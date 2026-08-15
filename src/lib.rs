@@ -29,7 +29,6 @@ pub mod kernel;
 pub mod klib;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod performance;
 pub mod productivity;
@@ -43,7 +42,6 @@ pub mod virtualization;
 pub mod tracing;
 pub mod crash;
 pub mod media;
-pub mod graphics;
 pub mod gpu;
 
 pub use accessibility::{
