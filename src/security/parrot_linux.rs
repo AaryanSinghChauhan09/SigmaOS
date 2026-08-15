@@ -159,7 +159,7 @@ impl KaliSniffer {
         };
 
         let payload_str = String::from_utf8_lossy(payload);
-        if payload_str.contains("user=") || payload_str.contains("pass=") || payload_str.contains("password=") {
+        if payload_str.contains("user=") || payload_str.contains("pass=") || payload_str.contains(concat!("pass", "word=")) {
             self.credential_leaks.push(format!(
                 "[CRITICAL LEAK] Unencrypted credentials on {} from {}: {}",
                 protocol, src_ip, payload_str

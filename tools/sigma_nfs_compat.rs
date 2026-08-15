@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 //! SigmaOS NFS Compatibility
 //! Network File System (NFS client utilities)
 //! Zero external dependencies
