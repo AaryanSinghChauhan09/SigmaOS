@@ -81,24 +81,6 @@ pub struct Package {
     pub checksum: String,
 }
 
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
-
 /// Package dependency
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
