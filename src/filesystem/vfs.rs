@@ -52,13 +52,7 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    // Conforming Linux/BSD additions
-    pub link_count: u32,
-    pub hard_links_count: u32,
-    pub symlink_target: Option<String>,
-    pub xattrs: HashMap<String, Vec<u8>>,
-    pub data: Vec<u8>,                 // File storage data
-    pub entries: HashMap<String, u64>, // Directory entries
+    pub link_count: u32, // standard inode link count tracking hard links
 }
 
 impl Inode {
@@ -73,12 +67,7 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            link_count: 1,
-            hard_links_count: 1,
-            symlink_target: None,
-            xattrs: HashMap::new(),
-            data: Vec::new(),
-            entries: HashMap::new(),
+            link_count: 1, // default link count of 1
         }
     }
 }
@@ -258,30 +247,13 @@ impl VirtualFilesystem {
         Ok(bytes_written)
     }
 
-    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn read_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &mut [u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
-        if !token.has_permission(Permission::FileRead) {
-            return Err(FsError::PermissionDenied);
+    pub fn create_hard_link(&mut self, source_inode_id: u64) -> Result<(), FsError> {
+        if let Some(inode) = self.inodes.get_mut(&source_inode_id) {
+            inode.link_count += 1;
+            Ok(())
+        } else {
+            Err(FsError::NotFound)
         }
-        self.read_file(fd, buffer)
-    }
-
-    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn write_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &[u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
-        if !token.has_permission(Permission::FileWrite) {
-            return Err(FsError::PermissionDenied);
-        }
-        self.write_file(fd, buffer)
     }
 
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {

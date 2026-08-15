@@ -2,7 +2,21 @@
 pub mod chimera_linux;
 pub mod constellation_mesh;
 pub mod cross_platform;
-pub mod cross_platform_kernel;
+pub mod zorin;
+pub mod antix;
+
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine,
+    ZorinConnectState, ZorinConnectManager,
+    ZorinWindowsAppSupport,
+};
+
+pub use antix::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
+};
 pub mod historic_linux;
 pub mod india_stack_localization;
 pub mod legacy_adapters;

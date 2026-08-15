@@ -1,21 +1,9 @@
 // SigmaOS Security Subsystem
 pub mod capability;
-pub mod hardening;
-pub mod pledge;
-pub mod unveil;
-pub mod selinux;
-pub mod vulnerability;
-pub mod hardening;
-pub mod deobfuscation;
-pub mod kali_stack;
+pub mod pqc_enclave;
 
-pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
-};
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+pub use pqc_enclave::{
+    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
 };
 pub mod capability_enforcer;
 pub mod capability_token;

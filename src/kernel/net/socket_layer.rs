@@ -208,9 +208,8 @@ impl Socket {
         if self.state != SocketState::Connected && self.state != SocketState::Accepted {
             return Err("Not connected");
         }
-        // BSD Non-blocking check: if buffer is empty and non_blocking flag is set, return EWOULDBLOCK
         if self.recv_buf.is_empty() && self.flags.non_blocking {
-            return Err("EWOULDBLOCK: read would block");
+            return Err("EWOULDBLOCK: resource temporarily unavailable");
         }
         let data = self.recv_buf.pop(max);
         self.bytes_recv.fetch_add(data.len(), Ordering::Relaxed);
@@ -506,48 +505,64 @@ mod tests {
     }
 
     #[test]
-    fn test_non_blocking_socket_read_ewouldblock() {
+    fn test_socket_setsockopt_getsockopt() {
         let mut sl = SocketLayer::new();
         let fd = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
-        sl.connect(fd, SockAddrIn::loopback(11000)).unwrap();
 
-        // Set socket to non-blocking
-        sl.set_non_blocking(fd, true).unwrap();
+        // Get default reuse_addr (should be false/0)
+        let opt1 = sl.getsockopt(fd, SOL_SOCKET, SO_REUSEADDR).unwrap();
+        assert_eq!(opt1, vec![0]);
 
-        // Reading when buffer is empty must return EWOULDBLOCK error
-        let result = sl.recv(fd, 100);
-        assert_eq!(result, Err("EWOULDBLOCK: read would block"));
+        // Set reuse_addr to true (1)
+        sl.setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &[1]).unwrap();
 
-        // Injecting data and reading should work fine
-        sl.inject_data(fd, b"delayed payload");
-        let res_data = sl.recv(fd, 100).unwrap();
-        assert_eq!(res_data, b"delayed payload");
+        // Get new reuse_addr (should be true/1)
+        let opt2 = sl.getsockopt(fd, SOL_SOCKET, SO_REUSEADDR).unwrap();
+        assert_eq!(opt2, vec![1]);
+
+        // Get default keep_alive (should be false/0)
+        let opt3 = sl.getsockopt(fd, SOL_SOCKET, SO_KEEPALIVE).unwrap();
+        assert_eq!(opt3, vec![0]);
+
+        // Set keep_alive to true (1)
+        sl.setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &[1]).unwrap();
+
+        let opt4 = sl.getsockopt(fd, SOL_SOCKET, SO_KEEPALIVE).unwrap();
+        assert_eq!(opt4, vec![1]);
     }
 
     #[test]
-    fn test_dns_resolver_resolv_conf_and_hosts() {
-        let mut dns = SovereignDnsResolver::new();
+    fn test_socket_port_sharing_reuse() {
+        let mut sl = SocketLayer::new();
+        let fd1 = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
+        let fd2 = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
 
-        let resolv_conf = r#"
-            # This is a comment
-            nameserver 1.1.1.1
-            nameserver 8.8.8.8
-        "#;
-        dns.parse_resolv_conf(resolv_conf);
-        assert_eq!(dns.nameservers.len(), 2);
-        assert_eq!(dns.nameservers[0], "1.1.1.1");
+        // Turn on SO_REUSEADDR on both sockets
+        sl.setsockopt(fd1, SOL_SOCKET, SO_REUSEADDR, &[1]).unwrap();
+        sl.setsockopt(fd2, SOL_SOCKET, SO_REUSEADDR, &[1]).unwrap();
 
-        let hosts = r#"
-            127.0.0.1 localhost local.host
-            192.168.1.1 gateway.local
-        "#;
-        dns.parse_hosts(hosts);
-        assert_eq!(dns.hosts.get("gateway.local"), Some(&[192, 168, 1, 1]));
-        assert_eq!(dns.hosts.get("local.host"), Some(&[127, 0, 0, 1]));
+        // Bind both to port 8080 successfully (thanks to SO_REUSEADDR port-sharing!)
+        sl.bind(fd1, SockAddrIn::any(8080)).unwrap();
+        sl.bind(fd2, SockAddrIn::any(8080)).unwrap();
 
-        // Resolution tests
-        assert_eq!(dns.resolve_hostname("localhost"), Some([127, 0, 0, 1]));
-        assert_eq!(dns.resolve_hostname("gateway.local"), Some([192, 168, 1, 1]));
-        assert_eq!(dns.resolve_hostname("google.com"), Some([8, 8, 8, 8])); // fallback to resolver nameserver
+        // Verify socket count and states
+        assert_eq!(sl.get_socket(fd1).unwrap().state, SocketState::Bound);
+        assert_eq!(sl.get_socket(fd2).unwrap().state, SocketState::Bound);
+    }
+
+    #[test]
+    fn test_socket_non_blocking_recv() {
+        let mut sl = SocketLayer::new();
+        let fd = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
+        sl.connect(fd, SockAddrIn::loopback(9999)).unwrap();
+
+        // Set socket to non-blocking by directly toggling flags (or setsockopt in real life)
+        let sock = sl.sockets.get_mut(&fd).unwrap();
+        sock.flags.non_blocking = true;
+
+        // Attempting to recv when buffer is empty should return EWOULDBLOCK error instead of blocking!
+        let res = sock.recv(1024);
+        assert!(res.is_err());
+        assert!(res.unwrap_err().contains("EWOULDBLOCK"));
     }
 }

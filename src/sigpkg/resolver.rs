@@ -73,29 +73,21 @@ impl Package {
 
 use std::collections::{HashMap, HashSet};
 
-/// elementaryOS-inspired strict reverse-domain and layout validator
+/// Debian-style APT Pinning Rule representing release and priority weighting
 #[derive(Debug, Clone)]
-pub struct DebianElementaryAppPackage {
-    pub app_id: String, // e.g. "io.elementary.calculator"
-    pub has_csd_decorations: bool,
-    pub prefers_dark_theme: bool,
+pub struct AptPinRule {
+    pub package_name_pattern: String,
+    pub release_target: String,
+    pub priority: i32,
 }
 
-impl DebianElementaryAppPackage {
-    pub fn new(app_id: &str, csd: bool, dark: bool) -> Self {
+impl AptPinRule {
+    pub fn new(pattern: &str, release: &str, priority: i32) -> Self {
         Self {
-            app_id: app_id.to_string(),
-            has_csd_decorations: csd,
-            prefers_dark_theme: dark,
+            package_name_pattern: pattern.to_string(),
+            release_target: release.to_string(),
+            priority,
         }
-    }
-
-    /// Validates reverse-domain naming and elementary design standards
-    pub fn is_elementary_compliant(&self) -> bool {
-        // App ID must be reverse domain starting with "io.elementary." or "org.sigmaos."
-        let valid_prefix =
-            self.app_id.starts_with("io.elementary.") || self.app_id.starts_with("org.sigmaos.");
-        valid_prefix && self.has_csd_decorations
     }
 }
 
@@ -247,6 +239,46 @@ impl SatSolver {
             VersionConstraint::LessOrEqual(v) => version <= v,
             VersionConstraint::Any => true,
         }
+    }
+
+    /// Resolves the optimal package version using Debian-style APT pinning priorities
+    pub fn resolve_with_pinning(
+        &self,
+        package_name: &str,
+        constraint: &VersionConstraint,
+        pin_rules: &[AptPinRule],
+    ) -> Result<Package, ResolveError> {
+        let candidates = self
+            .packages
+            .get(package_name)
+            .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
+
+        let mut best_candidate: Option<(&Package, i32)> = None;
+
+        for candidate in candidates {
+            if self.satisfies_constraint(&candidate.version, constraint) {
+                // Determine priority score based on pinning rules
+                let mut priority = 500; // Default Debian priority for installed packages
+                for rule in pin_rules {
+                    if rule.package_name_pattern == "*" || rule.package_name_pattern == package_name {
+                        // Priority is matched by release targets or patterns
+                        priority = rule.priority;
+                    }
+                }
+
+                if let Some((_, best_priority)) = best_candidate {
+                    if priority > best_priority {
+                        best_candidate = Some((candidate, priority));
+                    }
+                } else {
+                    best_candidate = Some((candidate, priority));
+                }
+            }
+        }
+
+        best_candidate
+            .map(|(p, _)| p.clone())
+            .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))
     }
 
     /// Detect circular dependencies

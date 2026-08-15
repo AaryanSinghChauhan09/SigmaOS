@@ -580,13 +580,8 @@ impl SimpleCompositor {
             window_order: Vec::new(),
             stats: CompositorStats::new(),
             capability,
-            back_buffer: Some(BitmapSurface::new(
-                9999,
-                1920,
-                1080,
-                SurfaceCapability::full(),
-            )),
-            double_buffering: AtomicBool::new(true),
+            back_buffer: None,
+            double_buffering: core::sync::atomic::AtomicBool::new(false),
         }
     }
 }

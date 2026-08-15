@@ -402,7 +402,7 @@ mod tests {
         let mut keyring = SimpleKeyring::new(cap);
         let secret_cap = SecretCapability::full();
         let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.store_secret(Box::new(secret)).unwrap();
+        let id = keyring.add_secret(Box::new(secret)).unwrap();
         assert_eq!(id, 1);
 
         let retrieved = keyring.get_secret(1).unwrap();

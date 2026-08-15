@@ -296,147 +296,47 @@ impl Default for LfsToolchainBuilder {
     }
 }
 
-/// os-tutorial: 16-bit real mode to 32-bit protected mode CPU transition simulator
-pub struct ProtectedModeSwitchSimulator {
-    pub cr0_pe_bit: bool, // Protection Enable (PE) bit of CR0
-    pub gdt_descriptor_loaded: bool,
-    pub active_cs_segment: u16, // Code segment register
-    pub active_ds_segment: u16, // Data segment register
+/// TinyCore-style RAM-only Ephemeral Execution Engine.
+/// Achieves minimal idle execution memory limits (below 30MB of RAM) through compressed read-only extensions (.tcz)
+/// mounted into a high-speed in-memory VFS overlay with copy-on-write persistence separation.
+pub struct TinyCoreEphemeralEngine {
+    pub mounted_extensions: std::collections::HashMap<String, usize>, // ext_name -> payload_size
+    pub volatile_overlay_ram_bytes: usize,
+    pub persistence_enabled: bool,
 }
 
-impl ProtectedModeSwitchSimulator {
+impl TinyCoreEphemeralEngine {
     pub fn new() -> Self {
-        Self {
-            cr0_pe_bit: false,
-            gdt_descriptor_loaded: false,
-            active_cs_segment: 0,
-            active_ds_segment: 0,
+        TinyCoreEphemeralEngine {
+            mounted_extensions: std::collections::HashMap::new(),
+            volatile_overlay_ram_bytes: 0,
+            persistence_enabled: false,
         }
     }
 
-    pub fn lgdt(&mut self) {
-        self.gdt_descriptor_loaded = true;
-    }
-
-    /// Toggles the CR0 PE bit, disables interrupts, and executes a far jump simulation
-    pub fn execute_switch_to_pm(&mut self) -> Result<(), &'static str> {
-        if !self.gdt_descriptor_loaded {
-            return Err("Cannot switch to Protected Mode: GDT descriptor not loaded");
+    pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
+        if ext_name.is_empty() || size_bytes == 0 {
+            return Err(HistoricError::MemoryAccessViolation);
         }
-        self.cr0_pe_bit = true;
-        // Far jump to code segment (offset 0x08)
-        self.active_cs_segment = 0x08;
-        self.active_ds_segment = 0x10; // Data segment descriptor (offset 0x10)
+        self.mounted_extensions.insert(ext_name.to_string(), size_bytes);
         Ok(())
     }
-}
 
-impl Default for ProtectedModeSwitchSimulator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// os-tutorial: VGA text mode screen driver simulator starting at 0xB8000
-pub struct VgaTextModeDriverSimulator {
-    pub buffer: [u16; 80 * 25], // 80 columns x 25 rows grid
-    pub cursor_offset: usize,
-}
-
-impl VgaTextModeDriverSimulator {
-    pub fn new() -> Self {
-        Self {
-            buffer: [0; 80 * 25],
-            cursor_offset: 0,
+    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
+        if self.persistence_enabled {
+            return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
         }
+        self.volatile_overlay_ram_bytes += data_len;
+        Ok(self.volatile_overlay_ram_bytes)
     }
 
-    /// Emulates writing a character with color attribute to 0xB8000 VGA memory
-    pub fn write_char(&mut self, ch: char, attribute: u8) {
-        if self.cursor_offset >= 80 * 25 {
-            self.scroll_one_line();
-        }
-        let code = (ch as u16) | ((attribute as u16) << 8);
-        self.buffer[self.cursor_offset] = code;
-        self.cursor_offset += 1;
-    }
-
-    /// Emulates direct VGA Port I/O cursor position updates (CRT controller ports 0x3D4 & 0x3D5)
-    pub fn update_cursor_via_ports(&mut self, port: u16, val: u8) -> Result<usize, &'static str> {
-        if port == 0x3D4 {
-            // Index Register
-            Ok(self.cursor_offset)
-        } else if port == 0x3D5 {
-            // Data Register (simplified update of cursor offset lower byte)
-            self.cursor_offset = (self.cursor_offset & 0xFF00) | (val as usize);
-            Ok(self.cursor_offset)
-        } else {
-            Err("Invalid CRT controller port access")
-        }
-    }
-
-    pub fn scroll_one_line(&mut self) {
-        // Shift rows up by 80 cells
-        for i in 80..(80 * 25) {
-            self.buffer[i - 80] = self.buffer[i];
-        }
-        // Zero out last row
-        for i in (80 * 24)..(80 * 25) {
-            self.buffer[i] = 0;
-        }
-        self.cursor_offset = 80 * 24;
+    pub fn reset_ephemeral_state(&mut self) {
+        // Drop volatile in-memory overlay structures completely on reset
+        self.volatile_overlay_ram_bytes = 0;
     }
 }
 
-impl Default for VgaTextModeDriverSimulator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// os-tutorial: Dual PIC (Programmable Interrupt Controllers) and scancode driver simulator
-pub struct PicKeyboardController {
-    pub master_pic_mask: u8,
-    pub slave_pic_mask: u8,
-    pub last_read_scancode: u8,
-}
-
-impl PicKeyboardController {
-    pub fn new() -> Self {
-        Self {
-            master_pic_mask: 0xFF,
-            slave_pic_mask: 0xFF,
-            last_read_scancode: 0,
-        }
-    }
-
-    /// Initialize dual PIC (out 0x20 / 0x21 and 0xA0 / 0xA1)
-    pub fn init_pic(&mut self) {
-        // Enable IRQ 1 (Keyboard) by unmasking master PIC line 1
-        self.master_pic_mask = 0xFD; // 0b11111101 (IRQ1 unmasked)
-        self.slave_pic_mask = 0xFF;
-    }
-
-    /// Simulates keyboard input by polling port 0x60 PS/2 data register
-    pub fn poll_port_60_read(&mut self, raw_scancode: u8) -> char {
-        self.last_read_scancode = raw_scancode;
-        // Basic Set 1 scancode to ASCII mappings
-        match raw_scancode {
-            0x02 => '1',
-            0x03 => '2',
-            0x04 => '3',
-            0x10 => 'q',
-            0x11 => 'w',
-            0x12 => 'e',
-            0x1E => 'a',
-            0x1F => 's',
-            0x20 => 'd',
-            _ => '?',
-        }
-    }
-}
-
-impl Default for PicKeyboardController {
+impl Default for TinyCoreEphemeralEngine {
     fn default() -> Self {
         Self::new()
     }

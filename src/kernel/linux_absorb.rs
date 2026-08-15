@@ -861,39 +861,14 @@ pub struct Plan9Server {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NinePMessage {
-    Tversion {
-        msize: u32,
-        version: String,
-    },
-    Rversion {
-        msize: u32,
-        version: String,
-    },
-    Tattach {
-        fid: u32,
-        afid: u32,
-        uname: String,
-        aname: String,
-    },
-    Rattach {
-        qid_path: u64,
-    },
-    Twalk {
-        fid: u32,
-        newfid: u32,
-        names: Vec<String>,
-    },
-    Rwalk {
-        qids: Vec<u64>,
-    },
-    Tread {
-        fid: u32,
-        offset: u64,
-        count: u32,
-    },
-    Rread {
-        data: Vec<u8>,
-    },
+    Tversion { msize: u32, version: String },
+    Rversion { msize: u32, version: String },
+    Tattach { fid: u32, afid: u32, uname: String, aname: String },
+    Rattach { qid_path: u64 },
+    Twalk { fid: u32, new_fid: u32, names: Vec<String> },
+    Rwalk { qids: Vec<u64> },
+    Tread { fid: u32, offset: u64, count: u32 },
+    Rread { data: Vec<u8> },
 }
 
 impl Plan9Server {
@@ -914,12 +889,7 @@ impl Plan9Server {
                     version: String::from("9P2000"),
                 })
             }
-            NinePMessage::Tattach {
-                fid,
-                afid,
-                uname,
-                aname,
-            } => {
+            NinePMessage::Tattach { fid, afid: _, uname: _, aname: _ } => {
                 if !self.active_fids.contains(&fid) {
                     self.active_fids.push(fid);
                 }

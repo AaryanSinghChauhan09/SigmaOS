@@ -1,7 +1,5 @@
-//! OOP-based UEFI Bootloader for SigmaOS
-//! Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
-
-#![no_std]
+/// OOP-based UEFI Bootloader for SigmaOS
+/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -9,15 +7,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BootStatus = usize;
 
-/// Standard UEFI Boot Phases
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootPhase {
-    Init = 0,
-    LoadKernel = 1,
-    Handoff = 2,
-    Complete = 3,
-}
+pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 
 impl BootPhase {
     pub fn from_usize(val: usize) -> Self {

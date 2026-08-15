@@ -3,13 +3,9 @@
 
 use std::io::{self, BufRead, Write};
 
-#[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
-
 impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
+    pub fn new() -> Self { AgentAutomationEngine }
 }
 
 /// Shell command type
@@ -67,41 +63,9 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Livepatch {
-        args: Vec<String>,
-    },
-    Cron {
-        args: Vec<String>,
-    },
-    Vm {
-        args: Vec<String>,
-    },
-    Research {
-        query: String,
-    },
-    Camera {
-        effect: String,
-    },
-    Grid {
-        args: Vec<String>,
-    },
-    Access {
-        args: Vec<String>,
-    },
-    Sysctl {
-        args: Vec<String>,
-    },
-    Patch {
-        args: Vec<String>,
-    },
-    Rescue {
-        args: Vec<String>,
-    },
-    Monitor {
-        args: Vec<String>,
-    },
-    Sandbox {
-        args: Vec<String>,
+    Alias {
+        shorthand: String,
+        statement: String,
     },
     Unknown(String),
 }
@@ -120,6 +84,7 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
+    pub command_history: Vec<String>,
 }
 
 impl ShellRepl {
@@ -142,6 +107,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -164,6 +130,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -190,8 +157,52 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
+    pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
+        let mut suggestions = Vec::new();
+        let commands = [
+            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
+            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+        ];
+        for cmd in &commands {
+            if cmd.starts_with(prefix) {
+                suggestions.push(cmd.to_string());
+            }
+        }
+        suggestions
+    }
+
+    pub fn history_suggest_fish(&self, partial: &str) -> Option<String> {
+        if partial.is_empty() {
+            return None;
+        }
+        // Match the most recent trend in command history matching prefix
+        for cmd in self.command_history.iter().rev() {
+            if cmd.starts_with(partial) {
+                return Some(cmd.clone());
+            }
+        }
+        None
+    }
+
     fn execute_line(&mut self, line: &str) {
-        let command = self.parse_command(line);
+        // Save command history (Fish style)
+        self.command_history.push(line.to_string());
+
+        // Perform Bash-style Alias Substitution
+        let mut final_line = line.to_string();
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if !parts.is_empty() {
+            if let Some(aliased) = self.aliases.get(parts[0]) {
+                let mut statement = aliased.clone();
+                if parts.len() > 1 {
+                    statement.push(' ');
+                    statement.push_str(&parts[1..].join(" "));
+                }
+                final_line = statement;
+            }
+        }
+
+        let command = self.parse_command(&final_line);
         let result = self.execute_command(command);
 
         match result {
@@ -358,53 +369,15 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "livepatch" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Livepatch { args }
-            }
-            "cron" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Cron { args }
-            }
-            "vm" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Vm { args }
-            }
-            "research" => {
-                let query = parts[1..].join(" ");
-                ShellCommand::Research { query }
-            }
-            "camera" => {
-                let effect = parts[1..].join(" ");
-                ShellCommand::Camera { effect }
-            }
-            "grid" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Grid { args }
-            }
-            "access" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Access { args }
-            }
-            "sysctl" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Sysctl { args }
-            }
-            "patch" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Patch { args }
-            }
-            "rescue" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Rescue { args }
-            }
-            "monitor" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Monitor { args }
-            }
-            "sandbox" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Sandbox { args }
+            "alias" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Alias {
+                        shorthand: parts[1].to_string(),
+                        statement: parts[2..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }
@@ -714,6 +687,10 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
+            ShellCommand::Alias { shorthand, statement } => {
+                self.aliases.insert(shorthand.clone(), statement.clone());
+                Ok(format!("Alias defined: {} -> {}", shorthand, statement))
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -758,6 +735,43 @@ mod tests {
         };
         let result = repl.execute_command(command);
         assert_eq!(result.unwrap(), "test");
+    }
+
+    #[test]
+    fn test_bash_alias_substitution() {
+        let mut repl = ShellRepl::new();
+        let alias_cmd = ShellCommand::Alias {
+            shorthand: "ll".to_string(),
+            statement: "ls -la".to_string(),
+        };
+        repl.execute_command(alias_cmd).unwrap();
+        assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
+
+        // Execute line with alias substitution
+        repl.execute_line("ll");
+        assert_eq!(repl.command_history[0], "ll");
+    }
+
+    #[test]
+    fn test_zsh_tab_completion() {
+        let repl = ShellRepl::new();
+        let suggestions = repl.complete_tab("cl");
+        assert_eq!(suggestions, vec!["clear".to_string()]);
+
+        let suggestions_all = repl.complete_tab("pwd");
+        assert_eq!(suggestions_all, vec!["pwd".to_string()]);
+    }
+
+    #[test]
+    fn test_fish_history_suggestions() {
+        let mut repl = ShellRepl::new();
+        repl.execute_line("clear");
+        repl.execute_line("systemctl list");
+
+        let suggestion = repl.history_suggest_fish("sys").unwrap();
+        assert_eq!(suggestion, "systemctl list");
+
+        assert!(repl.history_suggest_fish("invalid").is_none());
     }
 
     #[test]
