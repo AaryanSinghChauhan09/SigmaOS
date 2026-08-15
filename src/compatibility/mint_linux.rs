@@ -3,15 +3,11 @@
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+#![no_std]
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::Vec;
-
-#[cfg(feature = "standalone_test")]
 extern crate alloc;
-#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintUpdateLevel {
@@ -206,7 +202,9 @@ impl MintAppMetadata {
         for rev in self.reviews.iter() {
             sum += rev.stars;
         }
-        self.rating_stars = sum / self.reviews_count;
+        if self.reviews_count > 0 {
+            self.rating_stars = sum / self.reviews_count;
+        }
     }
 }
 
@@ -253,7 +251,6 @@ impl MintSoftwareManager {
     /// Returns apps ranked by user ratings (Featured Apps).
     pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
         let mut sorted = self.apps_catalog.clone();
-        // Simple bubble sort over vector to rank featured apps without external traits
         for i in 0..sorted.len() {
             for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
                 if sorted[j].rating_stars < sorted[j + 1].rating_stars {
@@ -262,6 +259,52 @@ impl MintSoftwareManager {
             }
         }
         sorted
+    }
+}
+
+// Cinnamon Desktop Theme Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CinnamonDesklet {
+    pub id: u32,
+    pub x: usize,
+    pub y: usize,
+}
+
+pub struct CinnamonThemeEngine {
+    pub active_gtk_theme: [u8; 32],
+    pub desklets: Vec<Option<CinnamonDesklet>>,
+    pub is_panel_enabled: bool,
+}
+
+impl CinnamonThemeEngine {
+    pub fn new() -> Self {
+        let mut theme = [0u8; 32];
+        let default_name = b"Mint-Y-Dark";
+        theme[..default_name.len()].copy_from_slice(default_name);
+        Self {
+            active_gtk_theme: theme,
+            desklets: Vec::new(),
+            is_panel_enabled: true,
+        }
+    }
+
+    pub fn set_gtk_theme(&mut self, theme_name: &[u8]) {
+        let mut theme = [0u8; 32];
+        let len = theme_name.len().min(31);
+        theme[..len].copy_from_slice(&theme_name[..len]);
+        self.active_gtk_theme = theme;
+    }
+
+    pub fn add_desklet(&mut self, id: u32, x: usize, y: usize) {
+        self.desklets.push(Some(CinnamonDesklet { id, x, y }));
+    }
+}
+
+impl Default for CinnamonThemeEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
