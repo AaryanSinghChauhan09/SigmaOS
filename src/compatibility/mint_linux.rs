@@ -231,6 +231,39 @@ impl MintSoftwareManager {
     pub fn add_app_to_catalog(&mut self, app: MintAppMetadata) {
         self.apps_catalog.push(app);
     }
+
+    /// Filters catalog by category.
+    pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
+        let mut filtered = Vec::new();
+        let cat_len = category.len().min(15);
+        for app in self.apps_catalog.iter() {
+            let mut matches = true;
+            for i in 0..cat_len {
+                if app.category[i] != category[i] {
+                    matches = false;
+                    break;
+                }
+            }
+            if matches {
+                filtered.push(app.clone());
+            }
+        }
+        filtered
+    }
+
+    /// Returns apps ranked by user ratings (Featured Apps).
+    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
+        let mut sorted = self.apps_catalog.clone();
+        // Simple bubble sort over vector to rank featured apps without external traits
+        for i in 0..sorted.len() {
+            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
+                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
+                    sorted.swap(j, j + 1);
+                }
+            }
+        }
+        sorted
+    }
 }
 
 /// MintReport: Detects system crashes, memory warnings, and provides direct advice remedies
