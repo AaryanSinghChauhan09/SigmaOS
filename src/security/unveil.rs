@@ -187,6 +187,19 @@ mod tests {
     }
 
     #[test]
+    fn test_unveil_at_landlock_inheritance() {
+        let mut manager = UnveilManager::new();
+        manager.unveil_at("/etc", "nginx", "r").unwrap();
+
+        assert!(manager
+            .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Read)
+            .is_ok());
+        assert!(manager
+            .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Write)
+            .is_err());
+    }
+
+    #[test]
     fn test_unveil_lock() {
         let mut manager = UnveilManager::new();
         manager.unveil("/tmp", "rw").unwrap();

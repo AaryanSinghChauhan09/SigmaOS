@@ -18,7 +18,11 @@ pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
 };
 
-pub use agent::{AIAgent, SimpleAIAgent};
+pub use agent::{AIAgent, SimpleAIAgent, BoltAgent, PaletteAgent, SentinelAgent};
+pub use orchestrator::{
+    AgentOrchestrator, AgentState, SimpleAgentOrchestrator, LocalLlmOrchestrator,
+    PrivacyRouter, DefaultDenyNetworkPolicy, OpenShellAgentSandbox, TaskKind,
+};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,

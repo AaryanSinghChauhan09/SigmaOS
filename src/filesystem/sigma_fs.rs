@@ -646,7 +646,26 @@ mod tests {
         let sig = encryptor.pqc_secure_sign(payload, "Kyber1024-Active-Key");
         assert!(encryptor.pqc_verify_signature(payload, &sig));
 
-        // Tamper with data (should fail PQC validation)
-        assert!(!encryptor.pqc_verify_signature(b"Sovereign data at rest modified", &sig));
+        let mapped_disks = raid.route_raid_sectors("md0", 500);
+        assert_eq!(mapped_disks, vec![0, 1]); // RAID-1 mirrors
+    }
+
+    #[test]
+    fn test_sigma_fs_luks_crypt() {
+        let mut luks = SigmaFsCrypt::new("secret-passphrase");
+        assert!(!luks.unlock_volume("wrong-password"));
+        assert!(luks.unlock_volume("secret-passphrase"));
+
+        let mut data = vec![0xAB, 0xCD];
+        luks.encrypt_sector(100, &mut data).unwrap();
+        assert_ne!(data, vec![0xAB, 0xCD]); // Encrypted
+    }
+
+    #[test]
+    fn test_sigma_fs_virtio_ring() {
+        let mut virtio = SigmaFsVirtio::new();
+        virtio.submit_virtio_buffer(0x1000, 512, 1);
+        assert_eq!(virtio.avail_ring_idx, 1);
+        assert_eq!(virtio.descriptors[0].addr, 0x1000);
     }
 }

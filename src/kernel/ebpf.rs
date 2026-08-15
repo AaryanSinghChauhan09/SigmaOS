@@ -344,6 +344,21 @@ mod tests {
     }
 
     #[test]
+    fn test_bpf_verifier() {
+        let verifier = BpfVerifier;
+        let valid_prog = [
+            BpfInstruction { opcode: 0xb7, dst_reg: 0, src_reg: 0, offset: 0, imm: 10 },
+            BpfInstruction { opcode: 0x95, dst_reg: 0, src_reg: 0, offset: 0, imm: 0 },
+        ];
+        assert!(verifier.verify_program(&valid_prog).is_ok());
+
+        let invalid_prog = [
+            BpfInstruction { opcode: 0xb7, dst_reg: 11, src_reg: 0, offset: 0, imm: 10 }, // Reg 11 out of bounds
+        ];
+        assert!(verifier.verify_program(&invalid_prog).is_err());
+    }
+
+    #[test]
     fn test_bpf_map_hash() {
         let map = BpfMap::new(BpfMapType::Hash, 4, 8, 100);
         

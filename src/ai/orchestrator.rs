@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// Local LLM Orchestrator for SigmaOS
 /// Dynamically schedules models, checks device bounds, and prunes context windows.
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -137,6 +134,97 @@ impl LocalLlmOrchestrator {
     }
 }
 
+/// Task Classification Kind for Multi-Agent Orchestration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskKind {
+    PerformanceOptimization,
+    UiUxTheme,
+    SecurityAudit,
+    GeneralInference,
+}
+
+/// OpenShell Privacy Router - Scans input prompt bytes and redacts confidential markers
+pub struct PrivacyRouter;
+
+impl PrivacyRouter {
+    pub fn scan_and_redact(prompt: &[u8]) -> (bool, [u8; 256]) {
+        let mut redacted = [0u8; 256];
+        let len = prompt.len().min(255);
+        redacted[..len].copy_from_slice(&prompt[..len]);
+
+        let mut contains_sensitive = false;
+
+        // Redact 16-digit credit card patterns
+        for i in 0..len.saturating_sub(15) {
+            let slice = &redacted[i..i + 16];
+            if slice.iter().all(|&b| b.is_ascii_digit()) {
+                contains_sensitive = true;
+                for b in &mut redacted[i..i + 16] {
+                    *b = b'*';
+                }
+            }
+        }
+
+        (contains_sensitive, redacted)
+    }
+}
+
+/// OpenShell Default Deny Network Policy
+pub struct DefaultDenyNetworkPolicy {
+    pub allow_outbound_internet: bool,
+    pub whitelisted_endpoints: [[u8; 32]; 4],
+}
+
+impl DefaultDenyNetworkPolicy {
+    pub fn new() -> Self {
+        Self {
+            allow_outbound_internet: false, // Default Deny
+            whitelisted_endpoints: [[0u8; 32]; 4],
+        }
+    }
+
+    pub fn validate_egress(&self, endpoint: &[u8]) -> bool {
+        if self.allow_outbound_internet {
+            return true;
+        }
+
+        let mut end_arr = [0u8; 32];
+        let len = endpoint.len().min(31);
+        end_arr[..len].copy_from_slice(&endpoint[..len]);
+
+        for whitelisted in &self.whitelisted_endpoints {
+            if *whitelisted == end_arr && whitelisted[0] != 0 {
+                return true;
+            }
+        }
+
+        false // Denied by Default Deny policy
+    }
+}
+
+impl Default for DefaultDenyNetworkPolicy {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OpenShell Agent Sandbox - Filters commands against shell-escaping injection sequences
+pub struct OpenShellAgentSandbox;
+
+impl OpenShellAgentSandbox {
+    pub fn validate_command(command: &[u8]) -> bool {
+        // Block dangerous shell escape sequences
+        let prohibited: &[&[u8]] = &[b"sudo", b"chmod", b"rm -rf", b"eval", b"/dev/mem"];
+
+        for &bad in prohibited {
+            if command.windows(bad.len()).any(|w| w == bad) {
+                return false; // Command blocked
+            }
+        }
+        true
+    }
+}
+
 /// A sliding context window history pruner
 pub struct ContextWindowPruner {
     pub history: Vec<[u8; 128]>,
@@ -209,7 +297,7 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
@@ -299,6 +387,26 @@ mod tests {
             orchestrator.allocated_gpu_memory_mb.load(Ordering::SeqCst),
             0
         );
+    }
+
+    #[test]
+    fn test_privacy_router_redaction() {
+        let prompt = b"User payload with card 1234567812345678 here";
+        let (found, redacted) = PrivacyRouter::scan_and_redact(prompt);
+        assert!(found);
+        assert!(redacted.windows(16).any(|w| w == b"****************"));
+    }
+
+    #[test]
+    fn test_default_deny_network_policy() {
+        let policy = DefaultDenyNetworkPolicy::new();
+        assert!(!policy.validate_egress(b"https://external-api.com"));
+    }
+
+    #[test]
+    fn test_openshell_agent_sandbox() {
+        assert!(!OpenShellAgentSandbox::validate_command(b"sudo rm -rf /"));
+        assert!(OpenShellAgentSandbox::validate_command(b"ls -la /tmp"));
     }
 
     #[test]

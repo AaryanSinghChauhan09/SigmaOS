@@ -32,7 +32,9 @@ pub struct SigmaMediaEngine {
     pub channels: [AudioChannel; MAX_AUDIO_CHANNELS],
     pub master_mute: AtomicBool,
     pub state: PlaybackState,
-    pub has_track: bool,
+    pub active_track: Option<String>,
+    pub format: Option<MediaFormat>,
+    pub duration_seconds: usize,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -60,7 +62,9 @@ impl SigmaMediaEngine {
             ],
             master_mute: AtomicBool::new(false),
             state: PlaybackState::Stopped,
-            has_track: false,
+            active_track: None,
+            format: None,
+            duration_seconds: 0,
         }
     }
 

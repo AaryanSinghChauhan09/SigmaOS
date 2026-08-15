@@ -4,7 +4,6 @@ use core::ptr::NonNull;
 // SigmaOS Core Kernel Structures and Advanced Algorithms Subsystem
 // Conforms to zero-dependency, #![no_std] compliant OOP structures
 
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
@@ -361,6 +360,9 @@ mod tests {
         assert_eq!(pop2, Some((100, 1)));
     fn test_circular_doubly_linked_list_sentinel() {
         let mut list = CircularDoublyLinkedList::<i32>::new();
+        assert!(list.is_empty());
+        assert_eq!(list.len(), 0);
+
         list.push_tail(1000);
         list.push_tail(2000);
         list.push_tail(3000);
