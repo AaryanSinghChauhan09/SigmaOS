@@ -112,6 +112,16 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
+        self
+    }
+
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
+        self
+    }
+
     pub fn validate(&self) -> Result<(), RecipeError> {
         if self.name.is_empty() {
             return Err(RecipeError::InvalidName);

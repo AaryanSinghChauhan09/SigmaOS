@@ -159,7 +159,7 @@ impl KaliSniffer {
         };
 
         let payload_str = String::from_utf8_lossy(payload);
-        if payload_str.contains("user=") || payload_str.contains("pass=") || payload_str.contains(concat!("pass", "word=")) {
+        if payload_str.contains("user=") || payload_str.contains("pass=") || payload_str.contains("password=") {
             self.credential_leaks.push(format!(
                 "[CRITICAL LEAK] Unencrypted credentials on {} from {}: {}",
                 protocol, src_ip, payload_str
@@ -183,7 +183,7 @@ impl PentestAssistant {
         Self {
             weak_password_dictionary: alloc::vec![
                 "123456".to_string(),
-                concat!("pass", "word").to_string(),
+                "password".to_string(),
                 "admin".to_string(),
                 "root".to_string(),
             ],

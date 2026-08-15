@@ -9,9 +9,9 @@ pub mod peripheral;
 pub mod storage;
 pub mod vesa;
 pub mod more_devices;
+pub mod even_more_devices;
 
 // Temporarily disabled problematic modules
-// pub mod even_more_devices;
 // pub mod kernel_releases;
 // pub mod legacy_floppy;
 // pub mod modern_usb;
@@ -43,4 +43,9 @@ pub use more_devices::{
     FloppyDiskDriver, SoundBlaster16Driver, GameportJoystickDriver, IdeControllerDriver,
     ParallelPrinterDriver, CgaGraphicsDriver, PcieGen5NvmeDriver, Thunderbolt4Controller,
     Wifi7Adapter, IntelXeGpuDriver, CxlMemoryDriver, AppleSiliconUnifiedMemoryBus,
+};
+pub use even_more_devices::{
+    AdLibSynthDriver, PciIdeBridge, Ps2MouseDriver, VgaTextModeDriver, SerialMouseDriver,
+    Ne2000NetworkDriver, Usb4HostController, NvlinkBusDriver, Bluetooth5_4_Adapter,
+    PcieGen6Bridge, Sata3Controller, Ufs4FlashMemoryDriver,
 };
