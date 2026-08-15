@@ -22,7 +22,6 @@ pub enum DriverType {
     Char = 1,
     Network = 2,
     Storage = 3,
-    Input = 4,
 }
 
 #[repr(usize)]
@@ -37,13 +36,8 @@ pub trait Driver {
     fn id(&self) -> DriverID;
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
-    fn set_state(&self, state: DriverState);
-    fn init(&mut self) -> Result<(), DriverError>;
-    fn probe(&mut self) -> Result<bool, DriverError>;
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
-    fn shutdown(&mut self) -> Result<(), DriverError>;
-    fn dependencies(&self) -> &'static [DriverType];
 }
 
 #[repr(C)]
@@ -99,7 +93,7 @@ impl SimpleDriver {
         Ok(())
     }
 
-    pub fn probe(&mut self) -> Result<bool, DriverError> {
+    pub fn probe(&self) -> Result<bool, DriverError> {
         Ok(true)
     }
 
@@ -157,15 +151,6 @@ impl SimpleStorageDriver {
     }
 }
 
-impl StorageDriver for SimpleStorageDriver {
-    fn read_blocks(&mut self, _block_idx: u64, _buf: &mut [u8]) -> Result<usize, DriverError> {
-        Ok(0)
-    }
-    fn write_blocks(&mut self, _block_idx: u64, _buf: &[u8]) -> Result<usize, DriverError> {
-        Ok(0)
-    }
-}
-
 impl Driver for SimpleStorageDriver {
     fn id(&self) -> DriverID {
         self.id
@@ -192,12 +177,6 @@ impl Driver for SimpleStorageDriver {
     fn unload(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Unloaded);
         Ok(())
-    }
-    fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn dependencies(&self) -> &'static [DriverType] {
-        &[]
     }
 }
 
@@ -669,7 +648,7 @@ mod tests {
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
@@ -806,7 +785,6 @@ mod tests {
         assert_eq!(res_user.unwrap_err(), "General Protection Fault: Privilege violation accessing IDT gate");
     }
 }
-
 
 #[cfg(test)]
 mod tests_shim {

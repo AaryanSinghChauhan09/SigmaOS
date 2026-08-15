@@ -1,11 +1,25 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::boxed::Box;
+use alloc::format;
+use alloc::string::ToString;
+
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
 /// Implements command parsing, execution, and built-in commands
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+extern "C" {
+    #[link_name = "alloc"]
+    fn sys_alloc(size: usize) -> *mut u8;
+    #[link_name = "free"]
+    fn sys_free(ptr: *mut u8);
+}
 
 pub type CommandID = usize;
 
@@ -371,7 +385,10 @@ impl ShellCommand for SigmaFindCommand {
         }
 
         // Simulate fd color/style matching
-        let matches: &[&[u8]] = &[b"src/package/universal.rs", b"tests/integration_test.rs"];
+        let matches: &[&[u8]] = &[
+            b"src/package/universal.rs",
+            b"tests/integration_test.rs",
+        ];
 
         for text in matches {
             for &b in *text {
@@ -742,28 +759,6 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8, size: usize) {
-    use std::alloc::{dealloc, Layout};
-    if !ptr.is_null() && size > 0 {
-        let layout = Layout::from_size_align(size, 8).unwrap();
-        dealloc(ptr, layout);
-    }
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8, size: usize);
-}
 
 #[cfg(test)]
 mod tests {

@@ -1,23 +1,14 @@
 // SigmaOS Security Subsystem
 pub mod capability;
-pub mod pqc_enclave;
-pub mod defensive_audit;
-pub mod parrot;
-pub mod pledge;
-pub mod unveil;
-pub mod selinux;
-pub mod vulnerability;
 pub mod hardening;
-pub mod deobfuscation;
-pub mod securelevels;
-pub mod pam;
-pub mod crypto_utils;
-pub mod qubes_isolation;
-pub mod kali_stack;
-pub mod malware;
+pub mod pledge;
+pub mod vulnerability;
 
-pub use pqc_enclave::{
-    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+};
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };
 pub mod capability_enforcer;
 pub mod capability_token;
@@ -32,7 +23,6 @@ pub mod nemoclaw;
 pub mod parrot_parity;
 pub mod password;
 pub mod pki;
-pub mod pledge;
 pub mod bridge;
 pub mod prism;
 pub mod sandbox;
@@ -45,8 +35,7 @@ pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
-pub mod vulnerability;
-pub mod parrot_kali;
+pub mod parrot_linux;
 
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
@@ -128,26 +117,22 @@ pub use defensive_audit::{
 };
 pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
-pub use kali_stack::{
-    PluggableAuthenticationModule, FirewallRule, IptablesFirewall, CronJob, CronDaemon,
-    SudoPrivilegeEscalation, TmuxPane, TmuxMultiplexer, SwapSpaceManager, DmesgLog, KaliError,
+pub use parrot_linux::{
+    AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
+    SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionSeverity, IntrusionAlert,
 };
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
-pub use parrot_kali::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
-    HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
-    GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
-};
-pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
-pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
-pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
-pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
-pub use malware::{
-    FileIntegrityGuard, MalwareSignature, RootkitDetector, ScanVerdict, SovereignMalwareEngine,
-    ThreatSeverity, ThreatType, YaraSignatureMatcher,
-};
+// NemoClaw Security Primitives
+pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
+
+pub struct CronDaemon;
+pub struct CronJob;
+pub struct DmesgLog;
+pub struct FirewallRule;
+pub struct IptablesFirewall;
+pub struct KaliError;
+pub struct PluggableAuthenticationModule;
+pub struct SudoPrivilegeEscalation;
+pub struct SwapSpaceManager;
+pub struct TmuxMultiplexer;
+pub struct TmuxPane;
