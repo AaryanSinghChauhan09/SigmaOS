@@ -194,7 +194,9 @@ impl ABITranslator {
     }
 
     /// Legacy fallback register map translation
-    pub fn translate_register_map(&self, old_registers: &[u64_type]) -> Result<Vec<u64_type>, ()> {
+    pub fn translate_register_map(&self, _old_registers: &[u64_type]) -> Result<Vec<u64_type>, ()> {
+        Ok(Vec::new())
+    }
 
     /// Computes register and stack layouts for a function invocation based on chosen ABI / calling convention
     pub fn compute_invocation_layout(

@@ -174,29 +174,26 @@ impl SimplePageTable {
 }
 
 impl PageTable for SimplePageTable {
-    /// # Safety
-    /// This function accesses a `static mut DUMMY` entry when `index >= 512`.
-    /// The DUMMY entry is only used as a safe fallback and is never modified through this shared reference.
     fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry {
         if index < 512 {
             &self.entries[index]
         } else {
-            static mut DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
-            #[allow(static_mut_refs)]
-            unsafe { &mut DUMMY }
+            // Return a reference to a dummy entry for out-of-bounds access
+            // Use a const dummy instead of static mut to avoid safety issues
+            const DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
+            &DUMMY
         }
     }
-    /// # Safety
-    /// This function accesses a `static mut DUMMY` entry when `index >= 512`.
-    /// The DUMMY entry acts as a discard sink for out-of-bounds writes; callers must
-    /// ensure no concurrent mutable access to this function occurs.
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry {
         if index < 512 {
             &mut self.entries[index]
         } else {
-            static mut DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
-            #[allow(static_mut_refs)]
-            unsafe { &mut DUMMY }
+            // For out-of-bounds writes, we need a mutable dummy
+            // Since we can't have static mut, we'll extend the entries vector
+            while self.entries.len() <= index {
+                self.entries.push(SimplePageTableEntry::new());
+            }
+            &mut self.entries[index]
         }
     }
     fn set_entry(&mut self, index: usize, entry: SimplePageTableEntry) {

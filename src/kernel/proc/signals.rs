@@ -42,12 +42,26 @@ pub enum Signal {
     SIGTERM = 15,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum SignalHandler {
     Default,
     Ignore,
     Custom(extern "C" fn(u32)),
 }
+
+impl PartialEq for SignalHandler {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (SignalHandler::Default, SignalHandler::Default) => true,
+            (SignalHandler::Ignore, SignalHandler::Ignore) => true,
+            // Don't compare function pointers - they're not reliable for equality
+            (SignalHandler::Custom(_), SignalHandler::Custom(_)) => false,
+            _ => false,
+        }
+    }
+}
+
+impl Eq for SignalHandler {}
 
 pub struct SignalManager {
     pending_signals: BTreeMap<u64, Vec<Signal>>,

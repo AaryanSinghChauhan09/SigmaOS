@@ -277,7 +277,7 @@ impl BpfMap {
     }
 
     /// Simple hash map update
-    pub fn update(&self, key: &[u8], value: &[u8]) -> Result<(), BpfError> {
+    pub fn update(&self, _key: &[u8], value: &[u8]) -> Result<(), BpfError> {
         if value.len() != self.value_size as usize {
             return Err(BpfError::InvalidMemoryAccess);
         }
