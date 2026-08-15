@@ -1,7 +1,5 @@
 // SigmaOS Distro/Ecosystem Maturity Module
-pub mod arch_parity;
 pub mod certification;
-pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
 pub mod developer;
@@ -28,9 +26,7 @@ pub use linux_bsd_inspirations::{
     OpenBSDUnveil, NetBsdRumpRouter, RumpDriver, DriverContext,
     GentooUseFlagsManager,
 };
-pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
-pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
     ManjaroKernelRelease, ManjaroKernelSwitcher,

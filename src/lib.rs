@@ -27,6 +27,7 @@ pub mod config;
 pub mod container;
 pub mod customization;
 pub mod dashboard;
+pub mod desktop;
 pub mod distro;
 pub mod edge;
 pub mod filesystem;
@@ -216,6 +217,15 @@ pub use distro::{
     DebianDpkgDbSimulator, DpkgPackageStatus, DpkgPackageRecord,
     AlpineApkOverlayEngine, ApkOverlayFile,
     SystemdCgroupGovernor, CgroupV2Limits, CgroupV2Accounting,
+};
+pub use desktop::{
+    GraniteUiToolkit, ToastNotification, AccentColor,
+    SwitchboardSettingsHub, SwitchboardPlug, SwitchboardCategory,
+    ContractorService, ContractorAction,
+    ScreenTimeParentalGovernor, TimeQuota,
+    GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
+    PlankDockItem, SlingshotLauncher, SlingshotApp, SlingshotCategory, AppCenter,
+    AppCenterProduct, PantheonGreeter,
 };
 pub use security::hardening;
 pub use shell::{ShellCommand, ShellRepl};

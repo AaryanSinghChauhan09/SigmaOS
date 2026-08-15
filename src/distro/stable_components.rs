@@ -2,8 +2,6 @@
 // SigmaOS Stable Linux Distro Parity Subsystem
 // Inspired by RHEL/Rocky/AlmaLinux, Debian dpkg, Alpine lbu/apk, and Enterprise systemd cgroupv2
 
-#![cfg_attr(target_os = "none", no_std)]
-
 #[cfg(not(target_os = "none"))]
 use std::vec::Vec;
 
