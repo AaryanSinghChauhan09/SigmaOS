@@ -498,12 +498,14 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
-        let mut resolved = Vec::new();
-        let mut to_visit = vec![package_name.to_string()];
-        let mut visited: std::collections::HashSet<String> = std::collections::HashSet::new();
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
+        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+        to_visit.push(package_name.to_string());
+        let mut visited = std::collections::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
+            let current: String = current;
             if visited.contains(&current) {
                 continue;
             }
@@ -512,6 +514,7 @@ impl DependencyResolver {
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
+                    let dep: &String = dep;
                     if !visited.contains(dep) {
                         to_visit.push(dep.clone());
                     }
@@ -651,8 +654,9 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys: Vec<String> = Vec::new();
+        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
         for key in installed.keys() {
+            let key: &String = key;
             keys.push(key.clone());
         }
 
@@ -777,18 +781,19 @@ impl UniversalPackageManager {
 
         // Install packages
         for dep_name in dependencies {
-            let package: &UnifiedPackage = match self.packages.get(&dep_name) {
-                Some(p) => p,
-                None => continue,
-            };
-            // Find appropriate adapter
-            for format in &package.formats {
-                let adapter = match self.adapters.get(format) {
-                    Some(a) => a,
-                    None => continue,
-                };
-                adapter.install(package)?;
-                break;
+            if let Some(package) = self.packages.get(&dep_name) {
+                // Find appropriate adapter
+                for format in &package.formats {
+                    if let Some(adapter) = self.adapters.get(format) {
+                        let adapter: &PackageAdapter = adapter;
+                        adapter.install(package)?;
+                        break;
+                    }
+                }
+
+                let mut installed = package.clone();
+                installed.installed = true;
+                self.installed_packages.insert(dep_name.clone(), installed);
             }
 
             let mut installed = package.clone();

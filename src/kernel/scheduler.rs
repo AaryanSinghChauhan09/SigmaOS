@@ -127,8 +127,8 @@ impl Process {
             Priority::Idle => 1024,
             Priority::Low => 512,
             Priority::Normal => 256,
-            Priority::High => 128,
-            Priority::Realtime => 64,
+            Priority::High => 512,
+            Priority::Realtime => 1024,
         };
         
         // Nice value adjustment: higher nice = lower priority
@@ -164,6 +164,19 @@ impl Process {
         let adjusted_slice = base_slice + interactive_bonus;
         Duration::from_millis((adjusted_slice.as_millis() as f32 * thermal_factor) as u64)
     }
+
+    pub fn update_virtual_deadline_bore(&mut self, current_time: u64) {
+        let weight = match self.priority {
+            Priority::Idle => 64,
+            Priority::Low => 128,
+            Priority::Normal => 256,
+            Priority::High => 512,
+            Priority::Realtime => 1024,
+        };
+        // CachyOS-style BORE burst penalty: higher burst score means higher virtual deadline (less eligibility)
+        let bore_penalty = self.burst_score / 2;
+        self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
+    }
 }
 
 /// Enhanced EEVDF Scheduler with real-time features
@@ -195,6 +208,19 @@ impl Scheduler {
         process.update_virtual_deadline(self.current_time);
         process.last_switch_time = self.current_time;
         self.processes.push(process);
+    }
+
+    pub fn charge_process_burst(&mut self, pid: u64, burst_amount: u64) {
+        if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
+            process.burst_score = process.burst_score.saturating_add(burst_amount);
+            process.update_virtual_deadline_bore(self.current_time);
+        }
+    }
+
+    pub fn decay_process_bursts(&mut self) {
+        for process in &mut self.processes {
+            process.burst_score = process.burst_score.saturating_sub(1);
+        }
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
@@ -544,5 +570,40 @@ mod tests {
         assert_eq!(stats.total_processes, 3);
         assert_eq!(stats.realtime_processes, 1);
         assert_eq!(stats.interactive_processes, 1);
+    }
+
+    #[test]
+    fn test_bore_scheduling_prioritization() {
+        let mut scheduler = Scheduler::new();
+
+        // 1. Create a CPU-bound process and an interactive process with identical priorities
+        let p_cpu = Process::new(1, "cpu_bound".to_string(), Priority::Normal);
+        let p_interactive = Process::new(2, "interactive".to_string(), Priority::Normal);
+
+        // Add both to scheduler
+        scheduler.add_process(p_cpu);
+        scheduler.add_process(p_interactive);
+
+        // 2. Simulate CPU-bound process running for long bursts, accumulating high burst score
+        scheduler.charge_process_burst(1, 50); // charge 50 burst penalty to cpu_bound
+
+        // Assert that the CPU-bound process now has a significantly higher virtual deadline (penalized)
+        let proc_cpu = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        let proc_interactive = scheduler.processes.iter().find(|p| p.pid == 2).unwrap();
+        assert!(proc_cpu.virtual_deadline > proc_interactive.virtual_deadline);
+
+        // 3. Advancing scheduler time ticks and scheduling should pick the interactive process first
+        for _ in 0..10 {
+            scheduler.tick();
+        }
+
+        let chosen = scheduler.schedule().unwrap();
+        assert_eq!(chosen.pid, 2); // interactive should be scheduled first
+        assert_eq!(chosen.name, "interactive");
+
+        // 4. Test decay of burst scores
+        scheduler.decay_process_bursts();
+        let proc_cpu_decayed = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        assert_eq!(proc_cpu_decayed.burst_score, 49); // decayed by 1
     }
 }

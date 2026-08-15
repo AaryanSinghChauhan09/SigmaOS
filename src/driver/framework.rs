@@ -22,6 +22,7 @@ pub enum DriverType {
     Char = 1,
     Network = 2,
     Storage = 3,
+    Input = 4,
 }
 
 #[repr(usize)]
@@ -93,7 +94,7 @@ impl SimpleDriver {
         Ok(())
     }
 
-    pub fn probe(&self) -> Result<bool, DriverError> {
+    pub fn probe(&mut self) -> Result<bool, DriverError> {
         Ok(true)
     }
 
