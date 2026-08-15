@@ -118,29 +118,24 @@ impl SlabAllocator {
     }
 
     pub fn allocate(&mut self, size: usize) -> Option<(usize, usize)> {
-        // Find best fitting cache
-        let mut sorted_sizes = Vec::new();
-        for &k in self.caches.keys() {
-            sorted_sizes.push(k);
-        }
-
-        // simple sort
-        for i in 0..sorted_sizes.len() {
-            for j in (i+1)..sorted_sizes.len() {
-                if sorted_sizes[j] < sorted_sizes[i] {
-                    let tmp = sorted_sizes[i];
-                    sorted_sizes[i] = sorted_sizes[j];
-                    sorted_sizes[j] = tmp;
+        // Bolt ⚡ Optimization:
+        // Find the minimal cache_size >= size in a single O(N) pass without heap allocation.
+        // Previously allocated a temporary Vec and performed an O(N^2) bubble sort on every call.
+        let mut best_cache_size: Option<usize> = None;
+        for &cache_size in self.caches.keys() {
+            if cache_size >= size {
+                match best_cache_size {
+                    Some(best) if cache_size < best => best_cache_size = Some(cache_size),
+                    None => best_cache_size = Some(cache_size),
+                    _ => {}
                 }
             }
         }
 
-        for cache_size in sorted_sizes {
-            if cache_size >= size {
-                let cache = self.caches.get_mut(&cache_size)?;
-                let id = cache.allocate()?;
-                return Some((id, cache_size));
-            }
+        if let Some(cache_size) = best_cache_size {
+            let cache = self.caches.get_mut(&cache_size)?;
+            let id = cache.allocate()?;
+            return Some((id, cache_size));
         }
         None
     }
