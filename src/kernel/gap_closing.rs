@@ -435,7 +435,7 @@ impl X86RootkitAuditor {
         let mut hash = 0xcbf29ce484222325;
         for &b in buf {
             hash ^= b as u64;
-            hash = hash.wrapping_mul(1099511628211);
+            hash = hash.wrapping_mul(1099511628211_u64);
         }
         hash
     }
@@ -445,7 +445,7 @@ impl X86RootkitAuditor {
         for entry in &ssdt.service_table {
             hash ^= entry.syscall_id as u64;
             hash ^= entry.handler as usize as u64;
-            hash = hash.wrapping_mul(1099511628211);
+            hash = hash.wrapping_mul(1099511628211_u64);
         }
         hash
     }

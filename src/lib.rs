@@ -21,6 +21,7 @@ pub mod package;
 pub mod performance;
 pub mod productivity;
 pub mod resilience;
+pub mod resource;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -36,25 +37,32 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
-    AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, ApplicationBinary,
-    BinaryCompatMatrix, BinaryFormat, BrailleMatrix, BsdJailSandbox, BundleType, CloudOrchestrator,
-    CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError, CompatibilityLayer,
-    CompatibilityManager, CompatibilityMode, ContainerRuntime, ContinuityCoordinator, DesktopMode,
-    DesktopProfile, DesktopTheme, DiscontinuedFS, DistroReleaseChannel, DriverBridge,
-    EcosystemSnapshot, FSRevival, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
-    KapudanAssistant, KernelPersona, KernelPersonaVM, LanguageTranslationCatalog, LegacyBus,
-    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
-    MicroService, MicroServiceState, NetworkBridge, ReleaseGovernanceCouncil,
-    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, StorageBridge, SuiteRegistry,
-    SyscallAbi, TargetPlatform, TranslationLayer, TribeInstaller, TtsSynthesizer, UnifiedAppStore,
-    WorkloadOptimizer, WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI,
-    GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN,
-    GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
-    GLOBAL_WORKLOAD_OPTIMIZER,
+    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AnanicyManager,
+    AnacondaInstaller, AntixControlCenter, AntixDesktopProfiler, AntixInitManager, AppSuiteBundle,
+    AppSuiteType, ApplicationBinary, BinaryCompatMatrix, BinaryFormat, BodhiUpdateTriage,
+    BoreSchedulerGovernor, BrailleMatrix, BsdJailSandbox, BundleType, CachyInitramfs,
+    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError,
+    CompatibilityLayer, CompatibilityManager, CompatibilityMode, ContainerRuntime,
+    ContinuityCoordinator, DesktopMode, DesktopProfile, DesktopTheme, DiscontinuedFS,
+    DistroReleaseChannel, DnfPackageResolver, DriverBridge, EcosystemSnapshot, FSRevival,
+    FedoraAlu, FedoraAluFlags, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, KojiBuildServer, LanguageTranslationCatalog,
+    LegacyBus, LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
+    MicroService, MicroServiceState, MockChrootBuilder, NetworkBridge, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SeLinuxContext, SeLinuxEngine, SchedPolicy, SigmaChangeProposal,
+    SigmaChangeProcessEngine, SigmaContainer, SigmaNextChannel, SnapshotManager, StorageBridge,
+    SuiteRegistry, SyscallAbi, SystemdPresetConfigurator, TargetPlatform, TranslationLayer,
+    TribeInstaller, TtsSynthesizer, UnifiedAppStore, V4OptimizedPackageManager, WorkloadOptimizer,
+    WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use distro::{
+    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
+    PinRule, AptPinStore, OpenRCService,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
@@ -117,9 +125,11 @@ pub use resilience::{
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
 };
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
+    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
+    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
+    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
+    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use shell::{ShellCommand, ShellRepl};
