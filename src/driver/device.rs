@@ -348,6 +348,42 @@ mod tests {
         // Test translated ioctl call
         assert_eq!(dde_wrapper.ioctl(0xFF, 0).unwrap(), 1);
     }
+
+    #[test]
+    fn test_wdm_driver_lifecycle() {
+        let mut io_mgr = IoManager::new();
+
+        // 1. Emulate normal driver installation process
+        let driver_idx = io_mgr.normal_driver_installation_process(b"MySerialDriver", b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver").unwrap();
+        assert_eq!(io_mgr.active_drivers.len(), 1);
+
+        let driver = &mut io_mgr.active_drivers[driver_idx];
+        assert_eq!(&driver.driver_name[..14], b"MySerialDriver");
+        assert_eq!(&driver.registry_path[..66], b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver");
+
+        // Set DRIVERUNLOAD unload routine callback
+        driver.unload_routine = Some(|_drv| {});
+
+        // 2. Create Device associated with the Driver Object
+        assert!(io_mgr.io_create_device(driver_idx, b"COM1", DeviceType::Character).is_ok());
+
+        let driver_updated = &io_mgr.active_drivers[driver_idx];
+        assert_eq!(driver_updated.device_objects.len(), 1);
+        assert_eq!(&driver_updated.device_objects[0].name[..4], b"COM1");
+        assert_eq!(driver_updated.device_objects[0].device_type, DeviceType::Character);
+
+        // Configure HW Resource allocations inside Device Extension
+        let ext = &mut io_mgr.active_drivers[driver_idx].device_objects[0].device_extension;
+        ext.irq = 4;
+        ext.base_port = 0x3F8;
+        ext.device_context[0] = 0xFF; // Write custom driver context information
+
+        // 3. Unload Driver and perform driver-specific cleanup tasks
+        assert!(io_mgr.io_unload_driver(driver_idx).is_ok());
+
+        // Assert that all Device Objects and Extensions have been freed/deleted cleanly from the pool
+        assert_eq!(io_mgr.active_drivers[driver_idx].device_objects.len(), 0);
+    }
 }
 
 impl BlockDevice for SimpleBlockDevice {
@@ -792,6 +828,140 @@ unsafe fn free(ptr: *mut u8) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+/// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
+#[derive(Debug, Clone)]
+pub struct DeviceExtension {
+    pub irq: u8,
+    pub base_port: u16,
+    pub base_address: u32,
+    pub memory_size: usize,
+    pub device_context: [u8; 128], // Driver-specific context information buffer
+}
+
+impl DeviceExtension {
+    pub fn new() -> Self {
+        Self {
+            irq: 0,
+            base_port: 0,
+            base_address: 0,
+            memory_size: 0,
+            device_context: [0; 128],
+        }
+    }
+}
+
+/// Windows NT-style Device Object representing a logical, physical, or virtual device instance
+pub struct DeviceObject {
+    pub name: [u8; 64],
+    pub device_type: DeviceType,
+    pub device_extension: DeviceExtension,
+}
+
+impl DeviceObject {
+    pub fn new(name: &[u8], device_type: DeviceType) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+
+        Self {
+            name: name_array,
+            device_type,
+            device_extension: DeviceExtension::new(),
+        }
+    }
+}
+
+/// Windows NT-style Driver Object representing a loaded driver image
+pub struct DriverObject {
+    pub driver_name: [u8; 64],
+    pub registry_path: [u8; 128], // Registry path config lookup (e.g. \Registry\Machine\System\CurrentControlSet\Services\...)
+    pub device_objects: Vec<DeviceObject>,
+    pub unload_routine: Option<fn(&mut DriverObject)>, // Unload Routine (DRIVERUNLOAD)
+}
+
+impl DriverObject {
+    pub fn new(name: &[u8], reg_path: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+
+        let mut reg_array = [0u8; 128];
+        let reg_len = reg_path.len().min(127);
+        unsafe {
+            core::ptr::copy_nonoverlapping(reg_path.as_ptr(), reg_array.as_mut_ptr(), reg_len);
+        }
+
+        Self {
+            driver_name: name_array,
+            registry_path: reg_array,
+            device_objects: Vec::new(),
+            unload_routine: None,
+        }
+    }
+}
+
+/// Windows NT-style I/O Manager Subsystem coordinating driver lifecycles, creation, and unload tasks
+pub struct IoManager {
+    pub active_drivers: Vec<DriverObject>,
+}
+
+impl IoManager {
+    pub fn new() -> Self {
+        Self {
+            active_drivers: Vec::new(),
+        }
+    }
+
+    /// Emulate the normal driver installation process (creates a registered DriverObject)
+    pub fn normal_driver_installation_process(&mut self, driver_name: &[u8], registry_path: &[u8]) -> Result<usize, DeviceError> {
+        let driver = DriverObject::new(driver_name, registry_path);
+        self.active_drivers.push(driver);
+        Ok(self.active_drivers.len() - 1)
+    }
+
+    /// IoCreateDevice: Create a Device Object associated with the specific Driver Object
+    pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
+        if driver_idx >= self.active_drivers.len() {
+            return Err(DeviceError::InvalidParameter);
+        }
+
+        let device_obj = DeviceObject::new(name, device_type);
+        self.active_drivers[driver_idx].device_objects.push(device_obj);
+        Ok(())
+    }
+
+    /// IoUnloadDriver: Executes driver-specific cleanup tasks and calls the DRIVERUNLOAD unload routine
+    pub fn io_unload_driver(&mut self, driver_idx: usize) -> Result<(), DeviceError> {
+        if driver_idx >= self.active_drivers.len() {
+            return Err(DeviceError::InvalidParameter);
+        }
+
+        // Get mutable borrow of the driver object
+        let driver = &mut self.active_drivers[driver_idx];
+
+        // Execute the unload routine if registered (DRIVERUNLOAD)
+        if let Some(unload) = driver.unload_routine {
+            (unload)(driver);
+        }
+
+        // Perform Driver-Specific Cleanup Tasks: Delete/Free all associated Device Objects and Extensions
+        println!("I/O Manager: Executing driver-specific cleanup tasks for driver.");
+        driver.device_objects = Vec::new(); // Drop/Delete all Device Objects
+
+        Ok(())
+    }
+}
+
+impl Default for IoManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Unified representation of communication channels (OOP Abstraction)
