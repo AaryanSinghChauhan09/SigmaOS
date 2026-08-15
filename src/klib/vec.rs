@@ -1,32 +1,20 @@
 use core::mem;
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
 #[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
+unsafe fn free(ptr: *mut u8, size: usize) {
+    let _ = (ptr, size);
 }
 
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+    fn free(ptr: *mut u8, size: usize);
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    let _ = size;
+    core::ptr::null_mut()
 }
 
 pub struct Vec<T> {
@@ -65,14 +53,6 @@ impl<T> Vec<T> {
         self.len == 0
     }
 
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
-    }
-
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -83,12 +63,6 @@ impl<T> Vec<T> {
                 self.len += 1;
             }
         }
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
 
     pub fn pop(&mut self) -> Option<T> {
@@ -121,12 +95,14 @@ impl<T> Vec<T> {
         }
         false
     }
+
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
             vec: self,
             index: 0,
         }
     }
+
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
         VecIterMut {
             data: self.data,
@@ -135,6 +111,7 @@ impl<T> Vec<T> {
             _marker: core::marker::PhantomData,
         }
     }
+
     pub fn remove(&mut self, index: usize) -> T {
         if index >= self.len {
             panic!("index out of bounds");
@@ -204,7 +181,7 @@ impl<T> Default for Vec<T> {
 
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+    type IntoIter = VecIter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
@@ -237,7 +214,7 @@ impl<T> Drop for Vec<T> {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
-                free(self.data as *mut u8);
+                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
             }
         }
     }
@@ -256,3 +233,40 @@ impl<T: Clone> Clone for Vec<T> {
     }
 }
 
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
