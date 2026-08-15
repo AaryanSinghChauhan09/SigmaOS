@@ -1,11 +1,19 @@
-//! Desktop environment module for SigmaOS
-//! 
-//! Contains GUI components, window management, and desktop applications
-//! including the enhanced terminal with SerenityOS-style tabs.
+// SigmaOS Desktop Module
+pub mod zenith_compositor;
+pub mod moksha;
+pub mod pantheon;
 
-pub mod terminal;
+pub use pantheon::{
+    GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
+    PlankDockItem, SlingshotLauncher, SlingshotApp, SlingshotCategory, AppCenter,
+    AppCenterProduct, PantheonGreeter,
+};
 
-pub use terminal::{
-    Terminal, TerminalManager, TerminalTab, TabManager, TabColorScheme,
-    SplitDirection, TabSplitConfig, TabGroup, TabStats, TerminalError,
+pub use zenith_compositor::{
+    DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
+    WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
+};
+pub use moksha::{
+    EvasCanvasManager, EvasObject, MokshaProfile, MokshaWindowManager, MokshaWindowType,
+    ShelfOrientation, WallpaperTransition, TerminologyBackend, EphotoViewer, BodhiAppCenterInstaller,
 };

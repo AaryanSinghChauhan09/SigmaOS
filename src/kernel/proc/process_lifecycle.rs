@@ -22,7 +22,7 @@ use crate::klib::HashMap;
 use std::collections::HashMap;
 
 #[cfg(test)]
-pub mod mock_scheduler {
+mod mock_scheduler {
     use core::time::Duration;
     use alloc::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -113,7 +113,6 @@ pub struct ProcessLifecycleManager {
     extended_contexts: HashMap<u64, ProcessExtendedContext>,
     parent_map: HashMap<u64, u64>, // child -> parent
     exit_codes: HashMap<u64, i32>,
-    pub group_ids: HashMap<u64, u32>,
     next_pid: AtomicUsize,
 }
 
@@ -124,7 +123,6 @@ impl ProcessLifecycleManager {
             extended_contexts: HashMap::new(),
             parent_map: HashMap::new(),
             exit_codes: HashMap::new(),
-            group_ids: HashMap::new(),
             next_pid: AtomicUsize::new(100),
         }
     }
@@ -165,8 +163,6 @@ impl ProcessLifecycleManager {
         self.processes.insert(child_pid, child);
         self.extended_contexts.insert(child_pid, child_ctx);
         self.parent_map.insert(child_pid, parent_pid);
-        let parent_pgid = *self.group_ids.get(&parent_pid).unwrap_or(&0);
-        self.group_ids.insert(child_pid, parent_pgid);
 
         Ok(child_pid)
     }
@@ -278,118 +274,6 @@ impl Default for ProcessLifecycleManager {
     fn default() -> Self {
         Self::new()
     }
-}
-
-/// Windows/Linux/BSD-inspired Executive & Kernel Process/Thread Control Blocks (EPROCESS, KPROCESS, ETHREAD, KTHREAD)
-/// with x86_64/ARM64 architectural contexts, Process Environment Block (PEB), and Thread Environment Block (TEB).
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ShardExecutionState {
-    Ready,
-    Running,
-    Waiting,
-    Terminated,
-}
-
-/// x86_64 CPU Architectural Context saved during scheduler preemptions
-#[repr(C)]
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub struct X86_64Context {
-    pub rip: u64,
-    pub rsp: u64,
-    pub rflags: u64,
-    pub rax: u64,
-    pub rbx: u64,
-    pub rcx: u64,
-    pub rdx: u64,
-    pub rsi: u64,
-    pub rdi: u64,
-    pub rbp: u64,
-    pub r8: u64,
-    pub r9: u64,
-    pub r10: u64,
-    pub r11: u64,
-    pub r12: u64,
-    pub r13: u64,
-    pub r14: u64,
-    pub r15: u64,
-}
-
-/// ARM64 CPU Architectural Context saved during scheduler preemptions
-#[repr(C)]
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub struct Arm64Context {
-    pub pc: u64,
-    pub sp: u64,
-    pub cpsr: u64,
-    pub x: [u64; 31],
-}
-
-/// KPROCESS (Kernel Process Block): Low-level scheduler and hardware page directory root
-#[repr(C)]
-pub struct KProcess {
-    pub directory_table_base: u64, // CR3 register equivalent
-    pub affinity_mask: u64,        // CPU cores affinity bitmask
-    pub kernel_time_ms: u64,
-    pub user_time_ms: u64,
-    pub capability_mask: u64,
-}
-
-/// EPROCESS (Executive Process Block): High-level process metadata wrapping KPROCESS (Windows/BSD inspired)
-#[repr(C)]
-pub struct EProcess {
-    pub pcb: KProcess,             // Kernel Process Block (PCB)
-    pub unique_process_id: u64,    // PID
-    pub parent_process_id: u64,
-    pub image_file_name: [u8; 16],
-    pub peb_address: u64,          // Virtual pointer to Process Environment Block (PEB)
-    pub exit_status: i32,
-    pub active_threads_count: usize,
-}
-
-/// KTHREAD (Kernel Thread Block): Low-level scheduler thread state and stack boundaries
-#[repr(C)]
-pub struct KThread {
-    pub kernel_stack_top: u64,
-    pub kernel_stack_bottom: u64,
-    pub priority: u8,
-    pub state: ShardExecutionState,
-    pub context_x64: X86_64Context,
-    pub context_arm: Arm64Context,
-    pub cpu_id: u32,               // Active running CPU core id
-}
-
-/// ETHREAD (Executive Thread Block): High-level thread block wrapping KTHREAD (Windows/BSD inspired)
-#[repr(C)]
-pub struct EThread {
-    pub tcb: KThread,              // Thread Control Block (TCB)
-    pub unique_thread_id: u64,     // TID
-    pub process_id: u64,           // Parent Process ID
-    pub start_address: u64,
-    pub teb_address: u64,          // Virtual pointer to Thread Environment Block (TEB)
-}
-
-/// PEB (Process Environment Block): User-mode accessible process info (Windows/Linux/BSD inspired)
-#[repr(C)]
-#[derive(Debug, Clone, Copy, Default)]
-pub struct ProcessEnvironmentBlock {
-    pub image_base_address: u64,
-    pub loader_data_address: u64,
-    pub process_parameters_address: u64, // Environment variables path
-    pub heap_base_address: u64,
-    pub number_of_processors: u32,
-    pub session_id: u32,
-}
-
-/// TEB (Thread Environment Block): User-mode accessible thread info (Windows/Linux/BSD inspired)
-#[repr(C)]
-#[derive(Debug, Clone, Copy, Default)]
-pub struct ThreadEnvironmentBlock {
-    pub stack_limit: u64,         // User stack bottom
-    pub stack_base: u64,          // User stack top
-    pub thread_local_storage_ptr: u64, // TLS pointer
-    pub exception_list_address: u64, // Exception list pointer
 }
 
 #[cfg(test)]

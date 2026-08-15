@@ -5,9 +5,6 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::format;
-use alloc::collections::BTreeMap;
 use core::ptr::NonNull;
 
 pub const PAGE_SIZE: usize = 4096;
@@ -22,9 +19,6 @@ impl PageTableFlags {
     pub const USER_ACCESSIBLE: u64 = 1 << 2;
     pub const WRITE_THROUGH: u64 = 1 << 3;
     pub const NO_CACHE: u64 = 1 << 4;
-    pub const HUGE_PAGE: u64 = 1 << 7; // Page Size (PS) flag for huge pages
-    pub const COW: u64 = 1 << 9; // Copy-On-Write flag
-    pub const SWAPPED_OUT: u64 = 1 << 10; // Page is evacuated to swap disk space
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -180,141 +174,104 @@ impl VirtualMemoryManagerV2 {
     }
 }
 
-// ==========================================
-// Virtual Memory Demand Paging & Swapping
-// ==========================================
+// =========================================================================
+// Memory Descriptor List (MDL) Architecture
+// =========================================================================
 
-use std::collections::HashMap;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PageFaultReason {
-    LazyLoad,
-    SwappedOut,
-    CopyOnWrite,
-    ProtectionViolation,
-}
-
+/// Represents a Memory Descriptor List (MDL) describing the physical layout of a virtual memory buffer.
+/// Inspired by the Windows and Linux/BSD kernel designs for handling DMA buffers,
+/// mapping user buffers to kernel space, locking physical pages, and virtual memory protection.
 #[derive(Debug, Clone)]
-pub struct DemandPageZone {
-    pub start_address: u64,
-    pub size_pages: usize,
-    pub allocated: HashMap<u64, u64>, // VirtAddr -> PhysAddr
-    pub swap_disk_blocks: HashMap<u64, Vec<u8>>, // VirtAddr -> Evacuated swap bytes
+pub struct MemoryDescriptorList {
+    pub virtual_address: u64,
+    pub byte_count: usize,
+    pub byte_offset: usize,
+    pub physical_pages: Vec<u64>,
+    pub is_probed: bool,
+    pub is_locked: bool,
+    pub is_mapped: bool,
+    pub mapped_kernel_address: Option<u64>,
 }
 
-pub struct DemandPagingSubsystem {
-    pub managed_zones: HashMap<u64, DemandPageZone>, // PID -> Page zone
-    pub physical_lru_queue: Vec<(u64, u64)>,        // (PID, VirtAddr) for LRU tracking
-    pub max_physical_frames: usize,
-    pub swap_out_count: usize,
-}
+impl MemoryDescriptorList {
+    /// Initialize a new Memory Descriptor List (MDL)
+    pub fn new(virtual_address: u64, byte_count: usize) -> Self {
+        let byte_offset = (virtual_address & 0xFFF) as usize;
+        let start_page = virtual_address & !0xFFF;
+        let end_page = (virtual_address + byte_count as u64 + 0xFFF) & !0xFFF;
+        let page_count = ((end_page - start_page) / 4096) as usize;
 
-impl DemandPagingSubsystem {
-    pub fn new(max_physical_frames: usize) -> Self {
         Self {
-            managed_zones: HashMap::new(),
-            physical_lru_queue: Vec::new(),
-            max_physical_frames,
-            swap_out_count: 0,
+            virtual_address,
+            byte_count,
+            byte_offset,
+            physical_pages: alloc::vec![0; page_count],
+            is_probed: false,
+            is_locked: false,
+            is_mapped: false,
+            mapped_kernel_address: None,
         }
     }
 
-    /// Registers a lazy demand-loadable zone for a process
-    pub fn register_lazy_zone(&mut self, pid: u64, start_address: u64, size_pages: usize) {
-        self.managed_zones.insert(pid, DemandPageZone {
-            start_address,
-            size_pages,
-            allocated: HashMap::new(),
-            swap_disk_blocks: HashMap::new(),
-        });
-    }
-
-    /// Performs LRU eviction of physical frames when memory limit is reached (Tails & Linux Swap inspired)
-    pub fn evacuate_to_swap_lru(&mut self) -> Result<(u64, u64), &'static str> {
-        if self.physical_lru_queue.is_empty() {
-            return Err("No active frames in LRU queue to swap out");
+    /// Probes and locks the physical pages associated with the virtual address range
+    pub fn probe_and_lock(&mut self, vmm: &VirtualMemoryManagerV2) -> Result<(), &'static str> {
+        if self.is_locked {
+            return Err("MDL is already locked");
         }
 
-        // Evict the least-recently used page (oldest)
-        let (pid, virt_addr) = self.physical_lru_queue.remove(0);
-        let zone = self.managed_zones.get_mut(&pid).ok_or("Zone missing for pid")?;
-
-        if let Some(phys_addr) = zone.allocated.remove(&virt_addr) {
-            // Write to simulated swap disk block
-            let mut mock_swapped_bytes = vec![0u8; 4096];
-            mock_swapped_bytes[0] = 0xAA; // mock payload marker
-            zone.swap_disk_blocks.insert(virt_addr, mock_swapped_bytes);
-            self.swap_out_count += 1;
-            Ok((pid, virt_addr))
-        } else {
-            Err("Page metadata not found during swap-out")
+        let start_page = self.virtual_address & !0xFFF;
+        for i in 0..self.physical_pages.len() {
+            let virt = start_page + (i * 4096) as u64;
+            let phys = unsafe { vmm.translate(virt) }.ok_or("Virtual address page fault during probe")?;
+            self.physical_pages[i] = phys & !0xFFF;
         }
+
+        self.is_probed = true;
+        self.is_locked = true;
+        Ok(())
     }
 
-    /// Handles and resolves demand page faults natively
-    pub fn handle_demand_fault(
+    /// Maps the physically locked pages of the MDL to a contiguous virtual buffer in kernel space
+    pub unsafe fn map_to_kernel_space(
         &mut self,
-        pid: u64,
-        fault_addr: u64,
-    ) -> Result<(PageFaultReason, u64), &'static str> {
-        let aligned_addr = fault_addr & !0xFFF;
-
-        // Check if zone exists and address boundaries
-        {
-            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
-            let page_offset = (aligned_addr - zone.start_address) / 4096;
-            if page_offset as usize >= zone.size_pages {
-                return Err("Fault address outside registered process memory boundaries");
-            }
+        mut kernel_start_virt: u64,
+        vmm: &mut VirtualMemoryManagerV2,
+        allocator: &mut dyn FnMut() -> Option<NonNull<PageTable>>,
+    ) -> Result<u64, &'static str> {
+        if !self.is_locked {
+            return Err("MDL must be locked before mapping");
+        }
+        if self.is_mapped {
+            return Err("MDL is already mapped");
         }
 
-        // Case 1: Swapped Out Page
-        let is_swapped = {
-            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
-            zone.swap_disk_blocks.contains_key(&aligned_addr)
-        };
-
-        if is_swapped {
-            let zone = self.managed_zones.get_mut(&pid).ok_or("No mapped zone for PID")?;
-            zone.swap_disk_blocks.remove(&aligned_addr);
-            let reallocated_phys = aligned_addr + 0x5000_0000;
-            zone.allocated.insert(aligned_addr, reallocated_phys);
-            self.physical_lru_queue.push((pid, aligned_addr));
-            return Ok((PageFaultReason::SwappedOut, reallocated_phys));
+        let map_flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+        for &phys in &self.physical_pages {
+            vmm.map_page(kernel_start_virt, phys, map_flags, allocator)?;
+            kernel_start_virt += 4096;
         }
 
-        // Case 2: Lazy Load Page (First access)
-        let is_allocated = {
-            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
-            zone.allocated.contains_key(&aligned_addr)
-        };
-
-        if !is_allocated {
-            // Check if we need to swap out a page first to respect physical limit
-            if self.physical_lru_queue.len() >= self.max_physical_frames {
-                let _ = self.evacuate_to_swap_lru()?;
-            }
-
-            let zone = self.managed_zones.get_mut(&pid).ok_or("No mapped zone for PID")?;
-            let new_phys = aligned_addr + 0x4000_0000; // Lazy dynamic mapping
-            zone.allocated.insert(aligned_addr, new_phys);
-            self.physical_lru_queue.push((pid, aligned_addr));
-            return Ok((PageFaultReason::LazyLoad, new_phys));
-        }
-
-        Err("Page fault cannot be handled by DemandPagingSubsystem")
+        let mapped_address = kernel_start_virt - (self.physical_pages.len() * 4096) as u64 + self.byte_offset as u64;
+        self.mapped_kernel_address = Some(mapped_address);
+        self.is_mapped = true;
+        Ok(mapped_address)
     }
-}
 
-impl Default for DemandPagingSubsystem {
-    fn default() -> Self {
-        Self::new(1024)
+    /// Unmaps the mapped virtual buffer in kernel space
+    pub fn unmap(&mut self) {
+        self.mapped_kernel_address = None;
+        self.is_mapped = false;
+    }
+
+    /// Unlocks the physical pages
+    pub fn unlock(&mut self) {
+        self.is_locked = false;
+        self.is_probed = false;
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::*;
 
     #[test]
@@ -435,217 +392,5 @@ mod tests {
         assert!(!mdl.is_mapped);
         mdl.unlock();
         assert!(!mdl.is_locked);
-    }
-
-    #[test]
-    fn test_demand_paging_lazy_and_file_allocation() {
-        let mut pml4 = PageTable::new();
-        let mut pdpt = PageTable::new();
-        let mut pd = PageTable::new();
-        let mut pt = PageTable::new();
-
-        let pml4_ptr = &mut pml4 as *mut PageTable;
-        let pdpt_ptr = NonNull::new(&mut pdpt as *mut PageTable);
-        let pd_ptr = NonNull::new(&mut pd as *mut PageTable);
-        let pt_ptr = NonNull::new(&mut pt as *mut PageTable);
-
-        let mut allocator_calls = 0;
-        let mut allocator = || {
-            allocator_calls += 1;
-            match allocator_calls {
-                1 => Some(pdpt_ptr.unwrap()),
-                2 => Some(pd_ptr.unwrap()),
-                3 => Some(pt_ptr.unwrap()),
-                _ => None,
-            }
-        };
-
-        let mut vmm = unsafe { VirtualMemoryManagerV2::new(pml4_ptr as u64) };
-        let mut dp_subsystem = DemandPagingSubsystem::new();
-
-        // Register two demand paging zones
-        let anon_zone = DemandPageZone::new(0x0000_1000_0000_0000, 0x10000, DemandPageType::Anonymous);
-        let mut file_zone = DemandPageZone::new(0x0000_1000_0008_0000, 0x10000, DemandPageType::FileBacked);
-        file_zone.backing_file_id = Some(42);
-        file_zone.backing_file_offset = 8192;
-
-        dp_subsystem.register_zone(anon_zone);
-        dp_subsystem.register_zone(file_zone);
-
-        let mut phys_allocator_calls = 0;
-        let mut phys_allocator = || {
-            phys_allocator_calls += 1;
-            Some(0x5000_0000 + (phys_allocator_calls * 4096) as u64)
-        };
-
-        // 1. Handle PageNotPresent on Anonymous Zone
-        let res_anon = unsafe {
-            dp_subsystem.handle_page_fault(
-                0x0000_1000_0000_4050,
-                PageFaultReason::PageNotPresent,
-                &mut vmm,
-                &mut allocator,
-                &mut phys_allocator,
-            ).unwrap()
-        };
-        assert!(res_anon.contains("Lazy Paging"));
-        assert!(res_anon.contains("0x50001000"));
-
-        // Translate should now successfully yield mapped physical address
-        let resolved = unsafe { vmm.translate(0x0000_1000_0000_4050).unwrap() };
-        assert_eq!(resolved, 0x5000_1050);
-
-        // 2. Handle PageNotPresent on File-Backed Zone
-        let res_file = unsafe {
-            dp_subsystem.handle_page_fault(
-                0x0000_1000_0008_1010,
-                PageFaultReason::PageNotPresent,
-                &mut vmm,
-                &mut allocator,
-                &mut phys_allocator,
-            ).unwrap()
-        };
-        assert!(res_file.contains("File Paging"));
-        assert!(res_file.contains("file_id=42"));
-        assert!(res_file.contains("offset=12288")); // 8192 + 0x1000 = 12288
-    }
-
-    #[test]
-    fn test_demand_paging_copy_on_write() {
-        let mut pml4 = PageTable::new();
-        let mut pdpt = PageTable::new();
-        let mut pd = PageTable::new();
-        let mut pt = PageTable::new();
-
-        let pml4_ptr = &mut pml4 as *mut PageTable;
-        let pdpt_ptr = NonNull::new(&mut pdpt as *mut PageTable);
-        let pd_ptr = NonNull::new(&mut pd as *mut PageTable);
-        let pt_ptr = NonNull::new(&mut pt as *mut PageTable);
-
-        let mut allocator_calls = 0;
-        let mut allocator = || {
-            allocator_calls += 1;
-            match allocator_calls {
-                1 => Some(pdpt_ptr.unwrap()),
-                2 => Some(pd_ptr.unwrap()),
-                3 => Some(pt_ptr.unwrap()),
-                _ => None,
-            }
-        };
-
-        let mut vmm = unsafe { VirtualMemoryManagerV2::new(pml4_ptr as u64) };
-        let mut dp_subsystem = DemandPagingSubsystem::new();
-
-        let cow_zone = DemandPageZone::new(0x0000_3000_0000_0000, 0x1000, DemandPageType::Anonymous);
-        dp_subsystem.register_zone(cow_zone);
-
-        let shared_phys_frame = 0x6000_0000;
-        // Register shared physical frame with 2 active process references
-        dp_subsystem.cow_shared_frames.insert(shared_phys_frame, 2);
-
-        // Map initial read-only page to the shared physical frame
-        let r_flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::USER_ACCESSIBLE);
-        unsafe {
-            vmm.map_page(0x0000_3000_0000_0000, shared_phys_frame, r_flags, &mut allocator).unwrap();
-        }
-
-        let mut phys_allocator_calls = 0;
-        let mut phys_allocator = || {
-            phys_allocator_calls += 1;
-            Some(0x7000_0000 + (phys_allocator_calls * 4096) as u64)
-        };
-
-        // Trigger WriteOnCopyOnWrite Page Fault
-        let res_cow = unsafe {
-            dp_subsystem.handle_page_fault(
-                0x0000_3000_0000_0200,
-                PageFaultReason::WriteOnCopyOnWrite,
-                &mut vmm,
-                &mut allocator,
-                &mut phys_allocator,
-            ).unwrap()
-        };
-
-        assert!(res_cow.contains("COW Fault"));
-        assert!(res_cow.contains("Duplicated shared physical frame 0x60000000 to 0x70001000"));
-
-        // Verify the virtual page is now mapped to the duplicated writable page
-        let resolved = unsafe { vmm.translate(0x0000_3000_0000_0200).unwrap() };
-        assert_eq!(resolved, 0x7000_1200);
-
-        // Reference count of the old shared physical frame should be decremented to 1
-        assert_eq!(dp_subsystem.cow_shared_frames.get(&shared_phys_frame), Some(&1));
-    }
-
-    #[test]
-    fn test_demand_paging_subsystem_lazy_and_swap() {
-        let mut sub = DemandPagingSubsystem::new(2); // physical memory limit is 2 pages
-        sub.register_lazy_zone(100, 0x1000_0000, 10); // PID 100, start 0x1000_0000, size 10 pages
-
-        // 1. First access (Lazy load)
-        let (reason1, frame1) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
-        assert_eq!(reason1, PageFaultReason::LazyLoad);
-        assert_eq!(frame1, 0x1000_0000 + 0x4000_0000);
-        assert_eq!(sub.physical_lru_queue.len(), 1);
-
-        // 2. Second access (Lazy load)
-        let (reason2, frame2) = sub.handle_demand_fault(100, 0x1000_1000).unwrap();
-        assert_eq!(reason2, PageFaultReason::LazyLoad);
-        assert_eq!(sub.physical_lru_queue.len(), 2);
-
-        // 3. Third access exceeds physical limit (2) -> triggers swap eviction of first page
-        let (reason3, frame3) = sub.handle_demand_fault(100, 0x1000_2000).unwrap();
-        assert_eq!(reason3, PageFaultReason::LazyLoad);
-        assert_eq!(sub.swap_out_count, 1);
-        assert_eq!(sub.physical_lru_queue.len(), 2); // Capped at physical limit
-
-        // Verify that address 0x1000_0000 has been swapped out
-        let zone = sub.managed_zones.get(&100).unwrap();
-        assert!(zone.swap_disk_blocks.contains_key(&0x1000_0000));
-        assert!(!zone.allocated.contains_key(&0x1000_0000));
-
-        // 4. Access swapped out address -> triggers load from swap disk and swap recovery
-        let (reason4, frame4) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
-        assert_eq!(reason4, PageFaultReason::SwappedOut);
-        assert_eq!(frame4, 0x1000_0000 + 0x5000_0000);
-
-        let zone = sub.managed_zones.get(&100).unwrap();
-        assert!(!zone.swap_disk_blocks.contains_key(&0x1000_0000)); // Pulled back from swap
-    }
-
-    #[test]
-    fn test_demand_paging_subsystem_lazy_and_swap() {
-        let mut sub = DemandPagingSubsystem::new(2); // physical memory limit is 2 pages
-        sub.register_lazy_zone(100, 0x1000_0000, 10); // PID 100, start 0x1000_0000, size 10 pages
-
-        // 1. First access (Lazy load)
-        let (reason1, frame1) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
-        assert_eq!(reason1, PageFaultReason::LazyLoad);
-        assert_eq!(frame1, 0x1000_0000 + 0x4000_0000);
-        assert_eq!(sub.physical_lru_queue.len(), 1);
-
-        // 2. Second access (Lazy load)
-        let (reason2, frame2) = sub.handle_demand_fault(100, 0x1000_1000).unwrap();
-        assert_eq!(reason2, PageFaultReason::LazyLoad);
-        assert_eq!(sub.physical_lru_queue.len(), 2);
-
-        // 3. Third access exceeds physical limit (2) -> triggers swap eviction of first page
-        let (reason3, frame3) = sub.handle_demand_fault(100, 0x1000_2000).unwrap();
-        assert_eq!(reason3, PageFaultReason::LazyLoad);
-        assert_eq!(sub.swap_out_count, 1);
-        assert_eq!(sub.physical_lru_queue.len(), 2); // Capped at physical limit
-
-        // Verify that address 0x1000_0000 has been swapped out
-        let zone = sub.managed_zones.get(&100).unwrap();
-        assert!(zone.swap_disk_blocks.contains_key(&0x1000_0000));
-        assert!(!zone.allocated.contains_key(&0x1000_0000));
-
-        // 4. Access swapped out address -> triggers load from swap disk and swap recovery
-        let (reason4, frame4) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
-        assert_eq!(reason4, PageFaultReason::SwappedOut);
-        assert_eq!(frame4, 0x1000_0000 + 0x5000_0000);
-
-        let zone = sub.managed_zones.get(&100).unwrap();
-        assert!(!zone.swap_disk_blocks.contains_key(&0x1000_0000)); // Pulled back from swap
     }
 }
