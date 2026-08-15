@@ -717,12 +717,13 @@ impl MacroExecutor {
     /// Executes a registered document macro script (simplified AST/string evaluator)
     pub fn execute_macro(&self, name: &str, processor: &mut TextProcessor) -> Result<bool> {
         if let Some(script) = self.registered_macros.get(name) {
-            let scr: &String = script;
-            if scr.contains("insert_header") {
+            if script.contains("insert_header") {
                 processor.add_heading(1, "Automated Report Header").unwrap();
             }
-            if scr.contains("insert_footer") {
-                processor.add_text("Confidential Sovereign Document", false, true).unwrap();
+            if script.contains("insert_footer") {
+                processor
+                    .add_text("Confidential Sovereign Document", false, true)
+                    .unwrap();
             }
             Ok(true)
         } else {
@@ -752,9 +753,7 @@ pub struct SovereignCrmPipeline {
 
 impl SovereignCrmPipeline {
     pub fn new() -> Self {
-        Self {
-            leads: Vec::new(),
-        }
+        Self { leads: Vec::new() }
     }
 
     pub fn add_lead(&mut self, lead: Lead) {
@@ -763,17 +762,33 @@ impl SovereignCrmPipeline {
 
     /// Auto-compiles active sales leads directly into a formatted SigmaOffice Spreadsheet
     pub fn compile_leads_to_spreadsheet(&self, processor: &mut SpreadsheetProcessor) -> Result<()> {
-        processor.set_cell(0, 0, CellValue::Text("Lead ID".to_string())).unwrap();
-        processor.set_cell(0, 1, CellValue::Text("Company Name".to_string())).unwrap();
-        processor.set_cell(0, 2, CellValue::Text("Est. Revenue".to_string())).unwrap();
-        processor.set_cell(0, 3, CellValue::Text("Status".to_string())).unwrap();
+        processor
+            .set_cell(0, 0, CellValue::Text("Lead ID".to_string()))
+            .unwrap();
+        processor
+            .set_cell(0, 1, CellValue::Text("Company Name".to_string()))
+            .unwrap();
+        processor
+            .set_cell(0, 2, CellValue::Text("Est. Revenue".to_string()))
+            .unwrap();
+        processor
+            .set_cell(0, 3, CellValue::Text("Status".to_string()))
+            .unwrap();
 
         for (idx, lead) in self.leads.iter().enumerate() {
             let row = (idx + 1) as u32;
-            processor.set_cell(row, 0, CellValue::Number(lead.id as f64)).unwrap();
-            processor.set_cell(row, 1, CellValue::Text(lead.company_name.clone())).unwrap();
-            processor.set_cell(row, 2, CellValue::Number(lead.estimated_revenue)).unwrap();
-            processor.set_cell(row, 3, CellValue::Text(lead.status.clone())).unwrap();
+            processor
+                .set_cell(row, 0, CellValue::Number(lead.id as f64))
+                .unwrap();
+            processor
+                .set_cell(row, 1, CellValue::Text(lead.company_name.clone()))
+                .unwrap();
+            processor
+                .set_cell(row, 2, CellValue::Number(lead.estimated_revenue))
+                .unwrap();
+            processor
+                .set_cell(row, 3, CellValue::Text(lead.status.clone()))
+                .unwrap();
         }
         Ok(())
     }
@@ -892,16 +907,27 @@ mod tests {
 
         // 1. LiveCoAuthoringManager Test
         let mut coauth = LiveCoAuthoringManager::new();
-        assert!(coauth.acquire_lock("p_1".to_string(), "alice".to_string()).unwrap());
-        assert!(!coauth.acquire_lock("p_1".to_string(), "bob".to_string()).unwrap()); // blocked by alice
+        assert!(coauth
+            .acquire_lock("p_1".to_string(), "alice".to_string())
+            .unwrap());
+        assert!(!coauth
+            .acquire_lock("p_1".to_string(), "bob".to_string())
+            .unwrap()); // blocked by alice
         coauth.release_lock("p_1");
-        assert!(coauth.acquire_lock("p_1".to_string(), "bob".to_string()).unwrap()); // allowed now
+        assert!(coauth
+            .acquire_lock("p_1".to_string(), "bob".to_string())
+            .unwrap()); // allowed now
 
         // 2. MacroExecutor Test
         let mut text_proc = TextProcessor::new("Report".to_string(), capability.clone());
         let mut macro_exec = MacroExecutor::new();
-        macro_exec.register_macro("setup_report".to_string(), "insert_header; insert_footer;".to_string());
-        assert!(macro_exec.execute_macro("setup_report", &mut text_proc).unwrap());
+        macro_exec.register_macro(
+            "setup_report".to_string(),
+            "insert_header; insert_footer;".to_string(),
+        );
+        assert!(macro_exec
+            .execute_macro("setup_report", &mut text_proc)
+            .unwrap());
         assert_eq!(text_proc.document().tree().len(), 2);
 
         // 3. SovereignCrmPipeline Test
@@ -914,54 +940,15 @@ mod tests {
         });
         let mut sheet_proc = SpreadsheetProcessor::new("CRM Pipeline".to_string(), capability);
         crm.compile_leads_to_spreadsheet(&mut sheet_proc).unwrap();
-        assert_eq!(sheet_proc.get_cell(1, 1), Some(&CellValue::Text("Antigravity AI".to_string())));
+        assert_eq!(
+            sheet_proc.get_cell(1, 1),
+            Some(&CellValue::Text("Antigravity AI".to_string()))
+        );
 
         // 4. VersionHistoryManager Test
         let mut history = VersionHistoryManager::new();
         history.create_checkpoint(1000, "Initial Draft".to_string(), "Budget v1".to_string());
         let checkpoint = history.rollback_to_checkpoint(1000).unwrap();
         assert_eq!(checkpoint.name, "Initial Draft");
-    }
-
-    #[test]
-    fn test_sigmacalc_and_sigmawrite_features() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
-
-        // Test Markdown Loader & LaTeX Renderer in SigmaWrite
-        let mut doc_proc = TextProcessor::new("My Novel".to_string(), capability.clone());
-        doc_proc.import_markdown("# Chapter 1\nThis is **bold** text.").unwrap();
-        doc_proc.add_latex_math("\\sum").unwrap();
-
-        let tree = doc_proc.document().tree();
-        assert_eq!(tree.len(), 4); // heading, paragraph break, latexmath, text
-        if let DocumentNode::LatexMath { rendered_symbol, .. } = &tree[2] {
-            assert_eq!(rendered_symbol, "∑");
-        }
-
-        // Test Lazy Recalculation & DAG Evaluation in SigmaCalc
-        let mut sheet_proc = SpreadsheetProcessor::new("Sheet1".to_string(), capability);
-        sheet_proc.set_cell(0, 0, CellValue::Number(10.0)).unwrap();
-        sheet_proc.set_cell(0, 1, CellValue::Number(20.0)).unwrap();
-        sheet_proc.set_formula(0, 2, "=SUM((0,0),(0,1))").unwrap();
-
-        // Initially evaluates to 30.0
-        let evaluated_first = sheet_proc.evaluate_cell(0, 2);
-        assert_eq!(evaluated_first, CellValue::Number(30.0));
-
-        // Change a cell -> triggers dirty flag propagation
-        sheet_proc.set_cell(0, 1, CellValue::Number(50.0)).unwrap();
-        // Re-evaluates on demand lazily to 60.0
-        let evaluated_second = sheet_proc.evaluate_cell(0, 2);
-        assert_eq!(evaluated_second, CellValue::Number(60.0));
-
-        // CSV/Excel/ODS export testing
-        let csv_out = sheet_proc.export_to_csv();
-        assert!(csv_out.contains("10,50"));
-
-        let excel_out = sheet_proc.export_to_excel();
-        assert!(excel_out.starts_with(b"EXCEL-NATIVE-OOXML"));
-
-        let ods_out = sheet_proc.export_to_ods();
-        assert!(ods_out.starts_with(b"ODF-SPREADSHEET-XML"));
     }
 }

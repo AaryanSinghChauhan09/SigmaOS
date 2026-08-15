@@ -1,18 +1,29 @@
 /// OOP-based Thread Management for SigmaOS
 /// Based on Roadmap Item 12: Thread management
 /// Absorbing Linux interruptible/alertable state concepts, CPU affinity, and nice prioritization values
-
 extern crate alloc;
 
 use alloc::boxed::Box;
-use core::sync::atomic::{AtomicUsize, Ordering, AtomicI32};
 use core::mem;
+use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 
 pub type ThreadID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ThreadState { Ready = 0, Running = 1, Blocked = 2, Terminated = 3 }
+pub enum ThreadState {
+    Ready = 0,
+    Running = 1,
+    Blocked = 2,
+    Terminated = 3,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThreadAlertableState {
+    NonAlertable = 0,
+    Alertable = 1,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +44,12 @@ pub trait Thread {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ThreadError { Success = 0, StartFailed = 1, StopFailed = 2, InvalidNiceValue = 3 }
+pub enum ThreadError {
+    Success = 0,
+    StartFailed = 1,
+    StopFailed = 2,
+    InvalidNiceValue = 3,
+}
 
 #[repr(C)]
 pub struct SimpleThread {
@@ -57,7 +73,9 @@ impl SimpleThread {
 }
 
 impl Thread for SimpleThread {
-    fn id(&self) -> ThreadID { self.id }
+    fn id(&self) -> ThreadID {
+        self.id
+    }
     fn state(&self) -> ThreadState {
         match self.state.load(Ordering::SeqCst) {
             1 => ThreadState::Running,
@@ -68,12 +86,14 @@ impl Thread for SimpleThread {
     }
 
     fn start(&mut self) -> Result<(), ThreadError> {
-        self.state.store(ThreadState::Running as usize, Ordering::SeqCst);
+        self.state
+            .store(ThreadState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn stop(&mut self) -> Result<(), ThreadError> {
-        self.state.store(ThreadState::Terminated as usize, Ordering::SeqCst);
+        self.state
+            .store(ThreadState::Terminated as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -123,7 +143,12 @@ pub struct SimpleThreadManager {
 }
 
 impl SimpleThreadManager {
-    pub fn new() -> Self { SimpleThreadManager { threads: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleThreadManager {
+            threads: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl ThreadManager for SimpleThreadManager {
@@ -149,7 +174,20 @@ impl ThreadManager for SimpleThreadManager {
     fn get_thread(&self, id: ThreadID) -> Option<&dyn Thread> {
         for thread_option in self.threads.as_slice() {
             if let Some(ref thread) = *thread_option {
-                if thread.id() == id { return Some(thread.as_ref()); }
+                if thread.id() == id {
+                    return Some(thread.as_ref());
+                }
+            }
+        }
+        None
+    }
+
+    fn get_thread_mut(&mut self, id: ThreadID) -> Option<&mut dyn Thread> {
+        for thread_option in self.threads.as_slice_mut() {
+            if let Some(ref mut thread) = *thread_option {
+                if thread.id() == id {
+                    return Some(thread.as_mut());
+                }
             }
         }
         None
@@ -165,20 +203,34 @@ impl ThreadManager for SimpleThreadManager {
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    fn clear(&mut self) { self.len = 0; }
+    fn clear(&mut self) {
+        self.len = 0;
+    }
     fn as_slice(&self) -> &[T] {
         if self.data.is_null() {
             &[]
@@ -194,11 +246,19 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -245,7 +305,7 @@ mod tests {
         assert!(thread.set_nice(-15).is_ok());
         assert_eq!(thread.nice(), -15);
         assert!(thread.set_nice(-30).is_err()); // invalid nice level
-        assert!(thread.set_nice(20).is_err());  // invalid nice level
+        assert!(thread.set_nice(20).is_err()); // invalid nice level
 
         // Modify CPU affinity mask
         thread.set_cpu_affinity(0b1101);

@@ -1,7 +1,10 @@
 // SigmaOS Kernel Memory Management
 // Implements buddy allocator and paging
 
-use core::ptr::NonNull;
+extern crate alloc;
+use alloc::vec::Vec;
+use std::ptr::NonNull;
+use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -13,9 +16,23 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
-#[derive(Clone)]
-pub struct BuddyAllocatorCheckpoint {
-    free_lists: [Vec<MemoryBlock>; 12],
+pub struct Zone {
+    pub present_pages: u64,
+}
+
+pub struct Page {
+    pub flags: AtomicUsize,
+    pub count: AtomicUsize,
+    pub mapping: Option<usize>,
+    pub index: u64,
+    pub private: Option<usize>,
+    pub zone: Option<*const Zone>,
+}
+
+impl Page {
+    pub fn dec_ref(&self) -> bool {
+        self.count.fetch_sub(1, Ordering::SeqCst) == 1
+    }
 }
 
 /// Buddy allocator for memory management

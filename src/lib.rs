@@ -9,6 +9,7 @@ pub mod customization;
 pub mod distro;
 pub mod dashboard;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
@@ -16,22 +17,56 @@ pub mod graphics;
 pub mod ipc;
 pub mod kernel;
 pub mod klib;
+pub mod legal;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
-pub mod performance;
+pub mod process;
 pub mod productivity;
 pub mod resilience;
 pub mod resource;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod thread;
 pub mod tools;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
 pub mod virtualization;
-pub mod tracing;
-pub mod crash;
-pub mod media;
-pub mod gpu;
+
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+}
+pub mod boot;
+pub mod toolchain {
+    pub mod adapter;
+    pub mod bootstrap;
+    pub mod capsule;
+    pub mod codex;
+}
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -47,18 +82,31 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
-    InterimLispVM, JehanneError, JehanneNamespace, LispVal, MintBackupTool, MintSoftwareManager,
-    MintUpdateItem, MintUpdateLevel, MintUpdateManager, MntReformLpcDriver, MockUPIService,
-    MultilingualSupport, NamespaceBindEntry, NtHandle, NtObjectManager, NtObjectType, NtStatus,
-    Plan9pMessage, Plan9pMsgType, PortableExecutableLoader, ReformPowerStats, RegistryHive,
-    SoftwareMeta, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
-    Literal, SpacSatResolver,
-    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
-    AlpineSyslogManager, BusyBoxMulticall,
+    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
+    CorebootGatewayMesh, DACConstellation, DeferredProcedureCall, DotMatrixMesh,
+    DriverArchiveGridV2, EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine,
+    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, FhsConventionStatus,
+    FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, HistoricError,
+    HistoricSyscallEmulator, HistoricalCpuState, IdtEntry, Idtr, Irql, IrqlController,
+    KernelConstellationGrid, Kpcr, Kpcrb, LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid,
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LfsToolchainBuilder, LinuxEra,
+    LsbProfile, MemoryArch, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PageAccessMode, PageDirectory, PageTableEntry, PairingState, PeripheralArchiveMesh,
+    PicKeyboardController, PosixComplianceLevel, ProcessAlmanacHub, ProtectedModeSwitchSimulator,
+    SELinuxConstellation, SecurityConstellation, SovereignKernelInternals,
+    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, SystemServiceTable,
+    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, UmsContext, UmsThreadState,
+    VgaTextModeDriverSimulator, VintageDriverTranslator, VintagePackageConverter,
+    VintageVirtualizationSandbox, WelcomeTab as EosWelcomeTab, YayAurHelper,
+    ZeroTrustConstellation, ZorinChameleonEngine, ZorinConnectManager, ZorinLayoutSwitcher,
+    ZorinLayoutType, ZorinWindowsAppSupport,
+};
+pub use container::{
+    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
+    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
+    SimpleContainer, SimpleContainerRuntime,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -70,13 +118,29 @@ pub use distro::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+pub use distro::{
+    AdminAction, AiSysAdmin, AppManifest, AuditResult, AuditRule, BackupSnapshot, BackupSystem,
+    BountyStatus, BugBountyProgram, BugBountyReport, BuildJob, BuildStatus, CanFrame,
+    CertificationStatus, CommunityConference, ComplianceAuditor, ComponentType, ConferenceTalk,
+    ConfigHook, CrossBuildPipeline, DevTool, DeveloperToolkit, DirectoryService, DirectoryUser,
+    DllLoader, DllModule, EcuController, EduChallenge, EduPlayground, ForumChannel, ForumPost,
+    GdiObjectType, HardwareCertificate, HardwareCertificationProgram, HardwareProfile,
+    HardwareRegressionSuite, HelpSystem, HowToGuide, HpcClusterJob, HpcJobState, ImeCandidate,
+    InputMethodEngine, IntegrityState, KernelTrace, LanguagePack, LinuxSyscall, LiveDebugger,
+    LivepatchManager, LivepatchPatch, LocaleManager, ManPage, MpiCommunicator, NetplanConfig,
+    NetplanManager, P2pNode, PackageBuildService, PosixTranslation, PqcSelfHealing,
+    QAStagedRelease, RegionalSettings, RegistryType, RegistryValue, ReleaseStage, RescueISO,
+    RescueISOManager, SoftwareCertificationProgram, SovereignP2PSync, TargetArch,
+    TimeTravelCheckpoint, TimeTravelEngine, WikiPage, Win32Gdi, WindowsRegistry,
+};
 pub use drivers::{
-    Bdle, Ch340Driver, DeviceGeneration, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver,
-    GpuError, GpuPipeline, GpuShader, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, IntelHdaDriver, NetworkCommand, NetworkDriver, NetworkError,
-    NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
-    RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
-    TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    E1000RxDescriptor, E1000TxDescriptor, GpuCommand, GpuDriver, GpuError, HidError,
+    HidKeyboardEvent, HidReportType, InputDriver, InputEvent, InputType, IntelE1000Driver,
+    LegacyAudioAc97, ModernAudioIntelHda, ModernNvmeDriver, ModernUsbPrinterDriver,
+    ModernWifiDriver, NetworkCommand, NetworkDriver, NetworkError, NetworkType, StorageCommand,
+    StorageDriver, StorageError, StorageType, TouchJingosDriver, UsbHidDriver, VesaDriver,
+    VesaError, VesaModeInfo, VirtioBlkDriver, VirtioDeviceType, VirtioMmioHeader, VirtioNetDriver,
+    VirtioRngDriver,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -88,22 +152,31 @@ pub use ipc::{
     signals::{SignalType, SignalDisposition, PendingSignal, ProcessSignalState, SignalDeliverySystem},
 };
 pub use kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    AuditBlock, BsdPfStateTable, BuddyAllocator, CgroupResourceLimits, Channel,
-    CircularDoublyLinkedList, CpuArchitectureClass, CpuRegisters, FreeBsdVfsNullfs, FutexOp,
-    FutexWaiter, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LinuxFutexEngine, LookasideList, LotteryTask,
-    MemoryBlock, MemoryDescriptorList, Message, Pcb, PfFiveTuple, PfStateEntry,
-    PolicyMechanismCoordinator, PoolType, Priority, Process, ProcessState, ProcessorInitState,
-    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SequencedSinglyLinkedList,
-    SinglyLinkedList, SovereignCgroupGovernor, SovereignMechanism, SystemThread, Tcb, ThreadState,
-    WorkItem, PAGE_SIZE,
+    sched::{DragonFlySmpQueueManager, LwktMessage, PowerGovernor, SovereignGameMode, UksmPageDeduplicator},
+    ABIManager, AcpiInterruptManager, AiNativeRuntime, BuddyAllocator, Channel,
+    EnergyAwareScheduler, FastPathIpc, GapError, Generation, GenerationManager, InterruptMechanism,
+    IpcError, IpcManager, IrqRoutingTable, JournalBlock, JournalState, KernelGraph, KernelPersona,
+    KernelPlugin, KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel,
+    MetadataJournal, MicroDriver, NetPod, Pml4PageTableEntry, PolicyError, PolicyManager, Priority,
+    PrivacyFirstSandbox, PrivilegeLevel, Process, ProcessState, ProtectionDomain, ResourceBroker,
+    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel,
+    SigmaFsPlusPlus, UniversalAbiTranslator, UserDefinedKernelFunctions,
+    VirtualMemoryPagingManager, PAGE_SIZE,
+};
+pub use legal::{
+    ComplianceCert as LegalComplianceCert, ComplianceStatus as LegalComplianceStatus,
+    ComponentLicense, GlobalStandard, InternationalComplianceTracker, LabourLawCompliance,
+    LabourLawConfig, LegalComplianceRegistry, LicenseType, PatentRecord, RegulatoryControl,
+    StatutoryFiling, StatutoryFilingDashboard, StatutoryPayrollBreakdown,
 };
 pub use network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
     SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
     UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
+};
+pub use observability::{
+    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
+    SimpleObservabilityStack,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -111,23 +184,19 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageError, PackageFormat, PackageFormatAdapter,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use performance::{
-    AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CallGraph,
-    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoSchedClass, IoTaskPriority,
-    PerformanceProfileRule, PhysicalPageFrame, Profile, ProfileType, Profiler, ProfilerError,
-    RamDefragmenter, SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
-    SmartResourceOptimizer, UltraKernelSamepageMerger, X86v3v4OptimizationDetector,
-    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
-};
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore, EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
-    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
-    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
-    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
+    Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
+    PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
+    TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+};
+pub use remote::{
+    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
+    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    SimpleShellManager,
 };
 pub use resilience::{
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
@@ -135,79 +204,75 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN, Securelevel, LinuxCapability,
-    SovereignSecurelevelManager, PamError, PamUser, PamGroup, SovereignPamManager,
+    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
+    IsolationError, Permission, PledgeManager, PledgePromise,
+    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
+pub use shell::{
+    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
-    PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
-    Transaction, UniversalPackageAdapter,
+    AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter, FileState,
+    FileTransactionEntry, MirrorNode, PackageDependencyResolver,
+    PackageFormatAdapter as SpecPackageFormatAdapter, PackageRecipe, PacmanAdapter, RecipeError,
+    RecipeManager, RpmAdapter, SandboxRule, SatSolver, SovereignDeltaGenerator,
+    SovereignMirrorSelector, SovereignSandboxEnforcer, SovereignTransactionManager, Transaction,
+    UniversalPackageManager as SpecUniversalPackageManager, Version, MAX_RECIPE_DEPENDENCIES,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-pub use graphics::{
-    PixelRgba, VideoFrame, BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
-    Surface, Window, VideoClip, VideoEffect, VideoTimeline, VideoTrack as GraphicsVideoTrack,
-};
-pub use gpu::driver::{GPUDeviceID, GPUVendor};
-pub use media::{
-    SovereignScreenRecorder, CaptureSource, GpuEncoderType, RecorderState, RecordingStats,
-    AdBlockFilter, BrowserProcess, BrowserProcessType, SearchEngineType, SearchSwitcher,
-    SecureStorageContainer, SovereignBrowserEngine,
-    CGroup, CGroupController, CodecType, DnsResolver, InitService, NtpClient, PageTable,
-    PlayerState, SecureBootKeyring, SigmaSystemd, SovereignVideoPlayer, SovereignVmm,
-    SovereignVideoEditor, VideoTrack, TimelineClip, AscCdl, EditorError,
+
+pub use thread::management::{
+    SimpleThread, SimpleThreadManager, Thread, ThreadAlertableState, ThreadError, ThreadID,
+    ThreadManager, ThreadState as LibThreadState,
 };
 
-// Temporarily disabled problematic modules
-// pub mod accessibility;
-// pub mod automation;
-// pub mod container;
+pub use process::spawn::{
+    Process, ProcessError, ProcessGroup, ProcessID, ProcessSpawner,
+    ProcessState as LibProcessState, ProcessWaiter, SimpleProcess, SimpleProcessGroup,
+    SimpleProcessSpawner, SimpleProcessWaiter, CLONE_NEWNET, CLONE_NEWNS, CLONE_NEWPID,
+};
 
-// #[cfg(test)]
-// #[path = "compatibility/fedora.rs"]
-// pub mod fedora_compat_test;
-// pub mod customization;
-// pub mod dashboard;
-// pub mod desktop;
-// pub mod device;
-// pub mod driver;
-// pub mod filesystem;
-// pub mod ml;
-// pub mod network;
-// pub mod observability;
-// pub mod orchestration;
-// pub mod distro;
-// pub mod package;
-// pub mod performance;
-// pub mod productivity;
-// pub mod remote;
-// pub mod resilience;
-// pub mod shell;
-// pub mod sigpkg;
-// pub mod virtualization;
-// pub mod graphics {
-//     pub mod compositor;
-//     pub mod paint;
-//     pub mod video;
-// }
-// pub mod hardware {
-//     pub mod compatibility;
-//     pub mod win32;
-// }
-// pub mod power {
-//     pub mod governor;
-// }
-// pub mod ai {
-//     pub mod agent;
-//     pub mod orchestrator;
-// }
-// pub mod boot;
-// pub mod system;
-// pub mod installer;
+pub use tools::{
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
+    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
+    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
+    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
+    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
+    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity as LibUserIdentity,
+};
+
+// Re-export strategic unimplemented tools and features
+pub use unimplemented_features::{
+    AiNativeRuntime as FeatureAiNativeRuntime, ContinuationTask, CrossDeviceContinuity,
+    EnergyAwareScheduler as FeatureEnergyAwareScheduler, FsPluginType, GuestOsType, ModelProcess,
+    ModelType as FeatureModelType, PrivacyFirstSandbox as FeaturePrivacyFirstSandbox, SigmaFsPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions as FeatureUserDefinedKernelFunctions,
+};
+
+pub use unimplemented_tools::{
+    AccessibilitySuite, AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiComplianceDashboard,
+    AiDependencyResolver, AiDifficultyDirector, AiFileOrganizer, AiScheduler, AiSearchAssistant,
+    AiTaskbar, ApiTestingTool, AppSandboxing, AppStoreItem, AudioEditor, AudioTrack,
+    AutomationRoutine, BatterySaver, ButtonToKeyMapping, CameraFilter, CloudBackupUtility,
+    CloudGaming, CodeProfiler, ControllerMapper, CrossDeviceSync as ToolCrossDeviceSync,
+    CrossLanguageBuildTool, DeclarativeBuildSystem, DiagnosticMetric, DiskDefragmenter,
+    DisplayScreen, DocumentScanner, DuplicateFileFinder, EmulatorCore, EmulatorManager,
+    FlatpakSnapLayer, ForensicSnapshot, GameDetails, GameHubLauncher, GameModManager,
+    GamePerformanceBooster, GameRecorder, GamifiedDesktop, GamifiedTodo, GamifiedTodoTask,
+    GanttChartPlanner, GanttTask, GestureControl, GifConverter, GitCommitNode, GitGuiClient,
+    GuiAppStore, IotDevice, IotDeviceManager, KanbanBoard, KanbanColumn, KanbanTask,
+    MemoryLeakDetector, MeshNetworking as ToolMeshNetworking, MeshPeer, MindMapCreator,
+    MindMapNode, MockHttpRequest, ModDetails, MultiMonitorManager, MusicLibraryManager, MusicTrack,
+    NaturalLanguageShell, Notification, OfflinePackageInstaller, OverlayWidget,
+    PackagePublishingHub, PdfEditor, PerformanceOptimizer, PluginDetails, PluginMarketplace,
+    PodcastRecorder, PredictiveMaintenance, PrivacyDashboard, ProcessSandbox, ProfileSample,
+    RemoteDesktop as ToolRemoteDesktop, SecureContainer as ToolSecureContainer, SecureFileSharing,
+    SecureFileShredder, SmartCleanup, SmartNotificationManager, StartupOptimizer,
+    StaticAnalysisWarning, StaticAnalyzer, StreamingOverlayManager, SubtitleEditor, SubtitleLine,
+    SystemRestoreSnapshot, VoiceControl, VrArRuntime, VrPose, WebcamEffects, ZeroTrustTpmBoot,
+};

@@ -1,7 +1,9 @@
 // Minimal capability token implementation for SigmaOS
 // This provides the basic CapabilityToken structure needed by drivers
 
-use core::default::Default;
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {

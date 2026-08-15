@@ -6,7 +6,7 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -654,6 +654,8 @@ impl Compositor for SimpleCompositor {
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError> {
         self.stats.frame_count += 1;
 
+        // If double buffering is enabled, we render to our back buffer first, then copy to output.
+        // Otherwise, we render directly to output.
         let use_double_buffering =
             self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
 
@@ -686,23 +688,20 @@ impl Compositor for SimpleCompositor {
                                 if output_index < back_data.len()
                                     && window_index < window_data.len()
                                 {
-                                    // Apply standard Alpha Blending (simulated via scaling)
-                                    let pixel = window_data[window_index];
-                                    if opacity < 0.99f32 {
-                                        let a = ((pixel >> 24) & 0xFF) as f32 * opacity;
-                                        let r = ((pixel >> 16) & 0xFF) as f32 * opacity;
-                                        let g = ((pixel >> 8) & 0xFF) as f32 * opacity;
-                                        let b = (pixel & 0xFF) as f32 * opacity;
-                                        back_data[output_index] = ((a as u32) << 24) | ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
-                                    } else {
-                                        back_data[output_index] = pixel;
-                                    }
+                                    back_data[output_index] = window_data[window_index];
                                 }
                             }
                         }
                     }
                 }
             }
+
+            // Copy back buffer to output
+            let back = self.back_buffer.as_ref().unwrap();
+            let back_data = back.data();
+            let output_data = output.data_mut();
+            let len = back_data.len().min(output_data.len());
+            output_data[..len].copy_from_slice(&back_data[..len]);
         } else {
             &mut *output
         };
@@ -729,9 +728,11 @@ impl Compositor for SimpleCompositor {
                             let output_index = output_y * output_stride + output_x;
                             let window_index = y * window_stride + x;
 
-                            if output_index < output_data.len() && window_index < window_data.len()
-                            {
-                                output_data[output_index] = window_data[window_index];
+                                if output_index < output_data.len()
+                                    && window_index < window_data.len()
+                                {
+                                    output_data[output_index] = window_data[window_index];
+                                }
                             }
                         }
                     }

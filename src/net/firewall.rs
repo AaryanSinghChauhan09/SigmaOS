@@ -6,9 +6,8 @@ use std_alloc::boxed::Box;
 #![no_std]
 #![cfg_attr(not(test), no_main)]
 
-/// OOP-based Firewall & AI Intrusion Detection System (IDS) for SigmaOS
-/// Implements standard packet filtering, Snort-style signature checking,
-/// and CrowdStrike Falcon-inspired AI anomaly rate monitoring.
+/// Sovereign Stateful Firewall & Netfilter-Style Connection Tracker for SigmaOS
+/// Inspired by Linux Netfilter (iptables/nftables) and conntrack architectures
 
 extern crate alloc;
 
@@ -308,282 +307,66 @@ mod tests {
         let src = [192, 168, 1, 10];
         let dst = [8, 8, 8, 8];
 
-impl SimpleNAT {
-    pub fn new() -> Self {
-        SimpleNAT {
-            mappings: Vec::new(),
-        }
-    }
-}
+        // First packet initiates a NEW connection flow
+        let state1 = conntrack.track_packet(Protocol::Tcp, src, dst, 45210, 80, 1000);
+        assert_eq!(state1, ConnectionState::New);
 
-impl NAT for SimpleNAT {
-    fn add_mapping(&mut self, internal_ip: &[u8], internal_port: u16, external_port: u16) -> Result<(), FirewallError> {
-        let mut ip_array = [0u8; 4];
-        let ip_len = internal_ip.len().min(4);
-        for i in 0..ip_len { ip_array[i] = internal_ip[i]; }
-        self.mappings.push((ip_array, internal_port, external_port));
-        Ok(())
-    }
-
-    fn remove_mapping(&mut self, internal_port: u16) -> Result<(), FirewallError> {
-        for i in 0..self.mappings.len() {
-            if self.mappings[i].1 == internal_port {
-                self.mappings.remove(i);
-                return Ok(());
-            }
-        }
-        Err(FirewallError::NotFound)
-    }
-
-    fn translate(&self, internal_ip: &[u8], internal_port: u16) -> Option<(u16, [u8; 4])> {
-        for &(ref ip, int_port, ext_port) in &self.mappings {
-            if ip == internal_ip && int_port == internal_port {
-                return Some((ext_port, *ip));
-            }
-        }
-        None
-    }
-}
-
-/// Snort-style security signature description (IDS payload checker)
-#[derive(Debug, Clone)]
-pub struct SnortSignature {
-    pub pattern: Vec<u8>,
-    pub protocol: Protocol,
-    pub dst_port: u16,
-    pub alert_message: &'static str,
-}
-
-/// Active traffic count per IP for Crowdstrike Falcon-inspired AI Flood monitoring
-#[derive(Debug, Clone)]
-pub struct CrowdstrikeIpTelemetry {
-    pub source_ip: [u8; 4],
-    pub packet_count: u32,
-    pub anomaly_flagged: bool,
-}
-
-/// Sovereign AI Network Intrusion Detection System (combines Snort & Crowdstrike)
-pub struct SovereignSecurityIds {
-    pub signatures: Vec<SnortSignature>,
-    pub telemetry: Vec<CrowdstrikeIpTelemetry>,
-    pub max_packet_flood_threshold: u32, // Max allowed requests per IP frame
-}
-
-impl Default for SovereignSecurityIds {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl SovereignSecurityIds {
-    pub fn new() -> Self {
-        SovereignSecurityIds {
-            signatures: Vec::new(),
-            telemetry: Vec::new(),
-            max_packet_flood_threshold: 50,
-        }
-    }
-
-    pub fn add_signature(&mut self, sig: SnortSignature) {
-        self.signatures.push(sig);
-    }
-
-    /// Evaluates active packets against signature lists and behavioral floods
-    pub fn inspect_packet(
-        &mut self,
-        source_ip: [u8; 4],
-        protocol: Protocol,
-        dst_port: u16,
-        payload: &[u8],
-    ) -> Result<RuleAction, &'static str> {
-        // 1. Crowdstrike-style Flood/DDOS Anomaly Check
-        let mut telemetry_index = None;
-        for i in 0..self.telemetry.len() {
-            if self.telemetry[i].source_ip == source_ip {
-                telemetry_index = Some(i);
-                break;
-            }
-        }
-
-        let idx = if let Some(i) = telemetry_index {
-            i
-        } else {
-            let item = CrowdstrikeIpTelemetry {
-                source_ip,
-                packet_count: 0,
-                anomaly_flagged: false,
-            };
-            self.telemetry.push(item);
-            self.telemetry.len() - 1
-        };
-
-        self.telemetry[idx].packet_count += 1;
-
-        if self.telemetry[idx].packet_count >= self.max_packet_flood_threshold {
-            self.telemetry[idx].anomaly_flagged = true;
-            return Err("CrowdStrike: DDOS flood anomaly detected. Dropping packet flow.");
-        }
-
-        // 2. Snort-style Signature Inspection
-        for sig in self.signatures.iter() {
-            if (sig.protocol == Protocol::Any || sig.protocol == protocol) && sig.dst_port == dst_port {
-                // Perform simple substring search in standard #![no_std] slice
-                if contains_substring(payload, &sig.pattern) {
-                    return Err(sig.alert_message);
-                }
-            }
-        }
-
-        Ok(RuleAction::Accept)
-    }
-}
-
-fn contains_substring(haystack: &[u8], needle: &[u8]) -> bool {
-    if needle.is_empty() { return true; }
-    if haystack.len() < needle.len() { return false; }
-    for i in 0..=haystack.len() - needle.len() {
-        if &haystack[i..i + needle.len()] == needle {
-            return true;
-        }
-    }
-    false
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    fn len(&self) -> usize { self.len }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_snort_signature_matching() {
-        let mut ids = SovereignSecurityIds::new();
-
-        let sig = SnortSignature {
-            pattern: b"exploit_command".to_vec(),
-            protocol: Protocol::TCP,
-            dst_port: 80,
-            alert_message: "Snort: Blocked standard remote code execution exploit attempt.",
-        };
-
-        ids.add_signature(sig);
-
-        // Safe packet -> should be accepted
-        let action_clean = ids.inspect_packet([192, 168, 1, 10], Protocol::TCP, 80, b"GET /index.html HTTP/1.1");
-        assert_eq!(action_clean, Ok(RuleAction::Accept));
-
-        // Exploiting packet -> should be rejected with Snort alert
-        let action_exploit = ids.inspect_packet([192, 168, 1, 10], Protocol::TCP, 80, b"POST /submit?cmd=exploit_command");
-        assert_eq!(action_exploit, Err("Snort: Blocked standard remote code execution exploit attempt."));
+        // Reverse or subsequent response packet is marked as ESTABLISHED
+        let state2 = conntrack.track_packet(Protocol::Tcp, dst, src, 80, 45210, 1001);
+        assert_eq!(state2, ConnectionState::Established);
     }
 
     #[test]
-    fn test_crowdstrike_flood_ddos_detection() {
-        let mut ids = SovereignSecurityIds::new();
-        ids.max_packet_flood_threshold = 4; // limit to 4 packets
+    fn test_netfilter_rules_matching() {
+        let mut firewall = SovereignFirewall::new();
+        let src = [192, 168, 1, 50];
+        let dst = [10, 0, 0, 1];
 
-        let attacker_ip = [10, 0, 0, 9];
+        // Register a drop rule on forwarding chain for UDP protocol
+        let rule = SimpleFirewallRule::new(
+            1,
+            RuleAction::Drop,
+            Protocol::Udp,
+            &src,
+            &[0, 0, 0, 0],
+            0,
+            53,
+            FirewallHook::Forward,
+        );
+        firewall.add_rule(Box::new(rule));
 
-        // First 3 packets are accepted
-        for _ in 0..3 {
-            assert_eq!(ids.inspect_packet(attacker_ip, Protocol::UDP, 53, b"dns_query"), Ok(RuleAction::Accept));
-        }
+        // Matching UDP on Forward hook should be dropped
+        let action1 = firewall.filter_packet(
+            FirewallHook::Forward,
+            Protocol::Udp,
+            src,
+            dst,
+            5520,
+            53,
+            2000,
+        );
+        assert_eq!(action1, RuleAction::Drop);
 
-        // 4th packet triggers Crowdstrike flood anomaly threshold
-        let block_res = ids.inspect_packet(attacker_ip, Protocol::UDP, 53, b"dns_query");
-        assert!(block_res.is_err());
-        assert!(ids.telemetry[0].anomaly_flagged);
+        // Different protocol (TCP) on same hook should be accepted
+        let action2 = firewall.filter_packet(
+            FirewallHook::Forward,
+            Protocol::Tcp,
+            src,
+            dst,
+            5520,
+            53,
+            2001,
+        );
+        assert_eq!(action2, RuleAction::Accept);
+    }
+
+    #[test]
+    fn test_nat_address_translation() {
+        let mut firewall = SovereignFirewall::new();
+        let internal = [192, 168, 1, 15];
+
+        firewall.add_nat_mapping(internal, 8080, 80);
+        assert_eq!(firewall.translate_nat(internal, 8080), Some(80));
+        assert_eq!(firewall.translate_nat(internal, 9000), None);
     }
 }

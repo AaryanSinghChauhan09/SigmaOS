@@ -4,6 +4,7 @@
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::collections::BTreeMap as HashMap;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use crate::klib::HashMap;
@@ -313,18 +314,25 @@ impl SigmaPatch {
     }
 
     /// Splicing newly compiled instructions natively inside live microkernel paths
-    pub fn apply_live_patch(&mut self, patch_hash: &str, memory_addr: u64, signature: &[u8]) -> Result<(), SigmaToolError> {
+    pub fn apply_live_patch(
+        &mut self,
+        patch_hash: &str,
+        memory_addr: u64,
+        signature: &[u8],
+    ) -> Result<(), SigmaToolError> {
         if signature.is_empty() {
             return Err(SigmaToolError::AuthenticationFailed);
         }
 
         // Simulates unmapping legacy instructions and mapping patch instruction frames
-        self.applied_patches.insert(patch_hash.to_string(), memory_addr);
+        self.applied_patches
+            .insert(patch_hash.to_string(), memory_addr);
         Ok(())
     }
 
     pub fn rollback_patch(&mut self, patch_hash: &str) -> Result<(), SigmaToolError> {
-        self.applied_patches.remove(patch_hash)
+        self.applied_patches
+            .remove(patch_hash)
             .ok_or(SigmaToolError::ResourceUnavailable)?;
         Ok(())
     }
@@ -356,7 +364,11 @@ impl SigmaRescue {
     }
 
     /// Walks back structural storage tracks to point the filesystem Merkle root to a previous secure checkpoint
-    pub fn walk_back_merkle_root(&self, partition: &str, target_hash: &str) -> Result<String, SigmaToolError> {
+    pub fn walk_back_merkle_root(
+        &self,
+        partition: &str,
+        target_hash: &str,
+    ) -> Result<String, SigmaToolError> {
         if !self.target_partitions.contains(&partition.to_string()) {
             return Err(SigmaToolError::ResourceUnavailable);
         }
@@ -365,7 +377,10 @@ impl SigmaRescue {
             return Err(SigmaToolError::IntegrityFailure);
         }
 
-        Ok(format!("Partition {} successfully rolled back to secure Merkle Root Point [{}].", partition, target_hash))
+        Ok(format!(
+            "Partition {} successfully rolled back to secure Merkle Root Point [{}].",
+            partition, target_hash
+        ))
     }
 }
 
@@ -512,8 +527,12 @@ mod tests {
     #[test]
     fn test_sigma_patch_hot_splicing() {
         let mut patcher = SigmaPatch::new();
-        assert!(patcher.apply_live_patch("patch_01", 0x1000200, &[]).is_err());
-        assert!(patcher.apply_live_patch("patch_01", 0x1000200, &[1, 2]).is_ok());
+        assert!(patcher
+            .apply_live_patch("patch_01", 0x1000200, &[])
+            .is_err());
+        assert!(patcher
+            .apply_live_patch("patch_01", 0x1000200, &[1, 2])
+            .is_ok());
         assert_eq!(*patcher.applied_patches.get("patch_01").unwrap(), 0x1000200);
 
         assert!(patcher.rollback_patch("patch_01").is_ok());
@@ -523,9 +542,18 @@ mod tests {
     #[test]
     fn test_sigma_rescue_merkle_recovery() {
         let rescue = SigmaRescue::new();
-        assert!(rescue.walk_back_merkle_root("/dev/invalid", "sha256-hash-representation").is_err());
-        assert!(rescue.walk_back_merkle_root("/dev/sda1", "too-short").is_err());
-        let res = rescue.walk_back_merkle_root("/dev/sda1", "sha256-valid-hash-length-string-representation").unwrap();
+        assert!(rescue
+            .walk_back_merkle_root("/dev/invalid", "sha256-hash-representation")
+            .is_err());
+        assert!(rescue
+            .walk_back_merkle_root("/dev/sda1", "too-short")
+            .is_err());
+        let res = rescue
+            .walk_back_merkle_root(
+                "/dev/sda1",
+                "sha256-valid-hash-length-string-representation",
+            )
+            .unwrap();
         assert!(res.contains("/dev/sda1"));
     }
 
@@ -564,7 +592,10 @@ impl SovereignDpkgEtcher {
             return Err("Empty bootable image payload");
         }
         self.bytes_written = image_bytes.len() as u64;
-        Ok(format!("SovereignEtcher: Flashed {} bytes bootable image onto {} successfully", self.bytes_written, self.target_device_path))
+        Ok(format!(
+            "SovereignEtcher: Flashed {} bytes bootable image onto {} successfully",
+            self.bytes_written, self.target_device_path
+        ))
     }
 }
 
@@ -583,7 +614,12 @@ impl SovereignAptDuo {
             let line_a = lines_a.get(i).copied().unwrap_or("");
             let line_b = lines_b.get(i).copied().unwrap_or("");
             if line_a != line_b {
-                diffs.push(format!("Diff at line {}: '{}' vs '{}'", i + 1, line_a, line_b));
+                diffs.push(format!(
+                    "Diff at line {}: '{}' vs '{}'",
+                    i + 1,
+                    line_a,
+                    line_b
+                ));
             }
         }
         diffs
@@ -665,7 +701,10 @@ impl SovereignTextFixer {
     }
 
     pub fn remove_special_symbols(&self, input: &str) -> String {
-        input.chars().filter(|c| c.is_alphanumeric() || c.is_whitespace()).collect()
+        input
+            .chars()
+            .filter(|c| c.is_alphanumeric() || c.is_whitespace())
+            .collect()
     }
 }
 
@@ -686,8 +725,16 @@ impl SovereignImageToDataUri {
         let mut i = 0;
         while i < bytes.len() {
             let b0 = bytes[i] as usize;
-            let b1 = if i + 1 < bytes.len() { bytes[i + 1] as usize } else { 0 };
-            let b2 = if i + 2 < bytes.len() { bytes[i + 2] as usize } else { 0 };
+            let b1 = if i + 1 < bytes.len() {
+                bytes[i + 1] as usize
+            } else {
+                0
+            };
+            let b2 = if i + 2 < bytes.len() {
+                bytes[i + 2] as usize
+            } else {
+                0
+            };
 
             let c0 = b0 >> 2;
             let c1 = ((b0 & 3) << 4) | (b1 >> 4);
@@ -1026,7 +1073,10 @@ mod tests_replicated {
 
     #[test]
     fn test_word_counter() {
-        let mut wc = SovereignWordCounter { total_words: 0, total_chars: 0 };
+        let mut wc = SovereignWordCounter {
+            total_words: 0,
+            total_chars: 0,
+        };
         let duplicates = wc.evaluate_text("hello world hello");
         assert_eq!(wc.total_words, 3);
         assert_eq!(wc.total_chars, 17);

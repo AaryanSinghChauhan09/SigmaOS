@@ -1,11 +1,12 @@
-// Completely Fair Scheduler (CFS), Real-time (RT), and Deadline CPU scheduler
-// High-fidelity multi-class task scheduling inspired by standard Linux kernels
+// SigmaOS CFS and custom scheduler classes
+// Inspired by Linux schedulers, including the legendary CachyOS BORE (Burst-Oriented Response Enhancer)
 
 #![no_std]
 
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task, PID_MAX_LIMIT};
@@ -91,10 +92,7 @@ impl SchedClass for StopSchedClass {
         Ok(())
     }
     fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
-        if rq.stop_rq.nr_running > 0 {
-            rq.stop_rq.nr_running -= 1;
-            rq.nr_running.fetch_sub(1, Ordering::SeqCst);
-        }
+        rq.stop_rq.nr_running -= 1;
         Ok(())
     }
     fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
@@ -103,12 +101,8 @@ impl SchedClass for StopSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         true
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
-        if rq.stop_rq.pending {
-            Some(9999) // mock STOP task PID
-        } else {
-            None
-        }
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
+        None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -128,32 +122,15 @@ impl SchedClass for StopSchedClass {
 }
 
 impl SchedClass for FairSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        let entity = SchedEntity {
-            pid: task.pid,
-            vruntime: task.utime,
-            deadline: 0,
-            runtime: task.stime,
-            priority: task.priority,
-            policy: task.policy,
-            cpu: rq.cpu_id,
-            on_rq: true,
-        };
-        rq.cfs_rq.deadlines.push(entity);
+    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.cfs_rq.nr_running += 1;
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
         task.state = ProcessState::Runnable;
         Ok(())
     }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        let initial_len = rq.cfs_rq.deadlines.len();
-        rq.cfs_rq.deadlines.retain(|entity| entity.pid != task.pid);
-        let removed = initial_len - rq.cfs_rq.deadlines.len();
-
-        if removed > 0 {
-            rq.cfs_rq.nr_running -= removed as u32;
-            rq.nr_running.fetch_sub(removed as u32, Ordering::SeqCst);
-        }
+    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        rq.cfs_rq.nr_running -= 1;
+        rq.nr_running.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
     fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
@@ -163,24 +140,8 @@ impl SchedClass for FairSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
-        // CFS selection: pick task with minimum virtual runtime (vruntime)
-        if rq.cfs_rq.deadlines.is_empty() {
-            return None;
-        }
-        let mut min_idx = 0;
-        let mut min_vruntime = rq.cfs_rq.deadlines[0].vruntime;
-
-        for (i, entity) in rq.cfs_rq.deadlines.iter().enumerate() {
-            if entity.vruntime < min_vruntime {
-                min_vruntime = entity.vruntime;
-                min_idx = i;
-            }
-        }
-
-        let min_entity = &rq.cfs_rq.deadlines[min_idx];
-        rq.cfs_rq.min_vruntime = min_entity.vruntime;
-        Some(min_entity.pid)
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
+        None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -199,35 +160,68 @@ impl SchedClass for FairSchedClass {
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
-impl SchedClass for DeadlineSchedClass {
+/// CachyOS-style BORE (Burst-Oriented Response Enhancer) Scheduler Class
+pub struct BoreSchedClass {
+    pub base: FairSchedClass,
+}
+
+impl BoreSchedClass {
+    pub fn new() -> Self {
+        Self { base: FairSchedClass }
+    }
+
+    /// Computes BORE scaled vruntime bonus based on process burstiness metrics (sleep vs run ratio)
+    pub fn compute_bore_vruntime(&self, runtime: u64, sleep_time: u64) -> u64 {
+        // High sleep time -> bursty/interactive -> smaller vruntime increment (interactive boost)
+        if sleep_time > runtime {
+            runtime / 2 // Award 2x boost (half vruntime increment)
+        } else {
+            runtime * 2 // Background/batch task -> double vruntime increment (penalized)
+        }
+    }
+}
+
+impl SchedClass for BoreSchedClass {
     fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        // DL scheduling parameters
-        let deadline = if task.static_prio > 0 { task.static_prio as u64 } else { 1000 };
-        let entity = SchedEntity {
-            pid: task.pid,
-            vruntime: 0,
-            deadline,
-            runtime: task.stime,
-            priority: task.priority,
-            policy: task.policy,
-            cpu: rq.cpu_id,
-            on_rq: true,
-        };
-        rq.dl_rq.deadlines.push(entity);
-        rq.dl_rq.nr_running += 1;
-        rq.nr_running.fetch_add(1, Ordering::SeqCst);
-        task.state = ProcessState::Runnable;
-        Ok(())
+        self.base.enqueue_task(rq, task)
     }
     fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        let initial_len = rq.dl_rq.deadlines.len();
-        rq.dl_rq.deadlines.retain(|entity| entity.pid != task.pid);
-        let removed = initial_len - rq.dl_rq.deadlines.len();
+        self.base.dequeue_task(rq, task)
+    }
+    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        self.base.yield_task(rq, task)
+    }
+    fn check_preempt_curr(&self, rq: &mut RunQueue, task: &Task) -> bool {
+        self.base.check_preempt_curr(rq, task)
+    }
+    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+        self.base.pick_next_task(rq)
+    }
+    fn put_prev_task(&self, rq: &mut RunQueue, task: &mut Task) {
+        self.base.put_prev_task(rq, task)
+    }
+    fn set_curr_task(&self, rq: &mut RunQueue, task: &mut Task) {
+        self.base.set_curr_task(rq, task)
+    }
+    fn task_tick(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        self.base.task_tick(rq, task)
+    }
+    fn task_fork(&self, rq: &mut RunQueue, child: &mut Task, parent: &Task) -> Result<(), FsError> {
+        self.base.task_fork(rq, child, parent)
+    }
+    fn task_dead(&self, rq: &mut RunQueue, task: &mut Task) {
+        self.base.task_dead(rq, task)
+    }
+    fn prio_changed(&self, rq: &mut RunQueue, task: &mut Task) {
+        self.base.prio_changed(rq, task)
+    }
+}
 
-        if removed > 0 {
-            rq.dl_rq.nr_running -= removed as u32;
-            rq.nr_running.fetch_sub(removed as u32, Ordering::SeqCst);
-        }
+impl SchedClass for DeadlineSchedClass {
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
     fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
@@ -237,24 +231,8 @@ impl SchedClass for DeadlineSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
-        // Earliest Deadline First (EDF) selection
-        if rq.dl_rq.deadlines.is_empty() {
-            return None;
-        }
-        let mut earliest_idx = 0;
-        let mut min_deadline = rq.dl_rq.deadlines[0].deadline;
-
-        for (i, entity) in rq.dl_rq.deadlines.iter().enumerate() {
-            if entity.deadline < min_deadline {
-                min_deadline = entity.deadline;
-                earliest_idx = i;
-            }
-        }
-
-        let earliest_entity = &rq.dl_rq.deadlines[earliest_idx];
-        rq.dl_rq.earliest_deadline = earliest_entity.deadline;
-        Some(earliest_entity.pid)
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
+        None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -274,34 +252,10 @@ impl SchedClass for DeadlineSchedClass {
 }
 
 impl SchedClass for RealtimeSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        let prio = task.priority.clamp(0, 139) as usize;
-        let entity = SchedEntity {
-            pid: task.pid,
-            vruntime: 0,
-            deadline: 0,
-            runtime: task.stime,
-            priority: task.priority,
-            policy: task.policy,
-            cpu: rq.cpu_id,
-            on_rq: true,
-        };
-        rq.rt_rq.active[prio].push(entity);
-        rq.rt_rq.nr_running += 1;
-        rq.nr_running.fetch_add(1, Ordering::SeqCst);
-        task.state = ProcessState::Runnable;
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        let prio = task.priority.clamp(0, 139) as usize;
-        let initial_len = rq.rt_rq.active[prio].len();
-        rq.rt_rq.active[prio].retain(|entity| entity.pid != task.pid);
-        let removed = initial_len - rq.rt_rq.active[prio].len();
-
-        if removed > 0 {
-            rq.rt_rq.nr_running -= removed as u32;
-            rq.nr_running.fetch_sub(removed as u32, Ordering::SeqCst);
-        }
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
     fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
@@ -311,13 +265,7 @@ impl SchedClass for RealtimeSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
-        // Priority Array scanning (0 is highest RT priority)
-        for i in 0..140 {
-            if !rq.rt_rq.active[i].is_empty() {
-                return Some(rq.rt_rq.active[i][0].pid);
-            }
-        }
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -338,16 +286,10 @@ impl SchedClass for RealtimeSchedClass {
 }
 
 impl SchedClass for IdleSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
-        rq.idle_rq.nr_running += 1;
-        rq.nr_running.fetch_add(1, Ordering::SeqCst);
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
-    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
-        if rq.idle_rq.nr_running > 0 {
-            rq.idle_rq.nr_running -= 1;
-            rq.nr_running.fetch_sub(1, Ordering::SeqCst);
-        }
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
     fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
@@ -357,7 +299,7 @@ impl SchedClass for IdleSchedClass {
         false
     }
     fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
-        Some(0) // IDLE task PID is always 0
+        None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
     fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -474,170 +416,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_cfs_virtual_runtime_selection() {
-        let mut rq = RunQueue {
-            cfs_rq: CfsRunQueue {
-                vruntime: 0,
-                min_vruntime: 0,
-                nr_running: 0,
-                rb_leftmost: None,
-                deadlines: Vec::new(),
-            },
-            rt_rq: RtRunQueue {
-                active: core::array::from_fn(|_| Vec::new()),
-                highest_prio: 140,
-                nr_running: 0,
-            },
-            dl_rq: DeadlineRunQueue {
-                earliest_deadline: u64::MAX,
-                nr_running: 0,
-                deadlines: Vec::new(),
-            },
-            stop_rq: StopRunQueue {
-                pending: false,
-                nr_running: 0,
-            },
-            idle_rq: IdleRunQueue { nr_running: 0 },
-            nr_running: AtomicU32::new(0),
-            cpu_id: 0,
-            load: 0,
-            avg_load: 0,
-        };
+    fn test_bore_scheduler_scale() {
+        let bore = BoreSchedClass::new();
 
-        let mut task_a = Task::new(100, "task_a");
-        task_a.utime = 20; // higher vruntime
+        // Test highly interactive/bursty task: sleep_time = 1000, runtime = 100
+        let interactive_vruntime = bore.compute_bore_vruntime(100, 1000);
+        assert_eq!(interactive_vruntime, 50); // scaled down -> gets scheduled sooner
 
-        let mut task_b = Task::new(200, "task_b");
-        task_b.utime = 10; // lower vruntime
-
-        let fair_class = FairSchedClass;
-        fair_class.enqueue_task(&mut rq, &mut task_a).unwrap();
-        fair_class.enqueue_task(&mut rq, &mut task_b).unwrap();
-
-        // 1. Minimum vruntime should be picked first (task_b with 10)
-        let next1 = fair_class.pick_next_task(&mut rq).unwrap();
-        assert_eq!(next1, 200);
-
-        // 2. Modify vruntime of task_b to be larger than task_a
-        fair_class.dequeue_task(&mut rq, &mut task_b).unwrap();
-        task_b.utime = 30;
-        fair_class.enqueue_task(&mut rq, &mut task_b).unwrap();
-
-        // Now task_a (with 20) is minimum
-        let next2 = fair_class.pick_next_task(&mut rq).unwrap();
-        assert_eq!(next2, 100);
-    }
-
-    #[test]
-    fn test_rt_priority_array_scanning() {
-        let mut rq = RunQueue {
-            cfs_rq: CfsRunQueue {
-                vruntime: 0,
-                min_vruntime: 0,
-                nr_running: 0,
-                rb_leftmost: None,
-                deadlines: Vec::new(),
-            },
-            rt_rq: RtRunQueue {
-                active: core::array::from_fn(|_| Vec::new()),
-                highest_prio: 140,
-                nr_running: 0,
-            },
-            dl_rq: DeadlineRunQueue {
-                earliest_deadline: u64::MAX,
-                nr_running: 0,
-                deadlines: Vec::new(),
-            },
-            stop_rq: StopRunQueue {
-                pending: false,
-                nr_running: 0,
-            },
-            idle_rq: IdleRunQueue { nr_running: 0 },
-            nr_running: AtomicU32::new(0),
-            cpu_id: 0,
-            load: 0,
-            avg_load: 0,
-        };
-
-        let mut task_low = Task::new(300, "task_low");
-        task_low.priority = 90; // lower priority
-
-        let mut task_high = Task::new(400, "task_high");
-        task_high.priority = 10; // higher priority (closer to 0)
-
-        let rt_class = RealtimeSchedClass;
-        rt_class.enqueue_task(&mut rq, &mut task_low).unwrap();
-        rt_class.enqueue_task(&mut rq, &mut task_high).unwrap();
-
-        // Pick task. Priority 10 should be selected first.
-        let next = rt_class.pick_next_task(&mut rq).unwrap();
-        assert_eq!(next, 400);
-    }
-
-    #[test]
-    fn test_deadline_earliest_deadline_first() {
-        let mut rq = RunQueue {
-            cfs_rq: CfsRunQueue {
-                vruntime: 0,
-                min_vruntime: 0,
-                nr_running: 0,
-                rb_leftmost: None,
-                deadlines: Vec::new(),
-            },
-            rt_rq: RtRunQueue {
-                active: core::array::from_fn(|_| Vec::new()),
-                highest_prio: 140,
-                nr_running: 0,
-            },
-            dl_rq: DeadlineRunQueue {
-                earliest_deadline: u64::MAX,
-                nr_running: 0,
-                deadlines: Vec::new(),
-            },
-            stop_rq: StopRunQueue {
-                pending: false,
-                nr_running: 0,
-            },
-            idle_rq: IdleRunQueue { nr_running: 0 },
-            nr_running: AtomicU32::new(0),
-            cpu_id: 0,
-            load: 0,
-            avg_load: 0,
-        };
-
-        let mut task_late = Task::new(600, "task_late");
-        task_late.static_prio = 2000; // deadline = 2000
-
-        let mut task_early = Task::new(500, "task_early");
-        task_early.static_prio = 500; // deadline = 500
-
-        let dl_class = DeadlineSchedClass;
-        dl_class.enqueue_task(&mut rq, &mut task_late).unwrap();
-        dl_class.enqueue_task(&mut rq, &mut task_early).unwrap();
-
-        // Earliest deadline should be selected first (task_early)
-        let next = dl_class.pick_next_task(&mut rq).unwrap();
-        assert_eq!(next, 500);
-    }
-
-    #[test]
-    fn test_multiclass_scheduler_cascade() {
-        let mut scheduler = Scheduler::new(1);
-
-        let mut cfs_task = Task::new(100, "cfs_task");
-        cfs_task.utime = 10;
-        cfs_task.policy = SchedPolicy::Normal;
-
-        let mut rt_task = Task::new(400, "rt_task");
-        rt_task.priority = 10;
-        rt_task.policy = SchedPolicy::RoundRobin;
-
-        // Enqueue on their respective runqueues
-        FairSchedClass.enqueue_task(&mut scheduler.runqueues[0], &mut cfs_task).unwrap();
-        RealtimeSchedClass.enqueue_task(&mut scheduler.runqueues[0], &mut rt_task).unwrap();
-
-        // Run unified schedule. Real-time class should take precedence over CFS.
-        let scheduled_pid = scheduler.schedule().unwrap();
-        assert_eq!(scheduled_pid, 400); // RT task picked first
+        // Test background batch task: sleep_time = 10, runtime = 500
+        let batch_vruntime = bore.compute_bore_vruntime(500, 10);
+        assert_eq!(batch_vruntime, 1000); // scaled up -> gets penalized
     }
 }

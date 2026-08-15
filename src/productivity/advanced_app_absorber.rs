@@ -66,7 +66,11 @@ impl ShareXFlameshotEngine {
 
         // Add ShareX-style auto upload if enabled
         if self.auto_upload_enabled {
-            screenshot.cloud_url = Some(format!("{}/capture_{}.png", self.target_cloud_destination, crate::klib::uuid::Uuid::new().to_string()));
+            screenshot.cloud_url = Some(format!(
+                "{}/capture_{}.png",
+                self.target_cloud_destination,
+                uuid::Uuid::new_v4()
+            ));
         }
 
         self.screenshot_history.push_back(screenshot.clone());
@@ -86,8 +90,8 @@ pub struct Subtitle {
 }
 
 pub struct PotPlayerVlcEngine {
-    pub playback_speed: f32, // 0.25x to 4.0x
-    pub equalizer_presets: BTreeMap<String, Vec<f32>>, // Frequency gain settings
+    pub playback_speed: f32,                          // 0.25x to 4.0x
+    pub equalizer_presets: HashMap<String, Vec<f32>>, // Frequency gain settings
     pub subtitle_delay_ms: i32,
     pub subtitles: Vec<Subtitle>,
     pub playlist: Vec<PathBuf>,
@@ -152,7 +156,10 @@ impl EverythingSearchEngine {
             size_bytes: 4096,
             last_modified: 1700000000,
         };
-        self.index.entry("kernel_signing_key.pem".to_string()).or_default().push(file_record);
+        self.index
+            .entry("kernel_signing_key.pem".to_string())
+            .or_default()
+            .push(file_record);
     }
 
     pub fn query_everything(&self, query: &str) -> Vec<IndexedFile> {
@@ -211,8 +218,16 @@ impl EarTrumpetAudioRouter {
     pub fn new() -> Self {
         Self {
             sessions: vec![
-                AppAudioSession { process_name: "Brave.exe".to_string(), volume: 0.9, output_device: "Speakers".to_string() },
-                AppAudioSession { process_name: "Discord.exe".to_string(), volume: 0.5, output_device: "Headset".to_string() },
+                AppAudioSession {
+                    process_name: "Brave.exe".to_string(),
+                    volume: 0.9,
+                    output_device: "Speakers".to_string(),
+                },
+                AppAudioSession {
+                    process_name: "Discord.exe".to_string(),
+                    volume: 0.5,
+                    output_device: "Headset".to_string(),
+                },
             ],
             system_default_output: "Speakers".to_string(),
         }
@@ -264,7 +279,10 @@ impl BraveBrowserEngine {
                 upgrade_https: true,
                 fingerprinting_blocked: true,
             },
-            adblock_definitions: vec!["||doubleclick.net^".to_string(), "||adservice.google.com^".to_string()],
+            adblock_definitions: vec![
+                "||doubleclick.net^".to_string(),
+                "||adservice.google.com^".to_string(),
+            ],
         }
     }
 
@@ -322,7 +340,10 @@ impl AudacityEditor {
     }
 
     pub fn apply_gain(&mut self, factor: f32) {
-        self.audio_track.samples.iter_mut().for_each(|s| *s *= factor);
+        self.audio_track
+            .samples
+            .iter_mut()
+            .for_each(|s| *s *= factor);
     }
 }
 
@@ -331,8 +352,8 @@ impl AudacityEditor {
 // =========================================================================
 
 pub struct NotepadPlusWorkspace {
-    pub tabs: Vec<(String, String)>, // (File name, content)
-    pub macros: BTreeMap<String, Vec<String>>, // Recorded keyboard macro sequences
+    pub tabs: Vec<(String, String)>,          // (File name, content)
+    pub macros: HashMap<String, Vec<String>>, // Recorded keyboard macro sequences
     pub active_tab_index: usize,
 }
 
@@ -376,9 +397,15 @@ pub struct OneCommanderDualPane {
 impl OneCommanderDualPane {
     pub fn new() -> Self {
         Self {
-            left_pane: OneCommanderPane { current_directory: PathBuf::from("/"), selected_files: Vec::new() },
-            right_pane: OneCommanderPane { current_directory: PathBuf::from("/home"), selected_files: Vec::new() },
-            tags_colors: BTreeMap::new(),
+            left_pane: OneCommanderPane {
+                current_directory: PathBuf::from("/"),
+                selected_files: Vec::new(),
+            },
+            right_pane: OneCommanderPane {
+                current_directory: PathBuf::from("/home"),
+                selected_files: Vec::new(),
+            },
+            tags_colors: HashMap::new(),
         }
     }
 
@@ -408,10 +435,26 @@ impl ObsStudioMixer {
     pub fn new() -> Self {
         Self {
             sources: vec![
-                MediaSource { name: "Desktop Video Capture".to_string(), volume_db: 0.0, enabled: true },
-                EarTrumpetAudioRouter::new().sessions.first().map(|s| MediaSource { name: s.process_name.clone(), volume_db: -3.0, enabled: true }).unwrap_or(MediaSource { name: "System Mic".to_string(), volume_db: -6.0, enabled: true }),
+                MediaSource {
+                    name: "Desktop Video Capture".to_string(),
+                    volume_db: 0.0,
+                    enabled: true,
+                },
+                EarTrumpetAudioRouter::new()
+                    .sessions
+                    .first()
+                    .map(|s| MediaSource {
+                        name: s.process_name.clone(),
+                        volume_db: -3.0,
+                        enabled: true,
+                    })
+                    .unwrap_or(MediaSource {
+                        name: "System Mic".to_string(),
+                        volume_db: -6.0,
+                        enabled: true,
+                    }),
             ],
-            stream_bitrate: 6000, // 6000 kbps (1080p60 target)
+            stream_bitrate: 6000,             // 6000 kbps (1080p60 target)
             record_format: "mkv".to_string(), // Robust crash-resistant format
         }
     }
@@ -478,7 +521,10 @@ mod tests {
         // OneCommander visual color tags labeling
         let mut explorer = OneCommanderDualPane::new();
         explorer.tag_file_with_color(PathBuf::from("/etc/fstab"), "Red");
-        assert_eq!(explorer.tags_colors.get(&PathBuf::from("/etc/fstab")), Some(&"Red".to_string()));
+        assert_eq!(
+            explorer.tags_colors.get(&PathBuf::from("/etc/fstab")),
+            Some(&"Red".to_string())
+        );
 
         // OBS Studio video/audio channel mixer test
         let mut obs = ObsStudioMixer::new();

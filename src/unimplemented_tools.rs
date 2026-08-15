@@ -1,3 +1,13 @@
+// Sovereign, AI-Native zero-dependency implementation of 100-Improvement-Ideas remaining tools
+// Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.
+
+extern crate alloc;
+use alloc::format;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+
+// =========================================================================
 // 1. MULTIMEDIA TOOLS
 
 /// Audio editor (multi-track, filters) [Audacity, Adobe Audition Parity]
@@ -1116,7 +1126,11 @@ impl PdfEditor {
         pdf_data
     }
 
-    pub fn split_pages(&mut self, start_page: usize, end_page: usize) -> Result<PdfEditor, &'static str> {
+    pub fn split_pages(
+        &mut self,
+        start_page: usize,
+        end_page: usize,
+    ) -> Result<PdfEditor, &'static str> {
         if start_page == 0 || end_page > self.page_count || start_page > end_page {
             return Err("Invalid page range specified");
         }

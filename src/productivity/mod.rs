@@ -47,7 +47,7 @@ pub use terminal::{
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
 pub use tmux::{
-    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
 pub use mind_map::{
     MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,

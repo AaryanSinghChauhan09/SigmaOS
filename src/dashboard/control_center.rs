@@ -258,7 +258,10 @@ impl UnifiedControlCenter {
         self.contrast_setting = contrast;
     }
 
-    pub fn apply_accessibility_overlay(&mut self, overlay: &super::accessibility_gamification::AccessibilityOverlay) {
+    pub fn apply_accessibility_overlay(
+        &mut self,
+        overlay: &super::accessibility_gamification::AccessibilityOverlay,
+    ) {
         if overlay.high_contrast {
             self.contrast_setting = 2.0;
         } else {

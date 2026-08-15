@@ -3,12 +3,11 @@
 // No dependency on external AI frameworks
 // Based on Roadmap Item 81: SigmaAI core agent
 
-use core::mem;
-/// OOP-based AI Agent Framework for SigmaOS
-/// Implements AI agent using OOP principles with traits and structs
-/// No dependency on external AI frameworks
-/// Based on Roadmap Item 81: SigmaAI core agent
-use core::ptr::{self, NonNull};
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
@@ -130,7 +129,14 @@ impl Pattern {
 
 impl SimpleAIAgent {
     pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
-        let name_str = std::str::from_utf8(name).unwrap_or("").to_string();
+        let mut name_str = String::new();
+        for &byte in name {
+            if byte == 0 {
+                break;
+            }
+            let c: char = byte as char;
+            name_str.push(c);
+        }
         SimpleAIAgent {
             name: name_str,
             version,
@@ -210,8 +216,9 @@ impl SimpleAIAgent {
         }
 
         // WiFi connection checks
-        let has_wifi = self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi");
-        if self.contains_bytes(input, b"connect") && has_wifi {
+        if self.contains_bytes(input, b"connect")
+            && (self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi"))
+        {
             let mut out = Vec::new();
             for &b in b"sigma-wifi connect --ssid Home" {
                 out.push(b);
@@ -383,7 +390,10 @@ mod tests_basics {
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
         let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        agent.register_mcp_tool("fetch_weather".to_string(), "MCP weather fetcher".to_string());
+        agent.register_mcp_tool(
+            "fetch_weather".to_string(),
+            "MCP weather fetcher".to_string(),
+        );
         assert_eq!(agent.mcp_tools.len(), 1);
 
         let opt_score = agent.optimize_prompt_weights();

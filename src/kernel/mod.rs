@@ -2,22 +2,23 @@
 pub mod architecture;
 pub mod breakthroughs;
 pub mod ipc;
-pub mod linux_bsd_innovations;
+pub mod linux_absorb;
 pub mod memory;
 pub mod policy_mechanism;
-pub mod roundrobin;
-pub mod scheduler;
-pub mod structures;
+pub mod sched;
+pub mod subsystem;
 
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,
     InstructionCyclePhase as ArchInstructionCyclePhase, Irql, LookasideList, MemoryDescriptorList,
     Pcb, PoolType, ProcessorInitState, Tcb, ThreadState,
 };
-pub use breakthroughs::{
-    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
-    UniversalAbiTranslator, UserDefinedKernelFunctions,
+pub use crate::container::runtime::oci::{
+    Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
+    ResourceConfig, Runtime,
 };
+pub use bus::{Bus, PciBus, UsableBus};
+pub use generation_manager::{Generation, GenerationManager};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_bsd_innovations::{
     BsdPfStateTable, FreeBsdVfsNullfs, FutexOp, FutexWaiter, LinuxFutexEngine,

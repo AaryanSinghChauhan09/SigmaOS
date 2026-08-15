@@ -1,25 +1,11 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::ToString;
-
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
 /// Implements command parsing, execution, and built-in commands
 use core::sync::atomic::{AtomicUsize, Ordering};
-
-extern "C" {
-    #[link_name = "alloc"]
-    fn sys_alloc(size: usize) -> *mut u8;
-    #[link_name = "free"]
-    fn sys_free(ptr: *mut u8);
-}
 
 pub type CommandID = usize;
 
@@ -385,10 +371,7 @@ impl ShellCommand for SigmaFindCommand {
         }
 
         // Simulate fd color/style matching
-        let matches: &[&[u8]] = &[
-            b"src/package/universal.rs",
-            b"tests/integration_test.rs",
-        ];
+        let matches: &[&[u8]] = &[b"src/package/universal.rs", b"tests/integration_test.rs"];
 
         for text in matches {
             for &b in *text {
@@ -806,10 +789,27 @@ impl<T> Vec<T> {
             if self.len >= self.capacity {
                 self.grow();
             }
-            if !self.data.is_null() && self.capacity > self.len {
+            if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+    fn len(&self) -> usize {
+        self.len
+    }
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
         }
     }
     unsafe fn grow(&mut self) {
@@ -818,14 +818,13 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_size = new_capacity * mem::size_of::<T>();
-        let new_data = alloc(new_size) as *mut T;
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
             if self.capacity > 0 {
-                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                free(self.data as *mut u8);
             }
             self.data = new_data;
             self.capacity = new_capacity;
