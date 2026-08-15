@@ -1,12 +1,7 @@
-#![no_std]
-
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::{Vec, String, ToString, HashMap};
-
-#[cfg(feature = "standalone_test")]
-extern crate std;
 
 #[cfg(feature = "standalone_test")]
 use alloc::{vec::Vec, string::{String, ToString}};
@@ -29,6 +24,201 @@ impl ArchUserRepoManager {
     pub fn install_from_aur(&mut self, pkg_name: &str, build_script: &str) -> Result<(), &'static str> {
         self.packages.insert(pkg_name.to_string(), build_script.to_string());
         Ok(())
+    }
+}
+
+// ================= OpenBSD PF Stateful Packet Filtering Table =================
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PfFiveTuple {
+    pub src_ip: String,
+    pub dst_ip: String,
+    pub src_port: u16,
+    pub dst_port: u16,
+    pub protocol: String, // "TCP", "UDP", "ICMP"
+}
+
+#[derive(Debug, Clone)]
+pub struct PfStateEntry {
+    pub tuple: PfFiveTuple,
+    pub translated_src_ip: Option<String>, // NAT mapping if active
+    pub translated_src_port: Option<u16>,
+    pub packets_passed: u64,
+    pub last_seen_timestamp_sec: u64,
+    pub timeout_sec: u64,
+}
+
+/// OpenBSD PF (Packet Filter) stateful firewall engine
+pub struct BsdPfStateTable {
+    pub states: HashMap<PfFiveTuple, PfStateEntry>,
+    pub default_timeout_sec: u64,
+}
+
+impl BsdPfStateTable {
+    pub fn new(default_timeout_sec: u64) -> Self {
+        Self {
+            states: HashMap::new(),
+            default_timeout_sec,
+        }
+    }
+
+    pub fn create_state(&mut self, tuple: PfFiveTuple, nat_ip: Option<&str>, nat_port: Option<u16>, now_sec: u64) {
+        let entry = PfStateEntry {
+            tuple: tuple.clone(),
+            translated_src_ip: nat_ip.map(|s| s.to_string()),
+            translated_src_port: nat_port,
+            packets_passed: 1,
+            last_seen_timestamp_sec: now_sec,
+            timeout_sec: self.default_timeout_sec,
+        };
+        self.states.insert(tuple, entry);
+    }
+
+    pub fn process_packet(&mut self, tuple: &PfFiveTuple, now_sec: u64) -> Result<Option<(String, u16)>, &'static str> {
+        if let Some(state) = self.states.get_mut(tuple) {
+            if now_sec > state.last_seen_timestamp_sec.saturating_add(state.timeout_sec) {
+                // State expired
+                self.states.remove(tuple);
+                return Err("PF: Matching state entry expired");
+            }
+            state.packets_passed += 1;
+            state.last_seen_timestamp_sec = now_sec;
+
+            if let (Some(nat_ip), Some(nat_port)) = (&state.translated_src_ip, state.translated_src_port) {
+                Ok(Some((nat_ip.clone(), nat_port)))
+            } else {
+                Ok(None)
+            }
+        } else {
+            Err("PF: No state match found (packet blocked by default drop policy)")
+        }
+    }
+
+    pub fn expire_states(&mut self, now_sec: u64) -> usize {
+        let mut expired_keys = Vec::new();
+        for (tuple, state) in &self.states {
+            if now_sec > state.last_seen_timestamp_sec.saturating_add(state.timeout_sec) {
+                expired_keys.push(tuple.clone());
+            }
+        }
+        let count = expired_keys.len();
+        for k in expired_keys {
+            self.states.remove(&k);
+        }
+        count
+    }
+}
+
+// ================= Linux Fast Userspace Mutex (sys_futex) Engine =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FutexOp {
+    Wait,
+    Wake,
+    Requeue,
+}
+
+#[derive(Debug, Clone)]
+pub struct FutexWaiter {
+    pub thread_id: u64,
+    pub uaddr: u64,
+    pub val: u32,
+    pub timeout_ns: Option<u64>,
+}
+
+/// Linux sys_futex fast userspace mutex lock queue engine
+pub struct LinuxFutexEngine {
+    pub buckets: HashMap<u64, Vec<FutexWaiter>>,
+}
+
+impl LinuxFutexEngine {
+    pub fn new() -> Self {
+        Self {
+            buckets: HashMap::new(),
+        }
+    }
+
+    /// Futex WAIT: Atomically verify *uaddr == val; if true, enqueue caller thread to wait
+    pub fn futex_wait(&mut self, uaddr: u64, current_mem_val: u32, expected_val: u32, thread_id: u64, timeout_ns: Option<u64>) -> Result<(), &'static str> {
+        if current_mem_val != expected_val {
+            return Err("Futex: EAGAIN - Memory value changed before lock acquired");
+        }
+        let waiter = FutexWaiter {
+            thread_id,
+            uaddr,
+            val: expected_val,
+            timeout_ns,
+        };
+        self.buckets.entry(uaddr).or_insert_with(Vec::new).push(waiter);
+        Ok(())
+    }
+
+    /// Futex WAKE: Wake up at most `val_wake` threads sleeping on `uaddr`
+    pub fn futex_wake(&mut self, uaddr: u64, val_wake: usize) -> usize {
+        let mut woken = 0;
+        if let Some(waiters) = self.buckets.get_mut(&uaddr) {
+            let count = val_wake.min(waiters.len());
+            for _ in 0..count {
+                if !waiters.is_empty() {
+                    waiters.remove(0);
+                    woken += 1;
+                }
+            }
+            if waiters.is_empty() {
+                self.buckets.remove(&uaddr);
+            }
+        }
+        woken
+    }
+}
+
+// ================= FreeBSD VFS Nullfs Loopback Overlay Layer =================
+
+#[derive(Debug, Clone)]
+pub struct NullfsLayerNode {
+    pub target_lower_path: String,
+    pub mount_point: String,
+    pub read_only: bool,
+    pub override_permissions: Option<u32>,
+}
+
+/// FreeBSD nullfs / loopback filesystem overlay layer
+pub struct FreeBsdVfsNullfs {
+    pub mounts: HashMap<String, NullfsLayerNode>,
+}
+
+impl FreeBsdVfsNullfs {
+    pub fn new() -> Self {
+        Self {
+            mounts: HashMap::new(),
+        }
+    }
+
+    pub fn mount_nullfs(&mut self, lower_path: &str, mount_point: &str, read_only: bool, perm_override: Option<u32>) -> Result<(), &'static str> {
+        if self.mounts.contains_key(mount_point) {
+            return Err("Nullfs: Mount point busy");
+        }
+        self.mounts.insert(mount_point.to_string(), NullfsLayerNode {
+            target_lower_path: lower_path.to_string(),
+            mount_point: mount_point.to_string(),
+            read_only,
+            override_permissions: perm_override,
+        });
+        Ok(())
+    }
+
+    pub fn resolve_overlay_path(&self, overlay_path: &str, is_write: bool) -> Result<(String, Option<u32>), &'static str> {
+        for (mp, node) in &self.mounts {
+            if overlay_path == mp || (overlay_path.starts_with(mp) && overlay_path.as_bytes().get(mp.len()) == Some(&b'/')) {
+                if is_write && node.read_only {
+                    return Err("Nullfs: EROFS - Read-only file system layer");
+                }
+                let relative_suffix = &overlay_path[mp.len()..];
+                let resolved = alloc::format!("{}{}", node.target_lower_path, relative_suffix);
+                return Ok((resolved, node.override_permissions));
+            }
+        }
+        Err("Nullfs: Path not mapped under any active nullfs overlay mount")
     }
 }
 
@@ -96,6 +286,104 @@ impl OpenBsdPledge {
             }
         }
         false
+    }
+}
+
+// ================= Linux Cgroups v2 Resource Controller =================
+
+#[derive(Debug, Clone)]
+pub struct CgroupResourceLimits {
+    pub cpu_quota_us: u64,     // e.g. 50000 us per period (50% CPU)
+    pub cpu_period_us: u64,    // e.g. 100000 us
+    pub memory_max_bytes: u64,  // hard memory limit in bytes
+    pub memory_high_bytes: u64, // soft memory limit (throttle boundary)
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u16,        // 1 to 1000 (BFQ/io weight)
+}
+
+impl Default for CgroupResourceLimits {
+    fn default() -> Self {
+        Self {
+            cpu_quota_us: u64::MAX,
+            cpu_period_us: 100_000,
+            memory_max_bytes: u64::MAX,
+            memory_high_bytes: u64::MAX,
+            memory_swap_max_bytes: u64::MAX,
+            io_weight: 100,
+        }
+    }
+}
+
+pub struct CgroupNode {
+    pub path: String,
+    pub limits: CgroupResourceLimits,
+    pub pids: Vec<u64>,
+    pub current_cpu_usage_us: u64,
+    pub current_memory_bytes: u64,
+}
+
+/// Linux Cgroups v2 unified hierarchy governor
+pub struct SovereignCgroupGovernor {
+    pub groups: HashMap<String, CgroupNode>,
+}
+
+impl SovereignCgroupGovernor {
+    pub fn new() -> Self {
+        Self {
+            groups: HashMap::new(),
+        }
+    }
+
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        if self.groups.contains_key(path) {
+            return Err("Cgroup: Group path already exists");
+        }
+        self.groups.insert(path.to_string(), CgroupNode {
+            path: path.to_string(),
+            limits: CgroupResourceLimits::default(),
+            pids: Vec::new(),
+            current_cpu_usage_us: 0,
+            current_memory_bytes: 0,
+        });
+        Ok(())
+    }
+
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+        let node = self.groups.get_mut(path).ok_or("Cgroup: Group not found")?;
+        node.limits = limits;
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
+        let node = self.groups.get_mut(path).ok_or("Cgroup: Target group not found")?;
+        if !node.pids.contains(&pid) {
+            node.pids.push(pid);
+        }
+        Ok(())
+    }
+
+    pub fn check_cpu_budget(&mut self, path: &str, proposed_usage_us: u64) -> Result<bool, &'static str> {
+        let node = self.groups.get_mut(path).ok_or("Cgroup: Target group not found")?;
+        if node.limits.cpu_quota_us == u64::MAX {
+            node.current_cpu_usage_us = node.current_cpu_usage_us.saturating_add(proposed_usage_us);
+            return Ok(true); // Unlimited
+        }
+        if node.current_cpu_usage_us.saturating_add(proposed_usage_us) > node.limits.cpu_quota_us {
+            Ok(false) // Throttled
+        } else {
+            node.current_cpu_usage_us = node.current_cpu_usage_us.saturating_add(proposed_usage_us);
+            Ok(true)
+        }
+    }
+
+    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
+        let node = self.groups.get_mut(path).ok_or("Cgroup: Target group not found")?;
+        let proposed = node.current_memory_bytes.saturating_add(bytes);
+        if proposed > node.limits.memory_max_bytes {
+            return Err("Cgroup: Out-of-memory! Maximum memory threshold exceeded (OOM killed)");
+        }
+        node.current_memory_bytes = proposed;
+        Ok(())
     }
 }
 
@@ -1380,6 +1668,89 @@ mod tests {
         // VNIC setup
         manager.configure_vnic("db_zone", "10.0.0.5").unwrap();
         assert_eq!(manager.zones.get("db_zone").unwrap().vnic_ips[0], "10.0.0.5");
+    }
+
+    #[test]
+    fn test_sovereign_cgroup_governor() {
+        let mut gov = SovereignCgroupGovernor::new();
+        gov.create_group("/sys/fs/cgroup/db").unwrap();
+
+        let limits = CgroupResourceLimits {
+            cpu_quota_us: 50_000,
+            cpu_period_us: 100_000,
+            memory_max_bytes: 1024 * 1024,
+            memory_high_bytes: 512 * 1024,
+            memory_swap_max_bytes: 0,
+            io_weight: 500,
+        };
+        gov.configure_limits("/sys/fs/cgroup/db", limits).unwrap();
+        gov.attach_pid("/sys/fs/cgroup/db", 1001).unwrap();
+
+        assert!(gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap());
+        assert!(!gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap()); // Exceeds 50k quota
+
+        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 500_000).is_ok());
+        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 600_000).is_err()); // Exceeds 1MB limit
+    }
+
+    #[test]
+    fn test_bsd_pf_state_table() {
+        let mut pf = BsdPfStateTable::new(60);
+        let tuple = PfFiveTuple {
+            src_ip: "192.168.1.100".to_string(),
+            dst_ip: "1.1.1.1".to_string(),
+            src_port: 5000,
+            dst_port: 443,
+            protocol: "TCP".to_string(),
+        };
+
+        pf.create_state(tuple.clone(), Some("203.0.113.5"), Some(40000), 1000);
+
+        let nat_res = pf.process_packet(&tuple, 1010).unwrap();
+        assert!(nat_res.is_some());
+        let (nat_ip, nat_port) = nat_res.unwrap();
+        assert_eq!(nat_ip, "203.0.113.5");
+        assert_eq!(nat_port, 40000);
+
+        // Expire state
+        assert_eq!(pf.expire_states(1100), 1);
+        assert!(pf.process_packet(&tuple, 1105).is_err());
+    }
+
+    #[test]
+    fn test_linux_futex_engine() {
+        let mut futex = LinuxFutexEngine::new();
+        let uaddr = 0x7fff0000;
+
+        // Memory value changed (EAGAIN)
+        assert!(futex.futex_wait(uaddr, 1, 0, 101, None).is_err());
+
+        // Successful wait enqueue
+        assert!(futex.futex_wait(uaddr, 0, 0, 101, None).is_ok());
+        assert!(futex.futex_wait(uaddr, 0, 0, 102, None).is_ok());
+
+        // Wake 1 thread
+        let woken = futex.futex_wake(uaddr, 1);
+        assert_eq!(woken, 1);
+        assert_eq!(futex.buckets.get(&uaddr).unwrap().len(), 1);
+
+        // Wake remaining
+        let woken_all = futex.futex_wake(uaddr, 5);
+        assert_eq!(woken_all, 1);
+        assert!(futex.buckets.get(&uaddr).is_none());
+    }
+
+    #[test]
+    fn test_freebsd_vfs_nullfs() {
+        let mut nullfs = FreeBsdVfsNullfs::new();
+        nullfs.mount_nullfs("/usr/src/sys", "/sys", true, Some(0o755)).unwrap();
+
+        let (resolved, perm) = nullfs.resolve_overlay_path("/sys/kern/vfs_subr.c", false).unwrap();
+        assert_eq!(resolved, "/usr/src/sys/kern/vfs_subr.c");
+        assert_eq!(perm, Some(0o755));
+
+        // Write to read-only nullfs layer should fail
+        assert!(nullfs.resolve_overlay_path("/sys/kern/vfs_subr.c", true).is_err());
     }
 }
 

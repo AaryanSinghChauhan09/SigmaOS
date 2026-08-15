@@ -45,20 +45,36 @@ impl LegacyKeyboard {
 }
 
 impl PeripheralDeviceTrait for LegacyKeyboard {
-    fn device_id(&self) -> u32 {
-        self.device_id
+    fn name(&self) -> &'static str {
+        "Legacy PS/2 Keyboard"
     }
 
     fn generation(&self) -> DeviceGeneration {
         DeviceGeneration::Legacy
     }
 
-    fn power_state(&self) -> PowerState {
-        self.power_state
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len())
     }
 
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.power_state = PowerState::Off;
+        self.is_initialized = false;
         Ok(())
     }
 }
