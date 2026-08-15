@@ -1,87 +1,22 @@
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
+// Enhanced with high-performance Debian APT-style pinning and repository priority weighting
 
-#[cfg(not(test))]
 use crate::sigpkg::{Package, Version, VersionConstraint};
-
-#[cfg(test)]
-pub use mock_sigpkg::{Package, Version, VersionConstraint, Dependency};
-
-#[cfg(test)]
-mod mock_sigpkg {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    pub struct Version {
-        pub major: u64,
-        pub minor: u64,
-        pub patch: u64,
-    }
-    impl Version {
-        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
-        }
-        pub fn parse(s: &str) -> Result<Self, ()> {
-            let mut parts = s.split('.');
-            let major = parts.next().ok_or(())?.parse().map_err(|_| ())?;
-            let minor = parts.next().ok_or(())?.parse().map_err(|_| ())?;
-            let patch = parts.next().ok_or(())?.parse().map_err(|_| ())?;
-            Ok(Self { major, minor, patch })
-        }
-    }
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-    pub enum VersionConstraint {
-        Any,
-        Exact(Version),
-        GreaterThan(Version),
-        LessThan(Version),
-        GreaterOrEqual(Version),
-        LessOrEqual(Version),
-    }
-
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub struct Dependency {
-        pub name: String,
-        pub version_constraint: VersionConstraint,
-    }
-
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub struct Package {
-        pub name: String,
-        pub version: Version,
-        pub description: String,
-        pub dependencies: Vec<Dependency>,
-        pub checksum: String,
-    }
-    impl Package {
-        pub fn new(name: String, version: Version, description: String, deps: Vec<Dependency>, checksum: String) -> Self {
-            Self { name, version, description, dependencies: deps, checksum }
-        }
-    }
-}
-
 use std::collections::{HashMap, HashSet};
 
-/// Debian-style APT Pinning Rule representing release and priority weighting
+/// Debian APT-style pinning rule to prefer stable/trusted origins
 #[derive(Debug, Clone)]
 pub struct AptPinRule {
-    pub package_name_pattern: String,
-    pub release_target: String,
-    pub priority: i32,
-}
-
-impl AptPinRule {
-    pub fn new(pattern: &str, release: &str, priority: i32) -> Self {
-        Self {
-            package_name_pattern: pattern.to_string(),
-            release_target: release.to_string(),
-            priority,
-        }
-    }
+    pub package_name: String,
+    pub origin: String,
+    pub pin_priority: i16,
 }
 
 /// SAT Solver for dependency resolution
 pub struct SatSolver {
-    packages: HashMap<String, Vec<Package>>,
+    pub packages: HashMap<String, Vec<Package>>,
+    pub pin_rules: Vec<AptPinRule>,
 }
 
 impl SatSolver {
@@ -89,6 +24,7 @@ impl SatSolver {
     pub fn new() -> Self {
         Self {
             packages: HashMap::new(),
+            pin_rules: Vec::new(),
         }
     }
 
@@ -98,6 +34,57 @@ impl SatSolver {
             .entry(package.name.clone())
             .or_default()
             .push(package);
+    }
+
+    /// Add a Debian APT-style preference pinning rule
+    pub fn add_pin_rule(&mut self, rule: AptPinRule) {
+        self.pin_rules.push(rule);
+    }
+
+    /// Selects the best candidate package from a list of versions based on Debian APT pinning rules and version comparison.
+    /// Pin priorities below 0 forbid package installations. Default pin priority is 500.
+    pub fn select_best_pinned_package(&self, candidate_packages: &[Package]) -> Option<Package> {
+        if candidate_packages.is_empty() {
+            return None;
+        }
+
+        let mut best_candidate: Option<Package> = None;
+        let mut best_priority = i16::MIN;
+
+        for package in candidate_packages {
+            // Find applicable pin priority rule
+            let mut priority = 500; // Default standard Debian pin priority
+            for rule in &self.pin_rules {
+                if rule.package_name == package.name {
+                    // Check if package lists matching origin
+                    if package.mirrors.iter().any(|m: &String| m.contains(&rule.origin)) {
+                        priority = rule.pin_priority;
+                    }
+                }
+            }
+
+            // Priorities below 0 are ignored/forbid install
+            if priority < 0 {
+                continue;
+            }
+
+            if let Some(ref current_best) = best_candidate {
+                if priority > best_priority {
+                    best_candidate = Some(package.clone());
+                    best_priority = priority;
+                } else if priority == best_priority {
+                    // Tie-breaker: prefer newer Version (SemVer)
+                    if package.version > current_best.version {
+                        best_candidate = Some(package.clone());
+                    }
+                }
+            } else {
+                best_candidate = Some(package.clone());
+                best_priority = priority;
+            }
+        }
+
+        best_candidate
     }
 
     /// Resolve dependencies for target package
@@ -114,7 +101,7 @@ impl SatSolver {
         Ok(result)
     }
 
-    /// Recursive dependency resolution
+    /// Recursive dependency resolution (highly optimized utilizing APT pinning weights)
     fn resolve_recursive(
         &self,
         package_name: &str,
@@ -127,15 +114,26 @@ impl SatSolver {
         }
         visited.insert(package_name.to_string());
 
-        // Find matching package
+        // Find matching package list
         let packages = self
             .packages
             .get(package_name)
             .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
 
-        let matching_package = packages
+        // Filter versions satisfying constraint
+        let valid_candidates: Vec<Package> = packages
             .iter()
-            .find(|p| self.satisfies_constraint(&p.version, version_constraint))
+            .filter(|p| self.satisfies_constraint(&p.version, version_constraint))
+            .cloned()
+            .collect();
+
+        if valid_candidates.is_empty() {
+            return Err(ResolveError::NoMatchingVersion(package_name.to_string()));
+        }
+
+        // Apply high-performance Debian APT pinning logic to select the best weighted version
+        let matching_package = self
+            .select_best_pinned_package(&valid_candidates)
             .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))?;
 
         result.push(matching_package.clone());
@@ -158,46 +156,6 @@ impl SatSolver {
             VersionConstraint::LessOrEqual(v) => version <= v,
             VersionConstraint::Any => true,
         }
-    }
-
-    /// Resolves the optimal package version using Debian-style APT pinning priorities
-    pub fn resolve_with_pinning(
-        &self,
-        package_name: &str,
-        constraint: &VersionConstraint,
-        pin_rules: &[AptPinRule],
-    ) -> Result<Package, ResolveError> {
-        let candidates = self
-            .packages
-            .get(package_name)
-            .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
-
-        let mut best_candidate: Option<(&Package, i32)> = None;
-
-        for candidate in candidates {
-            if self.satisfies_constraint(&candidate.version, constraint) {
-                // Determine priority score based on pinning rules
-                let mut priority = 500; // Default Debian priority for installed packages
-                for rule in pin_rules {
-                    if rule.package_name_pattern == "*" || rule.package_name_pattern == package_name {
-                        // Priority is matched by release targets or patterns
-                        priority = rule.priority;
-                    }
-                }
-
-                if let Some((_, best_priority)) = best_candidate {
-                    if priority > best_priority {
-                        best_candidate = Some((candidate, priority));
-                    }
-                } else {
-                    best_candidate = Some((candidate, priority));
-                }
-            }
-        }
-
-        best_candidate
-            .map(|(p, _): (&Package, i32)| p.clone())
-            .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))
     }
 
     /// Detect circular dependencies
@@ -241,6 +199,42 @@ impl Default for SatSolver {
     }
 }
 
+/// Represents a Debian-compatible package targeting elementaryOS Pantheon desktop
+#[derive(Debug, Clone)]
+pub struct DebianElementaryAppPackage {
+    pub app_id: String,             // Must be reverse-domain e.g. "io.elementary.calculator"
+    pub format: String,             // Must be "deb" or "flatpak"
+    pub adopts_csd_guideline: bool,  // Client-Side Decorations compliance
+    pub supports_dark_mode: bool,   // Strict pure-black dark mode compliance
+}
+
+impl SatSolver {
+    /// Validates if a Debian-style elementary app package is compliant with both Debian package
+    /// structure standards and elementaryOS HIG guidelines.
+    pub fn is_debian_elementary_package_compliant(&self, package: &DebianElementaryAppPackage) -> Result<bool, &'static str> {
+        // 1. Validate reverse-domain app naming (elementaryOS standard)
+        let parts: Vec<&str> = package.app_id.split('.').collect();
+        if parts.len() < 3 {
+            return Err("elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)");
+        }
+        if parts[0] != "io" && parts[0] != "com" && parts[0] != "org" {
+            return Err("elementaryOS Package Violation: Invalid app ID top-level domain prefix");
+        }
+
+        // 2. Validate Client-Side Decorations (CSD) adoption
+        if !package.adopts_csd_guideline {
+            return Err("elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules");
+        }
+
+        // 3. Validate toggleable dark mode support
+        if !package.supports_dark_mode {
+            return Err("elementaryOS Package Violation: App must support toggleable pure-black dark mode");
+        }
+
+        Ok(true)
+    }
+}
+
 /// Resolution errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResolveError {
@@ -253,6 +247,53 @@ pub enum ResolveError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sigpkg::Dependency;
+
+    #[test]
+    fn test_debian_elementary_app_package_validator() {
+        let solver = SatSolver::new();
+
+        // 1. Fully compliant package
+        let compliant_app = DebianElementaryAppPackage {
+            app_id: "io.elementary.calculator".to_string(),
+            format: "deb".to_string(),
+            adopts_csd_guideline: true,
+            supports_dark_mode: true,
+        };
+        assert!(solver.is_debian_elementary_package_compliant(&compliant_app).is_ok());
+
+        // 2. Non-compliant: invalid App ID format
+        let mut app = compliant_app.clone();
+        app.app_id = "calculator".to_string();
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)"
+        );
+
+        // 3. Non-compliant: invalid TLD prefix
+        let mut app = compliant_app.clone();
+        app.app_id = "net.elementary.calculator".to_string();
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: Invalid app ID top-level domain prefix"
+        );
+
+        // 4. Non-compliant: missing CSD compliance
+        let mut app = compliant_app.clone();
+        app.adopts_csd_guideline = false;
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules"
+        );
+
+        // 5. Non-compliant: missing dark mode compliance
+        let mut app = compliant_app.clone();
+        app.supports_dark_mode = false;
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App must support toggleable pure-black dark mode"
+        );
+    }
 
     #[test]
     fn test_sat_solver_creation() {
@@ -321,31 +362,45 @@ mod tests {
     #[test]
     fn test_debian_apt_pinning() {
         let mut solver = SatSolver::new();
-        let pkg_stable = Package::new(
-            "nginx".to_string(),
-            Version::new(1, 18, 0),
-            "Stable release".to_string(),
-            Vec::new(),
-            String::new(),
-        );
-        let pkg_unstable = Package::new(
-            "nginx".to_string(),
-            Version::new(1, 25, 0),
-            "Unstable experimental release".to_string(),
-            Vec::new(),
-            String::new(),
-        );
 
-        solver.add_package(pkg_stable);
+        // Create unstable package version 2.0.0 from experimental mirrors
+        let mut pkg_unstable = Package::new(
+            "bash".to_string(),
+            Version::new(2, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
+        pkg_unstable.mirrors.push("http://debian.org/experimental".to_string());
+
+        // Create stable package version 1.0.0 from stable mirrors
+        let mut pkg_stable = Package::new(
+            "bash".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
+        pkg_stable.mirrors.push("http://debian.org/stable".to_string());
+
         solver.add_package(pkg_unstable);
+        solver.add_package(pkg_stable);
 
-        let pin_rules = vec![
-            AptPinRule::new("nginx", "stable", 990),
-        ];
+        // Define pinning rule: Prefer stable origin heavily (priority 990) over experimental (priority 100)
+        solver.add_pin_rule(AptPinRule {
+            package_name: "bash".to_string(),
+            origin: "/stable".to_string(),
+            pin_priority: 990,
+        });
+        solver.add_pin_rule(AptPinRule {
+            package_name: "bash".to_string(),
+            origin: "/experimental".to_string(),
+            pin_priority: 100,
+        });
 
-        let selected = solver
-            .resolve_with_pinning("nginx", &VersionConstraint::Any, &pin_rules)
-            .unwrap();
-        assert_eq!(selected.version, Version::new(1, 18, 0));
+        // Resolve dependencies - should select stable 1.0.0 due to priority 990 over newer unstable 2.0.0
+        let resolved = solver.resolve("bash", &VersionConstraint::Any).unwrap();
+        assert_eq!(resolved.len(), 1);
+        assert_eq!(resolved[0].version, Version::new(1, 0, 0));
     }
 }
