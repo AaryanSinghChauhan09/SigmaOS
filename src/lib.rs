@@ -7,6 +7,7 @@ pub mod compatibility;
 pub mod container;
 pub mod customization;
 pub mod dashboard;
+pub mod desktop;
 pub mod device;
 pub mod driver;
 pub mod drivers;
@@ -19,6 +20,7 @@ pub mod observability;
 pub mod orchestration;
 pub mod distro;
 pub mod package;
+pub mod performance;
 pub mod productivity;
 pub mod remote;
 pub mod resilience;
@@ -81,6 +83,8 @@ pub use compatibility::{
     TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
     EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
     Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -93,11 +97,17 @@ pub use customization::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+pub use desktop::{
+    Notification, SimpleNotification, NotificationManager, SimpleNotificationManager,
+    NotificationUrgency, NotificationError,
+};
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+    UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
+    DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -120,6 +130,7 @@ pub use network::{
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
+    CognitiveOSNarrator, AdaptiveComplianceGater, SynestheticFeedbackEngine, GenerativeConfigParser, InterplanetaryDtnRoute, CollectiveSimulationNode,
 };
 pub use distro::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -170,6 +181,9 @@ pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
     PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
+    HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
+    GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
