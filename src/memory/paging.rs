@@ -88,15 +88,7 @@ impl PageTableEntry {
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
@@ -131,10 +123,7 @@ impl Default for PageTable {
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
     pub huge_entries: Vec<Option<PageTableEntry>>, // Holds 2MB huge page entries
@@ -173,6 +162,14 @@ impl PageDirectory {
     pub fn get_table_mut(&mut self, idx: usize) -> Option<&mut PageTable> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
+    }
+
+    pub fn get_huge_entry_mut(&mut self, idx: usize) -> Option<&mut PageTableEntry> {
+        self.huge_entries.get_mut(idx).and_then(|e| e.as_mut())
+    }
 }
 
 impl Default for PageDirectory {
@@ -181,10 +178,7 @@ impl Default for PageDirectory {
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,
     pub huge_entries: Vec<Option<PageTableEntry>>, // Holds 1GB huge page entries
@@ -222,6 +216,14 @@ impl PageDirectoryPointerTable {
 
     pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
+    }
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
+    }
+
+    pub fn get_huge_entry_mut(&mut self, idx: usize) -> Option<&mut PageTableEntry> {
+        self.huge_entries.get_mut(idx).and_then(|e| e.as_mut())
     }
 }
 

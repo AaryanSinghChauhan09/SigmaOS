@@ -15,7 +15,6 @@ pub mod apache_ossie;
 pub mod sovereign_suite;
 pub mod gentoo;
 pub mod legacy_adapters;
-pub mod canonical;
 
 pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
