@@ -35,7 +35,7 @@ pub struct SecurityContext {
 
 impl SecurityContext {
     pub fn parse(context_str: &str) -> Result<Self, &'static str> {
-        let parts: Vec<&str> = context_str.splitn(4, ':').collect();
+        let parts: Vec<&str> = context_str.split(':').collect();
         if parts.len() != 4 {
             return Err("Invalid SELinux context format! Must be user:role:type:sensitivity");
         }
@@ -49,57 +49,6 @@ impl SecurityContext {
 
     pub fn to_string(&self) -> String {
         format!("{}:{}:{}:{}", self.user, self.role, self.type_name, self.sensitivity)
-    }
-
-    /// Extracts the integer hierarchical sensitivity level from a level string (e.g., "s1" -> 1, "s0" -> 0)
-    pub fn get_sensitivity_level(&self) -> u32 {
-        let level_part = if let Some(idx) = self.sensitivity.find(':') {
-            &self.sensitivity[..idx]
-        } else {
-            &self.sensitivity
-        };
-
-        if level_part.starts_with('s') {
-            level_part[1..].parse::<u32>().unwrap_or(0)
-        } else {
-            0
-        }
-    }
-
-    /// Extracts the categories set (e.g., "c0,c1" from "s1:c0,c1")
-    pub fn get_categories(&self) -> HashSet<String> {
-        let mut categories = HashSet::new();
-        if let Some(idx) = self.sensitivity.find(':') {
-            let cat_part = &self.sensitivity[idx + 1..];
-            for cat in cat_part.split(',') {
-                let trimmed = cat.trim();
-                if !trimmed.is_empty() {
-                    categories.insert(trimmed.to_string());
-                }
-            }
-        }
-        categories
-    }
-
-    /// Checks if this security context dominates another context (MLS/MCS Dominance Check)
-    /// A dominates B if:
-    /// 1. A's hierarchical sensitivity level is >= B's hierarchical sensitivity level.
-    /// 2. B's category set is a subset of A's category set.
-    pub fn dominates(&self, other: &SecurityContext) -> bool {
-        let self_level = self.get_sensitivity_level();
-        let other_level = other.get_sensitivity_level();
-        if self_level < other_level {
-            return false;
-        }
-
-        let self_cats = self.get_categories();
-        let other_cats = other.get_categories();
-        for cat in &other_cats {
-            if !self_cats.contains(cat) {
-                return false;
-            }
-        }
-        true
     }
 }
 
@@ -154,28 +103,11 @@ pub struct PolicyRule {
     pub permission: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ConditionalPolicyRule {
-    pub key: AvcKey,
-    pub boolean_name: String,
-    pub expected_value: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TypeTransitionKey {
-    pub source_type: String,
-    pub target_type: String,
-    pub class: String,
-}
-
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,
     pub policies: HashSet<AvcKey>,
     pub avc: AccessVectorCache,
     pub audit_logs: Vec<String>,
-    pub booleans: HashMap<String, bool>,
-    pub conditional_policies: Vec<ConditionalPolicyRule>,
-    pub type_transitions: HashMap<TypeTransitionKey, String>,
 }
 
 impl SelinuxEngine {
@@ -185,9 +117,6 @@ impl SelinuxEngine {
             policies: HashSet::new(),
             avc: AccessVectorCache::new(),
             audit_logs: Vec::new(),
-            booleans: HashMap::new(),
-            conditional_policies: Vec::new(),
-            type_transitions: HashMap::new(),
         };
         engine.load_default_policies();
         engine
@@ -218,65 +147,6 @@ impl SelinuxEngine {
         self.mode = mode;
     }
 
-    pub fn set_boolean(&mut self, name: &str, value: bool) {
-        self.booleans.insert(name.to_string(), value);
-        self.avc.clear(); // Flush cache when boolean changes
-    }
-
-    pub fn allow_conditional(
-        &mut self,
-        source: &str,
-        target: &str,
-        class: &str,
-        permission: &str,
-        boolean_name: &str,
-        expected_value: bool,
-    ) {
-        let key = AvcKey {
-            source_type: source.to_string(),
-            target_type: target.to_string(),
-            class: class.to_string(),
-            permission: permission.to_string(),
-        };
-        self.conditional_policies.push(ConditionalPolicyRule {
-            key,
-            boolean_name: boolean_name.to_string(),
-            expected_value,
-        });
-        self.avc.clear(); // Flush cache on policy update
-    }
-
-    pub fn add_type_transition(&mut self, source_type: &str, target_type: &str, class: &str, new_type: &str) {
-        let key = TypeTransitionKey {
-            source_type: source_type.to_string(),
-            target_type: target_type.to_string(),
-            class: class.to_string(),
-        };
-        self.type_transitions.insert(key, new_type.to_string());
-    }
-
-    pub fn compute_transition(&self, source: &str, target: &str, class: &str) -> Result<String, &'static str> {
-        let src_context = SecurityContext::parse(source)?;
-        let tgt_context = SecurityContext::parse(target)?;
-
-        let key = TypeTransitionKey {
-            source_type: src_context.type_name.clone(),
-            target_type: tgt_context.type_name.clone(),
-            class: class.to_string(),
-        };
-
-        if let Some(new_type) = self.type_transitions.get(&key) {
-            Ok(SecurityContext {
-                user: src_context.user.clone(),
-                role: src_context.role.clone(),
-                type_name: new_type.clone(),
-                sensitivity: src_context.sensitivity.clone(),
-            }.to_string())
-        } else {
-            Ok(source.to_string())
-        }
-    }
-
     /// Verifies access between a source context and target context
     pub fn has_permission(
         &mut self,
@@ -303,18 +173,7 @@ impl SelinuxEngine {
         let allowed = if let Some(decision) = self.avc.query(&avc_key) {
             decision
         } else {
-            let mut decision = self.policies.contains(&avc_key);
-            if !decision {
-                for rule in &self.conditional_policies {
-                    if rule.key == avc_key {
-                        let active_val = self.booleans.get(&rule.boolean_name).copied().unwrap_or(false);
-                        if active_val == rule.expected_value {
-                            decision = true;
-                            break;
-                        }
-                    }
-                }
-            }
+            let decision = self.policies.contains(&avc_key);
             self.avc.insert(avc_key, decision);
             decision
         };
@@ -339,6 +198,8 @@ impl SelinuxEngine {
         Ok(true)
     }
 }
+
+use std::collections::HashSet;
 
 /// Multi-Level Security (MLS) sensitivity levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -501,72 +362,5 @@ mod tests {
         let allowed_d = engine.has_permission(src, tgt, "file", "write").unwrap();
         assert!(allowed_d);
         assert_eq!(engine.audit_logs.len(), 2); // No new audit log added
-    }
-
-    #[test]
-    fn test_mls_mcs_dominance() {
-        let low = SecurityContext::parse("system_u:object_r:tmp_t:s0").unwrap();
-        let high = SecurityContext::parse("system_u:object_r:secret_t:s2").unwrap();
-
-        assert!(high.dominates(&low));
-        assert!(!low.dominates(&high));
-
-        let s1_c0_c1 = SecurityContext::parse("system_u:object_r:topsecret_t:s1:c0,c1").unwrap();
-        let s1_c0 = SecurityContext::parse("system_u:object_r:topsecret_t:s1:c0").unwrap();
-        let s1_c2 = SecurityContext::parse("system_u:object_r:topsecret_t:s1:c2").unwrap();
-
-        assert!(s1_c0_c1.dominates(&s1_c0));
-        assert!(!s1_c0.dominates(&s1_c0_c1));
-        assert!(!s1_c0_c1.dominates(&s1_c2));
-    }
-
-    #[test]
-    fn test_selinux_booleans() {
-        let mut engine = SelinuxEngine::new();
-        let src = "system_u:system_r:httpd_t:s0";
-        let tgt = "system_u:object_r:system_wlan_t:s0";
-
-        // Initial check: not allowed
-        let allowed_init = engine.has_permission(src, tgt, "network", "connect").unwrap();
-        assert!(!allowed_init);
-
-        // Add conditional policy rule
-        engine.allow_conditional("httpd_t", "system_wlan_t", "network", "connect", "httpd_can_network_connect", true);
-
-        // Still not allowed because the boolean is not set to true yet
-        let allowed_cond_unset = engine.has_permission(src, tgt, "network", "connect").unwrap();
-        assert!(!allowed_cond_unset);
-
-        // Set boolean to true
-        engine.set_boolean("httpd_can_network_connect", true);
-
-        // Now it must be allowed!
-        let allowed_cond_active = engine.has_permission(src, tgt, "network", "connect").unwrap();
-        assert!(allowed_cond_active);
-
-        // Set boolean back to false
-        engine.set_boolean("httpd_can_network_connect", false);
-
-        // Must be denied again
-        let allowed_cond_disabled = engine.has_permission(src, tgt, "network", "connect").unwrap();
-        assert!(!allowed_cond_disabled);
-    }
-
-    #[test]
-    fn test_selinux_type_transitions() {
-        let mut engine = SelinuxEngine::new();
-        let src = "system_u:system_r:init_t:s0:c0";
-        let target_file = "system_u:object_r:httpd_exec_t:s0";
-
-        // No transition rule initially -> returns source
-        let res_init = engine.compute_transition(src, target_file, "process").unwrap();
-        assert_eq!(res_init, src);
-
-        // Add type transition rule
-        engine.add_type_transition("init_t", "httpd_exec_t", "process", "httpd_t");
-
-        // Compute transition -> transitions to httpd_t, preserving user, role, and sensitivity
-        let res_trans = engine.compute_transition(src, target_file, "process").unwrap();
-        assert_eq!(res_trans, "system_u:system_r:httpd_t:s0:c0");
     }
 }
