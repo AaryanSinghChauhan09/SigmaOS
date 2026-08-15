@@ -234,43 +234,8 @@ pub use remote::{
     SimpleShellManager,
 };
 pub use resilience::{
-<<<<<<< HEAD
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
-=======
-    RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
-    SystemSnapshot,
-};
-pub use security::{
-    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
-    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
-    PenetrationAssistant, secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
-    FileIntegrityGuard, MalwareSignature, RootkitDetector, ScanVerdict, SovereignMalwareEngine,
-    ThreatSeverity, ThreatType, YaraSignatureMatcher,
-};
-pub use distro::{
-    RhelSubscriptionEntitlementManager, SubscriptionPool, EntitlementCertificate,
-    DebianDpkgDbSimulator, DpkgPackageStatus, DpkgPackageRecord,
-    AlpineApkOverlayEngine, ApkOverlayFile,
-    SystemdCgroupGovernor, CgroupV2Limits, CgroupV2Accounting,
-    BsdStatefulPacketFilter, PfRuleAction, PfStateEntry,
-    DragonFlyHammerFs, Hammer2Snapshot,
-    VoidRunitManager, RunitServiceState, RunitService,
-    SovereignAnonScrubber,
-    TlpPowerGovernor, PowerSource, CpuGovernorPolicy, TlpConfig,
-    NmtuiNetworkManager, ConnectionType, NetworkConnectionProfile,
-    FreeBsdBhyveHypervisor, BhyveVmState, BhyveVirtualMachine,
-    TailscaleWireguardMesh, WireguardPeer,
-};
-pub use desktop::{
-    GraniteUiToolkit, ToastNotification, AccentColor,
-    SwitchboardSettingsHub, SwitchboardPlug, SwitchboardCategory,
-    ContractorService, ContractorAction,
-    ScreenTimeParentalGovernor, TimeQuota,
-    GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
-    PlankDockItem, SlingshotLauncher, SlingshotApp, SlingshotCategory, AppCenter,
-    AppCenterProduct, PantheonGreeter,
->>>>>>> origin/improve-security-and-access-control-16390481506940537632-10641549495497073187
 };
 pub use security::hardening;
 pub use security::{
@@ -280,12 +245,11 @@ pub use security::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
     HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
     GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
-
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
-    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
-    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
-    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
-    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    CronDaemon, CronJob,
+    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock,
+    IptablesFirewall, KaliError, MaliciousSignature, PluggableAuthenticationModule,
+    SandboxPolicy, SudoPrivilegeEscalation,
+    SwapSpaceManager, TmuxMultiplexer, TmuxPane,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use shell::{ShellCommand, ShellRepl};

@@ -145,13 +145,9 @@ pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabe
 pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
 pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
-};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-
-=======
 pub use defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
 pub use malware::{
     FileIntegrityGuard, MalwareSignature, RootkitDetector, ScanVerdict, SovereignMalwareEngine,
     ThreatSeverity, ThreatType, YaraSignatureMatcher,
 };
->>>>>>> origin/improve-security-and-access-control-16390481506940537632-10641549495497073187

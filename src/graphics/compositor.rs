@@ -723,11 +723,10 @@ impl Compositor for SimpleCompositor {
                             let output_index = output_y * output_stride + output_x;
                             let window_index = y * window_stride + x;
 
-                                if output_index < output_data.len()
-                                    && window_index < window_data.len()
-                                {
-                                    output_data[output_index] = window_data[window_index];
-                                }
+                            if output_index < output_data.len()
+                                && window_index < window_data.len()
+                            {
+                                output_data[output_index] = window_data[window_index];
                             }
                         }
                     }

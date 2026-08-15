@@ -9,10 +9,6 @@ impl AgentAutomationEngine {
     pub fn new() -> Self {
         AgentAutomationEngine
     }
-
-pub struct AgentAutomationEngine;
-impl AgentAutomationEngine {
-    pub fn new() -> Self { AgentAutomationEngine }
 }
 
 /// Shell command type

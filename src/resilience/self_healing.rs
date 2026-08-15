@@ -674,7 +674,9 @@ mod tests {
 
         // Successive restarts are blocked to protect microkernel stability
         assert!(guard.record_attempt(1004).is_err());
+    }
 
+    #[test]
     fn test_system_stability_monitor_heartbeat() {
         let mut monitor = SystemStabilityMonitor::new();
         assert_eq!(monitor.system_stability_score, 100.0);
