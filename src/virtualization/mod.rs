@@ -7,6 +7,9 @@ pub use deterministic::{
     VmExecutionSnapshot,
 };
 pub use orchestration::{
-    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
-    VirtualizationOrchestrator, VirtualizationTech, VmState,
+    Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,
+    ResourcePool, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
+    VirtualizationStrategy, VirtualizationStrategyFactory, VirtualizationTech, VmState,
 };
+
+pub use oci_pod::{ContainerConfig, OciPod, OciPodManager, PodState};

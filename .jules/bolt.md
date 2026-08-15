@@ -23,3 +23,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-10 - O(1) Short-Circuit Optimization in Buddy Allocator
 **Learning:** When performing physical memory allocation search sequences under high concurrency, scanning empty priority free lists introduces O(N) traversal overhead. Short-circuiting the traversal immediately when the allocator saturation bitmask registers 0 for the requested block order guarantees O(1) failure latency and maximizes cache line locality in low-memory states.
 **Action:** Enforce fast-path bitmask lookups before diving into segment search iterators.
+
+## 2026-08-11 - Optimizing UKSM Page Deduplication Lookup Complexity
+**Learning:** Checking for duplicate physical pages using a linear scan (`contains`) on a standard `Vec` inside high-frequency deduplication passes degrades to $O(N^2)$ complexity. Utilizing a `BTreeSet` reduces search and insertion overhead to $O(\log N)$ while maintaining complete `#![no_std]` compatibility.
+**Action:** Always prefer `BTreeSet` or sorted collections over linear lookup vectors for high-density indexing/deduplication arrays in memory-constrained environments.

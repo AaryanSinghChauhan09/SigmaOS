@@ -313,10 +313,20 @@ impl VirtualMemoryManager for SimpleVMM {
         }
 
         let pdpt_idx_in_vec = pml4_idx;
+        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pdpt_idx_in_vec];
+        let pdpt_present = if let Some(ref mut pdpt) = pdpt_table {
+            pdpt.get_entry(pdpt_idx).is_present()
+        } else {
+            false
+        };
 
-        if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
-            let is_pdpt_present = pdpt.get_entry_ref(pdpt_idx).is_present();
-            if !is_pdpt_present {
+        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+        let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+
+        if !pdpt_present {
+            let pdpt_table_mut: &mut Option<SimplePageTable> =
+                &mut self.pdpt_tables[pdpt_idx_in_vec];
+            if let Some(ref mut pdpt) = pdpt_table_mut {
                 let pd_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
                 let mut pd_entry = SimplePageTableEntry::new();
                 pd_entry.set_present(true);
@@ -364,6 +374,16 @@ impl VirtualMemoryManager for SimpleVMM {
                     self.tlb_tracker.register_invalidation(virt);
                 }
             }
+        }
+
+        let pt_table_mut: &mut Option<SimplePageTable> = &mut self.pt_tables[pt_idx_in_vec];
+        if let Some(ref mut pt) = pt_table_mut {
+            let mut pt_entry = SimplePageTableEntry::new();
+            pt_entry.set_present(true);
+            pt_entry.set_writable(writable);
+            pt_entry.set_user_accessible(user);
+            pt_entry.set_physical_address(phys);
+            pt.set_entry(pt_idx, pt_entry);
         }
 
         Ok(())
@@ -441,22 +461,29 @@ impl VirtualMemoryManager for SimpleVMM {
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
 
-        let pml4_entry = self.pml4.get_entry(pml4_idx);
-        if !pml4_entry.is_present() {
+        let pml4_present = self.pml4.get_entry(pml4_idx).is_present();
+        if !pml4_present {
             return Err(PageFaultError::NotPresent);
         }
 
-        if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
-            let pdpt_entry = pdpt.get_entry(pdpt_idx);
-            if !pdpt_entry.is_present() {
+        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pml4_idx];
+        if let Some(ref mut pdpt) = pdpt_table {
+            let pdpt_present = pdpt.get_entry(pdpt_idx).is_present();
+            if !pdpt_present {
                 return Err(PageFaultError::NotPresent);
             }
+
+            let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
 
             if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
                 let pd_entry = pd.get_entry(pd_idx);
                 if !pd_entry.is_present() {
                     return Err(PageFaultError::NotPresent);
                 }
+
+                let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
+                let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
 
                 if pd_entry.is_huge() {
                     pd_entry.set_present(false);
@@ -492,11 +519,17 @@ impl VirtualMemoryManager for SimpleVMM {
                 return None;
             }
 
+            let pdpt_phys = self.pml4.get_entry_ref(pml4_idx).get_physical_address();
+            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+
             if let Some(ref pd) = self.pd_tables[pdpt_idx] {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
                 }
+
+                let pd_phys = pdpt.get_entry_ref(pdpt_idx).get_physical_address();
+                let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
 
                 // If marked as huge page, resolve the remaining 21 bits offset (2MB boundary)
                 if pd_entry.is_huge() {

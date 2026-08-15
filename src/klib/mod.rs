@@ -15,3 +15,17 @@ pub use std::collections::BTreeMap as StdBTreeMap;
 
 #[cfg(not(target_os = "none"))]
 pub use std::string::String;
+
+// New zero-dependency klib modules
+pub mod ringbuf;
+pub mod slab;
+pub mod bitmap;
+
+// Re-exports for convenience
+pub use ringbuf::RingBuf;
+pub use ringbuf::MpscRingBuf;
+pub use slab::SlabCache;
+pub use slab::SlabRegistry;
+pub use bitmap::AtomicBitmap;
+pub use bitmap::PageFrameBitmap;
+pub use bitmap::PidBitmap;

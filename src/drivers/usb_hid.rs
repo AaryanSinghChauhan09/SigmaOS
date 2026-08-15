@@ -13,7 +13,7 @@ pub enum HidReportType {
 }
 
 /// USB HID keyboard event
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HidKeyboardEvent {
     pub keycode: u8,
     pub pressed: bool,
@@ -27,9 +27,21 @@ pub struct UsbHidDriver {
     pub capabilities: CapabilityToken,
     pub event_buffer: Vec<HidKeyboardEvent>,
     pub connected: bool,
+
+    // Typematic auto-repeat control inspired by Linux Input subsystem
     pub repeat_delay_ms: u32,
     pub repeat_rate_ms: u32,
-    pub layout: String,
+    pub last_pressed_keycode: Option<u8>,
+    pub last_press_time_ms: u32,
+    pub last_repeat_time_ms: u32,
+
+    // Lock key state indicators
+    pub caps_lock_active: bool,
+    pub num_lock_active: bool,
+    pub scroll_lock_active: bool,
+
+    // Rollover tracking (N-Key Rollover / NKRO)
+    pub active_held_keys: Vec<u8>,
 }
 
 impl UsbHidDriver {
@@ -40,9 +52,15 @@ impl UsbHidDriver {
             capabilities: CapabilityToken::new(),
             event_buffer: Vec::new(),
             connected: false,
-            repeat_delay_ms: 250,
-            repeat_rate_ms: 33,
-            layout: "US-QWERTY".to_string(),
+            repeat_delay_ms: 250, // standard Linux default (250ms delay)
+            repeat_rate_ms: 33,   // standard Linux default (30Hz repeat rate / ~33ms interval)
+            last_pressed_keycode: None,
+            last_press_time_ms: 0,
+            last_repeat_time_ms: 0,
+            caps_lock_active: false,
+            num_lock_active: false,
+            scroll_lock_active: false,
+            active_held_keys: Vec::new(),
         }
     }
 
@@ -63,6 +81,8 @@ impl UsbHidDriver {
 
     pub fn disconnect(&mut self) {
         self.connected = false;
+        self.active_held_keys.clear();
+        self.last_pressed_keycode = None;
     }
 
     pub fn poll_event(&mut self) -> Option<HidKeyboardEvent> {
@@ -73,7 +93,63 @@ impl UsbHidDriver {
     }
 
     pub fn push_event(&mut self, event: HidKeyboardEvent) {
+        // Track N-Key Rollover state
+        if event.pressed {
+            if !self.active_held_keys.contains(&event.keycode) {
+                self.active_held_keys.push(event.keycode);
+            }
+            // Update typematic repeat state
+            self.last_pressed_keycode = Some(event.keycode);
+            self.last_press_time_ms = 0; // Simulated relative start
+            self.last_repeat_time_ms = 0;
+        } else {
+            self.active_held_keys.retain(|&k| k != event.keycode);
+            if self.last_pressed_keycode == Some(event.keycode) {
+                self.last_pressed_keycode = None;
+            }
+        }
+
+        // Toggle Lock States when keycode matches standard keyboard locks
+        // Keycode 0x39 = Caps Lock, 0x53 = Num Lock, 0x47 = Scroll Lock
+        if event.pressed {
+            if event.keycode == 0x39 {
+                self.toggle_caps_lock();
+            } else if event.keycode == 0x53 {
+                self.toggle_num_lock();
+            } else if event.keycode == 0x47 {
+                self.toggle_scroll_lock();
+            }
+        }
+
         self.event_buffer.push(event);
+    }
+
+    /// Simulates passing CPU timer ticks to evaluate and trigger typematic repeats
+    pub fn tick_repeat(&mut self, current_time_ms: u32) -> Option<HidKeyboardEvent> {
+        if !self.connected {
+            return None;
+        }
+        let keycode = self.last_pressed_keycode?;
+        if self.last_press_time_ms == 0 {
+            self.last_press_time_ms = current_time_ms;
+            self.last_repeat_time_ms = current_time_ms;
+            return None;
+        }
+
+        let elapsed = current_time_ms - self.last_press_time_ms;
+        if elapsed >= self.repeat_delay_ms {
+            let repeat_elapsed = current_time_ms - self.last_repeat_time_ms;
+            if repeat_elapsed >= self.repeat_rate_ms {
+                self.last_repeat_time_ms = current_time_ms;
+                // Dispatch repeat input event
+                return Some(HidKeyboardEvent {
+                    keycode,
+                    pressed: true,
+                    modifiers: 0,
+                });
+            }
+        }
+        None
     }
 
     pub fn send_report(
@@ -100,6 +176,38 @@ impl UsbHidDriver {
 
     pub fn set_leds(&mut self, leds: u8) -> Result<(), HidError> {
         self.send_report(HidReportType::Output, &[leds])
+    }
+
+    /// Toggles Caps Lock state and formats LED report (Bit 1 = Caps Lock LED)
+    pub fn toggle_caps_lock(&mut self) {
+        self.caps_lock_active = !self.caps_lock_active;
+        self.update_led_report().ok();
+    }
+
+    /// Toggles Num Lock state and formats LED report (Bit 0 = Num Lock LED)
+    pub fn toggle_num_lock(&mut self) {
+        self.num_lock_active = !self.num_lock_active;
+        self.update_led_report().ok();
+    }
+
+    /// Toggles Scroll Lock state and formats LED report (Bit 2 = Scroll Lock LED)
+    pub fn toggle_scroll_lock(&mut self) {
+        self.scroll_lock_active = !self.scroll_lock_active;
+        self.update_led_report().ok();
+    }
+
+    fn update_led_report(&mut self) -> Result<(), HidError> {
+        let mut leds = 0u8;
+        if self.num_lock_active {
+            leds |= 0x01;
+        }
+        if self.caps_lock_active {
+            leds |= 0x02;
+        }
+        if self.scroll_lock_active {
+            leds |= 0x04;
+        }
+        self.set_leds(leds)
     }
 
     pub fn set_capabilities(&mut self, capabilities: CapabilityToken) {
@@ -265,6 +373,7 @@ mod tests {
         assert_eq!(hid.vendor_id, 0x1234);
         assert_eq!(hid.product_id, 0x5678);
         assert!(!hid.connected);
+        assert_eq!(hid.repeat_delay_ms, 250);
     }
 
     #[test]
@@ -283,24 +392,55 @@ mod tests {
     }
 
     #[test]
-    fn test_event_buffer() {
+    fn test_nkro_and_locks() {
         let mut hid = UsbHidDriver::new(0x1234, 0x5678);
         hid.connect().unwrap();
-        let event = HidKeyboardEvent {
-            keycode: 0x04,
+
+        // Caps Lock Toggle keycode (0x39)
+        let caps_event = HidKeyboardEvent {
+            keycode: 0x39,
             pressed: true,
             modifiers: 0,
         };
-        hid.push_event(event.clone());
-        let polled = hid.poll_event();
-        assert!(polled.is_some());
+        hid.push_event(caps_event.clone());
+        assert!(hid.caps_lock_active);
+        assert_eq!(hid.active_held_keys, vec![0x39]);
+
+        // Key Release
+        let caps_release = HidKeyboardEvent {
+            keycode: 0x39,
+            pressed: false,
+            modifiers: 0,
+        };
+        hid.push_event(caps_release);
+        assert!(hid.caps_lock_active); // remains true (toggle)
+        assert!(hid.active_held_keys.is_empty());
     }
 
     #[test]
-    fn test_not_connected_error() {
+    fn test_typematic_auto_repeat() {
         let mut hid = UsbHidDriver::new(0x1234, 0x5678);
-        let result = hid.send_report(HidReportType::Output, &[0x01]);
-        assert!(result.is_err());
+        hid.connect().unwrap();
+
+        let key_event = HidKeyboardEvent {
+            keycode: 0x04, // 'a'
+            pressed: true,
+            modifiers: 0,
+        };
+        hid.push_event(key_event);
+
+        // First tick maps initial timings
+        let t1 = hid.tick_repeat(10);
+        assert!(t1.is_none());
+
+        // Wait within delay threshold
+        let t2 = hid.tick_repeat(100);
+        assert!(t2.is_none());
+
+        // Cross delay threshold (delay = 250ms), tick_repeat triggers repeats
+        let t3 = hid.tick_repeat(300); // 300 - 10 = 290 > 250
+        assert!(t3.is_some());
+        assert_eq!(t3.unwrap().keycode, 0x04);
     }
 
     #[test]

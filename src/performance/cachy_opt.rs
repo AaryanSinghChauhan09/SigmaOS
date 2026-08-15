@@ -2,6 +2,7 @@
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
 extern crate alloc;
+use alloc::collections::BTreeSet;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::cell::RefCell;
@@ -141,8 +142,9 @@ impl UltraKernelSamepageMerger {
     }
 
     /// Scans, fingerprints, and merges duplicate physical pages (UKSM samepage deduplication)
+    /// Optimized by using a BTreeSet for O(log N) lookup complexity instead of O(N) linear scans.
     pub fn deduplicate_pages(&self, frames: &mut [PhysicalPageFrame]) -> usize {
-        let mut unique_hashes: Vec<u32> = Vec::new();
+        let mut unique_hashes: BTreeSet<u32> = BTreeSet::new();
         let mut duplicates_merged = 0;
 
         for frame in frames.iter_mut() {
@@ -156,7 +158,7 @@ impl UltraKernelSamepageMerger {
                     frame.address, frame.content_hash
                 );
             } else {
-                unique_hashes.push(frame.content_hash);
+                unique_hashes.insert(frame.content_hash);
             }
         }
 
