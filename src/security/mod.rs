@@ -25,6 +25,7 @@ pub mod vulnerability;
 pub mod clipboard;
 pub mod intrusion;
 pub mod password;
+pub mod parrot_kali;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -63,3 +64,8 @@ pub use vpn::{
     WireGuardHandler,
 };
 pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+pub use parrot_kali::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
+    HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
+    GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
+};
