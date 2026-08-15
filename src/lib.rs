@@ -141,6 +141,7 @@ pub use drivers::{
     StorageDriver, StorageError, StorageType, TouchJingosDriver, UsbHidDriver, VesaDriver,
     VesaError, VesaModeInfo, VirtioBlkDriver, VirtioDeviceType, VirtioMmioHeader, VirtioNetDriver,
     VirtioRngDriver,
+};
 
 pub use desktop::{
     Notification, SimpleNotification, NotificationManager, SimpleNotificationManager,
