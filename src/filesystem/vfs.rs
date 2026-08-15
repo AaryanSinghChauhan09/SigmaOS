@@ -52,7 +52,13 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    pub link_count: u32, // standard inode link count tracking hard links
+    // Conforming Linux/BSD additions
+    pub hard_links_count: u32,
+    pub link_count: u32,
+    pub symlink_target: Option<String>,
+    pub xattrs: HashMap<String, Vec<u8>>,
+    pub data: Vec<u8>,                 // File storage data
+    pub entries: HashMap<String, u64>, // Directory entries
 }
 
 impl Inode {
@@ -67,7 +73,12 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            link_count: 1, // default link count of 1
+            hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            entries: HashMap::new(),
         }
     }
 }
@@ -410,5 +421,34 @@ mod tests {
         assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
         assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
         assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
+    }
+
+    #[test]
+    fn test_linux_hardlinks_symlinks_and_xattrs() {
+        let mut vfs = VirtualFilesystem::new();
+
+        // 1. Create a regular file with extended attribute (user.mime_type = "text/plain")
+        let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
+        vfs.set_xattr(inode_id, "user.mime_type", b"text/plain").unwrap();
+        assert_eq!(vfs.get_xattr(inode_id, "user.mime_type").unwrap(), b"text/plain");
+
+        // 2. Create a symlink pointing to our file
+        let symlink_id = vfs.create_symlink("/home/tc/file.txt", 1000).unwrap();
+        assert_eq!(vfs.get_inode(symlink_id).unwrap().file_type, FileType::Symlink);
+        assert_eq!(vfs.get_inode(symlink_id).unwrap().symlink_target.as_ref().unwrap(), "/home/tc/file.txt");
+
+        // 3. Create a hard link -> increments link_count
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+        vfs.create_hard_link(inode_id).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
+
+        // 4. Deleting the file first time simply decrements link_count and keeps underlying Inode alive!
+        vfs.delete_file(inode_id).unwrap();
+        assert!(vfs.get_inode(inode_id).is_some());
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+
+        // 5. Deleting the file second time drops link_count to 0, successfully freeing the Inode from VFS!
+        vfs.delete_file(inode_id).unwrap();
+        assert!(vfs.get_inode(inode_id).is_none());
     }
 }

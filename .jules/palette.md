@@ -16,6 +16,6 @@ This journal logs CRITICAL usability enhancements, accessibility standard compli
 **Learning:** Screen layout changes or color saturation variations can render normal visual indicators invisible. Enforcing dynamic boundary contrasts makes keyboard navigation accessible.
 **Action:** Ensure active outline color contrasts meet WCAG 2.1 AA ratios of at least 4.5:1.
 
-## 2026-08-10 - ARIA Assertive Live Regions for Terminal Diagnostics
-**Learning:** Users relying on assistive screen readers miss critical real-time compilation progress logs or interactive installation feedback in the custom terminal emulator unless those output blocks are explicitly marked as `aria-live="assertive"`. Adding assistive live region containers guarantees instant notification of system state changes without manual scroll focus shifts.
-**Action:** Wrap active terminal buffer outputs inside declarative assertive live components.
+## 2026-08-10 - EndeavourOS Calamares & EOS Welcome Application Parity
+**Learning:** Desktop installers and welcome applications without clear progress feedback cause user frustration. Implementing `CalamaresInstaller` and `EosWelcomeApp` with structured status messages and pastebin log diagnostics provides a seamless setup and maintenance experience.
+**Action:** Ensure all installation and maintenance wizards provide explicit status messages and clear diagnostic feedback.

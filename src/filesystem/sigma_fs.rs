@@ -650,4 +650,3 @@ mod tests {
         assert!(!encryptor.pqc_verify_signature(b"Sovereign data at rest modified", &sig));
     }
 }
-

@@ -1,3 +1,7 @@
+// SigmaOS Glary Utilities & Advanced SystemCare Parity Resource Optimizer
+// Zero-dependency, #![no_std] compliant, zero-allocation
+// Dynamically tunes CPU cores, compacts memory page fragmentation, and adjusts disk I/O priorities under live workloads.
+
 use crate::kernel::{Priority, Process, ProcessState};
 use core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 
@@ -213,6 +217,11 @@ impl SmartResourceOptimizer {
         let next_profile = rule.evaluate_target_profile(battery_level, temp_celsius);
         self.active_profile
             .store(next_profile.to_u8(), Ordering::SeqCst);
+        println!(
+            "SmartOptimizer: Evaluation Rule '{}' selected SmartPerformanceProfile::{:?}.",
+            rule.name(),
+            next_profile
+        );
     }
 
     pub fn get_profile(&self) -> SmartPerformanceProfile {

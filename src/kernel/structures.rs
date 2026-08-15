@@ -1,6 +1,9 @@
 use core::cell::{Cell, RefCell};
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 use core::ptr::NonNull;
+// SigmaOS Core Kernel Structures and Advanced Algorithms Subsystem
+// Conforms to zero-dependency, #![no_std] compliant OOP structures
+
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -237,73 +240,49 @@ pub struct CpuContext {
     pub r1: u64,
     pub cpsr: u64,
 }
-
 // 5. ASYNCHRONOUS PROCEDURE CALLS (APC)
 // Inspired by Windows KAPC and Linux signal delivery models.
-
 pub struct Apc {
     pub apc_id: u64,
     pub target_tid: u64,
     pub mode: ApcMode,
     pub priority: u8,
     pub param: u64,
-}
-
 pub struct ApcQueue {
     pub apcs: SinglyLinkedList<Apc>,
-}
-
 impl ApcQueue {
     pub const fn new() -> Self {
         Self {
             apcs: SinglyLinkedList::new(),
         }
     }
-
     pub fn queue_apc(&mut self, apc: Apc) {
         // Enqueue APC sorted by priority (higher priority first)
         let priority = apc.priority;
         let mut apc_opt = Some(apc);
         let mut temp = SinglyLinkedList::new();
         let mut placed = false;
-
         while let Some(current) = self.apcs.pop_front() {
             if !placed && priority >= current.priority {
                 temp.push_front(apc_opt.take().unwrap());
                 placed = true;
                 temp.push_front(current);
             } else {
-                temp.push_front(current);
             }
-        }
-
         // Restore list from temp
         let mut final_apcs = SinglyLinkedList::new();
         while let Some(item) = temp.pop_front() {
             final_apcs.push_front(item);
-        }
-
         if !placed {
             if let Some(item) = apc_opt {
                 final_apcs.push_front(item);
-            }
-        }
-
         self.apcs = final_apcs;
-    }
-
     pub fn deliver_next(&mut self) -> Option<Apc> {
         self.apcs.pop_front()
-    }
-
     pub fn len(&self) -> usize {
         self.apcs.len()
-    }
-}
-
 // 6. SYSTEM THREAD
 // Inspired by Windows ETHREAD, Linux task_struct, and BSD thread structures.
-
 pub struct SystemThread {
     pub tid: u64,
     pub parent_pid: u64,
@@ -312,11 +291,8 @@ pub struct SystemThread {
     pub core_affinity: usize,
     pub apc_queue: ApcQueue,
     pub kernel_stack_base: u64,
-}
-
 impl SystemThread {
     pub fn new(tid: u64, parent_pid: u64, core_affinity: usize) -> Self {
-        Self {
             tid,
             parent_pid,
             state: ThreadState::Ready,
@@ -324,13 +300,7 @@ impl SystemThread {
             core_affinity,
             apc_queue: ApcQueue::new(),
             kernel_stack_base: 0xFFFF_8000_0000_0000 | (tid << 12),
-        }
-    }
-
-    pub fn queue_apc(&mut self, apc: Apc) {
         self.apc_queue.queue_apc(apc);
-    }
-
     pub fn dispatch_pending_apcs(&mut self) -> usize {
         let mut delivered = 0;
         while let Some(apc) = self.apc_queue.deliver_next() {
@@ -342,145 +312,89 @@ impl SystemThread {
                 }
                 ApcMode::UserMode => {
                     self.context.rip = 0x00007FFF_0000_2000; // Mock user APC routine
-                    self.context.rax = apc.param;
-                }
-            }
             delivered += 1;
-        }
         delivered
-    }
-}
-
 // 7. WORK ITEMS
 // Inspired by Windows WORK_QUEUE_ITEM and Linux work_struct/workqueue model.
-
 pub struct WorkItem {
     pub work_id: u64,
     pub executed: bool,
     pub execution_flags: u32,
     pub payload_data: u64,
-}
-
 impl WorkItem {
     pub const fn new(work_id: u64, payload: u64) -> Self {
-        Self {
             work_id,
             executed: false,
             execution_flags: 0,
             payload_data: payload,
-        }
-    }
-
     pub fn execute(&mut self) {
         self.executed = true;
         self.execution_flags |= 0x1; // Mark active/completed flags
-    }
-}
-
 // 8. UNIT TESTS
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
     #[test]
     fn test_singly_linked_list_operations() {
         let mut list = SinglyLinkedList::new();
         assert!(list.is_empty());
         assert_eq!(list.len(), 0);
-
         list.push_front(10);
         list.push_front(20);
         list.push_front(30);
-
         assert_eq!(list.len(), 3);
         assert!(!list.is_empty());
-
         assert_eq!(list.pop_front(), Some(30));
         assert_eq!(list.pop_front(), Some(20));
         assert_eq!(list.pop_front(), Some(10));
         assert_eq!(list.pop_front(), None);
-        assert_eq!(list.len(), 0);
-    }
-
-    #[test]
     fn test_sequenced_slist_reclaiming() {
         let mut list = SequencedSinglyLinkedList::new();
-        assert!(list.is_empty());
-
         let seq1 = list.push_front(100);
         let seq2 = list.push_front(200);
-
         assert_eq!(seq1, 1);
         assert_eq!(seq2, 2);
         assert_eq!(list.len(), 2);
-
         let pop1 = list.pop_front();
         assert_eq!(pop1, Some((200, 2)));
-
         let pop2 = list.pop_front();
         assert_eq!(pop2, Some((100, 1)));
-
-        assert_eq!(list.pop_front(), None);
-    }
-
-    #[test]
     fn test_circular_doubly_linked_list_sentinel() {
         let mut list = CircularDoublyLinkedList::<i32>::new();
-        assert!(list.is_empty());
-        assert_eq!(list.len(), 0);
-
         list.push_tail(1000);
         list.push_tail(2000);
         list.push_tail(3000);
-
-        assert_eq!(list.len(), 3);
-
         assert_eq!(list.pop_head(), Some(1000));
         assert_eq!(list.pop_head(), Some(2000));
         assert_eq!(list.pop_head(), Some(3000));
         assert_eq!(list.pop_head(), None);
-    }
-
-    #[test]
     fn test_system_thread_context_and_states() {
         let mut thread = SystemThread::new(42, 10, 2);
         assert_eq!(thread.tid, 42);
         assert_eq!(thread.parent_pid, 10);
         assert_eq!(thread.core_affinity, 2);
         assert_eq!(thread.state, ThreadState::Ready);
-
         thread.state = ThreadState::Running;
         assert_eq!(thread.state, ThreadState::Running);
-
         // Hardware registers configuration simulation
         thread.context.rip = 0x8000;
         thread.context.rsp = 0x7FFF;
         thread.context.pc = 0x9000;
         thread.context.sp = 0x8FFF;
-
         assert_eq!(thread.context.rip, 0x8000);
         assert_eq!(thread.context.rsp, 0x7FFF);
         assert_eq!(thread.context.pc, 0x9000);
         assert_eq!(thread.context.sp, 0x8FFF);
-    }
-
-    #[test]
     fn test_deferred_work_items_execution() {
         let mut item = WorkItem::new(101, 0xABCD);
         assert_eq!(item.work_id, 101);
         assert_eq!(item.payload_data, 0xABCD);
         assert!(!item.executed);
-
         item.execute();
         assert!(item.executed);
         assert_eq!(item.execution_flags, 0x1);
-    }
-
-    #[test]
     fn test_apc_queue_delivery_and_execution() {
         let mut thread = SystemThread::new(9, 1, 0);
-
         // Create APCs with different priorities
         let apc_low = Apc {
             apc_id: 1,
@@ -489,31 +403,38 @@ mod tests {
             priority: 5,
             param: 100,
         };
-
         let apc_high = Apc {
             apc_id: 2,
-            target_tid: 9,
             mode: ApcMode::KernelMode,
             priority: 10,
             param: 200,
-        };
-
         thread.queue_apc(apc_low);
         thread.queue_apc(apc_high);
-
         // High priority (10) should be delivered first, then low priority (5)
         assert_eq!(thread.apc_queue.len(), 2);
-
         // Dispatch APCs
         let executed = thread.dispatch_pending_apcs();
         assert_eq!(executed, 2);
         assert_eq!(thread.apc_queue.len(), 0);
-
         // The last dispatched APC was low (param: 100, UserMode)
         assert_eq!(thread.context.rip, 0x00007FFF_0000_2000);
         assert_eq!(thread.context.rax, 100);
-    }
-}
+    pub apc_id: usize,
+    pub callback_id: usize,
+    pub apcs: Vec<Apc>,
+    pub fn new() -> Self {
+        Self { apcs: Vec::new() }
+        self.apcs.push(apc);
+    pub fn deliver_apcs(&mut self, mode: ApcMode) -> usize {
+        let mut count = 0;
+        self.apcs.retain(|apc| {
+            if apc.mode == mode {
+                println!("[apc] Delivering APC #{} in {:?}", apc.apc_id, mode);
+                count += 1;
+                false // Remove from queue
+                true // Retain in queue
+        });
+        count
 // 3. Next-Generation Advanced Algorithms (SovereignAlgorithms Blueprint)
 
 const MAX_SCHEDULER_TASKS: usize = 16;

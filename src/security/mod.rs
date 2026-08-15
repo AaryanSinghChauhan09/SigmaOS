@@ -1,6 +1,17 @@
 // SigmaOS Security Subsystem
 pub mod capability;
 pub mod pqc_enclave;
+pub mod defensive_audit;
+pub mod parrot;
+pub mod pledge;
+pub mod unveil;
+pub mod selinux;
+pub mod vulnerability;
+pub mod hardening;
+pub mod deobfuscation;
+pub mod securelevels;
+pub mod pam;
+pub mod crypto_utils;
 
 pub use pqc_enclave::{
     KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
@@ -124,10 +135,13 @@ pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use kali_stack::{
     PluggableAuthenticationModule, FirewallRule, IptablesFirewall, CronJob, CronDaemon,
     SudoPrivilegeEscalation, TmuxPane, TmuxMultiplexer, SwapSpaceManager, DmesgLog, KaliError,
-
 pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
 pub use parrot_kali::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
     HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
     GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
 };
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
+pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
+pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
