@@ -4,179 +4,24 @@
 /// OOP-based Desktop Terminal for SigmaOS
 /// Implements terminal emulator, ANSI escape interpretation, and shell integration.
 /// Inspired by Alacritty, GNOME-Terminal, xterm, and tmux from Linux & BSD distributions.
-/// Enhanced with SerenityOS-style tab support for better productivity.
 
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type TerminalID = usize;
-pub type TabID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TerminalError { Success = 0, NotFound = 1, CommandFailed = 2, TabNotFound = 3, TabLimitReached = 4 }
+pub enum TerminalError { Success = 0, NotFound = 1, CommandFailed = 2 }
 
 pub trait Terminal {
     fn id(&self) -> TerminalID;
     fn title(&self) -> &[u8];
     fn working_directory(&self) -> &[u8];
     fn set_working_directory(&mut self, path: &[u8]);
-}
-
-/// SerenityOS-style Tab for terminal emulator
-#[repr(C)]
-pub struct TerminalTab {
-    pub id: TabID,
-    pub title: String,
-    pub terminal_id: TerminalID,
-    pub is_active: bool,
-    pub is_pinned: bool,
-    pub color_scheme: TabColorScheme,
-    pub working_directory: String,
-    pub shell_process: Option<usize>, // Process ID of shell
-    pub scrollback_lines: Vec<String>,
-    pub current_line: String,
-    pub cursor_position: (usize, usize), // (row, col)
-    pub history: Vec<String>,           // Command history
-    pub history_index: usize,
-    pub split_config: Option<TabSplitConfig>, // For split panes
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TabColorScheme {
-    Default = 0,
-    Dark = 1,
-    Light = 2,
-    Solarized = 3,
-    Custom = 4,
-}
-
-/// Tab split configuration for terminal panes
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SplitDirection {
-    Horizontal = 0,
-    Vertical = 1,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone)]
-pub struct TabSplitConfig {
-    pub direction: SplitDirection,
-    pub split_ratio: f32, // 0.0 to 1.0, position of split
-    pub child_tabs: Vec<TabID>, // IDs of child tabs in split
-}
-
-impl TerminalTab {
-    pub fn new(id: TabID, title: &str, terminal_id: TerminalID) -> Self {
-        TerminalTab {
-            id,
-            title: String::from(title),
-            terminal_id,
-            is_active: false,
-            is_pinned: false,
-            color_scheme: TabColorScheme::Default,
-            working_directory: String::from("/home/user"),
-            shell_process: None,
-            scrollback_lines: Vec::new(),
-            current_line: String::new(),
-            cursor_position: (0, 0),
-            history: Vec::new(),
-            history_index: 0,
-            split_config: None,
-        }
-    }
-
-    pub fn set_title(&mut self, title: &str) {
-        self.title = String::from(title);
-    }
-
-    pub fn set_active(&mut self, active: bool) {
-        self.is_active = active;
-    }
-
-    pub fn set_pinned(&mut self, pinned: bool) {
-        self.is_pinned = pinned;
-    }
-
-    pub fn set_color_scheme(&mut self, scheme: TabColorScheme) {
-        self.color_scheme = scheme;
-    }
-
-    pub fn set_working_directory(&mut self, path: &str) {
-        self.working_directory = String::from(path);
-    }
-
-    pub fn add_to_history(&mut self, command: &str) {
-        if !command.trim().is_empty() {
-            self.history.retain(|c| c != command); // Remove duplicates
-            self.history.push(String::from(command));
-            self.history_index = self.history.len();
-        }
-    }
-
-    pub fn get_history_previous(&mut self) -> Option<&str> {
-        if self.history.is_empty() {
-            return None;
-        }
-        if self.history_index > 0 {
-            self.history_index -= 1;
-            self.history.get(self.history_index).map(|s| s.as_str())
-        } else {
-            self.history.get(0).map(|s| s.as_str())
-        }
-    }
-
-    pub fn get_history_next(&mut self) -> Option<&str> {
-        if self.history.is_empty() {
-            return None;
-        }
-        if self.history_index < self.history.len() - 1 {
-            self.history_index += 1;
-            self.history.get(self.history_index).map(|s| s.as_str())
-        } else {
-            None
-        }
-    }
-
-    pub fn split_tab(&mut self, direction: SplitDirection, ratio: f32, new_tab_id: TabID) {
-        let mut child_tabs = vec![self.id, new_tab_id];
-        self.split_config = Some(TabSplitConfig {
-            direction,
-            split_ratio: ratio,
-            child_tabs,
-        });
-    }
-
-    pub fn write_to_scrollback(&mut self, line: &str) {
-        self.scrollback_lines.push(String::from(line));
-        // Limit scrollback to prevent memory issues
-        if self.scrollback_lines.len() > 10000 {
-            self.scrollback_lines.remove(0);
-        }
-    }
-
-    pub fn get_scrollback(&self) -> &[String] {
-        &self.scrollback_lines
-    }
-
-    pub fn clear_scrollback(&mut self) {
-        self.scrollback_lines.clear();
-    }
-
-    pub fn set_cursor_position(&mut self, row: usize, col: usize) {
-        self.cursor_position = (row, col);
-    }
-
-    pub fn get_cursor_position(&self) -> (usize, usize) {
-        self.cursor_position
-    }
 }
 
 #[repr(C)]
@@ -230,319 +75,10 @@ pub trait TerminalManager {
     fn execute_command(&mut self, terminal_id: TerminalID, command: &[u8]) -> Result<Vec<u8>, TerminalError>;
 }
 
-/// Tab group for organizing related tabs
-#[repr(C)]
-#[derive(Debug, Clone)]
-pub struct TabGroup {
-    pub id: usize,
-    pub name: String,
-    pub tab_ids: Vec<TabID>,
-    pub color: Option<u32>, // RGB color for group indicator
-}
-
-impl TabGroup {
-    pub fn new(id: usize, name: &str) -> Self {
-        TabGroup {
-            id,
-            name: String::from(name),
-            tab_ids: Vec::new(),
-            color: None,
-        }
-    }
-
-    pub fn add_tab(&mut self, tab_id: TabID) {
-        if !self.tab_ids.contains(&tab_id) {
-            self.tab_ids.push(tab_id);
-        }
-    }
-
-    pub fn remove_tab(&mut self, tab_id: TabID) {
-        self.tab_ids.retain(|&id| id != tab_id);
-    }
-}
-
-/// SerenityOS-style Tab Manager for terminal emulator
-#[repr(C)]
-pub struct TabManager {
-    pub tabs: Vec<TerminalTab>,
-    pub active_tab_id: Option<TabID>,
-    pub next_tab_id: AtomicUsize,
-    pub max_tabs: usize,
-    pub tab_groups: Vec<TabGroup>, // For organizing tabs into groups
-    pub search_query: Option<String>, // For tab search/filtering
-}
-
-impl TabManager {
-    pub fn new(max_tabs: usize) -> Self {
-        TabManager {
-            tabs: Vec::new(),
-            active_tab_id: None,
-            next_tab_id: AtomicUsize::new(1),
-            max_tabs,
-            tab_groups: Vec::new(),
-            search_query: None,
-        }
-    }
-
-    /// Create a new tab
-    pub fn create_tab(&mut self, title: &str, terminal_id: TerminalID) -> Result<TabID, TerminalError> {
-        if self.tabs.len() >= self.max_tabs {
-            return Err(TerminalError::TabLimitReached);
-        }
-
-        let tab_id = self.next_tab_id.fetch_add(1, Ordering::SeqCst);
-        let mut tab = TerminalTab::new(tab_id, title, terminal_id);
-        
-        // If this is the first tab, make it active
-        if self.tabs.is_empty() {
-            tab.set_active(true);
-            self.active_tab_id = Some(tab_id);
-        }
-
-        self.tabs.push(tab);
-        Ok(tab_id)
-    }
-
-    /// Close a tab
-    pub fn close_tab(&mut self, tab_id: TabID) -> Result<(), TerminalError> {
-        let tab_index = self.tabs.iter().position(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-
-        let was_active = self.tabs[tab_index].is_active;
-        self.tabs.remove(tab_index);
-
-        // If we closed the active tab, activate another one
-        if was_active && !self.tabs.is_empty() {
-            let new_active_index = tab_index.min(self.tabs.len() - 1);
-            self.tabs[new_active_index].set_active(true);
-            self.active_tab_id = Some(self.tabs[new_active_index].id);
-        } else if self.tabs.is_empty() {
-            self.active_tab_id = None;
-        }
-
-        Ok(())
-    }
-
-    /// Switch to a specific tab
-    pub fn switch_to_tab(&mut self, tab_id: TabID) -> Result<(), TerminalError> {
-        let tab = self.tabs.iter_mut().find(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-
-        // Deactivate current active tab
-        if let Some(current_id) = self.active_tab_id {
-            if let Some(current_tab) = self.tabs.iter_mut().find(|t| t.id == current_id) {
-                current_tab.set_active(false);
-            }
-        }
-
-        // Activate new tab
-        tab.set_active(true);
-        self.active_tab_id = Some(tab_id);
-        Ok(())
-    }
-
-    /// Get the active tab
-    pub fn get_active_tab(&self) -> Option<&TerminalTab> {
-        self.active_tab_id.and_then(|id| self.tabs.iter().find(|t| t.id == id))
-    }
-
-    /// Get all tabs
-    pub fn get_tabs(&self) -> &[TerminalTab] {
-        &self.tabs
-    }
-
-    /// Move tab to new position
-    pub fn move_tab(&mut self, tab_id: TabID, new_index: usize) -> Result<(), TerminalError> {
-        let current_index = self.tabs.iter().position(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-
-        if new_index >= self.tabs.len() {
-            return Err(TerminalError::NotFound);
-        }
-
-        let tab = self.tabs.remove(current_index);
-        self.tabs.insert(new_index, tab);
-        Ok(())
-    }
-
-    /// Pin/unpin a tab
-    pub fn toggle_pin_tab(&mut self, tab_id: TabID) -> Result<(), TerminalError> {
-        let tab = self.tabs.iter_mut().find(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-        tab.set_pinned(!tab.is_pinned);
-        Ok(())
-    }
-
-    /// Set tab color scheme
-    pub fn set_tab_color_scheme(&mut self, tab_id: TabID, scheme: TabColorScheme) -> Result<(), TerminalError> {
-        let tab = self.tabs.iter_mut().find(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-        tab.set_color_scheme(scheme);
-        Ok(())
-    }
-
-    /// Get next tab (for cycling)
-    pub fn get_next_tab(&self) -> Option<&TerminalTab> {
-        if let Some(current_id) = self.active_tab_id {
-            let current_index = self.tabs.iter().position(|t| t.id == current_id)?;
-            let next_index = (current_index + 1) % self.tabs.len();
-            self.tabs.get(next_index)
-        } else {
-            self.tabs.first()
-        }
-    }
-
-    /// Get previous tab (for cycling)
-    pub fn get_previous_tab(&self) -> Option<&TerminalTab> {
-        if let Some(current_id) = self.active_tab_id {
-            let current_index = self.tabs.iter().position(|t| t.id == current_id)?;
-            let prev_index = if current_index == 0 {
-                self.tabs.len() - 1
-            } else {
-                current_index - 1
-            };
-            self.tabs.get(prev_index)
-        } else {
-            self.tabs.last()
-        }
-    }
-
-    /// Create a new tab group
-    pub fn create_tab_group(&mut self, name: &str) -> usize {
-        let group_id = self.tab_groups.len();
-        let group = TabGroup::new(group_id, name);
-        self.tab_groups.push(group);
-        group_id
-    }
-
-    /// Add tab to group
-    pub fn add_tab_to_group(&mut self, tab_id: TabID, group_id: usize) -> Result<(), TerminalError> {
-        if let Some(group) = self.tab_groups.get_mut(group_id) {
-            group.add_tab(tab_id);
-            Ok(())
-        } else {
-            Err(TerminalError::NotFound)
-        }
-    }
-
-    /// Remove tab from group
-    pub fn remove_tab_from_group(&mut self, tab_id: TabID, group_id: usize) -> Result<(), TerminalError> {
-        if let Some(group) = self.tab_groups.get_mut(group_id) {
-            group.remove_tab(tab_id);
-            Ok(())
-        } else {
-            Err(TerminalError::NotFound)
-        }
-    }
-
-    /// Get tabs in a group
-    pub fn get_group_tabs(&self, group_id: usize) -> Vec<&TerminalTab> {
-        if let Some(group) = self.tab_groups.get(group_id) {
-            group.tab_ids.iter()
-                .filter_map(|&tab_id| self.tabs.iter().find(|t| t.id == tab_id))
-                .collect()
-        } else {
-            Vec::new()
-        }
-    }
-
-    /// Search tabs by title or content
-    pub fn search_tabs(&mut self, query: &str) -> Vec<&TerminalTab> {
-        self.search_query = Some(String::from(query));
-        
-        if query.is_empty() {
-            return self.tabs.iter().collect();
-        }
-
-        let query_lower = query.to_lowercase();
-        self.tabs.iter()
-            .filter(|tab| {
-                tab.title.to_lowercase().contains(&query_lower) ||
-                tab.working_directory.to_lowercase().contains(&query_lower)
-            })
-            .collect()
-    }
-
-    /// Clear search query
-    pub fn clear_search(&mut self) {
-        self.search_query = None;
-    }
-
-    /// Duplicate a tab (create new tab with same working directory)
-    pub fn duplicate_tab(&mut self, tab_id: TabID) -> Result<TabID, TerminalError> {
-        let original_tab = self.tabs.iter().find(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-
-        let new_tab_id = self.create_tab(&format!("{} (copy)", original_tab.title), original_tab.terminal_id)?;
-        
-        if let Some(new_tab) = self.tabs.iter_mut().find(|t| t.id == new_tab_id) {
-            new_tab.set_working_directory(&original_tab.working_directory);
-            new_tab.color_scheme = original_tab.color_scheme;
-        }
-
-        Ok(new_tab_id)
-    }
-
-    /// Export tab history to file
-    pub fn export_tab_history(&self, tab_id: TabID) -> Result<Vec<String>, TerminalError> {
-        let tab = self.tabs.iter().find(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-        Ok(tab.history.clone())
-    }
-
-    /// Import tab history from file
-    pub fn import_tab_history(&mut self, tab_id: TabID, history: Vec<String>) -> Result<(), TerminalError> {
-        let tab = self.tabs.iter_mut().find(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-        tab.history = history;
-        tab.history_index = tab.history.len();
-        Ok(())
-    }
-
-    /// Get tab statistics
-    pub fn get_tab_stats(&self, tab_id: TabID) -> Result<TabStats, TerminalError> {
-        let tab = self.tabs.iter().find(|t| t.id == tab_id)
-            .ok_or(TerminalError::TabNotFound)?;
-
-        Ok(TabStats {
-            id: tab.id,
-            title: tab.title.clone(),
-            working_directory: tab.working_directory.clone(),
-            command_count: tab.history.len(),
-            scrollback_lines: tab.scrollback_lines.len(),
-            is_active: tab.is_active,
-            is_pinned: tab.is_pinned,
-            has_split: tab.split_config.is_some(),
-        })
-    }
-
-    /// Get all tab statistics
-    pub fn get_all_tab_stats(&self) -> Vec<TabStats> {
-        self.tabs.iter()
-            .filter_map(|tab| self.get_tab_stats(tab.id).ok())
-            .collect()
-    }
-}
-
-/// Tab statistics for monitoring and debugging
-#[repr(C)]
-#[derive(Debug, Clone)]
-pub struct TabStats {
-    pub id: TabID,
-    pub title: String,
-    pub working_directory: String,
-    pub command_count: usize,
-    pub scrollback_lines: usize,
-    pub is_active: bool,
-    pub is_pinned: bool,
-    pub has_split: bool,
-}
-
 #[repr(C)]
 pub struct SimpleTerminalManager {
     pub terminals: Vec<Option<Box<dyn Terminal>>>,
     pub next_id: AtomicUsize,
-    pub tab_manager: TabManager,
 }
 
 impl SimpleTerminalManager {
@@ -550,7 +86,6 @@ impl SimpleTerminalManager {
         SimpleTerminalManager {
             terminals: Vec::new(),
             next_id: AtomicUsize::new(1),
-            tab_manager: TabManager::new(32), // Max 32 tabs per terminal window
         }
     }
 }
@@ -560,26 +95,10 @@ impl TerminalManager for SimpleTerminalManager {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let terminal = SimpleTerminal::new(id, title);
         self.terminals.push(Some(Box::new(terminal)));
-        
-        // Automatically create a default tab for the new terminal
-        let title_str = core::str::from_utf8(title).unwrap_or("Terminal");
-        self.tab_manager.create_tab(title_str, id).ok();
-        
         Ok(id)
     }
     
     fn close_terminal(&mut self, id: TerminalID) -> Result<(), TerminalError> {
-        // Close all tabs associated with this terminal
-        let tabs_to_close: Vec<TabID> = self.tab_manager.get_tabs()
-            .iter()
-            .filter(|t| t.terminal_id == id)
-            .map(|t| t.id)
-            .collect();
-        
-        for tab_id in tabs_to_close {
-            self.tab_manager.close_tab(tab_id).ok();
-        }
-
         for terminal_option in &mut self.terminals {
             if let Some(ref terminal) = *terminal_option {
                 let term_ref: &dyn Terminal = terminal.as_ref();
@@ -875,3 +394,92 @@ impl Default for Utf8Decoder {
     }
 }
 
+// ==============================================================================
+// Vec Implementation
+// ==============================================================================
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    pub fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn clear(&mut self) {
+        while self.len > 0 {
+            self.remove(0);
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
