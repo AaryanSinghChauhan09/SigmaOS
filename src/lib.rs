@@ -3,6 +3,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -55,6 +56,10 @@ pub use compatibility::{
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use distro::{
+    AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
+    ReflectorMirrorManager, YayParuHelper,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
@@ -120,7 +125,8 @@ pub use security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
     ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
     PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN, Securelevel, LinuxCapability,
+    SovereignSecurelevelManager, PamError, PamUser, PamGroup, SovereignPamManager,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
