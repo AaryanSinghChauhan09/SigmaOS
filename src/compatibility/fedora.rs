@@ -924,36 +924,6 @@ impl SovereignFirewalldManager {
 // SELinux State and Policy Enforcer
 // ==========================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SeLinuxMode {
-    Enforcing,
-    Permissive,
-    Disabled,
-}
-
-#[derive(Debug, Clone)]
-pub struct SeLinuxContext {
-    pub user: String,
-    pub role: String,
-    pub domain_type: String,
-    pub sensitivity: String,
-}
-
-impl SeLinuxContext {
-    pub fn parse(context_str: &str) -> Result<Self, &'static str> {
-        let parts: Vec<&str> = context_str.split(':').collect();
-        if parts.len() < 4 {
-            return Err("Invalid SELinux context string format");
-        }
-        Ok(Self {
-            user: parts[0].to_string(),
-            role: parts[1].to_string(),
-            domain_type: parts[2].to_string(),
-            sensitivity: parts[3].to_string(),
-        })
-    }
-}
-
 pub struct SeLinuxEnforcer {
     pub mode: SeLinuxMode,
     pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
@@ -1033,6 +1003,58 @@ impl CoprRepositoryManager {
             }
         }
         Err("COPR build task ID not found")
+    }
+}
+
+pub struct SovereignCockpitConsole {
+    pub is_listening: bool,
+    pub connected_clients: usize,
+    pub metrics: HashMap<String, f64>,
+}
+
+impl SovereignCockpitConsole {
+    pub fn new() -> Self {
+        Self {
+            is_listening: false,
+            connected_clients: 0,
+            metrics: HashMap::new(),
+        }
+    }
+
+    pub fn start_server(&mut self) -> Result<(), &'static str> {
+        if self.is_listening {
+            return Err("Server already running");
+        }
+        self.is_listening = true;
+        Ok(())
+    }
+
+    pub fn stop_server(&mut self) {
+        self.is_listening = false;
+        self.connected_clients = 0;
+    }
+
+    pub fn register_client(&mut self) -> Result<usize, &'static str> {
+        if !self.is_listening {
+            return Err("Server not listening");
+        }
+        self.connected_clients += 1;
+        Ok(self.connected_clients)
+    }
+
+    pub fn update_metric(&mut self, name: &str, value: f64) {
+        self.metrics.insert(name.to_string(), value);
+    }
+
+    pub fn stream_metrics_json(&self) -> Result<String, &'static str> {
+        let mut json = String::from("{");
+        json.push_str(&format!("\"listening\":{},", self.is_listening));
+        json.push_str(&format!("\"clients\":{}", self.connected_clients));
+        for (name, val) in &self.metrics {
+            json.push_str(&format!(",\"{}\":{}", name, val));
+        }
+        json.push_str("}");
+        Ok(json)
     }
 }
 
