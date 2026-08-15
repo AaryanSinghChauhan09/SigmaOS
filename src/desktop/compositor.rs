@@ -5,15 +5,19 @@
 
 extern crate alloc;
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::string::ToString;
 
 /// Window management modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowMode {
     /// Tiling (i3/bspwm inspiration)
     Tiling,
+    /// Binary Space Partitioning Tiling (bspwm inspiration)
+    BspTiling,
+    /// Master-Stack Tiling (dwwm/xmonad inspiration)
+    MasterStack,
     /// Stacking (Openbox inspiration)
     Stacking,
     /// Floating (macOS inspiration)
@@ -209,17 +213,93 @@ impl Compositor {
     pub fn layout_windows(&mut self) {
         match self.window_mode {
             WindowMode::Tiling => self.layout_tiling(),
+            WindowMode::BspTiling => self.layout_bsp_tiling(),
+            WindowMode::MasterStack => self.layout_master_stack(),
             WindowMode::Stacking => self.layout_stacking(),
             WindowMode::Floating => self.layout_floating(),
             WindowMode::Dynamic => self.layout_dynamic(),
         }
     }
 
-    fn layout_tiling(&mut self) {
-        // Tiling layout (i3 inspiration)
-        let workspace_windows: Vec<&mut Window> = self.windows
+    fn layout_master_stack(&mut self) {
+        let active_ws = self.active_workspace;
+        let mut workspace_windows: Vec<&mut Window> = self.windows
             .iter_mut()
-            .filter(|w| w.workspace == self.active_workspace && w.state == WindowState::Normal)
+            .filter(|w| w.workspace == active_ws && w.state == WindowState::Normal)
+            .collect();
+
+        let count = workspace_windows.len();
+        if count == 0 {
+            return;
+        }
+
+        let screen_width = 1920u32;
+        let screen_height = 1080u32;
+
+        if count == 1 {
+            workspace_windows[0].set_position(0, 0);
+            workspace_windows[0].set_size(screen_width, screen_height);
+        } else {
+            let master_width = screen_width / 2;
+            let stack_width = screen_width - master_width;
+            let stack_height = screen_height / (count as u32 - 1);
+
+            workspace_windows[0].set_position(0, 0);
+            workspace_windows[0].set_size(master_width, screen_height);
+
+            for (i, window) in workspace_windows.iter_mut().skip(1).enumerate() {
+                let y = (i as u32 * stack_height) as i32;
+                window.set_position(master_width as i32, y);
+                window.set_size(stack_width, stack_height);
+            }
+        }
+    }
+
+    fn layout_bsp_tiling(&mut self) {
+        let active_ws = self.active_workspace;
+        let mut workspace_windows: Vec<&mut Window> = self.windows
+            .iter_mut()
+            .filter(|w| w.workspace == active_ws && w.state == WindowState::Normal)
+            .collect();
+
+        let count = workspace_windows.len();
+        if count == 0 {
+            return;
+        }
+
+        let mut curr_x = 0i32;
+        let mut curr_y = 0i32;
+        let mut curr_w = 1920u32;
+        let mut curr_h = 1080u32;
+
+        for (i, window) in workspace_windows.iter_mut().enumerate() {
+            if i == count - 1 {
+                window.set_position(curr_x, curr_y);
+                window.set_size(curr_w, curr_h);
+            } else if i % 2 == 0 {
+                // Split vertically
+                let half_w = curr_w / 2;
+                window.set_position(curr_x, curr_y);
+                window.set_size(half_w, curr_h);
+                curr_x += half_w as i32;
+                curr_w -= half_w;
+            } else {
+                // Split horizontally
+                let half_h = curr_h / 2;
+                window.set_position(curr_x, curr_y);
+                window.set_size(curr_w, half_h);
+                curr_y += half_h as i32;
+                curr_h -= half_h;
+            }
+        }
+    }
+
+    fn layout_tiling(&mut self) {
+        let active_ws = self.active_workspace;
+        // Tiling layout (i3 inspiration)
+        let mut workspace_windows: Vec<&mut Window> = self.windows
+            .iter_mut()
+            .filter(|w| w.workspace == active_ws && w.state == WindowState::Normal)
             .collect();
         
         let count = workspace_windows.len();
@@ -259,10 +339,11 @@ impl Compositor {
     }
 
     fn layout_stacking(&mut self) {
+        let active_ws = self.active_workspace;
         // Stacking layout (Openbox inspiration)
-        let workspace_windows: Vec<&mut Window> = self.windows
+        let mut workspace_windows: Vec<&mut Window> = self.windows
             .iter_mut()
-            .filter(|w| w.workspace == self.active_workspace && w.state == WindowState::Normal)
+            .filter(|w| w.workspace == active_ws && w.state == WindowState::Normal)
             .collect();
         
         let screen_width = 1920;
@@ -285,14 +366,13 @@ impl Compositor {
     }
 
     fn layout_dynamic(&mut self) {
-        // Dynamic layout (GNOME Shell inspiration)
-        // Adaptive layout based on window count and content
-        let workspace_windows: Vec<&mut Window> = self.windows
-            .iter_mut()
-            .filter(|w| w.workspace == self.active_workspace && w.state == WindowState::Normal)
-            .collect();
-        
-        if workspace_windows.len() <= 1 {
+        let active_ws = self.active_workspace;
+        let count = self.windows
+            .iter()
+            .filter(|w| w.workspace == active_ws && w.state == WindowState::Normal)
+            .count();
+
+        if count <= 1 {
             self.layout_tiling();
         } else {
             self.layout_stacking();
@@ -397,9 +477,10 @@ impl DesktopEnvironment {
     }
 
     pub fn create_application_window(&mut self, app_name: &str) -> u32 {
+        let active_ws = self.compositor.active_workspace;
         let window_id = self.compositor.create_window(app_name);
         if let Some(window) = self.compositor.get_window(window_id) {
-            window.workspace = self.compositor.active_workspace;
+            window.workspace = active_ws;
         }
         window_id
     }
