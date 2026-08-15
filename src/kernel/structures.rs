@@ -1,3 +1,12 @@
+use core::cell::{Cell, RefCell};
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+use core::ptr::NonNull;
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
+
 // 1. SINGLY LINKED LIST
 
 pub struct SinglyListNode<T> {
@@ -505,156 +514,6 @@ mod tests {
         assert_eq!(thread.context.rax, 100);
     }
 }
-||||||| 43be3a7e8
-// SigmaOS Core Kernel Structures and Advanced Algorithms Subsystem
-// Conforms to zero-dependency, #![no_std] compliant OOP structures
-
-use core::cell::{Cell, RefCell};
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
-
-// 1. Singly, Sequenced, and Circular Doubly Linked Lists
-
-pub struct SinglyLinkedList<T> {
-    pub value: T,
-    pub next: Option<Box<SinglyLinkedList<T>>>,
-}
-
-impl<T> SinglyLinkedList<T> {
-    pub fn new(value: T) -> Self {
-        Self { value, next: None }
-    }
-
-    pub fn push_next(&mut self, next_val: T) {
-        let mut node = Box::new(SinglyLinkedList::new(next_val));
-        if let Some(existing) = self.next.take() {
-            node.next = Some(existing);
-        }
-        self.next = Some(node);
-    }
-}
-
-pub struct SequencedSinglyLinkedList<T> {
-    pub value: T,
-    pub sequence_number: u64,
-    pub next: Option<Box<SequencedSinglyLinkedList<T>>>,
-}
-
-impl<T> SequencedSinglyLinkedList<T> {
-    pub fn new(value: T, seq: u64) -> Self {
-        Self {
-            value,
-            sequence_number: seq,
-            next: None,
-        }
-    }
-}
-
-pub struct CircularDoublyLinkedList<T> {
-    pub value: Option<T>,
-    // Simulated pointers to represent list links (Windows LIST_ENTRY and Linux list_head style)
-    pub next_id: Option<usize>,
-    pub prev_id: Option<usize>,
-}
-
-impl<T> CircularDoublyLinkedList<T> {
-    pub fn new(value: T) -> Self {
-        Self {
-            value: Some(value),
-            next_id: None,
-            prev_id: None,
-        }
-    }
-}
-
-// 2. Scheduler SystemThread, WorkItems, APCs
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86,
-    X64,
-    Arm,
-    Cisc,
-}
-
-pub struct SystemThread {
-    pub thread_id: usize,
-    pub priority: u8,
-    pub arch: CpuArchitectureClass,
-    pub register_context: [u64; 16], // Mock registers (rax, rbx, r1-r15 etc)
-}
-
-impl SystemThread {
-    pub fn new(thread_id: usize, priority: u8, arch: CpuArchitectureClass) -> Self {
-        Self {
-            thread_id,
-            priority,
-            arch,
-            register_context: [0u64; 16],
-        }
-    }
-}
-
-pub struct WorkItem {
-    pub work_id: usize,
-    pub is_processed: AtomicBool,
-    pub payload_hash: u32,
-}
-
-impl WorkItem {
-    pub fn new(work_id: usize, payload_hash: u32) -> Self {
-        Self {
-            work_id,
-            is_processed: AtomicBool::new(false),
-            payload_hash,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ApcMode {
-    KernelMode,
-    UserMode,
-}
-
-pub struct Apc {
-    pub apc_id: usize,
-    pub mode: ApcMode,
-    pub callback_id: usize,
-}
-
-pub struct ApcQueue {
-    pub apcs: Vec<Apc>,
-}
-
-impl ApcQueue {
-    pub fn new() -> Self {
-        Self { apcs: Vec::new() }
-    }
-
-    pub fn queue_apc(&mut self, apc: Apc) {
-        self.apcs.push(apc);
-    }
-
-    pub fn deliver_apcs(&mut self, mode: ApcMode) -> usize {
-        let mut count = 0;
-        self.apcs.retain(|apc| {
-            if apc.mode == mode {
-                println!("[apc] Delivering APC #{} in {:?}", apc.apc_id, mode);
-                count += 1;
-                false // Remove from queue
-            } else {
-                true // Retain in queue
-            }
-        });
-        count
-    }
-}
-
 // 3. Next-Generation Advanced Algorithms (SovereignAlgorithms Blueprint)
 
 const MAX_SCHEDULER_TASKS: usize = 16;
@@ -755,7 +614,7 @@ impl AdvancedAlgorithmsManager {
     // 1. EARLIEST DEADLINE FIRST REAL-TIME SCHEDULER
     pub fn add_edf_task(&self, task: EdfTask) -> Result<(), &'static str> {
         let mut queue = self.edf_queue.borrow_mut();
-        for slot in queue.iter_mut() {
+        for slot in (*queue).iter_mut() {
             if slot.is_none() {
                 *slot = Some(task);
                 return Ok(());
@@ -792,7 +651,7 @@ impl AdvancedAlgorithmsManager {
     // 2. PROBABILISTIC LOTTERY SCHEDULER
     pub fn add_lottery_task(&self, task: LotteryTask) -> Result<(), &'static str> {
         let mut queue = self.lottery_queue.borrow_mut();
-        for slot in queue.iter_mut() {
+        for slot in (*queue).iter_mut() {
             if slot.is_none() {
                 *slot = Some(task);
                 return Ok(());

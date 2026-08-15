@@ -29,11 +29,11 @@ use core::mem;
 pub type QuotaID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResourceType { CPU = 0, Memory = 1, Disk = 2, Network = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QuotaError { Success = 0, Exceeded = 1, NotFound = 2 }
 
 pub trait Quota {
@@ -43,6 +43,7 @@ pub trait Quota {
     fn usage(&self) -> u64;
     fn set_limit(&mut self, limit: u64);
     fn add_usage(&mut self, amount: u64) -> Result<(), QuotaError>;
+    fn reset_usage(&mut self);
 }
 
 #[repr(C)]
@@ -66,7 +67,15 @@ impl SimpleQuota {
 
 impl Quota for SimpleQuota {
     fn id(&self) -> QuotaID { self.id }
-    fn resource_type(&self) -> ResourceType { unsafe { core::mem::transmute(self.resource_type.load(Ordering::SeqCst)) } }
+    fn resource_type(&self) -> ResourceType {
+        match self.resource_type.load(Ordering::SeqCst) {
+            0 => ResourceType::CPU,
+            1 => ResourceType::Memory,
+            2 => ResourceType::Disk,
+            3 => ResourceType::Network,
+            _ => ResourceType::CPU,
+        }
+    }
     fn limit(&self) -> u64 { self.limit.load(Ordering::SeqCst) as u64 }
     fn usage(&self) -> u64 { self.usage.load(Ordering::SeqCst) as u64 }
 
@@ -85,6 +94,10 @@ impl Quota for SimpleQuota {
             Ok(())
         }
     }
+
+    fn reset_usage(&mut self) {
+        self.usage.store(0, Ordering::SeqCst);
+    }
 }
 
 pub trait QuotaManager {
@@ -92,7 +105,7 @@ pub trait QuotaManager {
     fn delete_quota(&mut self, id: QuotaID) -> Result<(), QuotaError>;
     fn get_quota(&self, id: QuotaID) -> Option<&dyn Quota>;
     fn check_quota(&self, id: QuotaID, amount: u64) -> Result<(), QuotaError>;
-    def reset_usage(&mut self, id: QuotaID) -> Result<(), QuotaError>;
+    fn reset_usage(&mut self, id: QuotaID) -> Result<(), QuotaError>;
 }
 
 #[repr(C)]
@@ -158,7 +171,7 @@ impl QuotaManager for SimpleQuotaManager {
         for quota_option in &mut self.quotas {
             if let Some(ref mut quota) = *quota_option {
                 if quota.id() == id {
-                    quota.usage.store(0, Ordering::SeqCst);
+                    quota.reset_usage();
                     return Ok(());
                 }
             }
