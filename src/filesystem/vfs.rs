@@ -53,6 +53,7 @@ pub struct Inode {
     pub modified: u64,
     pub capabilities: CapabilityToken,
     // Conforming Linux/BSD additions
+    pub link_count: u32,
     pub hard_links_count: u32,
     pub link_count: u32,
     pub symlink_target: Option<String>,
@@ -73,6 +74,7 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
+            link_count: 1,
             hard_links_count: 1,
             link_count: 1,
             symlink_target: None,

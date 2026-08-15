@@ -13,6 +13,7 @@ pub mod securelevels;
 pub mod pam;
 pub mod crypto_utils;
 pub mod qubes_isolation;
+pub mod kali_stack;
 
 pub use pqc_enclave::{
     KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
@@ -123,3 +124,6 @@ pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabe
 pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
 pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
+};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+
