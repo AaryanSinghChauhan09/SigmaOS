@@ -46,6 +46,7 @@ pub struct PageTableEntry {
     pub dirty: bool,                 // D bit (written)
     pub accessed: bool,              // A bit (accessed)
     pub is_ksm_shared: bool,         // Linux KSM shared read-only page indicator
+    pub is_cow: bool,                // Copy-on-Write indicator
     pub physical_address: PhysicalAddress,
 }
 
@@ -62,6 +63,7 @@ impl PageTableEntry {
             dirty: false,
             accessed: false,
             is_ksm_shared: false,
+            is_cow: false,
             physical_address: phys,
         }
     }
@@ -83,19 +85,12 @@ impl PageTableEntry {
             dirty: false,
             accessed: false,
             is_ksm_shared: false,
+            is_cow: false,
             physical_address: phys,
         }
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
@@ -132,9 +127,6 @@ impl Default for PageTable {
 }
 
 #[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
     pub huge_entries: Vec<Option<PageTableEntry>>, // Holds 2MB huge page entries
@@ -166,6 +158,10 @@ impl PageDirectory {
         Ok(())
     }
 
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
+    }
+
     pub fn get_table(&self, idx: usize) -> Option<&PageTable> {
         self.entries.get(idx).and_then(|e| e.as_ref())
     }
@@ -181,9 +177,6 @@ impl Default for PageDirectory {
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,
@@ -214,6 +207,10 @@ impl PageDirectoryPointerTable {
         self.huge_entries[idx] = Some(entry);
         self.entries[idx] = None; // clear standard mapping if any
         Ok(())
+    }
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
     }
 
     pub fn get_directory(&self, idx: usize) -> Option<&PageDirectory> {
@@ -304,12 +301,81 @@ impl SimpleVMM {
         self.vmas.push(vma);
     }
 
-    /// Maps a standard 4KB page
-    pub fn map_page(
+    /// Marks a page as Copy-on-Write (COW). Sets `is_cow` to true and `writable` to false.
+    pub fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), MemoryError> {
+        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
+
+        if let Some(pml4) = &mut self.pml4_table[pml4_idx] {
+            if let Some(pdpt) = pml4.get_directory_mut(pdpt_idx) {
+                if let Some(pd) = pdpt.get_table_mut(pd_idx) {
+                    if let Some(pte) = pd.get_entry_mut(pt_idx) {
+                        pte.is_cow = true;
+                        pte.writable = false;
+                        return Ok(());
+                    }
+                }
+            }
+        }
+        Err(MemoryError::PageNotPresent)
+    }
+
+    /// Linux-style mprotect: modifies permissions of a range of virtual memory
+    pub fn mprotect(
+        &mut self,
+        addr: VirtualAddress,
+        len: u64,
+        is_writable: bool,
+        is_executable: bool,
+    ) -> Result<(), MemoryError> {
+        // Update any matching VMAs
+        let end_addr = addr.0 + len;
+
+        for vma in &mut self.vmas {
+            // Check intersection/containment
+            if vma.start_address <= addr.0 && vma.start_address + vma.size >= end_addr {
+                vma.is_writable = is_writable;
+                vma.is_executable = is_executable;
+            }
+        }
+
+        // Walk the page table pages and update mapped entries in the range
+        for offset in (0..len).step_by(4096) {
+            let virt = VirtualAddress(addr.0 + offset);
+            let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+            let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+            let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+            let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
+
+            if let Some(pml4) = &mut self.pml4_table[pml4_idx] {
+                if let Some(pdpt) = pml4.get_directory_mut(pdpt_idx) {
+                    if let Some(pd) = pdpt.get_table_mut(pd_idx) {
+                        if let Some(pte) = pd.get_entry_mut(pt_idx) {
+                            pte.writable = is_writable;
+                            pte.execute_disable = !is_executable;
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn map_page_with_flags(
         &mut self,
         virt: VirtualAddress,
         phys: PhysicalAddress,
+        writable: bool,
+        execute_disable: bool,
     ) -> Result<(), MemoryError> {
+        // Alignment verification checks
+        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -346,6 +412,15 @@ impl SimpleVMM {
         }
 
         Ok(())
+    }
+
+    /// Maps a standard 4KB page
+    pub fn map_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+    ) -> Result<(), MemoryError> {
+        self.map_page_with_flags(virt, phys, true, false)
     }
 
     /// Maps a 2MB Huge Page (at the Page Directory level)
@@ -418,10 +493,8 @@ impl SimpleVMM {
         &mut self,
         virt: VirtualAddress,
     ) -> Result<PhysicalAddress, MemoryError> {
-        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
-        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
-        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
-        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
+        self.get_physical_address_with_access(virt, false, false)
+    }
 
     /// Resolves virtual address while validating and recording access permissions (Read/Write/Execute)
     /// Incorporates Copy-on-Write (CoW) page-splitting for KSM merged pages upon write intents.
@@ -477,6 +550,18 @@ impl SimpleVMM {
         }
 
         let pte = pd.get_entry_mut(pt_idx).unwrap();
+
+        // Copy-on-Write (CoW) page split trigger if a write intent is made on a copy-on-write page
+        if write_intent && pte.is_cow && !pte.writable {
+            // Safe split clone: allocate a unique writable physical page frame
+            let unique_phys = PhysicalAddress((pte.physical_address.0 & !0xFFF) + 0x20000000); // offset to represent cloned frame
+            pte.writable = true;
+            pte.is_cow = false;
+            pte.physical_address = unique_phys;
+
+            let offset = virt.0 & 0xFFF;
+            return Ok(PhysicalAddress(unique_phys.0 + offset));
+        }
 
         // Copy-on-Write (CoW) page split trigger if a write intent is made on a KSM shared read-only page
         if write_intent && pte.is_ksm_shared && !pte.writable {
@@ -1004,5 +1089,56 @@ mod tests {
         let restored_phys = vmm.get_physical_address(oldest_virt).unwrap();
         assert_eq!(restored_phys.0, oldest_virt.0);
         assert_eq!(vmm.swap_disk.len(), 0);
+    }
+
+    #[test]
+    fn test_cow_and_mprotect() {
+        let mut vmm = SimpleVMM::new();
+        let virt = VirtualAddress(0x5000);
+        vmm.map_page(virt, PhysicalAddress(0x50000)).unwrap();
+
+        // 1. Mark page as Copy-on-Write (COW)
+        vmm.mark_copy_on_write(virt).unwrap();
+
+        // Check it is read-only initially
+        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
+        {
+            let pte = vmm.pml4_table[pml4_idx].as_mut().unwrap()
+                .get_directory_mut(pdpt_idx).unwrap()
+                .get_table_mut(pd_idx).unwrap()
+                .get_entry(pt_idx).unwrap();
+            assert_eq!(pte.is_cow, true);
+            assert_eq!(pte.writable, false);
+        }
+
+        // 2. Simulate write access to trigger COW copy
+        let resolved_phys = vmm.resolve_address(virt, true, false).unwrap();
+        // Physical address should have changed to the cloned frame offset
+        assert_ne!(resolved_phys.0, 0x50000);
+        assert_eq!(resolved_phys.0, 0x50000 + 0x20000000);
+
+        // Check it is now writable and no longer COW
+        {
+            let pte = vmm.pml4_table[pml4_idx].as_mut().unwrap()
+                .get_directory_mut(pdpt_idx).unwrap()
+                .get_table_mut(pd_idx).unwrap()
+                .get_entry(pt_idx).unwrap();
+            assert_eq!(pte.is_cow, false);
+            assert_eq!(pte.writable, true);
+        }
+
+        // 3. Test mprotect to change it back to read-only
+        vmm.mprotect(virt, 4096, false, true).unwrap();
+        {
+            let pte = vmm.pml4_table[pml4_idx].as_mut().unwrap()
+                .get_directory_mut(pdpt_idx).unwrap()
+                .get_table_mut(pd_idx).unwrap()
+                .get_entry(pt_idx).unwrap();
+            assert_eq!(pte.writable, false);
+            assert_eq!(pte.execute_disable, false); // execute-enabled
+        }
     }
 }
