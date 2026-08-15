@@ -1,104 +1,153 @@
 // SigmaOS Compatibility Module
-pub mod cross_platform;
-pub mod historic_linux;
-pub mod mint_linux;
+pub mod absorb_tools;
+pub mod android_chromeos;
+pub mod apache_ossie;
 pub mod chimera_linux;
+pub mod cross_platform;
+pub mod india_stack;
+pub mod india_professional_tools;
+pub mod alpine_linux;
+pub mod interim;
+pub mod jehanne;
+pub mod macos_darwin;
+pub mod mint_linux;
+pub mod reactos;
+pub mod lubuntu;
+pub mod antix;
+pub mod bodhi_moksha;
+pub mod cachy_os;
+pub mod chakra;
+pub mod endeavour;
+pub mod garuda_zen;
+pub mod gentoo;
+pub mod tiny_core;
+pub mod localsend;
+pub mod arch_linux;
+
+pub use macos_darwin::{
+    ApfsFileClone, ApfsSnapshot, ApfsSnapshotManager, AudioStreamDescription, CoreAudioHalRouter,
+    CoreAudioNode, FatArch, LaunchdJobConfig, LaunchdServiceManager, LaunchdState, MachO64Header,
+    MachOLoader, MachOSegment64, SpotlightMetadata, SpotlightMetadataIndex, FAT_MAGIC,
+    LC_LOAD_DYLIB, LC_MAIN, LC_SEGMENT_64, MH_MAGIC_64,
+};
+
+pub use android_chromeos::{
+    AndroidActivity, AndroidAppManifest, ApkManifestParser, ArtBytecodeSandbox,
+    CrostiniContainerBridge, CrostiniState, DexClassDef, IntentRouter, IntentTarget, PartitionSlot,
+    VerifiedBootSlotSwitcher,
+};
+
+pub use arch_linux::{
+    ProcFile, ProcFileType, DevFile, DevFileType, ArchPackage, PacmanError as PacmanCompatError,
+    PacmanEngine, RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule,
+    ArchFirewall, LsmMode, LsmSentinel, PamGate, TmuxMultiplexer, SovereignEnvRegistry,
+    YayParuAdapter, ReflectorMirrorlist, ArchinstallParity, ArtixInitBridge, PacmanKeyring,
+    AurPatchEngine,
+};
+
+pub use zorin::{
+    ZorinLayoutSwitcher,
+    ZorinChameleonEngine,
+    ZorinConnectManager,
+    ZorinWindowsAppSupport,
+};
+pub mod historic_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod wasm_sandbox;
-pub mod absorb_tools;
-pub mod tiny_core;
-pub mod apache_ossie;
 pub mod sovereign_suite;
+pub mod wasm_sandbox;
+pub mod open_source_tier1;
 
+pub use open_source_tier1::{
+    WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
+};
+
+pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SovereignOstreeDeployer, SovereignSeLinuxContext, SovereignSeLinuxEngine,
+    SovereignFirewalldManager, SovereignCockpitConsole,
+};
+pub use legacy_adapters::{
+    KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
+    APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
+    WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
+    LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_WORKLOAD_OPTIMIZER,
+};
+
+pub use constellation_mesh::{
+    BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
+    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
+    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid,
+    LegacyCCodexGrid, LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+    StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
+};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-
-pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError,
+pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
+    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+    SpacSatResolver,
+};
+pub use alpine_linux::{
+    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
+    AlpineSyslogManager, BusyBoxMulticall,
+};
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
+pub use jehanne::{
+    ComputeNode, DistributedComputeHandoff, JehanneError, JehanneNamespace, NamespaceBindEntry,
+    Plan9pMessage, Plan9pMsgType,
 };
 
 pub use mint_linux::{
-    MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-    MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
-    MintReportSystem,
+    MintBackupTool, MintSoftwareManager, MintUpdateLevel, MintUpdateManager,
+    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert,
+    MintReportSystem, MintTimeshiftEngine, TimeshiftSnapshot,
 };
 
 pub use chimera_linux::{
-    DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
-    ApkPackageMetadata, ApkPackageStore,
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+    DinitServiceState,
 };
 
 pub use relay_nexus::{
-    PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
-    NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
-    StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
-    FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
-    BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
-    BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
-    ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
-    TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
+    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
+    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
+    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
+    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
+    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
+    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
+    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
+    ZeroTrustNexus,
 };
 
 pub use solid_kernel::{
-    IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
-    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
+    SigmaFSPlusPlus, SolidKernelCore,
 };
 
-pub use wasm_sandbox::{
-    WasmState, WasmModule, WasmSandboxEngine,
-};
+pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
 
 pub use absorb_tools::{
-    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
-    DpllSatSolver, CasObject, ContentAddressedStorage,
+    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, PledgePermission,
+    PledgeUnveilSandbox, PqcSecureChannel,
 };
 
-pub use tiny_core::{
-    TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
-};
+pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 
 pub use apache_ossie::{
-    MetricAggregation, OssieMetric, OssieDimension, OssieRelationship, OssieCatalog,
-    SemanticRow, OssieInterpreter, OssieOntology,
+    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
+    OssieRelationship, SemanticRow,
 };
 
 pub use sovereign_suite::{
-    EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
-    FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
+    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
+    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
-
-pub mod debian;
-pub use debian::{
-    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
-    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
-};
-
-pub mod innovations;
-pub use innovations::{
-    WorkloadCategory, ISchedulerPolicy, MlAcceleratedPolicy, GreenComputingPolicy,
-    SigmaScheduler, ISyscallTranslator, LinuxTranslator, WindowsTranslator,
-    UniversalAbiTranslator, IFileSystemCore, ISemanticSearchPlugin, ICasDeduplicator,
-    SigmaFsPlusPlus, IRecoveryStrategy, RollbackRecovery, SelfHealingOS,
-};
-
-pub mod fedora;
-pub use fedora::{
-    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
-};
-
-pub mod india_professional_tools;
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, PMWaniHotspotController,
-    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker,
-};
-
-pub mod india_stack;
-pub use india_stack::{MockUPIService, IndiaStackError};
-
-pub mod india_stack_localization;
-pub use india_stack_localization::{IndianLanguage, LocalizationProvider, LocalizationManager};
+pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
+pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};
