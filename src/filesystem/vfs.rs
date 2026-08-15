@@ -55,6 +55,7 @@ pub struct Inode {
     // Conforming Linux/BSD additions
     pub link_count: u32,
     pub hard_links_count: u32,
+    pub link_count: u32,
     pub symlink_target: Option<String>,
     pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
@@ -75,6 +76,7 @@ impl Inode {
             capabilities: CapabilityToken::new(),
             link_count: 1,
             hard_links_count: 1,
+            link_count: 1,
             symlink_target: None,
             xattrs: HashMap::new(),
             data: Vec::new(),
@@ -136,6 +138,37 @@ impl VirtualFilesystem {
         self.inodes.insert(inode_id, inode);
 
         Ok(inode_id)
+    }
+
+    /// Creates a symbolic link (Symlink) pointing to a target filepath string
+    pub fn create_symlink(&mut self, target_path: &str, owner: u64) -> Result<u64, FsError> {
+        let inode_id = self.create_file(FileType::Symlink, owner)?;
+        if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            inode.symlink_target = Some(target_path.to_string());
+        }
+        Ok(inode_id)
+    }
+
+    /// Creates a hard link pointing directly to the same underlying file Inode
+    pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.link_count += 1;
+        inode.hard_links_count = inode.link_count;
+        Ok(())
+    }
+
+    /// Sets an extended attribute (xattr) on an active Inode
+    pub fn set_xattr(&mut self, inode_id: u64, name: &str, value: &[u8]) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.xattrs.insert(name.to_string(), value.to_vec());
+        Ok(())
+    }
+
+    /// Retrieves an extended attribute (xattr) from an active Inode
+    pub fn get_xattr(&self, inode_id: u64, name: &str) -> Result<std::vec::Vec<u8>, FsError> {
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+        let val = inode.xattrs.get(name).ok_or(FsError::AttributeNotFound)?;
+        Ok(val.clone())
     }
 
     pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
@@ -258,7 +291,15 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
-        if !self.inodes.contains_key(&inode_id) {
+        let mut should_delete = false;
+        if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            if inode.link_count > 1 {
+                inode.link_count -= 1;
+                inode.hard_links_count = inode.link_count;
+            } else {
+                should_delete = true;
+            }
+        } else {
             return Err(FsError::NotFound);
         }
 
@@ -392,15 +433,12 @@ mod tests {
         );
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
+        // Re-open file to reset offset to 0 for reading
+        let read_fd = vfs.open_file(inode_id, 0).unwrap();
+
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(
-            vfs.read_file_gated(fd, &mut buf, &bad_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(
-            vfs.read_file_gated(fd, &mut buf, &write_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
     }
 }

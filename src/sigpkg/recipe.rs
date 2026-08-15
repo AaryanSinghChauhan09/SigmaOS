@@ -100,11 +100,9 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
-
-    // Gentoo-inspired features
-    pub active_use_flags: Vec<UseFlag>,
-    pub compilation_profile: StageProfile,
-    pub conditional_dependencies: Vec<(UseFlag, Dependency)>, // Dependency unlocked ONLY if USE flag is active
+    pub arch: String,
+    pub license_spdx: String,
+    pub package_commands: Vec<String>,
 }
 
 impl PackageRecipe {
@@ -120,10 +118,8 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
-            pkgrel: 1,
             arch: "x86_64".to_string(),
-            license_spdx: "MIT".to_string(),
-            prepare_commands: Vec::new(),
+            license_spdx: "GPL".to_string(),
             package_commands: Vec::new(),
         }
     }
@@ -169,44 +165,14 @@ impl PackageRecipe {
         self
     }
 
-    // Builder helpers for USE flags and compilation profiles
-    pub fn with_use_flag(mut self, flag: UseFlag) -> Self {
-        self.active_use_flags.push(flag);
+    pub fn with_arch(mut self, arch: String) -> Self {
+        self.arch = arch;
         self
     }
 
-    pub fn with_compilation_profile(mut self, profile: StageProfile) -> Self {
-        self.compilation_profile = profile;
+    pub fn with_package_command(mut self, command: String) -> Self {
+        self.package_commands.push(command);
         self
-    }
-
-    pub fn with_conditional_dependency(mut self, flag: UseFlag, dependency: Dependency) -> Self {
-        self.conditional_dependencies.push((flag, dependency));
-        self
-    }
-
-    pub fn is_use_active(&self, flag: UseFlag) -> bool {
-        self.active_use_flags.contains(&flag)
-    }
-
-    /// Evaluates and returns all active dependencies including conditional USE-flag targets
-    pub fn get_active_dependencies(&self) -> Vec<Dependency> {
-        let mut deps = self.dependencies.clone();
-        for (flag, dep) in self.conditional_dependencies.iter() {
-            if self.is_use_active(*flag) {
-                deps.push(dep.clone());
-            }
-        }
-        deps
-    }
-
-    /// Returns CFLAGS/CXXFLAGS compilation flags matching the active Stage Profile
-    pub fn get_stage_optimization_flags(&self) -> &'static str {
-        match self.compilation_profile {
-            StageProfile::Stage1Minimal => "-O1 -mno-sse2",
-            StageProfile::Stage2Bootstrap => "-O2 -pipe",
-            StageProfile::Stage3Optimized => "-O3 -march=native -flto=fat -funroll-loops",
-        }
     }
 
     pub fn validate(&self) -> Result<(), RecipeError> {

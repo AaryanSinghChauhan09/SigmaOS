@@ -1,31 +1,41 @@
 pub mod vec;
 pub mod paging;
-pub mod buddy_allocator;
+#[cfg(target_os = "none")]
 pub mod hashmap;
+#[cfg(target_os = "none")]
+pub mod hashset;
+pub mod vec;
+pub mod error;
+pub mod uuid;
 pub mod hash;
 
-// For now, we use our custom Vec and HashMap (aliased to our bucket-based BTreeMap)
+// Conditional compilation of other collection modules
+#[cfg(target_os = "none")]
+pub mod hashmap;
+#[cfg(target_os = "none")]
+pub mod hashset;
+#[cfg(target_os = "none")]
+pub mod btreemap;
+#[cfg(target_os = "none")]
+pub mod vecdeque;
+
+// Re-exports
+pub use string::{String, ToString};
+pub use arc::Arc;
+pub use ring_buffer::{RingBuffer, HeapRingBuffer};
+pub use linked_list::{LinkedList, SList};
+pub use slab::{SlabCache, TypedSlabCache};
+pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
+
 pub use vec::Vec;
-pub use hashmap::BTreeMap as HashMap;
-pub use hashmap::BTreeMap;
-
-// For other collections, use std when available
-#[cfg(not(target_os = "none"))]
-pub use std::collections::BTreeMap as StdBTreeMap;
+pub use uuid::Uuid;
 
 #[cfg(not(target_os = "none"))]
-pub use std::string::String;
+pub use std::collections::HashMap;
+#[cfg(not(target_os = "none"))]
+pub use std::collections::HashSet;
 
-// New zero-dependency klib modules
-pub mod ringbuf;
-pub mod slab;
-pub mod bitmap;
-
-// Re-exports for convenience
-pub use ringbuf::RingBuf;
-pub use ringbuf::MpscRingBuf;
-pub use slab::SlabCache;
-pub use slab::SlabRegistry;
-pub use bitmap::AtomicBitmap;
-pub use bitmap::PageFrameBitmap;
-pub use bitmap::PidBitmap;
+#[cfg(target_os = "none")]
+pub use hashmap::HashMap;
+#[cfg(target_os = "none")]
+pub use hashset::HashSet;

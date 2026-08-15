@@ -1,19 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod audio {
-    pub mod driver;
-    pub mod editor;
-}
-pub use audio::driver::{
-    AudioDevice, AudioDeviceID, AudioError, AudioManager, AudioMixer, AudioStream, AudioType,
-    SimpleAudioDevice, SimpleAudioManager, SimpleAudioMixer, SimpleAudioStream,
-};
-pub use audio::editor::{
-    AmplifyEffect, AudioEditor, AudioEffect, AudioTrack, EchoEffect, LowPassFilter,
-    MultiTrackSession, NoiseGateEffect,
-};
-
+pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -75,8 +63,8 @@ pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
 };
 pub use distro::{
-    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService,
+    AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
+    ReflectorMirrorManager, YayParuHelper,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
@@ -142,9 +130,11 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    secure_zeroize, AuditLogEntry, CapabilityGate, CapabilityToken, ExploitPayload,
-    HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, PenetrationAssistant, Permission,
-    PledgeManager, PledgePromise, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
+    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
+    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN, Securelevel, LinuxCapability,
+    SovereignSecurelevelManager, PamError, PamUser, PamGroup, SovereignPamManager,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{

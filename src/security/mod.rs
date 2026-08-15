@@ -2,7 +2,14 @@
 pub mod capability;
 pub mod hardening;
 pub mod pledge;
+pub mod unveil;
+pub mod selinux;
 pub mod vulnerability;
+pub mod hardening;
+pub mod deobfuscation;
+pub mod securelevels;
+pub mod pam;
+pub mod crypto_utils;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use hardening::{
@@ -123,21 +130,8 @@ pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
-pub use parrot_linux::{
-    AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
-    SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionSeverity, IntrusionAlert,
-};
-// NemoClaw Security Primitives
-pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
-
-pub struct CronDaemon;
-pub struct CronJob;
-pub struct DmesgLog;
-pub struct FirewallRule;
-pub struct IptablesFirewall;
-pub struct KaliError;
-pub struct PluggableAuthenticationModule;
-pub struct SudoPrivilegeEscalation;
-pub struct SwapSpaceManager;
-pub struct TmuxMultiplexer;
-pub struct TmuxPane;
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
+pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
+pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};

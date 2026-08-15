@@ -12,7 +12,7 @@ pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
-pub mod linux_bsd_inspirations;
+pub mod endeavour_os;
 
 pub mod arch_parity;
 pub mod chakra_parity;
@@ -23,11 +23,16 @@ pub use linux_bsd_inspirations::{
     Hammer2MultiVersionEngine, SovereignOstreeEngine,
 };
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
+pub use endeavour_os::{
+    AkmKernelManager, AurPackageSpec, CalamaresConfig, CalamaresInstaller, DesktopEnvironment,
+    EosKernelFlavor, EosLogTool, EosWelcomeApp, InstallMode, PacmanMirror, PartitionType,
+    ReflectorMirrorManager, WelcomeButtonTask, YayParuHelper,
+};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease,
+    ManjaroKernelRelease, AurPackage, FlatpakPackage, SnapPackage, MhwdDkmsRebuilder,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
