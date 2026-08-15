@@ -1,22 +1,4 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::string::String;
@@ -24,7 +6,7 @@ use alloc::vec::Vec;
 use core::any::Any;
 
 use crate::kernel::object::{KRef, KernelObject};
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DeviceType {
@@ -110,7 +92,6 @@ pub enum DriverError {
     IoFailed,
     ShutdownFailed,
     CapabilityDenied,
-    AlreadyRegistered,
 }
 
 pub struct DeviceBinding {
@@ -138,7 +119,6 @@ pub struct DeviceManager {
 }
 
 impl DeviceManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DeviceManager {
             devices: Vec::new(),
@@ -160,20 +140,18 @@ impl DeviceManager {
         }
     }
 
-    pub fn find_device(&self, name: &str) -> Option<&dyn Device> {
+    pub fn find_device<'a>(&'a self, name: &str) -> Option<&'a (dyn Device + 'static)> {
         self.devices
             .iter()
             .find(|d| d.name() == name)
             .map(|d| d.as_ref())
     }
 
-    pub fn find_device_mut(&mut self, name: &str) -> Option<&mut dyn Device> {
-        for device in self.devices.iter_mut() {
-            if device.name() == name {
-                return Some(device.as_mut());
-            }
-        }
-        None
+    pub fn find_device_mut<'a>(&'a mut self, name: &str) -> Option<&'a mut (dyn Device + 'static)> {
+        self.devices
+            .iter_mut()
+            .find(|d| d.name() == name)
+            .map(|d| d.as_mut())
     }
 
     pub fn bind_driver(&mut self, device_name: &str, driver_name: &str) -> Result<(), DriverError> {

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Ping Compatibility
 //! Network connectivity testing (ping command)

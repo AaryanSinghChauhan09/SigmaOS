@@ -2,7 +2,7 @@
 // Fully absorbs and implements design philosophies of Linux (SMEP/SMAP, LSTAR) and BSD distros (Guard pages, strict GDT/IDT):
 // x86-64 GDT segment structures, IDT gates, hardened CR0/CR4 control registers, virtual memory maps, and fast SYSCALL/SYSRET.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Standard CPU segments defined in the Global Descriptor Table (GDT)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,7 @@ pub struct VirtualMemoryRegion {
 /// The core processor controller managing GDT, IDT, CR registers, and System Call MSRs
 pub struct ProcessorInitSuite {
     pub gdt: Vec<GdtDescriptor>,
-    pub idt: HashMap<u8, IdtGate>,
+    pub idt: BTreeMap<u8, IdtGate>,
     pub memory_regions: Vec<VirtualMemoryRegion>,
     pub cr0_wp_enabled: bool,  // Write Protect (prevents kernel writing to read-only pages)
     pub cr4_smep_enabled: bool, // Supervisor Mode Execution Prevention (prevents executing user code in ring 0)
@@ -60,7 +60,7 @@ impl ProcessorInitSuite {
     pub fn new() -> Self {
         Self {
             gdt: Vec::new(),
-            idt: HashMap::new(),
+            idt: BTreeMap::new(),
             memory_regions: Self::default_virtual_memory_layout(),
             cr0_wp_enabled: false,
             cr4_smep_enabled: false,

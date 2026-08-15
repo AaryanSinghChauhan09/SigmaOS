@@ -21,7 +21,7 @@
 // Provides zero-copy hardware-accelerated surface rendering.
 
 use crate::drivers::{GpuDriver, GpuCommand};
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Wayland Protocol Object IDs
 pub type WaylandId = u32;
@@ -62,7 +62,7 @@ impl WaylandSurface {
 /// Sovereign Wayland Compositor
 pub struct WaylandCompositor {
     pub next_client_id: ClientId,
-    pub surfaces: HashMap<WaylandId, WaylandSurface>,
+    pub surfaces: BTreeMap<WaylandId, WaylandSurface>,
     pub gpu: GpuDriver,
 }
 
@@ -70,7 +70,7 @@ impl WaylandCompositor {
     pub fn new(width: u32, height: u32) -> Self {
         Self {
             next_client_id: 1,
-            surfaces: HashMap::new(),
+            surfaces: BTreeMap::new(),
             gpu: GpuDriver::new(width, height),
         }
     }

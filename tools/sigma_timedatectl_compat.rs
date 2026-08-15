@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Timedatectl Compatibility
 //! System time and date management (timedatectl command)
@@ -61,7 +62,7 @@ pub unsafe extern "C" fn timedatectl_init() -> SigmaI32 {
 /// Get time status
 #[no_mangle]
 pub unsafe extern "C" fn timedatectl_status(settings: *mut TimeSettings) -> SigmaI32 {
-    if !TIMECTL_INITIALIZED || settings.isnull() {
+    if !TIMECTL_INITIALIZED || settings.is_null() {
         return -1;
     }
     
@@ -72,7 +73,7 @@ pub unsafe extern "C" fn timedatectl_status(settings: *mut TimeSettings) -> Sigm
 /// Set timezone
 #[no_mangle]
 pub unsafe extern "C" fn timedatectl_set_timezone(timezone: *const u8) -> SigmaI32 {
-    if !TIMECTL_INITIALIZED || timezone.isnull() {
+    if !TIMECTL_INITIALIZED || timezone.is_null() {
         return -1;
     }
     
@@ -111,7 +112,7 @@ pub unsafe extern "C" fn timedatectl_set_ntp(enabled: SigmaBool) -> SigmaI32 {
 /// Set NTP server
 #[no_mangle]
 pub unsafe extern "C" fn timedatectl_set_ntp_server(server: *const u8) -> SigmaI32 {
-    if !TIMECTL_INITIALIZED || server.isnull() {
+    if !TIMECTL_INITIALIZED || server.is_null() {
         return -1;
     }
     
@@ -127,7 +128,7 @@ pub unsafe extern "C" fn timedatectl_set_ntp_server(server: *const u8) -> SigmaI
 /// List timezones
 #[no_mangle]
 pub unsafe extern "C" fn timedatectl_list_timezones(timezones: *mut [u8; 64], max_count: SigmaU32) -> SigmaU32 {
-    if !TIMECTL_INITIALIZED || timezones.isnull() {
+    if !TIMECTL_INITIALIZED || timezones.is_null() {
         return 0;
     }
     

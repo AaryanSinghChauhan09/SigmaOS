@@ -1,28 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
-use crate::klib::HashMap;
+/// Enhanced with Debian Linux style DNS resolv.conf and /etc/hosts resolution engine.
+use std::collections::HashMap;
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 // ── Address Families & Socket Types ──────────────────────────────────────
 
@@ -255,18 +238,18 @@ pub const SO_RCVBUF: i32 = 8;
 pub const SO_SNDBUF: i32 = 7;
 
 pub struct SocketLayer {
-    sockets: HashMap<u32, Socket>,
+    sockets: BTreeMap<u32, Socket>,
     next_fd: AtomicUsize,
-    bound_ports: HashMap<u16, u32>, // port -> fd
+    bound_ports: BTreeMap<u16, u32>, // port -> fd
 }
 
 impl SocketLayer {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SocketLayer {
-            sockets: HashMap::new(),
+            sockets: BTreeMap::new(),
             next_fd: AtomicUsize::new(4),
-            bound_ports: HashMap::new(),
+            bound_ports: BTreeMap::new(),
         }
     }
 
@@ -356,6 +339,12 @@ impl SocketLayer {
         }
     }
 
+    pub fn set_non_blocking(&mut self, fd: u32, non_blocking: bool) -> Result<(), &'static str> {
+        let sock = self.sockets.get_mut(&fd).ok_or("EBADF")?;
+        sock.flags.non_blocking = non_blocking;
+        Ok(())
+    }
+
     pub fn close(&mut self, fd: u32) -> Result<(), &'static str> {
         let sock = self.sockets.remove(&fd).ok_or("EBADF")?;
         if let Some(addr) = sock.local_addr {
@@ -373,6 +362,81 @@ impl SocketLayer {
 }
 
 impl Default for SocketLayer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ── Debian-Style DNS and host configuration parser ─────────────────────────
+
+/// Sovereign DNS Resolver Configuration Parser (replicates /etc/resolv.conf and /etc/hosts)
+pub struct SovereignDnsResolver {
+    pub nameservers: Vec<String>,
+    pub hosts: HashMap<String, [u8; 4]>,
+}
+
+impl SovereignDnsResolver {
+    pub fn new() -> Self {
+        Self {
+            nameservers: Vec::new(),
+            hosts: HashMap::new(),
+        }
+    }
+
+    /// Parses standard Debian /etc/resolv.conf lines
+    pub fn parse_resolv_conf(&mut self, content: &str) {
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with(';') {
+                continue;
+            }
+            let parts: Vec<&str> = trimmed.split_whitespace().collect();
+            if parts.len() >= 2 && parts[0] == "nameserver" {
+                self.nameservers.push(parts[1].to_string());
+            }
+        }
+    }
+
+    /// Parses standard Debian /etc/hosts lines
+    pub fn parse_hosts(&mut self, content: &str) {
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            let parts: Vec<&str> = trimmed.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let ip_str = parts[0];
+                let mut ip_bytes = [0u8; 4];
+                let octets: Vec<&str> = ip_str.split('.').collect();
+                if octets.len() == 4 {
+                    for i in 0..4 {
+                        ip_bytes[i] = octets[i].parse::<u8>().unwrap_or(0);
+                    }
+                    for &hostname in &parts[1..] {
+                        self.hosts.insert(hostname.to_string(), ip_bytes);
+                    }
+                }
+            }
+        }
+    }
+
+    /// Resolves hostname dynamically via static hosts files or returns default loopbacks
+    pub fn resolve_hostname(&self, hostname: &str) -> Option<[u8; 4]> {
+        if let Some(ip) = self.hosts.get(hostname) {
+            Some(*ip)
+        } else if hostname == "localhost" {
+            Some([127, 0, 0, 1])
+        } else if !self.nameservers.is_empty() {
+            // Simulated fallback to first nameserver
+            Some([8, 8, 8, 8])
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for SovereignDnsResolver {
     fn default() -> Self {
         Self::new()
     }

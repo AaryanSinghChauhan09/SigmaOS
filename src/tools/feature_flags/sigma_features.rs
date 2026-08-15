@@ -1,0 +1,378 @@
+// SigmaOS Feature Flags System
+// Inspired by Gentoo Portage USE flags
+// Fine-grained control over package compilation and system configuration
+
+#![no_std]
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+
+/// Feature flag definition
+#[repr(C)]
+#[derive(Debug, Clone)]
+pub struct FeatureFlag {
+    pub name: [u8; 64],
+    pub description: [u8; 256],
+    pub enabled: bool,
+    pub global: bool,
+    pub dependencies: [u64; 16], // Other flags this depends on
+    pub dep_count: u32,
+}
+
+impl FeatureFlag {
+    /// Create a new empty feature flag
+    pub const fn empty() -> Self {
+        Self {
+            name: [0; 64],
+            description: [0; 256],
+            enabled: false,
+            global: false,
+            dependencies: [0; 16],
+            dep_count: 0,
+        }
+    }
+
+    /// Create a new feature flag with given parameters
+    pub fn new(name: &str, description: &str, enabled: bool, global: bool) -> Self {
+        let mut flag = Self::empty();
+        
+        // Copy name (truncated if too long)
+        let name_bytes = name.as_bytes();
+        for (i, &byte) in name_bytes.iter().enumerate().take(64) {
+            flag.name[i] = byte;
+        }
+        
+        // Copy description (truncated if too long)
+        let desc_bytes = description.as_bytes();
+        for (i, &byte) in desc_bytes.iter().enumerate().take(256) {
+            flag.description[i] = byte;
+        }
+        
+        flag.enabled = enabled;
+        flag.global = global;
+        flag
+    }
+
+    /// Get name as string
+    pub fn get_name(&self) -> String {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        String::from_utf8_lossy(&self.name[..len]).to_string()
+    }
+
+    /// Get description as string
+    pub fn get_description(&self) -> String {
+        let len = self.description.iter().position(|&b| b == 0).unwrap_or(256);
+        String::from_utf8_lossy(&self.description[..len]).to_string()
+    }
+
+    /// Add a dependency
+    pub fn add_dependency(&mut self, dep_hash: u64) {
+        if self.dep_count < 16 {
+            self.dependencies[self.dep_count as usize] = dep_hash;
+            self.dep_count += 1;
+        }
+    }
+}
+
+/// Maximum number of feature flags
+pub const MAX_FEATURE_FLAGS: usize = 512;
+
+/// Global feature flags registry
+static mut FEATURE_FLAGS: [FeatureFlag; MAX_FEATURE_FLAGS] = [FeatureFlag::empty(); MAX_FEATURE_FLAGS];
+static mut FLAG_COUNT: usize = 0;
+
+/// Feature flag configuration entry
+#[derive(Debug, Clone)]
+pub struct FeatureFlagConfig {
+    pub name: String,
+    pub enabled: bool,
+    pub description: String,
+    pub global: bool,
+}
+
+/// Feature flag profile
+#[derive(Debug, Clone)]
+pub struct FeatureProfile {
+    pub name: String,
+    pub description: String,
+    pub flags: Vec<String>,
+}
+
+/// Feature flag resolver for dependency resolution
+pub struct FeatureFlagResolver {
+    pub flags: BTreeMap<String, FeatureFlagConfig>,
+    pub profiles: BTreeMap<String, FeatureProfile>,
+    pub active_profile: Option<String>,
+}
+
+impl FeatureFlagResolver {
+    /// Create new feature flag resolver
+    pub fn new() -> Self {
+        Self {
+            flags: BTreeMap::new(),
+            profiles: BTreeMap::new(),
+            active_profile: None,
+        }
+    }
+
+    /// Register a feature flag
+    pub fn register_flag(&mut self, config: FeatureFlagConfig) {
+        self.flags.insert(config.name.clone(), config);
+    }
+
+    /// Register a profile
+    pub fn register_profile(&mut self, profile: FeatureProfile) {
+        self.profiles.insert(profile.name.clone(), profile);
+    }
+
+    /// Set active profile
+    pub fn set_active_profile(&mut self, profile_name: &str) -> Result<(), String> {
+        if !self.profiles.contains_key(profile_name) {
+            return Err(format!("Profile {} not found", profile_name));
+        }
+        self.active_profile = Some(profile_name.to_string());
+        Ok(())
+    }
+
+    /// Resolve feature flags with dependencies
+    pub fn resolve(&self) -> Result<Vec<String>, String> {
+        let mut enabled_flags = Vec::new();
+        let mut visited = BTreeMap::new();
+
+        // Start with profile flags if active
+        if let Some(profile_name) = &self.active_profile {
+            if let Some(profile) = self.profiles.get(profile_name) {
+                for flag_name in &profile.flags {
+                    self.resolve_flag(flag_name, &mut enabled_flags, &mut visited)?;
+                }
+            }
+        }
+
+        // Add globally enabled flags
+        for (name, config) in &self.flags {
+            if config.global && config.enabled {
+                self.resolve_flag(name, &mut enabled_flags, &mut visited)?;
+            }
+        }
+
+        Ok(enabled_flags)
+    }
+
+    /// Recursively resolve a feature flag and its dependencies
+    fn resolve_flag(
+        &self,
+        flag_name: &str,
+        enabled_flags: &mut Vec<String>,
+        visited: &mut BTreeMap<String, bool>,
+    ) -> Result<(), String> {
+        // Check for circular dependencies
+        if let Some(&in_progress) = visited.get(flag_name) {
+            if in_progress {
+                return Err(format!("Circular dependency detected for flag {}", flag_name));
+            }
+            return Ok(()); // Already resolved
+        }
+
+        visited.insert(flag_name.to_string(), true);
+
+        // Get flag configuration
+        let config = self.flags.get(flag_name)
+            .ok_or_else(|| format!("Feature flag {} not found", flag_name))?;
+
+        if config.enabled {
+            // Add to enabled flags if not already present
+            if !enabled_flags.contains(&flag_name.to_string()) {
+                enabled_flags.push(flag_name.to_string());
+            }
+        }
+
+        visited.insert(flag_name.to_string(), false);
+        Ok(())
+    }
+
+    /// Check for conflicts between flags
+    pub fn check_conflicts(&self) -> Vec<String> {
+        let mut conflicts = Vec::new();
+        
+        // Example conflict: X11 vs Wayland
+        if self.is_flag_enabled("x11") && self.is_flag_enabled("wayland") {
+            conflicts.push("x11 and wayland are mutually exclusive".to_string());
+        }
+
+        // Example conflict: systemd vs openrc
+        if self.is_flag_enabled("systemd") && self.is_flag_enabled("openrc") {
+            conflicts.push("systemd and openrc are mutually exclusive".to_string());
+        }
+
+        conflicts
+    }
+
+    /// Check if a flag is enabled
+    pub fn is_flag_enabled(&self, flag_name: &str) -> bool {
+        self.flags.get(flag_name).map(|c| c.enabled).unwrap_or(false)
+    }
+
+    /// Enable a flag
+    pub fn enable_flag(&mut self, flag_name: &str) -> Result<(), String> {
+        if let Some(config) = self.flags.get_mut(flag_name) {
+            config.enabled = true;
+            Ok(())
+        } else {
+            Err(format!("Feature flag {} not found", flag_name))
+        }
+    }
+
+    /// Disable a flag
+    pub fn disable_flag(&mut self, flag_name: &str) -> Result<(), String> {
+        if let Some(config) = self.flags.get_mut(flag_name) {
+            config.enabled = false;
+            Ok(())
+        } else {
+            Err(format!("Feature flag {} not found", flag_name))
+        }
+    }
+
+    /// List all registered flags
+    pub fn list_flags(&self) -> Vec<&FeatureFlagConfig> {
+        self.flags.values().collect()
+    }
+
+    /// List all profiles
+    pub fn list_profiles(&self) -> Vec<&FeatureProfile> {
+        self.profiles.values().collect()
+    }
+}
+
+impl Default for FeatureFlagResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Initialize default feature flags
+pub fn init_default_flags(resolver: &mut FeatureFlagResolver) {
+    // System-level flags
+    resolver.register_flag(FeatureFlagConfig {
+        name: "bluetooth".to_string(),
+        enabled: false,
+        description: "Bluetooth support".to_string(),
+        global: true,
+    });
+
+    resolver.register_flag(FeatureFlagConfig {
+        name: "dbus".to_string(),
+        enabled: true,
+        description: "D-Bus IPC system".to_string(),
+        global: true,
+    });
+
+    resolver.register_flag(FeatureFlagConfig {
+        name: "systemd".to_string(),
+        enabled: false,
+        description: "systemd init system compatibility".to_string(),
+        global: true,
+    });
+
+    resolver.register_flag(FeatureFlagConfig {
+        name: "openrc".to_string(),
+        enabled: true,
+        description: "OpenRC init system".to_string(),
+        global: true,
+    });
+
+    // Desktop flags
+    resolver.register_flag(FeatureFlagConfig {
+        name: "wayland".to_string(),
+        enabled: true,
+        description: "Wayland display server".to_string(),
+        global: false,
+    });
+
+    resolver.register_flag(FeatureFlagConfig {
+        name: "x11".to_string(),
+        enabled: false,
+        description: "X11 display server".to_string(),
+        global: false,
+    });
+
+    // Security flags
+    resolver.register_flag(FeatureFlagConfig {
+        name: "selinux".to_string(),
+        enabled: false,
+        description: "SELinux mandatory access control".to_string(),
+        global: true,
+    });
+
+    resolver.register_flag(FeatureFlagConfig {
+        name: "apparmor".to_string(),
+        enabled: true,
+        description: "AppArmor mandatory access control".to_string(),
+        global: true,
+    });
+
+    // Development flags
+    resolver.register_flag(FeatureFlagConfig {
+        name: "debug".to_string(),
+        enabled: false,
+        description: "Enable debug symbols and logging".to_string(),
+        global: true,
+    });
+
+    resolver.register_flag(FeatureFlagConfig {
+        name: "optimize".to_string(),
+        enabled: true,
+        description: "Enable compiler optimizations".to_string(),
+        global: true,
+    });
+}
+
+/// Initialize default profiles
+pub fn init_default_profiles(resolver: &mut FeatureFlagResolver) {
+    // Minimal profile
+    resolver.register_profile(FeatureProfile {
+        name: "minimal".to_string(),
+        description: "Minimal system with no extras".to_string(),
+        flags: vec![
+            "dbus".to_string(),
+            "openrc".to_string(),
+            "apparmor".to_string(),
+            "optimize".to_string(),
+        ],
+    });
+
+    // Desktop profile
+    resolver.register_profile(FeatureProfile {
+        name: "desktop".to_string(),
+        description: "Full desktop system".to_string(),
+        flags: vec![
+            "dbus".to_string(),
+            "openrc".to_string(),
+            "wayland".to_string(),
+            "bluetooth".to_string(),
+            "apparmor".to_string(),
+            "optimize".to_string(),
+        ],
+    });
+
+    // Development profile
+    resolver.register_profile(FeatureProfile {
+        name: "development".to_string(),
+        description: "Development system with debug tools".to_string(),
+        flags: vec![
+            "dbus".to_string(),
+            "openrc".to_string(),
+            "debug".to_string(),
+            "apparmor".to_string(),
+        ],
+    });
+}
+
+/// Calculate hash for feature flag name (FNV-1a)
+pub fn calculate_flag_hash(name: &str) -> u64 {
+    let mut hash: u64 = 14695981039346656037;
+    for &byte in name.as_bytes() {
+        hash ^= byte as u64;
+        hash = hash.wrapping_mul(1099511628211);
+    }
+    hash
+}

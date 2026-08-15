@@ -21,7 +21,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 // =========================================================================
 // 1. Kernel Personality Proxy
@@ -82,14 +82,14 @@ pub struct SyscallLedgerEntry {
 }
 
 pub struct LedgerManager {
-    pub ledger: HashMap<u32, SyscallLedgerEntry>,
+    pub ledger: BTreeMap<u32, SyscallLedgerEntry>,
 }
 
 impl LedgerManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         LedgerManager {
-            ledger: HashMap::new(),
+            ledger: BTreeMap::new(),
         }
     }
 
@@ -332,7 +332,7 @@ impl SecurityModel for DACProxy {
 }
 
 pub struct SELinuxProxy {
-    pub context_mapping: HashMap<String, String>,
+    pub context_mapping: BTreeMap<String, String>,
 }
 
 impl SecurityModel for SELinuxProxy {
@@ -386,7 +386,7 @@ pub trait ObsoleteDevice {
 }
 
 pub struct FloppyProxy {
-    pub sectors: HashMap<u32, Vec<u8>>,
+    pub sectors: BTreeMap<u32, Vec<u8>>,
 }
 
 impl ObsoleteDevice for FloppyProxy {
@@ -847,7 +847,7 @@ mod tests {
 
     #[test]
     fn test_peripheral_proxy_pods() {
-        let mut sectors = HashMap::new();
+        let mut sectors = BTreeMap::new();
         sectors.insert(0, vec![0xEB, 0x3C, 0x90]); // Floppy boot sector signature
         let floppy = Box::new(FloppyProxy { sectors });
         let mut proxy = PeripheralProxy::new("FloppyDrive", floppy);

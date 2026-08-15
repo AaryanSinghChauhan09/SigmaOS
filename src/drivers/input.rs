@@ -19,7 +19,7 @@
 // SigmaOS Input Driver
 // Hardware abstraction for input devices
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 /// Input device type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Curl Compatibility
 //! Data transfer tool (curl command)
@@ -65,7 +66,7 @@ pub unsafe extern "C" fn curl_perform(
     _options: CurlOptions,
     response: *mut HttpResponse,
 ) -> SigmaI32 {
-    if !CURL_INITIALIZED || url.isnull() || response.isnull() {
+    if !CURL_INITIALIZED || url.is_null() || response.is_null() {
         return -1;
     }
     
@@ -108,7 +109,7 @@ pub unsafe extern "C" fn curl_set_header(
     value: *const u8,
     options: *mut CurlOptions,
 ) -> SigmaI32 {
-    if !CURL_INITIALIZED || name.isnull() || value.isnull() || options.isnull() {
+    if !CURL_INITIALIZED || name.is_null() || value.is_null() || options.is_null() {
         return -1;
     }
     
@@ -138,7 +139,7 @@ pub unsafe extern "C" fn curl_set_data(
     size: SigmaU32,
     options: *mut CurlOptions,
 ) -> SigmaI32 {
-    if !CURL_INITIALIZED || data.isnull() || options.isnull() {
+    if !CURL_INITIALIZED || data.is_null() || options.is_null() {
         return -1;
     }
     
@@ -162,7 +163,7 @@ pub unsafe extern "C" fn curl_download(
     output_file: *const u8,
     _options: CurlOptions,
 ) -> SigmaI32 {
-    if !CURL_INITIALIZED || url.isnull() || output_file.isnull() {
+    if !CURL_INITIALIZED || url.is_null() || output_file.is_null() {
         return -1;
     }
     

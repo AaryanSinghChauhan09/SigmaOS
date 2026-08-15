@@ -3,7 +3,7 @@
 // JSON schemas, deterministic exact-match structured extraction, multi-source aggregation,
 // near-miss distraction filtering, citations/verification tracking, and high-performance single-pass execution.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Simple schema types supported by the extractor
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -56,8 +56,8 @@ pub struct Citation {
 /// The output of a successful structured extraction run
 #[derive(Debug, Clone)]
 pub struct ExtractionResult {
-    pub extracted_values: HashMap<String, String>,
-    pub list_values: HashMap<String, Vec<String>>,
+    pub extracted_values: BTreeMap<String, String>,
+    pub list_values: BTreeMap<String, Vec<String>>,
     pub citations: Vec<Citation>,
     pub median_latency_ms: u32,
     pub full_document_accuracy_percent: f32,
@@ -96,8 +96,8 @@ impl DocumentExtractor {
             return Err(LiftError::ExtractionFailed);
         }
 
-        let mut extracted_values = HashMap::new();
-        let mut list_values = HashMap::new();
+        let mut extracted_values = BTreeMap::new();
+        let mut list_values = BTreeMap::new();
         let mut citations = Vec::new();
 
         // Simulated high-performance OCR / Vision parsing

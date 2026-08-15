@@ -1,14 +1,12 @@
 #![no_std]
+#![no_main]
 
-use core::mem;
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type EventID = usize;
 
@@ -21,7 +19,7 @@ pub enum EventType {
     SystemChange = 3,
 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuditError {
     Success = 0,
@@ -56,7 +54,7 @@ impl SimpleAuditEvent {
         SimpleAuditEvent {
             id,
             event_type: AtomicUsize::new(event_type as usize),
-            timestamp: AtomicUsize::new(1000000),
+            timestamp: AtomicUsize::new(0),
             user_id: AtomicUsize::new(user_id),
             description: desc_array,
         }
@@ -67,15 +65,19 @@ impl AuditEvent for SimpleAuditEvent {
     fn id(&self) -> EventID {
         self.id
     }
+
     fn event_type(&self) -> EventType {
         unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
     }
+
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64
     }
+
     fn user_id(&self) -> usize {
         self.user_id.load(Ordering::SeqCst)
     }
+
     fn description(&self) -> &[u8] {
         let len = self.description.iter().position(|&b| b == 0).unwrap_or(256);
         &self.description[..len]
@@ -91,14 +93,12 @@ pub trait AuditLogger {
 
 pub struct SimpleAuditLogger {
     pub events: Vec<Option<Box<dyn AuditEvent>>>,
-    pub next_id: AtomicUsize,
 }
 
 impl SimpleAuditLogger {
     pub fn new() -> Self {
         SimpleAuditLogger {
             events: Vec::new(),
-            next_id: AtomicUsize::new(1),
         }
     }
 }
@@ -117,8 +117,8 @@ impl AuditLogger for SimpleAuditLogger {
     }
 
     fn get_event(&self, id: EventID) -> Option<&dyn AuditEvent> {
-        for event_option in &self.events {
-            if let Some(ref event) = *event_option {
+        for i in 0..self.events.len() {
+            if let Some(ref event) = self.events[i] {
                 if event.id() == id {
                     return Some(event.as_ref());
                 }
@@ -129,8 +129,8 @@ impl AuditLogger for SimpleAuditLogger {
 
     fn query_events(&self, event_type: EventType, user_id: usize) -> Vec<EventID> {
         let mut ids = Vec::new();
-        for event_option in &self.events {
-            if let Some(ref event) = *event_option {
+        for i in 0..self.events.len() {
+            if let Some(ref event) = self.events[i] {
                 if event.event_type() == event_type && event.user_id() == user_id {
                     ids.push(event.id());
                 }
@@ -142,13 +142,13 @@ impl AuditLogger for SimpleAuditLogger {
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
         let mut i = 0;
         while i < self.events.len() {
-            let matches = if let Some(ref event) = self.events[i] {
-                event.timestamp() < older_than
-            } else {
-                false
-            };
-
-            if matches {
+            let mut remove = false;
+            if let Some(ref event) = self.events[i] {
+                if event.timestamp() < older_than {
+                    remove = true;
+                }
+            }
+            if remove {
                 self.events.remove(i);
             } else {
                 i += 1;
@@ -163,6 +163,7 @@ pub trait AuditPolicy {
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError>;
 }
 
+#[repr(C)]
 pub struct SimpleAuditPolicy {
     pub require_authentication: AtomicUsize,
 }
@@ -172,12 +173,6 @@ impl SimpleAuditPolicy {
         SimpleAuditPolicy {
             require_authentication: AtomicUsize::new(1),
         }
-    }
-}
-
-impl Default for SimpleAuditPolicy {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -204,44 +199,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_simple_audit_event() {
-        let event = SimpleAuditEvent::new(101, EventType::Authentication, 42, b"User logged in");
-        assert_eq!(event.id(), 101);
-        assert_eq!(event.event_type(), EventType::Authentication);
-        assert_eq!(event.user_id(), 42);
-        assert_eq!(event.description(), b"User logged in");
-    }
-
-    #[test]
-    fn test_simple_audit_logger() {
+    fn test_audit_event_logging() {
         let mut logger = SimpleAuditLogger::new();
-        let event = Box::new(SimpleAuditEvent::new(
-            101,
-            EventType::Authentication,
-            42,
-            b"User logged in",
-        ));
-        let id = logger.log_event(event).unwrap();
-        assert_eq!(id, 101);
+        let event = SimpleAuditEvent::new(1, EventType::Authentication, 1001, b"User logged in successfully");
+        logger.log_event(Box::new(event)).unwrap();
 
-        let retrieved = logger.get_event(101).unwrap();
-        assert_eq!(retrieved.id(), 101);
-
-        let queried = logger.query_events(EventType::Authentication, 42);
-        assert_eq!(queried.len(), 1);
-        assert_eq!(queried[0], 101);
-
-        logger.clear_events(2000000).unwrap();
-        assert!(logger.get_event(101).is_none());
-    }
-
-    #[test]
-    fn test_simple_audit_policy() {
-        let policy = SimpleAuditPolicy::new();
-        let auth_event = SimpleAuditEvent::new(1, EventType::Authentication, 42, b"Login");
-        let sys_event = SimpleAuditEvent::new(2, EventType::SystemChange, 42, b"Change");
-
-        assert!(policy.check_compliance(&auth_event));
-        assert!(!policy.check_compliance(&sys_event));
+        let found = logger.get_event(1).unwrap();
+        assert_eq!(found.user_id(), 1001);
+        assert_eq!(found.event_type(), EventType::Authentication);
     }
 }

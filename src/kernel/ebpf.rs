@@ -1,106 +1,91 @@
-// SigmaOS eBPF-inspired Extended Berkeley Packet Filter
-// Inspired by Linux kernel eBPF - safe, efficient kernel-space programming
-// Zero-dependency, #![no_std] compliant
+// Linux-inspired eBPF (Extended Berkeley Packet Filter) Engine and Instruction Verifier
+// Features static bytecode validation (bounds, division-by-zero, stack alignment, backward jump loop-prevention)
+// and execution over standard in-kernel maps.
 
-use core::cell::RefCell;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::collections::HashMap;
 
-/// eBPF program type classification
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BpfProgramType {
-    SocketFilter = 1,
-    Kprobe = 2,
-    SchedClassifier = 3,
-    Xdp = 4,
-    PerfEvent = 5,
-    CgroupSock = 6,
-    CgroupSockAddr = 7,
-    LwtIn = 8,
-    LwtOut = 9,
-    LwtXmit = 10,
-    SocketMap = 11,
-    SkMsg = 12,
-    RawTracepoint = 13,
-    CgroupSockOps = 14,
-}
-
-/// eBPF instruction set (64-bit instruction encoding)
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct BpfInstruction {
+pub struct EbpfInstruction {
     pub opcode: u8,
-    pub dst_reg: u8,
-    pub src_reg: u8,
+    pub dst: u8,
+    pub src: u8,
     pub offset: i16,
     pub imm: i32,
 }
 
-/// eBPF register set (10 general-purpose registers)
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct BpfRegisters {
-    pub r0: u64,  // return value
-    pub r1: u64,  // argument 1
-    pub r2: u64,  // argument 2
-    pub r3: u64,  // argument 3
-    pub r4: u64,  // argument 4
-    pub r5: u64,  // argument 5
-    pub r6: u64,  // callee-saved
-    pub r7: u64,  // callee-saved
-    pub r8: u64,  // callee-saved
-    pub r9: u64,  // callee-saved
-    pub r10: u64, // read-only frame pointer
-}
+// Opcode constants
+pub const EBPF_OP_ADD: u8 = 0x01;
+pub const EBPF_OP_ADDI: u8 = 0x02;
+pub const EBPF_OP_SUB: u8 = 0x03;
+pub const EBPF_OP_LD: u8 = 0x04;
+pub const EBPF_OP_ST: u8 = 0x05;
+pub const EBPF_OP_JEQ: u8 = 0x06;
+pub const EBPF_OP_JNE: u8 = 0x07;
+pub const EBPF_OP_MAP_LOOKUP: u8 = 0x08;
+pub const EBPF_OP_EXIT: u8 = 0x09;
+pub const EBPF_OP_DIV: u8 = 0x0A;
 
-/// eBPF virtual machine state
-pub struct BpfVm {
-    pub registers: BpfRegisters,
-    pub program: RefCell<[BpfInstruction; 4096]>, // max 4096 instructions
-    pub program_len: AtomicUsize,
-    pub stack: RefCell<[u8; 512]>, // 512-byte stack
-}
+pub struct EbpfVerifier;
 
-impl BpfVm {
-    pub fn new() -> Self {
-        BpfVm {
-            registers: BpfRegisters {
-                r0: 0, r1: 0, r2: 0, r3: 0, r4: 0, r5: 0,
-                r6: 0, r7: 0, r8: 0, r9: 0, r10: 512,
-            },
-            program: RefCell::new([BpfInstruction {
-                opcode: 0, dst_reg: 0, src_reg: 0, offset: 0, imm: 0
-            }; 4096]),
-            program_len: AtomicUsize::new(0),
-            stack: RefCell::new([0u8; 512]),
-        }
-    }
-
-    /// Load eBPF program
-    pub fn load_program(&self, instructions: &[BpfInstruction]) -> Result<(), BpfError> {
-        if instructions.len() > 4096 {
-            return Err(BpfError::ProgramTooLarge);
+impl EbpfVerifier {
+    /// Validates the eBPF bytecode statically before kernel execution.
+    pub fn verify(program: &[EbpfInstruction]) -> Result<(), &'static str> {
+        if program.is_empty() {
+            return Err("Empty eBPF program!");
         }
 
-        let mut prog = self.program.borrow_mut();
-        for (i, &inst) in instructions.iter().enumerate() {
-            prog[i] = inst;
+        let mut has_exit = false;
+
+        for (idx, inst) in program.iter().enumerate() {
+            // 1. Verify register ranges (R0 - R9 are valid)
+            if inst.dst >= 10 || inst.src >= 10 {
+                return Err("Register index out of bounds! Valid registers: R0-R9");
+            }
+
+            // 2. Prevent division-by-zero statically
+            if inst.opcode == EBPF_OP_DIV && inst.imm == 0 && inst.src == 0 {
+                return Err("Static validation error: Division by zero immediate!");
+            }
+
+            // 3. Verify stack bounds (standard eBPF 512-byte stack limit)
+            if inst.opcode == EBPF_OP_LD || inst.opcode == EBPF_OP_ST {
+                if inst.offset < 0 || inst.offset > 504 {
+                    return Err("Stack offset out of bounds! Must be between 0 and 504 (aligned)");
+                }
+                if inst.offset % 4 != 0 {
+                    return Err("Stack offset must be 4-byte aligned!");
+                }
+            }
+
+            // 4. Verify jump targets & prevent infinite loops (no backward jumps)
+            if inst.opcode == EBPF_OP_JEQ || inst.opcode == EBPF_OP_JNE {
+                if inst.offset <= 0 {
+                    return Err("Infinite loop prevention: Backward or self-referential jumps are rejected!");
+                }
+                let target_idx = idx as i32 + 1 + inst.offset as i32;
+                if target_idx < 0 || target_idx >= program.len() as i32 {
+                    return Err("Jump instruction targets index out of bounds!");
+                }
+            }
+
+            if inst.opcode == EBPF_OP_EXIT {
+                has_exit = true;
+            }
         }
-        self.program_len.store(instructions.len(), Ordering::SeqCst);
+
+        if !has_exit {
+            return Err("Program missing standard EBPF_OP_EXIT opcode!");
+        }
+
         Ok(())
     }
+}
 
-    /// Execute eBPF program
-    pub fn execute(&self, packet_data: &[u8]) -> Result<u64, BpfError> {
-        let prog_len = self.program_len.load(Ordering::SeqCst);
-        let prog = self.program.borrow();
-        
-        let mut pc: i32 = 0; // program counter
-        let mut regs = self.registers;
-        
-        // Set packet data pointer
-        regs.r1 = packet_data.as_ptr() as u64;
-        regs.r2 = packet_data.len() as u64;
+pub struct EbpfEngine {
+    pub registers: [i64; 10], // R0..R9
+    pub stack: [u8; 512],
+    pub map: HashMap<i64, i64>, // Simulated eBPF kernel map
+}
 
         while (pc as usize) < prog_len {
             let inst = prog[pc as usize];
@@ -186,18 +171,12 @@ impl BpfVm {
                     };
                     
                     if cond == inst.imm as u64 {
-                        pc += inst.offset;
+                        pc += inst.offset as i32;
                     }
                 }
                 _ => return Err(BpfError::InvalidOpcode),
             }
-            
-            pc += 1;
-        }
-        
-        Ok(regs.r0)
-    }
-}
+            instruction_count += 1;
 
 /// eBPF error types
 #[repr(C)]
@@ -208,18 +187,20 @@ pub enum BpfError {
     InvalidOpcode,
     StackOverflow,
     InvalidMemoryAccess,
+    InvalidInstruction,
 }
 
-/// eBPF map type (kernel-space data structures)
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BpfMapType {
-    Hash = 1,
-    Array = 2,
-    PerCpuHash = 3,
-    PerCpuArray = 4,
-    RingBuf = 5,
-}
+                    if divisor == 0 {
+                        return Err("Division by zero at runtime!");
+                    }
+                    self.registers[inst.dst as usize] /= divisor;
+                }
+                EBPF_OP_EXIT => {
+                    // R0 holds the return value of an eBPF program
+                    return Ok(self.registers[0]);
+                }
+                _ => return Err("Invalid opcode during execution!"),
+            }
 
 /// eBPF map definition
 pub struct BpfMap {
@@ -228,6 +209,44 @@ pub struct BpfMap {
     pub value_size: u32,
     pub max_entries: u32,
     pub data: RefCell<[u8; 65536]>, // 64KB max map size
+}
+
+/// eBPF Static Safety Verifier
+pub struct BpfVerifier;
+
+impl BpfVerifier {
+    pub fn verify_program(&self, instructions: &[BpfInstruction]) -> Result<(), BpfError> {
+        if instructions.is_empty() || instructions.len() > 4096 {
+            return Err(BpfError::ProgramTooLarge);
+        }
+
+        let mut contains_exit = false;
+        for (i, inst) in instructions.iter().enumerate() {
+            // Register bound checks
+            if inst.dst_reg > 10 || inst.src_reg > 10 {
+                return Err(BpfError::InvalidMemoryAccess);
+            }
+
+            // Check for backward jumps (bounded loop safety verification)
+            if inst.offset < 0 {
+                let target_pc = (i as i32) + 1 + (inst.offset as i32);
+                if target_pc < 0 || target_pc >= i as i32 {
+                    return Err(BpfError::InvalidInstruction);
+                }
+            }
+
+            // Check for exit instruction
+            if inst.opcode == 0x95 {
+                contains_exit = true;
+            }
+        }
+
+        if !contains_exit {
+            return Err(BpfError::InvalidInstruction);
+        }
+
+        Ok(())
+    }
 }
 
 impl BpfMap {
@@ -263,24 +282,7 @@ impl BpfMap {
             return Err(BpfError::InvalidMemoryAccess);
         }
 
-        let mut data = self.data.borrow_mut();
-        let hash = self.simple_hash(key);
-        let offset = (hash % self.max_entries as u64) as usize;
-        
-        if offset + self.value_size as usize <= data.len() {
-            data[offset..offset + self.value_size as usize].copy_from_slice(value);
-            Ok(())
-        } else {
-            Err(BpfError::InvalidMemoryAccess)
-        }
-    }
-
-    fn simple_hash(&self, key: &[u8]) -> u64 {
-        let mut hash: u64 = 5381;
-        for &byte in key {
-            hash = hash.wrapping_mul(33).wrapping_add(byte as u64);
-        }
-        hash
+        Err("Program terminated without EXIT opcode!")
     }
 }
 
@@ -289,19 +291,56 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_bpf_vm_simple_program() {
-        let vm = BpfVm::new();
-        
-        // Simple program: return packet length
-        let program = [
-            BpfInstruction { opcode: 0xb7, dst_reg: 0, src_reg: 0, offset: 0, imm: 0 }, // r0 = 0
-            BpfInstruction { opcode: 0x07, dst_reg: 0, src_reg: 0, offset: 0, imm: 10 }, // r0 += 10
-            BpfInstruction { opcode: 0x95, dst_reg: 0, src_reg: 0, offset: 0, imm: 0 }, // exit
+    fn test_ebpf_verifications() {
+        // Invalid registers check
+        let program1 = vec![
+            EbpfInstruction { opcode: EBPF_OP_ADDI, dst: 15, src: 0, offset: 0, imm: 10 },
+            EbpfInstruction { opcode: EBPF_OP_EXIT, dst: 0, src: 0, offset: 0, imm: 0 },
         ];
-        
-        vm.load_program(&program).unwrap();
-        let result = vm.execute(&[1, 2, 3, 4, 5]).unwrap();
-        assert_eq!(result, 10);
+        assert_eq!(EbpfVerifier::verify(&program1), Err("Register index out of bounds! Valid registers: R0-R9"));
+
+        // Division by zero immediate check
+        let program2 = vec![
+            EbpfInstruction { opcode: EBPF_OP_DIV, dst: 1, src: 0, offset: 0, imm: 0 },
+            EbpfInstruction { opcode: EBPF_OP_EXIT, dst: 0, src: 0, offset: 0, imm: 0 },
+        ];
+        assert_eq!(EbpfVerifier::verify(&program2), Err("Static validation error: Division by zero immediate!"));
+
+        // Unaligned stack offset check
+        let program3 = vec![
+            EbpfInstruction { opcode: EBPF_OP_ST, dst: 1, src: 0, offset: 11, imm: 0 },
+            EbpfInstruction { opcode: EBPF_OP_EXIT, dst: 0, src: 0, offset: 0, imm: 0 },
+        ];
+        assert_eq!(EbpfVerifier::verify(&program3), Err("Stack offset must be 4-byte aligned!"));
+
+        // Out of bounds stack offset check
+        let program4 = vec![
+            EbpfInstruction { opcode: EBPF_OP_ST, dst: 1, src: 0, offset: 512, imm: 0 },
+            EbpfInstruction { opcode: EBPF_OP_EXIT, dst: 0, src: 0, offset: 0, imm: 0 },
+        ];
+        assert_eq!(EbpfVerifier::verify(&program4), Err("Stack offset out of bounds! Must be between 0 and 504 (aligned)"));
+
+        // Backward jump infinite loop prevention check
+        let program5 = vec![
+            EbpfInstruction { opcode: EBPF_OP_JEQ, dst: 1, src: 2, offset: -1, imm: 0 },
+            EbpfInstruction { opcode: EBPF_OP_EXIT, dst: 0, src: 0, offset: 0, imm: 0 },
+        ];
+        assert_eq!(EbpfVerifier::verify(&program5), Err("Infinite loop prevention: Backward or self-referential jumps are rejected!"));
+    }
+
+    #[test]
+    fn test_bpf_verifier() {
+        let verifier = BpfVerifier;
+        let valid_prog = [
+            BpfInstruction { opcode: 0xb7, dst_reg: 0, src_reg: 0, offset: 0, imm: 10 },
+            BpfInstruction { opcode: 0x95, dst_reg: 0, src_reg: 0, offset: 0, imm: 0 },
+        ];
+        assert!(verifier.verify_program(&valid_prog).is_ok());
+
+        let invalid_prog = [
+            BpfInstruction { opcode: 0xb7, dst_reg: 11, src_reg: 0, offset: 0, imm: 10 }, // Reg 11 out of bounds
+        ];
+        assert!(verifier.verify_program(&invalid_prog).is_err());
     }
 
     #[test]

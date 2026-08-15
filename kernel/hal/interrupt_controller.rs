@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// SigmaOS: APIC + PIC Initialization
 /// Phase G Blocker #5: APIC + PIC init
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.

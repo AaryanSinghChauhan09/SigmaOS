@@ -19,14 +19,14 @@
 // Content-Addressed Store for SigmaPkg
 // Stores packages by SHA3-256 hash for reproducibility
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use crate::sigpkg::Package;
 use std::path::PathBuf;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
     base_path: PathBuf,
-    packages: HashMap<String, StoredPackage>,
+    packages: BTreeMap<String, StoredPackage>,
 }
 
 /// Stored package metadata
@@ -42,7 +42,7 @@ impl ContentAddressedStore {
     pub fn new(base_path: PathBuf) -> Self {
         Self {
             base_path,
-            packages: HashMap::new(),
+            packages: BTreeMap::new(),
         }
     }
 

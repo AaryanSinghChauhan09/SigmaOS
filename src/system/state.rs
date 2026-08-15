@@ -39,7 +39,7 @@ pub enum StateValue {
     Boolean(bool),
     Integer(i64),
     String(&'static str),
-    Array([StateValue; 16]),
+    Array([Box<StateValue>; 16]),
 }
 
 /// Immutable state graph for declarative configuration

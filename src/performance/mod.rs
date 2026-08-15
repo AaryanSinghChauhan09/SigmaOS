@@ -1,4 +1,3 @@
-// SigmaOS Performance Module
 pub mod profiler;
 pub mod mglru;
 pub mod io_uring;

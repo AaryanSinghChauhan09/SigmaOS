@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Environment Variable Compatibility
 //! Environment variable management (env command)
@@ -91,7 +92,7 @@ pub unsafe extern "C" fn env_init() -> SigmaI32 {
 /// Set environment variable
 #[no_mangle]
 pub unsafe extern "C" fn env_set(name: *const u8, value: *const u8) -> SigmaI32 {
-    if !ENV_INITIALIZED || name.isnull() || value.isnull() {
+    if !ENV_INITIALIZED || name.is_null() || value.is_null() {
         return -1;
     }
     
@@ -154,7 +155,7 @@ pub unsafe extern "C" fn env_set(name: *const u8, value: *const u8) -> SigmaI32 
 /// Get environment variable
 #[no_mangle]
 pub unsafe extern "C" fn env_get(name: *const u8, value: *mut u8, max_len: SigmaU32) -> SigmaI32 {
-    if !ENV_INITIALIZED || name.isnull() || value.isnull() {
+    if !ENV_INITIALIZED || name.is_null() || value.is_null() {
         return -1;
     }
     
@@ -193,7 +194,7 @@ pub unsafe extern "C" fn env_get(name: *const u8, value: *mut u8, max_len: Sigma
 /// Unset environment variable
 #[no_mangle]
 pub unsafe extern "C" fn env_unset(name: *const u8) -> SigmaI32 {
-    if !ENV_INITIALIZED || name.isnull() {
+    if !ENV_INITIALIZED || name.is_null() {
         return -1;
     }
     
@@ -230,7 +231,7 @@ pub unsafe extern "C" fn env_unset(name: *const u8) -> SigmaI32 {
 /// List all environment variables
 #[no_mangle]
 pub unsafe extern "C" fn env_list(vars: *mut EnvVar, max_count: SigmaU32) -> SigmaU32 {
-    if !ENV_INITIALIZED || vars.isnull() {
+    if !ENV_INITIALIZED || vars.is_null() {
         return 0;
     }
     

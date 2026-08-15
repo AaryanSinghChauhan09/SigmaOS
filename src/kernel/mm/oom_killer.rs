@@ -19,17 +19,17 @@
 use crate::kernel::scheduler::Process;
 /// SigmaOS OOM (Out Of Memory) Killer implementation
 /// Calculates badness score of processes and kills the worst culprit
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 pub struct OomKiller {
-    oom_scores_adj: HashMap<u64, i32>,
+    oom_scores_adj: BTreeMap<u64, i32>,
 }
 
 impl OomKiller {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         OomKiller {
-            oom_scores_adj: HashMap::new(),
+            oom_scores_adj: BTreeMap::new(),
         }
     }
 
@@ -46,7 +46,7 @@ impl OomKiller {
     pub fn select_victim(
         &self,
         processes: &[Process],
-        memory_usages: &HashMap<u64, u64>,
+        memory_usages: &BTreeMap<u64, u64>,
     ) -> Option<u64> {
         let mut worst_pid = None;
         let mut worst_points = -99999i64;
@@ -102,7 +102,7 @@ mod tests {
         let p1 = Process::new(101, "browser".to_string(), Priority::Normal);
         let p2 = Process::new(102, "db".to_string(), Priority::High);
 
-        let mut usages = HashMap::new();
+        let mut usages = BTreeMap::new();
         usages.insert(101, 1024 * 1024 * 50); // 50MB
         usages.insert(102, 1024 * 1024 * 100); // 100MB
 

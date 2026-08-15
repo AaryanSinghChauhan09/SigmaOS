@@ -18,8 +18,14 @@
 
 // SigmaOS Orchestration Module
 pub mod cross_device;
+pub mod sigmakube;
 
 pub use cross_device::{
     AutomationRule, AutomationTrigger, ConnectedDevice, ConnectionStatus, CrossDeviceAction,
     CrossDeviceOrchestrator, DeviceCapability, DeviceType, OrchestrationError, SmartHomeDevice,
+};
+pub use sigmakube::{
+    Cluster, ClusterState, Node, NodeState, Pod, PodPhase, Service, ServiceType,
+    Deployment, DeploymentStrategy, ContainerSpec, ResourceRequirements, ContainerPort,
+    ServicePort, PodTemplate, Metadata, PodSpec, SigmaKube, ClusterStats,
 };

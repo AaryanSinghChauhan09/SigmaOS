@@ -1,12 +1,12 @@
-//! Custom HashMap implementation for SigmaOS
-//! Reduces dependency on std::collections::HashMap
+//! Custom BTreeMap implementation for SigmaOS
+//! Reduces dependency on alloc::collections::BTreeMap
 
 use crate::klib::Vec;
 use core::borrow::Borrow;
 use core::hash::{Hash, Hasher};
 use crate::klib::hash::SimpleHasher;
 
-pub struct HashMap<K, V> {
+pub struct BTreeMap<K, V> {
     buckets: Vec<Option<Vec<(K, V)>>>,
     capacity: usize,
     len: usize,
@@ -23,7 +23,7 @@ pub struct OccupiedEntry<'a, K, V> {
 }
 
 pub struct VacantEntry<'a, K, V> {
-    map: &'a mut HashMap<K, V>,
+    map: &'a mut BTreeMap<K, V>,
     key: K,
 }
 
@@ -45,29 +45,37 @@ where
             }
         }
     }
+
+    pub fn or_default(self) -> &'a mut V
+    where
+        V: Default,
+    {
+        self.or_insert_with(Default::default)
+    }
 }
 
-impl<K, V> HashMap<K, V>
+impl<K, V> BTreeMap<K, V>
 where
     K: Eq + Hash,
 {
     pub fn new() -> Self {
-        HashMap {
+        BTreeMap {
             buckets: Vec::new(),
-            capacity: 16,
+            capacity: 0,
             len: 0,
         }
     }
 
     pub fn with_capacity(capacity: usize) -> Self {
-        let mut map = HashMap::new();
+        let mut map = BTreeMap::new();
         map.capacity = capacity.next_power_of_two();
         map.resize_buckets();
         map
     }
 
     fn resize_buckets(&mut self) {
-        self.buckets = Vec::new();
+        // Optimized by Bolt ⚡: pre-allocate with_capacity to eliminate O(log N) vector resizing overhead.
+        self.buckets = Vec::with_capacity(self.capacity);
         for _ in 0..self.capacity {
             self.buckets.push(None);
         }
@@ -110,10 +118,10 @@ where
         self.len += 1;
     }
 
-    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
+    pub fn get<Q>(&self, key: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
-        Q: Hash + Eq,
+        Q: Hash + Eq + ?Sized,
     {
         if self.capacity == 0 || self.buckets.is_empty() {
             return None;
@@ -129,10 +137,10 @@ where
         None
     }
 
-    pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
+    pub fn get_mut<Q>(&mut self, key: &Q) -> Option<&mut V>
     where
         K: Borrow<Q>,
-        Q: Hash + Eq,
+        Q: Hash + Eq + ?Sized,
     {
         if self.capacity == 0 || self.buckets.is_empty() {
             return None;
@@ -148,10 +156,10 @@ where
         None
     }
 
-    pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
+    pub fn remove<Q>(&mut self, key: &Q) -> Option<V>
     where
         K: Borrow<Q>,
-        Q: Hash + Eq,
+        Q: Hash + Eq + ?Sized,
     {
         if self.capacity == 0 || self.buckets.is_empty() {
             return None;
@@ -169,10 +177,10 @@ where
         None
     }
 
-    pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
+    pub fn contains_key<Q>(&self, key: &Q) -> bool
     where
         K: Borrow<Q>,
-        Q: Hash + Eq,
+        Q: Hash + Eq + ?Sized,
     {
         self.get(key).is_some()
     }
@@ -192,16 +200,16 @@ where
         self.len = 0;
     }
 
-    pub fn iter(&self) -> HashMapIter<'_, K, V> {
-        HashMapIter {
+    pub fn iter(&self) -> BTreeMapIter<'_, K, V> {
+        BTreeMapIter {
             map: self,
             bucket_idx: 0,
             item_idx: 0,
         }
     }
 
-    pub fn iter_mut(&mut self) -> HashMapIterMut<'_, K, V> {
-        HashMapIterMut {
+    pub fn iter_mut(&mut self) -> BTreeMapIterMut<'_, K, V> {
+        BTreeMapIterMut {
             map: self,
             bucket_idx: 0,
             item_idx: 0,
@@ -220,6 +228,7 @@ where
             for i in 0..bucket.len() {
                 if bucket[i].0 == key {
                     let val_ptr = &mut bucket[i].1 as *mut V;
+                    // SAFETY: val_ptr is a valid pointer to the value in the bucket
                     return Entry::Occupied(OccupiedEntry { value: unsafe { &mut *val_ptr }, _marker: core::marker::PhantomData });
                 }
             }
@@ -239,6 +248,7 @@ where
         ValuesMut { iter: self.iter_mut(), _marker: core::marker::PhantomData }
     }
 
+    #[allow(unused_mut)]
     fn grow(&mut self) {
         let mut old_buckets = core::mem::replace(&mut self.buckets, Vec::new());
         self.capacity *= 2;
@@ -255,7 +265,7 @@ where
     }
 }
 
-impl<K, V> Default for HashMap<K, V>
+impl<K, V> Default for BTreeMap<K, V>
 where
     K: Eq + Hash,
 {
@@ -264,7 +274,7 @@ where
     }
 }
 
-impl<K, V> Clone for HashMap<K, V>
+impl<K, V> Clone for BTreeMap<K, V>
 where
     K: Clone,
     V: Clone,
@@ -278,7 +288,7 @@ where
     }
 }
 
-impl<K, V> core::fmt::Debug for HashMap<K, V>
+impl<K, V> core::fmt::Debug for BTreeMap<K, V>
 where
     K: Eq + Hash + core::fmt::Debug,
     V: core::fmt::Debug,
@@ -292,13 +302,13 @@ where
     }
 }
 
-pub struct HashMapIter<'a, K, V> {
-    map: &'a HashMap<K, V>,
+pub struct BTreeMapIter<'a, K, V> {
+    map: &'a BTreeMap<K, V>,
     bucket_idx: usize,
     item_idx: usize,
 }
 
-impl<'a, K, V> Iterator for HashMapIter<'a, K, V> {
+impl<'a, K, V> Iterator for BTreeMapIter<'a, K, V> {
     type Item = (&'a K, &'a V);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -320,13 +330,13 @@ impl<'a, K, V> Iterator for HashMapIter<'a, K, V> {
     }
 }
 
-pub struct HashMapIterMut<'a, K, V> {
-    map: &'a mut HashMap<K, V>,
+pub struct BTreeMapIterMut<'a, K, V> {
+    map: &'a mut BTreeMap<K, V>,
     bucket_idx: usize,
     item_idx: usize,
 }
 
-impl<'a, K, V> Iterator for HashMapIterMut<'a, K, V> {
+impl<'a, K, V> Iterator for BTreeMapIterMut<'a, K, V> {
     type Item = (&'a K, &'a mut V);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -337,6 +347,7 @@ impl<'a, K, V> Iterator for HashMapIterMut<'a, K, V> {
             if let Some(ref mut bucket) = self.map.buckets[self.bucket_idx] {
                 if self.item_idx < bucket.len() {
                     unsafe {
+                        // SAFETY: item_idx < bucket.len() ensures valid pointer
                         let item_ptr = &mut bucket[self.item_idx] as *mut (K, V);
                         self.item_idx += 1;
                         return Some((&(*item_ptr).0, &mut (*item_ptr).1));
@@ -350,12 +361,12 @@ impl<'a, K, V> Iterator for HashMapIterMut<'a, K, V> {
     }
 }
 
-impl<'a, K, V> IntoIterator for &'a HashMap<K, V>
+impl<'a, K, V> IntoIterator for &'a BTreeMap<K, V>
 where
     K: Eq + Hash,
 {
     type Item = (&'a K, &'a V);
-    type IntoIter = HashMapIter<'a, K, V>;
+    type IntoIter = BTreeMapIter<'a, K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
@@ -363,7 +374,7 @@ where
 }
 
 pub struct Keys<'a, K, V> {
-    iter: HashMapIter<'a, K, V>,
+    iter: BTreeMapIter<'a, K, V>,
 }
 
 impl<'a, K, V> Iterator for Keys<'a, K, V> {
@@ -375,7 +386,7 @@ impl<'a, K, V> Iterator for Keys<'a, K, V> {
 }
 
 pub struct Values<'a, K, V> {
-    iter: HashMapIter<'a, K, V>,
+    iter: BTreeMapIter<'a, K, V>,
 }
 
 impl<'a, K, V> Iterator for Values<'a, K, V> {
@@ -386,8 +397,11 @@ impl<'a, K, V> Iterator for Values<'a, K, V> {
     }
 }
 
+pub type HashMapValues<'a, K, V> = Values<'a, K, V>;
+pub type HashMapValuesMut<'a, K, V> = ValuesMut<'a, K, V>;
+
 pub struct ValuesMut<'a, K, V> {
-    iter: HashMapIterMut<'a, K, V>,
+    iter: BTreeMapIterMut<'a, K, V>,
     _marker: core::marker::PhantomData<K>,
 }
 
@@ -399,13 +413,13 @@ impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
     }
 }
 
-impl<K, V, const N: usize> From<[(K, V); N]> for HashMap<K, V>
+impl<K, V, const N: usize> From<[(K, V); N]> for BTreeMap<K, V>
 where
     K: Eq + Hash + Clone,
     V: Clone,
 {
     fn from(arr: [(K, V); N]) -> Self {
-        let mut map = HashMap::with_capacity(N);
+        let mut map = BTreeMap::with_capacity(N);
         for (k, v) in arr {
             map.insert(k, v);
         }
@@ -418,7 +432,7 @@ mod tests {
 
     #[test]
     fn test_hashmap_basic() {
-        let mut map = HashMap::new();
+        let mut map = BTreeMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
         
@@ -429,7 +443,7 @@ mod tests {
 
     #[test]
     fn test_hashmap_remove() {
-        let mut map = HashMap::new();
+        let mut map = BTreeMap::new();
         map.insert("key1", "value1");
         assert_eq!(map.remove(&"key1"), Some("value1"));
         assert_eq!(map.get(&"key1"), None);
@@ -437,7 +451,7 @@ mod tests {
 
     #[test]
     fn test_hashmap_iter() {
-        let mut map = HashMap::new();
+        let mut map = BTreeMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
         

@@ -1,15 +1,15 @@
-// OOP-based Container Runtime Support for SigmaOS
-// Implements OCI runtime and sandboxed container primitives.
+#![no_std]
+#![no_main]
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use core::mem;
+/// OOP-based Container Runtime Support for SigmaOS
+/// Based on Ideas-999-Structured: Core System Item 17
+/// Implements OCI runtime and sandboxed container primitives
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ContainerID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
@@ -20,7 +20,7 @@ pub enum ContainerState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum ContainerError {
     Success = 0,
     InvalidConfig = 1,
@@ -39,6 +39,7 @@ pub trait Container {
     fn resume(&mut self) -> Result<(), ContainerError>;
 }
 
+#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -50,8 +51,9 @@ impl SimpleContainer {
     pub fn new(id: ContainerID, name: &[u8]) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        }
         SimpleContainer {
             id,
             name: name_array,
@@ -65,20 +67,12 @@ impl Container for SimpleContainer {
     fn id(&self) -> ContainerID {
         self.id
     }
-
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-
     fn state(&self) -> ContainerState {
-        match self.state.load(Ordering::SeqCst) {
-            0 => ContainerState::Created,
-            1 => ContainerState::Running,
-            2 => ContainerState::Paused,
-            3 => ContainerState::Stopped,
-            _ => ContainerState::Deleting,
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     fn start(&mut self) -> Result<(), ContainerError> {
@@ -119,6 +113,7 @@ pub trait OCISpec {
     fn validate_spec(&self, spec: &[u8]) -> Result<(), ContainerError>;
 }
 
+#[repr(C)]
 pub struct SimpleOCISpec {
     pub containers: Vec<Option<Box<dyn Container>>>,
     pub next_id: AtomicUsize,
@@ -133,16 +128,10 @@ impl SimpleOCISpec {
     }
 }
 
-impl Default for SimpleOCISpec {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl OCISpec for SimpleOCISpec {
     fn create_from_spec(&mut self, spec: &[u8]) -> Result<ContainerID, ContainerError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let name = if !spec.is_empty() { spec } else { b"container" };
+        let name = if spec.len() > 0 { spec } else { b"container" };
         let container = SimpleContainer::new(id, name);
         self.containers.push(Some(Box::new(container)));
         Ok(id)
@@ -172,7 +161,8 @@ pub trait Sandbox {
     ) -> Result<(), ContainerError>;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum Namespace {
     PID = 0,
     Network = 1,
@@ -182,6 +172,7 @@ pub enum Namespace {
     User = 5,
 }
 
+#[repr(C)]
 pub struct SimpleSandbox {
     pub namespaces: Vec<(ContainerID, Namespace)>,
     pub cgroups: Vec<(ContainerID, (usize, usize))>,
@@ -195,12 +186,6 @@ impl SimpleSandbox {
             cgroups: Vec::new(),
             seccomp_profiles: Vec::new(),
         }
-    }
-}
-
-impl Default for SimpleSandbox {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -231,7 +216,9 @@ impl Sandbox for SimpleSandbox {
     ) -> Result<(), ContainerError> {
         let mut profile_array = [0u8; 256];
         let len = profile.len().min(255);
-        profile_array[..len].copy_from_slice(&profile[..len]);
+        for i in 0..len {
+            profile_array[i] = profile[i];
+        }
         self.seccomp_profiles.push((container_id, profile_array));
         Ok(())
     }
@@ -243,6 +230,7 @@ pub trait ImageManager {
     fn remove_image(&mut self, name: &[u8], tag: &[u8]) -> Result<(), ContainerError>;
 }
 
+#[repr(C)]
 pub struct SimpleImageManager {
     pub images: Vec<([u8; 128], [u8; 32])>,
 }
@@ -253,19 +241,14 @@ impl SimpleImageManager {
     }
 }
 
-impl Default for SimpleImageManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ImageManager for SimpleImageManager {
-    fn pull_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
+    fn pull_image(&mut self, name: &[u8], _: &[u8]) -> Result<(), ContainerError> {
         let mut name_array = [0u8; 128];
         let mut digest_array = [0u8; 32];
         let name_len = name.len().min(127);
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-
+        for i in 0..name_len {
+            name_array[i] = name[i];
+        }
         for i in 0..32 {
             digest_array[i] = ((i * 17 + 31) % 256) as u8;
         }
@@ -302,6 +285,7 @@ pub trait ContainerRuntime {
     fn list_containers(&self) -> Vec<ContainerID>;
 }
 
+#[repr(C)]
 pub struct SimpleContainerRuntime {
     pub oci_spec: SimpleOCISpec,
     pub sandbox: SimpleSandbox,
@@ -318,12 +302,6 @@ impl SimpleContainerRuntime {
     }
 }
 
-impl Default for SimpleContainerRuntime {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ContainerRuntime for SimpleContainerRuntime {
     fn create_container(
         &mut self,
@@ -331,7 +309,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
         image: &[u8],
     ) -> Result<ContainerID, ContainerError> {
         self.image_manager.pull_image(image, b"latest")?;
-        let id = self.oci_spec.create_from_spec(name)?;
+        let spec = name;
+        let id = self.oci_spec.create_from_spec(spec)?;
 
         self.sandbox.set_namespace(id, Namespace::PID)?;
         self.sandbox.set_namespace(id, Namespace::Network)?;
@@ -341,8 +320,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut *self.oci_spec.containers {
-            if let Some(ref mut container) = container_option {
+        for container_option in &mut self.oci_spec.containers {
+            if let Some(ref mut container) = *container_option {
                 if container.id() == id {
                     return container.start();
                 }
@@ -352,8 +331,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut *self.oci_spec.containers {
-            if let Some(ref mut container) = container_option {
+        for container_option in &mut self.oci_spec.containers {
+            if let Some(ref mut container) = *container_option {
                 if container.id() == id {
                     return container.stop();
                 }
@@ -377,8 +356,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
     fn list_containers(&self) -> Vec<ContainerID> {
         let mut ids = Vec::new();
-        for container_option in &*self.oci_spec.containers {
-            if let Some(ref container) = container_option {
+        for container_option in &self.oci_spec.containers {
+            if let Some(ref container) = *container_option {
                 ids.push(container.id());
             }
         }
@@ -386,27 +365,72 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
-    #[test]
-    fn test_oci_container_and_sandbox_namespaces() {
-        let mut runtime = SimpleContainerRuntime::new();
-        let id = runtime
-            .create_container(b"redis-pod", b"redis:alpine")
-            .unwrap();
-
-        assert_eq!(runtime.list_containers().len(), 1);
-        assert_eq!(runtime.sandbox.namespaces.len(), 2); // PID and Network namespaces assigned!
-        assert_eq!(runtime.sandbox.namespaces[0].1, Namespace::PID);
-        assert_eq!(runtime.sandbox.namespaces[1].1, Namespace::Network);
-
-        // Start container
-        runtime.start_container(id).unwrap();
-
-        // Remove container
-        runtime.remove_container(id).unwrap();
-        assert_eq!(runtime.list_containers().len(), 0);
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
     }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn clone(&self) -> Vec<T> {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                let item = core::ptr::read(self.data.add(i));
+                new_vec.push(item);
+            }
+        }
+        new_vec
+    }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

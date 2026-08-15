@@ -19,7 +19,7 @@
 // SigmaOS Code Editor
 // OOP-based code editor with syntax highlighting and LSP integration
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::PathBuf;
 
 /// Document
@@ -256,7 +256,7 @@ impl LspClient for MockLspClient {
 
 /// OOP-based Code Editor
 pub struct CodeEditor {
-    documents: HashMap<String, Document>,
+    documents: BTreeMap<String, Document>,
     active_document: Option<String>,
     highlighter: Box<dyn SyntaxHighlighter>,
     lsp_client: Option<Box<dyn LspClient>>,
@@ -267,7 +267,7 @@ pub struct CodeEditor {
 impl CodeEditor {
     pub fn new(highlighter: Box<dyn SyntaxHighlighter>, config: EditorConfig) -> Self {
         Self {
-            documents: HashMap::new(),
+            documents: BTreeMap::new(),
             active_document: None,
             highlighter,
             lsp_client: None,

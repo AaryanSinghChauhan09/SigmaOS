@@ -90,12 +90,6 @@ pub struct SimpleDeviceManager {
     pub next_id: AtomicUsize,
 }
 
-impl Default for SimpleDeviceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl SimpleDeviceManager {
     pub fn new() -> Self {
         SimpleDeviceManager {
@@ -181,7 +175,9 @@ impl DeviceDriver for SimpleDeviceDriver {
     }
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        buffer.fill(0u8);
+        for i in 0..buffer.len() {
+            buffer[i] = 0u8;
+        }
         Ok(buffer.len())
     }
 
@@ -205,12 +201,6 @@ pub struct SimpleDeviceHotplug {
     pub enabled: AtomicUsize,
     pub added_devices: Vec<DeviceID>,
     pub removed_devices: Vec<DeviceID>,
-}
-
-impl Default for SimpleDeviceHotplug {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleDeviceHotplug {
@@ -242,12 +232,6 @@ impl DeviceHotplug for SimpleDeviceHotplug {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -261,9 +245,6 @@ impl<T> Vec<T> {
             len: 0,
             capacity: 0,
         }
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
     pub fn push(&mut self, item: T) {
         unsafe {
@@ -309,6 +290,19 @@ impl<T> Vec<T> {
             }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

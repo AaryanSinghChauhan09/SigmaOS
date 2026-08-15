@@ -1,15 +1,30 @@
-// SigmaOS Capability-Based Security System
-// Implements 64-bit hardware-enforced capability model
+// Minimal capability token implementation for SigmaOS
+// This provides the basic CapabilityToken structure needed by drivers
 
-use std::string::String;
-use std::vec::Vec;
-use std::sync::atomic::{AtomicU64, Ordering};
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 
-/// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
-    /// 64-bit capability bitmask
-    bits: u64,
+    pub permissions: u64,
+}
+
+impl CapabilityToken {
+    pub fn new() -> Self {
+        CapabilityToken {
+            permissions: 0,
+        }
+    }
+    
+    pub fn with_permission(mut self, permission: u64) -> Self {
+        self.permissions |= permission;
+        self
+    }
+
+    pub fn bits(&self) -> u64 {
+        self.permissions
+    }
 }
 
 impl Default for CapabilityToken {
@@ -24,12 +39,9 @@ impl CapabilityToken {
         Self { bits: 0 }
     }
 
+    /// Create capability token from raw bits
     pub fn from_bits(bits: u64) -> Self {
         Self { bits }
-    }
-
-    pub fn allow_capability(&mut self, bit: u64) {
-        self.bits |= bit;
     }
 
     /// Allow network access
@@ -47,7 +59,7 @@ impl CapabilityToken {
 
     /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") || path == "/" {
+        if path.starts_with("/var/www") {
             self.bits |= 1 << 2;
         }
         self

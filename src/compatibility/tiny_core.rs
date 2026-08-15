@@ -1,16 +1,15 @@
+// SigmaOS Distro Compatibility Layer
 /// Tiny Core Linux Compatibility & Philosophy Absorption for SigmaOS
 /// Implements frugal booting, RAM-only execution isolation, .tcz read-only extension loop mounting,
 /// boot code parsing (base, norestore, etc.), and filetool-style (mydata.tgz) user backup/restore.
-
 use crate::klib::Vec;
-use crate::filesystem::FileType;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TinyCoreBootConfig {
-    pub is_base_only: bool,       // Skip loading any application extensions (the "base" boot code)
-    pub is_no_restore: bool,      // Skip loading user backup (the "norestore" boot code)
+    pub is_base_only: bool, // Skip loading any application extensions (the "base" boot code)
+    pub is_no_restore: bool, // Skip loading user backup (the "norestore" boot code)
     pub local_path: Option<String>, // Path for persistent extensions (e.g., "local=sda1")
-    pub home_path: Option<String>,  // Path for persistent home (e.g., "home=sda1")
+    pub home_path: Option<String>, // Path for persistent home (e.g., "home=sda1")
 }
 
 impl TinyCoreBootConfig {
@@ -87,7 +86,11 @@ impl TceLoader {
     }
 
     /// Recursively mounts a .tcz extension and its dependencies onto the virtual filesystem
-    pub fn mount_extension(&mut self, name: &str, vfs: &mut crate::filesystem::VirtualFilesystem) -> Result<(), &'static str> {
+    pub fn mount_extension(
+        &mut self,
+        name: &str,
+        vfs: &mut crate::filesystem::VirtualFilesystem,
+    ) -> Result<(), &'static str> {
         // Find extension
         let mut ext_idx = None;
         for i in 0..self.extensions.len() {
@@ -112,10 +115,16 @@ impl TceLoader {
         // Mount the files into VFS (frugal loop mount simulation)
         let files = self.extensions[idx].files.clone();
         for (_path, content) in &files {
-            let file_id = vfs.create_file(FileType::Regular, 0).map_err(|_| "Failed to create VFS node")?;
-            let fd = vfs.open_file(file_id, 0).map_err(|_| "Failed to open loop mount node")?;
-            vfs.write_file(fd, content.as_bytes()).map_err(|_| "Failed to write loop mount content")?;
-            vfs.close_file(fd).map_err(|_| "Failed to close loop mount fd")?;
+            let file_id = vfs
+                .create_file(FileType::Regular, 0)
+                .map_err(|_| "Failed to create VFS node")?;
+            let fd = vfs
+                .open_file(file_id, 0)
+                .map_err(|_| "Failed to open loop mount node")?;
+            vfs.write_file(fd, content.as_bytes())
+                .map_err(|_| "Failed to write loop mount content")?;
+            vfs.close_file(fd)
+                .map_err(|_| "Failed to close loop mount fd")?;
         }
 
         self.extensions[idx].is_mounted = true;
@@ -165,7 +174,8 @@ impl FiletoolOverlay {
                     return;
                 }
             }
-            self.ram_changes.push((path.to_string(), content.to_string()));
+            self.ram_changes
+                .push((path.to_string(), content.to_string()));
         }
     }
 
@@ -238,16 +248,26 @@ impl FrugalLoader {
     }
 
     /// Runs the Frugal Boot configuration, setting up RAM loop mounting and configuration restores
-    pub fn execute_boot_sequence(&mut self, vfs: &mut crate::filesystem::VirtualFilesystem, mydata_archive: &[u8]) -> Result<(), &'static str> {
+    pub fn execute_boot_sequence(
+        &mut self,
+        vfs: &mut crate::filesystem::VirtualFilesystem,
+        mydata_archive: &[u8],
+    ) -> Result<(), &'static str> {
         // 1. Check if restore is permitted
         if !self.config.is_no_restore && !mydata_archive.is_empty() {
             self.filetool.restore_mydata(mydata_archive);
             // Write restored changes back to VFS
             for (_path, content) in &self.filetool.ram_changes {
-                let file_id = vfs.create_file(FileType::Regular, 0).map_err(|_| "Failed to restore file")?;
-                let fd = vfs.open_file(file_id, 0).map_err(|_| "Failed to open restored file")?;
-                vfs.write_file(fd, content.as_bytes()).map_err(|_| "Failed to write restored content")?;
-                vfs.close_file(fd).map_err(|_| "Failed to close restored fd")?;
+                let file_id = vfs
+                    .create_file(FileType::Regular, 0)
+                    .map_err(|_| "Failed to restore file")?;
+                let fd = vfs
+                    .open_file(file_id, 0)
+                    .map_err(|_| "Failed to open restored file")?;
+                vfs.write_file(fd, content.as_bytes())
+                    .map_err(|_| "Failed to write restored content")?;
+                vfs.close_file(fd)
+                    .map_err(|_| "Failed to close restored fd")?;
             }
         }
 
@@ -295,8 +315,22 @@ mod tests {
         assert!(loader.mount_extension("flwm.tcz", &mut vfs).is_ok());
 
         // Verify flwm and its dependency fltk are both marked as mounted
-        assert!(loader.extensions.iter().find(|e| e.name == "flwm.tcz").unwrap().is_mounted);
-        assert!(loader.extensions.iter().find(|e| e.name == "fltk.tcz").unwrap().is_mounted);
+        assert!(
+            loader
+                .extensions
+                .iter()
+                .find(|e| e.name == "flwm.tcz")
+                .unwrap()
+                .is_mounted
+        );
+        assert!(
+            loader
+                .extensions
+                .iter()
+                .find(|e| e.name == "fltk.tcz")
+                .unwrap()
+                .is_mounted
+        );
     }
 
     #[test]
@@ -321,7 +355,12 @@ mod tests {
 
         assert_eq!(restored_filetool.ram_changes.len(), 2);
         assert_eq!(
-            restored_filetool.ram_changes.iter().find(|c| c.0 == "/opt/bootlocal.sh").unwrap().1,
+            restored_filetool
+                .ram_changes
+                .iter()
+                .find(|c| c.0 == "/opt/bootlocal.sh")
+                .unwrap()
+                .1,
             "echo boot"
         );
     }
@@ -342,7 +381,9 @@ mod tests {
         loader.tce_loader.register_extension(flwm);
 
         // Boot system with backup and extensions
-        assert!(loader.execute_boot_sequence(&mut vfs, archive.as_slice()).is_ok());
+        assert!(loader
+            .execute_boot_sequence(&mut vfs, archive.as_slice())
+            .is_ok());
 
         // Verify extension is mounted and config is restored
         assert!(loader.tce_loader.extensions[0].is_mounted);

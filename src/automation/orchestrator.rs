@@ -19,7 +19,7 @@
 // SigmaOS AI Orchestrator for System Optimization
 // OOP-based AI system optimization with predictive modeling
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::time::{Duration, Instant};
 
 /// System state
@@ -38,7 +38,7 @@ pub struct SystemState {
 #[derive(Debug, Clone)]
 pub struct SystemAction {
     pub action_type: ActionType,
-    pub parameters: HashMap<String, String>,
+    pub parameters: BTreeMap<String, String>,
     pub priority: ActionPriority,
     pub estimated_impact: f64,
 }
@@ -185,7 +185,7 @@ impl RuleBasedOptimizer {
                     SystemAction {
                         action_type: ActionType::AdjustCpuFrequency,
                         parameters: {
-                            let mut map = HashMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert("frequency".to_string(), "balanced".to_string());
                             map
                         },
@@ -195,7 +195,7 @@ impl RuleBasedOptimizer {
                     SystemAction {
                         action_type: ActionType::ThrottleProcess,
                         parameters: {
-                            let mut map = HashMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert("target".to_string(), "background".to_string());
                             map
                         },
@@ -217,14 +217,14 @@ impl RuleBasedOptimizer {
                 actions: vec![
                     SystemAction {
                         action_type: ActionType::EnablePowerSaving,
-                        parameters: HashMap::new(),
+                        parameters: BTreeMap::new(),
                         priority: ActionPriority::Critical,
                         estimated_impact: 25.0,
                     },
                     SystemAction {
                         action_type: ActionType::AdjustCpuFrequency,
                         parameters: {
-                            let mut map = HashMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert("frequency".to_string(), "low".to_string());
                             map
                         },
@@ -246,7 +246,7 @@ impl RuleBasedOptimizer {
                 actions: vec![SystemAction {
                     action_type: ActionType::AdjustMemoryAllocation,
                     parameters: {
-                        let mut map = HashMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert("action".to_string(), "compact".to_string());
                         map
                     },
@@ -273,7 +273,7 @@ impl AiOptimizationStrategy for RuleBasedOptimizer {
         recommendations
     }
 
-    fn execute(&mut self, _action: &SystemAction) -> Result<(), OptimizationError> {
+    fn execute(&mut self, action: &SystemAction) -> Result<(), OptimizationError> {
         // Simulated action execution
         match action.action_type {
             ActionType::AdjustCpuFrequency => {
@@ -331,7 +331,7 @@ impl AiOptimizationStrategy for MlOptimizer {
                 ),
                 actions: vec![SystemAction {
                     action_type: ActionType::AdjustCpuFrequency,
-                    parameters: HashMap::new(),
+                    parameters: BTreeMap::new(),
                     priority: ActionPriority::Medium,
                     estimated_impact: prediction_score * 10.0,
                 }],

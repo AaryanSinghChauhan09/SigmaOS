@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -20,11 +21,15 @@
 // OOP-based memory leak detection with tracking and analysis
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{HashMap, HashSet};
+use crate::klib::BTreeMap;
 
 #[cfg(feature = "standalone_test")]
-use std::collections::{HashMap, HashSet};
+use std::collections::BTreeMap;
 
+#[cfg(not(feature = "standalone_test"))]
+use std::time::{Duration, Instant};
+
+#[cfg(feature = "standalone_test")]
 use std::time::{Duration, Instant};
 
 /// Memory allocation record
@@ -79,16 +84,16 @@ pub trait LeakDetectionStrategy {
 
 /// Reference counting leak detector
 pub struct ReferenceCountingDetector {
-    allocations: HashMap<usize, AllocationRecord>,
-    reference_counts: HashMap<usize, usize>,
+    allocations: BTreeMap<usize, AllocationRecord>,
+    reference_counts: BTreeMap<usize, usize>,
 }
 
 impl ReferenceCountingDetector {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            allocations: HashMap::new(),
-            reference_counts: HashMap::new(),
+            allocations: BTreeMap::new(),
+            reference_counts: BTreeMap::new(),
         }
     }
 }
@@ -114,7 +119,7 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
         let leaked_allocations = self.allocations.len();
         let total_leaked_bytes: u64 = self.allocations.values().map(|r| r.size as u64).sum();
 
-        let mut leak_locations: HashMap<String, LeakLocation> = HashMap::new();
+        let mut leak_locations: BTreeMap<String, LeakLocation> = BTreeMap::new();
 
         for record in self.allocations.values() {
             let stack_key = record.stack_trace.join(" | ");
@@ -154,7 +159,7 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
 
 /// Time-based leak detector
 pub struct TimeBasedDetector {
-    allocations: HashMap<usize, AllocationRecord>,
+    allocations: BTreeMap<usize, AllocationRecord>,
     leak_threshold: Duration,
 }
 
@@ -162,7 +167,7 @@ impl TimeBasedDetector {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            allocations: HashMap::new(),
+            allocations: BTreeMap::new(),
             leak_threshold: Duration::from_secs(60), // 1 minute threshold
         }
     }
@@ -195,7 +200,7 @@ impl LeakDetectionStrategy for TimeBasedDetector {
         let leaked_count = leaked_allocations.len();
         let total_leaked_bytes: u64 = leaked_allocations.iter().map(|r| r.size as u64).sum();
 
-        let mut leak_locations: HashMap<String, LeakLocation> = HashMap::new();
+        let mut leak_locations: BTreeMap<String, LeakLocation> = BTreeMap::new();
 
         for record in leaked_allocations {
             let stack_key = record.stack_trace.join(" | ");
@@ -329,14 +334,14 @@ pub enum ReachabilityStatus {
 
 /// LeakSanitizer (LSan) Parity Pointer Reachability Detector
 pub struct LeakSanitizerDetector {
-    pub allocations: HashMap<usize, AllocationRecord>,
+    pub allocations: BTreeMap<usize, AllocationRecord>,
     pub root_pointers: HashSet<usize>, // Active root pointer set
 }
 
 impl LeakSanitizerDetector {
     pub fn new() -> Self {
         Self {
-            allocations: HashMap::new(),
+            allocations: BTreeMap::new(),
             root_pointers: HashSet::new(),
         }
     }
@@ -354,8 +359,8 @@ impl LeakSanitizerDetector {
     }
 
     /// Perform a full reachability scan on all heap allocations
-    pub fn scan_reachability(&self) -> HashMap<usize, ReachabilityStatus> {
-        let mut status_map = HashMap::new();
+    pub fn scan_reachability(&self) -> BTreeMap<usize, ReachabilityStatus> {
+        let mut status_map = BTreeMap::new();
         let mut visited = HashSet::new();
 
         // 1. Mark phase starting from our Root Set
@@ -406,23 +411,23 @@ impl LeakSanitizerDetector {
 
 /// AddressSanitizer-grade redzone guard zone violation detector
 pub struct AsanGuardZoneDetector {
-    pub allocations: HashMap<usize, AllocationRecord>,
+    pub allocations: BTreeMap<usize, AllocationRecord>,
     pub redzone_size: usize,
-    pub redzones: HashMap<usize, Vec<u8>>, // address -> redzone magic bytes pattern
+    pub redzones: BTreeMap<usize, Vec<u8>>, // address -> redzone magic bytes pattern
 }
 
 impl AsanGuardZoneDetector {
     pub fn new(redzone_size: usize) -> Self {
         Self {
-            allocations: HashMap::new(),
+            allocations: BTreeMap::new(),
             redzone_size,
-            redzones: HashMap::new(),
+            redzones: BTreeMap::new(),
         }
     }
 
     pub fn track_allocation(&mut self, record: AllocationRecord) {
         let mut magic_pattern = Vec::new();
-        for i in 0..self.redzone_size {
+        for _i in 0..self.redzone_size {
             magic_pattern.push(0xFA); // Standard ASan Heap Redzone marker byte
         }
         self.redzones.insert(record.address + record.size, magic_pattern);
@@ -448,7 +453,7 @@ impl AsanGuardZoneDetector {
 /// Valgrind & AddressSanitizer Use-After-Free (UAF) Quarantine queue
 pub struct UseAfterFreeQuarantine {
     pub quarantine_queue: Vec<usize>,
-    pub allocations: HashMap<usize, AllocationRecord>,
+    pub allocations: BTreeMap<usize, AllocationRecord>,
     pub limit: usize,
 }
 
@@ -456,7 +461,7 @@ impl UseAfterFreeQuarantine {
     pub fn new(limit: usize) -> Self {
         Self {
             quarantine_queue: Vec::new(),
-            allocations: HashMap::new(),
+            allocations: BTreeMap::new(),
             limit,
         }
     }

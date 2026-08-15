@@ -42,6 +42,8 @@ pub struct RegisterSet {
     pub rbx: u64,
     pub rcx: u64,
     pub rdx: u64,
+    pub rdi: u64, // General Purpose / Destination Index (Syscall arg 1)
+    pub rsi: u64, // General Purpose / Source Index (Syscall arg 2)
     pub cr0: u64, // Control Register 0: Bit 0 is PE (Protection Enable), Bit 3 is TS (Task Switched)
     pub cr3: u64, // Control Register 3: Page Table Base Address
     pub cr4: u64, // Control Register 4: Os Support for SSE/XSAVE
@@ -56,6 +58,9 @@ pub struct ModelSpecificRegisters {
     pub star: u64,   // Segment selector for SYSENTER/SYSEXIT
     pub lstar: u64,  // Target RIP for 64-bit SYSCALL
     pub sfmask: u64, // RFLAGS mask for SYSCALL
+    pub fs_base: u64, // Thread Local Storage (TLS) pointer (Linux/BSD standard)
+    pub gs_base: u64, // Per-CPU data block pointer
+    pub kernel_gs_base: u64, // Saved kernel GS base pointer (swapped on transition)
 }
 
 /// Sovereign Virtual CPU managing execution state and privilege boundaries
@@ -80,6 +85,8 @@ impl SovereignVirtualCPU {
                 rbx: 0,
                 rcx: 0,
                 rdx: 0,
+                rdi: 0,
+                rsi: 0,
                 cr0: 0,
                 cr3: 0,
                 cr4: 0,
@@ -91,6 +98,9 @@ impl SovereignVirtualCPU {
                 star: 0,
                 lstar: 0,
                 sfmask: 0,
+                fs_base: 0,
+                gs_base: 0,
+                kernel_gs_base: 0,
             },
             stack_memory: vec![0; 128], // 128 stack frames
             fp_dirty: false,
@@ -237,6 +247,13 @@ impl SovereignVirtualCPU {
         self.registers.rip = handler_rip;
 
         Ok(())
+    }
+
+    /// Emulates the x86 `SWAPGS` instruction (Linux/BSD transition from user space to kernel space).
+    pub fn swapgs(&mut self) {
+        let temp = self.msrs.gs_base;
+        self.msrs.gs_base = self.msrs.kernel_gs_base;
+        self.msrs.kernel_gs_base = temp;
     }
 
     /// Lazily handles floating-point/vector register context switches (Linux/BSD style).

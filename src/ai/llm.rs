@@ -193,317 +193,6 @@ impl InferenceResponse {
     }
 }
 
-// =========================================================================
-// xAI Grok-1 Parity Subsystems
-// =========================================================================
-
-/// Represent the multi-host JAX tensor parallel layout coordinate specs.
-/// Re-implements column/row-wise partitioning patterns over an N-dimensional mesh.
-#[derive(Debug, Clone)]
-pub struct JaxTensorSharding {
-    pub mesh_dims: Vec<usize>, // e.g., [2, 4] for 2-way pipeline, 4-way tensor parallel mesh
-    pub slice_names: Vec<String>, // e.g., ["data", "model"]
-}
-
-impl JaxTensorSharding {
-    pub fn new(mesh_dims: Vec<usize>, slice_names: Vec<String>) -> Self {
-        Self {
-            mesh_dims,
-            slice_names,
-        }
-    }
-
-    /// Calculate the host slice coordinate bounds for column-parallel sharded weights.
-    pub fn get_column_sharded_bounds(
-        &self,
-        total_columns: usize,
-        host_rank: usize,
-    ) -> (usize, usize) {
-        let total_hosts: usize = self.mesh_dims.iter().product();
-        if total_hosts == 0 {
-            return (0, total_columns);
-        }
-        let shard_size = total_columns / total_hosts;
-        let start = (host_rank % total_hosts) * shard_size;
-        let end = (start + shard_size).min(total_columns);
-        (start, end)
-    }
-
-    /// Calculate the bounds for row-parallel sharded weights.
-    pub fn get_row_sharded_bounds(&self, total_rows: usize, host_rank: usize) -> (usize, usize) {
-        let total_hosts: usize = self.mesh_dims.iter().product();
-        if total_hosts == 0 {
-            return (0, total_rows);
-        }
-        let shard_size = total_rows / total_hosts;
-        let start = (host_rank % total_hosts) * shard_size;
-        let end = (start + shard_size).min(total_rows);
-        (start, end)
-    }
-}
-
-/// Grok-1 SwiGLU Activation Function: Swish(x * W) * (x * V)
-/// Swish(x) = x * sigmoid(beta * x) (with beta usually equal to 1.0)
-pub struct SwiGluActivation;
-
-impl SwiGluActivation {
-    /// In no_std, we approximate sigmoid: 1 / (1 + exp(-x)) using a fast, high-fidelity approximation.
-    pub fn fast_sigmoid(x: f32) -> f32 {
-        1.0 / (1.0 + Self::fast_exp(-x))
-    }
-
-    /// Approximation of e^x
-    /// Optimised by Bolt ⚡: Fully unrolled Taylor series expansion using pre-computed factorial reciprocals
-    /// to completely eliminate floating-point divisions and loop branching overhead in hot path.
-    pub fn fast_exp(x: f32) -> f32 {
-        let x2 = x * x;
-        let x3 = x2 * x;
-        let x4 = x3 * x;
-        let x5 = x4 * x;
-        let x6 = x5 * x;
-        let x7 = x6 * x;
-        let x8 = x7 * x;
-        let x9 = x8 * x;
-
-        1.0 + x
-            + x2 * 0.5
-            + x3 * 0.16666667
-            + x4 * 0.041666668
-            + x5 * 0.008333333
-            + x6 * 0.0013888889
-            + x7 * 0.0001984127
-            + x8 * 0.000024801587
-            + x9 * 0.0000027557319
-    }
-
-    /// Compute the SwiGLU gating activation over dual input channels.
-    pub fn forward(x_w: &[f32], x_v: &[f32], output: &mut [f32]) {
-        let len = x_w.len().min(x_v.len()).min(output.len());
-        for i in 0..len {
-            let swish = x_w[i] * Self::fast_sigmoid(x_w[i]);
-            output[i] = swish * x_v[i];
-        }
-    }
-}
-
-/// Grok-1 Mixture-of-Experts Router.
-/// Manages N experts, Top-E gating with softmax scores, capacity load-balancing, and auxiliary entropy loss estimation.
-#[derive(Debug, Clone)]
-pub struct GrokMoeRouter {
-    pub num_experts: usize,
-    pub active_experts_per_token: usize,
-    pub expert_capacities: Vec<usize>,
-}
-
-impl GrokMoeRouter {
-    pub fn new(num_experts: usize, active_experts_per_token: usize) -> Self {
-        Self {
-            num_experts,
-            active_experts_per_token,
-            expert_capacities: vec![0; num_experts],
-        }
-    }
-
-    /// Route tokens using a simulated routing matrix. Returns a tuple of
-    /// (Selected Experts per token, Gating Softmax Scores, Load Balancing Loss).
-    pub fn route_tokens(
-        &mut self,
-        token_embeddings: &[Vec<f32>],
-    ) -> (Vec<Vec<usize>>, Vec<Vec<f32>>, f32) {
-        let mut selected_experts = Vec::new();
-        let mut gating_scores = Vec::new();
-        let mut expert_use_count = vec![0; self.num_experts];
-
-        // Process routing projection for each token
-        for (token_idx, embed) in token_embeddings.iter().enumerate() {
-            // Compute deterministic raw score based on token embeddings to mock routing layer weights
-            let mut raw_scores = vec![0.0f32; self.num_experts];
-            for i in 0..self.num_experts {
-                let mut sum = 0.0;
-                for (j, &val) in embed.iter().enumerate() {
-                    // Simulated projection weight pseudo-hashes
-                    let w = ((i * 127 + j * 31) % 97) as f32 / 100.0 - 0.5;
-                    sum += val * w;
-                }
-                raw_scores[i] = sum;
-            }
-
-            // Softmax scores
-            let max_score = raw_scores.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
-            let mut exp_scores: Vec<f32> = raw_scores
-                .iter()
-                .map(|&s| SwiGluActivation::fast_exp(s - max_score))
-                .collect();
-            let sum_exp: f32 = exp_scores.iter().sum();
-            for score in exp_scores.iter_mut() {
-                *score /= sum_exp;
-            }
-
-            // Select top active_experts_per_token experts
-            let mut indexed_scores: Vec<(usize, f32)> = exp_scores
-                .iter()
-                .enumerate()
-                .map(|(idx, &s)| (idx, s))
-                .collect();
-            // Sort descending by score
-            indexed_scores
-                .sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(core::cmp::Ordering::Equal));
-
-            let mut active_experts = Vec::new();
-            let mut active_scores = Vec::new();
-            for i in 0..self.active_experts_per_token.min(self.num_experts) {
-                let (expert_id, score) = indexed_scores[i];
-                active_experts.push(expert_id);
-                active_scores.push(score);
-                expert_use_count[expert_id] += 1;
-            }
-
-            selected_experts.push(active_experts);
-            gating_scores.push(active_scores);
-        }
-
-        // Calculate load-balancing auxiliary loss to penalize expert starvation/overflow
-        // Loss is computed as: N * sum_{i=1}^{N}(f_i * P_i) where f_i is fractions of tokens dispatched to expert i
-        let total_dispatched: usize = expert_use_count.iter().sum();
-        let mut aux_loss = 0.0;
-        if total_dispatched > 0 {
-            for &count in &expert_use_count {
-                let f_i = count as f32 / total_dispatched as f32;
-                aux_loss += f_i * f_i; // Target flat uniform distribution
-            }
-            aux_loss *= self.num_experts as f32;
-        }
-
-        (selected_experts, gating_scores, aux_loss)
-    }
-}
-
-/// Rotary Position Embeddings (RoPE) as used by xAI's Grok-1 architecture.
-/// Applies rotary matrix rotations to Query/Key attention head channels.
-pub struct RotaryPositionEmbedding {
-    pub dim: usize,
-    pub base: f32,
-}
-
-impl RotaryPositionEmbedding {
-    pub fn new(dim: usize, base: f32) -> Self {
-        Self { dim, base }
-    }
-
-    /// Rotate Query or Key slices in-place for a specific sequence token position.
-    pub fn apply_rope(&self, vector: &mut [f32], position: usize) {
-        let half_dim = self.dim / 2;
-        for i in 0..half_dim {
-            if i * 2 + 1 >= vector.len() {
-                break;
-            }
-            // Theta scale = base ^ (-2i / dim)
-            let exponent = -2.0 * (i as f32) / (self.dim as f32);
-            let theta = SwiGluActivation::fast_exp(
-                exponent * SwiGluActivation::fast_exp((self.base).ln() as f32),
-            ); // Approximated
-            let angle = (position as f32) * theta;
-
-            // Simple Taylor approximation of cos and sin for no_std precision
-            let (cos_a, sin_a) = Self::approx_cos_sin(angle);
-
-            let v_even = vector[i * 2];
-            let v_odd = vector[i * 2 + 1];
-
-            // Complex rotation
-            vector[i * 2] = v_even * cos_a - v_odd * sin_a;
-            vector[i * 2 + 1] = v_even * sin_a + v_odd * cos_a;
-        }
-    }
-
-    /// Fast Taylor series approximation for cos and sin
-    pub fn approx_cos_sin(angle: f32) -> (f32, f32) {
-        // Wrap angle to [-PI, PI]
-        let mut norm_angle = angle % (2.0 * 3.14159265);
-        if norm_angle > 3.14159265 {
-            norm_angle -= 2.0 * 3.14159265;
-        } else if norm_angle < -3.14159265 {
-            norm_angle += 2.0 * 3.14159265;
-        }
-
-        // sin(x) = x - x^3/6 + x^5/120
-        let x2 = norm_angle * norm_angle;
-        let sin_val = norm_angle * (1.0 - x2 / 6.0 + (x2 * x2) / 120.0);
-
-        // cos(x) = 1 - x^2/2 + x^4/24
-        let cos_val = 1.0 - x2 / 2.0 + (x2 * x2) / 24.0;
-
-        (cos_val, sin_val)
-    }
-}
-
-/// Grouped-Query Attention (GQA) Head Mapper.
-/// Solves indexing maps to repeat/replicate Key-Value heads to Query attention groups.
-pub struct GrokGqaMapper {
-    pub num_query_heads: usize,
-    pub num_kv_heads: usize,
-}
-
-impl GrokGqaMapper {
-    pub fn new(num_query_heads: usize, num_kv_heads: usize) -> Self {
-        Self {
-            num_query_heads,
-            num_kv_heads,
-        }
-    }
-
-    /// Retrieve the corresponding KV head index for a given Query head.
-    pub fn map_query_to_kv_head(&self, query_head_idx: usize) -> usize {
-        if self.num_kv_heads == 0 {
-            return 0;
-        }
-        let group_size = self.num_query_heads / self.num_kv_heads;
-        if group_size == 0 {
-            return query_head_idx;
-        }
-        query_head_idx / group_size
-    }
-}
-
-/// Grok checkpoint dynamic weight streamer & virtual tensor page layout mapper.
-/// Lets SigmaOS stream terabytes of JAX model checkpoints directly from storage disks
-/// to local compute buffers on demand.
-pub struct GrokWeightStreamer {
-    pub checkpoint_path: String,
-    pub file_size: usize,
-    pub buffer: Vec<u8>,
-}
-
-impl GrokWeightStreamer {
-    pub fn new(checkpoint_path: String, file_size: usize) -> Self {
-        Self {
-            checkpoint_path,
-            file_size,
-            buffer: vec![0; 4096], // Simulated mapped frame page
-        }
-    }
-
-    /// Simulated read / memory map of specified model parameter offsets.
-    pub fn stream_parameter_slice(&mut self, offset: usize, size: usize) -> &[u8] {
-        if offset + size > self.file_size {
-            return &[];
-        }
-        if self.buffer.len() < size {
-            self.buffer.resize(size, 0);
-        }
-
-        // Mock stream load of JAX parameters into high-speed memory buffers
-        for i in 0..size {
-            self.buffer[i] = ((offset + i) % 256) as u8;
-        }
-        &self.buffer[0..size]
-    }
-}
-
-// =========================================================================
-// Existing LocalLlmEngine implementation & extensions
-// =========================================================================
-
 /// Local LLM inference engine
 pub struct LocalLlmEngine {
     config: LlmConfig,
@@ -524,11 +213,6 @@ impl LocalLlmEngine {
             config,
             loaded: false,
             cache_enabled: true,
-            sharding: JaxTensorSharding::new(
-                vec![1, 8],
-                vec!["data".to_string(), "model".to_string()],
-            ),
-            router: GrokMoeRouter::new(8, 2),
         }
     }
 
@@ -562,18 +246,15 @@ impl LocalLlmEngine {
 
         // Determine output based on format
         let text_output = match request.format {
-            InferenceFormat::Json => {
-                "{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON\"}"
-                    .to_string()
-            }
+            InferenceFormat::Json => "{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON\"}".to_string(),
             _ => "Generated response placeholder".to_string(),
         };
 
         // For now, return a placeholder response
-        let start_time = 0; // Would use actual timing
+        let _start_time = 0; // Would use actual timing
 
         let mut response = InferenceResponse::new(
-            "Generated response placeholder".to_string(),
+            text_output,
             10,
             100,
         );
@@ -643,7 +324,8 @@ impl LocalLlmEngine {
 
     /// Estimate memory usage
     pub fn estimate_memory_usage(&self) -> usize {
-        let base_size: u64 = 314_000_000_000; // 314B parameter Grok model representation
+        // Rough estimation based on model size and quantization
+        let base_size: u64 = 7_000_000_000; // 7GB for a 7B model in fp32
 
         let multiplier = match self.config.quantization {
             QuantizationType::Fp32 => 1.0,
@@ -734,6 +416,157 @@ impl StreamingInference {
     /// Get full response
     pub fn response(&self) -> &InferenceResponse {
         &self.response
+    }
+}
+
+// ============================================================================
+// OPEN SOURCE INSPIRED ADVANCEMENTS (vLLM, llama.cpp, Outlines)
+// ============================================================================
+
+/// PagedAttention KV-Cache Block Manager
+/// Inspired by **vLLM**'s memory virtual-paging allocation algorithm.
+/// Reduces memory fragmentation during generation via non-contiguous block tables.
+pub struct PagedAttentionCacheManager {
+    pub block_size_tokens: usize,
+    pub total_physical_blocks: usize,
+    pub block_alloc_map: Vec<bool>, // true = allocated, false = free
+    pub seq_block_table: Vec<(usize, Vec<usize>)>, // (seq_id, physical_blocks)
+}
+
+impl PagedAttentionCacheManager {
+    pub fn new(total_blocks: usize, block_size: usize) -> Self {
+        Self {
+            block_size_tokens: block_size,
+            total_physical_blocks: total_blocks,
+            block_alloc_map: vec![false; total_blocks],
+            seq_block_table: Vec::new(),
+        }
+    }
+
+    /// Allocate non-contiguous physical blocks for a logical token sequence
+    pub fn allocate_blocks_for_sequence(&mut self, seq_id: usize, token_count: usize) -> Result<Vec<usize>, String> {
+        let blocks_needed = (token_count + self.block_size_tokens - 1) / self.block_size_tokens;
+        let mut allocated = Vec::new();
+
+        for i in 0..self.total_physical_blocks {
+            if !self.block_alloc_map[i] {
+                self.block_alloc_map[i] = true;
+                allocated.push(i);
+                if allocated.len() == blocks_needed {
+                    break;
+                }
+            }
+        }
+
+        if allocated.len() < blocks_needed {
+            // Rollback allocation
+            for block in &allocated {
+                self.block_alloc_map[*block] = false;
+            }
+            return Err("Out of virtual GPU KV cache memory blocks".to_string());
+        }
+
+        self.seq_block_table.push((seq_id, allocated.clone()));
+        Ok(allocated)
+    }
+
+    /// Deallocate blocks associated with sequence ID
+    pub fn deallocate_sequence(&mut self, seq_id: usize) {
+        let mut found_idx = None;
+        for (i, (s_id, _)) in self.seq_block_table.iter().enumerate() {
+            if *s_id == seq_id {
+                found_idx = Some(i);
+                break;
+            }
+        }
+
+        if let Some(idx) = found_idx {
+            let (_, blocks) = self.seq_block_table.remove(idx);
+            for block in blocks {
+                if block < self.total_physical_blocks {
+                    self.block_alloc_map[block] = false;
+                }
+            }
+        }
+    }
+}
+
+/// Speculative Decoding Acceleration Engine
+/// Inspired by **llama.cpp** / draft model execution.
+/// Fast draft models speculate K tokens, validated in parallel by target model.
+pub struct SpeculativeDecodingEngine {
+    pub validation_threshold: f32,
+}
+
+impl SpeculativeDecodingEngine {
+    pub fn new(threshold: f32) -> Self {
+        Self {
+            validation_threshold: threshold,
+        }
+    }
+
+    /// Verifies draft tokens against target model validation probabilities.
+    /// Returns the subset of accepted speculative tokens and whether verification should halt.
+    pub fn validate_draft_tokens(
+        &self,
+        draft_tokens: &[u32],
+        target_token_probabilities: &[f32],
+    ) -> (Vec<u32>, bool) {
+        let mut accepted = Vec::with_capacity(draft_tokens.len());
+        let mut halt = false;
+
+        for (i, &token) in draft_tokens.iter().enumerate() {
+            let prob = target_token_probabilities.get(i).copied().unwrap_or(0.0);
+            if prob >= self.validation_threshold {
+                accepted.push(token);
+            } else {
+                // Speculative path diverged, truncate sequence here
+                halt = true;
+                break;
+            }
+        }
+
+        (accepted, halt)
+    }
+}
+
+/// CFG (Context-Free Grammar) & Regex Logits Constraint Processor
+/// Inspired by **Outlines** and **llama.cpp** custom GBNF grammar parser.
+/// Shapes LLM output by biasing/masking logits according to permissible state transitions.
+pub struct GrammarLogitsProcessor {
+    pub allowed_state_transitions: Vec<(usize, Vec<u32>)>, // (current_state, permissible_token_ids)
+}
+
+impl GrammarLogitsProcessor {
+    pub fn new() -> Self {
+        Self {
+            allowed_state_transitions: Vec::new(),
+        }
+    }
+
+    pub fn register_state_transitions(&mut self, state: usize, mut permissible_tokens: Vec<u32>) {
+        permissible_tokens.sort_unstable();
+        self.allowed_state_transitions.push((state, permissible_tokens));
+    }
+
+    /// Modifies logits array by setting non-permissible token scores to -infinity (-1e9)
+    pub fn apply_grammar_mask(&self, current_state: usize, logits: &mut [f32]) {
+        let mut allowed_tokens = None;
+        for (state, tokens) in &self.allowed_state_transitions {
+            if *state == current_state {
+                allowed_tokens = Some(tokens);
+                break;
+            }
+        }
+
+        if let Some(permissible) = allowed_tokens {
+            for (i, logit) in logits.iter_mut().enumerate() {
+                let token_id = i as u32;
+                if permissible.binary_search(&token_id).is_err() {
+                    *logit = -1e9; // Negate/mask out invalid token pathways
+                }
+            }
+        }
     }
 }
 
@@ -867,28 +700,6 @@ mod tests {
     }
 
     #[test]
-    fn test_jax_tensor_sharding() {
-        let sharding =
-            JaxTensorSharding::new(vec![2, 4], vec!["data".to_string(), "model".to_string()]);
-        // 2 * 4 = 8 hosts
-        let total_cols = 1024;
-        let (start, end) = sharding.get_column_sharded_bounds(total_cols, 3);
-        assert_eq!(end - start, 128);
-        assert_eq!(start, 3 * 128);
-    }
-
-    #[test]
-    fn test_moe_gating_and_balancing_loss() {
-        let mut router = GrokMoeRouter::new(8, 2);
-        let embeddings = vec![vec![0.1, -0.2, 0.4, 0.9], vec![-0.5, 0.8, 0.3, -0.1]];
-        let (experts, scores, loss) = router.route_tokens(&embeddings);
-        assert_eq!(experts.len(), 2);
-        assert_eq!(experts[0].len(), 2); // Top-2 experts
-        assert_eq!(scores[0].len(), 2);
-        assert!(loss > 0.0);
-    }
-
-    #[test]
     fn test_vercel_ai_sdk_tool_calling_and_structured_outputs() {
         let mut engine = LocalLlmEngine::new(LlmConfig::default());
         engine.load().unwrap();
@@ -913,25 +724,52 @@ mod tests {
     }
 
     #[test]
-    fn test_optimized_fast_exp() {
-        // e^0 = 1.0
-        let val0 = SwiGluActivation::fast_exp(0.0);
-        assert!((val0 - 1.0).abs() < 1e-5);
+    fn test_open_source_inspired_paged_attention_kv_cache() {
+        // Physical block size of 4, total 10 blocks (fits 40 tokens)
+        let mut manager = PagedAttentionCacheManager::new(10, 4);
 
-        // e^1 ≈ 2.71828
-        let val1 = SwiGluActivation::fast_exp(1.0);
-        assert!((val1 - 2.71828).abs() < 1e-3);
+        // Allocate blocks for a sequence needing 12 tokens (3 blocks logical)
+        let blocks = manager.allocate_blocks_for_sequence(42, 12).unwrap();
+        assert_eq!(blocks.len(), 3);
+        assert_eq!(manager.block_alloc_map[0], true);
+        assert_eq!(manager.block_alloc_map[2], true);
+        assert_eq!(manager.block_alloc_map[3], false);
 
-        // sigmoid(0) = 0.5
-        let sig0 = SwiGluActivation::fast_sigmoid(0.0);
-        assert!((sig0 - 0.5).abs() < 1e-5);
+        // Deallocate sequence
+        manager.deallocate_sequence(42);
+        assert_eq!(manager.block_alloc_map[0], false);
+        assert_eq!(manager.block_alloc_map[1], false);
+    }
 
-        // SwiGLU forward pass test
-        let x_w = vec![0.5, -1.0, 2.0];
-        let x_v = vec![1.5, 0.5, -0.5];
-        let mut out = vec![0.0; 3];
-        SwiGluActivation::forward(&x_w, &x_v, &mut out);
-        assert!(out[0] > 0.0);
-        assert!(out[1] < 0.0 || out[1] > -1.0);
+    #[test]
+    fn test_open_source_inspired_speculative_decoding() {
+        let engine = SpeculativeDecodingEngine::new(0.85);
+        let draft_tokens = vec![101, 102, 103, 104];
+        let target_probs = vec![0.98, 0.95, 0.40, 0.90]; // Token 103 is below 0.85 threshold
+
+        let (accepted, halt) = engine.validate_draft_tokens(&draft_tokens, &target_probs);
+        assert_eq!(accepted.len(), 2);
+        assert_eq!(accepted[0], 101);
+        assert_eq!(accepted[1], 102);
+        assert!(halt);
+    }
+
+    #[test]
+    fn test_open_source_inspired_grammar_logits() {
+        let mut processor = GrammarLogitsProcessor::new();
+        // State 0 allows only tokens 1 and 3
+        processor.register_state_transitions(0, vec![1, 3]);
+
+        let mut logits = vec![10.0, 5.0, 12.0, 8.0, 1.0]; // Token 0, 1, 2, 3, 4
+        processor.apply_grammar_mask(0, &mut logits);
+
+        // Token 1 and 3 scores should be unaffected
+        assert_eq!(logits[1], 5.0);
+        assert_eq!(logits[3], 8.0);
+
+        // Disallowed tokens should be masked to -1e9
+        assert_eq!(logits[0], -1e9);
+        assert_eq!(logits[2], -1e9);
+        assert_eq!(logits[4], -1e9);
     }
 }

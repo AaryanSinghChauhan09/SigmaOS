@@ -20,9 +20,24 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
+
+#[cfg(not(test))]
+use crate::klib::{BTreeMap, VecDeque};
+
+#[cfg(test)]
 use std::collections::{BTreeMap, VecDeque};
-use std::string::{String, ToString};
-use std::vec::Vec;
+
+#[cfg(not(test))]
+use crate::klib::SigmaString as String;
+
+#[cfg(test)]
+use alloc::string::String;
+
+#[cfg(not(test))]
+use crate::klib::Vec;
+
+#[cfg(test)]
+use alloc::vec::Vec;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks
@@ -249,7 +264,7 @@ impl BlockDevice for RamDisk {
 // ── Block device manager ──────────────────────────────────────────────────
 
 pub struct BlockDeviceManager {
-    devices: std::collections::HashMap<String, Box<dyn BlockDevice>>,
+    devices: alloc::collections::BTreeMap<String, Box<dyn BlockDevice>>,
     scheduler: DeadlineScheduler,
     bio_counter: AtomicU64,
 }
@@ -258,7 +273,7 @@ impl BlockDeviceManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BlockDeviceManager {
-            devices: std::collections::HashMap::new(),
+            devices: alloc::collections::BTreeMap::new(),
             scheduler: DeadlineScheduler::new(),
             bio_counter: AtomicU64::new(0),
         }

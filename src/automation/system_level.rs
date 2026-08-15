@@ -19,7 +19,7 @@
 // SigmaOS AI-Powered System-Level Automation
 // Extended Samsung Modes & Routines for system-level workflows
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 /// System event type
@@ -183,7 +183,7 @@ impl SystemAutomationRule {
         self
     }
 
-    pub fn matches(&self, event: SystemEventType, _context: &HashMap<String, f64>) -> bool {
+    pub fn matches(&self, event: SystemEventType, _context: &BTreeMap<String, f64>) -> bool {
         if self.trigger_event != event {
             return false;
         }
@@ -196,7 +196,7 @@ impl SystemAutomationRule {
 /// AI-powered system automation manager
 pub struct SystemAutomationManager {
     pub rules: Vec<SystemAutomationRule>,
-    pub performance_profiles: HashMap<String, PerformanceProfile>,
+    pub performance_profiles: BTreeMap<String, PerformanceProfile>,
     pub predictions: Vec<SystemPrediction>,
     pub current_profile: Option<String>,
     pub learning_enabled: bool,
@@ -208,7 +208,7 @@ impl SystemAutomationManager {
     pub fn new() -> Self {
         let mut manager = Self {
             rules: Vec::new(),
-            performance_profiles: HashMap::new(),
+            performance_profiles: BTreeMap::new(),
             predictions: Vec::new(),
             current_profile: None,
             learning_enabled: true,
@@ -311,7 +311,7 @@ impl SystemAutomationManager {
     pub fn handle_event(
         &mut self,
         event: SystemEventType,
-        context: HashMap<String, f64>,
+        context: BTreeMap<String, f64>,
     ) -> Vec<SystemAction> {
         let mut triggered_actions = Vec::new();
 
@@ -389,7 +389,7 @@ impl SystemAutomationManager {
     pub fn generate_prediction(
         &mut self,
         model_type: PredictiveModel,
-        context: &HashMap<String, f64>,
+        context: &BTreeMap<String, f64>,
     ) -> SystemPrediction {
         let predicted_value = match model_type {
             PredictiveModel::UsagePattern => context.get("cpu_usage").unwrap_or(&50.0) * 1.1,
@@ -450,7 +450,7 @@ impl SystemAutomationManager {
         self.adaptation_enabled = false;
     }
 
-    pub fn adapt_rules(&mut self, context: &HashMap<String, f64>) {
+    pub fn adapt_rules(&mut self, context: &BTreeMap<String, f64>) {
         if !self.adaptation_enabled || !self.learning_enabled {
             return;
         }
@@ -513,14 +513,14 @@ mod tests {
     #[test]
     fn test_event_handling() {
         let mut manager = SystemAutomationManager::new();
-        let actions = manager.handle_event(SystemEventType::CpuHighUsage, HashMap::new());
+        let actions = manager.handle_event(SystemEventType::CpuHighUsage, BTreeMap::new());
         assert!(!actions.is_empty());
     }
 
     #[test]
     fn test_prediction_generation() {
         let mut manager = SystemAutomationManager::new();
-        let mut context = HashMap::new();
+        let mut context = BTreeMap::new();
         context.insert("cpu_usage".to_string(), 75.0);
         let prediction = manager.generate_prediction(PredictiveModel::UsagePattern, &context);
         assert_eq!(prediction.model_type, PredictiveModel::UsagePattern);

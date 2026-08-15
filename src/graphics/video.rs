@@ -362,9 +362,111 @@ impl Default for StreamingOverlayManager {
     }
 }
 
+/// Simulated app window conforming to Zenith & elementaryOS Human Interface Guidelines (HIG)
+#[derive(Debug, Clone)]
+pub struct ZenithAppWindow {
+    pub id: u32,
+    pub title: String,
+    pub has_csd_titlebar: bool,       // Client-Side Decorations (CSD)
+    pub has_pure_black_dark_mode: bool, // Strict dark mode compliance
+    pub tap_target_width: u32,         // Minimum 44px
+    pub tap_target_height: u32,        // Minimum 44px
+}
+
+/// elementaryOS-inspired Human Interface Guidelines (HIG) Compliance Checker
+pub struct ElementaryHigChecker {
+    pub enforce_csd: bool,
+    pub enforce_pure_black_dark_mode: bool,
+    pub min_tap_target_size: u32, // standard 44px
+}
+
+impl ElementaryHigChecker {
+    pub fn new() -> Self {
+        Self {
+            enforce_csd: true,
+            enforce_pure_black_dark_mode: true,
+            min_tap_target_size: 44,
+        }
+    }
+
+    /// Evaluates if a window complies with strict elementaryOS HIG rules
+    pub fn evaluate_window_compliance(&self, window: &ZenithAppWindow) -> Result<bool, &'static str> {
+        if self.enforce_csd && !window.has_csd_titlebar {
+            return Err("elementaryOS HIG Violation: Must use Client-Side Decorations (CSD) titlebar");
+        }
+        if self.enforce_pure_black_dark_mode && !window.has_pure_black_dark_mode {
+            return Err("elementaryOS HIG Violation: Missing toggleable pure-black dark mode support");
+        }
+        if window.tap_target_width < self.min_tap_target_size || window.tap_target_height < self.min_tap_target_size {
+            return Err("elementaryOS HIG Violation: Touch/tap target size must be at least 44x44px");
+        }
+        Ok(true)
+    }
+
+    /// wingpanel focus-first notification filtering helper
+    pub fn filter_wingpanel_notification(&self, is_focus_mode: bool, alert_severity: u32) -> bool {
+        if !is_focus_mode {
+            return true; // Focus Mode off: allow all notifications
+        }
+        // Focus Mode on (Do Not Disturb): only critical alerts bypass the filter
+        alert_severity >= 8
+    }
+}
+
+impl Default for ElementaryHigChecker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_elementary_hig_checker() {
+        let checker = ElementaryHigChecker::new();
+
+        // 1. Fully compliant window
+        let compliant_app = ZenithAppWindow {
+            id: 1,
+            title: "App Boutique".to_string(),
+            has_csd_titlebar: true,
+            has_pure_black_dark_mode: true,
+            tap_target_width: 44,
+            tap_target_height: 50,
+        };
+        assert!(checker.evaluate_window_compliance(&compliant_app).is_ok());
+
+        // 2. Non-compliant: missing CSD
+        let mut app = compliant_app.clone();
+        app.has_csd_titlebar = false;
+        assert_eq!(
+            checker.evaluate_window_compliance(&app).unwrap_err(),
+            "elementaryOS HIG Violation: Must use Client-Side Decorations (CSD) titlebar"
+        );
+
+        // 3. Non-compliant: missing dark mode
+        let mut app = compliant_app.clone();
+        app.has_pure_black_dark_mode = false;
+        assert_eq!(
+            checker.evaluate_window_compliance(&app).unwrap_err(),
+            "elementaryOS HIG Violation: Missing toggleable pure-black dark mode support"
+        );
+
+        // 4. Non-compliant: small tap target
+        let mut app = compliant_app.clone();
+        app.tap_target_width = 40;
+        assert_eq!(
+            checker.evaluate_window_compliance(&app).unwrap_err(),
+            "elementaryOS HIG Violation: Touch/tap target size must be at least 44x44px"
+        );
+
+        // 5. wingpanel Focus Mode (Do Not Disturb) filtering check
+        assert!(checker.filter_wingpanel_notification(false, 3)); // allowed
+        assert!(!checker.filter_wingpanel_notification(true, 3)); // blocked (severity < 8)
+        assert!(checker.filter_wingpanel_notification(true, 9));  // allowed (critical alert)
+    }
 
     #[test]
     fn test_video_clip_creation() {

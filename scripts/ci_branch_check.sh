@@ -1,8 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: MIT
 # SigmaOS CI Branch Parity and Feature Matrix Verification Script
 # Verifies presence of core strategic roadmap and documentation assets on active branches.
 
-set -e
+set -eo pipefail
 
 BRANCH=""
 
@@ -17,8 +18,9 @@ done
 echo "=== SigmaOS CI Branch Parity Check ==="
 echo "Active target branch: ${BRANCH:-unknown}"
 
-# Verify presence of core strategic files
+# Verify presence of core strategic files aligned with the current repository branch
 REQUIRED_FILES=(
+    "DETAILED_IMPROVEMENT_PLAN.md"
     "FUTURE-DEVELOPMENT-ROADMAP.md"
     "Cargo.toml"
     "Makefile"

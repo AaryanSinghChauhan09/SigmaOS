@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Uniq Compatibility
 //! Filter adjacent matching lines (uniq command)
@@ -43,7 +44,7 @@ pub unsafe extern "C" fn uniq_init() -> SigmaI32 {
 /// Add line to uniq
 #[no_mangle]
 pub unsafe extern "C" fn uniq_add_line(line: *const u8) -> SigmaI32 {
-    if !UNIQ_INITIALIZED || line.isnull() || UNIQ_LINE_COUNT >= MAX_LINES as SigmaU32 {
+    if !UNIQ_INITIALIZED || line.is_null() || UNIQ_LINE_COUNT >= MAX_LINES as SigmaU32 {
         return -1;
     }
     
@@ -65,7 +66,7 @@ pub unsafe extern "C" fn uniq_execute(
     max_output: SigmaU32,
     options: UniqOptions,
 ) -> SigmaU32 {
-    if !UNIQ_INITIALIZED || output.isnull() || UNIQ_LINE_COUNT == 0 {
+    if !UNIQ_INITIALIZED || output.is_null() || UNIQ_LINE_COUNT == 0 {
         return 0;
     }
     

@@ -1,3 +1,8 @@
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+#[cfg(not(target_os = "none"))]
+use std_alloc::boxed::Box;
+
 #![no_std]
 #![cfg_attr(not(test), no_main)]
 

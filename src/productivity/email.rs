@@ -19,7 +19,7 @@
 // SigmaOS Email Client
 // OOP-based email client with IMAP/SMTP support and organization
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Email address
 #[derive(Debug, Clone)]
@@ -127,14 +127,14 @@ pub trait EmailBackend {
 /// IMAP/SMTP backend
 pub struct ImapSmtpBackend {
     config: EmailAccountConfig,
-    emails: HashMap<String, EmailMessage>,
+    emails: BTreeMap<String, EmailMessage>,
 }
 
 impl ImapSmtpBackend {
     pub fn new(config: EmailAccountConfig) -> Self {
         Self {
             config,
-            emails: HashMap::new(),
+            emails: BTreeMap::new(),
         }
     }
 }

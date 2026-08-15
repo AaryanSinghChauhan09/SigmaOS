@@ -23,8 +23,8 @@
 // 2. ClawVoiceTranscriber (Acoustic frame feature-extraction & S-CLI mapper)
 // 3. ClawChatIntegrator (Chat webhook alert triggers and GitHub triage)
 
-use std::collections::{HashMap, VecDeque};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::collections::{BTreeMap, VecDeque};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 // ==========================================
 // 1. ClawBackgroundDaemon
@@ -135,7 +135,7 @@ pub enum AlertPlatform {
 }
 
 pub struct ClawChatIntegrator {
-    pub webhook_endpoints: HashMap<AlertPlatform, String>,
+    pub webhook_endpoints: BTreeMap<AlertPlatform, String>,
     pub transmitted_alerts: Vec<(AlertPlatform, String)>,
 }
 
@@ -143,7 +143,7 @@ impl ClawChatIntegrator {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            webhook_endpoints: HashMap::new(),
+            webhook_endpoints: BTreeMap::new(),
             transmitted_alerts: Vec::new(),
         }
     }

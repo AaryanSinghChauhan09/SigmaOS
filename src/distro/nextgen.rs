@@ -16,7 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Represents an AI SysAdmin Recommendation or Action
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -84,7 +84,7 @@ pub enum IntegrityState {
 /// Post-Quantum Cryptographically Enforced Self-Healing engine
 #[derive(Debug, Clone)]
 pub struct PqcSelfHealing {
-    pub active_signed_hashes: HashMap<String, String>, // filepath -> Dilithium-5 signature
+    pub active_signed_hashes: BTreeMap<String, String>, // filepath -> Dilithium-5 signature
     pub isolation_log: Vec<String>,
 }
 
@@ -92,7 +92,7 @@ impl PqcSelfHealing {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            active_signed_hashes: HashMap::new(),
+            active_signed_hashes: BTreeMap::new(),
             isolation_log: Vec::new(),
         }
     }
@@ -135,7 +135,7 @@ pub struct P2pNode {
 #[derive(Debug, Clone)]
 pub struct SovereignP2PSync {
     pub active_peers: Vec<P2pNode>,
-    pub package_checksums: HashMap<String, String>, // pkg_name -> sha256
+    pub package_checksums: BTreeMap<String, String>, // pkg_name -> sha256
 }
 
 impl SovereignP2PSync {
@@ -143,7 +143,7 @@ impl SovereignP2PSync {
     pub fn new() -> Self {
         Self {
             active_peers: Vec::new(),
-            package_checksums: HashMap::new(),
+            package_checksums: BTreeMap::new(),
         }
     }
 
@@ -231,14 +231,14 @@ pub struct NetplanConfig {
 }
 
 pub struct NetplanManager {
-    pub configurations: HashMap<String, NetplanConfig>,
+    pub configurations: BTreeMap<String, NetplanConfig>,
 }
 
 impl NetplanManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            configurations: HashMap::new(),
+            configurations: BTreeMap::new(),
         }
     }
 
@@ -278,7 +278,7 @@ pub struct LivepatchPatch {
 }
 
 pub struct LivepatchManager {
-    pub active_patches: HashMap<String, LivepatchPatch>,
+    pub active_patches: BTreeMap<String, LivepatchPatch>,
     pub redirection_log: Vec<String>,
 }
 
@@ -286,7 +286,7 @@ impl LivepatchManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            active_patches: HashMap::new(),
+            active_patches: BTreeMap::new(),
             redirection_log: Vec::new(),
         }
     }

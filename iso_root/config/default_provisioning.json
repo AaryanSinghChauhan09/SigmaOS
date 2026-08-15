@@ -1,0 +1,8 @@
+{
+  "system": {
+    "profile": "standalone",
+    "architecture": "x86_64",
+    "sovereignty_level": "maximum",
+    "capabilities": ["stdio", "network", "ipc", "graphics"]
+  }
+}

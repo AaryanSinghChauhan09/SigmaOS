@@ -20,21 +20,32 @@
 // System-level utilities and tools
 
 pub mod cleanup;
+pub mod config;
+pub mod cron;
 pub mod defrag;
 pub mod duplicate;
 pub mod generation_manager;
 pub mod memory;
 pub mod optimizer;
 pub mod power;
+pub mod process_supervisor;
 pub mod sandbox;
 pub mod shredder;
 pub mod snapshot;
 pub mod startup;
 pub mod state;
+pub mod syslog;
+pub mod user;
 
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
     SystemCleanupManager, TempFileStrategy,
+};
+pub use config::{
+    ConfigEntry, ConfigError, ConfigType, ServiceManager, ServiceUnit, SystemConfigManager,
+};
+pub use cron::{
+    CronJob, CronSchedule, CronManager, CronError,
 };
 pub use defrag::{
     DefragError, DefragResult, DefragStrategy, DiskDefragmenter, FileBlockInfo,
@@ -57,6 +68,9 @@ pub use power::{
     BatterySaverManager, BatteryStatus, CpuPowerStrategy, DisplayPowerStrategy,
     NetworkPowerStrategy, PowerError, PowerMode, PowerResult, PowerStrategy,
 };
+pub use process_supervisor::{
+    ProcessConfig, ProcessState, ProcessStatus, ProcessSupervisor, SupervisorError,
+};
 pub use sandbox::{
     CapabilitySandboxEnforcer, NamespaceSandboxEnforcer, NetworkPolicy, ProcessSandboxManager,
     ResourceLimits, ResourceUsage, SandboxEnforcement, SandboxError, SandboxOperation,
@@ -78,4 +92,10 @@ pub use startup::{
 pub use state::{
     DeclarativeStateGraph, StateError, StateNode, StateValue, SystemConfiguration,
     get_system_config, get_system_config_mut, init_system_config,
+};
+pub use syslog::{
+    LogLevel, LogFacility, LogEntry, SyslogManager, LogRule, LogAction, SyslogError,
+};
+pub use user::{
+    Group, User, UserError, UserManager,
 };

@@ -1,11 +1,15 @@
-/// Advanced High-Fidelity Interrupt & Exception Handler for SigmaOS
-/// Models standard x86/x64 CPU register states, AMD64 canonical address checks, exception ISR routers, and PIC/APIC controllers.
+// Advanced High-Fidelity Interrupt & Exception Handler for SigmaOS
+// Models standard x86/x64 CPU register states, AMD64 canonical address checks, exception ISR routers, and PIC/APIC controllers.
+// Enhanced with advanced GDB/WinDbg-inspired Predefined and User-Defined Pseudo Registers
 
 extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::boxed::Box;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::string::ToString;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 pub type InterruptNumber = u32;
 
@@ -220,6 +224,121 @@ impl InterruptManager {
     }
 }
 
+impl Default for InterruptManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Predefined and User-Defined Pseudo Registers
+// ==========================================
+
+/// GDB/WinDbg-inspired Predefined Pseudo Registers
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PredefinedPseudoRegister {
+    Pid,            // Current process ID
+    Tid,            // Current thread ID
+    Irql,           // Current Interrupt Request Level
+    KernelBase,     // Virtual kernel load base
+    Pc,             // Alias for Program Counter (RIP/EIP)
+    Sp,             // Alias for Stack Pointer (RSP/ESP)
+    Fp,             // Alias for Frame Pointer (RBP/EBP)
+    PageTableBase,  // CR3 / Page Directory base pointer representation
+}
+
+/// Manager of Predefined and User-Defined Pseudo Registers
+pub struct SovereignPseudoRegisterManager {
+    // Current virtual/emulated execution states
+    pub pid: u32,
+    pub tid: u32,
+    pub irql: u8,
+    pub kernel_base: u64,
+    pub page_table_base: u64,
+
+    // User-defined pseudo registers (GDB convenience variables e.g., $t0, $t1, $my_var)
+    pub user_defined: BTreeMap<String, u64>,
+}
+
+impl SovereignPseudoRegisterManager {
+    pub fn new() -> Self {
+        Self {
+            pid: 0,
+            tid: 0,
+            irql: 0,
+            kernel_base: 0xFFFFFFFF80000000, // standard x86_64 kernel load base
+            page_table_base: 0x1000,
+            user_defined: BTreeMap::new(),
+        }
+    }
+
+    /// Read value of a predefined pseudo register
+    pub fn read_predefined(&self, reg: PredefinedPseudoRegister, regs: &RegisterSet) -> u64 {
+        match reg {
+            PredefinedPseudoRegister::Pid => self.pid as u64,
+            PredefinedPseudoRegister::Tid => self.tid as u64,
+            PredefinedPseudoRegister::Irql => self.irql as u64,
+            PredefinedPseudoRegister::KernelBase => self.kernel_base,
+            PredefinedPseudoRegister::Pc => regs.rip,
+            PredefinedPseudoRegister::Sp => regs.rsp,
+            PredefinedPseudoRegister::Fp => regs.rbp,
+            PredefinedPseudoRegister::PageTableBase => self.page_table_base,
+        }
+    }
+
+    /// Retrieve register value by its pseudo-register name (supporting "$" prefix)
+    pub fn read_pseudo_register(&self, name: &str, regs: &RegisterSet) -> Option<u64> {
+        let clean_name = name.trim_start_matches('$');
+        match clean_name {
+            "pid" | "proc_id" => Some(self.read_predefined(PredefinedPseudoRegister::Pid, regs)),
+            "tid" | "thread_id" => Some(self.read_predefined(PredefinedPseudoRegister::Tid, regs)),
+            "irql" => Some(self.read_predefined(PredefinedPseudoRegister::Irql, regs)),
+            "kernel_base" | "kbase" => Some(self.read_predefined(PredefinedPseudoRegister::KernelBase, regs)),
+            "pc" | "ip" | "rip" => Some(self.read_predefined(PredefinedPseudoRegister::Pc, regs)),
+            "sp" | "rsp" => Some(self.read_predefined(PredefinedPseudoRegister::Sp, regs)),
+            "fp" | "rbp" => Some(self.read_predefined(PredefinedPseudoRegister::Fp, regs)),
+            "cr3" | "pg_base" | "page_table_base" => Some(self.read_predefined(PredefinedPseudoRegister::PageTableBase, regs)),
+            _ => {
+                // Check user-defined pseudo registers map
+                self.user_defined.get(clean_name).copied()
+            }
+        }
+    }
+
+    /// Write value to a user-defined pseudo register
+    pub fn write_user_defined_register(&mut self, name: &str, value: u64) -> Result<(), &'static str> {
+        let clean_name = name.trim_start_matches('$');
+
+        // Cannot overwrite predefined pseudo register names
+        match clean_name {
+            "pid" | "proc_id" | "tid" | "thread_id" | "irql" | "kernel_base" | "kbase"
+            | "pc" | "ip" | "rip" | "sp" | "rsp" | "fp" | "rbp" | "cr3" | "pg_base"
+            | "page_table_base" => {
+                return Err("PseudoRegister: Cannot overwrite a predefined pseudo register name");
+            }
+            _ => {}
+        }
+
+        if clean_name.is_empty() {
+            return Err("PseudoRegister: Name cannot be empty");
+        }
+
+        self.user_defined.insert(clean_name.to_string(), value);
+        Ok(())
+    }
+
+    /// Clear all user-defined convenience variable registers
+    pub fn clear_user_defined(&mut self) {
+        self.user_defined.clear();
+    }
+}
+
+impl Default for SovereignPseudoRegisterManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -278,5 +397,58 @@ mod tests {
         let res = manager.dispatch_exception(ExceptionVector::GeneralProtectionFault, &mut regs);
         assert_eq!(res, InterruptResult::Handled); // Core GPF handler intercepts and overrides
         assert_eq!(manager.stats.gpf_faults, 1);
+    }
+
+    // ==========================================
+    // Pseudo Registers Tests
+    // ==========================================
+
+    #[test]
+    fn test_predefined_pseudo_registers() {
+        let mut regs = RegisterSet::default();
+        regs.rip = 0x1111222233334444;
+        regs.rsp = 0xAAAA_BBBB_CCCC_DDDD;
+        regs.rbp = 0x5555_6666_7777_8888;
+
+        let mut mgr = SovereignPseudoRegisterManager::new();
+        mgr.pid = 42;
+        mgr.tid = 1337;
+        mgr.irql = 2; // DPC_LEVEL
+
+        // Test basic enum read
+        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Pid, &regs), 42);
+        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Tid, &regs), 1337);
+        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Irql, &regs), 2);
+        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Pc, &regs), 0x1111222233334444);
+        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Sp, &regs), 0xAAAA_BBBB_CCCC_DDDD);
+        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Fp, &regs), 0x5555_6666_7777_8888);
+
+        // Test string name resolution with/without "$" prefix
+        assert_eq!(mgr.read_pseudo_register("$pid", &regs), Some(42));
+        assert_eq!(mgr.read_pseudo_register("tid", &regs), Some(1337));
+        assert_eq!(mgr.read_pseudo_register("$pc", &regs), Some(0x1111222233334444));
+        assert_eq!(mgr.read_pseudo_register("$cr3", &regs), Some(0x1000));
+    }
+
+    #[test]
+    fn test_user_defined_pseudo_registers() {
+        let regs = RegisterSet::default();
+        let mut mgr = SovereignPseudoRegisterManager::new();
+
+        // Register custom convenience variables
+        assert!(mgr.write_user_defined_register("$t0", 0x12345).is_ok());
+        assert!(mgr.write_user_defined_register("my_temp_var", 9999).is_ok());
+
+        assert_eq!(mgr.read_pseudo_register("$t0", &regs), Some(0x12345));
+        assert_eq!(mgr.read_pseudo_register("my_temp_var", &regs), Some(9999));
+        assert_eq!(mgr.read_pseudo_register("nonexistent", &regs), None);
+
+        // Disallow overwriting predefined register names
+        assert!(mgr.write_user_defined_register("$pid", 100).is_err());
+        assert!(mgr.write_user_defined_register("rip", 200).is_err());
+
+        // Clear works
+        mgr.clear_user_defined();
+        assert_eq!(mgr.read_pseudo_register("$t0", &regs), None);
     }
 }

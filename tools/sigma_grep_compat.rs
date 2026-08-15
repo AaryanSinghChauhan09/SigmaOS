@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Grep Compatibility
 //! Text search (grep command)
@@ -64,7 +65,7 @@ pub unsafe extern "C" fn grep_search(
     matches: *mut GrepMatch,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !GREP_INITIALIZED || pattern.isnull() || file_path.isnull() || matches.isnull() {
+    if !GREP_INITIALIZED || pattern.is_null() || file_path.is_null() || matches.is_null() {
         return 0;
     }
     
@@ -95,7 +96,7 @@ pub unsafe extern "C" fn grep_search_regex(
     matches: *mut GrepMatch,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !GREP_INITIALIZED || pattern.isnull() || file_path.isnull() || matches.isnull() {
+    if !GREP_INITIALIZED || pattern.is_null() || file_path.is_null() || matches.is_null() {
         return 0;
     }
     
@@ -110,7 +111,7 @@ pub unsafe extern "C" fn grep_count(
     file_path: *const u8,
     options: GrepOptions,
 ) -> SigmaU32 {
-    if !GREP_INITIALIZED || pattern.isnull() || file_path.isnull() {
+    if !GREP_INITIALIZED || pattern.is_null() || file_path.is_null() {
         return 0;
     }
     
@@ -160,7 +161,7 @@ pub unsafe extern "C" fn grep_add_match(
         match_length,
     };
     
-    if !file_path.isnull() {
+    if !file_path.is_null() {
         for i in 0..511 {
             let byte = *file_path.add(i);
             if byte == 0 { break; }
@@ -168,7 +169,7 @@ pub unsafe extern "C" fn grep_add_match(
         }
     }
     
-    if !line_content.isnull() {
+    if !line_content.is_null() {
         for i in 0..1023 {
             let byte = *line_content.add(i);
             if byte == 0 { break; }

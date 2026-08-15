@@ -1,15 +1,7 @@
-// SigmaOS Boot Module
-// Firmware, PCI scanning, and early system initialization
+//! Boot System (GRUB2/systemd-boot/refind Inspiration)
+//! Advanced boot manager with themes, secure boot, and boot environments
 
-pub mod bridge_grid;
-pub mod firmware;
-pub mod firmware_bridge;
-pub mod optimization;
-pub mod pci;
-pub mod post;
-pub mod secure;
-pub mod uefi;
-pub mod verified;
+#![no_std]
 
 pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};

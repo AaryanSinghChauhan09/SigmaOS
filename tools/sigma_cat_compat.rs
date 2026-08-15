@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Cat Compatibility
 //! Concatenate and print files (cat command)
@@ -42,7 +43,7 @@ pub unsafe extern "C" fn cat_concatenate(
     max_output: SigmaU32,
     options: CatOptions,
 ) -> SigmaI32 {
-    if !CAT_INITIALIZED || files.isnull() || output.isnull() {
+    if !CAT_INITIALIZED || files.is_null() || output.is_null() {
         return -1;
     }
     
@@ -55,7 +56,7 @@ pub unsafe extern "C" fn cat_concatenate(
         }
         
         let file = *files.add(i);
-        if file.isnull() {
+        if file.is_null() {
             continue;
         }
         
@@ -117,7 +118,7 @@ pub unsafe extern "C" fn cat_with_line_numbers(
     output: *mut u8,
     max_output: SigmaU32,
 ) -> SigmaI32 {
-    if !CAT_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !CAT_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     
@@ -139,7 +140,7 @@ pub unsafe extern "C" fn cat_show_nonprinting(
     output: *mut u8,
     max_output: SigmaU32,
 ) -> SigmaI32 {
-    if !CAT_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !CAT_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     
@@ -161,7 +162,7 @@ pub unsafe extern "C" fn cat_show_ends(
     output: *mut u8,
     max_output: SigmaU32,
 ) -> SigmaI32 {
-    if !CAT_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !CAT_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     
@@ -183,7 +184,7 @@ pub unsafe extern "C" fn cat_show_tabs(
     output: *mut u8,
     max_output: SigmaU32,
 ) -> SigmaI32 {
-    if !CAT_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !CAT_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     

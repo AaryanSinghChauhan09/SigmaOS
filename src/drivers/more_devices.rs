@@ -1,4 +1,5 @@
 // SigmaOS More Devices — Ancient & Newer OOP Drivers
+// SigmaOS More Devices — Ancient & Newer OOP Drivers
 // This file implements 12 distinct drivers spanning ancient/legacy era to state-of-the-art modern hardware.
 
 #![allow(clippy::all, warnings)]
@@ -6,6 +7,7 @@
 extern crate alloc;
 
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use core::result::Result::{self, Ok, Err};
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::String;
@@ -107,6 +109,83 @@ impl PeripheralDevice for FloppyDiskDriver {
         self.power_state = PowerState::Off;
         self.motor_on = false;
         self.sectors = Vec::new();
+        Ok(())
+    }
+}
+
+/// 13. UFS 4.0 Storage Driver (Universal Flash Storage 4.0, up to 4.2 GB/s, dual-lane)
+pub struct Ufs4StorageDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    gear: u8, // M-PHY Gear 5
+    lanes: u8, // 2 lanes
+    storage_size_bytes: u64,
+    device_data: Vec<u8>,
+}
+
+impl Ufs4StorageDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            gear: 5,
+            lanes: 2,
+            storage_size_bytes: 1_099_511_627_776, // 1 TB UFS 4.0
+            device_data: Vec::new(),
+        }
+    }
+
+    pub fn current_gear(&self) -> u8 {
+        self.gear
+    }
+}
+
+impl PeripheralDevice for Ufs4StorageDriver {
+    fn name(&self) -> &'static str {
+        "Universal Flash Storage 4.0 Driver"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.device_data = Vec::new();
+        for _ in 0..1024 {
+            self.device_data.push(0u8);
+        }
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("UFS 4.0 controller is offline");
+        }
+        let len = buffer.len().min(self.device_data.len());
+        buffer[..len].copy_from_slice(&self.device_data[..len]);
+        Ok(len)
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("UFS 4.0 controller is offline");
+        }
+        let len = data.len().min(self.device_data.len());
+        self.device_data[..len].copy_from_slice(&data[..len]);
+        Ok(len)
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.device_data = Vec::new();
         Ok(())
     }
 }
@@ -340,6 +419,24 @@ mod tests {
         assert_eq!(bus.memory_bandwidth(), 1600);
 
         assert!(bus.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_ufs4_storage_driver() {
+        let mut ufs = Ufs4StorageDriver::new();
+        assert_eq!(ufs.name(), "Universal Flash Storage 4.0 Driver");
+        assert_eq!(ufs.generation(), DeviceGeneration::Modern);
+        assert_eq!(ufs.current_gear(), 5);
+
+        assert!(ufs.initialize().is_ok());
+        let write_data = [9u8; 8];
+        assert_eq!(ufs.write(&write_data).unwrap(), 8);
+
+        let mut buf = [0u8; 8];
+        assert_eq!(ufs.read(&mut buf).unwrap(), 8);
+        assert_eq!(buf, [9u8; 8]);
+
+        assert!(ufs.shutdown().is_ok());
     }
 
     #[test]

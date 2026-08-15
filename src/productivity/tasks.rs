@@ -19,7 +19,7 @@
 // SigmaOS Task Manager
 // OOP-based task management with Kanban boards and reminders
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::time::{Duration, Instant};
 
 /// Task
@@ -125,14 +125,14 @@ pub trait TaskStorage {
 
 /// In-memory task storage
 pub struct InMemoryStorage {
-    tasks: HashMap<String, Task>,
+    tasks: BTreeMap<String, Task>,
 }
 
 impl InMemoryStorage {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            tasks: HashMap::new(),
+            tasks: BTreeMap::new(),
         }
     }
 }
@@ -169,8 +169,8 @@ impl TaskStorage for InMemoryStorage {
 /// OOP-based Task Manager
 pub struct TaskManager {
     storage: Box<dyn TaskStorage>,
-    projects: HashMap<String, Project>,
-    boards: HashMap<String, KanbanBoard>,
+    projects: BTreeMap<String, Project>,
+    boards: BTreeMap<String, KanbanBoard>,
     reminders: Vec<Reminder>,
     auto_cleanup_enabled: bool,
 }
@@ -179,8 +179,8 @@ impl TaskManager {
     pub fn new(storage: Box<dyn TaskStorage>) -> Self {
         Self {
             storage,
-            projects: HashMap::new(),
-            boards: HashMap::new(),
+            projects: BTreeMap::new(),
+            boards: BTreeMap::new(),
             reminders: Vec::new(),
             auto_cleanup_enabled: false,
         }

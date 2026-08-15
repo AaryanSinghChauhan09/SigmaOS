@@ -1,0 +1,4 @@
+SigmaOS 0.1.0
+Build Date: 2024-05-18 02:40:00 UTC
+Architecture: x86_64
+Git Commit: 8832f50

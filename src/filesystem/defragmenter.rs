@@ -3,7 +3,7 @@
 // File fragmentation analysis, contiguous cluster relocation, free space consolidation,
 // S.M.A.R.T. thermal validation, and an interactive colored-block cluster map representation.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Represents the state of a single sector/cluster on disk (Defraggler standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub struct DefragStats {
 pub struct DiskDefragmenter {
     pub total_sectors: usize,
     pub cluster_map: Vec<ClusterState>,
-    pub file_map: HashMap<String, FragmentedFile>,
+    pub file_map: BTreeMap<String, FragmentedFile>,
     pub temperature_c: f32, // S.M.A.R.T. thermal validation
 }
 
@@ -52,7 +52,7 @@ impl DiskDefragmenter {
         Self {
             total_sectors,
             cluster_map: map,
-            file_map: HashMap::new(),
+            file_map: BTreeMap::new(),
             temperature_c: 32.5, // 32.5 C standard operating temp
         }
     }

@@ -12,6 +12,18 @@ where
     entries: Vec<(K, V)>,
 }
 
+impl<K, V> Clone for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    fn clone(&self) -> Self {
+        BTreeMap {
+            entries: self.entries.clone(),
+        }
+    }
+}
+
 impl<K, V> BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -97,18 +109,6 @@ where
     }
 }
 
-impl<K, V> Clone for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: Clone,
-{
-    fn clone(&self) -> Self {
-        BTreeMap {
-            entries: self.entries.clone(),
-        }
-    }
-}
-
 pub struct BTreeMapIter<'a, K, V> {
     entries: &'a Vec<(K, V)>,
     idx: usize,
@@ -116,8 +116,8 @@ pub struct BTreeMapIter<'a, K, V> {
 
 impl<'a, K, V> Iterator for BTreeMapIter<'a, K, V>
 where
-    K: PartialEq + Clone + Ord + 'a,
-    V: Clone + 'a,
+    K: PartialEq + Clone + Ord,
+    V: Clone,
 {
     type Item = (&'a K, &'a V);
 
@@ -142,7 +142,7 @@ mod tests {
         map.insert(1, "a");
         map.insert(3, "c");
         map.insert(2, "b");
-
+        
         assert_eq!(map.get(&1), Some(&"a"));
         assert_eq!(map.get(&2), Some(&"b"));
         assert_eq!(map.get(&3), Some(&"c"));
@@ -162,11 +162,8 @@ mod tests {
         map.insert(3, "c");
         map.insert(1, "a");
         map.insert(2, "b");
-
+        
         let items: std::vec::Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
         assert_eq!(items, vec![(1, "a"), (2, "b"), (3, "c")]);
-        
-        let items: Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
-        assert_eq!(items.as_slice(), &[(1, "a"), (2, "b"), (3, "c")]);
     }
 }

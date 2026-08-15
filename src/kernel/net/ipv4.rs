@@ -20,9 +20,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS IPv4 Network Stack
 /// ARP, IPv4 routing, ICMP echo, raw packet I/O
 /// Absorbs Linux net/ipv4/: arp.c, ip_input.c, ip_output.c, icmp.c
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -129,7 +129,7 @@ pub struct ArpEntry {
 }
 
 pub struct ArpTable {
-    entries: HashMap<[u8; 4], ArpEntry>,
+    entries: BTreeMap<[u8; 4], ArpEntry>,
     lookups: AtomicUsize,
     miss_count: AtomicUsize,
 }
@@ -138,7 +138,7 @@ impl ArpTable {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ArpTable {
-            entries: HashMap::new(),
+            entries: BTreeMap::new(),
             lookups: AtomicUsize::new(0),
             miss_count: AtomicUsize::new(0),
         }

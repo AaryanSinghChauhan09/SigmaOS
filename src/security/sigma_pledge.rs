@@ -31,10 +31,11 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 use sigma_types::{CapabilityToken, Result};
-use crate::klib::HashSet;
+
+use std::collections::HashSet;
 
 /// Pledge namespaces representing different syscall categories
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum PledgeNamespace {
     /// TCP/UDP socket creation
     Inet,
@@ -119,7 +120,7 @@ macro_rules! sigma_pledge {
 
 /// Syscall filter that checks pledges
 pub struct SyscallFilter {
-    process_promises: std::collections::HashMap<u64, PledgePromise>,
+    process_promises: alloc::collections::BTreeMap<u64, PledgePromise>,
 }
 
 impl SyscallFilter {
@@ -127,7 +128,7 @@ impl SyscallFilter {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SyscallFilter {
-            process_promises: std::collections::HashMap::new(),
+            process_promises: alloc::collections::BTreeMap::new(),
         }
     }
 

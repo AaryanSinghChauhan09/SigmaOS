@@ -1,26 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Unified Subsystem Architecture
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 
@@ -29,7 +11,27 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
+#[cfg(not(test))]
 use crate::security::CapabilityToken;
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub bits: u64,
+}
+
+#[cfg(test)]
+impl CapabilityToken {
+    pub fn new() -> Self {
+        Self { bits: 0 }
+    }
+    pub fn allow_capability(&mut self, cap: u64) {
+        self.bits |= cap;
+    }
+    pub fn bits(&self) -> u64 {
+        self.bits
+    }
+}
 
 // ============================================================================
 // Core Driver Abstraction
@@ -546,7 +548,7 @@ impl<T: DeviceDriver> SecureDriverWrapper<T> {
     }
 
     /// Verify the driver's cryptographic signature
-    pub fn verify_signature(&mut self, signature: &[u8]) -> Result<(), DriverError> {
+    pub fn verify_signature(&mut self, _signature: &[u8]) -> Result<(), DriverError> {
         // In production, this would verify against a trusted key
         self.signature_verified = true;
         Ok(())
@@ -618,7 +620,6 @@ pub struct DriverRegistry {
 
 impl DriverRegistry {
     /// Create a new driver registry
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             drivers: Vec::new(),
@@ -691,7 +692,7 @@ impl DriverRegistry {
         for driver in &mut self.drivers {
             driver
                 .init()
-                .map_err(|e| RegistryError::InitializationFailed(format!("{:?}", e)))?;
+                .map_err(|e| RegistryError::InitializationFailed(alloc::format!("{:?}", e)))?;
         }
         Ok(())
     }
@@ -727,6 +728,7 @@ pub enum RegistryError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     // Mock driver for testing
     struct MockDriver {
@@ -832,13 +834,13 @@ mod tests {
 // ============================================================================
 
 /// A robust round-robin task selector helper
+#[derive(Clone)]
 pub struct RoundRobinScheduler {
     pub ready_queue: Vec<ProcessInfo>,
     pub current_index: usize,
 }
 
 impl RoundRobinScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             ready_queue: Vec::new(),
@@ -905,7 +907,6 @@ pub struct UsbHidKeyboardSimulator {
 }
 
 impl UsbHidKeyboardSimulator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_caps_lock: false,
@@ -983,6 +984,7 @@ impl PackageRecipeParser {
 #[cfg(test)]
 mod extra_tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_round_robin_scheduler() {

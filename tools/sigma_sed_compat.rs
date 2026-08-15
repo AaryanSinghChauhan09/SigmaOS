@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Sed Compatibility
 //! Stream editor (sed command)
@@ -61,7 +62,7 @@ pub unsafe extern "C" fn sed_add_command(
     global: SigmaBool,
     case_insensitive: SigmaBool,
 ) -> SigmaI32 {
-    if !SED_INITIALIZED || pattern.isnull() || replacement.isnull() {
+    if !SED_INITIALIZED || pattern.is_null() || replacement.is_null() {
         return -1;
     }
     
@@ -101,7 +102,7 @@ pub unsafe extern "C" fn sed_process_line(
     output: *mut u8,
     max_output: SigmaU32,
 ) -> SigmaI32 {
-    if !SED_INITIALIZED || input.isnull() || output.isnull() {
+    if !SED_INITIALIZED || input.is_null() || output.is_null() {
         return -1;
     }
     
@@ -167,7 +168,7 @@ pub unsafe extern "C" fn sed_process_file(
     _output_file: *const u8,
     _options: SedOptions,
 ) -> SigmaI32 {
-    if !SED_INITIALIZED || input_file.isnull() {
+    if !SED_INITIALIZED || input_file.is_null() {
         return -1;
     }
     

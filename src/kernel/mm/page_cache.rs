@@ -16,11 +16,21 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Page Cache — absorbs Linux mm/filemap.c and mm/page-writeback.c
 /// Caches file data in memory pages, tracks dirty pages, writeback pressure
-use std::collections::HashMap;
-use std::vec::Vec;
+
+#[cfg(not(test))]
+use crate::klib::BTreeMap;
+
+#[cfg(test)]
+use alloc::collections::BTreeMap;
+
+#[cfg(not(test))]
+use crate::klib::Vec;
+
+#[cfg(test)]
+use alloc::vec::Vec;
 
 pub const PAGE_SIZE: usize = 4096;
 
@@ -83,13 +93,13 @@ impl ClearLinuxReadAheadEngine {
 #[derive(Debug, Clone)]
 pub struct NixOSPageDeduplicator {
     // Content hash -> list of (inode_id, page_idx)
-    hash_index: HashMap<u64, Vec<(u64, u64)>>,
+    hash_index: BTreeMap<u64, Vec<(u64, u64)>>,
 }
 
 impl NixOSPageDeduplicator {
     pub fn new() -> Self {
         Self {
-            hash_index: HashMap::new(),
+            hash_index: BTreeMap::new(),
         }
     }
 
@@ -200,7 +210,7 @@ impl CachedPage {
 
 /// Page cache — global in-memory file cache
 pub struct PageCache {
-    pages: HashMap<(u64, u64), CachedPage>, // (inode_id, page_idx) → page
+    pages: BTreeMap<(u64, u64), CachedPage>, // (inode_id, page_idx) → page
     capacity: usize,
     hits: AtomicUsize,
     misses: AtomicUsize,
@@ -215,7 +225,7 @@ pub struct PageCache {
 impl PageCache {
     pub fn new(capacity_pages: usize) -> Self {
         PageCache {
-            pages: HashMap::new(),
+            pages: BTreeMap::new(),
             capacity: capacity_pages,
             hits: AtomicUsize::new(0),
             misses: AtomicUsize::new(0),

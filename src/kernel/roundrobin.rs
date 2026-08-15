@@ -3,11 +3,10 @@
 
 use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
-/// CPU register context saved during a context switch (Linux pt_regs / BSD trapframe style)
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+/// CPU register context saved during a context switch
+#[derive(Debug, Clone, Copy, Default)]
 #[repr(C)]
 pub struct CpuContext {
-    // General Purpose Registers (GPRs)
     pub rax: u64,
     pub rbx: u64,
     pub rcx: u64,
@@ -26,35 +25,6 @@ pub struct CpuContext {
     pub r15: u64,
     pub rip: u64,
     pub rflags: u64,
-
-    // Segment Registers
-    pub cs: u16,
-    pub ds: u16,
-    pub es: u16,
-    pub fs: u16,
-    pub gs: u16,
-    pub ss: u16,
-
-    // Control Registers
-    pub cr0: u64,
-    pub cr2: u64,
-    pub cr3: u64,
-    pub cr4: u64,
-
-    // Debug Registers (Hardware Breakpoints)
-    pub dr0: u64,
-    pub dr1: u64,
-    pub dr2: u64,
-    pub dr3: u64,
-    pub dr6: u64,
-    pub dr7: u64,
-
-    // Model-Specific Registers (MSRs) for Fast System Calls and TLS
-    pub star: u64,
-    pub lstar: u64,
-    pub sfmask: u64,
-    pub fs_base: u64,
-    pub gs_base: u64,
 }
 
 impl CpuContext {
@@ -67,41 +37,6 @@ impl CpuContext {
         self.rsp = rsp;
         self.rip = rip;
     }
-
-    /// Write values to Control Registers
-    pub fn set_control_register(&mut self, index: usize, value: u64) -> Result<(), &'static str> {
-        match index {
-            0 => { self.cr0 = value; Ok(()) }
-            2 => { self.cr2 = value; Ok(()) }
-            3 => { self.cr3 = value; Ok(()) }
-            4 => { self.cr4 = value; Ok(()) }
-            _ => Err("Invalid control register index"),
-        }
-    }
-
-    /// Read values from Control Registers
-    pub fn get_control_register(&self, index: usize) -> Result<u64, &'static str> {
-        match index {
-            0 => Ok(self.cr0),
-            2 => Ok(self.cr2),
-            3 => Ok(self.cr3),
-            4 => Ok(self.cr4),
-            _ => Err("Invalid control register index"),
-        }
-    }
-
-    /// Write values to Model-Specific Registers (MSRs)
-    pub fn set_msr_register(&mut self, msr_id: u32, value: u64) -> Result<(), &'static str> {
-        // Mock MSR register IDs (0xC0000080+ are standard x86-64 MSRs)
-        match msr_id {
-            0xC0000081 => { self.star = value; Ok(()) }
-            0xC0000082 => { self.lstar = value; Ok(()) }
-            0xC0000084 => { self.sfmask = value; Ok(()) }
-            0xC0000100 => { self.fs_base = value; Ok(()) }
-            0xC0000101 => { self.gs_base = value; Ok(()) }
-            _ => Err("Unknown MSR register ID"),
-        }
-    }
 }
 
 /// Extended process entry that includes context and yields tracking
@@ -111,6 +46,10 @@ pub struct ScheduledProcess {
     pub context: CpuContext,
     pub yield_requested: bool,
     pub cpu_time_used: u64,
+    pub cpu_affinity: u64,
+    pub full_slice_depletions: u64,
+    pub voluntary_yields: u64,
+    pub interactive_score: i32,
 }
 
 impl ScheduledProcess {
@@ -120,12 +59,24 @@ impl ScheduledProcess {
             context: CpuContext::new(),
             yield_requested: false,
             cpu_time_used: 0,
+            cpu_affinity: !0, // Allowed on all CPUs by default
+            full_slice_depletions: 0,
+            voluntary_yields: 0,
+            interactive_score: 0,
         }
     }
 
     /// Request this process to yield the CPU voluntarily
     pub fn request_yield(&mut self) {
         self.yield_requested = true;
+    }
+
+    pub fn boost_interactive_score(&mut self) {
+        self.interactive_score = (self.interactive_score + 10).min(100);
+    }
+
+    pub fn penalize_interactive_score(&mut self) {
+        self.interactive_score = (self.interactive_score - 5).max(-100);
     }
 
     /// Priority-based weight: higher priority gets a larger time slice multiplier
@@ -137,7 +88,14 @@ impl ScheduledProcess {
             Priority::Low => 1,
             Priority::Idle => 1, // Idle still gets a minimal slice
         };
-        base_slice * multiplier
+        let boost = if self.interactive_score > 50 {
+            2
+        } else if self.interactive_score < -50 {
+            1
+        } else {
+            1
+        };
+        base_slice * multiplier * boost
     }
 }
 
@@ -191,20 +149,32 @@ impl RoundRobinScheduler {
         Ok(())
     }
 
-    pub fn schedule(&mut self) -> Option<&Process> {
+    pub fn schedule_on_cpu(&mut self, cpu_id: u8) -> Option<&Process> {
         if self.processes.is_empty() {
             return None;
         }
 
         let start_index = self.current_index;
         loop {
-            if self.processes[self.current_index].process.state == ProcessState::Ready {
+            let entry = &self.processes[self.current_index];
+            let is_affinity_matched = (entry.cpu_affinity & (1 << cpu_id)) != 0;
+            if entry.process.state == ProcessState::Ready && is_affinity_matched {
                 return Some(&self.processes[self.current_index].process);
             }
             self.current_index = (self.current_index + 1) % self.processes.len();
             if self.current_index == start_index {
                 return None;
             }
+        }
+    }
+
+    pub fn schedule(&mut self) -> Option<&Process> {
+        self.schedule_on_cpu(0)
+    }
+
+    pub fn set_cpu_affinity(&mut self, pid: u64, affinity: u64) {
+        if let Some(entry) = self.processes.iter_mut().find(|e| e.process.pid == pid) {
+            entry.cpu_affinity = affinity;
         }
     }
 
@@ -215,13 +185,29 @@ impl RoundRobinScheduler {
             return;
         }
 
+        // Safeguard current_index boundaries to prevent any out of bounds panic
+        if self.current_index >= self.processes.len() {
+            self.current_index = 0;
+        }
+
         let needs_switch = {
             let entry = &mut self.processes[self.current_index];
             entry.cpu_time_used += 1;
             let slice = entry.time_slice_ticks(self.config.time_slice);
             let yielding = entry.yield_requested;
             entry.yield_requested = false;
-            yielding || entry.cpu_time_used.is_multiple_of(slice)
+
+            if yielding {
+                entry.voluntary_yields += 1;
+                entry.boost_interactive_score();
+                true
+            } else if entry.cpu_time_used % slice == 0 {
+                entry.full_slice_depletions += 1;
+                entry.penalize_interactive_score();
+                true
+            } else {
+                false
+            }
         };
 
         if needs_switch {
@@ -402,23 +388,47 @@ mod tests {
     }
 
     #[test]
-    fn test_extended_architectural_registers() {
-        let mut ctx = CpuContext::new();
+    fn test_cpu_affinity() {
+        let mut scheduler = RoundRobinScheduler::new();
+        let p1 = Process::new(1, "cpu1_only".to_string(), Priority::Normal);
+        let p2 = Process::new(2, "cpu2_only".to_string(), Priority::Normal);
+        scheduler.add_process(p1).unwrap();
+        scheduler.add_process(p2).unwrap();
 
-        // General Segment registers
-        ctx.cs = 0x08;
-        ctx.ds = 0x10;
-        assert_eq!(ctx.cs, 0x08);
-        assert_eq!(ctx.ds, 0x10);
+        // Limit process 1 to CPU 0 (bit 0) and process 2 to CPU 1 (bit 1)
+        scheduler.set_cpu_affinity(1, 1 << 0);
+        scheduler.set_cpu_affinity(2, 1 << 1);
 
-        // Control registers
-        assert!(ctx.set_control_register(0, 0x80050033).is_ok()); // cr0 with paging enabled
-        assert_eq!(ctx.get_control_register(0).unwrap(), 0x80050033);
-        assert!(ctx.set_control_register(9, 0).is_err()); // invalid
+        // On CPU 0, only process 1 should be scheduled
+        let scheduled_on_cpu0 = scheduler.schedule_on_cpu(0).unwrap();
+        assert_eq!(scheduled_on_cpu0.pid, 1);
 
-        // Model-Specific Registers (MSRs)
-        assert!(ctx.set_msr_register(0xC0000100, 0x7FFF0000).is_ok()); // fs_base
-        assert_eq!(ctx.fs_base, 0x7FFF0000);
-        assert!(ctx.set_msr_register(0x111, 0).is_err()); // invalid
+        // On CPU 1, only process 2 should be scheduled
+        let scheduled_on_cpu1 = scheduler.schedule_on_cpu(1).unwrap();
+        assert_eq!(scheduled_on_cpu1.pid, 2);
+    }
+
+    #[test]
+    fn test_interactive_boosting() {
+        let mut scheduler = RoundRobinScheduler::new();
+        let p1 = Process::new(1, "sleeper_interactive".to_string(), Priority::Normal);
+        scheduler.add_process(p1).unwrap();
+
+        // Voluntarily yield boosts interactive score
+        scheduler.yield_current();
+        scheduler.tick(); // trigger voluntary yield
+
+        let p = &scheduler.processes[0];
+        assert!(p.interactive_score > 0);
+        assert_eq!(p.voluntary_yields, 1);
+        assert_eq!(p.full_slice_depletions, 0);
+
+        // Artificially deplete its time slice to test penalty
+        for _ in 0..100 {
+            scheduler.tick();
+        }
+        let p_penalized = &scheduler.processes[0];
+        assert!(p_penalized.interactive_score < 0);
+        assert!(p_penalized.full_slice_depletions > 0);
     }
 }

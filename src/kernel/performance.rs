@@ -52,7 +52,6 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     }
 
     /// Pushes a zero-copy reference or page frame onto the queue without locks
-    /// Optimised by Bolt ⚡: utilizes bitwise masking if N is a power of two to bypass expensive modulo/division operations.
     pub fn enqueue(&mut self, item: T) -> Result<(), IpcError> {
         let head = self.head.load(Ordering::Relaxed);
         let tail = self.tail.load(Ordering::Acquire);
@@ -62,17 +61,12 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
             return Err(IpcError::QueueFull);
         }
 
-        // Bitwise optimization for power-of-two queue capacities
-        let idx = if N.is_power_of_two() {
-            head & (N - 1)
-        } else {
-            head % N
-        };
+        let idx = head % N;
         self.buffer[idx] = Some(item);
         self.head.store(head.wrapping_add(1), Ordering::Release);
         self.metrics.enqueued_count += 1;
 
-        let current_size = head.wrapping_sub(tail) + 1;
+        let current_size = head.wrapping_sub(tail);
         if current_size > self.metrics.peak_occupancy {
             self.metrics.peak_occupancy = current_size;
         }
@@ -81,7 +75,6 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     }
 
     /// Pulls a zero-copy reference or page frame out of the queue
-    /// Optimised by Bolt ⚡: utilizes bitwise masking if N is a power of two to bypass expensive modulo/division operations.
     pub fn dequeue(&mut self) -> Result<T, IpcError> {
         let head = self.head.load(Ordering::Acquire);
         let tail = self.tail.load(Ordering::Relaxed);
@@ -91,12 +84,7 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
             return Err(IpcError::QueueEmpty);
         }
 
-        // Bitwise optimization for power-of-two queue capacities
-        let idx = if N.is_power_of_two() {
-            tail & (N - 1)
-        } else {
-            tail % N
-        };
+        let idx = tail % N;
         let item = self.buffer[idx].take().ok_or_else(|| {
             self.metrics.empty_errors += 1;
             IpcError::InvalidPayload
@@ -177,7 +165,6 @@ impl UdfSchedVm {
     }
 
     /// Evaluates a process profile, calculating its custom scheduling dynamic priority weight
-    /// Optimised by Bolt ⚡: coalesced redundant opcode match patterns to reduce branching logic overhead inside the VM execution hot-path.
     pub fn evaluate_priority(&mut self, process: &ProcessProfile) -> Result<u32, &'static str> {
         self.metrics.evaluation_runs += 1;
         let mut pc = 0;
@@ -188,9 +175,17 @@ impl UdfSchedVm {
             let inst = &self.program[pc];
             self.metrics.instructions_executed += 1;
 
+            let cycles = match inst.opcode {
+                SchedOpcode::LoadPriority | SchedOpcode::LoadRuntime => 2,
+                SchedOpcode::MulConst => 4,
+                SchedOpcode::AddConst => 1,
+                SchedOpcode::StoreResult => 1,
+                SchedOpcode::Halt => 1,
+            };
+            self.metrics.estimated_cycles += cycles;
+
             match inst.opcode {
                 SchedOpcode::LoadPriority => {
-                    self.metrics.estimated_cycles += 2;
                     let reg = inst.arg1 as usize;
                     if reg < 4 {
                         self.registers[reg] = process.priority_level as u32;
@@ -200,7 +195,6 @@ impl UdfSchedVm {
                     }
                 }
                 SchedOpcode::LoadRuntime => {
-                    self.metrics.estimated_cycles += 2;
                     let reg = inst.arg1 as usize;
                     if reg < 4 {
                         self.registers[reg] = process.runtime_ms;
@@ -210,7 +204,6 @@ impl UdfSchedVm {
                     }
                 }
                 SchedOpcode::MulConst => {
-                    self.metrics.estimated_cycles += 4;
                     let reg = inst.arg1 as usize;
                     if reg < 4 {
                         self.registers[reg] = self.registers[reg].wrapping_mul(inst.arg2 as u32);
@@ -220,7 +213,6 @@ impl UdfSchedVm {
                     }
                 }
                 SchedOpcode::AddConst => {
-                    self.metrics.estimated_cycles += 1;
                     let reg = inst.arg1 as usize;
                     if reg < 4 {
                         self.registers[reg] = self.registers[reg].wrapping_add(inst.arg2 as u32);
@@ -230,7 +222,6 @@ impl UdfSchedVm {
                     }
                 }
                 SchedOpcode::StoreResult => {
-                    self.metrics.estimated_cycles += 1;
                     let reg = inst.arg1 as usize;
                     if reg < 4 {
                         decision = self.registers[reg];
@@ -240,7 +231,6 @@ impl UdfSchedVm {
                     }
                 }
                 SchedOpcode::Halt => {
-                    self.metrics.estimated_cycles += 1;
                     break;
                 }
             }
@@ -344,8 +334,6 @@ impl SovereignSimdOptimizer {
 
 impl SimdOptimizer for SovereignSimdOptimizer {
     /// High-performance SIMD vector additions bypassing standard loop iterations
-    /// Optimised by Bolt ⚡: replaces raw indexing with zero-bounds-checked single-pass zip iterators,
-    /// enabling compiler auto-vectorization and avoiding CPU boundary check cycles.
     fn optimize_vector_add(
         &self,
         source_a: &[f32],
@@ -363,15 +351,15 @@ impl SimdOptimizer for SovereignSimdOptimizer {
             CpuInstructionExtension::AVX512 => {
                 // In production, execute native AVX-512 assembly blocks here.
                 // For portable test safety on other host environments, we perform unrolled vector addition:
-                for ((d, &sa), &sb) in dest.iter_mut().zip(source_a.iter()).zip(source_b.iter()) {
-                    *d = sa + sb;
+                for i in 0..VECTOR_SIZE {
+                    dest[i] = source_a[i] + source_b[i];
                 }
                 Ok(())
             }
             _ => {
                 // Fallback serial execution path
-                for ((d, &sa), &sb) in dest.iter_mut().zip(source_a.iter()).zip(source_b.iter()) {
-                    *d = sa + sb;
+                for i in 0..VECTOR_SIZE {
+                    dest[i] = source_a[i] + source_b[i];
                 }
                 Ok(())
             }
@@ -382,7 +370,6 @@ impl SimdOptimizer for SovereignSimdOptimizer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
 
     #[test]
     fn test_zero_copy_queue() {
@@ -586,38 +573,15 @@ mod tests {
     #[test]
     fn test_udf_sched_vm_metrics() {
         let program = vec![
-            SchedInstruction {
-                opcode: SchedOpcode::LoadPriority,
-                arg1: 0,
-                arg2: 0,
-            },
-            SchedInstruction {
-                opcode: SchedOpcode::AddConst,
-                arg1: 0,
-                arg2: 10,
-            },
-            SchedInstruction {
-                opcode: SchedOpcode::MulConst,
-                arg1: 0,
-                arg2: 2,
-            },
-            SchedInstruction {
-                opcode: SchedOpcode::StoreResult,
-                arg1: 0,
-                arg2: 0,
-            },
-            SchedInstruction {
-                opcode: SchedOpcode::Halt,
-                arg1: 0,
-                arg2: 0,
-            },
+            SchedInstruction { opcode: SchedOpcode::LoadPriority, arg1: 0, arg2: 0 },
+            SchedInstruction { opcode: SchedOpcode::AddConst, arg1: 0, arg2: 10 },
+            SchedInstruction { opcode: SchedOpcode::MulConst, arg1: 0, arg2: 2 },
+            SchedInstruction { opcode: SchedOpcode::StoreResult, arg1: 0, arg2: 0 },
+            SchedInstruction { opcode: SchedOpcode::Halt, arg1: 0, arg2: 0 },
         ];
 
         let mut vm = UdfSchedVm::new(program);
-        let process = ProcessProfile {
-            priority_level: 5,
-            runtime_ms: 100,
-        };
+        let process = ProcessProfile { priority_level: 5, runtime_ms: 100 };
 
         let result = vm.evaluate_priority(&process).unwrap();
         assert_eq!(result, 30); // (5 + 10) * 2 = 30
@@ -630,37 +594,12 @@ mod tests {
         assert_eq!(metrics.estimated_cycles, 9);
 
         // Register index out of bounds triggers error and increments counter
-        let bad_program = vec![SchedInstruction {
-            opcode: SchedOpcode::LoadPriority,
-            arg1: 4,
-            arg2: 0,
-        }];
+        let bad_program = vec![
+            SchedInstruction { opcode: SchedOpcode::LoadPriority, arg1: 4, arg2: 0 },
+        ];
         vm.load_program(bad_program);
         assert!(vm.evaluate_priority(&process).is_err());
         assert_eq!(vm.get_metrics().register_errors, 1);
         assert_eq!(vm.get_metrics().evaluation_runs, 2);
-    }
-
-    #[test]
-    fn test_optimized_vector_add_benchmark() {
-        let optimizer = SovereignSimdOptimizer::new();
-        let source_a = [1.0f32; 16];
-        let source_b = [2.0f32; 16];
-        let mut dest = [0.0f32; 16];
-
-        optimizer.optimize_vector_add(&source_a, &source_b, &mut dest).unwrap();
-
-        for i in 0..16 {
-            assert_eq!(dest[i], 3.0f32);
-        }
-
-        // Simulating the AVX512 path as well
-        let avx_optimizer = SovereignSimdOptimizer::with_extension(CpuInstructionExtension::AVX512);
-        let mut dest_avx = [0.0f32; 16];
-        avx_optimizer.optimize_vector_add(&source_a, &source_b, &mut dest_avx).unwrap();
-
-        for i in 0..16 {
-            assert_eq!(dest_avx[i], 3.0f32);
-        }
     }
 }

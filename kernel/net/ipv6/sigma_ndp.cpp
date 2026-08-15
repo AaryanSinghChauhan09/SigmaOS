@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /*
  * =========================================================================
  * Σ SIGMAOS: IPv6 NEIGHBOR DISCOVERY PROTOCOL (NDP)

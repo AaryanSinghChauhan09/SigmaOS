@@ -19,7 +19,7 @@
 // SigmaOS Network Driver
 // Hardware abstraction for network interfaces
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 /// Network interface type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

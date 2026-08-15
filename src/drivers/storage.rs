@@ -19,7 +19,7 @@
 // SigmaOS Storage Driver
 // Hardware abstraction for storage devices
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 /// Storage device type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

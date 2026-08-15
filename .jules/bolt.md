@@ -15,3 +15,15 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-01 - Avoiding Heap Allocations in Dependency Traversal
 **Learning:** Recursively traversing dependency trees with naive `to_visit: Vec<String>` structures incurs heavy heap reallocation and copy overhead if strings are cloned at every node visit. Storing references (`&str`) or using `to_visit` stacks with capacity pre-allocation dramatically cuts allocator stress during package dependency resolution.
 **Action:** Pre-allocate capacity for traversal stacks and use borrowed string references where lifetimes allow.
+
+## 2026-08-09 - Transitioning dynamic formatting out of hotpaths
+**Learning:** Performing dynamic formatting like `format!("...")` inside critical execution loops blocks register reuse and triggers standard allocator locks. Replacing them with pre-allocated trace buffers saves microsecond context processing times.
+**Action:** Always use static lifetime strings or write directly to static ring buffers in critical kernel tasks.
+
+## 2026-08-10 - O(1) Short-Circuit Optimization in Buddy Allocator
+**Learning:** When performing physical memory allocation search sequences under high concurrency, scanning empty priority free lists introduces O(N) traversal overhead. Short-circuiting the traversal immediately when the allocator saturation bitmask registers 0 for the requested block order guarantees O(1) failure latency and maximizes cache line locality in low-memory states.
+**Action:** Enforce fast-path bitmask lookups before diving into segment search iterators.
+
+## 2026-08-11 - Optimizing UKSM Page Deduplication Lookup Complexity
+**Learning:** Checking for duplicate physical pages using a linear scan (`contains`) on a standard `Vec` inside high-frequency deduplication passes degrades to $O(N^2)$ complexity. Utilizing a `BTreeSet` reduces search and insertion overhead to $O(\log N)$ while maintaining complete `#![no_std]` compatibility.
+**Action:** Always prefer `BTreeSet` or sorted collections over linear lookup vectors for high-density indexing/deduplication arrays in memory-constrained environments.

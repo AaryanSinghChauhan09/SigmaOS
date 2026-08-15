@@ -87,10 +87,7 @@ impl KernelMechanism for SovereignMechanism {
     }
 
     fn force_io_wait(&mut self, wait_profile: IoWaitProfile) {
-        println!(
-            "[mechanism] Thread yielding context to enter wait profile: {:?}",
-            wait_profile
-        );
+        println!("[mechanism] Thread yielding context to enter wait profile: {:?}", wait_profile);
         self.io_wait_count.fetch_add(1, Ordering::SeqCst);
     }
 
@@ -184,10 +181,7 @@ impl PolicyMechanismCoordinator {
             }
             _ => {}
         }
-        println!(
-            "[control-unit] Dispatched interrupt event class: {:?}",
-            class
-        );
+        println!("[control-unit] Dispatched interrupt event class: {:?}", class);
     }
 
     /// Triggers dynamic thread prioritization and scheduling slices by coordinating policy and mechanism

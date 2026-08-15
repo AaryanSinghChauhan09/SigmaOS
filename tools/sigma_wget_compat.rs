@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Wget Compatibility
 //! Network file download (wget command)
@@ -64,7 +65,7 @@ pub unsafe extern "C" fn wget_download(
     url: *const u8,
     _options: DownloadOptions,
 ) -> SigmaI32 {
-    if !WGET_INITIALIZED || url.isnull() {
+    if !WGET_INITIALIZED || url.is_null() {
         return -1;
     }
     
@@ -95,7 +96,7 @@ pub unsafe extern "C" fn wget_download(
 /// Get download progress
 #[no_mangle]
 pub unsafe extern "C" fn wget_get_progress(progress: *mut DownloadProgress) -> SigmaI32 {
-    if !WGET_INITIALIZED || progress.isnull() {
+    if !WGET_INITIALIZED || progress.is_null() {
         return -1;
     }
     
@@ -118,7 +119,7 @@ pub unsafe extern "C" fn wget_cancel() -> SigmaI32 {
 /// Set output file
 #[no_mangle]
 pub unsafe extern "C" fn wget_set_output(output: *const u8) -> SigmaI32 {
-    if !WGET_INITIALIZED || output.isnull() {
+    if !WGET_INITIALIZED || output.is_null() {
         return -1;
     }
     
@@ -130,7 +131,7 @@ pub unsafe extern "C" fn wget_set_output(output: *const u8) -> SigmaI32 {
 /// Set user agent
 #[no_mangle]
 pub unsafe extern "C" fn wget_set_user_agent(user_agent: *const u8) -> SigmaI32 {
-    if !WGET_INITIALIZED || user_agent.isnull() {
+    if !WGET_INITIALIZED || user_agent.is_null() {
         return -1;
     }
     

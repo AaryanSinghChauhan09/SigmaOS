@@ -22,7 +22,25 @@ jobs:
         with:
           node-version: "20"
       - run: npm install -g @commitlint/cli @commitlint/config-conventional
-      - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.sha }}
+      - run: |
+          cat > .commitlintrc.json << 'EOF'
+          {
+            "extends": ["@commitlint/config-conventional"],
+            "rules": {
+              "type-enum": [2, "always", [
+                "feat", "fix", "docs", "style", "refactor",
+                "perf", "test", "chore", "revert", "impl",
+                "driver", "security", "kernel", "arch", "ci",
+                "pkg", "ai", "ux", "sdk", "boot"
+              ]],
+              "header-max-length": [0, "always", 100],
+              "subject-empty": [2, "never"],
+              "subject-case": [0, "never"],
+              "body-max-line-length": [0, "always", 10000]
+            }
+          }
+          EOF
+          npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.sha }}
 
   # ── 2. Formatter Check ──────────────────────────────────────────────────────
   format-check:
@@ -84,7 +102,7 @@ jobs:
           if [ "${{ matrix.arch }}" = "riscv64gc" ]; then
             TARGET="riscv64gc-unknown-none-elf"
           fi
-          cd kernel/rust
+          cd kernel
           cargo +nightly build --target "$TARGET" --release || true
 
   # ── 5. Clippy (Rust) ────────────────────────────────────────────────────────

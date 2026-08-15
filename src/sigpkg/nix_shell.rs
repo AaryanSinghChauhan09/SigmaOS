@@ -12,14 +12,14 @@
 #[allow(unused_mut)]
 #[allow(unused_imports)]
 
-use crate::klib::{HashMap, Vec, String, ToString};
+use crate::klib::{BTreeMap, Vec, String, ToString};
 
 /// Development environment configuration
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DevEnvironment {
     pub name: String,
     pub packages: Vec<String>,
-    pub environment_vars: HashMap<String, String>,
+    pub environment_vars: BTreeMap<String, String>,
     pub build_commands: Vec<String>,
 }
 
@@ -28,7 +28,7 @@ impl DevEnvironment {
         DevEnvironment {
             name,
             packages: Vec::new(),
-            environment_vars: HashMap::new(),
+            environment_vars: BTreeMap::new(),
             build_commands: Vec::new(),
         }
     }
@@ -79,14 +79,14 @@ impl Default for DevEnvironment {
 
 /// nix-shell manager for managing development environments
 pub struct NixShellManager {
-    environments: HashMap<String, DevEnvironment>,
+    environments: BTreeMap<String, DevEnvironment>,
     active_environment: Option<String>,
 }
 
 impl NixShellManager {
     pub fn new() -> Self {
         NixShellManager {
-            environments: HashMap::new(),
+            environments: BTreeMap::new(),
             active_environment: None,
         }
     }

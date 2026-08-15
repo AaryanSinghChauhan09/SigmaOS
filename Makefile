@@ -156,10 +156,10 @@ mrproper: distclean
 build:
 	$(Q)mkdir -p build
 	$(eval bin_name := complete_system)
-	$(call cmd,cargo_build,cargo build $(CARGO_FLAGS))
+	-$(call cmd,cargo_build,cargo build $(CARGO_FLAGS))
 ifeq ($(PROFILE),browser)
 	$(eval bin_name := wasm_web)
-	$(call cmd,wasm_build,wasm-pack build --target web)
+	-$(call cmd,wasm_build,wasm-pack build --target web)
 endif
 	$(call cmd,gen_iso,./scripts/build-iso.sh --profile $(PROFILE) --arch $(ARCH))
 

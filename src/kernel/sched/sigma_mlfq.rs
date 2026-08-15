@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -5,7 +6,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
@@ -144,16 +144,16 @@ impl SchedClass for MlfqSchedClass {
         false
     }
 
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         // Pick task with the lowest vruntime
         None
     }
 
-    fn put_prev_task(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn set_curr_task(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn task_tick(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
@@ -166,9 +166,9 @@ impl SchedClass for MlfqSchedClass {
         Ok(())
     }
 
-    fn task_dead(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn prio_changed(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
 #[cfg(test)]

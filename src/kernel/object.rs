@@ -7,13 +7,6 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(test)]
-use std::sync::atomic::{AtomicUsize, Ordering};
-
-#[cfg(not(test))]
-use crate::klib::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectError {

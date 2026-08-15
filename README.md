@@ -1,6 +1,6 @@
 # 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
-> **"Sovereignty is the ultimate efficiency."**
+> **"Sovereignty is the ultimate efficiency."**  
 > The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.
 
 ---
@@ -108,6 +108,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 ### Current Status
 
+**Kernel Core:**
 - ✅ Kernel scheduler (MLFQ+CFS+EDF)
 - ✅ Syscalls (I/O + Process)
 - ✅ Physical MM (buddy allocator)
@@ -115,11 +116,61 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ APIC + timer
 - ✅ sigma_pledge + sigma_unveil
 - ✅ Kyber-1024 KEM + Dilithium-5
+- ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
+- ✅ Linux Driver Absorption Engine
+- ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
+
+**Networking & Storage:**
 - 🔄 TCP/UDP stack - Partial
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
+
+**Desktop & Productivity:**
 - ✅ Zenith Desktop prototype
+- 🔄 Screen recorder with GPU acceleration
+- 🔄 Screenshot tool with annotation
+- 🔄 Calendar + task manager
+- 🔄 Email client with IMAP/SMTP
+- 🔄 Note-taking app with Markdown
+- 🔄 Code editor with LSP support
+- ✅ Integrated terminal
+- ✅ Clipboard manager with history
+- 🔄 Task manager
+
+**Security:**
+- ✅ Encrypted file vault
+- 🔄 Password manager with biometric unlock
+- ✅ Intrusion detection system
+- 🔄 Secure VPN client
+- ✅ Capability-based security framework
+
+**System Tools:**
+- ✅ File manager
+- ✅ Archive manager
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- 🔄 Virtual machine manager (QEMU/KVM)
+- 🔄 Container manager (Docker/Podman)
+
+**Package Management:**
 - ✅ sigma-pkg CLI
+- 🔄 Universal package manager
+- 🔄 Rollback package snapshots
+
+**Networking:**
+- 🔄 Cloud sync engine
+- 🔄 Built-in torrent client
+- 🔄 Network traffic analyzer
+
+**AI & Automation:**
+- 🔄 AI orchestrator for system optimization
+
+**Customization:**
+- 🔄 Unified control center
+- ✅ Declarative theming engine
+
+**Boot & Deployment:**
 - ⬜ Bootable ISO (Phase G)
 
 
@@ -145,6 +196,8 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Repository Documentation
 
+- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
+- [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
 - [Roadmap](Roadmap.md) — Development plan
 - [INSTALL.md](INSTALL.md) — Build instructions
@@ -159,14 +212,25 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 - **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
+- **Kernel Evolution**: [Kernel Evolution Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Kernel_Evolution_Architecture)
+- **Driver Ecosystem**: [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
+- **Strategic Planning**: [Gap Filling Strategic Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/GAP_FILLING_STRATEGIC_PLAN)
 - **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
 - **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
 - **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
 - **Local AI Daemon**: [Sigma AI Agents](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sigma_AI_Agents)
+- **Linux Distro Absorption**: [Strategic Distro Absorption Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/LINUX_DISTRO_ABSORPTION_SPEC)
+- **S-Boot Firmware**: [Sovereign BIOS & UEFI Firmware Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BIOS_FIRMWARE_SPEC)
+- **Zenith Compositor**: [Wayland Zenith UI Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/WAYLAND_ZENITH_SPEC)
+- **Portable Apps**: [Portable Application Format Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PORTABLE_APP_FORMAT_PLAN)
+- **Custom Personalization**: [Custom Personalization & Theme Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CUSTOM_PERSONALIZATION_SPEC)
+- **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
+- **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
+- **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
 
 
 ---
 
-## 📄 License
+## 🏛️ Design Specification & Architecture Layers (Zenith Release Microkernel)
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.

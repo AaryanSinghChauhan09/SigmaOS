@@ -3,7 +3,7 @@
 // fine-grained USE flag feature toggles, target-specific CPU hardware optimization,
 // and topological sort build order dependency resolution.
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use crate::klib::HashSet;
 use crate::sigpkg::Version;
 
@@ -18,15 +18,15 @@ pub struct UseFlag {
 /// Feature Set for system-wide and per-package configurations
 #[derive(Debug, Clone, Default)]
 pub struct FeatureSet {
-    pub global_features: HashMap<String, bool>,
-    pub per_package_features: HashMap<String, HashMap<String, bool>>,
+    pub global_features: BTreeMap<String, bool>,
+    pub per_package_features: BTreeMap<String, BTreeMap<String, bool>>,
 }
 
 impl FeatureSet {
     pub fn new() -> Self {
         Self {
-            global_features: HashMap::new(),
-            per_package_features: HashMap::new(),
+            global_features: BTreeMap::new(),
+            per_package_features: BTreeMap::new(),
         }
     }
 
@@ -116,8 +116,8 @@ impl CpuOptimizationDetector {
     }
 
     /// Generate optimal compilation flags for compiler backends
-    pub fn optimal_flags(&self) -> HashMap<String, String> {
-        let mut flags = HashMap::new();
+    pub fn optimal_flags(&self) -> BTreeMap<String, String> {
+        let mut flags = BTreeMap::new();
         flags.insert(
             "CFLAGS".to_string(),
             "-march=native -O3 -pipe -fomit-frame-pointer".to_string(),
@@ -136,7 +136,7 @@ impl CpuOptimizationDetector {
 
 /// Dependency and build graph engine for Gentoo/Portage-style emerges
 pub struct SigmaBuildGraph {
-    pub packages: HashMap<String, BuildSpec>,
+    pub packages: BTreeMap<String, BuildSpec>,
     pub features: FeatureSet,
     pub cpu: CpuOptimizationDetector,
 }
@@ -144,7 +144,7 @@ pub struct SigmaBuildGraph {
 impl SigmaBuildGraph {
     pub fn new() -> Self {
         Self {
-            packages: HashMap::new(),
+            packages: BTreeMap::new(),
             features: FeatureSet::new(),
             cpu: CpuOptimizationDetector::detect(),
         }
@@ -272,7 +272,7 @@ mod tests {
         features.global_features.insert("gui".to_string(), false);
 
         // Per-package overrides
-        let mut overrides = HashMap::new();
+        let mut overrides = BTreeMap::new();
         overrides.insert("gui".to_string(), true);
         features
             .per_package_features

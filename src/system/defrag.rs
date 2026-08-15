@@ -19,7 +19,7 @@
 // SigmaOS Disk Defragmenter for SigmaFS
 // OOP-based defragmentation with Merkle tree optimization
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// OOP trait for defragmentation strategies

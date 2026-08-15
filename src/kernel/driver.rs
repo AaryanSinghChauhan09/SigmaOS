@@ -7,7 +7,7 @@ use core::any::Any;
 
 use crate::kernel::device::{Device, DeviceBinding, DeviceType, DriverError, DriverMetadata};
 use crate::kernel::object::{KRef, KernelObject};
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 pub trait Driver: KernelObject + Send + Sync {
     fn driver_name(&self) -> &str;
@@ -31,6 +31,7 @@ pub trait DeviceDriver: Any + Send + Sync {
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
+#[derive(Debug, Clone)]
 pub struct DriverRegistration {
     pub driver: Box<dyn Driver>,
     pub priority: u32,
@@ -103,20 +104,18 @@ impl DriverRegistry {
         }
     }
 
-    pub fn find_driver(&self, name: &str) -> Option<&dyn Driver> {
+    pub fn find_driver<'a>(&'a self, name: &str) -> Option<&'a (dyn Driver + 'static)> {
         self.drivers
             .iter()
             .find(|d| d.driver.driver_name() == name)
             .map(|d| d.driver.as_ref())
     }
 
-    pub fn find_driver_mut(&mut self, name: &str) -> Option<&mut dyn Driver> {
-        for reg in self.drivers.iter_mut() {
-            if reg.driver.driver_name() == name {
-                return Some(reg.driver.as_mut());
-            }
-        }
-        None
+    pub fn find_driver_mut<'a>(&'a mut self, name: &str) -> Option<&'a mut (dyn Driver + 'static)> {
+        self.drivers
+            .iter_mut()
+            .find(|d| d.driver.driver_name() == name)
+            .map(|d| d.driver.as_mut())
     }
 
     pub fn register_device(&mut self, device: Box<dyn Device>) -> Result<(), DriverError> {
@@ -132,25 +131,19 @@ impl DriverRegistry {
     }
 
     pub fn probe_and_bind(&mut self) -> Result<(), DriverError> {
-        let mut bindings_to_make = Vec::new();
-
         for device in self.device_manager.devices() {
             for reg in &mut self.drivers {
                 if !reg.loaded && reg.driver.probe(device) {
                     if let Some(driver) = reg.driver.as_driver_impl_mut() {
                         driver.init()?;
-                        bindings_to_make.push((device.name().to_string(), reg.driver.driver_name().to_string()));
+                        self.device_manager
+                            .bind_driver(device.name(), reg.driver.driver_name())?;
                         reg.loaded = true;
                         break;
                     }
                 }
             }
         }
-
-        for (dev_name, drv_name) in bindings_to_make {
-            self.device_manager.bind_driver(&dev_name, &drv_name)?;
-        }
-
         Ok(())
     }
 

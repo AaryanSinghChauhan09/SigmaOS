@@ -204,6 +204,186 @@ pub enum PackageError {
     NetworkError,
 }
 
+/// Systemd Timer / Calendar Scheduler Parity
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TimerType {
+    OnBoot,
+    OnCalendarDaily,
+    OnCalendarWeekly,
+}
+
+pub struct SystemdTimer {
+    pub name: String,
+    pub timer_type: TimerType,
+    pub last_triggered_ms: u64,
+    pub active: bool,
+}
+
+pub struct SystemdTimerScheduler {
+    pub timers: Vec<SystemdTimer>,
+    pub current_time_ms: u64,
+}
+
+impl SystemdTimerScheduler {
+    pub fn new() -> Self {
+        Self {
+            timers: Vec::new(),
+            current_time_ms: 0,
+        }
+    }
+
+    pub fn register_timer(&mut self, name: &str, timer_type: TimerType) {
+        self.timers.push(SystemdTimer {
+            name: name.to_string(),
+            timer_type,
+            last_triggered_ms: 0,
+            active: true,
+        });
+    }
+
+    pub fn trigger_time_advance(&mut self, delta_ms: u64) -> Vec<String> {
+        self.current_time_ms += delta_ms;
+        let mut triggered_timers = Vec::new();
+
+        for timer in &mut self.timers {
+            if !timer.active {
+                continue;
+            }
+            let trigger = match timer.timer_type {
+                TimerType::OnBoot => {
+                    timer.last_triggered_ms == 0 && self.current_time_ms >= 500
+                }
+                TimerType::OnCalendarDaily => {
+                    self.current_time_ms - timer.last_triggered_ms >= 86_400_000
+                }
+                TimerType::OnCalendarWeekly => {
+                    self.current_time_ms - timer.last_triggered_ms >= 604_800_000
+                }
+            };
+            if trigger {
+                timer.last_triggered_ms = self.current_time_ms;
+                triggered_timers.push(timer.name.clone());
+            }
+        }
+        triggered_timers
+    }
+}
+
+impl Default for SystemdTimerScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Seccomp System Call Filtering Auditor
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeccompAction {
+    Allow,
+    KillThread,
+    Trap,
+}
+
+pub struct SeccompRule {
+    pub syscall_nr: u32,
+    pub action: SeccompAction,
+}
+
+pub struct SeccompSystemAuditor {
+    pub rules: Vec<SeccompRule>,
+    pub violation_count: u32,
+}
+
+impl SeccompSystemAuditor {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            violation_count: 0,
+        }
+    }
+
+    pub fn add_rule(&mut self, syscall_nr: u32, action: SeccompAction) {
+        self.rules.push(SeccompRule { syscall_nr, action });
+    }
+
+    pub fn evaluate_syscall(&mut self, syscall_nr: u32) -> SeccompAction {
+        for rule in &self.rules {
+            if rule.syscall_nr == syscall_nr {
+                if rule.action != SeccompAction::Allow {
+                    self.violation_count += 1;
+                }
+                return rule.action;
+            }
+        }
+        SeccompAction::Allow // Default is allow
+    }
+}
+
+impl Default for SeccompSystemAuditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Pluggable Authentication Modules Chain (PAM)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PamModuleResult {
+    Success,
+    AuthError,
+    UserUnknown,
+    SessionError,
+}
+
+pub struct PamModule {
+    pub name: String,
+    pub control_flag: String, // "required", "sufficient", "optional"
+    pub result_to_mock: PamModuleResult,
+}
+
+pub struct PamServiceChain {
+    pub modules: Vec<PamModule>,
+}
+
+impl PamServiceChain {
+    pub fn new() -> Self {
+        Self { modules: Vec::new() }
+    }
+
+    pub fn add_module(&mut self, name: &str, control_flag: &str, result: PamModuleResult) {
+        self.modules.push(PamModule {
+            name: name.to_string(),
+            control_flag: control_flag.to_string(),
+            result_to_mock: result,
+        });
+    }
+
+    pub fn authenticate(&self) -> bool {
+        let mut overall_success = true;
+        for module in &self.modules {
+            let res = module.result_to_mock;
+            if module.control_flag == "required" {
+                if res != PamModuleResult::Success {
+                    overall_success = false;
+                }
+            } else if module.control_flag == "sufficient" && res == PamModuleResult::Success {
+                return true;
+            }
+        }
+        overall_success
+    }
+}
+
+impl Default for PamServiceChain {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Linux compatibility layer for common utilities
 pub struct LinuxCompat {
     path: String,
@@ -267,5 +447,45 @@ mod tests {
     fn test_linux_compat() {
         let compat = LinuxCompat::new();
         assert!(compat.which("ls").is_some());
+    }
+
+    #[test]
+    fn test_systemd_timer_scheduler() {
+        let mut scheduler = SystemdTimerScheduler::new();
+        scheduler.register_timer("logrotate.timer", TimerType::OnCalendarDaily);
+        scheduler.register_timer("fstrim.timer", TimerType::OnCalendarWeekly);
+
+        let triggered = scheduler.trigger_time_advance(10_000_000);
+        assert_eq!(triggered.len(), 0);
+
+        let triggered = scheduler.trigger_time_advance(80_000_000); // Exceeds daily delta (total 90_000_000)
+        assert_eq!(triggered.len(), 1);
+        assert_eq!(triggered[0], "logrotate.timer");
+    }
+
+    #[test]
+    fn test_seccomp_system_auditor() {
+        let mut auditor = SeccompSystemAuditor::new();
+        auditor.add_rule(57, SeccompAction::KillThread); // fork/clone system call constraint
+        auditor.add_rule(59, SeccompAction::Allow);      // execve
+
+        assert_eq!(auditor.evaluate_syscall(59), SeccompAction::Allow);
+        assert_eq!(auditor.evaluate_syscall(57), SeccompAction::KillThread);
+        assert_eq!(auditor.violation_count, 1);
+    }
+
+    #[test]
+    fn test_pam_service_chain() {
+        let mut chain = PamServiceChain::new();
+        chain.add_module("pam_unix.so", "required", PamModuleResult::Success);
+        chain.add_module("pam_deny.so", "required", PamModuleResult::AuthError);
+
+        assert!(!chain.authenticate());
+
+        let mut chain_sufficient = PamServiceChain::new();
+        chain_sufficient.add_module("pam_local.so", "sufficient", PamModuleResult::Success);
+        chain_sufficient.add_module("pam_remote.so", "required", PamModuleResult::AuthError);
+
+        assert!(chain_sufficient.authenticate());
     }
 }

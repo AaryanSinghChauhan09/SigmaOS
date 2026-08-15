@@ -7,6 +7,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::{format, vec};
 
 /// nftables-inspired table families
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -572,11 +573,13 @@ impl NftConntrack {
             }
         }
 
+        let count = expired.len();
+
         for key in expired {
             self.connections.remove(&key);
         }
 
-        expired.len()
+        count
     }
 
     fn calculate_conn_key(&self, conn: &NftConnection) -> u64 {
@@ -619,6 +622,105 @@ pub struct NftablesManager {
     counters: BTreeMap<String, NftCounter>,
     quotas: BTreeMap<String, NftQuota>,
     conntrack: NftConntrack,
+}
+
+// ================= Stateful Iptables-to-Nftables Translation Engine =================
+
+pub struct IptablesRuleLegacy {
+    pub chain: String,
+    pub protocol: String,
+    pub dport: u16,
+    pub action: String,
+}
+
+pub struct IptablesToNftablesTranslator;
+
+impl IptablesToNftablesTranslator {
+    /// Translates legacy iptables chains and rules into modern nftables expressions
+    pub fn translate_rule(legacy_rule: &IptablesRuleLegacy, rule_handle: u64) -> NftRule {
+        let mut expressions = Vec::new();
+
+        // 1. Add Protocol expression (e.g. -p tcp)
+        let proto = match legacy_rule.protocol.as_str() {
+            "tcp" => NftPayloadProtocol::Tcp,
+            "udp" => NftPayloadProtocol::Udp,
+            _ => NftPayloadProtocol::Ip,
+        };
+        expressions.push(NftExpression::Payload {
+            protocol: proto,
+            offset: 9, // Protocol field in IPv4 header
+            len: 1,
+            dest_reg: NftRegister::Reg1,
+        });
+
+        // 2. Add Destination Port expression (e.g. --dport 80)
+        expressions.push(NftExpression::Payload {
+            protocol: proto,
+            offset: 2, // Destination port field offset in TCP/UDP header
+            len: 2,
+            dest_reg: NftRegister::Reg2,
+        });
+
+        // 3. Add Verdict expression (e.g. -j ACCEPT)
+        let verdict = match legacy_rule.action.as_str() {
+            "ACCEPT" => NftVerdict::Accept,
+            "DROP" => NftVerdict::Drop,
+            _ => NftVerdict::Continue,
+        };
+        expressions.push(NftExpression::Verdict(verdict));
+
+        NftRule {
+            handle: rule_handle,
+            expressions,
+            comment: alloc::format!(
+                "Translated from iptables -A {} -p {} --dport {} -j {}",
+                legacy_rule.chain, legacy_rule.protocol, legacy_rule.dport, legacy_rule.action
+            ),
+        }
+    }
+}
+
+// ================= Kubernetes-style Service Load Balancer & Proxy =================
+
+#[derive(Clone)]
+pub struct ServiceBackend {
+    pub pod_ip: String,
+    pub port: u16,
+}
+
+pub struct KubeProxyLoadBalancer {
+    pub service_vip: String,
+    pub service_port: u16,
+    pub backends: Vec<ServiceBackend>,
+    pub next_backend_idx: usize,
+}
+
+impl KubeProxyLoadBalancer {
+    pub fn new(vip: &str, port: u16) -> Self {
+        Self {
+            service_vip: vip.to_string(),
+            service_port: port,
+            backends: Vec::new(),
+            next_backend_idx: 0,
+        }
+    }
+
+    pub fn register_pod_backend(&mut self, ip: &str, port: u16) {
+        self.backends.push(ServiceBackend {
+            pod_ip: ip.to_string(),
+            port,
+        });
+    }
+
+    /// Selects a backend Pod destination using round-robin (kube-proxy IPTABLES/IPVS-parity)
+    pub fn route_connection(&mut self) -> Result<ServiceBackend, &'static str> {
+        if self.backends.is_empty() {
+            return Err("KubeProxy: No backend pods registered to receive cluster VIP traffic");
+        }
+        let backend = self.backends[self.next_backend_idx].clone();
+        self.next_backend_idx = (self.next_backend_idx + 1) % self.backends.len();
+        Ok(backend)
+    }
 }
 
 impl NftablesManager {
@@ -775,7 +877,7 @@ impl NftablesManager {
 
     fn evaluate_rule(
         &self,
-        _rule: &NftRule,
+        rule: &NftRule,
         _src_addr: &str,
         _src_port: u16,
         _dst_addr: &str,
@@ -974,5 +1076,42 @@ mod tests {
         set.add_element(vec![192, 168, 1, 1]).unwrap();
 
         assert!(set.contains(&vec![192, 168, 1, 1]));
+    }
+
+    #[test]
+    fn test_iptables_to_nftables_translation() {
+        let legacy_rule = IptablesRuleLegacy {
+            chain: "INPUT".to_string(),
+            protocol: "tcp".to_string(),
+            dport: 80,
+            action: "ACCEPT".to_string(),
+        };
+
+        let nft_rule = IptablesToNftablesTranslator::translate_rule(&legacy_rule, 101);
+        assert_eq!(nft_rule.handle, 101);
+        assert!(nft_rule.comment.contains("Translated from iptables"));
+        assert_eq!(nft_rule.expressions.len(), 3);
+
+        if let NftExpression::Verdict(verdict) = &nft_rule.expressions[2] {
+            assert_eq!(*verdict, NftVerdict::Accept);
+        } else {
+            panic!("Expected verdict expression as third element");
+        }
+    }
+
+    #[test]
+    fn test_kubeproxy_load_balancer() {
+        let mut lb = KubeProxyLoadBalancer::new("10.96.0.1", 80);
+        lb.register_pod_backend("10.244.1.5", 8080);
+        lb.register_pod_backend("10.244.2.8", 8080);
+
+        let dest1 = lb.route_connection().unwrap();
+        assert_eq!(dest1.pod_ip, "10.244.1.5");
+
+        let dest2 = lb.route_connection().unwrap();
+        assert_eq!(dest2.pod_ip, "10.244.2.8");
+
+        let dest3 = lb.route_connection().unwrap();
+        assert_eq!(dest3.pod_ip, "10.244.1.5"); // Loops back via round-robin
     }
 }

@@ -18,7 +18,7 @@
 
 /// SigmaOS Huge Pages and hugetlbfs memory support
 /// Standard huge pages: 2MB or 1GB configurations to reduce TLB misses
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum HugePageSize {
@@ -36,19 +36,19 @@ impl HugePageSize {
 }
 
 pub struct HugePageManager {
-    allocated_pages: HashMap<usize, HugePageSize>,
-    free_pages: HashMap<HugePageSize, usize>,
+    allocated_pages: BTreeMap<usize, HugePageSize>,
+    free_pages: BTreeMap<HugePageSize, usize>,
 }
 
 impl HugePageManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut free_pages = HashMap::new();
+        let mut free_pages = BTreeMap::new();
         free_pages.insert(HugePageSize::Size2Mb, 512); // Pre-reserve 1GB worth of 2MB pages
         free_pages.insert(HugePageSize::Size1Gb, 4); // Pre-reserve 4GB worth of 1GB pages
 
         HugePageManager {
-            allocated_pages: HashMap::new(),
+            allocated_pages: BTreeMap::new(),
             free_pages,
         }
     }

@@ -505,3 +505,983 @@ mod tests {
         assert!(regs.get_by_name("invalid_reg").is_none());
     }
 }
+
+/// Linux/BSD-inspired CPU System Control Registers manager
+/// Implements reading and writing Control Registers (x86_64 CR0/CR3/CR4, ARM64 SCTLR_EL1/TTBR0_EL1)
+/// Utilizing high-performance, zero-dependency inline assembly.
+pub struct SovereignCpuRegisters {
+    pub emulated_cr0: AtomicUsize,
+    pub emulated_cr3: AtomicUsize,
+    pub emulated_cr4: AtomicUsize,
+}
+
+impl Default for SovereignCpuRegisters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCpuRegisters {
+    pub fn new() -> Self {
+        SovereignCpuRegisters {
+            emulated_cr0: AtomicUsize::new(0x80050033), // standard paging enable CR0
+            emulated_cr3: AtomicUsize::new(0x1F000),    // default CR3
+            emulated_cr4: AtomicUsize::new(0x000006F0), // standard PAE CR4
+        }
+    }
+
+    /// Read x86_64 Control Register 0 (CR0)
+    pub fn read_cr0(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr0", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 0 (CR0)
+    pub fn write_cr0(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr0, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 3 (CR3 - Page Table Directory Base)
+    pub fn read_cr3(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr3", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 3 (CR3)
+    pub fn write_cr3(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr3, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 4 (CR4)
+    pub fn read_cr4(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr4", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 4 (CR4)
+    pub fn write_cr4(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr4, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read ARM64 System Control Register 1 (SCTLR_EL1)
+    pub fn read_sctlr_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, sctlr_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x30D00800 // emulated default ARM64 control register
+    }
+
+    /// Read ARM64 Translation Table Base Register 0 (TTBR0_EL1)
+    pub fn read_ttbr0_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, ttbr0_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x1F000
+    }
+}
+
+#[cfg(test)]
+mod register_tests {
+    use super::*;
+
+    #[test]
+    fn test_cpu_control_register_read_writes() {
+        let regs = SovereignCpuRegisters::new();
+
+        // 1. Audit CR0 read/write
+        let initial_cr0 = regs.read_cr0();
+        assert_eq!(initial_cr0, 0x80050033);
+
+        regs.write_cr0(0x80050031); // Toggle bit
+        assert_eq!(regs.read_cr0(), 0x80050031);
+
+        // 2. Audit CR3 read/write
+        assert_eq!(regs.read_cr3(), 0x1F000);
+        regs.write_cr3(0x2A000);
+        assert_eq!(regs.read_cr3(), 0x2A000);
+
+        // 3. Audit ARM64 SCTLR read
+        assert_eq!(regs.read_sctlr_el1(), 0x30D00800);
+    }
+}
+
+/// Linux/BSD-inspired CPU System Control Registers manager
+/// Implements reading and writing Control Registers (x86_64 CR0/CR3/CR4, ARM64 SCTLR_EL1/TTBR0_EL1)
+/// Utilizing high-performance, zero-dependency inline assembly.
+pub struct SovereignCpuRegisters {
+    pub emulated_cr0: AtomicUsize,
+    pub emulated_cr3: AtomicUsize,
+    pub emulated_cr4: AtomicUsize,
+}
+
+impl Default for SovereignCpuRegisters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCpuRegisters {
+    pub fn new() -> Self {
+        SovereignCpuRegisters {
+            emulated_cr0: AtomicUsize::new(0x80050033), // standard paging enable CR0
+            emulated_cr3: AtomicUsize::new(0x1F000),    // default CR3
+            emulated_cr4: AtomicUsize::new(0x000006F0), // standard PAE CR4
+        }
+    }
+
+    /// Read x86_64 Control Register 0 (CR0)
+    pub fn read_cr0(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr0", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 0 (CR0)
+    pub fn write_cr0(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr0, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 3 (CR3 - Page Table Directory Base)
+    pub fn read_cr3(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr3", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 3 (CR3)
+    pub fn write_cr3(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr3, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 4 (CR4)
+    pub fn read_cr4(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr4", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 4 (CR4)
+    pub fn write_cr4(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr4, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read ARM64 System Control Register 1 (SCTLR_EL1)
+    pub fn read_sctlr_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, sctlr_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x30D00800 // emulated default ARM64 control register
+    }
+
+    /// Read ARM64 Translation Table Base Register 0 (TTBR0_EL1)
+    pub fn read_ttbr0_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, ttbr0_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x1F000
+    }
+}
+
+#[cfg(test)]
+mod register_tests {
+    use super::*;
+
+    #[test]
+    fn test_cpu_control_register_read_writes() {
+        let regs = SovereignCpuRegisters::new();
+
+        // 1. Audit CR0 read/write
+        let initial_cr0 = regs.read_cr0();
+        assert_eq!(initial_cr0, 0x80050033);
+
+        regs.write_cr0(0x80050031); // Toggle bit
+        assert_eq!(regs.read_cr0(), 0x80050031);
+
+        // 2. Audit CR3 read/write
+        assert_eq!(regs.read_cr3(), 0x1F000);
+        regs.write_cr3(0x2A000);
+        assert_eq!(regs.read_cr3(), 0x2A000);
+
+        // 3. Audit ARM64 SCTLR read
+        assert_eq!(regs.read_sctlr_el1(), 0x30D00800);
+    }
+}
+
+/// Linux/BSD-inspired CPU System Control Registers manager
+/// Implements reading and writing Control Registers (x86_64 CR0/CR3/CR4, ARM64 SCTLR_EL1/TTBR0_EL1)
+/// Utilizing high-performance, zero-dependency inline assembly.
+pub struct SovereignCpuRegisters {
+    pub emulated_cr0: AtomicUsize,
+    pub emulated_cr3: AtomicUsize,
+    pub emulated_cr4: AtomicUsize,
+}
+
+impl Default for SovereignCpuRegisters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCpuRegisters {
+    pub fn new() -> Self {
+        SovereignCpuRegisters {
+            emulated_cr0: AtomicUsize::new(0x80050033), // standard paging enable CR0
+            emulated_cr3: AtomicUsize::new(0x1F000),    // default CR3
+            emulated_cr4: AtomicUsize::new(0x000006F0), // standard PAE CR4
+        }
+    }
+
+    /// Read x86_64 Control Register 0 (CR0)
+    pub fn read_cr0(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr0", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 0 (CR0)
+    pub fn write_cr0(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr0, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 3 (CR3 - Page Table Directory Base)
+    pub fn read_cr3(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr3", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 3 (CR3)
+    pub fn write_cr3(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr3, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 4 (CR4)
+    pub fn read_cr4(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr4", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 4 (CR4)
+    pub fn write_cr4(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr4, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read ARM64 System Control Register 1 (SCTLR_EL1)
+    pub fn read_sctlr_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, sctlr_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x30D00800 // emulated default ARM64 control register
+    }
+
+    /// Read ARM64 Translation Table Base Register 0 (TTBR0_EL1)
+    pub fn read_ttbr0_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, ttbr0_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x1F000
+    }
+}
+
+#[cfg(test)]
+mod register_tests {
+    use super::*;
+
+    #[test]
+    fn test_cpu_control_register_read_writes() {
+        let regs = SovereignCpuRegisters::new();
+
+        // 1. Audit CR0 read/write
+        let initial_cr0 = regs.read_cr0();
+        assert_eq!(initial_cr0, 0x80050033);
+
+        regs.write_cr0(0x80050031); // Toggle bit
+        assert_eq!(regs.read_cr0(), 0x80050031);
+
+        // 2. Audit CR3 read/write
+        assert_eq!(regs.read_cr3(), 0x1F000);
+        regs.write_cr3(0x2A000);
+        assert_eq!(regs.read_cr3(), 0x2A000);
+
+        // 3. Audit ARM64 SCTLR read
+        assert_eq!(regs.read_sctlr_el1(), 0x30D00800);
+    }
+}
+
+/// Linux/BSD-inspired CPU System Control Registers manager
+/// Implements reading and writing Control Registers (x86_64 CR0/CR3/CR4, ARM64 SCTLR_EL1/TTBR0_EL1)
+/// Utilizing high-performance, zero-dependency inline assembly.
+pub struct SovereignCpuRegisters {
+    pub emulated_cr0: AtomicUsize,
+    pub emulated_cr3: AtomicUsize,
+    pub emulated_cr4: AtomicUsize,
+}
+
+impl Default for SovereignCpuRegisters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCpuRegisters {
+    pub fn new() -> Self {
+        SovereignCpuRegisters {
+            emulated_cr0: AtomicUsize::new(0x80050033), // standard paging enable CR0
+            emulated_cr3: AtomicUsize::new(0x1F000),    // default CR3
+            emulated_cr4: AtomicUsize::new(0x000006F0), // standard PAE CR4
+        }
+    }
+
+    /// Read x86_64 Control Register 0 (CR0)
+    pub fn read_cr0(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr0", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 0 (CR0)
+    pub fn write_cr0(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr0, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 3 (CR3 - Page Table Directory Base)
+    pub fn read_cr3(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr3", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 3 (CR3)
+    pub fn write_cr3(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr3, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 4 (CR4)
+    pub fn read_cr4(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr4", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 4 (CR4)
+    pub fn write_cr4(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr4, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read ARM64 System Control Register 1 (SCTLR_EL1)
+    pub fn read_sctlr_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, sctlr_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x30D00800 // emulated default ARM64 control register
+    }
+
+    /// Read ARM64 Translation Table Base Register 0 (TTBR0_EL1)
+    pub fn read_ttbr0_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, ttbr0_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x1F000
+    }
+}
+
+#[cfg(test)]
+mod register_tests {
+    use super::*;
+
+    #[test]
+    fn test_cpu_control_register_read_writes() {
+        let regs = SovereignCpuRegisters::new();
+
+        // 1. Audit CR0 read/write
+        let initial_cr0 = regs.read_cr0();
+        assert_eq!(initial_cr0, 0x80050033);
+
+        regs.write_cr0(0x80050031); // Toggle bit
+        assert_eq!(regs.read_cr0(), 0x80050031);
+
+        // 2. Audit CR3 read/write
+        assert_eq!(regs.read_cr3(), 0x1F000);
+        regs.write_cr3(0x2A000);
+        assert_eq!(regs.read_cr3(), 0x2A000);
+
+        // 3. Audit ARM64 SCTLR read
+        assert_eq!(regs.read_sctlr_el1(), 0x30D00800);
+    }
+}
+
+/// Linux/BSD-inspired CPU System Control Registers manager
+/// Implements reading and writing Control Registers (x86_64 CR0/CR3/CR4, ARM64 SCTLR_EL1/TTBR0_EL1)
+/// Utilizing high-performance, zero-dependency inline assembly.
+pub struct SovereignCpuRegisters {
+    pub emulated_cr0: AtomicUsize,
+    pub emulated_cr3: AtomicUsize,
+    pub emulated_cr4: AtomicUsize,
+}
+
+impl Default for SovereignCpuRegisters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCpuRegisters {
+    pub fn new() -> Self {
+        SovereignCpuRegisters {
+            emulated_cr0: AtomicUsize::new(0x80050033), // standard paging enable CR0
+            emulated_cr3: AtomicUsize::new(0x1F000),    // default CR3
+            emulated_cr4: AtomicUsize::new(0x000006F0), // standard PAE CR4
+        }
+    }
+
+    /// Read x86_64 Control Register 0 (CR0)
+    pub fn read_cr0(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr0", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 0 (CR0)
+    pub fn write_cr0(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr0, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 3 (CR3 - Page Table Directory Base)
+    pub fn read_cr3(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr3", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 3 (CR3)
+    pub fn write_cr3(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr3, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 4 (CR4)
+    pub fn read_cr4(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr4", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 4 (CR4)
+    pub fn write_cr4(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr4, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read ARM64 System Control Register 1 (SCTLR_EL1)
+    pub fn read_sctlr_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, sctlr_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x30D00800 // emulated default ARM64 control register
+    }
+
+    /// Read ARM64 Translation Table Base Register 0 (TTBR0_EL1)
+    pub fn read_ttbr0_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, ttbr0_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x1F000
+    }
+}
+
+#[cfg(test)]
+mod register_tests {
+    use super::*;
+
+    #[test]
+    fn test_cpu_control_register_read_writes() {
+        let regs = SovereignCpuRegisters::new();
+
+        // 1. Audit CR0 read/write
+        let initial_cr0 = regs.read_cr0();
+        assert_eq!(initial_cr0, 0x80050033);
+
+        regs.write_cr0(0x80050031); // Toggle bit
+        assert_eq!(regs.read_cr0(), 0x80050031);
+
+        // 2. Audit CR3 read/write
+        assert_eq!(regs.read_cr3(), 0x1F000);
+        regs.write_cr3(0x2A000);
+        assert_eq!(regs.read_cr3(), 0x2A000);
+
+        // 3. Audit ARM64 SCTLR read
+        assert_eq!(regs.read_sctlr_el1(), 0x30D00800);
+    }
+}
+
+/// Linux/BSD-inspired CPU System Control Registers manager
+/// Implements reading and writing Control Registers (x86_64 CR0/CR3/CR4, ARM64 SCTLR_EL1/TTBR0_EL1)
+/// Utilizing high-performance, zero-dependency inline assembly.
+pub struct SovereignCpuRegisters {
+    pub emulated_cr0: AtomicUsize,
+    pub emulated_cr3: AtomicUsize,
+    pub emulated_cr4: AtomicUsize,
+}
+
+impl Default for SovereignCpuRegisters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCpuRegisters {
+    pub fn new() -> Self {
+        SovereignCpuRegisters {
+            emulated_cr0: AtomicUsize::new(0x80050033), // standard paging enable CR0
+            emulated_cr3: AtomicUsize::new(0x1F000),    // default CR3
+            emulated_cr4: AtomicUsize::new(0x000006F0), // standard PAE CR4
+        }
+    }
+
+    /// Read x86_64 Control Register 0 (CR0)
+    pub fn read_cr0(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr0", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 0 (CR0)
+    pub fn write_cr0(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr0, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 3 (CR3 - Page Table Directory Base)
+    pub fn read_cr3(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr3", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 3 (CR3)
+    pub fn write_cr3(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr3, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 4 (CR4)
+    pub fn read_cr4(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr4", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 4 (CR4)
+    pub fn write_cr4(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr4, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read ARM64 System Control Register 1 (SCTLR_EL1)
+    pub fn read_sctlr_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, sctlr_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x30D00800 // emulated default ARM64 control register
+    }
+
+    /// Read ARM64 Translation Table Base Register 0 (TTBR0_EL1)
+    pub fn read_ttbr0_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, ttbr0_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x1F000
+    }
+}
+
+#[cfg(test)]
+mod register_tests {
+    use super::*;
+
+    #[test]
+    fn test_cpu_control_register_read_writes() {
+        let regs = SovereignCpuRegisters::new();
+
+        // 1. Audit CR0 read/write
+        let initial_cr0 = regs.read_cr0();
+        assert_eq!(initial_cr0, 0x80050033);
+
+        regs.write_cr0(0x80050031); // Toggle bit
+        assert_eq!(regs.read_cr0(), 0x80050031);
+
+        // 2. Audit CR3 read/write
+        assert_eq!(regs.read_cr3(), 0x1F000);
+        regs.write_cr3(0x2A000);
+        assert_eq!(regs.read_cr3(), 0x2A000);
+
+        // 3. Audit ARM64 SCTLR read
+        assert_eq!(regs.read_sctlr_el1(), 0x30D00800);
+    }
+}
+
+/// Linux/BSD-inspired CPU System Control Registers manager
+/// Implements reading and writing Control Registers (x86_64 CR0/CR3/CR4, ARM64 SCTLR_EL1/TTBR0_EL1)
+/// Utilizing high-performance, zero-dependency inline assembly.
+pub struct SovereignCpuRegisters {
+    pub emulated_cr0: AtomicUsize,
+    pub emulated_cr3: AtomicUsize,
+    pub emulated_cr4: AtomicUsize,
+}
+
+impl Default for SovereignCpuRegisters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCpuRegisters {
+    pub fn new() -> Self {
+        SovereignCpuRegisters {
+            emulated_cr0: AtomicUsize::new(0x80050033), // standard paging enable CR0
+            emulated_cr3: AtomicUsize::new(0x1F000),    // default CR3
+            emulated_cr4: AtomicUsize::new(0x000006F0), // standard PAE CR4
+        }
+    }
+
+    /// Read x86_64 Control Register 0 (CR0)
+    pub fn read_cr0(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr0", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 0 (CR0)
+    pub fn write_cr0(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr0, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr0.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 3 (CR3 - Page Table Directory Base)
+    pub fn read_cr3(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr3", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 3 (CR3)
+    pub fn write_cr3(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr3, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr3.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read x86_64 Control Register 4 (CR4)
+    pub fn read_cr4(&self) -> u64 {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mov {}, cr4", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.load(Ordering::SeqCst) as u64
+    }
+
+    /// Write x86_64 Control Register 4 (CR4)
+    pub fn write_cr4(&self, val: u64) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::asm!("mov cr4, {}", in(reg) val);
+        }
+        #[cfg(not(all(target_arch = "x86_64", target_os = "none")))]
+        self.emulated_cr4.store(val as usize, Ordering::SeqCst);
+    }
+
+    /// Read ARM64 System Control Register 1 (SCTLR_EL1)
+    pub fn read_sctlr_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, sctlr_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x30D00800 // emulated default ARM64 control register
+    }
+
+    /// Read ARM64 Translation Table Base Register 0 (TTBR0_EL1)
+    pub fn read_ttbr0_el1(&self) -> u64 {
+        #[cfg(all(target_arch = "aarch64", target_os = "none"))]
+        unsafe {
+            let val: u64;
+            core::arch::asm!("mrs {}, ttbr0_el1", out(reg) val);
+            val
+        }
+        #[cfg(not(all(target_arch = "aarch64", target_os = "none")))]
+        0x1F000
+    }
+}
+
+#[cfg(test)]
+mod register_tests {
+    use super::*;
+
+    #[test]
+    fn test_cpu_control_register_read_writes() {
+        let regs = SovereignCpuRegisters::new();
+
+        // 1. Audit CR0 read/write
+        let initial_cr0 = regs.read_cr0();
+        assert_eq!(initial_cr0, 0x80050033);
+
+        regs.write_cr0(0x80050031); // Toggle bit
+        assert_eq!(regs.read_cr0(), 0x80050031);
+
+        // 2. Audit CR3 read/write
+        assert_eq!(regs.read_cr3(), 0x1F000);
+        regs.write_cr3(0x2A000);
+        assert_eq!(regs.read_cr3(), 0x2A000);
+
+        // 3. Audit ARM64 SCTLR read
+        assert_eq!(regs.read_sctlr_el1(), 0x30D00800);
+    }
+}

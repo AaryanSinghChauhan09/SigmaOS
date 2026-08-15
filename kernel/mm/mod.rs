@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Memory management module - exports Phase G memory components
 pub mod buddy_allocator;
 pub mod slab_allocator;

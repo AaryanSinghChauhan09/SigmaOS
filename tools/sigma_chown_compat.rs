@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Chown Compatibility
 //! File ownership modification (chown command)
@@ -44,7 +45,7 @@ pub unsafe extern "C" fn chown_init() -> SigmaI32 {
 /// Change file owner
 #[no_mangle]
 pub unsafe extern "C" fn chown_set(path: *const u8, uid: SigmaU32, gid: SigmaU32) -> SigmaI32 {
-    if !CHOWN_INITIALIZED || path.isnull() {
+    if !CHOWN_INITIALIZED || path.is_null() {
         return -1;
     }
     
@@ -99,7 +100,7 @@ pub unsafe extern "C" fn chown_set(path: *const u8, uid: SigmaU32, gid: SigmaU32
 /// Get file ownership
 #[no_mangle]
 pub unsafe extern "C" fn chown_get(path: *const u8, uid: *mut SigmaU32, gid: *mut SigmaU32) -> SigmaI32 {
-    if !CHOWN_INITIALIZED || path.isnull() || uid.isnull() || gid.isnull() {
+    if !CHOWN_INITIALIZED || path.is_null() || uid.is_null() || gid.is_null() {
         return -1;
     }
     
@@ -133,7 +134,7 @@ pub unsafe extern "C" fn chown_get(path: *const u8, uid: *mut SigmaU32, gid: *mu
 /// Recursive chown
 #[no_mangle]
 pub unsafe extern "C" fn chown_recursive(path: *const u8, uid: SigmaU32, gid: SigmaU32) -> SigmaI32 {
-    if !CHOWN_INITIALIZED || path.isnull() {
+    if !CHOWN_INITIALIZED || path.is_null() {
         return -1;
     }
     

@@ -19,7 +19,7 @@
 // SigmaOS File Manager
 // OOP-based file management with advanced features
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// File item
@@ -128,7 +128,7 @@ pub struct FileManager {
     show_hidden: bool,
     file_operation: Box<dyn FileOperation>,
     clipboard: Vec<(PathBuf, ClipboardOperation)>,
-    bookmarks: HashMap<String, PathBuf>,
+    bookmarks: BTreeMap<String, PathBuf>,
     recent_paths: Vec<PathBuf>,
 }
 
@@ -141,7 +141,7 @@ impl FileManager {
             show_hidden: false,
             file_operation,
             clipboard: Vec::new(),
-            bookmarks: HashMap::new(),
+            bookmarks: BTreeMap::new(),
             recent_paths: Vec::new(),
         }
     }

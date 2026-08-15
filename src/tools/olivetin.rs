@@ -4,9 +4,8 @@
 //! in a sandboxed, ease-of-use environment under #![no_std].
 
 extern crate alloc;
-use alloc::string::String;
 use alloc::string::ToString;
-use crate::klib::{Vec, HashMap};
+use crate::klib::{Vec, BTreeMap};
 
 #[derive(Debug, Clone)]
 pub struct OliveTinAction {

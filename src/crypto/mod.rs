@@ -21,6 +21,7 @@ pub mod encryption;
 pub mod hash;
 pub mod kdf;
 pub mod keys;
+pub mod libsodium;
 pub mod postquantum;
 pub mod pqc_dilithium;
 pub mod primitives;

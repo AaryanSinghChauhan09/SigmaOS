@@ -19,7 +19,7 @@
 // SigmaOS Calendar App
 // OOP-based calendar with events, reminders, and scheduling
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 /// Event type
@@ -111,14 +111,14 @@ pub trait CalendarStorage {
 
 /// In-memory calendar storage
 pub struct InMemoryCalendarStorage {
-    events: HashMap<String, CalendarEvent>,
+    events: BTreeMap<String, CalendarEvent>,
 }
 
 impl InMemoryCalendarStorage {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            events: HashMap::new(),
+            events: BTreeMap::new(),
         }
     }
 }
@@ -166,7 +166,7 @@ pub struct CalendarApp {
     storage: Box<dyn CalendarStorage>,
     current_view: CalendarView,
     current_date: u64,
-    timezones: HashMap<String, String>,
+    timezones: BTreeMap<String, String>,
 }
 
 impl CalendarApp {
@@ -180,7 +180,7 @@ impl CalendarApp {
             storage,
             current_view: CalendarView::Month,
             current_date: now,
-            timezones: HashMap::new(),
+            timezones: BTreeMap::new(),
         }
     }
 

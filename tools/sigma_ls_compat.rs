@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS LS Compatibility
 //! Directory listing (ls command)
@@ -119,7 +120,7 @@ pub unsafe extern "C" fn ls_list(path: *const u8, entries: *mut FileEntry, max_c
 /// List with long format
 #[no_mangle]
 pub unsafe extern "C" fn ls_list_long(path: *const u8, entries: *mut FileEntry, max_count: SigmaU32) -> SigmaU32 {
-    if !LS_INITIALIZED || entries.isnull() {
+    if !LS_INITIALIZED || entries.is_null() {
         return 0;
     }
     
@@ -129,7 +130,7 @@ pub unsafe extern "C" fn ls_list_long(path: *const u8, entries: *mut FileEntry, 
 /// List all files (including hidden)
 #[no_mangle]
 pub unsafe extern "C" fn ls_list_all(path: *const u8, entries: *mut FileEntry, max_count: SigmaU32) -> SigmaU32 {
-    if !LS_INITIALIZED || entries.isnull() {
+    if !LS_INITIALIZED || entries.is_null() {
         return 0;
     }
     
@@ -164,7 +165,7 @@ pub unsafe extern "C" fn ls_add_entry(
         modified_time: 0,
     };
     
-    if !name.isnull() {
+    if !name.is_null() {
         for i in 0..255 {
             let byte = *name.add(i);
             if byte == 0 { break; }

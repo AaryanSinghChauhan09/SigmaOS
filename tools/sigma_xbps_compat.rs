@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS XBPS Compatibility Layer
 //! XBPS compatibility for Void Linux

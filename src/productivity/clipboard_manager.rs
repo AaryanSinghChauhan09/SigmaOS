@@ -19,7 +19,7 @@
 // SigmaOS Clipboard Manager
 // OOP-based clipboard management with history and type support
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::time::{Duration, Instant};
 
 /// Clipboard item type
@@ -38,7 +38,7 @@ pub struct ClipboardItem {
     pub id: String,
     pub item_type: ClipboardItemType,
     pub content: Vec<u8>,
-    pub metadata: HashMap<String, String>,
+    pub metadata: BTreeMap<String, String>,
     pub timestamp: Instant,
     pub source_app: Option<String>,
 }
@@ -168,7 +168,7 @@ impl ClipboardManager {
             item_type: ClipboardItemType::Text,
             content: text.into_bytes(),
             metadata: {
-                let mut meta = HashMap::new();
+                let mut meta = BTreeMap::new();
                 meta.insert("text_length".to_string(), text_len.to_string());
                 meta
             },
@@ -359,7 +359,7 @@ mod tests {
             id: "test".to_string(),
             item_type: ClipboardItemType::Text,
             content: b"Hello".to_vec(),
-            metadata: HashMap::new(),
+            metadata: BTreeMap::new(),
             timestamp: Instant::now(),
             source_app: None,
         };

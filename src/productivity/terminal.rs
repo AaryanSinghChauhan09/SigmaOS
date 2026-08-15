@@ -19,7 +19,7 @@
 // SigmaOS Integrated Terminal
 // OOP-based terminal emulator with shell integration
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Terminal session
 #[derive(Debug, Clone)]
@@ -28,7 +28,7 @@ pub struct TerminalSession {
     pub shell_type: ShellType,
     pub working_directory: String,
     pub history: Vec<String>,
-    pub env_vars: HashMap<String, String>,
+    pub env_vars: BTreeMap<String, String>,
     pub is_active: bool,
 }
 
@@ -264,7 +264,7 @@ impl IntegratedTerminal {
             working_directory: "/home/user".to_string(),
             history: Vec::new(),
             env_vars: {
-                let mut vars = HashMap::new();
+                let mut vars = BTreeMap::new();
                 vars.insert("PATH".to_string(), "/usr/bin:/bin".to_string());
                 vars.insert("HOME".to_string(), "/home/user".to_string());
                 vars.insert("TERM".to_string(), "sigma-term".to_string());

@@ -16,14 +16,14 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Represents a Language Pack for translating system messages.
 #[derive(Debug, Clone)]
 pub struct LanguagePack {
     pub language_code: String,
     pub name: String,
-    pub translations: HashMap<String, String>,
+    pub translations: BTreeMap<String, String>,
 }
 
 impl LanguagePack {
@@ -31,7 +31,7 @@ impl LanguagePack {
         Self {
             language_code: language_code.to_string(),
             name: name.to_string(),
-            translations: HashMap::new(),
+            translations: BTreeMap::new(),
         }
     }
 
@@ -40,7 +40,7 @@ impl LanguagePack {
     }
 
     pub fn translate(&self, key: &str) -> Option<&str> {
-        self.translations.get(key).map(|s| s.as_str())
+        self.translations.get(key).map(|s: &String| s.as_str())
     }
 
     /// Formats the translation by replacing placeholders like `{0}`, `{1}` with arguments.
@@ -76,14 +76,14 @@ pub struct ImeCandidate {
 #[derive(Debug, Clone)]
 pub struct InputMethodEngine {
     pub script_name: String,
-    pub dictionary: HashMap<String, Vec<ImeCandidate>>,
+    pub dictionary: BTreeMap<String, Vec<ImeCandidate>>,
 }
 
 impl InputMethodEngine {
     pub fn new(script_name: &str) -> Self {
         Self {
             script_name: script_name.to_string(),
-            dictionary: HashMap::new(),
+            dictionary: BTreeMap::new(),
         }
     }
 
@@ -98,6 +98,7 @@ impl InputMethodEngine {
     /// Automatically converts input if a single perfect candidate exists, or returns the original.
     pub fn convert_auto(&self, input: &str) -> String {
         if let Some(candidates) = self.dictionary.get(input) {
+            let candidates: &Vec<ImeCandidate> = candidates;
             if !candidates.is_empty() {
                 return candidates[0].text.clone();
             }
@@ -182,18 +183,18 @@ impl RegionalSettings {
 #[derive(Debug, Clone)]
 pub struct LocaleManager {
     pub current_locale: String,
-    pub language_packs: HashMap<String, LanguagePack>,
-    pub imes: HashMap<String, InputMethodEngine>,
-    pub regional_settings: HashMap<String, RegionalSettings>,
+    pub language_packs: BTreeMap<String, LanguagePack>,
+    pub imes: BTreeMap<String, InputMethodEngine>,
+    pub regional_settings: BTreeMap<String, RegionalSettings>,
 }
 
 impl LocaleManager {
     pub fn new(default_locale: &str) -> Self {
         Self {
             current_locale: default_locale.to_string(),
-            language_packs: HashMap::new(),
-            imes: HashMap::new(),
-            regional_settings: HashMap::new(),
+            language_packs: BTreeMap::new(),
+            imes: BTreeMap::new(),
+            regional_settings: BTreeMap::new(),
         }
     }
 
@@ -221,7 +222,9 @@ impl LocaleManager {
 
     pub fn translate(&self, key: &str) -> String {
         if let Some(pack) = self.language_packs.get(&self.current_locale) {
+            let pack: &LanguagePack = pack;
             if let Some(translation) = pack.translate(key) {
+                let translation: &str = translation;
                 return translation.to_string();
             }
         }

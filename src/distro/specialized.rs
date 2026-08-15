@@ -447,11 +447,15 @@ impl AptCacheSimulator {
         }
     }
 
-    pub fn cache_package_metadata(&mut self, manifest: AptPackageManifest) -> Result<&'static str, &'static str> {
+    pub fn cache_package_metadata(
+        &mut self,
+        manifest: AptPackageManifest,
+    ) -> Result<&'static str, &'static str> {
         if self.cached_manifests.len() >= self.max_cache_size {
             return Err("APT Cache is full, trigger cache pruning");
         }
-        self.cached_manifests.insert(manifest.name.clone(), manifest);
+        self.cached_manifests
+            .insert(manifest.name.clone(), manifest);
         Ok("Package metadata stored in offline APT cache")
     }
 
@@ -507,7 +511,9 @@ impl DebianPolicyEnforcer {
         }
         if self.enforce_fhs {
             // FHS conventions require standard starting blocks
-            return path.starts_with("/usr/") || path.starts_with("/bin/") || path.starts_with("/etc/");
+            return path.starts_with("/usr/")
+                || path.starts_with("/bin/")
+                || path.starts_with("/etc/");
         }
         true
     }
@@ -647,9 +653,98 @@ impl Default for FreezeBasedStabilization {
     }
 }
 
+/// Debian-style preseed configuration question representing a installer response
+#[derive(Debug, Clone)]
+pub struct PreseedQuestion {
+    pub owner: String,       // e.g. "d-i" or "debian-installer"
+    pub template: String,    // e.g. "mirror/http/hostname"
+    pub question_type: String, // e.g. "string"
+    pub value: String,       // e.g. "ftp.us.debian.org"
+}
+
+/// Debian-style Automated Preseed installer configuration engine
+pub struct DebianPreseedEngine {
+    pub answers: HashMap<String, PreseedQuestion>,
+}
+
+impl DebianPreseedEngine {
+    pub fn new() -> Self {
+        Self {
+            answers: HashMap::new(),
+        }
+    }
+
+    /// Parses a standard debian preseed configuration file line:
+    /// e.g. "d-i mirror/http/hostname string ftp.us.debian.org"
+    pub fn parse_preseed_line(&mut self, line: &str) -> Result<(), &'static str> {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            return Ok(()); // Ignore empty lines or comments
+        }
+
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.len() < 4 {
+            return Err("Invalid preseed directive format, expected: owner template type value");
+        }
+
+        let owner = parts[0].to_string();
+        let template = parts[1].to_string();
+        let question_type = parts[2].to_string();
+        let value = parts[3..].join(" ");
+
+        let question = PreseedQuestion {
+            owner,
+            template: template.clone(),
+            question_type,
+            value,
+        };
+
+        self.answers.insert(template, question);
+        Ok(())
+    }
+
+    /// Retrieves pre-configured answers for automated installations
+    pub fn answer_question(&self, _owner: &str, template: &str) -> Option<String> {
+        self.answers.get(template).map(|q| q.value.clone())
+    }
+}
+
+impl Default for DebianPreseedEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_debian_preseed_engine() {
+        let mut engine = DebianPreseedEngine::new();
+
+        // Parse comment and empty lines
+        assert!(engine.parse_preseed_line("# This is a comment").is_ok());
+        assert!(engine.parse_preseed_line("   ").is_ok());
+
+        // Parse valid standard preseed directive
+        assert!(engine.parse_preseed_line("d-i mirror/http/hostname string ftp.us.debian.org").is_ok());
+        assert!(engine.parse_preseed_line("d-i passwd/root-login boolean false").is_ok());
+
+        // Invalid format
+        assert!(engine.parse_preseed_line("d-i invalid_line").is_err());
+
+        // Verify pre-configured answers
+        assert_eq!(
+            engine.answer_question("d-i", "mirror/http/hostname").unwrap(),
+            "ftp.us.debian.org"
+        );
+        assert_eq!(
+            engine.answer_question("d-i", "passwd/root-login").unwrap(),
+            "false"
+        );
+        assert!(engine.answer_question("d-i", "nonexistent/template").is_none());
+    }
 
     #[test]
     fn test_hpc_cluster_jobs() {
@@ -789,15 +884,28 @@ mod tests {
     fn test_runit_service_manager() {
         let mut manager = RunitServiceManager::new();
         manager.register_and_start_service("vfs_shard");
-        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
+        assert_eq!(
+            manager.active_services.get("vfs_shard").unwrap().status,
+            ServiceStatus::Up
+        );
 
         // Manually panic the service
         manager.active_services.get_mut("vfs_shard").unwrap().status = ServiceStatus::Panicked;
 
         let recovered = manager.supervise_and_recover_services();
         assert_eq!(recovered, 1);
-        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
-        assert_eq!(manager.active_services.get("vfs_shard").unwrap().restart_count, 1);
+        assert_eq!(
+            manager.active_services.get("vfs_shard").unwrap().status,
+            ServiceStatus::Up
+        );
+        assert_eq!(
+            manager
+                .active_services
+                .get("vfs_shard")
+                .unwrap()
+                .restart_count,
+            1
+        );
     }
 
     #[test]
@@ -819,7 +927,10 @@ mod tests {
             sha256: "sha256_mock_manifest_bytes".to_string(),
         };
         assert!(cache.cache_package_metadata(m1).is_ok());
-        assert_eq!(cache.query_cached_package("libreoffice").unwrap().version, "1.0.0");
+        assert_eq!(
+            cache.query_cached_package("libreoffice").unwrap().version,
+            "1.0.0"
+        );
 
         let m2 = AptPackageManifest {
             name: "vim".to_string(),

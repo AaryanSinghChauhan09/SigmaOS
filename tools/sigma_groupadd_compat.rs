@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Groupadd Compatibility
 //! Group management (groupadd command)
@@ -63,7 +64,7 @@ pub unsafe extern "C" fn groupadd_init() -> SigmaI32 {
 /// Add group
 #[no_mangle]
 pub unsafe extern "C" fn groupadd(groupname: *const u8, gid: SigmaU32) -> SigmaI32 {
-    if !GROUPADD_INITIALIZED || groupname.isnull() || GROUP_COUNT >= MAX_GROUPS as SigmaU32 {
+    if !GROUPADD_INITIALIZED || groupname.is_null() || GROUP_COUNT >= MAX_GROUPS as SigmaU32 {
         return -1;
     }
     
@@ -93,7 +94,7 @@ pub unsafe extern "C" fn groupadd(groupname: *const u8, gid: SigmaU32) -> SigmaI
 /// Delete group
 #[no_mangle]
 pub unsafe extern "C" fn groupdel(groupname: *const u8) -> SigmaI32 {
-    if !GROUPADD_INITIALIZED || groupname.isnull() {
+    if !GROUPADD_INITIALIZED || groupname.is_null() {
         return -1;
     }
     
@@ -130,7 +131,7 @@ pub unsafe extern "C" fn groupdel(groupname: *const u8) -> SigmaI32 {
 /// Get group by name
 #[no_mangle]
 pub unsafe extern "C" fn groupadd_get_by_name(groupname: *const u8, group: *mut Group) -> SigmaI32 {
-    if !GROUPADD_INITIALIZED || groupname.isnull() || group.isnull() {
+    if !GROUPADD_INITIALIZED || groupname.is_null() || group.is_null() {
         return -1;
     }
     
@@ -163,7 +164,7 @@ pub unsafe extern "C" fn groupadd_get_by_name(groupname: *const u8, group: *mut 
 /// Get group by GID
 #[no_mangle]
 pub unsafe extern "C" fn groupadd_get_by_gid(gid: SigmaU32, group: *mut Group) -> SigmaI32 {
-    if !GROUPADD_INITIALIZED || group.isnull() {
+    if !GROUPADD_INITIALIZED || group.is_null() {
         return -1;
     }
     
@@ -180,7 +181,7 @@ pub unsafe extern "C" fn groupadd_get_by_gid(gid: SigmaU32, group: *mut Group) -
 /// Add member to group
 #[no_mangle]
 pub unsafe extern "C" fn groupadd_add_member(groupname: *const u8, username: *const u8) -> SigmaI32 {
-    if !GROUPADD_INITIALIZED || groupname.isnull() || username.isnull() {
+    if !GROUPADD_INITIALIZED || groupname.is_null() || username.is_null() {
         return -1;
     }
     
@@ -224,7 +225,7 @@ pub unsafe extern "C" fn groupadd_add_member(groupname: *const u8, username: *co
 /// List groups
 #[no_mangle]
 pub unsafe extern "C" fn groupadd_list(groups: *mut Group, max_count: SigmaU32) -> SigmaU32 {
-    if !GROUPADD_INITIALIZED || groups.isnull() {
+    if !GROUPADD_INITIALIZED || groups.is_null() {
         return 0;
     }
     

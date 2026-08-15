@@ -365,14 +365,209 @@ impl LinuxLoopDevice {
 }
 
 // ============================================================================
+// 6. Linux-Style Framebuffer Console Driver (fbcon)
+// ============================================================================
+
+pub struct LinuxFbConsole {
+    pub width: usize,
+    pub height: usize,
+    pub cursor_x: usize,
+    pub cursor_y: usize,
+    pub text_cols: usize,
+    pub text_rows: usize,
+    pub char_width: usize,
+    pub char_height: usize,
+    pub framebuffer: Vec<u32>, // 32-bit ARGB pixel buffer
+    pub text_buffer: Vec<char>,
+}
+
+impl LinuxFbConsole {
+    pub fn new(width: usize, height: usize) -> Self {
+        let char_width = 8;
+        let char_height = 16;
+        let text_cols = width / char_width;
+        let text_rows = height / char_height;
+
+        Self {
+            width,
+            height,
+            cursor_x: 0,
+            cursor_y: 0,
+            text_cols,
+            text_rows,
+            char_width,
+            char_height,
+            framebuffer: alloc::vec![0u32; width * height],
+            text_buffer: alloc::vec![' '; text_cols * text_rows],
+        }
+    }
+
+    /// Appends a character to the console and simulates text rendering on the framebuffer
+    pub fn putchar(&mut self, c: char) {
+        if c == '\n' {
+            self.cursor_x = 0;
+            self.cursor_y += 1;
+        } else {
+            if self.cursor_x < self.text_cols && self.cursor_y < self.text_rows {
+                let idx = self.cursor_y * self.text_cols + self.cursor_x;
+                self.text_buffer[idx] = c;
+
+                // Simulate rendering pixels for the character on the 32-bit ARGB framebuffer
+                // We'll set a block of 8x16 pixels to white (0x00FFFFFF)
+                let start_pixel_x = self.cursor_x * self.char_width;
+                let start_pixel_y = self.cursor_y * self.char_height;
+
+                for py in 0..self.char_height {
+                    for px in 0..self.char_width {
+                        let fx = start_pixel_x + px;
+                        let fy = start_pixel_y + py;
+                        if fx < self.width && fy < self.height {
+                            let fb_idx = fy * self.width + fx;
+                            self.framebuffer[fb_idx] = 0x00FFFFFF; // White
+                        }
+                    }
+                }
+
+                self.cursor_x += 1;
+            }
+        }
+
+        // Automatic hardware scrolling if cursor reaches screen boundaries
+        if self.cursor_x >= self.text_cols {
+            self.cursor_x = 0;
+            self.cursor_y += 1;
+        }
+
+        if self.cursor_y >= self.text_rows {
+            self.scroll_up();
+        }
+    }
+
+    /// Simulates scrolling up the terminal by one row
+    pub fn scroll_up(&mut self) {
+        // Shift text buffer up by one row
+        let row_size = self.text_cols;
+        for r in 0..(self.text_rows - 1) {
+            for c in 0..row_size {
+                let target = r * row_size + c;
+                let source = (r + 1) * row_size + c;
+                self.text_buffer[target] = self.text_buffer[source];
+            }
+        }
+
+        // Clear bottom row
+        let last_row_start = (self.text_rows - 1) * row_size;
+        for c in 0..row_size {
+            self.text_buffer[last_row_start + c] = ' ';
+        }
+
+        // Shift framebuffer pixels up by 16 scanlines
+        let pixel_row_size = self.width;
+        let shift_pixels = self.char_height * pixel_row_size;
+
+        for p in 0..(self.framebuffer.len() - shift_pixels) {
+            self.framebuffer[p] = self.framebuffer[p + shift_pixels];
+        }
+
+        // Clear bottom 16 scanlines
+        let last_scanlines_start = self.framebuffer.len() - shift_pixels;
+        for p in last_scanlines_start..self.framebuffer.len() {
+            self.framebuffer[p] = 0; // Black
+        }
+
+        self.cursor_y = self.text_rows - 1;
+        self.cursor_x = 0;
+    }
+
+    pub fn print_string(&mut self, s: &str) {
+        for c in s.chars() {
+            self.putchar(c);
+        }
+    }
+}
+
+// ============================================================================
+// 7. BSD — Physical & Kernel Virtual Memory Device Driver (/dev/mem, /dev/kmem)
+// ============================================================================
+
+pub struct BsdMemDevice {
+    pub simulated_physical_ram: Vec<u8>,
+    pub simulated_kernel_vmem: Vec<u8>,
+}
+
+impl BsdMemDevice {
+    pub fn new(ram_size: usize, vmem_size: usize) -> Self {
+        Self {
+            simulated_physical_ram: alloc::vec![0u8; ram_size],
+            simulated_kernel_vmem: alloc::vec![0xAAu8; vmem_size], // default filled with 0xAA
+        }
+    }
+
+    /// Read from physical memory (/dev/mem) at given offset
+    pub fn read_phys(&self, offset: usize, buffer: &mut [u8], caller_uid: u32) -> Result<usize, &'static str> {
+        if caller_uid != 0 {
+            return Err("PermissionDenied: Only root user (UID 0) can read /dev/mem");
+        }
+        if offset + buffer.len() > self.simulated_physical_ram.len() {
+            return Err("AccessViolation: Address out of physical RAM bounds");
+        }
+        for i in 0..buffer.len() {
+            buffer[i] = self.simulated_physical_ram[offset + i];
+        }
+        Ok(buffer.len())
+    }
+
+    /// Write to physical memory (/dev/mem) at given offset
+    pub fn write_phys(&mut self, offset: usize, data: &[u8], caller_uid: u32) -> Result<usize, &'static str> {
+        if caller_uid != 0 {
+            return Err("PermissionDenied: Only root user (UID 0) can write to /dev/mem");
+        }
+        if offset + data.len() > self.simulated_physical_ram.len() {
+            return Err("AccessViolation: Address out of physical RAM bounds");
+        }
+        for i in 0..data.len() {
+            self.simulated_physical_ram[offset + i] = data[i];
+        }
+        Ok(data.len())
+    }
+
+    /// Read from kernel virtual memory (/dev/kmem)
+    pub fn read_kernel(&self, offset: usize, buffer: &mut [u8], caller_uid: u32) -> Result<usize, &'static str> {
+        if caller_uid != 0 {
+            return Err("PermissionDenied: Only root user (UID 0) can read /dev/kmem");
+        }
+        if offset + buffer.len() > self.simulated_kernel_vmem.len() {
+            return Err("AccessViolation: Address out of kernel virtual memory bounds");
+        }
+        for i in 0..buffer.len() {
+            buffer[i] = self.simulated_kernel_vmem[offset + i];
+        }
+        Ok(buffer.len())
+    }
+
+    /// Write to kernel virtual memory (/dev/kmem)
+    pub fn write_kernel(&mut self, offset: usize, data: &[u8], caller_uid: u32) -> Result<usize, &'static str> {
+        if caller_uid != 0 {
+            return Err("PermissionDenied: Only root user (UID 0) can write to /dev/kmem");
+        }
+        if offset + data.len() > self.simulated_kernel_vmem.len() {
+            return Err("AccessViolation: Address out of kernel virtual memory bounds");
+        }
+        for i in 0..data.len() {
+            self.simulated_kernel_vmem[offset + i] = data[i];
+        }
+        Ok(data.len())
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
 #[cfg(test)]
 mod tests {
+    extern crate std;
     use super::*;
-    use alloc::vec;
-    use alloc::vec::Vec;
 
     #[test]
     fn test_linux_devtmpfs() {
@@ -399,7 +594,7 @@ mod tests {
     fn test_bsd_audio_mixer() {
         let mut mixer = BsdAudioMixer::new();
 
-        let stream1 = vec![
+        let stream1 = alloc::vec![
             PcmFrame {
                 left: 1000,
                 right: 2000
@@ -409,7 +604,7 @@ mod tests {
                 right: -1000
             },
         ];
-        let stream2 = vec![
+        let stream2 = alloc::vec![
             PcmFrame {
                 left: 3000,
                 right: 1000
@@ -439,19 +634,24 @@ mod tests {
         let mut key = [0u8; 32];
         let mut iv = [0u8; 12];
         
-        // Use a more complex, non-linear generation pattern for test purposes
-        let seed: u64 = 9876543210u64;
+        // Use timestamp-based generation for better randomness in tests
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        
         for i in 0..32 {
-            let mut val = timestamp.wrapping_mul(i as u64 + 1);
+            let mut val = timestamp.wrapping_mul(i as u128 + 1);
             val ^= val >> 33;
             val = val.wrapping_mul(0xff51afd7ed558ccd);
             val ^= val >> 33;
             key[i] = (val & 0xFF) as u8;
         }
-
-        // Generate IV using timestamp as well
+        
+        // Initialize IV with timestamp-based values for test security
         for i in 0..12 {
-            let mut val = timestamp.wrapping_add(i as u64 * 13);
+            let mut val = timestamp.wrapping_add(i as u128 * 7);
             val ^= val >> 17;
             val = val.wrapping_mul(0x9e3779b97f4a7c15);
             iv[i] = (val & 0xFF) as u8;
@@ -528,5 +728,59 @@ mod tests {
         let mut receive_buf = vec![0u8; 512];
         assert_eq!(loop_dev.read_sectors(0, 1, &mut receive_buf).unwrap(), 512);
         assert_eq!(receive_buf, custom_sector_data.as_slice());
+    }
+
+    #[test]
+    fn test_fb_console() {
+        let mut fbcon = LinuxFbConsole::new(80, 160); // 10 columns by 10 rows
+        assert_eq!(fbcon.text_cols, 10);
+        assert_eq!(fbcon.text_rows, 10);
+
+        fbcon.print_string("Hello\nWorld");
+        assert_eq!(fbcon.cursor_x, 5);
+        assert_eq!(fbcon.cursor_y, 1);
+        assert_eq!(fbcon.text_buffer[0], 'H');
+        assert_eq!(fbcon.text_buffer[fbcon.text_cols + 0], 'W');
+
+        // Verify pixel rendering in framebuffer
+        assert_eq!(fbcon.framebuffer[0], 0x00FFFFFF); // rendered 'H'
+
+        // Scroll testing
+        let mut fbcon_small = LinuxFbConsole::new(80, 32); // 10 cols by 2 rows
+        fbcon_small.print_string("Line1\nLine2\nLine3");
+        // Row 1 should have been scrolled up to Row 0, Line3 is now on Row 1
+        assert_eq!(fbcon_small.text_buffer[0], 'L');
+        assert_eq!(fbcon_small.text_buffer[1], 'i');
+        assert_eq!(fbcon_small.text_buffer[2], 'n');
+        assert_eq!(fbcon_small.text_buffer[3], 'e');
+        assert_eq!(fbcon_small.text_buffer[4], '2');
+    }
+
+    #[test]
+    fn test_bsd_mem_device() {
+        let mut mem_dev = BsdMemDevice::new(1024, 512);
+
+        // 1. Physical RAM reads / writes
+        let write_res = mem_dev.write_phys(10, b"phys_data", 0); // Root UID 0
+        assert!(write_res.is_ok());
+
+        let mut read_buf = [0u8; 9];
+        let read_res = mem_dev.read_phys(10, &mut read_buf, 0);
+        assert!(read_res.is_ok());
+        assert_eq!(&read_buf, b"phys_data");
+
+        // Privilege checks
+        let non_root_err = mem_dev.write_phys(10, b"phys_data", 1000); // UID 1000
+        assert!(non_root_err.is_err());
+
+        // 2. Kernel Virtual Memory reads / writes
+        let mut k_read_buf = [0u8; 4];
+        mem_dev.read_kernel(0, &mut k_read_buf, 0).unwrap();
+        assert_eq!(&k_read_buf, &[0xAA, 0xAA, 0xAA, 0xAA]); // Default values
+
+        mem_dev.write_kernel(100, b"vmem", 0).unwrap();
+        let mut k_read_buf_new = [0u8; 4];
+        mem_dev.read_kernel(100, &mut k_read_buf_new, 0).unwrap();
+        assert_eq!(&k_read_buf_new, b"vmem");
     }
 }

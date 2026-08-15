@@ -23,7 +23,7 @@
 // 2. PawToolGuard & PawFileGuard (Security layers)
 // 3. PawAgentCommunicationProtocol (Multi-agent orchestration/ACP)
 
-use crate::klib::VecDeque;
+use std::collections::VecDeque;
 
 pub struct PawThreeLayerMemory {
     pub live_context: Vec<String>,
@@ -176,9 +176,133 @@ impl Default for PawAgentCommunicationProtocol {
     }
 }
 
+// ============================================================================
+// Semantic Kernel AI Skills & Composable Planner Subsystem (Inspired by dotnet/skills)
+// ============================================================================
+
+use std::collections::HashMap;
+use std::sync::Arc;
+
+pub struct SemanticSkillFunction {
+    pub name: String,
+    pub prompt_template: String, // e.g. "Generate an article on {topic} for {audience}."
+}
+
+impl SemanticSkillFunction {
+    pub fn new(name: &str, template: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            prompt_template: template.to_string(),
+        }
+    }
+
+    /// Composes and returns the final rendered prompt with bracket variable replacements
+    pub fn render_prompt(&self, variables: &HashMap<String, String>) -> String {
+        let mut rendered = self.prompt_template.clone();
+        for (key, val) in variables {
+            let placeholder = format!("{{{}}}", key);
+            rendered = rendered.replace(&placeholder, val);
+        }
+        rendered
+    }
+}
+
+pub struct NativeSkillFunction {
+    pub name: String,
+    pub handler: Arc<dyn Fn(&HashMap<String, String>) -> Result<String, &'static str> + Send + Sync>,
+}
+
+pub struct SovereignSkillKernel {
+    pub semantic_skills: HashMap<String, SemanticSkillFunction>,
+    pub native_skills: HashMap<String, NativeSkillFunction>,
+}
+
+impl SovereignSkillKernel {
+    pub fn new() -> Self {
+        Self {
+            semantic_skills: HashMap::new(),
+            native_skills: HashMap::new(),
+        }
+    }
+
+    pub fn register_semantic_skill(&mut self, skill: SemanticSkillFunction) {
+        self.semantic_skills.insert(skill.name.clone(), skill);
+    }
+
+    pub fn register_native_skill(&mut self, skill: NativeSkillFunction) {
+        self.native_skills.insert(skill.name.clone(), skill);
+    }
+
+    /// Evaluates and runs a sequential composable multi-skill pipeline (planner execution)
+    pub fn run_pipeline(
+        &self,
+        steps: &[String], // List of skill function names to execute in sequence
+        initial_context: &HashMap<String, String>,
+    ) -> Result<String, &'static str> {
+        let mut context = initial_context.clone();
+        let mut output = String::new();
+
+        for step in steps {
+            if let Some(native_func) = self.native_skills.get(step) {
+                // Execute programmatic Native Skill
+                output = (native_func.handler)(&context)?;
+                context.insert("input".to_string(), output.clone());
+            } else if let Some(semantic_func) = self.semantic_skills.get(step) {
+                // Render and "execute" Semantic Skill (return prompt as mock LLM result)
+                output = semantic_func.render_prompt(&context);
+                context.insert("input".to_string(), output.clone());
+            } else {
+                return Err("Skill step function not registered in kernel");
+            }
+        }
+        Ok(output)
+    }
+}
+
+impl Default for SovereignSkillKernel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_semantic_kernel_skills_pipeline() {
+        let mut kernel = SovereignSkillKernel::new();
+
+        // 1. Register a semantic prompt renderer skill
+        let draft_skill = SemanticSkillFunction::new(
+            "DraftEmail",
+            "To: {recipient}\nSubject: {subject}\nBody: This is a composed brief regarding {topic}.",
+        );
+        kernel.register_semantic_skill(draft_skill);
+
+        // 2. Register a native processing skill (uppercases inputs)
+        let uppercase_skill = NativeSkillFunction {
+            name: "UppercaseText".to_string(),
+            handler: Arc::new(|ctx| {
+                let text = ctx.get("input").ok_or("No input context found")?;
+                Ok(text.to_uppercase())
+            }),
+        };
+        kernel.register_native_skill(uppercase_skill);
+
+        // 3. Run composable sequential pipeline (DraftEmail -> UppercaseText)
+        let mut context = HashMap::new();
+        context.insert("recipient".to_string(), "Chief Release Manager".to_string());
+        context.insert("subject".to_string(), "Status Update".to_string());
+        context.insert("topic".to_string(), "SigmaOS release parity".to_string());
+
+        let pipeline_steps = vec!["DraftEmail".to_string(), "UppercaseText".to_string()];
+        let final_result = kernel.run_pipeline(&pipeline_steps, &context).unwrap();
+
+        assert!(final_result.contains("TO: CHIEF RELEASE MANAGER"));
+        assert!(final_result.contains("SUBJECT: STATUS UPDATE"));
+        assert!(final_result.contains("SIGMAOS RELEASE PARITY"));
+    }
 
     #[test]
     fn test_three_layer_memory() {

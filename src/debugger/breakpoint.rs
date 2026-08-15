@@ -1,35 +1,22 @@
-#![allow(unused_variables)]
 #![no_std]
 #![no_main]
 
-#[cfg(not(target_os = "none"))]
-extern crate alloc;
-#[cfg(not(target_os = "none"))]
-use alloc::vec::Vec;
-
-use core::mem;
 /// OOP-based Debugger for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 171
 /// Implements breakpoints and debugging interface
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type BreakpointID = usize;
 
 #[repr(usize)]
-#[derive(Debug, Clone, Copy)]
-pub enum BreakpointType {
-    Software = 0,
-    Hardware = 1,
-    Watchpoint = 2,
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BreakpointType { Software = 0, Hardware = 1, Watchpoint = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum DebuggerError {
-    Success = 0,
-    NotFound = 1,
-    InvalidAddress = 2,
-}
+pub enum DebuggerError { Success = 0, NotFound = 1, InvalidAddress = 2 }
 
 pub trait Breakpoint {
     fn id(&self) -> BreakpointID;
@@ -60,25 +47,10 @@ impl SimpleBreakpoint {
 }
 
 impl Breakpoint for SimpleBreakpoint {
-    fn id(&self) -> BreakpointID {
-        self.id
-    }
-    fn address(&self) -> usize {
-        self.address.load(Ordering::SeqCst)
-    }
-    fn breakpoint_type(&self) -> BreakpointType {
-        {
-            let raw = self.breakpoint_type.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => BreakpointType::Hardware,
-                2 => BreakpointType::Watchpoint,
-                _ => BreakpointType::Software,
-            }
-        }
-    }
-    fn is_enabled(&self) -> bool {
-        self.enabled.load(Ordering::SeqCst) == 1
-    }
+    fn id(&self) -> BreakpointID { self.id }
+    fn address(&self) -> usize { self.address.load(Ordering::SeqCst) }
+    fn breakpoint_type(&self) -> BreakpointType { unsafe { core::mem::transmute(self.breakpoint_type.load(Ordering::SeqCst)) } }
+    fn is_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
 
     fn enable(&mut self) {
         self.enabled.store(1, Ordering::SeqCst);
@@ -90,11 +62,7 @@ impl Breakpoint for SimpleBreakpoint {
 }
 
 pub trait Debugger {
-    fn set_breakpoint(
-        &mut self,
-        address: usize,
-        breakpoint_type: BreakpointType,
-    ) -> Result<BreakpointID, DebuggerError>;
+    fn set_breakpoint(&mut self, address: usize, breakpoint_type: BreakpointType) -> Result<BreakpointID, DebuggerError>;
     fn remove_breakpoint(&mut self, id: BreakpointID) -> Result<(), DebuggerError>;
     fn get_breakpoint(&self, id: BreakpointID) -> Option<&dyn Breakpoint>;
     fn hit_breakpoint(&self, address: usize) -> Option<BreakpointID>;
@@ -120,11 +88,7 @@ impl SimpleDebugger {
 }
 
 impl Debugger for SimpleDebugger {
-    fn set_breakpoint(
-        &mut self,
-        address: usize,
-        breakpoint_type: BreakpointType,
-    ) -> Result<BreakpointID, DebuggerError> {
+    fn set_breakpoint(&mut self, address: usize, breakpoint_type: BreakpointType) -> Result<BreakpointID, DebuggerError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let breakpoint = SimpleBreakpoint::new(id, address, breakpoint_type);
         self.breakpoints.push(Some(Box::new(breakpoint)));
@@ -145,9 +109,7 @@ impl Debugger for SimpleDebugger {
     fn get_breakpoint(&self, id: BreakpointID) -> Option<&dyn Breakpoint> {
         for breakpoint_option in &self.breakpoints {
             if let Some(ref breakpoint) = *breakpoint_option {
-                if breakpoint.id() == id {
-                    return Some(breakpoint.as_ref());
-                }
+                if breakpoint.id() == id { return Some(breakpoint.as_ref()); }
             }
         }
         None
@@ -189,7 +151,7 @@ pub struct SimpleRegisterViewer {
 impl SimpleRegisterViewer {
     pub fn new() -> Self {
         let mut registers = Vec::new();
-        for _ in 0..16 {
+        for i in 0..16 {
             registers.push(0u64);
         }
         SimpleRegisterViewer { registers }
@@ -244,18 +206,10 @@ struct Vec<T> {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -263,229 +217,15 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-// ==========================================
-// 5. Windbg / GDB / LLDB-Grade Debugging Suite
-// ==========================================
-
-/// Debug Process Representation
-#[derive(Debug, Clone)]
-pub struct DebugProcess {
-    pub pid: usize,
-    pub name: &'static str,
-    pub modules: Vec<DebugModule>,
-}
-
-/// Debug Module Representation
-#[derive(Debug, Clone)]
-pub struct DebugModule {
-    pub base_address: usize,
-    pub size: usize,
-    pub name: &'static str,
-}
-
-/// Windbg-parity Pseudo Registers State.
-/// Supports predefined registers ($peb, $teb, $ip, $sp)
-/// and User-Defined registers ($u0 through $u9).
-pub struct PseudoRegisterSet {
-    pub predefined_registers: Vec<(&'static str, u64)>,
-    pub user_registers: [u64; 10], // $u0 to $u9
-}
-
-impl PseudoRegisterSet {
-    pub fn new() -> Self {
-        let mut predefined = Vec::new();
-        predefined.push(("$peb", 0x7FFFF000));
-        predefined.push(("$teb", 0x7FFF1000));
-        predefined.push(("$ip", 0x1000));
-        predefined.push(("$sp", 0x9000));
-
-        Self {
-            predefined_registers: predefined,
-            user_registers: [0; 10],
-        }
-    }
-
-    pub fn read(&self, name: &str) -> Option<u64> {
-        if name.starts_with("$u") && name.len() == 3 {
-            let idx = name.chars().nth(2)?.to_digit(10)? as usize;
-            if idx < 10 {
-                return Some(self.user_registers[idx]);
-            }
-        }
-        for &(k, v) in &self.predefined_registers {
-            if k == name {
-                return Some(v);
-            }
-        }
-        None
-    }
-
-    pub fn write(&mut self, name: &str, val: u64) -> bool {
-        if name.starts_with("$u") && name.len() == 3 {
-            if let Some(idx) = name.chars().nth(2).and_then(|c| c.to_digit(10)) {
-                let idx = idx as usize;
-                if idx < 10 {
-                    self.user_registers[idx] = val;
-                    return true;
-                }
-            }
-        }
-        false
-    }
-}
-
-/// Debugger Alias Manager.
-/// Supports User-Named (as/ad), Fixed-Name ($ntns), and Automatic ($cache) aliases.
-pub struct DebugAliasManager {
-    pub user_aliases: Vec<(&'static str, &'static str)>,
-}
-
-impl DebugAliasManager {
-    pub fn new() -> Self {
-        Self {
-            user_aliases: Vec::new(),
-        }
-    }
-
-    pub fn set_user_alias(&mut self, name: &'static str, expansion: &'static str) {
-        // Remove existing alias if it matches
-        for i in 0..self.user_aliases.len() {
-            if self.user_aliases[i].0 == name {
-                self.user_aliases[i] = (name, expansion);
-                return;
-            }
-        }
-        self.user_aliases.push((name, expansion));
-    }
-
-    pub fn expand(&self, name: &str) -> alloc::string::String {
-        use alloc::string::ToString;
-        // Handle Automatic and Fixed aliases parity
-        if name == "$ntns" {
-            return "sigma_kernel::sys".to_string();
-        }
-        if name == "$cache" {
-            return "VMM_Page_Cache".to_string();
-        }
-        for &(k, v) in &self.user_aliases {
-            if k == name {
-                return v.to_string();
-            }
-        }
-        name.to_string()
-    }
-}
-
-/// Windbg DML (Debugger Markup Language) Renderer
-pub struct DmlRenderer;
-
-impl DmlRenderer {
-    /// Renders text stripping markup tags or simulating interactive clickable links
-    pub fn render_dml(input: &str) -> alloc::string::String {
-        let mut output = alloc::string::String::new();
-        let mut in_tag = false;
-        for c in input.chars() {
-            if c == '<' {
-                in_tag = true;
-                continue;
-            }
-            if c == '>' {
-                in_tag = false;
-                continue;
-            }
-            if !in_tag {
-                output.push(c);
-            }
-        }
-        output
-    }
-}
-
-/// Debugger script parser and .printf command engine
-pub struct DebugScriptEngine;
-
-impl DebugScriptEngine {
-    /// Simple .printf interpreter that evaluates register placeholders
-    pub fn printf_eval(format_str: &str, val: u64) -> alloc::string::String {
-        use alloc::format;
-        let mut output = alloc::string::String::new();
-        let mut chars = format_str.chars().peekable();
-        while let Some(c) = chars.next() {
-            if c == '%' && chars.peek() == Some(&'x') {
-                chars.next();
-                output.push_str(&format!("{:x}", val));
-            } else if c == '%' && chars.peek() == Some(&'d') {
-                chars.next();
-                output.push_str(&format!("{}", val));
-            } else {
-                output.push(c);
-            }
-        }
-        output
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_pseudo_registers() {
-        let mut pr = PseudoRegisterSet::new();
-        assert_eq!(pr.read("$peb"), Some(0x7FFFF000));
-        assert_eq!(pr.read("$teb"), Some(0x7FFF1000));
-
-        // Test user-defined registers
-        assert_eq!(pr.read("$u1"), Some(0));
-        assert!(pr.write("$u1", 0xDEADBEEF));
-        assert_eq!(pr.read("$u1"), Some(0xDEADBEEF));
-    }
-
-    #[test]
-    fn test_debugger_aliases() {
-        let mut am = DebugAliasManager::new();
-        assert_eq!(am.expand("$ntns"), "sigma_kernel::sys");
-        assert_eq!(am.expand("$cache"), "VMM_Page_Cache");
-
-        am.set_user_alias("my_alias", "Value_Here");
-        assert_eq!(am.expand("my_alias"), "Value_Here");
-    }
-
-    #[test]
-    fn test_dml_rendering() {
-        let raw = "<b>Bold Text</b> with <link cmd=\"g\">Clickable Target</link>";
-        let rendered = DmlRenderer::render_dml(raw);
-        assert_eq!(rendered, "Bold Text with Clickable Target");
-    }
-
-    #[test]
-    fn test_printf_evaluation() {
-        let format_str = "Value = %x or decimal %d";
-        let rendered = DebugScriptEngine::printf_eval(format_str, 255);
-        assert_eq!(rendered, "Value = ff or decimal 255");
-    }
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

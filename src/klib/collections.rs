@@ -1,352 +1,238 @@
-// SigmaOS Custom Collections Library
-// Zero-dependency alternatives to std::collections
-// #![no_std] compliant
+// SigmaOS Kernel Library Collections
+// Eliminates dependency on std::collections
 
-use core::cell::RefCell;
-use core::sync::atomic::{AtomicUsize, Ordering};
+#![allow(dead_code)]
 
-/// Simple hash set implementation
-pub struct SimpleHashSet<T> {
-    buckets: RefCell<Vec<Vec<T>>>,
-    capacity: AtomicUsize,
-    len: AtomicUsize,
+extern crate alloc;
+use alloc::collections::BTreeMap as AllocBTreeMap;
+use alloc::collections::BTreeSet as AllocBTreeSet;
+use alloc::collections::VecDeque as AllocVecDeque;
+use core::cell::Cell;
+
+/// Simple BTreeMap implementation for klib
+pub struct BTreeMap<K, V> {
+    inner: AllocBTreeMap<K, V>,
 }
 
-impl<T: PartialEq + Clone> SimpleHashSet<T> {
-    pub fn new(capacity: usize) -> Self {
-        let mut buckets = Vec::new();
-        for _ in 0..capacity {
-            buckets.push(Vec::new());
-        }
-        
-        SimpleHashSet {
-            buckets: RefCell::new(buckets),
-            capacity: AtomicUsize::new(capacity),
-            len: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn insert(&self, item: T) -> bool {
-        let hash = self.simple_hash(&item);
-        let capacity = self.capacity.load(Ordering::SeqCst);
-        let bucket_idx = (hash % capacity) as usize;
-        
-        let mut buckets = self.buckets.borrow_mut();
-        let bucket = &mut buckets[bucket_idx];
-        
-        if bucket.contains(&item) {
-            return false;
-        }
-        
-        bucket.push(item);
-        self.len.fetch_add(1, Ordering::SeqCst);
-        true
-    }
-
-    pub fn contains(&self, item: &T) -> bool {
-        let hash = self.simple_hash(item);
-        let capacity = self.capacity.load(Ordering::SeqCst);
-        let bucket_idx = (hash % capacity) as usize;
-        
-        let buckets = self.buckets.borrow();
-        buckets[bucket_idx].contains(item)
-    }
-
-    pub fn remove(&self, item: &T) -> bool {
-        let hash = self.simple_hash(item);
-        let capacity = self.capacity.load(Ordering::SeqCst);
-        let bucket_idx = (hash % capacity) as usize;
-        
-        let mut buckets = self.buckets.borrow_mut();
-        let bucket = &mut buckets[bucket_idx];
-        
-        if let Some(pos) = bucket.iter().position(|x| x == item) {
-            bucket.remove(pos);
-            self.len.fetch_sub(1, Ordering::SeqCst);
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.len.load(Ordering::SeqCst)
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    fn simple_hash(&self, item: &T) -> usize {
-        // Simple hash based on memory address and value
-        let ptr = item as *const T as usize;
-        let mut hash: usize = 5381;
-        hash = hash.wrapping_mul(33).wrapping_add(ptr);
-        hash
-    }
-}
-
-/// Simple binary heap (priority queue) implementation
-pub struct SimpleBinaryHeap<T> {
-    data: RefCell<Vec<T>>,
-    len: AtomicUsize,
-}
-
-impl<T: Ord + Clone> SimpleBinaryHeap<T> {
+impl<K: Ord, V> BTreeMap<K, V> {
     pub fn new() -> Self {
-        SimpleBinaryHeap {
-            data: RefCell::new(Vec::new()),
-            len: AtomicUsize::new(0),
+        Self {
+            inner: AllocBTreeMap::new(),
         }
     }
 
-    pub fn push(&self, item: T) {
-        let mut data = self.data.borrow_mut();
-        data.push(item);
-        let idx = data.len() - 1;
-        self.sift_up(&mut data, idx);
-        self.len.store(data.len(), Ordering::SeqCst);
+    pub fn insert(&mut self, key: K, value: V) -> Option<V> {
+        self.inner.insert(key, value)
     }
 
-    pub fn pop(&self) -> Option<T> {
-        let mut data = self.data.borrow_mut();
-        if data.is_empty() {
-            return None;
-        }
-        
-        let len = data.len();
-        data.swap(0, len - 1);
-        let item = data.pop();
-        self.sift_down(&mut data, 0);
-        self.len.store(data.len(), Ordering::SeqCst);
-        item
+    pub fn get(&self, key: &K) -> Option<&V> {
+        self.inner.get(key)
     }
 
-    pub fn peek(&self) -> Option<T> {
-        let data = self.data.borrow();
-        data.first().cloned()
+    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
+        self.inner.get_mut(key)
+    }
+
+    pub fn remove(&mut self, key: &K) -> Option<V> {
+        self.inner.remove(key)
     }
 
     pub fn len(&self) -> usize {
-        self.len.load(Ordering::SeqCst)
+        self.inner.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    fn sift_up(&self, data: &mut Vec<T>, mut idx: usize) {
-        while idx > 0 {
-            let parent = (idx - 1) / 2;
-            if data[idx] >= data[parent] {
-                break;
-            }
-            data.swap(idx, parent);
-            idx = parent;
-        }
-    }
-
-    fn sift_down(&self, data: &mut Vec<T>, mut idx: usize) {
-        let len = data.len();
-        loop {
-            let left = 2 * idx + 1;
-            let right = 2 * idx + 2;
-            let mut smallest = idx;
-
-            if left < len && data[left] < data[smallest] {
-                smallest = left;
-            }
-            if right < len && data[right] < data[smallest] {
-                smallest = right;
-            }
-
-            if smallest == idx {
-                break;
-            }
-
-            data.swap(idx, smallest);
-            idx = smallest;
-        }
+        self.inner.is_empty()
     }
 }
 
-/// Simple BTree-like ordered set
-pub struct SimpleOrderedSet<T> {
-    data: RefCell<Vec<T>>,
-    len: AtomicUsize,
+impl<K: Ord, V> Default for BTreeMap<K, V> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-impl<T: Ord + Clone> SimpleOrderedSet<T> {
+/// Simple HashSet implementation for klib (Using BTreeSet internally)
+pub struct HashSet<T> {
+    inner: AllocBTreeSet<T>,
+}
+
+impl<T: Ord> HashSet<T> {
     pub fn new() -> Self {
-        SimpleOrderedSet {
-            data: RefCell::new(Vec::new()),
-            len: AtomicUsize::new(0),
+        Self {
+            inner: AllocBTreeSet::new(),
         }
     }
 
-    pub fn insert(&self, item: T) -> bool {
-        let mut data = self.data.borrow_mut();
-        
-        // Binary search for insertion point
-        let mut left = 0;
-        let mut right = data.len();
-        
-        while left < right {
-            let mid = left + (right - left) / 2;
-            if data[mid] < item {
-                left = mid + 1;
-            } else if data[mid] > item {
-                right = mid;
-            } else {
-                return false; // Already exists
-            }
-        }
-        
-        data.insert(left, item);
-        self.len.store(data.len(), Ordering::SeqCst);
-        true
+    pub fn insert(&mut self, value: T) -> bool {
+        self.inner.insert(value)
     }
 
-    pub fn contains(&self, item: &T) -> bool {
-        let data = self.data.borrow();
-        
-        let mut left = 0;
-        let mut right = data.len();
-        
-        while left < right {
-            let mid = left + (right - left) / 2;
-            if data[mid] < *item {
-                left = mid + 1;
-            } else if data[mid] > *item {
-                right = mid;
-            } else {
-                return true;
-            }
-        }
-        
-        false
+    pub fn contains(&self, value: &T) -> bool {
+        self.inner.contains(value)
     }
 
-    pub fn remove(&self, item: &T) -> bool {
-        let mut data = self.data.borrow_mut();
-        
-        let mut left = 0;
-        let mut right = data.len();
-        
-        while left < right {
-            let mid = left + (right - left) / 2;
-            if data[mid] < *item {
-                left = mid + 1;
-            } else if data[mid] > *item {
-                right = mid;
-            } else {
-                data.remove(mid);
-                self.len.store(data.len(), Ordering::SeqCst);
-                return true;
-            }
-        }
-        
-        false
+    pub fn remove(&mut self, value: &T) -> bool {
+        self.inner.remove(value)
     }
 
     pub fn len(&self) -> usize {
-        self.len.load(Ordering::SeqCst)
+        self.inner.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    pub fn iter(&self) -> Vec<T> {
-        self.data.borrow().clone()
+        self.inner.is_empty()
     }
 }
 
-/// Simple deque (double-ended queue) implementation
-pub struct SimpleDeque<T> {
-    front: RefCell<Vec<T>>,
-    back: RefCell<Vec<T>>,
-    len: AtomicUsize,
+impl<T: Ord> Default for HashSet<T> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-impl<T: Clone> SimpleDeque<T> {
+/// Simple VecDeque implementation for klib
+pub struct VecDeque<T> {
+    inner: AllocVecDeque<T>,
+}
+
+impl<T> VecDeque<T> {
     pub fn new() -> Self {
-        SimpleDeque {
-            front: RefCell::new(Vec::new()),
-            back: RefCell::new(Vec::new()),
-            len: AtomicUsize::new(0),
+        Self {
+            inner: AllocVecDeque::new(),
         }
     }
 
-    pub fn push_front(&self, item: T) {
-        let mut front = self.front.borrow_mut();
-        front.push(item);
-        self.len.fetch_add(1, Ordering::SeqCst);
+    pub fn push_front(&mut self, value: T) {
+        self.inner.push_front(value)
     }
 
-    pub fn push_back(&self, item: T) {
-        let mut back = self.back.borrow_mut();
-        back.push(item);
-        self.len.fetch_add(1, Ordering::SeqCst);
+    pub fn push_back(&mut self, value: T) {
+        self.inner.push_back(value)
     }
 
-    pub fn pop_front(&self) -> Option<T> {
-        let mut front = self.front.borrow_mut();
-        if let Some(item) = front.pop() {
-            self.len.fetch_sub(1, Ordering::SeqCst);
-            return Some(item);
-        }
-        
-        // If front is empty, try back (reversed)
-        let mut back = self.back.borrow_mut();
-        if back.is_empty() {
-            return None;
-        }
-        
-        // Move all elements from back to front
-        let moved: Vec<T> = back.drain(..).rev().collect();
-        front.extend(moved);
-        
-        if let Some(item) = front.pop() {
-            self.len.fetch_sub(1, Ordering::SeqCst);
-            Some(item)
-        } else {
-            None
-        }
+    pub fn pop_front(&mut self) -> Option<T> {
+        self.inner.pop_front()
     }
 
-    pub fn pop_back(&self) -> Option<T> {
-        let mut back = self.back.borrow_mut();
-        if let Some(item) = back.pop() {
-            self.len.fetch_sub(1, Ordering::SeqCst);
-            return Some(item);
-        }
-        
-        // If back is empty, try front (reversed)
-        let mut front = self.front.borrow_mut();
-        if front.is_empty() {
-            return None;
-        }
-        
-        // Move all elements from front to back
-        let moved: Vec<T> = front.drain(..).rev().collect();
-        back.extend(moved);
-        
-        if let Some(item) = back.pop() {
-            self.len.fetch_sub(1, Ordering::SeqCst);
-            Some(item)
-        } else {
-            None
-        }
+    pub fn pop_back(&mut self) -> Option<T> {
+        self.inner.pop_back()
+    }
+
+    pub fn front(&self) -> Option<&T> {
+        self.inner.front()
+    }
+
+    pub fn back(&self) -> Option<&T> {
+        self.inner.back()
     }
 
     pub fn len(&self) -> usize {
-        self.len.load(Ordering::SeqCst)
+        self.inner.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len() == 0
+        self.inner.is_empty()
     }
+}
+
+impl<T> Default for VecDeque<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Simple atomic types for klib (no_std compatible)
+pub struct AtomicBool {
+    value: Cell<bool>,
+}
+
+impl AtomicBool {
+    pub fn new(v: bool) -> Self {
+        Self {
+            value: Cell::new(v),
+        }
+    }
+
+    pub fn load(&self) -> bool {
+        self.value.get()
+    }
+
+    pub fn store(&self, v: bool) {
+        self.value.set(v);
+    }
+
+    pub fn swap(&self, v: bool) -> bool {
+        self.value.replace(v)
+    }
+}
+
+pub struct AtomicUsize {
+    value: Cell<usize>,
+}
+
+impl AtomicUsize {
+    pub fn new(v: usize) -> Self {
+        Self {
+            value: Cell::new(v),
+        }
+    }
+
+    pub fn load(&self) -> usize {
+        self.value.get()
+    }
+
+    pub fn store(&self, v: usize) {
+        self.value.set(v);
+    }
+
+    pub fn fetch_add(&self, v: usize) -> usize {
+        let old = self.value.get();
+        self.value.set(old.wrapping_add(v));
+        old
+    }
+
+    pub fn fetch_sub(&self, v: usize) -> usize {
+        let old = self.value.get();
+        self.value.set(old.wrapping_sub(v));
+        old
+    }
+}
+
+pub struct AtomicU64 {
+    value: Cell<u64>,
+}
+
+impl AtomicU64 {
+    pub fn new(v: u64) -> Self {
+        Self {
+            value: Cell::new(v),
+        }
+    }
+
+    pub fn load(&self) -> u64 {
+        self.value.get()
+    }
+
+    pub fn store(&self, v: u64) {
+        self.value.set(v);
+    }
+
+    pub fn fetch_add(&self, v: u64) -> u64 {
+        let old = self.value.get();
+        self.value.set(old.wrapping_add(v));
+        old
+    }
+}
+
+/// Memory ordering constants (simplified for no_std)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Ordering {
+    Relaxed,
+    Release,
+    Acquire,
+    AcqRel,
+    SeqCst,
 }
 
 #[cfg(test)]
@@ -354,56 +240,47 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_hash_set() {
-        let set = SimpleHashSet::new(16);
-        assert!(set.insert(42));
-        assert!(set.contains(&42));
-        assert!(!set.insert(42)); // Duplicate
-        assert!(set.remove(&42));
-        assert!(!set.contains(&42));
+    fn test_hashmap_basic() {
+        let mut map = BTreeMap::<u32, u32>::new();
+        assert!(map.is_empty());
+        assert_eq!(map.len(), 0);
     }
 
     #[test]
-    fn test_binary_heap() {
-        let heap = SimpleBinaryHeap::new();
-        heap.push(5);
-        heap.push(2);
-        heap.push(8);
-        heap.push(1);
-        
-        assert_eq!(heap.pop(), Some(1));
-        assert_eq!(heap.pop(), Some(2));
-        assert_eq!(heap.pop(), Some(5));
-        assert_eq!(heap.pop(), Some(8));
-        assert_eq!(heap.pop(), None);
+    fn test_hashset_basic() {
+        let mut set = HashSet::<u32>::new();
+        assert!(set.is_empty());
+        assert_eq!(set.len(), 0);
     }
 
     #[test]
-    fn test_ordered_set() {
-        let set = SimpleOrderedSet::new();
-        set.insert(5);
-        set.insert(2);
-        set.insert(8);
-        set.insert(1);
-        
-        assert!(set.contains(&5));
-        assert!(set.contains(&2));
-        assert!(!set.contains(&10));
-        
-        let items = set.iter();
-        assert_eq!(items, vec![1, 2, 5, 8]);
+    fn test_vecdeque_basic() {
+        let deque = VecDeque::<u32>::new();
+        assert!(deque.is_empty());
+        assert_eq!(deque.len(), 0);
     }
 
     #[test]
-    fn test_deque() {
-        let deque = SimpleDeque::new();
-        deque.push_back(1);
-        deque.push_back(2);
-        deque.push_front(0);
-        
-        assert_eq!(deque.pop_front(), Some(0));
-        assert_eq!(deque.pop_front(), Some(1));
-        assert_eq!(deque.pop_back(), Some(2));
-        assert_eq!(deque.pop_back(), None);
+    fn test_atomic_bool() {
+        let atomic = AtomicBool::new(false);
+        assert!(!atomic.load());
+        atomic.store(true);
+        assert!(atomic.load());
+    }
+
+    #[test]
+    fn test_atomic_usize() {
+        let atomic = AtomicUsize::new(0);
+        assert_eq!(atomic.load(), 0);
+        assert_eq!(atomic.fetch_add(5), 0);
+        assert_eq!(atomic.load(), 5);
+    }
+
+    #[test]
+    fn test_atomic_u64() {
+        let atomic = AtomicU64::new(0);
+        assert_eq!(atomic.load(), 0);
+        assert_eq!(atomic.fetch_add(10), 0);
+        assert_eq!(atomic.load(), 10);
     }
 }

@@ -18,7 +18,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,7 +61,7 @@ pub struct ManPage {
     pub section: u32,
     pub synopsis: String,
     pub description: String,
-    pub options: HashMap<String, String>,
+    pub options: BTreeMap<String, String>,
 }
 
 impl ManPage {
@@ -71,7 +71,7 @@ impl ManPage {
             section,
             synopsis: synopsis.to_string(),
             description: description.to_string(),
-            options: HashMap::new(),
+            options: BTreeMap::new(),
         }
     }
 
@@ -292,20 +292,20 @@ impl CommunityConference {
 /// The overall help and community knowledge manager.
 #[derive(Debug, Clone)]
 pub struct HelpSystem {
-    pub man_pages: HashMap<String, ManPage>,
+    pub man_pages: BTreeMap<String, ManPage>,
     pub guides: Vec<HowToGuide>,
-    pub wiki_pages: HashMap<String, WikiPage>,
-    pub forum_channels: HashMap<String, ForumChannel>,
+    pub wiki_pages: BTreeMap<String, WikiPage>,
+    pub forum_channels: BTreeMap<String, ForumChannel>,
 }
 
 impl HelpSystem {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            man_pages: HashMap::new(),
+            man_pages: BTreeMap::new(),
             guides: Vec::new(),
-            wiki_pages: HashMap::new(),
-            forum_channels: HashMap::new(),
+            wiki_pages: BTreeMap::new(),
+            forum_channels: BTreeMap::new(),
         }
     }
 
@@ -343,7 +343,7 @@ impl HelpSystem {
     pub fn translate_man_summary(
         &self,
         query: &str,
-        locale_dictionary: &HashMap<String, String>,
+        locale_dictionary: &BTreeMap<String, String>,
     ) -> String {
         if let Some(page) = self.man_pages.get(query) {
             let key = format!("man_{}_summary", query);
@@ -492,7 +492,7 @@ mod tests {
         );
         system.add_man_page(page);
 
-        let mut dict = HashMap::new();
+        let mut dict = BTreeMap::new();
         dict.insert(
             "man_sigma-pkg_summary".to_string(),
             "Gestionnaire de paquets universels de SigmaOS".to_string(),

@@ -1,8 +1,8 @@
 // SigmaOS Standard CLI Utilities & Diagnostic Tools (Linux/BSD/Windows Parity)
 // Implements top/htop, ifconfig/ip, and ping equivalents inside the microkernel ecosystem.
 
-use std::collections::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use alloc::collections::BTreeMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. TOP / HTOP (System Resource & Process Task Monitor)
@@ -40,13 +40,11 @@ impl TopCommand {
 
     /// Simulates sorting processes by CPU or Memory RSS (htop sorting)
     pub fn sort_by_cpu(&mut self) {
-        self.processes
-            .sort_by(|a, b| b.cpu_usage_pct.partial_cmp(&a.cpu_usage_pct).unwrap());
+        self.processes.sort_by(|a, b| b.cpu_usage_pct.partial_cmp(&a.cpu_usage_pct).unwrap());
     }
 
     pub fn sort_by_memory(&mut self) {
-        self.processes
-            .sort_by(|a, b| b.memory_rss_bytes.cmp(&a.memory_rss_bytes));
+        self.processes.sort_by(|a, b| b.memory_rss_bytes.cmp(&a.memory_rss_bytes));
     }
 }
 
@@ -64,13 +62,13 @@ pub struct NetworkInterface {
 }
 
 pub struct IfconfigCommand {
-    pub interfaces: HashMap<String, NetworkInterface>,
+    pub interfaces: BTreeMap<String, NetworkInterface>,
 }
 
 impl IfconfigCommand {
     pub fn new() -> Self {
         let mut ic = Self {
-            interfaces: HashMap::new(),
+            interfaces: BTreeMap::new(),
         };
         // Seed default loopback interface
         ic.set_interface("lo0", "127.0.0.1", "00:00:00:00:00:00", 16384, true);
@@ -125,9 +123,7 @@ impl PingCommand {
 
         // Simulate network latency calculations using a linear congruential generator
         for _ in 0..count {
-            seed = seed
-                .wrapping_mul(6364136223846793005)
-                .wrapping_add(1442695040888963407);
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
             let latency = 5.0f32 + (seed % 45) as f32; // Latency between 5ms and 50ms
             rtt_sum += latency;
         }

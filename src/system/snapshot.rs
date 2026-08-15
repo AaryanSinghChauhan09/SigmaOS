@@ -19,7 +19,7 @@
 // SigmaOS System Restore Snapshots
 // OOP-based system snapshot and restore functionality
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -97,7 +97,7 @@ pub trait SnapshotStorage {
 /// File-based snapshot storage
 pub struct FileSnapshotStorage {
     base_path: PathBuf,
-    snapshots: HashMap<String, SnapshotMetadata>,
+    snapshots: BTreeMap<String, SnapshotMetadata>,
     config: SnapshotConfig,
 }
 
@@ -105,7 +105,7 @@ impl FileSnapshotStorage {
     pub fn new(base_path: PathBuf, config: SnapshotConfig) -> Self {
         Self {
             base_path,
-            snapshots: HashMap::new(),
+            snapshots: BTreeMap::new(),
             config,
         }
     }
@@ -220,7 +220,7 @@ impl FileSnapshotStorage {
 /// Merkle tree-based snapshot storage (SigmaFS optimized)
 pub struct MerkleSnapshotStorage {
     base_path: PathBuf,
-    snapshots: HashMap<String, SnapshotMetadata>,
+    snapshots: BTreeMap<String, SnapshotMetadata>,
     config: SnapshotConfig,
 }
 
@@ -228,7 +228,7 @@ impl MerkleSnapshotStorage {
     pub fn new(base_path: PathBuf, config: SnapshotConfig) -> Self {
         Self {
             base_path,
-            snapshots: HashMap::new(),
+            snapshots: BTreeMap::new(),
             config,
         }
     }
@@ -458,8 +458,93 @@ pub enum SnapshotError {
     StorageFull,
 }
 
+/// Profile Generation state representing an atomic state checkpoint
+#[derive(Debug, Clone)]
+pub struct ProfileGeneration {
+    pub generation_id: usize,
+    pub profile_name: String,
+    pub store_path: String,
+    pub timestamp: u64,
+    pub active: bool,
+}
+
+/// Sovereign Profile Manager for NixOS-style generational rollbacks
+pub struct SovereignProfileManager {
+    pub profile_name: String,
+    pub generations: Vec<ProfileGeneration>,
+    pub active_generation: Option<usize>,
+}
+
+impl SovereignProfileManager {
+    pub fn new(profile_name: &str) -> Self {
+        Self {
+            profile_name: profile_name.to_string(),
+            generations: Vec::new(),
+            active_generation: None,
+        }
+    }
+
+    /// Creates an atomic generational profile checkpoint
+    pub fn create_generation(&mut self, store_path: &str) -> usize {
+        let generation_id = self.generations.len() + 1;
+
+        // Deactivate old generation
+        for gen in &mut self.generations {
+            gen.active = false;
+        }
+
+        let new_gen = ProfileGeneration {
+            generation_id,
+            profile_name: self.profile_name.clone(),
+            store_path: store_path.to_string(),
+            timestamp: 1716000000 + (generation_id as u64 * 3600),
+            active: true,
+        };
+
+        self.generations.push(new_gen);
+        self.active_generation = Some(generation_id);
+        generation_id
+    }
+
+    /// Roll back to a previous profile generation atomically
+    pub fn rollback_generation(&mut self, target_generation: usize) -> Result<(), &'static str> {
+        let mut found = false;
+        for gen in &mut self.generations {
+            if gen.generation_id == target_generation {
+                gen.active = true;
+                found = true;
+            } else {
+                gen.active = false;
+            }
+        }
+
+        if found {
+            self.active_generation = Some(target_generation);
+            Ok(())
+        } else {
+            Err("Target profile generation not found")
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn test_sovereign_profile_manager() {
+        let mut pm = SovereignProfileManager::new("system-default");
+        let gen1 = pm.create_generation("/nix/store/hash1-system-v1");
+        let gen2 = pm.create_generation("/nix/store/hash2-system-v2");
+
+        assert_eq!(gen1, 1);
+        assert_eq!(gen2, 2);
+        assert_eq!(pm.active_generation, Some(2));
+
+        // Atomic Rollback to Generation 1
+        assert!(pm.rollback_generation(1).is_ok());
+        assert_eq!(pm.active_generation, Some(1));
+        assert!(pm.generations[0].active);
+        assert!(!pm.generations[1].active);
+    }
     use super::*;
 
     #[test]

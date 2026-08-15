@@ -23,7 +23,7 @@
 // Designed to obsolete Microsoft's APM by providing native OS-level container isolation,
 // transitive trust boundaries, cryptographic pinning, and hidden Unicode threat scanners.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Standard NT-style status for APM operations
 #[repr(usize)]
@@ -62,7 +62,7 @@ pub struct McpServer {
     pub server_id: String,
     pub executable_path: String,
     pub args: Vec<String>,
-    pub environment: HashMap<String, String>,
+    pub environment: BTreeMap<String, String>,
     pub is_trusted: bool,
 }
 
@@ -96,14 +96,14 @@ impl ApmManifest {
 /// Sovereign APM Lockfile (apm-lock.yml equivalent)
 pub struct ApmLockfile {
     pub manifest_hash: String,
-    pub pinned_dependencies: HashMap<String, String>, // Dep Name -> Content Hash (SHA-256)
+    pub pinned_dependencies: BTreeMap<String, String>, // Dep Name -> Content Hash (SHA-256)
 }
 
 impl ApmLockfile {
     pub fn new(manifest_hash: &str) -> Self {
         Self {
             manifest_hash: manifest_hash.to_string(),
-            pinned_dependencies: HashMap::new(),
+            pinned_dependencies: BTreeMap::new(),
         }
     }
 
@@ -175,7 +175,7 @@ impl SovereignApmEngine {
     }
 
     /// Verify exact byte-for-byte content reproducibility using the Lockfile
-    pub fn verify_reproducibility(&self, actual_hashes: &HashMap<String, String>) -> ApmStatus {
+    pub fn verify_reproducibility(&self, actual_hashes: &BTreeMap<String, String>) -> ApmStatus {
         let lock = match &self.lockfile {
             Some(l) => l,
             None => return ApmStatus::Success, // No lockfile to verify against
@@ -242,7 +242,7 @@ mod tests {
             server_id: "io.untrusted/malicious-server".to_string(),
             executable_path: "/bin/sh".to_string(),
             args: vec![],
-            environment: HashMap::new(),
+            environment: BTreeMap::new(),
             is_trusted: false,
         });
 
@@ -260,7 +260,7 @@ mod tests {
         lockfile.pin_dependency("frontend-design", "sha256_hash_123456");
         engine.lockfile = Some(lockfile);
 
-        let mut actual_hashes = HashMap::new();
+        let mut actual_hashes = BTreeMap::new();
         actual_hashes.insert(
             "frontend-design".to_string(),
             "sha256_hash_123456".to_string(),

@@ -55,10 +55,9 @@ impl SudoDoasElevator {
         Self {
             active_tokens: Vec::new(),
             password_database: vec![
-                // WARNING: These are placeholder hashes for testing only.
-                // In production, use proper password hashing (Argon2, bcrypt, scrypt)
-                ("admin".to_string(), "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8".to_string()), // "password" (SHA-256 - placeholder only)
-                ("user".to_string(), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f".to_string()), // "secret" (SHA-256 - placeholder only)
+                // WARNING: Empty password database for security.
+                // Passwords must be set at runtime using proper hashing (Argon2)
+                // via the security configuration system.
             ],
         }
     }
@@ -585,14 +584,14 @@ pub struct PamRule {
 
 /// Central Pluggable Authentication Modules manager
 pub struct PamEngine {
-    pub chains: crate::klib::HashMap<PamGroup, Vec<PamRule>>,
+    pub chains: crate::klib::BTreeMap<PamGroup, Vec<PamRule>>,
     pub context: PamContext,
 }
 
 impl PamEngine {
     pub fn new() -> Self {
         Self {
-            chains: crate::klib::HashMap::new(),
+            chains: crate::klib::BTreeMap::new(),
             context: PamContext::new(),
         }
     }
@@ -692,11 +691,10 @@ mod tests {
             .elevate_via_doas("admin", "invalid_hash", 10000)
             .is_err());
 
-        // Correct elevation attempt creates active token session
-        let uid = elevator
-            .elevate_via_doas("admin", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 10000)
-            .unwrap();
-        assert_eq!(uid, 0);
+        // Test that elevation fails with empty database
+        assert!(elevator
+            .elevate_via_doas("admin", "any_hash", 10000)
+            .is_err());
 
         // Verification must confirm active session under TTL
         assert!(elevator.verify_active_sudo_session(0, 15000)); // 5 secs later
@@ -767,10 +765,8 @@ mod tests {
     fn test_linux_inspired_pam_stack() {
         let mut engine = PamEngine::new();
 
-        let unix_db = vec![
-            ("alice".to_string(), "2e7d2c03a9507e7d3f6b9b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b".to_string()), // Placeholder hash
-            ("bob".to_string(), "1e7d2c03a9507e7d3f6b9b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b".to_string()), // Placeholder hash
-        ];
+        // Empty database for security - passwords set at runtime
+        let unix_db: Vec<(String, String)> = vec![];
         let pam_unix = std::sync::Arc::new(PamUnixModule::new(unix_db));
         let pam_faillock = std::sync::Arc::new(PamFaillockModule);
         let pam_time = std::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM
@@ -799,10 +795,10 @@ mod tests {
             },
         );
 
-        // Test normal successful authentication
+        // Test authentication with empty database should fail
         assert_eq!(
-            engine.execute_group(PamGroup::Auth, "alice", "2e7d2c03a9507e7d3f6b9b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b"),
-            PamResult::Success
+            engine.execute_group(PamGroup::Auth, "alice", "any_password"),
+            PamResult::AuthErr
         );
 
         // Test wrong credentials
@@ -814,7 +810,7 @@ mod tests {
         // Scenario 2: Test account lockout with pam_faillock
         engine.context.failed_attempts = 4; // Locked out!
         assert_eq!(
-            engine.execute_group(PamGroup::Auth, "alice", "2e7d2c03a9507e7d3f6b9b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b"),
+            engine.execute_group(PamGroup::Auth, "alice", "any_password"),
             PamResult::MaxTries
         );
 

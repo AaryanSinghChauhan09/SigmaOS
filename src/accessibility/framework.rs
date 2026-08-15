@@ -19,7 +19,7 @@
 // SigmaOS Accessibility Framework
 // Advanced vision, hearing, mobility, and cognitive support
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Accessibility category
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -32,7 +32,7 @@ pub enum AccessibilityCategory {
 }
 
 /// Accessibility feature type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum AccessibilityFeature {
     ScreenReader,
     HighContrast,
@@ -52,7 +52,7 @@ pub struct AccessibilitySetting {
     pub feature: AccessibilityFeature,
     pub enabled: bool,
     pub intensity: f64, // 0.0 to 1.0
-    pub custom_params: HashMap<String, String>,
+    pub custom_params: BTreeMap<String, String>,
 }
 
 impl AccessibilitySetting {
@@ -61,7 +61,7 @@ impl AccessibilitySetting {
             feature,
             enabled: false,
             intensity: 0.5,
-            custom_params: HashMap::new(),
+            custom_params: BTreeMap::new(),
         }
     }
 
@@ -125,18 +125,18 @@ impl AccessibilityProfile {
 
 /// Accessibility framework
 pub struct AccessibilityFramework {
-    pub profiles: HashMap<String, AccessibilityProfile>,
+    pub profiles: BTreeMap<String, AccessibilityProfile>,
     pub active_profile: Option<String>,
-    pub global_settings: HashMap<AccessibilityFeature, AccessibilitySetting>,
+    pub global_settings: BTreeMap<AccessibilityFeature, AccessibilitySetting>,
 }
 
 impl AccessibilityFramework {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut framework = Self {
-            profiles: HashMap::new(),
+            profiles: BTreeMap::new(),
             active_profile: None,
-            global_settings: HashMap::new(),
+            global_settings: BTreeMap::new(),
         };
 
         // Add default profiles
@@ -223,6 +223,7 @@ impl AccessibilityFramework {
         }
         self.active_profile = Some(name.to_string());
         if let Some(profile) = self.profiles.get_mut(name) {
+            let profile: &mut AccessibilityProfile = profile;
             profile.enable_all();
         }
         Ok(())

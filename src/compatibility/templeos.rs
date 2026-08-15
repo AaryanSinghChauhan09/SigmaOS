@@ -20,21 +20,21 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 // =========================================================================
 // 1. HolyC JIT Compiler Shell
 // =========================================================================
 
 pub struct HolyCShell {
-    pub jitted_symbols: HashMap<String, Vec<u8>>,
+    pub jitted_symbols: BTreeMap<String, Vec<u8>>,
 }
 
 impl HolyCShell {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         HolyCShell {
-            jitted_symbols: HashMap::new(),
+            jitted_symbols: BTreeMap::new(),
         }
     }
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Gzip Compatibility
 //! Gzip compression/decompression (gzip command)
@@ -45,10 +46,10 @@ pub unsafe extern "C" fn gzip_init() -> SigmaI32 {
 #[no_mangle]
 pub unsafe extern "C" fn gzip_compress(
     input_file: *const u8,
-    output_file: *const u8,
+    _output_file: *const u8,
     _options: GzipOptions,
 ) -> SigmaI32 {
-    if !GZIP_INITIALIZED || input_file.isnull() {
+    if !GZIP_INITIALIZED || input_file.is_null() {
         return -1;
     }
     
@@ -65,10 +66,10 @@ pub unsafe extern "C" fn gzip_compress(
 #[no_mangle]
 pub unsafe extern "C" fn gzip_decompress(
     input_file: *const u8,
-    _output_file: *const u8,
+    __output_file: *const u8,
     _options: GzipOptions,
 ) -> SigmaI32 {
-    if !GZIP_INITIALIZED || input_file.isnull() {
+    if !GZIP_INITIALIZED || input_file.is_null() {
         return -1;
     }
     
@@ -87,7 +88,7 @@ pub unsafe extern "C" fn gzip_get_ratio(
     input_file: *const u8,
     ratio: *mut SigmaU32,
 ) -> SigmaI32 {
-    if !GZIP_INITIALIZED || input_file.isnull() || ratio.isnull() {
+    if !GZIP_INITIALIZED || input_file.is_null() || ratio.is_null() {
         return -1;
     }
     

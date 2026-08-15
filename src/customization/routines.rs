@@ -19,6 +19,10 @@
 // SigmaOS Customization Engine
 // Samsung Modes & Routines-style automation and theming
 
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
 
 /// Automation trigger type
@@ -57,7 +61,10 @@ impl Condition {
     pub fn evaluate(&self, current_value: &str) -> bool {
         match self.operator.as_str() {
             "equals" => current_value == self.value,
+            "not_equals" => current_value != self.value,
             "contains" => current_value.contains(&self.value),
+            "starts_with" => current_value.starts_with(&self.value),
+            "ends_with" => current_value.ends_with(&self.value),
             "greater_than" => {
                 if let (Ok(curr), Ok(val)) =
                     (current_value.parse::<f64>(), self.value.parse::<f64>())
@@ -72,6 +79,33 @@ impl Condition {
                     (current_value.parse::<f64>(), self.value.parse::<f64>())
                 {
                     curr < val
+                } else {
+                    false
+                }
+            }
+            "greater_than_or_equal" => {
+                if let (Ok(curr), Ok(val)) =
+                    (current_value.parse::<f64>(), self.value.parse::<f64>())
+                {
+                    curr >= val
+                } else {
+                    false
+                }
+            }
+            "less_than_or_equal" => {
+                if let (Ok(curr), Ok(val)) =
+                    (current_value.parse::<f64>(), self.value.parse::<f64>())
+                {
+                    curr <= val
+                } else {
+                    false
+                }
+            }
+            "bitwise_and" => {
+                if let (Ok(curr), Ok(val)) =
+                    (current_value.parse::<u64>(), self.value.parse::<u64>())
+                {
+                    (curr & val) == val
                 } else {
                     false
                 }
@@ -147,7 +181,7 @@ impl Routine {
         self.conditions.iter().all(|condition| {
             let current_value = context
                 .get(&condition.value)
-                .map(|s| s.as_str())
+                .map(|s: &String| s.as_str())
                 .unwrap_or("");
             condition.evaluate(current_value)
         })
@@ -435,6 +469,7 @@ impl CustomizationEngine {
         let mut triggered_actions = Vec::new();
 
         for routine in self.routines.values() {
+            let routine: &Routine = routine;
             if routine.should_trigger(&self.context) {
                 triggered_actions.extend(routine.actions.clone());
             }
@@ -567,5 +602,49 @@ mod tests {
             WindowGridLayout::ThreeColumn
         );
         assert_eq!(personalizer.layout_customizer.spacing_px, 12);
+    }
+
+    #[test]
+    fn test_not_equals_and_linux_string_operators() {
+        let cond_neq = Condition::new(TriggerType::SystemEvent, "critical_oom".to_string())
+            .with_operator("not_equals".to_string());
+        assert!(cond_neq.evaluate("minor_cache_trim"));
+        assert!(!cond_neq.evaluate("critical_oom"));
+
+        let cond_start = Condition::new(TriggerType::Application, "git_".to_string())
+            .with_operator("starts_with".to_string());
+        assert!(cond_start.evaluate("git_commit"));
+        assert!(!cond_start.evaluate("commit_git"));
+
+        let cond_end = Condition::new(TriggerType::Application, "_daemon".to_string())
+            .with_operator("ends_with".to_string());
+        assert!(cond_end.evaluate("syslog_daemon"));
+        assert!(!cond_end.evaluate("daemon_syslog"));
+    }
+
+    #[test]
+    fn test_advanced_windows_version_operators() {
+        let cond_gte = Condition::new(TriggerType::SystemEvent, "601.0".to_string()) // Windows 7 (NT 6.1) parity
+            .with_operator("greater_than_or_equal".to_string());
+        assert!(cond_gte.evaluate("601.0"));
+        assert!(cond_gte.evaluate("1000.0")); // Windows 10 (NT 10.0) parity
+        assert!(!cond_gte.evaluate("600.0")); // Windows Vista (NT 6.0) parity
+
+        let cond_lte = Condition::new(TriggerType::SystemEvent, "601.0".to_string())
+            .with_operator("less_than_or_equal".to_string());
+        assert!(cond_lte.evaluate("601.0"));
+        assert!(cond_lte.evaluate("600.0"));
+        assert!(!cond_lte.evaluate("1000.0"));
+    }
+
+    #[test]
+    fn test_bsd_bitwise_flag_operators() {
+        // BSD flag mask: checking if bit 0x2 is set
+        let cond_bit = Condition::new(TriggerType::SystemEvent, "2".to_string())
+            .with_operator("bitwise_and".to_string());
+
+        assert!(cond_bit.evaluate("3")); // (3 & 2) == 2 (True)
+        assert!(cond_bit.evaluate("6")); // (6 & 2) == 2 (True)
+        assert!(!cond_bit.evaluate("4")); // (4 & 2) == 0 (False)
     }
 }

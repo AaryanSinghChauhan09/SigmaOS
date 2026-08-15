@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Ifconfig Compatibility
 //! Network interface configuration (ifconfig command)

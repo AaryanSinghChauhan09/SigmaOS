@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS APK Compatibility Layer
 //! APK compatibility for Alpine Linux

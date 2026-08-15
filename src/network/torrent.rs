@@ -19,7 +19,7 @@
 // SigmaOS Built-in Torrent Client
 // OOP-based BitTorrent client with peer management
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
@@ -162,7 +162,7 @@ impl TorrentProtocol for BitTorrentProtocol {
 /// OOP-based Torrent Client
 pub struct TorrentClient {
     protocol: Box<dyn TorrentProtocol>,
-    torrents: HashMap<String, TorrentHandle>,
+    torrents: BTreeMap<String, TorrentHandle>,
     download_directory: PathBuf,
     max_upload_speed_mbps: Option<u32>,
     max_download_speed_mbps: Option<u32>,
@@ -173,7 +173,7 @@ impl TorrentClient {
     pub fn new(protocol: Box<dyn TorrentProtocol>, download_directory: PathBuf) -> Self {
         Self {
             protocol,
-            torrents: HashMap::new(),
+            torrents: BTreeMap::new(),
             download_directory,
             max_upload_speed_mbps: None,
             max_download_speed_mbps: None,

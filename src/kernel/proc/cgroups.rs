@@ -18,7 +18,7 @@
 
 /// SigmaOS cgroups v2 resource controller implementation
 /// Controls CPU limits, Memory limits, and PID limits
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,13 +55,13 @@ impl Cgroup {
 }
 
 pub struct CgroupManager {
-    groups: HashMap<String, Cgroup>,
+    groups: BTreeMap<String, Cgroup>,
 }
 
 impl CgroupManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut groups = HashMap::new();
+        let mut groups = BTreeMap::new();
         groups.insert("root".to_string(), Cgroup::new("root"));
         CgroupManager { groups }
     }

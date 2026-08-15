@@ -2,7 +2,7 @@
 // Enables on-kernel compiler and toolchain bootstrapping to build/link
 // native development tooling, making the operating system fully self-hosting.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// Error types thrown during compilation and toolchain initialization
@@ -25,13 +25,13 @@ pub struct CompilerConfig {
 /// The Self Hosting compiler and assembler controller
 pub struct SelfHostingManager {
     pub config: CompilerConfig,
-    pub installed_tools: HashMap<String, String>, // Name -> Version mapping
+    pub installed_tools: BTreeMap<String, String>, // Name -> Version mapping
     pub verified_self_host: bool,
 }
 
 impl SelfHostingManager {
     pub fn new(target: &str) -> Self {
-        let mut tools = HashMap::new();
+        let mut tools = BTreeMap::new();
         tools.insert("rustc".to_string(), "1.80.0-sigma".to_string());
         tools.insert("cargo".to_string(), "1.80.0-sigma".to_string());
         tools.insert("ld".to_string(), "2.42-sigma".to_string());

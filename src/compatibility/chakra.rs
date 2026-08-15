@@ -1,12 +1,9 @@
-// SigmaOS Distro Compatibility Layer
 // SigmaOS Chakra Linux Parity Engine Shard
 // Zero-dependency, #![no_std] compliant, zero-allocation
 
 use core::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 
-// ==========================================
 // 1. Akabei Bundle Resolver & Bundler
-// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BundleType {
@@ -79,9 +76,7 @@ impl AkabeiPackageEngine {
     }
 }
 
-// ==========================================
 // 2. Kapudan First-Boot Startup Assistant Engine
-// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopTheme {
@@ -119,9 +114,7 @@ impl KapudanAssistant {
 
     /// Welcomes the user with a guided introduction wizard simulation (Kapudan's role)
     pub fn welcome_user(&self) {
-        println!("==============================================================");
         println!("    Welcome to SigmaOS - Guided by Kapudan Setup Assistant   ");
-        println!("==============================================================");
         println!("Let's customize your sovereign workspace configurations.");
     }
 
@@ -139,9 +132,7 @@ impl KapudanAssistant {
     }
 }
 
-// ==========================================
 // 3. Tribe Modular Installer Sequencer
-// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstallerStep {
@@ -219,9 +210,7 @@ impl TribeInstaller {
     }
 }
 
-// ==========================================
 // Global Static Orchestrator Points
-// ==========================================
 
 pub static GLOBAL_AKABEI: AkabeiPackageEngine = AkabeiPackageEngine::new();
 pub static GLOBAL_KAPUDAN: KapudanAssistant = KapudanAssistant::new();

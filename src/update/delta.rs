@@ -37,6 +37,7 @@ pub trait DeltaPatch {
     fn source_version(&self) -> &[u8];
     fn target_version(&self) -> &[u8];
     fn size(&self) -> usize;
+    fn operations(&self) -> &[[u8; 256]];
 }
 
 #[repr(C)]
@@ -79,6 +80,9 @@ impl DeltaPatch for SimpleDeltaPatch {
         &self.target_version[..len]
     }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
+    fn operations(&self) -> &[[u8; 256]] {
+        &self.operations
+    }
 }
 
 pub trait DeltaGenerator {
@@ -170,8 +174,7 @@ impl DeltaApplier for SimpleDeltaApplier {
         for patch_option in &self.generator.patches {
             if let Some(ref patch) = *patch_option {
                 if patch.id() == patch_id {
-                    if let SimpleDeltaPatch { ref operations, .. } = **patch {
-                        for op in operations {
+                    for op in patch.operations() {
                             match op[0] {
                                 b'C' => {
                                     let offset = op[1] as usize;
@@ -188,7 +191,6 @@ impl DeltaApplier for SimpleDeltaApplier {
                                 _ => {}
                             }
                         }
-                    }
                     return Ok(());
                 }
             }

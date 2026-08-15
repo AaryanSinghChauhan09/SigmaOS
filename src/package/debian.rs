@@ -57,6 +57,16 @@ impl DebControl {
             return Err("Package and Version fields are mandatory in Debian control file");
         }
 
+        // Validate package name (alphanumeric, '+', '-', '.' only, no relative traversal or path separators)
+        if package.starts_with('.') || package.contains('/') || package.contains('\\') || package.contains("..") {
+            return Err("Invalid or unsafe package name in Debian control file");
+        }
+        for b in package.bytes() {
+            if !b.is_ascii_alphanumeric() && b != b'+' && b != b'-' && b != b'.' {
+                return Err("Debian package name contains illegal characters");
+            }
+        }
+
         Ok(Self {
             package,
             version,
@@ -344,6 +354,18 @@ mod tests {
         assert_eq!(deb.control.package, "curl");
         assert_eq!(deb.control.version, "7.88.1-8");
         assert_eq!(deb.control.description, "command line tool for transferring data");
+    }
+
+    #[test]
+    fn test_debian_control_unsafe_package_name_rejected() {
+        let unsafe_control = "Package: ../../etc/passwd\nVersion: 1.0\n";
+        assert!(DebControl::parse(unsafe_control).is_err());
+
+        let invalid_char_control = "Package: nginx;rm -rf /\nVersion: 1.0\n";
+        assert!(DebControl::parse(invalid_char_control).is_err());
+
+        let dot_start_control = "Package: .hidden_pkg\nVersion: 1.0\n";
+        assert!(DebControl::parse(dot_start_control).is_err());
     }
 
     #[test]

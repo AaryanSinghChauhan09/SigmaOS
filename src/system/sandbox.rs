@@ -19,7 +19,7 @@
 // SigmaOS Process Sandbox Manager
 // OOP-based process sandboxing with capability-based security
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// Sandbox profile
@@ -114,14 +114,14 @@ pub struct SandboxResult {
 
 /// Capability-based sandbox enforcer
 pub struct CapabilitySandboxEnforcer {
-    active_sandboxes: HashMap<u64, SandboxProfile>,
+    active_sandboxes: BTreeMap<u64, SandboxProfile>,
 }
 
 impl CapabilitySandboxEnforcer {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            active_sandboxes: HashMap::new(),
+            active_sandboxes: BTreeMap::new(),
         }
     }
 }
@@ -203,14 +203,14 @@ impl CapabilitySandboxEnforcer {
 
 /// Namespace-based sandbox enforcer
 pub struct NamespaceSandboxEnforcer {
-    active_sandboxes: HashMap<u64, SandboxProfile>,
+    active_sandboxes: BTreeMap<u64, SandboxProfile>,
 }
 
 impl NamespaceSandboxEnforcer {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            active_sandboxes: HashMap::new(),
+            active_sandboxes: BTreeMap::new(),
         }
     }
 }
@@ -273,7 +273,7 @@ impl NamespaceSandboxEnforcer {
 /// OOP-based Process Sandbox Manager
 pub struct ProcessSandboxManager {
     enforcer: Box<dyn SandboxEnforcement>,
-    profiles: HashMap<String, SandboxProfile>,
+    profiles: BTreeMap<String, SandboxProfile>,
     active_processes: Vec<SandboxProcess>,
 }
 
@@ -281,7 +281,7 @@ impl ProcessSandboxManager {
     pub fn new(enforcer: Box<dyn SandboxEnforcement>) -> Self {
         Self {
             enforcer,
-            profiles: HashMap::new(),
+            profiles: BTreeMap::new(),
             active_processes: Vec::new(),
         }
     }
@@ -336,7 +336,7 @@ impl ProcessSandboxManager {
     }
 
     /// Get sandbox profiles
-    pub fn profiles(&self) -> &HashMap<String, SandboxProfile> {
+    pub fn profiles(&self) -> &BTreeMap<String, SandboxProfile> {
         &self.profiles
     }
 

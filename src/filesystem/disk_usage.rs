@@ -208,7 +208,7 @@ impl DiskUsageAnalyzer {
     }
 
     /// Get size by file type
-    pub fn get_size_by_type(&self, _path: &Path) -> HashMap<String, u64> {
+    pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
         let mut sizes = HashMap::new();
         sizes.insert("txt".to_string(), 1024 * 1024);
         sizes.insert("pdf".to_string(), 5 * 1024 * 1024);
@@ -340,8 +340,8 @@ impl Default for SovereignDfEngine {
             filesystem: "/dev/sda1".to_string(),
             fs_type: "SigmaFS".to_string(),
             total_bytes: 100 * 1024 * 1024 * 1024, // 100GB
-            used_bytes: 40 * 1024 * 1024 * 1024,   // 40GB
-            free_bytes: 60 * 1024 * 1024 * 1024,   // 60GB
+            used_bytes: 40 * 1024 * 1024 * 1024,  // 40GB
+            free_bytes: 60 * 1024 * 1024 * 1024,  // 60GB
             use_percent: 40.0,
             total_inodes: 10_000_000,
             used_inodes: 1_200_000,
@@ -353,8 +353,8 @@ impl Default for SovereignDfEngine {
             filesystem: "tmpfs".to_string(),
             fs_type: "tmpfs".to_string(),
             total_bytes: 8 * 1024 * 1024 * 1024, // 8GB
-            used_bytes: 512 * 1024 * 1024,       // 512MB
-            free_bytes: 75 * 1024 * 1024 * 1024, // remaining
+            used_bytes: 512 * 1024 * 1024,      // 512MB
+            free_bytes: 75 * 1024 * 1024 * 1024,  // remaining
             use_percent: 6.25,
             total_inodes: 500_000,
             used_inodes: 5_000,
@@ -443,11 +443,7 @@ impl SovereignParted {
     /// User-defined physical alignment validation function
     /// Standard modern disks use 4KB physical sectors (8 logical 512-byte sectors).
     /// GNU Parted warning is generated if start_sector is not divisible by 8.
-    pub fn verify_alignment<F>(
-        &self,
-        index: u32,
-        alignment_checker: F,
-    ) -> Result<bool, &'static str>
+    pub fn verify_alignment<F>(&self, index: u32, alignment_checker: F) -> Result<bool, &'static str>
     where
         F: Fn(u64) -> bool,
     {
@@ -513,15 +509,11 @@ mod tests {
         let mut parted = SovereignParted::new(1000000, PartitionScheme::Gpt);
 
         // Add partition 1 (perfectly aligned with 8-sector boundary, start = 2048)
-        let idx1 = parted
-            .add_partition("SovereignRoot".to_string(), 2048, 100000, FsType::SigmaFS)
-            .unwrap();
+        let idx1 = parted.add_partition("SovereignRoot".to_string(), 2048, 100000, FsType::SigmaFS).unwrap();
         assert_eq!(idx1, 1);
 
         // Add partition 2 (misaligned, start = 100003)
-        let idx2 = parted
-            .add_partition("UnstructuredData".to_string(), 100003, 200000, FsType::Ext4)
-            .unwrap();
+        let idx2 = parted.add_partition("UnstructuredData".to_string(), 100003, 200000, FsType::Ext4).unwrap();
         assert_eq!(idx2, 2);
 
         // Verify alignments with 8-sector 4KB boundary physical alignment checker F

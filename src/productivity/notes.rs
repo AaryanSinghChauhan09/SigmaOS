@@ -19,7 +19,7 @@
 // SigmaOS Note-taking App
 // OOP-based note management with rich text and organization
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::PathBuf;
 
 /// Note
@@ -91,14 +91,14 @@ pub trait NoteStorage {
 
 /// In-memory note storage
 pub struct InMemoryNoteStorage {
-    notes: HashMap<String, Note>,
+    notes: BTreeMap<String, Note>,
 }
 
 impl InMemoryNoteStorage {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            notes: HashMap::new(),
+            notes: BTreeMap::new(),
         }
     }
 }
@@ -135,20 +135,20 @@ impl NoteStorage for InMemoryNoteStorage {
 /// OOP-based Note-taking App
 pub struct NoteTakingApp {
     storage: Box<dyn NoteStorage>,
-    folders: HashMap<String, Folder>,
-    notebooks: HashMap<String, Notebook>,
+    folders: BTreeMap<String, Folder>,
+    notebooks: BTreeMap<String, Notebook>,
     active_note: Option<String>,
-    search_index: HashMap<String, Vec<String>>,
+    search_index: BTreeMap<String, Vec<String>>,
 }
 
 impl NoteTakingApp {
     pub fn new(storage: Box<dyn NoteStorage>) -> Self {
         Self {
             storage,
-            folders: HashMap::new(),
-            notebooks: HashMap::new(),
+            folders: BTreeMap::new(),
+            notebooks: BTreeMap::new(),
             active_note: None,
-            search_index: HashMap::new(),
+            search_index: BTreeMap::new(),
         }
     }
 

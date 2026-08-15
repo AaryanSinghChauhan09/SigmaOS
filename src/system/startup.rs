@@ -20,11 +20,11 @@
 // OOP-based startup process optimization with dependency analysis
 
 #[cfg(not(test))]
-use crate::klib::{HashMap, Duration, Instant};
+use crate::klib::BTreeMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
-#[cfg(test)]
+use alloc::collections::BTreeMap;
+
 use std::time::{Duration, Instant};
 
 /// Startup item classification (inspired by Sysinternals Autoruns)

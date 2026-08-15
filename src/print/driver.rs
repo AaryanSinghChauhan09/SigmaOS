@@ -30,8 +30,21 @@ pub type PrinterID = usize;
 pub type JobID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrinterState { Idle = 0, Printing = 1, Error = 2, Offline = 3 }
+
+impl PrinterState {
+    /// Safe conversion from usize without unsafe transmute
+    pub fn from_usize(val: usize) -> Self {
+        match val {
+            0 => Self::Idle,
+            1 => Self::Printing,
+            2 => Self::Error,
+            3 => Self::Offline,
+            _ => Self::Error, // safe default
+        }
+    }
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -72,7 +85,7 @@ impl Printer for SimplePrinter {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> PrinterState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> PrinterState { PrinterState::from_usize(self.state.load(Ordering::SeqCst)) }
 
     fn set_state(&mut self, state: PrinterState) {
         self.state.store(state as usize, Ordering::SeqCst);

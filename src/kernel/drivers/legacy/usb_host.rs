@@ -24,7 +24,7 @@ use crate::kernel::subsystems::registry::{
 /// USB HID (keyboards, mice, gamepads), USB Mass Storage (BBB protocol)
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 /// USB speed
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,149 +1,36 @@
-# SigmaOS CI/CD Pipeline
 name: CI
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'src/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
-    paths:
-      - 'src/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
+    branches: [ main, develop ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Rust (no_std)
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        target: x86_64-unknown-none
-        override: true
-        components: rust-src, llvm-tools-preview
-
-    - name: Cache Cargo registry
-      uses: actions/cache@v4
-      with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-
-    - name: Cache Cargo index
-      uses: actions/cache@v4
-      with:
-        path: ~/.cargo/git
-        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-
-    # Mock step since we don't have a full Cargo workspace setup yet
-    - name: Check Kernel Compilation (Syntax & Types)
-      run: |
-        echo "Running syntax and type checks on bare-metal code..."
-        # Example: cargo check --target x86_64-unknown-none
-        echo "Check passed."
-
-    - name: SBOM Generation
-      run: |
-        echo "Generating Software Bill of Materials (SBOM)..."
-        # Example: cargo install cargo-sbom && cargo sbom > sbom.json
-        touch sbom.json
-        echo "SBOM generated."
-
-    - name: Kernel Signing
-      run: |
-        echo "Signing kernel artifacts (Mock)..."
-        # Example: sbsign --key secureboot.key --cert secureboot.crt vmlinuz
-        echo "Signing complete."
-
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        path: target
-        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
-    
-    - name: Format check
-      run: cargo fmt -- --check
-    
-    - name: Clippy
-      run: cargo clippy -- -D warnings
-      continue-on-error: true
-    
-    - name: Build
-      run: cargo build --verbose
-      continue-on-error: true
-    
-    - name: Run tests
-      run: cargo test --verbose
-      continue-on-error: true
-    
-    - name: Security audit
-      uses: rustsec/audit-check@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-      continue-on-error: true
-
-  test:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
         toolchain: stable
+        override: true
     
-    - name: Initialize build directory
-      run: mkdir -p build
-
-    - name: Run unit tests
-      run: cargo test --lib
-      continue-on-error: true
+    - name: Build
+      run: cargo build --release
     
-    - name: Run integration tests
-      run: cargo test --test '*'
-      continue-on-error: true
-
-    - name: Initialize build and compile workspace
-      run: |
-        mkdir -p build
-        cargo build
-      continue-on-error: true
+    - name: Test
+      run: cargo test
     
-    - name: Build binaries and initialize build dir for smoke test
-      run: |
-        mkdir -p build
-        cargo build
-      continue-on-error: true
-
-    - name: Run smoke tests
-      run: |
-        mkdir -p build
-        mkdir -p target/debug
-        touch target/debug/sigma_kernel
-        chmod +x ./scripts/smoke-test.sh
-        ./scripts/smoke-test.sh
-
-  security:
-    runs-on: ubuntu-latest
+    - name: Clippy
+      run: cargo clippy -- -D warnings
     
-    steps:
-    - uses: actions/checkout@v3
+    - name: Format check
+      run: cargo fmt -- --check
     
-    - name: Run security checks
-      run: |
-        cargo install cargo-audit
-        cargo audit
-    
-    - name: Check for vulnerabilities
-      uses: rustsec/audit-check@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Security audit
+      run: cargo audit

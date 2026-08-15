@@ -1,44 +1,88 @@
-# Security Policy
+# SigmaOS Security Policy
 
 ## Supported Versions
 
 | Version | Supported |
-| ------- | --------- |
-| latest (main) | ✅ |
-| v0.x | ✅ |
-| < v0.1 | ❌ |
+|---------|-----------|
+| main (HEAD) | ✅ Security fixes |
+| 0.x (pre-release) | ✅ Security fixes |
+| Development branches | ⚠️ Best effort |
 
 ## Reporting a Vulnerability
 
-**Do NOT** open a public issue for security vulnerabilities.
+**DO NOT** report security vulnerabilities via public GitHub issues.
 
-Send encrypted email to: **security@sigmaos.dev**
+### Private Disclosure
 
-Include the following information:
-- Vulnerability description
-- Impact assessment
-- Reproduction steps
-- Proof of concept
-- Affected versions
-- Suggested fix
+1. **GitHub Security Advisory**: Use [GitHub's private vulnerability reporting](https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories/new)
+2. **Email**: Report to the maintainer via GitHub private message
+3. **Response time**: We aim to acknowledge within 48 hours
 
-### PGP Key
+### What to Include
 
-```text
-Key ID: 0x1234567890ABCDEF
-Fingerprint: 1234 5678 90AB CDEF 1234 5678 90AB CDEF 1234 5678
-```
+- Description of the vulnerability
+- Affected component(s) (`src/security/`, `src/kernel/`, etc.)
+- Steps to reproduce
+- Potential impact assessment
+- Suggested fix (optional)
 
-## Security Best Practices
+## Security Architecture
 
-- **Post-Quantum Cryptography**: Kyber-1024 KEM + Dilithium-5 signatures
-- **Capability-Based Security**: 64-bit hardware-enforced permissions
-- **Zero-Trust Architecture**: Continuous authentication and verification
-- **Memory Safety**: Rust memory safety, W^X enforcement, ASLR
-- **Minimal Attack Surface**: Microkernel design with minimal TCB
+SigmaOS implements a defense-in-depth security model:
 
-## Security Audits
+### Layer 1: Process Isolation
+- **pledge(2)**: Promise-based syscall restriction (OpenBSD-inspired)
+- **unveil(2)**: Filesystem visibility restriction (OpenBSD-inspired)
+- **Capsicum**: Capability-based access control (FreeBSD-inspired)
+- **Namespaces**: PID, mount, network namespaces (Linux-inspired)
+- **cgroups**: Resource limitation and accounting
 
-- **Static Analysis**: cargo clippy, cargo audit
-- **Dynamic Analysis**: fuzzing, penetration testing
-- **Third-Party Audits**: Annual external security review
+### Layer 2: Memory Safety
+- Written in Rust (memory-safe by default)
+- Custom buddy allocator (`src/klib/buddy_allocator.rs`)
+- ASLR (Address Space Layout Randomization)
+- Stack canaries in unsafe blocks
+- No undefined behavior by construction in safe Rust
+
+### Layer 3: Cryptography
+- Post-quantum cryptography (Dilithium, Kyber)
+- TLS 1.3 with PQC hybrid mode
+- No hard-coded cryptographic keys in production code
+- HMAC-based key derivation
+
+### Layer 4: Privilege Separation
+- Principle of least privilege
+- Separate security contexts per process
+- Kernel/userspace strict separation
+- No unnecessary `unsafe` blocks
+
+### Layer 5: Code Quality
+- GitHub CodeQL scanning on every push
+- No use of `unwrap()` in kernel code (explicit error handling)
+- Fuzzing with cargo-fuzz
+- All security-sensitive modules have comprehensive tests
+
+## Known Security Limitations
+
+- **Experimental OS**: Not production-ready for security-critical deployments
+- **Custom allocator**: Less battle-tested than glibc malloc
+- **Hardware drivers**: Some drivers may have vulnerabilities
+
+## Security Contacts
+
+- GitHub Security Advisories: Preferred method
+- Code scanning: Automated via [GitHub CodeQL](https://github.com/AaryanSinghChauhan09/SigmaOS/security/code-scanning)
+
+## CVE Process
+
+If a vulnerability is confirmed:
+1. We will request a CVE via [MITRE](https://cveform.mitre.org/)
+2. Fix will be developed in private
+3. Coordinated disclosure after patch is ready
+4. Credit to researcher in CHANGELOG and release notes
+
+## Security Acknowledgments
+
+We thank all security researchers who responsibly disclose vulnerabilities.
+
+See [CHANGELOG.md](CHANGELOG.md) for security fix history.

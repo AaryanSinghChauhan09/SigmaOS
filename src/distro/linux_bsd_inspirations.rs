@@ -12,7 +12,179 @@ use alloc::string::{String, ToString};
 use alloc::format;
 
 // ==========================================
-// 1. ARCH LINUX INSPIRATIONS
+// 1. LINUX EBPF VM SIMULATOR (SovereignEbpfEngine)
+// ==========================================
+
+/// Instruction opcodes for our simulated Linux eBPF VM
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EbpfOpcode {
+    Add,  // RegDst = RegDst + RegSrc (or Imm)
+    Sub,  // RegDst = RegDst - RegSrc (or Imm)
+    Mul,  // RegDst = RegDst * RegSrc (or Imm)
+    Div,  // RegDst = RegDst / RegSrc (or Imm)
+    Load, // RegDst = Mem[RegSrc + Offset]
+    Store,// Mem[RegDst + Offset] = RegSrc (or Imm)
+    Jump, // PC = PC + Offset (unconditional)
+    Jeq,  // PC = PC + Offset if RegDst == RegSrc (or Imm)
+    Exit, // Halt VM
+}
+
+/// eBPF instruction representation
+#[derive(Debug, Clone, Copy)]
+pub struct EbpfInstruction {
+    pub opcode: EbpfOpcode,
+    pub dst: usize,
+    pub src: usize,
+    pub offset: i16,
+    pub imm: i64,
+    pub use_imm: bool,
+}
+
+/// Simulated Linux eBPF execution engine with static verification
+pub struct SovereignEbpfEngine {
+    pub registers: [i64; 10], // r0 to r9
+    pub memory: Vec<u8>,
+}
+
+impl SovereignEbpfEngine {
+    pub fn new(mem_size: usize) -> Self {
+        Self {
+            registers: [0; 10],
+            memory: vec![0; mem_size],
+        }
+    }
+
+    /// Run static program verifier checking for safety constraints
+    /// Detects division by zero (if imm is 0 and use_imm), infinite loop bounds,
+    /// and out-of-bound jumps/offsets before execution.
+    pub fn verify_program(&self, instructions: &[EbpfInstruction]) -> Result<(), &'static str> {
+        if instructions.is_empty() {
+            return Err("Empty eBPF program");
+        }
+
+        let mut exit_found = false;
+        let num_instrs = instructions.len();
+
+        for (pc, inst) in instructions.iter().enumerate() {
+            // Check register bounds (0-9)
+            if inst.dst >= 10 || inst.src >= 10 {
+                return Err("Register index out of bounds");
+            }
+
+            // Check for division by zero
+            if inst.opcode == EbpfOpcode::Div && inst.use_imm && inst.imm == 0 {
+                return Err("Static verification error: division by zero");
+            }
+
+            // Check jumps bounds
+            match inst.opcode {
+                EbpfOpcode::Jump | EbpfOpcode::Jeq => {
+                    let target_pc = (pc as i32) + 1 + (inst.offset as i32);
+                    if target_pc < 0 || target_pc as usize >= num_instrs {
+                        return Err("Static verification error: out-of-bounds jump target");
+                    }
+                }
+                EbpfOpcode::Exit => {
+                    exit_found = true;
+                }
+                _ => {}
+            }
+        }
+
+        if !exit_found {
+            return Err("Static verification error: program does not terminate with Exit instruction");
+        }
+
+        Ok(())
+    }
+
+    /// Execute the eBPF instructions on the VM
+    pub fn execute(&mut self, instructions: &[EbpfInstruction]) -> Result<i64, &'static str> {
+        // Run verification first to guarantee safety
+        self.verify_program(instructions)?;
+
+        let mut pc = 0;
+        let mut steps = 0;
+        let max_steps = 1000; // Prevent infinite execution loops
+
+        while pc < instructions.len() {
+            if steps >= max_steps {
+                return Err("Execution exceeded maximum permitted steps (infinite loop protection)");
+            }
+            steps += 1;
+
+            let inst = instructions[pc];
+            match inst.opcode {
+                EbpfOpcode::Add => {
+                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    self.registers[inst.dst] = self.registers[inst.dst].wrapping_add(val);
+                    pc += 1;
+                }
+                EbpfOpcode::Sub => {
+                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    self.registers[inst.dst] = self.registers[inst.dst].wrapping_sub(val);
+                    pc += 1;
+                }
+                EbpfOpcode::Mul => {
+                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    self.registers[inst.dst] = self.registers[inst.dst].wrapping_mul(val);
+                    pc += 1;
+                }
+                EbpfOpcode::Div => {
+                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    if val == 0 {
+                        return Err("Runtime division by zero");
+                    }
+                    self.registers[inst.dst] = self.registers[inst.dst] / val;
+                    pc += 1;
+                }
+                EbpfOpcode::Load => {
+                    let base = self.registers[inst.src];
+                    let addr = (base + inst.offset as i64) as usize;
+                    if addr + 8 > self.memory.len() {
+                        return Err("Memory load out of bounds");
+                    }
+                    // Load 64-bit integer
+                    let mut data = [0u8; 8];
+                    data.copy_from_slice(&self.memory[addr..addr+8]);
+                    self.registers[inst.dst] = i64::from_le_bytes(data);
+                    pc += 1;
+                }
+                EbpfOpcode::Store => {
+                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    let base = self.registers[inst.dst];
+                    let addr = (base + inst.offset as i64) as usize;
+                    if addr + 8 > self.memory.len() {
+                        return Err("Memory store out of bounds");
+                    }
+                    // Store 64-bit integer
+                    let data = val.to_le_bytes();
+                    self.memory[addr..addr+8].copy_from_slice(&data);
+                    pc += 1;
+                }
+                EbpfOpcode::Jump => {
+                    pc = (pc as i32 + 1 + inst.offset as i32) as usize;
+                }
+                EbpfOpcode::Jeq => {
+                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    if self.registers[inst.dst] == val {
+                        pc = (pc as i32 + 1 + inst.offset as i32) as usize;
+                    } else {
+                        pc += 1;
+                    }
+                }
+                EbpfOpcode::Exit => {
+                    break;
+                }
+            }
+        }
+
+        Ok(self.registers[0]) // standard return value register is R0
+    }
+}
+
+// ==========================================
+// 2. ARCH LINUX INSPIRATIONS
 // ==========================================
 
 /// Arch Linux-style rolling release dependency resolver
@@ -220,6 +392,93 @@ impl FreeBSDJail {
 // 3. OPENBSD INSPIRATIONS
 // ==========================================
 
+/// OpenBSD unveil-inspired file system access restriction
+pub struct OpenBSDUnveil {
+    // Maps exact paths or prefix directory paths to permission flags ('r', 'w', 'x', 'c')
+    pub mappings: Vec<(String, String)>,
+    pub is_locked: bool,
+}
+
+impl OpenBSDUnveil {
+    pub fn new() -> Self {
+        Self {
+            mappings: Vec::new(),
+            is_locked: false,
+        }
+    }
+
+    /// Register/restrict path to given permissions. Subsequent unveil calls can only subset or tighten permissions.
+    /// If locked, no further modifications can be made.
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if self.is_locked {
+            return Err("Unveil configurations are locked permanently");
+        }
+
+        // Clean path to handle trailing slashes
+        let cleaned_path = if path.ends_with('/') && path.len() > 1 {
+            path.trim_end_matches('/').to_string()
+        } else {
+            path.to_string()
+        };
+
+        // If path is already unveiled, we can only restrict/subset (remove letters), not escalate!
+        if let Some(pos) = self.mappings.iter().position(|(p, _)| p == &cleaned_path) {
+            let existing_perms = &self.mappings[pos].1;
+            for c in permissions.chars() {
+                if !existing_perms.contains(c) {
+                    return Err("Illegal unveil permission escalation attempt blocked");
+                }
+            }
+            self.mappings[pos].1 = permissions.to_string();
+        } else {
+            self.mappings.push((cleaned_path, permissions.to_string()));
+        }
+
+        Ok(())
+    }
+
+    /// Freeze configurations permanently
+    pub fn lock(&mut self) {
+        self.is_locked = true;
+    }
+
+    /// Check if path has requested permission. If no unveil mappings exist, everything is allowed.
+    /// Otherwise, we search for matching prefix/parent directory in our unveil definitions.
+    pub fn check_permission(&self, path: &str, required_permission: char) -> bool {
+        if self.mappings.is_empty() {
+            return true; // No constraints registered, allow all (default behavior)
+        }
+
+        let cleaned_path = if path.ends_with('/') && path.len() > 1 {
+            path.trim_end_matches('/').to_string()
+        } else {
+            path.to_string()
+        };
+
+        // Find the best matching prefix
+        let mut best_match: Option<&str> = None;
+        let mut best_perms: Option<&str> = None;
+
+        for (unveiled_path, perms) in &self.mappings {
+            if cleaned_path == *unveiled_path ||
+               (cleaned_path.starts_with(unveiled_path) &&
+                (unveiled_path == "/" || cleaned_path.as_bytes().get(unveiled_path.len()) == Some(&b'/'))) {
+
+                if best_match.is_none() || unveiled_path.len() > best_match.unwrap().len() {
+                    best_match = Some(unveiled_path);
+                    best_perms = Some(perms);
+                }
+            }
+        }
+
+        if let Some(perms) = best_perms {
+            perms.contains(required_permission)
+        } else {
+            false // Path was not unveiled explicitly nor matched under prefix, deny by default
+        }
+    }
+}
+
 /// OpenBSD pledge-inspired capability restriction
 pub struct OpenBSDPledge {
     pub allowed_operations: Vec<String>,
@@ -409,7 +668,151 @@ impl AptPinStore {
 }
 
 // ==========================================
-// 6. SYSTEMD ALTERNATIVES
+// 6. NETBSD RUMP KERNEL (NetBsdRumpRouter)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverContext {
+    KernelSpace,
+    UserSpace,
+}
+
+#[derive(Debug, Clone)]
+pub struct RumpDriver {
+    pub name: String,
+    pub context: DriverContext,
+    pub operations_handled: Vec<String>,
+}
+
+/// NetBSD Rump Kernel inspired "anykernel" driver router
+pub struct NetBsdRumpRouter {
+    pub drivers: Vec<RumpDriver>,
+    pub hypercall_count: u64,
+    pub userspace_switches: u64,
+}
+
+impl NetBsdRumpRouter {
+    pub fn new() -> Self {
+        Self {
+            drivers: Vec::new(),
+            hypercall_count: 0,
+            userspace_switches: 0,
+        }
+    }
+
+    pub fn register_driver(&mut self, driver: RumpDriver) {
+        self.drivers.push(driver);
+    }
+
+    /// Simulates routing a hardware/virtual hypercall.
+    /// Translates contexts automatically (e.g. tracking overhead of userspace driver context switches).
+    pub fn dispatch_hypercall(&mut self, driver_name: &str, operation: &str) -> Result<String, &'static str> {
+        self.hypercall_count += 1;
+
+        let driver = self.drivers.iter()
+            .find(|d| d.name == driver_name)
+            .ok_or("Driver not found")?;
+
+        if !driver.operations_handled.contains(&operation.to_string()) {
+            return Err("Operation unsupported by target driver");
+        }
+
+        // Switch tracking
+        match driver.context {
+            DriverContext::UserSpace => {
+                self.userspace_switches += 1;
+                Ok(format!("Dispatched {} to userspace driver {}", operation, driver_name))
+            }
+            DriverContext::KernelSpace => {
+                Ok(format!("Dispatched {} directly to kernelspace driver {}", operation, driver_name))
+            }
+        }
+    }
+
+    /// Retrieve performance metrics regarding anykernel overhead
+    pub fn get_switch_ratio(&self) -> f64 {
+        if self.hypercall_count == 0 {
+            0.0
+        } else {
+            self.userspace_switches as f64 / self.hypercall_count as f64
+        }
+    }
+}
+
+// ==========================================
+// 7. GENTOO PORTAGE (GentooUseFlagsManager)
+// ==========================================
+
+pub struct GentooUseFlagsManager {
+    // Global active use flags
+    pub global_flags: Vec<String>,
+    // Package specific custom overrides e.g. ("dev-libs/openssl", vec!["ssl", "-asm"])
+    pub package_overrides: Vec<(String, Vec<String>)>,
+}
+
+impl GentooUseFlagsManager {
+    pub fn new() -> Self {
+        Self {
+            global_flags: Vec::new(),
+            package_overrides: Vec::new(),
+        }
+    }
+
+    pub fn set_global_flags(&mut self, flags: &[&str]) {
+        self.global_flags = flags.iter().map(|s| s.to_string()).collect();
+    }
+
+    pub fn set_package_override(&mut self, package: &str, flags: &[&str]) {
+        let over_flags: Vec<String> = flags.iter().map(|s| s.to_string()).collect();
+        if let Some(pos) = self.package_overrides.iter().position(|(p, _)| p == package) {
+            self.package_overrides[pos].1 = over_flags;
+        } else {
+            self.package_overrides.push((package.to_string(), over_flags));
+        }
+    }
+
+    /// Evaluates if a flag is active for a specific package.
+    /// Check package override first, and falls back to global flags.
+    /// Also resolves negative flags (e.g. if override contains "-flag", it is explicitly disabled).
+    pub fn is_flag_enabled(&self, package: &str, flag: &str) -> bool {
+        // 1. Check package specific overrides first
+        if let Some((_, overrides)) = self.package_overrides.iter().find(|(p, _)| p == package) {
+            // Check for negative flag override e.g. "-flag"
+            let negative_flag = format!("-{}", flag);
+            if overrides.contains(&negative_flag) {
+                return false;
+            }
+            if overrides.contains(&flag.to_string()) {
+                return true;
+            }
+        }
+
+        // 2. Check global flags
+        self.global_flags.contains(&flag.to_string())
+    }
+
+    /// Resolve compile requirements.
+    /// Requirements are defined as expressions like "ssl", "!ldap", etc.
+    /// Returns Ok(()) if satisfied, or Err describing the missing/conflicting flag.
+    pub fn verify_requirements(&self, package: &str, requirements: &[&str]) -> Result<(), String> {
+        for req in requirements {
+            if req.starts_with('!') {
+                let actual_flag = &req[1..];
+                if self.is_flag_enabled(package, actual_flag) {
+                    return Err(format!("Conflict: package {} requires flag {} to be disabled", package, actual_flag));
+                }
+            } else {
+                if !self.is_flag_enabled(package, req) {
+                    return Err(format!("Requirement unfulfilled: package {} requires flag {}", package, req));
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+// ==========================================
+// 8. SYSTEMD ALTERNATIVES
 // ==========================================
 
 /// OpenRC-inspired service management (alternative to systemd)
@@ -452,9 +855,760 @@ impl OpenRCService {
     }
 }
 
+// ==========================================
+// 9. LINUX IO_URING SIMULATOR (SovereignIoUring)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoUringOpcode {
+    Read,
+    Write,
+    Nop,
+}
+
+#[derive(Debug, Clone)]
+pub struct SubmissionQueueEntry {
+    pub opcode: IoUringOpcode,
+    pub fd: i32,
+    pub offset: u64,
+    pub user_data: u64,
+    pub data: Vec<u8>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CompletionQueueEntry {
+    pub user_data: u64,
+    pub result: i32, // negative represents errors (like -EINVAL), positive/zero is success or bytes read/written
+}
+
+/// Linux io_uring inspired asynchronous I/O engine
+pub struct SovereignIoUring {
+    pub sq: Vec<SubmissionQueueEntry>,
+    pub cq: Vec<CompletionQueueEntry>,
+    pub max_entries: usize,
+}
+
+impl SovereignIoUring {
+    pub fn new(entries: usize) -> Self {
+        Self {
+            sq: Vec::with_capacity(entries),
+            cq: Vec::with_capacity(entries),
+            max_entries: entries,
+        }
+    }
+
+    /// Submit an entry to the submission queue (SQ)
+    pub fn submit_entry(&mut self, sqe: SubmissionQueueEntry) -> Result<(), &'static str> {
+        if self.sq.len() >= self.max_entries {
+            return Err("Submission Queue is full");
+        }
+        self.sq.push(sqe);
+        Ok(())
+    }
+
+    /// Processes all SQ entries asynchronously/simulated and populates the Completion Queue (CQ)
+    pub fn submit_and_wait(&mut self) -> usize {
+        let mut processed = 0;
+        let entries: Vec<SubmissionQueueEntry> = self.sq.drain(..).collect();
+
+        for sqe in entries {
+            let res = match sqe.opcode {
+                IoUringOpcode::Nop => 0,
+                IoUringOpcode::Read => sqe.data.len() as i32,
+                IoUringOpcode::Write => sqe.data.len() as i32,
+            };
+
+            self.cq.push(CompletionQueueEntry {
+                user_data: sqe.user_data,
+                result: res,
+            });
+            processed += 1;
+        }
+
+        processed
+    }
+
+    /// Harvest a single Completion Queue Entry (CQE)
+    pub fn reap_cqe(&mut self) -> Option<CompletionQueueEntry> {
+        if self.cq.is_empty() {
+            None
+        } else {
+            Some(self.cq.remove(0))
+        }
+    }
+}
+
+// ==========================================
+// 10. LINUX LANDLOCK LSM SIMULATOR (SovereignLandlockLsm)
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LandlockAccess {
+    ReadOnly,
+    ReadWrite,
+    Execute,
+}
+
+#[derive(Debug, Clone)]
+pub struct LandlockRule {
+    pub path: String,
+    pub access: LandlockAccess,
+}
+
+/// Linux Landlock LSM inspired path-specific sandbox
+pub struct SovereignLandlockLsm {
+    pub rules: Vec<LandlockRule>,
+    pub is_enforced: bool,
+}
+
+impl SovereignLandlockLsm {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            is_enforced: false,
+        }
+    }
+
+    /// Add a path rule to the ruleset
+    pub fn add_rule(&mut self, path: &str, access: LandlockAccess) -> Result<(), &'static str> {
+        if self.is_enforced {
+            return Err("Ruleset is already enforced and immutable");
+        }
+        self.rules.push(LandlockRule {
+            path: path.to_string(),
+            access,
+        });
+        Ok(())
+    }
+
+    /// Enable ruleset enforcement
+    pub fn restrict_self(&mut self) {
+        self.is_enforced = true;
+    }
+
+    /// Check if a path can be accessed with a specific access type
+    pub fn check_access(&self, path: &str, access_type: LandlockAccess) -> bool {
+        if !self.is_enforced {
+            return true; // Not restricted yet
+        }
+
+        let mut best_match: Option<&LandlockRule> = None;
+
+        for rule in &self.rules {
+            if path == rule.path || (path.starts_with(&rule.path) && (rule.path == "/" || path.as_bytes().get(rule.path.len()) == Some(&b'/'))) {
+                match best_match {
+                    Some(best) if rule.path.len() > best.path.len() => {
+                        best_match = Some(rule);
+                    }
+                    None => {
+                        best_match = Some(rule);
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if let Some(rule) = best_match {
+            match (&rule.access, &access_type) {
+                (LandlockAccess::ReadWrite, _) => true, // ReadWrite allows anything
+                (LandlockAccess::ReadOnly, LandlockAccess::ReadOnly) => true,
+                (LandlockAccess::Execute, LandlockAccess::Execute) => true,
+                _ => false,
+            }
+        } else {
+            false // Denied by default if restricted and no matching rule
+        }
+    }
+}
+
+impl Default for SovereignLandlockLsm {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 11. LINUX KFIFO-INSPIRED SPSC LOCK-FREE RING BUFFER (SovereignRingBuffer)
+// ==========================================
+
+/// Single-producer single-consumer lock-free ring buffer directly modeled on Linux kfifo
+pub struct SovereignRingBuffer<T, const N: usize> {
+    pub buffer: [Option<T>; N],
+    pub write_idx: usize,
+    pub read_idx: usize,
+}
+
+impl<T, const N: usize> SovereignRingBuffer<T, N> {
+    pub const fn new() -> Self {
+        Self {
+            buffer: [const { None }; N],
+            write_idx: 0,
+            read_idx: 0,
+        }
+    }
+
+    /// Push an item into the ring buffer (lock-free SPSC)
+    pub fn push(&mut self, item: T) -> Result<(), &'static str> {
+        let next_write = (self.write_idx + 1) % N;
+        if next_write == self.read_idx {
+            return Err("Ring buffer is full");
+        }
+        self.buffer[self.write_idx] = Some(item);
+        self.write_idx = next_write;
+        Ok(())
+    }
+
+    /// Pop an item from the ring buffer (lock-free SPSC)
+    pub fn pop(&mut self) -> Option<T> {
+        if self.read_idx == self.write_idx {
+            None
+        } else {
+            let item = self.buffer[self.read_idx].take();
+            self.read_idx = (self.read_idx + 1) % N;
+            item
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.read_idx == self.write_idx
+    }
+
+    pub fn len(&self) -> usize {
+        if self.write_idx >= self.read_idx {
+            self.write_idx - self.read_idx
+        } else {
+            N - (self.read_idx - self.write_idx)
+        }
+    }
+}
+
+// ==========================================
+// 12. DRM/KMS ATOMIC MODESETTING SPECIFICATION (DrmModeInfo)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DrmModeInfo {
+    pub clock: u32,
+    pub hdisplay: u16,
+    pub hsync_start: u16,
+    pub hsync_end: u16,
+    pub htotal: u16,
+    pub vdisplay: u16,
+    pub vsync_start: u16,
+    pub vsync_end: u16,
+    pub vtotal: u16,
+    pub vrefresh: u32,
+    pub flags: u32,
+    pub name: [u8; 32],
+}
+
+impl DrmModeInfo {
+    pub fn new(width: u16, height: u16, refresh: u32) -> Self {
+        let mut name = [0u8; 32];
+        let name_str = format!("{}x{}@{}", width, height, refresh);
+        let bytes = name_str.as_bytes();
+        let len = bytes.len().min(31);
+        for i in 0..len {
+            name[i] = bytes[i];
+        }
+
+        Self {
+            clock: (width as u32 * height as u32 * refresh) / 1000,
+            hdisplay: width,
+            hsync_start: width + 8,
+            hsync_end: width + 16,
+            htotal: width + 32,
+            vdisplay: height,
+            vsync_start: height + 2,
+            vsync_end: height + 4,
+            vtotal: height + 8,
+            vrefresh: refresh,
+            flags: 0,
+            name,
+        }
+    }
+
+    /// Verifies if the modesetting timing complies with standard refresh margins
+    pub fn verify_timing_boundaries(&self) -> bool {
+        if self.htotal <= self.hdisplay || self.vtotal <= self.vdisplay {
+            return false;
+        }
+        if self.hsync_start < self.hdisplay || self.hsync_end < self.hsync_start || self.hsync_end > self.htotal {
+            return false;
+        }
+        if self.vsync_start < self.vdisplay || self.vsync_end < self.vsync_start || self.vsync_end > self.vtotal {
+            return false;
+        }
+        true
+    }
+}
+
+// ==========================================
+// 13. LINUX BPF CO-RE & BTF ENGINE (SovereignBpfCoReEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct BtfFieldReloc {
+    pub type_name: String,
+    pub field_name: String,
+    pub target_offset: i16,
+}
+
+pub struct SovereignBpfCoReEngine {
+    pub relocations: Vec<BtfFieldReloc>,
+}
+
+impl SovereignBpfCoReEngine {
+    pub fn new() -> Self {
+        Self { relocations: Vec::new() }
+    }
+
+    pub fn register_relocation(&mut self, type_name: &str, field_name: &str, target_offset: i16) {
+        self.relocations.push(BtfFieldReloc {
+            type_name: type_name.to_string(),
+            field_name: field_name.to_string(),
+            target_offset,
+        });
+    }
+
+    pub fn relocate_instruction(&self, type_name: &str, field_name: &str, inst: &mut EbpfInstruction) -> Result<(), &'static str> {
+        if let Some(reloc) = self.relocations.iter().find(|r| r.type_name == type_name && r.field_name == field_name) {
+            inst.offset = reloc.target_offset;
+            Ok(())
+        } else {
+            Err("BTF field relocation mapping not found")
+        }
+    }
+}
+
+impl Default for SovereignBpfCoReEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 14. FREEBSD CAPSICUM CAPABILITY RIGHTS (BsdCapsicumRights)
+// ==========================================
+
+pub struct BsdCapsicumRights {
+    pub cap_read: bool,
+    pub cap_write: bool,
+    pub cap_seek: bool,
+    pub cap_fstat: bool,
+    pub cap_mmap: bool,
+    pub cap_ioctl: bool,
+    pub in_capability_mode: bool,
+}
+
+impl BsdCapsicumRights {
+    pub fn new_full_rights() -> Self {
+        Self {
+            cap_read: true,
+            cap_write: true,
+            cap_seek: true,
+            cap_fstat: true,
+            cap_mmap: true,
+            cap_ioctl: true,
+            in_capability_mode: false,
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.in_capability_mode = true;
+    }
+
+    pub fn limit_rights(&mut self, read: bool, write: bool, seek: bool, fstat: bool, mmap: bool, ioctl: bool) {
+        self.cap_read &= read;
+        self.cap_write &= write;
+        self.cap_seek &= seek;
+        self.cap_fstat &= fstat;
+        self.cap_mmap &= mmap;
+        self.cap_ioctl &= ioctl;
+    }
+
+    pub fn check_right(&self, operation: &str) -> bool {
+        match operation {
+            "read" => self.cap_read,
+            "write" => self.cap_write,
+            "seek" => self.cap_seek,
+            "fstat" => self.cap_fstat,
+            "mmap" => self.cap_mmap,
+            "ioctl" => self.cap_ioctl,
+            _ => !self.in_capability_mode,
+        }
+    }
+}
+
+impl Default for BsdCapsicumRights {
+    fn default() -> Self {
+        Self::new_full_rights()
+    }
+}
+
+// ==========================================
+// 15. DRAGONFLY BSD HAMMER2 MVCC B-TREE ENGINE (Hammer2MultiVersionEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct Hammer2Inode {
+    pub inode_id: u64,
+    pub generation: u64,
+    pub path: String,
+    pub data: Vec<u8>,
+}
+
+pub struct Hammer2MultiVersionEngine {
+    pub inodes: Vec<Hammer2Inode>,
+    pub current_generation: u64,
+}
+
+impl Hammer2MultiVersionEngine {
+    pub fn new() -> Self {
+        Self {
+            inodes: Vec::new(),
+            current_generation: 1,
+        }
+    }
+
+    pub fn write_inode(&mut self, inode_id: u64, path: &str, data: &[u8]) {
+        self.inodes.push(Hammer2Inode {
+            inode_id,
+            generation: self.current_generation,
+            path: path.to_string(),
+            data: data.to_vec(),
+        });
+    }
+
+    pub fn create_snapshot(&mut self) -> u64 {
+        let snap_gen = self.current_generation;
+        self.current_generation += 1;
+        snap_gen
+    }
+
+    pub fn read_at_generation(&self, inode_id: u64, target_gen: u64) -> Option<&Hammer2Inode> {
+        self.inodes.iter()
+            .filter(|i| i.inode_id == inode_id && i.generation <= target_gen)
+            .max_by_key(|i| i.generation)
+    }
+}
+
+impl Default for Hammer2MultiVersionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 16. FEDORA SILVERBLUE OSTREE ATOMIC ENGINE (SovereignOstreeEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct OstreeCommit {
+    pub checksum: String,
+    pub version: String,
+    pub kernel_ref: String,
+    pub rootfs_hash: u64,
+}
+
+pub struct SovereignOstreeEngine {
+    pub staged_commits: Vec<OstreeCommit>,
+    pub active_deployment_idx: Option<usize>,
+}
+
+impl SovereignOstreeEngine {
+    pub fn new() -> Self {
+        Self {
+            staged_commits: Vec::new(),
+            active_deployment_idx: None,
+        }
+    }
+
+    pub fn stage_commit(&mut self, checksum: &str, version: &str, kernel_ref: &str, rootfs_hash: u64) -> usize {
+        let commit = OstreeCommit {
+            checksum: checksum.to_string(),
+            version: version.to_string(),
+            kernel_ref: kernel_ref.to_string(),
+            rootfs_hash,
+        };
+        self.staged_commits.push(commit);
+        let idx = self.staged_commits.len() - 1;
+        if self.active_deployment_idx.is_none() {
+            self.active_deployment_idx = Some(idx);
+        }
+        idx
+    }
+
+    pub fn switch_active_deployment(&mut self, idx: usize) -> Result<(), &'static str> {
+        if idx >= self.staged_commits.len() {
+            return Err("Target Ostree commit deployment index out of bounds");
+        }
+        self.active_deployment_idx = Some(idx);
+        Ok(())
+    }
+
+    pub fn get_active_deployment(&self) -> Option<&OstreeCommit> {
+        self.active_deployment_idx.and_then(|idx| self.staged_commits.get(idx))
+    }
+}
+
+impl Default for SovereignOstreeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_ebpf_verification_and_interpreter() {
+        let mut engine = SovereignEbpfEngine::new(64);
+
+        // Simple arithmetic: R1 = 10, R2 = 20, R1 = R1 + R2 (30), Exit
+        let instrs = vec![
+            EbpfInstruction {
+                opcode: EbpfOpcode::Add,
+                dst: 1,
+                src: 0,
+                offset: 0,
+                imm: 10,
+                use_imm: true,
+            },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Add,
+                dst: 2,
+                src: 0,
+                offset: 0,
+                imm: 20,
+                use_imm: true,
+            },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Add,
+                dst: 1,
+                src: 2,
+                offset: 0,
+                imm: 0,
+                use_imm: false,
+            },
+            // Move result to R0 (r0 is index 0)
+            EbpfInstruction {
+                opcode: EbpfOpcode::Add,
+                dst: 0,
+                src: 1,
+                offset: 0,
+                imm: 0,
+                use_imm: false,
+            },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Exit,
+                dst: 0,
+                src: 0,
+                offset: 0,
+                imm: 0,
+                use_imm: false,
+            },
+        ];
+
+        let result = engine.execute(&instrs);
+        assert_eq!(result.unwrap(), 30);
+
+        // Verification fail: missing Exit instruction
+        let missing_exit = vec![
+            EbpfInstruction {
+                opcode: EbpfOpcode::Add,
+                dst: 1,
+                src: 0,
+                offset: 0,
+                imm: 10,
+                use_imm: true,
+            }
+        ];
+        assert!(engine.verify_program(&missing_exit).is_err());
+
+        // Verification fail: jump out of bounds
+        let bad_jump = vec![
+            EbpfInstruction {
+                opcode: EbpfOpcode::Jump,
+                dst: 0,
+                src: 0,
+                offset: 10,
+                imm: 0,
+                use_imm: false,
+            },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Exit,
+                dst: 0,
+                src: 0,
+                offset: 0,
+                imm: 0,
+                use_imm: false,
+            }
+        ];
+        assert!(engine.verify_program(&bad_jump).is_err());
+
+        // Verification fail: division by zero static check
+        let bad_div = vec![
+            EbpfInstruction {
+                opcode: EbpfOpcode::Div,
+                dst: 1,
+                src: 0,
+                offset: 0,
+                imm: 0,
+                use_imm: true,
+            },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Exit,
+                dst: 0,
+                src: 0,
+                offset: 0,
+                imm: 0,
+                use_imm: false,
+            }
+        ];
+        assert!(engine.verify_program(&bad_div).is_err());
+
+        // Memory load/store tests
+        let memory_test_program = vec![
+            // Store imm 12345 at Mem[R1 + 0] where R1 is r0(index 1) which is currently 0.
+            EbpfInstruction {
+                opcode: EbpfOpcode::Store,
+                dst: 1,
+                src: 0,
+                offset: 0,
+                imm: 12345,
+                use_imm: true,
+            },
+            // Load from Mem[R1 + 0] into R3
+            EbpfInstruction {
+                opcode: EbpfOpcode::Load,
+                dst: 3,
+                src: 1,
+                offset: 0,
+                imm: 0,
+                use_imm: false,
+            },
+            // Move R3 to R0
+            EbpfInstruction {
+                opcode: EbpfOpcode::Add,
+                dst: 0,
+                src: 3,
+                offset: 0,
+                imm: 0,
+                use_imm: false,
+            },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Exit,
+                dst: 0,
+                src: 0,
+                offset: 0,
+                imm: 0,
+                use_imm: false,
+            },
+        ];
+        let mut mem_engine = SovereignEbpfEngine::new(64);
+        let res_mem = mem_engine.execute(&memory_test_program);
+        assert_eq!(res_mem.unwrap(), 12345);
+    }
+
+    #[test]
+    fn test_unveil_filesystem_access_and_locking() {
+        let mut unveil_sys = OpenBSDUnveil::new();
+
+        // 1. Initial state permits everything
+        assert!(unveil_sys.check_permission("/usr/bin/cargo", 'x'));
+
+        // 2. Add path mappings
+        assert!(unveil_sys.unveil("/usr", "rx").is_ok());
+        assert!(unveil_sys.unveil("/tmp", "rwc").is_ok());
+
+        // 3. Test exact matching and hierarchy checks
+        assert!(unveil_sys.check_permission("/usr/bin/cargo", 'x'));
+        assert!(unveil_sys.check_permission("/usr/bin/cargo", 'r'));
+        assert!(!unveil_sys.check_permission("/usr/bin/cargo", 'w')); // not allowed
+
+        assert!(unveil_sys.check_permission("/tmp/file.txt", 'w'));
+        assert!(!unveil_sys.check_permission("/var/log/syslog", 'r')); // no matching unveil mapping -> denied
+
+        // 4. Test tightening constraints (subsets)
+        assert!(unveil_sys.unveil("/usr", "r").is_ok());
+        assert!(unveil_sys.check_permission("/usr/bin/cargo", 'r'));
+        assert!(!unveil_sys.check_permission("/usr/bin/cargo", 'x')); // tightened, no longer has 'x'
+
+        // 5. Block escalation attempts
+        assert!(unveil_sys.unveil("/usr", "rx").is_err()); // 'x' was removed, can't add it back
+
+        // 6. Test locking
+        unveil_sys.lock();
+        assert!(unveil_sys.unveil("/tmp", "r").is_err()); // locked!
+    }
+
+    #[test]
+    fn test_rump_router_driver_contexts() {
+        let mut router = NetBsdRumpRouter::new();
+
+        let storage_driver = RumpDriver {
+            name: "nvme".to_string(),
+            context: DriverContext::KernelSpace,
+            operations_handled: vec!["read".to_string(), "write".to_string()],
+        };
+
+        let usb_driver = RumpDriver {
+            name: "usb_mouse".to_string(),
+            context: DriverContext::UserSpace,
+            operations_handled: vec!["poll".to_string()],
+        };
+
+        router.register_driver(storage_driver);
+        router.register_driver(usb_driver);
+
+        // Dispatch storage
+        let res1 = router.dispatch_hypercall("nvme", "read");
+        assert!(res1.is_ok());
+        assert!(res1.unwrap().contains("directly to kernelspace"));
+
+        // Dispatch USB mouse (userspace)
+        let res2 = router.dispatch_hypercall("usb_mouse", "poll");
+        assert!(res2.is_ok());
+        assert!(res2.unwrap().contains("to userspace driver"));
+
+        // Invalid dispatcher calls
+        assert!(router.dispatch_hypercall("nvme", "poll").is_err()); // Unsupported op
+        assert!(router.dispatch_hypercall("nonexistent", "read").is_err()); // Driver doesn't exist
+
+        // Performance ratio
+        assert_eq!(router.hypercall_count, 4);
+        assert_eq!(router.userspace_switches, 1);
+        assert_eq!(router.get_switch_ratio(), 0.25);
+    }
+
+    #[test]
+    fn test_gentoo_use_flags_and_conflicts() {
+        let mut pm = GentooUseFlagsManager::new();
+
+        pm.set_global_flags(&["ssl", "nls", "systemd"]);
+        pm.set_package_override("sys-apps/dbus", &["-systemd", "xwidgets"]);
+
+        // Test flag evaluation
+        assert!(pm.is_flag_enabled("sys-libs/glibc", "ssl")); // global flag
+        assert!(!pm.is_flag_enabled("sys-apps/dbus", "systemd")); // explicitly overridden negative flag
+        assert!(pm.is_flag_enabled("sys-apps/dbus", "xwidgets")); // overridden positive flag
+
+        // Test requirements resolution
+        let dbus_reqs = vec!["xwidgets", "!systemd"];
+        assert!(pm.verify_requirements("sys-apps/dbus", &dbus_reqs).is_ok());
+
+        let failing_reqs = vec!["systemd"];
+        let res = pm.verify_requirements("sys-apps/dbus", &failing_reqs);
+        assert!(res.is_err());
+        assert!(res.unwrap_err().contains("Requirement unfulfilled"));
+
+        let conflict_reqs = vec!["ssl", "!xwidgets"];
+        let res_conflict = pm.verify_requirements("sys-apps/dbus", &conflict_reqs);
+        assert!(res_conflict.is_err());
+        assert!(res_conflict.unwrap_err().contains("Conflict:"));
+    }
 
     #[test]
     fn test_arch_dependency_resolver_kahn_and_cycles() {
@@ -582,5 +1736,191 @@ mod tests {
         let deleted2 = store.garbage_collect();
         assert!(deleted2.contains(&path1));
         assert!(deleted2.contains(&path2));
+    }
+
+    #[test]
+    fn test_sovereign_io_uring_queues() {
+        let mut io_uring = SovereignIoUring::new(4);
+
+        let sqe1 = SubmissionQueueEntry {
+            opcode: IoUringOpcode::Nop,
+            fd: 0,
+            offset: 0,
+            user_data: 42,
+            data: Vec::new(),
+        };
+
+        let sqe2 = SubmissionQueueEntry {
+            opcode: IoUringOpcode::Read,
+            fd: 3,
+            offset: 1024,
+            user_data: 43,
+            data: vec![0; 128],
+        };
+
+        assert!(io_uring.submit_entry(sqe1).is_ok());
+        assert!(io_uring.submit_entry(sqe2).is_ok());
+
+        // SQ should have 2 entries
+        assert_eq!(io_uring.sq.len(), 2);
+
+        // Submit and wait for processing
+        let processed = io_uring.submit_and_wait();
+        assert_eq!(processed, 2);
+        assert_eq!(io_uring.sq.len(), 0);
+        assert_eq!(io_uring.cq.len(), 2);
+
+        // Reap CQEs
+        let cqe1 = io_uring.reap_cqe().unwrap();
+        assert_eq!(cqe1.user_data, 42);
+        assert_eq!(cqe1.result, 0);
+
+        let cqe2 = io_uring.reap_cqe().unwrap();
+        assert_eq!(cqe2.user_data, 43);
+        assert_eq!(cqe2.result, 128); // bytes read/written length
+
+        assert!(io_uring.reap_cqe().is_none());
+    }
+
+    #[test]
+    fn test_sovereign_landlock_sandboxing() {
+        let mut lsm = SovereignLandlockLsm::new();
+
+        // Rules can only be added before self restriction
+        assert!(lsm.add_rule("/usr/bin", LandlockAccess::Execute).is_ok());
+        assert!(lsm.add_rule("/home/user", LandlockAccess::ReadOnly).is_ok());
+        assert!(lsm.add_rule("/home/user/downloads", LandlockAccess::ReadWrite).is_ok());
+
+        // Prior to restriction, all access is allowed
+        assert!(lsm.check_access("/etc/shadow", LandlockAccess::ReadWrite));
+
+        // Enforce sandboxing
+        lsm.restrict_self();
+
+        // Adding rule post restriction is rejected
+        assert!(lsm.add_rule("/tmp", LandlockAccess::ReadWrite).is_err());
+
+        // Check path matching and hierarchical permissions
+        assert!(lsm.check_access("/usr/bin/cargo", LandlockAccess::Execute));
+        assert!(!lsm.check_access("/usr/bin/cargo", LandlockAccess::ReadWrite)); // no write allowed
+
+        assert!(lsm.check_access("/home/user/document.txt", LandlockAccess::ReadOnly));
+        assert!(!lsm.check_access("/home/user/document.txt", LandlockAccess::ReadWrite));
+
+        // downloads subpath is ReadWrite (best match because it is longer than /home/user)
+        assert!(lsm.check_access("/home/user/downloads/movie.mp4", LandlockAccess::ReadWrite));
+        assert!(lsm.check_access("/home/user/downloads/movie.mp4", LandlockAccess::ReadOnly));
+
+        // /etc/shadow has no rules so it is denied by default under enforcement
+        assert!(!lsm.check_access("/etc/shadow", LandlockAccess::ReadOnly));
+    }
+
+    #[test]
+    fn test_sovereign_ring_buffer_fifo() {
+        let mut ring: SovereignRingBuffer<i32, 5> = SovereignRingBuffer::new();
+        assert!(ring.is_empty());
+        assert_eq!(ring.len(), 0);
+
+        assert!(ring.push(10).is_ok());
+        assert!(ring.push(20).is_ok());
+        assert!(ring.push(30).is_ok());
+        assert!(ring.push(40).is_ok());
+        assert_eq!(ring.len(), 4);
+
+        // Fifth push should fail because SPSC queue of capacity 5 allows at most 4 items (1 slot is always left empty to distinguish empty vs full)
+        assert!(ring.push(50).is_err());
+
+        assert_eq!(ring.pop(), Some(10));
+        assert_eq!(ring.pop(), Some(20));
+        assert_eq!(ring.len(), 2);
+
+        assert!(ring.push(50).is_ok());
+        assert_eq!(ring.len(), 3);
+
+        assert_eq!(ring.pop(), Some(30));
+        assert_eq!(ring.pop(), Some(40));
+        assert_eq!(ring.pop(), Some(50));
+        assert!(ring.pop().is_none());
+        assert!(ring.is_empty());
+    }
+
+    #[test]
+    fn test_drm_kms_modesetting_validation() {
+        let mode = DrmModeInfo::new(1920, 1080, 60);
+        assert!(mode.verify_timing_boundaries());
+        assert_eq!(mode.hdisplay, 1920);
+        assert_eq!(mode.vdisplay, 1080);
+        assert_eq!(mode.vrefresh, 60);
+
+        // Custom invalid timing should be caught
+        let mut bad_mode = mode;
+        bad_mode.htotal = 1900; // invalid total < display
+        assert!(!bad_mode.verify_timing_boundaries());
+    }
+
+    #[test]
+    fn test_bpf_core_relocation() {
+        let mut core_engine = SovereignBpfCoReEngine::new();
+        core_engine.register_relocation("task_struct", "pid", 16);
+
+        let mut inst = EbpfInstruction {
+            opcode: EbpfOpcode::Load,
+            dst: 1,
+            src: 0,
+            offset: 0,
+            imm: 0,
+            use_imm: false,
+        };
+
+        assert!(core_engine.relocate_instruction("task_struct", "pid", &mut inst).is_ok());
+        assert_eq!(inst.offset, 16);
+        assert!(core_engine.relocate_instruction("task_struct", "nonexistent", &mut inst).is_err());
+    }
+
+    #[test]
+    fn test_bsd_capsicum_rights_and_mode() {
+        let mut capsicum = BsdCapsicumRights::new_full_rights();
+        assert!(capsicum.check_right("read"));
+        assert!(capsicum.check_right("write"));
+        assert!(capsicum.check_right("exec_other")); // Allowed before capability mode
+
+        capsicum.limit_rights(true, false, true, true, false, false);
+        capsicum.enter_capability_mode();
+
+        assert!(capsicum.check_right("read"));
+        assert!(!capsicum.check_right("write"));
+        assert!(!capsicum.check_right("exec_other")); // Blocked in capability mode
+    }
+
+    #[test]
+    fn test_hammer2_mvcc_snapshots() {
+        let mut hammer2 = Hammer2MultiVersionEngine::new();
+
+        hammer2.write_inode(100, "/etc/config", b"v1_data");
+        let gen1 = hammer2.create_snapshot();
+
+        hammer2.write_inode(100, "/etc/config", b"v2_data");
+        let gen2 = hammer2.create_snapshot();
+
+        let v1_node = hammer2.read_at_generation(100, gen1).unwrap();
+        assert_eq!(v1_node.data, b"v1_data");
+
+        let v2_node = hammer2.read_at_generation(100, gen2).unwrap();
+        assert_eq!(v2_node.data, b"v2_data");
+    }
+
+    #[test]
+    fn test_ostree_atomic_deployment_switch() {
+        let mut ostree = SovereignOstreeEngine::new();
+        let _idx0 = ostree.stage_commit("hash0", "1.0.0", "vmlinuz-1.0", 0x1111);
+        let idx1 = ostree.stage_commit("hash1", "1.1.0", "vmlinuz-1.1", 0x2222);
+
+        assert_eq!(ostree.get_active_deployment().unwrap().version, "1.0.0");
+
+        assert!(ostree.switch_active_deployment(idx1).is_ok());
+        assert_eq!(ostree.get_active_deployment().unwrap().version, "1.1.0");
+        assert_eq!(ostree.get_active_deployment().unwrap().rootfs_hash, 0x2222);
+
+        assert!(ostree.switch_active_deployment(99).is_err());
     }
 }

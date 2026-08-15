@@ -65,8 +65,8 @@ pub enum PfAddress {
     Any,
     Single(String),
     Range(String, String), // start, end
-    Network(String, u8),   // network, prefix
-    Table(String),         // table name
+    Network(String, u8),  // network, prefix
+    Table(String),        // table name
 }
 
 impl PfAddress {
@@ -491,9 +491,8 @@ impl PfFirewall {
         timestamp: u64,
     ) -> PfAction {
         // Check if this packet belongs to an existing state
-        let state_key =
-            self.calculate_state_key(&source_addr, source_port, &dest_addr, dest_port, protocol);
-
+        let state_key = self.calculate_state_key(&source_addr, source_port, &dest_addr, dest_port, protocol);
+        
         if let Some(state) = self.states.get(&state_key) {
             if !state.is_expired(timestamp, self.state_timeout) {
                 // Allow packets for established connections
@@ -505,39 +504,27 @@ impl PfFirewall {
         }
 
         // Evaluate rules in order
-        for rule in &self.rules {
-            if self.rule_matches(
-                rule,
-                &source_addr,
-                source_port,
-                &dest_addr,
-                dest_port,
-                protocol,
-                direction,
-                interface.as_deref(),
-            ) {
-                if rule.options.log && self.log_enabled {
-                    // Log the packet match
-                }
+        let mut final_action = self.default_action;
+        let mut final_keep_state = false;
+        let mut _final_log = false;
 
-                if rule.options.keep_state && rule.action == PfAction::Pass {
-                    self.create_state(
-                        source_addr,
-                        source_port,
-                        dest_addr,
-                        dest_port,
-                        protocol,
-                        timestamp,
-                    );
-                }
+        for rule in &self.rules {
+            if self.rule_matches(rule, &source_addr, source_port, &dest_addr, dest_port, protocol, direction, interface.as_deref()) {
+                final_action = rule.action;
+                final_keep_state = rule.options.keep_state;
+                _final_log = rule.options.log;
 
                 if rule.options.quick {
-                    return rule.action;
+                    break;
                 }
             }
         }
 
-        self.default_action
+        if final_keep_state && final_action == PfAction::Pass {
+            self.create_state(source_addr, source_port, dest_addr, dest_port, protocol, timestamp);
+        }
+
+        final_action
     }
 
     fn rule_matches(
@@ -619,14 +606,7 @@ impl PfFirewall {
         }
     }
 
-    fn calculate_state_key(
-        &self,
-        src: &str,
-        src_port: u16,
-        dst: &str,
-        dst_port: u16,
-        proto: PfProtocol,
-    ) -> u64 {
+    fn calculate_state_key(&self, src: &str, src_port: u16, dst: &str, dst_port: u16, proto: PfProtocol) -> u64 {
         // Simple hash function for state lookup
         let mut hash: u64 = 5381;
         for byte in src.bytes() {
@@ -653,40 +633,28 @@ impl PfFirewall {
         let id = self.next_state_id;
         self.next_state_id += 1;
 
-        let state = ConnectionState::new(
-            id,
-            source_addr,
-            source_port,
-            dest_addr,
-            dest_port,
-            protocol,
-            timestamp,
-        );
-        let key = self.calculate_state_key(
-            &state.source_addr,
-            state.source_port,
-            &state.dest_addr,
-            state.dest_port,
-            protocol,
-        );
+        let state = ConnectionState::new(id, source_addr, source_port, dest_addr, dest_port, protocol, timestamp);
+        let key = self.calculate_state_key(&state.source_addr, state.source_port, &state.dest_addr, state.dest_port, protocol);
         self.states.insert(key, state);
     }
 
     /// Clean up expired states
     pub fn cleanup_expired_states(&mut self, current_time: u64) -> usize {
         let mut expired = Vec::new();
-
+        
         for (&key, state) in &self.states {
             if state.is_expired(current_time, self.state_timeout) {
                 expired.push(key);
             }
         }
 
+        let count = expired.len();
+
         for key in expired {
             self.states.remove(&key);
         }
 
-        expired.len()
+        count
     }
 
     /// Get firewall statistics
@@ -744,11 +712,8 @@ mod tests {
     fn test_rule_creation() {
         let rule = PfRule::new(1, PfAction::Pass)
             .with_protocol(PfProtocol::Tcp)
-            .with_destination(
-                PfAddress::single("192.168.1.1".to_string()),
-                PfPort::single(80),
-            );
-
+            .with_destination(PfAddress::single("192.168.1.1".to_string()), PfPort::single(80));
+        
         assert_eq!(rule.action, PfAction::Pass);
         assert_eq!(rule.protocol, PfProtocol::Tcp);
     }
@@ -758,30 +723,27 @@ mod tests {
         let mut firewall = PfFirewall::new();
         let table = PfTable::new("blocked_hosts".to_string());
         firewall.add_table(table).unwrap();
-
+        
         let table = firewall.get_table_mut("blocked_hosts").unwrap();
         table.add_address("10.0.0.1".to_string());
-
+        
         assert!(table.contains("10.0.0.1"));
     }
 
     #[test]
     fn test_packet_processing() {
         let mut firewall = PfFirewall::with_default_action(PfAction::Block);
-
+        
         let rule = PfRule::new(1, PfAction::Pass)
             .with_protocol(PfProtocol::Tcp)
-            .with_destination(
-                PfAddress::single("192.168.1.1".to_string()),
-                PfPort::single(80),
-            )
+            .with_destination(PfAddress::single("192.168.1.1".to_string()), PfPort::single(80))
             .with_options(PfRuleOptions {
                 quick: true,
                 ..Default::default()
             });
-
+        
         firewall.add_rule(rule);
-
+        
         let action = firewall.process_packet(
             "10.0.0.1".to_string(),
             12345,
@@ -792,7 +754,7 @@ mod tests {
             None,
             0,
         );
-
+        
         assert_eq!(action, PfAction::Pass);
     }
 }
