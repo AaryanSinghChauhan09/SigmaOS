@@ -10,19 +10,24 @@ pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
-pub mod parity;
-pub mod arch;
+pub mod transformation_engine;
+pub mod preseed;
+pub mod linux_bsd_inspirations;
 
-pub use arch::{
-    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
-    ArchRepoType,
+pub mod arch_parity;
+pub mod chakra_parity;
+
+pub use linux_bsd_inspirations::{
+    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
+    PinRule, AptPinStore, OpenRCService, SovereignBpfCoReEngine, BsdCapsicumRights,
+    Hammer2MultiVersionEngine, SovereignOstreeEngine,
 };
-
-pub use parity::{
-    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
-    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
-    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
-    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
+pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
+pub use preseed::{SovereignPreseedParser, PreseedVariable};
+pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
+pub use manjaro::{
+    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
+    ManjaroKernelRelease,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -64,4 +69,9 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+};
+pub use transformation_engine::{
+    AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,
+    ForensicReadinessAuditor, GlobalComplianceDashboard, DeveloperToolkitConverter,
+    IotDeviceMeshOrchestrator, IotMeshDevice,
 };
