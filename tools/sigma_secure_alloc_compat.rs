@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 //! SigmaOS Process-Local Secure Memory Scrubbing Allocator
 //!
 //! Provides a safe, thread-safe memory allocation tracking wrapper that
