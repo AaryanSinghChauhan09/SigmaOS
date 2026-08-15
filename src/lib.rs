@@ -2,7 +2,6 @@
 // Core library for SigmaOS operating system
 
 pub mod ai;
-pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -10,12 +9,15 @@ pub mod customization;
 pub mod distro;
 pub mod dashboard;
 pub mod desktop;
+pub mod edge;
+pub mod filesystem;
+pub mod functions;
+pub mod graphics;
+pub mod hal;
+pub mod iot;
 pub mod device;
-pub mod distro;
 pub mod driver;
 pub mod drivers;
-pub mod filesystem;
-pub mod graphics;
 pub mod ipc;
 pub mod kernel;
 pub mod klib;
@@ -25,7 +27,6 @@ pub mod network;
 pub mod orchestration;
 pub mod package;
 pub mod performance;
-
 pub mod process;
 pub mod productivity;
 pub mod resilience;
@@ -233,8 +234,43 @@ pub use remote::{
     SimpleShellManager,
 };
 pub use resilience::{
+<<<<<<< HEAD
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
+=======
+    RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
+    SystemSnapshot,
+};
+pub use security::{
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
+    PenetrationAssistant, secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
+    FileIntegrityGuard, MalwareSignature, RootkitDetector, ScanVerdict, SovereignMalwareEngine,
+    ThreatSeverity, ThreatType, YaraSignatureMatcher,
+};
+pub use distro::{
+    RhelSubscriptionEntitlementManager, SubscriptionPool, EntitlementCertificate,
+    DebianDpkgDbSimulator, DpkgPackageStatus, DpkgPackageRecord,
+    AlpineApkOverlayEngine, ApkOverlayFile,
+    SystemdCgroupGovernor, CgroupV2Limits, CgroupV2Accounting,
+    BsdStatefulPacketFilter, PfRuleAction, PfStateEntry,
+    DragonFlyHammerFs, Hammer2Snapshot,
+    VoidRunitManager, RunitServiceState, RunitService,
+    SovereignAnonScrubber,
+    TlpPowerGovernor, PowerSource, CpuGovernorPolicy, TlpConfig,
+    NmtuiNetworkManager, ConnectionType, NetworkConnectionProfile,
+    FreeBsdBhyveHypervisor, BhyveVmState, BhyveVirtualMachine,
+    TailscaleWireguardMesh, WireguardPeer,
+};
+pub use desktop::{
+    GraniteUiToolkit, ToastNotification, AccentColor,
+    SwitchboardSettingsHub, SwitchboardPlug, SwitchboardCategory,
+    ContractorService, ContractorAction,
+    ScreenTimeParentalGovernor, TimeQuota,
+    GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
+    PlankDockItem, SlingshotLauncher, SlingshotApp, SlingshotCategory, AppCenter,
+    AppCenterProduct, PantheonGreeter,
+>>>>>>> origin/improve-security-and-access-control-16390481506940537632-10641549495497073187
 };
 pub use security::hardening;
 pub use security::{

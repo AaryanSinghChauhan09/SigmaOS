@@ -2,7 +2,6 @@
 // Hardware abstraction for graphics rendering with Vulkan/Mesa-parity pipeline models and self-healing recovery
 
 use crate::security::capability::CapabilityToken;
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -121,7 +120,7 @@ pub struct GpuResetState {
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,
-    pub capabilities: CapabilityToken,
+    pub capability_mask: u64,
     pub frame_buffer: Vec<u32>,
     pub crtc: Option<DrmCrtc>,
     pub connector: Option<DrmConnector>,
@@ -129,6 +128,8 @@ pub struct GpuDriver {
     pub registered_pipelines: Vec<GpuPipeline>,
     pub bound_pipeline_id: Option<usize>,
     pub reset_state: GpuResetState,
+    pub crtc: Option<DrmCrtc>,
+    pub connector: Option<DrmConnector>,
 }
 
 impl GpuDriver {
@@ -137,7 +138,7 @@ impl GpuDriver {
         Self {
             width,
             height,
-            capabilities: CapabilityToken::new(),
+            capability_mask: 0xFFFFFFFFFFFFFFFF,
             frame_buffer: vec![0; size],
             crtc: None,
             connector: None,
@@ -149,6 +150,8 @@ impl GpuDriver {
                 pipeline_reconstructed_count: 0,
                 is_hardware_ready: true,
             },
+            crtc: None,
+            connector: None,
         }
     }
 
@@ -275,12 +278,12 @@ impl GpuDriver {
         );
     }
 
-    pub fn set_capabilities(&mut self, capabilities: CapabilityToken) {
-        self.capabilities = capabilities;
+    pub fn set_capability_mask(&mut self, mask: u64) {
+        self.capability_mask = mask;
     }
 
     pub fn has_capability(&self, capability: u64) -> bool {
-        (self.capabilities.bits() & capability) != 0
+        (self.capability_mask & capability) != 0
     }
 }
 
@@ -327,5 +330,36 @@ mod tests {
             height: 20,
         };
         assert!(gpu.execute_command(command).is_ok());
+    }
+
+    #[test]
+    fn test_drm_kms_mode_setting() {
+        let mut gpu = GpuDriver::new(800, 600);
+        let mode = DrmModeInfo {
+            hdisplay: 1920,
+            vdisplay: 1080,
+        };
+        assert!(gpu.set_drm_mode(1, 10, mode).is_ok());
+        assert_eq!(gpu.width, 1920);
+        assert_eq!(gpu.height, 1080);
+        assert!(gpu.crtc.is_some());
+        assert!(gpu.connector.is_some());
+        let crtc = gpu.crtc.as_ref().unwrap();
+        assert_eq!(crtc.id, 10);
+        assert!(crtc.active);
+    }
+
+    #[test]
+    fn test_gpu_self_healing_recovery() {
+        let mut gpu = GpuDriver::new(640, 480);
+        let mut cmd_buf = GpuCommandBuffer::new();
+        cmd_buf.begin_recording();
+        cmd_buf.record_command(GpuCommand::ClearScreen { r: 100, g: 100, b: 100 });
+        cmd_buf.record_command(GpuCommand::SimulateHang);
+        cmd_buf.end_recording();
+
+        assert_eq!(gpu.submit_command_buffer(cmd_buf), Err(GpuError::HardwareHang));
+        assert!(gpu.reset_state.is_hardware_ready);
+        assert_eq!(gpu.reset_state.total_hangs_recovered, 1);
     }
 }
