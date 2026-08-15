@@ -243,9 +243,11 @@ impl IoManager {
         }
 
         let mut driver_name = "";
+        let mut is_minifilter = false;
         for dev in self.devices.iter() {
             if dev.id == current_id {
                 driver_name = dev.driver_name;
+                is_minifilter = dev.is_minifilter;
                 break;
             }
         }
@@ -255,6 +257,7 @@ impl IoManager {
                 if let Some(handler) = driver.major_functions[irp.major_function as usize] {
                     // Temporarily create a mutable slice reference to simulate WDM vtable calling
                     let mut dummy_dev = DeviceObject::new(current_id, driver_name);
+                    dummy_dev.is_minifilter = is_minifilter;
                     let status = handler(&mut dummy_dev, irp);
                     irp.io_status = status;
                     return status;

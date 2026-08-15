@@ -4,8 +4,12 @@ extern crate alloc;
 // Sovereign implementations - no external crate dependencies
 pub mod buddy_allocator;
 pub mod paging;
+#[cfg(target_os = "none")]
 pub mod hashmap;
+#[cfg(target_os = "none")]
 pub mod hashset;
+pub mod vec;
+pub mod error;
 pub mod uuid;
 pub mod hash;
 pub mod string;
@@ -28,15 +32,21 @@ pub mod vecdeque;
 
 // Re-exports
 pub use string::{String, ToString};
-pub use custom_string::SigmaString;
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
 pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
 
-#[cfg(target_os = "none")]
 pub use vec::Vec;
-pub use hashmap::HashMap;
-pub use hashset::HashSet;
 pub use uuid::Uuid;
+
+#[cfg(not(target_os = "none"))]
+pub use std::collections::HashMap;
+#[cfg(not(target_os = "none"))]
+pub use std::collections::HashSet;
+
+#[cfg(target_os = "none")]
+pub use hashmap::HashMap;
+#[cfg(target_os = "none")]
+pub use hashset::HashSet;
