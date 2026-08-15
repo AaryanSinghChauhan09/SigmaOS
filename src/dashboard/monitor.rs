@@ -86,29 +86,6 @@ impl DashboardWidget {
         let sum: f64 = self.data.iter().map(|d| d.value).sum();
         sum / self.data.len() as f64
     }
-
-    /// Returns an htop-inspired ASCII progressive graph representing the latest telemetry metrics (CPU, memory, disk).
-    pub fn render_htop_format(&self) -> String {
-        let title = &self.title;
-        let latest = self.get_latest_value().unwrap_or(0.0);
-
-        // Scale 0.0-100.0 value into 20 columns
-        let cols = ((latest / 100.0) * 20.0).max(0.0).min(20.0) as usize;
-
-        let mut bar = [b' '; 20];
-        let bar_char = match self.widget_type {
-            WidgetType::LineChart | WidgetType::BarChart => b'|',
-            _ => b'=',
-        };
-
-        for i in 0..cols {
-            bar[i] = bar_char;
-        }
-
-        // Standard htop formatting
-        let bar_str = std::str::from_utf8(&bar).unwrap_or("");
-        format!("{:<12} [{}] {:.1}%", title, bar_str, latest)
-    }
 }
 
 /// Unified dashboard
@@ -160,10 +137,9 @@ impl UnifiedDashboard {
     pub fn get_system_summary(&self) -> HashMap<String, f64> {
         let mut summary = HashMap::new();
 
-        let iter = self.widgets.iter();
-        for (id, widget) in iter {
+        for (id, widget) in &self.widgets {
             if let Some(value) = widget.get_latest_value() {
-                let id: &String = id; let value: f64 = value; summary.insert(id.clone(), value);
+                summary.insert(id.clone(), value);
             }
         }
 
@@ -345,26 +321,6 @@ mod tests {
             timestamp: Instant::now(),
         });
         assert_eq!(widget.get_average(), 50.0);
-    }
-
-    #[test]
-    fn test_htop_rendering() {
-        let mut widget = DashboardWidget::new(
-            "cpu".to_string(),
-            WidgetType::LineChart,
-            "CPU Usage".to_string(),
-        );
-        let data = MetricData {
-            metric_type: MetricType::CPU,
-            value: 50.0,
-            unit: "%".to_string(),
-            timestamp: Instant::now(),
-        };
-        widget.add_data_point(data);
-
-        let htop_str = widget.render_htop_format();
-        assert!(htop_str.contains("CPU Usage"));
-        assert!(htop_str.contains("[||||||||||")); // 10 bars for 50%
     }
 
     #[test]
