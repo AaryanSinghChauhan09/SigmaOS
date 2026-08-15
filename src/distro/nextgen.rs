@@ -221,7 +221,8 @@ impl NetplanManager {
 
     /// Load declarative netplan configuration
     pub fn load_config(&mut self, config: NetplanConfig) {
-        self.configurations.insert(config.interface_name.clone(), config);
+        self.configurations
+            .insert(config.interface_name.clone(), config);
     }
 
     /// Apply declarative settings to interfaces
@@ -273,15 +274,21 @@ impl LivepatchManager {
         }
         self.redirection_log.push(format!(
             "LIVEPATCH: Redirecting calls of '{}' (0x{:x}) to patched body (0x{:x}). Checksum={}.",
-            patch.target_symbol, patch.old_function_address, patch.new_function_address, patch.checksum
+            patch.target_symbol,
+            patch.old_function_address,
+            patch.new_function_address,
+            patch.checksum
         ));
-        self.active_patches.insert(patch.target_symbol.clone(), patch);
+        self.active_patches
+            .insert(patch.target_symbol.clone(), patch);
         Ok(())
     }
 
     /// Simulates redirecting a function call dynamically
     pub fn redirect_call(&self, target_symbol: &str) -> Option<usize> {
-        self.active_patches.get(target_symbol).map(|patch| patch.new_function_address)
+        self.active_patches
+            .get(target_symbol)
+            .map(|patch| patch.new_function_address)
     }
 }
 
@@ -382,7 +389,10 @@ mod tests {
         };
 
         assert!(patcher.register_patch(patch).is_ok());
-        assert_eq!(patcher.redirect_call("sys_read").unwrap(), 0xffffffffc0300100);
+        assert_eq!(
+            patcher.redirect_call("sys_read").unwrap(),
+            0xffffffffc0300100
+        );
         assert!(patcher.redirect_call("sys_write").is_none());
         assert_eq!(patcher.redirection_log.len(), 1);
 

@@ -3,7 +3,11 @@ pub mod task;
 pub mod sigma_mlfq;
 pub mod sigma_transformer_sched;
 pub mod sigma_thermal_sched;
+pub mod gaming_performance;
 
+pub use gaming_performance::{
+    DragonFlySmpQueueManager, LwktMessage, PowerGovernor, SovereignGameMode, UksmPageDeduplicator,
+};
 pub use scheduler::{
     DeadlineSchedClass, FairSchedClass, IdleSchedClass, RealtimeSchedClass, RunQueue, SchedClass,
     Scheduler, StopSchedClass,

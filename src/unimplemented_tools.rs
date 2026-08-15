@@ -2,10 +2,10 @@
 // Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.
 
 extern crate alloc;
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
-use alloc::format;
 
 // =========================================================================
 // 1. MULTIMEDIA TOOLS
@@ -35,7 +35,11 @@ impl AudioEditor {
         });
     }
 
-    pub fn apply_filter(&mut self, track_idx: usize, filter: &'static str) -> Result<(), &'static str> {
+    pub fn apply_filter(
+        &mut self,
+        track_idx: usize,
+        filter: &'static str,
+    ) -> Result<(), &'static str> {
         if track_idx < self.tracks.len() {
             self.tracks[track_idx].filter_applied = Some(filter);
             Ok(())
@@ -412,7 +416,9 @@ pub struct StartupOptimizer {
 
 impl StartupOptimizer {
     pub fn new() -> Self {
-        Self { delay_services: Vec::new() }
+        Self {
+            delay_services: Vec::new(),
+        }
     }
 
     pub fn delay_service_at_boot(&mut self, service: &str) {
@@ -427,7 +433,9 @@ pub struct SecureFileShredder {
 
 impl SecureFileShredder {
     pub fn new(passes: u32) -> Self {
-        Self { overwrite_passes: passes }
+        Self {
+            overwrite_passes: passes,
+        }
     }
 
     pub fn shred_file(&self, data: &mut [u8]) {
@@ -494,7 +502,9 @@ pub struct PredictiveMaintenance {
 
 impl PredictiveMaintenance {
     pub fn new() -> Self {
-        Self { metrics: Vec::new() }
+        Self {
+            metrics: Vec::new(),
+        }
     }
 
     pub fn record_metric(&mut self, subsystem: &'static str, load: f32, temp: f32) {
@@ -544,7 +554,9 @@ impl ApiTestingTool {
     }
 
     pub fn add_header(&mut self, key: &str, val: &str) {
-        self.request.headers.push((key.to_string(), val.to_string()));
+        self.request
+            .headers
+            .push((key.to_string(), val.to_string()));
     }
 
     pub fn send(&self) -> (u16, String) {
@@ -890,7 +902,11 @@ impl VrArRuntime {
         Self {
             active_session: false,
             frame_count: 0,
-            last_pose: VrPose { x: 0.0, y: 0.0, z: 0.0 },
+            last_pose: VrPose {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
         }
     }
 
@@ -912,7 +928,9 @@ pub struct ControllerMapper {
 
 impl ControllerMapper {
     pub fn new() -> Self {
-        Self { mappings: Vec::new() }
+        Self {
+            mappings: Vec::new(),
+        }
     }
 
     pub fn bind_button(&mut self, physical: u8, virtual_char: char) {
@@ -1094,7 +1112,11 @@ impl PdfEditor {
         pdf_data
     }
 
-    pub fn split_pages(&mut self, start_page: usize, end_page: usize) -> Result<PdfEditor, &'static str> {
+    pub fn split_pages(
+        &mut self,
+        start_page: usize,
+        end_page: usize,
+    ) -> Result<PdfEditor, &'static str> {
         if start_page == 0 || end_page > self.page_count || start_page > end_page {
             return Err("Invalid page range specified");
         }
@@ -1146,7 +1168,9 @@ pub struct DocumentScanner {
 
 impl DocumentScanner {
     pub fn new() -> Self {
-        Self { is_calibrated: true }
+        Self {
+            is_calibrated: true,
+        }
     }
 
     pub fn scan_and_ocr(&self, image_data: &[u8]) -> Result<String, &'static str> {
@@ -1173,7 +1197,9 @@ pub struct CodeProfiler {
 
 impl CodeProfiler {
     pub fn new() -> Self {
-        Self { samples: Vec::new() }
+        Self {
+            samples: Vec::new(),
+        }
     }
 
     pub fn record_sample(&mut self, rip: u64) {
@@ -1183,7 +1209,10 @@ impl CodeProfiler {
                 return;
             }
         }
-        self.samples.push(ProfileSample { rip_addr: rip, call_count: 1 });
+        self.samples.push(ProfileSample {
+            rip_addr: rip,
+            call_count: 1,
+        });
     }
 }
 
@@ -1200,7 +1229,9 @@ pub struct StaticAnalyzer {
 
 impl StaticAnalyzer {
     pub fn new() -> Self {
-        Self { warnings_found: Vec::new() }
+        Self {
+            warnings_found: Vec::new(),
+        }
     }
 
     pub fn run_source_check(&mut self, filename: &'static str, content: &str) {
@@ -1208,7 +1239,8 @@ impl StaticAnalyzer {
             self.warnings_found.push(StaticAnalysisWarning {
                 filename,
                 line_number: 42,
-                message: "Potential transmute size mismatch. Use explicit size cast (as u32) first.",
+                message:
+                    "Potential transmute size mismatch. Use explicit size cast (as u32) first.",
             });
         }
     }
@@ -1221,7 +1253,9 @@ pub struct PackagePublishingHub {
 
 impl PackagePublishingHub {
     pub fn new() -> Self {
-        Self { registered_packages: Vec::new() }
+        Self {
+            registered_packages: Vec::new(),
+        }
     }
 
     pub fn publish_package(&mut self, name: &str) -> Result<String, &'static str> {
@@ -1276,7 +1310,9 @@ pub struct AiSearchAssistant {
 
 impl AiSearchAssistant {
     pub fn new() -> Self {
-        Self { chat_history: Vec::new() }
+        Self {
+            chat_history: Vec::new(),
+        }
     }
 
     pub fn submit_query(&mut self, query: &str) -> String {
@@ -1317,7 +1353,9 @@ pub struct AiCodeAssistant {
 
 impl AiCodeAssistant {
     pub fn new() -> Self {
-        Self { suggestions_count: 0 }
+        Self {
+            suggestions_count: 0,
+        }
     }
 
     pub fn suggest_completion(&mut self, language: &str, line: &str) -> Option<String> {
@@ -1365,7 +1403,9 @@ pub struct SmartNotificationManager {
 
 impl SmartNotificationManager {
     pub fn new() -> Self {
-        Self { notifications: Vec::new() }
+        Self {
+            notifications: Vec::new(),
+        }
     }
 
     pub fn receive_notification(&mut self, sender: &str, content: &str) {
@@ -1378,7 +1418,8 @@ impl SmartNotificationManager {
             content: content.to_string(),
             priority,
         });
-        self.notifications.sort_by_key(|n| core::cmp::Reverse(n.priority));
+        self.notifications
+            .sort_by_key(|n| core::cmp::Reverse(n.priority));
     }
 }
 
@@ -1444,7 +1485,9 @@ pub struct IotDeviceManager {
 
 impl IotDeviceManager {
     pub fn new() -> Self {
-        Self { devices: Vec::new() }
+        Self {
+            devices: Vec::new(),
+        }
     }
 
     pub fn register_device(&mut self, name: &str) {
@@ -1472,7 +1515,9 @@ pub struct CloudBackupUtility {
 
 impl CloudBackupUtility {
     pub fn new() -> Self {
-        Self { encrypted_bytes_transferred: 0 }
+        Self {
+            encrypted_bytes_transferred: 0,
+        }
     }
 
     pub fn backup_block(&mut self, block: &[u8]) -> Result<(), &'static str> {
@@ -1515,7 +1560,9 @@ pub struct AiScheduler {
 
 impl AiScheduler {
     pub fn new() -> Self {
-        Self { routines: Vec::new() }
+        Self {
+            routines: Vec::new(),
+        }
     }
 
     pub fn register_routine(&mut self, battery_trigger: u32, action: &'static str) {
@@ -1619,7 +1666,9 @@ pub struct MultiMonitorManager {
 
 impl MultiMonitorManager {
     pub fn new() -> Self {
-        Self { displays: Vec::new() }
+        Self {
+            displays: Vec::new(),
+        }
     }
 
     pub fn add_display(&mut self, id: u32, x_offset: i32, w: u32, h: u32) {
@@ -1662,7 +1711,9 @@ pub struct VoiceControl {
 
 impl VoiceControl {
     pub fn new() -> Self {
-        Self { recognized_keywords: Vec::new() }
+        Self {
+            recognized_keywords: Vec::new(),
+        }
     }
 
     pub fn register_voice_phrase(&mut self, phrase: &str) {
@@ -1735,7 +1786,9 @@ pub struct FlatpakSnapLayer {
 
 impl FlatpakSnapLayer {
     pub fn new() -> Self {
-        Self { containers_loaded: 0 }
+        Self {
+            containers_loaded: 0,
+        }
     }
 
     pub fn load_flatpak_ref(&mut self, _app_id: &str) -> Result<(), &'static str> {
@@ -1770,7 +1823,9 @@ pub struct AiDependencyResolver {
 
 impl AiDependencyResolver {
     pub fn new() -> Self {
-        Self { solved_dependencies: Vec::new() }
+        Self {
+            solved_dependencies: Vec::new(),
+        }
     }
 
     pub fn resolve_dependencies_for(&mut self, pkg: &str) {
@@ -1878,7 +1933,9 @@ pub struct OfflinePackageInstaller {
 
 impl OfflinePackageInstaller {
     pub fn new() -> Self {
-        Self { total_packages_cached: 0 }
+        Self {
+            total_packages_cached: 0,
+        }
     }
 
     pub fn cache_offline_pkg(&mut self, _pkg_path: &str) {
@@ -1942,7 +1999,9 @@ pub struct PluginMarketplace {
 
 impl PluginMarketplace {
     pub fn new() -> Self {
-        Self { downloaded_extensions: Vec::new() }
+        Self {
+            downloaded_extensions: Vec::new(),
+        }
     }
 
     pub fn install_extension(&mut self, name: &str, ver: &str) {
@@ -2393,7 +2452,9 @@ mod tests {
         let mut sa = StaticAnalyzer::new();
         sa.run_source_check("main.rs", "core::mem::transmute(state)");
         assert_eq!(sa.warnings_found.len(), 1);
-        assert!(sa.warnings_found[0].message.contains("transmute size mismatch"));
+        assert!(sa.warnings_found[0]
+            .message
+            .contains("transmute size mismatch"));
     }
 
     #[test]
@@ -2422,7 +2483,10 @@ mod tests {
     #[test]
     fn test_natural_language_shell() {
         let shell = NaturalLanguageShell::new();
-        assert_eq!(shell.parse_to_command("please run cleanup"), "sigma-cleanup --temp");
+        assert_eq!(
+            shell.parse_to_command("please run cleanup"),
+            "sigma-cleanup --temp"
+        );
         assert_eq!(shell.parse_to_command("do update"), "sigpkg update");
     }
 
@@ -2437,7 +2501,10 @@ mod tests {
     fn test_ai_file_organizer() {
         let mut organizer = AiFileOrganizer::new();
         assert_eq!(organizer.classify_file_path("main.rs"), "/src/main.rs");
-        assert_eq!(organizer.classify_file_path("song.mp3"), "/media/music/song.mp3");
+        assert_eq!(
+            organizer.classify_file_path("song.mp3"),
+            "/media/music/song.mp3"
+        );
     }
 
     #[test]
