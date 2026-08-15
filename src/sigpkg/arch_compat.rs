@@ -1,6 +1,11 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
+<<<<<<< HEAD
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 // Enhanced with ALPM Hooks, mkinitcpio initramfs compilers, and makepkg package builders.
+=======
+// Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
+// and implements ALPM hooks, mkinitcpio initramfs builders, and makepkg source pipelines.
+>>>>>>> origin/jules-880081283500171861-1eb07604
 
 #[cfg(not(test))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
@@ -93,6 +98,7 @@ impl Package {
 
 use std::collections::HashMap;
 
+<<<<<<< HEAD
 /// Debian-style Sbuild Source Build Dependency Representation
 #[derive(Debug, Clone)]
 pub struct DebianSbuildPackage {
@@ -105,6 +111,74 @@ impl DebianSbuildPackage {
         Self {
             name: name.to_string(),
             build_depends: build_deps,
+=======
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum VersionConstraint {
+    Any,
+    Exact(Version),
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Dependency {
+    pub name: String,
+    pub version_constraint: VersionConstraint,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Version {
+    pub major: u32,
+    pub minor: u32,
+    pub patch: u32,
+}
+
+#[cfg(test)]
+impl Version {
+    pub fn new(major: u32, minor: u32, patch: u32) -> Self {
+        Self { major, minor, patch }
+    }
+
+    pub fn parse(s: &str) -> Result<Self, &'static str> {
+        let parts: Vec<&str> = s.split('.').collect();
+        if parts.len() >= 3 {
+            let major = parts[0].parse().unwrap_or(1);
+            let minor = parts[1].parse().unwrap_or(0);
+            let patch = parts[2].parse().unwrap_or(0);
+            Ok(Version { major, minor, patch })
+        } else {
+            Ok(Version { major: 1, minor: 0, patch: 0 })
+        }
+    }
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone)]
+pub struct Package {
+    pub name: String,
+    pub version: Version,
+    pub description: String,
+    pub dependencies: Vec<Dependency>,
+    pub checksum: String,
+}
+
+#[cfg(test)]
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+>>>>>>> origin/jules-880081283500171861-1eb07604
         }
     }
 }
@@ -279,16 +353,134 @@ impl PacmanDbAdapter {
     }
 }
 
+<<<<<<< HEAD
 // ==========================================
 // 8. ALPM Hooks, mkinitcpio & makepkg Features
 // ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AlpmHookAction {
+=======
+/// Gentoo-style compile-time USE flag toggle configuration
+#[derive(Debug, Clone)]
+pub struct GentooUseFlag {
+    pub name: String,
+    pub is_enabled: bool,
+}
+
+/// Gentoo-style declarative ebuild package build recipe descriptor
+#[derive(Debug, Clone)]
+pub struct GentooEbuildPackage {
+    pub name: String,
+    pub version: Version,
+    pub use_flags: Vec<GentooUseFlag>,
+    pub configure_flags: Vec<String>,
+}
+
+/// Gentoo Portage-style source-build package compiler & optimizer engine
+pub struct PortageEbuildCompiler {
+    pub global_use_flags: HashMap<String, bool>,
+}
+
+impl PortageEbuildCompiler {
+    pub fn new() -> Self {
+        Self {
+            global_use_flags: HashMap::new(),
+        }
+    }
+
+    pub fn set_global_use_flag(&mut self, name: &str, enabled: bool) {
+        self.global_use_flags.insert(name.to_string(), enabled);
+    }
+
+    /// Evaluates if custom USE flags match global feature policies, and dynamically generates
+    /// the optimized compiler `./configure` target strings.
+    pub fn configure_and_compile(&self, ebuild: &mut GentooEbuildPackage) -> Result<Package, &'static str> {
+        let mut active_features = Vec::new();
+
+        for flag in &mut ebuild.use_flags {
+            if let Some(&global_state) = self.global_use_flags.get(&flag.name) {
+                flag.is_enabled = global_state;
+            }
+            if flag.is_enabled {
+                active_features.push(flag.name.clone());
+            }
+        }
+
+        for feature in &active_features {
+            let config_arg = format!("--enable-{}", feature);
+            if !ebuild.configure_flags.contains(&config_arg) {
+                ebuild.configure_flags.push(config_arg);
+            }
+        }
+
+        let description = format!(
+            "Compiled Gentoo ebuild package: {} with active features: {:?}",
+            ebuild.name, active_features
+        );
+
+        Ok(Package::new(
+            ebuild.name.clone(),
+            ebuild.version.clone(),
+            description,
+            Vec::new(),
+            "sha256_portage_compiled_source_binary".to_string(),
+        ))
+    }
+
+    /// Portage-style compiler native CPU microarchitecture optimization target level generator
+    pub fn get_optimized_target_cpu_level(&self, cpu_features: &[&str]) -> usize {
+        let mut level = 1;
+        if cpu_features.contains(&"sse4.2") {
+            level = 2;
+        }
+        if cpu_features.contains(&"avx2") {
+            level = 3;
+        }
+        if cpu_features.contains(&"avx512f") {
+            level = 4;
+        }
+        level
+    }
+}
+
+impl Default for PortageEbuildCompiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Represents a Debian-style source package targeting sbuild compiler rules
+#[derive(Debug, Clone)]
+pub struct DebianSbuildPackage {
+    pub name: String,
+    pub version: Version,
+    pub build_depends: Vec<String>,
+}
+
+impl RollingSyncManager {
+    pub fn is_debian_sbuild_builddeps_satisfied(&self, package: &DebianSbuildPackage) -> bool {
+        for dep in &package.build_depends {
+            if !self.installed_packages.contains_key(dep) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+// ==========================================
+// 6. ALPM (Arch Linux Package Management) Hooks Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookWhen {
+>>>>>>> origin/jules-880081283500171861-1eb07604
     PreTransaction,
     PostTransaction,
 }
 
+<<<<<<< HEAD
 /// GDB/Pacman-inspired declarative ALPM Hook
 #[derive(Debug, Clone)]
 pub struct AlpmHook {
@@ -302,20 +494,37 @@ pub struct AlpmHook {
 pub struct AlpmHookManager {
     pub hooks: Vec<AlpmHook>,
     pub execution_log: Vec<String>,
+=======
+#[derive(Debug, Clone)]
+pub struct AlpmHook {
+    pub name: String,
+    pub when: HookWhen,
+    pub target_packages: Vec<String>, // e.g. ["glibc", "*"]
+    pub exec_command: String,
+}
+
+pub struct AlpmHookManager {
+    pub hooks: Vec<AlpmHook>,
+>>>>>>> origin/jules-880081283500171861-1eb07604
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
+<<<<<<< HEAD
         Self {
             hooks: Vec::new(),
             execution_log: Vec::new(),
         }
+=======
+        Self { hooks: Vec::new() }
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 
     pub fn register_hook(&mut self, hook: AlpmHook) {
         self.hooks.push(hook);
     }
 
+<<<<<<< HEAD
     /// Triggers hooks matching the packages updated during a Pacman transaction
     pub fn run_hooks(&mut self, action: AlpmHookAction, updated_pkgs: &[&str]) -> usize {
         let mut count = 0;
@@ -336,6 +545,24 @@ impl AlpmHookManager {
             }
         }
         count
+=======
+    /// Executes matching ALPM hooks for an install/upgrade event
+    pub fn trigger_hooks(&self, when: HookWhen, modified_packages: &[&str]) -> Vec<String> {
+        let mut executed = Vec::new();
+
+        for hook in &self.hooks {
+            if hook.when == when {
+                let matches = hook.target_packages.iter().any(|target| {
+                    target == "*" || modified_packages.contains(&target.as_str())
+                });
+
+                if matches {
+                    executed.push(hook.exec_command.clone());
+                }
+            }
+        }
+        executed
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }
 
@@ -345,14 +572,24 @@ impl Default for AlpmHookManager {
     }
 }
 
+<<<<<<< HEAD
 /// mkinitcpio initramfs configuration builder
 pub struct MkinitcpioBuilder {
     pub active_hooks: Vec<String>,
+=======
+// ==========================================
+// 7. Mkinitcpio Initramfs Image Builder
+// ==========================================
+
+pub struct MkinitcpioBuilder {
+    pub hooks: Vec<String>, // e.g. ["base", "udev", "block", "filesystems"]
+>>>>>>> origin/jules-880081283500171861-1eb07604
 }
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
         Self {
+<<<<<<< HEAD
             active_hooks: Vec::new(),
         }
     }
@@ -372,6 +609,25 @@ impl MkinitcpioBuilder {
             img_desc.push('|');
         }
         Ok(img_desc)
+=======
+            hooks: vec![
+                "base".to_string(),
+                "udev".to_string(),
+                "block".to_string(),
+                "filesystems".to_string(),
+            ],
+        }
+    }
+
+    pub fn build_initramfs(&self, kernel_ver: &str) -> Result<String, &'static str> {
+        if self.hooks.is_empty() {
+            return Err("Cannot build initramfs without hooks configured");
+        }
+        Ok(format!(
+            "/boot/initramfs-{}.img [hooks: {:?}]",
+            kernel_ver, self.hooks
+        ))
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }
 
@@ -381,6 +637,7 @@ impl Default for MkinitcpioBuilder {
     }
 }
 
+<<<<<<< HEAD
 /// makepkg automation compiler validating checksums and building .pkg.tar.zst packages
 pub struct MakepkgBuilder {
     pub default_compression_level: u32,
@@ -418,6 +675,37 @@ impl MakepkgBuilder {
             Vec::new(),
             expected_sha256.to_string(),
         ))
+=======
+// ==========================================
+// 8. Makepkg Source Build Pipeline Engine
+// ==========================================
+
+pub struct MakepkgBuilder;
+
+impl MakepkgBuilder {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Validates SHA256 checksums of downloaded sources and builds a `.pkg.tar.zst` binary package
+    pub fn build_package_from_source(
+        &self,
+        pkgname: &str,
+        pkgver: &str,
+        sources: &[(&str, &str)], // (filename, expected_sha256)
+        simulated_file_hashes: &HashMap<String, String>,
+    ) -> Result<String, &'static str> {
+        for (file, expected_hash) in sources {
+            let actual_hash = simulated_file_hashes
+                .get(*file)
+                .ok_or("Source file missing")?;
+            if actual_hash != expected_hash {
+                return Err("SHA256 checksum verification failed");
+            }
+        }
+
+        Ok(format!("{}-{}-1-x86_64.pkg.tar.zst", pkgname, pkgver))
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }
 
@@ -538,6 +826,7 @@ mod tests {
     }
 
     #[test]
+<<<<<<< HEAD
     fn test_debian_sbuild_resolver() {
         let mut sync = RollingSyncManager::new();
         sync.register_installed("gcc", Version::new(11, 2, 0));
@@ -575,10 +864,31 @@ mod tests {
         // Pre-transaction should not execute
         let executed_pre = manager.run_hooks(AlpmHookAction::PreTransaction, &["linux"]);
         assert_eq!(executed_pre, 0);
+=======
+    fn test_alpm_hooks() {
+        let mut manager = AlpmHookManager::new();
+
+        manager.register_hook(AlpmHook {
+            name: "update-fonts".to_string(),
+            when: HookWhen::PostTransaction,
+            target_packages: vec!["fontconfig".to_string()],
+            exec_command: "fc-cache -s".to_string(),
+        });
+
+        // Trigger post-transaction hooks when fontconfig is updated
+        let executed = manager.trigger_hooks(HookWhen::PostTransaction, &["fontconfig"]);
+        assert_eq!(executed.len(), 1);
+        assert_eq!(executed[0], "fc-cache -s");
+
+        // Trigger when unrelated package is updated -> 0 hooks executed
+        let executed_none = manager.trigger_hooks(HookWhen::PostTransaction, &["bash"]);
+        assert_eq!(executed_none.len(), 0);
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 
     #[test]
     fn test_mkinitcpio_builder() {
+<<<<<<< HEAD
         let mut builder = MkinitcpioBuilder::new();
         builder.add_hook("udev");
         builder.add_hook("base");
@@ -605,5 +915,23 @@ mod tests {
 
         // Failure with bad sha256 size
         assert!(builder.build_package("linux-firmware", Version::new(1, 0, 0), mock_src, "short_hash").is_err());
+=======
+        let builder = MkinitcpioBuilder::new();
+        let initramfs = builder.build_initramfs("6.1.0-arch1").unwrap();
+        assert!(initramfs.contains("/boot/initramfs-6.1.0-arch1.img"));
+    }
+
+    #[test]
+    fn test_makepkg_pipeline() {
+        let builder = MakepkgBuilder::new();
+        let mut hashes = HashMap::new();
+        hashes.insert("v1.0.tar.gz".to_string(), "abc123hash".to_string());
+
+        let sources = [("v1.0.tar.gz", "abc123hash")];
+        let pkg_file = builder
+            .build_package_from_source("htop", "3.2.0", &sources, &hashes)
+            .unwrap();
+        assert_eq!(pkg_file, "htop-3.2.0-1-x86_64.pkg.tar.zst");
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }

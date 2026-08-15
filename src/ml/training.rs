@@ -10,12 +10,17 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type TrainingID = usize;
 
 #[repr(usize)]
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizerType {
     SGD = 0,
     Adam = 1,
     RMSProp = 2,
 }
+=======
+#[derive(Debug, Clone, Copy)]
+pub enum OptimizerType { SGD = 0, Adam = 1, RMSProp = 2 }
+>>>>>>> origin/jules-880081283500171861-1eb07604
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

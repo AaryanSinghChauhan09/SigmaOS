@@ -9,9 +9,12 @@ pub mod sai;
 pub mod openclaw;
 pub mod system;
 pub mod voice;
+<<<<<<< HEAD
 pub mod wiki;
 pub mod qwenpaw;
 pub mod developer_platform;
+=======
+>>>>>>> origin/jules-880081283500171861-1eb07604
 pub mod open_computer;
 
 pub use openclaw::{
@@ -46,7 +49,10 @@ pub use open_computer::{
     OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
     AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
 };
+<<<<<<< HEAD
 pub use developer_platform::{
     AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
     MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };
+=======
+>>>>>>> origin/jules-880081283500171861-1eb07604

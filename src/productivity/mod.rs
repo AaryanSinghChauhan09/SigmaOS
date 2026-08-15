@@ -52,3 +52,6 @@ pub use tmux::{
 pub use mind_map::{
     MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
 };
+pub use mind_map::{
+    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
+};

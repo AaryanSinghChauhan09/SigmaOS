@@ -10,6 +10,8 @@ This comparative matrix evaluates **SigmaOS** against major commercial and open-
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Base Microkernel** | **#1 no-std Rust/Zig/Nim** | Monolithic C (systemd bloat) | Hybrid Mach C/C++ | Hybrid Monolithic C/C++ | Monolithic Linux Kernel C |
 | **Security Paradigm** | **64-bit Hardware Capabilities & PQC** | DAC (Sudo/Polkit, Ambient Root) | SIP & Sandbox Overlays | ACLs & Active Directory | Sandboxed Linux UID model |
+| **Agent Desktop** | **Open Computer (Text DOM/A11y VM)** | Pixel Vision Coordinate guess | Third-party only | Copilot API overlays | Voice Assistant only |
+
 | **Agent Desktop** | **Open Computer (Text DOM/A11y VM)** | Third-party only | Third-party only | Copilot API overlays | Voice Assistant only |
 | **National Localization** | **India-first: 22 languages & UPI** | None (Third-party packages) | ISO locales only | ISO locales only | Basic regional keyboard |
 | **Compliance Engines** | **Sovereign: BNSS/BNS, MSMED Act, EPF** | Manual audits only | None | Enterprise-only AD GPO | Work Profile only |
@@ -27,6 +29,8 @@ This comparative matrix evaluates **SigmaOS** against major commercial and open-
 
 ### 2. The Commercial Cloud Dependency (Data Renting)
 - **Windows/macOS's Gap:** Modern commercial operating systems require constant internet connectivity and rely heavily on cloud APIs to process AI logic, resulting in massive privacy and telemetry leakage.
+- **SigmaOS Solution:** Embeds **Open Computer** agent-virtual desktops natively in the OS, utilizing an accessibility-driven, token-efficient text-DOM navigation system that runs on on-device LLMs (e Gemma, Qwen) entirely offline.
+
 - **SigmaOS Solution:** Embeds **Open Computer** agent-virtual desktops natively in the OS, utilizing an accessibility-driven, token-efficient text-DOM navigation system that runs on on-device LLMs (e.g., Gemma, Qwen) entirely offline.
 
 ### 3. The Indian Institutional Gap (Imported Architecture)

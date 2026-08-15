@@ -200,6 +200,7 @@ impl PeLoader {
         Ok(())
     }
 
+<<<<<<< HEAD
     /// Emulates relocation of the PE image to a different base address (ASLR)
     pub fn perform_base_relocation(&mut self, new_base: u64) {
         self.image_base = new_base;
@@ -209,6 +210,29 @@ impl PeLoader {
     /// Translates a virtual relative address (RVA) to absolute address
     pub fn rva_to_va(&self, rva: u32) -> u64 {
         self.image_base + rva as u64
+=======
+    /// Debian WINE-style PE section relocation and mapping validator.
+    /// Safely computes the target virtual address offsets of PE sections (.text, .data, etc.)
+    /// relative to the preferred base address and the chosen relocation offset, preventing
+    /// out-of-bounds mapping errors.
+    pub fn validate_wine_relocation_table(
+        &self,
+        section: &WinePeSection,
+        preferred_base_addr: u64,
+        actual_load_addr: u64,
+    ) -> Result<u64, Win32Error> {
+        if actual_load_addr < preferred_base_addr {
+            return Err(Win32Error::PlatformMismatch);
+        }
+        let delta = actual_load_addr - preferred_base_addr;
+        let target_virtual_addr = section.virtual_address + delta;
+
+        // Ensure mapped address boundaries are correct
+        if target_virtual_addr < actual_load_addr {
+            return Err(Win32Error::PlatformMismatch); // Overflow guard
+        }
+        Ok(target_virtual_addr)
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }
 

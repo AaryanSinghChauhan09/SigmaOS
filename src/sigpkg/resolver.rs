@@ -89,6 +89,13 @@ impl AptPinRule {
             priority,
         }
     }
+
+/// Debian APT-style pinning rule to prefer stable/trusted origins
+#[derive(Debug, Clone)]
+pub struct AptPinRule {
+    pub package_name: String,
+    pub origin: String,
+    pub pin_priority: i16,
 }
 
 /// SAT Solver for dependency resolution
@@ -185,6 +192,8 @@ impl SatSolver {
     }
 
     /// Recursive dependency resolution
+
+    /// Recursive dependency resolution (highly optimized utilizing APT pinning weights)
     fn resolve_recursive(
         &self,
         package_name: &str,
@@ -418,6 +427,52 @@ mod tests {
     }
 
     #[test]
+    fn test_debian_elementary_app_package_validator() {
+        let solver = SatSolver::new();
+
+        // 1. Fully compliant package
+        let compliant_app = DebianElementaryAppPackage {
+            app_id: "io.elementary.calculator".to_string(),
+            format: "deb".to_string(),
+            adopts_csd_guideline: true,
+            supports_dark_mode: true,
+        };
+        assert!(solver.is_debian_elementary_package_compliant(&compliant_app).is_ok());
+
+        // 2. Non-compliant: invalid App ID format
+        let mut app = compliant_app.clone();
+        app.app_id = "calculator".to_string();
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)"
+        );
+
+        // 3. Non-compliant: invalid TLD prefix
+        let mut app = compliant_app.clone();
+        app.app_id = "net.elementary.calculator".to_string();
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: Invalid app ID top-level domain prefix"
+        );
+
+        // 4. Non-compliant: missing CSD compliance
+        let mut app = compliant_app.clone();
+        app.adopts_csd_guideline = false;
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules"
+        );
+
+        // 5. Non-compliant: missing dark mode compliance
+        let mut app = compliant_app.clone();
+        app.supports_dark_mode = false;
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App must support toggleable pure-black dark mode"
+        );
+    }
+
+    #[test]
     fn test_sat_solver_creation() {
         let solver = SatSolver::new();
         assert!(solver.packages.is_empty());
@@ -482,6 +537,49 @@ mod tests {
     }
 
     #[test]
+    fn test_debian_apt_pinning() {
+        let mut solver = SatSolver::new();
+
+        // Create unstable package version 2.0.0 from experimental mirrors
+        let mut pkg_unstable = Package::new(
+            "bash".to_string(),
+            Version::new(2, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
+        pkg_unstable.mirrors.push("http://debian.org/experimental".to_string());
+
+        // Create stable package version 1.0.0 from stable mirrors
+        let mut pkg_stable = Package::new(
+            "bash".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
+        pkg_stable.mirrors.push("http://debian.org/stable".to_string());
+
+        solver.add_package(pkg_unstable);
+        solver.add_package(pkg_stable);
+
+        // Define pinning rule: Prefer stable origin heavily (priority 990) over experimental (priority 100)
+        solver.add_pin_rule(AptPinRule {
+            package_name: "bash".to_string(),
+            origin: "/stable".to_string(),
+            pin_priority: 990,
+        });
+        solver.add_pin_rule(AptPinRule {
+            package_name: "bash".to_string(),
+            origin: "/experimental".to_string(),
+            pin_priority: 100,
+        });
+
+        // Resolve dependencies - should select stable 1.0.0 due to priority 990 over newer unstable 2.0.0
+        let resolved = solver.resolve("bash", &VersionConstraint::Any).unwrap();
+        assert_eq!(resolved.len(), 1);
+        assert_eq!(resolved[0].version, Version::new(1, 0, 0));
+
     fn test_debian_elementary_compliance() {
         let app1 = DebianElementaryAppPackage::new("io.elementary.calculator", true, true);
         assert!(app1.is_elementary_compliant());

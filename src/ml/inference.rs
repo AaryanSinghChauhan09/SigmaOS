@@ -15,6 +15,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type ModelID = usize;
 
 #[repr(usize)]
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModelType {
     NeuralNetwork = 0,
@@ -22,6 +23,10 @@ pub enum ModelType {
     SVM = 2,
     Transformer = 3,
 }
+=======
+#[derive(Debug, Clone, Copy)]
+pub enum ModelType { NeuralNetwork = 0, DecisionTree = 1, SVM = 2, Transformer = 3 }
+>>>>>>> origin/jules-880081283500171861-1eb07604
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

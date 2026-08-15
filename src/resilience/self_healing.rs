@@ -614,6 +614,7 @@ mod tests {
     }
 
     #[test]
+<<<<<<< HEAD
     fn test_system_stability_monitor_heartbeat() {
         let mut monitor = SystemStabilityMonitor::new();
         assert_eq!(monitor.system_stability_score, 100.0);
@@ -663,5 +664,67 @@ mod tests {
         let status_after_clear = monitor.trigger_recovery_for_fault("filesystem_corrupt");
         assert_eq!(status_after_clear, "ATTEMPTING_RECOVERY");
         assert!(!monitor.in_safe_mode);
+=======
+    fn test_shard_heartbeats_and_degraded_safety_mode() {
+        let mut monitor = SystemStabilityMonitor::new();
+        assert_eq!(monitor.system_health_score, 100);
+        assert!(!monitor.is_degraded_safety_mode);
+
+        monitor.register_shard("S-MM", 5); // 5 seconds max allowed latency
+        monitor.register_shard("S-NET", 5);
+
+        // Send heartbeats
+        assert!(monitor.send_heartbeat("S-MM", 1000).is_ok());
+        assert!(monitor.send_heartbeat("S-NET", 1000).is_ok());
+
+        // Check health at t=1002 (all healthy)
+        let dead = monitor.check_shards_health(1002);
+        assert!(dead.is_empty());
+        assert_eq!(monitor.system_health_score, 100);
+        assert!(!monitor.is_degraded_safety_mode);
+
+        // Check health at t=1010 (both are timed out since last heartbeat was at 1000, 10s > 5s max latency)
+        let dead_now = monitor.check_shards_health(1010);
+        assert_eq!(dead_now.len(), 2);
+        assert!(dead_now.contains(&"S-MM".to_string()));
+        assert!(dead_now.contains(&"S-NET".to_string()));
+
+        // Deductions should drop health below 50 (100 - 30 = 70. Wait, 2 dead shards * 15 = 30 deduction. Health = 70.
+        // Let's add more shards to trigger Degraded Safety Mode below 50%)
+        monitor.register_shard("S-FS", 5);
+        monitor.register_shard("S-SCHED", 5);
+        monitor.send_heartbeat("S-FS", 1000).unwrap();
+        monitor.send_heartbeat("S-SCHED", 1000).unwrap();
+
+        let dead_four = monitor.check_shards_health(1010);
+        assert_eq!(dead_four.len(), 4); // 4 dead shards * 15 deduction = 60. Health = 40%
+        assert_eq!(monitor.system_health_score, 40);
+        assert!(monitor.is_degraded_safety_mode); // Activated because health fell below 50%!
+    }
+
+    #[test]
+    fn test_double_fault_guard_cascades() {
+        let mut monitor = SystemStabilityMonitor::new();
+        monitor.register_shard("S-MM", 5);
+
+        // Simulate successful recovery attempts separated by time
+        assert!(monitor.record_recovery_attempt("S-MM", 1000).is_ok());
+        assert!(monitor.record_recovery_attempt("S-MM", 1005).is_ok());
+        assert!(monitor.record_recovery_attempt("S-MM", 1012).is_ok());
+
+        // Simulate rapid crashing cascade: 4 crashes within 10 seconds (observation window)
+        let mut guard = DoubleFaultGuard::new(3, 10);
+        assert!(guard.record_attempt(1000).is_ok());
+        assert!(guard.record_attempt(1001).is_ok());
+        assert!(guard.record_attempt(1002).is_ok());
+
+        // 4th crash within 10 seconds of 1000 (at 1003) -> threshold (3) exceeded, triggers isolation!
+        let crash_err = guard.record_attempt(1003);
+        assert!(crash_err.is_err());
+        assert!(guard.is_isolated);
+
+        // Successive restarts are blocked to protect microkernel stability
+        assert!(guard.record_attempt(1004).is_err());
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }

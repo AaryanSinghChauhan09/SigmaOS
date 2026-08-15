@@ -1,6 +1,10 @@
 // SigmaOS Privacy-First Sandbox Subsystem
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
+<<<<<<< HEAD
 // Enhanced with Sandboxie-style file system overlays and Firejail-style execution profiles.
+=======
+// Inspired by market-leading competitors Sandboxie (virtual file redirection/overlays) & Firejail (namespace isolation & profiles)
+>>>>>>> origin/jules-880081283500171861-1eb07604
 
 use std::collections::{HashSet, HashMap};
 
@@ -22,6 +26,7 @@ pub enum SandboxRule {
     FSWriteGate,
     FSReadGate,
     ProcessForkGate,
+<<<<<<< HEAD
     IpcAccessGate,          // Block inter-process communication
     MemoryDbgAttachGate,    // Prevent debuggers attaching (ptrace)
     RawSocketOpenGate,      // Block raw socket creations
@@ -41,15 +46,35 @@ pub enum SandboxProfile {
     UntrustedInstaller,
 }
 
+=======
+    RegistryReadWriteGate,
+    IpcAccessGate,
+    RawSocketOpenGate,
+    MemoryDbgAttachGate,
+    HardwareDbgAccessGate,
+}
+
+>>>>>>> origin/jules-880081283500171861-1eb07604
 /// High-fidelity, privacy-first sandbox container (inspired by Sandboxie and Firejail)
 pub struct PrivacyFirstSandbox {
     pub process_id: u32,
     pub is_active_sandboxed: bool,
     pub active_pqc_key_attestation: String,
     pub blocked_rules: HashSet<SandboxRule>,
+<<<<<<< HEAD
     pub profile: SandboxProfile,
     pub sanitized_env: HashMap<String, String>,
     pub virtual_filesystem_overlay: HashMap<String, Vec<u8>>, // Sandboxie-style overlay file system
+=======
+    pub active_profile: SandboxProfile,
+    /// Sandboxie-style file system virtualization overlay.
+    /// Redirects writes to this in-memory sandbox overlay rather than modifying the host system.
+    pub overlay_writes: HashMap<String, Vec<u8>>,
+    /// Firejail-style private namespaces. If path is in private_paths, host file reads are blocked.
+    pub private_paths: HashSet<String>,
+    /// Firejail-style read-only directories. Any writes to these will trigger access violation.
+    pub readonly_paths: HashSet<String>,
+>>>>>>> origin/jules-880081283500171861-1eb07604
 }
 
 impl PrivacyFirstSandbox {
@@ -122,6 +147,7 @@ impl PrivacyFirstSandbox {
             process_id: pid,
             is_active_sandboxed: true,
             active_pqc_key_attestation: pqc_key.to_string(),
+<<<<<<< HEAD
             blocked_rules: HashSet::new(),
             profile: SandboxProfile::None,
             sanitized_env: HashMap::new(),
@@ -182,6 +208,17 @@ impl PrivacyFirstSandbox {
         sandbox
     }
 
+=======
+            blocked_rules,
+            active_profile: profile,
+            overlay_writes: HashMap::new(),
+            private_paths,
+            readonly_paths,
+        }
+    }
+
+    /// Manually blocks a specific syscall capability rule
+>>>>>>> origin/jules-880081283500171861-1eb07604
     pub fn block_syscall_rule(&mut self, rule: SandboxRule) {
         self.blocked_rules.insert(rule);
     }
@@ -199,6 +236,7 @@ impl PrivacyFirstSandbox {
         !self.blocked_rules.contains(&rule)
     }
 
+<<<<<<< HEAD
     /// Firejail-style environment variable sanitizer to prevent privilege escalation / variable injections
     pub fn sanitize_environment(&mut self, env_vars: &[(&str, &str)]) {
         let sensitive_prefixes = ["LD_", "RUST_", "PATH", "SHELL", "USER"];
@@ -241,6 +279,59 @@ impl PrivacyFirstSandbox {
     /// Purges all virtualized file modifications inside the sandbox (perfect clean reset)
     pub fn purge_sandbox(&mut self) {
         self.virtual_filesystem_overlay.clear();
+=======
+    /// Sandboxie-style File Virtualization: Write Operation.
+    /// Intercepts path modifications and commits them strictly to the private memory overlay.
+    pub fn virtual_write(&mut self, path: &str, data: Vec<u8>) -> Result<(), &'static str> {
+        if !self.is_active_sandboxed {
+            return Err("Sandbox is inactive, virtual write denied.");
+        }
+        // Firejail-style read-only check
+        if self.readonly_paths.iter().any(|ro| path.starts_with(ro)) {
+            return Err("Access violation: write to a read-only sandboxed path.");
+        }
+        self.overlay_writes.insert(path.to_string(), data);
+        Ok(())
+    }
+
+    /// Sandboxie-style File Virtualization: Read Operation.
+    /// Intercepts path reads. Returns the sandboxed virtual file if modified, otherwise falls back to host.
+    pub fn virtual_read(&self, path: &str, host_content: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if !self.is_active_sandboxed {
+            return Ok(host_content.to_vec());
+        }
+        // Firejail-style private namespace check: hide sensitive files
+        if self.private_paths.iter().any(|priv_path| path.starts_with(priv_path)) {
+            return Err("Access violation: path is marked private in this sandbox namespace.");
+        }
+        if let Some(sandboxed_data) = self.overlay_writes.get(path) {
+            Ok(sandboxed_data.clone())
+        } else {
+            Ok(host_content.to_vec())
+        }
+    }
+
+    /// Discards all virtual overlay writes completely, leaving the host system completely clean.
+    pub fn purge_sandbox(&mut self) {
+        self.overlay_writes.clear();
+    }
+
+    /// Firejail-style environment variable sanitization.
+    /// Strips hazardous environment variables (e.g., LD_PRELOAD, LD_LIBRARY_PATH, path manipulation)
+    /// to prevent dynamic linking injection and process hijacking.
+    pub fn sanitize_env_variables(&self, env: HashMap<String, String>) -> HashMap<String, String> {
+        let blacklisted_vars = [
+            "LD_PRELOAD",
+            "LD_LIBRARY_PATH",
+            "DYLD_INSERT_LIBRARIES",
+            "DYLD_LIBRARY_PATH",
+            "PATH", // Optional security sanitization, but let's restrict to injection vectors
+        ];
+
+        env.into_iter()
+            .filter(|(key, _)| !blacklisted_vars.contains(&key.as_str()))
+            .collect()
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }
 
@@ -264,6 +355,7 @@ mod tests {
     }
 
     #[test]
+<<<<<<< HEAD
     fn test_firejail_execution_profiles() {
         let mut sandbox = PrivacyFirstSandbox::new(600, "crystal-key-888");
 
@@ -317,5 +409,86 @@ mod tests {
         sandbox.purge_sandbox();
         let read_after_purge = sandbox.virtual_read("/etc/hosts", host_etc_hosts);
         assert_eq!(read_after_purge, host_etc_hosts.to_vec());
+=======
+    fn test_sandbox_profiles() {
+        // Strict Browser profile
+        let browser_sandbox = PrivacyFirstSandbox::with_profile(
+            1001,
+            "dilithium-token",
+            SandboxProfile::StrictBrowser,
+        );
+        assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::FSWriteGate));
+        assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::MemoryDbgAttachGate));
+        assert!(browser_sandbox.private_paths.contains("/etc/shadow"));
+
+        // Restricted Office profile
+        let office_sandbox = PrivacyFirstSandbox::with_profile(
+            1002,
+            "dilithium-token",
+            SandboxProfile::RestrictedOffice,
+        );
+        assert!(!office_sandbox.validate_syscall_transition(SandboxRule::NetworkWriteGate));
+        assert!(office_sandbox.validate_syscall_transition(SandboxRule::FSWriteGate)); // Can write locally (or using overlay)
+
+        // ZeroTrust profile
+        let zero_trust_sandbox = PrivacyFirstSandbox::with_profile(
+            1003,
+            "dilithium-token",
+            SandboxProfile::ZeroTrust,
+        );
+        assert!(!zero_trust_sandbox.validate_syscall_transition(SandboxRule::FSReadGate));
+        assert!(!zero_trust_sandbox.validate_syscall_transition(SandboxRule::NetworkReadGate));
+    }
+
+    #[test]
+    fn test_file_virtualization_and_overlays() {
+        let mut sandbox = PrivacyFirstSandbox::with_profile(
+            2001,
+            "dilithium-token",
+            SandboxProfile::StrictBrowser, // Readonly on /lib and /usr/bin, private on /etc/shadow
+        );
+
+        // Standard mock host file contents
+        let host_etc_shadow = b"root:encryptedpasswordhere:12345:0:99999:7:::";
+        let host_profile = b"export PATH=/usr/bin";
+
+        // Virtual writes inside sandbox overlay
+        assert!(sandbox.virtual_write("/home/user/document.txt", b"secret info".to_vec()).is_ok());
+
+        // Check virtual reads (returns overlay write first)
+        let doc_res = sandbox.virtual_read("/home/user/document.txt", b"");
+        assert_eq!(doc_res.unwrap(), b"secret info");
+
+        // Fallback to host content
+        let profile_res = sandbox.virtual_read("/etc/profile", host_profile);
+        assert_eq!(profile_res.unwrap(), host_profile);
+
+        // Access violation for private path
+        let priv_res = sandbox.virtual_read("/etc/shadow", host_etc_shadow);
+        assert!(priv_res.is_err());
+
+        // Access violation for writing to read-only path
+        let ro_write_res = sandbox.virtual_write("/usr/bin/malicious_executable", b"payload".to_vec());
+        assert!(ro_write_res.is_err());
+
+        // Purge sandbox completely clears virtual changes
+        sandbox.purge_sandbox();
+        let doc_after_purge = sandbox.virtual_read("/home/user/document.txt", b"fallback");
+        assert_eq!(doc_after_purge.unwrap(), b"fallback");
+    }
+
+    #[test]
+    fn test_env_variable_sanitization() {
+        let sandbox = PrivacyFirstSandbox::new(3001, "dilithium-token");
+        let mut env = HashMap::new();
+        env.insert("USER".to_string(), "ubuntu".to_string());
+        env.insert("LD_PRELOAD".to_string(), "/tmp/malicious.so".to_string());
+        env.insert("LD_LIBRARY_PATH".to_string(), "/usr/local/lib".to_string());
+
+        let sanitized = sandbox.sanitize_env_variables(env);
+        assert_eq!(sanitized.get("USER").unwrap(), "ubuntu");
+        assert!(!sanitized.contains_key("LD_PRELOAD"));
+        assert!(!sanitized.contains_key("LD_LIBRARY_PATH"));
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }

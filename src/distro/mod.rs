@@ -11,8 +11,11 @@ pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
+<<<<<<< HEAD
 pub mod preseed;
 pub mod linux_bsd_inspirations;
+=======
+>>>>>>> origin/jules-880081283500171861-1eb07604
 
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,

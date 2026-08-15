@@ -22,7 +22,26 @@ pub mod storage;
 pub mod touch_jingos;
 pub mod usb_hid;
 pub mod vesa;
+<<<<<<< HEAD
 pub mod virtio;
+
+// Ubiquitous virtualization & gigabit networking drivers (inspired by Linux & BSD)
+pub mod virtio;
+pub mod intel_e1000;
+
+// Broad PC architecture compatibility drivers
+pub mod legacy_audio_ac97;
+pub mod modern_audio_intel_hda;
+pub mod modern_nvme;
+pub mod modern_usb_printer;
+pub mod modern_wifi;
+pub mod touch_jingos;
+pub mod unified_dma;
+=======
+pub mod boot_init;
+pub mod dde;
+pub mod flipper_gpio_sensor;
+>>>>>>> origin/jules-880081283500171861-1eb07604
 
 // Ubiquitous virtualization & gigabit networking drivers (inspired by Linux & BSD)
 pub mod virtio;
@@ -58,6 +77,22 @@ pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use touch_jingos::TouchJingosDriver;
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+<<<<<<< HEAD
 pub use virtio::{
     VirtioBlkDriver, VirtioDeviceType, VirtioMmioHeader, VirtioNetDriver, VirtioRngDriver,
+=======
+
+// Re-export the newly added virtual and physical standard device drivers
+pub use virtio::{VirtioBlkDriver, VirtioNetDriver, VirtioRngDriver, VirtQueue, VirtioDesc};
+pub use intel_e1000::{IntelE1000Driver, E1000RxDesc, E1000TxDesc};
+pub use legacy_audio_ac97::LegacyAudioAc97;
+pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use modern_nvme::ModernNvmeDriver;
+pub use modern_usb_printer::ModernUsbPrinter;
+pub use modern_wifi::ModernWifiDriver;
+pub use touch_jingos::TouchJingOS;
+pub use unified_dma::{
+    UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
+    DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
+>>>>>>> origin/jules-880081283500171861-1eb07604
 };

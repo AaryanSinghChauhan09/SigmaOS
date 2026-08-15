@@ -34,6 +34,7 @@ pub struct InvocationLayout {
     pub stack_size: usize,        // Bytes required on stack
     pub shadow_space_size: usize, // Windows x64 shadow/home space size
     pub stack_alignment: usize,   // Stack alignment boundary
+<<<<<<< HEAD
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,6 +56,8 @@ pub struct InvocationStackLayout {
     pub stack_cleaning_authority: &'static str,
     pub shadow_space_bytes: usize,
     pub stack_alignment_bytes: usize,
+=======
+>>>>>>> origin/jules-880081283500171861-1eb07604
 }
 
 pub struct ABITranslator {
@@ -70,6 +73,7 @@ impl ABITranslator {
         }
     }
 
+<<<<<<< HEAD
     /// Computes register and stack layouts for a function invocation based on chosen ABI / calling convention
     pub fn compute_invocation_layout(
         &self,
@@ -177,6 +181,133 @@ impl ABITranslator {
     }
 
     pub fn translate_register_map(&self, old_registers: &[u64]) -> Result<Vec<u64>, ()> {
+=======
+    /// Compute exact register map and stack layout for any calling convention
+    pub fn compute_invocation_layout(
+        &self,
+        convention: CallingConvention,
+        args: &[u64_type],
+    ) -> Result<InvocationLayout, &'static str> {
+        let mut layout = InvocationLayout {
+            registers: [0; 8],
+            registers_used: 0,
+            stack_size: 0,
+            shadow_space_size: 0,
+            stack_alignment: 4, // baseline 4-byte stack alignment
+        };
+
+        match convention {
+            CallingConvention::Cdecl | CallingConvention::Stdcall => {
+                // Stack-only conventions
+                layout.stack_size = args.len() * 4; // 32-bit stack slots
+                layout.stack_alignment = 4;
+            }
+            CallingConvention::Fastcall32 => {
+                // First 2 in ECX, EDX. Remaining on stack.
+                let mut reg_idx = 0;
+                let mut stack_idx = 0;
+                for &arg in args {
+                    if reg_idx < 2 {
+                        layout.registers[reg_idx] = arg;
+                        reg_idx += 1;
+                    } else {
+                        stack_idx += 1;
+                    }
+                }
+                layout.registers_used = reg_idx;
+                layout.stack_size = stack_idx * 4;
+                layout.stack_alignment = 4;
+            }
+            CallingConvention::Thiscall => {
+                // First argument in ECX (object pointer / this), remaining on stack.
+                let mut reg_idx = 0;
+                let mut stack_idx = 0;
+                for (i, &arg) in args.iter().enumerate() {
+                    if i == 0 {
+                        layout.registers[0] = arg;
+                        reg_idx = 1;
+                    } else {
+                        stack_idx += 1;
+                    }
+                }
+                layout.registers_used = reg_idx;
+                layout.stack_size = stack_idx * 4;
+                layout.stack_alignment = 4;
+            }
+            CallingConvention::MicrosoftX64 => {
+                // First 4 in RCX, RDX, R8, R9. Remaining on stack.
+                // 32-byte shadow space must be allocated by the caller regardless.
+                let mut reg_idx = 0;
+                let mut stack_idx = 0;
+                for &arg in args {
+                    if reg_idx < 4 {
+                        layout.registers[reg_idx] = arg;
+                        reg_idx += 1;
+                    } else {
+                        stack_idx += 1;
+                    }
+                }
+                layout.registers_used = reg_idx;
+                layout.stack_size = stack_idx * 8;
+                layout.shadow_space_size = 32;
+                layout.stack_alignment = 16; // x64 requires 16-byte alignment
+            }
+            CallingConvention::SystemVAmd64 => {
+                // First 6 in RDI, RSI, RDX, RCX, R8, R9. Remaining on stack.
+                let mut reg_idx = 0;
+                let mut stack_idx = 0;
+                for &arg in args {
+                    if reg_idx < 6 {
+                        layout.registers[reg_idx] = arg;
+                        reg_idx += 1;
+                    } else {
+                        stack_idx += 1;
+                    }
+                }
+                layout.registers_used = reg_idx;
+                layout.stack_size = stack_idx * 8;
+                layout.stack_alignment = 16;
+            }
+            CallingConvention::AArch32AAPCS => {
+                // First 4 in R0-R3. Remaining on stack.
+                let mut reg_idx = 0;
+                let mut stack_idx = 0;
+                for &arg in args {
+                    if reg_idx < 4 {
+                        layout.registers[reg_idx] = arg;
+                        reg_idx += 1;
+                    } else {
+                        stack_idx += 1;
+                    }
+                }
+                layout.registers_used = reg_idx;
+                layout.stack_size = stack_idx * 4;
+                layout.stack_alignment = 8; // AAPCS requires 8-byte stack alignment
+            }
+            CallingConvention::AArch64AAPCS => {
+                // First 8 in X0-X7. Remaining on stack.
+                let mut reg_idx = 0;
+                let mut stack_idx = 0;
+                for &arg in args {
+                    if reg_idx < 8 {
+                        layout.registers[reg_idx] = arg;
+                        reg_idx += 1;
+                    } else {
+                        stack_idx += 1;
+                    }
+                }
+                layout.registers_used = reg_idx;
+                layout.stack_size = stack_idx * 8;
+                layout.stack_alignment = 16; // 16-byte stack alignment
+            }
+        }
+
+        Ok(layout)
+    }
+
+    /// Legacy fallback register map translation
+    pub fn translate_register_map(&self, old_registers: &[u64_type]) -> Result<Vec<u64_type>, ()> {
+>>>>>>> origin/jules-880081283500171861-1eb07604
         let mut modern_registers = Vec::new();
         match self.target_arch {
             CpuArchitecture::X86 | CpuArchitecture::X64 => {
@@ -312,6 +443,7 @@ mod tests {
     }
 
     #[test]
+<<<<<<< HEAD
     fn test_compute_invocation_layout_x86() {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let params = vec![100, 200, 300, 400];
@@ -397,5 +529,43 @@ mod tests {
         ]);
         assert!(aapcs64.stack_params.is_empty());
         assert_eq!(aapcs64.stack_alignment_bytes, 16);
+=======
+    fn test_calling_convention_computations() {
+        let translator = ABITranslator::new(CpuArchitecture::X64);
+        let args = [100, 200, 300, 400, 500, 600, 700];
+
+        // 1. Windows x64 ABI (MicrosoftX64)
+        // First 4 registers: 100, 200, 300, 400. Remaining 3 stack slots.
+        let ms_layout = translator.compute_invocation_layout(CallingConvention::MicrosoftX64, &args).unwrap();
+        assert_eq!(ms_layout.registers_used, 4);
+        assert_eq!(ms_layout.registers[0], 100);
+        assert_eq!(ms_layout.registers[3], 400);
+        assert_eq!(ms_layout.stack_size, 3 * 8); // 3 arguments on stack
+        assert_eq!(ms_layout.shadow_space_size, 32);
+        assert_eq!(ms_layout.stack_alignment, 16);
+
+        // 2. Linux / BSD x64 ABI (SystemVAmd64)
+        // First 6 registers: 100-600. Remaining 1 stack slot.
+        let sysv_layout = translator.compute_invocation_layout(CallingConvention::SystemVAmd64, &args).unwrap();
+        assert_eq!(sysv_layout.registers_used, 6);
+        assert_eq!(sysv_layout.registers[0], 100);
+        assert_eq!(sysv_layout.registers[5], 600);
+        assert_eq!(sysv_layout.stack_size, 1 * 8); // 1 argument on stack
+        assert_eq!(sysv_layout.shadow_space_size, 0);
+    }
+
+    #[test]
+    fn test_arm_aapcs_calling_convention() {
+        let translator = ABITranslator::new(CpuArchitecture::Arm64);
+        let args = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+        // ARM 64-bit: 8 register arguments (X0-X7), 2 on stack.
+        let arm64_layout = translator.compute_invocation_layout(CallingConvention::AArch64AAPCS, &args).unwrap();
+        assert_eq!(arm64_layout.registers_used, 8);
+        assert_eq!(arm64_layout.registers[0], 1);
+        assert_eq!(arm64_layout.registers[7], 8);
+        assert_eq!(arm64_layout.stack_size, 2 * 8);
+        assert_eq!(arm64_layout.stack_alignment, 16);
+>>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }
