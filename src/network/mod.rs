@@ -8,6 +8,10 @@ pub mod tcp;
 pub mod legacy_net;
 pub mod revival;
 pub mod tcp_udp;
+pub mod sync;
+pub mod torrent;
+pub mod pf_firewall;
+pub mod nftables;
 
 pub use analyzer::{
     AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,
