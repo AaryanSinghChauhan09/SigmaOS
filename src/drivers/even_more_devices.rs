@@ -305,8 +305,8 @@ mod tests {
     }
 
     #[test]
-    fn test_ufs4_storage_driver() {
-        let mut ufs = Ufs4StorageDriver::new();
+    fn test_ufs4_flash_memory_driver() {
+        let mut ufs = Ufs4FlashMemoryDriver::new();
         assert_eq!(ufs.name(), "UFS 4.0 Flash Storage Memory");
         assert_eq!(ufs.generation(), DeviceGeneration::Modern);
         assert_eq!(ufs.get_fw(), "");
@@ -363,7 +363,7 @@ mod tests {
             .register_device(Box::new(Sata3Controller::new()))
             .is_ok());
         assert!(manager
-            .register_device(Box::new(Ufs4StorageDriver::new()))
+            .register_device(Box::new(Ufs4FlashMemoryDriver::new()))
             .is_ok());
 
         assert_eq!(manager.device_count(), 12);
@@ -1159,7 +1159,7 @@ impl PeripheralDevice for Sata3Controller {
 }
 
 /// 12. Universal Flash Storage 4.0 (UFS 4.0 mobile storage, up to 4.2 GB/s, MIPI M-PHY v5.0)
-pub struct Ufs4StorageDriver {
+pub struct Ufs4FlashMemoryDriver {
     is_initialized: bool,
     power_state: PowerState,
     lane_link_rate_mbs: u32,
@@ -1167,7 +1167,7 @@ pub struct Ufs4StorageDriver {
     firmware_revision: String,
 }
 
-impl Ufs4StorageDriver {
+impl Ufs4FlashMemoryDriver {
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -1183,7 +1183,7 @@ impl Ufs4StorageDriver {
     }
 }
 
-impl PeripheralDevice for Ufs4StorageDriver {
+impl PeripheralDevice for Ufs4FlashMemoryDriver {
     fn name(&self) -> &'static str {
         "UFS 4.0 Flash Storage Memory"
     }

@@ -304,6 +304,220 @@ impl Default for AppCenter {
     }
 }
 
+// ==========================================
+// Gala Multitasking View (Super+S Workspace Overview)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct WorkspacePreview {
+    pub id: usize,
+    pub title: String,
+    pub window_count: usize,
+}
+
+pub struct GalaMultitaskingView {
+    pub is_active: bool,
+    pub workspaces: Vec<WorkspacePreview>,
+}
+
+impl GalaMultitaskingView {
+    pub fn new() -> Self {
+        let mut view = Self {
+            is_active: false,
+            workspaces: Vec::new(),
+        };
+        view.add_workspace("Main");
+        view
+    }
+
+    pub fn toggle_overview(&mut self) -> bool {
+        self.is_active = !self.is_active;
+        self.is_active
+    }
+
+    pub fn add_workspace(&mut self, title: &str) -> usize {
+        let id = self.workspaces.len();
+        self.workspaces.push(WorkspacePreview {
+            id,
+            title: title.to_string(),
+            window_count: 0,
+        });
+        id
+    }
+
+    pub fn remove_workspace(&mut self, id: usize) -> bool {
+        if self.workspaces.len() > 1 && id < self.workspaces.len() {
+            self.workspaces.remove(id);
+            // Re-index remaining
+            for (idx, ws) in self.workspaces.iter_mut().enumerate() {
+                ws.id = idx;
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for GalaMultitaskingView {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Switchboard System Settings Framework
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct SwitchboardPlug {
+    pub name: String,
+    pub category: String,
+    pub icon_name: String,
+    pub enabled: bool,
+}
+
+pub struct SwitchboardManager {
+    pub plugs: HashMap<String, SwitchboardPlug>,
+}
+
+impl SwitchboardManager {
+    pub fn new() -> Self {
+        let mut mgr = Self {
+            plugs: HashMap::new(),
+        };
+        mgr.register_plug("display", "Display & Graphics", "Hardware", "display-symbolic");
+        mgr.register_plug("network", "Network & VPN", "Hardware", "network-wireless-symbolic");
+        mgr.register_plug("security", "Security & Privacy", "Personal", "security-high-symbolic");
+        mgr
+    }
+
+    pub fn register_plug(&mut self, id: &str, name: &str, category: &str, icon: &str) {
+        self.plugs.insert(
+            id.to_string(),
+            SwitchboardPlug {
+                name: name.to_string(),
+                category: category.to_string(),
+                icon_name: icon.to_string(),
+                enabled: true,
+            },
+        );
+    }
+
+    pub fn get_plugs_by_category(&self, category: &str) -> Vec<SwitchboardPlug> {
+        let mut list = Vec::new();
+        for plug in self.plugs.values() {
+            if plug.category == category {
+                list.push(plug.clone());
+            }
+        }
+        list
+    }
+}
+
+impl Default for SwitchboardManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Gala Picture-in-Picture (PiP) Window Pinning
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct GalaPipPin {
+    pub window_id: u64,
+    pub title: String,
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
+    pub always_on_top: bool,
+}
+
+pub struct GalaPipManager {
+    pub active_pins: Vec<GalaPipPin>,
+}
+
+impl GalaPipManager {
+    pub fn new() -> Self {
+        Self { active_pins: Vec::new() }
+    }
+
+    pub fn pin_window(&mut self, window_id: u64, title: &str, w: u32, h: u32) {
+        self.active_pins.push(GalaPipPin {
+            window_id,
+            title: title.to_string(),
+            x: 50,
+            y: 50,
+            width: w,
+            height: h,
+            always_on_top: true,
+        });
+    }
+
+    pub fn unpin_window(&mut self, window_id: u64) -> bool {
+        if let Some(idx) = self.active_pins.iter().position(|p| p.window_id == window_id) {
+            self.active_pins.remove(idx);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for GalaPipManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Pantheon Housekeeping Automatic File Cleanup
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HousekeepingRetention {
+    Daily = 1,
+    Weekly = 7,
+    Monthly = 30,
+}
+
+pub struct PantheonHousekeeping {
+    pub enabled: bool,
+    pub retention_days: HousekeepingRetention,
+    pub temp_files_deleted_count: u64,
+    pub bytes_freed: u64,
+}
+
+impl PantheonHousekeeping {
+    pub fn new() -> Self {
+        Self {
+            enabled: true,
+            retention_days: HousekeepingRetention::Weekly,
+            temp_files_deleted_count: 0,
+            bytes_freed: 0,
+        }
+    }
+
+    pub fn run_cleanup(&mut self, pending_files_count: u64, total_bytes: u64) -> u64 {
+        if self.enabled {
+            self.temp_files_deleted_count += pending_files_count;
+            self.bytes_freed += total_bytes;
+            total_bytes
+        } else {
+            0
+        }
+    }
+}
+
+impl Default for PantheonHousekeeping {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -394,5 +608,47 @@ mod tests {
         // Correct quantum token opens greeter
         assert!(greeter.authenticate_token(0x9999_FFFF_8888_7777));
         assert!(!greeter.is_locked.load(Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_gala_multitasking_view() {
+        let mut view = GalaMultitaskingView::new();
+        assert!(!view.is_active);
+        assert!(view.toggle_overview());
+        assert_eq!(view.workspaces.len(), 1);
+
+        let ws2 = view.add_workspace("Secondary");
+        assert_eq!(view.workspaces.len(), 2);
+        assert!(view.remove_workspace(ws2));
+        assert_eq!(view.workspaces.len(), 1);
+    }
+
+    #[test]
+    fn test_switchboard_plugs() {
+        let mgr = SwitchboardManager::new();
+        let hardware_plugs = mgr.get_plugs_by_category("Hardware");
+        assert_eq!(hardware_plugs.len(), 2);
+    }
+
+    #[test]
+    fn test_gala_pip_manager() {
+        let mut pip = GalaPipManager::new();
+        pip.pin_window(1001, "Video Player", 320, 240);
+        assert_eq!(pip.active_pins.len(), 1);
+        assert!(pip.active_pins[0].always_on_top);
+
+        assert!(pip.unpin_window(1001));
+        assert_eq!(pip.active_pins.len(), 0);
+    }
+
+    #[test]
+    fn test_pantheon_housekeeping() {
+        let mut hk = PantheonHousekeeping::new();
+        assert_eq!(hk.retention_days, HousekeepingRetention::Weekly);
+
+        let freed = hk.run_cleanup(50, 1024 * 1024 * 100);
+        assert_eq!(freed, 1024 * 1024 * 100);
+        assert_eq!(hk.temp_files_deleted_count, 50);
+        assert_eq!(hk.bytes_freed, 1024 * 1024 * 100);
     }
 }
