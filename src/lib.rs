@@ -27,6 +27,7 @@ pub mod config;
 pub mod container;
 pub mod customization;
 pub mod dashboard;
+pub mod distro;
 pub mod edge;
 pub mod filesystem;
 pub mod functions;
@@ -209,6 +210,12 @@ pub use security::{
     PenetrationAssistant, secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
     FileIntegrityGuard, MalwareSignature, RootkitDetector, ScanVerdict, SovereignMalwareEngine,
     ThreatSeverity, ThreatType, YaraSignatureMatcher,
+};
+pub use distro::{
+    RhelSubscriptionEntitlementManager, SubscriptionPool, EntitlementCertificate,
+    DebianDpkgDbSimulator, DpkgPackageStatus, DpkgPackageRecord,
+    AlpineApkOverlayEngine, ApkOverlayFile,
+    SystemdCgroupGovernor, CgroupV2Limits, CgroupV2Accounting,
 };
 pub use security::hardening;
 pub use shell::{ShellCommand, ShellRepl};
