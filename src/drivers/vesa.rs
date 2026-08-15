@@ -337,20 +337,31 @@ impl VesaDriver {
 }
 
 impl PeripheralDeviceTrait for VesaDriver {
-    fn device_id(&self) -> u32 {
-        self.device_id
+    fn name(&self) -> &'static str {
+        "VESA BIOS Extension Framebuffer"
     }
 
     fn generation(&self) -> DeviceGeneration {
         DeviceGeneration::Legacy
     }
 
-    fn power_state(&self) -> PowerState {
-        PowerState::On // VESA is always on when initialized
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.initialize().map_err(|_| "VESA initialization failed")
+    }
+
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
+        Ok(0)
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        Ok(data.len())
     }
 
     fn set_power_state(&mut self, _state: PowerState) -> Result<(), &'static str> {
-        // VESA doesn't support power state changes in this minimal implementation
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
         Ok(())
     }
 }

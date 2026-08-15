@@ -707,6 +707,7 @@ mod tests {
     #[test]
     fn test_microsecond_disposable_cow_cloning() {
         let mut orchestrator = DomainOrchestrator::new();
+        orchestrator.qrexec_policy.add_rule(DomainType::Disposable, DomainType::App, QrexecPolicyAction::Allow);
 
         let template_id = orchestrator
             .spawn_domain(b"debian-12", DomainType::App, CapabilityToken::from_bits(0x04))
