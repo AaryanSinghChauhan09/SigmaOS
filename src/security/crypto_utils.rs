@@ -132,8 +132,18 @@ pub fn hash_password_placeholder(password: &str, salt: &[u8; 16]) -> [u8; 32] {
     let mut hash = [0u8; 32];
     let password_bytes = password.as_bytes();
     
-    for i in 0..32 {
-        hash[i] = password_bytes[i % password_bytes.len()] ^ salt[i % 16];
+    // Performance optimization: Replace the index-modulo loop (R1-Bolt-optimization)
+    // with a single-pass iterator chain using `.iter().cycle()`.
+    // This completely eliminates:
+    // 1. Division/modulo instructions (`% password_bytes.len()`, `% 16`), which cost 10-40 cycles.
+    // 2. Bounds checking insertions, allowing compiler auto-vectorization and clean unrolling.
+    let mut pwd_cycle = password_bytes.iter().cycle();
+    let mut salt_cycle = salt.iter().cycle();
+
+    for h_byte in hash.iter_mut() {
+        if let (Some(&p_b), Some(&s_b)) = (pwd_cycle.next(), salt_cycle.next()) {
+            *h_byte = p_b ^ s_b;
+        }
     }
     
     hash
