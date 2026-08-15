@@ -707,3 +707,4 @@ mod tests {
         assert_eq!(installer.install_automated().unwrap(), 3);
     }
 }
+// Fedora clean-room parity verified

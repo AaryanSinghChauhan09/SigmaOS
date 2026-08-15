@@ -9,7 +9,21 @@ pub mod legacy_adapters;
 pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod zorin;
+pub mod wasm_sandbox;
+pub mod absorb_tools;
+pub mod tiny_core;
+pub mod apache_ossie;
+pub mod sovereign_suite;
+pub mod gentoo;
+pub mod legacy_adapters;
+pub mod fedora;
+pub mod cachy_os;
+
+pub use legacy_adapters::{KernelPersona, SyscallAbi};
+pub use cross_platform::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+};
 
 pub use legacy_adapters::{
     APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
@@ -110,6 +124,14 @@ pub use sovereign_suite::{
     CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
-pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
-pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
-pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};
+
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel, FedoraAluFlags,
+    FedoraAlu, SeLinuxContext, SeLinuxEngine, SystemdPresetConfigurator, AnacondaInstaller,
+};
+
+pub use cachy_os::{
+    BoreSchedulerGovernor, AnanicyManager, SchedPolicy, V4OptimizedPackageManager,
+    CachyInitramfs,
+};

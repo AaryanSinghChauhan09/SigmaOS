@@ -279,7 +279,6 @@ impl TerminalSession {
 
     // =========================================================================
     // CROSS-PLATFORM COMMAND TRANSLATION LAYER
-    // =========================================================================
 
     /// Translates standard Bash, PowerShell, or BSD shell commands into native SigmaOS commands
     pub fn translate_shell_script(&self, script: &str, source_shell: &str) -> String {

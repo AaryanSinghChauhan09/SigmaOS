@@ -55,7 +55,6 @@ pub struct Inode {
     // Conforming Linux/BSD additions
     pub link_count: u32,
     pub hard_links_count: u32,
-    pub link_count: u32,
     pub symlink_target: Option<String>,
     pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
@@ -76,7 +75,6 @@ impl Inode {
             capabilities: CapabilityToken::new(),
             link_count: 1,
             hard_links_count: 1,
-            link_count: 1,
             symlink_target: None,
             xattrs: HashMap::new(),
             data: Vec::new(),

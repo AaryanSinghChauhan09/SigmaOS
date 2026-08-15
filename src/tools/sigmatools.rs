@@ -1025,9 +1025,9 @@ impl SovereignPasswordGenerator {
         for _ in 0..length {
             seed = seed.wrapping_mul(1103515245).wrapping_add(12345);
             let selection_pool: &[u8] = if include_symbols && (seed % 3 == 0) {
-                symbols
+                &symbols[..]
             } else {
-                letters
+                &letters[..]
             };
             let idx = (seed as usize) % selection_pool.len();
             password.push(selection_pool[idx] as char);

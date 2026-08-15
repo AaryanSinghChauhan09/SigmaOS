@@ -20,7 +20,7 @@ pub enum PlaybackState {
 pub enum MediaFormat {
     Mp3,
     Wav,
-    Ogg,
+    Flac,
 }
 
 pub struct AudioChannel {
@@ -32,9 +32,7 @@ pub struct SigmaMediaEngine {
     pub channels: [AudioChannel; MAX_AUDIO_CHANNELS],
     pub master_mute: AtomicBool,
     pub state: PlaybackState,
-    pub active_track: Option<String>,
-    pub format: Option<MediaFormat>,
-    pub duration_seconds: usize,
+    pub has_track: bool,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -62,9 +60,7 @@ impl SigmaMediaEngine {
             ],
             master_mute: AtomicBool::new(false),
             state: PlaybackState::Stopped,
-            active_track: None,
-            format: None,
-            duration_seconds: 0,
+            has_track: false,
         }
     }
 

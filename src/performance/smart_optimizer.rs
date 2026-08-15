@@ -1,6 +1,5 @@
-use core::sync::atomic::{AtomicBool, AtomicUsize, AtomicU8, Ordering};
-use crate::process::{Process, ProcessState};
-use crate::Priority;
+use crate::kernel::{Priority, Process, ProcessState};
+use core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 
 // 1. CPU Core Thread-Priority Optimizer
 
@@ -229,6 +228,7 @@ pub static GLOBAL_GLARY_RULE: GlarySmartRule = GlarySmartRule;
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
     use super::*;
 
     #[test]

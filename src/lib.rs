@@ -29,10 +29,7 @@ pub mod resource;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub mod thread;
 pub mod tools;
-pub mod unimplemented_features;
-pub mod unimplemented_tools;
 pub mod virtualization;
 
 pub mod graphics {
@@ -82,38 +79,32 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
-    CorebootGatewayMesh, DACConstellation, DeferredProcedureCall, DotMatrixMesh,
-    DriverArchiveGridV2, EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine,
-    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, FhsConventionStatus,
-    FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, HistoricError,
-    HistoricSyscallEmulator, HistoricalCpuState, IdtEntry, Idtr, Irql, IrqlController,
-    KernelConstellationGrid, Kpcr, Kpcrb, LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LfsToolchainBuilder, LinuxEra,
-    LsbProfile, MemoryArch, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
-    PageAccessMode, PageDirectory, PageTableEntry, PairingState, PeripheralArchiveMesh,
-    PicKeyboardController, PosixComplianceLevel, ProcessAlmanacHub, ProtectedModeSwitchSimulator,
-    SELinuxConstellation, SecurityConstellation, SovereignKernelInternals,
-    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, SystemServiceTable,
-    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, UmsContext, UmsThreadState,
-    VgaTextModeDriverSimulator, VintageDriverTranslator, VintagePackageConverter,
-    VintageVirtualizationSandbox, WelcomeTab as EosWelcomeTab, YayAurHelper,
-    ZeroTrustConstellation, ZorinChameleonEngine, ZorinConnectManager, ZorinLayoutSwitcher,
-    ZorinLayoutType, ZorinWindowsAppSupport,
-};
-pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AnanicyManager,
+    AnacondaInstaller, AntixControlCenter, AntixDesktopProfiler, AntixInitManager, AppSuiteBundle,
+    AppSuiteType, ApplicationBinary, BinaryCompatMatrix, BinaryFormat, BodhiUpdateTriage,
+    BoreSchedulerGovernor, BrailleMatrix, BsdJailSandbox, BundleType, CachyInitramfs,
+    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError,
+    CompatibilityLayer, CompatibilityManager, CompatibilityMode, ContainerRuntime,
+    ContinuityCoordinator, DesktopMode, DesktopProfile, DesktopTheme, DiscontinuedFS,
+    DistroReleaseChannel, DnfPackageResolver, DriverBridge, EcosystemSnapshot, FSRevival,
+    FedoraAlu, FedoraAluFlags, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, KojiBuildServer, LanguageTranslationCatalog,
+    LegacyBus, LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
+    MicroService, MicroServiceState, MockChrootBuilder, NetworkBridge, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SeLinuxContext, SeLinuxEngine, SchedPolicy, SigmaChangeProposal,
+    SigmaChangeProcessEngine, SigmaContainer, SigmaNextChannel, SnapshotManager, StorageBridge,
+    SuiteRegistry, SyscallAbi, SystemdPresetConfigurator, TargetPlatform, TranslationLayer,
+    TribeInstaller, TtsSynthesizer, UnifiedAppStore, V4OptimizedPackageManager, WorkloadOptimizer,
+    WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
 };
 pub use distro::{
-    AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
-    ReflectorMirrorManager, YayParuHelper,
+    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
+    PinRule, AptPinStore, OpenRCService,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
@@ -204,14 +195,22 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
-    IsolationError, Permission, PledgeManager, PledgePromise,
-    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
-};
-pub use shell::{
-    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
+    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
+    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
+    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
+    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use shell::{ShellCommand, ShellRepl};
+pub use tools::{
+    AccessibilityFeature, AlmeidaCmosRtc, AlmeidaCoreDump, ClusterNode, NodeState, SigmaAccess,
+    SigmaCluster, SigmaDeploy, SigmaIdentity, SigmaMonitor, SigmaPatch, SigmaRescue, SigmaToolError,
+    SovereignAptDuo, SovereignDpkgEtcher, SovereignIPCalculator, SovereignImeConvertCase,
+    SovereignImageToDataUri, SovereignJsonPrettifier, SovereignKeyboardTester, SovereignIsWebsiteDown,
+    SovereignPasswordGenerator, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity,
+};
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter, FileState,
     FileTransactionEntry, MirrorNode, PackageDependencyResolver,
