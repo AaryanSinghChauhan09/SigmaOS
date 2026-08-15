@@ -152,7 +152,7 @@ Implements Parrot OS-inspired features:
 
 ## Code Scanning & Compliance
 
-Security alerts are tracked at:  
+Security alerts are tracked at:
 https://github.com/AaryanSinghChauhan09/SigmaOS/security/code-scanning
 
 ### Alert Categories Fixed
