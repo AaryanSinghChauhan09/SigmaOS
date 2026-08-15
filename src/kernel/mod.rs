@@ -3,6 +3,7 @@ pub mod architecture;
 pub mod breakthroughs;
 pub mod ipc;
 pub mod linux_absorb;
+pub mod linux_parity;
 pub mod memory;
 pub mod policy_mechanism;
 pub mod sched;
@@ -23,6 +24,10 @@ pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_bsd_innovations::{
     BsdPfStateTable, FreeBsdVfsNullfs, FutexOp, FutexWaiter, LinuxFutexEngine,
     PfFiveTuple, PfStateEntry, SovereignCgroupGovernor, CgroupResourceLimits,
+};
+pub use linux_parity::{
+    BpfLsmPolicyGovernor, CompletionQueueEntry, KernelIoUringEngine, LsmHookType,
+    MemfdSecretGuard, PageFolio, PageFolioCacheManager, SubmissionQueueEntry,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use meta::{

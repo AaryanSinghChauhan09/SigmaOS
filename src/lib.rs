@@ -1,13 +1,12 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod ai;
-pub mod klib;
 pub mod accessibility;
+pub mod ai;
 pub mod automation;
+pub mod boot;
 pub mod compatibility;
 pub mod customization;
-pub mod distro;
 pub mod dashboard;
 pub mod desktop;
 pub mod device;
@@ -25,7 +24,6 @@ pub mod network;
 pub mod orchestration;
 pub mod package;
 pub mod performance;
-
 pub mod process;
 pub mod productivity;
 pub mod resilience;
@@ -55,7 +53,6 @@ pub mod ai {
     pub mod agent;
     pub mod orchestrator;
 }
-pub mod boot;
 pub mod toolchain {
     pub mod adapter;
     pub mod bootstrap;
@@ -114,11 +111,6 @@ pub use customization::{
 pub use distro::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
     PinRule, AptPinStore, OpenRCService,
-};
-pub use dashboard::{
-    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
-};
-pub use distro::{
     AdminAction, AiSysAdmin, AppManifest, AuditResult, AuditRule, BackupSnapshot, BackupSystem,
     BountyStatus, BugBountyProgram, BugBountyReport, BuildJob, BuildStatus, CanFrame,
     CertificationStatus, CommunityConference, ComplianceAuditor, ComponentType, ConferenceTalk,
@@ -133,6 +125,9 @@ pub use distro::{
     RescueISOManager, SoftwareCertificationProgram, SovereignP2PSync, TargetArch,
     TimeTravelCheckpoint, TimeTravelEngine, WikiPage, Win32Gdi, WindowsRegistry,
 };
+pub use dashboard::{
+    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
 pub use drivers::{
     E1000RxDescriptor, E1000TxDescriptor, GpuCommand, GpuDriver, GpuError, HidError,
     HidKeyboardEvent, HidReportType, InputDriver, InputEvent, InputType, IntelE1000Driver,
@@ -140,19 +135,13 @@ pub use drivers::{
     ModernWifiDriver, NetworkCommand, NetworkDriver, NetworkError, NetworkType, StorageCommand,
     StorageDriver, StorageError, StorageType, TouchJingosDriver, UsbHidDriver, VesaDriver,
     VesaError, VesaModeInfo, VirtioBlkDriver, VirtioDeviceType, VirtioMmioHeader, VirtioNetDriver,
-    VirtioRngDriver,
+    VirtioRngDriver, UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
+    DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
+};
 
 pub use desktop::{
     Notification, SimpleNotification, NotificationManager, SimpleNotificationManager,
     NotificationUrgency, NotificationError,
-};
-pub use drivers::{
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
-    UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
-    DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -165,15 +154,16 @@ pub use ipc::{
 };
 pub use kernel::{
     sched::{DragonFlySmpQueueManager, LwktMessage, PowerGovernor, SovereignGameMode, UksmPageDeduplicator},
-    ABIManager, AcpiInterruptManager, AiNativeRuntime, BuddyAllocator, Channel,
-    EnergyAwareScheduler, FastPathIpc, GapError, Generation, GenerationManager, InterruptMechanism,
-    IpcError, IpcManager, IrqRoutingTable, JournalBlock, JournalState, KernelGraph, KernelPersona,
-    KernelPlugin, KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel,
-    MetadataJournal, MicroDriver, NetPod, Pml4PageTableEntry, PolicyError, PolicyManager, Priority,
-    PrivacyFirstSandbox, PrivilegeLevel, Process, ProcessState, ProtectionDomain, ResourceBroker,
-    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel,
-    SigmaFsPlusPlus, UniversalAbiTranslator, UserDefinedKernelFunctions,
-    VirtualMemoryPagingManager, PAGE_SIZE,
+    ABIManager, AcpiInterruptManager, AiNativeRuntime, BpfLsmPolicyGovernor, BuddyAllocator, Channel,
+    CompletionQueueEntry, EnergyAwareScheduler, FastPathIpc, GapError, Generation, GenerationManager,
+    InterruptMechanism, IpcError, IpcManager, IrqRoutingTable, JournalBlock, JournalState,
+    KernelGraph, KernelIoUringEngine, KernelPersona, KernelPlugin, KernelPluginManager,
+    LegacyScheduler, LsmHookType, MemfdSecretGuard, MemoryBlock, Message, MetaKernel, MetadataJournal,
+    MicroDriver, NetPod, PageFolio, PageFolioCacheManager, Pml4PageTableEntry, PolicyError,
+    PolicyManager, Priority, PrivacyFirstSandbox, PrivilegeLevel, Process, ProcessState,
+    ProtectionDomain, ResourceBroker, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError,
+    SelfHealingKernel, SigmaFsPlusPlus, SubmissionQueueEntry, UniversalAbiTranslator,
+    UserDefinedKernelFunctions, VirtualMemoryPagingManager, PAGE_SIZE,
 };
 pub use legal::{
     ComplianceCert as LegalComplianceCert, ComplianceStatus as LegalComplianceStatus,
@@ -188,8 +178,8 @@ pub use network::{
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
-    SimpleObservabilityStack,
-    CognitiveOSNarrator, AdaptiveComplianceGater, SynestheticFeedbackEngine, GenerativeConfigParser, InterplanetaryDtnRoute, CollectiveSimulationNode,
+    SimpleObservabilityStack, CognitiveOSNarrator, AdaptiveComplianceGater, SynestheticFeedbackEngine,
+    GenerativeConfigParser, InterplanetaryDtnRoute, CollectiveSimulationNode,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -223,12 +213,9 @@ pub use security::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
     HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
     GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
-
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
-    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
-    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
-    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
-    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    CronDaemon, CronJob, DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock,
+    IptablesFirewall, KaliError, MaliciousSignature, PluggableAuthenticationModule,
+    SandboxPolicy, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use shell::{ShellCommand, ShellRepl};
@@ -258,47 +245,6 @@ pub use thread::management::{
     ThreadManager, ThreadState as LibThreadState,
 };
 
-// #[cfg(test)]
-// #[path = "compatibility/fedora.rs"]
-// pub mod fedora_compat_test;
-// pub mod customization;
-// pub mod dashboard;
-// pub mod desktop;
-// pub mod device;
-// pub mod driver;
-// pub mod filesystem;
-// pub mod ml;
-// pub mod network;
-// pub mod observability;
-// pub mod orchestration;
-// pub mod distro;
-// pub mod package;
-// pub mod performance;
-// pub mod productivity;
-// pub mod remote;
-// pub mod resilience;
-// pub mod shell;
-// pub mod sigpkg;
-// pub mod virtualization;
-// pub mod graphics {
-//     pub mod compositor;
-//     pub mod paint;
-//     pub mod video;
-// }
-// pub mod hardware {
-//     pub mod compatibility;
-//     pub mod win32;
-// }
-// pub mod power {
-//     pub mod governor;
-// }
-// pub mod ai {
-//     pub mod agent;
-//     pub mod orchestrator;
-// }
-// pub mod boot;
-// pub mod system;
-// pub mod installer;
 pub use process::spawn::{
     Process, ProcessError, ProcessGroup, ProcessID, ProcessSpawner,
     ProcessState as LibProcessState, ProcessWaiter, SimpleProcess, SimpleProcessGroup,
@@ -309,9 +255,7 @@ pub use tools::{
     AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
     NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
     SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
-    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
-    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
-    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    SigmaToolError as LibSigmaToolError,
     UserIdentity as LibUserIdentity,
 };
 

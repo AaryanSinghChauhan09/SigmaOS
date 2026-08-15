@@ -1,21 +1,21 @@
-#![no_std]
-
 /// OOP-based UEFI Bootloader with Secure Boot database checking and TPM Measured Boot for SigmaOS
-
-/// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 
 extern crate alloc;
+
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BootStatus = usize;
 
-#[repr(C)]
-
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
+pub enum BootPhase {
+    Init = 0,
+    LoadKernel = 1,
+    Handoff = 2,
+    Complete = 3,
+}
 
 impl BootPhase {
     pub fn from_usize(val: usize) -> Self {
@@ -36,27 +36,33 @@ pub enum BootError {
     LoadFailed = 1,
     HandoffFailed = 2,
     SignatureInvalid = 3,
+    Revoked = 4,
 }
 
 /// Simulated raw UEFI Memory Descriptor conforming to UEFI spec
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootError {
-    Success = 0,
-    LoadFailed = 1,
-    HandoffFailed = 2,
+pub struct UefiMemoryDescriptor {
+    pub memory_type: u32,
+    pub physical_start: u64,
+    pub virtual_start: u64,
+    pub number_of_pages: u64,
+    pub attribute: u64,
 }
-
-pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2, Revoked = 3 }
 
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
+    fn load_kernel(&mut self, kernel_data: &[u8]) -> Result<BootStatus, BootError>;
+    /// # Safety
+    /// `kernel_raw` and `destination` must point to valid memory regions of at least `size` bytes.
     unsafe fn load_kernel_raw(
         &mut self,
         kernel_raw: *const u8,
         size: usize,
         destination: *mut u8,
     ) -> Result<BootStatus, BootError>;
+    /// # Safety
+    /// `map_ptr` must point to `descriptor_count` valid `UefiMemoryDescriptor` structures.
     unsafe fn parse_uefi_memory_map(
         &self,
         map_ptr: *const UefiMemoryDescriptor,
@@ -65,19 +71,19 @@ pub trait UEFIBootloader {
     fn handoff(&mut self) -> Result<BootStatus, BootError>;
 }
 
-/// Complete UEFI Bootloader Implementation with Raw Pointer Memory Handling
+/// Complete UEFI Bootloader Implementation with Boundary-Checked Memory Handling
 #[repr(C)]
 pub struct SimpleUEFIBootloader {
-    pub phase: AtomicU32,
-    pub kernel_loaded: AtomicU32,
+    pub phase: AtomicUsize,
+    pub kernel_loaded: AtomicUsize,
     pub secure_boot_active: bool,
 }
 
 impl SimpleUEFIBootloader {
     pub fn new() -> Self {
         SimpleUEFIBootloader {
-            phase: AtomicU32::new(BootPhase::Init as u32),
-            kernel_loaded: AtomicU32::new(0),
+            phase: AtomicUsize::new(BootPhase::Init as usize),
+            kernel_loaded: AtomicUsize::new(0),
             secure_boot_active: true,
         }
     }
@@ -91,16 +97,6 @@ impl Default for SimpleUEFIBootloader {
 
 impl UEFIBootloader for SimpleUEFIBootloader {
     fn phase(&self) -> BootPhase {
-        let val = self.phase.load(Ordering::SeqCst);
-        match val {
-            0 => BootPhase::Init,
-            1 => BootPhase::LoadKernel,
-            2 => BootPhase::Handoff,
-            _ => BootPhase::Complete,
-        }
-    }
-    fn load_kernel(&mut self, _kernel_data: &[u8]) -> Result<BootStatus, BootError> {
-
         BootPhase::from_usize(self.phase.load(Ordering::SeqCst))
     }
 
@@ -110,24 +106,35 @@ impl UEFIBootloader for SimpleUEFIBootloader {
         }
         self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
         self.kernel_loaded.store(1, Ordering::SeqCst);
-        Ok(1)
+        Ok(kernel_data.len())
     }
 
-    fn handoff(&mut self) -> Result<BootStatus, BootError> {
-        if self.kernel_loaded.load(Ordering::SeqCst) == 0 {
+    /// Safely copy raw kernel bytes into destination buffer
+    ///
+    /// # Safety
+    /// `kernel_raw` and `destination` must be valid, non-null, non-overlapping pointers for `size` bytes.
+    unsafe fn load_kernel_raw(
+        &mut self,
+        kernel_raw: *const u8,
+        size: usize,
+        destination: *mut u8,
+    ) -> Result<BootStatus, BootError> {
+        if kernel_raw.is_null() || destination.is_null() || size == 0 {
             return Err(BootError::LoadFailed);
         }
 
-        // Copy raw memory non-overlapping
+        // Copy raw memory non-overlapping safely
         core::ptr::copy_nonoverlapping(kernel_raw, destination, size);
 
-        self.phase
-            .store(BootPhase::LoadKernel as u32, Ordering::SeqCst);
+        self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
         self.kernel_loaded.store(1, Ordering::SeqCst);
         Ok(size)
     }
 
     /// Iterates across raw UEFI memory map descriptors to calculate total available physical pages
+    ///
+    /// # Safety
+    /// `map_ptr` must be non-null and point to an array of `descriptor_count` valid `UefiMemoryDescriptor` instances.
     unsafe fn parse_uefi_memory_map(
         &self,
         map_ptr: *const UefiMemoryDescriptor,
@@ -139,7 +146,6 @@ impl UEFIBootloader for SimpleUEFIBootloader {
 
         let mut total_pages = 0;
         for i in 0..descriptor_count {
-            // Raw offset dereference
             let desc = *map_ptr.add(i);
             // Type 7 is EfiConventionalMemory (Available RAM)
             if desc.memory_type == 7 {
@@ -153,10 +159,8 @@ impl UEFIBootloader for SimpleUEFIBootloader {
         if self.kernel_loaded.load(Ordering::SeqCst) == 0 {
             return Err(BootError::HandoffFailed);
         }
-        self.phase
-            .store(BootPhase::Handoff as u32, Ordering::SeqCst);
-        self.phase
-            .store(BootPhase::Complete as u32, Ordering::SeqCst);
+        self.phase.store(BootPhase::Handoff as usize, Ordering::SeqCst);
+        self.phase.store(BootPhase::Complete as usize, Ordering::SeqCst);
         Ok(1)
     }
 }
@@ -211,6 +215,12 @@ impl UefiDatabase {
     }
 }
 
+impl Default for UefiDatabase {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // TPM Platform Configuration Registers (Measured Boot)
 pub struct TpmMeasuredBoot {
     pub pcrs: [u32; 16],
@@ -224,21 +234,20 @@ impl TpmMeasuredBoot {
     pub fn extend_pcr(&mut self, pcr_idx: usize, val: u32) {
         if pcr_idx < 16 {
             let mut current = self.pcrs[pcr_idx];
-            current = current ^ val;
+            current ^= val;
             current = current.wrapping_mul(16777619);
             self.pcrs[pcr_idx] = current;
         }
     }
 }
 
-pub trait SecureBoot {
-    fn verify_signature(&self, data: &[u8], expected_signature: &[u8]) -> Result<bool, BootError>;
-    fn sign(&self, data: &[u8]) -> Result<Vec<u8>, BootError>;
+impl Default for TpmMeasuredBoot {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-/// Simulated Cryptographic Secure Boot Verification Engine
-#[repr(C)]
-
+pub trait SecureBoot {
     fn verify_signature(&self, data: &[u8], key_id: u32) -> Result<bool, BootError>;
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, BootError>;
 }
@@ -253,6 +262,8 @@ impl SimpleSecureBoot {
     pub fn new() -> Self {
         SimpleSecureBoot {
             bootloader: SimpleUEFIBootloader::new(),
+            db: UefiDatabase::new(),
+            tpm: TpmMeasuredBoot::new(),
         }
     }
 }
@@ -264,32 +275,11 @@ impl Default for SimpleSecureBoot {
 }
 
 impl SecureBoot for SimpleSecureBoot {
-    fn verify_signature(&self, data: &[u8]) -> Result<bool, BootError> {
+    fn verify_signature(&self, data: &[u8], key_id: u32) -> Result<bool, BootError> {
         if data.is_empty() {
             return Err(BootError::LoadFailed);
         }
 
-        // Verify image signature block or header structure:
-        // Support DOS MZ header (0x4D, 0x5A), ELF header (0x7F, b'E', b'L', b'F'), or valid signed block checksum
-        let has_dos_hdr = data.len() >= 2 && data[0] == 0x4D && data[1] == 0x5A;
-        let has_elf_hdr = data.len() >= 4 && data[0] == 0x7F && data[1] == b'E' && data[2] == b'L' && data[3] == b'F';
-
-        let checksum: u32 = data.iter().fold(0u32, |acc, &x| acc.wrapping_add(x as u32));
-
-        if has_dos_hdr || has_elf_hdr || checksum % 2 == 0 || data.len() >= 4 {
-            Ok(true)
-        } else {
-            Err(BootError::LoadFailed)
-        }
-
-            db: UefiDatabase::new(),
-            tpm: TpmMeasuredBoot::new(),
-        }
-    }
-}
-
-impl SecureBoot for SimpleSecureBoot {
-    fn verify_signature(&self, data: &[u8], key_id: u32) -> Result<bool, BootError> {
         // Hash data (simple deterministic checksum for #![no_std])
         let mut hash = [0u8; 32];
         for (i, &byte) in data.iter().enumerate() {
@@ -309,49 +299,6 @@ impl SecureBoot for SimpleSecureBoot {
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_uefi_bootloader_lifecycle() {
-        let mut loader = SimpleUEFIBootloader::new();
-        assert_eq!(loader.phase(), BootPhase::Init);
-        assert!(loader.load_kernel(&[0x90, 0x90, 0xCC]).is_ok());
-        assert_eq!(loader.phase(), BootPhase::LoadKernel);
-        assert!(loader.handoff().is_ok());
-        assert_eq!(loader.phase(), BootPhase::Complete);
-    }
-
-    #[test]
-    fn test_simple_secure_boot_signing_and_verification() {
-        let sb = SimpleSecureBoot::new();
-        let payload = [0x4D, 0x5A, 0x90, 0x00]; // DOS MZ PE header
-        let sig = sb.sign(&payload).unwrap();
-        assert_eq!(sig.len(), 4);
-        assert_eq!(sig[0], 0x8F);
-        assert!(sb.verify_signature(&payload).unwrap());
-
-        // Empty data fails
-        assert!(sb.verify_signature(&[]).is_err());
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -366,6 +313,56 @@ mod tests {
 
         boot.handoff().unwrap();
         assert_eq!(boot.phase(), BootPhase::Complete);
+    }
+
+    #[test]
+    fn test_uefi_raw_kernel_and_memory_map_parsing() {
+        let mut boot = SimpleUEFIBootloader::new();
+        let src_kernel = [0x90u8, 0x90, 0xCC, 0xC3];
+        let mut dst_kernel = [0u8; 4];
+
+        unsafe {
+            let loaded = boot
+                .load_kernel_raw(src_kernel.as_ptr(), 4, dst_kernel.as_mut_ptr())
+                .unwrap();
+            assert_eq!(loaded, 4);
+            assert_eq!(dst_kernel, src_kernel);
+        }
+
+        let descriptors = [
+            UefiMemoryDescriptor {
+                memory_type: 7, // EfiConventionalMemory
+                physical_start: 0x100000,
+                virtual_start: 0x100000,
+                number_of_pages: 256,
+                attribute: 0,
+            },
+            UefiMemoryDescriptor {
+                memory_type: 1, // Reserved
+                physical_start: 0x200000,
+                virtual_start: 0x200000,
+                number_of_pages: 128,
+                attribute: 0,
+            },
+        ];
+
+        unsafe {
+            let total_pages = boot.parse_uefi_memory_map(descriptors.as_ptr(), descriptors.len());
+            assert_eq!(total_pages, 256);
+        }
+    }
+
+    #[test]
+    fn test_tpm_pcr_measurements() {
+        let mut tpm = TpmMeasuredBoot::new();
+        assert_eq!(tpm.pcrs[0], 0);
+
+        tpm.extend_pcr(0, 0xDEADBEEF);
+        assert_ne!(tpm.pcrs[0], 0);
+
+        let prev = tpm.pcrs[0];
+        tpm.extend_pcr(0, 0xCAFEBABE);
+        assert_ne!(tpm.pcrs[0], prev);
     }
 
     #[test]
