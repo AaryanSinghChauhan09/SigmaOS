@@ -3,9 +3,14 @@ pub mod capability;
 pub mod defensive_audit;
 pub mod parrot;
 pub mod pledge;
+pub mod unveil;
+pub mod selinux;
 pub mod vulnerability;
 pub mod hardening;
 pub mod deobfuscation;
+pub mod securelevels;
+pub mod pam;
+pub mod crypto_utils;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use defensive_audit::{
@@ -17,3 +22,7 @@ pub use parrot::{
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
+pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
+pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
