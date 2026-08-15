@@ -114,8 +114,7 @@ impl TceLoader {
         for (_path, content) in &files {
             let file_id = vfs.create_file(FileType::Regular, 0).map_err(|_| "Failed to create VFS node")?;
             let fd = vfs.open_file(file_id, 0).map_err(|_| "Failed to open loop mount node")?;
-            let content_bytes: &[u8] = content.as_bytes();
-            vfs.write_file(fd, content_bytes).map_err(|_| "Failed to write loop mount content")?;
+            vfs.write_file(fd, content.as_bytes()).map_err(|_| "Failed to write loop mount content")?;
             vfs.close_file(fd).map_err(|_| "Failed to close loop mount fd")?;
         }
 
@@ -176,13 +175,11 @@ impl FiletoolOverlay {
         // Pack files in mydata.tgz format
         for (path, content) in &self.ram_changes {
             compressed_archive.push(b'[');
-            let path_bytes: &[u8] = path.as_bytes();
-            for &b in path_bytes {
+            for &b in path.as_bytes() {
                 compressed_archive.push(b);
             }
             compressed_archive.push(b':');
-            let content_bytes: &[u8] = content.as_bytes();
-            for &b in content_bytes {
+            for &b in content.as_bytes() {
                 compressed_archive.push(b);
             }
             compressed_archive.push(b']');
@@ -249,8 +246,7 @@ impl FrugalLoader {
             for (_path, content) in &self.filetool.ram_changes {
                 let file_id = vfs.create_file(FileType::Regular, 0).map_err(|_| "Failed to restore file")?;
                 let fd = vfs.open_file(file_id, 0).map_err(|_| "Failed to open restored file")?;
-                let content_bytes: &[u8] = content.as_bytes();
-                vfs.write_file(fd, content_bytes).map_err(|_| "Failed to write restored content")?;
+                vfs.write_file(fd, content.as_bytes()).map_err(|_| "Failed to write restored content")?;
                 vfs.close_file(fd).map_err(|_| "Failed to close restored fd")?;
             }
         }
