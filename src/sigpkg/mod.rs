@@ -8,10 +8,9 @@ pub mod transaction;
 pub mod verifier;
 pub mod rpm_compat;
 pub mod universal_adapter;
-pub mod importer;
+pub mod arch_compat;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;

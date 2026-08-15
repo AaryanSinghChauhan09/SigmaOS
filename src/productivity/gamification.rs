@@ -1,7 +1,7 @@
 // SigmaOS Gamified Productivity System
 // Built-in goal trackers, Pomodoro timers, and progress dashboards
 
-use crate::klib::BTreeMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// Achievement type
@@ -323,8 +323,8 @@ impl Default for ProductivityScore {
 
 /// Gamified productivity system
 pub struct GamifiedProductivity {
-    pub achievements: BTreeMap<String, Achievement>,
-    pub goals: BTreeMap<String, Goal>,
+    pub achievements: HashMap<String, Achievement>,
+    pub goals: HashMap<String, Goal>,
     pub pomodoro_timer: PomodoroTimer,
     pub productivity_score: ProductivityScore,
     pub level: u32,
@@ -334,8 +334,8 @@ pub struct GamifiedProductivity {
 impl GamifiedProductivity {
     pub fn new() -> Self {
         let mut system = Self {
-            achievements: BTreeMap::new(),
-            goals: BTreeMap::new(),
+            achievements: HashMap::new(),
+            goals: HashMap::new(),
             pomodoro_timer: PomodoroTimer::new(),
             productivity_score: ProductivityScore::new(),
             level: 1,
@@ -400,7 +400,6 @@ impl GamifiedProductivity {
     pub fn update_goal(&mut self, id: &str, value: u64) {
         let goal_opt: Option<&mut Goal> = self.goals.get_mut(id);
         if let Some(goal) = goal_opt {
-            let goal: &mut Goal = goal;
             goal.update_progress(value);
             if goal.completed {
                 self.add_experience(100);
