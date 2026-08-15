@@ -923,50 +923,6 @@ impl SovereignFirewalldManager {
     }
 }
 
-// ==========================================
-// COPR User Repositories Build Manager
-// ==========================================
-
-pub struct CoprBuildTask {
-    pub task_id: u32,
-    pub git_url: String,
-    pub status: String,
-}
-
-pub struct CoprRepositoryManager {
-    pub owner: String,
-    pub project_name: String,
-    pub builds: Vec<CoprBuildTask>,
-}
-
-impl CoprRepositoryManager {
-    pub fn new(owner: &str, project_name: &str) -> Self {
-        Self {
-            owner: owner.to_string(),
-            project_name: project_name.to_string(),
-            builds: Vec::new(),
-        }
-    }
-
-    pub fn submit_copr_build(&mut self, id: u32, git_url: &str) {
-        self.builds.push(CoprBuildTask {
-            task_id: id,
-            git_url: git_url.to_string(),
-            status: "Pending".to_string(),
-        });
-    }
-
-    pub fn execute_build_compile(&mut self, task_id: u32) -> Result<String, &'static str> {
-        for build in &mut self.builds {
-            if build.task_id == task_id {
-                build.status = "Success".to_string();
-                return Ok(format!("copr-build-{}-{}.rpm", self.project_name, task_id));
-            }
-        }
-        Err("COPR build task ID not found")
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

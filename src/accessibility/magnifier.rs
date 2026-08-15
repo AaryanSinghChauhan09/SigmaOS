@@ -1,7 +1,6 @@
-use crate::klib::Vec;
-/// OOP-based Screen Magnifier for SigmaOS
-/// Based on Ideas-999-Structured: User Experience & Desktop Item 826
-/// Implements screen magnification and zoom
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type MagnifierID = usize;
@@ -11,6 +10,7 @@ pub type MagnifierID = usize;
 pub enum MagnifierError {
     Success = 0,
     NotFound = 1,
+    InvalidZoom = 2,
 }
 
 pub trait Magnifier {
@@ -151,6 +151,167 @@ impl ColorFilter for SimpleColorFilter {
     }
 }
 
+// =========================================================================
+// ORCA & WINDOWS MAGNIFIER PARITY SCREEN MAGNIFIER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MagnifierViewMode {
+    FullScreen,
+    Lens,
+    Docked,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MagnifierTrackingMode {
+    FollowCursor,
+    FollowFocus,
+    FollowTextCaret,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ColorDeficiencyFilter {
+    None,
+    InvertedGrayscale,
+    HighContrast,
+    Protanopia,   // Red-blind
+    Deuteranopia, // Green-blind
+    Tritanopia,   // Blue-blind
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ScreenPoint {
+    pub x: f32,
+    pub y: f32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ScreenRect {
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+}
+
+/// Advanced Orca & Windows Magnifier Parity Subsystem
+pub struct SovereignMagnifierEngine {
+    pub zoom_level: f32, // 1.0 (100%) to 16.0 (1600%)
+    pub view_mode: MagnifierViewMode,
+    pub tracking_mode: MagnifierTrackingMode,
+    pub color_filter: ColorDeficiencyFilter,
+    pub lens_size: (f32, f32), // Width, Height in lens mode
+    pub current_center: ScreenPoint,
+    pub screen_bounds: ScreenRect,
+}
+
+impl SovereignMagnifierEngine {
+    pub fn new(screen_width: f32, screen_height: f32) -> Self {
+        Self {
+            zoom_level: 2.0,
+            view_mode: MagnifierViewMode::FullScreen,
+            tracking_mode: MagnifierTrackingMode::FollowCursor,
+            color_filter: ColorDeficiencyFilter::None,
+            lens_size: (300.0, 200.0),
+            current_center: ScreenPoint {
+                x: screen_width / 2.0,
+                y: screen_height / 2.0,
+            },
+            screen_bounds: ScreenRect {
+                x: 0.0,
+                y: 0.0,
+                width: screen_width,
+                height: screen_height,
+            },
+        }
+    }
+
+    pub fn set_zoom(&mut self, level: f32) -> Result<(), MagnifierError> {
+        if level < 1.0 || level > 16.0 {
+            return Err(MagnifierError::InvalidZoom);
+        }
+        self.zoom_level = level;
+        Ok(())
+    }
+
+    pub fn update_tracking(&mut self, cursor_pos: ScreenPoint, focus_rect: Option<ScreenRect>, text_caret: Option<ScreenPoint>) {
+        let target = match self.tracking_mode {
+            MagnifierTrackingMode::FollowCursor => cursor_pos,
+            MagnifierTrackingMode::FollowFocus => {
+                if let Some(rect) = focus_rect {
+                    ScreenPoint {
+                        x: rect.x + rect.width / 2.0,
+                        y: rect.y + rect.height / 2.0,
+                    }
+                } else {
+                    cursor_pos
+                }
+            }
+            MagnifierTrackingMode::FollowTextCaret => text_caret.unwrap_or(cursor_pos),
+        };
+
+        self.current_center.x = target.x.clamp(0.0, self.screen_bounds.width);
+        self.current_center.y = target.y.clamp(0.0, self.screen_bounds.height);
+    }
+
+    pub fn calculate_magnified_viewport(&self) -> ScreenRect {
+        let vp_width = self.screen_bounds.width / self.zoom_level;
+        let vp_height = self.screen_bounds.height / self.zoom_level;
+
+        let half_w = vp_width / 2.0;
+        let half_h = vp_height / 2.0;
+
+        let min_x = (self.current_center.x - half_w).clamp(0.0, self.screen_bounds.width - vp_width);
+        let min_y = (self.current_center.y - half_h).clamp(0.0, self.screen_bounds.height - vp_height);
+
+        ScreenRect {
+            x: min_x,
+            y: min_y,
+            width: vp_width,
+            height: vp_height,
+        }
+    }
+
+    pub fn apply_color_filter_pixel(&self, rgb: (u8, u8, u8)) -> (u8, u8, u8) {
+        let (r, g, b) = (rgb.0 as f32, rgb.1 as f32, rgb.2 as f32);
+
+        match self.color_filter {
+            ColorDeficiencyFilter::None => rgb,
+            ColorDeficiencyFilter::InvertedGrayscale => {
+                let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                let inv = 255.0 - gray;
+                let val = inv.clamp(0.0, 255.0) as u8;
+                (val, val, val)
+            }
+            ColorDeficiencyFilter::HighContrast => {
+                let gray = (0.299 * r + 0.587 * g + 0.114 * b) as u8;
+                if gray > 128 {
+                    (255, 255, 255)
+                } else {
+                    (0, 0, 0)
+                }
+            }
+            ColorDeficiencyFilter::Protanopia => {
+                let nr = (0.56667 * r + 0.43333 * g).clamp(0.0, 255.0) as u8;
+                let ng = (0.55833 * r + 0.44167 * g).clamp(0.0, 255.0) as u8;
+                let nb = (0.24167 * g + 0.75833 * b).clamp(0.0, 255.0) as u8;
+                (nr, ng, nb)
+            }
+            ColorDeficiencyFilter::Deuteranopia => {
+                let nr = (0.625 * r + 0.375 * g).clamp(0.0, 255.0) as u8;
+                let ng = (0.70 * r + 0.30 * g).clamp(0.0, 255.0) as u8;
+                let nb = (0.30 * g + 0.70 * b).clamp(0.0, 255.0) as u8;
+                (nr, ng, nb)
+            }
+            ColorDeficiencyFilter::Tritanopia => {
+                let nr = (0.95 * r + 0.05 * g).clamp(0.0, 255.0) as u8;
+                let ng = (0.43333 * g + 0.56667 * b).clamp(0.0, 255.0) as u8;
+                let nb = (0.475 * g + 0.525 * b).clamp(0.0, 255.0) as u8;
+                (nr, ng, nb)
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -172,5 +333,42 @@ mod tests {
         assert!(!filter.is_filter_enabled());
         filter.enable_filter(3);
         assert!(filter.is_filter_enabled());
+    }
+
+    #[test]
+    fn test_sovereign_magnifier_engine_zoom_and_viewport() {
+        let mut engine = SovereignMagnifierEngine::new(1920.0, 1080.0);
+        assert_eq!(engine.zoom_level, 2.0);
+
+        assert!(engine.set_zoom(4.0).is_ok());
+        assert_eq!(engine.zoom_level, 4.0);
+
+        assert_eq!(engine.set_zoom(0.5), Err(MagnifierError::InvalidZoom));
+
+        let vp = engine.calculate_magnified_viewport();
+        assert_eq!(vp.width, 480.0);
+        assert_eq!(vp.height, 270.0);
+    }
+
+    #[test]
+    fn test_sovereign_magnifier_tracking_and_filters() {
+        let mut engine = SovereignMagnifierEngine::new(1920.0, 1080.0);
+        engine.tracking_mode = MagnifierTrackingMode::FollowFocus;
+
+        let focus_rect = ScreenRect {
+            x: 500.0,
+            y: 400.0,
+            width: 100.0,
+            height: 50.0,
+        };
+        engine.update_tracking(ScreenPoint { x: 10.0, y: 10.0 }, Some(focus_rect), None);
+
+        assert_eq!(engine.current_center.x, 550.0);
+        assert_eq!(engine.current_center.y, 425.0);
+
+        // Test high contrast filter
+        engine.color_filter = ColorDeficiencyFilter::HighContrast;
+        assert_eq!(engine.apply_color_filter_pixel((200, 200, 200)), (255, 255, 255));
+        assert_eq!(engine.apply_color_filter_pixel((10, 10, 10)), (0, 0, 0));
     }
 }

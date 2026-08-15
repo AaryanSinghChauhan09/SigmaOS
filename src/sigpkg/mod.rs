@@ -52,9 +52,8 @@ pub use universal_oop_system::{
     IPackage, IPackageParser, PackageFormat, PackageMetadata,
     PackageParserFactory, UniversalPackageManager,
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError, InstallError, HookError,
+    UserDefinedHook, InstallError, HookError,
 };
-pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -139,24 +138,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }

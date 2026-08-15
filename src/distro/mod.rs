@@ -19,7 +19,8 @@ pub mod chakra_parity;
 
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService,
+    PinRule, AptPinStore, OpenRCService, SovereignBpfCoReEngine, BsdCapsicumRights,
+    Hammer2MultiVersionEngine, SovereignOstreeEngine,
 };
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};

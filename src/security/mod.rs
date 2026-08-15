@@ -4,11 +4,9 @@ pub mod hardening;
 pub mod pledge;
 pub mod vulnerability;
 
-pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };
@@ -25,7 +23,6 @@ pub mod nemoclaw;
 pub mod parrot_parity;
 pub mod password;
 pub mod pki;
-pub mod pledge;
 pub mod bridge;
 pub mod prism;
 pub mod sandbox;
@@ -38,7 +35,6 @@ pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
-pub mod vulnerability;
 pub mod parrot_linux;
 
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
@@ -121,7 +117,6 @@ pub use defensive_audit::{
 };
 pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 pub use parrot_linux::{
     AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
