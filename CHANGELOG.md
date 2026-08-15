@@ -76,3 +76,4 @@ All notable changes to SigmaOS are documented here following [Keep a Changelog](
 - CodeQL #4129: Hard-coded cryptographic password in `src/security/password.rs`
 - Multiple merge conflicts across linux-parity and linux-bsd feature branches
 
+2026-08-15 - Fixed code scanning security issues (unused variables, static mut refs, function pointer comparisons)
