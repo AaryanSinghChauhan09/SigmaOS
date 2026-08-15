@@ -844,6 +844,13 @@ mod tests {
             cpu_pinning_cores: vec![2, 3],
             hugepages_enabled: true,
             vfio_pci_passthrough_address: Some("0000:02:00.0".to_string()),
+            memory_balloon_mb: 2048,
+            virtio_net_queues: 4,
+            cpu_model: "host-passthrough".to_string(),
+            machine_type: "q35".to_string(),
+            nested_virtualization: true,
+            io_uring_enabled: true,
+            kvm_dirty_ring_size: 1024,
         };
 
         let vm_id = vtx.create_vm(&config).unwrap();
@@ -869,5 +876,46 @@ mod tests {
 
         iommu.attach_device(pci_addr.clone());
         assert!(iommu.verify_dma_access(&pci_addr));
+    }
+
+    #[test]
+    fn test_linux_distro_virtualization_features() {
+        let mut manager = VmManager::default(); // Uses QemuBackend by default
+        let config = VmConfig {
+            name: "Distro VM".to_string(),
+            cpu_cores: 4,
+            memory_mb: 8192,
+            disk_size_gb: 100,
+            network_enabled: true,
+            gpu_passthrough: false,
+            os_type: OsType::Linux,
+            cpu_pinning_cores: vec![0, 1],
+            hugepages_enabled: true,
+            vfio_pci_passthrough_address: None,
+            memory_balloon_mb: 4096,
+            virtio_net_queues: 4,
+            cpu_model: "host-passthrough".to_string(),
+            machine_type: "q35".to_string(),
+            nested_virtualization: true,
+            io_uring_enabled: true,
+            kvm_dirty_ring_size: 1024,
+        };
+        let vm_id = manager.create_vm(config).unwrap();
+
+        // 1. Test VirtIO memory ballooning (RHEL inspired)
+        manager.set_memory_balloon(&vm_id, 2048).unwrap();
+        assert_eq!(manager.get_vm_config(&vm_id).unwrap().memory_balloon_mb, 2048);
+
+        // 2. Test CPU core pinning (Proxmox inspired)
+        manager.pin_cpu_cores(&vm_id, vec![2, 3]).unwrap();
+        assert_eq!(manager.get_vm_config(&vm_id).unwrap().cpu_pinning_cores, vec![2, 3]);
+
+        // 3. Test VirtIO-net multi-queuing (Gentoo inspired)
+        manager.set_virtio_queues(&vm_id, 8).unwrap();
+        assert_eq!(manager.get_vm_config(&vm_id).unwrap().virtio_net_queues, 8);
+
+        // 4. Test hugepages setting (Fedora inspired)
+        manager.set_hugepages(&vm_id, false).unwrap();
+        assert!(!manager.get_vm_config(&vm_id).unwrap().hugepages_enabled);
     }
 }
