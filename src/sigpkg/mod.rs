@@ -23,6 +23,7 @@ pub use spec::{
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
+pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
@@ -37,6 +38,7 @@ pub use universal_oop_system::{
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
     UserDefinedHook, InstallError, HookError,
 };
+pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

@@ -133,8 +133,9 @@ impl HardenedAuditTrail {
                 return false; // Chain broken! Tampering detected!
             }
 
-            let payload = log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1 } else { 0 });
-            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211_u64);
+            let payload =
+                log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1 } else { 0 });
+            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211);
 
             if log.entry_hash != calculated_hash {
                 return false; // Entry hash mismatch! Tampering detected!

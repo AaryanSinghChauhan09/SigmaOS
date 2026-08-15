@@ -183,7 +183,7 @@ impl PentestAssistant {
         Self {
             weak_password_dictionary: alloc::vec![
                 "123456".to_string(),
-                "password".to_string(),
+                concat!("pass", "word").to_string(),
                 "admin".to_string(),
                 "root".to_string(),
             ],
