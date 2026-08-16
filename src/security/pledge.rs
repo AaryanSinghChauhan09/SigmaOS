@@ -103,15 +103,32 @@ impl PledgeManager {
             return true; // If no paths are unveiled, allow all accesses
         }
 
+        // Mitigate directory traversal: reject paths containing parent directory segments
+        for segment in path.split(|c| c == '/' || c == '\\') {
+            if segment == ".." {
+                return false;
+            }
+        }
+
         // Find the most specific match (longest prefix match)
         let mut best_match: Option<&UnveilEntry> = None;
         for entry in &self.unveiled_paths {
             if path.starts_with(&entry.path) {
-                match best_match {
-                    None => best_match = Some(entry),
-                    Some(best) => {
-                        if entry.path.len() > best.path.len() {
-                            best_match = Some(entry);
+                let e_len = entry.path.len();
+                // Ensure it is a valid boundary match (exact match, or followed by a separator, or suffix has slash)
+                let is_boundary = path.len() == e_len
+                    || path.as_bytes().get(e_len).copied() == Some(b'/')
+                    || path.as_bytes().get(e_len).copied() == Some(b'\\')
+                    || entry.path.ends_with('/')
+                    || entry.path.ends_with('\\');
+
+                if is_boundary {
+                    match best_match {
+                        None => best_match = Some(entry),
+                        Some(best) => {
+                            if entry.path.len() > best.path.len() {
+                                best_match = Some(entry);
+                            }
                         }
                     }
                 }
@@ -277,6 +294,7 @@ mod tests {
         // Unveil /var/www for read access, and /tmp for write access
         manager.unveil("/var/www", "r").unwrap();
         manager.unveil("/tmp", "rw").unwrap();
+        manager.unveil("/etc/ssl/", "r").unwrap();
 
         // Check path within /var/www
         assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
@@ -286,7 +304,16 @@ mod tests {
         assert!(manager.validate_unveil_access("/tmp/session.log", 'r'));
         assert!(manager.validate_unveil_access("/tmp/session.log", 'w'));
 
+        // Check path with trailing slash unveil config
+        assert!(manager.validate_unveil_access("/etc/ssl/cert.pem", 'r'));
+
         // Paths outside of unveiled must be blocked completely
         assert!(!manager.validate_unveil_access("/etc/passwd", 'r'));
+
+        // Traversal sequences must be blocked
+        assert!(!manager.validate_unveil_access("/var/www/../../etc/passwd", 'r'));
+
+        // Prefix bypasses must be blocked
+        assert!(!manager.validate_unveil_access("/var/www-secret", 'r'));
     }
 }

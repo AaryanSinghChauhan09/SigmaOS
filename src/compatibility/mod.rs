@@ -1,5 +1,7 @@
 // SigmaOS Compatibility Module
-pub mod constellation_mesh;
+pub mod absorb_tools;
+pub mod apache_ossie;
+pub mod chimera_linux;
 pub mod cross_platform;
 pub mod india_stack;
 pub mod india_professional_tools;
@@ -37,14 +39,16 @@ pub use zorin::{
 };
 pub mod historic_linux;
 pub mod mint_linux;
-pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod india_professional_tools;
-pub mod canonical;
-pub mod fedora;
+pub mod sovereign_suite;
+pub mod tiny_core;
+pub mod wasm_sandbox;
+pub mod open_source_tier1;
+
+pub use open_source_tier1::{
+    WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
+};
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{
@@ -95,14 +99,43 @@ pub use mint_linux::{
 };
 
 pub use chimera_linux::{
-    DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
-    ApkPackageMetadata, ApkPackageStore,
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+    DinitServiceState,
 };
-pub use lubuntu::{
-    CpuGovernor, SystemPressure, LubuntuHealthReport, LubuntuSystemManager,
-    LxqtSessionManager, LxqtSessionState, PcmanfmQtAdapter, FileNode,
-    DiscoverPackageAdapter, AptPackage, FeatherpadEditor, QTerminalEmulator, TerminalTab,
-    CalamaresInstallerShim, CalamaresStage
+
+pub use relay_nexus::{
+    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
+    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
+    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
+    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
+    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
+    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
+    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
+    ZeroTrustNexus,
+};
+
+pub use solid_kernel::{
+    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
+    SigmaFSPlusPlus, SolidKernelCore,
+};
+
+pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
+
+pub use absorb_tools::{
+    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
+    PledgeUnveilSandbox, PqcSecureChannel,
+};
+
+pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
+
+pub use apache_ossie::{
+    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
+    OssieRelationship, SemanticRow,
+};
+
+pub use sovereign_suite::{
+    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
+    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
 pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};

@@ -4,9 +4,11 @@
 #![no_std]
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::String;
+use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Hardened sysctl configuration
 #[derive(Debug, Clone)]
@@ -150,7 +152,7 @@ impl HardenedSysctlManager {
     
     pub fn apply_hardened_defaults(&self) -> Result<(), SysctlError> {
         // Apply all hardened security defaults
-        for (name, config) in &self.sysctls {
+        for (_name, config) in &self.sysctls {
             if config.security_critical {
                 // In a real implementation, this would apply to the kernel
                 // For now, we just validate the configuration
@@ -167,14 +169,23 @@ impl HardenedSysctlManager {
         
         for (name, config) in &self.sysctls {
             if config.security_critical {
-                match config.value {
-                    SysctlValue::Bool(false) => {
-                        issues.push(format!("Security-critical sysctl {} is disabled", name));
-                    }
-                    SysctlValue::U32(0) => {
-                        issues.push(format!("Security-critical sysctl {} is set to 0", name));
-                    }
-                    _ => {}
+                let is_insecure = match (name.as_str(), config.value) {
+                    ("security.bsd.allow_tiocsti", SysctlValue::Bool(true)) => true,
+                    ("security.bsd.unprivileged_kenv_read", SysctlValue::Bool(true)) => true,
+                    ("vm.phys_fictitious_segs", SysctlValue::Bool(true)) => true,
+                    ("hbsd.late_kld_prohibition_value", SysctlValue::U32(0)) => true,
+                    ("security.bbsd.stack_auto_init", SysctlValue::Bool(false)) => true,
+                    ("security.bbsd.ptrace_hardening", SysctlValue::Bool(false)) => true,
+                    ("security.bbsd.random_relink", SysctlValue::Bool(false)) => true,
+                    ("security.bbsd.aslr", SysctlValue::Bool(false)) => true,
+                    ("security.bbsd.stack_protector", SysctlValue::Bool(false)) => true,
+                    (n, SysctlValue::Bool(false)) if !n.starts_with("security.bsd.allow") && !n.starts_with("security.bsd.unprivileged") && !n.starts_with("vm.phys_fictitious") => true,
+                    (_, SysctlValue::U32(0)) => true,
+                    _ => false,
+                };
+
+                if is_insecure {
+                    issues.push(format!("Security-critical sysctl {} is set to an insecure value", name));
                 }
             }
         }
@@ -223,10 +234,22 @@ mod tests {
 
     #[test]
     fn test_security_audit() {
-        let manager = HardenedSysctlManager::new();
+        let mut manager = HardenedSysctlManager::new();
         let issues = manager.security_audit();
         // With hardened defaults, there should be no security issues
         assert!(issues.is_empty());
+
+        // Test flagging when a security-critical sysctl is set to disabled/false
+        manager.register_sysctl(SysctlConfig {
+            name: String::from("security.test.critical_disabled"),
+            value: SysctlValue::Bool(false),
+            description: String::from("Test critical sysctl disabled"),
+            read_only: false,
+            security_critical: true,
+        });
+        let audit_issues = manager.security_audit();
+        assert_eq!(audit_issues.len(), 1);
+        assert!(audit_issues[0].contains("security.test.critical_disabled"));
     }
 
     #[test]

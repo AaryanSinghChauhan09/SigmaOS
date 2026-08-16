@@ -44,3 +44,8 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 **Vulnerability:** High-severity vulnerabilities in dynamic sub-dependencies (specifically `brace-expansion` and `nanoid`) are not exposed as top-level dependencies, bypassing routine package-level upgrades.
 **Learning:** To securely patch indirect dependencies without breaking upstream dependency structures, utilize `"overrides"` (npm) and `"pnpm.overrides"` blocks directly inside `package.json` to pin safe versions (`^2.0.1` and `^3.3.17`).
 **Prevention:** Standardize a dynamic audit verification step (`npm audit`) within all development loops and CI security scans to enforce transitive dependency cleanliness.
+
+## 2026-08-11 - Path Traversal and Prefix Bypass in Unveil Filesystem Sandboxing
+**Vulnerability:** OpenBSD-inspired path narrowing sandboxes (`unveil.rs` and `pledge.rs`) were vulnerable to Directory Traversal (e.g. `/var/www/../../etc/passwd` bypassing constraints because it starts with `/var/www`) and Prefix Substring Bypasses (e.g. `/var/www-secret` matching `/var/www` as a prefix).
+**Learning:** Checking prefixes with raw `starts_with` string comparison is highly insecure without enforcing boundary path-separator checks and validating that path segments do not contain `..` relative traversal components.
+**Prevention:** Reject paths containing dot-dot (`..`) segments, and validate prefix substring matches by confirming they align on directory boundaries (exact matches, or followed by `/` or `\`, or configuring the policy path with a trailing slash).
