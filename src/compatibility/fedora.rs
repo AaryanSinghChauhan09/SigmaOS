@@ -1,5 +1,6 @@
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
+// Enhanced with SELinux (Security-Enhanced Linux) Transition engines and Anaconda Kickstart auto-provisioners
 
 use std::collections::HashMap;
 
@@ -222,6 +223,203 @@ impl BodhiUpdateTriage {
     }
 }
 
+// ==========================================
+// 5. SELinux Transition & Access Policy Engine
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SeLinuxContext {
+    pub user: String,
+    pub role: String,
+    pub domain_type: String,
+    pub sensitivity: String,
+}
+
+impl SeLinuxContext {
+    pub fn parse(context_str: &str) -> Option<Self> {
+        let parts: Vec<&str> = context_str.split(':').collect();
+        if parts.len() == 4 {
+            Some(SeLinuxContext {
+                user: parts[0].to_string(),
+                role: parts[1].to_string(),
+                domain_type: parts[2].to_string(),
+                sensitivity: parts[3].to_string(),
+            })
+        } else {
+            None
+        }
+    }
+
+    pub fn to_string(&self) -> String {
+        format!("{}:{}:{}:{}", self.user, self.role, self.domain_type, self.sensitivity)
+    }
+}
+
+pub struct SeLinuxPolicyEngine {
+    /// maps allow: (subject_type, target_type, class_permission) -> is_allowed
+    pub allow_rules: HashMap<(String, String, String), bool>,
+    /// maps transition: (current_type, executable_file_type) -> new_type
+    pub transition_rules: HashMap<(String, String), String>,
+    pub enforcing: bool,
+}
+
+impl SeLinuxPolicyEngine {
+    pub fn new(enforcing: bool) -> Self {
+        Self {
+            allow_rules: HashMap::new(),
+            transition_rules: HashMap::new(),
+            enforcing,
+        }
+    }
+
+    pub fn add_allow_rule(&mut self, subject: &str, target: &str, permission: &str) {
+        self.allow_rules.insert((subject.to_string(), target.to_string(), permission.to_string()), true);
+    }
+
+    pub fn add_transition_rule(&mut self, current: &str, executable: &str, target_domain: &str) {
+        self.transition_rules.insert((current.to_string(), executable.to_string()), target_domain.to_string());
+    }
+
+    /// Validates if subject has permission to interact with target object
+    pub fn check_permission(&self, subject: &SeLinuxContext, target: &SeLinuxContext, permission: &str) -> bool {
+        if !self.enforcing {
+            return true; // Permissive mode
+        }
+        let key = (subject.domain_type.clone(), target.domain_type.clone(), permission.to_string());
+        *self.allow_rules.get(&key).unwrap_or(&false)
+    }
+
+    /// Evaluates dynamic domain transition upon executing an executable file
+    pub fn transition_domain(&self, subject: &SeLinuxContext, exec_file: &SeLinuxContext) -> Option<SeLinuxContext> {
+        let key = (subject.domain_type.clone(), exec_file.domain_type.clone());
+        if let Some(target_type) = self.transition_rules.get(&key) {
+            Some(SeLinuxContext {
+                user: subject.user.clone(),
+                role: "system_r".to_string(), // Role transitions standardly to system_r
+                domain_type: target_type.clone(),
+                sensitivity: subject.sensitivity.clone(),
+            })
+        } else {
+            None // No transition matched, domain remains unchanged
+        }
+    }
+}
+
+// ==========================================
+// 6. Anaconda Kickstart Automated Provisioner
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KickstartPartition {
+    pub mount_point: String,
+    pub fs_type: String,
+    pub size_mb: usize,
+}
+
+pub struct AnacondaKickstartEngine {
+    pub timezone: String,
+    pub partitions: Vec<KickstartPartition>,
+    pub selected_packages: Vec<String>,
+    pub post_install_script: String,
+    pub is_dry_run: bool,
+}
+
+impl AnacondaKickstartEngine {
+    pub fn new() -> Self {
+        Self {
+            timezone: "UTC".to_string(),
+            partitions: Vec::new(),
+            selected_packages: Vec::new(),
+            post_install_script: String::new(),
+            is_dry_run: true,
+        }
+    }
+
+    /// Parses basic directives in a kickstart format
+    pub fn parse_kickstart(&mut self, contents: &str) -> Result<(), String> {
+        let mut in_packages_block = false;
+        let mut in_post_block = false;
+
+        for line in contents.lines() {
+            let line_trimmed = line.trim();
+            if line_trimmed.is_empty() || line_trimmed.starts_with('#') {
+                continue;
+            }
+
+            // Detect block starts
+            if line_trimmed == "%packages" {
+                in_packages_block = true;
+                in_post_block = false;
+                continue;
+            } else if line_trimmed == "%post" {
+                in_packages_block = false;
+                in_post_block = true;
+                continue;
+            } else if line_trimmed == "%end" {
+                in_packages_block = false;
+                in_post_block = false;
+                continue;
+            }
+
+            if in_packages_block {
+                self.selected_packages.push(line_trimmed.to_string());
+            } else if in_post_block {
+                self.post_install_script.push_str(line_trimmed);
+                self.post_install_script.push('\n');
+            } else {
+                // Parse standard configuration commands
+                let parts: Vec<&str> = line_trimmed.split_whitespace().collect();
+                if parts.is_empty() {
+                    continue;
+                }
+                match parts[0] {
+                    "timezone" => {
+                        if parts.len() > 1 {
+                            self.timezone = parts[1].to_string();
+                        }
+                    }
+                    "part" => {
+                        // e.g. "part /boot --fstype=ext4 --size=1024"
+                        if parts.len() >= 4 {
+                            let mount = parts[1].to_string();
+                            let mut fstype = "ext4".to_string();
+                            let mut size = 0;
+
+                            for part_arg in &parts[2..] {
+                                if part_arg.starts_with("--fstype=") {
+                                    fstype = part_arg.replace("--fstype=", "");
+                                } else if part_arg.starts_with("--size=") {
+                                    if let Ok(sz) = part_arg.replace("--size=", "").parse::<usize>() {
+                                        size = sz;
+                                    }
+                                }
+                            }
+                            self.partitions.push(KickstartPartition {
+                                mount_point: mount,
+                                fs_type: fstype,
+                                size_mb: size,
+                            });
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Simulates partition provisioning based on kickstart commands
+    pub fn provision_storage_size(&self) -> usize {
+        self.partitions.iter().map(|p| p.size_mb).sum()
+    }
+}
+
+impl Default for AnacondaKickstartEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -283,5 +481,57 @@ mod tests {
         // Direct promotion
         bodhi.submit_feedback("FEDORA-2023-A8F8", 2).unwrap();
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
+    }
+
+    #[test]
+    fn test_selinux_policy_transitions() {
+        let mut engine = SeLinuxPolicyEngine::new(true);
+
+        let httpd_ctx = SeLinuxContext::parse("system_u:system_r:httpd_t:s0").unwrap();
+        let db_ctx = SeLinuxContext::parse("system_u:object_r:postgresql_db_t:s0").unwrap();
+
+        // 1. Initially check permission without rule (denied)
+        assert!(!engine.check_permission(&httpd_ctx, &db_ctx, "connect"));
+
+        // 2. Add allow rule
+        engine.add_allow_rule("httpd_t", "postgresql_db_t", "connect");
+        assert!(engine.check_permission(&httpd_ctx, &db_ctx, "connect"));
+
+        // 3. Domain transitions upon executing httpd_exec_t
+        let exec_file_ctx = SeLinuxContext::parse("system_u:object_r:httpd_exec_t:s0").unwrap();
+        let user_ctx = SeLinuxContext::parse("user_u:user_r:user_t:s0").unwrap();
+
+        engine.add_transition_rule("user_t", "httpd_exec_t", "httpd_t");
+        let new_ctx = engine.transition_domain(&user_ctx, &exec_file_ctx).unwrap();
+        assert_eq!(new_ctx.domain_type, "httpd_t");
+        assert_eq!(new_ctx.role, "system_r");
+    }
+
+    #[test]
+    fn test_anaconda_kickstart_parser() {
+        let mut engine = AnacondaKickstartEngine::new();
+        let kickstart_script = r#"
+            # Simulated Fedora Kickstart config
+            timezone America/New_York
+            part /boot --fstype=ext4 --size=1024
+            part / --fstype=xfs --size=10240
+
+            %packages
+            @core
+            gcc
+            git
+            %end
+
+            %post
+            echo "Setup complete" > /etc/motd
+            %end
+        "#;
+
+        engine.parse_kickstart(kickstart_script).unwrap();
+        assert_eq!(engine.timezone, "America/New_York");
+        assert_eq!(engine.partitions.len(), 2);
+        assert_eq!(engine.provision_storage_size(), 11264); // 1024 + 10240
+        assert_eq!(engine.selected_packages, vec!["@core", "gcc", "git"]);
+        assert!(engine.post_install_script.contains("Setup complete"));
     }
 }
