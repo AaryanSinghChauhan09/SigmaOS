@@ -1,8 +1,8 @@
 //! Alpine Linux & BusyBox-inspired Minimal Footprint Subsystems
 //! Implements APK database parser, busybox syslog circular logger, and multicall binary router.
 
-use std::collections::HashMap;
-use std::string::{String, ToString};
+use crate::klib::{HashMap, String};
+use alloc::string::ToString;
 
 // ==========================================
 // 1. APK Database Installed Package Parser
