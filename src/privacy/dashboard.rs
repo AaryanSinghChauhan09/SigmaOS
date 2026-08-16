@@ -306,8 +306,8 @@ impl PrivacyDashboard for SimplePrivacyDashboard {
         }
 
         let mut index = None;
-        for (i, permission_option) in self.permissions.iter().enumerate() {
-            if let Some(ref permission) = *permission_option {
+        for i in 0..self.permissions.len() {
+            if let Some(ref permission) = self.permissions[i] {
                 if permission.id() == id {
                     index = Some(i);
                     break;
@@ -329,8 +329,8 @@ impl PrivacyDashboard for SimplePrivacyDashboard {
             return Err(PrivacyError::PermissionDenied);
         }
 
-        for permission_option in &mut self.permissions {
-            if let Some(ref mut permission) = *permission_option {
+        for i in 0..self.permissions.len() {
+            if let Some(ref mut permission) = self.permissions[i] {
                 if permission.id() == id {
                     let result = permission.grant();
                     if result.is_ok() {
@@ -349,8 +349,8 @@ impl PrivacyDashboard for SimplePrivacyDashboard {
             return Err(PrivacyError::PermissionDenied);
         }
 
-        for permission_option in &mut self.permissions {
-            if let Some(ref mut permission) = *permission_option {
+        for i in 0..self.permissions.len() {
+            if let Some(ref mut permission) = self.permissions[i] {
                 if permission.id() == id {
                     let result = permission.deny();
                     if result.is_ok() {
@@ -365,8 +365,8 @@ impl PrivacyDashboard for SimplePrivacyDashboard {
     }
 
     fn get_permission(&self, id: PermissionID) -> Option<&dyn Permission> {
-        for permission_option in &self.permissions {
-            if let Some(ref permission) = *permission_option {
+        for i in 0..self.permissions.len() {
+            if let Some(ref permission) = self.permissions[i] {
                 if permission.id() == id {
                     return Some(permission.as_ref());
                 }
@@ -378,8 +378,8 @@ impl PrivacyDashboard for SimplePrivacyDashboard {
     fn list_permissions(&self, category: &[u8]) -> Vec<PermissionID> {
         let mut ids = Vec::new();
 
-        for permission_option in &self.permissions {
-            if let Some(ref permission) = *permission_option {
+        for i in 0..self.permissions.len() {
+            if let Some(ref permission) = self.permissions[i] {
                 if permission.category() == category {
                     ids.push(permission.id());
                 }

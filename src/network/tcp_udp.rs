@@ -42,6 +42,21 @@ pub enum SocketOption {
     SndBuf,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BpfOp {
+    LoadPort,
+    JumpEqual,
+    ReturnMatch,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct BpfInstruction {
+    pub op: BpfOp,
+    pub k: u32,
+    pub jt: u8,
+    pub jf: u8,
+}
+
 #[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
@@ -54,6 +69,8 @@ pub struct SimpleSocket {
     pub tcp_nodelay: AtomicUsize,
     pub rcvbuf: AtomicUsize,
     pub sndbuf: AtomicUsize,
+    // BSD Berkeley Packet Filter (BPF) instructions
+    pub bpf_filters: Vec<BpfInstruction>,
 }
 
 impl SimpleSocket {
@@ -68,7 +85,42 @@ impl SimpleSocket {
             tcp_nodelay: AtomicUsize::new(0),
             rcvbuf: AtomicUsize::new(65536),
             sndbuf: AtomicUsize::new(65536),
+            bpf_filters: Vec::new(),
         }
+    }
+
+    pub fn attach_bpf_filter(&mut self, instructions: Vec<BpfInstruction>) {
+        self.bpf_filters = instructions;
+    }
+
+    /// Evaluates attached BPF bytecode filters against an incoming packet payload (TCP/IP header context)
+    pub fn execute_bpf_match(&self, packet_port: u16) -> bool {
+        if self.bpf_filters.is_empty() {
+            return true; // Default match-all if no filters attached
+        }
+        let mut pc = 0;
+        let mut accumulator: u32 = 0;
+
+        while pc < self.bpf_filters.len() {
+            let inst = &self.bpf_filters[pc];
+            match inst.op {
+                BpfOp::LoadPort => {
+                    accumulator = packet_port as u32;
+                    pc += 1;
+                }
+                BpfOp::JumpEqual => {
+                    if accumulator == inst.k {
+                        pc += inst.jt as usize;
+                    } else {
+                        pc += inst.jf as usize;
+                    }
+                }
+                BpfOp::ReturnMatch => {
+                    return inst.k != 0;
+                }
+            }
+        }
+        false
     }
 }
 
@@ -404,6 +456,13 @@ impl ZeroCopy for ZeroCopyNetwork {
     }
 }
 
+/// BSD packet filter (pf) NAT translation rule entry
+#[derive(Debug, Clone)]
+pub struct PfNatRule {
+    pub internal_ip: [u8; 4],
+    pub external_ip: [u8; 4],
+}
+
 /// Linux IP routing table entry
 #[derive(Debug, Clone)]
 pub struct RoutingEntry {
@@ -415,6 +474,7 @@ pub struct RoutingEntry {
 
 pub struct RoutingTable {
     pub entries: Vec<RoutingEntry>,
+    pub pf_nat_rules: Vec<PfNatRule>,
 }
 
 impl Default for RoutingTable {
@@ -425,11 +485,28 @@ impl Default for RoutingTable {
 
 impl RoutingTable {
     pub fn new() -> Self {
-        RoutingTable { entries: Vec::new() }
+        RoutingTable {
+            entries: Vec::new(),
+            pf_nat_rules: Vec::new(),
+        }
     }
 
     pub fn add_route(&mut self, entry: RoutingEntry) {
         self.entries.push(entry);
+    }
+
+    pub fn add_pf_nat_rule(&mut self, rule: PfNatRule) {
+        self.pf_nat_rules.push(rule);
+    }
+
+    /// Translates internal IP to mapped public IP if a BSD pf NAT rule matches (NAT egress)
+    pub fn apply_pf_nat(&self, internal_ip: [u8; 4]) -> [u8; 4] {
+        for rule in &self.pf_nat_rules {
+            if rule.internal_ip == internal_ip {
+                return rule.external_ip;
+            }
+        }
+        internal_ip
     }
 
     pub fn lookup(&self, dest_ip: [u8; 4]) -> Option<RoutingEntry> {
@@ -873,5 +950,36 @@ mod tests {
         let triggered = epoll.wait(&mut events_out).unwrap();
         assert_eq!(triggered, 1);
         assert_eq!(events_out[0].data, 999);
+    }
+
+    #[test]
+    fn test_bpf_packet_matching() {
+        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
+
+        let instructions = vec![
+            BpfInstruction { op: BpfOp::LoadPort, k: 0, jt: 0, jf: 0 },
+            BpfInstruction { op: BpfOp::JumpEqual, k: 443, jt: 1, jf: 2 },
+            BpfInstruction { op: BpfOp::ReturnMatch, k: 1, jt: 0, jf: 0 }, // If equal to 443, match (1)
+            BpfInstruction { op: BpfOp::ReturnMatch, k: 0, jt: 0, jf: 0 }, // Else, fail (0)
+        ];
+        socket.attach_bpf_filter(instructions);
+
+        assert!(socket.execute_bpf_match(443));
+        assert!(!socket.execute_bpf_match(80));
+    }
+
+    #[test]
+    fn test_bsd_pf_nat_rules() {
+        let mut routing = RoutingTable::new();
+        routing.add_pf_nat_rule(PfNatRule {
+            internal_ip: [192, 168, 1, 100],
+            external_ip: [111, 22, 33, 44],
+        });
+
+        let output_ip = routing.apply_pf_nat([192, 168, 1, 100]);
+        assert_eq!(output_ip, [111, 22, 33, 44]);
+
+        let other_ip = routing.apply_pf_nat([10, 0, 0, 5]);
+        assert_eq!(other_ip, [10, 0, 0, 5]);
     }
 }

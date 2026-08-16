@@ -99,7 +99,9 @@ impl AccessControl for SimpleAccessControl {
     }
     fn check_access(&self, user_id: usize, resource: &[u8], permission_type: PermissionType) -> AccessResult {
         if user_id >= self.user_permissions.len() { return AccessResult::Denied; }
-        for (id, perm_type, res) in &self.user_permissions[user_id] {
+        let perms = &self.user_permissions[user_id];
+        for i in 0..perms.len() {
+            let (_id, perm_type, res) = &perms[i];
             if *perm_type == permission_type {
                 let res_len = res.iter().position(|&b| b == 0).unwrap_or(64);
                 if &res[..res_len] == resource { return AccessResult::Granted; }
