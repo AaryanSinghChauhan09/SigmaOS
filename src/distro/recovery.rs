@@ -153,7 +153,6 @@ impl BackupSystem {
         } else {
             // First backup, everything is new
             for path in current_files.keys() {
-                let path: &String = path;
                 modified_or_new.push(path.clone());
             }
         }
@@ -173,8 +172,6 @@ impl BackupSystem {
                 found = true;
                 target_files.clear();
                 for (path, hash) in &snapshot.file_hashes {
-                    let path: &String = path;
-                    let hash: &String = hash;
                     target_files.insert(path.clone(), hash.clone());
                     rolled_back += 1;
                 }

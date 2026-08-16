@@ -6,7 +6,6 @@ extern crate alloc;
 /// OOP-based Package Signing & Attestation for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
 /// Implements provenance metadata and supply-chain attestations
-/// Enhanced with PQC (Dilithium-5) signature verification for BUG-005
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -23,7 +22,7 @@ pub enum SignatureAlgorithm { ED25519 = 0, RSA4096 = 1, Dilithium5 = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SigningError { Success = 0, KeyNotFound = 1, SignFailed = 2, VerifyFailed = 3, InvalidSignature = 4 }
+pub enum SigningError { Success = 0, KeyNotFound = 1, SignFailed = 2, VerifyFailed = 3 }
 
 pub trait SigningKey {
     fn id(&self) -> KeyID;
@@ -93,102 +92,6 @@ impl SigningKey for SimpleSigningKey {
         }
 
         Ok(true)
-    }
-}
-
-/// Enhanced PQC signing key using Dilithium-5
-#[repr(C)]
-pub struct PQCSigningKey {
-    pub id: KeyID,
-    pub algorithm: AtomicUsize,
-    pub public_key: [u8; 1312],  // Dilithium-5 public key size
-    pub private_key: [u8; 2528], // Dilithium-5 secret key size
-}
-
-impl PQCSigningKey {
-    pub fn new(id: KeyID) -> Self {
-        let mut public = [0u8; 1312];
-        let mut private = [0u8; 2528];
-
-        // Simulate key generation with deterministic values
-        for i in 0..1312 {
-            public[i] = ((i * 7 + 13) % 256) as u8;
-        }
-        for i in 0..2528 {
-            private[i] = ((i * 11 + 17) % 256) as u8;
-        }
-
-        PQCSigningKey {
-            id,
-            algorithm: AtomicUsize::new(SignatureAlgorithm::Dilithium5 as usize),
-            public_key: public,
-            private_key: private,
-        }
-    }
-
-    /// Compute SHA-3 hash for signing
-    fn compute_hash(&self, data: &[u8]) -> [u8; 32] {
-        let mut hash = [0u8; 32];
-        let mut accumulator: u64 = 0;
-
-        for (i, &byte) in data.iter().enumerate() {
-            accumulator = accumulator.wrapping_add(byte as u64);
-            accumulator = accumulator.wrapping_mul(31);
-            hash[i % 32] = (accumulator as u8) ^ byte;
-        }
-
-        hash
-    }
-
-    /// Create Dilithium-5 signature
-    fn create_dilithium_signature(&self, hash: [u8; 32]) -> [u8; 2592] {
-        let mut signature = [0u8; 2592];
-        
-        // Simulate Dilithium-5 signature generation
-        for i in 0..2592 {
-            signature[i] = hash[i % 32].wrapping_add((i as u8)).wrapping_mul(3);
-        }
-
-        signature
-    }
-
-    /// Verify Dilithium-5 signature
-    fn verify_dilithium_signature(&self, data: &[u8], signature: &[u8]) -> bool {
-        if signature.len() != 2592 {
-            return false;
-        }
-
-        let hash = self.compute_hash(data);
-        let expected_signature = self.create_dilithium_signature(hash);
-
-        // Compare signatures
-        for i in 0..2592 {
-            if signature[i] != expected_signature[i] {
-                return false;
-            }
-        }
-
-        true
-    }
-}
-
-impl SigningKey for PQCSigningKey {
-    fn id(&self) -> KeyID { self.id }
-    fn algorithm(&self) -> SignatureAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
-    fn public_key(&self) -> &[u8] { &self.public_key }
-
-    fn sign(&self, data: &[u8]) -> Result<Vec<u8>, SigningError> {
-        let hash = self.compute_hash(data);
-        let signature = self.create_dilithium_signature(hash);
-        Ok(signature.to_vec())
-    }
-
-    fn verify(&self, data: &[u8], signature: &[u8]) -> Result<bool, SigningError> {
-        if self.verify_dilithium_signature(data, signature) {
-            Ok(true)
-        } else {
-            Err(SigningError::InvalidSignature)
-        }
     }
 }
 
@@ -454,38 +357,6 @@ impl SovereignSupplyChainAuditor {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_pqc_signing_key() {
-        let pqc_key = PQCSigningKey::new(100);
-        assert_eq!(pqc_key.id(), 100);
-        assert_eq!(pqc_key.algorithm(), SignatureAlgorithm::Dilithium5);
-        assert_eq!(pqc_key.public_key().len(), 1312);
-    }
-
-    #[test]
-    fn test_pqc_sign_and_verify() {
-        let pqc_key = PQCSigningKey::new(100);
-        let data = b"test package data for PQC signing";
-        
-        let signature = pqc_key.sign(data).unwrap();
-        assert_eq!(signature.len(), 2592);
-        
-        let verification = pqc_key.verify(data, &signature);
-        assert!(verification.is_ok());
-        assert!(verification.unwrap());
-    }
-
-    #[test]
-    fn test_pqc_invalid_signature() {
-        let pqc_key = PQCSigningKey::new(100);
-        let data = b"test package data for PQC signing";
-        let fake_signature = vec![0u8; 2592];
-        
-        let verification = pqc_key.verify(data, &fake_signature);
-        assert!(verification.is_err());
-        assert_eq!(verification.unwrap_err(), SigningError::InvalidSignature);
-    }
 
     #[test]
     fn test_provenance_and_reproducible_chains() {

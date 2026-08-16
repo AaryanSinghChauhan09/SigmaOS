@@ -78,7 +78,7 @@ impl PackageRecipe {
     }
 
     pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.build_commands.insert(0, command);
+        self.build_commands.push(command);
         self
     }
 

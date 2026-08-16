@@ -10,6 +10,13 @@ pub mod absorb_tools;
 pub mod tiny_core;
 pub mod apache_ossie;
 pub mod sovereign_suite;
+pub mod fedora;
+pub mod bsd;
+pub mod innovations;
+pub mod india_professional_tools;
+pub mod debian;
+pub mod mobile_desktop_parity;
+pub mod opensuse_slackware;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -46,7 +53,7 @@ pub use relay_nexus::{
 
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
-    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus as SolidSigmaFSPlusPlus,
 };
 
 pub use wasm_sandbox::{
@@ -72,33 +79,35 @@ pub use sovereign_suite::{
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
 };
 
-pub mod debian;
-pub use debian::{
-    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
-    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
-};
-
-pub mod innovations;
-pub use innovations::{
-    WorkloadCategory, ISchedulerPolicy, MlAcceleratedPolicy, GreenComputingPolicy,
-    SigmaScheduler, ISyscallTranslator, LinuxTranslator, WindowsTranslator,
-    UniversalAbiTranslator, IFileSystemCore, ISemanticSearchPlugin, ICasDeduplicator,
-    SigmaFsPlusPlus, IRecoveryStrategy, RollbackRecovery, SelfHealingOS,
-};
-
-pub mod fedora;
 pub use fedora::{
     DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    FirewalldZone, RichRule, FirewalldZoneManager, PartitionLayout, AnacondaKickstartInstaller,
+    CoprBuildJob, CoprUserRepoBuilder, IpaUser, HbacRule, FreeIpaDirectoryService,
 };
 
-pub mod india_professional_tools;
+pub use bsd::{
+    BsdJail, FreeBsdJailManager, OpenBsdSysctlKernelMib,
+};
+
+pub use innovations::{
+    WorkloadCategory, SigmaScheduler, UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingOS,
+};
+
 pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, PMWaniHotspotController,
-    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker,
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper, PMWaniHotspotController,
+    DigiYatraPassScanner, IrctcPnrTracker,
 };
 
-pub mod india_stack;
-pub use india_stack::{MockUPIService, IndiaStackError};
+pub use debian::{
+    SysVinitRunlevel, SysVinitManager, AptPackageMetadata, AptRepositorySynchronizer,
+    AlternativeProvider, DebianAlternativesSystem, DebootstrapEngine,
+};
 
-pub mod india_stack_localization;
-pub use india_stack_localization::{IndianLanguage, LocalizationProvider, LocalizationManager};
+pub use mobile_desktop_parity::{
+    BinderTransactionType, BinderParcel, AospBinderIpc, LaunchdServiceState, LaunchdService,
+    MacosLaunchdDaemon, SecureEnclaveKeyStore,
+};
+
+pub use opensuse_slackware::{
+    YastModuleType, YastCentralControlCenter, SlackwarePackage, SlackwarePkgTools,
+};

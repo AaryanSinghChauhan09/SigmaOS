@@ -4,6 +4,7 @@ pub mod pledge;
 pub mod vulnerability;
 pub mod hardening;
 pub mod defensive_audit;
+pub mod vault;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use pledge::{PledgeError, PledgeManager, PledgePromise};

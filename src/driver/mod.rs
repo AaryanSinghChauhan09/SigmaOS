@@ -6,10 +6,10 @@ pub mod mapper;
 pub mod pods;
 pub mod simulation;
 pub mod vault;
-pub mod rootkit;
+pub mod shims;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use mapper::{DriverMapper, MapperCategory};
 pub use pods::{PeripheralPod, PodType};
 pub use vault::{DriverArchiveVault, VaultEntry};
-pub use rootkit::{SyscallStubDisassembler, SectionObject, SectionBackingType, MappedView, StealthFilterDriver, FileDirectoryEntry};
+pub use shims::{IntelE1000Driver, HdaSampleRate, IntelHdaDriver, VirtioBlockOp, VirtioBlockRequest, VirtioBlockDriver};

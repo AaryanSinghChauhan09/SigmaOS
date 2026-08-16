@@ -6,7 +6,22 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
+
+pub mod bsd_linux_innovations;
+pub mod complete_filesystems;
+pub mod legacy_fs;
+pub mod linux_package_parity;
+pub mod s_fs;
+pub mod sigma_fs;
+pub mod sigmafs;
 pub mod smart_symlink;
+pub mod vdbe_doom;
+
+pub use bsd_linux_innovations::{
+    BsdSoftUpdatesEngine, MetadataDependency, MetadataOp,
+    OpenBsdMountEnforcer, MNT_RDONLY, MNT_NOEXEC, MNT_NOSUID, MNT_NODEV,
+    LinuxOverlayFsManager, LinuxProcSysfsEmulator,
+};
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -23,9 +38,7 @@ pub use manager::{
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
 pub use support::{
-    Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem, SimpleFilesystemManager,
-};
-pub use smart_symlink::{
-    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
+    Filesystem, FilesystemError, FilesystemManager, FilesystemType, LegacyLinuxRule,
+    LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};

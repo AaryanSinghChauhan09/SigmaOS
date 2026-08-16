@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Encrypted File Vault
 // OOP-based encrypted file storage with post-quantum cryptography
 
-use crate::klib::BTreeMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -255,7 +237,7 @@ pub struct EncryptedFileVault {
     metadata: VaultMetadata,
     encryption: Box<dyn VaultEncryption>,
     master_key: Vec<u8>,
-    files: BTreeMap<PathBuf, EncryptedFile>,
+    files: HashMap<PathBuf, EncryptedFile>,
     vault_path: PathBuf,
 }
 
@@ -282,7 +264,7 @@ impl EncryptedFileVault {
             metadata,
             encryption,
             master_key,
-            files: BTreeMap::new(),
+            files: HashMap::new(),
             vault_path,
         }
     }
@@ -402,7 +384,7 @@ impl EncryptedFileVault {
         let mut files_processed = 0;
         let mut bytes_processed = 0u64;
 
-        for (original_path, encrypted_file) in &self.files.clone() {
+        for (original_path, encrypted_file) in self.files.clone().iter() {
             // Decrypt with old key
             let encrypted_data = std::fs::read(&encrypted_file.encrypted_path)
                 .map_err(|e| VaultError::IoError(e.to_string()))?;

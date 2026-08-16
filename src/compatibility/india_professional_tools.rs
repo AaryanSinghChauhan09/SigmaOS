@@ -2,7 +2,11 @@
 // Localized, high-performance, OOP-compliant tools for Indian Professionals.
 // Refers to India-Apps-Overview.md and India-first architecture.
 
+extern crate alloc;
 use crate::klib::HashMap;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 /// 1. Legal & Judicial Professionals (`sigma-judicial`)
 /// Manages Bharatiya Nyaya Sanhita (BNS), Bharatiya Nagarik Suraksha Sanhita (BNSS),
@@ -73,6 +77,9 @@ impl MsmeComplianceEngine {
 
     /// Classifies an MSME enterprise based on investment (Crore) and turnover (Crore) composite criteria
     pub fn classify_msme(&self, investment_cr: f64, turnover_cr: f64) -> &'static str {
+        if investment_cr < 0.0 || turnover_cr < 0.0 {
+            return "Invalid Parameters: MSME values cannot be negative";
+        }
         if investment_cr <= 1.0 && turnover_cr <= 5.0 {
             "Micro"
         } else if investment_cr <= 10.0 && turnover_cr <= 50.0 {
@@ -92,7 +99,7 @@ impl MsmeComplianceEngine {
         bank_rate: f64,
         delay_days: u32,
     ) -> f64 {
-        if delay_days == 0 {
+        if principal_amount <= 0.0 || bank_rate <= 0.0 || delay_days == 0 {
             return 0.0;
         }
         let effective_rate = 3.0 * bank_rate; // Three times the bank rate
@@ -148,16 +155,25 @@ impl AyushFormularyHelper {
         self.verified_practitioners.contains_key(registration_id)
     }
 
+    /// Performs case-insensitive formulation and ingredient verification lookup
     pub fn verify_ayurvedic_formulation(
         &self,
         product: &str,
         ingredient: &str,
     ) -> Result<bool, &'static str> {
-        let ingredients = self
-            .formulary_registry
-            .get(product)
-            .ok_or("Product not found in Ayurvedic Formulary")?;
-        Ok(ingredients.iter().any(|ing| ing == ingredient))
+        let prod_lower = product.to_lowercase();
+        let ing_lower = ingredient.to_lowercase();
+
+        let mut found_ingredients = None;
+        for (key, val) in self.formulary_registry.iter() {
+            if key.to_lowercase() == prod_lower {
+                found_ingredients = Some(val);
+                break;
+            }
+        }
+
+        let ingredients = found_ingredients.ok_or("Product not found in Ayurvedic Formulary")?;
+        Ok(ingredients.iter().any(|ing| ing.to_lowercase() == ing_lower))
     }
 }
 
@@ -181,8 +197,9 @@ impl PMWaniHotspotController {
     }
 
     pub fn register_pdo(&mut self, pdo_id: &str, location: &str) -> bool {
+        let is_new = !self.registered_pdos.contains_key(pdo_id);
         self.registered_pdos.insert(pdo_id.to_string(), location.to_string());
-        true
+        is_new
     }
 
     pub fn get_trai_bandwidth_profile(&self, active_users: u32) -> &'static str {
@@ -216,8 +233,9 @@ impl DigiYatraPassScanner {
     }
 
     pub fn enroll_passenger(&mut self, passenger_id: &str, face_signature: &[u8]) -> bool {
+        let is_new = !self.passenger_faces.contains_key(passenger_id);
         self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec());
-        true
+        is_new
     }
 
     pub fn verify_passenger_boarding(&self, passenger_id: &str, scan_signature: &[u8]) -> bool {
@@ -284,6 +302,10 @@ impl Default for IrctcPnrTracker {
     }
 }
 
+// =========================================================================
+// UNIT TESTS
+// =========================================================================
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -315,6 +337,9 @@ mod tests {
         assert_eq!(engine.classify_msme(25.0, 120.0), "Medium");
         assert_eq!(engine.classify_msme(100.0, 500.0), "Large (Non-MSME)");
 
+        // Non-negative / invalid parameters
+        assert_eq!(engine.classify_msme(-1.0, 5.0), "Invalid Parameters: MSME values cannot be negative");
+
         // Interest on delayed payment compound interest under MSMED Act Section 16 (3x Bank Rate)
         let principal = 100000.0;
         let bank_rate = 6.5; // effective rate = 19.5%
@@ -322,6 +347,9 @@ mod tests {
         assert!(interest > 0.0);
         // Approx 3 months of compounding at 19.5% annual
         assert!((interest - 4958.0).abs() < 50.0);
+
+        // Guard test
+        assert_eq!(engine.calculate_delayed_payment_interest(-1000.0, 6.5, 90), 0.0);
     }
 
     #[test]
@@ -334,8 +362,9 @@ mod tests {
         assert!(helper.verify_practitioner("REG-AYUSH-1234"));
         assert!(!helper.verify_practitioner("REG-AYUSH-9999"));
 
+        // Case-insensitive verification
         assert_eq!(
-            helper.verify_ayurvedic_formulation("Chyawanprash", "Amla"),
+            helper.verify_ayurvedic_formulation("chyawanprash", "amla"),
             Ok(true)
         );
         assert_eq!(
