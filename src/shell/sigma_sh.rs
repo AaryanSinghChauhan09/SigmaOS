@@ -102,8 +102,17 @@ pub trait Shell {
 }
 
 #[repr(C)]
+pub struct ShellAlias {
+    pub alias_name: [u8; 32],
+    pub alias_len: usize,
+    pub target_command: [u8; 128],
+    pub target_len: usize,
+}
+
+#[repr(C)]
 pub struct SimpleShell {
     pub commands: Vec<Option<Box<dyn ShellCommand>>>,
+    pub aliases: Vec<ShellAlias>,
     pub next_id: AtomicUsize,
     pub prompt: [u8; 64],
     pub prompt_len: AtomicUsize,
@@ -113,6 +122,7 @@ impl SimpleShell {
     pub fn new() -> Self {
         let mut shell = SimpleShell {
             commands: Vec::new(),
+            aliases: Vec::new(),
             next_id: AtomicUsize::new(1),
             prompt: [0u8; 64],
             prompt_len: AtomicUsize::new(0),
@@ -120,6 +130,86 @@ impl SimpleShell {
         let default_prompt = b"sigma-sh> ";
         shell.set_prompt(default_prompt);
         shell
+    }
+
+    /// Register alias mapping (mimics standard Bash alias builtin)
+    pub fn register_alias(&mut self, alias_name: &[u8], target: &[u8]) {
+        let name_len = alias_name.len().min(31);
+        let target_len = target.len().min(127);
+
+        let mut alias_arr = [0u8; 32];
+        let mut target_arr = [0u8; 128];
+
+        for i in 0..name_len {
+            alias_arr[i] = alias_name[i];
+        }
+        for i in 0..target_len {
+            target_arr[i] = target[i];
+        }
+
+        self.aliases.push(ShellAlias {
+            alias_name: alias_arr,
+            alias_len: name_len,
+            target_command: target_arr,
+            target_len,
+        });
+    }
+
+    /// Match alias and expand command name if match found
+    pub fn resolve_alias<'a>(&'a self, name: &'a [u8]) -> &'a [u8] {
+        for alias in &self.aliases {
+            if alias.alias_len == name.len() && &alias.alias_name[..name.len()] == name {
+                return &alias.target_command[..alias.target_len];
+            }
+        }
+        name
+    }
+
+    /// Tab-completion suggestions provider (mimics modern zsh autocomplete)
+    pub fn provide_completion(&self, partial_line: &[u8]) -> Option<&[u8]> {
+        if partial_line.is_empty() {
+            return None;
+        }
+        for cmd_option in &self.commands {
+            if let Some(ref cmd) = *cmd_option {
+                let name = cmd.name();
+                if name.len() >= partial_line.len() && &name[..partial_line.len()] == partial_line {
+                    return Some(name);
+                }
+            }
+        }
+        None
+    }
+
+    /// Parse and execute POSIX piping simulations: cmd1 | cmd2
+    pub fn execute_piped_line(&mut self, line: &[u8]) -> Result<(), ShellError> {
+        let mut segments = Vec::new();
+        let mut start = 0;
+
+        for (i, &byte) in line.iter().enumerate() {
+            if byte == b'|' {
+                segments.push(&line[start..i]);
+                start = i + 1;
+            }
+        }
+        segments.push(&line[start..line.len()]);
+
+        // Execute each segment sequentially (simulating piped execution stream)
+        for seg in &segments {
+            // Trim leading/trailing spaces
+            let mut s = 0;
+            let mut e = seg.len();
+            while s < e && (seg[s] == b' ' || seg[s] == b'\t') {
+                s += 1;
+            }
+            while e > s && (seg[e-1] == b' ' || seg[e-1] == b'\t' || seg[e-1] == b'\n') {
+                e -= 1;
+            }
+            if s < e {
+                self.execute_line(&seg[s..e])?;
+            }
+        }
+        Ok(())
     }
 }
 
@@ -157,7 +247,8 @@ impl Shell for SimpleShell {
             return Ok(());
         }
         
-        let cmd_name = args[0];
+        // Resolve alias on command name
+        let cmd_name = self.resolve_alias(args[0]);
         let cmd_args: Vec<&[u8]> = args[1..].to_vec();
         
         for cmd_option in &mut self.commands {
@@ -394,5 +485,48 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_shell_alias_resolution() {
+        let mut shell = SimpleShell::new();
+        shell.register_alias(b"ll", b"echo");
+
+        let resolved = shell.resolve_alias(b"ll");
+        assert_eq!(resolved, b"echo");
+
+        let unresolved = shell.resolve_alias(b"ls");
+        assert_eq!(unresolved, b"ls");
+    }
+
+    #[test]
+    fn test_shell_tab_completion() {
+        let mut shell = SimpleShell::new();
+        shell.register_command(Box::new(EchoCommand::new(1))).unwrap();
+        shell.register_command(Box::new(ExitCommand::new(2))).unwrap();
+
+        let suggestion = shell.provide_completion(b"ec").unwrap();
+        assert_eq!(suggestion, b"echo");
+
+        let exit_suggest = shell.provide_completion(b"ex").unwrap();
+        assert_eq!(exit_suggest, b"exit");
+
+        let none_suggest = shell.provide_completion(b"xx");
+        assert!(none_suggest.is_none());
+    }
+
+    #[test]
+    fn test_shell_piping_simulation() {
+        let mut shell = SimpleShell::new();
+        shell.register_command(Box::new(EchoCommand::new(1))).unwrap();
+        shell.register_command(Box::new(ExitCommand::new(2))).unwrap();
+
+        // Simulate piped sequence: echo | exit
+        assert!(shell.execute_piped_line(b"echo | exit").is_ok());
     }
 }
