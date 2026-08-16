@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🔌 Driver Development Plans
 
 > **"A hardware abstraction layer is only as good as its modularity, isolation boundaries, and object-oriented abstractions."**
@@ -282,8 +281,6 @@ To write a brand new driver conforming to our OOP patterns, follow this standard
 2. Implement the standard base `Driver` trait.
 3. Specialize the driver using `StorageDriver`, `NetworkDriver`, `GraphicsDriver`, or `InputDriver`.
 4. Register the driver struct with the static `GLOBAL_LIFECYCLE_MANAGER`.
-||||||| 43be3a7e82
-=======
 # 🛡️ SigmaOS: Sovereign Master Driver Development Blueprint
 
 This document details the complete, industrial-grade development plans, architectural specifications, and fully executable reference implementations for **SigmaOS's Unified Multi-Generation OOP Driver Framework**.
@@ -567,4 +564,3 @@ To guarantee absolute synchronicity and correctness of the driver ecosystem:
 3. **PQC Sandbox Attestation**: All memory read/write requests from user land are verified using post-quantum capability tags, ensuring perfect protection against hardware exploitation vectors.
 
 By implementing this comprehensive blueprint, **SigmaOS** delivers a pristine, ultra-lightweight, and fully optimized driver ecosystem that completely surpasses legacy OS assumptions.
->>>>>>> origin/feature/distro-parity-organizational-frameworks-251993214289770317

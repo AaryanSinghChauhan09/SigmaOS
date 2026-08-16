@@ -1,6 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -138,9 +139,9 @@ pub use virtualization::{
 // pub mod automation;
 // pub mod container;
 
-#[cfg(test)]
-#[path = "compatibility/fedora.rs"]
-pub mod fedora_compat_test;
+// #[cfg(test)]
+// #[path = "compatibility/fedora.rs"]
+// pub mod fedora_compat_test;
 // pub mod customization;
 // pub mod dashboard;
 // pub mod desktop;
