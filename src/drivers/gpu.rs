@@ -1,16 +1,30 @@
 // SigmaOS GPU Driver
 // Hardware abstraction for graphics rendering with Vulkan/Mesa-parity pipeline models and self-healing recovery
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::capability::CapabilityToken;
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
-pub struct DrmCrtc;
+pub struct DrmModeInfo {
+    pub hdisplay: u32,
+    pub vdisplay: u32,
+}
 
 #[derive(Debug, Clone)]
-pub struct DrmConnector;
+pub struct DrmCrtc {
+    pub id: u32,
+    pub active: bool,
+    pub mode: Option<DrmModeInfo>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DrmConnector {
+    pub id: u32,
+    pub connected: bool,
+}
 
 
 /// GPU command type
@@ -128,8 +142,6 @@ pub struct GpuDriver {
     pub registered_pipelines: Vec<GpuPipeline>,
     pub bound_pipeline_id: Option<usize>,
     pub reset_state: GpuResetState,
-    pub crtc: Option<DrmCrtc>,
-    pub connector: Option<DrmConnector>,
 }
 
 impl GpuDriver {
@@ -150,8 +162,6 @@ impl GpuDriver {
                 pipeline_reconstructed_count: 0,
                 is_hardware_ready: true,
             },
-            crtc: None,
-            connector: None,
         }
     }
 
@@ -284,6 +294,21 @@ impl GpuDriver {
 
     pub fn has_capability(&self, capability: u64) -> bool {
         (self.capability_mask & capability) != 0
+    }
+
+    pub fn set_drm_mode(&mut self, connector_id: u32, crtc_id: u32, mode: DrmModeInfo) -> Result<(), GpuError> {
+        self.width = mode.hdisplay;
+        self.height = mode.vdisplay;
+        self.crtc = Some(DrmCrtc {
+            id: crtc_id,
+            active: true,
+            mode: Some(mode),
+        });
+        self.connector = Some(DrmConnector {
+            id: connector_id,
+            connected: true,
+        });
+        Ok(())
     }
 }
 
