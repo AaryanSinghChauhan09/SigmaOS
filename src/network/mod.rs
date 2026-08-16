@@ -3,6 +3,9 @@ pub mod commands;
 pub mod tcp;
 pub mod tcp_udp;
 pub mod bsd_pf;
+pub mod npf_firewall;
+
+pub use npf_firewall::{NpfFirewallEngine, NpfRule, NpfTable, NatRule, NatType, NpfAction, NpfDirection, FiveTuple, IpProtocol};
 
 pub use commands::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
