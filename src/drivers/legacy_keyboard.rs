@@ -59,7 +59,7 @@ impl PeripheralDeviceTrait for LegacyKeyboard {
         Ok(())
     }
 
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
         Ok(0)
     }
 

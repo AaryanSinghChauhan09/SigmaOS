@@ -2,6 +2,8 @@
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
 #![cfg_attr(not(test), no_std)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -6945,11 +6947,13 @@ mod advanced_competitive_leapfrog_tests {
 
     #[test]
     fn test_privacy_preserving_telemetry() {
-        let telemetry = PrivacyPreservingTelemetry::new(0xF00D);
+        // lgtm[rust/hard-coded-cryptographic-value] - test XOR mask, not a production secret
+        const TEST_OBFUSCATION_MASK: u64 = 0xF00D;
+        let telemetry = PrivacyPreservingTelemetry::new(TEST_OBFUSCATION_MASK);
         let val = 42;
         let obfuscated = telemetry.obfuscate_metric(val);
         assert_ne!(val, obfuscated);
-        assert_eq!(obfuscated ^ 0xF00D, val);
+        assert_eq!(obfuscated ^ TEST_OBFUSCATION_MASK, val);
     }
 
     #[test]

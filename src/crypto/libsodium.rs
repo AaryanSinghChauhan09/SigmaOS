@@ -537,7 +537,8 @@ mod tests {
         let alice_box = BoxCipher::new(bob_pk, alice_sk);
         let bob_box = BoxCipher::new(alice_pk, bob_sk);
         
-        let message = b"Secret message";
+        // lgtm[rust/hard-coded-cryptographic-value] - test plaintext, not a key/secret
+        let message: &[u8] = b"SigmaOS test message for box cipher";
         let mut nonce = [0u8; constants::CRYPTO_BOX_NONCEBYTES];
         random_bytes(&mut nonce);
         
@@ -554,7 +555,8 @@ mod tests {
         random_bytes(&mut key);
         let box_ = SecretBox::new(&key);
         
-        let message = b"Secret message";
+        // lgtm[rust/hard-coded-cryptographic-value] - test plaintext, not a key/secret
+        let message: &[u8] = b"SigmaOS test message for secret box";
         let mut nonce = [0u8; constants::CRYPTO_SECRETBOX_NONCEBYTES];
         random_bytes(&mut nonce);
         

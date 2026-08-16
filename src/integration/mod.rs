@@ -122,7 +122,7 @@ impl SigmaIntegration {
     }
 
     /// Run Kuroko script with async IPC capabilities
-    pub fn run_async_kuroko_script(&mut self, script: &str, task_id: usize) 
+    pub fn run_async_kuroko_script(&mut self, script: &str, _task_id: usize) 
         -> Result<KurokoValue, IntegrationError> {
         
         // This would involve registering async functions in Kuroko

@@ -5,10 +5,17 @@ pub mod ipc;
 pub mod linux_absorb;
 pub mod linux_parity;
 pub mod memory;
-pub mod breakthroughs;
 pub mod policy_mechanism;
 pub mod sched;
 pub mod subsystem;
+pub mod bus;
+pub mod generation_manager;
+pub mod linux_bsd_innovations;
+pub mod meta;
+pub mod paging;
+pub mod roundrobin;
+pub mod scheduler;
+pub mod component;
 
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,

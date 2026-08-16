@@ -250,7 +250,7 @@ where
 
     #[allow(unused_mut)]
     fn grow(&mut self) {
-        let mut old_buckets = core::mem::replace(&mut self.buckets, Vec::new());
+        let mut old_buckets = core::mem::take(&mut self.buckets);
         self.capacity *= 2;
         self.resize_buckets();
         self.len = 0;

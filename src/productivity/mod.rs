@@ -54,4 +54,3 @@ pub use mind_map::{
 };
 pub use mind_map::{
     MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
-};

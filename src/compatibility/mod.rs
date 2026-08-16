@@ -4,14 +4,12 @@ pub mod apache_ossie;
 pub mod chimera_linux;
 pub mod cross_platform;
 pub mod india_stack;
-pub mod india_professional_tools;
 pub mod alpine_linux;
 pub mod antix;
 pub mod apache_ossie;
 pub mod arch_linux;
 pub mod bodhi_moksha;
 pub mod cachy_os;
-pub mod canonical;
 pub mod chakra;
 pub mod chimera_linux;
 pub mod constellation_mesh;
@@ -21,7 +19,6 @@ pub mod fedora;
 pub mod garuda_zen;
 pub mod gentoo;
 pub mod historic_linux;
-pub mod india_professional_tools;
 pub mod india_stack;
 pub mod interim;
 pub mod jehanne;
@@ -66,7 +63,6 @@ pub use open_source_tier1::{
     LibsodiumIntegration, SmolTcpIntegration, SqliteIntegration, WasmerIntegration,
 };
 
-pub use canonical::{SigmaCloudInit, SigmaCurtin, SigmaMultipass, SigmaNetplan, SigmaSubiquity};
 pub use fedora::{
     BodhiUpdateTriage, DnfPackageResolver, KojiBuildServer, MockChrootBuilder,
     SovereignCockpitConsole, SovereignFirewalldManager, SovereignOstreeDeployer,
@@ -98,7 +94,6 @@ pub use chakra::{
     TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
 
-pub use india_professional_tools::{
     AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker, JudicialTimelinePlanner,
     Literal as ProfLiteral, MsmeComplianceEngine, PMWaniHotspotController, SpacSatResolver,
 };
@@ -125,7 +120,6 @@ pub use antix::{
     GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
 };
 
-pub use canonical::{
     AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
     CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
     ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
