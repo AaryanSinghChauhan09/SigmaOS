@@ -8,12 +8,12 @@ This guide outlines actionable steps and architectural patterns designed to sust
 ## 📅 Chronological Roadmap of Critical Remediations
 
 ### 1. Phase 1: Compile-Time Verification & Hotfixes (Priority: Immediate)
-*   **Scrub Git Conflict Lines:**
-    Deploy an automated conflict scrubber across the 31 Rust source files (and 40+ total files) currently contaminated with conflict headers and git markers (`|||||||`). This is a critical prerequisite to restoring cargo workspace compile-time diagnostics.
 *   **Resolve Firewall Borrow Mismatches:**
     Modify `src/network/pf_firewall.rs` and `src/network/nftables.rs` to clone transient connection parameters (`source_addr.clone()`, `dest_addr.clone()`) and calculate the state changes using scope blocks or temporary vectors to decouple borrow lifetimes from the parent `&self.rules` loop iteration.
 *   **Correct Custom Vec Scope Bounds:**
     Add `use core::mem;` or fully-qualify size queries with `core::mem::size_of::<T>()` inside the bare-metal allocator module within `src/scheduler/scheduler.rs`.
+*   **Verify Fixed Syntax Blockers:**
+    Validate that our compilation fixes for `src/network/enterprise.rs`, `src/distro/improvements.rs`, `src/shell/command.rs`, and `src/sigpkg/resolver.rs` have successfully resolved the primary build-blocking parser errors.
 
 ### 2. Phase 2: Structural Performance Tuning (Priority: High)
 *   **Transition to Zero-Allocation Loggers:**
@@ -22,28 +22,10 @@ This guide outlines actionable steps and architectural patterns designed to sust
     Ensure loop conditions are configured with auto-vectorization friendly styles (e.g., contiguous iteration over memory blocks rather than index lookups), especially within mathematical or security routing engines.
 
 ### 3. Phase 3: Security & Compliance Integration (Priority: High)
-*   **Address ReDoS and Loop Risks in Desktop Tooling:**
-    Upgrade dependency `brace-expansion` inside `package.json` to `^2.0.1` and `nanoid` to `^3.3.17`, then run lockfile synchronization to eliminate vulnerabilities.
+*   **Address ReDoS Risks in Desktop Node Tooling:**
+    Upgrade dependency `brace-expansion` inside `package.json` to `^2.0.1` and run lockfile synchronization to eliminate GHSA-mh99-v99m-4gvg.
 *   **Add Pre-Commit Credentials Scanners:**
     Deploy a standard pre-commit hook targeting hardcoded credentials, test private keys, and API tokens to prevent accidental exposure of secret assets.
-
-### 4. Phase 4: Workflow Optimization & GHA Consolidation (Priority: Medium)
-*   **Reduce Redundant Actions:**
-    Consolidate the 70+ separate workflow YAML files inside `.github/workflows/` into a single, cohesive, multi-environment master pipeline (`ci.yml`) supporting conditional path triggers (`on: push: paths:`).
-*   **Leverage Rust Caching:**
-    Integrate `actions/cache` or similar tools to capture the `target/` and `~/.cargo/` build states, bringing down test wait cycles from 15 minutes to under 3 minutes.
-
----
-
-## ⚖️ Linux & BSD Competitor Comparison
-
-| Aspect | SigmaOS Current State | Competitor Benchmark (Linux/BSD) | Strategic Actions Needed |
-| :--- | :--- | :--- | :--- |
-| **Development** | Standalone compilations blocked by 31 file conflicts. | Arch Linux's automated compile verification pipelines. | Run automated conflict scrubbers globally. |
-| **Features** | Capabilities model with basic isolation boundaries. | Red Hat / SELinux dynamic MAC MLS/MCS dominance. | Incorporate hierarchical `DynamicMacEnforcer`. |
-| **Tools** | Static package dependency resolution mappings. | Gentoo Portage USE flags build optimizer engine. | Implement Portage dynamic USE flag compilation flags. |
-| **Functions** | Dynamic heap logging in critical kernel schedulers. | NixOS atomic immutable system-wide configurations. | Transition scheduler telemetry to static ring buffers. |
-| **Packages** | Static multi-architecture package spec manifests. | Debian dpkg multi-architecture emulations and apt pins. | Build topological sorting package dependencies. |
 
 ---
 
@@ -56,10 +38,14 @@ This guide outlines actionable steps and architectural patterns designed to sust
 ### B. OOP Best Practices for SigmaOS Core Modules
 *   **Encapsulation:** Ensure all sensitive driver status records and key material are marked as private (`pub(crate)` or `private`), forcing access through secure public handlers.
 *   **Polymorphism:** Standardize new device categories by implementing high-level, generic traits rather than writing concrete procedural routers.
-*   **Design Patterns:** Prefer Factory classes for generating instances of dynamic components (e.g., `PackageManagerFactory` for multi-arch distributions) to abstract complex constructor logic.
+*   **Design Patterns:** Prefer Factory classes for generating instances of dynamic components (e.g. `PackageManagerFactory` for multi-arch distributions) to abstract complex constructor logic.
+
+### C. CI/CD Pipeline Maintenance
+*   **Reduce Redundant Actions:** Consolidate the 30+ separate workflow YAML files inside `.github/workflows/` into a single, cohesive, multi-environment master pipeline (`ci.yml`) supporting conditional path triggers (`on: push: paths:`).
+*   **Leverage Rust Caching:** Integrate actions/cache or similar to capture the `target/` and `~/.cargo/` build states, bringing down test wait cycles dramatically.
 
 ---
 
 ## 🤝 Community Mentorship & Governance
-*   Ensure that new contributors are paired with experienced developers according to the Mentorship pairing guidelines outlined in `ImprovementPlan.md` (e.g., Lead Architect pairing on Kernel Memory improvements, Jules on AI Agent and Optimization logic, Palette on UX polishing).
+*   Ensure that new contributors are paired with experienced developers according to the Mentorship pairing guidelines outlined in `ImprovementPlan.md` (e.g. Lead Architect pairing on Kernel Memory improvements, Jules on AI Agent and Optimization logic, Palette on UX polishing).
 *   Categorize all backlog issues cleanly with labels (`bug`, `enhancement`, `feature`) to enable streamlined triaging.

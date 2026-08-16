@@ -1,139 +1,166 @@
 # Contributing to SigmaOS
 
-Thank you for your interest in contributing to SigmaOS! This document outlines guidelines for contributing.
+Thank you for your interest in contributing to SigmaOS! This document provides guidelines and instructions for contributing to the project.
 
 ## Code of Conduct
 
-Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+- Be respectful and inclusive
+- Focus on what is best for the community
+- Show empathy towards other community members
 
-## Development Setup
+## Getting Started
 
 ### Prerequisites
 
-- Rust nightly toolchain: `rustup toolchain install nightly`
-- QEMU for testing: `sudo apt install qemu-system-x86`
-- Cross-compilation target: `rustup target add x86_64-unknown-none`
-- Optional: `cargo install cargo-fuzz` for fuzzing
+- Rust (latest stable version)
+- Cargo (comes with Rust)
+- Git
+- QEMU (for testing)
+- Make
 
-### Building
+### Setting Up Development Environment
 
 ```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS
+# Clone the repository
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
-cargo build --release
-# Or for kernel-only:
-cargo build -p kernel --target x86_64-unknown-none
+
+# Build the project
+cargo build
+
+# Run tests
+cargo test
+
+# Run the project
+cargo run
 ```
+
+## Development Workflow
+
+### Branching Strategy
+
+- `main` - The main development branch
+- All changes should be made through pull requests
+- Feature branches should be named `feature/description`
+- Bugfix branches should be named `fix/description`
+
+### Commit Guidelines
+
+- Use clear, descriptive commit messages
+- Follow conventional commit format: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+
+### Code Style
+
+- Follow Rust standard formatting: `cargo fmt`
+- Use clippy for linting: `cargo clippy`
+- Write tests for new functionality
+- Document public APIs with rustdoc
+
+## Testing
 
 ### Running Tests
 
 ```bash
-cargo test                          # All unit tests
-cargo test -p kernel                # Kernel tests only
-cargo test --doc                    # Doctests
-cargo test -p klib                  # klib tests
+# Run all tests
+cargo test
+
+# Run specific test
+cargo test test_name
+
+# Run tests with output
+cargo test -- --nocapture
 ```
 
-## Contribution Guidelines
+### Test Coverage
 
-### Code Style
+- Aim for high test coverage
+- Write unit tests for individual functions
+- Write integration tests for component interactions
+- Use property-based testing where appropriate
 
-1. **No std in kernel code**: Use `#![no_std]` + `extern crate alloc`
-2. **Prefer klib**: Use `crate::klib` over `alloc` for kernel collections
-3. **No `unwrap()`**: Use `?` or explicit error handling in kernel code
-4. **Document with `///`**: All public APIs must have doc comments
-5. **Rustfmt**: Run `cargo fmt` before submitting
-6. **Clippy**: Run `cargo clippy -- -D warnings`
+## Documentation
 
-### Security Guidelines
+### Code Documentation
 
-1. **No hard-coded secrets**: Never commit keys, passwords, or secrets
-2. **Validate all inputs**: Especially in security-sensitive modules
-3. **Limit unsafe**: Document every `unsafe` block with a SAFETY comment
-4. **Test security properties**: Write tests that verify security invariants
+- Document all public functions and structs
+- Use `///` for item documentation
+- Use `//!` for module documentation
+- Include examples where helpful
 
-### Commit Messages
+### Wiki Documentation
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+- Update the wiki for major features
+- Add tutorials and guides
+- Keep architecture diagrams up to date
+- Document API changes
+
+## Pull Request Process
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Update documentation
+6. Submit a pull request
+7. Address review feedback
+8. Get approval and merge
+
+## Project Structure
 
 ```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
+SigmaOS/
+├── src/              # Source code
+├── tests/            # Integration tests
+├── docs/             # Documentation
+├── scripts/          # Utility scripts
+├── .github/          # GitHub configuration
+├── Cargo.toml        # Rust dependencies
+└── README.md         # Project overview
 ```
 
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `security`: Security improvement
-- `perf`: Performance improvement
-- `docs`: Documentation changes
-- `test`: Test additions/improvements
-- `refactor`: Code refactoring
-- `chore`: Build/tooling changes
+## Module Guidelines
 
-Examples:
-```
-feat(security): add Capsicum capability mode enforcement
-fix(klib): correct race condition in buddy allocator
-security(unveil): prevent directory traversal in path normalization
-perf(scheduler): replace linear scan with BTreeMap in BORE scheduler
-```
+### Security Module
 
-### Pull Request Process
+- Capability-based security model
+- No unsafe code without justification
+- Audit all security-sensitive operations
 
-1. **Fork** the repository
-2. **Create a branch**: `git checkout -b feat/my-feature`
-3. **Make changes** following the guidelines above
-4. **Add tests** for new functionality
-5. **Run CI locally**: `cargo test && cargo clippy && cargo fmt --check`
-6. **Push** and open a PR against `main`
-7. **Fill out the PR template**
-8. **Address review comments**
+### Kernel Module
 
-### PR Requirements
+- No_std compatible where possible
+- Minimal dependencies
+- Clear error handling
 
-- [ ] All CI checks pass (CodeQL, tests, clippy, fmt)
-- [ ] New public APIs have documentation
-- [ ] Security-sensitive changes reviewed by maintainer
-- [ ] No new `unwrap()` calls in kernel code
-- [ ] CHANGELOG.md updated for user-visible changes
+### Package Manager
 
-## Areas for Contribution
+- Zero-dependency where possible
+- Cryptographic verification
+- Atomic transactions
 
-### High Priority
-- **Security**: Fixes for [CodeQL alerts](https://github.com/AaryanSinghChauhan09/SigmaOS/security/code-scanning)
-- **klib**: Extending the zero-dependency standard library
-- **Drivers**: New hardware driver support
-- **Documentation**: Wiki pages and examples
+## Issue Reporting
 
-### Good First Issues
-- Adding doc comments to undocumented public APIs
-- Converting `std` imports to `alloc` imports in kernel code
-- Writing tests for existing modules
-- Fixing clippy warnings
+- Use GitHub Issues for bug reports
+- Provide reproduction steps
+- Include environment details
+- Tag relevant maintainers
 
-### Advanced Topics
-- SigmaBus IPC message routing improvements
-- BORE scheduler enhancements
-- Post-quantum cryptography integration
-- New Linux/BSD parity features
+## Feature Requests
 
-## Architecture Overview
+- Use GitHub Issues for feature requests
+- Describe the use case
+- Propose a solution
+- Consider implementation complexity
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture.
+## License
 
-Key modules:
-- `src/klib/` - Zero-dependency kernel library (start here!)
-- `src/security/` - Security subsystems (pledge, unveil, capsicum)
-- `src/kernel/` - Core kernel
-- `src/ipc/` - Inter-process communication
-- `src/scheduler/` - Process scheduling
+By contributing to SigmaOS, you agree that your contributions will be licensed under the same license as the project.
 
-## Getting Help
+## Questions?
 
-- GitHub Issues: For bug reports and feature requests
-- GitHub Discussions: For questions and design discussions
-- Wiki: For architecture and implementation details
+- Open an issue for questions
+- Contact maintainers via GitHub
+- Check existing documentation
+
+Thank you for contributing to SigmaOS!

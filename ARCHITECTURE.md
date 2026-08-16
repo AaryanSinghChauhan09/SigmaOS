@@ -1,232 +1,234 @@
-# SigmaOS Architecture Guide
+# SigmaOS Architecture
 
 ## Overview
 
-SigmaOS employs a revolutionary hybrid architecture that combines the best aspects of monolithic kernels, microkernels, and modern operating system designs. Our architecture prioritizes security, performance, and modularity while maintaining compatibility with existing software ecosystems.
+SigmaOS is a microkernel-inspired, `#[no_std]` operating system written in safe Rust. It is designed for full digital sovereignty: every subsystem is implemented natively, with zero dependency on C libraries, OpenSSL, or standard Linux userland.
 
-## Core Architecture Principles
+---
 
-### 1. Sovereign Computing Model
-- **Digital Independence**: Complete control over the computing stack
-- **Transparent Operations**: All system operations are auditable
-- **User Empowerment**: Users maintain full control over their data and system behavior
+## System Layers
 
-### 2. Hybrid Kernel Design
 ```
-┌─────────────────────────────────────────────────────┐
-│                  User Space                         │
-├─────────────────────────────────────────────────────┤
-│                Sigma Runtime                        │
-├─────────────────────────────────────────────────────┤
-│              Compatibility Layers                   │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐   │
-│  │  Linux  │ │   BSD   │ │ Windows │ │ Android │   │
-│  │  ABI    │ │  ABI    │ │   ABI   │ │   ABI   │   │
-│  └─────────┘ └─────────┘ └─────────┘ └─────────┘   │
-├─────────────────────────────────────────────────────┤
-│                 Sigma Kernel                        │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐   │
-│  │   Memory    │ │   Process   │ │   Network   │   │
-│  │ Management  │ │ Management  │ │    Stack    │   │
-│  └─────────────┘ └─────────────┘ └─────────────┘   │
-├─────────────────────────────────────────────────────┤
-│              Hardware Abstraction                   │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│            User Applications                     │
+│  (native SigmaOS apps + Linux compat layer)     │
+├─────────────────────────────────────────────────┤
+│              Zenith Desktop                      │
+│  (Wayland compositor, window manager, UI shards)│
+├─────────────────────────────────────────────────┤
+│            System Services / Daemons             │
+│  (network, SSH, cron, screen reader, IME, pkg)  │
+├─────────────────────────────────────────────────┤
+│              SigmaOS Runtime                     │
+│  (process manager, IPC, scheduler, syscalls)    │
+├─────────────────────────────────────────────────┤
+│              Security Layer                      │
+│  (SELinux, AppArmor, capabilities, MAC, audit)  │
+├─────────────────────────────────────────────────┤
+│               Microkernel Core                   │
+│  (memory, scheduler, IPC, drivers, VFS)         │
+├─────────────────────────────────────────────────┤
+│                 Bootloader                       │
+│  (UEFI Secure Boot, TPM, verified chain)        │
+└─────────────────────────────────────────────────┘
 ```
 
-## Kernel Components
+---
+
+## Kernel Architecture (`src/kernel/`)
+
+### Scheduler
+Multi-level feedback queue (MLFQ) with thermal-aware and transformer-scheduler variants:
+- `src/kernel/sched/scheduler.rs` — base Round-Robin + priority
+- `src/kernel/sched/sigma_mlfq.rs` — Multi-Level Feedback Queue
+- `src/kernel/sched/sigma_thermal_sched.rs` — thermal throttle-aware
+- `src/kernel/sched/sigma_transformer_sched.rs` — AI-hint scheduler
 
 ### Memory Management
-- **Unified Virtual Memory**: Single address space with hardware isolation
-- **Zero-Copy Operations**: Efficient data transfers between processes
-- **Compressed Memory**: ZRAM and ZSWAP for improved performance
-- **NUMA Awareness**: Optimized for multi-socket systems
+- `src/kernel/memory/pmm_vmm.rs` — Physical & Virtual Memory Manager
+- `src/klib/buddy_allocator.rs` — buddy allocator (kernel heap)
+- `src/kernel/slab_allocator.rs` — slab allocator for fixed-size objects
+- `src/kernel/paging.rs` — x86-64 paging (4-level page tables)
 
-### Process Management
-- **CFS+ Scheduler**: Enhanced Completely Fair Scheduler with AI optimization
-- **Container Runtime**: Built-in OCI container support
-- **Process Isolation**: Hardware-enforced security boundaries
-- **Real-time Support**: Deterministic scheduling for time-critical tasks
+### Interrupts & IRQ
+- `src/kernel/irq/irq_controller.rs` — PIC/APIC IRQ management
+- `src/interrupt/handler.rs` — IDT, exception handlers
 
-### File Systems
-- **SigmaFS**: Copy-on-write file system with snapshots
-- **Universal Mount**: Support for ext4, Btrfs, ZFS, NTFS, APFS
-- **Semantic File System**: AI-powered content organization
-- **Distributed Storage**: Built-in clustering and replication
+### Processes
+- `src/kernel/proc/process_lifecycle.rs` — fork/exec/wait lifecycle
+- `src/kernel/proc/signals.rs` — POSIX signal delivery (SIGTERM, SIGKILL, etc.)
+- `src/runtime/process/process.rs` — process control block
 
-## Security Architecture
+---
 
-### Multi-Layer Security Model
+## Security Architecture (`src/security/`)
+
+### Mandatory Access Control
 ```
-┌─────────────────────────────────────────────────────┐
-│              Application Layer                      │
-│  ◦ Code Signing    ◦ Sandboxing    ◦ Capabilities  │
-├─────────────────────────────────────────────────────┤
-│               System Layer                          │
-│  ◦ MAC Policies    ◦ Audit Trails   ◦ Integrity    │
-├─────────────────────────────────────────────────────┤
-│               Kernel Layer                          │
-│  ◦ Control Flow   ◦ Memory Safety   ◦ Exploit Mit. │
-├─────────────────────────────────────────────────────┤
-│              Hardware Layer                         │
-│  ◦ Secure Boot    ◦ TPM/TEE        ◦ Encryption    │
-└─────────────────────────────────────────────────────┘
+                    ┌─────────────────┐
+                    │  Security Policy │
+                    │  (rules engine)  │
+                    └────────┬────────┘
+          ┌──────────────────┼──────────────────┐
+          ▼                  ▼                  ▼
+   ┌─────────────┐  ┌──────────────┐  ┌──────────────┐
+   │  SELinux TE  │  │  AppArmor    │  │  Sigma-MAC   │
+   │  (type enf.) │  │  (path MAC)  │  │  (capability)│
+   └─────────────┘  └──────────────┘  └──────────────┘
 ```
 
-### Security Features
-- **Post-Quantum Cryptography**: Quantum-resistant algorithms
-- **Hardware Security Module**: TPM 2.0 and TEE integration
-- **Control Flow Integrity**: Protection against ROP/JOP attacks
-- **Memory Tagging**: Hardware-assisted memory safety
+Key files:
+- `selinux.rs` — SELinux type enforcement
+- `mac.rs` — AppArmor path-based profiles
+- `capability.rs` / `capability_token.rs` — POSIX capabilities + bitmask enforcement
+- `capability_enforcer.rs` — enforcement hook for every syscall
+- `sigma_pledge.rs` — OpenBSD pledge-style syscall restriction
+- `sigma_unveil.rs` — OpenBSD unveil-style path restriction
+- `audit.rs` — tamper-evident audit log
+- `qubes_isolation.rs` — Qubes OS VM isolation domains
+- `intrusion.rs` — fail2ban-style intrusion detection
 
-## Network Architecture
+---
 
-### Advanced Networking Stack
-- **IPv6 First**: Native IPv6 with IPv4 compatibility
-- **Mesh Networking**: Decentralized network topology
-- **Zero-Trust Networking**: Identity-based network access
-- **P2P Protocol Stack**: Built-in peer-to-peer capabilities
+## Virtual Filesystem (`src/filesystem/` + `src/fs/`)
 
-### Network Security
-- **Quantum-Safe Protocols**: Post-quantum TLS and IPSec
-- **Network Segmentation**: Automatic micro-segmentation
-- **DPI Engine**: Deep packet inspection with ML classification
-- **VPN Integration**: Built-in WireGuard and OpenVPN
-
-## AI Integration
-
-### System-Level AI
-- **Predictive Optimization**: ML-driven performance tuning
-- **Anomaly Detection**: Real-time security and performance monitoring
-- **Adaptive Scheduling**: AI-optimized process and resource scheduling
-- **Intelligent Prefetching**: Predictive data and application loading
-
-### AI Infrastructure
 ```
-┌─────────────────────────────────────────────────────┐
-│                AI Applications                      │
-├─────────────────────────────────────────────────────┤
-│               AI Framework Layer                    │
-│  ┌───────────┐ ┌───────────┐ ┌───────────┐        │
-│  │ Inference │ │ Training  │ │ Optimize  │        │
-│  │  Engine   │ │  Engine   │ │  Engine   │        │
-│  └───────────┘ └───────────┘ └───────────┘        │
-├─────────────────────────────────────────────────────┤
-│               AI Runtime Layer                      │
-│  ◦ Model Loading    ◦ GPU Scheduling    ◦ Memory   │
-├─────────────────────────────────────────────────────┤
-│              Hardware Acceleration                  │
-│  ◦ GPU/NPU Support  ◦ SIMD Optimization ◦ Offload  │
-└─────────────────────────────────────────────────────┘
+ Userspace
+     │
+     ▼
+┌──────────┐
+│   VFS    │  (src/filesystem/vfs.rs)
+│  Layer   │
+└────┬─────┘
+     │
+     ├── ext4 (src/fs/filesystem.rs)
+     ├── XFS  (src/fs/xfs.rs)
+     ├── Btrfs (src/filesystem/complete_filesystems.rs)
+     ├── tmpfs / devfs / procfs (src/kernel/fs/)
+     ├── EncryptedFS (src/crypto/)
+     └── CowSnapshot (src/filesystem/cow_snapshot.rs)
 ```
 
-## Shard System
+**OpenFileDescription / FileDescriptor split** (sovereign-branch improvement):
+- `OpenFileDescription` — system-wide, reference-counted file state
+- `FileDescriptor` — process-private handle to an `OpenFileDescription`
 
-### Modular Extensions
-- **Core Shards**: Essential system functionality (58 shards)
-- **Essential Shards**: Common applications and services (150 shards)  
-- **Optional Shards**: Specialized functionality (300 shards)
-- **Third-Party Shards**: Community extensions (unlimited)
+---
 
-### Shard Architecture
-```rust
-// Example shard interface
-pub trait Shard {
-    fn initialize(&mut self) -> Result<(), ShardError>;
-    fn execute(&mut self, context: &Context) -> Result<(), ShardError>;
-    fn cleanup(&mut self) -> Result<(), ShardError>;
-    
-    // Metadata
-    fn name(&self) -> &str;
-    fn version(&self) -> Version;
-    fn dependencies(&self) -> &[ShardId];
-}
+## Networking (`src/net/` + `src/network/`)
+
+- `src/net/tcpip_stack.rs` — native TCP/IP stack (no lwIP dependency)
+- `src/net/dns.rs` — DNS resolver with split-DNS, hosts file, dnsmasq-style latency sorting
+- `src/net/zenith.rs` — Zenith networking abstraction
+- `src/network/protocols.rs` — protocol handlers
+- `src/network/enterprise.rs` — enterprise networking (VPN, proxy)
+- `src/security/vpn.rs` — WireGuard-compatible VPN
+
+---
+
+## Package Management (`src/sigpkg/` + `src/package/`)
+
+SigmaPkg supports all major Linux package formats natively:
+
+| Format | File |
+|---|---|
+| .deb (Debian/Ubuntu) | `universal_adapter.rs` |
+| .rpm (Fedora/RHEL) | `universal_adapter.rs` + `rpm_compat.rs` |
+| .pkg.tar.zst (Arch) | `arch_compat.rs` |
+| .apk (Alpine) | `universal_adapter.rs` |
+| .snap | `universal_adapter.rs` |
+| Flatpak | `universal_adapter.rs` |
+| AppImage | `universal_adapter.rs` |
+| Nix flake | `universal_adapter.rs` |
+| ebuild (Gentoo) | `universal_adapter.rs` |
+| XBPS (Void) | `universal_adapter.rs` |
+| txz (Slackware) | `universal_adapter.rs` |
+| eopkg (Solus) | `universal_adapter.rs` |
+| guix | `universal_adapter.rs` |
+
+---
+
+## AI Subsystem (`src/ai/`)
+
+- `orchestrator.rs` — S-AI multi-agent orchestrator (model routing, task negotiation)
+- `llm.rs` — local LLM inference engine
+- `agent.rs` — autonomous agent framework (Bolt / Palette / Sentinel)
+- `autogen.rs` — multi-agent task generation
+- `lift_engine.rs` — context-lift memory search
+- `apm.rs` — AI performance monitor
+- `voice.rs` — speech synthesis/recognition
+
+---
+
+## Kernel Library (`src/klib/`) — Zero stdlib
+
+All standard collections reimplemented for `#[no_std]`:
+
+| Module | Replaces |
+|---|---|
+| `vec.rs` | `std::vec::Vec` |
+| `hashmap.rs` | `std::collections::HashMap` |
+| `btreemap.rs` | `std::collections::BTreeMap` |
+| `hashset.rs` | `std::collections::HashSet` |
+| `vecdeque.rs` | `std::collections::VecDeque` |
+| `buddy_allocator.rs` | `std::alloc` |
+| `hash.rs` | `std::hash::Hash` |
+
+---
+
+## Compatibility Layers (`src/compatibility/`)
+
+SigmaOS can run software from these ecosystems natively:
+- **Linux** (glibc/musl syscall translation via S-COSMOS)
+- **Windows** (Win32/NT via ReactOS-inspired layer)
+- **macOS** (mach port compatibility)
+- **WASM** (sandbox runtime)
+- **FreeDOS** / **TempleOS** (legacy)
+
+---
+
+## Build System
+
+```bash
+cargo build --release          # build SigmaOS library
+bash scripts/build-iso.sh      # build bootable ISO
+bash scripts/smoke-test.sh     # run smoke tests
+python3 scripts/qemu_smoke_test.py  # QEMU emulation test
 ```
 
-## Package Management
+Target: `x86_64-unknown-none` (bare-metal, no OS underneath)
 
-### Universal Package System
-- **SigPkg**: Native package format with content addressing
-- **Multi-Format Support**: deb, rpm, flatpak, snap, AppImage
-- **Atomic Updates**: Transactional package operations
-- **Rollback Support**: Easy system restoration
+---
 
-### Package Architecture
+## Directory Structure
+
 ```
-┌─────────────────────────────────────────────────────┐
-│              Application Layer                      │
-├─────────────────────────────────────────────────────┤
-│             Package Managers                        │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐   │
-│  │ sigpkg  │ │   apt   │ │   dnf   │ │flatpak  │   │
-│  └─────────┘ └─────────┘ └─────────┘ └─────────┘   │
-├─────────────────────────────────────────────────────┤
-│           Universal Adapter Layer                   │
-├─────────────────────────────────────────────────────┤
-│              Package Store                          │
-│    ◦ Content Addressing   ◦ Deduplication          │
-└─────────────────────────────────────────────────────┘
+SigmaOS/
+├── src/
+│   ├── kernel/     # Microkernel (scheduler, memory, IRQ, crypto)
+│   ├── klib/       # Zero-stdlib collections & allocators
+│   ├── security/   # MAC, capabilities, audit, crypto, VPN
+│   ├── filesystem/ # VFS, ext4, Btrfs, CoW snapshots
+│   ├── net/ network/ # TCP/IP stack, DNS, VPN, enterprise
+│   ├── ai/         # LLM, agents, orchestrator
+│   ├── driver/     # Hardware driver framework
+│   ├── drivers/    # Specific drivers (USB, input, GPU, serial)
+│   ├── compatibility/ # Linux/Windows/macOS compat layers
+│   ├── distro/     # Distro-specific implementations
+│   ├── sigpkg/     # Package management
+│   ├── shell/      # Sigma shell (REPL, commands)
+│   ├── desktop/    # Desktop environment
+│   ├── graphics/   # GPU driver, compositor, image decoder
+│   ├── audio/      # Audio subsystem
+│   ├── accessibility/ # Screen reader, magnifier, keyboard
+│   ├── productivity/ # Office suite, notes, email, recorder
+│   └── ...
+├── kernel/         # Low-level kernel modules (C/asm-adjacent)
+├── bootloader/     # UEFI bootloader
+├── crypto/         # Cryptographic primitives
+├── tools/          # Native tool replacements (ls, grep, curl…)
+├── scripts/        # Build, test, ISO creation scripts
+├── web_ui/         # Zenith desktop web UI
+├── docs/           # Documentation
+└── WIKI/           # Wiki content (synced to GitHub Wiki)
 ```
-
-## Compatibility Architecture
-
-### Multi-ABI Support
-- **Linux Compatibility**: Full syscall compatibility
-- **BSD Compatibility**: FreeBSD/OpenBSD support
-- **Windows Compatibility**: Wine-based Windows app support
-- **Legacy Support**: Historical UNIX and DOS applications
-
-### Compatibility Layers
-```rust
-// ABI translation example
-pub struct LinuxCompatLayer;
-
-impl ABILayer for LinuxCompatLayer {
-    fn translate_syscall(&self, call: u64, args: &[u64]) -> Result<u64, ABIError> {
-        match call {
-            SYS_OPEN => self.handle_open(args),
-            SYS_READ => self.handle_read(args),
-            SYS_WRITE => self.handle_write(args),
-            _ => self.handle_generic(call, args),
-        }
-    }
-}
-```
-
-## Performance Optimization
-
-### System Optimization
-- **Profile-Guided Optimization**: Runtime performance tuning
-- **Adaptive Scheduling**: Workload-aware process scheduling
-- **Memory Compression**: Transparent memory optimization
-- **I/O Optimization**: Advanced storage and network optimizations
-
-### Hardware Utilization
-- **Multi-Core Scaling**: Optimized for modern many-core processors
-- **GPU Compute**: General-purpose GPU computing integration
-- **Heterogeneous Computing**: ARM big.LITTLE and x86 hybrid support
-- **Power Management**: Advanced energy efficiency features
-
-## Development Architecture
-
-### System Development
-- **Rust-First**: Memory-safe systems programming
-- **C Compatibility**: Legacy code integration
-- **WebAssembly**: Portable application runtime
-- **Language Bindings**: Support for Python, JavaScript, Go, etc.
-
-### Development Tools
-- **Integrated Debugger**: Advanced debugging with AI assistance
-- **Performance Profiler**: Real-time performance analysis
-- **Security Scanner**: Automated vulnerability detection
-- **Testing Framework**: Comprehensive testing infrastructure
-
-## Future Architecture Evolution
-
-### Planned Enhancements
-- **Quantum Computing Integration**: Post-quantum algorithms and quantum acceleration
-- **Neural Network Hardware**: Dedicated AI processing units
-- **Distributed Computing**: Native cloud and edge computing support
-- **Autonomous Operation**: Self-healing and self-optimizing systems
-
-This architecture represents the cutting edge of operating system design, providing a foundation for the next generation of computing while maintaining compatibility with existing software ecosystems.
