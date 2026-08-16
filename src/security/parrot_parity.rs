@@ -106,12 +106,19 @@ impl AppSandboxEngine {
 
     /// Set sandbox policy
     pub fn set_policy(&self, policy: SandboxPolicy) {
-        self.current_policy.set(policy);
+        self.allow_network.store(policy.allow_network, Ordering::SeqCst);
+        self.allow_raw_sockets.store(policy.allow_raw_sockets, Ordering::SeqCst);
+        self.allow_filesystem_write.store(policy.allow_filesystem_write, Ordering::SeqCst);
     }
 
     /// Get current policy
     pub fn current_policy(&self) -> SandboxPolicy {
-        self.current_policy.get()
+        SandboxPolicy {
+            allow_network: self.allow_network.load(Ordering::SeqCst),
+            allow_raw_sockets: self.allow_raw_sockets.load(Ordering::SeqCst),
+            allow_filesystem_write: self.allow_filesystem_write.load(Ordering::SeqCst),
+            permitted_subpath: "/sandbox/tmp",
+        }
     }
 }
 

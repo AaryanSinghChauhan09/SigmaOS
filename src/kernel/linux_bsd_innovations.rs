@@ -1178,6 +1178,29 @@ impl NetBsdRumpKernel {
             Ok(alloc::format!("Bootstrap Anykernel component: {} running in Ring 0 Monolithic Space", name))
         }
     }
+
+    pub fn execute_rump_hypercall(
+        &self,
+        component_name: &str,
+        hypercall_id: u32,
+        payload: u64,
+    ) -> Result<u64, &'static str> {
+        let comp = self.components.get(component_name).ok_or("Component not found")?;
+        if !comp.run_in_userspace {
+            return Err("Hypercall allowed only for userspace rump microthreads");
+        }
+        Ok(payload ^ (hypercall_id as u64))
+    }
+
+    pub fn isolate_rump_vfs(&mut self, fs_name: &str) -> Result<String, &'static str> {
+        self.register_component(fs_name, true);
+        Ok(alloc::format!("Isolated Rump VFS driver '{}' in userspace microthread", fs_name))
+    }
+
+    pub fn virtualize_rump_network(&mut self, net_dev: &str) -> Result<String, &'static str> {
+        self.register_component(net_dev, true);
+        Ok(alloc::format!("Virtualised Rumpnet network stack driver '{}' in userspace microthread", net_dev))
+    }
 }
 
 // ================= Monolithic Kernel Inspirations =================
@@ -1434,6 +1457,15 @@ mod tests {
 
         let res_e1000 = rump.bootstrap_component("e1000").unwrap();
         assert!(res_e1000.contains("Ring 0 Monolithic Space"));
+
+        let hyper_res = rump.execute_rump_hypercall("ext4fs", 0x10, 0xAA00).unwrap();
+        assert_eq!(hyper_res, 0xAA00 ^ 0x10);
+
+        let vfs_res = rump.isolate_rump_vfs("zfs").unwrap();
+        assert!(vfs_res.contains("Isolated Rump VFS driver 'zfs'"));
+
+        let net_res = rump.virtualize_rump_network("iwlwifi").unwrap();
+        assert!(net_res.contains("Virtualised Rumpnet network stack driver 'iwlwifi'"));
     }
 
     #[test]

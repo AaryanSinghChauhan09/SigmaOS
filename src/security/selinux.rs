@@ -6,7 +6,7 @@ extern crate alloc;
 // Implements labeling security contexts (user:role:type:sensitivity), enforcement modes,
 // an Access Vector Cache (AVC) for performance, policy rules, and detailed audit logging.
 
-use alloc::collections::{BTreeMap as HashMap, BTreeSet as HashSet};
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SeLinuxMode {
@@ -199,6 +199,7 @@ impl SelinuxEngine {
     }
 }
 
+use std::collections::HashSet;
 
 /// Multi-Level Security (MLS) sensitivity levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
