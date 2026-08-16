@@ -3,6 +3,7 @@
 pub mod system;
 
 pub use system::{
-    ManagerCapability, Plugin, PluginCapability, PluginError, PluginID, PluginInfo, PluginManager,
-    PluginState, PluginStats, SimplePlugin, SimplePluginManager,
+    ExtensionType, ManagerCapability, MarketplaceItem, Plugin, PluginCapability, PluginError,
+    PluginID, PluginInfo, PluginManager, PluginMarketplace, PluginState, PluginStats, SimplePlugin,
+    SimplePluginManager,
 };
