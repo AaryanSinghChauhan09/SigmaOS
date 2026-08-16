@@ -8,6 +8,7 @@ pub mod developer;
 pub mod enterprise;
 pub mod i18n;
 pub mod linux_bsd_inspirations;
+pub mod linux_bsd_parity;
 pub mod manjaro;
 pub mod nextgen;
 pub mod preseed;
@@ -20,6 +21,11 @@ pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
     PinRule, AptPinStore, OpenRCService, SovereignBpfCoReEngine, BsdCapsicumRights,
     Hammer2MultiVersionEngine, SovereignOstreeEngine,
+};
+pub use linux_bsd_parity::{
+    ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
+    NixOSFlakeEngine, PacmanHook, PortagePackage, RunitService, ServiceState, SystemClosure,
+    VoidRunitSupervisor,
 };
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
