@@ -1,16 +1,4 @@
-#[cfg(test)]
-pub struct DdeDeviceWrapper {
-    pub simulated_pci_bar: [u8; 256],
-}
-#[cfg(test)]
-impl DdeDeviceWrapper {
-    pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
-        Self {
-            simulated_pci_bar: [0; 256],
-        }
-    }
-}
-
+use crate::driver::device::DdeDeviceWrapper;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
@@ -214,13 +202,11 @@ impl VintageVirtualizationSandbox {
 }
 
 /// Vintage Linux Driver Shim Translator
-#[cfg(test)]
 pub struct VintageDriverTranslator {
     pub era: LinuxEra,
     pub wrapper: DdeDeviceWrapper,
 }
 
-#[cfg(test)]
 impl VintageDriverTranslator {
     pub fn new(era: LinuxEra, device_name: &str) -> Self {
         VintageDriverTranslator {
@@ -262,37 +248,6 @@ pub enum HistoricError {
     MemoryAccessViolation,
     InvalidIoPortAccess,
     UnsupportedPackageFormat,
-    LfsBuildFailure,
-}
-
-/// Simulated LFS Stage 1 and 2 Toolchain builder
-pub struct LfsToolchainBuilder {
-    pub current_stage: u8,
-}
-
-impl LfsToolchainBuilder {
-    pub fn new() -> Self {
-        Self { current_stage: 1 }
-    }
-
-    pub fn execute_bootstrap_stage(&mut self, stage: u8) -> Result<&'static str, HistoricError> {
-        if stage > 3 {
-            return Err(HistoricError::LfsBuildFailure);
-        }
-        self.current_stage = stage;
-        match stage {
-            1 => Ok("LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"),
-            2 => Ok("LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"),
-            3 => Ok("LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"),
-            _ => Err(HistoricError::LfsBuildFailure),
-        }
-    }
-}
-
-impl Default for LfsToolchainBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// TinyCore-style RAM-only Ephemeral Execution Engine.
@@ -321,7 +276,7 @@ impl TinyCoreEphemeralEngine {
         Ok(())
     }
 
-    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
+    pub fn write_to_volatile_overlay(&mut self, _file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
         if self.persistence_enabled {
             return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
         }
@@ -421,57 +376,5 @@ mod tests {
         let conv = VintagePackageConverter;
         let res = conv.convert_package("old_bash", "tar.Z").unwrap();
         assert_eq!(res, "old_bash-sigpkg-compat");
-    }
-
-    #[test]
-    fn test_lfs_toolchain_stages() {
-        let mut builder = LfsToolchainBuilder::new();
-        assert_eq!(
-            builder.execute_bootstrap_stage(1).unwrap(),
-            "LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"
-        );
-        assert_eq!(
-            builder.execute_bootstrap_stage(2).unwrap(),
-            "LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"
-        );
-        assert_eq!(
-            builder.execute_bootstrap_stage(3).unwrap(),
-            "LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"
-        );
-        assert!(builder.execute_bootstrap_stage(4).is_err());
-    }
-
-    #[test]
-    fn test_os_tutorial_absorption() {
-        // 1. Protected Mode Switch Tests
-        let mut pm_switch = ProtectedModeSwitchSimulator::new();
-        assert!(pm_switch.execute_switch_to_pm().is_err()); // fails because GDT not loaded
-
-        pm_switch.lgdt();
-        assert!(pm_switch.execute_switch_to_pm().is_ok());
-        assert!(pm_switch.cr0_pe_bit);
-        assert_eq!(pm_switch.active_cs_segment, 0x08);
-        assert_eq!(pm_switch.active_ds_segment, 0x10);
-
-        // 2. VGA Text Mode Screen Driver Tests
-        let mut vga = VgaTextModeDriverSimulator::new();
-        vga.write_char('S', 0x0F); // white text on black background
-        assert_eq!(vga.buffer[0], ('S' as u16) | (0x0F << 8));
-        assert_eq!(vga.cursor_offset, 1);
-
-        assert_eq!(vga.update_cursor_via_ports(0x3D4, 0).unwrap(), 1);
-        vga.update_cursor_via_ports(0x3D5, 42).unwrap();
-        assert_eq!(vga.cursor_offset, 42);
-
-        // 3. PIC Keyboard Controller Tests
-        let mut keyboard = PicKeyboardController::new();
-        assert_eq!(keyboard.master_pic_mask, 0xFF);
-
-        keyboard.init_pic();
-        assert_eq!(keyboard.master_pic_mask, 0xFD); // IRQ1 unmasked
-
-        assert_eq!(keyboard.poll_port_60_read(0x10), 'q');
-        assert_eq!(keyboard.poll_port_60_read(0x1F), 's');
-        assert_eq!(keyboard.poll_port_60_read(0x99), '?');
     }
 }

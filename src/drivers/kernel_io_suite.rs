@@ -35,12 +35,6 @@ pub enum HidTokenType { Keyboard, Mouse, Joystick }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrinterFormat { Text, PostScript, Pdf }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HidTokenType { Keyboard, Mouse, Joystick }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PrinterFormat { Text, PostScript, Pdf }
-
 
 
 
@@ -1315,7 +1309,7 @@ impl Uart8250 {
         }
     }
 
-    pub fn write_byte(&mut self, _byte: u8) -> Result<(), AncientError> {
+    pub fn write_byte(&mut self, byte: u8) -> Result<(), AncientError> {
         if self.line_status & 0x20 != 0 {
             // THRE set, can write
             self.line_status |= 0x01;

@@ -1,197 +1,213 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
-// SigmaOS klib::slab - Slab Allocator (zero external dependencies)
-// Inspired by Linux's SLAB/SLUB allocator and FreeBSD's UMA (Universal Memory Allocator)
-// Uses only core, no std or alloc required
+extern crate alloc;
+
+// SigmaOS klib: Slab Allocator (like Linux SLUB/SLAB, FreeBSD UMA)
+// Custom memory allocator for fixed-size object allocation pools
+// No external dependencies - fully sovereign implementation
+
+#[allow(dead_code)]
 
 use core::alloc::Layout;
-use core::cell::UnsafeCell;
-use core::mem::{self, MaybeUninit};
-use core::ptr;
+use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// Maximum number of object sizes a slab cache can hold
-const MAX_SLAB_PAGES: usize = 16;
-
-/// A slab cache for a fixed-size object type.
-/// Provides O(1) alloc/free with minimal fragmentation.
-/// Inspired by Linux `kmem_cache_t` and FreeBSD `uma_zone_t`.
+/// A slab cache for fixed-size allocations.
+/// Inspired by Linux's SLAB/SLUB allocator and FreeBSD's UMA (Universal Memory Allocator).
+/// 
+/// Key design choices from Linux SLUB:
+/// - Per-cache object size (no wasted padding beyond alignment)
+/// - Free list stored inside free objects (no metadata overhead per object)
+/// - Batch allocation from buddy allocator
 pub struct SlabCache {
+    /// Size of each object in bytes
     object_size: usize,
-    objects_per_slab: usize,
-    free_count: AtomicUsize,
-    total_count: AtomicUsize,
-    /// Free-list head: index into slab backing store
+    /// Alignment requirement
+    align: usize,
+    /// Total objects in the pool
+    total: usize,
+    /// Free list head (index into pool, or usize::MAX for end)
     free_head: AtomicUsize,
-    /// Slab backing memory (statically sized for no_std)
-    backing: UnsafeCell<[MaybeUninit<u8>; 65536]>, // 64KB per slab cache
-    initialized: AtomicUsize, // 0 = not init, 1 = initialized
+    /// The backing memory
+    pool: *mut u8,
+    /// Number of allocated objects
+    allocated: AtomicUsize,
+    /// Cache name (for debugging, like Linux's kmem_cache_create name param)
+    name: &'static str,
 }
 
-unsafe impl Sync for SlabCache {}
+// SAFETY: The SlabCache manages memory exclusively through its interface
 unsafe impl Send for SlabCache {}
+unsafe impl Sync for SlabCache {}
 
-/// Free object header embedded in free objects (intrusive free list)
-#[repr(C)]
-struct FreeNode {
-    next: usize, // Index to next free node, or usize::MAX if last
-}
+const FREE_END: usize = usize::MAX;
 
 impl SlabCache {
-    /// Create a new slab cache (const for static initialization)
-    pub const fn new(object_size: usize) -> Self {
-        let aligned_size = if object_size < mem::size_of::<FreeNode>() {
-            mem::size_of::<FreeNode>()
-        } else {
-            // Round up to pointer alignment
-            (object_size + mem::align_of::<usize>() - 1) & !(mem::align_of::<usize>() - 1)
-        };
+    /// Create a new slab cache.
+    /// `object_size`: size of each object, must be >= size_of::<usize>()
+    /// `capacity`: maximum number of objects
+    /// `name`: debugging name (like Linux kmem_cache_create)
+    pub unsafe fn new(object_size: usize, align: usize, capacity: usize, name: &'static str) -> Option<Self> {
+        let obj_size = object_size.max(core::mem::size_of::<usize>());
+        // Align the object size to the required alignment
+        let obj_size = (obj_size + align - 1) & !(align - 1);
+        let total_bytes = obj_size * capacity;
 
-        let objects_per_slab = if aligned_size > 0 { 65536 / aligned_size } else { 0 };
-
-        Self {
-            object_size: aligned_size,
-            objects_per_slab,
-            free_count: AtomicUsize::new(0),
-            total_count: AtomicUsize::new(0),
-            free_head: AtomicUsize::new(usize::MAX),
-            backing: UnsafeCell::new([MaybeUninit::uninit(); 65536]),
-            initialized: AtomicUsize::new(0),
-        }
-    }
-
-    /// Initialize the slab cache. Must be called before first alloc.
-    pub fn init(&self) {
-        if self.initialized.load(Ordering::Relaxed) != 0 {
-            return; // Already initialized
-        }
-
-        if self.object_size == 0 || self.objects_per_slab == 0 {
-            return;
-        }
-
-        // Build the free list by writing FreeNode headers into each slot
-        // SAFETY: We have exclusive access during initialization
-        let backing = unsafe { &mut *self.backing.get() };
-
-        for i in 0..self.objects_per_slab {
-            let offset = i * self.object_size;
-            let next = if i + 1 < self.objects_per_slab { i + 1 } else { usize::MAX };
-
-            // Write FreeNode into the backing buffer
-            let node = FreeNode { next };
-            let node_bytes = unsafe {
-                core::slice::from_raw_parts(
-                    &node as *const FreeNode as *const MaybeUninit<u8>,
-                    mem::size_of::<FreeNode>(),
-                )
-            };
-            backing[offset..offset + mem::size_of::<FreeNode>()].copy_from_slice(node_bytes);
-        }
-
-        self.free_head.store(0, Ordering::Release);
-        self.free_count.store(self.objects_per_slab, Ordering::Release);
-        self.total_count.store(self.objects_per_slab, Ordering::Release);
-        self.initialized.store(1, Ordering::Release);
-    }
-
-    /// Allocate an object from this slab cache. Returns byte offset into backing store.
-    pub fn alloc(&self) -> Option<usize> {
-        let head = self.free_head.load(Ordering::Acquire);
-        if head == usize::MAX {
-            return None; // No free objects
-        }
-
-        let offset = head * self.object_size;
-
-        // Read next free node from the current head
-        // SAFETY: head is a valid index into backing store
-        let next = unsafe {
-            let backing = &*self.backing.get();
-            let node_ptr = backing[offset..].as_ptr() as *const FreeNode;
-            (*node_ptr).next
-        };
-
-        self.free_head.store(next, Ordering::Release);
-        self.free_count.fetch_sub(1, Ordering::Relaxed);
-
-        Some(offset)
-    }
-
-    /// Free an object by its byte offset into the backing store.
-    pub fn free(&self, offset: usize) {
-        // Push onto free list head
-        let old_head = self.free_head.load(Ordering::Acquire);
-
-        let node = FreeNode { next: old_head };
-
-        // SAFETY: offset is within backing store bounds
-        unsafe {
-            let backing = &mut *self.backing.get();
-            let node_bytes = core::slice::from_raw_parts(
-                &node as *const FreeNode as *const MaybeUninit<u8>,
-                mem::size_of::<FreeNode>(),
-            );
-            backing[offset..offset + mem::size_of::<FreeNode>()].copy_from_slice(node_bytes);
-        }
-
-        let slot_index = offset / self.object_size;
-        self.free_head.store(slot_index, Ordering::Release);
-        self.free_count.fetch_add(1, Ordering::Relaxed);
-    }
-
-    /// Get a mutable pointer to an object at offset
-    /// SAFETY: Caller must ensure the offset was returned by alloc() and not freed
-    pub unsafe fn get_ptr(&self, offset: usize) -> *mut u8 {
-        let backing = &mut *self.backing.get();
-        backing[offset].as_mut_ptr()
-    }
-
-    /// Statistics
-    pub fn free_count(&self) -> usize {
-        self.free_count.load(Ordering::Relaxed)
-    }
-
-    pub fn allocated_count(&self) -> usize {
-        self.total_count.load(Ordering::Relaxed)
-            .saturating_sub(self.free_count())
-    }
-
-    pub fn utilization_percent(&self) -> u8 {
-        let total = self.total_count.load(Ordering::Relaxed);
-        if total == 0 { return 0; }
-        let used = self.allocated_count();
-        ((used * 100) / total) as u8
-    }
-}
-
-/// A global slab cache registry inspired by Linux's kmem_cache
-/// Provides named caches for common kernel object sizes
-pub struct SlabRegistry {
-    caches: [Option<&'static SlabCache>; 16],
-    count: usize,
-}
-
-impl SlabRegistry {
-    pub const fn new() -> Self {
-        Self {
-            caches: [None; 16],
-            count: 0,
-        }
-    }
-
-    pub fn register(&mut self, cache: &'static SlabCache) -> Option<usize> {
-        if self.count >= 16 {
+        let layout = Layout::from_size_align(total_bytes, align).ok()?;
+        let pool = alloc::alloc::alloc(layout);
+        if pool.is_null() {
             return None;
         }
-        let idx = self.count;
-        self.caches[idx] = Some(cache);
-        self.count += 1;
-        Some(idx)
+
+        // Initialize free list - each free slot stores the index of the next free slot
+        for i in 0..capacity {
+            let slot_ptr = pool.add(i * obj_size) as *mut usize;
+            *slot_ptr = if i + 1 < capacity { i + 1 } else { FREE_END };
+        }
+
+        Some(Self {
+            object_size: obj_size,
+            align,
+            total: capacity,
+            free_head: AtomicUsize::new(0),
+            pool,
+            allocated: AtomicUsize::new(0),
+            name,
+        })
     }
 
-    pub fn get(&self, idx: usize) -> Option<&'static SlabCache> {
-        self.caches.get(idx)?.copied()
+    /// Allocate one object from the slab cache.
+    /// Returns None if the cache is full.
+    /// Like Linux's kmem_cache_alloc().
+    pub fn alloc(&self) -> Option<NonNull<u8>> {
+        loop {
+            let head = self.free_head.load(Ordering::Acquire);
+            if head == FREE_END {
+                return None; // Cache exhausted
+            }
+
+            // Read the next free index from the free object
+            let slot_ptr = unsafe { self.pool.add(head * self.object_size) as *mut usize };
+            let next = unsafe { *slot_ptr };
+
+            // CAS to claim this slot
+            match self.free_head.compare_exchange_weak(
+                head, next, Ordering::AcqRel, Ordering::Relaxed
+            ) {
+                Ok(_) => {
+                    self.allocated.fetch_add(1, Ordering::Relaxed);
+                    let ptr = unsafe { NonNull::new_unchecked(self.pool.add(head * self.object_size)) };
+                    // Zero-initialize (like Linux's kmem_cache_zalloc)
+                    unsafe { core::ptr::write_bytes(ptr.as_ptr(), 0, self.object_size); }
+                    return Some(ptr);
+                }
+                Err(_) => continue, // Retry on contention
+            }
+        }
     }
+
+    /// Free an object back to the slab cache.
+    /// Like Linux's kmem_cache_free().
+    /// 
+    /// # Safety
+    /// `ptr` must have been allocated from this cache and not yet freed.
+    pub unsafe fn free(&self, ptr: NonNull<u8>) {
+        let offset = ptr.as_ptr().offset_from(self.pool) as usize;
+        let index = offset / self.object_size;
+        debug_assert!(index < self.total, "Invalid pointer freed to slab cache");
+
+        loop {
+            let head = self.free_head.load(Ordering::Acquire);
+            // Store next-free index in the freed slot
+            *(ptr.as_ptr() as *mut usize) = head;
+            match self.free_head.compare_exchange_weak(
+                head, index, Ordering::AcqRel, Ordering::Relaxed
+            ) {
+                Ok(_) => {
+                    self.allocated.fetch_sub(1, Ordering::Relaxed);
+                    return;
+                }
+                Err(_) => continue,
+            }
+        }
+    }
+
+    /// Returns the number of currently allocated objects.
+    pub fn allocated(&self) -> usize {
+        self.allocated.load(Ordering::Relaxed)
+    }
+
+    /// Returns the total capacity.
+    pub fn capacity(&self) -> usize {
+        self.total
+    }
+
+    /// Returns the number of free slots.
+    pub fn free_slots(&self) -> usize {
+        self.total - self.allocated()
+    }
+
+    /// Returns the cache name.
+    pub fn name(&self) -> &str {
+        self.name
+    }
+
+    /// Returns the object size (aligned).
+    pub fn object_size(&self) -> usize {
+        self.object_size
+    }
+}
+
+impl Drop for SlabCache {
+    fn drop(&mut self) {
+        let total_bytes = self.object_size * self.total;
+        let layout = unsafe {
+            Layout::from_size_align_unchecked(total_bytes, self.align)
+        };
+        unsafe {
+            alloc::alloc::dealloc(self.pool, layout);
+        }
+    }
+}
+
+/// A typed slab cache for allocating objects of type T.
+/// Provides a safe, typed wrapper over SlabCache.
+pub struct TypedSlabCache<T> {
+    inner: SlabCache,
+    _marker: core::marker::PhantomData<T>,
+}
+
+impl<T> TypedSlabCache<T> {
+    /// Create a new typed slab cache.
+    pub fn new(capacity: usize, name: &'static str) -> Option<Self> {
+        let inner = unsafe {
+            SlabCache::new(
+                core::mem::size_of::<T>(),
+                core::mem::align_of::<T>(),
+                capacity,
+                name,
+            )?
+        };
+        Some(Self { inner, _marker: core::marker::PhantomData })
+    }
+
+    /// Allocate and initialize an object.
+    pub fn alloc_with(&self, value: T) -> Option<NonNull<T>> {
+        let ptr = self.inner.alloc()?;
+        let typed_ptr = ptr.as_ptr() as *mut T;
+        unsafe { typed_ptr.write(value); }
+        Some(unsafe { NonNull::new_unchecked(typed_ptr) })
+    }
+
+    /// Free an object back to the cache.
+    /// # Safety: ptr must come from this cache's alloc_with and not be freed twice.
+    pub unsafe fn free(&self, ptr: NonNull<T>) {
+        // Drop the object
+        core::ptr::drop_in_place(ptr.as_ptr());
+        self.inner.free(ptr.cast());
+    }
+
+    pub fn allocated(&self) -> usize { self.inner.allocated() }
+    pub fn capacity(&self) -> usize { self.inner.capacity() }
+    pub fn name(&self) -> &str { self.inner.name() }
 }
 
 #[cfg(test)]
@@ -199,34 +215,57 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_slab_alloc_free() {
-        static CACHE: SlabCache = SlabCache::new(64);
-        CACHE.init();
+    fn test_slab_cache_basic() {
+        let cache = TypedSlabCache::<u64>::new(16, "test_u64_cache").unwrap();
+        assert_eq!(cache.capacity(), 16);
+        assert_eq!(cache.allocated(), 0);
 
-        let offset1 = CACHE.alloc().expect("Should allocate");
-        let offset2 = CACHE.alloc().expect("Should allocate");
+        let ptr1 = cache.alloc_with(42u64).unwrap();
+        let ptr2 = cache.alloc_with(99u64).unwrap();
+        assert_eq!(cache.allocated(), 2);
 
-        assert_ne!(offset1, offset2);
-        assert_eq!(CACHE.allocated_count(), 2);
-
-        CACHE.free(offset1);
-        assert_eq!(CACHE.allocated_count(), 1);
-
-        let offset3 = CACHE.alloc().expect("Should reuse freed slot");
-        assert_eq!(offset3, offset1); // LIFO: freed slot is reused first
-
-        CACHE.free(offset2);
-        CACHE.free(offset3);
-        assert_eq!(CACHE.allocated_count(), 0);
+        unsafe {
+            assert_eq!(*ptr1.as_ptr(), 42);
+            assert_eq!(*ptr2.as_ptr(), 99);
+            cache.free(ptr1);
+            cache.free(ptr2);
+        }
+        assert_eq!(cache.allocated(), 0);
     }
 
     #[test]
-    fn test_slab_capacity() {
-        static CACHE: SlabCache = SlabCache::new(1024);
-        CACHE.init();
+    fn test_slab_cache_exhaustion() {
+        let cache = TypedSlabCache::<u32>::new(4, "tiny_cache").unwrap();
+        let ptrs: alloc::vec::Vec<_> = (0..4).filter_map(|i| cache.alloc_with(i as u32)).collect();
+        assert_eq!(ptrs.len(), 4);
+        // Should be full now
+        assert!(cache.alloc_with(99u32).is_none());
+        // Free one
+        unsafe { cache.free(ptrs[0]); }
+        // Should work now
+        let new_ptr = cache.alloc_with(100u32);
+        assert!(new_ptr.is_some());
+        unsafe {
+            for p in ptrs.into_iter().skip(1) {
+                cache.free(p);
+            }
+            cache.free(new_ptr.unwrap());
+        }
+    }
 
-        let capacity = CACHE.objects_per_slab;
-        assert!(capacity > 0);
-        assert!(CACHE.free_count() == capacity);
+    #[test]
+    fn test_slab_reuse() {
+        let cache = TypedSlabCache::<i32>::new(8, "reuse_test").unwrap();
+        let p = cache.alloc_with(777).unwrap();
+        unsafe {
+            assert_eq!(*p.as_ptr(), 777);
+            cache.free(p);
+        }
+        // Reuse the slot - should be zero-initialized
+        let p2 = cache.alloc_with(888).unwrap();
+        unsafe {
+            assert_eq!(*p2.as_ptr(), 888);
+            cache.free(p2);
+        }
     }
 }

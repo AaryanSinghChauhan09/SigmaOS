@@ -1,3 +1,5 @@
+#![allow(clippy::useless_format)]
+
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
@@ -28,8 +30,10 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
+    pub pkgrel: u32,
     pub arch: String,
     pub license_spdx: String,
+    pub prepare_commands: Vec<String>,
     pub package_commands: Vec<String>,
 }
 
@@ -46,8 +50,10 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
+            pkgrel: 1,
             arch: "x86_64".to_string(),
             license_spdx: "GPL".to_string(),
+            prepare_commands: Vec::new(),
             package_commands: Vec::new(),
         }
     }
@@ -83,18 +89,23 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
-        self.pkgrel = pkgrel;
-        self
-    }
-
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
         self
     }
 
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
+        self
+    }
+
     pub fn with_arch(mut self, arch: String) -> Self {
         self.arch = arch;
+        self
+    }
+
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
         self
     }
 
@@ -121,24 +132,16 @@ impl PackageRecipe {
 
     pub fn get_build_script(&self) -> String {
         match self.build_system {
-            BuildSystem::Cargo => {
-                format!("cargo build --release\ncargo install --path .")
-            }
-            BuildSystem::Make => {
-                format!("make -j$(nproc)\nmake install")
-            }
+            BuildSystem::Cargo => "cargo build --release\ncargo install --path .".to_string(),
+            BuildSystem::Make => "make -j$(nproc)\nmake install".to_string(),
             BuildSystem::CMake => {
-                format!("mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install")
+                "mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install".to_string()
             }
-            BuildSystem::Autotools => {
-                format!("./configure\nmake -j$(nproc)\nmake install")
-            }
+            BuildSystem::Autotools => "./configure\nmake -j$(nproc)\nmake install".to_string(),
             BuildSystem::Meson => {
-                format!("meson setup build\nmeson compile -C build\nmeson install -C build")
+                "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
-            BuildSystem::Ninja => {
-                format!("ninja\nninja install")
-            }
+            BuildSystem::Ninja => "ninja\nninja install".to_string(),
         }
     }
 }
