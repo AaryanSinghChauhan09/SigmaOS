@@ -1,10 +1,10 @@
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{Vec, String, ToString, HashMap};
+use crate::klib::{Vec, String, HashMap};
 
 #[cfg(feature = "standalone_test")]
-use alloc::{vec::Vec, string::{String, ToString}};
+use alloc::{vec::Vec, string::String};
 
 #[cfg(feature = "standalone_test")]
 use std::collections::HashMap;

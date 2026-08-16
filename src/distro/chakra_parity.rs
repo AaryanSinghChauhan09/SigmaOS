@@ -1,7 +1,7 @@
 // SigmaOS Chakra Linux Parity Implementation
 // Implements Akabei package bundling, Kapudan configuration, and Tribe installer
 
-use crate::klib::{SigmaString, Vec};
+use crate::klib::{custom_string::SigmaString, Vec};
 use core::cell::Cell;
 
 /// Bundle types for Chakra-inspired package management

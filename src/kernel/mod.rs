@@ -9,6 +9,7 @@ pub mod policy_mechanism;
 pub mod sched;
 pub mod subsystem;
 pub mod bus;
+pub mod object;
 pub mod generation_manager;
 pub mod linux_bsd_innovations;
 pub mod meta;
@@ -27,6 +28,7 @@ pub use architecture::{
 //     ResourceConfig, Runtime,
 // };
 pub use bus::{Bus, PciBus, UsableBus};
+pub use object::{KRef, KernelObject, KObject};
 pub use generation_manager::{Generation, GenerationManager};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_bsd_innovations::{
@@ -44,8 +46,8 @@ pub use meta::{
 };
 pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
 pub use policy_mechanism::{
-    FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
-    ResourceBroker,
+    InterruptClass, InstructionCyclePhase, IoWaitProfile, KernelMechanism, KernelPolicy,
+    SovereignMechanism, AdaptivePolicy, PolicyMechanismCoordinator,
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};

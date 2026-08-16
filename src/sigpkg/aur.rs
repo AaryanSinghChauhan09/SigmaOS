@@ -20,7 +20,7 @@
 // Zero-dependency, safe, and OOP-centric
 
 use std::cell::RefCell;
-use crate::klib::HashSet;
+use crate::klib::hashset::HashSet;
 use std::path::PathBuf;
 
 const MAX_DEPS: usize = 8;

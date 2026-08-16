@@ -1,9 +1,5 @@
 // SigmaOS Compatibility Module
 pub mod absorb_tools;
-pub mod apache_ossie;
-pub mod chimera_linux;
-pub mod cross_platform;
-pub mod india_stack;
 pub mod alpine_linux;
 pub mod antix;
 pub mod apache_ossie;
@@ -19,6 +15,7 @@ pub mod fedora;
 pub mod garuda_zen;
 pub mod gentoo;
 pub mod historic_linux;
+pub mod india_professional_tools;
 pub mod india_stack;
 pub mod interim;
 pub mod jehanne;
@@ -46,26 +43,17 @@ pub use arch_linux::{
 pub use zorin::{
     ZorinChameleonEngine, ZorinConnectManager, ZorinLayoutSwitcher, ZorinWindowsAppSupport,
 };
-pub mod historic_linux;
-pub mod mint_linux;
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod sovereign_suite;
-pub mod tiny_core;
-pub mod wasm_sandbox;
-pub mod open_source_tier1;
 
 pub use open_source_tier1::{
     WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
 };
 
-pub use open_source_tier1::{
-    LibsodiumIntegration, SmolTcpIntegration, SqliteIntegration, WasmerIntegration,
-};
+
+
 
 pub use fedora::{
     BodhiUpdateTriage, DnfPackageResolver, KojiBuildServer, MockChrootBuilder,
-    SovereignCockpitConsole, SovereignFirewalldManager, SovereignOstreeDeployer,
+    SovereignFirewalldManager, SovereignOstreeDeployer,
     SovereignSeLinuxContext, SovereignSeLinuxEngine,
 };
 pub use legacy_adapters::{
@@ -94,9 +82,8 @@ pub use chakra::{
     TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
 pub use india_professional_tools::{
-
     AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker, JudicialTimelinePlanner,
-    Literal as ProfLiteral, MsmeComplianceEngine, PMWaniHotspotController, SpacSatResolver,
+    MsmeComplianceEngine, PMWaniHotspotController,
 };
 pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
 pub use alpine_linux::{
@@ -111,8 +98,7 @@ pub use jehanne::{
 
 pub use mint_linux::{
     CinnamonThemeEngine, MintBackupTool, MintSoftwareManager, MintUpdateLevel,
-    MintUpdateManager, SoftwareMeta, TimeshiftSystemRestorer, WindowCoordinates,
-    ZenithDisplayCompositor,
+    MintUpdateManager, TimeshiftSystemRestorer,
 };
 
 pub use antix::{
@@ -121,14 +107,8 @@ pub use antix::{
     GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
 };
 
-pub use gap_closure::{
-    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
-    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
-    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
-    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
-    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
-    UnifiedAppStore, ZorinAppearanceSwitcher,
-};
+
+
 
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,

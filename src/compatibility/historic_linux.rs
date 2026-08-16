@@ -1,6 +1,3 @@
-#[cfg(not(test))]
-use crate::driver::device::DdeDeviceWrapper;
-
 #[cfg(test)]
 pub struct DdeDeviceWrapper {
     pub simulated_pci_bar: [u8; 256],
@@ -217,11 +214,13 @@ impl VintageVirtualizationSandbox {
 }
 
 /// Vintage Linux Driver Shim Translator
+#[cfg(test)]
 pub struct VintageDriverTranslator {
     pub era: LinuxEra,
     pub wrapper: DdeDeviceWrapper,
 }
 
+#[cfg(test)]
 impl VintageDriverTranslator {
     pub fn new(era: LinuxEra, device_name: &str) -> Self {
         VintageDriverTranslator {

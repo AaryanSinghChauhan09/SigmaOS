@@ -37,7 +37,6 @@ pub use std::string::String;
 
 // New zero-dependency klib modules
 pub mod ringbuf;
-pub mod slab;
 pub mod bitmap;
 
 // Re-exports for convenience
@@ -48,3 +47,4 @@ pub use slab::SlabRegistry;
 pub use bitmap::AtomicBitmap;
 pub use bitmap::PageFrameBitmap;
 pub use bitmap::PidBitmap;
+pub use ring_buffer::RingBuffer;

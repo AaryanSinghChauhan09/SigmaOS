@@ -10,7 +10,7 @@ pub use hardening::{
 };
 pub use pledge::{PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    ExploitPayload, PenetrationAssistant, VulnerabilityScanner,
 };
 pub mod capability_enforcer;
 pub mod capability_token;
@@ -41,8 +41,6 @@ pub mod parrot_linux;
 
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
-pub use audit::{AuditLogger, AuditPolicy, LogFormat};
-pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{
     CapabilityToken as AndroidStyleCapabilityToken,
@@ -60,7 +58,6 @@ pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use bridge::{
     LegacySecurityType, SecurityBridge,
 };
@@ -78,8 +75,7 @@ pub use selinux_integration::{
     initialize_selinux_integration, get_selinux_integration, check_syscall_selinux,
 };
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
-    SecurityRule, SelinuxPermission,
+    SecurityContext, SeLinuxMode, PolicyRule, SelinuxEngine, AccessVectorCache,
 };
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
@@ -110,8 +106,8 @@ pub use secrets::{
     SimpleSecret,
 };
 pub use vulnerability::{
-    CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
-    SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
+    CIPipelineIntegration, ScanSummary, SimpleCIPipelineIntegration,
+    SimpleVulnerability, Vulnerability,
 };
 pub use defensive_audit::{
     DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,

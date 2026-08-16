@@ -14,10 +14,10 @@ pub mod pf_firewall;
 pub mod nftables;
 
 pub use analyzer::{
-    AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,
-    ClearLinuxFlowLoadBalancer, ConnectionInfo, ConnectionState, GentooUseFlagsDissector,
-    KaliPacketFingerprinter, KaliSnoopAnalysis, NetworkTrafficAnalyzer, NixDeclarativeFilter,
-    Protocol, SecurityAnalysis, TrafficAlert, TrafficPacket, TrafficStatistics,
+    AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer,
+    ClearLinuxFlowLoadBalancer, GentooUseFlagsDissector,
+    KaliPacketFingerprinter, KaliSnoopAnalysis, NixDeclarativeFilter,
+    Protocol, TrafficPacket,
 };
 pub use config::{
     NetworkConfigManager, NetworkInterface, InterfaceType, InterfaceStatus,

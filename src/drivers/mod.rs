@@ -29,7 +29,7 @@ pub mod virtio;
 pub use even_more_devices::*;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
-pub use intel_e1000::{E1000RxDescriptor, E1000TxDescriptor, IntelE1000Driver};
+pub use intel_e1000::{E1000RxDesc, E1000TxDesc, IntelE1000Driver};
 pub use kernel_releases::*;
 pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use legacy_floppy::LegacyFloppyDisk;
@@ -52,5 +52,5 @@ pub use unified_dma::{
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 pub use virtio::{
-    VirtioBlkDriver, VirtioDeviceType, VirtioMmioHeader, VirtioNetDriver, VirtioRngDriver,
+    VirtioBlkDriver, VirtioNetDriver, VirtioRngDriver,
 };

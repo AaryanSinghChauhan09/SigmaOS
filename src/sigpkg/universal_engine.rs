@@ -20,8 +20,6 @@ pub enum PackageFormat {
     VoidXbps,
     FreeBsdPkg,
     Sovereign,
-    Nix,
-    Apk,
     Xbps,
 }
 

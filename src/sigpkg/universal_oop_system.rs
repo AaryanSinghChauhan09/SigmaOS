@@ -23,7 +23,9 @@
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{HashMap, Arc};
+use crate::klib::HashMap;
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::arc::Arc;
 
 #[cfg(feature = "standalone_test")]
 use std::collections::HashMap;

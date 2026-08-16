@@ -12,7 +12,8 @@
 #[allow(unused_mut)]
 #[allow(unused_imports)]
 
-use crate::klib::{BTreeMap, Vec, String, ToString};
+use crate::klib::{BTreeMap, Vec, String};
+use alloc::string::ToString;
 
 /// Development environment configuration
 #[derive(Debug, Clone, PartialEq, Eq)]
