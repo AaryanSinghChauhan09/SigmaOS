@@ -188,8 +188,7 @@ impl PageTable for SimplePageTable {
         if index < 512 {
             &mut self.entries[index]
         } else {
-            // For out-of-bounds writes, we need a mutable dummy
-            // Since we can't have static mut, we'll extend the entries vector
+            // For out-of-bounds writes, extend the entries vector dynamically
             while self.entries.len() <= index {
                 self.entries.push(SimplePageTableEntry::new());
             }

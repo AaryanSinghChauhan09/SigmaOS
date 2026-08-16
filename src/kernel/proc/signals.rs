@@ -54,12 +54,11 @@ impl PartialEq for SignalHandler {
         match (self, other) {
             (SignalHandler::Default, SignalHandler::Default) => true,
             (SignalHandler::Ignore, SignalHandler::Ignore) => true,
-            // Don't compare function pointers - they're not reliable for equality
+            // Custom handlers are never considered equal due to unpredictable function pointer comparisons
             (SignalHandler::Custom(_), SignalHandler::Custom(_)) => false,
             _ => false,
         }
     }
-}
 
 impl Eq for SignalHandler {}
 

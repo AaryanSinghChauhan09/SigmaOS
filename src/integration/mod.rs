@@ -70,7 +70,7 @@ impl SigmaIntegration {
 
     /// Send async message from terminal to another task
     pub fn send_terminal_message(&mut self, from_tab_id: usize, to_phone_id: usize, 
-                                  _message: &str) -> Result<(), IntegrationError> {
+                                  message: &str) -> Result<(), IntegrationError> {
         
         let call_id = self.async_system.ipc_manager.next_call_id.fetch_add(
             1, core::sync::atomic::Ordering::SeqCst
@@ -78,8 +78,11 @@ impl SigmaIntegration {
         
         let ipc_message = HelenMessage::new(100, call_id, from_tab_id as u64);
         
-        self.async_system.ipc_manager.send_async(to_phone_id as u64, ipc_message)
-            .map_err(|e| IntegrationError::IpcError(e))?;
+        // Process the message content
+        if !message.is_empty() {
+            self.async_system.ipc_manager.send_async(to_phone_id as u64, ipc_message)
+                .map_err(|e| IntegrationError::IpcError(e))?;
+        }
         
         Ok(())
     }
