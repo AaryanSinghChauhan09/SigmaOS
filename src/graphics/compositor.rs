@@ -6,7 +6,7 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use std::sync::atomic::{AtomicBool, Ordering};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -683,7 +683,17 @@ impl Compositor for SimpleCompositor {
                                 if output_index < back_data.len()
                                     && window_index < window_data.len()
                                 {
-                                    back_data[output_index] = window_data[window_index];
+                                    // Apply standard Alpha Blending (simulated via scaling)
+                                    let pixel = window_data[window_index];
+                                    if opacity < 0.99f32 {
+                                        let a = ((pixel >> 24) & 0xFF) as f32 * opacity;
+                                        let r = ((pixel >> 16) & 0xFF) as f32 * opacity;
+                                        let g = ((pixel >> 8) & 0xFF) as f32 * opacity;
+                                        let b = (pixel & 0xFF) as f32 * opacity;
+                                        back_data[output_index] = ((a as u32) << 24) | ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
+                                    } else {
+                                        back_data[output_index] = pixel;
+                                    }
                                 }
                             }
                         }

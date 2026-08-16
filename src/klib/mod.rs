@@ -25,12 +25,26 @@ pub mod vecdeque;
 
 // Re-exports
 pub use vec::Vec;
-pub use string::{String, ToString};
-pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
-pub use arc::Arc;
-pub use ring_buffer::{RingBuffer, HeapRingBuffer};
-pub use linked_list::{LinkedList, SList};
-pub use slab::{SlabCache, TypedSlabCache};
-pub use hashmap::HashMap;
-pub use hashset::HashSet;
-pub use uuid::Uuid;
+pub use hashmap::BTreeMap as HashMap;
+pub use hashmap::BTreeMap;
+
+// For other collections, use std when available
+#[cfg(not(target_os = "none"))]
+pub use std::collections::BTreeMap as StdBTreeMap;
+
+#[cfg(not(target_os = "none"))]
+pub use std::string::String;
+
+// New zero-dependency klib modules
+pub mod ringbuf;
+pub mod slab;
+pub mod bitmap;
+
+// Re-exports for convenience
+pub use ringbuf::RingBuf;
+pub use ringbuf::MpscRingBuf;
+pub use slab::SlabCache;
+pub use slab::SlabRegistry;
+pub use bitmap::AtomicBitmap;
+pub use bitmap::PageFrameBitmap;
+pub use bitmap::PidBitmap;

@@ -4,6 +4,19 @@ extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod audio {
+    pub mod driver;
+    pub mod editor;
+}
+pub use audio::driver::{
+    AudioDevice, AudioDeviceID, AudioError, AudioManager, AudioMixer, AudioStream, AudioType,
+    SimpleAudioDevice, SimpleAudioManager, SimpleAudioMixer, SimpleAudioStream,
+};
+pub use audio::editor::{
+    AmplifyEffect, AudioEditor, AudioEffect, AudioTrack, EchoEffect, LowPassFilter,
+    MultiTrackSession, NoiseGateEffect,
+};
+
 pub mod accessibility;
 pub mod ai;
 pub mod automation;
@@ -61,7 +74,11 @@ pub mod crypto {
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
-    AccessibilityProfile, AccessibilitySetting,
+    AccessibilityProfile, AccessibilitySetting, BrailleDisplay, ColorFilter, KeyID, KeyType,
+    Magnifier, MagnifierID, MagnifierManager, OnScreenKeyboard, ScreenReader, SimpleBrailleDisplay,
+    SimpleColorFilter, SimpleMagnifier, SimpleMagnifierManager, SimpleOnScreenKeyboard,
+    SimpleScreenReader, SimpleStickyKeys, SimpleVirtualKey, SimpleVoice, StickyKeys, VirtualKey,
+    Voice, VoiceGender, VoiceID,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -181,6 +198,7 @@ pub use resilience::{
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
 };
+pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
     ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
@@ -198,8 +216,9 @@ pub use security::{
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction,
+    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
+    PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
+    Transaction, UniversalPackageAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

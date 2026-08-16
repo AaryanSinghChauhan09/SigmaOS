@@ -71,7 +71,7 @@ impl SimpleBuddyAllocator {
             Vec::new(),
         ];
         let mut blocks = Vec::new();
-        let mut next_id = AtomicUsize::new(1);
+        let next_id = AtomicUsize::new(0);
 
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);

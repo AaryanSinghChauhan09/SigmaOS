@@ -54,6 +54,7 @@ pub use universal_oop_system::{
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
     UserDefinedHook, InstallError, HookError,
 };
+pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

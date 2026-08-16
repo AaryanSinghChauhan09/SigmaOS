@@ -1,7 +1,12 @@
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
+extern crate alloc;
+#[cfg(not(test))]
 use crate::klib::Vec;
+#[cfg(test)]
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone)]
 pub struct AudioTrack {
@@ -280,6 +285,46 @@ impl AudioEffect for GraphicEqualizer {
     }
 }
 
+/// Audacity / Adobe Audition-style Spectral Noise Suppression DSP Filter
+/// Attenuates background noise floor static across audio frames
+pub struct SpectralNoiseSuppressionEffect {
+    pub noise_threshold: f32, // Background static noise floor limit (0.0 to 1.0)
+    pub reduction_db: f32,    // Attenuation depth in dB
+}
+
+impl SpectralNoiseSuppressionEffect {
+    pub fn new(noise_threshold: f32, reduction_db: f32) -> Self {
+        Self {
+            noise_threshold: noise_threshold.clamp(0.001, 1.0),
+            reduction_db: reduction_db.max(0.0),
+        }
+    }
+
+    fn attenuation_factor(&self) -> f32 {
+        // e^(-reduction_db / 20 * ln(10)) => e^(-reduction_db * 0.115129)
+        let exponent = -self.reduction_db * 0.115129;
+        exponent.exp_m1() + 1.0
+    }
+}
+
+impl AudioEffect for SpectralNoiseSuppressionEffect {
+    fn apply(&self, samples: &mut [f32]) {
+        let att_factor = self.attenuation_factor();
+        for sample in samples.iter_mut() {
+            let magnitude = sample.abs();
+            if magnitude <= self.noise_threshold {
+                // Attenuate static noise floor
+                *sample *= att_factor;
+            } else {
+                // Preserves full signal energy above noise threshold
+                let ratio = ((magnitude - self.noise_threshold) / self.noise_threshold).clamp(0.0, 1.0);
+                let smooth_att = att_factor + (1.0 - att_factor) * ratio;
+                *sample *= smooth_att;
+            }
+        }
+    }
+}
+
 /// Dynamic Range Compressor (Reduces peak dynamic levels above absolute threshold)
 pub struct DynamicRangeCompressor {
     pub threshold_db: f32,  // Decibel compression threshold
@@ -542,6 +587,20 @@ mod tests {
         let eq = GraphicEqualizer::new(6.0, -3.0, 3.0); // Boost Bass and Treble, Cut Mids
         eq.apply(&mut samples);
         assert_eq!(samples.len(), 5);
+    }
+
+    #[test]
+    fn test_spectral_noise_suppression() {
+        let mut samples = [0.02, 0.05, 0.80, -0.01];
+        let noise_filter = SpectralNoiseSuppressionEffect::new(0.05, 12.0); // 12 dB noise reduction
+        noise_filter.apply(&mut samples);
+
+        // Noise floor samples (<= 0.05) should be attenuated significantly
+        assert!(samples[0].abs() < 0.01);
+        assert!(samples[1].abs() < 0.02);
+
+        // High amplitude signal (> 0.05) should preserve primary signal energy
+        assert!(samples[2] > 0.70);
     }
 
     #[test]

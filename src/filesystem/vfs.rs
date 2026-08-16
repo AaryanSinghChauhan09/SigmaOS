@@ -271,21 +271,39 @@ impl VirtualFilesystem {
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
-        // Resize storage data buffer if offset + written bytes exceeds size (handling holes)
-        if new_offset > inode.size {
-            inode.data.resize(new_offset as usize, 0);
-            inode.size = new_offset;
+        // Simulate write (in production, actual file I/O)
+        let bytes_written = buffer.len();
+        inode.size += bytes_written as u64;
+        file_descriptor.offset += bytes_written as u64;
+        inode.modified = 0; // In production, actual timestamp
+
+        Ok(bytes_written)
+    }
+
+    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
+    pub fn read_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &mut [u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
+        if !token.has_permission(Permission::FileRead) {
+            return Err(FsError::PermissionDenied);
         }
+        self.read_file(fd, buffer)
+    }
 
-        // Write the actual bytes into file storage data
-        let start = file_descriptor.offset as usize;
-        let end = start + buffer.len();
-        inode.data[start..end].copy_from_slice(buffer);
-
-        file_descriptor.offset = new_offset;
-        inode.modified = 1716000000; // Simulated timestamp
-
-        Ok(buffer.len())
+    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
+    pub fn write_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &[u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
+        if !token.has_permission(Permission::FileWrite) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.write_file(fd, buffer)
     }
 
     /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
@@ -564,7 +582,9 @@ mod tests {
         let bad_token = CapabilityToken::new(); // no read or write permissions
         let read_token = CapabilityToken::new().allow_read("/var/www");
         let write_token = CapabilityToken::new().allow_write("/tmp");
-        let _all_token = CapabilityToken::new().allow_read("/var/www").allow_write("/tmp");
+        let _all_token = CapabilityToken::new()
+            .allow_read("/var/www")
+            .allow_write("/tmp");
 
         let mut buf = [0u8; 10];
 

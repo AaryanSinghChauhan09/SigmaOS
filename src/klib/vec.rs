@@ -1,11 +1,21 @@
 use core::mem;
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                new_vec.push((*self.data.add(i)).clone());
+            }
+        }
+        new_vec
+    }
 }
 
 #[cfg(not(target_os = "none"))]
@@ -89,6 +99,12 @@ impl<T> Vec<T> {
             }
         }
     }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
 
     pub fn pop(&mut self) -> Option<T> {
         if self.len == 0 {
@@ -101,11 +117,44 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn as_slice(&self) -> &[T] {
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
         if self.len == 0 {
-            &[]
+            &mut []
         } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+
+    pub fn contains(&self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
+        for i in 0..self.len {
+            unsafe {
+                if &*self.data.add(i) == item {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+    pub fn remove(&mut self, index: usize) -> T {
+        if index >= self.len {
+            panic!("index out of bounds");
         }
     }
 
@@ -165,8 +214,12 @@ impl<T> Vec<T> {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8, self.capacity * mem::size_of::<T>()); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }

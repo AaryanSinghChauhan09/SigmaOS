@@ -1,5 +1,10 @@
 // SigmaOS Compatibility Module
 pub mod absorb_tools;
+pub mod apache_ossie;
+pub mod chimera_linux;
+pub mod cross_platform;
+pub mod india_stack;
+pub mod india_professional_tools;
 pub mod alpine_linux;
 pub mod antix;
 pub mod apache_ossie;
@@ -43,6 +48,18 @@ pub use arch_linux::{
 
 pub use zorin::{
     ZorinChameleonEngine, ZorinConnectManager, ZorinLayoutSwitcher, ZorinWindowsAppSupport,
+};
+pub mod historic_linux;
+pub mod mint_linux;
+pub mod relay_nexus;
+pub mod solid_kernel;
+pub mod sovereign_suite;
+pub mod tiny_core;
+pub mod wasm_sandbox;
+pub mod open_source_tier1;
+
+pub use open_source_tier1::{
+    WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
 };
 
 pub use open_source_tier1::{
