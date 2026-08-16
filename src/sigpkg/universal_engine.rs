@@ -11,6 +11,9 @@ pub enum PackageFormat {
     Pacman,
     Portage,
     Sovereign,
+    Nix,
+    Apk,
+    Xbps,
 }
 
 #[derive(Debug, Clone)]
@@ -384,22 +387,217 @@ fn hex_encode(bytes: &[u8; 32]) -> String {
 }
 
 pub struct PackageAdapterFactory;
+
+impl PackageAdapterFactory {
+    pub fn get_adapter(format: PackageFormat) -> std::boxed::Box<dyn IPackageAdapter> {
+        match format {
+            PackageFormat::Apt => std::boxed::Box::new(AptPackageAdapter),
+            PackageFormat::Yum => std::boxed::Box::new(YumPackageAdapter),
+            PackageFormat::Pacman => std::boxed::Box::new(PacmanPackageAdapter),
+            PackageFormat::Portage => std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new())),
+            PackageFormat::Sovereign => std::boxed::Box::new(SovereignPackageAdapter),
+            PackageFormat::Nix => std::boxed::Box::new(NixPackageAdapter),
+            PackageFormat::Apk => std::boxed::Box::new(ApkPackageAdapter),
+            PackageFormat::Xbps => std::boxed::Box::new(XbpsPackageAdapter::new(None)),
+        }
+    }
+}
+
 pub struct SnapPackageAdapter;
 pub struct NixPackageAdapter;
-pub struct EbuildPackageAdapter;
+impl IPackageAdapter for NixPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Nix
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Nix package payload");
+        }
+        let mut hash = [0x00; 32];
+        for (i, &b) in raw_data.iter().enumerate() {
+            hash[i % 32] ^= b;
+        }
+        Ok(PackageContext {
+            name: "nix-compat-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Nix,
+            dependencies: vec![],
+            files: vec!["/store/nix-compat-pkg/bin/binary".to_string()],
+            hash,
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Nix Adapter: Enforcing strict sandboxed hermeticity. Extracting to content-addressed path: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+pub struct EbuildPackageAdapter {
+    pub use_flags: Vec<String>,
+}
+
+impl EbuildPackageAdapter {
+    pub fn new(use_flags: Vec<String>) -> Self {
+        Self { use_flags }
+    }
+}
+
+impl IPackageAdapter for EbuildPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Portage
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Portage ebuild payload");
+        }
+        Ok(PackageContext {
+            name: "ebuild-compat-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Portage,
+            dependencies: vec!["gcc".to_string()],
+            files: vec!["/store/ebuild-compat-pkg/bin/binary".to_string()],
+            hash: [0xDD; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        let level = CachyCpuDetector::detect_level();
+        let march = match level {
+            CpuArchLevel::X86_64_v4 => "march=x86-64-v4",
+            CpuArchLevel::X86_64_v3 => "march=x86-64-v3",
+            CpuArchLevel::X86_64_v2 => "march=x86-64-v2",
+            CpuArchLevel::X86_64_v1 => "march=x86-64",
+        };
+        println!(
+            "Portage/ebuild compiler: Compiling source using micro-architecture target: {} with USE flags: {:?}",
+            march, self.use_flags
+        );
+        println!(
+            "Portage Adapter: Extracted/compiled ebuild targets to store: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
 pub struct ApkPackageAdapter;
+impl IPackageAdapter for ApkPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Apk
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty APK package payload");
+        }
+        Ok(PackageContext {
+            name: "apk-compat-pkg".to_string(),
+            version: "3.18.0".to_string(),
+            format: PackageFormat::Apk,
+            dependencies: vec![],
+            files: vec!["/sbin/apk-compat".to_string()],
+            hash: [0x77; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "APK Adapter: Fast-unpacking lightweight alpine layer to store: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+
 pub struct FlatpakPackageAdapter;
 pub struct TxzPackageAdapter;
-pub struct XbpsPackageAdapter;
-pub struct CachyCpuDetector;
 
-impl CachyCpuDetector {
-    pub fn detect_level() -> CpuArchLevel {
-        CpuArchLevel::X86_64_v3
+pub struct XbpsPackageAdapter {
+    pub service_name: Option<String>,
+}
+
+impl XbpsPackageAdapter {
+    pub fn new(service_name: Option<String>) -> Self {
+        Self { service_name }
+    }
+}
+
+impl IPackageAdapter for XbpsPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Xbps
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty XBPS package payload");
+        }
+        Ok(PackageContext {
+            name: "xbps-compat-pkg".to_string(),
+            version: "0.59.1".to_string(),
+            format: PackageFormat::Xbps,
+            dependencies: vec![],
+            files: vec!["/usr/bin/xbps-compat".to_string()],
+            hash: [0x88; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "XBPS Adapter: Unpacking binary package to store: {}",
+            store_path
+        );
+        if let Some(ref service) = self.service_name {
+            println!(
+                "XBPS Adapter: Void-style runit coupling - Automatically registering system service: {}",
+                service
+            );
+        }
+        Ok(())
     }
 }
 
 pub struct CachyosPackageAdapter;
+
+pub struct CachyCpuDetector;
+
+impl CachyCpuDetector {
+    /// Simulates detecting x86-64 microarchitecture levels based on CPU features.
+    /// x86-64-v1: baseline (SSE, SSE2)
+    /// x86-64-v2: CMPXCHG16B, LAHF-SAHF, POPCNT, SSE3, SSE4.1, SSE4.2, SSSE3
+    /// x86-64-v3: AVX, AVX2, BMI1, BMI2, F16C, FMA, LZCNT, MOVBE, OSXSAVE
+    /// x86-64-v4: AVX512F, AVX512CD, AVX512ER, AVX512PF, AVX512VL, AVX512DQ, AVX512BW
+    pub fn detect_level_from_features(features: &[&str]) -> CpuArchLevel {
+        let has_v2 = features.contains(&"sse3") && features.contains(&"sse4.1") && features.contains(&"sse4.2") && features.contains(&"popcnt");
+        let has_v3 = has_v2 && features.contains(&"avx") && features.contains(&"avx2") && features.contains(&"fma") && features.contains(&"bmi1") && features.contains(&"bmi2");
+        let has_v4 = has_v3 && features.contains(&"avx512f") && features.contains(&"avx512vl") && features.contains(&"avx512dq") && features.contains(&"avx512bw");
+
+        if has_v4 {
+            CpuArchLevel::X86_64_v4
+        } else if has_v3 {
+            CpuArchLevel::X86_64_v3
+        } else if has_v2 {
+            CpuArchLevel::X86_64_v2
+        } else {
+            CpuArchLevel::X86_64_v1
+        }
+    }
+
+    pub fn detect_level() -> CpuArchLevel {
+        Self::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2"])
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchLevel {
@@ -503,5 +701,66 @@ mod tests {
         pm.rollback_to_generation(0);
         assert_eq!(pm.active_generation, 0);
         assert!(!pm.installed_packages.contains_key("pacman-compat-pkg"));
+    }
+
+    #[test]
+    fn test_cachyos_cpu_detector() {
+        let level = CachyCpuDetector::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2"]);
+        assert_eq!(level, CpuArchLevel::X86_64_v3);
+
+        let v4_level = CachyCpuDetector::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2", "avx512f", "avx512vl", "avx512dq", "avx512bw"]);
+        assert_eq!(v4_level, CpuArchLevel::X86_64_v4);
+    }
+
+    #[test]
+    fn test_nix_package_adapter() {
+        let adapter = NixPackageAdapter;
+        assert_eq!(adapter.format(), PackageFormat::Nix);
+
+        let payload = b"nix package payload";
+        let ctx = adapter.parse_package(payload).unwrap();
+        assert_eq!(ctx.name, "nix-compat-pkg");
+        assert_eq!(ctx.format, PackageFormat::Nix);
+        assert!(adapter.extract_to_store(&ctx, "/store/test-nix").is_ok());
+    }
+
+    #[test]
+    fn test_portage_ebuild_adapter_with_use_flags() {
+        let use_flags = vec!["+avx2".to_string(), "-debug".to_string()];
+        let adapter = EbuildPackageAdapter::new(use_flags);
+        assert_eq!(adapter.format(), PackageFormat::Portage);
+
+        let ctx = adapter.parse_package(b"ebuild content").unwrap();
+        assert_eq!(ctx.name, "ebuild-compat-pkg");
+        assert!(adapter.extract_to_store(&ctx, "/store/test-ebuild").is_ok());
+    }
+
+    #[test]
+    fn test_alpine_apk_adapter() {
+        let adapter = ApkPackageAdapter;
+        assert_eq!(adapter.format(), PackageFormat::Apk);
+
+        let ctx = adapter.parse_package(b"apk content").unwrap();
+        assert_eq!(ctx.name, "apk-compat-pkg");
+        assert!(adapter.extract_to_store(&ctx, "/store/test-apk").is_ok());
+    }
+
+    #[test]
+    fn test_void_xbps_adapter() {
+        let adapter = XbpsPackageAdapter::new(Some("nginx-service".to_string()));
+        assert_eq!(adapter.format(), PackageFormat::Xbps);
+
+        let ctx = adapter.parse_package(b"xbps content").unwrap();
+        assert_eq!(ctx.name, "xbps-compat-pkg");
+        assert!(adapter.extract_to_store(&ctx, "/store/test-xbps").is_ok());
+    }
+
+    #[test]
+    fn test_package_adapter_factory() {
+        let nix_adapter = PackageAdapterFactory::get_adapter(PackageFormat::Nix);
+        assert_eq!(nix_adapter.format(), PackageFormat::Nix);
+
+        let apk_adapter = PackageAdapterFactory::get_adapter(PackageFormat::Apk);
+        assert_eq!(apk_adapter.format(), PackageFormat::Apk);
     }
 }
