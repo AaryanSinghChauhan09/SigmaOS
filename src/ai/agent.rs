@@ -589,4 +589,18 @@ mod tests {
         assert!(sentinel.audit_capability_token(0x0F, 0x0F));
         assert!(!sentinel.audit_capability_token(0xFF, 0x0F));
     }
+
+    #[test]
+    fn test_specialized_agents_bolt_palette_sentinel() {
+        let mut bolt = BoltAgent::new();
+        assert_eq!(bolt.optimize_ipc_circular_queue(1024, 150_000), 2048);
+
+        let palette = PaletteAgent::new();
+        let force = palette.evaluate_spring_physics(10.0, 2.0, 100.0, 5.0);
+        assert_eq!(force, -1010.0);
+
+        let mut sentinel = SentinelAgent::new();
+        assert!(sentinel.audit_capability_token(0x0F, 0x0F));
+        assert!(!sentinel.audit_capability_token(0xFF, 0x0F));
+    }
 }

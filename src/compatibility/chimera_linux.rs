@@ -3,9 +3,8 @@
 /// Dinit Service Manager with supervision, BSD-userland/chimerautils core,
 /// apk-tools v3 package registry & triggers, and LLVM/Clang CFI Hardening policies.
 
-extern crate alloc;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use alloc::vec::Vec;
+use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DinitServiceState {

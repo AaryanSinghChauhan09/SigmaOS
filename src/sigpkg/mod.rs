@@ -71,7 +71,7 @@ pub enum ParseError {
 }
 
 /// Package metadata
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
     pub version: Version,
@@ -101,7 +101,7 @@ impl Package {
 
 
 /// Package dependency
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,

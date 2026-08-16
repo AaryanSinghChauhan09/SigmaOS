@@ -88,14 +88,7 @@ impl PageTableEntry {
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
@@ -130,7 +123,7 @@ impl Default for PageTable {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
     pub huge_entries: Vec<Option<PageTableEntry>>, // Holds 2MB huge page entries
@@ -173,6 +166,10 @@ impl PageDirectory {
     pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
         self.huge_entries.get(idx).and_then(|e| e.as_ref())
     }
+
+    pub fn get_huge_entry_mut(&mut self, idx: usize) -> Option<&mut PageTableEntry> {
+        self.huge_entries.get_mut(idx).and_then(|e| e.as_mut())
+    }
 }
 
 impl Default for PageDirectory {
@@ -181,7 +178,7 @@ impl Default for PageDirectory {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,
     pub huge_entries: Vec<Option<PageTableEntry>>, // Holds 1GB huge page entries
@@ -223,6 +220,10 @@ impl PageDirectoryPointerTable {
 
     pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
         self.huge_entries.get(idx).and_then(|e| e.as_ref())
+    }
+
+    pub fn get_huge_entry_mut(&mut self, idx: usize) -> Option<&mut PageTableEntry> {
+        self.huge_entries.get_mut(idx).and_then(|e| e.as_mut())
     }
 }
 
@@ -311,22 +312,6 @@ impl SimpleVMM {
         virt: VirtualAddress,
         phys: PhysicalAddress,
     ) -> Result<(), MemoryError> {
-        self.map_page_with_flags(virt, phys, true, false)
-    }
-
-    /// Maps a standard 4KB page with flags
-    pub fn map_page_with_flags(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        writable: bool,
-        execute_disable: bool,
-    ) -> Result<(), MemoryError> {
-        // Alignment verification check (4KB = 4096 bytes = 0xFFF mask)
-        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
-
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -435,8 +420,10 @@ impl SimpleVMM {
         &mut self,
         virt: VirtualAddress,
     ) -> Result<PhysicalAddress, MemoryError> {
-        self.get_physical_address_with_access(virt, false, false)
-    }
+        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
 
     /// Resolves virtual address while validating and recording access permissions (Read/Write/Execute)
     /// Incorporates Copy-on-Write (CoW) page-splitting for KSM merged pages upon write intents.

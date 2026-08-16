@@ -3,8 +3,7 @@
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
 // Improved with dynamic env-var expansion, chroot-escape sandbox protection, and multi-lib target ABI routing.
 
-use crate::kernel::KernelPersona;
-use crate::compatibility::SyscallAbi;
+use crate::compatibility::{KernelPersona, SyscallAbi};
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 
@@ -25,7 +24,8 @@ impl SymlinkResolverRule for LinuxPersonaRule {
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
         match persona {
-            KernelPersona::Linux_6_x | KernelPersona::Linux_2_6 | KernelPersona::Linux_3_x | KernelPersona::Linux_4_x | KernelPersona::Linux_5_x => true,
+            KernelPersona::Linux_6_x | KernelPersona::Linux_2_6 => true,
+            _ => false,
         }
     }
 }

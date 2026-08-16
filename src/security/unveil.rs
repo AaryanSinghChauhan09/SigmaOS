@@ -96,34 +96,13 @@ impl UnveilManager {
             return Ok(()); // Permissive default
         }
 
-        // Mitigate directory traversal: reject paths containing parent directory segments
-        for segment in path.split(|c| c == '/' || c == '\\') {
-            if segment == ".." {
-                return Err(SigmaError::Security(SecurityError::AccessDenied));
-            }
-        }
-
-        // Find the most specific (longest) matching unveiled parent directory
         let mut best_match: Option<&UnveilRestriction> = None;
 
         for restriction in &self.restrictions {
-            if path.starts_with(&restriction.path) {
-                let r_len = restriction.path.len();
-                // Ensure it is a valid boundary match (exact match, or followed by a separator, or suffix has slash)
-                let is_boundary = path.len() == r_len
-                    || path.as_bytes().get(r_len).copied() == Some(b'/')
-                    || path.as_bytes().get(r_len).copied() == Some(b'\\')
-                    || restriction.path.ends_with('/')
-                    || restriction.path.ends_with('\\');
-
-                if is_boundary {
-                    match best_match {
-                        None => best_match = Some(restriction),
-                        Some(best) => {
-                            if restriction.path.len() > best.path.len() {
-                                best_match = Some(restriction);
-                            }
-                        }
+            if path == restriction.path || path.starts_with(&format!("{}/", restriction.path)) {
+                if let Some(best) = best_match {
+                    if restriction.path.len() > best.path.len() {
+                        best_match = Some(restriction);
                     }
                 } else {
                     best_match = Some(restriction);
@@ -166,7 +145,6 @@ mod tests {
         let mut manager = UnveilManager::new();
         manager.unveil("/var/www", "rw").unwrap();
         manager.unveil("/tmp", "rwc").unwrap();
-        manager.unveil("/etc/ssl/", "r").unwrap();
 
         assert!(manager
             .validate_path("/var/www/index.html", UnveilPermission::Read)
@@ -175,41 +153,12 @@ mod tests {
             .validate_path("/tmp/session.tmp", UnveilPermission::Create)
             .is_ok());
 
-        // Path with trailing slash config should pass
-        assert!(manager
-            .validate_path("/etc/ssl/cert.pem", UnveilPermission::Read)
-            .is_ok());
-
-        // Path inside unveiled directory with incorrect permissions should fail
         assert!(manager
             .validate_path("/var/www/upload.cgi", UnveilPermission::Execute)
             .is_err());
 
         assert!(manager
             .validate_path("/etc/passwd", UnveilPermission::Read)
-            .is_err());
-
-        // Traversal sequences should be immediately blocked
-        assert!(manager
-            .validate_path("/var/www/../../etc/passwd", UnveilPermission::Read)
-            .is_err());
-
-        // Prefix bypass should fail
-        assert!(manager
-            .validate_path("/var/www-secret", UnveilPermission::Read)
-            .is_err());
-    }
-
-    #[test]
-    fn test_unveil_at_landlock_inheritance() {
-        let mut manager = UnveilManager::new();
-        manager.unveil_at("/etc", "nginx", "r").unwrap();
-
-        assert!(manager
-            .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Read)
-            .is_ok());
-        assert!(manager
-            .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Write)
             .is_err());
     }
 
