@@ -8,8 +8,10 @@ pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
 pub mod verifier;
+pub mod importer;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
@@ -77,6 +79,26 @@ pub struct Package {
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
 }
+
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
+}
+
 
 /// Package dependency
 #[derive(Debug, Clone)]

@@ -87,17 +87,17 @@ where
 
     pub fn front(&self) -> Option<&T> {
         if !self.front.is_empty() {
-            self.front.last()
+            self.front.as_slice().last()
         } else {
-            self.back.first()
+            self.back.as_slice().first()
         }
     }
 
     pub fn back(&self) -> Option<&T> {
         if !self.back.is_empty() {
-            self.back.last()
+            self.back.as_slice().last()
         } else {
-            self.front.first()
+            self.front.as_slice().first()
         }
     }
 

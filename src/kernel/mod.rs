@@ -43,5 +43,5 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
+pub use scheduler::{Priority, Process, ProcessState};

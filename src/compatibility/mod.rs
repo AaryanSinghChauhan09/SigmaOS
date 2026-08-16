@@ -10,6 +10,9 @@ pub mod solid_kernel;
 pub mod sovereign_suite;
 pub mod tiny_core;
 pub mod wasm_sandbox;
+pub mod gentoo;
+
+pub use gentoo::{OpenRcManager, OpenRcService, OpenRcRunlevel};
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,

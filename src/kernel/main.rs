@@ -9,7 +9,7 @@ use alloc::string::ToString;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use sigmaos::kernel::{BuddyAllocator, Scheduler, Process, Priority};
+use sigmaos::kernel::{BuddyAllocator, RoundRobinScheduler as Scheduler, Process, Priority};
 use sigmaos::klib::paging::{SimpleVMM, VirtualMemoryManager};
 use sigmaos::compatibility::{OpenRcManager, OpenRcService, OpenRcRunlevel};
 

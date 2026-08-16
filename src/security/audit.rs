@@ -8,6 +8,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type EventID = usize;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat { Json, Text, Binary }
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
