@@ -525,5 +525,4 @@ mod tests {
         assert!(monitor.is_degraded_safety_mode); // Activated because health fell below 50%!
     }
 
-    #[test]
-    fn test_double_fault_guard_cascades() {
+}

@@ -4644,7 +4644,7 @@ impl SovereignPacketInjector {
     }
 
     /// Crafts and simulates injecting a raw TCP/IP frame into the network adapter ring
-    pub fn craft_and_inject(&mut self, dest_ip: [u8; 4], dest_port: u16, payload: &[u8]) -> RawPacketFrame {
+    pub fn craft_and_inject(&mut self, dest_ip: [u8; 4], _dest_port: u16, _payload: &[u8]) -> RawPacketFrame {
         self.injection_count += 1;
 
         let mut eth_header = [0u8; 14];
@@ -4786,7 +4786,7 @@ impl SelfHealingKernel {
     pub fn execute_heartbeat_check(&mut self) -> usize {
         let mut recovered = 0;
         for slot in self.shard_registry.iter_mut() {
-            if let Some((id, ref mut state)) = slot {
+            if let Some((_id, ref mut state)) = slot {
                 if *state == ShardState::Failed {
                     *state = ShardState::Running; // Restart Shard
                     self.restart_count += 1;
@@ -6537,7 +6537,7 @@ impl SovereignPacketInjector {
     }
 
     /// Crafts and simulates injecting a raw TCP/IP frame into the network adapter ring
-    pub fn craft_and_inject(&mut self, dest_ip: [u8; 4], dest_port: u16, payload: &[u8]) -> RawPacketFrame {
+    pub fn craft_and_inject(&mut self, dest_ip: [u8; 4], _dest_port: u16, _payload: &[u8]) -> RawPacketFrame {
         self.injection_count += 1;
 
         let mut eth_header = [0u8; 14];
@@ -6679,7 +6679,7 @@ impl SelfHealingKernel {
     pub fn execute_heartbeat_check(&mut self) -> usize {
         let mut recovered = 0;
         for slot in self.shard_registry.iter_mut() {
-            if let Some((id, ref mut state)) = slot {
+            if let Some((_id, ref mut state)) = slot {
                 if *state == ShardState::Failed {
                     *state = ShardState::Running; // Restart Shard
                     self.restart_count += 1;

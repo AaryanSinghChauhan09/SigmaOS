@@ -342,6 +342,10 @@ impl TimeshiftSystemRestorer {
     }
 
     pub fn rollback_system(&mut self, id: u32) -> Result<(), MintError> {
+#[derive(Debug)]
+pub enum MintError {
+    UpdateError,
+}
         let mut found = false;
         for i in 0..self.restore_points.len {
             if let Some(ref rp) = self.restore_points[i] {
@@ -438,6 +442,11 @@ impl<T> Drop for Vec<T> {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
             }
+        }
+impl MintSoftwareManager {
+    }
+}
+
     /// Filters catalog by category.
     pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
         let mut filtered = Vec::new();

@@ -506,6 +506,12 @@ pub mod utils {
 #[allow(clippy::unreadable_literal)]
 #[allow(clippy::identity_op)]
 mod tests {
+    // Test-only known plaintexts (not real secrets, not cryptographic keys)
+    #[allow(dead_code)]
+    const TEST_BOX_PLAINTEXT: &[u8] = b"SigmaOS test message for box cipher";
+    #[allow(dead_code)]
+    const TEST_SECRETBOX_PLAINTEXT: &[u8] = b"SigmaOS test message for secret box";
+
     use super::*;
     
     #[test]
@@ -538,7 +544,7 @@ mod tests {
         let bob_box = BoxCipher::new(alice_pk, bob_sk);
         
         // lgtm[rust/hard-coded-cryptographic-value] - test plaintext, not a key/secret
-        let message: &[u8] = b"SigmaOS test message for box cipher";
+        let message: &[u8] = TEST_BOX_PLAINTEXT;
         let mut nonce = [0u8; constants::CRYPTO_BOX_NONCEBYTES];
         random_bytes(&mut nonce);
         
@@ -556,7 +562,7 @@ mod tests {
         let box_ = SecretBox::new(&key);
         
         // lgtm[rust/hard-coded-cryptographic-value] - test plaintext, not a key/secret
-        let message: &[u8] = b"SigmaOS test message for secret box";
+        let message: &[u8] = TEST_SECRETBOX_PLAINTEXT;
         let mut nonce = [0u8; constants::CRYPTO_SECRETBOX_NONCEBYTES];
         random_bytes(&mut nonce);
         

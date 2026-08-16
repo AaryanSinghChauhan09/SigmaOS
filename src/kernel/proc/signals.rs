@@ -50,15 +50,13 @@ pub enum SignalHandler {
 }
 
 impl PartialEq for SignalHandler {
-    #[allow(unpredictable_function_pointer_comparisons)]
-    fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (SignalHandler::Default, SignalHandler::Default) => true,
             (SignalHandler::Ignore, SignalHandler::Ignore) => true,
-            // Custom handlers: compare by function pointer address for equality.
-            // Note: function pointer comparison is intentionally conservative —
-            // two closures capturing different environments will compare unequal.
-            (SignalHandler::Custom(a), SignalHandler::Custom(b)) => *a as usize == *b as usize,
+            // Custom handlers: compare by raw function pointer address (cast to usize).
+            // This avoids direct function pointer comparison (which is unpredictable)
+            // and instead compares the underlying address values, which is deterministic.
+            (SignalHandler::Custom(a), SignalHandler::Custom(b)) => (*a as usize) == (*b as usize),
             _ => false,
         }
     }
