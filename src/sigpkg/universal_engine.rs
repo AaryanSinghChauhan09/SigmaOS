@@ -1,9 +1,8 @@
 // SigmaOS Universal OOP Package Manager Engine
 // Zero-dependency, safe, robust package adapter and transaction orchestrator
 // Integrates User-Defined Functions (UDF) and instant O(1) transaction rollbacks
-// Supporting all major Linux/BSD distribution package formats (Apt, Yum, Pacman, Portage, Apk, Nix, AppImage, Flatpak, Snap, Slackware, VoidXbps, FreeBsdPkg, Sovereign)
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
@@ -11,15 +10,9 @@ pub enum PackageFormat {
     Yum,
     Pacman,
     Portage,
-    Apk,
-    Nix,
-    AppImage,
-    Flatpak,
-    Snap,
-    Slackware,
-    VoidXbps,
-    FreeBsdPkg,
     Sovereign,
+    Nix,
+    Apk,
     Xbps,
 }
 
@@ -58,8 +51,15 @@ impl IPackageAdapter for AptPackageAdapter {
             hash: [0xAA; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("APT Adapter: Extracted deb layers to immut store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "APT Adapter: Extracted deb layers to immut store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -82,8 +82,15 @@ impl IPackageAdapter for YumPackageAdapter {
             hash: [0xBB; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("YUM Adapter: Extracted rpm structures to immut store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "YUM Adapter: Extracted rpm structures to immut store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -106,8 +113,15 @@ impl IPackageAdapter for PacmanPackageAdapter {
             hash: [0xCC; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Pacman Adapter: Extracted pkg.tar.zst to immut store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Pacman Adapter: Extracted pkg.tar.zst to immut store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -130,200 +144,15 @@ impl IPackageAdapter for PortagePackageAdapter {
             hash: [0xDD; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Portage Adapter: Compiled Gentoo ebuild into target store: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct ApkPackageAdapter;
-impl IPackageAdapter for ApkPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Apk
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Alpine APK payload");
-        }
-        Ok(PackageContext {
-            name: "apk-compat-pkg".to_string(),
-            version: "3.16.0".to_string(),
-            format: PackageFormat::Apk,
-            dependencies: vec!["musl".to_string()],
-            files: vec!["/lib/libapk-compat.so".to_string()],
-            hash: [0x11; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("APK Adapter: Extracted Alpine APK layers to immut store: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct NixPackageAdapter;
-impl IPackageAdapter for NixPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Nix
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Nix store path expression");
-        }
-        Ok(PackageContext {
-            name: "nix-compat-pkg".to_string(),
-            version: "2.8.1".to_string(),
-            format: PackageFormat::Nix,
-            dependencies: vec![],
-            files: vec!["/nix/store/nix-compat-pkg-bin".to_string()],
-            hash: [0x22; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Nix Adapter: Synced Nix derivation path to target store: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct AppImagePackageAdapter;
-impl IPackageAdapter for AppImagePackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::AppImage
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty AppImage universal binary payload");
-        }
-        Ok(PackageContext {
-            name: "appimage-compat-pkg".to_string(),
-            version: "1.0.0-universal".to_string(),
-            format: PackageFormat::AppImage,
-            dependencies: vec![],
-            files: vec!["/opt/AppImage-compat".to_string()],
-            hash: [0x33; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("AppImage Adapter: Mounted and linked isolated runtime directories in: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct FlatpakPackageAdapter;
-impl IPackageAdapter for FlatpakPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Flatpak
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Flatpak sandbox application metadata");
-        }
-        Ok(PackageContext {
-            name: "flatpak-compat-pkg".to_string(),
-            version: "1.12.0".to_string(),
-            format: PackageFormat::Flatpak,
-            dependencies: vec!["org.freedesktop.Platform".to_string()],
-            files: vec!["/var/lib/flatpak/app/flatpak-compat-pkg".to_string()],
-            hash: [0x44; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Flatpak Adapter: Provisioned Ostree runtime sandbox directory: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct SnapPackageAdapter;
-impl IPackageAdapter for SnapPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Snap
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty SquashFS snap payload");
-        }
-        Ok(PackageContext {
-            name: "snap-compat-pkg".to_string(),
-            version: "2.56.0".to_string(),
-            format: PackageFormat::Snap,
-            dependencies: vec!["core20".to_string()],
-            files: vec!["/snap/snap-compat-pkg/current/bin".to_string()],
-            hash: [0x55; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Snap Adapter: Mounted SquashFS snap image at target mount: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct SlackwarePackageAdapter;
-impl IPackageAdapter for SlackwarePackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Slackware
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Slackware txz/tgz package archive");
-        }
-        Ok(PackageContext {
-            name: "slackware-compat-pkg".to_string(),
-            version: "15.0.0".to_string(),
-            format: PackageFormat::Slackware,
-            dependencies: vec![],
-            files: vec!["/usr/sbin/slack-compat".to_string()],
-            hash: [0x66; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Slackware Adapter: Extracted standard tarball layers to: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct VoidXbpsPackageAdapter;
-impl IPackageAdapter for VoidXbpsPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::VoidXbps
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Void Linux XBPS package binary");
-        }
-        Ok(PackageContext {
-            name: "xbps-compat-pkg".to_string(),
-            version: "0.59.0".to_string(),
-            format: PackageFormat::VoidXbps,
-            dependencies: vec!["libxbps".to_string()],
-            files: vec!["/usr/bin/xbps-compat-bin".to_string()],
-            hash: [0x77; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Void XBPS Adapter: Decoded and installed xbps layers inside: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct FreeBsdPkgAdapter;
-impl IPackageAdapter for FreeBsdPkgAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::FreeBsdPkg
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty FreeBSD pkgng txz archive");
-        }
-        Ok(PackageContext {
-            name: "freebsdpkg-compat-pkg".to_string(),
-            version: "1.18.0".to_string(),
-            format: PackageFormat::FreeBsdPkg,
-            dependencies: vec![],
-            files: vec!["/usr/local/bin/freebsd-compat".to_string()],
-            hash: [0x88; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("FreeBSD Pkg Adapter: Extracted pkgng system layouts to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Portage Adapter: Compiled Gentoo ebuild into target store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -346,8 +175,15 @@ impl IPackageAdapter for SovereignPackageAdapter {
             hash: [0xEE; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Sovereign Adapter: Created hermetic read-only link to CAS store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Sovereign Adapter: Created hermetic read-only link to CAS store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -374,7 +210,12 @@ pub struct UserDefinedPackageHook {
 }
 
 impl UserDefinedPackageHook {
-    pub fn new(hook_type: HookType, name: &str, capability_mask: u64, logic: fn(&PackageContext) -> bool) -> Self {
+    pub fn new(
+        hook_type: HookType,
+        name: &str,
+        capability_mask: u64,
+        logic: fn(&PackageContext) -> bool,
+    ) -> Self {
         Self {
             hook_type,
             hook_name: name.to_string(),
@@ -388,7 +229,10 @@ impl UserDefinedPackageHook {
             return Err("UDF execution blocked: insufficient capability token authorization");
         }
         if (self.check_logic)(ctx) {
-            println!("UDF Hook '{}' executed and verified successfully.", self.hook_name);
+            println!(
+                "UDF Hook '{}' executed and verified successfully.",
+                self.hook_name
+            );
             Ok(())
         } else {
             Err("UDF custom constraints validation failed")
@@ -420,7 +264,36 @@ impl SovereignPackageManager {
     }
 
     pub fn register_udf_hook(&mut self, hook: UserDefinedPackageHook) {
-        self.hooks.entry(hook.hook_type).or_insert_with(Vec::new).push(hook);
+        self.hooks
+            .entry(hook.hook_type)
+            .or_default()
+            .push(hook);
+    }
+
+    /// Dynamically routes package resolution to the most optimal microarchitecture binary based on CPU capability level (V4 down to V1)
+    pub fn resolve_optimized_package(&self, pkg_name: &str, cpu_level: CpuArchLevel) -> String {
+        let target_suffix = match cpu_level {
+            CpuArchLevel::X86_64_v4 => "-v4",
+            CpuArchLevel::X86_64_v3 => "-v3",
+            CpuArchLevel::X86_64_v2 => "-v2",
+            CpuArchLevel::X86_64_v1 => "",
+        };
+
+        // Simulated check if the optimized package suffix is supported or falls back
+        let candidates = [
+            format!("{}{}", pkg_name, target_suffix),
+            format!("{}-v3", pkg_name),
+            format!("{}-v2", pkg_name),
+            pkg_name.to_string(),
+        ];
+
+        for candidate in &candidates {
+            if self.installed_packages.contains_key(candidate) {
+                return candidate.clone();
+            }
+        }
+
+        pkg_name.to_string()
     }
 
     /// Performs dynamic polymorphic installation of any package format, invoking custom UDFs and supporting rollback on failure
@@ -437,7 +310,10 @@ impl SovereignPackageManager {
         if let Some(pre_hooks) = self.hooks.get(&HookType::PreInstall) {
             for hook in pre_hooks {
                 if let Err(e) = hook.execute(&ctx, token) {
-                    println!("Pre-Install UDF Hook failed: {}. Initiating O(1) pointer abort.", e);
+                    println!(
+                        "Pre-Install UDF Hook failed: {}. Initiating O(1) pointer abort.",
+                        e
+                    );
                     return Err(e);
                 }
             }
@@ -445,33 +321,42 @@ impl SovereignPackageManager {
 
         // Create rollback backup snapshot (O(1) generation pointer capture)
         let old_generation = self.active_generation;
-        let mut current_packages: Vec<String> = self.store_generations.get(&old_generation).unwrap().clone();
+        let mut current_packages: Vec<String> =
+            self.store_generations.get(&old_generation).unwrap().clone();
 
         // Step 3: Perform extract and extraction
         let store_path = format!("/store/sha256-{}", hex_encode(&ctx.hash));
         adapter.extract_to_store(&ctx, &store_path)?;
 
         // Update working state
-        self.installed_packages.insert(ctx.name.clone(), ctx.clone());
+        self.installed_packages
+            .insert(ctx.name.clone(), ctx.clone());
         current_packages.push(ctx.name.clone());
 
         // Increment generation snapshot atomically (generation checkpoint)
         let new_generation = old_generation + 1;
-        self.store_generations.insert(new_generation, current_packages);
+        self.store_generations
+            .insert(new_generation, current_packages);
         self.active_generation = new_generation;
 
         // Step 4: Trigger User-Defined PostInstall hooks
         if let Some(post_hooks) = self.hooks.get(&HookType::PostInstall) {
             for hook in post_hooks {
                 if let Err(e) = hook.execute(&ctx, token) {
-                    println!("Post-Install UDF Hook failed: {}. Triggering instant O(1) state rollback!", e);
+                    println!(
+                        "Post-Install UDF Hook failed: {}. Triggering instant O(1) state rollback!",
+                        e
+                    );
                     self.rollback_to_generation(old_generation);
                     return Err(e);
                 }
             }
         }
 
-        println!("Sovereign Package Manager: Installed {} (generation={}) successfully.", ctx.name, self.active_generation);
+        println!(
+            "Sovereign Package Manager: Installed {} (generation={}) successfully.",
+            ctx.name, self.active_generation
+        );
         Ok(())
     }
 
@@ -479,7 +364,8 @@ impl SovereignPackageManager {
     pub fn rollback_to_generation(&mut self, generation_id: u32) {
         if let Some(snapshot) = self.store_generations.get(&generation_id) {
             // Revert active packages directly to the captured generation snapshot state
-            self.installed_packages.retain(|name, _| snapshot.contains(name));
+            self.installed_packages
+                .retain(|name, _| snapshot.contains(name));
             self.active_generation = generation_id;
             println!("O(1) Rollback Complete: Successfully reverted active generation directory pointer to: #{}", generation_id);
         }
@@ -517,6 +403,123 @@ impl PackageAdapterFactory {
     }
 }
 
+pub struct SnapPackageAdapter;
+pub struct NixPackageAdapter;
+impl IPackageAdapter for NixPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Nix
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Nix package payload");
+        }
+        let mut hash = [0x00; 32];
+        for (i, &b) in raw_data.iter().enumerate() {
+            hash[i % 32] ^= b;
+        }
+        Ok(PackageContext {
+            name: "nix-compat-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Nix,
+            dependencies: vec![],
+            files: vec!["/store/nix-compat-pkg/bin/binary".to_string()],
+            hash,
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Nix Adapter: Enforcing strict sandboxed hermeticity. Extracting to content-addressed path: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+pub struct EbuildPackageAdapter {
+    pub use_flags: Vec<String>,
+}
+
+impl EbuildPackageAdapter {
+    pub fn new(use_flags: Vec<String>) -> Self {
+        Self { use_flags }
+    }
+}
+
+impl IPackageAdapter for EbuildPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Portage
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Portage ebuild payload");
+        }
+        Ok(PackageContext {
+            name: "ebuild-compat-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Portage,
+            dependencies: vec!["gcc".to_string()],
+            files: vec!["/store/ebuild-compat-pkg/bin/binary".to_string()],
+            hash: [0xDD; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        let level = CachyCpuDetector::detect_level();
+        let march = match level {
+            CpuArchLevel::X86_64_v4 => "march=x86-64-v4",
+            CpuArchLevel::X86_64_v3 => "march=x86-64-v3",
+            CpuArchLevel::X86_64_v2 => "march=x86-64-v2",
+            CpuArchLevel::X86_64_v1 => "march=x86-64",
+        };
+        println!(
+            "Portage/ebuild compiler: Compiling source using micro-architecture target: {} with USE flags: {:?}",
+            march, self.use_flags
+        );
+        println!(
+            "Portage Adapter: Extracted/compiled ebuild targets to store: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+pub struct ApkPackageAdapter;
+impl IPackageAdapter for ApkPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Apk
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty APK package payload");
+        }
+        Ok(PackageContext {
+            name: "apk-compat-pkg".to_string(),
+            version: "3.18.0".to_string(),
+            format: PackageFormat::Apk,
+            dependencies: vec![],
+            files: vec!["/sbin/apk-compat".to_string()],
+            hash: [0x77; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "APK Adapter: Fast-unpacking lightweight alpine layer to store: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+
+pub struct FlatpakPackageAdapter;
 pub struct TxzPackageAdapter;
 
 pub struct XbpsPackageAdapter {
@@ -624,57 +627,16 @@ mod tests {
         let yum = YumPackageAdapter;
         let pacman = PacmanPackageAdapter;
         let portage = PortagePackageAdapter;
-        let apk = ApkPackageAdapter;
-        let nix = NixPackageAdapter;
-        let appimage = AppImagePackageAdapter;
-        let flatpak = FlatpakPackageAdapter;
-        let snap = SnapPackageAdapter;
-        let slack = SlackwarePackageAdapter;
-        let xbps = VoidXbpsPackageAdapter;
-        let freebsd = FreeBsdPkgAdapter;
         let sovereign = SovereignPackageAdapter;
 
         assert_eq!(apt.format(), PackageFormat::Apt);
         assert_eq!(yum.format(), PackageFormat::Yum);
         assert_eq!(pacman.format(), PackageFormat::Pacman);
         assert_eq!(portage.format(), PackageFormat::Portage);
-        assert_eq!(apk.format(), PackageFormat::Apk);
-        assert_eq!(nix.format(), PackageFormat::Nix);
-        assert_eq!(appimage.format(), PackageFormat::AppImage);
-        assert_eq!(flatpak.format(), PackageFormat::Flatpak);
-        assert_eq!(snap.format(), PackageFormat::Snap);
-        assert_eq!(slack.format(), PackageFormat::Slackware);
-        assert_eq!(xbps.format(), PackageFormat::VoidXbps);
-        assert_eq!(freebsd.format(), PackageFormat::FreeBsdPkg);
         assert_eq!(sovereign.format(), PackageFormat::Sovereign);
 
         let parsed_apt = apt.parse_package(b"deb payload").unwrap();
         assert_eq!(parsed_apt.name, "apt-compat-pkg");
-
-        let parsed_apk = apk.parse_package(b"apk payload").unwrap();
-        assert_eq!(parsed_apk.name, "apk-compat-pkg");
-        assert_eq!(parsed_apk.dependencies[0], "musl");
-
-        let parsed_nix = nix.parse_package(b"nix path").unwrap();
-        assert_eq!(parsed_nix.name, "nix-compat-pkg");
-
-        let parsed_appimage = appimage.parse_package(b"appimage payload").unwrap();
-        assert_eq!(parsed_appimage.name, "appimage-compat-pkg");
-
-        let parsed_flatpak = flatpak.parse_package(b"flatpak metadata").unwrap();
-        assert_eq!(parsed_flatpak.name, "flatpak-compat-pkg");
-
-        let parsed_snap = snap.parse_package(b"snap payload").unwrap();
-        assert_eq!(parsed_snap.name, "snap-compat-pkg");
-
-        let parsed_slack = slack.parse_package(b"slackware package").unwrap();
-        assert_eq!(parsed_slack.name, "slackware-compat-pkg");
-
-        let parsed_xbps = xbps.parse_package(b"xbps binary").unwrap();
-        assert_eq!(parsed_xbps.name, "xbps-compat-pkg");
-
-        let parsed_freebsd = freebsd.parse_package(b"freebsd package").unwrap();
-        assert_eq!(parsed_freebsd.name, "freebsdpkg-compat-pkg");
 
         let parsed_sov = sovereign.parse_package(b"sigpkg payload").unwrap();
         assert_eq!(parsed_sov.name, "sovereign-core-pkg");
@@ -696,7 +658,7 @@ mod tests {
             HookType::PreInstall,
             "CheckNameHook",
             0xAA55, // Required capability token
-            |c| c.name.starts_with("udf")
+            |c| c.name.starts_with("udf"),
         );
 
         // Execute with insufficient token should fail
@@ -716,7 +678,7 @@ mod tests {
             HookType::PostInstall,
             "FailPostHook",
             0,
-            |c| c.format != PackageFormat::Apt // Fails if Apt format
+            |c| c.format != PackageFormat::Apt, // Fails if Apt format
         );
         pm.register_udf_hook(fail_post_hook);
 

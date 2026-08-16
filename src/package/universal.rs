@@ -12,11 +12,6 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
-    AppImage, // portable app
-    Guix,     // functional package format
-    Nix,      // nixos package format
-    Portage,  // gentoo emerge
-    Zypper,   // opensuse package format
 }
 
 /// Package source
@@ -160,12 +155,14 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
-        let mut resolved = Vec::new();
-        let mut to_visit = vec![package_name.to_string()];
-        let mut visited: std::collections::HashSet<String> = std::collections::HashSet::new();
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
+        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+        to_visit.push(package_name.to_string());
+        let mut visited = std::collections::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
+            let current: String = current;
             if visited.contains(&current) {
                 continue;
             }
@@ -174,6 +171,7 @@ impl DependencyResolver {
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
+                    let dep: &String = dep;
                     if !visited.contains(dep) {
                         to_visit.push(dep.clone());
                     }
@@ -192,16 +190,14 @@ impl DependencyResolver {
 
         for (i, pkg1_name) in packages.iter().enumerate() {
             for pkg2_name in packages.iter().skip(i + 1) {
-                let pkg1: &UnifiedPackage = match self.packages.get(pkg1_name) {
-                    Some(p) => p,
-                    None => continue,
-                };
-                let pkg2: &UnifiedPackage = match self.packages.get(pkg2_name) {
-                    Some(p) => p,
-                    None => continue,
-                };
-                if pkg1.has_conflict_with(pkg2) {
-                    conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+                if let (Some(pkg1), Some(pkg2)) =
+                    (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
+                {
+                    let pkg1: &UnifiedPackage = pkg1;
+                    let pkg2: &UnifiedPackage = pkg2;
+                    if pkg1.has_conflict_with(pkg2) {
+                        conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+                    }
                 }
             }
         }
@@ -216,56 +212,41 @@ impl DependencyResolver {
             ConflictResolution::PreferNewest => {
                 // Prefer the package with higher version
                 for (pkg1, pkg2) in conflicts {
-                    let p1: &UnifiedPackage = match self.packages.get(pkg1) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    let p2: &UnifiedPackage = match self.packages.get(pkg2) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    if p1.version > p2.version {
-                        resolution.push(pkg1.clone());
-                    } else {
-                        resolution.push(pkg2.clone());
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
+                        if p1.version > p2.version {
+                            resolution.push(pkg1.clone());
+                        } else {
+                            resolution.push(pkg2.clone());
+                        }
                     }
                 }
             }
             ConflictResolution::PreferOldest => {
                 // Prefer the package with lower version
                 for (pkg1, pkg2) in conflicts {
-                    let p1: &UnifiedPackage = match self.packages.get(pkg1) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    let p2: &UnifiedPackage = match self.packages.get(pkg2) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    if p1.version < p2.version {
-                        resolution.push(pkg1.clone());
-                    } else {
-                        resolution.push(pkg2.clone());
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
+                        if p1.version < p2.version {
+                            resolution.push(pkg1.clone());
+                        } else {
+                            resolution.push(pkg2.clone());
+                        }
                     }
                 }
             }
             ConflictResolution::PreferNative => {
                 // Prefer SigmaPkg format
                 for (pkg1, pkg2) in conflicts {
-                    let p1: &UnifiedPackage = match self.packages.get(pkg1) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    let p2: &UnifiedPackage = match self.packages.get(pkg2) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    if p1.formats.contains(&PackageFormat::SigmaPkg) {
-                        resolution.push(pkg1.clone());
-                    } else if p2.formats.contains(&PackageFormat::SigmaPkg) {
-                        resolution.push(pkg2.clone());
-                    } else {
-                        resolution.push(pkg1.clone());
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
+                        if p1.formats.contains(&PackageFormat::SigmaPkg) {
+                            resolution.push(pkg1.clone());
+                        } else if p2.formats.contains(&PackageFormat::SigmaPkg) {
+                            resolution.push(pkg2.clone());
+                        } else {
+                            resolution.push(pkg1.clone());
+                        }
                     }
                 }
             }
@@ -314,8 +295,9 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys: Vec<String> = Vec::new();
+        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
         for key in installed.keys() {
+            let key: &String = key;
             keys.push(key.clone());
         }
 
@@ -375,11 +357,6 @@ impl UniversalPackageManager {
         let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
         let flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
         let sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
-        let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
-        let guix_adapter = PackageAdapter::new(PackageFormat::Guix, "guix".to_string());
-        let nix_adapter = PackageAdapter::new(PackageFormat::Nix, "nix".to_string());
-        let portage_adapter = PackageAdapter::new(PackageFormat::Portage, "emerge".to_string());
-        let zypper_adapter = PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string());
 
         self.adapters.insert(PackageFormat::Deb, apt_adapter);
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
@@ -389,11 +366,6 @@ impl UniversalPackageManager {
             .insert(PackageFormat::Flatpak, flatpak_adapter);
         self.adapters
             .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
-        self.adapters.insert(PackageFormat::AppImage, appimage_adapter);
-        self.adapters.insert(PackageFormat::Guix, guix_adapter);
-        self.adapters.insert(PackageFormat::Nix, nix_adapter);
-        self.adapters.insert(PackageFormat::Portage, portage_adapter);
-        self.adapters.insert(PackageFormat::Zypper, zypper_adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -442,23 +414,20 @@ impl UniversalPackageManager {
 
         // Install packages
         for dep_name in dependencies {
-            let package: &UnifiedPackage = match self.packages.get(&dep_name) {
-                Some(p) => p,
-                None => continue,
-            };
-            // Find appropriate adapter
-            for format in &package.formats {
-                let adapter = match self.adapters.get(format) {
-                    Some(a) => a,
-                    None => continue,
-                };
-                adapter.install(package)?;
-                break;
-            }
+            if let Some(package) = self.packages.get(&dep_name) {
+                // Find appropriate adapter
+                for format in &package.formats {
+                    if let Some(adapter) = self.adapters.get(format) {
+                        let adapter: &PackageAdapter = adapter;
+                        adapter.install(package)?;
+                        break;
+                    }
+                }
 
-            let mut installed = package.clone();
-            installed.installed = true;
-            self.installed_packages.insert(dep_name.clone(), installed);
+                let mut installed = package.clone();
+                installed.installed = true;
+                self.installed_packages.insert(dep_name.clone(), installed);
+            }
         }
 
         Ok(())
@@ -467,12 +436,11 @@ impl UniversalPackageManager {
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
         if let Some(package) = self.installed_packages.get(package_name) {
             for format in &package.formats {
-                let adapter = match self.adapters.get(format) {
-                    Some(a) => a,
-                    None => continue,
-                };
-                adapter.remove(package)?;
-                break;
+                if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
+                    adapter.remove(package)?;
+                    break;
+                }
             }
             self.installed_packages.remove(package_name);
         }
@@ -482,12 +450,11 @@ impl UniversalPackageManager {
     pub fn update(&mut self, package_name: &str) -> Result<(), PackageError> {
         if let Some(package) = self.installed_packages.get(package_name) {
             for format in &package.formats {
-                let adapter = match self.adapters.get(format) {
-                    Some(a) => a,
-                    None => continue,
-                };
-                adapter.update(package)?;
-                break;
+                if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
+                    adapter.update(package)?;
+                    break;
+                }
             }
         }
         Ok(())
@@ -532,7 +499,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 11);
+        assert_eq!(manager.adapters.len(), 6);
     }
 
     #[test]

@@ -3,7 +3,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -127,31 +127,21 @@ impl Page {
     }
 }
 
-/// Buddy allocator for memory management
 pub struct BuddyAllocator {
-    free_lists: [Vec<MemoryBlock>; 12], // 2^0 to 2^11 pages (4KB to 8MB)
+    pub free_lists: [Vec<MemoryBlock>; 12],
+    pub free_pages: usize,
+    pub total_pages: usize,
+    pub zones: Vec<Zone>,
 }
 
 impl BuddyAllocator {
-    pub fn create_checkpoint(&self) -> BuddyAllocatorCheckpoint {
-        BuddyAllocatorCheckpoint {
-            free_lists: self.free_lists.clone(),
-        }
-    }
-
-    pub fn restore_checkpoint(&mut self, checkpoint: BuddyAllocatorCheckpoint) {
-        self.free_lists = checkpoint.free_lists;
-    }
     pub fn new() -> Self {
         Self {
             free_lists: Default::default(),
+            free_pages: 0,
+            total_pages: 0,
+            zones: Vec::new(),
         }
-    }
-
-    pub fn with_memory(base_addr: usize, size: usize) -> Self {
-        let mut allocator = Self::new();
-        allocator.initialize_memory(base_addr, size);
-        allocator
     }
 
     pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {
@@ -160,13 +150,26 @@ impl BuddyAllocator {
 
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
+                let block = MemoryBlock { addr, size };
                 self.free_lists[order].push(block);
             }
         }
+    }
+
+    /// Create a checkpoint of the allocator's current free list state (Phase 1.1)
+    pub fn create_checkpoint(&self) -> [Vec<MemoryBlock>; 12] {
+        let mut checkpoint: [Vec<MemoryBlock>; 12] = Default::default();
+        for order in 0..12 {
+            for block in &self.free_lists[order] {
+                checkpoint[order].push(*block);
+            }
+        }
+        checkpoint
+    }
+
+    /// Restore the allocator to a previously checkpointed state to recover from crash exceptions (Phase 1.1)
+    pub fn restore_checkpoint(&mut self, checkpoint: [Vec<MemoryBlock>; 12]) {
+        self.free_lists = checkpoint;
     }
 
     pub fn get_free_memory(&self) -> usize {
@@ -221,13 +224,15 @@ impl BuddyAllocator {
     }
 
     fn calculate_order(&self, pages: usize) -> usize {
-        let mut order = 0;
-        let mut size = 1;
-        while size < pages {
-            size *= 2;
-            order += 1;
+        // Bolt Optimization: Replace O(n) linear search loop with O(1) branchless bitwise operations.
+        // On modern hardware, next_power_of_two() and trailing_zeros() map directly to specialized
+        // CPU instructions (e.g., LZCNT/TZCNT/BSR), enabling nanosecond-level execution speeds and supporting HW acceleration.
+        if pages <= 1 {
+            0
+        } else {
+            let next_pow = pages.next_power_of_two();
+            next_pow.trailing_zeros() as usize
         }
-        order
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
@@ -265,7 +270,8 @@ impl BuddyAllocator {
         }
 
         let block_addr = block.addr.as_ptr() as usize;
-        let buddy_addr = block_addr ^ (1 << (order + 12)); // Calculate buddy address
+        // Calculate buddy address by XORing with block size (standard buddy system)
+        let buddy_addr = block_addr ^ block.size;
         let buddy_size = block.size * 2;
 
         // Find buddy in free list
@@ -282,9 +288,9 @@ impl BuddyAllocator {
                 buddy_addr
             };
 
-            if let Some(addr) = NonNull::new(merged_addr as *mut u8) {
+            if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
                 Ok(MemoryBlock {
-                    addr,
+                    addr: non_null,
                     size: buddy_size,
                 })
             } else {
@@ -324,6 +330,12 @@ impl PageFlags {
 #[repr(C)]
 pub struct PageTableEntry(u64);
 
+impl Default for PageTableEntry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PageTableEntry {
     pub fn new() -> Self {
         Self(0)
@@ -357,6 +369,12 @@ pub struct PageTable {
     pub entries: [PageTableEntry; 512],
 }
 
+impl Default for PageTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PageTable {
     pub fn new() -> Self {
         Self {
@@ -368,11 +386,33 @@ impl PageTable {
 /// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
+    pub buddy_allocator: BuddyAllocator,
 }
 
 impl VirtualMemoryManager {
     pub fn new(root_directory: NonNull<PageTable>) -> Self {
-        Self { root_directory }
+        Self {
+            root_directory,
+            buddy_allocator: BuddyAllocator::new(),
+        }
+    }
+
+    pub fn with_allocator(root_directory: NonNull<PageTable>, allocator: BuddyAllocator) -> Self {
+        Self {
+            root_directory,
+            buddy_allocator: allocator,
+        }
+    }
+
+    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
+    pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
+        let size = num_pages * PAGE_SIZE;
+        self.buddy_allocator.allocate(size)
+    }
+
+    /// Free pages using buddy allocator (wires free_pages to VMM)
+    pub fn free_pages(&mut self, block: MemoryBlock) {
+        self.buddy_allocator.deallocate(block);
     }
 
     /// Translates a virtual address into a physical address
@@ -424,6 +464,110 @@ impl VirtualMemoryManager {
     }
 }
 
+// =========================================================================
+// MEMORY DESCRIPTOR LIST (MDL) & ANCIENT ISA DMA BUFFER ABSTRACTIONS
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MemoryProtection {
+    ReadOnly,
+    ReadWrite,
+    ExecuteRead,
+    ExecuteReadWrite,
+}
+
+#[derive(Debug, Clone)]
+pub struct MemoryDescriptorList {
+    pub start_virtual_addr: u64,
+    pub byte_length: usize,
+    pub is_locked_pinned: bool,
+    pub protection_flags: MemoryProtection,
+    pub physical_page_offsets: Vec<u64>,
+}
+
+impl MemoryDescriptorList {
+    pub fn new(virtual_addr: u64, length: usize, protection: MemoryProtection) -> Self {
+        Self {
+            start_virtual_addr: virtual_addr,
+            byte_length: length,
+            is_locked_pinned: false,
+            protection_flags: protection,
+            physical_page_offsets: Vec::new(),
+        }
+    }
+
+    pub fn lock_pages_and_pin(&mut self, physical_pages: &[u64]) -> Result<(), &'static str> {
+        if self.is_locked_pinned {
+            return Err("MDL pages are already pinned in physical memory");
+        }
+        self.physical_page_offsets = physical_pages.to_vec();
+        self.is_locked_pinned = true;
+        Ok(())
+    }
+
+    pub fn unlock_pages(&mut self) {
+        self.is_locked_pinned = false;
+        self.physical_page_offsets.clear();
+    }
+}
+
+pub const ISA_DMA_MAX_PHYSICAL_ADDR: u64 = 16 * 1024 * 1024; // Strict 16MB physical boundary for ancient ISA DMA
+
+pub struct FloppyDiskDmaBuffer {
+    pub physical_addr: u64,
+    pub channel: u8, // ISA DMA Channel 2
+    pub buffer_length: usize, // Max 64KB
+}
+
+impl FloppyDiskDmaBuffer {
+    pub fn allocate_below_16mb(phys_addr: u64, length: usize) -> Result<Self, &'static str> {
+        if phys_addr >= ISA_DMA_MAX_PHYSICAL_ADDR {
+            return Err("Floppy Disk ISA DMA allocation exceeds 16MB physical RAM boundary");
+        }
+        if length > 64 * 1024 {
+            return Err("Floppy Disk DMA buffer exceeds 64KB transfer limit");
+        }
+        Ok(Self {
+            physical_addr: phys_addr,
+            channel: 2,
+            buffer_length: length,
+        })
+    }
+}
+
+pub struct SoundBlaster16DmaBuffer {
+    pub physical_addr: u64,
+    pub channel: u8, // ISA DMA Channel 5 (16-bit audio)
+    pub is_double_buffered: bool,
+}
+
+impl SoundBlaster16DmaBuffer {
+    pub fn allocate_ping_pong_buffer(phys_addr: u64) -> Result<Self, &'static str> {
+        if phys_addr >= ISA_DMA_MAX_PHYSICAL_ADDR {
+            return Err("Sound Blaster 16 ISA DMA allocation exceeds 16MB physical RAM boundary");
+        }
+        Ok(Self {
+            physical_addr: phys_addr,
+            channel: 5,
+            is_double_buffered: true,
+        })
+    }
+}
+
+pub struct Ne2000DmaBuffer {
+    pub shared_ram_base: u16,
+    pub ring_buffer_size: usize,
+}
+
+impl Ne2000DmaBuffer {
+    pub fn new(ram_base: u16, size: usize) -> Self {
+        Self {
+            shared_ram_base: ram_base,
+            ring_buffer_size: size,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -440,6 +584,9 @@ mod tests {
         assert_eq!(allocator.calculate_order(1), 0);
         assert_eq!(allocator.calculate_order(2), 1);
         assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 
     #[test]
@@ -447,26 +594,34 @@ mod tests {
         let mut allocator = BuddyAllocator::new();
         // This would need actual memory to work properly
         // For now, just test the interface
-        let result = allocator.allocate(4096);
+        let _result = allocator.allocate(4096);
         // Will fail without actual memory, but tests the flow
     }
 
     #[test]
-    fn test_checkpoint_restore() {
+    fn test_checkpoint_and_state_recovery() {
         let mut allocator = BuddyAllocator::new();
-        allocator.initialize_memory(0x1000, 4096);
-        assert_eq!(allocator.get_free_memory(), 4096);
+        allocator.initialize_memory(0x1000, 4096); // 1 page (order 0)
+        allocator.initialize_memory(0x3000, 8192); // 2 pages (order 1)
+        assert_eq!(allocator.get_free_memory(), 12288);
 
-        // Save state
+        // Checkpoint original state
         let checkpoint = allocator.create_checkpoint();
 
-        // Pretend an allocation fails/changes state
-        let block = allocator.allocate(4096).unwrap();
+        // Perform mock allocations which modify state
+        let _block1 = allocator.allocate(4096).unwrap();
+        let _block2 = allocator.allocate(8192).unwrap();
         assert_eq!(allocator.get_free_memory(), 0);
 
-        // Restore baseline checkpoint
+        // Simulated crash/unwinding: Restore from checkpoint to recover state
         allocator.restore_checkpoint(checkpoint);
-        assert_eq!(allocator.get_free_memory(), 4096);
+
+        // State is perfectly restored
+        assert_eq!(allocator.get_free_memory(), 12288);
+
+        // Verify we can allocate the same blocks again successfully
+        let block_retry = allocator.allocate(4096).unwrap();
+        assert_eq!(block_retry.size, 4096);
     }
 
     #[test]
@@ -500,5 +655,45 @@ mod tests {
 
         // Double Free (Should Fail)
         assert!(pool_manager.free_pool(paged_block.addr).is_err());
+    }
+
+    #[test]
+    fn test_memory_descriptor_list_mdl_pinning() {
+        let mut mdl = MemoryDescriptorList::new(0x7FFF_0000, 8192, MemoryProtection::ReadWrite);
+        assert!(!mdl.is_locked_pinned);
+
+        let phys_pages = [0x1000, 0x2000];
+        assert!(mdl.lock_pages_and_pin(&phys_pages).is_ok());
+        assert!(mdl.is_locked_pinned);
+        assert_eq!(mdl.physical_page_offsets, vec![0x1000, 0x2000]);
+
+        // Attempting to lock twice fails
+        assert!(mdl.lock_pages_and_pin(&phys_pages).is_err());
+
+        mdl.unlock_pages();
+        assert!(!mdl.is_locked_pinned);
+        assert!(mdl.physical_page_offsets.is_empty());
+    }
+
+    #[test]
+    fn test_ancient_isa_dma_buffer_boundaries() {
+        // Floppy Disk ISA DMA test (<16MB and <=64KB)
+        let floppy = FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 32 * 1024).unwrap();
+        assert_eq!(floppy.channel, 2);
+
+        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(17 * 1024 * 1024, 1024).is_err()); // > 16MB
+        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 128 * 1024).is_err()); // > 64KB
+
+        // Sound Blaster 16 ISA DMA test (<16MB)
+        let sb16 = SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(0x00B0_0000).unwrap();
+        assert_eq!(sb16.channel, 5);
+        assert!(sb16.is_double_buffered);
+
+        assert!(SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(18 * 1024 * 1024).is_err()); // > 16MB
+
+        // NE2000 Shared RAM Ring Buffer test
+        let ne2000 = Ne2000DmaBuffer::new(0x300, 16384);
+        assert_eq!(ne2000.shared_ram_base, 0x300);
+        assert_eq!(ne2000.ring_buffer_size, 16384);
     }
 }

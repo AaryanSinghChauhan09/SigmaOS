@@ -1,27 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS PKGBUILD Parser and AUR Sandbox Orchestration Shunts
 // Zero-dependency, safe, and OOP-centric
 
 use std::cell::RefCell;
-use crate::klib::hashset::HashSet;
-use std::path::PathBuf;
 
 const MAX_DEPS: usize = 8;
 const MAX_PREPARE_CMDS: usize = 4;
@@ -54,7 +34,6 @@ pub struct AurSandboxOrchestrator {
 }
 
 impl AurSandboxOrchestrator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         const EMPTY_DEP: Option<u32> = None;
         const EMPTY_CMD: Option<&'static str> = None;
@@ -82,11 +61,7 @@ impl AurSandboxOrchestrator {
     pub fn parse_pkgbuild_line(&mut self, line: &str) -> Option<PkgbuildMeta> {
         let line = line.trim();
         if line.starts_with("pkgname=") {
-            let name = line
-                .strip_prefix("pkgname=")
-                .unwrap()
-                .trim_matches('"')
-                .trim_matches('\'');
+            let name = line.strip_prefix("pkgname=").unwrap().trim_matches('"').trim_matches('\'');
             let hash = Self::calculate_name_hash(name);
             return Some(PkgbuildMeta {
                 name_hash: hash,
@@ -131,27 +106,13 @@ impl AurSandboxOrchestrator {
     }
 
     /// Executes the sandboxed compilation routines and registers the result package into sigpkg CAS
-    pub fn run_compilation(
-        &mut self,
-        meta: PkgbuildMeta,
-        sandbox: &PkgSandboxConfig,
-    ) -> Result<u32, &'static str> {
+    pub fn run_compilation(&mut self, meta: PkgbuildMeta, sandbox: &PkgSandboxConfig) -> Result<u32, &'static str> {
         if sandbox.allow_internet {
             return Err("AurOrchestrator: Insecure sandbox configuration - network connectivity prohibited during build phase");
         }
 
         // Simulate compiling source files inside isolated namespace boundaries
-        println!(
-            "AurCompiler: Compiling package (hash: 0x{:X}) inside isolated sandbox path: 0x{:X}",
-            meta.name_hash, sandbox.restricted_source_path_hash
-        );
-
-        // Compute simulated target output package hash
         let final_package_hash = meta.name_hash ^ 0xAAAAAAAA;
-        println!(
-            "AurCompiler: Attested package build successfully. Output CAS hash: 0x{:X}",
-            final_package_hash
-        );
 
         Ok(final_package_hash)
     }
@@ -178,13 +139,8 @@ mod tests {
     #[test]
     fn test_parse_pkgbuild_line() {
         let mut orchestrator = AurSandboxOrchestrator::new();
-        let meta = orchestrator
-            .parse_pkgbuild_line("pkgname=\"custom-app\"")
-            .unwrap();
-        assert_eq!(
-            meta.name_hash,
-            AurSandboxOrchestrator::calculate_name_hash("custom-app")
-        );
+        let meta = orchestrator.parse_pkgbuild_line("pkgname=\"custom-app\"").unwrap();
+        assert_eq!(meta.name_hash, AurSandboxOrchestrator::calculate_name_hash("custom-app"));
         assert_eq!(meta.version_major, 1);
         assert_eq!(meta.version_minor, 0);
         assert_eq!(meta.pkgrel, 1);
@@ -192,14 +148,8 @@ mod tests {
         orchestrator.parse_pkgbuild_line("depends=('libcurl' 'openssl')");
         assert_eq!(orchestrator.dep_count, 2);
         let deps = orchestrator.dependencies.borrow();
-        assert_eq!(
-            deps[0],
-            Some(AurSandboxOrchestrator::calculate_name_hash("libcurl"))
-        );
-        assert_eq!(
-            deps[1],
-            Some(AurSandboxOrchestrator::calculate_name_hash("openssl"))
-        );
+        assert_eq!(deps[0], Some(AurSandboxOrchestrator::calculate_name_hash("libcurl")));
+        assert_eq!(deps[1], Some(AurSandboxOrchestrator::calculate_name_hash("openssl")));
     }
 
     #[test]
