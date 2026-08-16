@@ -7,34 +7,26 @@ pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
-pub mod linux_bsd_inspirations;
-pub mod linux_bsd_parity;
 pub mod manjaro;
 pub mod nextgen;
-pub mod preseed;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
+pub mod preseed;
+pub mod linux_bsd_inspirations;
 
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService, SovereignBpfCoReEngine, BsdCapsicumRights,
-    Hammer2MultiVersionEngine, SovereignOstreeEngine, SovereignRunitSupervisor,
-    SovereignZfsPoolEngine, SovereignKaslrWxAllocator, RunitServiceStatus, RunitRunlevel,
-    ZfsVdevType, MemoryPagePerms,
-};
-pub use linux_bsd_parity::{
-    ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
-    NixOSFlakeEngine, PacmanHook, PortagePackage, RunitService, ServiceState, SystemClosure,
-    VoidRunitSupervisor,
+    PinRule, AptPinStore, OpenRCService,
 };
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease,
+    ManjaroKernelRelease, ManjaroKernelSwitcher,
+    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,

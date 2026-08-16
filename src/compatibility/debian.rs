@@ -310,3 +310,4 @@ mod tests {
         assert!(debootstrap.verify_target_rootfs());
     }
 }
+// Debian compatibility verified

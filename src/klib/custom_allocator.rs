@@ -162,6 +162,8 @@ pub struct SigmaBumpAllocator {
     total_allocated: AtomicUsize,
     /// Total bytes deallocated (for diagnostics).
     total_deallocated: AtomicUsize,
+    /// Pseudo-random seed for ASLR guard offset
+    random_seed: AtomicUsize,
 }
 
 impl SigmaBumpAllocator {
@@ -172,6 +174,34 @@ impl SigmaBumpAllocator {
             live_count: AtomicUsize::new(0),
             total_allocated: AtomicUsize::new(0),
             total_deallocated: AtomicUsize::new(0),
+            random_seed: AtomicUsize::new(0x1337_55AA),
+        }
+    }
+
+    /// Pseudo-random LCG generator for ASLR heap layout randomization
+    fn next_random(&self) -> usize {
+        let current = self.random_seed.load(Ordering::Relaxed);
+        let next = current.wrapping_mul(1103515245).wrapping_add(12345);
+        self.random_seed.store(next, Ordering::Relaxed);
+        next
+    }
+
+    /// Allocates memory with randomized ASLR guard padding (OpenBSD/Hardened Malloc inspired)
+    pub unsafe fn alloc_randomized(&self, layout: Layout) -> *mut u8 {
+        let align = layout.align().max(MIN_ALIGN);
+        let size = layout.size();
+
+        // Generate pseudo-random guard offset (0 to 112 bytes in multiples of MIN_ALIGN)
+        let guard_offset = (self.next_random() % 8) * MIN_ALIGN;
+        let total_size = size + guard_offset;
+
+        let adjusted_layout = Layout::from_size_align(total_size, align).unwrap_or(layout);
+        let ptr = self.alloc(adjusted_layout);
+        if !ptr.is_null() && guard_offset > 0 {
+            // Return pointer offset by randomized guard padding
+            ptr.add(guard_offset)
+        } else {
+            ptr
         }
     }
 
@@ -374,5 +404,19 @@ mod tests {
         let stats = SIGMA_ALLOCATOR.stats();
         assert_eq!(stats.heap_size, HEAP_SIZE);
         assert!(stats.bump_offset <= HEAP_SIZE);
+    }
+
+    #[test]
+    fn test_randomized_malloc_aslr_guard() {
+        let layout = Layout::from_size_align(64, 16).unwrap();
+        let ptr1 = unsafe { SIGMA_ALLOCATOR.alloc_randomized(layout) };
+        let ptr2 = unsafe { SIGMA_ALLOCATOR.alloc_randomized(layout) };
+        assert!(!ptr1.is_null());
+        assert!(!ptr2.is_null());
+        assert_ne!(ptr1, ptr2);
+        unsafe {
+            SIGMA_ALLOCATOR.dealloc(ptr1, layout);
+            SIGMA_ALLOCATOR.dealloc(ptr2, layout);
+        }
     }
 }

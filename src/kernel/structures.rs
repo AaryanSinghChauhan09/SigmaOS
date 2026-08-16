@@ -1,6 +1,6 @@
-use core::ptr::NonNull;
 use core::cell::{Cell, RefCell};
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+use core::ptr::NonNull;
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -514,14 +514,7 @@ mod tests {
         assert_eq!(thread.context.rax, 100);
     }
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86,
-    X64,
-    Arm,
-    Cisc,
-}
+// 3. Next-Generation Advanced Algorithms (SovereignAlgorithms Blueprint)
 
 const MAX_SCHEDULER_TASKS: usize = 16;
 const MAX_LEDGER_BLOCKS: usize = 8;
@@ -621,7 +614,7 @@ impl AdvancedAlgorithmsManager {
     // 1. EARLIEST DEADLINE FIRST REAL-TIME SCHEDULER
     pub fn add_edf_task(&self, task: EdfTask) -> Result<(), &'static str> {
         let mut queue = self.edf_queue.borrow_mut();
-        for slot in queue.iter_mut() {
+        for slot in (*queue).iter_mut() {
             if slot.is_none() {
                 *slot = Some(task);
                 return Ok(());
@@ -658,7 +651,7 @@ impl AdvancedAlgorithmsManager {
     // 2. PROBABILISTIC LOTTERY SCHEDULER
     pub fn add_lottery_task(&self, task: LotteryTask) -> Result<(), &'static str> {
         let mut queue = self.lottery_queue.borrow_mut();
-        for slot in queue.iter_mut() {
+        for slot in (*queue).iter_mut() {
             if slot.is_none() {
                 *slot = Some(task);
                 return Ok(());
