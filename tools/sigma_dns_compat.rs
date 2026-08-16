@@ -106,16 +106,10 @@ mod tests {
     }
 }
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IpAddress {
-    V4([u8; 4]),
-    V6([u8; 16]),
-}
+type SigmaU8 = u8;
+type SigmaU32 = u32;
+type SigmaI32 = i32;
+type SigmaBool = bool;
 
 /// Simple C-compatible DNS Record mapping
 #[derive(Copy, Clone)]
