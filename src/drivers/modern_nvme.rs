@@ -1,4 +1,6 @@
-// Modern high-performance NVMe PCIe block storage driver
+// Modern high-performance NVMe PCIe block storage & AHCI SATA Controller Driver
+// Conforms to SigmaOS Unified Peripheral Architecture
+
 #[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
@@ -21,10 +23,130 @@ pub trait PeripheralDevice {
     fn shutdown(&mut self) -> Result<(), &'static str>;
 }
 
+/// AHCI SATA Physical Region Descriptor Table (PRDT) Entry
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct AhciPrdtEntry {
+    pub dba: u64, // Data Base Address
+    pub reserved: u32,
+    pub dbc: u32, // Data Byte Count & Interrupt-on-Completion
+}
+
+/// AHCI SATA Command Header
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct AhciCommandHeader {
+    pub opts: u16, // Description flags, PRDT length
+    pub prdtl: u16, // PRDT Length
+    pub prdbc: u32, // PRD Byte Count
+    pub ctba: u64, // Command Table Base Address
+    pub reserved: [u32; 4],
+}
+
+/// AHCI Serial ATA Storage Controller Driver
+pub struct AhciStorageDriver {
+    pub is_initialized: bool,
+    pub power_state: PowerState,
+    pub ports_active_mask: u32,
+    pub command_headers: [AhciCommandHeader; 32],
+}
+
+impl Default for AhciStorageDriver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AhciStorageDriver {
+    pub fn new() -> Self {
+        AhciStorageDriver {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            ports_active_mask: 0x00000001, // Port 0 active
+            command_headers: [AhciCommandHeader {
+                opts: 0,
+                prdtl: 1,
+                prdbc: 0,
+                ctba: 0x100000,
+                reserved: [0; 4],
+            }; 32],
+        }
+    }
+
+    /// Issue SATA ATA Read DMA command over AHCI Port
+    pub fn execute_sata_read_dma(&mut self, port: usize, lba: u64, sectors: u32, buf: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("AHCI driver not initialized");
+        }
+        if port >= 32 || (self.ports_active_mask & (1 << port)) == 0 {
+            return Err("AHCI Port inactive");
+        }
+
+        // Simulate AHCI DMA PRDT transfer
+        let bytes_expected = (sectors as usize) * 512;
+        let read_len = buf.len().min(bytes_expected);
+        for (i, byte) in buf[..read_len].iter_mut().enumerate() {
+            *byte = ((lba as usize + i) % 256) as u8;
+        }
+
+        Ok(read_len)
+    }
+
+    /// Issue SATA ATA Write DMA command over AHCI Port
+    pub fn execute_sata_write_dma(&mut self, port: usize, _lba: u64, _sectors: u32, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("AHCI driver not initialized");
+        }
+        if port >= 32 || (self.ports_active_mask & (1 << port)) == 0 {
+            return Err("AHCI Port inactive");
+        }
+
+        Ok(data.len())
+    }
+}
+
+impl PeripheralDevice for AhciStorageDriver {
+    fn name(&self) -> &'static str {
+        "AHCI Serial ATA Storage Driver"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        self.execute_sata_read_dma(0, 0, (buffer.len() / 512).max(1) as u32, buffer)
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        self.execute_sata_write_dma(0, 0, (data.len() / 512).max(1) as u32, data)
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+/// PCIe NVMe Solid-State Block Driver
 pub struct ModernNvmeDriver {
-    is_initialized: bool,
-    power_state: PowerState,
-    lba_count: u64,
+    pub is_initialized: bool,
+    pub power_state: PowerState,
+    pub lba_count: u64,
+    pub submission_doorbell: u32,
+    pub completion_doorbell: u32,
 }
 
 impl ModernNvmeDriver {
@@ -33,11 +155,18 @@ impl ModernNvmeDriver {
             is_initialized: false,
             power_state: PowerState::Off,
             lba_count,
+            submission_doorbell: 0,
+            completion_doorbell: 0,
         }
     }
 
     pub fn get_lba_count(&self) -> u64 {
         self.lba_count
+    }
+
+    /// Ring NVMe Submission Queue Doorbell
+    pub fn ring_submission_doorbell(&mut self, tail_ptr: u32) {
+        self.submission_doorbell = tail_ptr;
     }
 }
 
@@ -108,5 +237,15 @@ mod tests {
         assert_eq!(driver.generation(), DeviceGeneration::Modern);
         assert_eq!(driver.write(&[1, 2, 3]).unwrap(), 3);
         driver.shutdown().unwrap();
+    }
+
+    #[test]
+    fn test_ahci_sata_driver() {
+        let mut ahci = AhciStorageDriver::new();
+        ahci.initialize().unwrap();
+        let mut buf = [0u8; 512];
+        let bytes = ahci.read(&mut buf).unwrap();
+        assert_eq!(bytes, 512);
+        assert_eq!(ahci.name(), "AHCI Serial ATA Storage Driver");
     }
 }

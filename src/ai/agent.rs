@@ -380,6 +380,100 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 }
 
+/// BoltAgent (⚡ Performance Optimizer)
+#[derive(Debug, Clone)]
+pub struct BoltAgent {
+    pub name: String,
+    pub hotpath_optimizations_count: usize,
+}
+
+impl BoltAgent {
+    pub fn new() -> Self {
+        Self {
+            name: "Bolt⚡".to_string(),
+            hotpath_optimizations_count: 0,
+        }
+    }
+
+    /// Analyzes kernel/IPC hotpaths and suggests circular queue buffer sizes
+    pub fn optimize_ipc_circular_queue(&mut self, current_depth: usize, throughput_pps: usize) -> usize {
+        self.hotpath_optimizations_count += 1;
+        if throughput_pps > 100_000 {
+            current_depth * 2
+        } else if throughput_pps < 100 {
+            current_depth / 2
+        } else {
+            current_depth
+        }
+    }
+}
+
+impl Default for BoltAgent {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// PaletteAgent (🎨 UI/UX Specialist)
+#[derive(Debug, Clone)]
+pub struct PaletteAgent {
+    pub name: String,
+    pub active_theme: String,
+}
+
+impl PaletteAgent {
+    pub fn new() -> Self {
+        Self {
+            name: "Palette🎨".to_string(),
+            active_theme: "ZenithDark".to_string(),
+        }
+    }
+
+    /// Evaluates UI spring physics motion equations (F = -k*x - c*v)
+    pub fn evaluate_spring_physics(&self, displacement: f32, velocity: f32, stiffness: f32, damping: f32) -> f32 {
+        -stiffness * displacement - damping * velocity
+    }
+
+    pub fn set_theme(&mut self, theme_name: &str) {
+        self.active_theme = theme_name.to_string();
+    }
+}
+
+impl Default for PaletteAgent {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// SentinelAgent (🛡️ Security Auditor)
+#[derive(Debug, Clone)]
+pub struct SentinelAgent {
+    pub name: String,
+    pub audited_tokens_count: usize,
+}
+
+impl SentinelAgent {
+    pub fn new() -> Self {
+        Self {
+            name: "Sentinel🛡️".to_string(),
+            audited_tokens_count: 0,
+        }
+    }
+
+    /// Audits capability tokens for privilege escalation or bitmask overlaps
+    pub fn audit_capability_token(&mut self, token_bits: u64, max_allowed_bits: u64) -> bool {
+        self.audited_tokens_count += 1;
+        // Verify no prohibited escalation bits are set outside max_allowed_bits
+        (token_bits & !max_allowed_bits) == 0
+    }
+}
+
+impl Default for SentinelAgent {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -467,5 +561,19 @@ mod tests {
 
         let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
         assert!(explanation.windows(8).any(|w| w == b"Extracts"));
+    }
+
+    #[test]
+    fn test_specialized_agents_bolt_palette_sentinel() {
+        let mut bolt = BoltAgent::new();
+        assert_eq!(bolt.optimize_ipc_circular_queue(1024, 150_000), 2048);
+
+        let palette = PaletteAgent::new();
+        let force = palette.evaluate_spring_physics(10.0, 2.0, 100.0, 5.0);
+        assert_eq!(force, -1010.0);
+
+        let mut sentinel = SentinelAgent::new();
+        assert!(sentinel.audit_capability_token(0x0F, 0x0F));
+        assert!(!sentinel.audit_capability_token(0xFF, 0x0F));
     }
 }

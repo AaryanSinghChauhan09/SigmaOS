@@ -223,6 +223,7 @@ impl AccessibilityFramework {
         }
         self.active_profile = Some(name.to_string());
         if let Some(profile) = self.profiles.get_mut(name) {
+            let profile: &mut AccessibilityProfile = profile;
             profile.enable_all();
         }
         Ok(())

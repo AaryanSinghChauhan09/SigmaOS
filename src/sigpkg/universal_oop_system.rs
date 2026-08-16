@@ -2393,14 +2393,14 @@ impl UniversalPackageManager {
 
     /// Get installed package
     pub fn get_package(&self, name: &str) -> Option<&dyn IPackage> {
-        self.installed_packages.get::<str>(name).map(|p| p.as_ref())
+        self.installed_packages.get(name).map(|p: &Box<dyn IPackage>| p.as_ref())
     }
 
     /// List all installed packages
     pub fn list_packages(&self) -> Vec<&dyn IPackage> {
         self.installed_packages
             .values()
-            .map(|p| p.as_ref())
+            .map(|p: &Box<dyn IPackage>| p.as_ref())
             .collect()
     }
 
@@ -3016,7 +3016,7 @@ Description: Hook test";
         let trigger = PathTriggerHook {
             name: "update-desktop-database".to_string(),
             pattern: "*.desktop".to_string(),
-            script: Arc::new(move |matched_paths| {
+            script: Arc::new(move |matched_paths: &[String]| {
                 assert_eq!(matched_paths.len(), 1);
                 assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
                 trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);

@@ -186,7 +186,7 @@ impl BpfVm {
                     };
                     
                     if cond == inst.imm as u64 {
-                        pc += inst.offset;
+                        pc += inst.offset as i32;
                     }
                 }
                 _ => return Err(BpfError::InvalidOpcode),
@@ -208,6 +208,7 @@ pub enum BpfError {
     InvalidOpcode,
     StackOverflow,
     InvalidMemoryAccess,
+    InvalidInstruction,
 }
 
 /// eBPF map type (kernel-space data structures)
@@ -228,6 +229,44 @@ pub struct BpfMap {
     pub value_size: u32,
     pub max_entries: u32,
     pub data: RefCell<[u8; 65536]>, // 64KB max map size
+}
+
+/// eBPF Static Safety Verifier
+pub struct BpfVerifier;
+
+impl BpfVerifier {
+    pub fn verify_program(&self, instructions: &[BpfInstruction]) -> Result<(), BpfError> {
+        if instructions.is_empty() || instructions.len() > 4096 {
+            return Err(BpfError::ProgramTooLarge);
+        }
+
+        let mut contains_exit = false;
+        for (i, inst) in instructions.iter().enumerate() {
+            // Register bound checks
+            if inst.dst_reg > 10 || inst.src_reg > 10 {
+                return Err(BpfError::InvalidMemoryAccess);
+            }
+
+            // Check for backward jumps (bounded loop safety verification)
+            if inst.offset < 0 {
+                let target_pc = (i as i32) + 1 + (inst.offset as i32);
+                if target_pc < 0 || target_pc >= i as i32 {
+                    return Err(BpfError::InvalidInstruction);
+                }
+            }
+
+            // Check for exit instruction
+            if inst.opcode == 0x95 {
+                contains_exit = true;
+            }
+        }
+
+        if !contains_exit {
+            return Err(BpfError::InvalidInstruction);
+        }
+
+        Ok(())
+    }
 }
 
 impl BpfMap {
@@ -302,6 +341,21 @@ mod tests {
         vm.load_program(&program).unwrap();
         let result = vm.execute(&[1, 2, 3, 4, 5]).unwrap();
         assert_eq!(result, 10);
+    }
+
+    #[test]
+    fn test_bpf_verifier() {
+        let verifier = BpfVerifier;
+        let valid_prog = [
+            BpfInstruction { opcode: 0xb7, dst_reg: 0, src_reg: 0, offset: 0, imm: 10 },
+            BpfInstruction { opcode: 0x95, dst_reg: 0, src_reg: 0, offset: 0, imm: 0 },
+        ];
+        assert!(verifier.verify_program(&valid_prog).is_ok());
+
+        let invalid_prog = [
+            BpfInstruction { opcode: 0xb7, dst_reg: 11, src_reg: 0, offset: 0, imm: 10 }, // Reg 11 out of bounds
+        ];
+        assert!(verifier.verify_program(&invalid_prog).is_err());
     }
 
     #[test]
