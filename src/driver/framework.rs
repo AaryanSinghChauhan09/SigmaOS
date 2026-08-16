@@ -56,15 +56,15 @@ impl SimpleDriver {
         }
     }
 
-    pub fn init(&self) -> Result<(), DriverError> {
+    pub fn init(&mut self) -> Result<(), DriverError> {
         Ok(())
     }
 
-    pub fn probe(&self) -> Result<bool, DriverError> {
+    pub fn probe(&mut self) -> Result<bool, DriverError> {
         Ok(true)
     }
 
-    pub fn shutdown(&self) -> Result<(), DriverError> {
+    pub fn shutdown(&mut self) -> Result<(), DriverError> {
         Ok(())
     }
 }
@@ -81,7 +81,7 @@ impl Driver for SimpleDriver {
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state
-            .store(DriverState::Loaded as usize, Ordering::SeqCst);
+            .store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
@@ -285,6 +285,20 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
     }
 }
 
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(_ptr: *mut u8) {
+    // Safe no-op or stub on hosted target during tests
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

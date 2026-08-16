@@ -4,12 +4,17 @@
 *.log
 *.tmp
 SigmaOS.wiki/
-node_modules/
-**/node_modules/
-dist/
-**/dist/
+
+# Build artifacts and compiled binaries
 build/
-**/build/
-test_enterprise
-wiki_repo/
-/sigma-test
+*.iso
+*.bin
+*.img
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.elf
+test_runner
