@@ -1,7 +1,8 @@
 /// OOP-based Access Control System for SigmaOS
 /// Based on Roadmap Item 14: Access control system
 
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 use core::sync::atomic::AtomicUsize;
 
 pub type PermissionID = usize;

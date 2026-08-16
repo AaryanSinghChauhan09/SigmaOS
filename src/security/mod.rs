@@ -18,6 +18,12 @@ pub use parrot::{
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+};
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+};
 
 pub use kali_stack::{
     PluggableAuthenticationModule, FirewallRule, IptablesFirewall, CronJob, CronDaemon,

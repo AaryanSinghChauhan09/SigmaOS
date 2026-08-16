@@ -4,8 +4,9 @@
 /// Enhanced with standard Ubuntu-style target states (reboot.target, poweroff.target,
 /// emergency.target) and structured service controls (reload, restart, status checks).
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
+use alloc::vec::Vec;
 
 pub type UnitID = usize;
 

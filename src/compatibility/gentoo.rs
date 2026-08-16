@@ -3,7 +3,9 @@
 /// Implements Portage-grade ebuild compilation recipes, global & local compile-time USE Flags,
 /// and OpenRC runlevel dependency-resolved parallel process/daemon supervision.
 
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
 
 // =========================================================================
 // 1. USE FLAGS (Gentoo-grade Compile-Time Feature Optimization)

@@ -1,4 +1,5 @@
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 /// WebAssembly (WASM) Sandbox and Secure Runtime Execution Engine
 /// Provides isolated module runtimes, memory sandboxing, and pledge security checks
 /// to achieve Wasmer/Wasmtime/wasm3 parity inside SigmaOS.

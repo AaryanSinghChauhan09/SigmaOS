@@ -2,7 +2,7 @@
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
 
-use crate::klib::Vec;
+use alloc::vec::Vec;
 use crate::security::Permission;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

@@ -9,7 +9,7 @@ extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use crate::klib::Vec;
+use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::string::ToString;

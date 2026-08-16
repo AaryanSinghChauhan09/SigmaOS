@@ -2,7 +2,8 @@
 /// Inspired by Windows NT (EPROCESS, KPROCESS, ETHREAD, KTHREAD, KPCR/KPRCB),
 /// Linux task_struct, BSD vmspace, and iOS Mach thread models.
 
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 
 /// Represents the alterable waiting state of a thread dispatcher (Windows NT/BSD style)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -3,7 +3,10 @@
 /// Establishes an on-device, vendor-neutral semantic layer and metric language interpreter.
 /// Enables AI agents, microservices, and databases to parse, define, and evaluate identical business metrics,
 /// dimensions, and relationships without loss of semantic meaning.
-use crate::klib::Vec;
+
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MetricAggregation {

@@ -1,4 +1,5 @@
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 /// SOLID Principles-Driven and Composable Kernel Architecture for SigmaOS
 /// Implements Dependency Inversion, Liskov Substitution, User-Defined Schedulers,
 /// and SigmaFS++ Composable filesystems with Blockchain Audit Trails.

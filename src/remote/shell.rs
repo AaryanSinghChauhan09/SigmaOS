@@ -5,8 +5,9 @@
 /// Based on Ideas-999-Structured: Cloud & Remote Item 966
 /// Implements remote shell access
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
+use alloc::vec::Vec;
 
 pub type ShellID = usize;
 

@@ -1,8 +1,4 @@
 extern crate alloc;
-
-#[cfg(not(test))]
-use crate::klib::Vec;
-#[cfg(test)]
 use alloc::vec::Vec;
 
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS

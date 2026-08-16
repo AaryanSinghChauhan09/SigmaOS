@@ -4,7 +4,8 @@
 //! ping statistics reporting, packet loss calculations, duplicate packet (DUP!) detection,
 //! and standard min/avg/max/mdev RTT tracking in #![no_std].
 
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IcmpType {

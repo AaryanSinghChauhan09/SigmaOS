@@ -2,7 +2,8 @@
 /// Implements advanced abstract interpretation, transformation inversion,
 /// opaque predicate resolution, and a continuum of static/dynamic disassembler callbacks.
 
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArch {

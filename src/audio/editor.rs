@@ -2,9 +2,6 @@
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
 extern crate alloc;
-#[cfg(not(test))]
-use crate::klib::Vec;
-#[cfg(test)]
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 

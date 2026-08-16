@@ -1,6 +1,5 @@
 use core::mem;
 
-#[cfg(target_os = "none")]
 pub struct Vec<T> {
     data: *mut T,
     len: usize,

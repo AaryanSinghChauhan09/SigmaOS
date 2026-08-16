@@ -26,10 +26,6 @@ use crate::klib::BTreeMap;
 #[cfg(test)]
 use alloc::collections::BTreeMap;
 
-#[cfg(not(test))]
-use crate::klib::Vec;
-
-#[cfg(test)]
 use alloc::vec::Vec;
 
 pub const PAGE_SIZE: usize = 4096;

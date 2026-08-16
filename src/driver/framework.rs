@@ -4,7 +4,7 @@
 extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
+use alloc::vec::Vec;
 use alloc::boxed::Box;
 
 pub type DriverID = usize;

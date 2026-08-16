@@ -4,6 +4,7 @@ pub mod apache_ossie;
 pub mod chimera_linux;
 pub mod cross_platform;
 pub mod historic_linux;
+pub mod legacy_adapters;
 pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
@@ -13,6 +14,7 @@ pub mod wasm_sandbox;
 pub mod gentoo;
 
 pub use gentoo::{OpenRcManager, OpenRcService, OpenRcRunlevel};
+pub use legacy_adapters::{SyscallAbi, LibcVersion};
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,

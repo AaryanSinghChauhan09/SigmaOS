@@ -33,10 +33,6 @@ use crate::klib::SigmaString as String;
 #[cfg(test)]
 use alloc::string::String;
 
-#[cfg(not(test))]
-use crate::klib::Vec;
-
-#[cfg(test)]
 use alloc::vec::Vec;
 
 pub const SECTOR_SIZE: usize = 512;

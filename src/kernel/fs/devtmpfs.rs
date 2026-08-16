@@ -2,9 +2,10 @@
 /// Automatically registers and creates device files when drivers boot.
 /// Improved with Linux-inspired udev rules, permissions, and symlink mappings.
 
+extern crate alloc;
 use crate::klib::HashMap;
-use crate::klib::Vec;
-use std::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceClass {

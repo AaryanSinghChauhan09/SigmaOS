@@ -6,6 +6,7 @@ pub mod async_runtime;
 pub mod error;
 pub mod isa;
 pub mod store;
+pub mod string;
 pub mod vec;
 pub mod buddy_allocator;
 pub mod paging;
@@ -24,18 +25,16 @@ pub mod uuid;
 pub mod conversion;
 
 // Re-exports
-#[cfg(target_os = "none")]
+pub use string::{String, ToString};
 pub use vec::Vec;
-#[cfg(target_os = "none")]
-pub use hashmap::{HashMap, Entry};
-#[cfg(target_os = "none")]
+pub use hashmap::{BTreeMap as HashMap, Entry};
+pub use hashmap::BTreeMap;
 pub use hashset::HashSet;
-#[cfg(target_os = "none")]
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
-pub use btreemap::BTreeMap;
+pub use btreemap::BTreeMap as StdBTreeMap;
 pub use vecdeque::VecDeque;
 pub use time::{Duration, Instant, monotonic_ms};
 pub use hash::{djb2_hash, simple_hash, fnv1a_hash, xor_hash, SimpleHasher, combine_hashes};

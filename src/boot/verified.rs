@@ -16,7 +16,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 use core::ops::{Deref, DerefMut};
 
 use core::mem;

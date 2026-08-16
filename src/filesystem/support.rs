@@ -5,7 +5,7 @@ use core::mem;
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
+use alloc::vec::Vec;
 use alloc::boxed::Box;
 
 pub type FilesystemID = usize;
