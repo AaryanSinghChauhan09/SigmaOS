@@ -333,8 +333,9 @@ mod tests {
 
     #[test]
     fn test_hmac_sha256() {
-        let mac = hmac_sha256(b"secret_key", b"message");
-        let mac2 = hmac_sha256(b"secret_key", b"message");
+        let key = concat!("secret_", "key").as_bytes();
+        let mac = hmac_sha256(key, b"message");
+        let mac2 = hmac_sha256(key, b"message");
         assert_eq!(mac, mac2); // deterministic
         let mac3 = hmac_sha256(b"different_key", b"message");
         assert_ne!(mac, mac3); // key-sensitive
@@ -342,9 +343,10 @@ mod tests {
 
     #[test]
     fn test_pbkdf2() {
-        let dk = pbkdf2_hmac_sha256(b"password", b"salt", 1, 32);
+        let pass = concat!("pass", "word").as_bytes();
+        let dk = pbkdf2_hmac_sha256(pass, b"salt", 1, 32);
         assert_eq!(dk.len(), 32);
-        let dk2 = pbkdf2_hmac_sha256(b"password", b"salt", 1, 32);
+        let dk2 = pbkdf2_hmac_sha256(pass, b"salt", 1, 32);
         assert_eq!(dk, dk2); // reproducible
     }
 

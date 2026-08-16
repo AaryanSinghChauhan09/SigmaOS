@@ -1,14 +1,10 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // and implements ALPM hooks, mkinitcpio initramfs builders, and makepkg source pipelines.
 
-// Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
-// Enhanced with ALPM Hooks, mkinitcpio initramfs compilers, and makepkg package builders.
+use std::collections::HashMap;
 
-#[cfg(not(test))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-
-#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
     pub major: u64,
@@ -16,38 +12,21 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(test)]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self {
-            major,
-            minor,
-            patch,
-        }
+        Self { major, minor, patch }
     }
 
     pub fn parse(v_str: &str) -> Result<Self, &'static str> {
-        let mut parts = v_str.split('.');
-        let major = parts
-            .next()
-            .ok_or("err")?
-            .parse::<u64>()
-            .map_err(|_| "err")?;
-        let minor = parts
-            .next()
-            .ok_or("err")?
-            .parse::<u64>()
-            .map_err(|_| "err")?;
-        let patch = parts
-            .next()
-            .ok_or("err")?
-            .parse::<u64>()
-            .map_err(|_| "err")?;
+        let clean_v = v_str.split('-').next().unwrap_or(v_str);
+        let mut parts = clean_v.split('.');
+        let major = parts.next().ok_or("err")?.parse::<u64>().unwrap_or(1);
+        let minor = parts.next().unwrap_or("0").parse::<u64>().unwrap_or(0);
+        let patch = parts.next().unwrap_or("0").parse::<u64>().unwrap_or(0);
         Ok(Self::new(major, minor, patch))
     }
 }
 
-#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Exact(Version),
@@ -58,14 +37,12 @@ pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(test)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(test)]
 #[derive(Debug, Clone)]
 pub struct Package {
     pub name: String,
@@ -75,7 +52,6 @@ pub struct Package {
     pub checksum: String,
 }
 
-#[cfg(test)]
 impl Package {
     pub fn new(
         name: String,
@@ -93,80 +69,12 @@ impl Package {
         }
     }
 }
-
-use std::collections::HashMap;
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum VersionConstraint {
-    Any,
-    Exact(Version),
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Dependency {
-    pub name: String,
-    pub version_constraint: VersionConstraint,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Version {
-    pub major: u32,
-    pub minor: u32,
-    pub patch: u32,
-}
-
-#[cfg(test)]
-impl Version {
-    pub fn new(major: u32, minor: u32, patch: u32) -> Self {
-        Self { major, minor, patch }
-    }
-
-    pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let parts: Vec<&str> = s.split('.').collect();
-        if parts.len() >= 3 {
-            let major = parts[0].parse().unwrap_or(1);
-            let minor = parts[1].parse().unwrap_or(0);
-            let patch = parts[2].parse().unwrap_or(0);
-            Ok(Version { major, minor, patch })
-        } else {
-            Ok(Version { major: 1, minor: 0, patch: 0 })
-        }
-    }
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone)]
-pub struct Package {
-    pub name: String,
-    pub version: Version,
-    pub description: String,
-    pub dependencies: Vec<Dependency>,
-    pub checksum: String,
-}
-
-#[cfg(test)]
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
 
 /// Debian-style Sbuild Source Build Dependency Representation
 #[derive(Debug, Clone)]
 pub struct DebianSbuildPackage {
     pub name: String,
+    pub version: Version,
     pub build_depends: Vec<String>,
 }
 
@@ -174,6 +82,7 @@ impl DebianSbuildPackage {
     pub fn new(name: &str, build_deps: Vec<String>) -> Self {
         Self {
             name: name.to_string(),
+            version: Version::new(1, 0, 0),
             build_depends: build_deps,
         }
     }
@@ -192,7 +101,7 @@ impl AurRecipeCompiler {
         }
     }
 
-    /// Compiles a declarative Arch-style PKGBUILD text into a native S-PKG Package metadata
+    /// Compiles a declarative Arch-style PKGBUILD text into a native Package metadata
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
@@ -223,8 +132,7 @@ impl AurRecipeCompiler {
             return Err("PKGBUILD missing mandatory pkgname field");
         }
 
-        let parsed_ver =
-            Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
+        let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
             pkgname.to_string(),
@@ -309,7 +217,7 @@ impl PacmanDbAdapter {
         }
     }
 
-    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into S-PKG Package metadata
+    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into Package metadata
     pub fn import_legacy_pacman_package(
         &self,
         desc_content: &str,
@@ -334,10 +242,8 @@ impl PacmanDbAdapter {
             return Err("Legacy Pacman desc file missing NAME block");
         }
 
-        // Clean any release suffixes like -1 or -arch from version string
         let base_version = version.split('-').next().unwrap_or("1.0.0");
-        let parsed_ver =
-            Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
+        let parsed_ver = Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
             name.to_string(),
@@ -381,8 +287,6 @@ impl PortageEbuildCompiler {
         self.global_use_flags.insert(name.to_string(), enabled);
     }
 
-    /// Evaluates if custom USE flags match global feature policies, and dynamically generates
-    /// the optimized compiler `./configure` target strings.
     pub fn configure_and_compile(&self, ebuild: &mut GentooEbuildPackage) -> Result<Package, &'static str> {
         let mut active_features = Vec::new();
 
@@ -409,14 +313,13 @@ impl PortageEbuildCompiler {
 
         Ok(Package::new(
             ebuild.name.clone(),
-            ebuild.version.clone(),
+            ebuild.version,
             description,
             Vec::new(),
             "sha256_portage_compiled_source_binary".to_string(),
         ))
     }
 
-    /// Portage-style compiler native CPU microarchitecture optimization target level generator
     pub fn get_optimized_target_cpu_level(&self, cpu_features: &[&str]) -> usize {
         let mut level = 1;
         if cpu_features.contains(&"sse4.2") {
@@ -438,38 +341,14 @@ impl Default for PortageEbuildCompiler {
     }
 }
 
-/// Represents a Debian-style source package targeting sbuild compiler rules
-#[derive(Debug, Clone)]
-pub struct DebianSbuildPackage {
-    pub name: String,
-    pub version: Version,
-    pub build_depends: Vec<String>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AlpmHookAction {
+    PreTransaction,
+    PostTransaction,
 }
-
-impl RollingSyncManager {
-    pub fn is_debian_sbuild_builddeps_satisfied(&self, package: &DebianSbuildPackage) -> bool {
-        for dep in &package.build_depends {
-            if !self.installed_packages.contains_key(dep) {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-// ==========================================
-// 6. ALPM (Arch Linux Package Management) Hooks Engine
-// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HookWhen {
-
-// ==========================================
-// 8. ALPM Hooks, mkinitcpio & makepkg Features
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AlpmHookAction {
     PreTransaction,
     PostTransaction,
 }
@@ -479,6 +358,7 @@ pub enum AlpmHookAction {
 pub struct AlpmHook {
     pub name: String,
     pub action: AlpmHookAction,
+    pub when: HookWhen,
     pub target_packages: Vec<String>,
     pub exec_command: String,
 }
@@ -487,17 +367,6 @@ pub struct AlpmHook {
 pub struct AlpmHookManager {
     pub hooks: Vec<AlpmHook>,
     pub execution_log: Vec<String>,
-
-#[derive(Debug, Clone)]
-pub struct AlpmHook {
-    pub name: String,
-    pub when: HookWhen,
-    pub target_packages: Vec<String>, // e.g. ["glibc", "*"]
-    pub exec_command: String,
-}
-
-pub struct AlpmHookManager {
-    pub hooks: Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
@@ -506,22 +375,18 @@ impl AlpmHookManager {
             hooks: Vec::new(),
             execution_log: Vec::new(),
         }
-
-        Self { hooks: Vec::new() }
     }
 
     pub fn register_hook(&mut self, hook: AlpmHook) {
         self.hooks.push(hook);
     }
 
-    /// Triggers hooks matching the packages updated during a Pacman transaction
     pub fn run_hooks(&mut self, action: AlpmHookAction, updated_pkgs: &[&str]) -> usize {
         let mut count = 0;
         for hook in &self.hooks {
             if hook.action == action {
-                // If target packages list contains any updated package, execute Hook
                 let matches = hook.target_packages.iter().any(|target| {
-                    updated_pkgs.iter().any(|&pkg| target == pkg)
+                    target == "*" || updated_pkgs.iter().any(|&pkg| target == pkg)
                 });
                 if matches {
                     let log_line = format!(
@@ -534,17 +399,15 @@ impl AlpmHookManager {
             }
         }
         count
+    }
 
-    /// Executes matching ALPM hooks for an install/upgrade event
     pub fn trigger_hooks(&self, when: HookWhen, modified_packages: &[&str]) -> Vec<String> {
         let mut executed = Vec::new();
-
         for hook in &self.hooks {
             if hook.when == when {
                 let matches = hook.target_packages.iter().any(|target| {
                     target == "*" || modified_packages.contains(&target.as_str())
                 });
-
                 if matches {
                     executed.push(hook.exec_command.clone());
                 }
@@ -560,22 +423,22 @@ impl Default for AlpmHookManager {
     }
 }
 
-// ==========================================
-// 7. Mkinitcpio Initramfs Image Builder
-// ==========================================
-
-pub struct MkinitcpioBuilder {
-    pub hooks: Vec<String>, // e.g. ["base", "udev", "block", "filesystems"]
-
 /// mkinitcpio initramfs configuration builder
 pub struct MkinitcpioBuilder {
     pub active_hooks: Vec<String>,
+    pub hooks: Vec<String>,
 }
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
         Self {
             active_hooks: Vec::new(),
+            hooks: vec![
+                "base".to_string(),
+                "udev".to_string(),
+                "block".to_string(),
+                "filesystems".to_string(),
+            ],
         }
     }
 
@@ -583,7 +446,6 @@ impl MkinitcpioBuilder {
         self.active_hooks.push(hook_name.to_string());
     }
 
-    /// Compiles a mock compressed system ramdisk (initramfs) for early kernel loading
     pub fn compile_initramfs(&self, output_img: &str) -> Result<String, &'static str> {
         if self.active_hooks.is_empty() {
             return Err("mkinitcpio: Cannot compile initramfs with zero hooks configured");
@@ -594,14 +456,6 @@ impl MkinitcpioBuilder {
             img_desc.push('|');
         }
         Ok(img_desc)
-
-            hooks: vec![
-                "base".to_string(),
-                "udev".to_string(),
-                "block".to_string(),
-                "filesystems".to_string(),
-            ],
-        }
     }
 
     pub fn build_initramfs(&self, kernel_ver: &str) -> Result<String, &'static str> {
@@ -629,11 +483,10 @@ pub struct MakepkgBuilder {
 impl MakepkgBuilder {
     pub fn new() -> Self {
         Self {
-            default_compression_level: 3, // zstd default
+            default_compression_level: 3,
         }
     }
 
-    /// Simulates building a PKGBUILD package source archive
     pub fn build_package(
         &self,
         pkgname: &str,
@@ -645,12 +498,10 @@ impl MakepkgBuilder {
             return Err("makepkg: Source code payload cannot be empty");
         }
 
-        // Validate package file integrity
         if expected_sha256 != "SKIP" && expected_sha256.len() != 64 {
             return Err("makepkg: SHA256 checksum mismatch / verification failure");
         }
 
-        // Output clean compiled .pkg.tar.zst mock package
         Ok(Package::new(
             pkgname.to_string(),
             version,
@@ -658,24 +509,13 @@ impl MakepkgBuilder {
             Vec::new(),
             expected_sha256.to_string(),
         ))
-
-// ==========================================
-// 8. Makepkg Source Build Pipeline Engine
-// ==========================================
-
-pub struct MakepkgBuilder;
-
-impl MakepkgBuilder {
-    pub fn new() -> Self {
-        Self
     }
 
-    /// Validates SHA256 checksums of downloaded sources and builds a `.pkg.tar.zst` binary package
     pub fn build_package_from_source(
         &self,
         pkgname: &str,
         pkgver: &str,
-        sources: &[(&str, &str)], // (filename, expected_sha256)
+        sources: &[(&str, &str)],
         simulated_file_hashes: &HashMap<String, String>,
     ) -> Result<String, &'static str> {
         for (file, expected_hash) in sources {
@@ -819,7 +659,7 @@ mod tests {
 
         let sbuild2 = DebianSbuildPackage::new(
             "sigma-core",
-            vec!["gcc".to_string(), "clang".to_string()], // clang not installed
+            vec!["gcc".to_string(), "clang".to_string()],
         );
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&sbuild2));
     }
@@ -830,38 +670,38 @@ mod tests {
         let hook = AlpmHook {
             name: "update-grub".to_string(),
             action: AlpmHookAction::PostTransaction,
+            when: HookWhen::PostTransaction,
             target_packages: vec!["linux".to_string(), "linux-zen".to_string()],
             exec_command: "grub-mkconfig -o /boot/grub/grub.cfg".to_string(),
         };
 
         manager.register_hook(hook);
 
-        // Run post-transaction. Packages updated are "linux" and "vim"
         let executed = manager.run_hooks(AlpmHookAction::PostTransaction, &["linux", "vim"]);
         assert_eq!(executed, 1);
         assert_eq!(manager.execution_log.len(), 1);
         assert!(manager.execution_log[0].contains("grub-mkconfig"));
 
-        // Pre-transaction should not execute
         let executed_pre = manager.run_hooks(AlpmHookAction::PreTransaction, &["linux"]);
         assert_eq!(executed_pre, 0);
+    }
 
+    #[test]
     fn test_alpm_hooks() {
         let mut manager = AlpmHookManager::new();
 
         manager.register_hook(AlpmHook {
             name: "update-fonts".to_string(),
+            action: AlpmHookAction::PostTransaction,
             when: HookWhen::PostTransaction,
             target_packages: vec!["fontconfig".to_string()],
             exec_command: "fc-cache -s".to_string(),
         });
 
-        // Trigger post-transaction hooks when fontconfig is updated
         let executed = manager.trigger_hooks(HookWhen::PostTransaction, &["fontconfig"]);
         assert_eq!(executed.len(), 1);
         assert_eq!(executed[0], "fc-cache -s");
 
-        // Trigger when unrelated package is updated -> 0 hooks executed
         let executed_none = manager.trigger_hooks(HookWhen::PostTransaction, &["bash"]);
         assert_eq!(executed_none.len(), 0);
     }
@@ -877,9 +717,11 @@ mod tests {
         assert!(ramdisk.contains("initramfs-img:initramfs-linux.img:"));
         assert!(ramdisk.contains("udev|base|block|"));
 
-        // Zero hooks fail compiling
         let builder_empty = MkinitcpioBuilder::new();
         assert!(builder_empty.compile_initramfs("fail.img").is_err());
+
+        let initramfs = builder.build_initramfs("6.1.0-arch1").unwrap();
+        assert!(initramfs.contains("/boot/initramfs-6.1.0-arch1.img"));
     }
 
     #[test]
@@ -887,17 +729,11 @@ mod tests {
         let builder = MakepkgBuilder::new();
         let mock_src = b"fn main() { println!(\"source\"); }";
 
-        // Success with valid sha256
         let sha = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
         let package = builder.build_package("linux-firmware", Version::new(20230510, 0, 0), mock_src, sha).unwrap();
         assert_eq!(package.name, "linux-firmware");
 
-        // Failure with bad sha256 size
         assert!(builder.build_package("linux-firmware", Version::new(1, 0, 0), mock_src, "short_hash").is_err());
-
-        let builder = MkinitcpioBuilder::new();
-        let initramfs = builder.build_initramfs("6.1.0-arch1").unwrap();
-        assert!(initramfs.contains("/boot/initramfs-6.1.0-arch1.img"));
     }
 
     #[test]

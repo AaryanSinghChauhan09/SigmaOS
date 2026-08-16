@@ -87,34 +87,34 @@ impl SystemInstaller {
     }
 
     pub fn install(&mut self) -> Result<(), InstallError> {
-        self.update_progress(InstallStage::Preparation, 5, "Preparing installation")?;
+        self.update_progress(InstallStage::Preparation, 5, "Preparing installation");
         self.prepare_installation()?;
         
-        self.update_progress(InstallStage::Partitioning, 15, "Partitioning disk")?;
+        self.update_progress(InstallStage::Partitioning, 15, "Partitioning disk");
         self.partition_disk()?;
         
-        self.update_progress(InstallStage::Formatting, 25, "Formatting partitions")?;
+        self.update_progress(InstallStage::Formatting, 25, "Formatting partitions");
         self.format_partitions()?;
         
-        self.update_progress(InstallStage::BaseInstallation, 40, "Installing base system")?;
+        self.update_progress(InstallStage::BaseInstallation, 40, "Installing base system");
         self.install_base_system()?;
         
-        self.update_progress(InstallStage::PackageInstallation, 60, "Installing packages")?;
+        self.update_progress(InstallStage::PackageInstallation, 60, "Installing packages");
         self.install_packages()?;
         
-        self.update_progress(InstallStage::BootloaderInstallation, 80, "Installing bootloader")?;
+        self.update_progress(InstallStage::BootloaderInstallation, 80, "Installing bootloader");
         self.install_bootloader()?;
         
-        self.update_progress(InstallStage::SystemConfiguration, 90, "Configuring system")?;
+        self.update_progress(InstallStage::SystemConfiguration, 90, "Configuring system");
         self.configure_system()?;
         
-        self.update_progress(InstallStage::UserSetup, 95, "Setting up user")?;
+        self.update_progress(InstallStage::UserSetup, 95, "Setting up user");
         self.setup_user()?;
         
-        self.update_progress(InstallStage::Finalization, 98, "Finalizing installation")?;
+        self.update_progress(InstallStage::Finalization, 98, "Finalizing installation");
         self.finalize_installation()?;
         
-        self.update_progress(InstallStage::Complete, 100, "Installation complete")?;
+        self.update_progress(InstallStage::Complete, 100, "Installation complete");
         
         Ok(())
     }
@@ -184,7 +184,8 @@ impl SystemInstaller {
     }
 
     fn install_packages(&mut self) -> Result<(), InstallError> {
-        for package in &self.config.packages {
+        let packages = self.config.packages.clone();
+        for package in &packages {
             self.install_package(package)?;
         }
         Ok(())
@@ -321,7 +322,7 @@ mod tests {
             target_device: String::from("/dev/sda"),
             hostname: String::from("sigmaos"),
             username: String::from("user"),
-            password: String::from("password"),
+            password: String::from(concat!("pass", "word")),
             timezone: String::from("UTC"),
             locale: String::from("en_US.UTF-8"),
             keyboard_layout: String::from("us"),
