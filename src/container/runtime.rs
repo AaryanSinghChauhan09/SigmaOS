@@ -12,9 +12,6 @@ use core::mem;
 /// Based on Roadmap Item 17: Container runtime support
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-extern crate alloc;
-use alloc::boxed::Box;
-
 /// Container ID
 pub type ContainerID = usize;
 
@@ -991,4 +988,5 @@ mod tests {
             ContainerError::PermissionDenied
         );
     }
+}
 }

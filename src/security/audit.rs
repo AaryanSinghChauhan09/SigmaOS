@@ -311,13 +311,6 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogFormat {
-    Text,
-    Json,
-    Binary,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
