@@ -519,4 +519,24 @@ mod tests {
         assert_eq!(summary.total_tests, 1);
         assert_eq!(summary.passed, 1);
     }
+
+    #[test]
+    fn test_fuzzing_framework() {
+        let mut framework = FuzzingTestFramework::new();
+
+        let fuzzer = Fuzzer {
+            name: String::from("test_fuzzer"),
+            target: |input| !input.is_empty(),
+            input_generator: || alloc::vec![1, 2, 3],
+            max_iterations: 10,
+        };
+        framework.add_fuzzer(fuzzer);
+
+        let summary = framework.run_all();
+        assert_eq!(summary.total_fuzzers, 1);
+        assert_eq!(summary.results.len(), 1);
+        assert_eq!(summary.results[0].iterations, 10);
+        assert_eq!(summary.results[0].crashes, 0);
+        assert_eq!(summary.results[0].crash_rate, 0.0);
+    }
 }
