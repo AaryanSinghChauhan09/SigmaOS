@@ -19,7 +19,6 @@ pub mod memory;
 pub mod klib;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod performance;
 pub mod productivity;
@@ -28,6 +27,10 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod tracing;
+pub mod crash;
+pub mod media;
+pub mod gpu;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,

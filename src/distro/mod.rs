@@ -7,14 +7,20 @@ pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
+pub mod linux_bsd_inspirations;
 pub mod manjaro;
 pub mod nextgen;
+pub mod preseed;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
-pub mod preseed;
 
+pub use linux_bsd_inspirations::{
+    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
+    PinRule, AptPinStore, OpenRCService, SovereignBpfCoReEngine, BsdCapsicumRights,
+    Hammer2MultiVersionEngine, SovereignOstreeEngine,
+};
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};

@@ -1,15 +1,25 @@
 //! Arch Linux Parity and Compatibility Subsystem for SigmaOS
-//! Arch Linux Parity and Compatibility Subsystem for SigmaOS
 //! Implements a rich suite of Arch Linux abstractions and parities:
 //! - Virtual `/proc` and `/dev` filesystems
 //! - Pacman-style package engine with dependency checking and database locking
 //! - Init targets, firewalls, LSM, PAM, and Tmux terminal multiplexers
 //! - Sovereign Environment Variables Registry supporting Linux default configurations
+//! - Arch Mkinitcpio, Makepkg configuration, arch-chroot binder, and Keyring revocation store
 
 extern crate alloc;
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
-use crate::klib::{Vec, HashMap};
+
+#[cfg(not(test))]
+use crate::klib::{HashMap, Vec};
+
+#[cfg(test)]
+extern crate std;
+#[cfg(test)]
+use std::collections::HashMap;
+#[cfg(test)]
+use std::vec::Vec;
 
 // ==========================================
 // 1. Virtual Filesystem Parity (/proc & /dev)
@@ -837,6 +847,184 @@ impl Default for AurPatchEngine {
 }
 
 // ==========================================
+// 17. Arch Mkinitcpio Image Generator
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InitramfsCompression {
+    Gzip,
+    Lz4,
+    Zstd,
+}
+
+#[derive(Debug, Clone)]
+pub struct MkinitcpioHook {
+    pub name: String,
+    pub is_builtin: bool,
+}
+
+pub struct ArchMkinitcpioEngine {
+    pub preset_name: String,
+    pub compression: InitramfsCompression,
+    pub hooks: Vec<MkinitcpioHook>,
+    pub early_microcode_included: bool,
+}
+
+impl ArchMkinitcpioEngine {
+    pub fn new(preset: &str) -> Self {
+        Self {
+            preset_name: preset.to_string(),
+            compression: InitramfsCompression::Zstd,
+            hooks: Vec::new(),
+            early_microcode_included: true,
+        }
+    }
+
+    pub fn add_hook(&mut self, hook_name: &str, builtin: bool) {
+        self.hooks.push(MkinitcpioHook {
+            name: hook_name.to_string(),
+            is_builtin: builtin,
+        });
+    }
+
+    pub fn build_initramfs_img(&self) -> Result<Vec<u8>, &'static str> {
+        if self.hooks.is_empty() {
+            return Err("No hooks configured in mkinitcpio preset");
+        }
+        let mut img = Vec::new();
+        if self.early_microcode_included {
+            img.extend_from_slice(b"EARLY_UCODE_HDR");
+        }
+        match self.compression {
+            InitramfsCompression::Zstd => img.extend_from_slice(b"CPIO_ZSTD_INITRAMFS"),
+            InitramfsCompression::Lz4 => img.extend_from_slice(b"CPIO_LZ4_INITRAMFS"),
+            InitramfsCompression::Gzip => img.extend_from_slice(b"CPIO_GZIP_INITRAMFS"),
+        }
+        img.push(self.hooks.len() as u8);
+        Ok(img)
+    }
+}
+
+// ==========================================
+// 18. Arch Makepkg Build Config Optimizer
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct ArchMakepkgConfig {
+    pub cflags: String,
+    pub cxxflags: String,
+    pub makeflags_jobs: u32,
+    pub enable_lto: bool,
+    pub strip_binaries: bool,
+}
+
+impl ArchMakepkgConfig {
+    pub fn auto_optimize_for_host(num_cores: u32) -> Self {
+        let jobs = if num_cores == 0 { 2 } else { num_cores + 1 };
+        Self {
+            cflags: "-march=native -O3 -pipe -fno-plt".to_string(),
+            cxxflags: "-march=native -O3 -pipe -fno-plt".to_string(),
+            makeflags_jobs: jobs,
+            enable_lto: true,
+            strip_binaries: true,
+        }
+    }
+
+    pub fn get_makeflags_arg(&self) -> String {
+        format!("-j{}", self.makeflags_jobs)
+    }
+}
+
+// ==========================================
+// 19. Arch Chroot Sandbox Environment
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChrootBindMount {
+    pub host_path: String,
+    pub target_path: String,
+}
+
+pub struct ArchChrootSandbox {
+    pub new_root_path: String,
+    pub bind_mounts: Vec<ChrootBindMount>,
+    pub is_active: bool,
+}
+
+impl ArchChrootSandbox {
+    pub fn new(root_dir: &str) -> Self {
+        let mut sandbox = Self {
+            new_root_path: root_dir.to_string(),
+            bind_mounts: Vec::new(),
+            is_active: false,
+        };
+        sandbox.bind_mounts.push(ChrootBindMount {
+            host_path: "/proc".to_string(),
+            target_path: format!("{}/proc", root_dir),
+        });
+        sandbox.bind_mounts.push(ChrootBindMount {
+            host_path: "/sys".to_string(),
+            target_path: format!("{}/sys", root_dir),
+        });
+        sandbox.bind_mounts.push(ChrootBindMount {
+            host_path: "/dev".to_string(),
+            target_path: format!("{}/dev", root_dir),
+        });
+        sandbox
+    }
+
+    pub fn enter_chroot(&mut self) -> Result<(), &'static str> {
+        if self.new_root_path.is_empty() {
+            return Err("Invalid chroot path");
+        }
+        self.is_active = true;
+        Ok(())
+    }
+
+    pub fn exit_chroot(&mut self) {
+        self.is_active = false;
+    }
+}
+
+// ==========================================
+// 20. Arch Keyring Revocation Store
+// ==========================================
+
+pub struct RevokedKeyEntry {
+    pub key_id: String,
+    pub revocation_reason: String,
+}
+
+pub struct ArchKeyringRevocationStore {
+    pub revoked_keys: Vec<RevokedKeyEntry>,
+}
+
+impl ArchKeyringRevocationStore {
+    pub fn new() -> Self {
+        Self {
+            revoked_keys: Vec::new(),
+        }
+    }
+
+    pub fn revoke_key(&mut self, key_id: &str, reason: &str) {
+        self.revoked_keys.push(RevokedKeyEntry {
+            key_id: key_id.to_string(),
+            revocation_reason: reason.to_string(),
+        });
+    }
+
+    pub fn is_key_revoked(&self, key_id: &str) -> bool {
+        self.revoked_keys.iter().any(|entry| entry.key_id == key_id)
+    }
+}
+
+impl Default for ArchKeyringRevocationStore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
 // 16. Integration Tests Module
 // ==========================================
 
@@ -1036,5 +1224,50 @@ mod tests {
             replacement_line: "pkgver=0.2.0".to_string(),
         };
         assert_eq!(engine.apply_patch(original, &bad_patch), Err("Patch target line not found in recipe"));
+    }
+
+    #[test]
+    fn test_arch_mkinitcpio_engine() {
+        let mut engine = ArchMkinitcpioEngine::new("linux");
+        assert!(engine.build_initramfs_img().is_err()); // No hooks
+
+        engine.add_hook("base", true);
+        engine.add_hook("udev", true);
+        engine.add_hook("autodetect", true);
+
+        let img = engine.build_initramfs_img().unwrap();
+        assert!(img.starts_with(b"EARLY_UCODE_HDR"));
+        assert!(img.windows(b"CPIO_ZSTD_INITRAMFS".len()).any(|w| w == b"CPIO_ZSTD_INITRAMFS"));
+        assert_eq!(*img.last().unwrap(), 3);
+    }
+
+    #[test]
+    fn test_arch_makepkg_config() {
+        let config = ArchMakepkgConfig::auto_optimize_for_host(8);
+        assert_eq!(config.get_makeflags_arg(), "-j9");
+        assert!(config.cflags.contains("-march=native"));
+        assert!(config.enable_lto);
+    }
+
+    #[test]
+    fn test_arch_chroot_sandbox() {
+        let mut chroot = ArchChrootSandbox::new("/mnt/archroot");
+        assert_eq!(chroot.bind_mounts.len(), 3);
+        assert!(!chroot.is_active);
+
+        assert!(chroot.enter_chroot().is_ok());
+        assert!(chroot.is_active);
+
+        chroot.exit_chroot();
+        assert!(!chroot.is_active);
+    }
+
+    #[test]
+    fn test_arch_keyring_revocation_store() {
+        let mut store = ArchKeyringRevocationStore::new();
+        assert!(!store.is_key_revoked("0xREVOKED_KEY"));
+
+        store.revoke_key("0xREVOKED_KEY", "Key compromise");
+        assert!(store.is_key_revoked("0xREVOKED_KEY"));
     }
 }
