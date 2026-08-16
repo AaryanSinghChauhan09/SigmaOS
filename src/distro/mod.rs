@@ -20,7 +20,9 @@ pub mod transformation_engine;
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
     PinRule, AptPinStore, OpenRCService, SovereignBpfCoReEngine, BsdCapsicumRights,
-    Hammer2MultiVersionEngine, SovereignOstreeEngine,
+    Hammer2MultiVersionEngine, SovereignOstreeEngine, SovereignRunitSupervisor,
+    SovereignZfsPoolEngine, SovereignKaslrWxAllocator, RunitServiceStatus, RunitRunlevel,
+    ZfsVdevType, MemoryPagePerms,
 };
 pub use linux_bsd_parity::{
     ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,

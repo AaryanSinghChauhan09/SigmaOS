@@ -55,11 +55,6 @@ pub struct UefiMemoryDescriptor {
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
     fn load_kernel(&mut self, kernel_data: &[u8]) -> Result<BootStatus, BootError>;
-<<<<<<< HEAD
-    fn handoff(&mut self) -> Result<BootStatus, BootError>;
-}
-
-=======
     /// # Safety
     /// `kernel_raw` and `destination` must point to valid memory regions of at least `size` bytes.
     unsafe fn load_kernel_raw(
@@ -79,15 +74,11 @@ pub trait UEFIBootloader {
 }
 
 /// Complete UEFI Bootloader Implementation with Boundary-Checked Memory Handling
->>>>>>> feature/sigmaos-strategic-roadmap-4958487270382794921
 #[repr(C)]
 pub struct SimpleUEFIBootloader {
     pub phase: AtomicUsize,
     pub kernel_loaded: AtomicUsize,
-<<<<<<< HEAD
-=======
     pub secure_boot_active: bool,
->>>>>>> feature/sigmaos-strategic-roadmap-4958487270382794921
 }
 
 impl SimpleUEFIBootloader {
@@ -95,10 +86,7 @@ impl SimpleUEFIBootloader {
         SimpleUEFIBootloader {
             phase: AtomicUsize::new(BootPhase::Init as usize),
             kernel_loaded: AtomicUsize::new(0),
-<<<<<<< HEAD
-=======
             secure_boot_active: true,
->>>>>>> feature/sigmaos-strategic-roadmap-4958487270382794921
         }
     }
 }
@@ -136,20 +124,6 @@ impl UEFIBootloader for SimpleUEFIBootloader {
         if kernel_raw.is_null() || destination.is_null() || size == 0 {
             return Err(BootError::LoadFailed);
         }
-<<<<<<< HEAD
-        self.phase.store(BootPhase::Handoff as usize, Ordering::SeqCst);
-        self.phase.store(BootPhase::Complete as usize, Ordering::SeqCst);
-        Ok(2)
-    }
-}
-
-pub trait SecureBoot {
-    fn verify_signature(&self, data: &[u8]) -> Result<bool, BootError>;
-    fn sign(&self, data: &[u8]) -> Result<Vec<u8>, BootError>;
-}
-
-#[repr(C)]
-=======
 
         // Copy raw memory non-overlapping safely
         core::ptr::copy_nonoverlapping(kernel_raw, destination, size);
@@ -280,9 +254,10 @@ pub trait SecureBoot {
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, BootError>;
 }
 
->>>>>>> feature/sigmaos-strategic-roadmap-4958487270382794921
 pub struct SimpleSecureBoot {
     pub bootloader: SimpleUEFIBootloader,
+    pub db: UefiDatabase,
+    pub tpm: TpmMeasuredBoot,
 }
 
 impl SimpleSecureBoot {
@@ -307,20 +282,6 @@ impl SecureBoot for SimpleSecureBoot {
             return Err(BootError::LoadFailed);
         }
 
-<<<<<<< HEAD
-        // Verify image signature block or header structure:
-        // Support DOS MZ header (0x4D, 0x5A), ELF header (0x7F, b'E', b'L', b'F'), or valid signed block checksum
-        let has_dos_hdr = data.len() >= 2 && data[0] == 0x4D && data[1] == 0x5A;
-        let has_elf_hdr = data.len() >= 4 && data[0] == 0x7F && data[1] == b'E' && data[2] == b'L' && data[3] == b'F';
-
-        let checksum: u32 = data.iter().fold(0u32, |acc, &x| acc.wrapping_add(x as u32));
-
-        if has_dos_hdr || has_elf_hdr || checksum % 2 == 0 || data.len() >= 4 {
-            Ok(true)
-        } else {
-            Err(BootError::LoadFailed)
-        }
-=======
         // Hash data (simple deterministic checksum for #![no_std])
         let mut hash = [0u8; 32];
         for (i, &byte) in data.iter().enumerate() {
@@ -329,7 +290,6 @@ impl SecureBoot for SimpleSecureBoot {
 
         let verified = self.db.verify_signature(&hash, key_id)?;
         Ok(verified)
->>>>>>> feature/sigmaos-strategic-roadmap-4958487270382794921
     }
 
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, BootError> {
@@ -347,27 +307,6 @@ mod tests {
 
     #[test]
     fn test_uefi_bootloader_lifecycle() {
-<<<<<<< HEAD
-        let mut loader = SimpleUEFIBootloader::new();
-        assert_eq!(loader.phase(), BootPhase::Init);
-        assert!(loader.load_kernel(&[0x90, 0x90, 0xCC]).is_ok());
-        assert_eq!(loader.phase(), BootPhase::LoadKernel);
-        assert!(loader.handoff().is_ok());
-        assert_eq!(loader.phase(), BootPhase::Complete);
-    }
-
-    #[test]
-    fn test_simple_secure_boot_signing_and_verification() {
-        let sb = SimpleSecureBoot::new();
-        let payload = [0x4D, 0x5A, 0x90, 0x00]; // DOS MZ PE header
-        let sig = sb.sign(&payload).unwrap();
-        assert_eq!(sig.len(), 4);
-        assert_eq!(sig[0], 0x8F);
-        assert!(sb.verify_signature(&payload).unwrap());
-
-        // Empty data fails
-        assert!(sb.verify_signature(&[]).is_err());
-=======
         let mut boot = SimpleUEFIBootloader::new();
         assert_eq!(boot.phase(), BootPhase::Init);
 
@@ -462,6 +401,5 @@ mod tests {
         // Check authorized succeeds
         let check_auth = sb.verify_signature(&kernel_data, 2001).unwrap();
         assert!(check_auth);
->>>>>>> feature/sigmaos-strategic-roadmap-4958487270382794921
     }
 }
