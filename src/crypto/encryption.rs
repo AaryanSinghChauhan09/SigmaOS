@@ -139,19 +139,6 @@ impl<T> Vec<T> {
     }
 }
 
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 #[cfg(test)]
@@ -173,7 +160,7 @@ mod tests {
         let bad_ciphertext: Vec<u8> = plaintext.iter().map(|&b| b ^ 0x42).collect();
         let mut mismatch = false;
         for i in 0..plaintext.len() {
-            if ciphertext.data.is_null() || bad_ciphertext.data.is_null() || unsafe { *ciphertext.data.add(i) } != unsafe { *bad_ciphertext.data.add(i) } {
+            if ciphertext.data.is_null() || unsafe { *ciphertext.data.add(i) } != unsafe { *bad_ciphertext.data.add(i) } {
                 mismatch = true;
                 break;
             }

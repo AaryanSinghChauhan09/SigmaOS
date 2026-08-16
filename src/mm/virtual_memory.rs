@@ -5,14 +5,6 @@
 // Enhanced with OpenBSD/FreeBSD W^X (Write XOR Execute) security, FreeBSD wired/pinned page protection,
 // and Linux kswapd-inspired active/inactive LRU page reclaimer scanning.
 
-
-#![no_std]
-
-/// OOP-based Virtual Memory Manager with Canonical Address Verification for SigmaOS
-/// Implements virtual memory management using OOP principles with traits and structs
-/// No dependency on external memory management libraries
-/// Inspired by x86_64, ARM64, Linux, BSD, and Windows canonical memory layouts
-
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -43,8 +35,6 @@ pub fn is_canonical_address(addr: VirtualAddress) -> bool {
     if sign_bit == 0 {
         upper_bits == 0
     } else {
-        // Shifting a 64-bit value right by 47 leaves 17 bits (64 - 47 = 17)
-        // If bit 47 was 1, those 17 bits must all be 1s (0x1FFFF)
         upper_bits == 0x1FFFF
     }
 }
@@ -466,7 +456,6 @@ impl SimpleVirtualMemoryManager {
     }
 
     unsafe fn allocate_region(&mut self, start: VirtualAddress, size: usize, permissions: MemoryPermissions) -> Result<NonNull<MemoryRegion>, MemoryError> {
-        // Enforce canonical address validation
         if !is_canonical_address(start) || !is_canonical_address(start + size) {
             return Err(MemoryError::InvalidAddress);
         }
@@ -845,21 +834,6 @@ mod tests {
 
     #[test]
     fn test_canonical_address_verifications() {
-        // Lower Canonical half (User space)
-        assert!(is_canonical_address(0x0000_0000_1000_0000));
-        assert_eq!(get_canonical_half(0x0000_0000_1000_0000), Some(CanonicalHalf::Lower));
-
-        // Upper Canonical half (Kernel space)
-        assert!(is_canonical_address(0xFFFF_8000_0000_1000));
-        assert_eq!(get_canonical_half(0xFFFF_8000_0000_1000), Some(CanonicalHalf::Upper));
-
-        // Non-canonical address
-        assert!(!is_canonical_address(0x0001_8000_0000_0000));
-        assert_eq!(get_canonical_half(0x0001_8000_0000_0000), None);
-
-        // Address canonicalization (sign-extension)
-        let raw_addr = 0x0000_8000_0000_0123; // non-canonical if bit 47 is 1 but upper bits are 0
-
         assert!(is_canonical_address(0x0000_0000_1000_0000));
         assert_eq!(get_canonical_half(0x0000_0000_1000_0000), Some(CanonicalHalf::Lower));
 

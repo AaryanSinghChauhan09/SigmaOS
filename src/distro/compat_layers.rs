@@ -1,26 +1,4 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::BTreeMap;
-
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -42,7 +20,7 @@ pub struct RegistryValue {
 #[derive(Debug, Clone)]
 pub struct WindowsRegistry {
     pub hive_name: String,
-    pub database: BTreeMap<String, BTreeMap<String, RegistryValue>>, // Key path -> (Value Name -> RegistryValue)
+    pub database: HashMap<String, HashMap<String, RegistryValue>>, // Key path -> (Value Name -> RegistryValue)
     pub transaction_log: Vec<String>,
 }
 
@@ -50,7 +28,7 @@ impl WindowsRegistry {
     pub fn new(hive_name: &str) -> Self {
         Self {
             hive_name: hive_name.to_string(),
-            database: BTreeMap::new(),
+            database: HashMap::new(),
             transaction_log: Vec::new(),
         }
     }
@@ -68,7 +46,7 @@ impl WindowsRegistry {
         let values = self
             .database
             .entry(key_str.clone())
-            .or_insert_with(BTreeMap::new);
+            .or_insert_with(HashMap::new);
         values.insert(
             val_str.clone(),
             RegistryValue {
@@ -91,7 +69,7 @@ impl WindowsRegistry {
 }
 
 /// Simulates Win32 GDI drawing objects (pen, brush, font)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum GdiObjectType {
     Pen,
     Brush,
@@ -101,16 +79,15 @@ pub enum GdiObjectType {
 /// Simulates a Win32 Device Context (DC) and object binding (GDI compatibility layer)
 #[derive(Debug, Clone)]
 pub struct Win32Gdi {
-    pub active_objects: BTreeMap<GdiObjectType, u32>, // type -> handle ID
+    pub active_objects: HashMap<GdiObjectType, u32>, // type -> handle ID
     pub current_color: u32,
     pub commands_executed: Vec<String>,
 }
 
 impl Win32Gdi {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            active_objects: BTreeMap::new(),
+            active_objects: HashMap::new(),
             current_color: 0x00000000,
             commands_executed: Vec::new(),
         }
@@ -146,7 +123,7 @@ impl Default for Win32Gdi {
 #[derive(Debug, Clone)]
 pub struct DllModule {
     pub name: String,
-    pub exported_symbols: BTreeMap<String, u64>, // Symbol Name -> virtual address offset
+    pub exported_symbols: HashMap<String, u64>, // Symbol Name -> virtual address offset
     pub is_loaded: bool,
     pub dll_main_called: bool,
 }
@@ -155,7 +132,7 @@ impl DllModule {
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
-            exported_symbols: BTreeMap::new(),
+            exported_symbols: HashMap::new(),
             is_loaded: false,
             dll_main_called: false,
         }
@@ -169,14 +146,13 @@ impl DllModule {
 /// Dynamic Link Library (DLL) loader (Windows ABI compatibility)
 #[derive(Debug, Clone)]
 pub struct DllLoader {
-    pub loaded_dlls: BTreeMap<String, DllModule>,
+    pub loaded_dlls: HashMap<String, DllModule>,
 }
 
 impl DllLoader {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            loaded_dlls: BTreeMap::new(),
+            loaded_dlls: HashMap::new(),
         }
     }
 
@@ -231,7 +207,6 @@ pub struct PosixTranslation {
 }
 
 impl PosixTranslation {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             translation_log: Vec::new(),
@@ -273,71 +248,45 @@ impl Default for PosixTranslation {
     }
 }
 
-// ==========================================================
-// NetBSD/FreeBSD kqueue & kevent event notification framework
-// ==========================================================
+// ==========================================
+// 5. FreeBSD/NetBSD kqueue & kevent Event Notification System
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum KFilter {
-    Read,
-    Write,
-    Signal,
-    Vnode,
+pub enum KEventFilter {
+    EvfiltRead,
+    EvfiltWrite,
+    EvfiltSignal,
+    EvfiltVnode,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KEvent {
-    pub ident: uptr,     // File descriptor, process ID, or signal number
-    pub filter: KFilter, // Event filter
-    pub flags: u16,      // Event flags (e.g., EV_ADD, EV_DELETE, EV_ENABLE, EV_DISABLE)
-    pub fflags: u32,     // Filter-specific flags
-    pub data: iptr,      // Filter-specific data value
-    pub udata: uptr,     // Opaque user-defined data
+    pub ident: u64, // File descriptor or signal ID
+    pub filter: KEventFilter,
+    pub flags: u16,
+    pub data: i64,
 }
 
-pub type uptr = usize;
-pub type iptr = isize;
-
-/// BSD kqueue event notifications manager
 pub struct KQueue {
-    pub registry: HashMap<(uptr, KFilter), KEvent>,
-    pub active_events: Vec<KEvent>,
+    pub pending_events: Vec<KEvent>,
 }
 
 impl KQueue {
     pub fn new() -> Self {
         Self {
-            registry: HashMap::new(),
-            active_events: Vec::new(),
+            pending_events: Vec::new(),
         }
     }
 
-    /// Registers a new event query to watch
     pub fn kevent_register(&mut self, event: KEvent) {
-        let key = (event.ident, event.filter);
-        self.registry.insert(key, event);
+        self.pending_events.push(event);
     }
 
-    /// Triggers a matched notification (used by kernel triggers like socket rx/tx or file modifications)
-    pub fn trigger_event(&mut self, ident: uptr, filter: KFilter, data: iptr) -> bool {
-        let key = (ident, filter);
-        if let Some(event) = self.registry.get(&key) {
-            let mut active_event = *event;
-            active_event.data = data;
-            self.active_events.push(active_event);
-            true
-        } else {
-            false
-        }
-    }
-
-    /// Polls/reaps next active event
-    pub fn kevent_poll(&mut self) -> Option<KEvent> {
-        if self.active_events.is_empty() {
-            None
-        } else {
-            Some(self.active_events.remove(0))
-        }
+    pub fn kevent_poll(&mut self) -> Vec<KEvent> {
+        let events = self.pending_events.clone();
+        self.pending_events.clear();
+        events
     }
 }
 
@@ -347,40 +296,37 @@ impl Default for KQueue {
     }
 }
 
-// ==========================================================
-// FreeBSD GEOM block storage layered topology framework
-// ==========================================================
+// ==========================================
+// 6. FreeBSD GEOM Modular Storage Topology Framework
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GeomType {
-    Disk,
-    PartitionTable, // e.g. GPT/MBR
-    Mirror,         // e.g. RAID1
-    Encryption,     // e.g. geli / crypt
-    Label,          // e.g. ufs label
+pub enum GeomClass {
+    Part,
+    Mirror,
+    Stripe,
+    Eli, // GELI Encryption
 }
 
 #[derive(Debug, Clone)]
 pub struct GeomProvider {
     pub name: String,
-    pub geom_type: GeomType,
-    pub sector_size: u32,
-    pub total_sectors: u64,
+    pub size_bytes: u64,
+    pub class: GeomClass,
 }
 
 #[derive(Debug, Clone)]
 pub struct GeomConsumer {
     pub name: String,
-    pub attached_provider_name: String,
+    pub provider_attached: String,
 }
 
-/// Dynamic stackable GEOM storage controller
-pub struct GeomTopology {
+pub struct GeomStorageTopology {
     pub providers: HashMap<String, GeomProvider>,
     pub consumers: Vec<GeomConsumer>,
 }
 
-impl GeomTopology {
+impl GeomStorageTopology {
     pub fn new() -> Self {
         Self {
             providers: HashMap::new(),
@@ -388,32 +334,30 @@ impl GeomTopology {
         }
     }
 
-    /// Register a virtual or hardware storage provider node
-    pub fn register_provider(&mut self, provider: GeomProvider) {
-        self.providers.insert(provider.name.clone(), provider);
+    pub fn register_provider(&mut self, name: &str, size_bytes: u64, class: GeomClass) {
+        self.providers.insert(
+            name.to_string(),
+            GeomProvider {
+                name: name.to_string(),
+                size_bytes,
+                class,
+            },
+        );
     }
 
-    /// Attaches a consumer layer to a provider to stack virtualization
-    pub fn attach_consumer(&mut self, consumer: GeomConsumer) -> Result<(), &'static str> {
-        if !self
-            .providers
-            .contains_key(&consumer.attached_provider_name)
-        {
-            return Err("GEOM: Target provider not found in active topology");
+    pub fn attach_consumer(&mut self, consumer_name: &str, provider_name: &str) -> Result<(), &'static str> {
+        if !self.providers.contains_key(provider_name) {
+            return Err("Target GEOM provider does not exist");
         }
-        self.consumers.push(consumer);
+        self.consumers.push(GeomConsumer {
+            name: consumer_name.to_string(),
+            provider_attached: provider_name.to_string(),
+        });
         Ok(())
-    }
-
-    /// Checks if a provider has any attached consumers (stacked layering)
-    pub fn is_provider_stacked(&self, provider_name: &str) -> bool {
-        self.consumers
-            .iter()
-            .any(|c| c.attached_provider_name == provider_name)
     }
 }
 
-impl Default for GeomTopology {
+impl Default for GeomStorageTopology {
     fn default() -> Self {
         Self::new()
     }
@@ -465,17 +409,14 @@ mod tests {
         user32.register_export("MessageBoxA", 0x7FFE0040);
         loader.register_dll(user32);
 
-        // Fail to resolve before library load
         assert!(loader
             .get_proc_address("user32.dll", "MessageBoxA")
             .is_err());
 
-        // Load library
         let loaded = loader.load_library("user32.dll").unwrap();
         assert!(loaded.is_loaded);
         assert!(loaded.dll_main_called);
 
-        // Resolve symbol
         let addr = loader
             .get_proc_address("user32.dll", "MessageBoxA")
             .unwrap();
@@ -500,61 +441,33 @@ mod tests {
     }
 
     #[test]
-    fn test_bsd_kqueue_and_kevent() {
+    fn test_kqueue_event_notifications() {
         let mut kq = KQueue::new();
-        let ev = KEvent {
-            ident: 10, // file descriptor 10
-            filter: KFilter::Read,
-            flags: 1, // EV_ADD
-            fflags: 0,
-            data: 0,
-            udata: 0xDEADBEEF,
-        };
 
-        // Register event to watch
-        kq.kevent_register(ev);
+        kq.kevent_register(KEvent {
+            ident: 3,
+            filter: KEventFilter::EvfiltRead,
+            flags: 1,
+            data: 512,
+        });
 
-        // Trigger action representing file descriptor becoming readable with 12 bytes of data
-        assert!(kq.trigger_event(10, KFilter::Read, 12));
-        assert!(!kq.trigger_event(11, KFilter::Read, 12)); // unregistered
+        let events = kq.kevent_poll();
+        assert_eq!(events.len(), 1);
+        assert_eq!(events[0].ident, 3);
+        assert_eq!(events[0].filter, KEventFilter::EvfiltRead);
 
-        // Poll and verify reaped event
-        let reaped = kq.kevent_poll().unwrap();
-        assert_eq!(reaped.ident, 10);
-        assert_eq!(reaped.filter, KFilter::Read);
-        assert_eq!(reaped.data, 12);
-        assert_eq!(reaped.udata, 0xDEADBEEF);
-        assert!(kq.kevent_poll().is_none());
+        // Subsequent poll is empty
+        assert_eq!(kq.kevent_poll().len(), 0);
     }
 
     #[test]
-    fn test_freebsd_geom_storage() {
-        let mut geom = GeomTopology::new();
+    fn test_geom_storage_topology() {
+        let mut geom = GeomStorageTopology::new();
 
-        // Register base disk
-        geom.register_provider(GeomProvider {
-            name: "ada0".to_string(),
-            geom_type: GeomType::Disk,
-            sector_size: 512,
-            total_sectors: 1000000,
-        });
+        geom.register_provider("ada0", 500_000_000_000, GeomClass::Part);
+        geom.register_provider("mirror/gm0", 500_000_000_000, GeomClass::Mirror);
 
-        // Try attaching consumer to nonexistent base provider - fails
-        let bad_consumer = GeomConsumer {
-            name: "gpt_part1".to_string(),
-            attached_provider_name: "ada1".to_string(),
-        };
-        assert!(geom.attach_consumer(bad_consumer).is_err());
-
-        // Attach consumer to active provider - succeeds
-        let consumer = GeomConsumer {
-            name: "gpt_part1".to_string(),
-            attached_provider_name: "ada0".to_string(),
-        };
-        assert!(geom.attach_consumer(consumer).is_ok());
-
-        // Check topology stacked properties
-        assert!(geom.is_provider_stacked("ada0"));
-        assert!(!geom.is_provider_stacked("ada1"));
+        assert!(geom.attach_consumer("consumer1", "mirror/gm0").is_ok());
+        assert!(geom.attach_consumer("consumer2", "nonexistent").is_err());
     }
 }

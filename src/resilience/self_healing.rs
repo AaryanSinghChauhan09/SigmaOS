@@ -525,4 +525,28 @@ mod tests {
         assert!(monitor.is_degraded_safety_mode); // Activated because health fell below 50%!
     }
 
+    #[test]
+    fn test_double_fault_guard_cascades() {
+        let mut monitor = SystemStabilityMonitor::new();
+        monitor.register_shard("S-MM", 5);
+
+        // Simulate successful recovery attempts separated by time
+        assert!(monitor.record_recovery_attempt("S-MM", 1000).is_ok());
+        assert!(monitor.record_recovery_attempt("S-MM", 1005).is_ok());
+        assert!(monitor.record_recovery_attempt("S-MM", 1012).is_ok());
+
+        // Simulate rapid crashing cascade: 4 crashes within 10 seconds (observation window)
+        let mut guard = DoubleFaultGuard::new(3, 10);
+        assert!(guard.record_attempt(1000).is_ok());
+        assert!(guard.record_attempt(1001).is_ok());
+        assert!(guard.record_attempt(1002).is_ok());
+
+        // 4th crash within 10 seconds of 1000 (at 1003) -> threshold (3) exceeded, triggers isolation!
+        let crash_err = guard.record_attempt(1003);
+        assert!(crash_err.is_err());
+        assert!(guard.is_isolated);
+
+        // Successive restarts are blocked to protect microkernel stability
+        assert!(guard.record_attempt(1004).is_err());
+    }
 }

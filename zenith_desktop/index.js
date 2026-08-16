@@ -67,7 +67,7 @@ export function renderCognitiveNarrative(event_type, pid, details, containerElem
       narrative = `System narrative: Process ${pid} behavior updated successfully. Details: ${details}.`;
   }
 
-  containerElement.innerHTML = "";
+  containerElement.textContent = "";
   const card = document.createElement("div");
   card.className = "cognitive-story-card";
   card.setAttribute("role", "status");
@@ -159,15 +159,6 @@ export function compileNaturalLanguageIntent(prompt) {
     scheduler_nice: priorityNice,
     enforced: true,
   };
-
-/**
- * Safely sets the text content of an element without reinterpreting it as HTML (XSS Protection).
- * Bypasses risk of DOM text being reinterpreted as HTML via unsanitized innerHTML assignments.
- */
-export function setSecureTextContent(element, text) {
-  if (element) {
-    element.textContent = text;
-  }
 }
 
 // Minimal dummy index file to export initialization and basic attributes
