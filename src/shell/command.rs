@@ -723,6 +723,7 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -734,6 +735,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
@@ -744,9 +746,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
     pub fn new() -> Self {
