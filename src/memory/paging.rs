@@ -92,12 +92,6 @@ impl PageTableEntry {
 }
 
 #[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
@@ -1121,7 +1115,7 @@ mod tests {
         }
 
         // 2. Simulate write access to trigger COW copy
-        let resolved_phys = vmm.resolve_address(virt, true, false).unwrap();
+        let resolved_phys = vmm.get_physical_address_with_access(virt, true, false).unwrap();
         // Physical address should have changed to the cloned frame offset
         assert_ne!(resolved_phys.0, 0x50000);
         assert_eq!(resolved_phys.0, 0x50000 + 0x20000000);

@@ -230,7 +230,6 @@ pub static GLOBAL_GLARY_RULE: GlarySmartRule = GlarySmartRule;
 mod tests {
     use super::*;
     extern crate alloc;
-    extern crate alloc;
 
     #[test]
     fn test_cpu_priority_optimizer() {

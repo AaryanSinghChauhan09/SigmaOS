@@ -140,7 +140,7 @@ mod tests {
         let mut free_pages = 4; // Below low_watermark (5)
         let mut swapped_count = 0;
 
-        let reclaimed = kswapd.step_reclaim(&mut free_pages, |_addr| {
+        let reclaimed = kswapd.step_reclaim(&mut free_pages, |addr| {
             swapped_count += 1;
             true
         });

@@ -39,7 +39,7 @@ impl Slab {
         self.free_slots.pop()
     }
 
-    pub fn free(&mut self, address: usize, _item_size: usize) {
+    pub fn free(&mut self, address: usize, item_size: usize) {
         // Double-free protection & boundary check
         if address >= self.start_address && address < self.start_address + self.size {
             if !self.free_slots.contains(&address) {
@@ -189,7 +189,6 @@ mod tests {
     use super::*;
 
     #[test]
-    #[allow(unused_variables)]
     fn test_zone_creation_and_alloc() {
         let mut allocator = BsdZoneAllocator::new(0x10000000);
         let thread_zone_idx = allocator.uma_zcreate("ThreadControlBlock", 256, 100);
