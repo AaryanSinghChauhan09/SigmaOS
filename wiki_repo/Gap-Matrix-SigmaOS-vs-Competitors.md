@@ -27,7 +27,7 @@ This comparative matrix evaluates **SigmaOS** against major commercial and open-
 
 ### 2. The Commercial Cloud Dependency (Data Renting)
 - **Windows/macOS's Gap:** Modern commercial operating systems require constant internet connectivity and rely heavily on cloud APIs to process AI logic, resulting in massive privacy and telemetry leakage.
-- **SigmaOS Solution:** Embeds **Open Computer** agent-virtual desktops natively in the OS, utilizing an accessibility-driven, token-efficient text-DOM navigation system that runs on on-device LLMs (e.g., Gemma, Qwen) entirely offline.
+- **SigmaOS Solution:** Embeds **Open Computer** agent-virtual desktops natively in the OS, utilizing an accessibility-driven, token-efficient text-DOM navigation system that runs on on-device LLMs (e Gemma, Qwen) entirely offline.
 
 ### 3. The Indian Institutional Gap (Imported Architecture)
 - **Competitors' Gap:** Competitors have generic, western-centric regulatory defaults. None natively understand statutory Indian accounting, labor, tax, or legal frameworks out of the box.

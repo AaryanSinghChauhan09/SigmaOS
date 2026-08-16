@@ -1582,9 +1582,7 @@ The core abstraction maps physical/virtual registers transparently, regardless o
 The device model is built completely from custom, self-contained primitives. It uses standard Rust traits with static polymorphic generics to eliminate dynamic runtime allocation and standard library overhead.
 
 ```rust
-// ==============================================================================
 // SOVEREIGN HARDWARE INTERFACES: ZERO-DEPENDENCY OOP ABSTRACT DEFINITIONS
-// ==============================================================================
 
 /// Represents the access mode of a hardware register.
 pub enum RegisterAccessMode {
@@ -2439,6 +2437,3 @@ To maintain perpetual OS dominance, the automated SigmaOS intelligence engine fo
 2. **Feature Extraction**: Extracts high-performance algorithms, data structures, and driver patterns.
 3. **Clean-Room Implementation**: Re-engineers extracted features using Rust/Zig/Nim low-level zero-dependency paradigms under strict `#![no_std]` constraints.
 4. **Wiki Synchronization**: Executes `scripts/sync_wiki.sh` using OOP Bash objects to mirror all markdown specifications across repository root, `WIKI/`, `wiki/`, and `wiki_repo/` targets.
-=======
-// ================================================================
->>>>>>> origin/jules-16717847979469158036-35ecad85
