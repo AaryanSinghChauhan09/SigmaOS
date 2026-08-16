@@ -3,6 +3,8 @@
 //! This module provides the core structures for SigmaOS's zero-copy,
 //! atomic rollback filesystem based on log-structured Merkle-Trees.
 
+extern crate alloc;
+
 use alloc::string::String;
 use alloc::vec::Vec;
 

@@ -10,10 +10,35 @@ pub struct MetaKernel {
     personas: Vec<KernelPersona>,
 }
 
-pub struct KernelPersona {
-    pub name: &'static str,
-    pub api_version: &'static str,
-    pub active_processes: usize,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KernelPersona {
+    Linux_2_6,
+    Linux_3_x,
+    Linux_4_x,
+    Linux_5_x,
+    Linux_6_x,
+}
+
+impl KernelPersona {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Linux_2_6 => "linux_2_6",
+            Self::Linux_3_x => "linux_3_x",
+            Self::Linux_4_x => "linux_4_x",
+            Self::Linux_5_x => "linux_5_x",
+            Self::Linux_6_x => "linux_6_x",
+        }
+    }
+
+    pub fn api_version(&self) -> &'static str {
+        match self {
+            Self::Linux_2_6 => "2.6.32",
+            Self::Linux_3_x => "3.19.0",
+            Self::Linux_4_x => "4.19.0",
+            Self::Linux_5_x => "5.15.0",
+            Self::Linux_6_x => "6.8.0",
+        }
+    }
 }
 
 impl MetaKernel {
@@ -33,7 +58,7 @@ impl MetaKernel {
         task_cost: usize,
     ) -> Result<usize, &'static str> {
         for p in self.personas.iter() {
-            if p.name == persona_name {
+            if p.name() == persona_name {
                 // Return processed cycle cost simulated under correct persona orchestration
                 return Ok(task_cost * 2);
             }
@@ -438,16 +463,8 @@ mod tests {
     #[test]
     fn test_metakernel_persona_orchestration() {
         let mut meta = MetaKernel::new();
-        meta.register_persona(KernelPersona {
-            name: "linux_2_6",
-            api_version: "2.6.32",
-            active_processes: 5,
-        });
-        meta.register_persona(KernelPersona {
-            name: "linux_6_x",
-            api_version: "6.1.0",
-            active_processes: 10,
-        });
+        meta.register_persona(KernelPersona::Linux_2_6);
+        meta.register_persona(KernelPersona::Linux_6_x);
 
         assert_eq!(meta.active_personas_count(), 2);
         assert_eq!(meta.execute_workload("linux_2_6", 50).unwrap(), 100);

@@ -5,7 +5,7 @@ use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-use crate::security::EncryptionAlgorithm;
+use crate::security::vault::EncryptionAlgorithm;
 
 pub type HashId = [u8; 32]; // SHA-256 equivalent
 
