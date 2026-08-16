@@ -152,26 +152,11 @@ mrproper: distclean
 	$(Q)rm -f Config.sigma
 	$(Q)rm -f .config
 
-# Build all networking, security, and processor compatibility tools from source
-compat:
-	@mkdir -p build
-	@echo "Building SigmaOS networking, security, and processor compatibility tools..."
-	@rustc --crate-type=lib tools/sigma_ssh_compat.rs --out-dir build/
-	@rustc --crate-type=lib tools/sigma_scp_compat.rs --out-dir build/
-	@rustc --crate-type=lib tools/sigma_nfs_compat.rs --out-dir build/
-	@rustc --crate-type=lib tools/sigma_samba_compat.rs --out-dir build/
-	@rustc --crate-type=lib tools/sigma_rsync_compat.rs --out-dir build/
-	@rustc --crate-type=lib tools/sigma_tcpdump_compat.rs --out-dir build/
-	@rustc --crate-type=lib tools/sigma_dns_compat.rs --out-dir build/
-	@rustc --crate-type=lib tools/sigma_secure_alloc_compat.rs --out-dir build/
-	@rustc --crate-type=lib tools/sigma_cpu_compat.rs --out-dir build/
-	@echo "Compatibility tools build complete."
-
 # Build complete system (Unified profile routing with no circular warnings)
-build: compat
-	@mkdir -p build
-	@echo "Building SigmaOS (Profile: $(PROFILE), Arch: $(ARCH))..."
-	@cargo build $(CARGO_FLAGS)
+build:
+	$(Q)mkdir -p build
+	$(eval bin_name := complete_system)
+	-$(call cmd,cargo_build,cargo build $(CARGO_FLAGS))
 ifeq ($(PROFILE),browser)
 	$(eval bin_name := wasm_web)
 	-$(call cmd,wasm_build,wasm-pack build --target web)

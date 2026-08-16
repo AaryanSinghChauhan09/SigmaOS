@@ -70,7 +70,8 @@ impl SigmaSoftwareStore {
             let app: &StoreApp = app;
             if app.is_installed && app.version != "1.5.0" {
                 // Assume latest stable is 1.5.0
-                self.pending_updates.push(name.clone());
+                let name_str: String = name.clone();
+                self.pending_updates.push(name_str);
             }
         }
         self.pending_updates.len()
