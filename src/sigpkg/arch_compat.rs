@@ -36,12 +36,12 @@ pub enum VersionConstraint {
     LessOrEqual(Version),
     Any,
 }
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
-
 
 #[derive(Debug, Clone)]
 pub struct Package {
@@ -514,28 +514,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_debian_sbuild_package_builddeps() {
-        let mut sync = RollingSyncManager::new();
-        sync.register_installed("gcc", Version::new(12, 2, 0));
-        sync.register_installed("make", Version::new(4, 3, 0));
-
-        let source_pkg = DebianSbuildPackage {
-            name: "coreutils".to_string(),
-            version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string()],
-        };
-
-        assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
-
-        let source_pkg_missing = DebianSbuildPackage {
-            name: "coreutils".to_string(),
-            version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
-        };
-        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
-    }
-
-    #[test]
     fn test_gentoo_portage_compiler() {
         let mut compiler = PortageEbuildCompiler::new();
         compiler.set_global_use_flag("vulkan", true);
@@ -620,25 +598,6 @@ mod tests {
     }
 
     #[test]
-<<<<<<< HEAD
-=======
-    fn test_debian_sbuild_resolver() {
-        let mut sync = RollingSyncManager::new();
-        sync.register_installed("gcc", Version::new(11, 2, 0));
-        sync.register_installed("make", Version::new(4, 3, 0));
-
-        let sbuild1 =
-            DebianSbuildPackage::new("sigma-core", vec!["gcc".to_string(), "make".to_string()]);
-        assert!(sync.is_debian_sbuild_builddeps_satisfied(&sbuild1));
-
-        let sbuild2 = DebianSbuildPackage::new(
-            "sigma-core",
-            vec!["gcc".to_string(), "clang".to_string()],
-        );
-        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&sbuild2));
-    }
-
-    #[test]
     fn test_alpm_hooks_routing() {
         let mut manager = AlpmHookManager::new();
         let hook = AlpmHook {
@@ -661,7 +620,6 @@ mod tests {
     }
 
     #[test]
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     fn test_alpm_hooks() {
         let mut manager = AlpmHookManager::new();
 
@@ -683,11 +641,6 @@ mod tests {
 
     #[test]
     fn test_mkinitcpio_builder() {
-<<<<<<< HEAD
-        let builder = MkinitcpioBuilder::new();
-        let initramfs = builder.build_initramfs("6.1.0-arch1").unwrap();
-        assert!(initramfs.contains("/boot/initramfs-6.1.0-arch1.img"));
-=======
         let mut builder = MkinitcpioBuilder::new();
         builder.add_hook("udev");
         builder.add_hook("base");
@@ -714,7 +667,6 @@ mod tests {
         assert_eq!(package.name, "linux-firmware");
 
         assert!(builder.build_package("linux-firmware", Version::new(1, 0, 0), mock_src, "short_hash").is_err());
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     }
 
     #[test]

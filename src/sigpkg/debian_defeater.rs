@@ -629,8 +629,6 @@ mod tests {
 
         let chosen = resolver.resolve_pinned_version("nginx", &candidates).unwrap();
         assert_eq!(chosen, "1.0.0");
-<<<<<<< HEAD
-=======
     }
 
     #[test]
@@ -706,6 +704,5 @@ mod tests {
 
         let reconstructed = compiler.apply_delta(old_pkg, &delta).unwrap();
         assert_eq!(reconstructed, new_pkg);
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     }
 }
