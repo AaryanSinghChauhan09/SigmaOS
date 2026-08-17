@@ -45,7 +45,7 @@ pub use config::{
     ConfigEntry, ConfigError, ConfigType, ServiceManager, ServiceUnit, SystemConfigManager,
 };
 pub use cron::{
-    CronJob, CronSchedule, CronManager, CronError,
+    CronJob, CronSchedule, CronDaemon, CronError, CronField,
 };
 pub use defrag::{
     DefragError, DefragResult, DefragStrategy, DiskDefragmenter, FileBlockInfo,
