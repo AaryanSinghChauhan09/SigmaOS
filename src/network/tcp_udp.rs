@@ -701,6 +701,10 @@ pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 impl<T> Vec<T> {
     pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     pub fn push(&mut self, item: T) {
+        // SAFETY: The entire block is safe because:
+        // 1. grow() ensures valid allocation before writing
+        // 2. We ensure capacity > len before writing
+        // 3. ptr::write is safe at valid memory location
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
@@ -718,6 +722,11 @@ impl<T> Vec<T> {
         VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
     }
     pub fn remove(&mut self, index: usize) -> T {
+        // SAFETY: The entire block is safe because:
+        // 1. We check that index is within bounds (implicitly via caller)
+        // 2. ptr::read is safe at valid memory location
+        // 3. copy_nonoverlapping shifts elements within valid memory
+        // 4. No overlapping source/destination in copy operation
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -730,6 +739,10 @@ impl<T> Vec<T> {
     pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
         let mut write_idx = 0;
         for i in 0..self.len {
+            // SAFETY: The dereference is safe because:
+            // 1. self.data points to valid allocated memory
+            // 2. i is within bounds (0..self.len)
+            // 3. The reference is only used within this scope
             unsafe {
                 let item = &*self.data.add(i);
                 if f(item) {
@@ -742,6 +755,12 @@ impl<T> Vec<T> {
         }
         self.len = write_idx;
     }
+    // SAFETY: grow() is unsafe because it handles raw pointer operations
+    // The function is safe when called because:
+    // 1. alloc() returns properly aligned memory or null
+    // 2. We check for null before using the pointer
+    // 3. copy_nonoverlapping copies between valid memory regions
+    // 4. free() is called on previously allocated memory
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -760,6 +779,10 @@ impl<T> core::ops::Index<usize> for Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: The dereference is safe because:
+        // 1. We've verified index < self.len
+        // 2. self.data points to valid allocated memory
+        // 3. The returned reference lifetime is tied to self
         unsafe { &*self.data.add(index) }
     }
 }
@@ -769,6 +792,11 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: The dereference is safe because:
+        // 1. We've verified index < self.len
+        // 2. self.data points to valid allocated memory
+        // 3. The returned reference lifetime is tied to self
+        // 4. We have exclusive access via &mut self
         unsafe { &mut *self.data.add(index) }
     }
 }

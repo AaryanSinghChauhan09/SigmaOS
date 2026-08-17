@@ -2,7 +2,7 @@
 // Capability-based, standard Linux/BSD conforming filesystem with security, hard links, and path traversal
 
 use crate::security::CapabilityToken;
-use std::collections::HashMap;
+use crate::klib::hashmap::HashMap;
 
 // Standard POSIX / Linux / BSD open flags
 pub const O_RDONLY: u32 = 0x0000;

@@ -1,17 +1,19 @@
 // SigmaOS Composable Filesystem (SigmaFS++)
 // Deploys plugin-based storage, deduplication, semantic indexers, and blockchain audit logs
 
-use std::collections::HashMap;
+use crate::klib::hashmap::HashMap;
+use crate::klib::string::SigmaString;
+use crate::klib::vec::Vec;
 
 pub struct FileBlock {
-    pub hash: String,
+    pub hash: SigmaString,
     pub content: Vec<u8>,
 }
 
 pub struct SigmaFS {
-    pub file_blocks: HashMap<String, FileBlock>, // content-addressed block deduplication
-    pub semantic_index: HashMap<String, String>, // search terms -> file names
-    pub audit_trail_hashes: Vec<String>,         // Tamper-evident SHA-256 blockchain hash ledger
+    pub file_blocks: HashMap<SigmaString, FileBlock>, // content-addressed block deduplication
+    pub semantic_index: HashMap<SigmaString, SigmaString>, // search terms -> file names
+    pub audit_trail_hashes: Vec<SigmaString>,         // Tamper-evident SHA-256 blockchain hash ledger
 }
 
 impl SigmaFS {
@@ -23,7 +25,7 @@ impl SigmaFS {
         }
     }
 
-    pub fn write_file_block(&mut self, file_name: &str, content: &[u8]) -> Result<String, ()> {
+    pub fn write_file_block(&mut self, file_name: &str, content: &[u8]) -> Result<SigmaString, ()> {
         if content.is_empty() {
             return Err(());
         }
@@ -63,7 +65,7 @@ impl SigmaFS {
         Ok(content_hash)
     }
 
-    pub fn semantic_search(&self, query: &str) -> Option<&String> {
+    pub fn semantic_search(&self, query: &str) -> Option<&SigmaString> {
         self.semantic_index.get(query)
     }
 
@@ -78,7 +80,7 @@ impl SigmaFS {
 // =========================================================================
 
 pub struct SigmaFhsRouter {
-    pub routing_rules: HashMap<String, String>, // Extension/pattern -> routed directory path
+    pub routing_rules: HashMap<SigmaString, SigmaString>, // Extension/pattern -> routed directory path
 }
 
 impl SigmaFhsRouter {
@@ -95,7 +97,7 @@ impl SigmaFhsRouter {
     }
 
     /// Dynamically routes paths, bypassing rigid static Linux FHS mappings
-    pub fn route_path(&self, filename: &str) -> String {
+    pub fn route_path(&self, filename: &str) -> SigmaString {
         for (pattern, routed_dir) in &self.routing_rules {
             if filename.contains(pattern) {
                 return format!("{}/{}", routed_dir, filename);
@@ -110,7 +112,7 @@ impl SigmaFhsRouter {
 // =========================================================================
 
 pub struct SigmaFhsHook {
-    pub name: String,
+    pub name: SigmaString,
     pub active: bool,
     pub run_counter: u64,
 }
@@ -118,7 +120,7 @@ pub struct SigmaFhsHook {
 impl SigmaFhsHook {
     pub fn new(name: &str) -> Self {
         SigmaFhsHook {
-            name: name.to_string(),
+            name: SigmaString::from(name),
             active: true,
             run_counter: 0,
         }
@@ -143,30 +145,30 @@ impl SigmaFhsHook {
 // =========================================================================
 
 pub struct SigmaFhsNamespace {
-    pub namespace_id: String,
-    pub bind_mounts: Vec<String>,
-    pub local_files: HashMap<String, Vec<u8>>,
+    pub namespace_id: SigmaString,
+    pub bind_mounts: Vec<SigmaString>,
+    pub local_files: HashMap<SigmaString, Vec<u8>>,
 }
 
 impl SigmaFhsNamespace {
     pub fn new(id: &str) -> Self {
         SigmaFhsNamespace {
-            namespace_id: id.to_string(),
+            namespace_id: SigmaString::from(id),
             bind_mounts: Vec::new(),
             local_files: HashMap::new(),
         }
     }
 
     pub fn bind_directory(&mut self, path: &str) {
-        self.bind_mounts.push(path.to_string());
+        self.bind_mounts.push(SigmaString::from(path));
     }
 
     pub fn write_isolated_file(&mut self, relative_path: &str, data: Vec<u8>) {
-        self.local_files.insert(relative_path.to_string(), data);
+        self.local_files.insert(SigmaString::from(relative_path), data);
     }
 
     pub fn read_isolated_file(&self, relative_path: &str) -> Option<&Vec<u8>> {
-        self.local_files.get(relative_path)
+        self.local_files.get(&SigmaString::from(relative_path))
     }
 }
 
@@ -177,9 +179,9 @@ impl SigmaFhsNamespace {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AuditLogRecord {
     pub timestamp_ms: u64,
-    pub namespace_id: String,
-    pub file_path: String,
-    pub action: String,
+    pub namespace_id: SigmaString,
+    pub file_path: SigmaString,
+    pub action: SigmaString,
     pub signature_hash: u64,
 }
 

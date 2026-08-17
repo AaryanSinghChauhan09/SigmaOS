@@ -2,7 +2,7 @@
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 
 use crate::sigpkg::{Package, Version, VersionConstraint, Dependency, ParseError};
-use std::collections::HashMap;
+use crate::klib::hashmap::HashMap;
 
 /// Abstract trait for package format adapters (OOPS principle)
 pub trait PackageFormatAdapter: Send + Sync {

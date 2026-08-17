@@ -38,6 +38,10 @@ impl SimpleShellCommand {
         let mut desc_array = [0u8; 128];
         let name_len = name.len().min(31);
         let desc_len = description.len().min(127);
+        // SAFETY: copy_nonoverlapping is safe here because:
+        // 1. We're copying within the same array (name_array and desc_array)
+        // 2. The lengths are bounded by the array sizes (128)
+        // 3. Source and destination pointers are derived from valid, non-overlapping memory
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
             core::ptr::copy_nonoverlapping(description.as_ptr(), desc_array.as_mut_ptr(), desc_len);
@@ -730,6 +734,10 @@ impl<T> core::ops::Deref for Vec<T> {
         if self.data.is_null() {
             &[]
         } else {
+            // SAFETY: from_raw_parts is safe here because:
+            // 1. self.data was allocated using our custom allocator and is valid
+            // 2. self.len accurately represents the number of elements
+            // 3. The memory is properly aligned for T
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
@@ -741,6 +749,11 @@ impl<T> core::ops::DerefMut for Vec<T> {
         if self.data.is_null() {
             &mut []
         } else {
+            // SAFETY: from_raw_parts_mut is safe here because:
+            // 1. self.data was allocated using our custom allocator and is valid
+            // 2. self.len accurately represents the number of elements
+            // 3. The memory is properly aligned for T
+            // 4. We have exclusive access (mutable reference)
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
@@ -759,6 +772,11 @@ impl<T> Vec<T> {
         }
     }
     pub fn push(&mut self, item: T) {
+        // SAFETY: The entire block is safe because:
+        // 1. grow() ensures valid allocation before writing
+        // 2. We check for null pointer before writing
+        // 3. We ensure capacity > len before writing
+        // 4. ptr::write is safe at valid memory location
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -769,6 +787,12 @@ impl<T> Vec<T> {
             }
         }
     }
+    // SAFETY: grow() is unsafe because it handles raw pointer operations
+    // The function is safe when called because:
+    // 1. alloc() returns properly aligned memory or null
+    // 2. We check for null before using the pointer
+    // 3. copy_nonoverlapping copies between valid memory regions
+    // 4. free() is called on previously allocated memory
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4

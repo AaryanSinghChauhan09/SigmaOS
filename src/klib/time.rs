@@ -21,6 +21,67 @@
 
 // (no_std only applicable at crate root - removed)
 
+/// Custom duration for reducing std::time dependency
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Duration {
+    pub secs: u64,
+    pub nanos: u32,
+}
+
+impl Duration {
+    pub fn from_secs(secs: u64) -> Self {
+        Duration { secs, nanos: 0 }
+    }
+
+    pub fn from_millis(millis: u64) -> Self {
+        Duration {
+            secs: millis / 1000,
+            nanos: ((millis % 1000) * 1_000_000) as u32,
+        }
+    }
+
+    pub fn as_secs(&self) -> u64 {
+        self.secs
+    }
+
+    pub fn as_millis(&self) -> u64 {
+        self.secs * 1000 + (self.nanos / 1_000_000) as u64
+    }
+}
+
+/// System time representation for reducing std::time dependency
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SystemTime {
+    pub secs_since_epoch: u64,
+}
+
+impl SystemTime {
+    pub fn now() -> Self {
+        // SAFETY: Reading hardware timestamp counter is safe for time estimation
+        // In production, this would use proper hardware time sources
+        unsafe {
+            let mut rdtsc: u64;
+            core::arch::asm!(
+                "rdtsc",
+                out("rax") rdtsc,
+                out("rdx") _,
+                options(nostack, nomem)
+            );
+            SystemTime {
+                secs_since_epoch: rdtsc / 1_000_000_000, // Convert nanoseconds to seconds
+            }
+        }
+    }
+
+    pub fn duration_since(&self, earlier: SystemTime) -> Duration {
+        let diff = self.secs_since_epoch.saturating_sub(earlier.secs_since_epoch);
+        Duration::from_secs(diff)
+    }
+}
+
+/// UNIX epoch constant
+pub const UNIX_EPOCH: SystemTime = SystemTime { secs_since_epoch: 0 };
+
 /// Simple time structure
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Time {

@@ -3,7 +3,7 @@
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 // Enhanced with high-performance Debian APT-style pinning and repository priority weighting
 
-use std::collections::{HashMap, HashSet};
+use crate::klib::{hashmap::HashMap, hashset::HashSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

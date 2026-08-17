@@ -3,7 +3,7 @@
 // Replicates netselect-apt, dpkg transactional safety guarantees, and maintainer script sanitization
 // Enhanced with Debian update-alternatives and APT Pinning /preferences routing engines
 
-use std::collections::HashMap;
+use crate::klib::hashmap::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {

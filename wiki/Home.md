@@ -227,6 +227,7 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 - **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
 - **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
 - **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
+- **LFS-Inspired Improvements**: [Linux From Scratch Methodology](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/LFS_INSPIRED_IMPROVEMENTS) - Step-by-step build methodology
 
 
 ---
