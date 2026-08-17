@@ -3,7 +3,9 @@
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Inspired by market-leading competitors Sandboxie (virtual file redirection/overlays) & Firejail (namespace isolation & profiles)
 
-use std::collections::{HashMap, HashSet};
+// Note: Using klib HashMap and HashSet instead of std::collections
+use crate::klib::hashmap::HashMap;
+use crate::klib::hashset::HashSet;
 
 /// Sandbox execution profiles matching specific application profiles (inspired by Firejail)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
