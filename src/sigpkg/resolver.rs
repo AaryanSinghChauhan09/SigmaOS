@@ -313,46 +313,6 @@ mod tests {
     fn test_debian_elementary_app_package_validator() {
         let solver = SatSolver::new();
 
-        // 1. Fully compliant package
-        let compliant_app = DebianElementaryAppPackage {
-            app_id: "io.elementary.calculator".to_string(),
-            format: "deb".to_string(),
-            adopts_csd_guideline: true,
-            supports_dark_mode: true,
-        };
-        assert!(solver.is_debian_elementary_package_compliant(&compliant_app).is_ok());
-
-        // 2. Non-compliant: invalid App ID format
-        let mut app = compliant_app.clone();
-        app.app_id = "calculator".to_string();
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)"
-        );
-
-        // 3. Non-compliant: invalid TLD prefix
-        let mut app = compliant_app.clone();
-        app.app_id = "net.elementary.calculator".to_string();
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: Invalid app ID top-level domain prefix"
-        );
-
-        // 4. Non-compliant: missing CSD compliance
-        let mut app = compliant_app.clone();
-        app.adopts_csd_guideline = false;
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules"
-        );
-
-        // 5. Non-compliant: missing dark mode compliance
-        let mut app = compliant_app.clone();
-        app.supports_dark_mode = false;
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App must support toggleable pure-black dark mode"
-        );
         let compliant_app = DebianElementaryAppPackage::new("io.elementary.calculator", true, true);
         assert!(solver.is_debian_elementary_package_compliant(&compliant_app));
 
