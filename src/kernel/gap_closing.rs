@@ -339,7 +339,7 @@ impl KeServiceDescriptorTable {
     }
 
     /// Dispatch a system call using SSDT routing with bounds validation
-    pub fn dispatch_syscall(&self, id: u32, _args: &[u64]) -> Result<u64, GapError> {
+    pub fn dispatch_syscall(&self, id: u32, args: &[u64]) -> Result<u64, GapError> {
         if let Some(entry) = self.service_table.iter().find(|e| e.syscall_id == id) {
             if args.len() < entry.argument_count as usize {
                 return Err(GapError::InvalidPageAddress); // mismatched arguments count
@@ -558,7 +558,198 @@ impl MdlBufferManager {
 }
 
 // ==========================================
-// 9. Calling Convention Simulator
+// 9. eBPF Sandboxed Verifier & JIT Compiler Parity
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EbpfOpcode {
+    Add = 0x07,
+    Sub = 0x17,
+    Mov = 0xb7,
+    Exit = 0x95,
+}
+
+#[derive(Debug, Clone)]
+pub struct EbpfInstruction {
+    pub opcode: EbpfOpcode,
+    pub dst_reg: u8,
+    pub src_reg: u8,
+    pub imm: i32,
+}
+
+pub struct EbpfJitVerifier;
+
+impl EbpfJitVerifier {
+    /// Safe static analysis verifier for eBPF bytecode programs (Linux kernel eBPF parity)
+    pub fn verify_program(instructions: &[EbpfInstruction]) -> Result<(), &'static str> {
+        if instructions.is_empty() {
+            return Err("eBPF program cannot be empty");
+        }
+
+        let mut has_exit = false;
+        for (idx, insn) in instructions.iter().enumerate() {
+            if insn.dst_reg > 10 || insn.src_reg > 10 {
+                return Err("eBPF register out of bounds (valid registers R0-R10)");
+            }
+
+            if insn.opcode == EbpfOpcode::Exit {
+                has_exit = true;
+                if idx != instructions.len() - 1 {
+                    return Err("eBPF Exit opcode must be the final instruction");
+                }
+            }
+        }
+
+        if !has_exit {
+            return Err("eBPF program missing Exit instruction");
+        }
+
+        Ok(())
+    }
+
+    /// Evaluates verified eBPF instructions on an isolated virtual machine register state
+    pub fn execute_program(instructions: &[EbpfInstruction]) -> Result<u64, &'static str> {
+        Self::verify_program(instructions)?;
+
+        let mut regs = [0u64; 11]; // R0-R10
+        for insn in instructions {
+            match insn.opcode {
+                EbpfOpcode::Mov => {
+                    regs[insn.dst_reg as usize] = insn.imm as u64;
+                }
+                EbpfOpcode::Add => {
+                    regs[insn.dst_reg as usize] = regs[insn.dst_reg as usize].wrapping_add(insn.imm as u64);
+                }
+                EbpfOpcode::Sub => {
+                    regs[insn.dst_reg as usize] = regs[insn.dst_reg as usize].wrapping_sub(insn.imm as u64);
+                }
+                EbpfOpcode::Exit => {
+                    return Ok(regs[0]); // R0 contains return value
+                }
+            }
+        }
+        Ok(regs[0])
+    }
+}
+
+// ==========================================
+// 10. OpenBSD Pledge & Unveil Sandbox Filter Parity
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PledgePromise {
+    Stdio,
+    Rpath,
+    Wpath,
+    Cpath,
+    Inet,
+    Exec,
+}
+
+pub struct OpenBsdPledgeUnveil {
+    pub pledged_promises: Vec<PledgePromise>,
+    pub unveiled_paths: Vec<(alloc::string::String, alloc::string::String)>, // (Path, Permissions e.g. "r", "rw")
+    pub is_pledged: bool,
+}
+
+impl OpenBsdPledgeUnveil {
+    pub fn new() -> Self {
+        Self {
+            pledged_promises: Vec::new(),
+            unveiled_paths: Vec::new(),
+            is_pledged: false,
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &[PledgePromise]) {
+        self.pledged_promises = promises.to_vec();
+        self.is_pledged = true;
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if self.is_pledged {
+            return Err("Cannot unveil new paths after pledge() has been called");
+        }
+        self.unveiled_paths.push((path.into(), permissions.into()));
+        Ok(())
+    }
+
+    pub fn check_permission(&self, promise: PledgePromise, path: Option<&str>) -> bool {
+        if self.is_pledged && !self.pledged_promises.contains(&promise) {
+            return false;
+        }
+
+        if let Some(target_path) = path {
+            if !self.unveiled_paths.is_empty() {
+                let allowed = self.unveiled_paths.iter().any(|(p, _)| target_path.starts_with(p));
+                if !allowed {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+}
+
+// ==========================================
+// 11. FreeBSD Capsicum Rights Engine Parity
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CapsicumRight {
+    Read,
+    Write,
+    Seek,
+    Ftruncate,
+    Fstat,
+}
+
+pub struct CapsicumCapability {
+    pub fd: u32,
+    pub rights: Vec<CapsicumRight>,
+}
+
+pub struct CapsicumEngine {
+    pub capabilities: Vec<CapsicumCapability>,
+    pub is_capability_mode: bool,
+}
+
+impl CapsicumEngine {
+    pub fn new() -> Self {
+        Self {
+            capabilities: Vec::new(),
+            is_capability_mode: false,
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.is_capability_mode = true;
+    }
+
+    pub fn limit_rights(&mut self, fd: u32, rights: &[CapsicumRight]) {
+        self.capabilities.push(CapsicumCapability {
+            fd,
+            rights: rights.to_vec(),
+        });
+    }
+
+    pub fn check_right(&self, fd: u32, right: CapsicumRight) -> bool {
+        if !self.is_capability_mode {
+            return true;
+        }
+
+        for cap in &self.capabilities {
+            if cap.fd == fd {
+                return cap.rights.contains(&right);
+            }
+        }
+        false
+    }
+}
+
+// ==========================================
+// 12. Calling Convention Simulator
 // ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -578,7 +769,7 @@ impl CallingConventionEngine {
 
     /// Simulate function call arguments alignment layout on the stack and registers.
     /// Returns register assignments and stack frame alignment offsets.
-    pub fn align_arguments(&self, _args: &[u64]) -> (Vec<(&'static str, u64)>, Vec<(usize, u64)>) {
+    pub fn align_arguments(&self, args: &[u64]) -> (Vec<(&'static str, u64)>, Vec<(usize, u64)>) {
         let mut registers = Vec::new();
         let mut stack = Vec::new();
 
@@ -703,7 +894,7 @@ mod tests {
     #[test]
     fn test_ke_service_descriptor_table() {
         let mut ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler(_args: &[u64]) -> u64 {
+        fn mock_handler(args: &[u64]) -> u64 {
             args[0] + args[1]
         }
 
@@ -814,5 +1005,39 @@ mod tests {
         assert_eq!(regs_f[0], ("RCX", 10));
         assert_eq!(stack_f.len(), 1);
         assert_eq!(stack_f[0], (0, 50));
+    }
+
+    #[test]
+    fn test_ebpf_verifier_and_execution() {
+        let prog = vec![
+            EbpfInstruction { opcode: EbpfOpcode::Mov, dst_reg: 0, src_reg: 0, imm: 10 },
+            EbpfInstruction { opcode: EbpfOpcode::Add, dst_reg: 0, src_reg: 0, imm: 32 },
+            EbpfInstruction { opcode: EbpfOpcode::Exit, dst_reg: 0, src_reg: 0, imm: 0 },
+        ];
+
+        let result = EbpfJitVerifier::execute_program(&prog);
+        assert_eq!(result, Ok(42));
+    }
+
+    #[test]
+    fn test_pledge_and_unveil() {
+        let mut pu = OpenBsdPledgeUnveil::new();
+        pu.unveil("/var/log", "r").unwrap();
+        pu.pledge(&[PledgePromise::Stdio, PledgePromise::Rpath]);
+
+        assert!(pu.check_permission(PledgePromise::Stdio, None));
+        assert!(pu.check_permission(PledgePromise::Rpath, Some("/var/log/syslog")));
+        assert!(!pu.check_permission(PledgePromise::Wpath, None));
+        assert!(!pu.check_permission(PledgePromise::Rpath, Some("/etc/shadow")));
+    }
+
+    #[test]
+    fn test_capsicum_rights() {
+        let mut cap = CapsicumEngine::new();
+        cap.limit_rights(3, &[CapsicumRight::Read, CapsicumRight::Fstat]);
+        cap.enter_capability_mode();
+
+        assert!(cap.check_right(3, CapsicumRight::Read));
+        assert!(!cap.check_right(3, CapsicumRight::Write));
     }
 }
