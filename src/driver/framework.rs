@@ -89,6 +89,24 @@ pub trait InputDriver: Driver {
     fn poll_events(&mut self) -> Result<usize, DriverError>;
 }
 
+/// Simple driver representation for package translation
+#[derive(Debug, Clone)]
+pub struct SimpleDriver {
+    pub name: String,
+    pub driver_type: DriverType,
+    pub state: DriverState,
+}
+
+impl SimpleDriver {
+    pub fn new(name: String, driver_type: DriverType) -> Self {
+        Self {
+            name,
+            driver_type,
+            state: DriverState::Unloaded,
+        }
+    }
+}
+
 // Concrete Driver Classes (OOP Implementation)
 
 pub struct SimpleStorageDriver {

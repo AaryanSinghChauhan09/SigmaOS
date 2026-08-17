@@ -2,7 +2,7 @@
 // Publisher-grade dashboards for system monitoring and productivity
 
 // Note: Using klib HashMap instead of std::collections::HashMap
-use crate::klib::hashmap::HashMap;
+use crate::klib::HashMap;
 // Note: std::time used for time operations - can be replaced with custom time in future
 use std::time::{Duration, Instant};
 

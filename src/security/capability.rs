@@ -4,6 +4,7 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
@@ -112,12 +113,12 @@ impl CapabilityToken {
 /// Permission types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
-    NetworkTcp = 0,
-    NetworkUdp = 1,
-    FileRead = 2,
-    FileWrite = 3,
-    ProcessExec = 4,
-    Ipc = 5,
+    NetworkTcp = 1,
+    NetworkUdp = 2,
+    FileRead = 4,
+    FileWrite = 8,
+    ProcessExec = 16,
+    Ipc = 32,
 }
 
 /// Capability gate for syscall validation
@@ -142,7 +143,7 @@ impl CapabilityGate {
     /// Validate syscall against current capability
     pub fn validate_syscall(&self, permission: Permission) -> bool {
         let current = self.current.load(Ordering::SeqCst);
-        (current & (1 << permission as u64)) != 0
+        (current & permission as u64) != 0
     }
 
     /// Get current capability

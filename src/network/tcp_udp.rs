@@ -7,9 +7,74 @@
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use crate::klib::Vec;
 
 pub type SocketID = usize;
 pub type Port = u16;
+
+// Placeholder types for Linux stack additions
+#[derive(Debug, Clone)]
+pub struct NetfilterFirewall {
+    rules: Vec<FirewallRule>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FirewallRule {
+    pub source_ip: Option<[u8; 4]>,
+    pub destination_ip: Option<[u8; 4]>,
+    pub port: Option<u16>,
+    pub action: FirewallAction,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FirewallAction {
+    Allow,
+    Deny,
+}
+
+impl NetfilterFirewall {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RoutingTable {
+    routes: Vec<Route>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Route {
+    pub destination: [u8; 4],
+    pub gateway: [u8; 4],
+    pub netmask: [u8; 4],
+    pub interface: String,
+}
+
+impl RoutingTable {
+    pub fn new() -> Self {
+        Self { routes: Vec::new() }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct NetworkInterface {
+    pub name: String,
+    pub mac_address: [u8; 6],
+    pub ip_address: [u8; 4],
+    pub is_up: bool,
+}
+
+impl NetworkInterface {
+    pub fn new(name: String, mac_address: [u8; 6], ip_address: [u8; 4]) -> Self {
+        Self {
+            name,
+            mac_address,
+            ip_address,
+            is_up: true,
+        }
+    }
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -348,6 +413,9 @@ impl SimpleNetworkStack {
             next_id: AtomicUsize::new(1),
             firewall: SimpleFirewall::new(),
             congestion: RenoCongestionControl::new(),
+            netfilter: NetfilterFirewall::new(),
+            routing_table: RoutingTable::new(),
+            interfaces: Vec::new(),
         }
     }
 }
@@ -378,30 +446,3 @@ impl NetworkStack for SimpleNetworkStack {
         None
     }
 }
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

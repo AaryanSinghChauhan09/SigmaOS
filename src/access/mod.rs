@@ -637,7 +637,8 @@ mod tests {
         let mut ldap = LdapAccessClient::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         assert!(ldap.search_user("alice").is_err()); // Not bound yet
 
-        ldap.bind("cn=admin,dc=sigmaos,dc=org", "secret_pass").unwrap();
+        // In production, use environment variables or secure configuration
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", std::env::var("LDAP_TEST_PASSWORD").expect("LDAP_TEST_PASSWORD environment variable must be set for testing")).unwrap();
         let user = ldap.search_user("alice").unwrap();
         assert_eq!(user.uid, "alice");
         assert_eq!(user.mail, "alice@sigmaos.org");

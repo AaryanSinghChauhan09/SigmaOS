@@ -1,11 +1,8 @@
 use core::cell::{Cell, RefCell};
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 use core::ptr::NonNull;
 
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
 
 // 1. SINGLY LINKED LIST
 
@@ -337,7 +334,7 @@ impl SystemThread {
             // Emulate execution: transition CPU context based on APC mode/parameters
             match apc.mode {
                 ApcMode::KernelMode => {
-                    self.context.rip = 0xFFFFFFFF_0000_1000; // Mock kernel APC routine
+                    self.context.rip = 0xFFFF_FFFF_0000_1000; // Mock kernel APC routine
                     self.context.rax = apc.param;
                 }
                 ApcMode::UserMode => {

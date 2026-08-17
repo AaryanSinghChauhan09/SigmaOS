@@ -1,3 +1,5 @@
+extern crate alloc;
+
 pub mod vec;
 pub mod paging;
 pub mod buddy_allocator;
@@ -19,7 +21,6 @@ pub mod adt;
 // For now, we use our custom Vec and HashMap (aliased to our bucket-based BTreeMap)
 pub use vec::Vec;
 pub use hashmap::BTreeMap as HashMap;
-pub use hashmap::BTreeMap;
 pub use adt::{SplayTree, RadixTree, SovereignPriorityQueue};
 #[cfg(target_os = "none")]
 pub use hashset::HashSet;
@@ -39,21 +40,8 @@ pub use hash::{djb2_hash, simple_hash, fnv1a_hash, xor_hash, SimpleHasher, combi
 #[cfg(not(target_os = "none"))]
 pub use std::string::String;
 
-/// Format integer to string without std::fmt
-#[cfg(not(target_os = "none"))]
-pub fn format_int(mut num: u64) -> alloc::string::String {
-    if num == 0 {
-        return alloc::string::String::from("0");
-    }
-    let mut buffer = alloc::vec::Vec::new();
-    while num > 0 {
-        let digit = (num % 10) as u8;
-        buffer.push(b'0' + digit);
-        num /= 10;
-    }
-    buffer.reverse();
-    alloc::string::String::from_utf8(buffer).unwrap_or_else(|_| alloc::string::String::from("ERR"))
-}
+// Re-export string utilities
+pub use string::format_int;
 
 /// C-ABI compatible string length function
 #[no_mangle]

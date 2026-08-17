@@ -2,7 +2,69 @@
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 
 use crate::sigpkg::{Package, Version, VersionConstraint, Dependency, ParseError};
-use crate::klib::hashmap::HashMap;
+use crate::klib::HashMap;
+use crate::security::capability::Permission;
+
+/// Placeholder types for package manifests
+#[derive(Debug, Clone)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackagePriority {
+    Required,
+    Important,
+    Standard,
+    Optional,
+    Extra,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanPkgbuild {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgrel: String,
+    pub depends: Vec<String>,
+    pub makedepends: Vec<String>,
+    pub description: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub description: String,
+    pub grade: String,
+    pub confinement: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlatpakManifest {
+    pub app_id: String,
+    pub runtime: String,
+    pub sdk: String,
+    pub command: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppImageManifest {
+    pub name: String,
+    pub version: String,
+    pub arch: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct NixDerivation {
+    pub name: String,
+    pub version: String,
+    pub dependencies: Vec<String>,
+}
 
 /// Abstract trait for package format adapters (OOPS principle)
 pub trait PackageFormatAdapter: Send + Sync {
@@ -1111,7 +1173,7 @@ impl AppImageContainer {
     }
 }
 
-impl UniversalPackageAdapter {
+impl UniversalPackageManager {
     /// Parses RedHat/Yum .spec files for RPM metadata translation
     pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
         let mut name = String::new();

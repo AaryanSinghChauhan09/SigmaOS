@@ -38,6 +38,23 @@ pub enum AlertSeverity {
     High,
     Critical,
 }
+
+/// Network security alert
+#[derive(Debug, Clone)]
+pub struct TrafficAlert {
+    pub alert_type: AlertType,
+    pub severity: AlertSeverity,
+    pub message: String,
+    pub timestamp: Instant,
+    pub related_ips: Vec<IpAddr>,
+}
+
+/// Network analysis strategy trait
+pub trait NetworkAnalysisStrategy {
+    fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;
+    fn name(&self) -> &str;
+}
+
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::time::{Duration, Instant};
 
@@ -284,7 +301,7 @@ impl KaliSnoopAnalysis {
     }
 }
 
-impl AnalysisStrategy for KaliSnoopAnalysis {
+impl NetworkAnalysisStrategy for KaliSnoopAnalysis {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert> {
         // Infer TTL and window size from packet size and port properties for emulation
         let inferred_ttl = if packet.destination_port == 22 || packet.destination_port == 443 {

@@ -6,6 +6,7 @@ use alloc::string::String;
 use alloc::boxed::Box;
 
 use core::mem;
+use crate::container::ContainerError;
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -657,7 +658,7 @@ impl<T> Vec<T> {
 
 pub mod oci {
     extern crate alloc;
-    use super::ContainerError;
+    use crate::container::ContainerError;
     use alloc::string::String;
     use alloc::string::ToString;
     use alloc::vec::Vec;

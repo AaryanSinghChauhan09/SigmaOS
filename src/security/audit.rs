@@ -67,7 +67,14 @@ impl AuditEvent for SimpleAuditEvent {
         self.id
     }
     fn event_type(&self) -> EventType {
-        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
+        match self.event_type.load(Ordering::SeqCst) as u32 {
+            0 => EventType::Login,
+            1 => EventType::Logout,
+            2 => EventType::FileAccess,
+            3 => EventType::ProcessExec,
+            4 => EventType::NetworkAccess,
+            _ => EventType::Other,
+        }
     }
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64
