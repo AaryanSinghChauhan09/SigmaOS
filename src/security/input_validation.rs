@@ -94,7 +94,15 @@ pub fn validate_filename(name: &[u8]) -> Result<(), ValidationError> {
 
 // ── Username / Hostname ────────────────────────────────────────────────────
 
-/// Validate a Unix username: alphanumeric, `_`, `-` only; ≤ 32 bytes.
+/// Validate a Unix username per POSIX / IEEE Std 1003.1.
+///
+/// Rules:
+/// - Non-empty
+/// - ≤ 32 bytes (`MAX_USERNAME_LEN`)
+/// - First byte MUST be an ASCII letter or underscore (`[a-zA-Z_]`).
+///   This prevents command-line option injection (e.g., usernames starting with `-`
+///   such as `-rf` or `--help` passed into system utilities).
+/// - Subsequent bytes MUST be ASCII alphanumeric, `_`, or `-`.
 pub fn validate_username(name: &[u8]) -> Result<(), ValidationError> {
     if name.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -102,7 +110,12 @@ pub fn validate_username(name: &[u8]) -> Result<(), ValidationError> {
     if name.len() > MAX_USERNAME_LEN {
         return Err(ValidationError::TooLong);
     }
-    for &b in name {
+    // Prevent argument injection: initial character cannot be `-` or a digit
+    let first = name[0];
+    if !first.is_ascii_alphabetic() && first != b'_' {
+        return Err(ValidationError::InvalidChars);
+    }
+    for &b in &name[1..] {
         if !b.is_ascii_alphanumeric() && b != b'_' && b != b'-' {
             return Err(ValidationError::InvalidChars);
         }
@@ -382,10 +395,27 @@ mod tests {
 
     #[test]
     fn test_username_validation() {
-        assert!(validate_username(b"alice").is_ok());
-        assert!(validate_username(b"alice-admin").is_ok());
-        assert!(validate_username(b"alice@domain").is_err());
-        assert!(validate_username(b"").is_err());
+        assert_eq!(validate_username(b"alice"), Ok(()));
+        assert_eq!(validate_username(b"_alice"), Ok(()));
+        assert_eq!(validate_username(b"alice-admin"), Ok(()));
+        assert_eq!(validate_username(b"user123"), Ok(()));
+
+        // Command-line option injection prevention (leading dash/hyphen)
+        assert_eq!(validate_username(b"-option"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_username(b"--help"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_username(b"-rf"), Err(ValidationError::InvalidChars));
+
+        // POSIX compliance (leading digit disallowed)
+        assert_eq!(validate_username(b"123user"), Err(ValidationError::InvalidChars));
+
+        // Disallowed special characters
+        assert_eq!(validate_username(b"alice@domain"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_username(b"alice;id"), Err(ValidationError::InvalidChars));
+
+        // Empty and length checks
+        assert_eq!(validate_username(b""), Err(ValidationError::EmptyInput));
+        let long_user = [b'a'; MAX_USERNAME_LEN + 1];
+        assert_eq!(validate_username(&long_user), Err(ValidationError::TooLong));
     }
 
     #[test]
