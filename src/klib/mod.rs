@@ -10,7 +10,9 @@ pub mod string;
 pub mod vec;
 pub mod buddy_allocator;
 pub mod paging;
+#[cfg(target_os = "none")]
 pub mod hashmap;
+#[cfg(target_os = "none")]
 pub mod hashset;
 pub mod arc;
 pub mod ring_buffer;
@@ -40,6 +42,7 @@ pub use time::{Duration, Instant, monotonic_ms};
 pub use hash::{djb2_hash, simple_hash, fnv1a_hash, xor_hash, SimpleHasher, combine_hashes};
 pub use math::{abs, min, max, clamp, pow, log2, sqrt};
 
+<<<<<<< HEAD
 /// Format integer to string without std::fmt
 pub fn format_int(mut num: u64) -> alloc::string::String {
     if num == 0 {
@@ -77,3 +80,21 @@ pub unsafe extern "C" fn sigma_memcmp(s1: *const u8, s2: *const u8, n: usize) ->
     }
     0
 }
+=======
+#[cfg(not(target_os = "none"))]
+pub use std::vec::Vec;
+
+#[cfg(target_os = "none")]
+pub use vec::Vec;
+pub use uuid::Uuid;
+
+#[cfg(not(target_os = "none"))]
+pub use std::collections::HashMap;
+#[cfg(not(target_os = "none"))]
+pub use std::collections::HashSet;
+
+#[cfg(target_os = "none")]
+pub use hashmap::HashMap;
+#[cfg(target_os = "none")]
+pub use hashset::HashSet;
+>>>>>>> origin/improve-security-and-access-control-16390481506940537632

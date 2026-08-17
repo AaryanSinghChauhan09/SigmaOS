@@ -12,95 +12,79 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Defines the generation of a peripheral device
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
+    /// Older generation devices (e.g., PS/2, Serial, legacy ISA)
     Legacy,
+    /// Modern generation devices (e.g., USB 3.0, PCIe)
     Modern,
-    Future,
+    /// Unknown or generic fallback
+    Unknown,
 }
 
+/// Current power state of the peripheral
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
-    Off,
     On,
     Sleep,
-    Standby,
+    Off,
 }
 
 /// Unified Peripheral Device Trait
 /// Any connected peripheral must implement this trait regardless of its generation.
 pub trait PeripheralDevice {
-    fn device_id(&self) -> u32 { 0 }
+    /// Returns the name or identifier of the device
+    fn name(&self) -> &'static str;
+
+    /// Returns the generation category of the device
     fn generation(&self) -> DeviceGeneration;
-    fn power_state(&self) -> PowerState { PowerState::Off }
-    fn name(&self) -> &'static str { "Unknown Device" }
-    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
-    fn set_power_state(&mut self, _state: PowerState) -> Result<(), &'static str> { Ok(()) }
-    fn shutdown(&mut self) -> Result<(), &'static str> { Ok(()) }
+
+    /// Initializes the device, preparing it for I/O operations
+    fn initialize(&mut self) -> Result<(), &'static str>;
+
+    /// Reads data from the device into the buffer
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str>;
+
+    /// Writes data to the device from the buffer
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str>;
+
+    /// Sets the power state of the device to optimize energy consumption
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str>;
+
+    /// Gracefully shuts down the device
+    fn shutdown(&mut self) -> Result<(), &'static str>;
 }
 
-/// Also implement a simpler trait alias for backward compat
-pub trait PeripheralDeviceTrait: PeripheralDevice {}
-
-#[derive(Debug, Clone)]
-pub struct PeripheralDeviceInfo {
-    pub generation: DeviceGeneration,
-    pub power_state: PowerState,
-    pub device_id: u32,
-}
-
-impl PeripheralDeviceInfo {
-    pub fn new(device_id: u32, generation: DeviceGeneration) -> Self {
-        PeripheralDeviceInfo {
-            generation,
-            power_state: PowerState::Off,
-            device_id,
-        }
-    }
-
-    pub fn set_power_state(&mut self, state: PowerState) {
-        self.power_state = state;
-    }
-}
-
-#[derive(Debug, Clone)]
+/// Centralized manager for peripheral devices.
 pub struct PeripheralManager {
-    pub devices: Vec<PeripheralDeviceInfo>,
+    devices: Vec<Box<dyn PeripheralDevice>>,
 }
 
 impl PeripheralManager {
     pub fn new() -> Self {
-        PeripheralManager {
+        Self {
             devices: Vec::new(),
         }
     }
 
-    pub fn add_device(&mut self, device: PeripheralDeviceInfo) {
+    /// Registers a new peripheral device into the system.
+    pub fn register_device(
+        &mut self,
+        mut device: Box<dyn PeripheralDevice>,
+    ) -> Result<(), &'static str> {
+        device.initialize()?;
         self.devices.push(device);
-    }
-
-    pub fn register_device(&mut self, device: alloc::boxed::Box<dyn PeripheralDevice>) -> Result<(), &'static str> {
-        let info = PeripheralDeviceInfo {
-            generation: device.generation(),
-            power_state: device.power_state(),
-            device_id: device.device_id(),
-        };
-        self.devices.push(info);
         Ok(())
     }
 
-    pub fn device_count(&self) -> usize {
-        self.devices.len()
-    }
-
+    /// Iterates over all devices and transitions them to a specific power state.
     pub fn broadcast_power_state(&mut self, state: PowerState) {
-        for device in &mut self.devices {
-            device.set_power_state(state);
+        for device in self.devices.iter_mut() {
+            let _ = device.set_power_state(state);
         }
     }
 
-    pub fn get_device(&self, device_id: u32) -> Option<&PeripheralDeviceInfo> {
-        self.devices.iter().find(|d| d.device_id == device_id)
+    /// Returns the number of active managed devices.
+    pub fn device_count(&self) -> usize {
+        self.devices.len()
     }
 }
 
@@ -260,12 +244,10 @@ impl IoManager {
 
         let mut driver_name = "";
         let mut is_minifilter = false;
-        let mut attached_device_id = None;
         for dev in self.devices.iter() {
             if dev.id == current_id {
                 driver_name = dev.driver_name;
                 is_minifilter = dev.is_minifilter;
-                attached_device_id = dev.attached_device_id;
                 break;
             }
         }
@@ -276,7 +258,6 @@ impl IoManager {
                     // Temporarily create a mutable slice reference to simulate WDM vtable calling
                     let mut dummy_dev = DeviceObject::new(current_id, driver_name);
                     dummy_dev.is_minifilter = is_minifilter;
-                    dummy_dev.attached_device_id = attached_device_id;
                     let status = handler(&mut dummy_dev, irp);
                     irp.io_status = status;
                     return status;

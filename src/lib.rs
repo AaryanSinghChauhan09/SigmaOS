@@ -1,6 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -27,6 +28,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod storage;
 pub mod virtualization;
 pub mod graphics {
     pub mod compositor;
@@ -91,6 +93,10 @@ pub use container::{
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use distro::{
+    AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
+    ReflectorMirrorManager, YayParuHelper,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
@@ -176,12 +182,15 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
-    IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
-    PORT_ALLOW_SSL, PORT_ALLOW_TCP,
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
-    HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
-    GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CrowdStrikeFalconAi,
+    DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter, IntrusionDetectionSystem,
+    LinuxCapability, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, PamError, PamGroup,
+    PamUser, Permission, PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, Securelevel,
+    SIGNATURE_LEN, SnortRule, SnortSignatureFirewall, SovereignPamManager,
+    SovereignSecurelevelManager, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+    MacChanger, KaliPacketSniffer, HashAuditor, PacketAnomaly, GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
@@ -190,6 +199,10 @@ pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
+};
+pub use storage::{
+    BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
+    PartitionEntry,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

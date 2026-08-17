@@ -2,13 +2,13 @@
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 // Enhanced with SELinux (Security-Enhanced Linux) Transition engines and Anaconda Kickstart auto-provisioners
 
-use std::collections::HashMap;
+use crate::klib::{hashmap::HashMap, string::SigmaString, vec::Vec};
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
 pub struct DnfPackageResolver {
-    pub packages: HashMap<String, Vec<String>>, // pkg_name -> dependencies
-    pub installed: HashMap<String, String>,      // pkg_name -> version
+    pub packages: HashMap<SigmaString, Vec<SigmaString>>, // pkg_name -> dependencies
+    pub installed: HashMap<SigmaString, SigmaString>,      // pkg_name -> version
     pub repodata_synced: bool,
     pub signatures_verified: bool,
 }

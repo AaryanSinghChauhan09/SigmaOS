@@ -203,6 +203,26 @@ impl ShellRepl {
                 let arg = if parts.len() >= 3 { Some(parts[2].to_string()) } else { None };
                 ShellCommand::Npfctl { subcommand, arg }
             }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "echo" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Echo {
+                        message: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Echo {
+                        message: String::new(),
+                    }
+                }
+            }
             "mkdir" => {
                 if parts.len() >= 2 {
                     ShellCommand::Mkdir {

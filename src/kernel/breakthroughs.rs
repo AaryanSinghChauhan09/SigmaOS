@@ -249,6 +249,12 @@ impl DynamicKernelPersonalitySwitcher {
     }
 }
 
+impl Default for DynamicKernelPersonalitySwitcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 9. Interrupt Rate Prediction
 pub struct InterruptRatePredictor {
     recent_rates: AtomicUsize,
@@ -268,6 +274,12 @@ impl InterruptRatePredictor {
     pub fn predict_storm_and_prebuffer(&self) -> bool {
         let count = self.recent_rates.load(Ordering::SeqCst);
         count > 1000
+    }
+}
+
+impl Default for InterruptRatePredictor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -305,144 +317,91 @@ impl DeterministicReplayEngine {
     }
 }
 
-// Simple Vec implementation for breakthroughs module
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+impl Default for DeterministicReplayEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_abi_translator_and_sigmafs_plus_plus() {
+        let translator = UniversalAbiTranslator::new("SigmaOS");
+        assert_eq!(translator.host_platform(), "SigmaOS");
+
+        let win_sys = translator.translate_abi_syscall("Windows", 0x2A).unwrap();
+        assert_eq!(win_sys, "sys_win32_create_window");
+
+        let fs = SigmaFsPlusPlus::new();
+        let mut audit_hash = [0u8; 32];
+        let size = fs.write_and_audit("/etc/hosts", b"127.0.0.1 localhost", &mut audit_hash);
+        assert_eq!(size, 19);
+        assert_eq!(fs.total_blocks(), 1); // 19 bytes is less than 4096, 1 block written
+        assert_ne!(audit_hash[0], 0);
     }
-}
 
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
+    #[test]
+    fn test_self_healing_and_ai_runtime() {
+        let kernel = SelfHealingKernel::new(0xABCDEF);
+        let stable_res = kernel.verify_and_heal(0xABCDEF).unwrap();
+        assert_eq!(stable_res, "System integral and stable");
+
+        let bad_res = kernel.verify_and_heal(0x112233).unwrap();
+        assert_eq!(
+            bad_res,
+            "Integrity violation detected: Rollback applied successfully"
+        );
+
+        let ai = AiNativeRuntime::new();
+        ai.register_model_context();
+        assert_eq!(ai.active_models_count(), 1);
+        assert_eq!(ai.execute_inference_cycles(1, 10), 2560);
     }
-}
 
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
+    #[test]
+    fn test_energy_scheduler_scripting_and_sandbox() {
+        let sched = EnergyAwareScheduler::new(80); // 80C thermal ceiling
+        let multiplier_high = sched.calculate_energy_multiplier(40, 10);
+        assert_eq!(multiplier_high, 4); // High performance on cold CPU
 
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
+        let multiplier_throttled = sched.calculate_energy_multiplier(85, 10);
+        assert_eq!(multiplier_throttled, 1); // Heavy throttle
+
+        let scripting = UserDefinedKernelFunctions::new();
+        let bytecode = [5u8];
+        let mut state = 10;
+        assert!(scripting
+            .execute_custom_script(&bytecode, &mut state)
+            .is_ok());
+        assert_eq!(state, 50);
+        assert_eq!(scripting.script_count(), 1);
+
+        let sandbox = PrivacyFirstSandbox::new();
+        let token = CapabilityToken::from_bits(0x0F);
+        assert!(sandbox.validate_and_execute_secure_call(&token, 0x0C));
+        assert!(!sandbox.validate_and_execute_secure_call(&token, 0x80));
     }
-}
 
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
+    #[test]
+    fn test_dynamic_switching_and_prediction() {
+        let switcher = DynamicKernelPersonalitySwitcher::new();
+        assert_eq!(switcher.get_mode(), KernelPersonalityMode::Microkernel);
+        switcher.set_mode(KernelPersonalityMode::Exokernel);
+        assert_eq!(switcher.get_mode(), KernelPersonalityMode::Exokernel);
 
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
+        let predictor = InterruptRatePredictor::new();
+        assert!(!predictor.predict_storm_and_prebuffer());
+        predictor.record_interrupt_event(1500);
+        assert!(predictor.predict_storm_and_prebuffer());
+
+        let mut replay = DeterministicReplayEngine::new();
+        assert_eq!(replay.get_trace_count(), 0);
+        assert!(!replay.replay_with_identical_timing());
+        replay.record_syscall(9, 100000);
+        assert_eq!(replay.get_trace_count(), 1);
+        assert!(replay.replay_with_identical_timing());
     }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }

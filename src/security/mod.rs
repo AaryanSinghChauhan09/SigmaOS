@@ -1,16 +1,18 @@
-// SigmaOS Security Module
-// Capability-based security, pledge, and access control
-
+// SigmaOS Security Subsystem
 pub mod audit;
 pub mod capability;
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
+pub mod defensive_audit;
 pub mod forensics;
+pub mod hardening;
 pub mod integrity;
 pub mod intrusion;
 pub mod mac;
+pub mod parrot;
+pub mod parrot_kali;
 pub mod password;
 pub mod pki;
 pub mod pledge;
@@ -19,10 +21,14 @@ pub mod secrets;
 pub mod selinux;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
+pub mod unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod parrot_kali;
+pub mod deobfuscation;
+pub mod securelevels;
+pub mod pam;
+pub mod crypto_utils;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -30,6 +36,14 @@ pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, Securit
 pub use capability_token::{
     CapabilityToken as AndroidStyleCapabilityToken,
     SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
+pub use intrusion::{
+    CrowdStrikeFalconAi, DetectionResult, EventType, IntrusionDetectionSystem, RuleAction,
+    SecurityEvent, Severity, SnortRule, SnortSignatureFirewall,
+};
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
 };
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
@@ -66,3 +80,7 @@ pub use parrot_kali::{
     HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
     GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
 };
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
+pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
+pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
