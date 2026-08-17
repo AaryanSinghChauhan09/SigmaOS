@@ -4,6 +4,7 @@
 // Core library for SigmaOS operating system
 
 pub mod access;
+pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -28,6 +29,7 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod tools;
+pub mod storage;
 pub mod virtualization;
 
 pub use access::{
@@ -74,7 +76,8 @@ pub use customization::{
 };
 pub use distro::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService,
+    PinRule, AptPinStore, OpenRCService, AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
+    ReflectorMirrorManager, YayParuHelper,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
@@ -141,8 +144,10 @@ pub use security::{
     DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
     IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
     PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
-    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    SwapSpaceManager, TmuxMultiplexer, TmuxPane, CrowdStrikeFalconAi,
+    IntrusionDetectionSystem, LinuxCapability, PamError, PamGroup, PamUser, Securelevel,
+    SnortRule, SnortSignatureFirewall, SovereignPamManager, SovereignSecurelevelManager,
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use plugin::{
     ExtensionType, ManagerCapability, MarketplaceItem, Plugin, PluginCapability, PluginError,
@@ -161,6 +166,10 @@ pub use tools::{
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
+};
+pub use storage::{
+    BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
+    PartitionEntry,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
