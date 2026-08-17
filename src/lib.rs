@@ -5,6 +5,7 @@
 
 pub mod access;
 pub mod klib;
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -31,6 +32,8 @@ pub mod sigpkg;
 pub mod tools;
 pub mod storage;
 pub mod virtualization;
+pub mod klib;
+pub use klib::{SplayTree, RadixTree, SovereignPriorityQueue};
 
 pub use access::{
     AccessError, AccessManager, AccessMode, AccessPattern, AccessResult, AccessRule,

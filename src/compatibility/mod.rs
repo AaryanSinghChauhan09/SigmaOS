@@ -18,6 +18,18 @@ pub mod legacy_adapters;
 pub mod fedora;
 pub mod debian;
 pub mod cachy_os;
+pub mod arch_linux;
+
+pub use arch_linux::{
+    ProcFileType, ProcFile, DevFileType, DevFile, ArchPackage, PacmanError, PacmanEngine,
+    RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule, ArchFirewall,
+    LsmMode, LsmSentinel, PamGate, PaneLayout, TmuxMultiplexer, SovereignEnvRegistry,
+    AurRepoStatus, YayParuAdapter, ArchMirror, ReflectorMirrorlist, SubvolumeConfig,
+    ArchinstallConfig, ArchinstallParity, ArtixInitSystemType, ServiceState, ArtixInitBridge,
+    KeyTrustLevel, PacmanKey, PacmanKeyring, AurPatch, AurPatchEngine,
+    MkinitcpioGenerator, NewsItem, ArchNewsFeedParser, CachedPackage, PacmanDbCleaner,
+    WikiPage, ArchWikiSearchEngine,
+};
 
 pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
