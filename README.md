@@ -195,6 +195,10 @@ SigmaOS is released under the MIT License. See LICENSE file for details.
 
 - GitHub: https://github.com/AaryanSinghChauhan09/SigmaOS
 - Issues: https://github.com/AaryanSinghChauhan09/SigmaOS/issues
+- LinkedIn:
+https://www.linkedin.com/in/aaryan-singh-chauhan-16a147288
+- SoloLearn:
+https://www.sololearn.com/profile/29816006/
 - Wiki: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
 
 ---
