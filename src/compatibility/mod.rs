@@ -8,7 +8,17 @@ pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
+pub mod india_professional_tools;
+pub mod canonical;
+pub mod fedora;
+pub mod linux_compat;
 
+pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
+pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};
+pub use linux_compat::{
+    LinuxCompatSpec, TargetDistro, DistroTargetProfile, LinuxSyscallTranslator,
+    LinuxSyscallNum, LinuxProcFsAdapter, LinuxElfLoaderShim, AuxVector,
+};
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
     APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
@@ -61,4 +71,9 @@ pub use relay_nexus::{
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+};
+
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
+    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
 };

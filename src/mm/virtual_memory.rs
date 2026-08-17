@@ -1,11 +1,11 @@
-#![no_std]
-#![no_main]
+// OOP-based Virtual Memory Manager with Canonical Address Verification for SigmaOS
+// Implements virtual memory management using OOP principles with traits and structs
+// No dependency on external memory management libraries
+// Inspired by x86_64, ARM64, Linux, BSD, and Windows canonical memory layouts
+// Enhanced with OpenBSD/FreeBSD W^X (Write XOR Execute) security, FreeBSD wired/pinned page protection,
+// and Linux kswapd-inspired active/inactive LRU page reclaimer scanning.
 
-/// OOP-based Virtual Memory Manager for SigmaOS
-/// Implements virtual memory management using OOP principles with traits and structs
-/// No dependency on external memory management libraries
-
-use core::ptr::{self, NonNull};
+use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -18,9 +18,53 @@ pub type VirtualAddress = usize;
 /// Physical address
 pub type PhysicalAddress = usize;
 
+// =========================================================================
+// x86_64 & ARM64 Inspired Canonical Address Verification Subsystem
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CanonicalHalf {
+    Lower, // User space (bits 47-63 are 0)
+    Upper, // Kernel space (bits 47-63 are 1)
+}
+
+/// Verification: under a 48-bit address space, bits 47 to 63 must be copies of bit 47
+pub fn is_canonical_address(addr: VirtualAddress) -> bool {
+    let sign_bit = (addr >> 47) & 1;
+    let upper_bits = addr >> 47;
+    if sign_bit == 0 {
+        upper_bits == 0
+    } else {
+        upper_bits == 0x1FFFF
+    }
+}
+
+/// Retrieve the canonical half of a virtual address (Lower vs Upper space)
+pub fn get_canonical_half(addr: VirtualAddress) -> Option<CanonicalHalf> {
+    if !is_canonical_address(addr) {
+        return None;
+    }
+    let sign_bit = (addr >> 47) & 1;
+    if sign_bit == 0 {
+        Some(CanonicalHalf::Lower)
+    } else {
+        Some(CanonicalHalf::Upper)
+    }
+}
+
+/// Sign-extend bit 47 to convert any address into its canonical representation
+pub fn canonicalize_address(addr: VirtualAddress) -> VirtualAddress {
+    let sign_bit = (addr >> 47) & 1;
+    if sign_bit == 1 {
+        addr | 0xFFFF_8000_0000_0000
+    } else {
+        addr & 0x0000_7FFF_FFFF_FFFF
+    }
+}
+
 /// Page table entry flags
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PageTableEntryFlags {
     pub present: bool,
     pub writable: bool,
@@ -30,6 +74,8 @@ pub struct PageTableEntryFlags {
     pub accessed: bool,
     pub dirty: bool,
     pub global: bool,
+    /// FreeBSD-inspired wired/pinned lock bit (prevents eviction or unmapping)
+    pub is_wired: bool,
 }
 
 impl PageTableEntryFlags {
@@ -43,6 +89,7 @@ impl PageTableEntryFlags {
             accessed: false,
             dirty: false,
             global: false,
+            is_wired: false,
         }
     }
 
@@ -56,12 +103,20 @@ impl PageTableEntryFlags {
         if self.accessed { flags |= 1 << 5; }
         if self.dirty { flags |= 1 << 6; }
         if self.global { flags |= 1 << 8; }
+        if self.is_wired { flags |= 1 << 9; }
         flags
+    }
+}
+
+impl Default for PageTableEntryFlags {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 /// Page table entry
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PageTableEntry {
     pub physical_address: PhysicalAddress,
     pub flags: PageTableEntryFlags,
@@ -139,6 +194,12 @@ impl PageTable {
         }
 
         let index = (virtual_addr / PAGE_SIZE) % 512;
+        if let Some(ref entry) = self.entries[index] {
+            // FreeBSD-style wired/pinned page protection check
+            if entry.flags.is_wired {
+                return Err(MemoryError::WiredPageLocked);
+            }
+        }
         self.entries[index] = None;
         Ok(())
     }
@@ -150,6 +211,9 @@ impl PageTable {
 
         let index = (virtual_addr / PAGE_SIZE) % 512;
         if let Some(ref mut entry) = self.entries[index] {
+            if entry.flags.is_wired && !flags.is_wired {
+                return Err(MemoryError::PermissionDenied);
+            }
             entry.flags = flags;
             Ok(())
         } else {
@@ -174,11 +238,13 @@ pub struct MemoryRegion {
 
 /// Memory permissions
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MemoryPermissions {
     pub read: bool,
     pub write: bool,
     pub execute: bool,
+    /// FreeBSD-inspired wired/pinned lock
+    pub is_wired: bool,
 }
 
 impl MemoryPermissions {
@@ -187,6 +253,7 @@ impl MemoryPermissions {
             read: false,
             write: false,
             execute: false,
+            is_wired: false,
         }
     }
 
@@ -208,6 +275,17 @@ impl MemoryPermissions {
         perms.read = true;
         perms.execute = true;
         perms
+    }
+
+    /// OpenBSD/FreeBSD W^X Security Audit rule: Memory cannot be Writeable and Executable simultaneously
+    pub fn is_wx_compliant(&self) -> bool {
+        !(self.write && self.execute)
+    }
+}
+
+impl Default for MemoryPermissions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -265,6 +343,10 @@ impl MemoryRegion {
         if !self.capability.can_change_permissions {
             return Err(MemoryError::PermissionDenied);
         }
+        // Enforce W^X security rule
+        if !permissions.is_wx_compliant() {
+            return Err(MemoryError::WxViolation);
+        }
         self.permissions = permissions;
         Ok(())
     }
@@ -272,7 +354,7 @@ impl MemoryRegion {
 
 /// Memory error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryError {
     Success = 0,
     OutOfMemory = 1,
@@ -281,6 +363,10 @@ pub enum MemoryError {
     NotMapped = 4,
     AlreadyMapped = 5,
     AlignmentError = 6,
+    /// OpenBSD/FreeBSD W^X Security Violation (Write XOR Execute)
+    WxViolation = 7,
+    /// FreeBSD Wired/Pinned page lock protection error
+    WiredPageLocked = 8,
 }
 
 /// Virtual memory manager trait (OOP interface)
@@ -370,6 +456,15 @@ impl SimpleVirtualMemoryManager {
     }
 
     unsafe fn allocate_region(&mut self, start: VirtualAddress, size: usize, permissions: MemoryPermissions) -> Result<NonNull<MemoryRegion>, MemoryError> {
+        if !is_canonical_address(start) || !is_canonical_address(start + size) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
+        // Enforce W^X (Write XOR Execute) security rule
+        if !permissions.is_wx_compliant() {
+            return Err(MemoryError::WxViolation);
+        }
+
         let region = MemoryRegion::new(start, start + size, permissions, MemoryRegionCapability::full());
         let region_ptr = alloc(mem::size_of::<MemoryRegion>()) as *mut MemoryRegion;
 
@@ -384,8 +479,9 @@ impl SimpleVirtualMemoryManager {
     }
 
     unsafe fn find_region(&self, addr: VirtualAddress) -> Option<&MemoryRegion> {
-        for region_option in &self.memory_regions {
-            if let Some(region_ptr) = *region_option {
+        for i in 0..self.memory_regions.len {
+            let slot = &*self.memory_regions.data.add(i);
+            if let Some(region_ptr) = *slot {
                 let region = &*region_ptr.as_ptr();
                 if region.contains(addr) {
                     return Some(region);
@@ -417,12 +513,21 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             return Err(MemoryError::PermissionDenied);
         }
 
+        if !is_canonical_address(addr) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         unsafe {
             let mut index = None;
-            for (i, region_option) in self.memory_regions.iter().enumerate() {
-                if let Some(region_ptr) = *region_option {
+            for i in 0..self.memory_regions.len {
+                let slot = &*self.memory_regions.data.add(i);
+                if let Some(region_ptr) = *slot {
                     let region = &*region_ptr.as_ptr();
                     if region.start == addr {
+                        // Check FreeBSD-style wired/pinned lock
+                        if region.permissions.is_wired {
+                            return Err(MemoryError::WiredPageLocked);
+                        }
                         index = Some(i);
                         break;
                     }
@@ -430,11 +535,12 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             }
 
             if let Some(i) = index {
-                if let Some(region_ptr) = self.memory_regions[i] {
+                let slot = &mut *self.memory_regions.data.add(i);
+                if let Some(region_ptr) = *slot {
                     core::ptr::drop_in_place(region_ptr.as_ptr());
                     free(region_ptr.as_ptr() as *mut u8);
                 }
-                self.memory_regions[i] = None;
+                *slot = None;
                 Ok(())
             } else {
                 Err(MemoryError::InvalidAddress)
@@ -445,6 +551,15 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
     fn map_physical(&mut self, virtual_addr: VirtualAddress, physical_addr: PhysicalAddress, size: usize, permissions: MemoryPermissions) -> Result<(), MemoryError> {
         if !self.capability.can_map_physical {
             return Err(MemoryError::PermissionDenied);
+        }
+
+        if !is_canonical_address(virtual_addr) || !is_canonical_address(virtual_addr + size) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
+        // Enforce W^X security rule
+        if !permissions.is_wx_compliant() {
+            return Err(MemoryError::WxViolation);
         }
 
         unsafe {
@@ -460,12 +575,13 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                 accessed: false,
                 dirty: false,
                 global: false,
+                is_wired: permissions.is_wired,
             };
 
             for offset in (0..aligned_size).step_by(PAGE_SIZE) {
                 let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
                 
-                while page_table_index >= self.page_tables.len() {
+                while page_table_index >= self.page_tables.len {
                     let page_table = PageTable::new(PageTableCapability::full());
                     let pt_ptr = alloc(mem::size_of::<PageTable>()) as *mut PageTable;
                     if pt_ptr.is_null() {
@@ -475,7 +591,8 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                     self.page_tables.push(Some(NonNull::new_unchecked(pt_ptr)));
                 }
 
-                if let Some(pt_ptr) = self.page_tables[page_table_index] {
+                let slot = &mut *self.page_tables.data.add(page_table_index);
+                if let Some(pt_ptr) = *slot {
                     let page_table = &mut *pt_ptr.as_ptr();
                     page_table.map_page(virtual_addr + offset, physical_addr + offset, flags)?;
                 }
@@ -490,15 +607,23 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             return Err(MemoryError::PermissionDenied);
         }
 
+        if !is_canonical_address(virtual_addr) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         unsafe {
             if let Some(region) = self.find_region(virtual_addr) {
+                if region.permissions.is_wired {
+                    return Err(MemoryError::WiredPageLocked);
+                }
+
                 let size = region.size();
-                
                 for offset in (0..size).step_by(PAGE_SIZE) {
                     let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
                     
-                    if page_table_index < self.page_tables.len() {
-                        if let Some(pt_ptr) = self.page_tables[page_table_index] {
+                    if page_table_index < self.page_tables.len {
+                        let slot = &mut *self.page_tables.data.add(page_table_index);
+                        if let Some(pt_ptr) = *slot {
                             let page_table = &mut *pt_ptr.as_ptr();
                             page_table.unmap_page(virtual_addr + offset)?;
                         }
@@ -513,6 +638,14 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
     }
 
     fn protect(&mut self, virtual_addr: VirtualAddress, permissions: MemoryPermissions) -> Result<(), MemoryError> {
+        if !is_canonical_address(virtual_addr) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
+        if !permissions.is_wx_compliant() {
+            return Err(MemoryError::WxViolation);
+        }
+
         unsafe {
             if let Some(region) = self.find_region(virtual_addr) {
                 region.change_permissions(permissions)?;
@@ -526,14 +659,16 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                     accessed: false,
                     dirty: false,
                     global: false,
+                    is_wired: permissions.is_wired,
                 };
 
                 let size = region.size();
                 for offset in (0..size).step_by(PAGE_SIZE) {
                     let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
                     
-                    if page_table_index < self.page_tables.len() {
-                        if let Some(pt_ptr) = self.page_tables[page_table_index] {
+                    if page_table_index < self.page_tables.len {
+                        let slot = &mut *self.page_tables.data.add(page_table_index);
+                        if let Some(pt_ptr) = *slot {
                             let page_table = &mut *pt_ptr.as_ptr();
                             page_table.protect_page(virtual_addr + offset, flags)?;
                         }
@@ -548,6 +683,10 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
     }
 
     fn info(&self, virtual_addr: VirtualAddress) -> Option<MemoryInfo> {
+        if !is_canonical_address(virtual_addr) {
+            return None;
+        }
+
         unsafe {
             if let Some(region) = self.find_region(virtual_addr) {
                 let mut info = MemoryInfo::new(virtual_addr);
@@ -559,6 +698,60 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                 None
             }
         }
+    }
+}
+
+// =========================================================================
+// Linux kswapd-inspired Active/Inactive Page Reclaimer Scanning Subsystem
+// =========================================================================
+
+pub struct SovereignPageReclaimer {
+    pub scanned_pages_count: usize,
+    pub reclaimed_pages_count: usize,
+}
+
+impl SovereignPageReclaimer {
+    pub fn new() -> Self {
+        Self {
+            scanned_pages_count: 0,
+            reclaimed_pages_count: 0,
+        }
+    }
+
+    /// Scans page tables, aging accessed bits and identifying unaccessed dirty pages for swap-out
+    pub unsafe fn scan_and_reclaim(&mut self, page_tables: &mut [Option<NonNull<PageTable>>]) -> usize {
+        let mut reclaimed = 0;
+
+        for slot in page_tables.iter_mut() {
+            if let Some(pt_ptr) = *slot {
+                let page_table = &mut *pt_ptr.as_ptr();
+                for entry_slot in page_table.entries.iter_mut() {
+                    if let Some(ref mut entry) = *entry_slot {
+                        self.scanned_pages_count += 1;
+                        if entry.flags.is_wired {
+                            continue; // Skip FreeBSD-style wired/pinned pages
+                        }
+
+                        if entry.flags.accessed {
+                            // Clear accessed flag (first-chance LRU aging scan)
+                            entry.flags.accessed = false;
+                        } else {
+                            // Page was not accessed since last scan -> Candidate for LRU eviction/reclaim
+                            reclaimed += 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        self.reclaimed_pages_count += reclaimed;
+        reclaimed
+    }
+}
+
+impl Default for SovereignPageReclaimer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -614,8 +807,106 @@ impl<T> Vec<T> {
     }
 }
 
-// External allocator functions
+// External allocator functions / Test Shims
+#[cfg(not(test))]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+#[no_mangle]
+pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
+    std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
+}
+
+#[cfg(test)]
+#[no_mangle]
+pub unsafe extern "C" fn free(ptr: *mut u8) {
+    if !ptr.is_null() {
+        std::alloc::dealloc(ptr, std::alloc::Layout::from_size_align_unchecked(1, 8));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_canonical_address_verifications() {
+        assert!(is_canonical_address(0x0000_0000_1000_0000));
+        assert_eq!(get_canonical_half(0x0000_0000_1000_0000), Some(CanonicalHalf::Lower));
+
+        assert!(is_canonical_address(0xFFFF_8000_0000_1000));
+        assert_eq!(get_canonical_half(0xFFFF_8000_0000_1000), Some(CanonicalHalf::Upper));
+
+        assert!(!is_canonical_address(0x0001_8000_0000_0000));
+        assert_eq!(get_canonical_half(0x0001_8000_0000_0000), None);
+
+        let raw_addr = 0x0000_8000_0000_0123;
+        let canonical_addr = canonicalize_address(raw_addr);
+        assert!(is_canonical_address(canonical_addr));
+        assert_eq!(get_canonical_half(canonical_addr), Some(CanonicalHalf::Upper));
+    }
+
+    #[test]
+    fn test_wx_protection_enforcement() {
+        let wx_perms = MemoryPermissions {
+            read: true,
+            write: true,
+            execute: true,
+            is_wired: false,
+        };
+        assert!(!wx_perms.is_wx_compliant()); // Violates W^X rule!
+
+        let rx_perms = MemoryPermissions::read_execute();
+        assert!(rx_perms.is_wx_compliant()); // Compliant RX
+
+        let rw_perms = MemoryPermissions::read_write();
+        assert!(rw_perms.is_wx_compliant()); // Compliant RW
+    }
+
+    #[test]
+    fn test_page_table_wired_lock_protection() {
+        let mut pt = PageTable::new(PageTableCapability::full());
+
+        let mut flags = PageTableEntryFlags::new();
+        flags.present = true;
+        flags.is_wired = true; // Pinned page lock
+
+        unsafe {
+            pt.map_page(0x0000_0000_1000_0000, 0x100000, flags).unwrap();
+
+            // Attempting to unmap a wired page returns WiredPageLocked error!
+            assert_eq!(pt.unmap_page(0x0000_0000_1000_0000), Err(MemoryError::WiredPageLocked));
+        }
+    }
+
+    #[test]
+    fn test_page_reclaimer_aging_scan() {
+        let mut pt = PageTable::new(PageTableCapability::full());
+
+        let mut flags = PageTableEntryFlags::new();
+        flags.present = true;
+        flags.accessed = true; // Initially accessed
+
+        unsafe {
+            pt.map_page(0x0000_0000_1000_0000, 0x100000, flags).unwrap();
+        }
+
+        let mut reclaimer = SovereignPageReclaimer::new();
+
+        let pt_ptr = NonNull::new(&mut pt as *mut PageTable).unwrap();
+        let mut pt_array = [Some(pt_ptr)];
+
+        unsafe {
+            // First scan: clears accessed bit (first chance aging)
+            let reclaimed_pass1 = reclaimer.scan_and_reclaim(&mut pt_array);
+            assert_eq!(reclaimed_pass1, 0); // 0 reclaimed because it was marked accessed
+
+            // Second scan: accessed is false -> page is identified as unaccessed LRU candidate!
+            let reclaimed_pass2 = reclaimer.scan_and_reclaim(&mut pt_array);
+            assert_eq!(reclaimed_pass2, 1);
+        }
+    }
 }

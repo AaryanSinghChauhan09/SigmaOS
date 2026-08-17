@@ -248,6 +248,121 @@ impl Default for PosixTranslation {
     }
 }
 
+// ==========================================
+// 5. FreeBSD/NetBSD kqueue & kevent Event Notification System
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum KEventFilter {
+    EvfiltRead,
+    EvfiltWrite,
+    EvfiltSignal,
+    EvfiltVnode,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KEvent {
+    pub ident: u64, // File descriptor or signal ID
+    pub filter: KEventFilter,
+    pub flags: u16,
+    pub data: i64,
+}
+
+pub struct KQueue {
+    pub pending_events: Vec<KEvent>,
+}
+
+impl KQueue {
+    pub fn new() -> Self {
+        Self {
+            pending_events: Vec::new(),
+        }
+    }
+
+    pub fn kevent_register(&mut self, event: KEvent) {
+        self.pending_events.push(event);
+    }
+
+    pub fn kevent_poll(&mut self) -> Vec<KEvent> {
+        let events = self.pending_events.clone();
+        self.pending_events.clear();
+        events
+    }
+}
+
+impl Default for KQueue {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 6. FreeBSD GEOM Modular Storage Topology Framework
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeomClass {
+    Part,
+    Mirror,
+    Stripe,
+    Eli, // GELI Encryption
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomProvider {
+    pub name: String,
+    pub size_bytes: u64,
+    pub class: GeomClass,
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomConsumer {
+    pub name: String,
+    pub provider_attached: String,
+}
+
+pub struct GeomStorageTopology {
+    pub providers: HashMap<String, GeomProvider>,
+    pub consumers: Vec<GeomConsumer>,
+}
+
+impl GeomStorageTopology {
+    pub fn new() -> Self {
+        Self {
+            providers: HashMap::new(),
+            consumers: Vec::new(),
+        }
+    }
+
+    pub fn register_provider(&mut self, name: &str, size_bytes: u64, class: GeomClass) {
+        self.providers.insert(
+            name.to_string(),
+            GeomProvider {
+                name: name.to_string(),
+                size_bytes,
+                class,
+            },
+        );
+    }
+
+    pub fn attach_consumer(&mut self, consumer_name: &str, provider_name: &str) -> Result<(), &'static str> {
+        if !self.providers.contains_key(provider_name) {
+            return Err("Target GEOM provider does not exist");
+        }
+        self.consumers.push(GeomConsumer {
+            name: consumer_name.to_string(),
+            provider_attached: provider_name.to_string(),
+        });
+        Ok(())
+    }
+}
+
+impl Default for GeomStorageTopology {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -294,17 +409,14 @@ mod tests {
         user32.register_export("MessageBoxA", 0x7FFE0040);
         loader.register_dll(user32);
 
-        // Fail to resolve before library load
         assert!(loader
             .get_proc_address("user32.dll", "MessageBoxA")
             .is_err());
 
-        // Load library
         let loaded = loader.load_library("user32.dll").unwrap();
         assert!(loaded.is_loaded);
         assert!(loaded.dll_main_called);
 
-        // Resolve symbol
         let addr = loader
             .get_proc_address("user32.dll", "MessageBoxA")
             .unwrap();
@@ -326,5 +438,36 @@ mod tests {
 
         let exec_success = translation.translate_syscall(LinuxSyscall::Execve, &[0x401000]);
         assert!(exec_success.is_ok());
+    }
+
+    #[test]
+    fn test_kqueue_event_notifications() {
+        let mut kq = KQueue::new();
+
+        kq.kevent_register(KEvent {
+            ident: 3,
+            filter: KEventFilter::EvfiltRead,
+            flags: 1,
+            data: 512,
+        });
+
+        let events = kq.kevent_poll();
+        assert_eq!(events.len(), 1);
+        assert_eq!(events[0].ident, 3);
+        assert_eq!(events[0].filter, KEventFilter::EvfiltRead);
+
+        // Subsequent poll is empty
+        assert_eq!(kq.kevent_poll().len(), 0);
+    }
+
+    #[test]
+    fn test_geom_storage_topology() {
+        let mut geom = GeomStorageTopology::new();
+
+        geom.register_provider("ada0", 500_000_000_000, GeomClass::Part);
+        geom.register_provider("mirror/gm0", 500_000_000_000, GeomClass::Mirror);
+
+        assert!(geom.attach_consumer("consumer1", "mirror/gm0").is_ok());
+        assert!(geom.attach_consumer("consumer2", "nonexistent").is_err());
     }
 }
