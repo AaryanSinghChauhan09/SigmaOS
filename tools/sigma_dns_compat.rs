@@ -106,7 +106,6 @@ mod tests {
     }
 }
 
-// C-compatible DNS functions for FFI
 type SigmaU8 = u8;
 type SigmaU32 = u32;
 type SigmaI32 = i32;

@@ -36,12 +36,12 @@ pub enum VersionConstraint {
     LessOrEqual(Version),
     Any,
 }
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
-
 
 #[derive(Debug, Clone)]
 pub struct Package {
@@ -66,6 +66,24 @@ impl Package {
             description,
             dependencies,
             checksum,
+        }
+    }
+}
+
+/// Debian-style Sbuild Source Build Dependency Representation
+#[derive(Debug, Clone)]
+pub struct DebianSbuildPackage {
+    pub name: String,
+    pub version: Version,
+    pub build_depends: Vec<String>,
+}
+
+impl DebianSbuildPackage {
+    pub fn new(name: &str, build_deps: Vec<String>) -> Self {
+        Self {
+            name: name.to_string(),
+            version: Version::new(1, 0, 0),
+            build_depends: build_deps,
         }
     }
 }
@@ -159,7 +177,7 @@ impl RollingSyncManager {
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
-            if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
+            if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
                 if remote_ver > installed_ver {
                     updates.push((pkg_name.clone(), *installed_ver, *remote_ver));
                 }
@@ -167,6 +185,16 @@ impl RollingSyncManager {
         }
         updates.sort_by(|a, b| a.0.cmp(&b.0));
         updates
+    }
+
+    /// Verifies if a Debian sbuild environment has all required build dependencies satisfied
+    pub fn is_debian_sbuild_builddeps_satisfied(&self, sbuild: &DebianSbuildPackage) -> bool {
+        for dep in &sbuild.build_depends {
+            if !self.installed_packages.contains_key(dep) {
+                return false;
+            }
+        }
+        true
     }
 }
 
@@ -620,6 +648,45 @@ mod tests {
     }
 
     #[test]
+    fn test_debian_sbuild_resolver() {
+        let mut sync = RollingSyncManager::new();
+        sync.register_installed("gcc", Version::new(11, 2, 0));
+        sync.register_installed("make", Version::new(4, 3, 0));
+
+        let sbuild1 =
+            DebianSbuildPackage::new("sigma-core", vec!["gcc".to_string(), "make".to_string()]);
+        assert!(sync.is_debian_sbuild_builddeps_satisfied(&sbuild1));
+
+        let sbuild2 = DebianSbuildPackage::new(
+            "sigma-core",
+            vec!["gcc".to_string(), "clang".to_string()],
+        );
+        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&sbuild2));
+    }
+
+    #[test]
+    fn test_alpm_hooks_routing() {
+        let mut manager = AlpmHookManager::new();
+        let hook = AlpmHook {
+            name: "update-grub".to_string(),
+            action: AlpmHookAction::PostTransaction,
+            when: HookWhen::PostTransaction,
+            target_packages: vec!["linux".to_string(), "linux-zen".to_string()],
+            exec_command: "grub-mkconfig -o /boot/grub/grub.cfg".to_string(),
+        };
+
+        manager.register_hook(hook);
+
+        let executed = manager.run_hooks(AlpmHookAction::PostTransaction, &["linux", "vim"]);
+        assert_eq!(executed, 1);
+        assert_eq!(manager.execution_log.len(), 1);
+        assert!(manager.execution_log[0].contains("grub-mkconfig"));
+
+        let executed_pre = manager.run_hooks(AlpmHookAction::PreTransaction, &["linux"]);
+        assert_eq!(executed_pre, 0);
+    }
+
+    #[test]
     fn test_alpm_hooks() {
         let mut manager = AlpmHookManager::new();
 
@@ -641,9 +708,32 @@ mod tests {
 
     #[test]
     fn test_mkinitcpio_builder() {
-        let builder = MkinitcpioBuilder::new();
+        let mut builder = MkinitcpioBuilder::new();
+        builder.add_hook("udev");
+        builder.add_hook("base");
+        builder.add_hook("block");
+
+        let ramdisk = builder.compile_initramfs("initramfs-linux.img").unwrap();
+        assert!(ramdisk.contains("initramfs-img:initramfs-linux.img:"));
+        assert!(ramdisk.contains("udev|base|block|"));
+
+        let builder_empty = MkinitcpioBuilder::new();
+        assert!(builder_empty.compile_initramfs("fail.img").is_err());
+
         let initramfs = builder.build_initramfs("6.1.0-arch1").unwrap();
         assert!(initramfs.contains("/boot/initramfs-6.1.0-arch1.img"));
+    }
+
+    #[test]
+    fn test_makepkg_builder() {
+        let builder = MakepkgBuilder::new();
+        let mock_src = b"fn main() { println!(\"source\"); }";
+
+        let sha = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+        let package = builder.build_package("linux-firmware", Version::new(20230510, 0, 0), mock_src, sha).unwrap();
+        assert_eq!(package.name, "linux-firmware");
+
+        assert!(builder.build_package("linux-firmware", Version::new(1, 0, 0), mock_src, "short_hash").is_err());
     }
 
     #[test]

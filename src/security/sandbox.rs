@@ -242,6 +242,23 @@ impl PrivacyFirstSandbox {
             .filter(|(key, _)| !blacklisted_vars.contains(&key.as_str()))
             .collect()
     }
+
+    /// Firejail-style environment variable sanitizer to prevent privilege escalation / variable injections
+    pub fn sanitize_environment(&mut self, env_vars: &[(&str, &str)]) {
+        let sensitive_prefixes = ["LD_", "RUST_", "PATH", "SHELL", "USER"];
+        for &(key, val) in env_vars {
+            let mut is_sensitive = false;
+            for prefix in &sensitive_prefixes {
+                if key.starts_with(prefix) {
+                    is_sensitive = true;
+                    break;
+                }
+            }
+            if !is_sensitive {
+                self.sanitized_env.insert(key.to_string(), val.to_string());
+            }
+        }
+    }
 }
 
 #[cfg(test)]
