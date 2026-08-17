@@ -11,17 +11,17 @@ on:
 jobs:
   security:
     runs-on: ubuntu-latest
-    
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     
     - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    
+      uses: dtolnay/rust-toolchain@stable
+
     - name: Install cargo-audit
       run: cargo install cargo-audit
     
@@ -31,7 +31,12 @@ jobs:
     - name: Run dependency check
       run: cargo tree -d
     
-    - name: CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
       with:
         languages: rust
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:rust"
