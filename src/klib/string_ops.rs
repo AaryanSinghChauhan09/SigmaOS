@@ -1,5 +1,3 @@
-#![no_std]
-
 /// Custom string operations without std
 
 pub fn custom_strlen(s: *const u8) -> usize {

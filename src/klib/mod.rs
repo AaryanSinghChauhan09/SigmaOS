@@ -31,9 +31,6 @@ pub use math::{abs, min, max, clamp, pow, log2, sqrt};
 
 // For other collections, use std when available
 #[cfg(not(target_os = "none"))]
-pub use std::collections::BTreeMap as StdBTreeMap;
-
-#[cfg(not(target_os = "none"))]
 pub use std::string::String;
 
 /// Format integer to string without std::fmt

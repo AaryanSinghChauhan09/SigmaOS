@@ -1,5 +1,3 @@
-#![no_std]
-
 /// Custom math operations without std
 
 pub fn custom_sqrt(n: u32) -> u32 {

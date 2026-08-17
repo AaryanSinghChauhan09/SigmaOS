@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// NetBSD & OpenBSD-inspired UVM (Universal Virtual Memory) Subsystem for SigmaOS
 /// Provides machine-independent Anonymous Maps (amap), decoupled Physical Maps (pmap),
 /// and zero-copy Page Loanout mechanisms to prevent memory copying overhead.

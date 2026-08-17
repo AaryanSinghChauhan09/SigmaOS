@@ -1,8 +1,6 @@
 // SigmaOS Custom Arc (Atomic Reference Counting)
 // Reduces dependency on std::sync::Arc
 
-#![no_std]
-
 extern crate alloc;
 use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};

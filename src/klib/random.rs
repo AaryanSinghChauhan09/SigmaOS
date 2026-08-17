@@ -1,7 +1,6 @@
 // Simple random number generator for SigmaOS
 // Reduces dependency on external rand crate
 
-#![no_std]
 extern crate alloc;
 
 use core::cell::Cell;

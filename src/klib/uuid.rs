@@ -1,7 +1,6 @@
 // Simple UUID implementation for SigmaOS
 // Reduces dependency on external uuid crate
 
-#![no_std]
 extern crate alloc;
 
 use alloc::string::String;

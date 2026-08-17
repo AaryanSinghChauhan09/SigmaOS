@@ -1,8 +1,6 @@
 //! SigmaLib - Custom Standard Library (musl/dietlibc Inspiration)
 //! Zero-dependency implementation of standard library functions
 
-#![no_std]
-
 /// String operations (zero-allocation)
 pub mod string {
     /// Calculate string length
