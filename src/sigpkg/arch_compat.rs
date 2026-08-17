@@ -1,27 +1,12 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
-// and implements ALPM hooks, mkinitcpio initramfs builders, and makepkg source pipelines.
+// parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
 #[cfg(not(test))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use std::collections::HashMap;
 
 #[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum VersionConstraint {
-    Any,
-    Exact(Version),
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Dependency {
-    pub name: String,
-    pub version_constraint: VersionConstraint,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u32,
     pub minor: u32,
@@ -33,22 +18,33 @@ impl Version {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
         Self { major, minor, patch }
     }
-
     pub fn parse(s: &str) -> Result<Self, &'static str> {
         let parts: Vec<&str> = s.split('.').collect();
-        if parts.len() >= 3 {
-            let major = parts[0].parse().unwrap_or(1);
-            let minor = parts[1].parse().unwrap_or(0);
-            let patch = parts[2].parse().unwrap_or(0);
-            Ok(Version { major, minor, patch })
-        } else {
-            Ok(Version { major: 1, minor: 0, patch: 0 })
+        if parts.len() < 2 {
+            return Err("Invalid version string");
         }
+        let major = parts[0].parse().unwrap_or(1);
+        let minor = parts[1].parse().unwrap_or(0);
+        let patch = if parts.len() > 2 { parts[2].parse().unwrap_or(0) } else { 0 };
+        Ok(Self { major, minor, patch })
     }
 }
 
 #[cfg(test)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum VersionConstraint {
+    Any,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Dependency {
+    pub name: String,
+    pub version_constraint: VersionConstraint,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
     pub version: Version,
@@ -59,22 +55,12 @@ pub struct Package {
 
 #[cfg(test)]
 impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+        Self { name, version, description, dependencies, checksum }
     }
 }
+
+use std::collections::HashMap;
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
@@ -166,7 +152,7 @@ impl RollingSyncManager {
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
-            if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
+            if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
                 if remote_ver > installed_ver {
                     updates.push((pkg_name.clone(), *installed_ver, *remote_ver));
                 }
@@ -236,117 +222,7 @@ impl PacmanDbAdapter {
     }
 }
 
-/// Gentoo-style compile-time USE flag toggle configuration
-#[derive(Debug, Clone)]
-pub struct GentooUseFlag {
-    pub name: String,
-    pub is_enabled: bool,
-}
-
-/// Gentoo-style declarative ebuild package build recipe descriptor
-#[derive(Debug, Clone)]
-pub struct GentooEbuildPackage {
-    pub name: String,
-    pub version: Version,
-    pub use_flags: Vec<GentooUseFlag>,
-    pub configure_flags: Vec<String>,
-}
-
-/// Gentoo Portage-style source-build package compiler & optimizer engine
-pub struct PortageEbuildCompiler {
-    pub global_use_flags: HashMap<String, bool>,
-}
-
-impl PortageEbuildCompiler {
-    pub fn new() -> Self {
-        Self {
-            global_use_flags: HashMap::new(),
-        }
-    }
-
-    pub fn set_global_use_flag(&mut self, name: &str, enabled: bool) {
-        self.global_use_flags.insert(name.to_string(), enabled);
-    }
-
-    /// Evaluates if custom USE flags match global feature policies, and dynamically generates
-    /// the optimized compiler `./configure` target strings.
-    pub fn configure_and_compile(&self, ebuild: &mut GentooEbuildPackage) -> Result<Package, &'static str> {
-        let mut active_features = Vec::new();
-
-        for flag in &mut ebuild.use_flags {
-            if let Some(&global_state) = self.global_use_flags.get(&flag.name) {
-                flag.is_enabled = global_state;
-            }
-            if flag.is_enabled {
-                active_features.push(flag.name.clone());
-            }
-        }
-
-        for feature in &active_features {
-            let config_arg = format!("--enable-{}", feature);
-            if !ebuild.configure_flags.contains(&config_arg) {
-                ebuild.configure_flags.push(config_arg);
-            }
-        }
-
-        let description = format!(
-            "Compiled Gentoo ebuild package: {} with active features: {:?}",
-            ebuild.name, active_features
-        );
-
-        Ok(Package::new(
-            ebuild.name.clone(),
-            ebuild.version.clone(),
-            description,
-            Vec::new(),
-            "sha256_portage_compiled_source_binary".to_string(),
-        ))
-    }
-
-    /// Portage-style compiler native CPU microarchitecture optimization target level generator
-    pub fn get_optimized_target_cpu_level(&self, cpu_features: &[&str]) -> usize {
-        let mut level = 1;
-        if cpu_features.contains(&"sse4.2") {
-            level = 2;
-        }
-        if cpu_features.contains(&"avx2") {
-            level = 3;
-        }
-        if cpu_features.contains(&"avx512f") {
-            level = 4;
-        }
-        level
-    }
-}
-
-impl Default for PortageEbuildCompiler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Represents a Debian-style source package targeting sbuild compiler rules
-#[derive(Debug, Clone)]
-pub struct DebianSbuildPackage {
-    pub name: String,
-    pub version: Version,
-    pub build_depends: Vec<String>,
-}
-
-impl RollingSyncManager {
-    pub fn is_debian_sbuild_builddeps_satisfied(&self, package: &DebianSbuildPackage) -> bool {
-        for dep in &package.build_depends {
-            if !self.installed_packages.contains_key(dep) {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-// ==========================================
-// 6. ALPM (Arch Linux Package Management) Hooks Engine
-// ==========================================
+// --- ALPM Hooks Manager ---
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HookWhen {
@@ -358,10 +234,11 @@ pub enum HookWhen {
 pub struct AlpmHook {
     pub name: String,
     pub when: HookWhen,
-    pub target_packages: Vec<String>, // e.g. ["glibc", "*"]
-    pub exec_command: String,
+    pub target_pattern: String,
+    pub exec_cmd: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct AlpmHookManager {
     pub hooks: Vec<AlpmHook>,
 }
@@ -371,26 +248,53 @@ impl AlpmHookManager {
         Self { hooks: Vec::new() }
     }
 
-    pub fn register_hook(&mut self, hook: AlpmHook) {
+    pub fn add_hook(&mut self, hook: AlpmHook) {
         self.hooks.push(hook);
     }
 
-    /// Executes matching ALPM hooks for an install/upgrade event
-    pub fn trigger_hooks(&self, when: HookWhen, modified_packages: &[&str]) -> Vec<String> {
-        let mut executed = Vec::new();
+    pub fn parse_hook_file(&mut self, name: &str, content: &str) -> Result<(), &'static str> {
+        let mut when = HookWhen::PostTransaction;
+        let mut target_pattern = String::new();
+        let mut exec_cmd = String::new();
 
+        for line in content.lines() {
+            let line = line.trim();
+            if line.contains("When = PreTransaction") {
+                when = HookWhen::PreTransaction;
+            } else if line.contains("When = PostTransaction") {
+                when = HookWhen::PostTransaction;
+            } else if line.starts_with("Target =") {
+                target_pattern = line.strip_prefix("Target =").unwrap().trim().to_string();
+            } else if line.starts_with("Exec =") {
+                exec_cmd = line.strip_prefix("Exec =").unwrap().trim().to_string();
+            }
+        }
+
+        if exec_cmd.is_empty() {
+            return Err("Invalid ALPM hook file: missing Exec directive");
+        }
+
+        self.add_hook(AlpmHook {
+            name: name.to_string(),
+            when,
+            target_pattern,
+            exec_cmd,
+        });
+
+        Ok(())
+    }
+
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> Vec<String> {
+        let mut triggered_cmds = Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
-                let matches = hook.target_packages.iter().any(|target| {
-                    target == "*" || modified_packages.contains(&target.as_str())
-                });
-
-                if matches {
-                    executed.push(hook.exec_command.clone());
+                let pattern = hook.target_pattern.trim_end_matches('*');
+                if hook.target_pattern.is_empty() || changed_file.contains(pattern) {
+                    triggered_cmds.push(hook.exec_cmd.clone());
                 }
             }
         }
-        executed
+        triggered_cmds
     }
 }
 
@@ -400,12 +304,12 @@ impl Default for AlpmHookManager {
     }
 }
 
-// ==========================================
-// 7. Mkinitcpio Initramfs Image Builder
-// ==========================================
+// --- mkinitcpio Generator ---
 
+#[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub hooks: Vec<String>, // e.g. ["base", "udev", "block", "filesystems"]
+    pub hooks: Vec<String>,
+    pub compression: String,
 }
 
 impl MkinitcpioBuilder {
@@ -414,20 +318,31 @@ impl MkinitcpioBuilder {
             hooks: vec![
                 "base".to_string(),
                 "udev".to_string(),
+                "autodetect".to_string(),
+                "modconf".to_string(),
                 "block".to_string(),
                 "filesystems".to_string(),
             ],
+            compression: "zstd".to_string(),
         }
     }
 
-    pub fn build_initramfs(&self, kernel_ver: &str) -> Result<String, &'static str> {
-        if self.hooks.is_empty() {
-            return Err("Cannot build initramfs without hooks configured");
+    pub fn add_hook(&mut self, hook_name: &str) {
+        if !self.hooks.contains(&hook_name.to_string()) {
+            self.hooks.push(hook_name.to_string());
         }
-        Ok(format!(
-            "/boot/initramfs-{}.img [hooks: {:?}]",
-            kernel_ver, self.hooks
-        ))
+    }
+
+    pub fn build_initramfs_image(&self, kernel_version: &str) -> Vec<u8> {
+        let mut image_header = format!(
+            "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
+            kernel_version, self.hooks, self.compression
+        )
+        .into_bytes();
+
+        // Synthetic initramfs byte sequence
+        image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
+        image_header
     }
 }
 
@@ -437,291 +352,56 @@ impl Default for MkinitcpioBuilder {
     }
 }
 
-// ==========================================
-// 8. Makepkg Source Build Pipeline Engine
-// ==========================================
-
-pub struct MakepkgBuilder;
-
-impl MakepkgBuilder {
-    pub fn new() -> Self {
-        Self
-    }
-
-    /// Validates SHA256 checksums of downloaded sources and builds a `.pkg.tar.zst` binary package
-    pub fn build_package_from_source(
-        &self,
-        pkgname: &str,
-        pkgver: &str,
-        sources: &[(&str, &str)], // (filename, expected_sha256)
-        simulated_file_hashes: &HashMap<String, String>,
-    ) -> Result<String, &'static str> {
-        for (file, expected_hash) in sources {
-            let actual_hash = simulated_file_hashes
-                .get(*file)
-                .ok_or("Source file missing")?;
-            if actual_hash != expected_hash {
-                return Err("SHA256 checksum verification failed");
-            }
-        }
-
-        Ok(format!("{}-{}-1-x86_64.pkg.tar.zst", pkgname, pkgver))
-    }
-}
-
-impl Default for MakepkgBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 9. Pacman Transaction Database Lock Manager
-// ==========================================
-
-pub struct PacmanLockManager {
-    pub lock_file_path: String,
-    pub is_locked: bool,
-    pub holder_pid: Option<u32>,
-}
-
-impl PacmanLockManager {
-    pub fn new(path: &str) -> Self {
-        Self {
-            lock_file_path: path.to_string(),
-            is_locked: false,
-            holder_pid: None,
-        }
-    }
-
-    /// Acquires transaction database lock (/var/lib/pacman/db.lck)
-    pub fn acquire_lock(&mut self, pid: u32) -> Result<(), &'static str> {
-        if self.is_locked {
-            return Err("Pacman database is locked by another process (db.lck exists)");
-        }
-        self.is_locked = true;
-        self.holder_pid = Some(pid);
-        Ok(())
-    }
-
-    /// Releases transaction database lock
-    pub fn release_lock(&mut self, pid: u32) -> Result<(), &'static str> {
-        if !self.is_locked {
-            return Ok(());
-        }
-        if self.holder_pid != Some(pid) {
-            return Err("Cannot release lock held by another PID");
-        }
-        self.is_locked = false;
-        self.holder_pid = None;
-        Ok(())
-    }
-
-    /// Forcefully breaks stale lock if process holding lock no longer exists
-    pub fn force_unlock_stale(&mut self) {
-        self.is_locked = false;
-        self.holder_pid = None;
-    }
-}
-
-impl Default for PacmanLockManager {
-    fn default() -> Self {
-        Self::new("/var/lib/pacman/db.lck")
-    }
-}
-
-// ==========================================
-// 10. Parallel Download Engine (ParallelDownloads = N)
-// ==========================================
-
-pub struct ParallelDownloadEngine {
-    pub max_concurrent_streams: usize,
-}
-
-impl ParallelDownloadEngine {
-    pub fn new(max_concurrent_streams: usize) -> Self {
-        Self {
-            max_concurrent_streams: max_concurrent_streams.max(1),
-        }
-    }
-
-    /// Simulates concurrent downloading of multiple package targets across mirror pools
-    pub fn download_packages_parallel(&self, packages: &[&str]) -> Vec<(String, bool, usize)> {
-        let mut results = Vec::new();
-        for (i, pkg) in packages.iter().enumerate() {
-            let stream_id = i % self.max_concurrent_streams;
-            results.push((pkg.to_string(), true, stream_id));
-        }
-        results
-    }
-}
-
-impl Default for ParallelDownloadEngine {
-    fn default() -> Self {
-        Self::new(5)
-    }
-}
-
-// ==========================================
-// 11. Reflector Mirror Sorting & Rating Engine
-// ==========================================
+// --- makepkg Package Builder ---
 
 #[derive(Debug, Clone)]
-pub struct ArchMirror {
-    pub url: String,
-    pub country: String,
-    pub latency_ms: u32,
-    pub completion_rate: f32,
-    pub is_https: bool,
+pub struct MakepkgBuilder {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub arch: String,
+    pub expected_sha256: String,
 }
 
-pub struct ReflectorEngine {
-    pub mirrors: Vec<ArchMirror>,
-}
-
-impl ReflectorEngine {
-    pub fn new() -> Self {
-        Self { mirrors: Vec::new() }
-    }
-
-    pub fn add_mirror(&mut self, mirror: ArchMirror) {
-        self.mirrors.push(mirror);
-    }
-
-    /// Filters and ranks top Arch mirrors by latency, HTTPS protocol, and completion rate
-    pub fn get_ranked_mirrorlist(
-        &self,
-        require_https: bool,
-        top_n: usize,
-    ) -> Vec<ArchMirror> {
-        let mut filtered: Vec<ArchMirror> = self
-            .mirrors
-            .iter()
-            .filter(|m| !require_https || m.is_https)
-            .cloned()
-            .collect();
-
-        filtered.sort_by(|a, b| {
-            a.latency_ms
-                .cmp(&b.latency_ms)
-                .then_with(|| b.completion_rate.partial_cmp(&a.completion_rate).unwrap_or(core::cmp::Ordering::Equal))
-        });
-
-        filtered.into_iter().take(top_n).collect()
-    }
-}
-
-impl Default for ReflectorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 12. Archiso Boot & Live SquashFS RAM Engine
-// ==========================================
-
-pub struct ArchisoBootEngine {
-    pub archisobasedir: String,
-    pub archisolabel: String,
-    pub copytoram: bool,
-}
-
-impl ArchisoBootEngine {
-    pub fn new(basedir: &str, label: &str) -> Self {
+impl MakepkgBuilder {
+    pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
         Self {
-            archisobasedir: basedir.to_string(),
-            archisolabel: label.to_string(),
-            copytoram: false,
+            pkgname: pkgname.to_string(),
+            pkgver: pkgver.to_string(),
+            arch: arch.to_string(),
+            expected_sha256: expected_sha256.to_string(),
         }
     }
 
-    /// Parses Arch kernel cmdline boot parameters
-    pub fn parse_cmdline(&mut self, cmdline: &str) {
-        for arg in cmdline.split_whitespace() {
-            if arg == "copytoram" {
-                self.copytoram = true;
-            } else if arg.starts_with("archisobasedir=") {
-                self.archisobasedir = arg["archisobasedir=".len()..].to_string();
-            } else if arg.starts_with("archisolabel=") {
-                self.archisolabel = arg["archisolabel=".len()..].to_string();
-            }
+    pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
+        // Calculate mock SHA256 string
+        let mut checksum = 0u64;
+        for &b in source_data {
+            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
         }
+        let computed = format!("{:016x}", checksum);
+        computed == self.expected_sha256 || self.expected_sha256 == "SKIP"
     }
 
-    /// Simulates mounting the SquashFS Live ISO filesystem into RAM OverlayFS
-    pub fn mount_live_overlay(&self) -> Result<String, &'static str> {
-        if self.archisobasedir.is_empty() || self.archisolabel.is_empty() {
-            return Err("Missing mandatory archisobasedir or archisolabel parameter");
+    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(String, Vec<u8>), &'static str> {
+        if !self.verify_source_integrity(source_data) {
+            return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
-        let ram_status = if self.copytoram { "RAM Copy Active" } else { "Direct Mount" };
-        Ok(format!(
-            "Mounted ArchISO [{}/{}] - Status: {}",
-            self.archisolabel, self.archisobasedir, ram_status
-        ))
-    }
-}
 
-impl Default for ArchisoBootEngine {
-    fn default() -> Self {
-        Self::new("arch", "ARCH_202603")
+        let archive_name = format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch);
+        let mut archive_content = format!(
+            "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
+            self.pkgname, self.pkgver, self.arch
+        )
+        .into_bytes();
+
+        archive_content.extend_from_slice(source_data);
+        Ok((archive_name, archive_content))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_debian_sbuild_package_builddeps() {
-        let mut sync = RollingSyncManager::new();
-        sync.register_installed("gcc", Version::new(12, 2, 0));
-        sync.register_installed("make", Version::new(4, 3, 0));
-
-        let source_pkg = DebianSbuildPackage {
-            name: "coreutils".to_string(),
-            version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string()],
-        };
-
-        assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
-
-        let source_pkg_missing = DebianSbuildPackage {
-            name: "coreutils".to_string(),
-            version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
-        };
-        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
-    }
-
-    #[test]
-    fn test_gentoo_portage_compiler() {
-        let mut compiler = PortageEbuildCompiler::new();
-        compiler.set_global_use_flag("vulkan", true);
-        compiler.set_global_use_flag("x11", false);
-
-        let mut ebuild = GentooEbuildPackage {
-            name: "mpv-player".to_string(),
-            version: Version::new(0, 35, 0),
-            use_flags: vec![
-                GentooUseFlag { name: "vulkan".to_string(), is_enabled: false },
-                GentooUseFlag { name: "x11".to_string(), is_enabled: true },
-            ],
-            configure_flags: Vec::new(),
-        };
-
-        let pkg = compiler.configure_and_compile(&mut ebuild).unwrap();
-        assert_eq!(pkg.name, "mpv-player");
-        assert!(pkg.description.contains("vulkan"));
-        assert!(!pkg.description.contains("x11"));
-
-        assert!(ebuild.configure_flags.contains(&"--enable-vulkan".to_string()));
-        assert!(!ebuild.configure_flags.contains(&"--enable-x11".to_string()));
-
-        assert_eq!(compiler.get_optimized_target_cpu_level(&["sse4.2", "avx2"]), 3);
-        assert_eq!(compiler.get_optimized_target_cpu_level(&["avx512f", "avx2"]), 4);
-        assert_eq!(compiler.get_optimized_target_cpu_level(&[]), 1);
-    }
 
     #[test]
     fn test_aur_pkgbuild_compiler() {
@@ -745,8 +425,9 @@ mod tests {
         sync.register_installed("bash", Version::new(5, 1, 0));
         sync.register_installed("curl", Version::new(7, 85, 0));
 
-        sync.register_remote("bash", Version::new(5, 2, 0));
-        sync.register_remote("curl", Version::new(7, 85, 0));
+        // Remotes (Rolling upgrades)
+        sync.register_remote("bash", Version::new(5, 2, 0)); // Newer version
+        sync.register_remote("curl", Version::new(7, 85, 0)); // Equal version
 
         let pending = sync.list_pending_rolling_updates();
         assert_eq!(pending.len(), 1);
@@ -779,126 +460,44 @@ mod tests {
     }
 
     #[test]
-    fn test_alpm_hooks() {
+    fn test_alpm_hook_triggering() {
         let mut manager = AlpmHookManager::new();
+        let hook_str = r#"
+            [Trigger]
+            Operation = Install
+            Operation = Upgrade
+            Type = Path
+            Target = usr/bin/*
+            When = PostTransaction
+            Exec = /usr/bin/mkinitcpio -p linux
+        "#;
 
-        manager.register_hook(AlpmHook {
-            name: "update-fonts".to_string(),
-            when: HookWhen::PostTransaction,
-            target_packages: vec!["fontconfig".to_string()],
-            exec_command: "fc-cache -s".to_string(),
-        });
-
-        // Trigger post-transaction hooks when fontconfig is updated
-        let executed = manager.trigger_hooks(HookWhen::PostTransaction, &["fontconfig"]);
-        assert_eq!(executed.len(), 1);
-        assert_eq!(executed[0], "fc-cache -s");
-
-        // Trigger when unrelated package is updated -> 0 hooks executed
-        let executed_none = manager.trigger_hooks(HookWhen::PostTransaction, &["bash"]);
-        assert_eq!(executed_none.len(), 0);
+        assert!(manager.parse_hook_file("90-mkinitcpio.hook", hook_str).is_ok());
+        let triggered = manager.trigger_hooks(HookWhen::PostTransaction, "usr/bin/bash");
+        assert_eq!(triggered.len(), 1);
+        assert_eq!(triggered[0], "/usr/bin/mkinitcpio -p linux");
     }
 
     #[test]
     fn test_mkinitcpio_builder() {
-        let builder = MkinitcpioBuilder::new();
-        let initramfs = builder.build_initramfs("6.1.0-arch1").unwrap();
-        assert!(initramfs.contains("/boot/initramfs-6.1.0-arch1.img"));
+        let mut builder = MkinitcpioBuilder::new();
+        builder.add_hook("encrypt");
+        builder.add_hook("lvm2");
+
+        let img = builder.build_initramfs_image("6.5.0-arch1-1");
+        let header_str = String::from_utf8_lossy(&img);
+        assert!(header_str.contains("6.5.0-arch1-1"));
+        assert!(header_str.contains("encrypt"));
+        assert!(header_str.contains("lvm2"));
     }
 
     #[test]
-    fn test_makepkg_pipeline() {
-        let builder = MakepkgBuilder::new();
-        let mut hashes = HashMap::new();
-        hashes.insert("v1.0.tar.gz".to_string(), "abc123hash".to_string());
+    fn test_makepkg_builder() {
+        let builder = MakepkgBuilder::new("ripgrep", "13.0.0", "x86_64", "SKIP");
+        let source_bytes = b"cargo build --release";
 
-        let sources = [("v1.0.tar.gz", "abc123hash")];
-        let pkg_file = builder
-            .build_package_from_source("htop", "3.2.0", &sources, &hashes)
-            .unwrap();
-        assert_eq!(pkg_file, "htop-3.2.0-1-x86_64.pkg.tar.zst");
-    }
-
-    #[test]
-    fn test_pacman_lock_manager() {
-        let mut lock_mgr = PacmanLockManager::default();
-        assert!(!lock_mgr.is_locked);
-
-        // Acquire lock
-        assert!(lock_mgr.acquire_lock(1001).is_ok());
-        assert!(lock_mgr.is_locked);
-
-        // Attempting to acquire again fails
-        assert!(lock_mgr.acquire_lock(1002).is_err());
-
-        // Releasing from different PID fails
-        assert!(lock_mgr.release_lock(1002).is_err());
-
-        // Releasing from holding PID succeeds
-        assert!(lock_mgr.release_lock(1001).is_ok());
-        assert!(!lock_mgr.is_locked);
-
-        // Force unlock stale lock
-        lock_mgr.acquire_lock(2000).unwrap();
-        lock_mgr.force_unlock_stale();
-        assert!(!lock_mgr.is_locked);
-    }
-
-    #[test]
-    fn test_parallel_download_engine() {
-        let engine = ParallelDownloadEngine::new(3);
-        let packages = vec!["linux", "glibc", "systemd", "pacman", "gcc"];
-        let downloads = engine.download_packages_parallel(&packages);
-
-        assert_eq!(downloads.len(), 5);
-        assert_eq!(downloads[0].0, "linux");
-        assert_eq!(downloads[0].2, 0); // stream 0
-        assert_eq!(downloads[3].2, 0); // stream 0 (3 % 3)
-        assert_eq!(downloads[4].2, 1); // stream 1 (4 % 3)
-    }
-
-    #[test]
-    fn test_reflector_mirror_engine() {
-        let mut reflector = ReflectorEngine::new();
-        reflector.add_mirror(ArchMirror {
-            url: "http://mirror1.arch.org".to_string(),
-            country: "US".to_string(),
-            latency_ms: 120,
-            completion_rate: 0.99,
-            is_https: false,
-        });
-        reflector.add_mirror(ArchMirror {
-            url: "https://mirror2.arch.org".to_string(),
-            country: "DE".to_string(),
-            latency_ms: 45,
-            completion_rate: 1.0,
-            is_https: true,
-        });
-        reflector.add_mirror(ArchMirror {
-            url: "https://mirror3.arch.org".to_string(),
-            country: "JP".to_string(),
-            latency_ms: 85,
-            completion_rate: 0.98,
-            is_https: true,
-        });
-
-        let ranked_https = reflector.get_ranked_mirrorlist(true, 2);
-        assert_eq!(ranked_https.len(), 2);
-        assert_eq!(ranked_https[0].url, "https://mirror2.arch.org");
-        assert_eq!(ranked_https[1].url, "https://mirror3.arch.org");
-    }
-
-    #[test]
-    fn test_archiso_boot_engine() {
-        let mut engine = ArchisoBootEngine::default();
-        engine.parse_cmdline("archisobasedir=arch_custom archisolabel=SIGMA_LIVE copytoram");
-
-        assert_eq!(engine.archisobasedir, "arch_custom");
-        assert_eq!(engine.archisolabel, "SIGMA_LIVE");
-        assert!(engine.copytoram);
-
-        let status = engine.mount_live_overlay().unwrap();
-        assert!(status.contains("SIGMA_LIVE/arch_custom"));
-        assert!(status.contains("RAM Copy Active"));
+        let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
+        assert_eq!(pkg_file, "ripgrep-13.0.0-x86_64.pkg.tar.zst");
+        assert!(pkg_data.len() > source_bytes.len());
     }
 }

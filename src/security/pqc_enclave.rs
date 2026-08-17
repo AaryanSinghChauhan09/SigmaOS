@@ -18,17 +18,9 @@ pub struct KyberKem {
 
 impl KyberKem {
     pub fn new() -> Self {
-        let mut public_key = [0u8; 32];
-        let mut private_key = [0u8; 32];
-        let pub_ptr = &public_key as *const _ as usize;
-        let priv_ptr = &private_key as *const _ as usize;
-        for i in 0..32 {
-            public_key[i] = ((pub_ptr >> (i % 8)) & 0xFF) as u8 ^ 0xAB;
-            private_key[i] = ((priv_ptr >> (i % 8)) & 0xFF) as u8 ^ 0xCD;
-        }
         KyberKem {
-            public_key,
-            private_key,
+            public_key: [0xAB; 32],
+            private_key: [0xCD; 32],
         }
     }
 
@@ -80,17 +72,9 @@ pub struct DilithiumSignature {
 
 impl DilithiumSignature {
     pub fn new() -> Self {
-        let mut public_key = [0u8; 32];
-        let mut private_key = [0u8; 32];
-        let pub_ptr = &public_key as *const _ as usize;
-        let priv_ptr = &private_key as *const _ as usize;
-        for i in 0..32 {
-            public_key[i] = ((pub_ptr >> (i % 8)) & 0xFF) as u8 ^ 0x11;
-            private_key[i] = ((priv_ptr >> (i % 8)) & 0xFF) as u8 ^ 0x22;
-        }
         DilithiumSignature {
-            public_key,
-            private_key,
+            public_key: [0x11; 32],
+            private_key: [0x22; 32],
         }
     }
 

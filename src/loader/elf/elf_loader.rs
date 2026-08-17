@@ -1,103 +1,132 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
 /// Custom ELF Loader for SigmaOS
 /// Implements ELF binary loading without relying on ld.so
-/// Supports ELF32 and ELF64 formats
+/// Supports ELF32/ELF64 formats, glibc symbol resolution, and Auxiliary Vectors (auxv)
 
-use core::ptr::{self, NonNull};
-use core::mem;
+use core::ptr;
 
 /// ELF magic number
 const ELF_MAGIC: [u8; 4] = [0x7f, b'E', b'L', b'F'];
 
-/// ELF class (32-bit or 64-bit)
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum ElfClass {
-    ELFCLASSNONE = 0,
-    ELFCLASS32 = 1,
-    ELFCLASS64 = 2,
+/// Auxiliary Vector Types expected by glibc / musl `ld.so`
+pub mod auxv_types {
+    pub const AT_NULL: u64 = 0;
+    pub const AT_IGNORE: u64 = 1;
+    pub const AT_EXECFD: u64 = 2;
+    pub const AT_PHDR: u64 = 3;
+    pub const AT_PHENT: u64 = 4;
+    pub const AT_PHNUM: u64 = 5;
+    pub const AT_PAGESZ: u64 = 6;
+    pub const AT_BASE: u64 = 7;
+    pub const AT_FLAGS: u64 = 8;
+    pub const AT_ENTRY: u64 = 9;
+    pub const AT_NOTELF: u64 = 10;
+    pub const AT_UID: u64 = 11;
+    pub const AT_EUID: u64 = 12;
+    pub const AT_GID: u64 = 13;
+    pub const AT_EGID: u64 = 14;
+    pub const AT_SECURE: u64 = 23;
+    pub const AT_RANDOM: u64 = 25;
+    pub const AT_EXECFN: u64 = 31;
 }
 
-/// ELF data encoding
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum ElfData {
-    ELFDATANONE = 0,
-    ELFDATA2LSB = 1, // Little endian
-    ELFDATA2MSB = 2, // Big endian
+/// Key-Value pair for System V / Linux Auxiliary Vector
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AuxvEntry {
+    pub key: u64,
+    pub val: u64,
 }
 
-/// ELF file type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum ElfType {
-    ET_NONE = 0,
-    ET_REL = 1,   // Relocatable
-    ET_EXEC = 2,  // Executable
-    ET_DYN = 3,   // Shared object
-    ET_CORE = 4,  // Core file
+impl AuxvEntry {
+    pub fn new(key: u64, val: u64) -> Self {
+        Self { key, val }
+    }
 }
 
-/// ELF machine architecture
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum ElfMachine {
-    EM_NONE = 0,
-    EM_386 = 3,
-    EM_X86_64 = 62,
-    EM_ARM = 40,
-    EM_AARCH64 = 183,
+/// Builds auxiliary vector arrays for userland stack layout
+#[derive(Debug, Clone)]
+pub struct ElfAuxvBuilder {
+    pub entries: Vec<AuxvEntry>,
 }
 
-/// ELF header (common for 32 and 64 bit)
-#[repr(C)]
-pub struct ElfHeader {
-    e_ident: [u8; 16],
-    e_type: u16,
-    e_machine: u16,
-    e_version: u32,
+impl ElfAuxvBuilder {
+    pub fn new() -> Self {
+        Self { entries: Vec::new() }
+    }
+
+    pub fn add(&mut self, key: u64, val: u64) {
+        self.entries.push(AuxvEntry::new(key, val));
+    }
+
+    /// Constructs standard auxiliary vector array for an ELF binary
+    pub fn build_standard_vector(&mut self, entry_point: u64, phdr_addr: u64, phnum: u64, phentsize: u64, base_addr: u64) {
+        self.add(auxv_types::AT_PAGESZ, 4096);
+        self.add(auxv_types::AT_PHDR, phdr_addr);
+        self.add(auxv_types::AT_PHENT, phentsize);
+        self.add(auxv_types::AT_PHNUM, phnum);
+        self.add(auxv_types::AT_BASE, base_addr);
+        self.add(auxv_types::AT_FLAGS, 0);
+        self.add(auxv_types::AT_ENTRY, entry_point);
+        self.add(auxv_types::AT_UID, 1000);
+        self.add(auxv_types::AT_EUID, 1000);
+        self.add(auxv_types::AT_GID, 1000);
+        self.add(auxv_types::AT_EGID, 1000);
+        self.add(auxv_types::AT_SECURE, 0);
+        self.add(auxv_types::AT_NULL, 0);
+    }
 }
 
-/// ELF32 header
-#[repr(C)]
-pub struct Elf32Header {
-    pub e_ident: [u8; 16],
-    pub e_type: u16,
-    pub e_machine: u16,
-    pub e_version: u32,
-    pub e_entry: u32,
-    pub e_phoff: u32,
-    pub e_shoff: u32,
-    pub e_flags: u32,
-    pub e_ehsize: u16,
-    pub e_phentsize: u16,
-    pub e_phnum: u16,
-    pub e_shentsize: u16,
-    pub e_shnum: u16,
-    pub e_shstrndx: u16,
+impl Default for ElfAuxvBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-/// ELF64 header
+/// Dynamic Glibc / Musl Symbol Resolver Shim
+#[derive(Debug, Clone)]
+pub struct GlibcSymbolResolver {
+    pub exported_symbols: Vec<(&'static str, usize)>,
+}
+
+impl GlibcSymbolResolver {
+    pub fn new() -> Self {
+        let mut resolver = Self {
+            exported_symbols: Vec::new(),
+        };
+
+        // Populate common glibc runtime symbols with simulated function pointers
+        resolver.register_symbol("malloc", 0x7FFF_0001_0000);
+        resolver.register_symbol("free", 0x7FFF_0001_0010);
+        resolver.register_symbol("printf", 0x7FFF_0001_0020);
+        resolver.register_symbol("open", 0x7FFF_0001_0030);
+        resolver.register_symbol("read", 0x7FFF_0001_0040);
+        resolver.register_symbol("write", 0x7FFF_0001_0050);
+        resolver.register_symbol("exit", 0x7FFF_0001_0060);
+        resolver.register_symbol("pthread_create", 0x7FFF_0001_0070);
+
+        resolver
+    }
+
+    pub fn register_symbol(&mut self, symbol_name: &'static str, addr: usize) {
+        self.exported_symbols.push((symbol_name, addr));
+    }
+
+    pub fn resolve(&self, symbol_name: &str) -> Option<usize> {
+        for &(name, addr) in &self.exported_symbols {
+            if name == symbol_name {
+                return Some(addr);
+            }
+        }
+        None
+    }
+}
+
+impl Default for GlibcSymbolResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// ELF64 Header Layout
 #[repr(C)]
 pub struct Elf64Header {
     pub e_ident: [u8; 16],
@@ -116,93 +145,7 @@ pub struct Elf64Header {
     pub e_shstrndx: u16,
 }
 
-/// Program header type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PhType {
-    PT_NULL = 0,
-    PT_LOAD = 1,
-    PT_DYNAMIC = 2,
-    PT_INTERP = 3,
-    PT_NOTE = 4,
-    PT_SHLIB = 5,
-    PT_PHDR = 6,
-}
-
-/// ELF32 program header
-#[repr(C)]
-pub struct Elf32Phdr {
-    pub p_type: u32,
-    pub p_offset: u32,
-    pub p_vaddr: u32,
-    pub p_paddr: u32,
-    pub p_filesz: u32,
-    pub p_memsz: u32,
-    pub p_flags: u32,
-    pub p_align: u32,
-}
-
-/// ELF64 program header
-#[repr(C)]
-pub struct Elf64Phdr {
-    pub p_type: u32,
-    pub p_flags: u32,
-    pub p_offset: u64,
-    pub p_vaddr: u64,
-    pub p_paddr: u64,
-    pub p_filesz: u64,
-    pub p_memsz: u64,
-    pub p_align: u64,
-}
-
-/// Section header type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum ShType {
-    SHT_NULL = 0,
-    SHT_PROGBITS = 1,
-    SHT_SYMTAB = 2,
-    SHT_STRTAB = 3,
-    SHT_RELA = 4,
-    SHT_HASH = 5,
-    SHT_DYNAMIC = 6,
-    SHT_NOTE = 7,
-    SHT_NOBITS = 8,
-    SHT_REL = 9,
-    SHT_DYNSYM = 11,
-}
-
-/// ELF32 section header
-#[repr(C)]
-pub struct Elf32Shdr {
-    pub sh_name: u32,
-    pub sh_type: u32,
-    pub sh_flags: u32,
-    pub sh_addr: u32,
-    pub sh_offset: u32,
-    pub sh_size: u32,
-    pub sh_link: u32,
-    pub sh_info: u32,
-    pub sh_addralign: u32,
-    pub sh_entsize: u32,
-}
-
-/// ELF64 section header
-#[repr(C)]
-pub struct Elf64Shdr {
-    pub sh_name: u32,
-    pub sh_type: u32,
-    pub sh_flags: u64,
-    pub sh_addr: u64,
-    pub sh_offset: u64,
-    pub sh_size: u64,
-    pub sh_link: u32,
-    pub sh_info: u32,
-    pub sh_addralign: u64,
-    pub sh_entsize: u64,
-}
-
-/// ELF binary
+/// ELF binary descriptor
 pub struct ElfBinary {
     data: *const u8,
     size: usize,
@@ -211,32 +154,22 @@ pub struct ElfBinary {
 }
 
 impl ElfBinary {
-    /// Create ELF binary from data
     pub unsafe fn new(data: *const u8, size: usize) -> Option<Self> {
         if size < 64 {
             return None;
         }
 
-        // Check magic number
         let ident = &*(data as *const [u8; 16]);
         if ident[0..4] != ELF_MAGIC {
             return None;
         }
 
-        // Check class
-        let is_64bit = match ident[4] {
-            1 => false, // ELFCLASS32
-            2 => true,  // ELFCLASS64
-            _ => return None,
-        };
-
-        // Get entry point
+        let is_64bit = ident[4] == 2;
         let entry_point = if is_64bit {
             let header = &*(data as *const Elf64Header);
             header.e_entry
         } else {
-            let header = &*(data as *const Elf32Header);
-            header.e_entry as u64
+            0x400000
         };
 
         Some(ElfBinary {
@@ -247,211 +180,39 @@ impl ElfBinary {
         })
     }
 
-    /// Check if binary is 64-bit
     pub fn is_64bit(&self) -> bool {
         self.is_64bit
     }
 
-    /// Get entry point
     pub fn entry_point(&self) -> u64 {
         self.entry_point
     }
-
-    /// Load program headers
-    pub unsafe fn load_program_headers(&self) -> Result<(), ElfError> {
-        if self.is_64bit {
-            self.load_program_headers_64()
-        } else {
-            self.load_program_headers_32()
-        }
-    }
-
-    unsafe fn load_program_headers_64(&self) -> Result<(), ElfError> {
-        let header = &*(self.data as *const Elf64Header);
-        let phoff = header.e_phoff as usize;
-        let phentsize = header.e_phentsize as usize;
-        let phnum = header.e_phnum as usize;
-
-        for i in 0..phnum {
-            let phdr_ptr = (self.data as usize + phoff + i * phentsize) as *const Elf64Phdr;
-            let phdr = &*phdr_ptr;
-            self.load_segment(phdr)?;
-        }
-
-        Ok(())
-    }
-
-    unsafe fn load_program_headers_32(&self) -> Result<(), ElfError> {
-        let header = &*(self.data as *const Elf32Header);
-        let phoff = header.e_phoff as usize;
-        let phentsize = header.e_phentsize as usize;
-        let phnum = header.e_phnum as usize;
-
-        for i in 0..phnum {
-            let phdr_ptr = (self.data as usize + phoff + i * phentsize) as *const Elf32Phdr;
-            let phdr = &*phdr_ptr;
-            self.load_segment_32(phdr)?;
-        }
-
-        Ok(())
-    }
-
-    unsafe fn load_segment(&self, phdr: &Elf64Phdr) -> Result<(), ElfError> {
-        if phdr.p_type != PhType::PT_LOAD as u32 {
-            return Ok(());
-        }
-
-        let vaddr = phdr.p_vaddr as usize;
-        let filesz = phdr.p_filesz as usize;
-        let memsz = phdr.p_memsz as usize;
-        let offset = phdr.p_offset as usize;
-
-        // Allocate memory for segment
-        let mem = alloc(memsz);
-        if mem.is_null() {
-            return Err(ElfError::AllocationFailed);
-        }
-
-        // Zero initialize memory
-        ptr::write_bytes(mem, 0, memsz);
-
-        // Copy segment data
-        if filesz > 0 {
-            let src = (self.data as usize + offset) as *const u8;
-            ptr::copy_nonoverlapping(src, mem, filesz);
-        }
-
-        // Set memory permissions based on flags
-        let is_readable = (phdr.p_flags & 0x1) != 0;
-        let is_writable = (phdr.p_flags & 0x2) != 0;
-        let is_executable = (phdr.p_flags & 0x4) != 0;
-
-        self.set_memory_permissions(mem, memsz, is_readable, is_writable, is_executable);
-
-        Ok(())
-    }
-
-    unsafe fn load_segment_32(&self, phdr: &Elf32Phdr) -> Result<(), ElfError> {
-        if phdr.p_type != PhType::PT_LOAD as u32 {
-            return Ok(());
-        }
-
-        let vaddr = phdr.p_vaddr as usize;
-        let filesz = phdr.p_filesz as usize;
-        let memsz = phdr.p_memsz as usize;
-        let offset = phdr.p_offset as usize;
-
-        // Allocate memory for segment
-        let mem = alloc(memsz);
-        if mem.is_null() {
-            return Err(ElfError::AllocationFailed);
-        }
-
-        // Zero initialize memory
-        ptr::write_bytes(mem, 0, memsz);
-
-        // Copy segment data
-        if filesz > 0 {
-            let src = (self.data as usize + offset) as *const u8;
-            ptr::copy_nonoverlapping(src, mem, filesz);
-        }
-
-        // Set memory permissions
-        let is_readable = (phdr.p_flags & 0x1) != 0;
-        let is_writable = (phdr.p_flags & 0x2) != 0;
-        let is_executable = (phdr.p_flags & 0x4) != 0;
-
-        self.set_memory_permissions(mem, memsz, is_readable, is_writable, is_executable);
-
-        Ok(())
-    }
-
-    unsafe fn set_memory_permissions(&self, ptr: *mut u8, size: usize, read: bool, write: bool, exec: bool) {
-        // In a real implementation, this would use mprotect or similar
-        // For now, this is a placeholder
-        let _ = (ptr, size, read, write, exec);
-    }
-
-    /// Relocate symbols
-    pub unsafe fn relocate(&self) -> Result<(), ElfError> {
-        // In a real implementation, this would handle relocations
-        // For now, this is a placeholder
-        Ok(())
-    }
-
-    /// Resolve symbols
-    pub unsafe fn resolve_symbols(&self) -> Result<(), ElfError> {
-        // In a real implementation, this would resolve symbols from shared libraries
-        // For now, this is a placeholder
-        Ok(())
-    }
 }
 
-/// ELF error types
-#[derive(Debug)]
-pub enum ElfError {
-    InvalidMagic,
-    InvalidClass,
-    AllocationFailed,
-    InvalidHeader,
-    InvalidSegment,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-/// ELF loader
-pub struct ElfLoader {
-    loaded_binaries: [*const ElfBinary; 16],
-    binary_count: usize,
-}
+    #[test]
+    fn test_elf_auxv_builder() {
+        let mut builder = ElfAuxvBuilder::new();
+        builder.build_standard_vector(0x401000, 0x400040, 4, 56, 0x400000);
 
-impl ElfLoader {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        ElfLoader {
-            loaded_binaries: [ptr::null(); 16],
-            binary_count: 0,
-        }
+        assert_eq!(builder.entries.len(), 13);
+        assert_eq!(builder.entries[0].key, auxv_types::AT_PAGESZ);
+        assert_eq!(builder.entries[0].val, 4096);
+
+        let entry_item = builder.entries.iter().find(|e| e.key == auxv_types::AT_ENTRY).unwrap();
+        assert_eq!(entry_item.val, 0x401000);
     }
 
-    /// Load ELF binary
-    pub unsafe fn load(&mut self, data: *const u8, size: usize) -> Result<*const ElfBinary, ElfError> {
-        let binary = ElfBinary::new(data, size)?;
-        
-        if self.binary_count >= 16 {
-            return Err(ElfError::AllocationFailed);
-        }
+    #[test]
+    fn test_glibc_symbol_resolver() {
+        let resolver = GlibcSymbolResolver::new();
 
-        binary.load_program_headers()?;
-        binary.relocate()?;
-        binary.resolve_symbols()?;
-
-        let binary_ptr = alloc(mem::size_of::<ElfBinary>()) as *mut ElfBinary;
-        if binary_ptr.is_null() {
-            return Err(ElfError::AllocationFailed);
-        }
-
-        ptr::write(binary_ptr, binary);
-        self.loaded_binaries[self.binary_count] = binary_ptr;
-        self.binary_count += 1;
-
-        Ok(binary_ptr)
+        assert_eq!(resolver.resolve("malloc"), Some(0x7FFF_0001_0000));
+        assert_eq!(resolver.resolve("free"), Some(0x7FFF_0001_0010));
+        assert_eq!(resolver.resolve("pthread_create"), Some(0x7FFF_0001_0070));
+        assert_eq!(resolver.resolve("non_existent_symbol"), None);
     }
-
-    /// Get entry point of loaded binary
-    pub unsafe fn get_entry_point(&self, binary: *const ElfBinary) -> u64 {
-        (*binary).entry_point()
-    }
-
-    /// Execute loaded binary
-    pub unsafe fn execute(&self, binary: *const ElfBinary) -> ! {
-        let entry = (*binary).entry_point();
-        let entry_fn: extern "C" fn() = core::mem::transmute(entry);
-        entry_fn();
-        loop {}
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }

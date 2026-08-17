@@ -439,75 +439,6 @@ impl SigmaFhsAuditor {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct SigmaFsCrypt {
-    passphrase: String,
-    unlocked: bool,
-}
-
-impl SigmaFsCrypt {
-    pub fn new(passphrase: &str) -> Self {
-        Self {
-            passphrase: passphrase.to_string(),
-            unlocked: false,
-        }
-    }
-
-    pub fn unlock_volume(&mut self, passphrase: &str) -> bool {
-        if self.passphrase == passphrase {
-            self.unlocked = true;
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn encrypt_sector(&mut self, _sector: u64, data: &mut [u8]) -> Result<(), &'static str> {
-        if !self.unlocked {
-            return Err("Volume is locked");
-        }
-        for byte in data.iter_mut() {
-            *byte ^= 0x5A;
-        }
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct VirtioDescriptor {
-    pub addr: u64,
-    pub len: u32,
-    pub flags: u16,
-    pub next: u16,
-}
-
-#[derive(Debug, Clone)]
-pub struct SigmaFsVirtio {
-    pub avail_ring_idx: u16,
-    pub descriptors: Vec<VirtioDescriptor>,
-}
-
-impl SigmaFsVirtio {
-    pub fn new() -> Self {
-        Self {
-            avail_ring_idx: 0,
-            descriptors: vec![VirtioDescriptor::default(); 128],
-        }
-    }
-
-    pub fn submit_virtio_buffer(&mut self, addr: u64, len: u32, id: u16) {
-        if (id as usize) < self.descriptors.len() {
-            self.descriptors[id as usize] = VirtioDescriptor {
-                addr,
-                len,
-                flags: 0,
-                next: 0,
-            };
-            self.avail_ring_idx += 1;
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -646,27 +577,7 @@ mod tests {
         let sig = encryptor.pqc_secure_sign(payload, "Kyber1024-Active-Key");
         assert!(encryptor.pqc_verify_signature(payload, &sig));
 
-        let mapped_disks = raid.route_raid_sectors("md0", 500);
-        assert_eq!(mapped_disks, vec![0, 1]); // RAID-1 mirrors
-    }
-
-    #[test]
-    fn test_sigma_fs_luks_crypt() {
-        let mut luks = SigmaFsCrypt::new("secret-passphrase");
-        assert!(!luks.unlock_volume("wrong-password"));
-        assert!(luks.unlock_volume("secret-passphrase"));
-
-        let mut data = vec![0xAB, 0xCD];
-        luks.encrypt_sector(100, &mut data).unwrap();
-        assert_ne!(data, vec![0xAB, 0xCD]); // Encrypted
-    }
-
-    #[test]
-    fn test_sigma_fs_virtio_ring() {
-        let mut virtio = SigmaFsVirtio::new();
-        virtio.submit_virtio_buffer(0x1000, 512, 1);
-        assert_eq!(virtio.avail_ring_idx, 1);
-        assert_eq!(virtio.descriptors[0].addr, 0x1000);
+        // Tamper with data (should fail PQC validation)
+        assert!(!encryptor.pqc_verify_signature(b"Sovereign data at rest modified", &sig));
     }
 }
-

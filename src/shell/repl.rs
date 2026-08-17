@@ -1,16 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
-// Note: std::io used for I/O operations - can be replaced with custom I/O in future
 use std::io::{self, BufRead, Write};
-
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -67,9 +58,9 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Npfctl {
-        subcommand: String,
-        arg: Option<String>,
+    Alias {
+        shorthand: String,
+        statement: String,
     },
     Unknown(String),
 }
@@ -88,6 +79,7 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
+    pub command_history: Vec<String>,
 }
 
 impl ShellRepl {
@@ -110,6 +102,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -123,7 +116,7 @@ impl ShellRepl {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt,
+            prompt: "ubuntu@sigmaos:~$ ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
@@ -132,6 +125,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -158,8 +152,52 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
+    pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
+        let mut suggestions = Vec::new();
+        let commands = [
+            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
+            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+        ];
+        for cmd in &commands {
+            if cmd.starts_with(prefix) {
+                suggestions.push(cmd.to_string());
+            }
+        }
+        suggestions
+    }
+
+    pub fn history_suggest_fish(&self, partial: &str) -> Option<String> {
+        if partial.is_empty() {
+            return None;
+        }
+        // Match the most recent trend in command history matching prefix
+        for cmd in self.command_history.iter().rev() {
+            if cmd.starts_with(partial) {
+                return Some(cmd.clone());
+            }
+        }
+        None
+    }
+
     fn execute_line(&mut self, line: &str) {
-        let command = self.parse_command(line);
+        // Save command history (Fish style)
+        self.command_history.push(line.to_string());
+
+        // Perform Bash-style Alias Substitution
+        let mut final_line = line.to_string();
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if !parts.is_empty() {
+            if let Some(aliased) = self.aliases.get(parts[0]) {
+                let mut statement = aliased.clone();
+                if parts.len() > 1 {
+                    statement.push(' ');
+                    statement.push_str(&parts[1..].join(" "));
+                }
+                final_line = statement;
+            }
+        }
+
+        let command = self.parse_command(&final_line);
         let result = self.execute_command(command);
 
         match result {
@@ -197,31 +235,6 @@ impl ShellRepl {
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "npfctl" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "status".to_string() };
-                let arg = if parts.len() >= 3 { Some(parts[2].to_string()) } else { None };
-                ShellCommand::Npfctl { subcommand, arg }
-            }
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "echo" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Echo {
-                        message: parts[1..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Echo {
-                        message: String::new(),
-                    }
                 }
             }
             "mkdir" => {
@@ -275,6 +288,16 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Get {
                         variable: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "alias" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Alias {
+                        shorthand: parts[1].to_string(),
+                        statement: parts[2..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -443,17 +466,6 @@ impl ShellRepl {
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
             }
-            ShellCommand::Npfctl { subcommand, arg } => {
-                if subcommand == "status" {
-                    Ok("Filtering: ACTIVE\nConfiguration: /etc/npf.conf\nState tracking: Enabled (Conntrack)\nActive connections: 42\nTotal evaluated: 1542".to_string())
-                } else if subcommand == "reload" {
-                    Ok("npfctl: Reloaded /etc/npf.conf successfully. Active rules updated.".to_string())
-                } else if subcommand == "stats" {
-                    Ok("NPF Firewall Statistics:\nPassed: 1420\nBlocked: 122\nStateful matches: 890\nNAT translations: 310".to_string())
-                } else {
-                    Ok(format!("npfctl {}: Executed successfully.", subcommand))
-                }
-            }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -463,6 +475,10 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
+            ShellCommand::Alias { shorthand, statement } => {
+                self.aliases.insert(shorthand.clone(), statement.clone());
+                Ok(format!("Alias defined: {} -> {}", shorthand, statement))
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -507,6 +523,43 @@ mod tests {
         };
         let result = repl.execute_command(command);
         assert_eq!(result.unwrap(), "test");
+    }
+
+    #[test]
+    fn test_bash_alias_substitution() {
+        let mut repl = ShellRepl::new();
+        let alias_cmd = ShellCommand::Alias {
+            shorthand: "ll".to_string(),
+            statement: "ls -la".to_string(),
+        };
+        repl.execute_command(alias_cmd).unwrap();
+        assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
+
+        // Execute line with alias substitution
+        repl.execute_line("ll");
+        assert_eq!(repl.command_history[0], "ll");
+    }
+
+    #[test]
+    fn test_zsh_tab_completion() {
+        let repl = ShellRepl::new();
+        let suggestions = repl.complete_tab("cl");
+        assert_eq!(suggestions, vec!["clear".to_string()]);
+
+        let suggestions_all = repl.complete_tab("pwd");
+        assert_eq!(suggestions_all, vec!["pwd".to_string()]);
+    }
+
+    #[test]
+    fn test_fish_history_suggestions() {
+        let mut repl = ShellRepl::new();
+        repl.execute_line("clear");
+        repl.execute_line("systemctl list");
+
+        let suggestion = repl.history_suggest_fish("sys").unwrap();
+        assert_eq!(suggestion, "systemctl list");
+
+        assert!(repl.history_suggest_fish("invalid").is_none());
     }
 
     #[test]
