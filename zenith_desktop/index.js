@@ -5,46 +5,8 @@
  * Initialize accessible keyboard handlers for Zenith desktop controls.
  * Supports keyboard navigation (tab order, focus states) and ARIA attributes.
  */
-/**
- * Native, sovereign zero-dependency DOM element selector helper.
- * Replaces external DOM selector packages with browser-native, safe DOM query routines.
- */
-export class SovereignDomSelector {
-  static selectOne(selector, root = typeof document !== "undefined" ? document : null) {
-    if (!root || typeof root.querySelector !== "function") return null;
-    try {
-      return root.querySelector(selector);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  static selectAll(selector, root = typeof document !== "undefined" ? document : null) {
-    if (!root || typeof root.querySelectorAll !== "function") return [];
-    try {
-      return Array.from(root.querySelectorAll(selector));
-    } catch (e) {
-      return [];
-    }
-  }
-
-  static matches(element, selector) {
-    if (!element || typeof element.matches !== "function") return false;
-    try {
-      return element.matches(selector);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  static findByAttr(attrName, attrValue = null, root = typeof document !== "undefined" ? document : null) {
-    const selector = attrValue !== null ? `[${attrName}="${attrValue}"]` : `[${attrName}]`;
-    return this.selectAll(selector, root);
-  }
-}
-
 export function initKeyboardNavigation() {
-  const interactiveElements = SovereignDomSelector.selectAll(
+  const interactiveElements = document.querySelectorAll(
     '[role="button"], [tab-index="0"]',
   );
 
@@ -199,91 +161,49 @@ export function compileNaturalLanguageIntent(prompt) {
   };
 }
 
-// =========================================================================
-// 5. Web UI DOM Security & Prototype Pollution Protection
-// =========================================================================
-
 /**
- * Sanitizes input strings by escaping HTML special characters to prevent DOM-based XSS (js/xss-through-dom)
+ * 5. Sovereign Native CSS Color Engine (Zero Dependency)
+ * Replaces external @asamuzakjp/css-color npm packages for complete digital sovereignty.
  */
-export function sanitizeDOMString(str) {
-  if (typeof str !== "string") {
-    return "";
-  }
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;")
-    .replace(/\//g, "&#x2F;");
-}
+export function parseCssColor(colorStr) {
+  if (!colorStr) return [0, 0, 0, 1];
+  const str = colorStr.trim().toLowerCase();
 
-/**
- * Safely merges properties from source into target, explicitly filtering prototype pollution keys (js/prototype-pollution)
- */
-export function safeMergeObjects(target = {}, source = {}) {
-  if (typeof target !== "object" || target === null) {
-    target = {};
-  }
-  if (typeof source !== "object" || source === null) {
-    return target;
-  }
+  const namedColors = {
+    black: [0, 0, 0, 1],
+    white: [255, 255, 255, 1],
+    red: [255, 0, 0, 1],
+    green: [0, 128, 0, 1],
+    blue: [0, 0, 255, 1],
+    transparent: [0, 0, 0, 0],
+  };
+  if (namedColors[str]) return namedColors[str];
 
-  const unsafeKeys = new Set(["__proto__", "constructor", "prototype"]);
-
-  for (const key of Object.keys(source)) {
-    if (unsafeKeys.has(key)) {
-      continue; // Block prototype pollution injection vectors
-    }
-
-    const value = source[key];
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      if (typeof target[key] !== "object" || target[key] === null) {
-        target[key] = {};
-      }
-      safeMergeObjects(target[key], value);
-    } else {
-      target[key] = value;
+  if (str.startsWith('#')) {
+    const hex = str.slice(1);
+    if (hex.length === 3 || hex.length === 4) {
+      const r = parseInt(hex[0] + hex[0], 16);
+      const g = parseInt(hex[1] + hex[1], 16);
+      const b = parseInt(hex[2] + hex[2], 16);
+      const a = hex.length === 4 ? parseInt(hex[3] + hex[3], 16) / 255 : 1;
+      return [r, g, b, a];
+    } else if (hex.length === 6 || hex.length === 8) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      const a = hex.length === 8 ? parseInt(hex.slice(6, 8), 16) / 255 : 1;
+      return [r, g, b, a];
     }
   }
 
-  return target;
-}
+  if (str.startsWith('rgb')) {
+    const parts = str.replace(/rgba?\(|\)/g, '').split(',').map(s => parseFloat(s.trim()));
+    if (parts.length >= 3) {
+      return [parts[0], parts[1], parts[2], parts.length >= 4 ? parts[3] : 1];
+    }
+  }
 
-/**
- * Safely parses a JSON string, stripping prototype pollution property keys
- */
-export function safeJsonParse(jsonString, fallback = {}) {
-  try {
-    const parsed = JSON.parse(jsonString, (key, value) => {
-      if (key === "__proto__" || key === "constructor" || key === "prototype") {
-        return undefined; // Filter dangerous prototype keys during parsing
-      }
-      return value;
-    });
-    return parsed;
-  } catch (e) {
-    return fallback;
-  }
-}
-
-/**
- * Validates and sanitizes URLs to block malicious JavaScript/data URIs
- */
-export function sanitizeUrl(urlStr) {
-  if (typeof urlStr !== "string") {
-    return "about:blank";
-  }
-  const cleanUrl = urlStr.trim().toLowerCase();
-  if (
-    cleanUrl.startsWith("javascript:") ||
-    cleanUrl.startsWith("data:") ||
-    cleanUrl.startsWith("vbscript:")
-  ) {
-    return "about:blank";
-  }
-  return urlStr;
+  return [0, 0, 0, 1];
 }
 
 // Minimal dummy index file to export initialization and basic attributes

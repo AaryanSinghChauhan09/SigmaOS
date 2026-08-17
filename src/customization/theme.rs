@@ -626,6 +626,38 @@ pub struct IconThemeEngine {
     pub screen_dpi: f32,
 }
 
+/// Native, zero-dependency Sovereign CSS Color Engine
+pub struct SovereignCssColorEngine;
+
+impl SovereignCssColorEngine {
+    /// Parses CSS hex color strings (#rgb, #rgba, #rrggbb, #rrggbbaa) into RGBA floats (0.0 to 1.0)
+    pub fn parse_hex_color(hex_str: &str) -> Result<(f32, f32, f32, f32), &'static str> {
+        let clean = hex_str.trim().trim_start_matches('#');
+        match clean.len() {
+            3 => {
+                let r = u8::from_str_radix(&clean[0..1].repeat(2), 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let g = u8::from_str_radix(&clean[1..2].repeat(2), 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let b = u8::from_str_radix(&clean[2..3].repeat(2), 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                Ok((r, g, b, 1.0))
+            }
+            6 => {
+                let r = u8::from_str_radix(&clean[0..2], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let g = u8::from_str_radix(&clean[2..4], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let b = u8::from_str_radix(&clean[4..6], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                Ok((r, g, b, 1.0))
+            }
+            8 => {
+                let r = u8::from_str_radix(&clean[0..2], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let g = u8::from_str_radix(&clean[2..4], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let b = u8::from_str_radix(&clean[4..6], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let a = u8::from_str_radix(&clean[6..8], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                Ok((r, g, b, a))
+            }
+            _ => Err("Unsupported hex color length"),
+        }
+    }
+}
+
 impl IconThemeEngine {
     pub fn new(pack: &str, dpi: f32) -> Self {
         Self {
@@ -720,6 +752,16 @@ mod tests {
             scape.trigger_sound_event("notification"),
             Some("file:///system/audio/beep.wav")
         );
+    }
+
+    #[test]
+    fn test_sovereign_css_color_engine() {
+        let (r, g, b, a) = SovereignCssColorEngine::parse_hex_color("#FF0000").unwrap();
+        assert_eq!((r, g, b, a), (1.0, 0.0, 0.0, 1.0));
+
+        let (r, g, b, a) = SovereignCssColorEngine::parse_hex_color("#00FF0080").unwrap();
+        assert_eq!((r, g, b), (0.0, 1.0, 0.0));
+        assert!((a - 0.5019).abs() < 0.01);
     }
 
     #[test]

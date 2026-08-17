@@ -73,9 +73,7 @@ impl BbrEngine {
             return false;
         }
         // Secure deterministic cookie check based on IP hashing
-        const TFO_HASH_PRIME: u64 = 0x5bd1e995;
-        const TFO_HASH_XOR: u64 = 0x1e35a019;
-        let expected_cookie = (client_ip as u64).wrapping_mul(TFO_HASH_PRIME) ^ TFO_HASH_XOR;
+        let expected_cookie = (client_ip as u64).wrapping_mul(0x5bd1e995) ^ 0x1e35a019;
         cookie == expected_cookie
     }
 }
@@ -101,9 +99,7 @@ mod tests {
     fn test_tcp_fast_open_cookie_verification() {
         let bbr = BbrEngine::new();
         let client_ip = 0x7F000001; // 127.0.0.1
-        const TFO_HASH_PRIME: u64 = 0x5bd1e995;
-        const TFO_HASH_XOR: u64 = 0x1e35a019;
-        let expected_cookie = (client_ip as u64).wrapping_mul(TFO_HASH_PRIME) ^ TFO_HASH_XOR;
+        let expected_cookie = (client_ip as u64).wrapping_mul(0x5bd1e995) ^ 0x1e35a019;
 
         assert!(bbr.verify_tfo_cookie(client_ip, expected_cookie));
         assert!(!bbr.verify_tfo_cookie(client_ip, 0x12345678));
