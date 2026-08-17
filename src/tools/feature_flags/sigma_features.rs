@@ -1,15 +1,20 @@
-// SigmaOS Feature Flags System
-// Inspired by Gentoo Portage USE flags
-// Fine-grained control over package compilation and system configuration
+// SPDX-License-Identifier: MIT
+// SigmaOS Feature Flags Subsystem
+// Inspired by Gentoo Portage USE flags, OpenBSD pledge/unveil, and FreeBSD Capsicum rights
+// Fine-grained control over package compilation, system configuration, and kernel sandboxing
 
 #![no_std]
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
-/// Feature flag definition
+/// Feature flag definition for raw memory serialization
 #[repr(C)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct FeatureFlag {
     pub name: [u8; 64],
     pub description: [u8; 256],
@@ -35,19 +40,19 @@ impl FeatureFlag {
     /// Create a new feature flag with given parameters
     pub fn new(name: &str, description: &str, enabled: bool, global: bool) -> Self {
         let mut flag = Self::empty();
-        
+
         // Copy name (truncated if too long)
         let name_bytes = name.as_bytes();
         for (i, &byte) in name_bytes.iter().enumerate().take(64) {
             flag.name[i] = byte;
         }
-        
+
         // Copy description (truncated if too long)
         let desc_bytes = description.as_bytes();
         for (i, &byte) in desc_bytes.iter().enumerate().take(256) {
             flag.description[i] = byte;
         }
-        
+
         flag.enabled = enabled;
         flag.global = global;
         flag
@@ -82,7 +87,7 @@ static mut FEATURE_FLAGS: [FeatureFlag; MAX_FEATURE_FLAGS] = [FeatureFlag::empty
 static mut FLAG_COUNT: usize = 0;
 
 /// Feature flag configuration entry
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FeatureFlagConfig {
     pub name: String,
     pub enabled: bool,
@@ -90,19 +95,20 @@ pub struct FeatureFlagConfig {
     pub global: bool,
 }
 
-/// Feature flag profile
-#[derive(Debug, Clone)]
+/// Feature flag profile (Gentoo-inspired profile defaults)
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FeatureProfile {
     pub name: String,
     pub description: String,
     pub flags: Vec<String>,
 }
 
-/// Feature flag resolver for dependency resolution
+/// Feature flag resolver for dependency resolution and Portage-style USE flags
 pub struct FeatureFlagResolver {
     pub flags: BTreeMap<String, FeatureFlagConfig>,
     pub profiles: BTreeMap<String, FeatureProfile>,
     pub active_profile: Option<String>,
+    pub masked_flags: Vec<String>, // Explicitly negative USE flags (-flag)
 }
 
 impl FeatureFlagResolver {
@@ -112,6 +118,7 @@ impl FeatureFlagResolver {
             flags: BTreeMap::new(),
             profiles: BTreeMap::new(),
             active_profile: None,
+            masked_flags: Vec::new(),
         }
     }
 
@@ -134,7 +141,30 @@ impl FeatureFlagResolver {
         Ok(())
     }
 
-    /// Resolve feature flags with dependencies
+    /// Apply Portage-style USE flags (e.g., "+wayland", "-x11")
+    pub fn apply_use_flag(&mut self, flag_expr: &str) -> Result<(), String> {
+        if let Some(stripped) = flag_expr.strip_prefix('-') {
+            if !self.masked_flags.contains(&stripped.to_string()) {
+                self.masked_flags.push(stripped.to_string());
+            }
+            if let Some(config) = self.flags.get_mut(stripped) {
+                config.enabled = false;
+            }
+            Ok(())
+        } else {
+            let clean_flag = flag_expr.strip_prefix('+').unwrap_or(flag_expr);
+            // Unmask if previously masked
+            self.masked_flags.retain(|f| f != clean_flag);
+            if let Some(config) = self.flags.get_mut(clean_flag) {
+                config.enabled = true;
+                Ok(())
+            } else {
+                Err(format!("Feature flag {} not registered", clean_flag))
+            }
+        }
+    }
+
+    /// Resolve feature flags with dependencies and masks
     pub fn resolve(&self) -> Result<Vec<String>, String> {
         let mut enabled_flags = Vec::new();
         let mut visited = BTreeMap::new();
@@ -143,14 +173,20 @@ impl FeatureFlagResolver {
         if let Some(profile_name) = &self.active_profile {
             if let Some(profile) = self.profiles.get(profile_name) {
                 for flag_name in &profile.flags {
-                    self.resolve_flag(flag_name, &mut enabled_flags, &mut visited)?;
+                    if flag_name.starts_with('-') {
+                        continue;
+                    }
+                    let clean = flag_name.strip_prefix('+').unwrap_or(flag_name);
+                    if !self.masked_flags.contains(&clean.to_string()) {
+                        self.resolve_flag(clean, &mut enabled_flags, &mut visited)?;
+                    }
                 }
             }
         }
 
-        // Add globally enabled flags
+        // Add globally enabled flags that are not masked
         for (name, config) in &self.flags {
-            if config.global && config.enabled {
+            if config.global && config.enabled && !self.masked_flags.contains(name) {
                 self.resolve_flag(name, &mut enabled_flags, &mut visited)?;
             }
         }
@@ -165,6 +201,10 @@ impl FeatureFlagResolver {
         enabled_flags: &mut Vec<String>,
         visited: &mut BTreeMap<String, bool>,
     ) -> Result<(), String> {
+        if self.masked_flags.contains(&flag_name.to_string()) {
+            return Ok(());
+        }
+
         // Check for circular dependencies
         if let Some(&in_progress) = visited.get(flag_name) {
             if in_progress {
@@ -193,15 +233,20 @@ impl FeatureFlagResolver {
     /// Check for conflicts between flags
     pub fn check_conflicts(&self) -> Vec<String> {
         let mut conflicts = Vec::new();
-        
-        // Example conflict: X11 vs Wayland
+
+        // X11 vs Wayland
         if self.is_flag_enabled("x11") && self.is_flag_enabled("wayland") {
             conflicts.push("x11 and wayland are mutually exclusive".to_string());
         }
 
-        // Example conflict: systemd vs openrc
+        // systemd vs openrc
         if self.is_flag_enabled("systemd") && self.is_flag_enabled("openrc") {
             conflicts.push("systemd and openrc are mutually exclusive".to_string());
+        }
+
+        // SELinux vs AppArmor
+        if self.is_flag_enabled("selinux") && self.is_flag_enabled("apparmor") {
+            conflicts.push("selinux and apparmor are mutually exclusive".to_string());
         }
 
         conflicts
@@ -209,27 +254,22 @@ impl FeatureFlagResolver {
 
     /// Check if a flag is enabled
     pub fn is_flag_enabled(&self, flag_name: &str) -> bool {
+        if self.masked_flags.contains(&flag_name.to_string()) {
+            return false;
+        }
         self.flags.get(flag_name).map(|c| c.enabled).unwrap_or(false)
     }
 
     /// Enable a flag
     pub fn enable_flag(&mut self, flag_name: &str) -> Result<(), String> {
-        if let Some(config) = self.flags.get_mut(flag_name) {
-            config.enabled = true;
-            Ok(())
-        } else {
-            Err(format!("Feature flag {} not found", flag_name))
-        }
+        self.apply_use_flag(flag_name)
     }
 
     /// Disable a flag
     pub fn disable_flag(&mut self, flag_name: &str) -> Result<(), String> {
-        if let Some(config) = self.flags.get_mut(flag_name) {
-            config.enabled = false;
-            Ok(())
-        } else {
-            Err(format!("Feature flag {} not found", flag_name))
-        }
+        let mut neg = String::from("-");
+        neg.push_str(flag_name);
+        self.apply_use_flag(&neg)
     }
 
     /// List all registered flags
@@ -249,93 +289,117 @@ impl Default for FeatureFlagResolver {
     }
 }
 
-/// Initialize default feature flags
+/// Initialize default feature flags (Linux & BSD inspired)
 pub fn init_default_flags(resolver: &mut FeatureFlagResolver) {
     // System-level flags
     resolver.register_flag(FeatureFlagConfig {
         name: "bluetooth".to_string(),
         enabled: false,
-        description: "Bluetooth support".to_string(),
+        description: "Bluetooth network and audio support".to_string(),
         global: true,
     });
 
     resolver.register_flag(FeatureFlagConfig {
         name: "dbus".to_string(),
         enabled: true,
-        description: "D-Bus IPC system".to_string(),
+        description: "D-Bus IPC messaging bus system".to_string(),
         global: true,
     });
 
     resolver.register_flag(FeatureFlagConfig {
         name: "systemd".to_string(),
         enabled: false,
-        description: "systemd init system compatibility".to_string(),
+        description: "systemd init system and cgroup v2 compatibility".to_string(),
         global: true,
     });
 
     resolver.register_flag(FeatureFlagConfig {
         name: "openrc".to_string(),
         enabled: true,
-        description: "OpenRC init system".to_string(),
+        description: "OpenRC init system service supervision".to_string(),
         global: true,
     });
 
-    // Desktop flags
+    // Display & Graphics flags
     resolver.register_flag(FeatureFlagConfig {
         name: "wayland".to_string(),
         enabled: true,
-        description: "Wayland display server".to_string(),
+        description: "Wayland zenith graphics compositor engine".to_string(),
         global: false,
     });
 
     resolver.register_flag(FeatureFlagConfig {
         name: "x11".to_string(),
         enabled: false,
-        description: "X11 display server".to_string(),
+        description: "X11 legacy display server compatibility".to_string(),
         global: false,
     });
 
-    // Security flags
+    // Security & Mandatory Access Control flags
     resolver.register_flag(FeatureFlagConfig {
         name: "selinux".to_string(),
         enabled: false,
-        description: "SELinux mandatory access control".to_string(),
+        description: "SELinux mandatory access control policy engine".to_string(),
         global: true,
     });
 
     resolver.register_flag(FeatureFlagConfig {
         name: "apparmor".to_string(),
         enabled: true,
-        description: "AppArmor mandatory access control".to_string(),
+        description: "AppArmor file path profiling security engine".to_string(),
         global: true,
     });
 
-    // Development flags
+    // BSD Security Innovations
+    resolver.register_flag(FeatureFlagConfig {
+        name: "pledge".to_string(),
+        enabled: true,
+        description: "OpenBSD-style pledge syscall restricted execution".to_string(),
+        global: true,
+    });
+
+    resolver.register_flag(FeatureFlagConfig {
+        name: "unveil".to_string(),
+        enabled: true,
+        description: "OpenBSD-style unveil filesystem access filtering".to_string(),
+        global: true,
+    });
+
+    resolver.register_flag(FeatureFlagConfig {
+        name: "capsicum".to_string(),
+        enabled: true,
+        description: "FreeBSD Capsicum capability-based isolation".to_string(),
+        global: true,
+    });
+
+    // Development & Optimization flags
     resolver.register_flag(FeatureFlagConfig {
         name: "debug".to_string(),
         enabled: false,
-        description: "Enable debug symbols and logging".to_string(),
+        description: "Enable debug symbols, assertions, and tracing".to_string(),
         global: true,
     });
 
     resolver.register_flag(FeatureFlagConfig {
         name: "optimize".to_string(),
         enabled: true,
-        description: "Enable compiler optimizations".to_string(),
+        description: "Enable CPU micro-architecture vector optimizations".to_string(),
         global: true,
     });
 }
 
-/// Initialize default profiles
+/// Initialize default system profiles
 pub fn init_default_profiles(resolver: &mut FeatureFlagResolver) {
     // Minimal profile
     resolver.register_profile(FeatureProfile {
         name: "minimal".to_string(),
-        description: "Minimal system with no extras".to_string(),
+        description: "Minimal sovereign system kernel without desktop overhead".to_string(),
         flags: vec![
             "dbus".to_string(),
             "openrc".to_string(),
             "apparmor".to_string(),
+            "pledge".to_string(),
+            "unveil".to_string(),
             "optimize".to_string(),
         ],
     });
@@ -343,13 +407,16 @@ pub fn init_default_profiles(resolver: &mut FeatureFlagResolver) {
     // Desktop profile
     resolver.register_profile(FeatureProfile {
         name: "desktop".to_string(),
-        description: "Full desktop system".to_string(),
+        description: "Full sovereign desktop system with Wayland and Zenith UI".to_string(),
         flags: vec![
             "dbus".to_string(),
             "openrc".to_string(),
             "wayland".to_string(),
             "bluetooth".to_string(),
             "apparmor".to_string(),
+            "pledge".to_string(),
+            "unveil".to_string(),
+            "capsicum".to_string(),
             "optimize".to_string(),
         ],
     });
@@ -357,17 +424,18 @@ pub fn init_default_profiles(resolver: &mut FeatureFlagResolver) {
     // Development profile
     resolver.register_profile(FeatureProfile {
         name: "development".to_string(),
-        description: "Development system with debug tools".to_string(),
+        description: "Development environment with debugging tools enabled".to_string(),
         flags: vec![
             "dbus".to_string(),
             "openrc".to_string(),
             "debug".to_string(),
             "apparmor".to_string(),
+            "pledge".to_string(),
         ],
     });
 }
 
-/// Calculate hash for feature flag name (FNV-1a)
+/// Calculate hash for feature flag name (FNV-1a 64-bit)
 pub fn calculate_flag_hash(name: &str) -> u64 {
     let mut hash: u64 = 14695981039346656037;
     for &byte in name.as_bytes() {
@@ -375,4 +443,70 @@ pub fn calculate_flag_hash(name: &str) -> u64 {
         hash = hash.wrapping_mul(1099511628211);
     }
     hash
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_feature_flag_basic() {
+        let flag = FeatureFlag::new("wayland", "Wayland graphics", true, false);
+        assert_eq!(flag.get_name(), "wayland");
+        assert_eq!(flag.get_description(), "Wayland graphics");
+        assert!(flag.enabled);
+    }
+
+    #[test]
+    fn test_portage_style_use_flags() {
+        let mut resolver = FeatureFlagResolver::new();
+        init_default_flags(&mut resolver);
+
+        // Apply negative USE flag
+        assert!(resolver.is_flag_enabled("dbus"));
+        resolver.apply_use_flag("-dbus").unwrap();
+        assert!(!resolver.is_flag_enabled("dbus"));
+
+        // Apply positive USE flag
+        resolver.apply_use_flag("+bluetooth").unwrap();
+        assert!(resolver.is_flag_enabled("bluetooth"));
+    }
+
+    #[test]
+    fn test_profile_resolution() {
+        let mut resolver = FeatureFlagResolver::new();
+        init_default_flags(&mut resolver);
+        init_default_profiles(&mut resolver);
+
+        resolver.set_active_profile("desktop").unwrap();
+        let flags = resolver.resolve().unwrap();
+
+        assert!(flags.contains(&"wayland".to_string()));
+        assert!(flags.contains(&"pledge".to_string()));
+        assert!(flags.contains(&"capsicum".to_string()));
+    }
+
+    #[test]
+    fn test_flag_conflicts() {
+        let mut resolver = FeatureFlagResolver::new();
+        init_default_flags(&mut resolver);
+
+        // Enable mutually exclusive flags
+        resolver.enable_flag("x11").unwrap();
+        resolver.enable_flag("wayland").unwrap();
+
+        let conflicts = resolver.check_conflicts();
+        assert!(!conflicts.is_empty());
+        assert!(conflicts[0].contains("x11 and wayland"));
+    }
+
+    #[test]
+    fn test_bsd_security_flags() {
+        let mut resolver = FeatureFlagResolver::new();
+        init_default_flags(&mut resolver);
+
+        assert!(resolver.is_flag_enabled("pledge"));
+        assert!(resolver.is_flag_enabled("unveil"));
+        assert!(resolver.is_flag_enabled("capsicum"));
+    }
 }

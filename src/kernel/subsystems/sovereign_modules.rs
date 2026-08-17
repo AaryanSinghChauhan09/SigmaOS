@@ -1124,20 +1124,33 @@ impl ArmGicController {
         if irq < 64 {
             self.enabled_interrupts[irq] = true;
             self.interrupt_cores[irq] = core_id;
+        }
+    }
+
     pub fn route_interrupt(&self, irq: usize) -> Option<u32> {
         if irq < 64 && self.enabled_interrupts[irq] {
             Some(self.interrupt_cores[irq])
+        } else {
+            None
+        }
+    }
+}
+
 // SigmaOS Sovereign Core Modules & Subsystems
 // Implements missing enterprise, gaming, accessibility, mobile, localization,
 // and sovereign sector integrations (Healthcare, Education, Agriculture, Finance)
 // completing the gap analysis against Windows, Android, iOS, and Linux distros.
-#[cfg(not(test))]
-use crate::security::CapabilityToken;
-#[cfg(test)]
+
 pub struct CapabilityToken {
     pub id: u64,
+}
+
 impl CapabilityToken {
+    pub fn new() -> Self {
         Self { id: 1 }
+    }
+}
+
 /// 1. Unified Pool Memory Manager (Paged/Non-Paged pool partitioning)
 pub struct UnifiedPoolMemory {
     pub non_paged_limit: usize,
@@ -1145,59 +1158,92 @@ pub struct UnifiedPoolMemory {
     pub non_paged_allocated: usize,
     pub paged_allocated: usize,
     pub is_compressed: bool,
+}
+
 impl UnifiedPoolMemory {
     pub fn new(non_paged_limit: usize, paged_limit: usize) -> Self {
+        Self {
             non_paged_limit,
             paged_limit,
             non_paged_allocated: 0,
             paged_allocated: 0,
             is_compressed: true,
+        }
+    }
+
     pub fn allocate_non_paged(&mut self, size: usize) -> Result<usize, &'static str> {
         if self.non_paged_allocated + size > self.non_paged_limit {
             return Err("Out of Non-Paged Pool memory");
+        }
         self.non_paged_allocated += size;
         Ok(self.non_paged_allocated)
+    }
+
     pub fn allocate_paged(&mut self, size: usize) -> Result<usize, &'static str> {
         // Simple compression simulation: reduce paged footprint by 30% if compression active
         let actual_size = if self.is_compressed {
             (size * 7) / 10
+        } else {
             size
+        };
+
         if self.paged_allocated + actual_size > self.paged_limit {
             return Err("Out of Paged Pool memory");
+        }
         self.paged_allocated += actual_size;
         Ok(self.paged_allocated)
+    }
+}
+
 /// 2. Enterprise Active Directory & Group Policy Integration
 pub struct EnterpriseActiveDirectory {
     pub domain_name: String,
     pub connected: bool,
     pub active_policies: Vec<String>,
+}
+
 impl EnterpriseActiveDirectory {
     pub fn new(domain: &str) -> Self {
+        Self {
             domain_name: domain.to_string(),
             connected: false,
             active_policies: Vec::new(),
+        }
+    }
+
     pub fn join_domain(&mut self, token_auth: &str) -> Result<(), &'static str> {
         if token_auth == "valid-dilithium-token" {
             self.connected = true;
             Ok(())
+        } else {
             Err("Authentication failed: invalid Dilithium key")
+        }
+    }
+
     pub fn apply_signed_policy(&mut self, policy_name: &str) {
         self.active_policies.push(policy_name.to_string());
+    }
+}
+
 /// 3. Accessibility & Inclusivity Core Framework (WCAG 2.2 AA Release Gate)
 pub struct SovereignAccessManager {
     pub screen_reader_active: bool,
     pub high_contrast_active: bool,
     pub eye_tracking_active: bool,
+}
+
 impl SovereignAccessManager {
+    pub fn new() -> Self {
+        Self {
             screen_reader_active: false,
             high_contrast_active: false,
             eye_tracking_active: false,
-    pub fn synthesize_speech(&self, text: &str) -> Option<String> {
-        if self.screen_reader_active {
-            Some(format!("[Speech Synthesis]: {}", text))
         }
     }
 
+    pub fn synthesize_speech(&self, text: &str) -> Option<String> {
+        if self.screen_reader_active {
+            Some(format!("[Speech Synthesis]: {}", text))
         } else {
             None
         }

