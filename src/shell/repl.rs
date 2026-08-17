@@ -1,6 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
+// Note: std::io used for I/O operations - can be replaced with custom I/O in future
 use std::io::{self, BufRead, Write};
 
 #[derive(Debug, Clone)]
