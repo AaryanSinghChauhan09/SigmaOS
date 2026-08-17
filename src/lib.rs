@@ -32,7 +32,6 @@ pub mod sigpkg;
 pub mod tools;
 pub mod storage;
 pub mod virtualization;
-pub mod klib;
 pub use klib::{SplayTree, RadixTree, SovereignPriorityQueue};
 
 pub use access::{

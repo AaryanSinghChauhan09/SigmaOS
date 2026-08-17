@@ -31,7 +31,6 @@ pub use arch_linux::{
     WikiPage, ArchWikiSearchEngine,
 };
 
-pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,

@@ -21,10 +21,11 @@ pub use vec::Vec;
 pub use hashmap::BTreeMap as HashMap;
 pub use hashmap::BTreeMap;
 pub use adt::{SplayTree, RadixTree, SovereignPriorityQueue};
-<<<<<<< HEAD
 pub use hashset::HashSet;
 pub use uuid::Uuid;
-pub use string::{String, ToString};
+#[cfg(target_os = "none")]
+pub use string::String;
+pub use string::ToString;
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
@@ -34,8 +35,6 @@ pub use vecdeque::VecDeque;
 pub use time::{Duration, Instant, monotonic_ms};
 pub use hash::{djb2_hash, simple_hash, fnv1a_hash, xor_hash, SimpleHasher, combine_hashes};
 pub use math::{abs, min, max, clamp, pow, log2, sqrt};
-=======
->>>>>>> origin/jules-18086519973691592816-326e0a20
 
 // For other collections, use std when available
 #[cfg(not(target_os = "none"))]
@@ -80,6 +79,6 @@ pub unsafe extern "C" fn sigma_memcmp(s1: *const u8, s2: *const u8, n: usize) ->
 }
 
 #[cfg(not(target_os = "none"))]
-pub use std::collections::HashMap;
+pub use std::collections::HashMap as StdHashMap;
 #[cfg(not(target_os = "none"))]
-pub use std::collections::HashSet;
+pub use std::collections::HashSet as StdHashSet;
