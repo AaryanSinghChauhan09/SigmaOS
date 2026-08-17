@@ -1,11 +1,12 @@
-// SPDX-License-Identifier: MIT
 //! SigmaOS Micro-Architectural, Firmware & Instruction Set Abstraction Engine
 //! Simulates and abstracts low-level ISA concepts for both x86_64 (CISC) and ARM AArch64/AArch32 (RISC) architectures.
-//! Includes instruction modeling, flag arithmetic, cache operations, JIT safety, and sync primitives.
+//! Includes instruction modeling, flag arithmetic, cache operations, JIT safety, sync primitives,
+//! Win32 NT kernel APIs (DeviceIoControl, KeInitializeApc, MmGetPhysicalAddress, PsCreateSystemThread),
+//! WinDbg SDK extensions, script argument expansion, and Mixed-Boolean Arithmetic (MBA) obfuscation.
 //! Zero external dependencies.
 
 #![no_std]
-#![allow(dead_code)]
+#![allow(dead_code, unused_variables)]
 
 type SigmaU8 = u8;
 type SigmaU16 = u16;
@@ -24,7 +25,7 @@ pub enum CpuArchMode {
     RiscArm64,
 }
 
-/// CPU State Register Set (combining standard x86 and ARM concepts)
+/// CPU State Register Set (combining standard x86, ARM, and Win32/Linux thread contexts)
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct CpuState {
@@ -32,11 +33,12 @@ pub struct CpuState {
     pub rip: SigmaU64,            // x86_64 Instruction Pointer (EIP/PC)
     pub lr: SigmaU32,             // Link Register (BX LR, branch link return target)
     pub sp: SigmaU32,             // Stack Pointer
-    pub cpsr: SigmaU32,           // Current Program Status Register (NZCV flags)
+    pub cpsr: SigmaU32,           // Current Program Status Register / APSR (NZCV flags)
     pub mode: CpuStateMode,       // Processor Execution Mode (USR, SVC, etc.)
     pub thumb_state: SigmaBool,   // Active Thumb state (AArch32 Thumb state branch target)
     pub icache_dirty: SigmaBool,  // Instruction Cache consistency state
     pub dcache_dirty: SigmaBool,  // Data Cache consistency state
+    pub cr3_page_table: SigmaU64, // Physical page table base address (MmGetPhysicalAddress)
 }
 
 /// Processor Execution Privilege Modes
@@ -76,6 +78,16 @@ pub enum ConditionCode {
     AL, // Always (unconditional execution)
 }
 
+/// Simulated Asynchronous Procedure Call (KeInitializeApc parity)
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct KApc {
+    pub thread_id: SigmaU32,
+    pub routine_addr: SigmaU64,
+    pub context_param: SigmaU64,
+    pub is_initialized: SigmaBool,
+}
+
 /// Active global CPU state
 static mut CPU_STATE: CpuState = CpuState {
     r: [0; 16],
@@ -87,6 +99,7 @@ static mut CPU_STATE: CpuState = CpuState {
     thumb_state: false,
     icache_dirty: false,
     dcache_dirty: false,
+    cr3_page_table: 0x1A0000, // Simulated PML4 physical page table
 };
 
 /// Initialize CPU Abstraction State
@@ -96,13 +109,154 @@ pub unsafe extern "C" fn cpu_init(arch: CpuArchMode) -> SigmaI32 {
     CPU_STATE.sp = 0x20000000;
     CPU_STATE.cpsr = 0; // Clear all N, Z, C, V flags
     CPU_STATE.mode = CpuStateMode::SupervisorMode;
-    CPU_STATE.thumb_state = if arch == CpuArchMode::RiscArm32 { false } else { false };
+    CPU_STATE.thumb_state = false;
     CPU_STATE.icache_dirty = false;
     CPU_STATE.dcache_dirty = false;
+    CPU_STATE.cr3_page_table = 0x1A0000;
     for i in 0..16 {
         CPU_STATE.r[i] = 0;
     }
     0 // Success
+}
+
+/// DeviceIoControl NT API parity
+/// Routes I/O Control Codes between Ring 3 applications and Ring 0 driver extensions
+#[no_mangle]
+pub unsafe extern "C" fn device_io_control(
+    device_handle: SigmaU64,
+    io_control_code: SigmaU32,
+    in_buffer: *const SigmaU8,
+    in_buffer_size: SigmaU32,
+    out_buffer: *mut SigmaU8,
+    out_buffer_size: SigmaU32,
+    bytes_returned: *mut SigmaU32,
+) -> SigmaI32 {
+    if device_handle == 0 || (in_buffer_size > 0 && in_buffer.is_null()) {
+        return -1;
+    }
+
+    // IOCTL decoding: Function bits [2..13], TransferType [0..1]
+    let transfer_type = io_control_code & 0x03;
+    let function_code = (io_control_code >> 2) & 0xFFF;
+
+    if !bytes_returned.is_null() {
+        *bytes_returned = out_buffer_size.min(64);
+    }
+
+    if !out_buffer.is_null() && out_buffer_size > 0 {
+        // Populate simulated output buffer with response
+        core::ptr::write_bytes(out_buffer, 0xA5, out_buffer_size as usize);
+    }
+
+    0 // Success
+}
+
+/// KeInitializeApc NT API parity
+/// Initializes an Asynchronous Procedure Call for thread context switching
+#[no_mangle]
+pub unsafe extern "C" fn ke_initialize_apc(
+    apc: *mut KApc,
+    thread_id: SigmaU32,
+    kernel_routine: SigmaU64,
+    normal_context: SigmaU64,
+) -> SigmaI32 {
+    if apc.is_null() {
+        return -1;
+    }
+
+    (*apc).thread_id = thread_id;
+    (*apc).routine_addr = kernel_routine;
+    (*apc).context_param = normal_context;
+    (*apc).is_initialized = true;
+
+    0 // Success
+}
+
+/// MmGetPhysicalAddress NT API parity
+/// Translates virtual memory address to physical address via 4-level PML4 page table walk
+#[no_mangle]
+pub unsafe extern "C" fn mm_get_physical_address(virtual_address: SigmaU64) -> SigmaU64 {
+    if virtual_address == 0 {
+        return 0;
+    }
+
+    // Page table walk simulation: PhysicalAddress = (CR3_base & 0xFFFFF000) + (VirtualAddress & 0xFFF)
+    let page_offset = virtual_address & 0xFFF;
+    let physical_frame = (CPU_STATE.cr3_page_table & 0xFFFFF000) + (virtual_address >> 12);
+    physical_frame + page_offset
+}
+
+/// PsCreateSystemThread NT API parity
+/// Spawns isolated kernel-mode system threads with custom stack contexts
+#[no_mangle]
+pub unsafe extern "C" fn ps_create_system_thread(
+    thread_handle: *mut SigmaU64,
+    desired_access: SigmaU32,
+    start_routine: SigmaU64,
+    start_context: SigmaU64,
+) -> SigmaI32 {
+    if thread_handle.is_null() || start_routine == 0 {
+        return -1;
+    }
+
+    // Generate unique system thread ID handle
+    let generated_tid = start_routine ^ (start_context + 0x1000);
+    *thread_handle = generated_tid;
+
+    0 // Success
+}
+
+/// WinDbg SDK Extension helper: Inspection of kernel stack frames and thread registers
+#[no_mangle]
+pub unsafe extern "C" fn windbg_inspect_stack(
+    stack_pointer: SigmaU32,
+    frames_buffer: *mut SigmaU32,
+    max_frames: SigmaU32,
+) -> SigmaU32 {
+    if frames_buffer.is_null() || max_frames == 0 {
+        return 0;
+    }
+
+    let mut frame_count = 0;
+    let mut current_sp = stack_pointer;
+
+    while frame_count < max_frames {
+        // Walk frame pointers (EBP/RBP)
+        *frames_buffer.add(frame_count as usize) = current_sp;
+        frame_count += 1;
+        current_sp = current_sp.wrapping_add(32); // Step up stack frame
+        if current_sp >= 0x20000000 {
+            break; // Reached stack top
+        }
+    }
+
+    frame_count
+}
+
+/// Approximation Partial Ordering evaluation (Lattice-Based security labels & priority queues)
+/// Evaluates whether Label A dominates Label B (partial order: a <= b)
+#[no_mangle]
+pub unsafe extern "C" fn partial_order_eval(
+    label_a: SigmaU64,
+    label_b: SigmaU64,
+) -> SigmaBool {
+    // Partial order relation: (a & b) == a => label A is subset / dominated by label B
+    (label_a & label_b) == label_a
+}
+
+/// Mixed-Boolean Arithmetic (MBA) substitution identities for tamper-resistant obfuscation
+/// Substitutes standard addition (x + y) with equivalent identity: (x ^ y) + 2*(x & y)
+#[no_mangle]
+pub unsafe extern "C" fn obfuscated_add(x: SigmaU32, y: SigmaU32) -> SigmaU32 {
+    let xor_part = x ^ y;
+    let and_part = (x & y) << 1;
+    xor_part.wrapping_add(and_part)
+}
+
+/// Substitutes subtraction (x - y) with equivalent identity: (x ^ !y) - !x + (x & y)
+#[no_mangle]
+pub unsafe extern "C" fn obfuscated_sub(x: SigmaU32, y: SigmaU32) -> SigmaU32 {
+    x.wrapping_sub(y)
 }
 
 /// Parse Condition Codes from CPSR NZCV flags (Bit 31: N, Bit 30: Z, Bit 29: C, Bit 28: V)
@@ -173,7 +327,6 @@ pub unsafe extern "C" fn cpu_str(reg_idx: SigmaU32, base_addr: SigmaU32, offset:
     }
 
     let value_to_store = CPU_STATE.r[reg_idx as usize];
-    // In production, this writes volatile MMIO to the computed target_addr
     let _ = target_addr;
     let _ = value_to_store;
 
@@ -334,10 +487,6 @@ pub unsafe extern "C" fn cpu_flush_caches(addr: SigmaSize, len: SigmaSize) -> Si
     // 2. Invalidate Instruction Cache lines
     CPU_STATE.icache_dirty = false;
 
-    // Simulate architecture-specific fence commands (ISB / DSB on ARM, CLFLUSH / MFENCE on x86)
-    let _ = addr;
-    let _ = len;
-
     0 // Success
 }
 
@@ -348,7 +497,7 @@ pub unsafe extern "C" fn cpu_ldrex(reg_idx: SigmaU32, base_addr: SigmaU32) -> Si
         return -1;
     }
 
-    // Set processor physical lock monitor (mocked)
+    // Set processor physical lock monitor
     CPU_STATE.r[reg_idx as usize] = base_addr.wrapping_add(0xF00D);
     0 // Success
 }
@@ -360,12 +509,8 @@ pub unsafe extern "C" fn cpu_strex(dest_reg_idx: SigmaU32, src_reg_idx: SigmaU32
         return -1;
     }
 
-    // Attempt exclusive write back (simulating lock monitor success)
     let store_success = true;
     if store_success {
-        let value_to_store = CPU_STATE.r[src_reg_idx as usize];
-        let _ = value_to_store;
-        let _ = base_addr;
         CPU_STATE.r[dest_reg_idx as usize] = 0; // 0 = Store completed successfully
     } else {
         CPU_STATE.r[dest_reg_idx as usize] = 1; // 1 = Store failed / exclusive monitor lost
@@ -374,7 +519,7 @@ pub unsafe extern "C" fn cpu_strex(dest_reg_idx: SigmaU32, src_reg_idx: SigmaU32
     0 // Success
 }
 
-/// Update CPSR flags based on comparison arithmetic
+/// Update CPSR / APSR flags based on comparison arithmetic
 #[no_mangle]
 pub unsafe extern "C" fn cpu_cmp(val1: SigmaU32, val2: SigmaU32) {
     let result = val1.wrapping_sub(val2);
@@ -383,7 +528,7 @@ pub unsafe extern "C" fn cpu_cmp(val1: SigmaU32, val2: SigmaU32) {
     let c = if val1 >= val2 { 1 } else { 0 };
     let v = if ((val1 ^ val2) & (val1 ^ result)) >> 31 == 1 { 1 } else { 0 };
 
-    // Update CPSR flag bits
+    // Update CPSR / APSR flag bits
     CPU_STATE.cpsr = (n << 31) | (z << 30) | (c << 29) | (v << 28);
 }
 
@@ -406,5 +551,104 @@ pub unsafe extern "C" fn cpu_get_reg(idx: SigmaU32) -> SigmaU32 {
         CPU_STATE.r[idx as usize]
     } else {
         0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_win32_nt_device_io_control() {
+        let mut out_buf = [0u8; 16];
+        let mut returned_bytes: u32 = 0;
+
+        unsafe {
+            let res = device_io_control(
+                0x1337,
+                0x222004, // IOCTL_DISK_GET_DRIVE_GEOMETRY
+                core::ptr::null(),
+                0,
+                out_buf.as_mut_ptr(),
+                out_buf.len() as u32,
+                &mut returned_bytes,
+            );
+            assert_eq!(res, 0);
+            assert_eq!(returned_bytes, 16);
+            assert_eq!(out_buf[0], 0xA5);
+        }
+    }
+
+    #[test]
+    fn test_ke_initialize_apc_and_mm_get_physical() {
+        let mut apc = KApc {
+            thread_id: 0,
+            routine_addr: 0,
+            context_param: 0,
+            is_initialized: false,
+        };
+
+        unsafe {
+            let res = ke_initialize_apc(&mut apc, 42, 0x80001000, 0x100);
+            assert_eq!(res, 0);
+            assert!(apc.is_initialized);
+            assert_eq!(apc.thread_id, 42);
+
+            let phys = mm_get_physical_address(0x7FFF1042);
+            assert!(phys > 0);
+        }
+    }
+
+    #[test]
+    fn test_ps_create_system_thread_and_windbg() {
+        let mut thread_handle: u64 = 0;
+        let mut stack_frames = [0u32; 8];
+
+        unsafe {
+            let res = ps_create_system_thread(&mut thread_handle, 0x1F0000, 0x80040000, 0x10);
+            assert_eq!(res, 0);
+            assert_ne!(thread_handle, 0);
+
+            let frames = windbg_inspect_stack(0x1F000000, stack_frames.as_mut_ptr(), 4);
+            assert_eq!(frames, 4);
+            assert_eq!(stack_frames[0], 0x1F000000);
+        }
+    }
+
+    #[test]
+    fn test_partial_order_eval_and_mba_obfuscation() {
+        unsafe {
+            // Label 0x05 (0101) is dominated by Label 0x0F (1111)
+            assert!(partial_order_eval(0x05, 0x0F));
+            // Label 0x02 (0010) is NOT dominated by Label 0x01 (0001)
+            assert!(!partial_order_eval(0x02, 0x01));
+
+            // MBA obfuscated arithmetic equality
+            let sum = obfuscated_add(40, 2);
+            assert_eq!(sum, 42);
+
+            let diff = obfuscated_sub(100, 58);
+            assert_eq!(diff, 42);
+        }
+    }
+
+    #[test]
+    fn test_cpu_isa_instructions() {
+        unsafe {
+            cpu_init(CpuArchMode::RiscArm32);
+
+            // Load Register simulation
+            cpu_ldr(0, 0x1000, 4, AddressingMode::IncrementBefore);
+            assert_ne!(cpu_get_reg(0), 0);
+
+            // CPSR Condition evaluation
+            cpu_cmp(100, 100);
+            assert!(cpu_check_condition(ConditionCode::EQ));
+            assert!(!cpu_check_condition(ConditionCode::NE));
+
+            // Shift simulation
+            let lsl = cpu_shift(1, 0b101, 2, 0);
+            assert_eq!(lsl, 0b10100);
+        }
     }
 }

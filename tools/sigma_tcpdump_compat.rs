@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 //! SigmaOS Tcpdump Compatibility
 //! Tcpdump packet capture and filtering engine
 //! Zero external dependencies

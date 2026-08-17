@@ -103,105 +103,6 @@ impl Surface {
             format: 0x34325258, // XR24 (XRGB8888)
         }
     }
-
-    /// Sets a single pixel RGBA value
-    pub fn set_pixel(&mut self, x: u32, y: u32, color_rgba: u32) {
-        if x >= self.width || y >= self.height {
-            return;
-        }
-        let offset = ((y * self.stride) + x * 4) as usize;
-        if offset + 3 < self.buffer.len() {
-            self.buffer[offset] = ((color_rgba >> 24) & 0xFF) as u8;     // R
-            self.buffer[offset + 1] = ((color_rgba >> 16) & 0xFF) as u8; // G
-            self.buffer[offset + 2] = ((color_rgba >> 8) & 0xFF) as u8;  // B
-            self.buffer[offset + 3] = (color_rgba & 0xFF) as u8;         // A
-        }
-    }
-
-    /// Fills a solid rectangle
-    pub fn fill_rect(&mut self, rect_x: i32, rect_y: i32, width: u32, height: u32, color_rgba: u32) {
-        for py in 0..height {
-            let y = rect_y + py as i32;
-            if y < 0 || y as u32 >= self.height { continue; }
-            for px in 0..width {
-                let x = rect_x + px as i32;
-                if x < 0 || x as u32 >= self.width { continue; }
-                self.set_pixel(x as u32, y as u32, color_rgba);
-            }
-        }
-    }
-
-    /// Draws a border outline with a given thickness
-    pub fn draw_border(&mut self, x: i32, y: i32, width: u32, height: u32, thickness: u32, color_rgba: u32) {
-        // Top
-        self.fill_rect(x, y, width, thickness, color_rgba);
-        // Bottom
-        self.fill_rect(x, y + height as i32 - thickness as i32, width, thickness, color_rgba);
-        // Left
-        self.fill_rect(x, y, thickness, height, color_rgba);
-        // Right
-        self.fill_rect(x + width as i32 - thickness as i32, y, thickness, height, color_rgba);
-    }
-
-    /// Draws a Dr460nized-inspired neon gradient border transitioning from start_color to end_color
-    pub fn draw_gradient_border(&mut self, x: i32, y: i32, width: u32, height: u32, thickness: u32, start_color: u32, end_color: u32) {
-        for t in 0..thickness {
-            let factor = (t as f32) / (thickness as f32).max(1.0);
-            let r1 = ((start_color >> 24) & 0xFF) as f32;
-            let g1 = ((start_color >> 16) & 0xFF) as f32;
-            let b1 = ((start_color >> 8) & 0xFF) as f32;
-            let r2 = ((end_color >> 24) & 0xFF) as f32;
-            let g2 = ((end_color >> 16) & 0xFF) as f32;
-            let b2 = ((end_color >> 8) & 0xFF) as f32;
-
-            let r = (r1 + factor * (r2 - r1)) as u32;
-            let g = (g1 + factor * (g2 - g1)) as u32;
-            let b = (b1 + factor * (b2 - b1)) as u32;
-            let c = (r << 24) | (g << 16) | (b << 8) | 0xFF;
-
-            self.draw_border(x + t as i32, y + t as i32, width.saturating_sub(t * 2), height.saturating_sub(t * 2), 1, c);
-        }
-    }
-
-    /// Software alpha blending compositor: composite sub_surface over self at (dest_x, dest_y)
-    pub fn composite_surface(&mut self, src: &Surface, dest_x: i32, dest_y: i32, global_alpha: u8) {
-        let alpha_mult = (global_alpha as f32) / 255.0;
-
-        for sy in 0..src.height {
-            let dy = dest_y + sy as i32;
-            if dy < 0 || dy as u32 >= self.height { continue; }
-
-            for sx in 0..src.width {
-                let dx = dest_x + sx as i32;
-                if dx < 0 || dx as u32 >= self.width { continue; }
-
-                let src_off = ((sy * src.stride) + sx * 4) as usize;
-                let dst_off = ((dy as u32 * self.stride) + dx as u32 * 4) as usize;
-
-                if src_off + 3 < src.buffer.len() && dst_off + 3 < self.buffer.len() {
-                    let src_a = (src.buffer[src_off + 3] as f32 / 255.0) * alpha_mult;
-                    if src_a <= 0.0 { continue; }
-
-                    let src_r = src.buffer[src_off] as f32;
-                    let src_g = src.buffer[src_off + 1] as f32;
-                    let src_b = src.buffer[src_off + 2] as f32;
-
-                    let dst_r = self.buffer[dst_off] as f32;
-                    let dst_g = self.buffer[dst_off + 1] as f32;
-                    let dst_b = self.buffer[dst_off + 2] as f32;
-
-                    let out_r = (src_r * src_a + dst_r * (1.0 - src_a)) as u8;
-                    let out_g = (src_g * src_a + dst_g * (1.0 - src_a)) as u8;
-                    let out_b = (src_b * src_a + dst_b * (1.0 - src_a)) as u8;
-
-                    self.buffer[dst_off] = out_r;
-                    self.buffer[dst_off + 1] = out_g;
-                    self.buffer[dst_off + 2] = out_b;
-                    self.buffer[dst_off + 3] = 0xFF;
-                }
-            }
-        }
-    }
 }
 
 /// Damage region for rendering
@@ -320,80 +221,13 @@ pub enum ZenithProfile {
     Accessibility, // High-contrast, screen reader activated, 2.0 GHz CPU
 }
 
-/// Supported Desktop Visual Themes (Garuda Dr460nized, Linux Mint Cinnamon, Material Design 3)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DesktopThemeStyle {
-    /// Garuda Linux-inspired Dr460nized: Vibrant neon magenta/cyan gradients, dark translucent glass, glowing borders
-    Dr460nized,
-    /// Linux Mint-inspired Cinnamon: Sleek dark/light mint accents, clean taskbar panel, rounded corners
-    Cinnamon,
-    /// Material Design 3 Dark Mode
-    MaterialDark,
-    /// Material Design 3 Light Mode
-    MaterialLight,
-}
-
-#[derive(Debug, Clone)]
-pub struct ThemeStylingConfig {
-    pub style: DesktopThemeStyle,
-    pub primary_accent: u32,
-    pub secondary_accent: u32,
-    pub background_color: u32,
-    pub border_color: u32,
-    pub border_thickness: u32,
-    pub corner_radius: u32,
-    pub window_alpha: u8, // Translucency (e.g. 215 for Dr460nized glass)
-    pub is_dark: bool,
-}
-
-impl ThemeStylingConfig {
-    pub fn dr460nized() -> Self {
-        Self {
-            style: DesktopThemeStyle::Dr460nized,
-            primary_accent: 0xFF00FFFF,   // Vibrant Neon Cyan
-            secondary_accent: 0xFFFF00FF, // Vibrant Neon Magenta
-            background_color: 0x1A0B2EFF, // Deep Purple Translucent Glass
-            border_color: 0xFFFF00FF,
-            border_thickness: 3,
-            corner_radius: 16,
-            window_alpha: 215,
-            is_dark: true,
-        }
-    }
-
-    pub fn cinnamon() -> Self {
-        Self {
-            style: DesktopThemeStyle::Cinnamon,
-            primary_accent: 0x87C378FF,   // Mint Green
-            secondary_accent: 0x3D3D3DFF, // Sleek Panel Charcoal
-            background_color: 0x2F343FFF, // Mint Dark Background
-            border_color: 0x87C378FF,
-            border_thickness: 2,
-            corner_radius: 8,
-            window_alpha: 255,
-            is_dark: true,
-        }
-    }
-
-    pub fn material_dark() -> Self {
-        Self {
-            style: DesktopThemeStyle::MaterialDark,
-            primary_accent: 0xFFBB86FC,
-            secondary_accent: 0x03DAC6FF,
-            background_color: 0x121212FF,
-            border_color: 0xFFBB86FC,
-            border_thickness: 1,
-            corner_radius: 12,
-            window_alpha: 255,
-            is_dark: true,
-        }
-    }
-}
-
 /// Design Token Library representing Material Design 3 and GNOME HIG (Unified Design System)
 #[derive(Debug, Clone)]
 pub struct DesignTokens {
-    pub theme_config: ThemeStylingConfig,
+    pub is_dark_mode: bool,
+    pub color_primary: u32,
+    pub color_background: u32,
+    pub corner_radius: u32,
     pub spacing_unit: u32,
 }
 
@@ -401,48 +235,20 @@ impl DesignTokens {
     pub fn new(is_dark_mode: bool) -> Self {
         if is_dark_mode {
             Self {
-                theme_config: ThemeStylingConfig::material_dark(),
+                is_dark_mode: true,
+                color_primary: 0xFFBB86FC,
+                color_background: 0xFF121212,
+                corner_radius: 12,
                 spacing_unit: 8,
             }
         } else {
             Self {
-                theme_config: ThemeStylingConfig {
-                    style: DesktopThemeStyle::MaterialLight,
-                    primary_accent: 0x6200EEFF,
-                    secondary_accent: 0x018786FF,
-                    background_color: 0xFFFFFFFF,
-                    border_color: 0x6200EEFF,
-                    border_thickness: 1,
-                    corner_radius: 12,
-                    window_alpha: 255,
-                    is_dark: false,
-                },
+                is_dark_mode: false,
+                color_primary: 0xFF6200EE,
+                color_background: 0xFFFFFFFF,
+                corner_radius: 12,
                 spacing_unit: 8,
             }
-        }
-    }
-
-    pub fn with_theme(style: DesktopThemeStyle) -> Self {
-        let config = match style {
-            DesktopThemeStyle::Dr460nized => ThemeStylingConfig::dr460nized(),
-            DesktopThemeStyle::Cinnamon => ThemeStylingConfig::cinnamon(),
-            DesktopThemeStyle::MaterialDark => ThemeStylingConfig::material_dark(),
-            DesktopThemeStyle::MaterialLight => ThemeStylingConfig {
-                style: DesktopThemeStyle::MaterialLight,
-                primary_accent: 0x6200EEFF,
-                secondary_accent: 0x018786FF,
-                background_color: 0xFFFFFFFF,
-                border_color: 0x6200EEFF,
-                border_thickness: 1,
-                corner_radius: 12,
-                window_alpha: 255,
-                is_dark: false,
-            },
-        };
-
-        Self {
-            theme_config: config,
-            spacing_unit: 8,
         }
     }
 }
@@ -518,8 +324,8 @@ impl ZenithCompositor {
                 self.cpu_limit_khz = 2000000; // 2.0 GHz limit
                 self.scheduler_quantum_ms = 20;
                 // Force high contrast token swaps
-                self.design_tokens.theme_config.background_color = 0xFF000000;
-                self.design_tokens.theme_config.primary_accent = 0xFFFF0000;
+                self.design_tokens.color_background = 0xFF000000;
+                self.design_tokens.color_primary = 0xFFFF0000;
             }
         }
     }
@@ -893,40 +699,13 @@ mod tests {
         // Dark theme tokens check (Material Design 3)
         compositor.toggle_theme_mode(true);
         let tokens = compositor.get_design_tokens();
-        assert!(tokens.theme_config.is_dark);
-        assert_eq!(tokens.theme_config.background_color, 0x121212FF);
+        assert!(tokens.is_dark_mode);
+        assert_eq!(tokens.color_background, 0xFF121212);
 
         // Switch Accessibility profile overrides background colors for high contrast
         compositor.switch_profile(ZenithProfile::Accessibility);
         let tokens = compositor.get_design_tokens();
-        assert_eq!(tokens.theme_config.background_color, 0xFF000000); // Strict black background
-    }
-
-    #[test]
-    fn test_dr460nized_and_cinnamon_desktop_themes() {
-        // Test Dr460nized Theme
-        let dr16 = DesignTokens::with_theme(DesktopThemeStyle::Dr460nized);
-        assert_eq!(dr16.theme_config.style, DesktopThemeStyle::Dr460nized);
-        assert_eq!(dr16.theme_config.primary_accent, 0xFF00FFFF);
-        assert_eq!(dr16.theme_config.secondary_accent, 0xFFFF00FF);
-        assert_eq!(dr16.theme_config.window_alpha, 215);
-
-        // Test Cinnamon Theme
-        let cinn = DesignTokens::with_theme(DesktopThemeStyle::Cinnamon);
-        assert_eq!(cinn.theme_config.style, DesktopThemeStyle::Cinnamon);
-        assert_eq!(cinn.theme_config.primary_accent, 0x87C378FF);
-        assert_eq!(cinn.theme_config.window_alpha, 255);
-
-        // Test Surface Rendering with Dr460nized gradient border
-        let mut surface = Surface::new(SurfaceType::Software, 400, 300);
-        surface.draw_gradient_border(0, 0, 400, 300, 3, dr16.theme_config.primary_accent, dr16.theme_config.secondary_accent);
-
-        // Test Alpha Blending Surface Compositing
-        let mut dest_surface = Surface::new(SurfaceType::Software, 800, 600);
-        dest_surface.fill_rect(0, 0, 800, 600, 0x111111FF);
-        dest_surface.composite_surface(&surface, 50, 50, dr16.theme_config.window_alpha);
-
-        assert_eq!(dest_surface.width, 800);
+        assert_eq!(tokens.color_background, 0xFF000000); // Strict black background
     }
 }
 
