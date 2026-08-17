@@ -106,6 +106,7 @@ mod tests {
     }
 }
 
+// C-compatible DNS functions for FFI
 type SigmaU8 = u8;
 type SigmaU32 = u32;
 type SigmaI32 = i32;
@@ -201,5 +202,4 @@ pub unsafe extern "C" fn dns_local_resolve(domain: *const u8, resolved_ip: *mut 
         }
     }
     -1 // Resolution failed (isolated from global network leaks)
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
 }
