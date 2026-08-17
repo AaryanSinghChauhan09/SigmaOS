@@ -39,3 +39,7 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 ## 2026-08-09 - Sanitizing Dynamic Dependency Trees
 **Learning:** Unverified third-party libraries downloaded during build stages can introduce hidden supply chain vulnerabilities. Outdated sub-dependencies like `brace-expansion` and `nanoid` must have priority upgrades pinned at the package level to eliminate Regular Expression Denial of Service (ReDoS) and loop hazards.
 **Action:** Always scan for nested lockfile overrides and apply semantic versions upgrades strictly.
+
+## 2026-08-10 - Multi-Stage PAM Authentication and BSD Securelevels
+**Learning:** Single-factor authentication or static permission checks leave systems vulnerable to brute-force attacks and root level modifications. Implementing Linux-style Pluggable Authentication Modules (PAM) with account lockouts (`pam_tally2`) and pwquality password rules alongside BSD monotonically non-decreasing Securelevels creates a hardened defense-in-depth framework.
+**Action:** Enforce multi-stage PAM authentication for user access and gate critical network/storage operations behind BSD Securelevels and capability bitmasks.
