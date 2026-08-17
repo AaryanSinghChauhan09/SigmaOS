@@ -5,7 +5,7 @@
 // - Virtual /proc filesystem adapter (/proc/meminfo, cpuinfo, hostname, version, uptime)
 // - ELF dynamic loader & auxiliary vector (auxv) parser shim
 
-use std::collections::HashMap;
+use crate::klib::BTreeMap as HashMap;
 
 // ==========================================
 // 1. Phase 0: Compatibility Specification & Target Distro KPIs
