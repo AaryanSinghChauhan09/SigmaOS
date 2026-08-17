@@ -177,6 +177,97 @@ impl SqliteIntegration {
     }
 }
 
+/// Redox OS URL-like Scheme Translator (Redox OS Parity)
+pub struct RedoxSchemeTranslator {
+    pub active_schemes: HashMap<String, String>, // scheme_name -> target_endpoint
+}
+
+impl RedoxSchemeTranslator {
+    pub fn new() -> Self {
+        let mut schemes = HashMap::new();
+        schemes.insert("file".to_string(), "sovereign_fs_endpoint".to_string());
+        schemes.insert("net".to_string(), "sovereign_net_endpoint".to_string());
+        schemes.insert("event".to_string(), "sovereign_event_bus".to_string());
+        schemes.insert("env".to_string(), "sovereign_proc_env".to_string());
+        Self { active_schemes: schemes }
+    }
+
+    pub fn resolve_scheme_uri(&self, uri: &str) -> Result<String, &'static str> {
+        let parts: Vec<&str> = uri.splitn(2, ':').collect();
+        if parts.len() < 2 {
+            return Err("RedoxScheme: Invalid URI format, expected scheme:path");
+        }
+        let scheme = parts[0];
+        let path = parts[1];
+
+        if let Some(endpoint) = self.active_schemes.get(scheme) {
+            Ok(format!("ipc://{}/{}", endpoint, path.trim_start_matches('/')))
+        } else {
+            Err("RedoxScheme: Unknown scheme")
+        }
+    }
+}
+
+/// Haiku BeFS-style Extended Attribute Filesystem (Haiku OS Parity)
+pub struct HaikuAttributeFS {
+    pub attributes: HashMap<String, HashMap<String, String>>, // path -> (attr_key -> value)
+}
+
+impl HaikuAttributeFS {
+    pub fn new() -> Self {
+        Self { attributes: HashMap::new() }
+    }
+
+    pub fn write_attribute(&mut self, path: &str, attr_key: &str, value: &str) {
+        let entry = self.attributes.entry(path.to_string()).or_insert_with(HashMap::new);
+        entry.insert(attr_key.to_string(), value.to_string());
+    }
+
+    pub fn read_attribute(&self, path: &str, attr_key: &str) -> Option<&String> {
+        self.attributes.get(path)?.get(attr_key)
+    }
+
+    pub fn query_attribute(&self, attr_key: &str, target_value: &str) -> Vec<String> {
+        let mut matches = Vec::new();
+        for (path, attrs) in &self.attributes {
+            if let Some(val) = attrs.get(attr_key) {
+                if val == target_value {
+                    matches.push(path.clone());
+                }
+            }
+        }
+        matches
+    }
+}
+
+/// Plan 9 Per-Process Hierarchical Namespace Synthesizer (Plan 9 Parity)
+pub struct Plan9NamespaceSynthesizer {
+    pub process_namespaces: HashMap<u32, HashMap<String, String>>, // PID -> (mount_point -> source_target)
+}
+
+impl Plan9NamespaceSynthesizer {
+    pub fn new() -> Self {
+        Self { process_namespaces: HashMap::new() }
+    }
+
+    pub fn bind_namespace(&mut self, pid: u32, source: &str, target: &str) {
+        let ns = self.process_namespaces.entry(pid).or_insert_with(HashMap::new);
+        ns.insert(target.to_string(), source.to_string());
+    }
+
+    pub fn resolve_namespace_path(&self, pid: u32, path: &str) -> String {
+        if let Some(ns) = self.process_namespaces.get(&pid) {
+            for (target, source) in ns {
+                if path.starts_with(target) {
+                    let sub = path.trim_start_matches(target);
+                    return format!("{}/{}", source.trim_end_matches('/'), sub.trim_start_matches('/'));
+                }
+            }
+        }
+        path.to_string()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -230,5 +321,31 @@ mod tests {
 
         let count = db.execute_query("SELECT * FROM users").unwrap();
         assert_eq!(count, 1);
+    }
+
+    #[test]
+    fn test_redox_scheme_translator() {
+        let redox = RedoxSchemeTranslator::new();
+        let uri = redox.resolve_scheme_uri("file:///bin/sh").unwrap();
+        assert_eq!(uri, "ipc://sovereign_fs_endpoint/bin/sh");
+    }
+
+    #[test]
+    fn test_haiku_attribute_fs() {
+        let mut haiku = HaikuAttributeFS::new();
+        haiku.write_attribute("/home/user/document.pdf", "META:title", "Sovereign OS Architecture");
+        assert_eq!(haiku.read_attribute("/home/user/document.pdf", "META:title").unwrap(), "Sovereign OS Architecture");
+
+        let matches = haiku.query_attribute("META:title", "Sovereign OS Architecture");
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0], "/home/user/document.pdf");
+    }
+
+    #[test]
+    fn test_plan9_namespace_synthesizer() {
+        let mut plan9 = Plan9NamespaceSynthesizer::new();
+        plan9.bind_namespace(101, "/usr/custom/bin", "/bin");
+        let resolved = plan9.resolve_namespace_path(101, "/bin/ls");
+        assert_eq!(resolved, "/usr/custom/bin/ls");
     }
 }
