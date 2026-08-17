@@ -63,6 +63,9 @@ pub struct Inode {
     pub capabilities: CapabilityToken,
     // Conforming Linux/BSD additions
     pub hard_links_count: u32,
+    pub link_count: u32,
+    pub symlink_target: Option<String>,
+    pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
     pub entries: HashMap<String, u64>, // Directory entries
 }
@@ -80,6 +83,9 @@ impl Inode {
             modified: 0,
             capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
             data: Vec::new(),
             entries: HashMap::new(),
         }
@@ -154,6 +160,7 @@ impl VirtualFilesystem {
     pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
         let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
         inode.link_count += 1;
+        inode.hard_links_count = inode.link_count;
         Ok(())
     }
 
@@ -306,8 +313,9 @@ impl VirtualFilesystem {
 
         let mut should_delete = false;
         if let Some(inode) = self.inodes.get_mut(&inode_id) {
-            if inode.hard_links_count > 1 {
-                inode.hard_links_count -= 1;
+            if inode.link_count > 1 {
+                inode.link_count -= 1;
+                inode.hard_links_count = inode.link_count;
             } else {
                 should_delete = true;
             }
@@ -339,6 +347,38 @@ impl VirtualFilesystem {
     }
 
     // Advanced Linux & BSD Inspired Path Traversal, O_CREAT, and Link Handling
+
+    /// Normalizes and canonicalizes a path into its standard absolute Linux/BSD POSIX path format.
+    /// Handles '.', '..', redundant slashes, and relative path resolution.
+    pub fn canonicalize_path(&self, current_dir: &str, path: &str) -> String {
+        let absolute = if path.starts_with('/') {
+            path.to_string()
+        } else {
+            let base = if current_dir.ends_with('/') {
+                current_dir.to_string()
+            } else {
+                format!("{}/", current_dir)
+            };
+            format!("{}{}", base, path)
+        };
+
+        let mut stack: Vec<&str> = Vec::new();
+        for component in absolute.split('/') {
+            match component {
+                "" | "." => continue,
+                ".." => {
+                    stack.pop();
+                }
+                c => stack.push(c),
+            }
+        }
+
+        if stack.is_empty() {
+            "/".to_string()
+        } else {
+            format!("/{}", stack.join("/"))
+        }
+    }
 
     /// Traverses and resolves a path name (e.g. "/var/log/syslog") to its Inode ID
     pub fn resolve_path(&self, path: &str) -> Result<u64, FsError> {
@@ -510,6 +550,7 @@ pub enum FsError {
     IsDirectory,
     NoSpace,
     AlreadyExists,
+    AttributeNotFound,
 }
 
 #[cfg(test)]
@@ -566,10 +607,13 @@ mod tests {
         assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
+        // Re-open file to reset offset to 0 for reading
+        let read_fd = vfs.open_file(inode_id, 0).unwrap();
+
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
     }
 
     #[test]
@@ -599,5 +643,14 @@ mod tests {
         // 5. Deleting the file second time drops link_count to 0, successfully freeing the Inode from VFS!
         vfs.delete_file(inode_id).unwrap();
         assert!(vfs.get_inode(inode_id).is_none());
+    }
+
+    #[test]
+    fn test_canonicalize_path() {
+        let vfs = VirtualFilesystem::new();
+        assert_eq!(vfs.canonicalize_path("/var/log", "syslog"), "/var/log/syslog");
+        assert_eq!(vfs.canonicalize_path("/var/log", "../mail/../log/./syslog"), "/var/log/syslog");
+        assert_eq!(vfs.canonicalize_path("/home/user", "/usr/bin/../../etc/passwd"), "/etc/passwd");
+        assert_eq!(vfs.canonicalize_path("/home/user", ".."), "/home");
     }
 }
