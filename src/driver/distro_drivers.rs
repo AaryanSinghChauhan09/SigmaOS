@@ -220,12 +220,221 @@ impl OpenBsdCryptoDevice {
 }
 
 // ============================================================================
+// 4. Linux Udev Hotplug Event Governor & Netlink Dispatcher
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UeventAction {
+    Add,
+    Remove,
+    Change,
+    Bind,
+}
+
+#[derive(Debug, Clone)]
+pub struct LinuxUevent {
+    pub action: UeventAction,
+    pub devpath: String,
+    pub subsystem: String,
+    pub seqnum: u64,
+}
+
+pub struct LinuxUdevEventGovernor {
+    pub pending_events: Vec<LinuxUevent>,
+    pub current_seqnum: AtomicU32,
+}
+
+impl LinuxUdevEventGovernor {
+    pub fn new() -> Self {
+        Self {
+            pending_events: Vec::new(),
+            current_seqnum: AtomicU32::new(1000),
+        }
+    }
+
+    /// Emits a new uevent notification when hardware hotplug/unplug occurs
+    pub fn emit_uevent(&mut self, action: UeventAction, devpath: &str, subsystem: &str) -> u64 {
+        let seq = self.current_seqnum.fetch_add(1, Ordering::SeqCst) as u64;
+        self.pending_events.push(LinuxUevent {
+            action,
+            devpath: String::from(devpath),
+            subsystem: String::from(subsystem),
+            seqnum: seq,
+        });
+        seq
+    }
+
+    /// Pops the next pending uevent from the netlink event ring
+    pub fn poll_uevent(&mut self) -> Option<LinuxUevent> {
+        if !self.pending_events.is_empty() {
+            Some(self.pending_events.remove(0))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for LinuxUdevEventGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 5. FreeBSD Devd / Devctl Event Pipe Notifier
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct DevdEvent {
+    pub system: String,
+    pub subsystem: String,
+    pub event_type: String,
+    pub device_name: String,
+}
+
+pub struct FreeBsdDevdNotifier {
+    pub event_queue: Vec<DevdEvent>,
+}
+
+impl FreeBsdDevdNotifier {
+    pub fn new() -> Self {
+        Self {
+            event_queue: Vec::new(),
+        }
+    }
+
+    pub fn notify_attach(&mut self, subsystem: &str, device_name: &str) {
+        self.event_queue.push(DevdEvent {
+            system: String::from("DEVFS"),
+            subsystem: String::from(subsystem),
+            event_type: String::from("ATTACH"),
+            device_name: String::from(device_name),
+        });
+    }
+
+    pub fn notify_detach(&mut self, subsystem: &str, device_name: &str) {
+        self.event_queue.push(DevdEvent {
+            system: String::from("DEVFS"),
+            subsystem: String::from(subsystem),
+            event_type: String::from("DETACH"),
+            device_name: String::from(device_name),
+        });
+    }
+}
+
+impl Default for FreeBsdDevdNotifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 6. OpenBSD Autoconf Driver Match Probe Engine
+// ============================================================================
+
+pub struct AutoconfDeviceMatch {
+    pub vendor_id: u16,
+    pub device_id: u16,
+    pub driver_name: &'static str,
+    pub probe_priority: u32,
+}
+
+pub struct OpenBsdAutoconfProbe {
+    pub registered_matches: Vec<AutoconfDeviceMatch>,
+}
+
+impl OpenBsdAutoconfProbe {
+    pub fn new() -> Self {
+        Self {
+            registered_matches: Vec::new(),
+        }
+    }
+
+    pub fn register_driver_match(&mut self, vendor_id: u16, device_id: u16, driver_name: &'static str, priority: u32) {
+        self.registered_matches.push(AutoconfDeviceMatch {
+            vendor_id,
+            device_id,
+            driver_name,
+            probe_priority: priority,
+        });
+    }
+
+    /// Finds the highest-priority autoconf driver match for given hardware PCI IDs
+    pub fn match_device(&self, vendor_id: u16, device_id: u16) -> Option<&'static str> {
+        let mut best_match: Option<(&'static str, u32)> = None;
+        for m in &self.registered_matches {
+            if m.vendor_id == vendor_id && m.device_id == device_id {
+                if let Some((_, best_pri)) = best_match {
+                    if m.probe_priority > best_pri {
+                        best_match = Some((m.driver_name, m.probe_priority));
+                    }
+                } else {
+                    best_match = Some((m.driver_name, m.probe_priority));
+                }
+            }
+        }
+        best_match.map(|(driver, _)| driver)
+    }
+}
+
+impl Default for OpenBsdAutoconfProbe {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. Linux Dynamic Scatter-Gather DMA I/O Mapping Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct DmaScatterSegment {
+    pub phys_addr: u64,
+    pub length: usize,
+}
+
+pub struct LinuxDmaScatterGatherEngine {
+    pub segments: Vec<DmaScatterSegment>,
+    pub max_segment_size: usize,
+}
+
+impl LinuxDmaScatterGatherEngine {
+    pub fn new(max_size: usize) -> Self {
+        Self {
+            segments: Vec::new(),
+            max_segment_size: max_size,
+        }
+    }
+
+    /// Maps a virtual memory block into a scatter-gather DMA descriptor list
+    pub fn map_sg_buffer(&mut self, base_phys_addr: u64, total_bytes: usize) {
+        let mut remaining = total_bytes;
+        let mut cur_addr = base_phys_addr;
+
+        while remaining > 0 {
+            let chunk = remaining.min(self.max_segment_size);
+            self.segments.push(DmaScatterSegment {
+                phys_addr: cur_addr,
+                length: chunk,
+            });
+            cur_addr += chunk as u64;
+            remaining -= chunk;
+        }
+    }
+
+    pub fn total_mapped_length(&self) -> usize {
+        self.segments.iter().map(|seg| seg.length).sum()
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_linux_devtmpfs() {
@@ -292,8 +501,7 @@ mod tests {
         let mut key = [0u8; 32];
         let mut iv = [0u8; 12];
         
-        // Use a more complex, non-linear generation pattern for test purposes
-        let seed: u64 = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos() as u64;
+        let seed: u64 = 0x1234_5678_9abc_def0;
         for i in 0..32 {
             let mut val = seed.wrapping_mul(i as u64 + 1);
             val ^= val >> 33;
@@ -330,5 +538,38 @@ mod tests {
 
         aes_dev.process_data(input, &mut aes_ciphered).unwrap();
         assert_ne!(input, aes_ciphered.as_slice());
+    }
+
+    #[test]
+    fn test_linux_udev_and_freebsd_devd() {
+        let mut udev = LinuxUdevEventGovernor::new();
+        let seq = udev.emit_uevent(UeventAction::Add, "/sys/devices/pci0000:00/0000:00:1f.2/host0", "scsi_host");
+        assert_eq!(seq, 1000);
+
+        let polled = udev.poll_uevent();
+        assert!(polled.is_some());
+        let ev = polled.unwrap();
+        assert_eq!(ev.action, UeventAction::Add);
+        assert_eq!(ev.subsystem, "scsi_host");
+
+        let mut devd = FreeBsdDevdNotifier::new();
+        devd.notify_attach("usb", "ukbd0");
+        assert_eq!(devd.event_queue.len(), 1);
+        assert_eq!(devd.event_queue[0].event_type, "ATTACH");
+    }
+
+    #[test]
+    fn test_openbsd_autoconf_and_dma_sg() {
+        let mut autoconf = OpenBsdAutoconfProbe::new();
+        autoconf.register_driver_match(0x8086, 0x100e, "e1000_generic", 10);
+        autoconf.register_driver_match(0x8086, 0x100e, "e1000_optimized", 50);
+
+        let matched = autoconf.match_device(0x8086, 0x100e);
+        assert_eq!(matched, Some("e1000_optimized"));
+
+        let mut dma_sg = LinuxDmaScatterGatherEngine::new(4096);
+        dma_sg.map_sg_buffer(0x100000, 10000);
+        assert_eq!(dma_sg.segments.len(), 3); // 4096 + 4096 + 1808
+        assert_eq!(dma_sg.total_mapped_length(), 10000);
     }
 }
