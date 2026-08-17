@@ -39,7 +39,7 @@ pub unsafe extern "C" fn head_lines(
     max_output: SigmaU32,
     line_count: SigmaU32,
 ) -> SigmaI32 {
-    if !HEAD_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !HEAD_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     
@@ -77,7 +77,7 @@ pub unsafe extern "C" fn head_bytes(
     max_output: SigmaU32,
     byte_count: SigmaU32,
 ) -> SigmaI32 {
-    if !HEAD_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !HEAD_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     
@@ -105,7 +105,7 @@ pub unsafe extern "C" fn head_multiple(
     max_output: SigmaU32,
     options: HeadOptions,
 ) -> SigmaI32 {
-    if !HEAD_INITIALIZED || files.isnull() || output.isnull() {
+    if !HEAD_INITIALIZED || files.is_null() || output.is_null() {
         return -1;
     }
     
@@ -117,7 +117,7 @@ pub unsafe extern "C" fn head_multiple(
         }
         
         let file = *files.add(i);
-        if file.isnull() {
+        if file.is_null() {
             continue;
         }
         
