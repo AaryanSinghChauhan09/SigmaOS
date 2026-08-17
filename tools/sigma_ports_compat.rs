@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 //! SigmaOS FreeBSD-style Ports Compatibility Tool
 //! Safe, zero-dependency, `#![no_std]` compliant utility
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 //! SigmaOS RERA Act, 2016 Compatibility
 //! Real Estate Regulatory Authority compliance auditor
 //! Zero external dependencies

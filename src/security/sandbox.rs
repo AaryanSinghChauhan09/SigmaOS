@@ -3,7 +3,7 @@
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Inspired by market-leading competitors Sandboxie (virtual file redirection/overlays) & Firejail (namespace isolation & profiles)
 
-use crate::klib::{hashmap::HashMap, hashset::HashSet};
+use std::collections::{HashMap, HashSet};
 
 /// Sandbox execution profiles matching specific application profiles (inspired by Firejail)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -241,23 +241,6 @@ impl PrivacyFirstSandbox {
         env.into_iter()
             .filter(|(key, _)| !blacklisted_vars.contains(&key.as_str()))
             .collect()
-    }
-
-    /// Firejail-style environment variable sanitizer to prevent privilege escalation / variable injections
-    pub fn sanitize_environment(&mut self, env_vars: &[(&str, &str)]) {
-        let sensitive_prefixes = ["LD_", "RUST_", "PATH", "SHELL", "USER"];
-        for &(key, val) in env_vars {
-            let mut is_sensitive = false;
-            for prefix in &sensitive_prefixes {
-                if key.starts_with(prefix) {
-                    is_sensitive = true;
-                    break;
-                }
-            }
-            if !is_sensitive {
-                self.sanitized_env.insert(key.to_string(), val.to_string());
-            }
-        }
     }
 }
 

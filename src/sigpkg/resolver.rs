@@ -3,7 +3,7 @@
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 // Enhanced with high-performance Debian APT-style pinning and repository priority weighting
 
-use crate::klib::{hashmap::HashMap, hashset::HashSet};
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -218,10 +218,6 @@ impl SatSolver {
     }
 
     /// Detect circular dependencies
-    pub fn is_debian_elementary_package_compliant(&self, package: &DebianElementaryAppPackage) -> bool {
-        package.is_elementary_compliant()
-    }
-
     pub fn detect_circular(&self, package_name: &str) -> bool {
         let mut visited = HashSet::new();
         let mut recursion_stack = HashSet::new();
@@ -313,24 +309,46 @@ mod tests {
     fn test_debian_elementary_app_package_validator() {
         let solver = SatSolver::new();
 
-        let compliant_app = DebianElementaryAppPackage::new("io.elementary.calculator", true, true);
-        assert!(solver.is_debian_elementary_package_compliant(&compliant_app));
+        // 1. Fully compliant package
+        let compliant_app = DebianElementaryAppPackage {
+            app_id: "io.elementary.calculator".to_string(),
+            format: "deb".to_string(),
+            adopts_csd_guideline: true,
+            supports_dark_mode: true,
+        };
+        assert!(solver.is_debian_elementary_package_compliant(&compliant_app).is_ok());
 
+        // 2. Non-compliant: invalid App ID format
         let mut app = compliant_app.clone();
         app.app_id = "calculator".to_string();
-        assert!(!solver.is_debian_elementary_package_compliant(&app));
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)"
+        );
 
+        // 3. Non-compliant: invalid TLD prefix
         let mut app = compliant_app.clone();
         app.app_id = "net.elementary.calculator".to_string();
-        assert!(!solver.is_debian_elementary_package_compliant(&app));
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: Invalid app ID top-level domain prefix"
+        );
 
+        // 4. Non-compliant: missing CSD compliance
         let mut app = compliant_app.clone();
         app.adopts_csd_guideline = false;
-        assert!(!solver.is_debian_elementary_package_compliant(&app));
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules"
+        );
 
+        // 5. Non-compliant: missing dark mode compliance
         let mut app = compliant_app.clone();
         app.supports_dark_mode = false;
-        assert!(!solver.is_debian_elementary_package_compliant(&app));
+        assert_eq!(
+            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
+            "elementaryOS Package Violation: App must support toggleable pure-black dark mode"
+        );
     }
 
     #[test]
@@ -441,21 +459,5 @@ mod tests {
         let resolved = solver.resolve("bash", &VersionConstraint::Any).unwrap();
         assert_eq!(resolved.len(), 1);
         assert_eq!(resolved[0].version, Version::new(1, 0, 0));
-    }
-
-    #[test]
-    fn test_debian_elementary_compliance() {
-        let app1 = DebianElementaryAppPackage::new("io.elementary.calculator", true, true);
-        assert!(app1.is_elementary_compliant());
-
-        let app2 = DebianElementaryAppPackage::new("io.elementary.calculator", false, true);
-        assert!(!app2.is_elementary_compliant());
-
-        let app3 = DebianElementaryAppPackage::new("org.gnome.builder", true, true);
-        assert!(app3.is_elementary_compliant());
-
-        let solver = SatSolver::new();
-        assert!(solver.is_debian_elementary_package_compliant(&app1));
-        assert!(solver.is_debian_elementary_package_compliant(&app3));
     }
 }
