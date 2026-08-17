@@ -8,8 +8,8 @@ SigmaOS incorporates concepts from **Gentoo's Portage** package management and e
 
 ## Key Modules
 
-- [`src/sigpkg/portage.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/portage.rs): Clean-room Portage engine, USE flags evaluation, and slotting support.
-- [`src/toolchain/bootstrap.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/toolchain/bootstrap.rs): Autonomous bootstrap compiler and linker pipeline.
+- [`src/sigpkg/portage.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/sigpkg/portage.rs): Clean-room Portage engine, USE flags evaluation, and slotting support.
+- [`src/toolchain/bootstrap.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/toolchain/bootstrap.rs): Autonomous bootstrap compiler and linker pipeline.
 
 ---
 

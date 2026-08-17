@@ -8,8 +8,8 @@ SigmaOS provides a clean-room hardware execution and userland CPU architecture e
 
 ## Key Modules
 
-- [`src/docs/Sovereign-Processor-State-Emulator.md`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/docs/Sovereign-Processor-State-Emulator.md): ISA translation and register mapping specification.
-- [`src/compatibility/wasm_sandbox.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/compatibility/wasm_sandbox.rs): WebAssembly / bytecode universal execution engine.
+- [`src/docs/Sovereign-Processor-State-Emulator.md`](file:///home/aaryansinghchauhan/SigmaOS/src/docs/Sovereign-Processor-State-Emulator.md): ISA translation and register mapping specification.
+- [`src/compatibility/wasm_sandbox.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/compatibility/wasm_sandbox.rs): WebAssembly / bytecode universal execution engine.
 
 ---
 

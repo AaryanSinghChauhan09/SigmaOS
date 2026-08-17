@@ -4,7 +4,7 @@ SigmaOS aims to achieve ultimate self-sufficiency and reduce dependencies on pre
 
 ## Custom Dynamic Vector (`Vec<T>`)
 
-Located in [`src/klib/vec.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/klib/vec.rs), this structure replaces `std::vec::Vec`.
+Located in [`src/klib/vec.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/klib/vec.rs), this structure replaces `std::vec::Vec`.
 
 ### Key Features
 - **Manual Allocation**: Directly invokes `alloc`, `dealloc`, and `realloc` from the allocator shim interface.
@@ -30,7 +30,7 @@ for val in &v {
 
 ## Custom Hash Map (`HashMap<K, V>`)
 
-Located in [`src/klib/hashmap.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/klib/hashmap.rs), this structure replaces `std::collections::HashMap`.
+Located in [`src/klib/hashmap.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/klib/hashmap.rs), this structure replaces `std::collections::HashMap`.
 
 ### Key Features
 - **Bucket Array Layout**: Backed by a custom `Vec` containing list buckets to handle collisions via chaining.

@@ -8,8 +8,8 @@ SigmaOS incorporates the **half-rolling release model** and pure Qt/KDE applicat
 
 ## Key Modules
 
-- [`src/compatibility/chakra.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/compatibility/chakra.rs): Chakra package bundle system, half-rolling repository manager, and Akabe package tool.
-- [`src/sigpkg/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/mod.rs): Integrated half-rolling dependency resolution.
+- [`src/compatibility/chakra.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/compatibility/chakra.rs): Chakra package bundle system, half-rolling repository manager, and Akabe package tool.
+- [`src/sigpkg/mod.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/sigpkg/mod.rs): Integrated half-rolling dependency resolution.
 
 ---
 

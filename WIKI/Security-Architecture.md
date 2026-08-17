@@ -172,4 +172,4 @@ SigmaOS targets **workstation and server** deployments with:
 3. **Malicious software**: MAC + Landlock + Capabilities restrict damage
 4. **Insider threat**: Audit logs + MLS classification
 
-*See also: [SECURITY_HARDENING_COMPLETE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/SECURITY_HARDENING_COMPLETE.md)*
+*See also: [SECURITY_HARDENING_COMPLETE.md](file:///home/aaryansinghchauhan/SigmaOS/SECURITY_HARDENING_COMPLETE.md)*

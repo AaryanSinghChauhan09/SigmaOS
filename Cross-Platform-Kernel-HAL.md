@@ -2,7 +2,7 @@
 
 ## Overview
 
-SigmaOS implements a modular **Hardware Abstraction Layer (HAL)** in [`src/arch/hal.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/arch/hal.rs) and [`src/compatibility/cross_platform_kernel.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/compatibility/cross_platform_kernel.rs), isolating architecture-specific machine details from the generic OS kernel.
+SigmaOS implements a modular **Hardware Abstraction Layer (HAL)** in [`src/arch/hal.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/arch/hal.rs) and [`src/compatibility/cross_platform_kernel.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/compatibility/cross_platform_kernel.rs), isolating architecture-specific machine details from the generic OS kernel.
 
 ---
 
