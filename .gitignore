@@ -18,3 +18,8 @@ build/
 *.exe
 *.elf
 test_runner
+.cache/
+test_dma
+test_universal
+tests/sigma_test_runner
+zenith_desktop_screenshot.png
