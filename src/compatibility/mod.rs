@@ -55,12 +55,13 @@ pub use antix::{
 };
 
 pub use canonical::{
-    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
-    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
-    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
-    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
-    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
-    UnifiedAppStore, ZorinAppearanceSwitcher,
+    // Temporarily commented out due to missing implementations
+    // AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
+    // CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
+    // ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
+    // HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
+    // ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
+    // UnifiedAppStore, ZorinAppearanceSwitcher,
 };
 
 pub use solid_kernel::{

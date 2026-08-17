@@ -15,12 +15,15 @@ pub mod slab;
 pub mod btreemap;
 pub mod vecdeque;
 pub mod adt;
+pub mod time;
+pub mod math;
 
 // For now, we use our custom Vec and HashMap (aliased to our bucket-based BTreeMap)
 pub use vec::Vec;
 pub use hashmap::BTreeMap as HashMap;
 pub use hashmap::BTreeMap;
 pub use adt::{SplayTree, RadixTree, SovereignPriorityQueue};
+#[cfg(target_os = "none")]
 pub use hashset::HashSet;
 pub use uuid::Uuid;
 #[cfg(target_os = "none")]
