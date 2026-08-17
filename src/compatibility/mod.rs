@@ -1,80 +1,110 @@
 // SigmaOS Compatibility Module
-pub mod absorb_tools;
-pub mod apache_ossie;
-pub mod chimera_linux;
+pub mod constellation_mesh;
 pub mod cross_platform;
+pub mod india_stack;
+pub mod india_professional_tools;
+pub mod alpine_linux;
+pub mod interim;
+pub mod jehanne;
+pub mod mint_linux;
+pub mod reactos;
+pub mod lubuntu;
+pub mod antix;
+pub mod bodhi_moksha;
+pub mod cachy_os;
+pub mod chakra;
+pub mod chimera_linux;
+pub mod endeavour;
+pub mod garuda_zen;
+pub mod gentoo;
+pub mod tiny_core;
+pub mod localsend;
+
+pub use zorin::{
+    ZorinLayoutSwitcher,
+    ZorinChameleonEngine,
+    ZorinConnectManager,
+    ZorinWindowsAppSupport,
+};
 pub mod historic_linux;
 pub mod mint_linux;
+pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod sovereign_suite;
-pub mod tiny_core;
-pub mod wasm_sandbox;
-pub mod dragonfly_bsd;
+pub mod india_stack_localization;
+pub mod legacy_adapters;
+pub mod india_professional_tools;
+pub mod canonical;
+pub mod fedora;
 pub mod arch_linux;
 
+pub use arch_linux::{
+    ProcFileType, ProcFile, DevFileType, DevFile, ArchPackage, PacmanError, PacmanEngine,
+    RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule, ArchFirewall,
+    LsmMode, LsmSentinel, PamGate, PaneLayout, TmuxMultiplexer, SovereignEnvRegistry,
+    AurRepoStatus, YayParuAdapter, ArchMirror, ReflectorMirrorlist, SubvolumeConfig,
+    ArchinstallConfig, ArchinstallParity, ArtixInitSystemType, ServiceState, ArtixInitBridge,
+    KeyTrustLevel, PacmanKey, PacmanKeyring, AurPatch, AurPatchEngine,
+};
+
+pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SovereignOstreeDeployer, SovereignSeLinuxContext, SovereignSeLinuxEngine,
+    SovereignFirewalldManager, SovereignCockpitConsole,
+};
+pub use legacy_adapters::{
+    KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
+    APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
+    WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
+    LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_WORKLOAD_OPTIMIZER,
+};
+
+pub use constellation_mesh::{
+    BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
+    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
+    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid,
+    LegacyCCodexGrid, LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+    StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
+};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-
-pub use historic_linux::{
-    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
-    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
-    VintagePackageConverter, VintageVirtualizationSandbox,
+pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
+    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+    Literal, SpacSatResolver,
+};
+pub use alpine_linux::{
+    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
+    AlpineSyslogManager, BusyBoxMulticall,
+};
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
+pub use jehanne::{
+    ComputeNode, DistributedComputeHandoff, JehanneError, JehanneNamespace, NamespaceBindEntry,
+    Plan9pMessage, Plan9pMsgType,
 };
 
 pub use mint_linux::{
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
-    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, MintUpdateManager,
+    SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor, CinnamonThemeEngine,
+    TimeshiftSystemRestorer,
 };
 
 pub use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-    DinitServiceState,
+    DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
+    ApkPackageMetadata, ApkPackageStore,
 };
-
-pub use relay_nexus::{
-    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
-    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
-    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
-    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
-    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
-    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
-    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
-    ZeroTrustNexus,
+pub use lubuntu::{
+    CpuGovernor, SystemPressure, LubuntuHealthReport, LubuntuSystemManager,
+    LxqtSessionManager, LxqtSessionState, PcmanfmQtAdapter, FileNode,
+    DiscoverPackageAdapter, AptPackage, FeatherpadEditor, QTerminalEmulator, TerminalTab,
+    CalamaresInstallerShim, CalamaresStage
 };
-
-pub use solid_kernel::{
-    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
-    SigmaFSPlusPlus, SolidKernelCore,
-};
-
-pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
-
-pub use dragonfly_bsd::{
-    ConcurrentSlateLock, Hammer2Engine, Hammer2Transaction, Hammer2TransactionType, LwktMessage,
-    LwktScheduler, VKernelEngine, VKernelState,
-};
-
-pub use arch_linux::{
-    ArchInitSystem, ArchPackage, ArchFirewall, DevFile, LsmSentinel, PacmanEngine, PamGate,
-    Pkgbuild, PkgbuildParser, AurHelper, MkinitcpioEngine, ArchisoEngine, ProcFile,
-};
-
-pub use absorb_tools::{
-    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
-    PledgeUnveilSandbox, PqcSecureChannel,
-};
-
+pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
-
-pub use apache_ossie::{
-    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
-    OssieRelationship, SemanticRow,
-};
-
-pub use sovereign_suite::{
-    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
-    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
-};
+pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};
