@@ -82,7 +82,6 @@ impl SovereignGameMode {
 }
 
 /// Lightweight Kernel Thread (LWKT) Message (DragonFly BSD LWKT inspired)
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub fn calculate_fnv1a(data: &[u8]) -> u64 {
     let mut hash: u64 = 0xcbf29ce484222325;
     for &byte in data {

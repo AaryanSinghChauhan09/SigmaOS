@@ -180,7 +180,7 @@ impl PageTable for SimplePageTable {
         } else {
             // Return a reference to a dummy entry for out-of-bounds access
             // Use a const dummy instead of static mut to avoid safety issues
-            const DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
+            static DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
             &DUMMY
         }
     }

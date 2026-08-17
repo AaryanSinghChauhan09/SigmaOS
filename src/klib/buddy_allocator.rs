@@ -119,6 +119,8 @@ impl BuddyAllocator for SimpleBuddyAllocator {
             return Err(AllocError::OutOfMemory);
         }
 
+        let mut retry_count = 0;
+
         for current_order in order..=self.max_order.load(Ordering::SeqCst) {
             if !self.free_lists[current_order].is_empty() {
                 let block_id = self.free_lists[current_order].remove(0);

@@ -1,13 +1,21 @@
 // SigmaOS Kernel Module
 pub mod architecture;
 pub mod breakthroughs;
+pub mod bus;
+pub mod component;
+pub mod generation_manager;
 pub mod ipc;
 pub mod linux_absorb;
+pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub mod memory;
-pub mod breakthroughs;
+pub mod meta;
+pub mod object;
+pub mod paging;
 pub mod policy_mechanism;
+pub mod roundrobin;
 pub mod sched;
+pub mod scheduler;
 pub mod subsystem;
 
 pub use architecture::{

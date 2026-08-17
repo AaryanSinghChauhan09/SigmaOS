@@ -22,6 +22,8 @@ use crate::klib::BTreeMap;
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
 
+use std::collections::HashMap;
+
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RegistryType {

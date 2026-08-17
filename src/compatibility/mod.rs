@@ -83,7 +83,7 @@ pub use chakra::{
 
 pub use india_professional_tools::{
     AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker, JudicialTimelinePlanner,
-    Literal as ProfLiteral, MsmeComplianceEngine, PMWaniHotspotController, SpacSatResolver,
+    MsmeComplianceEngine, PMWaniHotspotController,
 };
 pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
 pub use alpine_linux::{
@@ -106,15 +106,6 @@ pub use antix::{
     AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
     LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
     GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
-};
-
-pub use canonical::{
-    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
-    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
-    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
-    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
-    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
-    UnifiedAppStore, ZorinAppearanceSwitcher,
 };
 
 pub use solid_kernel::{

@@ -2,6 +2,40 @@
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 
 use crate::sigpkg::{Package, Version, VersionConstraint, Dependency, ParseError};
+use crate::security::Permission;
+use crate::package::PackagePriority;
+
+#[derive(Debug, Clone)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanPkgbuild {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub confinement: String,
+    pub plugs: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlatpakManifest {
+    pub app_id: String,
+    pub command: String,
+    pub finish_args: Vec<String>,
+}
 use std::collections::HashMap;
 
 /// Abstract trait for package format adapters (OOPS principle)
@@ -46,6 +80,13 @@ impl DebAdapter {
         Self {
             user_hooks: Vec::new(),
         }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
     }
 
     /// Parses raw Debian control file text (Apt)
@@ -281,13 +322,13 @@ impl DebAdapter {
             });
         }
 
-        Ok(Package {
-            name: name.to_string(),
-            version: parsed_ver,
-            description: desc.to_string(),
+        Ok(Package::new(
+            name.to_string(),
+            parsed_ver,
+            desc.to_string(),
             dependencies,
-            checksum: format!("SHA256:{}", name),
-        })
+            format!("SHA256:{}", name),
+        ))
     }
 }
 
@@ -314,7 +355,7 @@ impl PackageFormatAdapter for DebAdapter {
             } else if line.starts_with("Description: ") {
                 description = line[13..].to_string();
             } else if line.starts_with("Depends: ") {
-                let deps_str = line[9..];
+                let deps_str = &line[9..];
                 for dep in deps_str.split(',') {
                     let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
                     if !dep_name.is_empty() {
@@ -1081,7 +1122,48 @@ impl AppImageContainer {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct UniversalPackageAdapter {
+    deb_adapter: DebAdapter,
+}
+
 impl UniversalPackageAdapter {
+    pub fn new() -> Self {
+        Self {
+            deb_adapter: DebAdapter::new(),
+        }
+    }
+
+    pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
+        self.deb_adapter.parse_apt_control(text)
+    }
+
+    pub fn parse_pacman_pkgbuild(&self, text: &str) -> Result<PacmanPkgbuild, &'static str> {
+        self.deb_adapter.parse_pacman_pkgbuild(text)
+    }
+
+    pub fn parse_snapcraft_yaml(&self, text: &str) -> Result<SnapcraftManifest, &'static str> {
+        self.deb_adapter.parse_snapcraft_yaml(text)
+    }
+
+    pub fn parse_flatpak_json(&self, text: &str) -> Result<FlatpakManifest, &'static str> {
+        self.deb_adapter.parse_flatpak_json(text)
+    }
+
+    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
+        self.deb_adapter.translate_sandbox_permissions(plugs_or_args)
+    }
+
+    pub fn translate_to_native_package(
+        &self,
+        name: &str,
+        version_str: &str,
+        desc: &str,
+        raw_deps: &[String],
+    ) -> Result<Package, &'static str> {
+        self.deb_adapter.translate_to_native_package(name, version_str, desc, raw_deps)
+    }
+
     /// Parses RedHat/Yum .spec files for RPM metadata translation
     pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
         let mut name = String::new();

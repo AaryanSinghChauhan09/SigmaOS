@@ -2,7 +2,8 @@
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::{BTreeMap, HashMap, VecDeque};
+use crate::klib::Uuid;
 use std::path::{Path, PathBuf};
 
 // =========================================================================
@@ -69,7 +70,7 @@ impl ShareXFlameshotEngine {
             screenshot.cloud_url = Some(format!(
                 "{}/capture_{}.png",
                 self.target_cloud_destination,
-                uuid::Uuid::new_v4()
+                Uuid::new_v4()
             ));
         }
 

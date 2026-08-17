@@ -6,11 +6,10 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use alloc::boxed::Box;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task, PID_MAX_LIMIT};
-use crate::kernel::vfs::inode::FsError;
+use crate::filesystem::vfs::FsError;
 
 pub struct RunQueue {
     pub cfs_rq: CfsRunQueue,
@@ -122,7 +121,7 @@ impl SchedClass for StopSchedClass {
 }
 
 impl SchedClass for FairSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
         rq.cfs_rq.nr_running += 1;
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
         task.state = ProcessState::Runnable;

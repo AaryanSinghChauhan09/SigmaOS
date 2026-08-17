@@ -19,7 +19,6 @@ pub enum Protocol {
 /// Standard RFC-793 TCP States
 #[repr(u32)]
 
-#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,

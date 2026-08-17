@@ -14,6 +14,82 @@ impl DdeDeviceWrapper {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ProtectedModeSwitchSimulator {
+    pub gdt_loaded: bool,
+    pub cr0_pe_bit: bool,
+    pub active_cs_segment: u16,
+    pub active_ds_segment: u16,
+}
+
+impl ProtectedModeSwitchSimulator {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn lgdt(&mut self) {
+        self.gdt_loaded = true;
+    }
+    pub fn execute_switch_to_pm(&mut self) -> Result<(), &'static str> {
+        if !self.gdt_loaded {
+            return Err("GDT not loaded");
+        }
+        self.cr0_pe_bit = true;
+        self.active_cs_segment = 0x08;
+        self.active_ds_segment = 0x10;
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct VgaTextModeDriverSimulator {
+    pub buffer: [u16; 2000],
+    pub cursor_offset: usize,
+}
+
+impl VgaTextModeDriverSimulator {
+    pub fn new() -> Self {
+        Self {
+            buffer: [0; 2000],
+            cursor_offset: 0,
+        }
+    }
+    pub fn write_char(&mut self, ch: char, attr: u8) {
+        if self.cursor_offset < 2000 {
+            self.buffer[self.cursor_offset] = (ch as u16) | ((attr as u16) << 8);
+            self.cursor_offset += 1;
+        }
+    }
+    pub fn update_cursor_via_ports(&mut self, port: u16, val: usize) -> Result<usize, &'static str> {
+        if port == 0x3D5 {
+            self.cursor_offset = val;
+        }
+        Ok(self.cursor_offset)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PicKeyboardController {
+    pub master_pic_mask: u8,
+}
+
+impl PicKeyboardController {
+    pub fn new() -> Self {
+        Self {
+            master_pic_mask: 0xFF,
+        }
+    }
+    pub fn init_pic(&mut self) {
+        self.master_pic_mask = 0xFD;
+    }
+    pub fn poll_port_60_read(&self, scancode: u8) -> char {
+        match scancode {
+            0x10 => 'q',
+            0x1F => 's',
+            _ => '?',
+        }
+    }
+}
+
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
