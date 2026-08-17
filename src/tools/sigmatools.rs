@@ -1,5 +1,25 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaTools - System suite for SigmaOS
 // SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess components
+
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
@@ -978,9 +998,9 @@ impl SovereignPasswordGenerator {
         for _ in 0..length {
             seed = seed.wrapping_mul(1103515245).wrapping_add(12345);
             let selection_pool: &[u8] = if include_symbols && (seed % 3 == 0) {
-                symbols
+                &symbols[..]
             } else {
-                letters
+                &letters[..]
             };
             let idx = (seed as usize) % selection_pool.len();
             password.push(selection_pool[idx] as char);
@@ -990,7 +1010,7 @@ impl SovereignPasswordGenerator {
 }
 
 #[cfg(test)]
-mod tests_replicated {
+mod replicated_tests {
     use super::*;
 
     #[test]

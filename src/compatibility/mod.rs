@@ -1,80 +1,102 @@
 // SigmaOS Compatibility Module
-pub mod absorb_tools;
-pub mod apache_ossie;
-pub mod chimera_linux;
+pub mod antix;
+pub mod canonical;
+pub mod chakra;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
+pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod sovereign_suite;
-pub mod tiny_core;
 pub mod wasm_sandbox;
-pub mod dragonfly_bsd;
-pub mod arch_linux;
+pub mod absorb_tools;
+pub mod tiny_core;
+pub mod apache_ossie;
+pub mod sovereign_suite;
+pub mod gentoo;
+pub mod legacy_adapters;
+pub mod fedora;
+pub mod debian;
+pub mod cachy_os;
 
+pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 
-pub use historic_linux::{
-    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
-    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
-    VintagePackageConverter, VintageVirtualizationSandbox,
+pub use legacy_adapters::{
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 
-pub use mint_linux::{
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
-    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+pub use chakra::{
+    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
+    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
 
-pub use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-    DinitServiceState,
+pub use antix::{
+    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
+    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
 };
 
-pub use relay_nexus::{
-    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
-    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
-    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
-    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
-    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
-    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
-    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
-    ZeroTrustNexus,
+pub use canonical::{
+    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
+    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
+    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
+    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
+    UnifiedAppStore, ZorinAppearanceSwitcher,
 };
 
 pub use solid_kernel::{
-    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
-    SigmaFSPlusPlus, SolidKernelCore,
+    IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
+    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
 };
 
-pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
-
-pub use dragonfly_bsd::{
-    ConcurrentSlateLock, Hammer2Engine, Hammer2Transaction, Hammer2TransactionType, LwktMessage,
-    LwktScheduler, VKernelEngine, VKernelState,
-};
-
-pub use arch_linux::{
-    ArchInitSystem, ArchPackage, ArchFirewall, DevFile, LsmSentinel, PacmanEngine, PamGate,
-    Pkgbuild, PkgbuildParser, AurHelper, MkinitcpioEngine, ArchisoEngine, ProcFile,
+pub use wasm_sandbox::{
+    WasmState, WasmModule, WasmSandboxEngine,
 };
 
 pub use absorb_tools::{
-    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
-    PledgeUnveilSandbox, PqcSecureChannel,
+    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
+    DpllSatSolver, CasObject, ContentAddressedStorage,
 };
 
-pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
+pub use tiny_core::{
+    TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
+};
 
 pub use apache_ossie::{
-    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
-    OssieRelationship, SemanticRow,
+    MetricAggregation, OssieMetric, OssieDimension, OssieRelationship, OssieCatalog,
+    SemanticRow, OssieInterpreter, OssieOntology,
 };
 
 pub use sovereign_suite::{
-    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
-    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
+    EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
+    FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
+};
+
+pub use gentoo::{
+    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
+    EbuildPackage, PortageEngine,
+};
+
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel, FedoraAluFlags,
+    FedoraAlu, SeLinuxContext, SeLinuxEngine, SystemdPresetConfigurator, AnacondaInstaller,
+};
+
+pub use debian::{
+    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine, AlternativeLink,
+    DebianAlternativesSystem, DebootstrapEngine,
+};
+
+pub use cachy_os::{
+    BoreSchedulerGovernor, AnanicyManager, SchedPolicy, V4OptimizedPackageManager,
+    CachyInitramfs,
 };

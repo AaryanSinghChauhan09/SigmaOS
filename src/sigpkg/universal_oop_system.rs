@@ -22,14 +22,8 @@
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-
-#[cfg(all(not(feature = "standalone_test"), target_os = "none"))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, Arc};
-
-#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
-use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
-use std::sync::Arc;
 
 #[cfg(feature = "standalone_test")]
 use std::collections::HashMap;
@@ -257,7 +251,7 @@ impl BaseAdapter {
 
     pub fn execute_hooks(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.user_hooks {
-            UserDefinedHook::execute(hook.as_ref(), package)?;
+            hook.execute(package)?;
         }
         Ok(())
     }
@@ -2229,11 +2223,12 @@ impl PackageParserFactory {
     }
 
     pub fn get_parser(&self, format: PackageFormat) -> Option<&dyn IPackageParser> {
-        self.parsers.get::<PackageFormat>(&format).map(|p| p.as_ref())
+        self.parsers.get(&format).map(|p: &Box<dyn IPackageParser>| p.as_ref())
     }
 
     pub fn auto_detect_parser(&self, data: &[u8]) -> Option<&dyn IPackageParser> {
         for parser in self.parsers.values() {
+            let parser: &Box<dyn IPackageParser> = parser;
             let p_ref: &dyn IPackageParser = parser.as_ref();
             if p_ref.can_parse(data) {
                 return Some(p_ref);
@@ -2290,7 +2285,8 @@ impl UniversalPackageManager {
 
         for trigger in &self.path_triggers {
             let mut matched_files = Vec::new();
-            let pattern = trigger.pattern();
+            let trigger_ref: &dyn IPathTrigger = trigger.as_ref();
+            let pattern = trigger_ref.pattern();
 
             for file in files {
                 // Simplified pattern matching support:
@@ -2346,7 +2342,7 @@ impl UniversalPackageManager {
 
     pub fn execute_hook_chain(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.global_hooks {
-            UserDefinedHook::execute(hook.as_ref(), package)?;
+            hook.execute(package)?;
         }
         Ok(())
     }
@@ -2408,7 +2404,7 @@ impl UniversalPackageManager {
         self.installed_packages
             .values()
             .map(|p: &Box<dyn IPackage>| p.as_ref())
-            .collect()
+            .collect::<Vec<&dyn IPackage>>()
     }
 
     /// Register a custom parser

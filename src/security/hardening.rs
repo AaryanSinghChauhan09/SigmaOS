@@ -105,7 +105,7 @@ impl HardenedAuditTrail {
 
         // Compute simple dynamic rolling hash chain: XOR elements with prime multi
         let entry_payload = pid ^ (perm as u64) ^ (if allowed { 1 } else { 0 });
-        let next_hash = (prev ^ entry_payload).wrapping_mul(1099511628211); // FNV-1a 64-bit prime
+        let next_hash = (prev ^ entry_payload).wrapping_mul(1099511628211_u64); // FNV-1a 64-bit prime
 
         let entry = AuditLogEntry {
             process_id: pid,
@@ -126,14 +126,14 @@ impl HardenedAuditTrail {
             return true;
         }
 
-        let mut expected_prev: u64 = 0x1337_C0DE_FA11_FACE;
+        let mut expected_prev = 0x1337_C0DE_FA11_FACE;
         for i in 0..self.logs.len() {
             let log = &self.logs[i];
             if log.previous_hash != expected_prev {
                 return false; // Chain broken! Tampering detected!
             }
 
-            let payload: u64 = log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1u64 } else { 0u64 });
+            let payload = log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1 } else { 0 });
             let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211_u64);
 
             if log.entry_hash != calculated_hash {

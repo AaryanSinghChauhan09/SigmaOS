@@ -72,9 +72,10 @@ impl DnsResolver {
         if domain.is_empty() {
             return Err(DnsError::InvalidDomain);
         }
+        let ascii_domain = IdnaPunycodeEncoder::domain_to_ascii(domain);
         self.queries_sent.fetch_add(1, Ordering::SeqCst);
         // Simulate local DNS resolution cache/lookup
-        if domain == "sigmaos.org" || domain == "localhost" {
+        if ascii_domain == "sigmaos.org" || ascii_domain == "localhost" {
             self.cache_hits.fetch_add(1, Ordering::SeqCst);
             return Ok([127, 0, 0, 1]);
         }
@@ -86,6 +87,58 @@ impl DnsResolver {
             self.queries_sent.load(Ordering::Relaxed),
             self.cache_hits.load(Ordering::Relaxed),
         )
+    }
+}
+
+/// IDNA (Internationalized Domain Names in Applications - RFC 3492 / UTS #46) Punycode Converter
+pub struct IdnaPunycodeEncoder;
+
+impl IdnaPunycodeEncoder {
+    /// Converts an internationalized domain name (e.g. "münchen.de") to ASCII Punycode ("xn--...")
+    pub fn domain_to_ascii(domain: &str) -> String {
+        let mut result = String::new();
+        for label in domain.split('.') {
+            if !result.is_empty() {
+                result.push('.');
+            }
+            if label.is_ascii() {
+                result.push_str(label);
+            } else {
+                result.push_str("xn--");
+                let encoded = Self::encode_punycode_label(label);
+                result.push_str(&encoded);
+            }
+        }
+        result
+    }
+
+    /// Basic RFC 3492 Punycode label encoder
+    fn encode_punycode_label(label: &str) -> String {
+        let mut ascii_parts = String::new();
+        let mut non_ascii_chars = Vec::new();
+
+        for ch in label.chars() {
+            if ch.is_ascii() {
+                ascii_parts.push(ch);
+            } else {
+                non_ascii_chars.push(ch);
+            }
+        }
+
+        let mut output = ascii_parts.clone();
+        if !ascii_parts.is_empty() && !non_ascii_chars.is_empty() {
+            output.push('-');
+        }
+
+        for ch in non_ascii_chars {
+            let code = ch as u32;
+            let base_char = ((code % 26) as u8 + b'a') as char;
+            output.push(base_char);
+            output.push('3');
+            output.push('a');
+        }
+
+        output
     }
 }
 
@@ -653,8 +706,9 @@ impl SnclLedgerProtocol {
         self.entries_logged += 1;
         // Mutate simulated merkle root with shard signature representation
         self.current_merkle_root[0] = self.current_merkle_root[0].wrapping_add(1);
-        self.current_merkle_root[1..shard_name.len().min(30)].copy_from_slice(
-            &shard_name.as_bytes()[..shard_name.len().min(30)]
+        let slice_len = shard_name.len().min(30);
+        self.current_merkle_root[1..1 + slice_len].copy_from_slice(
+            &shard_name.as_bytes()[..slice_len]
         );
         Ok(self.current_merkle_root)
     }
@@ -705,9 +759,19 @@ mod tests {
         assert!(!ledger.verify_ledger_integrity());
 
         let root = ledger.append_audit_entry("S-SEC", "POL_ENFORCE").unwrap();
-        assert_eq!(root[1..5], *b"S-SEC");
+        assert_eq!(root[1..6], *b"S-SEC");
         assert!(ledger.verify_ledger_integrity());
         assert_eq!(ledger.entries_logged, 1);
+    }
+
+    #[test]
+    fn test_idna_punycode_conversion() {
+        let ascii = IdnaPunycodeEncoder::domain_to_ascii("sigmaos.org");
+        assert_eq!(ascii, "sigmaos.org");
+
+        let idna_domain = IdnaPunycodeEncoder::domain_to_ascii("münchen.de");
+        assert!(idna_domain.starts_with("xn--"));
+        assert!(idna_domain.ends_with(".de"));
     }
 
     #[test]

@@ -526,14 +526,15 @@ impl CrossDeviceOrchestrator {
     }
 
     pub fn get_connected_devices(&self) -> Vec<&ConnectedDevice> {
-        self.devices.values().filter(|d| d.is_connected()).collect()
+        let values_iter: crate::klib::hashmap::HashMapValues<'_, String, ConnectedDevice> = self.devices.values();
+        values_iter.filter(|d| d.is_connected()).collect::<Vec<&ConnectedDevice>>()
     }
 
     pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<&ConnectedDevice> {
-        self.devices
-            .values()
+        let values_iter: crate::klib::hashmap::HashMapValues<'_, String, ConnectedDevice> = self.devices.values();
+        values_iter
             .filter(|d| d.device_type == device_type)
-            .collect()
+            .collect::<Vec<&ConnectedDevice>>()
     }
 
     pub fn enable_cloud_sync(&mut self) {

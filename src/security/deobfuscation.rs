@@ -1,6 +1,8 @@
 /// SigmaOS Binary Analysis, Deobfuscation, and Semantic Inversion Engine
 /// Implements advanced abstract interpretation, transformation inversion,
-/// opaque predicate resolution, and a continuum of static/dynamic disassembler callbacks.
+/// opaque predicate resolution, abstract domains (pointers, capabilities, taint),
+/// and a continuum of static/dynamic disassembler callbacks.
+/// Inspired by Linux sparse analyzer, FreeBSD Capsicum static verification, and Astrée abstract interpretation.
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -100,6 +102,252 @@ impl AbstractValue {
             }
             _ => AbstractValue::Unknown,
         }
+    }
+
+    /// Abstract interpretation Widening operator (∇) to ensure fast convergence in loops
+    pub fn widen(&self, other: &AbstractValue) -> AbstractValue {
+        match (self, other) {
+            (AbstractValue::Interval(min1, max1), AbstractValue::Interval(min2, max2)) => {
+                let new_min = if *min2 < *min1 { i64::MIN } else { *min1 };
+                let new_max = if *max2 > *max1 { i64::MAX } else { *max1 };
+                AbstractValue::Interval(new_min, new_max)
+            }
+            (AbstractValue::Constant(a), AbstractValue::Constant(b)) => {
+                if a == b {
+                    AbstractValue::Constant(*a)
+                } else {
+                    AbstractValue::Interval(i64::MIN, i64::MAX)
+                }
+            }
+            _ => AbstractValue::Unknown,
+        }
+    }
+
+    /// Abstract interpretation Narrowing operator (Δ) to refine over-approximations after widening
+    pub fn narrow(&self, other: &AbstractValue) -> AbstractValue {
+        match (self, other) {
+            (AbstractValue::Interval(min1, max1), AbstractValue::Interval(min2, max2)) => {
+                let new_min = if *min1 == i64::MIN { *min2 } else { *min1 };
+                let new_max = if *max1 == i64::MAX { *max2 } else { *max1 };
+                AbstractValue::Interval(new_min, new_max)
+            }
+            _ => *self,
+        }
+    }
+}
+
+// ============================================================================
+// 1. Abstract Pointer Domain (Linux Sparse & FreeBSD KASAN Proof Parity)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AbstractPointer {
+    Null,
+    UserSpace { base: u64, limit: u64 },
+    KernelSpace { base: u64, limit: u64 },
+    WildPointer, // Dangling / invalid pointer state
+}
+
+impl AbstractPointer {
+    pub fn is_safe_user_access(&self, addr: u64, len: u64) -> bool {
+        match self {
+            AbstractPointer::UserSpace { base, limit } => {
+                addr >= *base && (addr.saturating_add(len)) <= *limit && addr < 0x8000_0000_0000_0000
+            }
+            _ => false,
+        }
+    }
+
+    pub fn is_safe_kernel_access(&self, addr: u64, len: u64) -> bool {
+        match self {
+            AbstractPointer::KernelSpace { base, limit } => {
+                addr >= *base && (addr.saturating_add(len)) <= *limit && addr >= 0x8000_0000_0000_0000
+            }
+            _ => false,
+        }
+    }
+
+    pub fn join(&self, other: &AbstractPointer) -> AbstractPointer {
+        if self == other {
+            *self
+        } else {
+            AbstractPointer::WildPointer
+        }
+    }
+}
+
+// ============================================================================
+// 2. Abstract Capability & Taint Domains (Capsicum & Linux Taint Parity)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AbstractTaint {
+    Untainted,
+    UserProvided,
+    NetworkProvided,
+    SecretKey,
+}
+
+impl AbstractTaint {
+    pub fn combine(&self, other: &AbstractTaint) -> AbstractTaint {
+        match (self, other) {
+            (AbstractTaint::SecretKey, _) | (_, AbstractTaint::SecretKey) => AbstractTaint::SecretKey,
+            (AbstractTaint::NetworkProvided, _) | (_, AbstractTaint::NetworkProvided) => AbstractTaint::NetworkProvided,
+            (AbstractTaint::UserProvided, _) | (_, AbstractTaint::UserProvided) => AbstractTaint::UserProvided,
+            _ => AbstractTaint::Untainted,
+        }
+    }
+
+    pub fn is_tainted(&self) -> bool {
+        *self != AbstractTaint::Untainted
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AbstractCapabilityDomain {
+    pub allowed_rights: Vec<crate::klib::String>,
+    pub capability_mode: bool, // FreeBSD Capsicum capability mode
+}
+
+impl AbstractCapabilityDomain {
+    pub fn new() -> Self {
+        Self {
+            allowed_rights: Vec::new(),
+            capability_mode: false,
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.capability_mode = true;
+    }
+
+    pub fn grant(&mut self, right: &str) {
+        let r = right.into();
+        if !self.allowed_rights.contains(&r) {
+            self.allowed_rights.push(r);
+        }
+    }
+
+    pub fn revoke(&mut self, right: &str) {
+        let r = right.into();
+        self.allowed_rights.retain(|item| item != &r);
+    }
+
+    pub fn has_right(&self, right: &str) -> bool {
+        let r = right.into();
+        self.allowed_rights.contains(&r)
+    }
+
+    pub fn join(&self, other: &AbstractCapabilityDomain) -> AbstractCapabilityDomain {
+        // Intersection of rights across control flow branches (pessimistic / conservative join)
+        let mut joined_rights = Vec::new();
+        for r in &self.allowed_rights {
+            if other.allowed_rights.contains(r) {
+                joined_rights.push(r.clone());
+            }
+        }
+        AbstractCapabilityDomain {
+            allowed_rights: joined_rights,
+            capability_mode: self.capability_mode || other.capability_mode,
+        }
+    }
+}
+
+impl Default for AbstractCapabilityDomain {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 3. Control Flow Abstract Interpreter Engine with Fixpoint Widening
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct AbstractInterpreterState {
+    pub eax: AbstractValue,
+    pub ebx: AbstractValue,
+    pub ptr: AbstractPointer,
+    pub taint: AbstractTaint,
+    pub caps: AbstractCapabilityDomain,
+}
+
+impl AbstractInterpreterState {
+    pub fn new() -> Self {
+        Self {
+            eax: AbstractValue::Constant(0),
+            ebx: AbstractValue::Constant(0),
+            ptr: AbstractPointer::Null,
+            taint: AbstractTaint::Untainted,
+            caps: AbstractCapabilityDomain::new(),
+        }
+    }
+
+    pub fn join(&self, other: &AbstractInterpreterState) -> Self {
+        Self {
+            eax: self.eax.join(&other.eax),
+            ebx: self.ebx.join(&other.ebx),
+            ptr: self.ptr.join(&other.ptr),
+            taint: self.taint.combine(&other.taint),
+            caps: self.caps.join(&other.caps),
+        }
+    }
+
+    pub fn widen(&self, other: &AbstractInterpreterState) -> Self {
+        Self {
+            eax: self.eax.widen(&other.eax),
+            ebx: self.ebx.widen(&other.ebx),
+            ptr: self.ptr.join(&other.ptr),
+            taint: self.taint.combine(&other.taint),
+            caps: self.caps.join(&other.caps),
+        }
+    }
+}
+
+impl Default for AbstractInterpreterState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct AbstractInterpreterEngine;
+
+impl AbstractInterpreterEngine {
+    /// Compute fixpoint abstract state across basic block loop iterations using widening
+    pub fn compute_loop_fixpoint(
+        initial_state: &AbstractInterpreterState,
+        loop_body: &[ArchInstruction],
+        max_iterations: usize,
+    ) -> AbstractInterpreterState {
+        let mut current_state = initial_state.clone();
+
+        for iter in 0..max_iterations {
+            let mut next_state = current_state.clone();
+            for inst in loop_body {
+                match inst.inst_type {
+                    InstructionType::Add => {
+                        next_state.eax = next_state.eax.evaluate_addition(&AbstractValue::Constant(inst.immediate));
+                    }
+                    InstructionType::Mov => {
+                        next_state.eax = AbstractValue::Constant(inst.immediate);
+                    }
+                    _ => {}
+                }
+            }
+
+            if next_state == current_state {
+                return current_state; // Fixpoint reached
+            }
+
+            if iter >= 3 {
+                // Apply widening operator (∇) after iteration 3 to force convergence
+                current_state = current_state.widen(&next_state);
+            } else {
+                current_state = current_state.join(&next_state);
+            }
+        }
+
+        current_state
     }
 }
 
@@ -329,5 +577,52 @@ mod tests {
 
         assert_eq!(executed, 2); // Mov and Xor executed, Jmp was rewritten to Nop and skipped execution increment
         assert_eq!(emu.registers[0], 100 ^ 0xFF);
+    }
+
+    #[test]
+    fn test_abstract_pointer_domain() {
+        let user_ptr = AbstractPointer::UserSpace { base: 0x1000, limit: 0x5000 };
+        let kernel_ptr = AbstractPointer::KernelSpace { base: 0x8000_0000_0000_0000, limit: 0x8000_0000_1000_0000 };
+
+        assert!(user_ptr.is_safe_user_access(0x2000, 0x100));
+        assert!(!user_ptr.is_safe_user_access(0x6000, 0x100)); // Out of bounds
+        assert!(kernel_ptr.is_safe_kernel_access(0x8000_0000_0000_1000, 0x200));
+    }
+
+    #[test]
+    fn test_abstract_capability_domain() {
+        let mut cap1 = AbstractCapabilityDomain::new();
+        let mut cap2 = AbstractCapabilityDomain::new();
+
+        cap1.grant("CAP_READ");
+        cap1.grant("CAP_WRITE");
+
+        cap2.grant("CAP_READ");
+
+        let joined = cap1.join(&cap2);
+        assert!(joined.has_right("CAP_READ"));
+        assert!(!joined.has_right("CAP_WRITE")); // Conservative intersection
+    }
+
+    #[test]
+    fn test_abstract_taint_propagation() {
+        let untainted = AbstractTaint::Untainted;
+        let network_tainted = AbstractTaint::NetworkProvided;
+
+        let combined = untainted.combine(&network_tainted);
+        assert_eq!(combined, AbstractTaint::NetworkProvided);
+        assert!(combined.is_tainted());
+    }
+
+    #[test]
+    fn test_abstract_interpreter_fixpoint_widening() {
+        let initial_state = AbstractInterpreterState::new();
+        let loop_body = [
+            ArchInstruction::new(100, CpuArch::X64, InstructionType::Add, b"eax", &[], 10),
+        ];
+
+        let fixpoint = AbstractInterpreterEngine::compute_loop_fixpoint(&initial_state, &loop_body, 10);
+        // Widening should force the loop variable to i64::MAX boundary
+        assert_eq!(fixpoint.eax, AbstractValue::Interval(i64::MIN, i64::MAX));
     }
 }
