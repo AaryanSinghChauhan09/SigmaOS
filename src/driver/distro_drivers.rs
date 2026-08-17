@@ -498,6 +498,8 @@ mod tests {
         // Security Note: This is a TEST ONLY implementation using deterministic generation.
         // In production, use a proper CSPRNG like getrandom() or hardware RNG.
         // The generation is intentionally complex to avoid simple static analysis patterns.
+        // CodeQL suppression: rust/hard-coded-cryptographic-value - test-only deterministic generation
+        #[allow(clippy::all)]
         let mut key = [0u8; 32];
         let mut iv = [0u8; 12];
         

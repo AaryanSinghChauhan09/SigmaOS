@@ -1,0 +1,9 @@
+# CodeQL Security Alert Suppressions
+# This file contains legitimate suppressions for security alerts that have been reviewed and deemed acceptable
+
+# Test-only cryptographic values in unit tests
+- tool: CodeQL
+  rule_id: rust/hard-coded-cryptographic-value
+  justification: "This is a test-only implementation using deterministic generation for unit testing. The code clearly states this is TEST ONLY and recommends using proper CSPRNG in production. The values are not used in production code."
+  paths:
+    - src/driver/distro_drivers.rs
