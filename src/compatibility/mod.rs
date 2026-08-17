@@ -10,6 +10,8 @@ pub mod solid_kernel;
 pub mod sovereign_suite;
 pub mod tiny_core;
 pub mod wasm_sandbox;
+pub mod dragonfly_bsd;
+pub mod arch_linux;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -49,6 +51,16 @@ pub use solid_kernel::{
 };
 
 pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
+
+pub use dragonfly_bsd::{
+    ConcurrentSlateLock, Hammer2Engine, Hammer2Transaction, Hammer2TransactionType, LwktMessage,
+    LwktScheduler, VKernelEngine, VKernelState,
+};
+
+pub use arch_linux::{
+    ArchInitSystem, ArchPackage, ArchFirewall, DevFile, LsmSentinel, PacmanEngine, PamGate,
+    Pkgbuild, PkgbuildParser, AurHelper, MkinitcpioEngine, ArchisoEngine, ProcFile,
+};
 
 pub use absorb_tools::{
     CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
