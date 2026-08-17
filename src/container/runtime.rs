@@ -988,5 +988,66 @@ mod tests {
             ContainerError::PermissionDenied
         );
     }
+
+    #[test]
+    fn test_overlayfs_stacking() {
+        let mut overlay = OverlayFS::new(
+            vec!["/lower1".to_string(), "/lower2".to_string()],
+            "/upper".to_string(),
+            "/work".to_string(),
+        );
+        assert!(!overlay.mounted);
+        assert!(overlay.mount().is_ok());
+        assert!(overlay.mounted);
+        overlay.umount();
+        assert!(!overlay.mounted);
+
+        // Mount failure on empty lowerdirs
+        let mut invalid_overlay = OverlayFS::new(
+            vec![],
+            "/upper".to_string(),
+            "/work".to_string(),
+        );
+        assert!(invalid_overlay.mount().is_err());
+    }
+
+    #[test]
+    fn test_rootless_user_namespace_mapping() {
+        let ns = ContainerNamespace {
+            uid_mapping: 1000,
+            gid_mapping: 1000,
+            rootless: true,
+        };
+
+        // Container root (UID 0) maps to host unprivileged user (UID 1000)
+        assert_eq!(ns.map_uid(0).unwrap(), 1000);
+        assert_eq!(ns.map_gid(0).unwrap(), 1000);
+
+        // Regular container users offset accordingly
+        assert_eq!(ns.map_uid(10).unwrap(), 1010);
+    }
+
+    #[test]
+    fn test_hardened_seccomp_syscall_filtering() {
+        let mut container = SimpleContainer::new(
+            1,
+            b"hardened_ct",
+            b"alpine",
+            ContainerCapability::full(),
+        );
+        container.seccomp = SeccompProfile {
+            hardened: true,
+            blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)
+        };
+
+        // Allowed syscall (e.g. syscall 1)
+        assert!(container.execute_syscall(1).is_ok());
+
+        // Prohibited syscall (syscall 0)
+        assert_eq!(
+            container.execute_syscall(0).unwrap_err(),
+            ContainerError::PermissionDenied
+        );
+    }
 }
 }

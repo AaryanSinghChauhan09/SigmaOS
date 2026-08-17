@@ -4,6 +4,7 @@ pub mod breakthroughs;
 pub mod ipc;
 pub mod memory;
 pub mod policy_mechanism;
+pub mod perf_mm;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod structures;
