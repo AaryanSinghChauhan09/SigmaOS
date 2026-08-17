@@ -242,8 +242,6 @@ impl PrivacyFirstSandbox {
             .filter(|(key, _)| !blacklisted_vars.contains(&key.as_str()))
             .collect()
     }
-<<<<<<< HEAD
-=======
 
     /// Firejail-style environment variable sanitizer to prevent privilege escalation / variable injections
     pub fn sanitize_environment(&mut self, env_vars: &[(&str, &str)]) {
@@ -261,7 +259,6 @@ impl PrivacyFirstSandbox {
             }
         }
     }
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
 }
 
 #[cfg(test)]

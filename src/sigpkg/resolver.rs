@@ -165,10 +165,7 @@ impl SatSolver {
         Ok(result)
     }
 
-<<<<<<< HEAD
     /// Recursive dependency resolution (highly optimized utilizing APT pinning weights)
-=======
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     fn resolve_recursive(
         &self,
         package_name: &str,
@@ -220,14 +217,11 @@ impl SatSolver {
         }
     }
 
-<<<<<<< HEAD
     /// Detect circular dependencies
-=======
     pub fn is_debian_elementary_package_compliant(&self, package: &DebianElementaryAppPackage) -> bool {
         package.is_elementary_compliant()
     }
 
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     pub fn detect_circular(&self, package_name: &str) -> bool {
         let mut visited = HashSet::new();
         let mut recursion_stack = HashSet::new();
@@ -313,16 +307,12 @@ pub enum ResolveError {
 #[cfg(test)]
 mod tests {
     use super::*;
-<<<<<<< HEAD
     use crate::sigpkg::Dependency;
-=======
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
 
     #[test]
     fn test_debian_elementary_app_package_validator() {
         let solver = SatSolver::new();
 
-<<<<<<< HEAD
         // 1. Fully compliant package
         let compliant_app = DebianElementaryAppPackage {
             app_id: "io.elementary.calculator".to_string(),
@@ -363,7 +353,6 @@ mod tests {
             solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
             "elementaryOS Package Violation: App must support toggleable pure-black dark mode"
         );
-=======
         let compliant_app = DebianElementaryAppPackage::new("io.elementary.calculator", true, true);
         assert!(solver.is_debian_elementary_package_compliant(&compliant_app));
 
@@ -382,7 +371,6 @@ mod tests {
         let mut app = compliant_app.clone();
         app.supports_dark_mode = false;
         assert!(!solver.is_debian_elementary_package_compliant(&app));
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     }
 
     #[test]
@@ -493,8 +481,6 @@ mod tests {
         let resolved = solver.resolve("bash", &VersionConstraint::Any).unwrap();
         assert_eq!(resolved.len(), 1);
         assert_eq!(resolved[0].version, Version::new(1, 0, 0));
-<<<<<<< HEAD
-=======
     }
 
     #[test]
@@ -511,6 +497,5 @@ mod tests {
         let solver = SatSolver::new();
         assert!(solver.is_debian_elementary_package_compliant(&app1));
         assert!(solver.is_debian_elementary_package_compliant(&app3));
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     }
 }

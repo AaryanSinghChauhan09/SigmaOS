@@ -620,8 +620,6 @@ mod tests {
     }
 
     #[test]
-<<<<<<< HEAD
-=======
     fn test_debian_sbuild_resolver() {
         let mut sync = RollingSyncManager::new();
         sync.register_installed("gcc", Version::new(11, 2, 0));
@@ -661,7 +659,6 @@ mod tests {
     }
 
     #[test]
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     fn test_alpm_hooks() {
         let mut manager = AlpmHookManager::new();
 
@@ -683,11 +680,9 @@ mod tests {
 
     #[test]
     fn test_mkinitcpio_builder() {
-<<<<<<< HEAD
         let builder = MkinitcpioBuilder::new();
         let initramfs = builder.build_initramfs("6.1.0-arch1").unwrap();
         assert!(initramfs.contains("/boot/initramfs-6.1.0-arch1.img"));
-=======
         let mut builder = MkinitcpioBuilder::new();
         builder.add_hook("udev");
         builder.add_hook("base");
@@ -714,7 +709,6 @@ mod tests {
         assert_eq!(package.name, "linux-firmware");
 
         assert!(builder.build_package("linux-firmware", Version::new(1, 0, 0), mock_src, "short_hash").is_err());
->>>>>>> origin/bolt-optimize-vulnerability-scanner-10312631800595437539
     }
 
     #[test]
