@@ -15,8 +15,6 @@ pub mod slab;
 pub mod btreemap;
 pub mod vecdeque;
 pub mod adt;
-pub mod time;
-pub mod math;
 
 // For now, we use our custom Vec and HashMap (aliased to our bucket-based BTreeMap)
 pub use vec::Vec;
@@ -33,17 +31,16 @@ pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
-pub use btreemap::BTreeMap as StdBTreeMap;
+pub use btreemap::BTreeMap;
 pub use vecdeque::VecDeque;
-pub use time::{Duration, Instant, monotonic_ms};
 pub use hash::{djb2_hash, simple_hash, fnv1a_hash, xor_hash, SimpleHasher, combine_hashes};
-pub use math::{abs, min, max, clamp, pow, log2, sqrt};
 
 // For other collections, use std when available
 #[cfg(not(target_os = "none"))]
 pub use std::string::String;
 
 /// Format integer to string without std::fmt
+#[cfg(not(target_os = "none"))]
 pub fn format_int(mut num: u64) -> alloc::string::String {
     if num == 0 {
         return alloc::string::String::from("0");
@@ -80,8 +77,3 @@ pub unsafe extern "C" fn sigma_memcmp(s1: *const u8, s2: *const u8, n: usize) ->
     }
     0
 }
-
-#[cfg(not(target_os = "none"))]
-pub use std::collections::HashMap as StdHashMap;
-#[cfg(not(target_os = "none"))]
-pub use std::collections::HashSet as StdHashSet;

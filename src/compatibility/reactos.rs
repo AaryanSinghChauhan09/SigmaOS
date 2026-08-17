@@ -1,8 +1,6 @@
 // SigmaOS Windows NT & ReactOS Competitor Parity Subsystem
 // Independent, zero-dependency implementations of NT kernel and Win32 GDI subsystems
 
-#![no_std]
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
