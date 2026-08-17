@@ -36,6 +36,16 @@ pub mod legacy_adapters;
 pub mod india_professional_tools;
 pub mod canonical;
 pub mod fedora;
+pub mod arch_linux;
+
+pub use arch_linux::{
+    ProcFileType, ProcFile, DevFileType, DevFile, ArchPackage, PacmanError, PacmanEngine,
+    RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule, ArchFirewall,
+    LsmMode, LsmSentinel, PamGate, PaneLayout, TmuxMultiplexer, SovereignEnvRegistry,
+    AurRepoStatus, YayParuAdapter, ArchMirror, ReflectorMirrorlist, SubvolumeConfig,
+    ArchinstallConfig, ArchinstallParity, ArtixInitSystemType, ServiceState, ArtixInitBridge,
+    KeyTrustLevel, PacmanKey, PacmanKeyring, AurPatch, AurPatchEngine,
+};
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{

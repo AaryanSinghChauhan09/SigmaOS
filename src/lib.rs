@@ -1,6 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -26,6 +27,8 @@ pub mod shell;
 pub mod sigpkg;
 pub mod tools;
 pub mod virtualization;
+pub mod klib;
+pub use klib::{SplayTree, RadixTree, SovereignPriorityQueue};
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -138,9 +141,9 @@ pub use virtualization::{
 // pub mod automation;
 // pub mod container;
 
-#[cfg(test)]
-#[path = "compatibility/fedora.rs"]
-pub mod fedora_compat_test;
+// #[cfg(test)]
+// #[path = "compatibility/fedora.rs"]
+// pub mod fedora_compat_test;
 // pub mod customization;
 // pub mod dashboard;
 // pub mod desktop;
