@@ -12,6 +12,8 @@ pub mod tiny_core;
 pub mod wasm_sandbox;
 pub mod dragonfly_bsd;
 pub mod arch_linux;
+pub mod arch_aur;
+pub mod linux_compat;
 pub mod linux_distro_parity;
 
 pub use cross_platform::{
@@ -61,6 +63,14 @@ pub use dragonfly_bsd::{
 pub use arch_linux::{
     ArchInitSystem, ArchPackage, ArchFirewall, DevFile, LsmSentinel, PacmanEngine, PamGate,
     Pkgbuild, PkgbuildParser, AurHelper, MkinitcpioEngine, ArchisoEngine, ProcFile,
+};
+
+pub use arch_aur::{
+    ArchPkgMeta, AurDependencySolver, PkgbuildPayloadExtractor, ArchisoLivebootBuilder,
+};
+
+pub use linux_compat::{
+    BsdKqueueMultiplexer, BsdKevent, BsdKqueueFilter, OpenBsdPledgeUnveilFilter,
 };
 
 pub use linux_distro_parity::{

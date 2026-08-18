@@ -21,7 +21,10 @@ pub use compositor::{
     CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor, LayerBlendMode,
     RenderLayer, SigmaCompositor,
 };
-pub use gpu_driver::{Framebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat};
+pub use gpu_driver::{
+    Framebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat,
+    DrmAtomicPlaneState, WaylandDmaBuf, OpenBsdWsdisplayVt,
+};
 pub use image_decoder::{ColorSpace, DecodedImage, ImageDecoder, ImageFormat, ImageMetadata};
 pub use zenith::{
     Animation, AnimationCurve, CompositorError as ZenithError, HighContrastMode, LayoutStyle,

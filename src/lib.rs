@@ -98,6 +98,8 @@ pub use compatibility::{
     LwktScheduler, VKernelEngine, VKernelState,
     ArchInitSystem, ArchPackage, ArchFirewall, DevFile, LsmSentinel, PacmanEngine, PamGate,
     Pkgbuild, PkgbuildParser, AurHelper, MkinitcpioEngine, ArchisoEngine, ProcFile,
+    ArchPkgMeta, AurDependencySolver, PkgbuildPayloadExtractor, ArchisoLivebootBuilder,
+    BsdKqueueMultiplexer, BsdKevent, BsdKqueueFilter, OpenBsdPledgeUnveilFilter,
     FstabEntry, LinuxFstabEngine, LinuxLdSoLoader, LinuxRunlevel, LinuxRunlevelGovernor,
     LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary,
     CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
@@ -117,6 +119,7 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
+    DrmAtomicPlaneState, WaylandDmaBuf, OpenBsdWsdisplayVt,
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
