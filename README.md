@@ -170,7 +170,16 @@ We welcome contributions to SigmaOS! Please see our contributing guidelines for 
 - [Driver Development](./DRIVER_DEVELOPMENT.md)
 - [AI Subsystem](./AI_SUBSYSTEM.md)
 
-## 🐛 Bug Reporting
+- [36-Month Master Strategic Roadmap & Gap-Closing Blueprint](SigmaOS_Gap_Closing_Roadmap.md) — Multi-phase strategic blueprint detailing deep architectural gap-closures between Fedora Linux and SigmaOS
+- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
+- [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
+- [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
+- [Roadmap](Roadmap.md) — Development plan
+- [INSTALL.md](INSTALL.md) — Build instructions
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
+- [SECURITY_POLICY.md](SECURITY_POLICY.md) — Security policy
+- [SUPPORT.md](SUPPORT.md) — Support and troubleshooting
+- [FAQ](FAQ.md) — Common questions (coming soon)
 
 Please report bugs using our [issue tracker](https://github.com/AaryanSinghChauhan09/SigmaOS/issues) with the following information:
 - SigmaOS version

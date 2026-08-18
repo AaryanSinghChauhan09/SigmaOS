@@ -384,7 +384,7 @@ impl EncryptedFileVault {
         let mut files_processed = 0;
         let mut bytes_processed = 0u64;
 
-        for (original_path, encrypted_file) in self.files.clone().iter() {
+        for (original_path, encrypted_file) in &self.files.clone() {
             // Decrypt with old key
             let encrypted_data = std::fs::read(&encrypted_file.encrypted_path)
                 .map_err(|e| VaultError::IoError(e.to_string()))?;

@@ -503,5 +503,4 @@ mod tests {
         assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
         assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
         assert!(ring.pop_item().is_none());
-    }
-}
+    }}

@@ -22,8 +22,9 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod subsystem;
-pub mod vmm_paging;
+pub mod traits;
+pub mod virtual_cpu;
+pub mod wdk_core;
 
 pub use vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
 
@@ -44,6 +45,13 @@ pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 // };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};
-
-pub mod object;
+pub use traits::SchedulerError;
+pub use virtual_cpu::{CpuError as VirtualCpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU, Instruction};
+pub use wdk_core::{
+    Irql, CpuArch, SecurityToken, AddressSpace, ExecutionContext,
+    ThreadState, ApcMode, Apc, Dpc, WorkItem, WdkThread,
+    EventType, EventObject, SpinLock, MutexObject, FastMutex, GuardedMutex, EResource,
+    WdkTimer, TimerTable, Prcb,
+    PoolType, PoolAllocation, KernelPoolMemory,
+    IoStatusBlock, IoctlControl, IRP, WdkDriverObject, BugCheckData, BugCheckRegistry,
+};

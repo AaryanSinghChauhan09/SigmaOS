@@ -291,6 +291,10 @@ impl SimpleKeyring {
             capability,
         }
     }
+
+    pub fn store_secret(&mut self, secret: Box<dyn Secret>) -> Result<SecretID, SecretError> {
+        <Self as Keyring>::add_secret(self, secret)
+    }
 }
 
 impl Keyring for SimpleKeyring {
@@ -349,10 +353,14 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        for slot in self.secrets.iter_mut() {
-            if let Some(ref mut secret) = slot {
-                if secret.id() == id {
-                    return Some(secret);
+        let len = self.secrets.len();
+        for i in 0..len {
+            let ptr = &mut self.secrets[i] as *mut Option<Box<dyn Secret>>;
+            unsafe {
+                if let Some(ref mut secret) = *ptr {
+                    if secret.id() == id {
+                        return Some(secret);
+                    }
                 }
             }
         }
