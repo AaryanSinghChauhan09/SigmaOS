@@ -9,25 +9,24 @@ pub mod enterprise;
 pub mod i18n;
 pub mod manjaro;
 pub mod nextgen;
-pub mod ready_to_use;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
-pub mod endeavour_os;
+pub mod linux_bsd_inspirations;
 
-pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
-pub use endeavour_os::{
-    AkmKernelManager, AurPackageSpec, CalamaresConfig, CalamaresInstaller, DesktopEnvironment,
-    EosKernelFlavor, EosLogTool, EosWelcomeApp, InstallMode, PacmanMirror, PartitionType,
-    ReflectorMirrorManager, WelcomeButtonTask, YayParuHelper,
+pub use linux_bsd_inspirations::{
+    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
+    PinRule, AptPinStore, OpenRCService,
 };
+pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease, AurPackage, FlatpakPackage, SnapPackage, MhwdDkmsRebuilder,
+    ManjaroKernelRelease, ManjaroKernelSwitcher,
+    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -65,12 +64,6 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-};
-pub use ready_to_use::{
-    DistroServiceManager, ServiceState, ServiceUnit,
-    UniversalMountEngine, MountEntry, MountType,
-    InteractiveUserEnvironment, UserAccount, SessionEnvironment,
-    PlugAndPlayHardwareManager, DeviceCategory, HardwareEvent, DeviceNode,
 };
 pub use transformation_engine::{
     AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,

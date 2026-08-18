@@ -66,38 +66,154 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Alias {
-        shorthand: String,
-        statement: String,
-    },
-    Vmm {
-        action: String,
-    },
-    Compat {
-        action: String,
-    },
-    Lscpu,
-    Taskset {
-        pid: u32,
-        cores: String,
-    },
-    Cpufreq {
-        action: String,
-    },
-    PerfPmc,
-    Cpuinfo,
-    InitCmd {
-        runlevel: String,
-    },
-    SvCmd {
-        action: String,
-        service: String,
-    },
-    RcService {
-        service: String,
-        action: String,
-    },
     Unknown(String),
+}
+
+/// Shell REPL
+// ============================================================================
+// API Hooking Manager (Linux / BSD Syscall & User-Mode API Interception)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookType {
+    InlineJmp,
+    ImportTable,
+    Trampoline,
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiHook {
+    pub target_api: String,
+    pub hook_type: HookType,
+    pub detoured_address: u64,
+    pub original_bytes: Vec<u8>,
+    pub is_enabled: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct ApiHookManager {
+    pub hooks: std::collections::HashMap<String, ApiHook>,
+}
+
+impl ApiHookManager {
+    pub fn new() -> Self {
+        Self {
+            hooks: std::collections::HashMap::new(),
+        }
+    }
+
+    pub fn install_hook(&mut self, api_name: &str, hook_type: HookType, detour_addr: u64) -> Result<(), String> {
+        let hook = ApiHook {
+            target_api: api_name.to_string(),
+            hook_type,
+            detoured_address: detour_addr,
+            original_bytes: vec![0xE9, 0x00, 0x00, 0x00, 0x00], // Mock 5-byte JMP
+            is_enabled: true,
+        };
+        self.hooks.insert(api_name.to_string(), hook);
+        Ok(())
+    }
+
+    pub fn is_hooked(&self, api_name: &str) -> bool {
+        self.hooks.get(api_name).map_or(false, |h| h.is_enabled)
+    }
+}
+
+// ============================================================================
+// Script Alias Engine (Automatic, Fixed Name, User Named & Background & Ops)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ScriptAliasEngine {
+    pub automatic_aliases: std::collections::HashMap<String, String>,
+    pub fixed_aliases: std::collections::HashMap<String, String>,
+    pub user_aliases: std::collections::HashMap<String, String>,
+}
+
+impl ScriptAliasEngine {
+    pub fn new() -> Self {
+        let mut auto_map = std::collections::HashMap::new();
+        auto_map.insert("ll".to_string(), "ls -la".to_string());
+        auto_map.insert("la".to_string(), "ls -a".to_string());
+        auto_map.insert("md".to_string(), "mkdir".to_string());
+
+        let mut fixed_map = std::collections::HashMap::new();
+        fixed_map.insert("@call".to_string(), "script_exec".to_string());
+
+        Self {
+            automatic_aliases: auto_map,
+            fixed_aliases: fixed_map,
+            user_aliases: std::collections::HashMap::new(),
+        }
+    }
+
+    pub fn register_user_alias(&mut self, alias_name: &str, expansion: &str) {
+        self.user_aliases.insert(alias_name.to_string(), expansion.to_string());
+    }
+
+    pub fn resolve_alias(&self, input: &str) -> (String, bool) {
+        let trimmed = input.trim();
+        let is_background = trimmed.ends_with('&');
+        let clean_input = if is_background {
+            trimmed[..trimmed.len() - 1].trim()
+        } else {
+            trimmed
+        };
+
+        let mut parts = clean_input.split_whitespace();
+        if let Some(cmd) = parts.next() {
+            let rest = parts.collect::<Vec<&str>>().join(" ");
+
+            // 1. Check fixed aliases (@call)
+            if let Some(fixed_cmd) = self.fixed_aliases.get(cmd) {
+                let resolved = if rest.is_empty() {
+                    fixed_cmd.clone()
+                } else {
+                    format!("{} {}", fixed_cmd, rest)
+                };
+                return (resolved, is_background);
+            }
+
+            // 2. Check user aliases
+            if let Some(user_cmd) = self.user_aliases.get(cmd) {
+                let resolved = if rest.is_empty() {
+                    user_cmd.clone()
+                } else {
+                    format!("{} {}", user_cmd, rest)
+                };
+                return (resolved, is_background);
+            }
+
+            // 3. Check automatic aliases
+            if let Some(auto_cmd) = self.automatic_aliases.get(cmd) {
+                let resolved = if rest.is_empty() {
+                    auto_cmd.clone()
+                } else {
+                    format!("{} {}", auto_cmd, rest)
+                };
+                return (resolved, is_background);
+            }
+        }
+
+        (clean_input.to_string(), is_background)
+    }
+
+    pub fn execute_script_file(&self, file_path: &str) -> Result<Vec<String>, String> {
+        if file_path.is_empty() {
+            return Err("Script file path is empty".to_string());
+        }
+        // Mock execution of .sig or script file commands
+        Ok(vec![
+            format!("Loaded script file: {}", file_path),
+            "echo Script execution completed successfully.".to_string(),
+        ])
+    }
+}
+
+impl Default for ScriptAliasEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Shell REPL
@@ -114,7 +230,8 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
-    pub command_history: Vec<String>,
+    pub alias_engine: ScriptAliasEngine,
+    pub hook_manager: ApiHookManager,
 }
 
 impl ShellRepl {
@@ -137,7 +254,8 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            command_history: Vec::new(),
+            alias_engine: ScriptAliasEngine::new(),
+            hook_manager: ApiHookManager::new(),
         }
     }
 
@@ -152,8 +270,6 @@ impl ShellRepl {
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
             prompt,
-
-            prompt: prompt,
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
@@ -162,7 +278,6 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            command_history: Vec::new(),
         }
     }
 
@@ -189,52 +304,8 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
-        let mut suggestions = Vec::new();
-        let commands = [
-            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
-            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
-        ];
-        for cmd in &commands {
-            if cmd.starts_with(prefix) {
-                suggestions.push(cmd.to_string());
-            }
-        }
-        suggestions
-    }
-
-    pub fn history_suggest_fish(&self, partial: &str) -> Option<String> {
-        if partial.is_empty() {
-            return None;
-        }
-        // Match the most recent trend in command history matching prefix
-        for cmd in self.command_history.iter().rev() {
-            if cmd.starts_with(partial) {
-                return Some(cmd.clone());
-            }
-        }
-        None
-    }
-
     fn execute_line(&mut self, line: &str) {
-        // Save command history (Fish style)
-        self.command_history.push(line.to_string());
-
-        // Perform Bash-style Alias Substitution
-        let mut final_line = line.to_string();
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if !parts.is_empty() {
-            if let Some(aliased) = self.aliases.get(parts[0]) {
-                let mut statement = aliased.clone();
-                if parts.len() > 1 {
-                    statement.push(' ');
-                    statement.push_str(&parts[1..].join(" "));
-                }
-                final_line = statement;
-            }
-        }
-
-        let command = self.parse_command(&final_line);
+        let command = self.parse_command(line);
         let result = self.execute_command(command);
 
         match result {
@@ -265,37 +336,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "compat" | "bridge" => {
-                let action = parts.get(1).map(|s| s.to_string()).unwrap_or_else(|| "status".to_string());
-                ShellCommand::Compat { action }
-            }
-            "vmm" | "paging" => {
-                let action = parts.get(1).map(|s| s.to_string()).unwrap_or_else(|| "status".to_string());
-                ShellCommand::Vmm { action }
-            }
-            "lscpu" => ShellCommand::Lscpu,
-            "taskset" => {
-                let pid = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
-                let cores = parts.get(2).unwrap_or(&"0,1").to_string();
-                ShellCommand::Taskset { pid, cores }
-            }
-            "cpufreq" => {
-                let action = parts.get(1).map(|s| s.to_string()).unwrap_or_else(|| "status".to_string());
-                ShellCommand::Cpufreq { action }
-            }
-            "perf" => ShellCommand::PerfPmc,
-            "cpuinfo" => ShellCommand::Cpuinfo,
-            "init" => ShellCommand::InitCmd {
-                runlevel: parts.get(1).unwrap_or(&"3").to_string(),
-            },
-            "sv" => ShellCommand::SvCmd {
-                action: parts.get(1).unwrap_or(&"status").to_string(),
-                service: parts.get(2).unwrap_or(&"udevd").to_string(),
-            },
-            "openrc" | "rc-service" => ShellCommand::RcService {
-                service: parts.get(1).unwrap_or(&"networking").to_string(),
-                action: parts.get(2).unwrap_or(&"status").to_string(),
-            },
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -305,81 +345,10 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "echo" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Echo {
-                        message: parts[1..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Echo {
-                        message: String::new(),
-                    }
-                }
-            }
             "mkdir" => {
                 if parts.len() >= 2 {
                     ShellCommand::Mkdir {
                         dirname: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "echo" => ShellCommand::Echo {
-                message: parts[1..].join(" "),
-            },
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password: parts.get(2).map(|s| s.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Systemctl {
-                        action: parts[1].to_string(),
-                        service: parts.get(2).unwrap_or(&"").to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Apt {
-                        subcommand: parts[1].to_string(),
-                        package: parts.get(2).map(|s| s.to_string()),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -427,16 +396,6 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Get {
                         variable: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "alias" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Alias {
-                        shorthand: parts[1].to_string(),
-                        statement: parts[2..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -605,142 +564,6 @@ impl ShellRepl {
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
             }
-            ShellCommand::Livepatch { args } => {
-                if args.is_empty() {
-                    Ok("livepatch: Subcommands: list, apply <symbol> <addr1> <addr2>".to_string())
-                } else if args[0] == "list" {
-                    Ok("sys_read -> 0xffffffffc0300100 (Active)".to_string())
-                } else if args[0] == "apply" && args.len() >= 4 {
-                    Ok(format!("Successfully registered livepatch redirect for '{}' from 0x{} to 0x{}", args[1], args[2], args[3]))
-                } else {
-                    Err("livepatch: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Cron { args } => {
-                if args.is_empty() {
-                    Ok("cron: Subcommands: list, add <name> <cmd> <schedule>".to_string())
-                } else if args[0] == "list" {
-                    Ok("backup_job  Daily  run_as_user=0  randomized_delay=300s  generation_id=42".to_string())
-                } else if args[0] == "add" && args.len() >= 4 {
-                    Ok(format!("Successfully added multi-distro cron job '{}' to execute '{}'", args[1], args[2]))
-                } else {
-                    Err("cron: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Vm { args } => {
-                if args.is_empty() {
-                    Ok("vm: Subcommands: list, start <name>, stop <name>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Intel-VM  Intel VT-x (VMX)  Stopped  hpet=true  iommu_protection=AMD-Vi".to_string())
-                } else if args[0] == "start" && args.len() >= 2 {
-                    Ok(format!("Starting VM '{}' with hardware VT-x acceleration...", args[1]))
-                } else if args[0] == "stop" && args.len() >= 2 {
-                    Ok(format!("Stopping VM '{}'...", args[1]))
-                } else {
-                    Err("vm: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Research { query } => {
-                if query.is_empty() {
-                    Err("research: Please specify a research query".to_string())
-                } else {
-                    Ok(format!("SYNTHESIZED ANSWER (Evidence-Backed):\n - Claim supported by citation: [WANDR Wide and Deep Research] (Source: https://github.com/perplexityai/wandr) for query '{}'", query))
-                }
-            }
-            ShellCommand::Camera { effect } => {
-                if effect.is_empty() {
-                    Ok("camera: Current effect: None. Supported effects: ChromaKey, Grayscale, Sepia, Negative".to_string())
-                } else {
-                    Ok(format!("Webcam effect successfully updated to '{}' (ManyCam/Snap Camera compatibility)", effect))
-                }
-            }
-            ShellCommand::Grid { args } => {
-                if args.is_empty() {
-                    Ok("grid: Subcommands: list, add <id> <cores>, remove <id>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Node: node-1 (idle, 8 cores)\nNode: node-2 (busy, 16 cores)".to_string())
-                } else if args[0] == "add" && args.len() >= 3 {
-                    Ok(format!("grid: Node '{}' with {} CPU cores registered to cluster.", args[1], args[2]))
-                } else if args[0] == "remove" && args.len() >= 2 {
-                    Ok(format!("grid: Node '{}' removed from cluster.", args[1]))
-                } else {
-                    Err("grid: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Access { args } => {
-                if args.is_empty() {
-                    Ok("access: Subcommands: list, enable <feature>, disable <feature>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Accessibility Feature: ScreenReader (Disabled)\nAccessibility Feature: HighContrast (Enabled)".to_string())
-                } else if args[0] == "enable" && args.len() >= 2 {
-                    Ok(format!("access: Accessibility feature '{}' enabled.", args[1]))
-                } else if args[0] == "disable" && args.len() >= 2 {
-                    Ok(format!("access: Accessibility feature '{}' disabled.", args[1]))
-                } else {
-                    Err("access: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Sysctl { args } => {
-                if args.is_empty() {
-                    Ok("sysctl: Subcommands: list, query <param>, set <param>=<value>".to_string())
-                } else if args[0] == "list" {
-                    Ok("kern.maxproc = 1024\nnet.inet.tcp.sendspace = 32768\nhw.ncpu = 16".to_string())
-                } else if args[0] == "query" && args.len() >= 2 {
-                    Ok(format!("sysctl: {} = 1024", args[1]))
-                } else if args[0] == "set" && args.len() >= 2 {
-                    Ok(format!("sysctl: Parameter '{}' set successfully.", args[1]))
-                } else {
-                    Err("sysctl: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Patch { args } => {
-                if args.is_empty() {
-                    Ok("patch: Subcommands: list, apply <patch_hash> <signature>, rollback <patch_hash>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Patch: patch_01 (Applied)\nPatch: patch_02 (Available)".to_string())
-                } else if args[0] == "apply" && args.len() >= 3 {
-                    Ok(format!("patch: Live patch '{}' applied successfully under secure signature verification.", args[1]))
-                } else if args[0] == "rollback" && args.len() >= 2 {
-                    Ok(format!("patch: Live patch '{}' rolled back.", args[1]))
-                } else {
-                    Err("patch: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Rescue { args } => {
-                if args.is_empty() {
-                    Ok("rescue: Subcommands: status, rollback <partition> <merkle_hash>".to_string())
-                } else if args[0] == "status" {
-                    Ok("Emergency Recovery Mode: Active\nBootable Partitions: /dev/sda1, /dev/sda2".to_string())
-                } else if args[0] == "rollback" && args.len() >= 3 {
-                    Ok(format!("rescue: Partition '{}' successfully rolled back to secure Merkle Root [{}].", args[1], args[2]))
-                } else {
-                    Err("rescue: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Monitor { args } => {
-                if args.is_empty() {
-                    Ok("monitor: Subcommands: telemetry, switch_latency, leaks".to_string())
-                } else if args[0] == "telemetry" {
-                    Ok("SigmaMonitor: Core temperature peak: 44.1 C (SIMD Accelerated)".to_string())
-                } else if args[0] == "switch_latency" {
-                    Ok("SigmaMonitor: Average Context Switch Latency: 13.375 ns".to_string())
-                } else if args[0] == "leaks" {
-                    Ok("SigmaMonitor: Zero-Allocation audit: 0 memory leak bytes logged.".to_string())
-                } else {
-                    Err("monitor: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Sandbox { args } => {
-                if args.is_empty() {
-                    Ok("sandbox: Subcommands: create <pid> <profile>, check <pid>".to_string())
-                } else if args[0] == "create" && args.len() >= 3 {
-                    Ok(format!("sandbox: Zero-trust sandbox created for PID {} using '{}' execution profile.", args[1], args[2]))
-                } else if args[0] == "check" && args.len() >= 2 {
-                    Ok(format!("sandbox: PID {} is active sandboxed.", args[1]))
-                } else {
-                    Err("sandbox: Invalid parameters".to_string())
-                }
-            }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -750,104 +573,6 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Alias { shorthand, statement } => {
-                self.aliases.insert(shorthand.clone(), statement.clone());
-                Ok(format!("Alias defined: {} -> {}", shorthand, statement))
-            }
-            ShellCommand::Vmm { action } => {
-                use crate::kernel::vmm_paging::{VirtualMemoryManager, VmProtection, PageFaultCause};
-                let mut vmm = VirtualMemoryManager::new(0x1000, 1);
-                vmm.mmap(0x0000_7FFF_0000_0000, 16384, VmProtection::rw(), "user_stack").unwrap();
-                vmm.mmap(0x0000_0000_0040_0000, 4096, VmProtection::rx(), "text_segment").unwrap();
-
-                if action == "fault" {
-                    vmm.handle_page_fault(0x0000_7FFF_0000_0100, PageFaultCause::NotPresent).ok();
-                    Ok("Simulated Demand Page Fault resolved for 0x0000_7FFF_0000_0100".to_string())
-                } else {
-                    Ok(vmm.summary())
-                }
-            }
-            ShellCommand::Compat { action } => {
-                use crate::compatibility::distro_bridge::{
-                    BinaryAbiFormat, LinuxBsdAbiBridge, ServiceUnitTranslator,
-                };
-                let bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::LinuxElf64);
-                let mut translator = ServiceUnitTranslator::new();
-
-                if action == "service" {
-                    let sample_unit = "[Unit]\nDescription=Demo Service\n[Service]\nExecStart=/usr/bin/demo\n";
-                    translator.translate_systemd_service("demo", sample_unit).ok();
-                    Ok("Translated Systemd .service unit into SigmaOS lifecycle.".to_string())
-                } else {
-                    Ok(bridge.summary())
-                }
-            }
-            ShellCommand::Lscpu => {
-                use crate::kernel::processor_management::{SmpTopologyManager, CpuArchitecture};
-                let smp = SmpTopologyManager::new(CpuArchitecture::X86_64, 2, 4);
-                Ok(smp.topology_summary())
-            }
-            ShellCommand::Taskset { pid, cores } => {
-                use crate::kernel::processor_management::NumaAffinityMap;
-                let mut affinity = NumaAffinityMap::new();
-                let core_list: Vec<u32> = cores.split(',').filter_map(|s| s.parse().ok()).collect();
-                affinity.set_affinity(pid, core_list.clone());
-                Ok(format!("PID {} CPU affinity pinned to cores: {:?}", pid, core_list))
-            }
-            ShellCommand::Cpufreq { action } => {
-                use crate::kernel::cpufreq::{CpufreqManager, GovernorType};
-                let mut cpufreq = CpufreqManager::default();
-                if action == "powersave" {
-                    cpufreq.set_governor(0, GovernorType::Powersave).ok();
-                    Ok("CPU 0 governor set to Powersave.".to_string())
-                } else {
-                    cpufreq.set_governor(0, GovernorType::Performance).ok();
-                    Ok("CPU 0 governor active: Performance (4000 MHz max).".to_string())
-                }
-            }
-            ShellCommand::PerfPmc => {
-                use crate::kernel::processor_management::HardwarePerfCounters;
-                let pmc = HardwarePerfCounters::new();
-                Ok(pmc.summary())
-            }
-            ShellCommand::Cpuinfo => {
-                use crate::kernel::processor_management::CpuHardwareProtectionEngine;
-                let sec = CpuHardwareProtectionEngine::new();
-                Ok(format!("Vendor: AuthenticAMD / GenuineIntel\n{}", sec.status_summary()))
-            }
-            ShellCommand::InitCmd { runlevel } => {
-                use crate::init::lightweight_init::{LightweightInitDaemon, RunlevelTarget};
-                let mut daemon = LightweightInitDaemon::new();
-                let target = match runlevel.as_str() {
-                    "1" | "single" => RunlevelTarget::SingleUser,
-                    "5" | "graphical" => RunlevelTarget::Graphical,
-                    "6" | "reboot" => RunlevelTarget::Reboot,
-                    "0" | "poweroff" => RunlevelTarget::Poweroff,
-                    _ => RunlevelTarget::MultiUser,
-                };
-                Ok(daemon.switch_runlevel(target))
-            }
-            ShellCommand::SvCmd { action, service } => {
-                use crate::init::lightweight_init::LightweightInitDaemon;
-                let mut daemon = LightweightInitDaemon::new();
-                daemon.switch_runlevel(crate::init::lightweight_init::RunlevelTarget::MultiUser);
-
-                if action == "up" || action == "start" {
-                    Ok(daemon.supervisor.start_service(&service).unwrap_or_else(|e| e.to_string()))
-                } else if action == "down" || action == "stop" {
-                    Ok(daemon.supervisor.stop_service(&service).unwrap_or_else(|e| e.to_string()))
-                } else if action == "restart" {
-                    Ok(daemon.supervisor.restart_service(&service).unwrap_or_else(|e| e.to_string()))
-                } else {
-                    Ok(daemon.supervisor.service_status(&service).unwrap_or_else(|e| e.to_string()))
-                }
-            }
-            ShellCommand::RcService { service, action } => {
-                use crate::init::lightweight_init::LightweightInitDaemon;
-                let mut daemon = LightweightInitDaemon::new();
-                daemon.switch_runlevel(crate::init::lightweight_init::RunlevelTarget::MultiUser);
-                Ok(format!("OpenRC [{}]: {}", service, daemon.supervisor.service_status(&service).unwrap_or_else(|e| e.to_string())))
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -892,43 +617,6 @@ mod tests {
         };
         let result = repl.execute_command(command);
         assert_eq!(result.unwrap(), "test");
-    }
-
-    #[test]
-    fn test_bash_alias_substitution() {
-        let mut repl = ShellRepl::new();
-        let alias_cmd = ShellCommand::Alias {
-            shorthand: "ll".to_string(),
-            statement: "ls -la".to_string(),
-        };
-        repl.execute_command(alias_cmd).unwrap();
-        assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
-
-        // Execute line with alias substitution
-        repl.execute_line("ll");
-        assert_eq!(repl.command_history[0], "ll");
-    }
-
-    #[test]
-    fn test_zsh_tab_completion() {
-        let repl = ShellRepl::new();
-        let suggestions = repl.complete_tab("cl");
-        assert_eq!(suggestions, vec!["clear".to_string()]);
-
-        let suggestions_all = repl.complete_tab("pwd");
-        assert_eq!(suggestions_all, vec!["pwd".to_string()]);
-    }
-
-    #[test]
-    fn test_fish_history_suggestions() {
-        let mut repl = ShellRepl::new();
-        repl.execute_line("clear");
-        repl.execute_line("systemctl list");
-
-        let suggestion = repl.history_suggest_fish("sys").unwrap();
-        assert_eq!(suggestion, "systemctl list");
-
-        assert!(repl.history_suggest_fish("invalid").is_none());
     }
 
     #[test]
@@ -1085,88 +773,44 @@ mod tests {
     }
 
     #[test]
+    fn test_api_hook_trampoline() {
+        let mut mgr = ApiHookManager::new();
+        assert!(!mgr.is_hooked("sys_read"));
+
+        mgr.install_hook("sys_read", HookType::Trampoline, 0x7FFF0010).unwrap();
+        assert!(mgr.is_hooked("sys_read"));
+    }
+
+    #[test]
+    fn test_script_alias_and_ampersand_operations() {
+        let mut engine = ScriptAliasEngine::new();
+        engine.register_user_alias("cls", "clear");
+
+        // Test automatic alias with background &
+        let (resolved, is_bg) = engine.resolve_alias("ll &");
+        assert_eq!(resolved, "ls -la");
+        assert!(is_bg);
+
+        // Test user alias
+        let (resolved_cls, is_bg_cls) = engine.resolve_alias("cls");
+        assert_eq!(resolved_cls, "clear");
+        assert!(!is_bg_cls);
+
+        // Test fixed alias @call
+        let (resolved_call, _) = engine.resolve_alias("@call setup.sig");
+        assert_eq!(resolved_call, "script_exec setup.sig");
+
+        // Test script file execution
+        let res = engine.execute_script_file("setup.sig").unwrap();
+        assert_eq!(res.len(), 2);
+    }
+
+    #[test]
     fn test_rm_command() {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("rm testfile.txt");
         assert!(matches!(cmd, ShellCommand::Rm { .. }));
         let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Removed file: testfile.txt");
-    }
-
-    #[test]
-    fn test_extended_cli_commands() {
-        let mut repl = ShellRepl::new();
-
-        // 1. Livepatch Command Test
-        let cmd_livepatch = repl.parse_command("livepatch apply sys_read 8122c400 c0300100");
-        assert!(matches!(cmd_livepatch, ShellCommand::Livepatch { .. }));
-        let out_livepatch = repl.execute_command(cmd_livepatch).unwrap();
-        assert!(out_livepatch.contains("Successfully registered"));
-
-        // 2. Cron Command Test
-        let cmd_cron = repl.parse_command("cron list");
-        assert!(matches!(cmd_cron, ShellCommand::Cron { .. }));
-        let out_cron = repl.execute_command(cmd_cron).unwrap();
-        assert!(out_cron.contains("backup_job"));
-
-        // 3. VM Command Test
-        let cmd_vm = repl.parse_command("vm start Intel-VM");
-        assert!(matches!(cmd_vm, ShellCommand::Vm { .. }));
-        let out_vm = repl.execute_command(cmd_vm).unwrap();
-        assert!(out_vm.contains("Starting VM"));
-
-        // 4. Research Command Test
-        let cmd_res = repl.parse_command("research Perplexity");
-        assert!(matches!(cmd_res, ShellCommand::Research { .. }));
-        let out_res = repl.execute_command(cmd_res).unwrap();
-        assert!(out_res.contains("SYNTHESIZED ANSWER"));
-
-        // 5. Camera Command Test
-        let cmd_cam = repl.parse_command("camera Sepia");
-        assert!(matches!(cmd_cam, ShellCommand::Camera { .. }));
-        let out_cam = repl.execute_command(cmd_cam).unwrap();
-        assert!(out_cam.contains("Webcam effect successfully updated"));
-
-        // 6. Grid Command Test
-        let cmd_grid = repl.parse_command("grid add node-3 8");
-        assert!(matches!(cmd_grid, ShellCommand::Grid { .. }));
-        let out_grid = repl.execute_command(cmd_grid).unwrap();
-        assert!(out_grid.contains("node-3"));
-
-        // 7. Access Command Test
-        let cmd_access = repl.parse_command("access enable ScreenReader");
-        assert!(matches!(cmd_access, ShellCommand::Access { .. }));
-        let out_access = repl.execute_command(cmd_access).unwrap();
-        assert!(out_access.contains("ScreenReader"));
-
-        // 8. Sysctl Command Test
-        let cmd_sysctl = repl.parse_command("sysctl query kern.maxproc");
-        assert!(matches!(cmd_sysctl, ShellCommand::Sysctl { .. }));
-        let out_sysctl = repl.execute_command(cmd_sysctl).unwrap();
-        assert!(out_sysctl.contains("kern.maxproc"));
-
-        // 9. Patch Command Test
-        let cmd_patch = repl.parse_command("patch rollback patch_01");
-        assert!(matches!(cmd_patch, ShellCommand::Patch { .. }));
-        let out_patch = repl.execute_command(cmd_patch).unwrap();
-        assert!(out_patch.contains("rolled back"));
-
-        // 10. Rescue Command Test
-        let cmd_rescue = repl.parse_command("rescue rollback /dev/sda1 hash_val");
-        assert!(matches!(cmd_rescue, ShellCommand::Rescue { .. }));
-        let out_rescue = repl.execute_command(cmd_rescue).unwrap();
-        assert!(out_rescue.contains("/dev/sda1"));
-
-        // 11. Monitor Command Test
-        let cmd_monitor = repl.parse_command("monitor telemetry");
-        assert!(matches!(cmd_monitor, ShellCommand::Monitor { .. }));
-        let out_monitor = repl.execute_command(cmd_monitor).unwrap();
-        assert!(out_monitor.contains("SigmaMonitor"));
-
-        // 12. Sandbox Command Test
-        let cmd_sandbox = repl.parse_command("sandbox create 801 StrictBrowser");
-        assert!(matches!(cmd_sandbox, ShellCommand::Sandbox { .. }));
-        let out_sandbox = repl.execute_command(cmd_sandbox).unwrap();
-        assert!(out_sandbox.contains("StrictBrowser"));
     }
 }

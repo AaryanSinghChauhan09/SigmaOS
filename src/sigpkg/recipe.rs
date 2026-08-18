@@ -1,7 +1,7 @@
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
-use crate::sigpkg::{Dependency, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Version};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -43,8 +43,6 @@ pub struct PackageRecipe {
     pub hash: String,
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
-    pub prepare_commands: Vec<String>,
-    pub pkgrel: u32,
     pub environment: HashMap<String, String>,
     pub arch: String,
     pub license_spdx: String,
@@ -63,8 +61,6 @@ impl PackageRecipe {
             hash: String::new(),
             build_commands: Vec::new(),
             install_commands: Vec::new(),
-            prepare_commands: Vec::new(),
-            pkgrel: 1,
             environment: HashMap::new(),
             arch: "x86_64".to_string(),
             license_spdx: "GPL".to_string(),
@@ -100,11 +96,6 @@ impl PackageRecipe {
 
     pub fn with_install_command(mut self, command: String) -> Self {
         self.install_commands.push(command);
-        self
-    }
-
-    pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.prepare_commands.push(command);
         self
     }
 

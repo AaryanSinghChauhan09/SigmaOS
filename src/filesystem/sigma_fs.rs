@@ -730,3 +730,4 @@ mod tests {
         assert_eq!(virtio.descriptors[0].addr, 0x1000);
     }
 }
+

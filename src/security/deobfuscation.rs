@@ -4,8 +4,7 @@
 /// and a continuum of static/dynamic disassembler callbacks.
 /// Inspired by Linux sparse analyzer, FreeBSD Capsicum static verification, and Astrée abstract interpretation.
 
-extern crate alloc;
-use alloc::vec::Vec;
+use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArch {
@@ -580,42 +579,49 @@ mod tests {
     }
 
     #[test]
-    fn test_mba_deobfuscation() {
-        let deobf = ArithmeticSubstitutionDeobfuscator::new();
-        let add_val = deobf.simplify_mba_expression(12, 34, true);
-        assert_eq!(add_val, 12 + 34);
+    fn test_abstract_pointer_domain() {
+        let user_ptr = AbstractPointer::UserSpace { base: 0x1000, limit: 0x5000 };
+        let kernel_ptr = AbstractPointer::KernelSpace { base: 0x8000_0000_0000_0000, limit: 0x8000_0000_1000_0000 };
 
-        let sub_val = deobf.simplify_mba_expression(50, 20, false);
-        assert_eq!(sub_val, 50 - 20);
-    }
-}
-
-pub struct ArithmeticSubstitutionDeobfuscator;
-
-impl ArithmeticSubstitutionDeobfuscator {
-    pub fn new() -> Self {
-        Self
+        assert!(user_ptr.is_safe_user_access(0x2000, 0x100));
+        assert!(!user_ptr.is_safe_user_access(0x6000, 0x100)); // Out of bounds
+        assert!(kernel_ptr.is_safe_kernel_access(0x8000_0000_0000_1000, 0x200));
     }
 
-    /// Simplify Mixed Boolean-Arithmetic (MBA) identity expressions:
-    /// e.g. (x ^ y) + 2*(x & y) -> x + y
-    pub fn simplify_mba_expression(&self, x: u64, y: u64, is_add_mba: bool) -> u64 {
-        if is_add_mba {
-            // Evaluates MBA addition: (x ^ y) + 2 * (x & y) == x + y
-            let xor_part = x ^ y;
-            let and_part = x & y;
-            xor_part.wrapping_add(2 * and_part)
-        } else {
-            // Evaluates MBA subtraction: (x ^ y) - 2 * (!x & y) == x - y
-            let xor_part = x ^ y;
-            let not_x_and_y = (!x) & y;
-            xor_part.wrapping_sub(2 * not_x_and_y)
-        }
-    }
-}
+    #[test]
+    fn test_abstract_capability_domain() {
+        let mut cap1 = AbstractCapabilityDomain::new();
+        let mut cap2 = AbstractCapabilityDomain::new();
 
-impl Default for ArithmeticSubstitutionDeobfuscator {
-    fn default() -> Self {
-        Self::new()
+        cap1.grant("CAP_READ");
+        cap1.grant("CAP_WRITE");
+
+        cap2.grant("CAP_READ");
+
+        let joined = cap1.join(&cap2);
+        assert!(joined.has_right("CAP_READ"));
+        assert!(!joined.has_right("CAP_WRITE")); // Conservative intersection
+    }
+
+    #[test]
+    fn test_abstract_taint_propagation() {
+        let untainted = AbstractTaint::Untainted;
+        let network_tainted = AbstractTaint::NetworkProvided;
+
+        let combined = untainted.combine(&network_tainted);
+        assert_eq!(combined, AbstractTaint::NetworkProvided);
+        assert!(combined.is_tainted());
+    }
+
+    #[test]
+    fn test_abstract_interpreter_fixpoint_widening() {
+        let initial_state = AbstractInterpreterState::new();
+        let loop_body = [
+            ArchInstruction::new(100, CpuArch::X64, InstructionType::Add, b"eax", &[], 10),
+        ];
+
+        let fixpoint = AbstractInterpreterEngine::compute_loop_fixpoint(&initial_state, &loop_body, 10);
+        // Widening should force the loop variable to i64::MAX boundary
+        assert_eq!(fixpoint.eax, AbstractValue::Interval(i64::MIN, i64::MAX));
     }
 }

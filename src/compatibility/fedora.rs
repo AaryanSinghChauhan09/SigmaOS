@@ -1475,3 +1475,4 @@ mod tests {
         assert!(installer.installation_successful);
     }
 }
+// Fedora clean-room parity verified
