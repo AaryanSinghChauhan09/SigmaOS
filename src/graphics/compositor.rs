@@ -6,7 +6,7 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -183,7 +183,8 @@ pub struct BitmapSurface {
 impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
         let size = (width * height) as usize;
-        let data = vec![0; size];
+        let mut data = Vec::with_capacity(size);
+        data.resize(size, 0);
 
         BitmapSurface {
             id,
@@ -446,7 +447,7 @@ impl Window for SimpleWindow {
 
     fn apply_transition(&mut self, anim: AnimationType, progress: f32) {
         self.current_animation = Some(anim);
-        let clamped_progress = progress.clamp(0.0f32, 1.0f32);
+        let clamped_progress = progress.max(0.0f32).min(1.0f32);
         match anim {
             AnimationType::Fade => {
                 self.animation_opacity = 1.0f32 - clamped_progress;
@@ -682,17 +683,7 @@ impl Compositor for SimpleCompositor {
                                 if output_index < back_data.len()
                                     && window_index < window_data.len()
                                 {
-                                    // Apply standard Alpha Blending (simulated via scaling)
-                                    let pixel = window_data[window_index];
-                                    if opacity < 0.99f32 {
-                                        let a = ((pixel >> 24) & 0xFF) as f32 * opacity;
-                                        let r = ((pixel >> 16) & 0xFF) as f32 * opacity;
-                                        let g = ((pixel >> 8) & 0xFF) as f32 * opacity;
-                                        let b = (pixel & 0xFF) as f32 * opacity;
-                                        back_data[output_index] = ((a as u32) << 24) | ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
-                                    } else {
-                                        back_data[output_index] = pixel;
-                                    }
+                                    back_data[output_index] = window_data[window_index];
                                 }
                             }
                         }
@@ -708,6 +699,36 @@ impl Compositor for SimpleCompositor {
             output_data[..len].copy_from_slice(&back_data[..len]);
         } else {
             output.clear(Color::rgb(0, 0, 0));
+        }
+
+        // Compose windows in order (back to front)
+        for &window_id in &self.window_order {
+            if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                let window_rect = window.rect();
+                let output_stride = output.info().stride as usize / 4;
+                if let Some(surface) = window.surface() {
+                    let window_stride = surface.info().stride as usize / 4;
+                    let window_data = surface.data();
+                    let output_data = output.data_mut();
+
+                    // Copy window surface to output
+                    for y in 0..window_rect.size.height as usize {
+                        for x in 0..window_rect.size.width as usize {
+                            let output_x = (window_rect.position.x + x as i32) as usize;
+                            let output_y = (window_rect.position.y + y as i32) as usize;
+
+                            let output_index = output_y * output_stride + output_x;
+                            let window_index = y * window_stride + x;
+
+                            if output_index < output_data.len()
+                                && window_index < window_data.len()
+                            {
+                                output_data[output_index] = window_data[window_index];
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // Swap back to front buffer automatically if needed
@@ -731,74 +752,33 @@ impl Compositor for SimpleCompositor {
     }
 
     fn stats(&self) -> CompositorStats {
-        let mut stats = self.stats;
+        let mut stats = self.stats.clone();
         stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
         stats
     }
 }
 
-// =========================================================================
-// Wayland / X11 / DRM-KMS Display Protocol Parity Layer
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DisplayServerProtocol {
-    WaylandXdgShell,
-    X11Xcb,
-    DrmKmsAtomic,
-    DirectFb,
-}
-
-pub struct SovereignWaylandCompositor {
-    pub protocol: DisplayServerProtocol,
-    pub vsync_enabled: bool,
-    pub screen_width: u32,
-    pub screen_height: u32,
-    pub mapped_surfaces_count: usize,
-}
-
-impl SovereignWaylandCompositor {
-    pub fn new(protocol: DisplayServerProtocol, width: u32, height: u32) -> Self {
-        Self {
-            protocol,
-            vsync_enabled: true,
-            screen_width: width,
-            screen_height: height,
-            mapped_surfaces_count: 0,
-        }
-    }
-
-    pub fn map_xdg_surface(&mut self, _title: &str, _width: u32, _height: u32) -> Result<usize, GraphicsError> {
-        self.mapped_surfaces_count += 1;
-        Ok(self.mapped_surfaces_count)
-    }
-
-    pub fn commit_vsync_frame(&mut self) -> Result<(), GraphicsError> {
-        if !self.vsync_enabled {
-            return Err(GraphicsError::RenderFailed);
-        }
-        Ok(())
-    }
-}
-
-impl Default for SovereignWaylandCompositor {
-    fn default() -> Self {
-        Self::new(DisplayServerProtocol::WaylandXdgShell, 1920, 1080)
-    }
-}
-
 #[cfg(test)]
-mod tests {
+mod additional_compositor_tests {
     use super::*;
 
     #[test]
-    fn test_sovereign_wayland_compositor() {
-        let mut comp = SovereignWaylandCompositor::new(DisplayServerProtocol::WaylandXdgShell, 1920, 1080);
-        assert_eq!(comp.protocol, DisplayServerProtocol::WaylandXdgShell);
+    fn test_window_minimization_and_fade_animations() {
+        let rect = Rectangle::new(0, 0, 100, 100);
+        let mut window = SimpleWindow::new(1, rect, WindowCapability::full());
 
-        let id = comp.map_xdg_surface("Zenith Terminal", 800, 600).unwrap();
-        assert_eq!(id, 1);
-        assert_eq!(comp.mapped_surfaces_count, 1);
-        assert!(comp.commit_vsync_frame().is_ok());
+        // Default scale and opacity should be 1.0
+        assert_eq!(window.get_scale(), 1.0f32);
+        assert_eq!(window.get_opacity(), 1.0f32);
+
+        // Apply 50% progress Minimize transition
+        window.apply_transition(AnimationType::Minimize, 0.5f32);
+        assert_eq!(window.get_scale(), 0.75f32); // 1.0 - (0.5 * 0.5)
+        assert_eq!(window.get_opacity(), 0.5f32); // 1.0 - 0.5
+
+        // Apply complete transition
+        window.apply_transition(AnimationType::Minimize, 1.0f32);
+        assert_eq!(window.get_scale(), 0.5f32);
+        assert_eq!(window.get_opacity(), 0.0f32);
     }
 }

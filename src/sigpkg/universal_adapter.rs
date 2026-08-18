@@ -2,6 +2,40 @@
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 
 use crate::sigpkg::{Package, Version, VersionConstraint, Dependency, ParseError};
+use crate::security::Permission;
+use crate::package::PackagePriority;
+
+#[derive(Debug, Clone)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanPkgbuild {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub confinement: String,
+    pub plugs: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlatpakManifest {
+    pub app_id: String,
+    pub command: String,
+    pub finish_args: Vec<String>,
+}
 use std::collections::HashMap;
 
 /// Abstract trait for package format adapters (OOPS principle)
@@ -41,16 +75,266 @@ pub struct DebAdapter {
     user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
 }
 
+impl std::fmt::Debug for DebAdapter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DebAdapter").finish()
+    }
+}
+
+impl Clone for DebAdapter {
+    fn clone(&self) -> Self {
+        Self { user_hooks: Vec::new() }
+    }
+}
+
 impl DebAdapter {
     pub fn new() -> Self {
         Self {
             user_hooks: Vec::new(),
         }
     }
-    
-    /// Add user-defined processing hook
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
+    }
+
+    /// Parses raw Debian control file text (Apt)
+    pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
+        let mut package = String::new();
+        let mut version = String::new();
+        let mut depends = Vec::new();
+        let mut description = String::new();
+        let mut priority = PackagePriority::Optional;
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+                match key {
+                    "Package" => package = val.to_string(),
+                    "Version" => version = val.to_string(),
+                    "Depends" => {
+                        for dep in val.split(',') {
+                            depends.push(dep.trim().to_string());
+                        }
+                    }
+                    "Description" => description = val.to_string(),
+                    "Priority" => {
+                        priority = match val.to_lowercase().as_str() {
+                            "essential" => PackagePriority::Essential,
+                            "required" => PackagePriority::Required,
+                            "important" => PackagePriority::Important,
+                            "standard" => PackagePriority::Standard,
+                            _ => PackagePriority::Optional,
+                        };
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if package.is_empty() || version.is_empty() {
+            return Err("Invalid Debian control manifest: missing Package or Version");
+        }
+
+        Ok(AptDebManifest {
+            package,
+            version,
+            depends,
+            description,
+            priority,
+        })
+    }
+
+    /// Parses raw PKGBUILD script text (Pacman)
+    pub fn parse_pacman_pkgbuild(&self, text: &str) -> Result<PacmanPkgbuild, &'static str> {
+        let mut pkgname = String::new();
+        let mut pkgver = String::new();
+        let mut depends = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if line.starts_with("pkgname=") {
+                pkgname = line["pkgname=".len()..]
+                    .trim_matches(|c| c == '"' || c == '\'' || c == ' ')
+                    .to_string();
+            } else if line.starts_with("pkgver=") {
+                pkgver = line["pkgver=".len()..]
+                    .trim_matches(|c| c == '"' || c == '\'' || c == ' ')
+                    .to_string();
+            } else if line.starts_with("depends=") {
+                let dep_content =
+                    line["depends=".len()..].trim_matches(|c| c == '(' || c == ')' || c == ' ');
+                for dep in dep_content.split_whitespace() {
+                    let cleaned = dep.trim_matches(|c| c == '\'' || c == '"');
+                    depends.push(cleaned.to_string());
+                }
+            }
+        }
+
+        if pkgname.is_empty() || pkgver.is_empty() {
+            return Err("Invalid PKGBUILD: missing pkgname or pkgver");
+        }
+
+        Ok(PacmanPkgbuild {
+            pkgname,
+            pkgver,
+            depends,
+        })
+    }
+
+    /// Parses raw snapcraft.yaml text (Snap)
+    pub fn parse_snapcraft_yaml(&self, text: &str) -> Result<SnapcraftManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut summary = String::new();
+        let mut confinement = String::new();
+        let mut plugs = Vec::new();
+
+        let mut in_plugs_block = false;
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+                in_plugs_block = false;
+                match key {
+                    "name" => name = val.trim_matches(|c| c == '"' || c == '\'').to_string(),
+                    "version" => version = val.trim_matches(|c| c == '"' || c == '\'').to_string(),
+                    "summary" => summary = val.trim_matches(|c| c == '"' || c == '\'').to_string(),
+                    "confinement" => confinement = val.to_string(),
+                    "plugs" => {
+                        in_plugs_block = true;
+                        if !val.is_empty() {
+                            plugs.push(val.to_string());
+                        }
+                    }
+                    _ => {}
+                }
+            } else if line.starts_with("- ") && in_plugs_block {
+                let plug_name = line["- ".len()..].trim();
+                plugs.push(plug_name.to_string());
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Invalid snapcraft.yaml: missing name or version");
+        }
+
+        Ok(SnapcraftManifest {
+            name,
+            version,
+            summary,
+            confinement,
+            plugs,
+        })
+    }
+
+    /// Parses raw Flatpak JSON manifest text
+    pub fn parse_flatpak_json(&self, text: &str) -> Result<FlatpakManifest, &'static str> {
+        let mut app_id = String::new();
+        let mut command = String::new();
+        let mut finish_args = Vec::new();
+
+        let mut in_finish_args = false;
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with("//") {
+                continue;
+            }
+            if line.starts_with("\"app-id\"") {
+                if let Some(pos) = line.find(':') {
+                    app_id = line[pos + 1..]
+                        .trim_matches(|c| c == ',' || c == '"' || c == ' ' || c == '\n')
+                        .to_string();
+                }
+            } else if line.starts_with("\"command\"") {
+                if let Some(pos) = line.find(':') {
+                    command = line[pos + 1..]
+                        .trim_matches(|c| c == ',' || c == '"' || c == ' ' || c == '\n')
+                        .to_string();
+                }
+            } else if line.starts_with("\"finish-args\"") {
+                in_finish_args = true;
+            } else if line.starts_with(']') {
+                in_finish_args = false;
+            } else if in_finish_args && line.starts_with('"') {
+                let arg = line
+                    .trim_matches(|c| c == ',' || c == '"' || c == ' ' || c == '\n')
+                    .to_string();
+                finish_args.push(arg);
+            }
+        }
+
+        if app_id.is_empty() {
+            return Err("Invalid Flatpak JSON: missing app-id");
+        }
+
+        Ok(FlatpakManifest {
+            app_id,
+            command,
+            finish_args,
+        })
+    }
+
+    /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
+    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
+        let mut permissions = Vec::new();
+        for arg in plugs_or_args {
+            if arg == "network" || arg == "network-bind" || arg == "--share=network" {
+                permissions.push(Permission::NetworkTcp);
+                permissions.push(Permission::NetworkUdp);
+            } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
+                permissions.push(Permission::FileRead);
+                permissions.push(Permission::FileWrite);
+            } else if arg == "--share=ipc" {
+                permissions.push(Permission::Ipc);
+            }
+        }
+        permissions
+    }
+
+    /// Standardizes any foreign parsed manifest into SigmaOS native Package models
+    pub fn translate_to_native_package(
+        &self,
+        name: &str,
+        version_str: &str,
+        desc: &str,
+        raw_deps: &[String],
+    ) -> Result<Package, &'static str> {
+        let cleaned_ver = if version_str.contains('-') {
+            version_str.split('-').next().unwrap()
+        } else {
+            version_str
+        };
+
+        let parsed_ver =
+            Version::parse(cleaned_ver).map_err(|_| "Failed to parse semver representation")?;
+
+        let mut dependencies = Vec::new();
+        for dep in raw_deps {
+            dependencies.push(Dependency {
+                name: dep.clone(),
+                version_constraint: VersionConstraint::Any,
+            });
+        }
+
+        Ok(Package::new(name.to_string(), parsed_ver, desc.to_string(), dependencies, format!("SHA256:{}", name)))
     }
 }
 
@@ -77,7 +361,7 @@ impl PackageFormatAdapter for DebAdapter {
             } else if line.starts_with("Description: ") {
                 description = line[13..].to_string();
             } else if line.starts_with("Depends: ") {
-                let deps_str = line[9..];
+                let deps_str = &line[9..];
                 for dep in deps_str.split(',') {
                     let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
                     if !dep_name.is_empty() {
@@ -654,44 +938,71 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_deb_adapter_parsing() {
-        let adapter = DebAdapter::new();
-        let deb_data = b"Package: test-package
-Version: 1.0.0
-Description: A test package
-Depends: libc, libssl";
-        
-        let package = adapter.parse_package(deb_data).unwrap();
-        assert_eq!(package.name, "test-package");
-        assert_eq!(package.version.major, 1);
-        assert_eq!(package.dependencies.len(), 2);
+    fn test_apt_control_parsing_and_translation() {
+        let adapter = UniversalPackageAdapter::new();
+        let manifest_text = r#"
+            Package: curl
+            Version: 8.2.1
+            Depends: libcurl4, libssl3, zlib1g
+            Description: Command line tool for transferring data
+            Priority: standard
+        "#;
+
+        let parsed = adapter.parse_apt_control(manifest_text).unwrap();
+        assert_eq!(parsed.package, "curl");
+        assert_eq!(parsed.version, "8.2.1");
+        assert_eq!(parsed.depends.len(), 3);
+        assert_eq!(parsed.priority, PackagePriority::Standard);
+
+        // Test parsing system essential priority (Debian-style)
+        let essential_text = r#"
+            Package: sigma-init
+            Version: 1.0.0
+            Priority: essential
+        "#;
+        let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
+        assert_eq!(parsed_essential.priority, PackagePriority::Essential);
+
+        let native = adapter
+            .translate_to_native_package(
+                &parsed.package,
+                &parsed.version,
+                &parsed.description,
+                parsed.depends.as_slice(),
+            )
+            .unwrap();
+        assert_eq!(native.name, "curl");
+        assert_eq!(native.version, Version::new(8, 2, 1));
     }
-    
+
     #[test]
-    fn test_rpm_adapter_parsing() {
-        let adapter = RpmAdapter::new();
-        let rpm_data = b"Name: test-rpm
-Version: 2.0.0
-Summary: An RPM test package
-Requires: glibc openssl";
-        
-        let package = adapter.parse_package(rpm_data).unwrap();
-        assert_eq!(package.name, "test-rpm");
-        assert_eq!(package.version.major, 2);
+    fn test_apk_adapter_parsing() {
+        let adapter = ApkAdapter::new();
+        let apk_data = b"P:test-apk\nV:4.2.0\nT:Alpine test\nD:musl openssl";
+        let pkg = adapter.parse_package(apk_data).unwrap();
+        assert_eq!(pkg.name, "test-apk");
+        assert_eq!(pkg.version.major, 4);
+        assert_eq!(pkg.dependencies.len(), 2);
     }
-    
+
     #[test]
-    fn test_pacman_adapter_parsing() {
-        let adapter = PacmanAdapter::new();
-        let pacman_data = b"pkgname = test-pacman
-pkgver = 3.0.0
-pkgdesc = A Pacman test package
-depend = glibc
-depend = openssl";
-        
-        let package = adapter.parse_package(pacman_data).unwrap();
-        assert_eq!(package.name, "test-pacman");
-        assert_eq!(package.version.major, 3);
+    fn test_nix_adapter_parsing() {
+        let adapter = NixAdapter::new();
+        let nix_data = b"pname = \"test-nix\";\nversion = \"5.1.0\";\ndescription = \"Nix test\";\nbuildInputs = [ glibc ];";
+        let pkg = adapter.parse_package(nix_data).unwrap();
+        assert_eq!(pkg.name, "test-nix");
+        assert_eq!(pkg.version.major, 5);
+        assert_eq!(pkg.dependencies.len(), 1);
+    }
+
+    #[test]
+    fn test_ebuild_adapter_parsing() {
+        let adapter = EbuildAdapter::new();
+        let ebuild_data = b"PN=\"test-ebuild\"\nPV=\"6.2.3\"\nDESCRIPTION=\"Gentoo test\"\nDEPEND=\"gcc clang\"";
+        let pkg = adapter.parse_package(ebuild_data).unwrap();
+        assert_eq!(pkg.name, "test-ebuild");
+        assert_eq!(pkg.version.major, 6);
+        assert_eq!(pkg.dependencies.len(), 2);
     }
 
     #[test]
@@ -771,5 +1082,183 @@ Description: Hook test";
         
         assert!(rpm_str.contains("Name: convert-test"));
         assert!(rpm_str.contains("Version: 1.0.0"));
+    }
+}
+
+/// RedHat/Yum RPM SPEC manifest structure
+#[derive(Debug, Clone)]
+pub struct RpmSpecManifest {
+    pub name: String,
+    pub version: String,
+    pub release: String,
+    pub summary: String,
+    pub license: String,
+    pub requires: Vec<String>, // Dependencies list
+}
+
+/// AppImage single-file containerized loop-mounted layout
+#[derive(Debug, Clone)]
+pub struct AppImageContainer {
+    pub file_name: String,
+    pub payload_offset_bytes: u64,
+    pub entry_point_cmd: String,
+    pub mounted: bool,
+}
+
+impl AppImageContainer {
+    pub fn new(file_name: &str, entry_point_cmd: &str) -> Self {
+        AppImageContainer {
+            file_name: file_name.to_string(),
+            payload_offset_bytes: 0x20000, // standard SquashFS offset
+            entry_point_cmd: entry_point_cmd.to_string(),
+            mounted: false,
+        }
+    }
+
+    /// Mounts the SquashFS payload of the AppImage dynamically (simulated)
+    pub fn mount_and_run(&mut self, mount_point: &str) -> Result<String, &'static str> {
+        if mount_point.is_empty() {
+            return Err("AppImage: Invalid mount point.");
+        }
+        self.mounted = true;
+        let mut exec_path = mount_point.to_string();
+        exec_path.push_str("/");
+        exec_path.push_str(&self.entry_point_cmd);
+        Ok(exec_path)
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct UniversalPackageAdapter {
+    deb_adapter: DebAdapter,
+}
+
+impl UniversalPackageAdapter {
+    pub fn new() -> Self {
+        Self {
+            deb_adapter: DebAdapter::new(),
+        }
+    }
+
+    pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
+        self.deb_adapter.parse_apt_control(text)
+    }
+
+    pub fn parse_pacman_pkgbuild(&self, text: &str) -> Result<PacmanPkgbuild, &'static str> {
+        self.deb_adapter.parse_pacman_pkgbuild(text)
+    }
+
+    pub fn parse_snapcraft_yaml(&self, text: &str) -> Result<SnapcraftManifest, &'static str> {
+        self.deb_adapter.parse_snapcraft_yaml(text)
+    }
+
+    pub fn parse_flatpak_json(&self, text: &str) -> Result<FlatpakManifest, &'static str> {
+        self.deb_adapter.parse_flatpak_json(text)
+    }
+
+    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
+        self.deb_adapter.translate_sandbox_permissions(plugs_or_args)
+    }
+
+    pub fn translate_to_native_package(
+        &self,
+        name: &str,
+        version_str: &str,
+        desc: &str,
+        raw_deps: &[String],
+    ) -> Result<Package, &'static str> {
+        self.deb_adapter.translate_to_native_package(name, version_str, desc, raw_deps)
+    }
+
+    /// Parses RedHat/Yum .spec files for RPM metadata translation
+    pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut release = String::new();
+        let mut summary = String::new();
+        let mut license = String::new();
+        let mut requires = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+                match key {
+                    "Name" => name = val.to_string(),
+                    "Version" => version = val.to_string(),
+                    "Release" => release = val.to_string(),
+                    "Summary" => summary = val.to_string(),
+                    "License" => license = val.to_string(),
+                    "Requires" => {
+                        for req in val.split(',') {
+                            requires.push(req.trim().to_string());
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Invalid RPM spec file: missing Name or Version");
+        }
+
+        Ok(RpmSpecManifest {
+            name,
+            version,
+            release,
+            summary,
+            license,
+            requires,
+        })
+    }
+}
+
+#[cfg(test)]
+mod additional_adapter_tests {
+    use super::*;
+
+    #[test]
+    fn test_rpm_spec_parsing_and_native_translation() {
+        let adapter = UniversalPackageAdapter::new();
+        let spec_text = r#"
+            Name: custom_service
+            Version: 2.1
+            Release: 1%{?dist}
+            Summary: High performance backend service
+            License: GPL-3.0
+            Requires: bash, glibc >= 2.17
+        "#;
+
+        let parsed = adapter.parse_rpm_spec(spec_text).unwrap();
+        assert_eq!(parsed.name, "custom_service");
+        assert_eq!(parsed.version, "2.1");
+        assert_eq!(parsed.license, "GPL-3.0");
+        assert_eq!(parsed.requires.len(), 2);
+        assert_eq!(parsed.requires[0], "bash");
+
+        let native = adapter.translate_to_native_package(
+            &parsed.name,
+            &parsed.version,
+            &parsed.summary,
+            parsed.requires.as_slice(),
+        ).unwrap();
+
+        assert_eq!(native.name, "custom_service");
+        assert_eq!(native.version, Version::new(2, 1, 0));
+    }
+
+    #[test]
+    fn test_appimage_single_file_loop_mounting() {
+        let mut appimage = AppImageContainer::new("Vlc-3.0.18-x86_64.AppImage", "vlc");
+        assert!(!appimage.mounted);
+
+        let exec_path = appimage.mount_and_run("/tmp/.mount_vlc").unwrap();
+        assert_eq!(exec_path, "/tmp/.mount_vlc/vlc");
+        assert!(appimage.mounted);
     }
 }

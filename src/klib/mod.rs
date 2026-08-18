@@ -1,27 +1,36 @@
 extern crate alloc;
 
-pub mod vec;
-pub mod paging;
+// Core Library Collection Modules for SigmaOS
+// Sovereign implementations - no external crate dependencies
+pub mod vec; // declared first in module tree to prevent circular dependencies
 pub mod buddy_allocator;
+pub mod paging;
 pub mod hashmap;
-#[cfg(target_os = "none")]
 pub mod hashset;
-pub mod error;
 pub mod uuid;
 pub mod hash;
-pub mod adt;
+pub mod string;
+pub mod arc;
+pub mod ring_buffer;
+pub mod linked_list;
+pub mod slab;
+pub mod custom_string;
+pub mod custom_allocator;
+
+// Conditional compilation of other collection modules
+#[cfg(target_os = "none")]
+pub mod btreemap;
+#[cfg(target_os = "none")]
 pub mod vecdeque;
 
-// For now, we use our custom Vec and HashMap (aliased to our bucket-based BTreeMap)
+// Re-exports
 pub use vec::Vec;
-pub use hashmap::BTreeMap as HashMap;
-pub use hashmap::BTreeMap;
-pub use adt::{SplayTree, RadixTree, SovereignPriorityQueue};
-pub use vecdeque::VecDeque;
-
-// For other collections, use std when available
-#[cfg(not(target_os = "none"))]
-pub use std::collections::BTreeMap as StdBTreeMap;
-
-#[cfg(not(target_os = "none"))]
-pub use std::string::String;
+pub use string::{String, ToString};
+pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
+pub use arc::Arc;
+pub use ring_buffer::{RingBuffer, HeapRingBuffer};
+pub use linked_list::{LinkedList, SList};
+pub use slab::{SlabCache, TypedSlabCache};
+pub use hashmap::{HashMap, BTreeMap};
+pub use hashset::HashSet;
+pub use uuid::Uuid;
