@@ -9,8 +9,8 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceClass {
     Block = 0,
     Character = 1,
