@@ -174,9 +174,9 @@ impl Secret for SimpleSecret {
             return Err(SecretError::EncryptionFailed);
         }
 
-        // Simple XOR encryption for demonstration
-        for i in 0..self.data_len {
-            self.data[i] ^= key[i % key.len()];
+        // Optimized single-pass iterator chain without modulo division or bounds checks
+        for (byte, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
+            *byte ^= k;
         }
 
         self.is_encrypted.store(true, Ordering::SeqCst);
@@ -192,9 +192,9 @@ impl Secret for SimpleSecret {
             return Err(SecretError::DecryptionFailed);
         }
 
-        // Simple XOR decryption (same as encryption)
-        for i in 0..self.data_len {
-            self.data[i] ^= key[i % key.len()];
+        // Optimized single-pass iterator chain without modulo division or bounds checks
+        for (byte, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
+            *byte ^= k;
         }
 
         self.is_encrypted.store(false, Ordering::SeqCst);
@@ -403,5 +403,25 @@ mod tests {
 
         let retrieved = keyring.get_secret(1).unwrap();
         assert_eq!(retrieved.name(), b"TestSecret");
+    }
+
+    #[test]
+    fn test_simple_secret_encryption_decryption_roundtrip() {
+        let secret_cap = SecretCapability::full();
+        let mut secret = SimpleSecret::new(100, b"MySecretKey", SecretType::Password, secret_cap);
+        let raw_data = b"super_secret_payload_12345";
+        secret.set_data(raw_data);
+
+        assert_eq!(secret.get_data(), raw_data);
+
+        let key = b"encryption_key_32_bytes_long!!";
+
+        // Test encryption
+        assert!(secret.encrypt(key).is_ok());
+        assert_ne!(secret.get_data(), raw_data);
+
+        // Test decryption
+        assert!(secret.decrypt(key).is_ok());
+        assert_eq!(secret.get_data(), raw_data);
     }
 }
