@@ -12,7 +12,15 @@ use alloc::vec::Vec;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::Permission;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    FileRead = 1,
+    NetworkTcp = 2,
+}
 
 // =========================================================================
 // 1. SECURE ZEROIZATION & INTRUSION MONITORING

@@ -17,14 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Scan repository for vulnerabilities
-        uses: anchore/scan-action@v3
+        uses: anchore/scan-action@v6
         id: grype-scan
+        continue-on-error: true
         with:
           path: "."
           fail-build: false
           severity-cutoff: high
           output-format: sarif
       - name: Upload Grype SARIF report
+        if: ${{ !cancelled() && hashFiles('*.sarif') != '' }}
         uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
         with:
           sarif_file: ${{ steps.grype-scan.outputs.sarif }}
