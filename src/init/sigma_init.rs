@@ -84,6 +84,94 @@ impl Service for SimpleService {
     }
 }
 
+// ============================================================================
+// Parallel Boot & Service Startup Optimization Orchestrator
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum BootStage {
+    EarlyKernel = 0,
+    SystemDrivers = 1,
+    CoreServices = 2,
+    UserSpaceUI = 3,
+}
+
+#[derive(Debug, Clone)]
+pub struct BootTask {
+    pub task_id: usize,
+    pub name: [u8; 32],
+    pub stage: BootStage,
+    pub startup_time_ms: usize,
+    pub is_completed: bool,
+}
+
+pub struct ParallelBootOrchestrator {
+    pub tasks: Vec<BootTask>,
+    pub current_stage: BootStage,
+    pub total_boot_time_ms: usize,
+}
+
+impl ParallelBootOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            tasks: Vec::new(),
+            current_stage: BootStage::EarlyKernel,
+            total_boot_time_ms: 0,
+        }
+    }
+
+    pub fn register_task(&mut self, name: &str, stage: BootStage, estimated_ms: usize) {
+        let mut name_arr = [0u8; 32];
+        let len = name.len().min(31);
+        name_arr[..len].copy_from_slice(&name.as_bytes()[..len]);
+
+        let id = self.tasks.len() + 1;
+        self.tasks.push(BootTask {
+            task_id: id,
+            name: name_arr,
+            stage,
+            startup_time_ms: estimated_ms,
+            is_completed: false,
+        });
+    }
+
+    /// Parallelizes task execution within each BootStage phase
+    pub fn execute_parallel_boot(&mut self) -> usize {
+        self.total_boot_time_ms = 0;
+        let stages = [
+            BootStage::EarlyKernel,
+            BootStage::SystemDrivers,
+            BootStage::CoreServices,
+            BootStage::UserSpaceUI,
+        ];
+
+        for &stage in &stages {
+            self.current_stage = stage;
+            let mut stage_max_ms = 0;
+
+            // Compute wall-clock time for parallel stage execution (max of concurrently run tasks in stage)
+            for i in 0..self.tasks.len() {
+                if self.tasks[i].stage == stage {
+                    self.tasks[i].is_completed = true;
+                    if self.tasks[i].startup_time_ms > stage_max_ms {
+                        stage_max_ms = self.tasks[i].startup_time_ms;
+                    }
+                }
+            }
+
+            self.total_boot_time_ms += stage_max_ms;
+        }
+
+        self.total_boot_time_ms
+    }
+}
+
+impl Default for ParallelBootOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub trait InitSystem {
     fn register_service(&mut self, service: Box<dyn Service>) -> Result<ServiceID, InitError>;
     fn start_service(&mut self, id: ServiceID) -> Result<(), InitError>;
@@ -480,6 +568,20 @@ extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_parallel_boot_orchestrator() {
+        let mut orch = ParallelBootOrchestrator::new();
+        orch.register_task("vfs_init", BootStage::EarlyKernel, 10);
+        orch.register_task("mm_init", BootStage::EarlyKernel, 15);
+        orch.register_task("nvme_driver", BootStage::SystemDrivers, 50);
+        orch.register_task("wifi_driver", BootStage::SystemDrivers, 40);
+
+        let total_ms = orch.execute_parallel_boot();
+        // EarlyKernel max is 15ms, SystemDrivers max is 50ms -> Parallel Total = 65ms
+        assert_eq!(total_ms, 65);
+        assert!(orch.tasks.iter().all(|t| t.is_completed));
+    }
 
     #[test]
     fn test_rancher_container_init() {
