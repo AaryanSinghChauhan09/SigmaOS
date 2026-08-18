@@ -19,6 +19,7 @@ permissions:
 jobs:
 
   build:
+    if: ${{ secrets.SYSDIG_SECURE_TOKEN != '' }}
 
     permissions:
       checks: write # for sysdiglabs/scan-action to publish the checks
