@@ -8,6 +8,7 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
+pub mod distro_readiness;
 
 // Exposing additional audio, printer, wifi drivers
 pub mod legacy_audio_ac97;
@@ -25,6 +26,11 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+
+pub use distro_readiness::{
+    DrmDisplayMode, FreeBsdGeomDiskEngine, GeomPartition, LinuxPciBusGovernor, OpenBsdDrmKmsController,
+    PciBarRegister, PciBarType, PciDeviceNode, UniversalXhciRingEngine, XhciTrb, XhciTrbType,
+};
 
 pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use modern_audio_intel_hda::ModernAudioIntelHda;

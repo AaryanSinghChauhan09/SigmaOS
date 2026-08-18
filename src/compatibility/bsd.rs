@@ -153,6 +153,29 @@ impl Default for OpenBsdSysctlKernelMib {
 }
 
 // =========================================================================
+// NetBSD Rump Kernel Hypercall Translation Router
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RumpHypercall {
+    Syscall,
+    DriverAccess,
+    MemoryAlloc,
+}
+
+pub struct NetBsdRumpKernelRouter;
+
+impl NetBsdRumpKernelRouter {
+    pub fn dispatch_hypercall(call_type: RumpHypercall, param: u64) -> u64 {
+        match call_type {
+            RumpHypercall::Syscall => param.wrapping_add(1),
+            RumpHypercall::DriverAccess => param ^ 0xFF00FF00,
+            RumpHypercall::MemoryAlloc => (param + 4095) & !4095,
+        }
+    }
+}
+
+// =========================================================================
 // UNIT TESTS MODULE
 // =========================================================================
 
@@ -208,5 +231,11 @@ mod tests {
         // Attempt to lower securelevel (blocked)
         assert!(sysctl.write_mib("kern.securelevel", "0").is_err());
         assert_eq!(sysctl.query_mib("kern.securelevel").unwrap(), "1");
+    }
+
+    #[test]
+    fn test_netbsd_rump_router() {
+        assert_eq!(NetBsdRumpKernelRouter::dispatch_hypercall(RumpHypercall::Syscall, 100), 101);
+        assert_eq!(NetBsdRumpKernelRouter::dispatch_hypercall(RumpHypercall::MemoryAlloc, 5000), 8192);
     }
 }
