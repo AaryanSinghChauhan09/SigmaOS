@@ -28,7 +28,10 @@ pub use parrot::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
+pub use selinux::{
+    AccessVectorCache, AvcKey, DynamicMacEnforcer, SeLinuxMode,
+    SecurityContext as SelinuxSecurityContext, SelinuxEngine, SensitivityLevel,
+};
 pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
 pub use hardening::{
