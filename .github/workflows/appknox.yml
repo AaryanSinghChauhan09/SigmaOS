@@ -28,6 +28,7 @@ on:
     branches: [ "main" ]
 jobs:
   appknox:
+    if: ${{ secrets.APPKNOX_ACCESS_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
