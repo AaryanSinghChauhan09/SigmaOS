@@ -381,7 +381,7 @@ impl PortageResolver {
 
         for package_name in packages {
             if let Some(versions) = self.packages.get(package_name) {
-                if let Some(best) = self.select_best_version(versions) {
+                if let Ok(best) = self.select_best_version(versions) {
                     let slot_key = format!("{}:{}", best.name, best.slot.name);
                     slot_usage.entry(slot_key.clone())
                         .or_insert_with(Vec::new)
@@ -473,7 +473,7 @@ impl PortageResolver {
         temp_visited.insert(package.to_string());
 
         if let Some(versions) = self.packages.get(package) {
-            if let Some(best) = self.select_best_version(versions) {
+            if let Ok(best) = self.select_best_version(versions) {
                 self.visit_condition(&best.dependencies, order, visited, temp_visited)?;
             }
         }

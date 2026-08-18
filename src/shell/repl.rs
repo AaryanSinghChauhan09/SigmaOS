@@ -70,6 +70,33 @@ pub enum ShellCommand {
         shorthand: String,
         statement: String,
     },
+    Vmm {
+        action: String,
+    },
+    Compat {
+        action: String,
+    },
+    Lscpu,
+    Taskset {
+        pid: u32,
+        cores: String,
+    },
+    Cpufreq {
+        action: String,
+    },
+    PerfPmc,
+    Cpuinfo,
+    InitCmd {
+        runlevel: String,
+    },
+    SvCmd {
+        action: String,
+        service: String,
+    },
+    RcService {
+        service: String,
+        action: String,
+    },
     Unknown(String),
 }
 
@@ -238,6 +265,37 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "compat" | "bridge" => {
+                let action = parts.get(1).map(|s| s.to_string()).unwrap_or_else(|| "status".to_string());
+                ShellCommand::Compat { action }
+            }
+            "vmm" | "paging" => {
+                let action = parts.get(1).map(|s| s.to_string()).unwrap_or_else(|| "status".to_string());
+                ShellCommand::Vmm { action }
+            }
+            "lscpu" => ShellCommand::Lscpu,
+            "taskset" => {
+                let pid = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
+                let cores = parts.get(2).unwrap_or(&"0,1").to_string();
+                ShellCommand::Taskset { pid, cores }
+            }
+            "cpufreq" => {
+                let action = parts.get(1).map(|s| s.to_string()).unwrap_or_else(|| "status".to_string());
+                ShellCommand::Cpufreq { action }
+            }
+            "perf" => ShellCommand::PerfPmc,
+            "cpuinfo" => ShellCommand::Cpuinfo,
+            "init" => ShellCommand::InitCmd {
+                runlevel: parts.get(1).unwrap_or(&"3").to_string(),
+            },
+            "sv" => ShellCommand::SvCmd {
+                action: parts.get(1).unwrap_or(&"status").to_string(),
+                service: parts.get(2).unwrap_or(&"udevd").to_string(),
+            },
+            "openrc" | "rc-service" => ShellCommand::RcService {
+                service: parts.get(1).unwrap_or(&"networking").to_string(),
+                action: parts.get(2).unwrap_or(&"status").to_string(),
+            },
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -695,6 +753,100 @@ impl ShellRepl {
             ShellCommand::Alias { shorthand, statement } => {
                 self.aliases.insert(shorthand.clone(), statement.clone());
                 Ok(format!("Alias defined: {} -> {}", shorthand, statement))
+            }
+            ShellCommand::Vmm { action } => {
+                use crate::kernel::vmm_paging::{VirtualMemoryManager, VmProtection, PageFaultCause};
+                let mut vmm = VirtualMemoryManager::new(0x1000, 1);
+                vmm.mmap(0x0000_7FFF_0000_0000, 16384, VmProtection::rw(), "user_stack").unwrap();
+                vmm.mmap(0x0000_0000_0040_0000, 4096, VmProtection::rx(), "text_segment").unwrap();
+
+                if action == "fault" {
+                    vmm.handle_page_fault(0x0000_7FFF_0000_0100, PageFaultCause::NotPresent).ok();
+                    Ok("Simulated Demand Page Fault resolved for 0x0000_7FFF_0000_0100".to_string())
+                } else {
+                    Ok(vmm.summary())
+                }
+            }
+            ShellCommand::Compat { action } => {
+                use crate::compatibility::distro_bridge::{
+                    BinaryAbiFormat, LinuxBsdAbiBridge, ServiceUnitTranslator,
+                };
+                let bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::LinuxElf64);
+                let mut translator = ServiceUnitTranslator::new();
+
+                if action == "service" {
+                    let sample_unit = "[Unit]\nDescription=Demo Service\n[Service]\nExecStart=/usr/bin/demo\n";
+                    translator.translate_systemd_service("demo", sample_unit).ok();
+                    Ok("Translated Systemd .service unit into SigmaOS lifecycle.".to_string())
+                } else {
+                    Ok(bridge.summary())
+                }
+            }
+            ShellCommand::Lscpu => {
+                use crate::kernel::processor_management::{SmpTopologyManager, CpuArchitecture};
+                let smp = SmpTopologyManager::new(CpuArchitecture::X86_64, 2, 4);
+                Ok(smp.topology_summary())
+            }
+            ShellCommand::Taskset { pid, cores } => {
+                use crate::kernel::processor_management::NumaAffinityMap;
+                let mut affinity = NumaAffinityMap::new();
+                let core_list: Vec<u32> = cores.split(',').filter_map(|s| s.parse().ok()).collect();
+                affinity.set_affinity(pid, core_list.clone());
+                Ok(format!("PID {} CPU affinity pinned to cores: {:?}", pid, core_list))
+            }
+            ShellCommand::Cpufreq { action } => {
+                use crate::kernel::cpufreq::{CpufreqManager, GovernorType};
+                let mut cpufreq = CpufreqManager::default();
+                if action == "powersave" {
+                    cpufreq.set_governor(0, GovernorType::Powersave).ok();
+                    Ok("CPU 0 governor set to Powersave.".to_string())
+                } else {
+                    cpufreq.set_governor(0, GovernorType::Performance).ok();
+                    Ok("CPU 0 governor active: Performance (4000 MHz max).".to_string())
+                }
+            }
+            ShellCommand::PerfPmc => {
+                use crate::kernel::processor_management::HardwarePerfCounters;
+                let pmc = HardwarePerfCounters::new();
+                Ok(pmc.summary())
+            }
+            ShellCommand::Cpuinfo => {
+                use crate::kernel::processor_management::CpuHardwareProtectionEngine;
+                let sec = CpuHardwareProtectionEngine::new();
+                Ok(format!("Vendor: AuthenticAMD / GenuineIntel\n{}", sec.status_summary()))
+            }
+            ShellCommand::InitCmd { runlevel } => {
+                use crate::init::lightweight_init::{LightweightInitDaemon, RunlevelTarget};
+                let mut daemon = LightweightInitDaemon::new();
+                let target = match runlevel.as_str() {
+                    "1" | "single" => RunlevelTarget::SingleUser,
+                    "5" | "graphical" => RunlevelTarget::Graphical,
+                    "6" | "reboot" => RunlevelTarget::Reboot,
+                    "0" | "poweroff" => RunlevelTarget::Poweroff,
+                    _ => RunlevelTarget::MultiUser,
+                };
+                Ok(daemon.switch_runlevel(target))
+            }
+            ShellCommand::SvCmd { action, service } => {
+                use crate::init::lightweight_init::LightweightInitDaemon;
+                let mut daemon = LightweightInitDaemon::new();
+                daemon.switch_runlevel(crate::init::lightweight_init::RunlevelTarget::MultiUser);
+
+                if action == "up" || action == "start" {
+                    Ok(daemon.supervisor.start_service(&service).unwrap_or_else(|e| e.to_string()))
+                } else if action == "down" || action == "stop" {
+                    Ok(daemon.supervisor.stop_service(&service).unwrap_or_else(|e| e.to_string()))
+                } else if action == "restart" {
+                    Ok(daemon.supervisor.restart_service(&service).unwrap_or_else(|e| e.to_string()))
+                } else {
+                    Ok(daemon.supervisor.service_status(&service).unwrap_or_else(|e| e.to_string()))
+                }
+            }
+            ShellCommand::RcService { service, action } => {
+                use crate::init::lightweight_init::LightweightInitDaemon;
+                let mut daemon = LightweightInitDaemon::new();
+                daemon.switch_runlevel(crate::init::lightweight_init::RunlevelTarget::MultiUser);
+                Ok(format!("OpenRC [{}]: {}", service, daemon.supervisor.service_status(&service).unwrap_or_else(|e| e.to_string())))
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }

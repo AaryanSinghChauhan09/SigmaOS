@@ -36,6 +36,21 @@ struct FreeNode {
     next: usize, // Index to next free node, or usize::MAX if last
 }
 
+#[derive(Debug)]
+pub struct TypedSlabCache<T> {
+    cache: SlabCache,
+    _phantom: core::marker::PhantomData<T>,
+}
+
+impl<T> TypedSlabCache<T> {
+    pub fn new(obj_size: usize, capacity: usize) -> Self {
+        Self {
+            cache: SlabCache::new(obj_size, capacity),
+            _phantom: core::marker::PhantomData,
+        }
+    }
+}
+
 impl SlabCache {
     /// Create a new slab cache (const for static initialization)
     pub const fn new(object_size: usize) -> Self {

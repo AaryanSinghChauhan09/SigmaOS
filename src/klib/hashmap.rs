@@ -6,6 +6,8 @@ use core::borrow::Borrow;
 use core::hash::{Hash, Hasher};
 use crate::klib::hash::SimpleHasher;
 
+pub type HashMap<K, V> = BTreeMap<K, V>;
+
 pub struct BTreeMap<K, V> {
     buckets: Vec<Option<Vec<(K, V)>>>,
     capacity: usize,

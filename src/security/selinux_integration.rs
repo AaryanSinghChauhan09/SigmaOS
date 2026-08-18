@@ -7,6 +7,7 @@
 extern crate alloc;
 
 use alloc::string::String;
+use std::collections::HashMap;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use crate::security::selinux::{

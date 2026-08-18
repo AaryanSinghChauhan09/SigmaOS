@@ -16,8 +16,6 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
-use core::ptr::NonNull;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolType {
     Paged,    // Swappable (virtual pages can be swapped out to disk)
@@ -129,6 +127,11 @@ impl Page {
 }
 
 /// Buddy allocator for memory management
+#[derive(Debug, Clone)]
+pub struct BuddyAllocatorCheckpoint {
+    pub free_lists: [Vec<MemoryBlock>; 12],
+}
+
 pub struct BuddyAllocator {
     free_lists: [Vec<MemoryBlock>; 12], // 2^0 to 2^11 pages (4KB to 8MB)
 }

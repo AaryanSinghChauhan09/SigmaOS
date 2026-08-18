@@ -5,6 +5,8 @@ pub mod cow_snapshot;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
+pub mod sigma_fs;
+pub mod smart_symlink;
 pub mod tmpfs;
 pub mod vfs;
 
@@ -38,4 +40,3 @@ pub use support::{
     Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
     SimpleFilesystemManager,
 };
-pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
