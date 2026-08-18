@@ -12,8 +12,10 @@ pub mod securelevels;
 pub mod pam;
 pub mod intrusion;
 pub mod crypto_utils;
+pub mod kernel_hardening;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use kernel_hardening::{HardenedSyscallDispatcher, SmepSmapEnforcer, SovereignKaslrEngine};
 pub use intrusion::{
     CrowdStrikeFalconAi, DetectionResult, EventType, IntrusionDetectionSystem, RuleAction,
     SecurityEvent, Severity, SnortRule, SnortSignatureFirewall,
