@@ -5,7 +5,7 @@ pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
-pub mod customization;
+pub mod unimplemented_features;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
