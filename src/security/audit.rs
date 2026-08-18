@@ -18,6 +18,11 @@ pub enum EventType {
     Authorization = 1,
     FileAccess = 2,
     SystemChange = 3,
+    Login = 4,
+    Logout = 5,
+    NetworkAccess = 6,
+    ProcessExec = 7,
+    Other = 8,
 }
 
 #[repr(C)]

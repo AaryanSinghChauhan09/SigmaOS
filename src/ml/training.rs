@@ -23,6 +23,9 @@ pub trait TrainingSession {
     fn epoch(&self) -> usize;
     fn loss(&self) -> f32;
     fn is_complete(&self) -> bool;
+    fn increment_epoch(&self) -> usize;
+    fn set_loss(&self, loss: f32);
+    fn mark_complete(&self);
 }
 
 #[repr(C)]
@@ -47,8 +50,11 @@ impl SimpleTrainingSession {
 impl TrainingSession for SimpleTrainingSession {
     fn id(&self) -> TrainingID { self.id }
     fn epoch(&self) -> usize { self.epoch.load(Ordering::SeqCst) }
-    fn loss(&self) -> f32 { self.loss.load(Ordering::SeqCst) as f32 }
+    fn loss(&self) -> f32 { self.loss.load(Ordering::SeqCst) as f32 / 10000.0 }
     fn is_complete(&self) -> bool { self.complete.load(Ordering::SeqCst) == 1 }
+    fn increment_epoch(&self) -> usize { self.epoch.fetch_add(1, Ordering::SeqCst) }
+    fn set_loss(&self, loss: f32) { self.loss.store((loss * 10000.0) as usize, Ordering::SeqCst); }
+    fn mark_complete(&self) { self.complete.store(1, Ordering::SeqCst); }
 }
 
 pub trait Optimizer {
@@ -124,7 +130,7 @@ impl Trainer for SimpleTrainer {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
                 if session.id() == session_id {
-                    let epoch = session.epoch.fetch_add(1, Ordering::SeqCst);
+                    let epoch = session.increment_epoch();
 
                     let mut loss: f32 = 0.0;
                     for i in 0..inputs.len().min(targets.len()) {
@@ -133,13 +139,14 @@ impl Trainer for SimpleTrainer {
                     }
                     loss /= inputs.len() as f32;
 
-                    session.loss.store((loss * 10000.0) as usize, Ordering::SeqCst);
+                    session.set_loss(loss);
 
                     if epoch >= 1000 {
-                        session.complete.store(1, Ordering::SeqCst);
+                        session.mark_complete();
                     }
 
                     return Ok(());
+
                 }
             }
         }
@@ -222,6 +229,15 @@ impl<T> Vec<T> {
             }
         }
     }
+    fn len(&self) -> usize {
+        self.len
+    }
+    fn iter(&self) -> VecIter<'_, T> {
+        VecIter { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
+    fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -233,5 +249,73 @@ impl<T> Vec<T> {
         }
     }
 }
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        assert!(index < self.len);
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        assert!(index < self.len);
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+struct VecIter<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a T>,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &*self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter { self.iter() }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter { self.iter_mut() }
+}
+
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

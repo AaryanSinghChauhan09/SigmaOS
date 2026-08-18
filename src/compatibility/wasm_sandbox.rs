@@ -233,6 +233,7 @@ pub enum WasmerRefType {
 }
 
 /// Wasmer-compatible instance
+#[derive(Debug, Clone)]
 pub struct WasmerInstance {
     pub module: WasmModule,
     pub memory: Option<WasmMemory>,
@@ -254,6 +255,7 @@ pub struct WasmerImport {
 }
 
 /// WASM memory representation
+#[derive(Debug, Clone)]
 pub struct WasmMemory {
     pub data: Vec<u8>,
     pub min_pages: u32,

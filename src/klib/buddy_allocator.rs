@@ -119,7 +119,7 @@ impl BuddyAllocator for SimpleBuddyAllocator {
         let mut retry_count = 0;
         for current_order in order..=self.max_order.load(Ordering::SeqCst) {
             if !self.free_lists[current_order].is_empty() {
-                let block_id = self.free_lists[current_order].remove(0);
+                let mut block_id = self.free_lists[current_order].remove(0);
 
                 while current_order > order {
                     let new_order = current_order - 1;
@@ -337,6 +337,15 @@ impl<T> Vec<T> {
         }
         self.len = write_idx;
     }
+    fn len(&self) -> usize {
+        self.len
+    }
+    fn iter(&self) -> BuddyVecIter<'_, T> {
+        BuddyVecIter { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
+    fn iter_mut(&mut self) -> BuddyVecIterMut<'_, T> {
+        BuddyVecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -356,6 +365,74 @@ impl<T> Vec<T> {
         }
     }
 }
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        assert!(index < self.len, "index out of bounds");
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        assert!(index < self.len, "index out of bounds");
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+struct BuddyVecIter<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a T>,
+}
+
+impl<'a, T> Iterator for BuddyVecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &*self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+struct BuddyVecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for BuddyVecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = BuddyVecIter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter { self.iter() }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = BuddyVecIterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter { self.iter_mut() }
+}
+
 
 extern "C" {
     fn alloc(size: usize) -> *mut u8;

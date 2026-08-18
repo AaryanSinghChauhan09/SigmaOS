@@ -30,6 +30,7 @@ pub trait RemoteSession {
     fn id(&self) -> SessionID;
     fn host(&self) -> &[u8];
     fn state(&self) -> SessionState;
+    fn set_state(&self, state: SessionState);
 }
 
 #[repr(C)]
@@ -64,6 +65,9 @@ impl RemoteSession for SimpleRemoteSession {
     }
     fn state(&self) -> SessionState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: SessionState) {
+        self.state.store(state as usize, Ordering::SeqCst);
     }
 }
 
@@ -102,15 +106,14 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
                 if session.id() == id {
-                    session
-                        .state
-                        .store(SessionState::Disconnected as usize, Ordering::SeqCst);
+                    session.set_state(SessionState::Disconnected);
                     return Ok(());
                 }
             }
         }
         Err(RemoteError::NotFound)
     }
+
 
     fn send_input(&self, id: SessionID, _input: &[u8]) -> Result<(), RemoteError> {
         if self.get_session(id).is_some() {
@@ -204,6 +207,15 @@ impl<T> Vec<T> {
             }
         }
     }
+    fn len(&self) -> usize {
+        self.len
+    }
+    fn iter(&self) -> VecIter<'_, T> {
+        VecIter { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
+    fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -223,6 +235,74 @@ impl<T> Vec<T> {
         }
     }
 }
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        assert!(index < self.len);
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        assert!(index < self.len);
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+struct VecIter<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a T>,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &*self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter { self.iter() }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter { self.iter_mut() }
+}
+
 
 extern "C" {
     fn alloc(size: usize) -> *mut u8;

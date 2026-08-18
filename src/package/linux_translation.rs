@@ -132,7 +132,7 @@ impl LinuxDriverPackageTranslator for DebPackageDriverTranslator {
         } else {
             DriverType::Char
         };
-        SimpleDriver::new(9901, driver_type)
+        SimpleDriver::new("9901".to_string(), driver_type)
     }
 }
 
@@ -161,7 +161,7 @@ impl LinuxDriverPackageTranslator for RpmPackageDriverTranslator {
                 "PackageTranslator: RPM signature is valid. Provisioning micro-driver bridge."
             );
         }
-        SimpleDriver::new(9902, DriverType::Char)
+        SimpleDriver::new("9902".to_string(), DriverType::Char)
     }
 }
 
@@ -188,7 +188,7 @@ impl LinuxDriverPackageTranslator for PacmanPackageDriverTranslator {
         if self.has_aur_recipes {
             println!("  -> Found embedded AUR building recipes. Executing clean compile sandbox.");
         }
-        SimpleDriver::new(9903, DriverType::Network)
+        SimpleDriver::new("9903".to_string(), DriverType::Network)
     }
 }
 

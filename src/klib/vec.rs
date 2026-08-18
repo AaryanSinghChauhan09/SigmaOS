@@ -118,6 +118,122 @@ impl<T> Vec<T> {
         }
         self.len = write_idx;
     }
+
+    pub fn clear(&mut self) {
+        for i in 0..self.len {
+            unsafe { core::ptr::drop_in_place(self.data.add(i)); }
+        }
+        self.len = 0;
+    }
+
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    pub fn first(&self) -> Option<&T> {
+        self.get(0)
+    }
+
+    pub fn last(&self) -> Option<&T> {
+        if self.len > 0 { self.get(self.len - 1) } else { None }
+    }
+
+    pub fn extend_from_slice(&mut self, other: &[T]) where T: Clone {
+        for item in other {
+            self.push(item.clone());
+        }
+    }
+
+    pub fn insert(&mut self, index: usize, item: T) {
+        assert!(index <= self.len, "insertion index out of bounds");
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                // shift elements right
+                for i in (index..self.len).rev() {
+                    core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+                }
+                core::ptr::write(self.data.add(index), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    pub fn sort_by<F>(&mut self, mut compare: F) where F: FnMut(&T, &T) -> core::cmp::Ordering {
+        // Simple insertion sort - correct, if not the fastest
+        for i in 1..self.len {
+            let mut j = i;
+            while j > 0 {
+                unsafe {
+                    if compare(&*self.data.add(j - 1), &*self.data.add(j)) == core::cmp::Ordering::Greater {
+                        core::ptr::swap(self.data.add(j - 1), self.data.add(j));
+                        j -= 1;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn dedup(&mut self) where T: PartialEq {
+        if self.len <= 1 { return; }
+        let mut write = 1;
+        for read in 1..self.len {
+            unsafe {
+                if *self.data.add(read) != *self.data.add(write - 1) {
+                    if write != read {
+                        core::ptr::copy_nonoverlapping(self.data.add(read), self.data.add(write), 1);
+                    }
+                    write += 1;
+                }
+            }
+        }
+        self.len = write;
+    }
+
+    pub fn truncate(&mut self, len: usize) {
+        while self.len > len {
+            self.len -= 1;
+            unsafe { core::ptr::drop_in_place(self.data.add(self.len)); }
+        }
+    }
+
+    pub fn as_ptr(&self) -> *const T {
+        self.data
+    }
+
+    pub fn as_mut_ptr(&mut self) -> *mut T {
+        self.data
+    }
+
+    pub fn swap_remove(&mut self, index: usize) -> T {
+        let last = self.len - 1;
+        if index != last {
+            unsafe { core::ptr::swap(self.data.add(index), self.data.add(last)); }
+        }
+        self.pop().unwrap()
+    }
+
+    pub fn swap(&mut self, a: usize, b: usize) {
+        if a != b {
+            assert!(a < self.len && b < self.len, "swap index out of bounds");
+            unsafe { core::ptr::swap(self.data.add(a), self.data.add(b)); }
+        }
+    }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -129,6 +245,41 @@ impl<T> Vec<T> {
         }
     }
 }
+
+impl<T: PartialEq> PartialEq for Vec<T> {
+    fn eq(&self, other: &Self) -> bool {
+        if self.len != other.len { return false; }
+        for i in 0..self.len {
+            unsafe {
+                if *self.data.add(i) != *other.data.add(i) { return false; }
+            }
+        }
+        true
+    }
+}
+
+impl<T: Eq> Eq for Vec<T> {}
+
+impl<T> FromIterator<T> for Vec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut v = Vec::new();
+        for item in iter {
+            v.push(item);
+        }
+        v
+    }
+}
+
+impl<T: Clone> From<&[T]> for Vec<T> {
+    fn from(slice: &[T]) -> Self {
+        let mut v = Vec::new();
+        for item in slice {
+            v.push(item.clone());
+        }
+        v
+    }
+}
+
 
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;

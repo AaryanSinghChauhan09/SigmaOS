@@ -321,7 +321,7 @@ impl AptPinningResolver {
 
             for rule in &self.preferences {
                 let matches_pkg = rule.package_pattern == "*" || rule.package_pattern == package_name;
-                let matches_release = rule.pin_release == release;
+                let matches_release = rule.pin_release == *release;
                 if matches_pkg && matches_release {
                     priority = rule.priority;
                 }

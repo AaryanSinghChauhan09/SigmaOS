@@ -31,6 +31,8 @@ pub struct PackageRecipe {
     pub arch: String,
     pub license_spdx: String,
     pub package_commands: Vec<String>,
+    pub prepare_commands: Vec<String>,
+    pub pkgrel: u32,
 }
 
 impl PackageRecipe {
@@ -49,6 +51,8 @@ impl PackageRecipe {
             arch: "x86_64".to_string(),
             license_spdx: "GPL".to_string(),
             package_commands: Vec::new(),
+            prepare_commands: Vec::new(),
+            pkgrel: 1,
         }
     }
 
@@ -100,6 +104,11 @@ impl PackageRecipe {
 
     pub fn with_package_command(mut self, command: String) -> Self {
         self.package_commands.push(command);
+        self
+    }
+
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
         self
     }
 

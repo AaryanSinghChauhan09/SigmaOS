@@ -1,6 +1,6 @@
-// SigmaOS USB HID Keyboard Driver
-// Hardware abstraction for USB HID devices + PeripheralDevice OOP integration
-
+extern crate alloc;
+use alloc::string::String;
+use alloc::string::ToString;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use crate::security::CapabilityToken;
 
@@ -42,6 +42,7 @@ pub struct UsbHidDriver {
 
     // Rollover tracking (N-Key Rollover / NKRO)
     pub active_held_keys: Vec<u8>,
+    pub layout: String,
 }
 
 impl UsbHidDriver {
@@ -61,6 +62,7 @@ impl UsbHidDriver {
             num_lock_active: false,
             scroll_lock_active: false,
             active_held_keys: Vec::new(),
+            layout: String::from("us"),
         }
     }
 

@@ -24,6 +24,7 @@ pub struct VesaDriver {
     pub aspect_ratio: &'static str,
     pub double_buffered: bool,
     pub back_buffer: std::sync::Mutex<Vec<u32>>, // thread-safe Mutex
+    pub back_buffer_active: bool,
     pub device_id: u32,
 }
 
@@ -44,6 +45,7 @@ impl VesaDriver {
             aspect_ratio: "4:3",
             double_buffered: true,
             back_buffer: std::sync::Mutex::new(vec![0; 1024 * 768]),
+            back_buffer_active: false,
             device_id: 3,
         }
     }
@@ -72,6 +74,7 @@ impl VesaDriver {
             aspect_ratio,
             double_buffered: true,
             back_buffer: std::sync::Mutex::new(vec![0; (width * height) as usize]),
+            back_buffer_active: false,
             device_id: 3,
         }
     }
@@ -125,7 +128,7 @@ impl VesaDriver {
         // Resize back buffer if active
         if self.back_buffer_active {
             let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
-            self.back_buffer.resize(total_pixels, 0);
+            self.back_buffer.lock().unwrap().resize(total_pixels, 0);
         }
 
         Ok(())
@@ -135,13 +138,13 @@ impl VesaDriver {
     pub fn enable_double_buffering(&mut self) {
         self.back_buffer_active = true;
         let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
-        self.back_buffer.resize(total_pixels, 0);
+        self.back_buffer.lock().unwrap().resize(total_pixels, 0);
     }
 
     /// Disables double-buffering backing storage
     pub fn disable_double_buffering(&mut self) {
         self.back_buffer_active = false;
-        self.back_buffer.clear();
+        self.back_buffer.lock().unwrap().clear();
     }
 
     /// Swaps the simulated back buffer elements onto the active hardware framebuffer
@@ -192,7 +195,7 @@ impl VesaDriver {
             let idx = (y * self.mode_info.width + x) as usize;
             if idx < total_pixels {
                 // In safe context, we modify via mutable raw pointers or ignore if immutable self
-                let ptr = self.back_buffer.as_ptr() as *mut u32;
+                let ptr = self.back_buffer.lock().unwrap().as_ptr() as *mut u32;
                 unsafe {
                     ptr.add(idx).write(color);
                 }
@@ -204,7 +207,7 @@ impl VesaDriver {
 
     pub fn clear_screen(&self, color: u32) -> Result<(), VesaError> {
         if self.back_buffer_active {
-            let ptr = self.back_buffer.as_ptr() as *mut u32;
+            let ptr = self.back_buffer.lock().unwrap().as_ptr() as *mut u32;
             let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
             unsafe {
                 for i in 0..total_pixels {

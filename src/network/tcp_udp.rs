@@ -132,6 +132,10 @@ pub struct SimpleSocket {
     pub local_port: AtomicUsize,
     pub remote_port: AtomicUsize,
     pub state: AtomicUsize,
+    pub reuse_addr: AtomicUsize,
+    pub tcp_nodelay: AtomicUsize,
+    pub rcvbuf: AtomicUsize,
+    pub sndbuf: AtomicUsize,
 }
 
 impl SimpleSocket {
@@ -142,6 +146,10 @@ impl SimpleSocket {
             local_port: AtomicUsize::new(local_port as usize),
             remote_port: AtomicUsize::new(0),
             state: AtomicUsize::new(TCPState::Closed as usize),
+            reuse_addr: AtomicUsize::new(0),
+            tcp_nodelay: AtomicUsize::new(0),
+            rcvbuf: AtomicUsize::new(8192),
+            sndbuf: AtomicUsize::new(8192),
         }
     }
 }
@@ -342,7 +350,13 @@ pub struct SimpleFirewall {
 
 impl SimpleFirewall {
     pub fn new() -> Self {
-        let mut allowed_ports = [AtomicUsize::new(0); 65536];
+        // Construct array element by element via a helper or standard macro
+        // Since we are in no_std, we can use unsafe core::mem::MaybeUninit or safe helper.
+        // Actually, since AtomicUsize does not implement Copy, let's create it safely:
+        let mut allowed_ports: [AtomicUsize; 65536] = unsafe { core::mem::zeroed() };
+        for i in 0..65536 {
+            allowed_ports[i] = AtomicUsize::new(0);
+        }
         SimpleFirewall { allowed_ports }
     }
 }

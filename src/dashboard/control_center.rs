@@ -4,7 +4,7 @@
 use std::collections::BTreeMap;
 
 /// Control panel type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum ControlPanel {
     Network,
     Display,

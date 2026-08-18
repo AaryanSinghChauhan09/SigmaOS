@@ -615,7 +615,7 @@ impl VirtualMemoryManager for SimpleVMM {
                 pd_entry.set_writable(writable);
                 pd_entry.set_user_accessible(user);
                 pd_entry.set_physical_address(phys);
-                pd_entry.set_huge_page(true);
+                pd_entry.set_huge(true);
 
                 pd.set_entry(pd_idx, pd_entry);
             }
