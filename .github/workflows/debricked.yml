@@ -35,6 +35,7 @@ jobs:
   vulnerabilities-scan:
     name: Vulnerabilities scan
     runs-on: ubuntu-latest
+    if: ${{ secrets.DEBRICKED_TOKEN != '' }}
 
     steps:
       - uses: actions/checkout@v4

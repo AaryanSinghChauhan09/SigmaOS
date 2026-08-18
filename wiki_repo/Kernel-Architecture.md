@@ -58,7 +58,7 @@ Novel attention-based scheduling:
 - Attention weights computed from process history
 - Learns scheduling patterns without external ML frameworks
 - No-std compatible: pure Rust, no heap allocation for inference
-- Based on: [SigmaOS Competitive Development Master Plan](file:///home/aaryansinghchauhan/SigmaOS/SIGMAOS_COMPETITIVE_DEVELOPMENT_MASTER_PLAN.md)
+- Based on: [SigmaOS Competitive Development Master Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/SIGMAOS_COMPETITIVE_DEVELOPMENT_MASTER_PLAN.md)
 
 ### 3. Thermal-Aware Scheduler
 **Module:** `src/kernel/sched/sigma_thermal_sched.rs`
@@ -183,6 +183,6 @@ UEFI Firmware
 ```
 
 *See also:*
-- [ARCHITECTURE.md](file:///home/aaryansinghchauhan/SigmaOS/ARCHITECTURE.md)
-- [KERNEL_PERFORMANCE_PLAN.md](file:///home/aaryansinghchauhan/SigmaOS/KERNEL_PERFORMANCE_PLAN.md)
-- [SYSCALL_TABLE.md](file:///home/aaryansinghchauhan/SigmaOS/SYSCALL_TABLE.md)
+- [ARCHITECTURE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ARCHITECTURE.md)
+- [KERNEL_PERFORMANCE_PLAN.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/KERNEL_PERFORMANCE_PLAN.md)
+- [SYSCALL_TABLE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/SYSCALL_TABLE.md)
