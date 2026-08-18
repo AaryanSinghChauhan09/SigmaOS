@@ -43,6 +43,9 @@ pub use std::vec::Vec;
 
 #[cfg(target_os = "none")]
 pub use vec::Vec;
+
+pub use hashmap::{HashMap, BTreeMap};
+pub use hashset::HashSet;
 pub use uuid::Uuid;
 
 #[cfg(not(target_os = "none"))]

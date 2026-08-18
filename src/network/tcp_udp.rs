@@ -13,10 +13,23 @@ pub type Port = u16;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol { TCP = 0, UDP = 1 }
 
-#[repr(C)]
+/// Standard RFC-793 TCP States
+#[repr(u32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TCPState { Closed = 0, Listen = 1, SynSent = 2, SynReceived = 3, Established = 4, FinWait1 = 5, FinWait2 = 6, CloseWait = 7, Closing = 8, TimeWait = 9 }
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
 
+/// Network Errors
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum NetworkError { Success = 0, InvalidSocket = 1, ConnectionFailed = 2, SendFailed = 3, InvalidParameter = 4 }

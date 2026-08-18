@@ -4,6 +4,22 @@
 use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use std::collections::HashMap;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum UseFlag {
+    Ssl,
+    X11,
+    Wayland,
+    Alsa,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StageProfile {
+    Stage1Minimal,
+    Stage2Standard,
+    Stage3Optimized,
+}
+
+
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BuildSystem {

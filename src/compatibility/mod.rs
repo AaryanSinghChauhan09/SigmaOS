@@ -4,6 +4,14 @@ pub mod apache_ossie;
 pub mod chimera_linux;
 pub mod cross_platform;
 pub mod historic_linux;
+pub mod india_professional_tools;
+pub mod india_stack;
+pub mod interim;
+pub mod jehanne;
+pub mod legacy_adapters;
+pub mod distro_bridge;
+pub mod localsend;
+pub mod lubuntu;
 pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
@@ -21,10 +29,23 @@ pub use cross_platform::{
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 
+pub use distro_bridge::{BinaryAbiFormat, LinuxBsdAbiBridge, ServiceInitType, ServiceUnitTranslator, TranslatedService};
+
 pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
     HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
     VintagePackageConverter, VintageVirtualizationSandbox,
+};
+
+pub use india_professional_tools::{
+    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker, JudicialTimelinePlanner,
+    MsmeComplianceEngine, PMWaniHotspotController,
+};
+pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
+pub use jehanne::{
+    ComputeNode, DistributedComputeHandoff, JehanneError, JehanneNamespace, NamespaceBindEntry,
+    Plan9pMessage, Plan9pMsgType,
 };
 
 pub use mint_linux::{

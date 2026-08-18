@@ -3,8 +3,9 @@
 
 pub mod accessibility;
 pub mod automation;
-pub mod compatibility;
+pub mod boot;
 pub mod container;
+pub mod compatibility;
 pub mod unimplemented_features;
 pub mod dashboard;
 pub mod device;
@@ -63,6 +64,9 @@ pub mod scheduler {
 pub mod crypto {
     pub mod vectorized_pqc;
 }
+pub mod init;
+pub mod memory;
+pub mod tools;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -109,6 +113,22 @@ pub use compatibility::{
     OssieRelationship, SemanticRow,
     CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
+    BinaryAbiFormat, LinuxBsdAbiBridge, ServiceInitType, ServiceUnitTranslator, TranslatedService, AiResourceScheduler,
+    AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType,
+    BinaryCompatMatrix, BrailleMatrix, BsdJailSandbox, BundleType, CloudOrchestrator,
+    CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
+    ContinuityCoordinator, DesktopMode,
+    DesktopProfile, DesktopTheme, DiscontinuedFS, DistroReleaseChannel, DriverBridge,
+    EcosystemSnapshot, FSRevival, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, LanguageTranslationCatalog, LegacyBus,
+    LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
+    MicroService, MicroServiceState, NetworkBridge, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, StorageBridge, SuiteRegistry,
+    SyscallAbi, TribeInstaller, TtsSynthesizer, UnifiedAppStore,
+    WorkloadOptimizer, WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI,
+    GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN,
+    GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
+    GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -124,6 +144,11 @@ pub use drivers::{
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+    DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState, E1000RxDescriptor,
+    E1000TxDescriptor, IntelE1000Driver, LegacyAudioAc97, ModernAudioIntelHda, ModernNvmeDriver,
+    ModernUsbPrinterDriver, ModernWifiDriver, TouchJingosDriver, VirtioBlkDriver, VirtioDeviceType,
+    VirtioMmioHeader, VirtioNetDriver, VirtioRngDriver, UnifiedDmaBroker, SelfHealingDriverManager,
+    DmaDescriptor, DeviceCommandType, DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -189,6 +214,11 @@ pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
+pub use kernel::vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
+pub use kernel::processor_management::{
+    CpuArchitecture, CpuCoreDescriptor, CpuHardwareProtectionEngine, HardwarePerfCounters,
+    NumaAffinityMap, SmpTopologyManager,
+};
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
@@ -212,4 +242,19 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use memory::{
+    BsdZoneAllocator, LinuxKswapd, MemCgroupManager, SimpleVMM, Zone, MemCgroup, PageState,
+};
+
+pub use tools::{
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
+    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
+    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
+    SigmaToolError as LibSigmaToolError,
+    UserIdentity as LibUserIdentity,
+};
+pub use init::{
+    LightweightInitDaemon, RunlevelTarget, RunsvSupervisor, ServiceDescriptor,
+    ServiceSupervisionState,
 };
