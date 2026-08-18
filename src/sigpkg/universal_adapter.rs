@@ -964,7 +964,8 @@ mod tests {
     
     #[test]
     fn test_apt_control_parsing_and_translation() {
-        let adapter = UniversalPackageManager::new();
+        let manager = UniversalPackageManager::new();
+        let deb_adapter = DebAdapter::new();
         let manifest_text = r#"
             Package: curl
             Version: 8.2.1
@@ -973,7 +974,7 @@ mod tests {
             Priority: standard
         "#;
 
-        let parsed = adapter.parse_apt_control(manifest_text).unwrap();
+        let parsed = deb_adapter.parse_apt_control(manifest_text).unwrap();
         assert_eq!(parsed.package, "curl");
         assert_eq!(parsed.version, "8.2.1");
         assert_eq!(parsed.depends.len(), 3);
@@ -985,10 +986,10 @@ mod tests {
             Version: 1.0.0
             Priority: essential
         "#;
-        let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
+        let parsed_essential = deb_adapter.parse_apt_control(essential_text).unwrap();
         assert_eq!(parsed_essential.priority, PackagePriority::Required);
 
-        let native = adapter
+        let native = deb_adapter
             .translate_to_native_package(
                 &parsed.package,
                 &parsed.version,
@@ -1195,7 +1196,8 @@ mod additional_adapter_tests {
 
     #[test]
     fn test_rpm_spec_parsing_and_native_translation() {
-        let adapter = UniversalPackageAdapter::new();
+        let manager = UniversalPackageManager::new();
+        let deb_adapter = DebAdapter::new();
         let spec_text = r#"
             Name: custom_service
             Version: 2.1
@@ -1205,14 +1207,14 @@ mod additional_adapter_tests {
             Requires: bash, glibc >= 2.17
         "#;
 
-        let parsed = adapter.parse_rpm_spec(spec_text).unwrap();
+        let parsed = manager.parse_rpm_spec(spec_text).unwrap();
         assert_eq!(parsed.name, "custom_service");
         assert_eq!(parsed.version, "2.1");
         assert_eq!(parsed.license, "GPL-3.0");
         assert_eq!(parsed.requires.len(), 2);
         assert_eq!(parsed.requires[0], "bash");
 
-        let native = adapter.translate_to_native_package(
+        let native = deb_adapter.translate_to_native_package(
             &parsed.name,
             &parsed.version,
             &parsed.summary,

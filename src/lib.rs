@@ -139,6 +139,10 @@ pub use network::{
 //     Span, SpanCapability, SpanInfo, StackCapability, TraceID,
 // };
 pub use distro::{
+    DistroServiceManager, ServiceState, ServiceUnit,
+    UniversalMountEngine, MountEntry, MountType,
+    InteractiveUserEnvironment, UserAccount, SessionEnvironment,
+    PlugAndPlayHardwareManager, DeviceCategory, HardwareEvent, DeviceNode,
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
     ReleaseStage, SoftwareCertificationProgram,
