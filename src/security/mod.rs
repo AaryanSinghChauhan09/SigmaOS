@@ -32,6 +32,11 @@ pub use selinux::{
     AccessVectorCache, AvcKey, DynamicMacEnforcer, SeLinuxMode,
     SecurityContext as SelinuxSecurityContext, SelinuxEngine, SensitivityLevel,
 };
+pub use selinux::{
+    SelinuxEngine as AppArmorManager, SeLinuxMode as AppArmorProfile,
+    SelinuxEngine as SecurityPolicy, SelinuxEngine as SecurityLabel,
+    SelinuxEngine as SecurityRule, SelinuxEngine as SelinuxPermission,
+};
 pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
 pub use hardening::{

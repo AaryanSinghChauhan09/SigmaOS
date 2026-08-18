@@ -6,7 +6,6 @@
 /// - Linux & BSD inspired Kernel Address Space Layout Randomization (KASLR / KARL)
 /// - SMEP (Supervisor Mode Execution Prevention) & SMAP (Supervisor Mode Access Prevention) mitigations
 /// - Hardened Syscall Dispatcher with boundary-checked UserPtr, register scrubbing, and stack canary verification
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
