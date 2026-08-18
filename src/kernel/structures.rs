@@ -1,3 +1,12 @@
+use core::cell::{Cell, RefCell};
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+use core::ptr::NonNull;
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
+
 // 1. SINGLY LINKED LIST
 
 pub struct SinglyListNode<T> {
@@ -207,8 +216,54 @@ pub enum ThreadState {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ApcMode {
+    SpecialKernelMode,
+    NormalKernelMode,
     KernelMode,
     UserMode,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum IrqlLevel {
+    PassiveLevel = 0,
+    ApcLevel = 1,
+    DispatchLevel = 2,
+    DpcLevel = 3,
+    HighLevel = 4,
+}
+
+#[derive(Debug, Clone)]
+pub struct IrqlState {
+    pub current_level: IrqlLevel,
+}
+
+impl IrqlState {
+    pub fn new() -> Self {
+        Self { current_level: IrqlLevel::PassiveLevel }
+    }
+
+    pub fn raise_irql(&mut self, new_level: IrqlLevel) -> Result<IrqlLevel, &'static str> {
+        if new_level < self.current_level {
+            return Err("Cannot raise IRQL to lower level");
+        }
+        let old = self.current_level;
+        self.current_level = new_level;
+        Ok(old)
+    }
+
+    pub fn lower_irql(&mut self, new_level: IrqlLevel) -> Result<IrqlLevel, &'static str> {
+        if new_level > self.current_level {
+            return Err("Cannot lower IRQL to higher level");
+        }
+        let old = self.current_level;
+        self.current_level = new_level;
+        Ok(old)
+    }
+}
+
+impl Default for IrqlState {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Simulated hardware CPU registers across various architectures (x86, x64, ARM, CISC)
@@ -303,6 +358,9 @@ pub struct SystemThread {
     pub core_affinity: usize,
     pub apc_queue: ApcQueue,
     pub kernel_stack_base: u64,
+    pub user_mode_suspended: bool,
+    pub user_suspend_count: u32,
+    pub irql: IrqlState,
 }
 
 impl SystemThread {
@@ -315,7 +373,38 @@ impl SystemThread {
             core_affinity,
             apc_queue: ApcQueue::new(),
             kernel_stack_base: 0xFFFF_8000_0000_0000 | (tid << 12),
+            user_mode_suspended: false,
+            user_suspend_count: 0,
+            irql: IrqlState::new(),
         }
+    }
+
+    pub fn suspend_user_mode(&mut self) -> u32 {
+        self.user_suspend_count += 1;
+        self.user_mode_suspended = true;
+        // Enqueue user-mode suspension APC
+        self.queue_apc(Apc {
+            apc_id: 0x5555,
+            target_tid: self.tid,
+            mode: ApcMode::UserMode,
+            priority: 255,
+            param: 0x1, // User-mode suspend flag
+        });
+        self.user_suspend_count
+    }
+
+    pub fn resume_user_mode(&mut self) -> u32 {
+        if self.user_suspend_count > 0 {
+            self.user_suspend_count -= 1;
+            if self.user_suspend_count == 0 {
+                self.user_mode_suspended = false;
+            }
+        }
+        self.user_suspend_count
+    }
+
+    pub fn is_suspended(&self) -> bool {
+        self.user_mode_suspended
     }
 
     pub fn queue_apc(&mut self, apc: Apc) {
@@ -327,7 +416,11 @@ impl SystemThread {
         while let Some(apc) = self.apc_queue.deliver_next() {
             // Emulate execution: transition CPU context based on APC mode/parameters
             match apc.mode {
-                ApcMode::KernelMode => {
+                ApcMode::SpecialKernelMode => {
+                    self.context.rip = 0xFFFFFFFF_0000_0100; // Mock special kernel APC
+                    self.context.rax = apc.param;
+                }
+                ApcMode::NormalKernelMode | ApcMode::KernelMode => {
                     self.context.rip = 0xFFFFFFFF_0000_1000; // Mock kernel APC routine
                     self.context.rax = apc.param;
                 }
@@ -469,6 +562,38 @@ mod tests {
     }
 
     #[test]
+    fn test_user_mode_thread_suspension() {
+        let mut thread = SystemThread::new(88, 1, 0);
+        assert!(!thread.is_suspended());
+
+        thread.suspend_user_mode();
+        assert!(thread.is_suspended());
+        assert_eq!(thread.user_suspend_count, 1);
+
+        thread.resume_user_mode();
+        assert!(!thread.is_suspended());
+        assert_eq!(thread.user_suspend_count, 0);
+    }
+
+    #[test]
+    fn test_apc_special_kernel_delivery() {
+        let mut thread = SystemThread::new(99, 1, 0);
+        let special_apc = Apc {
+            apc_id: 1,
+            target_tid: 99,
+            mode: ApcMode::SpecialKernelMode,
+            priority: 200,
+            param: 0xDEADBEEF,
+        };
+
+        thread.queue_apc(special_apc);
+        let delivered = thread.dispatch_pending_apcs();
+        assert_eq!(delivered, 1);
+        assert_eq!(thread.context.rip, 0xFFFFFFFF_0000_0100);
+        assert_eq!(thread.context.rax, 0xDEADBEEF);
+    }
+
+    #[test]
     fn test_apc_queue_delivery_and_execution() {
         let mut thread = SystemThread::new(9, 1, 0);
 
@@ -505,156 +630,6 @@ mod tests {
         assert_eq!(thread.context.rax, 100);
     }
 }
-||||||| 43be3a7e8
-// SigmaOS Core Kernel Structures and Advanced Algorithms Subsystem
-// Conforms to zero-dependency, #![no_std] compliant OOP structures
-
-use core::cell::{Cell, RefCell};
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
-
-// 1. Singly, Sequenced, and Circular Doubly Linked Lists
-
-pub struct SinglyLinkedList<T> {
-    pub value: T,
-    pub next: Option<Box<SinglyLinkedList<T>>>,
-}
-
-impl<T> SinglyLinkedList<T> {
-    pub fn new(value: T) -> Self {
-        Self { value, next: None }
-    }
-
-    pub fn push_next(&mut self, next_val: T) {
-        let mut node = Box::new(SinglyLinkedList::new(next_val));
-        if let Some(existing) = self.next.take() {
-            node.next = Some(existing);
-        }
-        self.next = Some(node);
-    }
-}
-
-pub struct SequencedSinglyLinkedList<T> {
-    pub value: T,
-    pub sequence_number: u64,
-    pub next: Option<Box<SequencedSinglyLinkedList<T>>>,
-}
-
-impl<T> SequencedSinglyLinkedList<T> {
-    pub fn new(value: T, seq: u64) -> Self {
-        Self {
-            value,
-            sequence_number: seq,
-            next: None,
-        }
-    }
-}
-
-pub struct CircularDoublyLinkedList<T> {
-    pub value: Option<T>,
-    // Simulated pointers to represent list links (Windows LIST_ENTRY and Linux list_head style)
-    pub next_id: Option<usize>,
-    pub prev_id: Option<usize>,
-}
-
-impl<T> CircularDoublyLinkedList<T> {
-    pub fn new(value: T) -> Self {
-        Self {
-            value: Some(value),
-            next_id: None,
-            prev_id: None,
-        }
-    }
-}
-
-// 2. Scheduler SystemThread, WorkItems, APCs
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86,
-    X64,
-    Arm,
-    Cisc,
-}
-
-pub struct SystemThread {
-    pub thread_id: usize,
-    pub priority: u8,
-    pub arch: CpuArchitectureClass,
-    pub register_context: [u64; 16], // Mock registers (rax, rbx, r1-r15 etc)
-}
-
-impl SystemThread {
-    pub fn new(thread_id: usize, priority: u8, arch: CpuArchitectureClass) -> Self {
-        Self {
-            thread_id,
-            priority,
-            arch,
-            register_context: [0u64; 16],
-        }
-    }
-}
-
-pub struct WorkItem {
-    pub work_id: usize,
-    pub is_processed: AtomicBool,
-    pub payload_hash: u32,
-}
-
-impl WorkItem {
-    pub fn new(work_id: usize, payload_hash: u32) -> Self {
-        Self {
-            work_id,
-            is_processed: AtomicBool::new(false),
-            payload_hash,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ApcMode {
-    KernelMode,
-    UserMode,
-}
-
-pub struct Apc {
-    pub apc_id: usize,
-    pub mode: ApcMode,
-    pub callback_id: usize,
-}
-
-pub struct ApcQueue {
-    pub apcs: Vec<Apc>,
-}
-
-impl ApcQueue {
-    pub fn new() -> Self {
-        Self { apcs: Vec::new() }
-    }
-
-    pub fn queue_apc(&mut self, apc: Apc) {
-        self.apcs.push(apc);
-    }
-
-    pub fn deliver_apcs(&mut self, mode: ApcMode) -> usize {
-        let mut count = 0;
-        self.apcs.retain(|apc| {
-            if apc.mode == mode {
-                println!("[apc] Delivering APC #{} in {:?}", apc.apc_id, mode);
-                count += 1;
-                false // Remove from queue
-            } else {
-                true // Retain in queue
-            }
-        });
-        count
-    }
-}
-
 // 3. Next-Generation Advanced Algorithms (SovereignAlgorithms Blueprint)
 
 const MAX_SCHEDULER_TASKS: usize = 16;
@@ -755,7 +730,7 @@ impl AdvancedAlgorithmsManager {
     // 1. EARLIEST DEADLINE FIRST REAL-TIME SCHEDULER
     pub fn add_edf_task(&self, task: EdfTask) -> Result<(), &'static str> {
         let mut queue = self.edf_queue.borrow_mut();
-        for slot in queue.iter_mut() {
+        for slot in (*queue).iter_mut() {
             if slot.is_none() {
                 *slot = Some(task);
                 return Ok(());
@@ -792,7 +767,7 @@ impl AdvancedAlgorithmsManager {
     // 2. PROBABILISTIC LOTTERY SCHEDULER
     pub fn add_lottery_task(&self, task: LotteryTask) -> Result<(), &'static str> {
         let mut queue = self.lottery_queue.borrow_mut();
-        for slot in queue.iter_mut() {
+        for slot in (*queue).iter_mut() {
             if slot.is_none() {
                 *slot = Some(task);
                 return Ok(());

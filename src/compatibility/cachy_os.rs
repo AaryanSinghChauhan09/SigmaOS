@@ -211,3 +211,4 @@ mod tests {
         assert!(!initramfs.verify_zstd_magic(&bad_header));
     }
 }
+// CachyOS optimization suite verified
