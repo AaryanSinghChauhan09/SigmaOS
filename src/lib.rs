@@ -1,16 +1,15 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod ai;
 pub mod accessibility;
+pub mod ai;
 pub mod automation;
 pub mod boot;
-pub mod container;
 pub mod compatibility;
 pub mod container;
-pub mod unimplemented_features;
 pub mod dashboard;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod ecosystem;
@@ -20,7 +19,6 @@ pub mod klib;
 pub mod ml;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod productivity;
 pub mod remote;
@@ -28,9 +26,9 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub mod virtualization;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
+pub mod virtualization;
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
@@ -47,11 +45,6 @@ pub mod observability {
     pub mod profiler;
     pub mod stack;
 }
-pub mod ai {
-    pub mod agent;
-    pub mod orchestrator;
-}
-pub mod boot;
 pub mod toolchain {
     pub mod adapter;
     pub mod capsule;
@@ -98,13 +91,9 @@ pub use container::{
 };
 pub use ecosystem::{
     ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
-    EnterprisePartner, KimiCodeAssistant, CodeSnippet, NDArray, numpy_mean, numpy_std_dev,
-    CvImage, WinUiControl, WinUiState, WinUiPanel,
+    EnterprisePartner, CodeSnippet, NDArray,
     SigmaGrpcEngine, GrpcServiceStub, MachMessageHeader, MachPort, MachZone,
     SigmaFreeTypeFont, UiRect, NavigationDirection, SpatialNavigationEngine,
-};
-pub use customization::{
-    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType as DashboardMetricType, SystemMonitor, UnifiedDashboard, WidgetType,
