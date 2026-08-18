@@ -15,6 +15,7 @@ pub mod crypto_utils;
 pub mod kernel_hardening;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use capability_enforcer::{SecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP};
 pub use kernel_hardening::{HardenedSyscallDispatcher, SmepSmapEnforcer, SovereignKaslrEngine};
 pub use intrusion::{
     CrowdStrikeFalconAi, DetectionResult, EventType, IntrusionDetectionSystem, RuleAction,
