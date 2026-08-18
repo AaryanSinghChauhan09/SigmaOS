@@ -8,6 +8,7 @@ pub mod accessibility;
 pub mod ai;
 pub mod automation;
 pub mod boot;
+pub mod container;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
@@ -69,7 +70,7 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
+    APITimelineManager, BinaryAbiFormat, LinuxBsdAbiBridge, ServiceInitType, ServiceUnitTranslator, TranslatedService, AiResourceScheduler,
     AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, ApplicationBinary,
     BinaryCompatMatrix, BinaryFormat, BrailleMatrix, BsdJailSandbox, BundleType, CloudOrchestrator,
     CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError, CompatibilityLayer,
@@ -110,17 +111,14 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    Bdle, Ch340Driver, DeviceGeneration, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver,
-    GpuError, GpuPipeline, GpuShader, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, IntelHdaDriver, NetworkCommand, NetworkDriver, NetworkError,
-    NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
-    RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
-    TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
-    E1000RxDescriptor, E1000TxDescriptor, IntelE1000Driver,
-    LegacyAudioAc97, ModernAudioIntelHda, ModernNvmeDriver, ModernUsbPrinterDriver,
-    ModernWifiDriver, TouchJingosDriver, VirtioBlkDriver, VirtioDeviceType, VirtioMmioHeader, VirtioNetDriver,
-    VirtioRngDriver, UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
-    DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
+    DeviceGeneration, GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
+    InputDriver, InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    PeripheralDevice, PeripheralManager, PowerState, StorageCommand, StorageDriver, StorageError,
+    StorageType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, E1000RxDescriptor,
+    E1000TxDescriptor, IntelE1000Driver, LegacyAudioAc97, ModernAudioIntelHda, ModernNvmeDriver,
+    ModernUsbPrinterDriver, ModernWifiDriver, TouchJingosDriver, VirtioBlkDriver, VirtioDeviceType,
+    VirtioMmioHeader, VirtioNetDriver, VirtioRngDriver, UnifiedDmaBroker, SelfHealingDriverManager,
+    DmaDescriptor, DeviceCommandType, DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -177,6 +175,7 @@ pub use productivity::{
     AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
     ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
 };
+pub use kernel::vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
 pub use resilience::{
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,

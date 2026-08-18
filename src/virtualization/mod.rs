@@ -7,9 +7,7 @@ pub use deterministic::{
     VmExecutionSnapshot,
 };
 pub use orchestration::{
-    Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,
-    ResourcePool, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
-    VirtualizationStrategy, VirtualizationStrategyFactory, VirtualizationTech, VmState,
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
 pub use container::{

@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use std::collections::HashMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::BTreeMap;

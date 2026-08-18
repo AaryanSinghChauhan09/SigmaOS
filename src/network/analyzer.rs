@@ -284,6 +284,20 @@ impl KaliSnoopAnalysis {
     }
 }
 
+pub trait AnalysisStrategy {
+    fn name(&self) -> &str { "AnalysisStrategy" }
+    fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;
+}
+
+#[derive(Debug, Clone)]
+pub struct TrafficAlert {
+    pub alert_type: AlertType,
+    pub severity: AlertSeverity,
+    pub message: String,
+    pub timestamp: Instant,
+    pub related_ips: Vec<String>,
+}
+
 impl AnalysisStrategy for KaliSnoopAnalysis {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert> {
         // Infer TTL and window size from packet size and port properties for emulation
