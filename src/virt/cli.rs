@@ -370,8 +370,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
     }
 
     fn execute_command(&mut self, name: &[u8], args: &[u8]) -> Result<Vec<u8>, CLIError> {
-        for command_option in self.commands.iter_mut() {
-            if let Some(command) = command_option.as_mut() {
+        for i in 0..self.commands.len() {
+            if let Some(ref mut command) = self.commands[i] {
                 if command.name() == name {
                     return command.execute(args);
                 }
@@ -398,8 +398,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
         }
 
         let mut index = None;
-        for (i, vm_option) in self.vms.iter().enumerate() {
-            if let Some(ref vm) = *vm_option {
+        for i in 0..self.vms.len() {
+            if let Some(ref vm) = self.vms[i] {
                 if vm.id() == id {
                     index = Some(i);
                     break;
@@ -421,8 +421,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
             return Err(CLIError::PermissionDenied);
         }
 
-        for vm_option in self.vms.iter_mut() {
-            if let Some(vm) = vm_option.as_mut() {
+        for i in 0..self.vms.len() {
+            if let Some(ref mut vm) = self.vms[i] {
                 if vm.id() == id {
                     let result = vm.start();
                     if result.is_ok() {
@@ -440,8 +440,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
             return Err(CLIError::PermissionDenied);
         }
 
-        for vm_option in self.vms.iter_mut() {
-            if let Some(vm) = vm_option.as_mut() {
+        for i in 0..self.vms.len() {
+            if let Some(ref mut vm) = self.vms[i] {
                 if vm.id() == id {
                     let result = vm.stop();
                     if result.is_ok() {
@@ -456,8 +456,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
 
     fn list_vms(&self) -> Vec<VMID> {
         let mut ids = Vec::new();
-        for vm_option in self.vms.iter() {
-            if let Some(vm) = vm_option.as_ref() {
+        for i in 0..self.vms.len() {
+            if let Some(ref vm) = self.vms[i] {
                 ids.push(vm.id());
             }
         }
@@ -570,6 +570,24 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
 pub struct VecIter<'a, T> {
     vec: &'a Vec<T>,
     index: usize,
@@ -635,6 +653,16 @@ impl<T> core::ops::Deref for Vec<T> {
             &[]
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
 }
