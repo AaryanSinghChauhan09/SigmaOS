@@ -120,6 +120,12 @@ pub struct SimpleCompatibilityMatrix {
     pub hotplug_history: Vec<(HotplugEvent, DeviceID)>,
 }
 
+impl Default for SimpleCompatibilityMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleCompatibilityMatrix {
     pub fn new() -> Self {
         SimpleCompatibilityMatrix {

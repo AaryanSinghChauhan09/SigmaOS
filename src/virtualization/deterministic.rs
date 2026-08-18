@@ -139,6 +139,12 @@ pub struct DeterministicHypervisor {
     pub next_snapshot_id: AtomicUsize,
 }
 
+impl Default for DeterministicHypervisor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DeterministicHypervisor {
     pub fn new() -> Self {
         DeterministicHypervisor {

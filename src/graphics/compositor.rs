@@ -183,8 +183,7 @@ pub struct BitmapSurface {
 impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
         let size = (width * height) as usize;
-        let mut data = Vec::with_capacity(size);
-        data.resize(size, 0);
+        let data = vec![0; size];
 
         BitmapSurface {
             id,
@@ -447,7 +446,7 @@ impl Window for SimpleWindow {
 
     fn apply_transition(&mut self, anim: AnimationType, progress: f32) {
         self.current_animation = Some(anim);
-        let clamped_progress = progress.max(0.0f32).min(1.0f32);
+        let clamped_progress = progress.clamp(0.0f32, 1.0f32);
         match anim {
             AnimationType::Fade => {
                 self.animation_opacity = 1.0f32 - clamped_progress;
@@ -711,27 +710,6 @@ impl Compositor for SimpleCompositor {
             output.clear(Color::rgb(0, 0, 0));
         }
 
-                        // Copy window surface to output
-                        for y in 0..window_rect.size.height as usize {
-                            for x in 0..window_rect.size.width as usize {
-                                let output_x = (window_rect.position.x + x as i32) as usize;
-                                let output_y = (window_rect.position.y + y as i32) as usize;
-
-                                let output_index = output_y * output_stride + output_x;
-                                let window_index = y * window_stride + x;
-
-                                if output_index < output_data.len()
-                                    && window_index < window_data.len()
-                                {
-                                    output_data[output_index] = window_data[window_index];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         // Swap back to front buffer automatically if needed
         if self.double_buffering.load(Ordering::SeqCst) {
             self.swap_buffers()?;
@@ -753,7 +731,7 @@ impl Compositor for SimpleCompositor {
     }
 
     fn stats(&self) -> CompositorStats {
-        let mut stats = self.stats.clone();
+        let mut stats = self.stats;
         stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
         stats
     }

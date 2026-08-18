@@ -367,24 +367,7 @@ impl Default for TinyCoreEphemeralEngine {
     }
 }
 
-/// TinyCore-style RAM-only Ephemeral Execution Engine.
-/// Achieves minimal idle execution memory limits (below 30MB of RAM) through compressed read-only extensions (.tcz)
-/// mounted into a high-speed in-memory VFS overlay with copy-on-write persistence separation.
-pub struct TinyCoreEphemeralEngine {
-    pub mounted_extensions: std::collections::HashMap<String, usize>, // ext_name -> payload_size
-    pub volatile_overlay_ram_bytes: usize,
-    pub persistence_enabled: bool,
-}
-
 impl TinyCoreEphemeralEngine {
-    pub fn new() -> Self {
-        TinyCoreEphemeralEngine {
-            mounted_extensions: std::collections::HashMap::new(),
-            volatile_overlay_ram_bytes: 0,
-            persistence_enabled: false,
-        }
-    }
-
     pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
         if ext_name.is_empty() || size_bytes == 0 {
             return Err(HistoricError::MemoryAccessViolation);

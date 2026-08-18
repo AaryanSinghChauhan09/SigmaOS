@@ -361,6 +361,12 @@ pub struct SigmaAgentREPL {
     pub agent: SimpleAIAgent,
 }
 
+impl Default for SigmaAgentREPL {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SigmaAgentREPL {
     pub fn new() -> Self {
         Self {

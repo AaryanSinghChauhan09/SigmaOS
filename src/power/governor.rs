@@ -48,13 +48,13 @@ impl SigmaGovernor {
         self.adjust_frequencies();
     }
 
-    pub fn record_utilization(&mut self, cpu_id: u32, utilization: f32) -> Result<(), ()> {
+    pub fn record_utilization(&mut self, cpu_id: u32, utilization: f32) -> Result<(), String> {
         if let Some(core) = self.cores.iter_mut().find(|c| c.cpu_id == cpu_id) {
             core.core_utilization = utilization.clamp(0.0, 1.0);
             self.adjust_core_frequency(cpu_id);
             Ok(())
         } else {
-            Err(())
+            Err(format!("CPU core {} not found", cpu_id))
         }
     }
 

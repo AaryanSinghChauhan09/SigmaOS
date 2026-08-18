@@ -19,8 +19,6 @@ pub mod distro_readiness;
 pub mod ch340_usb;
 pub mod e1000_nic;
 pub mod intel_hda;
-pub mod legacy_floppy;
-pub mod legacy_serial;
 pub mod modern_wifi;
 pub mod modern_nvme;
 pub mod legacy_parallel_printer;

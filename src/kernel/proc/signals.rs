@@ -50,6 +50,7 @@ pub enum SignalHandler {
 }
 
 impl PartialEq for SignalHandler {
+    fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (SignalHandler::Default, SignalHandler::Default) => true,
             (SignalHandler::Ignore, SignalHandler::Ignore) => true,
@@ -60,6 +61,7 @@ impl PartialEq for SignalHandler {
             _ => false,
         }
     }
+}
 
 impl Eq for SignalHandler {}
 

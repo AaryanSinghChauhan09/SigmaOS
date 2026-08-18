@@ -33,6 +33,12 @@ pub struct PeLoader {
     pub entry_point_addr: u64,
 }
 
+impl Default for PeLoader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PeLoader {
     pub fn new() -> Self {
         PeLoader {
@@ -94,6 +100,12 @@ pub struct RegistryManager {
     pub keys: HashMap<String, String>,
 }
 
+impl Default for RegistryManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl RegistryManager {
     pub fn new() -> Self {
         let mut reg = RegistryManager {
@@ -129,6 +141,12 @@ pub enum Win32Message {
 
 pub struct User32MessageQueue {
     pub messages: Vec<Win32Message>,
+}
+
+impl Default for User32MessageQueue {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl User32MessageQueue {

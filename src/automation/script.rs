@@ -565,7 +565,6 @@ impl ShellScriptInterpreter {
     }
 }
 
-=======
 #[cfg(test)]
 mod tests {
     use super::*;
