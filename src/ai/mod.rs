@@ -9,7 +9,9 @@ pub mod sai;
 pub mod openclaw;
 pub mod system;
 pub mod voice;
-pub mod open_computer;
+pub mod wiki;
+pub mod qwenpaw;
+pub mod developer_platform;
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
@@ -27,6 +29,7 @@ pub use llm::{
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+    SovereignGpuAiAccelerator,
 };
 pub use system::{
     AdaptiveSchedulingService, AiServiceConfig, AiServiceManager, AiServiceMetrics, AiServiceState,
@@ -40,6 +43,10 @@ pub use voice::{
 pub use open_computer::{
     OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
     AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
+};
+pub use developer_platform::{
+    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
+    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };
 pub use developer_platform::{
     AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,

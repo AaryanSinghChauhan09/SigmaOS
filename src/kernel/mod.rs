@@ -1,7 +1,14 @@
 // SigmaOS Kernel Module
-pub mod architecture;
-pub mod breakthroughs;
-pub mod bus;
+// Core working components
+pub mod memory;
+pub mod scheduler;
+pub mod cpu_features;
+
+pub use cpu_features::{ApsrFlags, ArmExecutionState};
+pub mod object;
+pub mod proc;
+
+// Genode-style Component Tree Architecture
 pub mod component;
 pub mod generation_manager;
 pub mod ipc;

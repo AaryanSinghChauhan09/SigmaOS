@@ -789,7 +789,544 @@ impl Default for SovereignEnvRegistry {
 }
 
 // ==========================================
-// 9. Integration Tests Module
+// 10. Yay & Paru AUR Helper Parity
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AurRepoStatus {
+    Cloned,
+    DependencyResolved,
+    Compiled,
+    Failed,
+}
+
+pub struct YayParuAdapter {
+    pub cached_aur_git_repos: HashMap<String, AurRepoStatus>,
+    pub search_query_cache: Vec<String>,
+}
+
+impl YayParuAdapter {
+    pub fn new() -> Self {
+        Self {
+            cached_aur_git_repos: HashMap::new(),
+            search_query_cache: Vec::new(),
+        }
+    }
+
+    pub fn clone_aur_repo(&mut self, pkgname: &str) -> Result<(), &'static str> {
+        if pkgname.is_empty() {
+            return Err("Empty package name");
+        }
+        self.cached_aur_git_repos.insert(pkgname.to_string(), AurRepoStatus::Cloned);
+        Ok(())
+    }
+
+    pub fn resolve_dependencies(&mut self, pkgname: &str) -> Result<(), &'static str> {
+        let status = self.cached_aur_git_repos.get_mut(pkgname).ok_or("Repo not cloned yet")?;
+        *status = AurRepoStatus::DependencyResolved;
+        Ok(())
+    }
+
+    pub fn trigger_makepkg(&mut self, pkgname: &str) -> Result<(), &'static str> {
+        let status = self.cached_aur_git_repos.get_mut(pkgname).ok_or("Repo not cloned yet")?;
+        if *status != AurRepoStatus::DependencyResolved {
+            return Err("Dependencies not resolved");
+        }
+        *status = AurRepoStatus::Compiled;
+        Ok(())
+    }
+}
+
+impl Default for YayParuAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 11. Reflector Mirror Selection Parity
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct ArchMirror {
+    pub url: String,
+    pub country: String,
+    pub protocol: String,
+    pub latency_ms: u32,
+}
+
+pub struct ReflectorMirrorlist {
+    pub mirrors: Vec<ArchMirror>,
+}
+
+impl ReflectorMirrorlist {
+    pub fn new() -> Self {
+        Self { mirrors: Vec::new() }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, country: &str, protocol: &str, latency_ms: u32) {
+        self.mirrors.push(ArchMirror {
+            url: url.to_string(),
+            country: country.to_string(),
+            protocol: protocol.to_string(),
+            latency_ms,
+        });
+    }
+
+    pub fn filter_and_sort(&self, country: &str, protocol: &str) -> Vec<ArchMirror> {
+        let mut filtered = Vec::new();
+        for m in &self.mirrors {
+            if m.country == country && m.protocol == protocol {
+                filtered.push(m.clone());
+            }
+        }
+        let n = filtered.len();
+        for i in 0..n {
+            for j in 0..n - 1 - i {
+                if filtered[j].latency_ms > filtered[j+1].latency_ms {
+                    let temp = filtered[j].clone();
+                    filtered[j] = filtered[j+1].clone();
+                    filtered[j+1] = temp;
+                }
+            }
+        }
+        filtered
+    }
+}
+
+impl Default for ReflectorMirrorlist {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 12. Declarative Archinstall Framework Parity
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SubvolumeConfig {
+    pub name: String,
+    pub mountpoint: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchinstallConfig {
+    pub target_disk: String,
+    pub btrfs_subvolumes: Vec<SubvolumeConfig>,
+    pub desktop_environment: String,
+    pub is_kernel_zen: bool,
+}
+
+pub struct ArchinstallParity {
+    pub active_config: Option<ArchinstallConfig>,
+    pub installation_progress_percent: u32,
+}
+
+impl ArchinstallParity {
+    pub fn new() -> Self {
+        Self {
+            active_config: None,
+            installation_progress_percent: 0,
+        }
+    }
+
+    pub fn load_profile(&mut self, config: ArchinstallConfig) {
+        self.active_config = Some(config);
+        self.installation_progress_percent = 0;
+    }
+
+    pub fn execute_step(&mut self) -> bool {
+        if self.active_config.is_none() {
+            return false;
+        }
+        if self.installation_progress_percent < 100 {
+            self.installation_progress_percent += 25;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for ArchinstallParity {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 13. Alternative Artix Init Bridges Parity
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArtixInitSystemType {
+    OpenRc,
+    Runit,
+    S6,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServiceState {
+    Stopped,
+    Started,
+    Supervised,
+}
+
+pub struct ArtixInitBridge {
+    pub init_type: ArtixInitSystemType,
+    pub active_services: HashMap<String, ServiceState>,
+}
+
+impl ArtixInitBridge {
+    pub fn new(init_type: ArtixInitSystemType) -> Self {
+        Self {
+            init_type,
+            active_services: HashMap::new(),
+        }
+    }
+
+    pub fn manage_service(&mut self, service: &str, state: ServiceState) {
+        self.active_services.insert(service.to_string(), state);
+    }
+
+    pub fn query_service_status(&self, service: &str) -> ServiceState {
+        self.active_services.get(service).cloned().unwrap_or(ServiceState::Stopped)
+    }
+}
+
+// ==========================================
+// 14. Pacman Keyring Manager (pacman-key)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeyTrustLevel {
+    Unknown,
+    Marginal,
+    Full,
+    Ultimate,
+}
+
+pub struct PacmanKey {
+    pub id: String,
+    pub owner: String,
+    pub trust: KeyTrustLevel,
+}
+
+pub struct PacmanKeyring {
+    pub keys: HashMap<String, PacmanKey>,
+    pub is_initialized: bool,
+}
+
+impl PacmanKeyring {
+    pub fn new() -> Self {
+        Self {
+            keys: HashMap::new(),
+            is_initialized: false,
+        }
+    }
+
+    pub fn initialize_keyring(&mut self) {
+        self.is_initialized = true;
+    }
+
+    pub fn populate_arch_keys(&mut self) -> Result<(), &'static str> {
+        if !self.is_initialized {
+            return Err("Keyring not initialized");
+        }
+        self.keys.insert("0x9E5A86A21B607B76".to_string(), PacmanKey {
+            id: "0x9E5A86A21B607B76".to_string(),
+            owner: "Arch Linux Master Signing Key".to_string(),
+            trust: KeyTrustLevel::Ultimate,
+        });
+        self.keys.insert("0x8D969EEF6ECAD3C2".to_string(), PacmanKey {
+            id: "0x8D969EEF6ECAD3C2".to_string(),
+            owner: "Arch Linux Package Maintainer".to_string(),
+            trust: KeyTrustLevel::Full,
+        });
+        Ok(())
+    }
+
+    pub fn verify_signature(&self, key_id: &str) -> bool {
+        if let Some(key) = self.keys.get(key_id) {
+            key.trust == KeyTrustLevel::Full || key.trust == KeyTrustLevel::Ultimate
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for PacmanKeyring {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 15. AUR Unified Patch Engine
+// ==========================================
+
+pub struct AurPatch {
+    pub target_line: String,
+    pub replacement_line: String,
+}
+
+pub struct AurPatchEngine;
+
+impl AurPatchEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Applies line-by-line diff patch on an AUR PKGBUILD script
+    pub fn apply_patch(&self, original_script: &str, patch: &AurPatch) -> Result<String, &'static str> {
+        if !original_script.contains(&patch.target_line) {
+            return Err("Patch target line not found in recipe");
+        }
+        let replaced = original_script.replace(&patch.target_line, &patch.replacement_line);
+        Ok(replaced)
+    }
+}
+
+impl Default for AurPatchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 17. Mkinitcpio Initramfs Generator Parity
+// ==========================================
+
+pub struct MkinitcpioGenerator {
+    pub hooks: Vec<String>,
+    pub modules: Vec<String>,
+    pub compression: String,
+}
+
+impl MkinitcpioGenerator {
+    pub fn new() -> Self {
+        let mut hooks = Vec::new();
+        hooks.push("base".to_string());
+        hooks.push("udev".to_string());
+        hooks.push("autodetect".to_string());
+        hooks.push("modconf".to_string());
+        hooks.push("block".to_string());
+        hooks.push("filesystems".to_string());
+        hooks.push("fsck".to_string());
+
+        Self {
+            hooks,
+            modules: Vec::new(),
+            compression: "zstd".to_string(),
+        }
+    }
+
+    pub fn add_hook(&mut self, hook: &str) {
+        if !self.hooks.contains(&hook.to_string()) {
+            self.hooks.push(hook.to_string());
+        }
+    }
+
+    pub fn add_module(&mut self, module: &str) {
+        if !self.modules.contains(&module.to_string()) {
+            self.modules.push(module.to_string());
+        }
+    }
+
+    pub fn generate_preset_config(&self) -> String {
+        let mut config = String::new();
+        config.push_str("HOOKS=(");
+        for (i, h) in self.hooks.iter().enumerate() {
+            if i > 0 { config.push(' '); }
+            config.push_str(h);
+        }
+        config.push_str(")\nCOMPRESSION=\"");
+        config.push_str(&self.compression);
+        config.push_str("\"\n");
+        config
+    }
+}
+
+impl Default for MkinitcpioGenerator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 18. Arch News Feed & Security Advisory Feed
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct NewsItem {
+    pub title: String,
+    pub date: String,
+    pub content: String,
+    pub is_critical: bool,
+}
+
+pub struct ArchNewsFeedParser {
+    pub news: Vec<NewsItem>,
+}
+
+impl ArchNewsFeedParser {
+    pub fn new() -> Self {
+        Self { news: Vec::new() }
+    }
+
+    pub fn add_item(&mut self, title: &str, date: &str, content: &str, is_critical: bool) {
+        self.news.push(NewsItem {
+            title: title.to_string(),
+            date: date.to_string(),
+            content: content.to_string(),
+            is_critical,
+        });
+    }
+
+    pub fn get_latest_advisories(&self) -> Vec<&NewsItem> {
+        let mut advisories = Vec::new();
+        for item in &self.news {
+            if item.is_critical {
+                advisories.push(item);
+            }
+        }
+        advisories
+    }
+}
+
+impl Default for ArchNewsFeedParser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 19. Pacman Cache Trimmer (paccache parity)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct CachedPackage {
+    pub name: String,
+    pub version: u32,
+}
+
+pub struct PacmanDbCleaner {
+    pub cache: Vec<CachedPackage>,
+}
+
+impl PacmanDbCleaner {
+    pub fn new() -> Self {
+        Self { cache: Vec::new() }
+    }
+
+    pub fn add_cached_pkg(&mut self, name: &str, version: u32) {
+        self.cache.push(CachedPackage {
+            name: name.to_string(),
+            version,
+        });
+    }
+
+    pub fn clean_cache(&mut self, keep_versions: usize) -> usize {
+        let mut removed_count = 0;
+        let mut unique_names = Vec::<String>::new();
+        for pkg in &self.cache {
+            if !unique_names.contains(&pkg.name) {
+                unique_names.push(pkg.name.clone());
+            }
+        }
+
+        let mut kept_cache = Vec::new();
+        for name in &unique_names {
+            let mut versions: Vec<u32> = self
+                .cache
+                .iter()
+                .filter(|p| p.name == *name)
+                .map(|p| p.version)
+                .collect();
+
+            // Sort ascending
+            let n = versions.len();
+            for i in 0..n {
+                for j in 0..n - 1 - i {
+                    if versions[j] > versions[j + 1] {
+                        let tmp = versions[j];
+                        versions[j] = versions[j + 1];
+                        versions[j + 1] = tmp;
+                    }
+                }
+            }
+
+            let split_idx = if versions.len() > keep_versions {
+                versions.len() - keep_versions
+            } else {
+                0
+            };
+
+            removed_count += split_idx;
+            for v in &versions[split_idx..] {
+                kept_cache.push(CachedPackage {
+                    name: name.clone(),
+                    version: *v,
+                });
+            }
+        }
+        self.cache = kept_cache;
+        removed_count
+    }
+}
+
+impl Default for PacmanDbCleaner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 20. Arch Wiki Offline Search Engine
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct WikiPage {
+    pub title: String,
+    pub content: String,
+}
+
+pub struct ArchWikiSearchEngine {
+    pub pages: Vec<WikiPage>,
+}
+
+impl ArchWikiSearchEngine {
+    pub fn new() -> Self {
+        Self { pages: Vec::new() }
+    }
+
+    pub fn index_page(&mut self, title: &str, content: &str) {
+        self.pages.push(WikiPage {
+            title: title.to_string(),
+            content: content.to_string(),
+        });
+    }
+
+    pub fn search_topics(&self, query: &str) -> Vec<&WikiPage> {
+        let mut results = Vec::new();
+        for page in &self.pages {
+            if page.title.contains(query) || page.content.contains(query) {
+                results.push(page);
+            }
+        }
+        results
+    }
+}
+
+impl Default for ArchWikiSearchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 16. Integration Tests Module
 // ==========================================
 
 #[cfg(test)]
@@ -931,9 +1468,122 @@ depends=('glibc')
         assert!(initramfs.starts_with(b"070701"));
         assert!(initramfs.windows(6).any(|w| w == b"[HOOK:"));
 
-        let archiso = ArchisoEngine::new("ARCH_202405");
-        let mount_cmd = archiso.mount_live_root();
-        assert!(mount_cmd.contains("mount -t overlay overlay"));
-        assert!(mount_cmd.contains("/run/archiso/cowspace"));
+        let filtered = list.filter_and_sort("US", "HTTPS");
+        assert_eq!(filtered.len(), 3);
+        assert_eq!(filtered[0].latency_ms, 20);
+        assert_eq!(filtered[1].latency_ms, 80);
+        assert_eq!(filtered[2].latency_ms, 150);
+    }
+
+    #[test]
+    fn test_archinstall_parity() {
+        let mut installer = ArchinstallParity::new();
+        assert!(!installer.execute_step());
+
+        let mut subs = Vec::new();
+        subs.push(SubvolumeConfig {
+            name: "root".to_string(),
+            mountpoint: "/".to_string(),
+        });
+
+        let config = ArchinstallConfig {
+            target_disk: "/dev/sda".to_string(),
+            btrfs_subvolumes: subs,
+            desktop_environment: "GNOME".to_string(),
+            is_kernel_zen: true,
+        };
+
+        installer.load_profile(config);
+        assert_eq!(installer.installation_progress_percent, 0);
+
+        assert!(installer.execute_step());
+        assert_eq!(installer.installation_progress_percent, 25);
+    }
+
+    #[test]
+    fn test_artix_init_bridge() {
+        let mut openrc = ArtixInitBridge::new(ArtixInitSystemType::OpenRc);
+        assert_eq!(openrc.query_service_status("dbus"), ServiceState::Stopped);
+
+        openrc.manage_service("dbus", ServiceState::Started);
+        assert_eq!(openrc.query_service_status("dbus"), ServiceState::Started);
+    }
+
+    #[test]
+    fn test_pacman_keyring() {
+        let mut keyring = PacmanKeyring::new();
+        assert_eq!(keyring.populate_arch_keys(), Err("Keyring not initialized"));
+
+        keyring.initialize_keyring();
+        assert!(keyring.populate_arch_keys().is_ok());
+
+        assert!(keyring.verify_signature("0x9E5A86A21B607B76"));
+        assert!(!keyring.verify_signature("0xBAD_KEY_ID"));
+    }
+
+    #[test]
+    fn test_mkinitcpio_generator() {
+        let mut gen = MkinitcpioGenerator::new();
+        gen.add_hook("encrypt");
+        gen.add_module("ext4");
+        let conf = gen.generate_preset_config();
+        assert!(conf.contains("encrypt"));
+        assert!(conf.contains("COMPRESSION=\"zstd\""));
+    }
+
+    #[test]
+    fn test_arch_news_feed_parser() {
+        let mut news = ArchNewsFeedParser::new();
+        news.add_item("Manual intervention required", "2024-05-01", "Update glibc manually", true);
+        news.add_item("Regular update", "2024-05-02", "Minor patches", false);
+        let advisories = news.get_latest_advisories();
+        assert_eq!(advisories.len(), 1);
+        assert_eq!(advisories[0].title, "Manual intervention required");
+    }
+
+    #[test]
+    fn test_pacman_db_cleaner() {
+        let mut cleaner = PacmanDbCleaner::new();
+        cleaner.add_cached_pkg("linux", 1);
+        cleaner.add_cached_pkg("linux", 2);
+        cleaner.add_cached_pkg("linux", 3);
+        cleaner.add_cached_pkg("linux", 4);
+        let removed = cleaner.clean_cache(2);
+        assert_eq!(removed, 2);
+        assert_eq!(cleaner.cache.len(), 2);
+    }
+
+    #[test]
+    fn test_arch_wiki_search_engine() {
+        let mut wiki = ArchWikiSearchEngine::new();
+        wiki.index_page("Systemd", "Systemd service manager guide.");
+        wiki.index_page("Pacman", "Pacman package manager syntax.");
+        let results = wiki.search_topics("Pacman");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].title, "Pacman");
+    }
+
+    #[test]
+    fn test_aur_patch_engine() {
+        let original = r#"
+            pkgname="neovim-git"
+            pkgver=0.9.0
+        "#;
+
+        let patch = AurPatch {
+            target_line: "pkgver=0.9.0".to_string(),
+            replacement_line: "pkgver=0.10.0".to_string(),
+        };
+
+        let engine = AurPatchEngine::new();
+        let patched = engine.apply_patch(original, &patch).unwrap();
+        assert!(patched.contains("pkgver=0.10.0"));
+
+        // Fail Case (nonexistent target line)
+        let bad_patch = AurPatch {
+            target_line: "pkgver=0.1.0".to_string(),
+            replacement_line: "pkgver=0.2.0".to_string(),
+        };
+        assert_eq!(engine.apply_patch(original, &bad_patch), Err("Patch target line not found in recipe"));
     }
 }

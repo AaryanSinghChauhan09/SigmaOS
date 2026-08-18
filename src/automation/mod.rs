@@ -20,6 +20,9 @@
 pub mod ai_optimizer;
 pub mod orchestrator;
 pub mod system_level;
+pub mod script;
+
+pub use script::ScriptArgumentRouter;
 
 pub use ai_optimizer::{
     AiOptimizer, OptimizationCategory, OptimizationError, OptimizationRecommendation, SystemState,
