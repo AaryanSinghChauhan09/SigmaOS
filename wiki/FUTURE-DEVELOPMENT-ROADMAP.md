@@ -2211,3 +2211,58 @@ To maintain perpetual OS dominance, the automated SigmaOS intelligence engine fo
 2. **Feature Extraction**: Extracts high-performance algorithms, data structures, and driver patterns.
 3. **Clean-Room Implementation**: Re-engineers extracted features using Rust/Zig/Nim low-level zero-dependency paradigms under strict `#![no_std]` constraints.
 4. **Wiki Synchronization**: Executes `scripts/sync_wiki.sh` using OOP Bash objects to mirror all markdown specifications across repository root, `WIKI/`, `wiki/`, and `wiki_repo/` targets.
+
+---
+
+## 🛠️ SECTION 33: GITHUB CI CHECK SUITE DIAGNOSTICS & CONTINUOUS INTEGRATION REMEDIATION PLAN
+
+### 33.1 Comprehensive CI Check Suite Failure Diagnosis
+To ensure continuous integration reliability across all workflow pipelines in the repository, the automated CI diagnostic engine categorizes and maps every failure mode detected during workflow execution:
+
+| Failure Category | Affected Workflows | Root Cause Analysis | Architectural Remediation Strategy |
+| :--- | :--- | :--- | :--- |
+| **Rust `#![no_std]` & `alloc` Module Scope** | `sigma_posix_ltp_ci.yml`, `sigma-ci.yml`, `ci.yml` | Missing `extern crate alloc;` declaration in crate root (`src/lib.rs`) causes `E0433` ("cannot find module or crate `alloc` in this scope") across submodules invoking `alloc::vec::Vec`, `alloc::string::String`, and `alloc::boxed::Box`. | Declare `extern crate alloc;` at the crate root in `src/lib.rs` under `#![no_std]` conditional compilation guards. Maintain zero-dependency core while allowing kernel heap allocations. |
+| **Vite Web UI Entrypoint Resolution** | `03_Web_Zenith.yml`, `Node.js CI` (`ci.yml`) | `index.html` references script path `web_ui/scripts/sigma_api_service.js`, which was omitted or moved during directory restructuring, causing Rollup bundle failure (`Failed to resolve web_ui/scripts/sigma_api_service.js`). | Standardize Web Zenith UI asset paths in `index.html` and ensure mock API service script stubs exist in `web_ui/scripts/` to pass production bundle generation. |
+| **Missing Android/Gradle Runner Artefacts** | `appknox.yml` | Workflow executes `chmod +x gradlew`, but repository is a freestanding C++/Rust bare-metal OS containing no Android Gradle wrapper (`gradlew`), triggering process exit code 1. | Add conditional check guards (`[ -f gradlew ]`) before invoking Gradle commands or update `appknox.yml` matrix to trigger only on mobile-specific platform builds. |
+| **Missing Cloud Security Authentication Secrets** | `apisec-scan.yml`, `snyk.yml`, `fortify.yml` | Security scanning actions fail with HTTP 401 (`SNYK-0005`, `runId = null`) due to unconfigured repository secrets (`SNYK_TOKEN`, `APISEC_TOKEN`, `FORTIFY_TOKEN`) on pull requests from forks. | Implement secret presence checks (`if: ${{ secrets.SNYK_TOKEN != '' }}`) in workflow definitions to skip external SaaS security API calls gracefully when secrets are unavailable. |
+| **CodeQL C++ Autobuild Engine Scan Gaps** | `codeql-analysis.yml` | CodeQL C++ extractor reports exit code 32 ("CodeQL could not process any code written in C/C++") because `make build` returns non-zero when kernel binary compilation fails or `grub-mkrescue` is missing. | Configure explicit build commands (`build-mode: manual`) in `codeql-analysis.yml` and provide stub C/C++ driver compilation targets so the tracer captures native translation units cleanly. |
+| **Deprecated GitHub Actions & Runners** | `scan-pr`, `01_Sovereign_Build.yml` | Workflows fail due to deprecated action major versions (`actions/upload-artifact@v3`, `actions/checkout@v3`, Node.js 20 runner deprecation). | Upgrade all GitHub Actions dependencies to modern major versions (`actions/upload-artifact@v4`, `actions/checkout@v4`, `actions/setup-node@v4` on Node.js 24 runners). |
+
+### 33.2 Low-Level Zero-Dependency CI Verification Protocol
+1. **Local Build Pre-Flight Gate**: Enforce local compilation tests using `cargo check --lib --all-targets` and `cargo test --lib` before committing pull requests.
+2. **Automated Workflow Sanitization Pipeline**:
+   - Step A: Verify `#![no_std]` crate root exports (`extern crate alloc;` in `src/lib.rs`).
+   - Step B: Validate `index.html` and asset path integrity for Web Zenith Vite builds.
+   - Step C: Check all workflow YAML files in `.github/workflows/` for secret guards and updated action versions (`v4`).
+3. **Synchronized Documentation Lifecycle**: Always execute `./scripts/sync_wiki.sh` after updating documentation specifications to maintain perfect line-for-line identity across `FUTURE-DEVELOPMENT-ROADMAP.md` and Wiki targets.
+
+---
+
+## 🛠️ SECTION 34: SOVEREIGN DEBUGGER, ARM/X86 EXECUTION EMULATION & DRIVER BUFFERING SUBSYSTEM
+
+### 34.1 Advanced Debugging, Breakpoint Engine & Scripting Blocks (`bp`, `bu`, `.break`)
+SigmaOS integrates a zero-dependency kernel/userland debugger subsystem inspired by Linux `ptrace`/`kprobes`, OpenBSD `ptrace`, and WinDbg/GDB architecture:
+
+1. **Breakpoint Engine & Unresolved Symbol Deferred Breakpoints (`bp` & `bu`)**:
+   - **`bp` (Software & Hardware Breakpoints)**: Manages x86_64 debug registers (`DR0`-`DR3` for hardware execution/watchpoints, `DR7` control register) and ARM64 Breakpoint Value/Control Registers (`DBGBVRn`/`DBGBCRn`). Implements software breakpoints via single-byte `INT 3` (`0xCC` on x86) and `BRK #0` (`0xD4200000` on ARM64) instruction substitution with atomic opcode restoration.
+   - **`bu` (Unresolved / Deferred Symbol Breakpoints)**: Handles deferred breakpoint binding for dynamically loaded sovereign modules, shared objects, or unmapped memory regions. Unresolved breakpoints remain queued in a lockless symbol resolution table; upon module load or memory mapping events, `bu` traps auto-bind and write native breakpoint opcodes into memory.
+   - **Scripting Blocks & `.break` Execution Loops**: Supports conditional script execution blocks within break events. Debugger scripts execute predicate evaluations (e.g., inspecting CPU registers or memory descriptors); if conditions fail, `.break` breaks out of script loop execution and immediately resumes target thread execution without round-tripping to userland debugger shells.
+
+### 34.2 ARM & x86 Branching, `BLX` & Conditional Execution Emulation
+To support multi-architecture emulation, kernel-level binary translation, and dry-run execution tracing across ARM/ARM64 and x86_64 targets:
+
+1. **ARM Branching & Link Exchange (`BLX` / `BL` / `B.cond`)**:
+   - **`BLX` (Branch with Link and Exchange)**: Simulates ARM/Thumb state transitions and target PC calculation. Updates Link Register (`LR` / `R14`) with the return address while toggling CPU Execution State (ARM vs. Thumb mode via CPSR T-bit) and flushing execution pipelines.
+   - **Conditional Execution & Predicate Emulation**: Evaluates ARM condition codes (`EQ`, `NE`, `CS`/`HS`, `CC`/`LO`, `MI`, `PL`, `VS`, `VC`, `HI`, `LS`, `GE`, `LT`, `GT`, `LE`, `AL`) against CPSR flags (`N`, `Z`, `C`, `V`). Skips instruction execution in constant time O(1) when predicate conditions evaluate to false, maintaining cycle-accurate instruction stepping.
+2. **x86_64 Branch & JCC Emulation**:
+   - Evaluates RFLAGS (`ZF`, `CF`, `SF`, `OF`, `PF`) for conditional jumps (`JE`, `JNE`, `JG`, `JLE`, `JA`, `JBE`) and computes relative/absolute branch target offsets during single-step debugging without corrupting thread execution states.
+
+### 34.3 High-Performance Driver I/O Buffering Methods
+Inspired by Linux kernel `tty_buffer` / `ring_buffer` and FreeBSD `sys/buf.h` / lockless SPSC DMA drivers:
+
+1. **Lockless Circular DMA Ring Buffers**:
+   - Direct Memory Access (DMA) ring buffers utilizing atomic read/write head and tail pointers (`AtomicUsize`) with cacheline padding to eliminate false sharing. Enables zero-copy frame and packet transfers between hardware controllers (NVMe, xHCI, E1000) and kernel memory without lock contention.
+2. **Double-Buffering & Flip-Buffering Pipelines**:
+   - Allocates primary active buffers and secondary shadow buffers for framebuffers, audio PCM streams, and high-throughput device drivers. Switches active pointers atomically during vertical sync or interrupt service routines, eliminating read/write race conditions and display tearing.
+3. **Scatter-Gather TTY & Device Ring Buffering**:
+   - Implements page-aligned scatter-gather buffer lists with dynamic chunking. Dynamically expands driver receive/transmit queues under high I/O burst conditions while enforcing capability-sandboxed page boundary protection.
