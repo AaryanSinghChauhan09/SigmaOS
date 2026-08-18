@@ -12,18 +12,6 @@ use alloc::vec::Vec;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp = 1,
-    NetworkUdp = 2,
-    FileRead = 4,
-    FileWrite = 8,
-    ProcessExec = 16,
-    Ipc = 32,
-}
-
-#[cfg(not(test))]
 use crate::security::Permission;
 
 // =========================================================================
