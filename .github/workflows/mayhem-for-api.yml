@@ -32,6 +32,7 @@ on:
 
 jobs:
   mayhem-for-api:
+    if: ${{ secrets.MAYHEM_TOKEN != '' }}
     name: Mayhem for API
     # Mayhem for API runs on linux, mac and windows
     runs-on: ubuntu-latest
