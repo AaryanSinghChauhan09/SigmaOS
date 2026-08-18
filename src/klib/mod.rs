@@ -32,38 +32,6 @@ pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
-pub use btreemap::BTreeMap;
-pub use vecdeque::VecDeque;
-pub use hash::{djb2_hash, simple_hash, fnv1a_hash, xor_hash, SimpleHasher, combine_hashes};
-
-// For other collections, use std when available
-#[cfg(not(target_os = "none"))]
-pub use std::string::String;
-#[cfg(not(target_os = "none"))]
-pub use std::path::PathBuf;
-
-// Re-export string utilities
-pub use string::format_int;
-
-/// C-ABI compatible string length function
-#[no_mangle]
-pub unsafe extern "C" fn sigma_strlen(s: *const core::ffi::c_char) -> usize {
-    let mut len = 0;
-    while *s.add(len) != 0 {
-        len += 1;
-    }
-    len
-}
-
-/// C-ABI compatible memory comparison function
-#[no_mangle]
-pub unsafe extern "C" fn sigma_memcmp(s1: *const u8, s2: *const u8, n: usize) -> i32 {
-    for i in 0..n {
-        let a = *s1.add(i);
-        let b = *s2.add(i);
-        if a != b {
-            return (a as i32) - (b as i32);
-        }
-    }
-    0
-}
+pub use hashmap::{HashMap, BTreeMap};
+pub use hashset::HashSet;
+pub use uuid::Uuid;

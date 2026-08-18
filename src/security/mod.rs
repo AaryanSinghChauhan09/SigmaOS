@@ -1,12 +1,16 @@
-// SigmaOS Security Module
-// Capability-based security, pledge, and access control
-
+// SigmaOS Security Subsystem
 pub mod audit;
 pub mod capability;
-pub mod pqc_enclave;
+pub mod hardening;
+pub mod pledge;
+pub mod vulnerability;
 
-pub use pqc_enclave::{
-    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+};
+pub use vulnerability::{
+    CIPipelineIntegration, ScanSummary, SimpleCIPipelineIntegration,
+    SimpleVulnerability, Vulnerability, VulnerabilityScanner,
 };
 pub mod capability_enforcer;
 pub mod capability_token;
@@ -64,4 +68,50 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+pub use integrity::{
+    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError as SecIntegrityError,
+    IntegrityStats, IntegrityStatus as SecIntegrityStatus, MonitorCapability, SimpleFile,
+    SimpleIntegrityMonitor as SecSimpleIntegrityMonitor,
+};
+pub use mac::{
+    ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACStats, MLSPolicy,
+    PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
+    SimpleMACEngine,
+};
+pub use pki::{
+    PKIManager as SecPKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
+};
+pub use secrets::{
+    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SimpleKeyring,
+    SimpleSecret,
+};
+pub use vulnerability::{
+    CIPipelineIntegration, ScanSummary, SimpleCIPipelineIntegration,
+    SimpleVulnerability, Vulnerability, VulnerabilityScanner,
+};
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
+};
+pub use parrot_parity::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
+};
+pub use parrot_linux::{
+    AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
+    SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionAlert,
+};
+// NemoClaw Security Primitives
+pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
+
+pub struct CronDaemon;
+pub struct CronJob;
+pub struct DmesgLog;
+pub struct FirewallRule;
+pub struct IptablesFirewall;
+pub struct KaliError;
+pub struct PluggableAuthenticationModule;
+pub struct SudoPrivilegeEscalation;
+pub struct SwapSpaceManager;
+pub struct TmuxMultiplexer;
+pub struct TmuxPane;

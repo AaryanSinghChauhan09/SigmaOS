@@ -1,3 +1,4 @@
+use crate::klib::Uuid;
 // SigmaOS Multi-Application Parity Integration Layer (advanced_app_absorber)
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
@@ -66,7 +67,11 @@ impl ShareXFlameshotEngine {
 
         // Add ShareX-style auto upload if enabled
         if self.auto_upload_enabled {
-            screenshot.cloud_url = Some(format!("{}/capture_{}.png", self.target_cloud_destination, crate::klib::uuid::Uuid::new().to_string()));
+            screenshot.cloud_url = Some(format!(
+                "{}/capture_{}.png",
+                self.target_cloud_destination,
+                Uuid::new_v4()
+            ));
         }
 
         self.screenshot_history.push_back(screenshot.clone());
@@ -86,8 +91,8 @@ pub struct Subtitle {
 }
 
 pub struct PotPlayerVlcEngine {
-    pub playback_speed: f32, // 0.25x to 4.0x
-    pub equalizer_presets: HashMap<String, Vec<f32>>, // Frequency gain settings
+    pub playback_speed: f32,                          // 0.25x to 4.0x
+    pub equalizer_presets: BTreeMap<String, Vec<f32>>, // Frequency gain settings
     pub subtitle_delay_ms: i32,
     pub subtitles: Vec<Subtitle>,
     pub playlist: Vec<PathBuf>,
@@ -331,8 +336,8 @@ impl AudacityEditor {
 // =========================================================================
 
 pub struct NotepadPlusWorkspace {
-    pub tabs: Vec<(String, String)>, // (File name, content)
-    pub macros: HashMap<String, Vec<String>>, // Recorded keyboard macro sequences
+    pub tabs: Vec<(String, String)>,          // (File name, content)
+    pub macros: BTreeMap<String, Vec<String>>, // Recorded keyboard macro sequences
     pub active_tab_index: usize,
 }
 
@@ -376,9 +381,15 @@ pub struct OneCommanderDualPane {
 impl OneCommanderDualPane {
     pub fn new() -> Self {
         Self {
-            left_pane: OneCommanderPane { current_directory: PathBuf::from("/"), selected_files: Vec::new() },
-            right_pane: OneCommanderPane { current_directory: PathBuf::from("/home"), selected_files: Vec::new() },
-            tags_colors: HashMap::new(),
+            left_pane: OneCommanderPane {
+                current_directory: PathBuf::from("/"),
+                selected_files: Vec::new(),
+            },
+            right_pane: OneCommanderPane {
+                current_directory: PathBuf::from("/home"),
+                selected_files: Vec::new(),
+            },
+            tags_colors: BTreeMap::new(),
         }
     }
 

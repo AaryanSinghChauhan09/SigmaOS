@@ -15,8 +15,6 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
-use core::ptr::NonNull;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolType {
     Paged,    // Swappable (virtual pages can be swapped out to disk)
@@ -125,6 +123,12 @@ impl Page {
     pub fn dec_ref(&self) -> bool {
         self.count.fetch_sub(1, Ordering::SeqCst) == 1
     }
+}
+
+/// Buddy allocator for memory management
+#[derive(Debug, Clone)]
+pub struct BuddyAllocatorCheckpoint {
+    pub free_lists: [Vec<MemoryBlock>; 12],
 }
 
 pub struct BuddyAllocator {

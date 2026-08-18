@@ -68,6 +68,11 @@ pub trait Driver {
     fn state(&self) -> DriverState;
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
+    fn set_state(&self, _state: DriverState) {}
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
+    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn dependencies(&self) -> &'static [DriverType] { &[] }
 }
 
 pub trait StorageDriver: Driver {

@@ -6,6 +6,10 @@
 
 use std::collections::HashMap;
 
+#[derive(Debug, Clone, Default)]
+pub struct SovereignCockpitConsole;
+impl SovereignCockpitConsole { pub fn new() -> Self { Self } }
+
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
 pub struct DnfPackageResolver {

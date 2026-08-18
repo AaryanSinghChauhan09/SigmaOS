@@ -85,7 +85,7 @@ pub struct FairSchedClass;
 pub struct IdleSchedClass;
 
 impl SchedClass for StopSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
         rq.stop_rq.nr_running += 1;
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
         Ok(())
@@ -121,7 +121,7 @@ impl SchedClass for StopSchedClass {
 }
 
 impl SchedClass for FairSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
         rq.cfs_rq.nr_running += 1;
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
         task.state = ProcessState::Runnable;

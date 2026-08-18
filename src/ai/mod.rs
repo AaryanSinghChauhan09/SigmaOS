@@ -24,12 +24,10 @@ pub use llm::{
     BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
     LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
 };
-pub use orchestrator::{AgentOrchestrator, AgentState, SimpleAgentOrchestrator};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
 };
-pub use sai::{Agent, AgentRole, AgentTask as Task, TaskStatus};
 pub use system::{
     AdaptiveSchedulingService, AiServiceConfig, AiServiceManager, AiServiceMetrics, AiServiceState,
     AiServiceType, AiSystemService, PredictiveMaintenanceService, ResourceManagementService,
@@ -42,4 +40,8 @@ pub use voice::{
 pub use open_computer::{
     OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
     AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
+};
+pub use developer_platform::{
+    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
+    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };

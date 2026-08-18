@@ -709,16 +709,7 @@ impl Compositor for SimpleCompositor {
             output_data[..len].copy_from_slice(&back_data[..len]);
         } else {
             output.clear(Color::rgb(0, 0, 0));
-
-            // Compose windows in order (back to front)
-            for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                    let window_rect = window.rect();
-                    let output_stride = output.info().stride as usize / 4;
-                    if let Some(surface) = window.surface() {
-                        let window_stride = surface.info().stride as usize / 4;
-                        let window_data = surface.data();
-                        let output_data = output.data_mut();
+        }
 
                         // Copy window surface to output
                         for y in 0..window_rect.size.height as usize {

@@ -27,61 +27,6 @@ pub struct FirewallRule {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FirewallAction {
-    Allow,
-    Deny,
-}
-
-impl NetfilterFirewall {
-    pub fn new() -> Self {
-        Self { rules: Vec::new() }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct RoutingTable {
-    routes: Vec<Route>,
-}
-
-#[derive(Debug, Clone)]
-pub struct Route {
-    pub destination: [u8; 4],
-    pub gateway: [u8; 4],
-    pub netmask: [u8; 4],
-    pub interface: String,
-}
-
-impl RoutingTable {
-    pub fn new() -> Self {
-        Self { routes: Vec::new() }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct NetworkInterface {
-    pub name: String,
-    pub mac_address: [u8; 6],
-    pub ip_address: [u8; 4],
-    pub is_up: bool,
-}
-
-impl NetworkInterface {
-    pub fn new(name: String, mac_address: [u8; 6], ip_address: [u8; 4]) -> Self {
-        Self {
-            name,
-            mac_address,
-            ip_address,
-            is_up: true,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum Protocol { TCP = 0, UDP = 1 }
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
     Listen = 1,

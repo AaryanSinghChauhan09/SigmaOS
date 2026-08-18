@@ -2,10 +2,9 @@
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 
 use crate::sigpkg::{Package, Version, VersionConstraint, Dependency, ParseError};
-use crate::klib::HashMap;
-use crate::security::capability::Permission;
+use crate::security::Permission;
+use crate::package::PackagePriority;
 
-/// Placeholder types for package manifests
 #[derive(Debug, Clone)]
 pub struct AptDebManifest {
     pub package: String,
@@ -15,23 +14,11 @@ pub struct AptDebManifest {
     pub priority: PackagePriority,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PackagePriority {
-    Required,
-    Important,
-    Standard,
-    Optional,
-    Extra,
-}
-
 #[derive(Debug, Clone)]
 pub struct PacmanPkgbuild {
     pub pkgname: String,
     pub pkgver: String,
-    pub pkgrel: String,
     pub depends: Vec<String>,
-    pub makedepends: Vec<String>,
-    pub description: String,
 }
 
 #[derive(Debug, Clone)]
@@ -39,34 +26,17 @@ pub struct SnapcraftManifest {
     pub name: String,
     pub version: String,
     pub summary: String,
-    pub description: String,
-    pub grade: String,
     pub confinement: String,
-    pub permissions: Vec<String>,
+    pub plugs: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
 pub struct FlatpakManifest {
     pub app_id: String,
-    pub runtime: String,
-    pub sdk: String,
     pub command: String,
-    pub permissions: Vec<String>,
+    pub finish_args: Vec<String>,
 }
-
-#[derive(Debug, Clone)]
-pub struct AppImageManifest {
-    pub name: String,
-    pub version: String,
-    pub arch: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct NixDerivation {
-    pub name: String,
-    pub version: String,
-    pub dependencies: Vec<String>,
-}
+use std::collections::HashMap;
 
 /// Abstract trait for package format adapters (OOPS principle)
 pub trait PackageFormatAdapter: Send + Sync {
@@ -105,11 +75,30 @@ pub struct DebAdapter {
     user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
 }
 
+impl std::fmt::Debug for DebAdapter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DebAdapter").finish()
+    }
+}
+
+impl Clone for DebAdapter {
+    fn clone(&self) -> Self {
+        Self { user_hooks: Vec::new() }
+    }
+}
+
 impl DebAdapter {
     pub fn new() -> Self {
         Self {
             user_hooks: Vec::new(),
         }
+    }
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
+        self.user_hooks.push(Box::new(hook));
     }
 
     /// Parses raw Debian control file text (Apt)
@@ -353,13 +342,7 @@ impl DebAdapter {
             });
         }
 
-        Ok(Package::new(
-            name.to_string(),
-            parsed_ver,
-            desc.to_string(),
-            dependencies,
-            format!("SHA256:{}", name),
-        ))
+        Ok(Package::new(name.to_string(), parsed_ver, desc.to_string(), dependencies, format!("SHA256:{}", name)))
     }
 }
 
@@ -1140,7 +1123,48 @@ impl AppImageContainer {
     }
 }
 
-impl UniversalPackageManager {
+#[derive(Debug, Clone, Default)]
+pub struct UniversalPackageAdapter {
+    deb_adapter: DebAdapter,
+}
+
+impl UniversalPackageAdapter {
+    pub fn new() -> Self {
+        Self {
+            deb_adapter: DebAdapter::new(),
+        }
+    }
+
+    pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
+        self.deb_adapter.parse_apt_control(text)
+    }
+
+    pub fn parse_pacman_pkgbuild(&self, text: &str) -> Result<PacmanPkgbuild, &'static str> {
+        self.deb_adapter.parse_pacman_pkgbuild(text)
+    }
+
+    pub fn parse_snapcraft_yaml(&self, text: &str) -> Result<SnapcraftManifest, &'static str> {
+        self.deb_adapter.parse_snapcraft_yaml(text)
+    }
+
+    pub fn parse_flatpak_json(&self, text: &str) -> Result<FlatpakManifest, &'static str> {
+        self.deb_adapter.parse_flatpak_json(text)
+    }
+
+    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
+        self.deb_adapter.translate_sandbox_permissions(plugs_or_args)
+    }
+
+    pub fn translate_to_native_package(
+        &self,
+        name: &str,
+        version_str: &str,
+        desc: &str,
+        raw_deps: &[String],
+    ) -> Result<Package, &'static str> {
+        self.deb_adapter.translate_to_native_package(name, version_str, desc, raw_deps)
+    }
+
     /// Parses RedHat/Yum .spec files for RPM metadata translation
     pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
         let mut name = String::new();

@@ -179,8 +179,9 @@ impl PageTable for SimplePageTable {
             &self.entries[index]
         } else {
             // Return a reference to a dummy entry for out-of-bounds access
-            // For safety, we'll use the first entry as a fallback
-            &self.entries[0]
+            // Use a const dummy instead of static mut to avoid safety issues
+            let index = index.min(511);
+        &self.entries[index]
         }
     }
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry {

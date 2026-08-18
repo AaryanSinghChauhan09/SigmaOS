@@ -3,6 +3,8 @@
 
 pub mod accessibility;
 pub mod automation;
+pub mod boot;
+pub mod container;
 pub mod compatibility;
 pub mod container;
 pub mod unimplemented_features;
@@ -68,39 +70,22 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ContainerRuntime, TargetPlatform, TranslationLayer,
-    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
-    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
-    VintagePackageConverter, VintageVirtualizationSandbox,
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
-    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-    DinitServiceState,
-    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
-    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
-    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
-    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
-    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
-    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
-    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
-    ZeroTrustNexus,
-    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
-    SigmaFSPlusPlus, SolidKernelCore,
-    WasmModule, WasmSandboxEngine, WasmState,
-    ConcurrentSlateLock, Hammer2Engine, Hammer2Transaction, Hammer2TransactionType, LwktMessage,
-    LwktScheduler, VKernelEngine, VKernelState,
-    ArchInitSystem, ArchPackage, ArchFirewall, DevFile, LsmSentinel, PacmanEngine, PamGate,
-    Pkgbuild, PkgbuildParser, AurHelper, MkinitcpioEngine, ArchisoEngine, ProcFile,
-    FstabEntry, LinuxFstabEngine, LinuxLdSoLoader, LinuxRunlevel, LinuxRunlevelGovernor,
-    LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary,
-    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
-    PledgeUnveilSandbox, PqcSecureChannel,
-    FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig,
-    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
-    OssieRelationship, SemanticRow,
-    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
-    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
+    APITimelineManager, BinaryAbiFormat, LinuxBsdAbiBridge, ServiceInitType, ServiceUnitTranslator, TranslatedService, AiResourceScheduler,
+    AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, ApplicationBinary,
+    BinaryCompatMatrix, BinaryFormat, BrailleMatrix, BsdJailSandbox, BundleType, CloudOrchestrator,
+    CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError, CompatibilityLayer,
+    CompatibilityManager, CompatibilityMode, ContainerRuntime, ContinuityCoordinator, DesktopMode,
+    DesktopProfile, DesktopTheme, DiscontinuedFS, DistroReleaseChannel, DriverBridge,
+    EcosystemSnapshot, FSRevival, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, LanguageTranslationCatalog, LegacyBus,
+    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
+    MicroService, MicroServiceState, NetworkBridge, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, StorageBridge, SuiteRegistry,
+    SyscallAbi, TargetPlatform, TranslationLayer, TribeInstaller, TtsSynthesizer, UnifiedAppStore,
+    WorkloadOptimizer, WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI,
+    GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN,
+    GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
+    GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -111,10 +96,14 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    DeviceGeneration, GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
+    InputDriver, InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    PeripheralDevice, PeripheralManager, PowerState, StorageCommand, StorageDriver, StorageError,
+    StorageType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, E1000RxDescriptor,
+    E1000TxDescriptor, IntelE1000Driver, LegacyAudioAc97, ModernAudioIntelHda, ModernNvmeDriver,
+    ModernUsbPrinterDriver, ModernWifiDriver, TouchJingosDriver, VirtioBlkDriver, VirtioDeviceType,
+    VirtioMmioHeader, VirtioNetDriver, VirtioRngDriver, UnifiedDmaBroker, SelfHealingDriverManager,
+    DmaDescriptor, DeviceCommandType, DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -176,6 +165,7 @@ pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
+pub use kernel::vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,

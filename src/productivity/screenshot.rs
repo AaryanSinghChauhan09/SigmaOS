@@ -305,13 +305,43 @@ impl AnnotationEngine {
         }
     }
 
-    pub fn draw_rectangle(&mut self, x: u32, y: u32, w: u32, h: u32) {
+    pub fn draw_shape(&mut self, annotation_type: AnnotationType, region: CaptureRegion, color: u32) {
         self.annotations.push(VectorAnnotation {
-            annotation_type: AnnotationType::Rectangle,
+            annotation_type,
+            region,
+            color_rgba: color,
+            text_label: None,
+            step_index: None,
+        });
+    }
+
+    pub fn draw_text(&mut self, region: CaptureRegion, text: &str, color: u32) {
+        self.annotations.push(VectorAnnotation {
+            annotation_type: AnnotationType::Text,
+            region,
+            color_rgba: color,
+            text_label: Some(text.to_string()),
+            step_index: None,
+        });
+    }
+
+    pub fn draw_step_number(&mut self, x: u32, y: u32, color: u32) -> u32 {
+        let step = self.next_step_number;
+        self.next_step_number += 1;
+
+        let region = CaptureRegion {
             x,
             y,
-            width: w,
-            height: h,
+            width: 24, // diameter of sticker
+            height: 24,
+        };
+
+        self.annotations.push(VectorAnnotation {
+            annotation_type: AnnotationType::StepNumber,
+            region,
+            color_rgba: color,
+            text_label: None,
+            step_index: Some(step),
         });
     }
 
