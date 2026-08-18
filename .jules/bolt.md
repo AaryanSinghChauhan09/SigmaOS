@@ -23,7 +23,3 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-10 - Target-Conditional Collection Re-Exports for Zero-Allocation & Host Compilation
 **Learning:** Re-exporting custom `klib` collection structures (`klib::HashMap`, `klib::HashSet`) unconditionally under host targets (`target_os != "none"`) caused severe type inference errors and disabled standard compiler vectorization.
 **Action:** Conditionally re-export standard `std::collections` on hosted targets and custom `klib` collections on bare-metal (`target_os = "none"`), ensuring optimal compilation speed and full host test compatibility.
-
-## 2026-08-15 - Explicit String Length Storage for Fixed-Size Byte Buffer Records
-**Learning:** Repeatedly invoking linear scans (`.position(|&b| b == 0)`) across fixed-size byte buffer arrays (such as `[u8; 16]`, `[u8; 64]`, or `[u8; 256]`) inside frequent loop bodies (such as package vulnerability remediation and report generation) creates an unnecessary $O(N)$ scanning bottleneck per record. Storing explicit length fields (`cve_id_len: u8`, `affected_package_len: u8`) upon `VulnerabilityReport` record creation reduces slice retrieval to an instantaneous $O(1)$ operation, avoiding CPU cache misses and byte-by-byte comparison overhead during bulk vulnerability audits.
-**Action:** Always store explicit byte lengths alongside fixed-size buffer arrays when records are repeatedly sliced/compared during high-frequency subsystem scans.

@@ -1,64 +1,32 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
-extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod klib;
 pub mod accessibility;
-pub mod ai;
 pub mod automation;
-pub mod boot;
-pub mod container;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
-pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
 pub mod kernel;
-pub mod memory;
-pub mod klib;
 pub mod network;
 pub mod orchestration;
+pub mod distro;
 pub mod package;
 pub mod performance;
-pub mod process;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod storage;
 pub mod virtualization;
-pub mod tracing;
-pub mod crash;
-pub mod media;
-pub mod gpu;
-
-pub mod hardware {
-    pub mod compatibility;
-    pub mod win32;
-}
-pub mod power {
-    pub mod governor;
-}
-pub mod observability {
-    pub mod profiler;
-}
-pub mod toolchain {
-    pub mod adapter;
-    pub mod bootstrap;
-    pub mod capsule;
-    pub mod codex;
-}
-pub mod scheduler {
-    pub mod numa_scheduler;
-}
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -70,7 +38,7 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    APITimelineManager, BinaryAbiFormat, LinuxBsdAbiBridge, ServiceInitType, ServiceUnitTranslator, TranslatedService, AiResourceScheduler,
+    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
     AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, ApplicationBinary,
     BinaryCompatMatrix, BinaryFormat, BrailleMatrix, BsdJailSandbox, BundleType, CloudOrchestrator,
     CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError, CompatibilityLayer,
@@ -91,34 +59,19 @@ pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
 };
 pub use distro::{
-    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService, ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine,
-    NixOSFlakeEngine, PacmanHook, PortagePackage, RunitService, ServiceState, SystemClosure, VoidRunitSupervisor,
-    AdminAction, AiSysAdmin, AppManifest, AuditResult, AuditRule, BackupSnapshot, BackupSystem,
-    BountyStatus, BugBountyProgram, BugBountyReport, BuildJob, BuildStatus, CanFrame,
-    CertificationStatus, CommunityConference, ConferenceTalk, ConfigHook, CrossBuildPipeline, DevTool, DeveloperToolkit, DirectoryService, DirectoryUser,
-    DllLoader, DllModule, EcuController, EduChallenge, EduPlayground, ForumChannel, ForumPost,
-    GdiObjectType, HardwareCertificate, HardwareCertificationProgram, HardwareProfile,
-    HardwareRegressionSuite, HelpSystem, HowToGuide, HpcClusterJob, HpcJobState, ImeCandidate,
-    InputMethodEngine, IntegrityState, KernelTrace, LanguagePack, LinuxSyscall, LiveDebugger,
-    LivepatchManager, LivepatchPatch, LocaleManager as DistroLocaleManager, ManPage, MpiCommunicator, NetplanConfig,
-    NetplanManager, P2pNode, PackageBuildService, PosixTranslation, PqcSelfHealing,
-    QAStagedRelease, RegionalSettings, RegistryType, RegistryValue, ReleaseStage, RescueISO,
-    RescueISOManager, SoftwareCertificationProgram, SovereignP2PSync, TargetArch,
-    TimeTravelCheckpoint, TimeTravelEngine, WikiPage, Win32Gdi, WindowsRegistry,
+    AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
+    ReflectorMirrorManager, YayParuHelper,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    DeviceGeneration, GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
-    InputDriver, InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    PeripheralDevice, PeripheralManager, PowerState, StorageCommand, StorageDriver, StorageError,
-    StorageType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, E1000RxDescriptor,
-    E1000TxDescriptor, IntelE1000Driver, LegacyAudioAc97, ModernAudioIntelHda, ModernNvmeDriver,
-    ModernUsbPrinterDriver, ModernWifiDriver, TouchJingosDriver, VirtioBlkDriver, VirtioDeviceType,
-    VirtioMmioHeader, VirtioNetDriver, VirtioRngDriver, UnifiedDmaBroker, SelfHealingDriverManager,
-    DmaDescriptor, DeviceCommandType, DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
+    Bdle, Ch340Driver, DeviceGeneration, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver,
+    GpuError, GpuPipeline, GpuShader, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, IntelHdaDriver, NetworkCommand, NetworkDriver, NetworkError,
+    NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
+    RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
+    TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -135,16 +88,6 @@ pub use kernel::{
     ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
     SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
     Tcb, ThreadState, WorkItem, PAGE_SIZE,
-    ABIManager, AcpiInterruptManager, AiNativeRuntime, BpfLsmPolicyGovernor,
-    CompletionQueueEntry, EnergyAwareScheduler, FastPathIpc, GapError, Generation, GenerationManager,
-    InterruptMechanism, IrqRoutingTable, JournalBlock, JournalState,
-    KernelGraph, KernelIoUringEngine, KernelPersona, KernelPlugin, KernelPluginManager,
-    LegacyScheduler, LsmHookType, MemfdSecretGuard, MetaKernel, MetadataJournal,
-    MicroDriver, NetPod, PageFolio, PageFolioCacheManager, Pml4PageTableEntry, PolicyError,
-    PolicyManager, PrivacyFirstSandbox, PrivilegeLevel,
-    ProtectionDomain, ResourceBroker,
-    SelfHealingKernel, SigmaFsPlusPlus, SubmissionQueueEntry, UniversalAbiTranslator,
-    UserDefinedKernelFunctions, VirtualMemoryPagingManager,
 };
 pub use network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
@@ -175,47 +118,28 @@ pub use productivity::{
     AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
     ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
 };
-pub use kernel::vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
-pub use kernel::processor_management::{
-    CpuArchitecture, CpuCoreDescriptor, CpuHardwareProtectionEngine, HardwarePerfCounters,
-    NumaAffinityMap, SmpTopologyManager,
-};
 pub use resilience::{
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
 };
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
-    IsolationError, SecurityEnforcer as AndroidStyleSecurityEnforcer,
-    PORT_ALLOW_SSL, PORT_ALLOW_TCP,
-    MacChanger, KaliPacketSniffer,
-    HashAuditor, PacketAnomaly,
-    GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
-    CronDaemon, CronJob, DmesgLog, FirewallRule,
-    IptablesFirewall, KaliError, PluggableAuthenticationModule,
-    SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CrowdStrikeFalconAi,
+    DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter, IntrusionDetectionSystem,
+    LinuxCapability, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, PamError, PamGroup,
+    PamUser, Permission, PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, Securelevel,
+    SIGNATURE_LEN, SnortRule, SnortSignatureFirewall, SovereignPamManager,
+    SovereignSecurelevelManager, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
 };
+pub use storage::{
+    BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
+    PartitionEntry,
+};
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-pub use memory::{
-    BsdZoneAllocator, LinuxKswapd, MemCgroupManager, SimpleVMM, Zone, MemCgroup, PageState,
-};
-
-pub use tools::{
-    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
-    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
-    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
-    SigmaToolError as LibSigmaToolError,
-    UserIdentity as LibUserIdentity,
 };

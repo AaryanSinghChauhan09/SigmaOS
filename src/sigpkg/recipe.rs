@@ -1,24 +1,8 @@
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
-use crate::sigpkg::{Dependency, Version};
+use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use std::collections::HashMap;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum UseFlag {
-    Ssl,
-    X11,
-    Wayland,
-    Alsa,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StageProfile {
-    Stage1Minimal,
-    Stage2Standard,
-    Stage3Optimized,
-}
-
 
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,12 +27,12 @@ pub struct PackageRecipe {
     pub hash: String,
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
+    pub prepare_commands: Vec<String>,
+    pub pkgrel: u32,
     pub environment: HashMap<String, String>,
     pub arch: String,
     pub license_spdx: String,
     pub package_commands: Vec<String>,
-    pub prepare_commands: Vec<String>,
-    pub pkgrel: u32,
 }
 
 impl PackageRecipe {
@@ -63,12 +47,12 @@ impl PackageRecipe {
             hash: String::new(),
             build_commands: Vec::new(),
             install_commands: Vec::new(),
+            prepare_commands: Vec::new(),
+            pkgrel: 1,
             environment: HashMap::new(),
             arch: "x86_64".to_string(),
             license_spdx: "GPL".to_string(),
             package_commands: Vec::new(),
-            prepare_commands: Vec::new(),
-            pkgrel: 1,
         }
     }
 
@@ -103,6 +87,11 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
+        self
+    }
+
     pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
         self.pkgrel = pkgrel;
         self
@@ -120,11 +109,6 @@ impl PackageRecipe {
 
     pub fn with_package_command(mut self, command: String) -> Self {
         self.package_commands.push(command);
-        self
-    }
-
-    pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.prepare_commands.push(command);
         self
     }
 

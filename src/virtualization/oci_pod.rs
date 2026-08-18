@@ -1,6 +1,10 @@
 /// OCI-Compliant Container Pod and Namespace Manager
 /// Manages pod configurations, limits, shared namespaces, and container orchestration
 /// to easily match and exceed Fedora's native Podman/Kubernetes setups.
+
+extern crate alloc;
+
+use alloc::vec::Vec;
 use core::sync::atomic::AtomicUsize;
 
 pub type PodID = usize;
@@ -99,12 +103,10 @@ impl OciPodManager {
     }
 }
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(target_os = "none")]
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+#[cfg(target_os = "none")]
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = Vec::new();
@@ -117,77 +119,53 @@ impl<T: Clone> Clone for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_list().entries(self.iter()).finish()
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> Default for Vec<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
+        VecIter { vec: self, index: 0 }
     }
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {
@@ -198,6 +176,7 @@ impl<T> core::ops::Index<usize> for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::IndexMut<usize> for Vec<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         if index >= self.len {
@@ -207,6 +186,7 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = VecIter<'a, T>;
@@ -216,6 +196,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = VecIterMut<'a, T>;
@@ -225,11 +206,13 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 pub struct VecIter<'a, T> {
     vec: &'a Vec<T>,
     index: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> Iterator for VecIter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
@@ -243,6 +226,7 @@ impl<'a, T> Iterator for VecIter<'a, T> {
     }
 }
 
+#[cfg(target_os = "none")]
 pub struct VecIterMut<'a, T> {
     data: *mut T,
     len: usize,
@@ -250,6 +234,7 @@ pub struct VecIterMut<'a, T> {
     _marker: core::marker::PhantomData<&'a mut T>,
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> Iterator for VecIterMut<'a, T> {
     type Item = &'a mut T;
     fn next(&mut self) -> Option<Self::Item> {
@@ -290,8 +275,7 @@ mod tests {
     fn test_oci_pod_deployment() {
         let mut manager = OciPodManager::new();
         let mut pod = OciPod::new(10);
-        let container =
-            ContainerConfig::new(20, b"fedora-toolbox:39", 1024, 2 * 1024 * 1024 * 1024);
+        let container = ContainerConfig::new(20, b"fedora-toolbox:39", 1024, 2 * 1024 * 1024 * 1024);
         pod.containers.push(container);
 
         // Deploy pod

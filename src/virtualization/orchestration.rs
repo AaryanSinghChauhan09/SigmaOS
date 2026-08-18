@@ -1,7 +1,21 @@
 // SigmaOS Built-in Virtualization Support
 // KVM/QEMU, Docker, and Kubernetes orchestration preconfigured
 
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use core::default::Default;
+use core::result::Result::{self, Ok, Err};
+use core::option::Option::{self, Some, None};
+
+#[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
+
+#[cfg(target_os = "none")]
+use crate::klib::HashMap;
 
 /// Virtualization technology
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
