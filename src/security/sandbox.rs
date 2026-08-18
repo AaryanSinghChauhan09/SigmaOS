@@ -29,6 +29,9 @@ pub struct PrivacyFirstSandbox {
     pub profile: SandboxProfile,
     pub sanitized_env: HashMap<String, String>,
     pub virtual_filesystem_overlay: HashMap<String, Vec<u8>>, // Sandboxie-style overlay file system
+    pub overlay_writes: HashMap<String, Vec<u8>>, // New optimized overlay writes
+    pub readonly_paths: Vec<String>, // Firejail-style read-only paths
+    pub private_paths: Vec<String>, // Firejail-style private namespace paths
 }
 
 impl PrivacyFirstSandbox {
@@ -41,6 +44,9 @@ impl PrivacyFirstSandbox {
             profile: SandboxProfile::None,
             sanitized_env: HashMap::new(),
             virtual_filesystem_overlay: HashMap::new(),
+            overlay_writes: HashMap::new(),
+            readonly_paths: Vec::new(),
+            private_paths: Vec::new(),
         }
     }
 
@@ -101,17 +107,46 @@ impl PrivacyFirstSandbox {
     // Sandboxie-style File Virtualization Overlay
     // ==========================================
 
-    /// Emulates writing a file inside the isolated sandbox overlay
-    pub fn virtual_write(&mut self, file_path: &str, content: &[u8]) -> Result<(), &'static str> {
-        if !self.validate_syscall_transition(SandboxRule::FSWriteGate) {
-            return Err("System FSWriteGate is blocked; filesystem mutations must go through custom overlay maps");
+    /// Sandboxie-style File Virtualization: Write Operation.
+    /// Intercepts path modifications and commits them strictly to the private memory overlay.
+    pub fn virtual_write(&mut self, path: &str, data: &[u8]) -> Result<(), &'static str> {
+        if !self.is_active_sandboxed {
+            return Err("Sandbox is inactive, virtual write denied.");
         }
-        self.virtual_filesystem_overlay.insert(file_path.to_string(), content.to_vec());
+        if !self.validate_syscall_transition(SandboxRule::FSWriteGate) {
+            return Err("System FSWriteGate is blocked");
+        }
+        // Firejail-style read-only check
+        if self.readonly_paths.iter().any(|ro| path.starts_with(ro)) {
+            return Err("Access violation: write to a read-only sandboxed path.");
+        }
+        self.overlay_writes.insert(path.to_string(), data.to_vec());
+        // Also maintain compatibility with old virtual_filesystem_overlay
+        self.virtual_filesystem_overlay.insert(path.to_string(), data.to_vec());
         Ok(())
     }
 
-    /// Emulates reading a file, falling back to host buffer if not modified inside the sandbox
-    pub fn virtual_read(&self, file_path: &str, host_fallback_content: &[u8]) -> Vec<u8> {
+    /// Sandboxie-style File Virtualization: Read Operation.
+    /// Intercepts path reads. Returns the sandboxed virtual file if modified, otherwise falls back to host.
+    pub fn virtual_read(&self, path: &str, host_content: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if !self.is_active_sandboxed {
+            return Ok(host_content.to_vec());
+        }
+        // Firejail-style private namespace check: hide sensitive files
+        if self.private_paths.iter().any(|priv_path| path.starts_with(priv_path)) {
+            return Err("Access violation: path is marked private in this sandbox namespace.");
+        }
+        if let Some(sandboxed_data) = self.overlay_writes.get(path) {
+            Ok(sandboxed_data.clone())
+        } else if let Some(legacy_data) = self.virtual_filesystem_overlay.get(path) {
+            Ok(legacy_data.clone())
+        } else {
+            Ok(host_content.to_vec())
+        }
+    }
+
+    /// Emulates reading a file, falling back to host buffer if not modified inside the sandbox (legacy compatibility)
+    pub fn virtual_read_legacy(&self, file_path: &str, host_fallback_content: &[u8]) -> Vec<u8> {
         if let Some(content) = self.virtual_filesystem_overlay.get(file_path) {
             content.clone()
         } else {
@@ -119,9 +154,31 @@ impl PrivacyFirstSandbox {
         }
     }
 
-    /// Purges all virtualized file modifications inside the sandbox (perfect clean reset)
+    /// Discards all virtual overlay writes completely, leaving the host system completely clean.
     pub fn purge_sandbox(&mut self) {
+        self.overlay_writes.clear();
         self.virtual_filesystem_overlay.clear();
+    }
+
+    pub fn set_environment(&mut self, key: String, val: String) {
+        self.sanitized_env.insert(key, val);
+    }
+
+    /// Firejail-style environment variable sanitization.
+    /// Strips hazardous environment variables (e.g., LD_PRELOAD, LD_LIBRARY_PATH, path manipulation)
+    /// to prevent dynamic linking injection and process hijacking.
+    pub fn sanitize_env_variables(&self, env: HashMap<String, String>) -> HashMap<String, String> {
+        let blacklisted_vars = [
+            "LD_PRELOAD",
+            "LD_LIBRARY_PATH",
+            "DYLD_INSERT_LIBRARIES",
+            "DYLD_LIBRARY_PATH",
+            "PATH",
+        ];
+
+        env.into_iter()
+            .filter(|(key, _)| !blacklisted_vars.contains(&key.as_str()))
+            .collect
     }
 }
 
@@ -187,16 +244,16 @@ mod tests {
         assert!(sandbox.virtual_write("/etc/hosts", sandboxed_hosts).is_ok());
 
         // Read virtualized overlay should return modified version
-        let read_content = sandbox.virtual_read("/etc/hosts", host_etc_hosts);
+        let read_content = sandbox.virtual_read("/etc/hosts", host_etc_hosts).unwrap();
         assert_eq!(read_content, sandboxed_hosts.to_vec());
 
         // Read unmodified file should return host fallback
-        let read_unmodified = sandbox.virtual_read("/etc/resolv.conf", b"nameserver 8.8.8.8");
+        let read_unmodified = sandbox.virtual_read("/etc/resolv.conf", b"nameserver 8.8.8.8").unwrap();
         assert_eq!(read_unmodified, b"nameserver 8.8.8.8".to_vec());
 
         // Purge and check reset to host fallbacks
         sandbox.purge_sandbox();
-        let read_after_purge = sandbox.virtual_read("/etc/hosts", host_etc_hosts);
+        let read_after_purge = sandbox.virtual_read("/etc/hosts", host_etc_hosts).unwrap();
         assert_eq!(read_after_purge, host_etc_hosts.to_vec());
     }
 }

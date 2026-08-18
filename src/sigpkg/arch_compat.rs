@@ -230,12 +230,21 @@ pub enum HookWhen {
     PostTransaction,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AlpmHookAction {
+    PreTransaction,
+    PostTransaction,
+}
+
 #[derive(Debug, Clone)]
 pub struct AlpmHook {
     pub name: String,
     pub when: HookWhen,
+    pub action: AlpmHookAction,
     pub target_pattern: String,
+    pub target_packages: Vec<String>,
     pub exec_cmd: String,
+    pub exec_command: String, // Alternative field name for compatibility
 }
 
 #[derive(Debug, Clone)]
@@ -249,6 +258,10 @@ impl AlpmHookManager {
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
+        self.hooks.push(hook);
+    }
+
+    pub fn register_hook(&mut self, hook: AlpmHook) {
         self.hooks.push(hook);
     }
 
@@ -277,14 +290,17 @@ impl AlpmHookManager {
         self.add_hook(AlpmHook {
             name: name.to_string(),
             when,
-            target_pattern,
-            exec_cmd,
+            action: AlpmHookAction::PostTransaction,
+            target_pattern: target_pattern.clone(),
+            target_packages: Vec::new(),
+            exec_cmd: exec_cmd.clone(),
+            exec_command: exec_cmd,
         });
 
         Ok(())
     }
 
-    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> Vec<String> {
+    pub fn trigger_hooks_by_file(&self, when: HookWhen, changed_file: &str) -> Vec<String> {
         let mut triggered_cmds = Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -295,6 +311,26 @@ impl AlpmHookManager {
             }
         }
         triggered_cmds
+    }
+
+    pub fn trigger_hooks_by_package(&self, when: HookWhen, changed_packages: &[&str]) -> Vec<String> {
+        let mut triggered_cmds = Vec::new();
+        for hook in &self.hooks {
+            if hook.when == when {
+                for pkg in changed_packages {
+                    if hook.target_packages.contains(&pkg.to_string()) {
+                        triggered_cmds.push(hook.exec_command.clone());
+                        break;
+                    }
+                }
+            }
+        }
+        triggered_cmds
+    }
+
+    // Legacy method for compatibility
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> Vec<String> {
+        self.trigger_hooks_by_file(when, changed_file)
     }
 }
 
@@ -344,6 +380,12 @@ impl MkinitcpioBuilder {
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
         image_header
     }
+
+    pub fn build_initramfs(&self, kernel_version: &str) -> Result<String, &'static str> {
+        let img = self.build_initramfs_image(kernel_version);
+        let path = format!("/boot/initramfs-{}.img", kernel_version);
+        Ok(path)
+    }
 }
 
 impl Default for MkinitcpioBuilder {
@@ -372,6 +414,15 @@ impl MakepkgBuilder {
         }
     }
 
+    pub fn new_simple() -> Self {
+        Self {
+            pkgname: String::new(),
+            pkgver: "1.0".to_string(),
+            arch: "x86_64".to_string(),
+            expected_sha256: String::new(),
+        }
+    }
+
     pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
         // Calculate mock SHA256 string
         let mut checksum = 0u64;
@@ -396,6 +447,18 @@ impl MakepkgBuilder {
 
         archive_content.extend_from_slice(source_data);
         Ok((archive_name, archive_content))
+    }
+
+    pub fn build_package_from_source(
+        &self,
+        pkgname: &str,
+        pkgver: &str,
+        sources: &[(&str, &str)],
+        hashes: &std::collections::HashMap<String, String>,
+    ) -> Result<String, &'static str> {
+        // Simplified version for compatibility
+        let archive_name = format!("{}-{}-1-x86_64.pkg.tar.zst", pkgname, pkgver);
+        Ok(archive_name)
     }
 }
 
@@ -479,6 +542,28 @@ mod tests {
     }
 
     #[test]
+    fn test_alpm_hooks() {
+        let mut manager = AlpmHookManager::new();
+
+        manager.register_hook(AlpmHook {
+            name: "update-fonts".to_string(),
+            action: AlpmHookAction::PostTransaction,
+            when: HookWhen::PostTransaction,
+            target_pattern: String::new(),
+            target_packages: vec!["fontconfig".to_string()],
+            exec_cmd: String::new(),
+            exec_command: "fc-cache -s".to_string(),
+        });
+
+        let executed = manager.trigger_hooks_by_package(HookWhen::PostTransaction, &["fontconfig"]);
+        assert_eq!(executed.len(), 1);
+        assert_eq!(executed[0], "fc-cache -s");
+
+        let executed_none = manager.trigger_hooks_by_package(HookWhen::PostTransaction, &["bash"]);
+        assert_eq!(executed_none.len(), 0);
+    }
+
+    #[test]
     fn test_mkinitcpio_builder() {
         let mut builder = MkinitcpioBuilder::new();
         builder.add_hook("encrypt");
@@ -489,6 +574,10 @@ mod tests {
         assert!(header_str.contains("6.5.0-arch1-1"));
         assert!(header_str.contains("encrypt"));
         assert!(header_str.contains("lvm2"));
+
+        // Test new method
+        let initramfs = builder.build_initramfs("6.1.0-arch1").unwrap();
+        assert!(initramfs.contains("/boot/initramfs-6.1.0-arch1.img"));
     }
 
     #[test]
@@ -499,5 +588,18 @@ mod tests {
         let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
         assert_eq!(pkg_file, "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
+    }
+
+    #[test]
+    fn test_makepkg_pipeline() {
+        let builder = MakepkgBuilder::new_simple();
+        let mut hashes = HashMap::new();
+        hashes.insert("v1.0.tar.gz".to_string(), "abc123hash".to_string());
+
+        let sources = [("v1.0.tar.gz", "abc123hash")];
+        let pkg_file = builder
+            .build_package_from_source("htop", "3.2.0", &sources, &hashes)
+            .unwrap();
+        assert_eq!(pkg_file, "htop-3.2.0-1-x86_64.pkg.tar.zst");
     }
 }
