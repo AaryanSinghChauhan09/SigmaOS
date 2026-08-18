@@ -44,6 +44,15 @@ pub struct RegisterSet {
     pub rdx: u64,
     pub rdi: u64, // General Purpose / Destination Index (Syscall arg 1)
     pub rsi: u64, // General Purpose / Source Index (Syscall arg 2)
+    pub rbp: u64, // Base Frame Pointer (x86_64 / Linux / BSD stack unwinding)
+    pub r8: u64,  // General Purpose x86_64 64-bit Extension Register 8
+    pub r9: u64,  // General Purpose x86_64 64-bit Extension Register 9
+    pub r10: u64, // General Purpose x86_64 64-bit Extension Register 10
+    pub r11: u64, // General Purpose x86_64 64-bit Extension Register 11
+    pub r12: u64, // General Purpose x86_64 64-bit Extension Register 12
+    pub r13: u64, // General Purpose x86_64 64-bit Extension Register 13
+    pub r14: u64, // General Purpose x86_64 64-bit Extension Register 14
+    pub r15: u64, // General Purpose x86_64 64-bit Extension Register 15
     pub cr0: u64, // Control Register 0: Bit 0 is PE (Protection Enable), Bit 3 is TS (Task Switched)
     pub cr3: u64, // Control Register 3: Page Table Base Address
     pub cr4: u64, // Control Register 4: Os Support for SSE/XSAVE
@@ -61,6 +70,48 @@ pub struct ModelSpecificRegisters {
     pub fs_base: u64, // Thread Local Storage (TLS) pointer (Linux/BSD standard)
     pub gs_base: u64, // Per-CPU data block pointer
     pub kernel_gs_base: u64, // Saved kernel GS base pointer (swapped on transition)
+}
+
+/// System Bus Special Function Registers: MAR, MBR, I/OAR, I/OBR
+#[derive(Debug, Clone, Copy, Default)]
+pub struct SystemBusRegisters {
+    pub mar: u64,  // Memory Address Register
+    pub mbr: u64,  // Memory Buffer Register
+    pub ioar: u16, // I/O Address Register
+    pub iobr: u32, // I/O Buffer Register
+}
+
+/// System Bus Controller managing memory and I/O bus transactions
+pub struct SystemBusController {
+    pub bus_regs: SystemBusRegisters,
+}
+
+impl SystemBusController {
+    pub fn new() -> Self {
+        Self {
+            bus_regs: SystemBusRegisters::default(),
+        }
+    }
+
+    pub fn write_memory_bus(&mut self, addr: u64, data: u64) {
+        self.bus_regs.mar = addr;
+        self.bus_regs.mbr = data;
+    }
+
+    pub fn read_memory_bus(&mut self, addr: u64) -> u64 {
+        self.bus_regs.mar = addr;
+        self.bus_regs.mbr
+    }
+
+    pub fn write_io_bus(&mut self, port: u16, data: u32) {
+        self.bus_regs.ioar = port;
+        self.bus_regs.iobr = data;
+    }
+
+    pub fn read_io_bus(&mut self, port: u16) -> u32 {
+        self.bus_regs.ioar = port;
+        self.bus_regs.iobr
+    }
 }
 
 /// Sovereign Virtual CPU managing execution state and privilege boundaries
@@ -87,6 +138,15 @@ impl SovereignVirtualCPU {
                 rdx: 0,
                 rdi: 0,
                 rsi: 0,
+                rbp: 0,
+                r8: 0,
+                r9: 0,
+                r10: 0,
+                r11: 0,
+                r12: 0,
+                r13: 0,
+                r14: 0,
+                r15: 0,
                 cr0: 0,
                 cr3: 0,
                 cr4: 0,
@@ -115,6 +175,17 @@ impl SovereignVirtualCPU {
             "rbx" => self.registers.rbx = val,
             "rcx" => self.registers.rcx = val,
             "rdx" => self.registers.rdx = val,
+            "rdi" => self.registers.rdi = val,
+            "rsi" => self.registers.rsi = val,
+            "rbp" => self.registers.rbp = val,
+            "r8"  => self.registers.r8 = val,
+            "r9"  => self.registers.r9 = val,
+            "r10" => self.registers.r10 = val,
+            "r11" => self.registers.r11 = val,
+            "r12" => self.registers.r12 = val,
+            "r13" => self.registers.r13 = val,
+            "r14" => self.registers.r14 = val,
+            "r15" => self.registers.r15 = val,
             _ => return Err(CpuError::InvalidRegister),
         }
         Ok(())
@@ -294,12 +365,30 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_system_bus_controller_registers() {
+        let mut bus = SystemBusController::new();
+        bus.write_memory_bus(0x1000, 0xCAFEBABEDEADBEEF);
+        assert_eq!(bus.bus_regs.mar, 0x1000);
+        assert_eq!(bus.bus_regs.mbr, 0xCAFEBABEDEADBEEF);
+        assert_eq!(bus.read_memory_bus(0x1000), 0xCAFEBABEDEADBEEF);
+
+        bus.write_io_bus(0x3F8, 0x00000041);
+        assert_eq!(bus.bus_regs.ioar, 0x3F8);
+        assert_eq!(bus.bus_regs.iobr, 0x00000041);
+        assert_eq!(bus.read_io_bus(0x3F8), 0x00000041);
+    }
+
+    #[test]
     fn test_virtual_cpu_instructions_and_data_movement() {
         let mut cpu = SovereignVirtualCPU::new();
 
-        // 1. Move value 120 directly to register RAX
+        // 1. Move value 120 directly to register RAX and test 64-bit extension registers (R8-R15)
         cpu.mov_val_to_reg("rax", 120).unwrap();
         assert_eq!(cpu.registers.rax, 120);
+        cpu.mov_val_to_reg("r8", 0xDEADBEEF88888888).unwrap();
+        assert_eq!(cpu.registers.r8, 0xDEADBEEF88888888);
+        cpu.mov_val_to_reg("r15", 0x1515151515151515).unwrap();
+        assert_eq!(cpu.registers.r15, 0x1515151515151515);
 
         // 2. Push value to stack
         cpu.push_stack(999).unwrap();

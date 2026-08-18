@@ -93,11 +93,20 @@ pub struct Hammer2Snapshot {
     pub checksum: u64,
 }
 
+/// HAMMER2 Pseudo-FS (pFS) Cluster Node Descriptor
+#[derive(Debug, Clone)]
+pub struct PfsClusterNode {
+    pub node_id: u32,
+    pub cluster_label: &'static str,
+    pub is_master: bool,
+}
+
 /// DragonFly BSD HAMMER2 Snapshot Engine
 #[derive(Debug)]
 pub struct DragonFlyHammerFs {
     next_trans_id: u64,
     snapshots: Vec<Hammer2Snapshot>,
+    cluster_nodes: Vec<PfsClusterNode>,
 }
 
 impl DragonFlyHammerFs {
@@ -105,7 +114,20 @@ impl DragonFlyHammerFs {
         Self {
             next_trans_id: 1000,
             snapshots: Vec::new(),
+            cluster_nodes: Vec::new(),
         }
+    }
+
+    pub fn add_pfs_cluster_node(&mut self, node_id: u32, label: &'static str, is_master: bool) {
+        self.cluster_nodes.push(PfsClusterNode {
+            node_id,
+            cluster_label: label,
+            is_master,
+        });
+    }
+
+    pub fn get_cluster_node_count(&self) -> usize {
+        self.cluster_nodes.len()
     }
 
     pub fn create_snapshot(&mut self, label: &'static str, root_data: &[u8]) -> u64 {
@@ -323,6 +345,11 @@ mod tests {
         let snap = hammer.get_snapshot("@snap_v1").unwrap();
         assert_eq!(snap.label, "@snap_v1");
         assert!(snap.checksum > 0);
+
+        // Test DragonFly HAMMER2 pFS cluster node synchronization
+        hammer.add_pfs_cluster_node(1, "@master_node", true);
+        hammer.add_pfs_cluster_node(2, "@slave_node_1", false);
+        assert_eq!(hammer.get_cluster_node_count(), 2);
     }
 
     #[test]
