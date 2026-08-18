@@ -698,11 +698,8 @@ impl Compositor for SimpleCompositor {
             let len = back_data.len().min(output_data.len());
             output_data[..len].copy_from_slice(&back_data[..len]);
         } else {
-            &mut *output
-        };
-
-        // Clear target surface
-        target_surface.clear(Color::rgb(0, 0, 0));
+            output.clear(Color::rgb(0, 0, 0));
+        }
 
         // Compose windows in order (back to front)
         for &window_id in &self.window_order {

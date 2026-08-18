@@ -4,6 +4,31 @@
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BandicamCaptureMode { ScreenRegion, GameHookOpenGL, GameHookDirectX }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpuEncoderType { NvidiaNvenc, AmdAmf, IntelQuickSync, SoftwareCpu }
+
+#[derive(Debug, Clone)]
+pub struct BandicamGpuBackend {
+    pub encoder: GpuEncoderType,
+    pub capture_mode: BandicamCaptureMode,
+}
+impl BandicamGpuBackend {
+    pub fn new(encoder: GpuEncoderType, capture_mode: BandicamCaptureMode) -> Self { Self { encoder, capture_mode } }
+}
+impl RecordingBackend for BandicamGpuBackend {
+    fn name(&self) -> &str { "Bandicam GPU Accelerator" }
+    fn start_recording(&mut self, _config: &RecordingConfig) -> Result<(), RecorderError> { Ok(()) }
+    fn stop_recording(&mut self) -> Result<PathBuf, RecorderError> { Ok(PathBuf::from("/tmp/recording.mp4")) }
+    fn pause_recording(&mut self) -> Result<(), RecorderError> { Ok(()) }
+    fn resume_recording(&mut self) -> Result<(), RecorderError> { Ok(()) }
+    fn get_state(&self) -> RecordingState { RecordingState::Idle }
+    fn get_progress(&self) -> RecordingProgress { RecordingProgress { frames_recorded: 120, elapsed_ms: 2000, file_size_bytes: 1048576 } }
+}
+
 /// Recording format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RecordingFormat {

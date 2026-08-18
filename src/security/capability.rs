@@ -4,27 +4,12 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
+    pub bits: u64,
     pub permissions: u64,
-}
-
-impl CapabilityToken {
-    pub fn new() -> Self {
-        CapabilityToken {
-            permissions: 0,
-        }
-    }
-    
-    pub fn with_permission(mut self, permission: u64) -> Self {
-        self.permissions |= permission;
-        self
-    }
-
-    pub fn bits(&self) -> u64 {
-        self.permissions
-    }
 }
 
 impl Default for CapabilityToken {
@@ -34,6 +19,11 @@ impl Default for CapabilityToken {
 }
 
 impl CapabilityToken {
+    pub fn with_permission(mut self, permission: u64) -> Self {
+        self.bits |= permission;
+        self.permissions |= permission;
+        self
+    }
     /// Create a new capability token with no permissions
     pub fn new() -> Self {
         Self { bits: 0 }

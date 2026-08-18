@@ -24,7 +24,7 @@ use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-use crate::kernel::vfs::inode::FsError;
+use crate::filesystem::vfs::FsError;
 
 /// Multi-Level Feedback Queue (MLFQ) Scheduler
 ///
