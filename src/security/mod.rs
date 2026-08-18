@@ -5,6 +5,8 @@ pub mod parrot;
 pub mod pledge;
 pub mod unveil;
 pub mod selinux;
+pub mod selinux_integration;
+pub mod kernel_security;
 pub mod vulnerability;
 pub mod hardening;
 pub mod deobfuscation;
@@ -32,10 +34,13 @@ pub use selinux::{
     AccessVectorCache, AvcKey, DynamicMacEnforcer, SeLinuxMode,
     SecurityContext as SelinuxSecurityContext, SelinuxEngine, SensitivityLevel,
 };
-pub use selinux::{
-    SelinuxEngine as AppArmorManager, SeLinuxMode as AppArmorProfile,
-    SelinuxEngine as SecurityPolicy, SelinuxEngine as SecurityLabel,
-    SelinuxEngine as SecurityRule, SelinuxEngine as SelinuxPermission,
+pub use selinux_integration::{
+    SelinuxError, SelinuxStats, SelinuxSyscallIntegration, SyscallSecurityClass,
+};
+pub use kernel_security::{
+    Capability, KernelSecurity, Pledge as KernelPledge, SandboxLevel, SandboxRestrictions,
+    SecurityAction, SecurityCondition, SecurityContext as KernelSecurityContext, SecurityPolicy,
+    SecurityProfile, SecurityRule, Unveil as KernelUnveil,
 };
 pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
