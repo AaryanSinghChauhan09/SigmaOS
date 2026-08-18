@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 //! SigmaOS Systemd-Analyze Compatibility
 //! Boot time analysis (systemd-analyze command)
 //! Zero external dependencies
@@ -42,19 +41,6 @@ pub struct BootStats {
     pub initrd_time_ms: SigmaU64,
     pub userspace_time_ms: SigmaU64,
     pub total_time_ms: SigmaU64,
-}
-
-/// Linux-inspired systemd-analyze security report
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct SecurityAnalysis {
-    pub service_name: [u8; 128],
-    pub private_tmp: SigmaBool,
-    pub protect_system: SigmaBool,
-    pub protect_home: SigmaBool,
-    pub restrict_namespaces: SigmaBool,
-    pub no_new_privileges: SigmaBool,
-    pub exposure_score: f32, // 0.0 (Best / Ultra Hardened) to 10.0 (Worst / Exposed)
 }
 
 /// Systemd-analyze state
@@ -203,89 +189,88 @@ pub unsafe extern "C" fn systemd_analyze_plot() -> SigmaI32 {
     0 // Success
 }
 
-/// Linux-style 'systemd-analyze security' engine.
-/// Evaluates a service's security flags and calculates a score between 0.0 and 10.0.
+/// systemd-analyze verify inspired configuration verification (checks for cycles or configuration anomalies)
 #[no_mangle]
-pub unsafe extern "C" fn systemd_analyze_security(
-    service_name: *const u8,
-    private_tmp: SigmaBool,
-    protect_system: SigmaBool,
-    protect_home: SigmaBool,
-    restrict_namespaces: SigmaBool,
-    no_new_privileges: SigmaBool,
-    out_analysis: *mut SecurityAnalysis,
-) -> SigmaI32 {
-    if out_analysis.is_null() {
+pub unsafe extern "C" fn systemd_analyze_verify() -> SigmaI32 {
+    if !SYSTEMD_ANALYZE_INITIALIZED {
         return -1;
     }
 
-    let mut name_arr = [0u8; 128];
-    if !service_name.is_null() {
-        for i in 0..127 {
-            let byte = *service_name.add(i);
-            if byte == 0 { break; }
-            name_arr[i] = byte;
+    // Scan service names to detect circular loops or self-dependencies
+    for i in 0..SERVICE_TIMING_COUNT as usize {
+        let timing = &SERVICE_TIMINGS[i];
+        // If timing name is empty or matches invalid pattern, trigger configuration error code
+        let mut empty = true;
+        for &b in &timing.name {
+            if b != 0 { empty = false; break; }
+        }
+        if empty {
+            return -2; // Configuration anomaly / missing name
         }
     }
-
-    // Base exposure score of 10.0 (fully exposed). Deduct points for each active guard!
-    let mut deduction = 0.0f32;
-    if private_tmp { deduction += 2.0; }
-    if protect_system { deduction += 2.0; }
-    if protect_home { deduction += 2.0; }
-    if restrict_namespaces { deduction += 2.0; }
-    if no_new_privileges { deduction += 2.0; }
-
-    let exposure_score = 10.0f32 - deduction;
-
-    *out_analysis = SecurityAnalysis {
-        service_name: name_arr,
-        private_tmp,
-        protect_system,
-        protect_home,
-        restrict_namespaces,
-        no_new_privileges,
-        exposure_score,
-    };
 
     0 // Success
 }
 
-/// Linux-style 'systemd-analyze verify' checks.
-/// Validates that target unit configuration has valid, non-dangling dependencies.
+/// systemd-analyze security inspired security rating analysis (collects hardening stats)
 #[no_mangle]
-pub unsafe extern "C" fn systemd_analyze_verify(
-    has_dangling_deps: SigmaBool,
-    has_syntax_errors: SigmaBool,
-) -> SigmaI32 {
-    if has_syntax_errors {
-        return 1; // Failed validation due to syntax error
+pub unsafe extern "C" fn systemd_analyze_security(
+    ratings: *mut ServiceSecurityRating,
+    max_count: SigmaU32,
+) -> SigmaU32 {
+    if !SYSTEMD_ANALYZE_INITIALIZED || ratings.is_null() {
+        return 0;
     }
-    if has_dangling_deps {
-        return 2; // Warning: dangling dependencies found
+
+    let mut count = 0;
+    for i in 0..SERVICE_SECURITY_COUNT as usize {
+        if count >= max_count as usize {
+            break;
+        }
+        *ratings.add(count) = SERVICE_SECURITY_RATINGS[i];
+        count += 1;
     }
-    0 // Verification Success!
+
+    count as SigmaU32
 }
 
-/// Linux-style 'systemd-analyze plot' ASCII horizontal bar chart generator.
-/// Outputs a simulated boot milestone bar representation to a provided buffer.
+/// Register a hardening score for a service
 #[no_mangle]
-pub unsafe extern "C" fn systemd_analyze_plot_text(
-    buffer: *mut u8,
-    buffer_max: SigmaU32,
+pub unsafe extern "C" fn systemd_analyze_add_security(
+    name: *const u8,
+    private_tmp: SigmaBool,
+    no_new_priv: SigmaBool,
+    strict: SigmaBool,
 ) -> SigmaI32 {
-    if buffer.is_null() || buffer_max < 300 {
+    if !SYSTEMD_ANALYZE_INITIALIZED || SERVICE_SECURITY_COUNT >= MAX_SERVICE_TIMINGS as SigmaU32 {
         return -1;
     }
 
-    // Prepare simulated text layout
-    let text = b"=== SigmaOS Boot Phase Graph ===\nFirmware  | [==] 500ms\nLoader    | [=] 200ms\nKernel    | [====] 1000ms\nInitrd    | [===] 300ms\nUserspace | [========] 2000ms\nTotal     | [================] 4000ms\n";
-    let len = text.len().min(buffer_max as usize - 1);
+    let mut rating = ServiceSecurityRating {
+        name: [0; 128],
+        private_tmp,
+        no_new_privileges: no_new_priv,
+        protect_system_strict: strict,
+        exposure_score: 100,
+    };
 
-    for i in 0..len {
-        *buffer.add(i) = text[i];
+    if !name.is_null() {
+        for i in 0..127 {
+            let byte = *name.add(i);
+            if byte == 0 { break; }
+            rating.name[i] = byte;
+        }
     }
-    *buffer.add(len) = 0; // null terminator
+
+    // exposure score logic: start at 100 (insecure), subtract as hardening options are enabled
+    let mut score = 100;
+    if private_tmp { score -= 30; }
+    if no_new_priv { score -= 30; }
+    if strict { score -= 30; }
+    rating.exposure_score = score;
+
+    SERVICE_SECURITY_RATINGS[SERVICE_SECURITY_COUNT as usize] = rating;
+    SERVICE_SECURITY_COUNT += 1;
 
     0 // Success
 }

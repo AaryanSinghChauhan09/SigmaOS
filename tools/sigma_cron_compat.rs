@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 //! SigmaOS Cron Compatibility Layer
 //! Cron job scheduling compatibility
 //! Zero external dependencies
@@ -55,6 +54,10 @@ pub struct CronJob {
     pub mailto: [u8; 64],           // RedHat/Vixie style email output configuration
     pub allow_overlap: SigmaBool,   // Cronie flock-style parallel execution prevention
     pub is_running: SigmaBool,      // Active run tracker for flock-style locking
+    // Low-Level ISA & Async Execution Parameters:
+    pub cpu_affinity_mask: SigmaU64,    // Hardware CPU core/thread mask for x86/ARM core binding
+    pub jit_execution_enabled: SigmaBool, // Flag allowing direct JIT bytecode execution
+    pub async_execution_handle: SigmaU64, // Tracking handle for async / ad-hoc task execution
 }
 
 /// Cron state
@@ -83,6 +86,9 @@ static mut CRON_JOBS: [CronJob; MAX_CRON_JOBS] = [CronJob {
     mailto: [0; 64],
     allow_overlap: true,
     is_running: false,
+    cpu_affinity_mask: 0,
+    jit_execution_enabled: false,
+    async_execution_handle: 0,
 }; MAX_CRON_JOBS];
 
 static mut CRON_JOB_COUNT: SigmaU32 = 0;
@@ -120,6 +126,40 @@ unsafe fn log_cron_action(job_name: &[u8; 64], action_str: &str, user_id: u32) {
         }
         CRON_LOGS[CRON_LOG_COUNT] = entry;
         CRON_LOG_COUNT += 1;
+    }
+}
+
+/// Configures CPU affinity core mask for binding cron tasks to specific x86/ARM hardware threads
+#[no_mangle]
+pub unsafe extern "C" fn cron_job_set_cpu_affinity(job_index: usize, mask: u64) -> isize {
+    if job_index < CRON_JOB_COUNT as usize {
+        CRON_JOBS[job_index].cpu_affinity_mask = mask;
+        0
+    } else {
+        -1
+    }
+}
+
+/// Enables or disables direct JIT bytecode execution for a specific cron job
+#[no_mangle]
+pub unsafe extern "C" fn cron_job_enable_jit(job_index: usize, enabled: bool) -> isize {
+    if job_index < CRON_JOB_COUNT as usize {
+        CRON_JOBS[job_index].jit_execution_enabled = enabled;
+        0
+    } else {
+        -1
+    }
+}
+
+/// Dispatches an asynchronous, ad-hoc execution trigger handle for a specific cron job
+#[no_mangle]
+pub unsafe extern "C" fn cron_job_dispatch_async(job_index: usize, handle: u64) -> isize {
+    if job_index < CRON_JOB_COUNT as usize {
+        CRON_JOBS[job_index].async_execution_handle = handle;
+        log_cron_action(&CRON_JOBS[job_index].name, "async_dispatched", CRON_JOBS[job_index].run_as_user);
+        0
+    } else {
+        -1
     }
 }
 
@@ -222,6 +262,9 @@ pub unsafe extern "C" fn cron_add_job(
         mailto: [0; 64],
         allow_overlap: true,
         is_running: false,
+        cpu_affinity_mask: 0,
+        jit_execution_enabled: false,
+        async_execution_handle: 0,
     };
     
     if !name.is_null() {
@@ -566,32 +609,6 @@ pub unsafe extern "C" fn cron_add_job_ext(
     res
 }
 
-/// Add cron job with extended multi-distro parameters
-#[no_mangle]
-pub unsafe extern "C" fn cron_add_job_ext(
-    name: *const u8,
-    command: *const u8,
-    minute: *const u8,
-    hour: *const u8,
-    day_of_month: *const u8,
-    month: *const u8,
-    day_of_week: *const u8,
-    category: u8,
-    run_as_user: u32,
-    randomized_delay_sec: u32,
-    generation_id: u32,
-) -> SigmaI32 {
-    let res = cron_add_job(name, command, minute, hour, day_of_month, month, day_of_week);
-    if res == 0 {
-        let job = &mut CRON_JOBS[(CRON_JOB_COUNT - 1) as usize];
-        job.category = category;
-        job.run_as_user = run_as_user;
-        job.randomized_delay_sec = randomized_delay_sec;
-        job.generation_id = generation_id;
-    }
-    res
-}
-
 /// Add cron job with advanced Linux-distro inspired parameters
 #[no_mangle]
 pub unsafe extern "C" fn cron_add_job_linux(
@@ -695,6 +712,7 @@ mod tests {
         unsafe {
             test_sigma_cron_advanced();
             test_linux_distro_features();
+            test_cpu_isa_and_async_cron_features();
         }
     }
 
@@ -760,6 +778,9 @@ mod tests {
             mailto: [0; 64],
             allow_overlap: true,
             is_running: false,
+            cpu_affinity_mask: 0,
+            jit_execution_enabled: false,
+            async_execution_handle: 0,
         }; 1];
 
         cron_list_jobs(jobs_list.as_mut_ptr(), 1);
@@ -1017,5 +1038,59 @@ mod tests {
         }
         assert!(found_selinux);
         assert!(found_mail);
+    }
+
+    unsafe fn test_cpu_isa_and_async_cron_features() {
+        cron_init();
+        cron_reset_logs();
+
+        let res = cron_add_job_linux(
+            b"isa_async_job\0".as_ptr(),
+            b"echo affinity_task\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            CronCategory::Custom as u8,
+            1000,
+            0,
+            1,
+            0,
+            true,
+            core::ptr::null(),
+            core::ptr::null(),
+            true,
+        );
+        assert_eq!(res, 0);
+
+        // Test CPU affinity mask setting
+        assert_eq!(cron_job_set_cpu_affinity(0, 0x0F), 0);
+        assert_eq!(CRON_JOBS[0].cpu_affinity_mask, 0x0F);
+
+        // Test JIT execution flag toggle
+        assert_eq!(cron_job_enable_jit(0, true), 0);
+        assert!(CRON_JOBS[0].jit_execution_enabled);
+
+        // Test async ad-hoc execution dispatch
+        assert_eq!(cron_job_dispatch_async(0, 0x9999), 0);
+        assert_eq!(CRON_JOBS[0].async_execution_handle, 0x9999);
+
+        // Verify async log entry was generated
+        let mut found_async_dispatched = false;
+        for idx in 0..cron_get_log_count() {
+            let mut name_buf = [0u8; 64];
+            let mut act_buf = [0u8; 32];
+            let mut uid = 0;
+            cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
+
+            let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
+            let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
+
+            if name_str.starts_with("isa_async_job") && act_str == "async_dispatched" {
+                found_async_dispatched = true;
+            }
+        }
+        assert!(found_async_dispatched);
     }
 }

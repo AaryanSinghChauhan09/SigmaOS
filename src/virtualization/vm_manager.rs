@@ -1,7 +1,7 @@
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::PathBuf;
 
 /// VM configuration
@@ -25,11 +25,6 @@ pub struct VmConfig {
     pub nested_virtualization: bool,
     pub io_uring_enabled: bool,
     pub kvm_dirty_ring_size: u32,
-    // QEMU/KVM-Inspired Virtual Device Enhancements
-    pub spice_server_enabled: bool,
-    pub qxl_vram_mb: u32,
-    pub iops_throttle_limit: u64,
-    pub vhost_user_net_enabled: bool,
 }
 
 /// OS type
@@ -122,18 +117,6 @@ pub trait HypervisorBackend {
         let _ = vm_id;
         let _ = enabled;
         Err(VmError::FeatureNotSupported("Hugepages".to_string()))
-    }
-    /// Set IOPS Throttling limit (QEMU disk throttling)
-    fn set_iops_throttle(&mut self, vm_id: &str, iops: u64) -> Result<(), VmError> {
-        let _ = vm_id;
-        let _ = iops;
-        Err(VmError::FeatureNotSupported("IOPS Throttling".to_string()))
-    }
-    /// Configure SPICE display server (QEMU/KVM SPICE integration)
-    fn set_spice_server(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
-        let _ = vm_id;
-        let _ = enabled;
-        Err(VmError::FeatureNotSupported("SPICE Server".to_string()))
     }
 }
 
@@ -272,24 +255,6 @@ impl HypervisorBackend for QemuBackend {
     fn set_hugepages(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
         if let Some(config) = self.vms.get_mut(vm_id) {
             config.hugepages_enabled = enabled;
-            Ok(())
-        } else {
-            Err(VmError::VmNotFound(vm_id.to_string()))
-        }
-    }
-
-    fn set_iops_throttle(&mut self, vm_id: &str, iops: u64) -> Result<(), VmError> {
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.iops_throttle_limit = iops;
-            Ok(())
-        } else {
-            Err(VmError::VmNotFound(vm_id.to_string()))
-        }
-    }
-
-    fn set_spice_server(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.spice_server_enabled = enabled;
             Ok(())
         } else {
             Err(VmError::VmNotFound(vm_id.to_string()))
@@ -514,24 +479,6 @@ impl HypervisorBackend for IntelVtxBackend {
     fn name(&self) -> &str {
         "Intel VT-x (VMX)"
     }
-
-    fn set_iops_throttle(&mut self, vm_id: &str, iops: u64) -> Result<(), VmError> {
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.iops_throttle_limit = iops;
-            Ok(())
-        } else {
-            Err(VmError::VmNotFound(vm_id.to_string()))
-        }
-    }
-
-    fn set_spice_server(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.spice_server_enabled = enabled;
-            Ok(())
-        } else {
-            Err(VmError::VmNotFound(vm_id.to_string()))
-        }
-    }
 }
 
 /// AMD-Vi IOMMU protection manager for devices
@@ -746,24 +693,6 @@ impl VmManager {
         }
         Ok(())
     }
-
-    /// Set IOPS throttling limit dynamically (QEMU I/O throttling)
-    pub fn set_iops_throttle(&mut self, vm_id: &str, iops: u64) -> Result<(), VmError> {
-        self.backend.set_iops_throttle(vm_id, iops)?;
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.iops_throttle_limit = iops;
-        }
-        Ok(())
-    }
-
-    /// Configure SPICE server dynamically (QEMU/KVM SPICE integration)
-    pub fn set_spice_server(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
-        self.backend.set_spice_server(vm_id, enabled)?;
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.spice_server_enabled = enabled;
-        }
-        Ok(())
-    }
 }
 
 impl Default for VmManager {
@@ -812,10 +741,6 @@ mod tests {
             nested_virtualization: true,
             io_uring_enabled: true,
             kvm_dirty_ring_size: 1024,
-            spice_server_enabled: true,
-            qxl_vram_mb: 64,
-            iops_throttle_limit: 5000,
-            vhost_user_net_enabled: true,
         };
         assert_eq!(config.name, "Test VM");
         assert_eq!(config.cpu_pinning_cores.len(), 2);
@@ -869,10 +794,6 @@ mod tests {
             nested_virtualization: true,
             io_uring_enabled: true,
             kvm_dirty_ring_size: 1024,
-            spice_server_enabled: true,
-            qxl_vram_mb: 64,
-            iops_throttle_limit: 5000,
-            vhost_user_net_enabled: true,
         };
         let vm_id = manager.create_vm(config).unwrap();
         assert!(!vm_id.is_empty());
@@ -899,10 +820,6 @@ mod tests {
             nested_virtualization: true,
             io_uring_enabled: true,
             kvm_dirty_ring_size: 1024,
-            spice_server_enabled: true,
-            qxl_vram_mb: 64,
-            iops_throttle_limit: 5000,
-            vhost_user_net_enabled: true,
         };
         let vm_id = manager.create_vm(config).unwrap();
         manager.start_vm(&vm_id).unwrap();
@@ -934,10 +851,6 @@ mod tests {
             nested_virtualization: true,
             io_uring_enabled: true,
             kvm_dirty_ring_size: 1024,
-            spice_server_enabled: true,
-            qxl_vram_mb: 64,
-            iops_throttle_limit: 5000,
-            vhost_user_net_enabled: true,
         };
 
         let vm_id = vtx.create_vm(&config).unwrap();
@@ -986,10 +899,6 @@ mod tests {
             nested_virtualization: true,
             io_uring_enabled: true,
             kvm_dirty_ring_size: 1024,
-            spice_server_enabled: true,
-            qxl_vram_mb: 64,
-            iops_throttle_limit: 5000,
-            vhost_user_net_enabled: true,
         };
         let vm_id = manager.create_vm(config).unwrap();
 
@@ -1005,12 +914,8 @@ mod tests {
         manager.set_virtio_queues(&vm_id, 8).unwrap();
         assert_eq!(manager.get_vm_config(&vm_id).unwrap().virtio_net_queues, 8);
 
-        // 5. Test IOPS throttling (QEMU disk throttling)
-        manager.set_iops_throttle(&vm_id, 10000).unwrap();
-        assert_eq!(manager.get_vm_config(&vm_id).unwrap().iops_throttle_limit, 10000);
-
-        // 6. Test SPICE server configuration (QEMU/KVM SPICE integration)
-        manager.set_spice_server(&vm_id, true).unwrap();
-        assert!(manager.get_vm_config(&vm_id).unwrap().spice_server_enabled);
+        // 4. Test hugepages setting (Fedora inspired)
+        manager.set_hugepages(&vm_id, false).unwrap();
+        assert!(!manager.get_vm_config(&vm_id).unwrap().hugepages_enabled);
     }
 }

@@ -270,43 +270,40 @@ impl Default for ScreenshotTool {
     }
 }
 
-/// Vector annotation element types
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnnotationType {
     Rectangle,
     Arrow,
     Highlight,
-    BlurPixelate,
-    Text(String),
-    StepSticker(u32), // Auto-incrementing step circle
+    Pixelate,
+    Text,
+    StepNumber,
 }
 
-/// Annotation object
 #[derive(Debug, Clone)]
-pub struct VectorAnnotation {
+pub struct Annotation {
     pub annotation_type: AnnotationType,
-    pub x: u32,
-    pub y: u32,
-    pub width: u32,
-    pub height: u32,
+    pub region: CaptureRegion,
+    pub color_rgba: u32,
+    pub text_label: Option<String>,
+    pub step_index: Option<u32>,
 }
 
-/// Specialized annotator & vector editing engine
 pub struct AnnotationEngine {
-    pub annotations: Vec<VectorAnnotation>,
-    pub current_step: u32,
+    pub annotations: Vec<Annotation>,
+    pub next_step_number: u32,
 }
 
 impl AnnotationEngine {
     pub fn new() -> Self {
         Self {
             annotations: Vec::new(),
-            current_step: 1,
+            next_step_number: 1,
         }
     }
 
     pub fn draw_shape(&mut self, annotation_type: AnnotationType, region: CaptureRegion, color: u32) {
-        self.annotations.push(VectorAnnotation {
+        self.annotations.push(Annotation {
             annotation_type,
             region,
             color_rgba: color,
@@ -316,7 +313,7 @@ impl AnnotationEngine {
     }
 
     pub fn draw_text(&mut self, region: CaptureRegion, text: &str, color: u32) {
-        self.annotations.push(VectorAnnotation {
+        self.annotations.push(Annotation {
             annotation_type: AnnotationType::Text,
             region,
             color_rgba: color,
@@ -336,72 +333,56 @@ impl AnnotationEngine {
             height: 24,
         };
 
-        self.annotations.push(VectorAnnotation {
+        self.annotations.push(Annotation {
             annotation_type: AnnotationType::StepNumber,
             region,
             color_rgba: color,
             text_label: None,
             step_index: Some(step),
         });
-    }
 
-    pub fn draw_arrow(&mut self, x: u32, y: u32, length: u32) {
-        self.annotations.push(VectorAnnotation {
-            annotation_type: AnnotationType::Arrow,
-            x,
-            y,
-            width: length,
-            height: 10, // constant thickness
-        });
-    }
-
-    pub fn add_blur_redaction(&mut self, x: u32, y: u32, w: u32, h: u32) {
-        self.annotations.push(VectorAnnotation {
-            annotation_type: AnnotationType::BlurPixelate,
-            x,
-            y,
-            width: w,
-            height: h,
-        });
-    }
-
-    pub fn add_step_number_sticker(&mut self, x: u32, y: u32) -> u32 {
-        let step = self.current_step;
-        self.annotations.push(VectorAnnotation {
-            annotation_type: AnnotationType::StepSticker(step),
-            x,
-            y,
-            width: 24, // sticker diameter
-            height: 24,
-        });
-        self.current_step += 1;
         step
+    }
+
+    pub fn clear(&mut self) {
+        self.annotations.clear();
+        self.next_step_number = 1;
     }
 }
 
-/// Optical Character Recognition OCR engine for extracted text capture
+impl Default for AnnotationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct OcrEngine {
-    pub is_model_loaded: bool,
+    pub language: String,
 }
 
 impl OcrEngine {
-    pub fn new() -> Self {
+    pub fn new(lang: &str) -> Self {
         Self {
-            is_model_loaded: true,
+            language: lang.to_string(),
         }
     }
 
-    pub fn extract_text_from_region(&self, _result: &ScreenshotResult, region: &CaptureRegion) -> Result<String, ScreenshotError> {
-        if region.width == 0 || region.height == 0 {
-            return Err(ScreenshotError::InvalidRegion("Target area cannot be empty".to_string()));
-        }
-
-        // Simulating highly performant local OCR text extraction
-        if region.x == 100 && region.y == 200 {
-            Ok("SigmaOS Sovereign Kernel Subsystem".to_string())
+    /// Simulates OCR recognition to extract text within a screenshot region
+    pub fn extract_text_from_region(&self, region: &CaptureRegion) -> String {
+        // Return simulated recognized text depending on the target region bounds
+        if region.width > 200 && region.height > 100 {
+            "Sovereign Operating System - SigmaOS".to_string()
+        } else if region.x == 50 && region.y == 50 {
+            "Verification Passed".to_string()
         } else {
-            Ok("Extracted unicode text stream from framebuffer region".to_string())
+            "No recognized text found".to_string()
         }
+    }
+}
+
+impl Default for OcrEngine {
+    fn default() -> Self {
+        Self::new("en")
     }
 }
 
@@ -487,42 +468,55 @@ mod tests {
     }
 
     #[test]
-    fn test_annotation_engine_features() {
-        let mut annotator = AnnotationEngine::new();
-        annotator.draw_rectangle(10, 10, 100, 200);
-        annotator.draw_arrow(50, 50, 80);
-        annotator.add_blur_redaction(300, 100, 120, 40);
+    fn test_screenshot_annotation_shapes_and_steps() {
+        let mut engine = AnnotationEngine::new();
+        assert_eq!(engine.annotations.len(), 0);
 
-        let step1 = annotator.add_step_number_sticker(150, 150);
-        let step2 = annotator.add_step_number_sticker(250, 250);
+        // Draw rectangle shape
+        let rect = CaptureRegion { x: 10, y: 10, width: 100, height: 50 };
+        engine.draw_shape(AnnotationType::Rectangle, rect, 0xFF0000FF);
+        assert_eq!(engine.annotations.len(), 1);
+        assert_eq!(engine.annotations[0].annotation_type, AnnotationType::Rectangle);
 
-        assert_eq!(annotator.annotations.len(), 5);
-        assert_eq!(step1, 1);
-        assert_eq!(step2, 2);
-        assert_eq!(annotator.annotations[4].annotation_type, AnnotationType::StepSticker(2));
+        // Draw text label
+        let text_reg = CaptureRegion { x: 10, y: 70, width: 200, height: 30 };
+        engine.draw_text(text_reg, "Error Here", 0x00FF00FF);
+        assert_eq!(engine.annotations.len(), 2);
+        assert_eq!(engine.annotations[1].text_label.as_ref().unwrap(), "Error Here");
+
+        // Draw sequential step number stickers
+        let s1 = engine.draw_step_number(15, 15, 0x0000FFFF);
+        let s2 = engine.draw_step_number(45, 15, 0x0000FFFF);
+        assert_eq!(s1, 1);
+        assert_eq!(s2, 2);
+        assert_eq!(engine.annotations.len(), 4);
+        assert_eq!(engine.annotations[2].step_index, Some(1));
+        assert_eq!(engine.annotations[3].step_index, Some(2));
+
+        // Clear engine
+        engine.clear();
+        assert_eq!(engine.annotations.len(), 0);
+        assert_eq!(engine.next_step_number, 1);
     }
 
     #[test]
-    fn test_screenshot_ocr_engine() {
-        let ocr = OcrEngine::new();
-        let result = ScreenshotResult {
-            success: true,
-            output_path: PathBuf::from("/test/screen.png"),
-            width: 1024,
-            height: 768,
-            file_size_bytes: 512 * 1024,
-            capture_time_ms: 20,
-        };
+    fn test_screenshot_ocr_extraction() {
+        let ocr = OcrEngine::new("en");
+        assert_eq!(ocr.language, "en");
 
-        let empty_region = CaptureRegion { x: 0, y: 0, width: 0, height: 0 };
-        assert!(ocr.extract_text_from_region(&result, &empty_region).is_err());
+        // Test with large region (returns SigmaOS text)
+        let large_reg = CaptureRegion { x: 0, y: 0, width: 300, height: 150 };
+        let text1 = ocr.extract_text_from_region(&large_reg);
+        assert_eq!(text1, "Sovereign Operating System - SigmaOS");
 
-        let target_region = CaptureRegion { x: 100, y: 200, width: 400, height: 100 };
-        let text = ocr.extract_text_from_region(&result, &target_region).unwrap();
-        assert_eq!(text, "SigmaOS Sovereign Kernel Subsystem");
+        // Test with custom coordinates
+        let custom_reg = CaptureRegion { x: 50, y: 50, width: 100, height: 50 };
+        let text2 = ocr.extract_text_from_region(&custom_reg);
+        assert_eq!(text2, "Verification Passed");
 
-        let generic_region = CaptureRegion { x: 50, y: 50, width: 200, height: 200 };
-        let generic_text = ocr.extract_text_from_region(&result, &generic_region).unwrap();
-        assert!(generic_text.contains("Extracted unicode text stream"));
+        // Test with empty/fallback region
+        let small_reg = CaptureRegion { x: 0, y: 0, width: 50, height: 50 };
+        let text3 = ocr.extract_text_from_region(&small_reg);
+        assert_eq!(text3, "No recognized text found");
     }
 }
