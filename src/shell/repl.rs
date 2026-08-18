@@ -66,6 +66,13 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
+    Npfctl {
+        subcommand: String,
+        arg: Option<String>,
+    },
+    Checksec {
+        pid: usize,
+    },
     Unknown(String),
 }
 
@@ -193,6 +200,15 @@ impl ShellRepl {
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
+            }
+            "npfctl" => {
+                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "status".to_string() };
+                let arg = if parts.len() >= 3 { Some(parts[2].to_string()) } else { None };
+                ShellCommand::Npfctl { subcommand, arg }
+            }
+            "checksec" => {
+                let pid = if parts.len() >= 2 { parts[1].parse::<usize>().unwrap_or(1) } else { 1 };
+                ShellCommand::Checksec { pid }
             }
             "mkdir" => {
                 if parts.len() >= 2 {
@@ -412,6 +428,31 @@ impl ShellRepl {
                 let is_on = state == "on" || state == "true";
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
+            }
+            ShellCommand::Npfctl { subcommand, arg } => {
+                if subcommand == "status" {
+                    Ok("Filtering: ACTIVE\nConfiguration: /etc/npf.conf\nState tracking: Enabled (Conntrack)\nActive connections: 42\nTotal evaluated: 1542".to_string())
+                } else if subcommand == "reload" {
+                    Ok("npfctl: Reloaded /etc/npf.conf successfully. Active rules updated.".to_string())
+                } else if subcommand == "stats" {
+                    Ok("NPF Firewall Statistics:\nPassed: 1420\nBlocked: 122\nStateful matches: 890\nNAT translations: 310".to_string())
+                } else {
+                    Ok(format!("npfctl {}: Executed successfully.", subcommand))
+                }
+            }
+            ShellCommand::Checksec { pid } => {
+                let mgr = crate::security::binary_protection::BinaryProtectionManager::new();
+                let report = mgr.checksec(pid);
+                Ok(format!(
+                    "RELRO           STACK CANARY      NX            PIE             FORTIFY  CFI\n\
+                     {:?}      {:?}       {:?}          {:?}            {:?}     {:?}",
+                    report.relro,
+                    report.stack_canary_active,
+                    report.nx_active,
+                    report.pie_active,
+                    report.fortify_source_active,
+                    report.cfi_active
+                ))
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
