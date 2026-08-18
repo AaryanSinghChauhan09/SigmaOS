@@ -208,6 +208,7 @@ pub enum ThreadState {
     Ready,
     Running,
     Waiting,
+    Suspended,
     Terminated,
 }
 
@@ -345,6 +346,26 @@ impl SystemThread {
             delivered += 1;
         }
         delivered
+    }
+
+    /// Suspends thread execution in user-mode (inspired by Linux SIGSTOP / BSD ptrace)
+    pub fn suspend_user_mode(&mut self) -> bool {
+        if self.state == ThreadState::Running || self.state == ThreadState::Ready {
+            self.state = ThreadState::Suspended;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Resumes a suspended thread (inspired by Linux SIGCONT / BSD ptracect)
+    pub fn resume_thread(&mut self) -> bool {
+        if self.state == ThreadState::Suspended {
+            self.state = ThreadState::Ready;
+            true
+        } else {
+            false
+        }
     }
 }
 
