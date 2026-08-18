@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 //! SigmaOS Cron Compatibility Layer
 //! Cron job scheduling compatibility
 //! Zero external dependencies
