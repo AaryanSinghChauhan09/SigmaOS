@@ -15,3 +15,7 @@ This journal logs CRITICAL usability enhancements, accessibility standard compli
 ## 2026-08-09 - High-Contrast focus boundaries
 **Learning:** Screen layout changes or color saturation variations can render normal visual indicators invisible. Enforcing dynamic boundary contrasts makes keyboard navigation accessible.
 **Action:** Ensure active outline color contrasts meet WCAG 2.1 AA ratios of at least 4.5:1.
+
+## 2026-08-10 - EndeavourOS Calamares & EOS Welcome Application Parity
+**Learning:** Desktop installers and welcome applications without clear progress feedback cause user frustration. Implementing `CalamaresInstaller` and `EosWelcomeApp` with structured status messages and pastebin log diagnostics provides a seamless setup and maintenance experience.
+**Action:** Ensure all installation and maintenance wizards provide explicit status messages and clear diagnostic feedback.
