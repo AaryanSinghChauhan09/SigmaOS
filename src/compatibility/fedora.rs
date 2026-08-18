@@ -398,6 +398,24 @@ impl FedoraAlu {
         };
         res_saturated
     }
+
+    /// Saturated 64-bit addition with CPU flag simulation
+    pub fn add_saturated_64(&mut self, a: i64, b: i64) -> i64 {
+        let (res, overflow) = a.overflowing_add(b);
+        let res_saturated = if overflow {
+            if a > 0 { i64::MAX } else { i64::MIN }
+        } else {
+            res
+        };
+
+        self.flags = FedoraAluFlags {
+            zero: res_saturated == 0,
+            sign: res_saturated < 0,
+            carry: overflow,
+            overflow,
+        };
+        res_saturated
+    }
 }
 
 // ==========================================================
