@@ -20,8 +20,6 @@ pub enum PackageFormat {
     VoidXbps,
     FreeBsdPkg,
     Sovereign,
-    Nix,
-    Apk,
     Xbps,
 }
 
@@ -110,6 +108,37 @@ impl IPackageAdapter for PacmanPackageAdapter {
     }
     fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Pacman Adapter: Extracted pkg.tar.zst to immut store: {}", store_path);
+        Ok(())
+    }
+}
+
+
+pub struct EbuildPackageAdapter {
+    pub use_flags: Vec<String>,
+}
+
+impl EbuildPackageAdapter {
+    pub fn new(use_flags: Vec<String>) -> Self {
+        Self { use_flags }
+    }
+}
+
+impl IPackageAdapter for EbuildPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Portage
+    }
+    fn parse_package(&self, _raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        Ok(PackageContext {
+            name: "ebuild-compat-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Portage,
+            dependencies: vec!["gcc".to_string()],
+            files: vec!["/store/ebuild-compat-pkg/bin/binary".to_string()],
+            hash: [0xDD; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Ebuild Adapter: Extracted to {}", store_path);
         Ok(())
     }
 }
@@ -510,133 +539,15 @@ impl PackageAdapterFactory {
             PackageFormat::Apt => std::boxed::Box::new(AptPackageAdapter),
             PackageFormat::Yum => std::boxed::Box::new(YumPackageAdapter),
             PackageFormat::Pacman => std::boxed::Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage => std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new())),
+            PackageFormat::Portage => std::boxed::Box::new(PortagePackageAdapter),
             PackageFormat::Sovereign => std::boxed::Box::new(SovereignPackageAdapter),
             PackageFormat::Nix => std::boxed::Box::new(NixPackageAdapter),
             PackageFormat::Apk => std::boxed::Box::new(ApkPackageAdapter),
             PackageFormat::Xbps => std::boxed::Box::new(XbpsPackageAdapter::new(None)),
+            _ => std::boxed::Box::new(SovereignPackageAdapter),
         }
     }
 }
-
-pub struct SnapPackageAdapter;
-pub struct NixPackageAdapter;
-impl IPackageAdapter for NixPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Nix
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Nix package payload");
-        }
-        let mut hash = [0x00; 32];
-        for (i, &b) in raw_data.iter().enumerate() {
-            hash[i % 32] ^= b;
-        }
-        Ok(PackageContext {
-            name: "nix-compat-pkg".to_string(),
-            version: "1.0.0".to_string(),
-            format: PackageFormat::Nix,
-            dependencies: vec![],
-            files: vec!["/store/nix-compat-pkg/bin/binary".to_string()],
-            hash,
-        })
-    }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!(
-            "Nix Adapter: Enforcing strict sandboxed hermeticity. Extracting to content-addressed path: {}",
-            store_path
-        );
-        Ok(())
-    }
-}
-pub struct EbuildPackageAdapter {
-    pub use_flags: Vec<String>,
-}
-
-impl EbuildPackageAdapter {
-    pub fn new(use_flags: Vec<String>) -> Self {
-        Self { use_flags }
-    }
-}
-
-impl IPackageAdapter for EbuildPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Portage
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Portage ebuild payload");
-        }
-        Ok(PackageContext {
-            name: "ebuild-compat-pkg".to_string(),
-            version: "1.0.0".to_string(),
-            format: PackageFormat::Portage,
-            dependencies: vec!["gcc".to_string()],
-            files: vec!["/store/ebuild-compat-pkg/bin/binary".to_string()],
-            hash: [0xDD; 32],
-        })
-    }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        let level = CachyCpuDetector::detect_level();
-        let march = match level {
-            CpuArchLevel::X86_64_v4 => "march=x86-64-v4",
-            CpuArchLevel::X86_64_v3 => "march=x86-64-v3",
-            CpuArchLevel::X86_64_v2 => "march=x86-64-v2",
-            CpuArchLevel::X86_64_v1 => "march=x86-64",
-        };
-        println!(
-            "Portage/ebuild compiler: Compiling source using micro-architecture target: {} with USE flags: {:?}",
-            march, self.use_flags
-        );
-        println!(
-            "Portage Adapter: Extracted/compiled ebuild targets to store: {}",
-            store_path
-        );
-        Ok(())
-    }
-}
-pub struct ApkPackageAdapter;
-impl IPackageAdapter for ApkPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Apk
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty APK package payload");
-        }
-        Ok(PackageContext {
-            name: "apk-compat-pkg".to_string(),
-            version: "3.18.0".to_string(),
-            format: PackageFormat::Apk,
-            dependencies: vec![],
-            files: vec!["/sbin/apk-compat".to_string()],
-            hash: [0x77; 32],
-        })
-    }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!(
-            "APK Adapter: Fast-unpacking lightweight alpine layer to store: {}",
-            store_path
-        );
-        Ok(())
-    }
-}
-
-pub struct FlatpakPackageAdapter;
-pub struct TxzPackageAdapter;
 
 pub struct XbpsPackageAdapter {
     pub service_name: Option<String>,

@@ -285,6 +285,8 @@ impl Device for SimpleBlockDevice {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::drivers::dde::UdfInterpreter;
+    use crate::compatibility::historic_linux::DdeDeviceWrapper;
 
     #[test]
     fn test_legacy_device_oop() {
@@ -1020,14 +1022,71 @@ impl Default for IoManager {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PortAddress {
     PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+    MemoryMapped(u64), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+}
+
+#[derive(Debug, Clone)]
+pub struct LegacyDevice {
+    pub id: u32,
+    pub name: Vec<u8>,
+    pub port: u16,
+}
+
+impl LegacyDevice {
+    pub fn new(id: u32, name: &[u8], port: u16) -> Self {
+        Self {
+            id,
+            name: name.to_vec(),
+            port,
+        }
+    }
+    pub fn query_channel(&self) -> PortAddress {
+        PortAddress::PortIO(self.port)
+    }
+    pub fn read_byte(&self, _offset: usize) -> Result<u8, &'static str> {
+        Ok(0)
+    }
+    pub fn write_byte(&mut self, _offset: usize, _val: u8) -> Result<(), &'static str> {
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModernDevice {
+    pub id: u32,
+    pub name: Vec<u8>,
+    pub mmio_addr: u64,
+}
+
+impl ModernDevice {
+    pub fn new(id: u32, name: &[u8], mmio_addr: u64) -> Self {
+        Self {
+            id,
+            name: name.to_vec(),
+            mmio_addr,
+        }
+    }
+    pub fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.mmio_addr)
+    }
+    pub fn read_byte(&self, _offset: usize) -> Result<u8, &'static str> {
+        Ok(0)
+    }
+    pub fn write_byte(&mut self, _offset: usize, _val: u8) -> Result<(), &'static str> {
+        Ok(())
+    }
 }
 
 #[cfg(test)]
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    malloc(size)
+    let layout = std::alloc::Layout::from_size_align(size, 8).unwrap();
+    std::alloc::alloc(layout)
 }
+
+#[cfg(test)]
+#[no_mangle]
+pub unsafe extern "C" fn free(_ptr: *mut u8) {}
 
 // ==========================================
 // Standalone unit tests
@@ -1036,6 +1095,8 @@ pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::drivers::dde::UdfInterpreter;
+    use crate::compatibility::historic_linux::DdeDeviceWrapper;
 
     #[test]
     fn test_device_descriptors() {

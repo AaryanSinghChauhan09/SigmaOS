@@ -31,6 +31,6 @@ pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
-pub use hashmap::HashMap;
+pub use hashmap::{HashMap, BTreeMap};
 pub use hashset::HashSet;
 pub use uuid::Uuid;

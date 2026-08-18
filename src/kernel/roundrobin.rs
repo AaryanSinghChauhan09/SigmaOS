@@ -4,9 +4,10 @@
 use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
 /// CPU register context saved during a context switch
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct CpuContext {
+    // General Purpose Registers (GPRs)
     pub rax: u64,
     pub rbx: u64,
     pub rcx: u64,
@@ -25,6 +26,49 @@ pub struct CpuContext {
     pub r15: u64,
     pub rip: u64,
     pub rflags: u64,
+
+    // Segment Selectors (Linux pt_regs & FreeBSD struct reg parity)
+    pub cs: u64,
+    pub ds: u64,
+    pub es: u64,
+    pub fs: u64,
+    pub gs: u64,
+    pub ss: u64,
+
+    // Control & Debug Registers
+    pub cr0: u64,
+    pub cr2: u64,
+    pub cr3: u64,
+    pub cr4: u64,
+    pub dr0: u64,
+    pub dr1: u64,
+    pub dr2: u64,
+    pub dr3: u64,
+    pub dr6: u64,
+    pub dr7: u64,
+
+    // Model Specific Registers (MSRs)
+    pub fs_base: u64,
+    pub gs_base: u64,
+    pub kernel_gs_base: u64,
+
+    // FPU/AVX Vector Register State (FXSAVE/XSAVE 512-byte area)
+    pub fxsave_area: [u8; 512],
+}
+
+impl Default for CpuContext {
+    fn default() -> Self {
+        Self {
+            rax: 0, rbx: 0, rcx: 0, rdx: 0, rsi: 0, rdi: 0, rbp: 0, rsp: 0,
+            r8: 0, r9: 0, r10: 0, r11: 0, r12: 0, r13: 0, r14: 0, r15: 0,
+            rip: 0, rflags: 0x202, // IF (Interrupt Flag) enabled
+            cs: 0x23, ds: 0x2B, es: 0x2B, fs: 0x00, gs: 0x00, ss: 0x2B,
+            cr0: 0x8001003B, cr2: 0, cr3: 0x1000, cr4: 0x6F0,
+            dr0: 0, dr1: 0, dr2: 0, dr3: 0, dr6: 0xFFFF0FF0, dr7: 0x400,
+            fs_base: 0, gs_base: 0, kernel_gs_base: 0,
+            fxsave_area: [0u8; 512],
+        }
+    }
 }
 
 impl CpuContext {
@@ -36,6 +80,31 @@ impl CpuContext {
     pub fn save_from(&mut self, rsp: u64, rip: u64) {
         self.rsp = rsp;
         self.rip = rip;
+    }
+
+    /// Save FPU/AVX state into FXSAVE area
+    pub fn save_fpu(&mut self, data: &[u8; 512]) {
+        self.fxsave_area.copy_from_slice(data);
+    }
+
+    /// Format and dump register context for debugging / kernel oops
+    pub fn dump(&self) -> String {
+        format!(
+            "RAX: {:#018x} RBX: {:#018x} RCX: {:#018x} RDX: {:#018x}\n\
+             RSI: {:#018x} RDI: {:#018x} RBP: {:#018x} RSP: {:#018x}\n\
+             R8:  {:#018x} R9:  {:#018x} R10: {:#018x} R11: {:#018x}\n\
+             R12: {:#018x} R13: {:#018x} R14: {:#018x} R15: {:#018x}\n\
+             RIP: {:#018x} RFLAGS: {:#018x}\n\
+             CS: {:#06x} DS: {:#06x} ES: {:#06x} SS: {:#06x} FS_BASE: {:#018x} GS_BASE: {:#018x}\n\
+             CR0: {:#018x} CR2: {:#018x} CR3: {:#018x} CR4: {:#018x}",
+            self.rax, self.rbx, self.rcx, self.rdx,
+            self.rsi, self.rdi, self.rbp, self.rsp,
+            self.r8, self.r9, self.r10, self.r11,
+            self.r12, self.r13, self.r14, self.r15,
+            self.rip, self.rflags,
+            self.cs, self.ds, self.es, self.ss, self.fs_base, self.gs_base,
+            self.cr0, self.cr2, self.cr3, self.cr4
+        )
     }
 }
 

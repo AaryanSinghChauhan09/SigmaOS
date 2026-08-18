@@ -306,7 +306,7 @@ impl AnnotationEngine {
     }
 
     pub fn draw_shape(&mut self, annotation_type: AnnotationType, region: CaptureRegion, color: u32) {
-        self.annotations.push(Annotation {
+        self.annotations.push(VectorAnnotation {
             annotation_type,
             region,
             color_rgba: color,
@@ -316,7 +316,7 @@ impl AnnotationEngine {
     }
 
     pub fn draw_text(&mut self, region: CaptureRegion, text: &str, color: u32) {
-        self.annotations.push(Annotation {
+        self.annotations.push(VectorAnnotation {
             annotation_type: AnnotationType::Text,
             region,
             color_rgba: color,
@@ -336,7 +336,7 @@ impl AnnotationEngine {
             height: 24,
         };
 
-        self.annotations.push(Annotation {
+        self.annotations.push(VectorAnnotation {
             annotation_type: AnnotationType::StepNumber,
             region,
             color_rgba: color,

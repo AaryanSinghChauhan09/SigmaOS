@@ -115,6 +115,7 @@ impl BuddyAllocator for SimpleBuddyAllocator {
     }
 
     fn allocate(&mut self, order: usize) -> Result<BlockID, AllocError> {
+        let mut retry_count = 0;
         if order > self.max_order.load(Ordering::SeqCst) {
             return Err(AllocError::OutOfMemory);
         }

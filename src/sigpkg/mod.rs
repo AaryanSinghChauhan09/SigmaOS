@@ -29,11 +29,9 @@ pub mod universal_oop_system;
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use debian_defeater::{SovereignMirrorSelector, SovereignTransactionManager, SovereignSandboxEnforcer, SovereignDeltaGenerator, TransactionStatus};
 pub use spec::{
-    AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
+    ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
-    NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
-    TxzPackageAdapter, XbpsPackageAdapter,
+    SimplePackage, SimplePackageManager,
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
@@ -61,6 +59,12 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {

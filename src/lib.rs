@@ -8,6 +8,7 @@ pub mod accessibility;
 pub mod ai;
 pub mod automation;
 pub mod boot;
+pub mod container;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;

@@ -70,6 +70,7 @@ pub enum ShellCommand {
         shorthand: String,
         statement: String,
     },
+    Regs,
     Unknown(String),
 }
 
@@ -238,6 +239,7 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "regs" | "registers" => ShellCommand::Regs,
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -695,6 +697,11 @@ impl ShellRepl {
             ShellCommand::Alias { shorthand, statement } => {
                 self.aliases.insert(shorthand.clone(), statement.clone());
                 Ok(format!("Alias defined: {} -> {}", shorthand, statement))
+            }
+            ShellCommand::Regs => {
+                use crate::kernel::roundrobin::CpuContext;
+                let ctx = CpuContext::default();
+                Ok(format!("Current CPU Register Context (x86_64):\n{}", ctx.dump()))
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }

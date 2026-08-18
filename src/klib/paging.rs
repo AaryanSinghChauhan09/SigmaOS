@@ -180,8 +180,8 @@ impl PageTable for SimplePageTable {
         } else {
             // Return a reference to a dummy entry for out-of-bounds access
             // Use a const dummy instead of static mut to avoid safety issues
-            const DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
-            &DUMMY
+            let index = index.min(511);
+        &self.entries[index]
         }
     }
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry {

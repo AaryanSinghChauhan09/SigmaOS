@@ -1,4 +1,5 @@
 // SigmaOS Security Subsystem
+pub mod audit;
 pub mod capability;
 pub mod hardening;
 pub mod pledge;
@@ -108,8 +109,8 @@ pub use secrets::{
     SimpleSecret,
 };
 pub use vulnerability::{
-    CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
-    SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
+    CIPipelineIntegration, ScanSummary, SimpleCIPipelineIntegration,
+    SimpleVulnerability, Vulnerability, VulnerabilityScanner,
 };
 pub use defensive_audit::{
     DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
@@ -120,7 +121,7 @@ pub use parrot_parity::{
 };
 pub use parrot_linux::{
     AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
-    SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionSeverity, IntrusionAlert,
+    SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionAlert,
 };
 // NemoClaw Security Primitives
 pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
