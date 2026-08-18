@@ -98,10 +98,21 @@ impl UnveilManager {
 
         let mut best_match: Option<&UnveilRestriction> = None;
 
+        // Zero-allocation path matching: avoids heap-allocating `format!("{}/", restriction.path)`
+        // per iteration in high-frequency path validation loops.
         for restriction in &self.restrictions {
-            if path == restriction.path || path.starts_with(&format!("{}/", restriction.path)) {
+            let r_path = &restriction.path;
+            let is_match = path == r_path || (
+                path.starts_with(r_path) && (
+                    r_path.ends_with('/') ||
+                    path[r_path.len()..].starts_with('/') ||
+                    path[r_path.len()..].starts_with('\\')
+                )
+            );
+
+            if is_match {
                 if let Some(best) = best_match {
-                    if restriction.path.len() > best.path.len() {
+                    if r_path.len() > best.path.len() {
                         best_match = Some(restriction);
                     }
                 } else {
@@ -159,6 +170,11 @@ mod tests {
 
         assert!(manager
             .validate_path("/etc/passwd", UnveilPermission::Read)
+            .is_err());
+
+        // Verify prefix bypasses are properly blocked
+        assert!(manager
+            .validate_path("/var/www-secret", UnveilPermission::Read)
             .is_err());
     }
 
