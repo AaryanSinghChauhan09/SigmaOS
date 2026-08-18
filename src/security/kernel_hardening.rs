@@ -99,9 +99,9 @@ impl SovereignKaslrEngine {
         self.active_kernel_base = self.base_address_min.wrapping_add(aligned_slide);
 
         // Randomize section offsets (OpenBSD KARL style section relinking)
-        let text_offset = ((hashed ^ 0x1111_2222_3333_4444) % (16 * 1024 * 1024)) & self.alignment_mask;
-        let data_offset = ((hashed ^ 0x5555_6666_7777_8888) % (16 * 1024 * 1024)) & self.alignment_mask;
-        let rodata_offset = ((hashed ^ 0x9999_AAAA_BBBB_CCCC) % (16 * 1024 * 1024)) & self.alignment_mask;
+        let text_offset = (hashed ^ 0x1111_2222_3333_4444) % (16 * 1024 * 1024) & self.alignment_mask;
+        let data_offset = (hashed ^ 0x5555_6666_7777_8888) % (16 * 1024 * 1024) & self.alignment_mask;
+        let rodata_offset = (hashed ^ 0x9999_AAAA_BBBB_CCCC) % (16 * 1024 * 1024) & self.alignment_mask;
 
         self.region_offsets.insert(".text".to_string(), self.active_kernel_base.wrapping_add(text_offset));
         self.region_offsets.insert(".data".to_string(), self.active_kernel_base.wrapping_add(0x1000_0000 + data_offset));

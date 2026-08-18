@@ -1,5 +1,6 @@
 // SigmaOS Security Subsystem
 pub mod capability;
+pub mod capability_enforcer;
 pub mod defensive_audit;
 pub mod parrot;
 pub mod pledge;
