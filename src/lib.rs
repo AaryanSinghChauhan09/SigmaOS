@@ -224,7 +224,8 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
+    CapabilityGate, CapabilityToken, HardenedSyscallDispatcher, Permission, PledgeManager, PledgePromise,
+    SecurityEnforcer as AndroidStyleSecurityEnforcer, SmepSmapEnforcer, SovereignKaslrEngine,
     PORT_ALLOW_SSL, PORT_ALLOW_TCP,
     secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
     HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
