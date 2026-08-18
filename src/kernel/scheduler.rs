@@ -33,3 +33,19 @@ pub struct Process {
     pub virtual_deadline: u64,
     pub time_slice: Duration,
     pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
+}
+
+impl Process {
+    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
+        Self {
+            pid,
+            name,
+            priority,
+            state: ProcessState::Ready,
+            runtime: Duration::from_millis(0),
+            virtual_deadline: 0,
+            time_slice: Duration::from_millis(10),
+            edf_deadline: None,
+        }
+    }
+}
