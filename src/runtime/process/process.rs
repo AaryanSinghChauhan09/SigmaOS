@@ -399,6 +399,33 @@ impl ProcessManager {
         }
     }
 
+    /// Abort a process gracefully using Linux/BSD-inspired signal escalation (SigTerm -> SigKill)
+    pub unsafe fn abort_process(&mut self, pid: ProcessID, force: bool) -> bool {
+        if pid >= 256 {
+            return false;
+        }
+
+        if let Some(process_ptr) = self.processes[pid] {
+            let process = &*process_ptr.as_ptr();
+            if !process.capability.can_terminate {
+                return false;
+            }
+
+            let signal = if force { ProcessSignal::SigKill } else { ProcessSignal::SigTerm };
+            process.send_signal(signal);
+
+            if force || process.get_state() == ProcessState::Stopped {
+                process.set_state(ProcessState::Terminated);
+                process.set_exit_code(128 + (signal as usize));
+            } else {
+                process.set_state(ProcessState::Zombie);
+            }
+            true
+        } else {
+            false
+        }
+    }
+
     pub unsafe fn suspend_process(&mut self, pid: ProcessID) -> bool {
         if pid >= 256 {
             return false;
