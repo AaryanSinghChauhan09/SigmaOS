@@ -13,6 +13,7 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
+pub mod distro_readiness;
 
 // Expose rich hidden Linux/BSD-inspired drivers
 pub mod ch340_usb;
@@ -46,12 +47,15 @@ pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
-// Re-exports of hidden drivers
-pub use ch340_usb::{Ch340Driver, CH340_VENDOR_ID, CH340_PRODUCT_ID};
-pub use e1000_nic::{E1000Driver, RxDescriptor, TxDescriptor};
-pub use intel_hda::{IntelHdaDriver, Bdle};
-pub use legacy_floppy::LegacyFloppyDisk;
-pub use legacy_serial::LegacySerialPort;
+pub use distro_readiness::{
+    DrmDisplayMode, FreeBsdGeomDiskEngine, GeomPartition, LinuxPciBusGovernor, OpenBsdDrmKmsController,
+    PciBarRegister, PciBarType, PciDeviceNode, UniversalXhciRingEngine, XhciTrb, XhciTrbType,
+};
+
+pub use legacy_audio_ac97::LegacyAudioAc97;
+pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use legacy_parallel_printer::LegacyParallelPrinter;
+pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::ModernWifiDriver;
 pub use modern_nvme::{ModernNvmeDriver, NvmeCmd as ModernNvmeCmd, NvmeSubmissionQueue, NvmeCompletionQueue, SmartTelemetry, AhciCommandHeader, AhciPort};
 pub use legacy_parallel_printer::LegacyParallelPrinter;
