@@ -20,6 +20,9 @@
 // Core working components
 pub mod memory;
 pub mod scheduler;
+pub mod cpu_features;
+
+pub use cpu_features::{ApsrFlags, ArmExecutionState};
 pub mod object;
 pub mod proc;
 

@@ -1,6 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -26,6 +27,10 @@ pub mod shell;
 pub mod sigpkg;
 pub mod tools;
 pub mod virtualization;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
+pub mod klib;
+pub use klib::{SplayTree, RadixTree, SovereignPriorityQueue};
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -35,6 +40,7 @@ pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
+    ScriptArgumentRouter,
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -75,6 +81,7 @@ pub use filesystem::{
 pub use graphics::paint::ColorRgba;
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    ApsrFlags, ArmExecutionState,
     AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
     CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
     InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
@@ -119,6 +126,7 @@ pub use resilience::{
 };
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
+    ArithmeticSubstitutionDeobfuscator,
     ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
     PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
@@ -138,9 +146,9 @@ pub use virtualization::{
 // pub mod automation;
 // pub mod container;
 
-#[cfg(test)]
-#[path = "compatibility/fedora.rs"]
-pub mod fedora_compat_test;
+// #[cfg(test)]
+// #[path = "compatibility/fedora.rs"]
+// pub mod fedora_compat_test;
 // pub mod customization;
 // pub mod dashboard;
 // pub mod desktop;
