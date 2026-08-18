@@ -2,8 +2,9 @@
 // Inspired by SELinux, AppArmor, OpenBSD pledge/unveil, and PaX
 // Provides comprehensive kernel-level security policies and enforcement
 
-use std::collections::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::{HashMap, Vec};
+use core::sync::atomic::{AtomicUsize, Ordering};
+use alloc::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityPolicy {

@@ -2,7 +2,8 @@
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Enhanced with Sandboxie-style file system overlays and Firejail-style execution profiles.
 
-use std::collections::{HashSet, HashMap};
+use crate::klib::{HashMap, Vec};
+use alloc::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SandboxRule {
@@ -25,7 +26,7 @@ pub struct PrivacyFirstSandbox {
     pub process_id: u32,
     pub is_active_sandboxed: bool,
     pub active_pqc_key_attestation: String,
-    pub blocked_rules: HashSet<SandboxRule>,
+    pub blocked_rules: HashMap<SandboxRule, bool>, // Using HashMap as HashSet substitute
     pub profile: SandboxProfile,
     pub sanitized_env: HashMap<String, String>,
     pub virtual_filesystem_overlay: HashMap<String, Vec<u8>>, // Sandboxie-style overlay file system
@@ -37,7 +38,7 @@ impl PrivacyFirstSandbox {
             process_id: pid,
             is_active_sandboxed: true,
             active_pqc_key_attestation: pqc_key.to_string(),
-            blocked_rules: HashSet::new(),
+            blocked_rules: HashMap::new(),
             profile: SandboxProfile::None,
             sanitized_env: HashMap::new(),
             virtual_filesystem_overlay: HashMap::new(),
@@ -50,16 +51,16 @@ impl PrivacyFirstSandbox {
         match profile {
             SandboxProfile::StrictBrowser => {
                 // Allow network writes, block raw socket openings, local file modifications, and debugging
-                self.blocked_rules.insert(SandboxRule::FSWriteGate);
-                self.blocked_rules.insert(SandboxRule::MemoryDbgAttachGate);
-                self.blocked_rules.insert(SandboxRule::RawSocketOpenGate);
+                self.blocked_rules.insert(SandboxRule::FSWriteGate, true);
+                self.blocked_rules.insert(SandboxRule::MemoryDbgAttachGate, true);
+                self.blocked_rules.insert(SandboxRule::RawSocketOpenGate, true);
                 self.blocked_rules.remove(&SandboxRule::NetworkWriteGate);
             }
             SandboxProfile::RestrictedOffice => {
                 // Allow filesystem writes, strictly block any outgoing/incoming network sockets and debuggers
-                self.blocked_rules.insert(SandboxRule::NetworkWriteGate);
-                self.blocked_rules.insert(SandboxRule::RawSocketOpenGate);
-                self.blocked_rules.insert(SandboxRule::MemoryDbgAttachGate);
+                self.blocked_rules.insert(SandboxRule::NetworkWriteGate, true);
+                self.blocked_rules.insert(SandboxRule::RawSocketOpenGate, true);
+                self.blocked_rules.insert(SandboxRule::MemoryDbgAttachGate, true);
                 self.blocked_rules.remove(&SandboxRule::FSWriteGate);
             }
             SandboxProfile::None => {
@@ -69,7 +70,7 @@ impl PrivacyFirstSandbox {
     }
 
     pub fn block_syscall_rule(&mut self, rule: SandboxRule) {
-        self.blocked_rules.insert(rule);
+        self.blocked_rules.insert(rule, true);
     }
 
     pub fn validate_syscall_transition(&self, rule: SandboxRule) -> bool {
@@ -77,7 +78,7 @@ impl PrivacyFirstSandbox {
             return true; // Bypass checks if sandboxing is explicitly disabled
         }
         // If the rule is blocked, deny transition
-        !self.blocked_rules.contains(&rule)
+        !self.blocked_rules.contains_key(&rule)
     }
 
     /// Firejail-style environment variable sanitizer to prevent privilege escalation / variable injections

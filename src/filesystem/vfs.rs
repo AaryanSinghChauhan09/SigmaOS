@@ -2,7 +2,7 @@
 // Capability-based filesystem with security
 
 use crate::security::CapabilityToken;
-use std::collections::HashMap;
+use crate::klib::{HashMap, Vec};
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -5,13 +5,8 @@ use core::sync::atomic::{AtomicU64, AtomicBool, Ordering};
 /// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
 /// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
 
-use crate::klib::HashMap;
-
-#[cfg(test)]
-use std::collections::HashMap;
-
-use std::string::{String, ToString};
-use std::vec::Vec;
+use crate::klib::{HashMap, Vec};
+use alloc::string::{String, ToString};
 
 // ── Syscall numbers (Linux-compatible subset + SigmaOS extensions) ────────
 
@@ -234,17 +229,17 @@ impl SyscallHandler for ExitHandler {
 }
 
 struct BrkHandler {
-    heap_end: std::sync::Mutex<u64>,
+    heap_end: core::sync::atomic::AtomicU64,
 }
 impl SyscallHandler for BrkHandler {
     fn handle(&self, args: &SyscallArgs) -> SyscallResult {
-        let mut end = self.heap_end.lock().unwrap();
+        let end = self.heap_end.load(core::sync::atomic::Ordering::SeqCst);
         if args.a0 == 0 {
-            return SyscallResult::Ok(*end);
+            return SyscallResult::Ok(end);
         }
-        if args.a0 >= *end {
-            *end = args.a0;
-            SyscallResult::Ok(*end)
+        if args.a0 >= end {
+            self.heap_end.store(args.a0, core::sync::atomic::Ordering::SeqCst);
+            SyscallResult::Ok(args.a0)
         } else {
             SyscallResult::Err(SyscallError::ENOMEM)
         }
@@ -403,7 +398,7 @@ impl SyscallTable {
         table.register(Box::new(GetpidHandler { pid: 1 }));
         table.register(Box::new(ExitHandler));
         table.register(Box::new(BrkHandler {
-            heap_end: std::sync::Mutex::new(0xA000_0000),
+            heap_end: core::sync::atomic::AtomicU64::new(0xA000_0000),
         }));
         table
     }

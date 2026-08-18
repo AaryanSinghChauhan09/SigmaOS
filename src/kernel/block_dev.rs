@@ -22,18 +22,18 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
 
 #[cfg(not(test))]
-use crate::klib::{BTreeMap, VecDeque};
+use crate::klib::{BTreeMap, Vec, VecDeque};
 
 #[cfg(test)]
 use std::collections::{BTreeMap, VecDeque};
 
 #[cfg(not(test))]
-use crate::klib::SigmaString as String;
+use crate::klib::Vec;
 
 #[cfg(test)]
-use alloc::string::String;
-
 use alloc::vec::Vec;
+
+use alloc::string::String;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks
