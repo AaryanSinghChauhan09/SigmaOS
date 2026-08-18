@@ -2,7 +2,8 @@
 // Inspired by Linux VMA (vm_area_struct) & BSD UMA/vm_map virtual memory architectures
 // Implements 4-Level/5-Level x86_64 Paging, Demand Paging, Copy-On-Write (COW), TLB Shootdown, and mmap/mprotect/madvise
 
-use std::collections::HashMap;
+use crate::klib::{HashMap, Vec};
+use alloc::string::String;
 
 /// Page Table Flags (x86_64 / ARM64 parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
