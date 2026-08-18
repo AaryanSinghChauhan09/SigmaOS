@@ -10,9 +10,6 @@ pub struct AptPinRule {
     pub package_name_pattern: String,
     pub release_target: String,
     pub priority: i32,
-    pub package_name: String, // Additional field for enhanced compatibility
-    pub origin: String, // Additional field for enhanced compatibility
-    pub pin_priority: i32, // Additional field for enhanced compatibility
 }
 
 impl AptPinRule {
@@ -21,26 +18,13 @@ impl AptPinRule {
             package_name_pattern: pattern.to_string(),
             release_target: release.to_string(),
             priority,
-            package_name: String::new(),
-            origin: String::new(),
-            pin_priority: priority,
         }
     }
-}
-
-/// Debian elementary OS package compliance structure
-#[derive(Debug, Clone)]
-pub struct DebianElementaryAppPackage {
-    pub app_id: String,
-    pub format: String,
-    pub adopts_csd_guideline: bool,
-    pub supports_dark_mode: bool,
 }
 
 /// SAT Solver for dependency resolution
 pub struct SatSolver {
     packages: HashMap<String, Vec<Package>>,
-    pin_rules: Vec<AptPinRule>,
 }
 
 impl SatSolver {
@@ -48,7 +32,6 @@ impl SatSolver {
     pub fn new() -> Self {
         Self {
             packages: HashMap::new(),
-            pin_rules: Vec::new(),
         }
     }
 
@@ -58,41 +41,6 @@ impl SatSolver {
             .entry(package.name.clone())
             .or_default()
             .push(package);
-    }
-
-    /// Add pin rule for APT-style resolution
-    pub fn add_pin_rule(&mut self, rule: AptPinRule) {
-        self.pin_rules.push(rule);
-    }
-
-    /// Validate Debian elementary OS package compliance
-    pub fn is_debian_elementary_package_compliant(&self, pkg: &DebianElementaryAppPackage) -> Result<(), &'static str> {
-        // Check reverse-domain naming convention (e.g., io.elementary.name)
-        if !pkg.app_id.contains('.') {
-            return Err("elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)");
-        }
-
-        let parts: Vec<&str> = pkg.app_id.split('.').collect();
-        if parts.len() < 3 {
-            return Err("elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)");
-        }
-
-        // Check TLD prefix - must be 'io' for elementary OS
-        if parts[0] != "io" {
-            return Err("elementaryOS Package Violation: Invalid app ID top-level domain prefix");
-        }
-
-        // Check CSD (Client-Side Decorations) compliance
-        if !pkg.adopts_csd_guideline {
-            return Err("elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules");
-        }
-
-        // Check dark mode support
-        if !pkg.supports_dark_mode {
-            return Err("elementaryOS Package Violation: App must support toggleable pure-black dark mode");
-        }
-
-        Ok(())
     }
 
     /// Resolve dependencies for target package
@@ -109,7 +57,7 @@ impl SatSolver {
         Ok(result)
     }
 
-    /// Recursive dependency resolution (highly optimized utilizing APT pinning weights)
+    /// Recursive dependency resolution
     fn resolve_recursive(
         &self,
         package_name: &str,
@@ -251,52 +199,6 @@ mod tests {
     use crate::sigpkg::Dependency;
 
     #[test]
-    fn test_debian_elementary_app_package_validator() {
-        let solver = SatSolver::new();
-
-        // 1. Fully compliant package
-        let compliant_app = DebianElementaryAppPackage {
-            app_id: "io.elementary.calculator".to_string(),
-            format: "deb".to_string(),
-            adopts_csd_guideline: true,
-            supports_dark_mode: true,
-        };
-        assert!(solver.is_debian_elementary_package_compliant(&compliant_app).is_ok());
-
-        // 2. Non-compliant: invalid App ID format
-        let mut app = compliant_app.clone();
-        app.app_id = "calculator".to_string();
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)"
-        );
-
-        // 3. Non-compliant: invalid TLD prefix
-        let mut app = compliant_app.clone();
-        app.app_id = "net.elementary.calculator".to_string();
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: Invalid app ID top-level domain prefix"
-        );
-
-        // 4. Non-compliant: missing CSD compliance
-        let mut app = compliant_app.clone();
-        app.adopts_csd_guideline = false;
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules"
-        );
-
-        // 5. Non-compliant: missing dark mode compliance
-        let mut app = compliant_app.clone();
-        app.supports_dark_mode = false;
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App must support toggleable pure-black dark mode"
-        );
-    }
-
-    #[test]
     fn test_sat_solver_creation() {
         let solver = SatSolver::new();
         assert!(solver.packages.is_empty());
@@ -358,35 +260,5 @@ mod tests {
         solver.add_package(pkg_b);
 
         assert!(solver.detect_circular("A"));
-    }
-
-    #[test]
-    fn test_debian_apt_pinning() {
-        let mut solver = SatSolver::new();
-
-        let pkg_unstable = Package::new(
-            "bash".to_string(),
-            Version::new(2, 0, 0),
-            String::new(),
-            Vec::new(),
-            String::new(),
-        );
-
-        let pkg_stable = Package::new(
-            "bash".to_string(),
-            Version::new(1, 0, 0),
-            String::new(),
-            Vec::new(),
-            String::new(),
-        );
-
-        solver.add_package(pkg_unstable);
-        solver.add_package(pkg_stable);
-
-        solver.add_pin_rule(AptPinRule::new("bash", "stable", 990));
-        solver.add_pin_rule(AptPinRule::new("bash", "experimental", 100));
-
-        let resolved = solver.resolve_with_pinning("bash", &VersionConstraint::Any, &solver.pin_rules).unwrap();
-        assert_eq!(resolved.version, Version::new(1, 0, 0));
     }
 }

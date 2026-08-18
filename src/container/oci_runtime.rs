@@ -474,6 +474,7 @@ impl<T> core::ops::Index<usize> for Vec<T> {
 }
 
 impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    type Output = T;
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         assert!(index < self.len, "index out of bounds");
         unsafe { &mut *self.data.add(index) }
@@ -535,7 +536,6 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
         self.iter_mut()
     }
 }
-
 
 
 #[cfg(not(target_os = "none"))]

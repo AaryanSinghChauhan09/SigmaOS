@@ -3,18 +3,6 @@
 
 use std::io::{self, BufRead, Write};
 
-/// Placeholder for Agent Automation Engine
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine {
-    pub enabled: bool,
-}
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        Self { enabled: false }
-    }
-}
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -73,12 +61,6 @@ pub enum ShellCommand {
     Alias {
         shorthand: String,
         statement: String,
-    },
-    Vmm {
-        action: String,
-    },
-    Compat {
-        action: String,
     },
     Unknown(String),
 }
@@ -246,14 +228,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "compat" | "bridge" => {
-                let action = parts.get(1).map(|s| s.to_string()).unwrap_or_else(|| "status".to_string());
-                ShellCommand::Compat { action }
-            }
-            "vmm" | "paging" => {
-                let action = parts.get(1).map(|s| s.to_string()).unwrap_or_else(|| "status".to_string());
-                ShellCommand::Vmm { action }
-            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -504,34 +478,6 @@ impl ShellRepl {
             ShellCommand::Alias { shorthand, statement } => {
                 self.aliases.insert(shorthand.clone(), statement.clone());
                 Ok(format!("Alias defined: {} -> {}", shorthand, statement))
-            }
-            ShellCommand::Vmm { action } => {
-                use crate::kernel::vmm_paging::{VirtualMemoryManager, VmProtection, PageFaultCause};
-                let mut vmm = VirtualMemoryManager::new(0x1000, 1);
-                vmm.mmap(0x0000_7FFF_0000_0000, 16384, VmProtection::rw(), "user_stack").unwrap();
-                vmm.mmap(0x0000_0000_0040_0000, 4096, VmProtection::rx(), "text_segment").unwrap();
-
-                if action == "fault" {
-                    vmm.handle_page_fault(0x0000_7FFF_0000_0100, PageFaultCause::NotPresent).ok();
-                    Ok("Simulated Demand Page Fault resolved for 0x0000_7FFF_0000_0100".to_string())
-                } else {
-                    Ok(vmm.summary())
-                }
-            }
-            ShellCommand::Compat { action } => {
-                use crate::compatibility::distro_bridge::{
-                    BinaryAbiFormat, LinuxBsdAbiBridge, ServiceUnitTranslator,
-                };
-                let bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::LinuxElf64);
-                let mut translator = ServiceUnitTranslator::new();
-
-                if action == "service" {
-                    let sample_unit = "[Unit]\nDescription=Demo Service\n[Service]\nExecStart=/usr/bin/demo\n";
-                    translator.translate_systemd_service("demo", sample_unit).ok();
-                    Ok("Translated Systemd .service unit into SigmaOS lifecycle.".to_string())
-                } else {
-                    Ok(bridge.summary())
-                }
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }

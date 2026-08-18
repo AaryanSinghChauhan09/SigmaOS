@@ -4,7 +4,6 @@
 /// Local LLM Orchestrator for SigmaOS
 /// Dynamically schedules models, checks device bounds, and prunes context windows.
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

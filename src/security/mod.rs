@@ -1,16 +1,12 @@
-// SigmaOS Security Subsystem
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
+
 pub mod audit;
 pub mod capability;
-pub mod hardening;
-pub mod pledge;
-pub mod vulnerability;
+pub mod pqc_enclave;
 
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
-};
-pub use vulnerability::{
-    CIPipelineIntegration, ScanSummary, SimpleCIPipelineIntegration,
-    SimpleVulnerability, Vulnerability, VulnerabilityScanner,
+pub use pqc_enclave::{
+    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
 };
 pub mod capability_enforcer;
 pub mod capability_token;
@@ -23,12 +19,6 @@ pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
-pub mod bridge;
-pub mod deobfuscation;
-pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
-pub mod prism;
-pub mod sandbox;
-pub mod qubes_isolation;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
@@ -37,6 +27,9 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod clipboard;
+pub mod intrusion;
+pub mod password;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -58,10 +51,10 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-// pub use selinux::{
-//     AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
-//     SecurityLabel, SecurityPolicy, SecurityRule,
-// };
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule,
+};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
 pub use vault::{
@@ -74,50 +67,4 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use integrity::{
-    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError as SecIntegrityError,
-    IntegrityStats, IntegrityStatus as SecIntegrityStatus, MonitorCapability, SimpleFile,
-    SimpleIntegrityMonitor as SecSimpleIntegrityMonitor,
-};
-pub use mac::{
-    ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACStats, MLSPolicy,
-    PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
-    SimpleMACEngine,
-};
-pub use pki::{
-    PKIManager as SecPKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
-};
-pub use secrets::{
-    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SimpleKeyring,
-    SimpleSecret,
-};
-pub use vulnerability::{
-    CIPipelineIntegration, ScanSummary, SimpleCIPipelineIntegration,
-    SimpleVulnerability, Vulnerability, VulnerabilityScanner,
-};
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
-pub use parrot_parity::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-};
-pub use parrot_linux::{
-    AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
-    SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionAlert,
-};
-// NemoClaw Security Primitives
-pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
-
-pub struct CronDaemon;
-pub struct CronJob;
-pub struct DmesgLog;
-pub struct FirewallRule;
-pub struct IptablesFirewall;
-pub struct KaliError;
-pub struct PluggableAuthenticationModule;
-pub struct SudoPrivilegeEscalation;
-pub struct SwapSpaceManager;
-pub struct TmuxMultiplexer;
-pub struct TmuxPane;
+pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};

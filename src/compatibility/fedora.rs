@@ -1208,6 +1208,12 @@ impl SovereignCockpitConsole {
     }
 }
 
+impl Default for AnacondaInstaller {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

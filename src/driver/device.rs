@@ -1044,6 +1044,12 @@ pub enum PortAddress {
 }
 
 #[cfg(test)]
+extern "C" {
+    fn malloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     let layout = std::alloc::Layout::from_size_align(size, 8).unwrap();

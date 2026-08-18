@@ -3,6 +3,21 @@ pub mod absorb_tools;
 pub mod apache_ossie;
 pub mod chimera_linux;
 pub mod cross_platform;
+pub mod zorin;
+pub mod antix;
+
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine,
+    ZorinConnectState, ZorinConnectManager,
+    ZorinWindowsAppSupport,
+};
+
+pub use antix::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
+};
 pub mod historic_linux;
 pub mod india_professional_tools;
 pub mod india_stack;

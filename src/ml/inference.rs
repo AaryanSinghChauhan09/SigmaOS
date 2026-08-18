@@ -14,7 +14,7 @@ use core::mem;
 
 pub type ModelID = usize;
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum ModelType { NeuralNetwork = 0, DecisionTree = 1, SVM = 2, Transformer = 3 }
 
@@ -57,7 +57,7 @@ impl SimpleMLModel {
 
 impl MLModel for SimpleMLModel {
     fn id(&self) -> ModelID { self.id }
-    fn model_type(&self) -> ModelType { match self.model_type.load(Ordering::SeqCst) as u32 { 0 => ModelType::NeuralNetwork, 1 => ModelType::DecisionTree, 2 => ModelType::SVM, _ => ModelType::NeuralNetwork } }
+    fn model_type(&self) -> ModelType { unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst) as u32) } }
     fn input_size(&self) -> usize { self.input_size.load(Ordering::SeqCst) }
     fn output_size(&self) -> usize { self.output_size.load(Ordering::SeqCst) }
 
