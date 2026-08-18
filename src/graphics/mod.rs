@@ -10,6 +10,7 @@ pub mod vector_engine;
 pub mod video_timeline;
 pub mod zenith;
 pub mod zenith_compositor;
+pub mod bsd_graphics;
 
 pub use raytracer::{Ray, Sphere, Vec3};
 pub use vector_engine::{PathCommand, Point2D, VectorPath};
@@ -29,4 +30,8 @@ pub use zenith::{
 pub use zenith_compositor::{
     Geometry, WindowNode, WindowState, ZenithCompositor as WaylandZenithCompositor, SCREEN_HEIGHT,
     SCREEN_WIDTH,
+};
+pub use bsd_graphics::{
+    ConsoleDisplayMode, FreeBsdWsconsFbEngine, DrmDumbBuffer, OpenBsdDrmKmsSovereignShim,
+    RenderCommand, DragonFlySmpGraphicsRing, SovereignWaylandFreeBsdCompositor,
 };

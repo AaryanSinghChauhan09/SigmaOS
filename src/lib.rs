@@ -32,7 +32,13 @@ pub mod graphics {
     pub mod compositor;
     pub mod paint;
     pub mod video;
+    pub mod bsd_graphics;
 }
+
+pub use graphics::bsd_graphics::{
+    ConsoleDisplayMode, FreeBsdWsconsFbEngine, DrmDumbBuffer, OpenBsdDrmKmsSovereignShim,
+    RenderCommand, DragonFlySmpGraphicsRing, SovereignWaylandFreeBsdCompositor,
+};
 pub mod hardware {
     pub mod compatibility;
     pub mod win32;
@@ -139,6 +145,10 @@ pub use network::{
 //     Span, SpanCapability, SpanInfo, StackCapability, TraceID,
 // };
 pub use distro::{
+    DistroServiceManager, ServiceState, ServiceUnit,
+    UniversalMountEngine, MountEntry, MountType,
+    InteractiveUserEnvironment, UserAccount, SessionEnvironment,
+    PlugAndPlayHardwareManager, DeviceCategory, HardwareEvent, DeviceNode,
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
     ReleaseStage, SoftwareCertificationProgram,
