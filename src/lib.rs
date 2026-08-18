@@ -32,7 +32,13 @@ pub mod graphics {
     pub mod compositor;
     pub mod paint;
     pub mod video;
+    pub mod bsd_graphics;
 }
+
+pub use graphics::bsd_graphics::{
+    ConsoleDisplayMode, FreeBsdWsconsFbEngine, DrmDumbBuffer, OpenBsdDrmKmsSovereignShim,
+    RenderCommand, DragonFlySmpGraphicsRing, SovereignWaylandFreeBsdCompositor,
+};
 pub mod hardware {
     pub mod compatibility;
     pub mod win32;
@@ -92,6 +98,8 @@ pub use compatibility::{
     LwktScheduler, VKernelEngine, VKernelState,
     ArchInitSystem, ArchPackage, ArchFirewall, DevFile, LsmSentinel, PacmanEngine, PamGate,
     Pkgbuild, PkgbuildParser, AurHelper, MkinitcpioEngine, ArchisoEngine, ProcFile,
+    ArchPkgMeta, AurDependencySolver, PkgbuildPayloadExtractor, ArchisoLivebootBuilder,
+    BsdKqueueMultiplexer, BsdKevent, BsdKqueueFilter, OpenBsdPledgeUnveilFilter,
     FstabEntry, LinuxFstabEngine, LinuxLdSoLoader, LinuxRunlevel, LinuxRunlevelGovernor,
     LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary,
     CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
@@ -111,6 +119,7 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
+    DrmAtomicPlaneState, WaylandDmaBuf, OpenBsdWsdisplayVt,
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
@@ -139,6 +148,10 @@ pub use network::{
 //     Span, SpanCapability, SpanInfo, StackCapability, TraceID,
 // };
 pub use distro::{
+    DistroServiceManager, ServiceState, ServiceUnit,
+    UniversalMountEngine, MountEntry, MountType,
+    InteractiveUserEnvironment, UserAccount, SessionEnvironment,
+    PlugAndPlayHardwareManager, DeviceCategory, HardwareEvent, DeviceNode,
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
     ReleaseStage, SoftwareCertificationProgram,

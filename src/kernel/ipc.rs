@@ -457,8 +457,8 @@ mod tests {
 
         assert_eq!(spliced, 2);
         assert_eq!(splice_engine.bytes_spliced, 6);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![1, 1, 1]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![2, 2, 2]);
+        assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![1, 1, 1]));
+        assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![2, 2, 2]));
     }
 
     #[test]
@@ -476,8 +476,8 @@ mod tests {
         assert_eq!(sent, 4);
         assert_eq!(sendfile_engine.files_sent, 1);
         assert_eq!(sendfile_engine.total_bytes_sent, 4);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![30, 40]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![50, 60]);
+        assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![30, 40]));
+        assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![50, 60]));
     }
 
     #[test]
