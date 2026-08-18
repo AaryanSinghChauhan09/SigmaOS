@@ -31,3 +31,10 @@ pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
 pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
 pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
+    HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
+    KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
+    SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
+    UserAccessGuard, UserPtr,
+};

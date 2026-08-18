@@ -196,6 +196,11 @@ pub use resilience::{
 pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
     PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+    secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
+    HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
+    KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
+    SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
+    UserAccessGuard, UserPtr,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
