@@ -21,7 +21,7 @@
 
 use crate::klib::BTreeMap;
 use crate::sigpkg::Package;
-use std::path::PathBuf;
+use crate::klib::PathBuf;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
@@ -101,7 +101,7 @@ impl ContentAddressedStore {
 
     /// Get package path
     pub fn get_path(&self, name: &str) -> Option<PathBuf> {
-        self.packages.get(name).map(|s| s.path.clone())
+        self.packages.get(&name.to_string()).map(|s| s.path.clone())
     }
 }
 

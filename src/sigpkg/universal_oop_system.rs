@@ -20,66 +20,15 @@
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package as SigPackage, Version, VersionConstraint};
 
-#[cfg(all(not(feature = "standalone_test"), target_os = "none"))]
+#[cfg(target_os = "none")]
 use crate::klib::{HashMap, Arc};
 
-#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
+#[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
+#[cfg(not(target_os = "none"))]
 use std::sync::Arc;
-
-#[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
-#[cfg(feature = "standalone_test")]
-use std::sync::Arc;
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
-}
-
-#[cfg(feature = "standalone_test")]
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
-}
-
-#[cfg(feature = "standalone_test")]
-impl Version {
-    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
-    }
-    pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let mut parts = s.split('.');
-        let major = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
-        let minor = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
-        let patch = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
-        Ok(Self::new(major, minor, patch))
-    }
-}
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Dependency {
-    pub name: String,
-    pub version_constraint: VersionConstraint,
-}
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum VersionConstraint {
-    Any,
-}
-
-#[cfg(feature = "standalone_test")]
-pub struct Package;
 
 // ============================================================================
 // Core Abstractions (OOP Interface Layer)

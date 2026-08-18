@@ -42,6 +42,7 @@ pub struct SnapcraftManifest {
     pub description: String,
     pub grade: String,
     pub confinement: String,
+    pub permissions: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -50,6 +51,7 @@ pub struct FlatpakManifest {
     pub runtime: String,
     pub sdk: String,
     pub command: String,
+    pub permissions: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -137,11 +139,12 @@ impl DebAdapter {
                     "Description" => description = val.to_string(),
                     "Priority" => {
                         priority = match val.to_lowercase().as_str() {
-                            "essential" => PackagePriority::Essential,
                             "required" => PackagePriority::Required,
                             "important" => PackagePriority::Important,
                             "standard" => PackagePriority::Standard,
-                            _ => PackagePriority::Optional,
+                            "optional" => PackagePriority::Optional,
+                            "extra" => PackagePriority::Extra,
+                            _ => PackagePriority::Required,
                         };
                     }
                     _ => {}
@@ -198,7 +201,10 @@ impl DebAdapter {
         Ok(PacmanPkgbuild {
             pkgname,
             pkgver,
+            pkgrel: "1".to_string(),
             depends,
+            makedepends: Vec::new(),
+            description: String::new(),
         })
     }
 
@@ -208,7 +214,7 @@ impl DebAdapter {
         let mut version = String::new();
         let mut summary = String::new();
         let mut confinement = String::new();
-        let mut plugs = Vec::new();
+        let mut permissions = Vec::new();
 
         let mut in_plugs_block = false;
 
@@ -229,14 +235,14 @@ impl DebAdapter {
                     "plugs" => {
                         in_plugs_block = true;
                         if !val.is_empty() {
-                            plugs.push(val.to_string());
+                            permissions.push(val.to_string());
                         }
                     }
                     _ => {}
                 }
             } else if line.starts_with("- ") && in_plugs_block {
                 let plug_name = line["- ".len()..].trim();
-                plugs.push(plug_name.to_string());
+                permissions.push(plug_name.to_string());
             }
         }
 
@@ -248,8 +254,10 @@ impl DebAdapter {
             name,
             version,
             summary,
+            description: String::new(),
+            grade: "stable".to_string(),
             confinement,
-            plugs,
+            permissions,
         })
     }
 
@@ -257,7 +265,7 @@ impl DebAdapter {
     pub fn parse_flatpak_json(&self, text: &str) -> Result<FlatpakManifest, &'static str> {
         let mut app_id = String::new();
         let mut command = String::new();
-        let mut finish_args = Vec::new();
+        let mut permissions = Vec::new();
 
         let mut in_finish_args = false;
 
@@ -286,7 +294,7 @@ impl DebAdapter {
                 let arg = line
                     .trim_matches(|c| c == ',' || c == '"' || c == ' ' || c == '\n')
                     .to_string();
-                finish_args.push(arg);
+                permissions.push(arg);
             }
         }
 
@@ -296,8 +304,10 @@ impl DebAdapter {
 
         Ok(FlatpakManifest {
             app_id,
+            runtime: "org.freedesktop.Platform".to_string(),
+            sdk: "org.freedesktop.Sdk".to_string(),
             command,
-            finish_args,
+            permissions,
         })
     }
 

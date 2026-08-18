@@ -39,6 +39,8 @@ pub use hash::{djb2_hash, simple_hash, fnv1a_hash, xor_hash, SimpleHasher, combi
 // For other collections, use std when available
 #[cfg(not(target_os = "none"))]
 pub use std::string::String;
+#[cfg(not(target_os = "none"))]
+pub use std::path::PathBuf;
 
 // Re-export string utilities
 pub use string::format_int;
