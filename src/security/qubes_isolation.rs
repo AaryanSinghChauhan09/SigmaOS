@@ -19,7 +19,10 @@ impl CapabilityToken {
     }
 }
 
+#[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(test)]
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DomainID = usize;
 
@@ -543,7 +546,7 @@ mod tests {
     fn test_qubes_disposable_domain_cleanup() {
         let mut orchestrator = DomainOrchestrator::new();
 
-        let app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
+        let _app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
         let disp_id = orchestrator.spawn_domain(b"disp-browser", DomainType::Disposable, CapabilityToken::from_bits(0x00)).unwrap();
 
         assert_eq!(orchestrator.active_domains_count(), 2);
