@@ -4,6 +4,7 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -434,5 +435,140 @@ mod tests {
         let plugin_ref = manager.get_plugin(42).unwrap();
         assert_eq!(plugin_ref.name(), b"SovereignSecurityAgent");
         assert_eq!(plugin_ref.version(), (1, 0, 0));
+    }
+}
+
+// ==========================================
+// PLUGIN MARKETPLACE (VS Code & GNOME Extensions Parity)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExtensionType {
+    VsCodeExtension,
+    GnomeExtension,
+    SigmaNativeExtension,
+}
+
+#[derive(Clone)]
+pub struct MarketplaceItem {
+    pub id: PluginID,
+    pub name: String,
+    pub publisher: String,
+    pub category: String,
+    pub rating: f32,
+    pub downloads: u64,
+    pub is_verified: bool,
+    pub extension_type: ExtensionType,
+}
+
+pub struct PluginMarketplace {
+    pub catalog: Vec<MarketplaceItem>,
+}
+
+impl PluginMarketplace {
+    pub fn new() -> Self {
+        Self { catalog: Vec::new() }
+    }
+
+    pub fn register_item(&mut self, item: MarketplaceItem) {
+        self.catalog.push(item);
+    }
+
+    pub fn search(&self, query: &str) -> Vec<MarketplaceItem> {
+        let mut results = Vec::new();
+        for item in &self.catalog {
+            if item.name.contains(query) || item.publisher.contains(query) || item.category.contains(query) {
+                results.push(item.clone());
+            }
+        }
+        results
+    }
+
+    pub fn filter_by_type(&self, ext_type: ExtensionType) -> Vec<MarketplaceItem> {
+        let mut results = Vec::new();
+        for item in &self.catalog {
+            if item.extension_type == ext_type {
+                results.push(item.clone());
+            }
+        }
+        results
+    }
+
+    pub fn install_plugin_to_manager(
+        &self,
+        item_id: PluginID,
+        manager: &mut SimplePluginManager,
+    ) -> Result<PluginID, PluginError> {
+        for item in &self.catalog {
+            if item.id == item_id {
+                let name_bytes = item.name.as_bytes();
+                let plugin = SimplePlugin::new(
+                    item.id,
+                    name_bytes,
+                    (1, 0, 0),
+                    PluginCapability::full(),
+                );
+                return manager.load_plugin(Box::new(plugin));
+            }
+        }
+        Err(PluginError::InvalidState)
+    }
+}
+
+impl Default for PluginMarketplace {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod marketplace_tests {
+    use super::*;
+
+    #[test]
+    fn test_plugin_marketplace_search_and_install() {
+        let mut marketplace = PluginMarketplace::new();
+        marketplace.register_item(MarketplaceItem {
+            id: 101,
+            name: String::from("rust-analyzer-sigma"),
+            publisher: String::from("RustLang"),
+            category: String::from("Programming Languages"),
+            rating: 4.9,
+            downloads: 125000,
+            is_verified: true,
+            extension_type: ExtensionType::VsCodeExtension,
+        });
+
+        marketplace.register_item(MarketplaceItem {
+            id: 102,
+            name: String::from("dash-to-dock-sigma"),
+            publisher: String::from("GnomeDevs"),
+            category: String::from("Desktop Themes"),
+            rating: 4.7,
+            downloads: 89000,
+            is_verified: true,
+            extension_type: ExtensionType::GnomeExtension,
+        });
+
+        // Search test
+        let search_results = marketplace.search("rust");
+        assert_eq!(search_results.len(), 1);
+        assert_eq!(search_results[0].name, "rust-analyzer-sigma");
+
+        // Filter by extension type test
+        let gnome_exts = marketplace.filter_by_type(ExtensionType::GnomeExtension);
+        assert_eq!(gnome_exts.len(), 1);
+        assert_eq!(gnome_exts[0].id, 102);
+
+        // Installation test into SimplePluginManager
+        let mut manager = SimplePluginManager::new(ManagerCapability::full());
+        let installed_id = marketplace.install_plugin_to_manager(101, &mut manager).unwrap();
+        assert_eq!(installed_id, 101);
+
+        let stats = manager.stats();
+        assert_eq!(stats.loaded_plugins, 1);
+
+        let loaded_plugin = manager.get_plugin(101).unwrap();
+        assert_eq!(loaded_plugin.name(), b"rust-analyzer-sigma");
     }
 }

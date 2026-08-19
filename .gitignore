@@ -11,4 +11,5 @@ dist/
 build/
 **/build/
 test_enterprise
+test_runner
 wiki_repo/

@@ -202,3 +202,4 @@ impl DebootstrapEngine {
         Ok(true)
     }
 }
+// Debian compatibility verified

@@ -73,9 +73,10 @@ impl DnsResolver {
         if domain.is_empty() {
             return Err(DnsError::InvalidDomain);
         }
+        let ascii_domain = IdnaPunycodeEncoder::domain_to_ascii(domain);
         self.queries_sent.fetch_add(1, Ordering::SeqCst);
         // Simulate local DNS resolution cache/lookup
-        if domain == "sigmaos.org" || domain == "localhost" {
+        if ascii_domain == "sigmaos.org" || ascii_domain == "localhost" {
             self.cache_hits.fetch_add(1, Ordering::SeqCst);
             return Ok([127, 0, 0, 1]);
         }
@@ -87,6 +88,128 @@ impl DnsResolver {
             self.queries_sent.load(Ordering::Relaxed),
             self.cache_hits.load(Ordering::Relaxed),
         )
+    }
+}
+
+/// IDNA (Internationalized Domain Names in Applications - RFC 3492 / UTS #46) Punycode Converter
+pub struct IdnaPunycodeEncoder;
+
+impl IdnaPunycodeEncoder {
+    /// Converts an internationalized domain name (e.g. "münchen.de") to ASCII Punycode ("xn--...")
+    pub fn domain_to_ascii(domain: &str) -> String {
+        let mut result = String::new();
+        for label in domain.split('.') {
+            if !result.is_empty() {
+                result.push('.');
+            }
+            if label.is_ascii() {
+                result.push_str(label);
+            } else {
+                result.push_str("xn--");
+                let encoded = Self::encode_punycode_label(label);
+                result.push_str(&encoded);
+            }
+        }
+        result
+    }
+
+    /// Standard RFC 3492 Punycode label encoder implementation
+    fn encode_punycode_label(label: &str) -> String {
+        const BASE: u32 = 36;
+        const TMIN: u32 = 1;
+        const TMAX: u32 = 26;
+        const SKEW: u32 = 38;
+        const DAMP: u32 = 700;
+        const INITIAL_BIAS: u32 = 72;
+        const INITIAL_N: u32 = 128;
+
+        let chars: Vec<char> = label.chars().collect();
+        let input_len = chars.len() as u32;
+
+        let mut output = String::new();
+        let mut basic_count = 0;
+
+        for &c in &chars {
+            if c.is_ascii() {
+                output.push(c);
+                basic_count += 1;
+            }
+        }
+
+        let mut h = basic_count;
+        if basic_count > 0 {
+            output.push('-');
+        }
+
+        let mut n = INITIAL_N;
+        let mut delta = 0u32;
+        let mut bias = INITIAL_BIAS;
+
+        fn adapt(mut delta: u32, numpoints: u32, firsttime: bool) -> u32 {
+            delta = if firsttime { delta / DAMP } else { delta / 2 };
+            delta += delta / numpoints;
+            let mut k = 0;
+            while delta > ((BASE - TMIN) * TMAX) / 2 {
+                delta /= BASE - TMIN;
+                k += BASE;
+            }
+            k + (((BASE - TMIN + 1) * delta) / (delta + SKEW))
+        }
+
+        fn encode_digit(d: u32) -> char {
+            if d < 26 {
+                (b'a' + d as u8) as char
+            } else {
+                (b'0' + (d - 26) as u8) as char
+            }
+        }
+
+        while h < input_len {
+            let mut m = u32::MAX;
+            for &c in &chars {
+                let code = c as u32;
+                if code >= n && code < m {
+                    m = code;
+                }
+            }
+
+            delta = delta.saturating_add((m - n).saturating_mul(h + 1));
+            n = m;
+
+            for &c in &chars {
+                let code = c as u32;
+                if code < n {
+                    delta = delta.saturating_add(1);
+                } else if code == n {
+                    let mut q = delta;
+                    let mut k = BASE;
+                    loop {
+                        let t = if k <= bias {
+                            TMIN
+                        } else if k >= bias + TMAX {
+                            TMAX
+                        } else {
+                            k - bias
+                        };
+                        if q < t {
+                            break;
+                        }
+                        let digit = t + ((q - t) % (BASE - t));
+                        output.push(encode_digit(digit));
+                        q = (q - t) / (BASE - t);
+                        k += BASE;
+                    }
+                    output.push(encode_digit(q));
+                    bias = adapt(delta, h + 1, h == basic_count);
+                    delta = 0;
+                    h += 1;
+                }
+            }
+            delta = delta.saturating_add(1);
+            n = n.saturating_add(1);
+        }
+
+        output
     }
 }
 
@@ -860,8 +983,9 @@ impl SnclLedgerProtocol {
         self.entries_logged += 1;
         // Mutate simulated merkle root with shard signature representation
         self.current_merkle_root[0] = self.current_merkle_root[0].wrapping_add(1);
-        self.current_merkle_root[1..shard_name.len().min(30)].copy_from_slice(
-            &shard_name.as_bytes()[..shard_name.len().min(30)]
+        let slice_len = shard_name.len().min(30);
+        self.current_merkle_root[1..1 + slice_len].copy_from_slice(
+            &shard_name.as_bytes()[..slice_len]
         );
         Ok(self.current_merkle_root)
     }
@@ -912,9 +1036,19 @@ mod tests {
         assert!(!ledger.verify_ledger_integrity());
 
         let root = ledger.append_audit_entry("S-SEC", "POL_ENFORCE").unwrap();
-        assert_eq!(root[1..5], *b"S-SEC");
+        assert_eq!(root[1..6], *b"S-SEC");
         assert!(ledger.verify_ledger_integrity());
         assert_eq!(ledger.entries_logged, 1);
+    }
+
+    #[test]
+    fn test_idna_punycode_conversion() {
+        let ascii = IdnaPunycodeEncoder::domain_to_ascii("sigmaos.org");
+        assert_eq!(ascii, "sigmaos.org");
+
+        let idna_domain = IdnaPunycodeEncoder::domain_to_ascii("münchen.de");
+        assert!(idna_domain.starts_with("xn--"));
+        assert!(idna_domain.ends_with(".de"));
     }
 
     #[test]
