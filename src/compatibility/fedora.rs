@@ -4,7 +4,13 @@
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-use std::collections::HashMap;
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Default)]
 pub struct SovereignCockpitConsole;
@@ -13,8 +19,8 @@ impl SovereignCockpitConsole { pub fn new() -> Self { Self } }
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
 pub struct DnfPackageResolver {
-    pub packages: HashMap<String, Vec<String>>, // pkg_name -> dependencies
-    pub installed: HashMap<String, String>,      // pkg_name -> version
+    pub packages: BTreeMap<String, Vec<String>>, // pkg_name -> dependencies
+    pub installed: BTreeMap<String, String>,      // pkg_name -> version
     pub repodata_synced: bool,
     pub signatures_verified: bool,
 }
@@ -22,8 +28,8 @@ pub struct DnfPackageResolver {
 impl DnfPackageResolver {
     pub fn new() -> Self {
         DnfPackageResolver {
-            packages: HashMap::new(),
-            installed: HashMap::new(),
+            packages: BTreeMap::new(),
+            installed: BTreeMap::new(),
             repodata_synced: false,
             signatures_verified: false,
         }
@@ -57,7 +63,7 @@ impl DnfPackageResolver {
         }
 
         let mut install_order = Vec::new();
-        let mut visited = HashMap::new();
+        let mut visited = BTreeMap::new();
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
 
@@ -72,7 +78,7 @@ impl DnfPackageResolver {
         &self,
         name: &str,
         order: &mut Vec<String>,
-        visited: &mut HashMap<String, bool>,
+        visited: &mut BTreeMap<String, bool>,
     ) -> Result<(), String> {
         if let Some(&in_progress) = visited.get(name) {
             if in_progress {
@@ -193,15 +199,15 @@ impl KojiBuildServer {
 /// BodhiUpdateTriage mimics Fedora's update triage system (Bodhi).
 /// It handles community feedback, accumulates karma, and gates the transition to stable.
 pub struct BodhiUpdateTriage {
-    pub updates: HashMap<String, i32>, // update_id -> karma
-    pub stable_gated: HashMap<String, bool>, // update_id -> is_gated
+    pub updates: BTreeMap<String, i32>, // update_id -> karma
+    pub stable_gated: BTreeMap<String, bool>, // update_id -> is_gated
 }
 
 impl BodhiUpdateTriage {
     pub fn new() -> Self {
         BodhiUpdateTriage {
-            updates: HashMap::new(),
-            stable_gated: HashMap::new(),
+            updates: BTreeMap::new(),
+            stable_gated: BTreeMap::new(),
         }
     }
 
@@ -242,13 +248,13 @@ pub struct SigmaChangeProposal {
 
 /// Tracks, gates, and updates technological transitions within SigmaOS, inspired by Fedora's Change Process.
 pub struct SigmaChangeProcessEngine {
-    pub proposals: HashMap<String, SigmaChangeProposal>,
+    pub proposals: BTreeMap<String, SigmaChangeProposal>,
 }
 
 impl SigmaChangeProcessEngine {
     pub fn new() -> Self {
         SigmaChangeProcessEngine {
-            proposals: HashMap::new(),
+            proposals: BTreeMap::new(),
         }
     }
 
@@ -265,7 +271,7 @@ impl SigmaChangeProcessEngine {
         }
     }
 
-    pub fn get_proposals(&self) -> &HashMap<String, SigmaChangeProposal> {
+    pub fn get_proposals(&self) -> &BTreeMap<String, SigmaChangeProposal> {
         &self.proposals
     }
 }
@@ -761,12 +767,12 @@ pub enum SeLinuxMode {
 
 pub struct SeLinuxEnforcer {
     pub mode: SeLinuxMode,
-    pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
+    pub allowed_transitions: BTreeMap<String, Vec<String>>, // src_type -> dest_types
 }
 
 impl SeLinuxEnforcer {
     pub fn new(mode: SeLinuxMode) -> Self {
-        let mut transitions = HashMap::new();
+        let mut transitions = BTreeMap::new();
         transitions.insert("httpd_t".to_string(), vec!["httpd_sys_content_t".to_string()]);
         Self {
             mode,
@@ -951,18 +957,18 @@ impl SovereignSeLinuxContext {
 
 pub struct SovereignSeLinuxEngine {
     pub mode: SeLinuxMode,
-    pub file_contexts: HashMap<String, SovereignSeLinuxContext>,
-    pub allowed_transitions: HashMap<String, Vec<String>>,
-    pub domain_permissions: HashMap<String, HashMap<String, Vec<String>>>,
+    pub file_contexts: BTreeMap<String, SovereignSeLinuxContext>,
+    pub allowed_transitions: BTreeMap<String, Vec<String>>,
+    pub domain_permissions: BTreeMap<String, BTreeMap<String, Vec<String>>>,
 }
 
 impl SovereignSeLinuxEngine {
     pub fn new(mode: SeLinuxMode) -> Self {
         Self {
             mode,
-            file_contexts: HashMap::new(),
-            allowed_transitions: HashMap::new(),
-            domain_permissions: HashMap::new(),
+            file_contexts: BTreeMap::new(),
+            allowed_transitions: BTreeMap::new(),
+            domain_permissions: BTreeMap::new(),
         }
     }
 
@@ -980,7 +986,7 @@ impl SovereignSeLinuxEngine {
     pub fn add_permission(&mut self, domain: &str, class: &str, permission: &str) {
         self.domain_permissions
             .entry(domain.to_string())
-            .or_insert_with(HashMap::new)
+            .or_insert_with(BTreeMap::new)
             .entry(class.to_string())
             .or_insert_with(Vec::new)
             .push(permission.to_string());
@@ -1036,19 +1042,19 @@ impl SovereignSeLinuxEngine {
 // ==========================================
 
 pub struct SovereignFirewalldManager {
-    pub active_zones: HashMap<String, Vec<String>>,
-    pub zone_allowed_ports: HashMap<String, Vec<u16>>,
+    pub active_zones: BTreeMap<String, Vec<String>>,
+    pub zone_allowed_ports: BTreeMap<String, Vec<u16>>,
     pub default_zone: String,
 }
 
 impl SovereignFirewalldManager {
     pub fn new() -> Self {
-        let mut active_zones = HashMap::new();
+        let mut active_zones = BTreeMap::new();
         active_zones.insert("public".to_string(), Vec::new());
         active_zones.insert("trusted".to_string(), Vec::new());
         active_zones.insert("work".to_string(), Vec::new());
 
-        let mut zone_allowed_ports = HashMap::new();
+        let mut zone_allowed_ports = BTreeMap::new();
         zone_allowed_ports.insert("public".to_string(), vec![22, 80, 443]);
         zone_allowed_ports.insert("trusted".to_string(), (1..=65535).collect());
         zone_allowed_ports.insert("work".to_string(), vec![22, 80, 443, 8080]);
@@ -1112,12 +1118,12 @@ impl SovereignFirewalldManager {
 
 pub struct SeLinuxEnforcer {
     pub mode: SeLinuxMode,
-    pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
+    pub allowed_transitions: BTreeMap<String, Vec<String>>, // src_type -> dest_types
 }
 
 impl SeLinuxEnforcer {
     pub fn new(mode: SeLinuxMode) -> Self {
-        let mut transitions = HashMap::new();
+        let mut transitions = BTreeMap::new();
         transitions.insert("httpd_t".to_string(), vec!["httpd_sys_content_t".to_string()]);
         Self {
             mode,
@@ -1195,7 +1201,7 @@ impl CoprRepositoryManager {
 pub struct SovereignCockpitConsole {
     pub is_listening: bool,
     pub connected_clients: usize,
-    pub metrics: HashMap<String, f64>,
+    pub metrics: BTreeMap<String, f64>,
 }
 
 impl SovereignCockpitConsole {
@@ -1203,7 +1209,7 @@ impl SovereignCockpitConsole {
         Self {
             is_listening: false,
             connected_clients: 0,
-            metrics: HashMap::new(),
+            metrics: BTreeMap::new(),
         }
     }
 

@@ -19,7 +19,7 @@
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// Sigma-Aid Daemon: AI-Native LLM Orchestrator
 /// Provides an OOP interface for GGUF model execution and local inference
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

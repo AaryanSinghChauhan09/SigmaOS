@@ -673,7 +673,7 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 }
 
 #[cfg(test)]
-unsafe fn free(ptr: *mut u8) {
+unsafe fn free(_ptr: *mut u8) {
     // No-op for test stub allocation
 }
 

@@ -31,7 +31,13 @@
 // 10. Sovereign Recover Utility (sigma-recover): Sector node recovery from pristine backups
 // 11. Asynchronous Shard Ignition (ASI) with write-once system images (CoreOS Parity)
 
-use std::collections::{BTreeMap, VecDeque};
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::{BTreeMap, VecDeque};
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 // ==========================================
