@@ -1,8 +1,8 @@
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
-use std::collections::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH};
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
 
 /// Recovery event type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,22 +33,20 @@ pub enum RecoveryAction {
 pub struct SystemSnapshot {
     pub id: String,
     pub timestamp: u64,
-    pub system_state: HashMap<String, String>,
-    pub configuration: HashMap<String, String>,
+    pub system_state: BTreeMap<String, String>,
+    pub configuration: BTreeMap<String, String>,
     pub description: String,
 }
 
 impl SystemSnapshot {
     pub fn new(description: String) -> Self {
-        let timestamp_nanos = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_nanos())
-            .unwrap_or(0);
+        // Simple timestamp counter (in real implementation, use hardware timer)
+        let timestamp_nanos = 0u128; // Placeholder for actual timer
         Self {
-            id: format!("snap-{}", timestamp_nanos),
+            id: alloc::format!("snap-{}", timestamp_nanos),
             timestamp: (timestamp_nanos / 1_000_000_000) as u64,
-            system_state: HashMap::new(),
-            configuration: HashMap::new(),
+            system_state: BTreeMap::new(),
+            configuration: BTreeMap::new(),
             description,
         }
     }
@@ -98,7 +96,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        context: &HashMap<String, String>,
+        context: &BTreeMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;
@@ -202,7 +200,7 @@ impl SelfHealingModule {
     pub fn handle_event(
         &mut self,
         event_type: RecoveryEventType,
-        context: HashMap<String, String>,
+        context: BTreeMap<String, String>,
     ) -> Vec<RecoveryAction> {
         // Log the event
         self.event_log.push((
@@ -350,8 +348,8 @@ impl DoubleFaultGuard {
 
 /// Highly robust System Stability and Fault Tolerance Monitor
 pub struct SystemStabilityMonitor {
-    pub heartbeats: HashMap<String, ShardHeartbeat>,
-    pub fault_guards: HashMap<String, DoubleFaultGuard>,
+    pub heartbeats: BTreeMap<String, ShardHeartbeat>,
+    pub fault_guards: BTreeMap<String, DoubleFaultGuard>,
     pub system_health_score: u32, // 0 to 100
     pub is_degraded_safety_mode: bool,
 }
@@ -359,8 +357,8 @@ pub struct SystemStabilityMonitor {
 impl SystemStabilityMonitor {
     pub fn new() -> Self {
         Self {
-            heartbeats: HashMap::new(),
-            fault_guards: HashMap::new(),
+            heartbeats: BTreeMap::new(),
+            fault_guards: BTreeMap::new(),
             system_health_score: 100,
             is_degraded_safety_mode: false,
         }
@@ -462,7 +460,7 @@ mod tests {
     #[test]
     fn test_event_handling() {
         let mut module = SelfHealingModule::new();
-        let actions = module.handle_event(RecoveryEventType::ProcessCrash, HashMap::new());
+        let actions = module.handle_event(RecoveryEventType::ProcessCrash, BTreeMap::new());
         assert!(!actions.is_empty());
     }
 

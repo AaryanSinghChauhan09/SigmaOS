@@ -1,8 +1,8 @@
 // SigmaOS Polish-Parity System Backup (SigmaTimeshift)
 // Designed for automated, transaction-safe snapshots and system recovery
 
-use std::collections::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH};
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BackupError {
@@ -16,7 +16,7 @@ pub struct BackupSnapshot {
     pub id: String,
     pub timestamp: u64,
     pub label: String,
-    pub files_hash: HashMap<String, String>,
+    pub files_hash: BTreeMap<String, String>,
 }
 
 pub struct SigmaTimeshift {
@@ -34,13 +34,11 @@ impl SigmaTimeshift {
         }
     }
 
-    pub fn create_snapshot(&mut self, label: String, system_files: HashMap<String, String>) -> Result<String, BackupError> {
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_secs())
-            .unwrap_or(0);
+    pub fn create_snapshot(&mut self, label: String, system_files: BTreeMap<String, String>) -> Result<String, BackupError> {
+        // Simple timestamp counter (in real implementation, use hardware timer)
+        let timestamp = 0u64; // Placeholder for actual timer
 
-        let id = format!("timeshift-snap-{}", timestamp);
+        let id = alloc::format!("timeshift-snap-{}", timestamp);
         let snapshot = BackupSnapshot {
             id: id.clone(),
             timestamp,
@@ -52,7 +50,7 @@ impl SigmaTimeshift {
         Ok(id)
     }
 
-    pub fn restore_snapshot(&self, id: &str) -> Result<HashMap<String, String>, BackupError> {
+    pub fn restore_snapshot(&self, id: &str) -> Result<BTreeMap<String, String>, BackupError> {
         if let Some(snap) = self.snapshots.iter().find(|s| s.id == id) {
             Ok(snap.files_hash.clone())
         } else {
@@ -77,7 +75,7 @@ mod tests {
     #[test]
     fn test_timeshift_backup() {
         let mut timeshift = SigmaTimeshift::new();
-        let mut files = HashMap::new();
+        let mut files = BTreeMap::new();
         files.insert("/etc/hosts".to_string(), "hash123".to_string());
         files.insert("/bin/sigma-sh".to_string(), "hash456".to_string());
 
