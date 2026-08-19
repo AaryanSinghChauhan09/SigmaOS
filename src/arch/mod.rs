@@ -1,10 +1,15 @@
 pub mod hal;
 pub mod portability;
 pub mod cpu_sys;
+pub mod cpu_features;
 pub mod comprehensive;
 pub mod arm_bx_formats;
 
 pub use cpu_sys::{SegmentType, GdtDescriptor, IdtGate, VirtualMemoryRegion, ProcessorInitSuite, FastSyscallDispatcher};
+pub use cpu_features::{
+    CpuInstructionExtension, SovereignCompilerOptimizer, SovereignRegisterSet,
+    SovereignCpuRegisters, SovereignX86Topology, SovereignXcr0State,
+};
 pub use comprehensive::{
     PageTableEntry, MultiLevelPaging, ArmExceptionLevel, ArmV8ProcessorState,
     NtMajorFunction, IoStatusBlock, IoRequestPacket, ObjectType as NtObjectType,
