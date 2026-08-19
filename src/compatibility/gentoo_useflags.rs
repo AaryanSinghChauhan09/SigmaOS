@@ -1,9 +1,14 @@
 //! Gentoo-Inspired USE Flags and Source Compilation System
 
-use std::collections::{HashMap, HashSet};
-use serde::{Deserialize, Serialize};
+#![no_std]
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+extern crate alloc;
+
+use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::string::String;
+use alloc::vec::Vec;
+
+#[derive(Debug, Clone)]
 pub struct UseFlag {
     pub name: String,
     pub description: String,
@@ -12,15 +17,15 @@ pub struct UseFlag {
 
 #[derive(Debug, Clone)]
 pub struct UseFlagManager {
-    global_flags: HashSet<String>,
-    package_flags: HashMap<String, HashSet<String>>,
+    global_flags: BTreeSet<String>,
+    package_flags: BTreeMap<String, BTreeSet<String>>,
 }
 
 impl UseFlagManager {
     pub fn new() -> Self {
         let mut manager = Self {
-            global_flags: HashSet::new(),
-            package_flags: HashMap::new(),
+            global_flags: BTreeSet::new(),
+            package_flags: BTreeMap::new(),
         };
         manager.initialize_defaults();
         manager

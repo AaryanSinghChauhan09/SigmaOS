@@ -1,7 +1,13 @@
 // SigmaOS Kernel Persona Containers & Syscall Graph
 // Encapsulates lightweight legacy kernel version mimicry and graph-based dynamic syscall mapping
 
-use std::collections::HashMap;
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PersonaVersion {
@@ -56,15 +62,15 @@ pub struct SyscallNode {
 }
 
 pub struct SyscallGraph {
-    pub nodes: HashMap<u32, SyscallNode>,
-    pub translation_edges: HashMap<u32, u32>, // maps old syscall number -> modern syscall number
+    pub nodes: BTreeMap<u32, SyscallNode>,
+    pub translation_edges: BTreeMap<u32, u32>, // maps old syscall number -> modern syscall number
 }
 
 impl SyscallGraph {
     pub fn new() -> Self {
         let mut graph = SyscallGraph {
-            nodes: HashMap::new(),
-            translation_edges: HashMap::new(),
+            nodes: BTreeMap::new(),
+            translation_edges: BTreeMap::new(),
         };
         // Seed default legacy-to-modern syscall mappings
         graph.add_syscall(1, SyscallCategory::Process, "sys_exit_legacy".to_string(), true);

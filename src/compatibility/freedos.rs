@@ -2,8 +2,13 @@
 // Fully absorbs and implements all features, systems, and philosophies of FreeDOS:
 // AUTOEXEC.BAT batch files, CONFIG.SYS drivers, INT 21h MS-DOS syscalls, TSR multiplexing, FAT32/LBA filesystems, and shell utilities.
 
-use std::collections::{BTreeMap, VecDeque};
-use std::path::{Path, PathBuf};
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::{BTreeMap, VecDeque};
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Represents CONFIG.SYS driver or parameter settings
 #[derive(Debug, Clone)]
@@ -37,8 +42,8 @@ pub struct FreeDosEmulator {
     pub autoexec_bat: Vec<String>,
     pub tsrs: Vec<TsrProgram>,
     pub environment: BTreeMap<String, String>,
-    pub fat_entries: BTreeMap<PathBuf, Vec<FatDirectoryEntry>>,
-    pub files: BTreeMap<PathBuf, Vec<u8>>,
+    pub fat_entries: BTreeMap<String, Vec<FatDirectoryEntry>>,
+    pub files: BTreeMap<String, Vec<u8>>,
     pub output_stream: Vec<String>,
     pub input_buffer: VecDeque<String>,
 }
@@ -170,9 +175,9 @@ impl FreeDosEmulator {
             }
             0x3C => {
                 // Create File (DX = filename pointer, CX = attribute)
-                let path = PathBuf::from(format!("C:\\DOS_FILE_{}.TXT", dx));
+                let path = format!("C:\\DOS_FILE_{}.TXT", dx);
                 self.files.insert(path.clone(), Vec::new());
-                self.output_stream.push(format!("Created DOS file: {:?}", path));
+                self.output_stream.push(format!("Created DOS file: {}", path));
                 Ok(1) // Return file handle
             }
             0x3F => {
@@ -183,7 +188,7 @@ impl FreeDosEmulator {
             }
             0x40 => {
                 // Write to File (BX = handle, CX = length)
-                let path = PathBuf::from(format!("C:\\DOS_FILE_1.TXT"));
+                let path = format!("C:\\DOS_FILE_1.TXT");
                 if let Some(buf) = self.files.get_mut(&path) {
                     buf.extend_from_slice(&vec![0xAA; cx as usize]);
                 }
@@ -316,7 +321,7 @@ mod tests {
         let written = dos.handle_interrupt_21h(0x40, 1, 12).unwrap(); // Write
         assert_eq!(written, 12);
 
-        assert_eq!(dos.files.get(&PathBuf::from("C:\\DOS_FILE_1.TXT")).unwrap().len(), 12);
+        assert_eq!(dos.files.get("C:\\DOS_FILE_1.TXT").unwrap().len(), 12);
     }
 
     #[test]
