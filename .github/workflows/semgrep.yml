@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@11bd5193b48c4b3c7778881999d4b1d7e0ba3a8c # v4.2.2
       - run: semgrep scan --config auto --sarif --output=semgrep.sarif
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@8685613e7270999a0b60a2bb20a5666b789c9b0e # v3.27.9
         with:
           sarif_file: semgrep.sarif
         if: always()
