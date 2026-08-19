@@ -2,20 +2,19 @@
 // Localized, high-performance, OOP-compliant tools for Indian Professionals.
 // Refers to India-Apps-Overview.md and India-first architecture.
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use crate::klib::HashMap;
 
 /// 1. Legal & Judicial Professionals (`sigma-judicial`)
 /// Manages Bharatiya Nyaya Sanhita (BNS), Bharatiya Nagarik Suraksha Sanhita (BNSS),
 /// and Bharatiya Sakshya Adhiniyam (BSA) case schedules and bail readiness.
 pub struct JudicialTimelinePlanner {
-    pub active_cases: BTreeMap<String, u64>,
+    pub active_cases: HashMap<String, u64>,
 }
 
 impl JudicialTimelinePlanner {
     pub fn new() -> Self {
         Self {
-            active_cases: BTreeMap::new(),
+            active_cases: HashMap::new(),
         }
     }
 
@@ -30,7 +29,11 @@ impl JudicialTimelinePlanner {
     }
 
     /// Evaluates if an accused is ready for default bail under Section 480 of BNSS
-    pub fn calculate_bail_readiness(&self, offense_gravity: &str, days_in_custody: u32) -> Result<bool, &'static str> {
+    pub fn calculate_bail_readiness(
+        &self,
+        offense_gravity: &str,
+        days_in_custody: u32,
+    ) -> Result<bool, &'static str> {
         match offense_gravity {
             "LIFE_IMPRISONMENT" | "DEATH_PENALTY" => {
                 // Default bail limit is usually 90 days under BNSS
@@ -58,13 +61,13 @@ impl Default for JudicialTimelinePlanner {
 /// 2. Business & Trade Professionals (`sigma-msme`)
 /// Verifies Udyam Registration parameters and computes delayed payment interest under the MSMED Act.
 pub struct MsmeComplianceEngine {
-    pub registered_udyam_ids: BTreeMap<String, String>,
+    pub registered_udyam_ids: HashMap<String, String>,
 }
 
 impl MsmeComplianceEngine {
     pub fn new() -> Self {
         Self {
-            registered_udyam_ids: BTreeMap::new(),
+            registered_udyam_ids: HashMap::new(),
         }
     }
 
@@ -83,7 +86,12 @@ impl MsmeComplianceEngine {
 
     /// Calculates delayed payment interest under Section 16 of the MSMED Act
     /// Interest is compound interest with monthly rests at three times the bank rate
-    pub fn calculate_delayed_payment_interest(&self, principal_amount: f64, bank_rate: f64, delay_days: u32) -> f64 {
+    pub fn calculate_delayed_payment_interest(
+        &self,
+        principal_amount: f64,
+        bank_rate: f64,
+        delay_days: u32,
+    ) -> f64 {
         if delay_days == 0 {
             return 0.0;
         }
@@ -106,24 +114,32 @@ impl Default for MsmeComplianceEngine {
 /// 3. Medical & AYUSH Practitioners (`sigma-ayush`)
 /// Digital integration for AYUSH practitioner registry and Ayurvedic Formulary lookups.
 pub struct AyushFormularyHelper {
-    pub verified_practitioners: BTreeMap<String, String>,
-    pub formulary_registry: BTreeMap<String, Vec<String>>,
+    pub verified_practitioners: HashMap<String, String>,
+    pub formulary_registry: HashMap<String, Vec<String>>,
 }
 
 impl AyushFormularyHelper {
     pub fn new() -> Self {
-        let mut formulary = BTreeMap::new();
+        let mut formulary = HashMap::new();
         formulary.insert(
             "Chyawanprash".to_string(),
-            vec!["Amla".to_string(), "Ashwagandha".to_string(), "Guduchi".to_string()],
+            vec![
+                "Amla".to_string(),
+                "Ashwagandha".to_string(),
+                "Guduchi".to_string(),
+            ],
         );
         formulary.insert(
             "Triphala".to_string(),
-            vec!["Amalaki".to_string(), "Bibhitaki".to_string(), "Haritaki".to_string()],
+            vec![
+                "Amalaki".to_string(),
+                "Bibhitaki".to_string(),
+                "Haritaki".to_string(),
+            ],
         );
 
         Self {
-            verified_practitioners: BTreeMap::new(),
+            verified_practitioners: HashMap::new(),
             formulary_registry: formulary,
         }
     }
@@ -132,8 +148,15 @@ impl AyushFormularyHelper {
         self.verified_practitioners.contains_key(registration_id)
     }
 
-    pub fn verify_ayurvedic_formulation(&self, product: &str, ingredient: &str) -> Result<bool, &'static str> {
-        let ingredients = self.formulary_registry.get(product).ok_or("Product not found in Ayurvedic Formulary")?;
+    pub fn verify_ayurvedic_formulation(
+        &self,
+        product: &str,
+        ingredient: &str,
+    ) -> Result<bool, &'static str> {
+        let ingredients = self
+            .formulary_registry
+            .get(product)
+            .ok_or("Product not found in Ayurvedic Formulary")?;
         Ok(ingredients.iter().any(|ing| ing == ingredient))
     }
 }
@@ -147,18 +170,19 @@ impl Default for AyushFormularyHelper {
 /// 4. Hotspot & Telecommunications Operators (`sigma-wani`)
 /// Implements TRAI Public Data Office (PDO) registries and bandwidth sharing profiles.
 pub struct PMWaniHotspotController {
-    pub registered_pdos: BTreeMap<String, String>,
+    pub registered_pdos: HashMap<String, String>,
 }
 
 impl PMWaniHotspotController {
     pub fn new() -> Self {
         Self {
-            registered_pdos: BTreeMap::new(),
+            registered_pdos: HashMap::new(),
         }
     }
 
     pub fn register_pdo(&mut self, pdo_id: &str, location: &str) -> bool {
-        self.registered_pdos.insert(pdo_id.to_string(), location.to_string()).is_none()
+        self.registered_pdos.insert(pdo_id.to_string(), location.to_string());
+        true
     }
 
     pub fn get_trai_bandwidth_profile(&self, active_users: u32) -> &'static str {
@@ -181,18 +205,19 @@ impl Default for PMWaniHotspotController {
 /// 5. Aviation & Airport Operators (`sigma-digiyatra`)
 /// Deep integration for passenger face enrollment and paperless railway/airport boarding validation.
 pub struct DigiYatraPassScanner {
-    pub passenger_faces: BTreeMap<String, Vec<u8>>,
+    pub passenger_faces: HashMap<String, Vec<u8>>,
 }
 
 impl DigiYatraPassScanner {
     pub fn new() -> Self {
         Self {
-            passenger_faces: BTreeMap::new(),
+            passenger_faces: HashMap::new(),
         }
     }
 
     pub fn enroll_passenger(&mut self, passenger_id: &str, face_signature: &[u8]) -> bool {
-        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec()).is_none()
+        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec());
+        true
     }
 
     pub fn verify_passenger_boarding(&self, passenger_id: &str, scan_signature: &[u8]) -> bool {
@@ -213,13 +238,13 @@ impl Default for DigiYatraPassScanner {
 /// 6. Transit & Logistics Professionals (`sigma-irctc`)
 /// Facilitates deep train running status track, Tatkal window status, and PNR monitoring.
 pub struct IrctcPnrTracker {
-    pub pnr_statuses: BTreeMap<String, String>,
+    pub pnr_statuses: HashMap<String, String>,
 }
 
 impl IrctcPnrTracker {
     pub fn new() -> Self {
         Self {
-            pnr_statuses: BTreeMap::new(),
+            pnr_statuses: HashMap::new(),
         }
     }
 
@@ -244,7 +269,8 @@ impl IrctcPnrTracker {
     }
 
     pub fn update_pnr_status(&mut self, pnr: &str, status: &str) {
-        self.pnr_statuses.insert(pnr.to_string(), status.to_string());
+        self.pnr_statuses
+            .insert(pnr.to_string(), status.to_string());
     }
 
     pub fn get_pnr_status(&self, pnr: &str) -> Option<&str> {
@@ -270,8 +296,14 @@ mod tests {
         assert_eq!(deadline, 1000 + (60 * 24 * 60 * 60));
 
         // Bail readiness under BNSS
-        assert_eq!(planner.calculate_bail_readiness("LIFE_IMPRISONMENT", 95), Ok(true));
-        assert_eq!(planner.calculate_bail_readiness("LIFE_IMPRISONMENT", 80), Ok(false));
+        assert_eq!(
+            planner.calculate_bail_readiness("LIFE_IMPRISONMENT", 95),
+            Ok(true)
+        );
+        assert_eq!(
+            planner.calculate_bail_readiness("LIFE_IMPRISONMENT", 80),
+            Ok(false)
+        );
     }
 
     #[test]
@@ -295,36 +327,60 @@ mod tests {
     #[test]
     fn test_ayush_formulary_helper() {
         let mut helper = AyushFormularyHelper::new();
-        helper.verified_practitioners.insert("REG-AYUSH-1234".to_string(), "Dr. Aaryan".to_string());
+        helper
+            .verified_practitioners
+            .insert("REG-AYUSH-1234".to_string(), "Dr. Aaryan".to_string());
 
         assert!(helper.verify_practitioner("REG-AYUSH-1234"));
         assert!(!helper.verify_practitioner("REG-AYUSH-9999"));
 
-        assert_eq!(helper.verify_ayurvedic_formulation("Chyawanprash", "Amla"), Ok(true));
-        assert_eq!(helper.verify_ayurvedic_formulation("Chyawanprash", "Pipali"), Ok(false));
+        assert_eq!(
+            helper.verify_ayurvedic_formulation("Chyawanprash", "Amla"),
+            Ok(true)
+        );
+        assert_eq!(
+            helper.verify_ayurvedic_formulation("Chyawanprash", "Pipali"),
+            Ok(false)
+        );
     }
 
     #[test]
     fn test_pm_wani_hotspot_controller() {
         let mut controller = PMWaniHotspotController::new();
         assert!(controller.register_pdo("PDO-MUMBAI-01", "Dharavi Hotspot"));
-        assert_eq!(controller.get_trai_bandwidth_profile(5), "Ultra-High-Speed (Unlimited)");
-        assert_eq!(controller.get_trai_bandwidth_profile(25), "Balanced Quality-of-Service");
-        assert_eq!(controller.get_trai_bandwidth_profile(100), "TRAI FUP Bandwidth Throttle");
+        assert_eq!(
+            controller.get_trai_bandwidth_profile(5),
+            "Ultra-High-Speed (Unlimited)"
+        );
+        assert_eq!(
+            controller.get_trai_bandwidth_profile(25),
+            "Balanced Quality-of-Service"
+        );
+        assert_eq!(
+            controller.get_trai_bandwidth_profile(100),
+            "TRAI FUP Bandwidth Throttle"
+        );
     }
 
     #[test]
     fn test_digiyatra_pass_scanner() {
         let mut scanner = DigiYatraPassScanner::new();
         assert!(scanner.enroll_passenger("DY-PASS-789", b"face_descriptor_vector_bytes_789"));
-        assert!(scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_vector_bytes_789"));
-        assert!(!scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_mismatch_bytes"));
+        assert!(
+            scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_vector_bytes_789")
+        );
+        assert!(
+            !scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_mismatch_bytes")
+        );
     }
 
     #[test]
     fn test_irctc_pnr_tracker() {
         let mut tracker = IrctcPnrTracker::new();
-        assert_eq!(tracker.check_tatkal_window(10, "AC"), "TATKAL_WINDOW_OPEN (AC Class)");
+        assert_eq!(
+            tracker.check_tatkal_window(10, "AC"),
+            "TATKAL_WINDOW_OPEN (AC Class)"
+        );
         assert_eq!(tracker.check_tatkal_window(9, "AC"), "TATKAL_WINDOW_CLOSED");
 
         tracker.update_pnr_status("2748927491", "CONFIRMED");

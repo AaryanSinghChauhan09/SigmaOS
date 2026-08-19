@@ -1,9 +1,8 @@
 // SigmaOS Smart Symbolic Link Engine
 // Zero-dependency, #![no_std] compliant, highly-optimized
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
-// Improved with dynamic env-var expansion, chroot-escape sandbox protection, and multi-lib target ABI routing.
 
-use crate::compatibility::{KernelPersona, SyscallAbi};
+use crate::kernel::KernelPersona;
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 
@@ -23,10 +22,7 @@ impl SymlinkResolverRule for LinuxPersonaRule {
         "linux-persona-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        match persona {
-            KernelPersona::Linux_6_x | KernelPersona::Linux_2_6 => true,
-            _ => false,
-        }
+        persona.name.contains("Linux") || persona.name.contains("linux")
     }
 }
 
@@ -36,10 +32,7 @@ impl SymlinkResolverRule for LegacyLinuxRule {
         "legacy-linux-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        match persona {
-            KernelPersona::Linux_2_6 => true,
-            _ => false,
-        }
+        persona.name == "Linux_2_6" || persona.api_version == "2.6"
     }
 }
 
@@ -75,80 +68,6 @@ impl SmartSymlink {
             true
         } else {
             false
-        }
-    }
-
-    /// Improvement 1: Dynamic Environment Variable Context Expansion
-    /// Translates context tags like "$USER", "$LANG", "$ABI" into target-specific values
-    pub fn expand_environment_context(
-        &self,
-        target_path: &str,
-        user: &str,
-        lang: &str,
-    ) -> &'static str {
-        // In a `#![no_std]` environment, we map typical path pattern substitutions to static slices
-        if target_path.contains("$USER") {
-            if user == "admin" {
-                return "/home/admin/libs";
-            } else {
-                return "/home/guest/libs";
-            }
-        }
-        if target_path.contains("$LANG") {
-            if lang == "en_US" {
-                return "/usr/share/locale/en";
-            } else {
-                return "/usr/share/locale/generic";
-            }
-        }
-        // Fallback to primary static target
-        self.primary_target
-    }
-
-    /// Improvement 2: Sandbox Directory Boundary Traversal Protection
-    /// Prevents relative path escapes (e.g. "../../../etc/passwd") out of the sandboxed directory
-    pub fn is_sandbox_escape_safe(&self, path: &str, sandbox_root: &str) -> bool {
-        // Enforce strict root path boundaries
-        if !path.starts_with(sandbox_root) {
-            return false;
-        }
-
-        // Count path segments to ensure parent traversals do not exceed baseline directory bounds
-        let mut balance: isize = 0;
-        let mut start = 0;
-        while start < path.len() {
-            let end = path[start..]
-                .find('/')
-                .map(|idx| start + idx)
-                .unwrap_or(path.len());
-            let segment = &path[start..end];
-            if segment == ".." {
-                balance -= 1;
-                if balance < 0 {
-                    // Escape attempt beyond the initial parent directory bounds
-                    return false;
-                }
-            } else if !segment.is_empty() && segment != "." {
-                balance += 1;
-            }
-            start = end + 1;
-        }
-
-        true
-    }
-
-    /// Improvement 3: Multi-Lib Architecture Routing
-    /// Routes the symlink path to /lib32 or /lib64 automatically depending on the active ABI
-    pub fn resolve_multi_lib_routing(&self, syscall_abi: SyscallAbi) -> &'static str {
-        match syscall_abi {
-            SyscallAbi::Oabi_32 | SyscallAbi::Eabi_32 => {
-                // Route to legacy 32-bit library directory (multi-lib parity)
-                "/lib32/libc.so"
-            }
-            SyscallAbi::Eabi_64 => {
-                // Route to modern 64-bit library directory
-                "/lib64/libc.so"
-            }
         }
     }
 
@@ -246,133 +165,5 @@ impl SmartSymlink {
                 Err(e)
             }
         }
-    }
-}
-// SigmaOS next-generation context-aware, self-healing, and infinite-recursion-safe Symbolic Link Engine
-// Discards legacy standard Linux/BSD symlink vulnerabilities by enforcing sandboxed boundary limits and loop breakage
-
-use std::collections::HashMap;
-
-/// Symbolic Link Engine errors
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SymlinkError {
-    Success = 0,
-    InfiniteLoopDetected = 1,
-    SandboxEscapeAttempted = 2,
-    DepthLimitExceeded = 3,
-    InvalidPath = 4,
-}
-
-pub struct SmartSymlink {
-    pub target_pattern: String, // e.g. "/home/$USER/.config" or "../etc/shadow"
-}
-
-impl SmartSymlink {
-    pub fn new(target: &str) -> Self {
-        SmartSymlink {
-            target_pattern: target.to_string(),
-        }
-    }
-
-    /// Evaluates and expands context environment variables inside the symlink path
-    pub fn expand_context_variables(&self, user_context: &str, lang_context: &str) -> String {
-        let mut expanded = self.target_pattern.replace("$USER", user_context);
-        expanded = expanded.replace("$LANG", lang_context);
-        expanded
-    }
-
-    /// Recursion-bounded and sandbox-bounded resolution logic
-    pub fn resolve_symlink_path(
-        &self,
-        user_context: &str,
-        lang_context: &str,
-        sandbox_root: &str,
-        mut current_depth: u32,
-        active_symlinks_map: &HashMap<String, SmartSymlink>,
-        mut visited_paths: Vec<String>,
-    ) -> Result<String, SymlinkError> {
-        // Enforce max recursion depth limits (Linux standard limits to 40 traversals)
-        if current_depth >= 40 {
-            return Err(SymlinkError::DepthLimitExceeded);
-        }
-
-        let expanded_path = self.expand_context_variables(user_context, lang_context);
-
-        // Standard loop detection check: prevent circular loop hangs (a -> b, b -> a)
-        if visited_paths.contains(&expanded_path) {
-            return Err(SymlinkError::InfiniteLoopDetected);
-        }
-        visited_paths.push(expanded_path.clone());
-
-        // Check if path attempt to escape above active sandbox root (chroot boundary guard)
-        if expanded_path.contains("..") {
-            let normalized_path = expanded_path.replace("../", "");
-            if !normalized_path.starts_with(sandbox_root) && !sandbox_root.is_empty() {
-                return Err(SymlinkError::SandboxEscapeAttempted);
-            }
-        }
-
-        // If the expanded target is itself a symbolic link, resolve it recursively
-        if let Some(next_link) = active_symlinks_map.get(&expanded_path) {
-            current_depth += 1;
-            next_link.resolve_symlink_path(
-                user_context,
-                lang_context,
-                sandbox_root,
-                current_depth,
-                active_symlinks_map,
-                visited_paths,
-            )
-        } else {
-            Ok(expanded_path)
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_variable_context_expansion() {
-        let symlink = SmartSymlink::new("/home/$USER/.config/settings.$LANG.conf");
-        let expanded = symlink.expand_context_variables("aaryan", "en_US");
-        assert_eq!(expanded, "/home/aaryan/.config/settings.en_US.conf");
-    }
-
-    #[test]
-    fn test_infinite_loop_breakage() {
-        let mut map = HashMap::new();
-        map.insert("/var/log/messages".to_string(), SmartSymlink::new("/var/log/syslog"));
-        map.insert("/var/log/syslog".to_string(), SmartSymlink::new("/var/log/messages")); // Loop
-
-        let start_link = SmartSymlink::new("/var/log/messages");
-        let result = start_link.resolve_symlink_path(
-            "user1",
-            "en",
-            "/",
-            0,
-            &map,
-            Vec::new(),
-        );
-
-        assert_eq!(result, Err(SymlinkError::InfiniteLoopDetected));
-    }
-
-    #[test]
-    fn test_sandbox_boundary_guard() {
-        let map = HashMap::new();
-        let symlink = SmartSymlink::new("../../../../etc/shadow"); // Escape attempt
-
-        let result = symlink.resolve_symlink_path(
-            "user1",
-            "en",
-            "/home/user1/sandbox",
-            0,
-            &map,
-            Vec::new(),
-        );
-
-        assert_eq!(result, Err(SymlinkError::SandboxEscapeAttempted));
     }
 }

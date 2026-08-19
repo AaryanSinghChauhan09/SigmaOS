@@ -1,39 +1,5 @@
 // SigmaOS Compatibility Module
-pub mod chimera_linux;
 pub mod cross_platform;
-pub mod interim;
-pub mod lubuntu;
-pub mod mint_linux;
-pub mod reactos;
-pub mod sigmawin;
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod cross_platform_kernel;
-pub mod linux_adapter;
-pub mod persona;
-pub mod abi_translator;
-pub mod lattice;
-pub mod prism;
-pub mod canonical;
-pub mod chakra;
-pub mod cross_platform;
-pub mod zorin;
-pub mod antix;
-
-pub use zorin::{
-    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
-    ZorinChameleonColor, ZorinChameleonEngine,
-    ZorinConnectState, ZorinConnectManager,
-    ZorinWindowsAppSupport,
-};
-
-pub use antix::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
-    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
-    AntiXControlCentre,
-};
 pub mod historic_linux;
 pub mod mint_linux;
 pub mod chimera_linux;
@@ -44,50 +10,38 @@ pub mod absorb_tools;
 pub mod tiny_core;
 pub mod apache_ossie;
 pub mod sovereign_suite;
-pub mod gentoo;
-pub mod legacy_adapters;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
-pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
 
-pub use legacy_adapters::{
-    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
-    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
-    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
-    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
+pub use historic_linux::{
+    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
+    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
+    VintageDriverTranslator, VintagePackageConverter, HistoricError,
 };
 
-pub use chakra::{
-    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
-    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
-};
-pub use linux_adapter::{
-    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
-};
-pub use persona::{
-    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
-};
-pub use abi_translator::{
-    CpuArchitecture, ABITranslator,
-};
-pub use lattice::{
-    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
-};
-pub use prism::{
-    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+pub use mint_linux::{
+    MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
+    MintReportSystem,
 };
 
-pub use canonical::{
-    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
-    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
-    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
-    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
-    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
-    UnifiedAppStore, ZorinAppearanceSwitcher,
+pub use chimera_linux::{
+    DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
+    ApkPackageMetadata, ApkPackageStore,
+};
+
+pub use relay_nexus::{
+    PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
+    StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
+    FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
+    BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
+    BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
+    ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
+    TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
 };
 
 pub use solid_kernel::{
@@ -118,23 +72,33 @@ pub use sovereign_suite::{
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
 };
 
-pub use gentoo::{
-    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
-    EbuildPackage, PortageEngine,
+pub mod debian;
+pub use debian::{
+    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
+    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
 };
 
+pub mod innovations;
+pub use innovations::{
+    WorkloadCategory, ISchedulerPolicy, MlAcceleratedPolicy, GreenComputingPolicy,
+    SigmaScheduler, ISyscallTranslator, LinuxTranslator, WindowsTranslator,
+    UniversalAbiTranslator, IFileSystemCore, ISemanticSearchPlugin, ICasDeduplicator,
+    SigmaFsPlusPlus, IRecoveryStrategy, RollbackRecovery, SelfHealingOS,
+};
+
+pub mod fedora;
 pub use fedora::{
     DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
-    SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel, FedoraAluFlags,
-    FedoraAlu, SeLinuxContext, SeLinuxEngine, SystemdPresetConfigurator, AnacondaInstaller,
 };
 
-pub use debian::{
-    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine, AlternativeLink,
-    DebianAlternativesSystem, DebootstrapEngine,
+pub mod india_professional_tools;
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, PMWaniHotspotController,
+    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker,
 };
 
-pub use cachy_os::{
-    BoreSchedulerGovernor, AnanicyManager, SchedPolicy, V4OptimizedPackageManager,
-    CachyInitramfs,
-};
+pub mod india_stack;
+pub use india_stack::{MockUPIService, IndiaStackError};
+
+pub mod india_stack_localization;
+pub use india_stack_localization::{IndianLanguage, LocalizationProvider, LocalizationManager};
