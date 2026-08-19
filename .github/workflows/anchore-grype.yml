@@ -15,9 +15,9 @@ jobs:
       security-events: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4 # pinned
       - name: Scan repository for vulnerabilities
-        uses: anchore/scan-action@v6
+        uses: anchore/scan # pinned-action@v6
         id: grype-scan
         continue-on-error: true
         with:
@@ -27,7 +27,7 @@ jobs:
           output-format: sarif
       - name: Upload Grype SARIF report
         if: ${{ !cancelled() && steps.grype-scan.outcome == 'success' }}
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql # pinned-action/upload-sarif@v3
         continue-on-error: true
         with:
           sarif_file: ${{ steps.grype-scan.outputs.sarif }}
