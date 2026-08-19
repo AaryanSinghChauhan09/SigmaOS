@@ -55,6 +55,7 @@ permissions:
 jobs:
   terraform:
     name: 'Terraform'
+    if: ${{ hashFiles('**/*.tf') != '' }}
     runs-on: ubuntu-latest
     environment: production
 

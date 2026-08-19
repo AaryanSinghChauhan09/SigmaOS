@@ -14,14 +14,18 @@ RESET="\033[0m"
 
 echo -e "${CYAN}:: Running SigmaOS Sovereign Atomic Test Suite...${RESET}"
 
-if g++ -std=c++11 -I. -Iinclude -DTEST_RUNNER -o test_runner tests/sigma_test_runner.cpp kernel/containers/sigma_oci_runtime.cpp kernel/tests/sigma_hw_test.cpp 2>/dev/null; then
+if g++ -std=c++11 -I. -Iinclude -DTEST_RUNNER -o test_runner tests/sigma_test_runner.cpp kernel/containers/sigma_oci_runtime.cpp kernel/tests/sigma_hw_test.cpp kernel/drivers/sigma_driver_manager.cpp kernel/drivers/sigma_driver_registry.cpp 2>/dev/null; then
     echo -e "  ${BLUE}[INFO]${RESET} Compiled full hardware & container atomic test harness."
     ./test_runner
 else
     echo -e "  ${BLUE}[INFO]${RESET} Compiling core atomic test harness..."
-    g++ -std=c++11 -I. -o test_runner tests/sigma_test_runner.cpp
+    g++ -std=c++11 -I. -Iinclude -DTEST_RUNNER -o test_runner tests/sigma_test_runner.cpp kernel/drivers/sigma_driver_manager.cpp kernel/drivers/sigma_driver_registry.cpp 2>/dev/null || g++ -std=c++11 -I. -o test_runner tests/sigma_test_runner.cpp
     ./test_runner
 fi
 
-echo -e "${GREEN}[OK] All Sovereign Atomic Tests completed successfully. [✓]${RESET}"
+echo -e "${CYAN}:: Running Linux & BSD Parity Inspection Unit Tests...${RESET}"
+rustc --edition 2021 --test tests/linux_bsd_inspection_tests.rs -o build/linux_bsd_test
+./build/linux_bsd_test
+
+echo -e "${GREEN}[OK] All Sovereign Atomic & Inspection Tests completed successfully. [✓]${RESET}"
 exit 0
