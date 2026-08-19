@@ -27,6 +27,7 @@ pub mod universal_engine;
 pub mod universal_oop_system;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{SovereignMirrorSelector, SovereignTransactionManager, SovereignSandboxEnforcer, SovereignDeltaGenerator, TransactionStatus};
 pub use spec::{
     ManagerCapability, PackageCapability,

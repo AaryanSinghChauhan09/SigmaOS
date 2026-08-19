@@ -86,6 +86,7 @@ pub use drivers::{
     NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
     RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
     TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    DrmAtomicPlaneState, WaylandDmaBuf, OpenBsdWsdisplayVt,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -148,6 +149,7 @@ pub use security::{
     KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
     SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
     UserAccessGuard, UserPtr,
+    SecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
 };
 pub use plugin::{
     ExtensionType, ManagerCapability, MarketplaceItem, Plugin, PluginCapability, PluginError,
