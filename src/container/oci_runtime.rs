@@ -144,6 +144,76 @@ impl OCISpec for SimpleOCISpec {
     }
 }
 
+// ============================================================================
+// OCI Spec v1.1.0 & Sandboxed Container Primitives
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct OciContainerSpec {
+    pub oci_version: [u8; 16], // e.g. "1.1.0"
+    pub root_path: [u8; 128],  // e.g. "/var/lib/sigma/containers/rootfs"
+    pub readonly_rootfs: bool,
+    pub uid_mapping: (u32, u32, u32), // host_uid, container_uid, count
+    pub gid_mapping: (u32, u32, u32), // host_gid, container_gid, count
+    pub apparmor_profile: [u8; 64],
+    pub landlock_paths: Vec<[u8; 128]>,
+}
+
+impl OciContainerSpec {
+    pub fn new(root_fs: &[u8], readonly: bool) -> Self {
+        let mut ver_arr = [0u8; 16];
+        ver_arr[..5].copy_from_slice(b"1.1.0");
+
+        let mut root_arr = [0u8; 128];
+        let len = root_fs.len().min(127);
+        root_arr[..len].copy_from_slice(&root_fs[..len]);
+
+        let mut apparmor = [0u8; 64];
+        apparmor[..19].copy_from_slice(b"docker-default-prof");
+
+        Self {
+            oci_version: ver_arr,
+            root_path: root_arr,
+            readonly_rootfs: readonly,
+            uid_mapping: (1000, 0, 65536),
+            gid_mapping: (1000, 0, 65536),
+            apparmor_profile: apparmor,
+            landlock_paths: Vec::new(),
+        }
+    }
+}
+
+pub struct SandboxedContainerEngine {
+    pub active_containers: Vec<(ContainerID, OciContainerSpec)>,
+}
+
+impl SandboxedContainerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_containers: Vec::new(),
+        }
+    }
+
+    pub fn spawn_sandboxed_container(
+        &mut self,
+        container_id: ContainerID,
+        spec: OciContainerSpec,
+    ) -> Result<(), ContainerError> {
+        if spec.landlock_paths.is_empty() && !spec.readonly_rootfs {
+            // Mandate sandboxing guarantees
+            return Err(ContainerError::InvalidConfig);
+        }
+        self.active_containers.push((container_id, spec));
+        Ok(())
+    }
+}
+
+impl Default for SandboxedContainerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub trait Sandbox {
     fn set_namespace(
         &mut self,
@@ -554,4 +624,23 @@ unsafe fn free(ptr: *mut u8) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_oci_sandboxed_container_engine() {
+        let mut engine = SandboxedContainerEngine::new();
+        let mut spec = OciContainerSpec::new(b"/var/lib/sigma/rootfs", false);
+
+        // Fail spawning if no sandboxing landlock path / readonly mode is set
+        assert!(engine.spawn_sandboxed_container(1, spec.clone()).is_err());
+
+        // Make rootfs read-only -> spawn succeeds
+        spec.readonly_rootfs = true;
+        assert!(engine.spawn_sandboxed_container(1, spec).is_ok());
+        assert_eq!(engine.active_containers.len(), 1);
+    }
 }

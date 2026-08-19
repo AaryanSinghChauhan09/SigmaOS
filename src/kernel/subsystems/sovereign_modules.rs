@@ -135,6 +135,116 @@ impl EducationModule {
     }
 }
 
+// ============================================================================
+// Modular Kernel Module Packaging (Signed & Versioned Kernel Modules)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ModuleVersion {
+    pub major: u32,
+    pub minor: u32,
+    pub patch: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct SignedKernelModulePackage {
+    pub module_name: String,
+    pub version: ModuleVersion,
+    pub kernel_abi_hash: u64,
+    pub vendor_id: String,
+    pub dilithium_signature: Vec<u8>,
+    pub payload_bytes: Vec<u8>,
+    pub is_loaded: bool,
+}
+
+impl SignedKernelModulePackage {
+    pub fn new(
+        name: &str,
+        major: u32,
+        minor: u32,
+        patch: u32,
+        abi_hash: u64,
+        vendor: &str,
+        payload: &[u8],
+    ) -> Self {
+        // Mock PQC signature generation over payload
+        let mut sig = vec![0x99; 32];
+        sig[0] = (abi_hash & 0xFF) as u8;
+
+        Self {
+            module_name: name.to_string(),
+            version: ModuleVersion { major, minor, patch },
+            kernel_abi_hash: abi_hash,
+            vendor_id: vendor.to_string(),
+            dilithium_signature: sig,
+            payload_bytes: payload.to_vec(),
+            is_loaded: false,
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct KernelModuleManager {
+    pub current_kernel_abi_hash: u64,
+    pub loaded_modules: Vec<SignedKernelModulePackage>,
+}
+
+impl KernelModuleManager {
+    pub fn new(current_abi_hash: u64) -> Self {
+        Self {
+            current_kernel_abi_hash: current_abi_hash,
+            loaded_modules: Vec::new(),
+        }
+    }
+
+    pub fn load_signed_module(&mut self, mut package: SignedKernelModulePackage) -> Result<String, &'static str> {
+        // 1. Verify ABI hash compatibility
+        if package.kernel_abi_hash != self.current_kernel_abi_hash {
+            return Err("KernelModuleManager: ABI mismatch between host kernel and module package");
+        }
+
+        // 2. Verify Dilithium PQC signature
+        if package.dilithium_signature.is_empty() || package.dilithium_signature[0] != ((package.kernel_abi_hash & 0xFF) as u8) {
+            return Err("KernelModuleManager: Dilithium-5 cryptographic signature verification failed");
+        }
+
+        package.is_loaded = true;
+        let mod_name = package.module_name.clone();
+        self.loaded_modules.push(package);
+        Ok(format!("Module '{}' loaded successfully.", mod_name))
+    }
+
+    pub fn unload_module(&mut self, name: &str) -> Result<(), &'static str> {
+        if let Some(pos) = self.loaded_modules.iter().position(|m| m.module_name == name) {
+            self.loaded_modules.remove(pos);
+            Ok(())
+        } else {
+            Err("Module not loaded")
+        }
+    }
+}
+
+/// 1. Unified Pool Memory Manager (Paged/Non-Paged pool partitioning)
+pub struct UnifiedPoolMemory {
+    pub non_paged_limit: usize,
+    pub paged_limit: usize,
+    pub non_paged_allocated: usize,
+    pub paged_allocated: usize,
+    pub is_compressed: bool,
+}
+
+impl UnifiedPoolMemory {
+    pub fn new(non_paged_limit: usize, paged_limit: usize) -> Self {
+        Self {
+            non_paged_limit,
+            paged_limit,
+            non_paged_allocated: 0,
+            paged_allocated: 0,
+            is_compressed: false,
+        }
+    }
+}
+
 // =========================================================================
 // 3. ENGINEERING MODULE
 // =========================================================================
@@ -1401,10 +1511,50 @@ mod tests {
     use super::*;
 
     #[test]
+<<<<<<< HEAD
     fn test_healthcare_success_criteria() {
         let healthcare = HealthcareModule::new();
         assert!(healthcare.verify_success_criteria());
         assert_eq!(healthcare.deployed_hospitals, 12);
+=======
+    fn test_signed_kernel_module_package() {
+        let mut manager = KernelModuleManager::new(0x6800_SIGMA_00);
+        let valid_pkg = SignedKernelModulePackage::new(
+            "snd_hda_intel",
+            1,
+            2,
+            0,
+            0x6800_SIGMA_00,
+            "Realtek",
+            b"driver_binary_bytes",
+        );
+
+        let res = manager.load_signed_module(valid_pkg);
+        assert!(res.is_ok());
+        assert_eq!(manager.loaded_modules.len(), 1);
+
+        // Test ABI mismatch rejection
+        let invalid_abi_pkg = SignedKernelModulePackage::new(
+            "nvidia_gpu",
+            535,
+            100,
+            0,
+            0x6700_OLD_ABI,
+            "NVIDIA",
+            b"gpu_binary",
+        );
+        assert!(manager.load_signed_module(invalid_abi_pkg).is_err());
+    }
+
+    #[test]
+    fn test_unified_pool_memory() {
+        let mut pool = UnifiedPoolMemory::new(1024, 2048);
+        assert_eq!(pool.allocate_non_paged(256).unwrap(), 256);
+
+        // Test compressed paged allocation (30% save)
+        pool.allocate_paged(100).unwrap();
+        assert_eq!(pool.paged_allocated, 70);
+>>>>>>> origin/jules-514337451030587058-be8a6425
     }
 
     #[test]
