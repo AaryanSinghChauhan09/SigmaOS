@@ -1056,8 +1056,6 @@ pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     std::alloc::alloc(layout)
 }
 
-pub unsafe extern "C" fn free(_ptr: *mut u8) {}
-
 // ==========================================
 // Standalone unit tests
 // ==========================================
