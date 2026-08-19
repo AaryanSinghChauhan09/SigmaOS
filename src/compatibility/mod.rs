@@ -1,5 +1,21 @@
 // SigmaOS Compatibility Module
-pub mod antix;
+pub mod chimera_linux;
+pub mod cross_platform;
+pub mod interim;
+pub mod lubuntu;
+pub mod mint_linux;
+pub mod reactos;
+pub mod sigmawin;
+pub mod relay_nexus;
+pub mod solid_kernel;
+pub mod india_stack_localization;
+pub mod legacy_adapters;
+pub mod cross_platform_kernel;
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
 pub mod canonical;
 pub mod chakra;
 pub mod cross_platform;
@@ -35,6 +51,8 @@ pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
+pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
 
 pub use legacy_adapters::{
     APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
@@ -47,11 +65,20 @@ pub use chakra::{
     AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
     TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
-
-pub use antix::{
-    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
-    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
-    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
+pub use linux_adapter::{
+    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+pub use persona::{
+    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
+};
+pub use abi_translator::{
+    CpuArchitecture, ABITranslator,
+};
+pub use lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
+pub use prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
 };
 
 pub use canonical::{

@@ -1,8 +1,15 @@
 // SigmaOS Productivity Module
 pub mod gamification;
-pub mod subtitle_editor;
-pub mod sigmadev;
-pub mod mint_competitor;
+pub mod media;
+pub mod notes;
+pub mod screen_recorder;
+pub mod screenshot;
+pub mod sigma_office;
+pub mod tasks;
+pub mod terminal;
+pub mod advanced_app_absorber;
+pub mod tmux;
+pub mod utility_suite;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -37,6 +44,19 @@ pub use terminal::{
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
-pub use mind_map::{
-    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
+pub use media::{
+    MediaFormat, PlaybackState, AudioTrack, SigmaMediaEngine,
+};
+pub use utility_suite::{
+    FileIndexEntry, EverythingSearchEngine, TextTab, NotepadPlusPlusBuffer,
+    BrowserContainerType, BrowserTabInstance, SovereignBrowserEngine,
+    CompressionMethod, ArchiveVolume, SevenZipEngine,
+    AnnotationShape, ScreenshotAnnotation, FlameshotAnnotator,
+    VideoSourceLayer, ObsStudioMixer,
+    AudacityWaveEditor,
+    VlcCodecPipeline,
+    VideoTrackClip, DaVinciTimeline,
+    ItemAgeColor, OneCommanderFileGrid,
+    AppVolumeChannel, EarTrumpetVolumeMatrix,
+    ExifMetadata, IrfanViewEngine,
 };

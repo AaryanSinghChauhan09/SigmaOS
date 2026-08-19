@@ -4,9 +4,17 @@
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
-
 extern crate alloc;
 use alloc::boxed::Box;
+
+use core::mem;
+extern crate alloc;
+
+extern crate alloc;
+
+extern crate alloc;
+
+extern crate alloc;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};

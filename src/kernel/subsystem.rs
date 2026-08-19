@@ -983,8 +983,6 @@ impl PackageRecipeParser {
 
 #[cfg(test)]
 mod extra_tests {
-    use super::*;
-    use alloc::string::ToString;
 
     #[test]
     fn test_round_robin_scheduler() {

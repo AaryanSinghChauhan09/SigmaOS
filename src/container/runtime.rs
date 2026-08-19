@@ -1,3 +1,7 @@
+// OOP-based Container Runtime for SigmaOS
+// Implements container runtime using OOP principles with traits and structs.
+#![no_std]
+#![no_main]
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 
@@ -5,8 +9,15 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::boxed::Box;
 
+extern crate alloc;
+
+use alloc::vec::Vec;
 use core::mem;
-use crate::container::ContainerError;
+/// OOP-based Container Runtime for SigmaOS
+/// Implements container runtime using OOP principles with traits and structs
+/// No dependency on external container frameworks
+/// Based on Roadmap Item 17: Container runtime support
+use core::ptr::{self, NonNull};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -85,6 +96,126 @@ pub trait Container {
     fn state(&self) -> ContainerState;
     /// Get container info
     fn info(&self) -> ContainerInfo;
+}
+
+/// Container error types
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerError {
+    Success = 0,
+    AlreadyStarted = 1,
+    AlreadyStopped = 2,
+    StartFailed = 3,
+    StopFailed = 4,
+    PermissionDenied = 5,
+    ResourceLimit = 6,
+}
+
+/// Container info
+#[repr(C)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
+}
+
+impl ContainerInfo {
+    pub fn new(id: ContainerID) -> Self {
+        ContainerInfo {
+            id,
+            name: [0; 64],
+            image: [0; 128],
+            state: ContainerState::Created,
+            pid: None,
+            memory_limit: 0,
+            cpu_limit: 0,
+            capability: ContainerCapability::new(),
+        }
+    }
+}
+
+/// Container capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
+}
+
+impl ContainerCapability {
+    pub const fn new() -> Self {
+        ContainerCapability {
+            can_start: false,
+            can_stop: false,
+            can_pause: false,
+            can_modify: false,
+        }
+    }
+
+    pub const fn full() -> Self {
+        ContainerCapability {
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
+            can_modify: true,
+        }
+    }
+}
+
+impl Default for ContainerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+/// Container network configuration type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerNetworkType {
+    None,
+    Bridge,
+    Overlay,
+}
+
+/// Container volume configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerVolume {
+    pub is_bind_mount: bool,
+    pub is_tmpfs: bool,
+    pub read_only: bool,
+}
+
+/// Container user namespaces mapping
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerNamespace {
+    pub uid_mapping: u32,
+    pub gid_mapping: u32,
+    pub rootless: bool,
+}
+
+/// Container seccomp profiles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+/// Container network configuration type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerNetworkType {
+    None,
+    Bridge,
+    Overlay,
+}
+
+/// Container volume configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerVolume {
+    pub is_bind_mount: bool,
+    pub is_tmpfs: bool,
+    pub read_only: bool,
 }
 
 /// Container user namespaces mapping
@@ -778,12 +909,11 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = RuntimeVecIterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
 }
 
 

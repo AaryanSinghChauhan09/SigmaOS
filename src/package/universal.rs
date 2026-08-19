@@ -102,11 +102,14 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
-    AppImage, // portable app
-    Guix,     // functional package format
-    Nix,      // nixos package format
-    Portage,  // gentoo emerge
-    Zypper,   // opensuse package format
+    // Advanced Open-Source Packaging Formats:
+    Portage,      // Gentoo Portage (ebuild source recipes)
+    FreeBsdPkg,   // FreeBSD pkg (txz binaries)
+    ArchPkgBuild, // Arch PKGBUILD (source compile scripts)
+    NixStore,     // Nix package manager (content-addressed store hashes)
+    AppImage,     // AppImage (self-contained portable binaries)
+    Homebrew,     // Homebrew (ruby formulas)
+    Apk,      // alpine apk format
 }
 
 /// Package source
@@ -723,6 +726,7 @@ pub struct PackageCheckpoint {
     pub installed_keys: Vec<String>,
 }
 
+/// Universal package manager with transaction-safe snapshots & rollback mechanisms
 /// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
 #[derive(Debug, Clone)]
 pub struct TransactionalHistory {
@@ -811,13 +815,40 @@ impl UniversalPackageManager {
             .insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
     }
 
-    /// Dynamic polymorphic registration of custom format adapters
-    pub fn register_adapter(
-        &mut self,
-        format: PackageFormat,
-        adapter: Box<dyn PackageFormatAdapter>,
-    ) {
-        self.adapters.insert(format, adapter);
+        // Advanced Open-Source Adapters:
+        let portage_adapter =
+            PackageAdapter::new(PackageFormat::Portage, "portage_ebuild".to_string());
+        let freebsd_adapter =
+            PackageAdapter::new(PackageFormat::FreeBsdPkg, "freebsd_pkg".to_string());
+        let arch_pkgbuild_adapter =
+            PackageAdapter::new(PackageFormat::ArchPkgBuild, "arch_pkgbuild".to_string());
+        let nix_adapter = PackageAdapter::new(PackageFormat::NixStore, "nix_store".to_string());
+        let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
+        let homebrew_adapter =
+            PackageAdapter::new(PackageFormat::Homebrew, "homebrew_formula".to_string());
+
+        self.adapters.insert(PackageFormat::Deb, apt_adapter);
+        self.adapters.insert(PackageFormat::Rpm, yum_adapter);
+        self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
+        self.adapters.insert(PackageFormat::Snap, snap_adapter);
+        self.adapters
+            .insert(PackageFormat::Flatpak, flatpak_adapter);
+        self.adapters
+            .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
+
+        self.adapters
+            .insert(PackageFormat::Portage, portage_adapter);
+        self.adapters
+            .insert(PackageFormat::FreeBsdPkg, freebsd_adapter);
+        self.adapters
+            .insert(PackageFormat::ArchPkgBuild, arch_pkgbuild_adapter);
+        self.adapters.insert(PackageFormat::NixStore, nix_adapter);
+        self.adapters
+            .insert(PackageFormat::AppImage, appimage_adapter);
+        self.adapters
+            .insert(PackageFormat::Homebrew, homebrew_adapter);
+        self.adapters
+            .insert(PackageFormat::Apk, apk_adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -955,7 +986,9 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 11);
+        assert_eq!(manager.adapters.len(), 12); // Includes all 12 formats now!
+        assert_eq!(manager.adapters.len(), 6);
+        assert_eq!(manager.adapters.len(), 7); // Deb, Rpm, Pacman, Snap, Flatpak, SigmaPkg, Apk
     }
 
     #[test]
@@ -1047,7 +1080,81 @@ mod tests {
 
         manager.add_package(pkg1);
 
-        let checkpoint_id = manager.create_checkpoint();
-        assert_eq!(checkpoint_id, 0);
+        // Install first package
+        manager.install("essential-tool").unwrap();
+        assert_eq!(manager.installed_packages.len(), 1);
+        assert!(manager.installed_packages.contains_key("essential-tool"));
+
+        // Create snapshot 1
+        let snap_id = manager.create_snapshot("First stable package state".to_string());
+        assert_eq!(manager.list_snapshots().len(), 1);
+
+        // Install second package
+        manager.install("add-on-tool").unwrap();
+        assert_eq!(manager.installed_packages.len(), 2);
+        assert!(manager.installed_packages.contains_key("add-on-tool"));
+
+        // Rollback to snapshot 1
+        manager.rollback_to_snapshot(snap_id).unwrap();
+
+        // Verify state is reverted to exactly one package
+        assert_eq!(manager.installed_packages.len(), 1);
+        assert!(manager.installed_packages.contains_key("essential-tool"));
+        assert!(!manager.installed_packages.contains_key("add-on-tool"));
+
+        // Delete snapshot
+        assert!(manager.delete_snapshot(snap_id).is_ok());
+        assert!(manager.list_snapshots().is_empty());
+    }
+
+    #[test]
+    fn test_multi_distro_metadata_parser() {
+        let adapter = MultiDistroPackageAdapter::new();
+
+        // DEB
+        let deb_ctrl = "Package: nginx\nVersion: 1.18.0\nDepends: libc6, libpcre3\n";
+        let deb_pkg = adapter.parse_package_headers(deb_ctrl, PackageFormat::Deb).unwrap();
+        assert_eq!(deb_pkg.name, "nginx");
+        assert_eq!(deb_pkg.version, "1.18.0");
+        assert_eq!(deb_pkg.dependencies, vec!["libc6", "libpcre3"]);
+
+        // RPM
+        let rpm_spec = "Name: coreutils\nVersion: 8.32\nRequires: glibc, selinux-policy\n";
+        let rpm_pkg = adapter.parse_package_headers(rpm_spec, PackageFormat::Rpm).unwrap();
+        assert_eq!(rpm_pkg.name, "coreutils");
+        assert_eq!(rpm_pkg.dependencies, vec!["glibc", "selinux-policy"]);
+
+        // Pacman
+        let pacman_pkginfo = "pkgname = pacman\npkgver = 6.0.1\ndepend = openssl\ndepend = curl\n";
+        let pac_pkg = adapter.parse_package_headers(pacman_pkginfo, PackageFormat::Pacman).unwrap();
+        assert_eq!(pac_pkg.name, "pacman");
+        assert_eq!(pac_pkg.dependencies, vec!["openssl", "curl"]);
+
+        // APK
+        let apk_idx = "P:musl-utils\nV:1.2.2\nD:scanelf so:libc.musl-x86_64.so.1\n";
+        let apk_pkg = adapter.parse_package_headers(apk_idx, PackageFormat::Apk).unwrap();
+        assert_eq!(apk_pkg.name, "musl-utils");
+        assert_eq!(apk_pkg.dependencies, vec!["scanelf", "so:libc.musl-x86_64.so.1"]);
+    }
+
+    #[test]
+    fn test_package_install_hook() {
+        let mut hook = PackageInstallHook::new("AuditorHook");
+        let safe_pkg = UnifiedPackage::new("libreoffice".to_string(), "7.1.0".to_string());
+        let unsafe_pkg = UnifiedPackage::new("untrusted-app".to_string(), "2.0.0".to_string());
+
+        assert!(hook.execute_pre_install_hook(&safe_pkg));
+        assert!(!hook.execute_pre_install_hook(&unsafe_pkg));
+        assert_eq!(hook.run_counter, 2);
+    }
+
+    #[test]
+    fn test_multi_format_extractor() {
+        let mut extractor = MultiFormatExtractor::new();
+        let deb_pkg = UnifiedPackage::new("git".to_string(), "2.30.0".to_string()).with_format(PackageFormat::Deb);
+
+        let count = extractor.extract_payload(&deb_pkg).unwrap();
+        assert_eq!(count, 3);
+        assert_eq!(extractor.extracted_paths[0], "usr/bin/apt-app");
     }
 }

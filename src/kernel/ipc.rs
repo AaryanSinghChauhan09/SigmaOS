@@ -565,4 +565,39 @@ mod tests {
         assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
         assert!(ring.pop_item().is_none());
     }
+
+    #[test]
+    fn test_zero_copy_latency_and_capability_delegation() {
+        let mut channel = Channel::new(5, 100, 200);
+
+        // 1. Test delegated capability path message
+        let token = CapabilityToken::new().allow_ipc();
+        let msg = Message::DelegatedCapability {
+            token,
+            delegator: 100,
+            delegatee: 200,
+            delegation_path: vec![100, 150, 200],
+        };
+        assert!(channel.send(msg).is_ok());
+
+        // 2. Test zero-copy pointer transmission and latency checking (must be <100μs)
+        let virtual_ptr = 0x7FFF_0000;
+        let transfer_id = channel.send_zero_copy(virtual_ptr, 4096).unwrap();
+
+        let resolved_desc = channel.receive_zero_copy(transfer_id).unwrap();
+        assert_eq!(resolved_desc.source_virtual_addr, virtual_ptr);
+        assert_eq!(resolved_desc.length, 4096);
+        assert!(resolved_desc.latency_microseconds < 100); // verify <100μs latency
+    }
+
+    #[test]
+    fn test_ipc_fuzzing_harness() {
+        let mut manager = IpcManager::new();
+        let channel_id = manager.create_channel(10, 20);
+
+        // Run fuzz harness with various random seeds and check that all signals map correctly
+        for seed in 0..50 {
+            assert!(manager.fuzz_ipc_message_passing(channel_id, seed, 10).is_ok());
+        }
+    }
 }

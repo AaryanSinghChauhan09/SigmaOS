@@ -63,6 +63,7 @@ pub struct Inode {
     pub modified: u64,
     pub capabilities: CapabilityToken,
     pub link_count: u32, // standard inode link count tracking hard links
+    pub hard_links_count: u32, // standard Linux reference links counter
 }
 
 impl Inode {
@@ -78,6 +79,7 @@ impl Inode {
             modified: 0,
             capabilities: CapabilityToken::new(),
             link_count: 1, // default link count of 1
+            hard_links_count: 1, // Default initial link
         }
     }
 }
@@ -215,6 +217,10 @@ impl VirtualFilesystem {
         let bytes_to_read = buffer.len().min(remaining);
 
         // Prevent integer overflow in offset calculation
+        let new_offset = file_descriptor
+            .offset
+            .checked_add(buffer.len() as u64)
+        let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
         let _new_offset = file_descriptor
             .offset
             .checked_add(bytes_to_read as u64)
@@ -313,6 +319,10 @@ impl VirtualFilesystem {
         if link_reached_zero {
             self.inodes.remove(&inode_id);
         }
+        
+        self.inodes.remove(&inode_id);
+
+        self.inodes.remove(&inode_id);
         Ok(())
     }
 

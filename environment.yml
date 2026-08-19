@@ -5,3 +5,5 @@ dependencies:
   - python=3.10
   - flake8
   - pytest
+  - requests
+  - psutil

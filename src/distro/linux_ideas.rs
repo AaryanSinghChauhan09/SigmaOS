@@ -7,6 +7,12 @@
 #![allow(unused_imports)]
 #![allow(clippy::new_without_default)]
 
+extern crate alloc;
+use crate::klib::Vec;
+use alloc::string::String;
+use crate::klib::{Vec, String};
+#[cfg(not(test))]
+#[cfg(test)]
 use std::vec::Vec;
 use std::string::String;
 
@@ -322,11 +328,22 @@ pub struct RunitService {
 
 impl RunitService {
     pub fn new(name: String) -> Self {
+        Self {
+            name,
+            status: ServiceStatus::Down,
+            restart_count: 0,
+            max_restarts: 5,
+            log_enabled: true,
+        }
         Self { name, status: ServiceStatus::Down, restart_count: 0, max_restarts: 5, log_enabled: true }
     }
 
     pub fn start(&mut self, pid: u32) {
         self.status = ServiceStatus::Starting;
+        self.status = ServiceStatus::Up {
+            pid,
+            uptime_secs: 0,
+        };
         self.status = ServiceStatus::Up { pid, uptime_secs: 0 };
     }
 

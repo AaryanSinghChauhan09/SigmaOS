@@ -1,9 +1,15 @@
+// OOP-based Interrupt/IRQ Controller for SigmaOS
+// Based on APIC/GIC Support specifications.
+#![no_std]
+#![no_main]
 /// Advanced High-Fidelity Heterogeneous Interrupt Controller (APIC, GIC, PLIC) for SigmaOS
 /// Models x86_64 APIC Inter-Processor Interrupts (IPI), ARM GIC Fast Interrupts (FIQ), and RISC-V PLIC Supervisor targets.
 
 extern crate alloc;
 
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type IRQNumber = usize;
@@ -20,6 +26,15 @@ pub enum IRQState {
 
 /// Dynamic Heterogeneous Interrupt Controller architectures
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IRQState {
+    Disabled = 0,
+    Enabled = 1,
+    Pending = 2,
+    InService = 3,
+}
+#[derive(Debug, Clone, Copy)]
+pub enum IRQState { Disabled = 0, Enabled = 1, Pending = 2, InService = 3 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ControllerType {
     Apic = 0, // x86_64 Advanced Programmable Interrupt Controller
@@ -47,6 +62,14 @@ pub enum InterruptPriority {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ControllerType {
+    APIC = 0,
+    GIC = 1,
+    PLIC = 2,
+}
+#[derive(Debug, Clone, Copy)]
+pub enum ControllerType { APIC = 0, GIC = 1, PLIC = 2 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IRQError {
     Success = 0,
     InvalidIRQ = 1,
@@ -60,9 +83,24 @@ pub trait InterruptController {
     fn get_irq_state(&self, irq: IRQNumber) -> IRQState;
 }
 
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IRQError {
+    Success = 0,
+    InvalidIRQ = 1,
+    ControllerError = 2,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum IRQError { Success = 0, InvalidIRQ = 1, ControllerError = 2 }
+
+#[repr(C)]
 /// Unified Multi-Architecture Interrupt Controller
 pub struct SimpleInterruptController {
     pub controller_type: ControllerType,
+    pub irq_states: Vec<AtomicUsize>,
+    pub irq_states: [AtomicUsize; 256],
     pub irq_states: Vec<AtomicU32>,
     pub irq_priorities: Vec<InterruptPriority>,
     pub target_mode: CpuPrivilegeMode,
@@ -70,6 +108,16 @@ pub struct SimpleInterruptController {
 
 impl SimpleInterruptController {
     pub fn new(controller_type: ControllerType) -> Self {
+        let mut irq_states = Vec::new();
+        for _ in 0..256 {
+            irq_states.push(AtomicUsize::new(IRQState::Disabled as usize));
+        }
+        SimpleInterruptController {
+            controller_type,
+            irq_states,
+        }
+        let mut irq_states = [AtomicUsize::new(IRQState::Disabled as usize); 256];
+        SimpleInterruptController { controller_type, irq_states }
         let mut states = Vec::new();
         let mut priorities = Vec::new();
         for _ in 0..256 {
@@ -104,11 +152,23 @@ impl InterruptController for SimpleInterruptController {
         if irq >= 256 {
             return Err(IRQError::InvalidIRQ);
         }
+        self.irq_states[irq].store(IRQState::Enabled as usize, Ordering::SeqCst);
+        if irq >= 256 { return Err(IRQError::InvalidIRQ); }
+        self.irq_states[irq].store(IRQState::Enabled as usize, Ordering::SeqCst);
+        if irq >= 256 {
+            return Err(IRQError::InvalidIRQ);
+        }
         self.irq_states[irq].store(IRQState::Enabled as u32, Ordering::SeqCst);
         Ok(())
     }
 
     fn disable_irq(&mut self, irq: IRQNumber) -> Result<(), IRQError> {
+        if irq >= 256 {
+            return Err(IRQError::InvalidIRQ);
+        }
+        self.irq_states[irq].store(IRQState::Disabled as usize, Ordering::SeqCst);
+        if irq >= 256 { return Err(IRQError::InvalidIRQ); }
+        self.irq_states[irq].store(IRQState::Disabled as usize, Ordering::SeqCst);
         if irq >= 256 {
             return Err(IRQError::InvalidIRQ);
         }
@@ -120,6 +180,17 @@ impl InterruptController for SimpleInterruptController {
         if irq >= 256 {
             return IRQState::Disabled;
         }
+        match self.irq_states[irq].load(Ordering::SeqCst) {
+            0 => IRQState::Disabled,
+            1 => IRQState::Enabled,
+            2 => IRQState::Pending,
+            _ => IRQState::InService,
+        }
+        if irq >= 256 { return IRQState::Disabled; }
+        unsafe { core::mem::transmute(self.irq_states[irq].load(Ordering::SeqCst)) }
+        if irq >= 256 {
+            return IRQState::Disabled;
+        }
         unsafe { core::mem::transmute(self.irq_states[irq].load(Ordering::SeqCst)) }
     }
 }
@@ -128,6 +199,7 @@ pub trait IRQHandler {
     fn handle_irq(&mut self, irq: IRQNumber) -> Result<(), IRQError>;
 }
 
+#[repr(C)]
 /// Real-time IRQ router
 pub struct SimpleIRQHandler {
     pub controller: SimpleInterruptController,
@@ -162,11 +234,18 @@ pub trait APICSupport {
 
 impl APICSupport for SimpleInterruptController {
     fn init_apic(&mut self) -> Result<(), IRQError> {
+        for state in &self.irq_states {
+            state.store(IRQState::Disabled as usize, Ordering::SeqCst);
+        for i in 0..256 {
+            self.irq_states[i].store(IRQState::Disabled as usize, Ordering::SeqCst);
         for i in 0..256 {
             self.irq_states[i].store(IRQState::Disabled as u32, Ordering::SeqCst);
         }
         Ok(())
     }
+
+    fn send_ipi(&mut self, _target: usize, _vector: usize) -> Result<(), IRQError> {
+    fn send_ipi(&mut self, _target: usize, _vector: usize) -> Result<(), IRQError> {
 
     /// Emits Inter-Processor Interrupt (IPI) to signal target CPU threads (x86 APIC specification)
     fn send_ipi(&mut self, _target_cpu_id: usize, vector: u8) -> Result<(), IRQError> {
@@ -177,6 +256,23 @@ impl APICSupport for SimpleInterruptController {
         // Set state to pending on the remote CPU line
         self.irq_states[v_idx].store(IRQState::Pending as u32, Ordering::SeqCst);
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_irq_controller_flows() {
+        let mut controller = SimpleInterruptController::new(ControllerType::APIC);
+        assert_eq!(controller.get_irq_state(42), IRQState::Disabled);
+
+        controller.enable_irq(42).unwrap();
+        assert_eq!(controller.get_irq_state(42), IRQState::Enabled);
+
+        controller.disable_irq(42).unwrap();
+        assert_eq!(controller.get_irq_state(42), IRQState::Disabled);
     }
 }
 
@@ -208,7 +304,6 @@ impl SimpleInterruptController {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_interrupt_controller_initialization() {

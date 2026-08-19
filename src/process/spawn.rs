@@ -1,11 +1,24 @@
+// OOP-based Process Spawning and POSIX Signals Framework for SigmaOS
+// Implements process lifecycles, fork, exec, and signals (SIGKILL, SIGTERM, SIGINT) under `#![no_std]`.
+
+extern crate alloc;
+#![no_std]
+#![no_main]
+
+/// OOP-based Process Spawning for SigmaOS
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 121
+/// Implements process creation, fork, and exec
 /// OOP-based Process Spawning for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 121
 /// Implements process creation, fork, exec, namespace isolations, and nice priority levels
-extern crate alloc;
 
 use alloc::boxed::Box;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
+extern crate alloc;
+
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicI32};
 
 pub type ProcessID = usize;
 
@@ -18,6 +31,10 @@ pub enum ProcessState {
     Zombie = 3,
     Terminated = 4,
 }
+#[derive(Debug, Clone, Copy)]
+pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,6 +45,10 @@ pub enum ProcessError {
     SpawnFailed = 3,
     InvalidNiceValue = 4,
 }
+#[derive(Debug, Clone, Copy)]
+pub enum ProcessError { Success = 0, NotFound = 1, InvalidArgs = 2, SpawnFailed = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessError { Success = 0, NotFound = 1, InvalidArgs = 2, SpawnFailed = 3, InvalidNiceValue = 4 }
 
 // Linux namespace isolation flags representation
 pub const CLONE_NEWNS: u32 = 0x00020000; // Mount namespace
@@ -40,6 +61,7 @@ pub trait Process {
     fn state(&self) -> ProcessState;
     fn set_state(&mut self, state: ProcessState);
     fn exit_code(&self) -> i32;
+    fn set_exit_code(&mut self, code: i32);
     fn nice(&self) -> i32;
     fn set_nice(&mut self, value: i32) -> Result<(), ProcessError>;
     fn namespace_flags(&self) -> u32;
@@ -76,6 +98,20 @@ impl Process for SimpleProcess {
     fn parent_id(&self) -> ProcessID {
         self.parent_id
     }
+    fn state(&self) -> ProcessState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => ProcessState::Created,
+            1 => ProcessState::Running,
+            2 => ProcessState::Sleeping,
+            3 => ProcessState::Zombie,
+            _ => ProcessState::Terminated,
+        }
+    }
+    fn id(&self) -> ProcessID { self.id }
+    fn parent_id(&self) -> ProcessID { self.parent_id }
+    fn state(&self) -> ProcessState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn id(&self) -> ProcessID { self.id }
+    fn parent_id(&self) -> ProcessID { self.parent_id }
 
     fn state(&self) -> ProcessState {
         match self.state.load(Ordering::SeqCst) {
@@ -94,6 +130,12 @@ impl Process for SimpleProcess {
     fn exit_code(&self) -> i32 {
         self.exit_code.load(Ordering::SeqCst) as i32
     }
+
+    fn set_exit_code(&mut self, code: i32) {
+        self.exit_code.store(code as usize, Ordering::SeqCst);
+    }
+    fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
+    fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
 
     fn nice(&self) -> i32 {
         self.nice_val.load(Ordering::SeqCst)
@@ -164,6 +206,10 @@ impl ProcessSpawner for SimpleProcessSpawner {
         _executable: &[u8],
         _args: &[[u8; 64]],
     ) -> Result<(), ProcessError> {
+        for process_option in &mut self.processes {
+    fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
+        for process_option in &mut self.processes {
+    fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
         for process_option in self.processes.as_slice_mut() {
             if let Some(ref mut process) = *process_option {
                 if process.id() == process_id {
@@ -175,6 +221,14 @@ impl ProcessSpawner for SimpleProcessSpawner {
         Err(ProcessError::NotFound)
     }
 
+    /// Dispatches POSIX signals. SIGKILL forces instant termination. Graceful signals trigger handlers or exit.
+    fn kill(&mut self, process_id: ProcessID, signal: u8) -> Result<(), ProcessError> {
+        let mut process_found = false;
+        let mut exit_code_to_set = 0;
+
+        for process_option in &mut self.processes {
+    fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
+        for process_option in &mut self.processes {
     fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
         for process_option in self.processes.as_slice_mut() {
             if let Some(ref mut process) = *process_option {
@@ -227,6 +281,10 @@ impl ProcessWaiter for SimpleProcessWaiter {
         process_id: ProcessID,
         _options: u32,
     ) -> Result<(ProcessID, i32), ProcessError> {
+        for process_option in &self.spawner.processes {
+    fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
+        for process_option in &self.spawner.processes {
+    fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
         for process_option in self.spawner.processes.as_slice() {
             if let Some(ref process) = *process_option {
                 if process.id() == process_id {
@@ -281,6 +339,8 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 
     fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
+        for group in &self.groups {
+        for group in &mut self.groups {
         for group in self.groups.as_slice_mut() {
             if group.0 == group_id {
                 return Ok(());
@@ -290,18 +350,56 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 }
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use core::sync::atomic::AtomicUsize;
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
+    static CUSTOM_SIGNAL_DISPATCH_COUNT: AtomicUsize = AtomicUsize::new(0);
+
+    fn custom_sigterm_handler(_pid: ProcessID, _sig: u8) {
+        CUSTOM_SIGNAL_DISPATCH_COUNT.fetch_add(1, Ordering::SeqCst);
+    }
+
+    #[test]
+    fn test_process_spawning_and_sigkill() {
+        let mut spawner = SimpleProcessSpawner::new();
+        let pid = spawner.spawn(b"/bin/shell", &[]).unwrap();
+
+        // 1. Send un-catchable SIGKILL -> Process should be instantly terminated with exit status 137
+        spawner.kill(pid, SIGKILL).unwrap();
+
+        let mut waiter = SimpleProcessWaiter::new(spawner);
+        let exit_code = waiter.wait(pid).unwrap();
+        assert_eq!(exit_code, 137);
+    }
+
+    #[test]
+    fn test_custom_signal_handler_and_sigterm() {
+        let mut spawner = SimpleProcessSpawner::new();
+        let pid = spawner.spawn(b"/bin/logger", &[]).unwrap();
+        spawner.exec(pid, b"/bin/logger", &[]).unwrap();
+
+        // Register custom SIGTERM (15) handler
+        spawner.register_signal_handler(pid, SIGTERM, custom_sigterm_handler);
+
+        // Send SIGTERM -> Custom handler should be dispatched instead of default termination
+        spawner.kill(pid, SIGTERM).unwrap();
+        assert_eq!(CUSTOM_SIGNAL_DISPATCH_COUNT.load(Ordering::SeqCst), 1);
+
+        // Standard processes state is unchanged since handler didn't call exit
+        let mut waiter = SimpleProcessWaiter::new(spawner);
+        assert!(waiter.wait(pid).is_err()); // Not terminated yet!
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
         }
     }
     fn push(&mut self, item: T) {
@@ -349,6 +447,8 @@ impl<T> Vec<T> {
     }
 }
 
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
 #[cfg(not(test))]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
@@ -370,7 +470,6 @@ unsafe fn free(_ptr: *mut u8) {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_process_nice_and_namespaces() {

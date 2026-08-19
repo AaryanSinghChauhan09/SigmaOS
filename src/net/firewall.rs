@@ -5,6 +5,10 @@ use std_alloc::boxed::Box;
 
 #![no_std]
 #![cfg_attr(not(test), no_main)]
+#![no_std]
+#![no_main]
+// #![no_std]
+// #![no_main]
 
 /// OOP-based Firewall & AI Intrusion Detection System (IDS) for SigmaOS
 /// Implements standard packet filtering, Snort-style signature checking,
@@ -29,6 +33,12 @@ pub enum FirewallHook {
     Output,
     Postrouting,
 }
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum RuleAction { Accept = 0, Drop = 1, Reject = 2, Log = 3 }
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RuleAction { Accept = 0, Drop = 1, Reject = 2, Log = 3 }
 
 /// Action taken on matching packet
 #[repr(C)]
@@ -39,6 +49,10 @@ pub enum RuleAction {
     Reject = 2,
     Log = 3,
 }
+#[derive(Debug, Clone, Copy)]
+pub enum Protocol { TCP = 6, UDP = 17, ICMP = 1, Any = 255 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Protocol { TCP = 6, UDP = 17, ICMP = 1, Any = 255 }
 
 /// Supported packet protocols
 #[repr(C)]
@@ -49,6 +63,10 @@ pub enum Protocol {
     Icmp = 1,
     Any = 255,
 }
+#[derive(Debug, Clone, Copy)]
+pub enum FirewallError { Success = 0, InvalidRule = 1, NotFound = 2 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FirewallError { Success = 0, InvalidRule = 1, NotFound = 2 }
 
 /// Stateful Connection Tracking States
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -203,6 +221,35 @@ impl FirewallRule for SimpleFirewallRule {
     fn hook(&self) -> FirewallHook {
         self.hook
     }
+    fn id(&self) -> RuleID { self.id }
+    fn action(&self) -> RuleAction { unsafe { core::mem::transmute(self.action.load(Ordering::SeqCst)) } }
+    fn protocol(&self) -> Protocol { unsafe { core::mem::transmute(self.protocol.load(Ordering::SeqCst)) } }
+    fn source_ip(&self) -> &[u8] { &self.source_ip }
+    fn destination_ip(&self) -> &[u8] { &self.destination_ip }
+    fn source_port(&self) -> u16 { self.source_port.load(Ordering::SeqCst) as u16 }
+    fn destination_port(&self) -> u16 { self.destination_port.load(Ordering::SeqCst) as u16 }
+    fn id(&self) -> RuleID { self.id }
+    fn action(&self) -> RuleAction {
+        match self.action.load(Ordering::SeqCst) {
+            0 => RuleAction::Accept,
+            1 => RuleAction::Drop,
+            2 => RuleAction::Reject,
+            3 => RuleAction::Log,
+            _ => RuleAction::Drop,
+        }
+    }
+    fn protocol(&self) -> Protocol {
+        match self.protocol.load(Ordering::SeqCst) {
+            6 => Protocol::TCP,
+            17 => Protocol::UDP,
+            1 => Protocol::ICMP,
+            _ => Protocol::Any,
+        }
+    }
+    fn source_ip(&self) -> &[u8] { &self.source_ip }
+    fn destination_ip(&self) -> &[u8] { &self.destination_ip }
+    fn source_port(&self) -> u16 { self.source_port.load(Ordering::SeqCst) as u16 }
+    fn destination_port(&self) -> u16 { self.destination_port.load(Ordering::SeqCst) as u16 }
 }
 
 /// Network Address Translation (NAT) Mapping entry
@@ -241,6 +288,22 @@ impl SovereignFirewall {
             true
         } else {
             false
+    fn remove_rule(&mut self, id: RuleID) -> Result<(), FirewallError> {
+        for rule_option in &mut self.rules {
+            if let Some(ref rule) = *rule_option {
+                if rule.id() == id {
+                    return Ok(());
+                }
+            }
+    fn remove_rule(&mut self, id: RuleID) -> Result<(), FirewallError> {
+        for i in 0..self.rules.len {
+            let rule_option = unsafe { &mut *self.rules.data.add(i) };
+            if let Some(ref rule) = *rule_option {
+                if rule.id() == id {
+                    *rule_option = None;
+                    return Ok(());
+                }
+            }
         }
     }
 
@@ -259,11 +322,29 @@ impl SovereignFirewall {
         let state = self.conntrack.track_packet(protocol, src_ip, dst_ip, src_port, dst_port, timestamp);
         if state == ConnectionState::Established {
             return RuleAction::Accept; // Instant fast-path acceptance (iptables state ESTABLISHED rule equivalent)
+    fn get_rule(&self, id: RuleID) -> Option<&dyn FirewallRule> {
+        for rule_option in &self.rules {
+            if let Some(ref rule) = *rule_option {
+                if rule.id() == id { return Some(rule.as_ref()); }
+            }
+    fn get_rule(&self, id: RuleID) -> Option<&dyn FirewallRule> {
+        for i in 0..self.rules.len {
+            let rule_option = unsafe { &*self.rules.data.add(i) };
+            if let Some(ref rule) = *rule_option {
+                if rule.id() == id { return Some(rule.as_ref()); }
+            }
         }
 
         // 2. Netfilter Rule Chain Match
         for rule in &self.rules {
             if rule.hook() == hook {
+    fn filter_packet(&self, protocol: Protocol, source_ip: &[u8], destination_ip: &[u8], source_port: u16, destination_port: u16) -> RuleAction {
+        for rule_option in &self.rules {
+            if let Some(ref rule) = *rule_option {
+    fn filter_packet(&self, protocol: Protocol, source_ip: &[u8], destination_ip: &[u8], source_port: u16, destination_port: u16) -> RuleAction {
+        for i in 0..self.rules.len {
+            let rule_option = unsafe { &*self.rules.data.add(i) };
+            if let Some(ref rule) = *rule_option {
                 if rule.protocol() == Protocol::Any || rule.protocol() == protocol {
                     if rule.source_ip() == &[0, 0, 0, 0] || rule.source_ip() == src_ip {
                         if rule.destination_ip() == &[0, 0, 0, 0] || rule.destination_ip() == dst_ip {
@@ -545,7 +626,6 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_snort_signature_matching() {

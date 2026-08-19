@@ -10,7 +10,6 @@ use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::format;
-use alloc::string::ToString;
 
 /// Documentation format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -270,7 +269,6 @@ impl Default for ApiDocBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
 
     #[test]
     fn test_doc_entry_creation() {
@@ -382,6 +380,34 @@ mod tests {
     }
 
     #[test]
+    fn test_sovereign_man_pages() {
+        let mut indexer = SovereignManPageIndexer::new();
+
+        // Check default pages registered
+        assert_eq!(indexer.pages.len(), 2);
+
+        // Compile sigpkg page
+        let compiled = indexer.compile_man_page("sigpkg", None).unwrap();
+        assert!(compiled.contains("NAME"));
+        assert!(compiled.contains("sigpkg"));
+        assert!(compiled.contains("SYNOPSIS"));
+        assert!(compiled.contains("sigma-vim"));
+
+        // Add custom manual page (Pledge)
+        indexer.register_man_page(ManPage {
+            name: "pledge".to_string(),
+            section: 2,
+            synopsis: "pledge(promises)".to_string(),
+            description: "Dropping execution capabilities statically.".to_string(),
+            examples: "pledge(\"stdio rpath\")".to_string(),
+        });
+
+        assert_eq!(indexer.pages.len(), 3);
+        let pledge_page = indexer.compile_man_page("pledge", Some(2)).unwrap();
+        assert!(pledge_page.contains("stdio rpath"));
+    }
+
+    #[test]
     fn test_pdf_generation() {
         let mut generator = DocGenerator::new();
         generator.add_entry(DocEntry::new(
@@ -397,5 +423,33 @@ mod tests {
         assert!(pdf.starts_with("%PDF-1.4"));
         assert!(pdf.contains("Architecture Guide"));
         assert!(pdf.ends_with("%%EOF"));
+    }
+
+    #[test]
+    fn test_sovereign_man_pages() {
+        let mut indexer = SovereignManPageIndexer::new();
+
+        // Check default pages registered
+        assert_eq!(indexer.pages.len(), 2);
+
+        // Compile sigpkg page
+        let compiled = indexer.compile_man_page("sigpkg", None).unwrap();
+        assert!(compiled.contains("NAME"));
+        assert!(compiled.contains("sigpkg"));
+        assert!(compiled.contains("SYNOPSIS"));
+        assert!(compiled.contains("sigma-vim"));
+
+        // Add custom manual page (Pledge)
+        indexer.register_man_page(ManPage {
+            name: "pledge".to_string(),
+            section: 2,
+            synopsis: "pledge(promises)".to_string(),
+            description: "Dropping execution capabilities statically.".to_string(),
+            examples: "pledge(\"stdio rpath\")".to_string(),
+        });
+
+        assert_eq!(indexer.pages.len(), 3);
+        let pledge_page = indexer.compile_man_page("pledge", Some(2)).unwrap();
+        assert!(pledge_page.contains("stdio rpath"));
     }
 }

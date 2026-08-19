@@ -344,6 +344,95 @@ impl Default for GpuAcceleratedBackend {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpuEncoderType {
+    NvidiaNvenc,
+    IntelQuickSync,
+    AmdVce,
+    SoftwareFallback,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BandicamCaptureMode {
+    ScreenArea,
+    GameHookOpenGL,
+    DirectXOverlay,
+}
+
+/// Bandicam-inspired GPU-accelerated High-Performance Screen and Game Recorder
+pub struct BandicamGpuBackend {
+    state: RecordingState,
+    start_time: Option<Instant>,
+    config: Option<RecordingConfig>,
+    pub encoder: GpuEncoderType,
+    pub capture_mode: BandicamCaptureMode,
+}
+
+impl BandicamGpuBackend {
+    pub fn new(encoder: GpuEncoderType, capture_mode: BandicamCaptureMode) -> Self {
+        Self {
+            state: RecordingState::Idle,
+            start_time: None,
+            config: None,
+            encoder,
+            capture_mode,
+        }
+    }
+}
+
+impl RecordingBackend for BandicamGpuBackend {
+    fn start_recording(&mut self, config: &RecordingConfig) -> Result<(), RecorderError> {
+        self.state = RecordingState::Recording;
+        self.start_time = Some(Instant::now());
+        self.config = Some(config.clone());
+        Ok(())
+    }
+
+    fn stop_recording(&mut self) -> Result<PathBuf, RecorderError> {
+        let config = self.config.as_ref().ok_or(RecorderError::NotRecording)?;
+        let output_path = config.output_path.clone();
+        self.state = RecordingState::Idle;
+        self.start_time = None;
+        self.config = None;
+        Ok(output_path)
+    }
+
+    fn pause_recording(&mut self) -> Result<(), RecorderError> {
+        if self.state != RecordingState::Recording {
+            return Err(RecorderError::NotRecording);
+        }
+        self.state = RecordingState::Paused;
+        Ok(())
+    }
+
+    fn resume_recording(&mut self) -> Result<(), RecorderError> {
+        if self.state != RecordingState::Paused {
+            return Err(RecorderError::NotPaused);
+        }
+        self.state = RecordingState::Recording;
+        Ok(())
+    }
+
+    fn get_state(&self) -> RecordingState {
+        self.state
+    }
+
+    fn get_progress(&self) -> RecordingProgress {
+        let duration = self.start_time.map(|t| t.elapsed().as_secs()).unwrap_or(0);
+
+        RecordingProgress {
+            duration_seconds: duration,
+            frames_captured: duration * 60,          // Bandicam high-refresh 60 FPS recording
+            file_size_bytes: duration * 256 * 1024,  // 256KB per second (highly efficient GPU NVENC compression)
+            current_bitrate_mbps: 2.0,               // highly efficient compression ratio
+        }
+    }
+
+    fn name(&self) -> &str {
+        "Bandicam GPU Accelerator"
+    }
+}
+
 /// OOP-based Screen Recorder
 pub struct ScreenRecorder {
     backend: Box<dyn RecordingBackend>,

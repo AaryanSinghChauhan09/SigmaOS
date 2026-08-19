@@ -16,12 +16,10 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod subsystem;
-pub mod vmm_paging;
-pub mod processor_management;
-pub mod cpufreq;
-pub mod structures;
-pub mod object;
+pub mod virtual_cpu;
+pub mod self_healing;
+pub mod udkf;
+pub mod breakthrough;
 
 pub use vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
 
@@ -46,9 +44,14 @@ pub use performance::{
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use structures::{
-    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
-    CpuArchitectureClass, EdfTask, LcgRandom, LotteryTask, SequencedSinglyLinkedList,
-    SinglyLinkedList, SystemThread, WorkItem,
+pub use virtual_cpu::{CpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU};
+pub use self_healing::{
+    SovereignSelfHealingKernel,
+};
+pub use breakthrough::{
+    SovereignKernelModuleSystem, SovereignKernelModule, ModuleState, SigmaSignal, ProcessProvenanceNode, PredictiveScheduler, AdaptiveRoot, ThreatLevel,
+};
+pub use udkf::{
+    UdkfHook, UserDefinedKernelFunctions,
 };
 pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};

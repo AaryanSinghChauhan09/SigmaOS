@@ -367,6 +367,17 @@ mod tests {
             Version::new(1, 0, 0),
             String::new(),
             vec![Dependency {
+        // Create circular dependency: A -> B -> A
+        let pkg_a = Package {
+            name: "A".to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            dependencies: vec![Dependency {
+        let pkg_a = Package {
+            name: "A".to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            dependencies: vec![Dependency {
                 name: "B".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],

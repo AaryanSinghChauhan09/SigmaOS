@@ -1,7 +1,8 @@
 // SigmaOS Driver Module
 pub mod device;
 pub mod framework;
-pub mod grid;
+pub mod windows_compat;
+pub mod simulation;
 pub mod mapper;
 pub mod pods;
 pub mod simulation;

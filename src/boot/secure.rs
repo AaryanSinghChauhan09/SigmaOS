@@ -645,7 +645,6 @@ extern "C" {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_uefi_secure_db_verifications() {
