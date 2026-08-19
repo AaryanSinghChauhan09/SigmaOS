@@ -337,6 +337,55 @@ impl MultiTrackSession {
 
         stereo_mix
     }
+
+    /// Mixes tracks into a stereo interleaved L/R buffer (Audition-style spatial panning)
+    pub fn mix_stereo_session(&self) -> Vec<(f32, f32)> {
+        let mut max_len = 0;
+        let mut has_solo_active = false;
+
+        for track in &self.tracks {
+            if track.is_solo && !track.is_muted {
+                has_solo_active = true;
+            }
+            if track.samples.len() > max_len {
+                max_len = track.samples.len();
+            }
+        }
+
+        let mut stereo_mix = Vec::with_capacity(max_len);
+        for _ in 0..max_len {
+            stereo_mix.push((0.0f32, 0.0f32));
+        }
+
+        for track in &self.tracks {
+            let is_active = if has_solo_active {
+                track.is_solo && !track.is_muted
+            } else {
+                !track.is_muted
+            };
+
+            if is_active {
+                // Constant-power panning law
+                let pan_clamped = track.pan.clamp(-1.0, 1.0);
+                let left_gain = ((1.0 - pan_clamped) * 0.5).sqrt() * track.volume;
+                let right_gain = ((1.0 + pan_clamped) * 0.5).sqrt() * track.volume;
+
+                for sample_idx in 0..track.samples.len() {
+                    let s = track.samples[sample_idx];
+                    stereo_mix[sample_idx].0 += s * left_gain;
+                    stereo_mix[sample_idx].1 += s * right_gain;
+                }
+            }
+        }
+
+        // Apply hard limiter to both left and right channels
+        for pair in &mut stereo_mix {
+            pair.0 = pair.0.clamp(-1.0, 1.0);
+            pair.1 = pair.1.clamp(-1.0, 1.0);
+        }
+
+        stereo_mix
+    }
 }
 
 impl Default for MultiTrackSession {
@@ -1271,6 +1320,43 @@ mod tests {
         AudioEditor::silence(&mut track, 1, 3);
         assert_eq!(track.samples[1], 0.0);
         assert_eq!(track.samples[2], 0.0);
+    }
+
+    #[test]
+    fn test_vocal_remover_and_adsr_envelope() {
+        let left = [0.8, 0.5, 0.9];
+        let right = [0.8, -0.5, 0.9]; // Center vocal (0.8, 0.9) matches, sides differ
+
+        let mono = VocalRemoverEffect::apply_vocal_remover(&left, &right);
+        assert_eq!(mono[0], 0.0); // Identical center vocal completely cancelled!
+        assert_eq!(mono[1], 0.5); // Side differences preserved
+
+        let mut samples = [1.0; 100];
+        let adsr = ADSRVolumeEnvelope::new(10, 10, 0.5, 20);
+        adsr.apply(&mut samples);
+
+        assert_eq!(samples[0], 0.0); // Attack starts at zero
+        assert!((samples[20] - 0.5).abs() < 1e-5); // Sustain level reached
+        assert!(samples[99] < 0.05); // Release fades to near-zero at tail
+    }
+
+    #[test]
+    fn test_stereo_panning_session() {
+        let mut session = MultiTrackSession::new(44100);
+
+        let mut left_track = AudioTrack::new(1, "LeftGuitar").with_samples(&[1.0]);
+        left_track.pan = -1.0; // Hard panned left
+
+        let mut right_track = AudioTrack::new(2, "RightGuitar").with_samples(&[1.0]);
+        right_track.pan = 1.0; // Hard panned right
+
+        session.add_track(left_track);
+        session.add_track(right_track);
+
+        let stereo = session.mix_stereo_session();
+        assert_eq!(stereo.len(), 1);
+        assert!(stereo[0].0 > 0.9); // Left channel has energy
+        assert!(stereo[0].1 > 0.9); // Right channel has energy
     }
 
     #[test]

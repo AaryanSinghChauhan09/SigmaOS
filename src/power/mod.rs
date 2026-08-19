@@ -9,6 +9,13 @@ use crate::klib::{Vec, String};
 use alloc::vec::Vec;
 use alloc::string::String;
 
+pub mod sovereign_power;
+
+pub use sovereign_power::{
+    SovereignPowerThermalGovernance, AcpiSystemPowerState, CpuCState,
+    SovereignCpuGovernor, RaplPowerLimits,
+};
+
 /// Power profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerProfile {

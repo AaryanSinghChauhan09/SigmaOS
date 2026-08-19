@@ -18,6 +18,8 @@ pub mod pf_firewall;
 pub mod nftables;
 pub mod npf;
 
+pub use npf::{NpfFirewallEngine, NpfFilterAction, NpfDirection, NpfPacket, NpfStateRule};
+
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use analyzer::{
     NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
