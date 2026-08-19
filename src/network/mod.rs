@@ -12,6 +12,9 @@ pub mod sync;
 pub mod torrent;
 pub mod pf_firewall;
 pub mod nftables;
+pub mod npf;
+
+pub use npf::{NpfFirewallEngine, NpfFilterAction, NpfDirection, NpfPacket, NpfStateRule};
 
 // pub use analyzer::{
 //     AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,

@@ -33,6 +33,12 @@ pub mod boot_init;
 pub mod dde;
 pub mod flipper_gpio_sensor;
 pub mod intel_e1000;
+pub mod sovereign_driver_lifecycle;
+
+pub use sovereign_driver_lifecycle::{
+    SovereignDriverManager, UniversalDriverDescriptor, HardwareTier,
+    DriverLifecycleState, LocklessDmaRingQueue, PciDeviceId,
+};
 
 pub use even_more_devices::*;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
