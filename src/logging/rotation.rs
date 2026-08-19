@@ -2,7 +2,6 @@
 // Enhanced with standard Linux-conforming syslog-parity multi-generation rotations, facilities, and RLE compression
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -99,6 +98,26 @@ pub trait LogRotator {
     fn rotate(&mut self, id: LogFileID) -> Result<(), RotationError>;
 }
 
+/// Log rotation retention configuration inspired by Linux logrotate & BSD newsyslog
+#[derive(Debug, Clone)]
+pub struct LogRotateConfig {
+    pub max_size_bytes: usize,
+    pub max_generations: usize,
+    pub compress_rotated: bool,
+    pub policy: RotationPolicy,
+}
+
+impl LogRotateConfig {
+    pub fn default_syslog() -> Self {
+        Self {
+            max_size_bytes: 10 * 1024 * 1024, // 10MB
+            max_generations: 5,
+            compress_rotated: true,
+            policy: RotationPolicy::Size,
+        }
+    }
+}
+
 #[repr(C)]
 pub struct SimpleLogRotator {
     pub log_files: Vec<Option<Box<dyn LogFile>>>,
@@ -106,6 +125,7 @@ pub struct SimpleLogRotator {
     pub threshold: AtomicUsize,
     pub next_id: AtomicUsize,
     pub active_generations: Vec<String>, // Tracks rotated generations e.g. "syslog.1.gz", "syslog.2.gz"
+    pub compressor: SimpleLogCompressor,
 }
 
 impl SimpleLogRotator {
@@ -116,6 +136,7 @@ impl SimpleLogRotator {
             threshold: AtomicUsize::new(10 * 1024 * 1024),
             next_id: AtomicUsize::new(1),
             active_generations: Vec::new(),
+            compressor: SimpleLogCompressor::new(),
         }
     }
 
@@ -132,6 +153,11 @@ impl SimpleLogRotator {
         }
         new_generations.push(format!("{}.1.gz", base_filename));
         self.active_generations = new_generations;
+    }
+
+    /// Compress log payload buffer using built-in RLE log compressor
+    pub fn compress_log_payload(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
+        self.compressor.compress(data)
     }
 }
 

@@ -15,6 +15,7 @@ pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
 pub mod kernel;
+pub mod logging;
 pub mod network;
 pub mod orchestration;
 pub mod distro;
@@ -93,6 +94,13 @@ pub use filesystem::{
     SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
 };
 pub use graphics::paint::ColorRgba;
+pub use logging::{
+    ConsoleLogTarget, FileLogTarget, LogCompressor, LogError, LogFacility, LogField, LogFile,
+    LogLevel, LogRotateConfig, LogRotator, LogSeverity, LogTarget, LoggerCapability,
+    MemoryLogTarget, NetworkFramingFormat, NetworkLogTarget, NetworkProtocol, RotationPolicy,
+    SimpleLogCompressor, SimpleLogFile, SimpleLogRotator, SimpleUnifiedLogger, SyslogFacility,
+    TargetCapability, TargetInfo, TargetType, UnifiedLogEntry, UnifiedLogStats, UnifiedLogger,
+};
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
     AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
