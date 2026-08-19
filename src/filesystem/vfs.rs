@@ -4,6 +4,8 @@
 use crate::security::{CapabilityToken, Permission};
 use alloc::collections::BTreeMap;
 use alloc::collections::HashMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // Standard POSIX / Linux / BSD open flags
 pub const O_RDONLY: u32 = 0x0000;
@@ -64,6 +66,11 @@ pub struct Inode {
     pub capabilities: CapabilityToken,
     pub link_count: u32, // standard inode link count tracking hard links
     pub hard_links_count: u32, // standard Linux reference links counter
+    // Conforming Linux/BSD additions
+    pub symlink_target: Option<String>,
+    pub xattrs: HashMap<String, Vec<u8>>,
+    pub data: Vec<u8>,                 // File storage data
+    pub entries: BTreeMap<String, u64>, // Directory entries
 }
 
 impl Inode {
@@ -80,6 +87,10 @@ impl Inode {
             capabilities: CapabilityToken::new(),
             link_count: 1, // default link count of 1
             hard_links_count: 1, // Default initial link
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            entries: BTreeMap::new(),
         }
     }
 }

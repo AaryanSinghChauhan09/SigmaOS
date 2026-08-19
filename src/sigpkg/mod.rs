@@ -26,11 +26,10 @@ pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
 
-pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-pub use debian_defeater::{
-    SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox,
-    SovereignMirrorSelector,
-};
+pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
+pub use debian_defeater::{AptPinningResolver, SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector, SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus};
+pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use spec::{
     ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
