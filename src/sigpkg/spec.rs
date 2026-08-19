@@ -606,16 +606,16 @@ impl CachyCpuDetector {
     }
 }
 
-pub struct AptPackageAdapter;
+pub struct AptPackageAdapterSpec;
 pub struct PackageAdapterFactory;
-pub struct PacmanPackageAdapter;
+pub struct PacmanPackageAdapterSpec;
 pub struct SnapPackageAdapter;
 pub struct NixPackageAdapter;
-pub struct EbuildPackageAdapter;
+pub struct EbuildPackageAdapterSpec;
 pub struct ApkPackageAdapter;
 pub struct FlatpakPackageAdapter;
 pub struct TxzPackageAdapter;
-pub struct XbpsPackageAdapter;
+pub struct XbpsPackageAdapterSpec;
 pub struct CachyosPackageAdapter;
 
 pub trait UniversalPackage {}
