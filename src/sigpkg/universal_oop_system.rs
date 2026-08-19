@@ -23,18 +23,11 @@
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(all(not(feature = "standalone_test"), target_os = "none"))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, Arc};
 
-#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
-use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
-use std::sync::Arc;
-
 #[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
-#[cfg(feature = "standalone_test")]
-use std::sync::Arc;
+use crate::klib::{HashMap, Arc};
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
