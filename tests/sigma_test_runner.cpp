@@ -67,6 +67,11 @@ extern "C" {
     sigma_status sigma_driver_registry_install(unsigned int index);
     sigma_status sigma_driver_registry_rebuild_dkms_abi(const char* kernel_version, const char* expected_abi_hash);
 
+    // OCI Container Runtime Function Declarations
+    int sigma_oci_create(const char* id, const char* bundle);
+    int sigma_oci_start(const char* id);
+    int sigma_oci_kill(const char* id, int signal);
+
     // Mock logs for linker resolution
     void zenith_log_structured(unsigned int code, const char* comp, const char* desc, unsigned int cid) {
         (void)code; (void)comp; (void)desc; (void)cid;
@@ -159,9 +164,15 @@ static void test_suite_networking() {
 
 static void test_suite_containers() {
     sigma_printf("\n[sigma-test] ── Container Runtime Tests ────────────\n");
-    SIGMA_ASSERT(1, "sigma_oci_create(): shard created from OCI bundle");
-    SIGMA_ASSERT(1, "sigma_oci_start(): entrypoint executed in shard");
-    SIGMA_ASSERT(1, "sigma_oci_kill(): proc shard terminated on SIGTERM");
+    int create_res = sigma_oci_create("test-container", "/var/bundles/nginx");
+    SIGMA_ASSERT(create_res == 0, "sigma_oci_create(): shard created from OCI bundle");
+
+    int start_res = sigma_oci_start("test-container");
+    SIGMA_ASSERT(start_res == 0, "sigma_oci_start(): entrypoint executed in shard");
+
+    int kill_res = sigma_oci_kill("test-container", 15);
+    SIGMA_ASSERT(kill_res == 0, "sigma_oci_kill(): proc shard terminated on SIGTERM");
+
     SIGMA_ASSERT(1, "sigma_oci_state(): returns valid OCI state JSON");
 }
 
