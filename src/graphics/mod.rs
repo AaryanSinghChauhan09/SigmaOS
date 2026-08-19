@@ -31,7 +31,7 @@ pub use zenith::{
     Magnifier, Panel, PanelOrientation, ScreenReader, Widget, ZenithCompositor,
 };
 pub use zenith_compositor::{
-    Geometry, WindowNode, WindowState, ZenithCompositor as WaylandZenithCompositor, SCREEN_HEIGHT,
+    Geometry, WindowNode, WindowState, WaylandZenithCompositor, SCREEN_HEIGHT,
     SCREEN_WIDTH,
 };
 pub use bsd_graphics::{
