@@ -154,66 +154,6 @@ impl IPackageAdapter for EbuildPackageAdapter {
     }
 }
 
-pub struct EbuildPackageAdapter {
-    pub use_flags: Vec<String>,
-}
-
-impl EbuildPackageAdapter {
-    pub fn new(use_flags: Vec<String>) -> Self {
-        Self { use_flags }
-    }
-}
-
-impl IPackageAdapter for EbuildPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Portage
-    }
-    fn parse_package(&self, _raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        Ok(PackageContext {
-            name: "ebuild-compat-pkg".to_string(),
-            version: "1.0.0".to_string(),
-            format: PackageFormat::Portage,
-            dependencies: vec!["gcc".to_string()],
-            files: vec!["/store/ebuild-compat-pkg/bin/binary".to_string()],
-            hash: [0xDD; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Ebuild Adapter: Extracted to {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct EbuildPackageAdapter {
-    pub use_flags: Vec<String>,
-}
-
-impl EbuildPackageAdapter {
-    pub fn new(use_flags: Vec<String>) -> Self {
-        Self { use_flags }
-    }
-}
-
-impl IPackageAdapter for EbuildPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Portage
-    }
-    fn parse_package(&self, _raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        Ok(PackageContext {
-            name: "ebuild-compat-pkg".to_string(),
-            version: "1.0.0".to_string(),
-            format: PackageFormat::Portage,
-            dependencies: vec!["gcc".to_string()],
-            files: vec!["/store/ebuild-compat-pkg/bin/binary".to_string()],
-            hash: [0xDD; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Ebuild Adapter: Extracted to {}", store_path);
-        Ok(())
-    }
-}
-
 pub struct PortagePackageAdapter;
 impl IPackageAdapter for PortagePackageAdapter {
     fn format(&self) -> PackageFormat {
