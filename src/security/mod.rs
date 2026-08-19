@@ -1,11 +1,14 @@
 // SigmaOS Security Subsystem
 pub mod capability;
+pub mod capability_enforcer;
 pub mod defensive_audit;
 pub mod parrot;
 pub mod pledge;
 pub mod unveil;
 pub mod vulnerability;
 pub mod hardening;
+pub mod kernel_hardening;
+pub mod intrusion;
 pub mod deobfuscation;
 pub mod kali_stack;
 
@@ -16,6 +19,12 @@ pub use hardening::{
     KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
     SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
     UserAccessGuard, UserPtr,
+};
+pub use capability_enforcer::{SecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP};
+pub use kernel_hardening::{HardenedSyscallDispatcher, SmepSmapEnforcer, SovereignKaslrEngine};
+pub use intrusion::{
+    CrowdStrikeFalconAi, DetectionResult, EventType, IntrusionDetectionSystem, RuleAction,
+    SecurityEvent, Severity, SnortRule, SnortSignatureFirewall,
 };
 pub use defensive_audit::{
     DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
