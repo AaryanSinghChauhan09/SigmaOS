@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 //! SigmaOS Process-Local DNS Resolver & Cache Compatibility Layer
 //!
 //! Provides a secure, zero-dependency, safe, and thread-safe process-local
