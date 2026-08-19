@@ -56,14 +56,6 @@ pub enum DriverType {
     Storage = 3,
     Input = 4,
 }
-#[derive(Debug, Clone, Copy)]
-pub enum DriverType { Block = 0, Char = 1, Network = 2 }
-#[derive(Debug, Clone, Copy)]
-pub enum DriverType {
-    Block = 0,
-    Char = 1,
-    Network = 2,
-}
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -127,12 +119,6 @@ impl SimpleDriver {
 
     pub fn shutdown(&self) -> Result<(), DriverError> {
         Ok(())
-        SimpleDriver { id, driver_type, state: AtomicUsize::new(DriverState::Unloaded as usize) }
-        SimpleDriver {
-            id,
-            driver_type,
-            state: AtomicUsize::new(DriverState::Unloaded as usize),
-        }
     }
 }
 
