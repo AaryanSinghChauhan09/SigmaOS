@@ -132,6 +132,14 @@ impl Default for AurRecipeCompiler {
     }
 }
 
+/// Debian-style sbuild build dependency recipe descriptor
+#[derive(Debug, Clone)]
+pub struct DebianSbuildPackage {
+    pub name: String,
+    pub version: Version,
+    pub build_depends: Vec<String>,
+}
+
 /// Rolling Release System Synchronizer
 #[derive(Debug, Clone)]
 pub struct RollingSyncManager {
@@ -167,6 +175,11 @@ impl RollingSyncManager {
         }
         updates.sort_by(|a, b| a.0.cmp(&b.0));
         updates
+    }
+
+    /// Validates if all compile-time build dependencies for a Debian sbuild source package are satisfied
+    pub fn is_debian_sbuild_builddeps_satisfied(&self, pkg: &DebianSbuildPackage) -> bool {
+        pkg.build_depends.iter().all(|dep| self.installed_packages.contains_key(dep))
     }
 }
 
