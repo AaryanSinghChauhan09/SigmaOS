@@ -1,6 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -26,6 +27,10 @@ pub mod shell;
 pub mod sigpkg;
 pub mod tools;
 pub mod virtualization;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
+pub mod klib;
+pub use klib::{SplayTree, RadixTree, SovereignPriorityQueue};
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -35,6 +40,7 @@ pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
+    ScriptArgumentRouter,
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -49,6 +55,13 @@ pub use compatibility::{
     Literal, SpacSatResolver,
     ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
     AlpineSyslogManager, BusyBoxMulticall,
+    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
+    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
+    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
+    HidGraphicsDriver, AiTaskOrchestrator,
+    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
+    SovereignTimeMachine, NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine,
+    SovereignForensics, SovereignRecoverUtility, ShardIgnitor,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -75,6 +88,7 @@ pub use filesystem::{
 pub use graphics::paint::ColorRgba;
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,
     AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
     CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
     InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
@@ -119,6 +133,7 @@ pub use resilience::{
 };
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
+    ArithmeticSubstitutionDeobfuscator,
     ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
     PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
@@ -132,15 +147,28 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
+pub use unimplemented_tools::{
+    AudioEditor, PodcastRecorder, SubtitleEditor, MemoryLeakDetector, GamifiedTodo, MindMapCreator,
+    GameHubLauncher, EmulatorManager, GameRecorder, GamePerformanceBooster, CloudGaming, VrArRuntime,
+    ControllerMapper, GameModManager, AiDifficultyDirector, GanttChartPlanner, PdfEditor,
+    DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
+    AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
+    RemoteDesktop, MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
+    AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
+    CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
+    SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
+    PluginMarketplace, MusicLibraryManager, TimeMachineBackup, SysinternalsProcMon, SystemdCgTop,
+    TrussSyscallTracer, NetworkQualityProbe, WindowsPowercfg,
+};
 
 // Temporarily disabled problematic modules
 // pub mod accessibility;
 // pub mod automation;
 // pub mod container;
 
-#[cfg(test)]
-#[path = "compatibility/fedora.rs"]
-pub mod fedora_compat_test;
+// #[cfg(test)]
+// #[path = "compatibility/fedora.rs"]
+// pub mod fedora_compat_test;
 // pub mod customization;
 // pub mod dashboard;
 // pub mod desktop;

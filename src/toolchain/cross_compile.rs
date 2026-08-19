@@ -18,6 +18,109 @@ pub enum Architecture { X86_64 = 0, ARM64 = 1, RISCV64 = 2, PPC64 = 3 }
 #[derive(Debug, Clone, Copy)]
 pub enum ToolchainError { Success = 0, NotFound = 1, CompileFailed = 2, InvalidTarget = 3 }
 
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SourceLanguage {
+    Rust = 0,
+    Zig = 1,
+    Nim = 2,
+    C = 3,
+    Cpp = 4,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildSystemType {
+    NativeCargo = 0,
+    ZigBuild = 1,
+    Nimble = 2,
+    CMake = 3,
+    Meson = 4,
+}
+
+/// CMake-compatible script generator for cross-compiling C/C++/Rust polyglot targets
+pub struct CMakeGenerator;
+
+impl CMakeGenerator {
+    pub fn generate_cmake_lists(project_name: &str, lang: SourceLanguage) -> Vec<u8> {
+        let mut script = Vec::new();
+        let header = format!("cmake_minimum_required(VERSION 3.20)\nproject({})\n", project_name);
+        script.extend_from_slice(header.as_bytes());
+
+        match lang {
+            SourceLanguage::Cpp | SourceLanguage::C => {
+                script.extend_from_slice(b"add_executable(main main.cpp)\n");
+            }
+            SourceLanguage::Rust => {
+                script.extend_from_slice(b"enable_language(CorRust)\nadd_executable(main src/main.rs)\n");
+            }
+            _ => {
+                script.extend_from_slice(b"enable_language(C)\n");
+            }
+        }
+        script
+    }
+}
+
+/// Polyglot Cross Build Tool Orchestrator for Rust, Zig, Nim, C, and C++ targets
+pub struct PolyglotCrossBuildTool {
+    pub target_arch: Architecture,
+    pub build_system: BuildSystemType,
+    pub language: SourceLanguage,
+}
+
+impl PolyglotCrossBuildTool {
+    pub fn new(arch: Architecture, build_system: BuildSystemType, language: SourceLanguage) -> Self {
+        Self {
+            target_arch: arch,
+            build_system,
+            language,
+        }
+    }
+
+    pub fn compile_source(&self, source_code: &[u8]) -> Result<Vec<u8>, ToolchainError> {
+        if source_code.is_empty() {
+            return Err(ToolchainError::CompileFailed);
+        }
+
+        let mut output_binary = Vec::new();
+        // Simulate ELF header emission for target architecture
+        output_binary.extend_from_slice(b"\x7FELF\x02\x01\x01\x00"); // 64-bit ELF magic
+        output_binary.extend_from_slice(source_code);
+
+        Ok(output_binary)
+    }
+
+    pub fn generate_build_definition(&self, project_name: &str) -> Vec<u8> {
+        match self.build_system {
+            BuildSystemType::CMake => CMakeGenerator::generate_cmake_lists(project_name, self.language),
+            BuildSystemType::Meson => MesonGenerator::generate_meson_build(project_name, self.language),
+            BuildSystemType::NativeCargo => format!("[package]\nname = \"{}\"\nversion = \"1.0.0\"\n", project_name).into_bytes(),
+            BuildSystemType::ZigBuild => format!("const std = @import(\"std\");\npub fn build(b: *std.Build) void {{ _ = b; }}\n").into_bytes(),
+            BuildSystemType::Nimble => format!("version = \"1.0.0\"\nauthor = \"SigmaOS Developer\"\n").into_bytes(),
+        }
+    }
+}
+
+/// Meson-compatible build file generator for cross-compiling targets
+pub struct MesonGenerator;
+
+impl MesonGenerator {
+    pub fn generate_meson_build(project_name: &str, lang: SourceLanguage) -> Vec<u8> {
+        let mut script = Vec::new();
+        let lang_str = match lang {
+            SourceLanguage::Rust => "rust",
+            SourceLanguage::Zig => "c",
+            SourceLanguage::Nim => "c",
+            SourceLanguage::C => "c",
+            SourceLanguage::Cpp => "cpp",
+        };
+        let content = format!("project('{}', '{}', version : '1.0.0')\nexecutable('main', 'src/main.rs')\n", project_name, lang_str);
+        script.extend_from_slice(content.as_bytes());
+        script
+    }
+}
+
 pub trait Toolchain {
     fn id(&self) -> ToolchainID;
     fn target_arch(&self) -> Architecture;
@@ -736,5 +839,31 @@ mod tests {
         assert!(report_str3.contains("Status: NON-REPRODUCIBLE"));
         assert!(report_str3.contains("Difference found at offset"));
         assert!(report_str3.contains("Total differences: 8 bytes mismatch."));
+    }
+
+    #[test]
+    fn test_polyglot_cross_build_tool() {
+        let tool = PolyglotCrossBuildTool::new(
+            Architecture::ARM64,
+            BuildSystemType::CMake,
+            SourceLanguage::Cpp,
+        );
+
+        let cmake_file = tool.generate_build_definition("sovereign-app");
+        let cmake_str = core::str::from_utf8(&cmake_file).unwrap();
+        assert!(cmake_str.contains("project(sovereign-app)"));
+        assert!(cmake_str.contains("add_executable(main main.cpp)"));
+
+        let binary = tool.compile_source(b"int main() { return 0; }").unwrap();
+        assert_eq!(&binary[..4], b"\x7FELF");
+
+        let meson_tool = PolyglotCrossBuildTool::new(
+            Architecture::RISCV64,
+            BuildSystemType::Meson,
+            SourceLanguage::Rust,
+        );
+        let meson_file = meson_tool.generate_build_definition("sovereign-rust");
+        let meson_str = core::str::from_utf8(&meson_file).unwrap();
+        assert!(meson_str.contains("project('sovereign-rust', 'rust'"));
     }
 }

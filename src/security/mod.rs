@@ -23,6 +23,8 @@ pub mod password;
 pub mod pki;
 pub mod pledge;
 pub mod bridge;
+pub mod deobfuscation;
+pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod prism;
 pub mod sandbox;
 pub mod qubes_isolation;
