@@ -3,6 +3,7 @@
 
 use crate::security::{CapabilityToken, Permission};
 use alloc::collections::BTreeMap;
+use alloc::collections::HashMap;
 
 // Standard POSIX / Linux / BSD open flags
 pub const O_RDONLY: u32 = 0x0000;
@@ -65,7 +66,6 @@ pub struct Inode {
     pub link_count: u32,
     pub hard_links_count: u32,
     pub symlink_target: Option<String>,
-    pub link_count: u32,
     pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
     pub entries: BTreeMap<String, u64>, // Directory entries
@@ -86,7 +86,6 @@ impl Inode {
             link_count: 1,
             hard_links_count: 1,
             symlink_target: None,
-            link_count: 1,
             xattrs: HashMap::new(),
             data: Vec::new(),
             entries: BTreeMap::new(),
@@ -609,4 +608,7 @@ mod tests {
         vfs.delete_file(inode_id).unwrap();
         assert!(vfs.get_inode(inode_id).is_none());
     }
+=======
+    pub link_count: u32, // standard inode link count tracking hard links
+>>>>>>> origin/jules-9755787455003647459-20fb3c86
 }
