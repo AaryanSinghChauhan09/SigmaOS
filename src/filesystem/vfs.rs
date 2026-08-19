@@ -608,7 +608,4 @@ mod tests {
         vfs.delete_file(inode_id).unwrap();
         assert!(vfs.get_inode(inode_id).is_none());
     }
-=======
-    pub link_count: u32, // standard inode link count tracking hard links
->>>>>>> origin/jules-9755787455003647459-20fb3c86
 }

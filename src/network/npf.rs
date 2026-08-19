@@ -76,15 +76,6 @@ impl NpfFirewallEngine {
 
     fn serialize_state_key(packet: &NpfPacket) -> [u8; 18] {
         let mut key = [0u8; 18];
-<<<<<<< HEAD
-        key[0..4].copy_from_slice(&packet.src_ip);
-        key[4..8].copy_from_slice(&packet.dst_ip);
-        key[8..10].copy_from_slice(&packet.src_port.to_be_bytes());
-        key[10..12].copy_from_slice(&packet.dst_port.to_be_bytes());
-        key[12] = packet.protocol;
-        // Symmetric reverse direction key offset
-        key[13..17].copy_from_slice(&packet.dst_ip);
-=======
         // Normalize direction (canonical order) so both inbound and outbound packets produce the identical state key
         let ((ip1, port1), (ip2, port2)) = if (packet.src_ip, packet.src_port) <= (packet.dst_ip, packet.dst_port) {
             ((packet.src_ip, packet.src_port), (packet.dst_ip, packet.dst_port))
@@ -97,7 +88,6 @@ impl NpfFirewallEngine {
         key[8..10].copy_from_slice(&port1.to_be_bytes());
         key[10..12].copy_from_slice(&port2.to_be_bytes());
         key[12] = packet.protocol;
->>>>>>> origin/jules-5387654575179832508-cadee73d
         key[17] = 1;
         key
     }
