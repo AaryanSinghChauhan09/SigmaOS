@@ -5,7 +5,6 @@
 
 extern crate alloc;
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
 use alloc::string::String;
 
@@ -186,7 +185,7 @@ impl AudioGraph {
         Ok(())
     }
 
-    pub suspend(&mut self) -> Result<(), AudioError> {
+    pub fn suspend(&mut self) -> Result<(), AudioError> {
         for node in &mut self.nodes {
             node.suspend()?;
         }
