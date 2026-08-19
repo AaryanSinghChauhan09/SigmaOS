@@ -18,3 +18,11 @@ build/
 *.exe
 *.elf
 test_runner
+.cache/
+__pycache__/
+*.pyc
+/test_dma
+/test_runner
+/test_universal
+/tests/sigma_test_runner
+*.png

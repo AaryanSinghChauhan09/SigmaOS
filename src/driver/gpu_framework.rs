@@ -1,10 +1,14 @@
 //! GPU Driver Framework (Linux DRM & BSD drm-kmod Inspiration)
 //! Native bare-metal hardware drivers for AMD, Intel, NVIDIA, and VirtIO-GPU
 
+#![no_std]
+
 extern crate alloc;
 
 use crate::klib::{String, Vec, ToString};
 use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// GPU device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
