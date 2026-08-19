@@ -12,4 +12,8 @@ pub use io_uring::{IoUring, SubmissionQueueEntry, CompletionQueueEntry, IoOpcode
 pub use io_scheduler::{AdaptiveIOScheduler, DeviceType, IOSchedulerPolicy, IORequest};
 pub use network_bbr::{BbrEngine, BbrState};
 pub use eevdf::{EevdfScheduler, EevdfTask, MAX_SCHED_TASKS};
-pub use zero_copy_ipc::{ZeroCopyQueue, IPCError, QUEUE_SIZE};
+pub use zero_copy_ipc::{
+    CpuInstructionExtension, IPCError, IpcError, ProcessProfile, SchedInstruction, SchedOpcode,
+    SimdOptimizer, SovereignSimdOptimizer, UdfSchedVm, VmPerformanceMetrics, ZeroCopyMetrics,
+    ZeroCopyQueue, QUEUE_SIZE,
+};

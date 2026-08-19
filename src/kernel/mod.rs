@@ -11,6 +11,7 @@ pub mod linux_parity;
 pub mod memory;
 pub mod meta;
 pub mod paging;
+pub mod performance;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
@@ -38,6 +39,10 @@ pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use policy_mechanism::{
     AdaptivePolicy, InstructionCyclePhase, InterruptClass, IoWaitProfile, KernelMechanism,
     KernelPolicy, PolicyMechanismCoordinator, SovereignMechanism,
+};
+pub use performance::{
+    CpuInstructionExtension, ProcessProfile, SchedInstruction, SchedOpcode, SimdOptimizer,
+    SovereignSimdOptimizer, UdfSchedVm, VmPerformanceMetrics, ZeroCopyMetrics, ZeroCopyQueue,
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
