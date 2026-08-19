@@ -370,7 +370,7 @@ mod tests {
     fn test_sandboxie_file_virtualizer_overlay() {
         let mut sandbox = PrivacyFirstSandbox::new(800, "key-888");
 
-        let host_etc_hosts = b"127.0.0.1 localhost"; // Test hostname, not debug code
+        let host_etc_hosts = b"127.0.0.1 sigmaos-test"; // Test hostname for sandbox validation
 
         let sandboxed_hosts = b"127.0.0.1 localhost\n127.0.0.1 my-blocked-site.com";
         assert!(sandbox.virtual_write("/etc/hosts", sandboxed_hosts.to_vec()).is_ok());
