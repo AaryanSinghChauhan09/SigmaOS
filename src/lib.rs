@@ -6,6 +6,7 @@ extern crate alloc;
 
 pub mod ai;
 pub mod accessibility;
+pub mod audio;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
@@ -43,6 +44,15 @@ pub use access::{
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
+};
+pub use audio::{
+    AmplifyEffect, AudioDevice, AudioEditor, AudioEffect, AudioError, AudioFormat,
+    AudioGraph, AudioLink, AudioNode, AudioNodeType, AudioProfile, AudioSession, AudioStats,
+    AutomationEnvelope, CenterChannelExtractor, DeviceType, DistortionEffect, DynamicRangeCompressor,
+    EchoEffect, EditorAudioTrack, EnvelopePoint, FlangerEffect, GraphicEqualizer, GraphState,
+    HighPassFilter, LinkState, LowPassFilter, MultiTrackSession, NodeState, NoiseGateEffect,
+    PitchShifter, ReverbEffect, SessionState, SignalGenerator, SigmaAudio,
+    SpectralNoiseSuppressionEffect, StereoMixdown, WaveformType,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
