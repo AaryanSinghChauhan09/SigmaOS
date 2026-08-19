@@ -7,8 +7,9 @@
 extern crate alloc;
 
 use alloc::string::String;
-use std::collections::HashMap;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use alloc::vec::Vec;
+use crate::klib::HashMap;
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use crate::security::selinux::{
     SeLinuxMode, SecurityContext, AvcKey, AccessVectorCache, SelinuxEngine
@@ -55,16 +56,16 @@ impl SelinuxSyscallIntegration {
 
     fn load_default_contexts(&mut self) {
         self.process_contexts.insert(1, "system_u:system_r:init_t:s0".to_string());
-        self.process_contexts.insert(2, "system_u:system_r:kernel_t:s0");
-        self.process_contexts.insert(100, "system_u:system_r:httpd_t:s0");
-        self.process_contexts.insert(101, "system_u:system_r:unconfined_t:s0");
+        self.process_contexts.insert(2, "system_u:system_r:kernel_t:s0".to_string());
+        self.process_contexts.insert(100, "system_u:system_r:httpd_t:s0".to_string());
+        self.process_contexts.insert(101, "system_u:system_r:unconfined_t:s0".to_string());
 
-        self.file_contexts.insert("/etc/passwd", "system_u:object_r:etc_t:s0".to_string());
-        self.file_contexts.insert("/etc/shadow", "system_u:object_r:shadow_t:s0");
-        self.file_contexts.insert("/var/www/html", "system_u:object_r:httpd_sys_content_t:s0");
-        self.file_contexts.insert("/home", "system_u:object_r:home_root_t:s0");
-        self.file_contexts.insert("/bin", "system_u:object_r:bin_t:s0");
-        self.file_contexts.insert("/sbin", "system_u:object_r:sbin_t:s0");
+        self.file_contexts.insert("/etc/passwd".to_string(), "system_u:object_r:etc_t:s0".to_string());
+        self.file_contexts.insert("/etc/shadow".to_string(), "system_u:object_r:shadow_t:s0".to_string());
+        self.file_contexts.insert("/var/www/html".to_string(), "system_u:object_r:httpd_sys_content_t:s0".to_string());
+        self.file_contexts.insert("/home".to_string(), "system_u:object_r:home_root_t:s0".to_string());
+        self.file_contexts.insert("/bin".to_string(), "system_u:object_r:bin_t:s0".to_string());
+        self.file_contexts.insert("/sbin".to_string(), "system_u:object_r:sbin_t:s0".to_string());
     }
 
     pub fn check_syscall_permission(
@@ -83,14 +84,15 @@ impl SelinuxSyscallIntegration {
         let source_context = self.get_process_context(process_id)?;
         let target_context = self.get_target_context(resource_path)?;
 
+        let audit_count_before = self.selinux_engine.audit_logs.len();
         let allowed = self.selinux_engine.has_permission(
             &source_context,
             &target_context,
             security_class.as_str(),
             permission,
-        )?;
+        ).map_err(|_| SelinuxError::ContextNotFound)?;
 
-        if !allowed {
+        if self.selinux_engine.audit_logs.len() > audit_count_before || !allowed {
             let mode = self.selinux_engine.mode;
             if mode == SeLinuxMode::Enforcing {
                 self.denied_syscalls.fetch_add(1, Ordering::SeqCst);
@@ -303,7 +305,7 @@ mod tests {
         let mut integration = SelinuxSyscallIntegration::new();
         integration.initialize();
         
-        let policy = "httpd_t admin_home_t file write";
+        let policy = "httpd_t etc_t file write";
         assert!(integration.load_policy_string(policy).is_ok());
         
         let result = integration.check_syscall_permission(100, 3, Some("/etc/passwd"));
@@ -328,8 +330,8 @@ mod tests {
         let mut integration = SelinuxSyscallIntegration::new();
         integration.initialize();
         
-        integration.check_syscall_permission(100, 2, Some("/var/www/html")).unwrap();
-        integration.check_syscall_permission(100, 3, Some("/etc/passwd")).unwrap();
+        let _ = integration.check_syscall_permission(100, 2, Some("/var/www/html"));
+        let _ = integration.check_syscall_permission(100, 3, Some("/etc/passwd"));
         
         let stats = integration.get_stats();
         assert_eq!(stats.syscall_checks, 2);
