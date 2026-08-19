@@ -50,6 +50,7 @@ pub trait LogFile {
 pub struct SimpleLogFile {
     pub id: LogFileID,
     pub path: [u8; 256],
+    pub path_len: u16, // Explicit path length to eliminate O(N) linear null-byte scan on path retrieval
     pub size: AtomicUsize,
     pub created: AtomicUsize,
     pub severity: LogSeverity,
@@ -59,13 +60,14 @@ pub struct SimpleLogFile {
 impl SimpleLogFile {
     pub fn new(id: LogFileID, path: &[u8]) -> Self {
         let mut path_array = [0u8; 256];
-        let path_len = path.len().min(255);
+        let path_len = path.len().min(256);
         unsafe {
             core::ptr::copy_nonoverlapping(path.as_ptr(), path_array.as_mut_ptr(), path_len);
         }
         SimpleLogFile {
             id,
             path: path_array,
+            path_len: path_len as u16,
             size: AtomicUsize::new(0),
             created: AtomicUsize::new(1000000),
             severity: LogSeverity::Info,
@@ -83,8 +85,8 @@ impl SimpleLogFile {
 impl LogFile for SimpleLogFile {
     fn id(&self) -> LogFileID { self.id }
     fn path(&self) -> &[u8] {
-        let len = self.path.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.path[..len]
+        // Fast path slicing: O(1) instantaneous lookup using cached byte length instead of linear O(N) scan
+        &self.path[..self.path_len as usize]
     }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn created(&self) -> u64 { self.created.load(Ordering::SeqCst) as u64 }
