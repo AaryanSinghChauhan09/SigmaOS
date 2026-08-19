@@ -12,11 +12,6 @@ pub mod zenith;
 pub mod zenith_compositor;
 pub mod bsd_graphics;
 
-pub use raytracer::{Ray, Sphere, Vec3};
-pub use vector_engine::{PathCommand, Point2D, VectorPath};
-pub use multi_monitor::{DisplayOutput, DisplayRotation, MultiMonitorManager};
-pub use video_timeline::{VideoClip, VideoTimeline, VideoTrack};
-
 pub use compositor::{
     CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor, LayerBlendMode,
     RenderLayer, SigmaCompositor,

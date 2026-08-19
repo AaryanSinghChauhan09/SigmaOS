@@ -1,9 +1,10 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
+extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod access;
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -15,7 +16,8 @@ pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
 pub mod kernel;
-pub mod logging;
+pub mod memory;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod distro;
@@ -116,6 +118,7 @@ pub use network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
     SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
     UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
+    NpfFirewallEngine, NpfRule, NpfTable, NatRule, NatType, NpfAction, NpfDirection, FiveTuple, IpProtocol,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -154,17 +157,7 @@ pub use security::{
     PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
     SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
-    secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
-    HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
-    KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
-    SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
-    UserAccessGuard, UserPtr,
-    SecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
-};
-pub use plugin::{
-    ExtensionType, ManagerCapability, MarketplaceItem, Plugin, PluginCapability, PluginError,
-    PluginID, PluginInfo, PluginManager, PluginMarketplace, PluginState, PluginStats, SimplePlugin,
-    SimplePluginManager,
+    BinaryProtectionManager, RelroMode, AslrMap, ChecksecReport,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use tools::{
@@ -182,4 +175,7 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use memory::{
+    BsdZoneAllocator, LinuxKswapd, MemCgroupManager, SimpleVMM, Zone, MemCgroup, PageState,
 };

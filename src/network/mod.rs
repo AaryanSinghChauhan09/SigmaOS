@@ -8,10 +8,13 @@ pub mod tcp;
 pub mod legacy_net;
 pub mod revival;
 pub mod tcp_udp;
-pub mod sync;
-pub mod torrent;
-pub mod pf_firewall;
-pub mod nftables;
+pub mod bsd_pf;
+pub mod npf_firewall;
+pub mod virtual_switch;
+
+pub use virtual_switch::{VirtualSwitchEngine, VirtualSwitchBridge, SwitchPort, SwitchPortMode, StpPortState, FlowAction, FdbEntry};
+
+pub use npf_firewall::{NpfFirewallEngine, NpfRule, NpfTable, NatRule, NatType, NpfAction, NpfDirection, FiveTuple, IpProtocol};
 
 // pub use analyzer::{
 //     AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,

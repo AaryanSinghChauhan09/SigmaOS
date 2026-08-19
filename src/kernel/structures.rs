@@ -1,6 +1,6 @@
+use core::ptr::NonNull;
 use core::cell::{Cell, RefCell};
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
-use core::ptr::NonNull;
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -651,7 +651,14 @@ mod tests {
         assert_eq!(thread.context.rax, 100);
     }
 }
-// 3. Next-Generation Advanced Algorithms (SovereignAlgorithms Blueprint)
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchitectureClass {
+    X86,
+    X64,
+    Arm,
+    Cisc,
+}
 
 const MAX_SCHEDULER_TASKS: usize = 16;
 const MAX_LEDGER_BLOCKS: usize = 8;

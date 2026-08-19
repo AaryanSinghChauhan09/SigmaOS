@@ -10,7 +10,9 @@ pub mod hardening;
 pub mod kernel_hardening;
 pub mod intrusion;
 pub mod deobfuscation;
-pub mod kali_stack;
+pub mod binary_protection;
+
+pub use binary_protection::{BinaryProtectionManager, RelroMode, AslrMap, ChecksecReport};
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use hardening::{

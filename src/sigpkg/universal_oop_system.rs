@@ -2865,7 +2865,11 @@ Depends: kernel-base";
             }
         }
 
-        adapter.add_hook(Arc::new(CustomHook));
+        let raw_hook = Arc::new(CustomHook).into_raw_inner();
+        let coerced_hook: Arc<dyn UserDefinedHook> = unsafe {
+            Arc::from_raw_inner(core::ptr::NonNull::new_unchecked(raw_hook))
+        };
+        adapter.add_hook(coerced_hook);
 
         let deb_data = b"Package: original
 Version: 1.0.0
@@ -3022,18 +3026,29 @@ Description: Hook test";
         let trigger_executed = Arc::new(std::sync::atomic::AtomicBool::new(false));
         let trigger_executed_clone = trigger_executed.clone();
 
+        let script_closure = move |matched_paths: &[String]| -> Result<(), HookError> {
+            assert_eq!(matched_paths.len(), 1);
+            assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
+            trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+            Ok::<(), HookError>(())
+        };
+        let raw_script = Arc::new(script_closure).into_raw_inner();
+        let coerced_script: Arc<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync> = unsafe {
+            Arc::from_raw_inner(core::ptr::NonNull::new_unchecked(raw_script))
+        };
+
         let trigger = PathTriggerHook {
             name: "update-desktop-database".to_string(),
             pattern: "*.desktop".to_string(),
-            script: Arc::new(move |matched_paths: &[String]| {
-                assert_eq!(matched_paths.len(), 1);
-                assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
-                trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
-                Ok(())
-            }),
+            script: coerced_script,
         };
 
-        manager.add_path_trigger(Arc::new(trigger));
+        let raw_trigger = Arc::new(trigger).into_raw_inner();
+        let coerced_trigger: Arc<dyn IPathTrigger> = unsafe {
+            Arc::from_raw_inner(core::ptr::NonNull::new_unchecked(raw_trigger))
+        };
+
+        manager.add_path_trigger(coerced_trigger);
 
         let pkg = StandardPackage {
             metadata: PackageMetadata {

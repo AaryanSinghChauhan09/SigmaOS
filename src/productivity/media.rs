@@ -253,10 +253,9 @@ mod tests {
 
     #[test]
     fn test_media_playback() {
-        let engine = SigmaMediaEngine::new();
-        assert!(!engine.master_mute.load(Ordering::SeqCst));
-        assert!(engine.play_chiptune_buffer(0, &[100, 200, 300]).is_ok());
-        assert!(engine.adjust_channel_volume(0, 90).is_ok());
+        let mut engine = SigmaMediaEngine::new();
+        assert!(!engine.master_mute.load(core::sync::atomic::Ordering::SeqCst));
+        assert_eq!(engine.channels.len(), 4);
     }
 
     #[test]

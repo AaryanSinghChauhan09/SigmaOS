@@ -65,7 +65,8 @@ pub struct Inode {
     pub link_count: u32,
     pub hard_links_count: u32,
     pub symlink_target: Option<String>,
-    pub xattrs: BTreeMap<String, Vec<u8>>,
+    pub link_count: u32,
+    pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
     pub entries: BTreeMap<String, u64>, // Directory entries
 }
@@ -85,7 +86,8 @@ impl Inode {
             link_count: 1,
             hard_links_count: 1,
             symlink_target: None,
-            xattrs: BTreeMap::new(),
+            link_count: 1,
+            xattrs: HashMap::new(),
             data: Vec::new(),
             entries: BTreeMap::new(),
         }
