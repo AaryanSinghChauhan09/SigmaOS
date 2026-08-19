@@ -137,7 +137,326 @@ impl MacAddressFilter {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 4. ROLE-BASED ACCESS CONTROL (RBAC) & ZERO TRUST POLICIES
+// 4. POSIX 1003.1e ACCESS CONTROL LISTS (LINUX & BSD UNIX ACLs)
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AclTag {
+    UserObj,
+    User(UserID),
+    GroupObj,
+    Group(GroupID),
+    Mask,
+    Other,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AclEntry {
+    pub tag: AclTag,
+    pub permissions: u8, // Bitmask: READ (0o4), WRITE (0o2), EXECUTE (0o1)
+}
+
+impl AclEntry {
+    pub fn new(tag: AclTag, permissions: u8) -> Self {
+        Self { tag, permissions }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PosixAcl {
+    pub entries: Vec<AclEntry>,
+}
+
+impl PosixAcl {
+    pub fn new() -> Self {
+        Self {
+            entries: Vec::new(),
+        }
+    }
+
+    pub fn from_mode(owner_uid: UserID, group_gid: GroupID, mode_bits: u16) -> Self {
+        let owner_perms = ((mode_bits >> 6) & 0o7) as u8;
+        let group_perms = ((mode_bits >> 3) & 0o7) as u8;
+        let other_perms = (mode_bits & 0o7) as u8;
+
+        let mut acl = Self::new();
+        acl.entries.push(AclEntry::new(AclTag::UserObj, owner_perms));
+        acl.entries.push(AclEntry::new(AclTag::GroupObj, group_perms));
+        acl.entries.push(AclEntry::new(AclTag::Other, other_perms));
+        acl
+    }
+
+    pub fn add_entry(&mut self, entry: AclEntry) {
+        self.entries.retain(|e| e.tag != entry.tag);
+        self.entries.push(entry);
+        self.recalculate_mask();
+    }
+
+    pub fn recalculate_mask(&mut self) {
+        let has_named_entries = self.entries.iter().any(|e| match e.tag {
+            AclTag::User(_) | AclTag::Group(_) => true,
+            _ => false,
+        });
+
+        if has_named_entries {
+            let mut mask_perms = 0u8;
+            for e in &self.entries {
+                match e.tag {
+                    AclTag::User(_) | AclTag::GroupObj | AclTag::Group(_) => {
+                        mask_perms |= e.permissions;
+                    }
+                    _ => {}
+                }
+            }
+            self.add_entry_raw(AclEntry::new(AclTag::Mask, mask_perms));
+        }
+    }
+
+    fn add_entry_raw(&mut self, entry: AclEntry) {
+        self.entries.retain(|e| e.tag != entry.tag);
+        self.entries.push(entry);
+    }
+
+    pub fn get_mask(&self) -> Option<u8> {
+        self.entries
+            .iter()
+            .find(|e| e.tag == AclTag::Mask)
+            .map(|e| e.permissions)
+    }
+
+    /// Evaluates POSIX 1003.1e access logic taking into account Mask and named User/Group entries
+    pub fn evaluate_access(
+        &self,
+        subject_uid: UserID,
+        subject_gid: GroupID,
+        secondary_gids: &[GroupID],
+        owner_uid: UserID,
+        group_gid: GroupID,
+        requested_perm: u8,
+    ) -> bool {
+        if subject_uid == 0 {
+            return true; // Root bypasses standard ACLs
+        }
+
+        let mask = self.get_mask();
+
+        // 1. Owner matching
+        if subject_uid == owner_uid {
+            if let Some(entry) = self.entries.iter().find(|e| e.tag == AclTag::UserObj) {
+                return (entry.permissions & requested_perm) == requested_perm;
+            }
+        }
+
+        // 2. Named User matching
+        if let Some(entry) = self.entries.iter().find(|e| e.tag == AclTag::User(subject_uid)) {
+            let effective = if let Some(m) = mask {
+                entry.permissions & m
+            } else {
+                entry.permissions
+            };
+            return (effective & requested_perm) == requested_perm;
+        }
+
+        // 3. Group matching (GroupObj or named Group)
+        let mut group_matched = false;
+        let mut combined_effective = 0u8;
+
+        for entry in &self.entries {
+            let matches = match entry.tag {
+                AclTag::GroupObj => subject_gid == group_gid || secondary_gids.contains(&group_gid),
+                AclTag::Group(gid) => subject_gid == gid || secondary_gids.contains(&gid),
+                _ => false,
+            };
+
+            if matches {
+                group_matched = true;
+                let eff = if let Some(m) = mask {
+                    entry.permissions & m
+                } else {
+                    entry.permissions
+                };
+                combined_effective |= eff;
+            }
+        }
+
+        if group_matched {
+            return (combined_effective & requested_perm) == requested_perm;
+        }
+
+        // 4. Other
+        if let Some(entry) = self.entries.iter().find(|e| e.tag == AclTag::Other) {
+            return (entry.permissions & requested_perm) == requested_perm;
+        }
+
+        false
+    }
+
+    /// Generates inherited default POSIX ACL for a child node inside a directory
+    pub fn inherit_default_acl(&self, is_directory: bool) -> PosixAcl {
+        let mut child = self.clone();
+        if !is_directory {
+            // Strip execute bits if child is a regular file and non-executable
+            for entry in &mut child.entries {
+                match entry.tag {
+                    AclTag::UserObj | AclTag::GroupObj | AclTag::Other | AclTag::User(_) | AclTag::Group(_) => {
+                        entry.permissions &= !dac_flags::EXECUTE as u8;
+                    }
+                    _ => {}
+                }
+            }
+            child.recalculate_mask();
+        }
+        child
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. NFSv4 / FREEBSD RICH ACCESS CONTROL LISTS (NFSv4 ACEs)
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Nfs4AceType {
+    AccessAllowed = 0,
+    AccessDenied = 1,
+    Audit = 2,
+    Alarm = 3,
+}
+
+pub mod nfs4_flags {
+    pub const FILE_INHERIT: u32 = 0x00000001;
+    pub const DIRECTORY_INHERIT: u32 = 0x00000002;
+    pub const NO_PROPAGATE_INHERIT: u32 = 0x00000004;
+    pub const INHERIT_ONLY: u32 = 0x00000008;
+    pub const SUCCESSFUL_ACCESS: u32 = 0x00000010;
+    pub const FAILED_ACCESS: u32 = 0x00000020;
+    pub const IDENTIFIER_GROUP: u32 = 0x00000040;
+}
+
+pub mod nfs4_mask {
+    pub const READ_DATA: u32 = 1 << 0;
+    pub const WRITE_DATA: u32 = 1 << 1;
+    pub const APPEND_DATA: u32 = 1 << 2;
+    pub const READ_NAMED_ATTRS: u32 = 1 << 3;
+    pub const WRITE_NAMED_ATTRS: u32 = 1 << 4;
+    pub const EXECUTE: u32 = 1 << 5;
+    pub const DELETE_CHILD: u32 = 1 << 6;
+    pub const READ_ATTRIBUTES: u32 = 1 << 7;
+    pub const WRITE_ATTRIBUTES: u32 = 1 << 8;
+    pub const DELETE: u32 = 1 << 16;
+    pub const READ_CONTROL: u32 = 1 << 17;
+    pub const WRITE_DAC: u32 = 1 << 18;
+    pub const WRITE_OWNER: u32 = 1 << 19;
+    pub const SYNCHRONIZE: u32 = 1 << 20;
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Nfs4Ace {
+    pub ace_type: Nfs4AceType,
+    pub flags: u32,
+    pub mask: u32,
+    pub who: UserID,
+}
+
+impl Nfs4Ace {
+    pub fn new(ace_type: Nfs4AceType, flags: u32, mask: u32, who: UserID) -> Self {
+        Self {
+            ace_type,
+            flags,
+            mask,
+            who,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Nfs4Acl {
+    pub aces: Vec<Nfs4Ace>,
+}
+
+impl Nfs4Acl {
+    pub fn new() -> Self {
+        Self { aces: Vec::new() }
+    }
+
+    pub fn add_ace(&mut self, ace: Nfs4Ace) {
+        self.aces.push(ace);
+    }
+
+    /// Evaluates NFSv4 / FreeBSD fine-grained access mask sequentially
+    pub fn evaluate_access(&self, subject_uid: UserID, subject_gid: GroupID, requested_mask: u32) -> bool {
+        if subject_uid == 0 {
+            return true; // Root bypasses NFSv4 checks
+        }
+
+        let mut remaining_requested = requested_mask;
+        let mut denied_mask = 0u32;
+
+        for ace in &self.aces {
+            let is_match = if (ace.flags & nfs4_flags::IDENTIFIER_GROUP) != 0 {
+                ace.who == subject_gid
+            } else {
+                ace.who == subject_uid || ace.who == 65534 // 65534 = EVERYONE
+            };
+
+            if is_match && (ace.flags & nfs4_flags::INHERIT_ONLY) == 0 {
+                match ace.ace_type {
+                    Nfs4AceType::AccessDenied => {
+                        if (ace.mask & remaining_requested) != 0 {
+                            denied_mask |= ace.mask & remaining_requested;
+                        }
+                    }
+                    Nfs4AceType::AccessAllowed => {
+                        let granted = ace.mask & !denied_mask;
+                        remaining_requested &= !granted;
+                    }
+                    _ => {}
+                }
+
+                if remaining_requested == 0 {
+                    return true;
+                }
+                if (denied_mask & requested_mask) != 0 {
+                    return false;
+                }
+            }
+        }
+
+        remaining_requested == 0
+    }
+
+    /// Inherits NFSv4 ACE entries for a newly created child node
+    pub fn inherit_for_child(&self, is_directory: bool) -> Nfs4Acl {
+        let mut child_acl = Nfs4Acl::new();
+
+        for ace in &self.aces {
+            let inherit_flag = if is_directory {
+                nfs4_flags::DIRECTORY_INHERIT
+            } else {
+                nfs4_flags::FILE_INHERIT
+            };
+
+            if (ace.flags & inherit_flag) != 0 {
+                let mut child_flags = ace.flags;
+
+                if (ace.flags & nfs4_flags::NO_PROPAGATE_INHERIT) != 0 {
+                    child_flags &= !(nfs4_flags::FILE_INHERIT | nfs4_flags::DIRECTORY_INHERIT);
+                }
+
+                if !is_directory {
+                    child_flags &= !nfs4_flags::INHERIT_ONLY;
+                }
+
+                child_acl.add_ace(Nfs4Ace::new(ace.ace_type, child_flags, ace.mask, ace.who));
+            }
+        }
+
+        child_acl
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. ROLE-BASED ACCESS CONTROL (RBAC) & ZERO TRUST POLICIES
 // ─────────────────────────────────────────────────────────────────────────────
 
 pub trait Role {
@@ -377,5 +696,45 @@ mod tests {
 
         assert!(controller.check_access(1, b"/etc/shadow", b"write").unwrap());
         assert!(!controller.check_access(1, b"/etc/shadow", b"execute").unwrap());
+    }
+
+    #[test]
+    fn test_posix_1003_1e_acl() {
+        let mut acl = PosixAcl::from_mode(1000, 1000, 0o750);
+
+        // Add named user entry (user 2000 has rwx: 7)
+        acl.add_entry(AclEntry::new(AclTag::User(2000), 7));
+
+        // Mask should be recalculated automatically
+        assert!(acl.get_mask().is_some());
+
+        // User 2000 has access
+        assert!(acl.evaluate_access(2000, 2000, &[], 1000, 1000, 4));
+
+        // User 3000 (other) is denied
+        assert!(!acl.evaluate_access(3000, 3000, &[], 1000, 1000, 4));
+
+        // Test ACL inheritance
+        let child_acl = acl.inherit_default_acl(false);
+        assert_eq!(child_acl.entries.len(), acl.entries.len());
+    }
+
+    #[test]
+    fn test_nfsv4_rich_acl() {
+        let mut acl = Nfs4Acl::new();
+
+        // Deny write_data to user 2000
+        acl.add_ace(Nfs4Ace::new(Nfs4AceType::AccessDenied, 0, nfs4_mask::WRITE_DATA, 2000));
+        // Allow read_data and write_data to everyone (65534)
+        acl.add_ace(Nfs4Ace::new(Nfs4AceType::AccessAllowed, 0, nfs4_mask::READ_DATA | nfs4_mask::WRITE_DATA, 65534));
+
+        // User 2000 requesting READ_DATA -> Allowed
+        assert!(acl.evaluate_access(2000, 2000, nfs4_mask::READ_DATA));
+
+        // User 2000 requesting WRITE_DATA -> Denied due to explicit AccessDenied ACE
+        assert!(!acl.evaluate_access(2000, 2000, nfs4_mask::WRITE_DATA));
+
+        // User 3000 requesting WRITE_DATA -> Allowed
+        assert!(acl.evaluate_access(3000, 3000, nfs4_mask::WRITE_DATA));
     }
 }

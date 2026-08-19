@@ -3,8 +3,13 @@
 /// Dinit Service Manager with supervision, BSD-userland/chimerautils core,
 /// apk-tools v3 package registry & triggers, and LLVM/Clang CFI Hardening policies.
 
+extern crate alloc;
+
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+#[cfg(not(test))]
 use crate::klib::Vec;
+#[cfg(test)]
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DinitServiceState {
@@ -135,7 +140,7 @@ impl DinitServiceManager {
         // Recursively start dependencies first (Dinit topological dependency graph logic)
         let deps = self.services[idx].dependencies.clone();
         for dep in &deps {
-            let end_idx = dep.iter().position(|&b| b == 0).unwrap_or(32);
+            let end_idx = dep.iter().position(|b: &u8| -> bool { *b == 0 }).unwrap_or(32);
             let dep_name = &dep[..end_idx];
             self.start_service(dep_name)?;
         }

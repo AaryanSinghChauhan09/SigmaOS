@@ -15,6 +15,7 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
+pub mod ipc;
 pub mod kernel;
 pub mod memory;
 pub mod klib;
@@ -94,6 +95,10 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
     SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
+};
+pub use ipc::{
+    AlpcFacility, AlpcFacilityServer, AlpcManager, AlpcMessage, AlpcMessageHeader, AlpcPort,
+    AlpcPortType, AlpcSectionHandle, alpc_flags,
 };
 pub use graphics::paint::ColorRgba;
 pub use logging::{
