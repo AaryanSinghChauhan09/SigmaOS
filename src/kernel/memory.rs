@@ -3,6 +3,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
+use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Memory page size (4KB)

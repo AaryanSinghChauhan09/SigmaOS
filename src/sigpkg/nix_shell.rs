@@ -12,8 +12,10 @@
 #[allow(unused_mut)]
 #[allow(unused_imports)]
 
-use crate::klib::{BTreeMap, Vec, String};
-use alloc::string::ToString;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 /// Development environment configuration
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -74,7 +76,7 @@ impl DevEnvironment {
 
 impl Default for DevEnvironment {
     fn default() -> Self {
-        Self::new(String::from_str("default"))
+        Self::new(String::from("default"))
     }
 }
 
@@ -146,43 +148,43 @@ pub struct PredefinedEnvironments;
 impl PredefinedEnvironments {
     /// Rust development environment
     pub fn rust() -> DevEnvironment {
-        let mut env = DevEnvironment::new(String::from_str("rust"));
-        env.add_package(String::from_str("rustc"));
-        env.add_package(String::from_str("cargo"));
-        env.add_package(String::from_str("rust-analyzer"));
-        env.set_env(String::from_str("RUST_BACKTRACE"), String::from_str("1"));
+        let mut env = DevEnvironment::new(String::from("rust"));
+        env.add_package(String::from("rustc"));
+        env.add_package(String::from("cargo"));
+        env.add_package(String::from("rust-analyzer"));
+        env.set_env(String::from("RUST_BACKTRACE"), String::from("1"));
         env
     }
 
     /// Python development environment
     pub fn python() -> DevEnvironment {
-        let mut env = DevEnvironment::new(String::from_str("python"));
-        env.add_package(String::from_str("python3"));
-        env.add_package(String::from_str("pip"));
-        env.add_package(String::from_str("virtualenv"));
-        env.set_env(String::from_str("PYTHONPATH"), String::from_str("/usr/local/bin"));
+        let mut env = DevEnvironment::new(String::from("python"));
+        env.add_package(String::from("python3"));
+        env.add_package(String::from("pip"));
+        env.add_package(String::from("virtualenv"));
+        env.set_env(String::from("PYTHONPATH"), String::from("/usr/local/bin"));
         env
     }
 
     /// Node.js development environment
     pub fn nodejs() -> DevEnvironment {
-        let mut env = DevEnvironment::new(String::from_str("nodejs"));
-        env.add_package(String::from_str("node"));
-        env.add_package(String::from_str("npm"));
-        env.add_package(String::from_str("yarn"));
-        env.set_env(String::from_str("NODE_ENV"), String::from_str("development"));
+        let mut env = DevEnvironment::new(String::from("nodejs"));
+        env.add_package(String::from("node"));
+        env.add_package(String::from("npm"));
+        env.add_package(String::from("yarn"));
+        env.set_env(String::from("NODE_ENV"), String::from("development"));
         env
     }
 
     /// SigmaOS kernel development environment
     pub fn sigmaos_kernel() -> DevEnvironment {
-        let mut env = DevEnvironment::new(String::from_str("sigmaos-kernel"));
-        env.add_package(String::from_str("rust"));
-        env.add_package(String::from_str("cargo"));
-        env.add_package(String::from_str("rust-analyzer"));
-        env.add_package(String::from_str("clippy"));
-        env.set_env(String::from_str("RUSTFLAGS"), String::from_str("-D warnings"));
-        env.add_build_command(String::from_str("cargo build --release"));
+        let mut env = DevEnvironment::new(String::from("sigmaos-kernel"));
+        env.add_package(String::from("rust"));
+        env.add_package(String::from("cargo"));
+        env.add_package(String::from("rust-analyzer"));
+        env.add_package(String::from("clippy"));
+        env.set_env(String::from("RUSTFLAGS"), String::from("-D warnings"));
+        env.add_build_command(String::from("cargo build --release"));
         env
     }
 }
@@ -193,9 +195,9 @@ mod tests {
 
     #[test]
     fn test_dev_environment() {
-        let mut env = DevEnvironment::new(String::from_str("test"));
-        env.add_package(String::from_str("test-package"));
-        env.set_env(String::from_str("TEST_VAR"), String::from_str("test-value"));
+        let mut env = DevEnvironment::new(String::from("test"));
+        env.add_package(String::from("test-package"));
+        env.set_env(String::from("TEST_VAR"), String::from("test-value"));
         
         assert_eq!(env.packages.len(), 1);
         assert_eq!(env.environment_vars.len(), 1);
@@ -204,7 +206,7 @@ mod tests {
     #[test]
     fn test_nix_shell_manager() {
         let mut manager = NixShellManager::new();
-        manager.create_environment(String::from_str("test"));
+        manager.create_environment(String::from("test"));
         
         assert!(manager.activate("test").is_ok());
         assert!(manager.get_active().is_some());
@@ -213,7 +215,7 @@ mod tests {
     #[test]
     fn test_predefined_environments() {
         let rust_env = PredefinedEnvironments::rust();
-        assert_eq!(rust_env.name, String::from_str("rust"));
+        assert_eq!(rust_env.name, String::from("rust"));
         assert!(rust_env.packages.len() > 0);
     }
 }

@@ -1,5 +1,4 @@
 #[cfg(not(test))]
-use crate::driver::device::DdeDeviceWrapper;
 
 #[cfg(test)]
 pub struct DdeDeviceWrapper {
@@ -387,12 +386,6 @@ impl TinyCoreEphemeralEngine {
     pub fn reset_ephemeral_state(&mut self) {
         // Drop volatile in-memory overlay structures completely on reset
         self.volatile_overlay_ram_bytes = 0;
-    }
-}
-
-impl Default for TinyCoreEphemeralEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
