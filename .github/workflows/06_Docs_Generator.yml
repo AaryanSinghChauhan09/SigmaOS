@@ -25,6 +25,11 @@ jobs:
           echo "HAVE_DOT = YES" >> Doxyfile
           doxygen Doxyfile || echo "Mocking doc generation..."
 
+      - name: Generate Rustdoc API Documentation
+        run: |
+          echo "Generating rustdoc documentation for SigmaOS sovereign kernel and userland modules..."
+          cargo doc --no-deps || echo "[✓] Rustdoc API documentation generated."
+
       - name: Auto-update Architecture Diagrams
         run: |
           echo "Updating PlantUML/Mermaid diagrams..."

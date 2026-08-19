@@ -21,6 +21,7 @@ pub mod distro;
 pub mod package;
 pub mod performance;
 pub mod plugin;
+pub mod power;
 pub mod productivity;
 pub mod resilience;
 pub mod resource;

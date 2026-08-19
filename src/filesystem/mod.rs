@@ -9,6 +9,9 @@ pub mod sigma_fs;
 pub mod smart_symlink;
 pub mod tmpfs;
 pub mod vfs;
+pub mod geom;
+
+pub use geom::{GeomClass, GeomProvider, GeomConsumer, GeomAccessRights};
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
