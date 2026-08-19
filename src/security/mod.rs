@@ -1,16 +1,15 @@
 // SigmaOS Security Subsystem
+pub mod audit;
 pub mod capability;
 pub mod hardening;
 pub mod pledge;
 pub mod vulnerability;
 
-pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner, VulnerabilityClass, VulnerabilityReport,
 };
 pub mod capability_enforcer;
 pub mod capability_token;
@@ -25,7 +24,6 @@ pub mod nemoclaw;
 pub mod parrot_parity;
 pub mod password;
 pub mod pki;
-pub mod pledge;
 pub mod bridge;
 pub mod prism;
 pub mod sandbox;
@@ -38,7 +36,6 @@ pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
-pub mod vulnerability;
 pub mod parrot_linux;
 
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
@@ -113,7 +110,7 @@ pub use secrets::{
 };
 pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
-    SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
+    SimpleVulnerability, Vulnerability, VulnerabilityScanner,
 };
 pub use defensive_audit::{
     DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
@@ -125,7 +122,7 @@ pub use parrot_parity::{
 };
 pub use parrot_linux::{
     AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
-    SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionSeverity, IntrusionAlert,
+    SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionAlert,
 };
 // NemoClaw Security Primitives
 pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};

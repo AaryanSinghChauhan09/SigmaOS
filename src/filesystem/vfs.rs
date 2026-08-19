@@ -1,7 +1,7 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
 
-use crate::security::CapabilityToken;
+use crate::security::{CapabilityToken, Permission};
 use std::collections::HashMap;
 
 /// File type

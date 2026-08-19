@@ -19,6 +19,13 @@ pub struct BackupSnapshot {
     pub files_hash: HashMap<String, String>,
 }
 
+#[derive(Debug, Clone)]
+pub struct FsSnapshot {
+    pub id: String,
+    pub path: String,
+    pub timestamp: u64,
+}
+
 pub struct SigmaTimeshift {
     pub snapshots: Vec<BackupSnapshot>,
     pub backup_schedule_enabled: bool,
@@ -69,6 +76,18 @@ impl SigmaTimeshift {
         }
     }
 }
+
+impl Default for SigmaTimeshift {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub static GLOBAL_TIMESHIFT: SigmaTimeshift = SigmaTimeshift {
+    snapshots: Vec::new(),
+    backup_schedule_enabled: true,
+    last_scheduled_run: 0,
+};
 
 #[cfg(test)]
 mod tests {

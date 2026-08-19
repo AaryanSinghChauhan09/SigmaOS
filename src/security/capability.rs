@@ -2,27 +2,11 @@
 // This provides the basic CapabilityToken structure needed by drivers
 
 use core::default::Default;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
-    pub permissions: u64,
-}
-
-impl CapabilityToken {
-    pub fn new() -> Self {
-        CapabilityToken {
-            permissions: 0,
-        }
-    }
-    
-    pub fn with_permission(mut self, permission: u64) -> Self {
-        self.permissions |= permission;
-        self
-    }
-
-    pub fn bits(&self) -> u64 {
-        self.permissions
-    }
+    pub bits: u64,
 }
 
 impl Default for CapabilityToken {
@@ -35,6 +19,11 @@ impl CapabilityToken {
     /// Create a new capability token with no permissions
     pub fn new() -> Self {
         Self { bits: 0 }
+    }
+
+    pub fn with_permission(mut self, permission: u64) -> Self {
+        self.bits |= permission;
+        self
     }
 
     /// Create capability token from raw bits

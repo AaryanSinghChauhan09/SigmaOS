@@ -68,8 +68,6 @@ pub struct PeripheralManager {
     pub devices: Vec<PeripheralDeviceInfo>,
 }
 
-use std::vec::Vec;
-
 impl PeripheralManager {
     pub fn new() -> Self {
         PeripheralManager {

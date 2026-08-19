@@ -148,6 +148,13 @@ impl SovereignTransactionManager {
 
 /// Maintenance Script capability sandbox boundaries
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TransactionStatus {
+    Pending,
+    Committed,
+    RolledBack,
+    Failed,
+}
+
 pub enum SandboxRule {
     AllowWriteRoot,
     DenyNetwork,

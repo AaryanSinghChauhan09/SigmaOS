@@ -3131,6 +3131,28 @@ impl UnifiedPeripheral for LegacyDevice {
     }
 }
 
+/// DDE Driver Wrapper
+pub struct DdeDeviceWrapper {
+    pub device_id: u32,
+    pub name: [u8; 32],
+    pub io_port: u16,
+    pub simulated_pci_bar: [u8; 256],
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(device_id: u32, name: &[u8], io_port: u16, _os_tag: &[u8]) -> Self {
+        let mut name_arr = [0u8; 32];
+        let len = name.len().min(31);
+        name_arr[..len].copy_from_slice(&name[..len]);
+        Self {
+            device_id,
+            name: name_arr,
+            io_port,
+            simulated_pci_bar: [0u8; 256],
+        }
+    }
+}
+
 /// Modern implementation of a peripheral using MMIO
 pub struct ModernDevice {
     pub base_address: u32,

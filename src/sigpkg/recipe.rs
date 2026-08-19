@@ -18,6 +18,21 @@ pub enum BuildSystem {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UseFlag {
+    Ssl,
+    X11,
+    Wayland,
+    Audio,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StageProfile {
+    Stage1Minimal,
+    Stage2Bootstrap,
+    Stage3Optimized,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RecipeError {
     InvalidFormat,
     MissingField,
@@ -100,6 +115,11 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
+    pub pkgrel: u32,
+    pub arch: String,
+    pub license_spdx: String,
+    pub prepare_commands: Vec<String>,
+    pub package_commands: Vec<String>,
 
     // Gentoo-inspired features
     pub active_use_flags: Vec<UseFlag>,
@@ -125,6 +145,9 @@ impl PackageRecipe {
             license_spdx: "MIT".to_string(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
+            active_use_flags: Vec::new(),
+            compilation_profile: StageProfile::Stage2Bootstrap,
+            conditional_dependencies: Vec::new(),
         }
     }
 
@@ -309,7 +332,7 @@ mod tests {
         // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
         let ssl_dependency = Dependency {
             name: "openssl".to_string(),
-            version: Version::new(3, 0, 0),
+            version_constraint: crate::sigpkg::VersionConstraint::Any,
         };
 
         recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);

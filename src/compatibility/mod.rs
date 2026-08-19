@@ -1,13 +1,19 @@
 // SigmaOS Compatibility Module
 pub mod absorb_tools;
+pub mod android_chromeos;
 pub mod apache_ossie;
+pub mod canonical;
 pub mod chimera_linux;
+pub mod constellation_mesh;
 pub mod cross_platform;
+pub mod fedora;
 pub mod india_stack;
 pub mod india_professional_tools;
 pub mod alpine_linux;
 pub mod interim;
 pub mod jehanne;
+pub mod legacy_adapters;
+pub mod macos_darwin;
 pub mod mint_linux;
 pub mod reactos;
 pub mod lubuntu;
@@ -15,13 +21,26 @@ pub mod antix;
 pub mod bodhi_moksha;
 pub mod cachy_os;
 pub mod chakra;
-pub mod chimera_linux;
 pub mod endeavour;
 pub mod garuda_zen;
 pub mod gentoo;
 pub mod tiny_core;
 pub mod localsend;
 pub mod arch_linux;
+pub mod zorin;
+
+pub use macos_darwin::{
+    ApfsFileClone, ApfsSnapshot, ApfsSnapshotManager, AudioStreamDescription, CoreAudioHalRouter,
+    CoreAudioNode, FatArch, LaunchdJobConfig, LaunchdServiceManager, LaunchdState, MachO64Header,
+    MachOLoader, MachOSegment64, SpotlightMetadata, SpotlightMetadataIndex, FAT_MAGIC,
+    LC_LOAD_DYLIB, LC_MAIN, LC_SEGMENT_64, MH_MAGIC_64,
+};
+
+pub use android_chromeos::{
+    AndroidActivity, AndroidAppManifest, ApkManifestParser, ArtBytecodeSandbox,
+    CrostiniContainerBridge, CrostiniState, DexClassDef, IntentRouter, IntentTarget, PartitionSlot,
+    VerifiedBootSlotSwitcher,
+};
 
 pub use arch_linux::{
     ProcFile, ProcFileType, DevFile, DevFileType, ArchPackage, PacmanError as PacmanCompatError,
@@ -38,11 +57,9 @@ pub use zorin::{
     ZorinWindowsAppSupport,
 };
 pub mod historic_linux;
-pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod sovereign_suite;
-pub mod tiny_core;
 pub mod wasm_sandbox;
 pub mod open_source_tier1;
 
@@ -74,13 +91,16 @@ pub use constellation_mesh::{
 };
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
+};
+pub use reactos::{
+    NtHandle, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader, RegistryHive,
 };
 pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
 pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
-    Literal, SpacSatResolver,
+    SpacSatResolver,
 };
 pub use alpine_linux::{
     ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
@@ -93,9 +113,9 @@ pub use jehanne::{
 };
 
 pub use mint_linux::{
-    MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, MintUpdateManager,
-    SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor, CinnamonThemeEngine,
-    TimeshiftSystemRestorer,
+    MintBackupTool, MintSoftwareManager, MintUpdateLevel, MintUpdateManager,
+    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert,
+    MintReportSystem, MintTimeshiftEngine, TimeshiftSnapshot,
 };
 
 pub use chimera_linux::{
@@ -122,7 +142,7 @@ pub use solid_kernel::{
 pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
 
 pub use absorb_tools::{
-    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
+    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, PledgePermission,
     PledgeUnveilSandbox, PqcSecureChannel,
 };
 
@@ -138,5 +158,4 @@ pub use sovereign_suite::{
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
 pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
-pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};

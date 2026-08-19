@@ -19,6 +19,40 @@ use crate::virtualization::{
     VmState,
 };
 
+#[derive(Debug, Clone)]
+pub struct AgentTask {
+    pub description: String,
+    pub commands: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine {
+    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
+    pub next_id: usize,
+}
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_tasks: std::collections::HashMap::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.registered_tasks.insert(id, AgentTask { description, commands });
+        id
+    }
+}
+
+impl Default for AgentAutomationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {

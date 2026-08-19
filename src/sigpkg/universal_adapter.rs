@@ -2,6 +2,11 @@
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 
 use crate::sigpkg::{Package, Version, VersionConstraint, Dependency, ParseError};
+use crate::package::universal::{
+    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest,
+};
+use crate::distro::linux_ideas::PackagePriority;
+use crate::security::Permission;
 use std::collections::HashMap;
 
 /// Abstract trait for package format adapters (OOPS principle)
@@ -75,7 +80,7 @@ impl DebAdapter {
                     "Description" => description = val.to_string(),
                     "Priority" => {
                         priority = match val.to_lowercase().as_str() {
-                            "essential" => PackagePriority::Essential,
+                            "essential" => PackagePriority::Required,
                             "required" => PackagePriority::Required,
                             "important" => PackagePriority::Important,
                             "standard" => PackagePriority::Standard,
@@ -799,6 +804,36 @@ pub struct UniversalPackageManager {
 }
 
 impl UniversalPackageManager {
+    pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
+        DebAdapter::new().parse_apt_control(text)
+    }
+
+    pub fn parse_pacman_pkgbuild(&self, text: &str) -> Result<PacmanPkgbuild, &'static str> {
+        DebAdapter::new().parse_pacman_pkgbuild(text)
+    }
+
+    pub fn parse_snapcraft_yaml(&self, text: &str) -> Result<SnapcraftManifest, &'static str> {
+        DebAdapter::new().parse_snapcraft_yaml(text)
+    }
+
+    pub fn parse_flatpak_json(&self, text: &str) -> Result<FlatpakManifest, &'static str> {
+        DebAdapter::new().parse_flatpak_json(text)
+    }
+
+    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
+        DebAdapter::new().translate_sandbox_permissions(plugs_or_args)
+    }
+
+    pub fn translate_to_native_package(
+        &self,
+        name: &str,
+        version_str: &str,
+        desc: &str,
+        raw_deps: &[String],
+    ) -> Result<Package, &'static str> {
+        DebAdapter::new().translate_to_native_package(name, version_str, desc, raw_deps)
+    }
+
     pub fn new() -> Self {
         let mut manager = Self {
             adapters: HashMap::new(),
@@ -892,7 +927,7 @@ mod tests {
     
     #[test]
     fn test_apt_control_parsing_and_translation() {
-        let adapter = UniversalPackageAdapter::new();
+        let adapter = UniversalPackageManager::new();
         let manifest_text = r#"
             Package: curl
             Version: 8.2.1
@@ -914,7 +949,7 @@ mod tests {
             Priority: essential
         "#;
         let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
-        assert_eq!(parsed_essential.priority, PackagePriority::Essential);
+        assert_eq!(parsed_essential.priority, PackagePriority::Required);
 
         let native = adapter
             .translate_to_native_package(
@@ -1051,7 +1086,7 @@ impl AppImageContainer {
     }
 }
 
-impl UniversalPackageAdapter {
+impl UniversalPackageManager {
     /// Parses RedHat/Yum .spec files for RPM metadata translation
     pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
         let mut name = String::new();
@@ -1106,7 +1141,7 @@ mod additional_adapter_tests {
 
     #[test]
     fn test_rpm_spec_parsing_and_native_translation() {
-        let adapter = UniversalPackageAdapter::new();
+        let adapter = UniversalPackageManager::new();
         let spec_text = r#"
             Name: custom_service
             Version: 2.1

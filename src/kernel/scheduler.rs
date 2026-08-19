@@ -4,6 +4,13 @@
 
 use core::time::Duration;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedulerError {
+    TaskNotFound,
+    QueueFull,
+    InvalidPriority,
+}
+
 /// Process priority levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {

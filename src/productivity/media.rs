@@ -2,6 +2,7 @@
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
+extern crate alloc;
 use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
 use alloc::string::String;
 use alloc::string::ToString;
@@ -144,29 +145,6 @@ impl SigmaMediaEngine {
         Ok(())
     }
 
-    pub fn load_track(&mut self, track: String, format: MediaFormat, duration: usize) {
-        self.active_track = Some(track);
-        self.format = Some(format);
-        self.duration_seconds = duration;
-    }
-
-    pub fn play(&mut self) -> Result<(), &'static str> {
-        if self.active_track.is_none() {
-            return Err("No track loaded");
-        }
-        self.state = PlaybackState::Playing;
-        Ok(())
-    }
-
-    pub fn pause(&mut self) {
-        if self.state == PlaybackState::Playing {
-            self.state = PlaybackState::Paused;
-        }
-    }
-
-    pub fn stop(&mut self) {
-        self.state = PlaybackState::Stopped;
-    }
 }
 
 // 1. SigmaSupportSubtitleSync (Aegisub ASS Advanced Styling & Karaoke Parity)

@@ -54,6 +54,29 @@ impl Default for JudicialTimelinePlanner {
     }
 }
 
+/// 7. Space & Satellite Professionals (`sigma-isro`)
+pub struct SpacSatResolver {
+    pub satellite_catalog: HashMap<String, String>,
+}
+
+impl SpacSatResolver {
+    pub fn new() -> Self {
+        Self {
+            satellite_catalog: HashMap::new(),
+        }
+    }
+
+    pub fn resolve_orbit(&self, satellite: &str) -> Option<&String> {
+        self.satellite_catalog.get(satellite)
+    }
+}
+
+impl Default for SpacSatResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 2. Business & Trade Professionals (`sigma-msme`)
 /// Verifies Udyam Registration parameters and computes delayed payment interest under the MSMED Act.
 pub struct MsmeComplianceEngine {

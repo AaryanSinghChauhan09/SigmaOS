@@ -17,38 +17,39 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Kernel Module
-// Core working components
-pub mod memory;
-pub mod scheduler;
-pub mod object;
-pub mod proc;
-
-// Genode-style Component Tree Architecture
+pub mod architecture;
+pub mod breakthroughs;
 pub mod component;
+pub mod ipc;
+pub mod linux_bsd_innovations;
+pub mod memory;
+pub mod meta;
+pub mod object;
+pub mod paging;
+pub mod policy_mechanism;
+pub mod proc;
+pub mod roundrobin;
+pub mod scheduler;
+pub mod self_healing;
+pub mod structures;
+pub mod udkf;
 
-// Temporarily disabled problematic modules
-// pub mod breakthroughs;
-// pub mod ipc;
-// pub mod meta;
-// pub mod paging;
-// pub mod policy_mechanism;
-// pub mod roundrobin;
-// pub mod self_healing;
-// pub mod udkf;
-// pub mod object;
-// pub mod proc;
-
-// Working exports
+pub use architecture::{
+    ArchitectureEngine, CpuArchitectureClass, CpuRegisters, HardwareException, Irql,
+    LookasideList, MemoryDescriptorList, Pcb, PoolType, ProcessorInitState, SystemServiceDescriptorTable,
+    SyscallHandler, Tcb, ThreadState as ArchThreadState,
+};
+pub use breakthroughs::*;
+pub use component::{CapabilityHandle, CapabilityRights, Component, ComponentError, ComponentId, ComponentState, ComponentTree, ResourceAllocation, ResourceType};
+pub use ipc::*;
+pub use linux_bsd_innovations::*;
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use meta::{
     ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
     MetaKernel, MicroDriver, NetPod,
 };
 pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
-pub use policy_mechanism::{
-    FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
-    ResourceBroker,
-};
+pub use policy_mechanism::*;
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};
+pub use scheduler::{Priority, Process, ProcessState, Scheduler, SchedulerError};
+pub use structures::*;

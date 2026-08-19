@@ -178,7 +178,7 @@ impl TCPConnection for SimpleSocket {
         Ok(())
     }
     fn get_state(&self) -> TCPState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 }
 

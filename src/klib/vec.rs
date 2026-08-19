@@ -1,33 +1,5 @@
 use core::mem;
-
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+use crate::klib::custom_allocator::{alloc, free};
 
 pub struct Vec<T> {
     pub data: *mut T,
@@ -65,14 +37,6 @@ impl<T> Vec<T> {
         self.len == 0
     }
 
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
-    }
-
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -83,12 +47,6 @@ impl<T> Vec<T> {
                 self.len += 1;
             }
         }
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
 
     pub fn pop(&mut self) -> Option<T> {
@@ -121,20 +79,7 @@ impl<T> Vec<T> {
         }
         false
     }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
+
     pub fn remove(&mut self, index: usize) -> T {
         if index >= self.len {
             panic!("index out of bounds");
@@ -188,7 +133,7 @@ impl<T> Vec<T> {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
             if self.capacity > 0 {
-                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                free(self.data as *mut u8);
             }
             self.data = new_data;
             self.capacity = new_capacity;
@@ -199,15 +144,6 @@ impl<T> Vec<T> {
 impl<T> Default for Vec<T> {
     fn default() -> Self {
         Vec::new()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
     }
 }
 
@@ -255,4 +191,3 @@ impl<T: Clone> Clone for Vec<T> {
         new_vec
     }
 }
-

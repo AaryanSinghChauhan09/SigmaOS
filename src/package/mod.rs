@@ -7,6 +7,7 @@ pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
+pub use crate::sigpkg::universal_adapter::PackageFormatAdapter;
 pub use store::{
     StoreError, StoreApp, SigmaSoftwareStore,
 };

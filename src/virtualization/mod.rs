@@ -1,6 +1,7 @@
 // SigmaOS Virtualization Module
 pub mod deterministic;
 pub mod orchestration;
+pub mod oci_pod;
 
 pub use deterministic::{
     DeterministicError, DeterministicHypervisor, DeterministicVirtualMachine, VirtualCpuContext,

@@ -8,6 +8,7 @@ extern crate alloc;
 
 use alloc::string::String;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use crate::klib::{HashMap, Vec};
 
 use crate::security::selinux::{
     SeLinuxMode, SecurityContext, AvcKey, AccessVectorCache, SelinuxEngine

@@ -12,7 +12,8 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
-use crate::klib::{BTreeMap, Vec, String, ToString};
+extern crate alloc;
+use crate::klib::{BTreeMap, Vec, String};
 use crate::sigpkg::{Package, Version};
 
 /// PKGBUILD parser for Arch Linux package recipes

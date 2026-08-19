@@ -277,24 +277,24 @@ pub enum AnnotationType {
     Arrow,
     Highlight,
     BlurPixelate,
-    Text(String),
-    StepSticker(u32), // Auto-incrementing step circle
+    Text,
+    StepNumber,
 }
 
 /// Annotation object
 #[derive(Debug, Clone)]
-pub struct VectorAnnotation {
+pub struct Annotation {
     pub annotation_type: AnnotationType,
-    pub x: u32,
-    pub y: u32,
-    pub width: u32,
-    pub height: u32,
+    pub region: CaptureRegion,
+    pub color_rgba: u32,
+    pub text_label: Option<String>,
+    pub step_index: Option<u32>,
 }
 
 /// Specialized annotator & vector editing engine
 pub struct AnnotationEngine {
-    pub annotations: Vec<VectorAnnotation>,
-    pub current_step: u32,
+    pub annotations: Vec<Annotation>,
+    pub next_step_number: u32,
 }
 
 impl AnnotationEngine {

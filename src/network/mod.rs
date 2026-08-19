@@ -1,5 +1,6 @@
 // SigmaOS Network Stack Module
 pub mod analyzer;
+pub mod commands;
 pub mod config;
 pub mod enterprise;
 pub mod ring_buffer_stack;
@@ -11,6 +12,7 @@ pub mod tcp_udp;
 pub mod sync;
 pub mod torrent;
 
+pub use commands::*;
 pub use analyzer::{
     AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,
     ClearLinuxFlowLoadBalancer, ConnectionInfo, ConnectionState, GentooUseFlagsDissector,

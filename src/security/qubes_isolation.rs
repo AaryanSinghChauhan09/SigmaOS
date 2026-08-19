@@ -136,8 +136,35 @@ impl SQrexecChannel {
         unsafe {
             // Memory scrubbing: securely zero out shared memory pages before releasing to prevent side-channel leaks
             core::ptr::write_bytes(self.buffer, 0, self.size);
-            free(self.buffer);
+            free(self.buffer, self.size);
         }
+    }
+}
+
+pub struct DomainOrchestrator {
+    pub domains: Vec<IsolatedDomain>,
+    pub policy_engine: QrexecPolicyEngine,
+}
+
+impl DomainOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            domains: Vec::new(),
+            policy_engine: QrexecPolicyEngine::new(),
+        }
+    }
+
+    pub fn create_domain(&mut self, name: &[u8], domain_type: DomainType, caps: CapabilityToken) -> DomainID {
+        let id = self.domains.len() + 1;
+        let dom = IsolatedDomain::new(id, name, domain_type, caps);
+        self.domains.push(dom);
+        id
+    }
+}
+
+impl Default for DomainOrchestrator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -224,8 +251,8 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 }
 
 #[cfg(not(test))]
-unsafe fn free(ptr: *mut u8) {
-    crate::klib::custom_allocator::free(ptr)
+unsafe fn free(ptr: *mut u8, size: usize) {
+    crate::klib::custom_allocator::free(ptr, size)
 }
 
 #[cfg(test)]
@@ -234,6 +261,8 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 }
 
 #[cfg(test)]
-unsafe fn free(ptr: *mut u8) {
-    std::alloc::dealloc(ptr, std::alloc::Layout::from_size_align(1, 8).unwrap()) // placeholder size
+unsafe fn free(ptr: *mut u8, size: usize) {
+    if !ptr.is_null() && size > 0 {
+        std::alloc::dealloc(ptr, std::alloc::Layout::from_size_align(size, 8).unwrap());
+    }
 }

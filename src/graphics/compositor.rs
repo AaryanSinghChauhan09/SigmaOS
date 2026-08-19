@@ -704,34 +704,32 @@ impl Compositor for SimpleCompositor {
                 }
             }
         } else {
-            &mut *output
-        };
+            // Clear target surface
+            output.clear(Color::rgb(0, 0, 0));
 
-        // Clear target surface
-        target_surface.clear(Color::rgb(0, 0, 0));
+            // Compose windows in order (back to front)
+            for &window_id in &self.window_order {
+                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                    let window_rect = window.rect();
+                    let output_stride = output.info().stride as usize / 4;
+                    if let Some(surface) = window.surface() {
+                        let window_stride = surface.info().stride as usize / 4;
+                        let window_data = surface.data();
+                        let output_data = output.data_mut();
 
-        // Compose windows in order (back to front)
-        for &window_id in &self.window_order {
-            if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                let window_rect = window.rect();
-                let output_stride = output.info().stride as usize / 4;
-                if let Some(surface) = window.surface() {
-                    let window_stride = surface.info().stride as usize / 4;
-                    let window_data = surface.data();
-                    let output_data = output.data_mut();
+                        // Copy window surface to output
+                        for y in 0..window_rect.size.height as usize {
+                            for x in 0..window_rect.size.width as usize {
+                                let output_x = (window_rect.position.x + x as i32) as usize;
+                                let output_y = (window_rect.position.y + y as i32) as usize;
 
-                    // Copy window surface to output
-                    for y in 0..window_rect.size.height as usize {
-                        for x in 0..window_rect.size.width as usize {
-                            let output_x = (window_rect.position.x + x as i32) as usize;
-                            let output_y = (window_rect.position.y + y as i32) as usize;
+                                let output_index = output_y * output_stride + output_x;
+                                let window_index = y * window_stride + x;
 
-                            let output_index = output_y * output_stride + output_x;
-                            let window_index = y * window_stride + x;
-
-                            if output_index < output_data.len() && window_index < window_data.len()
-                            {
-                                output_data[output_index] = window_data[window_index];
+                                if output_index < output_data.len() && window_index < window_data.len()
+                                {
+                                    output_data[output_index] = window_data[window_index];
+                                }
                             }
                         }
                     }

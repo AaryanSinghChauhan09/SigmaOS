@@ -376,7 +376,7 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        let pt_table_mut: &mut Option<SimplePageTable> = &mut self.pt_tables[pt_idx_in_vec];
+        let pt_table_mut: &mut Option<SimplePageTable> = &mut self.pt_tables[pd_idx_in_vec];
         if let Some(ref mut pt) = pt_table_mut {
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);

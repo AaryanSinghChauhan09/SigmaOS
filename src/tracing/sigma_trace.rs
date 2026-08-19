@@ -19,62 +19,6 @@
 // Kali-Style: Isolated Dynamic System Tracing Sandbox Hook
 // Hooks trace handlers directly inside the kernel transaction bus using isolated spans
 
-// (no_std only applicable at crate root - removed)
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
 extern crate alloc;
 use alloc::vec::Vec;
 

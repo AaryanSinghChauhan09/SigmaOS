@@ -29,7 +29,6 @@ pub mod kernel;
 pub mod klib;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod performance;
 pub mod productivity;
@@ -43,7 +42,6 @@ pub mod virtualization;
 pub mod tracing;
 pub mod crash;
 pub mod media;
-pub mod graphics;
 pub mod gpu;
 
 pub use accessibility::{
@@ -63,15 +61,17 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
     InterimLispVM, JehanneError, JehanneNamespace, LispVal, MintBackupTool, MintSoftwareManager,
-    MintUpdateItem, MintUpdateLevel, MintUpdateManager, MntReformLpcDriver, MockUPIService,
+    MintUpdateLevel, MintUpdateManager, MntReformLpcDriver, MockUPIService,
     MultilingualSupport, NamespaceBindEntry, NtHandle, NtObjectManager, NtObjectType, NtStatus,
     Plan9pMessage, Plan9pMsgType, PortableExecutableLoader, ReformPowerStats, RegistryHive,
-    SoftwareMeta, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
+    TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
-    Literal, SpacSatResolver,
+    SpacSatResolver,
     ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
     AlpineSyslogManager, BusyBoxMulticall,
+    MachOLoader, LaunchdServiceManager, SpotlightMetadataIndex, CoreAudioHalRouter, ApfsSnapshotManager,
+    ApkManifestParser, ArtBytecodeSandbox, IntentRouter, CrostiniContainerBridge, VerifiedBootSlotSwitcher,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -90,6 +90,11 @@ pub use drivers::{
     NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
     RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
     TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    EvdevEvent, EvdevEventType, EvdevInputDevice, MultiTouchSlot,
+    DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, FreeBsdDrmConnector,
+    DriverCapability, OpenBsdDriverPledge,
+    NetBsdRumpDriverHost,
+    LinuxUrb, LinuxUrbQueue, UrbTransferType,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -99,8 +104,8 @@ pub use graphics::paint::ColorRgba;
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
     AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
+    CpuRegisters, EdfTask, HardwareException,
+    InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
     KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
     MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
     ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
@@ -130,11 +135,10 @@ pub use performance::{
     GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
 };
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore, EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
-    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
-    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
-    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
+    Achievement, AchievementType, AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter,
+    EverythingSearchEngine, GamifiedProductivity, Goal, NotepadPlusWorkspace, ObsStudioMixer,
+    OneCommanderDualPane, PomodoroState, PomodoroTimer, PotPlayerVlcEngine, ProductivityScore,
+    SevenZipCompressor, ShareXFlameshotEngine,
 };
 pub use resilience::{
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,

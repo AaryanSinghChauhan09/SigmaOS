@@ -1,7 +1,7 @@
 // SigmaOS Arch Linux Parity Implementation
 // Implements PKGBUILD parsing, makepkg compiler parity, and AUR integration
 
-use crate::klib::{BTreeMap, SigmaString, ToString, Vec};
+use crate::klib::{BTreeMap, SigmaString, Vec};
 use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards

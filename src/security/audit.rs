@@ -19,8 +19,13 @@ pub enum EventType {
     SystemChange = 3,
 }
 
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    PlainText,
+    Json,
+    Binary,
+}
+
 pub enum AuditError {
     Success = 0,
     LogFull = 1,

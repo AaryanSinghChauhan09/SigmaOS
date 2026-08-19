@@ -178,6 +178,62 @@ pub struct SelinuxEngine {
     pub type_transitions: HashMap<TypeTransitionKey, String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ObjectType {
+    File,
+    Process,
+    Socket,
+    Capability,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SelinuxPermission {
+    Read,
+    Write,
+    Execute,
+    Append,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SecurityLabel {
+    pub label: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SecurityRule {
+    pub source_type: String,
+    pub target_type: String,
+    pub object_type: ObjectType,
+    pub permission: SelinuxPermission,
+}
+
+#[derive(Debug, Clone)]
+pub struct SecurityPolicy {
+    pub rules: Vec<SecurityRule>,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorProfile {
+    pub name: String,
+    pub mode: String,
+}
+
+pub struct AppArmorManager {
+    pub profiles: Vec<AppArmorProfile>,
+}
+
+impl AppArmorManager {
+    pub fn new() -> Self {
+        Self { profiles: Vec::new() }
+    }
+}
+
+impl Default for AppArmorManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SelinuxEngine {
     pub fn new() -> Self {
         let mut engine = Self {
