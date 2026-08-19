@@ -9,7 +9,7 @@ use alloc::vec::Vec;
 use alloc::vec;
 use core::default::Default;
 use core::result::Result::{self, Ok, Err};
-use core::option::Option::{self, Some, None};
+use core::option::Option::{self, Some};
 
 #[cfg(not(target_os = "none"))]
 use std::collections::HashMap;

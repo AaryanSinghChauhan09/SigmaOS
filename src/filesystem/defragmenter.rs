@@ -3,6 +3,8 @@
 // File fragmentation analysis, contiguous cluster relocation, free space consolidation,
 // S.M.A.R.T. thermal validation, and an interactive colored-block cluster map representation.
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 
 /// Represents the state of a single sector/cluster on disk (Defraggler standard)

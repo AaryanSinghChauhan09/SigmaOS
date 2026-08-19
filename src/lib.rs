@@ -143,6 +143,11 @@ pub use security::{
     PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
     SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
+    HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
+    KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
+    SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
+    UserAccessGuard, UserPtr,
 };
 pub use plugin::{
     ExtensionType, ManagerCapability, MarketplaceItem, Plugin, PluginCapability, PluginError,
