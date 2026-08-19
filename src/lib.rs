@@ -28,6 +28,7 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod tools;
+pub mod unimplemented_tools;
 pub mod virtualization;
 
 pub use access::{
@@ -86,7 +87,6 @@ pub use drivers::{
     NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
     RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
     TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
-    DrmAtomicPlaneState, WaylandDmaBuf, OpenBsdWsdisplayVt,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -105,9 +105,8 @@ pub use kernel::{
     Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
 pub use network::{
-    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
-    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
-    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
+    CloudSyncManager, PeerInfo, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    TorrentClient, TorrentError, TorrentState,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -115,27 +114,22 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use performance::{
-    AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CallGraph,
-    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoSchedClass, IoTaskPriority,
-    PerformanceProfileRule, PhysicalPageFrame, Profile, ProfileType, Profiler, ProfilerError,
-    RamDefragmenter, SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
-    SmartResourceOptimizer, UltraKernelSamepageMerger, X86v3v4OptimizationDetector,
-    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+    AdaptiveIOScheduler, BbrEngine, BbrState, CallGraph, EevdfScheduler, EevdfTask,
+    IoOpcode, MultiGenLRU, PageInfo, PageState, Profile, ProfileType, Profiler, ProfilerError,
+    SimpleCallGraph, SimpleProfile, SimpleProfiler, ZeroCopyQueue,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore, EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
-    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
-    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
-    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
+    ProductivityScore, NoteTakingApp, ScreenRecorder, ScreenshotTool, SigmaOffice, TaskManager,
+    IntegratedTerminal, TmuxSessionManager, MindMapCreator,
 };
 pub use resilience::{
-    FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
-    SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
+    BackupError, BackupSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
+    SelfHealingModule, SigmaTimeshift, SystemSnapshot,
 };
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
@@ -164,6 +158,24 @@ pub use tools::{
     SovereignImageToDataUri, SovereignJsonPrettifier, SovereignKeyboardTester, SovereignIsWebsiteDown,
     SovereignPasswordGenerator, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
     UserIdentity,
+};
+pub use unimplemented_tools::{
+    AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiComplianceDashboard, AiDependencyResolver,
+    AiDifficultyDirector, AiFileOrganizer, AiScheduler, AiSearchAssistant, AiTaskbar, ApiTestingTool,
+    AppSandboxing, AudioEditor, AudioTrack, BatterySaver, CameraFilter, CloudBackupUtility,
+    CloudGaming, ControllerMapper, CrossDeviceSync, CrossLanguageBuildTool, DeclarativeBuildSystem,
+    DiskDefragmenter, DocumentScanner, DuplicateFileFinder, EmailClient, EmulatorManager,
+    FlatpakSnapLayer, ForensicSnapshot, GameHubLauncher, GameModManager, GamePerformanceBooster,
+    GameRecorder, GamifiedDesktop, GamifiedTodo, GanttChartPlanner, GestureControl, GifConverter,
+    GitGuiClient, GuiAppStore, IotDeviceManager, KanbanBoard, KanbanColumn, MarkdownNotebook,
+    MemoryLeakDetector, MeshNetworking, MindMapCreator, MultiMonitorManager, MusicLibraryManager,
+    NaturalLanguageShell, OfflinePackageInstaller, PacketSniffer, PartitionManager, PdfEditor,
+    PerformanceOptimizer, PluginMarketplace, PodcastRecorder, PredictiveMaintenance, PrivacyDashboard,
+    ProcessSandbox, ProfileSample, RemoteDesktop, SecureContainer, SecureFileSharing,
+    SecureFileShredder, SmartCleanup, SmartNotificationManager, StartupOptimizer, StaticAnalyzer,
+    StreamingOverlayManager, SubtitleEditor, SystemRestoreSnapshot, VectorDraftEngine,
+    VirtualMachineGuest, VmGuestSupervisor, VoiceControl, VpnTunnelManager, VrArRuntime,
+    WebcamEffects, ZeroKnowledgeVault, ZeroTrustTpmBoot,
 };
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,

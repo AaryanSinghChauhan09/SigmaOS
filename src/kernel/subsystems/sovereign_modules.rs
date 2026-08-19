@@ -12,10 +12,8 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
 
-// =========================================================================
-// 1. HEALTHCARE MODULE
-// =========================================================================
-
+// ==================================================================// 1. HEALTHCARE MODULE
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HealthcareApp {
     OpenMRS,
@@ -66,10 +64,8 @@ impl HealthcareModule {
     }
 }
 
-// =========================================================================
-// 2. EDUCATION MODULE
-// =========================================================================
-
+// ==================================================================// 2. EDUCATION MODULE
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EducationApp {
     GeoGebra,
@@ -135,10 +131,8 @@ impl EducationModule {
     }
 }
 
-// ============================================================================
-// Modular Kernel Module Packaging (Signed & Versioned Kernel Modules)
-// ============================================================================
-
+// =====================================================================// Modular Kernel Module Packaging (Signed & Versioned Kernel Modules)
+// =====================================================================
 #[derive(Debug, Clone)]
 pub struct ModuleVersion {
     pub major: u32,
@@ -168,7 +162,7 @@ impl SignedKernelModulePackage {
         payload: &[u8],
     ) -> Self {
         // Mock PQC signature generation over payload
-        let mut sig = vec![0x99; 32];
+        let mut sig = alloc::vec![0x99; 32];
         sig[0] = (abi_hash & 0xFF) as u8;
 
         Self {
@@ -243,12 +237,27 @@ impl UnifiedPoolMemory {
             is_compressed: false,
         }
     }
+
+    pub fn allocate_non_paged(&mut self, size: usize) -> Result<usize, &'static str> {
+        if self.non_paged_allocated + size > self.non_paged_limit {
+            return Err("Non-paged pool limit exceeded");
+        }
+        self.non_paged_allocated += size;
+        Ok(size)
+    }
+
+    pub fn allocate_paged(&mut self, size: usize) -> Result<usize, &'static str> {
+        let compressed_size = (size * 70) / 100;
+        if self.paged_allocated + compressed_size > self.paged_limit {
+            return Err("Paged pool limit exceeded");
+        }
+        self.paged_allocated += compressed_size;
+        Ok(compressed_size)
+    }
 }
 
-// =========================================================================
-// 3. ENGINEERING MODULE
-// =========================================================================
-
+// ==================================================================// 3. ENGINEERING MODULE
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EngineeringApp {
     FreeCAD,
@@ -314,10 +323,8 @@ impl EngineeringModule {
     }
 }
 
-// =========================================================================
-// 4. FINANCE MODULE
-// =========================================================================
-
+// ==================================================================// 4. FINANCE MODULE
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FinanceApp {
     GNUCash,
@@ -383,10 +390,8 @@ impl FinanceModule {
     }
 }
 
-// =========================================================================
-// 5. AGRICULTURE MODULE
-// =========================================================================
-
+// ==================================================================// 5. AGRICULTURE MODULE
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgricultureApp {
     QGIS,
@@ -452,10 +457,8 @@ impl AgricultureModule {
     }
 }
 
-// =========================================================================
-// 6. MULTILINGUAL SUPPORT
-// =========================================================================
-
+// ==================================================================// 6. MULTILINGUAL SUPPORT
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Language {
     Hindi,
@@ -490,10 +493,8 @@ impl MultilingualSupport {
     }
 }
 
-// =========================================================================
-// 7. HIGH-IMPACT SYSTEM COMPONENTS
-// =========================================================================
-
+// ==================================================================// 7. HIGH-IMPACT SYSTEM COMPONENTS
+// ==================================================================
 // --- A. ROUND-ROBIN SCHEDULER IMPLEMENTATION ---
 
 pub struct Thread {
@@ -797,10 +798,8 @@ impl PackageRecipes {
     }
 }
 
-// =========================================================================
-// 11. ENTERPRISE, GAMING, AND CLOUD-NATIVE SERVICES
-// =========================================================================
-
+// ==================================================================// 11. ENTERPRISE, GAMING, AND CLOUD-NATIVE SERVICES
+// ==================================================================
 pub struct KerberosTicket {
     pub principal: String,
     pub realm: String,
@@ -916,10 +915,8 @@ impl SigmaCloudSync {
     }
 }
 
-// =========================================================================
-// 12. PERSONAS, MIGRATION TOOLKIT, AND NEXT-GEN HARDWARE HOOKS
-// =========================================================================
-
+// ==================================================================// 12. PERSONAS, MIGRATION TOOLKIT, AND NEXT-GEN HARDWARE HOOKS
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OsPersona {
     MinimalistHacker,
@@ -1023,10 +1020,8 @@ impl QuantumHardwareHooks {
     }
 }
 
-// =========================================================================
-// 13. COLLABORATION, ETHICAL TELEMETRY, AND DYNAMIC KERNEL TUNING
-// =========================================================================
-
+// ==================================================================// 13. COLLABORATION, ETHICAL TELEMETRY, AND DYNAMIC KERNEL TUNING
+// ==================================================================
 pub struct CollaborativeUser {
     pub username: String,
     pub cursor_x: u32,
@@ -1121,10 +1116,8 @@ impl DynamicKernelPersonalizer {
     }
 }
 
-// =========================================================================
-// 8. CPU ARCHITECTURAL ABSTRACTIONS (x86 & ARM)
-// =========================================================================
-
+// ==================================================================// 8. CPU ARCHITECTURAL ABSTRACTIONS (x86 & ARM)
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct X86GdtEntry {
     pub limit: u16,
@@ -1246,10 +1239,8 @@ impl ArmGicController {
     }
 }
 
-// =========================================================================
-// 9. CISC & RISC DESIGN MODEL SIMULATORS
-// =========================================================================
-
+// ==================================================================// 9. CISC & RISC DESIGN MODEL SIMULATORS
+// ==================================================================
 pub struct CiscInstructionDecoder;
 
 impl CiscInstructionDecoder {
@@ -1370,10 +1361,8 @@ impl RiscPipelineSimulator {
     }
 }
 
-// =========================================================================
-// 10. MULTI-OS COMPATIBILITY ABSTRACTIONS (Linux, BSD, Windows)
-// =========================================================================
-
+// ==================================================================// 10. MULTI-OS COMPATIBILITY ABSTRACTIONS (Linux, BSD, Windows)
+// ==================================================================
 pub struct LinuxCgroup {
     pub cgroup_id: u32,
     pub cpu_weight: u32,
@@ -1502,29 +1491,28 @@ impl WinObjectManager {
     }
 }
 
-// =========================================================================
-// UNIT TESTS
-// =========================================================================
-
+// ==================================================================// UNIT TESTS
+// ==================================================================
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-<<<<<<< HEAD
     fn test_healthcare_success_criteria() {
         let healthcare = HealthcareModule::new();
         assert!(healthcare.verify_success_criteria());
         assert_eq!(healthcare.deployed_hospitals, 12);
-=======
+    }
+
+    #[test]
     fn test_signed_kernel_module_package() {
-        let mut manager = KernelModuleManager::new(0x6800_SIGMA_00);
+        let mut manager = KernelModuleManager::new(0x6800_516B_00);
         let valid_pkg = SignedKernelModulePackage::new(
             "snd_hda_intel",
             1,
             2,
             0,
-            0x6800_SIGMA_00,
+            0x6800_516B_00,
             "Realtek",
             b"driver_binary_bytes",
         );
@@ -1539,7 +1527,7 @@ mod tests {
             535,
             100,
             0,
-            0x6700_OLD_ABI,
+            0x6700_01D0_AB,
             "NVIDIA",
             b"gpu_binary",
         );
@@ -1554,7 +1542,6 @@ mod tests {
         // Test compressed paged allocation (30% save)
         pool.allocate_paged(100).unwrap();
         assert_eq!(pool.paged_allocated, 70);
->>>>>>> origin/jules-514337451030587058-be8a6425
     }
 
     #[test]

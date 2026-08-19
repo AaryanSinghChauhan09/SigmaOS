@@ -12,6 +12,8 @@ pub enum PackageFormat {
     Portage,
     Sovereign,
     Xbps,
+    Nix,
+    Apk,
 }
 
 #[derive(Debug, Clone)]
@@ -124,62 +126,50 @@ impl IPackageAdapter for PacmanPackageAdapter {
     }
 }
 
-pub struct EbuildPackageAdapter {
-    pub use_flags: Vec<String>,
-}
-
-impl EbuildPackageAdapter {
-    pub fn new(use_flags: Vec<String>) -> Self {
-        Self { use_flags }
-    }
-}
-
-impl IPackageAdapter for EbuildPackageAdapter {
+pub struct NixPackageAdapter;
+impl IPackageAdapter for NixPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Portage
+        PackageFormat::Nix
     }
-    fn parse_package(&self, _raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Nix expression payload");
+        }
         Ok(PackageContext {
-            name: "ebuild-compat-pkg".to_string(),
+            name: "nix-store-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Portage,
-            dependencies: vec!["gcc".to_string()],
-            files: vec!["/store/ebuild-compat-pkg/bin/binary".to_string()],
-            hash: [0xDD; 32],
+            format: PackageFormat::Nix,
+            dependencies: vec![],
+            files: vec!["/nix/store/pkg/bin/exe".to_string()],
+            hash: [0xAA; 32],
         })
     }
     fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Ebuild Adapter: Extracted to {}", store_path);
+        println!("Nix Adapter: Extracted store path {}", store_path);
         Ok(())
     }
 }
 
-pub struct EbuildPackageAdapter {
-    pub use_flags: Vec<String>,
-}
-
-impl EbuildPackageAdapter {
-    pub fn new(use_flags: Vec<String>) -> Self {
-        Self { use_flags }
-    }
-}
-
-impl IPackageAdapter for EbuildPackageAdapter {
+pub struct ApkPackageAdapter;
+impl IPackageAdapter for ApkPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Portage
+        PackageFormat::Apk
     }
-    fn parse_package(&self, _raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Alpine APK payload");
+        }
         Ok(PackageContext {
-            name: "ebuild-compat-pkg".to_string(),
+            name: "apk-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Portage,
-            dependencies: vec!["gcc".to_string()],
-            files: vec!["/store/ebuild-compat-pkg/bin/binary".to_string()],
-            hash: [0xDD; 32],
+            format: PackageFormat::Apk,
+            dependencies: vec![],
+            files: vec!["/lib/apk/pkg".to_string()],
+            hash: [0xBB; 32],
         })
     }
     fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Ebuild Adapter: Extracted to {}", store_path);
+        println!("APK Adapter: Extracted apk package {}", store_path);
         Ok(())
     }
 }

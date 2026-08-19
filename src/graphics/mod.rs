@@ -18,8 +18,10 @@ pub use multi_monitor::{DisplayOutput, DisplayRotation, MultiMonitorManager};
 pub use video_timeline::{VideoClip, VideoTimeline, VideoTrack};
 
 pub use compositor::{
-    CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor, LayerBlendMode,
-    RenderLayer, SigmaCompositor,
+    AnimationType, BitmapSurface, Color, Compositor, CompositorCapability, CompositorStats,
+    GraphicsError, PixelFormat as CompositorPixelFormat, Position, Rectangle, SimpleCompositor,
+    SimpleWindow, Size, Surface, SurfaceCapability, SurfaceInfo, Window, WindowCapability,
+    WindowInfo,
 };
 pub use gpu_driver::{
     Framebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat,
