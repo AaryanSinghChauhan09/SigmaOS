@@ -2,7 +2,7 @@
 // Capability-based, standard Linux/BSD conforming filesystem with security, hard links, and path traversal
 
 use crate::security::{CapabilityToken, Permission};
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 // Standard POSIX / Linux / BSD open flags
 pub const O_RDONLY: u32 = 0x0000;
@@ -65,9 +65,9 @@ pub struct Inode {
     pub link_count: u32,
     pub hard_links_count: u32,
     pub symlink_target: Option<String>,
-    pub xattrs: HashMap<String, Vec<u8>>,
+    pub xattrs: BTreeMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
-    pub entries: HashMap<String, u64>, // Directory entries
+    pub entries: BTreeMap<String, u64>, // Directory entries
 }
 
 impl Inode {
@@ -85,9 +85,9 @@ impl Inode {
             link_count: 1,
             hard_links_count: 1,
             symlink_target: None,
-            xattrs: HashMap::new(),
+            xattrs: BTreeMap::new(),
             data: Vec::new(),
-            entries: HashMap::new(),
+            entries: BTreeMap::new(),
         }
     }
 }
@@ -112,20 +112,20 @@ impl FileDescriptor {
 
 /// Virtual Filesystem
 pub struct VirtualFilesystem {
-    inodes: HashMap<u64, Inode>,
+    inodes: BTreeMap<u64, Inode>,
     next_inode_id: u64,
     root_inode: u64,
-    file_descriptors: HashMap<u64, FileDescriptor>,
+    file_descriptors: BTreeMap<u64, FileDescriptor>,
     next_fd: u64,
 }
 
 impl VirtualFilesystem {
     pub fn new() -> Self {
         let mut fs = Self {
-            inodes: HashMap::new(),
+            inodes: BTreeMap::new(),
             next_inode_id: 1,
             root_inode: 0,
-            file_descriptors: HashMap::new(),
+            file_descriptors: BTreeMap::new(),
             next_fd: 0,
         };
 

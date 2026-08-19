@@ -1,7 +1,7 @@
 // SigmaOS Kernel Feature Lattice & Syscall Tracker
 // Encapsulates fine-grained feature path selection and lifecycle-aware syscall tracking
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum LatticeFeature {
@@ -12,13 +12,13 @@ pub enum LatticeFeature {
 }
 
 pub struct KernelLattice {
-    pub enabled_features: HashMap<LatticeFeature, bool>,
+    pub enabled_features: BTreeMap<LatticeFeature, bool>,
 }
 
 impl KernelLattice {
     pub fn new() -> Self {
         let mut lattice = KernelLattice {
-            enabled_features: HashMap::new(),
+            enabled_features: BTreeMap::new(),
         };
         lattice.enabled_features.insert(LatticeFeature::LegacyMemoryModel, false);
         lattice.enabled_features.insert(LatticeFeature::PredictiveScheduling, true);
@@ -56,13 +56,13 @@ pub struct SyscallHistory {
 }
 
 pub struct SyscallTracker {
-    pub tracking_pool: HashMap<u32, SyscallHistory>,
+    pub tracking_pool: BTreeMap<u32, SyscallHistory>,
 }
 
 impl SyscallTracker {
     pub fn new() -> Self {
         let mut tracker = SyscallTracker {
-            tracking_pool: HashMap::new(),
+            tracking_pool: BTreeMap::new(),
         };
         // Seed default trace history
         tracker.register_syscall(1, "sys_exit".to_string(), SyscallLifecycle::Deprecated, "Linux 2.6".to_string());
