@@ -120,11 +120,13 @@ pub use package::{
 };
 pub use performance::{
     AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CallGraph,
-    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoSchedClass, IoTaskPriority,
-    PerformanceProfileRule, PhysicalPageFrame, Profile, ProfileType, Profiler, ProfilerError,
-    RamDefragmenter, SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
-    SmartResourceOptimizer, UltraKernelSamepageMerger, X86v3v4OptimizationDetector,
-    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+    CpuInstructionExtension, CpuPriorityOptimizer, GlarySmartRule, IPCError, IpcError,
+    IoPriorityOptimizer, IoSchedClass, IoTaskPriority, PerformanceProfileRule, PhysicalPageFrame,
+    ProcessProfile, Profile, ProfileType, Profiler, ProfilerError, RamDefragmenter,
+    SchedInstruction, SchedOpcode, SimdOptimizer, SimpleCallGraph, SimpleProfile, SimpleProfiler,
+    SmartPerformanceProfile, SmartResourceOptimizer, SovereignSimdOptimizer, UdfSchedVm,
+    UltraKernelSamepageMerger, VmPerformanceMetrics, X86v3v4OptimizationDetector, ZeroCopyMetrics,
+    ZeroCopyQueue, GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER, QUEUE_SIZE,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,

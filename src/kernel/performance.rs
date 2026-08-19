@@ -14,6 +14,8 @@ pub enum IpcError {
     InvalidPayload,
 }
 
+pub type IPCError = IpcError;
+
 /// Zero-Allocation High-Fidelity Performance Metrics for Zero-Copy Queues
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct ZeroCopyMetrics {
@@ -66,7 +68,7 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
         self.head.store(head.wrapping_add(1), Ordering::Release);
         self.metrics.enqueued_count += 1;
 
-        let current_size = head.wrapping_sub(tail);
+        let current_size = head.wrapping_sub(tail) + 1;
         if current_size > self.metrics.peak_occupancy {
             self.metrics.peak_occupancy = current_size;
         }
@@ -167,6 +169,7 @@ impl UdfSchedVm {
     /// Evaluates a process profile, calculating its custom scheduling dynamic priority weight
     pub fn evaluate_priority(&mut self, process: &ProcessProfile) -> Result<u32, &'static str> {
         self.metrics.evaluation_runs += 1;
+        self.registers = [0; 4];
         let mut pc = 0;
         let limit = self.program.len();
         let mut decision = 0;
