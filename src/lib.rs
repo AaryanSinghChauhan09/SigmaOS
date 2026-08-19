@@ -13,9 +13,9 @@ pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod performance;
 pub mod productivity;
@@ -95,7 +95,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use performance::{

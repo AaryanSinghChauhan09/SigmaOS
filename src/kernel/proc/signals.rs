@@ -18,6 +18,7 @@
 
 /// SigmaOS POSIX signals implementation
 /// Based on early and modern Linux signals design
+extern crate alloc;
 use crate::klib::BTreeMap;
 use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
 use alloc::vec::Vec;

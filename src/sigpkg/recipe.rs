@@ -149,6 +149,16 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_prepare_command(mut self, cmd: String) -> Self {
+        self.prepare_commands.push(cmd);
+        self
+    }
+
+    pub fn with_package_command(mut self, cmd: String) -> Self {
+        self.package_commands.push(cmd);
+        self
+    }
+
     pub fn with_build_command(mut self, command: String) -> Self {
         self.build_commands.push(command);
         self
@@ -171,11 +181,6 @@ impl PackageRecipe {
 
     pub fn with_arch(mut self, arch: String) -> Self {
         self.arch = arch;
-        self
-    }
-
-    pub fn with_package_command(mut self, command: String) -> Self {
-        self.package_commands.push(command);
         self
     }
 

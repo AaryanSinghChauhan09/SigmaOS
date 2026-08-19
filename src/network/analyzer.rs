@@ -38,6 +38,45 @@ pub enum AlertSeverity {
     High,
     Critical,
 }
+
+pub trait AnalysisStrategy {
+    fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;
+    fn name(&self) -> &str;
+}
+
+#[derive(Debug, Clone)]
+pub struct TrafficAlert {
+    pub alert_type: AlertType,
+    pub severity: AlertSeverity,
+    pub message: String,
+    pub timestamp: Instant,
+    pub related_ips: Vec<IpAddr>,
+}
+
+#[derive(Debug, Clone)]
+pub struct BandwidthAnalysis {
+    pub total_bytes: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConnectionInfo {
+    pub source_ip: IpAddr,
+    pub destination_ip: IpAddr,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConnectionState {
+    Established,
+    Closed,
+}
+
+pub struct NetworkTrafficAnalyzer;
+
+pub struct SecurityAnalysis;
+
+#[derive(Debug, Clone)]
+pub struct TrafficStatistics;
+
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::time::{Duration, Instant};
 

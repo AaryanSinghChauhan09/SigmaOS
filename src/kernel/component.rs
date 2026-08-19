@@ -337,17 +337,19 @@ impl ComponentTree {
             return Err(ComponentError::PermissionDenied); // Can't destroy root
         }
 
-        let component = self.components.get(&component_id).ok_or(ComponentError::NotFound)?;
+        let (children_to_destroy, parent_id) = {
+            let component = self.components.get(&component_id).ok_or(ComponentError::NotFound)?;
+            (component.children.clone(), component.parent)
+        };
         
         // Recursively destroy children
-        let children_to_destroy: Vec<ComponentId> = component.children.clone();
         for child_id in children_to_destroy {
             self.destroy_component(child_id).ok();
         }
 
         // Remove from parent's children
-        if let Some(parent_id) = component.parent {
-            if let Some(parent_component) = self.components.get_mut(&parent_id) {
+        if let Some(p_id) = parent_id {
+            if let Some(parent_component) = self.components.get_mut(&p_id) {
                 parent_component.remove_child(component_id);
             }
         }
@@ -437,23 +439,25 @@ impl ComponentTree {
 
     /// Propagate resource limits from parent to children
     pub fn propagate_resource_limits(&mut self, parent_id: ComponentId) -> Result<(), ComponentError> {
-        let parent = self.components.get(&parent_id).ok_or(ComponentError::NotFound)?;
-        let parent_resources: Vec<ResourceAllocation> = parent.resources.clone();
+        let (parent_resources, children) = {
+            let parent = self.components.get(&parent_id).ok_or(ComponentError::NotFound)?;
+            (parent.resources.clone(), parent.children.clone())
+        };
 
-        for &child_id in &parent.children {
+        for &child_id in &children {
             if let Some(child) = self.components.get_mut(&child_id) {
                 // Distribute parent resources among children
                 for resource in &parent_resources {
                     let child_allocation = ResourceAllocation::new(
                         resource.resource_type,
-                        resource.amount / parent.children.len().max(1),
+                        resource.amount / children.len().max(1),
                         resource.start,
                         resource.end,
                     );
                     child.allocate_resource(child_allocation).ok();
                 }
-                self.propagate_resource_limits(child_id).ok();
             }
+            self.propagate_resource_limits(child_id).ok();
         }
 
         Ok(())
@@ -472,7 +476,7 @@ mod tests {
 
     #[test]
     fn test_component_creation() {
-        let tree = ComponentTree::new();
+        let mut tree = ComponentTree::new();
         let child_id = tree.create_component(0, "test_child").unwrap();
         assert!(tree.get_component(child_id).is_ok());
     }

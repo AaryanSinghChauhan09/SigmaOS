@@ -577,6 +577,7 @@ mod tests {
         let sig = encryptor.pqc_secure_sign(payload, "Kyber1024-Active-Key");
         assert!(encryptor.pqc_verify_signature(payload, &sig));
 
+        let raid = SigmaFsRaidEngine::new(RaidLevel::Raid1);
         let mapped_disks = raid.route_raid_sectors("md0", 500);
         assert_eq!(mapped_disks, vec![0, 1]); // RAID-1 mirrors
     }
