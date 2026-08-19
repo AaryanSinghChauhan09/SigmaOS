@@ -13,16 +13,7 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
-pub mod boot_init;
-pub mod dde;
-pub mod even_more_devices;
-pub mod flipper_gpio_sensor;
-pub mod legacy_audio_ac97;
-pub mod modern_audio_intel_hda;
-pub mod modern_nvme;
-pub mod modern_usb_printer;
-pub mod modern_wifi;
-pub mod touch_jingos;
+pub mod distro_readiness;
 
 // Expose rich hidden Linux/BSD-inspired drivers
 pub mod ch340_usb;
@@ -42,15 +33,11 @@ pub mod boot_init;
 pub mod dde;
 pub mod flipper_gpio_sensor;
 pub mod intel_e1000;
-pub mod sovereign_driver_lifecycle;
-
-pub use sovereign_driver_lifecycle::{
-    SovereignDriverManager, UniversalDriverDescriptor, HardwareTier,
-    DriverLifecycleState, LocklessDmaRingQueue, PciDeviceId,
-};
 
 pub use even_more_devices::*;
-pub use gpu::{GpuCommand, GpuDriver, GpuError};
+pub use gpu::{GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline, GpuShader, ShaderStage};
+pub use ch340_usb::Ch340Driver;
+pub use intel_hda::{Bdle, IntelHdaDriver};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use kernel_releases::*;
 pub use legacy_keyboard::LegacyKeyboard;
@@ -63,10 +50,20 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+
+pub use distro_readiness::{
+    DrmDisplayMode, FreeBsdGeomDiskEngine, GeomPartition, LinuxPciBusGovernor, OpenBsdDrmKmsController,
+    PciBarRegister, PciBarType, PciDeviceNode, UniversalXhciRingEngine, XhciTrb, XhciTrbType,
+};
+
 pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use modern_audio_intel_hda::ModernAudioIntelHda;
-pub use modern_nvme::ModernNvmeDriver;
+pub use legacy_parallel_printer::LegacyParallelPrinter;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::ModernWifiDriver;
+pub use modern_nvme::{ModernNvmeDriver, AhciCommandHeader, AhciPrdtEntry, AhciStorageDriver};
 pub use touch_jingos::TouchJingosDriver;
-pub use peripheral::{PeripheralDevice, PeripheralManager, DeviceGeneration, PowerState};
+pub use nvme_storage::{NvmeDriver, NvmeCmd, NvmeCqe};
+pub use soc::{PinController, ClockController, GenericPin, GenericClock, SocPinController, SocClockController, UnifiedSocController, PinDirection, PinPull, PinError, ClockError};
+pub use kernel_io_suite::{BluetoothHciDriver, BluetoothMode, AclPacket, ScoPacket, L2capChannel, L2capState, BluetoothError, PrinterCupsDriver, PrinterProtocol, PrinterBackend, PrintJob, PrintFormat, JobStatus, PrinterError, GpuAccelerationDriver, CommandBuffer, GpuCommand as SuiteGpuCommand, PrimitiveType, CommandStatus, FlipRequest, DisplayMode, PixelFormat, GpuError as SuiteGpuError, AlsaSoundDriver, RingBuffer, SampleFormat, AlsaError, WifiFullStackDriver, WifiState, ScanResult, SecurityType, BssInfo, WpaToken, WpaTokenType, QosMapping, WifiError, MultiTouchDriver, TouchProtocol, TouchContact, GestureState, GestureType, TouchError, VesaFramebufferDriver, Cursor, VesaFramebufferError, UsbHidFullDriver, HidInputReport, HidOutputReport, HidFullError, AncientDeviceLayer, Uart8250, IsaBus, IsaDevice, Ne2000Ethernet, MfmDiskInterface, AdLibSynth, EgaCgaAdapter, VideoMode, AncientError, HidTokenType, PrinterFormat};
+pub use intel_e1000::*;

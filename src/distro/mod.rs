@@ -27,7 +27,7 @@ pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease,
+    ManjaroKernelRelease, MhwdDkmsRebuilder,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,

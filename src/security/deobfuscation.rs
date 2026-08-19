@@ -4,7 +4,9 @@
 /// and a continuum of static/dynamic disassembler callbacks.
 /// Inspired by Linux sparse analyzer, FreeBSD Capsicum static verification, and Astrée abstract interpretation.
 
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArch {

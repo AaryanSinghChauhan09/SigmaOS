@@ -142,6 +142,20 @@ impl Driver for SimpleDriver {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeviceId {
+    pub vendor: u16,
+    pub device: u16,
+}
+
+pub type SdfResult<T> = Result<T, DriverError>;
+
+pub trait SdfDriver {
+    fn probe(dev: &DeviceId) -> bool;
+    fn init(&mut self) -> SdfResult<()>;
+    fn shutdown(&mut self);
+}
+
 pub trait DriverFramework {
     fn register_driver(&mut self, driver: Box<dyn Driver>) -> Result<DriverID, DriverError>;
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
