@@ -1,6 +1,5 @@
 // OOP-based Interrupt Handler for SigmaOS
 // Implements interrupt handling using OOP principles with traits and structs.
-||||||| 984d1301f
 #![no_std]
 #![no_main]
 /// Advanced High-Fidelity Interrupt & Exception Handler for SigmaOS
@@ -11,12 +10,9 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-||||||| 984d1301f
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 pub type InterruptNumber = u32;
@@ -68,7 +64,6 @@ pub enum InterruptError {
     AlreadyDisabled = 3,
     PermissionDenied = 4,
     HandlerNotFound = 5,
-||||||| 984d1301f
 #[derive(Debug, Clone, Copy)]
 pub enum InterruptError {
     Success = 0,
@@ -267,7 +262,6 @@ impl InterruptDescriptor {
 }
 
 /// Simple interrupt handler (OOP: Concrete handler class)
-||||||| 984d1301f
 impl InterruptHandlerInfo {
     pub fn new(handler_type: HandlerType) -> Self {
         InterruptHandlerInfo {
@@ -428,7 +422,6 @@ impl SimpleInterruptHandler {
         priority: Priority,
         capability: HandlerCapability,
     ) -> Self {
-||||||| 984d1301f
     pub fn new(handler_type: HandlerType, priority: Priority, capability: HandlerCapability) -> Self {
     pub fn new(vector: InterruptNumber) -> Self {
         SimpleInterruptHandler {
@@ -441,7 +434,6 @@ impl SimpleInterruptHandler {
 impl InterruptHandler for SimpleInterruptHandler {
     fn handle(&mut self, _interrupt: InterruptNumber) -> InterruptResult {
         self.handle_count.fetch_add(1, Ordering::SeqCst);
-||||||| 984d1301f
     fn handle(&mut self, interrupt: InterruptNumber) -> InterruptResult {
         self.handle_count.fetch_add(1, Ordering::SeqCst);
         // In a real implementation, this would handle the interrupt
@@ -495,7 +487,6 @@ pub trait InterruptController {
 /// Interrupt statistics
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 984d1301f
 /// Interrupt controller trait (OOP interface)
 pub trait InterruptController {
     /// Register handler
@@ -699,7 +690,6 @@ impl InterruptController for PIC {
 }
 
 /// Interrupt manager (OOP: Manager class)
-||||||| 984d1301f
 impl InterruptStats {
     pub fn new() -> Self {
         InterruptStats {
@@ -948,7 +938,6 @@ impl InterruptManager {
 impl Default for InterruptManager {
     fn default() -> Self {
         Self::new()
-||||||| 984d1301f
 /// Simple Vec implementation for no_std
 struct Vec<T> {
     data: *mut T,
@@ -1061,7 +1050,6 @@ mod tests {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_interrupt_handling_and_dispatch() {
@@ -1080,7 +1068,6 @@ mod tests {
         assert_eq!(pic.stats().handled_interrupts, 1);
     }
 }
-||||||| 984d1301f
 
 // External allocator functions
 extern "C" {

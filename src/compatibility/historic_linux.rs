@@ -340,7 +340,6 @@ impl Default for TinyCoreEphemeralEngine {
     }
 }
 
-||||||| 984d1301f
 /// os-tutorial: 16-bit real mode to 32-bit protected mode CPU transition simulator
 pub struct ProtectedModeSwitchSimulator {
     pub cr0_pe_bit: bool,       // Protection Enable (PE) bit of CR0

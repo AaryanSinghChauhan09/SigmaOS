@@ -63,7 +63,6 @@ impl SigmaSoftwareStore {
                     }
                     return Ok(());
                 }
-||||||| 65885484f
     pub fn check_for_updates(&mut self) -> usize {
         self.pending_updates.clear();
         for (name, app) in &self.catalog {
@@ -110,7 +109,6 @@ impl SigmaSoftwareStore {
 }
 
 pub static GLOBAL_SOFTWARE_STORE: SigmaSoftwareStore = SigmaSoftwareStore::new();
-||||||| 43be3a7e8
 // SigmaOS Polish-Parity Software Store & Update Manager (SigmaStore)
 // Designed for software installation, package upgrades, and security auditing
 

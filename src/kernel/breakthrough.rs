@@ -499,15 +499,12 @@ mod tests {
         assert!(!sudo.evaluate_contextual_sudo("read_etc")); // even read denied!
     }
 }
-||||||| 43be3a7e8
 // #![no_std]
 // #![no_main]
 
 /// SigmaOS Breakthrough Futuristic Systems
 /// Inspired by user comparative roadmap and future-focused design patterns.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 // =========================================================================
 // 1. Hot-Pluggable Kernel Module System with PQC and AI Tuning
@@ -840,7 +837,6 @@ impl<T> Vec<T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
     if let Ok(layout) = Layout::from_size_align(size, 8) {
         std_alloc(layout)
     } else {
@@ -861,7 +857,6 @@ extern "C" {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::init::sigma_init::{SigmaInit, SimpleService, Service, InitSystem, ServiceState};
 
     #[test]

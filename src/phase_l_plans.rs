@@ -591,7 +591,6 @@ pub mod roadmap_innovations {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
 
         #[test]
         fn test_kernel_profile() {
@@ -930,7 +929,6 @@ pub mod sovereign_vmm {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
 
         #[test]
         fn test_cap_token_logic() {
@@ -1205,7 +1203,6 @@ pub mod sovereign_browser {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
 
         #[test]
         fn test_tab_load_url() {
@@ -1509,7 +1506,6 @@ pub mod sovereign_sched {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
 
         #[test]
         fn test_eevdf_schedule() {
@@ -1794,7 +1790,6 @@ pub mod sigmafs_extended {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
 
         #[test]
         fn test_nvme_read_write() {
@@ -2103,7 +2098,6 @@ pub mod s_ai_engine {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
 
         #[test]
         fn test_matrix_relu() {
@@ -2428,7 +2422,6 @@ pub mod s_cosmos {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
 
         #[test]
         fn test_pe_valid_magic() {

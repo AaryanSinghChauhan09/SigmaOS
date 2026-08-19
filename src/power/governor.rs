@@ -199,7 +199,6 @@ mod tests {
         assert_eq!(balancer.boost_interactive_threads(false, 10), 8);
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Dynamic CPU Performance & Power Governor (SigmaGovernor)
 // Designed for real-time task scaling, thermal bursts, and CPU cycle optimization
 
@@ -388,7 +387,6 @@ impl SigmaSupportPriorityOptimizer {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_governor_modes() {

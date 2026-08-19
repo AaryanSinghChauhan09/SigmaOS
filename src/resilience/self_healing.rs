@@ -193,7 +193,6 @@ impl SelfHealingModule {
         let snapshot = self
             .get_snapshot(id)
             .ok_or(ResilienceError::SnapshotNotFound)?;
-||||||| 43be3a7e8
         if !self.snapshots.iter().any(|s| s.id == id) {
             return Err(ResilienceError::SnapshotNotFound);
         }
@@ -438,7 +437,6 @@ impl Default for SystemStabilityMonitor {
     }
 }
 
-||||||| 984d1301f
 #[derive(Debug, Clone)]
 pub struct ShardHeartbeat {
     pub shard_name: String,
@@ -638,7 +636,6 @@ mod tests {
         assert_eq!(status_after_clear, "ATTEMPTING_RECOVERY");
         assert!(!monitor.in_safe_mode);
     }
-||||||| 984d1301f
 
     #[test]
     fn test_double_fault_guard_and_heartbeats() {

@@ -10,10 +10,8 @@
 extern crate alloc;
 use crate::klib::Vec;
 use alloc::string::String;
-||||||| 68c19dfa6
 use crate::klib::{Vec, String};
 #[cfg(not(test))]
-use crate::klib::{Vec, String};
 #[cfg(test)]
 use std::vec::Vec;
 #[cfg(test)]
@@ -396,7 +394,6 @@ impl RunitService {
             max_restarts: 5,
             log_enabled: true,
         }
-||||||| 68c19dfa6
         Self { name, status: ServiceStatus::Down, restart_count: 0, max_restarts: 5, log_enabled: true }
         Self {
             name,
@@ -426,7 +423,6 @@ impl RunitService {
             pid,
             uptime_secs: 0,
         };
-||||||| 68c19dfa6
         self.status = ServiceStatus::Up { pid, uptime_secs: 0 };
         self.status = ServiceStatus::Up { pid, uptime_secs: 0 };
         self.log_event("Service started successfully");

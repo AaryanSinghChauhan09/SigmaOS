@@ -1,6 +1,5 @@
 // OOP-based Container Runtime for SigmaOS
 // Implements container runtime using OOP principles with traits and structs.
-||||||| 65885484f
 #![no_std]
 #![no_main]
 #![cfg_attr(target_os = "none", no_std)]
@@ -12,16 +11,13 @@ use alloc::boxed::Box;
 
 extern crate alloc;
 
-use alloc::boxed::Box;
 use alloc::vec::Vec;
-||||||| 65885484f
 use core::mem;
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
 use core::ptr::{self, NonNull};
-use core::mem;
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -137,7 +133,6 @@ impl Default for ContainerCapability {
     fn default() -> Self {
         Self::new()
     }
-||||||| 65885484f
 /// Container network configuration type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerNetworkType {
@@ -710,7 +705,6 @@ impl SimpleContainerRuntime {
     }
 }
 
-||||||| 65885484f
 /// Simple Vec implementation for no_std
 struct Vec<T> {
     data: *mut T,
@@ -886,7 +880,6 @@ impl<T> Vec<T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
     std_alloc(layout)
 }

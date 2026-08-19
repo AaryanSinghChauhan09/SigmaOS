@@ -67,7 +67,6 @@ mod tests {
         assert!(!adapter.is_mounted);
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Legacy Filesystem Adaptation Layer (LegacyFSAdapter)
 // Designed for FAT32, Minix, and ReiserFS filesystem mounting and translations
 
@@ -117,7 +116,6 @@ impl LegacyFSAdapter {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_legacy_fs_adapter() {

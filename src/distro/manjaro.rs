@@ -280,7 +280,6 @@ impl MhwdDkmsRebuilder {
     }
 }
 
-||||||| 68c19dfa6
 /// Manjaro-inspired: Dynamic Kernel Module Support (DKMS) auto-module rebuilder on host kernel swaps
 #[derive(Debug, Clone)]
 pub struct MhwdDkmsRebuilder {
@@ -448,7 +447,6 @@ impl PamacPackageManager {
     pub fn install_snap(&mut self, app: SnapPackage) {
         self.installed_snaps.insert(app.name.clone(), app);
     }
-||||||| 68c19dfa6
 
     /// Pamac-unified: Simulates user-space secure sandbox compilation and installation of an AUR package
     pub fn build_and_install_aur(&mut self, pkg: AurPackage) -> Result<(), &'static str> {
@@ -616,7 +614,6 @@ impl Default for MhwdPowerGovernor {
     }
 }
 
-||||||| 68c19dfa6
 /// MSM Localization Pack Installer - handles dynamic localization files and system dictionaries
 #[derive(Debug, Clone)]
 pub struct MsmLanguagePackInstaller {
@@ -865,7 +862,6 @@ mod tests {
             .langpack_installer
             .installed_packs
             .contains(&"firefox-i18n-de".to_string()));
-||||||| 68c19dfa6
         assert!(msm.langpack_installer.installed_packs.contains(&"firefox-i18n-de".to_string()));
 
         msm.configure_thermal_profile(true);
@@ -949,7 +945,6 @@ mod tests {
         assert!(installer
             .installed_packs
             .contains(&"fcitx-mozc".to_string()));
-||||||| 68c19dfa6
         assert_eq!(msm.power_governor.current_profile, PowerProfile::Performance);
         assert_eq!(msm.power_governor.target_cpu_freq_mhz, 4800);
     }

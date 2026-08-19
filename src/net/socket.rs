@@ -5,7 +5,6 @@ pub enum AddressFamily {
     Unix,
     Inet,
     Inet6,
-||||||| 43be3a7e8
 /// OOP-based Socket API for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
 /// Implements socket creation and network communication
@@ -32,8 +31,6 @@ pub trait Socket {
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
 /// Implements socket creation and network communication
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type SocketID = usize;
 
@@ -146,7 +143,6 @@ impl Socket {
             socket_type,
             is_bound: false,
             is_listening: false,
-||||||| 43be3a7e8
 impl Socket for SimpleSocket {
     fn id(&self) -> SocketID { self.id }
     fn socket_type(&self) -> SocketType { unsafe { core::mem::transmute(self.socket_type.load(Ordering::SeqCst)) } }
@@ -365,7 +361,6 @@ impl SocketManager for SimpleSocketManager {
         Ok(0)
     }
 }
-||||||| 43be3a7e8
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 

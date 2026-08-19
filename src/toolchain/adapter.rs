@@ -165,7 +165,6 @@ mod tests {
         assert!(flags.contains(&"-Wl,-z,now".to_string()));
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Ancient Compiler & Toolchain Support Adapter
 // Wraps legacy compilation profiles (GCC 2.x, early LLVM, and assembly) natively without source patching
 
@@ -215,7 +214,6 @@ impl ToolchainAdapter {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_toolchain_flags_c90() {

@@ -21,16 +21,8 @@ mod tests {
     use sigmaos::productivity::media::{
         SigmaSupportSubtitleEdit, SigmaSupportSubtitleSync, SubtitleFormat,
     };
-||||||| 43be3a7e8
     // Integration tests will be added here
     // These test the interaction between different system components
-    use super::*;
-    use sigmaos::filesystem::sigma_fs::{JournalState, RaidLevel};
-    use sigmaos::compatibility::canonical::{
-        ZorinAppearanceSwitcher, ZorinLayoutPreset, ZorinConnectHub, ZorinWineLayer, ZorinLiteOptimizer,
-        SigmaEcosystemInit, FhsRunlevel, SigmaEcosystemProfiler, GraphicPresetMode,
-        SigmaOnboardingWelcome, SigmaOnboardingLog,
-    };
     use sigmaos::productivity::media::{SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, SubtitleFormat};
     use sigmaos::power::governor::{SigmaSupportResourceOptimizer, SigmaSupportPriorityOptimizer};
     use sigmaos::logging::rotation::{SimpleLogFile, LogSeverity, LogFacility, SimpleLogRotator, SimpleLogCompressor, LogCompressor};
@@ -348,7 +340,6 @@ mod tests {
 
     #[test]
     fn test_process_signals_integration() {
-        use sigmaos::runtime::process::{Process, ProcessSignal, ProcessCapability};
 
         let cap = ProcessCapability::full();
         let process = unsafe { Process::new(10, 1, cap) };
@@ -361,7 +352,6 @@ mod tests {
 
     #[test]
     fn test_supervised_service_targets() {
-        use sigmaos::runtime::process::{Process, ProcessState, ProcessCapability, SupervisedServiceTarget};
 
         let cap = ProcessCapability::full();
         let process = unsafe { Process::new(11, 1, cap) };
@@ -378,7 +368,6 @@ mod tests {
 
     #[test]
     fn test_multi_distro_packaging_compatibility() {
-        use sigmaos::sigpkg::universal_adapter::{ApkAdapter, NixAdapter, EbuildAdapter, PackageFormatAdapter};
 
         let apk = ApkAdapter::new();
         assert_eq!(apk.format_name(), "apk");
@@ -388,7 +377,6 @@ mod tests {
 
         let ebuild = EbuildAdapter::new();
         assert_eq!(ebuild.format_name(), "ebuild");
-||||||| 43be3a7e8
         // Placeholder for integration tests
         assert!(true);
         // =========================================================================

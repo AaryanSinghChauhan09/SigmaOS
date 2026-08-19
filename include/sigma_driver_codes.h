@@ -54,7 +54,6 @@ static inline const char* sigma_driver_strerror(sigma_u32 code) {
 }
 
 #endif // SIGMA_DRIVER_CODES_H
-||||||| 65885484f
 #ifndef SIGMA_DRIVER_CODES_H
 #define SIGMA_DRIVER_CODES_H
 

@@ -9,8 +9,6 @@ pub mod tasks;
 pub mod terminal;
 pub mod advanced_app_absorber;
 pub mod tmux;
-||||||| 43be3a7e8
-pub mod media;
 pub mod utility_suite;
 
 pub use gamification::{
@@ -46,7 +44,6 @@ pub use terminal::{
 pub use tmux::{
     SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
-||||||| 43be3a7e8
 pub use media::{
     MediaFormat, PlaybackState, AudioTrack, SigmaMediaEngine,
 };

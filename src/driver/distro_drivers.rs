@@ -371,8 +371,6 @@ impl LinuxLoopDevice {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
-    use alloc::vec::Vec;
 
     #[test]
     fn test_linux_devtmpfs() {

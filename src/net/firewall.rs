@@ -1,6 +1,5 @@
 #![no_std]
 #![cfg_attr(not(test), no_main)]
-||||||| 43be3a7e8
 #![no_std]
 #![no_main]
 // #![no_std]
@@ -28,7 +27,6 @@ pub enum FirewallHook {
     Output,
     Postrouting,
 }
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum RuleAction { Accept = 0, Drop = 1, Reject = 2, Log = 3 }
@@ -45,7 +43,6 @@ pub enum RuleAction {
     Reject = 2,
     Log = 3,
 }
-||||||| 43be3a7e8
 #[derive(Debug, Clone, Copy)]
 pub enum Protocol { TCP = 6, UDP = 17, ICMP = 1, Any = 255 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -60,7 +57,6 @@ pub enum Protocol {
     Icmp = 1,
     Any = 255,
 }
-||||||| 43be3a7e8
 #[derive(Debug, Clone, Copy)]
 pub enum FirewallError { Success = 0, InvalidRule = 1, NotFound = 2 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -219,7 +215,6 @@ impl FirewallRule for SimpleFirewallRule {
     fn hook(&self) -> FirewallHook {
         self.hook
     }
-||||||| 43be3a7e8
     fn id(&self) -> RuleID { self.id }
     fn action(&self) -> RuleAction { unsafe { core::mem::transmute(self.action.load(Ordering::SeqCst)) } }
     fn protocol(&self) -> Protocol { unsafe { core::mem::transmute(self.protocol.load(Ordering::SeqCst)) } }
@@ -287,7 +282,6 @@ impl SovereignFirewall {
             true
         } else {
             false
-||||||| 43be3a7e8
     fn remove_rule(&mut self, id: RuleID) -> Result<(), FirewallError> {
         for rule_option in &mut self.rules {
             if let Some(ref rule) = *rule_option {
@@ -322,7 +316,6 @@ impl SovereignFirewall {
         let state = self.conntrack.track_packet(protocol, src_ip, dst_ip, src_port, dst_port, timestamp);
         if state == ConnectionState::Established {
             return RuleAction::Accept; // Instant fast-path acceptance (iptables state ESTABLISHED rule equivalent)
-||||||| 43be3a7e8
     fn get_rule(&self, id: RuleID) -> Option<&dyn FirewallRule> {
         for rule_option in &self.rules {
             if let Some(ref rule) = *rule_option {
@@ -339,7 +332,6 @@ impl SovereignFirewall {
         // 2. Netfilter Rule Chain Match
         for rule in &self.rules {
             if rule.hook() == hook {
-||||||| 43be3a7e8
     fn filter_packet(&self, protocol: Protocol, source_ip: &[u8], destination_ip: &[u8], source_port: u16, destination_port: u16) -> RuleAction {
         for rule_option in &self.rules {
             if let Some(ref rule) = *rule_option {
@@ -454,7 +446,6 @@ mod tests {
         assert_eq!(firewall.translate_nat(internal, 9000), None);
     }
 }
-||||||| 43be3a7e8
 
 impl NAT for SimpleNAT {
     fn add_mapping(&mut self, internal_ip: &[u8], internal_port: u16, external_port: u16) -> Result<(), FirewallError> {
@@ -1144,7 +1135,6 @@ extern "C" {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_ufw_command_parsing() {

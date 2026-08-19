@@ -109,11 +109,9 @@ mod tests {
         assert!(kernel.rollback_driver_on_failure(999).is_err());
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Sovereign Self-Healing Kernel
 // Deploys active system integrity checkers, memory quarantine, and AI-generated hot patches
 
-use std::collections::HashMap;
 
 pub struct SovereignSelfHealingKernel {
     pub integrity_hashes: HashMap<String, String>, // file paths -> baseline hashes
@@ -149,7 +147,6 @@ impl SovereignSelfHealingKernel {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_self_healing_kernel_audit() {

@@ -982,7 +982,6 @@ impl PackageRecipeParser {
 
 #[cfg(test)]
 mod extra_tests {
-    use super::*;
 
     #[test]
     fn test_round_robin_scheduler() {

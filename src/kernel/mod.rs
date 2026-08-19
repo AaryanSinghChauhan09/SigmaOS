@@ -5,7 +5,6 @@ pub mod memory;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod virtual_cpu;
-||||||| 43be3a7e8
 pub mod self_healing;
 pub mod udkf;
 pub mod breakthrough;
@@ -16,7 +15,6 @@ pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use virtual_cpu::{CpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU};
-||||||| 43be3a7e8
 pub use self_healing::{
     SovereignSelfHealingKernel,
 };

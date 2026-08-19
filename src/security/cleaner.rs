@@ -219,7 +219,6 @@ impl Default for MetadataScrubber {
 
 #[cfg(test)]
 mod tails_parity_tests {
-    use super::*;
 
     #[test]
     fn test_tor_firewall_rules() {

@@ -308,11 +308,9 @@ mod tests {
         assert_eq!(manager.cloud_tools.cni_type, "Cilium");
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Ecosystem Integration Framework
 // Mobile/embedded presence matrices, enterprise partnerships, and hardware/software certification pipelines
 
-use std::collections::HashMap;
 
 /// Hardware architectures supported by SigmaOS
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -430,7 +428,6 @@ impl Default for EcosystemManager {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_architecture_presence_matrix() {

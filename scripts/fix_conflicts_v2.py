@@ -1,63 +1,74 @@
 #!/usr/bin/env python3
 """
-Advanced conflict resolution for SigmaOS: handles diff3 (|||||||) merge markers.
-Strategy: Extract ALL unique non-marker lines from all sections (current, base, incoming)
-and synthesize them into one clean file, deduplicating identical declarations.
+Advanced conflict resolution for SigmaOS: handles diff3 (|||||||) and standard merge markers.
+Strategy: Extract ALL unique non-marker lines from conflict sections and synthesize them into one clean file,
+safely ignoring stray/residual conflict markers.
 """
 
 import os
 import re
 import sys
-from collections import OrderedDict
-
 
 def extract_all_content(content):
     """
-    Parse diff3-style conflict markers and extract all unique content.
-    In diff3: 
-      <<<<<<< current
-      ... current version ...
-      ||||||| base commit hash
-      ... base version ...
-      ======= 
-      ... incoming version ...
-      >>>>>>> incoming
-    
-    Strategy: collect ALL non-marker lines from ALL sections, deduplicate.
+    Robustly parse standard git conflict blocks and stray markers.
     """
     lines = content.split('\n')
-    collected = []
-    
+    out_lines = []
     i = 0
-    while i < len(lines):
+    n = len(lines)
+
+    while i < n:
         line = lines[i]
         
-        # Skip conflict start markers
         if line.startswith('<<<<<<<'):
+            current_section = []
+            base_section = []
+            incoming_section = []
+
+            # 1. Collect current
             i += 1
-            # Collect current section lines
-            while i < len(lines) and not lines[i].startswith('|||||||') and not lines[i].startswith('=======') and not lines[i].startswith('>>>>>>>'):
-                collected.append(lines[i])
+            while i < n and not lines[i].startswith('|||||||') and not lines[i].startswith('=======') and not lines[i].startswith('>>>>>>>'):
+                current_section.append(lines[i])
                 i += 1
-        elif line.startswith('|||||||'):
+
+            # 2. Collect base (optional)
+            if i < n and lines[i].startswith('|||||||'):
+                i += 1
+                while i < n and not lines[i].startswith('=======') and not lines[i].startswith('>>>>>>>'):
+                    base_section.append(lines[i])
+                    i += 1
+
+            # 3. Collect incoming (optional)
+            if i < n and lines[i].startswith('======='):
+                i += 1
+                while i < n and not lines[i].startswith('>>>>>>>'):
+                    incoming_section.append(lines[i])
+                    i += 1
+
+            # 4. Skip closing >>>>>>>
+            if i < n and lines[i].startswith('>>>>>>>'):
+                i += 1
+
+            # Combine cleanly, preserving order and removing exact duplicates
+            seen = set()
+            combined = []
+            for l in current_section + incoming_section:
+                if l not in seen or not l.strip():
+                    combined.append(l)
+                    if l.strip():
+                        seen.add(l)
+
+            out_lines.extend(combined)
+
+        elif line.startswith('|||||||') or line.startswith('=======') or line.startswith('>>>>>>>'):
+            # Stray marker - skip
             i += 1
-            # Collect base section lines (skip them as they're the common ancestor)
-            # We skip these since we have both current and incoming
-            while i < len(lines) and not lines[i].startswith('=======') and not lines[i].startswith('>>>>>>>'):
-                i += 1
-        elif line.startswith('======='):
-            i += 1
-            # Collect incoming section lines
-            while i < len(lines) and not lines[i].startswith('>>>>>>>'):
-                collected.append(lines[i])
-                i += 1
-        elif line.startswith('>>>>>>>'):
-            i += 1  # skip end marker
         else:
-            collected.append(line)
+            out_lines.append(line)
             i += 1
-    
-    return '\n'.join(collected)
+
+    return '\n'.join(out_lines)
 
 
 def deduplicate_declarations(content):
@@ -65,7 +76,6 @@ def deduplicate_declarations(content):
     lines = content.split('\n')
     result = []
     
-    # Track seen simple one-liner declarations
     seen_pub_mod = set()
     seen_use_blocks = set()
     
@@ -74,16 +84,13 @@ def deduplicate_declarations(content):
         line = lines[i]
         stripped = line.strip()
         
-        # Handle `pub mod X;` declarations
         if re.match(r'^pub mod \w+;$', stripped):
             mod_name = re.match(r'^pub mod (\w+);$', stripped).group(1)
             if mod_name not in seen_pub_mod:
                 seen_pub_mod.add(mod_name)
                 result.append(line)
-            # else: skip duplicate
             i += 1
             
-        # Handle `mod X;` declarations
         elif re.match(r'^mod \w+;$', stripped):
             mod_name = re.match(r'^mod (\w+);$', stripped).group(1)
             key = f"mod_{mod_name}"
@@ -92,7 +99,6 @@ def deduplicate_declarations(content):
                 result.append(line)
             i += 1
         
-        # Handle single-line `pub use X::Y;` or `use X::Y;`
         elif re.match(r'^(pub )?use .+;$', stripped):
             key = stripped.rstrip(';').strip()
             if key not in seen_use_blocks:
@@ -100,9 +106,7 @@ def deduplicate_declarations(content):
                 result.append(line)
             i += 1
         
-        # Handle multi-line use blocks: `pub use X::{`
         elif re.match(r'^(pub )?use .+\{$', stripped):
-            # Collect the whole block
             block_lines = [line]
             i += 1
             while i < len(lines) and not lines[i].strip().endswith('};'):
@@ -112,7 +116,6 @@ def deduplicate_declarations(content):
                 block_lines.append(lines[i])
                 i += 1
             
-            # Create a key from the use statement base
             use_key = re.match(r'^(pub )?use (.+)\{', stripped)
             if use_key:
                 base = use_key.group(2).strip().rstrip('{').strip()
@@ -138,22 +141,17 @@ def fix_file(filepath, verbose=True):
         print(f"ERROR reading {filepath}: {e}")
         return False
     
-    if '|||||||' not in original and '<<<<<<' not in original:
-        return False  # No conflict markers
+    if '|||||||' not in original and '<<<<<<<' not in original and '=======' not in original and '>>>>>>>' not in original:
+        return False
     
-    # Step 1: Extract all content from conflict sections
     cleaned = extract_all_content(original)
-    
-    # Step 2: Deduplicate declarations
     cleaned = deduplicate_declarations(cleaned)
     
-    # Step 3: Safety net - remove any remaining conflict markers
+    # Strip any potential residual markers
     cleaned = re.sub(r'^<<<<<<<.*\n?', '', cleaned, flags=re.MULTILINE)
     cleaned = re.sub(r'^\|\|\|\|\|\|\|.*\n?', '', cleaned, flags=re.MULTILINE)
     cleaned = re.sub(r'^=======\s*\n?', '', cleaned, flags=re.MULTILINE)
     cleaned = re.sub(r'^>>>>>>>.*\n?', '', cleaned, flags=re.MULTILINE)
-    
-    # Step 4: Clean up excessive blank lines (more than 2 consecutive)
     cleaned = re.sub(r'\n{4,}', '\n\n\n', cleaned)
     
     try:
@@ -189,8 +187,10 @@ def find_and_fix_all(root_dir, extensions=('.rs', '.md', '.toml', '.c', '.h', '.
                 
                 has_diff3 = '|||||||' in content
                 has_conflict = '<<<<<<<' in content
+                has_sep = '=======' in content
+                has_end = '>>>>>>>' in content
                 
-                if has_diff3 or has_conflict:
+                if has_diff3 or has_conflict or has_sep or has_end:
                     result = fix_file(filepath)
                     if result:
                         fixed += 1
@@ -207,7 +207,7 @@ def find_and_fix_all(root_dir, extensions=('.rs', '.md', '.toml', '.c', '.h', '.
 
 
 if __name__ == '__main__':
-    root = sys.argv[1] if len(sys.argv) > 1 else '/home/aaryansinghchauhan/SigmaOS/src'
+    root = sys.argv[1] if len(sys.argv) > 1 else '.'
     print(f"Scanning {root} for conflict markers...")
     fixed, skipped, errors = find_and_fix_all(root)
     print(f"\nDone: {fixed} files fixed, {skipped} files skipped, {errors} errors")

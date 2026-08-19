@@ -19,7 +19,6 @@ pub enum PackageFormat {
     NixStore,     // Nix package manager (content-addressed store hashes)
     AppImage,     // AppImage (self-contained portable binaries)
     Homebrew,     // Homebrew (ruby formulas)
-||||||| 43be3a7e8
     Apk,      // alpine apk format
 }
 
@@ -288,7 +287,6 @@ pub struct PackageSnapshot {
 }
 
 /// Universal package manager with transaction-safe snapshots & rollback mechanisms
-||||||| 65885484f
 /// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
 #[derive(Debug, Clone)]
 pub struct TransactionalHistory {
@@ -453,7 +451,6 @@ impl UniversalPackageManager {
             .insert(PackageFormat::AppImage, appimage_adapter);
         self.adapters
             .insert(PackageFormat::Homebrew, homebrew_adapter);
-||||||| 43be3a7e8
         self.adapters
             .insert(PackageFormat::Apk, apk_adapter);
     }
@@ -822,7 +819,6 @@ mod tests {
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
         assert_eq!(manager.adapters.len(), 12); // Includes all 12 formats now!
-||||||| 43be3a7e8
         assert_eq!(manager.adapters.len(), 6);
         assert_eq!(manager.adapters.len(), 7); // Deb, Rpm, Pacman, Snap, Flatpak, SigmaPkg, Apk
     }
@@ -937,7 +933,6 @@ mod tests {
         assert!(manager.delete_snapshot(snap_id).is_ok());
         assert!(manager.list_snapshots().is_empty());
     }
-||||||| 43be3a7e8
 
     #[test]
     fn test_multi_distro_metadata_parser() {
