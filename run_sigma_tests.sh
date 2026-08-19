@@ -14,7 +14,7 @@ RESET="\033[0m"
 
 echo -e "${CYAN}:: Running SigmaOS Sovereign Atomic Test Suite...${RESET}"
 
-if g++ -std=c++11 -I. -Iinclude -DTEST_RUNNER -o test_runner tests/sigma_test_runner.cpp kernel/containers/sigma_oci_runtime.cpp kernel/tests/sigma_hw_test.cpp kernel/drivers/sigma_driver_manager.cpp kernel/drivers/sigma_driver_registry.cpp 2>/dev/null; then
+if g++ -std=c++11 -I. -Iinclude -DTEST_RUNNER -o test_runner tests/sigma_test_runner.cpp kernel/drivers/sigma_driver_manager.cpp kernel/drivers/sigma_driver_registry.cpp kernel/containers/sigma_oci_runtime.cpp kernel/tests/sigma_hw_test.cpp; then
     echo -e "  ${BLUE}[INFO]${RESET} Compiled full hardware & container atomic test harness."
     ./test_runner
 else

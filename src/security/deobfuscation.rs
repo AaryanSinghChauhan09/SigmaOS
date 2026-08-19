@@ -204,7 +204,7 @@ impl AbstractTaint {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AbstractCapabilityDomain {
-    pub allowed_rights: Vec<crate::klib::String>,
+    pub allowed_rights: Vec<String>,
     pub capability_mode: bool, // FreeBSD Capsicum capability mode
 }
 
