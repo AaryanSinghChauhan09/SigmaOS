@@ -6,6 +6,9 @@ pub mod pledge;
 pub mod vulnerability;
 pub mod hardening;
 pub mod deobfuscation;
+pub mod binary_protection;
+
+pub use binary_protection::{BinaryProtectionManager, RelroMode, AslrMap, ChecksecReport};
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use defensive_audit::{

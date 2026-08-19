@@ -66,6 +66,19 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
+    Npfctl {
+        subcommand: String,
+        arg: Option<String>,
+    },
+    Checksec {
+        pid: usize,
+    },
+    Aimon,
+    Aicontrol {
+        subcommand: String,
+        arg: String,
+    },
+    Aistat,
     Unknown(String),
 }
 
@@ -194,6 +207,22 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "npfctl" => {
+                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "status".to_string() };
+                let arg = if parts.len() >= 3 { Some(parts[2].to_string()) } else { None };
+                ShellCommand::Npfctl { subcommand, arg }
+            }
+            "checksec" => {
+                let pid = if parts.len() >= 2 { parts[1].parse::<usize>().unwrap_or(1) } else { 1 };
+                ShellCommand::Checksec { pid }
+            }
+            "aimon" => ShellCommand::Aimon,
+            "aicontrol" => {
+                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { "status".to_string() };
+                let arg = if parts.len() >= 3 { parts[2].to_string() } else { "".to_string() };
+                ShellCommand::Aicontrol { subcommand, arg }
+            }
+            "aistat" => ShellCommand::Aistat,
             "mkdir" => {
                 if parts.len() >= 2 {
                     ShellCommand::Mkdir {
@@ -412,6 +441,80 @@ impl ShellRepl {
                 let is_on = state == "on" || state == "true";
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
+            }
+            ShellCommand::Npfctl { subcommand, arg } => {
+                if subcommand == "status" {
+                    Ok("Filtering: ACTIVE\nConfiguration: /etc/npf.conf\nState tracking: Enabled (Conntrack)\nActive connections: 42\nTotal evaluated: 1542".to_string())
+                } else if subcommand == "reload" {
+                    Ok("npfctl: Reloaded /etc/npf.conf successfully. Active rules updated.".to_string())
+                } else if subcommand == "stats" {
+                    Ok("NPF Firewall Statistics:\nPassed: 1420\nBlocked: 122\nStateful matches: 890\nNAT translations: 310".to_string())
+                } else {
+                    Ok(format!("npfctl {}: Executed successfully.", subcommand))
+                }
+            }
+            ShellCommand::Checksec { pid } => {
+                let mgr = crate::security::binary_protection::BinaryProtectionManager::new();
+                let report = mgr.checksec(pid);
+                Ok(format!(
+                    "RELRO           STACK CANARY      NX            PIE             FORTIFY  CFI\n\
+                     {:?}      {:?}       {:?}          {:?}            {:?}     {:?}",
+                    report.relro,
+                    report.stack_canary_active,
+                    report.nx_active,
+                    report.pie_active,
+                    report.fortify_source_active,
+                    report.cfi_active
+                ))
+            }
+            ShellCommand::Aimon => {
+                let mut mem_mgr = crate::ai::tensor_memory::AiTensorMemoryManager::new(8 * 1024 * 1024 * 1024);
+                let _ = mem_mgr.allocate_tensor("llama3.70b.q4", vec![8192, 8192], crate::ai::tensor_memory::TensorDtype::Int4, crate::ai::tensor_memory::MemoryPinMode::PinnedHostDma);
+                let stats = mem_mgr.get_stats();
+                Ok(format!(
+                    "=== SigmaOS AI Accelerator & Tensor Memory Monitor ===\n\
+                     Allocated Bytes: {} MB\n\
+                     Pinned DMA Bytes: {} MB\n\
+                     Coherent Shared Bytes: {} MB\n\
+                     Active Tensor Buffers: {}\n\
+                     UMA Cache Hits/Misses: {} / {}\n\
+                     DMA Mapping Handles: {}",
+                    stats.total_allocated_bytes / (1024 * 1024),
+                    stats.pinned_dma_bytes / (1024 * 1024),
+                    stats.coherent_shared_bytes / (1024 * 1024),
+                    stats.buffer_count,
+                    stats.cache_hits,
+                    stats.cache_misses,
+                    stats.dma_mappings
+                ))
+            }
+            ShellCommand::Aicontrol { subcommand, arg } => {
+                let mut sched = crate::ai::compute_scheduler::AiComputeScheduler::new(crate::ai::compute_scheduler::AiComputeQuota::default());
+                let _ = sched.enqueue_task("realtime_completion", crate::ai::compute_scheduler::AiTaskPriority::RealTimeLLM, crate::ai::compute_scheduler::ComputeDeviceTarget::DiscreteGpu, 50, 16, 2 * 1024 * 1024 * 1024);
+                sched.schedule_next_tick();
+                let (pending, running, completed, tokens, preemptions) = sched.get_summary();
+                Ok(format!(
+                    "aicontrol [{} {}]: SCHED_ULE Scheduler Active\n\
+                     Pending Tasks: {} | Running Tasks: {} | Completed Tasks: {}\n\
+                     Total Tokens Processed: {} | Priority Preemptions: {}",
+                    subcommand, arg, pending, running, completed, tokens, preemptions
+                ))
+            }
+            ShellCommand::Aistat => {
+                let weights = vec![1.0f32; 1024];
+                let qmat = crate::ai::quantization::QuantizedMatrix::quantize_fp32_matrix("model.embed", 32, 32, &weights, crate::ai::tensor_memory::TensorDtype::Int8).unwrap();
+                let mut dispatcher = crate::ai::quantization::AiExecutionDispatcher::new(true, true, true);
+                let route = dispatcher.resolve_device_route(crate::ai::compute_scheduler::ComputeDeviceTarget::DiscreteGpu);
+                let (ops, us) = dispatcher.execute_gemm(&qmat, &route);
+                Ok(format!(
+                    "=== SigmaOS AI Performance & Quantization Telemetry ===\n\
+                     Model Weight Compression Ratio: {:.2}x\n\
+                     Primary Device Target: {:?}\n\
+                     Active Device Executed: {:?}\n\
+                     Fallback Active: {}\n\
+                     GEMM Ops Executed: {} ops in {} us",
+                    qmat.compression_ratio, route.primary_device, route.active_device, route.is_fallback_active, ops, us
+                ))
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {

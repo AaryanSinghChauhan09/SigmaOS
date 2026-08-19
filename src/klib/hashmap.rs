@@ -389,6 +389,9 @@ impl<'a, K, V> Iterator for Values<'a, K, V> {
     }
 }
 
+pub type HashMapValues<'a, K, V> = Values<'a, K, V>;
+pub type HashMapValuesMut<'a, K, V> = ValuesMut<'a, K, V>;
+
 pub struct ValuesMut<'a, K, V> {
     iter: HashMapIterMut<'a, K, V>,
     _marker: core::marker::PhantomData<K>,
