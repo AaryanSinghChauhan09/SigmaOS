@@ -26,7 +26,7 @@ jobs:
           severity-cutoff: high
           output-format: sarif
       - name: Upload Grype SARIF report
-        if: ${{ !cancelled() && hashFiles('*.sarif') != '' }}
+        if: ${{ !cancelled() && steps.grype-scan.outcome == 'success' }}
         uses: github/codeql-action/upload-sarif@v3
         continue-on-error: true
         with:
