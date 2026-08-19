@@ -20,7 +20,6 @@ on:
 
 jobs:
   build:
-    if: ${{ secrets.BLACKDUCKSCA_TOKEN != '' || secrets.POLARIS_ACCESS_TOKEN != '' || secrets.SRM_API_KEY != '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

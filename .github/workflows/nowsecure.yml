@@ -30,7 +30,6 @@ on:
 
 jobs:
   nowsecure:
-    if: ${{ secrets.NS_TOKEN != '' }}
     name: NowSecure
     runs-on: ubuntu-latest
     steps:

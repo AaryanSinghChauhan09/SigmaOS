@@ -6,26 +6,21 @@
 /// - Linux & BSD inspired Kernel Address Space Layout Randomization (KASLR / KARL)
 /// - SMEP (Supervisor Mode Execution Prevention) & SMAP (Supervisor Mode Access Prevention) mitigations
 /// - Hardened Syscall Dispatcher with boundary-checked UserPtr, register scrubbing, and stack canary verification
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
-#[cfg(test)]
+#[cfg(not(feature = "standalone_test"))]
+use crate::security::Permission;
+
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
-    NetworkTcp = 1,
-    NetworkUdp = 2,
-    FileRead = 4,
-    FileWrite = 8,
-    ProcessExec = 16,
-    Ipc = 32,
+    FileRead = 1,
+    NetworkTcp = 2,
 }
-
-#[cfg(not(test))]
-use crate::security::Permission;
 
 // =========================================================================
 // 1. SECURE ZEROIZATION & INTRUSION MONITORING

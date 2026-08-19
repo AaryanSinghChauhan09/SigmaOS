@@ -24,6 +24,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(test)]
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+#[cfg(test)]
+use std::sync::atomic::{AtomicUsize, Ordering};
+
 pub type DomainID = usize;
 
 #[repr(C)]

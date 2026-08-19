@@ -36,7 +36,6 @@ permissions:
 
 jobs:
   nowsecure:
-    if: ${{ secrets.NS_TOKEN != '' }}
     name: NowSecure Mobile SBOM
     runs-on: ubuntu-latest
     permissions:
