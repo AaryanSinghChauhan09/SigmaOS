@@ -324,6 +324,166 @@ impl PerformanceBaselineDatabase {
     }
 }
 
+// ============================================================================
+// Linux & BSD Inspired Accumulators for SigmaOS
+// ============================================================================
+
+/// Linux PSI (Pressure Stall Information) Accumulator
+/// Tracks CPU, Memory, and I/O pressure stall microsecond durations over sliding windows
+#[derive(Debug, Clone, Copy)]
+pub struct SigmaPressureAccumulator {
+    pub cpu_some_stall_us: u64,
+    pub cpu_full_stall_us: u64,
+    pub mem_some_stall_us: u64,
+    pub mem_full_stall_us: u64,
+    pub io_some_stall_us: u64,
+    pub io_full_stall_us: u64,
+    pub total_window_us: u64,
+}
+
+impl SigmaPressureAccumulator {
+    pub fn new() -> Self {
+        Self {
+            cpu_some_stall_us: 0,
+            cpu_full_stall_us: 0,
+            mem_some_stall_us: 0,
+            mem_full_stall_us: 0,
+            io_some_stall_us: 0,
+            io_full_stall_us: 0,
+            total_window_us: 10_000_000, // 10s window in microseconds
+        }
+    }
+
+    pub fn accumulate_cpu_stall(&mut self, some_us: u64, full_us: u64) {
+        self.cpu_some_stall_us = self.cpu_some_stall_us.saturating_add(some_us);
+        self.cpu_full_stall_us = self.cpu_full_stall_us.saturating_add(full_us);
+    }
+
+    pub fn accumulate_mem_stall(&mut self, some_us: u64, full_us: u64) {
+        self.mem_some_stall_us = self.mem_some_stall_us.saturating_add(some_us);
+        self.mem_full_stall_us = self.mem_full_stall_us.saturating_add(full_us);
+    }
+
+    pub fn get_cpu_pressure_pct(&self) -> (f32, f32) {
+        let some = (self.cpu_some_stall_us as f32 / self.total_window_us as f32) * 100.0;
+        let full = (self.cpu_full_stall_us as f32 / self.total_window_us as f32) * 100.0;
+        (some.min(100.0), full.min(100.0))
+    }
+}
+
+impl Default for SigmaPressureAccumulator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// FreeBSD vmstat/iostat inspired System Stat Accumulator
+#[derive(Debug, Clone, Copy)]
+pub struct BsdSystemStatAccumulator {
+    pub user_ticks: u64,
+    pub sys_ticks: u64,
+    pub idle_ticks: u64,
+    pub context_switches: u64,
+    pub interrupts: u64,
+    pub page_faults: u64,
+    pub disk_reads: u64,
+    pub disk_writes: u64,
+}
+
+impl BsdSystemStatAccumulator {
+    pub fn new() -> Self {
+        Self {
+            user_ticks: 0,
+            sys_ticks: 0,
+            idle_ticks: 0,
+            context_switches: 0,
+            interrupts: 0,
+            page_faults: 0,
+            disk_reads: 0,
+            disk_writes: 0,
+        }
+    }
+
+    pub fn record_tick(&mut self, user: u64, sys: u64, idle: u64) {
+        self.user_ticks = self.user_ticks.saturating_add(user);
+        self.sys_ticks = self.sys_ticks.saturating_add(sys);
+        self.idle_ticks = self.idle_ticks.saturating_add(idle);
+    }
+
+    pub fn record_event(&mut self, ctx_switches: u64, irqs: u64, faults: u64) {
+        self.context_switches = self.context_switches.saturating_add(ctx_switches);
+        self.interrupts = self.interrupts.saturating_add(irqs);
+        self.page_faults = self.page_faults.saturating_add(faults);
+    }
+
+    pub fn get_cpu_utilization_pct(&self) -> f32 {
+        let active = self.user_ticks + self.sys_ticks;
+        let total = active + self.idle_ticks;
+        if total == 0 {
+            0.0
+        } else {
+            (active as f32 / total as f32) * 100.0
+        }
+    }
+}
+
+impl Default for BsdSystemStatAccumulator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Sliding-Window Latency & Histogram Percentile Accumulator
+pub struct SlidingLatencyAccumulator {
+    pub samples: [u64; 64],
+    pub head: usize,
+    pub sample_count: usize,
+}
+
+impl SlidingLatencyAccumulator {
+    pub fn new() -> Self {
+        Self {
+            samples: [0; 64],
+            head: 0,
+            sample_count: 0,
+        }
+    }
+
+    pub fn record_sample(&mut self, latency_us: u64) {
+        self.samples[self.head] = latency_us;
+        self.head = (self.head + 1) % 64;
+        self.sample_count = (self.sample_count + 1).min(64);
+    }
+
+    pub fn get_percentile(&self, percentile: f32) -> u64 {
+        if self.sample_count == 0 {
+            return 0;
+        }
+        let mut sorted = [0u64; 64];
+        for i in 0..self.sample_count {
+            sorted[i] = self.samples[i];
+        }
+        // Bubble sort for small fixed-size buffer
+        for i in 0..self.sample_count {
+            for j in 0..self.sample_count.saturating_sub(i).saturating_sub(1) {
+                if sorted[j] > sorted[j + 1] {
+                    let tmp = sorted[j];
+                    sorted[j] = sorted[j + 1];
+                    sorted[j + 1] = tmp;
+                }
+            }
+        }
+        let index = ((self.sample_count as f32 * percentile) / 100.0) as usize;
+        sorted[index.min(self.sample_count - 1)]
+    }
+}
+
+impl Default for SlidingLatencyAccumulator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub trait MetricsExporter {
     fn export(&self) -> Vec<&[u8]>;
     fn export_prometheus(&self) -> Vec<u8>;
@@ -594,5 +754,33 @@ mod tests {
 
         // Fetch unknown target should be None
         assert!(db.get_normalized_baseline(&[0; 20], &cpu, ram_speed).is_none());
+    }
+
+    #[test]
+    fn test_sigma_pressure_accumulator() {
+        let mut acc = SigmaPressureAccumulator::new();
+        acc.accumulate_cpu_stall(1_000_000, 200_000);
+        let (some_pct, full_pct) = acc.get_cpu_pressure_pct();
+        assert_eq!(some_pct, 10.0);
+        assert_eq!(full_pct, 2.0);
+    }
+
+    #[test]
+    fn test_bsd_system_stat_accumulator() {
+        let mut acc = BsdSystemStatAccumulator::new();
+        acc.record_tick(70, 10, 20);
+        acc.record_event(1500, 250, 12);
+        assert_eq!(acc.get_cpu_utilization_pct(), 80.0);
+        assert_eq!(acc.context_switches, 1500);
+    }
+
+    #[test]
+    fn test_sliding_latency_accumulator() {
+        let mut acc = SlidingLatencyAccumulator::new();
+        for i in 1..=10 {
+            acc.record_sample(i * 10);
+        }
+        let p50 = acc.get_percentile(50.0);
+        assert_eq!(p50, 60);
     }
 }
