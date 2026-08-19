@@ -185,8 +185,6 @@ mod tests {
         let pass_again = engine.evaluate_packet(&pkt, NpfDirection::Outbound);
         assert_eq!(pass_again, NpfFilterAction::Pass);
 
-<<<<<<< HEAD
-=======
         // Verify reverse direction packet (inbound response) hits state table
         let return_pkt = NpfPacket {
             src_ip: [1, 1, 1, 1],
@@ -199,7 +197,6 @@ mod tests {
         let return_pass = engine.evaluate_packet(&return_pkt, NpfDirection::Inbound);
         assert_eq!(return_pass, NpfFilterAction::Pass);
 
->>>>>>> origin/jules-5387654575179832508-cadee73d
         // Apply NAT
         engine.apply_outbound_nat(&mut pkt);
         assert_eq!(pkt.src_ip, [192, 168, 1, 1]);
