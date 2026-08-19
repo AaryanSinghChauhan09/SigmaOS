@@ -2,8 +2,6 @@
 // Zero-dependency, safe, robust stateful packet filtering and NAT framework
 // Inspired by NetBSD's NPF (N-Packet Filter) architecture
 
-#![no_std]
-
 extern crate alloc;
 
 use alloc::collections::BTreeMap;

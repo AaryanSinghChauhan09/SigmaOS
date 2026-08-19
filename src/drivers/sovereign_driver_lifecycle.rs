@@ -3,8 +3,6 @@
 // 30-year ancient-to-modern hardware bring-up tier (BIOS shims, ISA DMA, ATA/IDE, PCIe Gen5/CXL 3.0, NVMe 2.0),
 // and lockless SPSC DMA ring queues under #![no_std] constraints.
 
-#![no_std]
-
 extern crate alloc;
 
 use alloc::collections::BTreeMap;

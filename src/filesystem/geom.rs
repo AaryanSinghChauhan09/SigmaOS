@@ -2,8 +2,6 @@
 // Modular storage class, provider, consumer, and volume transformation topology
 // Inspired by FreeBSD's GEOM storage architecture (sys/geom)
 
-#![no_std]
-
 extern crate alloc;
 
 use alloc::collections::BTreeMap;

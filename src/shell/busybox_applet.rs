@@ -2,8 +2,6 @@
 // Zero-dependency, safe, robust command multiplexing for sovereign userland shell
 // Inspired by Alpine Linux BusyBox multicall binary architecture
 
-#![no_std]
-
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
