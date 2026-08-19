@@ -1,4 +1,7 @@
 // SigmaOS Compatibility Module
+pub mod antix;
+pub mod canonical;
+pub mod chakra;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
@@ -10,38 +13,43 @@ pub mod absorb_tools;
 pub mod tiny_core;
 pub mod apache_ossie;
 pub mod sovereign_suite;
+pub mod gentoo;
+pub mod legacy_adapters;
+pub mod fedora;
+pub mod debian;
+pub mod cachy_os;
 
+pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 
-pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError,
+pub use legacy_adapters::{
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 
-pub use mint_linux::{
-    MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-    MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
-    MintReportSystem,
+pub use chakra::{
+    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
+    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
 
-pub use chimera_linux::{
-    DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
-    ApkPackageMetadata, ApkPackageStore,
+pub use antix::{
+    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
+    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
 };
 
-pub use relay_nexus::{
-    PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
-    NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
-    StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
-    FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
-    BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
-    BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
-    ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
-    TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
+pub use canonical::{
+    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
+    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
+    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
+    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
+    UnifiedAppStore, ZorinAppearanceSwitcher,
 };
 
 pub use solid_kernel::{
@@ -72,33 +80,23 @@ pub use sovereign_suite::{
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
 };
 
-pub mod debian;
-pub use debian::{
-    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
-    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
+pub use gentoo::{
+    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
+    EbuildPackage, PortageEngine,
 };
 
-pub mod innovations;
-pub use innovations::{
-    WorkloadCategory, ISchedulerPolicy, MlAcceleratedPolicy, GreenComputingPolicy,
-    SigmaScheduler, ISyscallTranslator, LinuxTranslator, WindowsTranslator,
-    UniversalAbiTranslator, IFileSystemCore, ISemanticSearchPlugin, ICasDeduplicator,
-    SigmaFsPlusPlus, IRecoveryStrategy, RollbackRecovery, SelfHealingOS,
-};
-
-pub mod fedora;
 pub use fedora::{
     DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel, FedoraAluFlags,
+    FedoraAlu, SeLinuxContext, SeLinuxEngine, SystemdPresetConfigurator, AnacondaInstaller,
 };
 
-pub mod india_professional_tools;
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, PMWaniHotspotController,
-    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker,
+pub use debian::{
+    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine, AlternativeLink,
+    DebianAlternativesSystem, DebootstrapEngine,
 };
 
-pub mod india_stack;
-pub use india_stack::{MockUPIService, IndiaStackError};
-
-pub mod india_stack_localization;
-pub use india_stack_localization::{IndianLanguage, LocalizationProvider, LocalizationManager};
+pub use cachy_os::{
+    BoreSchedulerGovernor, AnanicyManager, SchedPolicy, V4OptimizedPackageManager,
+    CachyInitramfs,
+};

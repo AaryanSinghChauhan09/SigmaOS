@@ -1,6 +1,6 @@
-use core::ptr::NonNull;
 use core::cell::{Cell, RefCell};
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+use core::ptr::NonNull;
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -211,7 +211,6 @@ pub enum ThreadState {
     Ready,
     Running,
     Waiting,
-    Suspended,
     Terminated,
 }
 
@@ -434,26 +433,6 @@ impl SystemThread {
         }
         delivered
     }
-
-    /// Suspends thread execution in user-mode (inspired by Linux SIGSTOP / BSD ptrace)
-    pub fn suspend_user_mode(&mut self) -> bool {
-        if self.state == ThreadState::Running || self.state == ThreadState::Ready {
-            self.state = ThreadState::Suspended;
-            true
-        } else {
-            false
-        }
-    }
-
-    /// Resumes a suspended thread (inspired by Linux SIGCONT / BSD ptracect)
-    pub fn resume_thread(&mut self) -> bool {
-        if self.state == ThreadState::Suspended {
-            self.state = ThreadState::Ready;
-            true
-        } else {
-            false
-        }
-    }
 }
 
 // 7. WORK ITEMS
@@ -651,14 +630,7 @@ mod tests {
         assert_eq!(thread.context.rax, 100);
     }
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86,
-    X64,
-    Arm,
-    Cisc,
-}
+// 3. Next-Generation Advanced Algorithms (SovereignAlgorithms Blueprint)
 
 const MAX_SCHEDULER_TASKS: usize = 16;
 const MAX_LEDGER_BLOCKS: usize = 8;

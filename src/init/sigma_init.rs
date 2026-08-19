@@ -1,18 +1,8 @@
 #![no_std]
-#![allow(warnings)]
-#![allow(clippy::all)]
-#![no_std]
 #![no_main]
-// #![no_std]
-// #![no_main]
 
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
-/// Implements minimal init system with service management, dependency resolution, parallel startup,
-/// and modular FirmwarePort / SecurityPort structures
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 /// Implements minimal init system with service management, dependency resolution, parallel startup
 
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -20,36 +10,12 @@ use core::mem;
 
 pub type ServiceID = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ServiceState {
-    Stopped = 0,
-    Starting = 1,
-    Running = 2,
-    Stopping = 3,
-    Failed = 4,
-}
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ServiceState { Stopped = 0, Starting = 1, Running = 2, Stopping = 3, Failed = 4 }
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState { Stopped = 0, Starting = 1, Running = 2, Stopping = 3, Failed = 4 }
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum InitError {
-    Success = 0,
-    ServiceNotFound = 1,
-    DependencyFailed = 2,
-    StartFailed = 3,
-    StopFailed = 4,
-}
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum InitError { Success = 0, ServiceNotFound = 1, DependencyFailed = 2, StartFailed = 3, StopFailed = 4 }
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InitError { Success = 0, ServiceNotFound = 1, DependencyFailed = 2, StartFailed = 3, StopFailed = 4 }
 
 pub trait Service {
@@ -94,23 +60,7 @@ impl Service for SimpleService {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ServiceState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-    }
-    fn dependencies(&self) -> Vec<ServiceID> {
-        self.deps.clone()
-    }
     fn state(&self) -> ServiceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
-    fn state(&self) -> ServiceState {
-        match self.state.load(Ordering::SeqCst) {
-            0 => ServiceState::Stopped,
-            1 => ServiceState::Starting,
-            2 => ServiceState::Running,
-            3 => ServiceState::Stopping,
-            _ => ServiceState::Failed,
-        }
-    }
     fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
 
     fn start(&mut self) -> Result<(), InitError> {
@@ -246,12 +196,6 @@ impl SigmaInit {
         }
     }
 
-    pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
-        self.stop_service(id)?;
-        self.start_service(id)?;
-        Ok(())
-    }
-
     pub fn enable_parallel_startup(&mut self) {
         self.parallel_startup.store(1, Ordering::SeqCst);
     }
@@ -261,129 +205,9 @@ impl SigmaInit {
     }
 
     pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
-        for svc_option in &mut self.services {
-            if let Some(ref mut svc) = *svc_option {
-                if svc.id() == id {
-                    return svc.restart();
-                }
-            }
-        }
-        Err(InitError::ServiceNotFound)
-    }
-}
-
-impl Default for SigmaInit {
-    fn default() -> Self {
-        Self::new()
-    }
-
-    // =========================================================================
-    // SigmaInit Evolution: Parallel Startup Schedule, Bottleneck Prediction, Self-Healing
-    // =========================================================================
-
-    pub fn parallel_DAG_startup(&mut self) -> Result<Vec<Vec<ServiceID>>, InitError> {
-        // Parallel Startup DAG scheduler: Schedules independent services to launch on different parallel cores
-        let ids = self.get_all_services();
-        let mut scheduled = Vec::new();
-        let mut completed = Vec::new();
-
-        while completed.len < ids.len {
-            let mut current_wave = Vec::new();
-            for i in 0..self.services.len {
-                let svc_option = unsafe { &*self.services.data.add(i) };
-                if let Some(ref svc) = *svc_option {
-                    let id = svc.id();
-                    if completed.contains(&id) {
-                        continue;
-                    }
-                    // Check if all dependencies are completed
-                    let mut deps_satisfied = true;
-                    let deps = svc.dependencies();
-                    for j in 0..deps.len {
-                        let dep_id = unsafe { *deps.data.add(j) };
-                        if !completed.contains(&dep_id) {
-                            deps_satisfied = false;
-                            break;
-                        }
-                    }
-                    if deps_satisfied {
-                        current_wave.push(id);
-                    }
-                }
-            }
-
-            if current_wave.len == 0 {
-                // Dependency deadlock/cycle detected
-                return Err(InitError::DependencyFailed);
-            }
-
-            // Move current wave to completed and scheduled
-            for j in 0..current_wave.len {
-                let id = unsafe { *current_wave.data.add(j) };
-                completed.push(id);
-            }
-            scheduled.push(current_wave);
-        }
-
-        Ok(scheduled)
-    }
-
-    pub fn predict_boot_bottleneck(&self) -> Option<ServiceID> {
-        // AI-driven Bottleneck prediction: identifies the service with the highest dependent weight
-        let ids = self.get_all_services();
-        if ids.len == 0 {
-            return None;
-        }
-
-        let mut max_deps = 0;
-        let mut bottleneck_id = None;
-
-        for i in 0..self.services.len {
-            let svc_option = unsafe { &*self.services.data.add(i) };
-            if let Some(ref svc) = *svc_option {
-                let mut dep_weight = 0;
-                // Count how many other services depend on this service
-                for j in 0..self.services.len {
-                    let other_option = unsafe { &*self.services.data.add(j) };
-                    if let Some(ref other) = *other_option {
-                        if other.dependencies().contains(&svc.id()) {
-                            dep_weight += 1;
-                        }
-                    }
-                }
-                if dep_weight > max_deps {
-                    max_deps = dep_weight;
-                    bottleneck_id = Some(svc.id());
-                }
-            }
-        }
-
-        if bottleneck_id.is_none() {
-            // fallback
-            unsafe { Some(*ids.data.add(0)) }
-        } else {
-            bottleneck_id
-        }
-    }
-
-    pub fn self_healing_restart(&mut self, id: ServiceID) -> Result<(), InitError> {
-        // Self-Healing Restart: implements exponential backoff to intelligently restart failed daemons
-        for i in 0..self.services.len {
-            let svc_option = unsafe { &mut *self.services.data.add(i) };
-            if let Some(ref mut svc) = *svc_option {
-                if svc.id() == id {
-                    let count = svc.increment_restarts();
-                    if count > 5 {
-                        // Prevent blind infinite restart loops, mark as Failed
-                        return Err(InitError::StartFailed);
-                    }
-                    // Exponential backoff logic (simulated delay ticks)
-                    let _backoff_delay = 1 << count;
-                    return svc.restart();
-                }
-            }
-        }
-        Err(InitError::ServiceNotFound)
+        self.stop_service(id)?;
+        self.start_service(id)?;
+        Ok(())
     }
 }
 
@@ -395,44 +219,17 @@ impl InitSystem for SigmaInit {
     }
 
     fn start_service(&mut self, id: ServiceID) -> Result<(), InitError> {
-        let mut deps_to_start = Vec::new();
-        let mut found_idx = None;
-
-        for (i, svc_option) in self.services.iter().enumerate() {
-            if let Some(ref svc) = *svc_option {
-                if svc.id() == id {
-                    deps_to_start = svc.dependencies();
-                    found_idx = Some(i);
-                    break;
-                }
-            }
-        }
-
-        for dep_id in deps {
-            self.start_service(dep_id)?;
-        }
-
-        // Start main service
         for svc_option in &mut self.services {
-        for svc_option in &mut self.services {
-        for i in 0..self.services.len {
-            let svc_option = unsafe { &mut *self.services.data.add(i) };
             if let Some(ref mut svc) = *svc_option {
                 if svc.id() == id {
                     let deps = svc.dependencies();
                     for dep_id in deps {
                         self.start_service(dep_id)?;
                     }
-                    let deps = svc.dependencies();
-                    for j in 0..deps.len {
-                        let dep_id = unsafe { *deps.data.add(j) };
-                        self.start_service(dep_id)?;
-                    }
                     return svc.start();
                 }
             }
         }
-
         Err(InitError::ServiceNotFound)
     }
 
@@ -592,19 +389,11 @@ impl ServiceMonitor for SimpleServiceMonitor {
     }
 }
 
-/// Advanced OOP-driven Firmware Port Class Hierarchy
-pub trait FirmwarePort {
-    fn boot_type(&self) -> &'static str;
-    fn handoff(&self) -> Result<(), &'static str>;
-}
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerDaemonType {
     SystemDaemon, // PID 1 System Docker equivalent managing core OS containers
     UserDaemon,   // User Docker equivalent managing user workloads
 }
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-pub struct Vec<T> { pub data: *mut T, pub len: usize, pub capacity: usize }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
@@ -636,24 +425,6 @@ impl RancherContainerInit {
             user_daemon_active: false,
             system_containers: Vec::new(),
             user_containers: Vec::new(),
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
         }
     }
 
@@ -687,20 +458,6 @@ impl<T> Vec<T> {
     pub fn start_user_daemon(&mut self) -> Result<(), &'static str> {
         if !self.system_daemon_active {
             return Err("Cannot start User Daemon: System Daemon (PID 1) must be active first");
-    fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
-    pub fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
         }
         self.user_daemon_active = true;
         Ok(())
@@ -747,6 +504,40 @@ impl<T> Vec<T> {
                     state: ContainerState::Running,
                 });
                 Ok(id)
+            }
+        }
+    }
+}
+
+impl Default for RancherContainerInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn clone(&self) -> Vec<T> {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                let item = core::ptr::read(self.data.add(i));
+                new_vec.push(item);
+            }
+        }
+        new_vec
+    }
     fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
             unsafe {
@@ -772,139 +563,7 @@ impl<T> Vec<T> {
     }
 }
 
-#[cfg(not(target_os = "none"))]
-#[no_mangle]
-pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    use std_alloc::alloc::{alloc as std_alloc_fn, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc_fn(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-#[no_mangle]
-pub unsafe extern "C" fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-/// Runit-inspired lightweight service supervisor (runsv / runsvdir equivalent)
-pub struct RunitServiceSupervisor {
-    pub service_name: [u8; 32],
-    pub pid: AtomicUsize,
-    pub restart_count: AtomicUsize,
-    pub is_down: bool,
-    pub auto_respawn: bool,
-}
-
-impl RunitServiceSupervisor {
-    pub fn new(name: &str) -> Self {
-        let mut name_arr = [0u8; 32];
-        let len = name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_bytes().as_ptr(), name_arr.as_mut_ptr(), len);
-        }
-        RunitServiceSupervisor {
-            service_name: name_arr,
-            pid: AtomicUsize::new(0),
-            restart_count: AtomicUsize::new(0),
-            is_down: false,
-            auto_respawn: true,
-        }
-    }
-
-    /// Simulates runsv execution loop spawning or restarting service
-    pub fn runsv_step(&mut self) -> Result<usize, InitError> {
-        if self.is_down {
-            return Err(InitError::StopFailed);
-        }
-        let current_pid = self.pid.load(Ordering::SeqCst);
-        if current_pid == 0 {
-            // Service crashed or not started; respawn immediately
-            let new_pid = 2000 + self.restart_count.fetch_add(1, Ordering::SeqCst);
-            self.pid.store(new_pid, Ordering::SeqCst);
-            Ok(new_pid)
-        } else {
-            Ok(current_pid)
-        }
-    }
-
-    /// Sends SIGTERM equivalent to stop supervised process (sv down equivalent)
-    pub fn sv_down(&mut self) {
-        self.is_down = true;
-        self.pid.store(0, Ordering::SeqCst);
-    }
-
-    /// Restores supervised process monitoring (sv up equivalent)
-    pub fn sv_up(&mut self) {
-        self.is_down = false;
-    }
-}
-
-/// OpenRC-inspired Runlevel Target Manager (boot, default, nonetwork, shutdown)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OpenRcRunlevel {
-    SysInit,
-    Boot,
-    Default,
-    NoNetwork,
-    Shutdown,
-}
-
-pub struct OpenRcRunlevelManager {
-    pub current_runlevel: OpenRcRunlevel,
-    pub active_services: Vec<[u8; 32]>,
-}
-
-impl OpenRcRunlevelManager {
-    pub fn new() -> Self {
-        OpenRcRunlevelManager {
-            current_runlevel: OpenRcRunlevel::SysInit,
-            active_services: Vec::new(),
-        }
-    }
-
-    /// Switch OpenRC runlevel and trigger init scripts in topological order
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) -> Result<(), InitError> {
-        self.current_runlevel = target;
-        match target {
-            OpenRcRunlevel::Boot => {
-                self.add_active_service(b"devfs");
-                self.add_active_service(b"procfs");
-                self.add_active_service(b"sysfs");
-            }
-            OpenRcRunlevel::Default => {
-                self.add_active_service(b"sshd");
-                self.add_active_service(b"chronyd");
-                self.add_active_service(b"networking");
-            }
-            OpenRcRunlevel::NoNetwork => {
-                self.active_services = Vec::new();
-            }
-            OpenRcRunlevel::Shutdown => {
-                self.active_services = Vec::new(); // Stop all running services
-            }
-            _ => {}
-        }
-        Ok(())
-    }
-
-    fn add_active_service(&mut self, name: &[u8]) {
-        let mut arr = [0u8; 32];
-        let len = name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), arr.as_mut_ptr(), len);
-        }
-        self.active_services.push(arr);
-    }
-}
-
-impl Default for OpenRcRunlevelManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -923,45 +582,6 @@ mod tests {
         assert_eq!(total_ms, 65);
         assert!(orch.tasks.iter().all(|t| t.is_completed));
     }
-
-    #[test]
-    fn test_runit_supervisor_restart_loop() {
-        let mut supervisor = RunitServiceSupervisor::new("sshd");
-        assert_eq!(supervisor.pid.load(Ordering::SeqCst), 0);
-
-        // First step starts the service
-        let pid1 = supervisor.runsv_step().unwrap();
-        assert_eq!(pid1, 2000);
-
-        // Simulate crash
-        supervisor.pid.store(0, Ordering::SeqCst);
-        let pid2 = supervisor.runsv_step().unwrap();
-        assert_eq!(pid2, 2001); // Respawned with new PID
-
-        // sv down stops supervision
-        supervisor.sv_down();
-        assert_eq!(supervisor.runsv_step(), Err(InitError::StopFailed));
-    }
-
-    #[test]
-    fn test_openrc_runlevel_transitions() {
-        let mut manager = OpenRcRunlevelManager::new();
-        assert_eq!(manager.current_runlevel, OpenRcRunlevel::SysInit);
-
-        manager.transition_runlevel(OpenRcRunlevel::Boot).unwrap();
-        assert_eq!(manager.current_runlevel, OpenRcRunlevel::Boot);
-        assert_eq!(manager.active_services.len(), 3);
-
-        manager.transition_runlevel(OpenRcRunlevel::Shutdown).unwrap();
-        assert_eq!(manager.current_runlevel, OpenRcRunlevel::Shutdown);
-        assert_eq!(manager.active_services.len(), 0);
-    }
-}
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-#[cfg(test)]
-mod tests {
 
     #[test]
     fn test_rancher_container_init() {
@@ -991,26 +611,4 @@ mod tests {
         assert_eq!(web_id, 1);
         assert_eq!(r_init.user_containers.len(), 1);
     }
-}
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    if let Ok(layout) = Layout::from_size_align(size, 8) {
-        std_alloc(layout)
-    } else {
-        core::ptr::null_mut()
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
