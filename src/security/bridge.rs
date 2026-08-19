@@ -1,7 +1,7 @@
 // SigmaOS Security Evolution Bridge (SecurityBridge)
 // Maps legacy security models (basic Unix DAC, AppArmor profile contexts, legacy SELinux labels) to modern zero-trust capability gates
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum LegacySecurityType {

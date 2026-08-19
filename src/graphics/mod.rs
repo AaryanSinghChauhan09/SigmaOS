@@ -8,6 +8,7 @@ pub mod raytracer;
 pub mod multi_monitor;
 pub mod vector_engine;
 pub mod video_timeline;
+pub mod video_editor;
 pub mod zenith;
 pub mod zenith_compositor;
 pub mod bsd_graphics;
@@ -15,7 +16,12 @@ pub mod bsd_graphics;
 pub use raytracer::{Ray, Sphere, Vec3};
 pub use vector_engine::{PathCommand, Point2D, VectorPath};
 pub use multi_monitor::{DisplayOutput, DisplayRotation, MultiMonitorManager};
-pub use video_timeline::{VideoClip, VideoTimeline, VideoTrack};
+pub use video_timeline::{VideoClip as TimelineClip, VideoTimeline as BasicVideoTimeline, VideoTrack as TimelineTrack};
+pub use video_editor::{
+    AudioClip, AudioEffect, AudioTrack, ExportFormat, ExportProfile, Keyframe,
+    KeyframeInterpolation, LumetriColorCorrection, TransformKeyframes,
+    VideoClip, VideoEffect, VideoError, VideoTimeline, VideoTrack,
+};
 
 pub use compositor::{
     CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor, LayerBlendMode,
