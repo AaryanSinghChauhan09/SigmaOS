@@ -1,309 +1,295 @@
-#![no_std]
-#![no_main]
-
-/// OOP-based Power Management Stack for SigmaOS
-/// Based on Ideas-999-Structured: Core System Item 8
-/// Implements advanced power profiles, CPU governor tuning, thermal management
+/// Advanced Power Management Stack for SigmaOS
+/// Inspired by Linux Intel/AMD P-State drivers, FreeBSD ACPI powerd, and OpenBSD apmd.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type PowerProfileID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PowerProfile { Performance = 0, Balanced = 1, PowerSaver = 2, Custom = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerProfile {
+    Performance = 0,
+    Balanced = 1,
+    PowerSaver = 2,
+    Custom = 3,
+}
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum CPUGovernor { Performance = 0, Ondemand = 1, Conservative = 2, Powersave = 3, Userspace = 4 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CPUGovernor {
+    Performance = 0,
+    Ondemand = 1,
+    Conservative = 2,
+    Powersave = 3,
+    Userspace = 4,
+    Schedutil = 5,
+}
+
+/// Linux-style Energy Performance Preference (EPP) for P-State scaling
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EppMode {
+    Performance = 0,
+    BalancePerformance = 1,
+    BalancePower = 2,
+    Power = 3,
+}
+
+/// FreeBSD-style CPU Sleep C-States
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum CpuCState {
+    C0Active = 0,
+    C1Halt = 1,
+    C2StopGrant = 2,
+    C3Sleep = 3,
+}
+
+/// ACPI System Sleep States
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AcpiSleepState {
+    S0Working = 0,
+    S3SuspendToRam = 3,
+    S4HibernateToDisk = 4,
+    S5SoftOff = 5,
+}
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PowerError { Success = 0, InvalidProfile = 1, GovernorFailed = 2, ThermalCritical = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerError {
+    Success = 0,
+    InvalidProfile = 1,
+    GovernorFailed = 2,
+    ThermalCritical = 3,
+    SleepStateUnsupported = 4,
+}
 
-pub trait PowerProfile {
+pub trait PowerProfileTrait {
     fn id(&self) -> PowerProfileID;
     fn name(&self) -> &[u8];
     fn profile_type(&self) -> PowerProfile;
     fn cpu_governor(&self) -> CPUGovernor;
+    fn epp_mode(&self) -> EppMode;
     fn max_cpu_freq(&self) -> usize;
     fn min_cpu_freq(&self) -> usize;
 }
 
-#[repr(C)]
 pub struct SimplePowerProfile {
     pub id: PowerProfileID,
     pub name: [u8; 32],
     pub profile_type: AtomicUsize,
     pub cpu_governor: AtomicUsize,
+    pub epp_mode: AtomicUsize,
     pub max_cpu_freq: AtomicUsize,
     pub min_cpu_freq: AtomicUsize,
 }
 
 impl SimplePowerProfile {
-    pub fn new(id: PowerProfileID, name: &[u8], profile_type: PowerProfile, governor: CPUGovernor) -> Self {
+    pub fn new(id: PowerProfileID, name: &[u8], profile_type: PowerProfile, governor: CPUGovernor, epp: EppMode) -> Self {
         let mut name_array = [0u8; 32];
         let name_len = name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+
         SimplePowerProfile {
             id,
             name: name_array,
             profile_type: AtomicUsize::new(profile_type as usize),
             cpu_governor: AtomicUsize::new(governor as usize),
+            epp_mode: AtomicUsize::new(epp as usize),
             max_cpu_freq: AtomicUsize::new(3500000),
             min_cpu_freq: AtomicUsize::new(800000),
         }
     }
 }
 
-impl PowerProfile for SimplePowerProfile {
-    fn id(&self) -> PowerProfileID { self.id }
+impl PowerProfileTrait for SimplePowerProfile {
+    fn id(&self) -> PowerProfileID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
         &self.name[..len]
     }
-    fn profile_type(&self) -> PowerProfile { unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) } }
-    fn cpu_governor(&self) -> CPUGovernor { unsafe { core::mem::transmute(self.cpu_governor.load(Ordering::SeqCst)) } }
-    fn max_cpu_freq(&self) -> usize { self.max_cpu_freq.load(Ordering::SeqCst) }
-    fn min_cpu_freq(&self) -> usize { self.min_cpu_freq.load(Ordering::SeqCst) }
-}
-
-pub trait CPUGovernor {
-    fn set_governor(&mut self, governor: CPUGovernor) -> Result<(), PowerError>;
-    fn get_governor(&self) -> CPUGovernor;
-    fn set_frequency(&mut self, freq_khz: usize) -> Result<(), PowerError>;
-    fn get_frequency(&self) -> usize;
-}
-
-#[repr(C)]
-pub struct SimpleCPUGovernor {
-    pub current_governor: AtomicUsize,
-    pub current_freq: AtomicUsize,
-    pub max_freq: AtomicUsize,
-    pub min_freq: AtomicUsize,
-}
-
-impl SimpleCPUGovernor {
-    pub fn new() -> Self {
-        SimpleCPUGovernor {
-            current_governor: AtomicUsize::new(CPUGovernor::Balanced as usize),
-            current_freq: AtomicUsize::new(2000000),
-            max_freq: AtomicUsize::new(3500000),
-            min_freq: AtomicUsize::new(800000),
+    fn profile_type(&self) -> PowerProfile {
+        match self.profile_type.load(Ordering::SeqCst) {
+            0 => PowerProfile::Performance,
+            1 => PowerProfile::Balanced,
+            2 => PowerProfile::PowerSaver,
+            _ => PowerProfile::Custom,
         }
+    }
+    fn cpu_governor(&self) -> CPUGovernor {
+        match self.cpu_governor.load(Ordering::SeqCst) {
+            0 => CPUGovernor::Performance,
+            1 => CPUGovernor::Ondemand,
+            2 => CPUGovernor::Conservative,
+            3 => CPUGovernor::Powersave,
+            4 => CPUGovernor::Userspace,
+            _ => CPUGovernor::Schedutil,
+        }
+    }
+    fn epp_mode(&self) -> EppMode {
+        match self.epp_mode.load(Ordering::SeqCst) {
+            0 => EppMode::Performance,
+            1 => EppMode::BalancePerformance,
+            2 => EppMode::BalancePower,
+            _ => EppMode::Power,
+        }
+    }
+    fn max_cpu_freq(&self) -> usize {
+        self.max_cpu_freq.load(Ordering::SeqCst)
+    }
+    fn min_cpu_freq(&self) -> usize {
+        self.min_cpu_freq.load(Ordering::SeqCst)
     }
 }
 
-impl CPUGovernor for SimpleCPUGovernor {
-    fn set_governor(&mut self, governor: CPUGovernor) -> Result<(), PowerError> {
-        self.current_governor.store(governor as usize, Ordering::SeqCst);
-        match governor {
-            CPUGovernor::Performance => self.current_freq.store(self.max_freq.load(Ordering::SeqCst), Ordering::SeqCst),
-            CPUGovernor::Powersave => self.current_freq.store(self.min_freq.load(Ordering::SeqCst), Ordering::SeqCst),
-            CPUGovernor::Balanced => self.current_freq.store(2000000, Ordering::SeqCst),
-            _ => self.current_freq.store(1500000, Ordering::SeqCst),
-        }
-        Ok(())
-    }
-
-    fn get_governor(&self) -> CPUGovernor { unsafe { core::mem::transmute(self.current_governor.load(Ordering::SeqCst)) } }
-
-    fn set_frequency(&mut self, freq_khz: usize) -> Result<(), PowerError> {
-        let max = self.max_freq.load(Ordering::SeqCst);
-        let min = self.min_freq.load(Ordering::SeqCst);
-        if freq_khz < min || freq_khz > max {
-            return Err(PowerError::InvalidProfile);
-        }
-        self.current_freq.store(freq_khz, Ordering::SeqCst);
-        Ok(())
-    }
-
-    fn get_frequency(&self) -> usize { self.current_freq.load(Ordering::SeqCst) }
-}
-
-pub trait ThermalManager {
-    fn get_temperature(&self) -> i32;
-    fn set_threshold(&mut self, temp_celsius: i32);
-    fn get_threshold(&self) -> i32;
-    fn is_critical(&self) -> bool;
-}
-
-#[repr(C)]
 pub struct SimpleThermalManager {
     pub current_temp: AtomicUsize,
-    pub critical_threshold: AtomicUsize,
     pub warning_threshold: AtomicUsize,
+    pub critical_threshold: AtomicUsize,
+    pub fan_speed_percent: AtomicUsize,
 }
 
 impl SimpleThermalManager {
     pub fn new() -> Self {
         SimpleThermalManager {
             current_temp: AtomicUsize::new(45),
-            critical_threshold: AtomicUsize::new(90),
             warning_threshold: AtomicUsize::new(75),
+            critical_threshold: AtomicUsize::new(90),
+            fan_speed_percent: AtomicUsize::new(30),
         }
     }
-}
 
-impl ThermalManager for SimpleThermalManager {
-    fn get_temperature(&self) -> i32 { self.current_temp.load(Ordering::SeqCst) as i32 }
+    pub fn update_temperature(&self, temp_celsius: usize) {
+        self.current_temp.store(temp_celsius, Ordering::SeqCst);
+        let warning = self.warning_threshold.load(Ordering::SeqCst);
+        let critical = self.critical_threshold.load(Ordering::SeqCst);
 
-    fn set_threshold(&mut self, temp_celsius: i32) {
-        self.critical_threshold.store(temp_celsius as usize, Ordering::SeqCst);
+        if temp_celsius >= critical {
+            self.fan_speed_percent.store(100, Ordering::SeqCst);
+        } else if temp_celsius >= warning {
+            self.fan_speed_percent.store(75, Ordering::SeqCst);
+        } else {
+            self.fan_speed_percent.store(35, Ordering::SeqCst);
+        }
     }
 
-    fn get_threshold(&self) -> i32 { self.critical_threshold.load(Ordering::SeqCst) as i32 }
-
-    fn is_critical(&self) -> bool {
+    pub fn is_critical(&self) -> bool {
         self.current_temp.load(Ordering::SeqCst) >= self.critical_threshold.load(Ordering::SeqCst)
     }
 }
 
-pub trait PowerManager {
-    fn add_profile(&mut self, profile: Box<dyn PowerProfile>) -> Result<PowerProfileID, PowerError>;
-    fn set_profile(&mut self, id: PowerProfileID) -> Result<(), PowerError>;
-    fn get_profile(&self, id: PowerProfileID) -> Option<&dyn PowerProfile>;
-    fn get_current_profile(&self) -> Option<PowerProfileID>;
+impl Default for SimpleThermalManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-#[repr(C)]
-pub struct SimplePowerManager {
-    pub profiles: Vec<Option<Box<dyn PowerProfile>>>,
-    pub current_profile: AtomicUsize,
-    pub governor: SimpleCPUGovernor,
+/// Advanced System Power State Controller
+pub struct AdvancedPowerManager {
+    pub active_profile: PowerProfile,
+    pub epp_mode: EppMode,
+    pub lowest_cstate: CpuCState,
+    pub sleep_state: AcpiSleepState,
     pub thermal: SimpleThermalManager,
-    pub next_id: AtomicUsize,
 }
 
-impl SimplePowerManager {
+impl AdvancedPowerManager {
     pub fn new() -> Self {
-        SimplePowerManager {
-            profiles: Vec::new(),
-            current_profile: AtomicUsize::new(0),
-            governor: SimpleCPUGovernor::new(),
+        Self {
+            active_profile: PowerProfile::Balanced,
+            epp_mode: EppMode::BalancePerformance,
+            lowest_cstate: CpuCState::C0Active,
+            sleep_state: AcpiSleepState::S0Working,
             thermal: SimpleThermalManager::new(),
-            next_id: AtomicUsize::new(1),
         }
     }
 
-    pub fn create_default_profiles(&mut self) {
-        let perf_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let perf_profile = SimplePowerProfile::new(perf_id, b"performance", PowerProfile::Performance, CPUGovernor::Performance);
-        self.profiles.push(Some(Box::new(perf_profile)));
-
-        let balanced_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let balanced_profile = SimplePowerProfile::new(balanced_id, b"balanced", PowerProfile::Balanced, CPUGovernor::Ondemand);
-        self.profiles.push(Some(Box::new(balanced_profile)));
-
-        let powersave_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let powersave_profile = SimplePowerProfile::new(powersave_id, b"powersave", PowerProfile::PowerSaver, CPUGovernor::Powersave);
-        self.profiles.push(Some(Box::new(powersave_profile)));
-    }
-}
-
-impl PowerManager for SimplePowerManager {
-    fn add_profile(&mut self, profile: Box<dyn PowerProfile>) -> Result<PowerProfileID, PowerError> {
-        let id = profile.id();
-        self.profiles.push(Some(profile));
-        Ok(id)
-    }
-
-    fn set_profile(&mut self, id: PowerProfileID) -> Result<(), PowerError> {
-        for profile_option in &self.profiles {
-            if let Some(ref profile) = *profile_option {
-                if profile.id() == id {
-                    self.current_profile.store(id, Ordering::SeqCst);
-                    self.governor.set_governor(profile.cpu_governor())?;
-                    return Ok(());
-                }
+    pub fn set_sleep_state(&mut self, state: AcpiSleepState) -> Result<(), PowerError> {
+        self.sleep_state = state;
+        match state {
+            AcpiSleepState::S0Working => {
+                self.lowest_cstate = CpuCState::C0Active;
+            }
+            AcpiSleepState::S3SuspendToRam => {
+                self.lowest_cstate = CpuCState::C3Sleep;
+            }
+            AcpiSleepState::S4HibernateToDisk | AcpiSleepState::S5SoftOff => {
+                self.lowest_cstate = CpuCState::C3Sleep;
             }
         }
-        Err(PowerError::InvalidProfile)
+        Ok(())
     }
 
-    fn get_profile(&self, id: PowerProfileID) -> Option<&dyn PowerProfile> {
-        for profile_option in &self.profiles {
-            if let Some(ref profile) = *profile_option {
-                if profile.id() == id { return Some(profile.as_ref()); }
+    pub fn apply_profile(&mut self, profile: PowerProfile) {
+        self.active_profile = profile;
+        match profile {
+            PowerProfile::Performance => {
+                self.epp_mode = EppMode::Performance;
             }
-        }
-        None
-    }
-
-    fn get_current_profile(&self) -> Option<PowerProfileID> {
-        let id = self.current_profile.load(Ordering::SeqCst);
-        if id == 0 { None } else { Some(id) }
-    }
-}
-
-pub trait BatteryManager {
-    fn get_capacity(&self) -> i32;
-    fn get_status(&self) -> BatteryStatus;
-    fn is_charging(&self) -> bool;
-    fn get_time_remaining(&self) -> i32;
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum BatteryStatus { Unknown = 0, Charging = 1, Discharging = 2, Full = 3 }
-
-#[repr(C)]
-pub struct SimpleBatteryManager {
-    pub capacity: AtomicUsize,
-    pub status: AtomicUsize,
-    pub is_charging_flag: AtomicUsize,
-}
-
-impl SimpleBatteryManager {
-    pub fn new() -> Self {
-        SimpleBatteryManager {
-            capacity: AtomicUsize::new(100),
-            status: AtomicUsize::new(BatteryStatus::Full as usize),
-            is_charging_flag: AtomicUsize::new(0),
-        }
-    }
-}
-
-impl BatteryManager for SimpleBatteryManager {
-    fn get_capacity(&self) -> i32 { self.capacity.load(Ordering::SeqCst) as i32 }
-
-    fn get_status(&self) -> BatteryStatus { unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) } }
-
-    fn is_charging(&self) -> bool { self.is_charging_flag.load(Ordering::SeqCst) == 1 }
-
-    fn get_time_remaining(&self) -> i32 {
-        let capacity = self.capacity.load(Ordering::SeqCst) as i32;
-        if capacity <= 0 { return 0; }
-        capacity * 5
-    }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+            PowerProfile::Balanced => {
+                self.epp_mode = EppMode::BalancePerformance;
             }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
+            PowerProfile::PowerSaver => {
+                self.epp_mode = EppMode::Power;
+            }
+            PowerProfile::Custom => {}
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+impl Default for AdvancedPowerManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_power_profile_epp() {
+        let profile = SimplePowerProfile::new(
+            1,
+            b"perf",
+            PowerProfile::Performance,
+            CPUGovernor::Performance,
+            EppMode::Performance,
+        );
+
+        assert_eq!(profile.id(), 1);
+        assert_eq!(profile.epp_mode(), EppMode::Performance);
+        assert_eq!(profile.cpu_governor(), CPUGovernor::Performance);
+    }
+
+    #[test]
+    fn test_advanced_power_manager_transitions() {
+        let mut mgr = AdvancedPowerManager::new();
+        assert_eq!(mgr.sleep_state, AcpiSleepState::S0Working);
+
+        assert!(mgr.set_sleep_state(AcpiSleepState::S3SuspendToRam).is_ok());
+        assert_eq!(mgr.sleep_state, AcpiSleepState::S3SuspendToRam);
+        assert_eq!(mgr.lowest_cstate, CpuCState::C3Sleep);
+
+        mgr.apply_profile(PowerProfile::PowerSaver);
+        assert_eq!(mgr.epp_mode, EppMode::Power);
+    }
+
+    #[test]
+    fn test_thermal_fan_control() {
+        let thermal = SimpleThermalManager::new();
+        assert_eq!(thermal.fan_speed_percent.load(Ordering::SeqCst), 30);
+
+        // Update temp to warning level (80C)
+        thermal.update_temperature(80);
+        assert_eq!(thermal.fan_speed_percent.load(Ordering::SeqCst), 75);
+
+        // Update temp to critical level (92C)
+        thermal.update_temperature(92);
+        assert!(thermal.is_critical());
+        assert_eq!(thermal.fan_speed_percent.load(Ordering::SeqCst), 100);
+    }
+}

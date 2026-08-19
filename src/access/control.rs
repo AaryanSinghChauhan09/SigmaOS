@@ -1,293 +1,421 @@
-#![no_std]
-#![no_main]
-
-/// OOP-based Access Control for SigmaOS
-/// Based on Ideas-999-Structured: Security & Sovereignty Item 541
-/// Implements zero-trust access control and RBAC
-
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+/// Access Control Matrix (ACM), Extended POSIX ACLs, Capability Bounding Sets,
+/// Mandatory Access Control (MAC - Bell-LaPadula), and Hardware Network Filters for SigmaOS.
 
 pub type RoleID = usize;
 pub type PermissionID = usize;
+pub type UserID = u32;
+pub type GroupID = u32;
+pub type SubjectID = u64;
+pub type ObjectID = u64;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum AccessError { Success = 0, Denied = 1, InvalidRole = 2, InvalidPermission = 3 }
-
-pub trait Role {
-    fn id(&self) -> RoleID;
-    fn name(&self) -> &[u8];
-    fn has_permission(&self, permission_id: PermissionID) -> bool;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AccessError {
+    Success = 0,
+    Denied = 1,
+    InvalidRole = 2,
+    InvalidPermission = 3,
+    MacLevelViolation = 4,
+    MacAddressBlocked = 5,
+    CapabilityBounded = 6,
 }
 
-#[repr(C)]
-pub struct SimpleRole {
-    pub id: RoleID,
-    pub name: [u8; 64],
-    pub permissions: Vec<PermissionID>,
+// ─────────────────────────────────────────────────────────────────────────────
+// 1. ACCESS CONTROL MATRIX (ACM - 2D Grid Rights Mapping)
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub mod acm_rights {
+    pub const READ: u32 = 0x01;
+    pub const WRITE: u32 = 0x02;
+    pub const EXECUTE: u32 = 0x04;
+    pub const DELEGATE: u32 = 0x08;
+    pub const ADMIN: u32 = 0x10;
 }
 
-impl SimpleRole {
-    pub fn new(id: RoleID, name: &[u8]) -> Self {
-        let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+#[derive(Debug, Clone)]
+pub struct AccessControlMatrix {
+    pub matrix: Vec<(SubjectID, ObjectID, u32)>, // (Subject, Object) -> Right Mask
+}
+
+impl AccessControlMatrix {
+    pub fn new() -> Self {
+        Self { matrix: Vec::new() }
+    }
+
+    pub fn grant_right(&mut self, subject: SubjectID, object: ObjectID, right_mask: u32) {
+        for entry in self.matrix.iter_mut() {
+            if entry.0 == subject && entry.1 == object {
+                entry.2 |= right_mask;
+                return;
+            }
         }
-        SimpleRole {
-            id,
-            name: name_array,
-            permissions: Vec::new(),
+        self.matrix.push((subject, object, right_mask));
+    }
+
+    pub fn revoke_right(&mut self, subject: SubjectID, object: ObjectID, right_mask: u32) {
+        for entry in self.matrix.iter_mut() {
+            if entry.0 == subject && entry.1 == object {
+                entry.2 &= !right_mask;
+                return;
+            }
         }
     }
-}
 
-impl Role for SimpleRole {
-    fn id(&self) -> RoleID { self.id }
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
-    }
-    fn has_permission(&self, permission_id: PermissionID) -> bool {
-        for &perm in &self.permissions {
-            if perm == permission_id { return true; }
+    pub fn check_right(&self, subject: SubjectID, object: ObjectID, required_right: u32) -> bool {
+        for entry in &self.matrix {
+            if entry.0 == subject && entry.1 == object {
+                return (entry.2 & required_right) == required_right;
+            }
         }
         false
     }
 }
 
-pub trait Permission {
-    fn id(&self) -> PermissionID;
-    fn resource(&self) -> &[u8];
-    fn action(&self) -> &[u8];
-}
-
-#[repr(C)]
-pub struct SimplePermission {
-    pub id: PermissionID,
-    pub resource: [u8; 128],
-    pub action: [u8; 64],
-}
-
-impl SimplePermission {
-    pub fn new(id: PermissionID, resource: &[u8], action: &[u8]) -> Self {
-        let mut resource_array = [0u8; 128];
-        let mut action_array = [0u8; 64];
-        let resource_len = resource.len().min(127);
-        let action_len = action.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(resource.as_ptr(), resource_array.as_mut_ptr(), resource_len);
-            core::ptr::copy_nonoverlapping(action.as_ptr(), action_array.as_mut_ptr(), action_len);
-        }
-        SimplePermission {
-            id,
-            resource: resource_array,
-            action: action_array,
-        }
+impl Default for AccessControlMatrix {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl Permission for SimplePermission {
-    fn id(&self) -> PermissionID { self.id }
-    fn resource(&self) -> &[u8] {
-        let len = self.resource.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.resource[..len]
-    }
-    fn action(&self) -> &[u8] {
-        let len = self.action.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.action[..len]
-    }
+// ─────────────────────────────────────────────────────────────────────────────
+// 2. EXTENDED POSIX ACCESS CONTROL LISTS (POSIX ACLs - setfacl/getfacl)
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AclType {
+    UserObj,
+    NamedUser,
+    GroupObj,
+    NamedGroup,
+    Mask,
+    Other,
 }
 
-pub trait AccessController {
-    fn grant_permission(&mut self, role_id: RoleID, permission_id: PermissionID) -> Result<(), AccessError>;
-    fn revoke_permission(&mut self, role_id: RoleID, permission_id: PermissionID) -> Result<(), AccessError>;
-    fn check_access(&self, role_id: RoleID, resource: &[u8], action: &[u8]) -> Result<bool, AccessError>;
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AclEntry {
+    pub acl_type: AclType,
+    pub qualifier_id: u32, // UID for NamedUser, GID for NamedGroup
+    pub perm_bits: u16,    // 0o7 (rwx)
 }
 
-#[repr(C)]
-pub struct SimpleAccessController {
-    pub roles: Vec<Option<Box<dyn Role>>>,
-    pub permissions: Vec<Option<Box<dyn Permission>>>,
+#[derive(Debug, Clone)]
+pub struct PosixAcl {
+    pub entries: Vec<AclEntry>,
 }
 
-impl SimpleAccessController {
+impl PosixAcl {
     pub fn new() -> Self {
-        SimpleAccessController {
-            roles: Vec::new(),
-            permissions: Vec::new(),
-        }
+        Self { entries: Vec::new() }
     }
-}
 
-impl AccessController for SimpleAccessController {
-    fn grant_permission(&mut self, role_id: RoleID, permission_id: PermissionID) -> Result<(), AccessError> {
-        for role_option in &mut self.roles {
-            if let Some(ref mut role) = *role_option {
-                if role.id() == role_id {
-                    if let SimpleRole { ref mut permissions, .. } = **role {
-                        permissions.push(permission_id);
-                        return Ok(());
-                    }
-                }
+    pub fn add_entry(&mut self, acl_type: AclType, qualifier_id: u32, perm_bits: u16) {
+        self.entries.push(AclEntry {
+            acl_type,
+            qualifier_id,
+            perm_bits: perm_bits & 0o7,
+        });
+    }
+
+    /// Evaluates Extended POSIX ACL for a user and group
+    pub fn evaluate_acl(&self, uid: UserID, gid: GroupID, owner_uid: UserID, group_gid: GroupID, requested_bits: u16) -> bool {
+        if uid == 0 {
+            return true; // Root bypasses ACLs
+        }
+
+        // Calculate mask if present
+        let mask = self
+            .entries
+            .iter()
+            .find(|e| e.acl_type == AclType::Mask)
+            .map(|e| e.perm_bits)
+            .unwrap_or(0o7);
+
+        // 1. UserObj check
+        if uid == owner_uid {
+            if let Some(user_obj) = self.entries.iter().find(|e| e.acl_type == AclType::UserObj) {
+                return (user_obj.perm_bits & requested_bits) == requested_bits;
             }
         }
-        Err(AccessError::InvalidRole)
-    }
 
-    fn revoke_permission(&mut self, role_id: RoleID, permission_id: PermissionID) -> Result<(), AccessError> {
-        for role_option in &mut self.roles {
-            if let Some(ref mut role) = *role_option {
-                if role.id() == role_id {
-                    if let SimpleRole { ref mut permissions, .. } = **role {
-                        for i in 0..permissions.len() {
-                            if permissions[i] == permission_id {
-                                permissions.remove(i);
-                                return Ok(());
-                            }
-                        }
-                    }
-                }
+        // 2. NamedUser check (filtered by MASK)
+        if let Some(named_user) = self
+            .entries
+            .iter()
+            .find(|e| e.acl_type == AclType::NamedUser && e.qualifier_id == uid)
+        {
+            let effective = named_user.perm_bits & mask;
+            return (effective & requested_bits) == requested_bits;
+        }
+
+        // 3. GroupObj & NamedGroup check (filtered by MASK)
+        if let Some(named_group) = self
+            .entries
+            .iter()
+            .find(|e| e.acl_type == AclType::NamedGroup && e.qualifier_id == gid)
+        {
+            let effective = named_group.perm_bits & mask;
+            return (effective & requested_bits) == requested_bits;
+        }
+
+        if gid == group_gid {
+            if let Some(group_obj) = self.entries.iter().find(|e| e.acl_type == AclType::GroupObj) {
+                let effective = group_obj.perm_bits & mask;
+                return (effective & requested_bits) == requested_bits;
             }
         }
-        Err(AccessError::InvalidRole)
-    }
 
-    fn check_access(&self, role_id: RoleID, resource: &[u8], action: &[u8]) -> Result<bool, AccessError> {
-        for role_option in &self.roles {
-            if let Some(ref role) = *role_option {
-                if role.id() == role_id {
-                    for perm_option in &self.permissions {
-                        if let Some(ref perm) = *perm_option {
-                            if role.has_permission(perm.id()) {
-                                if perm.resource() == resource && perm.action() == action {
-                                    return Ok(true);
-                                }
-                            }
-                        }
-                    }
-                    return Ok(false);
-                }
-            }
+        // 4. Other check
+        if let Some(other) = self.entries.iter().find(|e| e.acl_type == AclType::Other) {
+            return (other.perm_bits & requested_bits) == requested_bits;
         }
-        Err(AccessError::InvalidRole)
+
+        false
     }
 }
 
-pub trait ZeroTrustPolicy {
-    fn verify_identity(&self, identity: &[u8]) -> Result<bool, AccessError>;
-    fn check_device_trust(&self, device_id: usize) -> Result<bool, AccessError>;
-    fn enforce_mfa(&self, user_id: usize) -> Result<bool, AccessError>;
-}
-
-#[repr(C)]
-pub struct SimpleZeroTrustPolicy {
-    pub trusted_devices: Vec<usize>,
-}
-
-impl SimpleZeroTrustPolicy {
-    pub fn new() -> Self {
-        SimpleZeroTrustPolicy {
-            trusted_devices: Vec::new(),
-        }
+impl Default for PosixAcl {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl ZeroTrustPolicy for SimpleZeroTrustPolicy {
-    fn verify_identity(&self, _identity: &[u8]) -> Result<bool, AccessError> {
-        Ok(true)
+// ─────────────────────────────────────────────────────────────────────────────
+// 3. CAPABILITY BOUNDING SET (CapBoundingSet)
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapBoundingSet {
+    pub capability_mask: u64,
+}
+
+impl CapBoundingSet {
+    pub fn new(mask: u64) -> Self {
+        Self { capability_mask: mask }
     }
 
-    fn check_device_trust(&self, device_id: usize) -> Result<bool, AccessError> {
-        for &id in &self.trusted_devices {
-            if id == device_id { return Ok(true); }
-        }
-        Ok(false)
+    pub fn drop_capability(&mut self, cap_bit: u64) {
+        self.capability_mask &= !(1 << cap_bit);
     }
 
-    fn enforce_mfa(&self, _user_id: usize) -> Result<bool, AccessError> {
-        Ok(true)
+    pub fn is_capability_permitted(&self, cap_bit: u64) -> bool {
+        (self.capability_mask & (1 << cap_bit)) != 0
     }
 }
 
-pub trait AuditLogger {
-    fn log_access_attempt(&mut self, role_id: RoleID, resource: &[u8], action: &[u8], granted: bool);
-    fn get_audit_trail(&self) -> Vec<(RoleID, [u8; 128], [u8; 64], bool)>;
+// ─────────────────────────────────────────────────────────────────────────────
+// 4. DISCRETIONARY ACCESS CONTROL (DAC - POSIX Mode Bits & UID/GID)
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub mod dac_flags {
+    pub const READ: u16 = 0o4;
+    pub const WRITE: u16 = 0o2;
+    pub const EXECUTE: u16 = 0o1;
 }
 
-#[repr(C)]
-pub struct SimpleAuditLogger {
-    pub audit_trail: Vec<(RoleID, [u8; 128], [u8; 64], bool)>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DacPermission {
+    pub owner_uid: UserID,
+    pub group_gid: GroupID,
+    pub mode_bits: u16, // Mode bits e.g. 0o755 (rwxr-xr-x)
 }
 
-impl SimpleAuditLogger {
-    pub fn new() -> Self {
-        SimpleAuditLogger {
-            audit_trail: Vec::new(),
+impl DacPermission {
+    pub fn new(owner_uid: UserID, group_gid: GroupID, mode_bits: u16) -> Self {
+        Self {
+            owner_uid,
+            group_gid,
+            mode_bits,
         }
     }
-}
 
-impl AuditLogger for SimpleAuditLogger {
-    fn log_access_attempt(&mut self, role_id: RoleID, resource: &[u8], action: &[u8], granted: bool) {
-        let mut resource_array = [0u8; 128];
-        let mut action_array = [0u8; 64];
-        let resource_len = resource.len().min(127);
-        let action_len = action.len().min(63);
-        for i in 0..resource_len { resource_array[i] = resource[i]; }
-        for i in 0..action_len { action_array[i] = action[i]; }
-        self.audit_trail.push((role_id, resource_array, action_array, granted));
-    }
+    pub fn evaluate_access(&self, subject_uid: UserID, subject_gid: GroupID, requested_mode: u16) -> bool {
+        let allowed_bits = if subject_uid == 0 {
+            0o777 // Root bypasses standard DAC
+        } else if subject_uid == self.owner_uid {
+            (self.mode_bits >> 6) & 0o7
+        } else if subject_gid == self.group_gid {
+            (self.mode_bits >> 3) & 0o7
+        } else {
+            self.mode_bits & 0o7
+        };
 
-    fn get_audit_trail(&self) -> Vec<(RoleID, [u8; 128], [u8; 64], bool)> {
-        self.audit_trail.clone()
-    }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
-        }
-        new_vec
-    }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+        (allowed_bits & requested_mode) == requested_mode
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. MANDATORY ACCESS CONTROL (MAC - Bell-LaPadula Multilevel Security)
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SensitivityLevel {
+    Unclassified = 0,
+    Confidential = 1,
+    Secret = 2,
+    TopSecret = 3,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MacSecurityLabel {
+    pub level: SensitivityLevel,
+    pub category_mask: u32,
+}
+
+impl MacSecurityLabel {
+    pub fn new(level: SensitivityLevel, category_mask: u32) -> Self {
+        Self { level, category_mask }
+    }
+
+    pub fn can_read(&self, object_label: &MacSecurityLabel) -> bool {
+        self.level >= object_label.level && (self.category_mask & object_label.category_mask) == object_label.category_mask
+    }
+
+    pub fn can_write(&self, object_label: &MacSecurityLabel) -> bool {
+        self.level <= object_label.level && (object_label.category_mask & self.category_mask) == self.category_mask
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. MAC ADDRESS HARDWARE NETWORK FILTERING
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FilterPolicy {
+    Whitelist,
+    Blacklist,
+}
+
+pub struct MacAddressFilter {
+    pub policy: FilterPolicy,
+    pub addresses: Vec<[u8; 6]>,
+}
+
+impl MacAddressFilter {
+    pub fn new(policy: FilterPolicy) -> Self {
+        Self {
+            policy,
+            addresses: Vec::new(),
+        }
+    }
+
+    pub fn add_mac(&mut self, mac: [u8; 6]) {
+        if !self.addresses.contains(&mac) {
+            self.addresses.push(mac);
+        }
+    }
+
+    pub fn is_allowed(&self, mac: &[u8; 6]) -> bool {
+        let is_listed = self.addresses.contains(mac);
+        match self.policy {
+            FilterPolicy::Whitelist => is_listed,
+            FilterPolicy::Blacklist => !is_listed,
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. UNIFIED ZERO TRUST ACCESS GATE
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub struct ZeroTrustAccessGate {
+    pub matrix: AccessControlMatrix,
+    pub mac_filter: MacAddressFilter,
+    pub cap_bounds: CapBoundingSet,
+}
+
+impl ZeroTrustAccessGate {
+    pub fn new(policy: FilterPolicy, cap_mask: u64) -> Self {
+        Self {
+            matrix: AccessControlMatrix::new(),
+            mac_filter: MacAddressFilter::new(policy),
+            cap_bounds: CapBoundingSet::new(cap_mask),
+        }
+    }
+
+    /// Unified zero trust security gate evaluation
+    pub fn evaluate_request(
+        &self,
+        subject: SubjectID,
+        object: ObjectID,
+        right_mask: u32,
+        cap_bit: u64,
+        net_mac: &[u8; 6],
+    ) -> Result<(), AccessError> {
+        // 1. Network MAC Hardware check
+        if !self.mac_filter.is_allowed(net_mac) {
+            return Err(AccessError::MacAddressBlocked);
+        }
+
+        // 2. Capability Bounding Set check
+        if !self.cap_bounds.is_capability_permitted(cap_bit) {
+            return Err(AccessError::CapabilityBounded);
+        }
+
+        // 3. Access Control Matrix check
+        if !self.matrix.check_right(subject, object, right_mask) {
+            return Err(AccessError::Denied);
+        }
+
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_access_control_matrix() {
+        let mut acm = AccessControlMatrix::new();
+        let subject = 1001;
+        let object = 5001;
+
+        acm.grant_right(subject, object, acm_rights::READ | acm_rights::WRITE);
+        assert!(acm.check_right(subject, object, acm_rights::READ));
+        assert!(acm.check_right(subject, object, acm_rights::WRITE));
+        assert!(!acm.check_right(subject, object, acm_rights::EXECUTE));
+
+        acm.revoke_right(subject, object, acm_rights::WRITE);
+        assert!(!acm.check_right(subject, object, acm_rights::WRITE));
+    }
+
+    #[test]
+    fn test_posix_extended_acls() {
+        let mut acl = PosixAcl::new();
+        acl.add_entry(AclType::UserObj, 0, 0o7); // Owner: rwx
+        acl.add_entry(AclType::NamedUser, 1002, 0o6); // NamedUser 1002: rw-
+        acl.add_entry(AclType::Mask, 0, 0o4); // Mask: r--
+
+        // NamedUser 1002 requests Read (4) -> Mask allows Read (4) -> Granted
+        assert!(acl.evaluate_acl(1002, 2000, 1000, 2000, 0o4));
+
+        // NamedUser 1002 requests Write (2) -> Mask restricts to r-- -> Denied
+        assert!(!acl.evaluate_acl(1002, 2000, 1000, 2000, 0o2));
+    }
+
+    #[test]
+    fn test_cap_bounding_set() {
+        let mut bounds = CapBoundingSet::new(0xFFFF_FFFF);
+        assert!(bounds.is_capability_permitted(21)); // CAP_SYS_ADMIN
+
+        bounds.drop_capability(21);
+        assert!(!bounds.is_capability_permitted(21)); // Dropped
+    }
+
+    #[test]
+    fn test_zero_trust_access_gate() {
+        let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
+        let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+        gate.mac_filter.add_mac(allowed_mac);
+
+        gate.matrix.grant_right(1, 10, acm_rights::READ);
+
+        // Valid request -> OK
+        assert_eq!(gate.evaluate_request(1, 10, acm_rights::READ, 2, &allowed_mac), Ok(()));
+
+        // Unknown MAC -> Blocked
+        let blocked_mac = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
+        assert_eq!(gate.evaluate_request(1, 10, acm_rights::READ, 2, &blocked_mac), Err(AccessError::MacAddressBlocked));
+    }
+}
