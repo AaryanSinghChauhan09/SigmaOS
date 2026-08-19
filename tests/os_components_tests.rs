@@ -31,8 +31,15 @@ mod endeavour_os;
 #[path = "../src/compatibility/fedora.rs"]
 mod fedora_compat;
 
+#[path = "../src/access/control.rs"]
+mod access_control;
+
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
+
+use access_control::{
+    AclEntry, AclTag, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, nfs4_flags, nfs4_mask,
+};
 
 use pipes::Pipe;
 use unveil::{UnveilManager, UnveilPermission};
@@ -244,4 +251,36 @@ fn test_sigmatools_suite() {
 
     let rtc = AlmeidaCmosRtc::decode_cmos_values(0x00, 0x30, 0x14, 0x15, 0x08, 0x26, true);
     assert_eq!(rtc.format_timestamp(), "2026-08-15 14:30:00");
+}
+
+#[test]
+fn test_posix_and_nfsv4_acls() {
+    // POSIX 1003.1e ACL verification
+    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
+    posix_acl.add_entry(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
+
+    assert!(posix_acl.get_mask().is_some());
+    assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
+    assert!(!posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 2)); // Denied write (2)
+    assert!(!posix_acl.evaluate_access(1002, 1002, &[], 1000, 1000, 4)); // Other denied
+
+    let child_posix = posix_acl.inherit_default_acl(false);
+    assert_eq!(child_posix.get_mask(), Some(4)); // Execute bit stripped for file child
+
+    // NFSv4 / FreeBSD Rich ACL verification
+    let mut nfsv4_acl = Nfs4Acl::new();
+    nfsv4_acl.add_ace(Nfs4Ace::new(Nfs4AceType::AccessDenied, 0, nfs4_mask::DELETE, 1002));
+    nfsv4_acl.add_ace(Nfs4Ace::new(
+        Nfs4AceType::AccessAllowed,
+        nfs4_flags::FILE_INHERIT | nfs4_flags::DIRECTORY_INHERIT,
+        nfs4_mask::READ_DATA | nfs4_mask::WRITE_DATA | nfs4_mask::DELETE,
+        65534, // Everyone
+    ));
+
+    assert!(nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::READ_DATA));
+    assert!(!nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::DELETE));
+    assert!(nfsv4_acl.evaluate_access(1003, 1003, nfs4_mask::DELETE));
+
+    let child_nfsv4 = nfsv4_acl.inherit_for_child(true);
+    assert_eq!(child_nfsv4.aces.len(), 1);
 }
