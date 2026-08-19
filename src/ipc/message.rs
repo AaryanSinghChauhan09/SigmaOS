@@ -17,56 +17,212 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // OOP-based IPC Message System for SigmaOS
-// Based on Ideas-999-Structured: Kernel & Hardware Item 131
-// Implements message passing and shared memory IPC
-
-// (no_std only applicable at crate root - removed)
+// Implements Direct Addressing (1-to-1 explicit Process IDs),
+// Indirect Addressing (Mailboxes/Ports with 1-to-1, 1-to-N, N-to-N relationships),
+// Structured Message Headers with payload validation, sequence numbers, and delivery modes.
 
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type ChannelID = usize;
+pub type Pid = u32;
+pub type MailboxId = u32;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IPCError { Success = 0, ChannelFull = 1, ChannelEmpty = 2, InvalidChannel = 3 }
-
-pub trait MessageChannel {
-    fn id(&self) -> ChannelID;
-    fn capacity(&self) -> usize;
-    fn send(&mut self, message: &[u8]) -> Result<(), IPCError>;
-    fn receive(&mut self) -> Result<Vec<u8>, IPCError>;
-    fn is_empty(&self) -> bool;
-    fn is_full(&self) -> bool;
+pub enum IPCError {
+    Success = 0,
+    ChannelFull = 1,
+    ChannelEmpty = 2,
+    InvalidChannel = 3,
+    InvalidRecipient = 4,
+    PayloadTooLarge = 5,
+    RelationshipViolation = 6,
+    Timeout = 7,
 }
 
-#[repr(C)]
-pub struct SimpleMessageChannel {
-    pub id: ChannelID,
-    pub capacity: AtomicUsize,
-    pub messages: Vec<[u8; 256]>,
+/// Communication addressing modes
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AddressingMode {
+    /// Direct process-to-process addressing (explicit sender Pid & recipient Pid)
+    Direct { sender: Pid, recipient: Pid },
+    /// Indirect addressing via shared Mailbox/Port ID
+    Indirect { mailbox_id: MailboxId },
 }
 
-impl SimpleMessageChannel {
-    pub fn new(id: ChannelID, capacity: usize) -> Self {
-        SimpleMessageChannel {
-            id,
-            capacity: AtomicUsize::new(capacity),
-            messages: Vec::new(),
+/// Process relationship cardinality
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessRelationship {
+    /// 1-to-1: Exactly one sender process communicating with one receiver process
+    OneToOne,
+    /// 1-to-N: One sender process broadcasting to multiple receiver processes
+    OneToMany,
+    /// N-to-N: Multiple sender processes communicating with multiple receiver processes
+    ManyToMany,
+}
+
+/// Delivery mode requirements
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeliveryMode {
+    SynchronousBlocking,
+    AsynchronousNonBlocking,
+}
+
+/// Message header containing requirements, sequence ID, and payload validation metadata
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MessageHeader {
+    pub sequence_number: u64,
+    pub sender_pid: Pid,
+    pub recipient_pid: Option<Pid>,
+    pub mailbox_id: Option<MailboxId>,
+    pub payload_len: usize,
+    pub delivery_mode: DeliveryMode,
+    pub timeout_ticks: u64,
+}
+
+impl MessageHeader {
+    pub fn new(
+        sequence_number: u64,
+        sender_pid: Pid,
+        payload_len: usize,
+        delivery_mode: DeliveryMode,
+    ) -> Self {
+        Self {
+            sequence_number,
+            sender_pid,
+            recipient_pid: None,
+            mailbox_id: None,
+            payload_len,
+            delivery_mode,
+            timeout_ticks: 1000,
         }
     }
 }
 
-impl MessageChannel for SimpleMessageChannel {
-    fn id(&self) -> ChannelID { self.id }
-    fn capacity(&self) -> usize { self.capacity.load(Ordering::SeqCst) }
+pub trait MessageChannel {
+    fn id(&self) -> ChannelID;
+    fn capacity(&self) -> usize;
+    fn send(&mut self, header: MessageHeader, message: &[u8]) -> Result<(), IPCError>;
+    fn receive(&mut self) -> Result<(MessageHeader, Vec<u8>), IPCError>;
+    fn is_empty(&self) -> bool;
+    fn is_full(&self) -> bool;
+}
 
-    fn send(&mut self, message: &[u8]) -> Result<(), IPCError> {
+pub struct SimpleMessageChannel {
+    pub id: ChannelID,
+    pub capacity: AtomicUsize,
+    pub addressing_mode: AddressingMode,
+    pub relationship: ProcessRelationship,
+    pub allowed_senders: Vec<Pid>,
+    pub allowed_receivers: Vec<Pid>,
+    pub headers: Vec<MessageHeader>,
+    pub messages: Vec<[u8; 256]>,
+}
+
+impl SimpleMessageChannel {
+    pub fn new_direct(id: ChannelID, capacity: usize, sender: Pid, recipient: Pid) -> Self {
+        let mut senders = Vec::new();
+        senders.push(sender);
+        let mut receivers = Vec::new();
+        receivers.push(recipient);
+
+        SimpleMessageChannel {
+            id,
+            capacity: AtomicUsize::new(capacity),
+            addressing_mode: AddressingMode::Direct { sender, recipient },
+            relationship: ProcessRelationship::OneToOne,
+            allowed_senders: senders,
+            allowed_receivers: receivers,
+            headers: Vec::new(),
+            messages: Vec::new(),
+        }
+    }
+
+    pub fn new_indirect(
+        id: ChannelID,
+        capacity: usize,
+        mailbox_id: MailboxId,
+        relationship: ProcessRelationship,
+    ) -> Self {
+        SimpleMessageChannel {
+            id,
+            capacity: AtomicUsize::new(capacity),
+            addressing_mode: AddressingMode::Indirect { mailbox_id },
+            relationship,
+            allowed_senders: Vec::new(),
+            allowed_receivers: Vec::new(),
+            headers: Vec::new(),
+            messages: Vec::new(),
+        }
+    }
+
+    pub fn register_sender(&mut self, pid: Pid) -> Result<(), IPCError> {
+        match self.relationship {
+            ProcessRelationship::OneToOne | ProcessRelationship::OneToMany => {
+                if !self.allowed_senders.is_empty() && !self.allowed_senders.contains(&pid) {
+                    return Err(IPCError::RelationshipViolation);
+                }
+            }
+            ProcessRelationship::ManyToMany => {}
+        }
+        if !self.allowed_senders.contains(&pid) {
+            self.allowed_senders.push(pid);
+        }
+        Ok(())
+    }
+
+    pub fn register_receiver(&mut self, pid: Pid) -> Result<(), IPCError> {
+        match self.relationship {
+            ProcessRelationship::OneToOne => {
+                if !self.allowed_receivers.is_empty() && !self.allowed_receivers.contains(&pid) {
+                    return Err(IPCError::RelationshipViolation);
+                }
+            }
+            ProcessRelationship::OneToMany | ProcessRelationship::ManyToMany => {}
+        }
+        if !self.allowed_receivers.contains(&pid) {
+            self.allowed_receivers.push(pid);
+        }
+        Ok(())
+    }
+}
+
+impl MessageChannel for SimpleMessageChannel {
+    fn id(&self) -> ChannelID {
+        self.id
+    }
+    fn capacity(&self) -> usize {
+        self.capacity.load(Ordering::SeqCst)
+    }
+
+    fn send(&mut self, mut header: MessageHeader, message: &[u8]) -> Result<(), IPCError> {
         if self.messages.len() >= self.capacity() {
             return Err(IPCError::ChannelFull);
         }
+
+        if message.len() > 255 {
+            return Err(IPCError::PayloadTooLarge);
+        }
+
+        // Validate sender relationship
+        if !self.allowed_senders.is_empty() && !self.allowed_senders.contains(&header.sender_pid) {
+            return Err(IPCError::RelationshipViolation);
+        }
+
+        // Direct addressing validation
+        if let AddressingMode::Direct { sender, recipient } = self.addressing_mode {
+            if header.sender_pid != sender {
+                return Err(IPCError::InvalidRecipient);
+            }
+            header.recipient_pid = Some(recipient);
+        } else if let AddressingMode::Indirect { mailbox_id } = self.addressing_mode {
+            header.mailbox_id = Some(mailbox_id);
+        }
+
+        header.payload_len = message.len();
 
         let mut msg_array = [0u8; 256];
         let msg_len = message.len().min(255);
@@ -74,27 +230,34 @@ impl MessageChannel for SimpleMessageChannel {
             msg_array[i] = message[i];
         }
 
+        self.headers.push(header);
         self.messages.push(msg_array);
         Ok(())
     }
 
-    fn receive(&mut self) -> Result<Vec<u8>, IPCError> {
+    fn receive(&mut self) -> Result<(MessageHeader, Vec<u8>), IPCError> {
         if self.messages.is_empty() {
             return Err(IPCError::ChannelEmpty);
         }
 
+        let header = self.headers.remove(0);
         let msg_array = self.messages.remove(0);
-        let len = msg_array.iter().position(|&b| b == 0).unwrap_or(256);
+
         let mut result = Vec::new();
-        for i in 0..len {
+        for i in 0..header.payload_len {
             result.push(msg_array[i]);
         }
-        Ok(result)
+
+        Ok((header, result))
     }
 
-    fn is_empty(&self) -> bool { self.messages.is_empty() }
+    fn is_empty(&self) -> bool {
+        self.messages.is_empty()
+    }
 
-    fn is_full(&self) -> bool { self.messages.len() >= self.capacity() }
+    fn is_full(&self) -> bool {
+        self.messages.len() >= self.capacity()
+    }
 }
 
 pub trait IPCManager {
@@ -103,7 +266,6 @@ pub trait IPCManager {
     fn get_channel(&mut self, id: ChannelID) -> Option<&mut dyn MessageChannel>;
 }
 
-#[repr(C)]
 pub struct SimpleIPCManager {
     pub channels: Vec<Option<Box<dyn MessageChannel>>>,
     pub next_id: AtomicUsize,
@@ -122,7 +284,12 @@ impl SimpleIPCManager {
 impl IPCManager for SimpleIPCManager {
     fn create_channel(&mut self, capacity: usize) -> Result<ChannelID, IPCError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let channel = SimpleMessageChannel::new(id, capacity);
+        let channel = SimpleMessageChannel::new_indirect(
+            id,
+            capacity,
+            id as MailboxId,
+            ProcessRelationship::ManyToMany,
+        );
         self.channels.push(Some(Box::new(channel)));
         Ok(id)
     }
@@ -141,7 +308,9 @@ impl IPCManager for SimpleIPCManager {
     fn get_channel(&mut self, id: ChannelID) -> Option<&mut dyn MessageChannel> {
         for channel_option in &mut self.channels {
             if let Some(ref mut channel) = *channel_option {
-                if channel.id() == id { return Some(channel.as_mut()); }
+                if channel.id() == id {
+                    return Some(channel.as_mut());
+                }
             }
         }
         None
@@ -155,7 +324,6 @@ pub trait SharedMemory {
     fn read(&self, id: usize, offset: usize, buffer: &mut [u8]) -> Result<(), IPCError>;
 }
 
-#[repr(C)]
 pub struct SimpleSharedMemory {
     pub regions: Vec<(usize, Vec<u8>)>,
     pub next_id: AtomicUsize,
@@ -231,7 +399,6 @@ pub trait Semaphore {
     fn count(&self) -> usize;
 }
 
-#[repr(C)]
 pub struct SimpleSemaphore {
     pub count: AtomicUsize,
     pub max_count: AtomicUsize,
@@ -268,84 +435,59 @@ impl Semaphore for SimpleSemaphore {
         }
     }
 
-    fn count(&self) -> usize { self.count.load(Ordering::SeqCst) }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+    fn count(&self) -> usize {
+        self.count.load(Ordering::SeqCst)
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
+    #[test]
+    fn test_direct_addressing_one_to_one() {
+        let mut ch = SimpleMessageChannel::new_direct(1, 10, 100, 200);
+        let header = MessageHeader::new(1, 100, 11, DeliveryMode::AsynchronousNonBlocking);
+
+        // Sender 100 sends message to Recipient 200
+        assert!(ch.send(header, b"hello direct").is_ok());
+
+        // Attempt from unauthorized sender 101 fails with RelationshipViolation
+        let bad_header = MessageHeader::new(2, 101, 11, DeliveryMode::AsynchronousNonBlocking);
+        assert_eq!(ch.send(bad_header, b"fail"), Err(IPCError::RelationshipViolation));
+
+        let (recv_header, payload) = ch.receive().unwrap();
+        assert_eq!(recv_header.recipient_pid, Some(200));
+        assert_eq!(&payload[..], b"hello direct");
     }
-}
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
+    #[test]
+    fn test_indirect_addressing_one_to_many() {
+        let mut ch = SimpleMessageChannel::new_indirect(2, 10, 5000, ProcessRelationship::OneToMany);
+        ch.register_sender(100).unwrap();
+
+        // Second sender registration fails due to 1-to-N constraint
+        assert_eq!(ch.register_sender(101), Err(IPCError::RelationshipViolation));
+
+        // Multiple receivers can register
+        assert!(ch.register_receiver(201).is_ok());
+        assert!(ch.register_receiver(202).is_ok());
+
+        let header = MessageHeader::new(1, 100, 12, DeliveryMode::AsynchronousNonBlocking);
+        assert!(ch.send(header, b"broadcast msg").is_ok());
+
+        let (recv_header, payload) = ch.receive().unwrap();
+        assert_eq!(recv_header.mailbox_id, Some(5000));
+        assert_eq!(&payload[..], b"broadcast msg");
     }
-}
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+    #[test]
+    fn test_message_header_payload_limits() {
+        let mut ch = SimpleMessageChannel::new_direct(3, 10, 10, 20);
+        let header = MessageHeader::new(100, 10, 300, DeliveryMode::SynchronousBlocking);
+        let oversized_payload = [0u8; 300];
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        // Should return PayloadTooLarge error
+        assert_eq!(ch.send(header, &oversized_payload), Err(IPCError::PayloadTooLarge));
     }
 }
