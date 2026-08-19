@@ -2,14 +2,14 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-extern crate alloc;
-
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 63: Secrets management
+
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
+use core::mem;
 
 /// Secret ID
 pub type SecretID = usize;
@@ -115,12 +115,7 @@ pub struct SimpleSecret {
 }
 
 impl SimpleSecret {
-    pub fn new(
-        id: SecretID,
-        name: &[u8],
-        secret_type: SecretType,
-        capability: SecretCapability,
-    ) -> Self {
+    pub fn new(id: SecretID, name: &[u8], secret_type: SecretType, capability: SecretCapability) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -171,17 +166,13 @@ impl Secret for SimpleSecret {
             return Err(SecretError::PermissionDenied);
         }
 
-        if key.is_empty() {
-            return Err(SecretError::InvalidKey);
-        }
-
         if self.is_encrypted.load(Ordering::SeqCst) {
             return Err(SecretError::EncryptionFailed);
         }
 
-        // Fast zero-copy iterator zip with cycling key: eliminates modulo division and array bounds checks
-        for (byte, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
-            *byte ^= k;
+        // Simple XOR encryption for demonstration
+        for i in 0..self.data_len {
+            self.data[i] ^= key[i % key.len()];
         }
 
         self.is_encrypted.store(true, Ordering::SeqCst);
@@ -193,17 +184,13 @@ impl Secret for SimpleSecret {
             return Err(SecretError::PermissionDenied);
         }
 
-        if key.is_empty() {
-            return Err(SecretError::InvalidKey);
-        }
-
         if !self.is_encrypted.load(Ordering::SeqCst) {
             return Err(SecretError::DecryptionFailed);
         }
 
-        // Fast zero-copy iterator zip with cycling key: eliminates modulo division and array bounds checks
-        for (byte, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
-            *byte ^= k;
+        // Simple XOR decryption (same as encryption)
+        for i in 0..self.data_len {
+            self.data[i] ^= key[i % key.len()];
         }
 
         self.is_encrypted.store(false, Ordering::SeqCst);
@@ -409,24 +396,9 @@ mod tests {
         let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
         let id = keyring.add_secret(Box::new(secret)).unwrap();
         assert_eq!(id, 1);
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    #[test]
-    fn test_simple_keyring() {
-        let cap = KeyringCapability::full();
-        let mut keyring = SimpleKeyring::new(cap);
-        let secret_cap = SecretCapability::full();
-        let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.store_secret(Box::new(secret)).unwrap();
-        assert_eq!(id, 1);
 
         let retrieved = keyring.get_secret(1).unwrap();
         assert_eq!(retrieved.name(), b"TestSecret");
     }
 }
+

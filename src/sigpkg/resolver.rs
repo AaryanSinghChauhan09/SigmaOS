@@ -1,8 +1,7 @@
-// SPDX-License-Identifier: MIT
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
-// Enhanced with high-performance Debian APT-style pinning and repository priority weighting
 
+use crate::sigpkg::{Package, Version, VersionConstraint};
 use std::collections::{HashMap, HashSet};
 
 /// Debian-style APT Pinning Rule representing release and priority weighting
@@ -25,18 +24,18 @@ impl AptPinRule {
 
 /// SAT Solver for dependency resolution
 pub struct SatSolver {
-    pub packages: HashMap<String, Vec<Package>>,
-    pub pin_rules: Vec<AptPinRule>,
+    packages: HashMap<String, Vec<Package>>,
 }
 
 impl SatSolver {
+    /// Create new SAT solver
     pub fn new() -> Self {
         Self {
             packages: HashMap::new(),
-            pin_rules: Vec::new(),
         }
     }
 
+    /// Add package to solver
     pub fn add_package(&mut self, package: Package) {
         self.packages
             .entry(package.name.clone())
@@ -44,50 +43,7 @@ impl SatSolver {
             .push(package);
     }
 
-    pub fn add_pin_rule(&mut self, rule: AptPinRule) {
-        self.pin_rules.push(rule);
-    }
-
-    pub fn select_best_pinned_package(&self, candidate_packages: &[Package]) -> Option<Package> {
-        if candidate_packages.is_empty() {
-            return None;
-        }
-
-        let mut best_candidate: Option<Package> = None;
-        let mut best_priority = i16::MIN;
-
-        for package in candidate_packages {
-            let mut priority: i16 = 500;
-            for rule in &self.pin_rules {
-                if rule.package_name == package.name || rule.package_name_pattern == "*" || rule.package_name_pattern == package.name {
-                    if package.mirrors.iter().any(|m| m.contains(&rule.origin) || m.contains(&rule.release_target)) {
-                        priority = rule.pin_priority;
-                    }
-                }
-            }
-
-            if priority < 0 {
-                continue;
-            }
-
-            if let Some(ref current_best) = best_candidate {
-                if priority > best_priority {
-                    best_candidate = Some(package.clone());
-                    best_priority = priority;
-                } else if priority == best_priority {
-                    if package.version > current_best.version {
-                        best_candidate = Some(package.clone());
-                    }
-                }
-            } else {
-                best_candidate = Some(package.clone());
-                best_priority = priority;
-            }
-        }
-
-        best_candidate
-    }
-
+    /// Resolve dependencies for target package
     pub fn resolve(
         &self,
         package_name: &str,
@@ -101,7 +57,7 @@ impl SatSolver {
         Ok(result)
     }
 
-    /// Recursive dependency resolution (highly optimized utilizing APT pinning weights)
+    /// Recursive dependency resolution
     fn resolve_recursive(
         &self,
         package_name: &str,
@@ -110,31 +66,24 @@ impl SatSolver {
         visited: &mut HashSet<String>,
     ) -> Result<(), ResolveError> {
         if visited.contains(package_name) {
-            return Ok(());
+            return Ok(()); // Already processed
         }
         visited.insert(package_name.to_string());
 
+        // Find matching package
         let packages = self
             .packages
             .get(package_name)
-            .ok_or_else(|| ResolveError::PackageNotFound(package_name.to_string()))?;
+            .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
 
-        let valid_candidates: Vec<Package> = packages
+        let matching_package = packages
             .iter()
-            .filter(|p| self.satisfies_constraint(&p.version, version_constraint))
-            .cloned()
-            .collect();
-
-        if valid_candidates.is_empty() {
-            return Err(ResolveError::NoMatchingVersion(package_name.to_string()));
-        }
-
-        let matching_package = self
-            .select_best_pinned_package(&valid_candidates)
-            .ok_or_else(|| ResolveError::NoMatchingVersion(package_name.to_string()))?;
+            .find(|p| self.satisfies_constraint(&p.version, version_constraint))
+            .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))?;
 
         result.push(matching_package.clone());
 
+        // Resolve dependencies
         for dep in &matching_package.dependencies {
             self.resolve_recursive(&dep.name, &dep.version_constraint, result, visited)?;
         }
@@ -142,6 +91,7 @@ impl SatSolver {
         Ok(())
     }
 
+    /// Check if version satisfies constraint
     fn satisfies_constraint(&self, version: &Version, constraint: &VersionConstraint) -> bool {
         match constraint {
             VersionConstraint::Exact(v) => version == v,
@@ -234,40 +184,7 @@ impl Default for SatSolver {
     }
 }
 
-/// Represents a Debian-compatible package targeting elementaryOS Pantheon desktop
-#[derive(Debug, Clone)]
-pub struct DebianElementaryAppPackage {
-    pub app_id: String,
-    pub format: String,
-    pub adopts_csd_guideline: bool,
-    pub supports_dark_mode: bool,
-}
-
-impl DebianElementaryAppPackage {
-    pub fn new(app_id: &str, adopts_csd: bool, supports_dark: bool) -> Self {
-        Self {
-            app_id: app_id.to_string(),
-            format: "deb".to_string(),
-            adopts_csd_guideline: adopts_csd,
-            supports_dark_mode: supports_dark,
-        }
-    }
-
-    pub fn is_elementary_compliant(&self) -> bool {
-        let parts: Vec<&str> = self.app_id.split('.').collect();
-        if parts.len() < 3 {
-            return false;
-        }
-        if parts[0] != "io" && parts[0] != "com" && parts[0] != "org" {
-            return false;
-        }
-        if !self.adopts_csd_guideline || !self.supports_dark_mode {
-            return false;
-        }
-        true
-    }
-}
-
+/// Resolution errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResolveError {
     PackageNotFound(String),
@@ -280,52 +197,6 @@ pub enum ResolveError {
 mod tests {
     use super::*;
     use crate::sigpkg::Dependency;
-
-    #[test]
-    fn test_debian_elementary_app_package_validator() {
-        let solver = SatSolver::new();
-
-        // 1. Fully compliant package
-        let compliant_app = DebianElementaryAppPackage {
-            app_id: "io.elementary.calculator".to_string(),
-            format: "deb".to_string(),
-            adopts_csd_guideline: true,
-            supports_dark_mode: true,
-        };
-        assert!(solver.is_debian_elementary_package_compliant(&compliant_app).is_ok());
-
-        // 2. Non-compliant: invalid App ID format
-        let mut app = compliant_app.clone();
-        app.app_id = "calculator".to_string();
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)"
-        );
-
-        // 3. Non-compliant: invalid TLD prefix
-        let mut app = compliant_app.clone();
-        app.app_id = "net.elementary.calculator".to_string();
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: Invalid app ID top-level domain prefix"
-        );
-
-        // 4. Non-compliant: missing CSD compliance
-        let mut app = compliant_app.clone();
-        app.adopts_csd_guideline = false;
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules"
-        );
-
-        // 5. Non-compliant: missing dark mode compliance
-        let mut app = compliant_app.clone();
-        app.supports_dark_mode = false;
-        assert_eq!(
-            solver.is_debian_elementary_package_compliant(&app).unwrap_err(),
-            "elementaryOS Package Violation: App must support toggleable pure-black dark mode"
-        );
-    }
 
     #[test]
     fn test_sat_solver_creation() {
@@ -362,22 +233,12 @@ mod tests {
     fn test_circular_dependency_detection() {
         let mut solver = SatSolver::new();
 
+        // Create circular dependency: A -> B -> A
         let pkg_a = Package::new(
             "A".to_string(),
             Version::new(1, 0, 0),
             String::new(),
             vec![Dependency {
-        // Create circular dependency: A -> B -> A
-        let pkg_a = Package {
-            name: "A".to_string(),
-            version: Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: vec![Dependency {
-        let pkg_a = Package {
-            name: "A".to_string(),
-            version: Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: vec![Dependency {
                 name: "B".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
@@ -399,52 +260,5 @@ mod tests {
         solver.add_package(pkg_b);
 
         assert!(solver.detect_circular("A"));
-    }
-
-    #[test]
-    fn test_debian_apt_pinning() {
-        let mut solver = SatSolver::new();
-
-        let mut pkg_unstable = Package::new(
-            "bash".to_string(),
-            Version::new(2, 0, 0),
-            String::new(),
-            Vec::new(),
-            String::new(),
-        );
-        pkg_unstable.mirrors.push("http://debian.org/experimental".to_string());
-
-        let mut pkg_stable = Package::new(
-            "bash".to_string(),
-            Version::new(1, 0, 0),
-            String::new(),
-            Vec::new(),
-            String::new(),
-        );
-        pkg_stable.mirrors.push("http://debian.org/stable".to_string());
-
-        solver.add_package(pkg_unstable);
-        solver.add_package(pkg_stable);
-
-        solver.add_pin_rule(AptPinRule {
-            package_name_pattern: "bash".to_string(),
-            package_name: "bash".to_string(),
-            release_target: "stable".to_string(),
-            origin: "/stable".to_string(),
-            priority: 990,
-            pin_priority: 990,
-        });
-        solver.add_pin_rule(AptPinRule {
-            package_name_pattern: "bash".to_string(),
-            package_name: "bash".to_string(),
-            release_target: "experimental".to_string(),
-            origin: "/experimental".to_string(),
-            priority: 100,
-            pin_priority: 100,
-        });
-
-        let resolved = solver.resolve("bash", &VersionConstraint::Any).unwrap();
-        assert_eq!(resolved.len(), 1);
-        assert_eq!(resolved[0].version, Version::new(1, 0, 0));
     }
 }

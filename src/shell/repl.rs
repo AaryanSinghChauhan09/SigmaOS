@@ -3,14 +3,6 @@
 
 use std::io::{self, BufRead, Write};
 
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -66,154 +58,11 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
+    Alias {
+        shorthand: String,
+        statement: String,
+    },
     Unknown(String),
-}
-
-/// Shell REPL
-// ============================================================================
-// API Hooking Manager (Linux / BSD Syscall & User-Mode API Interception)
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HookType {
-    InlineJmp,
-    ImportTable,
-    Trampoline,
-}
-
-#[derive(Debug, Clone)]
-pub struct ApiHook {
-    pub target_api: String,
-    pub hook_type: HookType,
-    pub detoured_address: u64,
-    pub original_bytes: Vec<u8>,
-    pub is_enabled: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct ApiHookManager {
-    pub hooks: std::collections::HashMap<String, ApiHook>,
-}
-
-impl ApiHookManager {
-    pub fn new() -> Self {
-        Self {
-            hooks: std::collections::HashMap::new(),
-        }
-    }
-
-    pub fn install_hook(&mut self, api_name: &str, hook_type: HookType, detour_addr: u64) -> Result<(), String> {
-        let hook = ApiHook {
-            target_api: api_name.to_string(),
-            hook_type,
-            detoured_address: detour_addr,
-            original_bytes: vec![0xE9, 0x00, 0x00, 0x00, 0x00], // Mock 5-byte JMP
-            is_enabled: true,
-        };
-        self.hooks.insert(api_name.to_string(), hook);
-        Ok(())
-    }
-
-    pub fn is_hooked(&self, api_name: &str) -> bool {
-        self.hooks.get(api_name).map_or(false, |h| h.is_enabled)
-    }
-}
-
-// ============================================================================
-// Script Alias Engine (Automatic, Fixed Name, User Named & Background & Ops)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct ScriptAliasEngine {
-    pub automatic_aliases: std::collections::HashMap<String, String>,
-    pub fixed_aliases: std::collections::HashMap<String, String>,
-    pub user_aliases: std::collections::HashMap<String, String>,
-}
-
-impl ScriptAliasEngine {
-    pub fn new() -> Self {
-        let mut auto_map = std::collections::HashMap::new();
-        auto_map.insert("ll".to_string(), "ls -la".to_string());
-        auto_map.insert("la".to_string(), "ls -a".to_string());
-        auto_map.insert("md".to_string(), "mkdir".to_string());
-
-        let mut fixed_map = std::collections::HashMap::new();
-        fixed_map.insert("@call".to_string(), "script_exec".to_string());
-
-        Self {
-            automatic_aliases: auto_map,
-            fixed_aliases: fixed_map,
-            user_aliases: std::collections::HashMap::new(),
-        }
-    }
-
-    pub fn register_user_alias(&mut self, alias_name: &str, expansion: &str) {
-        self.user_aliases.insert(alias_name.to_string(), expansion.to_string());
-    }
-
-    pub fn resolve_alias(&self, input: &str) -> (String, bool) {
-        let trimmed = input.trim();
-        let is_background = trimmed.ends_with('&');
-        let clean_input = if is_background {
-            trimmed[..trimmed.len() - 1].trim()
-        } else {
-            trimmed
-        };
-
-        let mut parts = clean_input.split_whitespace();
-        if let Some(cmd) = parts.next() {
-            let rest = parts.collect::<Vec<&str>>().join(" ");
-
-            // 1. Check fixed aliases (@call)
-            if let Some(fixed_cmd) = self.fixed_aliases.get(cmd) {
-                let resolved = if rest.is_empty() {
-                    fixed_cmd.clone()
-                } else {
-                    format!("{} {}", fixed_cmd, rest)
-                };
-                return (resolved, is_background);
-            }
-
-            // 2. Check user aliases
-            if let Some(user_cmd) = self.user_aliases.get(cmd) {
-                let resolved = if rest.is_empty() {
-                    user_cmd.clone()
-                } else {
-                    format!("{} {}", user_cmd, rest)
-                };
-                return (resolved, is_background);
-            }
-
-            // 3. Check automatic aliases
-            if let Some(auto_cmd) = self.automatic_aliases.get(cmd) {
-                let resolved = if rest.is_empty() {
-                    auto_cmd.clone()
-                } else {
-                    format!("{} {}", auto_cmd, rest)
-                };
-                return (resolved, is_background);
-            }
-        }
-
-        (clean_input.to_string(), is_background)
-    }
-
-    pub fn execute_script_file(&self, file_path: &str) -> Result<Vec<String>, String> {
-        if file_path.is_empty() {
-            return Err("Script file path is empty".to_string());
-        }
-        // Mock execution of .sig or script file commands
-        Ok(vec![
-            format!("Loaded script file: {}", file_path),
-            "echo Script execution completed successfully.".to_string(),
-        ])
-    }
-}
-
-impl Default for ScriptAliasEngine {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// Shell REPL
@@ -230,8 +79,7 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
-    pub alias_engine: ScriptAliasEngine,
-    pub hook_manager: ApiHookManager,
+    pub command_history: Vec<String>,
 }
 
 impl ShellRepl {
@@ -254,8 +102,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            alias_engine: ScriptAliasEngine::new(),
-            hook_manager: ApiHookManager::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -269,7 +116,7 @@ impl ShellRepl {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt,
+            prompt: "ubuntu@sigmaos:~$ ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
@@ -278,6 +125,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -304,8 +152,52 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
+    pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
+        let mut suggestions = Vec::new();
+        let commands = [
+            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
+            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+        ];
+        for cmd in &commands {
+            if cmd.starts_with(prefix) {
+                suggestions.push(cmd.to_string());
+            }
+        }
+        suggestions
+    }
+
+    pub fn history_suggest_fish(&self, partial: &str) -> Option<String> {
+        if partial.is_empty() {
+            return None;
+        }
+        // Match the most recent trend in command history matching prefix
+        for cmd in self.command_history.iter().rev() {
+            if cmd.starts_with(partial) {
+                return Some(cmd.clone());
+            }
+        }
+        None
+    }
+
     fn execute_line(&mut self, line: &str) {
-        let command = self.parse_command(line);
+        // Save command history (Fish style)
+        self.command_history.push(line.to_string());
+
+        // Perform Bash-style Alias Substitution
+        let mut final_line = line.to_string();
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if !parts.is_empty() {
+            if let Some(aliased) = self.aliases.get(parts[0]) {
+                let mut statement = aliased.clone();
+                if parts.len() > 1 {
+                    statement.push(' ');
+                    statement.push_str(&parts[1..].join(" "));
+                }
+                final_line = statement;
+            }
+        }
+
+        let command = self.parse_command(&final_line);
         let result = self.execute_command(command);
 
         match result {
@@ -396,6 +288,16 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Get {
                         variable: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "alias" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Alias {
+                        shorthand: parts[1].to_string(),
+                        statement: parts[2..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -573,6 +475,10 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
+            ShellCommand::Alias { shorthand, statement } => {
+                self.aliases.insert(shorthand.clone(), statement.clone());
+                Ok(format!("Alias defined: {} -> {}", shorthand, statement))
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -617,6 +523,43 @@ mod tests {
         };
         let result = repl.execute_command(command);
         assert_eq!(result.unwrap(), "test");
+    }
+
+    #[test]
+    fn test_bash_alias_substitution() {
+        let mut repl = ShellRepl::new();
+        let alias_cmd = ShellCommand::Alias {
+            shorthand: "ll".to_string(),
+            statement: "ls -la".to_string(),
+        };
+        repl.execute_command(alias_cmd).unwrap();
+        assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
+
+        // Execute line with alias substitution
+        repl.execute_line("ll");
+        assert_eq!(repl.command_history[0], "ll");
+    }
+
+    #[test]
+    fn test_zsh_tab_completion() {
+        let repl = ShellRepl::new();
+        let suggestions = repl.complete_tab("cl");
+        assert_eq!(suggestions, vec!["clear".to_string()]);
+
+        let suggestions_all = repl.complete_tab("pwd");
+        assert_eq!(suggestions_all, vec!["pwd".to_string()]);
+    }
+
+    #[test]
+    fn test_fish_history_suggestions() {
+        let mut repl = ShellRepl::new();
+        repl.execute_line("clear");
+        repl.execute_line("systemctl list");
+
+        let suggestion = repl.history_suggest_fish("sys").unwrap();
+        assert_eq!(suggestion, "systemctl list");
+
+        assert!(repl.history_suggest_fish("invalid").is_none());
     }
 
     #[test]
@@ -770,39 +713,6 @@ mod tests {
         assert!(matches!(cmd, ShellCommand::Mkdir { .. }));
         let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Created directory: testdir");
-    }
-
-    #[test]
-    fn test_api_hook_trampoline() {
-        let mut mgr = ApiHookManager::new();
-        assert!(!mgr.is_hooked("sys_read"));
-
-        mgr.install_hook("sys_read", HookType::Trampoline, 0x7FFF0010).unwrap();
-        assert!(mgr.is_hooked("sys_read"));
-    }
-
-    #[test]
-    fn test_script_alias_and_ampersand_operations() {
-        let mut engine = ScriptAliasEngine::new();
-        engine.register_user_alias("cls", "clear");
-
-        // Test automatic alias with background &
-        let (resolved, is_bg) = engine.resolve_alias("ll &");
-        assert_eq!(resolved, "ls -la");
-        assert!(is_bg);
-
-        // Test user alias
-        let (resolved_cls, is_bg_cls) = engine.resolve_alias("cls");
-        assert_eq!(resolved_cls, "clear");
-        assert!(!is_bg_cls);
-
-        // Test fixed alias @call
-        let (resolved_call, _) = engine.resolve_alias("@call setup.sig");
-        assert_eq!(resolved_call, "script_exec setup.sig");
-
-        // Test script file execution
-        let res = engine.execute_script_file("setup.sig").unwrap();
-        assert_eq!(res.len(), 2);
     }
 
     #[test]

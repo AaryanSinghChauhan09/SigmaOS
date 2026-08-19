@@ -1,8 +1,8 @@
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use std::collections::HashMap;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Recovery event type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,20 +33,22 @@ pub enum RecoveryAction {
 pub struct SystemSnapshot {
     pub id: String,
     pub timestamp: u64,
-    pub system_state: BTreeMap<String, String>,
-    pub configuration: BTreeMap<String, String>,
+    pub system_state: HashMap<String, String>,
+    pub configuration: HashMap<String, String>,
     pub description: String,
 }
 
 impl SystemSnapshot {
     pub fn new(description: String) -> Self {
-        // Simple timestamp counter (in real implementation, use hardware timer)
-        let timestamp_nanos = 0u128; // Placeholder for actual timer
+        let timestamp_nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
         Self {
-            id: alloc::format!("snap-{}", timestamp_nanos),
+            id: format!("snap-{}", timestamp_nanos),
             timestamp: (timestamp_nanos / 1_000_000_000) as u64,
-            system_state: BTreeMap::new(),
-            configuration: BTreeMap::new(),
+            system_state: HashMap::new(),
+            configuration: HashMap::new(),
             description,
         }
     }
@@ -96,7 +98,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        context: &BTreeMap<String, String>,
+        context: &HashMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;
@@ -191,12 +193,6 @@ impl SelfHealingModule {
         let snapshot = self
             .get_snapshot(id)
             .ok_or(ResilienceError::SnapshotNotFound)?;
-        if !self.snapshots.iter().any(|s| s.id == id) {
-            return Err(ResilienceError::SnapshotNotFound);
-        }
-
-        let snapshot = self.get_snapshot(id).unwrap();
-        let snapshot = self.get_snapshot(id).ok_or(ResilienceError::SnapshotNotFound)?;
         println!("Rolling back to snapshot: {}", snapshot.description);
 
         // Simulate rollback
@@ -206,7 +202,7 @@ impl SelfHealingModule {
     pub fn handle_event(
         &mut self,
         event_type: RecoveryEventType,
-        context: BTreeMap<String, String>,
+        context: HashMap<String, String>,
     ) -> Vec<RecoveryAction> {
         // Log the event
         self.event_log.push((
@@ -300,131 +296,6 @@ impl SelfHealingModule {
 
     pub fn get_event_log(&self) -> &[(RecoveryEventType, u64)] {
         &self.event_log
-    }
-}
-
-/// Represents a registered shard's heartbeat state
-#[derive(Debug, Clone)]
-pub struct ShardHeartbeat {
-    pub shard_name: String,
-    pub last_heartbeat_timestamp: u64,
-    pub max_allowed_latency_secs: u64,
-}
-
-/// Double Fault Guard & Cascade Protection
-/// Tracks sequential recovery failures within small observation windows
-#[derive(Debug, Clone)]
-pub struct DoubleFaultGuard {
-    pub recovery_timestamps: Vec<u64>,
-    pub max_allowed_failures: u32,
-    pub observation_window_secs: u64,
-    pub is_isolated: bool,
-}
-
-impl DoubleFaultGuard {
-    pub fn new(max_failures: u32, window_secs: u64) -> Self {
-        Self {
-            recovery_timestamps: Vec::new(),
-            max_allowed_failures: max_failures,
-            observation_window_secs: window_secs,
-            is_isolated: false,
-        }
-    }
-
-    /// Records a recovery attempt. Returns an Error if cascading failure threshold is breached.
-    pub fn record_attempt(&mut self, timestamp: u64) -> Result<(), &'static str> {
-        if self.is_isolated {
-            return Err("Double Fault Guard Active: Shard is isolated. Restart blocked to prevent cascading crash loops.");
-        }
-
-        self.recovery_timestamps.push(timestamp);
-
-        // Remove timestamps older than the observation window
-        let window_start = timestamp.saturating_sub(self.observation_window_secs);
-        self.recovery_timestamps.retain(|&t| t >= window_start);
-
-        if self.recovery_timestamps.len() > self.max_allowed_failures as usize {
-            self.is_isolated = true;
-            return Err("Double Fault Guard Triggered: Cascading failures detected! Shard isolated to protect microkernel stability.");
-        }
-
-        Ok(())
-    }
-}
-
-/// Highly robust System Stability and Fault Tolerance Monitor
-pub struct SystemStabilityMonitor {
-    pub heartbeats: BTreeMap<String, ShardHeartbeat>,
-    pub fault_guards: BTreeMap<String, DoubleFaultGuard>,
-    pub system_health_score: u32, // 0 to 100
-    pub is_degraded_safety_mode: bool,
-}
-
-impl SystemStabilityMonitor {
-    pub fn new() -> Self {
-        Self {
-            heartbeats: BTreeMap::new(),
-            fault_guards: BTreeMap::new(),
-            system_health_score: 100,
-            is_degraded_safety_mode: false,
-        }
-    }
-
-    pub fn register_shard(&mut self, shard_name: &str, max_latency_secs: u64) {
-        let heartbeat = ShardHeartbeat {
-            shard_name: shard_name.to_string(),
-            last_heartbeat_timestamp: 0,
-            max_allowed_latency_secs: max_latency_secs,
-        };
-        self.heartbeats.insert(shard_name.to_string(), heartbeat);
-        // Default guard rule: max 3 crashes within 10 seconds before isolating
-        self.fault_guards.insert(shard_name.to_string(), DoubleFaultGuard::new(3, 10));
-    }
-
-    pub fn send_heartbeat(&mut self, shard_name: &str, timestamp: u64) -> Result<(), &'static str> {
-        let heartbeat = self.heartbeats.get_mut(shard_name).ok_or("Shard not registered")?;
-        heartbeat.last_heartbeat_timestamp = timestamp;
-        Ok(())
-    }
-
-    /// Checks the health of all registered shards. Returns lists of dead/unresponsive shard names.
-    pub fn check_shards_health(&mut self, current_time_secs: u64) -> Vec<String> {
-        let mut dead_shards = Vec::new();
-        for heartbeat in self.heartbeats.values() {
-            // Heartbeat of 0 represents never booted yet
-            if heartbeat.last_heartbeat_timestamp == 0 {
-                continue;
-            }
-            let latency = current_time_secs.saturating_sub(heartbeat.last_heartbeat_timestamp);
-            if latency > heartbeat.max_allowed_latency_secs {
-                dead_shards.push(heartbeat.shard_name.clone());
-            }
-        }
-
-        // Deduct 15 points of health for each unresponsive dead shard
-        let total_deductions = (dead_shards.len() as u32) * 15;
-        self.system_health_score = 100u32.saturating_sub(total_deductions);
-
-        // Degraded safety mode triggers automatically if health falls below 50%
-        if self.system_health_score < 50 {
-            self.is_degraded_safety_mode = true;
-        } else {
-            self.is_degraded_safety_mode = false;
-        }
-
-        dead_shards
-    }
-
-    /// Tracks recovery crashes. Prevents endless restart cascades.
-    pub fn record_recovery_attempt(&mut self, shard_name: &str, timestamp: u64) -> Result<(), &'static str> {
-        let guard = self.fault_guards.get_mut(shard_name).ok_or("Fault guard not registered for shard")?;
-        guard.record_attempt(timestamp)
-    }
-}
-
-impl Default for SystemStabilityMonitor {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -560,97 +431,6 @@ impl Default for SystemStabilityMonitor {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct ShardHeartbeat {
-    pub shard_name: String,
-    pub last_heartbeat_timestamp: u64,
-    pub latency_ms: u32,
-    pub is_responsive: bool,
-}
-
-pub struct DoubleFaultGuard {
-    pub consecutive_failures: u32,
-    pub max_allowed_failures: u32,
-    pub safety_mode_activated: bool,
-}
-
-impl DoubleFaultGuard {
-    pub fn new(max_allowed_failures: u32) -> Self {
-        Self {
-            consecutive_failures: 0,
-            max_allowed_failures,
-            safety_mode_activated: false,
-        }
-    }
-
-    pub fn record_failure(&mut self) -> bool {
-        self.consecutive_failures += 1;
-        if self.consecutive_failures >= self.max_allowed_failures {
-            self.safety_mode_activated = true;
-        }
-        self.safety_mode_activated
-    }
-
-    pub fn record_success(&mut self) {
-        self.consecutive_failures = 0;
-        self.safety_mode_activated = false;
-    }
-}
-
-pub struct SystemStabilityMonitor {
-    pub shards: HashMap<String, ShardHeartbeat>,
-    pub fault_guard: DoubleFaultGuard,
-}
-
-impl SystemStabilityMonitor {
-    pub fn new() -> Self {
-        Self {
-            shards: HashMap::new(),
-            fault_guard: DoubleFaultGuard::new(2), // Max 2 consecutive failures triggers safety-mode
-        }
-    }
-
-    pub fn report_heartbeat(&mut self, shard_name: String, timestamp: u64, latency_ms: u32) {
-        let is_responsive = latency_ms < 500; // Unresponsive if latency >= 500ms
-        let shard = ShardHeartbeat {
-            shard_name: shard_name.clone(),
-            last_heartbeat_timestamp: timestamp,
-            latency_ms,
-            is_responsive,
-        };
-        self.shards.insert(shard_name, shard);
-    }
-
-    pub fn check_overall_health(&mut self) -> u32 {
-        let mut responsive_count = 0;
-        let total_count = self.shards.len();
-        if total_count == 0 {
-            return 100;
-        }
-
-        for shard in self.shards.values() {
-            if shard.is_responsive {
-                responsive_count += 1;
-            }
-        }
-
-        let health_percent = (responsive_count * 100) / total_count;
-        if health_percent < 50 {
-            self.fault_guard.record_failure();
-        } else {
-            self.fault_guard.record_success();
-        }
-
-        health_percent as u32
-    }
-}
-
-impl Default for SystemStabilityMonitor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Resilience errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResilienceError {
@@ -659,7 +439,6 @@ pub enum ResilienceError {
     InvalidRule,
     RecoveryFailed,
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -683,7 +462,7 @@ mod tests {
     #[test]
     fn test_event_handling() {
         let mut module = SelfHealingModule::new();
-        let actions = module.handle_event(RecoveryEventType::ProcessCrash, BTreeMap::new());
+        let actions = module.handle_event(RecoveryEventType::ProcessCrash, HashMap::new());
         assert!(!actions.is_empty());
     }
 
@@ -759,40 +538,5 @@ mod tests {
         let status_after_clear = monitor.trigger_recovery_for_fault("filesystem_corrupt");
         assert_eq!(status_after_clear, "ATTEMPTING_RECOVERY");
         assert!(!monitor.in_safe_mode);
-    }
-
-    #[test]
-    fn test_double_fault_guard_and_heartbeats() {
-        let mut monitor = SystemStabilityMonitor::new();
-        assert_eq!(monitor.check_overall_health(), 100);
-
-        // Report normal heartbeats
-        monitor.report_heartbeat("network_shard".to_string(), 1718900000, 50);
-        monitor.report_heartbeat("audio_shard".to_string(), 1718900000, 120);
-        assert_eq!(monitor.check_overall_health(), 100);
-        assert!(!monitor.fault_guard.safety_mode_activated);
-
-        // Report high latency (unresponsive) on one shard
-        monitor.report_heartbeat("audio_shard".to_string(), 1718900100, 600); // unresponsive
-        assert_eq!(monitor.check_overall_health(), 50); // 50% responsive
-        assert!(!monitor.fault_guard.safety_mode_activated);
-
-        // Report unresponsive on both shards -> health falls below 50%
-        monitor.report_heartbeat("network_shard".to_string(), 1718900100, 750); // unresponsive
-        assert_eq!(monitor.check_overall_health(), 0); // 0% responsive, triggers first failure
-        assert_eq!(monitor.fault_guard.consecutive_failures, 1);
-        assert!(!monitor.fault_guard.safety_mode_activated);
-
-        // Second check with 0% responsive triggers second failure -> activates safety-mode
-        assert_eq!(monitor.check_overall_health(), 0);
-        assert_eq!(monitor.fault_guard.consecutive_failures, 2);
-        assert!(monitor.fault_guard.safety_mode_activated); // Safety mode successfully locked!
-
-        // Back to normal responsive state clears failure counters
-        monitor.report_heartbeat("network_shard".to_string(), 1718900200, 50);
-        monitor.report_heartbeat("audio_shard".to_string(), 1718900200, 50);
-        assert_eq!(monitor.check_overall_health(), 100);
-        assert_eq!(monitor.fault_guard.consecutive_failures, 0);
-        assert!(!monitor.fault_guard.safety_mode_activated);
     }
 }

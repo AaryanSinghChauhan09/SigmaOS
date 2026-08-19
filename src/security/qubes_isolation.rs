@@ -187,8 +187,6 @@ impl TemplateVmManager {
         if self.app_vm_count > 0 {
             self.app_vm_count -= 1;
             self.active_overlays_allocated_bytes = self.active_overlays_allocated_bytes.saturating_sub(128 * 1024 * 1024);
-            parent_id: None,
-            page_table_base: 0x1000 * id as u64, // Isolated hardware page offset
         }
     }
 }
@@ -545,7 +543,7 @@ mod tests {
     fn test_qubes_disposable_domain_cleanup() {
         let mut orchestrator = DomainOrchestrator::new();
 
-        let _app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
+        let app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
         let disp_id = orchestrator.spawn_domain(b"disp-browser", DomainType::Disposable, CapabilityToken::from_bits(0x00)).unwrap();
 
         assert_eq!(orchestrator.active_domains_count(), 2);

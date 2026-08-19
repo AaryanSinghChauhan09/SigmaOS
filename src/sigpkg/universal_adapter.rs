@@ -1050,6 +1050,36 @@ mod tests {
         assert_eq!(pkg.version.major, 6);
         assert_eq!(pkg.dependencies.len(), 2);
     }
+
+    #[test]
+    fn test_apk_adapter_parsing() {
+        let adapter = ApkAdapter::new();
+        let apk_data = b"P:test-apk\nV:4.2.0\nT:Alpine test\nD:musl openssl";
+        let pkg = adapter.parse_package(apk_data).unwrap();
+        assert_eq!(pkg.name, "test-apk");
+        assert_eq!(pkg.version.major, 4);
+        assert_eq!(pkg.dependencies.len(), 2);
+    }
+
+    #[test]
+    fn test_nix_adapter_parsing() {
+        let adapter = NixAdapter::new();
+        let nix_data = b"pname = \"test-nix\";\nversion = \"5.1.0\";\ndescription = \"Nix test\";\nbuildInputs = [ glibc ];";
+        let pkg = adapter.parse_package(nix_data).unwrap();
+        assert_eq!(pkg.name, "test-nix");
+        assert_eq!(pkg.version.major, 5);
+        assert_eq!(pkg.dependencies.len(), 1);
+    }
+
+    #[test]
+    fn test_ebuild_adapter_parsing() {
+        let adapter = EbuildAdapter::new();
+        let ebuild_data = b"PN=\"test-ebuild\"\nPV=\"6.2.3\"\nDESCRIPTION=\"Gentoo test\"\nDEPEND=\"gcc clang\"";
+        let pkg = adapter.parse_package(ebuild_data).unwrap();
+        assert_eq!(pkg.name, "test-ebuild");
+        assert_eq!(pkg.version.major, 6);
+        assert_eq!(pkg.dependencies.len(), 2);
+    }
     
     #[test]
     fn test_universal_manager_auto_parse() {

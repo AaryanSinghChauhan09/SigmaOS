@@ -1,73 +1,4 @@
-#[cfg(not(test))]
-
-#[cfg(test)]
-pub struct DdeDeviceWrapper {
-    pub simulated_pci_bar: [u8; 256],
-}
-#[cfg(test)]
-impl DdeDeviceWrapper {
-    pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
-        Self {
-            simulated_pci_bar: [0; 256],
-        }
-    }
-}
-
-
-#[derive(Debug, Clone, Default)]
-pub struct ProtectedModeSwitchSimulator {
-    pub gdt_loaded: bool,
-    pub cr0_pe_bit: bool,
-    pub active_cs_segment: u16,
-    pub active_ds_segment: u16,
-}
-impl ProtectedModeSwitchSimulator {
-    pub fn new() -> Self { Self::default() }
-    pub fn lgdt(&mut self) { self.gdt_loaded = true; }
-    pub fn execute_switch_to_pm(&mut self) -> Result<(), &'static str> {
-        if !self.gdt_loaded { return Err("GDT not loaded"); }
-        self.cr0_pe_bit = true;
-        self.active_cs_segment = 0x08;
-        self.active_ds_segment = 0x10;
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct VgaTextModeDriverSimulator {
-    pub buffer: [u16; 2000],
-    pub cursor_offset: usize,
-}
-impl VgaTextModeDriverSimulator {
-    pub fn new() -> Self { Self { buffer: [0; 2000], cursor_offset: 0 } }
-    pub fn write_char(&mut self, ch: char, attr: u8) {
-        if self.cursor_offset < 2000 {
-            self.buffer[self.cursor_offset] = (ch as u16) | ((attr as u16) << 8);
-            self.cursor_offset += 1;
-        }
-    }
-    pub fn update_cursor_via_ports(&mut self, port: u16, val: usize) -> Result<usize, &'static str> {
-        if port == 0x3D5 { self.cursor_offset = val; }
-        Ok(self.cursor_offset)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PicKeyboardController {
-    pub master_pic_mask: u8,
-}
-impl PicKeyboardController {
-    pub fn new() -> Self { Self { master_pic_mask: 0xFF } }
-    pub fn init_pic(&mut self) { self.master_pic_mask = 0xFD; }
-    pub fn poll_port_60_read(&self, scancode: u8) -> char {
-        match scancode {
-            0x10 => 'q',
-            0x1F => 's',
-            _ => '?',
-        }
-    }
-}
-
+use crate::driver::device::DdeDeviceWrapper;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
@@ -273,15 +204,14 @@ impl VintageVirtualizationSandbox {
 /// Vintage Linux Driver Shim Translator
 pub struct VintageDriverTranslator {
     pub era: LinuxEra,
-    // TODO: Replace with actual driver wrapper when available
-    pub wrapper: core::marker::PhantomData<()>,
+    pub wrapper: DdeDeviceWrapper,
 }
 
 impl VintageDriverTranslator {
-    pub fn new(era: LinuxEra, _device_name: &str) -> Self {
+    pub fn new(era: LinuxEra, device_name: &str) -> Self {
         VintageDriverTranslator {
             era,
-            wrapper: core::marker::PhantomData,
+            wrapper: DdeDeviceWrapper::new(1001, device_name.as_bytes(), 0x3F8, b"Linux"),
         }
     }
 
@@ -289,7 +219,7 @@ impl VintageDriverTranslator {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
             let idx = (port % 256) as usize;
-            self.wrapper.simulated_pci_bar[idx] = val as u32;
+            self.wrapper.simulated_pci_bar[idx] = val;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)
@@ -318,6 +248,37 @@ pub enum HistoricError {
     MemoryAccessViolation,
     InvalidIoPortAccess,
     UnsupportedPackageFormat,
+    LfsBuildFailure,
+}
+
+/// Simulated LFS Stage 1 and 2 Toolchain builder
+pub struct LfsToolchainBuilder {
+    pub current_stage: u8,
+}
+
+impl LfsToolchainBuilder {
+    pub fn new() -> Self {
+        Self { current_stage: 1 }
+    }
+
+    pub fn execute_bootstrap_stage(&mut self, stage: u8) -> Result<&'static str, HistoricError> {
+        if stage > 3 {
+            return Err(HistoricError::LfsBuildFailure);
+        }
+        self.current_stage = stage;
+        match stage {
+            1 => Ok("LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"),
+            2 => Ok("LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"),
+            3 => Ok("LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"),
+            _ => Err(HistoricError::LfsBuildFailure),
+        }
+    }
+}
+
+impl Default for LfsToolchainBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// TinyCore-style RAM-only Ephemeral Execution Engine.
@@ -346,7 +307,7 @@ impl TinyCoreEphemeralEngine {
         Ok(())
     }
 
-    pub fn write_to_volatile_overlay(&mut self, _file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
+    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
         if self.persistence_enabled {
             return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
         }
@@ -363,29 +324,6 @@ impl TinyCoreEphemeralEngine {
 impl Default for TinyCoreEphemeralEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl TinyCoreEphemeralEngine {
-    pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
-        if ext_name.is_empty() || size_bytes == 0 {
-            return Err(HistoricError::MemoryAccessViolation);
-        }
-        self.mounted_extensions.insert(ext_name.to_string(), size_bytes);
-        Ok(())
-    }
-
-    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
-        if self.persistence_enabled {
-            return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
-        }
-        self.volatile_overlay_ram_bytes += data_len;
-        Ok(self.volatile_overlay_ram_bytes)
-    }
-
-    pub fn reset_ephemeral_state(&mut self) {
-        // Drop volatile in-memory overlay structures completely on reset
-        self.volatile_overlay_ram_bytes = 0;
     }
 }
 
@@ -469,5 +407,23 @@ mod tests {
         let conv = VintagePackageConverter;
         let res = conv.convert_package("old_bash", "tar.Z").unwrap();
         assert_eq!(res, "old_bash-sigpkg-compat");
+    }
+
+    #[test]
+    fn test_lfs_toolchain_stages() {
+        let mut builder = LfsToolchainBuilder::new();
+        assert_eq!(
+            builder.execute_bootstrap_stage(1).unwrap(),
+            "LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"
+        );
+        assert_eq!(
+            builder.execute_bootstrap_stage(2).unwrap(),
+            "LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"
+        );
+        assert_eq!(
+            builder.execute_bootstrap_stage(3).unwrap(),
+            "LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"
+        );
+        assert!(builder.execute_bootstrap_stage(4).is_err());
     }
 }
