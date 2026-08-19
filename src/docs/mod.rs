@@ -29,11 +29,6 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 use alloc::format;
-||||||| 65885484f
-use alloc::format;
-use alloc::string::ToString;
-||||||| 984d1301f
-use alloc::format;
 
 /// Documentation format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -355,7 +350,6 @@ impl Default for ApiDocBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
 
     #[test]
     fn test_doc_entry_creation() {
@@ -493,7 +487,6 @@ mod tests {
         let pledge_page = indexer.compile_man_page("pledge", Some(2)).unwrap();
         assert!(pledge_page.contains("stdio rpath"));
     }
-||||||| 65885484f
 
     #[test]
     fn test_pdf_generation() {
@@ -512,7 +505,6 @@ mod tests {
         assert!(pdf.contains("Architecture Guide"));
         assert!(pdf.ends_with("%%EOF"));
     }
-||||||| 984d1301f
 
     #[test]
     fn test_sovereign_man_pages() {

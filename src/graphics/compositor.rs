@@ -1,6 +1,5 @@
 // Custom, OOP-driven High-Performance Graphics Compositor for SigmaOS
 // Implements screen composition, double buffering, and screen capturing
-||||||| 43be3a7e8
 #![no_std]
 #![no_main]
 // OOP-based Graphics Compositor for SigmaOS
@@ -17,12 +16,10 @@ use alloc::vec::Vec;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-||||||| 43be3a7e8
 /// OOP-based Graphics Compositor for SigmaOS
 /// Implements graphics composition using OOP principles with traits and structs
 /// No dependency on external graphics frameworks
 
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -30,7 +27,6 @@ use std::sync::atomic::{AtomicBool, Ordering};
 /// Position
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,7 +44,6 @@ impl Position {
 /// Size
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -70,7 +65,6 @@ impl Size {
 /// Rectangle
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rectangle {
@@ -104,7 +98,6 @@ impl Rectangle {
 /// Color (RGBA)
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -148,7 +141,6 @@ pub trait Surface {
 /// Surface info
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SurfaceInfo {
@@ -174,7 +166,6 @@ impl SurfaceInfo {
 /// Pixel format
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -188,7 +179,6 @@ pub enum PixelFormat {
 /// Surface capability
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -237,7 +227,6 @@ impl BitmapSurface {
         let size = (width * height) as usize;
         let mut data = Vec::new();
         data.resize(size, 0);
-||||||| 43be3a7e8
         let data = unsafe {
             let size = (width * height) as usize;
             let ptr = alloc(size * mem::size_of::<u32>()) as *mut u32;
@@ -311,7 +300,6 @@ impl Surface for BitmapSurface {
             for x in rect.position.x.max(0) as usize
                 ..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize
             {
-||||||| 43be3a7e8
         for y in rect.position.y.max(0) as usize..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize {
             for x in rect.position.x.max(0) as usize..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize {
         let data = self.data_mut();
@@ -360,7 +348,6 @@ pub trait Window {
 /// Window info
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowInfo {
@@ -386,7 +373,6 @@ impl WindowInfo {
 /// Window capability
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -533,7 +519,6 @@ pub trait Compositor {
 /// Graphics error types
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -550,7 +535,6 @@ pub enum GraphicsError {
 /// Compositor statistics
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompositorStats {
@@ -585,7 +569,6 @@ pub struct SimpleCompositor {
     pub capability: CompositorCapability,
     pub back_buffer: Option<BitmapSurface>,
     pub double_buffering: AtomicBool,
-||||||| 43be3a7e8
     windows: Vec<Option<Box<dyn Window>>>,
     window_order: Vec<usize>,
     stats: CompositorStats,
@@ -599,7 +582,6 @@ pub struct SimpleCompositor {
 /// Compositor capability
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -746,7 +728,6 @@ impl Compositor for SimpleCompositor {
 
             if let Some(window) = found_window {
                 let window_rect = window.rect();
-||||||| 43be3a7e8
             if let Some(ref mut window) = self.windows[window_id] {
             if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
                 let window_rect = window.rect();
@@ -755,7 +736,6 @@ impl Compositor for SimpleCompositor {
                     let window_stride = surface.info().stride as usize / 4;
                     let window_data = surface.data();
                     let output_data = target_surface.data_mut();
-||||||| 43be3a7e8
                     let window_data = surface.data();
                     let output_data = output.data_mut();
 
@@ -811,7 +791,6 @@ impl Compositor for SimpleCompositor {
             }
         }
 
-||||||| 43be3a7e8
         let mut stats = self.stats.clone();
         stats.visible_windows = 0;
 
@@ -860,7 +839,6 @@ mod tests {
 
         let screenshot = comp.capture_screenshot().unwrap();
         assert_eq!(screenshot.len(), 1920 * 1080);
-||||||| 43be3a7e8
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {

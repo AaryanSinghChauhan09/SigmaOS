@@ -146,7 +146,6 @@ impl AhciPort {
     }
 }
 
-||||||| 984d1301f
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration { Legacy, Modern }

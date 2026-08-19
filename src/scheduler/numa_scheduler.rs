@@ -163,11 +163,9 @@ mod tests {
         assert!(!stack.top.load(Ordering::Relaxed).is_null());
     }
 }
-||||||| 43be3a7e8
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems
 
-use std::sync::atomic::{AtomicPtr, Ordering};
 
 pub struct NumaNode {
     pub node_id: u32,
@@ -275,7 +273,6 @@ impl<T> TreiberStack<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_numa_scheduler() {

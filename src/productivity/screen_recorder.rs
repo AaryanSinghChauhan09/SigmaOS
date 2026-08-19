@@ -319,7 +319,6 @@ impl Default for GpuAcceleratedBackend {
     }
 }
 
-||||||| 984d1301f
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuEncoderType {
     NvidiaNvenc,

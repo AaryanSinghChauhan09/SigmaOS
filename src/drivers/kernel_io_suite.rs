@@ -36,9 +36,6 @@ pub enum HidTokenType { Keyboard, Mouse, Joystick }
 pub enum PrinterFormat { Text, PostScript, Pdf }
 
 
-
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HidTokenType { Keyboard, Mouse, Joystick }
 

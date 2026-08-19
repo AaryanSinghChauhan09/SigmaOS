@@ -65,11 +65,9 @@ mod tests {
         assert_eq!(entry.dependencies[0], "isa_bus_device");
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)
 // Stores legacy drivers in secure vault entries with lineage metadata and dependency chains
 
-use std::collections::HashMap;
 
 pub struct VaultEntry {
     pub id: usize,
@@ -109,7 +107,6 @@ impl DriverArchiveVault {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_driver_archive_vault() {

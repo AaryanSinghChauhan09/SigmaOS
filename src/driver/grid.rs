@@ -63,7 +63,6 @@ mod tests {
         assert_eq!(grid.query_capacity(), 1200);
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Peripheral Archive Grid (PeripheralArchiveGrid)
 // Provides simulated grid layouts for legacy hardware components with absolute zero overhead
 
@@ -105,7 +104,6 @@ impl PeripheralArchiveGrid {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_archive_grid_floppy() {

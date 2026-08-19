@@ -533,7 +533,6 @@ mod tests {
         assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
         assert!(ring.pop_item().is_none());
     }
-||||||| 43be3a7e8
 
     #[test]
     fn test_zero_copy_latency_and_capability_delegation() {

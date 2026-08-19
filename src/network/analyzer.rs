@@ -445,7 +445,6 @@ impl ClearLinuxFlowLoadBalancer {
     }
 }
 
-||||||| 68c19dfa6
 // =========================================================================
 // LINUX DISTRO-INSPIRED WIRESHARK PARITY ENHANCEMENTS
 // =========================================================================
@@ -1496,7 +1495,6 @@ mod tests {
         assert!(core_flow2 < 4);
         assert_eq!(lb.get_active_flows_count(), 2);
     }
-||||||| 68c19dfa6
 
     #[test]
     fn test_alpine_zero_alloc_capture_buffer() {

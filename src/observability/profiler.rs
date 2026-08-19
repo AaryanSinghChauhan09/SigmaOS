@@ -113,11 +113,9 @@ mod tests {
         assert_eq!(metric.total_hits, 2);
     }
 }
-||||||| 43be3a7e8
 // SigmaOS High-Performance eBPF Tracing & Latency Profiler (SigmaProfiler)
 // Designed for tracking scheduler task latency, system tracepoints, and CPU profiling
 
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TracepointType {
@@ -187,7 +185,6 @@ impl SigmaProfiler {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_profiler_metrics() {

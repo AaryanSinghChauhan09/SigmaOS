@@ -2,7 +2,6 @@
 pub mod device;
 pub mod framework;
 pub mod windows_compat;
-||||||| 43be3a7e8
 pub mod simulation;
 pub mod mapper;
 pub mod pods;

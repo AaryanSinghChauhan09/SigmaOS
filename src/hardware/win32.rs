@@ -207,11 +207,9 @@ mod tests {
         assert_eq!(queue.get_message(), Ok(Win32Message::Close));
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Safe Win32 Compatibility Subsystem (SigmaWin)
 // Designed to parse, load, and manage legacy Win32 binaries securely on the sovereign transaction bus
 
-use std::collections::HashMap;
 
 /// Win32 processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -354,7 +352,6 @@ impl User32MessageQueue {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_pe_loader_invalid_bytes() {

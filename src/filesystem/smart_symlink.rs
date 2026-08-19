@@ -251,7 +251,6 @@ impl SmartSymlink {
         }
     }
 }
-||||||| 43be3a7e8
 // SigmaOS next-generation context-aware, self-healing, and infinite-recursion-safe Symbolic Link Engine
 // Discards legacy standard Linux/BSD symlink vulnerabilities by enforcing sandboxed boundary limits and loop breakage
 

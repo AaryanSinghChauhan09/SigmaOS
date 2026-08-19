@@ -1,6 +1,5 @@
 // OOP-based AI Agent Framework for SigmaOS
 // Implements AI agent using OOP principles with traits and structs.
-||||||| 43be3a7e8
 #![no_std]
 #![no_main]
 // OOP-based AI Agent Framework for SigmaOS
@@ -12,7 +11,6 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-||||||| 43be3a7e8
 /// OOP-based AI Agent Framework for SigmaOS
 /// Implements AI agent using OOP principles with traits and structs
 /// No dependency on external AI frameworks
@@ -24,7 +22,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Intent type
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,7 +48,6 @@ impl Intent {
         let cmd_len = command.len().min(255);
         command_array[..cmd_len].copy_from_slice(&command[..cmd_len]);
 
-||||||| 43be3a7e8
     pub fn new(intent_type: IntentType, command: &[u8]) -> Self {
         let mut command_array = [0u8; 256];
         let cmd_len = command.len().min(255);
@@ -72,7 +68,6 @@ impl Intent {
     pub fn set_parameters(&mut self, parameters: &[u8]) {
         let len = parameters.len().min(511);
         self.parameters[..len].copy_from_slice(&parameters[..len]);
-||||||| 43be3a7e8
     pub fn set_parameters(&mut self, parameters: &[u8]) {
         let len = parameters.len().min(511);
         unsafe {
@@ -87,7 +82,6 @@ impl Intent {
 /// AI error types
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -152,7 +146,6 @@ impl AgentCapability {
             can_learn: true,
         }
     }
-||||||| 43be3a7e8
 /// Agent info
 #[repr(C)]
 pub struct AgentInfo {
@@ -251,7 +244,6 @@ impl Pattern {
             template: template_array,
         }
     }
-||||||| 43be3a7e8
     pub capability: AgentCapability,
     pub patterns: Vec<Pattern>,
 }
@@ -293,7 +285,6 @@ impl SimpleAIAgent {
         let name_len = name.len().min(63);
         name_array[..name_len].copy_from_slice(&name[..name_len]);
 
-||||||| 43be3a7e8
     pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
@@ -327,7 +318,6 @@ impl SimpleAIAgent {
         }
         None
     }
-||||||| 43be3a7e8
 
     pub fn add_pattern(&mut self, pattern: Pattern) {
         self.patterns.push(pattern);
@@ -363,7 +353,6 @@ impl AIAgent for SimpleAIAgent {
         }
 
         if input.is_empty() {
-||||||| 43be3a7e8
     fn parse(&mut self, input: &[u8]) -> Result<Intent, AIError> {
         if !self.capability.can_parse {
             return Err(AIError::PermissionDenied);
@@ -385,7 +374,6 @@ impl AIAgent for SimpleAIAgent {
             let mut intent = Intent::new(IntentType::InformationQuery, input);
             intent.confidence = 0.5;
             Ok(intent)
-||||||| 43be3a7e8
         unsafe {
             if let Some(pattern) = self.match_pattern(input) {
                 let mut intent = Intent::new(pattern.intent_type, &pattern.template);
@@ -412,7 +400,6 @@ impl AIAgent for SimpleAIAgent {
     fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError> {
         self.execution_count.fetch_add(1, Ordering::SeqCst);
 
-||||||| 43be3a7e8
 
         // In a real implementation, this would execute the actual command
         // For now, return a simulated response
@@ -420,7 +407,6 @@ impl AIAgent for SimpleAIAgent {
         let success_msg = b"Command executed successfully";
         response.extend_from_slice(success_msg);
         Ok(response)
-||||||| 43be3a7e8
         let success_msg = b"Command executed successfully";
         
         for byte in success_msg {
@@ -455,7 +441,6 @@ impl AIAgent for SimpleAIAgent {
         if !self.capability.can_learn {
             return;
         }
-||||||| 43be3a7e8
     fn learn(&mut self, input: &[u8], feedback: bool) {
         if !self.capability.can_learn {
             return;
@@ -475,7 +460,6 @@ impl AIAgent for SimpleAIAgent {
             execution_count: self.execution_count.load(Ordering::SeqCst),
             capability: self.capability,
         }
-||||||| 43be3a7e8
     fn info(&self) -> AgentInfo {
         AgentInfo {
             name: self.name,
@@ -527,7 +511,6 @@ impl Default for AIStats {
 }
 
 /// Simple AI agent manager (OOP: Concrete manager class)
-||||||| 43be3a7e8
 /// AI statistics
 #[repr(C)]
 pub struct AIStats {
@@ -581,7 +564,6 @@ impl ManagerCapability {
             can_process: true,
         }
     }
-||||||| 43be3a7e8
     agents: Vec<Option<Box<dyn AIAgent>>>,
     active_agent: AtomicUsize,
     stats: AIStats,
@@ -664,7 +646,6 @@ impl AIAgentManager for SimpleAIAgentManager {
                 self.stats.failed_requests += 1;
                 Err(AIError::InvalidInput)
             }
-||||||| 43be3a7e8
     fn process(&mut self, input: &[u8]) -> Result<Vec<u8>, AIError> {
         if !self.capability.can_process {
             return Err(AIError::PermissionDenied);
@@ -720,7 +701,6 @@ mod tests {
         let response = manager.process(b"help set network").unwrap();
         assert_eq!(response, b"Command executed successfully");
         assert_eq!(manager.stats().successful_requests, 1);
-||||||| 43be3a7e8
             self.stats.failed_requests += 1;
             Err(AIError::InvalidInput)
         }
@@ -784,7 +764,6 @@ impl<T> Vec<T> {
         }
     }
 }
-||||||| 43be3a7e8
 
 // External allocator functions
 extern "C" {
@@ -794,7 +773,6 @@ extern "C" {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_ai_agent_parsing() {

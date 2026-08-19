@@ -112,11 +112,9 @@ mod tests {
         assert!(!engine.audit_port_checksum("freebsd-libc", "wrongchecksum"));
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Linux-From-Scratch (LFS) and FreeBSD Inspired Bootstrap & Ports Engine
 // Designed for toolchain compiling, Stage 1/2 bootstrapping, and secure ports auditing
 
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootstrapStage {
@@ -197,7 +195,6 @@ impl LfsBootstrapEngine {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_bootstrap_flow() {

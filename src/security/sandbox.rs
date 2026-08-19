@@ -1,11 +1,9 @@
 // SigmaOS Privacy-First Sandbox Subsystem
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Enhanced with Sandboxie-style file system overlays and Firejail-style execution profiles.
-||||||| 984d1301f
 // Taking inspiration from industry-leading competitors Sandboxie (FS virtualization overlays) and Firejail (strict execution profiles)
 
 use std::collections::{HashSet, HashMap};
-||||||| 984d1301f
 use std::collections::HashSet;
 use std::collections::{HashSet, HashMap, BTreeMap};
 
@@ -24,7 +22,6 @@ pub enum SandboxProfile {
     None,
     StrictBrowser,   // Demands network, blocks local filesystems except user downloads
     RestrictedOffice, // Demands file writes, absolutely blocks network gates
-||||||| 984d1301f
     IpcAccessGate,           // New: Prevents raw inter-process communications
     MemoryDbgAttachGate,     // New: Prevents ptrace or debugger attachments
     RawSocketOpenGate,       // New: Blocks raw network socket creation
@@ -45,7 +42,6 @@ pub struct PrivacyFirstSandbox {
     pub profile: SandboxProfile,
     pub sanitized_env: HashMap<String, String>,
     pub virtual_filesystem_overlay: HashMap<String, Vec<u8>>, // Sandboxie-style overlay file system
-||||||| 984d1301f
     // Sandboxie-inspired file system virtualization overlays
     pub virtualization_overlay: BTreeMap<String, String>,
     // Firejail-inspired sanitized execution environment
@@ -87,7 +83,6 @@ impl PrivacyFirstSandbox {
             SandboxProfile::None => {
                 self.blocked_rules.clear();
             }
-||||||| 984d1301f
             virtualization_overlay: BTreeMap::new(),
             environment_variables: HashMap::new(),
             profile: None,
@@ -178,7 +173,6 @@ impl PrivacyFirstSandbox {
     pub fn purge_sandbox(&mut self) {
         self.virtual_filesystem_overlay.clear();
     }
-||||||| 984d1301f
 
     /// Sandboxie-style virtualization write: writes securely to an isolated memory overlay instead of modifying the host FS
     pub fn virtual_write(&mut self, path: &str, content: String) {
@@ -280,7 +274,6 @@ mod tests {
         let read_after_purge = sandbox.virtual_read("/etc/hosts", host_etc_hosts);
         assert_eq!(read_after_purge, host_etc_hosts.to_vec());
     }
-||||||| 984d1301f
 
     #[test]
     fn test_competitor_profiles_sandboxing() {
@@ -312,12 +305,10 @@ mod tests {
         assert!(sandbox.virtual_read("/etc/passwd").is_none());
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Privacy-First Sandbox Subsystem
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Absorbs advanced security controls from SELinux, AppArmor, and Firejail to satisfy Common Criteria and FIPS compliance
 
-use std::collections::HashSet;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SandboxRule {
@@ -447,7 +438,6 @@ impl PrivacyFirstSandbox {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_privacy_first_sandbox() {

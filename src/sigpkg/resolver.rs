@@ -442,7 +442,6 @@ mod tests {
             Version::new(1, 0, 0),
             String::new(),
             vec![Dependency {
-||||||| 43be3a7e8
         // Create circular dependency: A -> B -> A
         let pkg_a = Package {
             name: "A".to_string(),

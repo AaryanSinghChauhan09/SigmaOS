@@ -15,7 +15,6 @@ pub struct Task {
 impl PartialEq for Task {
     fn eq(&self, other: &Self) -> bool {
         self.vruntime == other.vruntime
-||||||| 43be3a7e8
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
@@ -174,7 +173,6 @@ pub struct CfsScheduler {
     tasks: [Option<Task>; 64],
     task_count: usize,
     current_time: u64,
-||||||| 43be3a7e8
 /// EEVDF Scheduler
 pub struct Scheduler {
     processes: Vec<Process>,
@@ -206,7 +204,6 @@ impl CfsScheduler {
             self.task_count += 1;
             self.sort_tasks();
         }
-||||||| 43be3a7e8
     pub fn add_process(&mut self, mut process: Process) {
         process.update_virtual_deadline(self.current_time);
         self.processes.push(process);
@@ -228,7 +225,6 @@ impl CfsScheduler {
         } else {
             None
         }
-||||||| 43be3a7e8
     pub fn schedule(&mut self) -> Option<&Process> {
         // Find process with earliest eligible virtual deadline
         let now = self.current_time;
@@ -332,7 +328,6 @@ impl CfsScheduler {
             while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
                 self.tasks.swap(j - 1, j);
                 j -= 1;
-||||||| 43be3a7e8
     pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
         if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
             process.state = state;
@@ -346,7 +341,6 @@ impl CfsScheduler {
             }
         }
     }
-||||||| 43be3a7e8
 
     pub fn remove_process(&mut self, pid: u64) {
         self.processes.retain(|p| p.pid != pid);
@@ -411,7 +405,6 @@ impl Default for Scheduler {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_scheduler_creation() {
