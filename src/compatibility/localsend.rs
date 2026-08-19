@@ -22,7 +22,7 @@
 // to enable offline peer-to-peer secure file transfer within local networks.
 
 use crate::security::capability::CapabilityToken;
-use std::collections::{BTreeMap, HashSet};
+use alloc::collections::{BTreeMap, BTreeSet};
 
 /// Device types supported by LocalSend protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

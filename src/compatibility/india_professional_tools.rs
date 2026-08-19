@@ -2,19 +2,20 @@
 // Localized, high-performance, OOP-compliant tools for Indian Professionals.
 // Refers to India-Apps-Overview.md and India-first architecture.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
 
 /// 1. Legal & Judicial Professionals (`sigma-judicial`)
 /// Manages Bharatiya Nyaya Sanhita (BNS), Bharatiya Nagarik Suraksha Sanhita (BNSS),
 /// and Bharatiya Sakshya Adhiniyam (BSA) case schedules and bail readiness.
 pub struct JudicialTimelinePlanner {
-    pub active_cases: HashMap<String, u64>,
+    pub active_cases: BTreeMap<String, u64>,
 }
 
 impl JudicialTimelinePlanner {
     pub fn new() -> Self {
         Self {
-            active_cases: HashMap::new(),
+            active_cases: BTreeMap::new(),
         }
     }
 
@@ -57,13 +58,13 @@ impl Default for JudicialTimelinePlanner {
 /// 2. Business & Trade Professionals (`sigma-msme`)
 /// Verifies Udyam Registration parameters and computes delayed payment interest under the MSMED Act.
 pub struct MsmeComplianceEngine {
-    pub registered_udyam_ids: HashMap<String, String>,
+    pub registered_udyam_ids: BTreeMap<String, String>,
 }
 
 impl MsmeComplianceEngine {
     pub fn new() -> Self {
         Self {
-            registered_udyam_ids: HashMap::new(),
+            registered_udyam_ids: BTreeMap::new(),
         }
     }
 
@@ -105,13 +106,13 @@ impl Default for MsmeComplianceEngine {
 /// 3. Medical & AYUSH Practitioners (`sigma-ayush`)
 /// Digital integration for AYUSH practitioner registry and Ayurvedic Formulary lookups.
 pub struct AyushFormularyHelper {
-    pub verified_practitioners: HashMap<String, String>,
-    pub formulary_registry: HashMap<String, Vec<String>>,
+    pub verified_practitioners: BTreeMap<String, String>,
+    pub formulary_registry: BTreeMap<String, Vec<String>>,
 }
 
 impl AyushFormularyHelper {
     pub fn new() -> Self {
-        let mut formulary = HashMap::new();
+        let mut formulary = BTreeMap::new();
         formulary.insert(
             "Chyawanprash".to_string(),
             vec!["Amla".to_string(), "Ashwagandha".to_string(), "Guduchi".to_string()],
@@ -122,7 +123,7 @@ impl AyushFormularyHelper {
         );
 
         Self {
-            verified_practitioners: HashMap::new(),
+            verified_practitioners: BTreeMap::new(),
             formulary_registry: formulary,
         }
     }
@@ -146,13 +147,13 @@ impl Default for AyushFormularyHelper {
 /// 4. Hotspot & Telecommunications Operators (`sigma-wani`)
 /// Implements TRAI Public Data Office (PDO) registries and bandwidth sharing profiles.
 pub struct PMWaniHotspotController {
-    pub registered_pdos: HashMap<String, String>,
+    pub registered_pdos: BTreeMap<String, String>,
 }
 
 impl PMWaniHotspotController {
     pub fn new() -> Self {
         Self {
-            registered_pdos: HashMap::new(),
+            registered_pdos: BTreeMap::new(),
         }
     }
 
@@ -180,13 +181,13 @@ impl Default for PMWaniHotspotController {
 /// 5. Aviation & Airport Operators (`sigma-digiyatra`)
 /// Deep integration for passenger face enrollment and paperless railway/airport boarding validation.
 pub struct DigiYatraPassScanner {
-    pub passenger_faces: HashMap<String, Vec<u8>>,
+    pub passenger_faces: BTreeMap<String, Vec<u8>>,
 }
 
 impl DigiYatraPassScanner {
     pub fn new() -> Self {
         Self {
-            passenger_faces: HashMap::new(),
+            passenger_faces: BTreeMap::new(),
         }
     }
 
@@ -212,13 +213,13 @@ impl Default for DigiYatraPassScanner {
 /// 6. Transit & Logistics Professionals (`sigma-irctc`)
 /// Facilitates deep train running status track, Tatkal window status, and PNR monitoring.
 pub struct IrctcPnrTracker {
-    pub pnr_statuses: HashMap<String, String>,
+    pub pnr_statuses: BTreeMap<String, String>,
 }
 
 impl IrctcPnrTracker {
     pub fn new() -> Self {
         Self {
-            pnr_statuses: HashMap::new(),
+            pnr_statuses: BTreeMap::new(),
         }
     }
 

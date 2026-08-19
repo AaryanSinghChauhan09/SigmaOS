@@ -31,7 +31,7 @@
 // 10. High-impact HID keyboard/mouse and VESA Framebuffer graphics drivers
 // 11. Local AI task orchestration scheduler (S-AI)
 
-use std::collections::{BTreeMap, HashSet};
+use alloc::collections::{BTreeMap, BTreeSet};
 
 // ==========================================
 // 1. Kernel Module Management
@@ -172,7 +172,7 @@ impl DriverRepositoryManager {
         target_driver: &str,
     ) -> Result<Vec<String>, &'static str> {
         let mut order = Vec::new();
-        let mut visited = HashSet::new();
+        let mut visited = BTreeSet::new();
         self.dfs_resolve(target_driver, &mut order, &mut visited)?;
         Ok(order)
     }
@@ -181,7 +181,7 @@ impl DriverRepositoryManager {
         &self,
         driver: &str,
         order: &mut Vec<String>,
-        visited: &mut HashSet<String>,
+        visited: &mut BTreeSet<String>,
     ) -> Result<(), &'static str> {
         if visited.contains(driver) {
             return Ok(());
@@ -434,7 +434,7 @@ pub enum IpProtocol {
 
 pub struct NetworkStackGateway {
     pub routing_table: BTreeMap<String, String>, // maps dest IP pattern to gateway
-    pub blocked_ports: HashSet<u16>,
+    pub blocked_ports: BTreeSet<u16>,
 }
 
 impl NetworkStackGateway {
@@ -442,7 +442,7 @@ impl NetworkStackGateway {
     pub fn new() -> Self {
         Self {
             routing_table: BTreeMap::new(),
-            blocked_ports: HashSet::new(),
+            blocked_ports: BTreeSet::new(),
         }
     }
 
