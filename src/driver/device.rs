@@ -2971,19 +2971,12 @@ impl<T> Vec<T> {
 
     pub fn clear(&mut self) {
         self.len = 0;
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
     }
 
-    pub fn iter(&self) -> VecIterator<'_, T> {
-        VecIterator {
-            vec: self,
-            index: 0,
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter { vec: self, index: 0 }
+    }
+
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
         VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
     }
