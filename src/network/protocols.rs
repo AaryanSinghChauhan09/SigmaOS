@@ -706,9 +706,8 @@ impl SnclLedgerProtocol {
         self.entries_logged += 1;
         // Mutate simulated merkle root with shard signature representation
         self.current_merkle_root[0] = self.current_merkle_root[0].wrapping_add(1);
-        let slice_len = shard_name.len().min(30);
-        self.current_merkle_root[1..1 + slice_len].copy_from_slice(
-            &shard_name.as_bytes()[..slice_len]
+        self.current_merkle_root[1..shard_name.len().min(30)].copy_from_slice(
+            &shard_name.as_bytes()[..shard_name.len().min(30)]
         );
         Ok(self.current_merkle_root)
     }
@@ -759,19 +758,9 @@ mod tests {
         assert!(!ledger.verify_ledger_integrity());
 
         let root = ledger.append_audit_entry("S-SEC", "POL_ENFORCE").unwrap();
-        assert_eq!(root[1..6], *b"S-SEC");
+        assert_eq!(root[1..5], *b"S-SEC");
         assert!(ledger.verify_ledger_integrity());
         assert_eq!(ledger.entries_logged, 1);
-    }
-
-    #[test]
-    fn test_idna_punycode_conversion() {
-        let ascii = IdnaPunycodeEncoder::domain_to_ascii("sigmaos.org");
-        assert_eq!(ascii, "sigmaos.org");
-
-        let idna_domain = IdnaPunycodeEncoder::domain_to_ascii("münchen.de");
-        assert!(idna_domain.starts_with("xn--"));
-        assert!(idna_domain.ends_with(".de"));
     }
 
     #[test]

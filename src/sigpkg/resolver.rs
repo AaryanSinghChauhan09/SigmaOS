@@ -5,84 +5,20 @@
 
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
-}
-
-impl Version {
-    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum VersionConstraint {
-    Exact(Version),
-    GreaterThan(Version),
-    LessThan(Version),
-    GreaterOrEqual(Version),
-    LessOrEqual(Version),
-    Any,
-}
-
-#[derive(Debug, Clone)]
-pub struct Dependency {
-    pub name: String,
-    pub version_constraint: VersionConstraint,
-}
-
-#[derive(Debug, Clone)]
-pub struct Package {
-    pub name: String,
-    pub version: Version,
-    pub description: String,
-    pub dependencies: Vec<Dependency>,
-    pub checksum: String,
-    pub mirrors: Vec<String>,
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-            mirrors: Vec::new(),
-        }
-    }
-}
-
 /// Debian-style APT Pinning Rule representing release and priority weighting
 #[derive(Debug, Clone)]
 pub struct AptPinRule {
     pub package_name_pattern: String,
-    pub package_name: String,
     pub release_target: String,
-    pub origin: String,
     pub priority: i32,
-    pub pin_priority: i16,
 }
 
 impl AptPinRule {
     pub fn new(pattern: &str, release: &str, priority: i32) -> Self {
         Self {
             package_name_pattern: pattern.to_string(),
-            package_name: pattern.to_string(),
             release_target: release.to_string(),
-            origin: release.to_string(),
             priority,
-            pin_priority: priority as i16,
         }
     }
 }
@@ -215,6 +151,46 @@ impl SatSolver {
             VersionConstraint::LessOrEqual(v) => version <= v,
             VersionConstraint::Any => true,
         }
+    }
+
+    /// Resolves the optimal package version using Debian-style APT pinning priorities
+    pub fn resolve_with_pinning(
+        &self,
+        package_name: &str,
+        constraint: &VersionConstraint,
+        pin_rules: &[AptPinRule],
+    ) -> Result<Package, ResolveError> {
+        let candidates = self
+            .packages
+            .get(package_name)
+            .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
+
+        let mut best_candidate: Option<(&Package, i32)> = None;
+
+        for candidate in candidates {
+            if self.satisfies_constraint(&candidate.version, constraint) {
+                // Determine priority score based on pinning rules
+                let mut priority = 500; // Default Debian priority for installed packages
+                for rule in pin_rules {
+                    if rule.package_name_pattern == "*" || rule.package_name_pattern == package_name {
+                        // Priority is matched by release targets or patterns
+                        priority = rule.priority;
+                    }
+                }
+
+                if let Some((_, best_priority)) = best_candidate {
+                    if priority > best_priority {
+                        best_candidate = Some((candidate, priority));
+                    }
+                } else {
+                    best_candidate = Some((candidate, priority));
+                }
+            }
+        }
+
+        best_candidate
+            .map(|(p, _)| p.clone())
+            .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))
     }
 
     /// Detect circular dependencies

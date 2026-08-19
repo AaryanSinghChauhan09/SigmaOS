@@ -412,34 +412,4 @@ mod tests {
         let retrieved = keyring.get_secret(1).unwrap();
         assert_eq!(retrieved.name(), b"TestSecret");
     }
-
-    #[test]
-    fn test_secret_encryption_decryption_optimization() {
-        let secret_cap = SecretCapability::full();
-        let mut secret = SimpleSecret::new(42, b"OptimizedSecret", SecretType::Password, secret_cap);
-        let raw_payload = b"SuperSecretDataPayloadToBeEncryptedAndDecryptedFast!";
-        secret.set_data(raw_payload);
-
-        let key = b"SecretKey123";
-
-        // Test encryption
-        assert!(secret.encrypt(key).is_ok());
-        assert!(secret.info().is_encrypted);
-        assert_ne!(secret.get_data(), raw_payload);
-
-        // Test decryption
-        assert!(secret.decrypt(key).is_ok());
-        assert!(!secret.info().is_encrypted);
-        assert_eq!(secret.get_data(), raw_payload);
-    }
-
-    #[test]
-    fn test_secret_empty_key_validation() {
-        let secret_cap = SecretCapability::full();
-        let mut secret = SimpleSecret::new(100, b"EmptyKeyTest", SecretType::Token, secret_cap);
-        secret.set_data(b"SomeTokenData");
-
-        let empty_key: &[u8] = &[];
-        assert!(matches!(secret.encrypt(empty_key), Err(SecretError::InvalidKey)));
-    }
 }

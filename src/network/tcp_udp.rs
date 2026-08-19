@@ -221,19 +221,7 @@ impl TCPConnection for SimpleSocket {
         Ok(())
     }
     fn get_state(&self) -> TCPState {
-        let val = self.state.load(Ordering::SeqCst);
-        match val {
-            0 => TCPState::Closed,
-            1 => TCPState::Listen,
-            2 => TCPState::SynSent,
-            3 => TCPState::SynReceived,
-            4 => TCPState::Established,
-            5 => TCPState::FinWait1,
-            6 => TCPState::FinWait2,
-            7 => TCPState::CloseWait,
-            8 => TCPState::Closing,
-            _ => TCPState::TimeWait,
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
 }
 

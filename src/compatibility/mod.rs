@@ -3,6 +3,21 @@ pub mod antix;
 pub mod canonical;
 pub mod chakra;
 pub mod cross_platform;
+pub mod zorin;
+pub mod antix;
+
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine,
+    ZorinConnectState, ZorinConnectManager,
+    ZorinWindowsAppSupport,
+};
+
+pub use antix::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
+};
 pub mod historic_linux;
 pub mod mint_linux;
 pub mod chimera_linux;

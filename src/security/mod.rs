@@ -1,5 +1,10 @@
 // SigmaOS Security Subsystem
 pub mod capability;
+pub mod pqc_enclave;
+
+pub use pqc_enclave::{
+    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
+};
 pub mod capability_enforcer;
 pub mod defensive_audit;
 pub mod parrot;

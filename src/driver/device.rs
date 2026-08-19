@@ -884,165 +884,6 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-/// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
-#[derive(Debug, Clone)]
-pub struct DeviceExtension {
-    pub irq: u8,
-    pub base_port: u16,
-    pub base_address: u32,
-    pub memory_size: usize,
-    pub device_context: [u8; 128], // Driver-specific context information buffer
-}
-
-impl DeviceExtension {
-    pub fn new() -> Self {
-        Self {
-            irq: 0,
-            base_port: 0,
-            base_address: 0,
-            memory_size: 0,
-            device_context: [0; 128],
-        }
-    }
-}
-
-/// Windows NT-style Device Object representing a logical, physical, or virtual device instance
-pub struct DeviceObject {
-    pub name: [u8; 64],
-    pub device_type: DeviceType,
-    pub device_extension: DeviceExtension,
-}
-
-impl DeviceObject {
-    pub fn new(name: &[u8], device_type: DeviceType) -> Self {
-        let mut name_array = [0u8; 64];
-        let len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        Self {
-            name: name_array,
-            device_type,
-            device_extension: DeviceExtension::new(),
-        }
-    }
-}
-
-/// Windows NT-style Driver Object representing a loaded driver image
-pub struct DriverObject {
-    pub driver_name: [u8; 64],
-    pub registry_path: [u8; 128], // Registry path config lookup (e.g. \Registry\Machine\System\CurrentControlSet\Services\...)
-    pub device_objects: Vec<DeviceObject>,
-    pub unload_routine: Option<fn(&mut DriverObject)>, // Unload Routine (DRIVERUNLOAD)
-}
-
-impl DriverObject {
-    pub fn new(name: &[u8], reg_path: &[u8]) -> Self {
-        let mut name_array = [0u8; 64];
-        let len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        let mut reg_array = [0u8; 128];
-        let reg_len = reg_path.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(reg_path.as_ptr(), reg_array.as_mut_ptr(), reg_len);
-        }
-
-        Self {
-            driver_name: name_array,
-            registry_path: reg_array,
-            device_objects: Vec::new(),
-            unload_routine: None,
-        }
-    }
-}
-
-/// Windows NT-style I/O Manager Subsystem coordinating driver lifecycles, creation, and unload tasks
-pub struct IoManager {
-    pub active_drivers: Vec<DriverObject>,
-}
-
-impl IoManager {
-    pub fn new() -> Self {
-        Self {
-            active_drivers: Vec::new(),
-        }
-    }
-
-    /// Emulate the normal driver installation process (creates a registered DriverObject)
-    pub fn normal_driver_installation_process(&mut self, driver_name: &[u8], registry_path: &[u8]) -> Result<usize, DeviceError> {
-        let driver = DriverObject::new(driver_name, registry_path);
-        self.active_drivers.push(driver);
-        Ok(self.active_drivers.len() - 1)
-    }
-
-    /// IoCreateDevice: Create a Device Object associated with the specific Driver Object
-    pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
-        if driver_idx >= self.active_drivers.len() {
-            return Err(DeviceError::InvalidParameter);
-        }
-
-        let device_obj = DeviceObject::new(name, device_type);
-        self.active_drivers[driver_idx].device_objects.push(device_obj);
-        Ok(())
-    }
-
-    /// IoUnloadDriver: Executes driver-specific cleanup tasks and calls the DRIVERUNLOAD unload routine
-    pub fn io_unload_driver(&mut self, driver_idx: usize) -> Result<(), DeviceError> {
-        if driver_idx >= self.active_drivers.len() {
-            return Err(DeviceError::InvalidParameter);
-        }
-
-        // Get mutable borrow of the driver object
-        let driver = &mut self.active_drivers[driver_idx];
-
-        // Execute the unload routine if registered (DRIVERUNLOAD)
-        if let Some(unload) = driver.unload_routine {
-            (unload)(driver);
-        }
-
-        // Perform Driver-Specific Cleanup Tasks: Delete/Free all associated Device Objects and Extensions
-        println!("I/O Manager: Executing driver-specific cleanup tasks for driver.");
-        driver.device_objects = Vec::new(); // Drop/Delete all Device Objects
-
-        Ok(())
-    }
-}
-
-impl Default for IoManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Unified representation of communication channels (OOP Abstraction)
-
-#[derive(Debug, Clone)]
-pub struct LegacyDevice { pub id: u32, pub name: Vec<u8>, pub port: u16 }
-impl LegacyDevice {
-    pub fn new(id: u32, name: &[u8], port: u16) -> Self { Self { id, name: name.to_vec(), port } }
-    pub fn query_channel(&self) -> PortAddress { PortAddress::PortIO(self.port) }
-    pub fn read_byte(&self, _offset: usize) -> Result<u8, &'static str> { Ok(0) }
-    pub fn write_byte(&mut self, _offset: usize, _val: u8) -> Result<(), &'static str> { Ok(()) }
-}
-
-#[derive(Debug, Clone)]
-pub struct ModernDevice { pub id: u32, pub name: Vec<u8>, pub mmio_addr: u64 }
-impl ModernDevice {
-    pub fn new(id: u32, name: &[u8], mmio_addr: u64) -> Self { Self { id, name: name.to_vec(), mmio_addr } }
-    pub fn query_channel(&self) -> PortAddress { PortAddress::MemoryMapped(self.mmio_addr) }
-    pub fn read_byte(&self, _offset: usize) -> Result<u8, &'static str> { Ok(0) }
-    pub fn write_byte(&mut self, _offset: usize, _val: u8) -> Result<(), &'static str> { Ok(()) }
-}
-
-pub enum PortAddress {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
-}
-
 #[cfg(test)]
 extern "C" {
     fn malloc(size: usize) -> *mut u8;
@@ -1052,8 +893,7 @@ extern "C" {
 #[cfg(test)]
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    let layout = std::alloc::Layout::from_size_align(size, 8).unwrap();
-    std::alloc::alloc(layout)
+    malloc(size)
 }
 
 // ==========================================
@@ -1063,8 +903,6 @@ pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::dde::UdfInterpreter;
-    use crate::compatibility::historic_linux::DdeDeviceWrapper;
 
     #[test]
     fn test_device_descriptors() {
