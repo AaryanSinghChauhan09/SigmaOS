@@ -18,7 +18,9 @@ pub mod linux_bsd_inspirations;
 
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService,
+    PinRule, AptPinStore, OpenRCService, SovereignDTraceEngine, DTraceProvider, DTraceAggregation,
+    SovereignRaidSelfHealer, RaidLevel, ScrubResult, SovereignDeclarativeSystemEngine,
+    RollbackStatus, SovereignPrivSepSandbox, PrivSepProcessRole,
 };
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};

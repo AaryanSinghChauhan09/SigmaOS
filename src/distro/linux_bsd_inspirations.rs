@@ -1710,6 +1710,660 @@ impl SovereignKaslrWxAllocator {
     }
 }
 
+// ==========================================
+// 20. SOLARIS / FREEBSD DTRACE DYNAMIC TRACING ENGINE (SovereignDTraceEngine)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DTraceProvider {
+    Fbt,      // Function Boundary Tracing
+    Sysinfo,  // System statistics
+    Profile,  // Timer/profiling probes
+    Sdt,      // Statically Defined Tracing
+    Lockstat, // Lock statistics
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DTraceAggregation {
+    Count,
+    Sum,
+    Min,
+    Max,
+    Avg,
+}
+
+#[derive(Debug, Clone)]
+pub struct DTraceProbe {
+    pub id: u32,
+    pub provider: DTraceProvider,
+    pub module: String,
+    pub function: String,
+    pub name: String,
+    pub enabled: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct DTraceEvent {
+    pub probe_id: u32,
+    pub timestamp: u64,
+    pub pid: u64,
+    pub arg0: u64,
+    pub arg1: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct DTraceAggState {
+    pub probe_id: u32,
+    pub agg_type: DTraceAggregation,
+    pub sum_or_val: u64,
+    pub count: u64,
+    pub min_val: u64,
+    pub max_val: u64,
+}
+
+pub struct SovereignDTraceEngine {
+    pub probes: Vec<DTraceProbe>,
+    pub aggregations: Vec<DTraceAggState>,
+    pub events: Vec<DTraceEvent>,
+    pub next_probe_id: u32,
+}
+
+impl SovereignDTraceEngine {
+    pub fn new() -> Self {
+        Self {
+            probes: Vec::new(),
+            aggregations: Vec::new(),
+            events: Vec::new(),
+            next_probe_id: 100,
+        }
+    }
+
+    pub fn register_probe(&mut self, provider: DTraceProvider, module: &str, function: &str, name: &str) -> u32 {
+        let probe_id = self.next_probe_id;
+        self.next_probe_id += 1;
+        self.probes.push(DTraceProbe {
+            id: probe_id,
+            provider,
+            module: module.to_string(),
+            function: function.to_string(),
+            name: name.to_string(),
+            enabled: false,
+        });
+        probe_id
+    }
+
+    pub fn enable_probe(&mut self, probe_id: u32) -> bool {
+        if let Some(probe) = self.probes.iter_mut().find(|p| p.id == probe_id) {
+            probe.enabled = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn disable_probe(&mut self, probe_id: u32) -> bool {
+        if let Some(probe) = self.probes.iter_mut().find(|p| p.id == probe_id) {
+            probe.enabled = false;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn fire_probe(&mut self, probe_id: u32, pid: u64, arg0: u64, arg1: u64) -> bool {
+        let is_enabled = self.probes.iter().any(|p| p.id == probe_id && p.enabled);
+        if is_enabled {
+            self.events.push(DTraceEvent {
+                probe_id,
+                timestamp: self.events.len() as u64 + 1,
+                pid,
+                arg0,
+                arg1,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn aggregate_metric(&mut self, probe_id: u32, agg_type: DTraceAggregation, val: u64) {
+        if let Some(agg) = self.aggregations.iter_mut().find(|a| a.probe_id == probe_id && a.agg_type == agg_type) {
+            agg.count += 1;
+            agg.sum_or_val = agg.sum_or_val.wrapping_add(val);
+            if val < agg.min_val {
+                agg.min_val = val;
+            }
+            if val > agg.max_val {
+                agg.max_val = val;
+            }
+        } else {
+            self.aggregations.push(DTraceAggState {
+                probe_id,
+                agg_type,
+                sum_or_val: val,
+                count: 1,
+                min_val: val,
+                max_val: val,
+            });
+        }
+    }
+
+    pub fn get_aggregation_value(&self, probe_id: u32, agg_type: DTraceAggregation) -> Option<u64> {
+        if agg_type == DTraceAggregation::Avg {
+            let sum_agg = self.aggregations.iter().find(|a| a.probe_id == probe_id && a.agg_type == DTraceAggregation::Sum);
+            let count_agg = self.aggregations.iter().find(|a| a.probe_id == probe_id && a.agg_type == DTraceAggregation::Count);
+            if let (Some(sum), Some(cnt)) = (sum_agg, count_agg) {
+                if cnt.count > 0 {
+                    return Some(sum.sum_or_val / cnt.count);
+                }
+            }
+        }
+        let agg = self.aggregations.iter().find(|a| a.probe_id == probe_id && a.agg_type == agg_type)?;
+        match agg_type {
+            DTraceAggregation::Count => Some(agg.count),
+            DTraceAggregation::Sum => Some(agg.sum_or_val),
+            DTraceAggregation::Min => Some(agg.min_val),
+            DTraceAggregation::Max => Some(agg.max_val),
+            DTraceAggregation::Avg => {
+                if agg.count == 0 {
+                    Some(0)
+                } else {
+                    Some(agg.sum_or_val / agg.count)
+                }
+            }
+        }
+    }
+
+    pub fn clear_aggregations(&mut self) {
+        self.aggregations.clear();
+    }
+}
+
+impl Default for SovereignDTraceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 21. BTRFS / ZFS MULTI-DEVICE RAID BIT-ROT SELF-HEALING ENGINE (SovereignRaidSelfHealer)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RaidLevel {
+    Raid1Mirror,
+    Raid5Parity,
+}
+
+#[derive(Debug, Clone)]
+pub struct RaidChunk {
+    pub chunk_id: u64,
+    pub device_id: u32,
+    pub data: Vec<u8>,
+    pub checksum: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct RaidDevice {
+    pub device_id: u32,
+    pub name: String,
+    pub chunks: Vec<RaidChunk>,
+    pub online: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ScrubResult {
+    pub corrupted_chunks_found: usize,
+    pub chunks_repaired: usize,
+}
+
+pub struct SovereignRaidSelfHealer {
+    pub raid_level: RaidLevel,
+    pub devices: Vec<RaidDevice>,
+}
+
+impl SovereignRaidSelfHealer {
+    pub fn new(raid_level: RaidLevel) -> Self {
+        Self {
+            raid_level,
+            devices: Vec::new(),
+        }
+    }
+
+    pub fn add_device(&mut self, device_id: u32, name: &str) {
+        self.devices.push(RaidDevice {
+            device_id,
+            name: name.to_string(),
+            chunks: Vec::new(),
+            online: true,
+        });
+    }
+
+    pub fn calculate_checksum(data: &[u8]) -> u64 {
+        let mut sum: u64 = 0xcbf29ce484222325;
+        for &b in data {
+            sum ^= b as u64;
+            sum = sum.wrapping_mul(0x100000001b3);
+        }
+        sum
+    }
+
+    pub fn write_chunk(&mut self, chunk_id: u64, data: &[u8]) -> Result<(), &'static str> {
+        if self.devices.is_empty() {
+            return Err("No devices present in RAID array");
+        }
+        let checksum = Self::calculate_checksum(data);
+
+        match self.raid_level {
+            RaidLevel::Raid1Mirror => {
+                // Duplicate chunk across all online devices
+                for dev in self.devices.iter_mut().filter(|d| d.online) {
+                    let chunk = RaidChunk {
+                        chunk_id,
+                        device_id: dev.device_id,
+                        data: data.to_vec(),
+                        checksum,
+                    };
+                    if let Some(pos) = dev.chunks.iter().position(|c| c.chunk_id == chunk_id) {
+                        dev.chunks[pos] = chunk;
+                    } else {
+                        dev.chunks.push(chunk);
+                    }
+                }
+            }
+            RaidLevel::Raid5Parity => {
+                if self.devices.len() < 3 {
+                    return Err("RAID5 requires at least 3 devices");
+                }
+                // Striping and XOR parity
+                let num_data_devs = self.devices.len() - 1;
+                let data_target_idx = (chunk_id as usize) % num_data_devs;
+                let parity_target_idx = self.devices.len() - 1;
+
+                // Write data to data target
+                let data_chunk = RaidChunk {
+                    chunk_id,
+                    device_id: self.devices[data_target_idx].device_id,
+                    data: data.to_vec(),
+                    checksum,
+                };
+                if let Some(pos) = self.devices[data_target_idx].chunks.iter().position(|c| c.chunk_id == chunk_id) {
+                    self.devices[data_target_idx].chunks[pos] = data_chunk;
+                } else {
+                    self.devices[data_target_idx].chunks.push(data_chunk);
+                }
+
+                // Write parity chunk to parity target
+                let parity_chunk = RaidChunk {
+                    chunk_id,
+                    device_id: self.devices[parity_target_idx].device_id,
+                    data: data.to_vec(), // Simplified parity representation
+                    checksum,
+                };
+                if let Some(pos) = self.devices[parity_target_idx].chunks.iter().position(|c| c.chunk_id == chunk_id) {
+                    self.devices[parity_target_idx].chunks[pos] = parity_chunk;
+                } else {
+                    self.devices[parity_target_idx].chunks.push(parity_chunk);
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn corrupt_chunk_for_testing(&mut self, device_id: u32, chunk_id: u64) {
+        if let Some(dev) = self.devices.iter_mut().find(|d| d.device_id == device_id) {
+            if let Some(chunk) = dev.chunks.iter_mut().find(|c| c.chunk_id == chunk_id) {
+                if !chunk.data.is_empty() {
+                    chunk.data[0] ^= 0xFF; // Flip bits to simulate bit-rot
+                }
+            }
+        }
+    }
+
+    pub fn scrub_and_heal_chunks(&mut self) -> ScrubResult {
+        let mut corrupted_chunks_found = 0;
+        let mut chunks_repaired = 0;
+
+        match self.raid_level {
+            RaidLevel::Raid1Mirror => {
+                // Collect unique chunk IDs
+                let mut chunk_ids = Vec::new();
+                for dev in &self.devices {
+                    for chunk in &dev.chunks {
+                        if !chunk_ids.contains(&chunk.chunk_id) {
+                            chunk_ids.push(chunk.chunk_id);
+                        }
+                    }
+                }
+
+                for cid in chunk_ids {
+                    // Find a healthy copy among devices
+                    let healthy_copy = self.devices.iter().find_map(|dev| {
+                        dev.chunks.iter().find(|c| c.chunk_id == cid && Self::calculate_checksum(&c.data) == c.checksum)
+                    }).cloned();
+
+                    if let Some(healthy) = healthy_copy {
+                        // Heal corrupted copies on other devices
+                        for dev in self.devices.iter_mut() {
+                            if let Some(chunk) = dev.chunks.iter_mut().find(|c| c.chunk_id == cid) {
+                                if Self::calculate_checksum(&chunk.data) != chunk.checksum {
+                                    corrupted_chunks_found += 1;
+                                    chunk.data = healthy.data.clone();
+                                    chunk.checksum = healthy.checksum;
+                                    chunks_repaired += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            RaidLevel::Raid5Parity => {
+                // Check each device for corrupted checksums
+                let mut chunk_ids = Vec::new();
+                for dev in &self.devices {
+                    for chunk in &dev.chunks {
+                        if !chunk_ids.contains(&chunk.chunk_id) {
+                            chunk_ids.push(chunk.chunk_id);
+                        }
+                    }
+                }
+
+                for cid in chunk_ids {
+                    let healthy_copy = self.devices.iter().find_map(|dev| {
+                        dev.chunks.iter().find(|c| c.chunk_id == cid && Self::calculate_checksum(&c.data) == c.checksum)
+                    }).cloned();
+
+                    if let Some(healthy) = healthy_copy {
+                        for dev in self.devices.iter_mut() {
+                            if let Some(chunk) = dev.chunks.iter_mut().find(|c| c.chunk_id == cid) {
+                                if Self::calculate_checksum(&chunk.data) != chunk.checksum {
+                                    corrupted_chunks_found += 1;
+                                    chunk.data = healthy.data.clone();
+                                    chunk.checksum = healthy.checksum;
+                                    chunks_repaired += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        ScrubResult {
+            corrupted_chunks_found,
+            chunks_repaired,
+        }
+    }
+
+    pub fn verify_integrity(&self) -> bool {
+        for dev in &self.devices {
+            for chunk in &dev.chunks {
+                if Self::calculate_checksum(&chunk.data) != chunk.checksum {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+}
+
+// ==========================================
+// 22. NIXOS / GUIX PURE DECLARATIVE SYSTEM STATE ENGINE (SovereignDeclarativeSystemEngine)
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SystemStateConfig {
+    pub generation_id: u32,
+    pub hostname: String,
+    pub packages: Vec<String>,
+    pub services: Vec<String>,
+    pub config_hash: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SystemStateGeneration {
+    pub generation_id: u32,
+    pub config: SystemStateConfig,
+    pub timestamp: u64,
+    pub active: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RollbackStatus {
+    Success,
+    GenerationNotFound,
+    AlreadyActive,
+}
+
+pub struct SovereignDeclarativeSystemEngine {
+    pub generations: Vec<SystemStateGeneration>,
+    pub current_gen_id: u32,
+}
+
+impl SovereignDeclarativeSystemEngine {
+    pub fn new() -> Self {
+        Self {
+            generations: Vec::new(),
+            current_gen_id: 0,
+        }
+    }
+
+    pub fn calculate_config_hash(hostname: &str, packages: &[&str], services: &[&str]) -> u64 {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in hostname.as_bytes() {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        for pkg in packages {
+            for &b in pkg.as_bytes() {
+                hash ^= b as u64;
+                hash = hash.wrapping_mul(0x100000001b3);
+            }
+        }
+        for svc in services {
+            for &b in svc.as_bytes() {
+                hash ^= b as u64;
+                hash = hash.wrapping_mul(0x100000001b3);
+            }
+        }
+        hash
+    }
+
+    pub fn build_generation(&mut self, hostname: &str, packages: &[&str], services: &[&str]) -> u32 {
+        self.current_gen_id += 1;
+        let gen_id = self.current_gen_id;
+        let config_hash = Self::calculate_config_hash(hostname, packages, services);
+
+        let config = SystemStateConfig {
+            generation_id: gen_id,
+            hostname: hostname.to_string(),
+            packages: packages.iter().map(|s| s.to_string()).collect(),
+            services: services.iter().map(|s| s.to_string()).collect(),
+            config_hash,
+        };
+
+        let is_first = self.generations.is_empty();
+
+        self.generations.push(SystemStateGeneration {
+            generation_id: gen_id,
+            config,
+            timestamp: self.generations.len() as u64 + 1,
+            active: is_first,
+        });
+
+        gen_id
+    }
+
+    pub fn activate_generation(&mut self, gen_id: u32) -> Result<(), &'static str> {
+        let exists = self.generations.iter().any(|g| g.generation_id == gen_id);
+        if !exists {
+            return Err("Generation not found");
+        }
+
+        for gen in self.generations.iter_mut() {
+            gen.active = gen.generation_id == gen_id;
+        }
+
+        Ok(())
+    }
+
+    pub fn rollback_to_generation(&mut self, gen_id: u32) -> RollbackStatus {
+        if let Some(pos) = self.generations.iter().position(|g| g.generation_id == gen_id) {
+            if self.generations[pos].active {
+                RollbackStatus::AlreadyActive
+            } else {
+                for g in self.generations.iter_mut() {
+                    g.active = g.generation_id == gen_id;
+                }
+                RollbackStatus::Success
+            }
+        } else {
+            RollbackStatus::GenerationNotFound
+        }
+    }
+
+    pub fn compute_config_diff(&self, gen_a: u32, gen_b: u32) -> Option<(Vec<String>, Vec<String>)> {
+        let config_a = self.generations.iter().find(|g| g.generation_id == gen_a).map(|g| &g.config)?;
+        let config_b = self.generations.iter().find(|g| g.generation_id == gen_b).map(|g| &g.config)?;
+
+        let mut added = Vec::new();
+        let mut removed = Vec::new();
+
+        for pkg in &config_b.packages {
+            if !config_a.packages.contains(pkg) {
+                added.push(pkg.clone());
+            }
+        }
+
+        for pkg in &config_a.packages {
+            if !config_b.packages.contains(pkg) {
+                removed.push(pkg.clone());
+            }
+        }
+
+        Some((added, removed))
+    }
+}
+
+impl Default for SovereignDeclarativeSystemEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 23. OPENBSD PRIVILEGE-SEPARATED FAILSAFE SANDBOX ENGINE (SovereignPrivSepSandbox)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrivSepProcessRole {
+    RootParent,
+    UnprivilegedChild,
+    ChrootedWorker,
+}
+
+#[derive(Debug, Clone)]
+pub struct PrivSepSyscallPolicy {
+    pub role: PrivSepProcessRole,
+    pub allowed_syscalls: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PrivSepProcess {
+    pub pid: u64,
+    pub role: PrivSepProcessRole,
+    pub alive: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct PrivSepViolation {
+    pub pid: u64,
+    pub role: PrivSepProcessRole,
+    pub syscall: String,
+    pub timestamp: u64,
+}
+
+pub struct SovereignPrivSepSandbox {
+    pub policies: Vec<PrivSepSyscallPolicy>,
+    pub processes: Vec<PrivSepProcess>,
+    pub violations: Vec<PrivSepViolation>,
+}
+
+impl SovereignPrivSepSandbox {
+    pub fn new() -> Self {
+        let mut sandbox = Self {
+            policies: Vec::new(),
+            processes: Vec::new(),
+            violations: Vec::new(),
+        };
+
+        // Default strict OpenBSD-style privilege separation policies
+        sandbox.restrict_role_policy(PrivSepProcessRole::RootParent, &["fork", "exec", "socket", "bind", "setuid"]);
+        sandbox.restrict_role_policy(PrivSepProcessRole::UnprivilegedChild, &["read", "write", "select", "poll"]);
+        sandbox.restrict_role_policy(PrivSepProcessRole::ChrootedWorker, &["read", "write"]);
+
+        sandbox
+    }
+
+    pub fn restrict_role_policy(&mut self, role: PrivSepProcessRole, allowed_syscalls: &[&str]) {
+        let syscalls = allowed_syscalls.iter().map(|s| s.to_string()).collect();
+        if let Some(pos) = self.policies.iter().position(|p| p.role == role) {
+            self.policies[pos].allowed_syscalls = syscalls;
+        } else {
+            self.policies.push(PrivSepSyscallPolicy {
+                role,
+                allowed_syscalls: syscalls,
+            });
+        }
+    }
+
+    pub fn spawn_process(&mut self, pid: u64, role: PrivSepProcessRole) {
+        self.processes.push(PrivSepProcess {
+            pid,
+            role,
+            alive: true,
+        });
+    }
+
+    pub fn audit_syscall(&mut self, pid: u64, syscall: &str) -> bool {
+        let proc_opt = self.processes.iter().find(|p| p.pid == pid && p.alive).cloned();
+        if let Some(proc_info) = proc_opt {
+            let is_allowed = self.policies.iter()
+                .find(|p| p.role == proc_info.role)
+                .map(|p| p.allowed_syscalls.contains(&syscall.to_string()))
+                .unwrap_or(false);
+
+            if is_allowed {
+                true
+            } else {
+                self.violations.push(PrivSepViolation {
+                    pid,
+                    role: proc_info.role,
+                    syscall: syscall.to_string(),
+                    timestamp: self.violations.len() as u64 + 1,
+                });
+                self.terminate_violating_process(pid);
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    pub fn terminate_violating_process(&mut self, pid: u64) {
+        if let Some(p) = self.processes.iter_mut().find(|p| p.pid == pid) {
+            p.alive = false;
+        }
+    }
+}
+
+impl Default for SovereignPrivSepSandbox {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2355,5 +3009,101 @@ mod tests {
         assert!(!alloc.validate_execution_attempt(virt_data));
         assert_eq!(alloc.security_violations.len(), 1);
         assert!(alloc.security_violations[0].contains("W^X Violation"));
+    }
+
+    #[test]
+    fn test_sovereign_dtrace_engine() {
+        let mut dtrace = SovereignDTraceEngine::new();
+        let pid = 1234;
+
+        let p1 = dtrace.register_probe(DTraceProvider::Fbt, "kernel", "sys_read", "entry");
+        let p2 = dtrace.register_probe(DTraceProvider::Sysinfo, "kernel", "cpu", "ticks");
+
+        // Probe inactive by default
+        assert!(!dtrace.fire_probe(p1, pid, 10, 20));
+        assert_eq!(dtrace.events.len(), 0);
+
+        // Enable probe
+        assert!(dtrace.enable_probe(p1));
+        assert!(dtrace.fire_probe(p1, pid, 10, 20));
+        assert_eq!(dtrace.events.len(), 1);
+        assert_eq!(dtrace.events[0].arg0, 10);
+
+        // Aggregations
+        dtrace.aggregate_metric(p2, DTraceAggregation::Count, 1);
+        dtrace.aggregate_metric(p2, DTraceAggregation::Count, 1);
+        dtrace.aggregate_metric(p2, DTraceAggregation::Sum, 100);
+        dtrace.aggregate_metric(p2, DTraceAggregation::Sum, 200);
+
+        assert_eq!(dtrace.get_aggregation_value(p2, DTraceAggregation::Count), Some(2));
+        assert_eq!(dtrace.get_aggregation_value(p2, DTraceAggregation::Sum), Some(300));
+        assert_eq!(dtrace.get_aggregation_value(p2, DTraceAggregation::Avg), Some(150));
+    }
+
+    #[test]
+    fn test_sovereign_raid_self_healer() {
+        let mut healer = SovereignRaidSelfHealer::new(RaidLevel::Raid1Mirror);
+        healer.add_device(1, "/dev/sda");
+        healer.add_device(2, "/dev/sdb");
+
+        let chunk_data = b"CRITICAL_FILESYSTEM_BLOCK_DATA";
+        assert!(healer.write_chunk(1001, chunk_data).is_ok());
+        assert!(healer.verify_integrity());
+
+        // Corrupt dev 1, chunk 1001
+        healer.corrupt_chunk_for_testing(1, 1001);
+        assert!(!healer.verify_integrity());
+
+        // Scrub and self-heal
+        let scrub = healer.scrub_and_heal_chunks();
+        assert_eq!(scrub.corrupted_chunks_found, 1);
+        assert_eq!(scrub.chunks_repaired, 1);
+        assert!(healer.verify_integrity());
+    }
+
+    #[test]
+    fn test_sovereign_declarative_system_engine() {
+        let mut engine = SovereignDeclarativeSystemEngine::new();
+
+        let gen1 = engine.build_generation("sigma-node-1", &["coreutils", "kernel"], &["syslogd"]);
+        let gen2 = engine.build_generation("sigma-node-1", &["coreutils", "kernel", "nginx"], &["syslogd", "nginx"]);
+
+        assert_eq!(gen1, 1);
+        assert_eq!(gen2, 2);
+
+        assert!(engine.generations[0].active);
+        assert!(!engine.generations[1].active);
+
+        // Activate generation 2
+        assert!(engine.activate_generation(gen2).is_ok());
+        assert!(!engine.generations[0].active);
+        assert!(engine.generations[1].active);
+
+        // Rollback to gen 1
+        let roll = engine.rollback_to_generation(gen1);
+        assert_eq!(roll, RollbackStatus::Success);
+        assert!(engine.generations[0].active);
+
+        // Diff computation
+        let (added, removed) = engine.compute_config_diff(gen1, gen2).unwrap();
+        assert_eq!(added, vec!["nginx".to_string()]);
+        assert!(removed.is_empty());
+    }
+
+    #[test]
+    fn test_sovereign_priv_sep_sandbox() {
+        let mut sandbox = SovereignPrivSepSandbox::new();
+
+        sandbox.spawn_process(101, PrivSepProcessRole::ChrootedWorker);
+
+        // Allowed syscall
+        assert!(sandbox.audit_syscall(101, "read"));
+        assert!(sandbox.processes[0].alive);
+
+        // Disallowed syscall -> causes immediate process termination and security violation logging
+        assert!(!sandbox.audit_syscall(101, "exec"));
+        assert!(!sandbox.processes[0].alive);
+        assert_eq!(sandbox.violations.len(), 1);
+        assert_eq!(sandbox.violations[0].syscall, "exec");
     }
 }
