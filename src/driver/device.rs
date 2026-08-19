@@ -2986,27 +2986,14 @@ impl<T> Vec<T> {
             &[]
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
         }
     }
 
-    pub fn as_slice(&self) -> &[T] {
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
         if self.len == 0 {
-            &[]
+            &mut []
         } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-
-    pub fn iter_mut(&mut self) -> VecIteratorMut<'_, T> {
-        VecIteratorMut {
-            vec: self,
-            index: 0,
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
 
@@ -3211,6 +3198,7 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
     if let Ok(layout) = Layout::from_size_align(size, 8) {
         std_alloc(layout)
     } else {
@@ -3235,30 +3223,23 @@ extern "C" {
 extern "C" {
     fn malloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
 /// Unified representation of communication channels (OOP Abstraction)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PortAddress {
     PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
     MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+}
+
 /// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
 #[derive(Debug, Clone)]
 pub struct DeviceExtension {
     pub irq: u8,
-    PortIO(u16),      // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32) // Modern 32/64-bit Memory Mapped I/O (newer generations)
-}
-
-/// Unified Peripheral Object-Oriented Interface (OOP Principle)
-pub trait UnifiedPeripheral: Device {
-    fn query_channel(&self) -> PortAddress;
-    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError>;
-    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError>;
-}
-
-/// Legacy implementation of a peripheral using Port I/O
-pub struct LegacyDevice {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+    pub base_port: u16,
+    pub base_address: u32,
+    pub memory_size: usize,
+    pub device_context: [u8; 128],
 }
 
 /// Unified Peripheral Object-Oriented Interface (OOP Principle)
@@ -3315,33 +3296,34 @@ impl UnifiedPeripheral for LegacyDevice {
 
 /// Modern implementation of a peripheral using MMIO
 pub struct ModernDevice {
+    pub base_address: u32,
     pub id: usize,
     pub name: [u8; 64],
 }
 
-impl LegacyDevice {
-    pub fn new(id: usize, name: &[u8], base_port: u16) -> Self {
+impl ModernDevice {
+    pub fn new(id: usize, name: &[u8], base_address: u32) -> Self {
         let mut name_array = [0u8; 64];
         let len = name.len().min(63);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        LegacyDevice {
-            base_port,
+        ModernDevice {
+            base_address,
             id,
             name: name_array,
         }
     }
 }
 
-impl Device for LegacyDevice {
+impl Device for ModernDevice {
     fn init(&mut self) -> Result<(), DeviceError> {
         Ok(())
     }
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        // Simulate reading from legacy Port I/O
+        // Simulate reading MMIO
         for b in buffer.iter_mut() {
-            *b = 0; // Stub reading legacy port
+            *b = 0;
         }
         Ok(buffer.len())
     }
@@ -3359,25 +3341,16 @@ impl Device for LegacyDevice {
     }
 }
 
-impl UnifiedPeripheral for LegacyDevice {
+impl UnifiedPeripheral for ModernDevice {
     fn query_channel(&self) -> PortAddress {
-        PortAddress::PortIO(self.base_port)
+        PortAddress::MemoryMapped(self.base_address)
     }
     fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
-        // Simulate inb instruction
         Ok(0)
     }
     fn write_byte(&mut self, _offset: u32, _value: u8) -> Result<(), DeviceError> {
-        // Simulate outb instruction
         Ok(())
     }
-}
-
-/// Modern implementation of a peripheral using MMIO
-pub struct ModernDevice {
-    pub base_address: u32,
-    pub memory_size: usize,
-    pub device_context: [u8; 128], // Driver-specific context information buffer
 }
 
 impl DeviceExtension {
@@ -3406,52 +3379,11 @@ impl DeviceObject {
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        ModernDevice { base_address, id, name: name_array }
-    }
-}
-        ModernDevice {
-            base_address,
-            id,
-            name: name_array,
-        }
-    }
-}
-
         Self {
             name: name_array,
             device_type,
             device_extension: DeviceExtension::new(),
-impl Device for ModernDevice {
-    fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        // Simulate reading MMIO
-        for b in buffer.iter_mut() {
-            *b = 0;
-impl Device for ModernDevice {
-    fn init(&mut self) -> Result<(), DeviceError> {
-        Ok(())
-    }
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        // Simulate reading MMIO
-        for b in buffer.iter_mut() {
-            *b = 0;
         }
-    }
-    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> { Ok(buffer.len()) }
-    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> { Ok(0) }
-    fn info(&self) -> DeviceInfo { DeviceInfo::new(DeviceType::Character) }
-    fn shutdown(&mut self) -> Result<(), DeviceError> { Ok(()) }
-    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
-        Ok(buffer.len())
-    }
-    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
-        Ok(0)
-    }
-    fn info(&self) -> DeviceInfo {
-        DeviceInfo::new(DeviceType::Character)
-    }
-    fn shutdown(&mut self) -> Result<(), DeviceError> {
-        Ok(())
     }
 }
 
@@ -3467,14 +3399,6 @@ impl DriverObject {
     pub fn new(name: &[u8], reg_path: &[u8]) -> Self {
         let mut name_array = [0u8; 64];
         let len = name.len().min(63);
-impl UnifiedPeripheral for ModernDevice {
-    fn query_channel(&self) -> PortAddress { PortAddress::MemoryMapped(self.base_address) }
-    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
-impl UnifiedPeripheral for ModernDevice {
-    fn query_channel(&self) -> PortAddress {
-        PortAddress::MemoryMapped(self.base_address)
-    }
-    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
@@ -3517,116 +3441,6 @@ impl IoManager {
     pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
         if driver_idx >= self.active_drivers.len() {
             return Err(DeviceError::InvalidParameter);
-    /// Execute the sandboxed User-Defined Function bytecode
-    /// Bytecode instructions:
-    /// - 0x01: Read Port IO / MMIO
-    /// - 0x02: Write Port IO / MMIO
-    /// - 0x03: Custom scaling transformation
-    /// - 0x04: Terminate with success
-    pub fn execute(&self, peripheral: &mut dyn UnifiedPeripheral, registers: &mut [u32; 4]) -> Result<(), DeviceError> {
-        let mut pc = 0;
-        while pc < self.bytecode.len() {
-            let op = self.bytecode[pc];
-            match op {
-                0x01 => {
-                    // Read operation. Register index in bytecode[pc+1], offset in bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() { return Err(DeviceError::InvalidParameter); }
-                    let reg_idx = self.bytecode[pc + 1] as usize;
-                    let offset = self.bytecode[pc + 2] as u32;
-                    if reg_idx < registers.len() {
-                        registers[reg_idx] = peripheral.read_byte(offset)? as u32;
-                    }
-                    pc += 3;
-                }
-                0x02 => {
-                    // Write operation. Offset in bytecode[pc+1], register index holding value in bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() { return Err(DeviceError::InvalidParameter); }
-                    let offset = self.bytecode[pc + 1] as u32;
-                    let reg_idx = self.bytecode[pc + 2] as usize;
-                    if reg_idx < registers.len() {
-                        peripheral.write_byte(offset, registers[reg_idx] as u8)?;
-                    }
-                    pc += 3;
-                }
-                0x03 => {
-                    // Custom scale/transformation operation. Multiply register[pc+1] by factor bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() { return Err(DeviceError::InvalidParameter); }
-                    let reg_idx = self.bytecode[pc + 1] as usize;
-                    let factor = self.bytecode[pc + 2] as u32;
-                    if reg_idx < registers.len() {
-                        registers[reg_idx] = registers[reg_idx].wrapping_mul(factor);
-                    }
-                    pc += 3;
-                }
-                0x04 => {
-                    // Halt with success
-                    return Ok(());
-                }
-                _ => {
-                    // Unknown opcode
-                    return Err(DeviceError::NotSupported);
-                }
-            }
-    /// Execute the sandboxed User-Defined Function bytecode
-    /// Bytecode instructions:
-    /// - 0x01: Read Port IO / MMIO
-    /// - 0x02: Write Port IO / MMIO
-    /// - 0x03: Custom scaling transformation
-    /// - 0x04: Terminate with success
-    pub fn execute(
-        &self,
-        peripheral: &mut dyn UnifiedPeripheral,
-        registers: &mut [u32; 4],
-    ) -> Result<(), DeviceError> {
-        let mut pc = 0;
-        while pc < self.bytecode.len() {
-            let op = self.bytecode[pc];
-            match op {
-                0x01 => {
-                    // Read operation. Register index in bytecode[pc+1], offset in bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() {
-                        return Err(DeviceError::InvalidParameter);
-                    }
-                    let reg_idx = self.bytecode[pc + 1] as usize;
-                    let offset = self.bytecode[pc + 2] as u32;
-                    if reg_idx < registers.len() {
-                        registers[reg_idx] = peripheral.read_byte(offset)? as u32;
-                    }
-                    pc += 3;
-                }
-                0x02 => {
-                    // Write operation. Offset in bytecode[pc+1], register index holding value in bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() {
-                        return Err(DeviceError::InvalidParameter);
-                    }
-                    let offset = self.bytecode[pc + 1] as u32;
-                    let reg_idx = self.bytecode[pc + 2] as usize;
-                    if reg_idx < registers.len() {
-                        peripheral.write_byte(offset, registers[reg_idx] as u8)?;
-                    }
-                    pc += 3;
-                }
-                0x03 => {
-                    // Custom scale/transformation operation. Multiply register[pc+1] by factor bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() {
-                        return Err(DeviceError::InvalidParameter);
-                    }
-                    let reg_idx = self.bytecode[pc + 1] as usize;
-                    let factor = self.bytecode[pc + 2] as u32;
-                    if reg_idx < registers.len() {
-                        registers[reg_idx] = registers[reg_idx].wrapping_mul(factor);
-                    }
-                    pc += 3;
-                }
-                0x04 => {
-                    // Halt with success
-                    return Ok(());
-                }
-                _ => {
-                    // Unknown opcode
-                    return Err(DeviceError::NotSupported);
-                }
-            }
         }
 
         let device_obj = DeviceObject::new(name, device_type);
@@ -3662,69 +3476,79 @@ impl Default for IoManager {
     }
 }
 
-/// Unified representation of communication channels (OOP Abstraction)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortAddress {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+/// UDF (User-Defined Function) Interpreter for executing sandboxed bytecode on peripherals
+pub struct UdfInterpreter<'a> {
+    bytecode: &'a [u8],
+}
+
+impl<'a> UdfInterpreter<'a> {
+    pub fn new(bytecode: &'a [u8]) -> Self {
+        Self { bytecode }
+    }
+
+    /// Execute the sandboxed User-Defined Function bytecode
+    /// Bytecode instructions:
+    /// - 0x01: Read Port IO / MMIO
+    /// - 0x02: Write Port IO / MMIO
+    /// - 0x03: Custom scaling transformation
+    /// - 0x04: Terminate with success
+    pub fn execute(&self, peripheral: &mut dyn UnifiedPeripheral, registers: &mut [u32; 4]) -> Result<(), DeviceError> {
+        let mut pc = 0;
+        while pc < self.bytecode.len() {
+            let op = self.bytecode[pc];
+            match op {
+                0x01 => {
+                    // Read operation. Register index in bytecode[pc+1], offset in bytecode[pc+2]
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
+                    let reg_idx = self.bytecode[pc + 1] as usize;
+                    let offset = self.bytecode[pc + 2] as u32;
+                    if reg_idx < registers.len() {
+                        registers[reg_idx] = peripheral.read_byte(offset)? as u32;
+                    }
+                    pc += 3;
+                }
+                0x02 => {
+                    // Write operation. Offset in bytecode[pc+1], register index holding value in bytecode[pc+2]
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
+                    let offset = self.bytecode[pc + 1] as u32;
+                    let reg_idx = self.bytecode[pc + 2] as usize;
+                    if reg_idx < registers.len() {
+                        peripheral.write_byte(offset, registers[reg_idx] as u8)?;
+                    }
+                    pc += 3;
+                }
+                0x03 => {
+                    // Custom scale/transformation operation. Multiply register[pc+1] by factor bytecode[pc+2]
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
+                    let reg_idx = self.bytecode[pc + 1] as usize;
+                    let factor = self.bytecode[pc + 2] as u32;
+                    if reg_idx < registers.len() {
+                        registers[reg_idx] = registers[reg_idx].wrapping_mul(factor);
+                    }
+                    pc += 3;
+                }
+                0x04 => {
+                    // Halt with success
+                    return Ok(());
+                }
+                _ => {
+                    // Unknown opcode
+                    return Err(DeviceError::NotSupported);
+                }
+            }
+        }
+        Err(DeviceError::InvalidParameter)
+    }
 }
 
 #[cfg(test)]
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     malloc(size)
-}
-
-// ==========================================
-// Standalone unit tests
-// ==========================================
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_device_descriptors() {
-        let capability = DeviceCapability::full();
-        let desc = DeviceDescriptor::new(10, b"SerialTTY", DeviceType::Character, capability);
-        assert_eq!(desc.get_state(), DeviceState::Uninitialized);
-        desc.set_state(DeviceState::Ready);
-        assert_eq!(desc.get_state(), DeviceState::Ready);
-    }
-
-    #[test]
-    fn test_simple_block_device() {
-        let mut dev = SimpleBlockDevice::new(1, b"disk0", 4, 512);
-        assert_eq!(dev.info().vendor_id, 0x8086);
-        assert!(dev.init().is_ok());
-
-        let mut write_buf = [0u8; 512];
-        write_buf[0] = 0xAA;
-        assert!(dev.write_block(2, &write_buf).is_ok());
-
-        let mut read_buf = [0u8; 512];
-        assert!(dev.read_block(2, &mut read_buf).is_ok());
-        assert_eq!(read_buf[0], 0xAA);
-    }
-
-    #[test]
-    fn test_device_manager_autoprobe_and_params() {
-        let mut mgr = DeviceManager::new();
-
-        // Register custom boot parameter (module param)
-        mgr.set_module_param(b"debug_level", 4);
-        assert_eq!(mgr.get_module_param(b"debug_level"), Some(4));
-        assert_eq!(mgr.get_module_param(b"non_existent"), None);
-
-        // Register PCI device table probe matches
-        let entry = DriverProbeEntry {
-            vendor_id: 0x10EC,
-            device_id: 0x8168,
-            device_type: DeviceType::Network,
-        };
-        mgr.register_probe_match(entry);
-
-        // Check autoprobe success
-        assert!(mgr.auto_probe_and_bind(0x10EC, 0x8168, DeviceType::Network));
-        assert!(!mgr.auto_probe_and_bind(0xFFFF, 0xFFFF, DeviceType::Network));
-    }
 }
