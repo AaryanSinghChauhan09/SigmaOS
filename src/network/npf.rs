@@ -76,6 +76,7 @@ impl NpfFirewallEngine {
 
     fn serialize_state_key(packet: &NpfPacket) -> [u8; 18] {
         let mut key = [0u8; 18];
+<<<<<<< HEAD
         key[0..4].copy_from_slice(&packet.src_ip);
         key[4..8].copy_from_slice(&packet.dst_ip);
         key[8..10].copy_from_slice(&packet.src_port.to_be_bytes());
@@ -83,6 +84,20 @@ impl NpfFirewallEngine {
         key[12] = packet.protocol;
         // Symmetric reverse direction key offset
         key[13..17].copy_from_slice(&packet.dst_ip);
+=======
+        // Normalize direction (canonical order) so both inbound and outbound packets produce the identical state key
+        let ((ip1, port1), (ip2, port2)) = if (packet.src_ip, packet.src_port) <= (packet.dst_ip, packet.dst_port) {
+            ((packet.src_ip, packet.src_port), (packet.dst_ip, packet.dst_port))
+        } else {
+            ((packet.dst_ip, packet.dst_port), (packet.src_ip, packet.src_port))
+        };
+
+        key[0..4].copy_from_slice(&ip1);
+        key[4..8].copy_from_slice(&ip2);
+        key[8..10].copy_from_slice(&port1.to_be_bytes());
+        key[10..12].copy_from_slice(&port2.to_be_bytes());
+        key[12] = packet.protocol;
+>>>>>>> origin/jules-5387654575179832508-cadee73d
         key[17] = 1;
         key
     }
@@ -180,6 +195,21 @@ mod tests {
         let pass_again = engine.evaluate_packet(&pkt, NpfDirection::Outbound);
         assert_eq!(pass_again, NpfFilterAction::Pass);
 
+<<<<<<< HEAD
+=======
+        // Verify reverse direction packet (inbound response) hits state table
+        let return_pkt = NpfPacket {
+            src_ip: [1, 1, 1, 1],
+            dst_ip: [10, 0, 0, 2],
+            src_port: 80,
+            dst_port: 54321,
+            protocol: 6,
+            payload: Vec::new(),
+        };
+        let return_pass = engine.evaluate_packet(&return_pkt, NpfDirection::Inbound);
+        assert_eq!(return_pass, NpfFilterAction::Pass);
+
+>>>>>>> origin/jules-5387654575179832508-cadee73d
         // Apply NAT
         engine.apply_outbound_nat(&mut pkt);
         assert_eq!(pkt.src_ip, [192, 168, 1, 1]);
