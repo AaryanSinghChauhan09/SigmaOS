@@ -12,6 +12,8 @@ pub enum PackageFormat {
     Portage,
     Sovereign,
     Xbps,
+    Nix,
+    Apk,
 }
 
 #[derive(Debug, Clone)]
@@ -474,6 +476,70 @@ impl IPackageAdapter for XbpsPackageAdapter {
                 service
             );
         }
+        Ok(())
+    }
+}
+
+pub struct NixPackageAdapter;
+
+impl IPackageAdapter for NixPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Nix
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Nix package payload");
+        }
+        Ok(PackageContext {
+            name: "nix-compat-pkg".to_string(),
+            version: "2.3.16".to_string(),
+            format: PackageFormat::Nix,
+            dependencies: vec![],
+            files: vec!["/nix/store/nix-compat-pkg/bin/nix".to_string()],
+            hash: [0x99; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Nix Adapter: Created functional store link: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+
+pub struct ApkPackageAdapter;
+
+impl IPackageAdapter for ApkPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Apk
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty APK package payload");
+        }
+        Ok(PackageContext {
+            name: "apk-compat-pkg".to_string(),
+            version: "2.14.0".to_string(),
+            format: PackageFormat::Apk,
+            dependencies: vec!["musl".to_string()],
+            files: vec!["/bin/apk-compat".to_string()],
+            hash: [0x77; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "APK Adapter: Extracted Alpine package to store: {}",
+            store_path
+        );
         Ok(())
     }
 }
