@@ -392,7 +392,7 @@ impl SovereignPackageManager {
                         "Pre-Install UDF Hook failed: {}. Initiating O(1) pointer abort.",
                         e
                     );
-                    return Err(e as &'static str);
+                    return Err(e);
                 }
             }
         }
@@ -426,7 +426,7 @@ impl SovereignPackageManager {
                         e
                     );
                     self.rollback_to_generation(old_generation);
-                    return Err(e as &'static str);
+                    return Err(e);
                 }
             }
         }
