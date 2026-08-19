@@ -1,5 +1,8 @@
 #![no_std]
-#![no_main]
+#![cfg_attr(not(test), no_main)]
+
+extern crate alloc as std_alloc;
+use std_alloc::boxed::Box;
 
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
@@ -10,12 +13,12 @@ use core::mem;
 
 pub type ServiceID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState { Stopped = 0, Starting = 1, Running = 2, Stopping = 3, Failed = 4 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InitError { Success = 0, ServiceNotFound = 1, DependencyFailed = 2, StartFailed = 3, StopFailed = 4 }
 
 pub trait Service {
@@ -60,7 +63,10 @@ impl Service for SimpleService {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ServiceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ServiceState {
+        let val = self.state.load(Ordering::SeqCst) as u32;
+        unsafe { core::mem::transmute(val) }
+    }
     fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
 
     fn start(&mut self) -> Result<(), InitError> {
@@ -108,6 +114,12 @@ impl SigmaInit {
         }
     }
 
+    pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        self.stop_service(id)?;
+        self.start_service(id)?;
+        Ok(())
+    }
+
     pub fn enable_parallel_startup(&mut self) {
         self.parallel_startup.store(1, Ordering::SeqCst);
     }
@@ -125,17 +137,28 @@ impl InitSystem for SigmaInit {
     }
 
     fn start_service(&mut self, id: ServiceID) -> Result<(), InitError> {
-        for svc_option in &mut self.services {
-            if let Some(ref mut svc) = *svc_option {
+        let mut deps_to_start = Vec::new();
+        let mut found_idx = None;
+
+        for (i, svc_option) in self.services.iter().enumerate() {
+            if let Some(ref svc) = *svc_option {
                 if svc.id() == id {
-                    let deps = svc.dependencies();
-                    for dep_id in deps {
-                        self.start_service(dep_id)?;
-                    }
-                    return svc.start();
+                    deps_to_start = svc.dependencies();
+                    found_idx = Some(i);
+                    break;
                 }
             }
         }
+
+        if let Some(idx) = found_idx {
+            for dep_id in deps_to_start {
+                self.start_service(dep_id)?;
+            }
+            if let Some(ref mut svc) = self.services[idx] {
+                return svc.start();
+            }
+        }
+
         Err(InitError::ServiceNotFound)
     }
 
@@ -421,7 +444,76 @@ impl Default for RancherContainerInit {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+impl<T> IntoIterator for Vec<T> {
+    type Item = T;
+    type IntoIter = VecIntoIter<T>;
+    fn into_iter(self) -> Self::IntoIter {
+        VecIntoIter { vec: self, index: 0 }
+    }
+}
+
+pub struct VecIntoIter<T> {
+    vec: Vec<T>,
+    index: usize,
+}
+
+impl<T> Iterator for VecIntoIter<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len {
+            unsafe {
+                let item = core::ptr::read(self.vec.data.add(self.index));
+                self.index += 1;
+                Some(item)
+            }
+        } else {
+            None
+        }
+    }
+}
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
@@ -443,6 +535,9 @@ impl<T> Vec<T> {
             }
         }
         new_vec
+    }
+    fn len(&self) -> usize {
+        self.len
     }
     fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
@@ -469,11 +564,176 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(not(target_os = "none"))]
+#[no_mangle]
+pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
+    use std_alloc::alloc::{alloc as std_alloc_fn, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc_fn(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+#[no_mangle]
+pub unsafe extern "C" fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+/// Runit-inspired lightweight service supervisor (runsv / runsvdir equivalent)
+pub struct RunitServiceSupervisor {
+    pub service_name: [u8; 32],
+    pub pid: AtomicUsize,
+    pub restart_count: AtomicUsize,
+    pub is_down: bool,
+    pub auto_respawn: bool,
+}
+
+impl RunitServiceSupervisor {
+    pub fn new(name: &str) -> Self {
+        let mut name_arr = [0u8; 32];
+        let len = name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_bytes().as_ptr(), name_arr.as_mut_ptr(), len);
+        }
+        RunitServiceSupervisor {
+            service_name: name_arr,
+            pid: AtomicUsize::new(0),
+            restart_count: AtomicUsize::new(0),
+            is_down: false,
+            auto_respawn: true,
+        }
+    }
+
+    /// Simulates runsv execution loop spawning or restarting service
+    pub fn runsv_step(&mut self) -> Result<usize, InitError> {
+        if self.is_down {
+            return Err(InitError::StopFailed);
+        }
+        let current_pid = self.pid.load(Ordering::SeqCst);
+        if current_pid == 0 {
+            // Service crashed or not started; respawn immediately
+            let new_pid = 2000 + self.restart_count.fetch_add(1, Ordering::SeqCst);
+            self.pid.store(new_pid, Ordering::SeqCst);
+            Ok(new_pid)
+        } else {
+            Ok(current_pid)
+        }
+    }
+
+    /// Sends SIGTERM equivalent to stop supervised process (sv down equivalent)
+    pub fn sv_down(&mut self) {
+        self.is_down = true;
+        self.pid.store(0, Ordering::SeqCst);
+    }
+
+    /// Restores supervised process monitoring (sv up equivalent)
+    pub fn sv_up(&mut self) {
+        self.is_down = false;
+    }
+}
+
+/// OpenRC-inspired Runlevel Target Manager (boot, default, nonetwork, shutdown)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OpenRcRunlevel {
+    SysInit,
+    Boot,
+    Default,
+    NoNetwork,
+    Shutdown,
+}
+
+pub struct OpenRcRunlevelManager {
+    pub current_runlevel: OpenRcRunlevel,
+    pub active_services: Vec<[u8; 32]>,
+}
+
+impl OpenRcRunlevelManager {
+    pub fn new() -> Self {
+        OpenRcRunlevelManager {
+            current_runlevel: OpenRcRunlevel::SysInit,
+            active_services: Vec::new(),
+        }
+    }
+
+    /// Switch OpenRC runlevel and trigger init scripts in topological order
+    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) -> Result<(), InitError> {
+        self.current_runlevel = target;
+        match target {
+            OpenRcRunlevel::Boot => {
+                self.add_active_service(b"devfs");
+                self.add_active_service(b"procfs");
+                self.add_active_service(b"sysfs");
+            }
+            OpenRcRunlevel::Default => {
+                self.add_active_service(b"sshd");
+                self.add_active_service(b"chronyd");
+                self.add_active_service(b"networking");
+            }
+            OpenRcRunlevel::NoNetwork => {
+                self.active_services = Vec::new();
+            }
+            OpenRcRunlevel::Shutdown => {
+                self.active_services = Vec::new(); // Stop all running services
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
+    fn add_active_service(&mut self, name: &[u8]) {
+        let mut arr = [0u8; 32];
+        let len = name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), arr.as_mut_ptr(), len);
+        }
+        self.active_services.push(arr);
+    }
+}
+
+impl Default for OpenRcRunlevelManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_runit_supervisor_restart_loop() {
+        let mut supervisor = RunitServiceSupervisor::new("sshd");
+        assert_eq!(supervisor.pid.load(Ordering::SeqCst), 0);
+
+        // First step starts the service
+        let pid1 = supervisor.runsv_step().unwrap();
+        assert_eq!(pid1, 2000);
+
+        // Simulate crash
+        supervisor.pid.store(0, Ordering::SeqCst);
+        let pid2 = supervisor.runsv_step().unwrap();
+        assert_eq!(pid2, 2001); // Respawned with new PID
+
+        // sv down stops supervision
+        supervisor.sv_down();
+        assert_eq!(supervisor.runsv_step(), Err(InitError::StopFailed));
+    }
+
+    #[test]
+    fn test_openrc_runlevel_transitions() {
+        let mut manager = OpenRcRunlevelManager::new();
+        assert_eq!(manager.current_runlevel, OpenRcRunlevel::SysInit);
+
+        manager.transition_runlevel(OpenRcRunlevel::Boot).unwrap();
+        assert_eq!(manager.current_runlevel, OpenRcRunlevel::Boot);
+        assert_eq!(manager.active_services.len(), 3);
+
+        manager.transition_runlevel(OpenRcRunlevel::Shutdown).unwrap();
+        assert_eq!(manager.current_runlevel, OpenRcRunlevel::Shutdown);
+        assert_eq!(manager.active_services.len(), 0);
+    }
 
     #[test]
     fn test_rancher_container_init() {
