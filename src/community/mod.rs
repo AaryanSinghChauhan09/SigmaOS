@@ -1,12 +1,14 @@
-// SigmaOS Community Subsystem
-// Collaborative handbooks, reproducible package recipes, security profile templates,
-// hybrid firewall configurations, and virtualization blueprints.
-
+// SigmaOS Community Module
+pub mod infrastructure;
 pub mod toolkit;
 
+pub use infrastructure::{
+    BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
+    IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
+};
+
 pub use toolkit::{
-    CommunityHandbookCatalog, HandbookArticle, HybridFirewallTemplate,
-    HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, ReproducibleRecipe,
-    SecurityProfileTemplateStore, SharedSecurityProfile, VirtualizationBlueprint,
-    VirtualizationBlueprintStore,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
+    RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
+    SecurityProfileTemplateStore, SecurityTemplate,
 };

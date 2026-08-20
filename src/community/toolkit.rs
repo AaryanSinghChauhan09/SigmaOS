@@ -1,58 +1,95 @@
-//! Community Toolkit & Blueprint Manager for SigmaOS
-//! Provides collaborative handbook documentation catalog (Arch Wiki / FreeBSD Handbook parity),
-//! reproducible package recipes (Nixpkgs / BSD Ports parity),
-//! shared security profile templates (SELinux/AppArmor/Capsicum),
-//! hybrid PF+nftables firewall templates, and virtualization blueprints (bhyve+QEMU & OCI).
+// Community Handbook, Reproducible Package Recipes & Blueprint Toolkit for SigmaOS
+// Inspired by Arch Wiki, FreeBSD Handbook, Gentoo Portage, Void XBPS-src, and OpenBSD ports.
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
+use std::collections::HashMap;
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::collections::BTreeMap;
-
-/// Community Handbook Documentation Catalog (Arch Wiki / FreeBSD Handbook model)
-#[derive(Debug, Clone)]
-pub struct HandbookArticle {
-    pub article_id: String,
-    pub title: String,
-    pub category: String,
-    pub content_md: String,
-    pub contributors_count: usize,
+/// Article categories for the Community Handbook
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArticleCategory {
+    Installation,
+    SystemAdministration,
+    Networking,
+    SecurityHardening,
+    PackageManagement,
+    KernelTuning,
+    HardwareDrivers,
+    Troubleshooting,
 }
 
+/// Community Handbook Article (Arch Wiki & FreeBSD Handbook parity)
+#[derive(Debug, Clone)]
+pub struct HandbookArticle {
+    pub id: usize,
+    pub title: String,
+    pub category: ArticleCategory,
+    pub tags: Vec<String>,
+    pub content: String,
+    pub distro_inspiration: String, // e.g. "Arch Linux Wiki", "FreeBSD Handbook"
+}
+
+/// Community Handbook Catalog Engine
 pub struct CommunityHandbookCatalog {
-    pub articles: BTreeMap<String, HandbookArticle>,
+    pub articles: HashMap<usize, HandbookArticle>,
+    pub next_id: usize,
 }
 
 impl CommunityHandbookCatalog {
     pub fn new() -> Self {
         let mut catalog = Self {
-            articles: BTreeMap::new(),
+            articles: HashMap::new(),
+            next_id: 1,
         };
-        catalog.add_article(
-            "sigma-handbook-01",
-            "SigmaOS Installation & Kernel Architecture",
-            "Core",
-            "# SigmaOS Handbook\nWelcome to sovereign OS development.",
-            5,
-        );
+        catalog.seed_handbook_defaults();
         catalog
     }
 
-    pub fn add_article(&mut self, id: &str, title: &str, cat: &str, md: &str, contributors: usize) {
-        self.articles.insert(id.to_string(), HandbookArticle {
-            article_id: id.to_string(),
-            title: title.to_string(),
-            category: cat.to_string(),
-            content_md: md.to_string(),
-            contributors_count: contributors,
-        });
+    pub fn seed_handbook_defaults(&mut self) {
+        self.add_article(
+            "SigmaOS Installation & Partitioning Guide",
+            ArticleCategory::Installation,
+            &["install", "partitioning", "btrfs", "zfs"],
+            "Guide covering UEFI, S-Boot, Btrfs snapshots, and ZFS pool setup inspired by Arch Wiki.",
+            "Arch Linux Wiki",
+        );
+
+        self.add_article(
+            "FreeBSD GEOM Storage & GELI Disk Encryption",
+            ArticleCategory::SystemAdministration,
+            &["geom", "geli", "encryption", "raid"],
+            "Configuring FreeBSD GEOM transformations, g_mirror, g_stripe, and GELI encryption.",
+            "FreeBSD Handbook",
+        );
+
+        self.add_article(
+            "OpenBSD pledge and unveil Security Sandboxing",
+            ArticleCategory::SecurityHardening,
+            &["pledge", "unveil", "sandboxing", "security"],
+            "Applying OpenBSD pledge system call restrictions and unveil filesystem path restriction policies.",
+            "OpenBSD Manual",
+        );
     }
 
-    pub fn get_article(&self, id: &str) -> Option<&HandbookArticle> {
-        self.articles.get(id)
+    pub fn add_article(&mut self, title: &str, category: ArticleCategory, tags: &[&str], content: &str, inspiration: &str) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        let article = HandbookArticle {
+            id,
+            title: title.to_string(),
+            category,
+            tags: tags.iter().map(|t| t.to_string()).collect(),
+            content: content.to_string(),
+            distro_inspiration: inspiration.to_string(),
+        };
+        self.articles.insert(id, article);
+        id
+    }
+
+    pub fn search_articles(&self, query: &str) -> Vec<&HandbookArticle> {
+        let q = query.to_lowercase();
+        self.articles
+            .values()
+            .filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q) || a.tags.iter().any(|t| t.to_lowercase().contains(&q)))
+            .collect()
     }
 }
 
@@ -62,34 +99,63 @@ impl Default for CommunityHandbookCatalog {
     }
 }
 
-/// Reproducible Package Recipe (Nixpkgs / BSD Ports parity)
-#[derive(Debug, Clone)]
-pub struct ReproducibleRecipe {
-    pub package_name: String,
-    pub version: String,
-    pub hash_signature: String,
-    pub dependencies: Vec<String>,
+/// Recipe source format
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecipeSourceFormat {
+    ArchPkgBuild,
+    GentooEbuild,
+    VoidXbpsSrc,
+    FreeBsdPort,
+    SigmaRecipe,
 }
 
+/// Reproducible Package Recipe (Arch PKGBUILD, Gentoo ebuild, Void XBPS-src parity)
+#[derive(Debug, Clone)]
+pub struct PackageRecipe {
+    pub name: String,
+    pub version: String,
+    pub format: RecipeSourceFormat,
+    pub source_url: String,
+    pub sha256_checksum: String,
+    pub build_dependencies: Vec<String>,
+    pub run_dependencies: Vec<String>,
+    pub use_flags: Vec<String>,
+}
+
+/// Reproducible Package Recipe Manager
 pub struct ReproduciblePackageRecipeManager {
-    pub recipes: BTreeMap<String, ReproducibleRecipe>,
+    pub recipes: HashMap<String, PackageRecipe>,
 }
 
 impl ReproduciblePackageRecipeManager {
     pub fn new() -> Self {
-        Self {
-            recipes: BTreeMap::new(),
-        }
+        let mut manager = Self {
+            recipes: HashMap::new(),
+        };
+        manager.seed_default_recipes();
+        manager
     }
 
-    pub fn register_recipe(&mut self, name: &str, ver: &str, hash: &str, deps: &[&str]) {
-        let dep_vec = deps.iter().map(|s| s.to_string()).collect();
-        self.recipes.insert(name.to_string(), ReproducibleRecipe {
-            package_name: name.to_string(),
-            version: ver.to_string(),
-            hash_signature: hash.to_string(),
-            dependencies: dep_vec,
+    pub fn seed_default_recipes(&mut self) {
+        self.register_recipe(PackageRecipe {
+            name: "zenith-desktop".to_string(),
+            version: "1.0.0".to_string(),
+            format: RecipeSourceFormat::SigmaRecipe,
+            source_url: "https://packages.sigmaos.org/src/zenith-1.0.0.tar.gz".to_string(),
+            sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            build_dependencies: vec!["rust".to_string(), "cargo".to_string(), "wayland-protocols".to_string()],
+            run_dependencies: vec!["pixman".to_string(), "libxkbcommon".to_string()],
+            use_flags: vec!["vulkan".to_string(), "wayland".to_string()],
         });
+    }
+
+    pub fn register_recipe(&mut self, recipe: PackageRecipe) {
+        self.recipes.insert(recipe.name.clone(), recipe);
+    }
+
+    pub fn verify_checksum(&self, name: &str, computed_sha256: &str) -> Result<bool, &'static str> {
+        let recipe = self.recipes.get(name).ok_or("Recipe not found")?;
+        Ok(recipe.sha256_checksum == computed_sha256)
     }
 }
 
@@ -99,119 +165,47 @@ impl Default for ReproduciblePackageRecipeManager {
     }
 }
 
-/// Shared Security Profile Template Store (SELinux / AppArmor / Capsicum)
-#[derive(Debug, Clone)]
-pub struct SharedSecurityProfile {
-    pub profile_name: String,
-    pub framework: String, // "SELinux", "AppArmor", "Capsicum"
-    pub rules_payload: String,
+/// Security Profile Template Store (Pledge/Unveil, AppArmor/SELinux, Capsicum)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SecurityModelType {
+    OpenBsdPledgeUnveil,
+    FreeBsdCapsicum,
+    LinuxAppArmor,
+    LinuxSelinux,
+}
+
+pub struct SecurityTemplate {
+    pub name: String,
+    pub model_type: SecurityModelType,
+    pub profile_rules: String,
 }
 
 pub struct SecurityProfileTemplateStore {
-    pub profiles: BTreeMap<String, SharedSecurityProfile>,
+    pub templates: HashMap<String, SecurityTemplate>,
 }
 
 impl SecurityProfileTemplateStore {
     pub fn new() -> Self {
         let mut store = Self {
-            profiles: BTreeMap::new(),
+            templates: HashMap::new(),
         };
-        store.register_profile("hardened-webserver", "SELinux", "httpd_t allow httpd_sys_content_t:file read;");
-        store.register_profile("sandbox-jail", "Capsicum", "cap_rights_limit(fd, CAP_READ | CAP_WRITE);");
+        store.register_template("browser_sandboxed", SecurityModelType::OpenBsdPledgeUnveil, "pledge: stdio rpath wpath cpath inet dns tty; unveil: /usr/share r, /home/user/Downloads rwc");
         store
     }
 
-    pub fn register_profile(&mut self, name: &str, framework: &str, payload: &str) {
-        self.profiles.insert(name.to_string(), SharedSecurityProfile {
-            profile_name: name.to_string(),
-            framework: framework.to_string(),
-            rules_payload: payload.to_string(),
-        });
+    pub fn register_template(&mut self, name: &str, model_type: SecurityModelType, rules: &str) {
+        self.templates.insert(
+            name.to_string(),
+            SecurityTemplate {
+                name: name.to_string(),
+                model_type,
+                profile_rules: rules.to_string(),
+            },
+        );
     }
 }
 
 impl Default for SecurityProfileTemplateStore {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Hybrid Firewall Template Store (PF + nftables)
-#[derive(Debug, Clone)]
-pub struct HybridFirewallTemplate {
-    pub template_name: String,
-    pub pf_rules: String,
-    pub nftables_rules: String,
-}
-
-pub struct HybridFirewallTemplateStore {
-    pub templates: BTreeMap<String, HybridFirewallTemplate>,
-}
-
-impl HybridFirewallTemplateStore {
-    pub fn new() -> Self {
-        let mut store = Self {
-            templates: BTreeMap::new(),
-        };
-        store.register_template(
-            "default-mesh-shield",
-            "block in all\npass out all keep state",
-            "table inet filter { chain input { type filter hook input priority 0; policy drop; } }",
-        );
-        store
-    }
-
-    pub fn register_template(&mut self, name: &str, pf: &str, nft: &str) {
-        self.templates.insert(name.to_string(), HybridFirewallTemplate {
-            template_name: name.to_string(),
-            pf_rules: pf.to_string(),
-            nftables_rules: nft.to_string(),
-        });
-    }
-}
-
-impl Default for HybridFirewallTemplateStore {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Virtualization Blueprint Store (bhyve + QEMU VM & OCI Container orchestration)
-#[derive(Debug, Clone)]
-pub struct VirtualizationBlueprint {
-    pub blueprint_id: String,
-    pub hypervisor: String, // "bhyve", "QEMU", "SigmaOCI"
-    pub cpus: u32,
-    pub memory_mb: u64,
-    pub config_spec: String,
-}
-
-pub struct VirtualizationBlueprintStore {
-    pub blueprints: BTreeMap<String, VirtualizationBlueprint>,
-}
-
-impl VirtualizationBlueprintStore {
-    pub fn new() -> Self {
-        let mut store = Self {
-            blueprints: BTreeMap::new(),
-        };
-        store.register_blueprint("micro-vm-node", "bhyve", 2, 2048, "bhyve -c 2 -m 2048M -s 0:0,hostbridge");
-        store.register_blueprint("oci-app-shard", "SigmaOCI", 1, 512, "oci.spec.v1.1.0: nginx-container");
-        store
-    }
-
-    pub fn register_blueprint(&mut self, id: &str, hypervisor: &str, cpus: u32, memory_mb: u64, spec: &str) {
-        self.blueprints.insert(id.to_string(), VirtualizationBlueprint {
-            blueprint_id: id.to_string(),
-            hypervisor: hypervisor.to_string(),
-            cpus,
-            memory_mb,
-            config_spec: spec.to_string(),
-        });
-    }
-}
-
-impl Default for VirtualizationBlueprintStore {
     fn default() -> Self {
         Self::new()
     }
@@ -222,21 +216,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_community_toolkit() {
-        let mut handbook = CommunityHandbookCatalog::new();
-        assert!(handbook.get_article("sigma-handbook-01").is_some());
+    fn test_community_handbook_and_recipes() {
+        let catalog = CommunityHandbookCatalog::new();
+        let articles = catalog.search_articles("FreeBSD");
+        assert!(!articles.is_empty());
+        assert_eq!(articles[0].distro_inspiration, "FreeBSD Handbook");
 
-        let mut recipes = ReproduciblePackageRecipeManager::new();
-        recipes.register_recipe("nginx", "1.24.0", "sha256:112233", &["pcre", "zlib"]);
-        assert!(recipes.recipes.contains_key("nginx"));
+        let recipe_mgr = ReproduciblePackageRecipeManager::new();
+        assert!(recipe_mgr.verify_checksum("zenith-desktop", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").unwrap());
 
-        let sec = SecurityProfileTemplateStore::new();
-        assert!(sec.profiles.contains_key("hardened-webserver"));
-
-        let fw = HybridFirewallTemplateStore::new();
-        assert!(fw.templates.contains_key("default-mesh-shield"));
-
-        let virt = VirtualizationBlueprintStore::new();
-        assert!(virt.blueprints.contains_key("micro-vm-node"));
+        let sec_store = SecurityProfileTemplateStore::new();
+        assert!(sec_store.templates.contains_key("browser_sandboxed"));
     }
 }

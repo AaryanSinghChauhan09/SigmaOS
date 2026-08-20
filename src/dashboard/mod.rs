@@ -21,6 +21,7 @@ pub mod accessibility_gamification;
 pub mod control_center;
 pub mod monitor;
 pub mod process;
+pub mod privacy;
 pub mod statutory_compliance;
 
 pub use accessibility_gamification::{
@@ -44,6 +45,6 @@ pub use privacy::{
     TelemetryCategory, TrackerAction,
 };
 pub use statutory_compliance::{
-    BreachSeverity, DisputeAuditCheckpoint, DisputeAuditRollbackEngine, PenaltyBreachAlert,
-    PenaltyBreachNotifier, StatutoryAuthority, StatutoryGovernanceLayer, StatutoryGovernanceRule,
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier,
+    StatutoryBreachAlert, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };

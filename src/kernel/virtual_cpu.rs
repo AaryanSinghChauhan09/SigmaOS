@@ -1605,6 +1605,7 @@ mod tests {
         cpu.handle_lazy_fp_state_restore(true).unwrap();
         assert_eq!(cpu.registers.cr0 & (1 << 3), 0);
     }
+    #[test]
     fn test_ldr_str_addressing_modes() {
         let mut cpu = SovereignVirtualCPU::new();
 

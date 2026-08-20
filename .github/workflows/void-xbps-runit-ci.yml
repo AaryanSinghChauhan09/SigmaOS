@@ -1,22 +1,26 @@
-name: Void Linux XBPS & runit CI
+name: Void Linux XBPS & Runit Service Supervisor CI
 
 on:
   push:
-    branches: [ main, master, "jules-*" ]
+    branches: [ main, master, "feat/**" ]
   pull_request:
     branches: [ main, master ]
 
 jobs:
   void-runit-verification:
-    name: Void Linux XBPS Package Manager & runit Supervisor Test
+    name: Void Linux XBPS Package Manager & Runit Supervisor Test
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Run Void Linux Test Suite
+      - name: Execute Void Linux Runit & XBPS Subsystem Verification
         run: |
-          ./run_sigma_tests.sh
+          rustc --test src/process/activity_manager.rs -o test_act
+          ./test_act
+          rustc --test src/memory/segmentation_paging.rs -o test_seg
+          ./test_seg

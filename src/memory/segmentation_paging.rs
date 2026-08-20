@@ -1,345 +1,357 @@
-//! Memory Segmentation, Address Binding, Multi-Level Paging Translation & Space Protection Subsystem for SigmaOS.
-//! Inspired by x86_64 GDT/LDT segmentation, POSIX address binding modes, 4/5-level page table walking,
-//! W^X/DEP memory protection, SMEP/SMAP CPU security, and ASLR layout randomization.
+// Segmentation, Address Binding, Paging Translation & Executable Space Protection Subsystem for SigmaOS
+// Inspired by x86_64, ARM64, Linux, OpenBSD W^X, FreeBSD GEOM/UVM, and Windows NT memory paradigms.
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
+use std::collections::HashMap;
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-
-// =========================================================================
-// 1. Address Binding Modes & Protection Levels
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AddressBindingMode {
-    CompileTime,    // Absolute physical/virtual addresses generated at compile time
-    LoadTime,       // Relocatable code bound to addresses when loaded into RAM
-    DynamicRunTime, // Addresses bound dynamically during execution via MMU page tables
-}
-
+/// Processor execution rings
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ProtectionLevel {
-    KernelRing0 = 0,
-    HypervisorRing1 = 1,
-    DriverRing2 = 2,
-    UserRing3 = 3,
+pub enum CpuRing {
+    Ring0Kernel = 0,
+    Ring1Driver = 1,
+    Ring2Service = 2,
+    Ring3User = 3,
 }
 
-pub type PrivilegeLevel = ProtectionLevel;
-pub type PrivilegeRing = ProtectionLevel;
-pub type CpuPrivilegeMode = ProtectionLevel;
-
+/// Address space type representation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SegmentType {
-    Code,
-    Data,
-    Stack,
-    Tss,
+pub enum AddressType {
+    Logical,  // Segment Selector + Offset
+    Linear,   // Flat 64-bit linear virtual address post-segmentation
+    Virtual,  // Paged virtual address space
+    Physical, // MMU-translated physical memory address
+    Real,     // Bare-metal hardware RAM address
 }
 
-// =========================================================================
-// 2. Memory Segmentation (GDT / LDT & Protection Rings)
-// =========================================================================
-
+/// Segment Selector (CS, DS, SS, ES, FS, GS)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SegmentSelector {
     pub index: u16,
-    pub rpl: ProtectionLevel,
-    pub is_ldt: bool,
+    pub is_ldt: bool, // false = GDT, true = LDT
+    pub rpl: CpuRing, // Requested Privilege Level
 }
 
 impl SegmentSelector {
-    pub fn new(index: u16, rpl: ProtectionLevel, is_ldt: bool) -> Self {
-        Self { index, rpl, is_ldt }
+    pub fn new(index: u16, is_ldt: bool, rpl: CpuRing) -> Self {
+        Self { index, is_ldt, rpl }
     }
 
     pub fn to_u16(&self) -> u16 {
-        (self.index << 3) | ((self.is_ldt as u16) << 2) | (self.rpl as u16)
+        let mut val = (self.index & 0x1FFF) << 3;
+        if self.is_ldt {
+            val |= 1 << 2;
+        }
+        val |= (self.rpl as u16) & 0x3;
+        val
     }
 }
 
+/// Global/Local Descriptor Table Entry (Segment Descriptor)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SegmentedAddress {
-    pub selector: SegmentSelector,
-    pub offset: u64,
-}
-
-#[derive(Debug, Clone)]
 pub struct SegmentDescriptor {
-    pub base: u64,
-    pub limit: u64,
-    pub dpl: ProtectionLevel,
-    pub segment_type: SegmentType,
-    pub is_writable: bool,
-    pub is_executable: bool,
+    pub base_address: u64,
+    pub limit: u32,             // 20-bit segment limit
+    pub dpl: CpuRing,           // Descriptor Privilege Level
+    pub is_executable: bool,    // Code segment vs Data segment
+    pub is_writable_readable: bool, // Data: Writable, Code: Readable
+    pub is_present: bool,
+    pub is_64bit_code: bool,    // L bit (64-bit long mode code segment)
+    pub granularity_4kb: bool,  // G bit (false = 1 byte units, true = 4KB page units)
 }
 
 impl SegmentDescriptor {
-    pub fn new(base: u64, limit: u64, dpl: ProtectionLevel, is_code: bool) -> Self {
+    pub fn code_segment_ring0() -> Self {
         Self {
-            base,
-            limit,
-            dpl,
-            segment_type: if is_code { SegmentType::Code } else { SegmentType::Data },
-            is_writable: !is_code,
-            is_executable: is_code,
-        }
-    }
-
-    pub fn code_segment(base: u64, limit: u64, dpl: ProtectionLevel) -> Self {
-        Self {
-            base,
-            limit,
-            dpl,
-            segment_type: SegmentType::Code,
-            is_writable: false,
+            base_address: 0,
+            limit: 0xFFFFF,
+            dpl: CpuRing::Ring0Kernel,
             is_executable: true,
+            is_writable_readable: true,
+            is_present: true,
+            is_64bit_code: true,
+            granularity_4kb: true,
         }
     }
 
-    pub fn data_segment(base: u64, limit: u64, dpl: ProtectionLevel) -> Self {
+    pub fn data_segment_ring0() -> Self {
         Self {
-            base,
-            limit,
-            dpl,
-            segment_type: SegmentType::Data,
-            is_writable: true,
+            base_address: 0,
+            limit: 0xFFFFF,
+            dpl: CpuRing::Ring0Kernel,
             is_executable: false,
+            is_writable_readable: true,
+            is_present: true,
+            is_64bit_code: false,
+            granularity_4kb: true,
         }
     }
 
-    pub fn translate_logical_to_linear(
-        &self,
-        selector: &SegmentSelector,
-        offset: u64,
-    ) -> Result<u64, &'static str> {
-        if selector.rpl > self.dpl {
-            return Err("Segmentation Fault: Privilege violation (RPL > DPL)");
-        }
-        if offset > self.limit {
-            return Err("Segmentation Fault: Limit exceeded");
-        }
-        Ok(self.base + offset)
-    }
-}
-
-pub struct GlobalDescriptorTable {
-    descriptors: Vec<SegmentDescriptor>,
-}
-
-impl GlobalDescriptorTable {
-    pub fn new() -> Self {
-        let mut gdt = Self {
-            descriptors: Vec::new(),
-        };
-        // Null descriptor at index 0
-        gdt.descriptors.push(SegmentDescriptor::new(0, 0, ProtectionLevel::KernelRing0, false));
-        gdt
-    }
-
-    pub fn insert_descriptor(&mut self, descriptor: SegmentDescriptor) -> SegmentSelector {
-        let index = self.descriptors.len() as u16;
-        let dpl = descriptor.dpl;
-        self.descriptors.push(descriptor);
-        SegmentSelector::new(index, dpl, false)
-    }
-
-    pub fn translate_address(&self, seg_addr: SegmentedAddress, mode: CpuPrivilegeMode) -> Result<u64, &'static str> {
-        let index = seg_addr.selector.index as usize;
-        if index >= self.descriptors.len() {
-            return Err("Invalid segment selector index");
-        }
-        let desc = &self.descriptors[index];
-        desc.translate_logical_to_linear(&seg_addr.selector, seg_addr.offset)
-    }
-}
-
-pub struct LocalDescriptorTable {
-    descriptors: Vec<SegmentDescriptor>,
-}
-
-impl LocalDescriptorTable {
-    pub fn new() -> Self {
-        Self { descriptors: Vec::new() }
-    }
-}
-
-// =========================================================================
-// 3. Multi-Level Paging Translation & Space Protection
-// =========================================================================
-
-pub mod page_flags {
-    pub const PRESENT: u64    = 1 << 0;
-    pub const WRITABLE: u64   = 1 << 1;
-    pub const USER: u64       = 1 << 2;
-    pub const ACCESSED: u64   = 1 << 5;
-    pub const DIRTY: u64      = 1 << 6;
-    pub const NO_EXECUTE: u64 = 1 << 63;
-}
-
-pub type PageTableEntryFlags = u64;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PageTableEntryHardware {
-    pub raw: u64,
-}
-
-impl PageTableEntryHardware {
-    pub fn new(phys_addr: u64, flags: u64) -> Self {
+    pub fn code_segment_ring3() -> Self {
         Self {
-            raw: (phys_addr & 0x000F_FFFF_FFFF_F000) | flags,
+            base_address: 0,
+            limit: 0xFFFFF,
+            dpl: CpuRing::Ring3User,
+            is_executable: true,
+            is_writable_readable: true,
+            is_present: true,
+            is_64bit_code: true,
+            granularity_4kb: true,
         }
     }
 
-    pub fn is_present(&self) -> bool {
-        (self.raw & page_flags::PRESENT) != 0
-    }
-
-    pub fn is_writable(&self) -> bool {
-        (self.raw & page_flags::WRITABLE) != 0
-    }
-
-    pub fn is_user(&self) -> bool {
-        (self.raw & page_flags::USER) != 0
-    }
-
-    pub fn is_executable(&self) -> bool {
-        (self.raw & page_flags::NO_EXECUTE) == 0
-    }
-
-    pub fn get_physical_address(&self) -> u64 {
-        self.raw & 0x000F_FFFF_FFFF_F000
-    }
-}
-
-pub type PageDirectoryEntry = PageTableEntryHardware;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProtectionViolationType {
-    PageNotPresent,
-    WriteProtectionViolation,
-    ExecutionProhibitionViolation,
-    UserAccessViolation,
-    SmepViolation,
-    SmapViolation,
-    W3XViolation,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PagingMode {
-    FourLevelPml4,
-    FiveLevelPml5,
-}
-
-pub struct MultiLevelPagingEngine {
-    pub mode: PagingMode,
-    pub page_map: BTreeMap<u64, PageTableEntryHardware>,
-    pub enable_smep: bool,
-    pub enable_smap: bool,
-    pub enable_w_xor_x: bool,
-}
-
-impl MultiLevelPagingEngine {
-    pub fn new() -> Self {
+    pub fn data_segment_ring3() -> Self {
         Self {
-            mode: PagingMode::FourLevelPml4,
-            page_map: BTreeMap::new(),
-            enable_smep: true,
-            enable_smap: true,
-            enable_w_xor_x: true,
+            base_address: 0,
+            limit: 0xFFFFF,
+            dpl: CpuRing::Ring3User,
+            is_executable: false,
+            is_writable_readable: true,
+            is_present: true,
+            is_64bit_code: false,
+            granularity_4kb: true,
         }
     }
 
-    pub fn map_page(
-        &mut self,
-        vaddr: u64,
-        paddr: u64,
-        writable: bool,
-        user_accessible: bool,
-        no_execute: bool,
-    ) -> Result<(), ProtectionViolationType> {
-        let mut flags = page_flags::PRESENT;
-        if writable {
-            flags |= page_flags::WRITABLE;
+    /// Calculate effective byte limit based on G (granularity) bit
+    pub fn effective_limit_bytes(&self) -> u64 {
+        if self.granularity_4kb {
+            ((self.limit as u64 + 1) * 4096) - 1
+        } else {
+            self.limit as u64
         }
-        if user_accessible {
-            flags |= page_flags::USER;
-        }
-        if no_execute {
-            flags |= page_flags::NO_EXECUTE;
-        }
-
-        if self.enable_w_xor_x && writable && !no_execute {
-            return Err(ProtectionViolationType::W3XViolation);
-        }
-
-        let entry = PageTableEntryHardware::new(paddr, flags);
-        self.page_map.insert(vaddr & !0xFFF, entry);
-        Ok(())
-    }
-
-    pub fn walk_page_table(&self, vaddr: u64) -> Result<PageTableEntryHardware, ProtectionViolationType> {
-        let page_base = vaddr & !0xFFF;
-        self.page_map
-            .get(&page_base)
-            .cloned()
-            .ok_or(ProtectionViolationType::PageNotPresent)
-    }
-
-    pub fn verify_execution_access(
-        &self,
-        vaddr: u64,
-        is_user_mode: bool,
-        is_execute: bool,
-        is_supervisor_access: bool,
-    ) -> Result<u64, ProtectionViolationType> {
-        let pte = self.walk_page_table(vaddr)?;
-
-        if !pte.is_present() {
-            return Err(ProtectionViolationType::PageNotPresent);
-        }
-
-        if is_execute && !pte.is_executable() {
-            return Err(ProtectionViolationType::ExecutionProhibitionViolation);
-        }
-
-        if is_supervisor_access && pte.is_user() {
-            if self.enable_smep && is_execute {
-                return Err(ProtectionViolationType::SmepViolation);
-            }
-            if self.enable_smap && !is_execute {
-                return Err(ProtectionViolationType::SmapViolation);
-            }
-        }
-
-        let offset = vaddr & 0xFFF;
-        Ok(pte.get_physical_address() + offset)
     }
 }
 
-// =========================================================================
-// 4. ASLR Address Space Layout Randomization
-// =========================================================================
+/// Address Binding Abstraction (Compile-Time, Load-Time, Dynamic Run-Time)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AddressBindingMode {
+    CompileTime,   // Absolute fixed physical address generated by compiler
+    LoadTime,      // Relocatable code bound at executable load time
+    DynamicRunTime,// Position-Independent Execution (PIE) bound dynamically by MMU/ASLR
+}
 
+/// Program executable address binding record
+#[derive(Debug, Clone)]
+pub struct ExecutableAddressBinding {
+    pub binding_mode: AddressBindingMode,
+    pub target_base_address: u64,
+    pub entry_point_offset: u64,
+    pub code_segment_size: u64,
+    pub data_segment_size: u64,
+    pub stack_size: u64,
+    pub heap_size: u64,
+}
+
+/// Executable space protection configuration & flags (W^X, NX, SMEP, SMAP)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SpaceProtectionFlags {
+    pub enforce_wx_prevent_exec_write: bool, // OpenBSD/FreeBSD W^X Security
+    pub nx_no_execute_stack_heap: bool,     // DEP / NX Bit
+    pub smep_supervisor_exec_prevent: bool,  // SMEP protection
+    pub smap_supervisor_access_prevent: bool,// SMAP protection
+}
+
+impl SpaceProtectionFlags {
+    pub fn strict_hardening() -> Self {
+        Self {
+            enforce_wx_prevent_exec_write: true,
+            nx_no_execute_stack_heap: true,
+            smep_supervisor_exec_prevent: true,
+            smap_supervisor_access_prevent: true,
+        }
+    }
+}
+
+/// ASLR (Address Space Layout Randomization) Entropy Configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AslrEntropyConfig {
+    pub stack_entropy_bits: u8,
+    pub heap_entropy_bits: u8,
+    pub mmap_entropy_bits: u8,
+    pub text_entropy_bits: u8,
+}
+
+impl AslrEntropyConfig {
+    pub fn linux_default() -> Self {
+        Self {
+            stack_entropy_bits: 24,
+            heap_entropy_bits: 16,
+            mmap_entropy_bits: 28,
+            text_entropy_bits: 16,
+        }
+    }
+}
+
+/// Randomized address space layout generated via ASLR/KASLR
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RandomizedAddressSpace {
-    pub seed: u64,
+    pub text_base: u64,
+    pub data_base: u64,
+    pub heap_base: u64,
+    pub mmap_base: u64,
+    pub stack_top: u64,
 }
 
 impl RandomizedAddressSpace {
-    pub fn new(seed: u64) -> Self {
-        Self { seed }
+    /// Compute ASLR randomized memory layout using pseudo-random seed
+    pub fn compute_aslr_layout(baseline_virt_base: u64, config: AslrEntropyConfig, seed: u64) -> Self {
+        let mask = |bits: u8| -> u64 { (1u64 << bits) - 1 };
+
+        let text_offset = ((seed.wrapping_mul(1103515245).wrapping_add(12345) >> 12) & mask(config.text_entropy_bits)) * 4096;
+        let heap_offset = ((seed.wrapping_mul(214013).wrapping_add(2531011) >> 12) & mask(config.heap_entropy_bits)) * 4096;
+        let mmap_offset = ((seed.wrapping_mul(1664525).wrapping_add(1013904223) >> 12) & mask(config.mmap_entropy_bits)) * 4096;
+        let stack_offset = ((seed.wrapping_mul(69069).wrapping_add(1) >> 12) & mask(config.stack_entropy_bits)) * 4096;
+
+        let text_base = baseline_virt_base + text_offset;
+        let data_base = text_base + 0x100000;
+        let heap_base = 0x0000_6000_0000_0000 + heap_offset;
+        let mmap_base = 0x0000_7000_0000_0000 + mmap_offset;
+        let stack_top = 0x0000_7FFF_FFFF_0000 - stack_offset;
+
+        Self {
+            text_base,
+            data_base,
+            heap_base,
+            mmap_base,
+            stack_top,
+        }
+    }
+}
+
+/// System Register State Snapshot for Paging & Segmentation control
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SystemControlRegisters {
+    pub cr0_paging_enable: bool,       // CR0.PG bit 31
+    pub cr0_write_protect: bool,      // CR0.WP bit 16
+    pub cr2_page_fault_linear_addr: u64,// CR2 fault address
+    pub cr3_pml4_root_phys: u64,       // CR3 PML4 physical base
+    pub cr4_smep_enabled: bool,        // CR4.SMEP bit 20
+    pub cr4_smap_enabled: bool,        // CR4.SMAP bit 21
+    pub cr4_pcid_enabled: bool,        // CR4.PCIDE bit 17
+    pub efer_long_mode_active: bool,   // EFER.LMA bit 10
+    pub efer_nx_enabled: bool,         // EFER.NXE bit 11
+    pub gdtr_base: u64,
+    pub gdtr_limit: u16,
+    pub ldtr_selector: u16,
+    pub tr_task_register: u16,
+    pub cs_selector: SegmentSelector,
+    pub ds_selector: SegmentSelector,
+    pub ss_selector: SegmentSelector,
+}
+
+impl Default for SystemControlRegisters {
+    fn default() -> Self {
+        Self {
+            cr0_paging_enable: true,
+            cr0_write_protect: true,
+            cr2_page_fault_linear_addr: 0,
+            cr3_pml4_root_phys: 0x1000,
+            cr4_smep_enabled: true,
+            cr4_smap_enabled: true,
+            cr4_pcid_enabled: true,
+            efer_long_mode_active: true,
+            efer_nx_enabled: true,
+            gdtr_base: 0xFFFF_8000_0000_0000,
+            gdtr_limit: 0x3F,
+            ldtr_selector: 0,
+            tr_task_register: 0x28,
+            cs_selector: SegmentSelector::new(1, false, CpuRing::Ring0Kernel),
+            ds_selector: SegmentSelector::new(2, false, CpuRing::Ring0Kernel),
+            ss_selector: SegmentSelector::new(2, false, CpuRing::Ring0Kernel),
+        }
+    }
+}
+
+/// Segmentation & Paging Address Translation Engine
+pub struct SegmentationPagingEngine {
+    pub gdt: HashMap<u16, SegmentDescriptor>,
+    pub ldt: HashMap<u16, SegmentDescriptor>,
+    pub control_regs: SystemControlRegisters,
+    pub protection_policy: SpaceProtectionFlags,
+}
+
+impl SegmentationPagingEngine {
+    pub fn new(protection_policy: SpaceProtectionFlags) -> Self {
+        let mut gdt = HashMap::new();
+        // Setup standard GDT entries
+        gdt.insert(1, SegmentDescriptor::code_segment_ring0());
+        gdt.insert(2, SegmentDescriptor::data_segment_ring0());
+        gdt.insert(3, SegmentDescriptor::code_segment_ring3());
+        gdt.insert(4, SegmentDescriptor::data_segment_ring3());
+
+        Self {
+            gdt,
+            ldt: HashMap::new(),
+            control_regs: SystemControlRegisters::default(),
+            protection_policy,
+        }
     }
 
-    pub fn generate_random_base(&self, mode: AddressBindingMode, base_hint: u64) -> u64 {
-        let offset = (self.seed.wrapping_mul(0x5DEECE66D).wrapping_add(0xB) & 0xFFFF) * 0x1000;
-        match mode {
-            AddressBindingMode::CompileTime => base_hint,
-            AddressBindingMode::LoadTime | AddressBindingMode::DynamicRunTime => base_hint + offset,
+    /// Translate Logical Address (Segment Selector + Offset) to Linear/Virtual Address
+    pub fn translate_logical_to_linear(&self, selector: SegmentSelector, offset: u64, current_ring: CpuRing) -> Result<u64, &'static str> {
+        let table = if selector.is_ldt { &self.ldt } else { &self.gdt };
+
+        let descriptor = table.get(&selector.index).ok_or("Segment Selector not found in descriptor table")?;
+
+        if !descriptor.is_present {
+            return Err("Segment Not Present Fault (#NP)");
         }
+
+        // Privilege Check: Current ring and RPL must be <= Descriptor Privilege Level (DPL)
+        if current_ring > descriptor.dpl || selector.rpl > descriptor.dpl {
+            return Err("General Protection Fault (#GP): Privilege violation");
+        }
+
+        // Limit Check
+        let max_limit = descriptor.effective_limit_bytes();
+        if offset > max_limit {
+            return Err("General Protection Fault (#GP): Segment limit exceeded");
+        }
+
+        // In 64-bit Long Mode, base addresses for CS, DS, ES, SS are forced to 0
+        let linear_address = descriptor.base_address + offset;
+        Ok(linear_address)
+    }
+
+    /// Perform simulated Multi-Level Paging Walk (Virtual -> Physical Real Address Translation)
+    pub fn translate_virtual_to_physical(&self, virt_addr: u64, is_write: bool, is_execute: bool, access_ring: CpuRing) -> Result<u64, &'static str> {
+        if !self.control_regs.cr0_paging_enable {
+            return Ok(virt_addr); // Unpaged real memory mode
+        }
+
+        // SMEP Check: Supervisor mode Ring 0 executing user-space code
+        if access_ring == CpuRing::Ring0Kernel && is_execute && virt_addr < 0x0000_8000_0000_0000 && self.protection_policy.smep_supervisor_exec_prevent {
+            return Err("SMEP Violation Fault (#PF): Supervisor mode executed user page");
+        }
+
+        // SMAP Check: Supervisor mode Ring 0 accessing user-space data
+        if access_ring == CpuRing::Ring0Kernel && !is_execute && virt_addr < 0x0000_8000_0000_0000 && self.protection_policy.smap_supervisor_access_prevent {
+            return Err("SMAP Violation Fault (#PF): Supervisor mode accessed user page");
+        }
+
+        // W^X Enforcement Audit Policy Check
+        if is_write && is_execute && self.protection_policy.enforce_wx_prevent_exec_write {
+            return Err("W^X Security Violation: Page cannot be Writeable and Executable simultaneously");
+        }
+
+        // Simulated PML4 -> PDPT -> PD -> PT page table walk
+        let pml4_idx = (virt_addr >> 39) & 0x1FF;
+        let pdpt_idx = (virt_addr >> 30) & 0x1FF;
+        let pd_idx = (virt_addr >> 21) & 0x1FF;
+        let pt_idx = (virt_addr >> 12) & 0x1FF;
+        let offset = virt_addr & 0xFFF;
+
+        // Compute simulated physical address frame base
+        let phys_frame_base = 0x2000_0000 + (pml4_idx * 0x800000) + (pdpt_idx * 0x40000) + (pd_idx * 0x2000) + (pt_idx * 0x1000);
+        let physical_address = phys_frame_base + offset;
+
+        Ok(physical_address)
+    }
+
+    /// Perform end-to-end translation from Logical Address to Physical RAM Address
+    pub fn full_address_translation_walk(&self, selector: SegmentSelector, offset: u64, is_write: bool, is_execute: bool, access_ring: CpuRing) -> Result<(u64, u64), &'static str> {
+        let linear_addr = self.translate_logical_to_linear(selector, offset, access_ring)?;
+        let physical_addr = self.translate_virtual_to_physical(linear_addr, is_write, is_execute, access_ring)?;
+        Ok((linear_addr, physical_addr))
     }
 }
 
@@ -348,18 +360,56 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_segmentation_and_paging() {
-        let mut gdt = GlobalDescriptorTable::new();
-        let code = SegmentDescriptor::code_segment(0, 0xFFFFFFFF, ProtectionLevel::KernelRing0);
-        let sel = gdt.insert_descriptor(code);
+    fn test_logical_to_linear_translation_and_privilege_checks() {
+        let engine = SegmentationPagingEngine::new(SpaceProtectionFlags::strict_hardening());
 
-        let seg_addr = SegmentedAddress { selector: sel, offset: 0x1000 };
-        let linear = gdt.translate_address(seg_addr, CpuPrivilegeMode::KernelRing0).unwrap();
-        assert_eq!(linear, 0x1000);
+        // Ring 0 kernel segment translation
+        let sel_ring0 = SegmentSelector::new(1, false, CpuRing::Ring0Kernel);
+        let linear_addr = engine.translate_logical_to_linear(sel_ring0, 0x1000, CpuRing::Ring0Kernel).unwrap();
+        assert_eq!(linear_addr, 0x1000);
 
-        let mut paging = MultiLevelPagingEngine::new();
-        paging.map_page(0x800000, 0x100000, false, true, false).unwrap();
-        let pte = paging.walk_page_table(0x800000).unwrap();
-        assert_eq!(pte.get_physical_address(), 0x100000);
+        // Ring 3 user process attempting to access Ring 0 kernel segment -> triggers GP fault!
+        let err = engine.translate_logical_to_linear(sel_ring0, 0x1000, CpuRing::Ring3User);
+        assert_eq!(err, Err("General Protection Fault (#GP): Privilege violation"));
+    }
+
+    #[test]
+    fn test_paging_translation_and_smep_smap_wx_enforcement() {
+        let engine = SegmentationPagingEngine::new(SpaceProtectionFlags::strict_hardening());
+
+        // Standard user virtual address translation
+        let (linear, phys) = engine.full_address_translation_walk(
+            SegmentSelector::new(4, false, CpuRing::Ring3User),
+            0x0000_0000_0000_2000,
+            false,
+            false,
+            CpuRing::Ring3User,
+        ).unwrap();
+
+        assert_eq!(linear, 0x2000);
+        assert!(phys >= 0x2000_0000);
+
+        // SMEP Fault Check: Ring 0 Kernel attempting to execute user page
+        let smep_err = engine.translate_virtual_to_physical(0x0000_0000_0000_2000, false, true, CpuRing::Ring0Kernel);
+        assert_eq!(smep_err, Err("SMEP Violation Fault (#PF): Supervisor mode executed user page"));
+
+        // W^X Fault Check: Attempting simultaneously Writeable and Executable translation
+        let wx_err = engine.translate_virtual_to_physical(0x0000_7FFF_0000_1000, true, true, CpuRing::Ring3User);
+        assert_eq!(wx_err, Err("W^X Security Violation: Page cannot be Writeable and Executable simultaneously"));
+    }
+
+    #[test]
+    fn test_aslr_randomized_address_space_generation() {
+        let config = AslrEntropyConfig::linux_default();
+        let seed1 = 12345;
+        let seed2 = 67890;
+
+        let aslr1 = RandomizedAddressSpace::compute_aslr_layout(0x0000_0000_0040_0000, config, seed1);
+        let aslr2 = RandomizedAddressSpace::compute_aslr_layout(0x0000_0000_0040_0000, config, seed2);
+
+        // Confirm ASLR layouts are randomized and distinct
+        assert_ne!(aslr1.text_base, aslr2.text_base);
+        assert_ne!(aslr1.stack_top, aslr2.stack_top);
+        assert_ne!(aslr1.mmap_base, aslr2.mmap_base);
     }
 }

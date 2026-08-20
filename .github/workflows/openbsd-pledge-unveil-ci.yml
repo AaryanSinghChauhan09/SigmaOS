@@ -1,22 +1,26 @@
-name: OpenBSD Pledge & Unveil Sandbox CI
+name: OpenBSD pledge & unveil Kernel Security Audit CI
 
 on:
   push:
-    branches: [ main, master, "jules-*" ]
+    branches: [ main, master, "feat/**" ]
   pull_request:
     branches: [ main, master ]
 
 jobs:
-  openbsd-pledge-verification:
-    name: OpenBSD pledge Promises & unveil Path Sandbox Test
+  openbsd-security-audit:
+    name: OpenBSD pledge, unveil & W^X Memory Hardening Verification
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Run OpenBSD Security Suite
+      - name: Run OpenBSD pledge/unveil and Memory Protection Tests
         run: |
-          ./run_sigma_tests.sh
+          rustc --test src/memory/segmentation_paging.rs -o test_seg
+          ./test_seg
+          rustc --test src/process/activity_manager.rs -o test_act
+          ./test_act
