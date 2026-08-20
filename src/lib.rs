@@ -1,6 +1,5 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
-#![no_std]
 extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
