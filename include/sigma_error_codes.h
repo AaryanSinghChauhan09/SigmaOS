@@ -20,8 +20,14 @@
  * Top-Level Status Aliases
  * Canonical names used across the codebase.
  * ------------------------------------------------------------------------- */
+#ifndef SIGMA_SUCCESS
 #define SIGMA_SUCCESS       0
+#endif
+
+#ifndef SIGMA_ERROR
 #define SIGMA_ERROR        (-1)
+#endif
+
 #define ZEN_SUCCESS         0
 #define ZEN_ERROR          (-1)
 
@@ -38,7 +44,6 @@
 #define K_ERR_BUSY         (-7)   /* Resource busy / locked */
 #define K_ERR_OVERFLOW     (-8)   /* Arithmetic or buffer overflow */
 #define K_ERR_UNIMPL       (-9)   /* Feature not yet implemented */
-typedef int sigma_status;
 
 /* Hardware Profile extensions moved to sigma_driver_codes.h */
 
@@ -58,6 +63,11 @@ typedef int sigma_status;
 #define ZEN_DRV_RECIPE_SIG_INVALID    0xD003
 #define ZEN_DRV_RELOAD_FAIL           0xD004
 #define ZEN_DRV_CRASH                 0xD005
+#define ZEN_DRV_GPU_FIRMWARE_MISSING  0xD006
+#define ZEN_DRV_NET_LINK_DOWN         0xD007
+#define ZEN_DRV_NET_FIRMWARE_MISSING  0xD008
+#define ZEN_DRV_AUDIO_CODEC_NOT_FOUND 0xD009
+#define ZEN_DRV_REGISTRY_FETCH_FAILED 0xD00A
 
 /* 1xx: Container Errors */
 #define ZEN_101_CONTAINER_RUNTIME_FAILED  101

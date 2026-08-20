@@ -20,30 +20,18 @@ impl Default for AgentAutomationEngine {
     fn default() -> Self { Self::new() }
 }
 
-
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
-
 use crate::accessibility::{
-    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
-    AccessibilitySetting,
+    AccessibilityFeature, AccessibilityFramework, AccessibilitySetting,
 };
 use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
+    ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform,
 };
-use crate::customization::{CustomizationEngine, Theme};
-use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
-use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
+use crate::customization::CustomizationEngine;
+use crate::dashboard::SystemMonitor;
+use crate::package::{UnifiedPackage, UniversalPackageManager};
+use crate::resilience::SelfHealingModule;
 use crate::virtualization::{
-    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
-    VmState,
+    Container, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
 };
 
 /// Shell command type
@@ -53,16 +41,6 @@ pub enum ShellCommand {
     ListProcesses,
     ListFiles,
     Exit,
-    Echo {
-        message: String,
-    },
-    Set {
-        variable: String,
-        value: String,
-    },
-    Get {
-        variable: String,
-    },
     Pwd,
     WhoAmI,
     Su {
@@ -141,9 +119,6 @@ pub enum ShellCommand {
     Sandbox {
         args: Vec<String>,
     },
-    Echo { message: String },
-    Set { variable: String, value: String },
-    Get { variable: String },
     Echo {
         message: String,
     },
@@ -223,24 +198,18 @@ pub enum ShellCommand {
 /// Shell REPL
 pub struct ShellRepl {
     pub running: bool,
-    pub variables: std::collections::HashMap<String, String>,
-    pub aliases: std::collections::HashMap<String, String>,
+    pub variables: HashMap<String, String>,
+    pub aliases: HashMap<String, String>,
     pub prompt: String,
     pub agent_engine: AgentAutomationEngine,
     pub current_user: String,
     pub current_dir: String,
-    pub services: std::collections::HashMap<String, String>,
+    pub services: HashMap<String, String>,
     pub installed_packages: std::collections::HashSet<String>,
     pub current_theme: String,
     pub current_profile: String,
-    pub a11y_features: std::collections::HashMap<String, bool>,
+    pub a11y_features: HashMap<String, bool>,
     pub command_history: Vec<String>,
-    running: bool,
-    variables: std::collections::HashMap<String, String>,
-    prompt: String,
-    running: bool,
-    variables: HashMap<String, String>,
-    prompt: String,
 
     // Keep internal instances of engines for persistent state during shell interaction
     pub customization: CustomizationEngine,
@@ -253,17 +222,15 @@ pub struct ShellRepl {
 
 impl ShellRepl {
     pub fn new() -> Self {
-        let mut services = std::collections::HashMap::new();
+        let mut services = HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
-            variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
-            variables: std::collections::HashMap::new(),
             variables: HashMap::new(),
+            aliases: HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
@@ -272,11 +239,8 @@ impl ShellRepl {
             installed_packages: std::collections::HashSet::new(),
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
+            a11y_features: HashMap::new(),
             command_history: Vec::new(),
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
             customization: CustomizationEngine::new(),
             accessibility: AccessibilityFramework::new(),
             package_manager: UniversalPackageManager::new(),
@@ -287,31 +251,6 @@ impl ShellRepl {
     }
 
     pub fn with_prompt(prompt: String) -> Self {
-        let mut services = std::collections::HashMap::new();
-        services.insert("systemd-networkd".to_string(), "Running".to_string());
-        services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Running".to_string());
-
-        Self {
-            running: true,
-            variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
-            prompt: prompt,
-            agent_engine: AgentAutomationEngine::new(),
-            current_user: "ubuntu".to_string(),
-            current_dir: "/home/ubuntu".to_string(),
-            services,
-            installed_packages: std::collections::HashSet::new(),
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
-            command_history: Vec::new(),
-        }
-        Self {
-            running: true,
-            variables: std::collections::HashMap::new(),
-            prompt,
-        }
         let mut shell = Self::new();
         shell.prompt = prompt;
         shell
@@ -358,7 +297,6 @@ impl ShellRepl {
         if partial.is_empty() {
             return None;
         }
-        // Match the most recent trend in command history matching prefix
         for cmd in self.command_history.iter().rev() {
             if cmd.starts_with(partial) {
                 return Some(cmd.clone());
@@ -367,11 +305,9 @@ impl ShellRepl {
         None
     }
 
-    fn execute_line(&mut self, line: &str) {
-        // Save command history (Fish style)
+    pub fn execute_line(&mut self, line: &str) {
         self.command_history.push(line.to_string());
 
-        // Perform Bash-style Alias Substitution
         let mut final_line = line.to_string();
         let parts: Vec<&str> = line.split_whitespace().collect();
         if !parts.is_empty() {
@@ -434,11 +370,6 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "echo" => {
-                ShellCommand::Echo {
-                    message: parts[1..].join(" "),
-                }
-            }
             "rm" => {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {
@@ -487,34 +418,6 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        theme_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        profile_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        state: parts[2].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "set" => {
                 if parts.len() >= 3 {
                     ShellCommand::Set {
@@ -552,53 +455,6 @@ impl ShellRepl {
                 };
                 ShellCommand::Echo { message }
             }
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm { filename: parts[1].to_string() }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "su" => {
-                let username = if parts.len() >= 2 {
-                    parts[1].to_string()
-                } else {
-                    "root".to_string()
-                };
-                let password = if parts.len() >= 3 {
-                    Some(parts[2].to_string())
-                } else {
-                    None
-                };
-                ShellCommand::Su { username, password }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat { filename: parts[1..].join(" ") }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Systemctl {
-                        action: parts[1].to_string(),
-                        service: parts[2].to_string(),
-                    }
-                } else if parts.len() == 2 {
-                    ShellCommand::Systemctl {
-                        action: parts[1].to_string(),
-                        service: String::new(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { String::new() };
-                let package = if parts.len() >= 3 { Some(parts[2].to_string()) } else { None };
-                ShellCommand::Apt { subcommand, package }
-            }
             "livepatch" => {
                 let args = parts[1..].iter().map(|s| s.to_string()).collect();
                 ShellCommand::Livepatch { args }
@@ -606,10 +462,6 @@ impl ShellRepl {
             "cron" => {
                 let args = parts[1..].iter().map(|s| s.to_string()).collect();
                 ShellCommand::Cron { args }
-            }
-            "vm" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Vm { args }
             }
             "research" => {
                 let query = parts[1..].join(" ");
@@ -639,10 +491,6 @@ impl ShellRepl {
                 let args = parts[1..].iter().map(|s| s.to_string()).collect();
                 ShellCommand::Rescue { args }
             }
-            "monitor" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Monitor { args }
-            }
             "sandbox" => {
                 let args = parts[1..].iter().map(|s| s.to_string()).collect();
                 ShellCommand::Sandbox { args }
@@ -660,7 +508,9 @@ impl ShellRepl {
                                 ShellCommand::Unknown(input.to_string())
                             }
                         }
-                        _ => ShellCommand::Unknown(input.to_string()),
+                        _ => ShellCommand::Theme {
+                            theme_name: parts[1].to_string(),
+                        },
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -670,6 +520,15 @@ impl ShellRepl {
                 if parts.len() >= 3 && parts[1] == "enable" {
                     ShellCommand::RoutineEnable {
                         routine_id: parts[2].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        profile_name: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -693,7 +552,10 @@ impl ShellRepl {
                                 ShellCommand::Unknown(input.to_string())
                             }
                         }
-                        _ => ShellCommand::Unknown(input.to_string()),
+                        _ => ShellCommand::A11y {
+                            feature: parts[1].to_string(),
+                            state: parts[2].to_string(),
+                        },
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -703,7 +565,8 @@ impl ShellRepl {
                 if parts.len() >= 2 && parts[1] == "show" {
                     ShellCommand::MonitorShow
                 } else {
-                    ShellCommand::Unknown(input.to_string())
+                    let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                    ShellCommand::Monitor { args }
                 }
             }
             "pkg" => {
@@ -757,7 +620,10 @@ impl ShellRepl {
                                 ShellCommand::Unknown(input.to_string())
                             }
                         }
-                        _ => ShellCommand::Unknown(input.to_string()),
+                        _ => {
+                            let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                            ShellCommand::Vm { args }
+                        }
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -821,26 +687,6 @@ impl ShellRepl {
     pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help         - Show this help message\n\
-                   ps           - List running processes\n\
-                   ls           - List files\n\
-                   pwd          - Print working directory\n\
-                   whoami       - Print current logged-in user\n\
-                   su <user>    - Switch user account (try 'su root' or 'su guest')\n\
-                   cat <file>   - Display file contents\n\
-                   systemctl    - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
-                   apt <cmd>    - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
-                   echo         - Print a message\n\
-                   set          - Set a variable\n\
-                   get          - Get a variable\n\
-                   exit         - Exit the shell"
-                   help    - Show this help message\n\
-                   ps      - List running processes\n\
-                   ls      - List files\n\
-                   echo    - Print a message\n\
-                   set     - Set a variable\n\
-                   get     - Get a variable\n\
-                   exit    - Exit the shell"
                    help                      - Show this help message\n\
                    ps                        - List running processes\n\
                    ls                        - List files\n\
@@ -917,7 +763,7 @@ impl ShellRepl {
                 }
             }
             ShellCommand::Systemctl { action, service } => {
-                if action == "list" || action == "status" && service.is_empty() {
+                if action == "list" || (action == "status" && service.is_empty()) {
                     let mut list_str = "UNIT                ACTIVE   SUB\n".to_string();
                     for (s, st) in &self.services {
                         list_str.push_str(&format!("{:<20} {}  {}\n", s, if st == "Running" { "active" } else { "inactive" }, st));
@@ -1214,7 +1060,7 @@ impl ShellRepl {
             ShellCommand::MonitorShow => {
                 let mut monitor = SystemMonitor::new();
                 monitor.running = true;
-                monitor.update_metrics(); // automatically update to capture values
+                monitor.update_metrics();
 
                 let cpu_avg = monitor.dashboard.widgets.get("cpu").and_then(|w| w.get_latest_value()).unwrap_or(42.5);
                 let mem_avg = monitor.dashboard.widgets.get("memory").and_then(|w| w.get_latest_value()).unwrap_or(61.2);
@@ -1419,7 +1265,6 @@ mod tests {
         repl.execute_command(alias_cmd).unwrap();
         assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
 
-        // Execute line with alias substitution
         repl.execute_line("ll");
         assert_eq!(repl.command_history[0], "ll");
     }
@@ -1612,73 +1457,61 @@ mod tests {
     fn test_extended_cli_commands() {
         let mut repl = ShellRepl::new();
 
-        // 1. Livepatch Command Test
         let cmd_livepatch = repl.parse_command("livepatch apply sys_read 8122c400 c0300100");
         assert!(matches!(cmd_livepatch, ShellCommand::Livepatch { .. }));
         let out_livepatch = repl.execute_command(cmd_livepatch).unwrap();
         assert!(out_livepatch.contains("Successfully registered"));
 
-        // 2. Cron Command Test
         let cmd_cron = repl.parse_command("cron list");
         assert!(matches!(cmd_cron, ShellCommand::Cron { .. }));
         let out_cron = repl.execute_command(cmd_cron).unwrap();
         assert!(out_cron.contains("backup_job"));
 
-        // 3. VM Command Test
         let cmd_vm = repl.parse_command("vm start Intel-VM");
         assert!(matches!(cmd_vm, ShellCommand::Vm { .. }));
         let out_vm = repl.execute_command(cmd_vm).unwrap();
         assert!(out_vm.contains("Starting VM"));
 
-        // 4. Research Command Test
         let cmd_res = repl.parse_command("research Perplexity");
         assert!(matches!(cmd_res, ShellCommand::Research { .. }));
         let out_res = repl.execute_command(cmd_res).unwrap();
         assert!(out_res.contains("SYNTHESIZED ANSWER"));
 
-        // 5. Camera Command Test
         let cmd_cam = repl.parse_command("camera Sepia");
         assert!(matches!(cmd_cam, ShellCommand::Camera { .. }));
         let out_cam = repl.execute_command(cmd_cam).unwrap();
         assert!(out_cam.contains("Webcam effect successfully updated"));
 
-        // 6. Grid Command Test
         let cmd_grid = repl.parse_command("grid add node-3 8");
         assert!(matches!(cmd_grid, ShellCommand::Grid { .. }));
         let out_grid = repl.execute_command(cmd_grid).unwrap();
         assert!(out_grid.contains("node-3"));
 
-        // 7. Access Command Test
         let cmd_access = repl.parse_command("access enable ScreenReader");
         assert!(matches!(cmd_access, ShellCommand::Access { .. }));
         let out_access = repl.execute_command(cmd_access).unwrap();
         assert!(out_access.contains("ScreenReader"));
 
-        // 8. Sysctl Command Test
         let cmd_sysctl = repl.parse_command("sysctl query kern.maxproc");
         assert!(matches!(cmd_sysctl, ShellCommand::Sysctl { .. }));
         let out_sysctl = repl.execute_command(cmd_sysctl).unwrap();
         assert!(out_sysctl.contains("kern.maxproc"));
 
-        // 9. Patch Command Test
         let cmd_patch = repl.parse_command("patch rollback patch_01");
         assert!(matches!(cmd_patch, ShellCommand::Patch { .. }));
         let out_patch = repl.execute_command(cmd_patch).unwrap();
         assert!(out_patch.contains("rolled back"));
 
-        // 10. Rescue Command Test
         let cmd_rescue = repl.parse_command("rescue rollback /dev/sda1 hash_val");
         assert!(matches!(cmd_rescue, ShellCommand::Rescue { .. }));
         let out_rescue = repl.execute_command(cmd_rescue).unwrap();
         assert!(out_rescue.contains("/dev/sda1"));
 
-        // 11. Monitor Command Test
         let cmd_monitor = repl.parse_command("monitor telemetry");
         assert!(matches!(cmd_monitor, ShellCommand::Monitor { .. }));
         let out_monitor = repl.execute_command(cmd_monitor).unwrap();
         assert!(out_monitor.contains("SigmaMonitor"));
 
-        // 12. Sandbox Command Test
         let cmd_sandbox = repl.parse_command("sandbox create 801 StrictBrowser");
         assert!(matches!(cmd_sandbox, ShellCommand::Sandbox { .. }));
         let out_sandbox = repl.execute_command(cmd_sandbox).unwrap();
@@ -1796,7 +1629,6 @@ mod tests {
         let restore_cmd = repl.parse_command("snapshot restore checkpoint-1");
         assert!(matches!(restore_cmd, ShellCommand::SnapshotRestore { .. }));
         let restore_res = repl.execute_command(restore_cmd);
-        // "checkpoint-1" won't exist initially, returns not found Err
         assert!(restore_res.is_err());
     }
 

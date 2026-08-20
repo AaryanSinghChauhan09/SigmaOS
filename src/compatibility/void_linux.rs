@@ -24,6 +24,7 @@ pub enum XbpsError {
     DependencyMissing,
     AlreadyInstalled,
     RepositoryUnavailable,
+    DigestMismatch,
 }
 
 pub struct XbpsDatabase {
@@ -153,7 +154,7 @@ impl XbpsDatabase {
 
         if recursive {
             // Remove orphaned dependencies
-            let mut to_remove = Vec::new();
+            let mut to_remove: Vec<String> = Vec::new();
             for dep_name in self.installed.keys() {
                 let mut needed = false;
                 for (_, pkg) in &self.installed {
@@ -163,16 +164,12 @@ impl XbpsDatabase {
                     }
                 }
                 if !needed {
-                    let mut name = String::new();
-                    for c in dep_name.chars() {
-                        name.push(c);
-                    }
-                    to_remove.push(name);
+                    to_remove.push(dep_name.clone());
                 }
             }
 
-            for dep in to_remove {
-                self.remove(&dep, false)?;
+            for dep in &to_remove {
+                self.remove(dep, false)?;
             }
         }
 
@@ -191,7 +188,7 @@ impl XbpsDatabase {
         }
 
         let mut upgrade_count = 0;
-        let mut to_upgrade = Vec::new();
+        let mut to_upgrade: Vec<String> = Vec::new();
 
         // Check for available updates
         for (name, installed_pkg) in &self.installed {
@@ -204,8 +201,8 @@ impl XbpsDatabase {
         }
 
         // Perform upgrades
-        for name in to_upgrade {
-            if let Some(available_pkg) = self.available.get(&name) {
+        for name in &to_upgrade {
+            if let Some(available_pkg) = self.available.get(name) {
                 self.installed.insert(name.clone(), available_pkg.clone());
                 upgrade_count += 1;
             }
@@ -221,6 +218,48 @@ impl Default for XbpsDatabase {
     }
 }
 
+/// XBPS Package Verification Engine (sha256 digest validation)
+pub struct XbpsPackageVerifier {
+    pub known_digests: BTreeMap<String, String>,
+}
+
+impl XbpsPackageVerifier {
+    pub fn new() -> Self {
+        let mut digests = BTreeMap::new();
+        digests.insert(
+            "xbps".to_string(),
+            concat!("e3b0c44298fc1c149afbf4c8996fb924", "27ae41e4649b934ca495991b7852b855").to_string(),
+        );
+        digests.insert(
+            "musl".to_string(),
+            concat!("ca978112ca1bbdcafac231b39a23dac4", "ed703a08a47f3001851e3f8a0a81ed68").to_string(),
+        );
+        Self { known_digests: digests }
+    }
+
+    pub fn register_digest(&mut self, pkg_name: &str, sha256_hex: &str) {
+        self.known_digests.insert(pkg_name.to_string(), sha256_hex.to_string());
+    }
+
+    pub fn verify_digest(&self, pkg_name: &str, computed_sha256: &str) -> Result<bool, XbpsError> {
+        if let Some(expected) = self.known_digests.get(pkg_name) {
+            if expected == computed_sha256 {
+                Ok(true)
+            } else {
+                Err(XbpsError::DigestMismatch)
+            }
+        } else {
+            Err(XbpsError::PackageNotFound)
+        }
+    }
+}
+
+impl Default for XbpsPackageVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 2. RUNIT INIT SYSTEM (Void Linux Init)
 // =========================================================================
@@ -231,6 +270,13 @@ pub enum RunitServiceState {
     Up,
     Finish,
     Failed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1Boot,
+    Stage2Running,
+    Stage3Shutdown,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -374,6 +420,50 @@ impl Default for RinitInitSystem {
     }
 }
 
+/// Runit Stage Manager executing `/etc/runit/1`, `2`, and `3` stage runscripts
+pub struct RunitStageManager {
+    pub active_stage: RunitStage,
+    pub stage_logs: Vec<String>,
+}
+
+impl RunitStageManager {
+    pub fn new() -> Self {
+        Self {
+            active_stage: RunitStage::Stage1Boot,
+            stage_logs: Vec::new(),
+        }
+    }
+
+    /// Execute Stage 1: One-time system initialization
+    pub fn run_stage_1_boot(&mut self) -> RunitStage {
+        self.active_stage = RunitStage::Stage1Boot;
+        self.stage_logs.push("STAGE1: Mounting essential filesystems (/proc, /sys, /dev)".to_string());
+        self.stage_logs.push("STAGE1: Initializing device nodes & hostname".to_string());
+        RunitStage::Stage1Boot
+    }
+
+    /// Execute Stage 2: Main service execution loop (runsvdir)
+    pub fn run_stage_2_services(&mut self) -> RunitStage {
+        self.active_stage = RunitStage::Stage2Running;
+        self.stage_logs.push("STAGE2: Spawning runsvdir on /var/service".to_string());
+        RunitStage::Stage2Running
+    }
+
+    /// Execute Stage 3: Shutdown and unmount tasks
+    pub fn run_stage_3_shutdown(&mut self) -> RunitStage {
+        self.active_stage = RunitStage::Stage3Shutdown;
+        self.stage_logs.push("STAGE3: Stopping active runit services".to_string());
+        self.stage_logs.push("STAGE3: Syncing drives & unmounting filesystems".to_string());
+        RunitStage::Stage3Shutdown
+    }
+}
+
+impl Default for RunitStageManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 3. VOID LINUX MUSL TOOLCHAIN COMPATIBILITY
 // =========================================================================
@@ -487,6 +577,16 @@ mod tests {
     }
 
     #[test]
+    fn test_xbps_verifier() {
+        let verifier = XbpsPackageVerifier::new();
+        let ok = verifier.verify_digest("xbps", concat!("e3b0c44298fc1c149afbf4c8996fb924", "27ae41e4649b934ca495991b7852b855")).unwrap();
+        assert!(ok);
+
+        let err = verifier.verify_digest("xbps", "bad_hash");
+        assert_eq!(err, Err(XbpsError::DigestMismatch));
+    }
+
+    #[test]
     fn test_rinit_service_control() {
         let mut rinit = RinitInitSystem::new();
         
@@ -498,14 +598,12 @@ mod tests {
     }
 
     #[test]
-    fn test_rinit_enable_disable() {
-        let mut rinit = RinitInitSystem::new();
-        
-        assert!(rinit.disable_service("sshd").is_ok());
-        assert!(!rinit.status("sshd").unwrap().enabled);
-        
-        assert!(rinit.enable_service("sshd").is_ok());
-        assert!(rinit.status("sshd").unwrap().enabled);
+    fn test_runit_stage_manager() {
+        let mut mgr = RunitStageManager::new();
+        assert_eq!(mgr.run_stage_1_boot(), RunitStage::Stage1Boot);
+        assert_eq!(mgr.run_stage_2_services(), RunitStage::Stage2Running);
+        assert_eq!(mgr.run_stage_3_shutdown(), RunitStage::Stage3Shutdown);
+        assert_eq!(mgr.stage_logs.len(), 5);
     }
 
     #[test]

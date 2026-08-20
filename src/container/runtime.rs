@@ -1,27 +1,11 @@
 // OOP-based Container Runtime for SigmaOS
 // Implements container runtime using OOP principles with traits and structs.
-#![no_std]
-#![no_main]
-#![cfg_attr(target_os = "none", no_std)]
-#![cfg_attr(target_os = "none", no_main)]
 
 extern crate alloc;
-use alloc::string::String;
+
 use alloc::boxed::Box;
-
-extern crate alloc;
-
+use alloc::string::String;
 use alloc::vec::Vec;
-use core::mem;
-/// OOP-based Container Runtime for SigmaOS
-/// Implements container runtime using OOP principles with traits and structs
-/// No dependency on external container frameworks
-/// Based on Roadmap Item 17: Container runtime support
-use core::ptr::{self, NonNull};
-/// OOP-based Container Runtime for SigmaOS
-/// Implements container runtime using OOP principles with traits and structs
-/// No dependency on external container frameworks
-/// Based on Roadmap Item 17: Container runtime support
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
@@ -133,35 +117,8 @@ impl Default for ContainerCapability {
     fn default() -> Self {
         Self::new()
     }
-/// Container network configuration type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ContainerNetworkType {
-    None,
-    Bridge,
-    Overlay,
 }
 
-/// Container volume configuration
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerVolume {
-    pub is_bind_mount: bool,
-    pub is_tmpfs: bool,
-    pub read_only: bool,
-}
-
-/// Container user namespaces mapping
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerNamespace {
-    pub uid_mapping: u32,
-    pub gid_mapping: u32,
-    pub rootless: bool,
-}
-
-/// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
 /// Container network configuration type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerNetworkType {
@@ -235,14 +192,14 @@ impl SeccompProfile {
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
 pub struct OverlayFS {
-    pub lower_dirs: alloc::vec::Vec<String>,
+    pub lower_dirs: Vec<String>,
     pub upper_dir: String,
     pub work_dir: String,
     pub mounted: bool,
 }
 
 impl OverlayFS {
-    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
+    pub fn new(lower_dirs: Vec<String>, upper_dir: String, work_dir: String) -> Self {
         Self {
             lower_dirs,
             upper_dir,
@@ -259,16 +216,11 @@ impl OverlayFS {
             return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
         }
         self.mounted = true;
-        println!(
-            "OverlayFS mounted successfully: lowerdirs={:?}, upperdir={}, workdir={}",
-            self.lower_dirs, self.upper_dir, self.work_dir
-        );
         Ok(())
     }
 
     pub fn umount(&mut self) {
         self.mounted = false;
-        println!("OverlayFS unmounted successfully.");
     }
 }
 
@@ -282,16 +234,13 @@ pub struct SimpleContainer {
     pub memory_limit: u64,
     pub cpu_limit: u32,
     pub capability: ContainerCapability,
+    pub seccomp: SeccompProfile,
     pub environment: [u8; 512],
 }
 
 impl SimpleContainer {
     pub fn execute_syscall(&self, syscall_id: u32) -> Result<(), ContainerError> {
         if self.seccomp.is_syscall_blocked(syscall_id) {
-            println!(
-                "Container Seccomp Violation: Syscall {} is strictly prohibited by security profile",
-                syscall_id
-            );
             return Err(ContainerError::PermissionDenied);
         }
         Ok(())
@@ -321,6 +270,10 @@ impl SimpleContainer {
             memory_limit: 0,
             cpu_limit: 0,
             capability,
+            seccomp: SeccompProfile {
+                hardened: false,
+                blocked_syscalls_mask: 0,
+            },
             environment: [0; 512],
         }
     }
@@ -703,196 +656,6 @@ impl SimpleContainerRuntime {
         }
         None
     }
-}
-
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    #[allow(dead_code)]
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]
