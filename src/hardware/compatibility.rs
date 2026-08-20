@@ -1,114 +1,131 @@
-// SigmaOS Hardware Compatibility Matrix & Driver Interoperability Layer
-// Implements driver registration, hardware detection, power management, and hardware query abstractions.
+// Hardware Compatibility Matrix Subsystem for SigmaOS
+// Implements supported GPUs, Wi-Fi, printers, storage, and chipsets matrix.
 
+extern crate alloc;
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::collections::BTreeMap as HashMap;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceType {
-    Storage = 0,
-    Network = 1,
-    Display = 2,
-    Input = 3,
+    GPU = 0,
+    WiFi = 1,
+    Printer = 2,
+    Chipset = 3,
     Audio = 4,
-    Bus = 5,
-    Other = 6,
+    Storage = 5,
+    LegacyBus = 6,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PowerState {
-    D0 = 0, // Fully operational
-    D1 = 1, // Light sleep
-    D2 = 2, // Deep sleep
-    D3 = 3, // Powered off
+pub enum SupportStatus {
+    Supported = 0,
+    Partial = 1,
+    Unsupported = 2,
+    Unknown = 3,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HardwareError {
-    Success = 0,
-    DeviceNotFound = 1,
-    InitializationFailed = 2,
-    UnsupportedOperation = 3,
-    PowerStateTransitionFailed = 4,
-}
-
-pub trait Device {
+pub trait HardwareDevice {
     fn id(&self) -> DeviceID;
     fn device_type(&self) -> DeviceType;
+    fn vendor_id(&self) -> u16;
+    fn device_id(&self) -> u16;
     fn name(&self) -> &str;
-}
-
-pub trait HardwareDevice: Device {
-    fn initialize(&mut self) -> Result<(), HardwareError>;
-    fn reset(&mut self) -> Result<(), HardwareError>;
-    fn set_power_state(&mut self, state: PowerState) -> Result<(), HardwareError>;
-    fn power_state(&self) -> PowerState;
+    fn support_status(&self) -> SupportStatus;
 }
 
 pub struct SimpleDevice {
     pub id: DeviceID,
-    pub dev_type: DeviceType,
+    pub device_type: DeviceType,
+    pub vendor_id: u16,
+    pub device_id: u16,
     pub name: String,
-    pub power: PowerState,
+    pub support_status: SupportStatus,
 }
 
 impl SimpleDevice {
-    pub fn new(id: DeviceID, dev_type: DeviceType, name: String) -> Self {
+    pub fn new(
+        id: DeviceID,
+        device_type: DeviceType,
+        vendor_id: u16,
+        device_id: u16,
+        name: &str,
+        status: SupportStatus,
+    ) -> Self {
         SimpleDevice {
             id,
-            dev_type,
-            name,
-            power: PowerState::D0,
+            device_type,
+            vendor_id,
+            device_id,
+            name: name.to_string(),
+            support_status: status,
         }
     }
 }
 
-impl Device for SimpleDevice {
+impl HardwareDevice for SimpleDevice {
     fn id(&self) -> DeviceID {
         self.id
     }
     fn device_type(&self) -> DeviceType {
-        self.dev_type
+        self.device_type
+    }
+    fn vendor_id(&self) -> u16 {
+        self.vendor_id
+    }
+    fn device_id(&self) -> u16 {
+        self.device_id
     }
     fn name(&self) -> &str {
         &self.name
     }
-}
-
-impl HardwareDevice for SimpleDevice {
-    fn initialize(&mut self) -> Result<(), HardwareError> {
-        self.power = PowerState::D0;
-        Ok(())
-    }
-
-    fn reset(&mut self) -> Result<(), HardwareError> {
-        self.power = PowerState::D0;
-        Ok(())
-    }
-
-    fn set_power_state(&mut self, state: PowerState) -> Result<(), HardwareError> {
-        self.power = state;
-        Ok(())
-    }
-
-    fn power_state(&self) -> PowerState {
-        self.power
+    fn support_status(&self) -> SupportStatus {
+        self.support_status
     }
 }
 
 pub trait HardwareCompatibilityManager {
-    fn register_device(&mut self, device: Box<dyn HardwareDevice>) -> Result<DeviceID, HardwareError>;
-    fn unregister_device(&mut self, id: DeviceID) -> Result<(), HardwareError>;
-    fn get_device(&self, id: DeviceID) -> Option<&dyn Device>;
+    fn add_device(
+        &mut self,
+        device: Box<dyn HardwareDevice>,
+    ) -> Result<DeviceID, CompatibilityError>;
+    fn remove_device(&mut self, id: DeviceID) -> Result<(), CompatibilityError>;
+    fn get_device(&self, id: DeviceID) -> Option<&dyn HardwareDevice>;
+    fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<DeviceID>;
+    fn list_by_type(&self, device_type: DeviceType) -> Vec<DeviceID>;
+    fn list_supported(&self) -> Vec<DeviceID>;
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CompatibilityError {
+    Success = 0,
+    DeviceNotFound = 1,
+    DuplicateDevice = 2,
+    InvalidParameter = 3,
+}
+
+/// Hotplug event type (inspired by Linux udev)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HotplugEvent {
+    Add = 0,
+    Remove = 1,
+}
+
+pub trait HotplugManager {
+    fn trigger_hotplug(&mut self, event: HotplugEvent, device: Box<dyn HardwareDevice>) -> Result<(), &'static str>;
+    fn list_hotplug_history(&self) -> &[(HotplugEvent, DeviceID)];
 }
 
 pub struct SimpleCompatibilityMatrix {
-    pub devices: Vec<Option<Box<dyn HardwareDevice>>>,
+    pub devices: Vec<Box<dyn HardwareDevice>>,
     pub next_id: AtomicUsize,
+    pub hotplug_history: Vec<(HotplugEvent, DeviceID)>,
 }
 
 impl Default for SimpleCompatibilityMatrix {
@@ -122,39 +139,306 @@ impl SimpleCompatibilityMatrix {
         SimpleCompatibilityMatrix {
             devices: Vec::new(),
             next_id: AtomicUsize::new(1),
+            hotplug_history: Vec::new(),
         }
+    }
+
+    pub fn seed_with_defaults(&mut self) {
+        let gpu1 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::GPU,
+            0x10DE,
+            0x1C02,
+            "NVIDIA GeForce RTX 3060",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(gpu1));
+
+        let gpu2 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::GPU,
+            0x1002,
+            0x73DF,
+            "AMD Radeon RX 6800 XT",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(gpu2));
+
+        let wifi1 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::WiFi,
+            0x8086,
+            0x2723,
+            "Intel Wi-Fi 6 AX200",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(wifi1));
+
+        let wifi2 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::WiFi,
+            0x168C,
+            0x003A,
+            "Realtek RTL8852AE",
+            SupportStatus::Partial,
+        );
+        self.devices.push(Box::new(wifi2));
+
+        let isa_com = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::LegacyBus,
+            0x0003,
+            0x03F8,
+            "Serial Port COM1 (UART 16550)",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(isa_com));
+
+        let nvme1 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Storage,
+            0x144D,
+            0xA808,
+            "Samsung PCIe Gen 4 NVMe Controller",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(nvme1));
+
+        let audio1 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Audio,
+            0x10EC,
+            0x0887,
+            "Realtek ALC887",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(audio1));
+    }
+}
+
+impl HotplugManager for SimpleCompatibilityMatrix {
+    fn trigger_hotplug(&mut self, event: HotplugEvent, device: Box<dyn HardwareDevice>) -> Result<(), &'static str> {
+        let id = device.id();
+        self.hotplug_history.push((event, id));
+        if event == HotplugEvent::Add {
+            self.devices.push(device);
+        } else {
+            self.devices.retain(|d| d.id() != id);
+        }
+        Ok(())
+    }
+
+    fn list_hotplug_history(&self) -> &[(HotplugEvent, DeviceID)] {
+        &self.hotplug_history
     }
 }
 
 impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
-    fn register_device(&mut self, mut device: Box<dyn HardwareDevice>) -> Result<DeviceID, HardwareError> {
-        let _ = device.initialize();
+    fn add_device(
+        &mut self,
+        device: Box<dyn HardwareDevice>,
+    ) -> Result<DeviceID, CompatibilityError> {
         let id = device.id();
-        self.devices.push(Some(device));
+        self.devices.push(device);
         Ok(id)
     }
 
-    fn unregister_device(&mut self, id: DeviceID) -> Result<(), HardwareError> {
-        if let Some(pos) = self.devices.iter().position(|d| match d {
-            Some(dev) => dev.id() == id,
-            None => false,
-        }) {
+    fn remove_device(&mut self, id: DeviceID) -> Result<(), CompatibilityError> {
+        if let Some(pos) = self.devices.iter().position(|d| d.id() == id) {
             self.devices.remove(pos);
             Ok(())
         } else {
-            Err(HardwareError::DeviceNotFound)
+            Err(CompatibilityError::DeviceNotFound)
         }
     }
 
-    fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
-        for dev_opt in &self.devices {
-            if let Some(ref dev) = *dev_opt {
-                if dev.id() == id {
-                    return Some(dev.as_ref());
-                }
+    fn get_device(&self, id: DeviceID) -> Option<&dyn HardwareDevice> {
+        self.devices
+            .iter()
+            .find(|d| d.id() == id)
+            .map(|d| d.as_ref())
+    }
+
+    fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<DeviceID> {
+        self.devices
+            .iter()
+            .find(|d| d.vendor_id() == vendor_id && d.device_id() == device_id)
+            .map(|d| d.id())
+    }
+
+    fn list_by_type(&self, device_type: DeviceType) -> Vec<DeviceID> {
+        self.devices
+            .iter()
+            .filter(|d| d.device_type() == device_type)
+            .map(|d| d.id())
+            .collect()
+    }
+
+    fn list_supported(&self) -> Vec<DeviceID> {
+        self.devices
+            .iter()
+            .filter(|d| d.support_status() == SupportStatus::Supported)
+            .map(|d| d.id())
+            .collect()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CompatibilityResult { Healthy = 0, Warning = 1, Error = 2, Unknown = 3 }
+
+pub struct CompatibilityReport {
+    pub results: Vec<(DeviceID, CompatibilityResult)>,
+}
+
+#[repr(C)]
+pub struct SimpleDriverManager {
+    pub loaded_drivers: Vec<DeviceID>,
+}
+
+impl SimpleDriverManager {
+    pub fn new() -> Self {
+        SimpleDriverManager {
+            loaded_drivers: Vec::new(),
+        }
+    }
+}
+
+impl Default for SimpleDriverManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub trait DriverManager {
+    fn load_driver(&mut self, device_id: DeviceID) -> Result<(), ()>;
+    fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()>;
+    fn get_driver_status(&self, device_id: DeviceID) -> bool;
+}
+
+impl DriverManager for SimpleDriverManager {
+    fn load_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
+        if self.loaded_drivers.contains(&device_id) {
+            return Err(());
+        }
+        self.loaded_drivers.push(device_id);
+        Ok(())
+    }
+
+    fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
+        for i in 0..self.loaded_drivers.len() {
+            if self.loaded_drivers[i] == device_id {
+                self.loaded_drivers.remove(i);
+                return Ok(());
             }
         }
-        None
+        Err(())
+    }
+
+    fn get_driver_status(&self, device_id: DeviceID) -> bool {
+        self.loaded_drivers.contains(&device_id)
+    }
+}
+
+pub trait HardwareDiagnostics {
+    fn check_device(&self, device_id: DeviceID) -> DiagnosticResult;
+    fn run_full_scan(&self) -> Vec<(DeviceID, DiagnosticResult)>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DiagnosticResult {
+    Healthy = 0,
+    Warning = 1,
+    Error = 2,
+    Unknown = 3,
+}
+
+pub trait CompatibilityCheck {
+    fn check_device(&self, device_id: DeviceID) -> CompatibilityResult;
+    fn run_full_scan(&self) -> CompatibilityReport;
+}
+
+pub struct SimpleDiagnostics {
+    pub matrix: SimpleCompatibilityMatrix,
+}
+
+impl SimpleDiagnostics {
+    pub fn new(matrix: SimpleCompatibilityMatrix) -> Self {
+        SimpleDiagnostics { matrix }
+    }
+}
+
+impl CompatibilityCheck for SimpleDiagnostics {
+    fn check_device(&self, device_id: DeviceID) -> CompatibilityResult {
+        if let Some(device) = self.matrix.get_device(device_id) {
+            match device.support_status() {
+                SupportStatus::Supported => CompatibilityResult::Healthy,
+                SupportStatus::Partial => CompatibilityResult::Warning,
+                SupportStatus::Unsupported => CompatibilityResult::Error,
+                SupportStatus::Unknown => CompatibilityResult::Unknown,
+            }
+        } else {
+            CompatibilityResult::Unknown
+        }
+    }
+
+    fn run_full_scan(&self) -> CompatibilityReport {
+        let mut results = Vec::new();
+        for device in &self.matrix.devices {
+            let result = self.check_device((**device).id());
+            results.push(((**device).id(), result));
+        }
+        CompatibilityReport { results }
+    }
+}
+
+/// ACPI power and interrupt load balancing strategy (inspired by Linux and BSD)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AcpiPowerState {
+    D0 = 0, // Fully functional
+    D1 = 1,
+    D2 = 2,
+    D3 = 3, // Power off
+}
+
+pub trait AcpiLoadBalancer {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str>;
+    fn set_device_power_state(&mut self, device_id: DeviceID, state: AcpiPowerState) -> Result<(), &'static str>;
+    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState>;
+}
+
+pub struct SimpleAcpiManager {
+    pub irq_routing: HashMap<u8, usize>, // maps IRQ to CPU ID
+    pub device_states: HashMap<DeviceID, AcpiPowerState>,
+}
+
+impl SimpleAcpiManager {
+    pub fn new() -> Self {
+        SimpleAcpiManager {
+            irq_routing: HashMap::new(),
+            device_states: HashMap::new(),
+        }
+    }
+}
+
+impl Default for SimpleAcpiManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AcpiLoadBalancer for SimpleAcpiManager {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str> {
+        self.irq_routing.insert(interrupt_line, cpu_id);
+        Ok(())
+    }
+
+    fn set_device_power_state(&mut self, device_id: DeviceID, state: AcpiPowerState) -> Result<(), &'static str> {
+        self.device_states.insert(device_id, state);
+        Ok(())
+    }
+
+    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState> {
+        self.device_states.get(&device_id).copied()
     }
 }
 
@@ -163,24 +447,64 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_device_lifecycle() {
-        let mut dev = SimpleDevice::new(1, DeviceType::Storage, "nvme0".to_string());
-        assert_eq!(dev.power_state(), PowerState::D0);
-        assert!(dev.set_power_state(PowerState::D3).is_ok());
-        assert_eq!(dev.power_state(), PowerState::D3);
+    fn test_multi_generation_hardware_matrix() {
+        let mut matrix = SimpleCompatibilityMatrix::new();
+        matrix.seed_with_defaults();
+
+        let com1_id = matrix.find_by_vendor_device(0x0003, 0x03F8).unwrap();
+        let com1_dev = matrix.get_device(com1_id).unwrap();
+        assert_eq!(com1_dev.device_type(), DeviceType::LegacyBus);
+
+        let nvme_id = matrix.find_by_vendor_device(0x144D, 0xA808).unwrap();
+        let nvme_dev = matrix.get_device(nvme_id).unwrap();
+        assert_eq!(nvme_dev.device_type(), DeviceType::Storage);
     }
 
     #[test]
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
-        let dev = Box::new(SimpleDevice::new(100, DeviceType::Network, "eth0".to_string()));
-        let id = matrix.register_device(dev).unwrap();
-        assert_eq!(id, 100);
+        matrix.seed_with_defaults();
+        assert_eq!(matrix.list_supported().len(), 6);
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 2);
+    }
 
-        let registered = matrix.get_device(100).unwrap();
-        assert_eq!(registered.name(), "eth0");
+    #[test]
+    fn test_driver_manager_lifecycle() {
+        let mut driver_manager = SimpleDriverManager::new();
+        assert!(!driver_manager.get_driver_status(42));
 
-        assert!(matrix.unregister_device(100).is_ok());
-        assert!(matrix.get_device(100).is_none());
+        driver_manager.load_driver(42).unwrap();
+        assert!(driver_manager.get_driver_status(42));
+
+        driver_manager.unload_driver(42).unwrap();
+        assert!(!driver_manager.get_driver_status(42));
+    }
+
+    #[test]
+    fn test_diagnostics() {
+        let mut matrix = SimpleCompatibilityMatrix::new();
+        matrix.seed_with_defaults();
+        let diag = SimpleDiagnostics::new(matrix);
+        let report = diag.run_full_scan();
+        assert_eq!(report.results.len(), 7);
+    }
+
+    #[test]
+    fn test_acpi_load_balancing() {
+        let mut acpi = SimpleAcpiManager::new();
+        assert!(acpi.balance_irq_routing(11, 4).is_ok());
+        assert_eq!(acpi.irq_routing.get(&11), Some(&4));
+
+        assert!(acpi.set_device_power_state(42, AcpiPowerState::D3).is_ok());
+        assert_eq!(acpi.get_device_power_state(42), Some(AcpiPowerState::D3));
+    }
+
+    #[test]
+    fn test_hotplug_manager() {
+        let mut matrix = SimpleCompatibilityMatrix::new();
+        let cap = SimpleDevice::new(99, DeviceType::Storage, 0x1234, 0x5678, "HotplugDisk", SupportStatus::Supported);
+        assert!(matrix.trigger_hotplug(HotplugEvent::Add, Box::new(cap)).is_ok());
+        assert_eq!(matrix.list_hotplug_history().len(), 1);
+        assert_eq!(matrix.get_device(99).unwrap().name(), "HotplugDisk");
     }
 }

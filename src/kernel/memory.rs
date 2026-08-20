@@ -405,11 +405,13 @@ impl VirtualMemoryManager {
         }
     }
 
+    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
     pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
         let size = num_pages * PAGE_SIZE;
         self.buddy_allocator.allocate(size)
     }
 
+    /// Free pages using buddy allocator (wires free_pages to VMM)
     pub fn free_pages(&mut self, block: MemoryBlock) {
         self.buddy_allocator.deallocate(block);
     }
