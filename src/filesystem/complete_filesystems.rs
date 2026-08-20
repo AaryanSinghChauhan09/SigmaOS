@@ -24,6 +24,11 @@
 extern crate alloc;
 use alloc::vec::Vec;
 
+use crate::access::control::{
+    Ext4AccessCheckEngine, Ext4InodeMode, Ext4Xattr, NtfsSecurityDescriptor, PosixAclTable,
+    SecurityIdentifier,
+};
+
 /// Common interface for all file system implementations
 pub trait FileSystem {
     fn name(&self) -> &'static str;
@@ -476,6 +481,7 @@ pub struct NtfsFileSystem {
     pub mft_start_cluster: u64,
     pub mft_mirror_start_cluster: u64,
     pub records: Vec<NtfsRecord>,
+    pub security_descriptors: Vec<(u32, NtfsSecurityDescriptor)>,
 }
 
 impl NtfsFileSystem {
@@ -487,7 +493,30 @@ impl NtfsFileSystem {
             mft_start_cluster: 4,
             mft_mirror_start_cluster: 1024,
             records: Vec::new(),
+            security_descriptors: Vec::new(),
         }
+    }
+
+    /// Attaches an NTFS Security Descriptor to an MFT file record
+    pub fn attach_security_descriptor(&mut self, record_id: u32, sd: NtfsSecurityDescriptor) {
+        self.security_descriptors.retain(|(id, _)| *id != record_id);
+        self.security_descriptors.push((record_id, sd));
+    }
+
+    /// Evaluates requested access rights against an MFT file record's Security Descriptor
+    pub fn evaluate_record_access(
+        &self,
+        record_id: u32,
+        subject_sid: &SecurityIdentifier,
+        subject_group_sids: &[SecurityIdentifier],
+        requested_rights: u32,
+    ) -> bool {
+        for (id, sd) in &self.security_descriptors {
+            if *id == record_id {
+                return sd.evaluate_access(subject_sid, subject_group_sids, requested_rights);
+            }
+        }
+        false // Implicit deny if no security descriptor attached
     }
 }
 
@@ -603,6 +632,7 @@ pub struct ExtFileSystem {
     pub jbd2_journal_mode: &'static str, // JBD2: Ordered, Writeback, Journal
     pub mballoc_group_count: u32,       // Linux mballoc multiblock group count
     pub metadata_checksum_seed: u32,    // CRC32C seed
+    pub extended_attributes: Vec<(u32, Ext4Xattr)>, // Extended Attributes (xattr) mapping (inode_id, xattr)
 }
 
 impl ExtFileSystem {
@@ -626,7 +656,35 @@ impl ExtFileSystem {
             jbd2_journal_mode: if journal { "ordered" } else { "none" },
             mballoc_group_count: if extents { 64 } else { 0 },
             metadata_checksum_seed: 0xEDB88320,
+            extended_attributes: Vec::new(),
         }
+    }
+
+    /// Attaches an extended attribute (xattr) to an inode (e.g. "system.posix_acl_access")
+    pub fn set_xattr(&mut self, inode_id: u32, name: &[u8], value: &[u8]) {
+        self.extended_attributes.push((inode_id, Ext4Xattr::new(name, value)));
+    }
+
+    /// Evaluates Linux ext4 access permissions following root check -> POSIX ACL xattrs -> mode bits flow
+    pub fn evaluate_inode_access(
+        &self,
+        subject_uid: u32,
+        subject_gid: u32,
+        requested_mode: u16,
+        owner_uid: u32,
+        primary_gid: u32,
+        mode_bits: u16,
+        acl_opt: Option<&PosixAclTable>,
+    ) -> bool {
+        Ext4AccessCheckEngine::evaluate_ext4_access(
+            subject_uid,
+            subject_gid,
+            requested_mode,
+            owner_uid,
+            primary_gid,
+            mode_bits,
+            acl_opt,
+        )
     }
 
     /// Emulates Linux Ext4 extent tree mapping of logical blocks to physical blocks
