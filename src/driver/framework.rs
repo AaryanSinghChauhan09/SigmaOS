@@ -80,6 +80,12 @@ impl SimpleDriver {
 
     pub fn shutdown(&mut self) -> Result<(), DriverError> {
         Ok(())
+        SimpleDriver { id, driver_type, state: AtomicUsize::new(DriverState::Unloaded as usize) }
+        SimpleDriver {
+            id,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
     }
 }
 

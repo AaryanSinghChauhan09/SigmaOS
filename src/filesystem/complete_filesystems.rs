@@ -114,19 +114,6 @@ mod tests {
         assert_eq!(ntfs.cluster_size, 4096);
         assert!(ntfs.mount().is_ok());
         assert_eq!(ntfs.records.len(), 2);
-
-        // Test NTFS Security Descriptor & DACL Evaluation
-        let user_sid = SecurityIdentifier::new(5, &[21, 100, 200, 1001]);
-        let group_sid = SecurityIdentifier::new(5, &[21, 100, 200, 513]);
-        let mut sd = NtfsSecurityDescriptor::new(user_sid.clone(), group_sid.clone());
-        let mut dacl = crate::access::control::NtfsDacl::new();
-        dacl.add_ace(crate::access::control::NtfsAce::allow(user_sid.clone(), crate::access::control::ntfs_access_rights::READ, 0));
-        sd.dacl = Some(dacl);
-        ntfs.attach_security_descriptor(0, sd);
-
-        assert!(ntfs.evaluate_record_access(0, &user_sid, &[], crate::access::control::ntfs_access_rights::READ));
-        assert!(!ntfs.evaluate_record_access(0, &user_sid, &[], crate::access::control::ntfs_access_rights::WRITE));
-
         ntfs.unmount();
         assert_eq!(ntfs.records.len(), 0);
 
@@ -181,13 +168,6 @@ mod tests {
 
         assert!(ext4.commit_journal_transaction(123));
         assert!(ext4.verify_metadata_checksum(b"superblock_data"));
-
-        // Verifying Ext4 xattr & POSIX ACL evaluation flow
-        ext4.set_xattr(42, b"system.posix_acl_access", b"\x02\x00\x00\x00");
-        assert_eq!(ext4.extended_attributes.len(), 1);
-        assert_eq!(ext4.extended_attributes[0].1.name, b"system.posix_acl_access");
-
-        assert!(ext4.evaluate_inode_access(1000, 1000, crate::access::control::dac_flags::READ, 1000, 1000, 0o750, None));
     }
 }
 

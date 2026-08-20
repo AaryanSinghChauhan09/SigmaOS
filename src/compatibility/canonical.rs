@@ -418,6 +418,9 @@ impl BrailleMatrix {
 // ==========================================
 // 10. Localization (i18n) & Translation Engine
 // ==========================================
+#[cfg(test)]
+mod tests {
+    use super::*;
 pub struct SigmaLivepatchPatch {
     pub target_symbol: String,
     pub old_function_address: usize,
@@ -454,6 +457,9 @@ impl SigmaLivepatch {
         self.active_patches.get(target_symbol).map(|patch| patch.new_function_address)
     }
 }
+
+#[cfg(test)]
+mod tests {
 
 pub struct LanguageTranslationCatalog {
     pub locale: String,
