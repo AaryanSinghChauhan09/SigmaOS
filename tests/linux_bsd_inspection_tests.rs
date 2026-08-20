@@ -8,7 +8,11 @@
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 
+#[path = "../src/distro/linux_bsd_inspirations.rs"]
+mod distro_inspirations;
+
 use bsd::*;
+use distro_inspirations::*;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -39,4 +43,28 @@ fn test_openbsd_sysctl_mib_inspection() {
     assert_eq!(mib.query_mib("kern.ostype").unwrap(), "SigmaOS-OpenBSD");
     assert_eq!(mib.query_mib("kern.securelevel").unwrap(), "1");
     assert!(!mib.is_raw_disk_write_allowed());
+}
+
+#[test]
+fn test_sovereign_auxiliary_carry_and_system_awareness_inspection() {
+    let mut af = SovereignAuxiliaryCarryEngine::new();
+    let res = af.evaluate_add_af(0x0E, 0x05); // 14 + 5 = 19 > 15 -> AF set
+    assert!(af.rflags_af);
+
+    let mut awareness = SovereignSystemAwarenessEngine::new(AwarenessDegree::Omniscient);
+    assert!(awareness.compute_availability_score() > 0);
+}
+
+#[test]
+fn test_sovereign_avoidance_backbone_balloon_inspection() {
+    let mut avoidance = SovereignDeadlockStarvationAvoidanceEngine::new(vec![5, 5]);
+    avoidance.register_process(1, vec![3, 3]);
+    assert!(avoidance.is_safe_state_request(1, &[1, 1]));
+
+    let mut backbone = SovereignBackboneNetworkEngine::new();
+    backbone.add_route([10, 0, 0, 0], 8, [192, 168, 1, 1], 10, RouteProtocol::Bgp);
+    assert!(backbone.lookup_backbone_route([10, 1, 2, 3]).is_some());
+
+    let mut balloon = SovereignMemoryBallooningBalancer::new(2048);
+    assert_eq!(balloon.inflate_balloon(512), 512);
 }

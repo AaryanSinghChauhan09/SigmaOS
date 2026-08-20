@@ -15,14 +15,17 @@ pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
 pub mod linux_bsd_inspirations;
-pub mod arch_parity;
-pub mod chakra_parity;
 
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
     PinRule, AptPinStore, OpenRCService, SovereignDTraceEngine, DTraceProvider, DTraceAggregation,
     SovereignRaidSelfHealer, RaidLevel, ScrubResult, SovereignDeclarativeSystemEngine,
     RollbackStatus, SovereignPrivSepSandbox, PrivSepProcessRole,
+    SovereignAuxiliaryCarryEngine, SovereignSystemAwarenessEngine, AwarenessDegree, SystemTelemetryState,
+    SovereignDeadlockStarvationAvoidanceEngine, ProcessResourceRequest,
+    SovereignBackboneNetworkEngine, BackboneRoute, RouteProtocol,
+    SovereignBackgroundBackupEngine, BackgroundWorkItem, SystemBackupSnapshot,
+    SovereignMemoryBallooningBalancer,
 };
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};

@@ -2364,6 +2364,460 @@ impl Default for SovereignPrivSepSandbox {
     }
 }
 
+// ==========================================
+// 24. AUXILIARY CARRY FLAG & BCD ARITHMETIC EMULATION (SovereignAuxiliaryCarryEngine)
+// ==========================================
+
+/// x86 / 8086 Auxiliary Carry Flag (AF, bit 4 of RFLAGS) and Binary Coded Decimal (BCD) engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SovereignAuxiliaryCarryEngine {
+    pub rflags_af: bool,
+}
+
+impl SovereignAuxiliaryCarryEngine {
+    pub fn new() -> Self {
+        Self { rflags_af: false }
+    }
+
+    /// Evaluates Auxiliary Carry Flag (AF) for 8-bit addition (half-carry from bit 3 to bit 4)
+    pub fn evaluate_add_af(&mut self, op1: u8, op2: u8) -> u8 {
+        let result = op1.wrapping_add(op2);
+        self.rflags_af = ((op1 & 0x0F) + (op2 & 0x0F)) > 0x0F;
+        result
+    }
+
+    /// Evaluates Auxiliary Carry Flag (AF) for 8-bit subtraction (half-borrow from bit 4)
+    pub fn evaluate_sub_af(&mut self, op1: u8, op2: u8) -> u8 {
+        let result = op1.wrapping_sub(op2);
+        self.rflags_af = (op1 & 0x0F) < (op2 & 0x0F);
+        result
+    }
+
+    /// Emulates x86 Decimal Adjust AL after Addition (DAA)
+    pub fn daa_adjust(&mut self, mut al: u8, cf: &mut bool) -> u8 {
+        let old_al = al;
+        let old_af = self.rflags_af;
+
+        if (al & 0x0F) > 9 || old_af {
+            al = al.wrapping_add(6);
+            self.rflags_af = true;
+        } else {
+            self.rflags_af = false;
+        }
+
+        if old_al > 0x99 || *cf {
+            al = al.wrapping_add(0x60);
+            *cf = true;
+        } else {
+            *cf = false;
+        }
+
+        al
+    }
+
+    /// Emulates x86 Decimal Adjust AL after Subtraction (DAS)
+    pub fn das_adjust(&mut self, mut al: u8, cf: &mut bool) -> u8 {
+        let old_al = al;
+        let old_af = self.rflags_af;
+
+        if (al & 0x0F) > 9 || old_af {
+            al = al.wrapping_sub(6);
+            self.rflags_af = true;
+        } else {
+            self.rflags_af = false;
+        }
+
+        if old_al > 0x99 || *cf {
+            al = al.wrapping_sub(0x60);
+            *cf = true;
+        }
+
+        al
+    }
+}
+
+impl Default for SovereignAuxiliaryCarryEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 25. SYSTEM INFORMATION & AVAILABILITY STATE ENGINE (SovereignSystemAwarenessEngine)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AwarenessDegree {
+    Minimal,    // Basic CPU/Memory status
+    Standard,   // Process/I/O state tracking
+    Omniscient, // Full real-time kernel & hardware MIB telemetry
+}
+
+#[derive(Debug, Clone)]
+pub struct SystemTelemetryState {
+    pub active_cpus: usize,
+    pub total_memory_bytes: u64,
+    pub free_memory_bytes: u64,
+    pub thermal_temp_celsius: u32,
+    pub active_processes: usize,
+    pub uptime_seconds: u64,
+}
+
+pub struct SovereignSystemAwarenessEngine {
+    pub degree: AwarenessDegree,
+    pub state: SystemTelemetryState,
+}
+
+impl SovereignSystemAwarenessEngine {
+    pub fn new(degree: AwarenessDegree) -> Self {
+        Self {
+            degree,
+            state: SystemTelemetryState {
+                active_cpus: 1,
+                total_memory_bytes: 1024 * 1024 * 1024,
+                free_memory_bytes: 512 * 1024 * 1024,
+                thermal_temp_celsius: 45,
+                active_processes: 10,
+                uptime_seconds: 100,
+            },
+        }
+    }
+
+    pub fn update_telemetry(&mut self, free_mem: u64, temp: u32, procs: usize, uptime: u64) {
+        self.state.free_memory_bytes = free_mem;
+        self.state.thermal_temp_celsius = temp;
+        self.state.active_processes = procs;
+        self.state.uptime_seconds = uptime;
+    }
+
+    /// Computes system availability score (0 to 100 percentage)
+    pub fn compute_availability_score(&self) -> u32 {
+        let mem_avail_ratio = (self.state.free_memory_bytes as f64 / self.state.total_memory_bytes as f64) * 100.0;
+        let thermal_score = if self.state.thermal_temp_celsius > 90 {
+            10
+        } else if self.state.thermal_temp_celsius > 75 {
+            50
+        } else {
+            100
+        };
+
+        ((mem_avail_ratio as u32) + thermal_score) / 2
+    }
+}
+
+// ==========================================
+// 26. OS DEADLOCK & STARVATION AVOIDANCE ENGINE (SovereignDeadlockStarvationAvoidanceEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct ProcessResourceRequest {
+    pub pid: u64,
+    pub allocated: Vec<usize>,
+    pub max_claim: Vec<usize>,
+}
+
+pub struct SovereignDeadlockStarvationAvoidanceEngine {
+    pub available_resources: Vec<usize>,
+    pub requests: Vec<ProcessResourceRequest>,
+}
+
+impl SovereignDeadlockStarvationAvoidanceEngine {
+    pub fn new(available_resources: Vec<usize>) -> Self {
+        Self {
+            available_resources,
+            requests: Vec::new(),
+        }
+    }
+
+    pub fn register_process(&mut self, pid: u64, max_claim: Vec<usize>) {
+        let alloc_zeros = vec![0; max_claim.len()];
+        self.requests.push(ProcessResourceRequest {
+            pid,
+            allocated: alloc_zeros,
+            max_claim,
+        });
+    }
+
+    /// Banker's Algorithm for Deadlock Avoidance: determines if allocation leaves system in a Safe State
+    pub fn is_safe_state_request(&self, pid: u64, request: &[usize]) -> bool {
+        let mut work = self.available_resources.clone();
+        let num_resources = work.len();
+
+        for (i, &req) in request.iter().enumerate() {
+            if i >= num_resources || req > work[i] {
+                return false;
+            }
+        }
+
+        let mut temp_requests = self.requests.clone();
+        if let Some(proc_req) = temp_requests.iter_mut().find(|p| p.pid == pid) {
+            for i in 0..num_resources {
+                let need = proc_req.max_claim[i].saturating_sub(proc_req.allocated[i]);
+                if request[i] > need {
+                    return false;
+                }
+                proc_req.allocated[i] += request[i];
+                work[i] -= request[i];
+            }
+        } else {
+            return false;
+        }
+
+        let mut finish = vec![false; temp_requests.len()];
+        let mut progress = true;
+
+        while progress {
+            progress = false;
+            for (idx, proc_req) in temp_requests.iter().enumerate() {
+                if !finish[idx] {
+                    let mut can_finish = true;
+                    for r in 0..num_resources {
+                        let need = proc_req.max_claim[r].saturating_sub(proc_req.allocated[r]);
+                        if need > work[r] {
+                            can_finish = false;
+                            break;
+                        }
+                    }
+
+                    if can_finish {
+                        for r in 0..num_resources {
+                            work[r] += proc_req.allocated[r];
+                        }
+                        finish[idx] = true;
+                        progress = true;
+                    }
+                }
+            }
+        }
+
+        finish.iter().all(|&f| f)
+    }
+
+    /// FreeBSD-style Priority Aging Starvation Avoidance: increases priority for waiting threads
+    pub fn calculate_starvation_aging_boost(&self, wait_ticks: u64, current_priority: u32) -> u32 {
+        let boost = (wait_ticks / 10) as u32;
+        current_priority.saturating_add(boost)
+    }
+}
+
+// ==========================================
+// 27. BACKBONE NETWORK ENGINE (SovereignBackboneNetworkEngine)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RouteProtocol {
+    Static,
+    Bgp,
+    Ospf,
+}
+
+#[derive(Debug, Clone)]
+pub struct BackboneRoute {
+    pub prefix: [u8; 4],
+    pub prefix_len: u8,
+    pub next_hop: [u8; 4],
+    pub metric: u32,
+    pub protocol: RouteProtocol,
+    pub active: bool,
+}
+
+pub struct SovereignBackboneNetworkEngine {
+    pub routes: Vec<BackboneRoute>,
+    pub link_failover_active: bool,
+}
+
+impl SovereignBackboneNetworkEngine {
+    pub fn new() -> Self {
+        Self {
+            routes: Vec::new(),
+            link_failover_active: false,
+        }
+    }
+
+    pub fn add_route(&mut self, prefix: [u8; 4], prefix_len: u8, next_hop: [u8; 4], metric: u32, protocol: RouteProtocol) {
+        self.routes.push(BackboneRoute {
+            prefix,
+            prefix_len,
+            next_hop,
+            metric,
+            protocol,
+            active: true,
+        });
+    }
+
+    /// Simulates link failure and triggers automated dynamic path failover to backup routes
+    pub fn trigger_link_failover(&mut self, failed_next_hop: [u8; 4]) {
+        self.link_failover_active = true;
+        for route in self.routes.iter_mut() {
+            if route.next_hop == failed_next_hop {
+                route.active = false;
+            }
+        }
+    }
+
+    /// Backbone longest-prefix-match route lookup
+    pub fn lookup_backbone_route(&self, dest_ip: [u8; 4]) -> Option<&BackboneRoute> {
+        let mut best_route: Option<&BackboneRoute> = None;
+
+        for route in self.routes.iter().filter(|r| r.active) {
+            let mask = if route.prefix_len == 0 {
+                0u32
+            } else {
+                !((1u64 << (32 - route.prefix_len)) - 1) as u32
+            };
+            let dest_u32 = u32::from_be_bytes(dest_ip);
+            let prefix_u32 = u32::from_be_bytes(route.prefix);
+
+            if (dest_u32 & mask) == (prefix_u32 & mask) {
+                if best_route.is_none() || route.prefix_len > best_route.unwrap().prefix_len {
+                    best_route = Some(route);
+                }
+            }
+        }
+
+        best_route
+    }
+}
+
+impl Default for SovereignBackboneNetworkEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 28. BACKGROUND WORK & BACKUP ENGINE (SovereignBackgroundBackupEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct BackgroundWorkItem {
+    pub id: u64,
+    pub description: String,
+    pub completed: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct SystemBackupSnapshot {
+    pub snapshot_id: u64,
+    pub name: String,
+    pub timestamp: u64,
+    pub state_checksum: u64,
+}
+
+pub struct SovereignBackgroundBackupEngine {
+    pub work_queue: Vec<BackgroundWorkItem>,
+    pub snapshots: Vec<SystemBackupSnapshot>,
+    pub next_work_id: u64,
+}
+
+impl SovereignBackgroundBackupEngine {
+    pub fn new() -> Self {
+        Self {
+            work_queue: Vec::new(),
+            snapshots: Vec::new(),
+            next_work_id: 1,
+        }
+    }
+
+    pub fn enqueue_background_work(&mut self, description: &str) -> u64 {
+        let id = self.next_work_id;
+        self.next_work_id += 1;
+        self.work_queue.push(BackgroundWorkItem {
+            id,
+            description: description.to_string(),
+            completed: false,
+        });
+        id
+    }
+
+    pub fn process_background_work(&mut self) -> usize {
+        let mut processed = 0;
+        for item in self.work_queue.iter_mut().filter(|i| !i.completed) {
+            item.completed = true;
+            processed += 1;
+        }
+        processed
+    }
+
+    pub fn create_backup_snapshot(&mut self, snapshot_id: u64, name: &str, state_bytes: &[u8]) {
+        let mut checksum: u64 = 0;
+        for &b in state_bytes {
+            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
+        }
+
+        self.snapshots.push(SystemBackupSnapshot {
+            snapshot_id,
+            name: name.to_string(),
+            timestamp: self.snapshots.len() as u64 + 1,
+            state_checksum: checksum,
+        });
+    }
+
+    pub fn verify_backup_integrity(&self, snapshot_id: u64, state_bytes: &[u8]) -> bool {
+        if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
+            let mut checksum: u64 = 0;
+            for &b in state_bytes {
+                checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
+            }
+            checksum == snap.state_checksum
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignBackgroundBackupEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 29. RESOURCE BALANCING & VIRTIO BALLOONING ENGINE (SovereignMemoryBallooningBalancer)
+// ==========================================
+
+pub struct SovereignMemoryBallooningBalancer {
+    pub host_free_memory_mb: usize,
+    pub guest_balloon_target_mb: usize,
+    pub actual_ballooned_mb: usize,
+}
+
+impl SovereignMemoryBallooningBalancer {
+    pub fn new(host_free_mem_mb: usize) -> Self {
+        Self {
+            host_free_memory_mb: host_free_mem_mb,
+            guest_balloon_target_mb: 0,
+            actual_ballooned_mb: 0,
+        }
+    }
+
+    /// Inflates VirtIO memory balloon (reclaims memory from guest VM back to host)
+    pub fn inflate_balloon(&mut self, target_mb: usize) -> usize {
+        self.guest_balloon_target_mb = target_mb;
+        self.actual_ballooned_mb = target_mb;
+        self.host_free_memory_mb += target_mb;
+        self.actual_ballooned_mb
+    }
+
+    /// Deflates VirtIO memory balloon (returns memory to guest VM)
+    pub fn deflate_balloon(&mut self, release_mb: usize) -> usize {
+        let actual_release = release_mb.min(self.actual_ballooned_mb);
+        self.actual_ballooned_mb -= actual_release;
+        self.host_free_memory_mb = self.host_free_memory_mb.saturating_sub(actual_release);
+        self.actual_ballooned_mb
+    }
+
+    /// Dynamically balances resource load across NUMA nodes
+    pub fn balance_numa_load(&self, numa_loads: &[usize]) -> Vec<usize> {
+        let total: usize = numa_loads.iter().sum();
+        if numa_loads.is_empty() {
+            return Vec::new();
+        }
+        let avg = total / numa_loads.len();
+        vec![avg; numa_loads.len()]
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3105,5 +3559,96 @@ mod tests {
         assert!(!sandbox.processes[0].alive);
         assert_eq!(sandbox.violations.len(), 1);
         assert_eq!(sandbox.violations[0].syscall, "exec");
+    }
+
+    #[test]
+    fn test_sovereign_auxiliary_carry_engine() {
+        let mut af_engine = SovereignAuxiliaryCarryEngine::new();
+
+        // 5 + 12 = 17 (0x05 + 0x0C = 0x11). 5 + 12 = 17 > 15, half carry from bit 3
+        let res_add = af_engine.evaluate_add_af(0x05, 0x0C);
+        assert_eq!(res_add, 0x11);
+        assert!(af_engine.rflags_af);
+
+        // Subtraction borrow test: 0x10 - 0x01 -> 0x00 - 0x01 in lower nibbles -> half borrow
+        let res_sub = af_engine.evaluate_sub_af(0x10, 0x01);
+        assert_eq!(res_sub, 0x0F);
+        assert!(af_engine.rflags_af);
+
+        // DAA test
+        let mut cf = false;
+        let daa_res = af_engine.daa_adjust(0x0A, &mut cf); // 10 decimal -> adjusts lower nibble by +6 to get 0x10
+        assert_eq!(daa_res, 0x10);
+    }
+
+    #[test]
+    fn test_sovereign_system_awareness_engine() {
+        let mut awareness = SovereignSystemAwarenessEngine::new(AwarenessDegree::Omniscient);
+        let score = awareness.compute_availability_score();
+        assert!(score > 0 && score <= 100);
+
+        awareness.update_telemetry(100 * 1024 * 1024, 80, 25, 500);
+        let updated_score = awareness.compute_availability_score();
+        assert!(updated_score < score); // Higher thermal temp and lower free mem drops availability score
+    }
+
+    #[test]
+    fn test_sovereign_deadlock_starvation_avoidance() {
+        let mut avoidance = SovereignDeadlockStarvationAvoidanceEngine::new(vec![10, 5, 7]);
+        avoidance.register_process(1, vec![7, 5, 3]);
+
+        // Request within safe bounds
+        assert!(avoidance.is_safe_state_request(1, &[0, 2, 2]));
+
+        // Request exceeding available resources
+        assert!(!avoidance.is_safe_state_request(1, &[11, 0, 0]));
+
+        // FreeBSD starvation aging calculation
+        let boosted = avoidance.calculate_starvation_aging_boost(100, 10);
+        assert_eq!(boosted, 20); // 10 + (100 / 10) = 20
+    }
+
+    #[test]
+    fn test_sovereign_backbone_network_engine() {
+        let mut backbone = SovereignBackboneNetworkEngine::new();
+        backbone.add_route([10, 0, 0, 0], 8, [192, 168, 1, 1], 10, RouteProtocol::Bgp);
+        backbone.add_route([10, 10, 0, 0], 16, [192, 168, 1, 2], 5, RouteProtocol::Ospf);
+
+        let match1 = backbone.lookup_backbone_route([10, 10, 5, 5]).unwrap();
+        assert_eq!(match1.prefix_len, 16); // Longest prefix match
+
+        // Failover test
+        backbone.trigger_link_failover([192, 168, 1, 2]);
+        let match2 = backbone.lookup_backbone_route([10, 10, 5, 5]).unwrap();
+        assert_eq!(match2.prefix_len, 8); // Failover to 10.0.0.0/8 backup route
+    }
+
+    #[test]
+    fn test_sovereign_background_backup_engine() {
+        let mut engine = SovereignBackgroundBackupEngine::new();
+        let _w1 = engine.enqueue_background_work("Index database");
+        let _w2 = engine.enqueue_background_work("Reclaim cached pages");
+
+        assert_eq!(engine.process_background_work(), 2);
+
+        let state_data = b"CRITICAL_OS_STATE_METADATA";
+        engine.create_backup_snapshot(100, "snap_initial", state_data);
+        assert!(engine.verify_backup_integrity(100, state_data));
+        assert!(!engine.verify_backup_integrity(100, b"CORRUPTED_DATA"));
+    }
+
+    #[test]
+    fn test_sovereign_memory_ballooning_balancer() {
+        let mut balloon = SovereignMemoryBallooningBalancer::new(4096);
+        let ballooned = balloon.inflate_balloon(1024);
+        assert_eq!(ballooned, 1024);
+        assert_eq!(balloon.host_free_memory_mb, 5120);
+
+        let deflated = balloon.deflate_balloon(512);
+        assert_eq!(deflated, 512);
+        assert_eq!(balloon.host_free_memory_mb, 4608);
+
+        let numa_balanced = balloon.balance_numa_load(&[100, 300, 200]);
+        assert_eq!(numa_balanced, vec![200, 200, 200]);
     }
 }

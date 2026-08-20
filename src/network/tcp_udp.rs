@@ -344,12 +344,14 @@ impl CongestionControl for BBRCongestionControl {
     fn update_cwnd(&mut self, _acked: usize) {
         let bw = self.bw_estimate.load(Ordering::SeqCst);
         let rtt = self.rtt_min.load(Ordering::SeqCst);
-        let target = bw * rtt;
-        self.cwnd.store(target, Ordering::SeqCst);
+        if rtt > 0 {
+            let target = (bw * rtt) / 1000;
+            self.cwnd.store(target, Ordering::SeqCst);
+        }
     }
     fn on_loss(&mut self) {
-<<<<<<< HEAD
-        self.cwnd.store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
+        let current = self.cwnd.load(Ordering::SeqCst);
+        self.cwnd.store(current / 2, Ordering::SeqCst);
     }
     fn get_cwnd(&self) -> usize {
         self.cwnd.load(Ordering::SeqCst)
@@ -391,24 +393,6 @@ impl Firewall for SimpleFirewall {
     }
     fn is_allowed(&self, port: Port) -> bool {
         self.allowed_ports[port as usize]
-    }
-}
-
-impl CongestionControl for BBRCongestionControl {
-    fn update_cwnd(&mut self, acked: usize) {
-        let bw = self.bw_estimate.load(Ordering::SeqCst);
-        let rtt = self.rtt_min.load(Ordering::SeqCst);
-        if rtt > 0 {
-            let target = (bw * rtt) / 1000;
-            self.cwnd.store(target, Ordering::SeqCst);
-        }
-    }
-    fn on_loss(&mut self) {
-        let current = self.cwnd.load(Ordering::SeqCst);
-        self.cwnd.store(current / 2, Ordering::SeqCst);
-    }
-    fn get_cwnd(&self) -> usize {
-        self.cwnd.load(Ordering::SeqCst)
     }
 }
 
