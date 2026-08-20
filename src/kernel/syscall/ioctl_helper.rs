@@ -35,16 +35,20 @@ impl IoctlDecoder {
     /// - Bits 8-15: Group type (character byte, e.g. 'T' for tty)
     /// - Bits 0-7: Command sequence number
     pub fn decode_command(cmd: u32) -> DecodedIoctl {
-        let dir_bits = cmd & 0xC0000000;
+        let dir_bits = cmd & 0xE0000000;
         let direction = match dir_bits {
-            0x20000000 => IoctlDirection::Void,
-            0x40000000 => IoctlDirection::Out,
-            0x80000000 => IoctlDirection::In,
-            0xC0000000 => IoctlDirection::InOut,
+            IOC_VOID => IoctlDirection::Void,
+            IOC_OUT => IoctlDirection::Out,
+            IOC_IN => IoctlDirection::In,
+            IOC_INOUT => IoctlDirection::InOut,
             _ => IoctlDirection::Unknown,
         };
 
-        let parameter_size = ((cmd >> 16) & 0x3FFF) as usize;
+        let parameter_size = if direction == IoctlDirection::Void {
+            0
+        } else {
+            ((cmd >> 16) & 0x3FFF) as usize
+        };
         let group_char_byte = ((cmd >> 8) & 0xFF) as u8;
         let group_type = group_char_byte as char;
         let sequence_number = (cmd & 0xFF) as u8;
