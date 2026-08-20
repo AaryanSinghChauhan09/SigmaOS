@@ -1,6 +1,8 @@
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 
@@ -205,8 +207,8 @@ impl SelfHealingModule {
         // Log the event
         self.event_log.push((
             event_type,
-            SystemTime::now()
-                .duration_since(UNIX_EPOCH)
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
                 .map(|d| d.as_secs())
                 .unwrap_or(0),
         ));
