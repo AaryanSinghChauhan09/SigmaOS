@@ -256,12 +256,12 @@ impl HardwareAbstractionLayer for SovereignHal {
     }
 
     fn enable_interrupts(&self) {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(all(target_arch = "x86_64", not(test)))]
         unsafe { core::arch::asm!("sti", options(nomem, nostack)); }
     }
 
     fn disable_interrupts(&self) {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(all(target_arch = "x86_64", not(test)))]
         unsafe { core::arch::asm!("cli", options(nomem, nostack)); }
     }
 
