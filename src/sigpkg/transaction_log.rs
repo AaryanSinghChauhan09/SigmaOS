@@ -1,7 +1,9 @@
 //! Transaction Log System (Debian APT dpkg inspiration)
 //! Provides atomic transactions and rollback capabilities
 
-use crate::klib::{Vec, String};
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
+use alloc::format;
 use crate::sigpkg::Package;
 
 /// Transaction entry type

@@ -3,6 +3,17 @@ pub mod gamification;
 pub mod subtitle_editor;
 pub mod sigmadev;
 pub mod mint_competitor;
+pub mod notes;
+pub mod screen_recorder;
+pub mod screenshot;
+pub mod sigma_office;
+pub mod tasks;
+pub mod terminal;
+pub mod tmux;
+pub mod mind_map;
+pub mod advanced_app_absorber;
+pub mod utility_suite;
+pub mod media;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,

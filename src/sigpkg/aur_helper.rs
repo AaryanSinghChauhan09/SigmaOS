@@ -13,8 +13,9 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
-use crate::klib::{BTreeMap, Vec, String};
-use alloc::string::ToString;
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 /// AUR package metadata
 #[derive(Debug, Clone, PartialEq)]
@@ -48,10 +49,23 @@ impl AurParser {
         // Simplified parsing - in production, would use proper JSON parsing
         // For now, we simulate parsing from a simplified format
         
-        let name = String::from_str("unknown");
-        let version = String::from_str("1.0.0");
-        let description = String::from_str("No description");
-        let url = String::from_str("https://aur.archlinux.org");
+        let mut name = String::from("unknown");
+        let mut version = String::from("1.0.0");
+
+        if let Some(pos) = metadata.find("\"name\":\"") {
+            let sub = &metadata[pos + 8..];
+            if let Some(end) = sub.find('"') {
+                name = sub[..end].to_string();
+            }
+        }
+        if let Some(pos) = metadata.find("\"version\":\"") {
+            let sub = &metadata[pos + 11..];
+            if let Some(end) = sub.find('"') {
+                version = sub[..end].to_string();
+            }
+        }
+        let description = String::from("No description");
+        let url = String::from("https://aur.archlinux.org");
         let depends = Vec::new();
         let makedepends = Vec::new();
         let keywords = Vec::new();
@@ -212,10 +226,10 @@ mod tests {
         
         // Add a package with dependencies
         let pkg = AurPackage {
-            name: String::from_str("dep"),
-            version: String::from_str("1.0.0"),
-            description: String::from_str("Dependency"),
-            url: String::from_str("https://aur.archlinux.org"),
+            name: String::from("dep"),
+            version: String::from("1.0.0"),
+            description: String::from("Dependency"),
+            url: String::from("https://aur.archlinux.org"),
             depends: Vec::new(),
             makedepends: Vec::new(),
             keywords: Vec::new(),
@@ -224,7 +238,7 @@ mod tests {
         
         parser.cache.insert(pkg.name.clone(), pkg);
         
-        let order = parser.calculate_build_order(&[String::from_str("dep")]);
+        let order = parser.calculate_build_order(&[String::from("dep")]);
         assert!(order.is_ok());
     }
 }

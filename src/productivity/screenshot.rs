@@ -289,6 +289,8 @@ pub struct Annotation {
     pub step_index: Option<u32>,
 }
 
+pub type VectorAnnotation = Annotation;
+
 pub struct AnnotationEngine {
     pub annotations: Vec<Annotation>,
     pub next_step_number: u32,

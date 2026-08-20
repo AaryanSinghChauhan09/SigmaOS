@@ -35,12 +35,19 @@ impl Transaction {
         // Resolve dependencies first
         let resolved = self
             .resolver
-            .resolve(&package.name, &crate::sigpkg::VersionConstraint::Any)
+            .resolve(&package.name, &crate::sigpkg::resolver::VersionConstraint::Any)
             .map_err(|e| TransactionError::DependencyConflict(format!("{:?}", e)))?;
 
         for dep in resolved {
             if self.store.get(&dep.name).is_none() {
-                self.operations.push(Operation::Install { package: dep });
+                let pkg = Package::new(
+                    dep.name,
+                    crate::sigpkg::Version::new(dep.version.major, dep.version.minor, dep.version.patch),
+                    dep.description,
+                    Vec::new(),
+                    dep.checksum,
+                );
+                self.operations.push(Operation::Install { package: pkg });
             }
         }
 

@@ -969,12 +969,11 @@ mod tests {
     fn test_bpf_packet_matching() {
         let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
 
-        let instructions = vec![
-            BpfInstruction { op: BpfOp::LoadPort, k: 0, jt: 0, jf: 0 },
-            BpfInstruction { op: BpfOp::JumpEqual, k: 443, jt: 1, jf: 2 },
-            BpfInstruction { op: BpfOp::ReturnMatch, k: 1, jt: 0, jf: 0 }, // If equal to 443, match (1)
-            BpfInstruction { op: BpfOp::ReturnMatch, k: 0, jt: 0, jf: 0 }, // Else, fail (0)
-        ];
+        let mut instructions = Vec::new();
+        instructions.push(BpfInstruction { op: BpfOp::LoadPort, k: 0, jt: 0, jf: 0 });
+        instructions.push(BpfInstruction { op: BpfOp::JumpEqual, k: 443, jt: 1, jf: 2 });
+        instructions.push(BpfInstruction { op: BpfOp::ReturnMatch, k: 1, jt: 0, jf: 0 });
+        instructions.push(BpfInstruction { op: BpfOp::ReturnMatch, k: 0, jt: 0, jf: 0 });
         socket.attach_bpf_filter(instructions);
 
         assert!(socket.execute_bpf_match(443));

@@ -98,10 +98,11 @@ impl MlfqScheduler {
     }
 
     pub fn aging(&mut self) {
-        if self.ticks.fetch_add(1, Ordering::SeqCst) >= self.aging_threshold {
+        if (self.ticks.fetch_add(1, Ordering::SeqCst) as u64) >= self.aging_threshold {
             self.ticks.store(0, Ordering::SeqCst);
             for q in (1..self.nr_queues).rev() {
-                for &pid in &self.queues[q] {
+                let pids: Vec<u64> = self.queues[q].clone();
+                for pid in pids {
                     self.promote(pid);
                 }
             }

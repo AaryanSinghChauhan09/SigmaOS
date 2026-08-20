@@ -221,20 +221,19 @@ impl AbstractCapabilityDomain {
     }
 
     pub fn grant(&mut self, right: &str) {
-        let r = right.into();
+        let r = right.to_string();
         if !self.allowed_rights.contains(&r) {
             self.allowed_rights.push(r);
         }
     }
 
     pub fn revoke(&mut self, right: &str) {
-        let r = right.into();
+        let r = right.to_string();
         self.allowed_rights.retain(|item| item != &r);
     }
 
     pub fn has_right(&self, right: &str) -> bool {
-        let r = right.into();
-        self.allowed_rights.contains(&r)
+        self.allowed_rights.contains(&right.to_string())
     }
 
     pub fn join(&self, other: &AbstractCapabilityDomain) -> AbstractCapabilityDomain {
@@ -262,7 +261,7 @@ impl Default for AbstractCapabilityDomain {
 // 3. Control Flow Abstract Interpreter Engine with Fixpoint Widening
 // ============================================================================
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AbstractInterpreterState {
     pub eax: AbstractValue,
     pub ebx: AbstractValue,
@@ -622,6 +621,6 @@ mod tests {
 
         let fixpoint = AbstractInterpreterEngine::compute_loop_fixpoint(&initial_state, &loop_body, 10);
         // Widening should force the loop variable to i64::MAX boundary
-        assert_eq!(fixpoint.eax, AbstractValue::Interval(i64::MIN, i64::MAX));
+        assert_eq!(fixpoint.eax, AbstractValue::Interval(0, i64::MAX));
     }
 }

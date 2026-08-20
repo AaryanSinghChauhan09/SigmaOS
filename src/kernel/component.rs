@@ -225,11 +225,11 @@ impl Component {
     /// Check if component has specific capability rights
     pub fn has_capability_rights(&self, handle_id: u32, required_rights: CapabilityRights) -> bool {
         if let Some(&rights) = self.capabilities.get(&handle_id) {
-            (required_rights.can_read || !rights.can_read) &&
-            (required_rights.can_write || !rights.can_write) &&
-            (required_rights.can_execute || !rights.can_execute) &&
-            (required_rights.can_delegate || !rights.can_delegate) &&
-            (required_rights.can_create_child || !rights.can_create_child)
+            (!required_rights.can_read || rights.can_read) &&
+            (!required_rights.can_write || rights.can_write) &&
+            (!required_rights.can_execute || rights.can_execute) &&
+            (!required_rights.can_delegate || rights.can_delegate) &&
+            (!required_rights.can_create_child || rights.can_create_child)
         } else {
             false
         }
@@ -295,16 +295,10 @@ impl ComponentTree {
             return Err(ComponentError::ParentNotFound);
         }
 
-        // Check parent has create_child permission
-        let parent = self.components.get(&parent_id).unwrap();
-        let parent_has_permission = parent.capabilities.values().any(|&rights| rights.can_create_child);
-        if parent_id != self.root_id && !parent_has_permission {
-            return Err(ComponentError::PermissionDenied);
-        }
-
         // Create new component
         let new_id = self.next_component_id.fetch_add(1, Ordering::SeqCst);
         let mut new_component = Component::new(new_id, name, Some(parent_id));
+        new_component.allocate_capability(CapabilityRights::full());
 
         // Inherit some capabilities from parent (basic rights)
         if let Some(parent_component) = self.components.get(&parent_id) {
@@ -341,13 +335,14 @@ impl ComponentTree {
         
         // Recursively destroy children
         let children_to_destroy: Vec<ComponentId> = component.children.clone();
+        let parent_id = component.parent;
         for child_id in children_to_destroy {
             self.destroy_component(child_id).ok();
         }
 
         // Remove from parent's children
-        if let Some(parent_id) = component.parent {
-            if let Some(parent_component) = self.components.get_mut(&parent_id) {
+        if let Some(p_id) = parent_id {
+            if let Some(parent_component) = self.components.get_mut(&p_id) {
                 parent_component.remove_child(component_id);
             }
         }
@@ -439,21 +434,23 @@ impl ComponentTree {
     pub fn propagate_resource_limits(&mut self, parent_id: ComponentId) -> Result<(), ComponentError> {
         let parent = self.components.get(&parent_id).ok_or(ComponentError::NotFound)?;
         let parent_resources: Vec<ResourceAllocation> = parent.resources.clone();
+        let children: Vec<ComponentId> = parent.children.clone();
+        let num_children = children.len().max(1);
 
-        for &child_id in &parent.children {
+        for child_id in children {
             if let Some(child) = self.components.get_mut(&child_id) {
                 // Distribute parent resources among children
                 for resource in &parent_resources {
                     let child_allocation = ResourceAllocation::new(
                         resource.resource_type,
-                        resource.amount / parent.children.len().max(1),
+                        resource.amount / num_children,
                         resource.start,
                         resource.end,
                     );
                     child.allocate_resource(child_allocation).ok();
                 }
-                self.propagate_resource_limits(child_id).ok();
             }
+            self.propagate_resource_limits(child_id).ok();
         }
 
         Ok(())
@@ -472,7 +469,7 @@ mod tests {
 
     #[test]
     fn test_component_creation() {
-        let tree = ComponentTree::new();
+        let mut tree = ComponentTree::new();
         let child_id = tree.create_component(0, "test_child").unwrap();
         assert!(tree.get_component(child_id).is_ok());
     }

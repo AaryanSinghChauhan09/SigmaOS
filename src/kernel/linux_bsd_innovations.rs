@@ -102,8 +102,8 @@ impl BsdPfStateTable {
             }
         }
         let count = expired_keys.len();
-        for k in expired_keys {
-            self.states.remove(&k);
+        for k in &expired_keys {
+            self.states.remove(k);
         }
         count
     }
@@ -1299,11 +1299,13 @@ impl CapabilityDerivationTree {
                     }
                 }
             }
-            to_remove.extend(derived);
+            for d in &derived {
+                to_remove.push(*d);
+            }
         }
 
-        for id in to_remove {
-            self.capabilities.remove(&id);
+        for id in &to_remove {
+            self.capabilities.remove(id);
         }
     }
 }

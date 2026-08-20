@@ -1,13 +1,11 @@
-//! Power Management (TLP/PowerTop/Thermald Inspiration)
-//! Advanced power management with profiles, battery optimization, and thermal control
+// Power Management (TLP/PowerTop/Thermald Inspiration)
+// Advanced power management with profiles, battery optimization, and thermal control
 
-#![no_std]
+pub mod governor;
 
 extern crate alloc;
 
 use crate::klib::{Vec, String};
-use alloc::vec::Vec;
-use alloc::string::String;
 
 /// Power profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -169,8 +167,12 @@ pub struct PowerManager {
 
 impl PowerManager {
     pub fn new() -> Self {
+        let mut profiles = Vec::new();
+        profiles.push(PowerProfileConfig::new(PowerProfile::Performance));
+        profiles.push(PowerProfileConfig::new(PowerProfile::Balanced));
+        profiles.push(PowerProfileConfig::new(PowerProfile::PowerSaver));
         Self {
-            profiles: Vec::new(),
+            profiles,
             current_profile: PowerProfile::Balanced,
             battery: Battery::new("BAT0", 50000),
             thermal: Vec::new(),

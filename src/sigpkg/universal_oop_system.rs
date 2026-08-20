@@ -2865,9 +2865,9 @@ Depends: kernel-base";
             }
         }
 
-        let raw_hook = Arc::new(CustomHook).into_raw_inner();
+        let raw_hook = Arc::into_raw(Arc::new(CustomHook));
         let coerced_hook: Arc<dyn UserDefinedHook> = unsafe {
-            Arc::from_raw_inner(core::ptr::NonNull::new_unchecked(raw_hook))
+            Arc::from_raw(raw_hook)
         };
         adapter.add_hook(coerced_hook);
 
@@ -3032,9 +3032,9 @@ Description: Hook test";
             trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
             Ok::<(), HookError>(())
         };
-        let raw_script = Arc::new(script_closure).into_raw_inner();
+        let raw_script = Arc::into_raw(Arc::new(script_closure));
         let coerced_script: Arc<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync> = unsafe {
-            Arc::from_raw_inner(core::ptr::NonNull::new_unchecked(raw_script))
+            Arc::from_raw(raw_script)
         };
 
         let trigger = PathTriggerHook {
@@ -3043,9 +3043,9 @@ Description: Hook test";
             script: coerced_script,
         };
 
-        let raw_trigger = Arc::new(trigger).into_raw_inner();
+        let raw_trigger = Arc::into_raw(Arc::new(trigger));
         let coerced_trigger: Arc<dyn IPathTrigger> = unsafe {
-            Arc::from_raw_inner(core::ptr::NonNull::new_unchecked(raw_trigger))
+            Arc::from_raw(raw_trigger)
         };
 
         manager.add_path_trigger(coerced_trigger);

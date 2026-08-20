@@ -11,10 +11,13 @@ pub mod video_timeline;
 pub mod zenith;
 pub mod zenith_compositor;
 pub mod bsd_graphics;
+pub mod paint;
+
+pub use paint::ColorRgba;
 
 pub use compositor::{
-    CompositorError, CompositorResult, CompositorStrategy, FramebufferCompositor, LayerBlendMode,
-    RenderLayer, SigmaCompositor,
+    Compositor, CompositorCapability, CompositorStats, GraphicsError,
+    Rectangle, SimpleCompositor, SimpleWindow, Size, Surface, Window,
 };
 pub use gpu_driver::{
     Framebuffer, GpuDevice, GpuDriver, GpuState, GpuVendor, PixelFormat,

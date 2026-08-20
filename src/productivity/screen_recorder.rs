@@ -15,18 +15,37 @@ pub enum GpuEncoderType { NvidiaNvenc, AmdAmf, IntelQuickSync, SoftwareCpu }
 pub struct BandicamGpuBackend {
     pub encoder: GpuEncoderType,
     pub capture_mode: BandicamCaptureMode,
+    pub state: RecordingState,
 }
 impl BandicamGpuBackend {
-    pub fn new(encoder: GpuEncoderType, capture_mode: BandicamCaptureMode) -> Self { Self { encoder, capture_mode } }
+    pub fn new(encoder: GpuEncoderType, capture_mode: BandicamCaptureMode) -> Self {
+        Self {
+            encoder,
+            capture_mode,
+            state: RecordingState::Idle,
+        }
+    }
 }
 impl RecordingBackend for BandicamGpuBackend {
     fn name(&self) -> &str { "Bandicam GPU Accelerator" }
-    fn start_recording(&mut self, _config: &RecordingConfig) -> Result<(), RecorderError> { Ok(()) }
-    fn stop_recording(&mut self) -> Result<PathBuf, RecorderError> { Ok(PathBuf::from("/tmp/recording.mp4")) }
-    fn pause_recording(&mut self) -> Result<(), RecorderError> { Ok(()) }
-    fn resume_recording(&mut self) -> Result<(), RecorderError> { Ok(()) }
-    fn get_state(&self) -> RecordingState { RecordingState::Idle }
-    fn get_progress(&self) -> RecordingProgress { RecordingProgress { frames_recorded: 120, elapsed_ms: 2000, file_size_bytes: 1048576 } }
+    fn start_recording(&mut self, _config: &RecordingConfig) -> Result<(), RecorderError> {
+        self.state = RecordingState::Recording;
+        Ok(())
+    }
+    fn stop_recording(&mut self) -> Result<PathBuf, RecorderError> {
+        self.state = RecordingState::Idle;
+        Ok(PathBuf::from("/capture/game.mp4"))
+    }
+    fn pause_recording(&mut self) -> Result<(), RecorderError> {
+        self.state = RecordingState::Paused;
+        Ok(())
+    }
+    fn resume_recording(&mut self) -> Result<(), RecorderError> {
+        self.state = RecordingState::Recording;
+        Ok(())
+    }
+    fn get_state(&self) -> RecordingState { self.state }
+    fn get_progress(&self) -> RecordingProgress { RecordingProgress { duration_seconds: 2, frames_captured: 120, file_size_bytes: 1048576, current_bitrate_mbps: 2.0 } }
 }
 
 /// Recording format

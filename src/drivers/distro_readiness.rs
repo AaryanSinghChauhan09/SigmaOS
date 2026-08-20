@@ -8,7 +8,8 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
-use crate::klib::{Vec, HashMap};
+use alloc::vec::Vec;
+use crate::klib::HashMap;
 
 // ==========================================
 // 1. Linux PCI Bus Autoprobing & BAR Allocator

@@ -11,13 +11,14 @@ pub mod kernel_hardening;
 pub mod intrusion;
 pub mod deobfuscation;
 pub mod binary_protection;
+pub mod kali_stack;
 
 pub use binary_protection::{BinaryProtectionManager, RelroMode, AslrMap, ChecksecReport};
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use hardening::{
     secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
-    HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
+    IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
     KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
     SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
     UserAccessGuard, UserPtr,

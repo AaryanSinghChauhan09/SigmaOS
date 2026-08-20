@@ -95,6 +95,7 @@ pub enum PackagePriority {
     Optional,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum PackageFormat {
     Deb,      // apt
     Rpm,      // yum
@@ -216,13 +217,22 @@ impl PackageAdapter {
     pub fn can_handle(&self, package: &UnifiedPackage) -> bool {
         package.formats.contains(&self.format)
     }
+}
 
-    pub fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+impl PackageFormatAdapter for PackageAdapter {
+    fn format(&self) -> PackageFormat {
+        self.format
+    }
+
+    fn adapter_name(&self) -> &str {
+        &self.adapter_name
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Installing {} using {} adapter",
             package.name, self.adapter_name
         );
-        // Simulate installation
         Ok(())
     }
 
@@ -291,13 +301,11 @@ impl PackageFormatAdapter for AptDebAdapter {
             return Err("Invalid DEB manifest");
         }
 
-        Ok(UnifiedPackage::new(
-            &name,
-            &version,
-            PackageFormat::Deb,
-            dependencies,
-            vec!["/usr/bin/".to_string() + &name],
-        ))
+        let mut pkg = UnifiedPackage::new(name, version).with_format(PackageFormat::Deb);
+        for d in dependencies {
+            pkg = pkg.with_dependency(d);
+        }
+        Ok(pkg)
     }
 
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
@@ -331,7 +339,7 @@ impl PackageFormatAdapter for YumRpmAdapter {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Removing {} using {} adapter",
-            package.name, self.adapter_name
+            package.name, self.adapter_name()
         );
         // Simulate removal
         Ok(())
@@ -381,7 +389,7 @@ impl PackageFormatAdapter for PacmanAdapter {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
-            package.name, self.adapter_name
+            package.name, self.adapter_name()
         );
         Ok(())
     }
@@ -733,7 +741,8 @@ pub struct TransactionalHistory {
 impl TransactionalHistory {
     pub fn new() -> Self {
         Self {
-            cache: HashMap::new(),
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 0,
         }
     }
 
@@ -774,7 +783,7 @@ impl Default for TransactionalHistory {
 /// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
-    pub adapters: HashMap<PackageFormat, PackageAdapter>,
+    pub adapters: HashMap<PackageFormat, Box<dyn PackageFormatAdapter>>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
@@ -872,7 +881,6 @@ impl UniversalPackageManager {
                 // Find appropriate adapter
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
-                        let adapter: &PackageAdapter = adapter;
                         adapter.install(package)?;
                         break;
                     }
@@ -955,7 +963,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 11);
+        assert_eq!(manager.adapters.len(), 6);
     }
 
     #[test]

@@ -9,7 +9,6 @@ pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub mod memory;
-pub mod breakthroughs;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
@@ -20,6 +19,7 @@ pub mod processor_management;
 pub mod cpufreq;
 pub mod structures;
 pub mod object;
+pub mod performance;
 
 pub use vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
 
@@ -35,15 +35,15 @@ pub use breakthroughs::{
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use policy_mechanism::{
-    AdaptivePolicy, InstructionCyclePhase, InterruptClass, IoWaitProfile, KernelMechanism,
-    KernelPolicy, PolicyMechanismCoordinator, SovereignMechanism,
+    ResourceBroker, PolicyManager, ProtectionDomain, InterruptMechanism, FastPathIpc, PrivilegeLevel, PolicyError,
 };
-pub use performance::{
+pub use crate::performance::zero_copy_ipc::{
     CpuInstructionExtension, ProcessProfile, SchedInstruction, SchedOpcode, SimdOptimizer,
     SovereignSimdOptimizer, UdfSchedVm, VmPerformanceMetrics, ZeroCopyMetrics, ZeroCopyQueue,
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use scheduler::{Priority, Process, ProcessState};
+pub use sched::Scheduler;
 pub use structures::{
     AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
     CpuArchitectureClass, EdfTask, LcgRandom, LotteryTask, SequencedSinglyLinkedList,

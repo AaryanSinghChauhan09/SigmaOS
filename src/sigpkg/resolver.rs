@@ -112,6 +112,23 @@ impl SatSolver {
         self.pin_rules.push(rule);
     }
 
+    pub fn is_debian_elementary_package_compliant(&self, app: &DebianElementaryAppPackage) -> Result<bool, &'static str> {
+        let parts: Vec<&str> = app.app_id.split('.').collect();
+        if parts.len() < 3 {
+            return Err("elementaryOS Package Violation: App ID must follow reverse-domain naming convention (e.g. io.elementary.name)");
+        }
+        if parts[0] != "io" && parts[0] != "com" && parts[0] != "org" {
+            return Err("elementaryOS Package Violation: Invalid app ID top-level domain prefix");
+        }
+        if !app.adopts_csd_guideline {
+            return Err("elementaryOS Package Violation: App must adopt Client-Side Decorations (CSD) titlebar rules");
+        }
+        if !app.supports_dark_mode {
+            return Err("elementaryOS Package Violation: App must support toggleable pure-black dark mode");
+        }
+        Ok(true)
+    }
+
     pub fn select_best_pinned_package(&self, candidate_packages: &[Package]) -> Option<Package> {
         if candidate_packages.is_empty() {
             return None;
@@ -303,7 +320,6 @@ pub enum ResolveError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sigpkg::Dependency;
 
     #[test]
     fn test_debian_elementary_app_package_validator() {

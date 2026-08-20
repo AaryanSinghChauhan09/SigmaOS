@@ -60,7 +60,7 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        let val = self.fs_type.load(Ordering::SeqCst) as u32; unsafe { core::mem::transmute(val) }
+        let val = self.fs_type.load(Ordering::SeqCst); unsafe { core::mem::transmute(val) }
     }
 
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {

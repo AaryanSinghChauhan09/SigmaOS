@@ -12,9 +12,6 @@ use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone, Default)]
-pub struct SovereignCockpitConsole;
-impl SovereignCockpitConsole { pub fn new() -> Self { Self } }
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
@@ -385,42 +382,6 @@ impl FedoraAlu {
                 res
             }
         }
-    }
-
-    /// Saturated 64-bit addition with CPU flag simulation
-    pub fn add_saturated_64(&mut self, a: i64, b: i64) -> i64 {
-        let (res, overflow) = a.overflowing_add(b);
-        let res_saturated = if overflow {
-            if a > 0 { i64::MAX } else { i64::MIN }
-        } else {
-            res
-        };
-
-        self.flags = FedoraAluFlags {
-            zero: res_saturated == 0,
-            sign: res_saturated < 0,
-            carry: overflow,
-            overflow,
-        };
-        res_saturated
-    }
-
-    /// Saturated 64-bit addition with CPU flag simulation
-    pub fn add_saturated_64(&mut self, a: i64, b: i64) -> i64 {
-        let (res, overflow) = a.overflowing_add(b);
-        let res_saturated = if overflow {
-            if a > 0 { i64::MAX } else { i64::MIN }
-        } else {
-            res
-        };
-
-        self.flags = FedoraAluFlags {
-            zero: res_saturated == 0,
-            sign: res_saturated < 0,
-            carry: overflow,
-            overflow,
-        };
-        res_saturated
     }
 
     /// Saturated 64-bit addition with CPU flag simulation
@@ -1112,91 +1073,6 @@ impl SovereignFirewalldManager {
     }
 }
 
-// ==========================================
-// SELinux State and Policy Enforcer
-// ==========================================
-
-pub struct SeLinuxEnforcer {
-    pub mode: SeLinuxMode,
-    pub allowed_transitions: BTreeMap<String, Vec<String>>, // src_type -> dest_types
-}
-
-impl SeLinuxEnforcer {
-    pub fn new(mode: SeLinuxMode) -> Self {
-        let mut transitions = BTreeMap::new();
-        transitions.insert("httpd_t".to_string(), vec!["httpd_sys_content_t".to_string()]);
-        Self {
-            mode,
-            allowed_transitions: transitions,
-        }
-    }
-
-    /// Validates transition or access check between subject context type and target file context type
-    pub fn check_access(&self, subject_type: &str, target_type: &str) -> Result<bool, &'static str> {
-        if self.mode == SeLinuxMode::Disabled {
-            return Ok(true);
-        }
-
-        let is_allowed = if let Some(allowed) = self.allowed_transitions.get(subject_type) {
-            allowed.contains(&target_type.to_string())
-        } else {
-            false
-        };
-
-        if !is_allowed {
-            if self.mode == SeLinuxMode::Enforcing {
-                return Err("SELinux AVC Denial: Access Prohibited");
-            } else if self.mode == SeLinuxMode::Permissive {
-                println!("SELinux AVC Warning (Permissive): Access Prohibited but allowed");
-            }
-        }
-        Ok(true)
-    }
-}
-
-// ==========================================
-// COPR User Repositories Build Manager
-// ==========================================
-
-pub struct CoprBuildTask {
-    pub task_id: u32,
-    pub git_url: String,
-    pub status: String,
-}
-
-pub struct CoprRepositoryManager {
-    pub owner: String,
-    pub project_name: String,
-    pub builds: Vec<CoprBuildTask>,
-}
-
-impl CoprRepositoryManager {
-    pub fn new(owner: &str, project_name: &str) -> Self {
-        Self {
-            owner: owner.to_string(),
-            project_name: project_name.to_string(),
-            builds: Vec::new(),
-        }
-    }
-
-    pub fn submit_copr_build(&mut self, id: u32, git_url: &str) {
-        self.builds.push(CoprBuildTask {
-            task_id: id,
-            git_url: git_url.to_string(),
-            status: "Pending".to_string(),
-        });
-    }
-
-    pub fn execute_build_compile(&mut self, task_id: u32) -> Result<String, &'static str> {
-        for build in &mut self.builds {
-            if build.task_id == task_id {
-                build.status = "Success".to_string();
-                return Ok(format!("copr-build-{}-{}.rpm", self.project_name, task_id));
-            }
-        }
-        Err("COPR build task ID not found")
-    }
-}
 
 pub struct SovereignCockpitConsole {
     pub is_listening: bool,

@@ -450,7 +450,7 @@ mod tests {
         let mut hid = UsbHidDriver::new(0x1234, 0x5678);
         assert_eq!(hid.repeat_delay_ms, 250);
         assert_eq!(hid.repeat_rate_ms, 33);
-        assert_eq!(hid.layout, "US-QWERTY");
+        assert_eq!(hid.layout, "us");
 
         hid.set_repeat_settings(500, 50);
         assert_eq!(hid.repeat_delay_ms, 500);

@@ -1,16 +1,57 @@
-#[cfg(not(test))]
-use crate::driver::device::DdeDeviceWrapper;
-
-#[cfg(test)]
+#[derive(Debug, Clone)]
 pub struct DdeDeviceWrapper {
     pub simulated_pci_bar: [u8; 256],
+    pub port: u64,
 }
-#[cfg(test)]
+
 impl DdeDeviceWrapper {
-    pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
+    pub fn new(_id: u32, _name: &[u8], port: u64, _os: &[u8]) -> Self {
         Self {
             simulated_pci_bar: [0; 256],
+            port,
         }
+    }
+
+    pub fn query_channel(&self) -> crate::driver::device::PortAddress {
+        crate::driver::device::PortAddress::MemoryMapped(self.port as u32)
+    }
+
+    pub fn info(&self) -> crate::driver::device::DeviceInfo {
+        let mut info = crate::driver::device::DeviceInfo::new(crate::driver::device::DeviceType::Network);
+        info.vendor_id = 0x8086;
+        info.device_id = 0x100e;
+        info
+    }
+
+    pub fn write_byte(&mut self, offset: usize, val: u8) -> Result<(), &'static str> {
+        if offset < 256 {
+            self.simulated_pci_bar[offset] = val;
+        }
+        Ok(())
+    }
+
+    pub fn read_byte(&self, offset: usize) -> Result<u8, &'static str> {
+        if offset < 256 {
+            Ok(self.simulated_pci_bar[offset])
+        } else {
+            Ok(0)
+        }
+    }
+
+    pub fn write(&mut self, buf: &[u8]) -> Result<usize, &'static str> {
+        let len = buf.len().min(256);
+        self.simulated_pci_bar[..len].copy_from_slice(&buf[..len]);
+        Ok(len)
+    }
+
+    pub fn read(&self, buf: &mut [u8]) -> Result<usize, &'static str> {
+        let len = buf.len().min(256);
+        buf[..len].copy_from_slice(&self.simulated_pci_bar[..len]);
+        Ok(len)
+    }
+
+    pub fn ioctl(&mut self, _cmd: u32, _arg: usize) -> Result<usize, &'static str> {
+        Ok(1)
     }
 }
 
@@ -274,15 +315,14 @@ impl VintageVirtualizationSandbox {
 /// Vintage Linux Driver Shim Translator
 pub struct VintageDriverTranslator {
     pub era: LinuxEra,
-    // TODO: Replace with actual driver wrapper when available
-    pub wrapper: core::marker::PhantomData<()>,
+    pub wrapper: DdeDeviceWrapper,
 }
 
 impl VintageDriverTranslator {
-    pub fn new(era: LinuxEra, _device_name: &str) -> Self {
+    pub fn new(era: LinuxEra, device_name: &str) -> Self {
         VintageDriverTranslator {
             era,
-            wrapper: core::marker::PhantomData,
+            wrapper: DdeDeviceWrapper::new(1, device_name.as_bytes(), 0x1F0, b"Linux"),
         }
     }
 
@@ -290,7 +330,7 @@ impl VintageDriverTranslator {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
             let idx = (port % 256) as usize;
-            self.wrapper.simulated_pci_bar[idx] = val as u32;
+            self.wrapper.simulated_pci_bar[idx] = val;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)
@@ -367,34 +407,6 @@ impl Default for TinyCoreEphemeralEngine {
     }
 }
 
-impl TinyCoreEphemeralEngine {
-    pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
-        if ext_name.is_empty() || size_bytes == 0 {
-            return Err(HistoricError::MemoryAccessViolation);
-        }
-        self.mounted_extensions.insert(ext_name.to_string(), size_bytes);
-        Ok(())
-    }
-
-    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
-        if self.persistence_enabled {
-            return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
-        }
-        self.volatile_overlay_ram_bytes += data_len;
-        Ok(self.volatile_overlay_ram_bytes)
-    }
-
-    pub fn reset_ephemeral_state(&mut self) {
-        // Drop volatile in-memory overlay structures completely on reset
-        self.volatile_overlay_ram_bytes = 0;
-    }
-}
-
-impl Default for TinyCoreEphemeralEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[cfg(test)]
 mod tests {

@@ -147,6 +147,10 @@ impl VesaDriver {
         self.back_buffer.lock().unwrap().clear();
     }
 
+    pub fn present(&self) -> Result<(), VesaError> {
+        self.swap_buffers()
+    }
+
     /// Swaps the simulated back buffer elements onto the active hardware framebuffer
     pub fn swap_buffers(&self) -> Result<(), VesaError> {
         if !self.back_buffer_active {
@@ -439,10 +443,10 @@ mod tests {
         let mut vesa = VesaDriver::new();
         vesa.enable_double_buffering();
         assert!(vesa.write_pixel(100, 100, 0xFFFFFF).is_ok());
-        assert_eq!(vesa.back_buffer[(100 * 1024 + 100) as usize], 0xFFFFFF);
+        assert_eq!(vesa.back_buffer.lock().unwrap()[(100 * 1024 + 100) as usize], 0xFFFFFF);
 
         assert!(vesa.clear_screen(0x123456).is_ok());
-        assert_eq!(vesa.back_buffer[0], 0x123456);
+        assert_eq!(vesa.back_buffer.lock().unwrap()[0], 0x123456);
         assert!(vesa.swap_buffers().is_ok());
     }
 
@@ -451,7 +455,7 @@ mod tests {
         let mut vesa = VesaDriver::new();
         vesa.enable_double_buffering();
         assert!(vesa.draw_line(0, 0, 10, 10, 0xFFFFFF).is_ok());
-        assert_eq!(vesa.back_buffer[0], 0xFFFFFF);
+        assert_eq!(vesa.back_buffer.lock().unwrap()[0], 0xFFFFFF);
 
         assert!(vesa.draw_char(20, 20, 'A', 0xFFFFFF).is_ok());
     }
@@ -464,7 +468,8 @@ mod tests {
 
     #[test]
     fn test_double_buffered_presentation() {
-        let vesa = VesaDriver::new();
+        let mut vesa = VesaDriver::new();
+        vesa.enable_double_buffering();
         vesa.clear_screen(0x11223344).unwrap();
         assert_eq!(vesa.back_buffer.lock().unwrap()[0], 0x11223344);
         assert!(vesa.present().is_ok());

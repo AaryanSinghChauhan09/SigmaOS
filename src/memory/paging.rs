@@ -170,10 +170,6 @@ impl PageDirectory {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
 
-    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
-        self.huge_entries.get(idx).and_then(|e| e.as_ref())
-    }
-
     pub fn get_huge_entry_mut(&mut self, idx: usize) -> Option<&mut PageTableEntry> {
         self.huge_entries.get_mut(idx).and_then(|e| e.as_mut())
     }
@@ -227,10 +223,6 @@ impl PageDirectoryPointerTable {
 
     pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
-    }
-
-    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
-        self.huge_entries.get(idx).and_then(|e| e.as_ref())
     }
 
     pub fn get_huge_entry_mut(&mut self, idx: usize) -> Option<&mut PageTableEntry> {

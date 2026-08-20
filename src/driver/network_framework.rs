@@ -3,7 +3,8 @@
 
 extern crate alloc;
 
-use crate::klib::{String, Vec, ToString};
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 use alloc::boxed::Box;
 
 /// Network device types

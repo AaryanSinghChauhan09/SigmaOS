@@ -4,7 +4,7 @@
 /// apk-tools v3 package registry & triggers, and LLVM/Clang CFI Hardening policies.
 
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use crate::klib::Vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DinitServiceState {

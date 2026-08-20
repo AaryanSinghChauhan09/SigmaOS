@@ -2,7 +2,6 @@
 //! Reduces dependency on std::collections::HashSet
 
 use super::BTreeMap;
-use super::hashmap::BTreeMapIter;
 
 pub struct HashSet<T>
 where
@@ -35,33 +34,9 @@ where
     }
 }
 
-impl<T> Clone for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone,
-{
-    fn clone(&self) -> Self {
-        HashSet {
-            map: self.map.clone(),
-        }
-    }
-}
-
-impl<T> core::fmt::Debug for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone + core::fmt::Debug,
-{
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        let mut set = f.debug_set();
-        for item in self.iter() {
-            set.entry(item);
-        }
-        set.finish()
-    }
-}
-
 impl<T> core::iter::FromIterator<T> for HashSet<T>
 where
-    T: Eq + core::hash::Hash + Clone,
+    T: Eq + core::hash::Hash + Clone + Ord,
 {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let mut set = HashSet::new();
@@ -82,9 +57,9 @@ where
         }
     }
 
-    pub fn with_capacity(capacity: usize) -> Self {
+    pub fn with_capacity(_capacity: usize) -> Self {
         HashSet {
-            map: BTreeMap::with_capacity(capacity),
+            map: BTreeMap::new(),
         }
     }
 
@@ -127,7 +102,7 @@ where
 }
 
 pub struct HashSetIter<'a, T> {
-    map_iter: BTreeMapIter<'a, T, ()>,
+    map_iter: alloc::collections::btree_map::Iter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>

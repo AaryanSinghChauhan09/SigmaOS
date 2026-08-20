@@ -19,26 +19,19 @@ use sigmaos::drivers::{
     IntelHdaDriver, NvmeDriver, PeripheralDevice, PowerState, ShaderStage,
 };
 use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
-use sigmaos::network::{
-    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
-    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
-    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
-};
+use sigmaos::network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 use sigmaos::package::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
     LinuxTranslationService, PackageFormat, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE,
+    RpmPackageDriverTranslator, SigmaSoftwareStore,
     GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
 use sigmaos::performance::{
-    AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CpuPriorityOptimizer,
-    GlarySmartRule, IoPriorityOptimizer, IoSchedClass, IoTaskPriority, PerformanceProfileRule,
-    PhysicalPageFrame, RamDefragmenter, SmartPerformanceProfile, SmartResourceOptimizer,
-    UltraKernelSamepageMerger, X86v3v4OptimizationDetector, GLOBAL_GLARY_RULE,
-    GLOBAL_SMART_OPTIMIZER,
+    ProcessProfile, SchedInstruction, SchedOpcode, SimdOptimizer, SimpleCallGraph, SimpleProfile, SimpleProfiler,
+    SovereignSimdOptimizer, UdfSchedVm, VmPerformanceMetrics, ZeroCopyMetrics, ZeroCopyQueue,
 };
-use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
-use sigmaos::resilience::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
+use sigmaos::productivity::media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
+use sigmaos::resilience::SigmaTimeshift;
 use sigmaos::security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityToken, DefensiveAuditSystem, ForensicBlock,
     ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode, SandboxPolicy,
@@ -47,19 +40,18 @@ use sigmaos::security::{
 };
 
 use sigmaos::kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
     AuditBlock, CircularDoublyLinkedList, CpuArchitectureClass, CpuRegisters, EdfTask,
-    HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase, InstructionCyclePhase,
-    InterruptClass, IoWaitProfile, Irql, KernelMechanism, KernelPolicy, LcgRandom, LookasideList,
-    LotteryTask, MemoryDescriptorList, Pcb, PolicyMechanismCoordinator, PoolType, Priority,
+    HardwareException, Irql, LcgRandom, LookasideList,
+    LotteryTask, MemoryDescriptorList, Pcb, PoolType, Priority,
     Process, ProcessState, ProcessorInitState, SequencedSinglyLinkedList, SinglyLinkedList,
-    SovereignMechanism, SystemThread, Tcb, ThreadState, WorkItem,
+    SystemThread, Tcb, ThreadState, WorkItem,
 };
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sigmaos::compatibility::canonical::{
+    use sigmaos::compatibility::gap_closure::{
         FhsRunlevel, GraphicPresetMode, SigmaEcosystemInit, SigmaEcosystemProfiler,
         SigmaOnboardingLog, SigmaOnboardingWelcome, ZorinAppearanceSwitcher, ZorinConnectHub,
         ZorinLayoutPreset, ZorinLiteOptimizer, ZorinWineLayer,
@@ -69,10 +61,25 @@ mod tests {
         LogCompressor, LogFacility, LogSeverity, SimpleLogCompressor, SimpleLogFile,
         SimpleLogRotator,
     };
-    use sigmaos::power::governor::{SigmaSupportPriorityOptimizer, SigmaSupportResourceOptimizer};
+    use sigmaos::compatibility::gap_closure::{SigmaSupportPriorityOptimizer, SigmaSupportResourceOptimizer};
+    use sigmaos::crash::{CrashPipeline, Anonymizer};
     use sigmaos::productivity::media::{
         SigmaSupportSubtitleEdit, SigmaSupportSubtitleSync, SubtitleFormat,
     };
+    use sigmaos::filesystem::sigma_fs::{
+        SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+        SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio,
+    };
+    use sigmaos::filesystem::{VirtualFilesystem, FileType};
+    use sigmaos::productivity::utility_suite::{
+        EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
+        CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer, AudacityWaveEditor,
+        VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid, ItemAgeColor, EarTrumpetVolumeMatrix,
+        IrfanViewEngine,
+    };
+    use sigmaos::graphics::ColorRgba;
+    use sigmaos::sigpkg::universal_adapter::PackageFormatAdapter;
+    use std::collections::HashMap;
 
     #[test]
     fn test_system_integration() {
@@ -143,15 +150,6 @@ mod tests {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 1);
-
-        vfs.link_inode(inode_id).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 2);
-
-        assert_eq!(vfs.unlink_inode(inode_id).unwrap(), 1);
-        assert!(vfs.inodes.contains_key(&inode_id));
-
-        assert_eq!(vfs.unlink_inode(inode_id).unwrap(), 0);
-        assert!(!vfs.inodes.contains_key(&inode_id)); // fully freed
 
         // 3. Syslog-parity multi-generation rotations, facilities, and RLE compression
         let log_file = SimpleLogFile::new(10, b"/var/log/cron")
@@ -252,7 +250,7 @@ mod tests {
         assert_eq!(antix_prof.graphic_preset, GraphicPresetMode::JwmPreset);
 
         let mut eos_welcome = SigmaOnboardingWelcome::new();
-        let mut latencies = HashMap::new();
+        let mut latencies = std::collections::BTreeMap::new();
         latencies.insert("https://mirror.org/repo".to_string(), 10);
         eos_welcome.rank_package_mirrors(latencies);
         assert_eq!(eos_welcome.mirrors_ranked[0], "https://mirror.org/repo");

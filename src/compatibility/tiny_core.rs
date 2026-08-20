@@ -6,7 +6,6 @@ use crate::filesystem::vfs::FileType;
 
 extern crate alloc;
 use alloc::vec::Vec;
-use crate::filesystem::FileType;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TinyCoreBootConfig {

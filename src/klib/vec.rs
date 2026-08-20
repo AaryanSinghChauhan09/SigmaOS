@@ -81,6 +81,28 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+
+    pub fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
+        for item in iter {
+            self.push(item);
+        }
+    }
+
     pub fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
             unsafe {

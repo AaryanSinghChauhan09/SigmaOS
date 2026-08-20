@@ -11,6 +11,8 @@ pub mod tcp_udp;
 pub mod bsd_pf;
 pub mod npf_firewall;
 pub mod virtual_switch;
+pub mod sync;
+pub mod torrent;
 
 pub use virtual_switch::{VirtualSwitchEngine, VirtualSwitchBridge, SwitchPort, SwitchPortMode, StpPortState, FlowAction, FdbEntry};
 

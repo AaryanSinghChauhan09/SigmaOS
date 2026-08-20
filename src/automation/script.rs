@@ -585,7 +585,7 @@ mod tests {
         };
 
         let result = engine_with_script.execute_script_with_args(script_id, &[b"alice", b"sovereign"]).unwrap();
-        assert_eq!(result, b"echo hello alice, welcome back sovereign!");
+        assert_eq!(&result[..], b"echo hello alice, welcome back sovereign!");
     }
 
     #[test]
@@ -597,7 +597,7 @@ mod tests {
         engine.set_script_alias(b"backup", b"backup.sh");
 
         let res = engine.execute_by_alias(b"backup", &[b"/home/state"]).unwrap();
-        assert_eq!(res, b"tar -cvf /home/state");
+        assert_eq!(&res[..], b"tar -cvf /home/state");
     }
 
     #[test]
@@ -617,7 +617,7 @@ mod tests {
         ];
 
         let decompressed = unpacker.decompress_payload(&compressed_payload).unwrap();
-        assert_eq!(decompressed, b"HELLO");
+        assert_eq!(&decompressed[..], b"HELLO");
     }
 
     #[test]
@@ -636,7 +636,7 @@ mod tests {
         let scrambled = [b'A' ^ 0x33, b'B' ^ 0x33, b'C' ^ 0x33];
 
         let descrambled = descrambler.descramble_string(&scrambled);
-        assert_eq!(descrambled, b"ABC");
+        assert_eq!(&descrambled[..], b"ABC");
     }
 
     #[test]

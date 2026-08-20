@@ -129,6 +129,12 @@ pub enum VersionSuffix {
     P, // Patch
 }
 
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}-r{}", self.major, self.minor, self.patch, self.revision)
+    }
+}
+
 impl Version {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
         Self {
@@ -285,7 +291,8 @@ impl PortageResolver {
         let versions = self.packages.get(package_name)
             .ok_or_else(|| DependencyError::PackageNotFound(package_name.to_string()))?;
 
-        let best_version = self.select_best_version(versions)?;
+        let refs: Vec<&EbuildSpec> = versions.iter().collect();
+        let best_version = self.select_best_version(&refs)?;
 
         // Resolve build dependencies
         self.resolve_condition(&best_version.dependencies, resolved, visited)?;
@@ -358,8 +365,9 @@ impl PortageResolver {
         }
     }
 
-    fn select_best_version(&self, versions: &[EbuildSpec]) -> Result<&EbuildSpec, DependencyError> {
+    fn select_best_version<'a>(&self, versions: &[&'a EbuildSpec]) -> Result<&'a EbuildSpec, DependencyError> {
         let stable: Vec<_> = versions.iter()
+            .copied()
             .filter(|v| v.is_stable_for_arch(&self.arch))
             .collect();
 
@@ -370,6 +378,7 @@ impl PortageResolver {
         };
 
         candidates.iter()
+            .copied()
             .max_by_key(|v| &v.version)
             .ok_or_else(|| DependencyError::NoSuitableVersion)
     }
@@ -381,7 +390,8 @@ impl PortageResolver {
 
         for package_name in packages {
             if let Some(versions) = self.packages.get(package_name) {
-                if let Ok(best) = self.select_best_version(versions) {
+                let refs: Vec<&EbuildSpec> = versions.iter().collect();
+                if let Ok(best) = self.select_best_version(&refs) {
                     let slot_key = format!("{}:{}", best.name, best.slot.name);
                     slot_usage.entry(slot_key.clone())
                         .or_insert_with(Vec::new)
@@ -407,7 +417,8 @@ impl PortageResolver {
         let versions = self.packages.get(package_name)
             .ok_or_else(|| DependencyError::PackageNotFound(package_name.to_string()))?;
 
-        let best = self.select_best_version(versions)?;
+        let refs: Vec<&EbuildSpec> = versions.iter().collect();
+        let best = self.select_best_version(&refs)?;
         let mut required_flags = Vec::new();
 
         if let Some(required_use) = &best.required_use {
@@ -473,7 +484,8 @@ impl PortageResolver {
         temp_visited.insert(package.to_string());
 
         if let Some(versions) = self.packages.get(package) {
-            if let Ok(best) = self.select_best_version(versions) {
+            let refs: Vec<&EbuildSpec> = versions.iter().collect();
+            if let Ok(best) = self.select_best_version(&refs) {
                 self.visit_condition(&best.dependencies, order, visited, temp_visited)?;
             }
         }

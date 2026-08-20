@@ -2,6 +2,9 @@
 pub mod antix;
 pub mod canonical;
 pub mod chakra;
+pub mod fedora;
+pub mod debian;
+pub mod cachy_os;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
@@ -15,6 +18,7 @@ pub mod apache_ossie;
 pub mod sovereign_suite;
 pub mod gentoo;
 pub mod legacy_adapters;
+pub mod gap_closure;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -40,12 +44,7 @@ pub use antix::{
 };
 
 pub use canonical::{
-    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
-    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
-    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
-    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
-    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
-    UnifiedAppStore, ZorinAppearanceSwitcher,
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin, SigmaLivepatch, SigmaLivepatchPatch,
 };
 
 pub use solid_kernel::{

@@ -139,6 +139,13 @@ pub struct RollingSyncManager {
     pub remote_repository: HashMap<String, Version>,
 }
 
+#[derive(Debug, Clone)]
+pub struct DebianSbuildPackage {
+    pub name: String,
+    pub version: Version,
+    pub build_depends: Vec<String>,
+}
+
 impl RollingSyncManager {
     pub fn new() -> Self {
         Self {
@@ -153,6 +160,10 @@ impl RollingSyncManager {
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
         self.remote_repository.insert(name.to_string(), version);
+    }
+
+    pub fn is_debian_sbuild_builddeps_satisfied(&self, pkg: &DebianSbuildPackage) -> bool {
+        pkg.build_depends.iter().all(|dep| self.installed_packages.contains_key(dep))
     }
 
     /// Checks for available package updates in the rolling release stream

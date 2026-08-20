@@ -205,10 +205,7 @@ impl SelfHealingModule {
         // Log the event
         self.event_log.push((
             event_type,
-            SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .map(|d| d.as_secs())
-                .unwrap_or(0),
+            self.event_log.len() as u64 + 1,
         ));
 
         if !self.auto_recovery_enabled {

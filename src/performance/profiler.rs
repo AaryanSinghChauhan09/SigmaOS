@@ -24,6 +24,7 @@ pub trait Profile {
     fn start_time(&self) -> u64;
     fn end_time(&self) -> u64;
     fn duration(&self) -> u64;
+    fn stop(&self) {}
 }
 
 #[repr(C)]
@@ -54,6 +55,9 @@ impl Profile for SimpleProfile {
         let end = self.end_time();
         let start = self.start_time();
         if end > start { end - start } else { 0 }
+    }
+    fn stop(&self) {
+        self.end_time.store(2000000, Ordering::SeqCst);
     }
 }
 
@@ -93,10 +97,10 @@ impl Profiler for SimpleProfiler {
     }
 
     fn stop_profile(&mut self, id: ProfileID) -> Result<(), ProfilerError> {
-        for profile_option in &mut self.profiles {
-            if let Some(ref mut profile) = *profile_option {
+        for i in 0..self.profiles.len {
+            if let Some(ref mut profile) = self.profiles[i] {
                 if profile.id() == id {
-                    profile.end_time.store(2000000, Ordering::SeqCst);
+                    profile.stop();
                     return Ok(());
                 }
             }
@@ -105,8 +109,8 @@ impl Profiler for SimpleProfiler {
     }
 
     fn get_profile(&self, id: ProfileID) -> Option<&dyn Profile> {
-        for profile_option in &self.profiles {
-            if let Some(ref profile) = *profile_option {
+        for i in 0..self.profiles.len {
+            if let Some(ref profile) = self.profiles[i] {
                 if profile.id() == id { return Some(profile.as_ref()); }
             }
         }
@@ -161,7 +165,8 @@ impl CallGraph for SimpleCallGraph {
 
     fn get_hotspots(&self) -> Vec<&[u8]> {
         let mut hotspots = Vec::new();
-        for node in &self.nodes {
+        for i in 0..self.nodes.len {
+            let node = &self.nodes[i];
             let len = node.iter().position(|&b| b == 0).unwrap_or(128);
             hotspots.push(&node[..len]);
         }
@@ -170,6 +175,25 @@ impl CallGraph for SimpleCallGraph {
 }
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }

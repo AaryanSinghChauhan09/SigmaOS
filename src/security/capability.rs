@@ -26,12 +26,12 @@ impl CapabilityToken {
     }
     /// Create a new capability token with no permissions
     pub fn new() -> Self {
-        Self { bits: 0 }
+        Self { bits: 0, permissions: 0 }
     }
 
     /// Create capability token from raw bits
     pub fn from_bits(bits: u64) -> Self {
-        Self { bits }
+        Self { bits, permissions: bits }
     }
 
     /// Allow network access
@@ -102,12 +102,12 @@ impl CapabilityToken {
 /// Permission types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
-    NetworkTcp = 1,
-    NetworkUdp = 2,
-    FileRead = 4,
-    FileWrite = 8,
-    ProcessExec = 16,
-    Ipc = 32,
+    NetworkTcp = 0,
+    NetworkUdp = 1,
+    FileRead = 2,
+    FileWrite = 3,
+    ProcessExec = 4,
+    Ipc = 5,
 }
 
 /// Capability gate for syscall validation
@@ -132,13 +132,15 @@ impl CapabilityGate {
     /// Validate syscall against current capability
     pub fn validate_syscall(&self, permission: Permission) -> bool {
         let current = self.current.load(Ordering::SeqCst);
-        (current & permission as u64) != 0
+        (current & (1 << permission as u64)) != 0
     }
 
     /// Get current capability
     pub fn current_capability(&self) -> CapabilityToken {
+        let val = self.current.load(Ordering::SeqCst);
         CapabilityToken {
-            permissions: self.current.load(Ordering::SeqCst),
+            bits: val,
+            permissions: val,
         }
     }
 }

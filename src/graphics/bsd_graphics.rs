@@ -2,7 +2,7 @@
 //! BSD-Inspired Graphics & Display Subsystem Innovations
 //! Clean-room implementations of FreeBSD vt(4)/wscons, OpenBSD drm(4)/KMS, DragonFly LWKT SMP rendering rings, and FreeBSD kqueue-backed Compositors.
 
-use crate::klib::Vec;
+use alloc::vec::Vec;
 
 /// Virtual Console Display Mode (FreeBSD vt(4) / NetBSD wscons inspired)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

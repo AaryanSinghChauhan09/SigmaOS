@@ -5,6 +5,20 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeviceId {
+    pub vendor: u16,
+    pub device: u16,
+}
+
+pub type SdfResult<T> = Result<T, DriverError>;
+
+pub trait SdfDriver {
+    fn probe(dev: &DeviceId) -> bool where Self: Sized;
+    fn init(&mut self) -> SdfResult<()>;
+    fn shutdown(&mut self);
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverType {

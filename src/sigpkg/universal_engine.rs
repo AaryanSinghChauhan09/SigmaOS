@@ -12,6 +12,8 @@ pub enum PackageFormat {
     Portage,
     Sovereign,
     Xbps,
+    Nix,
+    Apk,
 }
 
 #[derive(Debug, Clone)]
@@ -58,6 +60,54 @@ impl IPackageAdapter for AptPackageAdapter {
             "APT Adapter: Extracted deb layers to immut store: {}",
             store_path
         );
+        Ok(())
+    }
+}
+
+pub struct NixPackageAdapter;
+impl IPackageAdapter for NixPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Nix
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Nix package payload");
+        }
+        Ok(PackageContext {
+            name: "nix-compat-pkg".to_string(),
+            version: "2.18.0".to_string(),
+            format: PackageFormat::Nix,
+            dependencies: vec![],
+            files: vec!["/nix/store/nix-compat-pkg".to_string()],
+            hash: [0x77; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Nix Adapter: Extracted store path: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct ApkPackageAdapter;
+impl IPackageAdapter for ApkPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Apk
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty APK package payload");
+        }
+        Ok(PackageContext {
+            name: "apk-compat-pkg".to_string(),
+            version: "3.18.0".to_string(),
+            format: PackageFormat::Apk,
+            dependencies: vec!["musl".to_string()],
+            files: vec!["/sbin/apk-compat".to_string()],
+            hash: [0x66; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("APK Adapter: Extracted musl-linked binary to store: {}", store_path);
         Ok(())
     }
 }
@@ -392,8 +442,13 @@ impl SovereignPackageManager {
     pub fn rollback_to_generation(&mut self, generation_id: u32) {
         if let Some(snapshot) = self.store_generations.get(&generation_id) {
             // Revert active packages directly to the captured generation snapshot state
-            self.installed_packages
-                .retain(|name, _| snapshot.contains(name));
+            let keys_to_remove: Vec<String> = self.installed_packages.keys()
+                .filter(|name| !snapshot.contains(*name))
+                .cloned()
+                .collect();
+            for key in keys_to_remove {
+                self.installed_packages.remove(&key);
+            }
             self.active_generation = generation_id;
             println!("O(1) Rollback Complete: Successfully reverted active generation directory pointer to: #{}", generation_id);
         }
