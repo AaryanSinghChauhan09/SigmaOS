@@ -418,7 +418,6 @@ impl BrailleMatrix {
 // ==========================================
 // 10. Localization (i18n) & Translation Engine
 // ==========================================
-
 pub struct SigmaLivepatchPatch {
     pub target_symbol: String,
     pub old_function_address: usize,
@@ -1225,9 +1224,9 @@ impl SigmaOnboardingLog {
         SigmaOnboardingLog {
             log_lines: Vec::new(),
             filtered_sensitive_patterns: vec![
-                format!("{}word=", "pass"),
-                format!("{}ey=", "secret_k"),
-                format!("{}token=", "private_"),
+                "password=".to_string(),
+                "secret_key=".to_string(),
+                "private_token=".to_string(),
             ],
         }
     }
