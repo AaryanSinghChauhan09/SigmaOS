@@ -329,4 +329,44 @@ mod tests {
         assert_eq!(executed, 2); // Mov and Xor executed, Jmp was rewritten to Nop and skipped execution increment
         assert_eq!(emu.registers[0], 100 ^ 0xFF);
     }
+
+    #[test]
+    fn test_mba_deobfuscation() {
+        let deobf = ArithmeticSubstitutionDeobfuscator::new();
+        let add_val = deobf.simplify_mba_expression(12, 34, true);
+        assert_eq!(add_val, 12 + 34);
+
+        let sub_val = deobf.simplify_mba_expression(50, 20, false);
+        assert_eq!(sub_val, 50 - 20);
+    }
+}
+
+pub struct ArithmeticSubstitutionDeobfuscator;
+
+impl ArithmeticSubstitutionDeobfuscator {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Simplify Mixed Boolean-Arithmetic (MBA) identity expressions:
+    /// e.g. (x ^ y) + 2*(x & y) -> x + y
+    pub fn simplify_mba_expression(&self, x: u64, y: u64, is_add_mba: bool) -> u64 {
+        if is_add_mba {
+            // Evaluates MBA addition: (x ^ y) + 2 * (x & y) == x + y
+            let xor_part = x ^ y;
+            let and_part = x & y;
+            xor_part.wrapping_add(2 * and_part)
+        } else {
+            // Evaluates MBA subtraction: (x ^ y) - 2 * (!x & y) == x - y
+            let xor_part = x ^ y;
+            let not_x_and_y = (!x) & y;
+            xor_part.wrapping_sub(2 * not_x_and_y)
+        }
+    }
+}
+
+impl Default for ArithmeticSubstitutionDeobfuscator {
+    fn default() -> Self {
+        Self::new()
+    }
 }

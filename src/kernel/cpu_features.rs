@@ -29,6 +29,36 @@ pub enum CpuRing {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArmExecutionState {
+    Arm32,
+    Thumb,
+    ThumbEE,
+    AArch64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct ApsrFlags {
+    pub negative: bool,
+    pub zero: bool,
+    pub carry: bool,
+    pub overflow: bool,
+    pub saturation: bool,
+}
+
+impl ApsrFlags {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn set_nzcv(&mut self, n: bool, z: bool, c: bool, v: bool) {
+        self.negative = n;
+        self.zero = z;
+        self.carry = c;
+        self.overflow = v;
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ArmPrivilegeMode {
     Usr, // User
     Svc, // Supervisor Call

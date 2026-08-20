@@ -17,15 +17,15 @@
     "audit": "npm audit --audit-level=moderate"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
-    "@vitest/ui": "4.1.9",
-    "electron": "43.0.0",
-    "eslint": "10.6.0",
+    "@eslint/js": "^10.0.1",
+    "@vitest/ui": "^4.1.9",
+    "electron": "^43.0.0",
+    "eslint": "^10.6.0",
     "eslint-plugin-security": "^4.0.1",
-    "globals": "17.7.0",
-    "jsdom": "29.1.1",
-    "prettier": "3.9.4",
-    "vite": "8.1.3",
-    "vitest": "4.1.9"
+    "globals": "^17.7.0",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.9.4",
+    "vite": "^8.1.3",
+    "vitest": "^4.1.9"
   }
 }

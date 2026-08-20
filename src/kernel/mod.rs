@@ -20,6 +20,16 @@
 // Core working components
 pub mod memory;
 pub mod scheduler;
+pub mod cpu_features;
+pub mod architecture;
+
+pub use cpu_features::{ApsrFlags, ArmExecutionState};
+pub mod linux_bsd_innovations;
+pub use linux_bsd_innovations::{
+    BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
+    AndroidBroadcastReceiverRegistry,
+};
+pub use architecture::{SovereignSystemBus, IoModuleController};
 pub mod object;
 pub mod proc;
 

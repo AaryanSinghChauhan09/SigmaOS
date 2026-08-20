@@ -199,8 +199,113 @@ impl SelinuxEngine {
     }
 }
 
+use std::collections::HashSet;
+
+/// Multi-Level Security (MLS) sensitivity levels
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SensitivityLevel {
+    Unclassified = 0,
+    Confidential = 1,
+    Secret = 2,
+    TopSecret = 3,
+}
+
+/// Dynamic Mandatory Access Control (MAC) MLS/MCS Enforcer (RHEL Parity)
+pub struct DynamicMacEnforcer {
+    pub process_levels: HashMap<String, SensitivityLevel>,
+    pub object_levels: HashMap<String, SensitivityLevel>,
+    pub process_categories: HashMap<String, HashSet<u32>>,
+    pub object_categories: HashMap<String, HashSet<u32>>,
+}
+
+impl DynamicMacEnforcer {
+    pub fn new() -> Self {
+        Self {
+            process_levels: HashMap::new(),
+            object_levels: HashMap::new(),
+            process_categories: HashMap::new(),
+            object_categories: HashMap::new(),
+        }
+    }
+
+    pub fn set_process_level(&mut self, process_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
+        self.process_levels.insert(process_id.to_string(), level);
+        self.process_categories.insert(process_id.to_string(), categories);
+    }
+
+    pub fn set_object_level(&mut self, object_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
+        self.object_levels.insert(object_id.to_string(), level);
+        self.object_categories.insert(object_id.to_string(), categories);
+    }
+
+    /// Read access check: No Read Up (Simple Security Property - Bell-LaPadula)
+    pub fn can_read(&self, process_id: &str, object_id: &str) -> bool {
+        let p_level = match self.process_levels.get(process_id) {
+            Some(lvl) => *lvl,
+            None => return false,
+        };
+        let o_level = match self.object_levels.get(object_id) {
+            Some(lvl) => *lvl,
+            None => return false,
+        };
+
+        if p_level < o_level {
+            return false; // Read Up prohibited
+        }
+
+        // Category containment check (MCS)
+        if let Some(o_cats) = self.object_categories.get(object_id) {
+            if !o_cats.is_empty() {
+                let p_cats = match self.process_categories.get(process_id) {
+                    Some(cats) => cats,
+                    None => return false,
+                };
+                if !o_cats.is_subset(p_cats) {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+
+    /// Write access check: No Write Down (*-Property - Bell-LaPadula)
+    pub fn can_write(&self, process_id: &str, object_id: &str) -> bool {
+        let p_level = match self.process_levels.get(process_id) {
+            Some(lvl) => *lvl,
+            None => return false,
+        };
+        let o_level = match self.object_levels.get(object_id) {
+            Some(lvl) => *lvl,
+            None => return false,
+        };
+
+        p_level <= o_level
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn test_dynamic_mac_enforcer() {
+        let mut mac = DynamicMacEnforcer::new();
+        let mut cats_secret = HashSet::new();
+        cats_secret.insert(1);
+        cats_secret.insert(2);
+
+        mac.set_process_level("proc_app", SensitivityLevel::Secret, cats_secret.clone());
+        mac.set_object_level("file_top_secret", SensitivityLevel::TopSecret, cats_secret.clone());
+        mac.set_object_level("file_secret", SensitivityLevel::Secret, cats_secret.clone());
+
+        // Cannot read TopSecret file from Secret process (No Read Up)
+        assert!(!mac.can_read("proc_app", "file_top_secret"));
+
+        // Can read Secret file from Secret process
+        assert!(mac.can_read("proc_app", "file_secret"));
+
+        // Can write TopSecret file from Secret process (Write Up)
+        assert!(mac.can_write("proc_app", "file_top_secret"));
+    }
     use super::*;
 
     #[test]
