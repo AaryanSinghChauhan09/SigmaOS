@@ -27,6 +27,9 @@ pub mod resource;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod thread;
+pub mod process;
+pub mod memory;
 pub mod tools;
 pub mod unimplemented_tools;
 pub mod virtualization;
@@ -184,4 +187,30 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+
+pub use thread::management::{
+    ThreadID, ThreadState as LibThreadState, ThreadAlertableState, Thread, ThreadError, SimpleThread, ThreadManager, SimpleThreadManager,
+};
+
+pub use process::spawn::{
+    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
+    CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
+};
+pub use process::activity_manager::{
+    ActivityManager, ActivityState, ProcessActivityRecord, RegisterSnapshot, AddressSpaceBinding,
+};
+pub use memory::segmentation_paging::{
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
+    SpaceProtectionFlags, SystemControlRegisters,
+};
+
+pub use tools::{
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode, NodeState as LibNodeState,
+    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
+    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, UserIdentity as LibUserIdentity,
+    SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
+    SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
+    SovereignIsWebsiteDown,
 };

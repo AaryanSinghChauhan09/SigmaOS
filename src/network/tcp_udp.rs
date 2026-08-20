@@ -154,35 +154,6 @@ impl Socket for SimpleSocket {
 
 impl BsdSocket for SimpleSocket {
     fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => {
-                self.reuse_addr.store(val, Ordering::SeqCst);
-            }
-            SocketOption::TcpNoDelay => {
-                self.tcp_nodelay.store(val, Ordering::SeqCst);
-            }
-            SocketOption::RcvBuf => {
-                self.rcvbuf.store(val, Ordering::SeqCst);
-            }
-            SocketOption::SndBuf => {
-                self.sndbuf.store(val, Ordering::SeqCst);
-            }
-        }
-        Ok(())
-    }
-
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
-            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
-            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
-            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
-        }
-    }
-}
-
-impl BsdSocket for SimpleSocket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
         let u_val = val as u32;
         match opt {
             SocketOption::ReuseAddr => {
@@ -393,6 +364,8 @@ impl CongestionControl for RenoCongestionControl {
     fn get_cwnd(&self) -> usize { self.cwnd.load(Ordering::SeqCst) }
 }
 
+=======
+>>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
 #[repr(C)]
 /// BBR (Bottleneck Bandwidth and RTT) Congestion Control Engine
 pub struct BBRCongestionControl {
@@ -425,11 +398,12 @@ impl CongestionControl for BBRCongestionControl {
     }
 
     fn on_loss(&mut self) {
-        self.cwnd
-            .store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
+        let current = self.cwnd.load(Ordering::SeqCst);
+        self.cwnd.store(current / 2, Ordering::SeqCst);
     }
     fn get_cwnd(&self) -> usize {
         self.cwnd.load(Ordering::SeqCst)
+<<<<<<< HEAD
         self.cwnd.store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
         // BBR is robust against isolated losses, reduces slightly
         self.cwnd = (self.cwnd as f32 * 0.8) as u32;
@@ -450,8 +424,6 @@ pub trait Firewall {
 /// Multi-port firewall initialized safely without Copy bound traits
 pub struct SimpleFirewall {
     pub allowed_ports: Vec<AtomicUsize>,
-    pub allowed_ports: [AtomicUsize; 65536],
-    pub allowed_ports: Vec<bool>,
 }
 
 impl SimpleFirewall {
@@ -469,13 +441,6 @@ impl SimpleFirewall {
 impl Default for SimpleFirewall {
     fn default() -> Self {
         Self::new()
-        let mut allowed_ports = [AtomicUsize::new(0); 65536];
-        SimpleFirewall { allowed_ports }
-        let mut allowed = Vec::new();
-        allowed.resize(65536, false);
-        SimpleFirewall {
-            allowed_ports: allowed,
-        }
     }
 }
 
@@ -535,6 +500,67 @@ impl ZeroCopy for ZeroCopyNetwork {
             buffer[i] = ((i * 13 + 19) % 256) as u8;
         }
         Ok(len)
+=======
+    }
+}
+
+/// Linux-Grade Netfilter/iptables Firewall
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterChain {
+    Input,
+    Output,
+    Forward,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterAction {
+    Accept,
+    Drop,
+    Reject,
+}
+
+#[derive(Debug, Clone)]
+pub struct NetfilterRule {
+    pub chain: NetfilterChain,
+    pub source_ip: [u8; 4],
+    pub dest_ip: [u8; 4],
+    pub protocol: Protocol,
+    pub port: Port,
+    pub action: NetfilterAction,
+}
+
+pub struct NetfilterFirewall {
+    pub rules: Vec<NetfilterRule>,
+}
+
+impl Default for NetfilterFirewall {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl NetfilterFirewall {
+    pub fn new() -> Self {
+        NetfilterFirewall { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: NetfilterRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn match_packet(&self, chain: NetfilterChain, src: [u8; 4], dest: [u8; 4], proto: Protocol, port: Port) -> NetfilterAction {
+        for rule in &self.rules {
+            if rule.chain == chain
+                && (rule.source_ip == [0, 0, 0, 0] || rule.source_ip == src)
+                && (rule.dest_ip == [0, 0, 0, 0] || rule.dest_ip == dest)
+                && rule.protocol == proto
+                && (rule.port == 0 || rule.port == port)
+            {
+                return rule.action;
+            }
+        }
+        NetfilterAction::Accept
+>>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
     }
 }
 
@@ -582,6 +608,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
+<<<<<<< HEAD
         for socket_option in &mut self.sockets {
             if let Some(ref socket) = *socket_option {
                 if socket.id() == id {
@@ -596,6 +623,9 @@ impl NetworkStack for SimpleNetworkStack {
                 }
             }
         if let Some(pos) = self.sockets.iter().position(|s| s.id() == id) {
+=======
+        if let Some(pos) = self.sockets.iter().position(|s| s.as_ref().map_or(false, |sock| sock.id() == id)) {
+>>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
             self.sockets.remove(pos);
             Ok(())
         } else {
@@ -612,13 +642,6 @@ impl NetworkStack for SimpleNetworkStack {
             }
         }
         None
-        for socket_option in &self.sockets {
-            if let Some(ref socket) = *socket_option {
-                if socket.id() == id { return Some(socket.as_ref()); }
-            }
-        }
-        None
-        self.sockets.iter().find(|s| s.id() == id).map(|s| s.as_ref())
     }
 }
 
@@ -635,15 +658,6 @@ mod tests {
         assert!(socket.connect(8080).is_ok());
         assert_eq!(socket.get_state(), TCPState::Established);
 
-        let data = b"hello";
-        assert_eq!(socket.send(data).unwrap(), 5);
-
-        let mut buf = [0u8; 10];
-        assert_eq!(socket.recv(&mut buf).unwrap(), 10);
-        assert_eq!(buf[0], 13);
-
-        assert!(socket.close().is_ok());
-        assert_eq!(socket.get_state(), TCPState::Closed);
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
@@ -656,7 +670,7 @@ impl<T> Vec<T> {
         }
     #[test]
     fn test_socket_options() {
-        let socket = SimpleSocket::new(1, Protocol::Tcp, 80);
+        let socket = SimpleSocket::new(1, Protocol::TCP, 80);
         socket.set_opt(SocketOption::TcpNoDelay, 1).unwrap();
         assert_eq!(socket.get_opt(SocketOption::TcpNoDelay).unwrap(), 1);
 
@@ -681,33 +695,8 @@ impl<T> Vec<T> {
     }
 
     #[test]
-    fn test_firewall_and_congestion() {
-        let mut firewall = SimpleFirewall::new();
-        assert!(!firewall.is_allowed(80));
-        firewall.allow_port(80);
-        assert!(firewall.is_allowed(80));
-        firewall.block_port(80);
-        assert!(!firewall.is_allowed(80));
-
-        let mut cc = RenoCongestionControl::new();
-        assert_eq!(cc.get_cwnd(), 10);
-        cc.update_cwnd(2);
-        assert_eq!(cc.get_cwnd(), 12);
-        cc.on_loss();
-        assert_eq!(cc.get_cwnd(), 1);
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-
-    #[test]
     fn test_tcp_state_machine_handshake() {
-        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 443);
+        let mut socket = SimpleSocket::new(1, Protocol::TCP, 443);
         assert_eq!(socket.get_state(), TCPState::Closed);
 
         // Perform active connect

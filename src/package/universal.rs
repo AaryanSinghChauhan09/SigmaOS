@@ -811,6 +811,8 @@ pub enum PackageError {
     ConflictDetected(Vec<(String, String)>),
 }
 
+=======
+>>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
 #[cfg(test)]
 mod tests {
     use super::*;

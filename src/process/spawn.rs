@@ -2,8 +2,6 @@
 // Implements process lifecycles, fork, exec, and signals (SIGKILL, SIGTERM, SIGINT) under `#![no_std]`.
 
 extern crate alloc;
-#![no_std]
-#![no_main]
 
 /// OOP-based Process Spawning for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 121
@@ -206,10 +204,6 @@ impl ProcessSpawner for SimpleProcessSpawner {
         _executable: &[u8],
         _args: &[[u8; 64]],
     ) -> Result<(), ProcessError> {
-        for process_option in &mut self.processes {
-    fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
-        for process_option in &mut self.processes {
-    fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
         for process_option in self.processes.as_slice_mut() {
             if let Some(ref mut process) = *process_option {
                 if process.id() == process_id {
@@ -221,14 +215,6 @@ impl ProcessSpawner for SimpleProcessSpawner {
         Err(ProcessError::NotFound)
     }
 
-    /// Dispatches POSIX signals. SIGKILL forces instant termination. Graceful signals trigger handlers or exit.
-    fn kill(&mut self, process_id: ProcessID, signal: u8) -> Result<(), ProcessError> {
-        let mut process_found = false;
-        let mut exit_code_to_set = 0;
-
-        for process_option in &mut self.processes {
-    fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
-        for process_option in &mut self.processes {
     fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
         for process_option in self.processes.as_slice_mut() {
             if let Some(ref mut process) = *process_option {
@@ -281,10 +267,6 @@ impl ProcessWaiter for SimpleProcessWaiter {
         process_id: ProcessID,
         _options: u32,
     ) -> Result<(ProcessID, i32), ProcessError> {
-        for process_option in &self.spawner.processes {
-    fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
-        for process_option in &self.spawner.processes {
-    fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
         for process_option in self.spawner.processes.as_slice() {
             if let Some(ref process) = *process_option {
                 if process.id() == process_id {
@@ -339,8 +321,6 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 
     fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
-        for group in &self.groups {
-        for group in &mut self.groups {
         for group in self.groups.as_slice_mut() {
             if group.0 == group_id {
                 return Ok(());
@@ -350,11 +330,6 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use core::sync::atomic::AtomicUsize;
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
     static CUSTOM_SIGNAL_DISPATCH_COUNT: AtomicUsize = AtomicUsize::new(0);
