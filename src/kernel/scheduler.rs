@@ -1,14 +1,12 @@
-// SigmaOS EEVDF & CFS Kernel Scheduler
-// Inspired by Linux EEVDF (Earliest Eligible Virtual Deadline First) scheduler
+//! EEVDF Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
 
-#![no_std]
-
-extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::Ordering;
 use core::time::Duration;
 
+/// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
     Idle = 0,
@@ -18,9 +16,11 @@ pub enum Priority {
     Realtime = 4,
 }
 
+/// Task Identifier
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TaskId(pub u32);
 
+/// Task structure for CFS compatibility
 #[derive(Debug, Clone, Copy)]
 pub struct Task {
     pub id: TaskId,
@@ -111,7 +111,7 @@ pub struct NumaNode {
 
 pub struct WorkStealingQueue {
     pub processor_id: u32,
-    pub tasks: Vec<u64>,
+    pub tasks: Vec<u64>, // List of process pids in the queue
 }
 
 impl WorkStealingQueue {
@@ -130,6 +130,7 @@ impl WorkStealingQueue {
         self.tasks.pop()
     }
 
+    /// Steals a task from another processor's queue to balance the SMP work load
     pub fn steal_task_from(&mut self, other: &mut WorkStealingQueue) -> Option<u64> {
         if other.tasks.len() > 1 {
             let stolen = other.tasks.remove(0);
@@ -152,7 +153,7 @@ pub struct Scheduler {
 
 impl Scheduler {
     pub fn new() -> Self {
-        Self {
+        Scheduler {
             processes: Vec::new(),
             current_time: 0,
             system_vtime: 0,
@@ -266,10 +267,11 @@ impl Default for Scheduler {
     }
 }
 
+/// CFS Scheduler implementation
 pub struct CfsScheduler {
-    pub tasks: [Option<Task>; 64],
-    pub task_count: usize,
-    pub current_time: u64,
+    tasks: [Option<Task>; 64],
+    task_count: usize,
+    current_time: u64,
 }
 
 impl CfsScheduler {
@@ -322,8 +324,6 @@ impl Default for CfsScheduler {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
 
     #[test]
     fn test_scheduler_creation() {
@@ -362,12 +362,8 @@ mod tests {
 
     #[test]
     fn test_eevdf_deadline_and_weight() {
-        let mut scheduler = Scheduler::new();
         let mut p1 = Process::new(1, "low-prio".to_string(), Priority::Low);
         let mut p2 = Process::new(2, "high-prio".to_string(), Priority::High);
-
-        scheduler.add_process(p1.clone());
-        scheduler.add_process(p2.clone());
 
         p1.update_virtual_deadline(0);
         p2.update_virtual_deadline(0);

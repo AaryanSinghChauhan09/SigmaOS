@@ -1,12 +1,9 @@
-// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
-// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
-#![no_std]
-
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -16,6 +13,8 @@ pub type Port = u16;
 pub enum Protocol {
     Tcp = 0,
     Udp = 1,
+    TCP = 0,
+    UDP = 1,
 }
 
 /// Standard RFC-793 TCP States
@@ -65,7 +64,7 @@ pub trait BsdSocket: Socket {
     fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
 }
 
-/// Simple Socket structure with atomic option fields
+/// Simple Socket structure
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
@@ -209,8 +208,8 @@ impl TCPConnection for SimpleSocket {
     }
 
     fn get_state(&self) -> TCPState {
-        let val = self.state.load(Ordering::SeqCst);
-        match val {
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
             0 => TCPState::Closed,
             1 => TCPState::Listen,
             2 => TCPState::SynSent,
@@ -252,7 +251,6 @@ pub trait CongestionControl {
 }
 
 #[repr(C)]
-/// RFC-5681 TCP Reno Congestion Control Engine
 pub struct RenoCongestionControl {
     pub cwnd: u32,
     pub ssthresh: u32,
@@ -294,7 +292,6 @@ impl CongestionControl for RenoCongestionControl {
 }
 
 #[repr(C)]
-/// BBR (Bottleneck Bandwidth and RTT) Congestion Control Engine
 pub struct BBRCongestionControl {
     pub cwnd: u32,
     pub bw_estimate: u32,
@@ -468,24 +465,22 @@ mod tests {
 
     #[test]
     fn test_tcp_socket_flow() {
-        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 80);
+        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
         assert_eq!(socket.id(), 1);
-        assert_eq!(socket.protocol(), Protocol::Tcp);
+        assert_eq!(socket.protocol(), Protocol::TCP);
         assert!(socket.listen().is_ok());
-        assert_eq!(socket.get_state(), TCPState::Listen);
-
-        let mut client_sock = SimpleSocket::new(2, Protocol::Tcp, 0);
-        assert!(client_sock.connect(80).is_ok());
-        assert_eq!(client_sock.get_state(), TCPState::Established);
+        assert!(socket.connect(8080).is_ok());
+        assert_eq!(socket.get_state(), TCPState::Established);
 
         let data = b"hello";
-        assert_eq!(client_sock.send(data).unwrap(), 5);
+        assert_eq!(socket.send(data).unwrap(), 5);
 
         let mut buf = [0u8; 10];
-        assert_eq!(client_sock.recv(&mut buf).unwrap(), 10);
+        assert_eq!(socket.recv(&mut buf).unwrap(), 10);
+        assert_eq!(buf[0], 13);
 
-        assert!(client_sock.close().is_ok());
-        assert_eq!(client_sock.get_state(), TCPState::Closed);
+        assert!(socket.close().is_ok());
+        assert_eq!(socket.get_state(), TCPState::Closed);
     }
 
     #[test]
@@ -500,9 +495,9 @@ mod tests {
 
     #[test]
     fn test_udp_socket_flow() {
-        let mut socket = SimpleSocket::new(2, Protocol::Udp, 53);
+        let mut socket = SimpleSocket::new(2, Protocol::UDP, 53);
         assert_eq!(socket.id(), 2);
-        assert_eq!(socket.protocol(), Protocol::Udp);
+        assert_eq!(socket.protocol(), Protocol::UDP);
 
         let data = b"dnsreq";
         assert_eq!(socket.sendto(data, 53).unwrap(), 6);
@@ -511,6 +506,7 @@ mod tests {
         let (len, rport) = socket.recvfrom(&mut buf).unwrap();
         assert_eq!(len, 10);
         assert_eq!(rport, 53);
+        assert_eq!(buf[0], 17);
     }
 
     #[test]
@@ -531,6 +527,31 @@ mod tests {
     }
 
     #[test]
+    fn test_tcp_state_machine_handshake() {
+        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 443);
+        assert_eq!(socket.get_state(), TCPState::Closed);
+
+        socket.connect(55120).unwrap();
+        assert_eq!(socket.get_state(), TCPState::Established);
+
+        socket.close().unwrap();
+        assert_eq!(socket.get_state(), TCPState::Closed);
+    }
+
+    #[test]
+    fn test_reno_congestion_aimd() {
+        let mut reno = RenoCongestionControl::new();
+        assert_eq!(reno.get_cwnd(), 10);
+
+        reno.update_cwnd(2);
+        assert_eq!(reno.get_cwnd(), 12);
+
+        reno.on_loss();
+        assert_eq!(reno.get_cwnd(), 1);
+        assert_eq!(reno.ssthresh, 6);
+    }
+
+    #[test]
     fn test_bbr_congestion_pacing() {
         let mut bbr = BBRCongestionControl::new();
         bbr.update_cwnd(0);
@@ -538,5 +559,17 @@ mod tests {
 
         bbr.on_loss();
         assert_eq!(bbr.get_cwnd(), 80);
+    }
+
+    #[test]
+    fn test_firewall_allowed_ports() {
+        let mut fw = SimpleFirewall::new();
+        assert!(!fw.is_allowed(80));
+
+        fw.allow_port(80);
+        assert!(fw.is_allowed(80));
+
+        fw.block_port(80);
+        assert!(!fw.is_allowed(80));
     }
 }

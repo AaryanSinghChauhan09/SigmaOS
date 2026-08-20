@@ -2,14 +2,17 @@
 // Implements container runtime using OOP principles with traits and structs.
 
 extern crate alloc;
+
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+/// Container ID
 pub type ContainerID = usize;
 
+/// Container state
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
@@ -19,41 +22,41 @@ pub enum ContainerState {
     Failed = 4,
 }
 
+/// Container trait (OOP interface)
+pub trait Container {
+    /// Get container ID
+    fn id(&self) -> ContainerID;
+    /// Get container name
+    fn name(&self) -> &[u8];
+    /// Start container
+    fn start(&mut self) -> Result<(), ContainerError>;
+    /// Stop container
+    fn stop(&mut self) -> Result<(), ContainerError>;
+    /// Pause container
+    fn pause(&mut self) -> Result<(), ContainerError>;
+    /// Resume container
+    fn resume(&mut self) -> Result<(), ContainerError>;
+    /// Get container state
+    fn state(&self) -> ContainerState;
+    /// Get container info
+    fn info(&self) -> ContainerInfo;
+}
+
+/// Container error types
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
+pub enum ContainerError {
+    Success = 0,
+    AlreadyStarted = 1,
+    AlreadyStopped = 2,
+    StartFailed = 3,
+    StopFailed = 4,
+    PermissionDenied = 5,
+    ResourceLimit = 6,
 }
 
-impl ContainerCapability {
-    pub fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-impl Default for ContainerCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
+/// Container info
+#[repr(C)]
 pub struct ContainerInfo {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -80,26 +83,40 @@ impl ContainerInfo {
     }
 }
 
-pub trait Container {
-    fn id(&self) -> ContainerID;
-    fn name(&self) -> &[u8];
-    fn start(&mut self) -> Result<(), ContainerError>;
-    fn stop(&mut self) -> Result<(), ContainerError>;
-    fn pause(&mut self) -> Result<(), ContainerError>;
-    fn resume(&mut self) -> Result<(), ContainerError>;
-    fn state(&self) -> ContainerState;
-    fn info(&self) -> ContainerInfo;
+/// Container capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ContainerError {
-    Success = 0,
-    AlreadyStarted = 1,
-    AlreadyStopped = 2,
-    StartFailed = 3,
-    StopFailed = 4,
-    PermissionDenied = 5,
-    ResourceLimit = 6,
+impl ContainerCapability {
+    pub const fn new() -> Self {
+        ContainerCapability {
+            can_start: false,
+            can_stop: false,
+            can_pause: false,
+            can_modify: false,
+        }
+    }
+
+    pub const fn full() -> Self {
+        ContainerCapability {
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
+            can_modify: true,
+        }
+    }
+}
+
+impl Default for ContainerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Container network configuration type
@@ -117,6 +134,8 @@ pub struct ContainerVolume {
     pub is_tmpfs: bool,
     pub read_only: bool,
 }
+
+/// Container user namespaces mapping
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerNamespace {
     pub uid_mapping: u32,
@@ -150,37 +169,7 @@ impl ContainerNamespace {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct NamespaceConfig {
-    pub pid: bool,
-    pub mnt: bool,
-    pub net: bool,
-    pub uts: bool,
-    pub ipc: bool,
-    pub user: bool,
-    pub cgroup: bool,
-}
-
-impl NamespaceConfig {
-    pub fn new() -> Self {
-        NamespaceConfig {
-            pid: false,
-            mnt: false,
-            net: false,
-            uts: false,
-            ipc: false,
-            user: false,
-            cgroup: false,
-        }
-    }
-}
-
-impl Default for NamespaceConfig {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
+/// Container seccomp profiles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SeccompProfile {
     pub hardened: bool,
@@ -200,6 +189,7 @@ impl SeccompProfile {
     }
 }
 
+/// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
 pub struct OverlayFS {
     pub lower_dirs: Vec<String>,
@@ -234,17 +224,18 @@ impl OverlayFS {
     }
 }
 
+/// Simple container (OOP: Concrete container class)
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
     pub image: [u8; 128],
-    pub state: AtomicUsize,
+    pub state: AtomicUsize, // ContainerState as usize
     pub pid: AtomicUsize,
     pub memory_limit: u64,
     pub cpu_limit: u32,
     pub capability: ContainerCapability,
-    pub environment: [u8; 512],
     pub seccomp: SeccompProfile,
+    pub environment: [u8; 512],
 }
 
 impl SimpleContainer {
@@ -279,18 +270,31 @@ impl SimpleContainer {
             memory_limit: 0,
             cpu_limit: 0,
             capability,
+            seccomp: SeccompProfile {
+                hardened: false,
+                blocked_syscalls_mask: 0,
+            },
             environment: [0; 512],
-            seccomp: SeccompProfile { hardened: false, blocked_syscalls_mask: 0 },
         }
+    }
+
+    pub fn set_environment(&mut self, env: &[u8]) {
+        let len = env.len().min(511);
+        self.environment[..len].copy_from_slice(&env[..len]);
+    }
+
+    pub fn set_limits(&mut self, memory_limit: u64, cpu_limit: u32) {
+        self.memory_limit = memory_limit;
+        self.cpu_limit = cpu_limit;
     }
 
     pub fn get_state(&self) -> ContainerState {
         match self.state.load(Ordering::SeqCst) {
+            0 => ContainerState::Created,
             1 => ContainerState::Running,
             2 => ContainerState::Paused,
             3 => ContainerState::Stopped,
-            4 => ContainerState::Failed,
-            _ => ContainerState::Created,
+            _ => ContainerState::Failed,
         }
     }
 
@@ -320,7 +324,7 @@ impl Container for SimpleContainer {
         }
 
         self.set_state(ContainerState::Running);
-        self.pid.store(1, Ordering::SeqCst);
+        self.pid.store(1, Ordering::SeqCst); // Simulated PID
         Ok(())
     }
 
@@ -386,20 +390,35 @@ impl Container for SimpleContainer {
     }
 }
 
+/// Container runtime trait (OOP interface)
 pub trait ContainerRuntime {
+    /// Create container
     fn create_container(
         &mut self,
         name: &[u8],
         image: &[u8],
         capability: ContainerCapability,
     ) -> Result<ContainerID, ContainerError>;
+    /// Remove container
     fn remove_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
+    /// Start container
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
+    /// Stop container
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
+    /// Pause container
+    fn pause_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
+    /// Resume container
+    fn resume_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
+    /// Get container
     fn get_container(&self, id: ContainerID) -> Option<&dyn Container>;
+    /// List containers
     fn list_containers(&self) -> Vec<ContainerID>;
+    /// Get runtime statistics
+    fn stats(&self) -> RuntimeStats;
 }
 
+/// Runtime statistics
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeStats {
     pub total_containers: usize,
@@ -408,6 +427,34 @@ pub struct RuntimeStats {
     pub stopped_containers: usize,
 }
 
+impl RuntimeStats {
+    pub const fn new() -> Self {
+        RuntimeStats {
+            total_containers: 0,
+            running_containers: 0,
+            paused_containers: 0,
+            stopped_containers: 0,
+        }
+    }
+}
+
+impl Default for RuntimeStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Simple container runtime (OOP: Concrete runtime class)
+pub struct SimpleContainerRuntime {
+    containers: Vec<Option<Box<dyn Container>>>,
+    next_id: AtomicUsize,
+    stats: RuntimeStats,
+    capability: RuntimeCapability,
+}
+
+/// Runtime capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,
@@ -415,7 +462,15 @@ pub struct RuntimeCapability {
 }
 
 impl RuntimeCapability {
-    pub fn full() -> Self {
+    pub const fn new() -> Self {
+        RuntimeCapability {
+            can_create: false,
+            can_remove: false,
+            can_manage: false,
+        }
+    }
+
+    pub const fn full() -> Self {
         RuntimeCapability {
             can_create: true,
             can_remove: true,
@@ -424,10 +479,10 @@ impl RuntimeCapability {
     }
 }
 
-pub struct SimpleContainerRuntime {
-    containers: Vec<Option<Box<dyn Container>>>,
-    next_id: AtomicUsize,
-    capability: RuntimeCapability,
+impl Default for RuntimeCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleContainerRuntime {
@@ -435,6 +490,7 @@ impl SimpleContainerRuntime {
         SimpleContainerRuntime {
             containers: Vec::new(),
             next_id: AtomicUsize::new(1),
+            stats: RuntimeStats::new(),
             capability,
         }
     }
@@ -454,6 +510,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let container = SimpleContainer::new(id, name, image, capability);
         self.containers.push(Some(Box::new(container)));
+        self.stats.total_containers += 1;
+        self.stats.stopped_containers += 1;
         Ok(id)
     }
 
@@ -462,11 +520,19 @@ impl ContainerRuntime for SimpleContainerRuntime {
             return Err(ContainerError::PermissionDenied);
         }
 
-        if let Some(pos) = self.containers.iter().position(|c| match c {
-            Some(cont) => cont.id() == id,
-            None => false,
-        }) {
-            self.containers.remove(pos);
+        let mut index = None;
+        for (i, container_option) in self.containers.iter().enumerate() {
+            if let Some(ref container) = *container_option {
+                if container.id() == id {
+                    index = Some(i);
+                    break;
+                }
+            }
+        }
+
+        if let Some(i) = index {
+            self.containers[i] = None;
+            self.stats.total_containers -= 1;
             Ok(())
         } else {
             Err(ContainerError::PermissionDenied)
@@ -474,30 +540,80 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        if let Some(pos) = self.containers.iter().position(|c| match c {
-            Some(cont) => cont.id() == id,
-            None => false,
-        }) {
-            if let Some(ref mut container) = self.containers[pos] {
-                container.start()
-            } else {
-                Err(ContainerError::PermissionDenied)
+        if !self.capability.can_manage {
+            return Err(ContainerError::PermissionDenied);
+        }
+
+        if let Some(ref mut container) = self.get_container_mut(id) {
+            let result = container.start();
+            if result.is_ok() {
+                let state = container.state();
+                if state == ContainerState::Running {
+                    self.stats.running_containers += 1;
+                    self.stats.stopped_containers -= 1;
+                }
             }
+            result
         } else {
             Err(ContainerError::PermissionDenied)
         }
     }
 
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        if let Some(pos) = self.containers.iter().position(|c| match c {
-            Some(cont) => cont.id() == id,
-            None => false,
-        }) {
-            if let Some(ref mut container) = self.containers[pos] {
-                container.stop()
-            } else {
-                Err(ContainerError::PermissionDenied)
+        if !self.capability.can_manage {
+            return Err(ContainerError::PermissionDenied);
+        }
+
+        if let Some(ref mut container) = self.get_container_mut(id) {
+            let result = container.stop();
+            if result.is_ok() {
+                let state = container.state();
+                if state == ContainerState::Stopped {
+                    self.stats.running_containers -= 1;
+                    self.stats.stopped_containers += 1;
+                }
             }
+            result
+        } else {
+            Err(ContainerError::PermissionDenied)
+        }
+    }
+
+    fn pause_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
+        if !self.capability.can_manage {
+            return Err(ContainerError::PermissionDenied);
+        }
+
+        if let Some(ref mut container) = self.get_container_mut(id) {
+            let result = container.pause();
+            if result.is_ok() {
+                let state = container.state();
+                if state == ContainerState::Paused {
+                    self.stats.running_containers -= 1;
+                    self.stats.paused_containers += 1;
+                }
+            }
+            result
+        } else {
+            Err(ContainerError::PermissionDenied)
+        }
+    }
+
+    fn resume_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
+        if !self.capability.can_manage {
+            return Err(ContainerError::PermissionDenied);
+        }
+
+        if let Some(ref mut container) = self.get_container_mut(id) {
+            let result = container.resume();
+            if result.is_ok() {
+                let state = container.state();
+                if state == ContainerState::Running {
+                    self.stats.paused_containers -= 1;
+                    self.stats.running_containers += 1;
+                }
+            }
+            result
         } else {
             Err(ContainerError::PermissionDenied)
         }
@@ -523,23 +639,58 @@ impl ContainerRuntime for SimpleContainerRuntime {
         }
         ids
     }
+
+    fn stats(&self) -> RuntimeStats {
+        self.stats
+    }
+}
+
+impl SimpleContainerRuntime {
+    fn get_container_mut(&mut self, id: ContainerID) -> Option<&mut Box<dyn Container>> {
+        for container_option in &mut self.containers {
+            if let Some(ref mut container) = *container_option {
+                if container.id() == id {
+                    return Some(container);
+                }
+            }
+        }
+        None
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
-    fn test_container_creation() {
+    fn test_container_lifecycle_flows() {
         let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
         let id = runtime
             .create_container(
-                b"sovereign_container",
-                b"ubuntu-pqc",
+                b"nginx-service",
+                b"nginx:alpine",
                 ContainerCapability::full(),
             )
             .unwrap();
-        assert_eq!(id, 1);
+
+        let stats_init = runtime.stats();
+        assert_eq!(stats_init.total_containers, 1);
+        assert_eq!(stats_init.stopped_containers, 1);
+        assert_eq!(stats_init.running_containers, 0);
+
+        // Start container
+        runtime.start_container(id).unwrap();
+        let stats_running = runtime.stats();
+        assert_eq!(stats_running.running_containers, 1);
+        assert_eq!(stats_running.stopped_containers, 0);
+
+        // Pause container
+        runtime.pause_container(id).unwrap();
+        let stats_paused = runtime.stats();
+        assert_eq!(stats_paused.paused_containers, 1);
+        assert_eq!(stats_paused.running_containers, 0);
     }
 
     #[test]
@@ -554,6 +705,14 @@ mod tests {
         assert!(overlay.mounted);
         overlay.umount();
         assert!(!overlay.mounted);
+
+        // Mount failure on empty lowerdirs
+        let mut invalid_overlay = OverlayFS::new(
+            vec![],
+            "/upper".to_string(),
+            "/work".to_string(),
+        );
+        assert!(invalid_overlay.mount().is_err());
     }
 
     #[test]
@@ -564,8 +723,11 @@ mod tests {
             rootless: true,
         };
 
+        // Container root (UID 0) maps to host unprivileged user (UID 1000)
         assert_eq!(ns.map_uid(0).unwrap(), 1000);
         assert_eq!(ns.map_gid(0).unwrap(), 1000);
+
+        // Regular container users offset accordingly
         assert_eq!(ns.map_uid(10).unwrap(), 1010);
     }
 
@@ -579,10 +741,13 @@ mod tests {
         );
         container.seccomp = SeccompProfile {
             hardened: true,
-            blocked_syscalls_mask: 1 << 0,
+            blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)
         };
 
+        // Allowed syscall (e.g. syscall 1)
         assert!(container.execute_syscall(1).is_ok());
+
+        // Prohibited syscall (syscall 0)
         assert_eq!(
             container.execute_syscall(0).unwrap_err(),
             ContainerError::PermissionDenied
