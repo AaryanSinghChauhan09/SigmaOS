@@ -31,3 +31,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-19 - Caching Explicit Slicing Lengths for Fixed Byte Array Fields in Logging Subsystems
 **Learning:** In fixed-size buffer structures (like `[u8; 256]` in `SimpleLogFile`), retrieving slice paths via `.position(|&b| b == 0)` runs an $O(N)$ scan up to 256 bytes for every single path reference or log rotation event. Storing an explicit `path_len: u8` field during struct initialization replaces linear scans with instant $O(1)$ index slicing `&self.path[..self.path_len as usize]`, eliminating linear scanning overhead during high-frequency log operations.
 **Action:** Store explicit byte lengths (`path_len: u8`) when initializing fixed byte array fields in log files or IO handles to guarantee $O(1)$ slice retrieval.
+
+## 2026-08-20 - Storing Cached Byte Lengths for Fixed-Size Log Buffers
+**Learning:** In fixed-size string/byte arrays (`[u8; 64]`, `[u8; 128]`, `[u8; 512]`), converting to string representations via `.position(|&b| b == 0)` causes $O(N)$ linear byte scans on every log message output, serialization, or network dispatch. Storing explicit length fields (`component_len`, `message_len`, `module_len`) during struct instantiation turns slice operations into instantaneous $O(1)$ lookups.
+**Action:** Store cached length fields alongside fixed-size buffer fields to avoid linear zero-byte scans during frequent display, formatting, or serialization routines.
