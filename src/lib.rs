@@ -28,6 +28,7 @@ pub mod plugin;
 pub mod productivity;
 pub mod resilience;
 pub mod resource;
+pub mod scheduler;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -184,3 +185,4 @@ pub use virtualization::{
 pub use memory::{
     BsdZoneAllocator, LinuxKswapd, MemCgroupManager, SimpleVMM, Zone, MemCgroup, PageState,
 };
+pub use scheduler::{TaskState as SystemTaskState, TaskWorkloadType};
