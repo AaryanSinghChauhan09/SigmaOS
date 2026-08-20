@@ -16,11 +16,17 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+pub mod alpc;
 pub mod ipc;
 pub mod mechanism;
 pub mod message;
 pub mod unix_socket;
 pub mod signals;
+
+pub use alpc::{
+    AlpcFacility, AlpcFacilityServer, AlpcManager, AlpcMessage, AlpcMessageHeader, AlpcPort,
+    AlpcPortType, AlpcSectionHandle, alpc_flags,
+};
 
 pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,

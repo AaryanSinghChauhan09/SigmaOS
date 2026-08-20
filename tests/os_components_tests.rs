@@ -31,6 +31,12 @@ mod endeavour_os;
 #[path = "../src/compatibility/fedora.rs"]
 mod fedora_compat;
 
+#[path = "../src/scheduler/scheduler.rs"]
+mod task_scheduler;
+
+#[path = "../src/ipc/alpc.rs"]
+mod alpc;
+
 #[path = "../src/access/control.rs"]
 mod access_control;
 
@@ -39,6 +45,10 @@ mod sigmatools;
 
 use access_control::{
     AclEntry, AclTag, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, nfs4_flags, nfs4_mask,
+};
+use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
+use task_scheduler::{
+    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType,
 };
 
 use pipes::Pipe;
@@ -283,4 +293,66 @@ fn test_posix_and_nfsv4_acls() {
 
     let child_nfsv4 = nfsv4_acl.inherit_for_child(true);
     assert_eq!(child_nfsv4.aces.len(), 1);
+}
+
+#[test]
+fn test_alpc_local_procedure_calls() {
+    let mut mgr = AlpcManager::new();
+    mgr.register_facility_server(AlpcFacility::SecurityAuth, "auth_server");
+
+    let server = mgr.get_facility_server_mut(AlpcFacility::SecurityAuth).unwrap();
+    server.register_procedure(301, |req| {
+        let payload = req.get_payload();
+        if payload == b"VERIFY_TOKEN_XYZ" {
+            b"TOKEN_VALIDATED_OK".to_vec()
+        } else {
+            b"TOKEN_INVALID".to_vec()
+        }
+    });
+
+    let req = AlpcMessage::new_inline(
+        100,
+        AlpcFacility::SecurityAuth,
+        301,
+        500,
+        1000,
+        b"VERIFY_TOKEN_XYZ".to_vec(),
+    );
+
+    let reply = mgr.request_reply(AlpcFacility::SecurityAuth, req).unwrap();
+    assert_eq!(reply.get_payload(), b"TOKEN_VALIDATED_OK");
+    assert_eq!((reply.header.flags & alpc_flags::REPLY_MESSAGE), alpc_flags::REPLY_MESSAGE);
+}
+
+#[test]
+fn test_task_states_and_workload_classifications() {
+    let mut sched = PriorityScheduler::new();
+
+    let task_cpu = Box::new(
+        Task::new(1, Priority::High, 10, TaskCapability::full())
+            .with_workload(TaskWorkloadType::CpuBound),
+    );
+    let task_io = Box::new(
+        Task::new(2, Priority::Normal, 10, TaskCapability::full())
+            .with_workload(TaskWorkloadType::IoBound),
+    );
+    let task_rt = Box::new(
+        Task::new(3, Priority::Realtime, 5, TaskCapability::full())
+            .with_workload(TaskWorkloadType::RealTimePeriodic {
+                period_ms: 10,
+                exec_time_ms: 2,
+            }),
+    );
+
+    sched.add_task(task_cpu).unwrap();
+    sched.add_task(task_io).unwrap();
+    sched.add_task(task_rt).unwrap();
+
+    let scheduled_id = sched.schedule().unwrap();
+    assert_eq!(scheduled_id, 3); // Realtime periodic task scheduled first
+
+    let stats = sched.stats();
+    assert_eq!(stats.total_tasks, 3);
+    assert_eq!(stats.running_tasks, 1);
+    assert_eq!(stats.ready_tasks, 2);
 }
