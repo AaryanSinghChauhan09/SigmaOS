@@ -1,8 +1,52 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based, standard Linux/BSD conforming filesystem with security, hard links, and path traversal
 
-use crate::security::{CapabilityToken, Permission};
+extern crate alloc;
 use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use std::collections::HashMap;
+
+#[cfg(not(test))]
+use crate::security::{CapabilityToken, Permission};
+
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub read_paths: Vec<String>,
+    pub write_paths: Vec<String>,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    FileRead,
+    FileWrite,
+}
+
+#[cfg(test)]
+impl CapabilityToken {
+    pub fn new() -> Self {
+        Self {
+            read_paths: Vec::new(),
+            write_paths: Vec::new(),
+        }
+    }
+    pub fn allow_read(mut self, path: &str) -> Self {
+        self.read_paths.push(path.to_string());
+        self
+    }
+    pub fn allow_write(mut self, path: &str) -> Self {
+        self.write_paths.push(path.to_string());
+        self
+    }
+    pub fn has_permission(&self, perm: Permission) -> bool {
+        match perm {
+            Permission::FileRead => !self.read_paths.is_empty(),
+            Permission::FileWrite => !self.write_paths.is_empty(),
+        }
+    }
+}
 
 // Standard POSIX / Linux / BSD open flags
 pub const O_RDONLY: u32 = 0x0000;
@@ -65,7 +109,6 @@ pub struct Inode {
     pub link_count: u32,
     pub hard_links_count: u32,
     pub symlink_target: Option<String>,
-    pub link_count: u32,
     pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
     pub entries: BTreeMap<String, u64>, // Directory entries
@@ -86,7 +129,6 @@ impl Inode {
             link_count: 1,
             hard_links_count: 1,
             symlink_target: None,
-            link_count: 1,
             xattrs: HashMap::new(),
             data: Vec::new(),
             entries: BTreeMap::new(),
@@ -162,6 +204,7 @@ impl VirtualFilesystem {
     pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
         let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
         inode.link_count += 1;
+        inode.hard_links_count += 1;
         Ok(())
     }
 
@@ -177,6 +220,49 @@ impl VirtualFilesystem {
         let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
         let val = inode.xattrs.get(name).ok_or(FsError::AttributeNotFound)?;
         Ok(val.clone())
+    }
+
+    /// Evaluates Linux ext4-style inode permissions with extended attribute (`system.posix_acl`) fallback
+    pub fn evaluate_inode_access(
+        &self,
+        inode_id: u64,
+        subject_uid: u64,
+        subject_gids: &[u64],
+        requested_mode: u16,
+    ) -> Result<bool, FsError> {
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+
+        if subject_uid == 0 {
+            return Ok(true); // Root superuser bypass
+        }
+
+        // 1. Check for extended attribute POSIX ACL (`system.posix_acl`)
+        if let Some(acl_bytes) = inode.xattrs.get("system.posix_acl") {
+            // Simplified ACL format parsing: byte 0=allow_read, byte 1=allow_write, byte 2=allow_exec
+            let acl_read = (acl_bytes.first().copied().unwrap_or(0u8) & 0o4) != 0;
+            let acl_write = (acl_bytes.get(1).copied().unwrap_or(0u8) & 0o2) != 0;
+            let acl_exec = (acl_bytes.get(2).copied().unwrap_or(0u8) & 0o1) != 0;
+
+            let r_ok = (requested_mode & 0o4 == 0) || acl_read;
+            let w_ok = (requested_mode & 0o2 == 0) || acl_write;
+            let x_ok = (requested_mode & 0o1 == 0) || acl_exec;
+
+            return Ok(r_ok && w_ok && x_ok);
+        }
+
+        // 2. Fallback to standard owner / group / other Inode permissions
+        let allowed = if subject_uid == inode.owner {
+            (requested_mode & 0o4 == 0 || inode.permissions.read)
+                && (requested_mode & 0o2 == 0 || inode.permissions.write)
+                && (requested_mode & 0o1 == 0 || inode.permissions.execute)
+        } else if subject_gids.contains(&inode.group) {
+            (requested_mode & 0o4 == 0 || inode.permissions.read)
+                && (requested_mode & 0o1 == 0 || inode.permissions.execute)
+        } else {
+            requested_mode & 0o4 == 0 || inode.permissions.read
+        };
+
+        Ok(allowed)
     }
 
     pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
@@ -316,6 +402,7 @@ impl VirtualFilesystem {
         if let Some(inode) = self.inodes.get_mut(&inode_id) {
             if inode.hard_links_count > 1 {
                 inode.hard_links_count -= 1;
+                inode.link_count -= 1;
             } else {
                 should_delete = true;
             }
@@ -472,6 +559,7 @@ impl VirtualFilesystem {
 
         let target_inode = self.inodes.get_mut(&target_id).ok_or(FsError::NotFound)?;
         target_inode.hard_links_count += 1;
+        target_inode.link_count += 1;
 
         Ok(())
     }
@@ -558,27 +646,42 @@ mod tests {
     }
 
     #[test]
+    fn test_ext4_posix_acl_xattr_evaluation() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
+
+        // Attach system.posix_acl extended attribute (read=4, write=0, exec=0)
+        vfs.set_xattr(inode_id, "system.posix_acl", &[0o4, 0o0, 0o0]).unwrap();
+
+        // Read (4) -> Allowed by xattr ACL
+        assert!(vfs.evaluate_inode_access(inode_id, 1001, &[1000], 0o4).unwrap());
+
+        // Write (2) -> Denied by xattr ACL
+        assert!(!vfs.evaluate_inode_access(inode_id, 1001, &[1000], 0o2).unwrap());
+    }
+
+    #[test]
     fn test_gated_read_write() {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        let fd = vfs.open_file(inode_id, 0).unwrap();
+        let write_fd = vfs.open_file(inode_id, 0).unwrap();
 
         let bad_token = CapabilityToken::new(); // no read or write permissions
         let read_token = CapabilityToken::new().allow_read("/var/www");
         let write_token = CapabilityToken::new().allow_write("/tmp");
-        let _all_token = CapabilityToken::new().allow_read("/var/www").allow_write("/tmp");
 
         let mut buf = [0u8; 10];
 
-        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
-        assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
+        // Write should fail with bad_token and read_token, but succeed with write_token
+        assert_eq!(vfs.write_file_gated(write_fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.write_file_gated(write_fd, b"gated", &read_token), Err(FsError::PermissionDenied));
+        assert!(vfs.write_file_gated(write_fd, b"gated", &write_token).is_ok());
 
-        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
+        // Read using a separate read_fd (at offset 0)
+        let read_fd = vfs.open_file(inode_id, 0).unwrap();
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
     }
 
     #[test]
@@ -595,7 +698,7 @@ mod tests {
         assert_eq!(vfs.get_inode(symlink_id).unwrap().file_type, FileType::Symlink);
         assert_eq!(vfs.get_inode(symlink_id).unwrap().symlink_target.as_ref().unwrap(), "/home/tc/file.txt");
 
-        // 3. Create a hard link -> increments link_count
+        // 3. Create a hard link -> increments link_count and hard_links_count
         assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
         vfs.create_hard_link(inode_id).unwrap();
         assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);

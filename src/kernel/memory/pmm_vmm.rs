@@ -5,6 +5,8 @@
 
 #![no_std]
 
+extern crate alloc;
+
 use core::sync::atomic::{AtomicUsize, AtomicPtr, Ordering};
 use core::ptr::null_mut;
 
@@ -118,7 +120,7 @@ impl PhysicalMemoryManager {
     }
 
     /// Get free page count
-    pub fn free_pages(&self) -> usize {
+    pub fn get_free_pages_count(&self) -> usize {
         self.free_pages.load(Ordering::SeqCst)
     }
 
@@ -163,7 +165,7 @@ impl BuddyAllocator {
 
         // Split from higher order recursively down to target order
         for current_order in (order + 1)..=10 {
-            if let Some(mut block) = self.pop_free_list(current_order) {
+            if let Some(block) = self.pop_free_list(current_order) {
                 // Perform recursive splits order-by-order to prevent memory loss
                 let mut temp_order = current_order;
                 while temp_order > order {
@@ -243,12 +245,10 @@ impl BuddyAllocator {
     }
 
     fn find_buddy(&self, block: *mut BuddyBlock, order: usize) -> *mut BuddyBlock {
-        unsafe {
-            let addr = block as usize;
-            let size = PAGE_SIZE << order;
-            let buddy_addr = addr ^ size;
-            buddy_addr as *mut BuddyBlock
-        }
+        let addr = block as usize;
+        let size = PAGE_SIZE << order;
+        let buddy_addr = addr ^ size;
+        buddy_addr as *mut BuddyBlock
     }
 
     fn try_coalesce(&self, block: *mut BuddyBlock, buddy: *mut BuddyBlock, order: usize) -> Option<*mut BuddyBlock> {
@@ -380,11 +380,11 @@ impl SlabCache {
 
     unsafe fn alloc_from_slab(&self, slab: *mut Slab) -> Option<*mut u8> {
         for i in 0..64 {
-            if slab.objects[i].compare_exchange(null_mut(), null_mut(), Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+            if (*slab).objects[i].compare_exchange(null_mut(), null_mut(), Ordering::SeqCst, Ordering::SeqCst).is_ok() {
                 let obj = (slab as *mut u8).add(i * self.size.load(Ordering::Acquire));
-                slab.inuse.fetch_add(1, Ordering::SeqCst);
+                (*slab).inuse.fetch_add(1, Ordering::SeqCst);
                 
-                if slab.inuse.load(Ordering::Acquire) == 64 {
+                if (*slab).inuse.load(Ordering::Acquire) == 64 {
                     // Move to full slabs
                     self.move_to_full(slab);
                 }
@@ -419,21 +419,22 @@ impl VirtualMemoryManager {
     /// Create new page table
     pub fn create_page_table(&self) -> *mut PageTable {
         unsafe {
-            let pt = core::alloc::alloc_zeroed(core::alloc::Layout::new::<PageTable>()) as *mut PageTable;
+            let layout = core::alloc::Layout::new::<PageTable>();
+            let pt = alloc::alloc::alloc_zeroed(layout) as *mut PageTable;
             pt
         }
     }
 
     /// Map virtual to physical address
-    pub fn map_page(&self, virt: usize, phys: usize, flags: PageFlags) {
+    pub fn map_page(&self, virt: usize, phys: usize, flags: usize) {
         unsafe {
             let pt = self.page_tables.load(Ordering::Acquire);
             if !pt.is_null() {
                 let index = (virt >> 12) & 0x1FF;
                 (*pt).entries[index].address.store(phys >> 12, Ordering::SeqCst);
                 (*pt).entries[index].present.store(1, Ordering::SeqCst);
-                (*pt).entries[index].writable.store((flags & PageFlags::WRITABLE) as usize, Ordering::SeqCst);
-                (*pt).entries[index].user.store((flags & PageFlags::USER) as usize, Ordering::SeqCst);
+                (*pt).entries[index].writable.store(flags & PageFlags::WRITABLE, Ordering::SeqCst);
+                (*pt).entries[index].user.store(flags & PageFlags::USER, Ordering::SeqCst);
             }
         }
     }
@@ -464,4 +465,128 @@ impl PageFlags {
 pub enum AllocError {
     InvalidOrder,
     OutOfMemory,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum BootMemoryType {
+    Usable = 1,
+    Reserved = 2,
+    AcpiReclaimable = 3,
+    Nvs = 4,
+    KernelCode = 5,
+    KernelData = 6,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+pub struct BootMemoryMapEntry {
+    pub base_addr: u64,
+    pub length: u64,
+    pub entry_type: BootMemoryType,
+}
+
+pub struct BitmapFrameAllocator<const BITMAP_SIZE: usize = 1024> {
+    pub bitmap: [u8; BITMAP_SIZE],
+    pub total_frames: usize,
+    pub free_frames: usize,
+}
+
+impl<const BITMAP_SIZE: usize> BitmapFrameAllocator<BITMAP_SIZE> {
+    pub const fn new() -> Self {
+        Self {
+            bitmap: [0xFF; BITMAP_SIZE], // All marked used by default
+            total_frames: BITMAP_SIZE * 8,
+            free_frames: 0,
+        }
+    }
+
+    /// Parse boot memory map and mark usable frames as free (0 in bitmap)
+    pub fn init_from_memory_map(&mut self, map: &[BootMemoryMapEntry]) {
+        // Reset bitmap to all used (1)
+        self.bitmap.fill(0xFF);
+        self.free_frames = 0;
+
+        for entry in map {
+            if entry.entry_type == BootMemoryType::Usable {
+                let start_frame = (entry.base_addr / PAGE_SIZE as u64) as usize;
+                let num_frames = (entry.length / PAGE_SIZE as u64) as usize;
+
+                for f in start_frame..(start_frame + num_frames) {
+                    if f < self.total_frames {
+                        let byte_idx = f / 8;
+                        let bit_idx = f % 8;
+                        if (self.bitmap[byte_idx] & (1 << bit_idx)) != 0 {
+                            self.bitmap[byte_idx] &= !(1 << bit_idx); // 0 = Free
+                            self.free_frames += 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Allocate a single 4KB physical page frame
+    pub fn alloc_frame(&mut self) -> Option<u64> {
+        for byte_idx in 0..BITMAP_SIZE {
+            if self.bitmap[byte_idx] != 0xFF {
+                for bit_idx in 0..8 {
+                    if (self.bitmap[byte_idx] & (1 << bit_idx)) == 0 {
+                        self.bitmap[byte_idx] |= 1 << bit_idx; // Mark used (1)
+                        self.free_frames -= 1;
+                        let frame_idx = byte_idx * 8 + bit_idx;
+                        return Some(frame_idx as u64 * PAGE_SIZE as u64);
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// Free a 4KB physical page frame
+    pub fn free_frame(&mut self, phys_addr: u64) {
+        let frame_idx = (phys_addr / PAGE_SIZE as u64) as usize;
+        if frame_idx < self.total_frames {
+            let byte_idx = frame_idx / 8;
+            let bit_idx = frame_idx % 8;
+            if (self.bitmap[byte_idx] & (1 << bit_idx)) != 0 {
+                self.bitmap[byte_idx] &= !(1 << bit_idx); // Mark free (0)
+                self.free_frames += 1;
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_boot_memory_map_and_bitmap_allocator() {
+        let mut allocator = BitmapFrameAllocator::<128>::new(); // 1024 frames total
+        let map = [
+            BootMemoryMapEntry {
+                base_addr: 0x0000,
+                length: 0x10000, // 64KB (16 frames) reserved
+                entry_type: BootMemoryType::Reserved,
+            },
+            BootMemoryMapEntry {
+                base_addr: 0x10000,
+                length: 0x40000, // 256KB (64 frames) usable
+                entry_type: BootMemoryType::Usable,
+            },
+        ];
+
+        allocator.init_from_memory_map(&map);
+        assert_eq!(allocator.free_frames, 64);
+
+        // Allocate first available frame (should be at 0x10000 = frame 16)
+        let frame1 = allocator.alloc_frame();
+        assert_eq!(frame1, Some(0x10000));
+        assert_eq!(allocator.free_frames, 63);
+
+        // Free frame back
+        allocator.free_frame(0x10000);
+        assert_eq!(allocator.free_frames, 64);
+    }
 }

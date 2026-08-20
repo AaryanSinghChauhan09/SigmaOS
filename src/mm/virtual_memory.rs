@@ -5,9 +5,11 @@
 // Enhanced with OpenBSD/FreeBSD W^X (Write XOR Execute) security, FreeBSD wired/pinned page protection,
 // and Linux kswapd-inspired active/inactive LRU page reclaimer scanning.
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Page size (4KB)
 const PAGE_SIZE: usize = 4096;
@@ -138,6 +140,7 @@ impl PageTableEntry {
 /// Page table (OOP: Page table object)
 #[repr(C)]
 pub struct PageTable {
+    pub base_virtual_address: VirtualAddress,
     pub entries: [Option<PageTableEntry>; 512],
     pub capability: PageTableCapability,
 }
@@ -170,8 +173,9 @@ impl PageTableCapability {
 }
 
 impl PageTable {
-    pub fn new(capability: PageTableCapability) -> Self {
+    pub fn new(base_virtual_address: VirtualAddress, capability: PageTableCapability) -> Self {
         PageTable {
+            base_virtual_address,
             entries: [None; 512],
             capability,
         }
@@ -182,7 +186,7 @@ impl PageTable {
             return Err(MemoryError::PermissionDenied);
         }
 
-        let index = (virtual_addr / PAGE_SIZE) % 512;
+        let index = ((virtual_addr - self.base_virtual_address) / PAGE_SIZE) % 512;
         let entry = PageTableEntry::new(physical_addr, flags);
         self.entries[index] = Some(entry);
         Ok(())
@@ -193,7 +197,7 @@ impl PageTable {
             return Err(MemoryError::PermissionDenied);
         }
 
-        let index = (virtual_addr / PAGE_SIZE) % 512;
+        let index = ((virtual_addr - self.base_virtual_address) / PAGE_SIZE) % 512;
         if let Some(ref entry) = self.entries[index] {
             // FreeBSD-style wired/pinned page protection check
             if entry.flags.is_wired {
@@ -209,7 +213,7 @@ impl PageTable {
             return Err(MemoryError::PermissionDenied);
         }
 
-        let index = (virtual_addr / PAGE_SIZE) % 512;
+        let index = ((virtual_addr - self.base_virtual_address) / PAGE_SIZE) % 512;
         if let Some(ref mut entry) = self.entries[index] {
             if entry.flags.is_wired && !flags.is_wired {
                 return Err(MemoryError::PermissionDenied);
@@ -222,8 +226,145 @@ impl PageTable {
     }
 
     pub fn get_entry(&self, virtual_addr: VirtualAddress) -> Option<&PageTableEntry> {
-        let index = (virtual_addr / PAGE_SIZE) % 512;
+        if virtual_addr < self.base_virtual_address {
+            return None;
+        }
+        let index = ((virtual_addr - self.base_virtual_address) / PAGE_SIZE) % 512;
         self.entries[index].as_ref()
+    }
+}
+
+/// Linux-style Page Translation Engine (Walking page tables / directory)
+pub struct LinearPageTranslator;
+
+impl LinearPageTranslator {
+    /// Performs virtual-to-physical address translation via page table lookup
+    pub unsafe fn translate_address(
+        page_tables: &[Option<NonNull<PageTable>>],
+        vaddr: VirtualAddress,
+    ) -> Result<PhysicalAddress, MemoryError> {
+        if !is_canonical_address(vaddr) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
+        let offset = vaddr % PAGE_SIZE;
+
+        for slot in page_tables {
+            if let Some(pt_ptr) = slot {
+                let pt = &*pt_ptr.as_ptr();
+                if let Some(entry) = pt.get_entry(vaddr) {
+                    if !entry.flags.present {
+                        return Err(MemoryError::NotMapped);
+                    }
+                    return Ok(entry.physical_address + offset);
+                }
+            }
+        }
+
+        Err(MemoryError::NotMapped)
+    }
+}
+
+// =========================================================================
+// Virtual Memory Address Relationship Subsystem (1-to-1, 1-to-N, N-to-N)
+// =========================================================================
+
+/// Memory mapping relationship type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageMappingRelationship {
+    /// 1-to-1: Single unique virtual page mapped directly to single physical frame
+    OneToOne,
+    /// 1-to-N: Single physical frame shared/mapped across N distinct virtual pages
+    OneToMany,
+    /// N-to-N: N virtual pages aliased to N physical frames (e.g., Copy-on-Write)
+    ManyToMany,
+}
+
+/// Page relationship tracking entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PageRelationshipEntry {
+    pub paddr: PhysicalAddress,
+    pub mapped_vaddrs: Vec<VirtualAddress>,
+    pub relationship: PageMappingRelationship,
+    pub is_cow: bool,
+}
+
+impl PageRelationshipEntry {
+    pub fn new(paddr: PhysicalAddress, vaddr: VirtualAddress) -> Self {
+        let mut vaddrs = Vec::new();
+        vaddrs.push(vaddr);
+        Self {
+            paddr,
+            mapped_vaddrs: vaddrs,
+            relationship: PageMappingRelationship::OneToOne,
+            is_cow: false,
+        }
+    }
+
+    pub fn add_mapping(&mut self, vaddr: VirtualAddress, is_cow: bool) {
+        if !self.mapped_vaddrs.contains(&vaddr) {
+            self.mapped_vaddrs.push(vaddr);
+        }
+        self.is_cow = is_cow;
+        if self.is_cow {
+            self.relationship = PageMappingRelationship::ManyToMany;
+        } else if self.mapped_vaddrs.len() > 1 {
+            self.relationship = PageMappingRelationship::OneToMany;
+        } else {
+            self.relationship = PageMappingRelationship::OneToOne;
+        }
+    }
+}
+
+pub struct PageRelationshipTracker {
+    pub mappings: Vec<PageRelationshipEntry>,
+}
+
+impl PageRelationshipTracker {
+    pub fn new() -> Self {
+        Self {
+            mappings: Vec::new(),
+        }
+    }
+
+    pub fn register_page_mapping(
+        &mut self,
+        paddr: PhysicalAddress,
+        vaddr: VirtualAddress,
+        is_cow: bool,
+    ) {
+        let mut found = false;
+        for entry in &mut self.mappings {
+            if entry.paddr == paddr {
+                entry.add_mapping(vaddr, is_cow);
+                found = true;
+                break;
+            }
+        }
+
+        if !found {
+            let mut entry = PageRelationshipEntry::new(paddr, vaddr);
+            if is_cow {
+                entry.is_cow = true;
+                entry.relationship = PageMappingRelationship::ManyToMany;
+            }
+            self.mappings.push(entry);
+        }
+    }
+
+    pub fn get_relationship(&self, paddr: PhysicalAddress) -> Option<PageMappingRelationship> {
+        for entry in &self.mappings {
+            if entry.paddr == paddr {
+                return Some(entry.relationship);
+            }
+        }
+        None
+    }
+}
+
+impl Default for PageRelationshipTracker {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -466,23 +607,30 @@ impl SimpleVirtualMemoryManager {
         }
 
         let region = MemoryRegion::new(start, start + size, permissions, MemoryRegionCapability::full());
-        let region_ptr = alloc(mem::size_of::<MemoryRegion>()) as *mut MemoryRegion;
+        let region_box = Box::new(region);
+        let region_ptr = Box::into_raw(region_box);
 
-        if region_ptr.is_null() {
-            return Err(MemoryError::OutOfMemory);
-        }
-
-        core::ptr::write(region_ptr, region);
         self.memory_regions.push(Some(NonNull::new_unchecked(region_ptr)));
 
         Ok(NonNull::new_unchecked(region_ptr))
     }
 
     unsafe fn find_region(&self, addr: VirtualAddress) -> Option<&MemoryRegion> {
-        for i in 0..self.memory_regions.len {
-            let slot = &*self.memory_regions.data.add(i);
-            if let Some(region_ptr) = *slot {
-                let region = &*region_ptr.as_ptr();
+        for slot in &self.memory_regions {
+            if let Some(region_ptr) = slot {
+                let region = region_ptr.as_ref();
+                if region.contains(addr) {
+                    return Some(region);
+                }
+            }
+        }
+        None
+    }
+
+    unsafe fn find_region_mut(&mut self, addr: VirtualAddress) -> Option<&mut MemoryRegion> {
+        for slot in &mut self.memory_regions {
+            if let Some(ref mut region_ptr) = slot {
+                let region = region_ptr.as_mut();
                 if region.contains(addr) {
                     return Some(region);
                 }
@@ -519,12 +667,10 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
 
         unsafe {
             let mut index = None;
-            for i in 0..self.memory_regions.len {
-                let slot = &*self.memory_regions.data.add(i);
-                if let Some(region_ptr) = *slot {
-                    let region = &*region_ptr.as_ptr();
+            for (i, slot) in self.memory_regions.iter().enumerate() {
+                if let Some(region_ptr) = slot {
+                    let region = region_ptr.as_ref();
                     if region.start == addr {
-                        // Check FreeBSD-style wired/pinned lock
                         if region.permissions.is_wired {
                             return Err(MemoryError::WiredPageLocked);
                         }
@@ -535,12 +681,9 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             }
 
             if let Some(i) = index {
-                let slot = &mut *self.memory_regions.data.add(i);
-                if let Some(region_ptr) = *slot {
-                    core::ptr::drop_in_place(region_ptr.as_ptr());
-                    free(region_ptr.as_ptr() as *mut u8);
+                if let Some(region_ptr) = self.memory_regions[i].take() {
+                    let _ = Box::from_raw(region_ptr.as_ptr());
                 }
-                *slot = None;
                 Ok(())
             } else {
                 Err(MemoryError::InvalidAddress)
@@ -579,20 +722,30 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             };
 
             for offset in (0..aligned_size).step_by(PAGE_SIZE) {
-                let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
+                let page_table_base = (virtual_addr + offset) & !(PAGE_SIZE * 512 - 1);
                 
-                while page_table_index >= self.page_tables.len {
-                    let page_table = PageTable::new(PageTableCapability::full());
-                    let pt_ptr = alloc(mem::size_of::<PageTable>()) as *mut PageTable;
-                    if pt_ptr.is_null() {
-                        return Err(MemoryError::OutOfMemory);
+                let mut pt_idx = None;
+                for (idx, slot) in self.page_tables.iter().enumerate() {
+                    if let Some(pt_ptr) = slot {
+                        if pt_ptr.as_ref().base_virtual_address == page_table_base {
+                            pt_idx = Some(idx);
+                            break;
+                        }
                     }
-                    core::ptr::write(pt_ptr, page_table);
-                    self.page_tables.push(Some(NonNull::new_unchecked(pt_ptr)));
                 }
 
-                let slot = &mut *self.page_tables.data.add(page_table_index);
-                if let Some(pt_ptr) = *slot {
+                let idx = match pt_idx {
+                    Some(i) => i,
+                    None => {
+                        let page_table = PageTable::new(page_table_base, PageTableCapability::full());
+                        let pt_box = Box::new(page_table);
+                        let pt_ptr = Box::into_raw(pt_box);
+                        self.page_tables.push(Some(NonNull::new_unchecked(pt_ptr)));
+                        self.page_tables.len() - 1
+                    }
+                };
+
+                if let Some(pt_ptr) = self.page_tables[idx] {
                     let page_table = &mut *pt_ptr.as_ptr();
                     page_table.map_page(virtual_addr + offset, physical_addr + offset, flags)?;
                 }
@@ -619,13 +772,13 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
 
                 let size = region.size();
                 for offset in (0..size).step_by(PAGE_SIZE) {
-                    let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
-                    
-                    if page_table_index < self.page_tables.len {
-                        let slot = &mut *self.page_tables.data.add(page_table_index);
-                        if let Some(pt_ptr) = *slot {
+                    let target_vaddr = virtual_addr + offset;
+                    for slot in &self.page_tables {
+                        if let Some(pt_ptr) = slot {
                             let page_table = &mut *pt_ptr.as_ptr();
-                            page_table.unmap_page(virtual_addr + offset)?;
+                            if page_table.get_entry(target_vaddr).is_some() {
+                                let _ = page_table.unmap_page(target_vaddr);
+                            }
                         }
                     }
                 }
@@ -647,38 +800,38 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
         }
 
         unsafe {
-            if let Some(region) = self.find_region(virtual_addr) {
+            let size = if let Some(region) = self.find_region_mut(virtual_addr) {
                 region.change_permissions(permissions)?;
+                region.size()
+            } else {
+                return Err(MemoryError::NotMapped);
+            };
 
-                let flags = PageTableEntryFlags {
-                    present: true,
-                    writable: permissions.write,
-                    user_accessible: true,
-                    write_through: false,
-                    cache_disabled: false,
-                    accessed: false,
-                    dirty: false,
-                    global: false,
-                    is_wired: permissions.is_wired,
-                };
+            let flags = PageTableEntryFlags {
+                present: true,
+                writable: permissions.write,
+                user_accessible: true,
+                write_through: false,
+                cache_disabled: false,
+                accessed: false,
+                dirty: false,
+                global: false,
+                is_wired: permissions.is_wired,
+            };
 
-                let size = region.size();
-                for offset in (0..size).step_by(PAGE_SIZE) {
-                    let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
-                    
-                    if page_table_index < self.page_tables.len {
-                        let slot = &mut *self.page_tables.data.add(page_table_index);
-                        if let Some(pt_ptr) = *slot {
-                            let page_table = &mut *pt_ptr.as_ptr();
-                            page_table.protect_page(virtual_addr + offset, flags)?;
+            for offset in (0..size).step_by(PAGE_SIZE) {
+                let target_vaddr = virtual_addr + offset;
+                for slot in &self.page_tables {
+                    if let Some(pt_ptr) = slot {
+                        let page_table = &mut *pt_ptr.as_ptr();
+                        if page_table.get_entry(target_vaddr).is_some() {
+                            let _ = page_table.protect_page(target_vaddr, flags);
                         }
                     }
                 }
-
-                Ok(())
-            } else {
-                Err(MemoryError::NotMapped)
             }
+
+            Ok(())
         }
     }
 
@@ -696,6 +849,23 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                 Some(info)
             } else {
                 None
+            }
+        }
+    }
+}
+
+impl Drop for SimpleVirtualMemoryManager {
+    fn drop(&mut self) {
+        unsafe {
+            for slot in &mut self.page_tables {
+                if let Some(pt_ptr) = slot.take() {
+                    let _ = Box::from_raw(pt_ptr.as_ptr());
+                }
+            }
+            for slot in &mut self.memory_regions {
+                if let Some(region_ptr) = slot.take() {
+                    let _ = Box::from_raw(region_ptr.as_ptr());
+                }
             }
         }
     }
@@ -755,79 +925,6 @@ impl Default for SovereignPageReclaimer {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions / Test Shims
-#[cfg(not(test))]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-#[no_mangle]
-pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
-}
-
-#[cfg(test)]
-#[no_mangle]
-pub unsafe extern "C" fn free(ptr: *mut u8) {
-    if !ptr.is_null() {
-        std::alloc::dealloc(ptr, std::alloc::Layout::from_size_align_unchecked(1, 8));
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -868,7 +965,7 @@ mod tests {
 
     #[test]
     fn test_page_table_wired_lock_protection() {
-        let mut pt = PageTable::new(PageTableCapability::full());
+        let mut pt = PageTable::new(0x0000_0000_1000_0000, PageTableCapability::full());
 
         let mut flags = PageTableEntryFlags::new();
         flags.present = true;
@@ -884,7 +981,7 @@ mod tests {
 
     #[test]
     fn test_page_reclaimer_aging_scan() {
-        let mut pt = PageTable::new(PageTableCapability::full());
+        let mut pt = PageTable::new(0x0000_0000_1000_0000, PageTableCapability::full());
 
         let mut flags = PageTableEntryFlags::new();
         flags.present = true;
@@ -908,5 +1005,42 @@ mod tests {
             let reclaimed_pass2 = reclaimer.scan_and_reclaim(&mut pt_array);
             assert_eq!(reclaimed_pass2, 1);
         }
+    }
+
+    #[test]
+    fn test_linear_page_translator() {
+        let mut pt = PageTable::new(0x0000_0000_1000_0000, PageTableCapability::full());
+        let mut flags = PageTableEntryFlags::new();
+        flags.present = true;
+
+        unsafe {
+            pt.map_page(0x0000_0000_1000_0000, 0x200000, flags).unwrap();
+        }
+
+        let pt_ptr = NonNull::new(&mut pt as *mut PageTable).unwrap();
+        let pt_slice = [Some(pt_ptr)];
+
+        unsafe {
+            // Translate virtual address 0x1000_0123 -> physical address 0x2000_0123
+            let phys = LinearPageTranslator::translate_address(&pt_slice, 0x0000_0000_1000_0123).unwrap();
+            assert_eq!(phys, 0x0020_0123);
+        }
+    }
+
+    #[test]
+    fn test_page_relationship_cardinality() {
+        let mut tracker = PageRelationshipTracker::new();
+
+        // 1-to-1 Mapping
+        tracker.register_page_mapping(0x5000, 0x1000_0000, false);
+        assert_eq!(tracker.get_relationship(0x5000), Some(PageMappingRelationship::OneToOne));
+
+        // 1-to-N Mapping
+        tracker.register_page_mapping(0x5000, 0x2000_0000, false);
+        assert_eq!(tracker.get_relationship(0x5000), Some(PageMappingRelationship::OneToMany));
+
+        // N-to-N CoW Mapping
+        tracker.register_page_mapping(0x6000, 0x3000_0000, true);
+        assert_eq!(tracker.get_relationship(0x6000), Some(PageMappingRelationship::ManyToMany));
     }
 }

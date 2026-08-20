@@ -2,7 +2,12 @@
 // Exposes robust, memory-safe Rust alternatives to BusyBox, systemd, syslog, cron, sudo/doas, and man pages.
 // Aligns perfectly with the core Sovereign replacement table.
 
-use std::collections::{HashMap, HashSet};
+extern crate alloc;
+
+use alloc::collections::{BTreeMap as HashMap, BTreeSet as HashSet};
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Log Level for sigma-log
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
