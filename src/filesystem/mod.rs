@@ -6,6 +6,9 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
+pub mod geom;
+
+pub use geom::{GeomClass, GeomProvider, GeomConsumer, GeomAccessRights};
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,

@@ -29,7 +29,7 @@ impl BusyBoxAppletDispatcher {
     }
 
     fn register_default_applets(&mut self) {
-        self.register_applet("ls", |_args| {
+        self.register_applet("ls", |args| {
             Ok("applet [ls]: .  ..  bin  dev  etc  proc  sys  usr  var".to_string())
         });
 

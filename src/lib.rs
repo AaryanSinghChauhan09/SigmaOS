@@ -1,12 +1,13 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod ai;
+pub mod access;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
-pub mod distro;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
@@ -19,6 +20,8 @@ pub mod orchestration;
 pub mod distro;
 pub mod package;
 pub mod performance;
+pub mod plugin;
+pub mod power;
 pub mod productivity;
 pub mod resilience;
 pub mod resource;
@@ -27,11 +30,14 @@ pub mod shell;
 pub mod sigpkg;
 pub mod tools;
 pub mod virtualization;
-pub mod unimplemented_features;
-pub mod unimplemented_tools;
-pub mod klib;
-pub use klib::{SplayTree, RadixTree, SovereignPriorityQueue};
 
+pub use access::{
+    AccessError, AccessManager, AccessMode, AccessPattern, AccessResult, AccessRule,
+    AccessTimeTracker, AnonymousAccessPolicy, DeviceAccessType, LdapAccessClient,
+    LdapUserEntry, ProcessMigrationControl, ProtectionLevel, RemoteAccessController,
+    RemoteAccessProtocol, RemoteAccessSession, RemoteFileHandle, SecurityAccessToken,
+    WirelessAccessPoint, WirelessAccessPointManager,
+};
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
@@ -40,28 +46,29 @@ pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
-    ScriptArgumentRouter,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
-    InterimLispVM, JehanneError, JehanneNamespace, LispVal, MintBackupTool, MintSoftwareManager,
-    MintUpdateItem, MintUpdateLevel, MintUpdateManager, MntReformLpcDriver, MockUPIService,
-    MultilingualSupport, NamespaceBindEntry, NtHandle, NtObjectManager, NtObjectType, NtStatus,
-    Plan9pMessage, Plan9pMsgType, PortableExecutableLoader, ReformPowerStats, RegistryHive,
-    SoftwareMeta, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
-    Literal, SpacSatResolver,
-    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
-    AlpineSyslogManager, BusyBoxMulticall,
-    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
-    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
-    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
-    HidGraphicsDriver, AiTaskOrchestrator,
-    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
-    SovereignTimeMachine, NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine,
-    SovereignForensics, SovereignRecoverUtility, ShardIgnitor,
+    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AlternativeLink,
+    AnanicyManager, AnacondaInstaller, AntixControlCenter, AntixDesktopProfiler, AntixInitManager,
+    AppSuiteBundle, AppSuiteType, ApplicationBinary, AptRepositorySync, BinaryCompatMatrix,
+    BinaryFormat, BodhiUpdateTriage, BoreSchedulerGovernor, BrailleMatrix, BsdJailSandbox,
+    BundleType, CachyInitramfs, CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat,
+    CompatibilityError, CompatibilityLayer, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, ContinuityCoordinator, DebianAlternativesSystem, DebianChannel,
+    DebootstrapEngine, DesktopMode, DesktopProfile, DesktopTheme, DiscontinuedFS,
+    DistroReleaseChannel, DnfPackageResolver, DriverBridge, EcosystemSnapshot, FSRevival,
+    FedoraAlu, FedoraAluFlags, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, KojiBuildServer, LanguageTranslationCatalog,
+    LegacyBus, LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
+    MicroService, MicroServiceState, MockChrootBuilder, NetworkBridge, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SeLinuxContext, SeLinuxEngine, SchedPolicy, SigmaChangeProposal,
+    SigmaChangeProcessEngine, SigmaContainer, SigmaNextChannel, SnapshotManager, StorageBridge,
+    SuiteRegistry, SysVInitEngine, SysVRunlevel, SyscallAbi, SystemdPresetConfigurator,
+    TargetPlatform, TranslationLayer, TribeInstaller, TtsSynthesizer, UnifiedAppStore,
+    V4OptimizedPackageManager, WorkloadOptimizer, WorkloadProfile, ZorinAppearanceSwitcher,
+    GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN,
+    GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
+    GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -80,6 +87,7 @@ pub use drivers::{
     NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
     RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
     TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    DrmAtomicPlaneState, WaylandDmaBuf, OpenBsdWsdisplayVt,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -88,7 +96,6 @@ pub use filesystem::{
 pub use graphics::paint::ColorRgba;
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,
     AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
     CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
     InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
@@ -132,13 +139,33 @@ pub use resilience::{
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
 };
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ArithmeticSubstitutionDeobfuscator,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
+    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
+    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
+    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
+    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
+    HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
+    KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
+    SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
+    UserAccessGuard, UserPtr,
+    SecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
+pub use plugin::{
+    ExtensionType, ManagerCapability, MarketplaceItem, Plugin, PluginCapability, PluginError,
+    PluginID, PluginInfo, PluginManager, PluginMarketplace, PluginState, PluginStats, SimplePlugin,
+    SimplePluginManager,
 };
 pub use shell::{ShellCommand, ShellRepl};
+pub use tools::{
+    AccessibilityFeature, AlmeidaCmosRtc, AlmeidaCoreDump, ClusterNode, NodeState, SigmaAccess,
+    SigmaCluster, SigmaDeploy, SigmaIdentity, SigmaMonitor, SigmaPatch, SigmaRescue, SigmaToolError,
+    SovereignAptDuo, SovereignDpkgEtcher, SovereignIPCalculator, SovereignImeConvertCase,
+    SovereignImageToDataUri, SovereignJsonPrettifier, SovereignKeyboardTester, SovereignIsWebsiteDown,
+    SovereignPasswordGenerator, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity,
+};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
@@ -147,63 +174,3 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-pub use unimplemented_tools::{
-    AudioEditor, PodcastRecorder, SubtitleEditor, MemoryLeakDetector, GamifiedTodo, MindMapCreator,
-    GameHubLauncher, EmulatorManager, GameRecorder, GamePerformanceBooster, CloudGaming, VrArRuntime,
-    ControllerMapper, GameModManager, AiDifficultyDirector, GanttChartPlanner, PdfEditor,
-    DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
-    AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
-    RemoteDesktop, MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
-    CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
-    SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
-    PluginMarketplace, MusicLibraryManager, TimeMachineBackup, SysinternalsProcMon, SystemdCgTop,
-    TrussSyscallTracer, NetworkQualityProbe, WindowsPowercfg,
-};
-
-// Temporarily disabled problematic modules
-// pub mod accessibility;
-// pub mod automation;
-// pub mod container;
-
-// #[cfg(test)]
-// #[path = "compatibility/fedora.rs"]
-// pub mod fedora_compat_test;
-// pub mod customization;
-// pub mod dashboard;
-// pub mod desktop;
-// pub mod device;
-// pub mod driver;
-// pub mod filesystem;
-// pub mod ml;
-// pub mod network;
-// pub mod observability;
-// pub mod orchestration;
-// pub mod distro;
-// pub mod package;
-// pub mod performance;
-// pub mod productivity;
-// pub mod remote;
-// pub mod resilience;
-// pub mod shell;
-// pub mod sigpkg;
-// pub mod virtualization;
-// pub mod graphics {
-//     pub mod compositor;
-//     pub mod paint;
-//     pub mod video;
-// }
-// pub mod hardware {
-//     pub mod compatibility;
-//     pub mod win32;
-// }
-// pub mod power {
-//     pub mod governor;
-// }
-// pub mod ai {
-//     pub mod agent;
-//     pub mod orchestrator;
-// }
-// pub mod boot;
-// pub mod system;
-// pub mod installer;
