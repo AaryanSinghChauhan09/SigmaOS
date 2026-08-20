@@ -33,6 +33,7 @@ pub const INIT_PID: u64 = 1;
 pub enum ProcessState {
     Running,
     Runnable,
+    BlockedWaiting,
     Stopped,
     Traced,
     Zombie,
@@ -42,6 +43,18 @@ pub enum ProcessState {
     Parked,
     Seized,
     Frozen,
+}
+
+/// Task Workload Classification for OS Scheduling & Resource Allocation
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskWorkloadType {
+    CpuBound,
+    IoBound,
+    Interactive,
+    Batch,
+    RealTimePeriodic,
+    RealTimeAperiodic,
+    SystemKernelDaemon,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -275,5 +288,42 @@ impl Task {
 
     pub fn is_alive(&self) -> bool {
         !self.is_zombie()
+    }
+
+    pub fn workload_type(&self) -> TaskWorkloadType {
+        match self.policy {
+            SchedPolicy::Deadline | SchedPolicy::Fifo => TaskWorkloadType::RealTimePeriodic,
+            SchedPolicy::Batch => TaskWorkloadType::Batch,
+            SchedPolicy::Idle => TaskWorkloadType::Batch,
+            _ => {
+                if self.pid == INIT_PID || self.parent_pid == 0 {
+                    TaskWorkloadType::SystemKernelDaemon
+                } else if self.nivcsw > self.nvcsw * 2 {
+                    TaskWorkloadType::CpuBound
+                } else {
+                    TaskWorkloadType::Interactive
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_task_workload_classification() {
+        let mut t1 = Task::new(1, "systemd");
+        assert_eq!(t1.workload_type(), TaskWorkloadType::SystemKernelDaemon);
+
+        let mut t2 = Task::new(100, "ffmpeg");
+        t2.nivcsw = 1000;
+        t2.nvcsw = 10;
+        assert_eq!(t2.workload_type(), TaskWorkloadType::CpuBound);
+
+        let mut t3 = Task::new(101, "realtime_audio");
+        t3.policy = SchedPolicy::Fifo;
+        assert_eq!(t3.workload_type(), TaskWorkloadType::RealTimePeriodic);
     }
 }

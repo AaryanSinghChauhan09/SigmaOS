@@ -1,7 +1,6 @@
 // SigmaOS Network Stack Module
 pub mod analyzer;
 pub mod config;
-pub mod commands;
 pub mod enterprise;
 pub mod ring_buffer_stack;
 pub mod stack;
@@ -11,13 +10,18 @@ pub mod revival;
 pub mod tcp_udp;
 pub mod sync;
 pub mod torrent;
+pub mod pf_firewall;
+pub mod nftables;
+pub mod npf;
 
-pub use analyzer::{
-    AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,
-    ClearLinuxFlowLoadBalancer, ConnectionInfo, ConnectionState, GentooUseFlagsDissector,
-    KaliPacketFingerprinter, KaliSnoopAnalysis, NetworkTrafficAnalyzer, NixDeclarativeFilter,
-    Protocol, SecurityAnalysis, TrafficAlert, TrafficPacket, TrafficStatistics,
-};
+pub use npf::{NpfFirewallEngine, NpfFilterAction, NpfDirection, NpfPacket, NpfStateRule};
+
+// pub use analyzer::{
+//     AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,
+//     ClearLinuxFlowLoadBalancer, ConnectionInfo, ConnectionState, GentooUseFlagsDissector,
+//     KaliPacketFingerprinter, KaliSnoopAnalysis, NetworkTrafficAnalyzer, NixDeclarativeFilter,
+//     Protocol, SecurityAnalysis, TrafficAlert, TrafficPacket, TrafficStatistics,
+// };
 pub use config::{
     NetworkConfigManager, NetworkInterface, InterfaceType, InterfaceStatus,
     DnsConfig, RouteEntry, NetworkError,
@@ -30,7 +34,3 @@ pub use ring_buffer_stack::{
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use sync::{CloudSyncManager, ConflictResolution, SyncConfig, SyncCredentials, SyncError, SyncItem, SyncItemType, SyncProvider, SyncResult, SyncStatus};
 pub use torrent::{PeerInfo, TorrentClient, TorrentError, TorrentState};
-pub use commands::{
-    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
-    SocketStatsCommand, SocketStatsEntry, UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
-};
