@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 //! SigmaOS Systemd-Analyze Compatibility
 //! Boot time analysis (systemd-analyze command)
 //! Zero external dependencies
