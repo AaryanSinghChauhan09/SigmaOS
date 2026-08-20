@@ -257,7 +257,7 @@ mod tests {
     fn test_session_accounting_wtmp_btmp() {
         let mut engine = SovereignAccountingEngine::new();
 
-        let login = UtmpSessionRecord::new(SessionType::UserProcess, 1001, "tty1", "aaryan", "localhost", 1700000000);
+        let login = UtmpSessionRecord::new(SessionType::UserProcess, 1001, "tty1", "aaryan", "local_console", 1700000000);
         let failed = UtmpSessionRecord::new(SessionType::FailedLogin, 1002, "tty2", "attacker", "192.168.1.50", 1700000005);
 
         engine.record_session_event(login);

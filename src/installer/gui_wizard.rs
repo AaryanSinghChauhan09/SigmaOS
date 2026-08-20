@@ -603,7 +603,9 @@ mod tests {
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
         wizard.select_disk("/dev/nvme0n1");
-        wizard.add_user_account(UserAccount::new("sovereign", "secret123"));
+        // Generate a secure random password for testing
+        let test_password = format!("test_pass_{}", std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos());
+        wizard.add_user_account(UserAccount::new("sovereign", &test_password));
 
         let summary = wizard.get_installation_summary();
         assert_eq!(summary.target_disk, "/dev/nvme0n1");

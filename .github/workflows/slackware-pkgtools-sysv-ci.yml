@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   slackware-verification:
     name: Slackware pkgtools & SlackBuilds Package Verification
@@ -14,9 +17,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
 
       - name: Verify Slackware SysV Init & Pkgtools Subsystems
         run: |

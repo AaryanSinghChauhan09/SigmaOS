@@ -246,7 +246,7 @@ static void test_suite_security() {
     // sigma-jail
     int jail_id = SigmaJailIsolation::create_jail("web_jail", "/vfs/jails/web");
     SIGMA_ASSERT(jail_id == 1, "sigma_jail_create(): VFS root pivoted");
-    SIGMA_ASSERT(SigmaJailIsolation::is_network_isolated(jail_id), "sigma_jail_create(): network stack isolated to localhost");
+    SIGMA_ASSERT(SigmaJailIsolation::is_network_isolated(jail_id), "sigma_jail_create(): network stack isolated");
 
     // sigma-shield
     SIGMA_ASSERT(!SigmaShieldPacketFilter::filter_packet("10.0.0.99", false), "sigma_shield_filter_packet(): blocks spoofed src IP");

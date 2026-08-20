@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   alpine-musl-build:
     name: Alpine musl & BusyBox Zero-Dependency Build
@@ -21,6 +24,8 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Test Atomic Test Harness under musl
         run: |
