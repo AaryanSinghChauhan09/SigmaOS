@@ -12,12 +12,43 @@ pub struct CapabilityToken {
     pub permissions: u64,
 }
 
+impl CapabilityToken {
+    pub fn new() -> Self {
+        CapabilityToken {
+            bits: 0,
+            permissions: 0,
+        }
+    }
+
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            bits,
+            permissions: bits,
+        }
+    }
+    
+    pub fn with_permission(mut self, permission: u64) -> Self {
+        self.permissions |= permission;
+        self
+    }
+
+    pub fn bits(&self) -> u64 {
+        self.permissions
+    }
+
+    pub fn allow_network(self, _proto: &str, _port: u16) -> Self { self }
+    pub fn allow_read(self, _path: &str) -> Self { self }
+    pub fn allow_write(self, _path: &str) -> Self { self }
+    pub fn allow_exec(self) -> Self { self }
+    pub fn allow_ipc(self) -> Self { self }
+}
 impl Default for CapabilityToken {
     fn default() -> Self {
         Self::new()
     }
 }
 
+<<<<<<< HEAD
 impl CapabilityToken {
     pub fn with_permission(mut self, permission: u64) -> Self {
         self.bits |= permission;
@@ -198,3 +229,30 @@ mod tests {
         assert_eq!(port, 443);
     }
 }
+=======
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    NetworkTcp,
+    NetworkUdp,
+    Ipc,
+}
+
+pub struct CapabilityGate {
+    pub token: CapabilityToken,
+}
+
+impl CapabilityGate {
+    pub fn new() -> Self {
+        CapabilityGate {
+            token: CapabilityToken::new(),
+        }
+    }
+
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.token = token;
+    }
+}
+>>>>>>> origin/fix/sigmaos-core-compilation-and-trait-alignment-16354210402009246066

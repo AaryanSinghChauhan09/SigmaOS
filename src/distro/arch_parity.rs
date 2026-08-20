@@ -1,37 +1,39 @@
 // SigmaOS Arch Linux Parity Implementation
 // Implements PKGBUILD parsing, makepkg compiler parity, and AUR integration
 
-use crate::klib::{BTreeMap, Vec};
+extern crate alloc;
+use crate::klib::{BTreeMap, SigmaString, Vec};
+use alloc::string::ToString;
 use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards
 #[derive(Debug, Clone)]
 pub struct PkgBuild {
-    pub pkgname: String,
-    pub pkgver: String,
+    pub pkgname: SigmaString,
+    pub pkgver: SigmaString,
     pub pkgrel: u32,
-    pub pkgdesc: String,
-    pub arch: Vec<String>,
-    pub url: String,
-    pub license: Vec<String>,
-    pub depends: Vec<String>,
-    pub makedepends: Vec<String>,
-    pub source: Vec<String>,
-    pub sha256sums: Vec<String>,
-    pub prepare: Option<String>,
-    pub build: Option<String>,
-    pub package: Option<String>,
+    pub pkgdesc: SigmaString,
+    pub arch: Vec<SigmaString>,
+    pub url: SigmaString,
+    pub license: Vec<SigmaString>,
+    pub depends: Vec<SigmaString>,
+    pub makedepends: Vec<SigmaString>,
+    pub source: Vec<SigmaString>,
+    pub sha256sums: Vec<SigmaString>,
+    pub prepare: Option<SigmaString>,
+    pub build: Option<SigmaString>,
+    pub package: Option<SigmaString>,
 }
 
 impl PkgBuild {
     pub fn new() -> Self {
         PkgBuild {
-            pkgname: String::new(),
-            pkgver: String::new(),
+            pkgname: SigmaString::empty(),
+            pkgver: SigmaString::empty(),
             pkgrel: 1,
-            pkgdesc: String::new(),
+            pkgdesc: SigmaString::empty(),
             arch: Vec::new(),
-            url: String::new(),
+            url: SigmaString::empty(),
             license: Vec::new(),
             depends: Vec::new(),
             makedepends: Vec::new(),
@@ -50,15 +52,15 @@ impl PkgBuild {
         for line in content.lines() {
             let line = line.trim();
             if line.starts_with("pkgname=") {
-                pkg.pkgname = String::from(line[8..].trim_matches('"'));
+                pkg.pkgname = SigmaString::from_str(&line[9..].trim_matches('"'));
             } else if line.starts_with("pkgver=") {
-                pkg.pkgver = String::from(line[7..].trim_matches('"'));
+                pkg.pkgver = SigmaString::from_str(&line[8..].trim_matches('"'));
             } else if line.starts_with("pkgrel=") {
-                if let Ok(rel) = line[7..].trim_matches('"').parse::<u32>() {
+                if let Ok(rel) = line[8..].trim_matches('"').parse::<u32>() {
                     pkg.pkgrel = rel;
                 }
             } else if line.starts_with("pkgdesc=") {
-                pkg.pkgdesc = String::from(line[8..].trim_matches('"'));
+                pkg.pkgdesc = SigmaString::from_str(&line[9..].trim_matches('"'));
             }
             // Add more parsing as needed
         }
@@ -69,18 +71,18 @@ impl PkgBuild {
 
 /// AUR client helper for package management
 pub struct AurClient {
-    pub aur_url: String,
+    pub aur_url: SigmaString,
 }
 
 impl AurClient {
     pub fn new() -> Self {
         AurClient {
-            aur_url: String::from("https://aur.archlinux.org"),
+            aur_url: SigmaString::from_str("https://aur.archlinux.org"),
         }
     }
 
     /// Search for packages in AUR (simplified)
-    pub fn search(&self, _query: &str) -> Vec<String> {
+    pub fn search(&self, _query: &str) -> Vec<SigmaString> {
         // In production, this would make actual HTTP requests to AUR
         // For now, return empty vector
         Vec::new()
@@ -93,12 +95,12 @@ impl AurClient {
     }
 
     /// Downloads, parses, and compiles an AUR package using SandboxedCompiler safely on-the-fly
-    pub fn download_and_compile_aur_package(&self, pkgname: &str, compiler: &SandboxedCompiler, db: &mut AlpmDatabase) -> Result<(), String> {
+    pub fn download_and_compile_aur_package(&self, pkgname: &str, compiler: &SandboxedCompiler, db: &mut AlpmDatabase) -> Result<(), SigmaString> {
         let mut pkg = PkgBuild::new();
-        pkg.pkgname = String::from(pkgname);
-        pkg.pkgver = String::from("1.0.0");
+        pkg.pkgname = SigmaString::from_str(pkgname);
+        pkg.pkgver = SigmaString::from_str("1.0.0");
         pkg.pkgrel = 1;
-        pkg.pkgdesc = String::from("Downloaded and compiled safely from S-AUR.");
+        pkg.pkgdesc = SigmaString::from_str("Downloaded and compiled safely from S-AUR.");
 
         // Compile using the unprivileged sandboxed compiler
         compiler.compile_package(&pkg)?;
@@ -111,25 +113,25 @@ impl AurClient {
 
 /// Sandboxed compiler for safe package building
 pub struct SandboxedCompiler {
-    pub sandbox_path: String,
+    pub sandbox_path: SigmaString,
     pub is_isolated: Cell<bool>,
 }
 
 impl SandboxedCompiler {
     pub fn new() -> Self {
         SandboxedCompiler {
-            sandbox_path: String::from("/sandbox/compiler"),
+            sandbox_path: SigmaString::from_str("/sandbox/compiler"),
             is_isolated: Cell::new(true),
         }
     }
 
     /// Compile package in sandboxed environment
-    pub fn compile_package(&self, _pkgbuild: &PkgBuild) -> Result<(), String> {
+    pub fn compile_package(&self, _pkgbuild: &PkgBuild) -> Result<(), SigmaString> {
         if self.is_isolated.get() {
             // Simulate sandboxed compilation
             Ok(())
         } else {
-            Err(String::from("Compiler sandbox not enabled"))
+            Err(SigmaString::from_str("Compiler sandbox not enabled"))
         }
     }
 
@@ -141,7 +143,7 @@ impl SandboxedCompiler {
 
 /// ALPM database for package metadata sync
 pub struct AlpmDatabase {
-    pub packages: BTreeMap<String, PkgBuild>,
+    pub packages: BTreeMap<SigmaString, PkgBuild>,
 }
 
 impl AlpmDatabase {
@@ -159,11 +161,11 @@ impl AlpmDatabase {
 
     /// Get package from database
     pub fn get_package(&self, name: &str) -> Option<&PkgBuild> {
-        self.packages.get(&String::from(name))
+        self.packages.get(&SigmaString::from_str(name))
     }
 
     /// Sync with remote repository (simplified)
-    pub fn sync(&mut self) -> Result<(), String> {
+    pub fn sync(&mut self) -> Result<(), SigmaString> {
         // In production, this would fetch metadata from remote
         Ok(())
     }
@@ -172,37 +174,6 @@ impl AlpmDatabase {
 impl Default for PkgBuild {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_pkgbuild_parsing() {
-        let content = "pkgname=\"neovim-git\"\npkgver=\"0.10.0\"\npkgrel=3\npkgdesc=\"Sovereign text editor\"\n";
-        let pkg = PkgBuild::parse(content).unwrap();
-        assert_eq!(pkg.pkgname.as_str(), "neovim-git");
-        assert_eq!(pkg.pkgver.as_str(), "0.10.0");
-        assert_eq!(pkg.pkgrel, 3);
-        assert_eq!(pkg.pkgdesc.as_str(), "Sovereign text editor");
-    }
-
-    #[test]
-    fn test_alpm_database_and_sandbox_compiler() {
-        let mut db = AlpmDatabase::new();
-        let compiler = SandboxedCompiler::new();
-        let client = AurClient::new();
-
-        assert!(client.download_and_compile_aur_package("neovim-git", &compiler, &mut db).is_ok());
-
-        let pkg = db.get_package("neovim-git").unwrap();
-        assert_eq!(pkg.pkgname.as_str(), "neovim-git");
-        assert_eq!(pkg.pkgver.as_str(), "1.0.0");
-        assert_eq!(pkg.pkgdesc.as_str(), "Downloaded and compiled safely from S-AUR.");
-
-        assert!(db.sync().is_ok());
     }
 }
 

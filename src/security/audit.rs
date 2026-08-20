@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 use core::mem;
 /// OOP-based Security Audit for SigmaOS
@@ -146,6 +144,13 @@ impl AuditLogger for SimpleAuditLogger {
         }
         Ok(())
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    Json,
+    PlainText,
+    Binary,
 }
 
 pub trait AuditPolicy {

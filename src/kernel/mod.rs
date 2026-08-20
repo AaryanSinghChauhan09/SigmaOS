@@ -1,26 +1,30 @@
 // SigmaOS Kernel Module
+// Core working components
+pub mod memory;
+pub mod scheduler;
+pub mod object;
+pub mod proc;
 pub mod architecture;
+pub mod structures;
+pub mod policy_mechanism;
+pub mod ipc;
+pub mod roundrobin;
+
+// Genode-style Component Tree Architecture
 pub mod breakthroughs;
 pub mod bus;
 pub mod component;
 pub mod generation_manager;
-pub mod ipc;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
-pub mod memory;
 pub mod meta;
 pub mod paging;
-pub mod policy_mechanism;
-pub mod roundrobin;
 pub mod sched;
-pub mod scheduler;
 pub mod subsystem;
 pub mod vmm_paging;
 pub mod processor_management;
 pub mod cpufreq;
-pub mod structures;
-pub mod object;
 
 pub use vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
 
@@ -36,14 +40,15 @@ pub use breakthroughs::{
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use policy_mechanism::{
-    FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel,
-    ProtectionDomain, ResourceBroker,
+    AdaptivePolicy, FastPathIpc, InterruptClass, InterruptMechanism, IoWaitProfile, KernelMechanism,
+    KernelPolicy, PolicyError, PolicyManager, PolicyMechanismCoordinator, PrivilegeLevel,
+    ProtectionDomain, ResourceBroker, SovereignMechanism,
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState};
 pub use structures::{
-    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
-    CpuContext, EdfTask, IrqlLevel, IrqlState, LcgRandom, LotteryTask,
+    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CpuArchitectureClass,
+    CircularDoublyLinkedList, CpuContext, EdfTask, IrqlLevel, IrqlState, LcgRandom, LotteryTask,
     SequencedSinglyLinkedList, SinglyLinkedList, SystemThread, ThreadState, WorkItem,
 };
 pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};

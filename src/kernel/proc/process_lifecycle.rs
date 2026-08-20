@@ -1,11 +1,6 @@
 // SigmaOS Advanced Process Control & Lifecycle Management
 // Absorbs Linux fork/exec/exit/waitpid, copy-on-write namespaces, BSD rlimits, Windows Priority Classes, and Orphan Re-parenting.
 
-#![no_std]
-
-#[cfg(test)]
-extern crate std;
-
 extern crate alloc;
 
 use alloc::string::String;
@@ -24,7 +19,7 @@ use std::collections::HashMap;
 #[cfg(test)]
 mod mock_scheduler {
     use core::time::Duration;
-    use alloc::string::String;
+    use std::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
     pub enum Priority {
         Idle = 0,

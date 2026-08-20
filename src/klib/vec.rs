@@ -53,6 +53,34 @@ impl<T> Vec<T> {
             }
         }
     }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe {
+            if self.data.is_null() {
+                [].iter()
+            } else {
+                core::slice::from_raw_parts(self.data, self.len).iter()
+            }
+        }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe {
+            if self.data.is_null() {
+                [].iter_mut()
+            } else {
+                core::slice::from_raw_parts_mut(self.data, self.len).iter_mut()
+            }
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
@@ -284,6 +312,7 @@ impl<T> Vec<T> {
     }
 }
 
+<<<<<<< HEAD
 impl<T: PartialEq> PartialEq for Vec<T> {
     fn eq(&self, other: &Self) -> bool {
         if self.len != other.len { return false; }
@@ -297,6 +326,94 @@ impl<T: PartialEq> PartialEq for Vec<T> {
 }
 
 impl<T: Eq> Eq for Vec<T> {}
+=======
+impl<T: PartialEq> Vec<T> {
+    pub fn contains(&self, x: &T) -> bool {
+        self.iter().any(|item| item == x)
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Debug::fmt(&**self, f)
+    }
+}
+
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Vec::new()
+    }
+}
+
+pub struct IntoIter<T> {
+    vec: Vec<T>,
+    idx: usize,
+}
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        if self.idx < self.vec.len {
+            let item = unsafe { core::ptr::read(self.vec.data.add(self.idx)) };
+            self.idx += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+impl<T> Drop for IntoIter<T> {
+    fn drop(&mut self) {
+        unsafe {
+            for i in self.idx..self.vec.len {
+                core::ptr::drop_in_place(self.vec.data.add(i));
+            }
+            self.vec.len = 0;
+        }
+    }
+}
+
+impl<T> IntoIterator for Vec<T> {
+    type Item = T;
+    type IntoIter = IntoIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIter { vec: self, idx: 0 }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
 
 impl<T> FromIterator<T> for Vec<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
@@ -318,6 +435,14 @@ impl<T: Clone> From<&[T]> for Vec<T> {
     }
 }
 
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
 
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
@@ -408,6 +533,7 @@ impl<T> Drop for Vec<T> {
         }
     }
 }
+<<<<<<< HEAD
 
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]

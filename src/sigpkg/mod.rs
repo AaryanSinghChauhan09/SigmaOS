@@ -9,12 +9,14 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod zero_alloc_resolver;
+pub mod declarative_build;
+pub mod spec;
+pub mod universal_adapter;
+pub mod universal_oop_system;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-pub use debian_defeater::{
-    SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox,
-    SovereignMirrorSelector,
-};
+pub use debian_defeater::{SovereignMirrorSelector, SovereignTransactionManager, SovereignSandboxEnforcer, SovereignDeltaGenerator, TransactionStatus};
 pub use spec::{
     AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
@@ -38,7 +40,7 @@ pub use universal_oop_system::{
     IPackage, IPackageParser, PackageFormat, PackageMetadata,
     PackageParserFactory, UniversalPackageManager,
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError, InstallError, HookError,
+    UserDefinedHook, ParseError as OopParseError, InstallError, HookError,
 };
 
 /// Package version using SemVer
@@ -47,6 +49,12 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {
@@ -129,7 +137,7 @@ impl Package {
 }
 
 /// Package dependency
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,

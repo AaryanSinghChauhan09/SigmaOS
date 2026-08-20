@@ -17,11 +17,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::collections::HashMap;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::BTreeMap;
-
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

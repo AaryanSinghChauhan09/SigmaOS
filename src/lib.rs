@@ -17,7 +17,6 @@ pub mod ml;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod productivity;
 pub mod remote;
@@ -152,7 +151,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use remote::{

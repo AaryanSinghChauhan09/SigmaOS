@@ -1,5 +1,7 @@
 pub mod profiler;
 pub mod mglru;
+pub mod cachy_opt;
+pub mod smart_optimizer;
 pub mod io_uring;
 pub mod io_scheduler;
 pub mod network_bbr;
@@ -12,8 +14,13 @@ pub use io_uring::{IoUring, SubmissionQueueEntry, CompletionQueueEntry, IoOpcode
 pub use io_scheduler::{AdaptiveIOScheduler, DeviceType, IOSchedulerPolicy, IORequest};
 pub use network_bbr::{BbrEngine, BbrState};
 pub use eevdf::{EevdfScheduler, EevdfTask, MAX_SCHED_TASKS};
-pub use zero_copy_ipc::{
-    CpuInstructionExtension, IPCError, IpcError, ProcessProfile, SchedInstruction, SchedOpcode,
-    SimdOptimizer, SovereignSimdOptimizer, UdfSchedVm, VmPerformanceMetrics, ZeroCopyMetrics,
-    ZeroCopyQueue, QUEUE_SIZE,
+pub use zero_copy_ipc::{ZeroCopyQueue, IPCError, QUEUE_SIZE};
+pub use cachy_opt::{
+    BoreScheduler, AnanicyRule, AnanicyCppDaemon, UltraKernelSamepageMerger,
+    X86v3v4OptimizationDetector, CachyKernelManager, IoSchedClass, PhysicalPageFrame,
+};
+pub use smart_optimizer::{
+    CpuPriorityOptimizer, RamDefragmenter, IoPriorityOptimizer, IoTaskPriority,
+    SmartPerformanceProfile, PerformanceProfileRule, GlarySmartRule, SmartResourceOptimizer,
+    GLOBAL_SMART_OPTIMIZER, GLOBAL_GLARY_RULE,
 };
