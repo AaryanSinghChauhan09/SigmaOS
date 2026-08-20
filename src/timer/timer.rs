@@ -238,7 +238,6 @@ pub struct IoctlRequest {
 pub struct SovereignApcDpcEngine {
     pub apc_queue: Vec<ApcObject>,
     pub dpc_queue: Vec<DpcObject>,
-    pub completed_count: usize,
 }
 
 impl Default for SovereignApcDpcEngine {
@@ -252,7 +251,6 @@ impl SovereignApcDpcEngine {
         SovereignApcDpcEngine {
             apc_queue: Vec::new(),
             dpc_queue: Vec::new(),
-            completed_count: 0,
         }
     }
 
@@ -274,7 +272,6 @@ impl SovereignApcDpcEngine {
             (dpc.dpc_routine)(dpc.context1, dpc.context2);
             count += 1;
         }
-        self.completed_count += count;
         count
     }
 
@@ -291,7 +288,6 @@ impl SovereignApcDpcEngine {
                 i += 1;
             }
         }
-        self.completed_count += count;
         count
     }
 }

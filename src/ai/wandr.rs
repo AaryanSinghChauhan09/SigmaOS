@@ -1,10 +1,7 @@
 /// WANDR (Wide And Deep Research) Agent & Benchmark Engine for SigmaOS
 /// Replicates the design, features, metrics, and core principles of Perplexity AI's WANDR research benchmark
 /// Solves structured, high-volume information work requiring broad discovery (wide), systematic extraction, disambiguation, and auditable synthesis (deep).
-
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+use crate::klib::Vec;
 
 #[derive(Debug, Clone)]
 pub struct WandrTask {

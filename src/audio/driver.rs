@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use crate::klib::Vec;
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements audio device management and playback
@@ -116,8 +115,8 @@ impl AudioManager for SimpleAudioManager {
     }
 
     fn get_default_playback(&self) -> Option<&dyn AudioDevice> {
-        for i in 0..self.devices.len() {
-            if let Some(ref device) = self.devices[i] {
+        for device_option in &self.devices {
+            if let Some(ref device) = *device_option {
                 if device.audio_type() == AudioType::Playback
                     || device.audio_type() == AudioType::Duplex
                 {
@@ -129,8 +128,8 @@ impl AudioManager for SimpleAudioManager {
     }
 
     fn get_default_capture(&self) -> Option<&dyn AudioDevice> {
-        for i in 0..self.devices.len() {
-            if let Some(ref device) = self.devices[i] {
+        for device_option in &self.devices {
+            if let Some(ref device) = *device_option {
                 if device.audio_type() == AudioType::Capture
                     || device.audio_type() == AudioType::Duplex
                 {
@@ -143,8 +142,8 @@ impl AudioManager for SimpleAudioManager {
 
     fn list_devices(&self) -> Vec<AudioDeviceID> {
         let mut ids = Vec::new();
-        for i in 0..self.devices.len() {
-            if let Some(ref device) = self.devices[i] {
+        for device_option in &self.devices {
+            if let Some(ref device) = *device_option {
                 ids.push(device.id());
             }
         }
@@ -188,9 +187,9 @@ impl AudioMixer for SimpleAudioMixer {
     }
 
     fn get_volume(&self, device_id: AudioDeviceID) -> u8 {
-        for i in 0..self.volumes.len() {
-            if self.volumes[i].0 == device_id {
-                return self.volumes[i].1.load(Ordering::SeqCst) as u8;
+        for &(id, ref volume, _) in &self.volumes {
+            if id == device_id {
+                return volume.load(Ordering::SeqCst) as u8;
             }
         }
         100

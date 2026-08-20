@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use crate::klib::Vec;
 /// Open-Source Absorption and Synchronization Subsystem for SigmaOS
 /// Implements Pledge/Unveil sandboxing, Post-Quantum Cryptography secure channels,
 /// DPLL SAT-solving package dependency resolvers, and Content-Addressed Storage.

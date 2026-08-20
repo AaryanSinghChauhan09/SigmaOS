@@ -1,8 +1,8 @@
 // SigmaOS VESA Framebuffer Driver
 // Hardware abstraction for VESA BIOS extensions + PeripheralDevice OOP integration
 
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice as PeripheralDeviceTrait, PowerState};
-use crate::security::capability::CapabilityToken;
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use crate::security::CapabilityToken;
 
 /// VESA mode info
 #[derive(Debug, Clone)]
@@ -19,13 +19,10 @@ pub struct VesaDriver {
     pub mode_info: VesaModeInfo,
     pub capabilities: CapabilityToken,
     pub current_mode: u16,
-    pub refresh_rate_hz: u32,
-    pub color_depth: u32,
-    pub aspect_ratio: &'static str,
-    pub double_buffered: bool,
-    pub back_buffer: std::sync::Mutex<Vec<u32>>, // thread-safe Mutex
+
+    // Double buffering support inspired by Linux fbdev
     pub back_buffer_active: bool,
-    pub device_id: u32,
+    pub back_buffer: Vec<u32>,
 }
 
 impl VesaDriver {
@@ -40,25 +37,13 @@ impl VesaDriver {
             },
             capabilities: CapabilityToken::new(),
             current_mode: 0,
-            refresh_rate_hz: 60,
-            color_depth: 32,
-            aspect_ratio: "4:3",
-            double_buffered: true,
-            back_buffer: std::sync::Mutex::new(vec![0; 1024 * 768]),
             back_buffer_active: false,
-            device_id: 3,
+            back_buffer: Vec::new(),
         }
     }
 
     pub fn with_mode(width: u32, height: u32, bpp: u32) -> Self {
         let pitch = width * (bpp / 8);
-        let aspect_ratio = if width * 9 == height * 16 {
-            "16:9"
-        } else if width * 10 == height * 16 {
-            "16:10"
-        } else {
-            "4:3"
-        };
         Self {
             mode_info: VesaModeInfo {
                 width,
@@ -69,26 +54,9 @@ impl VesaDriver {
             },
             capabilities: CapabilityToken::new(),
             current_mode: 0,
-            refresh_rate_hz: 60,
-            color_depth: bpp,
-            aspect_ratio,
-            double_buffered: true,
-            back_buffer: std::sync::Mutex::new(vec![0; (width * height) as usize]),
             back_buffer_active: false,
-            device_id: 3,
+            back_buffer: Vec::new(),
         }
-    }
-
-    pub fn set_refresh_rate(&mut self, rate: u32) {
-        self.refresh_rate_hz = rate;
-    }
-
-    pub fn set_color_depth(&mut self, depth: u32) {
-        self.color_depth = depth;
-    }
-
-    pub fn get_aspect_ratio(&self) -> &'static str {
-        self.aspect_ratio
     }
 
     pub fn initialize(&mut self) -> Result<(), VesaError> {
@@ -128,7 +96,7 @@ impl VesaDriver {
         // Resize back buffer if active
         if self.back_buffer_active {
             let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
-            self.back_buffer.lock().unwrap().resize(total_pixels, 0);
+            self.back_buffer.resize(total_pixels, 0);
         }
 
         Ok(())
@@ -138,13 +106,13 @@ impl VesaDriver {
     pub fn enable_double_buffering(&mut self) {
         self.back_buffer_active = true;
         let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
-        self.back_buffer.lock().unwrap().resize(total_pixels, 0);
+        self.back_buffer.resize(total_pixels, 0);
     }
 
     /// Disables double-buffering backing storage
     pub fn disable_double_buffering(&mut self) {
         self.back_buffer_active = false;
-        self.back_buffer.lock().unwrap().clear();
+        self.back_buffer.clear();
     }
 
     /// Swaps the simulated back buffer elements onto the active hardware framebuffer
@@ -177,15 +145,6 @@ impl VesaDriver {
             return Err(VesaError::OutOfBounds);
         }
 
-        if self.double_buffered {
-            let index = (y * self.mode_info.width + x) as usize;
-            if let Ok(mut buffer) = self.back_buffer.lock() {
-                if index < buffer.len() {
-                    buffer[index] = color;
-                }
-            }
-        }
-
         // Calculate pixel offset
         let _offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
 
@@ -195,7 +154,7 @@ impl VesaDriver {
             let idx = (y * self.mode_info.width + x) as usize;
             if idx < total_pixels {
                 // In safe context, we modify via mutable raw pointers or ignore if immutable self
-                let ptr = self.back_buffer.lock().unwrap().as_ptr() as *mut u32;
+                let ptr = self.back_buffer.as_ptr() as *mut u32;
                 unsafe {
                     ptr.add(idx).write(color);
                 }
@@ -207,7 +166,7 @@ impl VesaDriver {
 
     pub fn clear_screen(&self, color: u32) -> Result<(), VesaError> {
         if self.back_buffer_active {
-            let ptr = self.back_buffer.lock().unwrap().as_ptr() as *mut u32;
+            let ptr = self.back_buffer.as_ptr() as *mut u32;
             let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
             unsafe {
                 for i in 0..total_pixels {
@@ -339,25 +298,47 @@ impl VesaDriver {
     }
 }
 
-impl PeripheralDeviceTrait for VesaDriver {
+impl PeripheralDevice for VesaDriver {
     fn name(&self) -> &'static str {
-        "VESA BIOS Extension Framebuffer"
+        "VESA Framebuffer"
     }
-
     fn generation(&self) -> DeviceGeneration {
         DeviceGeneration::Legacy
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
-        self.initialize().map_err(|_| "VESA initialization failed")
+        self.initialize().map_err(|_| "VESA: Initialization failed")
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
-        Ok(0)
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        // Framebuffers are write-only; return mode info bytes instead
+        let info = [
+            (self.mode_info.width >> 8) as u8,
+            (self.mode_info.width & 0xFF) as u8,
+            (self.mode_info.height >> 8) as u8,
+            (self.mode_info.height & 0xFF) as u8,
+            self.mode_info.bpp as u8,
+            self.current_mode as u8,
+        ];
+        let len = buffer.len().min(info.len());
+        buffer[..len].copy_from_slice(&info[..len]);
+        Ok(len)
     }
 
     fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
-        Ok(data.len())
+        // Interpret data as (x_hi, x_lo, y_hi, y_lo, r, g, b, a) pixel write packets
+        let mut written = 0;
+        let mut idx = 0;
+        while idx + 7 < data.len() {
+            let x = u32::from_be_bytes([0, 0, data[idx], data[idx + 1]]);
+            let y = u32::from_be_bytes([0, 0, data[idx + 2], data[idx + 3]]);
+            let color =
+                u32::from_be_bytes([data[idx + 4], data[idx + 5], data[idx + 6], data[idx + 7]]);
+            self.write_pixel_raw(x, y, color).ok();
+            idx += 8;
+            written += 8;
+        }
+        Ok(written)
     }
 
     fn set_power_state(&mut self, _state: PowerState) -> Result<(), &'static str> {
@@ -365,6 +346,7 @@ impl PeripheralDeviceTrait for VesaDriver {
     }
 
     fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.fill_screen(0x00000000).ok();
         Ok(())
     }
 }
@@ -394,23 +376,6 @@ mod tests {
         assert_eq!(vesa.mode_info.width, 1024);
         assert_eq!(vesa.mode_info.height, 768);
         assert_eq!(vesa.mode_info.bpp, 32);
-    }
-
-    #[test]
-    fn test_vesa_settings() {
-        let mut vesa = VesaDriver::new();
-        assert_eq!(vesa.refresh_rate_hz, 60);
-        assert_eq!(vesa.color_depth, 32);
-        assert_eq!(vesa.get_aspect_ratio(), "4:3");
-
-        vesa.set_refresh_rate(144);
-        assert_eq!(vesa.refresh_rate_hz, 144);
-
-        vesa.set_color_depth(24);
-        assert_eq!(vesa.color_depth, 24);
-
-        let vesa_hd = VesaDriver::with_mode(1920, 1080, 32);
-        assert_eq!(vesa_hd.get_aspect_ratio(), "16:9");
     }
 
     #[test]
@@ -460,13 +425,5 @@ mod tests {
     fn test_out_of_bounds() {
         let vesa = VesaDriver::new();
         assert!(vesa.write_pixel(9999, 9999, 0xFFFFFF).is_err());
-    }
-
-    #[test]
-    fn test_double_buffered_presentation() {
-        let vesa = VesaDriver::new();
-        vesa.clear_screen(0x11223344).unwrap();
-        assert_eq!(vesa.back_buffer.lock().unwrap()[0], 0x11223344);
-        assert!(vesa.present().is_ok());
     }
 }

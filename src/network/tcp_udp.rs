@@ -15,7 +15,7 @@ pub enum Protocol {
     UDP = 1,
 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
@@ -31,7 +31,7 @@ pub enum TCPState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum NetworkError {
     Success = 0,
     InvalidSocket = 1,
@@ -61,12 +61,18 @@ pub enum SocketOption {
     SndBuf,
 }
 
+#[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
     pub local_port: AtomicUsize,
     pub remote_port: AtomicUsize,
     pub state: AtomicUsize,
+    // Linux Socket Options
+    pub reuse_addr: AtomicUsize,
+    pub tcp_nodelay: AtomicUsize,
+    pub rcvbuf: AtomicUsize,
+    pub sndbuf: AtomicUsize,
 }
 
 impl SimpleSocket {
@@ -77,6 +83,10 @@ impl SimpleSocket {
             local_port: AtomicUsize::new(local_port as usize),
             remote_port: AtomicUsize::new(0),
             state: AtomicUsize::new(TCPState::Closed as usize),
+            reuse_addr: AtomicUsize::new(0),
+            tcp_nodelay: AtomicUsize::new(0),
+            rcvbuf: AtomicUsize::new(65536),
+            sndbuf: AtomicUsize::new(65536),
         }
     }
 }
@@ -167,8 +177,8 @@ impl TCPConnection for SimpleSocket {
             return Err(NetworkError::SendFailed);
         }
         let len = buffer.len().min(1024);
-        for i in 0..len {
-            buffer[i] = ((i * 7 + 13) % 256) as u8;
+        for (i, item) in buffer.iter_mut().enumerate().take(len) {
+            *item = ((i * 7 + 13) % 256) as u8;
         }
         Ok(len)
     }
@@ -178,7 +188,19 @@ impl TCPConnection for SimpleSocket {
         Ok(())
     }
     fn get_state(&self) -> TCPState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        let val = self.state.load(Ordering::SeqCst);
+        match val {
+            0 => TCPState::Closed,
+            1 => TCPState::Listen,
+            2 => TCPState::SynSent,
+            3 => TCPState::SynReceived,
+            4 => TCPState::Established,
+            5 => TCPState::FinWait1,
+            6 => TCPState::FinWait2,
+            7 => TCPState::CloseWait,
+            8 => TCPState::Closing,
+            _ => TCPState::TimeWait,
+        }
     }
 }
 
@@ -195,8 +217,8 @@ impl UDPSocket for SimpleSocket {
     }
     fn recvfrom(&mut self, buffer: &mut [u8]) -> Result<(usize, Port), NetworkError> {
         let len = buffer.len().min(1024);
-        for i in 0..len {
-            buffer[i] = ((i * 11 + 17) % 256) as u8;
+        for (i, item) in buffer.iter_mut().enumerate().take(len) {
+            *item = ((i * 11 + 17) % 256) as u8;
         }
         Ok((len, self.remote_port.load(Ordering::SeqCst) as Port))
     }
@@ -212,6 +234,12 @@ pub trait CongestionControl {
 pub struct RenoCongestionControl {
     pub cwnd: AtomicUsize,
     pub ssthresh: AtomicUsize,
+}
+
+impl Default for RenoCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl RenoCongestionControl {
@@ -249,6 +277,12 @@ pub struct BBRCongestionControl {
     pub rtt_min: AtomicUsize,
 }
 
+impl Default for BBRCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BBRCongestionControl {
     pub fn new() -> Self {
         BBRCongestionControl {
@@ -281,14 +315,22 @@ pub trait Firewall {
     fn is_allowed(&self, port: Port) -> bool;
 }
 
-#[repr(C)]
 pub struct SimpleFirewall {
-    pub allowed_ports: [AtomicUsize; 65536],
+    pub allowed_ports: Vec<AtomicUsize>,
+}
+
+impl Default for SimpleFirewall {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleFirewall {
     pub fn new() -> Self {
-        let mut allowed_ports = [AtomicUsize::new(0); 65536];
+        let mut allowed_ports = Vec::new();
+        for _ in 0..65536 {
+            allowed_ports.push(AtomicUsize::new(0));
+        }
         SimpleFirewall { allowed_ports }
     }
 }
@@ -381,6 +423,12 @@ pub struct ZeroCopyNetwork {
     pub dma_buffer: AtomicUsize,
 }
 
+impl Default for ZeroCopyNetwork {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
         ZeroCopyNetwork {
@@ -397,8 +445,8 @@ impl ZeroCopy for ZeroCopyNetwork {
     }
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError> {
         let len = buffer.len().min(1024);
-        for i in 0..len {
-            buffer[i] = ((i * 13 + 19) % 256) as u8;
+        for (i, item) in buffer.iter_mut().enumerate().take(len) {
+            *item = ((i * 13 + 19) % 256) as u8;
         }
         Ok(len)
     }
@@ -575,6 +623,12 @@ pub struct SimpleNetworkStack {
     pub interfaces: Vec<NetworkInterface>,
 }
 
+impl Default for SimpleNetworkStack {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleNetworkStack {
     pub fn new() -> Self {
         SimpleNetworkStack {
@@ -582,6 +636,9 @@ impl SimpleNetworkStack {
             next_id: AtomicUsize::new(1),
             firewall: SimpleFirewall::new(),
             congestion: RenoCongestionControl::new(),
+            netfilter: NetfilterFirewall::new(),
+            routing_table: RoutingTable::new(),
+            interfaces: Vec::new(),
         }
     }
 }

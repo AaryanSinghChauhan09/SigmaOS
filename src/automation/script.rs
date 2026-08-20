@@ -1,41 +1,17 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+#[cfg(not(target_os = "none"))]
+use std_alloc::boxed::Box;
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
 /// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
 /// Implements interactive scripting, dynamic script-like functions, positional arguments,
 /// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
 
-#[cfg(not(target_os = "none"))]
-use std::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(target_os = "none"))]
-use std::mem;
-#[cfg(not(target_os = "none"))]
-use std::ops::{Deref, DerefMut};
-
-#[cfg(target_os = "none")]
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(target_os = "none")]
 use core::mem;
-#[cfg(target_os = "none")]
-use core::ops::{Deref, DerefMut};
 
 pub type ScriptID = usize;
 
@@ -45,13 +21,7 @@ pub enum ScriptLanguage { Python = 0, JavaScript = 1, Lua = 2, Shell = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptError {
-    Success = 0,
-    NotFound = 1,
-    ExecutionFailed = 2,
-    SyntaxError = 3,
-    LoopOverflow = 4,
-}
+pub enum ScriptError { Success = 0, NotFound = 1, ExecutionFailed = 2, InvalidArgument = 3 }
 
 pub trait Script {
     fn id(&self) -> ScriptID;
@@ -94,14 +64,7 @@ impl Script for SimpleScript {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(128);
         &self.name[..len]
     }
-    fn language(&self) -> ScriptLanguage {
-        match self.language.load(Ordering::SeqCst) {
-            0 => ScriptLanguage::Python,
-            1 => ScriptLanguage::JavaScript,
-            2 => ScriptLanguage::Lua,
-            _ => ScriptLanguage::Shell,
-        }
-    }
+    fn language(&self) -> ScriptLanguage { unsafe { core::mem::transmute(self.language.load(Ordering::SeqCst)) } }
     fn source(&self) -> &[u8] { &self.source }
 }
 
@@ -120,7 +83,6 @@ pub struct SimpleScriptEngine {
 }
 
 impl SimpleScriptEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleScriptEngine {
             scripts: Vec::new(),
@@ -227,7 +189,6 @@ pub struct SimpleScriptAPI {
 }
 
 impl SimpleScriptAPI {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleScriptAPI {
             functions: Vec::new(),
@@ -470,6 +431,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     type IntoIter = core::slice::Iter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
         self.deref().iter()
     }
 }
@@ -480,88 +442,8 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type IntoIter = core::slice::IterMut<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
         self.deref_mut().iter_mut()
-    }
-}
-
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ShellLoopType {
-    For,
-    While,
-    DoWhile,
-    ForeachExtension,
-}
-
-/// Shell interpreter supporting string/file/command tokenization and counting/foreach repetition loops
-pub struct ShellScriptInterpreter;
-
-impl ShellScriptInterpreter {
-    pub fn tokenize_string(input: &str, delimiter: char) -> std::vec::Vec<std::string::String> {
-        let mut tokens = std::vec::Vec::new();
-        for token in input.split(delimiter) {
-            if !token.is_empty() {
-                tokens.push(token.to_string());
-            }
-        }
-        tokens
-    }
-
-    pub fn tokenize_command_output(output: &str) -> std::vec::Vec<std::string::String> {
-        let mut fields = std::vec::Vec::new();
-        for line in output.lines() {
-            for field in line.split_whitespace() {
-                if !field.is_empty() {
-                    fields.push(field.to_string());
-                }
-            }
-        }
-        fields
-    }
-
-    pub fn tokenize_from_file(file_content: &str) -> std::vec::Vec<std::string::String> {
-        let mut tokens = std::vec::Vec::new();
-        for line in file_content.lines() {
-            let clean = line.split('#').next().unwrap_or("").trim();
-            if !clean.is_empty() {
-                tokens.push(clean.to_string());
-            }
-        }
-        tokens
-    }
-
-    pub fn execute_shell_loop(loop_type: ShellLoopType, variable: &str, limit_or_files: &[&str]) -> Result<std::vec::Vec<std::string::String>, ScriptError> {
-        let mut results = std::vec::Vec::new();
-        if limit_or_files.len() > 1000 {
-            return Err(ScriptError::LoopOverflow);
-        }
-
-        match loop_type {
-            ShellLoopType::For | ShellLoopType::While | ShellLoopType::DoWhile => {
-                for &val in limit_or_files {
-                    results.push(std::format!("{}={}", variable, val));
-                }
-            }
-            ShellLoopType::ForeachExtension => {
-                for &file in limit_or_files {
-                    if file.ends_with(".rs") || file.ends_with(".sh") {
-                        results.push(std::format!("processed_{}:{}", variable, file));
-                    }
-                }
-            }
-        }
-        Ok(results)
-    }
-
-    pub fn evaluate_conditional_block(block_code: &str, flag_condition: bool) -> Result<std::string::String, ScriptError> {
-        if !block_code.contains("if") || !block_code.contains("fi") {
-            return Err(ScriptError::SyntaxError);
-        }
-        if flag_condition {
-            Ok("Executing then block".to_string())
-        } else {
-            Ok("Executing else block".to_string())
-        }
     }
 }
 
@@ -637,55 +519,5 @@ mod tests {
 
         let descrambled = descrambler.descramble_string(&scrambled);
         assert_eq!(descrambled, b"ABC");
-    }
-
-    #[test]
-    fn test_script_argument_router() {
-        let router = ScriptArgumentRouter::new("#!/bin/sh -x");
-        assert_eq!(router.shebang_interpreter, "/bin/sh -x");
-
-        let args = ["app", "arg1", "arg2"];
-        let res = router.substitute_arguments("Echo $1 then $2 all $@", &args);
-        assert!(res.contains("arg1"));
-        assert!(res.contains("arg2"));
-    }
-}
-
-pub struct ScriptArgumentRouter {
-    pub shebang_interpreter: String,
-}
-
-impl ScriptArgumentRouter {
-    pub fn new(shebang_line: &str) -> Self {
-        let interp = if shebang_line.starts_with("#!") {
-            shebang_line.trim_start_matches("#!").trim()
-        } else {
-            "/bin/sh"
-        };
-        Self {
-            shebang_interpreter: interp.to_string(),
-        }
-    }
-
-    pub fn substitute_arguments(&self, script: &str, args: &[&str]) -> String {
-        let mut result = script.to_string();
-        for (i, arg) in args.iter().enumerate() {
-            let var_name = format!("${}", i);
-            result = result.replace(&var_name, arg);
-        }
-
-        let mut all_args = String::new();
-        for (i, arg) in args.iter().skip(1).enumerate() {
-            if i > 0 { all_args.push(' '); }
-            all_args.push_str(arg);
-        }
-        result = result.replace("$@", &all_args);
-        result
-    }
-}
-
-impl Default for ScriptArgumentRouter {
-    fn default() -> Self {
-        Self::new("#!/bin/sh")
     }
 }

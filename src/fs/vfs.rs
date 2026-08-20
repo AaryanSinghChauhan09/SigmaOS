@@ -15,19 +15,6 @@ pub type MountID = usize;
 #[derive(Debug, Clone, Copy)]
 pub enum FileType { Regular = 0, Directory = 1, Symlink = 2, Device = 3 }
 
-impl FileType {
-    /// Safe conversion from usize without unsafe transmute
-    pub fn from_usize(val: usize) -> Self {
-        match val {
-            0 => Self::Regular,
-            1 => Self::Directory,
-            2 => Self::Symlink,
-            3 => Self::Device,
-            _ => Self::Regular, // safe default
-        }
-    }
-}
-
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum VFSError { Success = 0, NotFound = 1, PermissionDenied = 2, IsDirectory = 3 }
@@ -60,7 +47,7 @@ impl SimpleInode {
 
 impl Inode for SimpleInode {
     fn id(&self) -> InodeID { self.id }
-    fn file_type(&self) -> FileType { FileType::from_usize(self.file_type.load(Ordering::SeqCst)) }
+    fn file_type(&self) -> FileType { unsafe { core::mem::transmute(self.file_type.load(Ordering::SeqCst)) } }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn permissions(&self) -> u16 { self.permissions.load(Ordering::SeqCst) as u16 }
 }
@@ -244,10 +231,8 @@ impl FileDescriptor for SimpleFileDescriptor {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]

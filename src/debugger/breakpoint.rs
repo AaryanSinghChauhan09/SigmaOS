@@ -1,7 +1,11 @@
-extern crate alloc;
+#![no_std]
+#![no_main]
 
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
-use alloc::boxed::Box;
+
 use core::mem;
 /// OOP-based Debugger for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 171
@@ -236,7 +240,7 @@ pub struct SimpleRegisterViewer {
 impl SimpleRegisterViewer {
     pub fn new() -> Self {
         let mut registers = Vec::new();
-        for _ in 0..16 {
+        for i in 0..16 {
             registers.push(0u64);
         }
         SimpleRegisterViewer { registers }
@@ -277,16 +281,12 @@ impl RegisterViewer for SimpleRegisterViewer {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]

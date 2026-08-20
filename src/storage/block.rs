@@ -1,13 +1,11 @@
+#![no_std]
+#![no_main]
+
+use core::mem;
 /// OOP-based Block Storage for SigmaOS
 /// Based on 100-Improvement-Ideas.md storage management concepts
 /// Implements comprehensive block device abstraction, partition management,
 /// and caching for high-performance storage operations
-
-extern crate alloc;
-
-use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BlockDeviceID = usize;
@@ -285,14 +283,12 @@ impl BlockCache for SimpleBlockCache {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]

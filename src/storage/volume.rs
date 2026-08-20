@@ -1,13 +1,12 @@
+#![no_std]
+#![no_main]
+
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
 
-extern crate alloc;
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 pub type VolumeID = usize;
 
@@ -55,7 +54,6 @@ impl SimpleVolume {
     }
 }
 
-#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
@@ -65,7 +63,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
@@ -191,7 +188,6 @@ impl SimpleSnapshotManager {
     }
 }
 
-#[cfg(target_os = "none")]
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &[T] {
@@ -203,7 +199,6 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut [T] {
         if self.data.is_null() {
@@ -214,7 +209,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if !self.data.is_null() {
@@ -256,10 +250,8 @@ impl SnapshotManager for SimpleSnapshotManager {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]

@@ -1,6 +1,6 @@
-extern crate alloc;
-use alloc::string::String;
-use alloc::string::ToString;
+// SigmaOS USB HID Keyboard Driver
+// Hardware abstraction for USB HID devices + PeripheralDevice OOP integration
+
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use crate::security::CapabilityToken;
 
@@ -42,7 +42,6 @@ pub struct UsbHidDriver {
 
     // Rollover tracking (N-Key Rollover / NKRO)
     pub active_held_keys: Vec<u8>,
-    pub layout: String,
 }
 
 impl UsbHidDriver {
@@ -62,17 +61,7 @@ impl UsbHidDriver {
             num_lock_active: false,
             scroll_lock_active: false,
             active_held_keys: Vec::new(),
-            layout: String::from("us"),
         }
-    }
-
-    pub fn set_repeat_settings(&mut self, delay: u32, rate: u32) {
-        self.repeat_delay_ms = delay;
-        self.repeat_rate_ms = rate;
-    }
-
-    pub fn set_layout(&mut self, layout: &str) {
-        self.layout = layout.to_string();
     }
 
     pub fn connect(&mut self) -> Result<(), HidError> {
@@ -239,14 +228,6 @@ const HID_SCANCODE_TO_ASCII: [u8; 57] = [
     b'\\', 0, b';', b'\'', b'`', b',', b'.', b'/',
 ];
 
-/// HID USB Scancode to ASCII mapping (French AZERTY, first 58 scancodes)
-const HID_SCANCODE_TO_ASCII_AZERTY: [u8; 57] = [
-    0, 0, 0, 0, b'q', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b',', b'n',
-    b'o', b'p', b'a', b'r', b's', b't', b'u', b'v', b'z', b'x', b'y', b'w', b'&', b'e', b'"', b'\'',
-    b'(', b'-', b'e', b'_', b'c', b'a', b'\n', 0, b'\x08', b'\t', b' ', b')', b'=', b'^', b'$',
-    b'*', 0, b'm', b'u', b'~', b';', b':', b'!',
-];
-
 /// Standalone HID Keyboard implementing PeripheralDevice for PeripheralManager
 pub struct HidKeyboard {
     inner: UsbHidDriver,
@@ -261,18 +242,13 @@ impl HidKeyboard {
         }
     }
 
-    /// Converts a USB HID scancode to ASCII character with layout-awareness
-    pub fn scancode_to_ascii_layout(scancode: u8, shift: bool, layout: &str) -> Option<u8> {
+    /// Converts a USB HID scancode to ASCII character
+    pub fn scancode_to_ascii(scancode: u8, shift: bool) -> Option<u8> {
         let idx = scancode as usize;
-        let map = if layout == "FR-AZERTY" {
-            &HID_SCANCODE_TO_ASCII_AZERTY
-        } else {
-            &HID_SCANCODE_TO_ASCII
-        };
-        if idx >= map.len() {
+        if idx >= HID_SCANCODE_TO_ASCII.len() {
             return None;
         }
-        let ch = map[idx];
+        let ch = HID_SCANCODE_TO_ASCII[idx];
         if ch == 0 {
             return None;
         }
@@ -283,20 +259,10 @@ impl HidKeyboard {
         }
     }
 
-    /// Converts a USB HID scancode to ASCII character
-    pub fn scancode_to_ascii(scancode: u8, shift: bool) -> Option<u8> {
-        Self::scancode_to_ascii_layout(scancode, shift, "US-QWERTY")
-    }
-
     /// Decode a keyboard event to a printable ASCII char
-    pub fn decode_event_layout(event: &HidKeyboardEvent, layout: &str) -> Option<char> {
-        let shift = (event.modifiers & 0x22) != 0;
-        Self::scancode_to_ascii_layout(event.keycode, shift, layout).map(|b| b as char)
-    }
-
-    /// Decode a keyboard event to a printable ASCII char (backward compatible associated function)
     pub fn decode_event(event: &HidKeyboardEvent) -> Option<char> {
-        Self::decode_event_layout(event, "US-QWERTY")
+        let shift = (event.modifiers & 0x22) != 0;
+        Self::scancode_to_ascii(event.keycode, shift).map(|b| b as char)
     }
 }
 
@@ -324,7 +290,7 @@ impl PeripheralDevice for HidKeyboard {
         while count < buffer.len() {
             match self.inner.poll_event() {
                 Some(event) if event.pressed => {
-                    if let Some(decoded) = Self::decode_event_layout(&event, &self.inner.layout) {
+                    if let Some(decoded) = Self::decode_event(&event) {
                         buffer[count] = decoded as u8;
                         count += 1;
                     }
@@ -443,35 +409,5 @@ mod tests {
         let t3 = hid.tick_repeat(300); // 300 - 10 = 290 > 250
         assert!(t3.is_some());
         assert_eq!(t3.unwrap().keycode, 0x04);
-    }
-
-    #[test]
-    fn test_repeat_and_layout_settings() {
-        let mut hid = UsbHidDriver::new(0x1234, 0x5678);
-        assert_eq!(hid.repeat_delay_ms, 250);
-        assert_eq!(hid.repeat_rate_ms, 33);
-        assert_eq!(hid.layout, "US-QWERTY");
-
-        hid.set_repeat_settings(500, 50);
-        assert_eq!(hid.repeat_delay_ms, 500);
-        assert_eq!(hid.repeat_rate_ms, 50);
-
-        hid.set_layout("FR-AZERTY");
-        assert_eq!(hid.layout, "FR-AZERTY");
-    }
-
-    #[test]
-    fn test_azerty_scancode_translation() {
-        let mut keyboard = HidKeyboard::new(0x1234, 0x5678);
-        keyboard.inner.set_layout("FR-AZERTY");
-
-        // In FR-AZERTY, scancode 4 maps to 'q' (unlike 'a' in QWERTY)
-        let event = HidKeyboardEvent {
-            keycode: 4,
-            pressed: true,
-            modifiers: 0,
-        };
-        let decoded = HidKeyboard::decode_event_layout(&event, "FR-AZERTY").unwrap();
-        assert_eq!(decoded, 'q');
     }
 }

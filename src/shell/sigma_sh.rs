@@ -3,6 +3,9 @@ extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]
 use std_alloc::boxed::Box;
 
+#![no_std]
+#![no_main]
+
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
 /// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
@@ -246,7 +249,7 @@ impl Shell for SimpleShell {
             }
         }
 
-        let cmd_args: Vec<&[u8]> = expanded_args.iter().copied().collect();
+        let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
         
         for cmd_option in &mut self.commands {
             if let Some(ref mut cmd) = *cmd_option {
@@ -316,12 +319,22 @@ impl ShellHistory for SimpleShellHistory {
         Some(&self.history[index][..len])
     }
     
-    fn get_last(&self) -> Option<&[u8]> {
+    fn get_last(&self) -> Option<&[u8]>;
+}
+
+impl SimpleShellHistory {
+    fn get_last_impl(&self) -> Option<&[u8]> {
         if self.history.is_empty() {
             return None;
         }
         let index = self.history.len() - 1;
         self.get(index)
+    }
+}
+
+impl ShellHistory for SimpleShellHistory {
+    fn get_last(&self) -> Option<&[u8]> {
+        self.get_last_impl()
     }
 }
 

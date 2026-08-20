@@ -1,12 +1,6 @@
-// SigmaOS Network Protocol Layer
 #![no_std]
 #![no_main]
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AddressFamily {
-    Unix,
-    Inet,
-    Inet6,
 /// OOP-based Socket API for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
 /// Implements socket creation, BSD-style Socket Options, and network communication
@@ -77,8 +71,10 @@ pub trait Socket {
     fn is_connected(&self) -> bool;
     fn is_bound(&self) -> bool;
 
-
-pub type SocketID = usize;
+    // BSD/Linux-style Socket Option getters/setters
+    fn set_opt(&mut self, option: SocketOption, value: u32) -> Result<(), SocketError>;
+    fn get_opt(&self, option: SocketOption) -> Result<u32, SocketError>;
+}
 
 #[repr(C)]
 pub struct SimpleSocket {
@@ -142,40 +138,16 @@ impl Socket for SimpleSocket {
         Ok(())
     }
 
-pub trait Socket {
-    fn id(&self) -> SocketID;
-    fn socket_type(&self) -> SocketType;
-    fn is_connected(&self) -> bool;
-    fn is_bound(&self) -> bool;
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SocketType {
-    Stream,
-    Datagram,
-    Raw,
-}
-
-#[derive(Debug)]
-pub struct Socket {
-    family: AddressFamily,
-    socket_type: SocketType,
-    is_bound: bool,
-    is_listening: bool,
-}
-
-impl Socket {
-    pub fn new(family: AddressFamily, socket_type: SocketType) -> Self {
-        Socket {
-            family,
-            socket_type,
-            is_bound: false,
-            is_listening: false,
-impl Socket for SimpleSocket {
-    fn id(&self) -> SocketID { self.id }
-    fn socket_type(&self) -> SocketType { unsafe { core::mem::transmute(self.socket_type.load(Ordering::SeqCst)) } }
-    fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
-    fn is_bound(&self) -> bool { self.bound.load(Ordering::SeqCst) == 1 }
+    fn get_opt(&self, option: SocketOption) -> Result<u32, SocketError> {
+        let val = match option {
+            SocketOption::ReuseAddr => self.reuse_addr.load(Ordering::SeqCst),
+            SocketOption::ReusePort => self.reuse_port.load(Ordering::SeqCst),
+            SocketOption::KeepAlive => self.keep_alive.load(Ordering::SeqCst),
+            SocketOption::ReceiveTimeout => self.receive_timeout.load(Ordering::SeqCst),
+            SocketOption::SendTimeout => self.send_timeout.load(Ordering::SeqCst),
+        };
+        Ok(val as u32)
+    }
 }
 
 pub trait SocketManager {
@@ -379,55 +351,8 @@ impl<T> Vec<T> {
         let new_capacity = if self.capacity == 0 {
             4
         } else {
-            Err(SocketError::NotFound)
-        }
-    }
-
-    pub fn bind(&mut self) -> Result<(), &'static str> {
-        if self.is_bound {
-            return Err("Socket already bound");
-        }
-        self.is_bound = true;
-        Ok(())
-    }
-
-    pub fn listen(&mut self, _backlog: usize) -> Result<(), &'static str> {
-        if !self.is_bound {
-            return Err("Socket not bound");
-        }
-        if self.socket_type != SocketType::Stream {
-            return Err("Listen only supported on stream sockets");
-        }
-        self.is_listening = true;
-        Ok(())
-    }
-
-    pub fn send(&self, _data: &[u8]) -> Result<usize, &'static str> {
-        // Implementation stub
-        Ok(0)
-    }
-
-    pub fn recv(&self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
-        // Implementation stub
-        Ok(0)
-    }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {

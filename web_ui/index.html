@@ -3,994 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SigmaOS Zenith Desktop Environment</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>Σ SigmaOS Calamares-Style Graphical Installer</title>
     <link rel="stylesheet" href="styles/style.css">
-    <style>
-        /* Interactive Desktop Grid Icons */
-        .desktop-icons {
-            position: absolute;
-            top: 70px;
-            left: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            z-index: 10;
-        }
-        .desktop-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            width: 80px;
-            padding: 8px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            border: 1px solid transparent;
-        }
-        .desktop-icon:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--border-glass);
-            transform: scale(1.05);
-        }
-        .desktop-icon-symbol {
-            font-size: 2.2rem;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-        }
-        .desktop-icon-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-align: center;
-            color: var(--text-white);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-
-        /* Launcher Menu */
-        .app-launcher-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-        .app-launcher-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            font-size: 0.85rem;
-        }
-        .app-launcher-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--accent-gold);
-        }
-    </style>
 </head>
-<body class="theme-gold">
+<body>
+    <div class="background-decor"></div>
+    <div class="glass installer-container" role="main">
+        <!-- Header -->
+        <header class="installer-header">
+            <div class="logo">Σ</div>
+            <div class="title-area">
+                <h1>SigmaOS Sovereign Installer</h1>
+                <p class="subtitle">Calamares-Style Graphical Installation Wizard with Dual-Boot Support</p>
+            </div>
+        </header>
 
-    <div id="mouse-glow"></div>
+        <!-- Stepper Indicator -->
+        <div class="stepper" role="navigation" aria-label="Installation Steps">
+            <div class="step active" id="step-ind-1">
+                <span class="step-num">1</span>
+                <span class="step-label">Welcome</span>
+            </div>
+            <div class="step" id="step-ind-2">
+                <span class="step-num">2</span>
+                <span class="step-label">Target Disk</span>
+            </div>
+            <div class="step" id="step-ind-3">
+                <span class="step-num">3</span>
+                <span class="step-label">Partitioning</span>
+            </div>
+            <div class="step" id="step-ind-4">
+                <span class="step-num">4</span>
+                <span class="step-label">Settings</span>
+            </div>
+            <div class="step" id="step-ind-5">
+                <span class="step-num">5</span>
+                <span class="step-label">Install</span>
+            </div>
+            <div class="step" id="step-ind-6">
+                <span class="step-num">6</span>
+                <span class="step-label">Ready</span>
+            </div>
+        </div>
 
-    <!-- Cinnamon/Zorin inspired Panel (Top Bar) -->
-    <div class="top-bar">
-        <div class="top-bar-left">
-            <div class="top-bar-brand" id="start-menu-btn" style="cursor: pointer;" title="Open Zorin-style Launcher">
-                <span>Σ</span> SigmaOS <span>Zenith</span>
-            </div>
-            <div class="capsule-badge">Microkernel Ring-3</div>
-        </div>
-        <div class="top-bar-center">
-            <div class="vital-item" title="S-SCHED Core Usage">
-                CPU: <span id="cpu-stat">0.2%</span>
-            </div>
-            <div class="vital-item" title="S-VIRT Sandbox State">
-                RAM: <span id="ram-stat">14.2 MB</span>
-            </div>
-            <div class="vital-item" title="Post-Quantum Key Exchange Active">
-                PQ-SEC: <span style="color: #4ade80;">Kyber-1024</span>
-            </div>
-        </div>
-        <div class="top-bar-right">
-            <div class="vital-item">
-                <span id="clock-time">10:00 AM</span>
-            </div>
-            <div class="vital-item" style="color: var(--text-muted);">
-                <span id="clock-date">Sun, Aug 2</span>
-            </div>
-        </div>
-    </div>
+        <!-- Wizard Panel Content -->
+        <div class="wizard-body">
+            <!-- Step 1: Welcome -->
+            <section class="panel active" id="panel-1" aria-labelledby="step-1-title">
+                <h2 id="step-1-title">Welcome to the Future of Computing</h2>
+                <p class="panel-desc">You are about to install SigmaOS — a sovereign, AI-native operating system built for post-quantum security and bare-metal performance.</p>
 
-    <!-- Desktop Grid Shortcuts -->
-    <div class="desktop-icons">
-        <div class="desktop-icon" onclick="openWindow('win-welcome')">
-            <div class="desktop-icon-symbol">👋</div>
-            <div class="desktop-icon-label">Welcome</div>
-        </div>
-        <div class="desktop-icon" onclick="openWindow('win-office')">
-            <div class="desktop-icon-symbol">📝</div>
-            <div class="desktop-icon-label">S-Office</div>
-        </div>
-        <div class="desktop-icon" onclick="openWindow('win-media')">
-            <div class="desktop-icon-symbol">🎵</div>
-            <div class="desktop-icon-label">S-Media</div>
-        </div>
-        <div class="desktop-icon" onclick="openWindow('win-ai')">
-            <div class="desktop-icon-symbol">🧠</div>
-            <div class="desktop-icon-label">S-AI Console</div>
-        </div>
-        <div class="desktop-icon" onclick="openWindow('win-robo')">
-            <div class="desktop-icon-symbol">✈️</div>
-            <div class="desktop-icon-label">S-Robo PID</div>
-        </div>
-        <div class="desktop-icon" onclick="openWindow('win-fs')">
-            <div class="desktop-icon-symbol">📂</div>
-            <div class="desktop-icon-label">SigmaFS++</div>
-        </div>
-        <div class="desktop-icon" onclick="openWindow('win-settings')">
-            <div class="desktop-icon-symbol">⚙️</div>
-            <div class="desktop-icon-label">Settings</div>
-        </div>
-        <div class="desktop-icon" onclick="openWindow('win-olivetin')">
-            <div class="desktop-icon-symbol">🎛️</div>
-            <div class="desktop-icon-label">OliveTin</div>
-        </div>
-    </div>
-
-    <!-- macOS style Dock at the Bottom -->
-    <div class="zenith-dock-container">
-        <div class="zenith-dock">
-            <div class="dock-item" data-tooltip="Welcome Screen" onclick="openWindow('win-welcome')">👋</div>
-            <div class="dock-item" data-tooltip="S-Office Suite" onclick="openWindow('win-office')">📝</div>
-            <div class="dock-item" data-tooltip="S-Media Audio Synth" onclick="openWindow('win-media')">🎵</div>
-            <div class="dock-item" data-tooltip="S-AI MoE Inference" onclick="openWindow('win-ai')">🧠</div>
-            <div class="dock-item" data-tooltip="S-Robo Flight PID" onclick="openWindow('win-robo')">✈️</div>
-            <div class="dock-item" data-tooltip="SigmaFS++ File Explorer" onclick="openWindow('win-fs')">📂</div>
-            <div class="dock-item" data-tooltip="OliveTin Quick Commands" onclick="openWindow('win-olivetin')">🎛️</div>
-            <div class="dock-separator"></div>
-            <div class="dock-item" data-tooltip="Control Center Settings" onclick="openWindow('win-settings')">⚙️</div>
-        </div>
-    </div>
-
-    <!-- Zorin OS inspired App Launcher (Menu) Overlay -->
-    <div class="app-launcher-overlay" id="app-launcher">
-        <div class="launcher-header">
-            <h3>Zenith App Launcher</h3>
-            <input type="text" class="launcher-search" placeholder="Search apps, files, or configurations..." oninput="filterLauncher(this.value)">
-        </div>
-        <div class="app-launcher-menu" id="launcher-menu-list">
-            <div class="app-launcher-item" onclick="openWindow('win-welcome')">
-                <span>👋</span> Welcome Guide (mintwelcome parity)
-            </div>
-            <div class="app-launcher-item" onclick="openWindow('win-office')">
-                <span>📝</span> S-Office Compose Editor (LibreOffice replacement)
-            </div>
-            <div class="app-launcher-item" onclick="openWindow('win-media')">
-                <span>🎵</span> S-Media Low-Latency Synthesizer (Audacity replacement)
-            </div>
-            <div class="app-launcher-item" onclick="openWindow('win-ai')">
-                <span>🧠</span> S-AI Local Mixture-of-Experts Router (LLaMA/DeepSeek replacement)
-            </div>
-            <div class="app-launcher-item" onclick="openWindow('win-robo')">
-                <span>✈️</span> S-Robo Flight Autopilot Controller (ArduPilot replacement)
-            </div>
-            <div class="app-launcher-item" onclick="openWindow('win-fs')">
-                <span>📂</span> SigmaFS++ Composable Explorer (btrfs/CoW integration)
-            </div>
-            <div class="app-launcher-item" onclick="openWindow('win-settings')">
-                <span>⚙️</span> System Settings & Themes (Zorin Look Changer)
-            </div>
-            <div class="app-launcher-item" onclick="openWindow('win-olivetin')">
-                <span>🎛️</span> OliveTin Quick Command Panel (safe shell buttons)
-            </div>
-        </div>
-    </div>
-
-    <!-- Right-Click Context Menu -->
-    <div id="context-menu">
-        <div class="context-item" onclick="openWindow('win-settings')">⚙️ Change Desktop Theme</div>
-        <div class="context-item" onclick="toggleHighContrast()">👁️ Toggle High Contrast Mode</div>
-        <div class="context-item" onclick="location.reload()">🔄 Refresh Desktop</div>
-    </div>
-
-    <!-- Mint Welcome Screen (guided wizard step card) -->
-    <div class="window active-focus" id="win-welcome" style="top: 15%; left: calc(50% - 300px);">
-        <div class="window-header">
-            <div class="window-title">👋 <span>Mintwelcome</span> - Welcome Screen</div>
-            <div class="window-controls">
-                <div class="control-dot min" onclick="minimizeWindow('win-welcome')"></div>
-                <div class="control-dot max" onclick="maximizeWindow('win-welcome')"></div>
-                <div class="control-dot close" onclick="closeWindow('win-welcome')"></div>
-            </div>
-        </div>
-        <div class="window-body">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="color: var(--accent-gold); margin-bottom: 8px;">Welcome to SigmaOS Standalone!</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">A fully sovereign operating system that natively absorbs all applications. Zero dependencies, complete autonomy.</p>
-            </div>
-            <div class="settings-group">
-                <h4>Guided Desktop Onboarding</h4>
-                <div id="wizard-step-1" class="wizard-step-card">
-                    <p style="font-size: 0.82rem; margin-bottom: 10px;"><strong>Step 1: Layout Selection.</strong> Choose your favorite Linux-inspired desktop look. We offer Cinnamon parity tiling panel and macOS style launch docks natively.</p>
-                    <button class="fm-btn" onclick="nextWizardStep(2)">Next Step ➡️</button>
-                </div>
-                <div id="wizard-step-2" class="wizard-step-card" style="display: none;">
-                    <p style="font-size: 0.82rem; margin-bottom: 10px;"><strong>Step 2: Microkernel Driver Audit.</strong> SigmaOS automatically scanned your PCI and USB buses. High-fidelity hotplugging is initialized warning-free.</p>
-                    <button class="fm-btn" onclick="nextWizardStep(3)">Next Step ➡️</button>
-                </div>
-                <div id="wizard-step-3" class="wizard-step-card" style="display: none;">
-                    <p style="font-size: 0.82rem; margin-bottom: 10px;"><strong>Step 3: Theme Personalization.</strong> Switch between classic Mint Dark-Teal (Gold), Solar Dawn, and Crimson Void instantly in System Settings.</p>
-                    <button class="fm-btn" onclick="closeWindow('win-welcome')">Complete Setup 🎉</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- S-OFFICE Compose Suite -->
-    <div class="window" id="win-office" style="top: 10%; left: 10%;">
-        <div class="window-header">
-            <div class="window-title">📝 <span>S-Office</span> Compose Suite</div>
-            <div class="window-controls">
-                <div class="control-dot min" onclick="minimizeWindow('win-office')"></div>
-                <div class="control-dot max" onclick="maximizeWindow('win-office')"></div>
-                <div class="control-dot close" onclick="closeWindow('win-office')"></div>
-            </div>
-        </div>
-        <div class="window-body" style="padding: 0; display: flex; flex-direction: column;">
-            <div style="background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-glass); padding: 8px 15px; display: flex; gap: 10px;">
-                <button class="fm-btn" onclick="compileToPDF()">📄 Export to PDF</button>
-                <button class="fm-btn" onclick="clearEditor()">🧹 Clear Canvas</button>
-                <span id="office-status" style="font-size: 0.75rem; color: var(--accent-gold); align-self: center; font-family: monospace;">Asynchronous DAG recalculations enabled</span>
-            </div>
-            <div style="display: flex; flex-grow: 1; height: calc(100% - 40px);">
-                <textarea id="office-input" style="flex: 1; background: transparent; border: none; border-right: 1px solid var(--border-glass); outline: none; color: white; padding: 15px; font-family: 'Outfit', sans-serif; resize: none; font-size: 0.9rem;" placeholder="Type markdown text here..." oninput="translateMarkdown(this.value)"># Financial Forecast Report
-This spreadsheet and text editor replacement uses reactive formula dependency trees.
-
-## Core Highlights:
-- Low-latency layout rendering.
-- No external Microsoft Office or LibreOffice suites needed.
-</textarea>
-                <div id="office-preview" style="flex: 1; padding: 15px; overflow-y: auto; font-size: 0.9rem; background: rgba(0,0,0,0.15);" class="term-line">
-                    <h1>Financial Forecast Report</h1>
-                    <p>This spreadsheet and text editor replacement uses reactive formula dependency trees.</p>
-                    <h2>Core Highlights:</h2>
-                    <ul>
-                        <li>Low-latency layout rendering.</li>
-                        <li>No external Microsoft Office or LibreOffice suites needed.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- S-MEDIA Synthesizer (Audacity Replace) -->
-    <div class="window" id="win-media" style="top: 15%; left: 15%;">
-        <div class="window-header">
-            <div class="window-title">🎵 <span>S-Media</span> Binaural Mixer</div>
-            <div class="window-controls">
-                <div class="control-dot min" onclick="minimizeWindow('win-media')"></div>
-                <div class="control-dot max" onclick="maximizeWindow('win-media')"></div>
-                <div class="control-dot close" onclick="closeWindow('win-media')"></div>
-            </div>
-        </div>
-        <div class="window-body">
-            <div style="margin-bottom: 15px;">
-                <h4 style="color: var(--accent-gold); margin-bottom: 6px;">Dual-Channel Frequency Synthesizer</h4>
-                <p style="font-size: 0.78rem; color: var(--text-muted);">Generates Audacity/Gnaural-parity low-latency binaural beat patterns directly mapped onto microkernel audio rings.</p>
-            </div>
-            <div class="settings-group">
-                <div class="form-switch">
-                    <span>Base Carrier Frequency (Hz): <strong id="base-freq-val">200</strong></span>
-                    <input type="range" class="auto-style-9" min="100" max="1000" value="200" oninput="updateAudioParams()">
-                </div>
-                <div class="form-switch">
-                    <span>Target Beat Offset (Hz): <strong id="beat-offset-val">10</strong></span>
-                    <input type="range" class="auto-style-10" min="1" max="50" value="10" oninput="updateAudioParams()">
-                </div>
-                <div class="form-switch">
-                    <span>Global Sound Attenuation: </span>
-                    <button class="fm-btn" id="audio-toggle-btn" onclick="toggleAudioSynthesis()">🔊 Play Binaural Beats</button>
-                </div>
-            </div>
-            <div style="margin-top: 15px; background: black; border-radius: 8px; border: 1px solid var(--border-glass); padding: 12px; font-family: monospace; font-size: 0.75rem;">
-                <span style="color: #4ade80;">[Audio-DSP]</span> Left Channel: <span id="left-audio-channel">195.00 Hz</span> Sine Wave<br>
-                <span style="color: #4ade80;">[Audio-DSP]</span> Right Channel: <span id="right-audio-channel">205.00 Hz</span> Sine Wave<br>
-                <span style="color: #a1a1aa;">[Status] Latency: 1.2 microseconds. Zero frames dropped.</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- S-AI Mixture-of-Experts Controller -->
-    <div class="window" id="win-ai" style="top: 20%; left: 20%;">
-        <div class="window-header">
-            <div class="window-title">🧠 <span>S-AI</span> Local MoE Inference Console</div>
-            <div class="window-controls">
-                <div class="control-dot min" onclick="minimizeWindow('win-ai')"></div>
-                <div class="control-dot max" onclick="maximizeWindow('win-ai')"></div>
-                <div class="control-dot close" onclick="closeWindow('win-ai')"></div>
-            </div>
-        </div>
-        <div class="window-body" style="display: flex; flex-direction: column; gap: 15px;">
-            <div>
-                <h4 style="color: var(--accent-gold); margin-bottom: 6px;">DeepSeek-R1 & LLaMA-3 native routing</h4>
-                <p style="font-size: 0.78rem; color: var(--text-muted);">Capability-bounded multi-agent execution pipeline. Runs continuous batching and load-balanced expert gating.</p>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="ai-prompt-input" style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); color: white; padding: 8px 12px; border-radius: 6px; outline: none; font-family: inherit; font-size: 0.85rem;" placeholder="Ask sovereign AI..." value="Summarize agricultural yields in rural districts">
-                <button class="fm-btn" onclick="dispatchMoEInference()">Run Inference</button>
-            </div>
-            <div id="ai-routing-stats" style="display: none; background: black; border-radius: 8px; border: 1px solid var(--border-glass); padding: 12px; font-family: monospace; font-size: 0.72rem; line-height: 1.4;">
-                <span style="color: #60a5fa;">[MoE-Router]</span> Gating token embeddings with softmax probabilities...<br>
-                <span style="color: #4ade80;">[Selected Expert #3]</span> Softmax Gating Weight: <span id="moe-weight-3">0.654</span><br>
-                <span style="color: #4ade80;">[Selected Expert #7]</span> Softmax Gating Weight: <span id="moe-weight-7">0.346</span><br>
-                <span style="color: #f472b6;">[Auxiliary Loss]</span> Expert load balancing loss: <span style="color: #f472b6;">0.1256 (Optimal flat-uniform)</span><br>
-                <div style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; color: #e4e4e7;">
-                    <strong>AI Output:</strong> <span id="ai-response-text">Analysing regional crop distributions... Loaded local model parameter slices natively via Memory-Mapped weight streaming.</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- S-ROBO Autopilot stabilized loop -->
-    <div class="window" id="win-robo" style="top: 25%; left: 25%;">
-        <div class="window-header">
-            <div class="window-title">✈️ <span>S-Robo</span> UAV PID Loop Autopilot</div>
-            <div class="window-controls">
-                <div class="control-dot min" onclick="minimizeWindow('win-robo')"></div>
-                <div class="control-dot max" onclick="maximizeWindow('win-robo')"></div>
-                <div class="control-dot close" onclick="closeWindow('win-robo')"></div>
-            </div>
-        </div>
-        <div class="window-body" style="display: flex; flex-direction: column; gap: 15px;">
-            <div>
-                <h4 style="color: var(--accent-gold); margin-bottom: 6px;">Flight Attitude PID Stabilizer</h4>
-                <p style="font-size: 0.78rem; color: var(--text-muted);">Real-time loop corrections simulating ArduPilot stabilization, resolving gyro targets at 100Hz interrupt rate.</p>
-            </div>
-            <div class="settings-group">
-                <div class="form-switch">
-                    <span>Target Gyro Angle: <strong id="target-gyro-angle">5.0°</strong></span>
-                    <input type="range" class="auto-style-9" min="-20" max="20" value="5" oninput="updateRoboAngle(this.value)">
-                </div>
-                <div class="form-switch">
-                    <span>Attitude Corrective Response Output: </span>
-                    <strong id="pid-response-output" style="color: #4ade80; font-family: monospace;">7.50 N-m</strong>
-                </div>
-            </div>
-            <div style="background: black; border-radius: 8px; border: 1px solid var(--border-glass); padding: 12px; font-family: monospace; font-size: 0.72rem; line-height: 1.4;">
-                <span style="color: #f59e0b;">[PID-Control]</span> Error tracking: Target=5.00°, Current=0.00°<br>
-                <span style="color: #f59e0b;">[PID-Control]</span> Proportional: 7.50, Integral: 0.00, Derivative: 0.00<br>
-                <span style="color: #4ade80;">[Actuator] Flight surfaces stabilized successfully at Ring-0 interrupt.</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- SigmaFS++ Composable Explorer -->
-    <div class="window" id="win-fs" style="top: 5%; left: 30%;">
-        <div class="window-header">
-            <div class="window-title">📂 <span>SigmaFS++</span> Explorer</div>
-            <div class="window-controls">
-                <div class="control-dot min" onclick="minimizeWindow('win-fs')"></div>
-                <div class="control-dot max" onclick="maximizeWindow('win-fs')"></div>
-                <div class="control-dot close" onclick="closeWindow('win-fs')"></div>
-            </div>
-        </div>
-        <div class="window-body">
-            <div class="fm-layout">
-                <div class="fm-toolbar">
-                    <button class="fm-btn" onclick="generateFSBackup()">🔄 Create Timeshift Snapshot (btrfs-COW)</button>
-                    <span class="fm-breadcrumbs">Path: /dev/sda1/snapshots/</span>
-                </div>
-                <div class="fm-grid">
-                    <div class="fm-item" onclick="alert('Timeshift Restore applied successfully')">
-                        <div class="fm-item-icon">📦</div>
-                        <div class="fm-item-label">snap_1</div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🛡️ Post-Quantum Security</h3>
+                        <p>Fully secured with Kyber-1024 key encapsulation and Dilithium-5 signatures.</p>
                     </div>
-                    <div class="fm-item" onclick="alert('Timeshift Restore applied successfully')">
-                        <div class="fm-item-icon">📦</div>
-                        <div class="fm-item-label">snap_2</div>
+                    <div class="feature-card">
+                        <h3>⚡ Bare-Metal Speed</h3>
+                        <p>Zero-dependency, capability-gated microkernel bypassing heavy POSIX layers.</p>
                     </div>
-                    <div class="fm-item">
-                        <div class="fm-item-icon">📄</div>
-                        <div class="fm-item-label">gdpr_audit.log</div>
+                    <div class="feature-card">
+                        <h3>⚙️ Local Intelligence</h3>
+                        <p>Embedded S-AI optimization daemon routing workloads natively on physical cores.</p>
                     </div>
                 </div>
-                <div id="fs-backup-msg" style="display: none; margin-top: 15px; padding: 10px; background: rgba(74,222,128,0.15); border: 1px solid #4ade80; border-radius: 6px; font-size: 0.8rem; color: #4ade80;">
-                    Timeshift COW Snapshot created: <strong>timeshift_snap_3</strong> at address block 1002.
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Settings (Zorin Look Changer Parity) -->
-    <div class="window" id="win-settings" style="top: 30%; left: 30%;">
-        <div class="window-header">
-            <div class="window-title">⚙️ <span>Control Center</span> - Personalize</div>
-            <div class="window-controls">
-                <div class="control-dot min" onclick="minimizeWindow('win-settings')"></div>
-                <div class="control-dot max" onclick="maximizeWindow('win-settings')"></div>
-                <div class="control-dot close" onclick="closeWindow('win-settings')"></div>
-            </div>
-        </div>
-        <div class="window-body">
-            <div class="settings-layout">
-                <div class="settings-tabs">
-                    <div class="settings-tab active" onclick="switchSettingsTab('settings-themes')">Themes</div>
-                    <div class="settings-tab" onclick="switchSettingsTab('settings-accessibility')">Accessibility</div>
+                <div class="license-agreement">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="accept-license" aria-required="true">
+                        <span class="checkmark"></span>
+                        I accept the Sovereign Digital Autonomy Agreement and Licensing Terms.
+                    </label>
                 </div>
-                <div class="settings-content">
-                    <!-- Themes tab -->
-                    <div id="settings-themes" class="settings-group">
-                        <h4>Zorin OS-inspired Look Changer</h4>
-                        <div class="theme-selector-grid">
-                            <button class="theme-button theme-gold" onclick="switchTheme('theme-gold')">Gold</button>
-                            <button class="theme-button theme-solar" onclick="switchTheme('theme-solar')">Solar</button>
-                            <button class="theme-button theme-crimson" onclick="switchTheme('theme-crimson')">Crimson</button>
-                            <button class="theme-button theme-cyan" onclick="switchTheme('theme-cyan')">Cyan</button>
+            </section>
+
+            <!-- Step 2: Disk Selection -->
+            <section class="panel" id="panel-2" aria-labelledby="step-2-title">
+                <h2 id="step-2-title">Select Target Storage Device</h2>
+                <p class="panel-desc">Choose the physical disk drive to use for SigmaOS installation.</p>
+
+                <div class="disk-list" role="radiogroup" aria-label="Select Target Disk">
+                    <div class="disk-card active" onclick="selectDisk(this, 'sda')" role="radio" aria-checked="true" tabindex="0">
+                        <div class="disk-icon">💾</div>
+                        <div class="disk-info">
+                            <span class="disk-name">/dev/sda - Sovereign Primary NVMe SSD</span>
+                            <span class="disk-meta">Size: 512 GB | Detected OS: Windows 11 Pro, Debian Linux 12</span>
                         </div>
                     </div>
-                    <!-- Accessibility tab -->
-                    <div id="settings-accessibility" class="settings-group" style="display: none;">
-                        <h4>Universal Accessibility settings</h4>
-                        <div class="form-switch">
-                            <span>High Contrast Mode (WCAG 2.1)</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="a11y-toggle" onchange="toggleHighContrast()">
-                                <span class="slider"></span>
-                            </label>
+                    <div class="disk-card" onclick="selectDisk(this, 'sdb')" role="radio" aria-checked="false" tabindex="0">
+                        <div class="disk-icon">💾</div>
+                        <div class="disk-info">
+                            <span class="disk-name">/dev/sdb - Auxiliary Block Storage</span>
+                            <span class="disk-meta">Size: 1 TB | Interface: USB4 / Thunderbolt</span>
+                        </div>
+                    </div>
+                    <div class="disk-card" onclick="selectDisk(this, 'vdisk')" role="radio" aria-checked="false" tabindex="0">
+                        <div class="disk-icon">🖥️</div>
+                        <div class="disk-info">
+                            <span class="disk-name">/dev/vdisk - Sandboxed Virtual VM Drive</span>
+                            <span class="disk-meta">Size: 64 GB | Interface: VirtIO Storage Ring</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </section>
 
-    <!-- OliveTin Quick Command Panel -->
-    <div class="window" id="win-olivetin" style="top: 20%; left: 25%; width: 680px; height: 480px; transform: scale(0.95); opacity: 0; pointer-events: none;">
-        <div class="window-header">
-            <div class="window-title">🎛️ <span>OliveTin</span> - Quick Command Panel</div>
-            <div class="window-controls">
-                <div class="control-dot min" onclick="minimizeWindow('win-olivetin')"></div>
-                <div class="control-dot max" onclick="maximizeWindow('win-olivetin')"></div>
-                <div class="control-dot close" onclick="closeWindow('win-olivetin')"></div>
-            </div>
-        </div>
-        <div class="window-body" style="display: flex; gap: 15px; padding: 15px; background: rgba(18, 18, 18, 0.95); color: #f4f4f5; height: calc(100% - 30px); box-sizing: border-box; overflow: hidden;">
-            <!-- Predefined Commands Sidebar -->
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid var(--border-glass); padding-right: 15px; overflow-y: auto;">
-                <h4 style="color: var(--accent-gold); margin-bottom: 5px;">Quick Actions</h4>
-                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('systemctl')">🔄 Manage Service</button>
-                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('backup')">📦 Timeshift Snapshot</button>
-                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('compact')">🧹 RAM Compaction</button>
-                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('security')">🛡️ Vulnerability Scan</button>
-                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('autotune')">⚡ Autotune Kernel</button>
-            </div>
+            <!-- Step 3: Calamares-Style Partitioning & Dual-Boot Mode -->
+            <section class="panel" id="panel-3" aria-labelledby="step-3-title">
+                <h2 id="step-3-title">Installation Type & Partition Layout</h2>
+                <p class="panel-desc">Select how you want to partition the storage drive. Dual-boot mode allows running SigmaOS alongside your current OS.</p>
 
-            <!-- Command Form & Console Output -->
-            <div style="flex: 2; display: flex; flex-direction: column; gap: 12px; height: 100%;">
-                <div id="olivetin-form-container" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); padding: 12px; border-radius: 8px;">
-                    <h5 id="olivetin-cmd-title" style="color: var(--accent-gold); margin-bottom: 8px;">Select a command from the sidebar</h5>
-                    <div id="olivetin-inputs" style="display: flex; flex-direction: column; gap: 8px;">
-                        <!-- Dynamic inputs inserted here -->
+                <div class="mode-list" role="radiogroup" aria-label="Partitioning Mode">
+                    <!-- Option 1: Install Alongside (Dual-Boot) -->
+                    <div class="mode-card active" id="mode-card-dual" onclick="selectInstallMode(this, 'dual')" role="radio" aria-checked="true" tabindex="0">
+                        <div class="mode-header">
+                            <span class="mode-icon">🔀</span>
+                            <div class="mode-title">
+                                <strong>Install Alongside Existing OS (Dual-Boot Mode)</strong>
+                                <span class="mode-sub">Safely shrinks <span id="detected-os-label">Windows 11 / Debian Linux</span> partition and installs SigmaOS in new space.</span>
+                            </div>
+                        </div>
+                        <div class="partition-preview-box">
+                            <div class="partition-title">Proposed Partition Split Preview:</div>
+                            <div class="partition-bar-outer">
+                                <div class="partition-bar-segment os-existing" style="width: 50%;">
+                                    <span>Existing OS (256 GB)</span>
+                                </div>
+                                <div class="partition-bar-segment os-sigma" style="width: 50%;">
+                                    <span>Σ SigmaOS (256 GB)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option 2: Erase Disk (Clean Install) -->
+                    <div class="mode-card" id="mode-card-clean" onclick="selectInstallMode(this, 'clean')" role="radio" aria-checked="false" tabindex="0">
+                        <div class="mode-header">
+                            <span class="mode-icon">🗑️</span>
+                            <div class="mode-title">
+                                <strong>Erase Entire Disk (Clean SovereignFS Install)</strong>
+                                <span class="mode-sub">Deletes all data on /dev/<span class="selected-disk-name">sda</span> and formats entire drive for SigmaOS.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option 3: Custom Partitioning -->
+                    <div class="mode-card" id="mode-card-custom" onclick="selectInstallMode(this, 'custom')" role="radio" aria-checked="false" tabindex="0">
+                        <div class="mode-header">
+                            <span class="mode-icon">⚙️</span>
+                            <div class="mode-title">
+                                <strong>Manual / Custom Partitioning</strong>
+                                <span class="mode-sub">Manually create, resize, or assign mount points for custom drive layouts.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Settings -->
+            <section class="panel" id="panel-4" aria-labelledby="step-4-title">
+                <h2 id="step-4-title">System Settings & Release Channels</h2>
+                <p class="panel-desc">Configure your locale, host parameters, and select your rolling system release stream.</p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="locale-select">System Locale</label>
+                        <select id="locale-select">
+                            <option value="en-US">English (United States)</option>
+                            <option value="en-IN">English (India - Sovereign Stack)</option>
+                            <option value="hi-IN">Hindi (India - Standard Devnagari)</option>
+                            <option value="de-DE">Deutsch (Germany)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timezone-select">Timezone</label>
+                        <select id="timezone-select">
+                            <option value="UTC">UTC (Coordinated Universal Time)</option>
+                            <option value="IST">IST (Indian Standard Time - UTC+5:30)</option>
+                            <option value="EST">EST (Eastern Standard Time - UTC-5:00)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hostname-input">Hostname</label>
+                        <input type="text" id="hostname-input" value="sigmaos-node" placeholder="Enter system name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="channel-select">Rolling Update Stream</label>
+                        <select id="channel-select">
+                            <option value="LTS">Long-Term Stable (Quarterly-vetted, highly secure)</option>
+                            <option value="Rolling" selected>Sovereign Rolling (Weekly rolling synchronized packages)</option>
+                            <option value="Experimental">Experimental (Bleeding edge daily automated integration)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 5: Interactive Progress -->
+            <section class="panel" id="panel-5" aria-labelledby="step-5-title">
+                <h2 id="step-5-title">Extracting Base Image & Packaging Shards</h2>
+                <p class="panel-desc">Please wait while the automated installer formats partitions and extracts the base system image.</p>
+
+                <div class="progress-container">
+                    <div class="progress-bar-outer">
+                        <div class="progress-bar-inner" id="installation-progress" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progress-status">Formatting SovereignFS partitions...</span>
+                        <span id="progress-percentage">0%</span>
                     </div>
                 </div>
 
-                <!-- Console Output Terminal -->
-                <div style="flex-grow: 1; display: flex; flex-direction: column; background: #09090b; border: 1px solid #27272a; border-radius: 8px; padding: 10px; overflow: hidden;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #27272a; padding-bottom: 6px; margin-bottom: 6px; font-size: 0.7rem; color: #a1a1aa; font-family: monospace;">
-                        <span>COMMAND TERMINAL</span>
-                        <span id="olivetin-status-badge" style="background: #18181b; padding: 2px 6px; border-radius: 4px;">IDLE</span>
+                <div class="terminal-log" role="log" aria-live="polite">
+                    <div class="terminal-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="terminal-title">sigma-install-logs</span>
                     </div>
-                    <pre id="olivetin-console" style="flex-grow: 1; margin: 0; padding: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.4; color: #a1a1aa; overflow-y: auto; white-space: pre-wrap; word-break: break-all;">🪶 OliveTin Safe Command Interface initialized.
-Select an administrative quick-action on the left.</pre>
+                    <div class="terminal-body" id="log-console">
+                        <div class="log-line text-blue">[install] Initializing Calamares GUI installation pipeline...</div>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- Step 6: Ready -->
+            <section class="panel" id="panel-6" aria-labelledby="step-6-title">
+                <div class="success-screen">
+                    <div class="success-icon">✓</div>
+                    <h2 id="step-6-title">Lattice Integration Complete!</h2>
+                    <p class="panel-desc">SigmaOS has been successfully written to disk, and dual-boot bootloader chainloading entries are configured in sigma-boot.</p>
+
+                    <div class="summary-box">
+                        <h3>Installation Summary</h3>
+                        <ul>
+                            <li><strong>Device:</strong> <span id="summary-device">/dev/sda</span></li>
+                            <li><strong>Installation Mode:</strong> <span id="summary-mode">Dual-Boot (Install Alongside)</span></li>
+                            <li><strong>Filesystem:</strong> SovereignFS (Lattice-Optimized)</li>
+                            <li><strong>Bootloader:</strong> sigma-boot UEFI Chainloader</li>
+                            <li><strong>System Identity:</strong> Kyber-1024 Generated (/etc/sigma/identity.pub)</li>
+                        </ul>
+                    </div>
+
+                    <p class="reboot-note">Remove the installation media and reboot the node to enter the Zenith desktop environment.</p>
+                </div>
+            </section>
         </div>
+
+        <!-- Footer Navigation Controls -->
+        <footer class="installer-footer">
+            <button class="btn btn-secondary" id="btn-back" disabled onclick="prevStep()" aria-label="Go Back to Previous Step">Back</button>
+            <button class="btn btn-primary" id="btn-next" onclick="nextStep()" aria-label="Continue to Next Step">Next</button>
+        </footer>
     </div>
 
+    <!-- Installer Script Logic -->
     <script>
-        // OliveTin Command Center interactive logic
-        let activeOliveTinCmd = '';
-        function selectOliveTinCmd(cmd) {
-            activeOliveTinCmd = cmd;
-            const title = document.getElementById('olivetin-cmd-title');
-            const inputs = document.getElementById('olivetin-inputs');
+        let currentStep = 1;
+        const totalSteps = 6;
+        let selectedDiskId = 'sda';
+        let selectedInstallMode = 'dual';
 
-            // Clear inputs safely
-            while (inputs.firstChild) {
-                inputs.removeChild(inputs.firstChild);
-            }
-
-            if (cmd === 'systemctl') {
-                title.innerText = 'Service Administration';
-                
-                // Create DOM elements safely
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.gap = '8px';
-                container.style.alignItems = 'center';
-                container.style.fontSize = '0.8rem';
-                container.style.flexWrap = 'wrap';
-
-                const actionLabel = document.createElement('span');
-                actionLabel.textContent = 'Action:';
-                container.appendChild(actionLabel);
-
-                const actionSelect = document.createElement('select');
-                actionSelect.id = 'ot-service-action';
-                actionSelect.style.background = '#18181b';
-                actionSelect.style.color = 'white';
-                actionSelect.style.border = '1px solid var(--border-glass)';
-                actionSelect.style.padding = '4px';
-                actionSelect.style.borderRadius = '4px';
-                actionSelect.style.outline = 'none';
-                
-                const actions = ['restart', 'start', 'stop', 'status'];
-                actions.forEach(action => {
-                    const option = document.createElement('option');
-                    option.value = action;
-                    option.textContent = action;
-                    actionSelect.appendChild(option);
-                });
-                container.appendChild(actionSelect);
-
-                const serviceLabel = document.createElement('span');
-                serviceLabel.textContent = 'Service:';
-                container.appendChild(serviceLabel);
-
-                const serviceInput = document.createElement('input');
-                serviceInput.type = 'text';
-                serviceInput.id = 'ot-service-name';
-                serviceInput.value = 'systemd-networkd';
-                serviceInput.style.background = '#18181b';
-                serviceInput.style.color = 'white';
-                serviceInput.style.border = '1px solid var(--border-glass)';
-                serviceInput.style.padding = '4px';
-                serviceInput.style.borderRadius = '4px';
-                serviceInput.style.outline = 'none';
-                serviceInput.style.width = '120px';
-                container.appendChild(serviceInput);
-
-                const executeBtn = document.createElement('button');
-                executeBtn.className = 'fm-btn';
-                executeBtn.textContent = 'Execute';
-                executeBtn.onclick = executeOliveTin;
-                container.appendChild(executeBtn);
-
-                inputs.appendChild(container);
-            } else if (cmd === 'backup') {
-                title.innerText = 'Timeshift btrfs-COW Backup';
-                
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.gap = '8px';
-                container.style.alignItems = 'center';
-                container.style.fontSize = '0.8rem';
-
-                const pathLabel = document.createElement('span');
-                pathLabel.textContent = 'Path:';
-                container.appendChild(pathLabel);
-
-                const pathInput = document.createElement('input');
-                pathInput.type = 'text';
-                pathInput.id = 'ot-backup-path';
-                pathInput.value = '/dev/sda1/snapshots';
-                pathInput.style.background = '#18181b';
-                pathInput.style.color = 'white';
-                pathInput.style.border = '1px solid var(--border-glass)';
-                pathInput.style.padding = '4px';
-                pathInput.style.borderRadius = '4px';
-                pathInput.style.outline = 'none';
-                pathInput.style.flex = '1';
-                container.appendChild(pathInput);
-
-                const snapshotBtn = document.createElement('button');
-                snapshotBtn.className = 'fm-btn';
-                snapshotBtn.textContent = 'Create Snapshot';
-                snapshotBtn.onclick = executeOliveTin;
-                container.appendChild(snapshotBtn);
-
-                inputs.appendChild(container);
-            } else if (cmd === 'compact') {
-                title.innerText = 'Memory Compaction & Defragmentation';
-                
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.gap = '8px';
-                container.style.alignItems = 'center';
-                container.style.fontSize = '0.8rem';
-
-                const targetLabel = document.createElement('span');
-                targetLabel.textContent = 'Defrag Target:';
-                container.appendChild(targetLabel);
-
-                const targetSelect = document.createElement('select');
-                targetSelect.id = 'ot-defrag-target';
-                targetSelect.style.background = '#18181b';
-                targetSelect.style.color = 'white';
-                targetSelect.style.border = '1px solid var(--border-glass)';
-                targetSelect.style.padding = '4px';
-                targetSelect.style.borderRadius = '4px';
-                targetSelect.style.outline = 'none';
-                
-                const targets = ['Slab', 'Buddy', 'Page'];
-                targets.forEach(target => {
-                    const option = document.createElement('option');
-                    option.value = target;
-                    option.textContent = target === 'Slab' ? 'Slab Cache' : target === 'Buddy' ? 'Buddy Allocator' : 'UVM Pages';
-                    targetSelect.appendChild(option);
-                });
-                container.appendChild(targetSelect);
-
-                const defragBtn = document.createElement('button');
-                defragBtn.className = 'fm-btn';
-                defragBtn.textContent = 'Defragment';
-                defragBtn.onclick = executeOliveTin;
-                container.appendChild(defragBtn);
-
-                inputs.appendChild(container);
-            } else if (cmd === 'security') {
-                title.innerText = 'Vulnerability CVE Scanner';
-                
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.gap = '8px';
-                container.style.alignItems = 'center';
-                container.style.fontSize = '0.8rem';
-
-                const targetLabel = document.createElement('span');
-                targetLabel.textContent = 'Target Port/IP:';
-                container.appendChild(targetLabel);
-
-                const targetInput = document.createElement('input');
-                targetInput.type = 'text';
-                targetInput.id = 'ot-sec-target';
-                targetInput.value = '127.0.0.1:80';
-                targetInput.style.background = '#18181b';
-                targetInput.style.color = 'white';
-                targetInput.style.border = '1px solid var(--border-glass)';
-                targetInput.style.padding = '4px';
-                targetInput.style.borderRadius = '4px';
-                targetInput.style.outline = 'none';
-                targetInput.style.width = '110px';
-                container.appendChild(targetInput);
-
-                const scanBtn = document.createElement('button');
-                scanBtn.className = 'fm-btn';
-                scanBtn.textContent = 'Scan Ports';
-                scanBtn.onclick = executeOliveTin;
-                container.appendChild(scanBtn);
-
-                inputs.appendChild(container);
-            } else if (cmd === 'autotune') {
-                title.innerText = 'Autonomic Kernel Tuning';
-                
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.gap = '8px';
-                container.style.alignItems = 'center';
-                container.style.fontSize = '0.8rem';
-
-                const profileLabel = document.createElement('span');
-                profileLabel.textContent = 'Scheduling Profile:';
-                container.appendChild(profileLabel);
-
-                const profileSelect = document.createElement('select');
-                profileSelect.id = 'ot-tune-profile';
-                profileSelect.style.background = '#18181b';
-                profileSelect.style.color = 'white';
-                profileSelect.style.border = '1px solid var(--border-glass)';
-                profileSelect.style.padding = '4px';
-                profileSelect.style.borderRadius = '4px';
-                profileSelect.style.outline = 'none';
-                
-                const profiles = [
-                    {value: 'Bolt', text: 'Bolt (High-throughput)'},
-                    {value: 'Autonomic', text: 'Autonomic (Energy Aware)'},
-                    {value: 'S-COMP', text: 'GDPR/HIPAA Secure Compliant'}
-                ];
-                profiles.forEach(profile => {
-                    const option = document.createElement('option');
-                    option.value = profile.value;
-                    option.textContent = profile.text;
-                    profileSelect.appendChild(option);
-                });
-                container.appendChild(profileSelect);
-
-                const tuneBtn = document.createElement('button');
-                tuneBtn.className = 'fm-btn';
-                tuneBtn.textContent = 'Tune Kernel';
-                tuneBtn.onclick = executeOliveTin;
-                container.appendChild(tuneBtn);
-
-                inputs.appendChild(container);
-            }
-        }
-
-        function executeOliveTin() {
-            const consoleBox = document.getElementById('olivetin-console');
-            const badge = document.getElementById('olivetin-status-badge');
-
-            badge.innerText = 'RUNNING';
-            badge.style.background = '#e59e0b';
-            badge.style.color = 'black';
-            consoleBox.textContent = `Running safe command sequence...`;
-
-            setTimeout(() => {
-                badge.innerText = 'SUCCESS';
-                badge.style.background = '#4ade80';
-                badge.style.color = 'black';
-
-                if (activeOliveTinCmd === 'systemctl') {
-                    const action = document.getElementById('ot-service-action').value;
-                    const service = document.getElementById('ot-service-name').value;
-                    consoleBox.textContent = `$` + ` systemctl ${action} ${service}\n` +
-                        `[SystemdEngine] Transitioning service state to '${action}'...\n` +
-                        `[SystemdEngine] Service '${service}' action completed successfully.\n` +
-                        `[Status] Current state: Active (Running). Up since Sun 10:45 AM.`;
-                } else if (activeOliveTinCmd === 'backup') {
-                    const path = document.getElementById('ot-backup-path').value;
-                    consoleBox.textContent = `$` + ` timeshift --create --snapshot-path ${path}\n` +
-                        `[btrfs-COW] Allocating Copy-on-Write metadata root...\n` +
-                        `[btrfs-COW] Root snapshot timeshift_snap_3 committed successfully.\n` +
-                        `[Status] Snapshot created at address address block 1002. Total files: 1,482.`;
-                } else if (activeOliveTinCmd === 'compact') {
-                    const target = document.getElementById('ot-defrag-target').value;
-                    consoleBox.textContent = `$` + ` sysctl vm.compact_memory=1 --target ${target}\n` +
-                        `[RAMDefrag] Initializing memory compaction on ${target} structures...\n` +
-                        `[RAMDefrag] Standardized UVM allocations aligned warning-free.\n` +
-                        `[Status] Freed 4,096 allocated byte-blocks. Fragmented spaces compacted: 12.4%.`;
-                } else if (activeOliveTinCmd === 'security') {
-                    const target = document.getElementById('ot-sec-target').value;
-                    consoleBox.textContent = `$` + ` nmap --script vuln ${target}\n` +
-                        `[VulnerabilityScanner] Dispatching active port-level CVE audit on ${target}...\n` +
-                        `[VulnerabilityScanner] Sentinel threat mitigation loop activated.\n` +
-                        `[Status] Scan completed: 0 critical, 0 high vulnerabilities found. System secure!`;
-                } else if (activeOliveTinCmd === 'autotune') {
-                    const profile = document.getElementById('ot-tune-profile').value;
-                    consoleBox.textContent = `$` + ` sysctl kernel.autotuning_profile=${profile}\n` +
-                        `[Autotuner] Tuning microkernel schedulers, thread contexts, and dynamic links...\n` +
-                        `[Autotuner] Transitioned system performance profile to '${profile}' natively.\n` +
-                        `[Status] Scheduler: Completely Fair CFS. Energy governor: Idle-state-aware.`;
-                }
-            }, 1000);
-        }
-
-        // Track open windows
-        let activeWindow = 'win-welcome';
-
-        // Mouse glow movement
-        const mouseGlow = document.getElementById('mouse-glow');
-        document.addEventListener('mousemove', (e) => {
-            mouseGlow.style.opacity = '1';
-            mouseGlow.style.left = `${e.clientX}px`;
-            mouseGlow.style.top = `${e.clientY}px`;
-        });
-
-        // App Launcher trigger
-        const startMenuBtn = document.getElementById('start-menu-btn');
-        const appLauncher = document.getElementById('app-launcher');
-        startMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            appLauncher.classList.toggle('active');
-        });
-        document.addEventListener('click', () => {
-            appLauncher.classList.remove('active');
-        });
-
-        // Start wizard navigation
-        function nextWizardStep(step) {
-            document.getElementById('wizard-step-1').style.display = 'none';
-            document.getElementById('wizard-step-2').style.display = 'none';
-            document.getElementById('wizard-step-3').style.display = 'none';
-            document.getElementById(`wizard-step-${step}`).style.display = 'block';
-        }
-
-        // Window open/focus logic
-        function openWindow(winId) {
-            const win = document.getElementById(winId);
-            win.style.opacity = '1';
-            win.style.transform = 'scale(1)';
-            win.style.pointerEvents = 'auto';
-            focusWindow(winId);
-        }
-
-        function focusWindow(winId) {
-            document.querySelectorAll('.window').forEach(w => w.classList.remove('active-focus'));
-            document.getElementById(winId).classList.add('active-focus');
-        }
-
-        function closeWindow(winId) {
-            const win = document.getElementById(winId);
-            win.style.opacity = '0';
-            win.style.transform = 'scale(0.95)';
-            win.style.pointerEvents = 'none';
-        }
-
-        function minimizeWindow(winId) {
-            closeWindow(winId);
-        }
-
-        function maximizeWindow(winId) {
-            const win = document.getElementById(winId);
-            win.style.top = '50px';
-            win.style.left = '0';
-            win.style.width = '100vw';
-            win.style.height = 'calc(100vh - 120px)';
-        }
-
-        // Draggable window implementation
-        document.querySelectorAll('.window').forEach(win => {
-            win.addEventListener('mousedown', () => focusWindow(win.id));
-            const header = win.querySelector('.window-header');
-            let isDragging = false;
-            let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
-
-            header.addEventListener('mousedown', dragStart);
-
-            function dragStart(e) {
-                isDragging = true;
-                initialX = e.clientX - xOffset;
-                initialY = e.clientY - yOffset;
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('mouseup', dragEnd);
-            }
-
-            function drag(e) {
-                if (isDragging) {
-                    e.preventDefault();
-                    currentX = e.clientX - initialX;
-                    currentY = e.clientY - initialY;
-                    xOffset = currentX;
-                    yOffset = currentY;
-                    win.style.transform = `translate(${currentX}px, ${currentY}px)`;
-                }
-            }
-
-            function dragEnd() {
-                isDragging = false;
-                document.removeEventListener('mousemove', drag);
-                document.removeEventListener('mouseup', dragEnd);
-            }
-        });
-
-        // Zorin style Theme switcher
-        function switchTheme(themeClass) {
-            document.body.className = '';
-            document.body.classList.add(themeClass);
-        }
-
-        // High contrast accessibility switcher
-        function toggleHighContrast() {
-            const active = document.body.classList.toggle('high-contrast-active');
-            document.getElementById('a11y-toggle').checked = active;
-        }
-
-        // S-Office markdown previewer
-        function translateMarkdown(val) {
-            const preview = document.getElementById('office-preview');
-            // Clear preview safely
-            while (preview.firstChild) {
-                preview.removeChild(preview.firstChild);
-            }
-            
-            // Safe DOM-based markdown translation
-            const lines = val.split('\n');
-            lines.forEach(line => {
-                if (line.startsWith('# ')) {
-                    const h1 = document.createElement('h1');
-                    h1.textContent = line.substring(2);
-                    preview.appendChild(h1);
-                } else if (line.startsWith('## ')) {
-                    const h2 = document.createElement('h2');
-                    h2.textContent = line.substring(3);
-                    preview.appendChild(h2);
-                } else if (line.startsWith('- ')) {
-                    const li = document.createElement('li');
-                    li.textContent = line.substring(2);
-                    preview.appendChild(li);
-                } else if (line.trim()) {
-                    const p = document.createElement('p');
-                    p.textContent = line;
-                    preview.appendChild(p);
-                }
+        function selectDisk(element, diskId) {
+            document.querySelectorAll('.disk-card').forEach(card => {
+                card.classList.remove('active');
+                card.setAttribute('aria-checked', 'false');
             });
+            element.classList.add('active');
+            element.setAttribute('aria-checked', 'true');
+            selectedDiskId = diskId;
+            document.querySelectorAll('.selected-disk-name').forEach(el => el.innerText = diskId);
         }
 
-        function compileToPDF() {
-            alert('PDF compiled successfully! No external Ghostscript/LaTeX needed.');
+        function selectInstallMode(element, mode) {
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.classList.remove('active');
+                card.setAttribute('aria-checked', 'false');
+            });
+            element.classList.add('active');
+            element.setAttribute('aria-checked', 'true');
+            selectedInstallMode = mode;
         }
 
-        function clearEditor() {
-            document.getElementById('office-input').value = '';
-            const preview = document.getElementById('office-preview');
-            while (preview.firstChild) {
-                preview.removeChild(preview.firstChild);
-            }
-        }
-
-        // S-Media synthesizer values
-        let isAudioPlaying = false;
-        function toggleAudioSynthesis() {
-            isAudioPlaying = !isAudioPlaying;
-            const btn = document.getElementById('audio-toggle-btn');
-            btn.textContent = isAudioPlaying ? '🛑 Stop Audio Synth' : '🔊 Play Binaural Beats';
-        }
-
-        function updateAudioParams() {
-            const baseFreq = parseInt(document.querySelectorAll('.settings-group input[type="range"]')[0].value);
-            const beatOffset = parseInt(document.querySelectorAll('.settings-group input[type="range"]')[1].value);
-
-            document.getElementById('base-freq-val').innerText = baseFreq;
-            document.getElementById('beat-offset-val').innerText = beatOffset;
-
-            document.getElementById('left-audio-channel').innerText = `${(baseFreq - beatOffset/2).toFixed(2)} Hz`;
-            document.getElementById('right-audio-channel').innerText = `${(baseFreq + beatOffset/2).toFixed(2)} Hz`;
-        }
-
-        // S-AI MoE inference simulator
-        function dispatchMoEInference() {
-            document.getElementById('ai-routing-stats').style.display = 'block';
-            const seed = Math.random();
-            document.getElementById('moe-weight-3').innerText = (0.5 + seed * 0.3).toFixed(3);
-            document.getElementById('moe-weight-7').innerText = (0.5 - seed * 0.3).toFixed(3);
-        }
-
-        // S-Robo angle adjustment PID responder
-        function updateRoboAngle(val) {
-            document.getElementById('target-gyro-angle').innerText = `${val}.0°`;
-            // Calculate proportional output adjustment
-            const pOutput = parseFloat(val) * 1.5;
-            document.getElementById('pid-response-output').innerText = `${pOutput.toFixed(2)} N-m`;
-        }
-
-        // SigmaFS Timeshift trigger
-        function generateFSBackup() {
-            document.getElementById('fs-backup-msg').style.display = 'block';
-        }
-
-        // Launcher search filter
-        function filterLauncher(query) {
-            const list = document.getElementById('launcher-menu-list');
-            const items = list.querySelectorAll('.app-launcher-item');
-            items.forEach(item => {
-                if (item.innerText.toLowerCase().includes(query.toLowerCase())) {
-                    item.style.display = 'flex';
+        function updateStepIndicators() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const indicator = document.getElementById(`step-ind-${i}`);
+                if (i < currentStep) {
+                    indicator.className = 'step completed';
+                } else if (i === currentStep) {
+                    indicator.className = 'step active';
                 } else {
-                    item.style.display = 'none';
+                    indicator.className = 'step';
                 }
-            });
+            }
         }
 
-        // Settings tab switcher
-        function switchSettingsTab(tabId) {
-            document.getElementById('settings-themes').style.display = 'none';
-            document.getElementById('settings-accessibility').style.display = 'none';
-            document.getElementById(tabId).style.display = 'flex';
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`panel-${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`panel-${currentStep}`).classList.add('active');
+                updateStepIndicators();
 
-            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+                document.getElementById('btn-next').innerText = 'Next';
+                document.getElementById('btn-next').disabled = false;
+
+                if (currentStep === 1) {
+                    document.getElementById('btn-back').disabled = true;
+                }
+            }
         }
 
-        // Right-Click Context Menu trigger
-        document.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            const menu = document.getElementById('context-menu');
-            menu.style.display = 'block';
-            menu.style.left = `${e.clientX}px`;
-            menu.style.top = `${e.clientY}px`;
-        });
+        function nextStep() {
+            if (currentStep === 1) {
+                const accepted = document.getElementById('accept-license').checked;
+                if (!accepted) {
+                    alert('Please accept the licensing terms and sovereign autonomy agreement to proceed.');
+                    return;
+                }
+            }
 
-        document.addEventListener('click', () => {
-            document.getElementById('context-menu').style.display = 'none';
-        });
+            if (currentStep < totalSteps) {
+                document.getElementById(`panel-${currentStep}`).classList.remove('active');
+                currentStep++;
+                document.getElementById(`panel-${currentStep}`).classList.add('active');
+                updateStepIndicators();
 
-        // Simulate clock ticks
-        setInterval(() => {
-            const date = new Date();
-            document.getElementById('clock-time').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }, 1000);
+                document.getElementById('btn-back').disabled = false;
+
+                if (currentStep === 5) {
+                    document.getElementById('btn-next').disabled = true;
+                    document.getElementById('btn-back').disabled = true;
+                    startInstallationSimulation();
+                } else if (currentStep === totalSteps) {
+                    document.getElementById('btn-next').innerText = 'Reboot';
+                    document.getElementById('btn-next').onclick = () => alert('Rebooting node... Entering Zenith.');
+                    document.getElementById('btn-back').disabled = true;
+                }
+            }
+        }
+
+        function appendLog(text, className = '') {
+            const consoleEl = document.getElementById('log-console');
+            const line = document.createElement('div');
+            line.className = `log-line ${className}`;
+            line.innerText = text;
+            consoleEl.appendChild(line);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function startInstallationSimulation() {
+            let progress = 0;
+            const progressBar = document.getElementById('installation-progress');
+            const progressPct = document.getElementById('progress-percentage');
+            const progressStatus = document.getElementById('progress-status');
+
+            document.getElementById('summary-device').innerText = `/dev/${selectedDiskId}`;
+            const modeText = selectedInstallMode === 'dual' ? 'Dual-Boot (Install Alongside)' : (selectedInstallMode === 'clean' ? 'Erase Entire Disk' : 'Custom Partitioning');
+            document.getElementById('summary-mode').innerText = modeText;
+
+            const logs = [
+                { prg: 5, msg: "Quering hardware buses... Detected CPU topology matching x86_64 standard.", class: "text-blue" },
+                { prg: 12, msg: "Probing existing partitions... Detected Windows 11 Pro and Debian Linux 12.", class: "text-yellow" },
+                { prg: 20, msg: selectedInstallMode === 'dual' ? "Resizing target partition SAFELY to create 256GB SovereignFS slice..." : "Formatting entire target drive in SovereignFS layout...", class: "text-blue" },
+                { prg: 30, msg: "Initializing CoW multi-layered SovereignFS partition root.", class: "" },
+                { prg: 40, msg: "Connecting to sovereign mirror... Handshaking with Kyber-1024 certificates.", class: "text-blue" },
+                { prg: 52, msg: "Streaming base architecture payload (387 MB image target)...", class: "" },
+                { prg: 65, msg: "Validating download hashes against Dilithium-5 digital signature.", class: "text-green" },
+                { prg: 78, msg: "Configuring sigma-boot UEFI chainloader entries for detected operating systems.", class: "text-yellow" },
+                { prg: 90, msg: "Generating machine cryptographic post-quantum keypair... Registered on mesh.", class: "text-blue" },
+                { prg: 100, msg: "✅ Installation completed successfully! Dual-boot boot records linked.", class: "text-green" }
+            ];
+
+            let logIndex = 0;
+            const interval = setInterval(() => {
+                if (logIndex < logs.length) {
+                    const currentLog = logs[logIndex];
+                    if (progress < currentLog.prg) {
+                        progress = currentLog.prg;
+                        progressBar.style.width = `${progress}%`;
+                        progressPct.innerText = `${progress}%`;
+                        progressStatus.innerText = currentLog.msg;
+                        appendLog(currentLog.msg, currentLog.class);
+                        logIndex++;
+                    }
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        nextStep();
+                    }, 1000);
+                }
+            }, 600);
+        }
     </script>
 </body>
 </html>

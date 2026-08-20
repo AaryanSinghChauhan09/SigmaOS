@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use crate::klib::Vec;
 /// OOP-based Accessibility Keyboard for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 836
 /// Implements on-screen keyboard and accessibility input
