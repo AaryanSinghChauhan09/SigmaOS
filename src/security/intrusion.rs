@@ -179,7 +179,8 @@ impl DetectionStrategy for AnomalyDetection {
         let metric_key = format!("{:?}", event.event_type);
         if let Some(baseline) = self.baseline.get(&metric_key) {
             // Simulate deviation calculation
-            let deviation = (event.timestamp.elapsed().as_secs() as f64 - baseline).abs();
+            let elapsed_secs: f64 = event.timestamp.elapsed().as_secs() as f64;
+            let deviation = (elapsed_secs - baseline).abs();
 
             if deviation > self.threshold {
                 return Some(DetectionResult {
