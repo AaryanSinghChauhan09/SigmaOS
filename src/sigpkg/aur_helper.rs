@@ -13,7 +13,10 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
-use crate::klib::{BTreeMap, Vec, String};
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 /// AUR package metadata
 #[derive(Debug, Clone, PartialEq)]
@@ -47,10 +50,10 @@ impl AurParser {
         // Simplified parsing - in production, would use proper JSON parsing
         // For now, we simulate parsing from a simplified format
         
-        let name = String::from_str("unknown");
-        let version = String::from_str("1.0.0");
-        let description = String::from_str("No description");
-        let url = String::from_str("https://aur.archlinux.org");
+        let name = String::from("unknown");
+        let version = String::from("1.0.0");
+        let description = String::from("No description");
+        let url = String::from("https://aur.archlinux.org");
         let depends = Vec::new();
         let makedepends = Vec::new();
         let keywords = Vec::new();
@@ -211,10 +214,10 @@ mod tests {
         
         // Add a package with dependencies
         let pkg = AurPackage {
-            name: String::from_str("dep"),
-            version: String::from_str("1.0.0"),
-            description: String::from_str("Dependency"),
-            url: String::from_str("https://aur.archlinux.org"),
+            name: String::from("dep"),
+            version: String::from("1.0.0"),
+            description: String::from("Dependency"),
+            url: String::from("https://aur.archlinux.org"),
             depends: Vec::new(),
             makedepends: Vec::new(),
             keywords: Vec::new(),
@@ -223,7 +226,7 @@ mod tests {
         
         parser.cache.insert(pkg.name.clone(), pkg);
         
-        let order = parser.calculate_build_order(&[String::from_str("dep")]);
+        let order = parser.calculate_build_order(&[String::from("dep")]);
         assert!(order.is_ok());
     }
 }
