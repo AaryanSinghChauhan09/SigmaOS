@@ -23,6 +23,7 @@ pub mod package;
 pub mod productivity;
 pub mod thread;
 pub mod process;
+pub mod memory;
 pub mod tools;
 pub mod virtualization;
 pub mod graphics {
@@ -205,6 +206,14 @@ pub use thread::management::{
 pub use process::spawn::{
     ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
     CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
+};
+pub use process::activity_manager::{
+    ActivityManager, ActivityState, ProcessActivityRecord, RegisterSnapshot, AddressSpaceBinding,
+};
+pub use memory::segmentation_paging::{
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
+    SpaceProtectionFlags, SystemControlRegisters,
 };
 
 pub use tools::{
