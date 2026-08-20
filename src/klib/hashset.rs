@@ -35,33 +35,9 @@ where
     }
 }
 
-impl<T> Clone for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone,
-{
-    fn clone(&self) -> Self {
-        HashSet {
-            map: self.map.clone(),
-        }
-    }
-}
-
-impl<T> core::fmt::Debug for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone + core::fmt::Debug,
-{
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        let mut set = f.debug_set();
-        for item in self.iter() {
-            set.entry(item);
-        }
-        set.finish()
-    }
-}
-
 impl<T> core::iter::FromIterator<T> for HashSet<T>
 where
-    T: Eq + core::hash::Hash + Clone,
+    T: Eq + core::hash::Hash + Clone + Ord,
 {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let mut set = HashSet::new();

@@ -71,7 +71,6 @@ pub struct ShellRepl {
     pub variables: std::collections::HashMap<String, String>,
     pub aliases: std::collections::HashMap<String, String>,
     pub prompt: String,
-    pub agent_engine: AgentAutomationEngine,
     pub current_user: String,
     pub current_dir: String,
     pub services: std::collections::HashMap<String, String>,
@@ -94,7 +93,6 @@ impl ShellRepl {
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
-            agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
@@ -117,7 +115,6 @@ impl ShellRepl {
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
             prompt: "ubuntu@sigmaos:~$ ".to_string(),
-            agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
@@ -170,7 +167,6 @@ impl ShellRepl {
         if partial.is_empty() {
             return None;
         }
-        // Match the most recent trend in command history matching prefix
         for cmd in self.command_history.iter().rev() {
             if cmd.starts_with(partial) {
                 return Some(cmd.clone());
@@ -180,10 +176,8 @@ impl ShellRepl {
     }
 
     fn execute_line(&mut self, line: &str) {
-        // Save command history (Fish style)
         self.command_history.push(line.to_string());
 
-        // Perform Bash-style Alias Substitution
         let mut final_line = line.to_string();
         let parts: Vec<&str> = line.split_whitespace().collect();
         if !parts.is_empty() {
@@ -535,7 +529,6 @@ mod tests {
         repl.execute_command(alias_cmd).unwrap();
         assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
 
-        // Execute line with alias substitution
         repl.execute_line("ll");
         assert_eq!(repl.command_history[0], "ll");
     }

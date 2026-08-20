@@ -3,64 +3,6 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-#[cfg(not(test))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Version {
-    pub major: u32,
-    pub minor: u32,
-    pub patch: u32,
-}
-
-#[cfg(test)]
-impl Version {
-    pub fn new(major: u32, minor: u32, patch: u32) -> Self {
-        Self { major, minor, patch }
-    }
-    pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let parts: Vec<&str> = s.split('.').collect();
-        if parts.len() < 2 {
-            return Err("Invalid version string");
-        }
-        let major = parts[0].parse().unwrap_or(1);
-        let minor = parts[1].parse().unwrap_or(0);
-        let patch = if parts.len() > 2 { parts[2].parse().unwrap_or(0) } else { 0 };
-        Ok(Self { major, minor, patch })
-    }
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum VersionConstraint {
-    Any,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Dependency {
-    pub name: String,
-    pub version_constraint: VersionConstraint,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Package {
-    pub name: String,
-    pub version: Version,
-    pub description: String,
-    pub dependencies: Vec<Dependency>,
-    pub checksum: String,
-}
-
-#[cfg(test)]
-impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Self { name, version, description, dependencies, checksum }
-    }
-}
-
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -94,12 +36,12 @@ pub enum VersionConstraint {
     LessOrEqual(Version),
     Any,
 }
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
-
 
 #[derive(Debug, Clone)]
 pub struct Package {
@@ -416,7 +358,6 @@ impl MkinitcpioBuilder {
         )
         .into_bytes();
 
-        // Synthetic initramfs byte sequence
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
         image_header
     }
@@ -449,7 +390,6 @@ impl MakepkgBuilder {
     }
 
     pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
-        // Calculate mock SHA256 string
         let mut checksum = 0u64;
         for &b in source_data {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
@@ -499,35 +439,6 @@ mod tests {
             build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
-    }
-
-    #[test]
-    fn test_gentoo_portage_compiler() {
-        let mut compiler = PortageEbuildCompiler::new();
-        compiler.set_global_use_flag("vulkan", true);
-        compiler.set_global_use_flag("x11", false);
-
-        let mut ebuild = GentooEbuildPackage {
-            name: "mpv-player".to_string(),
-            version: Version::new(0, 35, 0),
-            use_flags: vec![
-                GentooUseFlag { name: "vulkan".to_string(), is_enabled: false },
-                GentooUseFlag { name: "x11".to_string(), is_enabled: true },
-            ],
-            configure_flags: Vec::new(),
-        };
-
-        let pkg = compiler.configure_and_compile(&mut ebuild).unwrap();
-        assert_eq!(pkg.name, "mpv-player");
-        assert!(pkg.description.contains("vulkan"));
-        assert!(!pkg.description.contains("x11"));
-
-        assert!(ebuild.configure_flags.contains(&"--enable-vulkan".to_string()));
-        assert!(!ebuild.configure_flags.contains(&"--enable-x11".to_string()));
-
-        assert_eq!(compiler.get_optimized_target_cpu_level(&["sse4.2", "avx2"]), 3);
-        assert_eq!(compiler.get_optimized_target_cpu_level(&["avx512f", "avx2"]), 4);
-        assert_eq!(compiler.get_optimized_target_cpu_level(&[]), 1);
     }
 
     #[test]

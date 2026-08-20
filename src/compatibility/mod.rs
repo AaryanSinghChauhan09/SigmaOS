@@ -4,7 +4,6 @@ pub mod canonical;
 pub mod chakra;
 pub mod cross_platform;
 pub mod zorin;
-pub mod antix;
 
 pub use zorin::{
     ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
@@ -13,11 +12,6 @@ pub use zorin::{
     ZorinWindowsAppSupport,
 };
 
-pub use antix::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
-    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
-    AntiXControlCentre,
-};
 pub mod historic_linux;
 pub mod mint_linux;
 pub mod chimera_linux;
@@ -34,7 +28,6 @@ pub mod fedora;
 pub mod debian;
 pub mod cachy_os;
 
-pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
@@ -53,9 +46,9 @@ pub use chakra::{
 };
 
 pub use antix::{
-    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
-    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
-    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
 };
 
 pub use canonical::{

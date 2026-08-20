@@ -1,4 +1,6 @@
-use core::mem;
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
@@ -40,8 +42,7 @@ pub trait SdfDriver {
     fn init(&mut self) -> SdfResult<()>;
     fn shutdown(&mut self);
     fn verify_pqc_attestation(&self, token: &[u8]) -> bool {
-        // PQC Post-Quantum signature verification check (e.g. Dilithium)
-        token.len() >= 16 && token[0..4] == [0x50, 0x51, 0x43, 0x31] // "PQC1" magic header
+        token.len() >= 16 && token[0..4] == [0x50, 0x51, 0x43, 0x31]
     }
 }
 
@@ -70,6 +71,46 @@ pub trait Driver {
     fn unload(&mut self) -> Result<(), DriverError>;
 }
 
+pub struct SimpleDriver {
+    pub id: DriverID,
+    pub driver_type: DriverType,
+    pub state: AtomicUsize,
+}
+
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver {
+            id,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
+    }
+}
+
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        match self.state.load(Ordering::SeqCst) {
+            1 => DriverState::Loaded,
+            2 => DriverState::Active,
+            _ => DriverState::Unloaded,
+        }
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        Ok(())
+    }
+}
+
 pub trait StorageDriver: Driver {
     fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
@@ -88,8 +129,6 @@ pub trait GraphicsDriver: Driver {
 pub trait InputDriver: Driver {
     fn poll_events(&mut self) -> Result<usize, DriverError>;
 }
-
-// Concrete Driver Classes (OOP Implementation)
 
 pub struct SimpleStorageDriver {
     pub id: DriverID,
@@ -115,7 +154,11 @@ impl Driver for SimpleStorageDriver {
         DriverType::Storage
     }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        match self.state.load(Ordering::SeqCst) {
+            1 => DriverState::Loaded,
+            2 => DriverState::Active,
+            _ => DriverState::Unloaded,
+        }
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Active as usize, Ordering::SeqCst);
@@ -137,6 +180,12 @@ pub trait DriverFramework {
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
     next_id: AtomicUsize,
+}
+
+impl Default for SimpleDriverFramework {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleDriverFramework {
@@ -186,124 +235,6 @@ impl DriverFramework for SimpleDriverFramework {
     }
 }
 
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn len(&self) -> usize {
-        self.len
-    }
-    fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -334,11 +265,9 @@ mod tests {
         assert!(driver.init().is_ok());
         assert_eq!(driver.base, 0xF000_0000);
 
-        // Valid PQC token
         let token = b"PQC1_VALID_TOKEN_123";
         assert!(driver.verify_pqc_attestation(token));
 
-        // Invalid PQC token
         let invalid_token = b"INVALID_TOKEN_123";
         assert!(!driver.verify_pqc_attestation(invalid_token));
 
