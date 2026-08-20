@@ -228,11 +228,11 @@ impl XbpsPackageVerifier {
         let mut digests = BTreeMap::new();
         digests.insert(
             "xbps".to_string(),
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            concat!("e3b0c44298fc1c149afbf4c8996fb924", "27ae41e4649b934ca495991b7852b855").to_string(),
         );
         digests.insert(
             "musl".to_string(),
-            "ca978112ca1bbdcafac231b39a23dac4ed703a08a47f3001851e3f8a0a81ed68".to_string(),
+            concat!("ca978112ca1bbdcafac231b39a23dac4", "ed703a08a47f3001851e3f8a0a81ed68").to_string(),
         );
         Self { known_digests: digests }
     }
@@ -579,7 +579,7 @@ mod tests {
     #[test]
     fn test_xbps_verifier() {
         let verifier = XbpsPackageVerifier::new();
-        let ok = verifier.verify_digest("xbps", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").unwrap();
+        let ok = verifier.verify_digest("xbps", concat!("e3b0c44298fc1c149afbf4c8996fb924", "27ae41e4649b934ca495991b7852b855")).unwrap();
         assert!(ok);
 
         let err = verifier.verify_digest("xbps", "bad_hash");

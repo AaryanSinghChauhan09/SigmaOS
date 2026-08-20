@@ -82,65 +82,6 @@ impl IsolatedDomain {
     }
 }
 
-/// Simulated lock-free Shared Memory Channel for ultra-low latency inter-domain IPC (S-Qrexec equivalent)
-/// Bypasses virtual network cards (which cause bottlenecks in Qubes OS) to write directly into target buffer ranges.
-pub struct SQrexecChannel {
-    pub buffer: *mut u8,
-    pub size: usize,
-    pub write_cursor: AtomicUsize,
-    pub read_cursor: AtomicUsize,
-}
-
-impl SQrexecChannel {
-    pub fn new(size: usize) -> Self {
-        let buffer = unsafe { alloc(size) };
-        Self {
-            buffer,
-            size,
-            write_cursor: AtomicUsize::new(0),
-            read_cursor: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn write_payload(&self, data: &[u8]) -> Result<(), IsolationError> {
-        let w = self.write_cursor.load(Ordering::SeqCst);
-        let len = data.len();
-        if w + len > self.size {
-            return Err(IsolationError::IpcRouteFailed);
-        }
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.add(w), len);
-        }
-        self.write_cursor.store(w + len, Ordering::SeqCst);
-        Ok(())
-    }
-
-    pub fn read_payload(&self) -> Vec<u8> {
-        let w = self.write_cursor.load(Ordering::SeqCst);
-        let r = self.read_cursor.load(Ordering::SeqCst);
-        let mut vec = Vec::new();
-
-        if w > r {
-            unsafe {
-                for i in r..w {
-                    vec.push(*self.buffer.add(i));
-                }
-            }
-            self.read_cursor.store(w, Ordering::SeqCst);
-        }
-        vec
-    }
-
-    pub fn destroy(&self) {
-        unsafe {
-            // Memory scrubbing: securely zero out shared memory pages before releasing to prevent side-channel leaks
-            core::ptr::write_bytes(self.buffer, 0, self.size);
-            free(self.buffer);
-        }
-    }
-}
-
 /// Qrexec policy action
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QrexecPolicyAction {
@@ -214,8 +155,6 @@ impl TemplateVmManager {
         if self.app_vm_count > 0 {
             self.app_vm_count -= 1;
             self.active_overlays_allocated_bytes = self.active_overlays_allocated_bytes.saturating_sub(128 * 1024 * 1024);
-            parent_id: None,
-            page_table_base: 0x1000 * id as u64, // Isolated hardware page offset
         }
     }
 }
@@ -281,8 +220,8 @@ impl SQrexecChannel {
 
 /// Dynamic Orchestrator for SigmaQubes isolated compartmentalization
 pub struct DomainOrchestrator {
-    domains: Vec<Option<IsolatedDomain>>,
-    next_id: AtomicUsize,
+    pub domains: Vec<Option<IsolatedDomain>>,
+    pub next_id: AtomicUsize,
     pub qrexec_policy: QrexecPolicyEngine,
 }
 

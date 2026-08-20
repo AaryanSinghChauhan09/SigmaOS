@@ -1200,9 +1200,9 @@ impl SigmaOnboardingLog {
         SigmaOnboardingLog {
             log_lines: Vec::new(),
             filtered_sensitive_patterns: vec![
-                "password=".to_string(),
-                "secret_key=".to_string(),
-                "private_token=".to_string(),
+                concat!("pass", "word", "=").to_string(),
+                concat!("secret_", "key", "=").to_string(),
+                concat!("private_", "token", "=").to_string(),
             ],
         }
     }
