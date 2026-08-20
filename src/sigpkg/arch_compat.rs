@@ -338,12 +338,13 @@ pub struct DebianSbuildPackage {
 }
 
 impl DebianSbuildPackage {
-    pub fn new(name: String, version: Version, build_depends: Vec<String>) -> Self {
-        Self { name, version, build_depends }
+    pub fn new(name: &str, build_depends: Vec<String>) -> Self {
+        Self {
+            name: name.to_string(),
+            version: Version::new(1, 0, 0),
+            build_depends,
+        }
     }
-}
-
-impl RollingSyncManager {
 }
 
 #[cfg(test)]

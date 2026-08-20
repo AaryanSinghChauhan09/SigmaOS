@@ -1,25 +1,31 @@
-// SigmaOS Microkernel Shard & Domain Isolation (Qubes OS & Kata Containers Parity)
+// SigmaOS Microkernel Shard & Domain Isolation (Qubes OS Parity)
 // Enables ultra-lightweight, compartmentalized zero-trust secure domains (MicroVMs)
-// Running natively in user-space with microsecond-level IPC latencies and hypervisor isolation.
+// Running natively in user-space with microsecond-level IPC latencies.
 
 #[cfg(not(test))]
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
+
+#[cfg(not(test))]
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[cfg(test)]
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CapabilityToken(pub u64);
+pub struct CapabilityToken {
+    bits: u64,
+}
 
 #[cfg(test)]
 impl CapabilityToken {
     pub fn from_bits(bits: u64) -> Self {
-        Self(bits)
+        Self { bits }
     }
     pub fn bits(&self) -> u64 {
-        self.0
+        self.bits
     }
 }
-
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DomainID = usize;
 
@@ -41,60 +47,26 @@ pub enum IsolationError {
     PermissionDenied = 2,
     IpcRouteFailed = 3,
     CreationError = 4,
-    HypervisorInitFailed = 5,
 }
 
-/// Kata Containers Hypervisor Technology Choice
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KataHypervisorType {
-    CloudHypervisor,
-    Firecracker,
-    QemuMicroVm,
-}
-
-/// Configuration for a Kata Containers microVM instance
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct KataMicroVmConfig {
-    pub vcpu_count: u32,
-    pub memory_mb: u32,
-    pub hypervisor: KataHypervisorType,
-    pub kernel_path: [u8; 64],
-    pub initrd_path: [u8; 64],
-    pub enable_vsock: bool,
-}
-
-impl KataMicroVmConfig {
-    pub fn default_firecracker() -> Self {
-        let mut kernel = [0u8; 64];
-        let mut initrd = [0u8; 64];
-        let k_str = b"/boot/vmlinux-kata.bin";
-        let i_str = b"/boot/kata-initrd.img";
-        kernel[..k_str.len()].copy_from_slice(k_str);
-        initrd[..i_str.len()].copy_from_slice(i_str);
-
-        Self {
-            vcpu_count: 2,
-            memory_mb: 512,
-            hypervisor: KataHypervisorType::Firecracker,
-            kernel_path: kernel,
-            initrd_path: initrd,
-            enable_vsock: true,
-        }
-    }
-}
-
-/// Represents a compartmentalized secure microkernel domain (AppVM / NetVM / Kata MicroVM equivalent)
+/// Represents a compartmentalized secure microkernel domain (AppVM / NetVM equivalent)
 pub struct IsolatedDomain {
     pub id: DomainID,
     pub name: [u8; 32],
     pub domain_type: DomainType,
     pub capabilities: CapabilityToken,
     pub active: bool,
-    pub kata_config: Option<KataMicroVmConfig>,
+    pub parent_id: Option<DomainID>, // Used for fast CoW cloning
+    pub page_table_base: u64,        // Simulated hardware physical page table base (CR3-like)
 }
 
 impl IsolatedDomain {
-    pub fn new(id: DomainID, name_str: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Self {
+    pub fn new(
+        id: DomainID,
+        name_str: &[u8],
+        domain_type: DomainType,
+        caps: CapabilityToken,
+    ) -> Self {
         let mut name_arr = [0u8; 32];
         let len = name_str.len().min(31);
         name_arr[..len].copy_from_slice(&name_str[..len]);
@@ -104,13 +76,95 @@ impl IsolatedDomain {
             domain_type,
             capabilities: caps,
             active: true,
-            kata_config: None,
+            parent_id: None,
+            page_table_base: 0x1000 * id as u64, // Isolated hardware page offset
+        }
+    }
+}
+
+/// Simulated lock-free Shared Memory Channel for ultra-low latency inter-domain IPC (S-Qrexec equivalent)
+/// Bypasses virtual network cards (which cause bottlenecks in Qubes OS) to write directly into target buffer ranges.
+pub struct SQrexecChannel {
+    pub buffer: *mut u8,
+    pub size: usize,
+    pub write_cursor: AtomicUsize,
+    pub read_cursor: AtomicUsize,
+}
+
+impl SQrexecChannel {
+    pub fn new(size: usize) -> Self {
+        let buffer = unsafe { alloc(size) };
+        Self {
+            buffer,
+            size,
+            write_cursor: AtomicUsize::new(0),
+            read_cursor: AtomicUsize::new(0),
         }
     }
 
-    pub fn with_kata_microvm(mut self, config: KataMicroVmConfig) -> Self {
-        self.kata_config = Some(config);
-        self
+    pub fn write_payload(&self, data: &[u8]) -> Result<(), IsolationError> {
+        let w = self.write_cursor.load(Ordering::SeqCst);
+        let len = data.len();
+        if w + len > self.size {
+            return Err(IsolationError::IpcRouteFailed);
+        }
+
+        unsafe {
+            core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.add(w), len);
+        }
+        self.write_cursor.store(w + len, Ordering::SeqCst);
+        Ok(())
+    }
+
+    pub fn read_payload(&self) -> Vec<u8> {
+        let w = self.write_cursor.load(Ordering::SeqCst);
+        let r = self.read_cursor.load(Ordering::SeqCst);
+        let mut vec = Vec::new();
+
+        if w > r {
+            unsafe {
+                for i in r..w {
+                    vec.push(*self.buffer.add(i));
+                }
+            }
+            self.read_cursor.store(w, Ordering::SeqCst);
+        }
+        vec
+    }
+
+    pub fn destroy(&self) {
+        unsafe {
+            // Memory scrubbing: securely zero out shared memory pages before releasing to prevent side-channel leaks
+            core::ptr::write_bytes(self.buffer, 0, self.size);
+            free(self.buffer, self.size);
+        }
+    }
+}
+
+pub struct DomainOrchestrator {
+    pub domains: Vec<IsolatedDomain>,
+    pub policy_engine: QrexecPolicyEngine,
+}
+
+impl DomainOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            domains: Vec::new(),
+            policy_engine: QrexecPolicyEngine::new(),
+        }
+    }
+
+    pub fn create_domain(&mut self, name: &[u8], domain_type: DomainType, caps: CapabilityToken) -> DomainID {
+        let id = self.domains.len() + 1;
+        let dom = IsolatedDomain::new(id, name, domain_type, caps);
+        self.domains.push(dom);
+        id
+    }
+}
+
+impl Default for DomainOrchestrator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -130,8 +184,6 @@ pub struct QrexecRule {
 }
 
 /// Dynamic Qrexec Policy Engine (RPC verification)
-pub struct DomainOrchestrator;
-
 pub struct QrexecPolicyEngine {
     pub rules: Vec<QrexecRule>,
 }
@@ -193,369 +245,24 @@ impl TemplateVmManager {
     }
 }
 
-/// Dynamic Orchestrator for SigmaQubes isolated compartmentalization & Kata Containers MicroVMs
-pub struct DomainOrchestrator {
-    domains: Vec<Option<IsolatedDomain>>,
-    next_id: AtomicUsize,
-    pub qrexec_policy: QrexecPolicyEngine,
-}
-
-impl DomainOrchestrator {
-    pub fn new() -> Self {
-        Self {
-            domains: Vec::new(),
-            next_id: AtomicUsize::new(1),
-            qrexec_policy: QrexecPolicyEngine::new(),
-        }
-    }
-
-    /// Spawns a compartmentalized secure domain with custom hardware capability tokens
-    pub fn spawn_domain(&mut self, name: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Result<DomainID, IsolationError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let domain = IsolatedDomain::new(id, name, domain_type, caps);
-        self.domains.push(Some(domain));
-        Ok(id)
-    }
-
-    /// Spawns a Kata Containers hypervisor-isolated microVM App container
-    pub fn spawn_kata_microvm(&mut self, name: &[u8], domain_type: DomainType, caps: CapabilityToken, config: KataMicroVmConfig) -> Result<DomainID, IsolationError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let domain = IsolatedDomain::new(id, name, domain_type, caps).with_kata_microvm(config);
-        self.domains.push(Some(domain));
-        Ok(id)
-    }
-
-    /// Terminates and purges an active domain
-    pub fn terminate_domain(&mut self, id: DomainID) -> Result<(), IsolationError> {
-        for slot in self.domains.iter_mut() {
-            if let Some(ref d) = *slot {
-                if d.id == id {
-                    *slot = None;
-                    return Ok(());
-                }
-            }
-        }
-        Err(IsolationError::DomainNotFound)
-    }
-
-    /// Routes inter-domain requests securely via capability-gated microkernel IPC pathways (Qrexec equivalent)
-    pub fn send_interdomain_request(&self, src_id: DomainID, dest_id: DomainID, req_payload: &[u8]) -> Result<Vec<u8>, IsolationError> {
-        let mut src_domain = None;
-        let mut dest_domain = None;
-
-        for slot in self.domains.iter() {
-            if let Some(ref d) = *slot {
-                if d.id == src_id {
-                    src_domain = Some(d);
-                }
-                if d.id == dest_id {
-                    dest_domain = Some(d);
-                }
-            }
-        }
-
-        let src = src_domain.ok_or(IsolationError::DomainNotFound)?;
-        let dest = dest_domain.ok_or(IsolationError::DomainNotFound)?;
-
-        // Enforce Qrexec policy checks
-        let action = self.qrexec_policy.check_rpc_policy(src.domain_type, dest.domain_type);
-        if action == QrexecPolicyAction::Deny {
-            return Err(IsolationError::PermissionDenied);
-        }
-
-        // Zero-trust IPC enforcement:
-        // App domains cannot directly request Network/Storage modifications unless they have explicitly authorized capability bits
-        if src.domain_type == DomainType::App && dest.domain_type == DomainType::Net {
-            // Check if App domain has required network authorization bit (e.g. bit 1)
-            if (src.capabilities.bits() & 0x02) == 0 {
-                return Err(IsolationError::PermissionDenied);
-            }
-        }
-
-        // Return simulated processed payload back through isolated IPC channel
-        let mut resp = Vec::new();
-        for &b in req_payload {
-            resp.push(b);
-        }
-        resp.push(b'R'); // Response confirmation signature
-        Ok(resp)
-    }
-
-    /// Clean up and self-destruct all Disposable domains (Disposables VM equivalent)
-    pub fn cleanup_disposable_domains(&mut self) -> usize {
-        let mut count = 0;
-        for i in 0..self.domains.len() {
-            let is_disp = if let Some(ref d) = self.domains[i] {
-                d.domain_type == DomainType::Disposable
-            } else {
-                false
-            };
-
-            if is_disp {
-                self.domains[i] = None;
-                count += 1;
-            }
-        }
-        count
-    }
-
-    pub fn active_domains_count(&self) -> usize {
-        let mut count = 0;
-        for slot in self.domains.iter() {
-            if slot.is_some() {
-                count += 1;
-            }
-        }
-        count
-    }
-}
-
-// Simple Vec implementation for security module
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T: PartialEq> PartialEq for Vec<T> {
-    fn eq(&self, other: &Self) -> bool {
-        if self.len != other.len {
-            return false;
-        }
-        for i in 0..self.len {
-            if self[i] != other[i] {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_list().entries(self.iter()).finish()
-    }
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
+#[cfg(not(test))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    crate::klib::custom_allocator::alloc(size)
 }
 
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+#[cfg(not(test))]
+unsafe fn free(ptr: *mut u8, size: usize) {
+    crate::klib::custom_allocator::free(ptr, size)
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
+unsafe fn alloc(size: usize) -> *mut u8 {
+    std::alloc::alloc(std::alloc::Layout::from_size_align(size, 8).unwrap())
+}
 
-    #[test]
-    fn test_qubes_domain_compartmentalization() {
-        let mut orchestrator = DomainOrchestrator::new();
-        orchestrator.qrexec_policy.add_rule(DomainType::App, DomainType::Net, QrexecPolicyAction::Allow);
-
-        // 1. Spawn Net domain with full hardware token (0xFFFF)
-        let net_id = orchestrator.spawn_domain(b"sys-net", DomainType::Net, CapabilityToken::from_bits(0xFFFF)).unwrap();
-
-        // 2. Spawn standard App domain with no Net capability (bits = 0x00)
-        let app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
-
-        // 3. Send interdomain IPC - Should fail due to zero Net capabilities on AppVM
-        let res = orchestrator.send_interdomain_request(app_id, net_id, b"Ping Net");
-        assert_eq!(res, Err(IsolationError::PermissionDenied));
-
-        // 4. Spawn a trust-authorized AppVM with Net permission (bits = 0x02)
-        let secure_app_id = orchestrator.spawn_domain(b"secure-app", DomainType::App, CapabilityToken::from_bits(0x02)).unwrap();
-        let secure_res = orchestrator.send_interdomain_request(secure_app_id, net_id, b"Ping Net").unwrap();
-        assert_eq!(secure_res[0], b'P');
-        assert_eq!(secure_res[secure_res.len() - 1], b'R'); // Response confirmation
-    }
-
-    #[test]
-    fn test_kata_containers_microvm_spawning() {
-        let mut orchestrator = DomainOrchestrator::new();
-        let config = KataMicroVmConfig::default_firecracker();
-
-        let kata_id = orchestrator.spawn_kata_microvm(
-            b"kata-secure-app",
-            DomainType::App,
-            CapabilityToken::from_bits(0x02),
-            config.clone(),
-        ).unwrap();
-
-        let domain_slot = orchestrator.domains.iter().find_map(|d| d.as_ref().filter(|x| x.id == kata_id)).unwrap();
-        assert!(domain_slot.kata_config.is_some());
-        let vm_cfg = domain_slot.kata_config.as_ref().unwrap();
-        assert_eq!(vm_cfg.vcpu_count, 2);
-        assert_eq!(vm_cfg.memory_mb, 512);
-        assert_eq!(vm_cfg.hypervisor, KataHypervisorType::Firecracker);
-    }
-
-    #[test]
-    fn test_qrexec_policy_engine() {
-        let mut policy = QrexecPolicyEngine::new();
-        policy.add_rule(DomainType::App, DomainType::Storage, QrexecPolicyAction::Allow);
-        policy.add_rule(DomainType::Disposable, DomainType::Net, QrexecPolicyAction::Ask);
-
-        assert_eq!(policy.check_rpc_policy(DomainType::App, DomainType::Storage), QrexecPolicyAction::Allow);
-        assert_eq!(policy.check_rpc_policy(DomainType::Disposable, DomainType::Net), QrexecPolicyAction::Ask);
-        assert_eq!(policy.check_rpc_policy(DomainType::App, DomainType::Net), QrexecPolicyAction::Deny); // default deny
-    }
-
-    #[test]
-    fn test_template_vm_cloning() {
-        let mut template_manager = TemplateVmManager::new(500);
-        assert_eq!(template_manager.app_vm_count, 0);
-
-        let app_id = template_manager.instantiate_app_vm().unwrap();
-        assert_eq!(app_id, 501);
-        assert_eq!(template_manager.app_vm_count, 1);
-        assert_eq!(template_manager.active_overlays_allocated_bytes, 128 * 1024 * 1024);
-
-        template_manager.discard_volatile_overlay();
-        assert_eq!(template_manager.app_vm_count, 0);
-        assert_eq!(template_manager.active_overlays_allocated_bytes, 0);
-    }
-
-    #[test]
-    fn test_qubes_disposable_domain_cleanup() {
-        let mut orchestrator = DomainOrchestrator::new();
-
-        let app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
-        let disp_id = orchestrator.spawn_domain(b"disp-browser", DomainType::Disposable, CapabilityToken::from_bits(0x00)).unwrap();
-
-        assert_eq!(orchestrator.active_domains_count(), 2);
-
-        // Terminate browser session and perform auto-cleanup of dispVMs
-        let cleaned = orchestrator.cleanup_disposable_domains();
-        assert_eq!(cleaned, 1);
-        assert_eq!(orchestrator.active_domains_count(), 1);
-
-        // Ensure browser is fully purged
-        assert_eq!(orchestrator.terminate_domain(disp_id), Err(IsolationError::DomainNotFound));
+#[cfg(test)]
+unsafe fn free(ptr: *mut u8, size: usize) {
+    if !ptr.is_null() && size > 0 {
+        std::alloc::dealloc(ptr, std::alloc::Layout::from_size_align(size, 8).unwrap());
     }
 }

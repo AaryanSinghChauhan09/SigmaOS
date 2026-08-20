@@ -1,12 +1,11 @@
 // SigmaOS Distro/Ecosystem Maturity Module
-pub mod arch_parity;
 pub mod certification;
-pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
+pub mod linux_ideas;
 pub mod manjaro;
 pub mod nextgen;
 pub mod recovery;
@@ -15,9 +14,11 @@ pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
 pub mod linux_bsd_inspirations;
+
 pub mod arch_parity;
 pub mod chakra_parity;
 
+pub use linux_ideas::*;
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
     PinRule, AptPinStore, OpenRCService,
@@ -25,11 +26,6 @@ pub use linux_bsd_inspirations::{
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
-pub use manjaro::{
-    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease, ManjaroKernelSwitcher,
-    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
-};
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
@@ -51,10 +47,14 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
+pub use manjaro::{
+    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
+    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
+};
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
-    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
-    LivepatchPatch, LivepatchManager,
+    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
+    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
+    TimeTravelEngine,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,

@@ -1,63 +1,29 @@
 // Minimal capability token implementation for SigmaOS
 // This provides the basic CapabilityToken structure needed by drivers
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
-use std::sync::atomic::{AtomicU64, Ordering};
+use core::default::Default;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub bits: u64,
-    pub permissions: u64,
 }
 
-impl CapabilityToken {
-    pub fn new() -> Self {
-        CapabilityToken {
-            bits: 0,
-            permissions: 0,
-        }
-    }
-
-    pub fn from_bits(bits: u64) -> Self {
-        CapabilityToken {
-            bits,
-            permissions: bits,
-        }
-    }
-    
-    pub fn with_permission(mut self, permission: u64) -> Self {
-        self.permissions |= permission;
-        self
-    }
-
-    pub fn bits(&self) -> u64 {
-        self.permissions
-    }
-
-    pub fn allow_network(self, _proto: &str, _port: u16) -> Self { self }
-    pub fn allow_read(self, _path: &str) -> Self { self }
-    pub fn allow_write(self, _path: &str) -> Self { self }
-    pub fn allow_exec(self) -> Self { self }
-    pub fn allow_ipc(self) -> Self { self }
-}
 impl Default for CapabilityToken {
     fn default() -> Self {
         Self::new()
     }
 }
 
-<<<<<<< HEAD
 impl CapabilityToken {
-    pub fn with_permission(mut self, permission: u64) -> Self {
-        self.bits |= permission;
-        self.permissions |= permission;
-        self
-    }
     /// Create a new capability token with no permissions
     pub fn new() -> Self {
         Self { bits: 0 }
+    }
+
+    pub fn with_permission(mut self, permission: u64) -> Self {
+        self.bits |= permission;
+        self
     }
 
     /// Create capability token from raw bits
@@ -133,12 +99,12 @@ impl CapabilityToken {
 /// Permission types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
-    NetworkTcp = 1,
-    NetworkUdp = 2,
-    FileRead = 4,
-    FileWrite = 8,
-    ProcessExec = 16,
-    Ipc = 32,
+    NetworkTcp = 0,
+    NetworkUdp = 1,
+    FileRead = 2,
+    FileWrite = 3,
+    ProcessExec = 4,
+    Ipc = 5,
 }
 
 /// Capability gate for syscall validation
@@ -163,13 +129,13 @@ impl CapabilityGate {
     /// Validate syscall against current capability
     pub fn validate_syscall(&self, permission: Permission) -> bool {
         let current = self.current.load(Ordering::SeqCst);
-        (current & permission as u64) != 0
+        (current & (1 << permission as u64)) != 0
     }
 
     /// Get current capability
     pub fn current_capability(&self) -> CapabilityToken {
         CapabilityToken {
-            permissions: self.current.load(Ordering::SeqCst),
+            bits: self.current.load(Ordering::SeqCst),
         }
     }
 }
@@ -229,30 +195,3 @@ mod tests {
         assert_eq!(port, 443);
     }
 }
-=======
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    NetworkTcp,
-    NetworkUdp,
-    Ipc,
-}
-
-pub struct CapabilityGate {
-    pub token: CapabilityToken,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        CapabilityGate {
-            token: CapabilityToken::new(),
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
-    }
-}
->>>>>>> origin/fix/sigmaos-core-compilation-and-trait-alignment-16354210402009246066

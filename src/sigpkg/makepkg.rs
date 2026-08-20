@@ -13,9 +13,7 @@
 #![allow(unused_imports)]
 
 extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use crate::klib::{BTreeMap, Vec, String};
 use crate::sigpkg::{Package, Version};
 
 /// PKGBUILD parser for Arch Linux package recipes
@@ -44,7 +42,7 @@ impl PkgbuildParser {
 
             // Parse variable assignments
             if line.contains('=') && !line.starts_with("function ") {
-                let parts: Vec<&str> = line.splitn(2, '=').collect();
+                let parts: alloc::vec::Vec<&str> = line.splitn(2, '=').collect();
                 if parts.len() == 2 {
                     let key = parts[0].trim().to_string();
                     let value = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
@@ -153,8 +151,8 @@ impl MakepkgSandbox {
             .clone();
         
         let pkgdesc = self.pkgbuild.pkgdesc()
-            .cloned()
-            .unwrap_or_else(|| String::from("No description"));
+            .map(|s: &crate::klib::String| s.clone())
+            .unwrap_or_else(|| String::from_str("No description"));
 
         let cleaned_ver = if pkgver.contains('-') {
             pkgver.split('-').next().unwrap().to_string()
@@ -167,10 +165,10 @@ impl MakepkgSandbox {
             pkgname,
             version,
             pkgdesc,
-            Vec::new(),
-            String::new(),
+            alloc::vec::Vec::new(),
+            crate::klib::String::new(),
         );
-        pkg.source = String::from("arch");
+        pkg.source = String::from_str("arch");
         Ok(pkg)
     }
 
@@ -216,14 +214,14 @@ depends=("glibc")
 "#;
 
         assert!(parser.parse(content).is_ok());
-        assert_eq!(parser.pkgname(), Some(&String::from("test-package")));
-        assert_eq!(parser.pkgver(), Some(&String::from("1.0.0")));
-        assert_eq!(parser.pkgrel(), Some(&String::from("1")));
+        assert_eq!(parser.pkgname(), Some(&String::from_str("test-package")));
+        assert_eq!(parser.pkgver(), Some(&String::from_str("1.0.0")));
+        assert_eq!(parser.pkgrel(), Some(&String::from_str("1")));
     }
 
     #[test]
     fn test_makepkg_sandbox() {
-        let mut sandbox = MakepkgSandbox::new(String::from("/tmp/build"));
+        let mut sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
         let content = r#"
 pkgname="test-package"
 pkgver="1.0.0"

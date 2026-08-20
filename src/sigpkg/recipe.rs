@@ -1,6 +1,6 @@
-//! SigPkg: Community Recipe Packaging (Arch Linux Absorption)
-//!
-//! Zero-allocation package manager parsing simple, signed declarative community recipes.
+// SigmaOS Package Recipes
+// Build recipes for package compilation and installation
+// Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
 use crate::sigpkg::{Dependency, Version};
 use std::collections::HashMap;
@@ -15,6 +15,21 @@ pub enum BuildSystem {
     Meson,
     Ninja,
     Custom,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UseFlag {
+    Ssl,
+    X11,
+    Wayland,
+    Audio,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StageProfile {
+    Stage1Minimal,
+    Stage2Bootstrap,
+    Stage3Optimized,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -105,6 +120,11 @@ pub struct PackageRecipe {
     pub license_spdx: String,
     pub prepare_commands: Vec<String>,
     pub package_commands: Vec<String>,
+
+    // Gentoo-inspired features
+    pub active_use_flags: Vec<UseFlag>,
+    pub compilation_profile: StageProfile,
+    pub conditional_dependencies: Vec<(UseFlag, Dependency)>, // Dependency unlocked ONLY if USE flag is active
 }
 
 impl PackageRecipe {
@@ -125,6 +145,9 @@ impl PackageRecipe {
             license_spdx: "MIT".to_string(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
+            active_use_flags: Vec::new(),
+            compilation_profile: StageProfile::Stage2Bootstrap,
+            conditional_dependencies: Vec::new(),
         }
     }
 
@@ -149,16 +172,6 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_prepare_command(mut self, cmd: String) -> Self {
-        self.prepare_commands.push(cmd);
-        self
-    }
-
-    pub fn with_package_command(mut self, cmd: String) -> Self {
-        self.package_commands.push(cmd);
-        self
-    }
-
     pub fn with_build_command(mut self, command: String) -> Self {
         self.build_commands.push(command);
         self
@@ -179,9 +192,44 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_arch(mut self, arch: String) -> Self {
-        self.arch = arch;
+    // Builder helpers for USE flags and compilation profiles
+    pub fn with_use_flag(mut self, flag: UseFlag) -> Self {
+        self.active_use_flags.push(flag);
         self
+    }
+
+    pub fn with_compilation_profile(mut self, profile: StageProfile) -> Self {
+        self.compilation_profile = profile;
+        self
+    }
+
+    pub fn with_conditional_dependency(mut self, flag: UseFlag, dependency: Dependency) -> Self {
+        self.conditional_dependencies.push((flag, dependency));
+        self
+    }
+
+    pub fn is_use_active(&self, flag: UseFlag) -> bool {
+        self.active_use_flags.contains(&flag)
+    }
+
+    /// Evaluates and returns all active dependencies including conditional USE-flag targets
+    pub fn get_active_dependencies(&self) -> Vec<Dependency> {
+        let mut deps = self.dependencies.clone();
+        for (flag, dep) in self.conditional_dependencies.iter() {
+            if self.is_use_active(*flag) {
+                deps.push(dep.clone());
+            }
+        }
+        deps
+    }
+
+    /// Returns CFLAGS/CXXFLAGS compilation flags matching the active Stage Profile
+    pub fn get_stage_optimization_flags(&self) -> &'static str {
+        match self.compilation_profile {
+            StageProfile::Stage1Minimal => "-O1 -mno-sse2",
+            StageProfile::Stage2Bootstrap => "-O2 -pipe",
+            StageProfile::Stage3Optimized => "-O3 -march=native -flto=fat -funroll-loops",
+        }
     }
 
     pub fn validate(&self) -> Result<(), RecipeError> {
@@ -276,24 +324,38 @@ mod tests {
     }
 
     #[test]
-    fn test_pkgbuild_and_aur_compilation_fields() {
-        let recipe = PackageRecipe::new("neofetch-pqc".to_string(), Version::new(7, 1, 0))
-            .with_pkgrel(3)
-            .with_arch("aarch64".to_string())
-            .with_source(
-                "https://github.com/dylanaraps/neofetch".to_string(),
-                "hash_neofetch".to_string(),
-            )
-            .with_prepare_command("patch -p1 < pqc_patch.diff".to_string())
-            .with_build_command("make build".to_string())
-            .with_package_command("make DESTDIR=\"$pkgdir\" install".to_string());
+    fn test_portage_style_use_flags() {
+        let mut recipe = PackageRecipe::new("libcurl".to_string(), Version::new(8, 2, 1))
+            .with_source("https://example.com/curl".to_string(), "99aa88".to_string())
+            .with_build_command("make".to_string());
 
-        assert_eq!(recipe.pkgrel, 3);
-        assert_eq!(recipe.arch, "aarch64");
-        assert_eq!(recipe.prepare_commands[0], "patch -p1 < pqc_patch.diff");
-        assert_eq!(
-            recipe.package_commands[0],
-            "make DESTDIR=\"$pkgdir\" install"
-        );
+        // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
+        let ssl_dependency = Dependency {
+            name: "openssl".to_string(),
+            version_constraint: crate::sigpkg::VersionConstraint::Any,
+        };
+
+        recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);
+
+        // 1. By default, "Ssl" is inactive, so no conditional dependency is fetched
+        assert!(!recipe.is_use_active(UseFlag::Ssl));
+        assert_eq!(recipe.get_active_dependencies().len(), 0);
+
+        // 2. Toggle "Ssl" active
+        recipe = recipe.with_use_flag(UseFlag::Ssl);
+        assert!(recipe.is_use_active(UseFlag::Ssl));
+
+        let active_deps = recipe.get_active_dependencies();
+        assert_eq!(active_deps.len(), 1);
+        assert_eq!(active_deps[0].name, "openssl");
+    }
+
+    #[test]
+    fn test_portage_stage_optimization_flags() {
+        let mut recipe = PackageRecipe::new("kernel".to_string(), Version::new(6, 1, 0));
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O2 -pipe"); // default Stage2
+
+        recipe = recipe.with_compilation_profile(StageProfile::Stage3Optimized);
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O3 -march=native -flto=fat -funroll-loops");
     }
 }

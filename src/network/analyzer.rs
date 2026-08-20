@@ -501,3 +501,84 @@ impl ClearLinuxFlowLoadBalancer {
         self.flow_affinity.len()
     }
 }
+
+pub trait AnalysisStrategy {
+    fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;
+    fn name(&self) -> &str;
+}
+
+#[derive(Debug, Clone)]
+pub struct TrafficAlert {
+    pub alert_type: AlertType,
+    pub severity: AlertSeverity,
+    pub message: String,
+    pub timestamp: Instant,
+    pub related_ips: Vec<IpAddr>,
+}
+
+#[derive(Debug, Clone)]
+pub struct BandwidthAnalysis {
+    pub total_bytes_transferred: u64,
+    pub bytes_per_second: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConnectionInfo {
+    pub source_ip: IpAddr,
+    pub destination_ip: IpAddr,
+    pub state: ConnectionState,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConnectionState {
+    Established,
+    Closed,
+    Connecting,
+}
+
+#[derive(Debug, Clone)]
+pub struct SecurityAnalysis {
+    pub threat_score: f32,
+    pub alerts: Vec<TrafficAlert>,
+}
+
+#[derive(Debug, Clone)]
+pub struct TrafficStatistics {
+    pub packet_count: u64,
+    pub total_bytes: u64,
+}
+
+pub struct NetworkTrafficAnalyzer {
+    pub strategies: Vec<Box<dyn AnalysisStrategy>>,
+    pub stats: TrafficStatistics,
+}
+
+impl NetworkTrafficAnalyzer {
+    pub fn new() -> Self {
+        Self {
+            strategies: Vec::new(),
+            stats: TrafficStatistics {
+                packet_count: 0,
+                total_bytes: 0,
+            },
+        }
+    }
+
+    pub fn process_packet(&mut self, packet: &TrafficPacket) -> Vec<TrafficAlert> {
+        self.stats.packet_count += 1;
+        self.stats.total_bytes += packet.size_bytes;
+        let mut alerts = Vec::new();
+        for strat in &mut self.strategies {
+            if let Some(alert) = strat.analyze_packet(packet) {
+                alerts.push(alert);
+            }
+        }
+        alerts
+    }
+}
+
+impl Default for NetworkTrafficAnalyzer {
+    fn default() -> Self {
+        Self::new()
+    }
+}

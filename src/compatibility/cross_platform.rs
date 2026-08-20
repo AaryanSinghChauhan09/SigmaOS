@@ -962,8 +962,24 @@ impl Default for OpenSourceAiModelBridge {
     }
 }
 
-/// Compatibility errors
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WindowCoordinates {
+    pub x: i32,
+    pub y: i32,
+    pub width: u32,
+    pub height: u32,
+}
+
+pub struct ZenithDisplayCompositor {
+    pub active_windows_count: usize,
+}
+
+impl ZenithDisplayCompositor {
+    pub fn new() -> Self {
+        Self { active_windows_count: 0 }
+    }
+}
+
 pub enum CompatibilityError {
     BinaryNotFound,
     UnsupportedFormat,

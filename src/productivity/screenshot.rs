@@ -270,16 +270,18 @@ impl Default for ScreenshotTool {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Vector annotation element types
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AnnotationType {
     Rectangle,
     Arrow,
     Highlight,
-    Pixelate,
+    BlurPixelate,
     Text,
     StepNumber,
 }
 
+/// Annotation object
 #[derive(Debug, Clone)]
 pub struct Annotation {
     pub annotation_type: AnnotationType,
@@ -289,6 +291,7 @@ pub struct Annotation {
     pub step_index: Option<u32>,
 }
 
+/// Specialized annotator & vector editing engine
 pub struct AnnotationEngine {
     pub annotations: Vec<Annotation>,
     pub next_step_number: u32,
@@ -303,7 +306,7 @@ impl AnnotationEngine {
     }
 
     pub fn draw_shape(&mut self, annotation_type: AnnotationType, region: CaptureRegion, color: u32) {
-        self.annotations.push(VectorAnnotation {
+        self.annotations.push(Annotation {
             annotation_type,
             region,
             color_rgba: color,
@@ -313,7 +316,7 @@ impl AnnotationEngine {
     }
 
     pub fn draw_text(&mut self, region: CaptureRegion, text: &str, color: u32) {
-        self.annotations.push(VectorAnnotation {
+        self.annotations.push(Annotation {
             annotation_type: AnnotationType::Text,
             region,
             color_rgba: color,
@@ -333,7 +336,7 @@ impl AnnotationEngine {
             height: 24,
         };
 
-        self.annotations.push(VectorAnnotation {
+        self.annotations.push(Annotation {
             annotation_type: AnnotationType::StepNumber,
             region,
             color_rgba: color,

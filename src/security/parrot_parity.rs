@@ -1,5 +1,6 @@
 // SigmaOS Parrot Security Parity Implementation
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
+use crate::klib::custom_string::SigmaString;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
@@ -123,6 +124,29 @@ impl AppSandboxEngine {
 }
 
 /// Forensic storage filter for write protection
+pub static GLOBAL_ANONSURF: AnonSurfShunt = AnonSurfShunt {
+    current_mode: Cell::new(RoutingMode::DirectCleartext),
+    dns_leak_protection: Cell::new(true),
+    anonymized_packets_routed: Cell::new(0),
+};
+
+pub static GLOBAL_SANDBOX: AppSandboxEngine = AppSandboxEngine {
+    current_policy: Cell::new(SandboxPolicy {
+        allow_network: false,
+        allow_raw_sockets: false,
+        allow_filesystem_write: false,
+        permitted_subpath: SigmaString { data: [0; 64], len: 0 },
+    }),
+};
+
+pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter {
+    is_write_blocked: Cell::new(true),
+};
+
+unsafe impl Sync for AnonSurfShunt {}
+unsafe impl Sync for AppSandboxEngine {}
+unsafe impl Sync for ForensicStorageFilter {}
+
 pub struct ForensicStorageFilter {
     pub is_write_blocked: AtomicBool,
 }

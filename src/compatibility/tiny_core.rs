@@ -1,11 +1,8 @@
-use crate::filesystem::vfs::FileType;
 // SigmaOS Distro Compatibility Layer
 /// Tiny Core Linux Compatibility & Philosophy Absorption for SigmaOS
 /// Implements frugal booting, RAM-only execution isolation, .tcz read-only extension loop mounting,
 /// boot code parsing (base, norestore, etc.), and filetool-style (mydata.tgz) user backup/restore.
-
-extern crate alloc;
-use alloc::vec::Vec;
+use crate::klib::Vec;
 use crate::filesystem::FileType;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -93,7 +90,7 @@ impl TceLoader {
     pub fn mount_extension(
         &mut self,
         name: &str,
-        vfs: &mut crate::filesystem::vfs::VirtualFilesystem,
+        vfs: &mut crate::filesystem::VirtualFilesystem,
     ) -> Result<(), &'static str> {
         // Find extension
         let mut ext_idx = None;
@@ -254,7 +251,7 @@ impl FrugalLoader {
     /// Runs the Frugal Boot configuration, setting up RAM loop mounting and configuration restores
     pub fn execute_boot_sequence(
         &mut self,
-        vfs: &mut crate::filesystem::vfs::VirtualFilesystem,
+        vfs: &mut crate::filesystem::VirtualFilesystem,
         mydata_archive: &[u8],
     ) -> Result<(), &'static str> {
         // 1. Check if restore is permitted
@@ -303,7 +300,7 @@ mod tests {
 
     #[test]
     fn test_tcz_loop_mounting() {
-        let mut vfs = crate::filesystem::vfs::VirtualFilesystem::new();
+        let mut vfs = crate::filesystem::VirtualFilesystem::new();
         let mut loader = TceLoader::new();
 
         // Register flwm.tcz (depends on fltk.tcz)
@@ -371,7 +368,7 @@ mod tests {
 
     #[test]
     fn test_frugal_boot_execution() {
-        let mut vfs = crate::filesystem::vfs::VirtualFilesystem::new();
+        let mut vfs = crate::filesystem::VirtualFilesystem::new();
         let mut loader = FrugalLoader::new(1024, "home=sda1");
 
         // Create a backup archive

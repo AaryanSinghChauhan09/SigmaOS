@@ -11,8 +11,19 @@ pub mod transaction;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 pub mod declarative_build;
+pub mod aur;
+pub mod aur_helper;
+pub mod importer;
+pub mod linux_compat;
+pub mod makepkg;
+pub mod nix_shell;
+pub mod pacman;
+pub mod portage;
+pub mod repository_manager;
 pub mod spec;
+pub mod transaction_log;
 pub mod universal_adapter;
+pub mod universal_engine;
 pub mod universal_oop_system;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
@@ -28,6 +39,7 @@ pub use spec::{
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
+pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
@@ -42,6 +54,8 @@ pub use universal_oop_system::{
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
     UserDefinedHook, ParseError as OopParseError, InstallError, HookError,
 };
+pub use crate::package::universal::{AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
+pub use universal_adapter::UniversalPackageManager as UniversalPackageAdapter;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -49,12 +63,6 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
-}
-
-impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
 }
 
 impl Version {

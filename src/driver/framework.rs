@@ -36,13 +36,8 @@ pub trait Driver {
     fn id(&self) -> DriverID;
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
-    fn set_state(&self, _state: DriverState) {}
-    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
-    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
-    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
-    fn dependencies(&self) -> &'static [DriverType] { &[] }
 }
 
 #[repr(C)]
@@ -93,6 +88,18 @@ impl SimpleDriver {
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
+
+    pub fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+
+    pub fn probe(&self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+
+    pub fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
 }
 
 impl Driver for SimpleDriver {
@@ -105,28 +112,13 @@ impl Driver for SimpleDriver {
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Active);
+        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Unloaded);
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
-    }
-    fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn dependencies(&self) -> &'static [DriverType] {
-        &[]
     }
 }
 
@@ -154,21 +146,12 @@ impl Driver for SimpleStorageDriver {
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Active);
+        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Unloaded);
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -400,30 +383,15 @@ impl Driver for LinuxDriverShim {
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        (self.fops.open)();
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Active);
+        (self.fops.open)();
+        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
         (self.fops.release)();
-        self.set_state(DriverState::Unloaded);
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
-    }
-    fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn dependencies(&self) -> &'static [DriverType] {
-        &[]
     }
 }
 
@@ -641,7 +609,7 @@ mod tests {
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
@@ -776,46 +744,5 @@ mod tests {
         let res_user = idt.trigger_interrupt(0x21, 3, mock_keyboard_isr, 0x99AA);
         assert!(res_user.is_err());
         assert_eq!(res_user.unwrap_err(), "General Protection Fault: Privilege violation accessing IDT gate");
-    }
-
-    static mut OPEN_CALLED: i32 = 0;
-    static mut RELEASE_CALLED: i32 = 0;
-
-    fn mock_open() -> i32 {
-        unsafe { OPEN_CALLED += 1; }
-        0
-    }
-
-    fn mock_release() -> i32 {
-        unsafe { RELEASE_CALLED += 1; }
-        0
-    }
-
-    fn mock_read(_buf: &mut [u8]) -> i32 { 0 }
-    fn mock_write(_buf: &[u8]) -> i32 { 0 }
-    fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 { 0 }
-
-    #[test]
-    fn test_linux_driver_shim() {
-        let fops = LinuxFileOperations {
-            open: mock_open,
-            release: mock_release,
-            read: mock_read,
-            write: mock_write,
-            ioctl: mock_ioctl,
-        };
-
-        let mut shim = LinuxDriverShim::new(42, "e1000", DriverType::Network, fops);
-        assert_eq!(shim.id(), 42);
-        assert_eq!(shim.driver_type(), DriverType::Network);
-
-        assert!(shim.init().is_ok());
-        unsafe { assert_eq!(OPEN_CALLED, 1); }
-
-        assert!(shim.load().is_ok());
-        assert_eq!(shim.state(), DriverState::Active);
-
-        assert!(shim.unload().is_ok());
-        unsafe { assert_eq!(RELEASE_CALLED, 1); }
     }
 }

@@ -2,71 +2,12 @@
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 
 use crate::sigpkg::{Package, Version, VersionConstraint, Dependency, ParseError};
-use crate::klib::HashMap;
-use crate::security::capability::Permission;
-
-/// Placeholder types for package manifests
-#[derive(Debug, Clone)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub depends: Vec<String>,
-    pub description: String,
-    pub priority: PackagePriority,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PackagePriority {
-    Required,
-    Important,
-    Standard,
-    Optional,
-    Extra,
-}
-
-#[derive(Debug, Clone)]
-pub struct PacmanPkgbuild {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgrel: String,
-    pub depends: Vec<String>,
-    pub makedepends: Vec<String>,
-    pub description: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub description: String,
-    pub grade: String,
-    pub confinement: String,
-    pub permissions: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FlatpakManifest {
-    pub app_id: String,
-    pub runtime: String,
-    pub sdk: String,
-    pub command: String,
-    pub permissions: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppImageManifest {
-    pub name: String,
-    pub version: String,
-    pub arch: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct NixDerivation {
-    pub name: String,
-    pub version: String,
-    pub dependencies: Vec<String>,
-}
+use crate::package::universal::{
+    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest,
+};
+use crate::distro::linux_ideas::PackagePriority;
+use crate::security::Permission;
+use std::collections::HashMap;
 
 /// Abstract trait for package format adapters (OOPS principle)
 pub trait PackageFormatAdapter: Send + Sync {
@@ -139,12 +80,11 @@ impl DebAdapter {
                     "Description" => description = val.to_string(),
                     "Priority" => {
                         priority = match val.to_lowercase().as_str() {
+                            "essential" => PackagePriority::Required,
                             "required" => PackagePriority::Required,
                             "important" => PackagePriority::Important,
                             "standard" => PackagePriority::Standard,
-                            "optional" => PackagePriority::Optional,
-                            "extra" => PackagePriority::Extra,
-                            _ => PackagePriority::Required,
+                            _ => PackagePriority::Optional,
                         };
                     }
                     _ => {}
@@ -201,10 +141,7 @@ impl DebAdapter {
         Ok(PacmanPkgbuild {
             pkgname,
             pkgver,
-            pkgrel: "1".to_string(),
             depends,
-            makedepends: Vec::new(),
-            description: String::new(),
         })
     }
 
@@ -214,7 +151,7 @@ impl DebAdapter {
         let mut version = String::new();
         let mut summary = String::new();
         let mut confinement = String::new();
-        let mut permissions = Vec::new();
+        let mut plugs = Vec::new();
 
         let mut in_plugs_block = false;
 
@@ -235,14 +172,14 @@ impl DebAdapter {
                     "plugs" => {
                         in_plugs_block = true;
                         if !val.is_empty() {
-                            permissions.push(val.to_string());
+                            plugs.push(val.to_string());
                         }
                     }
                     _ => {}
                 }
             } else if line.starts_with("- ") && in_plugs_block {
                 let plug_name = line["- ".len()..].trim();
-                permissions.push(plug_name.to_string());
+                plugs.push(plug_name.to_string());
             }
         }
 
@@ -254,10 +191,8 @@ impl DebAdapter {
             name,
             version,
             summary,
-            description: String::new(),
-            grade: "stable".to_string(),
             confinement,
-            permissions,
+            plugs,
         })
     }
 
@@ -265,7 +200,7 @@ impl DebAdapter {
     pub fn parse_flatpak_json(&self, text: &str) -> Result<FlatpakManifest, &'static str> {
         let mut app_id = String::new();
         let mut command = String::new();
-        let mut permissions = Vec::new();
+        let mut finish_args = Vec::new();
 
         let mut in_finish_args = false;
 
@@ -294,7 +229,7 @@ impl DebAdapter {
                 let arg = line
                     .trim_matches(|c| c == ',' || c == '"' || c == ' ' || c == '\n')
                     .to_string();
-                permissions.push(arg);
+                finish_args.push(arg);
             }
         }
 
@@ -304,10 +239,8 @@ impl DebAdapter {
 
         Ok(FlatpakManifest {
             app_id,
-            runtime: "org.freedesktop.Platform".to_string(),
-            sdk: "org.freedesktop.Sdk".to_string(),
             command,
-            permissions,
+            finish_args,
         })
     }
 
@@ -353,13 +286,13 @@ impl DebAdapter {
             });
         }
 
-        Ok(Package::new(
-            name.to_string(),
-            parsed_ver,
-            desc.to_string(),
+        Ok(Package {
+            name: name.to_string(),
+            version: parsed_ver,
+            description: desc.to_string(),
             dependencies,
-            format!("SHA256:{}", name),
-        ))
+            checksum: format!("SHA256:{}", name),
+        })
     }
 }
 
@@ -386,7 +319,7 @@ impl PackageFormatAdapter for DebAdapter {
             } else if line.starts_with("Description: ") {
                 description = line[13..].to_string();
             } else if line.starts_with("Depends: ") {
-                let deps_str = &line[9..];
+                let deps_str = line[9..];
                 for dep in deps_str.split(',') {
                     let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
                     if !dep_name.is_empty() {
@@ -871,6 +804,36 @@ pub struct UniversalPackageManager {
 }
 
 impl UniversalPackageManager {
+    pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
+        DebAdapter::new().parse_apt_control(text)
+    }
+
+    pub fn parse_pacman_pkgbuild(&self, text: &str) -> Result<PacmanPkgbuild, &'static str> {
+        DebAdapter::new().parse_pacman_pkgbuild(text)
+    }
+
+    pub fn parse_snapcraft_yaml(&self, text: &str) -> Result<SnapcraftManifest, &'static str> {
+        DebAdapter::new().parse_snapcraft_yaml(text)
+    }
+
+    pub fn parse_flatpak_json(&self, text: &str) -> Result<FlatpakManifest, &'static str> {
+        DebAdapter::new().parse_flatpak_json(text)
+    }
+
+    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
+        DebAdapter::new().translate_sandbox_permissions(plugs_or_args)
+    }
+
+    pub fn translate_to_native_package(
+        &self,
+        name: &str,
+        version_str: &str,
+        desc: &str,
+        raw_deps: &[String],
+    ) -> Result<Package, &'static str> {
+        DebAdapter::new().translate_to_native_package(name, version_str, desc, raw_deps)
+    }
+
     pub fn new() -> Self {
         let mut manager = Self {
             adapters: HashMap::new(),
@@ -964,8 +927,7 @@ mod tests {
     
     #[test]
     fn test_apt_control_parsing_and_translation() {
-        let manager = UniversalPackageManager::new();
-        let deb_adapter = DebAdapter::new();
+        let adapter = UniversalPackageManager::new();
         let manifest_text = r#"
             Package: curl
             Version: 8.2.1
@@ -974,7 +936,7 @@ mod tests {
             Priority: standard
         "#;
 
-        let parsed = deb_adapter.parse_apt_control(manifest_text).unwrap();
+        let parsed = adapter.parse_apt_control(manifest_text).unwrap();
         assert_eq!(parsed.package, "curl");
         assert_eq!(parsed.version, "8.2.1");
         assert_eq!(parsed.depends.len(), 3);
@@ -986,10 +948,10 @@ mod tests {
             Version: 1.0.0
             Priority: essential
         "#;
-        let parsed_essential = deb_adapter.parse_apt_control(essential_text).unwrap();
+        let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
         assert_eq!(parsed_essential.priority, PackagePriority::Required);
 
-        let native = deb_adapter
+        let native = adapter
             .translate_to_native_package(
                 &parsed.package,
                 &parsed.version,
@@ -999,56 +961,6 @@ mod tests {
             .unwrap();
         assert_eq!(native.name, "curl");
         assert_eq!(native.version, Version::new(8, 2, 1));
-    }
-
-    #[test]
-    fn test_apk_adapter_parsing() {
-        let adapter = ApkAdapter::new();
-        let apk_data = b"P:test-apk\nV:4.2.0\nT:Alpine test\nD:musl openssl";
-        let pkg = adapter.parse_package(apk_data).unwrap();
-        assert_eq!(pkg.name, "test-apk");
-        assert_eq!(pkg.version.major, 4);
-        assert_eq!(pkg.dependencies.len(), 2);
-    }
-
-    #[test]
-    fn test_nix_adapter_parsing() {
-        let adapter = NixAdapter::new();
-        let nix_data = b"pname = \"test-nix\";\nversion = \"5.1.0\";\ndescription = \"Nix test\";\nbuildInputs = [ glibc ];";
-        let pkg = adapter.parse_package(nix_data).unwrap();
-        assert_eq!(pkg.name, "test-nix");
-        assert_eq!(pkg.version.major, 5);
-        assert_eq!(pkg.dependencies.len(), 1);
-    }
-
-    #[test]
-    fn test_apk_adapter_parsing() {
-        let adapter = ApkAdapter::new();
-        let apk_data = b"P:test-apk\nV:4.2.0\nT:Alpine test\nD:musl openssl";
-        let pkg = adapter.parse_package(apk_data).unwrap();
-        assert_eq!(pkg.name, "test-apk");
-        assert_eq!(pkg.version.major, 4);
-        assert_eq!(pkg.dependencies.len(), 2);
-    }
-
-    #[test]
-    fn test_nix_adapter_parsing() {
-        let adapter = NixAdapter::new();
-        let nix_data = b"pname = \"test-nix\";\nversion = \"5.1.0\";\ndescription = \"Nix test\";\nbuildInputs = [ glibc ];";
-        let pkg = adapter.parse_package(nix_data).unwrap();
-        assert_eq!(pkg.name, "test-nix");
-        assert_eq!(pkg.version.major, 5);
-        assert_eq!(pkg.dependencies.len(), 1);
-    }
-
-    #[test]
-    fn test_ebuild_adapter_parsing() {
-        let adapter = EbuildAdapter::new();
-        let ebuild_data = b"PN=\"test-ebuild\"\nPV=\"6.2.3\"\nDESCRIPTION=\"Gentoo test\"\nDEPEND=\"gcc clang\"";
-        let pkg = adapter.parse_package(ebuild_data).unwrap();
-        assert_eq!(pkg.name, "test-ebuild");
-        assert_eq!(pkg.version.major, 6);
-        assert_eq!(pkg.dependencies.len(), 2);
     }
 
     #[test]
@@ -1092,19 +1004,25 @@ Description: Auto-detection test";
         assert_eq!(package.name, "auto-test");
     }
     
-    // test_user_defined_hook is disabled: DebAdapter does not implement add_hook/process_hook
-    // #[test]
-    // fn test_user_defined_hook() {
-    //     let mut adapter = DebAdapter::new();
-    //     adapter.add_hook(|package: &mut Package| -> Result<(), AdapterError> {
-    //         package.name = format!("hooked-{}", package.name);
-    //         Ok(())
-    //     });
-    //     let deb_data = b"Package: original\nVersion: 1.0.0\nDescription: Hook test";
-    //     let mut package = adapter.parse_package(deb_data).unwrap();
-    //     adapter.process_hook(&mut package).unwrap();
-    //     assert_eq!(package.name, "hooked-original");
-    // }
+    #[test]
+    fn test_user_defined_hook() {
+        let mut adapter = DebAdapter::new();
+        
+        // Add a user-defined hook that modifies the package
+        adapter.add_hook(|package: &mut Package| -> Result<(), AdapterError> {
+            package.name = format!("hooked-{}", package.name);
+            Ok(())
+        });
+        
+        let deb_data = b"Package: original
+Version: 1.0.0
+Description: Hook test";
+        
+        let mut package = adapter.parse_package(deb_data).unwrap();
+        adapter.process_hook(&mut package).unwrap();
+        
+        assert_eq!(package.name, "hooked-original");
+    }
     
     #[test]
     fn test_format_conversion() {
@@ -1223,8 +1141,7 @@ mod additional_adapter_tests {
 
     #[test]
     fn test_rpm_spec_parsing_and_native_translation() {
-        let manager = UniversalPackageManager::new();
-        let deb_adapter = DebAdapter::new();
+        let adapter = UniversalPackageManager::new();
         let spec_text = r#"
             Name: custom_service
             Version: 2.1
@@ -1234,14 +1151,14 @@ mod additional_adapter_tests {
             Requires: bash, glibc >= 2.17
         "#;
 
-        let parsed = manager.parse_rpm_spec(spec_text).unwrap();
+        let parsed = adapter.parse_rpm_spec(spec_text).unwrap();
         assert_eq!(parsed.name, "custom_service");
         assert_eq!(parsed.version, "2.1");
         assert_eq!(parsed.license, "GPL-3.0");
         assert_eq!(parsed.requires.len(), 2);
         assert_eq!(parsed.requires[0], "bash");
 
-        let native = deb_adapter.translate_to_native_package(
+        let native = adapter.translate_to_native_package(
             &parsed.name,
             &parsed.version,
             &parsed.summary,

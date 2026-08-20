@@ -340,6 +340,18 @@ pub static SIGMA_ALLOCATOR: SigmaBumpAllocator = SigmaBumpAllocator::new();
 #[cfg(not(target_os = "none"))]
 pub static SIGMA_ALLOCATOR: SigmaBumpAllocator = SigmaBumpAllocator::new();
 
+pub unsafe fn alloc(size: usize) -> *mut u8 {
+    let layout = Layout::from_size_align(size, MIN_ALIGN).unwrap_or(Layout::from_size_align_unchecked(size, 1));
+    GlobalAlloc::alloc(&SIGMA_ALLOCATOR, layout)
+}
+
+pub unsafe fn free(ptr: *mut u8, size: usize) {
+    if !ptr.is_null() && size > 0 {
+        let layout = Layout::from_size_align(size, MIN_ALIGN).unwrap_or(Layout::from_size_align_unchecked(size, 1));
+        GlobalAlloc::dealloc(&SIGMA_ALLOCATOR, ptr, layout);
+    }
+}
+
 // ============================================================================
 // Out-of-memory handler
 // ============================================================================

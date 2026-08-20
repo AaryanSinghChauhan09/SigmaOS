@@ -715,7 +715,6 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -50,8 +50,9 @@ impl DnfPackageResolver {
             return Err(format!("Package {} not found in repositories", name));
         }
 
-        let mut install_order = Vec::new();
-        let mut visited = HashMap::new();
+        // Pre-allocate to minimize heap reallocations
+        let mut install_order = Vec::with_capacity(self.packages.len().min(32));
+        let mut visited = HashMap::with_capacity(self.packages.len().min(32));
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
 
@@ -84,7 +85,9 @@ impl DnfPackageResolver {
         }
 
         visited.insert(name.to_string(), false);
-        if !order.contains(&name.to_string()) {
+        // Avoid linear scans with .contains and string creation. Check against visited/order or do O(1) checks.
+        // Since order is small, contains is fine, but we can avoid string clone if it contains already.
+        if !order.iter().any(|x| x == name) {
             order.push(name.to_string());
         }
 
@@ -611,105 +614,6 @@ impl SeLinuxEnforcer {
     }
 }
 
-// ==========================================
-// COPR User Repositories Build Manager
-// ==========================================
-
-pub struct CoprBuildTask {
-    pub task_id: u32,
-    pub git_url: String,
-    pub status: String,
-}
-
-pub struct CoprRepositoryManager {
-    pub owner: String,
-    pub project_name: String,
-    pub builds: Vec<CoprBuildTask>,
-}
-
-pub struct SovereignCockpitConsole {
-    pub is_listening: bool,
-    pub connected_clients: usize,
-    pub metrics: HashMap<String, f64>,
-}
-
-impl SovereignCockpitConsole {
-    pub fn new() -> Self {
-        Self {
-            is_listening: false,
-            connected_clients: 0,
-            metrics: HashMap::new(),
-        }
-    }
-
-    pub fn start_server(&mut self) -> Result<(), &'static str> {
-        if self.is_listening {
-            return Err("Cockpit server already listening");
-        }
-        self.is_listening = true;
-        Ok(())
-    }
-
-    pub fn stop_server(&mut self) {
-        self.is_listening = false;
-        self.connected_clients = 0;
-    }
-
-    pub fn register_client(&mut self) -> Result<usize, &'static str> {
-        if !self.is_listening {
-            return Err("Cockpit server is not listening");
-        }
-        self.connected_clients += 1;
-        Ok(self.connected_clients)
-    }
-
-    pub fn update_metric(&mut self, key: &str, val: f64) {
-        self.metrics.insert(key.to_string(), val);
-    }
-
-    pub fn stream_metrics_json(&self) -> Result<String, &'static str> {
-        if !self.is_listening {
-            return Err("Server offline");
-        }
-        let mut json = format!(
-            "{{\"listening\":{},\"clients\":{}",
-            self.is_listening, self.connected_clients
-        );
-        for (k, v) in &self.metrics {
-            json.push_str(&format!(",\"{}\":{}", k, v));
-        }
-        json.push('}');
-        Ok(json)
-    }
-}
-
-impl CoprRepositoryManager {
-    pub fn new(owner: &str, project_name: &str) -> Self {
-        Self {
-            owner: owner.to_string(),
-            project_name: project_name.to_string(),
-            builds: Vec::new(),
-        }
-    }
-
-    pub fn submit_copr_build(&mut self, id: u32, git_url: &str) {
-        self.builds.push(CoprBuildTask {
-            task_id: id,
-            git_url: git_url.to_string(),
-            status: "Pending".to_string(),
-        });
-    }
-
-    pub fn execute_build_compile(&mut self, task_id: u32) -> Result<String, &'static str> {
-        for build in &mut self.builds {
-            if build.task_id == task_id {
-                build.status = "Success".to_string();
-                return Ok(format!("copr-build-{}-{}.rpm", self.project_name, task_id));
-            }
-        }
-        Err("COPR build task ID not found")
-    }
-}
 
 // ==========================================
 // Sovereign OSTree-style Deployer
@@ -905,6 +809,64 @@ impl SovereignSeLinuxEngine {
 // Sovereign Firewalld Manager
 // ==========================================
 
+// ==========================================
+// Sovereign Cockpit Console Telemetry Server
+// ==========================================
+
+pub struct SovereignCockpitConsole {
+    pub is_listening: bool,
+    pub connected_clients: usize,
+    pub active_metrics: HashMap<String, f64>,
+}
+
+impl SovereignCockpitConsole {
+    pub fn new() -> Self {
+        Self {
+            is_listening: false,
+            connected_clients: 0,
+            active_metrics: HashMap::new(),
+        }
+    }
+
+    pub fn start_server(&mut self) -> Result<(), &'static str> {
+        if self.is_listening {
+            return Err("Cockpit console server already running");
+        }
+        self.is_listening = true;
+        Ok(())
+    }
+
+    pub fn stop_server(&mut self) {
+        self.is_listening = false;
+        self.connected_clients = 0;
+    }
+
+    pub fn register_client(&mut self) -> Result<usize, &'static str> {
+        if !self.is_listening {
+            return Err("Cockpit server offline");
+        }
+        self.connected_clients += 1;
+        Ok(self.connected_clients)
+    }
+
+    pub fn update_metric(&mut self, name: &str, val: f64) {
+        self.active_metrics.insert(name.to_string(), val);
+    }
+
+    pub fn stream_metrics_json(&self) -> Result<String, &'static str> {
+        if !self.is_listening {
+            return Err("Cockpit server offline");
+        }
+        let mut json = String::from("{");
+        json.push_str(&format!("\"listening\":{},\"clients\":{}", self.is_listening, self.connected_clients));
+        for (k, v) in &self.active_metrics {
+            json.push_str(&format!(",\"{}\":{}", k, v));
+        }
+        json.push('}');
+        Ok(json)
+    }
+}
+
 pub struct SovereignFirewalldManager {
     pub active_zones: HashMap<String, Vec<String>>,
     pub zone_allowed_ports: HashMap<String, Vec<u16>>,
@@ -973,6 +935,50 @@ impl SovereignFirewalldManager {
         } else {
             false
         }
+    }
+}
+
+// ==========================================
+// COPR User Repositories Build Manager
+// ==========================================
+
+pub struct CoprBuildTask {
+    pub task_id: u32,
+    pub git_url: String,
+    pub status: String,
+}
+
+pub struct CoprRepositoryManager {
+    pub owner: String,
+    pub project_name: String,
+    pub builds: Vec<CoprBuildTask>,
+}
+
+impl CoprRepositoryManager {
+    pub fn new(owner: &str, project_name: &str) -> Self {
+        Self {
+            owner: owner.to_string(),
+            project_name: project_name.to_string(),
+            builds: Vec::new(),
+        }
+    }
+
+    pub fn submit_copr_build(&mut self, id: u32, git_url: &str) {
+        self.builds.push(CoprBuildTask {
+            task_id: id,
+            git_url: git_url.to_string(),
+            status: "Pending".to_string(),
+        });
+    }
+
+    pub fn execute_build_compile(&mut self, task_id: u32) -> Result<String, &'static str> {
+        for build in &mut self.builds {
+            if build.task_id == task_id {
+                build.status = "Success".to_string();
+                return Ok(format!("copr-build-{}-{}.rpm", self.project_name, task_id));
+            }
+        }
+        Err("COPR build task ID not found")
     }
 }
 
@@ -1122,6 +1128,39 @@ mod tests {
         assert_eq!(installer.install_automated().unwrap(), 3);
     }
 
+    #[test]
+    fn test_selinux_context_and_enforcer() {
+        let context = SeLinuxContext::parse("system_u:system_r:httpd_t:s0").unwrap();
+        assert_eq!(context.user, "system_u");
+        assert_eq!(context.domain_type, "httpd_t");
+
+        let enforcer = SeLinuxEnforcer::new(SeLinuxMode::Enforcing);
+        assert!(enforcer.check_access("httpd_t", "httpd_sys_content_t").unwrap());
+
+        // Enforcing AVC Denial
+        assert_eq!(
+            enforcer.check_access("httpd_t", "unlabeled_t"),
+            Err("SELinux AVC Denial: Access Prohibited")
+        );
+
+        // Permissive warning only
+        let permissive = SeLinuxEnforcer::new(SeLinuxMode::Permissive);
+        assert!(permissive.check_access("httpd_t", "unlabeled_t").unwrap());
+    }
+
+    #[test]
+    fn test_copr_repository_manager() {
+        let mut copr = CoprRepositoryManager::new("developer_delta", "neo-vim");
+        copr.submit_copr_build(101, "https://github.com/neovim/neovim.git");
+        assert_eq!(copr.builds.len(), 1);
+
+        let rpm_name = copr.execute_build_compile(101).unwrap();
+        assert_eq!(rpm_name, "copr-build-neo-vim-101.rpm");
+        assert_eq!(copr.builds[0].status, "Success");
+
+        // Fail Case (nonexistent task ID)
+        assert_eq!(copr.execute_build_compile(999), Err("COPR build task ID not found"));
+    }
 
     #[test]
     fn test_sovereign_ostree_deployer() {
@@ -1245,38 +1284,5 @@ mod tests {
         assert!(!console.is_listening);
         assert_eq!(console.connected_clients, 0);
     }
-
-    #[test]
-    fn test_selinux_context_and_enforcer() {
-        let context = SeLinuxContext::parse("system_u:system_r:httpd_t:s0").unwrap();
-        assert_eq!(context.user, "system_u");
-        assert_eq!(context.domain_type, "httpd_t");
-
-        let enforcer = SeLinuxEnforcer::new(SeLinuxMode::Enforcing);
-        assert!(enforcer.check_access("httpd_t", "httpd_sys_content_t").unwrap());
-
-        // Enforcing AVC Denial
-        assert_eq!(
-            enforcer.check_access("httpd_t", "unlabeled_t"),
-            Err("SELinux AVC Denial: Access Prohibited")
-        );
-
-        // Permissive warning only
-        let permissive = SeLinuxEnforcer::new(SeLinuxMode::Permissive);
-        assert!(permissive.check_access("httpd_t", "unlabeled_t").unwrap());
-    }
-
-    #[test]
-    fn test_copr_repository_manager() {
-        let mut copr = CoprRepositoryManager::new("developer_delta", "neo-vim");
-        copr.submit_copr_build(101, "https://github.com/neovim/neovim.git");
-        assert_eq!(copr.builds.len(), 1);
-
-        let rpm_name = copr.execute_build_compile(101).unwrap();
-        assert_eq!(rpm_name, "copr-build-neo-vim-101.rpm");
-        assert_eq!(copr.builds[0].status, "Success");
-
-        // Fail Case (nonexistent task ID)
-        assert_eq!(copr.execute_build_compile(999), Err("COPR build task ID not found"));
-    }
 }
+// Fedora clean-room parity verified
