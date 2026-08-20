@@ -3,17 +3,28 @@
 
 pub mod arch_compat;
 pub mod debian_defeater;
+pub mod importer;
+pub mod makepkg;
+pub mod nix_shell;
+pub mod portage;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
 
-pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-pub use debian_defeater::{
-    SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox,
-    SovereignMirrorSelector,
+pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
+pub use debian_defeater::{AptPinningResolver, SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus};
+pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
+pub use spec::{
+    ManagerCapability, PackageCapability,
+    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
+    SimplePackage, SimplePackageManager,
+    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
+    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;

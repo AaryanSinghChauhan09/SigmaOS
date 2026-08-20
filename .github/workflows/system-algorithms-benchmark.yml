@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+
 jobs:
   system-algorithms:
     name: CRC32, FNV-1a & Framebuffer Compression
