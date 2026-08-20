@@ -1,10 +1,16 @@
 // SigmaOS Compression Module
-// Data compression algorithms
+// Data compression algorithms & archive management
 // Zero-dependency implementation - no external libraries required
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
 #![allow(unused_imports)]
+
+pub mod archive;
+
+pub use archive::{
+    ArchiveEntry, ArchiveFormat, ArchiveImage, ArchiveManager, CompressionCodec, EntryType,
+};
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -15,19 +21,12 @@ use core::fmt;
 /// Error type for the Compression module
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CompressError {
-    /// Operation not supported
     NotSupported,
-    /// Invalid parameter
     InvalidParam,
-    /// Resource not found
     NotFound,
-    /// Permission denied
     PermissionDenied,
-    /// Out of memory
     OutOfMemory,
-    /// I/O error
     IoError,
-    /// Unknown error
     Unknown,
 }
 
@@ -57,7 +56,6 @@ pub struct Compressor {
 }
 
 impl Compressor {
-    /// Create a new Compressor with the given name
     pub fn new(name: &str) -> Self {
         Self {
             id: 0,
@@ -66,19 +64,16 @@ impl Compressor {
         }
     }
     
-    /// Enable this resource
     pub fn enable(&mut self) -> CompressionResult<()> {
         self.enabled = true;
         Ok(())
     }
     
-    /// Disable this resource
     pub fn disable(&mut self) -> CompressionResult<()> {
         self.enabled = false;
         Ok(())
     }
     
-    /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
@@ -92,7 +87,6 @@ pub struct Decompressor {
 }
 
 impl Decompressor {
-    /// Create a new Decompressor
     pub fn new() -> Self {
         Self {
             resources: Vec::new(),
@@ -100,13 +94,11 @@ impl Decompressor {
         }
     }
     
-    /// Initialize the Compression subsystem
     pub fn init(&mut self) -> CompressionResult<()> {
         self.initialized = true;
         Ok(())
     }
     
-    /// Add a resource
     pub fn add(&mut self, resource: Compressor) -> CompressionResult<u64> {
         if !self.initialized {
             return Err(CompressError::NotSupported);
@@ -116,27 +108,22 @@ impl Decompressor {
         Ok(id)
     }
     
-    /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&Compressor> {
         self.resources.get(id as usize)
     }
     
-    /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut Compressor> {
         self.resources.get_mut(id as usize)
     }
     
-    /// List all resources
     pub fn list(&self) -> &[Compressor] {
         &self.resources
     }
     
-    /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
     
-    /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> CompressionResult<()> {
         self.initialized = false;
         self.resources.clear();
