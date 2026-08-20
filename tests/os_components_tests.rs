@@ -186,7 +186,7 @@ fn test_debian_compat_system() {
 
     assert_eq!(alts.get_active_target().unwrap(), "/usr/bin/nano");
 
-    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "http://deb.debian.org/debian".to_string());
+    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "https://deb.debian.org/debian".to_string());
     repo.verify_release_keyring(&[0x99, 0x01]);
     assert!(repo.fetch_package_index().is_ok());
 }

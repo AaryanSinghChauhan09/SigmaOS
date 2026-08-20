@@ -52,8 +52,9 @@ struct MockKernelSyscall {
     }
     static int read(int fd, char* buf, size_t count) {
         if (fd < 0 || !buf) return -1;
-        snprintf(buf, count, "sigmaos_kernel_data");
-        return (int)strlen("sigmaos_kernel_data");
+        const char* data = "sigmaos_kernel_data";
+        snprintf(buf, count, "%s", data);
+        return (int)strnlen(data, count);
     }
     static int write(int fd, const char* buf, size_t count) {
         if (fd < 0 || !buf) return -1;
@@ -216,7 +217,7 @@ struct SigmaJailIsolation {
 struct SigmaShieldPacketFilter {
     static bool filter_packet(const char* src_ip, bool mesh_signed) {
         if (strcmp(src_ip, "10.0.0.99") == 0 && !mesh_signed) return false; // spoofed block
-        return mesh_signed || strcmp(src_ip, "127.0.0.1") == 0;
+        return mesh_signed; // Only allow mesh-signed packets in production
     }
 };
 
