@@ -1,0 +1,26 @@
+name: BSD KQueue, GEOM & Capsicum Subsystems CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  bsd-subsystems:
+    name: BSD KQueue, GEOM & Capsicum Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify KQueue Event Notifications & GEOM Topology
+        run: |
+          cargo test --lib distro::compat_layers
+
+      - name: Verify Capsicum Rights & Securelevels
+        run: |
+          cargo test --lib access::control

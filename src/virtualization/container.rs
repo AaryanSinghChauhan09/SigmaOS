@@ -2,8 +2,14 @@
 // OOP-based container management with Docker and Podman support
 // Inspired by Linux namespaces/cgroups and FreeBSD Jails for advanced isolation boundaries
 
-use std::collections::HashMap;
-use std::path::PathBuf;
+extern crate alloc;
+
+use alloc::collections::BTreeMap as HashMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use alloc::vec;
 
 /// FreeBSD Jail-inspired networking and capability boundaries
 #[derive(Debug, Clone)]
@@ -49,8 +55,8 @@ pub enum PortProtocol {
 /// Volume mapping
 #[derive(Debug, Clone)]
 pub struct VolumeMapping {
-    pub host_path: PathBuf,
-    pub container_path: PathBuf,
+    pub host_path: String,
+    pub container_path: String,
     pub read_only: bool,
 }
 
@@ -219,7 +225,6 @@ impl ContainerRuntime for DockerRuntime {
         }
         self.container_states
             .insert(container_id.to_string(), ContainerState::Restarting);
-        std::thread::sleep(std::time::Duration::from_millis(100));
         self.container_states
             .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
@@ -249,17 +254,9 @@ impl ContainerRuntime for DockerRuntime {
             name: config.name.clone(),
             image: config.image.clone(),
             state,
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            created_at: 1716000000,
             started_at: if state == ContainerState::Running {
-                Some(
-                    std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs(),
-                )
+                Some(1716000000)
             } else {
                 None
             },
@@ -298,10 +295,7 @@ impl ContainerRuntime for DockerRuntime {
                 name: config.name.clone(),
                 image: config.image.clone(),
                 state,
-                created_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                created_at: 1716000000,
                 started_at: None,
                 is_rootless: config.is_rootless,
                 jail_enabled: config.jail_config.is_some(),
@@ -392,7 +386,6 @@ impl ContainerRuntime for PodmanRuntime {
         }
         self.container_states
             .insert(container_id.to_string(), ContainerState::Restarting);
-        std::thread::sleep(std::time::Duration::from_millis(100));
         self.container_states
             .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
@@ -422,17 +415,9 @@ impl ContainerRuntime for PodmanRuntime {
             name: config.name.clone(),
             image: config.image.clone(),
             state,
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            created_at: 1716000000,
             started_at: if state == ContainerState::Running {
-                Some(
-                    std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs(),
-                )
+                Some(1716000000)
             } else {
                 None
             },
@@ -471,10 +456,7 @@ impl ContainerRuntime for PodmanRuntime {
                 name: config.name.clone(),
                 image: config.image.clone(),
                 state,
-                created_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                created_at: 1716000000,
                 started_at: None,
                 is_rootless: config.is_rootless,
                 jail_enabled: config.jail_config.is_some(),

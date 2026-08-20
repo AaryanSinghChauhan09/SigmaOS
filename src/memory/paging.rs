@@ -11,9 +11,8 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::vec;
 use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::string::ToString;
 
 pub const PAGE_SIZE_BYTES: usize = 4096;
 pub const PAGE_TABLE_ENTRIES: usize = 512;
@@ -170,10 +169,6 @@ impl PageDirectory {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
 
-    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
-        self.huge_entries.get(idx).and_then(|e| e.as_ref())
-    }
-
     pub fn get_huge_entry_mut(&mut self, idx: usize) -> Option<&mut PageTableEntry> {
         self.huge_entries.get_mut(idx).and_then(|e| e.as_mut())
     }
@@ -227,10 +222,6 @@ impl PageDirectoryPointerTable {
 
     pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
-    }
-
-    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
-        self.huge_entries.get(idx).and_then(|e| e.as_ref())
     }
 
     pub fn get_huge_entry_mut(&mut self, idx: usize) -> Option<&mut PageTableEntry> {
@@ -859,6 +850,53 @@ impl SimpleVMM {
 
         Ok(())
     }
+
+    /// Identity map low physical memory (e.g. 0x0 to max_phys)
+    pub fn identity_map_region(
+        &mut self,
+        start_phys: PhysicalAddress,
+        size_bytes: u64,
+        writable: bool,
+    ) -> Result<(), MemoryError> {
+        let mut offset = 0;
+        while offset < size_bytes {
+            let addr = start_phys.0 + offset;
+            self.map_page_with_flags(
+                VirtualAddress(addr),
+                PhysicalAddress(addr),
+                writable,
+                false,
+            )?;
+            offset += PAGE_SIZE_BYTES as u64;
+        }
+        Ok(())
+    }
+
+    /// Map higher-half virtual address range to physical address range
+    pub fn map_higher_half_region(
+        &mut self,
+        virt_base: VirtualAddress,
+        phys_base: PhysicalAddress,
+        size_bytes: u64,
+        writable: bool,
+    ) -> Result<(), MemoryError> {
+        let mut offset = 0;
+        while offset < size_bytes {
+            let virt = VirtualAddress(virt_base.0 + offset);
+            let phys = PhysicalAddress(phys_base.0 + offset);
+            self.map_page_with_flags(virt, phys, writable, false)?;
+            offset += PAGE_SIZE_BYTES as u64;
+        }
+        Ok(())
+    }
+
+    /// Compute self-referential PML4 entry virtual address for accessing page tables at pml4_index
+    pub fn get_self_referential_pml4_virtual_address(pml4_index: usize) -> u64 {
+        let idx = (pml4_index & 0x1FF) as u64;
+        // Sign-extend bit 47 for canonical 64-bit address space
+        let canonical_prefix = if (idx & 0x100) != 0 { 0xFFFF_0000_0000_0000 } else { 0 };
+        canonical_prefix | (idx << 39) | (idx << 30) | (idx << 21) | (idx << 12)
+    }
 }
 
 impl Default for SimpleVMM {
@@ -994,7 +1032,8 @@ mod tests {
 
         assert!(pt.set_entry(512, entry).is_err());
     }
-#[test]
+
+    #[test]
     fn test_vmm_address_alignment_verification() {
         let mut vmm = SimpleVMM::new();
 
@@ -1156,5 +1195,25 @@ mod tests {
             assert_eq!(pte.writable, false);
             assert_eq!(pte.execute_disable, false); // execute-enabled
         }
+    }
+
+    #[test]
+    fn test_identity_higher_half_and_self_ref_pml4() {
+        let mut vmm = SimpleVMM::new();
+
+        // Test Identity Mapping
+        vmm.identity_map_region(PhysicalAddress(0x0), 8192, true).unwrap();
+        assert_eq!(vmm.get_physical_address(VirtualAddress(0x0)).unwrap().0, 0x0);
+        assert_eq!(vmm.get_physical_address(VirtualAddress(0x1000)).unwrap().0, 0x1000);
+
+        // Test Higher-Half Mapping
+        let higher_base = VirtualAddress(0xFFFF_8000_0000_0000);
+        vmm.map_higher_half_region(higher_base, PhysicalAddress(0x200000), 8192, true).unwrap();
+        assert_eq!(vmm.get_physical_address(higher_base).unwrap().0, 0x200000);
+        assert_eq!(vmm.get_physical_address(VirtualAddress(higher_base.0 + 0x1000)).unwrap().0, 0x201000);
+
+        // Test Self-Referential Address Calculation
+        let self_ref = SimpleVMM::get_self_referential_pml4_virtual_address(511);
+        assert_eq!(self_ref, 0xFFFF_FFFF_FFFF_F000);
     }
 }

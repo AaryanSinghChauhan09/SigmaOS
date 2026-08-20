@@ -1,0 +1,22 @@
+name: System Algorithms Suite CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  system-algorithms:
+    name: CRC32, FNV-1a & Framebuffer Compression
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run High-Performance Algorithm Suite Unit Tests
+        run: |
+          cargo test --lib compression::algorithms

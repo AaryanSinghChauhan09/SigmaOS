@@ -4,7 +4,9 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::boxed::Box;
 use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -127,6 +129,12 @@ pub enum VersionSuffix {
     Rc,
     Pre,
     P, // Patch
+}
+
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {
@@ -352,26 +360,35 @@ impl PortageResolver {
                     return Err(DependencyError::VersionNotFound(name.clone()));
                 }
 
-                let best = self.select_best_version(&matching)?;
+                let best = self.select_best_version_from_refs(&matching)?;
                 self.resolve_recursive(&best.name, resolved, visited)
             }
         }
     }
 
-    fn select_best_version(&self, versions: &[EbuildSpec]) -> Result<&EbuildSpec, DependencyError> {
-        let stable: Vec<_> = versions.iter()
+    fn select_best_version<'a>(&self, versions: &'a [EbuildSpec]) -> Result<&'a EbuildSpec, DependencyError> {
+        let stable: Vec<&'a EbuildSpec> = versions.iter()
             .filter(|v| v.is_stable_for_arch(&self.arch))
             .collect();
 
-        let candidates = if stable.is_empty() {
-            versions
+        if !stable.is_empty() {
+            stable.into_iter().max_by_key(|v| &v.version).ok_or(DependencyError::NoSuitableVersion)
         } else {
-            &stable
-        };
+            versions.iter().max_by_key(|v| &v.version).ok_or(DependencyError::NoSuitableVersion)
+        }
+    }
 
-        candidates.iter()
-            .max_by_key(|v| &v.version)
-            .ok_or_else(|| DependencyError::NoSuitableVersion)
+    fn select_best_version_from_refs<'a>(&self, versions: &[&'a EbuildSpec]) -> Result<&'a EbuildSpec, DependencyError> {
+        let stable: Vec<&'a EbuildSpec> = versions.iter()
+            .copied()
+            .filter(|v| v.is_stable_for_arch(&self.arch))
+            .collect();
+
+        if !stable.is_empty() {
+            stable.into_iter().max_by_key(|v| &v.version).ok_or(DependencyError::NoSuitableVersion)
+        } else {
+            versions.iter().copied().max_by_key(|v| &v.version).ok_or(DependencyError::NoSuitableVersion)
+        }
     }
 
     /// Check for slot conflicts

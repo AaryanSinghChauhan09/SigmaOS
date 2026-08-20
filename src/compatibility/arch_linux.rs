@@ -6,9 +6,12 @@
 //! - Sovereign Environment Variables Registry supporting Linux default configurations
 
 extern crate alloc;
+use alloc::collections::BTreeMap as HashMap;
 use alloc::string::String;
 use alloc::string::ToString;
-use crate::klib::{Vec, HashMap};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
 
 // ==========================================
 // 1. Virtual Filesystem Parity (/proc & /dev)
@@ -618,9 +621,7 @@ impl AurHelper {
     pub fn search(&self, query: &str) -> Vec<&Pkgbuild> {
         let mut results = Vec::new();
         for (name, pkg) in &self.aur_repo {
-            let name_str: &str = name.as_str();
-            let desc_str: &str = pkg.pkgdesc.as_str();
-            if name_str.contains(query) || desc_str.contains(query) {
+            if name.contains(query) || pkg.pkgdesc.contains(query) {
                 results.push(pkg);
             }
         }
@@ -1289,6 +1290,7 @@ impl Default for PacmanDbCleaner {
 #[derive(Debug, Clone)]
 pub struct WikiPage {
     pub title: String,
+    pub category: String,
     pub content: String,
 }
 
@@ -1301,9 +1303,10 @@ impl ArchWikiSearchEngine {
         Self { pages: Vec::new() }
     }
 
-    pub fn index_page(&mut self, title: &str, content: &str) {
+    pub fn index_page(&mut self, title: &str, category: &str, content: &str) {
         self.pages.push(WikiPage {
             title: title.to_string(),
+            category: category.to_string(),
             content: content.to_string(),
         });
     }
@@ -1316,6 +1319,46 @@ impl ArchWikiSearchEngine {
             }
         }
         results
+    }
+
+    pub fn search_by_category(&self, category: &str) -> Vec<&WikiPage> {
+        let mut results = Vec::new();
+        for page in &self.pages {
+            if page.category.eq_ignore_ascii_case(category) {
+                results.push(page);
+            }
+        }
+        results
+    }
+
+    pub fn search_with_ranking(&self, query: &str) -> Vec<(&WikiPage, u32)> {
+        let mut ranked = Vec::new();
+        for page in &self.pages {
+            let mut score = 0u32;
+            if page.title.contains(query) {
+                score += 10;
+            }
+            if page.category.contains(query) {
+                score += 5;
+            }
+            if page.content.contains(query) {
+                score += 1;
+            }
+            if score > 0 {
+                ranked.push((page, score));
+            }
+        }
+        let n = ranked.len();
+        for i in 0..n {
+            for j in 0..n - 1 - i {
+                if ranked[j].1 < ranked[j + 1].1 {
+                    let tmp = ranked[j].clone();
+                    ranked[j] = ranked[j + 1].clone();
+                    ranked[j + 1] = tmp;
+                }
+            }
+        }
+        ranked
     }
 }
 
@@ -1472,5 +1515,22 @@ depends=('glibc')
         let mount_cmd = archiso.mount_live_root();
         assert!(mount_cmd.contains("mount -t overlay overlay"));
         assert!(mount_cmd.contains("/run/archiso/cowspace"));
+    }
+
+    #[test]
+    fn test_arch_wiki_category_and_ranking_search() {
+        let mut wiki = ArchWikiSearchEngine::new();
+        wiki.index_page("Pacman/Tips and tricks", "Package Management", "Advanced Pacman flags and cache cleaning procedures.");
+        wiki.index_page("General recommendations", "System Configuration", "System maintenance and Pacman setup for new installations.");
+
+        let package_pages = wiki.search_by_category("Package Management");
+        assert_eq!(package_pages.len(), 1);
+        assert_eq!(package_pages[0].title, "Pacman/Tips and tricks");
+
+        let ranked = wiki.search_with_ranking("Pacman");
+        assert!(!ranked.is_empty());
+        // "Pacman/Tips and tricks" should rank higher due to title match (10 points) vs content match (1 point)
+        assert_eq!(ranked[0].0.title, "Pacman/Tips and tricks");
+        assert!(ranked[0].1 >= 10);
     }
 }
