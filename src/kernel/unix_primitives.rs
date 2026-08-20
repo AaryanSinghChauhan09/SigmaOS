@@ -1496,20 +1496,23 @@ impl Witness {
         if class >= self.classes.len() {
             return Err(WitnessError::Uninitialized);
         }
-        let stack = self.thread_stack(thread);
-        // Recursion
-        if stack.contains(&class) {
-            self.violations += 1;
-            return Err(WitnessError::Recursion);
-        }
-        // Order: new lock rank must be >= top-of-stack rank (no inversion)
-        if let Some(&top) = stack.last() {
-            if self.classes[class].rank < self.classes[top].rank {
+        let top = {
+            let stack = self.thread_stack(thread);
+            if stack.contains(&class) {
+                self.violations += 1;
+                return Err(WitnessError::Recursion);
+            }
+            stack.last().copied()
+        };
+
+        if let Some(top_class) = top {
+            if self.classes[class].rank < self.classes[top_class].rank {
                 self.violations += 1;
                 return Err(WitnessError::LockOrderReversal);
             }
         }
-        stack.push(class);
+
+        self.thread_stack(thread).push(class);
         Ok(())
     }
 
@@ -1968,9 +1971,8 @@ mod tests {
     #[test]
     fn seqlock_consistent_read() {
         let lock = SeqLock::new();
-        let mut data = 0u64;
+        let data = 42u64;
         lock.write_begin();
-        data = 42;
         lock.write_end();
         loop {
             let s = lock.read_begin();
