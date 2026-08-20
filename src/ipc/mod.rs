@@ -26,6 +26,7 @@ pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
     Pipe, MessageQueue, SharedMemory, IPCManager,
     SerenityIpcMessage, SerenitySharedBackingStore, SerenityIpcSandboxEnforcer,
+    IpcAddressingMode, IpcTopology, IpcMailbox,
 };
 
 pub use unix_socket::{

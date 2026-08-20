@@ -32,6 +32,55 @@ use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
 use core::mem;
 
+/// IPC Addressing Mode (Direct vs Indirect Communication)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IpcAddressingMode {
+    Direct { target_pid: u64 },
+    IndirectMailbox { mailbox_id: u64 },
+}
+
+/// Communication Relationship Topology (1-to-1, 1-to-N, N-to-N)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IpcTopology {
+    OneToOne,
+    OneToN,
+    NToN,
+}
+
+/// Mailbox for Indirect IPC Communication
+pub struct IpcMailbox {
+    pub mailbox_id: u64,
+    pub topology: IpcTopology,
+    pub subscriber_pids: Vec<u64>,
+    pub messages: Vec<Vec<u8>>,
+}
+
+impl IpcMailbox {
+    pub fn new(mailbox_id: u64, topology: IpcTopology) -> Self {
+        Self {
+            mailbox_id,
+            topology,
+            subscriber_pids: Vec::new(),
+            messages: Vec::new(),
+        }
+    }
+
+    pub fn subscribe(&mut self, pid: u64) {
+        if !self.subscriber_pids.contains(&pid) {
+            self.subscriber_pids.push(pid);
+        }
+    }
+
+    pub fn publish(&mut self, _sender_pid: u64, message: Vec<u8>) -> usize {
+        let count = match self.topology {
+            IpcTopology::OneToOne => 1,
+            IpcTopology::OneToN | IpcTopology::NToN => self.subscriber_pids.len().max(1),
+        };
+        self.messages.push(message);
+        count
+    }
+}
+
 /// IPC endpoint trait (OOP interface)
 pub trait IPCEndpoint {
     /// Send message

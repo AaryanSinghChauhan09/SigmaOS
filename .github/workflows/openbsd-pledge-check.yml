@@ -1,0 +1,20 @@
+name: OpenBSD Pledge & Unveil Verification
+
+on:
+  push:
+    branches: [ main, master, "feature/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  pledge-unveil-verify:
+    name: Verify OpenBSD Pledge and Unveil Policies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Pledge & Unveil Tests
+        run: cargo test --lib security::pledge security::unveil security::bsd_pledge

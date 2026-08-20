@@ -39,6 +39,33 @@ impl CpuContext {
     }
 }
 
+/// x86_64 Model-Specific Registers (MSRs) for syscall/sysret
+pub const IA32_STAR_MSR: u32 = 0xC000_0081;
+pub const IA32_LSTAR_MSR: u32 = 0xC000_0082;
+pub const IA32_FMASK_MSR: u32 = 0xC000_0084;
+
+/// Native x86_64 System Call Dispatcher & Trap Frame Context
+#[derive(Debug, Clone, Copy)]
+pub struct SyscallMsrConfig {
+    pub star: u64,
+    pub lstar_handler_addr: u64,
+    pub fmask: u64,
+}
+
+impl SyscallMsrConfig {
+    pub fn new(handler_addr: u64) -> Self {
+        Self {
+            star: 0x0023_0008_0000_0000, // Kernel CS=0x08, User CS=0x23
+            lstar_handler_addr: handler_addr,
+            fmask: 0x0000_0200,          // Clear Interrupt Flag on syscall
+        }
+    }
+
+    pub fn configure_msrs(&self) -> (u64, u64, u64) {
+        (self.star, self.lstar_handler_addr, self.fmask)
+    }
+}
+
 /// Extended process entry that includes context and yields tracking
 #[derive(Debug, Clone)]
 pub struct ScheduledProcess {

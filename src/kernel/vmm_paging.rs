@@ -63,6 +63,9 @@ impl PageTableEntry {
     }
 }
 
+/// x86_64 PML4 Self-Referential Mapping slot
+pub const PML4_SELF_REF_INDEX: u16 = 510;
+
 /// 4-Level/5-Level x86_64 Page Table Manager
 #[derive(Debug, Clone)]
 pub struct PageTableManager {
@@ -70,16 +73,23 @@ pub struct PageTableManager {
     pub level5_enabled: bool, // 5-Level Paging (PML5) for 57-bit virtual address space
     pub entries: HashMap<u64, PageTableEntry>, // Virt Page -> PTE mapping
     pub pcid_asid: u16,                        // Process Context ID / ASID for TLB isolation
+    pub self_referential_slot: u16,
 }
 
 impl PageTableManager {
     pub fn new(pml4_phys_addr: u64, pcid_asid: u16) -> Self {
-        Self {
+        let mut mgr = Self {
             pml4_phys_addr,
             level5_enabled: false,
             entries: HashMap::new(),
             pcid_asid,
-        }
+            self_referential_slot: PML4_SELF_REF_INDEX,
+        };
+        // Setup self-referential entry mapping PML4 back onto itself
+        let mut flags = PageTableFlags::new();
+        flags.bits |= PageTableFlags::WRITABLE | PageTableFlags::PRESENT;
+        mgr.map_page(0xFFFF_FE00_0000_0000, pml4_phys_addr, flags);
+        mgr
     }
 
     /// Map a virtual page address (4KB aligned) to a physical frame
@@ -275,6 +285,24 @@ impl VirtualMemoryManager {
     /// Flush entire TLB cache (CR3 reload / ASID shootdown)
     pub fn flush_tlb_all(&mut self) {
         self.tlb_flush_count += 1;
+    }
+
+    /// Copy-On-Write (COW) Fork: Shares parent pages with child marked as read-only + COPY_ON_WRITE
+    pub fn fork_cow(&mut self, child_pml4_phys: u64, child_pcid: u16) -> VirtualMemoryManager {
+        let mut child_vmm = VirtualMemoryManager::new(child_pml4_phys, child_pcid);
+        child_vmm.vmas = self.vmas.clone();
+
+        for (virt_page, entry) in &mut self.page_table.entries {
+            // Mark parent page as COW and read-only
+            entry.flags.bits &= !PageTableFlags::WRITABLE;
+            entry.flags.bits |= PageTableFlags::COPY_ON_WRITE;
+
+            // Map same physical frame into child page table as COW and read-only
+            child_vmm.page_table.map_page(*virt_page, entry.physical_frame, entry.flags);
+        }
+
+        self.flush_tlb_all();
+        child_vmm
     }
 
     /// Summary of VMM & Paging stats
