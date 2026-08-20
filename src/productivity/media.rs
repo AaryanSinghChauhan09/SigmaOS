@@ -2,9 +2,27 @@
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
+extern crate alloc;
 use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 pub const MAX_AUDIO_CHANNELS: usize = 4;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PlaybackState {
+    Stopped,
+    Playing,
+    Paused,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MediaFormat {
+    Mp3,
+    Wav,
+    Flac,
+}
 
 pub struct AudioChannel {
     pub active: AtomicBool,
@@ -14,6 +32,11 @@ pub struct AudioChannel {
 pub struct SigmaMediaEngine {
     pub channels: [AudioChannel; MAX_AUDIO_CHANNELS],
     pub master_mute: AtomicBool,
+    pub state: PlaybackState,
+    pub has_track: bool,
+    pub active_track: Option<String>,
+    pub format: Option<MediaFormat>,
+    pub duration_seconds: usize,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -40,7 +63,38 @@ impl SigmaMediaEngine {
                 },
             ],
             master_mute: AtomicBool::new(false),
+            state: PlaybackState::Stopped,
+            has_track: false,
+            active_track: None,
+            format: None,
+            duration_seconds: 0,
         }
+    }
+
+    pub fn play(&mut self) -> Result<(), &'static str> {
+        if !self.has_track && self.active_track.is_none() {
+            return Err("No track loaded");
+        }
+        self.state = PlaybackState::Playing;
+        Ok(())
+    }
+
+    pub fn load_track(&mut self, name: String, format: MediaFormat, duration: usize) {
+        self.has_track = true;
+        self.active_track = Some(name);
+        self.format = Some(format);
+        self.duration_seconds = duration;
+        self.state = PlaybackState::Stopped;
+    }
+
+    pub fn pause(&mut self) {
+        if self.state == PlaybackState::Playing {
+            self.state = PlaybackState::Paused;
+        }
+    }
+
+    pub fn stop(&mut self) {
+        self.state = PlaybackState::Stopped;
     }
 
     /// Plays a raw chiptune sound buffer over an active audio channel
@@ -50,7 +104,6 @@ impl SigmaMediaEngine {
         buffer: &[u16],
     ) -> Result<(), &'static str> {
         if self.master_mute.load(Ordering::SeqCst) {
-            println!("MediaEngine: Master mute is active. Buffer playback bypassed.");
             return Ok(());
         }
 
@@ -61,13 +114,6 @@ impl SigmaMediaEngine {
         let channel = &self.channels[channel_id];
         channel.active.store(true, Ordering::SeqCst);
         let vol = channel.volume.load(Ordering::SeqCst);
-
-        println!(
-            "MediaEngine: Playing chiptune audio sample ({} samples) on Channel {} at volume level {}%.",
-            buffer.len(),
-            channel_id,
-            vol
-        );
 
         // Simulate PCM mixing on active hardware VESA/sound register
         let mut mixed_amplitude: u32 = 0;
@@ -93,86 +139,11 @@ impl SigmaMediaEngine {
         self.channels[channel_id]
             .volume
             .store(target_vol, Ordering::SeqCst);
-        println!(
-            "MediaEngine: Volume updated for Channel {} -> {}%.",
-            channel_id, target_vol
-        );
         Ok(())
     }
 }
 
-pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
-// SigmaOS Polish-Parity Out-of-the-Box Codecs & Multimedia Engine (SigmaMedia)
-// Designed for chiptune synthesizers, audio playing, and decoders with zero dependencies
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MediaFormat {
-    Mp3,
-    Wav,
-    Pcm,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PlaybackState {
-    Stopped,
-    Playing,
-    Paused,
-}
-
-pub struct AudioTrack {
-    pub name: String,
-    pub format: MediaFormat,
-    pub duration_secs: u32,
-    pub volume: f32, // 0.0 to 1.0
-}
-
-pub struct SigmaMediaEngine {
-    pub current_track: Option<AudioTrack>,
-    pub state: PlaybackState,
-}
-
-impl SigmaMediaEngine {
-    pub fn new() -> Self {
-        SigmaMediaEngine {
-            current_track: None,
-            state: PlaybackState::Stopped,
-        }
-    }
-
-    pub fn load_track(&mut self, name: String, format: MediaFormat, duration: u32) {
-        let track = AudioTrack {
-            name,
-            format,
-            duration_secs: duration,
-            volume: 0.8,
-        };
-        self.current_track = Some(track);
-        self.state = PlaybackState::Stopped;
-    }
-
-    pub fn play(&mut self) -> Result<(), ()> {
-        if self.current_track.is_some() {
-            self.state = PlaybackState::Playing;
-            Ok(())
-        } else {
-            Err(())
-        }
-    }
-
-    pub fn pause(&mut self) {
-        if self.state == PlaybackState::Playing {
-            self.state = PlaybackState::Paused;
-        }
-    }
-
-    pub fn stop(&mut self) {
-        self.state = PlaybackState::Stopped;
-    }
-}
-
-// =========================================================================
 // 1. SigmaSupportSubtitleSync (Aegisub ASS Advanced Styling & Karaoke Parity)
-// =========================================================================
 
 pub struct AegisubKaraokeSyllable {
     pub text: String,
@@ -228,9 +199,7 @@ impl SigmaSupportSubtitleSync {
     }
 }
 
-// =========================================================================
 // 2. SigmaSupportSubtitleEdit (Subtitle Edit Timing Synchronization Parity)
-// =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SubtitleFormat {
@@ -328,3 +297,4 @@ mod tests {
         assert_eq!(edit.entries[0].end_ms, 2500);
     }
 }
+pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();

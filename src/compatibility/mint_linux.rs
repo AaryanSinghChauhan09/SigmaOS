@@ -4,7 +4,6 @@
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::Vec;
@@ -13,6 +12,32 @@ use crate::klib::Vec;
 extern crate alloc;
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintError {
+    LayoutFailed,
+    UpdateError,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WindowCoordinates {
+    pub x: usize,
+    pub y: usize,
+    pub width: usize,
+    pub height: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct SoftwareMeta {
+    pub name: [u8; 32],
+}
+
+#[derive(Debug, Clone)]
+pub struct MintUpdateItem {
+    pub name: [u8; 32],
+}
+
+pub struct ZenithDisplayCompositor;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintUpdateLevel {
@@ -232,14 +257,32 @@ impl MintSoftwareManager {
         self.apps_catalog.push(app);
     }
 
-    /// Filters catalog by category.
+    /// Arrange windows using Stacking layout (Cascaded coordinations)
+    pub fn arrange_stacking(
+        num_windows: usize,
+        coords: &mut [WindowCoordinates],
+    ) -> Result<(), MintError> {
+        for i in 0..num_windows {
+            if i >= coords.len() {
+                return Err(MintError::LayoutFailed);
+            }
+            coords[i] = WindowCoordinates {
+                x: i * 30,
+                y: i * 30,
+                width: 800,
+                height: 600,
+            };
+        }
+        Ok(())
+    }
+
     pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
         let mut filtered = Vec::new();
-        let cat_len = category.len().min(15);
-        for app in self.apps_catalog.iter() {
+        for i in 0..self.apps_catalog.len() {
+            let app = &self.apps_catalog[i];
             let mut matches = true;
-            for i in 0..cat_len {
-                if app.category[i] != category[i] {
+            for j in 0..category.len() {
+                if j >= app.category.len() || app.category[j] != category[j] {
                     matches = false;
                     break;
                 }
@@ -258,11 +301,121 @@ impl MintSoftwareManager {
         for i in 0..sorted.len() {
             for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
                 if sorted[j].rating_stars < sorted[j + 1].rating_stars {
-                    sorted.swap(j, j + 1);
+                    let temp = sorted[j].clone();
+                    sorted[j] = sorted[j + 1].clone();
+                    sorted[j + 1] = temp;
                 }
             }
         }
         sorted
+    }
+}
+
+// ==========================================
+// Cinnamon Desktop Theme Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CinnamonDesklet {
+    pub id: u32,
+    pub x: usize,
+    pub y: usize,
+}
+
+pub struct CinnamonThemeEngine {
+    pub active_gtk_theme: [u8; 32],
+    pub desklets: Vec<Option<CinnamonDesklet>>,
+    pub is_panel_enabled: bool,
+}
+
+impl CinnamonThemeEngine {
+    pub fn new() -> Self {
+        let mut theme = [0u8; 32];
+        let default_name = b"Mint-Y-Dark";
+        unsafe {
+            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+        }
+        Self {
+            active_gtk_theme: theme,
+            desklets: Vec::new(),
+            is_panel_enabled: true,
+        }
+    }
+
+    pub fn set_gtk_theme(&mut self, theme_name: &[u8]) {
+        let mut theme = [0u8; 32];
+        let len = theme_name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(theme_name.as_ptr(), theme.as_mut_ptr(), len);
+        }
+        self.active_gtk_theme = theme;
+    }
+
+    pub fn add_desklet(&mut self, id: u32, x: usize, y: usize) {
+        self.desklets.push(Some(CinnamonDesklet { id, x, y }));
+    }
+}
+
+impl Default for CinnamonThemeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Timeshift-style System Restorer
+// ==========================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct SystemRestorePoint {
+    pub id: u32,
+    pub is_rsync: bool,
+    pub timestamp_ms: u64,
+}
+
+pub struct TimeshiftSystemRestorer {
+    pub restore_points: Vec<Option<SystemRestorePoint>>,
+    pub active_restore_point_id: u32,
+}
+
+impl TimeshiftSystemRestorer {
+    pub fn new() -> Self {
+        Self {
+            restore_points: Vec::new(),
+            active_restore_point_id: 0,
+        }
+    }
+
+    pub fn create_restore_point(&mut self, id: u32, is_rsync: bool) {
+        self.restore_points.push(Some(SystemRestorePoint {
+            id,
+            is_rsync,
+            timestamp_ms: 0,
+        }));
+    }
+
+    pub fn rollback_system(&mut self, id: u32) -> Result<(), MintError> {
+        let mut found = false;
+        for i in 0..self.restore_points.len {
+            if let Some(ref rp) = self.restore_points[i] {
+                if rp.id == id {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if found {
+            self.active_restore_point_id = id;
+            Ok(())
+        } else {
+            Err(MintError::UpdateError)
+        }
+    }
+}
+
+impl Default for TimeshiftSystemRestorer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -552,40 +705,40 @@ mod tests {
     }
 
     #[test]
-    fn test_mint_timeshift_restore_points() {
-        let mut timeshift = MintTimeshiftEngine::new();
-        let snap_id = timeshift.create_checkpoint(1690000000, b"Fresh boot restore point", 0xDEADBEEF);
-        assert_eq!(snap_id, 1);
+    fn test_cinnamon_theme_engine() {
+        let mut engine = CinnamonThemeEngine::new();
+        let mut default_theme = [0u8; 11];
+        for i in 0..11 {
+            default_theme[i] = engine.active_gtk_theme[i];
+        }
+        assert_eq!(&default_theme, b"Mint-Y-Dark");
 
-        let hash = timeshift.restore_checkpoint(1).unwrap();
-        assert_eq!(hash, 0xDEADBEEF);
+        engine.set_gtk_theme(b"Mint-Y-Light");
+        let mut new_theme = [0u8; 12];
+        for i in 0..12 {
+            new_theme[i] = engine.active_gtk_theme[i];
+        }
+        assert_eq!(&new_theme, b"Mint-Y-Light");
 
-        assert!(timeshift.restore_checkpoint(99).is_err());
+        engine.add_desklet(101, 200, 200);
+        assert_eq!(engine.desklets.len, 1);
+        assert_eq!(engine.desklets[0].unwrap().id, 101);
     }
 
     #[test]
-    fn test_mint_cinnamon_styling_options() {
-        let mut style = MintCinnamonStyling::default();
-        assert_eq!(style.panel_height, 40);
-        assert!(style.window_effects_enabled);
+    fn test_timeshift_system_restorer() {
+        let mut restorer = TimeshiftSystemRestorer::new();
+        assert_eq!(restorer.active_restore_point_id, 0);
 
-        style.configure_workspace(36, true, 85, false);
-        assert_eq!(style.panel_height, 36);
-        assert!(style.menu_layout_compact);
-        assert_eq!(style.opacity_percent, 85);
-        assert!(!style.window_effects_enabled);
-    }
+        restorer.create_restore_point(101, true); // rsync snapshot
+        restorer.create_restore_point(102, false); // btrfs snapshot
+        assert_eq!(restorer.restore_points.len, 2);
 
-    #[test]
-    fn test_mint_driver_manager_flows() {
-        let mut drivers = MintDriverManager::new();
-        let wifi_drv = MintDriverInfo::new(b"Broadcom BCM4360 WiFi", b"Wireless Controller", true);
-        drivers.register_driver(wifi_drv);
+        // Rollback succeeds for existing restore point
+        assert!(restorer.rollback_system(102).is_ok());
+        assert_eq!(restorer.active_restore_point_id, 102);
 
-        assert_eq!(drivers.available_drivers.len(), 1);
-        assert!(!drivers.available_drivers[0].active);
-
-        drivers.toggle_driver(b"Broadcom BCM4360 WiFi", true).unwrap();
-        assert!(drivers.available_drivers[0].active);
+        // Rollback fails for nonexistent point
+        assert_eq!(restorer.rollback_system(999), Err(MintError::UpdateError));
     }
 }

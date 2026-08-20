@@ -15,6 +15,8 @@ pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
 pub mod linux_bsd_inspirations;
+pub mod arch_parity;
+pub mod chakra_parity;
 
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,

@@ -1,32 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaTools - System suite for SigmaOS
 // SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess components
-
-// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::collections::BTreeMap as HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigmaToolError {
@@ -990,14 +969,14 @@ pub struct SovereignPasswordGenerator;
 impl SovereignPasswordGenerator {
     pub fn generate_secure_password(&self, length: usize, include_symbols: bool) -> String {
         let mut password = String::new();
-        let letters = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let symbols = b"!@#$%^&*()_+-=[]{}|;:,./?";
+        let letters: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let symbols: &[u8] = b"!@#$%^&*()_+-=[]{}|;:,./?";
 
         // Simple high-entropy pseudorandom mapping based on local timestamp variations
         let mut seed = length as u32 * 31;
         for _ in 0..length {
             seed = seed.wrapping_mul(1103515245).wrapping_add(12345);
-            let selection_pool = if include_symbols && (seed % 3 == 0) {
+            let selection_pool: &[u8] = if include_symbols && (seed % 3 == 0) {
                 symbols
             } else {
                 letters
@@ -1010,7 +989,8 @@ impl SovereignPasswordGenerator {
 }
 
 #[cfg(test)]
-mod replicated_tests {
+mod tests_replicated {
+    use super::*;
 
     #[test]
     fn test_dpkg_etcher() {

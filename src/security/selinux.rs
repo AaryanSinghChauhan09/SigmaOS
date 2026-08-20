@@ -103,6 +103,14 @@ pub struct PolicyRule {
     pub permission: String,
 }
 
+pub struct AppArmorManager;
+pub struct AppArmorProfile;
+pub enum ObjectType { File, Directory }
+pub struct SecurityLabel;
+pub struct SecurityPolicy;
+pub struct SecurityRule;
+pub enum SelinuxPermission { Read, Write, Execute }
+
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,
     pub policies: HashSet<AvcKey>,

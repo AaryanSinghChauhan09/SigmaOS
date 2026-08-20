@@ -81,13 +81,11 @@ pub trait IPathTrigger: Send + Sync {
     fn execute(&self, files: &[String]) -> Result<(), HookError>;
 }
 
-#[derive(Debug, Clone)]
 pub struct ConditionalDependency {
     pub required_use_flag: String,
     pub dependency: Dependency,
 }
 
-/// Core package trait - defines the contract for all package operations
 pub trait IPackage: Send + Sync {
     fn name(&self) -> &str;
     fn version(&self) -> &Version;

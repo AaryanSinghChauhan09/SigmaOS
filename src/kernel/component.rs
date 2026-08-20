@@ -348,8 +348,8 @@ impl ComponentTree {
         }
 
         // Remove from parent's children
-        if let Some(pid) = parent_id {
-            if let Some(parent_component) = self.components.get_mut(&pid) {
+        if let Some(p_id) = parent_id {
+            if let Some(parent_component) = self.components.get_mut(&p_id) {
                 parent_component.remove_child(component_id);
             }
         }
@@ -444,15 +444,13 @@ impl ComponentTree {
             (parent.resources.clone(), parent.children.clone())
         };
 
-        let num_children = children.len().max(1);
-
-        for child_id in children {
+        for &child_id in &children {
             if let Some(child) = self.components.get_mut(&child_id) {
                 // Distribute parent resources among children
                 for resource in &parent_resources {
                     let child_allocation = ResourceAllocation::new(
                         resource.resource_type,
-                        resource.amount / num_children,
+                        resource.amount / children.len().max(1),
                         resource.start,
                         resource.end,
                     );

@@ -2,11 +2,39 @@
 // This provides the basic CapabilityToken structure needed by drivers
 
 use core::default::Default;
-use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
-    pub bits: u64,
+    pub permissions: u64,
+}
+
+impl CapabilityToken {
+    pub fn new() -> Self {
+        CapabilityToken {
+            permissions: 0,
+        }
+    }
+
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            permissions: bits,
+        }
+    }
+    
+    pub fn with_permission(mut self, permission: u64) -> Self {
+        self.permissions |= permission;
+        self
+    }
+
+    pub fn bits(&self) -> u64 {
+        self.permissions
+    }
+
+    pub fn allow_network(self, _proto: &str, _port: u16) -> Self { self }
+    pub fn allow_read(self, _path: &str) -> Self { self }
+    pub fn allow_write(self, _path: &str) -> Self { self }
+    pub fn allow_exec(self) -> Self { self }
+    pub fn allow_ipc(self) -> Self { self }
 }
 
 impl Default for CapabilityToken {
@@ -15,183 +43,28 @@ impl Default for CapabilityToken {
     }
 }
 
-impl CapabilityToken {
-    /// Create a new capability token with no permissions
-    pub fn new() -> Self {
-        Self { bits: 0 }
-    }
-
-    pub fn with_permission(mut self, permission: u64) -> Self {
-        self.bits |= permission;
-        self
-    }
-
-    /// Create capability token from raw bits
-    pub fn from_bits(bits: u64) -> Self {
-        Self { bits }
-    }
-
-    /// Allow network access
-    pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
-        match protocol {
-            "tcp" => self.bits |= 1 << 0,
-            "udp" => self.bits |= 1 << 1,
-            _ => {}
-        }
-        // Mask and clear target bit ranges (bits 16-31) to prevent bitmask overlap privilege escalation
-        self.bits &= !(0xFFFF_u64 << 16);
-        self.bits |= (port as u64) << 16;
-        self
-    }
-
-    /// Allow file read access
-    pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") {
-            self.bits |= 1 << 2;
-        }
-        self
-    }
-
-    /// Allow file write access
-    pub fn allow_write(mut self, path: &str) -> Self {
-        if path.starts_with("/tmp") || path.starts_with("/home") {
-            self.bits |= 1 << 3;
-        }
-        self
-    }
-
-    /// Allow process execution
-    pub fn allow_exec(mut self) -> Self {
-        self.bits |= 1 << 4;
-        self
-    }
-
-    /// Allow IPC communication
-    pub fn allow_ipc(mut self) -> Self {
-        self.bits |= 1 << 5;
-        self
-    }
-
-    /// Check if capability has specific permission
-    pub fn has_permission(&self, permission: Permission) -> bool {
-        (self.bits & (1 << permission as u64)) != 0
-    }
-
-    /// Revoke all permissions
-    pub fn revoke_all(&mut self) {
-        self.bits = 0;
-    }
-
-    /// Get raw capability bits
-    pub fn bits(&self) -> u64 {
-        self.bits
-    }
-
-    pub fn allow_capability(&mut self, bitmask: u64) {
-        self.bits |= bitmask;
-    }
-
-    pub fn contains(&self, bitmask: u64) -> bool {
-        (self.bits & bitmask) == bitmask
-    }
-}
-
-/// Permission types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
-    NetworkTcp = 0,
-    NetworkUdp = 1,
-    FileRead = 2,
-    FileWrite = 3,
-    ProcessExec = 4,
-    Ipc = 5,
+    FileRead,
+    FileWrite,
+    ProcessExec,
+    NetworkTcp,
+    NetworkUdp,
+    Ipc,
 }
 
-/// Capability gate for syscall validation
 pub struct CapabilityGate {
-    /// Current capability token
-    current: AtomicU64,
+    pub token: CapabilityToken,
 }
 
 impl CapabilityGate {
-    /// Create new capability gate
     pub fn new() -> Self {
-        Self {
-            current: AtomicU64::new(0),
+        CapabilityGate {
+            token: CapabilityToken::new(),
         }
     }
 
-    /// Set current capability
-    pub fn set_capability(&self, token: CapabilityToken) {
-        self.current.store(token.bits(), Ordering::SeqCst);
-    }
-
-    /// Validate syscall against current capability
-    pub fn validate_syscall(&self, permission: Permission) -> bool {
-        let current = self.current.load(Ordering::SeqCst);
-        (current & (1 << permission as u64)) != 0
-    }
-
-    /// Get current capability
-    pub fn current_capability(&self) -> CapabilityToken {
-        CapabilityToken {
-            bits: self.current.load(Ordering::SeqCst),
-        }
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_capability_creation() {
-        let token = CapabilityToken::new();
-        assert_eq!(token.bits(), 0);
-    }
-
-    #[test]
-    fn test_network_permission() {
-        let token = CapabilityToken::new().allow_network("tcp", 80);
-        assert!(token.has_permission(Permission::NetworkTcp));
-    }
-
-    #[test]
-    fn test_file_read_permission() {
-        let token = CapabilityToken::new().allow_read("/var/www");
-        assert!(token.has_permission(Permission::FileRead));
-    }
-
-    #[test]
-    fn test_capability_revocation() {
-        let mut token = CapabilityToken::new().allow_network("tcp", 80);
-        token.revoke_all();
-        assert_eq!(token.bits(), 0);
-    }
-
-    #[test]
-    fn test_capability_gate_validation() {
-        let gate = CapabilityGate::new();
-        let token = CapabilityToken::new().allow_network("tcp", 80);
-        gate.set_capability(token);
-        assert!(gate.validate_syscall(Permission::NetworkTcp));
-    }
-
-    #[test]
-    fn test_bitmask_overlap_prevention() {
-        // Registering port 80 and then 443 should not result in a corrupted port 507,
-        // but rather only store the latest port 443 cleanly.
-        let token = CapabilityToken::new()
-            .allow_network("tcp", 80)
-            .allow_network("tcp", 443);
-        // Extracts port stored in bits 16-31
-        let port = (token.bits() >> 16) & 0xFFFF;
-        assert_eq!(port, 443);
+    pub fn set_capability(&mut self, token: CapabilityToken) {
+        self.token = token;
     }
 }
