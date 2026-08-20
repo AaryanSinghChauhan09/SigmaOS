@@ -9,6 +9,12 @@ pub mod sigma_fs;
 pub mod smart_symlink;
 pub mod tmpfs;
 pub mod vfs;
+pub mod ext4_ntfs_security;
+
+pub use ext4_ntfs_security::{
+    Ext4InodeMetadata, SecurityIdentifier, NtfsSecurityDescriptor,
+    NtfsAce, AceType, NtfsDacl, NtfsSacl, ext4_mode_bits, ntfs_rights,
+};
 pub mod geom;
 
 pub use geom::{GeomClass, GeomProvider, GeomConsumer, GeomAccessRights};
