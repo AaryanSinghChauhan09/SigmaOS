@@ -56,7 +56,6 @@ mod tests {
         assert_eq!(engine.execute_hook(UdkfHook::SchedulerWeight, 50), 60);
     }
 }
-||||||| 43be3a7e8
 // SigmaOS User-Defined Kernel Functions (UDKF) Scripting Engine
 // Allows safe, in-kernel customization of allocators, scheduling algorithms, and filesystems without recompilation
 
@@ -100,7 +99,6 @@ impl UserDefinedKernelFunctions {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_udkf_script_execution() {

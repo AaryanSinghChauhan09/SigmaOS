@@ -215,7 +215,6 @@ mod tests {
         assert_eq!(p.g, p.b);
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)
 // Designed for high-performance raster image canvas and layer filtering
 
@@ -398,7 +397,6 @@ impl ImageFilter for GrayscaleConversionFilter {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_raster_layer_creation() {

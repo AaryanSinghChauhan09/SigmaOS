@@ -13,11 +13,8 @@ pub mod secrets;
 pub mod securelevels;
 pub mod unveil;
 pub mod vulnerability;
-||||||| 65885484f
-pub mod hardening;
 pub mod hardening;
 pub mod qubes_isolation;
-||||||| 43be3a7e8
 pub mod bridge;
 pub mod prism;
 pub mod sandbox;
@@ -28,19 +25,12 @@ pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel}
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-||||||| 65885484f
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
-pub use hardening::{
-    secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
-};
 pub use pledge::{PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
 pub use hardening::{
     secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
 };
 pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
-||||||| 43be3a7e8
 pub use bridge::{
     LegacySecurityType, SecurityBridge,
 };

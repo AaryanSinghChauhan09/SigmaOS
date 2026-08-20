@@ -21,7 +21,6 @@ impl Default for AgentAutomationEngine {
 }
 
 
-||||||| 984d1301f
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
 
@@ -31,7 +30,6 @@ impl AgentAutomationEngine {
     }
 }
 
-||||||| 43be3a7e8
 use crate::accessibility::{
     AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
     AccessibilitySetting,
@@ -107,7 +105,6 @@ pub enum ShellCommand {
         shorthand: String,
         statement: String,
     },
-||||||| 984d1301f
     Livepatch {
         args: Vec<String>,
     },
@@ -144,7 +141,6 @@ pub enum ShellCommand {
     Sandbox {
         args: Vec<String>,
     },
-||||||| 43be3a7e8
     Echo { message: String },
     Set { variable: String, value: String },
     Get { variable: String },
@@ -239,7 +235,6 @@ pub struct ShellRepl {
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
     pub command_history: Vec<String>,
-||||||| 43be3a7e8
     running: bool,
     variables: std::collections::HashMap<String, String>,
     prompt: String,
@@ -267,7 +262,6 @@ impl ShellRepl {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-||||||| 43be3a7e8
             variables: std::collections::HashMap::new(),
             variables: HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
@@ -280,11 +274,9 @@ impl ShellRepl {
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
             command_history: Vec::new(),
-||||||| 984d1301f
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-||||||| 43be3a7e8
             customization: CustomizationEngine::new(),
             accessibility: AccessibilityFramework::new(),
             package_manager: UniversalPackageManager::new(),
@@ -315,7 +307,6 @@ impl ShellRepl {
             a11y_features: std::collections::HashMap::new(),
             command_history: Vec::new(),
         }
-||||||| 43be3a7e8
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
@@ -608,7 +599,6 @@ impl ShellRepl {
                 let package = if parts.len() >= 3 { Some(parts[2].to_string()) } else { None };
                 ShellCommand::Apt { subcommand, package }
             }
-||||||| 984d1301f
             "livepatch" => {
                 let args = parts[1..].iter().map(|s| s.to_string()).collect();
                 ShellCommand::Livepatch { args }
@@ -657,7 +647,6 @@ impl ShellRepl {
                 let args = parts[1..].iter().map(|s| s.to_string()).collect();
                 ShellCommand::Sandbox { args }
             }
-||||||| 43be3a7e8
             "theme" => {
                 if parts.len() >= 2 {
                     match parts[1] {
@@ -845,7 +834,6 @@ impl ShellRepl {
                    set          - Set a variable\n\
                    get          - Get a variable\n\
                    exit         - Exit the shell"
-||||||| 43be3a7e8
                    help    - Show this help message\n\
                    ps      - List running processes\n\
                    ls      - List files\n\
@@ -1171,7 +1159,6 @@ impl ShellRepl {
                 self.aliases.insert(shorthand.clone(), statement.clone());
                 Ok(format!("Alias defined: {} -> {}", shorthand, statement))
             }
-||||||| 43be3a7e8
 
             // Customization & Themes
             ShellCommand::ThemeList => {
@@ -1697,7 +1684,6 @@ mod tests {
         let out_sandbox = repl.execute_command(cmd_sandbox).unwrap();
         assert!(out_sandbox.contains("StrictBrowser"));
     }
-||||||| 43be3a7e8
 
     #[test]
     fn test_cli_customization() {

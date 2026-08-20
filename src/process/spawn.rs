@@ -2,7 +2,6 @@
 // Implements process lifecycles, fork, exec, and signals (SIGKILL, SIGTERM, SIGINT) under `#![no_std]`.
 
 extern crate alloc;
-||||||| 984d1301f
 #![no_std]
 #![no_main]
 
@@ -16,14 +15,10 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-||||||| 984d1301f
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 extern crate alloc;
 
-use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering, AtomicI32};
-use core::mem;
 
 pub type ProcessID = usize;
 pub type SignalHandlerFn = fn(ProcessID, u8);
@@ -43,7 +38,6 @@ pub enum ProcessState {
     Zombie = 3,
     Terminated = 4,
 }
-||||||| 984d1301f
 #[derive(Debug, Clone, Copy)]
 pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,7 +51,6 @@ pub enum ProcessError {
     InvalidArgs = 2,
     SpawnFailed = 3,
 }
-||||||| 984d1301f
 #[derive(Debug, Clone, Copy)]
 pub enum ProcessError { Success = 0, NotFound = 1, InvalidArgs = 2, SpawnFailed = 3 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -75,7 +68,6 @@ pub trait Process {
     fn set_state(&mut self, state: ProcessState);
     fn exit_code(&self) -> i32;
     fn set_exit_code(&mut self, code: i32);
-||||||| 984d1301f
     fn nice(&self) -> i32;
     fn set_nice(&mut self, value: i32) -> Result<(), ProcessError>;
     fn namespace_flags(&self) -> u32;
@@ -120,7 +112,6 @@ impl Process for SimpleProcess {
             _ => ProcessState::Terminated,
         }
     }
-||||||| 984d1301f
     fn id(&self) -> ProcessID { self.id }
     fn parent_id(&self) -> ProcessID { self.parent_id }
     fn state(&self) -> ProcessState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
@@ -148,7 +139,6 @@ impl Process for SimpleProcess {
     fn set_exit_code(&mut self, code: i32) {
         self.exit_code.store(code as usize, Ordering::SeqCst);
     }
-||||||| 984d1301f
     fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
     fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
 
@@ -243,7 +233,6 @@ impl ProcessSpawner for SimpleProcessSpawner {
         _args: &[[u8; 64]],
     ) -> Result<(), ProcessError> {
         for process_option in &mut self.processes {
-||||||| 984d1301f
     fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
         for process_option in &mut self.processes {
     fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
@@ -264,7 +253,6 @@ impl ProcessSpawner for SimpleProcessSpawner {
         let mut exit_code_to_set = 0;
 
         for process_option in &mut self.processes {
-||||||| 984d1301f
     fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
         for process_option in &mut self.processes {
     fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
@@ -360,7 +348,6 @@ impl ProcessWaiter for SimpleProcessWaiter {
         _options: u32,
     ) -> Result<(ProcessID, i32), ProcessError> {
         for process_option in &self.spawner.processes {
-||||||| 984d1301f
     fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
         for process_option in &self.spawner.processes {
     fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
@@ -424,7 +411,6 @@ impl ProcessGroup for SimpleProcessGroup {
 
     fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
         for group in &self.groups {
-||||||| 984d1301f
         for group in &mut self.groups {
         for group in self.groups.as_slice_mut() {
             if group.0 == group_id {
@@ -439,7 +425,6 @@ impl ProcessGroup for SimpleProcessGroup {
 mod tests {
     use super::*;
     use core::sync::atomic::AtomicUsize;
-||||||| 984d1301f
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
@@ -478,7 +463,6 @@ pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
         // Standard processes state is unchanged since handler didn't call exit
         let mut waiter = SimpleProcessWaiter::new(spawner);
         assert!(waiter.wait(pid).is_err()); // Not terminated yet!
-||||||| 984d1301f
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -513,7 +497,6 @@ pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
         }
     }
 }
-||||||| 984d1301f
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
@@ -538,7 +521,6 @@ unsafe fn free(_ptr: *mut u8) {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_process_nice_and_namespaces() {

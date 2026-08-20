@@ -418,7 +418,6 @@ impl BrailleMatrix {
 // ==========================================
 // 10. Localization (i18n) & Translation Engine
 // ==========================================
-||||||| 984d1301f
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -461,7 +460,6 @@ impl SigmaLivepatch {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
 pub struct LanguageTranslationCatalog {
     pub locale: String,
@@ -651,7 +649,6 @@ impl CloudOrchestrator {
         assert!(patcher.register_patch(invalid_patch).is_err());
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Canonical Clean-Room Absorption Daemons
 // Independent, zero-dependency reimplementations of Ubuntu's and derived distros' (Bodhi Linux, Zorin OS, antiX, EndeavourOS) core tooling
 
@@ -1259,7 +1256,6 @@ impl SigmaOnboardingLog {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_sigma_subiquity_installer() {

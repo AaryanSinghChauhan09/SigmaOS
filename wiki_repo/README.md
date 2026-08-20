@@ -170,7 +170,6 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 ## 📄 License
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
-||||||| 65885484f
 # SigmaOS Sovereign Wiki
 
 Welcome to the official developer and community wiki for SigmaOS—the next-generation sovereign microkernel-based operating system designed to outclass contemporary platforms in security, networking, driver resilience, and cross-platform compatibility.
@@ -230,7 +229,6 @@ We divide the expansion of our collaborative ecosystem into four sequential, tar
 3. **Issue Curation:** Label 10–15 pre-existing issues across the repositories as `"good first issue"`.
 4. **Networking Sprint Launch:** Announce the first online virtual sprint (focused on high-throughput socket layers).
 5. **Community Outreach:** Reach out directly to system forums and social channels for cross-pollination.
-||||||| 65885484f
 # 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
 > **"Sovereignty is the ultimate efficiency."**

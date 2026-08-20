@@ -66,11 +66,9 @@ mod tests {
         assert!(!codex.verify_build_integrity("init.c", "badhash"));
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Ancient Build Replay Codex (BuildCodex)
 // Formulates compiler build codex logs for legacy reproducible tooling
 
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodexCategory {
@@ -117,7 +115,6 @@ impl BuildCodex {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_build_codex_registration() {

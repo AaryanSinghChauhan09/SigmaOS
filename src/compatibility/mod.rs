@@ -4,21 +4,13 @@ pub mod cross_platform;
 pub mod interim;
 pub mod lubuntu;
 pub mod mint_linux;
-||||||| 68c19dfa6
-pub mod reactos;
 pub mod reactos;
 pub mod sigmawin;
-||||||| 984d1301f
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
 pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
 pub mod cross_platform_kernel;
-||||||| 43be3a7e8
 pub mod linux_adapter;
 pub mod persona;
 pub mod abi_translator;
@@ -33,7 +25,6 @@ pub use cross_platform::{
 };
 pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
 pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
-||||||| 984d1301f
 
 pub use cross_platform_kernel::{
     PageAccessMode, MemoryArch, TranslationEntry, PageDirectory, DeferredProcedureCall,
@@ -47,7 +38,6 @@ pub use historic_linux::{
     VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
     ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
 };
-||||||| 43be3a7e8
 pub use linux_adapter::{
     LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };

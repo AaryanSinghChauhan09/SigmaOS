@@ -1,6 +1,5 @@
 // OOP-based Hardware Compatibility Matrix for SigmaOS
 // Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
-||||||| 43be3a7e8
 #![no_std]
 #![no_main]
 // OOP-based Hardware Compatibility Matrix for SigmaOS
@@ -11,12 +10,10 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-||||||| 43be3a7e8
 /// OOP-based Hardware Compatibility Matrix for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 2
 /// Implements supported GPUs, Wi-Fi, printers, and chipsets matrix
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -33,7 +30,6 @@ pub enum DeviceType {
     Storage = 5,
     LegacyBus = 6,
 }
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum DeviceType { GPU = 0, WiFi = 1, Printer = 2, Chipset = 3, Audio = 4, Storage = 5 }
@@ -48,7 +44,6 @@ pub enum SupportStatus {
     Unsupported = 2,
     Unknown = 3,
 }
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum SupportStatus { Supported = 0, Partial = 1, Unsupported = 2, Unknown = 3 }
@@ -86,7 +81,6 @@ impl SimpleDevice {
         let name_len = name.len().min(127);
         name_array[..name_len].copy_from_slice(&name[..name_len]);
 
-||||||| 43be3a7e8
     pub fn new(id: DeviceID, device_type: DeviceType, vendor_id: u16, device_id: u16, name: &[u8], status: SupportStatus) -> Self {
         let mut name_array = [0u8; 128];
         let name_len = name.len().min(127);
@@ -138,7 +132,6 @@ impl Device for SimpleDevice {
             _ => SupportStatus::Unknown,
         }
     }
-||||||| 43be3a7e8
 impl Device for SimpleDevice {
     fn id(&self) -> DeviceID { self.id }
     fn device_type(&self) -> DeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
@@ -167,7 +160,6 @@ pub trait HardwareCompatibilityManager {
     fn list_supported(&self) -> Vec<DeviceID>;
 }
 
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompatibilityError {
@@ -243,7 +235,6 @@ impl SimpleCompatibilityMatrix {
             SupportStatus::Supported,
         );
         self.devices.push(Some(Box::new(gpu1)));
-||||||| 43be3a7e8
         let gpu1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::GPU, 0x10DE, 0x1C02, b"NVIDIA GeForce RTX 3060", SupportStatus::Supported);
         self.devices.push(Some(Box::new(gpu1)));
         let gpu1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::GPU, 0x10DE, 0x1C02, "NVIDIA GeForce RTX 3060", SupportStatus::Supported);
@@ -260,7 +251,6 @@ impl SimpleCompatibilityMatrix {
         self.devices.push(Some(Box::new(wifi1)));
     }
 }
-||||||| 43be3a7e8
         let gpu2 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::GPU, 0x1002, 0x73DF, b"AMD Radeon RX 6800 XT", SupportStatus::Supported);
         self.devices.push(Some(Box::new(gpu2)));
 
@@ -275,7 +265,6 @@ impl SimpleCompatibilityMatrix {
 impl Default for SimpleCompatibilityMatrix {
     fn default() -> Self {
         Self::new()
-||||||| 43be3a7e8
         let wifi2 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::WiFi, 0x168C, 0x003A, b"Realtek RTL8852AE", SupportStatus::Partial);
         self.devices.push(Some(Box::new(wifi2)));
 
@@ -320,7 +309,6 @@ impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
             }
         }
         None
-||||||| 43be3a7e8
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
@@ -362,7 +350,6 @@ pub struct CompatibilityReport {
 
 pub struct SimpleDriverManager {
     pub loaded_drivers: Vec<DeviceID>,
-||||||| 43be3a7e8
 #[repr(C)]
 pub struct SimpleDriverManager {
     pub loaded_drivers: Vec<DeviceID>,
@@ -423,7 +410,6 @@ pub enum DiagnosticResult {
 }
 
 pub struct SimpleHardwareDiagnostics {
-||||||| 43be3a7e8
 impl SimpleDriverManager {
     pub fn new() -> Self {
         SimpleDriverManager {
@@ -521,7 +507,6 @@ mod tests {
         let nvme_dev = matrix.get_device(nvme_id).unwrap();
         assert_eq!(nvme_dev.device_type(), DeviceType::Storage);
         assert_eq!(nvme_dev.name(), b"Samsung PCIe Gen 4 NVMe Controller");
-||||||| 43be3a7e8
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
@@ -550,7 +535,6 @@ impl<T> Vec<T> {
 
         driver_manager.unload_driver(42).unwrap();
         assert!(!driver_manager.get_driver_status(42));
-||||||| 43be3a7e8
     fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
             unsafe {

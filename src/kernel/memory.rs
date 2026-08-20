@@ -153,7 +153,6 @@ impl BuddyAllocator {
                 let block = MemoryBlock { addr, size };
                 self.free_lists[order].push(block);
             }
-||||||| 43be3a7e8
             let block = MemoryBlock {
                 addr: NonNull::new(base_addr as *mut u8).unwrap(),
                 size,
@@ -418,7 +417,6 @@ impl MemoryMerkleNode {
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
     pub buddy_allocator: BuddyAllocator,
-||||||| 43be3a7e8
     pub page_ref_counts: HashMap<u64, u32>, // physical frame addr -> reference count (for Copy-on-Write)
     pub shadow_snapshots: HashMap<u64, String>, // virtual_addr -> snapshot copy (for snapshot isolation)
 }
@@ -447,7 +445,6 @@ impl VirtualMemoryManager {
     /// Free pages using buddy allocator (wires free_pages to VMM)
     pub fn free_pages(&mut self, block: MemoryBlock) {
         self.buddy_allocator.deallocate(block);
-||||||| 43be3a7e8
         Self { root_directory }
         Self {
             root_directory,
@@ -628,7 +625,6 @@ mod tests {
         // Double Free (Should Fail)
         assert!(pool_manager.free_pool(paged_block.addr).is_err());
     }
-||||||| 43be3a7e8
 
     #[test]
     fn test_demand_paging_and_cow_snapshots() {

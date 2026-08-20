@@ -66,9 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic repository structure
 - Initial documentation
 - CI/CD pipeline setup
-||||||| 65885484f
 # Changelog
-||||||| 65885484f
 # Changelog
 
 All notable changes to SigmaOS will be documented in this file.

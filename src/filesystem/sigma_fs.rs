@@ -581,11 +581,9 @@ mod tests {
         assert!(!encryptor.pqc_verify_signature(b"Sovereign data at rest modified", &sig));
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Composable Filesystem (SigmaFS++)
 // Deploys plugin-based storage, deduplication, semantic indexers, and blockchain audit logs
 
-use std::collections::HashMap;
 
 pub struct FileBlock {
     pub hash: String,
@@ -1124,7 +1122,6 @@ impl SigmaFsVirtio {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_sigma_fs_deduplication() {

@@ -7,13 +7,11 @@
 extern crate alloc as alloc_crate;
 use alloc_crate::alloc::{alloc as alloc_fn, dealloc, Layout};
 use core::sync::atomic::{AtomicUsize, Ordering};
-||||||| 43be3a7e8
 /// OOP-based AI Orchestrator for SigmaOS
 /// Based on 100-Improvement-Ideas.md #51: AI orchestrator for system optimization
 /// Implements sigma-ai core with multi-agent coordination, workflow automation,
 /// and self-diagnosis capabilities for system optimization
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type AgentID = usize;
@@ -27,7 +25,6 @@ pub enum DeviceTarget {
     Cpu = 0,
     Gpu = 1,
     Tpu = 2,
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum AgentState { Idle = 0, Active = 1, Busy = 2, Error = 3, Learning = 4 }
@@ -61,7 +58,6 @@ pub enum OrchestratorError {
     OutOfMemory = 1,
     ModelNotFound = 2,
     LimitExceeded = 3,
-||||||| 43be3a7e8
 #[repr(C)]
 pub struct SimpleAIAgent {
     pub id: AgentID,
@@ -90,7 +86,6 @@ impl ModelResource {
             name: name_array,
             memory_required_mb,
             target,
-||||||| 43be3a7e8
 impl SimpleAIAgent {
     pub fn new(id: AgentID, name: &[u8]) -> Self {
         let mut name_array = [0u8; 64];
@@ -119,7 +114,6 @@ pub struct LocalLlmOrchestrator {
     pub total_tpu_memory_mb: usize,
     pub allocated_gpu_memory_mb: AtomicUsize,
     pub allocated_tpu_memory_mb: AtomicUsize,
-||||||| 43be3a7e8
 impl AIAgent for SimpleAIAgent {
     fn id(&self) -> AgentID { self.id }
     fn name(&self) -> &[u8] {
@@ -164,7 +158,6 @@ impl LocalLlmOrchestrator {
             total_tpu_memory_mb: tpu_mem,
             allocated_gpu_memory_mb: AtomicUsize::new(0),
             allocated_tpu_memory_mb: AtomicUsize::new(0),
-||||||| 43be3a7e8
 pub trait AgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
     fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
@@ -211,7 +204,6 @@ impl SimpleAgentOrchestrator {
         prefer_device: DeviceTarget,
     ) -> Result<DeviceTarget, OrchestratorError> {
         let mut final_device = prefer_device;
-||||||| 43be3a7e8
 impl AgentOrchestrator for SimpleAgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
         let id = agent.id();
@@ -252,7 +244,6 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                         final_device = DeviceTarget::Cpu;
                     }
                 }
-||||||| 43be3a7e8
     fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
         if let Some(target_id) = agent_id {
             for agent_option in &mut self.agents {
@@ -299,7 +290,6 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                     self.active_models[i] = None;
                     return Ok(());
                 }
-||||||| 43be3a7e8
             Err(AgentError::NotFound)
         } else {
             for agent_option in &mut self.agents {
@@ -316,7 +306,6 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
             }
         }
         Err(OrchestratorError::ModelNotFound)
-||||||| 43be3a7e8
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
@@ -360,7 +349,6 @@ impl ContextWindowPruner {
             max_lines,
         }
     }
-||||||| 43be3a7e8
 #[repr(C)]
 pub struct SimpleTaskQueue {
     pub tasks: Vec<([u8; 256], u8)>,
@@ -390,7 +378,6 @@ struct Vec<T> {
     pub data: *mut T,
     pub len: usize,
     pub capacity: usize,
-||||||| 43be3a7e8
 impl TaskQueue for SimpleTaskQueue {
     fn enqueue(&mut self, task: &[u8], priority: u8) {
         let mut task_array = [0u8; 256];
@@ -508,7 +495,6 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
-||||||| 43be3a7e8
 pub trait AgentCommunication {
     fn send_message(&mut self, from: AgentID, to: AgentID, message: &[u8]) -> Result<(), AgentError>;
     fn receive_message(&mut self, agent_id: AgentID) -> Option<[u8; 256]>;
@@ -709,7 +695,6 @@ extern "C" {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_model_scheduling() {
@@ -753,6 +738,5 @@ mod tests {
         assert_eq!(&turn_first, b"Context turn 2");
     }
 }
-||||||| 43be3a7e8
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

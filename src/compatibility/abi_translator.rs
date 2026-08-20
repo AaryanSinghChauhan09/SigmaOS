@@ -287,7 +287,6 @@ mod tests {
         assert_eq!(aapcs64.stack_alignment_bytes, 16);
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Cross-Kernel ABI Translator
 // Designed to translate function register calling conventions and packet alignments across x86 and ARM ABIs
 
@@ -349,7 +348,6 @@ impl ABITranslator {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_x86_abi_translation() {

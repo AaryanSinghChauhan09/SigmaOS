@@ -224,7 +224,6 @@ impl DefensiveAuditSystem {
     }
 }
 ```
-||||||| 43be3a7e8
 # 🛡️ SigmaOS: Sovereign Defensive Auditing & Sandbox Checking System (SigmaAudit)
 
 This document details the complete, industrial-grade development plans, architectural specifications, and fully executable reference implementations for **SigmaOS's Defensive Auditing & Sandbox Checking Subsystem (SigmaAudit)**.

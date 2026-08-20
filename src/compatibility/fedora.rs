@@ -552,11 +552,9 @@ mod tests {
         assert!(alu.flags.overflow);
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 
-use std::collections::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
@@ -779,7 +777,6 @@ impl BodhiUpdateTriage {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_dnf_package_resolver() {

@@ -71,7 +71,6 @@ mod tests {
         assert!(engine.execute_dilithium_sig_check(&[0x11], &[0x22]));
     }
 }
-||||||| 43be3a7e8
 // SigmaOS SIMD-Vectorized Crypto Engine (VectorizedPqcEngine)
 // Accelerates CRYSTALS-Kyber polynomial multiplications and Dilithium checks via simulated AVX-512 / Neon registers
 
@@ -121,7 +120,6 @@ impl VectorizedPqcEngine {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_kyber_vectorized_ntt() {

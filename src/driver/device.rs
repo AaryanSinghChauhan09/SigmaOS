@@ -5,15 +5,11 @@ extern crate alloc;
 use alloc::boxed::Box;
 
 use core::mem;
-||||||| 43be3a7e8
-use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
 use core::ptr::NonNull;
-||||||| 43be3a7e8
 
-use core::ptr::{self, NonNull};
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -288,7 +284,6 @@ impl Device for SimpleBlockDevice {
     }
 }
 
-||||||| 65885484f
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -357,7 +352,6 @@ mod tests {
     }
 }
 
-||||||| 43be3a7e8
 // =========================================================================
 // ANCIENT AND LEGACY DEVICE SUPPORT (OOP-BASED IMPLEMENTATIONS)
 // =========================================================================
@@ -2250,7 +2244,6 @@ impl UnifiedPeripheral for ImuSensorDriver {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_legacy_device_oop() {
@@ -2267,7 +2260,6 @@ mod tests {
             modern.query_channel(),
             PortAddress::MemoryMapped(0xFE000000)
         );
-||||||| 43be3a7e8
         let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
         assert_eq!(modern.query_channel(), PortAddress::MemoryMapped(0xFE000000));
         let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
@@ -2358,7 +2350,6 @@ mod tests {
         // Assert that all Device Objects and Extensions have been freed/deleted cleanly from the pool
         assert_eq!(io_mgr.active_drivers[driver_idx].device_objects.len(), 0);
     }
-||||||| 43be3a7e8
 
     #[test]
     fn test_graphics_drivers() {
@@ -2978,7 +2969,6 @@ impl<T> Vec<T> {
 
     pub fn clear(&mut self) {
         self.len = 0;
-||||||| 43be3a7e8
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter { vec: self, index: 0 }
     pub fn iter(&self) -> VecIter<'_, T> {
@@ -2992,7 +2982,6 @@ impl<T> Vec<T> {
         VecIterator {
             vec: self,
             index: 0,
-||||||| 43be3a7e8
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
         VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
     }
@@ -3132,7 +3121,6 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
 
 // External allocator functions
 #[cfg(not(test))]
-||||||| 43be3a7e8
 pub struct VecIter<'a, T> {
     vec: &'a Vec<T>,
     index: usize,
@@ -3228,7 +3216,6 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
     if let Ok(layout) = Layout::from_size_align(size, 8) {
         std_alloc(layout)
     } else {
@@ -3253,7 +3240,6 @@ extern "C" {
 extern "C" {
     fn malloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-||||||| 65885484f
 /// Unified representation of communication channels (OOP Abstraction)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PortAddress {
@@ -3263,7 +3249,6 @@ pub enum PortAddress {
 #[derive(Debug, Clone)]
 pub struct DeviceExtension {
     pub irq: u8,
-||||||| 43be3a7e8
     PortIO(u16),      // Legacy 16-bit Port I/O (older generations)
     MemoryMapped(u32) // Modern 32/64-bit Memory Mapped I/O (newer generations)
 }
@@ -3291,7 +3276,6 @@ pub trait UnifiedPeripheral: Device {
 /// Legacy implementation of a peripheral using Port I/O
 pub struct LegacyDevice {
     pub base_port: u16,
-||||||| 43be3a7e8
     pub id: usize,
     pub name: [u8; 64],
 }
@@ -3427,7 +3411,6 @@ impl DeviceObject {
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-||||||| 43be3a7e8
         ModernDevice { base_address, id, name: name_array }
     }
 }
@@ -3443,7 +3426,6 @@ impl DeviceObject {
             name: name_array,
             device_type,
             device_extension: DeviceExtension::new(),
-||||||| 43be3a7e8
 impl Device for ModernDevice {
     fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
@@ -3460,7 +3442,6 @@ impl Device for ModernDevice {
             *b = 0;
         }
     }
-||||||| 43be3a7e8
     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> { Ok(buffer.len()) }
     fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> { Ok(0) }
     fn info(&self) -> DeviceInfo { DeviceInfo::new(DeviceType::Character) }
@@ -3491,7 +3472,6 @@ impl DriverObject {
     pub fn new(name: &[u8], reg_path: &[u8]) -> Self {
         let mut name_array = [0u8; 64];
         let len = name.len().min(63);
-||||||| 43be3a7e8
 impl UnifiedPeripheral for ModernDevice {
     fn query_channel(&self) -> PortAddress { PortAddress::MemoryMapped(self.base_address) }
     fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
@@ -3542,7 +3522,6 @@ impl IoManager {
     pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
         if driver_idx >= self.active_drivers.len() {
             return Err(DeviceError::InvalidParameter);
-||||||| 43be3a7e8
     /// Execute the sandboxed User-Defined Function bytecode
     /// Bytecode instructions:
     /// - 0x01: Read Port IO / MMIO
@@ -3707,7 +3686,6 @@ pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_device_descriptors() {

@@ -871,12 +871,10 @@ mod tests {
         assert_eq!(parsed.camera_model, "SigmaLens-X1");
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Sovereign AI-Native Desktop Productivity & Utility Suite
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing features from:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, Vivaldi, Firefox, EarTrumpet, Kdenlive, Shotcut, DaVinci Resolve, Notepad++, Audacity.
 
-use crate::graphics::paint::ColorRgba;
 
 // =========================================================================
 // 1. Everything Instant File Search Engine (Everything/Voidtools Parity)
@@ -1514,7 +1512,6 @@ impl IrfanViewEngine {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_everything_search() {

@@ -281,7 +281,6 @@ To write a brand new driver conforming to our OOP patterns, follow this standard
 2. Implement the standard base `Driver` trait.
 3. Specialize the driver using `StorageDriver`, `NetworkDriver`, `GraphicsDriver`, or `InputDriver`.
 4. Register the driver struct with the static `GLOBAL_LIFECYCLE_MANAGER`.
-||||||| 43be3a7e8
 # 🛡️ SigmaOS: Sovereign Master Driver Development Blueprint
 
 This document details the complete, industrial-grade development plans, architectural specifications, and fully executable reference implementations for **SigmaOS's Unified Multi-Generation OOP Driver Framework**.

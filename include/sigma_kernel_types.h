@@ -16,7 +16,6 @@ typedef enum {
 } sigma_bool;
 
 #endif
-||||||| 65885484f
 #ifndef SIGMA_KERNEL_TYPES_H
 #define SIGMA_KERNEL_TYPES_H
 

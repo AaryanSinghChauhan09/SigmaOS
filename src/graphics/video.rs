@@ -469,7 +469,6 @@ mod tests {
         assert!(manager.active_alert.is_none());
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Sovereign AI-Native Video Editing Suite (SigmaCut)
 // Designed for high-performance timeline composition, YUV translation, and overlay effects
 
@@ -650,7 +649,6 @@ impl TimelineClip for VideoClip {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_video_clip_creation() {

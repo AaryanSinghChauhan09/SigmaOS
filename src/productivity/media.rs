@@ -102,7 +102,6 @@ impl SigmaMediaEngine {
 }
 
 pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
-||||||| 43be3a7e8
 // SigmaOS Polish-Parity Out-of-the-Box Codecs & Multimedia Engine (SigmaMedia)
 // Designed for chiptune synthesizers, audio playing, and decoders with zero dependencies
 

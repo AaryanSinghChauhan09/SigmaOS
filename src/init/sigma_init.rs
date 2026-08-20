@@ -1,7 +1,6 @@
 #![no_std]
 #![allow(warnings)]
 #![allow(clippy::all)]
-||||||| 43be3a7e8
 #![no_std]
 #![no_main]
 // #![no_std]
@@ -14,7 +13,6 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-||||||| 43be3a7e8
 /// Implements minimal init system with service management, dependency resolution, parallel startup
 /// Implements minimal init system with service management, dependency resolution, parallel startup, and AI-driven diagnostics
 
@@ -31,7 +29,6 @@ pub enum ServiceState {
     Stopping = 3,
     Failed = 4,
 }
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum ServiceState { Stopped = 0, Starting = 1, Running = 2, Stopping = 3, Failed = 4 }
@@ -48,7 +45,6 @@ pub enum InitError {
     StartFailed = 3,
     StopFailed = 4,
 }
-||||||| 43be3a7e8
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum InitError { Success = 0, ServiceNotFound = 1, DependencyFailed = 2, StartFailed = 3, StopFailed = 4 }
@@ -106,7 +102,6 @@ impl Service for SimpleService {
     fn dependencies(&self) -> Vec<ServiceID> {
         self.deps.clone()
     }
-||||||| 43be3a7e8
     fn state(&self) -> ServiceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
     fn state(&self) -> ServiceState {
@@ -197,7 +192,6 @@ impl Default for SigmaInit {
     fn default() -> Self {
         Self::new()
     }
-||||||| 43be3a7e8
 
     // =========================================================================
     // SigmaInit Evolution: Parallel Startup Schedule, Bottleneck Prediction, Self-Healing
@@ -334,13 +328,11 @@ impl InitSystem for SigmaInit {
 
         // Start main service
         for svc_option in &mut self.services {
-||||||| 43be3a7e8
         for svc_option in &mut self.services {
         for i in 0..self.services.len {
             let svc_option = unsafe { &mut *self.services.data.add(i) };
             if let Some(ref mut svc) = *svc_option {
                 if svc.id() == id {
-||||||| 43be3a7e8
                     let deps = svc.dependencies();
                     for dep_id in deps {
                         self.start_service(dep_id)?;
@@ -549,14 +541,12 @@ pub trait FirmwarePort {
     fn boot_type(&self) -> &'static str;
     fn handoff(&self) -> Result<(), &'static str>;
 }
-||||||| 984d1301f
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerDaemonType {
     SystemDaemon, // PID 1 System Docker equivalent managing core OS containers
     UserDaemon,   // User Docker equivalent managing user workloads
 }
-||||||| 43be3a7e8
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 pub struct Vec<T> { pub data: *mut T, pub len: usize, pub capacity: usize }
 
@@ -590,7 +580,6 @@ impl RancherContainerInit {
             user_daemon_active: false,
             system_containers: Vec::new(),
             user_containers: Vec::new(),
-||||||| 43be3a7e8
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
@@ -642,7 +631,6 @@ impl<T> Vec<T> {
     pub fn start_user_daemon(&mut self) -> Result<(), &'static str> {
         if !self.system_daemon_active {
             return Err("Cannot start User Daemon: System Daemon (PID 1) must be active first");
-||||||| 43be3a7e8
     fn clone(&self) -> Vec<T> {
         let mut new_vec = Vec::new();
         for i in 0..self.len {
@@ -703,7 +691,6 @@ impl<T> Vec<T> {
                     state: ContainerState::Running,
                 });
                 Ok(id)
-||||||| 43be3a7e8
     fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
             unsafe {
@@ -713,7 +700,6 @@ impl<T> Vec<T> {
             unsafe {
                 if &*self.data.add(i) == item { return true; }
             }
-||||||| 43be3a7e8
         }
         false
     }
@@ -881,13 +867,11 @@ mod tests {
         assert!(!zt.check_capability(1));
     }
 }
-||||||| 984d1301f
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_rancher_container_init() {
@@ -918,7 +902,6 @@ mod tests {
         assert_eq!(r_init.user_containers.len(), 1);
     }
 }
-||||||| 43be3a7e8
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]

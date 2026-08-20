@@ -81,7 +81,6 @@ impl SigmaTimeshift {
 }
 
 pub static GLOBAL_TIMESHIFT: SigmaTimeshift = SigmaTimeshift::new();
-||||||| 43be3a7e8
 // SigmaOS Polish-Parity System Backup (SigmaTimeshift)
 // Designed for automated, transaction-safe snapshots and system recovery
 

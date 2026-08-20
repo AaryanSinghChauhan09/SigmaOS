@@ -752,7 +752,6 @@ impl CallingConventionEngine {
     }
 }
 
-||||||| 68c19dfa6
 // ==========================================
 // 4. System Control Registers (CR0, CR3, CR4, SCTLR)
 // ==========================================
@@ -1602,7 +1601,6 @@ mod tests {
         assert!(res2.is_err());
         assert_eq!(res2.unwrap_err(), "Rootkit hook detected in DriverObject major function dispatch table!");
     }
-||||||| 68c19dfa6
 
     #[test]
     fn test_system_control_registers() {
@@ -1754,7 +1752,6 @@ mod tests {
         assert_eq!(irp.stack_locations.len(), 3);
 
         // Define a completion routine
-        use std::sync::atomic::{AtomicBool, Ordering};
         static COMPLETION_CALLED: AtomicBool = AtomicBool::new(false);
         fn completion_handler(dev: &DeviceObject, irp: &mut Irp) -> u32 {
             COMPLETION_CALLED.store(true, Ordering::SeqCst);

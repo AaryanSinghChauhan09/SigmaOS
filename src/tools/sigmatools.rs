@@ -1011,7 +1011,6 @@ impl SovereignPasswordGenerator {
 
 #[cfg(test)]
 mod replicated_tests {
-    use super::*;
 
     #[test]
     fn test_dpkg_etcher() {

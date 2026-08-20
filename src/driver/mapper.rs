@@ -64,11 +64,9 @@ mod tests {
         assert!(missing.is_none());
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Legacy Driver API Mapper (DriverMapper)
 // Maps legacy driver APIs directly to modern equivalents to bypass heavy emulation overhead
 
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MapperCategory {
@@ -110,7 +108,6 @@ impl DriverMapper {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_driver_mapper_api_resolving() {

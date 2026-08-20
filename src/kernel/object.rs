@@ -6,7 +6,6 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use crate::klib::HashMap;
-||||||| 68c19dfa6
 
 #[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -14,7 +13,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(not(test))]
-use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 
@@ -557,7 +555,6 @@ mod tests {
         }
     }
 }
-||||||| 68c19dfa6
 
 // ==========================================
 // Windows NT-Style Object Manager Subsystem
@@ -758,7 +755,6 @@ impl DriverEntry {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_nt_object_manager_directories_and_symlinks() {

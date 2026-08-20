@@ -55,7 +55,6 @@ mod tests {
         assert!(!bridge.is_graphic_output_ready());
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Legacy Firmware Bridge Grid (FirmwareBridgeGrid)
 // Deploys unified boot grid parameters to support modern/ancient hardware booting seamlessly
 
@@ -91,7 +90,6 @@ impl FirmwareBridgeGrid {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_bridge_grid_uefi() {
