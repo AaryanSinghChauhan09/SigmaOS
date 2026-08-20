@@ -25,6 +25,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod storage;
 pub mod thread;
 pub mod process;
 pub mod community;
@@ -174,6 +175,13 @@ pub use sigpkg::{
     SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
+pub use storage::{
+    BlockError as StorageBlockError, BlockKind, BlockOpCode, BlockOperationEngine, BlockOrientedDevice,
+    BlockingStrategy, CinderBackup, CinderBlockStorageEngine, CinderProvisioningType, CinderQosPolicy,
+    CinderSnapshot, CinderVolume, CinderVolumeState, CinderVolumeType, DeviceClass as StorageDeviceClass,
+    NvmeBlockDevice, RecordBlockingEngine, SimpleBlockDevice, SovereignBlockClassifier, SsdBlockDevice,
+    SystemBlockDiagramEngine,
+};
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
@@ -197,7 +205,7 @@ pub use memory::segmentation_paging::{
 };
 
 pub use community::toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe as CommunityPackageRecipe,
     RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
     SecurityProfileTemplateStore, SecurityTemplate,
 };

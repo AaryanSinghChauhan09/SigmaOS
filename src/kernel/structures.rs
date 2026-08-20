@@ -211,6 +211,10 @@ pub enum ThreadState {
     Ready,
     Running,
     Waiting,
+    Blocked,
+    BlockedWaiting,
+    BlockedSuspended,
+    Suspended,
     Terminated,
 }
 

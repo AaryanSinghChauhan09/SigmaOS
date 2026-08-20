@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -16,8 +17,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// (no_std only applicable at crate root - removed)
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -33,7 +32,9 @@ pub const INIT_PID: u64 = 1;
 pub enum ProcessState {
     Running,
     Runnable,
+    Blocked,
     BlockedWaiting,
+    BlockedSuspended,
     Stopped,
     Traced,
     Zombie,
@@ -119,6 +120,12 @@ impl Cred {
     }
 }
 
+impl Default for Cred {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SignalStruct {
     pub pending: Vec<u32>,
     pub blocked: u64,
@@ -200,6 +207,12 @@ impl MmStruct {
             context: 0,
             pgtables_bytes: 0,
         }
+    }
+}
+
+impl Default for MmStruct {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -290,6 +303,13 @@ impl Task {
         !self.is_zombie()
     }
 
+    pub fn is_blocked(&self) -> bool {
+        matches!(
+            self.state,
+            ProcessState::Blocked | ProcessState::BlockedWaiting | ProcessState::BlockedSuspended
+        )
+    }
+
     pub fn workload_type(&self) -> TaskWorkloadType {
         match self.policy {
             SchedPolicy::Deadline | SchedPolicy::Fifo => TaskWorkloadType::RealTimePeriodic,
@@ -325,5 +345,8 @@ mod tests {
         let mut t3 = Task::new(101, "realtime_audio");
         t3.policy = SchedPolicy::Fifo;
         assert_eq!(t3.workload_type(), TaskWorkloadType::RealTimePeriodic);
+
+        t3.state = ProcessState::BlockedWaiting;
+        assert!(t3.is_blocked());
     }
 }
