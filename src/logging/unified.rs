@@ -410,9 +410,9 @@ impl LogTarget for MemoryLogTarget {
 
         let mut entry_copy = UnifiedLogEntry::new(
             entry.level,
-            &entry.component[..entry.component_len as usize],
-            &entry.message[..entry.message_len as usize],
-            &entry.module[..entry.module_len as usize],
+            &entry.component,
+            &entry.message,
+            &entry.module,
             entry.line,
         );
         entry_copy.timestamp = entry.timestamp;
@@ -549,7 +549,8 @@ impl LogTarget for ConsoleLogTarget {
             return Err(LogError::PermissionDenied);
         }
 
-        let msg_str = entry.get_message_str();
+        let msg_len = entry.message.iter().position(|&b| b == 0).unwrap_or(512);
+        let msg_str = String::from_utf8_lossy(&entry.message[..msg_len]);
 
         let formatted = alloc::format!("[STDOUT][{:?}]: {}", entry.level, msg_str);
         self.output_history.push(formatted);
