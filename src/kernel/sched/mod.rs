@@ -22,7 +22,14 @@ pub mod sigma_mlfq;
 pub mod sigma_transformer_sched;
 pub mod sigma_thermal_sched;
 pub mod gaming_performance;
+pub mod comprehensive_schedulers;
 
+pub use comprehensive_schedulers::{
+    LongTermJobScheduler, MediumTermSwapper, ShortTermCpuScheduler,
+    MultilevelFeedbackQueueScheduler, AnticipatoryIoScheduler,
+    BfqCompletelyFairIoScheduler, ProcessTaskControlBlock, ProcessLifecycleState,
+    DiskIoRequest, IoRequestType,
+};
 pub use gaming_performance::{
     DragonFlySmpQueueManager, LwktMessage, PowerGovernor, SovereignGameMode, UksmPageDeduplicator,
 };
