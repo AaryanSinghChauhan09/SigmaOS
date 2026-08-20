@@ -2,6 +2,7 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
+pub mod auth;
 pub mod automation;
 pub mod compatibility;
 pub mod container;

@@ -3,11 +3,10 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-<<<<<<< HEAD
-use klib::collections::HashMap;
-=======
+#[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
->>>>>>> origin/ci-workflows-and-test-validation-15641703078746240029
+#[cfg(target_os = "none")]
+use klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

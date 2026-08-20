@@ -348,7 +348,6 @@ impl CongestionControl for BBRCongestionControl {
         self.cwnd.store(target, Ordering::SeqCst);
     }
     fn on_loss(&mut self) {
-<<<<<<< HEAD
         self.cwnd.store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
     }
     fn get_cwnd(&self) -> usize {

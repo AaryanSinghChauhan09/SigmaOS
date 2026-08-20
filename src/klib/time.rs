@@ -206,9 +206,8 @@ pub fn monotonic_ms() -> u64 {
     // In a real implementation, this would return monotonic time
     0
 }
-        Some(Duration { secs, nanos })
-    }
 
+impl Duration {
     pub fn checked_sub(self, rhs: Duration) -> Option<Duration> {
         let mut secs = self.secs.checked_sub(rhs.secs)?;
         let nanos = if self.nanos >= rhs.nanos {
