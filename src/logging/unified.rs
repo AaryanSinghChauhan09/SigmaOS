@@ -120,8 +120,11 @@ pub struct UnifiedLogEntry {
     pub facility: SyslogFacility,
     pub pid: u32,
     pub component: [u8; 64],
+    pub component_len: u8,
     pub message: [u8; 512],
+    pub message_len: u16,
     pub module: [u8; 128],
+    pub module_len: u8,
     pub line: u32,
     pub fields: Vec<LogField>,
 }
@@ -152,8 +155,11 @@ impl UnifiedLogEntry {
             facility: SyslogFacility::User,
             pid: 1,
             component: component_array,
+            component_len: component_len as u8,
             message: message_array,
+            message_len: message_len as u16,
             module: module_array,
+            module_len: module_len as u8,
             line,
             fields: Vec::new(),
         }
@@ -174,18 +180,20 @@ impl UnifiedLogEntry {
         self
     }
 
+    // Performance Optimization: Direct O(1) slice access using pre-calculated length fields
+    // instead of running linear scan `.position(|&b| b == 0)` across fixed byte arrays on every log formatting call.
     pub fn get_message_str(&self) -> String {
-        let msg_len = self.message.iter().position(|&b| b == 0).unwrap_or(512);
+        let msg_len = self.message_len as usize;
         String::from_utf8_lossy(&self.message[..msg_len]).into_owned()
     }
 
     pub fn get_component_str(&self) -> String {
-        let comp_len = self.component.iter().position(|&b| b == 0).unwrap_or(64);
+        let comp_len = self.component_len as usize;
         String::from_utf8_lossy(&self.component[..comp_len]).into_owned()
     }
 
     pub fn get_module_str(&self) -> String {
-        let mod_len = self.module.iter().position(|&b| b == 0).unwrap_or(128);
+        let mod_len = self.module_len as usize;
         String::from_utf8_lossy(&self.module[..mod_len]).into_owned()
     }
 
@@ -402,9 +410,9 @@ impl LogTarget for MemoryLogTarget {
 
         let mut entry_copy = UnifiedLogEntry::new(
             entry.level,
-            &entry.component,
-            &entry.message,
-            &entry.module,
+            &entry.component[..entry.component_len as usize],
+            &entry.message[..entry.message_len as usize],
+            &entry.module[..entry.module_len as usize],
             entry.line,
         );
         entry_copy.timestamp = entry.timestamp;
@@ -541,8 +549,7 @@ impl LogTarget for ConsoleLogTarget {
             return Err(LogError::PermissionDenied);
         }
 
-        let msg_len = entry.message.iter().position(|&b| b == 0).unwrap_or(512);
-        let msg_str = String::from_utf8_lossy(&entry.message[..msg_len]);
+        let msg_str = entry.get_message_str();
 
         let formatted = alloc::format!("[STDOUT][{:?}]: {}", entry.level, msg_str);
         self.output_history.push(formatted);
