@@ -1,8 +1,11 @@
+extern crate alloc;
+
 /// Access Control Engine for SigmaOS
 /// Supports Discretionary Access Control (DAC), Mandatory Access Control (MAC - Bell-LaPadula),
-/// MAC Address Hardware Network Filtering, and Role-Based Access Control (RBAC).
+/// MAC Address Hardware Network Filtering, POSIX ACLs, Access Control Matrix, and Role-Based Access Control (RBAC).
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 pub type RoleID = usize;
 pub type PermissionID = usize;
@@ -137,326 +140,7 @@ impl MacAddressFilter {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 4. POSIX 1003.1e ACCESS CONTROL LISTS (LINUX & BSD UNIX ACLs)
-// ─────────────────────────────────────────────────────────────────────────────
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AclTag {
-    UserObj,
-    User(UserID),
-    GroupObj,
-    Group(GroupID),
-    Mask,
-    Other,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AclEntry {
-    pub tag: AclTag,
-    pub permissions: u8, // Bitmask: READ (0o4), WRITE (0o2), EXECUTE (0o1)
-}
-
-impl AclEntry {
-    pub fn new(tag: AclTag, permissions: u8) -> Self {
-        Self { tag, permissions }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PosixAcl {
-    pub entries: Vec<AclEntry>,
-}
-
-impl PosixAcl {
-    pub fn new() -> Self {
-        Self {
-            entries: Vec::new(),
-        }
-    }
-
-    pub fn from_mode(owner_uid: UserID, group_gid: GroupID, mode_bits: u16) -> Self {
-        let owner_perms = ((mode_bits >> 6) & 0o7) as u8;
-        let group_perms = ((mode_bits >> 3) & 0o7) as u8;
-        let other_perms = (mode_bits & 0o7) as u8;
-
-        let mut acl = Self::new();
-        acl.entries.push(AclEntry::new(AclTag::UserObj, owner_perms));
-        acl.entries.push(AclEntry::new(AclTag::GroupObj, group_perms));
-        acl.entries.push(AclEntry::new(AclTag::Other, other_perms));
-        acl
-    }
-
-    pub fn add_entry(&mut self, entry: AclEntry) {
-        self.entries.retain(|e| e.tag != entry.tag);
-        self.entries.push(entry);
-        self.recalculate_mask();
-    }
-
-    pub fn recalculate_mask(&mut self) {
-        let has_named_entries = self.entries.iter().any(|e| match e.tag {
-            AclTag::User(_) | AclTag::Group(_) => true,
-            _ => false,
-        });
-
-        if has_named_entries {
-            let mut mask_perms = 0u8;
-            for e in &self.entries {
-                match e.tag {
-                    AclTag::User(_) | AclTag::GroupObj | AclTag::Group(_) => {
-                        mask_perms |= e.permissions;
-                    }
-                    _ => {}
-                }
-            }
-            self.add_entry_raw(AclEntry::new(AclTag::Mask, mask_perms));
-        }
-    }
-
-    fn add_entry_raw(&mut self, entry: AclEntry) {
-        self.entries.retain(|e| e.tag != entry.tag);
-        self.entries.push(entry);
-    }
-
-    pub fn get_mask(&self) -> Option<u8> {
-        self.entries
-            .iter()
-            .find(|e| e.tag == AclTag::Mask)
-            .map(|e| e.permissions)
-    }
-
-    /// Evaluates POSIX 1003.1e access logic taking into account Mask and named User/Group entries
-    pub fn evaluate_access(
-        &self,
-        subject_uid: UserID,
-        subject_gid: GroupID,
-        secondary_gids: &[GroupID],
-        owner_uid: UserID,
-        group_gid: GroupID,
-        requested_perm: u8,
-    ) -> bool {
-        if subject_uid == 0 {
-            return true; // Root bypasses standard ACLs
-        }
-
-        let mask = self.get_mask();
-
-        // 1. Owner matching
-        if subject_uid == owner_uid {
-            if let Some(entry) = self.entries.iter().find(|e| e.tag == AclTag::UserObj) {
-                return (entry.permissions & requested_perm) == requested_perm;
-            }
-        }
-
-        // 2. Named User matching
-        if let Some(entry) = self.entries.iter().find(|e| e.tag == AclTag::User(subject_uid)) {
-            let effective = if let Some(m) = mask {
-                entry.permissions & m
-            } else {
-                entry.permissions
-            };
-            return (effective & requested_perm) == requested_perm;
-        }
-
-        // 3. Group matching (GroupObj or named Group)
-        let mut group_matched = false;
-        let mut combined_effective = 0u8;
-
-        for entry in &self.entries {
-            let matches = match entry.tag {
-                AclTag::GroupObj => subject_gid == group_gid || secondary_gids.contains(&group_gid),
-                AclTag::Group(gid) => subject_gid == gid || secondary_gids.contains(&gid),
-                _ => false,
-            };
-
-            if matches {
-                group_matched = true;
-                let eff = if let Some(m) = mask {
-                    entry.permissions & m
-                } else {
-                    entry.permissions
-                };
-                combined_effective |= eff;
-            }
-        }
-
-        if group_matched {
-            return (combined_effective & requested_perm) == requested_perm;
-        }
-
-        // 4. Other
-        if let Some(entry) = self.entries.iter().find(|e| e.tag == AclTag::Other) {
-            return (entry.permissions & requested_perm) == requested_perm;
-        }
-
-        false
-    }
-
-    /// Generates inherited default POSIX ACL for a child node inside a directory
-    pub fn inherit_default_acl(&self, is_directory: bool) -> PosixAcl {
-        let mut child = self.clone();
-        if !is_directory {
-            // Strip execute bits if child is a regular file and non-executable
-            for entry in &mut child.entries {
-                match entry.tag {
-                    AclTag::UserObj | AclTag::GroupObj | AclTag::Other | AclTag::User(_) | AclTag::Group(_) => {
-                        entry.permissions &= !dac_flags::EXECUTE as u8;
-                    }
-                    _ => {}
-                }
-            }
-            child.recalculate_mask();
-        }
-        child
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 5. NFSv4 / FREEBSD RICH ACCESS CONTROL LISTS (NFSv4 ACEs)
-// ─────────────────────────────────────────────────────────────────────────────
-
-#[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Nfs4AceType {
-    AccessAllowed = 0,
-    AccessDenied = 1,
-    Audit = 2,
-    Alarm = 3,
-}
-
-pub mod nfs4_flags {
-    pub const FILE_INHERIT: u32 = 0x00000001;
-    pub const DIRECTORY_INHERIT: u32 = 0x00000002;
-    pub const NO_PROPAGATE_INHERIT: u32 = 0x00000004;
-    pub const INHERIT_ONLY: u32 = 0x00000008;
-    pub const SUCCESSFUL_ACCESS: u32 = 0x00000010;
-    pub const FAILED_ACCESS: u32 = 0x00000020;
-    pub const IDENTIFIER_GROUP: u32 = 0x00000040;
-}
-
-pub mod nfs4_mask {
-    pub const READ_DATA: u32 = 1 << 0;
-    pub const WRITE_DATA: u32 = 1 << 1;
-    pub const APPEND_DATA: u32 = 1 << 2;
-    pub const READ_NAMED_ATTRS: u32 = 1 << 3;
-    pub const WRITE_NAMED_ATTRS: u32 = 1 << 4;
-    pub const EXECUTE: u32 = 1 << 5;
-    pub const DELETE_CHILD: u32 = 1 << 6;
-    pub const READ_ATTRIBUTES: u32 = 1 << 7;
-    pub const WRITE_ATTRIBUTES: u32 = 1 << 8;
-    pub const DELETE: u32 = 1 << 16;
-    pub const READ_CONTROL: u32 = 1 << 17;
-    pub const WRITE_DAC: u32 = 1 << 18;
-    pub const WRITE_OWNER: u32 = 1 << 19;
-    pub const SYNCHRONIZE: u32 = 1 << 20;
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Nfs4Ace {
-    pub ace_type: Nfs4AceType,
-    pub flags: u32,
-    pub mask: u32,
-    pub who: UserID,
-}
-
-impl Nfs4Ace {
-    pub fn new(ace_type: Nfs4AceType, flags: u32, mask: u32, who: UserID) -> Self {
-        Self {
-            ace_type,
-            flags,
-            mask,
-            who,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct Nfs4Acl {
-    pub aces: Vec<Nfs4Ace>,
-}
-
-impl Nfs4Acl {
-    pub fn new() -> Self {
-        Self { aces: Vec::new() }
-    }
-
-    pub fn add_ace(&mut self, ace: Nfs4Ace) {
-        self.aces.push(ace);
-    }
-
-    /// Evaluates NFSv4 / FreeBSD fine-grained access mask sequentially
-    pub fn evaluate_access(&self, subject_uid: UserID, subject_gid: GroupID, requested_mask: u32) -> bool {
-        if subject_uid == 0 {
-            return true; // Root bypasses NFSv4 checks
-        }
-
-        let mut remaining_requested = requested_mask;
-        let mut denied_mask = 0u32;
-
-        for ace in &self.aces {
-            let is_match = if (ace.flags & nfs4_flags::IDENTIFIER_GROUP) != 0 {
-                ace.who == subject_gid
-            } else {
-                ace.who == subject_uid || ace.who == 65534 // 65534 = EVERYONE
-            };
-
-            if is_match && (ace.flags & nfs4_flags::INHERIT_ONLY) == 0 {
-                match ace.ace_type {
-                    Nfs4AceType::AccessDenied => {
-                        if (ace.mask & remaining_requested) != 0 {
-                            denied_mask |= ace.mask & remaining_requested;
-                        }
-                    }
-                    Nfs4AceType::AccessAllowed => {
-                        let granted = ace.mask & !denied_mask;
-                        remaining_requested &= !granted;
-                    }
-                    _ => {}
-                }
-
-                if remaining_requested == 0 {
-                    return true;
-                }
-                if (denied_mask & requested_mask) != 0 {
-                    return false;
-                }
-            }
-        }
-
-        remaining_requested == 0
-    }
-
-    /// Inherits NFSv4 ACE entries for a newly created child node
-    pub fn inherit_for_child(&self, is_directory: bool) -> Nfs4Acl {
-        let mut child_acl = Nfs4Acl::new();
-
-        for ace in &self.aces {
-            let inherit_flag = if is_directory {
-                nfs4_flags::DIRECTORY_INHERIT
-            } else {
-                nfs4_flags::FILE_INHERIT
-            };
-
-            if (ace.flags & inherit_flag) != 0 {
-                let mut child_flags = ace.flags;
-
-                if (ace.flags & nfs4_flags::NO_PROPAGATE_INHERIT) != 0 {
-                    child_flags &= !(nfs4_flags::FILE_INHERIT | nfs4_flags::DIRECTORY_INHERIT);
-                }
-
-                if !is_directory {
-                    child_flags &= !nfs4_flags::INHERIT_ONLY;
-                }
-
-                child_acl.add_ace(Nfs4Ace::new(ace.ace_type, child_flags, ace.mask, ace.who));
-            }
-        }
-
-        child_acl
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 6. ROLE-BASED ACCESS CONTROL (RBAC) & ZERO TRUST POLICIES
+// 4. ROLE-BASED ACCESS CONTROL (RBAC) & ZERO TRUST POLICIES
 // ─────────────────────────────────────────────────────────────────────────────
 
 pub trait Role {
@@ -627,103 +311,561 @@ impl Default for SimpleAccessController {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 7. FILE ATTRIBUTE FLAGS (LINUX CHATTR & BSD CHFLAGS ACCESS RIGHTS)
+// 5. UNIX / POSIX ACCESS CONTROL LISTS (ACLs)
 // ─────────────────────────────────────────────────────────────────────────────
 
-pub mod file_attribute_flags {
-    pub const APPEND_ONLY: u32     = 0x00000001; // Linux 'a' / BSD SF_APPEND
-    pub const IMMUTABLE: u32       = 0x00000002; // Linux 'i' / BSD SF_IMMUTABLE
-    pub const NO_DUMP: u32         = 0x00000004; // Linux 'd' / BSD UF_NODUMP
-    pub const SECURE_DELETE: u32   = 0x00000008; // Linux 's'
-    pub const NO_UNLINK: u32       = 0x00000010; // BSD SF_NOUNLINK (cannot be unlinked/removed)
-    pub const OPAQUE: u32          = 0x00000020; // BSD UF_OPAQUE (unionfs opaque directory)
-    pub const ARCHIVED: u32        = 0x00000040; // BSD SF_ARCHIVED (archived/backed up)
-    pub const COMPRESSED: u32      = 0x00000080; // Linux 'c' / BSD UF_COMPRESSED
-    pub const SYNCHRONOUS: u32     = 0x00000100; // Linux 'S' (synchronous updates)
-    pub const NO_ATIME: u32        = 0x00000200; // Linux 'A' (do not update atime)
-    pub const JOURNAL_DATA: u32    = 0x00000400; // Linux 'j' (journal data)
-    pub const PROT_APPEND_ONLY: u32= 0x00000800; // Linux / BSD memory page projection append-only
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PosixAclTag {
+    UserObj,  // Owner UID
+    User,     // Named User UID
+    GroupObj, // Primary Group GID
+    Group,    // Named Group GID
+    Mask,     // ACL Mask capping permissions
+    Other,    // Other / World
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct FileAttributeAccessControl {
-    pub flags: u32,
+pub struct PosixAclEntry {
+    pub tag: PosixAclTag,
+    pub id: u32,       // UID or GID (ignored for UserObj, GroupObj, Mask, Other)
+    pub perms: u16,    // Read (4), Write (2), Execute (1)
 }
 
-impl FileAttributeAccessControl {
-    pub fn new(flags: u32) -> Self {
-        Self { flags }
+#[derive(Debug, Clone)]
+pub struct PosixAclTable {
+    pub entries: Vec<PosixAclEntry>,
+}
+
+impl PosixAclTable {
+    pub fn new() -> Self {
+        Self { entries: Vec::new() }
     }
 
-    /// Evaluates if an operation (Write, Append, Delete/Modify) is permitted given chattr/chflags
-    pub fn can_modify(&self, is_append_op: bool, is_superuser: bool) -> bool {
-        // Immutable flag prevents all modifications, deletions, and appends even for root
-        if (self.flags & file_attribute_flags::IMMUTABLE) != 0 {
-            return false;
+    pub fn add_entry(&mut self, entry: PosixAclEntry) {
+        self.entries.push(entry);
+    }
+
+    /// Evaluates POSIX.1e ACL access rule precedence:
+    /// 1. UserObj match
+    /// 2. Named User match (capped by Mask if present)
+    /// 3. GroupObj or Named Group match (capped by Mask if present)
+    /// 4. Other
+    pub fn evaluate_acl_access(
+        &self,
+        subject_uid: UserID,
+        subject_gid: GroupID,
+        requested_perms: u16,
+        owner_uid: UserID,
+        primary_gid: GroupID,
+    ) -> bool {
+        if subject_uid == 0 {
+            return true; // Root superuser
         }
 
-        // Append-Only flag allows append operations, but blocks overwrite or truncation
-        if (self.flags & file_attribute_flags::APPEND_ONLY) != 0
-            || (self.flags & file_attribute_flags::PROT_APPEND_ONLY) != 0
+        // Check for Mask entry
+        let mask_perms = self
+            .entries
+            .iter()
+            .find(|e| e.tag == PosixAclTag::Mask)
+            .map(|e| e.perms);
+
+        // 1. Owner Match
+        if subject_uid == owner_uid {
+            if let Some(user_obj) = self.entries.iter().find(|e| e.tag == PosixAclTag::UserObj) {
+                return (user_obj.perms & requested_perms) == requested_perms;
+            }
+        }
+
+        // 2. Named User Match
+        if let Some(named_user) = self
+            .entries
+            .iter()
+            .find(|e| e.tag == PosixAclTag::User && e.id == subject_uid)
         {
-            return is_append_op;
+            let effective = if let Some(m) = mask_perms { named_user.perms & m } else { named_user.perms };
+            return (effective & requested_perms) == requested_perms;
         }
 
-        true
-    }
+        // 3. Group Match (Primary GID or Named Group)
+        let mut group_matched = false;
+        let mut group_perms_accum = 0u16;
 
-    /// Evaluates if file unlinking or deletion is permitted
-    pub fn can_unlink(&self) -> bool {
-        if (self.flags & file_attribute_flags::IMMUTABLE) != 0
-            || (self.flags & file_attribute_flags::APPEND_ONLY) != 0
-            || (self.flags & file_attribute_flags::NO_UNLINK) != 0
-        {
-            return false;
+        for e in &self.entries {
+            if (e.tag == PosixAclTag::GroupObj && subject_gid == primary_gid)
+                || (e.tag == PosixAclTag::Group && e.id == subject_gid)
+            {
+                group_matched = true;
+                group_perms_accum |= e.perms;
+            }
         }
-        true
-    }
 
-    /// Evaluates if backup dump utility should process file
-    pub fn can_dump(&self) -> bool {
-        (self.flags & file_attribute_flags::NO_DUMP) == 0
+        if group_matched {
+            let effective = if let Some(m) = mask_perms { group_perms_accum & m } else { group_perms_accum };
+            return (effective & requested_perms) == requested_perms;
+        }
+
+        // 4. Other / World Match
+        if let Some(other) = self.entries.iter().find(|e| e.tag == PosixAclTag::Other) {
+            return (other.perms & requested_perms) == requested_perms;
+        }
+
+        false
+    }
+}
+
+impl Default for PosixAclTable {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 8. HARDWARE-ENFORCED PRIVILEGE RINGS (SUPERVISOR VS USER MODE)
+// 6. ACCESS CONTROL MATRIX & CATEGORY-GATED SECURITY DOMAINS
 // ─────────────────────────────────────────────────────────────────────────────
 
-#[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ExecutionRingMode {
-    Ring0Supervisor = 0, // Kernel Mode (unrestricted hardware access)
-    Ring1Hypervisor = 1,
-    Ring2Drivers    = 2,
-    Ring3User       = 3, // User Mode (sandboxed application space)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub enum AccessDomainCategory {
+    KernelCore,
+    NetworkDriver,
+    StorageDriver,
+    UserApplication,
+    SecurityEnclave,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CpuPrivilegeEnforcer {
-    pub active_ring: ExecutionRingMode,
+pub struct FileCapabilityMask {
+    pub cap_chown: bool,
+    pub cap_dac_override: bool,
+    pub cap_net_admin: bool,
+    pub cap_sys_admin: bool,
 }
 
-impl CpuPrivilegeEnforcer {
-    pub fn new(ring: ExecutionRingMode) -> Self {
-        Self { active_ring: ring }
+impl FileCapabilityMask {
+    pub fn full() -> Self {
+        Self {
+            cap_chown: true,
+            cap_dac_override: true,
+            cap_net_admin: true,
+            cap_sys_admin: true,
+        }
     }
 
-    pub fn can_execute_privileged_instruction(&self) -> bool {
-        self.active_ring == ExecutionRingMode::Ring0Supervisor
+    pub fn unprivileged() -> Self {
+        Self {
+            cap_chown: false,
+            cap_dac_override: false,
+            cap_net_admin: false,
+            cap_sys_admin: false,
+        }
+    }
+}
+
+/// 2D Matrix of Subjects (UID) x Objects (Resource Handle / Path ID) -> Allowed Action Mask
+pub struct AccessControlMatrix {
+    pub matrix: BTreeMap<(UserID, usize), u16>,
+    pub domain_categories: BTreeMap<UserID, AccessDomainCategory>,
+    pub capabilities: BTreeMap<UserID, FileCapabilityMask>,
+}
+
+impl AccessControlMatrix {
+    pub fn new() -> Self {
+        Self {
+            matrix: BTreeMap::new(),
+            domain_categories: BTreeMap::new(),
+            capabilities: BTreeMap::new(),
+        }
     }
 
-    pub fn can_access_hardware_port(&self) -> bool {
-        self.active_ring == ExecutionRingMode::Ring0Supervisor || self.active_ring == ExecutionRingMode::Ring2Drivers
+    pub fn set_matrix_entry(&mut self, uid: UserID, resource_handle: usize, allowed_actions: u16) {
+        self.matrix.insert((uid, resource_handle), allowed_actions);
+    }
+
+    pub fn assign_domain_category(&mut self, uid: UserID, category: AccessDomainCategory) {
+        self.domain_categories.insert(uid, category);
+    }
+
+    pub fn grant_capability(&mut self, uid: UserID, caps: FileCapabilityMask) {
+        self.capabilities.insert(uid, caps);
+    }
+
+    pub fn check_matrix_access(&self, uid: UserID, resource_handle: usize, requested_action: u16) -> bool {
+        if uid == 0 {
+            return true; // Root
+        }
+
+        if let Some(&allowed) = self.matrix.get(&(uid, resource_handle)) {
+            (allowed & requested_action) == requested_action
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for AccessControlMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. EXT4 POSIX INODE MODE BITS & EXTENDED ATTRIBUTES (xattr)
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub mod ext4_special_bits {
+    pub const SUID: u16 = 0o4000;
+    pub const SGID: u16 = 0o2000;
+    pub const STICKY: u16 = 0o1000;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Ext4FileType {
+    RegularFile = 0o100000,
+    Directory   = 0o040000,
+    Symlink     = 0o120000,
+    BlockDev    = 0o060000,
+    CharDev     = 0o020000,
+    Fifo        = 0o010000,
+    Socket      = 0o140000,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Ext4InodeMode {
+    pub file_type: Ext4FileType,
+    pub permissions: u16, // 12-bit permissions (3 special + 9 standard rwx)
+}
+
+impl Ext4InodeMode {
+    pub fn new(file_type: Ext4FileType, permissions: u16) -> Self {
+        Self { file_type, permissions }
+    }
+
+    pub fn is_suid(&self) -> bool {
+        (self.permissions & ext4_special_bits::SUID) != 0
+    }
+
+    pub fn is_sgid(&self) -> bool {
+        (self.permissions & ext4_special_bits::SGID) != 0
+    }
+
+    pub fn is_sticky(&self) -> bool {
+        (self.permissions & ext4_special_bits::STICKY) != 0
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Ext4Xattr {
+    pub name: Vec<u8>,
+    pub value: Vec<u8>,
+}
+
+impl Ext4Xattr {
+    pub fn new(name: &[u8], value: &[u8]) -> Self {
+        Self {
+            name: name.to_vec(),
+            value: value.to_vec(),
+        }
+    }
+}
+
+pub struct Ext4AccessCheckEngine;
+
+impl Ext4AccessCheckEngine {
+    /// Evaluates Linux ext4 access check flow:
+    /// 1. If subject UID is 0 (Root), access is granted.
+    /// 2. If POSIX ACL extended attribute (`system.posix_acl_access`) is present, evaluate ACL entries.
+    /// 3. Otherwise, fall back to standard 16-bit inode mode bits (owner -> group -> other).
+    pub fn evaluate_ext4_access(
+        subject_uid: UserID,
+        subject_gid: GroupID,
+        requested_mode: u16,
+        owner_uid: UserID,
+        primary_gid: GroupID,
+        mode_bits: u16,
+        posix_acl_opt: Option<&PosixAclTable>,
+    ) -> bool {
+        if subject_uid == 0 {
+            return true; // Root superuser
+        }
+
+        if let Some(acl) = posix_acl_opt {
+            return acl.evaluate_acl_access(subject_uid, subject_gid, requested_mode, owner_uid, primary_gid);
+        }
+
+        // Fallback to standard owner/group/other bits
+        let standard_bits = mode_bits & 0o777;
+        let allowed_bits = if subject_uid == owner_uid {
+            (standard_bits >> 6) & 0o7
+        } else if subject_gid == primary_gid {
+            (standard_bits >> 3) & 0o7
+        } else {
+            standard_bits & 0o7
+        };
+
+        (allowed_bits & requested_mode) == requested_mode
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. WINDOWS NTFS SECURITY DESCRIPTORS, SIDS, DACLS & ACE EVALUATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub mod ntfs_access_rights {
+    pub const READ: u32 = 0x00000001;
+    pub const WRITE: u32 = 0x00000002;
+    pub const EXECUTE: u32 = 0x00000004;
+    pub const READ_AND_EXECUTE: u32 = READ | EXECUTE;
+    pub const MODIFY: u32 = READ | WRITE | EXECUTE;
+    pub const DELETE: u32 = 0x00010000;
+    pub const FULL_CONTROL: u32 = 0x10000000;
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SecurityIdentifier {
+    pub revision: u8,
+    pub identifier_authority: u64,
+    pub sub_authorities: Vec<u32>,
+}
+
+impl SecurityIdentifier {
+    pub fn new(identifier_authority: u64, sub_authorities: &[u32]) -> Self {
+        Self {
+            revision: 1,
+            identifier_authority,
+            sub_authorities: sub_authorities.to_vec(),
+        }
+    }
+
+    /// Well-known SID for Local System (S-1-5-18)
+    pub fn local_system() -> Self {
+        Self::new(5, &[18])
+    }
+
+    /// Well-known SID for Administrators group (S-1-5-32-544)
+    pub fn administrators() -> Self {
+        Self::new(5, &[32, 544])
+    }
+
+    /// Convert SID to standard string representation (e.g., "S-1-5-21-100-200-300")
+    pub fn to_sid_string(&self) -> Vec<u8> {
+        let mut res = Vec::new();
+        res.extend_from_slice(b"S-");
+        res.push(b'0' + self.revision);
+        res.push(b'-');
+
+        let auth_str = alloc::format!("{}", self.identifier_authority);
+        res.extend_from_slice(auth_str.as_bytes());
+
+        for sub_auth in &self.sub_authorities {
+            res.push(b'-');
+            let sub_str = alloc::format!("{}", sub_auth);
+            res.extend_from_slice(sub_str.as_bytes());
+        }
+
+        res
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NtfsAceType {
+    AccessAllowed = 0x00,
+    AccessDenied  = 0x01,
+    SystemAudit   = 0x02,
+}
+
+pub mod ntfs_ace_flags {
+    pub const OBJECT_INHERIT_ACE: u8 = 0x01;
+    pub const CONTAINER_INHERIT_ACE: u8 = 0x02;
+    pub const NO_PROPAGATE_INHERIT_ACE: u8 = 0x04;
+    pub const INHERIT_ONLY_ACE: u8 = 0x08;
+    pub const INHERITED_ACE: u8 = 0x10;
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtfsAce {
+    pub ace_type: NtfsAceType,
+    pub flags: u8,
+    pub access_mask: u32,
+    pub sid: SecurityIdentifier,
+}
+
+impl NtfsAce {
+    pub fn allow(sid: SecurityIdentifier, access_mask: u32, flags: u8) -> Self {
+        Self {
+            ace_type: NtfsAceType::AccessAllowed,
+            flags,
+            access_mask,
+            sid,
+        }
+    }
+
+    pub fn deny(sid: SecurityIdentifier, access_mask: u32, flags: u8) -> Self {
+        Self {
+            ace_type: NtfsAceType::AccessDenied,
+            flags,
+            access_mask,
+            sid,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtfsDacl {
+    pub aces: Vec<NtfsAce>,
+}
+
+impl NtfsDacl {
+    pub fn new() -> Self {
+        Self { aces: Vec::new() }
+    }
+
+    pub fn add_ace(&mut self, ace: NtfsAce) {
+        self.aces.push(ace);
+    }
+}
+
+impl Default for NtfsDacl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtfsSacl {
+    pub aces: Vec<NtfsAce>,
+}
+
+impl NtfsSacl {
+    pub fn new() -> Self {
+        Self { aces: Vec::new() }
+    }
+
+    pub fn add_audit_ace(&mut self, ace: NtfsAce) {
+        self.aces.push(ace);
+    }
+}
+
+impl Default for NtfsSacl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtfsSecurityDescriptor {
+    pub owner_sid: SecurityIdentifier,
+    pub group_sid: SecurityIdentifier,
+    pub dacl: Option<NtfsDacl>,
+    pub sacl: Option<NtfsSacl>,
+}
+
+impl NtfsSecurityDescriptor {
+    pub fn new(owner_sid: SecurityIdentifier, group_sid: SecurityIdentifier) -> Self {
+        Self {
+            owner_sid,
+            group_sid,
+            dacl: None,
+            sacl: None,
+        }
+    }
+
+    /// Evaluates Windows NTFS DACL access sequentially:
+    /// 1. Explicit Deny entries are checked first. If a matching deny ACE covers any requested bit, access is immediately blocked.
+    /// 2. Explicit Allow entries are checked next, accumulating allowed access rights.
+    /// 3. If all requested access rights are granted, return true.
+    /// 4. If DACL finishes without granting all requested rights (or DACL is absent), access is implicitly denied.
+    pub fn evaluate_access(
+        &self,
+        subject_sid: &SecurityIdentifier,
+        subject_group_sids: &[SecurityIdentifier],
+        requested_rights: u32,
+    ) -> bool {
+        let dacl = match self.dacl {
+            Some(ref d) => d,
+            None => return false, // Null/Empty DACL denies access by default in Windows rules
+        };
+
+        let is_match = |sid: &SecurityIdentifier| -> bool {
+            sid == subject_sid || subject_group_sids.contains(sid)
+        };
+
+        // 1. Pass 1: Explicit Deny ACEs evaluated first
+        for ace in &dacl.aces {
+            if ace.ace_type == NtfsAceType::AccessDenied && is_match(&ace.sid) {
+                if (ace.access_mask & requested_rights) != 0 {
+                    return false; // Immediately denied
+                }
+            }
+        }
+
+        // 2. Pass 2: Explicit Allow ACEs accumulated next
+        let mut accumulated_rights = 0u32;
+        for ace in &dacl.aces {
+            if ace.ace_type == NtfsAceType::AccessAllowed && is_match(&ace.sid) {
+                accumulated_rights |= ace.access_mask;
+            }
+        }
+
+        // Check if all requested rights have been granted
+        (accumulated_rights & requested_rights) == requested_rights
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_ext4_inode_mode_and_access_flow() {
+        let mode = Ext4InodeMode::new(Ext4FileType::RegularFile, 0o4750); // SUID + rwxr-x---
+        assert!(mode.is_suid());
+        assert!(!mode.is_sgid());
+        assert!(!mode.is_sticky());
+
+        // Test ext4 check flow without ACL:
+        // Owner 1000 requests Read|Write
+        assert!(Ext4AccessCheckEngine::evaluate_ext4_access(1000, 1000, dac_flags::READ | dac_flags::WRITE, 1000, 1000, mode.permissions, None));
+
+        // Group 1000 requests Write -> Denied
+        assert!(!Ext4AccessCheckEngine::evaluate_ext4_access(2000, 1000, dac_flags::WRITE, 1000, 1000, mode.permissions, None));
+
+        // Test ext4 check flow with POSIX ACL xattr override
+        let mut acl = PosixAclTable::new();
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::UserObj, id: 1000, perms: 0o7 });
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::User, id: 2000, perms: 0o6 }); // rw- granted to 2000
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::Other, id: 0, perms: 0o0 });
+
+        assert!(Ext4AccessCheckEngine::evaluate_ext4_access(2000, 3000, dac_flags::WRITE, 1000, 1000, mode.permissions, Some(&acl)));
+    }
+
+    #[test]
+    fn test_ntfs_security_descriptor_dacl_evaluation() {
+        let user_sid = SecurityIdentifier::new(5, &[21, 100, 200, 1001]);
+        let group_sid = SecurityIdentifier::new(5, &[21, 100, 200, 513]);
+        let sys_sid = SecurityIdentifier::local_system();
+
+        assert_eq!(sys_sid.to_sid_string(), b"S-1-5-18");
+
+        let mut sd = NtfsSecurityDescriptor::new(user_sid.clone(), group_sid.clone());
+        let mut dacl = NtfsDacl::new();
+
+        // Add Explicit Allow for user_sid for Read & Write
+        dacl.add_ace(NtfsAce::allow(user_sid.clone(), ntfs_access_rights::READ | ntfs_access_rights::WRITE, 0));
+
+        // Add Explicit Deny for user_sid for Write
+        dacl.add_ace(NtfsAce::deny(user_sid.clone(), ntfs_access_rights::WRITE, 0));
+
+        sd.dacl = Some(dacl);
+
+        // Explicit Deny evaluated first -> Write requests MUST be denied!
+        assert!(!sd.evaluate_access(&user_sid, &[], ntfs_access_rights::WRITE));
+
+        // Read requests SHOULD be granted
+        assert!(sd.evaluate_access(&user_sid, &[], ntfs_access_rights::READ));
+
+        // Unspecified user SHOULD be implicitly denied
+        let other_sid = SecurityIdentifier::new(5, &[21, 100, 200, 9999]);
+        assert!(!sd.evaluate_access(&other_sid, &[], ntfs_access_rights::READ));
+    }
 
     #[test]
     fn test_dac_evaluation() {
@@ -794,61 +936,36 @@ mod tests {
     }
 
     #[test]
-    fn test_posix_1003_1e_acl() {
-        let mut acl = PosixAcl::from_mode(1000, 1000, 0o750);
+    fn test_posix_acl_evaluation() {
+        let mut acl = PosixAclTable::new();
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::UserObj, id: 1000, perms: 0o7 });  // Owner: rwx
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::User, id: 1001, perms: 0o6 });     // Named User 1001: rw-
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::Mask, id: 0, perms: 0o4 });        // Mask caps to r--
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::Other, id: 0, perms: 0o0 });       // Other: ---
 
-        // Add named user entry (user 2000 has rwx: 7)
-        acl.add_entry(AclEntry::new(AclTag::User(2000), 7));
+        // Owner 1000 evaluates UserObj -> Granted rwx
+        assert!(acl.evaluate_acl_access(1000, 1000, dac_flags::READ | dac_flags::WRITE | dac_flags::EXECUTE, 1000, 1000));
 
-        // Mask should be recalculated automatically
-        assert!(acl.get_mask().is_some());
+        // Named User 1001 requests Read (4) -> Granted (rw- masked by r-- gives r--)
+        assert!(acl.evaluate_acl_access(1001, 1000, dac_flags::READ, 1000, 1000));
 
-        // User 2000 has access
-        assert!(acl.evaluate_access(2000, 2000, &[], 1000, 1000, 4));
-
-        // User 3000 (other) is denied
-        assert!(!acl.evaluate_access(3000, 3000, &[], 1000, 1000, 4));
-
-        // Test ACL inheritance
-        let child_acl = acl.inherit_default_acl(false);
-        assert_eq!(child_acl.entries.len(), acl.entries.len());
+        // Named User 1001 requests Write (2) -> Denied by Mask (r--)
+        assert!(!acl.evaluate_acl_access(1001, 1000, dac_flags::WRITE, 1000, 1000));
+        // Other user 2000 requests Read (4) -> Denied by Other (0o0)
+        assert!(!acl.evaluate_acl_access(2000, 2000, dac_flags::READ, 1000, 1000));
     }
 
     #[test]
-    fn test_nfsv4_rich_acl() {
-        let mut acl = Nfs4Acl::new();
+    fn test_access_control_matrix() {
+        let mut matrix = AccessControlMatrix::new();
+        matrix.set_matrix_entry(1000, 42, dac_flags::READ | dac_flags::WRITE);
+        matrix.assign_domain_category(1000, AccessDomainCategory::StorageDriver);
+        matrix.grant_capability(1000, FileCapabilityMask::full());
 
-        // Deny write_data to user 2000
-        acl.add_ace(Nfs4Ace::new(Nfs4AceType::AccessDenied, 0, nfs4_mask::WRITE_DATA, 2000));
-        // Allow read_data and write_data to everyone (65534)
-        acl.add_ace(Nfs4Ace::new(Nfs4AceType::AccessAllowed, 0, nfs4_mask::READ_DATA | nfs4_mask::WRITE_DATA, 65534));
-
-        // User 2000 requesting READ_DATA -> Allowed
-        assert!(acl.evaluate_access(2000, 2000, nfs4_mask::READ_DATA));
-
-        // User 2000 requesting WRITE_DATA -> Denied due to explicit AccessDenied ACE
-        assert!(!acl.evaluate_access(2000, 2000, nfs4_mask::WRITE_DATA));
-
-        // User 3000 requesting WRITE_DATA -> Allowed
-        assert!(acl.evaluate_access(3000, 3000, nfs4_mask::WRITE_DATA));
-    }
-
-    #[test]
-    fn test_file_attribute_flags_and_cpu_rings() {
-        let immutable_file = FileAttributeAccessControl::new(file_attribute_flags::IMMUTABLE);
-        assert!(!immutable_file.can_modify(true, true)); // Immutable blocks even root append
-        assert!(!immutable_file.can_modify(false, true));
-
-        let append_file = FileAttributeAccessControl::new(file_attribute_flags::APPEND_ONLY);
-        assert!(append_file.can_modify(true, false)); // Append allowed
-        assert!(!append_file.can_modify(false, false)); // Overwrite denied
-
-        let ring0 = CpuPrivilegeEnforcer::new(ExecutionRingMode::Ring0Supervisor);
-        assert!(ring0.can_execute_privileged_instruction());
-        assert!(ring0.can_access_hardware_port());
-
-        let ring3 = CpuPrivilegeEnforcer::new(ExecutionRingMode::Ring3User);
-        assert!(!ring3.can_execute_privileged_instruction());
-        assert!(!ring3.can_access_hardware_port());
+        assert!(matrix.check_matrix_access(1000, 42, dac_flags::READ));
+        assert!(matrix.check_matrix_access(1000, 42, dac_flags::WRITE));
+        assert!(!matrix.check_matrix_access(1000, 42, dac_flags::EXECUTE));
+        assert_eq!(*matrix.domain_categories.get(&1000).unwrap(), AccessDomainCategory::StorageDriver);
+        assert!(matrix.capabilities.get(&1000).unwrap().cap_sys_admin);
     }
 }
