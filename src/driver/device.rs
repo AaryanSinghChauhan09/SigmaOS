@@ -186,6 +186,8 @@ pub trait CharacterDevice: Device {
     fn flush(&mut self) -> Result<(), DeviceError>;
 }
 
+pub struct DdeDeviceWrapper;
+
 /// Network device trait (OOP: Interface for network devices)
 pub trait NetworkDevice: Device {
     fn send_packet(&mut self, packet: &[u8]) -> Result<(), DeviceError>;

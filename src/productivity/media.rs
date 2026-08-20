@@ -2,6 +2,7 @@
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
+extern crate alloc;
 use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
 use alloc::string::String;
 use alloc::string::ToString;
@@ -33,6 +34,9 @@ pub struct SigmaMediaEngine {
     pub master_mute: AtomicBool,
     pub state: PlaybackState,
     pub has_track: bool,
+    pub active_track: Option<String>,
+    pub format: Option<MediaFormat>,
+    pub duration_seconds: usize,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -61,19 +65,25 @@ impl SigmaMediaEngine {
             master_mute: AtomicBool::new(false),
             state: PlaybackState::Stopped,
             has_track: false,
+            active_track: None,
+            format: None,
+            duration_seconds: 0,
         }
     }
 
     pub fn play(&mut self) -> Result<(), &'static str> {
-        if !self.has_track {
+        if !self.has_track && self.active_track.is_none() {
             return Err("No track loaded");
         }
         self.state = PlaybackState::Playing;
         Ok(())
     }
 
-    pub fn load_track(&mut self, name: alloc::string::String, format: MediaFormat, duration: u32) {
+    pub fn load_track(&mut self, name: String, format: MediaFormat, duration: usize) {
         self.has_track = true;
+        self.active_track = Some(name);
+        self.format = Some(format);
+        self.duration_seconds = duration;
         self.state = PlaybackState::Stopped;
     }
 
@@ -94,7 +104,6 @@ impl SigmaMediaEngine {
         buffer: &[u16],
     ) -> Result<(), &'static str> {
         if self.master_mute.load(Ordering::SeqCst) {
-            println!("MediaEngine: Master mute is active. Buffer playback bypassed.");
             return Ok(());
         }
 
@@ -105,13 +114,6 @@ impl SigmaMediaEngine {
         let channel = &self.channels[channel_id];
         channel.active.store(true, Ordering::SeqCst);
         let vol = channel.volume.load(Ordering::SeqCst);
-
-        println!(
-            "MediaEngine: Playing chiptune audio sample ({} samples) on Channel {} at volume level {}%.",
-            buffer.len(),
-            channel_id,
-            vol
-        );
 
         // Simulate PCM mixing on active hardware VESA/sound register
         let mut mixed_amplitude: u32 = 0;
@@ -137,35 +139,7 @@ impl SigmaMediaEngine {
         self.channels[channel_id]
             .volume
             .store(target_vol, Ordering::SeqCst);
-        println!(
-            "MediaEngine: Volume updated for Channel {} -> {}%.",
-            channel_id, target_vol
-        );
         Ok(())
-    }
-
-    pub fn load_track(&mut self, track: String, format: MediaFormat, duration: usize) {
-        self.active_track = Some(track);
-        self.format = Some(format);
-        self.duration_seconds = duration;
-    }
-
-    pub fn play(&mut self) -> Result<(), &'static str> {
-        if self.active_track.is_none() {
-            return Err("No track loaded");
-        }
-        self.state = PlaybackState::Playing;
-        Ok(())
-    }
-
-    pub fn pause(&mut self) {
-        if self.state == PlaybackState::Playing {
-            self.state = PlaybackState::Paused;
-        }
-    }
-
-    pub fn stop(&mut self) {
-        self.state = PlaybackState::Stopped;
     }
 }
 
@@ -276,52 +250,6 @@ impl SigmaSupportSubtitleEdit {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum PlaybackState {
-        Stopped,
-        Playing,
-        Paused,
-    }
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum MediaFormat {
-        Mp3,
-    }
-
-    struct SigmaMediaEngine {
-        pub state: PlaybackState,
-        pub track: Option<String>,
-    }
-
-    impl SigmaMediaEngine {
-        pub fn new() -> Self {
-            Self {
-                state: PlaybackState::Stopped,
-                track: None,
-            }
-        }
-
-        pub fn play(&mut self) -> Result<(), &'static str> {
-            if self.track.is_none() {
-                return Err("No track loaded");
-            }
-            self.state = PlaybackState::Playing;
-            Ok(())
-        }
-
-        pub fn load_track(&mut self, name: String, _format: MediaFormat, _duration: usize) {
-            self.track = Some(name);
-        }
-
-        pub fn pause(&mut self) {
-            self.state = PlaybackState::Paused;
-        }
-
-        pub fn stop(&mut self) {
-            self.state = PlaybackState::Stopped;
-        }
-    }
 
     #[test]
     fn test_media_playback() {

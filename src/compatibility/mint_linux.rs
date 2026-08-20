@@ -14,6 +14,32 @@ extern crate alloc;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintError {
+    LayoutFailed,
+    UpdateError,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WindowCoordinates {
+    pub x: usize,
+    pub y: usize,
+    pub width: usize,
+    pub height: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct SoftwareMeta {
+    pub name: [u8; 32],
+}
+
+#[derive(Debug, Clone)]
+pub struct MintUpdateItem {
+    pub name: [u8; 32],
+}
+
+pub struct ZenithDisplayCompositor;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintUpdateLevel {
     Level1Safe,      // Certified safe updates (no system files)
     Level2Tested,    // Thoroughly tested system package upgrades
@@ -249,6 +275,40 @@ impl MintSoftwareManager {
         }
         Ok(())
     }
+
+    pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
+        let mut filtered = Vec::new();
+        for i in 0..self.apps_catalog.len() {
+            let app = &self.apps_catalog[i];
+            let mut matches = true;
+            for j in 0..category.len() {
+                if j >= app.category.len() || app.category[j] != category[j] {
+                    matches = false;
+                    break;
+                }
+            }
+            if matches {
+                filtered.push(app.clone());
+            }
+        }
+        filtered
+    }
+
+    /// Returns apps ranked by user ratings (Featured Apps).
+    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
+        let mut sorted = self.apps_catalog.clone();
+        // Simple bubble sort over vector to rank featured apps without external traits
+        for i in 0..sorted.len() {
+            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
+                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
+                    let temp = sorted[j].clone();
+                    sorted[j] = sorted[j + 1].clone();
+                    sorted[j + 1] = temp;
+                }
+            }
+        }
+        sorted
+    }
 }
 
 // ==========================================
@@ -356,100 +416,6 @@ impl TimeshiftSystemRestorer {
 impl Default for TimeshiftSystemRestorer {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-            }
-            if matches {
-                filtered.push(app.clone());
-            }
-        }
-        filtered
-    }
-
-    /// Returns apps ranked by user ratings (Featured Apps).
-    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
-        let mut sorted = self.apps_catalog.clone();
-        // Simple bubble sort over vector to rank featured apps without external traits
-        for i in 0..sorted.len() {
-            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
-                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
-                    sorted.swap(j, j + 1);
-                }
-            }
-        }
-        sorted
     }
 }
 

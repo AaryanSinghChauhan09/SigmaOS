@@ -2,6 +2,7 @@
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
 use core::cell::Cell;
+use crate::klib::SigmaString;
 
 /// Routing modes for network traffic
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,23 +73,14 @@ pub struct AppSandboxEngine {
 impl AppSandboxEngine {
     pub fn new() -> Self {
         AppSandboxEngine {
-            current_policy: Cell::new(SandboxPolicy {
-                allow_network: false,
-                allow_raw_sockets: false,
-                allow_filesystem_write: false,
-                permitted_subpath: SigmaString::from_str("/sandbox/tmp"),
-            }),
+            current_policy: Cell::new(SandboxPolicy::default()),
         }
     }
 
     /// Validate filesystem write access
-    pub fn validate_filesystem_write(&self, path: &str) -> bool {
+    pub fn validate_filesystem_write(&self, _path: &str) -> bool {
         let policy = self.current_policy.get();
-        if !policy.allow_filesystem_write {
-            path.starts_with(policy.permitted_subpath.as_str())
-        } else {
-            true
-        }
+        policy.allow_filesystem_write
     }
 
     /// Validate network socket creation
@@ -175,7 +167,30 @@ impl Default for SandboxPolicy {
             allow_network: false,
             allow_raw_sockets: false,
             allow_filesystem_write: false,
-            permitted_subpath: SigmaString::from_str("/sandbox/tmp"),
+            permitted_subpath: SigmaString::new(),
         }
     }
 }
+
+unsafe impl Sync for AnonSurfShunt {}
+unsafe impl Sync for AppSandboxEngine {}
+unsafe impl Sync for ForensicStorageFilter {}
+
+pub static GLOBAL_ANONSURF: AnonSurfShunt = AnonSurfShunt {
+    current_mode: Cell::new(RoutingMode::DirectCleartext),
+    dns_leak_protection: Cell::new(true),
+    anonymized_packets_routed: Cell::new(0),
+};
+
+pub static GLOBAL_SANDBOX: AppSandboxEngine = AppSandboxEngine {
+    current_policy: Cell::new(SandboxPolicy {
+        allow_network: false,
+        allow_raw_sockets: false,
+        allow_filesystem_write: false,
+        permitted_subpath: SigmaString::new(),
+    }),
+};
+
+pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter {
+    is_write_blocked: Cell::new(true),
+};

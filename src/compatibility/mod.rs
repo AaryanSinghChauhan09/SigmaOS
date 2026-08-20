@@ -20,6 +20,7 @@ pub mod gentoo;
 pub mod tiny_core;
 pub mod localsend;
 
+pub mod zorin;
 pub use zorin::{
     ZorinLayoutSwitcher,
     ZorinChameleonEngine,
@@ -27,13 +28,10 @@ pub use zorin::{
     ZorinWindowsAppSupport,
 };
 pub mod historic_linux;
-pub mod mint_linux;
-pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
-pub mod india_professional_tools;
 pub mod canonical;
 pub mod fedora;
 
@@ -98,3 +96,7 @@ pub use lubuntu::{
 pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};
+pub use reactos::{
+    NtHandle, NtObjectManager, NtObjectType, NtStatus,
+    PortableExecutableLoader, RegistryHive,
+};

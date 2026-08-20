@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
@@ -156,6 +154,13 @@ impl AuditLogger for SimpleAuditLogger {
         }
         Ok(())
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    Json,
+    PlainText,
+    Binary,
 }
 
 pub trait AuditPolicy {

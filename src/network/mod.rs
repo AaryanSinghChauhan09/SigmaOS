@@ -1,6 +1,7 @@
 // SigmaOS Network Stack Module
 pub mod analyzer;
 pub mod config;
+pub mod commands;
 pub mod enterprise;
 pub mod ring_buffer_stack;
 pub mod stack;
@@ -29,3 +30,7 @@ pub use ring_buffer_stack::{
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use sync::{CloudSyncManager, ConflictResolution, SyncConfig, SyncCredentials, SyncError, SyncItem, SyncItemType, SyncProvider, SyncResult, SyncStatus};
 pub use torrent::{PeerInfo, TorrentClient, TorrentError, TorrentState};
+pub use commands::{
+    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
+    SocketStatsCommand, SocketStatsEntry, UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
+};
