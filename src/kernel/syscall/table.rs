@@ -696,7 +696,7 @@ mod tests {
         let integrity_res = pg.verify_integrity(&ssdt);
         assert_eq!(integrity_res, Err(BugCheckCode::CriticalStructureCorruption));
     }
-=======
+
     #[test]
     fn test_kernel_symbol_exporters() {
         let sym = KernelSymbol {
@@ -774,5 +774,4 @@ mod tests {
         assert_eq!(hijacked_dkom.len(), 1);
         assert_eq!(hijacked_dkom[0], 501); // HIDDEN/DKOM TAMPERED PROCESS DETECTED!
     }
-}
 }

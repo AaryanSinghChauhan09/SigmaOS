@@ -7,7 +7,7 @@
 pub mod ioctl_helper;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use ioctl_helper::{IoctlCommand, validate_ioctl_buffer};
+use ioctl_helper::{IoctlDecoder, IoctlDirection};
 
 #[repr(C)]
 pub struct SyscallDispatcher {
@@ -68,13 +68,7 @@ pub const SYS_IOCTL: usize = 31;
 impl SyscallDispatcher {
     pub fn new() -> Self {
         let mut dispatcher = SyscallDispatcher {
-            syscall_table: {
-                let mut table = [SyscallHandler::new(0); 256];
-                for i in 0..256 {
-                    table[i] = SyscallHandler::new(i);
-                }
-                table
-            },
+            syscall_table: core::array::from_fn(|i| SyscallHandler::new(i)),
             call_count: AtomicUsize::new(0),
             error_count: AtomicUsize::new(0),
         };
@@ -164,14 +158,12 @@ impl SyscallDispatcher {
             }
             SYS_IOCTL => {
                 // Emulate direct ioctl dispatching
-                let fd = ctx.get_arg(0);
+                let _fd = ctx.get_arg(0);
                 let request = ctx.get_arg(1) as u32;
                 let arg_ptr = ctx.get_arg(2);
 
-                let cmd = IoctlCommand::decode(request);
-
                 // Safe boundary check (arbitrary 16MB user limit for stub simulation)
-                if validate_ioctl_buffer(&cmd, arg_ptr, 0x1000000).is_err() {
+                if IoctlDecoder::validate_parameter_bounds(request, arg_ptr, 0x1000000).is_err() {
                     ctx.error_code.store(14, Ordering::SeqCst); // EFAULT (Bad Address)
                     return -1;
                 }
@@ -216,13 +208,7 @@ impl SyscallContext {
     pub fn new(number: usize, args: [usize; 6]) -> Self {
         SyscallContext {
             syscall_number: AtomicUsize::new(number),
-            args: {
-                let mut arr = [AtomicUsize::new(0); 6];
-                for i in 0..6 {
-                    arr[i] = AtomicUsize::new(args[i]);
-                }
-                arr
-            },
+            args: core::array::from_fn(|i| AtomicUsize::new(args[i])),
             return_value: AtomicUsize::new(0),
             error_code: AtomicUsize::new(0),
         }
@@ -493,9 +479,107 @@ extern "C" fn sys_ioctl(ctx: &mut SyscallContext) -> isize {
     0
 }
 
+pub const IA32_STAR_MSR: u32 = 0xC0000081;
+pub const IA32_LSTAR_MSR: u32 = 0xC0000082;
+pub const IA32_FMASK_MSR: u32 = 0xC0000084;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+pub struct FastSyscallRegisters {
+    pub rax: u64, // Syscall number & return value
+    pub rdi: u64, // Arg 1
+    pub rsi: u64, // Arg 2
+    pub rdx: u64, // Arg 3
+    pub r10: u64, // Arg 4 (Linux fast syscall convention)
+    pub r8:  u64, // Arg 5
+    pub r9:  u64, // Arg 6
+    pub rcx: u64, // Saved RIP (overwritten by hardware `syscall`)
+    pub r11: u64, // Saved RFLAGS (overwritten by hardware `syscall`)
+    pub rbx: u64,
+    pub r12: u64,
+    pub r13: u64,
+    pub r14: u64,
+    pub r15: u64,
+}
+
+pub struct FastSyscallTrampoline {
+    pub msr_star: u64,
+    pub msr_lstar: u64,
+    pub msr_fmask: u64,
+    pub trampoline_entry_address: u64,
+}
+
+impl FastSyscallTrampoline {
+    pub fn new(trampoline_entry: u64, kernel_cs: u16, user_cs: u16) -> Self {
+        // IA32_STAR format: [63:48] = Sysret CS/SS, [47:32] = Syscall CS/SS
+        let star = ((user_cs as u64) << 48) | ((kernel_cs as u64) << 32);
+        let fmask = 0x257FD; // Mask IF, TF, DF, NT, etc.
+
+        Self {
+            msr_star: star,
+            msr_lstar: trampoline_entry,
+            msr_fmask: fmask,
+            trampoline_entry_address: trampoline_entry,
+        }
+    }
+
+    /// Fast dispatch using FastSyscallRegisters
+    pub fn dispatch_fast_syscall(
+        &self,
+        dispatcher: &SyscallDispatcher,
+        regs: &mut FastSyscallRegisters,
+    ) -> isize {
+        let mut ctx = SyscallContext::new(
+            regs.rax as usize,
+            [
+                regs.rdi as usize,
+                regs.rsi as usize,
+                regs.rdx as usize,
+                regs.r10 as usize,
+                regs.r8 as usize,
+                regs.r9 as usize,
+            ],
+        );
+
+        let res = dispatcher.dispatch(&mut ctx);
+        regs.rax = ctx.get_return() as u64;
+        res
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_fast_syscall_trampoline_and_msrs() {
+        let trampoline = FastSyscallTrampoline::new(0xFFFF_8000_0010_0000, 0x08, 0x1B);
+        assert_eq!(trampoline.trampoline_entry_address, 0xFFFF_8000_0010_0000);
+        assert_eq!(trampoline.msr_lstar, 0xFFFF_8000_0010_0000);
+        assert_eq!(trampoline.msr_star >> 32 & 0xFFFF, 0x08);
+
+        let dispatcher = SyscallDispatcher::new();
+        let mut regs = FastSyscallRegisters {
+            rax: SYS_GETPID as u64,
+            rdi: 0,
+            rsi: 0,
+            rdx: 0,
+            r10: 0,
+            r8: 0,
+            r9: 0,
+            rcx: 0x400100, // saved user RIP
+            r11: 0x202,    // saved user RFLAGS
+            rbx: 0,
+            r12: 0,
+            r13: 0,
+            r14: 0,
+            r15: 0,
+        };
+
+        let res = trampoline.dispatch_fast_syscall(&dispatcher, &mut regs);
+        assert_eq!(res, 1);
+        assert_eq!(regs.rax, 1); // PID 1 returned in rax
+    }
 
     #[test]
     fn test_syscall_dispatcher_ioctl() {
@@ -503,7 +587,7 @@ mod tests {
         assert_eq!(dispatcher.call_count(), 0);
 
         // Test ioctl with valid parameters
-        let raw_req = ioctl_helper::IoctlCommand::encode(ioctl_helper::IoctlDirection::Read, b'x', 2, 4);
+        let raw_req = ioctl_helper::IOC_IN | (4 << 16) | ((b'x' as u32) << 8) | 2;
         let mut ctx = SyscallContext::new(SYS_IOCTL, [3, raw_req as usize, 0x10000, 0, 0, 0]);
         let res = dispatcher.dispatch(&mut ctx);
 

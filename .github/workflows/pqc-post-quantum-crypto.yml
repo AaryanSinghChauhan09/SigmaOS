@@ -1,0 +1,22 @@
+name: Post-Quantum Crypto (PQC) Enclave Verification
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  pqc-enclave:
+    name: PQC Kyber & Dilithium Enclave Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test PQC Enclave & Token Rotation
+        run: |
+          cargo test --lib security::pqc_enclave
