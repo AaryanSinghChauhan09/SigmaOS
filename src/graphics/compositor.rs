@@ -294,16 +294,6 @@ impl Surface for BitmapSurface {
         let limit_y = (rect.position.y + rect.size.height as i32).min(self.size.height as i32);
         let limit_x = (rect.position.x + rect.size.width as i32).min(self.size.width as i32);
 
-        for y in rect.position.y.max(0) as usize
-            ..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize
-        {
-            for x in rect.position.x.max(0) as usize
-                ..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize
-            {
-        for y in rect.position.y.max(0) as usize..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize {
-            for x in rect.position.x.max(0) as usize..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize {
-        let data = self.data_mut();
-
         for y in rect.position.y.max(0) as usize..limit_y.max(0) as usize {
             for x in rect.position.x.max(0) as usize..limit_x.max(0) as usize {
                 let index = y * stride + x;
@@ -728,16 +718,11 @@ impl Compositor for SimpleCompositor {
 
             if let Some(window) = found_window {
                 let window_rect = window.rect();
-            if let Some(ref mut window) = self.windows[window_id] {
-            if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                let window_rect = window.rect();
                 let output_stride = output.info().stride as usize / 4;
                 if let Some(surface) = window.surface() {
                     let window_stride = surface.info().stride as usize / 4;
                     let window_data = surface.data();
                     let output_data = target_surface.data_mut();
-                    let window_data = surface.data();
-                    let output_data = output.data_mut();
 
                     // Copy window surface to output
                     for y in 0..window_rect.size.height as usize {
@@ -781,29 +766,7 @@ impl Compositor for SimpleCompositor {
 
     fn stats(&self) -> CompositorStats {
         let mut stats = self.stats;
-        stats.visible_windows = 0;
-
-        for window_option in &self.windows {
-            if let Some(ref window) = *window_option {
-                if window.info().visible {
-                    stats.visible_windows += 1;
-                }
-            }
-        }
-
-        let mut stats = self.stats.clone();
-        stats.visible_windows = 0;
-
-        for window_option in &self.windows {
-            if let Some(ref window) = *window_option {
-                if window.info().visible {
-                    stats.visible_windows += 1;
-                }
-            }
-        }
-
-        let mut stats = self.stats.clone();
-        stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
+        stats.visible_windows = self.windows.iter().filter_map(|w| w.as_ref()).filter(|w| w.info().visible).count() as u32;
         stats
     }
 }
@@ -839,6 +802,9 @@ mod tests {
 
         let screenshot = comp.capture_screenshot().unwrap();
         assert_eq!(screenshot.len(), 1920 * 1080);
+    }
+}
+
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -956,6 +922,13 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+#[cfg(test)]
+mod compositor_flow_tests {
+    use super::*;
+
     #[test]
     fn test_compositor_flow() {
         let mut comp = SimpleCompositor::new(CompositorCapability::full());

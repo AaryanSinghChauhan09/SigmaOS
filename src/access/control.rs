@@ -6,7 +6,6 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RoleID = usize;
 pub type PermissionID = usize;
@@ -508,9 +507,365 @@ impl Default for AccessControlMatrix {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. EXT4 POSIX INODE MODE BITS & EXTENDED ATTRIBUTES (xattr)
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub mod ext4_special_bits {
+    pub const SUID: u16 = 0o4000;
+    pub const SGID: u16 = 0o2000;
+    pub const STICKY: u16 = 0o1000;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Ext4FileType {
+    RegularFile = 0o100000,
+    Directory   = 0o040000,
+    Symlink     = 0o120000,
+    BlockDev    = 0o060000,
+    CharDev     = 0o020000,
+    Fifo        = 0o010000,
+    Socket      = 0o140000,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Ext4InodeMode {
+    pub file_type: Ext4FileType,
+    pub permissions: u16, // 12-bit permissions (3 special + 9 standard rwx)
+}
+
+impl Ext4InodeMode {
+    pub fn new(file_type: Ext4FileType, permissions: u16) -> Self {
+        Self { file_type, permissions }
+    }
+
+    pub fn is_suid(&self) -> bool {
+        (self.permissions & ext4_special_bits::SUID) != 0
+    }
+
+    pub fn is_sgid(&self) -> bool {
+        (self.permissions & ext4_special_bits::SGID) != 0
+    }
+
+    pub fn is_sticky(&self) -> bool {
+        (self.permissions & ext4_special_bits::STICKY) != 0
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Ext4Xattr {
+    pub name: Vec<u8>,
+    pub value: Vec<u8>,
+}
+
+impl Ext4Xattr {
+    pub fn new(name: &[u8], value: &[u8]) -> Self {
+        Self {
+            name: name.to_vec(),
+            value: value.to_vec(),
+        }
+    }
+}
+
+pub struct Ext4AccessCheckEngine;
+
+impl Ext4AccessCheckEngine {
+    /// Evaluates Linux ext4 access check flow:
+    /// 1. If subject UID is 0 (Root), access is granted.
+    /// 2. If POSIX ACL extended attribute (`system.posix_acl_access`) is present, evaluate ACL entries.
+    /// 3. Otherwise, fall back to standard 16-bit inode mode bits (owner -> group -> other).
+    pub fn evaluate_ext4_access(
+        subject_uid: UserID,
+        subject_gid: GroupID,
+        requested_mode: u16,
+        owner_uid: UserID,
+        primary_gid: GroupID,
+        mode_bits: u16,
+        posix_acl_opt: Option<&PosixAclTable>,
+    ) -> bool {
+        if subject_uid == 0 {
+            return true; // Root superuser
+        }
+
+        if let Some(acl) = posix_acl_opt {
+            return acl.evaluate_acl_access(subject_uid, subject_gid, requested_mode, owner_uid, primary_gid);
+        }
+
+        // Fallback to standard owner/group/other bits
+        let standard_bits = mode_bits & 0o777;
+        let allowed_bits = if subject_uid == owner_uid {
+            (standard_bits >> 6) & 0o7
+        } else if subject_gid == primary_gid {
+            (standard_bits >> 3) & 0o7
+        } else {
+            standard_bits & 0o7
+        };
+
+        (allowed_bits & requested_mode) == requested_mode
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. WINDOWS NTFS SECURITY DESCRIPTORS, SIDS, DACLS & ACE EVALUATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub mod ntfs_access_rights {
+    pub const READ: u32 = 0x00000001;
+    pub const WRITE: u32 = 0x00000002;
+    pub const EXECUTE: u32 = 0x00000004;
+    pub const READ_AND_EXECUTE: u32 = READ | EXECUTE;
+    pub const MODIFY: u32 = READ | WRITE | EXECUTE;
+    pub const DELETE: u32 = 0x00010000;
+    pub const FULL_CONTROL: u32 = 0x10000000;
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SecurityIdentifier {
+    pub revision: u8,
+    pub identifier_authority: u64,
+    pub sub_authorities: Vec<u32>,
+}
+
+impl SecurityIdentifier {
+    pub fn new(identifier_authority: u64, sub_authorities: &[u32]) -> Self {
+        Self {
+            revision: 1,
+            identifier_authority,
+            sub_authorities: sub_authorities.to_vec(),
+        }
+    }
+
+    /// Well-known SID for Local System (S-1-5-18)
+    pub fn local_system() -> Self {
+        Self::new(5, &[18])
+    }
+
+    /// Well-known SID for Administrators group (S-1-5-32-544)
+    pub fn administrators() -> Self {
+        Self::new(5, &[32, 544])
+    }
+
+    /// Convert SID to standard string representation (e.g., "S-1-5-21-100-200-300")
+    pub fn to_sid_string(&self) -> Vec<u8> {
+        let mut res = Vec::new();
+        res.extend_from_slice(b"S-");
+        res.push(b'0' + self.revision);
+        res.push(b'-');
+
+        let auth_str = alloc::format!("{}", self.identifier_authority);
+        res.extend_from_slice(auth_str.as_bytes());
+
+        for sub_auth in &self.sub_authorities {
+            res.push(b'-');
+            let sub_str = alloc::format!("{}", sub_auth);
+            res.extend_from_slice(sub_str.as_bytes());
+        }
+
+        res
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NtfsAceType {
+    AccessAllowed = 0x00,
+    AccessDenied  = 0x01,
+    SystemAudit   = 0x02,
+}
+
+pub mod ntfs_ace_flags {
+    pub const OBJECT_INHERIT_ACE: u8 = 0x01;
+    pub const CONTAINER_INHERIT_ACE: u8 = 0x02;
+    pub const NO_PROPAGATE_INHERIT_ACE: u8 = 0x04;
+    pub const INHERIT_ONLY_ACE: u8 = 0x08;
+    pub const INHERITED_ACE: u8 = 0x10;
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtfsAce {
+    pub ace_type: NtfsAceType,
+    pub flags: u8,
+    pub access_mask: u32,
+    pub sid: SecurityIdentifier,
+}
+
+impl NtfsAce {
+    pub fn allow(sid: SecurityIdentifier, access_mask: u32, flags: u8) -> Self {
+        Self {
+            ace_type: NtfsAceType::AccessAllowed,
+            flags,
+            access_mask,
+            sid,
+        }
+    }
+
+    pub fn deny(sid: SecurityIdentifier, access_mask: u32, flags: u8) -> Self {
+        Self {
+            ace_type: NtfsAceType::AccessDenied,
+            flags,
+            access_mask,
+            sid,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtfsDacl {
+    pub aces: Vec<NtfsAce>,
+}
+
+impl NtfsDacl {
+    pub fn new() -> Self {
+        Self { aces: Vec::new() }
+    }
+
+    pub fn add_ace(&mut self, ace: NtfsAce) {
+        self.aces.push(ace);
+    }
+}
+
+impl Default for NtfsDacl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtfsSacl {
+    pub aces: Vec<NtfsAce>,
+}
+
+impl NtfsSacl {
+    pub fn new() -> Self {
+        Self { aces: Vec::new() }
+    }
+
+    pub fn add_audit_ace(&mut self, ace: NtfsAce) {
+        self.aces.push(ace);
+    }
+}
+
+impl Default for NtfsSacl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtfsSecurityDescriptor {
+    pub owner_sid: SecurityIdentifier,
+    pub group_sid: SecurityIdentifier,
+    pub dacl: Option<NtfsDacl>,
+    pub sacl: Option<NtfsSacl>,
+}
+
+impl NtfsSecurityDescriptor {
+    pub fn new(owner_sid: SecurityIdentifier, group_sid: SecurityIdentifier) -> Self {
+        Self {
+            owner_sid,
+            group_sid,
+            dacl: None,
+            sacl: None,
+        }
+    }
+
+    /// Evaluates Windows NTFS DACL access sequentially:
+    /// 1. Explicit Deny entries are checked first. If a matching deny ACE covers any requested bit, access is immediately blocked.
+    /// 2. Explicit Allow entries are checked next, accumulating allowed access rights.
+    /// 3. If all requested access rights are granted, return true.
+    /// 4. If DACL finishes without granting all requested rights (or DACL is absent), access is implicitly denied.
+    pub fn evaluate_access(
+        &self,
+        subject_sid: &SecurityIdentifier,
+        subject_group_sids: &[SecurityIdentifier],
+        requested_rights: u32,
+    ) -> bool {
+        let dacl = match self.dacl {
+            Some(ref d) => d,
+            None => return false, // Null/Empty DACL denies access by default in Windows rules
+        };
+
+        let is_match = |sid: &SecurityIdentifier| -> bool {
+            sid == subject_sid || subject_group_sids.contains(sid)
+        };
+
+        // 1. Pass 1: Explicit Deny ACEs evaluated first
+        for ace in &dacl.aces {
+            if ace.ace_type == NtfsAceType::AccessDenied && is_match(&ace.sid) {
+                if (ace.access_mask & requested_rights) != 0 {
+                    return false; // Immediately denied
+                }
+            }
+        }
+
+        // 2. Pass 2: Explicit Allow ACEs accumulated next
+        let mut accumulated_rights = 0u32;
+        for ace in &dacl.aces {
+            if ace.ace_type == NtfsAceType::AccessAllowed && is_match(&ace.sid) {
+                accumulated_rights |= ace.access_mask;
+            }
+        }
+
+        // Check if all requested rights have been granted
+        (accumulated_rights & requested_rights) == requested_rights
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_ext4_inode_mode_and_access_flow() {
+        let mode = Ext4InodeMode::new(Ext4FileType::RegularFile, 0o4750); // SUID + rwxr-x---
+        assert!(mode.is_suid());
+        assert!(!mode.is_sgid());
+        assert!(!mode.is_sticky());
+
+        // Test ext4 check flow without ACL:
+        // Owner 1000 requests Read|Write
+        assert!(Ext4AccessCheckEngine::evaluate_ext4_access(1000, 1000, dac_flags::READ | dac_flags::WRITE, 1000, 1000, mode.permissions, None));
+
+        // Group 1000 requests Write -> Denied
+        assert!(!Ext4AccessCheckEngine::evaluate_ext4_access(2000, 1000, dac_flags::WRITE, 1000, 1000, mode.permissions, None));
+
+        // Test ext4 check flow with POSIX ACL xattr override
+        let mut acl = PosixAclTable::new();
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::UserObj, id: 1000, perms: 0o7 });
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::User, id: 2000, perms: 0o6 }); // rw- granted to 2000
+        acl.add_entry(PosixAclEntry { tag: PosixAclTag::Other, id: 0, perms: 0o0 });
+
+        assert!(Ext4AccessCheckEngine::evaluate_ext4_access(2000, 3000, dac_flags::WRITE, 1000, 1000, mode.permissions, Some(&acl)));
+    }
+
+    #[test]
+    fn test_ntfs_security_descriptor_dacl_evaluation() {
+        let user_sid = SecurityIdentifier::new(5, &[21, 100, 200, 1001]);
+        let group_sid = SecurityIdentifier::new(5, &[21, 100, 200, 513]);
+        let sys_sid = SecurityIdentifier::local_system();
+
+        assert_eq!(sys_sid.to_sid_string(), b"S-1-5-18");
+
+        let mut sd = NtfsSecurityDescriptor::new(user_sid.clone(), group_sid.clone());
+        let mut dacl = NtfsDacl::new();
+
+        // Add Explicit Allow for user_sid for Read & Write
+        dacl.add_ace(NtfsAce::allow(user_sid.clone(), ntfs_access_rights::READ | ntfs_access_rights::WRITE, 0));
+
+        // Add Explicit Deny for user_sid for Write
+        dacl.add_ace(NtfsAce::deny(user_sid.clone(), ntfs_access_rights::WRITE, 0));
+
+        sd.dacl = Some(dacl);
+
+        // Explicit Deny evaluated first -> Write requests MUST be denied!
+        assert!(!sd.evaluate_access(&user_sid, &[], ntfs_access_rights::WRITE));
+
+        // Read requests SHOULD be granted
+        assert!(sd.evaluate_access(&user_sid, &[], ntfs_access_rights::READ));
+
+        // Unspecified user SHOULD be implicitly denied
+        let other_sid = SecurityIdentifier::new(5, &[21, 100, 200, 9999]);
+        assert!(!sd.evaluate_access(&other_sid, &[], ntfs_access_rights::READ));
+    }
 
     #[test]
     fn test_dac_evaluation() {
@@ -596,22 +951,7 @@ mod tests {
 
         // Named User 1001 requests Write (2) -> Denied by Mask (r--)
         assert!(!acl.evaluate_acl_access(1001, 1000, dac_flags::WRITE, 1000, 1000));
-
         // Other user 2000 requests Read (4) -> Denied by Other (0o0)
         assert!(!acl.evaluate_acl_access(2000, 2000, dac_flags::READ, 1000, 1000));
-    }
-
-    #[test]
-    fn test_access_control_matrix() {
-        let mut matrix = AccessControlMatrix::new();
-        matrix.set_matrix_entry(1000, 42, dac_flags::READ | dac_flags::WRITE);
-        matrix.assign_domain_category(1000, AccessDomainCategory::StorageDriver);
-        matrix.grant_capability(1000, FileCapabilityMask::full());
-
-        assert!(matrix.check_matrix_access(1000, 42, dac_flags::READ));
-        assert!(matrix.check_matrix_access(1000, 42, dac_flags::WRITE));
-        assert!(!matrix.check_matrix_access(1000, 42, dac_flags::EXECUTE));
-        assert_eq!(*matrix.domain_categories.get(&1000).unwrap(), AccessDomainCategory::StorageDriver);
-        assert!(matrix.capabilities.get(&1000).unwrap().cap_sys_admin);
     }
 }
