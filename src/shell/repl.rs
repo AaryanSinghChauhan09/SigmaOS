@@ -19,6 +19,33 @@ use crate::virtualization::{
     VmState,
 };
 
+#[derive(Clone)]
+pub struct AgentTask {
+    pub description: String,
+    pub commands: Vec<String>,
+}
+
+pub struct AgentAutomationEngine {
+    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
+    pub next_id: usize,
+}
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_tasks: std::collections::HashMap::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
+        let id = self.next_id;
+        self.registered_tasks.insert(id, AgentTask { description, commands });
+        self.next_id += 1;
+        id
+    }
+}
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -66,10 +93,10 @@ pub enum ShellCommand {
         filename: String,
     },
     Theme {
-        theme_name: String,
+        name: String,
     },
     Profile {
-        profile_name: String,
+        name: String,
     },
     A11y {
         feature: String,
@@ -78,6 +105,24 @@ pub enum ShellCommand {
     Dnf {
         subcommand: String,
         package: Option<String>,
+    },
+    Alias {
+        name: String,
+        value: String,
+    },
+    Unalias {
+        name: String,
+    },
+    Run {
+        variable: String,
+    },
+    AgentRegister {
+        description: String,
+        commands: String,
+    },
+    AgentList,
+    AgentRun {
+        task_id: usize,
     },
     Unknown(String),
 }

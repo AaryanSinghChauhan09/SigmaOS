@@ -36,8 +36,13 @@ pub trait Driver {
     fn id(&self) -> DriverID;
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
+    fn set_state(&self, _state: DriverState) {}
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
+    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn dependencies(&self) -> &'static [DriverType] { &[] }
 }
 
 #[repr(C)]
@@ -87,18 +92,6 @@ impl SimpleDriver {
             driver_type,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
-    }
-
-    pub fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-
-    pub fn probe(&self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
-
-    pub fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
     }
 }
 
@@ -648,7 +641,7 @@ mod tests {
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
@@ -784,73 +777,6 @@ mod tests {
         assert!(res_user.is_err());
         assert_eq!(res_user.unwrap_err(), "General Protection Fault: Privilege violation accessing IDT gate");
     }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
 
     static mut OPEN_CALLED: i32 = 0;
     static mut RELEASE_CALLED: i32 = 0;

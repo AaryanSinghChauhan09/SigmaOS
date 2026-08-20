@@ -22,23 +22,38 @@ pub mod memory;
 pub mod scheduler;
 pub mod object;
 pub mod proc;
+pub mod architecture;
+pub mod structures;
+pub mod policy_mechanism;
+pub mod ipc;
+pub mod roundrobin;
 
 // Genode-style Component Tree Architecture
 pub mod component;
 
 // Temporarily disabled problematic modules
 // pub mod breakthroughs;
-// pub mod ipc;
 // pub mod meta;
 // pub mod paging;
-// pub mod policy_mechanism;
-// pub mod roundrobin;
 // pub mod self_healing;
 // pub mod udkf;
-// pub mod object;
-// pub mod proc;
 
 // Working exports
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};
+pub use architecture::{
+    InstructionCyclePhase, ProcessorInitState, CpuRegisters, Irql, HardwareException,
+    PoolType, LookasideList, MemoryDescriptorList, ThreadState, Tcb, Pcb, ArchitectureEngine,
+};
+pub use structures::{
+    Apc, ApcMode, ApcQueue, AdvancedAlgorithmsManager, AuditBlock, CircularDoublyLinkedList,
+    CpuArchitectureClass, LcgRandom, SequencedSinglyLinkedList,
+    SinglyLinkedList, SystemThread, WorkItem, LotteryTask, EdfTask,
+};
+pub use policy_mechanism::{
+    AdaptivePolicy, KernelMechanism, KernelPolicy, PolicyMechanismCoordinator, SovereignMechanism,
+    InterruptClass, IoWaitProfile,
+};
+pub use ipc::{Channel, Message, IpcManager, IpcError};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};

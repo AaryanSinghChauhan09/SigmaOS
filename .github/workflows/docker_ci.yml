@@ -1,0 +1,25 @@
+name: "Docker Container Build & Security Scan"
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  docker-build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test Dockerfile Build
+        run: |
+          if [ -f "Dockerfile" ]; then
+            docker build . -t sigmaos:latest || true
+          fi

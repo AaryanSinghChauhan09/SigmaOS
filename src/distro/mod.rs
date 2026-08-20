@@ -13,6 +13,8 @@ pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
 pub mod linux_bsd_inspirations;
+pub mod arch_parity;
+pub mod chakra_parity;
 
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
@@ -47,10 +49,6 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
-pub use manjaro::{
-    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
-    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
-};
 pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
     NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,

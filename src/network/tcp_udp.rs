@@ -67,6 +67,10 @@ pub struct SimpleSocket {
     pub local_port: AtomicUsize,
     pub remote_port: AtomicUsize,
     pub state: AtomicUsize,
+    pub reuse_addr: AtomicUsize,
+    pub tcp_nodelay: AtomicUsize,
+    pub rcvbuf: AtomicUsize,
+    pub sndbuf: AtomicUsize,
 }
 
 impl SimpleSocket {
@@ -77,6 +81,10 @@ impl SimpleSocket {
             local_port: AtomicUsize::new(local_port as usize),
             remote_port: AtomicUsize::new(0),
             state: AtomicUsize::new(TCPState::Closed as usize),
+            reuse_addr: AtomicUsize::new(0),
+            tcp_nodelay: AtomicUsize::new(0),
+            rcvbuf: AtomicUsize::new(65536),
+            sndbuf: AtomicUsize::new(65536),
         }
     }
 }
@@ -173,7 +181,18 @@ impl TCPConnection for SimpleSocket {
         Ok(())
     }
     fn get_state(&self) -> TCPState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+        match self.state.load(Ordering::SeqCst) {
+            1 => TCPState::Listen,
+            2 => TCPState::SynSent,
+            3 => TCPState::SynReceived,
+            4 => TCPState::Established,
+            5 => TCPState::FinWait1,
+            6 => TCPState::FinWait2,
+            7 => TCPState::CloseWait,
+            8 => TCPState::Closing,
+            9 => TCPState::TimeWait,
+            _ => TCPState::Closed,
+        }
     }
 }
 
@@ -330,6 +349,10 @@ pub trait NetworkStack {
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
 }
 
+pub struct NetfilterFirewall;
+pub struct RoutingTable;
+pub struct NetworkInterface;
+
 pub struct SimpleNetworkStack {
     pub sockets: Vec<Option<Box<dyn Socket>>>,
     pub next_id: AtomicUsize,
@@ -348,6 +371,9 @@ impl SimpleNetworkStack {
             next_id: AtomicUsize::new(1),
             firewall: SimpleFirewall::new(),
             congestion: RenoCongestionControl::new(),
+            netfilter: NetfilterFirewall,
+            routing_table: RoutingTable,
+            interfaces: Vec::new(),
         }
     }
 }
@@ -379,29 +405,6 @@ impl NetworkStack for SimpleNetworkStack {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
+use crate::klib::vec::Vec;
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

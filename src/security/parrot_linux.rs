@@ -18,6 +18,32 @@ pub struct SniffedPacket {
     pub payload: Vec<u8>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnonymityMode { Tor, I2p, Clearnet }
+
+pub struct AnonsurfEngine {
+    pub mode: AnonymityMode,
+}
+
+impl AnonsurfEngine {
+    pub fn new() -> Self { AnonsurfEngine { mode: AnonymityMode::Clearnet } }
+    pub fn start_anonsurf(&mut self) { self.mode = AnonymityMode::Tor; }
+    pub fn stop_anonsurf(&mut self) { self.mode = AnonymityMode::Clearnet; }
+}
+
+pub struct ForensicsAuditTool;
+#[derive(Debug, Clone)]
+pub struct RecoveredFile { pub name: String }
+
+pub struct KaliSniffer;
+pub struct PentestAssistant;
+pub struct SecureWipeTool;
+
+pub struct SigmaIDS;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntrusionSeverity { Low, Medium, High, Critical }
+pub struct IntrusionAlert { pub severity: IntrusionSeverity }
+
 pub struct ParrotSniffer {
     pub is_sniffing: bool,
     pub captured_packets: VecDeque<SniffedPacket>,

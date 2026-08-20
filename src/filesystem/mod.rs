@@ -30,7 +30,7 @@ pub use manager::{
 };
 pub use support::{
     Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
-    SimpleFilesystemManager,
+    SimpleFilesystemManager, LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
 pub use legacy_fs::{
