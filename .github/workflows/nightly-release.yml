@@ -5,6 +5,8 @@ on:
     - cron: '0 2 * * *' # Run at 2 AM UTC daily
   workflow_dispatch:      # Allow manual trigger
 
+permissions:
+  contents: read
 jobs:
   build:
     name: Reproducible Nightly Build

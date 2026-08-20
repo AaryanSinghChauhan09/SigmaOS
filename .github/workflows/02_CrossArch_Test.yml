@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "disabled-branch" ]
 
+permissions:
+  contents: read
+
 jobs:
   test-cross-arch:
     runs-on: ubuntu-latest

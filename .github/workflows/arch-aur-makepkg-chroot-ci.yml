@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   arch-aur-verification:
     name: Arch Linux AUR PKGBUILD & Sandboxed makepkg Chroot Test

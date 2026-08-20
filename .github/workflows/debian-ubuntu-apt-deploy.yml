@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   debian-apt-verification:
     name: Debian Control & APT Sync Matrix Verification

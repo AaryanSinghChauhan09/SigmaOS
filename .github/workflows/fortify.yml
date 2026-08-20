@@ -26,6 +26,8 @@ on:
     - cron: '38 0 * * 1'
   workflow_dispatch:
 
+permissions:
+  contents: read
 jobs:
   Fortify-AST-Scan:
     if: ${{ (secrets.FOD_TENANT != '' && secrets.FOD_USER != '' && secrets.FOD_PAT != '') || secrets.FOD_CLIENT_ID != '' || secrets.SSC_TOKEN != '' }}

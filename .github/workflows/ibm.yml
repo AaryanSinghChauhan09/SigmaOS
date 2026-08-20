@@ -24,6 +24,8 @@ env:
   DEPLOYMENT_NAME: iks-test
   PORT: 5001
 
+permissions:
+  contents: read
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy

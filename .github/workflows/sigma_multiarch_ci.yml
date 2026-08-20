@@ -19,6 +19,8 @@ env:
   CARGO_TERM_COLOR: always
   SOURCE_DATE_EPOCH: '1751000000'
 
+permissions:
+  contents: read
 jobs:
 
 # ── Cross-build matrix ───────────────────────────────────────────────────────

@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   chakra-akabei-verification:
     name: Chakra Linux Half-Rolling & Akabei Bundle Test

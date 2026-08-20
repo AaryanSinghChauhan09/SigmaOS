@@ -39,6 +39,9 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   AZURE_CONTAINER_REGISTRY: "your-azure-container-registry"
   CONTAINER_NAME: "your-container-name"

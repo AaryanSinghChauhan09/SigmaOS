@@ -6,6 +6,9 @@ on:
     tags: [ "v*" ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   deploy-k8s:
     name: Build & Deploy to K8s

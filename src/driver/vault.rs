@@ -1,17 +1,17 @@
 // SigmaOS Driver Archive Vault (DriverArchiveVault)
 // Encrypts driver binaries for cold storage to prevent unauthorized driver injection and tamper attacks
 
-use std::collections::HashMap;
+use klib::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct VaultEntry {
-    pub driver_name: String,
-    pub encrypted_payload: Vec<u8>,
-    pub hash_signature: String,
+    pub driver_name: klib::string::SigmaString,
+    pub encrypted_payload: klib::vec::Vec<u8>,
+    pub hash_signature: klib::string::SigmaString,
 }
 
 pub struct DriverArchiveVault {
-    pub archive: HashMap<String, VaultEntry>,
+    pub archive: HashMap<klib::string::SigmaString, VaultEntry>,
     pub secret_key: u8,
 }
 

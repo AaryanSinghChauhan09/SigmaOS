@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   arch-gentoo-build:
     name: Arch PKGBUILD & Gentoo Ebuild Clean-Room Verification

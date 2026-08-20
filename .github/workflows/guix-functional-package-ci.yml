@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   guix-shepherd-verification:
     name: GNU Guix Functional Store & Shepherd Service Test

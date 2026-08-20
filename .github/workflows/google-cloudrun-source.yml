@@ -39,6 +39,8 @@ env:
   REGION: 'us-central1' # TODO: update to your region
   SERVICE: 'my-service' # TODO: update to your service name
 
+permissions:
+  contents: read
 jobs:
   deploy:
     runs-on: 'ubuntu-latest'

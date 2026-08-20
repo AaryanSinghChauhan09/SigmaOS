@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   tails-amnesia-verification:
     name: Tails OS Amnesic RAM Shredding & Tor Network Shunt Test

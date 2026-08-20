@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   openbsd-pf-verification:
     name: OpenBSD CARP Redundancy Protocol & PF Firewall State Sync Test

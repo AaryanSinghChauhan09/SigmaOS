@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   popos-cosmic-verification:
     name: Pop!_OS COSMIC Desktop & System76 Power Scheduler Test

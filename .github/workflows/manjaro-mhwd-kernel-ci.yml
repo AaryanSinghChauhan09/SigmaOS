@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   manjaro-mhwd-verification:
     name: Manjaro MHWD Hardware Detection & Kernel Rebuilder Test

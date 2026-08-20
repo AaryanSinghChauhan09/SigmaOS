@@ -6,6 +6,8 @@ on:
   schedule:
     - cron: '0 0 * * *' # Daily stabilization audit
 
+permissions:
+  contents: read
 jobs:
   kernel-stress-test:
     runs-on: ubuntu-latest

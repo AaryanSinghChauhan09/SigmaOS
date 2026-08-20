@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   freebsd-jail-geom-test:
     name: FreeBSD Jail, VNET Virtual Network & GEOM Storage Verification

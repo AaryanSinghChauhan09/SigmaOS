@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   solus-budgie-verification:
     name: Solus eopkg Package Manager & Budgie DE Verification

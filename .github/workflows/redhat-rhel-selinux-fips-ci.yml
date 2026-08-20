@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   rhel-security-verification:
     name: Red Hat RHEL FIPS Cryptography & SELinux MLS Audit

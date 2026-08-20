@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main, "release/**", kernel-exp, drivers-dev]
 
+permissions:
+  contents: read
+
 jobs:
   feature-matrix:
     runs-on: ubuntu-latest

@@ -1,7 +1,7 @@
 // SigmaOS Ancient Build Replay Codex (BuildCodex)
 // Formulates compiler build codex logs for legacy reproducible tooling
 
-use std::collections::HashMap;
+use klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodexCategory {

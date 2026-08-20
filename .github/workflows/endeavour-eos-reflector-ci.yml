@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   endeavour-reflector-verification:
     name: EndeavourOS Reflector Mirror Ranking & Yay/Paru Helper Verification

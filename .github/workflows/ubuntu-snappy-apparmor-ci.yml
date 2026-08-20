@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   ubuntu-snappy-verification:
     name: Ubuntu Snap Package & AppArmor Profile Security Test

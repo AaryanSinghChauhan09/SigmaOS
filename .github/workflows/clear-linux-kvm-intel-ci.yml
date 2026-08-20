@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   clear-linux-verification:
     name: Clear Linux AVX-512 Optimization & Stateless Config Test

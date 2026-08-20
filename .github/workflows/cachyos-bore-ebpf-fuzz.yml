@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   cachyos-ebpf-verification:
     name: CachyOS BORE Scheduler, eBPF Verifier & Ananicy Tuning Test

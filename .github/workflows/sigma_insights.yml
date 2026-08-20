@@ -5,6 +5,8 @@ on:
     - cron: '0 0 * * 0' # Weekly
   workflow_dispatch:
 
+permissions:
+  contents: read
 jobs:
   generate_insights:
     name: Generate Ecosystem Metrics

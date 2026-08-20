@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   void-runit-verification:
     name: Void Linux XBPS Package Manager & Runit Supervisor Test

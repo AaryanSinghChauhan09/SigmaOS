@@ -9,6 +9,8 @@ on:
 env:
   PYTHON_VERSION: '3.x'
 
+permissions:
+  contents: read
 jobs:
   # ── Stage 1: Build all architectures in parallel ──────────
   build:

@@ -59,6 +59,8 @@ on:
     # Edit to the branch(es) you want to build and deploy on each push.
     branches: [ "main" ]
 
+permissions:
+  contents: read
 jobs:
   # 🖊️ EDIT if you want to run vulnerability check on your project before deploying
   # the application. Please uncomment the below CRDA scan job and configure to run it in

@@ -48,6 +48,8 @@ env:
   IMAGE: 'static-site'
   WORKLOAD_IDENTITY_PROVIDER: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider' # TODO: update to your workload identity provider
 
+permissions:
+  contents: read
 jobs:
   setup-build-publish-deploy:
     name: 'Setup, Build, Publish, and Deploy'

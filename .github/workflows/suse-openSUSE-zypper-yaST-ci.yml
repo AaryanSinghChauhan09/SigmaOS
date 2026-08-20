@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   opensuse-zypper-verification:
     name: openSUSE Zypper Package Manager & YaST Control Center Test

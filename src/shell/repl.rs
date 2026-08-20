@@ -1,7 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
-use std::io::{self, BufRead, Write};
+use klib::io::{self, KlibRead, KlibWrite};
 
 /// Shell command type
 #[derive(Debug, Clone)]

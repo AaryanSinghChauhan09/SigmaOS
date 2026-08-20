@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   dragonfly-hammer2-verification:
     name: DragonFly BSD HAMMER2 Distributed Storage & VFS Cache Test

@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   nixos-flake-verification:
     name: NixOS Flake Output Evaluation & Garbage Collector Closure Test

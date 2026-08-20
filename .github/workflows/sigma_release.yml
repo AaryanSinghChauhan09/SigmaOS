@@ -10,6 +10,8 @@ on:
         description: 'Release version (e.g. v29.0.0)'
         required: true
 
+permissions:
+  contents: read
 jobs:
   build_release:
     name: Build Sovereign Release ISO

@@ -1,7 +1,7 @@
 // SigmaOS Linux-From-Scratch (LFS) and FreeBSD Inspired Bootstrap & Ports Engine
 // Designed for toolchain compiling, Stage 1/2 bootstrapping, and secure ports auditing
 
-use std::collections::HashMap;
+use klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootstrapStage {

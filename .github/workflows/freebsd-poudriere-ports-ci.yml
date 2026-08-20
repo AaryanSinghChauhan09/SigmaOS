@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   freebsd-poudriere-verification:
     name: FreeBSD Poudriere Bulk Package Building & Ports Tree Verification

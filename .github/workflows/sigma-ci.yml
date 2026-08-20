@@ -8,6 +8,8 @@ on:
   schedule:
     - cron: '0 0 * * *'  # Daily at midnight UTC
 
+permissions:
+  contents: read
 jobs:
   build:
     name: Build SigmaOS (${{ matrix.arch }})

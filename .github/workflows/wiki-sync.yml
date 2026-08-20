@@ -9,6 +9,8 @@ on:
       - "CONTRIBUTING.md"
       - "CHANGELOG.md"
 
+permissions:
+  contents: read
 jobs:
   wiki-sync:
     runs-on: ubuntu-latest

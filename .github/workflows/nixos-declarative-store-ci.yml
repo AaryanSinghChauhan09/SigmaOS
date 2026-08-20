@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   nixos-store-verification:
     name: NixOS Hash-Addressed Store & Declarative State Test

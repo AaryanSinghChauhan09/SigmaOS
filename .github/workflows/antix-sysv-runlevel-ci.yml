@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   antix-sysv-verification:
     name: antiX Linux SysVinit Runlevel & Lightweight Desktop Test

@@ -11,14 +11,25 @@ pub mod vecdeque;
 pub mod error;
 pub mod hash;
 pub mod custom_string;
+pub mod io;
+pub mod time;
+pub mod net;
 
 pub use vec::Vec;
 pub use hashmap::{HashMap, Entry};
 pub use hashset::HashSet;
 pub use btreemap::BTreeMap;
 pub use vecdeque::VecDeque;
-pub use alloc::string::{String, ToString};
-pub use std::path::PathBuf;
+pub use custom_string::SigmaString;
+pub mod string {
+    pub use super::SigmaString as String;
+}
+pub mod collections {
+    pub use super::{HashMap, HashSet, BTreeMap, VecDeque};
+}
+pub mod path {
+    pub use super::custom_string::SigmaString as PathBuf;
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Uuid([u8; 16]);

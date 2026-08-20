@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ "disabled-branch" ]
 
+permissions:
+  contents: read
 jobs:
   qemu_x86_64:
     name: QEMU Boot Test (x86_64)

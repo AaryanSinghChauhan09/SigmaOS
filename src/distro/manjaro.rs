@@ -18,13 +18,13 @@
 
 // SigmaOS Manjaro Distro Integration Module
 
-use std::collections::HashMap;
+use klib::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {
-    pub name: String,
-    pub pkgbuild_url: String,
-    pub dependencies: Vec<String>,
+    pub name: klib::string::SigmaString,
+    pub pkgbuild_url: klib::string::SigmaString,
+    pub dependencies: klib::vec::Vec<klib::string::SigmaString>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

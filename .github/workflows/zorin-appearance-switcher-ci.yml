@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
 jobs:
   zorin-appearance-verification:
     name: Zorin OS Appearance Switcher & Layout Preset Test

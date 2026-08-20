@@ -10,6 +10,8 @@ on:
 env:
   SOURCE_DATE_EPOCH: "1700000000"
 
+permissions:
+  contents: read
 jobs:
   # ===========================================================================
   # Multi-architecture build matrix (NixOS + Void Linux inspired)

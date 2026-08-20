@@ -1,7 +1,7 @@
 // SigmaOS Custom I/O Implementation
 // Reduces dependency on std::io by providing custom implementations
 
-use crate::klib::{String, Vec};
+use crate::klib::{SigmaString, Vec};
 
 /// Custom buffer for I/O operations
 pub struct SigmaBuffer {
@@ -104,7 +104,7 @@ impl SigmaFormatter {
             }
         }
         
-        let mut string_result = String::new();
+        let mut string_result = SigmaString::new();
         for &byte in &result {
             string_result.push(byte as char);
         }
@@ -117,8 +117,8 @@ impl SigmaFormatter {
     }
 
     /// Get formatted string
-    pub fn get_string(&self) -> String {
-        let mut result = String::new();
+    pub fn get_string(&self) -> SigmaString {
+        let mut result = SigmaString::new();
         for &byte in &self.buffer.data {
             result.push(byte as char);
         }
@@ -147,4 +147,16 @@ impl Default for SigmaFormatter {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Custom Read trait for klib
+pub trait KlibRead {
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, SigmaIoError>;
+    fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), SigmaIoError>;
+}
+
+/// Custom Write trait for klib
+pub trait KlibWrite {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, SigmaIoError>;
+    fn flush(&mut self) -> Result<(), SigmaIoError>;
 }
