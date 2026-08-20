@@ -23,6 +23,7 @@ pub enum CpuError {
     IrqlViolation = 9,
     ThreadSuspended = 10,
     ApcDeliveryFailed = 11,
+}
 
 /// ARM-inspired addressing modes for LDR & STR instructions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,7 +41,6 @@ pub enum BlockTransferMode {
     IncrementBefore, // IB: Increment address before each transfer
     DecrementAfter,  // DA: Decrement address after each transfer
     DecrementBefore, // DB: Decrement address before each transfer
->>>>>>> origin/jules-9755787455003647459-20fb3c86
 }
 
 /// x86 CPU Execution Modes
@@ -349,16 +349,6 @@ impl SovereignVirtualCPU {
                 active_vector: None,
             },
             threads: vec![
-            memory: vec![0; 4096],     // 4096 bytes of simulated RAM
-            kprcb: SovereignKprcb {
-                current_irql: Irql::PassiveLevel,
-                dpc_queue: Vec::new(),
-                work_item_queue: Vec::new(),
-                active_thread_id: 1,
-                interrupt_mask: 0,
-                active_vector: None,
-            },
-            threads: vec![
                 SovereignThread {
                     id: 1,
                     parent_id: 0,
@@ -369,7 +359,6 @@ impl SovereignVirtualCPU {
                     apc_queue: Vec::new(),
                 }
             ],
->>>>>>> origin/jules-9755787455003647459-20fb3c86
         }
     }
 
@@ -415,8 +404,6 @@ impl SovereignVirtualCPU {
             "rbp" => self.registers.rbp = val,
             "r8" => self.registers.r8 = val,
             "r9" => self.registers.r9 = val,
-            "r9" => self.registers.r9 = val,
->>>>>>> origin/jules-9755787455003647459-20fb3c86
             "r10" => self.registers.r10 = val,
             "r11" => self.registers.r11 = val,
             "r12" => self.registers.r12 = val,
@@ -746,7 +733,6 @@ impl SovereignVirtualCPU {
             self.set_register(reg, val)?;
         }
         Ok(())
->>>>>>> origin/jules-9755787455003647459-20fb3c86
     }
 
     /// Transitions between x86 Execution Modes (Alters PE bits dynamically)
@@ -1475,7 +1461,6 @@ impl SovereignVirtualCPU {
         self.ring = CpuRing::Ring0;
         Ok(frame)
     }
->>>>>>> origin/jules-9755787455003647459-20fb3c86
 }
 
 impl Default for SovereignVirtualCPU {
@@ -1612,13 +1597,15 @@ mod tests {
 
     #[test]
     fn test_lazy_fp_state_restore() {
+        let mut cpu = SovereignVirtualCPU::new();
         // Active TS (Task Switched) bit in CR0
         cpu.registers.cr0 |= 1 << 3;
 
         // Try to access FP registers - triggers restoration and clears TS bit
         cpu.handle_lazy_fp_state_restore(true).unwrap();
         assert_eq!(cpu.registers.cr0 & (1 << 3), 0);
-=======
+    }
+    #[test]
     fn test_ldr_str_addressing_modes() {
         let mut cpu = SovereignVirtualCPU::new();
 
@@ -2001,6 +1988,5 @@ mod tests {
             cpu.ldr_scaled("rdx", "rbx", "rcx", 3, 16),
             Err(CpuError::InvalidAddress)
         );
->>>>>>> origin/jules-9755787455003647459-20fb3c86
     }
 }

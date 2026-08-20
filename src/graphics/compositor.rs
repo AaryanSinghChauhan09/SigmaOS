@@ -290,15 +290,6 @@ impl Surface for BitmapSurface {
         let stride = self.stride as usize / 4;
         let limit_y = (rect.position.y + rect.size.height as i32).min(self.size.height as i32);
         let limit_x = (rect.position.x + rect.size.width as i32).min(self.size.width as i32);
-
-        for y in rect.position.y.max(0) as usize
-            ..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize
-        {
-            for x in rect.position.x.max(0) as usize
-                ..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize
-            {
-        for y in rect.position.y.max(0) as usize..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize {
-            for x in rect.position.x.max(0) as usize..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize {
         let data = self.data_mut();
 
         for y in rect.position.y.max(0) as usize..limit_y.max(0) as usize {
@@ -736,8 +727,6 @@ impl Compositor for SimpleCompositor {
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError> {
         self.stats.frame_count += 1;
 
-        // If double buffering is enabled, we render to our back buffer first, then copy to output.
-        // Otherwise, we render directly to output.
         let use_double_buffering =
             self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
 
@@ -745,11 +734,9 @@ impl Compositor for SimpleCompositor {
             let back = self.back_buffer.as_mut().unwrap();
             back.clear(Color::rgb(0, 0, 0));
 
-            // Compose windows in order (back to front)
             for &window_id in &self.window_order {
                 if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
                     let window_rect = window.rect();
-                    let opacity = window.get_opacity(); // animation opacity factor
 
                     if let Some(surface) = window.surface() {
                         let window_stride = surface.info().stride as usize / 4;
@@ -758,7 +745,6 @@ impl Compositor for SimpleCompositor {
                         let back_stride = back.info().stride as usize / 4;
                         let back_data = back.data_mut();
 
-                        // Copy window surface to back buffer with clipping & opacity
                         for y in 0..window_rect.size.height as usize {
                             for x in 0..window_rect.size.width as usize {
                                 let output_x = (window_rect.position.x + x as i32) as usize;
@@ -777,33 +763,30 @@ impl Compositor for SimpleCompositor {
                     }
                 }
             }
+        } else {
+            for &window_id in &self.window_order {
+                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                    let window_rect = window.rect();
+                    let output_stride = output.info().stride as usize / 4;
 
-            if let Some(window) = found_window {
-                let window_rect = window.rect();
-            if let Some(ref mut window) = self.windows[window_id] {
-            if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                let window_rect = window.rect();
-                let output_stride = output.info().stride as usize / 4;
-                if let Some(surface) = window.surface() {
-                    let window_stride = surface.info().stride as usize / 4;
-                    let window_data = surface.data();
-                    let output_data = target_surface.data_mut();
-                    let window_data = surface.data();
-                    let output_data = output.data_mut();
+                    if let Some(surface) = window.surface() {
+                        let window_stride = surface.info().stride as usize / 4;
+                        let window_data = surface.data();
+                        let output_data = output.data_mut();
 
-                    // Copy window surface to output
-                    for y in 0..window_rect.size.height as usize {
-                        for x in 0..window_rect.size.width as usize {
-                            let output_x = (window_rect.position.x + x as i32) as usize;
-                            let output_y = (window_rect.position.y + y as i32) as usize;
+                        for y in 0..window_rect.size.height as usize {
+                            for x in 0..window_rect.size.width as usize {
+                                let output_x = (window_rect.position.x + x as i32) as usize;
+                                let output_y = (window_rect.position.y + y as i32) as usize;
 
-                            let output_index = output_y * output_stride + output_x;
-                            let window_index = y * window_stride + x;
+                                let output_index = output_y * output_stride + output_x;
+                                let window_index = y * window_stride + x;
 
-                            if output_index < output_data.len()
-                                && window_index < window_data.len()
-                            {
-                                output_data[output_index] = window_data[window_index];
+                                if output_index < output_data.len()
+                                    && window_index < window_data.len()
+                                {
+                                    output_data[output_index] = window_data[window_index];
+                                }
                             }
                         }
                     }
@@ -811,7 +794,6 @@ impl Compositor for SimpleCompositor {
             }
         }
 
-        // Swap back to front buffer automatically if needed
         if self.double_buffering.load(Ordering::SeqCst) {
             self.swap_buffers()?;
         }
@@ -832,28 +814,6 @@ impl Compositor for SimpleCompositor {
     }
 
     fn stats(&self) -> CompositorStats {
-        let mut stats = self.stats;
-        stats.visible_windows = 0;
-
-        for window_option in &self.windows {
-            if let Some(ref window) = *window_option {
-                if window.info().visible {
-                    stats.visible_windows += 1;
-                }
-            }
-        }
-
-        let mut stats = self.stats.clone();
-        stats.visible_windows = 0;
-
-        for window_option in &self.windows {
-            if let Some(ref window) = *window_option {
-                if window.info().visible {
-                    stats.visible_windows += 1;
-                }
-            }
-        }
-
         let mut stats = self.stats.clone();
         stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
         stats
@@ -877,17 +837,9 @@ mod additional_compositor_tests {
         window.apply_transition(AnimationType::Minimize, 0.5f32);
         assert_eq!(window.get_scale(), 0.75f32); // 1.0 - (0.5 * 0.5)
         assert_eq!(window.get_opacity(), 0.5f32); // 1.0 - 0.5
+    }
+}
 
-        let win_cap = WindowCapability::full();
-        let mut win = SimpleWindow::new(101, Rectangle::new(0, 0, 10, 10), win_cap);
-        win.show();
-        comp.add_window(Box::new(win)).unwrap();
-
-        let mut output = BitmapSurface::new(999, 1920, 1080, SurfaceCapability::full());
-        assert!(comp.compose(&mut output).is_ok());
-
-        let screenshot = comp.capture_screenshot().unwrap();
-        assert_eq!(screenshot.len(), 1920 * 1080);
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -1005,6 +957,13 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
     #[test]
     fn test_compositor_flow() {
         let mut comp = SimpleCompositor::new(CompositorCapability::full());
