@@ -8,7 +8,6 @@ pub mod wireless;
 pub mod zero_trust;
 pub mod legacy_net;
 pub mod revival;
-pub mod tcp_udp;
 pub mod bsd_pf;
 pub mod npf_firewall;
 pub mod virtual_switch;
@@ -17,6 +16,7 @@ pub mod torrent;
 pub mod pf_firewall;
 pub mod nftables;
 pub mod npf;
+pub mod distro_net;
 
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use analyzer::{
@@ -30,3 +30,6 @@ pub use analyzer::{
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use sync::{CloudSyncManager, ConflictResolution, SyncConfig, SyncCredentials, SyncError, SyncItem, SyncItemType, SyncProvider, SyncResult, SyncStatus};
 pub use torrent::{PeerInfo, TorrentClient, TorrentError, TorrentState};
+pub use distro_net::{
+    BpfInstruction, EbpfSocketFilter, LinuxDistroNetEngine, SynCookieEngine, WireguardTunnel,
+};

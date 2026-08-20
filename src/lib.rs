@@ -245,6 +245,19 @@ pub use ipc::async_io::{
     AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, SubmissionQueueEntry,
 };
 
+pub use driver::dkms_autoloader::{
+    DkmsEngine, DkmsModule, DkmsModuleStatus, PciIdMatch, UsbIdMatch,
+};
+
+pub use network::distro_net::{
+    BpfInstruction, EbpfSocketFilter, LinuxDistroNetEngine, SynCookieEngine, WireguardTunnel,
+};
+
+pub use container::distro_sandbox::{
+    CgroupV2Limits, DistroSandboxEngine, DistroSandboxInstance, LandlockPathRules,
+    NamespaceFlags, SeccompAction, SeccompPolicy,
+};
+
 pub use tools::{
     AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode, NodeState as LibNodeState,
     SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
