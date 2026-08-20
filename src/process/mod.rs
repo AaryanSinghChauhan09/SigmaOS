@@ -10,4 +10,8 @@ pub use activity_manager::{
 };
 pub use linux_proc::{NiceValue, CGroup, PidNamespace, LinuxProcessEntry, LinuxProcessState, LinuxSignal, ProcFileSystem};
 pub use linux_sysfs::{SysfsAttribute, LoopDevice, SysfsRegistry};
-pub use activity_manager::{ActivityManager, ActivityState, ProcessActivityRecord, RegisterSnapshot, AddressSpaceBinding};
+pub use activity_manager::{
+    ActivityManager, ActivityState, AddressSpaceBinding, ApplicationPerformanceProfile,
+    ProcessActivityRecord, ProcessPledgePromises, ProcessResourceLimits, PsiMetrics,
+    RegisterSnapshot,
+};

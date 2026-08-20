@@ -1,9 +1,77 @@
 // System Activity Manager for SigmaOS
 // Inspired by Linux systemd cgroup activity tracking, Android ActivityManager,
-// Garuda Zen interactivity governor, FreeBSD process activity accounting, and macOS Activity Monitor.
+// Garuda Zen interactivity governor, FreeBSD process activity accounting, OpenBSD pledge/unveil,
+// Linux Pressure Stall Information (PSI), and macOS Activity Monitor.
 
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::HashMap;
+
+/// Pressure Stall Information (PSI) metrics (Linux 4.20+ / systemd parity)
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct PsiMetrics {
+    pub cpu_some_pct_10s: f32,
+    pub memory_some_pct_10s: f32,
+    pub memory_full_pct_10s: f32,
+    pub io_some_pct_10s: f32,
+    pub io_full_pct_10s: f32,
+}
+
+/// OpenBSD-style Pledge promises for process capability sandboxing
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProcessPledgePromises {
+    pub stdio: bool,
+    pub rpath: bool,
+    pub wpath: bool,
+    pub cpath: bool,
+    pub inet: bool,
+    pub unix: bool,
+    pub exec: bool,
+    pub proc: bool,
+}
+
+impl Default for ProcessPledgePromises {
+    fn default() -> Self {
+        Self {
+            stdio: true,
+            rpath: true,
+            wpath: true,
+            cpath: true,
+            inet: false,
+            unix: false,
+            exec: false,
+            proc: false,
+        }
+    }
+}
+
+/// FreeBSD `rctl` resource control limits
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ProcessResourceLimits {
+    pub max_threads: usize,
+    pub max_memory_bytes: usize,
+    pub execution_time_limit_sec: u64,
+    pub open_files_max: usize,
+}
+
+impl Default for ProcessResourceLimits {
+    fn default() -> Self {
+        Self {
+            max_threads: 64,
+            max_memory_bytes: 512 * 1024 * 1024, // 512MB
+            execution_time_limit_sec: 3600,       // 1 hour default
+            open_files_max: 1024,
+        }
+    }
+}
+
+/// Dynamic performance profile for application processors (Garuda Zen / BORE scheduler parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ApplicationPerformanceProfile {
+    Standard,
+    PowerSaver,
+    Gaming,
+    Computational,
+}
 
 /// Process activity state classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -82,6 +150,11 @@ pub struct ProcessActivityRecord {
     pub register_snapshot: Option<RegisterSnapshot>,
     pub address_binding: Option<AddressSpaceBinding>,
     pub last_active_timestamp: u64,
+    pub oom_score_adj: i32, // Linux oom_score_adj (-1000 to +1000)
+    pub pledge_promises: ProcessPledgePromises,
+    pub unveiled_paths: Vec<String>,
+    pub resource_limits: ProcessResourceLimits,
+    pub performance_profile: ApplicationPerformanceProfile,
 }
 
 impl ProcessActivityRecord {
@@ -102,6 +175,11 @@ impl ProcessActivityRecord {
             register_snapshot: None,
             address_binding: None,
             last_active_timestamp: 1000,
+            oom_score_adj: 0,
+            pledge_promises: ProcessPledgePromises::default(),
+            unveiled_paths: Vec::new(),
+            resource_limits: ProcessResourceLimits::default(),
+            performance_profile: ApplicationPerformanceProfile::Standard,
         }
     }
 }
@@ -112,6 +190,7 @@ pub struct ActivityManager {
     pub active_foreground_pid: Option<usize>,
     pub total_cpu_cycles_tracked: AtomicUsize,
     pub power_saving_mode: bool,
+    pub psi_metrics: PsiMetrics,
 }
 
 impl ActivityManager {
@@ -121,7 +200,69 @@ impl ActivityManager {
             active_foreground_pid: None,
             total_cpu_cycles_tracked: AtomicUsize::new(0),
             power_saving_mode: false,
+            psi_metrics: PsiMetrics::default(),
         }
+    }
+
+    /// Update system-wide Pressure Stall Information (PSI)
+    pub fn update_psi_metrics(&mut self, metrics: PsiMetrics) {
+        self.psi_metrics = metrics;
+    }
+
+    /// Configure OpenBSD-style pledge promises for process PID
+    pub fn pledge_process(&mut self, pid: usize, promises: ProcessPledgePromises) -> Result<(), &'static str> {
+        let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
+        proc.pledge_promises = promises;
+        Ok(())
+    }
+
+    /// Add OpenBSD-style unveiled path restriction for process PID
+    pub fn unveil_path_process(&mut self, pid: usize, path: &str) -> Result<(), &'static str> {
+        let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
+        if !proc.unveiled_paths.contains(&path.to_string()) {
+            proc.unveiled_paths.push(path.to_string());
+        }
+        Ok(())
+    }
+
+    /// Set FreeBSD-style rctl resource limits for process PID
+    pub fn set_resource_limits(&mut self, pid: usize, limits: ProcessResourceLimits) -> Result<(), &'static str> {
+        let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
+        proc.resource_limits = limits;
+        Ok(())
+    }
+
+    /// Set Linux-style oom_score_adj (-1000 to +1000)
+    pub fn set_oom_score_adj(&mut self, pid: usize, score_adj: i32) -> Result<(), &'static str> {
+        let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
+        proc.oom_score_adj = score_adj.clamp(-1000, 1000);
+        Ok(())
+    }
+
+    /// Apply Application Performance Profile (Gaming boost / PowerSaver / Computational)
+    pub fn set_application_performance_profile(&mut self, pid: usize, profile: ApplicationPerformanceProfile) -> Result<(), &'static str> {
+        let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
+        proc.performance_profile = profile;
+        match profile {
+            ApplicationPerformanceProfile::Gaming => {
+                proc.priority = -10; // High priority scheduling
+                proc.power_throttling_enabled = false;
+                proc.oom_score_adj = -500; // Protection from OOM killer
+            }
+            ApplicationPerformanceProfile::PowerSaver => {
+                proc.priority = 10; // Low priority
+                proc.power_throttling_enabled = true;
+                proc.oom_score_adj = 200;
+            }
+            ApplicationPerformanceProfile::Computational => {
+                proc.priority = -5;
+                proc.power_throttling_enabled = false;
+            }
+            ApplicationPerformanceProfile::Standard => {
+                proc.priority = 0;
+            }
+        }
+        Ok(())
     }
 
     /// Register a newly spawned process for activity management
@@ -351,5 +492,61 @@ mod tests {
         assert_eq!(binding.binary_path, "/bin/shell");
         assert!(binding.is_wx_compliant);
         assert_eq!(binding.bound_libraries, vec!["libsigma.so"]);
+    }
+
+    #[test]
+    fn test_psi_pledge_unveil_rctl_and_performance_profiles() {
+        let mut am = ActivityManager::new();
+        am.register_process(401, 1, "game_engine", 0);
+
+        // 1. System PSI pressure update
+        let psi = PsiMetrics {
+            cpu_some_pct_10s: 1.5,
+            memory_some_pct_10s: 0.2,
+            memory_full_pct_10s: 0.0,
+            io_some_pct_10s: 0.8,
+            io_full_pct_10s: 0.1,
+        };
+        am.update_psi_metrics(psi);
+        assert_eq!(am.psi_metrics.cpu_some_pct_10s, 1.5);
+
+        // 2. OpenBSD Pledge and Unveil sandboxing
+        let pledge = ProcessPledgePromises {
+            stdio: true,
+            rpath: true,
+            wpath: true,
+            cpath: false,
+            inet: true,
+            unix: false,
+            exec: false,
+            proc: false,
+        };
+        am.pledge_process(401, pledge.clone()).unwrap();
+        am.unveil_path_process(401, "/usr/share/games").unwrap();
+
+        let proc = am.get_process_activity(401).unwrap();
+        assert_eq!(proc.pledge_promises, pledge);
+        assert_eq!(proc.unveiled_paths, vec!["/usr/share/games"]);
+
+        // 3. FreeBSD rctl limits & Linux oom_score_adj
+        let limits = ProcessResourceLimits {
+            max_threads: 128,
+            max_memory_bytes: 2048 * 1024 * 1024,
+            execution_time_limit_sec: 7200,
+            open_files_max: 2048,
+        };
+        am.set_resource_limits(401, limits).unwrap();
+        am.set_oom_score_adj(401, -300).unwrap();
+
+        let proc = am.get_process_activity(401).unwrap();
+        assert_eq!(proc.resource_limits, limits);
+        assert_eq!(proc.oom_score_adj, -300);
+
+        // 4. Performance Profile boost (Gaming profile)
+        am.set_application_performance_profile(401, ApplicationPerformanceProfile::Gaming).unwrap();
+        let proc = am.get_process_activity(401).unwrap();
+        assert_eq!(proc.performance_profile, ApplicationPerformanceProfile::Gaming);
+        assert_eq!(proc.priority, -10); // High priority boost
+        assert_eq!(proc.oom_score_adj, -500); // Strong OOM protection
     }
 }
