@@ -23,6 +23,7 @@ pub mod paging;
 pub mod zone;
 pub mod kswapd;
 pub mod cgroups;
+pub mod segmentation_paging;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
@@ -32,3 +33,8 @@ pub use paging::{
 pub use zone::{BsdZoneAllocator, Zone, ZoneStats, Slab};
 pub use kswapd::{LinuxKswapd, PageState};
 pub use cgroups::{MemCgroupManager, MemCgroup};
+pub use segmentation_paging::{
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
+    SpaceProtectionFlags, SystemControlRegisters,
+};
