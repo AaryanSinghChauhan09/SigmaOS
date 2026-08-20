@@ -26,14 +26,14 @@ pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
 
-pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-pub use debian_defeater::{SovereignMirrorSelector, SovereignTransactionManager, SovereignSandboxEnforcer, SovereignDeltaGenerator, TransactionStatus};
+pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
+pub use debian_defeater::{AptPinningResolver, SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus};
+pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use spec::{
-    AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
+    ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
-    NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
-    TxzPackageAdapter, XbpsPackageAdapter,
+    SimplePackage, SimplePackageManager,
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
@@ -52,10 +52,8 @@ pub use universal_oop_system::{
     IPackage, IPackageParser, PackageFormat, PackageMetadata,
     PackageParserFactory, UniversalPackageManager,
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError as OopParseError, InstallError, HookError,
+    UserDefinedHook, InstallError, HookError,
 };
-pub use crate::package::universal::{AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
-pub use universal_adapter::UniversalPackageManager as UniversalPackageAdapter;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -63,6 +61,12 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {
