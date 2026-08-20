@@ -8,7 +8,6 @@ pub mod wireless;
 pub mod zero_trust;
 pub mod legacy_net;
 pub mod revival;
-pub mod tcp_udp;
 pub mod bsd_pf;
 pub mod npf_firewall;
 pub mod virtual_switch;

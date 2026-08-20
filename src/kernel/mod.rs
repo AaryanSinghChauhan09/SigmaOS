@@ -27,20 +27,20 @@ pub use vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPage
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,
     InstructionCyclePhase as ArchInstructionCyclePhase, Irql, LookasideList, MemoryDescriptorList,
-    Pcb, PoolType, ProcessorInitState, Tcb, ThreadState,
+    Pcb, PoolType, ProcessorInitState, Tcb,
 };
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
+pub use memory::{BuddyAllocator, MemoryBlock, VirtualMemoryManager, PAGE_SIZE};
 pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel,
     ProtectionDomain, ResourceBroker,
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
-pub use scheduler::{Priority, Process, ProcessState};
+pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use structures::{
     AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
     CpuContext, EdfTask, IrqlLevel, IrqlState, LcgRandom, LotteryTask,

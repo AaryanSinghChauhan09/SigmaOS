@@ -2,9 +2,11 @@
 // Implements buddy allocator and paging
 
 extern crate alloc;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::BTreeMap as HashMap;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -53,7 +55,6 @@ impl KernelPoolManager {
             return Err("Cannot allocate 0-byte pool block");
         }
 
-        // Emulate allocating pool virtual address range
         let addr = match pool_type {
             PoolType::Paged => 0xD000_0000 + self.total_paged_bytes,
             PoolType::NonPaged => 0xF000_0000 + self.total_non_paged_bytes,
@@ -158,18 +159,6 @@ impl BuddyAllocator {
                 let block = MemoryBlock { addr, size };
                 self.free_lists[order].push(block);
             }
-            let block = MemoryBlock {
-                addr: NonNull::new(base_addr as *mut u8).unwrap(),
-                size,
-            };
-            self.free_lists[order].push(block);
-            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
-                self.free_lists[order].push(block);
-            }
         }
     }
 
@@ -206,7 +195,6 @@ impl BuddyAllocator {
     }
 
     pub fn allocate(&mut self, size: usize) -> Option<MemoryBlock> {
-        // Prevent integer overflow in size calculation
         if size == 0 || size > usize::MAX - PAGE_SIZE + 1 {
             return None;
         }
@@ -214,10 +202,8 @@ impl BuddyAllocator {
         let pages = size.div_ceil(PAGE_SIZE);
         let order = self.calculate_order(pages);
 
-        // Find smallest block that can satisfy request
         for current_order in order..12 {
             if let Some(block) = self.get_block(current_order) {
-                // Split block if necessary
                 if current_order > order {
                     let split_block = self.split_block(block, current_order - order)?;
                     return Some(split_block);
@@ -233,7 +219,6 @@ impl BuddyAllocator {
         let pages = block.size / PAGE_SIZE;
         let order = self.calculate_order(pages);
 
-        // Try to merge with buddy
         match self.try_merge(block, order) {
             Ok(merged_block) => self.deallocate(merged_block),
             Err(original_block) => self.free_lists[order].push(original_block),
@@ -241,9 +226,6 @@ impl BuddyAllocator {
     }
 
     fn calculate_order(&self, pages: usize) -> usize {
-        // Bolt Optimization: Replace O(n) linear search loop with O(1) branchless bitwise operations.
-        // On modern hardware, next_power_of_two() and trailing_zeros() map directly to specialized
-        // CPU instructions (e.g., LZCNT/TZCNT/BSR), enabling nanosecond-level execution speeds and supporting HW acceleration.
         if pages <= 1 {
             0
         } else {
@@ -283,22 +265,19 @@ impl BuddyAllocator {
 
     fn try_merge(&mut self, block: MemoryBlock, order: usize) -> Result<MemoryBlock, MemoryBlock> {
         if order >= 11 {
-            return Err(block); // Maximum order
+            return Err(block);
         }
 
         let block_addr = block.addr.as_ptr() as usize;
-        // Calculate buddy address by XORing with block size (standard buddy system)
         let buddy_addr = block_addr ^ block.size;
         let buddy_size = block.size * 2;
 
-        // Find buddy in free list
         if let Some(pos) = self.free_lists[order]
             .iter()
             .position(|b| b.addr.as_ptr() as usize == buddy_addr && b.size == block.size)
         {
             let _buddy = self.free_lists[order].remove(pos);
 
-            // Merge blocks
             let merged_addr = if block_addr < buddy_addr {
                 block_addr
             } else {
@@ -359,7 +338,6 @@ impl PageTableEntry {
     }
 
     pub fn set_addr(&mut self, addr: u64, flags: PageFlags) {
-        // Clear everything but flags, and mask the address to align with 4KB
         self.0 = (addr & 0x0000_00FF_FFFF_F000) | flags.0;
     }
 
@@ -404,8 +382,8 @@ impl PageTable {
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
     pub buddy_allocator: BuddyAllocator,
-    pub page_ref_counts: HashMap<u64, u32>, // physical frame addr -> reference count (for Copy-on-Write)
-    pub shadow_snapshots: HashMap<u64, String>, // virtual_addr -> snapshot copy (for snapshot isolation)
+    pub page_ref_counts: HashMap<u64, u32>,
+    pub shadow_snapshots: HashMap<u64, String>,
 }
 
 impl VirtualMemoryManager {
@@ -413,6 +391,8 @@ impl VirtualMemoryManager {
         Self {
             root_directory,
             buddy_allocator: BuddyAllocator::new(),
+            page_ref_counts: HashMap::new(),
+            shadow_snapshots: HashMap::new(),
         }
     }
 
@@ -420,30 +400,21 @@ impl VirtualMemoryManager {
         Self {
             root_directory,
             buddy_allocator: allocator,
-        }
-    }
-
-    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
-    pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
-        let size = num_pages * PAGE_SIZE;
-        self.buddy_allocator.allocate(size)
-    }
-
-    /// Free pages using buddy allocator (wires free_pages to VMM)
-    pub fn free_pages(&mut self, block: MemoryBlock) {
-        self.buddy_allocator.deallocate(block);
-        Self { root_directory }
-        Self {
-            root_directory,
             page_ref_counts: HashMap::new(),
             shadow_snapshots: HashMap::new(),
         }
     }
 
-    /// Translates a virtual address into a physical address
+    pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
+        let size = num_pages * PAGE_SIZE;
+        self.buddy_allocator.allocate(size)
+    }
+
+    pub fn free_pages(&mut self, block: MemoryBlock) {
+        self.buddy_allocator.deallocate(block);
+    }
+
     pub fn translate(&self, virtual_addr: u64) -> Option<u64> {
-        // Mock translation logic for SigmaOS OOP structure
-        // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_ref() };
 
@@ -455,7 +426,6 @@ impl VirtualMemoryManager {
         }
     }
 
-    /// Maps a virtual page to a physical frame
     pub fn map_page(
         &mut self,
         virtual_addr: u64,
@@ -474,7 +444,6 @@ impl VirtualMemoryManager {
         Ok(())
     }
 
-    /// Unmaps a virtual page
     pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
@@ -488,10 +457,6 @@ impl VirtualMemoryManager {
         Ok(())
     }
 }
-
-// =========================================================================
-// MEMORY DESCRIPTOR LIST (MDL) & ANCIENT ISA DMA BUFFER ABSTRACTIONS
-// =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryProtection {
@@ -536,12 +501,12 @@ impl MemoryDescriptorList {
     }
 }
 
-pub const ISA_DMA_MAX_PHYSICAL_ADDR: u64 = 16 * 1024 * 1024; // Strict 16MB physical boundary for ancient ISA DMA
+pub const ISA_DMA_MAX_PHYSICAL_ADDR: u64 = 16 * 1024 * 1024;
 
 pub struct FloppyDiskDmaBuffer {
     pub physical_addr: u64,
-    pub channel: u8, // ISA DMA Channel 2
-    pub buffer_length: usize, // Max 64KB
+    pub channel: u8,
+    pub buffer_length: usize,
 }
 
 impl FloppyDiskDmaBuffer {
@@ -562,7 +527,7 @@ impl FloppyDiskDmaBuffer {
 
 pub struct SoundBlaster16DmaBuffer {
     pub physical_addr: u64,
-    pub channel: u8, // ISA DMA Channel 5 (16-bit audio)
+    pub channel: u8,
     pub is_double_buffered: bool,
 }
 
@@ -617,34 +582,26 @@ mod tests {
     #[test]
     fn test_allocate_deallocate() {
         let mut allocator = BuddyAllocator::new();
-        // This would need actual memory to work properly
-        // For now, just test the interface
         let _result = allocator.allocate(4096);
-        // Will fail without actual memory, but tests the flow
     }
 
     #[test]
     fn test_checkpoint_and_state_recovery() {
         let mut allocator = BuddyAllocator::new();
-        allocator.initialize_memory(0x1000, 4096); // 1 page (order 0)
-        allocator.initialize_memory(0x3000, 8192); // 2 pages (order 1)
+        allocator.initialize_memory(0x1000, 4096);
+        allocator.initialize_memory(0x3000, 8192);
         assert_eq!(allocator.get_free_memory(), 12288);
 
-        // Checkpoint original state
         let checkpoint = allocator.create_checkpoint();
 
-        // Perform mock allocations which modify state
         let _block1 = allocator.allocate(4096).unwrap();
         let _block2 = allocator.allocate(8192).unwrap();
         assert_eq!(allocator.get_free_memory(), 0);
 
-        // Simulated crash/unwinding: Restore from checkpoint to recover state
         allocator.restore_checkpoint(checkpoint);
 
-        // State is perfectly restored
         assert_eq!(allocator.get_free_memory(), 12288);
 
-        // Verify we can allocate the same blocks again successfully
         let block_retry = allocator.allocate(4096).unwrap();
         assert_eq!(block_retry.size, 4096);
     }
@@ -653,32 +610,26 @@ mod tests {
     fn test_windows_nt_pool_allocator() {
         let mut pool_manager = KernelPoolManager::new();
 
-        // Allocate Paged Pool Block with Tag 'File'
         let paged_block = pool_manager.allocate_pool(PoolType::Paged, 1024, b"File").unwrap();
         assert_eq!(paged_block.size, 1024);
         assert_eq!(paged_block.pool_type, PoolType::Paged);
         assert_eq!(&paged_block.tag, b"File");
         assert_eq!(pool_manager.total_paged_bytes, 1024);
 
-        // Allocate NonPaged Pool Block with Tag 'Net '
         let non_paged_block = pool_manager.allocate_pool(PoolType::NonPaged, 2048, b"Net ").unwrap();
         assert_eq!(non_paged_block.size, 2048);
         assert_eq!(non_paged_block.pool_type, PoolType::NonPaged);
         assert_eq!(&non_paged_block.tag, b"Net ");
         assert_eq!(pool_manager.total_non_paged_bytes, 2048);
 
-        // Verify Address Separation
         assert!(paged_block.addr != non_paged_block.addr);
 
-        // Free Paged Pool Block
         assert!(pool_manager.free_pool(paged_block.addr).is_ok());
         assert_eq!(pool_manager.total_paged_bytes, 0);
 
-        // Free NonPaged Pool Block
         assert!(pool_manager.free_pool(non_paged_block.addr).is_ok());
         assert_eq!(pool_manager.total_non_paged_bytes, 0);
 
-        // Double Free (Should Fail)
         assert!(pool_manager.free_pool(paged_block.addr).is_err());
     }
 
@@ -692,7 +643,6 @@ mod tests {
         assert!(mdl.is_locked_pinned);
         assert_eq!(mdl.physical_page_offsets, vec![0x1000, 0x2000]);
 
-        // Attempting to lock twice fails
         assert!(mdl.lock_pages_and_pin(&phys_pages).is_err());
 
         mdl.unlock_pages();
@@ -702,21 +652,18 @@ mod tests {
 
     #[test]
     fn test_ancient_isa_dma_buffer_boundaries() {
-        // Floppy Disk ISA DMA test (<16MB and <=64KB)
         let floppy = FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 32 * 1024).unwrap();
         assert_eq!(floppy.channel, 2);
 
-        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(17 * 1024 * 1024, 1024).is_err()); // > 16MB
-        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 128 * 1024).is_err()); // > 64KB
+        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(17 * 1024 * 1024, 1024).is_err());
+        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 128 * 1024).is_err());
 
-        // Sound Blaster 16 ISA DMA test (<16MB)
         let sb16 = SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(0x00B0_0000).unwrap();
         assert_eq!(sb16.channel, 5);
         assert!(sb16.is_double_buffered);
 
-        assert!(SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(18 * 1024 * 1024).is_err()); // > 16MB
+        assert!(SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(18 * 1024 * 1024).is_err());
 
-        // NE2000 Shared RAM Ring Buffer test
         let ne2000 = Ne2000DmaBuffer::new(0x300, 16384);
         assert_eq!(ne2000.shared_ram_base, 0x300);
         assert_eq!(ne2000.ring_buffer_size, 16384);

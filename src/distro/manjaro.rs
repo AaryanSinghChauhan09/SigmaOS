@@ -17,12 +17,9 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Manjaro Distro Integration Module
-// Models advanced rolling-release, automatic hardware configuration,
-// kernel switching, and mirror-ranked transactional packaging.
 
 use std::collections::HashMap;
 
-/// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {
     pub name: String,
@@ -30,7 +27,6 @@ pub struct AurPackage {
     pub dependencies: Vec<String>,
 }
 
-/// A Flatpak sandboxed application representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FlatpakPackage {
     pub app_id: String,
@@ -38,16 +34,13 @@ pub struct FlatpakPackage {
     pub sandbox_permissions: Vec<String>,
 }
 
-/// A Snap sandboxed application representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SnapPackage {
     pub name: String,
-    pub channel: String,     // stable, beta, edge
-    pub confinement: String, // classic, strict
+    pub channel: String,
+    pub confinement: String,
 }
 
-
-/// Hardware GPU types detected on the system bus
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuType {
     IntelIntegrated,
@@ -56,7 +49,6 @@ pub enum GpuType {
     HybridIntelNvidia,
 }
 
-/// A driver module configuration managed by MHWD
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MhwdDriverConfig {
     pub name: String,
@@ -65,7 +57,6 @@ pub struct MhwdDriverConfig {
     pub hybrid_supported: bool,
 }
 
-/// Manjaro Hardware Detection (MHWD) - Auto-detects optimal open/proprietary drivers
 #[derive(Debug, Clone)]
 pub struct ManjaroHardwareDetection {
     pub detected_gpus: Vec<GpuType>,
@@ -73,7 +64,6 @@ pub struct ManjaroHardwareDetection {
 }
 
 impl ManjaroHardwareDetection {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             detected_gpus: Vec::new(),
@@ -85,7 +75,6 @@ impl ManjaroHardwareDetection {
         self.detected_gpus = gpus.to_vec();
     }
 
-    /// Auto-configures and installs optimal driver configurations
     pub fn auto_configure(&mut self) -> Result<usize, &'static str> {
         if self.detected_gpus.is_empty() {
             return Err("No compatible graphic processing units detected on PCI bus.");
@@ -142,7 +131,6 @@ impl Default for ManjaroHardwareDetection {
     }
 }
 
-/// Represents different available kernel releases to switch dynamically
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ManjaroKernelRelease {
     LinuxStable,
@@ -151,11 +139,98 @@ pub enum ManjaroKernelRelease {
     LinuxExperimental,
 }
 
-/// Manjaro-inspired: Dynamic Kernel Module Support (DKMS) auto-module rebuilder on host kernel swaps
+pub struct ManjaroKernelSwitcher {
+    pub active_release: ManjaroKernelRelease,
+    pub installed_releases: Vec<ManjaroKernelRelease>,
+}
+
+impl Default for ManjaroKernelSwitcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ManjaroKernelSwitcher {
+    pub fn new() -> Self {
+        Self {
+            active_release: ManjaroKernelRelease::LinuxLts,
+            installed_releases: vec![ManjaroKernelRelease::LinuxLts, ManjaroKernelRelease::LinuxStable],
+        }
+    }
+
+    pub fn switch_kernel(&mut self, release: ManjaroKernelRelease) -> Result<(), &'static str> {
+        if self.installed_releases.contains(&release) {
+            self.active_release = release;
+            Ok(())
+        } else {
+            Err("Kernel release not installed")
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PacmanMirror {
+    pub country: String,
+    pub url: String,
+    pub ping_ms: u32,
+}
+
+pub struct PamacPackageManager {
+    pub mirrors: Vec<PacmanMirror>,
+    pub installed_apps: Vec<String>,
+}
+
+impl Default for PamacPackageManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl PamacPackageManager {
+    pub fn new() -> Self {
+        Self {
+            mirrors: Vec::new(),
+            installed_apps: Vec::new(),
+        }
+    }
+
+    pub fn rank_mirrors(&mut self) {
+        self.mirrors.sort_by_key(|m| m.ping_ms);
+    }
+}
+
+pub struct ManjaroSettingsManager {
+    pub locale: String,
+    pub timezone: String,
+    pub kernel_switcher: ManjaroKernelSwitcher,
+}
+
+impl Default for ManjaroSettingsManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ManjaroSettingsManager {
+    pub fn new() -> Self {
+        Self {
+            locale: "en_US.UTF-8".to_string(),
+            timezone: "UTC".to_string(),
+            kernel_switcher: ManjaroKernelSwitcher::new(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct MhwdDkmsRebuilder {
     pub registered_modules: Vec<String>,
     pub compiled_modules_for_kernels: HashMap<String, Vec<String>>,
+}
+
+impl Default for MhwdDkmsRebuilder {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MhwdDkmsRebuilder {
@@ -172,7 +247,6 @@ impl MhwdDkmsRebuilder {
         }
     }
 
-    /// Rebuilds and recompiles registered modules dynamically for target kernel version
     pub fn trigger_rebuild(&mut self, kernel_version: &str) -> usize {
         let mut compiled = Vec::new();
         for module in &self.registered_modules {

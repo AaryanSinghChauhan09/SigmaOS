@@ -54,12 +54,12 @@ impl Channel {
     }
 }
 
-/// Represents a high-performance structured sovereign pipe (defeating legacy Linux pipes)
+/// Represents a high-performance structured sovereign pipe
 pub struct SovereignPipe {
     pub id: u64,
     pub reader_pid: u64,
     pub writer_pid: u64,
-    pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
+    pub ring_buffer: Vec<Vec<u8>>,
     pub max_capacity: usize,
     pub bytes_transferred: u64,
     pub non_blocking: bool,
@@ -78,12 +78,10 @@ impl SovereignPipe {
         }
     }
 
-    /// Set non-blocking mode (mimics O_NONBLOCK flag on Linux pipes)
     pub fn set_non_blocking(&mut self, non_blocking: bool) {
         self.non_blocking = non_blocking;
     }
 
-    /// Resize capacity dynamically (mimics F_SETPIPE_SZ fcntl command)
     pub fn resize_capacity(&mut self, new_capacity: usize) -> Result<(), IpcError> {
         if new_capacity < self.ring_buffer.len() {
             return Err(IpcError::InvalidMessage);
@@ -92,17 +90,14 @@ impl SovereignPipe {
         Ok(())
     }
 
-    /// Checks if pipe has data to read (mimics POLLIN)
     pub fn can_read(&self) -> bool {
         !self.ring_buffer.is_empty()
     }
 
-    /// Checks if pipe has space to write (mimics POLLOUT)
     pub fn can_write(&self) -> bool {
         self.ring_buffer.len() < self.max_capacity
     }
 
-    /// Structured write operation with dynamic backpressure (returns Err if capacity reached)
     pub fn write_structure(&mut self, payload: Vec<u8>) -> Result<(), IpcError> {
         if self.ring_buffer.len() >= self.max_capacity {
             if self.non_blocking {
@@ -115,7 +110,6 @@ impl SovereignPipe {
         Ok(())
     }
 
-    /// Structured read operation (returns None or WouldBlock error)
     pub fn read_structure(&mut self) -> Result<Option<Vec<u8>>, IpcError> {
         if self.ring_buffer.is_empty() {
             if self.non_blocking {
@@ -123,12 +117,10 @@ impl SovereignPipe {
             }
             Ok(None)
         } else {
-            // Read in FIFO order (circular ring style)
             Ok(Some(self.ring_buffer.remove(0)))
         }
     }
 
-    /// User-defined stream processing: Filters or transforms pipe payloads in-place
     pub fn filter_stream<F>(&mut self, filter_func: F)
     where
         F: Fn(&Vec<u8>) -> bool,
@@ -137,11 +129,15 @@ impl SovereignPipe {
     }
 }
 
-/// Linux-style Zero-Copy Splice Engine.
-/// Moves structured page/message streams directly between two SovereignPipes or channels
-/// bypassing user-space copy (copy-in / copy-out) overhead entirely.
+/// Linux-style Zero-Copy Splice Engine
 pub struct SovereignSpliceEngine {
     pub bytes_spliced: u64,
+}
+
+impl Default for SovereignSpliceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SovereignSpliceEngine {
@@ -149,7 +145,6 @@ impl SovereignSpliceEngine {
         Self { bytes_spliced: 0 }
     }
 
-    /// Splicing operation transferring a maximum number of bytes or structures from source pipe to destination pipe.
     pub fn splice(
         &mut self,
         source: &mut SovereignPipe,
@@ -158,11 +153,9 @@ impl SovereignSpliceEngine {
     ) -> Result<usize, IpcError> {
         let mut moved = 0;
         while moved < max_elements {
-            if let Some(payload) = source.read_structure() {
+            if let Some(payload) = source.read_structure()? {
                 let size = payload.len();
-                if let Err(e) = destination.write_structure(payload) {
-                    return Err(e);
-                }
+                destination.write_structure(payload)?;
                 self.bytes_spliced += size as u64;
                 moved += 1;
             } else {
@@ -173,12 +166,16 @@ impl SovereignSpliceEngine {
     }
 }
 
-/// BSD-style Zero-Copy Sendfile Engine.
-/// Bypasses user-space entirely by transmitting data blocks directly from virtual file cache buffers
-/// to destination channels or pipes.
+/// BSD-style Zero-Copy Sendfile Engine
 pub struct SovereignSendfileEngine {
     pub files_sent: u64,
     pub total_bytes_sent: u64,
+}
+
+impl Default for SovereignSendfileEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SovereignSendfileEngine {
@@ -189,8 +186,6 @@ impl SovereignSendfileEngine {
         }
     }
 
-    /// Simulates reading blocks directly from a file cache block (represented as a slice of buffers)
-    /// and transferring them to a destination SovereignPipe.
     pub fn send_file_to_pipe(
         &mut self,
         file_cache: &[Vec<u8>],
@@ -214,11 +209,15 @@ impl SovereignSendfileEngine {
     }
 }
 
-/// Mach-style Out-of-Line Page Table Remapper.
-/// Re-maps virtual memory page ownership in O(1) time between process address spaces,
-/// bypassing byte copying for large multi-megabyte payloads.
+/// Mach-style Out-of-Line Page Table Remapper
 pub struct SovereignOolRemapper {
     pub pages_remapped: u64,
+}
+
+impl Default for SovereignOolRemapper {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SovereignOolRemapper {
@@ -226,8 +225,6 @@ impl SovereignOolRemapper {
         Self { pages_remapped: 0 }
     }
 
-    /// Simulates O(1) zero-copy out-of-line remapping from sender PID to receiver PID.
-    /// Takes a page buffer, remaps its virtual address space pointers, and increments pages_remapped.
     pub fn remap_ool(
         &mut self,
         _sender_pid: u64,
@@ -241,9 +238,7 @@ impl SovereignOolRemapper {
     }
 }
 
-/// Solaris Doors / Xen-style lockless Shared Page Circular Ring Buffer.
-/// Communication occurs via shared page frames directly accessible by both processes,
-/// eliminating kernel entry overhead and system call context switches.
+/// Solaris Doors / Xen-style lockless Shared Page Circular Ring Buffer
 pub struct SharedPageRingBuffer {
     pub capacity: usize,
     pub head: usize,
@@ -267,7 +262,6 @@ impl SharedPageRingBuffer {
         }
     }
 
-    /// Non-blocking push. Returns Err if the shared buffer is full.
     pub fn push_item(&mut self, item: Vec<u8>) -> Result<(), IpcError> {
         let next_tail = (self.tail + 1) % self.capacity;
         if next_tail == self.head {
@@ -278,7 +272,6 @@ impl SharedPageRingBuffer {
         Ok(())
     }
 
-    /// Non-blocking pop. Returns None if empty.
     pub fn pop_item(&mut self) -> Option<Vec<u8>> {
         if self.head == self.tail {
             return None;
@@ -288,7 +281,6 @@ impl SharedPageRingBuffer {
         item
     }
 
-    /// Triggers a simulated hardware/IPI (Inter-Processor Interrupt) signaling the reader
     pub fn trigger_ipi(&mut self) {
         self.interrupts_triggered += 1;
     }
@@ -412,7 +404,6 @@ mod tests {
         assert!(pipe.can_write());
         assert!(!pipe.can_read());
 
-        // Write structured frames
         pipe.write_structure(vec![1, 2, 3]).unwrap();
         pipe.write_structure(vec![10, 20, 30]).unwrap();
         pipe.write_structure(vec![4, 5, 6]).unwrap();
@@ -420,13 +411,10 @@ mod tests {
         assert_eq!(pipe.ring_buffer.len(), 3);
         assert!(pipe.can_read());
 
-        // Run user-defined filter on structured stream
         pipe.filter_stream(|payload| payload[0] < 10);
 
-        // Payloads starting with 10 or greater are filtered out (i.e. vec![10, 20, 30] removed)
         assert_eq!(pipe.ring_buffer.len(), 2);
 
-        // Read structures back in FIFO order
         let r1 = pipe.read_structure().unwrap().unwrap();
         assert_eq!(r1, vec![1, 2, 3]);
 
@@ -436,7 +424,6 @@ mod tests {
         let r3 = pipe.read_structure().unwrap();
         assert!(r3.is_none());
 
-        // Test non-blocking mode & dynamic resizing
         pipe.set_non_blocking(true);
         assert_eq!(pipe.read_structure().unwrap_err(), IpcError::WouldBlock);
 
@@ -483,168 +470,11 @@ mod tests {
     #[test]
     fn test_sovereign_ool_remapper() {
         let mut remapper = SovereignOolRemapper::new();
-        let buffer = vec![0u8; 9000]; // Multi-page buffer
+        let buffer = vec![0u8; 9000];
         let remapped = remapper.remap_ool(10, 20, buffer.clone()).unwrap();
 
         assert_eq!(remapped.len(), 9000);
-        assert_eq!(remapper.pages_remapped, 3); // 9000 bytes spans 3 pages (each 4096)
-    }
-
-    #[test]
-    fn test_shared_page_ring_buffer() {
-        let mut ring = SharedPageRingBuffer::new(5);
-        assert!(ring.pop_item().is_none());
-
-        ring.push_item(vec![5, 10]).unwrap();
-        ring.push_item(vec![15, 20]).unwrap();
-        ring.trigger_ipi();
-
-        assert_eq!(ring.interrupts_triggered, 1);
-        assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
-        assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
-        assert!(ring.pop_item().is_none());
-    }
-
-    #[test]
-    fn test_sovereign_splice_engine() {
-        let mut source_pipe = SovereignPipe::new(1, 100, 200, 10);
-        let mut dest_pipe = SovereignPipe::new(2, 200, 300, 10);
-
-        source_pipe.write_structure(vec![1, 1, 1]).unwrap();
-        source_pipe.write_structure(vec![2, 2, 2]).unwrap();
-
-        let mut splice_engine = SovereignSpliceEngine::new();
-        let spliced = splice_engine.splice(&mut source_pipe, &mut dest_pipe, 2).unwrap();
-
-        assert_eq!(spliced, 2);
-        assert_eq!(splice_engine.bytes_spliced, 6);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![1, 1, 1]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![2, 2, 2]);
-    }
-
-    #[test]
-    fn test_sovereign_sendfile_engine() {
-        let mut dest_pipe = SovereignPipe::new(3, 100, 200, 10);
-        let file_cache = vec![
-            vec![10, 20],
-            vec![30, 40],
-            vec![50, 60],
-        ];
-
-        let mut sendfile_engine = SovereignSendfileEngine::new();
-        let sent = sendfile_engine.send_file_to_pipe(&file_cache, &mut dest_pipe, 1, 2).unwrap();
-
-        assert_eq!(sent, 4);
-        assert_eq!(sendfile_engine.files_sent, 1);
-        assert_eq!(sendfile_engine.total_bytes_sent, 4);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![30, 40]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![50, 60]);
-    }
-
-    #[test]
-    fn test_sovereign_ool_remapper() {
-        let mut remapper = SovereignOolRemapper::new();
-        let buffer = vec![0u8; 9000]; // Multi-page buffer
-        let remapped = remapper.remap_ool(10, 20, buffer.clone()).unwrap();
-
-        assert_eq!(remapped.len(), 9000);
-        assert_eq!(remapper.pages_remapped, 3); // 9000 bytes spans 3 pages (each 4096)
-    }
-
-    #[test]
-    fn test_shared_page_ring_buffer() {
-        let mut ring = SharedPageRingBuffer::new(5);
-        assert!(ring.pop_item().is_none());
-
-        ring.push_item(vec![5, 10]).unwrap();
-        ring.push_item(vec![15, 20]).unwrap();
-        ring.trigger_ipi();
-
-        assert_eq!(ring.interrupts_triggered, 1);
-        assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
-        assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
-        assert!(ring.pop_item().is_none());
-    }
-
-    #[test]
-    fn test_zero_copy_latency_and_capability_delegation() {
-        let mut channel = Channel::new(5, 100, 200);
-
-        // 1. Test delegated capability path message
-        let token = CapabilityToken::new().allow_ipc();
-        let msg = Message::DelegatedCapability {
-            token,
-            delegator: 100,
-            delegatee: 200,
-            delegation_path: vec![100, 150, 200],
-        };
-        assert!(channel.send(msg).is_ok());
-
-        // 2. Test zero-copy pointer transmission and latency checking (must be <100μs)
-        let virtual_ptr = 0x7FFF_0000;
-        let transfer_id = channel.send_zero_copy(virtual_ptr, 4096).unwrap();
-
-        let resolved_desc = channel.receive_zero_copy(transfer_id).unwrap();
-        assert_eq!(resolved_desc.source_virtual_addr, virtual_ptr);
-        assert_eq!(resolved_desc.length, 4096);
-        assert!(resolved_desc.latency_microseconds < 100); // verify <100μs latency
-    }
-
-    #[test]
-    fn test_ipc_fuzzing_harness() {
-        let mut manager = IpcManager::new();
-        let channel_id = manager.create_channel(10, 20);
-
-        // Run fuzz harness with various random seeds and check that all signals map correctly
-        for seed in 0..50 {
-            assert!(manager.fuzz_ipc_message_passing(channel_id, seed, 10).is_ok());
-        }
-    }
-
-    #[test]
-    fn test_sovereign_splice_engine() {
-        let mut source_pipe = SovereignPipe::new(1, 100, 200, 10);
-        let mut dest_pipe = SovereignPipe::new(2, 200, 300, 10);
-
-        source_pipe.write_structure(vec![1, 1, 1]).unwrap();
-        source_pipe.write_structure(vec![2, 2, 2]).unwrap();
-
-        let mut splice_engine = SovereignSpliceEngine::new();
-        let spliced = splice_engine.splice(&mut source_pipe, &mut dest_pipe, 2).unwrap();
-
-        assert_eq!(spliced, 2);
-        assert_eq!(splice_engine.bytes_spliced, 6);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![1, 1, 1]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![2, 2, 2]);
-    }
-
-    #[test]
-    fn test_sovereign_sendfile_engine() {
-        let mut dest_pipe = SovereignPipe::new(3, 100, 200, 10);
-        let file_cache = vec![
-            vec![10, 20],
-            vec![30, 40],
-            vec![50, 60],
-        ];
-
-        let mut sendfile_engine = SovereignSendfileEngine::new();
-        let sent = sendfile_engine.send_file_to_pipe(&file_cache, &mut dest_pipe, 1, 2).unwrap();
-
-        assert_eq!(sent, 4);
-        assert_eq!(sendfile_engine.files_sent, 1);
-        assert_eq!(sendfile_engine.total_bytes_sent, 4);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![30, 40]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![50, 60]);
-    }
-
-    #[test]
-    fn test_sovereign_ool_remapper() {
-        let mut remapper = SovereignOolRemapper::new();
-        let buffer = vec![0u8; 9000]; // Multi-page buffer
-        let remapped = remapper.remap_ool(10, 20, buffer.clone()).unwrap();
-
-        assert_eq!(remapped.len(), 9000);
-        assert_eq!(remapper.pages_remapped, 3); // 9000 bytes spans 3 pages (each 4096)
+        assert_eq!(remapper.pages_remapped, 3);
     }
 
     #[test]

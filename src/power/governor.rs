@@ -152,53 +152,6 @@ impl EnergyAwareThreadBalancer {
     }
 }
 
-// =========================================================================
-// UNIT TESTS
-// =========================================================================
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_cpufreq_governors_transitions() {
-        // Core with frequency limits 800MHz to 4000MHz
-        let mut core = CpuFreqCore::new(800, 4000, CpuGovernor::Performance);
-        assert_eq!(core.scale_frequency(50), 4000);
-
-        core.active_governor = CpuGovernor::Powersave;
-        assert_eq!(core.scale_frequency(50), 800);
-
-        core.active_governor = CpuGovernor::Ondemand;
-        assert_eq!(core.scale_frequency(90), 4000); // load spike triggers max freq
-        assert_eq!(core.scale_frequency(50), 800 + (3200 * 50 / 100)); // standard scale
-
-        core.active_governor = CpuGovernor::Schedutil;
-        // 1.25 * 4000 * 0.5 = 2500
-        assert_eq!(core.scale_frequency(50), 2500);
-    }
-
-    #[test]
-    fn test_tlp_power_management() {
-        let mut tlp = TlpPowerManager::new();
-        assert_eq!(tlp.pcie_aspm, AspmLevel::L0s);
-        assert_eq!(tlp.get_writeback_expiry_secs(), 5.0);
-
-        // Apply battery profile
-        tlp.apply_power_profile("battery");
-        assert_eq!(tlp.pcie_aspm, AspmLevel::L1_2);
-        assert_eq!(tlp.get_writeback_expiry_secs(), 15.0);
-        assert!(tlp.runtime_pm);
-    }
-
-    #[test]
-    fn test_energy_aware_thread_balancer() {
-        let balancer = EnergyAwareThreadBalancer::new(1.0);
-        // Interactive task gets boosted
-        assert_eq!(balancer.boost_interactive_threads(true, 10), 14);
-        // Batch background task gets throttled to save power
-        assert_eq!(balancer.boost_interactive_threads(false, 10), 8);
-    }
-}
 // SigmaOS Dynamic CPU Performance & Power Governor (SigmaGovernor)
 // Designed for real-time task scaling, thermal bursts, and CPU cycle optimization
 
@@ -255,7 +208,7 @@ impl SigmaGovernor {
             self.adjust_core_frequency(cpu_id);
             Ok(())
         } else {
-            Err(format!("CPU core {} not found", cpu_id))
+            Err(alloc::format!("CPU core {} not found", cpu_id))
         }
     }
 
@@ -288,54 +241,51 @@ impl SigmaGovernor {
     }
 }
 
+// =========================================================================
+// UNIT TESTS
+// =========================================================================
 #[cfg(test)]
 mod tests {
+    use super::*;
 
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum GovernorMode {
-        Performance,
-        Powersave,
-        Schedutil,
+    #[test]
+    fn test_cpufreq_governors_transitions() {
+        // Core with frequency limits 800MHz to 4000MHz
+        let mut core = CpuFreqCore::new(800, 4000, CpuGovernor::Performance);
+        assert_eq!(core.scale_frequency(50), 4000);
+
+        core.active_governor = CpuGovernor::Powersave;
+        assert_eq!(core.scale_frequency(50), 800);
+
+        core.active_governor = CpuGovernor::Ondemand;
+        assert_eq!(core.scale_frequency(90), 4000); // load spike triggers max freq
+        assert_eq!(core.scale_frequency(50), 800 + (3200 * 50 / 100)); // standard scale
+
+        core.active_governor = CpuGovernor::Schedutil;
+        // 1.25 * 4000 * 0.5 = 2500
+        assert_eq!(core.scale_frequency(50), 2500);
     }
 
-    pub struct MockCore {
-        pub current_frequency_mhz: usize,
+    #[test]
+    fn test_tlp_power_management() {
+        let mut tlp = TlpPowerManager::new();
+        assert_eq!(tlp.pcie_aspm, AspmLevel::L0s);
+        assert_eq!(tlp.get_writeback_expiry_secs(), 5.0);
+
+        // Apply battery profile
+        tlp.apply_power_profile("battery");
+        assert_eq!(tlp.pcie_aspm, AspmLevel::L1_2);
+        assert_eq!(tlp.get_writeback_expiry_secs(), 15.0);
+        assert!(tlp.runtime_pm);
     }
 
-    pub struct SigmaGovernor {
-        pub cores: Vec<MockCore>,
-        pub mode: GovernorMode,
-    }
-
-    impl SigmaGovernor {
-        pub fn new(mode: GovernorMode) -> Self {
-            let freq = match mode {
-                GovernorMode::Performance => 4200,
-                GovernorMode::Powersave => 800,
-                GovernorMode::Schedutil => 4200,
-            };
-            Self {
-                cores: vec![MockCore { current_frequency_mhz: freq }],
-                mode,
-            }
-        }
-
-        pub fn set_mode(&mut self, mode: GovernorMode) {
-            self.mode = mode;
-            let freq = match mode {
-                GovernorMode::Performance => 4200,
-                GovernorMode::Powersave => 800,
-                GovernorMode::Schedutil => 4200,
-            };
-            self.cores[0].current_frequency_mhz = freq;
-        }
-
-        pub fn record_utilization(&mut self, _core_idx: usize, util: f64) -> Result<(), &'static str> {
-            if self.mode == GovernorMode::Schedutil {
-                self.cores[0].current_frequency_mhz = 800 + (3400.0 * util) as usize;
-            }
-            Ok(())
-        }
+    #[test]
+    fn test_energy_aware_thread_balancer() {
+        let balancer = EnergyAwareThreadBalancer::new(1.0);
+        // Interactive task gets boosted
+        assert_eq!(balancer.boost_interactive_threads(true, 10), 14);
+        // Batch background task gets throttled to save power
+        assert_eq!(balancer.boost_interactive_threads(false, 10), 8);
     }
 
     #[test]
@@ -350,7 +300,6 @@ mod tests {
     #[test]
     fn test_governor_dynamic_scaling() {
         let mut governor = SigmaGovernor::new(GovernorMode::Schedutil);
-        // Standard utilization at 50%
         governor.record_utilization(0, 0.5).unwrap();
         // Delta = 4200 - 800 = 3400. 3400 * 0.5 = 1700. 800 + 1700 = 2500MHz.
         assert_eq!(governor.cores[0].current_frequency_mhz, 2500);

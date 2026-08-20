@@ -1,19 +1,18 @@
-use crate::filesystem::vfs::FileType;
-// SigmaOS Distro Compatibility Layer
 /// Tiny Core Linux Compatibility & Philosophy Absorption for SigmaOS
 /// Implements frugal booting, RAM-only execution isolation, .tcz read-only extension loop mounting,
 /// boot code parsing (base, norestore, etc.), and filetool-style (mydata.tgz) user backup/restore.
 
 extern crate alloc;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use crate::filesystem::FileType;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TinyCoreBootConfig {
-    pub is_base_only: bool, // Skip loading any application extensions (the "base" boot code)
-    pub is_no_restore: bool, // Skip loading user backup (the "norestore" boot code)
-    pub local_path: Option<String>, // Path for persistent extensions (e.g., "local=sda1")
-    pub home_path: Option<String>, // Path for persistent home (e.g., "home=sda1")
+    pub is_base_only: bool,
+    pub is_no_restore: bool,
+    pub local_path: Option<String>,
+    pub home_path: Option<String>,
 }
 
 impl TinyCoreBootConfig {
@@ -48,7 +47,7 @@ impl TinyCoreBootConfig {
 pub struct TczExtension {
     pub name: String,
     pub dependencies: Vec<String>,
-    pub files: Vec<(String, String)>, // (Relative filepath inside extension, content)
+    pub files: Vec<(String, String)>,
     pub is_mounted: bool,
 }
 
@@ -89,13 +88,11 @@ impl TceLoader {
         self.extensions.push(ext);
     }
 
-    /// Recursively mounts a .tcz extension and its dependencies onto the virtual filesystem
     pub fn mount_extension(
         &mut self,
         name: &str,
         vfs: &mut crate::filesystem::vfs::VirtualFilesystem,
     ) -> Result<(), &'static str> {
-        // Find extension
         let mut ext_idx = None;
         for i in 0..self.extensions.len() {
             if self.extensions[i].name == name {
@@ -107,16 +104,14 @@ impl TceLoader {
         let idx = ext_idx.ok_or("Extension not found in repository")?;
 
         if self.extensions[idx].is_mounted {
-            return Ok(()); // Already mounted
+            return Ok(());
         }
 
-        // Mount dependencies first
         let deps = self.extensions[idx].dependencies.clone();
         for dep in &deps {
             self.mount_extension(dep, vfs)?;
         }
 
-        // Mount the files into VFS (frugal loop mount simulation)
         let files = self.extensions[idx].files.clone();
         for (_path, content) in &files {
             let file_id = vfs
@@ -144,8 +139,8 @@ impl Default for TceLoader {
 
 /// Simulation of filetool.sh and mydata.tgz backup/restore systems
 pub struct FiletoolOverlay {
-    pub backup_paths: Vec<String>, // Paths to back up (e.g. "/home", "/opt")
-    pub ram_changes: Vec<(String, String)>, // Modified files in RAM overlay
+    pub backup_paths: Vec<String>,
+    pub ram_changes: Vec<(String, String)>,
 }
 
 impl FiletoolOverlay {
@@ -161,7 +156,6 @@ impl FiletoolOverlay {
     }
 
     pub fn write_ram_file(&mut self, path: &str, content: &str) {
-        // Check if path matches any backup_paths
         let mut is_backed_up = false;
         for b_path in &self.backup_paths {
             if path.starts_with(b_path) {
@@ -171,7 +165,6 @@ impl FiletoolOverlay {
         }
 
         if is_backed_up {
-            // Overwrite if exists, otherwise push
             for change in &mut self.ram_changes {
                 if change.0 == path {
                     change.1 = content.to_string();
@@ -183,10 +176,8 @@ impl FiletoolOverlay {
         }
     }
 
-    /// Simulates packaging specified folders into a compressed backup mydata.tgz
     pub fn package_mydata(&self) -> Vec<u8> {
         let mut compressed_archive = Vec::new();
-        // Pack files in mydata.tgz format
         for (path, content) in &self.ram_changes {
             compressed_archive.push(b'[');
             for &b in path.as_bytes() {
@@ -201,7 +192,6 @@ impl FiletoolOverlay {
         compressed_archive
     }
 
-    /// Simulates restoring user configurations from mydata.tgz into live RAM
     pub fn restore_mydata(&mut self, archive: &[u8]) {
         self.ram_changes = Vec::new();
         let mut i = 0;
@@ -214,7 +204,7 @@ impl FiletoolOverlay {
                 }
                 let path = String::from_utf8_lossy(&archive[start_path..i]).to_string();
 
-                i += 1; // Skip ':'
+                i += 1;
                 let start_content = i;
                 while i < archive.len() && archive[i] != b']' {
                     i += 1;
@@ -233,7 +223,6 @@ impl Default for FiletoolOverlay {
     }
 }
 
-/// The ultimate Frugal Loader executing the complete Tiny Core RAM-only execution cycle
 pub struct FrugalLoader {
     pub ram_size: usize,
     pub config: TinyCoreBootConfig,
@@ -251,16 +240,13 @@ impl FrugalLoader {
         }
     }
 
-    /// Runs the Frugal Boot configuration, setting up RAM loop mounting and configuration restores
     pub fn execute_boot_sequence(
         &mut self,
         vfs: &mut crate::filesystem::vfs::VirtualFilesystem,
         mydata_archive: &[u8],
     ) -> Result<(), &'static str> {
-        // 1. Check if restore is permitted
         if !self.config.is_no_restore && !mydata_archive.is_empty() {
             self.filetool.restore_mydata(mydata_archive);
-            // Write restored changes back to VFS
             for (_path, content) in &self.filetool.ram_changes {
                 let file_id = vfs
                     .create_file(FileType::Regular, 0)
@@ -275,9 +261,7 @@ impl FrugalLoader {
             }
         }
 
-        // 2. Check if we should mount extensions
         if !self.config.is_base_only {
-            // Find extensions in local or standard storage repository and mount them
             let available_tcz = self.tce_loader.extensions.clone();
             for ext in &available_tcz {
                 self.tce_loader.mount_extension(&ext.name, vfs)?;
@@ -306,7 +290,6 @@ mod tests {
         let mut vfs = crate::filesystem::vfs::VirtualFilesystem::new();
         let mut loader = TceLoader::new();
 
-        // Register flwm.tcz (depends on fltk.tcz)
         let fltk = TczExtension::new("fltk.tcz").with_file("/usr/lib/libfltk.so", "fltk_binary");
         let flwm = TczExtension::new("flwm.tcz")
             .with_dependency("fltk.tcz")
@@ -315,10 +298,8 @@ mod tests {
         loader.register_extension(fltk);
         loader.register_extension(flwm);
 
-        // Mount flwm.tcz
         assert!(loader.mount_extension("flwm.tcz", &mut vfs).is_ok());
 
-        // Verify flwm and its dependency fltk are both marked as mounted
         assert!(
             loader
                 .extensions
@@ -343,17 +324,14 @@ mod tests {
         filetool.add_backup_path("/home/tc");
         filetool.add_backup_path("/opt");
 
-        // Write files to RAM
         filetool.write_ram_file("/home/tc/.profile", "alias ls='ls -color'");
         filetool.write_ram_file("/opt/bootlocal.sh", "echo boot");
-        filetool.write_ram_file("/var/log/messages", "system log"); // Not backed up because path not registered
+        filetool.write_ram_file("/var/log/messages", "system log");
 
         assert_eq!(filetool.ram_changes.len(), 2);
 
-        // Package backup into mydata.tgz simulation
         let archive = filetool.package_mydata();
 
-        // Restore backup in fresh RAM system
         let mut restored_filetool = FiletoolOverlay::new();
         restored_filetool.restore_mydata(archive.as_slice());
 
@@ -374,22 +352,18 @@ mod tests {
         let mut vfs = crate::filesystem::vfs::VirtualFilesystem::new();
         let mut loader = FrugalLoader::new(1024, "home=sda1");
 
-        // Create a backup archive
         let mut backup_overlay = FiletoolOverlay::new();
         backup_overlay.add_backup_path("/home/tc");
         backup_overlay.write_ram_file("/home/tc/.ashrc", "export PS1='tc@core: '");
         let archive = backup_overlay.package_mydata();
 
-        // Setup extensions
         let flwm = TczExtension::new("flwm.tcz").with_file("/usr/bin/flwm", "gui");
         loader.tce_loader.register_extension(flwm);
 
-        // Boot system with backup and extensions
         assert!(loader
             .execute_boot_sequence(&mut vfs, archive.as_slice())
             .is_ok());
 
-        // Verify extension is mounted and config is restored
         assert!(loader.tce_loader.extensions[0].is_mounted);
     }
 }

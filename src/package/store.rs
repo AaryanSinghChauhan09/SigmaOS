@@ -15,14 +15,14 @@ pub struct SoftwareRegistryEntry {
     pub update_available: bool,
 }
 
-pub struct SigmaSoftwareStore {
+pub struct HardwareStore {
     pub registry: RefCell<[Option<SoftwareRegistryEntry>; MAX_STORE_ENTRIES]>,
     pub auto_updates_enabled: AtomicBool,
 }
 
-unsafe impl Sync for SigmaSoftwareStore {}
+unsafe impl Sync for HardwareStore {}
 
-impl SigmaSoftwareStore {
+impl HardwareStore {
     pub const fn new() -> Self {
         const EMPTY_ENTRY: Option<SoftwareRegistryEntry> = None;
         Self {
@@ -63,20 +63,6 @@ impl SigmaSoftwareStore {
                     }
                     return Ok(());
                 }
-    pub fn check_for_updates(&mut self) -> usize {
-        self.pending_updates.clear();
-        for (name, app) in &self.catalog {
-            if app.is_installed && app.version != "1.5.0" {
-                // Assume latest stable is 1.5.0
-                self.pending_updates.push(name.clone());
-    pub fn check_for_updates(&mut self) -> usize {
-        self.pending_updates.clear();
-        for (name, app) in &self.catalog {
-            let name: &String = name;
-            let app: &StoreApp = app;
-            if app.is_installed && app.version != "1.5.0" {
-                // Assume latest stable is 1.5.0
-                self.pending_updates.push(name.clone());
             }
         }
         Err("ENOENT: Package not registered in the Software Store.")
@@ -108,11 +94,14 @@ impl SigmaSoftwareStore {
     }
 }
 
-pub static GLOBAL_SOFTWARE_STORE: SigmaSoftwareStore = SigmaSoftwareStore::new();
+pub static GLOBAL_SOFTWARE_STORE: HardwareStore = HardwareStore::new();
+
 // SigmaOS Polish-Parity Software Store & Update Manager (SigmaStore)
 // Designed for software installation, package upgrades, and security auditing
 
-use crate::klib::HashMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::collections::BTreeMap as HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StoreError {
@@ -177,15 +166,17 @@ impl SigmaSoftwareStore {
     pub fn check_for_updates(&mut self) -> usize {
         self.pending_updates.clear();
         for (name, app) in &self.catalog {
-            let name: &String = name;
-            let app: &StoreApp = app;
             if app.is_installed && app.version != "1.5.0" {
-                // Assume latest stable is 1.5.0
-                let name_str: String = name.clone();
-                self.pending_updates.push(name_str);
+                self.pending_updates.push(name.clone());
             }
         }
         self.pending_updates.len()
+    }
+}
+
+impl Default for SigmaSoftwareStore {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

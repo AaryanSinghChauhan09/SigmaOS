@@ -1,7 +1,11 @@
 // SigmaOS Timeshift-Parity Recovery & Snapshot Shard
-// Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Permitting instant system-wide rollbacks of the root file system hierarchy if user updates damage any system file.
 
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 pub const MAX_SNAPSHOT_ENTRIES: usize = 4;
@@ -11,18 +15,18 @@ pub struct FsSnapshot {
     pub id: usize,
     pub timestamp: u64,
     pub active: bool,
-    pub root_hash: u32, // FNV-1a checksum of the root FHS directory entries
+    pub root_hash: u32,
 }
 
-pub struct SigmaTimeshift {
+pub struct HardwareTimeshift {
     pub snapshots: core::cell::RefCell<[Option<FsSnapshot>; MAX_SNAPSHOT_ENTRIES]>,
     pub backup_active: AtomicBool,
     pub next_id: AtomicUsize,
 }
 
-unsafe impl Sync for SigmaTimeshift {}
+unsafe impl Sync for HardwareTimeshift {}
 
-impl SigmaTimeshift {
+impl HardwareTimeshift {
     pub const fn new() -> Self {
         const EMPTY_SNAPSHOT: Option<FsSnapshot> = None;
         Self {
@@ -32,7 +36,6 @@ impl SigmaTimeshift {
         }
     }
 
-    /// Captures a virtual block-level snapshot of the current file system hierarchy (Linux Mint Timeshift parity)
     pub fn create_snapshot(
         &self,
         timestamp: u64,
@@ -54,24 +57,14 @@ impl SigmaTimeshift {
         let idx = (id - 1) % MAX_SNAPSHOT_ENTRIES;
         list[idx] = Some(snapshot);
 
-        println!(
-            "Timeshift: Created system snapshot ID {} at timestamp {}. Root hash context: {:#08X}",
-            id, timestamp, current_fhs_hash
-        );
         Ok(id)
     }
 
-    /// Restores the entire root system hierarchy state back to a previous snapshot
     pub fn rollback_to_snapshot(&self, snapshot_id: usize) -> Result<u32, &'static str> {
         let list = self.snapshots.borrow();
         for slot in list.iter() {
             if let Some(ref snapshot) = slot {
                 if snapshot.id == snapshot_id {
-                    println!(
-                        "Timeshift: Initiating system-wide rollback to snapshot ID {} (Captured: {})...",
-                        snapshot_id, snapshot.timestamp
-                    );
-                    println!("Timeshift: Successfully restored root FHS boundaries. Restoring root hash context...");
                     return Ok(snapshot.root_hash);
                 }
             }
@@ -80,12 +73,7 @@ impl SigmaTimeshift {
     }
 }
 
-pub static GLOBAL_TIMESHIFT: SigmaTimeshift = SigmaTimeshift::new();
-// SigmaOS Polish-Parity System Backup (SigmaTimeshift)
-// Designed for automated, transaction-safe snapshots and system recovery
-
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+pub static GLOBAL_TIMESHIFT: HardwareTimeshift = HardwareTimeshift::new();
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BackupError {
@@ -118,10 +106,9 @@ impl SigmaTimeshift {
     }
 
     pub fn create_snapshot(&mut self, label: String, system_files: BTreeMap<String, String>) -> Result<String, BackupError> {
-        // Simple timestamp counter (in real implementation, use hardware timer)
-        let timestamp = 0u64; // Placeholder for actual timer
+        let timestamp = 0u64;
 
-        let id = alloc::format!("timeshift-snap-{}", timestamp);
+        let id = format!("timeshift-snap-{}", timestamp);
         let snapshot = BackupSnapshot {
             id: id.clone(),
             timestamp,
@@ -148,6 +135,12 @@ impl SigmaTimeshift {
         } else {
             Err(BackupError::NoBackupFound)
         }
+    }
+}
+
+impl Default for SigmaTimeshift {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
