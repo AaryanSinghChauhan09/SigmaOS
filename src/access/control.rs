@@ -954,4 +954,18 @@ mod tests {
         // Other user 2000 requests Read (4) -> Denied by Other (0o0)
         assert!(!acl.evaluate_acl_access(2000, 2000, dac_flags::READ, 1000, 1000));
     }
+
+    #[test]
+    fn test_access_control_matrix() {
+        let mut matrix = AccessControlMatrix::new();
+        matrix.set_matrix_entry(1000, 42, dac_flags::READ | dac_flags::WRITE);
+        matrix.assign_domain_category(1000, AccessDomainCategory::StorageDriver);
+        matrix.grant_capability(1000, FileCapabilityMask::full());
+
+        assert!(matrix.check_matrix_access(1000, 42, dac_flags::READ));
+        assert!(matrix.check_matrix_access(1000, 42, dac_flags::WRITE));
+        assert!(!matrix.check_matrix_access(1000, 42, dac_flags::EXECUTE));
+        assert_eq!(*matrix.domain_categories.get(&1000).unwrap(), AccessDomainCategory::StorageDriver);
+        assert!(matrix.capabilities.get(&1000).unwrap().cap_sys_admin);
+    }
 }
