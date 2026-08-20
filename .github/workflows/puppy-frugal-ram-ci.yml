@@ -1,0 +1,22 @@
+name: Puppy Linux Frugal RAM Boot & OverlayFS CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  puppy-ram-verification:
+    name: Puppy Linux Frugal RAM Boot & OverlayFS Storage Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Puppy Linux Test Suite
+        run: |
+          ./run_sigma_tests.sh

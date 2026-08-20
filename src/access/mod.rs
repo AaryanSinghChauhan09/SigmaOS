@@ -7,6 +7,13 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 
+pub mod control;
+
+pub use control::{
+    AclEntry, AclTag, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl,
+    Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask,
+};
+
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};

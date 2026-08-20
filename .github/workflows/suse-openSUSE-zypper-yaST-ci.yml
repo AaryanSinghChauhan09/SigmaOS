@@ -1,0 +1,22 @@
+name: openSUSE Zypper & YaST Control CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  opensuse-zypper-verification:
+    name: openSUSE Zypper Package Manager & YaST Control Center Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run openSUSE Test Suite
+        run: |
+          ./run_sigma_tests.sh

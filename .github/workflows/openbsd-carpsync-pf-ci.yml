@@ -1,0 +1,22 @@
+name: OpenBSD CARP Failover & PF Firewall Sync CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  openbsd-pf-verification:
+    name: OpenBSD CARP Redundancy Protocol & PF Firewall State Sync Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run OpenBSD PF State Test
+        run: |
+          ./run_sigma_tests.sh

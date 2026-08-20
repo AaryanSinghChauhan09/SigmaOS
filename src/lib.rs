@@ -7,6 +7,7 @@ extern crate alloc;
 pub mod ai;
 pub mod accessibility;
 pub mod automation;
+pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
@@ -15,6 +16,7 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
+pub mod ipc;
 pub mod kernel;
 pub mod memory;
 pub mod klib;
@@ -27,7 +29,9 @@ pub mod plugin;
 pub mod productivity;
 pub mod resilience;
 pub mod resource;
+pub mod scheduler;
 pub mod security;
+pub mod system;
 pub mod shell;
 pub mod sigpkg;
 pub mod tools;
@@ -35,10 +39,11 @@ pub mod virtualization;
 
 pub use access::{
     AccessError, AccessManager, AccessMode, AccessPattern, AccessResult, AccessRule,
-    AccessTimeTracker, AnonymousAccessPolicy, DeviceAccessType, LdapAccessClient,
-    LdapUserEntry, ProcessMigrationControl, ProtectionLevel, RemoteAccessController,
-    RemoteAccessProtocol, RemoteAccessSession, RemoteFileHandle, SecurityAccessToken,
-    WirelessAccessPoint, WirelessAccessPointManager,
+    AccessTimeTracker, AnonymousAccessPolicy, CpuPrivilegeEnforcer, DeviceAccessType,
+    ExecutionRingMode, FileAttributeAccessControl, LdapAccessClient, LdapUserEntry,
+    ProcessMigrationControl, ProtectionLevel, RemoteAccessController, RemoteAccessProtocol,
+    RemoteAccessSession, RemoteFileHandle, SecurityAccessToken, WirelessAccessPoint,
+    WirelessAccessPointManager, file_attribute_flags,
 };
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -92,8 +97,15 @@ pub use drivers::{
     DrmAtomicPlaneState, WaylandDmaBuf, OpenBsdWsdisplayVt,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
+    Blake3BlockDeduplicationEngine, FileDescriptor, FilePermissions, FileType, FsError, Inode,
+    JournalState, LegacyLinuxRule, LinuxPersonaRule, PfsType, PseudoFilesystemNamespace,
+    RaidLevel, SigmaFS, SigmaFhsAuditor, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsRouter,
+    SigmaFsCow, SigmaFsCrypt, SigmaFsJournal, SigmaFsRaid, SigmaFsVirtio, SigmaFsVolume,
     SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
+};
+pub use ipc::{
+    AlpcFacility, AlpcFacilityServer, AlpcManager, AlpcMessage, AlpcMessageHeader, AlpcPort,
+    AlpcPortType, AlpcSectionHandle, alpc_flags,
 };
 pub use graphics::paint::ColorRgba;
 pub use logging::{
@@ -155,7 +167,8 @@ pub use security::{
     DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
     IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
     PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
-    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    SwapSpaceManager, ThreadSubPledgeContext, TmuxMultiplexer, TmuxPane, UnveilManager,
+    UnveilPermission, UnveilRestriction, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
     BinaryProtectionManager, RelroMode, AslrMap, ChecksecReport,
 };
@@ -177,5 +190,30 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 pub use memory::{
-    BsdZoneAllocator, LinuxKswapd, MemCgroupManager, SimpleVMM, Zone, MemCgroup, PageState,
+    AddressBindingMode, BitmapPhysicalMemoryManager, BsdZoneAllocator, BuddyAllocatorEngine,
+    CopyOnWriteForkEngine, CpuPrivilegeMode as MemoryCpuPrivilegeMode, FastSyscallDispatcher,
+    GlobalDescriptorTable, LinuxKswapd, LocalDescriptorTable, MemCgroup, MemCgroupManager,
+    MinimalPosixSyscallMatrix, MultiLevelPagingEngine, PML4_SELF_REF_SLOT, PageDirectoryEntry,
+    PageState, PageTableEntryFlags, PageTableEntryHardware, PagingMode, PrivilegeRing,
+    ProtectionLevel as MemoryProtectionLevel, ProtectionViolationType,
+    RandomizedAddressSpace, RecursivePageTableEngine, SegmentDescriptor, SegmentSelector,
+    SegmentType, SegmentedAddress, SelfReferentialPagingEngine, SimpleVMM, SlabCache,
+    SlabObjectType, SyscallTableRouter, SyscallTrapFrame, TrapRegisterFrame,
+    TwoTierMemoryAllocator, Zone, posix_syscall_nr, x86_msrs,
 };
+pub use process::{
+    ActivityState, ProcessActivityManager, ProcessActivityRecord, RegisterSnapshot,
+    ResourceUsageMetrics, ThreadActivityRecord,
+};
+pub use community::{
+    CommunityHandbookCatalog, HandbookArticle, HybridFirewallTemplate,
+    HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, ReproducibleRecipe,
+    SecurityProfileTemplateStore, SharedSecurityProfile, VirtualizationBlueprint,
+    VirtualizationBlueprintStore,
+};
+pub use dashboard::{
+    BreachSeverity, DisputeAuditCheckpoint, DisputeAuditRollbackEngine, PenaltyBreachAlert,
+    PenaltyBreachNotifier, StatutoryAuthority, StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
+pub use scheduler::{TaskState as SystemTaskState, TaskWorkloadType};
+pub use system::{Group as SystemGroup, ShadowEntry, SudoPolicyEngine, SudoersRule, User as SystemUser, UserManager as SystemUserManager};

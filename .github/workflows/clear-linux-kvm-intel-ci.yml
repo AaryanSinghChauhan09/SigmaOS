@@ -1,0 +1,22 @@
+name: Clear Linux AVX-512 & Stateless Config CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  clear-linux-verification:
+    name: Clear Linux AVX-512 Optimization & Stateless Config Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Clear Linux Test Suite
+        run: |
+          ./run_sigma_tests.sh

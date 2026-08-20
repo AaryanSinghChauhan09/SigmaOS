@@ -13,7 +13,7 @@ pub mod vfs;
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
 pub use sigma_fs::{
-    SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
-    JournalState, RaidLevel, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid,
-    SigmaFsCrypt, SigmaFsVirtio,
+    Blake3BlockDeduplicationEngine, JournalState, PfsType, PseudoFilesystemNamespace,
+    RaidLevel, SigmaFS, SigmaFhsAuditor, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsRouter,
+    SigmaFsCow, SigmaFsCrypt, SigmaFsJournal, SigmaFsRaid, SigmaFsVirtio, SigmaFsVolume,
 };

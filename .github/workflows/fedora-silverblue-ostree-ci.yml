@@ -1,0 +1,22 @@
+name: Fedora Silverblue rpm-ostree Atomic CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  silverblue-ostree-verification:
+    name: Fedora Silverblue rpm-ostree Atomic Deployment Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Silverblue ostree Test
+        run: |
+          ./run_sigma_tests.sh

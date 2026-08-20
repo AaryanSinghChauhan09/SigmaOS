@@ -1,0 +1,22 @@
+name: NixOS Flake Evaluation & Closure Check CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  nixos-flake-verification:
+    name: NixOS Flake Output Evaluation & Garbage Collector Closure Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run NixOS Flake Test
+        run: |
+          ./run_sigma_tests.sh

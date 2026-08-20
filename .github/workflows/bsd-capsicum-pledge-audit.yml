@@ -1,0 +1,22 @@
+name: FreeBSD Capsicum & OpenBSD Pledge/Unveil Security CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  bsd-security-audit:
+    name: FreeBSD Capsicum, OpenBSD Pledge/Unveil & NetBSD Rump Kernel Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run BSD Security Suite & Verification
+        run: |
+          ./run_sigma_tests.sh

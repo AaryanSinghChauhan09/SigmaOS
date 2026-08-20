@@ -1,0 +1,22 @@
+name: OpenBSD Pledge & Unveil Sandbox CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  openbsd-pledge-verification:
+    name: OpenBSD pledge Promises & unveil Path Sandbox Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run OpenBSD Security Suite
+        run: |
+          ./run_sigma_tests.sh

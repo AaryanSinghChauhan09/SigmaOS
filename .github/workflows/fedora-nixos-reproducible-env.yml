@@ -1,0 +1,22 @@
+name: Fedora DNF & NixOS Reproducible Environment CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  fedora-nixos-verification:
+    name: Fedora DNF, SELinux Policies & NixOS Reproducible Store Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Fedora & NixOS Verification Harness
+        run: |
+          ./run_sigma_tests.sh

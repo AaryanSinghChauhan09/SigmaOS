@@ -1,0 +1,22 @@
+name: Kali Linux Forensics & Security Audit CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  kali-forensics-verification:
+    name: Kali Linux Penetration Tools & Forensic Storage Filter Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Kali Security Audit Suite
+        run: |
+          ./run_sigma_tests.sh

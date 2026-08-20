@@ -1,0 +1,22 @@
+name: Ubuntu Snappy & AppArmor Profile CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  ubuntu-snappy-verification:
+    name: Ubuntu Snap Package & AppArmor Profile Security Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Ubuntu AppArmor Test Suite
+        run: |
+          ./run_sigma_tests.sh

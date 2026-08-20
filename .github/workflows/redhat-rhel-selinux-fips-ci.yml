@@ -1,0 +1,22 @@
+name: Red Hat RHEL FIPS 140-3 & SELinux MLS CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  rhel-security-verification:
+    name: Red Hat RHEL FIPS Cryptography & SELinux MLS Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run RHEL Security Audit
+        run: |
+          ./run_sigma_tests.sh

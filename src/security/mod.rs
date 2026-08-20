@@ -36,7 +36,7 @@ pub use parrot::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise, ThreadSubPledgeContext};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
 
 pub use kali_stack::{

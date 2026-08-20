@@ -3,7 +3,24 @@
 
 extern crate alloc;
 
+#[cfg(not(test))]
 use crate::klib::error::{SecurityError, SigmaError};
+
+#[cfg(test)]
+pub use test_stub::*;
+
+#[cfg(test)]
+mod test_stub {
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum SecurityError {
+        AccessDenied,
+        PrivilegeEscalationDetected,
+    }
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum SigmaError {
+        Security(SecurityError),
+    }
+}
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -16,11 +33,12 @@ pub enum UnveilPermission {
     Create,  // 'c'
 }
 
-/// A specific path restriction mapping
+/// A specific path restriction mapping supporting exact paths, prefix matches, and regex patterns
 #[derive(Debug, Clone)]
 pub struct UnveilRestriction {
     pub path: String,
     pub permissions: Vec<UnveilPermission>,
+    pub is_regex: bool,
 }
 
 /// Manager enforcing filesystem visibility and Landlock-style rule inheritance on a per-process basis
@@ -56,9 +74,11 @@ impl UnveilManager {
         if let Some(existing) = self.restrictions.iter_mut().find(|r| r.path == path) {
             existing.permissions = parsed_perms;
         } else {
+            let is_regex = path.contains('*') || path.contains('?') || path.starts_with('^');
             self.restrictions.push(UnveilRestriction {
                 path: path.to_string(),
                 permissions: parsed_perms,
+                is_regex,
             });
         }
 
@@ -73,6 +93,60 @@ impl UnveilManager {
             format!("{}/{}", base_path, relative_path)
         };
         self.unveil(&full_path, permissions)
+    }
+
+    /// Simple wildcard/regex-style path matcher without external crate dependencies
+    pub fn match_glob_regex(pattern: &str, path: &str) -> bool {
+        if pattern == "*" {
+            return true;
+        }
+
+        let p_bytes = pattern.as_bytes();
+        let s_bytes = path.as_bytes();
+
+        let mut px = 0;
+        let mut sx = 0;
+        let mut next_px = 0;
+        let mut next_sx = 0;
+
+        while px < p_bytes.len() || sx < s_bytes.len() {
+            if px < p_bytes.len() {
+                let c = p_bytes[px];
+                match c {
+                    b'?' => {
+                        if sx < s_bytes.len() {
+                            px += 1;
+                            sx += 1;
+                            continue;
+                        }
+                    }
+                    b'*' => {
+                        next_px = px + 1;
+                        next_sx = sx + 1;
+                        px += 1;
+                        continue;
+                    }
+                    _ => {
+                        if sx < s_bytes.len() && s_bytes[sx] == c {
+                            px += 1;
+                            sx += 1;
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            if next_sx > 0 && next_sx <= s_bytes.len() {
+                px = next_px;
+                sx = next_sx;
+                next_sx += 1;
+                continue;
+            }
+
+            return false;
+        }
+
+        true
     }
 
     /// Helper to parse character flags into UnveilPermissions
@@ -102,13 +176,17 @@ impl UnveilManager {
         // per iteration in high-frequency path validation loops.
         for restriction in &self.restrictions {
             let r_path = &restriction.path;
-            let is_match = path == r_path || (
-                path.starts_with(r_path) && (
-                    r_path.ends_with('/') ||
-                    path[r_path.len()..].starts_with('/') ||
-                    path[r_path.len()..].starts_with('\\')
+            let is_match = if restriction.is_regex {
+                Self::match_glob_regex(r_path, path)
+            } else {
+                path == r_path || (
+                    path.starts_with(r_path) && (
+                        r_path.ends_with('/') ||
+                        path[r_path.len()..].starts_with('/') ||
+                        path[r_path.len()..].starts_with('\\')
+                    )
                 )
-            );
+            };
 
             if is_match {
                 if let Some(best) = best_match {

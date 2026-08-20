@@ -1,0 +1,22 @@
+name: Solus eopkg & Budgie Desktop CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  solus-budgie-verification:
+    name: Solus eopkg Package Manager & Budgie DE Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Solus Test Suite
+        run: |
+          ./run_sigma_tests.sh

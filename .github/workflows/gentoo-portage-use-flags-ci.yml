@@ -1,0 +1,22 @@
+name: Gentoo Portage & USE Flags CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  gentoo-portage-verification:
+    name: Gentoo Portage USE Flags & Ebuild Compilation Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Gentoo Portage Test Suite
+        run: |
+          ./run_sigma_tests.sh

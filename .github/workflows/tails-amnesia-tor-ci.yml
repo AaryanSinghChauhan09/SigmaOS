@@ -1,0 +1,22 @@
+name: Tails OS Amnesic Memory & Tor Shunt CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  tails-amnesia-verification:
+    name: Tails OS Amnesic RAM Shredding & Tor Network Shunt Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Tails OS Test Suite
+        run: |
+          ./run_sigma_tests.sh

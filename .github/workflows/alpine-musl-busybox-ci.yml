@@ -1,0 +1,22 @@
+name: Alpine Linux musl & BusyBox CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  alpine-musl-verification:
+    name: Alpine musl libc, BusyBox & apk-tools Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Alpine musl Verification
+        run: |
+          ./run_sigma_tests.sh

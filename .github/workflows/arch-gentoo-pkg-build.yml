@@ -1,0 +1,22 @@
+name: Arch Linux & Gentoo Package Build CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  arch-gentoo-build:
+    name: Arch PKGBUILD & Gentoo Ebuild Clean-Room Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build & Test Arch/Gentoo Package Engine
+        run: |
+          ./run_sigma_tests.sh

@@ -1,0 +1,22 @@
+name: DragonFly BSD HAMMER2 File System CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  dragonfly-hammer2-verification:
+    name: DragonFly BSD HAMMER2 Distributed Storage & VFS Cache Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run DragonFly BSD Test
+        run: |
+          ./run_sigma_tests.sh

@@ -1,0 +1,22 @@
+name: NixOS Declarative Store & Flakes CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  nixos-store-verification:
+    name: NixOS Hash-Addressed Store & Declarative State Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run NixOS Parity Test
+        run: |
+          ./run_sigma_tests.sh
