@@ -3,7 +3,11 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
+<<<<<<< HEAD
 use klib::collections::HashMap;
+=======
+use std::collections::HashMap;
+>>>>>>> origin/ci-workflows-and-test-validation-15641703078746240029
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -143,8 +147,8 @@ pub struct DebianSbuildPackage {
 /// Rolling Release System Synchronizer
 #[derive(Debug, Clone)]
 pub struct RollingSyncManager {
-    pub installed_packages: HashMap<String, Version>,
-    pub remote_repository: HashMap<String, Version>,
+    pub installed_packages: HashMap<klib::string::SigmaString, Version>,
+    pub remote_repository: HashMap<klib::string::SigmaString, Version>,
 }
 
 impl RollingSyncManager {
@@ -156,15 +160,15 @@ impl RollingSyncManager {
     }
 
     pub fn register_installed(&mut self, name: &str, version: Version) {
-        self.installed_packages.insert(name.to_string(), version);
+        self.installed_packages.insert(klib::string::SigmaString::from(name), version);
     }
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
-        self.remote_repository.insert(name.to_string(), version);
+        self.remote_repository.insert(klib::string::SigmaString::from(name), version);
     }
 
     /// Checks for available package updates in the rolling release stream
-    pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
+    pub fn list_pending_rolling_updates(&self) -> Vec<(klib::string::SigmaString, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name) {

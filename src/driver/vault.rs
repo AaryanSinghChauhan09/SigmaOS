@@ -24,20 +24,20 @@ impl DriverArchiveVault {
     }
 
     pub fn store_driver(&mut self, name: &str, raw_binary: &[u8]) {
-        let encrypted: Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
-        let sig = format!("SIGMA_{}_OK", name);
+        let encrypted: klib::vec::Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
+        let sig = klib::string::SigmaString::from(format!("SIGMA_{}_OK", name));
 
         let entry = VaultEntry {
-            driver_name: name.to_string(),
+            driver_name: klib::string::SigmaString::from(name),
             encrypted_payload: encrypted,
             hash_signature: sig,
         };
-        self.archive.insert(name.to_string(), entry);
+        self.archive.insert(klib::string::SigmaString::from(name), entry);
     }
 
-    pub fn retrieve_driver(&self, name: &str) -> Option<Vec<u8>> {
-        if let Some(entry) = self.archive.get(name) {
-            let decrypted: Vec<u8> = entry
+    pub fn retrieve_driver(&self, name: &str) -> Option<klib::vec::Vec<u8>> {
+        if let Some(entry) = self.archive.get(&klib::string::SigmaString::from(name)) {
+            let decrypted: klib::vec::Vec<u8> = entry
                 .encrypted_payload
                 .iter()
                 .map(|b| b ^ self.secret_key)
@@ -61,7 +61,7 @@ mod tests {
         vault.store_driver("e1000", raw_driver);
         let retrieved = vault.retrieve_driver("e1000").unwrap();
 
-        assert_eq!(retrieved, raw_driver);
+        assert_eq!(retrieved.as_slice(), raw_driver);
         assert!(vault.retrieve_driver("nonexistent").is_none());
     }
 }
