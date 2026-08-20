@@ -18,6 +18,19 @@ pub mod lattice;
 pub mod prism;
 pub mod canonical;
 pub mod fedora;
+pub mod void_linux;
+pub mod pop_os;
+pub mod clear_linux;
+
+pub use void_linux::{
+    XbpsDatabase, RinitInitSystem, VoidMuslToolchain, XbpsPackageVerifier, RunitStageManager,
+};
+pub use pop_os::{
+    PopOsBspTiler, PopOsCosmicScheduler, CosmicWindowNode,
+};
+pub use clear_linux::{
+    ClearLinuxStatelessEngine, CpuIsaLevel,
+};
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
