@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.24.0
         with:
           toolchain: stable
 

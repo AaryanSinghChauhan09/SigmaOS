@@ -23,7 +23,7 @@ jobs:
           apk add --no-cache build-base rust cargo python3 bash git libffi-dev openssl-dev
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           persist-credentials: false
 
