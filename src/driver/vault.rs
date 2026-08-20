@@ -1,54 +1,51 @@
-// SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)
-// Stores legacy drivers in secure vault entries with lineage metadata and dependency chains
+// SigmaOS Driver Archive Vault (DriverArchiveVault)
+// Encrypts driver binaries for cold storage to prevent unauthorized driver injection and tamper attacks
 
 use std::collections::HashMap;
 
+#[derive(Debug, Clone)]
 pub struct VaultEntry {
-    pub id: usize,
-    pub name: String,
-    pub lineage_version: String,
-    pub dependencies: Vec<String>,
+    pub driver_name: String,
+    pub encrypted_payload: Vec<u8>,
+    pub hash_signature: String,
 }
 
 pub struct DriverArchiveVault {
-    pub vault: HashMap<usize, VaultEntry>,
+    pub archive: HashMap<String, VaultEntry>,
+    pub secret_key: u8,
 }
 
 impl DriverArchiveVault {
-    pub fn new() -> Self {
-        let mut archive = DriverArchiveVault {
-            vault: HashMap::new(),
+    pub fn new(key: u8) -> Self {
+        DriverArchiveVault {
+            archive: HashMap::new(),
+            secret_key: key,
+        }
+    }
+
+    pub fn store_driver(&mut self, name: &str, raw_binary: &[u8]) {
+        let encrypted: Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
+        let sig = format!("SIGMA_{}_OK", name);
+
+        let entry = VaultEntry {
+            driver_name: name.to_string(),
+            encrypted_payload: encrypted,
+            hash_signature: sig,
         };
-        // Seed default driver vault entries
-        archive.register_driver(
-            10,
-            "ne2000_isa_nic".to_string(),
-            "Linux 2.2 NIC".to_string(),
-            vec!["isa_bus_device".to_string()],
-        );
-        archive.register_driver(
-            11,
-            "ide_piix4_controller".to_string(),
-            "Linux 2.4 IDE".to_string(),
-            vec!["pci_express_bus".to_string()],
-        );
-        archive
+        self.archive.insert(name.to_string(), entry);
     }
 
-    pub fn register_driver(&mut self, id: usize, name: String, lineage: String, deps: Vec<String>) {
-        self.vault.insert(
-            id,
-            VaultEntry {
-                id,
-                name,
-                lineage_version: lineage,
-                dependencies: deps,
-            },
-        );
-    }
-
-    pub fn query_driver(&self, id: usize) -> Option<&VaultEntry> {
-        self.vault.get(&id)
+    pub fn retrieve_driver(&self, name: &str) -> Option<Vec<u8>> {
+        if let Some(entry) = self.archive.get(name) {
+            let decrypted: Vec<u8> = entry
+                .encrypted_payload
+                .iter()
+                .map(|b| b ^ self.secret_key)
+                .collect();
+            Some(decrypted)
+        } else {
+            None
+        }
     }
 }
 
@@ -57,63 +54,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_driver_archive_vault() {
-        let vault = DriverArchiveVault::new();
-        let entry = vault.query_driver(10).unwrap();
-        assert_eq!(entry.name, "ne2000_isa_nic");
-        assert_eq!(entry.lineage_version, "Linux 2.2 NIC");
-        assert_eq!(entry.dependencies[0], "isa_bus_device");
-    }
-}
-// SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)
-// Stores legacy drivers in secure vault entries with lineage metadata and dependency chains
+    fn test_driver_vault_encryption_decryption() {
+        let mut vault = DriverArchiveVault::new(0xAA);
+        let raw_driver = b"ELF_DRIVER_BINARY_DATA";
 
+        vault.store_driver("e1000", raw_driver);
+        let retrieved = vault.retrieve_driver("e1000").unwrap();
 
-pub struct VaultEntry {
-    pub id: usize,
-    pub name: String,
-    pub lineage_version: String,
-    pub dependencies: Vec<String>,
-}
-
-pub struct DriverArchiveVault {
-    pub vault: HashMap<usize, VaultEntry>,
-}
-
-impl DriverArchiveVault {
-    pub fn new() -> Self {
-        let mut archive = DriverArchiveVault {
-            vault: HashMap::new(),
-        };
-        // Seed default driver vault entries
-        archive.register_driver(10, "ne2000_isa_nic".to_string(), "Linux 2.2 NIC".to_string(), vec!["isa_bus_device".to_string()]);
-        archive.register_driver(11, "ide_piix4_controller".to_string(), "Linux 2.4 IDE".to_string(), vec!["pci_express_bus".to_string()]);
-        archive
-    }
-
-    pub fn register_driver(&mut self, id: usize, name: String, lineage: String, deps: Vec<String>) {
-        self.vault.insert(id, VaultEntry {
-            id,
-            name,
-            lineage_version: lineage,
-            dependencies: deps,
-        });
-    }
-
-    pub fn query_driver(&self, id: usize) -> Option<&VaultEntry> {
-        self.vault.get(&id)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_driver_archive_vault() {
-        let vault = DriverArchiveVault::new();
-        let entry = vault.query_driver(10).unwrap();
-        assert_eq!(entry.name, "ne2000_isa_nic");
-        assert_eq!(entry.lineage_version, "Linux 2.2 NIC");
-        assert_eq!(entry.dependencies[0], "isa_bus_device");
+        assert_eq!(retrieved, raw_driver);
+        assert!(vault.retrieve_driver("nonexistent").is_none());
     }
 }

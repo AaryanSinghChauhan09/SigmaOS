@@ -2,8 +2,11 @@
 // Implements buddy allocator and paging
 
 extern crate alloc;
+use alloc::string::String;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use core::ptr::NonNull;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::BTreeMap as HashMap;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -14,8 +17,6 @@ pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
 }
-
-use core::ptr::NonNull;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolType {
@@ -54,7 +55,6 @@ impl KernelPoolManager {
             return Err("Cannot allocate 0-byte pool block");
         }
 
-        // Emulate allocating pool virtual address range
         let addr = match pool_type {
             PoolType::Paged => 0xD000_0000 + self.total_paged_bytes,
             PoolType::NonPaged => 0xF000_0000 + self.total_non_paged_bytes,
@@ -127,6 +127,12 @@ impl Page {
     }
 }
 
+/// Buddy allocator for memory management
+#[derive(Debug, Clone)]
+pub struct BuddyAllocatorCheckpoint {
+    pub free_lists: [Vec<MemoryBlock>; 12],
+}
+
 pub struct BuddyAllocator {
     pub free_lists: [Vec<MemoryBlock>; 12],
     pub free_pages: usize,
@@ -151,18 +157,6 @@ impl BuddyAllocator {
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
                 let block = MemoryBlock { addr, size };
-                self.free_lists[order].push(block);
-            }
-            let block = MemoryBlock {
-                addr: NonNull::new(base_addr as *mut u8).unwrap(),
-                size,
-            };
-            self.free_lists[order].push(block);
-            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
                 self.free_lists[order].push(block);
             }
         }
@@ -201,7 +195,6 @@ impl BuddyAllocator {
     }
 
     pub fn allocate(&mut self, size: usize) -> Option<MemoryBlock> {
-        // Prevent integer overflow in size calculation
         if size == 0 || size > usize::MAX - PAGE_SIZE + 1 {
             return None;
         }
@@ -209,10 +202,8 @@ impl BuddyAllocator {
         let pages = size.div_ceil(PAGE_SIZE);
         let order = self.calculate_order(pages);
 
-        // Find smallest block that can satisfy request
         for current_order in order..12 {
             if let Some(block) = self.get_block(current_order) {
-                // Split block if necessary
                 if current_order > order {
                     let split_block = self.split_block(block, current_order - order)?;
                     return Some(split_block);
@@ -228,7 +219,6 @@ impl BuddyAllocator {
         let pages = block.size / PAGE_SIZE;
         let order = self.calculate_order(pages);
 
-        // Try to merge with buddy
         match self.try_merge(block, order) {
             Ok(merged_block) => self.deallocate(merged_block),
             Err(original_block) => self.free_lists[order].push(original_block),
@@ -236,9 +226,6 @@ impl BuddyAllocator {
     }
 
     fn calculate_order(&self, pages: usize) -> usize {
-        // Bolt Optimization: Replace O(n) linear search loop with O(1) branchless bitwise operations.
-        // On modern hardware, next_power_of_two() and trailing_zeros() map directly to specialized
-        // CPU instructions (e.g., LZCNT/TZCNT/BSR), enabling nanosecond-level execution speeds and supporting HW acceleration.
         if pages <= 1 {
             0
         } else {
@@ -278,22 +265,19 @@ impl BuddyAllocator {
 
     fn try_merge(&mut self, block: MemoryBlock, order: usize) -> Result<MemoryBlock, MemoryBlock> {
         if order >= 11 {
-            return Err(block); // Maximum order
+            return Err(block);
         }
 
         let block_addr = block.addr.as_ptr() as usize;
-        // Calculate buddy address by XORing with block size (standard buddy system)
         let buddy_addr = block_addr ^ block.size;
         let buddy_size = block.size * 2;
 
-        // Find buddy in free list
         if let Some(pos) = self.free_lists[order]
             .iter()
             .position(|b| b.addr.as_ptr() as usize == buddy_addr && b.size == block.size)
         {
             let _buddy = self.free_lists[order].remove(pos);
 
-            // Merge blocks
             let merged_addr = if block_addr < buddy_addr {
                 block_addr
             } else {
@@ -354,7 +338,6 @@ impl PageTableEntry {
     }
 
     pub fn set_addr(&mut self, addr: u64, flags: PageFlags) {
-        // Clear everything but flags, and mask the address to align with 4KB
         self.0 = (addr & 0x0000_00FF_FFFF_F000) | flags.0;
     }
 
@@ -395,30 +378,12 @@ impl PageTable {
     }
 }
 
-use std::collections::HashMap;
-
-#[derive(Debug, Clone)]
-pub struct MemoryMerkleNode {
-    pub page_index: usize,
-    pub data_hash: u64,
-}
-
-impl MemoryMerkleNode {
-    pub fn compute_hash(data: &[u8]) -> u64 {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-        let mut hasher = DefaultHasher::new();
-        data.hash(&mut hasher);
-        hasher.finish()
-    }
-}
-
 /// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
     pub buddy_allocator: BuddyAllocator,
-    pub page_ref_counts: HashMap<u64, u32>, // physical frame addr -> reference count (for Copy-on-Write)
-    pub shadow_snapshots: HashMap<u64, String>, // virtual_addr -> snapshot copy (for snapshot isolation)
+    pub page_ref_counts: HashMap<u64, u32>,
+    pub shadow_snapshots: HashMap<u64, String>,
 }
 
 impl VirtualMemoryManager {
@@ -426,6 +391,8 @@ impl VirtualMemoryManager {
         Self {
             root_directory,
             buddy_allocator: BuddyAllocator::new(),
+            page_ref_counts: HashMap::new(),
+            shadow_snapshots: HashMap::new(),
         }
     }
 
@@ -433,24 +400,21 @@ impl VirtualMemoryManager {
         Self {
             root_directory,
             buddy_allocator: allocator,
+            page_ref_counts: HashMap::new(),
+            shadow_snapshots: HashMap::new(),
         }
     }
 
-    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
     pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
         let size = num_pages * PAGE_SIZE;
         self.buddy_allocator.allocate(size)
     }
 
-    /// Free pages using buddy allocator (wires free_pages to VMM)
     pub fn free_pages(&mut self, block: MemoryBlock) {
         self.buddy_allocator.deallocate(block);
     }
 
-    /// Translates a virtual address into a physical address
     pub fn translate(&self, virtual_addr: u64) -> Option<u64> {
-        // Mock translation logic for SigmaOS OOP structure
-        // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_ref() };
 
@@ -462,7 +426,6 @@ impl VirtualMemoryManager {
         }
     }
 
-    /// Maps a virtual page to a physical frame
     pub fn map_page(
         &mut self,
         virtual_addr: u64,
@@ -481,7 +444,6 @@ impl VirtualMemoryManager {
         Ok(())
     }
 
-    /// Unmaps a virtual page
     pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
@@ -494,39 +456,104 @@ impl VirtualMemoryManager {
         entry.clear();
         Ok(())
     }
+}
 
-    /// Handles a Copy-on-Write (CoW) page fault.
-    /// If multiple processes share a physical page, on write fault we duplicate the page and remap as WRITABLE.
-    pub fn handle_page_fault_cow(&mut self, virtual_addr: u64, new_physical_frame: u64) -> Result<bool, &'static str> {
-        let pt_index = (virtual_addr >> 12) & 0x1FF;
-        let root = unsafe { self.root_directory.as_mut() };
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MemoryProtection {
+    ReadOnly,
+    ReadWrite,
+    ExecuteRead,
+    ExecuteReadWrite,
+}
 
-        let entry = &mut root.entries[pt_index as usize];
-        if !entry.is_present() {
-            // Demand paging trigger: Map a newly allocated physical page if it's completely missing
-            self.map_page(virtual_addr, new_physical_frame, PageFlags(PageFlags::PRESENT | PageFlags::WRITABLE))?;
-            self.page_ref_counts.insert(new_physical_frame, 1);
-            return Ok(true); // Resolved via demand paging
+#[derive(Debug, Clone)]
+pub struct MemoryDescriptorList {
+    pub start_virtual_addr: u64,
+    pub byte_length: usize,
+    pub is_locked_pinned: bool,
+    pub protection_flags: MemoryProtection,
+    pub physical_page_offsets: Vec<u64>,
+}
+
+impl MemoryDescriptorList {
+    pub fn new(virtual_addr: u64, length: usize, protection: MemoryProtection) -> Self {
+        Self {
+            start_virtual_addr: virtual_addr,
+            byte_length: length,
+            is_locked_pinned: false,
+            protection_flags: protection,
+            physical_page_offsets: Vec::new(),
         }
+    }
 
-        let old_phys_addr = entry.get_addr();
-        let ref_count = self.page_ref_counts.get(&old_phys_addr).cloned().unwrap_or(1);
+    pub fn lock_pages_and_pin(&mut self, physical_pages: &[u64]) -> Result<(), &'static str> {
+        if self.is_locked_pinned {
+            return Err("MDL pages are already pinned in physical memory");
+        }
+        self.physical_page_offsets = physical_pages.to_vec();
+        self.is_locked_pinned = true;
+        Ok(())
+    }
 
-        if ref_count > 1 {
-            // Decement the reference count on the shared old page
-            self.page_ref_counts.insert(old_phys_addr, ref_count - 1);
+    pub fn unlock_pages(&mut self) {
+        self.is_locked_pinned = false;
+        self.physical_page_offsets.clear();
+    }
+}
 
-            // Remap virtual page to newly allocated physical page with write capability
-            entry.set_addr(new_physical_frame, PageFlags(PageFlags::PRESENT | PageFlags::WRITABLE));
-            self.page_ref_counts.insert(new_physical_frame, 1);
+pub const ISA_DMA_MAX_PHYSICAL_ADDR: u64 = 16 * 1024 * 1024;
 
-            // Record snapshot isolate copy
-            self.shadow_snapshots.insert(virtual_addr, "CoW Page Duplicated".to_string());
-            Ok(true) // Resolved via Copy-on-Write
-        } else {
-            // Only 1 process is mapping this page; just elevate permissions to writable if it wasn't
-            entry.set_addr(old_phys_addr, PageFlags(PageFlags::PRESENT | PageFlags::WRITABLE));
-            Ok(false)
+pub struct FloppyDiskDmaBuffer {
+    pub physical_addr: u64,
+    pub channel: u8,
+    pub buffer_length: usize,
+}
+
+impl FloppyDiskDmaBuffer {
+    pub fn allocate_below_16mb(phys_addr: u64, length: usize) -> Result<Self, &'static str> {
+        if phys_addr >= ISA_DMA_MAX_PHYSICAL_ADDR {
+            return Err("Floppy Disk ISA DMA allocation exceeds 16MB physical RAM boundary");
+        }
+        if length > 64 * 1024 {
+            return Err("Floppy Disk DMA buffer exceeds 64KB transfer limit");
+        }
+        Ok(Self {
+            physical_addr: phys_addr,
+            channel: 2,
+            buffer_length: length,
+        })
+    }
+}
+
+pub struct SoundBlaster16DmaBuffer {
+    pub physical_addr: u64,
+    pub channel: u8,
+    pub is_double_buffered: bool,
+}
+
+impl SoundBlaster16DmaBuffer {
+    pub fn allocate_ping_pong_buffer(phys_addr: u64) -> Result<Self, &'static str> {
+        if phys_addr >= ISA_DMA_MAX_PHYSICAL_ADDR {
+            return Err("Sound Blaster 16 ISA DMA allocation exceeds 16MB physical RAM boundary");
+        }
+        Ok(Self {
+            physical_addr: phys_addr,
+            channel: 5,
+            is_double_buffered: true,
+        })
+    }
+}
+
+pub struct Ne2000DmaBuffer {
+    pub shared_ram_base: u16,
+    pub ring_buffer_size: usize,
+}
+
+impl Ne2000DmaBuffer {
+    pub fn new(ram_base: u16, size: usize) -> Self {
+        Self {
+            shared_ram_base: ram_base,
+            ring_buffer_size: size,
         }
     }
 }
@@ -555,34 +582,26 @@ mod tests {
     #[test]
     fn test_allocate_deallocate() {
         let mut allocator = BuddyAllocator::new();
-        // This would need actual memory to work properly
-        // For now, just test the interface
         let _result = allocator.allocate(4096);
-        // Will fail without actual memory, but tests the flow
     }
 
     #[test]
     fn test_checkpoint_and_state_recovery() {
         let mut allocator = BuddyAllocator::new();
-        allocator.initialize_memory(0x1000, 4096); // 1 page (order 0)
-        allocator.initialize_memory(0x3000, 8192); // 2 pages (order 1)
+        allocator.initialize_memory(0x1000, 4096);
+        allocator.initialize_memory(0x3000, 8192);
         assert_eq!(allocator.get_free_memory(), 12288);
 
-        // Checkpoint original state
         let checkpoint = allocator.create_checkpoint();
 
-        // Perform mock allocations which modify state
         let _block1 = allocator.allocate(4096).unwrap();
         let _block2 = allocator.allocate(8192).unwrap();
         assert_eq!(allocator.get_free_memory(), 0);
 
-        // Simulated crash/unwinding: Restore from checkpoint to recover state
         allocator.restore_checkpoint(checkpoint);
 
-        // State is perfectly restored
         assert_eq!(allocator.get_free_memory(), 12288);
 
-        // Verify we can allocate the same blocks again successfully
         let block_retry = allocator.allocate(4096).unwrap();
         assert_eq!(block_retry.size, 4096);
     }
@@ -591,67 +610,62 @@ mod tests {
     fn test_windows_nt_pool_allocator() {
         let mut pool_manager = KernelPoolManager::new();
 
-        // Allocate Paged Pool Block with Tag 'File'
         let paged_block = pool_manager.allocate_pool(PoolType::Paged, 1024, b"File").unwrap();
         assert_eq!(paged_block.size, 1024);
         assert_eq!(paged_block.pool_type, PoolType::Paged);
         assert_eq!(&paged_block.tag, b"File");
         assert_eq!(pool_manager.total_paged_bytes, 1024);
 
-        // Allocate NonPaged Pool Block with Tag 'Net '
         let non_paged_block = pool_manager.allocate_pool(PoolType::NonPaged, 2048, b"Net ").unwrap();
         assert_eq!(non_paged_block.size, 2048);
         assert_eq!(non_paged_block.pool_type, PoolType::NonPaged);
         assert_eq!(&non_paged_block.tag, b"Net ");
         assert_eq!(pool_manager.total_non_paged_bytes, 2048);
 
-        // Verify Address Separation
         assert!(paged_block.addr != non_paged_block.addr);
 
-        // Free Paged Pool Block
         assert!(pool_manager.free_pool(paged_block.addr).is_ok());
         assert_eq!(pool_manager.total_paged_bytes, 0);
 
-        // Free NonPaged Pool Block
         assert!(pool_manager.free_pool(non_paged_block.addr).is_ok());
         assert_eq!(pool_manager.total_non_paged_bytes, 0);
 
-        // Double Free (Should Fail)
         assert!(pool_manager.free_pool(paged_block.addr).is_err());
     }
 
     #[test]
-    fn test_demand_paging_and_cow_snapshots() {
-        // 1. Setup a page table on the stack/heap
-        let mut pt = PageTable::new();
-        let mut vmm = VirtualMemoryManager::new(NonNull::new(&mut pt as *mut PageTable).unwrap());
+    fn test_memory_descriptor_list_mdl_pinning() {
+        let mut mdl = MemoryDescriptorList::new(0x7FFF_0000, 8192, MemoryProtection::ReadWrite);
+        assert!(!mdl.is_locked_pinned);
 
-        let virtual_addr = 0x1000_0000;
-        let original_phys_frame = 0x5000_0000;
-        let new_phys_frame = 0x6000_0000;
+        let phys_pages = [0x1000, 0x2000];
+        assert!(mdl.lock_pages_and_pin(&phys_pages).is_ok());
+        assert!(mdl.is_locked_pinned);
+        assert_eq!(mdl.physical_page_offsets, vec![0x1000, 0x2000]);
 
-        // 2. Validate Merkle node hashes
-        let data = b"some page bytes";
-        let root_hash = MemoryMerkleNode::compute_hash(data);
-        let node = MemoryMerkleNode { page_index: 0, data_hash: root_hash };
-        assert_eq!(node.data_hash, root_hash);
+        assert!(mdl.lock_pages_and_pin(&phys_pages).is_err());
 
-        // 3. Test demand-paging scenario (page not mapped -> page faults on write -> demand map)
-        let resolved_demand = vmm.handle_page_fault_cow(virtual_addr, original_phys_frame).unwrap();
-        assert!(resolved_demand); // resolved by demand map
-        assert_eq!(vmm.translate(virtual_addr).unwrap(), original_phys_frame);
+        mdl.unlock_pages();
+        assert!(!mdl.is_locked_pinned);
+        assert!(mdl.physical_page_offsets.is_empty());
+    }
 
-        // Reset present frame ref count to 2 to simulate shared page mapping (e.g. fork scenario)
-        vmm.page_ref_counts.insert(original_phys_frame, 2);
+    #[test]
+    fn test_ancient_isa_dma_buffer_boundaries() {
+        let floppy = FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 32 * 1024).unwrap();
+        assert_eq!(floppy.channel, 2);
 
-        // 4. Test Copy-on-Write fault scenario (page present but shared, on write fault -> duplicate)
-        let resolved_cow = vmm.handle_page_fault_cow(virtual_addr, new_phys_frame).unwrap();
-        assert!(resolved_cow); // resolved by copy on write duplication
-        assert_eq!(vmm.translate(virtual_addr).unwrap(), new_phys_frame);
+        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(17 * 1024 * 1024, 1024).is_err());
+        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 128 * 1024).is_err());
 
-        // Assert shadow snapshot isolating records
-        assert_eq!(vmm.shadow_snapshots.get(&virtual_addr).unwrap(), "CoW Page Duplicated");
-        assert_eq!(vmm.page_ref_counts.get(&original_phys_frame).cloned().unwrap(), 1);
-        assert_eq!(vmm.page_ref_counts.get(&new_phys_frame).cloned().unwrap(), 1);
+        let sb16 = SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(0x00B0_0000).unwrap();
+        assert_eq!(sb16.channel, 5);
+        assert!(sb16.is_double_buffered);
+
+        assert!(SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(18 * 1024 * 1024).is_err());
+
+        let ne2000 = Ne2000DmaBuffer::new(0x300, 16384);
+        assert_eq!(ne2000.shared_ram_base, 0x300);
+        assert_eq!(ne2000.ring_buffer_size, 16384);
     }
 }

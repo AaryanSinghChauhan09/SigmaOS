@@ -549,7 +549,6 @@ impl<T: DeviceDriver> SecureDriverWrapper<T> {
 
     /// Verify the driver's cryptographic signature
     pub fn verify_signature(&mut self, _signature: &[u8]) -> Result<(), DriverError> {
-        // In production, this would verify against a trusted key
         self.signature_verified = true;
         Ok(())
     }
@@ -578,7 +577,6 @@ impl<T: DeviceDriver> DeviceDriver for SecureDriverWrapper<T> {
 
     fn handle_io(&mut self, operation: IoOperation) -> Result<IoResult, DriverError> {
         if self.sandbox_enabled {
-            // Apply sandbox restrictions
             match operation {
                 IoOperation::Mmap { .. } => self.check_capability(0x1000)?,
                 IoOperation::Ioctl { .. } => self.check_capability(0x2000)?,
@@ -619,7 +617,6 @@ pub struct DriverRegistry {
 }
 
 impl DriverRegistry {
-    /// Create a new driver registry
     pub fn new() -> Self {
         Self {
             drivers: Vec::new(),
@@ -630,13 +627,11 @@ impl DriverRegistry {
         }
     }
 
-    /// Register a device driver
     pub fn register_driver(&mut self, driver: Box<dyn DeviceDriver>) -> Result<(), RegistryError> {
         self.drivers.push(driver);
         Ok(())
     }
 
-    /// Register a network stack
     pub fn register_network_stack(
         &mut self,
         stack: Box<dyn NetworkStack>,
@@ -645,13 +640,11 @@ impl DriverRegistry {
         Ok(())
     }
 
-    /// Register a filesystem
     pub fn register_filesystem(&mut self, fs: Box<dyn FileSystem>) -> Result<(), RegistryError> {
         self.filesystems.push(fs);
         Ok(())
     }
 
-    /// Register a memory manager
     pub fn register_memory_manager(
         &mut self,
         mm: Box<dyn MemoryManager>,
@@ -660,7 +653,6 @@ impl DriverRegistry {
         Ok(())
     }
 
-    /// Register a scheduler
     pub fn register_scheduler(
         &mut self,
         scheduler: Box<dyn Scheduler>,
@@ -669,17 +661,14 @@ impl DriverRegistry {
         Ok(())
     }
 
-    /// Find a driver by name
     pub fn find_driver(&self, name: &str) -> Option<&Box<dyn DeviceDriver>> {
         self.drivers.iter().find(|d| d.metadata().name == name)
     }
 
-    /// Find a driver by capability
     pub fn find_driver_by_capability(&self, capability: u64) -> Option<&Box<dyn DeviceDriver>> {
         self.drivers.iter().find(|d| d.has_capability(capability))
     }
 
-    /// Get all drivers of a specific type
     pub fn get_drivers_by_type(&self, driver_type: DriverType) -> Vec<&Box<dyn DeviceDriver>> {
         self.drivers
             .iter()
@@ -687,7 +676,6 @@ impl DriverRegistry {
             .collect()
     }
 
-    /// Initialize all registered drivers
     pub fn initialize_all(&mut self) -> Result<(), RegistryError> {
         for driver in &mut self.drivers {
             driver
@@ -697,7 +685,6 @@ impl DriverRegistry {
         Ok(())
     }
 
-    /// Shutdown all registered drivers
     pub fn shutdown_all(&mut self) -> Result<(), RegistryError> {
         self.drivers.iter_mut().for_each(|d| {
             let _ = d.shutdown();
@@ -730,7 +717,6 @@ mod tests {
     use super::*;
     use alloc::vec;
 
-    // Mock driver for testing
     struct MockDriver {
         metadata: DriverMetadata,
         initialized: bool,
@@ -807,13 +793,8 @@ mod tests {
         let capabilities = CapabilityToken::new();
         let mut wrapper = SecureDriverWrapper::new(driver, capabilities);
 
-        // Should fail without signature verification
         assert!(wrapper.init().is_err());
-
-        // Verify signature
         assert!(wrapper.verify_signature(&[0u8; 32]).is_ok());
-
-        // Should succeed after verification
         assert!(wrapper.init().is_ok());
     }
 
@@ -983,6 +964,7 @@ impl PackageRecipeParser {
 
 #[cfg(test)]
 mod extra_tests {
+    use super::*;
 
     #[test]
     fn test_round_robin_scheduler() {
@@ -1015,9 +997,9 @@ mod extra_tests {
     #[test]
     fn test_buddy_allocator_check() {
         let bac = BuddyAllocatorCheck::new(4096, 10);
-        assert!(bac.is_order_boundary_valid(0x1000, 0)); // 4096 is multiple of 4096
-        assert!(bac.is_order_boundary_valid(0x2000, 1)); // 8192 is multiple of 8192
-        assert!(!bac.is_order_boundary_valid(0x1000, 1)); // 4096 is not multiple of 8192
+        assert!(bac.is_order_boundary_valid(0x1000, 0));
+        assert!(bac.is_order_boundary_valid(0x2000, 1));
+        assert!(!bac.is_order_boundary_valid(0x1000, 1));
     }
 
     #[test]

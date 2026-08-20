@@ -1,20 +1,28 @@
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {
-    /// Name of the superset-compatible software equivalent
     fn app_name(&self) -> &'static str;
-    /// Verifies if a specific capability (e.g. "mp4", "javascript", etc.) is fully supported
     fn has_superset_capability(&self, capability_name: &str) -> bool;
 }
 
-/// VLC Media Player superset capability match (OOP Class)
 pub struct MediaDecoderCapability {
     supported_formats: Vec<&'static str>,
+}
+
+impl Default for MediaDecoderCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MediaDecoderCapability {
@@ -35,9 +43,14 @@ impl SupersetApplicationCapability for MediaDecoderCapability {
     }
 }
 
-/// Chromium Browser superset capability match (OOP Class)
 pub struct HtmlRendererCapability {
     features: Vec<&'static str>,
+}
+
+impl Default for HtmlRendererCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl HtmlRendererCapability {
@@ -58,43 +71,43 @@ impl SupersetApplicationCapability for HtmlRendererCapability {
     }
 }
 
-/// Sovereign Video Player superset capability match (OOP Class)
-/// Features absolute parity with and improvements over VLC,
-/// meaning the built-in system is better than VLC Media Player.
 pub struct SovereignVideoPlayerCapability {
     supported_formats: Vec<&'static str>,
     advanced_features: Vec<&'static str>,
+}
+
+impl Default for SovereignVideoPlayerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SovereignVideoPlayerCapability {
     pub fn new() -> Self {
         Self {
             supported_formats: vec![
-                "mp4", "mkv", "avi", "mp3", "aac", "wav", "flac", // VLC core compatibility
-                "av1", "vvc", "opus", // Next-gen codecs
+                "mp4", "mkv", "avi", "mp3", "aac", "wav", "flac",
+                "av1", "vvc", "opus",
             ],
             advanced_features: vec![
-                "ai_upscale",          // Real-time local neural network video upscaling
-                "frame_interpolation", // AI-driven 60FPS/120FPS smooth motion generation
-                "pqc_streaming",       // Post-quantum Kyber-1024 encrypted stream rendering
-                "p2p_dist",            // OS-native decentralized streaming distribution
-                "spatial_audio",       // Immersive spatial audio processing and HRTF synthesis
-                "spatial_video",       // 3D holographic stereoscopic depth reprojection
-                "dolby_vision",        // Hardware-accelerated dynamic range tone-mapping
-                "hdr10plus",           // Dynamic metadata HDR processing
+                "ai_upscale",
+                "frame_interpolation",
+                "pqc_streaming",
+                "p2p_dist",
+                "spatial_audio",
+                "spatial_video",
+                "dolby_vision",
+                "hdr10plus",
             ],
         }
     }
 
-    /// Verifies programmatically that the Sovereign Video Player is a strict,
-    /// complete superset of VLC Media Player capabilities.
     pub fn is_strict_superset_of_vlc(&self, vlc: &MediaDecoderCapability) -> bool {
         for format in &vlc.supported_formats {
             if !self.has_superset_capability(format) {
                 return false;
             }
         }
-        // It must also have additional advanced features
         !self.advanced_features.is_empty()
     }
 }
@@ -110,9 +123,14 @@ impl SupersetApplicationCapability for SovereignVideoPlayerCapability {
     }
 }
 
-/// OOP Registry pattern to manage and query boxed SupersetApplicationCapability interfaces
 pub struct SovereignCapabilityRegistry {
     capabilities: BTreeMap<String, Box<dyn SupersetApplicationCapability>>,
+}
+
+impl Default for SovereignCapabilityRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SovereignCapabilityRegistry {
@@ -122,13 +140,11 @@ impl SovereignCapabilityRegistry {
         }
     }
 
-    /// Dynamically register a capability
     pub fn register_capability(&mut self, capability: Box<dyn SupersetApplicationCapability>) {
         let name = capability.app_name().to_string();
         self.capabilities.insert(name, capability);
     }
 
-    /// Query if any registered application possesses the given capability
     pub fn find_app_by_capability(&self, capability_name: &str) -> Option<&str> {
         for (name, cap) in &self.capabilities {
             if cap.has_superset_capability(capability_name) {
@@ -139,13 +155,6 @@ impl SovereignCapabilityRegistry {
     }
 }
 
-impl Default for SovereignCapabilityRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// OOP Composite pattern combining multiple capabilities under a single interface
 pub struct CompositeApplicationCapability {
     name: String,
     components: Vec<Box<dyn SupersetApplicationCapability>>,
@@ -159,7 +168,6 @@ impl CompositeApplicationCapability {
         }
     }
 
-    /// Add a capability component to the composite
     pub fn add_component(&mut self, component: Box<dyn SupersetApplicationCapability>) {
         self.components.push(component);
     }
@@ -177,7 +185,6 @@ impl SupersetApplicationCapability for CompositeApplicationCapability {
     }
 }
 
-/// Target platform
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetPlatform {
     Windows,
@@ -188,27 +195,24 @@ pub enum TargetPlatform {
     SigmaOS,
 }
 
-/// Binary format
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum BinaryFormat {
-    Exe, // Windows executable
-    Dmg, // macOS disk image
-    Apk, // Android package
-    Ipa, // iOS package
-    Elf, // Linux executable
-    Bin, // Generic binary
+    Exe,
+    Dmg,
+    Apk,
+    Ipa,
+    Elf,
+    Bin,
 }
 
-/// Compatibility mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompatibilityMode {
     Native,
-    Translation, // Binary translation (e.g., Wine, Rosetta)
-    Container,   // Containerization
-    Emulation,   // Full emulation (e.g., QEMU)
+    Translation,
+    Container,
+    Emulation,
 }
 
-/// Application binary
 #[derive(Debug, Clone)]
 pub struct ApplicationBinary {
     pub name: String,
@@ -254,19 +258,17 @@ impl ApplicationBinary {
     }
 }
 
-/// Polymorphic trait to verify matching capabilities for equivalent third-party software.
 pub trait SovereignAppCapability {
     fn capability_name(&self) -> &str;
-    fn as_any(&self) -> &dyn std::any::Any;
+    fn as_any(&self) -> &dyn core::any::Any;
     fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool;
 }
 
-/// Media decoder capability (e.g. for equivalent third-party software like VLC Media Player)
 #[derive(Debug, Clone)]
 pub struct StandardMediaCapability {
     pub name: String,
     pub supported_codecs: Vec<String>,
-    pub max_resolution: String, // e.g. "1080p", "4K", "8K"
+    pub max_resolution: String,
 }
 
 impl StandardMediaCapability {
@@ -284,19 +286,17 @@ impl SovereignAppCapability for StandardMediaCapability {
         &self.name
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn core::any::Any {
         self
     }
 
     fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool {
         if let Some(other) = required.as_any().downcast_ref::<StandardMediaCapability>() {
-            // Self is compatible with required if self supports all required codecs
             for codec in &other.supported_codecs {
                 if !self.supported_codecs.contains(codec) {
                     return false;
                 }
             }
-            // Resolution check
             let get_resolution_score = |res: &str| match res.to_lowercase().as_str() {
                 "8k" => 4,
                 "4k" => 3,
@@ -312,11 +312,10 @@ impl SovereignAppCapability for StandardMediaCapability {
     }
 }
 
-/// HTML Renderer capability (e.g. for equivalent third-party software like Chromium Browser)
 #[derive(Debug, Clone)]
 pub struct StandardHtmlCapability {
     pub name: String,
-    pub engine: String, // e.g. "Blink", "WebKit", "Gecko"
+    pub engine: String,
     pub supports_html5: bool,
     pub supports_wasm: bool,
 }
@@ -337,13 +336,12 @@ impl SovereignAppCapability for StandardHtmlCapability {
         &self.name
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn core::any::Any {
         self
     }
 
     fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool {
         if let Some(other) = required.as_any().downcast_ref::<StandardHtmlCapability>() {
-            // Engine compatibility or generic check
             if other.supports_html5 && !self.supports_html5 {
                 return false;
             }
@@ -357,12 +355,11 @@ impl SovereignAppCapability for StandardHtmlCapability {
     }
 }
 
-/// Translation layer
 pub struct TranslationLayer {
     pub name: String,
     pub supported_formats: Vec<BinaryFormat>,
     pub supported_targets: Vec<TargetPlatform>,
-    pub performance_overhead: f64, // 0.0 to 1.0
+    pub performance_overhead: f64,
 }
 
 impl TranslationLayer {
@@ -404,7 +401,6 @@ impl TranslationLayer {
     }
 }
 
-/// Container runtime
 pub struct ContainerRuntime {
     pub name: String,
     pub supported_formats: Vec<BinaryFormat>,
@@ -448,7 +444,6 @@ impl ContainerRuntime {
     }
 }
 
-/// Cross-platform compatibility manager
 pub struct CompatibilityManager {
     pub translation_layers: BTreeMap<String, TranslationLayer>,
     pub container_runtimes: BTreeMap<String, ContainerRuntime>,
@@ -471,37 +466,31 @@ impl CompatibilityManager {
     }
 
     fn add_default_layers(&mut self) {
-        // Wine for Windows executables
         let wine = TranslationLayer::new("Wine".to_string())
             .with_format(BinaryFormat::Exe)
             .with_target(TargetPlatform::Windows)
             .with_overhead(0.2);
 
-        // Proton (Valve's advanced fork of Wine for high-performance Windows gaming)
         let proton = TranslationLayer::new("Proton".to_string())
             .with_format(BinaryFormat::Exe)
             .with_target(TargetPlatform::Windows)
             .with_overhead(0.05);
 
-        // Rosetta-like translation for macOS binaries
         let rosetta = TranslationLayer::new("Rosetta".to_string())
             .with_format(BinaryFormat::Dmg)
             .with_target(TargetPlatform::MacOS)
             .with_overhead(0.1);
 
-        // Darling for Darwin/macOS application translation
         let darling = TranslationLayer::new("Darling".to_string())
             .with_format(BinaryFormat::Dmg)
             .with_target(TargetPlatform::MacOS)
             .with_overhead(0.25);
 
-        // Box86/Box64 for x86/x64 binaries on ARM
         let box86 = TranslationLayer::new("Box86".to_string())
             .with_format(BinaryFormat::Elf)
             .with_target(TargetPlatform::Linux)
             .with_overhead(0.15);
 
-        // Waydroid for Android application containerized translation
         let waydroid = TranslationLayer::new("Waydroid".to_string())
             .with_format(BinaryFormat::Elf)
             .with_target(TargetPlatform::Linux)
@@ -519,32 +508,26 @@ impl CompatibilityManager {
     }
 
     fn add_default_runtimes(&mut self) {
-        // Docker container runtime
         let docker = ContainerRuntime::new("Docker".to_string())
             .with_format(BinaryFormat::Elf)
             .with_isolation("process".to_string());
 
-        // Podman container runtime
         let podman = ContainerRuntime::new("Podman".to_string())
             .with_format(BinaryFormat::Elf)
             .with_isolation("process".to_string());
 
-        // LXC container runtime
         let lxc = ContainerRuntime::new("LXC".to_string())
             .with_format(BinaryFormat::Elf)
             .with_isolation("os".to_string());
 
-        // containerd container runtime
         let containerd = ContainerRuntime::new("containerd".to_string())
             .with_format(BinaryFormat::Elf)
             .with_isolation("process".to_string());
 
-        // CRI-O container runtime
         let crio = ContainerRuntime::new("CRI-O".to_string())
             .with_format(BinaryFormat::Elf)
             .with_isolation("process".to_string());
 
-        // runc container runtime
         let runc = ContainerRuntime::new("runc".to_string())
             .with_format(BinaryFormat::Elf)
             .with_isolation("process".to_string());
@@ -619,21 +602,18 @@ impl CompatibilityManager {
             return CompatibilityMode::Native;
         }
 
-        // Check for translation layer
         for layer in self.translation_layers.values() {
             if layer.can_translate(binary) {
                 return CompatibilityMode::Translation;
             }
         }
 
-        // Check for container runtime
         for runtime in self.container_runtimes.values() {
             if runtime.can_containerize(binary) {
                 return CompatibilityMode::Container;
             }
         }
 
-        // Fall back to emulation
         CompatibilityMode::Emulation
     }
 
@@ -664,7 +644,6 @@ impl Default for CompatibilityManager {
     }
 }
 
-/// FreeBSD Jail Sandbox Container
 #[derive(Debug, Clone)]
 pub struct FreeBsdJailSandbox {
     pub jid: u32,
@@ -694,7 +673,6 @@ impl FreeBsdJailSandbox {
     }
 }
 
-/// Kqueue scalable event notification queues
 #[derive(Debug, Clone)]
 pub struct KqueueEventNotifier {
     pub fd_list: Vec<i32>,
@@ -734,12 +712,11 @@ pub enum SysctlValue {
 
 #[derive(Debug, Clone)]
 pub struct SysctlParameter {
-    pub name: String, // Dot-separated path, e.g. "kern.maxproc"
+    pub name: String,
     pub value: SysctlValue,
     pub writable: bool,
 }
 
-/// BSD-inspired Sovereign Sysctl Kernel Parameter Tuning Engine
 pub struct SovereignSysctlManager {
     pub parameters: BTreeMap<String, SysctlParameter>,
 }
@@ -760,7 +737,7 @@ impl SovereignSysctlManager {
             SysctlValue::Integer(32768),
             true,
         );
-        self.register_param("hw.ncpu".to_string(), SysctlValue::Integer(16), false); // Read-only
+        self.register_param("hw.ncpu".to_string(), SysctlValue::Integer(16), false);
         let mut os_release = [0u8; 64];
         os_release[..15].copy_from_slice(b"6.24.0-mainline");
         self.register_param(
@@ -788,7 +765,6 @@ impl SovereignSysctlManager {
             if !param.writable {
                 return Err("Parameter is read-only");
             }
-            // Ensure type matches
             match (&param.value, &new_value) {
                 (SysctlValue::Integer(_), SysctlValue::Integer(_))
                 | (SysctlValue::Boolean(_), SysctlValue::Boolean(_))
@@ -803,7 +779,6 @@ impl SovereignSysctlManager {
         }
     }
 
-    /// Shell/Terminal interface parser for sysctl commands, e.g. "sysctl -w net.inet.tcp.sendspace=65536"
     pub fn parse_and_execute_command(&mut self, command: &str) -> Result<String, &'static str> {
         let parts: Vec<&str> = command.split_whitespace().collect();
         if parts.is_empty() {
@@ -815,7 +790,6 @@ impl SovereignSysctlManager {
         }
 
         if parts.len() == 2 {
-            // Read query, e.g. "sysctl kern.maxproc"
             let path = parts[1];
             if let Some(val) = self.query_param(path) {
                 match val {
@@ -834,13 +808,11 @@ impl SovereignSysctlManager {
                 Err("Parameter not found")
             }
         } else if parts.len() == 3 && parts[1] == "-w" {
-            // Write update, e.g. "sysctl -w net.inet.tcp.sendspace=65536"
             let kv: Vec<&str> = parts[2].split('=').collect();
             if kv.len() == 2 {
                 let path = kv[0];
                 let val_str = kv[1];
 
-                // Inspect type to parse correctly
                 let current_val = self.query_param(path).ok_or("Parameter not found")?;
                 let next_val = match current_val {
                     SysctlValue::Integer(_) => {
@@ -876,7 +848,6 @@ impl Default for SovereignSysctlManager {
     }
 }
 
-/// Dynamic bridge for open-source operating system subsystems (e.g. eBPF filter drivers or rump kernels)
 #[derive(Debug, Clone)]
 pub struct OpenSourceOsGapBridge {
     pub active_filters_count: usize,
@@ -906,7 +877,6 @@ impl Default for OpenSourceOsGapBridge {
     }
 }
 
-/// Dynamic bridge for open-source development tools (e.g. GDB trace registers or Git trees)
 #[derive(Debug, Clone)]
 pub struct OpenSourceToolsBridge {
     pub simulated_gdb_registers: BTreeMap<String, u64>,
@@ -934,7 +904,6 @@ impl Default for OpenSourceToolsBridge {
     }
 }
 
-/// Dynamic bridge for open-source AI models (e.g. Llama-3 BPE, Whisper audio pools, or latent image maps)
 #[derive(Debug, Clone)]
 pub struct OpenSourceAiModelBridge {
     pub loaded_models: Vec<String>,
@@ -962,24 +931,7 @@ impl Default for OpenSourceAiModelBridge {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct WindowCoordinates {
-    pub x: i32,
-    pub y: i32,
-    pub width: u32,
-    pub height: u32,
-}
-
-pub struct ZenithDisplayCompositor {
-    pub active_windows_count: usize,
-}
-
-impl ZenithDisplayCompositor {
-    pub fn new() -> Self {
-        Self { active_windows_count: 0 }
-    }
-}
-
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CompatibilityError {
     BinaryNotFound,
     UnsupportedFormat,
@@ -1110,7 +1062,6 @@ mod tests {
     fn test_bsd_sysctl_engine() {
         let mut manager = SovereignSysctlManager::new();
 
-        // 1. Query Default Parameters
         assert_eq!(
             manager.query_param("kern.maxproc").unwrap(),
             &SysctlValue::Integer(1024)
@@ -1120,13 +1071,11 @@ mod tests {
             &SysctlValue::Integer(16)
         );
 
-        // 2. Command Parsing Read Query
         let out_read = manager
             .parse_and_execute_command("sysctl kern.maxproc")
             .unwrap();
         assert_eq!(out_read, "kern.maxproc = 1024");
 
-        // 3. Command Parsing Write Update
         let out_write = manager
             .parse_and_execute_command("sysctl -w kern.maxproc=2048")
             .unwrap();
@@ -1136,7 +1085,6 @@ mod tests {
             &SysctlValue::Integer(2048)
         );
 
-        // 4. Try updating read-only parameter (hw.ncpu) -> should fail
         assert!(manager
             .update_param("hw.ncpu", SysctlValue::Integer(32))
             .is_err());

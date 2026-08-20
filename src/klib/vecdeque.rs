@@ -18,6 +18,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 use super::Vec;
 
 pub struct VecDeque<T> {
@@ -57,7 +58,6 @@ where
         if !self.front.is_empty() {
             self.front.pop()
         } else if !self.back.is_empty() {
-            // Move all elements from back to front
             let len = self.back.len();
             for i in 0..len {
                 self.front.push(self.back[len - 1 - i].clone());
@@ -73,7 +73,6 @@ where
         if !self.back.is_empty() {
             self.back.pop()
         } else if !self.front.is_empty() {
-            // Move all elements from front to back
             let len = self.front.len();
             for i in 0..len {
                 self.back.push(self.front[len - 1 - i].clone());
@@ -210,6 +209,6 @@ mod tests {
         deque.push_front(0);
 
         let items: alloc::vec::Vec<i32> = deque.iter().cloned().collect();
-        assert_eq!(items, vec![0, 1, 2]);
+        assert_eq!(items, alloc::vec![0, 1, 2]);
     }
 }

@@ -8,6 +8,16 @@ pub mod wireless;
 pub mod zero_trust;
 pub mod legacy_net;
 pub mod revival;
+pub mod bsd_pf;
+pub mod npf_firewall;
+pub mod virtual_switch;
+pub mod sync;
+pub mod torrent;
+pub mod pf_firewall;
+pub mod nftables;
+pub mod npf;
+
+pub use npf::{NpfFirewallEngine, NpfFilterAction, NpfDirection, NpfPacket, NpfStateRule};
 
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use analyzer::{
@@ -19,9 +29,5 @@ pub use analyzer::{
     ClearLinuxFlowLoadBalancer,
 };
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-pub use legacy_net::{
-    LegacyProtocol, LegacyProtocolAdapter,
-};
-pub use revival::{
-    RevivalProtocol, NetRevival,
-};
+pub use sync::{CloudSyncManager, ConflictResolution, SyncConfig, SyncCredentials, SyncError, SyncItem, SyncItemType, SyncProvider, SyncResult, SyncStatus};
+pub use torrent::{PeerInfo, TorrentClient, TorrentError, TorrentState};

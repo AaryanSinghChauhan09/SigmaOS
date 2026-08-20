@@ -9,51 +9,17 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
-pub mod zero_alloc_resolver;
-pub mod declarative_build;
-pub mod aur;
-pub mod aur_helper;
-pub mod importer;
-pub mod linux_compat;
-pub mod makepkg;
-pub mod nix_shell;
-pub mod pacman;
-pub mod portage;
-pub mod repository_manager;
-pub mod spec;
-pub mod transaction_log;
-pub mod universal_adapter;
-pub mod universal_engine;
-pub mod universal_oop_system;
 
-pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
-pub use debian_defeater::{AptPinningResolver, SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus};
-pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
-pub use spec::{
-    ManagerCapability, PackageCapability,
-    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    SimplePackage, SimplePackageManager,
-    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use debian_defeater::{
+    SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox,
+    SovereignMirrorSelector,
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
-};
-pub use universal_oop_system::{
-    IPackage, IPackageParser, PackageFormat, PackageMetadata,
-    PackageParserFactory, UniversalPackageManager,
-    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, InstallError, HookError,
-};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -61,12 +27,6 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
-}
-
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
 }
 
 impl Version {
@@ -78,7 +38,6 @@ impl Version {
         }
     }
 
-    /// Parses version input safely with a zero-allocation, stateless next() token iterator over '.' separators
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
         let mut parts = version_str.split('.');
 
@@ -149,7 +108,7 @@ impl Package {
 }
 
 /// Package dependency
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,

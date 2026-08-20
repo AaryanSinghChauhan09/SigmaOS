@@ -16,8 +16,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// (no_std only applicable at crate root - removed)
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::ptr;
@@ -27,6 +25,12 @@ use core::ptr;
 
 pub struct SecureCleaner;
 
+impl Default for SecureCleaner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SecureCleaner {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
@@ -35,20 +39,16 @@ impl SecureCleaner {
 
     /// Performs a 3-pass DoD 5220.22-M style secure wipe on a memory block
     pub fn secure_wipe(&self, block: &mut [u8]) {
-        // Pass 1: Zeros
         for b in block.iter_mut() {
             *b = 0x00;
         }
-        // Pass 2: Ones
         for b in block.iter_mut() {
             *b = 0xFF;
         }
-        // Pass 3: Random/Pseudo-random (simulated with fixed pattern for no_std deterministic test)
         for b in block.iter_mut() {
             *b = 0xAA;
         }
 
-        // Volatile write to ensure compiler doesn't optimize it away
         unsafe {
             let ptr = block.as_mut_ptr();
             for i in 0..block.len() {
@@ -82,21 +82,18 @@ mod tests {
 
         cleaner.secure_wipe(&mut sensitive_data);
 
-        // The volatile write at the end zeroes it out
         assert_eq!(sensitive_data, alloc::vec![0x00, 0x00, 0x00, 0x00]);
     }
 
     #[test]
     fn test_wipe_unallocated_space() {
         let cleaner = SecureCleaner::new();
-        let mut partition = alloc::vec![0xFF; 1024]; // Two 512-byte blocks
-        let bitmap = [true, false]; // Block 0 allocated, Block 1 unallocated
+        let mut partition = alloc::vec![0xFF; 1024];
+        let bitmap = [true, false];
 
         cleaner.wipe_unallocated_space(&mut partition, &bitmap);
 
-        // Block 0 should remain 0xFF
         assert_eq!(partition[0..512], alloc::vec![0xFF; 512]);
-        // Block 1 should be wiped to 0x00
         assert_eq!(partition[512..1024], alloc::vec![0x00; 512]);
     }
 }
@@ -115,28 +112,24 @@ impl TorAnonymityGate {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            tor_port: 9050, // standard SOCKS5 Tor port
+            tor_port: 9050,
             enforce_leak_prevention: true,
         }
     }
 
-    /// Verifies if an outgoing IP packet is leak-proof (directed to local loopback or Tor SOCKS proxy)
     pub fn validate_outgoing_traffic(&self, dest_ip: &[u8; 4], dest_port: u16) -> bool {
         if !self.enforce_leak_prevention {
             return true;
         }
 
-        // Allow loopback/localhost connections
         if dest_ip == &[127, 0, 0, 1] {
             return true;
         }
 
-        // Allow outgoing traffic directed to the Tor socks port
         if dest_port == self.tor_port {
             return true;
         }
 
-        // Block any other outgoing direct internet connection to prevent IP leaks
         false
     }
 }
@@ -158,10 +151,8 @@ impl AmnesiaManager {
         Self { rounds: 3 }
     }
 
-    /// Perform secure, multi-pass volatile memory zeros over RAM pages to defend against cold-boot attacks
     pub fn shred_ram_segment(&self, ram_page: &mut [u8]) {
         for _ in 0..self.rounds {
-            // High-security write-zero passes
             unsafe {
                 let ptr = ram_page.as_mut_ptr();
                 for i in 0..ram_page.len() {
@@ -187,7 +178,6 @@ impl MetadataScrubber {
         Self
     }
 
-    /// Locates and scrubs sensitive EXIF metadata tags in raw document streams
     pub fn scrub_exif_metadata(&self, document: &mut [u8]) -> usize {
         let mut scrub_count = 0;
         let exif_tag = b"Exif\0\0";
@@ -195,7 +185,6 @@ impl MetadataScrubber {
         let mut i = 0;
         while i + exif_tag.len() <= document.len() {
             if &document[i..i + exif_tag.len()] == exif_tag {
-                // Wipe the EXIF header and subsequent camera ID data (next 32 bytes)
                 let wipe_end = (i + 32).min(document.len());
                 for byte in &mut document[i..wipe_end] {
                     *byte = 0x00;
@@ -219,17 +208,15 @@ impl Default for MetadataScrubber {
 
 #[cfg(test)]
 mod tails_parity_tests {
+    use super::*;
 
     #[test]
     fn test_tor_firewall_rules() {
         let gate = TorAnonymityGate::new();
 
-        // Loopback is allowed
         assert!(gate.validate_outgoing_traffic(&[127, 0, 0, 1], 80));
-        // Traffic directed through Tor proxy port is allowed
         assert!(gate.validate_outgoing_traffic(&[104, 244, 42, 1], 9050));
 
-        // Direct non-Tor traffic is blocked to prevent anonymity leakage
         assert!(!gate.validate_outgoing_traffic(&[8, 8, 8, 8], 53));
         assert!(!gate.validate_outgoing_traffic(&[142, 250, 190, 46], 443));
     }
@@ -253,7 +240,6 @@ mod tails_parity_tests {
         let count = scrubber.scrub_exif_metadata(&mut document);
         assert_eq!(count, 1);
 
-        // Ensure "Exif" header was securely zeroed out
         assert!(!document.windows(6).any(|w| w == b"Exif\0\0"));
     }
 }
