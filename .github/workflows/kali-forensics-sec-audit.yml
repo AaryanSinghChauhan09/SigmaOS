@@ -1,4 +1,4 @@
-name: Gentoo Portage & USE Flags CI
+name: Kali Linux Forensics & Security Audit CI
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main, master ]
 
 jobs:
-  gentoo-portage-verification:
-    name: Gentoo Portage USE Flags & Ebuild Compilation Test
+  kali-forensics-verification:
+    name: Kali Linux Penetration Tools & Forensic Storage Filter Verification
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -17,6 +17,6 @@ jobs:
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Run Gentoo Portage Test Suite
+      - name: Run Kali Security Audit Suite
         run: |
           ./run_sigma_tests.sh

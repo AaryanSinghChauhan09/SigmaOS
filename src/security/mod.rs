@@ -1,42 +1,45 @@
-// SigmaOS Security Module
-// Capability-based security, pledge, and access control
-
-pub mod audit;
+// SigmaOS Security Subsystem
 pub mod capability;
-pub mod integrity;
-pub mod mac;
-pub mod obfuscator;
-pub mod phantom;
-pub mod pki;
+pub mod capability_enforcer;
+pub mod defensive_audit;
+pub mod parrot;
 pub mod pledge;
-pub mod secrets;
-pub mod securelevels;
 pub mod unveil;
 pub mod vulnerability;
 pub mod hardening;
-pub mod qubes_isolation;
-pub mod bridge;
-pub mod prism;
-pub mod sandbox;
+pub mod kernel_hardening;
+pub mod intrusion;
+pub mod deobfuscation;
+pub mod binary_protection;
+
+pub use binary_protection::{BinaryProtectionManager, RelroMode, AslrMap, ChecksecReport};
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use obfuscator::{SovereignCodeHardener, SovereignThreatDetector};
-pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
-pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
 pub use hardening::{
-    secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
+    secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
+    HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
+    KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
+    SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
+    UserAccessGuard, UserPtr,
 };
-pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
-pub use bridge::{
-    LegacySecurityType, SecurityBridge,
+pub use capability_enforcer::{SecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP};
+pub use kernel_hardening::{HardenedSyscallDispatcher, SmepSmapEnforcer, SovereignKaslrEngine};
+pub use intrusion::{
+    CrowdStrikeFalconAi, DetectionResult, EventType, IntrusionDetectionSystem, RuleAction,
+    SecurityEvent, Severity, SnortRule, SnortSignatureFirewall,
 };
-pub use prism::{
-    SecurityFacet, SecurityPrism,
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
 };
-pub use sandbox::{
-    SandboxRule, PrivacyFirstSandbox,
+pub use parrot::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise, ThreadSubPledgeContext};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+
+pub use kali_stack::{
+    PluggableAuthenticationModule, FirewallRule, IptablesFirewall, CronJob, CronDaemon,
+    SudoPrivilegeEscalation, TmuxPane, TmuxMultiplexer, SwapSpaceManager, DmesgLog, KaliError,
 };

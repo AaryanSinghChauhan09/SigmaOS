@@ -1,4 +1,4 @@
-name: Gentoo Portage & USE Flags CI
+name: antiX Linux SysVinit & Slim Desktop CI
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main, master ]
 
 jobs:
-  gentoo-portage-verification:
-    name: Gentoo Portage USE Flags & Ebuild Compilation Test
+  antix-sysv-verification:
+    name: antiX Linux SysVinit Runlevel & Lightweight Desktop Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -17,6 +17,6 @@ jobs:
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Run Gentoo Portage Test Suite
+      - name: Run antiX Test Suite
         run: |
           ./run_sigma_tests.sh

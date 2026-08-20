@@ -284,6 +284,106 @@ impl SigmaFS {
 }
 
 // =========================================================================
+// 0. HAMMER2/ZFS-inspired Pseudo-Filesystem (PFS) Namespaces & Deduplication Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PfsType {
+    Master,
+    Slave,
+    Snapshot,
+    Overlay,
+}
+
+#[derive(Debug, Clone)]
+pub struct PseudoFilesystemNamespace {
+    pub name: String,
+    pub pfs_type: PfsType,
+    pub parent_snapshot_id: Option<String>,
+    pub file_map: HashMap<String, String>, // file path -> content hash
+    pub is_read_only: bool,
+}
+
+impl PseudoFilesystemNamespace {
+    pub fn new(name: &str, pfs_type: PfsType) -> Self {
+        Self {
+            name: name.to_string(),
+            pfs_type,
+            parent_snapshot_id: None,
+            file_map: HashMap::new(),
+            is_read_only: false,
+        }
+    }
+
+    pub fn snapshot(name: &str, parent_name: &str, file_map: HashMap<String, String>) -> Self {
+        Self {
+            name: name.to_string(),
+            pfs_type: PfsType::Snapshot,
+            parent_snapshot_id: Some(parent_name.to_string()),
+            file_map,
+            is_read_only: true,
+        }
+    }
+}
+
+pub struct Blake3BlockDeduplicationEngine {
+    pub blocks: HashMap<String, Vec<u8>>,
+    pub ref_counts: HashMap<String, usize>,
+}
+
+impl Blake3BlockDeduplicationEngine {
+    pub fn new() -> Self {
+        Self {
+            blocks: HashMap::new(),
+            ref_counts: HashMap::new(),
+        }
+    }
+
+    /// Store a block using pseudo-BLAKE3 content addressing and increment reference count
+    pub fn store_block(&mut self, content: &[u8]) -> String {
+        let hash = self.compute_block_hash(content);
+        if let Some(count) = self.ref_counts.get_mut(&hash) {
+            *count += 1;
+        } else {
+            self.blocks.insert(hash.clone(), content.to_vec());
+            self.ref_counts.insert(hash.clone(), 1);
+        }
+        hash
+    }
+
+    /// Retrieve a block by its content hash
+    pub fn read_block(&self, hash: &str) -> Option<&Vec<u8>> {
+        self.blocks.get(hash)
+    }
+
+    /// Decrement reference count and purge block when reference count reaches zero
+    pub fn release_block(&mut self, hash: &str) -> bool {
+        if let Some(count) = self.ref_counts.get_mut(hash) {
+            if *count > 1 {
+                *count -= 1;
+                false
+            } else {
+                self.ref_counts.remove(hash);
+                self.blocks.remove(hash);
+                true
+            }
+        } else {
+            false
+        }
+    }
+
+    /// Computes content hash
+    fn compute_block_hash(&self, content: &[u8]) -> String {
+        let mut h: u64 = 0xcbf29ce484222325;
+        for &b in content {
+            h ^= b as u64;
+            h = h.wrapping_mul(0x100000001b3);
+        }
+        format!("blake3-{:016x}", h)
+    }
+}
+
+// =========================================================================
 // 1. SigmaFhsRouter (Ecosystem Integration Parity)
 // =========================================================================
 

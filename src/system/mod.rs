@@ -97,5 +97,5 @@ pub use syslog::{
     LogLevel, LogFacility, LogEntry, SyslogManager, LogRule, LogAction, SyslogError,
 };
 pub use user::{
-    Group, User, UserError, UserManager,
+    Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager,
 };

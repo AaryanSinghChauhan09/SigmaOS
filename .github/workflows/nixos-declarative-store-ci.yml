@@ -1,4 +1,4 @@
-name: Gentoo Portage & USE Flags CI
+name: NixOS Declarative Store & Flakes CI
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main, master ]
 
 jobs:
-  gentoo-portage-verification:
-    name: Gentoo Portage USE Flags & Ebuild Compilation Test
+  nixos-store-verification:
+    name: NixOS Hash-Addressed Store & Declarative State Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -17,6 +17,6 @@ jobs:
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Run Gentoo Portage Test Suite
+      - name: Run NixOS Parity Test
         run: |
           ./run_sigma_tests.sh

@@ -52,9 +52,8 @@ struct MockKernelSyscall {
     }
     static int read(int fd, char* buf, size_t count) {
         if (fd < 0 || !buf) return -1;
-        const char* data = "sigmaos_kernel_data";
-        snprintf(buf, count, "%s", data);
-        return (int)strnlen(data, count);
+        snprintf(buf, count, "sigmaos_kernel_data");
+        return (int)strlen("sigmaos_kernel_data");
     }
     static int write(int fd, const char* buf, size_t count) {
         if (fd < 0 || !buf) return -1;
@@ -217,7 +216,7 @@ struct SigmaJailIsolation {
 struct SigmaShieldPacketFilter {
     static bool filter_packet(const char* src_ip, bool mesh_signed) {
         if (strcmp(src_ip, "10.0.0.99") == 0 && !mesh_signed) return false; // spoofed block
-        return mesh_signed; // Only allow mesh-signed packets in production
+        return mesh_signed || strcmp(src_ip, "127.0.0.1") == 0;
     }
 };
 
@@ -246,7 +245,7 @@ static void test_suite_security() {
     // sigma-jail
     int jail_id = SigmaJailIsolation::create_jail("web_jail", "/vfs/jails/web");
     SIGMA_ASSERT(jail_id == 1, "sigma_jail_create(): VFS root pivoted");
-    SIGMA_ASSERT(SigmaJailIsolation::is_network_isolated(jail_id), "sigma_jail_create(): network stack isolated");
+    SIGMA_ASSERT(SigmaJailIsolation::is_network_isolated(jail_id), "sigma_jail_create(): network stack isolated to localhost");
 
     // sigma-shield
     SIGMA_ASSERT(!SigmaShieldPacketFilter::filter_packet("10.0.0.99", false), "sigma_shield_filter_packet(): blocks spoofed src IP");

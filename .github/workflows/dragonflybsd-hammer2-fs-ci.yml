@@ -1,4 +1,4 @@
-name: Gentoo Portage & USE Flags CI
+name: DragonFly BSD HAMMER2 File System CI
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main, master ]
 
 jobs:
-  gentoo-portage-verification:
-    name: Gentoo Portage USE Flags & Ebuild Compilation Test
+  dragonfly-hammer2-verification:
+    name: DragonFly BSD HAMMER2 Distributed Storage & VFS Cache Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -17,6 +17,6 @@ jobs:
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Run Gentoo Portage Test Suite
+      - name: Run DragonFly BSD Test
         run: |
           ./run_sigma_tests.sh

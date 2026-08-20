@@ -9,31 +9,11 @@ pub mod sigma_fs;
 pub mod smart_symlink;
 pub mod tmpfs;
 pub mod vfs;
-pub mod ext4_ntfs_security;
 
-pub use ext4_ntfs_security::{
-    Ext4InodeMetadata, SecurityIdentifier, NtfsSecurityDescriptor,
-    NtfsAce, AceType, NtfsDacl, NtfsSacl, ext4_mode_bits, ntfs_rights,
-};
-pub mod geom;
-
-pub use geom::{GeomClass, GeomProvider, GeomConsumer, GeomAccessRights};
-
-pub use archive::{
-    ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
-    CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
-};
-pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
-pub use defragmenter::{ClusterState, DefragStats, DiskDefragmenter, FragmentedFile};
-pub use disk_usage::{
-    AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
-    DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
-};
-pub use manager::{
-    ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
-    FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
-};
-pub use support::{
-    Filesystem, FilesystemError, FilesystemManager, FilesystemType, LegacyLinuxRule,
-    LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
+pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use sigma_fs::{
+    Blake3BlockDeduplicationEngine, JournalState, PfsType, PseudoFilesystemNamespace,
+    RaidLevel, SigmaFS, SigmaFhsAuditor, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsRouter,
+    SigmaFsCow, SigmaFsCrypt, SigmaFsJournal, SigmaFsRaid, SigmaFsVirtio, SigmaFsVolume,
 };

@@ -1,33 +1,22 @@
-name: Slackware Linux Pkgtools & SysV Init CI
+name: Slackware pkgtools & SysV Init CI
 
 on:
   push:
-    branches: [ main, master, "feat/**" ]
+    branches: [ main, master, "jules-*" ]
   pull_request:
     branches: [ main, master ]
 
-permissions:
-  contents: read
-
 jobs:
   slackware-verification:
-    name: Slackware pkgtools & SlackBuilds Package Verification
+    name: Slackware pkgtools & BSD rc.S Init Verification
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
       - name: Set up Rust Toolchain
-        uses: dtolnay/rust-toolchain@1.24.0
-        with:
-          toolchain: stable
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Verify Slackware SysV Init & Pkgtools Subsystems
+      - name: Run Slackware Integration Test
         run: |
-          rustc --test src/process/activity_manager.rs -o test_act
-          ./test_act
-          rustc --test src/memory/segmentation_paging.rs -o test_seg
-          ./test_seg
+          ./run_sigma_tests.sh

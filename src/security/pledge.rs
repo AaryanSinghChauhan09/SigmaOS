@@ -2,7 +2,17 @@
 // Inspired by OpenBSD pledge but capability-based
 
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
+
+/// Per-thread sub-pledge context enabling fine-grained worker thread isolation
+#[derive(Debug, Clone)]
+pub struct ThreadSubPledgeContext {
+    pub tid: u64,
+    pub sub_promise: PledgePromise,
+}
 
 /// Pledge promise representing process permissions
 #[derive(Debug)]
@@ -68,7 +78,7 @@ pub struct UnveilEntry {
     pub permissions: String, // e.g., "r", "rw", "rx"
 }
 
-/// Process pledge manager
+/// Process pledge manager supporting process-level and thread-level sub-pledges
 pub struct PledgeManager {
     /// Current pledge promise
     pledge: Option<PledgePromise>,
@@ -76,6 +86,8 @@ pub struct PledgeManager {
     gate: CapabilityGate,
     /// Unveiled paths for filesystem sandboxing
     unveiled_paths: Vec<UnveilEntry>,
+    /// Thread-specific sub-pledges
+    thread_sub_pledges: BTreeMap<u64, ThreadSubPledgeContext>,
 }
 
 impl PledgeManager {
@@ -85,7 +97,29 @@ impl PledgeManager {
             pledge: None,
             gate: CapabilityGate::new(),
             unveiled_paths: Vec::new(),
+            thread_sub_pledges: BTreeMap::new(),
         }
+    }
+
+    /// Assign a sub-pledge promise to a worker thread (must be a subset of main process pledge)
+    pub fn sub_pledge_thread(&mut self, tid: u64, sub_promise: PledgePromise) -> Result<(), PledgeError> {
+        if let Some(ref main_pledge) = self.pledge {
+            // Verify that thread sub-pledge does not exceed process pledge
+            for perm in sub_promise.permissions() {
+                if !main_pledge.allows(*perm) {
+                    return Err(PledgeError::Violation);
+                }
+            }
+        }
+        sub_promise.activate()?;
+        self.thread_sub_pledges.insert(
+            tid,
+            ThreadSubPledgeContext {
+                tid,
+                sub_promise,
+            },
+        );
+        Ok(())
     }
 
     /// Unveil filesystem paths to restrict access (sigma_unveil)
@@ -169,7 +203,17 @@ impl PledgeManager {
         Ok(())
     }
 
-    /// Validate syscall against pledge
+    /// Validate syscall against process or thread-specific pledge
+    pub fn validate_thread(&self, tid: u64, permission: Permission) -> Result<(), PledgeError> {
+        if let Some(thread_ctx) = self.thread_sub_pledges.get(&tid) {
+            if !thread_ctx.sub_promise.allows(permission) {
+                return Err(PledgeError::Violation);
+            }
+        }
+        self.validate(permission)
+    }
+
+    /// Validate syscall against process pledge
     pub fn validate(&self, permission: Permission) -> Result<(), PledgeError> {
         if let Some(ref pledge) = self.pledge {
             if !pledge.allows(permission) {

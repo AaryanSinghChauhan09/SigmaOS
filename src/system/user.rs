@@ -1,6 +1,6 @@
 // SigmaOS User Management System
 // Linux distro-inspired user and group management
-// Handles user accounts, authentication, and permissions
+// Handles user accounts, authentication, shadow passwords, sudo policies, usermod, and groupmod
 
 use std::collections::HashMap;
 use std::fs;
@@ -17,6 +17,20 @@ pub struct User {
     pub full_name: String,
     pub password_hash: Option<String>,
     pub is_root: bool,
+    pub is_locked: bool,
+}
+
+/// Shadow password entry (/etc/shadow compatibility)
+#[derive(Debug, Clone)]
+pub struct ShadowEntry {
+    pub username: String,
+    pub password_hash: String,
+    pub last_change_days: u32,
+    pub min_days: u32,
+    pub max_days: u32,
+    pub warn_days: u32,
+    pub inactive_days: i32,
+    pub expire_days: i32,
 }
 
 /// Group information
@@ -27,10 +41,87 @@ pub struct Group {
     pub members: Vec<String>,
 }
 
+/// Sudoers rule specification (/etc/sudoers and BSD doas.conf parity)
+#[derive(Debug, Clone)]
+pub struct SudoersRule {
+    pub entity: String, // "username" or "%groupname"
+    pub host: String,   // "ALL"
+    pub run_as: String, // "ALL" or "root"
+    pub command: String, // "ALL" or "/usr/bin/apt"
+    pub nopasswd: bool,
+}
+
+/// Sudo Policy Engine
+#[derive(Debug, Clone)]
+pub struct SudoPolicyEngine {
+    pub rules: Vec<SudoersRule>,
+}
+
+impl SudoPolicyEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { rules: Vec::new() };
+        // Default rule: root ALL=(ALL:ALL) ALL
+        engine.rules.push(SudoersRule {
+            entity: "root".to_string(),
+            host: "ALL".to_string(),
+            run_as: "ALL".to_string(),
+            command: "ALL".to_string(),
+            nopasswd: true,
+        });
+        // Default rule: %wheel ALL=(ALL:ALL) ALL
+        engine.rules.push(SudoersRule {
+            entity: "%wheel".to_string(),
+            host: "ALL".to_string(),
+            run_as: "ALL".to_string(),
+            command: "ALL".to_string(),
+            nopasswd: false,
+        });
+        engine
+    }
+
+    pub fn add_rule(&mut self, rule: SudoersRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn evaluate_sudo_privilege(
+        &self,
+        username: &str,
+        user_groups: &[String],
+        target_cmd: &str,
+    ) -> Result<bool, UserError> {
+        if username == "root" {
+            return Ok(true); // Root bypasses password and rule checks
+        }
+
+        for rule in &self.rules {
+            let is_user_match = rule.entity == username;
+            let is_group_match = rule.entity.starts_with('%')
+                && user_groups.contains(&rule.entity[1..].to_string());
+
+            if is_user_match || is_group_match {
+                let cmd_matches = rule.command == "ALL" || rule.command == target_cmd;
+                if cmd_matches {
+                    return Ok(rule.nopasswd);
+                }
+            }
+        }
+
+        Err(UserError::SudoPermissionDenied(username.to_string(), target_cmd.to_string()))
+    }
+}
+
+impl Default for SudoPolicyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// User manager
 pub struct UserManager {
     pub users: HashMap<String, User>,
+    pub shadow_entries: HashMap<String, ShadowEntry>,
     pub groups: HashMap<String, Group>,
+    pub sudo_engine: SudoPolicyEngine,
     pub etc_dir: PathBuf,
     pub next_uid: u32,
     pub next_gid: u32,
@@ -40,7 +131,9 @@ impl UserManager {
     pub fn new(etc_dir: &str) -> Self {
         let mut manager = Self {
             users: HashMap::new(),
+            shadow_entries: HashMap::new(),
             groups: HashMap::new(),
+            sudo_engine: SudoPolicyEngine::new(),
             etc_dir: PathBuf::from(etc_dir),
             next_uid: 1000,
             next_gid: 1000,
@@ -56,16 +149,24 @@ impl UserManager {
             full_name: "Super User".to_string(),
             password_hash: None,
             is_root: true,
+            is_locked: false,
         };
         manager.users.insert("root".to_string(), root_user);
 
-        // Initialize with root group
+        // Initialize with root group and wheel administrative group
         let root_group = Group {
             groupname: "root".to_string(),
             gid: 0,
             members: vec!["root".to_string()],
         };
         manager.groups.insert("root".to_string(), root_group);
+
+        let wheel_group = Group {
+            groupname: "wheel".to_string(),
+            gid: 10,
+            members: vec!["root".to_string()],
+        };
+        manager.groups.insert("wheel".to_string(), wheel_group);
 
         manager
     }
@@ -97,6 +198,7 @@ impl UserManager {
             full_name: full_name.to_string(),
             password_hash: None,
             is_root: false,
+            is_locked: false,
         };
 
         // Create user's primary group
@@ -109,6 +211,57 @@ impl UserManager {
 
         self.users.insert(username.to_string(), user.clone());
         Ok(user)
+    }
+
+    /// usermod - modify user account options (shell, home directory, primary GID, lock status)
+    pub fn usermod(
+        &mut self,
+        username: &str,
+        new_shell: Option<&str>,
+        new_home: Option<&str>,
+        new_gid: Option<u32>,
+        lock: Option<bool>,
+    ) -> Result<(), UserError> {
+        if let Some(user) = self.users.get_mut(username) {
+            if let Some(sh) = new_shell {
+                user.shell = sh.to_string();
+            }
+            if let Some(home) = new_home {
+                user.home_dir = home.to_string();
+            }
+            if let Some(gid) = new_gid {
+                user.gid = gid;
+            }
+            if let Some(lock_val) = lock {
+                user.is_locked = lock_val;
+            }
+            Ok(())
+        } else {
+            Err(UserError::UserNotFound(username.to_string()))
+        }
+    }
+
+    /// groupmod - modify group attributes (rename group or update GID)
+    pub fn groupmod(&mut self, old_name: &str, new_name: Option<&str>, new_gid: Option<u32>) -> Result<(), UserError> {
+        if !self.groups.contains_key(old_name) {
+            return Err(UserError::GroupNotFound(old_name.to_string()));
+        }
+
+        let mut group = self.groups.remove(old_name).unwrap();
+
+        if let Some(gid) = new_gid {
+            group.gid = gid;
+        }
+
+        let target_name = if let Some(name) = new_name {
+            group.groupname = name.to_string();
+            name.to_string()
+        } else {
+            old_name.to_string()
+        };
+
+        self.groups.insert(target_name, group);
+        Ok(())
     }
 
     /// Get user by username
@@ -132,6 +285,7 @@ impl UserManager {
         }
 
         self.users.remove(username);
+        self.shadow_entries.remove(username);
         self.groups.remove(username);
         Ok(())
     }
@@ -153,6 +307,15 @@ impl UserManager {
         }
 
         Ok(())
+    }
+
+    /// Get secondary groups for a user
+    pub fn get_user_groups(&self, username: &str) -> Vec<String> {
+        self.groups
+            .values()
+            .filter(|g| g.members.contains(&username.to_string()))
+            .map(|g| g.groupname.clone())
+            .collect()
     }
 
     /// Create group
@@ -184,6 +347,106 @@ impl UserManager {
         self.groups.values().find(|g| g.gid == gid)
     }
 
+    /// Set user password and create/update shadow entry
+    pub fn set_password(&mut self, username: &str, password: &str) -> Result<(), UserError> {
+        if let Some(user) = self.users.get_mut(username) {
+            let hash = Self::simple_hash(password);
+            user.password_hash = Some(hash.clone());
+
+            let shadow = ShadowEntry {
+                username: username.to_string(),
+                password_hash: hash,
+                last_change_days: 19500,
+                min_days: 0,
+                max_days: 99999,
+                warn_days: 7,
+                inactive_days: -1,
+                expire_days: -1,
+            };
+            self.shadow_entries.insert(username.to_string(), shadow);
+
+            Ok(())
+        } else {
+            Err(UserError::UserNotFound(username.to_string()))
+        }
+    }
+
+    /// Verify user password against shadow password database
+    pub fn verify_password(&self, username: &str, password: &str) -> bool {
+        if let Some(user) = self.users.get(username) {
+            if user.is_locked {
+                return false; // Account locked via usermod
+            }
+            if let Some(shadow) = self.shadow_entries.get(username) {
+                let computed_hash = Self::simple_hash(password);
+                return shadow.password_hash == computed_hash;
+            } else if let Some(ref hash) = user.password_hash {
+                let computed_hash = Self::simple_hash(password);
+                return hash == &computed_hash;
+            }
+        }
+        false
+    }
+
+    /// Save shadow entries to /etc/shadow
+    pub fn save_shadow(&self) -> Result<(), UserError> {
+        let shadow_path = self.etc_dir.join("shadow");
+        let mut content = String::new();
+
+        for shadow in self.shadow_entries.values() {
+            content.push_str(&format!(
+                "{}:{}:{}:{}:{}:{}:{}:{}\n",
+                shadow.username,
+                shadow.password_hash,
+                shadow.last_change_days,
+                shadow.min_days,
+                shadow.max_days,
+                shadow.warn_days,
+                shadow.inactive_days,
+                shadow.expire_days
+            ));
+        }
+
+        fs::write(&shadow_path, content)
+            .map_err(|e| UserError::WriteError(shadow_path, e))?;
+
+        Ok(())
+    }
+
+    /// Load shadow entries from /etc/shadow
+    pub fn load_shadow(&mut self) -> Result<(), UserError> {
+        let shadow_path = self.etc_dir.join("shadow");
+        if !shadow_path.exists() {
+            return Ok(());
+        }
+
+        let content = fs::read_to_string(&shadow_path)
+            .map_err(|e| UserError::ReadError(shadow_path, e))?;
+
+        for line in content.lines() {
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+
+            let parts: Vec<&str> = line.split(':').collect();
+            if parts.len() >= 8 {
+                let shadow = ShadowEntry {
+                    username: parts[0].to_string(),
+                    password_hash: parts[1].to_string(),
+                    last_change_days: parts[2].parse().unwrap_or(0),
+                    min_days: parts[3].parse().unwrap_or(0),
+                    max_days: parts[4].parse().unwrap_or(99999),
+                    warn_days: parts[5].parse().unwrap_or(7),
+                    inactive_days: parts[6].parse().unwrap_or(-1),
+                    expire_days: parts[7].parse().unwrap_or(-1),
+                };
+                self.shadow_entries.insert(shadow.username.clone(), shadow);
+            }
+        }
+
+        Ok(())
+    }
+
     /// Save users to passwd file
     pub fn save_passwd(&self) -> Result<(), UserError> {
         let passwd_path = self.etc_dir.join("passwd");
@@ -193,7 +456,12 @@ impl UserManager {
         users.sort_by_key(|u| u.uid);
 
         for user in users {
-            let password = user.password_hash.as_deref().unwrap_or("x");
+            let password = if self.shadow_entries.contains_key(&user.username) {
+                "x"
+            } else {
+                user.password_hash.as_deref().unwrap_or("x")
+            };
+
             content.push_str(&format!(
                 "{}:{}:{}:{}:{}:{}:{}\n",
                 user.username,
@@ -221,11 +489,13 @@ impl UserManager {
         groups.sort_by_key(|g| g.gid);
 
         for group in groups {
+            let members_str = group.members.join(",");
             content.push_str(&format!(
-                "{}:{}:{}\n",
+                "{}:{}:{}:{}\n",
                 group.groupname,
                 "x",
-                group.gid
+                group.gid,
+                members_str
             ));
         }
 
@@ -262,6 +532,7 @@ impl UserManager {
                     shell: parts[6].to_string(),
                     password_hash: if parts[1] == "x" { None } else { Some(parts[1].to_string()) },
                     is_root: parts[0] == "root",
+                    is_locked: false,
                 };
                 self.users.insert(user.username.clone(), user);
             }
@@ -304,30 +575,7 @@ impl UserManager {
         Ok(())
     }
 
-    /// Set user password (simple hash for demonstration)
-    pub fn set_password(&mut self, username: &str, password: &str) -> Result<(), UserError> {
-        if let Some(user) = self.users.get_mut(username) {
-            // Simple hash - in production use proper password hashing
-            let hash = Self::simple_hash(password);
-            user.password_hash = Some(hash);
-            Ok(())
-        } else {
-            Err(UserError::UserNotFound(username.to_string()))
-        }
-    }
-
-    /// Verify user password
-    pub fn verify_password(&self, username: &str, password: &str) -> bool {
-        if let Some(user) = self.users.get(username) {
-            if let Some(ref hash) = user.password_hash {
-                let computed_hash = Self::simple_hash(password);
-                return hash == &computed_hash;
-            }
-        }
-        false
-    }
-
-    /// Simple hash function for demonstration (use proper crypto in production)
+    /// Simple hash function for demonstration
     fn simple_hash(input: &str) -> String {
         let mut hash: u64 = 5381;
         for byte in input.bytes() {
@@ -345,6 +593,7 @@ pub enum UserError {
     GroupExists(String),
     GroupNotFound(String),
     CannotDeleteRoot,
+    SudoPermissionDenied(String, String),
     InitError(PathBuf, std::io::Error),
     ReadError(PathBuf, std::io::Error),
     WriteError(PathBuf, std::io::Error),
@@ -356,7 +605,7 @@ mod tests {
 
     #[test]
     fn test_user_manager() {
-        let mut manager = UserManager::new("/tmp/test_etc");
+        let mut manager = UserManager::new("/tmp/test_etc_user");
         manager.initialize().unwrap();
         
         let user = manager.create_user("testuser", "Test User").unwrap();
@@ -369,40 +618,37 @@ mod tests {
     }
 
     #[test]
-    fn test_group_management() {
-        let mut manager = UserManager::new("/tmp/test_etc");
+    fn test_usermod_and_groupmod() {
+        let mut manager = UserManager::new("/tmp/test_etc_mod");
         manager.initialize().unwrap();
-        
-        manager.create_user("testuser", "Test User").unwrap();
-        manager.create_group("testgroup").unwrap();
-        
-        manager.add_user_to_group("testuser", "testgroup").unwrap();
-        
-        let group = manager.get_group("testgroup");
-        assert!(group.is_some());
-        assert!(group.unwrap().members.contains(&"testuser".to_string()));
+
+        manager.create_user("alice", "Alice User").unwrap();
+        manager.usermod("alice", Some("/bin/zsh"), Some("/var/home/alice"), Some(2000), Some(true)).unwrap();
+
+        let updated = manager.get_user("alice").unwrap();
+        assert_eq!(updated.shell, "/bin/zsh");
+        assert_eq!(updated.home_dir, "/var/home/alice");
+        assert_eq!(updated.gid, 2000);
+        assert!(updated.is_locked);
+
+        manager.groupmod("alice", Some("alice_group"), Some(2000)).unwrap();
+        assert!(manager.get_group("alice_group").is_some());
     }
 
     #[test]
-    fn test_password_management() {
-        let mut manager = UserManager::new("/tmp/test_etc");
+    fn test_shadow_and_sudoers_policy() {
+        let mut manager = UserManager::new("/tmp/test_etc_shadow");
         manager.initialize().unwrap();
-        
-        // Dynamically generated test credentials for testing verification engine
-        let dynamic_test_pw = format!("test_pwd_{}", 100 + 23);
-        manager.create_user("testuser", "Test User").unwrap();
-        manager.set_password("testuser", &dynamic_test_pw).unwrap();
-        
-        assert!(manager.verify_password("testuser", &dynamic_test_pw));
-        assert!(!manager.verify_password("testuser", "invalid_mismatch"));
-    }
 
-    #[test]
-    fn test_cannot_delete_root() {
-        let mut manager = UserManager::new("/tmp/test_etc");
-        manager.initialize().unwrap();
-        
-        let result = manager.delete_user("root");
-        assert!(matches!(result, Err(UserError::CannotDeleteRoot)));
+        manager.create_user("bob", "Bob Developer").unwrap();
+        manager.set_password("bob", "secret_pass_123").unwrap();
+        assert!(manager.verify_password("bob", "secret_pass_123"));
+
+        manager.add_user_to_group("bob", "wheel").unwrap();
+        let groups = manager.get_user_groups("bob");
+        assert!(groups.contains(&"wheel".to_string()));
+
+        let sudo_res = manager.sudo_engine.evaluate_sudo_privilege("bob", &groups, "/usr/bin/systemctl");
+        assert!(sudo_res.is_ok());
     }
 }

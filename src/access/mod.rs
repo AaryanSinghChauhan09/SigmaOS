@@ -10,10 +10,8 @@
 pub mod control;
 
 pub use control::{
-    Ext4AccessCheckEngine, Ext4FileType, Ext4InodeMode, Ext4Xattr, NtfsAce, NtfsAceFlags,
-    NtfsAceType, NtfsAccessRights, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor, PosixAclEntry,
-    PosixAclTable, PosixAclTag, SecurityIdentifier, dac_flags, ext4_special_bits,
-    ntfs_access_rights, ntfs_ace_flags,
+    AclEntry, AclTag, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl,
+    Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask,
 };
 
 extern crate alloc;

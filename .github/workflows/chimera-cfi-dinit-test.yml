@@ -1,26 +1,22 @@
-name: Chimera Linux CFI Hardening & Dinit Supervisor Test
+name: Chimera Linux CFI Hardening & Dinit Supervisor CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, "jules-*" ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
-  chimera-test:
-    name: Chimera Linux Dinit Supervisor & Clang CFI Verification
+  chimera-dinit-verification:
+    name: Chimera Linux LLVM/Clang CFI Hardening & Dinit Service Supervisor Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Rust Toolchain
+      - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Test Chimera Linux Dinit & Userland Parity
+      - name: Run Chimera Linux Parity Suite
         run: |
-          cargo test --lib compatibility::chimera_linux
+          ./run_sigma_tests.sh

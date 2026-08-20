@@ -1,26 +1,22 @@
-name: Debian & Ubuntu APT Duo Deployment Pipeline
+name: Debian & Ubuntu APT Repository Deployment CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, "jules-*" ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
-  debian-ubuntu-deploy:
-    name: Debian Dpkg, APT Repository & SysVinit Verification
+  debian-apt-verification:
+    name: Debian Control & APT Sync Matrix Verification
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Rust Toolchain
+      - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Test Debian & Ubuntu Compatibility Layer
+      - name: Run Debian & System Verification Tests
         run: |
-          cargo test --lib compatibility::debian
+          ./run_sigma_tests.sh

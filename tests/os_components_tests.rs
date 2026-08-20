@@ -37,16 +37,58 @@ mod task_scheduler;
 #[path = "../src/ipc/alpc.rs"]
 mod alpc;
 
+#[path = "../src/memory/bitmap_pmm.rs"]
+mod bitmap_pmm;
+
+#[path = "../src/memory/low_level.rs"]
+mod low_level_memory;
+
 #[path = "../src/access/control.rs"]
 mod access_control;
+
+#[path = "../src/dashboard/statutory_compliance.rs"]
+mod statutory_compliance;
+
+#[path = "../src/community/toolkit.rs"]
+mod community_toolkit;
+
+#[path = "../src/system/user.rs"]
+mod system_user;
 
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
 
+#[path = "../src/memory/segmentation_paging.rs"]
+mod segmentation_paging;
+
+#[path = "../src/process/activity_manager.rs"]
+mod process_activity_manager;
+
+#[path = "../src/filesystem/sigma_fs.rs"]
+mod sigma_fs_extended;
+
+use community_toolkit::{
+    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
+    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
+};
+use statutory_compliance::{
+    BreachSeverity, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority,
+    StatutoryGovernanceLayer,
+};
+use system_user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
+
 use access_control::{
-    AclEntry, AclTag, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, nfs4_flags, nfs4_mask,
+    AclEntry, AclTag, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl,
+    Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
+use bitmap_pmm::{
+    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter,
+};
+use low_level_memory::{
+    CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine,
+    SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr,
+};
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType,
 };
@@ -62,6 +104,104 @@ use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
 use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
 use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
 use sigmatools::*;
+
+use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
+
+use segmentation_paging::{
+    AddressBindingMode, CpuPrivilegeMode as SegCpuPrivilegeMode, GlobalDescriptorTable,
+    MultiLevelPagingEngine, ProtectionLevel as SegProtectionLevel, ProtectionViolationType,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentType, SegmentedAddress,
+};
+
+use process_activity_manager::{
+    ActivityState, ProcessActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
+    ResourceUsageMetrics,
+};
+
+#[test]
+fn test_segmentation_paging_and_aslr() {
+    let mut gdt = GlobalDescriptorTable::new();
+    let code_desc = SegmentDescriptor::code_segment(
+        0x00000000,
+        0xFFFFFFFF,
+        SegProtectionLevel::KernelRing0,
+    );
+    let selector = gdt.insert_descriptor(code_desc);
+    assert_eq!(selector.index, 1);
+
+    let seg_addr = SegmentedAddress {
+        selector,
+        offset: 0x00001000,
+    };
+    let linear = gdt.translate_address(seg_addr, SegCpuPrivilegeMode::KernelRing0).unwrap();
+    assert_eq!(linear, 0x00001000);
+
+    let mut paging = MultiLevelPagingEngine::new();
+    paging.map_page(0x00007FFF00000000, 0x0000000100000000, false, true, false).unwrap();
+
+    let pte = paging.walk_page_table(0x00007FFF00000000).unwrap();
+    assert_eq!(pte.get_physical_address(), 0x0000000100000000);
+
+    assert_eq!(
+        paging.verify_execution_access(0x00007FFF00000000, false, true, true),
+        Err(ProtectionViolationType::SmepViolation)
+    );
+
+    let aslr = RandomizedAddressSpace::new(0x12345678);
+    let base = aslr.generate_random_base(AddressBindingMode::DynamicRunTime, 0x0001_0000_0000);
+    assert!(base >= 0x0001_0000_0000);
+}
+
+#[test]
+fn test_regex_unveil_and_glob_matching() {
+    let mut unveil_mgr = UnveilManager::new();
+    unveil_mgr.unveil("/var/log/*.log", "r").unwrap();
+    assert!(unveil_mgr.validate_path("/var/log/syslog.log", UnveilPermission::Read).is_ok());
+    assert!(unveil_mgr.validate_path("/var/log/syslog.txt", UnveilPermission::Read).is_err());
+}
+
+#[test]
+fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
+    let mut pfs = PseudoFilesystemNamespace::new("root_master", PfsType::Master);
+    pfs.file_map.insert("/etc/hostname".to_string(), "blake3-hash1".to_string());
+
+    let snap = PseudoFilesystemNamespace::snapshot("root_snap_1", "root_master", pfs.file_map.clone());
+    assert!(snap.is_read_only);
+    assert_eq!(snap.parent_snapshot_id.unwrap(), "root_master");
+
+    let mut dedup = Blake3BlockDeduplicationEngine::new();
+    let hash1 = dedup.store_block(b"SOVEREIGN_SYSTEM_BLOCK_DATA");
+    let hash2 = dedup.store_block(b"SOVEREIGN_SYSTEM_BLOCK_DATA");
+    assert_eq!(hash1, hash2);
+    assert_eq!(*dedup.ref_counts.get(&hash1).unwrap(), 2);
+
+    assert!(!dedup.release_block(&hash1));
+    assert!(dedup.release_block(&hash1));
+    assert!(dedup.read_block(&hash1).is_none());
+}
+
+#[test]
+fn test_process_activity_manager_and_registers() {
+    let mut pam = ProcessActivityManager::new();
+    pam.register_process(500, "chrome", "/usr/bin/chrome").unwrap();
+    pam.register_thread(500, 501, "render_main").unwrap();
+
+    pam.set_foreground_process(500).unwrap();
+    let active_procs = pam.get_active_processes();
+    assert_eq!(active_procs.len(), 1);
+    assert_eq!(active_procs[0].state, ActivityState::Interactive);
+
+    let ctx = ProcRegisterSnapshot {
+        rip: 0x00007FFF00002000,
+        rsp: 0x00007FFFFFFFD000,
+        rax: 1,
+        ..Default::default()
+    };
+    pam.save_thread_context(500, 501, ctx).unwrap();
+
+    let loaded_ctx = pam.get_thread_context(500, 501).unwrap();
+    assert_eq!(loaded_ctx.rip, 0x00007FFF00002000);
+}
 
 #[test]
 fn test_zero_copy_ipc_pipes() {
@@ -186,7 +326,7 @@ fn test_debian_compat_system() {
 
     assert_eq!(alts.get_active_target().unwrap(), "/usr/bin/nano");
 
-    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "https://deb.debian.org/debian".to_string());
+    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "http://deb.debian.org/debian".to_string());
     repo.verify_release_keyring(&[0x99, 0x01]);
     assert!(repo.fetch_package_index().is_ok());
 }
@@ -355,4 +495,140 @@ fn test_task_states_and_workload_classifications() {
     assert_eq!(stats.total_tasks, 3);
     assert_eq!(stats.running_tasks, 1);
     assert_eq!(stats.ready_tasks, 2);
+}
+
+#[test]
+fn test_file_attributes_and_cpu_ring_privileges() {
+    let imm = FileAttributeAccessControl::new(file_attribute_flags::IMMUTABLE);
+    assert!(!imm.can_modify(false, true)); // Overwrite denied for root
+    assert!(!imm.can_modify(true, true)); // Append denied for root
+    assert!(!imm.can_unlink()); // Unlink denied
+
+    let app = FileAttributeAccessControl::new(file_attribute_flags::APPEND_ONLY);
+    assert!(app.can_modify(true, false)); // Append allowed for normal user
+    assert!(!app.can_modify(false, false)); // Overwrite denied for normal user
+    assert!(!app.can_unlink()); // Unlink denied
+
+    let nounlink = FileAttributeAccessControl::new(file_attribute_flags::NO_UNLINK);
+    assert!(nounlink.can_modify(false, false)); // Overwrite allowed
+    assert!(!nounlink.can_unlink()); // Unlink denied
+
+    let dump_file = FileAttributeAccessControl::new(file_attribute_flags::NO_DUMP);
+    assert!(!dump_file.can_dump());
+
+    let ring0 = CpuPrivilegeEnforcer::new(ExecutionRingMode::Ring0Supervisor);
+    assert!(ring0.can_execute_privileged_instruction());
+
+    let ring3 = CpuPrivilegeEnforcer::new(ExecutionRingMode::Ring3User);
+    assert!(!ring3.can_execute_privileged_instruction());
+}
+
+#[test]
+fn test_two_tier_memory_and_fast_syscalls() {
+    let mut allocator = TwoTierMemoryAllocator::new(0x1000_0000, 64);
+
+    let pcb_obj = allocator.alloc_slab_object(SlabObjectType::ProcessControlBlock).unwrap();
+    let fd_obj = allocator.alloc_slab_object(SlabObjectType::FileDescriptor).unwrap();
+    let inode_obj = allocator.alloc_slab_object(SlabObjectType::InodeStruct).unwrap();
+
+    assert!(pcb_obj >= 0x1000_0000);
+    assert!(fd_obj >= 0x1000_0000);
+    assert!(inode_obj >= 0x1000_0000);
+
+    allocator.free_slab_object(SlabObjectType::ProcessControlBlock, pcb_obj);
+
+    let mut pt_engine = RecursivePageTableEngine::new(0x0008_0000);
+    pt_engine.enable_self_referential_mapping();
+    assert_ne!(pt_engine.calculate_pml4_virt_address(), 0);
+
+    let mut cow_engine = CopyOnWriteForkEngine::new();
+    cow_engine.fork_share_page(0x1000, 0x1000_0000);
+
+    let mut dispatcher = FastSyscallDispatcher::new();
+    dispatcher.configure_fast_syscall(0xFFFFFFFF80102000, 0x08, 0x1B);
+
+    let syscall_matrix = MinimalPosixSyscallMatrix::new();
+    let mut frame = TrapRegisterFrame::default();
+    frame.rax = posix_syscall_nr::SYS_OPEN;
+
+    let res_fd = dispatcher.dispatch_trap(&mut frame, &syscall_matrix);
+    assert_eq!(res_fd, 3);
+}
+
+#[test]
+fn test_bitmap_pmm_and_syscall_router() {
+    let mut pmm = BitmapPhysicalMemoryManager::new(64 * 4096);
+    pmm.free_region(0x20000, 16 * 4096);
+
+    let frame_addr = pmm.alloc_block().unwrap();
+    assert_eq!(frame_addr, 0x20000);
+
+    let paging = SelfRefPagingEngine::new(0x30000);
+    let mut pml4 = [0u64; 512];
+    paging.vmm_init_self_reference(&mut pml4);
+    assert_eq!(pml4[510], 0x30000 | 3);
+
+    let mut router = SyscallTableRouter::new();
+    router.register_handler(2, |a, b, _, _| (a * b) as i64);
+    assert_eq!(router.syscall_handler(2, 6, 7, 0), 42);
+}
+
+#[test]
+fn test_shadow_passwords_usermod_and_sudo_policy() {
+    let mut manager = TestUserManager::new("/tmp/test_etc_shadow_sudo");
+    manager.initialize().unwrap();
+
+    let user = manager.create_user("charlie", "Charlie Sysadmin").unwrap();
+    assert_eq!(user.username, "charlie");
+
+    manager.set_password("charlie", "P@ssword2026").unwrap();
+    assert!(manager.verify_password("charlie", "P@ssword2026"));
+
+    manager.usermod("charlie", Some("/bin/bash"), Some("/home/charlie"), None, None).unwrap();
+    assert_eq!(manager.get_user("charlie").unwrap().shell, "/bin/bash");
+
+    manager.add_user_to_group("charlie", "wheel").unwrap();
+    let groups = manager.get_user_groups("charlie");
+    assert!(groups.contains(&"wheel".to_string()));
+
+    let sudo_res = manager.sudo_engine.evaluate_sudo_privilege("charlie", &groups, "/usr/bin/apt");
+    assert!(sudo_res.is_ok());
+}
+
+#[test]
+fn test_statutory_compliance_overlay_and_community_toolkit() {
+    let gov = StatutoryGovernanceLayer::new();
+    let authorities = gov.evaluate_applicability(25, 18000.0);
+    assert!(authorities.contains(&StatutoryAuthority::EpfoSocialSecurity));
+
+    let mut notifier = PenaltyBreachNotifier::new();
+    let alert_id = notifier.issue_breach_alert(
+        StatutoryAuthority::EpfoSocialSecurity,
+        BreachSeverity::MajorNonCompliance,
+        2500.0,
+        "Delay in ECR remittance",
+        1700000000,
+    );
+    assert_eq!(alert_id, 1001);
+    assert_eq!(notifier.get_total_penalty(), 2500.0);
+
+    let mut rollback = DisputeAuditRollbackEngine::new();
+    rollback.create_dispute_checkpoint(100, "Form GSTR-3B", "hash:state100", 1700000000);
+    assert_eq!(rollback.resolve_dispute_and_rollback(100).unwrap(), "hash:state100");
+
+    let handbook = CommunityHandbookCatalog::new();
+    assert!(handbook.get_article("sigma-handbook-01").is_some());
+
+    let mut recipes = ReproduciblePackageRecipeManager::new();
+    recipes.register_recipe("nginx", "1.24.0", "sha256:112233", &["pcre"]);
+    assert!(recipes.recipes.contains_key("nginx"));
+
+    let sec = SecurityProfileTemplateStore::new();
+    assert!(sec.profiles.contains_key("hardened-webserver"));
+
+    let fw = HybridFirewallTemplateStore::new();
+    assert!(fw.templates.contains_key("default-mesh-shield"));
+
+    let virt = VirtualizationBlueprintStore::new();
+    assert!(virt.blueprints.contains_key("micro-vm-node"));
 }

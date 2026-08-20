@@ -1,29 +1,22 @@
-name: Fedora & NixOS Reproducible Environment Pipeline
+name: Fedora DNF & NixOS Reproducible Environment CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, "jules-*" ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
-  fedora-nixos-pipeline:
-    name: NixOS nix-shell & Fedora Clean-Room Parity Verification
+  fedora-nixos-verification:
+    name: Fedora DNF, SELinux Policies & NixOS Reproducible Store Verification
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Rust Toolchain
+      - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Test NixOS nix-shell & Fedora Clean-Room Parity
+      - name: Run Fedora & NixOS Verification Harness
         run: |
-          cargo test --lib sigpkg::nix_shell
-          cargo test --lib compatibility::fedora
-          cargo test --lib security::selinux
-          cargo test --lib security::selinux_integration
+          ./run_sigma_tests.sh

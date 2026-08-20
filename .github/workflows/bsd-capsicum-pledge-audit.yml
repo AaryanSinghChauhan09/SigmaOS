@@ -1,28 +1,22 @@
-name: FreeBSD & OpenBSD Security & Capsicum/Pledge Audit
+name: FreeBSD Capsicum & OpenBSD Pledge/Unveil Security CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, "jules-*" ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
   bsd-security-audit:
-    name: FreeBSD Capsicum, OpenBSD Pledge/Unveil & GEOM Storage Audit
+    name: FreeBSD Capsicum, OpenBSD Pledge/Unveil & NetBSD Rump Kernel Security Audit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Rust Toolchain
+      - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Test FreeBSD Jails, VNET, OpenBSD Pledge & Unveil
+      - name: Run BSD Security Suite & Verification
         run: |
-          cargo test --lib security::jails
-          cargo test --lib security::unveil
-          cargo test --lib storage::geom
+          ./run_sigma_tests.sh
