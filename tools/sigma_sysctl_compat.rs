@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 //! SigmaOS Sysctl Compatibility & Dynamic Kernel Parameter Tuner
 //! Implements runtime query and modification of kernel and VM tuning parameters.
 //! Inspired by Linux sysctl and BSD sysctl utilities.
