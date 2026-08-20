@@ -1,8 +1,10 @@
 // SigmaOS Distro Compatibility Layer
 /// Custom CachyOS Optimization Subsystems for SigmaOS
 /// Implements BORE (Burst-Oriented Response Enhancer) Scheduler, Ananicy-cpp rules manager,
-/// x86-64-v1/v2/v3/v4 microarchitecture optimization detector, and Cachy-Initramfs module loader.
+/// x86-64-v1/v2/v3/v4 microarchitecture optimization detector, Cachy-Initramfs module loader,
+/// Cachy-THP & Memory Compaction, KSM Samepage Merging, P-State Governor, and SIMD compiler tuning.
 extern crate alloc;
+use alloc::string::String;
 use alloc::vec::Vec;
 
 #[cfg(not(test))]
@@ -17,6 +19,7 @@ use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 pub struct BoreSchedulerGovernor {
     pub burst_threshold: u64,
     pub max_boost_factor: u64,
+    pub interactive_wakeup_boost_ms: u64,
 }
 
 impl BoreSchedulerGovernor {
@@ -24,6 +27,7 @@ impl BoreSchedulerGovernor {
         BoreSchedulerGovernor {
             burst_threshold: 1000,
             max_boost_factor: 5,
+            interactive_wakeup_boost_ms: 15,
         }
     }
 
@@ -45,6 +49,23 @@ impl BoreSchedulerGovernor {
         } else {
             0
         }
+    }
+
+    /// Evaluates wakeup boost for interactive threads waking from sleep
+    pub fn evaluate_wakeup_boost(&self, run_time_ms: u64, sleep_time_ms: u64) -> (bool, u64, i32) {
+        let burstiness = self.calculate_burstiness(run_time_ms, sleep_time_ms);
+        if burstiness < 15 {
+            // Highly interactive: grant immediate 15ms time-slice bonus and -8 nice preemption boost
+            (true, self.interactive_wakeup_boost_ms, -8)
+        } else {
+            (false, 0, 0)
+        }
+    }
+}
+
+impl Default for BoreSchedulerGovernor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -82,6 +103,12 @@ impl AnanicyManager {
         } else {
             (0, SchedPolicy::Normal, 2)
         }
+    }
+}
+
+impl Default for AnanicyManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -127,6 +154,12 @@ impl V4OptimizedPackageManager {
             2 => "_v2",
             _ => "",
         }
+    }
+}
+
+impl Default for V4OptimizedPackageManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -189,7 +222,7 @@ impl CachyThpTuner {
     }
 
     /// Periodically scans standard 4KB virtual pages to merge contiguous runs into 2MB huge pages
-    pub fn coalesce_contiguous_pages(&self, start_virt_addr: u64, size_kb: usize) -> usize {
+    pub fn coalesce_contiguous_pages(&self, _start_virt_addr: u64, size_kb: usize) -> usize {
         if self.mode == ThpMode::Never {
             return 0;
         }
@@ -330,7 +363,6 @@ impl CachyMicroarchCompilerTuner {
 
     pub fn inject_optimal_compilation_flags(&self) -> Vec<String> {
         let mut flags = Vec::new();
-        // Use standard alloc::string::ToString
         use alloc::string::ToString;
         flags.push("-O3".to_string());
         flags.push("-flto=thin".to_string());
@@ -366,6 +398,11 @@ mod tests {
         // Bursty interactive task: runs for 1ms, sleeps for 100ms
         let burstiness_low = bore.calculate_burstiness(1, 100);
         assert_eq!(bore.determine_nice_offset(burstiness_low), -5);
+
+        let (boosted, grant, nice_offset) = bore.evaluate_wakeup_boost(1, 100);
+        assert!(boosted);
+        assert_eq!(grant, 15);
+        assert_eq!(nice_offset, -8);
 
         // Batch CPU-bound task: runs for 500ms, sleeps for 1ms
         let burstiness_high = bore.calculate_burstiness(500, 1);
@@ -455,4 +492,3 @@ mod tests {
         assert!(flags_v3.contains(&"-march=x86-64-v3".to_string()));
     }
 }
-// CachyOS optimization suite verified
