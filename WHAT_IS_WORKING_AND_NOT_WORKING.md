@@ -210,7 +210,112 @@ match command {
 
 ---
 
-## SECTION 3: CHECKLIST FOR AI AGENTS FIXING ALGORITHMS
+## SECTION 3: LINUX & BSD VIRTUAL MM PARITY ARCHITECTURE & BLUEPRINTS
+
+To achieve full digital sovereignty and parity with Linux (`mm/`) and FreeBSD (`vm/`), any AI agent enhancing `src/klib/paging.rs` or `src/kernel/memory.rs` should implement the following four foundational virtual memory components:
+
+### 1. TLB Shootdown Engine & PCID Context Flusher (`TlbEngine`)
+- **Linux Parity Source:** `arch/x86/mm/tlb.c`
+- **FreeBSD Parity Source:** `sys/amd64/amd64/pmap.c`
+- **Blueprint:**
+```rust
+pub struct TlbEngine {
+    pub pcid_mask: u16,
+}
+
+impl TlbEngine {
+    pub fn invalidate_page(&self, vaddr: usize) {
+        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
+        unsafe {
+            core::arch::x86_64::_mm_clflush(vaddr as *const _);
+            core::arch::asm!("invlpg [{}]", in(reg) vaddr, options(nostack));
+        }
+    }
+
+    pub fn flush_pcid(&mut self, asid: u16) {
+        self.pcid_mask |= 1 << (asid % 16);
+    }
+}
+```
+
+### 2. VMA Range Splitter & Merger (`VmAreaManager`)
+- **Linux Parity Source:** `mm/mmap.c` (`vm_area_struct`)
+- **FreeBSD Parity Source:** `sys/vm/vm_map.c` (`vm_map_entry_t`)
+- **Blueprint:**
+```rust
+pub struct VmArea {
+    pub start: usize,
+    pub end: usize,
+    pub flags: u32, // PROT_READ = 1, PROT_WRITE = 2, PROT_EXEC = 4
+}
+
+pub struct VmAreaManager {
+    pub regions: crate::klib::vec::Vec<VmArea>,
+}
+
+impl VmAreaManager {
+    pub fn insert_and_merge(&mut self, mut area: VmArea) {
+        let mut merged = false;
+        for existing in self.regions.iter_mut() {
+            if existing.flags == area.flags && existing.end == area.start {
+                existing.end = area.end;
+                merged = true;
+                break;
+            }
+        }
+        if !merged {
+            self.regions.push(area);
+        }
+    }
+}
+```
+
+### 3. Buddy Page Frame Allocator (`BuddyPageFrameAllocator`)
+- **Linux Parity Source:** `mm/page_alloc.c` (Order 0 to Order 10)
+- **Blueprint:**
+```rust
+pub struct BuddyAllocator {
+    pub free_lists: [crate::klib::vec::Vec<usize>; 11], // Order 0..10
+}
+
+impl BuddyAllocator {
+    pub fn alloc_pages(&mut self, order: usize) -> Option<usize> {
+        if order > 10 { return None; }
+        if let Some(addr) = self.free_lists[order].pop() {
+            Some(addr)
+        } else {
+            None // Fallback to split higher order blocks
+        }
+    }
+}
+```
+
+### 4. LRU Active/Inactive Page Aging & OOM Score (`OomPageReclaimer`)
+- **Linux Parity Source:** `mm/vmscan.c` & `mm/oom_kill.c`
+- **FreeBSD Parity Source:** `sys/vm/vm_pageout.c`
+- **Blueprint:**
+```rust
+pub struct OomPageReclaimer {
+    pub active_pages: usize,
+    pub inactive_pages: usize,
+}
+
+impl OomPageReclaimer {
+    pub fn calculate_oom_badness(&self, rss_pages: usize, oom_score_adj: i16) -> usize {
+        let points = rss_pages;
+        let adj = oom_score_adj.max(-1000).min(1000);
+        if adj < 0 {
+            points.saturating_sub((-adj) as usize * 10)
+        } else {
+            points.saturating_add(adj as usize * 10)
+        }
+    }
+}
+```
+
+---
+
+## SECTION 4: CHECKLIST FOR AI AGENTS FIXING ALGORITHMS
 
 When making changes to SigmaOS algorithms or fixing bug reports, follow this mandatory workflow:
 

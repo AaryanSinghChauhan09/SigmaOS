@@ -193,6 +193,12 @@ impl SelfHealingModule {
         let snapshot = self
             .get_snapshot(id)
             .ok_or(ResilienceError::SnapshotNotFound)?;
+        if !self.snapshots.iter().any(|s| s.id == id) {
+            return Err(ResilienceError::SnapshotNotFound);
+        }
+
+        let snapshot = self.get_snapshot(id).unwrap();
+        let snapshot = self.get_snapshot(id).ok_or(ResilienceError::SnapshotNotFound)?;
         println!("Rolling back to snapshot: {}", snapshot.description);
 
         // Simulate rollback
@@ -431,6 +437,97 @@ impl Default for SystemStabilityMonitor {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct ShardHeartbeat {
+    pub shard_name: String,
+    pub last_heartbeat_timestamp: u64,
+    pub latency_ms: u32,
+    pub is_responsive: bool,
+}
+
+pub struct DoubleFaultGuard {
+    pub consecutive_failures: u32,
+    pub max_allowed_failures: u32,
+    pub safety_mode_activated: bool,
+}
+
+impl DoubleFaultGuard {
+    pub fn new(max_allowed_failures: u32) -> Self {
+        Self {
+            consecutive_failures: 0,
+            max_allowed_failures,
+            safety_mode_activated: false,
+        }
+    }
+
+    pub fn record_failure(&mut self) -> bool {
+        self.consecutive_failures += 1;
+        if self.consecutive_failures >= self.max_allowed_failures {
+            self.safety_mode_activated = true;
+        }
+        self.safety_mode_activated
+    }
+
+    pub fn record_success(&mut self) {
+        self.consecutive_failures = 0;
+        self.safety_mode_activated = false;
+    }
+}
+
+pub struct SystemStabilityMonitor {
+    pub shards: HashMap<String, ShardHeartbeat>,
+    pub fault_guard: DoubleFaultGuard,
+}
+
+impl SystemStabilityMonitor {
+    pub fn new() -> Self {
+        Self {
+            shards: HashMap::new(),
+            fault_guard: DoubleFaultGuard::new(2), // Max 2 consecutive failures triggers safety-mode
+        }
+    }
+
+    pub fn report_heartbeat(&mut self, shard_name: String, timestamp: u64, latency_ms: u32) {
+        let is_responsive = latency_ms < 500; // Unresponsive if latency >= 500ms
+        let shard = ShardHeartbeat {
+            shard_name: shard_name.clone(),
+            last_heartbeat_timestamp: timestamp,
+            latency_ms,
+            is_responsive,
+        };
+        self.shards.insert(shard_name, shard);
+    }
+
+    pub fn check_overall_health(&mut self) -> u32 {
+        let mut responsive_count = 0;
+        let total_count = self.shards.len();
+        if total_count == 0 {
+            return 100;
+        }
+
+        for shard in self.shards.values() {
+            if shard.is_responsive {
+                responsive_count += 1;
+            }
+        }
+
+        let health_percent = (responsive_count * 100) / total_count;
+        if health_percent < 50 {
+            self.fault_guard.record_failure();
+        } else {
+            self.fault_guard.record_success();
+        }
+
+        health_percent as u32
+    }
+}
+
+impl Default for SystemStabilityMonitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Resilience errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResilienceError {
@@ -538,5 +635,40 @@ mod tests {
         let status_after_clear = monitor.trigger_recovery_for_fault("filesystem_corrupt");
         assert_eq!(status_after_clear, "ATTEMPTING_RECOVERY");
         assert!(!monitor.in_safe_mode);
+    }
+
+    #[test]
+    fn test_double_fault_guard_and_heartbeats() {
+        let mut monitor = SystemStabilityMonitor::new();
+        assert_eq!(monitor.check_overall_health(), 100);
+
+        // Report normal heartbeats
+        monitor.report_heartbeat("network_shard".to_string(), 1718900000, 50);
+        monitor.report_heartbeat("audio_shard".to_string(), 1718900000, 120);
+        assert_eq!(monitor.check_overall_health(), 100);
+        assert!(!monitor.fault_guard.safety_mode_activated);
+
+        // Report high latency (unresponsive) on one shard
+        monitor.report_heartbeat("audio_shard".to_string(), 1718900100, 600); // unresponsive
+        assert_eq!(monitor.check_overall_health(), 50); // 50% responsive
+        assert!(!monitor.fault_guard.safety_mode_activated);
+
+        // Report unresponsive on both shards -> health falls below 50%
+        monitor.report_heartbeat("network_shard".to_string(), 1718900100, 750); // unresponsive
+        assert_eq!(monitor.check_overall_health(), 0); // 0% responsive, triggers first failure
+        assert_eq!(monitor.fault_guard.consecutive_failures, 1);
+        assert!(!monitor.fault_guard.safety_mode_activated);
+
+        // Second check with 0% responsive triggers second failure -> activates safety-mode
+        assert_eq!(monitor.check_overall_health(), 0);
+        assert_eq!(monitor.fault_guard.consecutive_failures, 2);
+        assert!(monitor.fault_guard.safety_mode_activated); // Safety mode successfully locked!
+
+        // Back to normal responsive state clears failure counters
+        monitor.report_heartbeat("network_shard".to_string(), 1718900200, 50);
+        monitor.report_heartbeat("audio_shard".to_string(), 1718900200, 50);
+        assert_eq!(monitor.check_overall_health(), 100);
+        assert_eq!(monitor.fault_guard.consecutive_failures, 0);
+        assert!(!monitor.fault_guard.safety_mode_activated);
     }
 }

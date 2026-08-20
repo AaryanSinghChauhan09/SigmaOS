@@ -1,6 +1,4 @@
 // SigmaOS Productivity Module
-pub mod utility_suite;
-pub mod advanced_app_absorber;
 pub mod gamification;
 pub mod media;
 pub mod notes;
@@ -9,14 +7,10 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
+pub mod advanced_app_absorber;
 pub mod tmux;
-pub mod editor;
+pub mod utility_suite;
 
-pub use advanced_app_absorber::{
-    AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter, EverythingSearchEngine,
-    NotepadPlusWorkspace, ObsStudioMixer, OneCommanderDualPane, PotPlayerVlcEngine,
-    SevenZipCompressor, ShareXFlameshotEngine,
-};
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
@@ -48,14 +42,21 @@ pub use terminal::{
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
 pub use tmux::{
-    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
-pub use editor::{
-    CodeEditor, Document as EditorDocument, EditorConfig, EditorError, Language as EditorLanguage,
-    LspClient, SyntaxHighlighter,
+pub use media::{
+    MediaFormat, PlaybackState, AudioTrack, SigmaMediaEngine,
 };
 pub use utility_suite::{
-    NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine, CompressionMethod,
-    FlameshotAnnotator, AnnotationShape, AudacityWaveEditor, VlcCodecPipeline,
-    DaVinciTimeline, OneCommanderFileGrid, ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
+    FileIndexEntry, EverythingSearchEngine, TextTab, NotepadPlusPlusBuffer,
+    BrowserContainerType, BrowserTabInstance, SovereignBrowserEngine,
+    CompressionMethod, ArchiveVolume, SevenZipEngine,
+    AnnotationShape, ScreenshotAnnotation, FlameshotAnnotator,
+    VideoSourceLayer, ObsStudioMixer,
+    AudacityWaveEditor,
+    VlcCodecPipeline,
+    VideoTrackClip, DaVinciTimeline,
+    ItemAgeColor, OneCommanderFileGrid,
+    AppVolumeChannel, EarTrumpetVolumeMatrix,
+    ExifMetadata, IrfanViewEngine,
 };
