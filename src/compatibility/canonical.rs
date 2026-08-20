@@ -418,6 +418,7 @@ impl BrailleMatrix {
 // ==========================================
 // 10. Localization (i18n) & Translation Engine
 // ==========================================
+
 pub struct SigmaLivepatchPatch {
     pub target_symbol: String,
     pub old_function_address: usize,
@@ -426,14 +427,14 @@ pub struct SigmaLivepatchPatch {
 }
 
 pub struct SigmaLivepatch {
-    pub active_patches: HashMap<String, SigmaLivepatchPatch>,
+    pub active_patches: std::collections::HashMap<String, SigmaLivepatchPatch>,
     pub redirection_log: Vec<String>,
 }
 
 impl SigmaLivepatch {
     pub fn new() -> Self {
         SigmaLivepatch {
-            active_patches: HashMap::new(),
+            active_patches: std::collections::HashMap::new(),
             redirection_log: Vec::new(),
         }
     }
