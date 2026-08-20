@@ -439,6 +439,75 @@ impl SigmaFhsAuditor {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct SigmaFsCrypt {
+    passphrase: String,
+    unlocked: bool,
+}
+
+impl SigmaFsCrypt {
+    pub fn new(passphrase: &str) -> Self {
+        Self {
+            passphrase: passphrase.to_string(),
+            unlocked: false,
+        }
+    }
+
+    pub fn unlock_volume(&mut self, passphrase: &str) -> bool {
+        if self.passphrase == passphrase {
+            self.unlocked = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn encrypt_sector(&mut self, _sector: u64, data: &mut [u8]) -> Result<(), &'static str> {
+        if !self.unlocked {
+            return Err("Volume is locked");
+        }
+        for byte in data.iter_mut() {
+            *byte ^= 0x5A;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct VirtioDescriptor {
+    pub addr: u64,
+    pub len: u32,
+    pub flags: u16,
+    pub next: u16,
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaFsVirtio {
+    pub avail_ring_idx: u16,
+    pub descriptors: Vec<VirtioDescriptor>,
+}
+
+impl SigmaFsVirtio {
+    pub fn new() -> Self {
+        Self {
+            avail_ring_idx: 0,
+            descriptors: vec![VirtioDescriptor::default(); 128],
+        }
+    }
+
+    pub fn submit_virtio_buffer(&mut self, addr: u64, len: u32, id: u16) {
+        if (id as usize) < self.descriptors.len() {
+            self.descriptors[id as usize] = VirtioDescriptor {
+                addr,
+                len,
+                flags: 0,
+                next: 0,
+            };
+            self.avail_ring_idx += 1;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

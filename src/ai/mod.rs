@@ -1,5 +1,5 @@
 // SigmaOS AI Module
-// S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, and quantization
+// S-AI engine, agents, orchestrator, and local inference
 
 pub mod agent;
 pub mod autogen;
@@ -9,10 +9,9 @@ pub mod sai;
 pub mod openclaw;
 pub mod system;
 pub mod voice;
-pub mod open_computer;
-pub mod tensor_memory;
-pub mod compute_scheduler;
-pub mod quantization;
+pub mod wiki;
+pub mod qwenpaw;
+pub mod developer_platform;
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
@@ -27,11 +26,13 @@ pub use llm::{
     BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
     LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
 };
+pub use orchestrator::{AgentOrchestrator, AgentState, SimpleAgentOrchestrator};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
     SovereignGpuAiAccelerator,
 };
+pub use sai::{Agent, AgentRole, AgentTask as Task, TaskStatus};
 pub use system::{
     AdaptiveSchedulingService, AiServiceConfig, AiServiceManager, AiServiceMetrics, AiServiceState,
     AiServiceType, AiSystemService, PredictiveMaintenanceService, ResourceManagementService,
@@ -41,16 +42,13 @@ pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
 };
-pub use open_computer::{
-    OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
-    AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
+pub use wiki::{SovereignWikiEngine, WikiArticle};
+pub use qwenpaw::{
+    PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentMessage,
+    PawAgentCommunicationProtocol, SemanticSkillFunction, NativeSkillFunction,
+    SovereignSkillKernel,
 };
-pub use tensor_memory::{
-    AiTensorMemoryManager, MemoryPinMode, TensorBuffer, TensorDtype, TensorMemoryStats,
-};
-pub use compute_scheduler::{
-    AiComputeQuota, AiComputeScheduler, AiComputeTask, AiTaskPriority, AiTaskState, ComputeDeviceTarget,
-};
-pub use quantization::{
-    AiExecutionDispatcher, DeviceFallbackRoute, QuantizedMatrix,
+pub use developer_platform::{
+    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
+    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };

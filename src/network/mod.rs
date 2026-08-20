@@ -12,6 +12,8 @@ pub mod revival;
 pub mod tcp_udp;
 pub mod sync;
 pub mod torrent;
+pub mod pf_firewall;
+pub mod nftables;
 
 pub use commands::*;
 pub use analyzer::{

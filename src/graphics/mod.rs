@@ -8,7 +8,7 @@ pub mod video;
 pub use video::{PixelRgba, VideoFrame, VideoEffect, VideoError, TimelineClip};
 pub use compositor::{
     BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
-    Surface, Window,
+    Surface, Window, DisplayServerProtocol, SovereignWaylandCompositor,
 };
 pub use video_editor::{VideoClip, VideoEffect as EditorVideoEffect, VideoTimeline, VideoTrack};
 pub use paint::ColorRgba;

@@ -103,75 +103,11 @@ pub struct PolicyRule {
     pub permission: String,
 }
 
-pub struct AppArmorManager;
-pub struct AppArmorProfile;
-pub enum ObjectType { File, Directory }
-pub struct SecurityLabel;
-pub struct SecurityPolicy;
-pub struct SecurityRule;
-pub enum SelinuxPermission { Read, Write, Execute }
-
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,
     pub policies: HashSet<AvcKey>,
     pub avc: AccessVectorCache,
     pub audit_logs: Vec<String>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ObjectType {
-    File,
-    Process,
-    Socket,
-    Capability,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SelinuxPermission {
-    Read,
-    Write,
-    Execute,
-    Append,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SecurityLabel {
-    pub label: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct SecurityRule {
-    pub source_type: String,
-    pub target_type: String,
-    pub object_type: ObjectType,
-    pub permission: SelinuxPermission,
-}
-
-#[derive(Debug, Clone)]
-pub struct SecurityPolicy {
-    pub rules: Vec<SecurityRule>,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppArmorProfile {
-    pub name: String,
-    pub mode: String,
-}
-
-pub struct AppArmorManager {
-    pub profiles: Vec<AppArmorProfile>,
-}
-
-impl AppArmorManager {
-    pub fn new() -> Self {
-        Self { profiles: Vec::new() }
-    }
-}
-
-impl Default for AppArmorManager {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SelinuxEngine {
@@ -263,6 +199,7 @@ impl SelinuxEngine {
     }
 }
 
+use std::collections::HashSet;
 
 /// Multi-Level Security (MLS) sensitivity levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

@@ -1,4 +1,5 @@
 //! Arch Linux Parity and Compatibility Subsystem for SigmaOS
+//! Arch Linux Parity and Compatibility Subsystem for SigmaOS
 //! Implements a rich suite of Arch Linux abstractions and parities:
 //! - Virtual `/proc` and `/dev` filesystems
 //! - Pacman-style package engine with dependency checking and database locking
@@ -491,266 +492,7 @@ impl TmuxMultiplexer {
 }
 
 // ==========================================
-// 8. AUR (Arch User Repository) & PKGBUILD Parser Parity
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct Pkgbuild {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgrel: String,
-    pub pkgdesc: String,
-    pub arch: Vec<String>,
-    pub url: String,
-    pub license: Vec<String>,
-    pub depends: Vec<String>,
-    pub makedepends: Vec<String>,
-    pub source: Vec<String>,
-    pub sha256sums: Vec<String>,
-}
-
-pub struct PkgbuildParser;
-
-impl PkgbuildParser {
-    /// Parses a standard Arch Linux PKGBUILD script file
-    pub fn parse(content: &str) -> Pkgbuild {
-        let mut pkgname = String::new();
-        let mut pkgver = String::new();
-        let mut pkgrel = String::new();
-        let mut pkgdesc = String::new();
-        let mut arch = Vec::new();
-        let mut url = String::new();
-        let mut license = Vec::new();
-        let mut depends = Vec::new();
-        let mut makedepends = Vec::new();
-        let mut source = Vec::new();
-        let mut sha256sums = Vec::new();
-
-        for line in content.lines() {
-            let trimmed = line.trim();
-            if trimmed.starts_with('#') || trimmed.is_empty() {
-                continue;
-            }
-
-            if let Some(idx) = trimmed.find('=') {
-                let key = trimmed[..idx].trim();
-                let val = trimmed[idx + 1..].trim().trim_matches('\'').trim_matches('"');
-
-                match key {
-                    "pkgname" => pkgname = val.to_string(),
-                    "pkgver" => pkgver = val.to_string(),
-                    "pkgrel" => pkgrel = val.to_string(),
-                    "pkgdesc" => pkgdesc = val.to_string(),
-                    "url" => url = val.to_string(),
-                    "arch" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            arch.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "license" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            license.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "depends" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            depends.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "makedepends" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            makedepends.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "source" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            source.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "sha256sums" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            sha256sums.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
-
-        Pkgbuild {
-            pkgname,
-            pkgver,
-            pkgrel,
-            pkgdesc,
-            arch,
-            url,
-            license,
-            depends,
-            makedepends,
-            source,
-            sha256sums,
-        }
-    }
-}
-
-/// AUR Helper (yay / paru inspired) for package searching and building
-pub struct AurHelper {
-    pub aur_repo: HashMap<String, Pkgbuild>,
-}
-
-impl AurHelper {
-    pub fn new() -> Self {
-        Self {
-            aur_repo: HashMap::new(),
-        }
-    }
-
-    pub fn publish_package(&mut self, pkgbuild: Pkgbuild) {
-        self.aur_repo.insert(pkgbuild.pkgname.clone(), pkgbuild);
-    }
-
-    pub fn search(&self, query: &str) -> Vec<&Pkgbuild> {
-        let mut results = Vec::new();
-        for (name, pkg) in &self.aur_repo {
-            let name_str: &str = name.as_str();
-            let desc_str: &str = pkg.pkgdesc.as_str();
-            if name_str.contains(query) || desc_str.contains(query) {
-                results.push(pkg);
-            }
-        }
-        results
-    }
-
-    pub fn build_and_install(&self, name: &str, pacman: &mut PacmanEngine) -> Result<(), PacmanError> {
-        let pkg = self.aur_repo.get(name).ok_or(PacmanError::PackageNotFound)?;
-
-        // Register newly built package in Pacman sync repo and install
-        pacman.repo_sync.insert(
-            pkg.pkgname.clone(),
-            ArchPackage {
-                name: pkg.pkgname.clone(),
-                version: format!("{}-{}", pkg.pkgver, pkg.pkgrel),
-                dependencies: pkg.depends.clone(),
-            },
-        );
-
-        pacman.install_package(&pkg.pkgname)
-    }
-}
-
-impl Default for AurHelper {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 9. Mkinitcpio Initramfs Generator Parity
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct MkinitcpioHook {
-    pub name: String,
-    pub description: String,
-    pub required_modules: Vec<String>,
-}
-
-pub struct MkinitcpioEngine {
-    pub hooks: Vec<MkinitcpioHook>,
-    pub compression_format: String,
-}
-
-impl MkinitcpioEngine {
-    pub fn new() -> Self {
-        let mut hooks = Vec::new();
-        hooks.push(MkinitcpioHook {
-            name: "base".to_string(),
-            description: "Base runtime init scripts".to_string(),
-            required_modules: Vec::new(),
-        });
-        hooks.push(MkinitcpioHook {
-            name: "udev".to_string(),
-            description: "Device node creation via udev".to_string(),
-            required_modules: Vec::new(),
-        });
-        hooks.push(MkinitcpioHook {
-            name: "block".to_string(),
-            description: "Block device drivers for root detection".to_string(),
-            required_modules: Vec::new(),
-        });
-        hooks.push(MkinitcpioHook {
-            name: "filesystems".to_string(),
-            description: "Filesystem modules (ext4, btrfs, zfs)".to_string(),
-            required_modules: Vec::new(),
-        });
-
-        Self {
-            hooks,
-            compression_format: "zstd".to_string(),
-        }
-    }
-
-    pub fn add_hook(&mut self, hook: MkinitcpioHook) {
-        self.hooks.push(hook);
-    }
-
-    pub fn generate_initramfs_image(&self) -> Vec<u8> {
-        let mut image = Vec::new();
-        // CPIO Header signature
-        image.extend_from_slice(b"070701");
-        // Append hook markers into the initramfs byte array
-        for hook in &self.hooks {
-            image.extend_from_slice(b"[HOOK:");
-            image.extend_from_slice(hook.name.as_bytes());
-            image.extend_from_slice(b"]");
-        }
-        image
-    }
-}
-
-impl Default for MkinitcpioEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 10. Archiso Live Boot & OverlayFS Parity
-// ==========================================
-
-pub struct ArchisoEngine {
-    pub iso_label: String,
-    pub is_read_only_squashfs: bool,
-    pub overlay_upper_dir: String,
-    pub overlay_work_dir: String,
-}
-
-impl ArchisoEngine {
-    pub fn new(label: &str) -> Self {
-        Self {
-            iso_label: label.to_string(),
-            is_read_only_squashfs: true,
-            overlay_upper_dir: "/run/archiso/cowspace".to_string(),
-            overlay_work_dir: "/run/archiso/work".to_string(),
-        }
-    }
-
-    pub fn mount_live_root(&self) -> String {
-        format!(
-            "mount -t overlay overlay -o lowerdir=/run/archiso/sfs/airootfs,upperdir={},workdir={} /sysroot",
-            self.overlay_upper_dir, self.overlay_work_dir
-        )
-    }
-}
-
-// ==========================================
-// 11. Sovereign Environment Variables Registry
+// 8. Sovereign Environment Variables Registry
 // ==========================================
 
 pub struct SovereignEnvRegistry {
@@ -1429,48 +1171,143 @@ mod tests {
     }
 
     #[test]
-    fn test_pkgbuild_and_aur() {
-        let pkgbuild_content = r#"
-# Maintainer: Arch User <arch@sigmaos.org>
-pkgname=visual-studio-code-bin
-pkgver=1.89.0
-pkgrel=1
-pkgdesc="Visual Studio Code binary release"
-arch=('x86_64')
-url="https://code.visualstudio.com/"
-license=('custom')
-depends=('glibc')
-"#;
-        let pkg = PkgbuildParser::parse(pkgbuild_content);
-        assert_eq!(pkg.pkgname, "visual-studio-code-bin");
-        assert_eq!(pkg.pkgver, "1.89.0");
-        assert_eq!(pkg.depends, vec!["glibc".to_string()]);
+    fn test_yay_paru_adapter() {
+        let mut adapter = YayParuAdapter::new();
+        assert!(adapter.clone_aur_repo("spotify").is_ok());
+        assert_eq!(adapter.clone_aur_repo(""), Err("Empty package name"));
 
-        let mut aur = AurHelper::new();
-        aur.publish_package(pkg);
+        assert_eq!(adapter.resolve_dependencies("nonexistent"), Err("Repo not cloned yet"));
+        assert!(adapter.resolve_dependencies("spotify").is_ok());
 
-        let search_results = aur.search("visual-studio");
-        assert_eq!(search_results.len(), 1);
-
-        let mut pacman = PacmanEngine::new();
-        pacman.sync_database().unwrap();
-        // Satisfy glibc dependency
-        pacman.install_package("glibc").unwrap();
-
-        // Build and install from AUR helper
-        assert!(aur.build_and_install("visual-studio-code-bin", &mut pacman).is_ok());
+        assert_eq!(adapter.trigger_makepkg("nonexistent"), Err("Repo not cloned yet"));
+        assert!(adapter.trigger_makepkg("spotify").is_ok());
+        assert_eq!(adapter.cached_aur_git_repos.get("spotify").unwrap(), &AurRepoStatus::Compiled);
     }
 
     #[test]
-    fn test_mkinitcpio_and_archiso() {
-        let mkinitcpio = MkinitcpioEngine::new();
-        let initramfs = mkinitcpio.generate_initramfs_image();
-        assert!(initramfs.starts_with(b"070701"));
-        assert!(initramfs.windows(6).any(|w| w == b"[HOOK:"));
+    fn test_reflector_mirrorlist() {
+        let mut list = ReflectorMirrorlist::new();
+        list.add_mirror("https://mirror.us.com", "US", "HTTPS", 80);
+        list.add_mirror("https://mirror.us.fast.com", "US", "HTTPS", 20);
+        list.add_mirror("https://mirror.us.slow.com", "US", "HTTPS", 150);
+        list.add_mirror("https://mirror.de.com", "DE", "HTTPS", 50);
 
-        let archiso = ArchisoEngine::new("ARCH_202405");
-        let mount_cmd = archiso.mount_live_root();
-        assert!(mount_cmd.contains("mount -t overlay overlay"));
-        assert!(mount_cmd.contains("/run/archiso/cowspace"));
+        let filtered = list.filter_and_sort("US", "HTTPS");
+        assert_eq!(filtered.len(), 3);
+        assert_eq!(filtered[0].latency_ms, 20);
+        assert_eq!(filtered[1].latency_ms, 80);
+        assert_eq!(filtered[2].latency_ms, 150);
+    }
+
+    #[test]
+    fn test_archinstall_parity() {
+        let mut installer = ArchinstallParity::new();
+        assert!(!installer.execute_step());
+
+        let mut subs = Vec::new();
+        subs.push(SubvolumeConfig {
+            name: "root".to_string(),
+            mountpoint: "/".to_string(),
+        });
+
+        let config = ArchinstallConfig {
+            target_disk: "/dev/sda".to_string(),
+            btrfs_subvolumes: subs,
+            desktop_environment: "GNOME".to_string(),
+            is_kernel_zen: true,
+        };
+
+        installer.load_profile(config);
+        assert_eq!(installer.installation_progress_percent, 0);
+
+        assert!(installer.execute_step());
+        assert_eq!(installer.installation_progress_percent, 25);
+    }
+
+    #[test]
+    fn test_artix_init_bridge() {
+        let mut openrc = ArtixInitBridge::new(ArtixInitSystemType::OpenRc);
+        assert_eq!(openrc.query_service_status("dbus"), ServiceState::Stopped);
+
+        openrc.manage_service("dbus", ServiceState::Started);
+        assert_eq!(openrc.query_service_status("dbus"), ServiceState::Started);
+    }
+
+    #[test]
+    fn test_pacman_keyring() {
+        let mut keyring = PacmanKeyring::new();
+        assert_eq!(keyring.populate_arch_keys(), Err("Keyring not initialized"));
+
+        keyring.initialize_keyring();
+        assert!(keyring.populate_arch_keys().is_ok());
+
+        assert!(keyring.verify_signature("0x9E5A86A21B607B76"));
+        assert!(!keyring.verify_signature("0xBAD_KEY_ID"));
+    }
+
+    #[test]
+    fn test_mkinitcpio_generator() {
+        let mut gen = MkinitcpioGenerator::new();
+        gen.add_hook("encrypt");
+        gen.add_module("ext4");
+        let conf = gen.generate_preset_config();
+        assert!(conf.contains("encrypt"));
+        assert!(conf.contains("COMPRESSION=\"zstd\""));
+    }
+
+    #[test]
+    fn test_arch_news_feed_parser() {
+        let mut news = ArchNewsFeedParser::new();
+        news.add_item("Manual intervention required", "2024-05-01", "Update glibc manually", true);
+        news.add_item("Regular update", "2024-05-02", "Minor patches", false);
+        let advisories = news.get_latest_advisories();
+        assert_eq!(advisories.len(), 1);
+        assert_eq!(advisories[0].title, "Manual intervention required");
+    }
+
+    #[test]
+    fn test_pacman_db_cleaner() {
+        let mut cleaner = PacmanDbCleaner::new();
+        cleaner.add_cached_pkg("linux", 1);
+        cleaner.add_cached_pkg("linux", 2);
+        cleaner.add_cached_pkg("linux", 3);
+        cleaner.add_cached_pkg("linux", 4);
+        let removed = cleaner.clean_cache(2);
+        assert_eq!(removed, 2);
+        assert_eq!(cleaner.cache.len(), 2);
+    }
+
+    #[test]
+    fn test_arch_wiki_search_engine() {
+        let mut wiki = ArchWikiSearchEngine::new();
+        wiki.index_page("Systemd", "Systemd service manager guide.");
+        wiki.index_page("Pacman", "Pacman package manager syntax.");
+        let results = wiki.search_topics("Pacman");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].title, "Pacman");
+    }
+
+    #[test]
+    fn test_aur_patch_engine() {
+        let original = r#"
+            pkgname="neovim-git"
+            pkgver=0.9.0
+        "#;
+
+        let patch = AurPatch {
+            target_line: "pkgver=0.9.0".to_string(),
+            replacement_line: "pkgver=0.10.0".to_string(),
+        };
+
+        let engine = AurPatchEngine::new();
+        let patched = engine.apply_patch(original, &patch).unwrap();
+        assert!(patched.contains("pkgver=0.10.0"));
+
+        // Fail Case (nonexistent target line)
+        let bad_patch = AurPatch {
+            target_line: "pkgver=0.1.0".to_string(),
+            replacement_line: "pkgver=0.2.0".to_string(),
+        };
+        assert_eq!(engine.apply_patch(original, &bad_patch), Err("Patch target line not found in recipe"));
     }
 }
