@@ -2,8 +2,11 @@
 #![no_main]
 
 /// OOP-based Application Launcher for SigmaOS
-/// Based on Ideas-999-Structured: User Experience & Desktop Item 756
-/// Implements application launcher and search
+/// Implements application launcher, search, and iconic Elementary OS / Pantheon desktop subsystems.
+/// Inspired by Plank, Slingshot, Wingpanel, Gala, and Pantheon-Files.
+
+extern crate alloc;
+use alloc::boxed::Box;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -11,8 +14,8 @@ use core::mem;
 pub type AppID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum LauncherError { Success = 0, NotFound = 1, LaunchFailed = 2 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LauncherError { Success = 0, NotFound = 1, LaunchFailed = 2, AlreadyExists = 3 }
 
 pub trait Application {
     fn id(&self) -> AppID;
@@ -22,6 +25,7 @@ pub trait Application {
 }
 
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct SimpleApplication {
     pub id: AppID,
     pub name: [u8; 64],
@@ -70,8 +74,9 @@ impl Application for SimpleApplication {
 pub trait ApplicationLauncher {
     fn register_app(&mut self, app: Box<dyn Application>) -> Result<AppID, LauncherError>;
     fn unregister_app(&mut self, id: AppID) -> Result<(), LauncherError>;
-    def launch_app(&self, id: AppID) -> Result<(), LauncherError>;
+    fn launch_app(&self, id: AppID) -> Result<(), LauncherError>;
     fn search_apps(&self, query: &[u8]) -> Vec<AppID>;
+    fn get_app(&self, id: AppID) -> Option<&dyn Application>;
 }
 
 #[repr(C)]
@@ -99,7 +104,9 @@ impl ApplicationLauncher for SimpleApplicationLauncher {
     fn unregister_app(&mut self, id: AppID) -> Result<(), LauncherError> {
         for app_option in &mut self.apps {
             if let Some(ref app) = *app_option {
-                if app.id() == id {
+                let app_ref: &dyn Application = app.as_ref();
+                if app_ref.id() == id {
+                    *app_option = None;
                     return Ok(());
                 }
             }
@@ -119,8 +126,9 @@ impl ApplicationLauncher for SimpleApplicationLauncher {
         let mut results = Vec::new();
         for app_option in &self.apps {
             if let Some(ref app) = *app_option {
-                if app.name().starts_with(query) {
-                    results.push(app.id());
+                let app_ref: &dyn Application = app.as_ref();
+                if app_ref.name().starts_with(query) {
+                    results.push(app_ref.id());
                 }
             }
         }
@@ -130,7 +138,8 @@ impl ApplicationLauncher for SimpleApplicationLauncher {
     fn get_app(&self, id: AppID) -> Option<&dyn Application> {
         for app_option in &self.apps {
             if let Some(ref app) = *app_option {
-                if app.id() == id { return Some(app.as_ref()); }
+                let app_ref: &dyn Application = app.as_ref();
+                if app_ref.id() == id { return Some(app_ref); }
             }
         }
         None
@@ -138,8 +147,8 @@ impl ApplicationLauncher for SimpleApplicationLauncher {
 }
 
 pub trait RecentApps {
-    def add_recent(&mut self, app_id: AppID);
-    def get_recent(&self) -> Vec<AppID>;
+    fn add_recent(&mut self, app_id: AppID);
+    fn get_recent(&self) -> Vec<AppID>;
 }
 
 #[repr(C)]
@@ -164,15 +173,237 @@ impl RecentApps for SimpleRecentApps {
     }
     
     fn get_recent(&self) -> Vec<AppID> {
-        self.recent.clone()
+        let mut cloned = Vec::new();
+        for &id in &self.recent {
+            cloned.push(id);
+        }
+        cloned
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+// ==============================================================================
+// 1. Slingshot Application Launcher (Paginated Grid, Categories, Search)
+// ==============================================================================
+#[repr(C)]
+pub struct SlingshotLauncher {
+    pub current_page: u32,
+    pub items_per_page: u32,
+    pub selected_category: [u8; 32], // e.g. "System", "Internet", "Office"
+}
+
+impl SlingshotLauncher {
+    pub fn new() -> Self {
+        Self {
+            current_page: 0,
+            items_per_page: 12, // 4x3 app grid
+            selected_category: [0; 32],
+        }
+    }
+
+    pub fn set_category(&mut self, cat: &[u8]) {
+        let len = cat.len().min(31);
+        self.selected_category[..len].copy_from_slice(&cat[..len]);
+        self.selected_category[len] = 0;
+    }
+
+    pub fn paginate(&mut self, forward: bool) {
+        if forward {
+            self.current_page += 1;
+        } else if self.current_page > 0 {
+            self.current_page -= 1;
+        }
+    }
+}
+
+impl Default for SlingshotLauncher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// 2. Plank Desktop Application Dock (Bottom Launch Bar)
+// ==============================================================================
+#[repr(C)]
+pub struct PlankDock {
+    pub pinned_apps: Vec<AppID>,
+    pub running_apps: Vec<AppID>,
+    pub zoom_level_percent: u32, // Magnification hover effect
+    pub active_indicator_id: Option<AppID>,
+}
+
+impl PlankDock {
+    pub fn new() -> Self {
+        Self {
+            pinned_apps: Vec::new(),
+            running_apps: Vec::new(),
+            zoom_level_percent: 100, // 100% standard scaling
+            active_indicator_id: None,
+        }
+    }
+
+    pub fn pin_app(&mut self, app_id: AppID) -> bool {
+        self.pinned_apps.push(app_id);
+        true
+    }
+
+    pub fn set_hover_zoom(&mut self, hover_index: usize) {
+        let _ = hover_index;
+        self.zoom_level_percent = 130; // Scale up hovered icon by 130%
+    }
+}
+
+impl Default for PlankDock {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// 3. Wingpanel Top System Panel (Tray Indicators)
+// ==============================================================================
+#[repr(C)]
+pub struct Wingpanel {
+    pub volume_level: u32,
+    pub is_wifi_connected: bool,
+    pub battery_percent: u32,
+    pub translucent_opacity_percent: u32, // wingpanel transitions opacity based on maximizations
+}
+
+impl Wingpanel {
+    pub fn new() -> Self {
+        Self {
+            volume_level: 80,
+            is_wifi_connected: true,
+            battery_percent: 100,
+            translucent_opacity_percent: 85, // Translucent default
+        }
+    }
+
+    pub fn update_opacity(&mut self, window_maximized: bool) {
+        if window_maximized {
+            self.translucent_opacity_percent = 100; // Solid black on maximized window
+        } else {
+            self.translucent_opacity_percent = 85;  // Translucent backdrop
+        }
+    }
+}
+
+impl Default for Wingpanel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// 4. Gala Window Manager & Workspaces Multitasking
+// ==============================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SnapLayout { None, LeftHalf, RightHalf, Maximize }
+
+pub struct GalaWorkspace {
+    pub id: u32,
+    pub mapped_window_ids: Vec<AppID>,
+    pub snap_modes: Vec<SnapLayout>,
+}
+
+pub struct GalaWindowManager {
+    pub workspaces: Vec<GalaWorkspace>,
+    pub active_workspace_idx: usize,
+}
+
+impl GalaWindowManager {
+    pub fn new() -> Self {
+        let mut spaces = Vec::new();
+        spaces.push(GalaWorkspace {
+            id: 1,
+            mapped_window_ids: Vec::new(),
+            snap_modes: Vec::new(),
+        });
+        Self {
+            workspaces: spaces,
+            active_workspace_idx: 0,
+        }
+    }
+
+    pub fn add_workspace(&mut self) -> usize {
+        let new_id = (self.workspaces.len() + 1) as u32;
+        self.workspaces.push(GalaWorkspace {
+            id: new_id,
+            mapped_window_ids: Vec::new(),
+            snap_modes: Vec::new(),
+        });
+        self.workspaces.len() - 1
+    }
+
+    pub fn switch_workspace(&mut self, index: usize) -> bool {
+        if index < self.workspaces.len() {
+            self.active_workspace_idx = index;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for GalaWindowManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// 5. Pantheon Files (Column Grid File Manager Tabs)
+// ==============================================================================
+#[derive(Clone, Copy)]
+pub struct PantheonTab {
+    pub path_hash: u64,
+    pub is_column_view: bool,
+}
+
+pub struct PantheonFileManager {
+    pub open_tabs: Vec<PantheonTab>,
+    pub active_tab_idx: usize,
+    pub favorite_folders_hashes: Vec<u64>,
+}
+
+impl PantheonFileManager {
+    pub fn new() -> Self {
+        let mut tabs = Vec::new();
+        tabs.push(PantheonTab {
+            path_hash: 0x1000, // Home directory /root
+            is_column_view: true,
+        });
+        Self {
+            open_tabs: tabs,
+            active_tab_idx: 0,
+            favorite_folders_hashes: Vec::new(),
+        }
+    }
+
+    pub fn open_new_tab(&mut self, path: u64) -> usize {
+        self.open_tabs.push(PantheonTab {
+            path_hash: path,
+            is_column_view: true,
+        });
+        self.open_tabs.len() - 1
+    }
+}
+
+impl Default for PantheonFileManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// Vec Implementation
+// ==============================================================================
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
@@ -181,7 +412,7 @@ impl<T> Vec<T> {
             }
         }
     }
-    fn remove(&mut self, index: usize) -> T {
+    pub fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -191,16 +422,8 @@ impl<T> Vec<T> {
             item
         }
     }
-    fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
-        }
-        new_vec
-    }
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
