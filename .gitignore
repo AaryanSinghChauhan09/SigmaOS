@@ -13,3 +13,10 @@ build/
 test_enterprise
 test_runner
 wiki_repo/
+.cache/
+test_dma
+test_universal
+test_cpu_feat
+test_cpu_sys
+tests/sigma_test_runner
+zenith_desktop_screenshot.png
