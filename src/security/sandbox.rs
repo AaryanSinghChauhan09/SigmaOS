@@ -83,6 +83,9 @@ impl PrivacyFirstSandbox {
             SandboxProfile::None => {
                 self.blocked_rules.clear();
             }
+            virtualization_overlay: BTreeMap::new(),
+            environment_variables: HashMap::new(),
+            profile: None,
         }
     }
 

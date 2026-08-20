@@ -133,8 +133,6 @@ impl Default for ContainerCapability {
     fn default() -> Self {
         Self::new()
     }
-}
-
 /// Container network configuration type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerNetworkType {
@@ -164,6 +162,28 @@ pub struct ContainerNamespace {
 pub struct SeccompProfile {
     pub hardened: bool,
     pub blocked_syscalls_mask: u32,
+/// Container network configuration type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerNetworkType {
+    None,
+    Bridge,
+    Overlay,
+}
+
+/// Container volume configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerVolume {
+    pub is_bind_mount: bool,
+    pub is_tmpfs: bool,
+    pub read_only: bool,
+}
+
+/// Container user namespaces mapping
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerNamespace {
+    pub uid_mapping: u32,
+    pub gid_mapping: u32,
+    pub rootless: bool,
 }
 
 impl ContainerNamespace {
