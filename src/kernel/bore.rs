@@ -1,6 +1,7 @@
 // Burst-Oriented Response Enhancer (BORE) Scheduler for SigmaOS
 // Inspired by CachyOS BORE, Linux EEVDF/CFS, and FreeBSD ULE schedulers.
-// Implements starvation-avoidance (aging), nice-value weighting, and Real-Time priority lanes.
+// Implements starvation-avoidance (aging), nice-value weighting, sliding window burst score decay,
+// FreeBSD ULE interactivity ranking, and Real-Time priority lanes.
 
 extern crate alloc;
 
@@ -27,6 +28,7 @@ pub struct BoreTask {
     pub nice: i8,           // Nice value: -20 (highest priority) to 19 (lowest priority)
     pub wait_ticks: u64,    // For FreeBSD-style starvation-avoidance aging
     pub is_real_time: bool, // Real-Time task bypass lane
+    pub burst_history: u64, // CachyOS BORE sliding window burst history
 }
 
 impl BoreTask {
@@ -40,6 +42,7 @@ impl BoreTask {
             nice: 0,
             wait_ticks: 0,
             is_real_time: false,
+            burst_history: 0,
         }
     }
 
@@ -56,10 +59,30 @@ impl BoreTask {
     }
 
     /// Calculates task "burstiness" score:
+    /// Incorporates current runtime, sleep time, and CachyOS BORE sliding window burst history.
     /// High burstiness (CPU-hogs) gets scaled high, while interactive (sleepy) tasks stay low.
     pub fn calculate_burst_score(&self) -> u64 {
         let divisor = self.sleep_time_ms + 1;
-        self.cpu_runtime_ms / divisor
+        let instant_burst = self.cpu_runtime_ms / divisor;
+        // BORE formula combining instant burst with decayed burst history
+        (instant_burst + self.burst_history) / 2
+    }
+
+    /// FreeBSD ULE-inspired Interactivity Score (0..100)
+    /// High score (closer to 100) indicates highly interactive UI/IO-bound task.
+    pub fn interactivity_score(&self) -> u32 {
+        let total = self.cpu_runtime_ms + self.sleep_time_ms;
+        if total == 0 {
+            return 100; // Default max interactivity for fresh tasks
+        }
+        ((self.sleep_time_ms * 100) / total) as u32
+    }
+
+    /// Decays historic burst score over time (sliding window) to ensure former CPU hogs regain responsiveness.
+    pub fn decay_burst_score(&mut self) {
+        self.burst_history = (self.burst_history * 3) / 4;
+        self.cpu_runtime_ms = (self.cpu_runtime_ms * 3) / 4;
+        self.sleep_time_ms = (self.sleep_time_ms * 3) / 4;
     }
 
     /// Dynamically scales virtual deadline based on burst score and nice weight to prioritize interactive tasks.
@@ -76,11 +99,17 @@ impl BoreTask {
         // BORE multiplier: penalize high-burst tasks by throwing their deadline further out
         let mut penalty = if burst > 50 { burst * 5 } else { burst };
 
+        // FreeBSD ULE interactivity adjustment: boost tasks with high interactivity score (> 70)
+        let interactivity = self.interactivity_score();
+        if interactivity > 70 {
+            penalty = penalty.saturating_sub(interactivity as u64);
+        }
+
         // Nice-value weight adjustment (Linux CFS inspired):
         // Shift penalty higher for positive nice values (lower priority)
         // Shift penalty lower for negative nice values (higher priority)
         let nice_factor = (self.nice as i32 + 20) as u64; // Map -20..19 to 0..39
-        penalty = penalty * (nice_factor + 1) / 20;
+        penalty = (penalty * (nice_factor + 1)) / 20;
 
         // Apply starvation-aging offset (FreeBSD ULE inspired):
         // Highly starved tasks get deadline boosts so they are guaranteed execution
@@ -95,6 +124,7 @@ impl BoreTask {
 pub struct BoreScheduler {
     pub tasks: Vec<BoreTask>,
     pub current_time: AtomicU64,
+    pub migration_threshold: u64, // FreeBSD ULE SMP migration threshold
 }
 
 impl BoreScheduler {
@@ -102,6 +132,7 @@ impl BoreScheduler {
         Self {
             tasks: Vec::new(),
             current_time: AtomicU64::new(0),
+            migration_threshold: 20,
         }
     }
 
@@ -130,7 +161,7 @@ impl BoreScheduler {
             return Some(&self.tasks[idx]);
         }
 
-        // Otherwise, find the standard standard task with the earliest virtual deadline
+        // Otherwise, find the standard task with the earliest virtual deadline
         let mut best_idx = 0;
         let mut min_deadline = self.tasks[0].virtual_deadline;
 
@@ -156,15 +187,34 @@ impl BoreScheduler {
         Some(&self.tasks[best_idx])
     }
 
-    /// Increments the global scheduler tick clock
-    pub fn tick(&self) {
-        self.current_time.fetch_add(1, Ordering::SeqCst);
+    /// Increments the global scheduler tick clock and decays burst scores periodically
+    pub fn tick(&mut self) {
+        let now = self.current_time.fetch_add(1, Ordering::SeqCst) + 1;
+        // Periodically decay burst history every 100 ticks
+        if now % 100 == 0 {
+            for task in &mut self.tasks {
+                task.decay_burst_score();
+            }
+        }
+    }
+
+    /// Checks if a task is a candidate for SMP load balance migration (FreeBSD ULE model)
+    pub fn is_migration_candidate(&self, pid: u64) -> bool {
+        if let Some(task) = self.tasks.iter().find(|t| t.pid == pid) {
+            // Highly interactive or real-time tasks resist migration to avoid CPU cache thrashing
+            if task.is_real_time || task.interactivity_score() > 80 {
+                return false;
+            }
+            return task.wait_ticks >= self.migration_threshold;
+        }
+        false
     }
 
     pub fn update_task_metrics(&mut self, pid: u64, cpu_runtime: u64, sleep_time: u64) {
         if let Some(task) = self.tasks.iter_mut().find(|t| t.pid == pid) {
             task.cpu_runtime_ms += cpu_runtime;
             task.sleep_time_ms += sleep_time;
+            task.burst_history = task.calculate_burst_score();
             task.update_deadline(self.current_time.load(Ordering::SeqCst));
         }
     }
@@ -273,5 +323,19 @@ mod tests {
         // Task 1's wait_ticks should have accumulated, decreasing its virtual deadline
         assert!(scheduler.tasks[0].wait_ticks > 0);
         assert_eq!(scheduler.tasks[1].wait_ticks, 0); // Task 2 ran, wait_ticks reset
+    }
+
+    #[test]
+    fn test_ule_interactivity_and_burst_decay() {
+        let mut task = BoreTask::new(1, "gui-browser");
+        task.cpu_runtime_ms = 20;
+        task.sleep_time_ms = 80;
+
+        // Interactivity score should be high (80%)
+        assert_eq!(task.interactivity_score(), 80);
+
+        task.burst_history = 100;
+        task.decay_burst_score();
+        assert_eq!(task.burst_history, 75);
     }
 }

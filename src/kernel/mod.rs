@@ -47,3 +47,9 @@ pub use structures::{
     SequencedSinglyLinkedList, SinglyLinkedList, SystemThread, ThreadState, WorkItem,
 };
 pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};
+
+pub mod classic_os;
+pub use classic_os::{
+    BankersAlgorithm, BatchJob, BatchSystemQueue, SleepingBarberQueue,
+    StackCanaryProtector, TicketSpinlock, VirtioBalloonManager,
+};
