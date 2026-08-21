@@ -5,9 +5,9 @@
 
 extern crate alloc;
 
+use crate::klib::{String, Vec, ToString};
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec;
+use alloc::string::String;
 use alloc::vec::Vec;
 
 /// GPU device types
@@ -65,6 +65,10 @@ pub enum GpuError {
     HardwareHang,
 }
 
+// ============================================================================
+// 1. AMDGPU Driver (Linux amdgpu & FreeBSD drm-kmod Inspiration)
+// ============================================================================
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AmdIpBlockType {
     Gfx,
@@ -112,7 +116,7 @@ impl AmdgpuDriver {
                 name: "AMDGPU Radeon RX".to_string(),
                 vendor: "AMD".to_string(),
                 device_id,
-                vram_size: 16 * 1024 * 1024 * 1024,
+                vram_size: 16 * 1024 * 1024 * 1024, // 16GB
                 supported_features: features,
                 gpu_type: GpuType::Amdgpu,
             },
@@ -141,6 +145,7 @@ impl AmdgpuDriver {
 
 impl GpuDriver for AmdgpuDriver {
     fn initialize(&mut self) -> Result<(), GpuError> {
+        // Discover IP Blocks (Linux amdgpu_device_init inspiration)
         self.ip_blocks.clear();
         self.ip_blocks.push(AmdIpBlock { block_type: AmdIpBlockType::Gfx, version_major: 11, version_minor: 0, initialized: true });
         self.ip_blocks.push(AmdIpBlock { block_type: AmdIpBlockType::Sdma, version_major: 6, version_minor: 0, initialized: true });
@@ -205,6 +210,10 @@ impl GpuDriver for AmdgpuDriver {
     }
 }
 
+// ============================================================================
+// 2. Intel GPU Driver (Linux i915 / Xe Inspiration)
+// ============================================================================
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntelRingType {
     Render,
@@ -220,6 +229,7 @@ pub struct GucHucStatus {
     pub firmware_version: String,
 }
 
+/// Intel DRM Driver modeling i915 / Xe architectures
 pub struct IntelDriver {
     info: GpuInfo,
     initialized: bool,
@@ -241,7 +251,7 @@ impl IntelDriver {
                 name: "Intel Arc / Iris Xe".to_string(),
                 vendor: "Intel".to_string(),
                 device_id,
-                vram_size: 8 * 1024 * 1024 * 1024,
+                vram_size: 8 * 1024 * 1024 * 1024, // 8GB Shared/Dedicated
                 supported_features: features,
                 gpu_type: GpuType::Intel,
             },
@@ -267,6 +277,7 @@ impl IntelDriver {
 
 impl GpuDriver for IntelDriver {
     fn initialize(&mut self) -> Result<(), GpuError> {
+        // Authenticate GuC and HuC firmware (Linux i915_guc_submission inspiration)
         self.guc_status.guc_loaded = true;
         self.guc_status.huc_authenticated = true;
         self.ggtt_mapped_pages = 1024;
@@ -327,6 +338,10 @@ impl GpuDriver for IntelDriver {
     }
 }
 
+// ============================================================================
+// 3. NVIDIA Nouveau / Open-Kernel Driver
+// ============================================================================
+
 #[derive(Debug, Clone)]
 pub struct NvidiaFifoChannel {
     pub channel_id: u32,
@@ -334,6 +349,7 @@ pub struct NvidiaFifoChannel {
     pub active: bool,
 }
 
+/// NVIDIA Driver modeling Nouveau & Open-Kernel GSP RPC
 pub struct NvidiaDriver {
     info: GpuInfo,
     initialized: bool,
@@ -353,7 +369,7 @@ impl NvidiaDriver {
                 name: "NVIDIA GeForce RTX".to_string(),
                 vendor: "NVIDIA".to_string(),
                 device_id,
-                vram_size: 12 * 1024 * 1024 * 1024,
+                vram_size: 12 * 1024 * 1024 * 1024, // 12GB
                 supported_features: features,
                 gpu_type: GpuType::Nvidia,
             },
@@ -379,6 +395,7 @@ impl NvidiaDriver {
 
 impl GpuDriver for NvidiaDriver {
     fn initialize(&mut self) -> Result<(), GpuError> {
+        // GSP RPC boot handshake (Linux nvidia-open / Nouveau inspiration)
         self.gsp_initialized = true;
         self.initialized = true;
         Ok(())
@@ -433,6 +450,10 @@ impl GpuDriver for NvidiaDriver {
     }
 }
 
+// ============================================================================
+// 4. VirtIO-GPU Driver (3D Virgl Acceleration)
+// ============================================================================
+
 #[derive(Debug, Clone)]
 pub struct VirtioResource2d {
     pub resource_id: u32,
@@ -441,6 +462,7 @@ pub struct VirtioResource2d {
     pub format: u32,
 }
 
+/// VirtIO-GPU Driver for QEMU / KVM virtualization
 pub struct VirtioGpuDriver {
     info: GpuInfo,
     initialized: bool,
@@ -479,7 +501,7 @@ impl VirtioGpuDriver {
             resource_id,
             width,
             height,
-            format: 1,
+            format: 1, // B8G8R8A8_UNORM
         });
         Ok(resource_id)
     }
@@ -540,15 +562,13 @@ impl GpuDriver for VirtioGpuDriver {
     }
 }
 
+// ============================================================================
+// 5. GPU Manager
+// ============================================================================
+
 pub struct GpuManager {
     drivers: Vec<Box<dyn GpuDriver>>,
     active_driver: Option<usize>,
-}
-
-impl Default for GpuManager {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl GpuManager {
@@ -591,6 +611,12 @@ impl GpuManager {
         } else {
             Err(GpuError::InitializationFailed)
         }
+    }
+}
+
+impl Default for GpuManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

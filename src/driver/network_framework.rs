@@ -5,9 +5,9 @@
 
 extern crate alloc;
 
+use crate::klib::{String, Vec, ToString};
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec;
+use alloc::string::String;
 use alloc::vec::Vec;
 
 /// Network device types
@@ -48,7 +48,7 @@ pub struct NetworkInfo {
     pub mac_address: [u8; 6],
     pub mtu: u32,
     pub link_up: bool,
-    pub speed: u32,
+    pub speed: u32, // Mbps
 }
 
 /// Network errors
@@ -79,10 +79,14 @@ pub enum EncryptionType {
 pub struct WirelessNetwork {
     pub ssid: String,
     pub bssid: [u8; 6],
-    pub signal_strength: i8,
+    pub signal_strength: i8, // dBm
     pub channel: u8,
     pub encryption: EncryptionType,
 }
+
+// ============================================================================
+// 1. Ethernet Driver (Linux e1000 / FreeBSD igb Inspiration)
+// ============================================================================
 
 pub struct EthernetDriver {
     info: NetworkInfo,
@@ -146,6 +150,10 @@ impl NetworkDriver for EthernetDriver {
     }
 }
 
+// ============================================================================
+// 2. Intel iwlwifi Driver (Linux iwlwifi & FreeBSD iwm/iw7000 Inspiration)
+// ============================================================================
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IwlwifiStationState {
     Disconnected,
@@ -175,7 +183,7 @@ impl IntelIwlWifiDriver {
                 mac_address: [0xA0, 0x36, 0xBC, 0x11, 0x22, 0x33],
                 mtu: 1500,
                 link_up: false,
-                speed: 2400,
+                speed: 2400, // Wi-Fi 6E (802.11ax) speed
             },
             initialized: false,
             firmware_loaded: false,
@@ -217,6 +225,7 @@ impl IntelIwlWifiDriver {
 
 impl NetworkDriver for IntelIwlWifiDriver {
     fn initialize(&mut self) -> Result<(), NetworkError> {
+        // Microcode firmware load handshake (Linux iwlwifi ucode init inspiration)
         self.firmware_loaded = true;
         self.initialized = true;
         Ok(())
@@ -252,6 +261,10 @@ impl NetworkDriver for IntelIwlWifiDriver {
     }
 }
 
+// ============================================================================
+// 3. Broadcom brcmfmac Driver (Linux brcmfmac & FreeBSD bhnd/bwn Inspiration)
+// ============================================================================
+
 pub struct BroadcomBrcmDriver {
     info: NetworkInfo,
     initialized: bool,
@@ -268,7 +281,7 @@ impl BroadcomBrcmDriver {
                 mac_address: [0xB8, 0x27, 0xEB, 0x44, 0x55, 0x66],
                 mtu: 1500,
                 link_up: false,
-                speed: 866,
+                speed: 866, // 802.11ac
             },
             initialized: false,
             sdio_bus_ready: false,
@@ -283,6 +296,7 @@ impl BroadcomBrcmDriver {
 
 impl NetworkDriver for BroadcomBrcmDriver {
     fn initialize(&mut self) -> Result<(), NetworkError> {
+        // SDIO / PCIe FullMAC RAM firmware initialization
         self.sdio_bus_ready = true;
         self.initialized = true;
         self.info.link_up = true;
@@ -318,6 +332,10 @@ impl NetworkDriver for BroadcomBrcmDriver {
     }
 }
 
+// ============================================================================
+// 4. Realtek rtw88 / rtw89 Driver (Linux rtw88 & FreeBSD rtwn Inspiration)
+// ============================================================================
+
 pub struct RealtekRtwDriver {
     info: NetworkInfo,
     initialized: bool,
@@ -334,7 +352,7 @@ impl RealtekRtwDriver {
                 mac_address: [0x00, 0xE0, 0x4C, 0x77, 0x88, 0x99],
                 mtu: 1500,
                 link_up: false,
-                speed: 1200,
+                speed: 1200, // Wi-Fi 6 (rtw89)
             },
             initialized: false,
             efuse_parsed: false,
@@ -383,6 +401,10 @@ impl NetworkDriver for RealtekRtwDriver {
         self.info.mac_address
     }
 }
+
+// ============================================================================
+// 5. Atheros ath10k Driver (Linux ath10k & FreeBSD ath/ath_hal Inspiration)
+// ============================================================================
 
 pub struct AtherosAthDriver {
     info: NetworkInfo,
@@ -448,15 +470,13 @@ impl NetworkDriver for AtherosAthDriver {
     }
 }
 
+// ============================================================================
+// 6. Network Manager
+// ============================================================================
+
 pub struct NetworkManager {
     drivers: Vec<Box<dyn NetworkDriver>>,
     active_interfaces: Vec<String>,
-}
-
-impl Default for NetworkManager {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl NetworkManager {
@@ -486,6 +506,12 @@ impl NetworkManager {
 
     pub fn list_interfaces(&self) -> Vec<NetworkInfo> {
         self.drivers.iter().map(|d| d.get_info()).collect()
+    }
+}
+
+impl Default for NetworkManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
