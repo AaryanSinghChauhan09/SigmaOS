@@ -53,7 +53,13 @@ impl SigmaSoftwareStore {
             if let Some(ref entry) = entry_slot {
                 if entry.name == name {
                     if entry.safety_score < 50 {
+                        println!("SoftwareStore: SECURITY BLOCKED: Package '{}' has a critical low safety score of {}!", entry.name, entry.safety_score);
                         return Err("SecurityBlocked: Package safety threshold not met.");
+                    }
+                    if !entry.is_sandboxed {
+                        println!("SoftwareStore: WARNING: Installing unsandboxed application '{}'. Sandbox policies degraded.", entry.name);
+                    } else {
+                        println!("SoftwareStore: Package '{}' validated (Safety: {}, Sandboxed: true). Installation granted.", entry.name, entry.safety_score);
                     }
                     return Ok(());
                 }
@@ -65,6 +71,7 @@ impl SigmaSoftwareStore {
     /// Automatically scans and triggers update routines for registered packages
     pub fn trigger_auto_updates(&self) -> usize {
         if !self.auto_updates_enabled.load(Ordering::SeqCst) {
+            println!("SoftwareStore: Auto-updates deactivated by user configuration.");
             return 0;
         }
 
@@ -73,18 +80,17 @@ impl SigmaSoftwareStore {
         for entry_slot in registry.iter_mut() {
             if let Some(ref mut entry) = entry_slot {
                 if entry.update_available {
+                    println!("SoftwareStore: Auto-updating package: '{}'...", entry.name);
                     entry.update_available = false;
                     count += 1;
                 }
             }
         }
+        println!(
+            "SoftwareStore: Update complete. Updated {} packages dynamically.",
+            count
+        );
         count
-    }
-}
-
-impl Default for SigmaSoftwareStore {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -95,16 +101,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_software_store_install() {
+    fn test_software_store_safety_check() {
         let store = SigmaSoftwareStore::new();
+        assert!(store.install_with_safety_check("firefox-developer").is_ok());
         assert!(store.install_with_safety_check("vlc-player").is_ok());
-        assert!(store.install_with_safety_check("unknown-app").is_err());
+        assert!(store.install_with_safety_check("nonexistent").is_err());
     }
 
     #[test]
-    fn test_software_store_updates() {
+    fn test_auto_updates() {
         let store = SigmaSoftwareStore::new();
-        let update_count = store.trigger_auto_updates();
-        assert_eq!(update_count, 1);
+        let updated = store.trigger_auto_updates();
+        assert_eq!(updated, 1);
+        let updated_again = store.trigger_auto_updates();
+        assert_eq!(updated_again, 0);
     }
 }

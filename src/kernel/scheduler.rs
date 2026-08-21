@@ -1,12 +1,9 @@
-#![no_std]
+// SigmaOS Kernel Scheduler
+// Implements EEVDF (Earliest Eligible Virtual Deadline First) & EDF (Earliest Deadline First) hybrid real-time scheduler
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
-use core::cmp::Ordering;
 use core::time::Duration;
 
+/// Process priority levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
     Idle = 0,
@@ -14,36 +11,6 @@ pub enum Priority {
     Normal = 2,
     High = 3,
     Realtime = 4,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TaskId(pub u32);
-
-#[derive(Debug, Clone, Copy)]
-pub struct Task {
-    pub id: TaskId,
-    pub vruntime: u64,
-    pub priority: u32,
-}
-
-impl PartialEq for Task {
-    fn eq(&self, other: &Self) -> bool {
-        self.vruntime == other.vruntime
-    }
-}
-
-impl Eq for Task {}
-
-impl PartialOrd for Task {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Task {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.vruntime.cmp(&other.vruntime)
-    }
 }
 
 /// Process state
@@ -55,7 +22,7 @@ pub enum ProcessState {
     Terminated,
 }
 
-/// Process control block (PCB) enhanced with EEVDF vruntime, lag, and deadline models
+/// Process control block (PCB) enhanced with EEVDF vruntime and deadline models
 /// Cache-line aligned to 64 bytes to prevent cache bouncing on SMP systems
 #[derive(Debug, Clone)]
 #[repr(C, align(64))]
@@ -67,7 +34,6 @@ pub struct Process {
     pub runtime: Duration,
     pub virtual_runtime: u64,  // EEVDF vruntime (ticks)
     pub virtual_deadline: u64, // EEVDF virtual deadline
-    pub lag: i64,              // EEVDF lag: (V - vruntime) * weight
     pub time_slice: Duration,
 }
 
@@ -81,7 +47,6 @@ impl Process {
             runtime: Duration::from_secs(0),
             virtual_runtime: 0,
             virtual_deadline: 0,
-            lag: 0,
             time_slice: Duration::from_millis(10),
         }
     }
@@ -96,18 +61,9 @@ impl Process {
         }
     }
 
-    /// Recalculates the process lag relative to the system virtual time (V)
-    /// Positive lag indicates the process has received less than its fair share of CPU time.
-    pub fn update_lag(&mut self, system_vtime: u64) {
-        let weight = self.get_weight() as i64;
-        let v_diff = system_vtime as i64 - self.virtual_runtime as i64;
-        self.lag = v_diff * weight;
-    }
-
     pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
-        self.update_lag(system_vtime);
         let weight = self.get_weight();
-        // EEVDF deadline = vruntime + (q / w) where q is time slice equivalent ticks (10)
+        // deadline = vruntime + (q / w) where q is time slice equivalent ticks (10)
         let q = 10;
         self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
     }
@@ -153,53 +109,6 @@ impl WorkStealingQueue {
     }
 }
 
-pub struct CfsScheduler {
-    tasks: [Option<Task>; 64],
-    task_count: usize,
-    current_time: u64,
-}
-
-impl CfsScheduler {
-    pub const fn new() -> Self {
-        CfsScheduler {
-            tasks: [None; 64],
-            task_count: 0,
-            current_time: 0,
-        }
-    }
-
-    pub fn add_task(&mut self, task: Task) {
-        if self.task_count < 64 {
-            self.tasks[self.task_count] = Some(task);
-            self.task_count += 1;
-            self.sort_tasks();
-        }
-    }
-
-    pub fn pick_next_task(&mut self) -> Option<Task> {
-        if self.task_count > 0 {
-            let task = self.tasks[0].take();
-            self.tasks[0] = self.tasks[self.task_count - 1];
-            self.tasks[self.task_count - 1] = None;
-            self.task_count -= 1;
-            self.sort_tasks();
-            task
-        } else {
-            None
-        }
-    }
-
-    fn sort_tasks(&mut self) {
-        for i in 1..self.task_count {
-            let mut j = i;
-            while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
-                self.tasks.swap(j - 1, j);
-                j -= 1;
-            }
-        }
-    }
-}
-
 /// EEVDF Scheduler Engine
 pub struct Scheduler {
     pub processes: Vec<Process>,
@@ -240,13 +149,7 @@ impl Scheduler {
             return None;
         }
 
-        // Update lag for all ready processes
-        let sys_vtime = self.system_vtime;
-        for &idx in &ready_indices {
-            self.processes[idx].update_lag(sys_vtime);
-        }
-
-        // 2. Identify eligible processes (virtual_runtime <= system_vtime, i.e., lag >= 0)
+        // 2. Identify eligible processes (virtual_runtime <= system_vtime)
         let mut eligible_indices = Vec::new();
         for &idx in &ready_indices {
             let p = &self.processes[idx];
@@ -258,7 +161,7 @@ impl Scheduler {
         // 3. Selection rules:
         // - Standard EEVDF: pick the eligible process with the EARLIEST virtual deadline
         // - Starvation Prevention: if no processes are currently eligible (e.g. system_vtime is lagging),
-        //   fallback to selecting the process with the highest lag / minimum virtual_runtime
+        //   fallback to selecting the process with the minimum virtual_runtime
         let selected_idx = if !eligible_indices.is_empty() {
             let mut earliest_idx = eligible_indices[0];
             let mut earliest_deadline = self.processes[earliest_idx].virtual_deadline;
@@ -355,7 +258,7 @@ mod tests {
     #[test]
     fn test_add_process() {
         let mut scheduler = Scheduler::new();
-        let process = Process::new(1, String::from("test"), Priority::Normal);
+        let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
         assert_eq!(scheduler.processes.len(), 1);
     }
@@ -363,7 +266,7 @@ mod tests {
     #[test]
     fn test_schedule() {
         let mut scheduler = Scheduler::new();
-        let process = Process::new(1, String::from("test"), Priority::Normal);
+        let process = Process::new(1, "test".to_string(), Priority::Normal);
         scheduler.add_process(process);
 
         for _ in 0..5 {
@@ -384,8 +287,8 @@ mod tests {
     #[test]
     fn test_eevdf_deadline_and_weight() {
         let mut scheduler = Scheduler::new();
-        let mut p1 = Process::new(1, String::from("low-prio"), Priority::Low);
-        let mut p2 = Process::new(2, String::from("high-prio"), Priority::High);
+        let mut p1 = Process::new(1, "low-prio".to_string(), Priority::Low);
+        let mut p2 = Process::new(2, "high-prio".to_string(), Priority::High);
 
         scheduler.add_process(p1.clone());
         scheduler.add_process(p2.clone());
@@ -395,20 +298,6 @@ mod tests {
 
         // High priority must have a tighter/earlier virtual deadline for the same vruntime!
         assert!(p2.virtual_deadline < p1.virtual_deadline);
-    }
-
-    #[test]
-    fn test_eevdf_lag_tracking() {
-        let mut process = Process::new(1, String::from("worker"), Priority::Normal); // weight = 4
-        process.virtual_runtime = 10;
-
-        // System V = 20, vruntime = 10 => lag = (20 - 10) * 4 = 40
-        process.update_lag(20);
-        assert_eq!(process.lag, 40);
-
-        // System V = 5, vruntime = 10 => lag = (5 - 10) * 4 = -20
-        process.update_lag(5);
-        assert_eq!(process.lag, -20);
     }
 
     #[test]

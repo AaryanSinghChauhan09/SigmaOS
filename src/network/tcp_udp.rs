@@ -1,21 +1,24 @@
+// SigmaOS Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets
+// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::mem;
-/// OOP-based Networking Stack (TCP/UDP) for SigmaOS
-/// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
-/// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
-/// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol {
     TCP = 0,
     UDP = 1,
 }
 
-#[repr(C)]
+/// Standard RFC-793 TCP States
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
@@ -30,8 +33,9 @@ pub enum TCPState {
     TimeWait = 9,
 }
 
+/// Network Errors
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
     Success = 0,
     InvalidSocket = 1,
@@ -61,6 +65,21 @@ pub enum SocketOption {
     SndBuf,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BpfOp {
+    LoadPort,
+    JumpEqual,
+    ReturnMatch,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct BpfInstruction {
+    pub op: BpfOp,
+    pub k: u32,
+    pub jt: u8,
+    pub jf: u8,
+}
+
 #[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
@@ -73,6 +92,8 @@ pub struct SimpleSocket {
     pub tcp_nodelay: AtomicUsize,
     pub rcvbuf: AtomicUsize,
     pub sndbuf: AtomicUsize,
+    // BSD Berkeley Packet Filter (BPF) instructions
+    pub bpf_filters: Vec<BpfInstruction>,
 }
 
 impl SimpleSocket {
@@ -87,7 +108,42 @@ impl SimpleSocket {
             tcp_nodelay: AtomicUsize::new(0),
             rcvbuf: AtomicUsize::new(65536),
             sndbuf: AtomicUsize::new(65536),
+            bpf_filters: Vec::new(),
         }
+    }
+
+    pub fn attach_bpf_filter(&mut self, instructions: Vec<BpfInstruction>) {
+        self.bpf_filters = instructions;
+    }
+
+    /// Evaluates attached BPF bytecode filters against an incoming packet payload (TCP/IP header context)
+    pub fn execute_bpf_match(&self, packet_port: u16) -> bool {
+        if self.bpf_filters.is_empty() {
+            return true; // Default match-all if no filters attached
+        }
+        let mut pc = 0;
+        let mut accumulator: u32 = 0;
+
+        while pc < self.bpf_filters.len() {
+            let inst = &self.bpf_filters[pc];
+            match inst.op {
+                BpfOp::LoadPort => {
+                    accumulator = packet_port as u32;
+                    pc += 1;
+                }
+                BpfOp::JumpEqual => {
+                    if accumulator == inst.k {
+                        pc += inst.jt as usize;
+                    } else {
+                        pc += inst.jf as usize;
+                    }
+                }
+                BpfOp::ReturnMatch => {
+                    return inst.k != 0;
+                }
+            }
+        }
+        false
     }
 }
 
@@ -188,19 +244,7 @@ impl TCPConnection for SimpleSocket {
         Ok(())
     }
     fn get_state(&self) -> TCPState {
-        let val = self.state.load(Ordering::SeqCst);
-        match val {
-            0 => TCPState::Closed,
-            1 => TCPState::Listen,
-            2 => TCPState::SynSent,
-            3 => TCPState::SynReceived,
-            4 => TCPState::Established,
-            5 => TCPState::FinWait1,
-            6 => TCPState::FinWait2,
-            7 => TCPState::CloseWait,
-            8 => TCPState::Closing,
-            _ => TCPState::TimeWait,
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as usize) }
     }
 }
 
@@ -315,23 +359,27 @@ pub trait Firewall {
     fn is_allowed(&self, port: Port) -> bool;
 }
 
+#[repr(C)]
+/// Multi-port firewall initialized safely without Copy bound traits
 pub struct SimpleFirewall {
     pub allowed_ports: Vec<AtomicUsize>,
+}
+
+impl SimpleFirewall {
+    pub fn new() -> Self {
+        let mut allowed = Vec::new();
+        for _ in 0..65536 {
+            allowed.push(AtomicUsize::new(0));
+        }
+        SimpleFirewall {
+            allowed_ports: allowed,
+        }
+    }
 }
 
 impl Default for SimpleFirewall {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl SimpleFirewall {
-    pub fn new() -> Self {
-        let mut allowed_ports = Vec::new();
-        for _ in 0..65536 {
-            allowed_ports.push(AtomicUsize::new(0));
-        }
-        SimpleFirewall { allowed_ports }
     }
 }
 
@@ -391,14 +439,7 @@ impl NetfilterFirewall {
         self.rules.push(rule);
     }
 
-    pub fn match_packet(
-        &self,
-        chain: NetfilterChain,
-        src: [u8; 4],
-        dest: [u8; 4],
-        proto: Protocol,
-        port: Port,
-    ) -> NetfilterAction {
+    pub fn match_packet(&self, chain: NetfilterChain, src: [u8; 4], dest: [u8; 4], proto: Protocol, port: Port) -> NetfilterAction {
         for rule in &self.rules {
             if rule.chain == chain
                 && (rule.source_ip == [0, 0, 0, 0] || rule.source_ip == src)
@@ -423,17 +464,15 @@ pub struct ZeroCopyNetwork {
     pub dma_buffer: AtomicUsize,
 }
 
-impl Default for ZeroCopyNetwork {
-    fn default() -> Self {
-        Self::new()
+impl ZeroCopyNetwork {
+    pub fn new() -> Self {
+        ZeroCopyNetwork { dma_buffer: AtomicUsize::new(0) }
     }
 }
 
-impl ZeroCopyNetwork {
-    pub fn new() -> Self {
-        ZeroCopyNetwork {
-            dma_buffer: AtomicUsize::new(0),
-        }
+impl Default for ZeroCopyNetwork {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -452,6 +491,13 @@ impl ZeroCopy for ZeroCopyNetwork {
     }
 }
 
+/// BSD packet filter (pf) NAT translation rule entry
+#[derive(Debug, Clone)]
+pub struct PfNatRule {
+    pub internal_ip: [u8; 4],
+    pub external_ip: [u8; 4],
+}
+
 /// Linux IP routing table entry
 #[derive(Debug, Clone)]
 pub struct RoutingEntry {
@@ -463,6 +509,7 @@ pub struct RoutingEntry {
 
 pub struct RoutingTable {
     pub entries: Vec<RoutingEntry>,
+    pub pf_nat_rules: Vec<PfNatRule>,
 }
 
 impl Default for RoutingTable {
@@ -475,11 +522,26 @@ impl RoutingTable {
     pub fn new() -> Self {
         RoutingTable {
             entries: Vec::new(),
+            pf_nat_rules: Vec::new(),
         }
     }
 
     pub fn add_route(&mut self, entry: RoutingEntry) {
         self.entries.push(entry);
+    }
+
+    pub fn add_pf_nat_rule(&mut self, rule: PfNatRule) {
+        self.pf_nat_rules.push(rule);
+    }
+
+    /// Translates internal IP to mapped public IP if a BSD pf NAT rule matches (NAT egress)
+    pub fn apply_pf_nat(&self, internal_ip: [u8; 4]) -> [u8; 4] {
+        for rule in &self.pf_nat_rules {
+            if rule.internal_ip == internal_ip {
+                return rule.external_ip;
+            }
+        }
+        internal_ip
     }
 
     pub fn lookup(&self, dest_ip: [u8; 4]) -> Option<RoutingEntry> {
@@ -490,9 +552,7 @@ impl RoutingTable {
             let mut matches = true;
             let mut mask_ones = 0;
             for i in 0..4 {
-                if (dest_ip[i] & entry.subnet_mask[i])
-                    != (entry.dest_network[i] & entry.subnet_mask[i])
-                {
+                if (dest_ip[i] & entry.subnet_mask[i]) != (entry.dest_network[i] & entry.subnet_mask[i]) {
                     matches = false;
                     break;
                 }
@@ -559,12 +619,7 @@ impl EpollInstance {
         }
     }
 
-    pub fn ctl(
-        &mut self,
-        op: EpollOp,
-        fd: SocketID,
-        event: EpollEvent,
-    ) -> Result<(), NetworkError> {
+    pub fn ctl(&mut self, op: EpollOp, fd: SocketID, event: EpollEvent) -> Result<(), NetworkError> {
         match op {
             EpollOp::Add => {
                 self.watched_sockets.push((fd, event));
@@ -651,14 +706,12 @@ impl NetworkStack for SimpleNetworkStack {
         Ok(id)
     }
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        for socket_option in &mut self.sockets {
-            if let Some(ref socket) = *socket_option {
-                if socket.id() == id {
-                    return Ok(());
-                }
-            }
+        if let Some(pos) = self.sockets.iter().position(|s| s.as_ref().map_or(false, |sock| sock.id() == id)) {
+            self.sockets.remove(pos);
+            Ok(())
+        } else {
+            Err(NetworkError::InvalidSocket)
         }
-        Err(NetworkError::InvalidSocket)
     }
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket_option in &self.sockets {
@@ -670,203 +723,6 @@ impl NetworkStack for SimpleNetworkStack {
         }
         None
     }
-}
-
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
-    pub fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    pub fn retain<F>(&mut self, mut f: F)
-    where
-        F: FnMut(&T) -> bool,
-    {
-        let mut write_idx = 0;
-        for i in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(i);
-                if f(item) {
-                    if write_idx != i {
-                        core::ptr::copy_nonoverlapping(
-                            self.data.add(i),
-                            self.data.add(write_idx),
-                            1,
-                        );
-                    }
-                    write_idx += 1;
-                }
-            }
-        }
-        self.len = write_idx;
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]
@@ -934,23 +790,11 @@ mod tests {
         fw.add_rule(rule);
 
         // Packet matches rule: should be dropped
-        let action = fw.match_packet(
-            NetfilterChain::Input,
-            [192, 168, 1, 100],
-            [10, 0, 0, 1],
-            Protocol::TCP,
-            22,
-        );
+        let action = fw.match_packet(NetfilterChain::Input, [192, 168, 1, 100], [10, 0, 0, 1], Protocol::TCP, 22);
         assert_eq!(action, NetfilterAction::Drop);
 
         // Different IP: should be accepted (by default policy)
-        let action_other = fw.match_packet(
-            NetfilterChain::Input,
-            [192, 168, 1, 101],
-            [10, 0, 0, 1],
-            Protocol::TCP,
-            22,
-        );
+        let action_other = fw.match_packet(NetfilterChain::Input, [192, 168, 1, 101], [10, 0, 0, 1], Protocol::TCP, 22);
         assert_eq!(action_other, NetfilterAction::Accept);
     }
 
@@ -976,15 +820,43 @@ mod tests {
     #[test]
     fn test_epoll_event_loop() {
         let mut epoll = EpollInstance::new(1);
-        let event = EpollEvent {
-            events: 1,
-            data: 999,
-        };
+        let event = EpollEvent { events: 1, data: 999 };
         epoll.ctl(EpollOp::Add, 10, event).unwrap();
 
         let mut events_out = [EpollEvent { events: 0, data: 0 }; 4];
         let triggered = epoll.wait(&mut events_out).unwrap();
         assert_eq!(triggered, 1);
         assert_eq!(events_out[0].data, 999);
+    }
+
+    #[test]
+    fn test_bpf_packet_matching() {
+        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
+
+        let instructions = vec![
+            BpfInstruction { op: BpfOp::LoadPort, k: 0, jt: 0, jf: 0 },
+            BpfInstruction { op: BpfOp::JumpEqual, k: 443, jt: 1, jf: 2 },
+            BpfInstruction { op: BpfOp::ReturnMatch, k: 1, jt: 0, jf: 0 }, // If equal to 443, match (1)
+            BpfInstruction { op: BpfOp::ReturnMatch, k: 0, jt: 0, jf: 0 }, // Else, fail (0)
+        ];
+        socket.attach_bpf_filter(instructions);
+
+        assert!(socket.execute_bpf_match(443));
+        assert!(!socket.execute_bpf_match(80));
+    }
+
+    #[test]
+    fn test_bsd_pf_nat_rules() {
+        let mut routing = RoutingTable::new();
+        routing.add_pf_nat_rule(PfNatRule {
+            internal_ip: [192, 168, 1, 100],
+            external_ip: [111, 22, 33, 44],
+        });
+
+        let output_ip = routing.apply_pf_nat([192, 168, 1, 100]);
+        assert_eq!(output_ip, [111, 22, 33, 44]);
+
+        let other_ip = routing.apply_pf_nat([10, 0, 0, 5]);
+        assert_eq!(other_ip, [10, 0, 0, 5]);
     }
 }
