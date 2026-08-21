@@ -84,6 +84,20 @@ This document outlines the strategic engineering roadmap and gap analysis for br
 
 ---
 
+---
+
+## 🏛️ 7. Hybrid Model Roadmap (OOP Storage + Procedural Runtime)
+
+SigmaOS implements a hybrid model combining OOP source code organization with procedural execution efficiency:
+
+- **Phase 1 (0–3 Months):** Refactor kernel subsystems into OOP classes, structs, and trait contracts (Encapsulation, SOLID).
+- **Phase 2 (3–6 Months):** Build procedural fast syscall dispatcher tables, APIC ISRs, and EEVDF scheduler execution loops.
+- **Phase 3 (6–9 Months):** Convert device drivers into OOP wrappers exporting flat procedural dispatch function tables (`ProceduralDriverDispatchTable`).
+- **Phase 4 (9–12 Months):** Optimize kernel execution runtime with zero-allocation procedural page allocators and fast lock-free data structures.
+- **Phase 5 (12–18 Months):** Compile comprehensive developer onboarding documentation (`docs/HYBRID_ARCHITECTURE.md`) and architecture guidelines.
+
+---
+
 ## 📌 Next Expansion Steps
 - **Branch-to-Feature Mapping:** Align GitHub branch capabilities with Linux/BSD module equivalents.
 - **Compliance Dashboard:** Integrate real-time legal, SBOM, and security compliance overlays (`GlobalComplianceDashboard`).
