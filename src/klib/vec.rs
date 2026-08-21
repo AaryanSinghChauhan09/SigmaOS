@@ -54,6 +54,85 @@ impl<T> Vec<T> {
         self.len == 0
     }
 
+    pub fn sort_by<F>(&mut self, mut compare: F)
+    where
+        F: FnMut(&T, &T) -> core::cmp::Ordering,
+    {
+        if self.len <= 1 {
+            return;
+        }
+        for i in 1..self.len {
+            let mut j = i;
+            while j > 0 {
+                let elem_j = unsafe { &*self.data.add(j) };
+                let elem_prev = unsafe { &*self.data.add(j - 1) };
+                if compare(elem_prev, elem_j) == core::cmp::Ordering::Greater {
+                    unsafe {
+                        core::ptr::swap(self.data.add(j - 1), self.data.add(j));
+                    }
+                    j -= 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    pub fn clear(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+            }
+        }
+        self.len = 0;
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+
+    pub fn contains(&self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
+        for i in 0..self.len {
+            if unsafe { &*self.data.add(i) } == item {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn insert(&mut self, index: usize, item: T) {
+        if index > self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            for i in (index..self.len).rev() {
+                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+            }
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
     pub fn iter(&self) -> core::slice::Iter<'_, T> {
         unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
     }
@@ -200,6 +279,22 @@ impl<T> Drop for Vec<T> {
     }
 }
 
+impl<T: PartialEq> PartialEq for Vec<T> {
+    fn eq(&self, other: &Self) -> bool {
+        if self.len != other.len {
+            return false;
+        }
+        for i in 0..self.len {
+            if self[i] != other[i] {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+impl<T: Eq + PartialEq> Eq for Vec<T> {}
+
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = Vec::with_capacity(self.capacity);
@@ -213,3 +308,18 @@ impl<T: Clone> Clone for Vec<T> {
     }
 }
 
+impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_list().entries(self.iter()).finish()
+    }
+}
+
+impl<T> FromIterator<T> for Vec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut vec = Vec::new();
+        for item in iter {
+            vec.push(item);
+        }
+        vec
+    }
+}

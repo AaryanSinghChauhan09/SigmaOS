@@ -990,8 +990,8 @@ pub struct SovereignPasswordGenerator;
 impl SovereignPasswordGenerator {
     pub fn generate_secure_password(&self, length: usize, include_symbols: bool) -> String {
         let mut password = String::new();
-        let letters = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let symbols = b"!@#$%^&*()_+-=[]{}|;:,./?";
+        let letters: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let symbols: &[u8] = b"!@#$%^&*()_+-=[]{}|;:,./?";
 
         // Simple high-entropy pseudorandom mapping based on local timestamp variations
         let mut seed = length as u32 * 31;
@@ -1011,6 +1011,7 @@ impl SovereignPasswordGenerator {
 
 #[cfg(test)]
 mod replicated_tests {
+    use super::*;
 
     #[test]
     fn test_dpkg_etcher() {

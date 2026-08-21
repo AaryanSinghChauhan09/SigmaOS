@@ -1,14 +1,17 @@
-#[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
-#[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
+// SPDX-License-Identifier: MIT
+#![no_std]
 
 /// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
 /// Implements interactive scripting, dynamic script-like functions, positional arguments,
 /// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ScriptID = usize;
 
@@ -31,7 +34,7 @@ pub trait Script {
 pub struct SimpleScript {
     pub id: ScriptID,
     pub name: [u8; 128],
-    pub language: AtomicUsize,
+    pub language: core::sync::atomic::AtomicU32,
     pub source: Vec<u8>,
 }
 
@@ -49,7 +52,7 @@ impl SimpleScript {
         SimpleScript {
             id,
             name: name_array,
-            language: AtomicUsize::new(language as usize),
+            language: core::sync::atomic::AtomicU32::new(language as u32),
             source: source_vec,
         }
     }
@@ -135,6 +138,12 @@ impl SimpleScriptEngine {
     }
 }
 
+impl Default for SimpleScriptEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ScriptEngine for SimpleScriptEngine {
     fn load_script(&mut self, script: Box<dyn Script>) -> Result<ScriptID, ScriptError> {
         let id = script.id();
@@ -190,6 +199,12 @@ impl SimpleScriptAPI {
         SimpleScriptAPI {
             functions: Vec::new(),
         }
+    }
+}
+
+impl Default for SimpleScriptAPI {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -266,6 +281,12 @@ impl SimpleScriptEnvironment {
             }
         }
         None
+    }
+}
+
+impl Default for SimpleScriptEnvironment {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -360,104 +381,19 @@ impl StringDescrambler {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    fn len(&self) -> usize { self.len }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_script_positional_arguments_expansion() {
-        let engine = SimpleScriptEngine::new();
         let script = SimpleScript::new(1, b"greet.sh", ScriptLanguage::Shell, b"echo hello $1, welcome back $2!");
 
         let script_id = 1;
         let mut scripts = Vec::new();
         scripts.push(Some(Box::new(script) as Box<dyn Script>));
 
-        let mut engine_with_script = SimpleScriptEngine {
+        let engine_with_script = SimpleScriptEngine {
             scripts,
             next_id: AtomicUsize::new(2),
             aliases: SimpleScriptEnvironment::new(),

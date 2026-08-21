@@ -16,9 +16,8 @@ pub mod time;
 pub mod net;
 
 pub use vec::Vec;
-pub use hashmap::{HashMap, Entry};
+pub use hashmap::{HashMap, BTreeMap, Entry};
 pub use hashset::HashSet;
-pub use btreemap::BTreeMap;
 pub use vecdeque::VecDeque;
 pub use custom_string::SigmaString;
 pub mod string {

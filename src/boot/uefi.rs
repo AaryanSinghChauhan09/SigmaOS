@@ -1,12 +1,8 @@
-/// OOP-based UEFI Bootloader for SigmaOS
-/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
-#![no_std]
-#![no_main]
-
-/// OOP-based UEFI Bootloader for SigmaOS
-/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
-/// Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
-/// Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
+// SPDX-License-Identifier: MIT
+//! OOP-based UEFI Bootloader for SigmaOS
+//! Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
+//! Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
+//! Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
 
 extern crate alloc;
 
@@ -15,14 +11,8 @@ use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type BootStatus = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 /// Standard UEFI Boot Phases
-#[repr(C)]
+#[repr(u32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootPhase {
     Init = 0,

@@ -21,7 +21,23 @@ pub mod fedora;
 pub mod void_linux;
 pub mod pop_os;
 pub mod clear_linux;
+pub mod historic_linux;
+pub mod antix;
+pub mod zorin;
 
+pub use antix::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
+};
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState,
+    ZorinConnectManager, ZorinWindowsAppSupport,
+};
+pub use legacy_adapters::{
+    KernelPersona, SyscallAbi,
+};
 pub use void_linux::{
     XbpsDatabase, RinitInitSystem, VoidMuslToolchain, XbpsPackageVerifier, RunitStageManager,
 };
@@ -40,7 +56,7 @@ pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
 pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
 
 pub use cross_platform_kernel::{
-    PageAccessMode, MemoryArch, TranslationEntry, PageDirectory, DeferredProcedureCall,
+    PageAccessMode, MemoryArch, PageTableEntry, PageDirectory, DeferredProcedureCall,
     Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
     UmsThreadState, UmsContext, SovereignKernelInternals,
 };

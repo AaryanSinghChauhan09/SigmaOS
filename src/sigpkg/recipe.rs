@@ -94,6 +94,15 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.build_commands.insert(0, command);
+        self
+    }
+
+    pub fn with_pkgrel(self, _rel: u32) -> Self {
+        self
+    }
+
     pub fn with_build_command(mut self, command: String) -> Self {
         self.build_commands.push(command);
         self
@@ -302,7 +311,7 @@ mod tests {
         // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
         let ssl_dependency = Dependency {
             name: "openssl".to_string(),
-            version: Version::new(3, 0, 0),
+            version_constraint: crate::sigpkg::VersionConstraint::Exact(Version::new(3, 0, 0)),
         };
 
         recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);

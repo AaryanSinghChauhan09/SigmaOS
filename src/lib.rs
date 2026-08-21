@@ -25,6 +25,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod storage;
 pub mod thread;
 pub mod process;
 pub mod community;
@@ -170,21 +171,27 @@ pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependency, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction, Version,
+};
+pub use storage::{
+    BlockError as StorageBlockError, BlockKind, BlockOpCode, BlockOperationEngine, BlockOrientedDevice,
+    BlockingStrategy, CinderBackup, CinderBlockStorageEngine, CinderProvisioningType, CinderQosPolicy,
+    CinderSnapshot, CinderVolume, CinderVolumeState, CinderVolumeType, DeviceClass as StorageDeviceClass,
+    NvmeBlockDevice, RecordBlockingEngine, SimpleBlockDevice, SovereignBlockClassifier, SsdBlockDevice,
+    SystemBlockDiagramEngine,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub use thread::management::{
-    ThreadID, ThreadState as LibThreadState, ThreadAlertableState, Thread, ThreadError, SimpleThread, ThreadManager, SimpleThreadManager,
+pub use thread::{
+    Thread, ThreadError, ThreadResult, Mutex as ThreadMutex,
 };
 
 pub use process::spawn::{
-    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
+    ProcessID, ProcessState as LibProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter,
     CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
 };
 pub use process::activity_manager::{
@@ -197,7 +204,7 @@ pub use memory::segmentation_paging::{
 };
 
 pub use community::toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe as CommunityPackageRecipe,
     RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
     SecurityProfileTemplateStore, SecurityTemplate,
 };

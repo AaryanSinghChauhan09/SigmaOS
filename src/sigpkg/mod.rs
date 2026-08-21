@@ -18,8 +18,8 @@ pub mod verifier;
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
-    SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox,
-    SovereignMirrorSelector, AptPinningResolver, SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus,
+    SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer,
+    SovereignTransactionManager, TransactionStatus,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use spec::{
@@ -41,6 +41,12 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {
@@ -96,6 +102,7 @@ pub struct Package {
     pub licenses: Vec<String>,
     pub maintainers: Vec<String>,
     pub changelogs: Vec<String>,
+    pub source: String,
 }
 
 impl Package {
@@ -117,6 +124,7 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
+            source: String::new(),
         }
     }
 }

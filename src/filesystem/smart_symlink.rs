@@ -266,13 +266,13 @@ pub enum SymlinkError {
     InvalidPath = 4,
 }
 
-pub struct SmartSymlink {
+pub struct ContextSmartSymlink {
     pub target_pattern: String, // e.g. "/home/$USER/.config" or "../etc/shadow"
 }
 
-impl SmartSymlink {
+impl ContextSmartSymlink {
     pub fn new(target: &str) -> Self {
-        SmartSymlink {
+        ContextSmartSymlink {
             target_pattern: target.to_string(),
         }
     }
@@ -291,7 +291,7 @@ impl SmartSymlink {
         lang_context: &str,
         sandbox_root: &str,
         mut current_depth: u32,
-        active_symlinks_map: &HashMap<String, SmartSymlink>,
+        active_symlinks_map: &HashMap<String, ContextSmartSymlink>,
         mut visited_paths: Vec<String>,
     ) -> Result<String, SymlinkError> {
         // Enforce max recursion depth limits (Linux standard limits to 40 traversals)
@@ -338,7 +338,7 @@ mod tests {
 
     #[test]
     fn test_variable_context_expansion() {
-        let symlink = SmartSymlink::new("/home/$USER/.config/settings.$LANG.conf");
+        let symlink = ContextSmartSymlink::new("/home/$USER/.config/settings.$LANG.conf");
         let expanded = symlink.expand_context_variables("aaryan", "en_US");
         assert_eq!(expanded, "/home/aaryan/.config/settings.en_US.conf");
     }
@@ -346,10 +346,10 @@ mod tests {
     #[test]
     fn test_infinite_loop_breakage() {
         let mut map = HashMap::new();
-        map.insert("/var/log/messages".to_string(), SmartSymlink::new("/var/log/syslog"));
-        map.insert("/var/log/syslog".to_string(), SmartSymlink::new("/var/log/messages")); // Loop
+        map.insert("/var/log/messages".to_string(), ContextSmartSymlink::new("/var/log/syslog"));
+        map.insert("/var/log/syslog".to_string(), ContextSmartSymlink::new("/var/log/messages")); // Loop
 
-        let start_link = SmartSymlink::new("/var/log/messages");
+        let start_link = ContextSmartSymlink::new("/var/log/messages");
         let result = start_link.resolve_symlink_path(
             "user1",
             "en",
@@ -365,7 +365,7 @@ mod tests {
     #[test]
     fn test_sandbox_boundary_guard() {
         let map = HashMap::new();
-        let symlink = SmartSymlink::new("../../../../etc/shadow"); // Escape attempt
+        let symlink = ContextSmartSymlink::new("../../../../etc/shadow"); // Escape attempt
 
         let result = symlink.resolve_symlink_path(
             "user1",

@@ -1,11 +1,7 @@
-#[cfg(not(test))]
-use crate::driver::device::DdeDeviceWrapper;
-
-#[cfg(test)]
 pub struct DdeDeviceWrapper {
     pub simulated_pci_bar: [u8; 256],
 }
-#[cfg(test)]
+
 impl DdeDeviceWrapper {
     pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
         Self { simulated_pci_bar: [0; 256] }

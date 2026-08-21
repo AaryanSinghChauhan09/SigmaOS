@@ -4,6 +4,7 @@
 
 use super::Vec;
 
+#[derive(Debug)]
 pub struct BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -52,7 +53,10 @@ where
         self.entries.insert(insert_idx, (key, value));
     }
 
-    pub fn get(&self, key: &K) -> Option<&V> {
+    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
+    where
+        K: PartialEq<Q>,
+    {
         for (k, v) in self.entries.iter() {
             if k == key {
                 return Some(v);
@@ -61,7 +65,10 @@ where
         None
     }
 
-    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
+    pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
+    where
+        K: PartialEq<Q>,
+    {
         for (k, v) in self.entries.iter_mut() {
             if k == key {
                 return Some(v);
@@ -70,16 +77,22 @@ where
         None
     }
 
-    pub fn remove(&mut self, key: &K) -> Option<V> {
+    pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
+    where
+        K: PartialEq<Q>,
+    {
         for i in 0..self.entries.len() {
-            if self.entries[i].0 == *key {
+            if &self.entries[i].0 == key {
                 return Some(self.entries.remove(i).1);
             }
         }
         None
     }
 
-    pub fn contains_key(&self, key: &K) -> bool {
+    pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
+    where
+        K: PartialEq<Q>,
+    {
         self.get(key).is_some()
     }
 
@@ -96,6 +109,14 @@ where
             entries: &self.entries,
             idx: 0,
         }
+    }
+
+    pub fn values(&self) -> impl Iterator<Item = &V> {
+        self.entries.iter().map(|(_, v)| v)
+    }
+
+    pub fn keys(&self) -> impl Iterator<Item = &K> {
+        self.entries.iter().map(|(k, _)| k)
     }
 }
 

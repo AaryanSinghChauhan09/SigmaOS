@@ -476,7 +476,7 @@ mod tests {
 
     #[test]
     fn test_component_creation() {
-        let tree = ComponentTree::new();
+        let mut tree = ComponentTree::new();
         let child_id = tree.create_component(0, "test_child").unwrap();
         assert!(tree.get_component(child_id).is_ok());
     }

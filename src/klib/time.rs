@@ -47,6 +47,10 @@ impl Duration {
     pub fn as_millis(&self) -> u64 {
         self.secs * 1000 + (self.nanos / 1_000_000) as u64
     }
+
+    pub fn as_secs_f64(&self) -> f64 {
+        (self.secs as f64) + (self.nanos as f64 / 1_000_000_000.0)
+    }
 }
 
 /// System time representation for reducing std::time dependency

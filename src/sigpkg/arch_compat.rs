@@ -3,11 +3,8 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-<<<<<<< HEAD
-use klib::collections::HashMap;
-=======
-use std::collections::HashMap;
->>>>>>> origin/ci-workflows-and-test-validation-15641703078746240029
+use crate::klib::collections::HashMap;
+use crate::klib::{SigmaString, Vec};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -43,26 +40,26 @@ pub enum VersionConstraint {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
-    pub name: klib::string::SigmaString,
+    pub name: SigmaString,
     pub version_constraint: VersionConstraint,
 }
 
 #[derive(Debug, Clone)]
 pub struct Package {
-    pub name: klib::string::SigmaString,
+    pub name: SigmaString,
     pub version: Version,
-    pub description: klib::string::SigmaString,
-    pub dependencies: klib::vec::Vec<Dependency>,
-    pub checksum: klib::string::SigmaString,
+    pub description: SigmaString,
+    pub dependencies: Vec<Dependency>,
+    pub checksum: SigmaString,
 }
 
 impl Package {
     pub fn new(
-        name: klib::string::SigmaString,
+        name: SigmaString,
         version: Version,
-        description: klib::string::SigmaString,
-        dependencies: klib::vec::Vec<Dependency>,
-        checksum: klib::string::SigmaString,
+        description: SigmaString,
+        dependencies: Vec<Dependency>,
+        checksum: SigmaString,
     ) -> Self {
         Self {
             name,
@@ -107,7 +104,7 @@ impl AurRecipeCompiler {
                     .trim_matches('"');
                 for d in dep_str.split_whitespace() {
                     depends.push(Dependency {
-                        name: d.replace('\'', "").replace('"', ""),
+                        name: SigmaString::from(d.replace('\'', "").replace('"', "")),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -121,11 +118,11 @@ impl AurRecipeCompiler {
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
-            pkgname.to_string(),
+            SigmaString::from(pkgname),
             parsed_ver,
-            format!("Compiled AUR Package: {}", pkgname),
+            SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
             depends,
-            "sha256_compiled_mock_hash_value".to_string(),
+            SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
 }
@@ -139,16 +136,16 @@ impl Default for AurRecipeCompiler {
 /// Debian-style sbuild build dependency recipe descriptor
 #[derive(Debug, Clone)]
 pub struct DebianSbuildPackage {
-    pub name: klib::string::SigmaString,
+    pub name: SigmaString,
     pub version: Version,
-    pub build_depends: klib::vec::Vec<klib::string::SigmaString>,
+    pub build_depends: Vec<SigmaString>,
 }
 
 /// Rolling Release System Synchronizer
 #[derive(Debug, Clone)]
 pub struct RollingSyncManager {
-    pub installed_packages: HashMap<klib::string::SigmaString, Version>,
-    pub remote_repository: HashMap<klib::string::SigmaString, Version>,
+    pub installed_packages: HashMap<SigmaString, Version>,
+    pub remote_repository: HashMap<SigmaString, Version>,
 }
 
 impl RollingSyncManager {
@@ -160,15 +157,15 @@ impl RollingSyncManager {
     }
 
     pub fn register_installed(&mut self, name: &str, version: Version) {
-        self.installed_packages.insert(klib::string::SigmaString::from(name), version);
+        self.installed_packages.insert(SigmaString::from(name), version);
     }
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
-        self.remote_repository.insert(klib::string::SigmaString::from(name), version);
+        self.remote_repository.insert(SigmaString::from(name), version);
     }
 
     /// Checks for available package updates in the rolling release stream
-    pub fn list_pending_rolling_updates(&self) -> Vec<(klib::string::SigmaString, Version, Version)> {
+    pub fn list_pending_rolling_updates(&self) -> Vec<(SigmaString, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
@@ -235,11 +232,11 @@ impl PacmanDbAdapter {
         let parsed_ver = Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
-            name.to_string(),
+            SigmaString::from(name),
             parsed_ver,
-            desc.to_string(),
+            SigmaString::from(desc),
             Vec::new(),
-            "sha256_imported_legacy_hash_value".to_string(),
+            SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
 }
@@ -254,20 +251,20 @@ pub enum HookWhen {
 
 #[derive(Debug, Clone)]
 pub struct AlpmHook {
-    pub name: klib::string::SigmaString,
+    pub name: SigmaString,
     pub when: HookWhen,
-    pub target_pattern: klib::string::SigmaString,
-    pub exec_cmd: klib::string::SigmaString,
+    pub target_pattern: SigmaString,
+    pub exec_cmd: SigmaString,
 }
 
 #[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: klib::vec::Vec<AlpmHook>,
+    pub hooks: Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self { hooks: klib::vec::Vec::new() }
+        Self { hooks: Vec::new() }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -297,10 +294,10 @@ impl AlpmHookManager {
         }
 
         self.add_hook(AlpmHook {
-            name: name.to_string(),
+            name: SigmaString::from(name),
             when,
-            target_pattern,
-            exec_cmd,
+            target_pattern: SigmaString::from(target_pattern),
+            exec_cmd: SigmaString::from(exec_cmd),
         });
 
         Ok(())
@@ -310,9 +307,9 @@ impl AlpmHookManager {
         let mut triggered_cmds = Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
-                let pattern = hook.target_pattern.trim_end_matches('*');
-                if hook.target_pattern.is_empty() || changed_file.contains(pattern) {
-                    triggered_cmds.push(hook.exec_cmd.clone());
+                let pattern = hook.target_pattern.as_str().trim_end_matches('*');
+                if hook.target_pattern.as_str().is_empty() || changed_file.contains(pattern) {
+                    triggered_cmds.push(hook.exec_cmd.as_str().to_string());
                 }
             }
         }
@@ -330,40 +327,44 @@ impl Default for AlpmHookManager {
 
 #[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub hooks: klib::vec::Vec<klib::string::SigmaString>,
-    pub compression: klib::string::SigmaString,
+    pub hooks: Vec<SigmaString>,
+    pub compression: SigmaString,
 }
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
+        let mut hooks = Vec::new();
+        hooks.push(SigmaString::from("base"));
+        hooks.push(SigmaString::from("udev"));
+        hooks.push(SigmaString::from("autodetect"));
+        hooks.push(SigmaString::from("modconf"));
+        hooks.push(SigmaString::from("block"));
+        hooks.push(SigmaString::from("filesystems"));
         Self {
-            hooks: klib::vec![
-                klib::string::SigmaString::from("base"),
-                klib::string::SigmaString::from("udev"),
-                klib::string::SigmaString::from("autodetect"),
-                klib::string::SigmaString::from("modconf"),
-                klib::string::SigmaString::from("block"),
-                klib::string::SigmaString::from("filesystems"),
-            ],
-            compression: klib::string::SigmaString::from("zstd"),
+            hooks,
+            compression: SigmaString::from("zstd"),
         }
     }
 
     pub fn add_hook(&mut self, hook_name: &str) {
-        let hook_string = klib::string::SigmaString::from(hook_name);
+        let hook_string = SigmaString::from(hook_name);
         if !self.hooks.contains(&hook_string) {
             self.hooks.push(hook_string);
         }
     }
 
-    pub fn build_initramfs_image(&self, kernel_version: &str) -> klib::vec::Vec<u8> {
-        let mut image_header = klib::string::SigmaString::from(format!(
+    pub fn build_initramfs_image(&self, kernel_version: &str) -> Vec<u8> {
+        let mut image_header = Vec::new();
+        let header_str = format!(
             "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
             kernel_version, self.hooks, self.compression
-        ))
-        .into_bytes();
-
-        image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
+        );
+        for &b in header_str.as_bytes() {
+            image_header.push(b);
+        }
+        for &b in b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES" {
+            image_header.push(b);
+        }
         image_header
     }
 }
@@ -378,19 +379,19 @@ impl Default for MkinitcpioBuilder {
 
 #[derive(Debug, Clone)]
 pub struct MakepkgBuilder {
-    pub pkgname: klib::string::SigmaString,
-    pub pkgver: klib::string::SigmaString,
-    pub arch: klib::string::SigmaString,
-    pub expected_sha256: klib::string::SigmaString,
+    pub pkgname: SigmaString,
+    pub pkgver: SigmaString,
+    pub arch: SigmaString,
+    pub expected_sha256: SigmaString,
 }
 
 impl MakepkgBuilder {
     pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
         Self {
-            pkgname: klib::string::SigmaString::from(pkgname),
-            pkgver: klib::string::SigmaString::from(pkgver),
-            arch: klib::string::SigmaString::from(arch),
-            expected_sha256: klib::string::SigmaString::from(expected_sha256),
+            pkgname: SigmaString::from(pkgname),
+            pkgver: SigmaString::from(pkgver),
+            arch: SigmaString::from(arch),
+            expected_sha256: SigmaString::from(expected_sha256),
         }
     }
 
@@ -399,23 +400,27 @@ impl MakepkgBuilder {
         for &b in source_data {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
         }
-        let computed = klib::string::SigmaString::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256 || self.expected_sha256 == klib::string::SigmaString::from("SKIP")
+        let computed = SigmaString::from(format!("{:016x}", checksum));
+        computed == self.expected_sha256 || self.expected_sha256 == SigmaString::from("SKIP")
     }
 
-    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(klib::string::SigmaString, klib::vec::Vec<u8>), &'static str> {
+    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(SigmaString, Vec<u8>), &'static str> {
         if !self.verify_source_integrity(source_data) {
             return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
 
-        let archive_name = klib::string::SigmaString::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
-        let mut archive_content = klib::string::SigmaString::from(format!(
+        let archive_name = SigmaString::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
+        let mut archive_content = Vec::new();
+        let header_str = format!(
             "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
             self.pkgname, self.pkgver, self.arch
-        ))
-        .into_bytes();
-
-        archive_content.extend_from_slice(source_data);
+        );
+        for &b in header_str.as_bytes() {
+            archive_content.push(b);
+        }
+        for &b in source_data {
+            archive_content.push(b);
+        }
         Ok((archive_name, archive_content))
     }
 }
@@ -430,18 +435,27 @@ mod tests {
         sync.register_installed("gcc", Version::new(12, 2, 0));
         sync.register_installed("make", Version::new(4, 3, 0));
 
+        let mut bd1 = Vec::new();
+        bd1.push(SigmaString::from("gcc"));
+        bd1.push(SigmaString::from("make"));
+
         let source_pkg = DebianSbuildPackage {
-            name: "coreutils".to_string(),
+            name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string()],
+            build_depends: bd1,
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
+        let mut bd2 = Vec::new();
+        bd2.push(SigmaString::from("gcc"));
+        bd2.push(SigmaString::from("make"));
+        bd2.push(SigmaString::from("libc-dev"));
+
         let source_pkg_missing = DebianSbuildPackage {
-            name: "coreutils".to_string(),
+            name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
+            build_depends: bd2,
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }
@@ -527,7 +541,7 @@ mod tests {
         builder.add_hook("lvm2");
 
         let img = builder.build_initramfs_image("6.5.0-arch1-1");
-        let header_str = String::from_utf8_lossy(&img);
+        let header_str = String::from_utf8_lossy(img.as_slice());
         assert!(header_str.contains("6.5.0-arch1-1"));
         assert!(header_str.contains("encrypt"));
         assert!(header_str.contains("lvm2"));
