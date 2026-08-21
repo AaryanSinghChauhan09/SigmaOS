@@ -66,7 +66,7 @@ pub unsafe extern "C" fn hostnamectl_init() -> SigmaI32 {
 /// Get system information
 #[no_mangle]
 pub unsafe extern "C" fn hostnamectl_status(info: *mut SystemInfo) -> SigmaI32 {
-    if !HOSTNAMECTL_INITIALIZED || info.isnull() {
+    if !HOSTNAMECTL_INITIALIZED || info.is_null() {
         return -1;
     }
     
@@ -77,7 +77,7 @@ pub unsafe extern "C" fn hostnamectl_status(info: *mut SystemInfo) -> SigmaI32 {
 /// Set static hostname
 #[no_mangle]
 pub unsafe extern "C" fn hostnamectl_set_static_hostname(hostname: *const u8) -> SigmaI32 {
-    if !HOSTNAMECTL_INITIALIZED || hostname.isnull() {
+    if !HOSTNAMECTL_INITIALIZED || hostname.is_null() {
         return -1;
     }
     
@@ -93,7 +93,7 @@ pub unsafe extern "C" fn hostnamectl_set_static_hostname(hostname: *const u8) ->
 /// Set pretty hostname
 #[no_mangle]
 pub unsafe extern "C" fn hostnamectl_set_pretty_hostname(hostname: *const u8) -> SigmaI32 {
-    if !HOSTNAMECTL_INITIALIZED || hostname.isnull() {
+    if !HOSTNAMECTL_INITIALIZED || hostname.is_null() {
         return -1;
     }
     
@@ -109,7 +109,7 @@ pub unsafe extern "C" fn hostnamectl_set_pretty_hostname(hostname: *const u8) ->
 /// Set icon name
 #[no_mangle]
 pub unsafe extern "C" fn hostnamectl_set_icon_name(icon: *const u8) -> SigmaI32 {
-    if !HOSTNAMECTL_INITIALIZED || icon.isnull() {
+    if !HOSTNAMECTL_INITIALIZED || icon.is_null() {
         return -1;
     }
     
@@ -125,7 +125,7 @@ pub unsafe extern "C" fn hostnamectl_set_icon_name(icon: *const u8) -> SigmaI32 
 /// Set chassis type
 #[no_mangle]
 pub unsafe extern "C" fn hostnamectl_set_chassis(chassis: *const u8) -> SigmaI32 {
-    if !HOSTNAMECTL_INITIALIZED || chassis.isnull() {
+    if !HOSTNAMECTL_INITIALIZED || chassis.is_null() {
         return -1;
     }
     
@@ -141,7 +141,7 @@ pub unsafe extern "C" fn hostnamectl_set_chassis(chassis: *const u8) -> SigmaI32
 /// Set deployment
 #[no_mangle]
 pub unsafe extern "C" fn hostnamectl_set_deployment(deployment: *const u8) -> SigmaI32 {
-    if !HOSTNAMECTL_INITIALIZED || deployment.isnull() {
+    if !HOSTNAMECTL_INITIALIZED || deployment.is_null() {
         return -1;
     }
     
@@ -157,7 +157,7 @@ pub unsafe extern "C" fn hostnamectl_set_deployment(deployment: *const u8) -> Si
 /// Set location
 #[no_mangle]
 pub unsafe extern "C" fn hostnamectl_set_location(location: *const u8) -> SigmaI32 {
-    if !HOSTNAMECTL_INITIALIZED || location.isnull() {
+    if !HOSTNAMECTL_INITIALIZED || location.is_null() {
         return -1;
     }
     

@@ -87,7 +87,7 @@ pub unsafe extern "C" fn awk_add_pattern(
     expression: *const u8,
     action: *const u8,
 ) -> SigmaI32 {
-    if !AWK_INITIALIZED || expression.isnull() || action.isnull() {
+    if !AWK_INITIALIZED || expression.is_null() || action.is_null() {
         return -1;
     }
     
@@ -124,7 +124,7 @@ pub unsafe extern "C" fn awk_parse_line(
     line: *const u8,
     separator: *const u8,
 ) -> SigmaI32 {
-    if !AWK_INITIALIZED || line.isnull() || separator.isnull() {
+    if !AWK_INITIALIZED || line.is_null() || separator.is_null() {
         return -1;
     }
     
@@ -196,7 +196,7 @@ pub unsafe extern "C" fn awk_get_field(
     value: *mut u8,
     max_len: SigmaU32,
 ) -> SigmaI32 {
-    if !AWK_INITIALIZED || value.isnull() || index >= 256 {
+    if !AWK_INITIALIZED || value.is_null() || index >= 256 {
         return -1;
     }
     
@@ -231,7 +231,7 @@ pub unsafe extern "C" fn awk_process_file(
     input_file: *const u8,
     options: AwkOptions,
 ) -> SigmaI32 {
-    if !AWK_INITIALIZED || input_file.isnull() {
+    if !AWK_INITIALIZED || input_file.is_null() {
         return -1;
     }
     

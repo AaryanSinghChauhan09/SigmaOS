@@ -71,7 +71,7 @@ pub unsafe extern "C" fn systemd_analyze_init() -> SigmaI32 {
 /// Get boot time
 #[no_mangle]
 pub unsafe extern "C" fn systemd_analyze_time(stats: *mut BootStats) -> SigmaI32 {
-    if !SYSTEMD_ANALYZE_INITIALIZED || stats.isnull() {
+    if !SYSTEMD_ANALYZE_INITIALIZED || stats.is_null() {
         return -1;
     }
     
@@ -82,7 +82,7 @@ pub unsafe extern "C" fn systemd_analyze_time(stats: *mut BootStats) -> SigmaI32
 /// Get blame (slow services)
 #[no_mangle]
 pub unsafe extern "C" fn systemd_analyze_blame(timings: *mut ServiceTiming, max_count: SigmaU32) -> SigmaU32 {
-    if !SYSTEMD_ANALYZE_INITIALIZED || timings.isnull() {
+    if !SYSTEMD_ANALYZE_INITIALIZED || timings.is_null() {
         return 0;
     }
     
@@ -101,7 +101,7 @@ pub unsafe extern "C" fn systemd_analyze_blame(timings: *mut ServiceTiming, max_
 /// Get critical chain
 #[no_mangle]
 pub unsafe extern "C" fn systemd_analyze_critical_chain(timings: *mut ServiceTiming, max_count: SigmaU32) -> SigmaU32 {
-    if !SYSTEMD_ANALYZE_INITIALIZED || timings.isnull() {
+    if !SYSTEMD_ANALYZE_INITIALIZED || timings.is_null() {
         return 0;
     }
     
@@ -135,7 +135,7 @@ pub unsafe extern "C" fn systemd_analyze_add_timing(
         activation_time_ms,
     };
     
-    if !name.isnull() {
+    if !name.is_null() {
         for i in 0..127 {
             let byte = *name.add(i);
             if byte == 0 { break; }
