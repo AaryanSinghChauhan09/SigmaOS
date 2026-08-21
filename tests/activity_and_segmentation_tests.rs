@@ -1,14 +1,15 @@
 // Comprehensive Integration & Subsystem Tests for Activity Manager and Segmentation/Paging Subsystem
 
-#[cfg(feature = "standalone_test")]
-use crate::activity_manager::*;
-#[cfg(feature = "standalone_test")]
-use crate::segmentation_paging::*;
+extern crate alloc;
 
-#[cfg(not(feature = "standalone_test"))]
-use sigmaos::process::activity_manager::*;
-#[cfg(not(feature = "standalone_test"))]
-use sigmaos::memory::segmentation_paging::*;
+#[path = "../src/process/activity_manager.rs"]
+mod activity_manager;
+
+#[path = "../src/memory/segmentation_paging.rs"]
+mod segmentation_paging;
+
+use activity_manager::*;
+use segmentation_paging::*;
 
 #[test]
 fn test_activity_manager_complete_suite() {
