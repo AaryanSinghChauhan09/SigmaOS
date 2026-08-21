@@ -21,6 +21,7 @@ pub mod pacman;
 pub mod portage;
 pub mod repository_manager;
 pub mod spec;
+pub mod sovereign_sigpkg;
 pub mod transaction_log;
 pub mod universal_adapter;
 pub mod universal_engine;
@@ -54,6 +55,7 @@ pub use universal_oop_system::{
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
     UserDefinedHook, InstallError, HookError,
 };
+pub use sovereign_sigpkg::*;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

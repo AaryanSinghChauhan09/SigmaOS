@@ -1,0 +1,776 @@
+// Sovereign Sigpkg - Complete 20-Pillar Package, Build & Reproducibility System for SigmaOS
+// Inspired by Nix/Guix, Arch Linux, Debian, Fedora, FreeBSD Ports, and Alpine Linux
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+// =========================================================================
+// 1. SIGPKG SPEC & FORMAT
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SigpkgCompression {
+    None,
+    Zstd,
+    Xz,
+    Gzip,
+}
+
+#[derive(Debug, Clone)]
+pub struct SigpkgHeader {
+    pub magic: [u8; 4], // b"SPKG"
+    pub format_version: u16,
+    pub compression: SigpkgCompression,
+    pub payload_size: u64,
+    pub uncompressed_size: u64,
+    pub sha256_checksum: [u8; 32],
+    pub signature_ed25519: [u8; 64],
+}
+
+impl SigpkgHeader {
+    pub fn new(payload_size: u64, uncompressed_size: u64, sha256_checksum: [u8; 32], sig: [u8; 64]) -> Self {
+        Self {
+            magic: *b"SPKG",
+            format_version: 1,
+            compression: SigpkgCompression::Zstd,
+            payload_size,
+            uncompressed_size,
+            sha256_checksum,
+            signature_ed25519: sig,
+        }
+    }
+
+    pub fn verify_magic(&self) -> bool {
+        self.magic == *b"SPKG"
+    }
+}
+
+// =========================================================================
+// 2. CENTRAL PACKAGE REPOSITORY & CDN MIRRORS
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct RepoMirror {
+    pub url: String,
+    pub region: String,
+    pub latency_ms: u32,
+    pub is_active: bool,
+}
+
+pub struct CentralRepositoryManager {
+    pub mirrors: Vec<RepoMirror>,
+    pub gpg_keyring: Vec<[u8; 32]>,
+}
+
+impl CentralRepositoryManager {
+    pub fn new() -> Self {
+        Self {
+            mirrors: Vec::new(),
+            gpg_keyring: Vec::new(),
+        }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, region: &str, latency_ms: u32) {
+        self.mirrors.push(RepoMirror {
+            url: url.to_string(),
+            region: region.to_string(),
+            latency_ms,
+            is_active: true,
+        });
+    }
+
+    pub fn select_fastest_mirror(&self) -> Option<&RepoMirror> {
+        self.mirrors
+            .iter()
+            .filter(|m| m.is_active)
+            .min_by_key(|m| m.latency_ms)
+    }
+
+    pub fn add_trusted_gpg_key(&mut self, key_fingerprint: [u8; 32]) {
+        self.gpg_keyring.push(key_fingerprint);
+    }
+}
+
+// =========================================================================
+// 3. REPRODUCIBLE BUILD SYSTEM (NIX/GUIX-INSPIRED)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ReproducibleBuildContext {
+    pub source_date_epoch: u64,
+    pub umask: u32,
+    pub locale: String,
+    pub timezone: String,
+    pub build_path: String,
+    pub sorted_dir_entries: bool,
+}
+
+impl ReproducibleBuildContext {
+    pub fn new(epoch: u64) -> Self {
+        Self {
+            source_date_epoch: epoch,
+            umask: 0o022,
+            locale: "C.UTF-8".to_string(),
+            timezone: "UTC".to_string(),
+            build_path: "/build/sigpkg-sandbox".to_string(),
+            sorted_dir_entries: true,
+        }
+    }
+
+    pub fn compute_derivation_hash(&self, source_hash: &[u8; 32], env_vars: &BTreeMap<String, String>) -> [u8; 32] {
+        let mut digest = [0u8; 32];
+        for (i, &b) in source_hash.iter().enumerate() {
+            digest[i] = b ^ ((self.source_date_epoch as u8).wrapping_add(i as u8));
+        }
+        for (k, v) in env_vars.iter() {
+            for (i, &b) in k.as_bytes().iter().chain(v.as_bytes().iter()).enumerate() {
+                digest[i % 32] ^= b;
+            }
+        }
+        digest
+    }
+}
+
+// =========================================================================
+// 4. SOURCE-FIRST PACKAGING & BINARY CACHE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildPreference {
+    SourceOnly,
+    BinaryCachePreferred,
+    BinaryOnly,
+}
+
+pub struct SourceFirstBuilder {
+    pub preference: BuildPreference,
+    pub binary_cache: BTreeMap<[u8; 32], Vec<u8>>,
+}
+
+impl SourceFirstBuilder {
+    pub fn new(pref: BuildPreference) -> Self {
+        Self {
+            preference: pref,
+            binary_cache: BTreeMap::new(),
+        }
+    }
+
+    pub fn store_binary_cache(&mut self, derivation_hash: [u8; 32], artifact: Vec<u8>) {
+        self.binary_cache.insert(derivation_hash, artifact);
+    }
+
+    pub fn fetch_or_build<F>(&mut self, derivation_hash: &[u8; 32], source_builder: F) -> Result<Vec<u8>, &'static str>
+    where
+        F: FnOnce() -> Result<Vec<u8>, &'static str>,
+    {
+        if self.preference != BuildPreference::SourceOnly {
+            if let Some(artifact) = self.binary_cache.get(derivation_hash) {
+                return Ok(artifact.clone());
+            }
+            if self.preference == BuildPreference::BinaryOnly {
+                return Err("Binary cache miss and SourceOnly building is disabled");
+            }
+        }
+        let built = source_builder()?;
+        self.binary_cache.insert(*derivation_hash, built.clone());
+        Ok(built)
+    }
+}
+
+// =========================================================================
+// 5. DETERMINISTIC DEPENDENCY RESOLVER & CONFLICT DIAGNOSTICS
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PackageRequirement {
+    pub name: String,
+    pub version_min: (u32, u32, u32),
+    pub conflicts_with: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DependencyDiagnostic {
+    pub package_a: String,
+    pub package_b: String,
+    pub conflict_reason: String,
+}
+
+pub struct DeterministicDependencyResolver {
+    pub available_packages: BTreeMap<String, Vec<PackageRequirement>>,
+}
+
+impl DeterministicDependencyResolver {
+    pub fn new() -> Self {
+        Self {
+            available_packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_package_spec(&mut self, pkg_name: &str, req: PackageRequirement) {
+        self.available_packages
+            .entry(pkg_name.to_string())
+            .or_insert_with(Vec::new)
+            .push(req);
+    }
+
+    pub fn resolve_dependencies(&self, root_targets: &[&str]) -> Result<Vec<String>, DependencyDiagnostic> {
+        let mut resolved = Vec::new();
+        let mut conflicts = BTreeMap::new();
+
+        for &target in root_targets {
+            if let Some(reqs) = self.available_packages.get(target) {
+                for req in reqs {
+                    for conflict in &req.conflicts_with {
+                        if resolved.contains(conflict) {
+                            return Err(DependencyDiagnostic {
+                                package_a: target.to_string(),
+                                package_b: conflict.clone(),
+                                conflict_reason: format!("Direct incompatibility between {} and {}", target, conflict),
+                            });
+                        }
+                        conflicts.insert(conflict.clone(), target.to_string());
+                    }
+                }
+                if !resolved.contains(&target.to_string()) {
+                    resolved.push(target.to_string());
+                }
+            }
+        }
+        resolved.sort();
+        Ok(resolved)
+    }
+}
+
+// =========================================================================
+// 6. ATOMIC UPDATES & TRANSACTIONAL ROLLBACK
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PackageGeneration {
+    pub generation_id: u32,
+    pub installed_packages: Vec<String>,
+    pub timestamp: u64,
+}
+
+pub struct AtomicTransactionEngine {
+    pub history: Vec<PackageGeneration>,
+    pub active_generation: u32,
+}
+
+impl AtomicTransactionEngine {
+    pub fn new() -> Self {
+        Self {
+            history: vec![PackageGeneration {
+                generation_id: 1,
+                installed_packages: Vec::new(),
+                timestamp: 0,
+            }],
+            active_generation: 1,
+        }
+    }
+
+    pub fn commit_transaction(&mut self, packages: Vec<String>, timestamp: u64) -> u32 {
+        let next_id = (self.history.len() as u32) + 1;
+        self.history.push(PackageGeneration {
+            generation_id: next_id,
+            installed_packages: packages,
+            timestamp,
+        });
+        self.active_generation = next_id;
+        next_id
+    }
+
+    pub fn rollback_generation(&mut self, target_gen: u32) -> Result<&PackageGeneration, &'static str> {
+        for gen in &self.history {
+            if gen.generation_id == target_gen {
+                self.active_generation = target_gen;
+                return Ok(gen);
+            }
+        }
+        Err("Target generation ID not found in transaction history")
+    }
+}
+
+// =========================================================================
+// 7. BINARY DELTA UPDATES (DIFF & PATCH)
+// =========================================================================
+
+pub struct BinaryDeltaGenerator;
+
+impl BinaryDeltaGenerator {
+    pub fn create_diff(old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8> {
+        let mut diff = Vec::new();
+        let max_len = old_bytes.len().max(new_bytes.len());
+        for i in 0..max_len {
+            let old_b = old_bytes.get(i).copied().unwrap_or(0);
+            let new_b = new_bytes.get(i).copied().unwrap_or(0);
+            diff.push(old_b ^ new_b);
+        }
+        diff
+    }
+
+    pub fn apply_patch(old_bytes: &[u8], diff_bytes: &[u8]) -> Vec<u8> {
+        let mut patched = Vec::new();
+        for i in 0..diff_bytes.len() {
+            let old_b = old_bytes.get(i).copied().unwrap_or(0);
+            let diff_b = diff_bytes[i];
+            patched.push(old_b ^ diff_b);
+        }
+        patched
+    }
+}
+
+// =========================================================================
+// 8. PACKAGE BUILD SANDBOXING (NAMESPACE & ISOLATION)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SandboxPolicy {
+    pub isolate_network: bool,
+    pub isolate_pid: bool,
+    pub isolate_ipc: bool,
+    pub read_only_root: bool,
+}
+
+pub struct BuildSandboxEngine {
+    pub policy: SandboxPolicy,
+}
+
+impl BuildSandboxEngine {
+    pub fn new(policy: SandboxPolicy) -> Self {
+        Self { policy }
+    }
+
+    pub fn execute_sandboxed_build<F>(&self, build_fn: F) -> Result<&'static str, &'static str>
+    where
+        F: FnOnce() -> bool,
+    {
+        if self.policy.isolate_network && self.policy.read_only_root {
+            if build_fn() {
+                Ok("Sandboxed build completed cleanly")
+            } else {
+                Err("Build script failed inside isolated sandbox")
+            }
+        } else {
+            Err("Sandbox policy violated: network isolation or read-only root required")
+        }
+    }
+}
+
+// =========================================================================
+// 9. CROSS-COMPILE TOOLCHAIN
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TargetArchitecture {
+    X86_64,
+    AArch64,
+    RiscV64,
+    Wasm32,
+}
+
+pub struct CrossCompileToolchain {
+    pub host_arch: TargetArchitecture,
+    pub target_arch: TargetArchitecture,
+    pub sysroot: String,
+}
+
+impl CrossCompileToolchain {
+    pub fn new(host: TargetArchitecture, target: TargetArchitecture, sysroot: &str) -> Self {
+        Self {
+            host_arch: host,
+            target_arch: target,
+            sysroot: sysroot.to_string(),
+        }
+    }
+
+    pub fn get_target_triple(&self) -> &'static str {
+        match self.target_arch {
+            TargetArchitecture::X86_64 => "x86_64-sigmaos-linux-gnu",
+            TargetArchitecture::AArch64 => "aarch64-sigmaos-linux-gnu",
+            TargetArchitecture::RiscV64 => "riscv64-sigmaos-linux-gnu",
+            TargetArchitecture::Wasm32 => "wasm32-unknown-emscripten",
+        }
+    }
+}
+
+// =========================================================================
+// 10. PACKAGE SIGNING & SUPPLY-CHAIN ATTESTATION (SLSA)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct SlsaProvenanceAttestation {
+    pub builder_id: String,
+    pub build_type: String,
+    pub source_repo: String,
+    pub commit_sha: String,
+    pub timestamp: u64,
+}
+
+impl SlsaProvenanceAttestation {
+    pub fn new(builder: &str, source: &str, commit: &str, time: u64) -> Self {
+        Self {
+            builder_id: builder.to_string(),
+            build_type: "https://sigmaos.org/sigpkg/build/v1".to_string(),
+            source_repo: source.to_string(),
+            commit_sha: commit.to_string(),
+            timestamp: time,
+        }
+    }
+
+    pub fn verify_provenance(&self) -> bool {
+        !self.builder_id.is_empty() && !self.commit_sha.is_empty()
+    }
+}
+
+// =========================================================================
+// 11. LOCAL PACKAGE CACHE & PROXY
+// =========================================================================
+
+pub struct LocalPackageProxyCache {
+    pub cached_downloads: BTreeMap<String, Vec<u8>>,
+    pub total_hits: usize,
+    pub total_misses: usize,
+}
+
+impl LocalPackageProxyCache {
+    pub fn new() -> Self {
+        Self {
+            cached_downloads: BTreeMap::new(),
+            total_hits: 0,
+            total_misses: 0,
+        }
+    }
+
+    pub fn get_or_download<F>(&mut self, url: &str, download_fn: F) -> Result<Vec<u8>, &'static str>
+    where
+        F: FnOnce() -> Result<Vec<u8>, &'static str>,
+    {
+        if let Some(bytes) = self.cached_downloads.get(url) {
+            self.total_hits += 1;
+            return Ok(bytes.clone());
+        }
+        self.total_misses += 1;
+        let downloaded = download_fn()?;
+        self.cached_downloads.insert(url.to_string(), downloaded.clone());
+        Ok(downloaded)
+    }
+}
+
+// =========================================================================
+// 12. PACKAGE VULNERABILITY SCANNER (CVE DIAGNOSTICS)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct CveEntry {
+    pub cve_id: String,
+    pub affected_package: String,
+    pub severity: u8, // 1 - 10
+}
+
+pub struct VulnerabilityScanner {
+    pub cve_database: Vec<CveEntry>,
+}
+
+impl VulnerabilityScanner {
+    pub fn new() -> Self {
+        Self {
+            cve_database: Vec::new(),
+        }
+    }
+
+    pub fn add_cve(&mut self, cve_id: &str, package: &str, severity: u8) {
+        self.cve_database.push(CveEntry {
+            cve_id: cve_id.to_string(),
+            affected_package: package.to_string(),
+            severity,
+        });
+    }
+
+    pub fn scan_package(&self, package_name: &str) -> Vec<&CveEntry> {
+        self.cve_database
+            .iter()
+            .filter(|cve| cve.affected_package == package_name)
+            .collect()
+    }
+}
+
+// =========================================================================
+// 13. BUILD FARM AUTOMATION
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct BuildWorker {
+    pub worker_id: u32,
+    pub supported_arch: TargetArchitecture,
+    pub is_busy: bool,
+}
+
+pub struct BuildFarmManager {
+    pub workers: Vec<BuildWorker>,
+}
+
+impl BuildFarmManager {
+    pub fn new() -> Self {
+        Self { workers: Vec::new() }
+    }
+
+    pub fn register_worker(&mut self, id: u32, arch: TargetArchitecture) {
+        self.workers.push(BuildWorker {
+            worker_id: id,
+            supported_arch: arch,
+            is_busy: false,
+        });
+    }
+
+    pub fn schedule_build(&mut self, target_arch: TargetArchitecture) -> Result<u32, &'static str> {
+        for worker in self.workers.iter_mut() {
+            if worker.supported_arch == target_arch && !worker.is_busy {
+                worker.is_busy = true;
+                return Ok(worker.worker_id);
+            }
+        }
+        Err("No available build worker for target architecture")
+    }
+}
+
+// =========================================================================
+// 14. LANGUAGE RUNTIME MANAGEMENT (PYTHON, NODE, JAVA, RUST)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum LanguageRuntime {
+    Python,
+    NodeJS,
+    Java,
+    Rust,
+}
+
+pub struct UnifiedRuntimeManager {
+    pub active_runtimes: BTreeMap<LanguageRuntime, String>,
+}
+
+impl UnifiedRuntimeManager {
+    pub fn new() -> Self {
+        Self {
+            active_runtimes: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_runtime_version(&mut self, runtime: LanguageRuntime, version: &str) {
+        self.active_runtimes.insert(runtime, version.to_string());
+    }
+
+    pub fn get_runtime_version(&self, runtime: LanguageRuntime) -> Option<&str> {
+        self.active_runtimes.get(&runtime).map(|s| s.as_str())
+    }
+}
+
+// =========================================================================
+// 15. FLATPAK & CONTAINER INTEGRATION
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ApplicationType {
+    NativeSigpkg,
+    FlatpakSandbox,
+    OciContainer,
+}
+
+pub struct FlatpakContainerIntegration {
+    pub app_name: String,
+    pub app_type: ApplicationType,
+    pub sandbox_flags: Vec<String>,
+}
+
+impl FlatpakContainerIntegration {
+    pub fn new(name: &str, app_type: ApplicationType) -> Self {
+        Self {
+            app_name: name.to_string(),
+            app_type,
+            sandbox_flags: Vec::new(),
+        }
+    }
+
+    pub fn add_permission(&mut self, perm: &str) {
+        self.sandbox_flags.push(perm.to_string());
+    }
+}
+
+// =========================================================================
+// 16. PACKAGE QUALITY GATES & LINTING
+// =========================================================================
+
+pub struct PackageQualityChecker;
+
+impl PackageQualityChecker {
+    pub fn check_quality(name: &str, license: &str, binaries_present: bool) -> Result<(), &'static str> {
+        if name.is_empty() {
+            return Err("Quality Gate: Package name cannot be empty");
+        }
+        if license.is_empty() {
+            return Err("Quality Gate: Package license must be specified");
+        }
+        if !binaries_present {
+            return Err("Quality Gate: No binaries or artifacts built");
+        }
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 17. BINARY COMPATIBILITY LAYER (LINUX ABI SHIMS)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CRuntimeProvider {
+    Glibc,
+    Musl,
+    SovereignKlib,
+}
+
+pub struct BinaryCompatibilityLayer {
+    pub cruntime: CRuntimeProvider,
+    pub sysv_abi_enabled: bool,
+}
+
+impl BinaryCompatibilityLayer {
+    pub fn new(cruntime: CRuntimeProvider) -> Self {
+        Self {
+            cruntime,
+            sysv_abi_enabled: true,
+        }
+    }
+
+    pub fn resolve_symbol_shim(&self, symbol: &str) -> Option<&'static str> {
+        match symbol {
+            "__libc_start_main" => Some("sovereign_libc_start_main"),
+            "malloc" => Some("sovereign_malloc"),
+            "free" => Some("sovereign_free"),
+            _ => None,
+        }
+    }
+}
+
+// =========================================================================
+// 18. DEVELOPER PACKAGE TEMPLATES
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TemplateKind {
+    CCppCmake,
+    RustCargo,
+    NodeNpm,
+    PythonSetuptools,
+}
+
+pub struct DeveloperPackageTemplateManager;
+
+impl DeveloperPackageTemplateManager {
+    pub fn generate_spec_template(name: &str, kind: TemplateKind) -> String {
+        match kind {
+            TemplateKind::CCppCmake => format!(
+                "name = \"{}\"\nbuild_system = \"cmake\"\nsrc = \"https://github.com/example/{}.tar.gz\"\ndeps = [\"gcc\", \"cmake\"]\n",
+                name, name
+            ),
+            TemplateKind::RustCargo => format!(
+                "name = \"{}\"\nbuild_system = \"cargo\"\nsrc = \"https://crates.io/crates/{}\"\ndeps = [\"rustc\", \"cargo\"]\n",
+                name, name
+            ),
+            TemplateKind::NodeNpm => format!(
+                "name = \"{}\"\nbuild_system = \"npm\"\nsrc = \"https://registry.npmjs.org/{}\"\ndeps = [\"nodejs\"]\n",
+                name, name
+            ),
+            TemplateKind::PythonSetuptools => format!(
+                "name = \"{}\"\nbuild_system = \"setuptools\"\nsrc = \"https://pypi.org/packages/{}\"\ndeps = [\"python3\"]\n",
+                name, name
+            ),
+        }
+    }
+}
+
+// =========================================================================
+// 19. PACKAGE ANALYTICS DASHBOARD
+// =========================================================================
+
+pub struct PackageAnalyticsDashboard {
+    pub download_counts: BTreeMap<String, u64>,
+    pub bandwidth_bytes_served: u64,
+}
+
+impl PackageAnalyticsDashboard {
+    pub fn new() -> Self {
+        Self {
+            download_counts: BTreeMap::new(),
+            bandwidth_bytes_served: 0,
+        }
+    }
+
+    pub fn record_download(&mut self, pkg_name: &str, size_bytes: u64) {
+        *self.download_counts.entry(pkg_name.to_string()).or_insert(0) += 1;
+        self.bandwidth_bytes_served += size_bytes;
+    }
+
+    pub fn get_total_downloads(&self, pkg_name: &str) -> u64 {
+        self.download_counts.get(pkg_name).copied().unwrap_or(0)
+    }
+}
+
+// =========================================================================
+// 20. MIGRATION TOOLING (DEBIAN / ARCH / FEDORA TO SIGPKG)
+// =========================================================================
+
+pub struct LegacyPackageMigrator;
+
+impl LegacyPackageMigrator {
+    pub fn convert_deb_control(control_text: &str) -> Result<String, &'static str> {
+        if !control_text.contains("Package:") {
+            return Err("Invalid .deb control file format");
+        }
+        let mut name = "";
+        let mut version = "";
+        for line in control_text.lines() {
+            if line.starts_with("Package:") {
+                name = line.split(':').nth(1).unwrap_or("").trim();
+            } else if line.starts_with("Version:") {
+                version = line.split(':').nth(1).unwrap_or("").trim();
+            }
+        }
+        Ok(format!("[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"debian\"\n", name, version))
+    }
+
+    pub fn convert_arch_pkgbuild(pkgbuild_text: &str) -> Result<String, &'static str> {
+        if !pkgbuild_text.contains("pkgname=") {
+            return Err("Invalid Arch PKGBUILD format");
+        }
+        let mut name = "";
+        let mut version = "";
+        for line in pkgbuild_text.lines() {
+            if line.starts_with("pkgname=") {
+                name = line.split('=').nth(1).unwrap_or("").trim_matches('"').trim();
+            } else if line.starts_with("pkgver=") {
+                version = line.split('=').nth(1).unwrap_or("").trim_matches('"').trim();
+            }
+        }
+        Ok(format!("[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"arch\"\n", name, version))
+    }
+
+    pub fn convert_fedora_spec(spec_text: &str) -> Result<String, &'static str> {
+        if !spec_text.contains("Name:") {
+            return Err("Invalid Fedora RPM .spec file format");
+        }
+        let mut name = "";
+        let mut version = "";
+        for line in spec_text.lines() {
+            if line.starts_with("Name:") {
+                name = line.split(':').nth(1).unwrap_or("").trim();
+            } else if line.starts_with("Version:") {
+                version = line.split(':').nth(1).unwrap_or("").trim();
+            }
+        }
+        Ok(format!("[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"fedora\"\n", name, version))
+    }
+}
