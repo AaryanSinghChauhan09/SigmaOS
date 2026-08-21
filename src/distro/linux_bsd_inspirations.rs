@@ -2364,6 +2364,403 @@ impl Default for SovereignPrivSepSandbox {
     }
 }
 
+// ==========================================
+// 24. SERPENT OS / SOLUS MOSS PACKAGE ENGINE (SerpentMossEngine)
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MossTransactionState {
+    Pending,
+    Active,
+    Committed,
+    RolledBack,
+}
+
+#[derive(Debug, Clone)]
+pub struct MossPackageSpec {
+    pub name: String,
+    pub version: String,
+    pub release: u32,
+    pub payload_hash: String,
+    pub dependencies: Vec<String>,
+    pub system_triggers: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct MossTransaction {
+    pub id: u64,
+    pub install_queue: Vec<MossPackageSpec>,
+    pub remove_queue: Vec<String>,
+    pub state: MossTransactionState,
+}
+
+pub struct SerpentMossEngine {
+    pub installed_packages: Vec<MossPackageSpec>,
+    pub active_transactions: Vec<MossTransaction>,
+    pub executed_triggers: Vec<String>,
+    pub next_tx_id: u64,
+}
+
+impl SerpentMossEngine {
+    pub fn new() -> Self {
+        Self {
+            installed_packages: Vec::new(),
+            active_transactions: Vec::new(),
+            executed_triggers: Vec::new(),
+            next_tx_id: 1,
+        }
+    }
+
+    pub fn create_transaction(&mut self) -> u64 {
+        let id = self.next_tx_id;
+        self.next_tx_id += 1;
+        self.active_transactions.push(MossTransaction {
+            id,
+            install_queue: Vec::new(),
+            remove_queue: Vec::new(),
+            state: MossTransactionState::Pending,
+        });
+        id
+    }
+
+    pub fn stage_install(&mut self, tx_id: u64, pkg: MossPackageSpec) -> Result<(), &'static str> {
+        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+            .ok_or("Transaction not found")?;
+        if tx.state != MossTransactionState::Pending {
+            return Err("Transaction is not in Pending state");
+        }
+        tx.install_queue.push(pkg);
+        Ok(())
+    }
+
+    pub fn stage_remove(&mut self, tx_id: u64, pkg_name: &str) -> Result<(), &'static str> {
+        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+            .ok_or("Transaction not found")?;
+        if tx.state != MossTransactionState::Pending {
+            return Err("Transaction is not in Pending state");
+        }
+        tx.remove_queue.push(pkg_name.to_string());
+        Ok(())
+    }
+
+    pub fn commit_transaction(&mut self, tx_id: u64) -> Result<(), &'static str> {
+        let tx_idx = self.active_transactions.iter().position(|t| t.id == tx_id)
+            .ok_or("Transaction not found")?;
+
+        self.active_transactions[tx_idx].state = MossTransactionState::Active;
+
+        // Execute removals
+        let remove_queue = self.active_transactions[tx_idx].remove_queue.clone();
+        self.installed_packages.retain(|p| !remove_queue.contains(&p.name));
+
+        // Execute installations & trigger registration
+        let install_queue = self.active_transactions[tx_idx].install_queue.clone();
+        for pkg in install_queue {
+            for trigger in &pkg.system_triggers {
+                if !self.executed_triggers.contains(trigger) {
+                    self.executed_triggers.push(trigger.clone());
+                }
+            }
+            self.installed_packages.push(pkg);
+        }
+
+        self.active_transactions[tx_idx].state = MossTransactionState::Committed;
+        Ok(())
+    }
+
+    pub fn rollback_transaction(&mut self, tx_id: u64) -> Result<(), &'static str> {
+        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+            .ok_or("Transaction not found")?;
+
+        if tx.state != MossTransactionState::Committed && tx.state != MossTransactionState::Active {
+            return Err("Cannot rollback transaction that is not active or committed");
+        }
+
+        // Revert installations
+        let installed_names: Vec<String> = tx.install_queue.iter().map(|p| p.name.clone()).collect();
+        self.installed_packages.retain(|p| !installed_names.contains(&p.name));
+
+        tx.state = MossTransactionState::RolledBack;
+        Ok(())
+    }
+}
+
+impl Default for SerpentMossEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 25. CACHYOS / LINUX BORE SCHEDULER HYPER-OPTIMIZER (CachyBoreScheduler)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CoreTypePreference {
+    PerformancePCore,
+    EfficiencyECore,
+    AnyCore,
+}
+
+#[derive(Debug, Clone)]
+pub struct BoreTaskProfile {
+    pub task_id: u64,
+    pub name: String,
+    pub priority: u8, // 0..255 (lower = higher urgency)
+    pub interactive_score: u8, // 0..100 (higher = user-facing latency sensitive)
+    pub burst_time_ns: u64,
+    pub preferred_core: CoreTypePreference,
+    pub ipc_intensity: u8,
+}
+
+pub struct CachyBoreScheduler {
+    pub task_queue: Vec<BoreTaskProfile>,
+    pub system_latency_target_ns: u64,
+}
+
+impl CachyBoreScheduler {
+    pub fn new(latency_target_ns: u64) -> Self {
+        Self {
+            task_queue: Vec::new(),
+            system_latency_target_ns: latency_target_ns,
+        }
+    }
+
+    pub fn register_task(&mut self, profile: BoreTaskProfile) {
+        self.task_queue.push(profile);
+    }
+
+    /// Calculates dynamic quantum time slice for BORE scheduling algorithm
+    pub fn calculate_timeslice_ns(&self, task_id: u64) -> u64 {
+        if let Some(task) = self.task_queue.iter().find(|t| t.task_id == task_id) {
+            // Interactive high-priority tasks receive shorter, fast-turnaround slices
+            let base_slice = self.system_latency_target_ns / (self.task_queue.len().max(1) as u64);
+            let score_bonus = (100 - task.interactive_score as u64) * 10;
+            base_slice + score_bonus
+        } else {
+            self.system_latency_target_ns
+        }
+    }
+
+    /// Picks the next optimal task considering core type affinity and latency score
+    pub fn schedule_next_task(&mut self, available_core_type: CoreTypePreference) -> Option<BoreTaskProfile> {
+        if self.task_queue.is_empty() {
+            return None;
+        }
+
+        // Sort by interactive_score desc, priority asc
+        let mut best_idx = 0;
+        let mut best_score = -1000i32;
+
+        for (idx, task) in self.task_queue.iter().enumerate() {
+            let mut score = task.interactive_score as i32 * 2 - task.priority as i32;
+            if task.preferred_core == available_core_type || available_core_type == CoreTypePreference::AnyCore {
+                score += 50;
+            }
+            if score > best_score {
+                best_score = score;
+                best_idx = idx;
+            }
+        }
+
+        Some(self.task_queue.remove(best_idx))
+    }
+
+    pub fn update_burst_score(&mut self, task_id: u64, new_burst_ns: u64) {
+        if let Some(task) = self.task_queue.iter_mut().find(|t| t.task_id == task_id) {
+            task.burst_time_ns = new_burst_ns;
+            // Adjust interactive score based on burst pattern
+            if new_burst_ns < 1_000_000 {
+                task.interactive_score = (task.interactive_score + 10).min(100);
+            } else if new_burst_ns > 10_000_000 {
+                task.interactive_score = task.interactive_score.saturating_sub(10);
+            }
+        }
+    }
+}
+
+// ==========================================
+// 26. FREEBSD RACCT/RCTL & VNET RESOURCE GUARD (FreeBsdRacctVnetGuard)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct RacctResourceLimits {
+    pub max_cpu_time_pct: u32,
+    pub max_rss_bytes: u64,
+    pub max_pids: u32,
+    pub bandwidth_limit_bps: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct VnetStack {
+    pub vnet_id: u32,
+    pub virtual_interfaces: Vec<String>,
+    pub default_gateway: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct JailGuardRecord {
+    pub jail_id: u64,
+    pub limits: RacctResourceLimits,
+    pub current_rss_bytes: u64,
+    pub current_pids: u32,
+    pub vnet: Option<VnetStack>,
+    pub throttled: bool,
+}
+
+pub struct FreeBsdRacctVnetGuard {
+    pub guards: Vec<JailGuardRecord>,
+    pub violations_log: Vec<String>,
+}
+
+impl FreeBsdRacctVnetGuard {
+    pub fn new() -> Self {
+        Self {
+            guards: Vec::new(),
+            violations_log: Vec::new(),
+        }
+    }
+
+    pub fn register_jail_guard(&mut self, jail_id: u64, limits: RacctResourceLimits, vnet: Option<VnetStack>) {
+        self.guards.push(JailGuardRecord {
+            jail_id,
+            limits,
+            current_rss_bytes: 0,
+            current_pids: 0,
+            vnet,
+            throttled: false,
+        });
+    }
+
+    pub fn update_usage(&mut self, jail_id: u64, rss_bytes: u64, pids: u32) -> Result<bool, &'static str> {
+        let guard = self.guards.iter_mut().find(|g| g.jail_id == jail_id)
+            .ok_or("Jail guard record not found")?;
+
+        guard.current_rss_bytes = rss_bytes;
+        guard.current_pids = pids;
+
+        if rss_bytes > guard.limits.max_rss_bytes || pids > guard.limits.max_pids {
+            guard.throttled = true;
+            self.violations_log.push(format!("RACCT/RCTL Violation: Jail {} exceeded resource limits (RSS: {}/{}, PIDs: {}/{})",
+                jail_id, rss_bytes, guard.limits.max_rss_bytes, pids, guard.limits.max_pids));
+            Ok(false) // Resource limit violated
+        } else {
+            guard.throttled = false;
+            Ok(true) // Within limits
+        }
+    }
+}
+
+impl Default for FreeBsdRacctVnetGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 27. OPENBSD DYNAMIC PLEDGE & UNVEIL AUDIT SENTINEL (OpenBsdPledgeUnveilSentinel)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AuditViolationType {
+    PledgeViolation,
+    UnveilViolation,
+}
+
+#[derive(Debug, Clone)]
+pub struct AuditViolationEvent {
+    pub pid: u64,
+    pub timestamp_ns: u64,
+    pub target: String,
+    pub violation_type: AuditViolationType,
+    pub terminated: bool,
+}
+
+pub struct OpenBsdPledgeUnveilSentinel {
+    pub pledged_processes: Vec<(u64, OpenBSDPledge)>,
+    pub unveiled_processes: Vec<(u64, OpenBSDUnveil)>,
+    pub audit_log: Vec<AuditViolationEvent>,
+}
+
+impl OpenBsdPledgeUnveilSentinel {
+    pub fn new() -> Self {
+        Self {
+            pledged_processes: Vec::new(),
+            unveiled_processes: Vec::new(),
+            audit_log: Vec::new(),
+        }
+    }
+
+    pub fn pledge_process(&mut self, pid: u64, operations: &[&str]) -> Result<(), &'static str> {
+        if let Some((_, pledge)) = self.pledged_processes.iter_mut().find(|(p, _)| *p == pid) {
+            pledge.pledge(operations)
+        } else {
+            let mut pledge = OpenBSDPledge::new();
+            pledge.pledge(operations)?;
+            self.pledged_processes.push((pid, pledge));
+            Ok(())
+        }
+    }
+
+    pub fn unveil_process(&mut self, pid: u64, path: &str, perms: &str) -> Result<(), &'static str> {
+        if let Some((_, unveil)) = self.unveiled_processes.iter_mut().find(|(p, _)| *p == pid) {
+            unveil.unveil(path, perms)
+        } else {
+            let mut unveil = OpenBSDUnveil::new();
+            unveil.unveil(path, perms)?;
+            self.unveiled_processes.push((pid, unveil));
+            Ok(())
+        }
+    }
+
+    pub fn audit_syscall(&mut self, pid: u64, timestamp_ns: u64, operation: &str, target_path: Option<&str>) -> bool {
+        // Check pledge
+        if let Some((_, pledge)) = self.pledged_processes.iter().find(|(p, _)| *p == pid) {
+            if !pledge.check_operation(operation) {
+                self.audit_log.push(AuditViolationEvent {
+                    pid,
+                    timestamp_ns,
+                    target: operation.to_string(),
+                    violation_type: AuditViolationType::PledgeViolation,
+                    terminated: true,
+                });
+                return false;
+            }
+        }
+
+        // Check unveil
+        if let Some(path) = target_path {
+            if let Some((_, unveil)) = self.unveiled_processes.iter().find(|(p, _)| *p == pid) {
+                let req_perm = match operation {
+                    "rpath" | "read" => 'r',
+                    "wpath" | "write" => 'w',
+                    "exec" => 'x',
+                    "cpath" | "create" => 'c',
+                    _ => 'r',
+                };
+                if !unveil.check_permission(path, req_perm) {
+                    self.audit_log.push(AuditViolationEvent {
+                        pid,
+                        timestamp_ns,
+                        target: path.to_string(),
+                        violation_type: AuditViolationType::UnveilViolation,
+                        terminated: true,
+                    });
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+}
+
+impl Default for OpenBsdPledgeUnveilSentinel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3105,5 +3502,113 @@ mod tests {
         assert!(!sandbox.processes[0].alive);
         assert_eq!(sandbox.violations.len(), 1);
         assert_eq!(sandbox.violations[0].syscall, "exec");
+    }
+
+    #[test]
+    fn test_serpent_moss_engine() {
+        let mut moss = SerpentMossEngine::new();
+        let tx = moss.create_transaction();
+
+        let pkg = MossPackageSpec {
+            name: "glibc".to_string(),
+            version: "2.38".to_string(),
+            release: 1,
+            payload_hash: "blake3-hash-123".to_string(),
+            dependencies: vec![],
+            system_triggers: vec!["ldconfig".to_string()],
+        };
+
+        assert!(moss.stage_install(tx, pkg).is_ok());
+        assert!(moss.commit_transaction(tx).is_ok());
+
+        assert_eq!(moss.installed_packages.len(), 1);
+        assert_eq!(moss.executed_triggers, vec!["ldconfig".to_string()]);
+
+        // Test rollback
+        assert!(moss.rollback_transaction(tx).is_ok());
+        assert_eq!(moss.installed_packages.len(), 0);
+    }
+
+    #[test]
+    fn test_cachy_bore_scheduler() {
+        let mut sched = CachyBoreScheduler::new(10_000_000); // 10ms target
+
+        sched.register_task(BoreTaskProfile {
+            task_id: 1,
+            name: "game_engine".to_string(),
+            priority: 10,
+            interactive_score: 90,
+            burst_time_ns: 500_000,
+            preferred_core: CoreTypePreference::PerformancePCore,
+            ipc_intensity: 80,
+        });
+
+        sched.register_task(BoreTaskProfile {
+            task_id: 2,
+            name: "background_indexing".to_string(),
+            priority: 100,
+            interactive_score: 10,
+            burst_time_ns: 20_000_000,
+            preferred_core: CoreTypePreference::EfficiencyECore,
+            ipc_intensity: 20,
+        });
+
+        // Time slice check
+        let slice1 = sched.calculate_timeslice_ns(1);
+        let slice2 = sched.calculate_timeslice_ns(2);
+        assert!(slice1 < slice2); // Interactive gets shorter, faster slices
+
+        // Next task scheduling
+        let next_task = sched.schedule_next_task(CoreTypePreference::PerformancePCore).unwrap();
+        assert_eq!(next_task.task_id, 1);
+    }
+
+    #[test]
+    fn test_freebsd_racct_vnet_guard() {
+        let mut guard = FreeBsdRacctVnetGuard::new();
+
+        let limits = RacctResourceLimits {
+            max_cpu_time_pct: 80,
+            max_rss_bytes: 1024 * 1024 * 100, // 100MB
+            max_pids: 50,
+            bandwidth_limit_bps: 1_000_000,
+        };
+
+        let vnet = VnetStack {
+            vnet_id: 1,
+            virtual_interfaces: vec!["vnet0".to_string()],
+            default_gateway: "192.168.1.1".to_string(),
+        };
+
+        guard.register_jail_guard(1001, limits, Some(vnet));
+
+        // Normal usage passes
+        assert_eq!(guard.update_usage(1001, 1024 * 1024 * 50, 20), Ok(true));
+
+        // Exceeding memory fails guard and triggers violation logging
+        assert_eq!(guard.update_usage(1001, 1024 * 1024 * 200, 20), Ok(false));
+        assert_eq!(guard.violations_log.len(), 1);
+        assert!(guard.violations_log[0].contains("RACCT/RCTL Violation"));
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_sentinel() {
+        let mut sentinel = OpenBsdPledgeUnveilSentinel::new();
+
+        assert!(sentinel.pledge_process(501, &["stdio", "rpath"]).is_ok());
+        assert!(sentinel.unveil_process(501, "/etc", "r").is_ok());
+
+        // Valid syscall passes
+        assert!(sentinel.audit_syscall(501, 1000, "rpath", Some("/etc/hosts")));
+
+        // Invalid pledge operation fails and logs violation
+        assert!(!sentinel.audit_syscall(501, 1001, "wpath", Some("/etc/hosts")));
+        assert_eq!(sentinel.audit_log.len(), 1);
+        assert_eq!(sentinel.audit_log[0].violation_type, AuditViolationType::PledgeViolation);
+
+        // Invalid unveil path fails and logs violation
+        assert!(!sentinel.audit_syscall(501, 1002, "rpath", Some("/var/log/syslog")));
+        assert_eq!(sentinel.audit_log.len(), 2);
+        assert_eq!(sentinel.audit_log[1].violation_type, AuditViolationType::UnveilViolation);
     }
 }
