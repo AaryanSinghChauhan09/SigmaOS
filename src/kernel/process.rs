@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS Comprehensive Process Model
-// Includes POSIX threads, complete states, signals, ELF loading stubs, context switching
+// Includes POSIX threads, complete states, signals, ELF loading stubs, context switching,
+// and advanced blocked process states (BlockedWaiting, BlockedSuspended, WaitChannels).
 
 #![allow(dead_code)]
 
@@ -17,8 +19,20 @@ pub enum ProcessState {
     Ready,
     Running,
     Blocked,
+    BlockedWaiting,
+    BlockedSuspended,
     Stopped,
     Zombie,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BlockReason {
+    IoWait,
+    LockWait,
+    SignalWait,
+    TimerWait,
+    PageFaultWait,
+    ChannelWait,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -47,6 +61,12 @@ impl TrapFrame {
     }
 }
 
+impl Default for TrapFrame {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct Thread {
     pub tid: ThreadId,
     pub pid: ProcessId,
@@ -54,6 +74,25 @@ pub struct Thread {
     pub kstack: usize,
     pub context: TrapFrame,
     pub fs_base: u64,
+    pub block_reason: Option<BlockReason>,
+    pub priority: u32,
+    pub inherited_priority: u32,
+}
+
+impl Thread {
+    pub fn new(tid: ThreadId, pid: ProcessId, kstack: usize) -> Self {
+        Self {
+            tid,
+            pid,
+            state: ProcessState::New,
+            kstack,
+            context: TrapFrame::new(),
+            fs_base: 0,
+            block_reason: None,
+            priority: 10,
+            inherited_priority: 10,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -92,6 +131,8 @@ pub struct Process {
     pub name: String,
     
     pub cwd: String,
+    pub block_reason: Option<BlockReason>,
+    pub is_suspended: bool,
 }
 
 static NEXT_PID: AtomicU64 = AtomicU64::new(1);
@@ -119,6 +160,8 @@ impl Process {
             exit_code: None,
             name: String::from(name),
             cwd: String::from("/"),
+            block_reason: None,
+            is_suspended: false,
         }
     }
 
@@ -137,6 +180,31 @@ impl Process {
         child.mmap_base = self.mmap_base;
         child.cwd = self.cwd.clone();
         child
+    }
+
+    pub fn transition_to_blocked(&mut self, reason: BlockReason) {
+        self.state = ProcessState::BlockedWaiting;
+        self.block_reason = Some(reason);
+    }
+
+    pub fn suspend_blocked_process(&mut self) -> Result<(), &'static str> {
+        if self.state == ProcessState::Blocked || self.state == ProcessState::BlockedWaiting {
+            self.state = ProcessState::BlockedSuspended;
+            self.is_suspended = true;
+            Ok(())
+        } else {
+            Err("Process must be in blocked state to suspend")
+        }
+    }
+
+    pub fn resume_blocked_process(&mut self) -> Result<(), &'static str> {
+        if self.state == ProcessState::BlockedSuspended {
+            self.state = ProcessState::BlockedWaiting;
+            self.is_suspended = false;
+            Ok(())
+        } else {
+            Err("Process is not in blocked-suspended state")
+        }
     }
 }
 
@@ -180,6 +248,7 @@ pub struct ProcessManager {
     threads: BTreeMap<ThreadId, Thread>,
     ready_queue: VecDeque<ThreadId>,
     wait_queues: BTreeMap<ProcessId, VecDeque<ThreadId>>,
+    wait_channels: BTreeMap<u64, VecDeque<ThreadId>>,
 }
 
 impl ProcessManager {
@@ -189,6 +258,7 @@ impl ProcessManager {
             threads: BTreeMap::new(),
             ready_queue: VecDeque::new(),
             wait_queues: BTreeMap::new(),
+            wait_channels: BTreeMap::new(),
         }
     }
 
@@ -214,7 +284,10 @@ impl ProcessManager {
         if let Some(p) = self.processes.get_mut(&pid) {
             if sig < 64 {
                 p.sig_pending |= 1 << sig;
-                // Wake up threads if blocked
+                // Wake up thread if blocked
+                if p.state == ProcessState::Blocked || p.state == ProcessState::BlockedWaiting {
+                    p.state = ProcessState::Ready;
+                }
                 Ok(())
             } else {
                 Err("Invalid signal")
@@ -222,6 +295,39 @@ impl ProcessManager {
         } else {
             Err("Process not found")
         }
+    }
+
+    pub fn block_thread_on_channel(&mut self, tid: ThreadId, wchan_id: u64, reason: BlockReason) -> Result<(), &'static str> {
+        let t = self.threads.get_mut(&tid).ok_or("Thread not found")?;
+        t.state = ProcessState::BlockedWaiting;
+        t.block_reason = Some(reason);
+
+        if let Some(p) = self.processes.get_mut(&t.pid) {
+            p.transition_to_blocked(reason);
+        }
+
+        self.wait_channels.entry(wchan_id).or_default().push_back(tid);
+        Ok(())
+    }
+
+    pub fn wakeup_channel(&mut self, wchan_id: u64) -> usize {
+        let mut awakened = 0;
+        if let Some(mut q) = self.wait_channels.remove(&wchan_id) {
+            while let Some(tid) = q.pop_front() {
+                if let Some(t) = self.threads.get_mut(&tid) {
+                    t.state = ProcessState::Ready;
+                    t.block_reason = None;
+                    self.ready_queue.push_back(tid);
+
+                    if let Some(p) = self.processes.get_mut(&t.pid) {
+                        p.state = ProcessState::Ready;
+                        p.block_reason = None;
+                    }
+                    awakened += 1;
+                }
+            }
+        }
+        awakened
     }
 
     pub fn waitpid(&mut self, ppid: ProcessId, pid: Option<ProcessId>, current_tid: ThreadId) -> Option<i32> {
@@ -243,14 +349,15 @@ impl ProcessManager {
         }
 
         // None are zombies, block the current thread
-        let q = self.wait_queues.entry(ppid).or_insert_with(VecDeque::new);
+        let q = self.wait_queues.entry(ppid).or_default();
         q.push_back(current_tid);
         
         if let Some(t) = self.threads.get_mut(&current_tid) {
-            t.state = ProcessState::Blocked;
+            t.state = ProcessState::BlockedWaiting;
+            t.block_reason = Some(BlockReason::ChannelWait);
         }
         
-        None // Requires scheduler to switch context
+        None
     }
     
     fn cleanup_zombie(&mut self, pid: ProcessId) {
@@ -259,7 +366,6 @@ impl ProcessManager {
                 parent.children.retain(|&c| c != pid);
             }
         }
-        // Also remove threads
         self.threads.retain(|_, t| t.pid != pid);
     }
 
@@ -267,7 +373,6 @@ impl ProcessManager {
         if let Some(p) = self.processes.get_mut(&pid) {
             p.state = ProcessState::Zombie;
             p.exit_code = Some(code);
-            // Reparent children to init (PID 1)
             let children = p.children.clone();
             p.children.clear();
             for cpid in children {
@@ -279,7 +384,6 @@ impl ProcessManager {
                 }
             }
             
-            // Wake up parent if waiting
             let ppid = p.ppid;
             if let Some(q) = self.wait_queues.get_mut(&ppid) {
                 while let Some(tid) = q.pop_front() {
@@ -292,7 +396,6 @@ impl ProcessManager {
         }
     }
     
-    // Very basic ELF parser stub - normally reads memory mapped file
     pub fn exec(&mut self, pid: ProcessId, elf_data: &[u8]) -> Result<u64, &'static str> {
         if elf_data.len() < core::mem::size_of::<Elf64Ehdr>() {
             return Err("Invalid ELF header");
@@ -303,18 +406,55 @@ impl ProcessManager {
             return Err("Not an ELF file");
         }
         
-        if ehdr.e_type != 2 && ehdr.e_type != 3 { // EXEC or DYN
+        if ehdr.e_type != 2 && ehdr.e_type != 3 {
             return Err("Unsupported ELF type");
         }
         
         let p = self.processes.get_mut(&pid).ok_or("Process not found")?;
         
-        // Reset memory regions
         p.brk = 0x40000000;
         p.start_brk = 0x40000000;
         p.mmap_base = 0x700000000000;
         p.sig_actions = core::array::from_fn(|_| SigAction { handler: 0, mask: 0, flags: 0 });
         
         Ok(ehdr.e_entry)
+    }
+}
+
+impl Default for ProcessManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_process_blocked_state_transitions() {
+        let mut pm = ProcessManager::new();
+        let mut proc = Process::new(0x1000, "worker_task");
+        let pid = proc.pid;
+        pm.add_process(proc);
+
+        let thread = Thread::new(ThreadId(101), pid, 0x8000);
+        pm.add_thread(thread);
+
+        // Block on I/O channel
+        assert!(pm.block_thread_on_channel(ThreadId(101), 0x55, BlockReason::IoWait).is_ok());
+        let p = pm.get_process(pid).unwrap();
+        assert_eq!(p.state, ProcessState::BlockedWaiting);
+        assert_eq!(p.block_reason, Some(BlockReason::IoWait));
+
+        // Suspend blocked process
+        let p_mut = pm.get_process_mut(pid).unwrap();
+        assert!(p_mut.suspend_blocked_process().is_ok());
+        assert_eq!(p_mut.state, ProcessState::BlockedSuspended);
+
+        // Resume and wakeup
+        assert!(p_mut.resume_blocked_process().is_ok());
+        assert_eq!(pm.wakeup_channel(0x55), 1);
+        assert_eq!(pm.get_process(pid).unwrap().state, ProcessState::Ready);
     }
 }
