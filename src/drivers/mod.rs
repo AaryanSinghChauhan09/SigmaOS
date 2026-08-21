@@ -15,8 +15,8 @@ pub mod usb_hid;
 pub mod vesa;
 pub mod boot_init;
 pub mod dde;
-pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
+pub mod intel_e1000;
 
 pub use even_more_devices::*;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
@@ -32,3 +32,4 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+pub use intel_e1000::*;

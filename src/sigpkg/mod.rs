@@ -2,6 +2,7 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod debian_defeater;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
@@ -10,6 +11,10 @@ pub mod transaction;
 pub mod verifier;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use debian_defeater::{
+    SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox,
+    SovereignMirrorSelector,
+};
 pub use spec::{
     AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
@@ -37,7 +42,7 @@ pub use universal_oop_system::{
 };
 
 /// Package version using SemVer
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,
     pub minor: u64,
@@ -119,24 +124,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }

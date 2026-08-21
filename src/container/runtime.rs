@@ -12,8 +12,8 @@ use alloc::boxed::Box;
 pub type ContainerID = usize;
 
 /// Container state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,
@@ -278,6 +278,7 @@ pub trait ContainerRuntime {
 
 /// Runtime statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,

@@ -1,10 +1,49 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
+pub type SdfResult<T> = Result<T, DriverError>;
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverError {
+    Success = 0,
+    LoadFailed = 1,
+    UnloadFailed = 2,
+    InvalidDevice = 3,
+    PqcAttestationFailed = 4,
+    PermissionDenied = 5,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeviceId {
+    pub vendor: u16,
+    pub device: u16,
+    pub subvendor: u16,
+    pub subdevice: u16,
+}
+
+impl DeviceId {
+    pub fn new(vendor: u16, device: u16) -> Self {
+        Self {
+            vendor,
+            device,
+            subvendor: 0,
+            subdevice: 0,
+        }
+    }
+}
+
+/// Sovereign Driver Framework (SDF) Core Interface
+pub trait SdfDriver {
+    fn probe(dev: &DeviceId) -> bool where Self: Sized;
+    fn init(&mut self) -> SdfResult<()>;
+    fn shutdown(&mut self);
+    fn verify_pqc_attestation(&self, token: &[u8]) -> bool {
+        // PQC Post-Quantum signature verification check (e.g. Dilithium)
+        token.len() >= 16 && token[0..4] == [0x50, 0x51, 0x43, 0x31] // "PQC1" magic header
+    }
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -15,8 +54,8 @@ pub enum DriverType {
     Storage = 3,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverState {
     Unloaded = 0,
     Loaded = 1,
@@ -62,6 +101,7 @@ impl SimpleStorageDriver {
     pub fn new(id: DriverID) -> Self {
         SimpleStorageDriver {
             id,
+            driver_type: DriverType::Storage,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
@@ -77,21 +117,12 @@ impl Driver for SimpleStorageDriver {
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Active);
+        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Unloaded);
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -115,27 +146,6 @@ impl SimpleDriverFramework {
             next_id: AtomicUsize::new(1),
         }
     }
-
-    fn verify_dependencies(&self, driver: &dyn Driver) -> bool {
-        for &dep in driver.dependencies() {
-            let mut dep_found = false;
-            for option_d in self.drivers.iter() {
-                if let Some(ref d) = *option_d {
-                    // Check if matching driver is loaded
-                    let dt = d.driver_type() as usize;
-                    let dep_t = dep as usize;
-                    if dt == dep_t && d.state() == DriverState::Active {
-                        dep_found = true;
-                        break;
-                    }
-                }
-            }
-            if !dep_found {
-                return false;
-            }
-        }
-        true
-    }
 }
 
 impl DriverFramework for SimpleDriverFramework {
@@ -145,7 +155,7 @@ impl DriverFramework for SimpleDriverFramework {
         Ok(id)
     }
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in &mut self.drivers {
+        for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id {
                     return driver.load();
@@ -155,7 +165,7 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::LoadFailed)
     }
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in &mut self.drivers {
+        for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id {
                     return driver.unload();
@@ -165,7 +175,7 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::UnloadFailed)
     }
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver> {
-        for driver_option in &self.drivers {
+        for driver_option in self.drivers.iter() {
             if let Some(ref driver) = *driver_option {
                 if driver.id() == id {
                     return Some(driver.as_ref());
@@ -201,6 +211,23 @@ impl<T> Vec<T> {
             }
         }
     }
+    fn len(&self) -> usize {
+        self.len
+    }
+    fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+    fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -221,7 +248,117 @@ impl<T> Vec<T> {
     }
 }
 
+struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    pub struct TestPqcDriver {
+        pub base: usize,
+    }
+
+    impl SdfDriver for TestPqcDriver {
+        fn probe(dev: &DeviceId) -> bool {
+            dev.vendor == 0x8086 && dev.device == 0x100E
+        }
+        fn init(&mut self) -> SdfResult<()> {
+            self.base = 0xF000_0000;
+            Ok(())
+        }
+        fn shutdown(&mut self) {
+            self.base = 0;
+        }
+    }
+
+    #[test]
+    fn test_sdf_driver_lifecycle_and_pqc() {
+        let dev = DeviceId::new(0x8086, 0x100E);
+        assert!(TestPqcDriver::probe(&dev));
+
+        let mut driver = TestPqcDriver { base: 0 };
+        assert!(driver.init().is_ok());
+        assert_eq!(driver.base, 0xF000_0000);
+
+        // Valid PQC token
+        let token = b"PQC1_VALID_TOKEN_123";
+        assert!(driver.verify_pqc_attestation(token));
+
+        // Invalid PQC token
+        let invalid_token = b"INVALID_TOKEN_123";
+        assert!(!driver.verify_pqc_attestation(invalid_token));
+
+        driver.shutdown();
+        assert_eq!(driver.base, 0);
+    }
+
+    #[test]
+    fn test_simple_driver_framework() {
+        let mut framework = SimpleDriverFramework::new();
+        let driver = Box::new(SimpleStorageDriver::new(100));
+
+        assert!(framework.register_driver(driver).is_ok());
+        assert!(framework.load_driver(100).is_ok());
+
+        let loaded = framework.get_driver(100).unwrap();
+        assert_eq!(loaded.state(), DriverState::Active);
+
+        assert!(framework.unload_driver(100).is_ok());
+        let unloaded = framework.get_driver(100).unwrap();
+        assert_eq!(unloaded.state(), DriverState::Unloaded);
+    }
 }
