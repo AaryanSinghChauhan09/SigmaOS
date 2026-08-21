@@ -46,25 +46,34 @@ fn test_openbsd_sysctl_mib_inspection() {
 }
 
 #[test]
-fn test_sovereign_auxiliary_carry_and_system_awareness_inspection() {
-    let mut af = SovereignAuxiliaryCarryEngine::new();
-    let res = af.evaluate_add_af(0x0E, 0x05); // 14 + 5 = 19 > 15 -> AF set
-    assert!(af.rflags_af);
+fn test_sovereign_ostree_and_io_uring_inspection() {
+    let mut ostree = SovereignOstreeEngine::new();
+    let idx = ostree.stage_commit("commit_hash_123", "v1.0.0-release", "kernel-6.8", 0xABCDEF);
+    assert_eq!(idx, 0);
 
-    let mut awareness = SovereignSystemAwarenessEngine::new(AwarenessDegree::Omniscient);
-    assert!(awareness.compute_availability_score() > 0);
+    let mut io_uring = SovereignIoUring::new(16);
+    let sqe = SubmissionQueueEntry {
+        opcode: IoUringOpcode::Nop,
+        fd: 0,
+        offset: 0,
+        data: vec![42],
+        user_data: 42,
+    };
+    assert!(io_uring.submit_entry(sqe).is_ok());
+    let processed = io_uring.submit_and_wait();
+    assert_eq!(processed, 1);
 }
 
 #[test]
-fn test_sovereign_avoidance_backbone_balloon_inspection() {
-    let mut avoidance = SovereignDeadlockStarvationAvoidanceEngine::new(vec![5, 5]);
-    avoidance.register_process(1, vec![3, 3]);
-    assert!(avoidance.is_safe_state_request(1, &[1, 1]));
+fn test_sovereign_landlock_and_runit_inspection() {
+    let mut landlock = SovereignLandlockLsm::new();
+    assert!(landlock.add_rule("/etc/sigma/config", LandlockAccess::ReadOnly).is_ok());
+    landlock.restrict_self();
+    assert!(landlock.check_access("/etc/sigma/config", LandlockAccess::ReadOnly));
+    assert!(!landlock.check_access("/etc/sigma/config", LandlockAccess::ReadWrite));
 
-    let mut backbone = SovereignBackboneNetworkEngine::new();
-    backbone.add_route([10, 0, 0, 0], 8, [192, 168, 1, 1], 10, RouteProtocol::Bgp);
-    assert!(backbone.lookup_backbone_route([10, 1, 2, 3]).is_some());
-
-    let mut balloon = SovereignMemoryBallooningBalancer::new(2048);
-    assert_eq!(balloon.inflate_balloon(512), 512);
+    let mut supervisor = SovereignRunitSupervisor::new(RunitRunlevel::Boot);
+    supervisor.register_service("network-daemon", RunitRunlevel::Boot, &[], 3);
+    assert_eq!(supervisor.services.len(), 1);
+    assert_eq!(supervisor.services[0].name, "network-daemon");
 }
