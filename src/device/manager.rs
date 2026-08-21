@@ -1,7 +1,8 @@
 #![no_std]
-#![no_main]
 
-use core::mem;
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
 /// Implements device detection, registration, and management
@@ -34,6 +35,20 @@ pub trait Device {
     fn device_class(&self) -> DeviceClass;
     fn initialize(&mut self) -> Result<(), DeviceError>;
     fn shutdown(&mut self) -> Result<(), DeviceError>;
+    fn suspend(&mut self) -> Result<(), DeviceError>;
+    fn resume(&mut self) -> Result<(), DeviceError>;
+    fn get_capability_token(&self) -> u64;
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), DeviceError>;
+    fn get_power_state(&self) -> PowerState;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerState {
+    D0,  // Full power
+    D1,  // Low power
+    D2,  // Standby
+    D3,  // Sleep
+    D4,  // Off
 }
 
 #[repr(C)]
@@ -41,6 +56,8 @@ pub struct SimpleDevice {
     pub id: DeviceID,
     pub name: [u8; 64],
     pub device_class: AtomicUsize,
+    pub power_state: PowerState,
+    pub capability_token: u64,
 }
 
 impl SimpleDevice {
@@ -54,6 +71,8 @@ impl SimpleDevice {
             id,
             name: name_array,
             device_class: AtomicUsize::new(device_class as usize),
+            power_state: PowerState::D0,
+            capability_token: 0,
         }
     }
 }
@@ -71,11 +90,36 @@ impl Device for SimpleDevice {
     }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {
+        self.power_state = PowerState::D0;
         Ok(())
     }
 
     fn shutdown(&mut self) -> Result<(), DeviceError> {
+        self.power_state = PowerState::D4;
         Ok(())
+    }
+    
+    fn suspend(&mut self) -> Result<(), DeviceError> {
+        self.power_state = PowerState::D3;
+        Ok(())
+    }
+    
+    fn resume(&mut self) -> Result<(), DeviceError> {
+        self.power_state = PowerState::D0;
+        Ok(())
+    }
+    
+    fn get_capability_token(&self) -> u64 {
+        self.capability_token
+    }
+    
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), DeviceError> {
+        self.power_state = state;
+        Ok(())
+    }
+    
+    fn get_power_state(&self) -> PowerState {
+        self.power_state
     }
 }
 
@@ -232,51 +276,6 @@ impl DeviceHotplug for SimpleDeviceHotplug {
     fn enable_hotplug(&mut self, enabled: bool) {
         self.enabled
             .store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
-    }
-}
-
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
     }
 }
 

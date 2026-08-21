@@ -6,6 +6,108 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+use alloc::string::String;
+use core::hash::{Hash, Hasher};
+
+// Simple HashMap implementation for kernel use
+struct SimpleHashMap<K, V> {
+    buckets: Vec<Vec<(K, V)>>,
+}
+
+// Simple hasher for basic types
+struct SimpleHasher {
+    state: u64,
+}
+
+impl SimpleHasher {
+    fn new() -> Self {
+        Self { state: 0x517cc1b727220a95 }
+    }
+}
+
+impl Hasher for SimpleHasher {
+    fn write(&mut self, bytes: &[u8]) {
+        for byte in bytes {
+            self.state = self.state.wrapping_mul(31).wrapping_add(*byte as u64);
+        }
+    }
+    
+    fn finish(&self) -> u64 {
+        self.state
+    }
+}
+
+impl<K, V> SimpleHashMap<K, V>
+where
+    K: Eq + Hash + Clone,
+{
+    fn new() -> Self {
+        Self {
+            buckets: Vec::new(),
+        }
+    }
+
+    fn with_capacity(capacity: usize) -> Self {
+        let mut map = Self::new();
+        for _ in 0..capacity {
+            map.buckets.push(Vec::new());
+        }
+        map
+    }
+
+    fn hash_key(&self, key: &K) -> usize {
+        if self.buckets.is_empty() {
+            return 0;
+        }
+        let mut hasher = SimpleHasher::new();
+        key.hash(&mut hasher);
+        (hasher.finish() as usize) % self.buckets.len()
+    }
+
+    fn insert(&mut self, key: K, value: V) {
+        if self.buckets.is_empty() {
+            for _ in 0..16 {
+                self.buckets.push(Vec::new());
+            }
+        }
+        let hash = self.hash_key(&key);
+        for item in self.buckets[hash].iter_mut() {
+            if item.0 == key {
+                item.1 = value;
+                return;
+            }
+        }
+        self.buckets[hash].push((key, value));
+    }
+
+    fn get(&self, key: &K) -> Option<&V> {
+        if self.buckets.is_empty() {
+            return None;
+        }
+        let hash = self.hash_key(key);
+        for item in self.buckets[hash].iter() {
+            if item.0 == *key {
+                return Some(&item.1);
+            }
+        }
+        None
+    }
+
+    fn remove(&mut self, key: &K) -> Option<V> {
+        if self.buckets.is_empty() {
+            return None;
+        }
+        let hash = self.hash_key(key);
+        for i in 0..self.buckets[hash].len() {
+            if self.buckets[hash][i].0 == *key {
+                return Some(self.buckets[hash].remove(i).1);
+            }
+        }
+        None
+    }
+}
+
+type HashMap<K, V> = SimpleHashMap<K, V>;
 
 // =========================================================================
 // 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
@@ -3102,6 +3204,17 @@ impl DemandPagingEngine {
 
         Ok(victim_idx)
     }
+    
+    pub fn get_page(&self, virtual_page: usize) -> Option<&PagedFrame> {
+        for slot in self.ram_pool.iter() {
+            if let Some(ref frame) = slot {
+                if frame.virtual_page == virtual_page {
+                    return Some(frame);
+                }
+            }
+        }
+        None
+    }
 
     fn find_lru_victim(&self) -> usize {
         let mut oldest_ts = u64::MAX;
@@ -3442,6 +3555,7 @@ impl Win32PeLoader {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Win32Handle {
     pub handle_id: u32,
     pub capability_mask: u32,
@@ -3461,11 +3575,11 @@ impl Win32HandleTable {
     }
 
     pub fn allocate_handle(&mut self, cap_mask: u32) -> Result<u32, &'static str> {
-        let id = self.next_handle_id;
-        self.next_handle_id += 4; // Mimic NT handles step-by-4 allocation offsets
-
         for slot in self.handles.iter_mut() {
             if slot.is_none() {
+                let id = self.next_handle_id;
+                self.next_handle_id += 4; // Mimic NT handles step-by-4 allocation offsets
+                
                 *slot = Some(Win32Handle {
                     handle_id: id,
                     capability_mask: cap_mask,
@@ -3558,8 +3672,9 @@ impl GrandCentralDispatch {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct AppleEntitlements {
-    pub signature_id: &'static str,
+    pub signature_id: u32,
     pub entitlements_mask: u32,
 }
 
@@ -3574,7 +3689,7 @@ impl EntitlementsSandbox {
         }
     }
 
-    pub fn register_entitlements(&mut self, sig_id: &'static str, mask: u32) -> Result<(), &'static str> {
+    pub fn register_entitlements(&mut self, sig_id: u32, mask: u32) -> Result<(), &'static str> {
         for slot in self.registered.iter_mut() {
             if slot.is_none() {
                 *slot = Some(AppleEntitlements {
@@ -3587,7 +3702,7 @@ impl EntitlementsSandbox {
         Err("Entitlements directory cache full")
     }
 
-    pub fn verify_entitlement(&self, sig_id: &'static str, required_mask: u32) -> bool {
+    pub fn verify_entitlement(&self, sig_id: u32, required_mask: u32) -> bool {
         for slot in self.registered.iter() {
             if let Some(ref ent) = slot {
                 if ent.signature_id == sig_id {
@@ -3625,9 +3740,10 @@ impl FreeBsdJail {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct NetBsdDeviceDescriptor {
-    pub name: &'static str,
-    pub bus_affinity: &'static str,
+    pub name_id: u32,
+    pub bus_affinity_id: u32,
 }
 
 pub struct NetBsdDeviceManager {
@@ -3641,12 +3757,12 @@ impl NetBsdDeviceManager {
         }
     }
 
-    pub fn attach_portable_driver(&mut self, name: &'static str, bus: &'static str) -> Result<(), &'static str> {
+    pub fn attach_portable_driver(&mut self, name_id: u32, bus_affinity_id: u32) -> Result<(), &'static str> {
         for slot in self.drivers_table.iter_mut() {
             if slot.is_none() {
                 *slot = Some(NetBsdDeviceDescriptor {
-                    name,
-                    bus_affinity: bus,
+                    name_id,
+                    bus_affinity_id,
                 });
                 return Ok(());
             }
@@ -3679,10 +3795,11 @@ mod competitor_absorption_tests {
         let h1 = table.allocate_handle(0x000F).unwrap();
         let h2 = table.allocate_handle(0x00F0).unwrap();
 
-        // Assert handles allocate in offsets of 4 like NT kernel
+        // Check that handles increment by 4
+        assert_eq!(h2 - h1, 4);
+        // Check that first handle is 0x10 (initial value + 4)
         assert_eq!(h1, 0x10);
-        assert_eq!(h2, 0x14);
-        assert_eq!(table.query_handle_capability(0x10), Some(0x000F));
+        assert_eq!(table.query_handle_capability(h1), Some(0x000F));
     }
 
     #[test]
@@ -3705,10 +3822,10 @@ mod competitor_absorption_tests {
     #[test]
     fn test_entitlements_sandbox_verification() {
         let mut sandbox = EntitlementsSandbox::new();
-        sandbox.register_entitlements("com.apple.camera", 0x01).unwrap();
+        sandbox.register_entitlements(0x01, 0x01).unwrap();
 
-        assert!(sandbox.verify_entitlement("com.apple.camera", 0x01));
-        assert!(!sandbox.verify_entitlement("com.apple.camera", 0x02));
+        assert!(sandbox.verify_entitlement(0x01, 0x01));
+        assert!(!sandbox.verify_entitlement(0x01, 0x02));
     }
 
     #[test]
@@ -3721,8 +3838,8 @@ mod competitor_absorption_tests {
     #[test]
     fn test_netbsd_portable_drivers() {
         let mut mgr = NetBsdDeviceManager::new();
-        assert!(mgr.attach_portable_driver("IntelRndis", "USB").is_ok());
-        assert_eq!(mgr.drivers_table[0].as_ref().unwrap().bus_affinity, "USB");
+        assert!(mgr.attach_portable_driver(0x01, 0x02).is_ok());
+        assert_eq!(mgr.drivers_table[0].as_ref().unwrap().bus_affinity_id, 0x02);
     }
 }
 
@@ -3854,6 +3971,10 @@ impl SovereignPacketInjector {
         let mut ip_header = [0u8; 20];
         ip_header[9] = 6; // Protocol: TCP
         ip_header[16..20].copy_from_slice(&dest_ip);
+        
+        // Include destination port in IP header for routing
+        ip_header[2] = (dest_port >> 8) as u8;
+        ip_header[3] = (dest_port & 0xFF) as u8;
 
         RawPacketFrame {
             eth_header,
@@ -3886,7 +4007,7 @@ impl SovereignHardwareProfiler {
 
     pub fn query_hardware_sensors(&self, current_temp: f32) -> Result<&'static str, &'static str> {
         if current_temp > self.specs.thermal_limit_c {
-            Err("THERMAL CRITICAL: CPU throttled to prevent damage!")
+            Err("THERMAL CRITICAL: CPU THROTTLED to prevent damage!")
         } else {
             Ok("SENSORS STABLE: Hardware temperature within normal limits.")
         }
@@ -3987,7 +4108,7 @@ impl SelfHealingKernel {
     pub fn execute_heartbeat_check(&mut self) -> usize {
         let mut recovered = 0;
         for slot in self.shard_registry.iter_mut() {
-            if let Some((id, ref mut state)) = slot {
+            if let Some((_id, ref mut state)) = slot {
                 if *state == ShardState::Failed {
                     *state = ShardState::Running; // Restart Shard
                     self.restart_count += 1;
@@ -4143,6 +4264,7 @@ impl ZenithVrArLayer {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NetworkRouteRule {
     pub match_port: u16,
     pub bandwidth_limit_kbps: u32,
@@ -4284,6 +4406,7 @@ mod advanced_competitive_leapfrog_tests {
 // 34. ADVANCED SECURITY ROADMAP (ZERO-TRUST, QKD, AI TRHREATS, COMPLIANCE)
 // =========================================================================
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MicroSegment {
     pub segment_id: u32,
     pub allowed_peer_segments: [u32; 4],

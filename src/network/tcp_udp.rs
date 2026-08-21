@@ -1,6 +1,3 @@
-#![no_std]
-#![cfg_attr(not(test), no_main)]
-
 /// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 /// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 

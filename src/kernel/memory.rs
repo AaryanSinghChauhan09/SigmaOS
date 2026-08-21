@@ -1,10 +1,203 @@
 // SigmaOS Kernel Memory Management
-// Implements buddy allocator and paging
+// Implements buddy allocator and paging with zero std dependency
 
 extern crate alloc;
 use alloc::vec::Vec;
+use alloc::string::String;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::hash::{Hash, Hasher};
+
+// Custom string operations to avoid std dependency
+pub fn sigma_strlen(s: &[u8]) -> usize {
+    let mut len = 0;
+    while len < s.len() && s[len] != 0 {
+        len += 1;
+    }
+    len
+}
+
+pub fn sigma_strcmp(a: &[u8], b: &[u8]) -> i32 {
+    let a_len = sigma_strlen(a);
+    let b_len = sigma_strlen(b);
+    let min_len = a_len.min(b_len);
+    
+    for i in 0..min_len {
+        if a[i] < b[i] {
+            return -1;
+        } else if a[i] > b[i] {
+            return 1;
+        }
+    }
+    
+    if a_len < b_len {
+        -1
+    } else if a_len > b_len {
+        1
+    } else {
+        0
+    }
+}
+
+pub fn sigma_strncmp(a: &[u8], b: &[u8], n: usize) -> i32 {
+    let a_len = sigma_strlen(a).min(n);
+    let b_len = sigma_strlen(b).min(n);
+    let min_len = a_len.min(b_len);
+    
+    for i in 0..min_len {
+        if a[i] < b[i] {
+            return -1;
+        } else if a[i] > b[i] {
+            return 1;
+        }
+    }
+    
+    if a_len < b_len {
+        -1
+    } else if a_len > b_len {
+        1
+    } else {
+        0
+    }
+}
+
+pub fn sigma_memcpy(dst: &mut [u8], src: &[u8]) -> usize {
+    let len = dst.len().min(src.len());
+    for i in 0..len {
+        dst[i] = src[i];
+    }
+    len
+}
+
+pub fn sigma_memset(dst: &mut [u8], value: u8) {
+    for byte in dst.iter_mut() {
+        *byte = value;
+    }
+}
+
+pub fn sigma_memcmp(a: &[u8], b: &[u8]) -> i32 {
+    let len = a.len().min(b.len());
+    
+    for i in 0..len {
+        if a[i] < b[i] {
+            return -1;
+        } else if a[i] > b[i] {
+            return 1;
+        }
+    }
+    
+    if a.len() < b.len() {
+        -1
+    } else if a.len() > b.len() {
+        1
+    } else {
+        0
+    }
+}
+
+// Simple HashMap implementation for kernel use
+struct SimpleHashMap<K, V> {
+    buckets: Vec<Vec<(K, V)>>,
+}
+
+// Simple hasher for basic types
+struct SimpleHasher {
+    state: u64,
+}
+
+impl SimpleHasher {
+    fn new() -> Self {
+        Self { state: 0x517cc1b727220a95 }
+    }
+    
+    fn finish(&self) -> u64 {
+        self.state
+    }
+}
+
+impl Hasher for SimpleHasher {
+    fn write(&mut self, bytes: &[u8]) {
+        for byte in bytes {
+            self.state = self.state.wrapping_mul(31).wrapping_add(*byte as u64);
+        }
+    }
+    
+    fn finish(&self) -> u64 {
+        self.state
+    }
+}
+
+impl<K, V> SimpleHashMap<K, V>
+where
+    K: Eq + Hash + Clone,
+{
+    fn new() -> Self {
+        Self {
+            buckets: Vec::new(),
+        }
+    }
+
+    fn with_capacity(capacity: usize) -> Self {
+        let mut map = Self::new();
+        for _ in 0..capacity {
+            map.buckets.push(Vec::new());
+        }
+        map
+    }
+
+    fn hash_key(&self, key: &K) -> usize {
+        if self.buckets.is_empty() {
+            return 0;
+        }
+        let mut hasher = SimpleHasher::new();
+        key.hash(&mut hasher);
+        (hasher.finish() as usize) % self.buckets.len()
+    }
+
+    fn insert(&mut self, key: K, value: V) {
+        if self.buckets.is_empty() {
+            for _ in 0..16 {
+                self.buckets.push(Vec::new());
+            }
+        }
+        let hash = self.hash_key(&key);
+        for item in self.buckets[hash].iter_mut() {
+            if item.0 == key {
+                item.1 = value;
+                return;
+            }
+        }
+        self.buckets[hash].push((key, value));
+    }
+
+    fn get(&self, key: &K) -> Option<&V> {
+        if self.buckets.is_empty() {
+            return None;
+        }
+        let hash = self.hash_key(key);
+        for item in self.buckets[hash].iter() {
+            if item.0 == *key {
+                return Some(&item.1);
+            }
+        }
+        None
+    }
+
+    fn remove(&mut self, key: &K) -> Option<V> {
+        if self.buckets.is_empty() {
+            return None;
+        }
+        let hash = self.hash_key(key);
+        for i in 0..self.buckets[hash].len() {
+            if self.buckets[hash][i].0 == *key {
+                return Some(self.buckets[hash].remove(i).1);
+            }
+        }
+        None
+    }
+}
+
+type HashMap<K, V> = SimpleHashMap<K, V>;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -14,97 +207,6 @@ pub const PAGE_SIZE: usize = 4096;
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PoolType {
-    Paged,    // Swappable (virtual pages can be swapped out to disk)
-    NonPaged, // Always resident in physical memory (for critical drivers and ISRs)
-}
-
-#[derive(Debug, Clone)]
-pub struct PoolBlock {
-    pub addr: usize,
-    pub size: usize,
-    pub pool_type: PoolType,
-    pub tag: [u8; 4], // 4-character driver tag (standard Windows NT Pool Tag, e.g. "File")
-}
-
-pub struct KernelPoolManager {
-    pub paged_pool: Vec<PoolBlock>,
-    pub non_paged_pool: Vec<PoolBlock>,
-    pub total_paged_bytes: usize,
-    pub total_non_paged_bytes: usize,
-}
-
-impl KernelPoolManager {
-    pub fn new() -> Self {
-        Self {
-            paged_pool: Vec::new(),
-            non_paged_pool: Vec::new(),
-            total_paged_bytes: 0,
-            total_non_paged_bytes: 0,
-        }
-    }
-
-    /// Allocate a block from the specific kernel pool with a pool tag (Inspired by Windows NT ExAllocatePoolWithTag)
-    pub fn allocate_pool(&mut self, pool_type: PoolType, size: usize, tag: &[u8; 4]) -> Result<PoolBlock, &'static str> {
-        if size == 0 {
-            return Err("Cannot allocate 0-byte pool block");
-        }
-
-        // Emulate allocating pool virtual address range
-        let addr = match pool_type {
-            PoolType::Paged => 0xD000_0000 + self.total_paged_bytes,
-            PoolType::NonPaged => 0xF000_0000 + self.total_non_paged_bytes,
-        };
-
-        let block = PoolBlock {
-            addr,
-            size,
-            pool_type,
-            tag: *tag,
-        };
-
-        match pool_type {
-            PoolType::Paged => {
-                self.paged_pool.push(block.clone());
-                self.total_paged_bytes += size;
-            }
-            PoolType::NonPaged => {
-                self.non_paged_pool.push(block.clone());
-                self.total_non_paged_bytes += size;
-            }
-        }
-
-        println!(
-            "Windows NT Pool Alloc: Allocated {:?} pool block of {} bytes with tag '{}' at address 0x{:X}",
-            pool_type, size, core::str::from_utf8(tag).unwrap_or("????"), addr
-        );
-
-        Ok(block)
-    }
-
-    /// Free a block from the kernel pool (Inspired by Windows NT ExFreePool)
-    pub fn free_pool(&mut self, addr: usize) -> Result<(), &'static str> {
-        if let Some(pos) = self.paged_pool.iter().position(|b| b.addr == addr) {
-            let block = self.paged_pool.remove(pos);
-            self.total_paged_bytes -= block.size;
-            Ok(())
-        } else if let Some(pos) = self.non_paged_pool.iter().position(|b| b.addr == addr) {
-            let block = self.non_paged_pool.remove(pos);
-            self.total_non_paged_bytes -= block.size;
-            Ok(())
-        } else {
-            Err("Invalid pool address; double free or corruption detected")
-        }
-    }
-}
-
-impl Default for KernelPoolManager {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -504,6 +606,8 @@ impl VirtualMemoryManager {
         Self {
             root_directory,
             buddy_allocator: BuddyAllocator::new(),
+            page_ref_counts: HashMap::new(),
+            shadow_snapshots: HashMap::new(),
         }
     }
 
@@ -511,6 +615,8 @@ impl VirtualMemoryManager {
         Self {
             root_directory,
             buddy_allocator: allocator,
+            page_ref_counts: HashMap::new(),
+            shadow_snapshots: HashMap::new(),
         }
     }
 

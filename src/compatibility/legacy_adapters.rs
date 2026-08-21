@@ -2,29 +2,151 @@
 // Provides implementations for legacy personality adaptations, syscall translations,
 // and bridge structures as expected by the integration tests.
 
-use std::cell::Cell;
+#![no_std]
+
+use core::cell::Cell;
 
 /// Represents kernel personas supported for legacy environments
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KernelPersona {
-    Linux_6_x,
-    Linux_2_6,
+    Linux6X,
+    Linux2_6,
+}
+
+impl KernelPersona {
+    pub fn name(&self) -> &'static str {
+        match self {
+            KernelPersona::Linux6X => "linux_6_x",
+            KernelPersona::Linux2_6 => "linux_2_6",
+        }
+    }
+    
+    pub fn api_version(&self) -> u32 {
+        match self {
+            KernelPersona::Linux6X => 60000,
+            KernelPersona::Linux2_6 => 20006,
+        }
+    }
 }
 
 /// Multi-persona Virtual Machine for sandboxing old binaries
 pub struct KernelPersonaVM {
     pub current_persona: Cell<KernelPersona>,
+    pub syscall_table: SyscallTable,
+    pub personality_state: PersonalityState,
+}
+
+pub struct SyscallTable {
+    pub entries: [SyscallEntry; 512],
+}
+
+pub struct SyscallEntry {
+    pub number: u32,
+    pub handler: unsafe extern "C" fn(),
+    pub persona: KernelPersona,
+}
+
+pub struct PersonalityState {
+    pub uid: u32,
+    pub gid: u32,
+    pub personality: u32,
+    pub domainname: [u8; 64],
+    pub hostname: [u8; 64],
 }
 
 impl KernelPersonaVM {
     pub fn new() -> Self {
         Self {
-            current_persona: Cell::new(KernelPersona::Linux_6_x),
+            current_persona: Cell::new(KernelPersona::Linux6X),
+            syscall_table: SyscallTable::new(),
+            personality_state: PersonalityState::default(),
         }
     }
 
     pub fn hot_swap_persona(&self, persona: KernelPersona) {
         self.current_persona.set(persona);
+        self.update_syscall_table(persona);
+    }
+    
+    fn update_syscall_table(&self, persona: KernelPersona) {
+        // Update syscall table based on persona
+        match persona {
+            KernelPersona::Linux6X => self.setup_linux6x_syscalls(),
+            KernelPersona::Linux2_6 => self.setup_linux26_syscalls(),
+        }
+    }
+    
+    fn setup_linux6x_syscalls(&self) {
+        // Setup Linux 6.x syscall table
+    }
+    
+    fn setup_linux26_syscalls(&self) {
+        // Setup Linux 2.6 syscall table
+    }
+    
+    pub fn translate_syscall(&self, syscall: u32) -> u32 {
+        match self.current_persona.get() {
+            KernelPersona::Linux6X => self.translate_linux6x(syscall),
+            KernelPersona::Linux2_6 => self.translate_linux26(syscall),
+        }
+    }
+    
+    fn translate_linux6x(&self, syscall: u32) -> u32 {
+        // Direct mapping for modern syscalls
+        syscall
+    }
+    
+    fn translate_linux26(&self, syscall: u32) -> u32 {
+        // Map legacy syscalls to modern equivalents
+        match syscall {
+            1 => 100, // Example: exit -> sigma_exit
+            2 => 101, // fork -> sigma_fork
+            _ => syscall,
+        }
+    }
+}
+
+impl SyscallTable {
+    pub fn new() -> Self {
+        Self {
+            entries: [SyscallEntry::default(); 512],
+        }
+    }
+    
+    pub fn register(&mut self, entry: SyscallEntry) {
+        if entry.number < 512 {
+            self.entries[entry.number as usize] = entry;
+        }
+    }
+    
+    pub fn lookup(&self, number: u32) -> Option<&SyscallEntry> {
+        if number < 512 {
+            Some(&self.entries[number as usize])
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for SyscallEntry {
+    fn default() -> Self {
+        Self {
+            number: 0,
+            handler: unsafe { core::mem::transmute(0usize) },
+            persona: KernelPersona::Linux6X,
+        }
+    }
+}
+
+impl Default for PersonalityState {
+    fn default() -> Self {
+        Self {
+            uid: 0,
+            gid: 0,
+            personality: 0,
+            domainname: [0; 64],
+            hostname: [0; 64],
+        }
     }
 }
 
@@ -32,14 +154,15 @@ impl KernelPersonaVM {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LibcVersion {
     Libc5,
-    Glibc_2_5,
+    Glibc2_5,
 }
 
 /// Syscall Application Binary Interfaces
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SyscallAbi {
-    Oabi_32,
-    Eabi_32,
+    Oabi32,
+    Eabi32,
+    Eabi64,
 }
 
 /// Matrix that maps old libc calls to modern equivalents
