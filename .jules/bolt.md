@@ -35,3 +35,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-20 - Storing Cached Byte Lengths for Fixed-Size Log Buffers
 **Learning:** In fixed-size string/byte arrays (`[u8; 64]`, `[u8; 128]`, `[u8; 512]`), converting to string representations via `.position(|&b| b == 0)` causes $O(N)$ linear byte scans on every log message output, serialization, or network dispatch. Storing explicit length fields (`component_len`, `message_len`, `module_len`) during struct instantiation turns slice operations into instantaneous $O(1)$ lookups.
 **Action:** Store cached length fields alongside fixed-size buffer fields to avoid linear zero-byte scans during frequent display, formatting, or serialization routines.
+
+## 2026-08-21 - Caching Byte Lengths in User Authentication Structs
+**Learning:** In authentication and user management routines (`SimpleUser`), calling `User::username(&self)` repeatedly executed an $O(N)$ linear scan (`.position(|&b| b == 0)`) over 32 bytes on every username comparison and access. Caching `username_len: u8` during `SimpleUser::new()` instantiation reduces slice retrieval to an instantaneous $O(1)$ constant-time lookup `&self.username[..self.username_len as usize]`, eliminating linear scanning overhead in user authentication routines.
+**Action:** Store `username_len: u8` during struct creation when managing fixed-size username byte arrays to ensure $O(1)$ constant-time username slicing.

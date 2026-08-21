@@ -175,9 +175,6 @@ impl Default for AntiXControlCentre {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
 
 pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();
 pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();

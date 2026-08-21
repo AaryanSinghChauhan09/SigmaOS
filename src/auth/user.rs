@@ -25,7 +25,7 @@ pub enum AuthError { Success = 0, InvalidCredentials = 1, AccountLocked = 2 }
 pub struct SimpleUser {
     pub id: UserID,
     pub username: [u8; 32],
-    pub username_len: u8, // Cached byte length for O(1) username slice retrieval
+    pub username_len: u8, // Caches username length during creation for O(1) retrieval
     pub password_hash: [u8; 64],
     pub state: AtomicUsize,
 }
@@ -53,14 +53,8 @@ impl SimpleUser {
 impl User for SimpleUser {
     fn id(&self) -> UserID { self.id }
     fn username(&self) -> &[u8] {
-        // Fast path: return slice using cached username length in O(1) time
-        // fallback to position search if len is 0 or uninitialized
-        let len = if self.username_len > 0 {
-            self.username_len as usize
-        } else {
-            self.username.iter().position(|&b| b == 0).unwrap_or(32)
-        };
-        &self.username[..len]
+        // Fast O(1) constant-time slice retrieval using cached username length
+        &self.username[..self.username_len as usize]
     }
     fn state(&self) -> UserState {
         let val = self.state.load(Ordering::SeqCst);
@@ -235,6 +229,15 @@ extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_simple_user_username_and_authentication() {
+        let mut user = SimpleUser::new(100, b"alice", b"hash123");
+        assert_eq!(user.id(), 100);
+        assert_eq!(user.username(), b"alice");
+        assert_eq!(user.state(), UserState::Active);
+        assert!(user.authenticate(b"hash123").unwrap());
+    }
 
     #[test]
     fn test_single_user_runlevel_boot() {
