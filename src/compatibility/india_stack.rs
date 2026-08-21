@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// India Stack Integration Suite for SigmaOS
 /// Provides sovereign Indian technology stack features including Mock UPI Payments,
 /// GST Tax calculation engine, and Multilingual support for major Indic languages.

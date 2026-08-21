@@ -503,6 +503,8 @@ impl SimpleCompositor {
             window_order: Vec::new(),
             stats: CompositorStats::new(),
             capability,
+            back_buffer: None,
+            double_buffering: core::sync::atomic::AtomicBool::new(false),
         }
     }
 }
