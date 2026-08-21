@@ -1,7 +1,7 @@
 // SigmaOS Safe Win32 Compatibility Subsystem (SigmaWin)
 // Designed to parse, load, and manage legacy Win32 binaries securely on the sovereign transaction bus
 
-use klib::collections::HashMap;
+use std::collections::HashMap;
 
 /// Win32 processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,12 +31,6 @@ pub enum PeFormat {
 pub struct PeLoader {
     pub binary_format: PeFormat,
     pub entry_point_addr: u64,
-}
-
-impl Default for PeLoader {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl PeLoader {
@@ -69,6 +63,8 @@ impl PeLoader {
             return Err(Win32Error::InvalidPEHeader);
         }
 
+        // Parse Magic field to determine 32-bit vs 64-bit
+        // Magic offset relative to PE header offset is usually 24 (Optional Header starts at 24)
         let optional_header_offset = pe_offset + 24;
         if optional_header_offset + 2 >= raw_bytes.len() {
             return Err(Win32Error::InvalidPEHeader);
@@ -78,10 +74,10 @@ impl PeLoader {
             | ((raw_bytes[optional_header_offset + 1] as u16) << 8);
         match magic {
             0x10B => {
-                self.binary_format = PeFormat::Pe32;
+                self.binary_format = PeFormat::Pe32; // x86 32-bit magic
             }
             0x20B => {
-                self.binary_format = PeFormat::Pe32Plus;
+                self.binary_format = PeFormat::Pe32Plus; // x86_64 64-bit magic
             }
             _ => return Err(Win32Error::InvalidPEHeader),
         }
@@ -98,17 +94,12 @@ pub struct RegistryManager {
     pub keys: HashMap<String, String>,
 }
 
-impl Default for RegistryManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl RegistryManager {
     pub fn new() -> Self {
         let mut reg = RegistryManager {
             keys: HashMap::new(),
         };
+        // Seed default registry settings
         reg.set_key(
             "HKLM\\Software\\SigmaWin\\Version".to_string(),
             "1.0.0-LTS".to_string(),
@@ -138,12 +129,6 @@ pub enum Win32Message {
 
 pub struct User32MessageQueue {
     pub messages: Vec<Win32Message>,
-}
-
-impl Default for User32MessageQueue {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl User32MessageQueue {
@@ -181,9 +166,10 @@ mod tests {
         let mut bytes = vec![0u8; 256];
         bytes[0] = b'M';
         bytes[1] = b'Z';
-        bytes[0x3C] = 64;
+        bytes[0x3C] = 64; // PE header offset
         bytes[64] = b'P';
         bytes[65] = b'E';
+        // Optional header starts at 64 + 24 = 88. Magic value for PE32+ (0x20B)
         bytes[88] = 0x0B;
         bytes[89] = 0x02;
 

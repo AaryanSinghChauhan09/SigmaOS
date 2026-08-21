@@ -4,12 +4,12 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::boxed::Box;
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task, PID_MAX_LIMIT};
-use crate::filesystem::vfs::FsError;
+use crate::kernel::vfs::inode::FsError;
 
 pub struct RunQueue {
     pub cfs_rq: CfsRunQueue,
@@ -52,7 +52,6 @@ pub struct IdleRunQueue {
     pub nr_running: u32,
 }
 
-#[derive(Debug, Clone, Copy)]
 pub struct SchedEntity {
     pub pid: u64,
     pub vruntime: u64,
@@ -85,9 +84,8 @@ pub struct FairSchedClass;
 pub struct IdleSchedClass;
 
 impl SchedClass for StopSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.stop_rq.nr_running += 1;
-        rq.nr_running.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
     fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
@@ -121,10 +119,9 @@ impl SchedClass for StopSchedClass {
 }
 
 impl SchedClass for FairSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.cfs_rq.nr_running += 1;
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
-        task.state = ProcessState::Runnable;
         Ok(())
     }
     fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
@@ -223,9 +220,8 @@ impl SchedClass for DeadlineSchedClass {
     fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
-    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        self.dequeue_task(rq, task)?;
-        self.enqueue_task(rq, task)
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
     }
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
@@ -257,9 +253,8 @@ impl SchedClass for RealtimeSchedClass {
     fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
-    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        self.dequeue_task(rq, task)?;
-        self.enqueue_task(rq, task)
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
     }
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
@@ -325,7 +320,7 @@ pub struct Scheduler {
 
 impl Scheduler {
     pub fn new(num_cpus: u32) -> Self {
-        let mut s = Scheduler {
+        Scheduler {
             runqueues: (0..num_cpus)
                 .map(|i| RunQueue {
                     cfs_rq: CfsRunQueue {
@@ -336,7 +331,7 @@ impl Scheduler {
                         deadlines: Vec::new(),
                     },
                     rt_rq: RtRunQueue {
-                        active: core::array::from_fn(|_| Vec::new()),
+                        active: [Vec::new(); 140],
                         highest_prio: 140,
                         nr_running: 0,
                     },
@@ -358,16 +353,7 @@ impl Scheduler {
                 .collect(),
             current: vec![0; num_cpus as usize],
             sched_class: Vec::new(),
-        };
-
-        // Seed classes sequentially by scheduling priorities (Stop > DL > RT > Fair > Idle)
-        s.register_class(Box::new(StopSchedClass));
-        s.register_class(Box::new(DeadlineSchedClass));
-        s.register_class(Box::new(RealtimeSchedClass));
-        s.register_class(Box::new(FairSchedClass));
-        s.register_class(Box::new(IdleSchedClass));
-
-        s
+        }
     }
 
     pub fn register_class(&mut self, sched_class: Box<dyn SchedClass>) {
@@ -386,26 +372,7 @@ impl Scheduler {
         child
     }
 
-    /// Perform unified core scheduling action across classes
     pub fn schedule(&mut self) -> Option<u64> {
-        self.schedule_on_cpu(0)
-    }
-
-    /// Schedule next task on specific cpu_id
-    pub fn schedule_on_cpu(&mut self, cpu_id: u32) -> Option<u64> {
-        let cpu_idx = cpu_id as usize;
-        if cpu_idx >= self.runqueues.len() {
-            return None;
-        }
-
-        // Standard Linux scheduler loop querying classes sequentially by priority
-        for class in &self.sched_class {
-            if let Some(pid) = class.pick_next_task(&mut self.runqueues[cpu_idx]) {
-                self.current[cpu_idx] = pid;
-                return Some(pid);
-            }
-        }
-
         None
     }
 }

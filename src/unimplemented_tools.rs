@@ -1113,7 +1113,11 @@ impl PdfEditor {
         pdf_data
     }
 
-    pub fn split_pages(&mut self, start_page: usize, end_page: usize) -> Result<PdfEditor, &'static str> {
+    pub fn split_pages(
+        &mut self,
+        start_page: usize,
+        end_page: usize,
+    ) -> Result<PdfEditor, &'static str> {
         if start_page == 0 || end_page > self.page_count || start_page > end_page {
             return Err("Invalid page range specified");
         }

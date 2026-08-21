@@ -1,15 +1,9 @@
-pub mod alias_system;
+// SigmaOS Shell Module
 pub mod command;
-pub mod intelligent_terminal;
-pub mod kimi_code_agent;
-pub mod multicall;
 pub mod repl;
-pub mod sigma_sh;
-pub mod terminal_emulator;
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
-
-pub use command::ShellCommand;
-pub use repl::ShellRepl;
+pub use command::{CommandError, ShellSession, SimpleShellSession};
+pub use repl::{ShellCommand, ShellRepl};
+pub use terminal_emulator::{
+    AnsiColor, AutoSuggestionEngine, TerminalSession, UserDefinedFunction,
+};

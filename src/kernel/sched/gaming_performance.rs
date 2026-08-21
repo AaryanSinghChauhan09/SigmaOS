@@ -1,8 +1,7 @@
 //! Gaming Performance & Advanced Distro SMP Extensions for SigmaOS
 //! Inspired by SteamOS GameMode, Pop!_OS System76 Scheduler, CachyOS UKSM, and DragonFly BSD LWKT.
 
-extern crate alloc;
-use alloc::vec::Vec;
+use crate::klib::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 /// CPU Power Governor Profiles for Dynamic Performance Switching
@@ -83,6 +82,7 @@ impl SovereignGameMode {
 }
 
 /// Lightweight Kernel Thread (LWKT) Message (DragonFly BSD LWKT inspired)
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub fn calculate_fnv1a(data: &[u8]) -> u64 {
     let mut hash: u64 = 0xcbf29ce484222325;
     for &byte in data {

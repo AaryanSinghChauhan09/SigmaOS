@@ -1,22 +1,4 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,7 +20,7 @@ pub struct RegistryValue {
 #[derive(Debug, Clone)]
 pub struct WindowsRegistry {
     pub hive_name: String,
-    pub database: BTreeMap<String, BTreeMap<String, RegistryValue>>, // Key path -> (Value Name -> RegistryValue)
+    pub database: HashMap<String, HashMap<String, RegistryValue>>, // Key path -> (Value Name -> RegistryValue)
     pub transaction_log: Vec<String>,
 }
 
@@ -46,7 +28,7 @@ impl WindowsRegistry {
     pub fn new(hive_name: &str) -> Self {
         Self {
             hive_name: hive_name.to_string(),
-            database: BTreeMap::new(),
+            database: HashMap::new(),
             transaction_log: Vec::new(),
         }
     }
@@ -64,7 +46,7 @@ impl WindowsRegistry {
         let values = self
             .database
             .entry(key_str.clone())
-            .or_insert_with(BTreeMap::new);
+            .or_insert_with(HashMap::new);
         values.insert(
             val_str.clone(),
             RegistryValue {
@@ -87,7 +69,7 @@ impl WindowsRegistry {
 }
 
 /// Simulates Win32 GDI drawing objects (pen, brush, font)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum GdiObjectType {
     Pen,
     Brush,
@@ -97,16 +79,15 @@ pub enum GdiObjectType {
 /// Simulates a Win32 Device Context (DC) and object binding (GDI compatibility layer)
 #[derive(Debug, Clone)]
 pub struct Win32Gdi {
-    pub active_objects: BTreeMap<GdiObjectType, u32>, // type -> handle ID
+    pub active_objects: HashMap<GdiObjectType, u32>, // type -> handle ID
     pub current_color: u32,
     pub commands_executed: Vec<String>,
 }
 
 impl Win32Gdi {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            active_objects: BTreeMap::new(),
+            active_objects: HashMap::new(),
             current_color: 0x00000000,
             commands_executed: Vec::new(),
         }
@@ -142,7 +123,7 @@ impl Default for Win32Gdi {
 #[derive(Debug, Clone)]
 pub struct DllModule {
     pub name: String,
-    pub exported_symbols: BTreeMap<String, u64>, // Symbol Name -> virtual address offset
+    pub exported_symbols: HashMap<String, u64>, // Symbol Name -> virtual address offset
     pub is_loaded: bool,
     pub dll_main_called: bool,
 }
@@ -151,7 +132,7 @@ impl DllModule {
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
-            exported_symbols: BTreeMap::new(),
+            exported_symbols: HashMap::new(),
             is_loaded: false,
             dll_main_called: false,
         }
@@ -165,14 +146,13 @@ impl DllModule {
 /// Dynamic Link Library (DLL) loader (Windows ABI compatibility)
 #[derive(Debug, Clone)]
 pub struct DllLoader {
-    pub loaded_dlls: BTreeMap<String, DllModule>,
+    pub loaded_dlls: HashMap<String, DllModule>,
 }
 
 impl DllLoader {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            loaded_dlls: BTreeMap::new(),
+            loaded_dlls: HashMap::new(),
         }
     }
 
@@ -227,7 +207,6 @@ pub struct PosixTranslation {
 }
 
 impl PosixTranslation {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             translation_log: Vec::new(),
@@ -391,7 +370,10 @@ impl GeomTopology {
 
     /// Attaches a consumer layer to a provider to stack virtualization
     pub fn attach_consumer(&mut self, consumer: GeomConsumer) -> Result<(), &'static str> {
-        if !self.providers.contains_key(&consumer.attached_provider_name) {
+        if !self
+            .providers
+            .contains_key(&consumer.attached_provider_name)
+        {
             return Err("GEOM: Target provider not found in active topology");
         }
         self.consumers.push(consumer);
@@ -400,7 +382,9 @@ impl GeomTopology {
 
     /// Checks if a provider has any attached consumers (stacked layering)
     pub fn is_provider_stacked(&self, provider_name: &str) -> bool {
-        self.consumers.iter().any(|c| c.attached_provider_name == provider_name)
+        self.consumers
+            .iter()
+            .any(|c| c.attached_provider_name == provider_name)
     }
 }
 

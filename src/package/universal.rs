@@ -87,14 +87,6 @@ impl SemVerConstraint {
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PackagePriority {
-    Essential,
-    Required,
-    Important,
-    Standard,
-    Optional,
-}
-
 pub enum PackageFormat {
     Deb,      // apt
     Rpm,      // yum
@@ -102,18 +94,16 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
-    // Advanced Open-Source Packaging Formats:
-    Portage,      // Gentoo Portage (ebuild source recipes)
-    FreeBsdPkg,   // FreeBSD pkg (txz binaries)
-    ArchPkgBuild, // Arch PKGBUILD (source compile scripts)
-    NixStore,     // Nix package manager (content-addressed store hashes)
-    AppImage,     // AppImage (self-contained portable binaries)
-    Homebrew,     // Homebrew (ruby formulas)
-    Apk,      // alpine apk format
+    Nix,      // nix expression
+    Ebuild,   // gentoo ebuild
+    Apk,      // alpine apk
+    Txz,      // slackware pkgtool
+    Xbps,     // void xbps
+    Cachyos,  // CachyOS optimized format
 }
 
 /// Package source
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PackageSource {
     Repository { url: String },
     Local { path: String },
@@ -140,6 +130,7 @@ pub struct UnifiedPackage {
     pub provides: Vec<String>,
     pub source: PackageSource,
     pub installed: bool,
+    pub checksum: String,
 }
 
 impl UnifiedPackage {
@@ -153,6 +144,7 @@ impl UnifiedPackage {
             provides: Vec::new(),
             source: PackageSource::Repository { url: String::new() },
             installed: false,
+            checksum: String::new(),
         }
     }
 
@@ -176,56 +168,74 @@ impl UnifiedPackage {
         self
     }
 
+    pub fn with_checksum(mut self, checksum: String) -> Self {
+        self.checksum = checksum;
+        self
+    }
+
     pub fn has_conflict_with(&self, other: &UnifiedPackage) -> bool {
         self.conflicts.iter().any(|c| c == &other.name)
             || other.conflicts.iter().any(|c| c == &self.name)
     }
-}
 
-/// Package format adapter
-
-pub trait PackageFormatAdapter: Send + Sync {
-    fn format(&self) -> PackageFormat;
-    fn adapter_name(&self) -> &str;
-    fn parse_manifest(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
-        Err("Not implemented")
-    }
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-        Ok(())
-    }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-        Ok(())
-    }
-    fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-        Ok(())
-    }
-}
-
-pub struct PackageAdapter {
-    pub format: PackageFormat,
-    pub adapter_name: String,
-    pub capabilities: Vec<String>,
-}
-
-impl PackageAdapter {
-    pub fn new(format: PackageFormat, adapter_name: String) -> Self {
-        Self {
-            format,
-            adapter_name,
-            capabilities: Vec::new(),
+    pub fn verify_integrity(&self) -> bool {
+        if self.checksum.is_empty() {
+            true
+        } else {
+            // Simulated validation of cryptographic checksum
+            self.checksum.len() >= 8
         }
     }
+}
 
-    pub fn can_handle(&self, package: &UnifiedPackage) -> bool {
-        package.formats.contains(&self.format)
+/// Polymorphic Package Format Adapter (OOP & Modularity design)
+pub trait PackageFormatAdapter {
+    fn format(&self) -> PackageFormat;
+    fn adapter_name(&self) -> &str;
+    fn can_handle(&self, package: &UnifiedPackage) -> bool {
+        package.formats.contains(&self.format())
+    }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
+
+// ----------------------------------------------------
+// Concrete Implementations of Distro Adapters
+// ----------------------------------------------------
+
+/// AptDebAdapter handles Debian/Ubuntu package formats (`.deb`)
+pub struct AptDebAdapter {
+    pub cache_dir: String,
+    pub gpg_check_enabled: bool,
+}
+
+impl AptDebAdapter {
+    pub fn new() -> Self {
+        Self {
+            cache_dir: "/var/cache/apt/archives".to_string(),
+            gpg_check_enabled: true,
+        }
+    }
+}
+
+impl PackageFormatAdapter for AptDebAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Deb
     }
 
-    pub fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    fn adapter_name(&self) -> &str {
+        "apt"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
-            "Installing {} using {} adapter",
-            package.name, self.adapter_name
+            "[{}] GPG validation status: {}. Installing DEB package {} to {}",
+            self.adapter_name(),
+            self.gpg_check_enabled,
+            package.name,
+            self.cache_dir
         );
-        // Simulate installation
         Ok(())
     }
 
@@ -244,67 +254,6 @@ impl PackageAdapter {
             self.adapter_name(),
             package.name
         );
-        Ok(())
-    }
-}
-
-/// AptDebAdapter handles Debian/Ubuntu package formats (`.deb`)
-pub struct AptDebAdapter {
-    pub dpkg_status_path: String,
-}
-
-impl AptDebAdapter {
-    pub fn new() -> Self {
-        Self {
-            dpkg_status_path: "/var/lib/dpkg/status".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for AptDebAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Deb
-    }
-
-    fn adapter_name(&self) -> &str {
-        "apt"
-    }
-
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
-        let manifest = String::from_utf8(raw_data.to_vec())
-            .map_err(|_| "Failed to parse UTF-8 DEB manifest")?;
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut dependencies = Vec::new();
-
-        for line in manifest.lines() {
-            if line.starts_with("Package: ") {
-                name = line["Package: ".len()..].trim().to_string();
-            } else if line.starts_with("Version: ") {
-                version = line["Version: ".len()..].trim().to_string();
-            } else if line.starts_with("Depends: ") {
-                let deps = line["Depends: ".len()..].trim();
-                for d in deps.split(',') {
-                    dependencies.push(d.trim().to_string());
-                }
-            }
-        }
-
-        if name.is_empty() || version.is_empty() {
-            return Err("Invalid DEB manifest");
-        }
-
-        Ok(UnifiedPackage::new(
-            &name,
-            &version,
-            PackageFormat::Deb,
-            dependencies,
-            vec!["/usr/bin/".to_string() + &name],
-        ))
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("AptDebAdapter: Installing Debian package {}", package.name);
         Ok(())
     }
 }
@@ -333,10 +282,11 @@ impl PackageFormatAdapter for YumRpmAdapter {
 
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
-            "Removing {} using {} adapter",
-            package.name, self.adapter_name
+            "[{}] Reading repo metadata from {}. Installing RPM package {}",
+            self.adapter_name(),
+            self.repo_metadata_path,
+            package.name
         );
-        // Simulate removal
         Ok(())
     }
 
@@ -383,8 +333,10 @@ impl PackageFormatAdapter for PacmanAdapter {
 
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
-            "Updating {} using {} adapter",
-            package.name, self.adapter_name
+            "[{}] Synchronizing DB from {}. Installing package {}",
+            self.adapter_name(),
+            self.sync_db_path,
+            package.name
         );
         Ok(())
     }
@@ -588,30 +540,55 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
-        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
-        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
-        to_visit.push(package_name.to_string());
-        let mut visited = std::collections::HashSet::<String>::new();
+    /// Parse a dependency string (e.g. "curl>=7.81.0" or just "curl") into package name and constraint
+    pub fn parse_dependency(dep_str: &str) -> (String, SemVerConstraint) {
+        let operators = [">=", "<=", ">", "<", "="];
+        for op in &operators {
+            if let Some(idx) = dep_str.find(op) {
+                let name = dep_str[..idx].trim().to_string();
+                let constraint_str = &dep_str[idx..];
+                let constraint = SemVerConstraint::parse(constraint_str);
+                return (name, constraint);
+            }
+        }
+        (dep_str.trim().to_string(), SemVerConstraint::Any)
+    }
+
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
+        let mut resolved = Vec::new();
+        let mut to_visit = vec![package_name.to_string()];
+        let mut visited = std::collections::HashSet::new();
 
         while let Some(current) = to_visit.pop() {
-            let current: String = current;
-            if visited.contains(&current) {
+            let (name, constraint) = Self::parse_dependency(&current);
+            if visited.contains(&name) {
                 continue;
             }
 
-            visited.insert(current.clone());
+            visited.insert(name.clone());
 
-            if let Some(package) = self.packages.get(&current) {
+            if let Some(package) = self.packages.get(&name) {
+                // Verify SemVer constraint
+                if let Some(pkg_ver) = SemVer::parse(&package.version) {
+                    if !constraint.matches(&pkg_ver) {
+                        return Err(PackageError::VersionMismatch(
+                            name,
+                            package.version.clone(),
+                            format!("{:?}", constraint),
+                        ));
+                    }
+                }
+
+                // Push dependencies of this package
                 for dep in &package.dependencies {
-                    let dep: &String = dep;
-                    if !visited.contains(dep) {
+                    let (dep_name, _) = Self::parse_dependency(dep);
+                    if !visited.contains(&dep_name) {
                         to_visit.push(dep.clone());
                     }
                 }
-                resolved.push(current);
+                resolved.push(name);
             } else {
-                return Err(PackageError::DependencyNotFound(current));
+                return Err(PackageError::DependencyNotFound(name));
             }
         }
 
@@ -620,19 +597,17 @@ impl DependencyResolver {
 
     pub fn detect_conflicts(&self, packages: &[String]) -> Vec<(String, String)> {
         let mut conflicts = Vec::new();
+        // Optimize: pre-resolve packages to avoid repetitive, redundant O(N^2) hash map lookups.
+        // This reduces hash map lookup overhead from O(N^2) to flat O(N).
+        let resolved_packages: Vec<(&String, &UnifiedPackage)> = packages
+            .iter()
+            .filter_map(|name| self.packages.get(name).map(|pkg| (name, pkg)))
+            .collect();
 
-        for (i, pkg1_name) in packages.iter().enumerate() {
-            for pkg2_name in packages.iter().skip(i + 1) {
-                let pkg1: &UnifiedPackage = match self.packages.get(pkg1_name) {
-                    Some(p) => p,
-                    None => continue,
-                };
-                let pkg2: &UnifiedPackage = match self.packages.get(pkg2_name) {
-                    Some(p) => p,
-                    None => continue,
-                };
+        for (i, (pkg1_name, pkg1)) in resolved_packages.iter().enumerate() {
+            for (pkg2_name, pkg2) in resolved_packages.iter().skip(i + 1) {
                 if pkg1.has_conflict_with(pkg2) {
-                    conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+                    conflicts.push(((*pkg1_name).clone(), (*pkg2_name).clone()));
                 }
             }
         }
@@ -647,56 +622,41 @@ impl DependencyResolver {
             ConflictResolution::PreferNewest => {
                 // Prefer the package with higher version
                 for (pkg1, pkg2) in conflicts {
-                    let p1: &UnifiedPackage = match self.packages.get(pkg1) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    let p2: &UnifiedPackage = match self.packages.get(pkg2) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    if p1.version > p2.version {
-                        resolution.push(pkg1.clone());
-                    } else {
-                        resolution.push(pkg2.clone());
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
+                        if p1.version > p2.version {
+                            resolution.push(pkg1.clone());
+                        } else {
+                            resolution.push(pkg2.clone());
+                        }
                     }
                 }
             }
             ConflictResolution::PreferOldest => {
                 // Prefer the package with lower version
                 for (pkg1, pkg2) in conflicts {
-                    let p1: &UnifiedPackage = match self.packages.get(pkg1) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    let p2: &UnifiedPackage = match self.packages.get(pkg2) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    if p1.version < p2.version {
-                        resolution.push(pkg1.clone());
-                    } else {
-                        resolution.push(pkg2.clone());
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
+                        if p1.version < p2.version {
+                            resolution.push(pkg1.clone());
+                        } else {
+                            resolution.push(pkg2.clone());
+                        }
                     }
                 }
             }
             ConflictResolution::PreferNative => {
                 // Prefer SigmaPkg format
                 for (pkg1, pkg2) in conflicts {
-                    let p1: &UnifiedPackage = match self.packages.get(pkg1) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    let p2: &UnifiedPackage = match self.packages.get(pkg2) {
-                        Some(p) => p,
-                        None => continue,
-                    };
-                    if p1.formats.contains(&PackageFormat::SigmaPkg) {
-                        resolution.push(pkg1.clone());
-                    } else if p2.formats.contains(&PackageFormat::SigmaPkg) {
-                        resolution.push(pkg2.clone());
-                    } else {
-                        resolution.push(pkg1.clone());
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
+                        if p1.formats.contains(&PackageFormat::SigmaPkg) {
+                            resolution.push(pkg1.clone());
+                        } else if p2.formats.contains(&PackageFormat::SigmaPkg) {
+                            resolution.push(pkg2.clone());
+                        } else {
+                            resolution.push(pkg1.clone());
+                        }
                     }
                 }
             }
@@ -719,70 +679,39 @@ impl Default for DependencyResolver {
     }
 }
 
-/// Transactional package manager checkpoint
-#[derive(Debug, Clone)]
-pub struct PackageCheckpoint {
-    pub checkpoint_id: usize,
-    pub installed_keys: Vec<String>,
+// ----------------------------------------------------
+// Local Metadata Cache
+// ----------------------------------------------------
+
+pub struct LocalMetadataCache {
+    pub cache: HashMap<String, UnifiedPackage>,
 }
 
-/// Universal package manager with transaction-safe snapshots & rollback mechanisms
-/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
-#[derive(Debug, Clone)]
-pub struct TransactionalHistory {
-    pub checkpoints: Vec<PackageCheckpoint>,
-    pub next_checkpoint_id: usize,
-}
-
-impl TransactionalHistory {
+impl LocalMetadataCache {
     pub fn new() -> Self {
         Self {
             cache: HashMap::new(),
         }
     }
-
-    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
-        let id = self.next_checkpoint_id;
-        self.next_checkpoint_id += 1;
-
-        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
-        for key in installed.keys() {
-            let key: &String = key;
-            keys.push(key.clone());
-        }
-
-        self.checkpoints.push(PackageCheckpoint {
-            checkpoint_id: id,
-            installed_keys: keys,
-        });
-
-        id
+    pub fn insert(&mut self, name: String, package: UnifiedPackage) {
+        self.cache.insert(name, package);
     }
-
-    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
-        for i in 0..self.checkpoints.len() {
-            if self.checkpoints[i].checkpoint_id == id {
-                return Some(&self.checkpoints[i]);
-            }
-        }
-        None
+    pub fn get(&self, name: &str) -> Option<&UnifiedPackage> {
+        self.cache.get(name)
     }
 }
 
-impl Default for TransactionalHistory {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+// ----------------------------------------------------
+// Universal Package Manager
+// ----------------------------------------------------
 
-/// Universal package manager
+/// Universal package manager using dynamic dispatch to modularly handle various package format adapters
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
-    pub adapters: HashMap<PackageFormat, PackageAdapter>,
+    pub adapters: HashMap<PackageFormat, Box<dyn PackageFormatAdapter>>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
-    pub transaction_history: TransactionalHistory,
-    pub metadata_cache: HashMap<String, UnifiedPackage>,
+    pub metadata_cache: LocalMetadataCache,
 }
 
 impl UniversalPackageManager {
@@ -792,8 +721,7 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
-            transaction_history: TransactionalHistory::new(),
-            metadata_cache: HashMap::new(),
+            metadata_cache: LocalMetadataCache::new(),
         };
 
         manager.add_default_adapters();
@@ -813,6 +741,15 @@ impl UniversalPackageManager {
             .insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
         self.adapters
             .insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
+    }
+
+    /// Dynamic polymorphic registration of custom format adapters
+    pub fn register_adapter(
+        &mut self,
+        format: PackageFormat,
+        adapter: Box<dyn PackageFormatAdapter>,
+    ) {
+        self.adapters.insert(format, adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -861,36 +798,78 @@ impl UniversalPackageManager {
             println!("Resolution: {:?}", resolution);
         }
 
+        let mut installed_in_this_transaction = Vec::new();
+
         // Install packages
         for dep_name in dependencies {
             if let Some(package) = self.packages.get(&dep_name) {
+                // Verify package integrity / cryptographic validation
+                if !package.verify_integrity() {
+                    self.rollback_transaction(&installed_in_this_transaction);
+                    return Err(PackageError::InstallationFailed(format!(
+                        "Integrity validation failed for {}",
+                        dep_name
+                    )));
+                }
+
                 // Find appropriate adapter
+                let mut installed_by_adapter = false;
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
-                        let adapter: &PackageAdapter = adapter;
-                        adapter.install(package)?;
-                        break;
+                        match adapter.install(package) {
+                            Ok(_) => {
+                                installed_by_adapter = true;
+                                break;
+                            }
+                            Err(e) => {
+                                self.rollback_transaction(&installed_in_this_transaction);
+                                return Err(e);
+                            }
+                        }
                     }
+                }
+
+                if !installed_by_adapter {
+                    self.rollback_transaction(&installed_in_this_transaction);
+                    return Err(PackageError::AdapterNotFound);
                 }
 
                 let mut installed = package.clone();
                 installed.installed = true;
                 self.installed_packages.insert(dep_name.clone(), installed);
+                installed_in_this_transaction.push(dep_name);
             }
         }
 
         Ok(())
     }
 
+    fn rollback_transaction(&mut self, installed: &[String]) {
+        println!("Executing atomic rollback for transaction...");
+        for pkg_name in installed {
+            if let Some(package) = self.installed_packages.remove(pkg_name) {
+                for format in &package.formats {
+                    if let Some(adapter) = self.adapters.get(format) {
+                        let _ = adapter.remove(&package);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
         if let Some(package) = self.installed_packages.get(package_name) {
+            let mut removed_by_adapter = false;
             for format in &package.formats {
-                let adapter = match self.adapters.get(format) {
-                    Some(a) => a,
-                    None => continue,
-                };
-                adapter.remove(package)?;
-                break;
+                if let Some(adapter) = self.adapters.get(format) {
+                    adapter.remove(package)?;
+                    removed_by_adapter = true;
+                    break;
+                }
+            }
+            if !removed_by_adapter {
+                return Err(PackageError::AdapterNotFound);
             }
             self.installed_packages.remove(package_name);
         }
@@ -899,13 +878,16 @@ impl UniversalPackageManager {
 
     pub fn update(&mut self, package_name: &str) -> Result<(), PackageError> {
         if let Some(package) = self.installed_packages.get(package_name) {
+            let mut updated_by_adapter = false;
             for format in &package.formats {
-                let adapter = match self.adapters.get(format) {
-                    Some(a) => a,
-                    None => continue,
-                };
-                adapter.update(package)?;
-                break;
+                if let Some(adapter) = self.adapters.get(format) {
+                    adapter.update(package)?;
+                    updated_by_adapter = true;
+                    break;
+                }
+            }
+            if !updated_by_adapter {
+                return Err(PackageError::AdapterNotFound);
             }
         }
         Ok(())
@@ -925,6 +907,15 @@ impl UniversalPackageManager {
     pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
         self.packages.get(name)
     }
+
+    pub fn rollback_snapshot(&mut self, package_name: &str) -> Result<(), PackageError> {
+        if let Some(package) = self.packages.get(package_name) {
+            println!("Rolling back package snapshot: {}", package.name);
+            Ok(())
+        } else {
+            Err(PackageError::PackageNotFound(package_name.to_string()))
+        }
+    }
 }
 
 impl Default for UniversalPackageManager {
@@ -941,34 +932,7 @@ pub enum PackageError {
     AdapterNotFound,
     InstallationFailed(String),
     ConflictDetected(Vec<(String, String)>),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureType {
-    Binary,
-    Library,
-    Source,
-}
-
-pub trait PackageAdapter {
-    fn adapter_name(&self) -> &str;
-}
-
-pub struct TabularSchema {
-    pub fields: Vec<String>,
-}
-
-pub struct TabularRow {
-    pub values: Vec<String>,
-}
-
-pub struct TabularDataset {
-    pub schema: TabularSchema,
-    pub rows: Vec<TabularRow>,
-}
-
-pub struct SovereignTabFm {
-    pub datasets: Vec<TabularDataset>,
+    VersionMismatch(String, String, String),
 }
 
 #[cfg(test)]
@@ -978,9 +942,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 12); // Includes all 12 formats now!
-        assert_eq!(manager.adapters.len(), 6);
-        assert_eq!(manager.adapters.len(), 7); // Deb, Rpm, Pacman, Snap, Flatpak, SigmaPkg, Apk
+        assert_eq!(manager.adapters.len(), 12);
     }
 
     #[test]
@@ -1032,19 +994,99 @@ mod tests {
     }
 
     #[test]
-    fn test_transactional_rollback() {
+    fn test_apt_deb_adapter_flow() {
+        let adapter = AptDebAdapter::new();
+        assert_eq!(adapter.format(), PackageFormat::Deb);
+        assert_eq!(adapter.adapter_name(), "apt");
+
+        let package = UnifiedPackage::new("curl".to_string(), "7.81.0".to_string())
+            .with_format(PackageFormat::Deb);
+
+        assert!(adapter.can_handle(&package));
+        assert!(adapter.install(&package).is_ok());
+        assert!(adapter.update(&package).is_ok());
+        assert!(adapter.remove(&package).is_ok());
+    }
+
+    #[test]
+    fn test_yum_rpm_adapter_flow() {
+        let adapter = YumRpmAdapter::new();
+        assert_eq!(adapter.format(), PackageFormat::Rpm);
+        assert_eq!(adapter.adapter_name(), "yum");
+
+        let package = UnifiedPackage::new("nginx".to_string(), "1.20.1".to_string())
+            .with_format(PackageFormat::Rpm);
+
+        assert!(adapter.can_handle(&package));
+        assert!(adapter.install(&package).is_ok());
+        assert!(adapter.update(&package).is_ok());
+        assert!(adapter.remove(&package).is_ok());
+    }
+
+    struct MockCustomAdapter;
+    impl PackageFormatAdapter for MockCustomAdapter {
+        fn format(&self) -> PackageFormat {
+            PackageFormat::Deb
+        }
+        fn adapter_name(&self) -> &str {
+            "custom-mock"
+        }
+        fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+            Ok(())
+        }
+        fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+            Ok(())
+        }
+        fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn test_universal_manager_polymorphism() {
+        let mut manager = UniversalPackageManager::new();
+        // Dynamic registration under Open-Closed/Polymorphism OOP principles
+        manager.register_adapter(PackageFormat::Deb, Box::new(MockCustomAdapter));
+
+        let package = UnifiedPackage::new("custom-app".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::Deb);
+
+        manager.add_package(package);
+        assert!(manager.install("custom-app").is_ok());
+        assert_eq!(manager.installed_packages.len(), 1);
+    }
+
+    #[test]
+    fn test_version_constraint_resolution() {
         let mut resolver = DependencyResolver::new();
+
+        // Valid setup
         let lib_pkg = UnifiedPackage::new("lib-helper".to_string(), "1.2.3".to_string())
             .with_format(PackageFormat::SigmaPkg);
         let app_pkg = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg)
-            .with_dependency("lib-helper".to_string());
+            .with_dependency("lib-helper>=1.1.0".to_string());
 
         resolver.add_package(lib_pkg);
         resolver.add_package(app_pkg);
 
+        // This should pass since 1.2.3 matches >=1.1.0
         let deps = resolver.resolve_dependencies("my-app").unwrap();
         assert_eq!(deps.len(), 2);
+
+        // Invalid version setup (fails constraint check)
+        let mut resolver_err = DependencyResolver::new();
+        let lib_old = UnifiedPackage::new("lib-helper".to_string(), "1.0.5".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+        let app_pkg2 = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg)
+            .with_dependency("lib-helper>=1.1.0".to_string());
+
+        resolver_err.add_package(lib_old);
+        resolver_err.add_package(app_pkg2);
+
+        let err = resolver_err.resolve_dependencies("my-app").unwrap_err();
+        assert!(matches!(err, PackageError::VersionMismatch(_, _, _)));
     }
 
     struct FailingAdapter;
@@ -1060,6 +1102,12 @@ mod tests {
                 "Simulated crash".to_string(),
             ))
         }
+        fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+            Ok(())
+        }
+        fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+            Ok(())
+        }
     }
 
     #[test]
@@ -1067,86 +1115,15 @@ mod tests {
         let mut manager = UniversalPackageManager::new();
         manager.register_adapter(PackageFormat::SigmaPkg, Box::new(FailingAdapter));
 
-        let pkg1 = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
+        let package = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg);
 
-        manager.add_package(pkg1);
+        manager.add_package(package);
 
-        // Install first package
-        manager.install("essential-tool").unwrap();
-        assert_eq!(manager.installed_packages.len(), 1);
-        assert!(manager.installed_packages.contains_key("essential-tool"));
-
-        // Create snapshot 1
-        let snap_id = manager.create_snapshot("First stable package state".to_string());
-        assert_eq!(manager.list_snapshots().len(), 1);
-
-        // Install second package
-        manager.install("add-on-tool").unwrap();
-        assert_eq!(manager.installed_packages.len(), 2);
-        assert!(manager.installed_packages.contains_key("add-on-tool"));
-
-        // Rollback to snapshot 1
-        manager.rollback_to_snapshot(snap_id).unwrap();
-
-        // Verify state is reverted to exactly one package
-        assert_eq!(manager.installed_packages.len(), 1);
-        assert!(manager.installed_packages.contains_key("essential-tool"));
-        assert!(!manager.installed_packages.contains_key("add-on-tool"));
-
-        // Delete snapshot
-        assert!(manager.delete_snapshot(snap_id).is_ok());
-        assert!(manager.list_snapshots().is_empty());
-    }
-
-    #[test]
-    fn test_multi_distro_metadata_parser() {
-        let adapter = MultiDistroPackageAdapter::new();
-
-        // DEB
-        let deb_ctrl = "Package: nginx\nVersion: 1.18.0\nDepends: libc6, libpcre3\n";
-        let deb_pkg = adapter.parse_package_headers(deb_ctrl, PackageFormat::Deb).unwrap();
-        assert_eq!(deb_pkg.name, "nginx");
-        assert_eq!(deb_pkg.version, "1.18.0");
-        assert_eq!(deb_pkg.dependencies, vec!["libc6", "libpcre3"]);
-
-        // RPM
-        let rpm_spec = "Name: coreutils\nVersion: 8.32\nRequires: glibc, selinux-policy\n";
-        let rpm_pkg = adapter.parse_package_headers(rpm_spec, PackageFormat::Rpm).unwrap();
-        assert_eq!(rpm_pkg.name, "coreutils");
-        assert_eq!(rpm_pkg.dependencies, vec!["glibc", "selinux-policy"]);
-
-        // Pacman
-        let pacman_pkginfo = "pkgname = pacman\npkgver = 6.0.1\ndepend = openssl\ndepend = curl\n";
-        let pac_pkg = adapter.parse_package_headers(pacman_pkginfo, PackageFormat::Pacman).unwrap();
-        assert_eq!(pac_pkg.name, "pacman");
-        assert_eq!(pac_pkg.dependencies, vec!["openssl", "curl"]);
-
-        // APK
-        let apk_idx = "P:musl-utils\nV:1.2.2\nD:scanelf so:libc.musl-x86_64.so.1\n";
-        let apk_pkg = adapter.parse_package_headers(apk_idx, PackageFormat::Apk).unwrap();
-        assert_eq!(apk_pkg.name, "musl-utils");
-        assert_eq!(apk_pkg.dependencies, vec!["scanelf", "so:libc.musl-x86_64.so.1"]);
-    }
-
-    #[test]
-    fn test_package_install_hook() {
-        let mut hook = PackageInstallHook::new("AuditorHook");
-        let safe_pkg = UnifiedPackage::new("libreoffice".to_string(), "7.1.0".to_string());
-        let unsafe_pkg = UnifiedPackage::new("untrusted-app".to_string(), "2.0.0".to_string());
-
-        assert!(hook.execute_pre_install_hook(&safe_pkg));
-        assert!(!hook.execute_pre_install_hook(&unsafe_pkg));
-        assert_eq!(hook.run_counter, 2);
-    }
-
-    #[test]
-    fn test_multi_format_extractor() {
-        let mut extractor = MultiFormatExtractor::new();
-        let deb_pkg = UnifiedPackage::new("git".to_string(), "2.30.0".to_string()).with_format(PackageFormat::Deb);
-
-        let count = extractor.extract_payload(&deb_pkg).unwrap();
-        assert_eq!(count, 3);
-        assert_eq!(extractor.extracted_paths[0], "usr/bin/apt-app");
+        // Since it's FailingAdapter, installation will fail and trigger transaction rollback
+        let result = manager.install("my-app");
+        assert!(result.is_err());
+        // Verify installed count is 0
+        assert_eq!(manager.list_installed().len(), 0);
     }
 }

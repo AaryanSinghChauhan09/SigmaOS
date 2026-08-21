@@ -1,10 +1,11 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
 /// Enhanced with Debian Linux style DNS resolv.conf and /etc/hosts resolution engine.
-use crate::klib::{HashMap, Vec};
-use alloc::string::{String, ToString};
+use std::collections::HashMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ── Address Families & Socket Types ──────────────────────────────────────
 
@@ -194,10 +195,6 @@ impl Socket {
         if self.state != SocketState::Connected {
             return Err("Not connected");
         }
-        let avail = self.send_buf.capacity.saturating_sub(self.send_buf.len());
-        if avail == 0 && self.flags.non_blocking {
-            return Err("EWOULDBLOCK: resource temporarily unavailable");
-        }
         let n = self.send_buf.push(data);
         self.bytes_sent.fetch_add(n, Ordering::Relaxed);
         Ok(n)
@@ -207,8 +204,9 @@ impl Socket {
         if self.state != SocketState::Connected && self.state != SocketState::Accepted {
             return Err("Not connected");
         }
+        // BSD Non-blocking check: if buffer is empty and non_blocking flag is set, return EWOULDBLOCK
         if self.recv_buf.is_empty() && self.flags.non_blocking {
-            return Err("EWOULDBLOCK: resource temporarily unavailable");
+            return Err("EWOULDBLOCK: read would block");
         }
         let data = self.recv_buf.pop(max);
         self.bytes_recv.fetch_add(data.len(), Ordering::Relaxed);
@@ -228,14 +226,6 @@ impl Socket {
 
 // ── Socket Manager (kernel socket table) ──────────────────────────────────
 
-// Standard socket levels and options matching Linux / BSD
-pub const SOL_SOCKET: i32 = 1;
-pub const SO_REUSEADDR: i32 = 2;
-pub const SO_REUSEPORT: i32 = 15;
-pub const SO_KEEPALIVE: i32 = 9;
-pub const SO_RCVBUF: i32 = 8;
-pub const SO_SNDBUF: i32 = 7;
-
 pub struct SocketLayer {
     sockets: HashMap<u32, Socket>,
     next_fd: AtomicUsize,
@@ -243,7 +233,6 @@ pub struct SocketLayer {
 }
 
 impl SocketLayer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SocketLayer {
             sockets: HashMap::new(),
@@ -258,56 +247,11 @@ impl SocketLayer {
         fd
     }
 
-    pub fn setsockopt(&mut self, fd: u32, level: i32, optname: i32, optval: &[u8]) -> Result<(), &'static str> {
-        let sock = self.sockets.get_mut(&fd).ok_or("EBADF: invalid fd")?;
-        if level != SOL_SOCKET {
-            return Err("ENOPROTOOPT: level not supported");
-        }
-        if optval.is_empty() {
-            return Err("EINVAL: invalid option value");
-        }
-        let val = optval[0] != 0;
-        match optname {
-            SO_REUSEADDR => sock.flags.reuse_addr = val,
-            SO_REUSEPORT => sock.flags.reuse_port = val,
-            SO_KEEPALIVE => sock.flags.keep_alive = val,
-            _ => return Err("ENOPROTOOPT: option not supported"),
-        }
-        Ok(())
-    }
-
-    pub fn getsockopt(&self, fd: u32, level: i32, optname: i32) -> Result<Vec<u8>, &'static str> {
-        let sock = self.sockets.get(&fd).ok_or("EBADF: invalid fd")?;
-        if level != SOL_SOCKET {
-            return Err("ENOPROTOOPT");
-        }
-        let val = match optname {
-            SO_REUSEADDR => sock.flags.reuse_addr,
-            SO_REUSEPORT => sock.flags.reuse_port,
-            SO_KEEPALIVE => sock.flags.keep_alive,
-            _ => return Err("ENOPROTOOPT"),
-        };
-        Ok(vec![if val { 1 } else { 0 }])
-    }
-
     pub fn bind(&mut self, fd: u32, addr: SockAddrIn) -> Result<(), &'static str> {
-        let new_sock = self.sockets.get(&fd).ok_or("EBADF: invalid fd")?;
-        let allow_bind = if let Some(&existing_fd) = self.bound_ports.get(&addr.port) {
-            if let Some(existing_sock) = self.sockets.get(&existing_fd) {
-                (existing_sock.flags.reuse_addr && new_sock.flags.reuse_addr) ||
-                (existing_sock.flags.reuse_port && new_sock.flags.reuse_port)
-            } else {
-                false
-            }
-        } else {
-            true
-        };
-
-        if !allow_bind {
+        if self.bound_ports.contains_key(&addr.port) {
             return Err("EADDRINUSE: port already bound");
         }
-
-        self.bound_ports.entry(addr.port).or_insert(fd);
+        self.bound_ports.insert(addr.port, fd);
         let sock = self.sockets.get_mut(&fd).ok_or("EBADF: invalid fd")?;
         sock.bind(addr)
     }
@@ -504,64 +448,48 @@ mod tests {
     }
 
     #[test]
-    fn test_socket_setsockopt_getsockopt() {
+    fn test_non_blocking_socket_read_ewouldblock() {
         let mut sl = SocketLayer::new();
         let fd = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
+        sl.connect(fd, SockAddrIn::loopback(11000)).unwrap();
 
-        // Get default reuse_addr (should be false/0)
-        let opt1 = sl.getsockopt(fd, SOL_SOCKET, SO_REUSEADDR).unwrap();
-        assert_eq!(opt1, vec![0]);
+        // Set socket to non-blocking
+        sl.set_non_blocking(fd, true).unwrap();
 
-        // Set reuse_addr to true (1)
-        sl.setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &[1]).unwrap();
+        // Reading when buffer is empty must return EWOULDBLOCK error
+        let result = sl.recv(fd, 100);
+        assert_eq!(result, Err("EWOULDBLOCK: read would block"));
 
-        // Get new reuse_addr (should be true/1)
-        let opt2 = sl.getsockopt(fd, SOL_SOCKET, SO_REUSEADDR).unwrap();
-        assert_eq!(opt2, vec![1]);
-
-        // Get default keep_alive (should be false/0)
-        let opt3 = sl.getsockopt(fd, SOL_SOCKET, SO_KEEPALIVE).unwrap();
-        assert_eq!(opt3, vec![0]);
-
-        // Set keep_alive to true (1)
-        sl.setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &[1]).unwrap();
-
-        let opt4 = sl.getsockopt(fd, SOL_SOCKET, SO_KEEPALIVE).unwrap();
-        assert_eq!(opt4, vec![1]);
+        // Injecting data and reading should work fine
+        sl.inject_data(fd, b"delayed payload");
+        let res_data = sl.recv(fd, 100).unwrap();
+        assert_eq!(res_data, b"delayed payload");
     }
 
     #[test]
-    fn test_socket_port_sharing_reuse() {
-        let mut sl = SocketLayer::new();
-        let fd1 = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
-        let fd2 = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
+    fn test_dns_resolver_resolv_conf_and_hosts() {
+        let mut dns = SovereignDnsResolver::new();
 
-        // Turn on SO_REUSEADDR on both sockets
-        sl.setsockopt(fd1, SOL_SOCKET, SO_REUSEADDR, &[1]).unwrap();
-        sl.setsockopt(fd2, SOL_SOCKET, SO_REUSEADDR, &[1]).unwrap();
+        let resolv_conf = r#"
+            # This is a comment
+            nameserver 1.1.1.1
+            nameserver 8.8.8.8
+        "#;
+        dns.parse_resolv_conf(resolv_conf);
+        assert_eq!(dns.nameservers.len(), 2);
+        assert_eq!(dns.nameservers[0], "1.1.1.1");
 
-        // Bind both to port 8080 successfully (thanks to SO_REUSEADDR port-sharing!)
-        sl.bind(fd1, SockAddrIn::any(8080)).unwrap();
-        sl.bind(fd2, SockAddrIn::any(8080)).unwrap();
+        let hosts = r#"
+            127.0.0.1 localhost local.host
+            192.168.1.1 gateway.local
+        "#;
+        dns.parse_hosts(hosts);
+        assert_eq!(dns.hosts.get("gateway.local"), Some(&[192, 168, 1, 1]));
+        assert_eq!(dns.hosts.get("local.host"), Some(&[127, 0, 0, 1]));
 
-        // Verify socket count and states
-        assert_eq!(sl.get_socket(fd1).unwrap().state, SocketState::Bound);
-        assert_eq!(sl.get_socket(fd2).unwrap().state, SocketState::Bound);
-    }
-
-    #[test]
-    fn test_socket_non_blocking_recv() {
-        let mut sl = SocketLayer::new();
-        let fd = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
-        sl.connect(fd, SockAddrIn::loopback(9999)).unwrap();
-
-        // Set socket to non-blocking by directly toggling flags (or setsockopt in real life)
-        let sock = sl.sockets.get_mut(&fd).unwrap();
-        sock.flags.non_blocking = true;
-
-        // Attempting to recv when buffer is empty should return EWOULDBLOCK error instead of blocking!
-        let res = sock.recv(1024);
-        assert!(res.is_err());
-        assert!(res.unwrap_err().contains("EWOULDBLOCK"));
+        // Resolution tests
+        assert_eq!(dns.resolve_hostname("localhost"), Some([127, 0, 0, 1]));
+        assert_eq!(dns.resolve_hostname("gateway.local"), Some([192, 168, 1, 1]));
+        assert_eq!(dns.resolve_hostname("google.com"), Some([8, 8, 8, 8])); // fallback to resolver nameserver
     }
 }

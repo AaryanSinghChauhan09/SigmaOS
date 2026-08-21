@@ -1,11 +1,11 @@
 // SigmaOS Archive Manager
 // OOP-based archive creation and extraction with multiple formats
 
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Archive format
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ArchiveFormat {
     Zip,
     Tar,
@@ -280,15 +280,13 @@ impl ArchiveHandler for SevenZipArchiveHandler {
     }
 
     fn list_contents(&self, _archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError> {
-        Ok(vec![
-            ArchiveEntry {
-                name: "file_7z.txt".to_string(),
-                size_bytes: 4096,
-                compressed_size_bytes: 1024,
-                is_directory: false,
-                modified_at: 1234567890,
-            },
-        ])
+        Ok(vec![ArchiveEntry {
+            name: "file_7z.txt".to_string(),
+            size_bytes: 4096,
+            compressed_size_bytes: 1024,
+            is_directory: false,
+            modified_at: 1234567890,
+        }])
     }
 
     fn name(&self) -> &str {
@@ -298,14 +296,14 @@ impl ArchiveHandler for SevenZipArchiveHandler {
 
 /// OOP-based Archive Manager
 pub struct ArchiveManager {
-    handlers: BTreeMap<ArchiveFormat, Box<dyn ArchiveHandler>>,
+    handlers: HashMap<ArchiveFormat, Box<dyn ArchiveHandler>>,
     default_format: ArchiveFormat,
     default_compression: CompressionLevel,
 }
 
 impl ArchiveManager {
     pub fn new() -> Self {
-        let mut handlers: BTreeMap<ArchiveFormat, Box<dyn ArchiveHandler>> = BTreeMap::new();
+        let mut handlers: HashMap<ArchiveFormat, Box<dyn ArchiveHandler>> = HashMap::new();
         handlers.insert(ArchiveFormat::Zip, Box::new(ZipArchiveHandler));
         handlers.insert(ArchiveFormat::Tar, Box::new(TarArchiveHandler));
         handlers.insert(ArchiveFormat::TarGz, Box::new(TarArchiveHandler));
@@ -498,9 +496,7 @@ mod tests {
             PathBuf::from("/test/file2.txt"),
         ];
         let path = PathBuf::from("/test/archive.zip");
-        let result = manager
-            .create_archive(&files, &PathBuf::from("/test/archive.zip"))
-            .unwrap();
+        let result = manager.create_archive(&files, &path).unwrap();
         assert!(result.success);
     }
 
@@ -508,9 +504,7 @@ mod tests {
     fn test_list_contents() {
         let manager = ArchiveManager::default();
         let path = PathBuf::from("/test/archive.zip");
-        let entries = manager
-            .list_contents(&PathBuf::from("/test/archive.zip"))
-            .unwrap();
+        let entries = manager.list_contents(&path).unwrap();
         assert!(!entries.is_empty());
     }
 
@@ -519,7 +513,9 @@ mod tests {
         let mut manager = ArchiveManager::default();
         manager.set_default_format(ArchiveFormat::SevenZip);
         let files = vec![PathBuf::from("/test/file1.txt")];
-        let res = manager.create_archive(&files, &PathBuf::from("/test/archive.7z")).unwrap();
+        let res = manager
+            .create_archive(&files, &PathBuf::from("/test/archive.7z"))
+            .unwrap();
         assert!(res.success);
         assert_eq!(res.compression_ratio, 0.4); // default normal compression
     }

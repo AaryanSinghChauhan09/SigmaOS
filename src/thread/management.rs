@@ -25,10 +25,6 @@ pub enum ThreadAlertableState {
     Alertable = 1,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ThreadAlertableState { NonAlertable = 0, Alertable = 1 }
-
 pub trait Thread {
     fn id(&self) -> ThreadID;
     fn state(&self) -> ThreadState;
@@ -188,15 +184,6 @@ impl ThreadManager for SimpleThreadManager {
                 if thread.id() == id {
                     return Some(thread.as_mut());
                 }
-            }
-        }
-        None
-    }
-
-    fn get_thread_mut(&mut self, id: ThreadID) -> Option<&mut dyn Thread> {
-        for thread_option in self.threads.as_slice_mut() {
-            if let Some(ref mut thread) = *thread_option {
-                if thread.id() == id { return Some(thread.as_mut()); }
             }
         }
         None

@@ -3,8 +3,8 @@
 // No dependency on external graphics frameworks
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
@@ -53,17 +53,17 @@ impl Rectangle {
     }
 
     pub fn contains(&self, point: Position) -> bool {
-        point.x >= self.position.x &&
-        point.x < self.position.x + self.size.width as i32 &&
-        point.y >= self.position.y &&
-        point.y < self.position.y + self.size.height as i32
+        point.x >= self.position.x
+            && point.x < self.position.x + self.size.width as i32
+            && point.y >= self.position.y
+            && point.y < self.position.y + self.size.height as i32
     }
 
     pub fn intersects(&self, other: &Rectangle) -> bool {
-        self.position.x < other.position.x + other.size.width as i32 &&
-        self.position.x + self.size.width as i32 > other.position.x &&
-        self.position.y < other.position.y + other.size.height as i32 &&
-        self.position.y + self.size.height as i32 > other.position.y
+        self.position.x < other.position.x + other.size.width as i32
+            && self.position.x + self.size.width as i32 > other.position.x
+            && self.position.y < other.position.y + other.size.height as i32
+            && self.position.y + self.size.height as i32 > other.position.y
     }
 }
 
@@ -86,10 +86,7 @@ impl Color {
     }
 
     pub fn to_u32(&self) -> u32 {
-        ((self.a as u32) << 24) |
-        ((self.r as u32) << 16) |
-        ((self.g as u32) << 8) |
-        (self.b as u32)
+        ((self.a as u32) << 24) | ((self.r as u32) << 16) | ((self.g as u32) << 8) | (self.b as u32)
     }
 }
 
@@ -345,7 +342,12 @@ pub struct SimpleWindow {
 
 impl SimpleWindow {
     pub fn new(id: usize, rect: Rectangle, capability: WindowCapability) -> Self {
-        let surface = BitmapSurface::new(id, rect.size.width, rect.size.height, SurfaceCapability::full());
+        let surface = BitmapSurface::new(
+            id,
+            rect.size.width,
+            rect.size.height,
+            SurfaceCapability::full(),
+        );
 
         SimpleWindow {
             id,
@@ -574,7 +576,8 @@ impl Compositor for SimpleCompositor {
 
         // If double buffering is enabled, we render to our back buffer first, then copy to output.
         // Otherwise, we render directly to output.
-        let use_double_buffering = self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
+        let use_double_buffering =
+            self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
 
         if use_double_buffering {
             let back = self.back_buffer.as_mut().unwrap();
@@ -600,7 +603,9 @@ impl Compositor for SimpleCompositor {
                                 let output_index = output_y * back_stride + output_x;
                                 let window_index = y * window_stride + x;
 
-                                if output_index < back_data.len() && window_index < window_data.len() {
+                                if output_index < back_data.len()
+                                    && window_index < window_data.len()
+                                {
                                     back_data[output_index] = window_data[window_index];
                                 }
                             }
@@ -615,7 +620,6 @@ impl Compositor for SimpleCompositor {
             let output_data = output.data_mut();
             let len = back_data.len().min(output_data.len());
             output_data[..len].copy_from_slice(&back_data[..len]);
-
         } else {
             output.clear(Color::rgb(0, 0, 0));
 
@@ -639,7 +643,9 @@ impl Compositor for SimpleCompositor {
                                 let output_index = output_y * output_stride + output_x;
                                 let window_index = y * window_stride + x;
 
-                                if output_index < output_data.len() && window_index < window_data.len() {
+                                if output_index < output_data.len()
+                                    && window_index < window_data.len()
+                                {
                                     output_data[output_index] = window_data[window_index];
                                 }
                             }

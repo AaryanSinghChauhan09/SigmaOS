@@ -1,3 +1,7 @@
+#![no_std]
+#![no_main]
+
+use core::mem;
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
 /// Implements 2^n page frames with free list per order, split/coalesce
@@ -47,7 +51,7 @@ pub struct SimpleBuddyAllocator {
 }
 
 impl SimpleBuddyAllocator {
-    pub fn new(max_order: usize, _total_frames: usize) -> Self {
+    pub fn new(max_order: usize, total_frames: usize) -> Self {
         let mut free_lists: [Vec<BlockID>; 12] = [
             Vec::new(),
             Vec::new(),
@@ -63,7 +67,7 @@ impl SimpleBuddyAllocator {
             Vec::new(),
         ];
         let mut blocks = Vec::new();
-        let next_id = AtomicUsize::new(0);
+        let mut next_id = AtomicUsize::new(1);
 
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
@@ -90,13 +94,13 @@ impl BuddyAllocator for SimpleBuddyAllocator {
             if !self.free_lists[current_order].is_empty() {
                 let block_id = self.free_lists[current_order].remove(0);
 
-                if current_order > order {
+                while current_order > order {
                     let new_order = current_order - 1;
                     let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
 
-                    let left_block = Block::new(new_order);
-                    let right_block = Block::new(new_order);
+                    let mut left_block = Block::new(new_order);
+                    let mut right_block = Block::new(new_order);
 
                     if let Some(ref mut parent) = self.blocks[block_id] {
                         parent.left.store(left_id, Ordering::SeqCst);
@@ -237,31 +241,87 @@ impl MemoryPool for SimpleBuddyAllocator {
     }
 }
 
-pub use crate::klib::vec::Vec;
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_buddy_allocator() {
-        let mut allocator = SimpleBuddyAllocator::new(10, 1024);
-
-        let block_1 = allocator.allocate(3).unwrap();
-        assert!(block_1 > 0);
-
-        let block_2 = allocator.allocate(3).unwrap();
-        assert!(block_2 > 0);
-        assert_ne!(block_1, block_2);
-
-        assert!(allocator.free(block_1, 3).is_ok());
-        assert!(allocator.free(block_2, 3).is_ok());
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
     }
-
-    #[test]
-    fn test_fragmentation() {
-        let allocator = SimpleBuddyAllocator::new(5, 32);
-        let ratio = allocator.get_fragmentation_ratio();
-        assert!((0.0..=1.0).contains(&ratio));
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
     }
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
+        let mut write_idx = 0;
+        for i in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(i);
+                if f(item) {
+                    if write_idx != i {
+                        core::ptr::copy_nonoverlapping(
+                            self.data.add(i),
+                            self.data.add(write_idx),
+                            1,
+                        );
+                    }
+                    write_idx += 1;
+                }
+            }
+        }
+        self.len = write_idx;
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

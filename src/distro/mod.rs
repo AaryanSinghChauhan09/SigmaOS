@@ -9,21 +9,7 @@ pub mod manjaro;
 pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
-pub mod tiny_core;
-pub mod parity;
-pub mod arch;
 
-pub use arch::{
-    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
-    ArchRepoType,
-};
-
-pub use parity::{
-    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
-    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
-    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
-    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
-};
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
@@ -59,9 +45,5 @@ pub use recovery::{
 };
 pub use specialized::{
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
-    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
-};
-pub use tiny_core::{
-    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+    MpiCommunicator,
 };

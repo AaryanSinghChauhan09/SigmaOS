@@ -63,7 +63,12 @@ impl RemoteSession for SimpleRemoteSession {
         &self.host[..len]
     }
     fn state(&self) -> SessionState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        match self.state.load(Ordering::SeqCst) {
+            1 => SessionState::Connecting,
+            2 => SessionState::Connected,
+            3 => SessionState::Error,
+            _ => SessionState::Disconnected,
+        }
     }
 }
 

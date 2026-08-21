@@ -1,5 +1,4 @@
 // SigmaOS Productivity Module
-pub mod utility_suite;
 pub mod advanced_app_absorber;
 pub mod gamification;
 pub mod media;
@@ -10,7 +9,6 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod tmux;
-pub mod editor;
 
 pub use advanced_app_absorber::{
     AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter, EverythingSearchEngine,
@@ -49,13 +47,4 @@ pub use terminal::{
 };
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
-};
-pub use editor::{
-    CodeEditor, Document as EditorDocument, EditorConfig, EditorError, Language as EditorLanguage,
-    LspClient, SyntaxHighlighter,
-};
-pub use utility_suite::{
-    NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine, CompressionMethod,
-    FlameshotAnnotator, AnnotationShape, AudacityWaveEditor, VlcCodecPipeline,
-    DaVinciTimeline, OneCommanderFileGrid, ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
 };

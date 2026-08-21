@@ -1,9 +1,12 @@
 // SigmaTools - System suite for SigmaOS
 // SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess components
 
+#![no_std]
+
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::collections::BTreeMap as HashMap;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -25,7 +28,6 @@ pub struct SigmaDeploy {
 }
 
 impl SigmaDeploy {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             tftp_enabled: false,
@@ -87,8 +89,8 @@ impl ClusterNode {
         self.state = state;
     }
 
-    pub fn update_load(&mut self, _load: f32) {
-        // Load update would be implemented in production
+    pub fn update_load(&mut self, load: f32) {
+        self.load = load;
     }
 }
 
@@ -98,7 +100,6 @@ pub struct SigmaCluster {
 }
 
 impl SigmaCluster {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             nodes: BTreeMap::new(),
@@ -185,7 +186,6 @@ pub struct SigmaIdentity {
 }
 
 impl SigmaIdentity {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             users: BTreeMap::new(),
@@ -246,7 +246,6 @@ pub struct SigmaAccess {
 }
 
 impl SigmaAccess {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             enabled_features: Vec::new(),
@@ -303,7 +302,6 @@ pub struct SigmaPatch {
 }
 
 impl SigmaPatch {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             applied_patches: BTreeMap::new(),
@@ -312,18 +310,25 @@ impl SigmaPatch {
     }
 
     /// Splicing newly compiled instructions natively inside live microkernel paths
-    pub fn apply_live_patch(&mut self, patch_hash: &str, memory_addr: u64, signature: &[u8]) -> Result<(), SigmaToolError> {
+    pub fn apply_live_patch(
+        &mut self,
+        patch_hash: &str,
+        memory_addr: u64,
+        signature: &[u8],
+    ) -> Result<(), SigmaToolError> {
         if signature.is_empty() {
             return Err(SigmaToolError::AuthenticationFailed);
         }
 
         // Simulates unmapping legacy instructions and mapping patch instruction frames
-        self.applied_patches.insert(patch_hash.to_string(), memory_addr);
+        self.applied_patches
+            .insert(patch_hash.to_string(), memory_addr);
         Ok(())
     }
 
     pub fn rollback_patch(&mut self, patch_hash: &str) -> Result<(), SigmaToolError> {
-        self.applied_patches.remove(patch_hash)
+        self.applied_patches
+            .remove(patch_hash)
             .ok_or(SigmaToolError::ResourceUnavailable)?;
         Ok(())
     }
@@ -342,7 +347,6 @@ pub struct SigmaRescue {
 }
 
 impl SigmaRescue {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut partitions = Vec::new();
         partitions.push("/dev/sda1".to_string());
@@ -355,7 +359,11 @@ impl SigmaRescue {
     }
 
     /// Walks back structural storage tracks to point the filesystem Merkle root to a previous secure checkpoint
-    pub fn walk_back_merkle_root(&self, partition: &str, target_hash: &str) -> Result<String, SigmaToolError> {
+    pub fn walk_back_merkle_root(
+        &self,
+        partition: &str,
+        target_hash: &str,
+    ) -> Result<String, SigmaToolError> {
         if !self.target_partitions.contains(&partition.to_string()) {
             return Err(SigmaToolError::ResourceUnavailable);
         }
@@ -364,7 +372,10 @@ impl SigmaRescue {
             return Err(SigmaToolError::IntegrityFailure);
         }
 
-        Ok(format!("Partition {} successfully rolled back to secure Merkle Root Point [{}].", partition, target_hash))
+        Ok(format!(
+            "Partition {} successfully rolled back to secure Merkle Root Point [{}].",
+            partition, target_hash
+        ))
     }
 }
 
@@ -382,7 +393,6 @@ pub struct SigmaMonitor {
 }
 
 impl SigmaMonitor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             cpu_core_temperatures: [38.5, 41.2, 42.0, 39.1, 40.5, 44.1, 43.2, 42.1],
@@ -511,8 +521,12 @@ mod tests {
     #[test]
     fn test_sigma_patch_hot_splicing() {
         let mut patcher = SigmaPatch::new();
-        assert!(patcher.apply_live_patch("patch_01", 0x1000200, &[]).is_err());
-        assert!(patcher.apply_live_patch("patch_01", 0x1000200, &[1, 2]).is_ok());
+        assert!(patcher
+            .apply_live_patch("patch_01", 0x1000200, &[])
+            .is_err());
+        assert!(patcher
+            .apply_live_patch("patch_01", 0x1000200, &[1, 2])
+            .is_ok());
         assert_eq!(*patcher.applied_patches.get("patch_01").unwrap(), 0x1000200);
 
         assert!(patcher.rollback_patch("patch_01").is_ok());
@@ -522,9 +536,18 @@ mod tests {
     #[test]
     fn test_sigma_rescue_merkle_recovery() {
         let rescue = SigmaRescue::new();
-        assert!(rescue.walk_back_merkle_root("/dev/invalid", "sha256-hash-representation").is_err());
-        assert!(rescue.walk_back_merkle_root("/dev/sda1", "too-short").is_err());
-        let res = rescue.walk_back_merkle_root("/dev/sda1", "sha256-valid-hash-length-string-representation").unwrap();
+        assert!(rescue
+            .walk_back_merkle_root("/dev/invalid", "sha256-hash-representation")
+            .is_err());
+        assert!(rescue
+            .walk_back_merkle_root("/dev/sda1", "too-short")
+            .is_err());
+        let res = rescue
+            .walk_back_merkle_root(
+                "/dev/sda1",
+                "sha256-valid-hash-length-string-representation",
+            )
+            .unwrap();
         assert!(res.contains("/dev/sda1"));
     }
 
@@ -563,7 +586,10 @@ impl SovereignDpkgEtcher {
             return Err("Empty bootable image payload");
         }
         self.bytes_written = image_bytes.len() as u64;
-        Ok(format!("SovereignEtcher: Flashed {} bytes bootable image onto {} successfully", self.bytes_written, self.target_device_path))
+        Ok(format!(
+            "SovereignEtcher: Flashed {} bytes bootable image onto {} successfully",
+            self.bytes_written, self.target_device_path
+        ))
     }
 }
 
@@ -582,7 +608,12 @@ impl SovereignAptDuo {
             let line_a = lines_a.get(i).copied().unwrap_or("");
             let line_b = lines_b.get(i).copied().unwrap_or("");
             if line_a != line_b {
-                diffs.push(format!("Diff at line {}: '{}' vs '{}'", i + 1, line_a, line_b));
+                diffs.push(format!(
+                    "Diff at line {}: '{}' vs '{}'",
+                    i + 1,
+                    line_a,
+                    line_b
+                ));
             }
         }
         diffs
@@ -664,7 +695,10 @@ impl SovereignTextFixer {
     }
 
     pub fn remove_special_symbols(&self, input: &str) -> String {
-        input.chars().filter(|c| c.is_alphanumeric() || c.is_whitespace()).collect()
+        input
+            .chars()
+            .filter(|c| c.is_alphanumeric() || c.is_whitespace())
+            .collect()
     }
 }
 
@@ -685,8 +719,16 @@ impl SovereignImageToDataUri {
         let mut i = 0;
         while i < bytes.len() {
             let b0 = bytes[i] as usize;
-            let b1 = if i + 1 < bytes.len() { bytes[i + 1] as usize } else { 0 };
-            let b2 = if i + 2 < bytes.len() { bytes[i + 2] as usize } else { 0 };
+            let b1 = if i + 1 < bytes.len() {
+                bytes[i + 1] as usize
+            } else {
+                0
+            };
+            let b2 = if i + 2 < bytes.len() {
+                bytes[i + 2] as usize
+            } else {
+                0
+            };
 
             let c0 = b0 >> 2;
             let c1 = ((b0 & 3) << 4) | (b1 >> 4);
@@ -719,7 +761,6 @@ pub struct SovereignKeyboardTester {
 }
 
 impl SovereignKeyboardTester {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pressed_keys: Vec::new(),
@@ -749,247 +790,8 @@ impl SovereignIsWebsiteDown {
     }
 }
 
-/// AlmeidaCoreDump (AlmeidaOS Register Core Dump replication)
-/// Simulates a detailed, 64-bit CPU register core dump for system panics and diagnostics
-pub struct AlmeidaCoreDump {
-    pub rip: u64,
-    pub rsp: u64,
-    pub rbp: u64,
-    pub rax: u64,
-    pub rbx: u64,
-    pub rcx: u64,
-    pub rdx: u64,
-    pub rsi: u64,
-    pub rdi: u64,
-}
-
-impl AlmeidaCoreDump {
-    pub fn new(rip: u64, rsp: u64, rbp: u64) -> Self {
-        Self {
-            rip,
-            rsp,
-            rbp,
-            rax: 0xBAADF00D,
-            rbx: 0,
-            rcx: 0,
-            rdx: 0,
-            rsi: 0,
-            rdi: 0,
-        }
-    }
-
-    pub fn format_dump(&self) -> String {
-        let mut out = String::new();
-        out.push_str("=== ALMEIDAOS CORE REGISTERS DUMP ===\n");
-        out.push_str(&format!("RIP: {:#018X}   RSP: {:#018X}\n", self.rip, self.rsp));
-        out.push_str(&format!("RBP: {:#018X}   RAX: {:#018X}\n", self.rbp, self.rax));
-        out.push_str(&format!("RBX: {:#018X}   RCX: {:#018X}\n", self.rbx, self.rcx));
-        out.push_str(&format!("RDX: {:#018X}   RSI: {:#018X}\n", self.rdx, self.rsi));
-        out.push_str(&format!("RDI: {:#018X}\n", self.rdi));
-        out.push_str("=====================================\n");
-        out
-    }
-}
-
-/// AlmeidaCmosRtc (AlmeidaOS CMOS RTC Real-Time Clock replication)
-/// Emulates reading, decoding, and validating CMOS RTC register bytes into structured dates
-pub struct AlmeidaCmosRtc {
-    pub seconds: u8,
-    pub minutes: u8,
-    pub hours: u8,
-    pub day: u8,
-    pub month: u8,
-    pub year: u16,
-}
-
-impl AlmeidaCmosRtc {
-    pub fn decode_cmos_values(
-        raw_sec: u8,
-        raw_min: u8,
-        raw_hour: u8,
-        raw_day: u8,
-        raw_month: u8,
-        raw_year: u8,
-        is_bcd: bool,
-    ) -> Self {
-        let bcd_to_bin = |val: u8| -> u8 {
-            if is_bcd {
-                ((val / 16) * 10) + (val % 16)
-            } else {
-                val
-            }
-        };
-
-        let sec = bcd_to_bin(raw_sec);
-        let min = bcd_to_bin(raw_min);
-        let hour = bcd_to_bin(raw_hour);
-        let day = bcd_to_bin(raw_day);
-        let month = bcd_to_bin(raw_month);
-        let year = 2000 + bcd_to_bin(raw_year) as u16;
-
-        Self {
-            seconds: sec,
-            minutes: min,
-            hours: hour,
-            day,
-            month,
-            year,
-        }
-    }
-
-    pub fn format_timestamp(&self) -> String {
-        format!(
-            "{:04}-{:02}-{:02} {:02}:{:02}:{:02}",
-            self.year, self.month, self.day, self.hours, self.minutes, self.seconds
-        )
-    }
-}
-
-/// SovereignJsonPrettifier (JSON Formatter replication)
-/// Prettifies or minifies raw JSON configuration strings cleanly
-pub struct SovereignJsonPrettifier;
-
-impl SovereignJsonPrettifier {
-    pub fn prettify_json(&self, raw_json: &str) -> String {
-        let mut pretty = String::new();
-        let mut indent_level = 0;
-        let mut in_quotes = false;
-
-        for c in raw_json.chars() {
-            match c {
-                '"' => {
-                    in_quotes = !in_quotes;
-                    pretty.push(c);
-                }
-                '{' | '[' if !in_quotes => {
-                    pretty.push(c);
-                    pretty.push('\n');
-                    indent_level += 1;
-                    pretty.push_str(&"  ".repeat(indent_level));
-                }
-                '}' | ']' if !in_quotes => {
-                    pretty.push('\n');
-                    if indent_level > 0 {
-                        indent_level -= 1;
-                    }
-                    pretty.push_str(&"  ".repeat(indent_level));
-                    pretty.push(c);
-                }
-                ',' if !in_quotes => {
-                    pretty.push(c);
-                    pretty.push('\n');
-                    pretty.push_str(&"  ".repeat(indent_level));
-                }
-                ':' if !in_quotes => {
-                    pretty.push(c);
-                    pretty.push(' ');
-                }
-                ' ' | '\t' | '\n' | '\r' if !in_quotes => {
-                    // Skip unneeded whitespace
-                }
-                _ => {
-                    pretty.push(c);
-                }
-            }
-        }
-        pretty
-    }
-
-    pub fn minify_json(&self, raw_json: &str) -> String {
-        let mut minified = String::new();
-        let mut in_quotes = false;
-
-        for c in raw_json.chars() {
-            match c {
-                '"' => {
-                    in_quotes = !in_quotes;
-                    minified.push(c);
-                }
-                ' ' | '\t' | '\n' | '\r' if !in_quotes => {
-                    // Skip spaces outside string values
-                }
-                _ => {
-                    minified.push(c);
-                }
-            }
-        }
-        minified
-    }
-}
-
-/// SovereignIPCalculator (CIDR/Subnet Calculator replication)
-/// Analyzes IPv4 networks, CIDR subnet masks, wildcard, host counts, and broadcasts
-pub struct SovereignIPCalculator;
-
-impl SovereignIPCalculator {
-    pub fn calculate_subnet_details(&self, ip_addr: &str, cidr_bits: u8) -> Result<(String, String, u32), &'static str> {
-        if cidr_bits > 32 {
-            return Err("Invalid CIDR prefix length");
-        }
-
-        let parts: Vec<&str> = ip_addr.split('.').collect();
-        if parts.len() != 4 {
-            return Err("Invalid IPv4 address format");
-        }
-
-        let mut ip_num: u32 = 0;
-        for part in parts {
-            let val = part.parse::<u32>().map_err(|_| "Invalid octet")?;
-            if val > 255 {
-                return Err("Octet out of range");
-            }
-            ip_num = (ip_num << 8) | val;
-        }
-
-        let mask: u32 = if cidr_bits == 0 {
-            0
-        } else {
-            !0u32 << (32 - cidr_bits)
-        };
-
-        let network_num = ip_num & mask;
-        let broadcast_num = ip_num | !mask;
-        let host_count = if cidr_bits >= 31 {
-            0
-        } else {
-            (1 << (32 - cidr_bits)) - 2
-        };
-
-        let net_str = format!("{}.{}.{}.{}", (network_num >> 24) & 0xFF, (network_num >> 16) & 0xFF, (network_num >> 8) & 0xFF, network_num & 0xFF);
-        let bcast_str = format!("{}.{}.{}.{}", (broadcast_num >> 24) & 0xFF, (broadcast_num >> 16) & 0xFF, (broadcast_num >> 8) & 0xFF, broadcast_num & 0xFF);
-
-        Ok((net_str, bcast_str, host_count))
-    }
-}
-
-/// SovereignPasswordGenerator (Password Generator replication)
-/// Creates robust secure passphrases with custom sets of symbols and lengths
-pub struct SovereignPasswordGenerator;
-
-impl SovereignPasswordGenerator {
-    pub fn generate_secure_password(&self, length: usize, include_symbols: bool) -> String {
-        let mut password = String::new();
-        let letters: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let symbols: &[u8] = b"!@#$%^&*()_+-=[]{}|;:,./?";
-
-        // Simple high-entropy pseudorandom mapping based on local timestamp variations
-        let mut seed = length as u32 * 31;
-        for _ in 0..length {
-            seed = seed.wrapping_mul(1103515245).wrapping_add(12345);
-            let selection_pool: &[u8] = if include_symbols && (seed % 3 == 0) {
-                symbols
-            } else {
-                letters
-            };
-            let idx = (seed as usize) % selection_pool.len();
-            password.push(selection_pool[idx] as char);
-        }
-        password
-    }
-}
-
 #[cfg(test)]
-mod tests_replicated {
+mod replicated_tests {
     use super::*;
 
     #[test]
@@ -1025,7 +827,10 @@ mod tests_replicated {
 
     #[test]
     fn test_word_counter() {
-        let mut wc = SovereignWordCounter { total_words: 0, total_chars: 0 };
+        let mut wc = SovereignWordCounter {
+            total_words: 0,
+            total_chars: 0,
+        };
         let duplicates = wc.evaluate_text("hello world hello");
         assert_eq!(wc.total_words, 3);
         assert_eq!(wc.total_chars, 17);
@@ -1059,57 +864,5 @@ mod tests_replicated {
         let checker = SovereignIsWebsiteDown;
         assert!(checker.ping_website_is_up("www.google.com"));
         assert!(!checker.ping_website_is_up("www.invalid_offline_domain.com"));
-    }
-
-    #[test]
-    fn test_json_prettifier() {
-        let prettifier = SovereignJsonPrettifier;
-        let raw = "{\"a\":1,\"b\":2}";
-        let pretty = prettifier.prettify_json(raw);
-        assert!(pretty.contains("\n"));
-        assert!(pretty.contains("  \"a\": 1"));
-
-        let minified = prettifier.minify_json(pretty.as_str());
-        assert_eq!(minified, "{\"a\":1,\"b\":2}");
-    }
-
-    #[test]
-    fn test_ip_calculator() {
-        let calc = SovereignIPCalculator;
-        let res = calc.calculate_subnet_details("192.168.1.15", 24).unwrap();
-        assert_eq!(res.0, "192.168.1.0");
-        assert_eq!(res.1, "192.168.1.255");
-        assert_eq!(res.2, 254);
-
-        assert!(calc.calculate_subnet_details("192.168.1.15", 35).is_err());
-        assert!(calc.calculate_subnet_details("192.168.1", 24).is_err());
-    }
-
-    #[test]
-    fn test_password_generator() {
-        let gen = SovereignPasswordGenerator;
-        let pass = gen.generate_secure_password(16, true);
-        assert_eq!(pass.len(), 16);
-    }
-
-    #[test]
-    fn test_almeida_core_dump() {
-        let dump = AlmeidaCoreDump::new(0x1000200, 0x7FFF0000, 0x7FFF0010);
-        let report = dump.format_dump();
-        assert!(report.contains("ALMEIDAOS CORE REGISTERS DUMP"));
-        assert!(report.contains("RIP: 0x0000000001000200"));
-    }
-
-    #[test]
-    fn test_almeida_cmos_rtc() {
-        // Test BCD decoded timestamp (e.g. 0x24 seconds = 24 decimal)
-        let rtc = AlmeidaCmosRtc::decode_cmos_values(0x24, 0x15, 0x12, 0x01, 0x08, 0x26, true);
-        assert_eq!(rtc.seconds, 24);
-        assert_eq!(rtc.minutes, 15);
-        assert_eq!(rtc.hours, 12);
-        assert_eq!(rtc.day, 1);
-        assert_eq!(rtc.month, 8);
-        assert_eq!(rtc.year, 2026);
-        assert_eq!(rtc.format_timestamp(), "2026-08-01 12:15:24");
     }
 }

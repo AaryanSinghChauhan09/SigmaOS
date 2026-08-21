@@ -1,10 +1,10 @@
 // SigmaOS Unified Control Center
 // OOP-based centralized settings panel with modular architecture
 
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Control panel type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ControlPanel {
     Network,
     Display,
@@ -25,7 +25,7 @@ pub enum ControlPanel {
 pub struct PanelState {
     pub panel: ControlPanel,
     pub is_active: bool,
-    pub settings: BTreeMap<String, String>,
+    pub settings: HashMap<String, String>,
 }
 
 /// Quick setting
@@ -113,7 +113,7 @@ impl NetworkPanel {
                 panel: ControlPanel::Network,
                 is_active: false,
                 settings: {
-                    let mut map = BTreeMap::new();
+                    let mut map = HashMap::new();
                     map.insert("wifi_enabled".to_string(), "true".to_string());
                     map.insert("airplane_mode".to_string(), "false".to_string());
                     map.insert("hotspot_enabled".to_string(), "false".to_string());
@@ -156,7 +156,7 @@ impl DisplayPanel {
                 panel: ControlPanel::Display,
                 is_active: false,
                 settings: {
-                    let mut map = BTreeMap::new();
+                    let mut map = HashMap::new();
                     map.insert("brightness".to_string(), "80".to_string());
                     map.insert("night_mode".to_string(), "false".to_string());
                     map.insert("resolution".to_string(), "1920x1080".to_string());
@@ -199,7 +199,7 @@ impl SoundPanel {
                 panel: ControlPanel::Sound,
                 is_active: false,
                 settings: {
-                    let mut map = BTreeMap::new();
+                    let mut map = HashMap::new();
                     map.insert("volume".to_string(), "75".to_string());
                     map.insert("mute".to_string(), "false".to_string());
                     map.insert("output_device".to_string(), "default".to_string());
@@ -232,7 +232,7 @@ impl ControlPanelImpl for SoundPanel {
 
 /// OOP-based Unified Control Center
 pub struct UnifiedControlCenter {
-    panels: BTreeMap<ControlPanel, Box<dyn ControlPanelImpl>>,
+    panels: HashMap<ControlPanel, Box<dyn ControlPanelImpl>>,
     quick_settings: Vec<QuickSetting>,
     widgets: Vec<DashboardWidget>,
     active_panel: Option<ControlPanel>,
@@ -244,7 +244,7 @@ pub struct UnifiedControlCenter {
 impl UnifiedControlCenter {
     pub fn new() -> Self {
         Self {
-            panels: BTreeMap::new(),
+            panels: HashMap::new(),
             quick_settings: Vec::new(),
             widgets: Vec::new(),
             active_panel: None,
@@ -258,7 +258,10 @@ impl UnifiedControlCenter {
         self.contrast_setting = contrast;
     }
 
-    pub fn apply_accessibility_overlay(&mut self, overlay: &super::accessibility_gamification::AccessibilityOverlay) {
+    pub fn apply_accessibility_overlay(
+        &mut self,
+        overlay: &super::accessibility_gamification::AccessibilityOverlay,
+    ) {
         if overlay.high_contrast {
             self.contrast_setting = 2.0;
         } else {
