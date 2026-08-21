@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 //! SigmaOS Rsync Compatibility
 //! Rsync block-level delta-transfer synchronization engine
 //! Zero external dependencies
