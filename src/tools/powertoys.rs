@@ -215,12 +215,125 @@ impl HostsEditor {
     }
 }
 
+/// Always On Top window Z-order pinning manager
+pub struct AlwaysOnTop {
+    pub pinned_pids: Vec<usize>,
+}
+
+impl AlwaysOnTop {
+    pub fn new() -> Self {
+        Self { pinned_pids: Vec::new() }
+    }
+
+    pub fn toggle_pin(&mut self, pid: usize) -> bool {
+        if let Some(pos) = self.pinned_pids.iter().position(|&p| p == pid) {
+            self.pinned_pids.remove(pos);
+            false
+        } else {
+            self.pinned_pids.push(pid);
+            true
+        }
+    }
+
+    pub fn is_pinned(&self, pid: usize) -> bool {
+        self.pinned_pids.contains(&pid)
+    }
+}
+
+/// On-screen Text Extractor & OCR text sanitizer
+pub struct TextExtractor;
+
+impl TextExtractor {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Strips non-printable control characters from screen text captures
+    pub fn sanitize_extracted_text(&self, raw_bytes: &[u8]) -> Vec<u8> {
+        let mut clean = Vec::new();
+        for &b in raw_bytes {
+            if b >= 32 && b <= 126 || b == b'\n' || b == b'\t' {
+                clean.push(b);
+            }
+        }
+        clean
+    }
+}
+
+/// Paste as Plain Text formatting stripper
+pub struct PastePlain;
+
+impl PastePlain {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Strips HTML/rich tags from clipboard buffer
+    pub fn strip_rich_formatting(&self, input: &[u8]) -> Vec<u8> {
+        let mut plain = Vec::new();
+        let mut in_tag = false;
+        for &b in input {
+            if b == b'<' {
+                in_tag = true;
+            } else if b == b'>' {
+                in_tag = false;
+            } else if !in_tag {
+                plain.push(b);
+            }
+        }
+        plain
+    }
+}
+
+/// Multi-monitor fast cursor teleportation helper
+pub struct MouseJump {
+    pub current_x: u32,
+    pub current_y: u32,
+}
+
+impl MouseJump {
+    pub fn new() -> Self {
+        Self { current_x: 0, current_y: 0 }
+    }
+
+    pub fn jump_to_screen_center(&mut self, screen_x: u32, screen_y: u32, width: u32, height: u32) -> (u32, u32) {
+        self.current_x = screen_x + width / 2;
+        self.current_y = screen_y + height / 2;
+        (self.current_x, self.current_y)
+    }
+}
+
+/// Awake power state sleep/display idle suppression manager
+pub struct AwakePowerKeep {
+    pub keep_awake: bool,
+    pub keep_display_on: bool,
+}
+
+impl AwakePowerKeep {
+    pub fn new() -> Self {
+        Self {
+            keep_awake: false,
+            keep_display_on: false,
+        }
+    }
+
+    pub fn set_mode(&mut self, keep_awake: bool, keep_display_on: bool) {
+        self.keep_awake = keep_awake;
+        self.keep_display_on = keep_display_on;
+    }
+}
+
 pub struct SovereignPowerToys {
     pub color_picker: ColorPicker,
     pub fancy_zones: FancyZones,
     pub power_rename: PowerRename,
     pub locksmith: FileLocksmith,
     pub hosts_editor: HostsEditor,
+    pub always_on_top: AlwaysOnTop,
+    pub text_extractor: TextExtractor,
+    pub paste_plain: PastePlain,
+    pub mouse_jump: MouseJump,
+    pub awake_keep: AwakePowerKeep,
 }
 
 impl SovereignPowerToys {
@@ -231,6 +344,11 @@ impl SovereignPowerToys {
             power_rename: PowerRename::new(),
             locksmith: FileLocksmith::new(),
             hosts_editor: HostsEditor::new(),
+            always_on_top: AlwaysOnTop::new(),
+            text_extractor: TextExtractor::new(),
+            paste_plain: PastePlain::new(),
+            mouse_jump: MouseJump::new(),
+            awake_keep: AwakePowerKeep::new(),
         }
     }
 }
@@ -286,5 +404,30 @@ mod tests {
         let ip = toys.hosts_editor.resolve_domain(b"www.google.com").unwrap();
         assert_eq!(ip, [8, 8, 8, 8]);
         assert!(toys.hosts_editor.resolve_domain(b"www.offline.com").is_none());
+
+        // 6. AlwaysOnTop window Z-order pinning
+        assert!(!toys.always_on_top.is_pinned(404));
+        assert!(toys.always_on_top.toggle_pin(404));
+        assert!(toys.always_on_top.is_pinned(404));
+        assert!(!toys.always_on_top.toggle_pin(404));
+
+        // 7. TextExtractor OCR text sanitizer
+        let raw_ocr = b"Line 1\nLine 2\x07\x00";
+        let clean_text = toys.text_extractor.sanitize_extracted_text(raw_ocr);
+        assert_eq!(&clean_text, b"Line 1\nLine 2");
+
+        // 8. PastePlain HTML tag stripper
+        let html_clip = b"<b>Bold Text</b> <i>Italic</i>";
+        let plain_clip = toys.paste_plain.strip_rich_formatting(html_clip);
+        assert_eq!(&plain_clip, b"Bold Text Italic");
+
+        // 9. MouseJump monitor center teleport
+        let (cx, cy) = toys.mouse_jump.jump_to_screen_center(1920, 0, 1920, 1080);
+        assert_eq!((cx, cy), (2880, 540));
+
+        // 10. AwakePowerKeep sleep suppression mode
+        toys.awake_keep.set_mode(true, true);
+        assert!(toys.awake_keep.keep_awake);
+        assert!(toys.awake_keep.keep_display_on);
     }
 }
