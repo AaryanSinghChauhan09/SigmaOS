@@ -167,3 +167,6 @@ pub use virt::hypervisor::{
 pub use virt::microvm::{
     MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
 };
+pub use kernel::sched::aperiodic::{
+    AperiodicPriority, AperiodicScheduler, AperiodicServerKind, AperiodicTask, SchedulerMetrics,
+};

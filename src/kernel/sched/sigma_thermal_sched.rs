@@ -2,11 +2,12 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
+use alloc::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-use crate::kernel::vfs::inode::FsError;
+use crate::filesystem::FsError;
 
 /// Thermal zone reading
 #[derive(Debug, Clone, Copy)]
@@ -112,48 +113,46 @@ impl ThermalSchedClass {
 }
 
 impl SchedClass for ThermalSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        rq.nr_running.fetch_add(1, Ordering::SeqCst);
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        rq.nr_running.fetch_sub(1, Ordering::SeqCst);
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn check_preempt_curr(&self, rq: &mut RunQueue, task: &Task) -> bool {
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
 
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
 
-    fn put_prev_task(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn set_curr_task(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn task_tick(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
     fn task_fork(
         &self,
-        rq: &mut RunQueue,
-        child: &mut Task,
-        parent: &Task,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
     ) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn task_dead(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn prio_changed(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
 impl Default for ThermalScheduler {
@@ -181,6 +180,7 @@ mod tests {
             critical_temp_c: 100.0,
             passive_delay_ms: 100,
         });
+        sched.update_temperature(0, 95.0);
         assert!(sched.is_throttling());
     }
 
@@ -228,6 +228,6 @@ mod tests {
             seccomp_filter: None,
         };
         let decision = sched.adjust_scheduling(&task);
-        matches!(decision, SchedulingDecision::Normal);
+        assert!(matches!(decision, SchedulingDecision::Normal));
     }
 }
