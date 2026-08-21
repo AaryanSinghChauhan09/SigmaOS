@@ -1,5 +1,8 @@
 #![no_std]
-#![no_main]
+#![cfg_attr(not(test), no_main)]
+
+#[cfg(test)]
+extern crate std;
 
 use core::mem;
 /// Arch Linux-inspired rolling release build engine (makepkg) and package manager (pacman) for SigmaOS.
@@ -156,7 +159,7 @@ impl PacmanManager {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     pub data: *mut T,
     pub len: usize,
     pub capacity: usize,

@@ -8,7 +8,12 @@ use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+
+#[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[cfg(test)]
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -95,6 +100,19 @@ pub struct AgentInfo {
     pub total_intents: usize,
     pub execution_count: usize,
     pub capability: AgentCapability,
+    pub description: String,
+    pub capabilities: Vec<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ManagerCapability {
+    pub value: u64,
+}
+
+impl ManagerCapability {
+    pub fn full() -> Self {
+        ManagerCapability { value: !0 }
+    }
 }
 
 impl AgentInfo {
@@ -105,6 +123,8 @@ impl AgentInfo {
             total_intents: 0,
             execution_count: 0,
             capability: AgentCapability::new(),
+            description: String::new(),
+            capabilities: Vec::new(),
         }
     }
 }
@@ -176,6 +196,30 @@ impl SimpleAIAgent {
         self.patterns.push(pattern);
     }
 
+    #[allow(dead_code)]
+    unsafe fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
+        for pattern in &self.patterns {
+            let pattern_len = pattern.pattern.iter().position(|&b| b == 0).unwrap_or(128);
+            let pattern_str = &pattern.pattern[..pattern_len];
+
+            if input.len() >= pattern_len {
+                let mut matches = true;
+                for i in 0..pattern_len {
+                    if input[i] != pattern_str[i] {
+                        matches = false;
+                        break;
+                    }
+                }
+
+                if matches {
+                    return Some(pattern);
+                }
+            }
+        }
+        None
+    }
+
+    /// Helper byte-level search function
     fn contains_bytes(&self, haystack: &[u8], needle: &[u8]) -> bool {
         if needle.is_empty() {
             return true;
@@ -279,7 +323,7 @@ impl AIAgent for SimpleAIAgent {
     }
 }
 
-/// Conversational Natural Language & Speech REPL Engine
+/// Conversational Natural Language & Speech REPL Engine (SigmaAgent Shell)
 pub struct SigmaAgentREPL {
     pub is_listening_speech: bool,
     pub active_language: String,
@@ -306,9 +350,11 @@ impl SigmaAgentREPL {
             return Err(AIError::InvalidInput);
         }
 
+        // Translate spoken natural language to capability-checked shell command
         let translated = self.agent.translate_natural_command(transcript.as_bytes())?;
         let cmd_str = String::from_utf8(translated).unwrap_or_else(|_| transcript.to_string());
 
+        // Run safety check
         if let Some(warning) = self.agent.perform_safety_check(cmd_str.as_bytes()) {
             let warn_str = String::from_utf8(warning).unwrap_or_default();
             Ok(format!("[SAFETY INTERCEPT]: {}", warn_str))
@@ -344,11 +390,13 @@ impl PredictiveMaintenanceAgent {
         }
     }
 
+    /// Evaluates machine-learning degradation risk model
     pub fn evaluate_hardware_health(&mut self, temp: f64, cycles: u64, misses: f64) -> f64 {
         self.cpu_temp_c = temp;
         self.disk_write_cycles = cycles;
         self.cache_miss_rate = misses;
 
+        // Predictive linear regression score model:
         let temp_score = if temp > 80.0 { (temp - 80.0) * 0.02 } else { 0.0 };
         let write_score = if cycles > 500000 { (cycles as f64 - 500000.0) / 10000000.0 } else { 0.0 };
         let miss_score = if misses > 0.3 { misses * 0.5 } else { 0.0 };
@@ -357,9 +405,10 @@ impl PredictiveMaintenanceAgent {
         self.failure_probability
     }
 
+    /// Triggers self-healing hardware actions if failure probability exceeds critical threshold
     pub fn trigger_self_healing_if_needed(&mut self) -> Option<&'static str> {
         if self.failure_probability > 0.6 {
-            self.fan_rpm = 4500;
+            self.fan_rpm = 4500; // Increase fan speed
             Some("Self-Healing Triggered: Increasing cooling fan RPM & throttling active CPU multiplier")
         } else {
             None
@@ -367,7 +416,7 @@ impl PredictiveMaintenanceAgent {
     }
 }
 
-/// AI Compliance Dashboard
+/// AI Compliance Dashboard evaluating GDPR, ISO 27001, SOC 2, and Indian Social Security Code
 pub struct AIComplianceDashboard {
     pub gdpr_compliant: bool,
     pub iso27001_compliant: bool,
@@ -416,6 +465,7 @@ impl AIComplianceDashboard {
     }
 }
 
+/// AI agent manager trait (OOP interface)
 pub trait AIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError>;
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
@@ -601,6 +651,7 @@ mod tests {
         let mut maintenance = PredictiveMaintenanceAgent::new();
         assert_eq!(maintenance.failure_probability, 0.01);
 
+        // High temperature & high write cycles trigger degradation alert
         let prob = maintenance.evaluate_hardware_health(88.0, 6000000, 0.4);
         assert!(prob > 0.6);
 

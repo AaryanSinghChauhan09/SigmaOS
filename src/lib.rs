@@ -28,6 +28,7 @@ pub mod sigpkg;
 pub mod virtualization;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
+pub mod cluster;
 
 pub mod graphics {
     pub mod compositor;

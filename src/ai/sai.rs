@@ -6,8 +6,7 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -705,6 +704,71 @@ impl SaiEngine {
 impl Default for SaiEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Sovereign Workflow Engine for DAG pipelines
+pub struct SovereignWorkflowEngine {
+    pub nodes: Vec<WorkflowNode>,
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowNode {
+    pub id: usize,
+    pub name: String,
+    pub depends_on: Option<usize>,
+    pub state_executed: bool,
+}
+
+impl SovereignWorkflowEngine {
+    pub fn new() -> Self {
+        Self { nodes: Vec::new() }
+    }
+
+    pub fn add_node(&mut self, id: usize, name: &str, depends_on: Option<usize>) {
+        self.nodes.push(WorkflowNode {
+            id,
+            name: name.to_string(),
+            depends_on,
+            state_executed: false,
+        });
+    }
+
+    pub fn execute_workflow(&mut self) -> Result<usize, &'static str> {
+        let mut executed_count = 0;
+        let node_len = self.nodes.len();
+
+        // Snapshot initial execution states before this pass
+        let initial_states: Vec<bool> = self.nodes.iter().map(|n| n.state_executed).collect();
+
+        for i in 0..node_len {
+            // If already executed, skip running but count as executed
+            if initial_states[i] {
+                executed_count += 1;
+                continue;
+            }
+
+            // Check if independent or its dependency was already executed before this pass started
+            let can_execute = match self.nodes[i].depends_on {
+                None => true,
+                Some(dep_id) => {
+                    let mut dep_ok = false;
+                    for j in 0..node_len {
+                        if self.nodes[j].id == dep_id && initial_states[j] {
+                            dep_ok = true;
+                            break;
+                        }
+                    }
+                    dep_ok
+                }
+            };
+
+            if can_execute {
+                self.nodes[i].state_executed = true;
+                executed_count += 1;
+            }
+        }
+        Ok(executed_count)
     }
 }
 

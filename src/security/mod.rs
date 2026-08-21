@@ -4,10 +4,13 @@
 pub mod audit;
 pub mod capability;
 pub mod pqc_enclave;
+pub mod hardening;
+pub mod qubes_isolation;
 
 pub use pqc_enclave::{
     KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
 };
+
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
@@ -68,3 +71,4 @@ pub use vpn::{
     WireGuardHandler,
 };
 pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
