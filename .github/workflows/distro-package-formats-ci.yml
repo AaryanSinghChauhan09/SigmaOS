@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-permissions:
-  contents: read
-
 jobs:
   distro-packages:
     name: Multi-Distro Package System Verification

@@ -1646,4 +1646,21 @@ mod tests {
         assert_eq!(ranked[0].0.title, "Pacman/Tips and tricks");
         assert!(ranked[0].1 >= 10);
     }
+
+    #[test]
+    fn test_arch_wiki_category_and_ranking_search() {
+        let mut wiki = ArchWikiSearchEngine::new();
+        wiki.index_page("Pacman/Tips and tricks", "Package Management", "Advanced Pacman flags and cache cleaning procedures.");
+        wiki.index_page("General recommendations", "System Configuration", "System maintenance and Pacman setup for new installations.");
+
+        let package_pages = wiki.search_by_category("Package Management");
+        assert_eq!(package_pages.len(), 1);
+        assert_eq!(package_pages[0].title, "Pacman/Tips and tricks");
+
+        let ranked = wiki.search_with_ranking("Pacman");
+        assert!(!ranked.is_empty());
+        // "Pacman/Tips and tricks" should rank higher due to title match (10 points) vs content match (1 point)
+        assert_eq!(ranked[0].0.title, "Pacman/Tips and tricks");
+        assert!(ranked[0].1 >= 10);
+    }
 }

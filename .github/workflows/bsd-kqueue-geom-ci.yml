@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-permissions:
-  contents: read
-
 jobs:
   bsd-subsystems:
     name: BSD KQueue, GEOM & Capsicum Verification

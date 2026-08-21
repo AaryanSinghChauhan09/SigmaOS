@@ -8,9 +8,6 @@ on:
   schedule:
     - cron: '0 2 * * *' # Nightly run at 02:00 UTC
 
-permissions:
-  contents: read
-
 jobs:
   kernel-fuzzing:
     name: Syzkaller & TCP Seed Fuzzer
