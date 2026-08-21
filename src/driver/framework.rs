@@ -1,6 +1,4 @@
 use core::mem;
-/// OOP-based Driver Framework for SigmaOS
-/// Based on Roadmap Item 1: Driver framework
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
@@ -54,15 +52,6 @@ pub enum DriverType {
     Char = 1,
     Network = 2,
     Storage = 3,
-    Input = 4,
-}
-#[derive(Debug, Clone, Copy)]
-pub enum DriverType { Block = 0, Char = 1, Network = 2 }
-#[derive(Debug, Clone, Copy)]
-pub enum DriverType {
-    Block = 0,
-    Char = 1,
-    Network = 2,
 }
 
 #[repr(usize)]
@@ -79,63 +68,51 @@ pub trait Driver {
     fn state(&self) -> DriverState;
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
-    fn set_state(&self, _state: DriverState) {}
-    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
-    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
-    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
-    fn dependencies(&self) -> &'static [DriverType] { &[] }
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DriverError {
-    Success = 0,
-    LoadFailed = 1,
-    UnloadFailed = 2,
-    ProbeFailed = 3,
-}
-pub enum DriverError { Success = 0, LoadFailed = 1, UnloadFailed = 2 }
-pub enum DriverError {
-    Success = 0,
-    LoadFailed = 1,
-    UnloadFailed = 2,
+pub trait StorageDriver: Driver {
+    fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
+    fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
 }
 
-#[repr(C)]
-pub struct SimpleDriver {
+pub trait NetworkDriver: Driver {
+    fn send_packet(&mut self, packet: &[u8]) -> Result<(), DriverError>;
+    fn receive_packet(&mut self, buf: &mut [u8]) -> Result<usize, DriverError>;
+}
+
+pub trait GraphicsDriver: Driver {
+    fn set_resolution(&mut self, width: u32, height: u32) -> Result<(), DriverError>;
+    fn flip_buffers(&mut self) -> Result<(), DriverError>;
+}
+
+pub trait InputDriver: Driver {
+    fn poll_events(&mut self) -> Result<usize, DriverError>;
+}
+
+// Concrete Driver Classes (OOP Implementation)
+
+pub struct SimpleStorageDriver {
     pub id: DriverID,
     pub driver_type: DriverType,
     pub state: AtomicUsize,
 }
 
-impl SimpleDriver {
-    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        SimpleDriver {
+impl SimpleStorageDriver {
+    pub fn new(id: DriverID) -> Self {
+        SimpleStorageDriver {
             id,
             driver_type: DriverType::Storage,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
-
-    pub fn init(&self) -> Result<(), DriverError> {
-        Ok(())
-    }
-
-    pub fn probe(&self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
-
-    pub fn shutdown(&self) -> Result<(), DriverError> {
-        Ok(())
-    }
 }
 
-impl Driver for SimpleDriver {
+impl Driver for SimpleStorageDriver {
     fn id(&self) -> DriverID {
         self.id
     }
     fn driver_type(&self) -> DriverType {
-        self.driver_type
+        DriverType::Storage
     }
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
@@ -157,16 +134,9 @@ pub trait DriverFramework {
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
 }
 
-#[allow(dead_code)]
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
     next_id: AtomicUsize,
-}
-
-impl Default for SimpleDriverFramework {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleDriverFramework {
@@ -216,30 +186,21 @@ impl DriverFramework for SimpleDriverFramework {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct Vec<T> {
+struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-    pub fn push(&mut self, item: T) {
+    fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();

@@ -1,5 +1,6 @@
-// SigmaOS Cross-Kernel ABI Translator
-// Designed to translate function register calling conventions and packet alignments across x86 and ARM ABIs
+// SigmaOS Cross-Kernel ABI & System Alignment Checker
+// Designed to translate function register calling conventions, stack alignments,
+// page boundaries, ISA DMA limits, and SIMD memory operand alignment.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchitecture {
@@ -50,9 +51,9 @@ impl ABITranslator {
     ) -> InvocationStackLayout {
         let mut register_params = Vec::new();
         let mut stack_params = Vec::new();
-        let mut stack_cleaning_authority = "CALLER";
+        let stack_cleaning_authority;
         let mut shadow_space_bytes = 0;
-        let mut stack_alignment_bytes = 4; // x86 standard
+        let stack_alignment_bytes;
 
         match convention {
             CallingConvention::Cdecl => {
@@ -152,12 +153,10 @@ impl ABITranslator {
         let mut modern_registers = Vec::new();
         match self.target_arch {
             CpuArchitecture::X86 => {
-                // Translate legacy fastcall/stdcall register passing (e.g. EAX, EDX, ECX)
-                // into modern System V AMD64 ABI (RDI, RSI, RDX, RCX, R8, R9)
                 if old_registers.len() >= 3 {
-                    modern_registers.push(old_registers[0]); // RDI = old param 1 (EAX)
-                    modern_registers.push(old_registers[1]); // RSI = old param 2 (EDX)
-                    modern_registers.push(old_registers[2]); // RDX = old param 3 (ECX)
+                    modern_registers.push(old_registers[0]);
+                    modern_registers.push(old_registers[1]);
+                    modern_registers.push(old_registers[2]);
                     for &reg in &old_registers[3..] {
                         modern_registers.push(reg);
                     }
@@ -168,13 +167,11 @@ impl ABITranslator {
                 }
             }
             CpuArchitecture::Arm => {
-                // Translate legacy OABI to modern EABI parameter alignment
                 for &reg in old_registers {
                     modern_registers.push(reg);
                 }
             }
             CpuArchitecture::Mips => {
-                // MIPS O32 to N32 register mapping translator
                 for &reg in old_registers {
                     modern_registers.push(reg);
                 }
@@ -184,16 +181,95 @@ impl ABITranslator {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SYSTEM ALIGNMENT VERIFICATION SUBSYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub struct SovereignAlignmentChecker;
+
+impl SovereignAlignmentChecker {
+    /// Verifies System V / ARM stack pointer alignment (e.g. 16-byte for x86-64 / AAPCS64, 8-byte for AArch32)
+    pub fn check_stack_alignment(stack_ptr: usize, required_alignment: usize) -> bool {
+        if required_alignment == 0 {
+            return true;
+        }
+        stack_ptr % required_alignment == 0
+    }
+
+    /// Verifies Virtual/Physical memory page boundary alignment (4KB, 2MB, 1GB)
+    pub fn check_page_alignment(addr: usize, page_byte_size: usize) -> bool {
+        if page_byte_size == 0 {
+            return true;
+        }
+        addr % page_byte_size == 0
+    }
+
+    /// Verifies Ancient Hardware ISA DMA boundary constraint (Sub-16MB memory limit and 64KB boundary cross)
+    pub fn check_isa_dma_alignment(phys_addr: usize, size: usize) -> bool {
+        let isa_16mb_limit = 16 * 1024 * 1024;
+        let isa_64kb_boundary = 64 * 1024;
+
+        if phys_addr + size > isa_16mb_limit {
+            return false; // Exceeds 16MB ISA physical limit
+        }
+
+        // Check if buffer crosses a 64KB physical page boundary
+        let start_page = phys_addr / isa_64kb_boundary;
+        let end_page = (phys_addr + size - 1) / isa_64kb_boundary;
+        start_page == end_page
+    }
+
+    /// Verifies 4KB Advanced Format (AF) disk sector alignment (8-sector boundary checks)
+    pub fn check_disk_sector_alignment(start_sector: u64, align_sectors: u64) -> bool {
+        if align_sectors == 0 {
+            return true;
+        }
+        start_sector % align_sectors == 0
+    }
+
+    /// Verifies SIMD / Vector instruction memory operand alignment (64-byte AVX-512, 32-byte AVX2, 16-byte SSE)
+    pub fn check_simd_alignment(ptr: usize, align_bytes: usize) -> bool {
+        if align_bytes == 0 {
+            return true;
+        }
+        ptr % align_bytes == 0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_sovereign_alignment_checker() {
+        // Stack alignment test (x86_64 16-byte alignment requirement)
+        assert!(SovereignAlignmentChecker::check_stack_alignment(0x7FFF_FFFF_F000, 16));
+        assert!(!SovereignAlignmentChecker::check_stack_alignment(0x7FFF_FFFF_F008, 16));
+
+        // Memory page alignment test (4KB, 2MB, 1GB)
+        assert!(SovereignAlignmentChecker::check_page_alignment(0x1000, 4096));
+        assert!(!SovereignAlignmentChecker::check_page_alignment(0x1080, 4096));
+        assert!(SovereignAlignmentChecker::check_page_alignment(0x200000, 2 * 1024 * 1024));
+
+        // Ancient ISA DMA 16MB & 64KB boundary test
+        assert!(SovereignAlignmentChecker::check_isa_dma_alignment(0x10000, 4096)); // Valid 64KB page
+        assert!(!SovereignAlignmentChecker::check_isa_dma_alignment(0xFF0001, 65536)); // Crosses 16MB limit
+        assert!(!SovereignAlignmentChecker::check_isa_dma_alignment(0x0F00, 65536)); // Crosses 64KB boundary
+
+        // Disk 4KB AF sector alignment test (8 sectors)
+        assert!(SovereignAlignmentChecker::check_disk_sector_alignment(2048, 8)); // 2048 % 8 == 0
+        assert!(!SovereignAlignmentChecker::check_disk_sector_alignment(2049, 8));
+
+        // SIMD vector alignment test (AVX-512 64-byte alignment)
+        assert!(SovereignAlignmentChecker::check_simd_alignment(0x1000, 64));
+        assert!(!SovereignAlignmentChecker::check_simd_alignment(0x1020, 64));
+    }
 
     #[test]
     fn test_x86_abi_translation() {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let old_regs = vec![10, 20, 30];
         let modern_regs = translator.translate_register_map(&old_regs).unwrap();
-        // Modern registers should map sequentially
         assert_eq!(modern_regs[0], 10);
         assert_eq!(modern_regs[1], 20);
         assert_eq!(modern_regs[2], 30);
@@ -204,19 +280,16 @@ mod tests {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let params = vec![100, 200, 300, 400];
 
-        // cdecl: all on stack
         let cdecl_layout = translator.compute_invocation_layout(&params, CallingConvention::Cdecl);
         assert_eq!(cdecl_layout.stack_params, vec![100, 200, 300, 400]);
         assert!(cdecl_layout.register_params.is_empty());
         assert_eq!(cdecl_layout.stack_cleaning_authority, "CALLER");
         assert_eq!(cdecl_layout.stack_alignment_bytes, 4);
 
-        // stdcall: all on stack, callee cleans
         let stdcall_layout = translator.compute_invocation_layout(&params, CallingConvention::Stdcall);
         assert_eq!(stdcall_layout.stack_params, vec![100, 200, 300, 400]);
         assert_eq!(stdcall_layout.stack_cleaning_authority, "CALLEE");
 
-        // fastcall: ECX, EDX, rest on stack
         let fastcall_layout = translator.compute_invocation_layout(&params, CallingConvention::Fastcall32);
         assert_eq!(fastcall_layout.register_params, vec![
             ("ECX".to_string(), 100),
@@ -231,7 +304,6 @@ mod tests {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let params = vec![1, 2, 3, 4, 5, 6, 7];
 
-        // Microsoft x64: RCX, RDX, R8, R9, rest on stack, 32-byte shadow
         let ms_layout = translator.compute_invocation_layout(&params, CallingConvention::MicrosoftX64);
         assert_eq!(ms_layout.register_params, vec![
             ("RCX".to_string(), 1),
@@ -243,7 +315,6 @@ mod tests {
         assert_eq!(ms_layout.shadow_space_bytes, 32);
         assert_eq!(ms_layout.stack_alignment_bytes, 16);
 
-        // System V AMD64: RDI, RSI, RDX, RCX, R8, R9, rest on stack
         let sysv_layout = translator.compute_invocation_layout(&params, CallingConvention::SystemVAmd64);
         assert_eq!(sysv_layout.register_params, vec![
             ("RDI".to_string(), 1),
@@ -263,7 +334,6 @@ mod tests {
         let translator = ABITranslator::new(CpuArchitecture::Arm);
         let params = vec![11, 22, 33, 44, 55];
 
-        // AArch32 AAPCS: R0-R3, rest on stack
         let aapcs32 = translator.compute_invocation_layout(&params, CallingConvention::AArch32AAPCS);
         assert_eq!(aapcs32.register_params, vec![
             ("R0".to_string(), 11),
@@ -274,7 +344,6 @@ mod tests {
         assert_eq!(aapcs32.stack_params, vec![55]);
         assert_eq!(aapcs32.stack_alignment_bytes, 8);
 
-        // AArch64 AAPCS: X0-X7, rest on stack
         let aapcs64 = translator.compute_invocation_layout(&params, CallingConvention::AArch64AAPCS);
         assert_eq!(aapcs64.register_params, vec![
             ("X0".to_string(), 11),

@@ -5,46 +5,8 @@
  * Initialize accessible keyboard handlers for Zenith desktop controls.
  * Supports keyboard navigation (tab order, focus states) and ARIA attributes.
  */
-/**
- * Native, sovereign zero-dependency DOM element selector helper.
- * Replaces external DOM selector packages with browser-native, safe DOM query routines.
- */
-export class SovereignDomSelector {
-  static selectOne(selector, root = typeof document !== "undefined" ? document : null) {
-    if (!root || typeof root.querySelector !== "function") return null;
-    try {
-      return root.querySelector(selector);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  static selectAll(selector, root = typeof document !== "undefined" ? document : null) {
-    if (!root || typeof root.querySelectorAll !== "function") return [];
-    try {
-      return Array.from(root.querySelectorAll(selector));
-    } catch (e) {
-      return [];
-    }
-  }
-
-  static matches(element, selector) {
-    if (!element || typeof element.matches !== "function") return false;
-    try {
-      return element.matches(selector);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  static findByAttr(attrName, attrValue = null, root = typeof document !== "undefined" ? document : null) {
-    const selector = attrValue !== null ? `[${attrName}="${attrValue}"]` : `[${attrName}]`;
-    return this.selectAll(selector, root);
-  }
-}
-
 export function initKeyboardNavigation() {
-  const interactiveElements = SovereignDomSelector.selectAll(
+  const interactiveElements = document.querySelectorAll(
     '[role="button"], [tab-index="0"]',
   );
 

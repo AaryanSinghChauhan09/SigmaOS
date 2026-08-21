@@ -1,25 +1,7 @@
 //! Sovereign VLC and MPV Equivalent Video Player
 //! Natively optimized for SigmaOS content-addressed and virtual memory architectures.
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
 
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::string::{String, ToString};
@@ -340,7 +322,6 @@ pub struct SovereignVmm {
 }
 
 impl SovereignVmm {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             root_pt: PageTable {
@@ -383,7 +364,6 @@ pub struct CGroupController {
 }
 
 impl CGroupController {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { groups: Vec::new() }
     }
@@ -412,7 +392,6 @@ pub struct DnsResolver {
 }
 
 impl DnsResolver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { cache: Vec::new() }
     }
@@ -445,7 +424,6 @@ pub struct SecureBootKeyring {
 }
 
 impl SecureBootKeyring {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             authorized_db_keys: [[0u8; 32]; 4],
@@ -488,7 +466,6 @@ pub struct SigmaSystemd {
 }
 
 impl SigmaSystemd {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             services: Vec::new(),
@@ -528,7 +505,6 @@ pub struct NtpClient {
 }
 
 impl NtpClient {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { offset_nanos: 0 }
     }
@@ -642,16 +618,7 @@ https://media.sigmaos.dev/trailer_b.mp4
     #[test]
     fn test_secure_boot() {
         let mut keyring = SecureBootKeyring::new();
-        // Generate test key using timestamp-based approach
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-        let mut key = [0u8; 32];
-        for (i, byte) in key.iter_mut().enumerate() {
-            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
-        }
+        let key = [0x55u8; 32];
         keyring.enroll_key(key).unwrap();
         assert!(keyring.verify_signature(&key));
     }
