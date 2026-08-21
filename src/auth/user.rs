@@ -25,6 +25,7 @@ pub enum AuthError { Success = 0, InvalidCredentials = 1, AccountLocked = 2 }
 pub struct SimpleUser {
     pub id: UserID,
     pub username: [u8; 32],
+    pub username_len: u8, // Cached byte length for O(1) username slice retrieval
     pub password_hash: [u8; 64],
     pub state: AtomicUsize,
 }
@@ -42,6 +43,7 @@ impl SimpleUser {
         SimpleUser {
             id,
             username: name_array,
+            username_len: name_len as u8,
             password_hash: hash_array,
             state: AtomicUsize::new(UserState::Active as usize),
         }
@@ -51,7 +53,13 @@ impl SimpleUser {
 impl User for SimpleUser {
     fn id(&self) -> UserID { self.id }
     fn username(&self) -> &[u8] {
-        let len = self.username.iter().position(|&b| b == 0).unwrap_or(32);
+        // Fast path: return slice using cached username length in O(1) time
+        // fallback to position search if len is 0 or uninitialized
+        let len = if self.username_len > 0 {
+            self.username_len as usize
+        } else {
+            self.username.iter().position(|&b| b == 0).unwrap_or(32)
+        };
         &self.username[..len]
     }
     fn state(&self) -> UserState {
