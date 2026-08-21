@@ -15,8 +15,6 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
-use core::ptr::NonNull;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolType {
     Paged,    // Swappable (virtual pages can be swapped out to disk)
@@ -127,6 +125,12 @@ impl Page {
     }
 }
 
+/// Buddy allocator for memory management
+#[derive(Debug, Clone)]
+pub struct BuddyAllocatorCheckpoint {
+    pub free_lists: [Vec<MemoryBlock>; 12],
+}
+
 pub struct BuddyAllocator {
     pub free_lists: [Vec<MemoryBlock>; 12],
     pub free_pages: usize,
@@ -151,6 +155,18 @@ impl BuddyAllocator {
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
                 let block = MemoryBlock { addr, size };
+                self.free_lists[order].push(block);
+            }
+            let block = MemoryBlock {
+                addr: NonNull::new(base_addr as *mut u8).unwrap(),
+                size,
+            };
+            self.free_lists[order].push(block);
+            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
+                let block = MemoryBlock {
+                    addr,
+                    size,
+                };
                 self.free_lists[order].push(block);
             }
         }
@@ -387,6 +403,8 @@ impl PageTable {
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
     pub buddy_allocator: BuddyAllocator,
+    pub page_ref_counts: HashMap<u64, u32>, // physical frame addr -> reference count (for Copy-on-Write)
+    pub shadow_snapshots: HashMap<u64, String>, // virtual_addr -> snapshot copy (for snapshot isolation)
 }
 
 impl VirtualMemoryManager {
