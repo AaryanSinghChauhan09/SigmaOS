@@ -64,7 +64,7 @@ pub unsafe extern "C" fn uname_init() -> SigmaI32 {
 /// Get system name
 #[no_mangle]
 pub unsafe extern "C" fn uname_sysname(sysname: *mut u8, max_len: SigmaU32) -> SigmaI32 {
-    if !UNAME_INITIALIZED || sysname.isnull() {
+    if !UNAME_INITIALIZED || sysname.is_null() {
         return -1;
     }
     
@@ -82,7 +82,7 @@ pub unsafe extern "C" fn uname_sysname(sysname: *mut u8, max_len: SigmaU32) -> S
 /// Get node name
 #[no_mangle]
 pub unsafe extern "C" fn uname_nodename(nodename: *mut u8, max_len: SigmaU32) -> SigmaI32 {
-    if !UNAME_INITIALIZED || nodename.isnull() {
+    if !UNAME_INITIALIZED || nodename.is_null() {
         return -1;
     }
     
@@ -100,7 +100,7 @@ pub unsafe extern "C" fn uname_nodename(nodename: *mut u8, max_len: SigmaU32) ->
 /// Get release
 #[no_mangle]
 pub unsafe extern "C" fn uname_release(release: *mut u8, max_len: SigmaU32) -> SigmaI32 {
-    if !UNAME_INITIALIZED || release.isnull() {
+    if !UNAME_INITIALIZED || release.is_null() {
         return -1;
     }
     
@@ -118,7 +118,7 @@ pub unsafe extern "C" fn uname_release(release: *mut u8, max_len: SigmaU32) -> S
 /// Get version
 #[no_mangle]
 pub unsafe extern "C" fn uname_version(version: *mut u8, max_len: SigmaU32) -> SigmaI32 {
-    if !UNAME_INITIALIZED || version.isnull() {
+    if !UNAME_INITIALIZED || version.is_null() {
         return -1;
     }
     
@@ -136,7 +136,7 @@ pub unsafe extern "C" fn uname_version(version: *mut u8, max_len: SigmaU32) -> S
 /// Get machine
 #[no_mangle]
 pub unsafe extern "C" fn uname_machine(machine: *mut u8, max_len: SigmaU32) -> SigmaI32 {
-    if !UNAME_INITIALIZED || machine.isnull() {
+    if !UNAME_INITIALIZED || machine.is_null() {
         return -1;
     }
     
@@ -154,7 +154,7 @@ pub unsafe extern "C" fn uname_machine(machine: *mut u8, max_len: SigmaU32) -> S
 /// Get all information
 #[no_mangle]
 pub unsafe extern "C" fn uname_all(info: *mut UnameInfo) -> SigmaI32 {
-    if !UNAME_INITIALIZED || info.isnull() {
+    if !UNAME_INITIALIZED || info.is_null() {
         return -1;
     }
     
@@ -165,7 +165,7 @@ pub unsafe extern "C" fn uname_all(info: *mut UnameInfo) -> SigmaI32 {
 /// Set system name
 #[no_mangle]
 pub unsafe extern "C" fn uname_set_sysname(sysname: *const u8) -> SigmaI32 {
-    if !UNAME_INITIALIZED || sysname.isnull() {
+    if !UNAME_INITIALIZED || sysname.is_null() {
         return -1;
     }
     
@@ -181,7 +181,7 @@ pub unsafe extern "C" fn uname_set_sysname(sysname: *const u8) -> SigmaI32 {
 /// Set node name
 #[no_mangle]
 pub unsafe extern "C" fn uname_set_nodename(nodename: *const u8) -> SigmaI32 {
-    if !UNAME_INITIALIZED || nodename.isnull() {
+    if !UNAME_INITIALIZED || nodename.is_null() {
         return -1;
     }
     
