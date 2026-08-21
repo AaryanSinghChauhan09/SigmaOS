@@ -6,19 +6,18 @@ pub mod autogen;
 pub mod llm;
 pub mod orchestrator;
 pub mod sai;
+pub mod openclaw;
 pub mod system;
 pub mod voice;
-pub mod lift_engine;
 pub mod wiki;
-pub mod apm;
+pub mod qwenpaw;
 pub mod developer_platform;
 
-pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
-
-pub use agent::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
-    Pattern, SimpleAIAgent, SimpleAIAgentManager,
+pub use openclaw::{
+    ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
 };
+
+pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,
@@ -27,14 +26,11 @@ pub use llm::{
     BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
     LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
 };
-pub use orchestrator::{
-    AIOSAgent, AgentState, LocalLlmOrchestrator, LocalModelSize, SovereignMultiAgentPlanner,
-};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+    SovereignGpuAiAccelerator,
 };
-pub use sai::{Agent, AgentRole, AgentTask as Task, TaskStatus};
 pub use system::{
     AdaptiveSchedulingService, AiServiceConfig, AiServiceManager, AiServiceMetrics, AiServiceState,
     AiServiceType, AiSystemService, PredictiveMaintenanceService, ResourceManagementService,
@@ -44,13 +40,7 @@ pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
 };
-pub use wiki::{SovereignWikiEngine, WikiArticle};
-pub use apm::{
-    ApmDependency, ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, McpServer,
-    SovereignApmEngine,
-};
 pub use developer_platform::{
-    DeviceTarget, LocalLlmOrchestrator, ModelAllocation, PrivacyRouter,
-    DefaultDenyNetworkPolicy, OpenShellAgentSandbox, ExperimentRun, MlExperimentTracker,
-    AiSafetyPolicyEngine, MarketplaceModel, SignedModelMarketplace, compute_blake3_simulated,
+    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
+    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };

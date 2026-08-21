@@ -392,4 +392,33 @@ mod tests {
         assert!(market.verify_and_load("model-01", model_data).is_ok());
         assert!(market.models[0].is_verified);
     }
+
+    #[test]
+    fn test_dvc_mlflow_vfs_tracker() {
+        let mut dvc = DvcMlflowVfsTracker::new("mnist-model");
+        let snap_id = dvc.snapshot_training_state("epoch-10", "/var/models/mnist.bin").unwrap();
+        assert_eq!(snap_id, "snap-1");
+        assert_eq!(dvc.snapshots.len(), 1);
+    }
+}
+
+/// DVC & MLflow VFS CoW Snapshot Tracker
+pub struct DvcMlflowVfsTracker {
+    pub experiment_name: String,
+    pub snapshots: Vec<String>,
+}
+
+impl DvcMlflowVfsTracker {
+    pub fn new(experiment_name: &str) -> Self {
+        Self {
+            experiment_name: experiment_name.to_string(),
+            snapshots: Vec::new(),
+        }
+    }
+
+    pub fn snapshot_training_state(&mut self, stage: &str, model_path: &str) -> Result<String, &'static str> {
+        let snap_id = format!("snap-{}", self.snapshots.len() + 1);
+        self.snapshots.push(format!("{}:{}:{}", snap_id, stage, model_path));
+        Ok(snap_id)
+    }
 }
