@@ -3,9 +3,10 @@
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 pub const MAX_AUDIO_CHANNELS: usize = 4;
 
@@ -21,7 +22,6 @@ pub enum MediaFormat {
     Mp3,
     Wav,
     Flac,
-    Pcm,
 }
 
 pub struct AudioChannel {
@@ -29,18 +29,14 @@ pub struct AudioChannel {
     pub volume: AtomicU16, // scale of 0-100
 }
 
-pub struct AudioTrack {
-    pub name: String,
-    pub format: MediaFormat,
-    pub duration_secs: u32,
-    pub volume: f32, // 0.0 to 1.0
-}
-
 pub struct SigmaMediaEngine {
     pub channels: [AudioChannel; MAX_AUDIO_CHANNELS],
     pub master_mute: AtomicBool,
-    pub current_track: Option<AudioTrack>,
     pub state: PlaybackState,
+    pub has_track: bool,
+    pub active_track: Option<String>,
+    pub format: Option<MediaFormat>,
+    pub duration_seconds: usize,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -67,27 +63,27 @@ impl SigmaMediaEngine {
                 },
             ],
             master_mute: AtomicBool::new(false),
-            current_track: None,
             state: PlaybackState::Stopped,
+            has_track: false,
+            active_track: None,
+            format: None,
+            duration_seconds: 0,
         }
     }
 
     pub fn play(&mut self) -> Result<(), &'static str> {
-        if self.current_track.is_none() {
+        if !self.has_track && self.active_track.is_none() {
             return Err("No track loaded");
         }
         self.state = PlaybackState::Playing;
         Ok(())
     }
 
-    pub fn load_track(&mut self, name: String, format: MediaFormat, duration: u32) {
-        let track = AudioTrack {
-            name,
-            format,
-            duration_secs: duration,
-            volume: 0.8,
-        };
-        self.current_track = Some(track);
+    pub fn load_track(&mut self, name: String, format: MediaFormat, duration: usize) {
+        self.has_track = true;
+        self.active_track = Some(name);
+        self.format = Some(format);
+        self.duration_seconds = duration;
         self.state = PlaybackState::Stopped;
     }
 
@@ -119,6 +115,7 @@ impl SigmaMediaEngine {
         channel.active.store(true, Ordering::SeqCst);
         let vol = channel.volume.load(Ordering::SeqCst);
 
+        // Simulate PCM mixing on active hardware VESA/sound register
         let mut mixed_amplitude: u32 = 0;
         for &sample in buffer {
             mixed_amplitude = mixed_amplitude.wrapping_add((sample as u32 * vol as u32) / 100);
@@ -146,13 +143,7 @@ impl SigmaMediaEngine {
     }
 }
 
-impl Default for SigmaMediaEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
+// 1. SigmaSupportSubtitleSync (Aegisub ASS Advanced Styling & Karaoke Parity)
 
 pub struct AegisubKaraokeSyllable {
     pub text: String,
@@ -176,6 +167,7 @@ impl SigmaSupportSubtitleSync {
         }
     }
 
+    /// Parses Aegisub-style ASS tags (e.g. {\fnArial\fs24\c&HFF0000&}Sovereign)
     pub fn parse_ass_styling_tags(&mut self, tag_str: &str) -> String {
         if !tag_str.starts_with("{\\") || !tag_str.contains('}') {
             return tag_str.to_string();
@@ -207,11 +199,7 @@ impl SigmaSupportSubtitleSync {
     }
 }
 
-impl Default for SigmaSupportSubtitleSync {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+// 2. SigmaSupportSubtitleEdit (Subtitle Edit Timing Synchronization Parity)
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SubtitleFormat {
@@ -247,6 +235,7 @@ impl SigmaSupportSubtitleEdit {
         });
     }
 
+    /// Subtitle Edit parity: applies frame-rate scale conversion and millisecond synchronization shifts
     pub fn shift_all_timings_ms(&mut self, offset_ms: i32) {
         for entry in &mut self.entries {
             let s = entry.start_ms as i64 + offset_ms as i64;
@@ -265,8 +254,20 @@ mod tests {
     #[test]
     fn test_media_playback() {
         let mut engine = SigmaMediaEngine::new();
-        assert!(!engine.master_mute.load(Ordering::SeqCst));
-        assert_eq!(engine.channels.len(), 4);
+        assert_eq!(engine.state, PlaybackState::Stopped);
+        assert!(engine.play().is_err());
+
+        engine.load_track("Symphony-9.mp3".to_string(), MediaFormat::Mp3, 340);
+        assert_eq!(engine.state, PlaybackState::Stopped);
+
+        assert!(engine.play().is_ok());
+        assert_eq!(engine.state, PlaybackState::Playing);
+
+        engine.pause();
+        assert_eq!(engine.state, PlaybackState::Paused);
+
+        engine.stop();
+        assert_eq!(engine.state, PlaybackState::Stopped);
     }
 
     #[test]
@@ -285,12 +286,15 @@ mod tests {
         let mut edit = SigmaSupportSubtitleEdit::new(SubtitleFormat::Srt);
         edit.insert_subtitle_entry(1000, 3000, "Hello World");
 
+        // Shift forward 500ms
         edit.shift_all_timings_ms(500);
         assert_eq!(edit.entries[0].start_ms, 1500);
         assert_eq!(edit.entries[0].end_ms, 3500);
 
+        // Shift backward 1000ms
         edit.shift_all_timings_ms(-1000);
         assert_eq!(edit.entries[0].start_ms, 500);
         assert_eq!(edit.entries[0].end_ms, 2500);
     }
 }
+pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();

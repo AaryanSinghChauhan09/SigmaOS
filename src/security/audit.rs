@@ -1,13 +1,14 @@
-// OOP-based Security Audit for SigmaOS
-// Implements security event logging and audit trails
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+/// OOP-based Security Audit for SigmaOS
+/// Based on Ideas-999-Structured: Security & Sovereignty Item 542
+/// Implements security event logging and audit trails
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type EventID = usize;
 
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
     Authentication = 0,
@@ -16,6 +17,7 @@ pub enum EventType {
     SystemChange = 3,
 }
 
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuditError {
     Success = 0,
@@ -31,6 +33,7 @@ pub trait AuditEvent {
     fn description(&self) -> &[u8];
 }
 
+#[repr(C)]
 pub struct SimpleAuditEvent {
     pub id: EventID,
     pub event_type: AtomicUsize,
@@ -43,11 +46,13 @@ impl SimpleAuditEvent {
     pub fn new(id: EventID, event_type: EventType, user_id: usize, description: &[u8]) -> Self {
         let mut desc_array = [0u8; 256];
         let desc_len = description.len().min(255);
-        desc_array[..desc_len].copy_from_slice(&description[..desc_len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(description.as_ptr(), desc_array.as_mut_ptr(), desc_len);
+        }
         SimpleAuditEvent {
             id,
             event_type: AtomicUsize::new(event_type as usize),
-            timestamp: AtomicUsize::new(1000000),
+            timestamp: AtomicUsize::new(0),
             user_id: AtomicUsize::new(user_id),
             description: desc_array,
         }
@@ -58,20 +63,19 @@ impl AuditEvent for SimpleAuditEvent {
     fn id(&self) -> EventID {
         self.id
     }
+
     fn event_type(&self) -> EventType {
-        match self.event_type.load(Ordering::SeqCst) {
-            1 => EventType::Authorization,
-            2 => EventType::FileAccess,
-            3 => EventType::SystemChange,
-            _ => EventType::Authentication,
-        }
+        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
     }
+
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64
     }
+
     fn user_id(&self) -> usize {
         self.user_id.load(Ordering::SeqCst)
     }
+
     fn description(&self) -> &[u8] {
         let len = self.description.iter().position(|&b| b == 0).unwrap_or(256);
         &self.description[..len]
@@ -87,21 +91,19 @@ pub trait AuditLogger {
 
 pub struct SimpleAuditLogger {
     pub events: Vec<Option<Box<dyn AuditEvent>>>,
-    pub next_id: AtomicUsize,
-}
-
-impl Default for SimpleAuditLogger {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleAuditLogger {
     pub fn new() -> Self {
         SimpleAuditLogger {
             events: Vec::new(),
-            next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAuditLogger {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -113,8 +115,8 @@ impl AuditLogger for SimpleAuditLogger {
     }
 
     fn get_event(&self, id: EventID) -> Option<&dyn AuditEvent> {
-        for event_option in &self.events {
-            if let Some(ref event) = *event_option {
+        for i in 0..self.events.len() {
+            if let Some(ref event) = self.events[i] {
                 if event.id() == id {
                     return Some(event.as_ref());
                 }
@@ -125,8 +127,8 @@ impl AuditLogger for SimpleAuditLogger {
 
     fn query_events(&self, event_type: EventType, user_id: usize) -> Vec<EventID> {
         let mut ids = Vec::new();
-        for event_option in &self.events {
-            if let Some(ref event) = *event_option {
+        for i in 0..self.events.len() {
+            if let Some(ref event) = self.events[i] {
                 if event.event_type() == event_type && event.user_id() == user_id {
                     ids.push(event.id());
                 }
@@ -136,14 +138,29 @@ impl AuditLogger for SimpleAuditLogger {
     }
 
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
-        if let Some(pos) = self.events.iter().position(|e| match e {
-            Some(evt) => evt.timestamp() < older_than,
-            None => false,
-        }) {
-            self.events.remove(pos);
+        let mut i = 0;
+        while i < self.events.len() {
+            let mut remove = false;
+            if let Some(ref event) = self.events[i] {
+                if event.timestamp() < older_than {
+                    remove = true;
+                }
+            }
+            if remove {
+                self.events.remove(i);
+            } else {
+                i += 1;
+            }
         }
         Ok(())
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    Json,
+    PlainText,
+    Binary,
 }
 
 pub trait AuditPolicy {
@@ -151,14 +168,9 @@ pub trait AuditPolicy {
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError>;
 }
 
+#[repr(C)]
 pub struct SimpleAuditPolicy {
     pub require_authentication: AtomicUsize,
-}
-
-impl Default for SimpleAuditPolicy {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleAuditPolicy {
@@ -184,5 +196,21 @@ impl AuditPolicy for SimpleAuditPolicy {
         } else {
             Err(AuditError::InvalidEvent)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_audit_event_logging() {
+        let mut logger = SimpleAuditLogger::new();
+        let event = SimpleAuditEvent::new(1, EventType::Authentication, 1001, b"User logged in successfully");
+        logger.log_event(Box::new(event)).unwrap();
+
+        let found = logger.get_event(1).unwrap();
+        assert_eq!(found.user_id(), 1001);
+        assert_eq!(found.event_type(), EventType::Authentication);
     }
 }

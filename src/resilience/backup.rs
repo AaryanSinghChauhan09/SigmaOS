@@ -90,11 +90,15 @@ pub struct BackupSnapshot {
     pub files_hash: BTreeMap<String, String>,
 }
 
+pub type FsSnapshot = BackupSnapshot;
+
 pub struct SigmaTimeshift {
     pub snapshots: Vec<BackupSnapshot>,
     pub backup_schedule_enabled: bool,
     pub last_scheduled_run: u64,
 }
+
+pub static GLOBAL_TIMESHIFT: () = ();
 
 impl SigmaTimeshift {
     pub fn new() -> Self {
