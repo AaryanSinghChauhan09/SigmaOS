@@ -1,19 +1,16 @@
-/// Local LLM Orchestrator for SigmaOS
-/// Dynamically schedules models, checks device bounds, and prunes context windows.
-/// OOP-based AI Orchestrator for SigmaOS
-/// Based on 100-Improvement-Ideas.md #51: AI orchestrator for system optimization
-/// Implements sigma-ai core with multi-agent coordination, workflow automation,
-/// and self-diagnosis capabilities for system optimization
-#![no_std]
+// Local LLM Orchestrator for SigmaOS
+// Dynamically schedules models, checks device bounds, and prunes context windows.
 
 extern crate alloc;
-
+use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::sync::Arc;
 use alloc::vec::Vec;
+use core::fmt::Write;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
-pub type AgentID = usize;
+pub type AgentID = u64;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,6 +41,168 @@ pub enum OrchestratorError {
     LimitExceeded = 3,
 }
 
+pub struct ModelResource {
+    pub name: [u8; 32],
+    pub memory_required_mb: usize,
+    pub target: DeviceTarget,
+}
+
+impl ModelResource {
+    pub fn new(name: &[u8], memory_required_mb: usize, target: DeviceTarget) -> Self {
+        let mut name_array = [0u8; 32];
+        let len = name.len().min(31);
+        name_array[..len].copy_from_slice(&name[..len]);
+        ModelResource {
+            name: name_array,
+            memory_required_mb,
+            target,
+        }
+    }
+}
+
+/// Type representing different local model sizes managed by the S-AI Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LocalModelSize {
+    Tiny1B,   // DeepSeek-R1-Distill-1.5B equivalent (Fast, low-latency, headless tools)
+    Medium8B, // LLaMA-3-8B / Qwen-2.5-7B equivalent (Analytical reasoning, complex logic)
+    Large70B, // DeepSeek-V3 MoE / LLaMA-70B equivalent (Highly complex mathematical or coding tasks)
+}
+
+/// A target agent profile managed by the multi-agent task planner
+#[derive(Debug, Clone)]
+pub struct AIOSAgent {
+    pub name: String,
+    pub role: String,
+    pub system_instructions: String,
+    pub primary_model: LocalModelSize,
+}
+
+/// Represents an active multi-agent plan routed dynamically across model constraints
+pub struct SovereignMultiAgentPlanner {
+    agents: Vec<AIOSAgent>,
+    active_tasks: AtomicUsize,
+    memory_vector_db: Arc<BTreeMap<String, Vec<f32>>>,
+}
+
+impl SovereignMultiAgentPlanner {
+    /// Creates a new self-contained multi-agent orchestrator
+    pub fn new() -> Self {
+        let mut default_agents = Vec::new();
+
+        // 1. CrewAI / Auto-GPT style analytical reasoning agent
+        default_agents.push(AIOSAgent {
+            name: "Sovereign_Researcher".to_string(),
+            role: "Information extraction and reasoning solver".to_string(),
+            system_instructions: "Solve complex tasks step-by-step by generating rationales.".to_string(),
+            primary_model: LocalModelSize::Medium8B,
+        });
+
+        // 2. High-speed automation agent
+        default_agents.push(AIOSAgent {
+            name: "Sovereign_Automator".to_string(),
+            role: "Task pipeline execution engine".to_string(),
+            system_instructions: "Extract actionable API mappings from user input.".to_string(),
+            primary_model: LocalModelSize::Tiny1B,
+        });
+
+        Self {
+            agents: default_agents,
+            active_tasks: AtomicUsize::new(0),
+            memory_vector_db: Arc::new(BTreeMap::new()),
+        }
+    }
+
+    /// Dynamically routes a user query to the optimal model size, avoiding resource starvation
+    pub fn route_task(&self, task_description: &str) -> (LocalModelSize, &str) {
+        self.active_tasks.fetch_add(1, Ordering::SeqCst);
+
+        // Simple heuristic search on target terms to replace Python-based classification runtimes
+        if task_description.contains("orbit")
+            || task_description.contains("quantum")
+            || task_description.contains("backprop")
+        {
+            (
+                LocalModelSize::Large70B,
+                "Routing to Large MoE Engine for high-precision scientific analysis.",
+            )
+        } else if task_description.contains("reason")
+            || task_description.contains("compile")
+            || task_description.contains("audit")
+        {
+            (
+                LocalModelSize::Medium8B,
+                "Routing to Medium Reasoning Engine for analytical task decomposition.",
+            )
+        } else {
+            (
+                LocalModelSize::Tiny1B,
+                "Routing to Tiny local model for immediate response.",
+            )
+        }
+    }
+
+    /// Simulates multi-agent negotiation (AutoGPT / CrewAI parity) for task completion
+    pub fn run_negotiated_task(&self, query: &str) -> Result<String, &'static str> {
+        let (model, rationale) = self.route_task(query);
+        let mut final_result = format!("Rationalization: {}\n", rationale);
+
+        for agent in &self.agents {
+            if agent.primary_model == model || model == LocalModelSize::Large70B {
+                let _ = write!(
+                    final_result,
+                    "[{}] executed task using instruction: '{}'\n",
+                    agent.name, agent.system_instructions
+                );
+            }
+        }
+
+        self.active_tasks.fetch_sub(1, Ordering::SeqCst);
+        Ok(final_result)
+    }
+
+    /// Embedded Cosine Similarity vector database lookup for agent memory search
+    pub fn search_memory(&self, query_vector: &[f32], threshold: f32) -> Vec<String> {
+        let mut matches = Vec::new();
+
+        for (text, vector) in self.memory_vector_db.iter() {
+            if vector.len() != query_vector.len() {
+                continue;
+            }
+
+            // Perform manual dot product to avoid third-party BLAS bindings
+            let dot_product: f32 = query_vector.iter().zip(vector.iter()).map(|(a, b)| a * b).sum();
+            let query_norm: f32 = fast_sqrt(query_vector.iter().map(|x| x * x).sum::<f32>());
+            let vector_norm: f32 = fast_sqrt(vector.iter().map(|x| x * x).sum::<f32>());
+
+            if query_norm > 0.0 && vector_norm > 0.0 {
+                let similarity = dot_product / (query_norm * vector_norm);
+                if similarity >= threshold {
+                    matches.push(text.clone());
+                }
+            }
+        }
+
+        matches
+    }
+}
+
+fn fast_sqrt(val: f32) -> f32 {
+    if val <= 0.0 {
+        return 0.0;
+    }
+    let mut x = val;
+    for _ in 0..10 {
+        x = 0.5 * (x + val / x);
+    }
+    x
+}
+
+impl Default for SovereignMultiAgentPlanner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SimpleAIAgent {
     pub id: AgentID,
     pub name: String,
@@ -57,76 +216,6 @@ impl SimpleAIAgent {
             name: name.to_string(),
             state: AgentState::Idle,
         }
-    }
-}
-
-impl AIAgent for SimpleAIAgent {
-    fn id(&self) -> AgentID { self.id }
-    fn name(&self) -> &str { &self.name }
-    fn state(&self) -> AgentState { self.state }
-
-    fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state = AgentState::Busy;
-        let mut result = Vec::new();
-        for &byte in self.name.as_bytes() { result.push(byte); }
-        result.push(b':');
-        result.push(b' ');
-        for &byte in task { result.push(byte); }
-        self.state = AgentState::Idle;
-        Ok(result)
-    }
-}
-
-pub trait AgentOrchestrator {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
-    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
-    fn list_agents(&self) -> Vec<AgentID>;
-}
-
-pub struct SimpleAgentOrchestrator {
-    pub agents: Vec<Box<dyn AIAgent>>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleAgentOrchestrator {
-    pub fn new() -> Self {
-        SimpleAgentOrchestrator {
-            agents: Vec::new(),
-            next_id: AtomicUsize::new(1),
-        }
-    }
-}
-
-impl AgentOrchestrator for SimpleAgentOrchestrator {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
-        let id = agent.id();
-        self.agents.push(agent);
-        Ok(id)
-    }
-
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
-        if let Some(target_id) = agent_id {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
-                agent.execute(task)
-            } else {
-                Err(AgentError::NotFound)
-            }
-        } else {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
-                agent.execute(task)
-            } else {
-                Err(AgentError::NotFound)
-            }
-        }
-    }
-
-    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
-    }
-
-    fn list_agents(&self) -> Vec<AgentID> {
-        self.agents.iter().map(|a| a.id()).collect()
     }
 }
 
@@ -226,46 +315,6 @@ pub trait TaskQueue {
     fn size(&self) -> usize;
 }
 
-pub struct SimpleTaskQueue {
-    pub tasks: Vec<([u8; 256], u8)>,
-}
-
-impl SimpleTaskQueue {
-    pub fn new() -> Self {
-        SimpleTaskQueue { tasks: Vec::new() }
-    }
-}
-
-impl TaskQueue for SimpleTaskQueue {
-    fn enqueue(&mut self, task: &[u8], priority: u8) {
-        let mut task_array = [0u8; 256];
-        let task_len = task.len().min(255);
-        task_array[..task_len].copy_from_slice(&task[..task_len]);
-        self.tasks.push((task_array, priority));
-    }
-
-    fn dequeue(&mut self) -> Option<[u8; 256]> {
-        if self.tasks.is_empty() {
-            return None;
-        }
-        let mut highest_idx = 0;
-        let mut highest_priority = 0;
-
-        for (i, (_, priority)) in self.tasks.iter().enumerate() {
-            if *priority > highest_priority {
-                highest_priority = *priority;
-                highest_idx = i;
-            }
-        }
-
-        Some(self.tasks.remove(highest_idx).0)
-    }
-
-    fn size(&self) -> usize {
-        self.tasks.len()
-    }
-}
-
 pub struct ContextWindowPruner {
     pub history: Vec<[u8; 128]>,
     pub max_lines: usize,
@@ -296,24 +345,6 @@ impl ContextWindowPruner {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_orchestrator_and_queue() {
-        let mut orchestrator = SimpleAgentOrchestrator::new();
-        let agent = SimpleAIAgent::new(1, "TaskAgent");
-        orchestrator.register_agent(Box::new(agent)).unwrap();
-
-        let response = orchestrator.dispatch_task(b"RELOAD_CORES", Some(1)).unwrap();
-        assert_eq!(String::from_utf8_lossy(&response), "TaskAgent: RELOAD_CORES");
-
-        let mut queue = SimpleTaskQueue::new();
-        queue.enqueue(b"TASK_PRIO_HIGH", 10);
-        queue.enqueue(b"TASK_PRIO_LOW", 1);
-        assert_eq!(queue.size(), 2);
-
-        let task = queue.dequeue().unwrap();
-        assert_eq!(&task[..14], b"TASK_PRIO_HIGH");
-    }
 
     #[test]
     fn test_model_scheduling() {
@@ -348,5 +379,26 @@ mod tests {
         let mut turn_first = [0u8; 14];
         turn_first.copy_from_slice(&pruner.history[0][..14]);
         assert_eq!(&turn_first, b"Context turn 2");
+    }
+
+    #[test]
+    fn test_orchestrator_routing() {
+        let orchestrator = SovereignMultiAgentPlanner::new();
+        let (model, _) =
+            orchestrator.route_task("Compute the quantum backpropagation step of a DeepSeek node");
+        assert_eq!(model, LocalModelSize::Large70B);
+
+        let (model2, _) =
+            orchestrator.route_task("Help compile this rust file and reason about the error");
+        assert_eq!(model2, LocalModelSize::Medium8B);
+    }
+
+    #[test]
+    fn test_negotiation_pipeline() {
+        let orchestrator = SovereignMultiAgentPlanner::new();
+        let output = orchestrator
+            .run_negotiated_task("Determine the optimal task execution pipeline")
+            .unwrap();
+        assert!(output.contains("Tiny1B") || output.contains("Sovereign_Automator"));
     }
 }

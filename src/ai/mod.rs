@@ -27,7 +27,9 @@ pub use llm::{
     BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
     LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
 };
-pub use orchestrator::{AgentOrchestrator, AgentState, SimpleAgentOrchestrator};
+pub use orchestrator::{
+    AIOSAgent, AgentState, LocalLlmOrchestrator, LocalModelSize, SovereignMultiAgentPlanner,
+};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,

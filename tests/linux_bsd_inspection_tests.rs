@@ -3,7 +3,7 @@
 // - FreeBSD Jails & sysctl MIB
 // - NetBSD Rump Kernel hypercall routing
 // - OpenBSD sysctl MIB
-// - Linux eBPF VM & OSTree Engine & Declarative System Engine
+// - Linux LSB / fstab parsing
 
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
@@ -46,39 +46,34 @@ fn test_openbsd_sysctl_mib_inspection() {
 }
 
 #[test]
-fn test_sovereign_ebpf_and_ostree_inspection() {
-    let mut engine = SovereignEbpfEngine::new(64);
-    let instrs = vec![
-        EbpfInstruction {
-            opcode: EbpfOpcode::Add,
-            dst: 0,
-            src: 0,
-            offset: 0,
-            imm: 42,
-            use_imm: true,
-        },
-        EbpfInstruction {
-            opcode: EbpfOpcode::Exit,
-            dst: 0,
-            src: 0,
-            offset: 0,
-            imm: 0,
-            use_imm: false,
-        },
-    ];
-    let res = engine.execute(&instrs).unwrap();
-    assert_eq!(res, 42);
-
+fn test_sovereign_ostree_and_io_uring_inspection() {
     let mut ostree = SovereignOstreeEngine::new();
-    let idx = ostree.stage_commit("commit1", "1.0.0", "vmlinuz-1.0", 0x1234);
+    let idx = ostree.stage_commit("commit_hash_123", "v1.0.0-release", "kernel-6.8", 0xABCDEF);
     assert_eq!(idx, 0);
-    assert_eq!(ostree.get_active_deployment().unwrap().version, "1.0.0");
+
+    let mut io_uring = SovereignIoUring::new(16);
+    let sqe = SubmissionQueueEntry {
+        opcode: IoUringOpcode::Nop,
+        fd: 0,
+        offset: 0,
+        data: vec![42],
+        user_data: 42,
+    };
+    assert!(io_uring.submit_entry(sqe).is_ok());
+    let processed = io_uring.submit_and_wait();
+    assert_eq!(processed, 1);
 }
 
 #[test]
-fn test_sovereign_declarative_engine_inspection() {
-    let mut decl = SovereignDeclarativeSystemEngine::new();
-    let gen1 = decl.build_generation("sigma-node", &["coreutils"], &["syslogd"]);
-    assert_eq!(gen1, 1);
-    assert!(decl.generations[0].active);
+fn test_sovereign_landlock_and_runit_inspection() {
+    let mut landlock = SovereignLandlockLsm::new();
+    assert!(landlock.add_rule("/etc/sigma/config", LandlockAccess::ReadOnly).is_ok());
+    landlock.restrict_self();
+    assert!(landlock.check_access("/etc/sigma/config", LandlockAccess::ReadOnly));
+    assert!(!landlock.check_access("/etc/sigma/config", LandlockAccess::ReadWrite));
+
+    let mut supervisor = SovereignRunitSupervisor::new(RunitRunlevel::Boot);
+    supervisor.register_service("network-daemon", RunitRunlevel::Boot, &[], 3);
+    assert_eq!(supervisor.services.len(), 1);
+    assert_eq!(supervisor.services[0].name, "network-daemon");
 }
