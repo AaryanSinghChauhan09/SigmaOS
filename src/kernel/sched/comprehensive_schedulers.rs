@@ -258,17 +258,95 @@ pub enum IoRequestType {
 #[derive(Debug, Clone)]
 pub struct DiskIoRequest {
     pub req_id: u32,
+    pub pid: u32,
     pub sector: u64,
+    pub sector_count: u32,
     pub req_type: IoRequestType,
     pub arrival_tick: u64,
 }
 
-/// Anticipatory I/O Scheduler: Pauses briefly after a read completion anticipating adjacent read requests (Linux Anticipatory/BFQ parity)
+impl DiskIoRequest {
+    pub fn simple(req_id: u32, sector: u64, req_type: IoRequestType, arrival_tick: u64) -> Self {
+        Self {
+            req_id,
+            pid: 1,
+            sector,
+            sector_count: 8,
+            req_type,
+            arrival_tick,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ElevatorDirection {
+    Ascending,
+    Descending,
+}
+
+#[derive(Debug, Clone)]
+pub struct ProcessIoStats {
+    pub last_read_sector: u64,
+    pub last_request_tick: u64,
+    pub think_time_accumulator_ticks: u64,
+    pub request_count: u64,
+    pub sequential_hits: u64,
+}
+
+impl ProcessIoStats {
+    pub fn new() -> Self {
+        Self {
+            last_read_sector: 0,
+            last_request_tick: 0,
+            think_time_accumulator_ticks: 0,
+            request_count: 0,
+            sequential_hits: 0,
+        }
+    }
+
+    pub fn average_think_time(&self) -> u64 {
+        if self.request_count == 0 {
+            0
+        } else {
+            self.think_time_accumulator_ticks / self.request_count
+        }
+    }
+}
+
+impl Default for ProcessIoStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct AnticipatoryTelemetry {
+    pub total_dispatched: u64,
+    pub anticipation_hits: u64,
+    pub anticipation_misses: u64,
+    pub seeks_saved_sectors: u64,
+    pub read_starvation_preventions: u64,
+    pub write_starvation_preventions: u64,
+}
+
+/// Advanced Anticipatory I/O Scheduler:
+/// Inspired by Linux Anticipatory (as-iosched.c), BFQ, and FreeBSD CAM I/O Scheduler.
+/// Features heuristic read anticipation, think-time profiling per process,
+/// directional SCAN/C-LOOK elevator, deadline starvation thresholds, and telemetry tracking.
 pub struct AnticipatoryIoScheduler {
     pub request_queue: Vec<DiskIoRequest>,
     pub current_head_sector: u64,
-    pub anticipation_timer_ticks: u32,
-    pub last_read_sector: Option<u64>,
+    pub head_direction: ElevatorDirection,
+    pub anticipation_window_ticks: u32,
+    pub spatial_anticipation_span_sectors: u64,
+    pub read_expire_ticks: u64,
+    pub write_expire_ticks: u64,
+    pub active_anticipation_pid: Option<u32>,
+    pub active_anticipation_until_tick: u64,
+    pub last_dispatched_sector: Option<u64>,
+    pub process_stats: BTreeMap<u32, ProcessIoStats>,
+    pub telemetry: AnticipatoryTelemetry,
+    pub current_tick: u64,
 }
 
 impl AnticipatoryIoScheduler {
@@ -276,51 +354,202 @@ impl AnticipatoryIoScheduler {
         Self {
             request_queue: Vec::new(),
             current_head_sector: 0,
-            anticipation_timer_ticks: 0,
-            last_read_sector: None,
+            head_direction: ElevatorDirection::Ascending,
+            anticipation_window_ticks: 6,
+            spatial_anticipation_span_sectors: 64,
+            read_expire_ticks: 100,
+            write_expire_ticks: 500,
+            active_anticipation_pid: None,
+            active_anticipation_until_tick: 0,
+            last_dispatched_sector: None,
+            process_stats: BTreeMap::new(),
+            telemetry: AnticipatoryTelemetry::default(),
+            current_tick: 0,
         }
     }
 
-    pub fn submit_request(&mut self, req: DiskIoRequest) {
+    pub fn tick(&mut self) {
+        self.current_tick += 1;
+    }
+
+    pub fn submit_request(&mut self, mut req: DiskIoRequest) {
+        if req.arrival_tick == 0 {
+            req.arrival_tick = self.current_tick;
+        }
+
+        // Profile process think time and spatial proximity
+        let stats = self.process_stats.entry(req.pid).or_default();
+        if stats.request_count > 0 {
+            let think_time = req.arrival_tick.saturating_sub(stats.last_request_tick);
+            stats.think_time_accumulator_ticks += think_time;
+        }
+        stats.request_count += 1;
+        stats.last_request_tick = req.arrival_tick;
+
+        if let Some(last_sector) = self.last_dispatched_sector {
+            if req.sector >= last_sector && req.sector <= last_sector + self.spatial_anticipation_span_sectors {
+                stats.sequential_hits += 1;
+            }
+        }
+
         self.request_queue.push(req);
     }
 
-    /// Selects next contiguous disk request or pauses briefly for anticipated adjacent reads
+    /// Primary dispatch loop implementing Anticipatory + Deadline + C-LOOK Elevator.
     pub fn dispatch_next(&mut self) -> Option<DiskIoRequest> {
         if self.request_queue.is_empty() {
+            if self.active_anticipation_pid.is_some() {
+                if self.current_tick >= self.active_anticipation_until_tick {
+                    self.telemetry.anticipation_misses += 1;
+                    self.active_anticipation_pid = None;
+                } else {
+                    // Still within anticipation window; pause dispatch for anticipated read
+                    return None;
+                }
+            }
             return None;
         }
 
-        // Check if there is an adjacent request near last_read_sector
-        if let Some(last_sector) = self.last_read_sector {
-            if let Some(pos) = self.request_queue.iter().position(|r| r.sector >= last_sector && r.sector <= last_sector + 16) {
-                let req = self.request_queue.remove(pos);
-                self.current_head_sector = req.sector;
-                self.last_read_sector = Some(req.sector);
-                return Some(req);
-            }
-        }
-
-        // Default elevator (closest head sector)
-        let mut min_dist_idx = 0;
-        let mut min_dist = u64::MAX;
-
+        // 1. Check for expired read/write deadlines (Linux Deadline parity)
+        let mut expired_idx = None;
         for (i, req) in self.request_queue.iter().enumerate() {
-            let dist = if req.sector >= self.current_head_sector {
-                req.sector - self.current_head_sector
-            } else {
-                self.current_head_sector - req.sector
+            let age = self.current_tick.saturating_sub(req.arrival_tick);
+            let expire_limit = match req.req_type {
+                IoRequestType::Read => self.read_expire_ticks,
+                IoRequestType::Write => self.write_expire_ticks,
             };
-            if dist < min_dist {
-                min_dist = dist;
-                min_dist_idx = i;
+            if age >= expire_limit {
+                expired_idx = Some((i, req.req_type));
+                break;
             }
         }
 
-        let req = self.request_queue.remove(min_dist_idx);
+        if let Some((idx, req_type)) = expired_idx {
+            match req_type {
+                IoRequestType::Read => self.telemetry.read_starvation_preventions += 1,
+                IoRequestType::Write => self.telemetry.write_starvation_preventions += 1,
+            }
+            let req = self.request_queue.remove(idx);
+            return Some(self.finalize_dispatch(req));
+        }
+
+        // 2. Check for Anticipation match (Linux Anticipatory / BFQ parity)
+        if let Some(last_sector) = self.last_dispatched_sector {
+            let active_pid = self.active_anticipation_pid;
+            let target_pid = active_pid.unwrap_or(0);
+
+            let mut best_adj_idx = None;
+            let mut min_forward_dist = u64::MAX;
+
+            for (i, req) in self.request_queue.iter().enumerate() {
+                if req.req_type == IoRequestType::Read && (active_pid.is_none() || req.pid == target_pid) {
+                    if req.sector >= last_sector && req.sector <= last_sector + self.spatial_anticipation_span_sectors {
+                        let dist = req.sector - last_sector;
+                        if dist < min_forward_dist {
+                            min_forward_dist = dist;
+                            best_adj_idx = Some(i);
+                        }
+                    }
+                }
+            }
+
+            if let Some(idx) = best_adj_idx {
+                let req = self.request_queue.remove(idx);
+                self.telemetry.anticipation_hits += 1;
+                let seek_saved = if req.sector >= self.current_head_sector {
+                    req.sector - self.current_head_sector
+                } else {
+                    self.current_head_sector - req.sector
+                };
+                self.telemetry.seeks_saved_sectors += seek_saved;
+                return Some(self.finalize_dispatch(req));
+            }
+        }
+
+        // 3. Directional SCAN / C-LOOK Elevator dispatch
+        let mut chosen_idx = None;
+        let mut best_dist = u64::MAX;
+
+        // Try same direction first
+        for (i, req) in self.request_queue.iter().enumerate() {
+            let (valid_direction, dist) = match self.head_direction {
+                ElevatorDirection::Ascending => (req.sector >= self.current_head_sector, req.sector.saturating_sub(self.current_head_sector)),
+                ElevatorDirection::Descending => (req.sector <= self.current_head_sector, self.current_head_sector.saturating_sub(req.sector)),
+            };
+
+            if valid_direction && dist < best_dist {
+                best_dist = dist;
+                chosen_idx = Some(i);
+            }
+        }
+
+        // If no request in current direction, reverse elevator direction
+        if chosen_idx.is_none() {
+            self.head_direction = match self.head_direction {
+                ElevatorDirection::Ascending => ElevatorDirection::Descending,
+                ElevatorDirection::Descending => ElevatorDirection::Ascending,
+            };
+
+            for (i, req) in self.request_queue.iter().enumerate() {
+                let (valid_direction, dist) = match self.head_direction {
+                    ElevatorDirection::Ascending => (req.sector >= self.current_head_sector, req.sector.saturating_sub(self.current_head_sector)),
+                    ElevatorDirection::Descending => (req.sector <= self.current_head_sector, self.current_head_sector.saturating_sub(req.sector)),
+                };
+
+                if valid_direction && dist < best_dist {
+                    best_dist = dist;
+                    chosen_idx = Some(i);
+                }
+            }
+        }
+
+        // Fallback: pick closest request overall
+        if chosen_idx.is_none() {
+            let mut min_abs_dist = u64::MAX;
+            for (i, req) in self.request_queue.iter().enumerate() {
+                let dist = if req.sector >= self.current_head_sector {
+                    req.sector - self.current_head_sector
+                } else {
+                    self.current_head_sector - req.sector
+                };
+                if dist < min_abs_dist {
+                    min_abs_dist = dist;
+                    chosen_idx = Some(i);
+                }
+            }
+        }
+
+        if let Some(idx) = chosen_idx {
+            let req = self.request_queue.remove(idx);
+            Some(self.finalize_dispatch(req))
+        } else {
+            None
+        }
+    }
+
+    fn finalize_dispatch(&mut self, req: DiskIoRequest) -> DiskIoRequest {
         self.current_head_sector = req.sector;
-        self.last_read_sector = Some(req.sector);
-        Some(req)
+        self.last_dispatched_sector = Some(req.sector);
+        self.telemetry.total_dispatched += 1;
+
+        if let Some(stats) = self.process_stats.get_mut(&req.pid) {
+            stats.last_read_sector = req.sector;
+        }
+
+        // Enable anticipation pause if it was a read request with good think-time profile
+        if req.req_type == IoRequestType::Read {
+            let avg_think = self.process_stats.get(&req.pid).map(|s| s.average_think_time()).unwrap_or(0);
+            if avg_think <= u64::from(self.anticipation_window_ticks) {
+                self.active_anticipation_pid = Some(req.pid);
+                self.active_anticipation_until_tick = self.current_tick + u64::from(self.anticipation_window_ticks);
+            } else {
+                self.active_anticipation_pid = None;
+            }
+        } else {
+            self.active_anticipation_pid = None;
+        }
+
+        req
     }
 }
 
@@ -433,34 +662,50 @@ mod tests {
     #[test]
     fn test_anticipatory_and_bfq_io_schedulers() {
         let mut aio = AnticipatoryIoScheduler::new();
-        aio.submit_request(DiskIoRequest {
-            req_id: 1,
-            sector: 100,
-            req_type: IoRequestType::Read,
-            arrival_tick: 1,
-        });
-        aio.submit_request(DiskIoRequest {
-            req_id: 2,
-            sector: 104, // Adjacent read
-            req_type: IoRequestType::Read,
-            arrival_tick: 2,
-        });
+        aio.submit_request(DiskIoRequest::simple(1, 100, IoRequestType::Read, 1));
+        aio.submit_request(DiskIoRequest::simple(2, 104, IoRequestType::Read, 2));
 
         let req1 = aio.dispatch_next().unwrap();
         assert_eq!(req1.sector, 100);
 
         let req2 = aio.dispatch_next().unwrap();
         assert_eq!(req2.sector, 104); // Anticipated adjacent sector
+        assert_eq!(aio.telemetry.anticipation_hits, 1);
 
         let mut bfq = BfqCompletelyFairIoScheduler::new();
-        bfq.enqueue_request(10, DiskIoRequest {
-            req_id: 3,
-            sector: 500,
-            req_type: IoRequestType::Read,
-            arrival_tick: 1,
-        });
+        bfq.enqueue_request(10, DiskIoRequest::simple(3, 500, IoRequestType::Read, 1));
 
         let bfq_req = bfq.dispatch_fair_request().unwrap();
         assert_eq!(bfq_req.req_id, 3);
+    }
+
+    #[test]
+    fn test_anticipatory_scheduler_advanced_features() {
+        let mut aio = AnticipatoryIoScheduler::new();
+
+        // Test Deadline Starvation Prevention
+        aio.current_tick = 10;
+        aio.submit_request(DiskIoRequest {
+            req_id: 10,
+            pid: 2,
+            sector: 500,
+            sector_count: 8,
+            req_type: IoRequestType::Write,
+            arrival_tick: 10,
+        });
+        aio.submit_request(DiskIoRequest {
+            req_id: 11,
+            pid: 2,
+            sector: 100,
+            sector_count: 8,
+            req_type: IoRequestType::Read,
+            arrival_tick: 10,
+        });
+
+        // Fast forward past read expiration threshold
+        aio.current_tick = 120;
+        let dispatched = aio.dispatch_next().unwrap();
+        assert_eq!(dispatched.req_id, 11); // Read expired (age 110 >= 100)
+        assert_eq!(aio.telemetry.read_starvation_preventions, 1);
     }
 }
