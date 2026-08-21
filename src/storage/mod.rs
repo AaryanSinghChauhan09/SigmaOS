@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -18,32 +17,23 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Storage Module
-// Database engines, block storage systems, and data management
+// Database engines, storage systems, and data management
 
 pub mod block;
-pub mod cinder;
+pub mod block_device_extended;
 pub mod geom;
 pub mod nosql_engine;
 pub mod search;
 pub mod sql_engine;
 pub mod volume;
 
-pub use block::{
-    BlockError, BlockKind, BlockOpCode, BlockOperationEngine, BlockOrientedDevice,
-    BlockingStrategy, DeviceClass, NvmeBlockDevice, RecordBlockingEngine, SimpleBlockDevice,
-    SovereignBlockClassifier, SsdBlockDevice, SystemBlockDiagramEngine,
+pub use block_device_extended::{
+    BlockRecordStrategy, CinderBlockVolume, CinderVolumeManager, VolumeAttachState, VolumeSnapshot,
 };
-
-pub use cinder::{
-    CinderBackup, CinderBlockStorageEngine, CinderProvisioningType, CinderQosPolicy,
-    CinderSnapshot, CinderVolume, CinderVolumeState, CinderVolumeType,
-};
-
 pub use geom::{
     BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
     PartitionEntry,
 };
-
 pub use sql_engine::{
     Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
 };
