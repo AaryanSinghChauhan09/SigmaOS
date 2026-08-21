@@ -60,7 +60,7 @@ impl Package {
     }
 }
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]

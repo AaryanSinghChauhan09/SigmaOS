@@ -6,13 +6,13 @@
 #[cfg(target_os = "none")]
 use core::panic::PanicInfo;
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Ubuntu/Linux-style Kernel Command Line Parser
 #[derive(Debug, Clone)]
 pub struct KernelCmdLineParser {
     pub params: HashMap<String, String>,
-    pub flags: alloc::vec::Vec<String>,
+    pub flags: crate::klib::Vec<String>,
 }
 
 impl KernelCmdLineParser {
