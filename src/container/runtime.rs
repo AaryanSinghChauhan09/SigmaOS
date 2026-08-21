@@ -27,45 +27,6 @@ pub enum ContainerState {
     Failed = 4,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
-impl ContainerCapability {
-    pub fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
-}
 
 /// Container trait (OOP interface)
 pub trait Container {
@@ -188,31 +149,6 @@ pub struct ContainerNamespace {
     pub rootless: bool,
 }
 
-impl ContainerNamespace {
-    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_uid == 0 {
-                Ok(self.uid_mapping)
-            } else {
-                Ok(self.uid_mapping + container_uid)
-            }
-        } else {
-            Ok(container_uid)
-        }
-    }
-
-    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_gid == 0 {
-                Ok(self.gid_mapping)
-            } else {
-                Ok(self.gid_mapping + container_gid)
-            }
-        } else {
-            Ok(container_gid)
-        }
-    }
-}
 
 /// Container seccomp profiles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -221,7 +157,6 @@ pub struct SeccompProfile {
     pub blocked_syscalls_mask: u32,
 }
 
-<<<<<<< HEAD
 impl ContainerNamespace {
     pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
         if self.rootless {
@@ -277,16 +212,6 @@ impl NamespaceConfig {
         self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
     }
 }
-
-/// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
-
-=======
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {
@@ -791,12 +716,7 @@ impl<T> Vec<T> {
         }
     }
 
-<<<<<<< HEAD
     pub fn len(&self) -> usize {
-=======
-    #[allow(dead_code)]
-    fn len(&self) -> usize {
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
         self.len
     }
 
@@ -942,10 +862,7 @@ extern "C" {
 #[cfg(test)]
 mod tests {
     use super::*;
-<<<<<<< HEAD
-    use super::super::*;
-=======
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
+
     use alloc::string::ToString;
     use alloc::vec;
 
