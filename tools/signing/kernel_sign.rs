@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Kernel and Module Signing Tool for SigmaOS
 // Location: tools/signing/kernel_sign.rs
 

@@ -47,7 +47,7 @@ pub struct SigmaSoftwareStore {
 unsafe impl Sync for SigmaSoftwareStore {}
 
 impl SigmaSoftwareStore {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         const EMPTY_ENTRY: Option<SoftwareRegistryEntry> = None;
         Self {
             registry: RefCell::new([
@@ -184,6 +184,12 @@ impl SigmaSoftwareStore {
 
     pub fn disable_auto_updates(&self) {
         self.auto_updates_enabled.store(false, Ordering::SeqCst);
+    }
+}
+
+impl Default for SigmaSoftwareStore {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

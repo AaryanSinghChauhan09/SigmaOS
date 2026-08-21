@@ -114,8 +114,9 @@ impl SyscallTable {
     }
     
     pub fn register(&mut self, entry: SyscallEntry) {
-        if entry.number < 512 {
-            self.entries[entry.number as usize] = entry;
+        let num = entry.number as usize;
+        if num < 512 {
+            self.entries[num] = entry;
         }
     }
     

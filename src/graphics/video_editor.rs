@@ -22,6 +22,7 @@ pub enum VideoError {
 /// A video rendering clip inside a timeline track
 #[derive(Debug, Clone)]
 pub struct VideoClip {
+    pub id: usize,
     pub source_path: String,
     pub timeline_start_frame: usize,
     pub duration_frames: usize,
@@ -30,8 +31,9 @@ pub struct VideoClip {
 }
 
 impl VideoClip {
-    pub fn new(source_path: &str, start_frame: usize, duration: usize) -> Self {
+    pub fn new(id: usize, source_path: &str, start_frame: usize, duration: usize) -> Self {
         Self {
+            id,
             source_path: String::from(source_path),
             timeline_start_frame: start_frame,
             duration_frames: duration,
@@ -54,14 +56,16 @@ pub enum VideoEffect {
 /// A sequential video track holding layered clips
 pub struct VideoTrack {
     pub id: usize,
+    pub name: String,
     pub clips: Vec<VideoClip>,
     pub effects: Vec<VideoEffect>,
 }
 
 impl VideoTrack {
-    pub fn new(id: usize) -> Self {
+    pub fn new(id: usize, name: &str) -> Self {
         Self {
             id,
+            name: String::from(name),
             clips: Vec::new(),
             effects: Vec::new(),
         }
@@ -112,6 +116,10 @@ impl VideoTimeline {
             playhead_frame: 0,
             gpu_scrub_latency_ns: 0,
         }
+    }
+
+    pub fn add_video_track(&mut self, track: VideoTrack) {
+        self.add_track(track);
     }
 
     pub fn add_track(&mut self, track: VideoTrack) {
@@ -281,9 +289,9 @@ mod tests {
     #[test]
     fn test_video_timeline_compositing() {
         let mut timeline = VideoTimeline::new(640, 480);
-        let mut track = VideoTrack::new(1);
+        let mut track = VideoTrack::new(1, "MainTrack");
 
-        let clip = VideoClip::new("assets/intro.mp4", 10, 60);
+        let clip = VideoClip::new(1, "assets/intro.mp4", 10, 60);
         track.add_clip(clip);
 
         timeline.add_track(track);
@@ -300,9 +308,9 @@ mod tests {
     #[test]
     fn test_video_effects_stack() {
         let mut timeline = VideoTimeline::new(320, 240);
-        let mut track = VideoTrack::new(1);
+        let mut track = VideoTrack::new(1, "ChromaTrack");
 
-        let clip = VideoClip::new("assets/greenscreen.mp4", 0, 30);
+        let clip = VideoClip::new(1, "assets/greenscreen.mp4", 0, 30);
         track.add_clip(clip);
 
         // Apply a Green Screen ChromaKey effect

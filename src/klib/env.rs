@@ -16,7 +16,7 @@ pub enum EnvError {
 impl SigmaEnv {
     pub fn get(key: &str) -> Option<&'static str> {
         // Read from process environment block
-        let envp = Self::get_envp_pointer();
+        let envp = unsafe { Self::get_envp_pointer() };
         if envp.is_null() {
             return None;
         }
@@ -56,7 +56,7 @@ impl SigmaEnv {
     
     pub fn args() -> impl Iterator<Item = &'static str> {
         // Get command line arguments
-        let argv = Self::get_argv_pointer();
+        let argv = unsafe { Self::get_argv_pointer() };
         EnvIterator::new(argv)
     }
     
@@ -98,13 +98,14 @@ impl SigmaEnv {
         }
     }
     
-    fn parse_env_entry(entry: &str, key: &str) -> Option<&'static str> {
-        let parts: Vec<&str> = entry.splitn(2, '=').collect();
-        if parts.len() == 2 && parts[0] == key {
-            Some(parts[1])
-        } else {
-            None
+    fn parse_env_entry(entry: &'static str, key: &str) -> Option<&'static str> {
+        if let Some(eq_idx) = entry.find('=') {
+            let (k, v) = entry.split_at(eq_idx);
+            if k == key {
+                return Some(&v[1..]);
+            }
         }
+        None
     }
     
     unsafe fn get_argv_pointer() -> *const *const u8 {

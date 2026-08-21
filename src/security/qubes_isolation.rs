@@ -273,10 +273,6 @@ impl DomainOrchestrator {
         }
     }
 
-<<<<<<< HEAD
-    /// Spawns a compartmentalized secure domain with custom hardware capability tokens
-    pub fn spawn_domain(&mut self, name: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Result<DomainID, IsolationError> {
-=======
     /// Spawns a compartmentalized secure domain with custom hardware capability tokens (S-Compartment)
     pub fn spawn_domain(
         &mut self,
@@ -330,7 +326,7 @@ impl DomainOrchestrator {
             clone_id,
             &clone_name,
             DomainType::Disposable,
-            temp.capabilities,
+            temp.capabilities.clone(),
         );
         clone_domain.parent_id = Some(template_id);
         // Copy-on-Write page table replication: reference parent's baseline physical memory mapping
