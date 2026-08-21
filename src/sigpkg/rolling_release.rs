@@ -162,6 +162,69 @@ impl RollingReleaseManager {
         let name_str = package_name.as_str();
         security_packages.iter().any(|&pkg| name_str.contains(pkg))
     }
+
+    /// Diagnostic warning generator for partial updates (Arch Linux "partial upgrade" anti-pattern detection)
+    pub fn find_partial_updates(&self, pending_updates: &[PackageUpdate]) -> Vec<SigmaString> {
+        let mut core_base = Vec::new();
+        let core_pkgs = ["glibc", "kernel", "gcc-libs", "openssl"];
+
+        let has_core_update = pending_updates.iter().any(|u| {
+            let s = u.package_name.as_str();
+            core_pkgs.iter().any(|&cp| s.contains(cp))
+        });
+
+        if has_core_update {
+            for (pkg_name, _) in &self.package_versions {
+                let is_pending = pending_updates.iter().any(|u| u.package_name == *pkg_name);
+                if !is_pending {
+                    core_base.push(pkg_name.clone());
+                }
+            }
+        }
+        core_base
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanMirror {
+    pub url: SigmaString,
+    pub latency_ms: u32,
+    pub completion_rate: f32,
+}
+
+pub struct PacmanMirrorlist {
+    pub mirrors: Vec<PacmanMirror>,
+}
+
+impl PacmanMirrorlist {
+    pub fn new() -> Self {
+        Self { mirrors: Vec::new() }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, latency: u32, completion_rate: f32) {
+        self.mirrors.push(PacmanMirror {
+            url: SigmaString::from(url),
+            latency_ms: latency,
+            completion_rate,
+        });
+    }
+
+    /// Sort mirrors by latency and completion rate (Arch reflector parity)
+    pub fn rank_mirrors(&mut self) {
+        self.mirrors.sort_by(|a, b| {
+            if (a.completion_rate - b.completion_rate).abs() > 0.01 {
+                b.completion_rate.partial_cmp(&a.completion_rate).unwrap_or(core::cmp::Ordering::Equal)
+            } else {
+                a.latency_ms.cmp(&b.latency_ms)
+            }
+        });
+    }
+}
+
+impl Default for PacmanMirrorlist {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Default for RollingReleaseManager {
@@ -232,5 +295,17 @@ mod tests {
         assert!(manager.is_security_critical(&SigmaString::from("kernel")));
         assert!(manager.is_security_critical(&SigmaString::from("openssl")));
         assert!(!manager.is_security_critical(&SigmaString::from("text-editor")));
+    }
+
+    #[test]
+    fn test_mirrorlist_reflector_ranking() {
+        let mut list = PacmanMirrorlist::new();
+        list.add_mirror("https://slow.arch.org", 250, 1.0);
+        list.add_mirror("https://fast.arch.org", 45, 1.0);
+        list.add_mirror("https://flaky.arch.org", 20, 0.8);
+
+        list.rank_mirrors();
+        assert_eq!(list.mirrors[0].url.as_str(), "https://fast.arch.org");
+        assert_eq!(list.mirrors[1].url.as_str(), "https://slow.arch.org");
     }
 }
