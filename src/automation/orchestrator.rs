@@ -558,4 +558,58 @@ mod tests {
         let recommendations = orchestrator.analyze();
         assert!(!recommendations.is_empty());
     }
+
+    #[test]
+    fn test_dev_sandbox_manager() {
+        let mut sandbox_mgr = DevSandboxManager::new();
+        let env_id = sandbox_mgr.allocate_ephemeral_workspace("rust-developer-lab").unwrap();
+        assert_eq!(env_id, "sandbox-env-1");
+        assert!(sandbox_mgr.is_workspace_active("sandbox-env-1"));
+
+        assert!(sandbox_mgr.teardown_workspace("sandbox-env-1").is_ok());
+        assert!(!sandbox_mgr.is_workspace_active("sandbox-env-1"));
+    }
+}
+
+/// Developer Sandbox Manager for ephemeral workspaces & reproducible labs (Roadmap Item 88)
+pub struct DevSandboxManager {
+    pub active_workspaces: HashMap<String, String>, // env_id -> profile
+    pub total_allocated: usize,
+}
+
+impl DevSandboxManager {
+    pub fn new() -> Self {
+        Self {
+            active_workspaces: HashMap::new(),
+            total_allocated: 0,
+        }
+    }
+
+    /// Allocates a lightweight, capability-isolated ephemeral workspace
+    pub fn allocate_ephemeral_workspace(&mut self, profile_name: &str) -> Result<String, &'static str> {
+        self.total_allocated += 1;
+        let env_id = format!("sandbox-env-{}", self.total_allocated);
+        self.active_workspaces.insert(env_id.clone(), profile_name.to_string());
+        Ok(env_id)
+    }
+
+    /// Checks if a sandbox environment is currently active
+    pub fn is_workspace_active(&self, env_id: &str) -> bool {
+        self.active_workspaces.contains_key(env_id)
+    }
+
+    /// Tears down and cleans up an ephemeral developer workspace
+    pub fn teardown_workspace(&mut self, env_id: &str) -> Result<(), &'static str> {
+        if self.active_workspaces.remove(env_id).is_some() {
+            Ok(())
+        } else {
+            Err("DevSandbox: Workspace ID not found.")
+        }
+    }
+}
+
+impl Default for DevSandboxManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }

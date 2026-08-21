@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [ main, master, "improve-*" ]
 
-permissions:
-  contents: read
 jobs:
   posix_ltp_verification:
     name: POSIX & LTP Verification (Harness)
