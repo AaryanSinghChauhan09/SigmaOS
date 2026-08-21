@@ -10,8 +10,8 @@ use alloc::string::String;
 use core::hash::{Hash, Hasher};
 
 // Simple HashMap implementation for kernel use
-struct SimpleHashMap<K, V> {
-    buckets: Vec<Vec<(K, V)>>,
+pub struct SimpleHashMap<K, V> {
+    pub buckets: Vec<Vec<(K, V)>>,
 }
 
 // Simple hasher for basic types
@@ -5145,5 +5145,212 @@ mod linux_lts_upstream_tests {
         let sqe = adapter.submit_io_uring_sqe(0x02).unwrap(); // IORING_OP_READ
         assert_eq!(sqe, 2);
         assert_eq!(adapter.io_uring.pending_submissions, 1);
+    }
+}
+
+// =========================================================================
+// 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
+// =========================================================================
+
+pub struct GentooUseFlagEngine {
+    pub enabled_flags: Vec<String>,
+    pub disabled_flags: Vec<String>,
+}
+
+impl GentooUseFlagEngine {
+    pub fn new() -> Self {
+        Self {
+            enabled_flags: Vec::new(),
+            disabled_flags: Vec::new(),
+        }
+    }
+
+    pub fn set_use_flag(&mut self, flag: &str) {
+        if flag.starts_with('-') {
+            let name = flag[1..].to_string();
+            self.disabled_flags.push(name.clone());
+            self.enabled_flags.retain(|f| f != &name);
+        } else {
+            let name = if flag.starts_with('+') { &flag[1..] } else { flag }.to_string();
+            self.enabled_flags.push(name.clone());
+            self.disabled_flags.retain(|f| f != &name);
+        }
+    }
+
+    pub fn is_flag_enabled(&self, flag: &str) -> bool {
+        self.enabled_flags.iter().any(|f| f == flag)
+    }
+
+    pub fn resolve_conflicts(&self, mutually_exclusive: (&str, &str)) -> Result<(), &'static str> {
+        if self.is_flag_enabled(mutually_exclusive.0) && self.is_flag_enabled(mutually_exclusive.1) {
+            Err("Gentoo USE flag conflict: mutually exclusive flags enabled")
+        } else {
+            Ok(())
+        }
+    }
+}
+
+pub const CAP_READ: u64 = 1 << 0;
+pub const CAP_WRITE: u64 = 1 << 1;
+pub const CAP_SEEK: u64 = 1 << 2;
+
+pub struct FreeBsdCapsicumEngine {
+    pub is_capability_mode: bool,
+    pub descriptor_rights: HashMap<u32, u64>,
+}
+
+impl FreeBsdCapsicumEngine {
+    pub fn new() -> Self {
+        Self {
+            is_capability_mode: false,
+            descriptor_rights: HashMap::new(),
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.is_capability_mode = true;
+    }
+
+    pub fn limit_descriptor_rights(&mut self, fd: u32, rights: u64) {
+        self.descriptor_rights.insert(fd, rights);
+    }
+
+    pub fn validate_right(&self, fd: u32, required_right: u64) -> bool {
+        if let Some(&rights) = self.descriptor_rights.get(&fd) {
+            (rights & required_right) == required_right
+        } else {
+            !self.is_capability_mode
+        }
+    }
+}
+
+pub struct OpenBsdUnveilFilter {
+    pub rules: Vec<(String, String)>,
+    pub is_locked: bool,
+}
+
+impl OpenBsdUnveilFilter {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            is_locked: false,
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if self.is_locked {
+            return Err("Unveil rules are locked");
+        }
+        self.rules.push((path.to_string(), permissions.to_string()));
+        Ok(())
+    }
+
+    pub fn lock(&mut self) {
+        self.is_locked = true;
+    }
+
+    pub fn check_permission(&self, path: &str, required_perm: char) -> bool {
+        if self.rules.is_empty() {
+            return true;
+        }
+        for (unveiled_path, perms) in &self.rules {
+            if path.starts_with(unveiled_path) {
+                return perms.contains(required_perm);
+            }
+        }
+        false
+    }
+}
+
+pub struct AurDependencySolver {
+    pub packages: Vec<(String, Vec<String>)>,
+}
+
+impl AurDependencySolver {
+    pub fn new() -> Self {
+        Self {
+            packages: Vec::new(),
+        }
+    }
+
+    pub fn add_package(&mut self, name: &str, dependencies: &[&str]) {
+        let deps = dependencies.iter().map(|s| s.to_string()).collect();
+        self.packages.push((name.to_string(), deps));
+    }
+
+    pub fn solve_build_order(&self, target_pkg: &str) -> Vec<String> {
+        let mut order = Vec::new();
+        self.resolve_dfs(target_pkg, &mut order);
+        order
+    }
+
+    fn resolve_dfs(&self, pkg_name: &str, order: &mut Vec<String>) {
+        if order.contains(&pkg_name.to_string()) {
+            return;
+        }
+        for (name, deps) in &self.packages {
+            if name == pkg_name {
+                for dep in deps {
+                    self.resolve_dfs(dep, order);
+                }
+                break;
+            }
+        }
+        order.push(pkg_name.to_string());
+    }
+}
+
+#[cfg(test)]
+mod distro_parity_tests {
+    use super::*;
+
+    #[test]
+    fn test_gentoo_use_flags() {
+        let mut gentoo = GentooUseFlagEngine::new();
+        gentoo.set_use_flag("+wayland");
+        gentoo.set_use_flag("-x11");
+        assert!(gentoo.is_flag_enabled("wayland"));
+        assert!(!gentoo.is_flag_enabled("x11"));
+
+        gentoo.set_use_flag("x11");
+        assert!(gentoo.resolve_conflicts(("wayland", "x11")).is_err());
+    }
+
+    #[test]
+    fn test_freebsd_capsicum() {
+        let mut capsicum = FreeBsdCapsicumEngine::new();
+        capsicum.limit_descriptor_rights(3, CAP_READ);
+        capsicum.enter_capability_mode();
+
+        assert!(capsicum.validate_right(3, CAP_READ));
+        assert!(!capsicum.validate_right(3, CAP_WRITE));
+        assert!(!capsicum.validate_right(4, CAP_READ)); // FD 4 has no rights in cap mode
+    }
+
+    #[test]
+    fn test_openbsd_unveil_filter() {
+        let mut unveil = OpenBsdUnveilFilter::new();
+        unveil.unveil("/usr/bin", "rx").unwrap();
+        unveil.unveil("/tmp", "rwc").unwrap();
+        unveil.lock();
+
+        assert!(unveil.check_permission("/usr/bin/git", 'r'));
+        assert!(unveil.check_permission("/usr/bin/git", 'x'));
+        assert!(!unveil.check_permission("/usr/bin/git", 'w'));
+        assert!(!unveil.check_permission("/etc/shadow", 'r'));
+    }
+
+    #[test]
+    fn test_aur_dependency_solver() {
+        let mut solver = AurDependencySolver::new();
+        solver.add_package("yay", &["go", "git"]);
+        solver.add_package("go", &["glibc"]);
+        solver.add_package("git", &["glibc", "openssl"]);
+        solver.add_package("glibc", &[]);
+        solver.add_package("openssl", &[]);
+
+        let order = solver.solve_build_order("yay");
+        assert_eq!(order.last().unwrap(), "yay");
+        assert!(order.contains(&"glibc".to_string()));
     }
 }

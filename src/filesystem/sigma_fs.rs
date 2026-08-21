@@ -326,6 +326,90 @@ impl SigmaFhsRouter {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PfsType {
+    Master,
+    Slave,
+    Snapshot,
+}
+
+#[derive(Debug, Clone)]
+pub struct PseudoFilesystemNamespace {
+    pub id: String,
+    pub pfs_type: PfsType,
+    pub file_map: HashMap<String, String>,
+    pub is_read_only: bool,
+    pub parent_snapshot_id: Option<String>,
+}
+
+impl PseudoFilesystemNamespace {
+    pub fn new(id: &str, pfs_type: PfsType) -> Self {
+        Self {
+            id: id.to_string(),
+            pfs_type,
+            file_map: HashMap::new(),
+            is_read_only: false,
+            parent_snapshot_id: None,
+        }
+    }
+
+    pub fn snapshot(snapshot_id: &str, parent_id: &str, file_map: HashMap<String, String>) -> Self {
+        Self {
+            id: snapshot_id.to_string(),
+            pfs_type: PfsType::Snapshot,
+            file_map,
+            is_read_only: true,
+            parent_snapshot_id: Some(parent_id.to_string()),
+        }
+    }
+}
+
+pub struct Blake3BlockDeduplicationEngine {
+    pub blocks: HashMap<String, Vec<u8>>,
+    pub ref_counts: HashMap<String, usize>,
+}
+
+impl Blake3BlockDeduplicationEngine {
+    pub fn new() -> Self {
+        Self {
+            blocks: HashMap::new(),
+            ref_counts: HashMap::new(),
+        }
+    }
+
+    pub fn store_block(&mut self, data: &[u8]) -> String {
+        let mut sum: u32 = 0x85ebca6b;
+        for &b in data {
+            sum = sum.wrapping_add(b as u32).wrapping_mul(31);
+        }
+        let hash = format!("blake3-{}", sum);
+
+        self.blocks.entry(hash.clone()).or_insert_with(|| data.to_vec());
+        let count = self.ref_counts.entry(hash.clone()).or_insert(0);
+        *count += 1;
+
+        hash
+    }
+
+    pub fn release_block(&mut self, hash: &str) -> bool {
+        if let Some(count) = self.ref_counts.get_mut(hash) {
+            if *count > 1 {
+                *count -= 1;
+                return false;
+            } else {
+                self.ref_counts.remove(hash);
+                self.blocks.remove(hash);
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn read_block(&self, hash: &str) -> Option<&Vec<u8>> {
+        self.blocks.get(hash)
+    }
+}
+
 // =========================================================================
 // 2. SigmaFhsHook (Ecosystem Integration Parity)
 // =========================================================================
