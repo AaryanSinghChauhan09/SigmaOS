@@ -16,6 +16,9 @@ extern crate alloc;
 
 extern crate alloc;
 
+extern crate alloc;
+use alloc::boxed::Box;
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 

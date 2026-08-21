@@ -26,6 +26,12 @@ pub mod shell;
 pub mod sigpkg;
 pub mod tools;
 pub mod virtualization;
+pub mod tracing;
+pub mod crash;
+pub mod media;
+pub mod graphics;
+pub mod gpu;
+pub mod installer;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -131,6 +137,23 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use graphics::{
+    PixelRgba, VideoFrame, BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
+    Surface, Window, VideoClip, VideoEffect, VideoTimeline, VideoTrack as GraphicsVideoTrack,
+};
+pub use gpu::driver::{GPUDeviceID, GPUVendor};
+pub use media::{
+    SovereignScreenRecorder, CaptureSource, GpuEncoderType, RecorderState, RecordingStats,
+    AdBlockFilter, BrowserProcess, BrowserProcessType, SearchEngineType, SearchSwitcher,
+    SecureStorageContainer, SovereignBrowserEngine,
+    CGroup, CGroupController, CodecType, DnsResolver, InitService, NtpClient, PageTable,
+    PlayerState, SecureBootKeyring, SigmaSystemd, SovereignVideoPlayer, SovereignVmm,
+    SovereignVideoEditor, VideoTrack, TimelineClip, AscCdl, EditorError,
+};
+pub use installer::{
+    GuiInstallerWizard, InstallerStep, PartitionStrategy, UserAccountConfig, PrivacySettings,
+    DetectedOperatingSystem,
 };
 
 // Temporarily disabled problematic modules

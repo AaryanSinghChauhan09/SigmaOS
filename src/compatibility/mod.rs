@@ -100,3 +100,34 @@ pub use reactos::{
     NtHandle, NtObjectManager, NtObjectType, NtStatus,
     PortableExecutableLoader, RegistryHive,
 };
+
+pub mod debian;
+pub use debian::{
+    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
+    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
+};
+
+pub mod innovations;
+pub use innovations::{
+    WorkloadCategory, ISchedulerPolicy, MlAcceleratedPolicy, GreenComputingPolicy,
+    SigmaScheduler, ISyscallTranslator, LinuxTranslator, WindowsTranslator,
+    UniversalAbiTranslator, IFileSystemCore, ISemanticSearchPlugin, ICasDeduplicator,
+    SigmaFsPlusPlus, IRecoveryStrategy, RollbackRecovery, SelfHealingOS,
+};
+
+pub mod fedora;
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+};
+
+pub mod india_professional_tools;
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, PMWaniHotspotController,
+    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker,
+};
+
+pub mod india_stack;
+pub use india_stack::{MockUPIService, IndiaStackError};
+
+pub mod india_stack_localization;
+pub use india_stack_localization::{IndianLanguage, LocalizationProvider, LocalizationManager};
