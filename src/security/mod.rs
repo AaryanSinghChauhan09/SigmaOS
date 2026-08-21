@@ -4,7 +4,6 @@
 pub mod audit;
 pub mod capability;
 pub mod pqc_enclave;
-pub mod governance;
 
 pub use pqc_enclave::{
     KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
@@ -28,6 +27,9 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod governance_privacy;
+
+pub use governance_privacy::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -39,14 +41,6 @@ pub use capability_token::{
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
-};
-pub use governance::{
-    ComplianceFramework, ComplianceProfileEngine, ContainerSecurityPolicyEngine,
-    DefaultSecurePosture, DeveloperKeyRotator, EncryptedHomeOptIn, GovernanceCharterManager,
-    ImmutableAuditTrail, IncidentResponsePlaybook, LicensingAuditor, MacPolicyEngine,
-    MacPolicyMode, NetworkZeroTrustEngine, PrivacyDashboardControls, PrivacyPreservingTelemetry,
-    RuntimeAppSandbox, SbomManager, SecureUpdateChannel, SecurityPrivacyGovernanceMasterSuite,
-    SystemSecretsKeyring, TpmHardwareAttestation, VulnerabilityDisclosureManager,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
