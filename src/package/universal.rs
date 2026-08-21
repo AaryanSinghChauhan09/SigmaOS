@@ -776,6 +776,173 @@ impl Default for TransactionalHistory {
 }
 
 /// Universal package manager
+pub struct UniversalPackageManager {
+    pub packages: HashMap<String, UnifiedPackage>,
+    pub adapters: HashMap<PackageFormat, PackageAdapter>,
+    pub resolver: DependencyResolver,
+    pub installed_packages: HashMap<String, UnifiedPackage>,
+    pub transaction_history: TransactionalHistory,
+    pub metadata_cache: HashMap<String, UnifiedPackage>,
+}
+
+impl UniversalPackageManager {
+    pub fn new() -> Self {
+        let mut manager = Self {
+            packages: HashMap::new(),
+            adapters: HashMap::new(),
+            resolver: DependencyResolver::new(),
+            installed_packages: HashMap::new(),
+            transaction_history: TransactionalHistory::new(),
+            metadata_cache: HashMap::new(),
+        };
+
+        manager.add_default_adapters();
+        manager
+    }
+
+    fn add_default_adapters(&mut self) {
+        self.adapters
+            .insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
+    }
+
+    pub fn add_package(&mut self, package: UnifiedPackage) {
+        self.resolver.add_package(package.clone());
+        self.metadata_cache
+            .insert(package.name.clone(), package.clone());
+        self.packages.insert(package.name.clone(), package);
+    }
+
+    pub fn create_checkpoint(&mut self) -> usize {
+        self.transaction_history
+            .create_checkpoint(&self.installed_packages)
+    }
+
+    pub fn rollback_to_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), PackageError> {
+        if let Some(checkpoint) = self
+            .transaction_history
+            .get_checkpoint(checkpoint_id)
+            .cloned()
+        {
+            let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
+            for key in current_keys {
+                if !checkpoint.installed_keys.contains(&key) {
+                    self.remove(&key)?;
+                }
+            }
+            Ok(())
+        } else {
+            Err(PackageError::PackageNotFound(format!(
+                "Checkpoint {} not found",
+                checkpoint_id
+            )))
+        }
+    }
+
+    pub fn install(&mut self, package_name: &str) -> Result<(), PackageError> {
+        // Resolve dependencies
+        let dependencies = self.resolver.resolve_dependencies(package_name)?;
+
+        // Detect conflicts
+        let conflicts = self.resolver.detect_conflicts(&dependencies);
+
+        if !conflicts.is_empty() {
+            let resolution = self.resolver.resolve_conflicts(&conflicts);
+            println!("Conflicts detected: {:?}", conflicts);
+            println!("Resolution: {:?}", resolution);
+        }
+
+        // Install packages
+        for dep_name in dependencies {
+            if let Some(package) = self.packages.get(&dep_name) {
+                // Find appropriate adapter
+                for format in &package.formats {
+                    if let Some(adapter) = self.adapters.get(format) {
+                        let adapter: &PackageAdapter = adapter;
+                        adapter.install(package)?;
+                        break;
+                    }
+                }
+
+                let mut installed = package.clone();
+                installed.installed = true;
+                self.installed_packages.insert(dep_name.clone(), installed);
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
+        if let Some(package) = self.installed_packages.get(package_name) {
+            for format in &package.formats {
+                let adapter = match self.adapters.get(format) {
+                    Some(a) => a,
+                    None => continue,
+                };
+                adapter.remove(package)?;
+                break;
+            }
+            self.installed_packages.remove(package_name);
+        }
+        Ok(())
+    }
+
+    pub fn update(&mut self, package_name: &str) -> Result<(), PackageError> {
+        if let Some(package) = self.installed_packages.get(package_name) {
+            for format in &package.formats {
+                let adapter = match self.adapters.get(format) {
+                    Some(a) => a,
+                    None => continue,
+                };
+                adapter.update(package)?;
+                break;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn search(&self, query: &str) -> Vec<&UnifiedPackage> {
+        self.packages
+            .values()
+            .filter(|p| p.name.contains(query) || p.version.contains(query))
+            .collect()
+    }
+
+    pub fn list_installed(&self) -> Vec<&UnifiedPackage> {
+        self.installed_packages.values().collect()
+    }
+
+    pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
+        self.packages.get(name)
+    }
+}
+
+impl Default for UniversalPackageManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Package errors
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PackageError {
+    PackageNotFound(String),
+    DependencyNotFound(String),
+    AdapterNotFound,
+    InstallationFailed(String),
+    ConflictDetected(Vec<(String, String)>),
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
