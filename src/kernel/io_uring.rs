@@ -3,7 +3,7 @@
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{Vec, String, ToString};
+use alloc::{vec::Vec, string::{String, ToString}};
 
 #[cfg(feature = "standalone_test")]
 extern crate std;

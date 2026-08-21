@@ -1006,7 +1006,7 @@ impl PacmanDbCleaner {
             };
 
             removed_count += split_idx;
-            for v in versions.iter().skip(split_idx) {
+            for v in &versions[split_idx..] {
                 kept_cache.push(CachedPackage {
                     name: name.clone(),
                     version: *v,
