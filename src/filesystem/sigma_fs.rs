@@ -306,7 +306,6 @@ impl SigmaFhsRouter {
         SigmaFhsRouter {
             routing_rules: rules,
         }
-        format!("/usr/share/{}", filename) // Default fallback
     }
 }
 

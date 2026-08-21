@@ -16,6 +16,9 @@ pub enum Priority {
 impl PartialEq for Task {
     fn eq(&self, other: &Self) -> bool {
         self.vruntime == other.vruntime
+    }
+}
+
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
@@ -60,6 +63,9 @@ impl Process {
             Priority::Realtime => 64,
         };
         self.virtual_deadline = current_time + (1000 / weight);
+    }
+}
+
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
@@ -174,17 +180,6 @@ pub struct CfsScheduler {
     tasks: [Option<Task>; 64],
     task_count: usize,
     current_time: u64,
-/// EEVDF Scheduler
-pub struct Scheduler {
-    processes: Vec<Process>,
-    current_time: u64,
-/// EEVDF Scheduler Engine
-pub struct Scheduler {
-    pub processes: Vec<Process>,
-    pub current_time: u64,
-    pub system_vtime: u64, // EEVDF System Virtual Time (V)
-    pub numa_nodes: Vec<NumaNode>,
-    pub run_queues: Vec<WorkStealingQueue>,
 }
 
 impl CfsScheduler {
@@ -193,9 +188,6 @@ impl CfsScheduler {
             tasks: [None; 64],
             task_count: 0,
             current_time: 0,
-            system_vtime: 0,
-            numa_nodes: Vec::new(),
-            run_queues: Vec::new(),
         }
     }
 
@@ -205,14 +197,6 @@ impl CfsScheduler {
             self.task_count += 1;
             self.sort_tasks();
         }
-    pub fn add_process(&mut self, mut process: Process) {
-        process.update_virtual_deadline(self.current_time);
-        self.processes.push(process);
-    pub fn add_process(&mut self, mut process: Process) {
-        // Set initial vruntime to system virtual time to prevent newly spawned process from hogging CPU
-        process.virtual_runtime = self.system_vtime;
-        process.update_virtual_deadline(self.system_vtime);
-        self.processes.push(process);
     }
 
     pub fn pick_next_task(&mut self) -> Option<Task> {
@@ -226,15 +210,46 @@ impl CfsScheduler {
         } else {
             None
         }
+    }
+
+    fn sort_tasks(&mut self) {
+        for i in 1..self.task_count {
+            let mut j = i;
+            while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
+                self.tasks.swap(j - 1, j);
+                j -= 1;
+            }
+        }
+    }
+}
+
+/// EEVDF Scheduler Engine
+pub struct Scheduler {
+    pub processes: Vec<Process>,
+    pub current_time: u64,
+    pub system_vtime: u64, // EEVDF System Virtual Time (V)
+    pub numa_nodes: Vec<NumaNode>,
+    pub run_queues: Vec<WorkStealingQueue>,
+}
+
+impl Scheduler {
+    pub fn new() -> Self {
+        Self {
+            processes: Vec::new(),
+            current_time: 0,
+            system_vtime: 0,
+            numa_nodes: Vec::new(),
+            run_queues: Vec::new(),
+        }
+    }
+
+    pub fn add_process(&mut self, mut process: Process) {
+        process.virtual_runtime = self.system_vtime;
+        process.update_virtual_deadline(self.system_vtime);
+        self.processes.push(process);
+    }
+
     pub fn schedule(&mut self) -> Option<&Process> {
-        // Find process with earliest eligible virtual deadline
-        let now = self.current_time;
-        self.processes
-            .iter()
-            .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
-            .min_by_key(|p| p.virtual_deadline)
-    pub fn schedule(&mut self) -> Option<&Process> {
-        // 1. Filter ready processes
         let mut ready_indices = Vec::new();
         for (idx, p) in self.processes.iter().enumerate() {
             if p.state == ProcessState::Ready {
@@ -246,7 +261,6 @@ impl CfsScheduler {
             return None;
         }
 
-        // 2. Identify eligible processes (virtual_runtime <= system_vtime)
         let mut eligible_indices = Vec::new();
         for &idx in &ready_indices {
             let p = &self.processes[idx];
@@ -255,10 +269,6 @@ impl CfsScheduler {
             }
         }
 
-        // 3. Selection rules:
-        // - Standard EEVDF: pick the eligible process with the EARLIEST virtual deadline
-        // - Starvation Prevention: if no processes are currently eligible (e.g. system_vtime is lagging),
-        //   fallback to selecting the process with the minimum virtual_runtime
         let selected_idx = if !eligible_indices.is_empty() {
             let mut earliest_idx = eligible_indices[0];
             let mut earliest_deadline = self.processes[earliest_idx].virtual_deadline;
@@ -291,7 +301,6 @@ impl CfsScheduler {
     pub fn tick(&mut self) {
         self.current_time += 1;
 
-        // Advance system virtual time (V) based on active threads vruntime progress
         let mut active_count = 0;
         let mut total_vruntime = 0;
 
@@ -304,15 +313,12 @@ impl CfsScheduler {
 
         if active_count > 0 {
             let avg_vtime = total_vruntime / active_count;
-            // System virtual time advances gracefully
             self.system_vtime = self.system_vtime.max(avg_vtime);
         }
         self.system_vtime += 1;
     }
 
     pub fn execute_process_ticks(&mut self, pid: u64, ticks_executed: u64) {
-        // Simulates thread execution and updates its vruntime based on priority weight:
-        // vruntime_delta = executed_ticks / weight
         if let Some(p) = self.processes.iter_mut().find(|p| p.pid == pid) {
             let weight = p.get_weight();
             let delta = (ticks_executed / weight).max(1);
@@ -322,18 +328,6 @@ impl CfsScheduler {
         }
     }
 
-    fn sort_tasks(&mut self) {
-        // Simple insertion sort for now since we don't have BTreeMap in no_std
-        for i in 1..self.task_count {
-            let mut j = i;
-            while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
-                self.tasks.swap(j - 1, j);
-                j -= 1;
-    pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
-        if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
-            process.state = state;
-            if state == ProcessState::Ready {
-                process.update_virtual_deadline(self.current_time);
     pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
         if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
             process.state = state;
