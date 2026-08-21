@@ -716,6 +716,228 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
+// =========================================================================
+// NT KERNEL APIS & ADVANCED ARCHITECTURE COMPATIBILITY EXTENSIONS
+// =========================================================================
+
+/// 1. DeviceIoControl & IRP Dispatch Routing
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoctlMethod {
+    Buffered,
+    InDirect,
+    OutDirect,
+    Neither,
+}
+
+pub struct DeviceIoControlEngine;
+
+impl DeviceIoControlEngine {
+    pub fn send_device_io_control(
+        driver: &NtDriver,
+        ioctl_code: u32,
+        _in_buffer: *mut u8,
+        in_len: usize,
+        out_buffer: *mut u8,
+        out_len: usize,
+    ) -> NtStatus {
+        let mut irp = Irp {
+            io_status: IoStatusBlock {
+                status: NtStatus::Success,
+                information: out_len,
+            },
+            current_stack_location: IrpStackLocation {
+                major_function: IrpMajorFunction::DeviceControl,
+                minor_function: 0,
+                flags: 0,
+                parameters_read_length: in_len,
+                parameters_write_length: out_len,
+                parameters_ioctl_code: ioctl_code,
+            },
+            user_buffer: out_buffer,
+            user_buffer_len: out_len,
+        };
+        driver.dispatch_irp(&mut irp)
+    }
+}
+
+/// 2. KeInitializeApc (Kernel Asynchronous Procedure Call)
+#[derive(Debug, Clone, Copy)]
+pub struct KApc {
+    pub target_thread_id: usize,
+    pub kernel_routine: Option<fn(usize)>,
+    pub normal_routine: Option<fn(usize)>,
+    pub is_initialized: bool,
+}
+
+pub struct KeApcManager;
+
+impl KeApcManager {
+    pub fn ke_initialize_apc(
+        apc: &mut KApc,
+        thread_id: usize,
+        kernel_routine: Option<fn(usize)>,
+        normal_routine: Option<fn(usize)>,
+    ) {
+        apc.target_thread_id = thread_id;
+        apc.kernel_routine = kernel_routine;
+        apc.normal_routine = normal_routine;
+        apc.is_initialized = true;
+    }
+}
+
+/// 3. MmGetPhysicalAddress (Virtual-to-Physical Address Translation)
+pub struct MmPhysicalMemoryTranslator;
+
+impl MmPhysicalMemoryTranslator {
+    pub fn mm_get_physical_address(virtual_addr: usize) -> u64 {
+        // High-memory physical mapping offset simulation
+        if virtual_addr >= 0x00400000 {
+            (virtual_addr as u64) & 0x0FFF_FFFF
+        } else {
+            virtual_addr as u64
+        }
+    }
+}
+
+/// 4. PsCreateSystemThread (Kernel System Thread Creation)
+pub struct PsThreadManager;
+
+impl PsThreadManager {
+    pub fn ps_create_system_thread(
+        target_process_id: usize,
+        start_routine: fn(usize),
+        context_param: usize,
+    ) -> NtThread {
+        NtThread {
+            tid: 0x200 + target_process_id,
+            teb: Teb {
+                stack_base: 0x00800000,
+                stack_limit: 0x00700000,
+                active_rpc_handle: 0,
+                thread_local_storage_pointer: 0,
+                peb_pointer: 0,
+                real_client_id: target_process_id,
+            },
+            context: ThreadContext {
+                rip: start_routine as usize,
+                rsp: 0x00800000,
+                rbp: 0x00800000,
+                rflags: 0x200,
+                rax: context_param,
+            },
+            priority: 8,
+            state: 0, // Ready state
+        }
+    }
+}
+
+/// 5. WinDbg Extension SDK Subsystem (`!process`, `!thread`, `!devobj`, `!pool`)
+pub struct WinDbgExtensionSdk;
+
+impl WinDbgExtensionSdk {
+    pub fn inspect_process_ext(proc: &NtProcess) -> [u8; 64] {
+        let mut buffer = [0u8; 64];
+        buffer[0] = b'P'; buffer[1] = b'R'; buffer[2] = b'O'; buffer[3] = b'C';
+        buffer[4] = (proc.pid & 0xFF) as u8;
+        buffer
+    }
+
+    pub fn inspect_thread_ext(thread: &NtThread) -> [u8; 64] {
+        let mut buffer = [0u8; 64];
+        buffer[0] = b'T'; buffer[1] = b'H'; buffer[2] = b'R'; buffer[3] = b'D';
+        buffer[4] = (thread.tid & 0xFF) as u8;
+        buffer
+    }
+}
+
+/// 6. Application Program Status Register (APSR) Model
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ApsrRegister {
+    pub negative: bool,  // N flag
+    pub zero: bool,      // Z flag
+    pub carry: bool,     // C flag
+    pub overflow: bool,  // V flag
+    pub saturation: bool, // Q flag
+}
+
+impl ApsrRegister {
+    pub fn new() -> Self {
+        Self {
+            negative: false,
+            zero: true,
+            carry: false,
+            overflow: false,
+            saturation: false,
+        }
+    }
+
+    pub fn update_flags(&mut self, result: i64) {
+        self.zero = result == 0;
+        self.negative = result < 0;
+    }
+}
+
+/// 7. Approximation Partial Ordering Scheduler (BSD DAG Inspired)
+pub struct ApproximationPartialOrdering {
+    pub task_dependencies: [(usize, usize); 8], // (dependent_task, prerequisite_task)
+    pub count: usize,
+}
+
+impl ApproximationPartialOrdering {
+    pub fn new() -> Self {
+        Self {
+            task_dependencies: [(0, 0); 8],
+            count: 0,
+        }
+    }
+
+    pub fn add_dependency(&mut self, dependent: usize, prereq: usize) -> Result<(), &'static str> {
+        if self.count >= 8 {
+            return Err("DAG Dependency Table Full");
+        }
+        self.task_dependencies[self.count] = (dependent, prereq);
+        self.count += 1;
+        Ok(())
+    }
+
+    pub fn is_executable(&self, task_id: usize, completed_tasks: &[usize]) -> bool {
+        for i in 0..self.count {
+            let (dep, prereq) = self.task_dependencies[i];
+            if dep == task_id {
+                let mut prereq_done = false;
+                for &done in completed_tasks {
+                    if done == prereq {
+                        prereq_done = true;
+                        break;
+                    }
+                }
+                if !prereq_done {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+}
+
+/// 8. Arbitrary Kernel Context Switcher
+pub struct ArbitraryKernelContext {
+    pub active_cr3_page_dir: u64,
+}
+
+impl ArbitraryKernelContext {
+    pub fn new(page_dir: u64) -> Self {
+        Self { active_cr3_page_dir: page_dir }
+    }
+
+    pub fn switch_context(&mut self, new_page_dir: u64) -> u64 {
+        let old = self.active_cr3_page_dir;
+        self.active_cr3_page_dir = new_page_dir;
+        old
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -858,5 +1080,101 @@ mod tests {
         assert_eq!(addr, 0x00400000);
 
         assert!(win32.win32_close_handle(h_file).is_ok());
+    }
+
+    #[test]
+    fn test_device_io_control_routing() {
+        let mut driver = NtDriver::new(b"StorageFilter");
+        fn mock_ioctl_dispatch(irp: &mut Irp) -> NtStatus {
+            irp.io_status.information = 1024;
+            NtStatus::Success
+        }
+        driver.dispatch_device_control = Some(mock_ioctl_dispatch);
+
+        let status = DeviceIoControlEngine::send_device_io_control(
+            &driver,
+            0x222000, // IOCTL code
+            core::ptr::null_mut(),
+            0,
+            core::ptr::null_mut(),
+            1024,
+        );
+        assert_eq!(status, NtStatus::Success);
+    }
+
+    #[test]
+    fn test_ke_initialize_apc() {
+        let mut apc = KApc {
+            target_thread_id: 0,
+            kernel_routine: None,
+            normal_routine: None,
+            is_initialized: false,
+        };
+        fn kernel_sub_apc(_param: usize) {}
+        KeApcManager::ke_initialize_apc(&mut apc, 0x100, Some(kernel_sub_apc), None);
+        assert!(apc.is_initialized);
+        assert_eq!(apc.target_thread_id, 0x100);
+    }
+
+    #[test]
+    fn test_mm_get_physical_address() {
+        let phys1 = MmPhysicalMemoryTranslator::mm_get_physical_address(0x00400000);
+        assert_eq!(phys1, 0x00400000);
+
+        let phys2 = MmPhysicalMemoryTranslator::mm_get_physical_address(0x10400000);
+        assert_eq!(phys2, 0x00400000); // Mapped mask simulation
+    }
+
+    #[test]
+    fn test_ps_create_system_thread() {
+        fn mock_system_thread(_context: usize) {}
+        let thread = PsThreadManager::ps_create_system_thread(0x10, mock_system_thread, 0xAA);
+        assert_eq!(thread.tid, 0x210);
+        assert_eq!(thread.context.rax, 0xAA);
+        assert_eq!(thread.state, 0); // Ready
+    }
+
+    #[test]
+    fn test_windbg_extension_sdk() {
+        let proc = NtProcess {
+            pid: 42,
+            peb: Peb {
+                inherited_address_space: 0,
+                read_image_file_exec_options: 0,
+                being_debugged: 0,
+                image_base_address: 0x400000,
+                loader_data: 0,
+                process_parameters: 0,
+            },
+        };
+        let buf = WinDbgExtensionSdk::inspect_process_ext(&proc);
+        assert_eq!(&buf[..4], b"PROC");
+        assert_eq!(buf[4], 42);
+    }
+
+    #[test]
+    fn test_apsr_register_flags() {
+        let mut apsr = ApsrRegister::new();
+        assert!(apsr.zero);
+        apsr.update_flags(-5);
+        assert!(!apsr.zero);
+        assert!(apsr.negative);
+    }
+
+    #[test]
+    fn test_approximation_partial_ordering_dag() {
+        let mut po = ApproximationPartialOrdering::new();
+        assert!(po.add_dependency(2, 1).is_ok()); // Task 2 depends on Task 1
+
+        assert!(!po.is_executable(2, &[])); // Prereq 1 not completed
+        assert!(po.is_executable(2, &[1])); // Prereq 1 completed!
+    }
+
+    #[test]
+    fn test_arbitrary_kernel_context_switch() {
+        let mut ctx = ArbitraryKernelContext::new(0x1000);
+        let old_cr3 = ctx.switch_context(0x2000);
+        assert_eq!(old_cr3, 0x1000);
+        assert_eq!(ctx.active_cr3_page_dir, 0x2000);
     }
 }
