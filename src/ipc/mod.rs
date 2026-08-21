@@ -22,6 +22,7 @@ pub mod mechanism;
 pub mod message;
 pub mod unix_socket;
 pub mod signals;
+pub mod async_io;
 
 pub use alpc::{
     AlpcFacility, AlpcFacilityServer, AlpcManager, AlpcMessage, AlpcMessageHeader, AlpcPort,
@@ -40,4 +41,8 @@ pub use unix_socket::{
 
 pub use signals::{
     SignalType, SignalDisposition, PendingSignal, ProcessSignalState, SignalDeliverySystem,
+};
+
+pub use async_io::{
+    AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, SubmissionQueueEntry,
 };

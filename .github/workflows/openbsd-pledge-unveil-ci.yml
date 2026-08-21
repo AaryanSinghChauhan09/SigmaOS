@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-
 jobs:
   openbsd-security-audit:
     name: OpenBSD pledge, unveil & W^X Memory Hardening Verification

@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-
 jobs:
   alpine-musl-build:
     name: Alpine musl & BusyBox Zero-Dependency Build

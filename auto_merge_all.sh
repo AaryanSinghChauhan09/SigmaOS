@@ -3,7 +3,7 @@ git fetch --all
 git checkout main
 
 # Get all remote branches except main and HEAD
-branches=$(git branch -r | grep 'origin/' | grep -v 'origin/main' | grep -v 'HEAD' | sed 's/origin\///')
+branches=$(git branch -r | grep '^[[:space:]]*origin/' | grep -v 'origin/main' | grep -v 'HEAD' | sed 's/^[[:space:]]*origin\///')
 
 for branch in $branches; do
     echo "=== Merging: $branch ==="

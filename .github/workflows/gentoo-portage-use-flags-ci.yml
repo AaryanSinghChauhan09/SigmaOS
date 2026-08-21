@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-
 jobs:
   gentoo-portage-matrix:
     name: Gentoo Portage Ebuild & USE Flags Matrix Test

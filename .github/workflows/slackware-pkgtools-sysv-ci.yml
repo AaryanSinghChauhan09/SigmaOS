@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-
 jobs:
   slackware-verification:
     name: Slackware pkgtools & SlackBuilds Package Verification

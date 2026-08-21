@@ -16,6 +16,7 @@ pub mod torrent;
 pub mod pf_firewall;
 pub mod nftables;
 pub mod npf;
+pub mod distro_net;
 
 pub use npf::{NpfFirewallEngine, NpfFilterAction, NpfDirection, NpfPacket, NpfStateRule};
 
@@ -31,3 +32,6 @@ pub use analyzer::{
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use sync::{CloudSyncManager, ConflictResolution, SyncConfig, SyncCredentials, SyncError, SyncItem, SyncItemType, SyncProvider, SyncResult, SyncStatus};
 pub use torrent::{PeerInfo, TorrentClient, TorrentError, TorrentState};
+pub use distro_net::{
+    BpfInstruction, EbpfSocketFilter, LinuxDistroNetEngine, SynCookieEngine, WireguardTunnel,
+};
