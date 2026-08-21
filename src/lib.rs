@@ -34,6 +34,14 @@ pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
 pub mod cluster;
+pub mod distro;
+
+pub use distro::{
+    BareMetalTelemetryRing, CommunityRemixBuilder, CommunityRemixConfig,
+    CryptographicBountyLedger, CryptographicMatrixVoting, IndiaStackPublicIntegration,
+    MerkleTransactionalBackupEngine, PqcVulnerabilityAdvisoryStream, SigmaAppImageFormat,
+    SigmaReleaseBranch, SovereignEdition, SovereignGuardTunPqc, ZenithWiFiBroker,
+};
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
