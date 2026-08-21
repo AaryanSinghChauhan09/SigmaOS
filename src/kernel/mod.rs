@@ -5,6 +5,7 @@ pub mod memory;
 pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
+pub mod perf_mm;
 pub mod roundrobin;
 pub mod scheduler;
 
