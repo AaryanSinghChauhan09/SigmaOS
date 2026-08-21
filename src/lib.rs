@@ -23,6 +23,10 @@ pub mod package;
 pub mod productivity;
 pub mod thread;
 pub mod process;
+pub mod community;
+pub mod compression;
+pub mod memory;
+pub mod ipc;
 pub mod tools;
 pub mod virtualization;
 pub mod graphics {
@@ -53,6 +57,7 @@ pub mod toolchain {
 }
 pub mod scheduler {
     pub mod numa_scheduler;
+    pub mod affinity;
 }
 pub mod crypto {
     pub mod vectorized_pqc;
@@ -98,6 +103,10 @@ pub use customization::{
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use dashboard::statutory_compliance::{
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier,
+    StatutoryBreachAlert, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
@@ -205,6 +214,48 @@ pub use thread::management::{
 pub use process::spawn::{
     ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
     CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
+};
+pub use process::activity_manager::{
+    ActivityManager, ActivityState, ProcessActivityRecord, RegisterSnapshot, AddressSpaceBinding,
+};
+pub use memory::segmentation_paging::{
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
+    SpaceProtectionFlags, SystemControlRegisters,
+};
+pub use memory::tlb_associative::{
+    AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags,
+};
+
+pub use community::toolkit::{
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
+    RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
+    SecurityProfileTemplateStore, SecurityTemplate,
+};
+
+pub use compression::archive::{
+    ArchiveEntry, ArchiveFormat, ArchiveImage, ArchiveManager, CompressionCodec, EntryType,
+};
+
+pub use scheduler::affinity::{
+    CpuAffinityMask, NumaDomainTopology, ProcessCpuAssigner,
+};
+
+pub use ipc::async_io::{
+    AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, SubmissionQueueEntry,
+};
+
+pub use driver::dkms_autoloader::{
+    DkmsEngine, DkmsModule, DkmsModuleStatus, PciIdMatch, UsbIdMatch,
+};
+
+pub use network::distro_net::{
+    BpfInstruction, EbpfSocketFilter, LinuxDistroNetEngine, SynCookieEngine, WireguardTunnel,
+};
+
+pub use container::distro_sandbox::{
+    CgroupV2Limits, DistroSandboxEngine, DistroSandboxInstance, LandlockPathRules,
+    NamespaceFlags, SeccompAction, SeccompPolicy,
 };
 
 pub use tools::{

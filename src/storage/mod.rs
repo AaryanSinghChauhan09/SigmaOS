@@ -20,12 +20,16 @@
 // Database engines, storage systems, and data management
 
 pub mod block;
+pub mod block_device_extended;
 pub mod geom;
 pub mod nosql_engine;
 pub mod search;
 pub mod sql_engine;
 pub mod volume;
 
+pub use block_device_extended::{
+    BlockRecordStrategy, CinderBlockVolume, CinderVolumeManager, VolumeAttachState, VolumeSnapshot,
+};
 pub use geom::{
     BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
     PartitionEntry,

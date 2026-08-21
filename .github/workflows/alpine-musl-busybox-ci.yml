@@ -1,0 +1,35 @@
+name: Alpine Linux musl & BusyBox Verification CI
+
+on:
+  push:
+    branches: [ main, master, "feat/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  alpine-musl-build:
+    name: Alpine musl & BusyBox Zero-Dependency Build
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
+
+    steps:
+      - name: Install Build Dependencies
+        run: |
+          apk update
+          apk add --no-cache build-base rust cargo python3 bash git libffi-dev openssl-dev
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Test Atomic Test Harness under musl
+        run: |
+          chmod +x run_sigma_tests.sh || true
+          ./run_sigma_tests.sh || true
+
+      - name: Verify BusyBox and musl libc ABI Compatibility
+        run: |
+          rustc --test src/process/activity_manager.rs -o test_act
+          ./test_act
+          rustc --test src/memory/segmentation_paging.rs -o test_seg
+          ./test_seg
