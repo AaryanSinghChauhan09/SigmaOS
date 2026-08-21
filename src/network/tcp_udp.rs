@@ -1,10 +1,9 @@
-/// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
-/// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
-extern crate alloc;
+//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -14,6 +13,11 @@ pub type Port = u16;
 pub enum Protocol {
     Tcp = 0,
     Udp = 1,
+}
+
+impl Protocol {
+    pub const TCP: Protocol = Protocol::Tcp;
+    pub const UDP: Protocol = Protocol::Udp;
 }
 
 /// Standard RFC-793 TCP States
@@ -40,7 +44,6 @@ pub enum NetworkError {
     InvalidSocket = 1,
     ConnectionFailed = 2,
     SendFailed = 3,
-    InvalidParameter = 4,
 }
 
 pub trait Socket {
@@ -48,12 +51,6 @@ pub trait Socket {
     fn protocol(&self) -> Protocol;
     fn local_port(&self) -> Port;
     fn remote_port(&self) -> Port;
-}
-
-/// BSD Socket Option Interface
-pub trait BsdSocket: Socket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -64,7 +61,13 @@ pub enum SocketOption {
     SndBuf,
 }
 
-/// Simple Socket structure with actual atomic option fields (fixes undefined fields)
+/// BSD Socket Option Interface
+pub trait BsdSocket: Socket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
+}
+
+/// Simple Socket structure
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
@@ -87,7 +90,7 @@ impl SimpleSocket {
             state: AtomicU32::new(TCPState::Closed as u32),
             reuse_addr: AtomicU32::new(0),
             tcp_nodelay: AtomicU32::new(0),
-            rcv_buf: AtomicU32::new(8192), // Default 8KB
+            rcv_buf: AtomicU32::new(8192),
             snd_buf: AtomicU32::new(8192),
         }
     }
@@ -152,7 +155,6 @@ pub trait TCPConnection {
 }
 
 impl TCPConnection for SimpleSocket {
-    /// Performs standard RFC-793 TCP state transitions from CLOSED to ESTABLISHED
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
         let current = self.get_state();
         if current != TCPState::Closed {
@@ -163,8 +165,7 @@ impl TCPConnection for SimpleSocket {
 
         // Transition: Closed -> SynSent -> Established
         self.state.store(TCPState::SynSent as u32, Ordering::SeqCst);
-        self.state
-            .store(TCPState::Established as u32, Ordering::SeqCst);
+        self.state.store(TCPState::Established as u32, Ordering::SeqCst);
         Ok(())
     }
 
@@ -177,7 +178,6 @@ impl TCPConnection for SimpleSocket {
         if self.get_state() != TCPState::Listen {
             return Err(NetworkError::ConnectionFailed);
         }
-        // Simulated child client socket allocation
         Ok(self.id + 1000)
     }
 
@@ -199,24 +199,31 @@ impl TCPConnection for SimpleSocket {
         Ok(len)
     }
 
-    /// Performs active shutdown close transition
     fn close(&mut self) -> Result<(), NetworkError> {
         let current = self.get_state();
         if current == TCPState::Established {
-            // Transition: Established -> FinWait1 -> FinWait2 -> TimeWait -> Closed
-            self.state
-                .store(TCPState::FinWait1 as u32, Ordering::SeqCst);
-            self.state
-                .store(TCPState::FinWait2 as u32, Ordering::SeqCst);
-            self.state
-                .store(TCPState::TimeWait as u32, Ordering::SeqCst);
+            self.state.store(TCPState::FinWait1 as u32, Ordering::SeqCst);
+            self.state.store(TCPState::FinWait2 as u32, Ordering::SeqCst);
+            self.state.store(TCPState::TimeWait as u32, Ordering::SeqCst);
         }
         self.state.store(TCPState::Closed as u32, Ordering::SeqCst);
         Ok(())
     }
 
     fn get_state(&self) -> TCPState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
+            0 => TCPState::Closed,
+            1 => TCPState::Listen,
+            2 => TCPState::SynSent,
+            3 => TCPState::SynReceived,
+            4 => TCPState::Established,
+            5 => TCPState::FinWait1,
+            6 => TCPState::FinWait2,
+            7 => TCPState::CloseWait,
+            8 => TCPState::Closing,
+            _ => TCPState::TimeWait,
+        }
     }
 }
 
@@ -246,7 +253,7 @@ pub trait CongestionControl {
     fn get_cwnd(&self) -> usize;
 }
 
-/// RFC-5681 TCP Reno Congestion Control Engine
+#[repr(C)]
 pub struct RenoCongestionControl {
     pub cwnd: u32,
     pub ssthresh: u32,
@@ -255,28 +262,31 @@ pub struct RenoCongestionControl {
 impl RenoCongestionControl {
     pub fn new() -> Self {
         RenoCongestionControl {
-            cwnd: 10, // Standard Linux initial congestion window
+            cwnd: 10,
             ssthresh: 65535,
         }
     }
 }
 
+impl Default for RenoCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CongestionControl for RenoCongestionControl {
-    /// Standard additive-increase, multiplicative-decrease (AIMD)
     fn update_cwnd(&mut self, acked: usize) {
         let acked_u32 = acked as u32;
         if self.cwnd < self.ssthresh {
-            // Slow Start phase: exponential increase
             self.cwnd += acked_u32;
         } else {
-            // Congestion Avoidance phase: linear increase
             self.cwnd += 1;
         }
     }
 
     fn on_loss(&mut self) {
         self.ssthresh = self.cwnd / 2;
-        self.cwnd = 1; // Back to slow start
+        self.cwnd = 1;
     }
 
     fn get_cwnd(&self) -> usize {
@@ -284,7 +294,7 @@ impl CongestionControl for RenoCongestionControl {
     }
 }
 
-/// BBR (Bottleneck Bandwidth and RTT) Congestion Control Engine
+#[repr(C)]
 pub struct BBRCongestionControl {
     pub cwnd: u32,
     pub bw_estimate: u32,
@@ -295,21 +305,25 @@ impl BBRCongestionControl {
     pub fn new() -> Self {
         BBRCongestionControl {
             cwnd: 10,
-            bw_estimate: 1000, // Simulated 1000 packets/sec
-            rtt_min_ms: 10,    // Simulated 10ms minimum RTT
+            bw_estimate: 1000,
+            rtt_min_ms: 10,
         }
     }
 }
 
+impl Default for BBRCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CongestionControl for BBRCongestionControl {
-    /// BBR updates window based on pacing rate (BDP = Bottleneck Bandwidth * RTT)
     fn update_cwnd(&mut self, _acked: usize) {
         let target = (self.bw_estimate * self.rtt_min_ms) / 100;
-        self.cwnd = target.max(4); // Keep minimum window of 4 packets
+        self.cwnd = target.max(4);
     }
 
     fn on_loss(&mut self) {
-        // BBR is robust against isolated losses, reduces slightly
         self.cwnd = (self.cwnd as f32 * 0.8) as u32;
     }
 
@@ -324,7 +338,6 @@ pub trait Firewall {
     fn is_allowed(&self, port: Port) -> bool;
 }
 
-/// Multi-port firewall initialized safely without Copy bound traits
 pub struct SimpleFirewall {
     pub allowed_ports: Vec<bool>,
 }
@@ -336,6 +349,12 @@ impl SimpleFirewall {
         SimpleFirewall {
             allowed_ports: allowed,
         }
+    }
+}
+
+impl Default for SimpleFirewall {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -370,6 +389,12 @@ impl ZeroCopyNetwork {
     }
 }
 
+impl Default for ZeroCopyNetwork {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ZeroCopy for ZeroCopyNetwork {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
         self.dma_buffer_address = data.as_ptr() as u64;
@@ -391,11 +416,11 @@ pub trait NetworkStack {
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
 }
 
-/// Parallel-safe, clean-room Networking Stack (fixes undefined fields)
 pub struct SimpleNetworkStack {
     pub sockets: Vec<Box<dyn Socket>>,
     pub next_id: AtomicU32,
     pub firewall: SimpleFirewall,
+    pub congestion: RenoCongestionControl,
 }
 
 impl SimpleNetworkStack {
@@ -404,7 +429,14 @@ impl SimpleNetworkStack {
             sockets: Vec::new(),
             next_id: AtomicU32::new(1),
             firewall: SimpleFirewall::new(),
+            congestion: RenoCongestionControl::new(),
         }
+    }
+}
+
+impl Default for SimpleNetworkStack {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -426,16 +458,33 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        self.sockets
-            .iter()
-            .find(|s| s.id() == id)
-            .map(|s| s.as_ref())
+        self.sockets.iter().find(|s| s.id() == id).map(|s| s.as_ref())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_tcp_socket_flow() {
+        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
+        assert_eq!(socket.id(), 1);
+        assert_eq!(socket.protocol(), Protocol::TCP);
+        assert!(socket.listen().is_ok());
+        assert!(socket.connect(8080).is_ok());
+        assert_eq!(socket.get_state(), TCPState::Established);
+
+        let data = b"hello";
+        assert_eq!(socket.send(data).unwrap(), 5);
+
+        let mut buf = [0u8; 10];
+        assert_eq!(socket.recv(&mut buf).unwrap(), 10);
+        assert_eq!(buf[0], 13);
+
+        assert!(socket.close().is_ok());
+        assert_eq!(socket.get_state(), TCPState::Closed);
+    }
 
     #[test]
     fn test_socket_options() {
@@ -448,15 +497,46 @@ mod tests {
     }
 
     #[test]
+    fn test_udp_socket_flow() {
+        let mut socket = SimpleSocket::new(2, Protocol::UDP, 53);
+        assert_eq!(socket.id(), 2);
+        assert_eq!(socket.protocol(), Protocol::UDP);
+
+        let data = b"dnsreq";
+        assert_eq!(socket.sendto(data, 53).unwrap(), 6);
+
+        let mut buf = [0u8; 10];
+        let (len, rport) = socket.recvfrom(&mut buf).unwrap();
+        assert_eq!(len, 10);
+        assert_eq!(rport, 53);
+        assert_eq!(buf[0], 17);
+    }
+
+    #[test]
+    fn test_firewall_and_congestion() {
+        let mut firewall = SimpleFirewall::new();
+        assert!(!firewall.is_allowed(80));
+        firewall.allow_port(80);
+        assert!(firewall.is_allowed(80));
+        firewall.block_port(80);
+        assert!(!firewall.is_allowed(80));
+
+        let mut cc = RenoCongestionControl::new();
+        assert_eq!(cc.get_cwnd(), 10);
+        cc.update_cwnd(2);
+        assert_eq!(cc.get_cwnd(), 12);
+        cc.on_loss();
+        assert_eq!(cc.get_cwnd(), 1);
+    }
+
+    #[test]
     fn test_tcp_state_machine_handshake() {
         let mut socket = SimpleSocket::new(1, Protocol::Tcp, 443);
         assert_eq!(socket.get_state(), TCPState::Closed);
 
-        // Perform active connect
         socket.connect(55120).unwrap();
         assert_eq!(socket.get_state(), TCPState::Established);
 
-        // Perform active close
         socket.close().unwrap();
         assert_eq!(socket.get_state(), TCPState::Closed);
     }
@@ -466,11 +546,9 @@ mod tests {
         let mut reno = RenoCongestionControl::new();
         assert_eq!(reno.get_cwnd(), 10);
 
-        // Slow start phase (exponential increase)
         reno.update_cwnd(2);
         assert_eq!(reno.get_cwnd(), 12);
 
-        // Simulated packet loss (multiplicative decrease)
         reno.on_loss();
         assert_eq!(reno.get_cwnd(), 1);
         assert_eq!(reno.ssthresh, 6);
@@ -479,12 +557,11 @@ mod tests {
     #[test]
     fn test_bbr_congestion_pacing() {
         let mut bbr = BBRCongestionControl::new();
-        // cwnd is computed based on bandwidth * RTT estimation
         bbr.update_cwnd(0);
-        assert_eq!(bbr.get_cwnd(), 100); // 1000 * 10 / 100 = 100
+        assert_eq!(bbr.get_cwnd(), 100);
 
         bbr.on_loss();
-        assert_eq!(bbr.get_cwnd(), 80); // robust drop to 80% (80)
+        assert_eq!(bbr.get_cwnd(), 80);
     }
 
     #[test]

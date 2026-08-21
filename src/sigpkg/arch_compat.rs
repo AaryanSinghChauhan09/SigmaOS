@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
-// Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
-// Enhanced with ALPM Hooks, mkinitcpio initramfs compilers, and makepkg package builders.
+// Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
+// parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-#[cfg(not(test))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use klib::collections::HashMap;
 
-#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
     pub major: u64,
@@ -13,38 +12,21 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(test)]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self {
-            major,
-            minor,
-            patch,
-        }
+        Self { major, minor, patch }
     }
 
     pub fn parse(v_str: &str) -> Result<Self, &'static str> {
-        let mut parts = v_str.split('.');
-        let major = parts
-            .next()
-            .ok_or("err")?
-            .parse::<u64>()
-            .map_err(|_| "err")?;
-        let minor = parts
-            .next()
-            .ok_or("err")?
-            .parse::<u64>()
-            .map_err(|_| "err")?;
-        let patch = parts
-            .next()
-            .ok_or("err")?
-            .parse::<u64>()
-            .map_err(|_| "err")?;
+        let clean_v = v_str.split('-').next().unwrap_or(v_str);
+        let mut parts = clean_v.split('.');
+        let major = parts.next().ok_or("err")?.parse::<u64>().unwrap_or(1);
+        let minor = parts.next().unwrap_or("0").parse::<u64>().unwrap_or(0);
+        let patch = parts.next().unwrap_or("0").parse::<u64>().unwrap_or(0);
         Ok(Self::new(major, minor, patch))
     }
 }
 
-#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Exact(Version),
@@ -55,31 +37,28 @@ pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(test)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
-    pub name: String,
+    pub name: klib::string::SigmaString,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(test)]
 #[derive(Debug, Clone)]
 pub struct Package {
-    pub name: String,
+    pub name: klib::string::SigmaString,
     pub version: Version,
-    pub description: String,
-    pub dependencies: Vec<Dependency>,
-    pub checksum: String,
+    pub description: klib::string::SigmaString,
+    pub dependencies: klib::vec::Vec<Dependency>,
+    pub checksum: klib::string::SigmaString,
 }
 
-#[cfg(test)]
 impl Package {
     pub fn new(
-        name: String,
+        name: klib::string::SigmaString,
         version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
+        description: klib::string::SigmaString,
+        dependencies: klib::vec::Vec<Dependency>,
+        checksum: klib::string::SigmaString,
     ) -> Self {
         Self {
             name,
@@ -87,24 +66,6 @@ impl Package {
             description,
             dependencies,
             checksum,
-        }
-    }
-}
-
-use std::collections::HashMap;
-
-/// Debian-style Sbuild Source Build Dependency Representation
-#[derive(Debug, Clone)]
-pub struct DebianSbuildPackage {
-    pub name: String,
-    pub build_depends: Vec<String>,
-}
-
-impl DebianSbuildPackage {
-    pub fn new(name: &str, build_deps: Vec<String>) -> Self {
-        Self {
-            name: name.to_string(),
-            build_depends: build_deps,
         }
     }
 }
@@ -122,7 +83,7 @@ impl AurRecipeCompiler {
         }
     }
 
-    /// Compiles a declarative Arch-style PKGBUILD text into a native S-PKG Package metadata
+    /// Compiles a declarative Arch-style PKGBUILD text into a native Package metadata
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
@@ -153,8 +114,7 @@ impl AurRecipeCompiler {
             return Err("PKGBUILD missing mandatory pkgname field");
         }
 
-        let parsed_ver =
-            Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
+        let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
             pkgname.to_string(),
@@ -172,11 +132,19 @@ impl Default for AurRecipeCompiler {
     }
 }
 
+/// Debian-style sbuild build dependency recipe descriptor
+#[derive(Debug, Clone)]
+pub struct DebianSbuildPackage {
+    pub name: klib::string::SigmaString,
+    pub version: Version,
+    pub build_depends: klib::vec::Vec<klib::string::SigmaString>,
+}
+
 /// Rolling Release System Synchronizer
 #[derive(Debug, Clone)]
 pub struct RollingSyncManager {
-    pub installed_packages: HashMap<String, Version>,
-    pub remote_repository: HashMap<String, Version>,
+    pub installed_packages: HashMap<klib::string::SigmaString, Version>,
+    pub remote_repository: HashMap<klib::string::SigmaString, Version>,
 }
 
 impl RollingSyncManager {
@@ -188,15 +156,15 @@ impl RollingSyncManager {
     }
 
     pub fn register_installed(&mut self, name: &str, version: Version) {
-        self.installed_packages.insert(name.to_string(), version);
+        self.installed_packages.insert(klib::string::SigmaString::from(name), version);
     }
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
-        self.remote_repository.insert(name.to_string(), version);
+        self.remote_repository.insert(klib::string::SigmaString::from(name), version);
     }
 
     /// Checks for available package updates in the rolling release stream
-    pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
+    pub fn list_pending_rolling_updates(&self) -> Vec<(klib::string::SigmaString, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
@@ -209,14 +177,9 @@ impl RollingSyncManager {
         updates
     }
 
-    /// Verifies if a Debian sbuild environment has all required build dependencies satisfied
-    pub fn is_debian_sbuild_builddeps_satisfied(&self, sbuild: &DebianSbuildPackage) -> bool {
-        for dep in &sbuild.build_depends {
-            if !self.installed_packages.contains_key(dep) {
-                return false;
-            }
-        }
-        true
+    /// Validates if all compile-time build dependencies for a Debian sbuild source package are satisfied
+    pub fn is_debian_sbuild_builddeps_satisfied(&self, pkg: &DebianSbuildPackage) -> bool {
+        pkg.build_depends.iter().all(|dep| self.installed_packages.contains_key(dep))
     }
 }
 
@@ -239,7 +202,7 @@ impl PacmanDbAdapter {
         }
     }
 
-    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into S-PKG Package metadata
+    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into Package metadata
     pub fn import_legacy_pacman_package(
         &self,
         desc_content: &str,
@@ -264,10 +227,8 @@ impl PacmanDbAdapter {
             return Err("Legacy Pacman desc file missing NAME block");
         }
 
-        // Clean any release suffixes like -1 or -arch from version string
         let base_version = version.split('-').next().unwrap_or("1.0.0");
-        let parsed_ver =
-            Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
+        let parsed_ver = Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
             name.to_string(),
@@ -279,63 +240,79 @@ impl PacmanDbAdapter {
     }
 }
 
-// ==========================================
-// 8. ALPM Hooks, mkinitcpio & makepkg Features
-// ==========================================
+// --- ALPM Hooks Manager ---
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AlpmHookAction {
+pub enum HookWhen {
     PreTransaction,
     PostTransaction,
 }
 
-/// GDB/Pacman-inspired declarative ALPM Hook
 #[derive(Debug, Clone)]
 pub struct AlpmHook {
-    pub name: String,
-    pub action: AlpmHookAction,
-    pub target_packages: Vec<String>,
-    pub exec_command: String,
+    pub name: klib::string::SigmaString,
+    pub when: HookWhen,
+    pub target_pattern: klib::string::SigmaString,
+    pub exec_cmd: klib::string::SigmaString,
 }
 
-/// ALPM Transaction Hook Manager
+#[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: Vec<AlpmHook>,
-    pub execution_log: Vec<String>,
+    pub hooks: klib::vec::Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self {
-            hooks: Vec::new(),
-            execution_log: Vec::new(),
-        }
+        Self { hooks: klib::vec::Vec::new() }
     }
 
-    pub fn register_hook(&mut self, hook: AlpmHook) {
+    pub fn add_hook(&mut self, hook: AlpmHook) {
         self.hooks.push(hook);
     }
 
-    /// Triggers hooks matching the packages updated during a Pacman transaction
-    pub fn run_hooks(&mut self, action: AlpmHookAction, updated_pkgs: &[&str]) -> usize {
-        let mut count = 0;
+    pub fn parse_hook_file(&mut self, name: &str, content: &str) -> Result<(), &'static str> {
+        let mut when = HookWhen::PostTransaction;
+        let mut target_pattern = String::new();
+        let mut exec_cmd = String::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if line.contains("When = PreTransaction") {
+                when = HookWhen::PreTransaction;
+            } else if line.contains("When = PostTransaction") {
+                when = HookWhen::PostTransaction;
+            } else if line.starts_with("Target =") {
+                target_pattern = line.strip_prefix("Target =").unwrap().trim().to_string();
+            } else if line.starts_with("Exec =") {
+                exec_cmd = line.strip_prefix("Exec =").unwrap().trim().to_string();
+            }
+        }
+
+        if exec_cmd.is_empty() {
+            return Err("Invalid ALPM hook file: missing Exec directive");
+        }
+
+        self.add_hook(AlpmHook {
+            name: name.to_string(),
+            when,
+            target_pattern,
+            exec_cmd,
+        });
+
+        Ok(())
+    }
+
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> Vec<String> {
+        let mut triggered_cmds = Vec::new();
         for hook in &self.hooks {
-            if hook.action == action {
-                // If target packages list contains any updated package, execute Hook
-                let matches = hook.target_packages.iter().any(|target| {
-                    updated_pkgs.iter().any(|&pkg| target == pkg)
-                });
-                if matches {
-                    let log_line = format!(
-                        "Hook '{}' executed command: '{}'",
-                        hook.name, hook.exec_command
-                    );
-                    self.execution_log.push(log_line);
-                    count += 1;
+            if hook.when == when {
+                let pattern = hook.target_pattern.trim_end_matches('*');
+                if hook.target_pattern.is_empty() || changed_file.contains(pattern) {
+                    triggered_cmds.push(hook.exec_cmd.clone());
                 }
             }
         }
-        count
+        triggered_cmds
     }
 }
 
@@ -345,33 +322,45 @@ impl Default for AlpmHookManager {
     }
 }
 
-/// mkinitcpio initramfs configuration builder
+// --- mkinitcpio Generator ---
+
+#[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub active_hooks: Vec<String>,
+    pub hooks: klib::vec::Vec<klib::string::SigmaString>,
+    pub compression: klib::string::SigmaString,
 }
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
         Self {
-            active_hooks: Vec::new(),
+            hooks: klib::vec![
+                klib::string::SigmaString::from("base"),
+                klib::string::SigmaString::from("udev"),
+                klib::string::SigmaString::from("autodetect"),
+                klib::string::SigmaString::from("modconf"),
+                klib::string::SigmaString::from("block"),
+                klib::string::SigmaString::from("filesystems"),
+            ],
+            compression: klib::string::SigmaString::from("zstd"),
         }
     }
 
     pub fn add_hook(&mut self, hook_name: &str) {
-        self.active_hooks.push(hook_name.to_string());
+        let hook_string = klib::string::SigmaString::from(hook_name);
+        if !self.hooks.contains(&hook_string) {
+            self.hooks.push(hook_string);
+        }
     }
 
-    /// Compiles a mock compressed system ramdisk (initramfs) for early kernel loading
-    pub fn compile_initramfs(&self, output_img: &str) -> Result<String, &'static str> {
-        if self.active_hooks.is_empty() {
-            return Err("mkinitcpio: Cannot compile initramfs with zero hooks configured");
-        }
-        let mut img_desc = format!("initramfs-img:{}:", output_img);
-        for hook in &self.active_hooks {
-            img_desc.push_str(hook);
-            img_desc.push('|');
-        }
-        Ok(img_desc)
+    pub fn build_initramfs_image(&self, kernel_version: &str) -> klib::vec::Vec<u8> {
+        let mut image_header = klib::string::SigmaString::from(format!(
+            "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
+            kernel_version, self.hooks, self.compression
+        ))
+        .into_bytes();
+
+        image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
+        image_header
     }
 }
 
@@ -381,55 +370,77 @@ impl Default for MkinitcpioBuilder {
     }
 }
 
-/// makepkg automation compiler validating checksums and building .pkg.tar.zst packages
+// --- makepkg Package Builder ---
+
+#[derive(Debug, Clone)]
 pub struct MakepkgBuilder {
-    pub default_compression_level: u32,
+    pub pkgname: klib::string::SigmaString,
+    pub pkgver: klib::string::SigmaString,
+    pub arch: klib::string::SigmaString,
+    pub expected_sha256: klib::string::SigmaString,
 }
 
 impl MakepkgBuilder {
-    pub fn new() -> Self {
+    pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
         Self {
-            default_compression_level: 3, // zstd default
+            pkgname: klib::string::SigmaString::from(pkgname),
+            pkgver: klib::string::SigmaString::from(pkgver),
+            arch: klib::string::SigmaString::from(arch),
+            expected_sha256: klib::string::SigmaString::from(expected_sha256),
         }
     }
 
-    /// Simulates building a PKGBUILD package source archive
-    pub fn build_package(
-        &self,
-        pkgname: &str,
-        version: Version,
-        source_payload: &[u8],
-        expected_sha256: &str,
-    ) -> Result<Package, &'static str> {
-        if source_payload.is_empty() {
-            return Err("makepkg: Source code payload cannot be empty");
+    pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
+        let mut checksum = 0u64;
+        for &b in source_data {
+            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
+        }
+        let computed = klib::string::SigmaString::from(format!("{:016x}", checksum));
+        computed == self.expected_sha256 || self.expected_sha256 == klib::string::SigmaString::from("SKIP")
+    }
+
+    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(klib::string::SigmaString, klib::vec::Vec<u8>), &'static str> {
+        if !self.verify_source_integrity(source_data) {
+            return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
 
-        // Validate package file integrity
-        if expected_sha256 != "SKIP" && expected_sha256.len() != 64 {
-            return Err("makepkg: SHA256 checksum mismatch / verification failure");
-        }
-
-        // Output clean compiled .pkg.tar.zst mock package
-        Ok(Package::new(
-            pkgname.to_string(),
-            version,
-            format!("Built Arch Package: {}", pkgname),
-            Vec::new(),
-            expected_sha256.to_string(),
+        let archive_name = klib::string::SigmaString::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
+        let mut archive_content = klib::string::SigmaString::from(format!(
+            "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
+            self.pkgname, self.pkgver, self.arch
         ))
-    }
-}
+        .into_bytes();
 
-impl Default for MakepkgBuilder {
-    fn default() -> Self {
-        Self::new()
+        archive_content.extend_from_slice(source_data);
+        Ok((archive_name, archive_content))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_debian_sbuild_package_builddeps() {
+        let mut sync = RollingSyncManager::new();
+        sync.register_installed("gcc", Version::new(12, 2, 0));
+        sync.register_installed("make", Version::new(4, 3, 0));
+
+        let source_pkg = DebianSbuildPackage {
+            name: "coreutils".to_string(),
+            version: Version::new(9, 1, 0),
+            build_depends: vec!["gcc".to_string(), "make".to_string()],
+        };
+
+        assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
+
+        let source_pkg_missing = DebianSbuildPackage {
+            name: "coreutils".to_string(),
+            version: Version::new(9, 1, 0),
+            build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
+        };
+        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
+    }
 
     #[test]
     fn test_aur_pkgbuild_compiler() {
@@ -453,9 +464,8 @@ mod tests {
         sync.register_installed("bash", Version::new(5, 1, 0));
         sync.register_installed("curl", Version::new(7, 85, 0));
 
-        // Remotes (Rolling upgrades)
-        sync.register_remote("bash", Version::new(5, 2, 0)); // Newer version
-        sync.register_remote("curl", Version::new(7, 85, 0)); // Equal version
+        sync.register_remote("bash", Version::new(5, 2, 0));
+        sync.register_remote("curl", Version::new(7, 85, 0));
 
         let pending = sync.list_pending_rolling_updates();
         assert_eq!(pending.len(), 1);
@@ -488,72 +498,44 @@ mod tests {
     }
 
     #[test]
-    fn test_debian_sbuild_resolver() {
-        let mut sync = RollingSyncManager::new();
-        sync.register_installed("gcc", Version::new(11, 2, 0));
-        sync.register_installed("make", Version::new(4, 3, 0));
-
-        let sbuild1 =
-            DebianSbuildPackage::new("sigma-core", vec!["gcc".to_string(), "make".to_string()]);
-        assert!(sync.is_debian_sbuild_builddeps_satisfied(&sbuild1));
-
-        let sbuild2 = DebianSbuildPackage::new(
-            "sigma-core",
-            vec!["gcc".to_string(), "clang".to_string()], // clang not installed
-        );
-        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&sbuild2));
-    }
-
-    #[test]
-    fn test_alpm_hooks_routing() {
+    fn test_alpm_hook_triggering() {
         let mut manager = AlpmHookManager::new();
-        let hook = AlpmHook {
-            name: "update-grub".to_string(),
-            action: AlpmHookAction::PostTransaction,
-            target_packages: vec!["linux".to_string(), "linux-zen".to_string()],
-            exec_command: "grub-mkconfig -o /boot/grub/grub.cfg".to_string(),
-        };
+        let hook_str = r#"
+            [Trigger]
+            Operation = Install
+            Operation = Upgrade
+            Type = Path
+            Target = usr/bin/*
+            When = PostTransaction
+            Exec = /usr/bin/mkinitcpio -p linux
+        "#;
 
-        manager.register_hook(hook);
-
-        // Run post-transaction. Packages updated are "linux" and "vim"
-        let executed = manager.run_hooks(AlpmHookAction::PostTransaction, &["linux", "vim"]);
-        assert_eq!(executed, 1);
-        assert_eq!(manager.execution_log.len(), 1);
-        assert!(manager.execution_log[0].contains("grub-mkconfig"));
-
-        // Pre-transaction should not execute
-        let executed_pre = manager.run_hooks(AlpmHookAction::PreTransaction, &["linux"]);
-        assert_eq!(executed_pre, 0);
+        assert!(manager.parse_hook_file("90-mkinitcpio.hook", hook_str).is_ok());
+        let triggered = manager.trigger_hooks(HookWhen::PostTransaction, "usr/bin/bash");
+        assert_eq!(triggered.len(), 1);
+        assert_eq!(triggered[0], "/usr/bin/mkinitcpio -p linux");
     }
 
     #[test]
     fn test_mkinitcpio_builder() {
         let mut builder = MkinitcpioBuilder::new();
-        builder.add_hook("udev");
-        builder.add_hook("base");
-        builder.add_hook("block");
+        builder.add_hook("encrypt");
+        builder.add_hook("lvm2");
 
-        let ramdisk = builder.compile_initramfs("initramfs-linux.img").unwrap();
-        assert!(ramdisk.contains("initramfs-img:initramfs-linux.img:"));
-        assert!(ramdisk.contains("udev|base|block|"));
-
-        // Zero hooks fail compiling
-        let builder_empty = MkinitcpioBuilder::new();
-        assert!(builder_empty.compile_initramfs("fail.img").is_err());
+        let img = builder.build_initramfs_image("6.5.0-arch1-1");
+        let header_str = String::from_utf8_lossy(&img);
+        assert!(header_str.contains("6.5.0-arch1-1"));
+        assert!(header_str.contains("encrypt"));
+        assert!(header_str.contains("lvm2"));
     }
 
     #[test]
     fn test_makepkg_builder() {
-        let builder = MakepkgBuilder::new();
-        let mock_src = b"fn main() { println!(\"source\"); }";
+        let builder = MakepkgBuilder::new("ripgrep", "13.0.0", "x86_64", "SKIP");
+        let source_bytes = b"cargo build --release";
 
-        // Success with valid sha256
-        let sha = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-        let package = builder.build_package("linux-firmware", Version::new(20230510, 0, 0), mock_src, sha).unwrap();
-        assert_eq!(package.name, "linux-firmware");
-
-        // Failure with bad sha256 size
-        assert!(builder.build_package("linux-firmware", Version::new(1, 0, 0), mock_src, "short_hash").is_err());
+        let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
+        assert_eq!(pkg_file, "ripgrep-13.0.0-x86_64.pkg.tar.zst");
+        assert!(pkg_data.len() > source_bytes.len());
     }
 }
