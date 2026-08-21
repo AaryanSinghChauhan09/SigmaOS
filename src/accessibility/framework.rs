@@ -285,6 +285,64 @@ pub enum AccessibilityError {
     FeatureNotSupported,
 }
 
+/// UI Component metadata for automated WCAG 2.1 compliance audits
+#[derive(Debug, Clone)]
+pub struct AccessibilityComponent {
+    pub id: String,
+    pub role: String,
+    pub label: Option<String>,
+    pub contrast_ratio: f32, // e.g. 4.5
+    pub keyboard_focusable: bool,
+}
+
+/// Automated WCAG compliance testing harness for UI components
+pub struct AccessibilityTestingHarness {
+    pub min_contrast_ratio: f32,
+}
+
+impl AccessibilityTestingHarness {
+    pub fn new() -> Self {
+        Self { min_contrast_ratio: 4.5 } // WCAG AA standard
+    }
+
+    /// Audit an individual UI component for WCAG 2.1 AA compliance
+    pub fn audit_component(&self, component: &AccessibilityComponent) -> Vec<&'static str> {
+        let mut violations = Vec::new();
+
+        if component.label.is_none() || component.label.as_ref().map_or(true, |l| l.trim().is_empty()) {
+            violations.push("Missing accessible label or ARIA name");
+        }
+
+        if component.contrast_ratio < self.min_contrast_ratio {
+            violations.push("Insufficient text/background contrast ratio (< 4.5:1)");
+        }
+
+        if !component.keyboard_focusable && component.role == "button" {
+            violations.push("Interactive button component is not keyboard focusable");
+        }
+
+        violations
+    }
+
+    /// Audit a full UI component tree
+    pub fn audit_ui_tree(&self, components: &[AccessibilityComponent]) -> BTreeMap<String, Vec<&'static str>> {
+        let mut report = BTreeMap::new();
+        for comp in components {
+            let violations = self.audit_component(comp);
+            if !violations.is_empty() {
+                report.insert(comp.id.clone(), violations);
+            }
+        }
+        report
+    }
+}
+
+impl Default for AccessibilityTestingHarness {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -328,5 +386,32 @@ mod tests {
                 ));
         framework.add_profile(custom_profile);
         assert_eq!(framework.profiles.len(), 5);
+    }
+
+    #[test]
+    fn test_accessibility_testing_harness() {
+        let harness = AccessibilityTestingHarness::new();
+        let valid_comp = AccessibilityComponent {
+            id: "btn_ok".to_string(),
+            role: "button".to_string(),
+            label: Some("Submit".to_string()),
+            contrast_ratio: 5.2,
+            keyboard_focusable: true,
+        };
+        assert!(harness.audit_component(&valid_comp).is_empty());
+
+        let invalid_comp = AccessibilityComponent {
+            id: "btn_bad".to_string(),
+            role: "button".to_string(),
+            label: None,
+            contrast_ratio: 2.1,
+            keyboard_focusable: false,
+        };
+        let violations = harness.audit_component(&invalid_comp);
+        assert_eq!(violations.len(), 3);
+
+        let report = harness.audit_ui_tree(&[valid_comp, invalid_comp]);
+        assert_eq!(report.len(), 1);
+        assert!(report.contains_key("btn_bad"));
     }
 }

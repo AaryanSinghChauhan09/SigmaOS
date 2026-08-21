@@ -5,8 +5,7 @@ extern crate alloc;
 use alloc::collections::BTreeSet;
 use alloc::string::String;
 use alloc::vec::Vec;
-use core::cell::RefCell;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 
 // ==========================================
 // 1. BORE SCHEDULER (BURST LATENCY MINIMIZER)
@@ -38,6 +37,80 @@ impl BoreScheduler {
 
         // Guarantee a minimum slice of 2ms to prevent scheduler thrashing
         core::cmp::max(adjusted_slice, 2)
+    }
+}
+
+impl Default for BoreScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 1B. CACHYOS BORE WAKEUP BOOSTER
+// ==========================================
+
+/// Tracks interactive thread sleep-to-run ratios to provide instant time-slice grants
+/// and priority preemption boosts when user-interaction threads wake from sleep.
+#[derive(Debug, Clone)]
+pub struct InteractiveThreadMetric {
+    pub pid: u64,
+    pub sleep_duration_ms: u64,
+    pub run_duration_ms: u64,
+    pub last_wakeup_timestamp: u64,
+    pub wakeup_boost_granted: bool,
+}
+
+pub struct CachyBoreWakeupBooster {
+    pub interactive_threshold_ratio: u32, // Percentage of sleep time required (e.g., >= 70%)
+    pub wakeup_grant_ms: u32,             // Immediate time-slice grant upon wakeup
+    pub boosted_threads_count: AtomicU32,
+}
+
+impl CachyBoreWakeupBooster {
+    pub fn new() -> Self {
+        Self {
+            interactive_threshold_ratio: 70,
+            wakeup_grant_ms: 15, // Extra 15ms slice grant for instant UI frame rendering
+            boosted_threads_count: AtomicU32::new(0),
+        }
+    }
+
+    /// Evaluates whether a thread waking up qualifies for an interactive priority boost
+    pub fn evaluate_wakeup_boost(&self, metric: &mut InteractiveThreadMetric, current_timestamp: u64) -> u32 {
+        let total_time = metric.sleep_duration_ms + metric.run_duration_ms;
+        if total_time == 0 {
+            metric.wakeup_boost_granted = true;
+            metric.last_wakeup_timestamp = current_timestamp;
+            self.boosted_threads_count.fetch_add(1, Ordering::SeqCst);
+            return self.wakeup_grant_ms;
+        }
+
+        let sleep_ratio = ((metric.sleep_duration_ms * 100) / total_time) as u32;
+        if sleep_ratio >= self.interactive_threshold_ratio {
+            metric.wakeup_boost_granted = true;
+            metric.last_wakeup_timestamp = current_timestamp;
+            self.boosted_threads_count.fetch_add(1, Ordering::SeqCst);
+            self.wakeup_grant_ms
+        } else {
+            metric.wakeup_boost_granted = false;
+            0
+        }
+    }
+
+    /// Calculates preemption priority score adjustment (negative nice offset for boosted threads)
+    pub fn calculate_preemption_boost(&self, is_boosted: bool) -> i32 {
+        if is_boosted {
+            -8 // Elevate priority significantly to preempt batch background tasks
+        } else {
+            0
+        }
+    }
+}
+
+impl Default for CachyBoreWakeupBooster {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -106,6 +179,12 @@ impl AnanicyCppDaemon {
     }
 }
 
+impl Default for AnanicyCppDaemon {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ==========================================
 // 3. ULTRA KERNEL SAMEPAGE MERGER (UKSM PARITY)
 // ==========================================
@@ -153,10 +232,6 @@ impl UltraKernelSamepageMerger {
                 // Duplicate samepage found! Merge and increment deduplication counters
                 duplicates_merged += 1;
                 self.saved_pages_count.fetch_add(1, Ordering::SeqCst);
-                println!(
-                    "[uksm] Samepage deduplicated at address 0x{:X} with fingerprint 0x{:X}.",
-                    frame.address, frame.content_hash
-                );
             } else {
                 unique_hashes.insert(frame.content_hash);
             }
@@ -166,8 +241,63 @@ impl UltraKernelSamepageMerger {
     }
 }
 
+impl Default for UltraKernelSamepageMerger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ==========================================
-// 4. X86-64-V3/V4 ARCHITECTURE DETECTOR
+// 3B. CACHYOS UNIFIED MEMORY COMPACTOR
+// ==========================================
+
+/// Unifies Transparent Huge Pages (THP), UKSM page deduplication, and Zero-Page reclamation.
+pub struct CachyMemoryCompactor {
+    pub thp_enabled: AtomicBool,
+    pub zero_pages_reclaimed: AtomicU64,
+    pub saved_memory_bytes: AtomicU64,
+}
+
+impl CachyMemoryCompactor {
+    pub fn new() -> Self {
+        Self {
+            thp_enabled: AtomicBool::new(true),
+            zero_pages_reclaimed: AtomicU64::new(0),
+            saved_memory_bytes: AtomicU64::new(0),
+        }
+    }
+
+    /// Scans physical memory regions and merges contiguous 4KB pages into 2MB HugePages while reclaiming zeroed pages
+    pub fn compact_and_coalesce(&self, pages: &mut [Vec<u8>], page_size_bytes: usize) -> (usize, usize) {
+        let mut huge_pages_formed = 0;
+        let mut zero_pages = 0;
+
+        for page in pages.iter() {
+            if page.iter().all(|&b| b == 0) {
+                zero_pages += 1;
+            }
+        }
+
+        if self.thp_enabled.load(Ordering::SeqCst) && pages.len() >= 512 {
+            huge_pages_formed = pages.len() / 512;
+        }
+
+        let reclaimed_bytes = (zero_pages * page_size_bytes) as u64;
+        self.zero_pages_reclaimed.fetch_add(zero_pages as u64, Ordering::SeqCst);
+        self.saved_memory_bytes.fetch_add(reclaimed_bytes, Ordering::SeqCst);
+
+        (huge_pages_formed, zero_pages)
+    }
+}
+
+impl Default for CachyMemoryCompactor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 4. X86-64-V3/V4 ARCHITECTURE DETECTOR & SIMD DISPATCHER
 // ==========================================
 
 pub struct X86v3v4OptimizationDetector {
@@ -196,8 +326,145 @@ impl X86v3v4OptimizationDetector {
     }
 }
 
+impl Default for X86v3v4OptimizationDetector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Dynamic SIMD vector execution dispatcher for high-throughput memory copy and vector math
+pub struct CachySimdDispatcher {
+    pub level: u8, // 1: baseline, 2: SSE4.2, 3: AVX2/FMA, 4: AVX-512
+}
+
+impl CachySimdDispatcher {
+    pub fn new(level: u8) -> Self {
+        Self { level: level.clamp(1, 4) }
+    }
+
+    /// High-performance memory copy selecting optimal vectorization lane
+    pub fn vectorized_memcpy(&self, dest: &mut [u8], src: &[u8]) -> usize {
+        let len = dest.len().min(src.len());
+        match self.level {
+            4 => {
+                // 512-bit (64-byte) chunk copying
+                let chunks = len / 64;
+                for i in 0..chunks {
+                    let idx = i * 64;
+                    dest[idx..idx + 64].copy_from_slice(&src[idx..idx + 64]);
+                }
+                let rem = len % 64;
+                if rem > 0 {
+                    let start = chunks * 64;
+                    dest[start..start + rem].copy_from_slice(&src[start..start + rem]);
+                }
+            }
+            3 => {
+                // 256-bit (32-byte) AVX2 chunk copying
+                let chunks = len / 32;
+                for i in 0..chunks {
+                    let idx = i * 32;
+                    dest[idx..idx + 32].copy_from_slice(&src[idx..idx + 32]);
+                }
+                let rem = len % 32;
+                if rem > 0 {
+                    let start = chunks * 32;
+                    dest[start..start + rem].copy_from_slice(&src[start..start + rem]);
+                }
+            }
+            _ => {
+                dest[..len].copy_from_slice(&src[..len]);
+            }
+        }
+        len
+    }
+}
+
 // ==========================================
-// 5. CACHYOS KERNEL MANAGER (SYSCTL & SCHEDULER SWAP)
+// 5. CACHYOS P-STATE GOVERNOR & SYSCTL TUNER
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PStateEppMode {
+    Performance,
+    BalancePerformance,
+    BalancePower,
+    Power,
+}
+
+pub struct CachyPStateGovernor {
+    pub epp_mode: PStateEppMode,
+    pub max_frequency_mhz: u32,
+    pub min_frequency_mhz: u32,
+}
+
+impl CachyPStateGovernor {
+    pub fn new() -> Self {
+        Self {
+            epp_mode: PStateEppMode::BalancePerformance,
+            max_frequency_mhz: 4800,
+            min_frequency_mhz: 800,
+        }
+    }
+
+    /// Switches EPP mode based on current desktop/gaming workload demands
+    pub fn set_epp_mode(&mut self, mode: PStateEppMode) {
+        self.epp_mode = mode;
+    }
+
+    /// Gets recommended energy performance preference value (0: maximum performance, 255: power save)
+    pub fn get_epp_register_value(&self) -> u8 {
+        match self.epp_mode {
+            PStateEppMode::Performance => 0x00,
+            PStateEppMode::BalancePerformance => 0x40,
+            PStateEppMode::BalancePower => 0x80,
+            PStateEppMode::Power => 0xC0,
+        }
+    }
+}
+
+impl Default for CachyPStateGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Applies CachyOS kernel sysctl parameters tuned specifically for desktop/gaming response
+pub struct CachySysctlTuner {
+    pub vfs_cache_pressure: u32,
+    pub dirty_ratio: u32,
+    pub dirty_background_ratio: u32,
+    pub swappiness: u32,
+    pub sched_cfs_bandwidth_slice_us: u32,
+}
+
+impl CachySysctlTuner {
+    pub fn new() -> Self {
+        Self {
+            vfs_cache_pressure: 50, // Keep VFS directory caches longer in RAM
+            dirty_ratio: 10,        // Flush dirty pages early to avoid I/O spikes
+            dirty_background_ratio: 5,
+            swappiness: 100, // Active swapping with ZRAM compression
+            sched_cfs_bandwidth_slice_us: 3000, // 3ms slice for latency minimization
+        }
+    }
+
+    /// Applies gaming profile sysctl parameters
+    pub fn apply_gaming_sysctls(&mut self) {
+        self.vfs_cache_pressure = 20;
+        self.dirty_ratio = 8;
+        self.sched_cfs_bandwidth_slice_us = 1000; // 1ms super-responsive time-slice
+    }
+}
+
+impl Default for CachySysctlTuner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 6. CACHYOS KERNEL MANAGER (SYSCTL & SCHEDULER SWAP)
 // ==========================================
 
 pub struct CachyKernelManager {
@@ -205,6 +472,8 @@ pub struct CachyKernelManager {
     pub tcp_congestion_control: String,
     pub bbrv3_active: bool,
     pub sysctl_dirty_ratio: u32,
+    pub pstate_governor: CachyPStateGovernor,
+    pub sysctl_tuner: CachySysctlTuner,
 }
 
 impl CachyKernelManager {
@@ -214,6 +483,8 @@ impl CachyKernelManager {
             tcp_congestion_control: String::from("cubic"),
             bbrv3_active: false,
             sysctl_dirty_ratio: 20,
+            pstate_governor: CachyPStateGovernor::new(),
+            sysctl_tuner: CachySysctlTuner::new(),
         }
     }
 
@@ -221,14 +492,84 @@ impl CachyKernelManager {
     pub fn enable_bbrv3_congestion(&mut self) -> Result<(), &'static str> {
         self.tcp_congestion_control = String::from("bbrv3");
         self.bbrv3_active = true;
-        println!("[cachy-sysctl] Enabled BBRv3 TCP congestion control dynamically.");
         Ok(())
     }
 
     /// Hot-swaps the kernel's active scheduler (e.g. BORE, EEVDF, CFS)
     pub fn hot_swap_scheduler(&mut self, scheduler: &str) -> Result<(), &'static str> {
         self.scheduler_name = String::from(scheduler);
-        println!("[cachy-sysctl] Hot-swapped active kernel scheduler target to: '{}'.", scheduler);
         Ok(())
+    }
+}
+
+impl Default for CachyKernelManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cachy_bore_wakeup_boost() {
+        let booster = CachyBoreWakeupBooster::new();
+        let mut metric = InteractiveThreadMetric {
+            pid: 101,
+            sleep_duration_ms: 80,
+            run_duration_ms: 20, // 80% sleep = highly interactive UI thread
+            last_wakeup_timestamp: 0,
+            wakeup_boost_granted: false,
+        };
+
+        let slice_grant = booster.evaluate_wakeup_boost(&mut metric, 500);
+        assert_eq!(slice_grant, 15);
+        assert!(metric.wakeup_boost_granted);
+        assert_eq!(metric.last_wakeup_timestamp, 500);
+        assert_eq!(booster.calculate_preemption_boost(true), -8);
+    }
+
+    #[test]
+    fn test_cachy_memory_compactor() {
+        let compactor = CachyMemoryCompactor::new();
+        let mut pages = Vec::new();
+        for i in 0..512 {
+            if i % 2 == 0 {
+                pages.push(vec![0u8; 4096]); // Zero page
+            } else {
+                pages.push(vec![1u8; 4096]);
+            }
+        }
+
+        let (huge_pages, zero_pages) = compactor.compact_and_coalesce(&mut pages, 4096);
+        assert_eq!(huge_pages, 1);
+        assert_eq!(zero_pages, 256);
+        assert_eq!(compactor.zero_pages_reclaimed.load(Ordering::SeqCst), 256);
+    }
+
+    #[test]
+    fn test_cachy_simd_dispatcher() {
+        let dispatcher = CachySimdDispatcher::new(3); // AVX2
+        let src = vec![42u8; 128];
+        let mut dest = vec![0u8; 128];
+
+        let copied = dispatcher.vectorized_memcpy(&mut dest, &src);
+        assert_eq!(copied, 128);
+        assert_eq!(dest, src);
+    }
+
+    #[test]
+    fn test_cachy_pstate_and_sysctl_tuner() {
+        let mut governor = CachyPStateGovernor::new();
+        governor.set_epp_mode(PStateEppMode::Performance);
+        assert_eq!(governor.get_epp_register_value(), 0x00);
+
+        let mut tuner = CachySysctlTuner::new();
+        assert_eq!(tuner.vfs_cache_pressure, 50);
+
+        tuner.apply_gaming_sysctls();
+        assert_eq!(tuner.vfs_cache_pressure, 20);
+        assert_eq!(tuner.sched_cfs_bandwidth_slice_us, 1000);
     }
 }

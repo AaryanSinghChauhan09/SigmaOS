@@ -47,27 +47,31 @@ impl AurParser {
 
     /// Parse AUR package metadata from JSON-like format
     pub fn parse_metadata(&mut self, metadata: &str) -> Result<AurPackage, &'static str> {
-        // Simplified parsing - in production, would use proper JSON parsing
-        // For now, we simulate parsing from a simplified format
-        
-        let name = String::from("unknown");
-        let version = String::from("1.0.0");
-        let description = String::from("No description");
-        let url = String::from("https://aur.archlinux.org");
-        let depends = Vec::new();
-        let makedepends = Vec::new();
-        let keywords = Vec::new();
-        let popularity = 0.0;
+        let mut name = String::from("unknown");
+        let mut version = String::from("1.0.0");
+
+        if let Some(idx) = metadata.find("\"name\":\"") {
+            let rest = &metadata[idx + 8..];
+            if let Some(end) = rest.find('"') {
+                name = rest[..end].to_string();
+            }
+        }
+        if let Some(idx) = metadata.find("\"version\":\"") {
+            let rest = &metadata[idx + 11..];
+            if let Some(end) = rest.find('"') {
+                version = rest[..end].to_string();
+            }
+        }
 
         let pkg = AurPackage {
             name,
             version,
-            description,
-            url,
-            depends,
-            makedepends,
-            keywords,
-            popularity,
+            description: String::from("No description"),
+            url: String::from("https://aur.archlinux.org"),
+            depends: Vec::new(),
+            makedepends: Vec::new(),
+            keywords: Vec::new(),
+            popularity: 1.0,
         };
 
         self.cache.insert(pkg.name.clone(), pkg.clone());
@@ -85,6 +89,73 @@ impl AurParser {
         }
         
         results
+    }
+
+    /// Parse standard Arch Linux .SRCINFO format metadata
+    pub fn parse_srcinfo(&mut self, srcinfo_text: &str) -> Result<AurPackage, &'static str> {
+        let mut pkgname = String::from("unknown");
+        let mut pkgver = String::from("1.0.0");
+        let mut pkgrel = String::from("1");
+        let mut pkgdesc = String::from("No description");
+        let mut url = String::from("https://aur.archlinux.org");
+        let mut depends = Vec::new();
+        let mut makedepends = Vec::new();
+
+        for line in srcinfo_text.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with('#') || trimmed.is_empty() {
+                continue;
+            }
+            if let Some(idx) = trimmed.find('=') {
+                let key = trimmed[..idx].trim();
+                let val = trimmed[idx + 1..].trim();
+
+                match key {
+                    "pkgname" => pkgname = val.to_string(),
+                    "pkgver" => pkgver = val.to_string(),
+                    "pkgrel" => pkgrel = val.to_string(),
+                    "pkgdesc" => pkgdesc = val.to_string(),
+                    "url" => url = val.to_string(),
+                    "depends" => depends.push(val.to_string()),
+                    "makedepends" => makedepends.push(val.to_string()),
+                    _ => {}
+                }
+            }
+        }
+
+        let pkg = AurPackage {
+            name: pkgname,
+            version: format!("{}-{}", pkgver, pkgrel),
+            description: pkgdesc,
+            url,
+            depends,
+            makedepends,
+            keywords: Vec::new(),
+            popularity: 1.0,
+        };
+
+        self.cache.insert(pkg.name.clone(), pkg.clone());
+        Ok(pkg)
+    }
+
+    /// Finds installed orphan packages (packages not required by any installed package)
+    pub fn find_orphans(&self, installed: &[String]) -> Vec<String> {
+        let mut required = BTreeMap::new();
+        for pkg_name in installed {
+            if let Some(pkg) = self.get_package(pkg_name) {
+                for dep in &pkg.depends {
+                    required.insert(dep.clone(), true);
+                }
+            }
+        }
+
+        let mut orphans = Vec::new();
+        for pkg_name in installed {
+            if !required.contains_key(pkg_name) {
+                orphans.push(pkg_name.clone());
+            }
+        }
+        orphans
     }
 
     /// Get package info by name
@@ -178,6 +249,19 @@ impl AurHelper {
     pub fn info(&self, pkg_name: &str) -> Option<&AurPackage> {
         self.parser.get_package(pkg_name)
     }
+
+    /// Clean build cache (equivalent to yay -Sc / pacman -Sc)
+    pub fn clean_cache(&mut self) -> usize {
+        let count = self.parser.cache.len();
+        self.parser.cache.clear();
+        count
+    }
+
+    /// Inspect PKGBUILD diff safety before execution
+    pub fn inspect_pkgbuild(&self, pkgbuild_content: &str) -> bool {
+        // Simple safety heuristic: check for suspicious commands
+        !pkgbuild_content.contains("rm -rf /") && !pkgbuild_content.contains(":(){ :|:& };:")
+    }
 }
 
 impl Default for AurHelper {
@@ -197,6 +281,45 @@ mod tests {
         
         assert!(parser.parse_metadata(metadata).is_ok());
         assert!(parser.get_package("test").is_some());
+    }
+
+    #[test]
+    fn test_srcinfo_parsing_and_orphans() {
+        let mut parser = AurParser::new();
+        let srcinfo = r#"
+pkgbase = neovim-git
+	pkgname = neovim-git
+	pkgver = 0.10.0
+	pkgrel = 1
+	pkgdesc = Vim-fork focused on extensibility and usability
+	url = https://neovim.io
+	depends = libunwind
+	depends = libuv
+	makedepends = cmake
+"#;
+        let pkg = parser.parse_srcinfo(srcinfo).unwrap();
+        assert_eq!(pkg.name, "neovim-git");
+        assert_eq!(pkg.version, "0.10.0-1");
+        assert_eq!(pkg.depends.len(), 2);
+
+        let installed = vec![String::from("neovim-git"), String::from("libunwind")];
+        let orphans = parser.find_orphans(&installed);
+        assert_eq!(orphans.len(), 1);
+        assert_eq!(orphans[0], "neovim-git");
+    }
+
+    #[test]
+    fn test_aur_helper_extended_operations() {
+        let mut helper = AurHelper::new();
+        let safe_pkgbuild = "pkgname=foo\nbuild() { cmake . ; make ; }";
+        let unsafe_pkgbuild = "pkgname=foo\nbuild() { rm -rf / ; }";
+
+        assert!(helper.inspect_pkgbuild(safe_pkgbuild));
+        assert!(!helper.inspect_pkgbuild(unsafe_pkgbuild));
+
+        helper.install("test-app").unwrap();
+        let cleaned = helper.clean_cache();
+        assert_eq!(cleaned, 0);
     }
 
     #[test]
