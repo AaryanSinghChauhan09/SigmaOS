@@ -52,23 +52,29 @@ impl<K: Ord + Clone, V: Clone> SplayTree<K, V> {
         let mut is_left = false;
 
         while let Some(idx) = curr {
-            if let Some(ref node) = self.nodes[idx] {
-                parent = Some(idx);
+            let key_match = if let Some(ref node) = self.nodes[idx] {
                 if key < node.key {
+                    parent = Some(idx);
                     curr = node.left;
                     is_left = true;
+                    None
                 } else if key > node.key {
+                    parent = Some(idx);
                     curr = node.right;
                     is_left = false;
+                    None
                 } else {
-                    // Update existing key
-                    if let Some(ref mut mut_node) = self.nodes[idx] {
-                        mut_node.value = value;
-                    }
-                    return;
+                    Some(idx)
                 }
             } else {
                 break;
+            };
+
+            if let Some(match_idx) = key_match {
+                if let Some(ref mut mut_node) = self.nodes[match_idx] {
+                    mut_node.value = value;
+                }
+                return;
             }
         }
 
@@ -176,9 +182,9 @@ impl<T: Clone> RadixTree<T> {
 
     /// Remove item at key
     pub fn remove(&mut self, key: u64) -> Option<T> {
-        for i in 0..self.entries.len() {
-            if self.entries[i].key == key {
-                return self.entries[i].value.take();
+        for entry in self.entries.iter_mut() {
+            if entry.key == key {
+                return entry.value.take();
             }
         }
         None

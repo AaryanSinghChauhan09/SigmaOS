@@ -7,12 +7,9 @@
 //! - Sovereign Environment Variables Registry supporting Linux default configurations
 
 extern crate alloc;
-use alloc::collections::BTreeMap as HashMap;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
+use crate::klib::{Vec, HashMap};
 
 // ==========================================
 // 1. Virtual Filesystem Parity (/proc & /dev)
@@ -495,264 +492,7 @@ impl TmuxMultiplexer {
 }
 
 // ==========================================
-// 8. AUR (Arch User Repository) & PKGBUILD Parser Parity
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct Pkgbuild {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgrel: String,
-    pub pkgdesc: String,
-    pub arch: Vec<String>,
-    pub url: String,
-    pub license: Vec<String>,
-    pub depends: Vec<String>,
-    pub makedepends: Vec<String>,
-    pub source: Vec<String>,
-    pub sha256sums: Vec<String>,
-}
-
-pub struct PkgbuildParser;
-
-impl PkgbuildParser {
-    /// Parses a standard Arch Linux PKGBUILD script file
-    pub fn parse(content: &str) -> Pkgbuild {
-        let mut pkgname = String::new();
-        let mut pkgver = String::new();
-        let mut pkgrel = String::new();
-        let mut pkgdesc = String::new();
-        let mut arch = Vec::new();
-        let mut url = String::new();
-        let mut license = Vec::new();
-        let mut depends = Vec::new();
-        let mut makedepends = Vec::new();
-        let mut source = Vec::new();
-        let mut sha256sums = Vec::new();
-
-        for line in content.lines() {
-            let trimmed = line.trim();
-            if trimmed.starts_with('#') || trimmed.is_empty() {
-                continue;
-            }
-
-            if let Some(idx) = trimmed.find('=') {
-                let key = trimmed[..idx].trim();
-                let val = trimmed[idx + 1..].trim().trim_matches('\'').trim_matches('"');
-
-                match key {
-                    "pkgname" => pkgname = val.to_string(),
-                    "pkgver" => pkgver = val.to_string(),
-                    "pkgrel" => pkgrel = val.to_string(),
-                    "pkgdesc" => pkgdesc = val.to_string(),
-                    "url" => url = val.to_string(),
-                    "arch" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            arch.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "license" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            license.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "depends" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            depends.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "makedepends" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            makedepends.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "source" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            source.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    "sha256sums" => {
-                        let inner = val.trim_matches('(').trim_matches(')');
-                        for item in inner.split_whitespace() {
-                            sha256sums.push(item.trim_matches('\'').trim_matches('"').to_string());
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
-
-        Pkgbuild {
-            pkgname,
-            pkgver,
-            pkgrel,
-            pkgdesc,
-            arch,
-            url,
-            license,
-            depends,
-            makedepends,
-            source,
-            sha256sums,
-        }
-    }
-}
-
-/// AUR Helper (yay / paru inspired) for package searching and building
-pub struct AurHelper {
-    pub aur_repo: HashMap<String, Pkgbuild>,
-}
-
-impl AurHelper {
-    pub fn new() -> Self {
-        Self {
-            aur_repo: HashMap::new(),
-        }
-    }
-
-    pub fn publish_package(&mut self, pkgbuild: Pkgbuild) {
-        self.aur_repo.insert(pkgbuild.pkgname.clone(), pkgbuild);
-    }
-
-    pub fn search(&self, query: &str) -> Vec<&Pkgbuild> {
-        let mut results = Vec::new();
-        for (name, pkg) in &self.aur_repo {
-            if name.contains(query) || pkg.pkgdesc.contains(query) {
-                results.push(pkg);
-            }
-        }
-        results
-    }
-
-    pub fn build_and_install(&self, name: &str, pacman: &mut PacmanEngine) -> Result<(), PacmanError> {
-        let pkg = self.aur_repo.get(name).ok_or(PacmanError::PackageNotFound)?;
-
-        // Register newly built package in Pacman sync repo and install
-        pacman.repo_sync.insert(
-            pkg.pkgname.clone(),
-            ArchPackage {
-                name: pkg.pkgname.clone(),
-                version: format!("{}-{}", pkg.pkgver, pkg.pkgrel),
-                dependencies: pkg.depends.clone(),
-            },
-        );
-
-        pacman.install_package(&pkg.pkgname)
-    }
-}
-
-impl Default for AurHelper {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 9. Mkinitcpio Initramfs Generator Parity
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct MkinitcpioHook {
-    pub name: String,
-    pub description: String,
-    pub required_modules: Vec<String>,
-}
-
-pub struct MkinitcpioEngine {
-    pub hooks: Vec<MkinitcpioHook>,
-    pub compression_format: String,
-}
-
-impl MkinitcpioEngine {
-    pub fn new() -> Self {
-        let mut hooks = Vec::new();
-        hooks.push(MkinitcpioHook {
-            name: "base".to_string(),
-            description: "Base runtime init scripts".to_string(),
-            required_modules: Vec::new(),
-        });
-        hooks.push(MkinitcpioHook {
-            name: "udev".to_string(),
-            description: "Device node creation via udev".to_string(),
-            required_modules: Vec::new(),
-        });
-        hooks.push(MkinitcpioHook {
-            name: "block".to_string(),
-            description: "Block device drivers for root detection".to_string(),
-            required_modules: Vec::new(),
-        });
-        hooks.push(MkinitcpioHook {
-            name: "filesystems".to_string(),
-            description: "Filesystem modules (ext4, btrfs, zfs)".to_string(),
-            required_modules: Vec::new(),
-        });
-
-        Self {
-            hooks,
-            compression_format: "zstd".to_string(),
-        }
-    }
-
-    pub fn add_hook(&mut self, hook: MkinitcpioHook) {
-        self.hooks.push(hook);
-    }
-
-    pub fn generate_initramfs_image(&self) -> Vec<u8> {
-        let mut image = Vec::new();
-        // CPIO Header signature
-        image.extend_from_slice(b"070701");
-        // Append hook markers into the initramfs byte array
-        for hook in &self.hooks {
-            image.extend_from_slice(b"[HOOK:");
-            image.extend_from_slice(hook.name.as_bytes());
-            image.extend_from_slice(b"]");
-        }
-        image
-    }
-}
-
-impl Default for MkinitcpioEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 10. Archiso Live Boot & OverlayFS Parity
-// ==========================================
-
-pub struct ArchisoEngine {
-    pub iso_label: String,
-    pub is_read_only_squashfs: bool,
-    pub overlay_upper_dir: String,
-    pub overlay_work_dir: String,
-}
-
-impl ArchisoEngine {
-    pub fn new(label: &str) -> Self {
-        Self {
-            iso_label: label.to_string(),
-            is_read_only_squashfs: true,
-            overlay_upper_dir: "/run/archiso/cowspace".to_string(),
-            overlay_work_dir: "/run/archiso/work".to_string(),
-        }
-    }
-
-    pub fn mount_live_root(&self) -> String {
-        format!(
-            "mount -t overlay overlay -o lowerdir=/run/archiso/sfs/airootfs,upperdir={},workdir={} /sysroot",
-            self.overlay_upper_dir, self.overlay_work_dir
-        )
-    }
-}
-
-// ==========================================
-// 11. Sovereign Environment Variables Registry
+// 8. Sovereign Environment Variables Registry
 // ==========================================
 
 pub struct SovereignEnvRegistry {
@@ -1291,7 +1031,6 @@ impl Default for PacmanDbCleaner {
 #[derive(Debug, Clone)]
 pub struct WikiPage {
     pub title: String,
-    pub category: String,
     pub content: String,
 }
 
@@ -1304,10 +1043,9 @@ impl ArchWikiSearchEngine {
         Self { pages: Vec::new() }
     }
 
-    pub fn index_page(&mut self, title: &str, category: &str, content: &str) {
+    pub fn index_page(&mut self, title: &str, content: &str) {
         self.pages.push(WikiPage {
             title: title.to_string(),
-            category: category.to_string(),
             content: content.to_string(),
         });
     }
@@ -1320,46 +1058,6 @@ impl ArchWikiSearchEngine {
             }
         }
         results
-    }
-
-    pub fn search_by_category(&self, category: &str) -> Vec<&WikiPage> {
-        let mut results = Vec::new();
-        for page in &self.pages {
-            if page.category.eq_ignore_ascii_case(category) {
-                results.push(page);
-            }
-        }
-        results
-    }
-
-    pub fn search_with_ranking(&self, query: &str) -> Vec<(&WikiPage, u32)> {
-        let mut ranked = Vec::new();
-        for page in &self.pages {
-            let mut score = 0u32;
-            if page.title.contains(query) {
-                score += 10;
-            }
-            if page.category.contains(query) {
-                score += 5;
-            }
-            if page.content.contains(query) {
-                score += 1;
-            }
-            if score > 0 {
-                ranked.push((page, score));
-            }
-        }
-        let n = ranked.len();
-        for i in 0..n {
-            for j in 0..n - 1 - i {
-                if ranked[j].1 < ranked[j + 1].1 {
-                    let tmp = ranked[j].clone();
-                    ranked[j] = ranked[j + 1].clone();
-                    ranked[j + 1] = tmp;
-                }
-            }
-        }
-        ranked
     }
 }
 
@@ -1611,56 +1309,5 @@ mod tests {
             replacement_line: "pkgver=0.2.0".to_string(),
         };
         assert_eq!(engine.apply_patch(original, &bad_patch), Err("Patch target line not found in recipe"));
-    }
-
-    #[test]
-    fn test_arch_wiki_category_and_ranking_search() {
-        let mut wiki = ArchWikiSearchEngine::new();
-        wiki.index_page("Pacman/Tips and tricks", "Package Management", "Advanced Pacman flags and cache cleaning procedures.");
-        wiki.index_page("General recommendations", "System Configuration", "System maintenance and Pacman setup for new installations.");
-
-        let package_pages = wiki.search_by_category("Package Management");
-        assert_eq!(package_pages.len(), 1);
-        assert_eq!(package_pages[0].title, "Pacman/Tips and tricks");
-
-        let ranked = wiki.search_with_ranking("Pacman");
-        assert!(!ranked.is_empty());
-        // "Pacman/Tips and tricks" should rank higher due to title match (10 points) vs content match (1 point)
-        assert_eq!(ranked[0].0.title, "Pacman/Tips and tricks");
-        assert!(ranked[0].1 >= 10);
-    }
-
-    #[test]
-    fn test_arch_wiki_category_and_ranking_search() {
-        let mut wiki = ArchWikiSearchEngine::new();
-        wiki.index_page("Pacman/Tips and tricks", "Package Management", "Advanced Pacman flags and cache cleaning procedures.");
-        wiki.index_page("General recommendations", "System Configuration", "System maintenance and Pacman setup for new installations.");
-
-        let package_pages = wiki.search_by_category("Package Management");
-        assert_eq!(package_pages.len(), 1);
-        assert_eq!(package_pages[0].title, "Pacman/Tips and tricks");
-
-        let ranked = wiki.search_with_ranking("Pacman");
-        assert!(!ranked.is_empty());
-        // "Pacman/Tips and tricks" should rank higher due to title match (10 points) vs content match (1 point)
-        assert_eq!(ranked[0].0.title, "Pacman/Tips and tricks");
-        assert!(ranked[0].1 >= 10);
-    }
-
-    #[test]
-    fn test_arch_wiki_category_and_ranking_search() {
-        let mut wiki = ArchWikiSearchEngine::new();
-        wiki.index_page("Pacman/Tips and tricks", "Package Management", "Advanced Pacman flags and cache cleaning procedures.");
-        wiki.index_page("General recommendations", "System Configuration", "System maintenance and Pacman setup for new installations.");
-
-        let package_pages = wiki.search_by_category("Package Management");
-        assert_eq!(package_pages.len(), 1);
-        assert_eq!(package_pages[0].title, "Pacman/Tips and tricks");
-
-        let ranked = wiki.search_with_ranking("Pacman");
-        assert!(!ranked.is_empty());
-        // "Pacman/Tips and tricks" should rank higher due to title match (10 points) vs content match (1 point)
-        assert_eq!(ranked[0].0.title, "Pacman/Tips and tricks");
-        assert!(ranked[0].1 >= 10);
     }
 }

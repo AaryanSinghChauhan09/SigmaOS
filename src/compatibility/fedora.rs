@@ -627,62 +627,6 @@ pub struct CoprRepositoryManager {
     pub builds: Vec<CoprBuildTask>,
 }
 
-pub struct SovereignCockpitConsole {
-    pub is_listening: bool,
-    pub connected_clients: usize,
-    pub metrics: HashMap<String, f64>,
-}
-
-impl SovereignCockpitConsole {
-    pub fn new() -> Self {
-        Self {
-            is_listening: false,
-            connected_clients: 0,
-            metrics: HashMap::new(),
-        }
-    }
-
-    pub fn start_server(&mut self) -> Result<(), &'static str> {
-        if self.is_listening {
-            return Err("Cockpit server already listening");
-        }
-        self.is_listening = true;
-        Ok(())
-    }
-
-    pub fn stop_server(&mut self) {
-        self.is_listening = false;
-        self.connected_clients = 0;
-    }
-
-    pub fn register_client(&mut self) -> Result<usize, &'static str> {
-        if !self.is_listening {
-            return Err("Cockpit server is not listening");
-        }
-        self.connected_clients += 1;
-        Ok(self.connected_clients)
-    }
-
-    pub fn update_metric(&mut self, key: &str, val: f64) {
-        self.metrics.insert(key.to_string(), val);
-    }
-
-    pub fn stream_metrics_json(&self) -> Result<String, &'static str> {
-        if !self.is_listening {
-            return Err("Server offline");
-        }
-        let mut json = format!(
-            "{{\"listening\":{},\"clients\":{}",
-            self.is_listening, self.connected_clients
-        );
-        for (k, v) in &self.metrics {
-            json.push_str(&format!(",\"{}\":{}", k, v));
-        }
-        json.push('}');
-        Ok(json)
-    }
-}
-
 impl CoprRepositoryManager {
     pub fn new(owner: &str, project_name: &str) -> Self {
         Self {
@@ -973,6 +917,144 @@ impl SovereignFirewalldManager {
         } else {
             false
         }
+    }
+}
+
+// ==========================================
+// SELinux State and Policy Enforcer
+// ==========================================
+
+pub struct SeLinuxEnforcer {
+    pub mode: SeLinuxMode,
+    pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
+}
+
+impl SeLinuxEnforcer {
+    pub fn new(mode: SeLinuxMode) -> Self {
+        let mut transitions = HashMap::new();
+        transitions.insert("httpd_t".to_string(), vec!["httpd_sys_content_t".to_string()]);
+        Self {
+            mode,
+            allowed_transitions: transitions,
+        }
+    }
+
+    /// Validates transition or access check between subject context type and target file context type
+    pub fn check_access(&self, subject_type: &str, target_type: &str) -> Result<bool, &'static str> {
+        if self.mode == SeLinuxMode::Disabled {
+            return Ok(true);
+        }
+
+        let is_allowed = if let Some(allowed) = self.allowed_transitions.get(subject_type) {
+            allowed.contains(&target_type.to_string())
+        } else {
+            false
+        };
+
+        if !is_allowed {
+            if self.mode == SeLinuxMode::Enforcing {
+                return Err("SELinux AVC Denial: Access Prohibited");
+            } else if self.mode == SeLinuxMode::Permissive {
+                println!("SELinux AVC Warning (Permissive): Access Prohibited but allowed");
+            }
+        }
+        Ok(true)
+    }
+}
+
+// ==========================================
+// COPR User Repositories Build Manager
+// ==========================================
+
+pub struct CoprBuildTask {
+    pub task_id: u32,
+    pub git_url: String,
+    pub status: String,
+}
+
+pub struct CoprRepositoryManager {
+    pub owner: String,
+    pub project_name: String,
+    pub builds: Vec<CoprBuildTask>,
+}
+
+impl CoprRepositoryManager {
+    pub fn new(owner: &str, project_name: &str) -> Self {
+        Self {
+            owner: owner.to_string(),
+            project_name: project_name.to_string(),
+            builds: Vec::new(),
+        }
+    }
+
+    pub fn submit_copr_build(&mut self, id: u32, git_url: &str) {
+        self.builds.push(CoprBuildTask {
+            task_id: id,
+            git_url: git_url.to_string(),
+            status: "Pending".to_string(),
+        });
+    }
+
+    pub fn execute_build_compile(&mut self, task_id: u32) -> Result<String, &'static str> {
+        for build in &mut self.builds {
+            if build.task_id == task_id {
+                build.status = "Success".to_string();
+                return Ok(format!("copr-build-{}-{}.rpm", self.project_name, task_id));
+            }
+        }
+        Err("COPR build task ID not found")
+    }
+}
+
+pub struct SovereignCockpitConsole {
+    pub is_listening: bool,
+    pub connected_clients: usize,
+    pub metrics: HashMap<String, f64>,
+}
+
+impl SovereignCockpitConsole {
+    pub fn new() -> Self {
+        Self {
+            is_listening: false,
+            connected_clients: 0,
+            metrics: HashMap::new(),
+        }
+    }
+
+    pub fn start_server(&mut self) -> Result<(), &'static str> {
+        if self.is_listening {
+            return Err("Server already running");
+        }
+        self.is_listening = true;
+        Ok(())
+    }
+
+    pub fn stop_server(&mut self) {
+        self.is_listening = false;
+        self.connected_clients = 0;
+    }
+
+    pub fn register_client(&mut self) -> Result<usize, &'static str> {
+        if !self.is_listening {
+            return Err("Server not listening");
+        }
+        self.connected_clients += 1;
+        Ok(self.connected_clients)
+    }
+
+    pub fn update_metric(&mut self, name: &str, value: f64) {
+        self.metrics.insert(name.to_string(), value);
+    }
+
+    pub fn stream_metrics_json(&self) -> Result<String, &'static str> {
+        let mut json = String::from("{");
+        json.push_str(&format!("\"listening\":{},", self.is_listening));
+        json.push_str(&format!("\"clients\":{}", self.connected_clients));
+        for (name, val) in &self.metrics {
+            json.push_str(&format!(",\"{}\":{}", name, val));
+        }
+        json.push_str("}");
+        Ok(json)
     }
 }
 
