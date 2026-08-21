@@ -3,17 +3,109 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use std::ptr::NonNull;
-use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
 
 /// Memory block
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
+}
+
+use core::ptr::NonNull;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PoolType {
+    Paged,    // Swappable (virtual pages can be swapped out to disk)
+    NonPaged, // Always resident in physical memory (for critical drivers and ISRs)
+}
+
+#[derive(Debug, Clone)]
+pub struct PoolBlock {
+    pub addr: usize,
+    pub size: usize,
+    pub pool_type: PoolType,
+    pub tag: [u8; 4], // 4-character driver tag (standard Windows NT Pool Tag, e.g. "File")
+}
+
+pub struct KernelPoolManager {
+    pub paged_pool: Vec<PoolBlock>,
+    pub non_paged_pool: Vec<PoolBlock>,
+    pub total_paged_bytes: usize,
+    pub total_non_paged_bytes: usize,
+}
+
+impl KernelPoolManager {
+    pub fn new() -> Self {
+        Self {
+            paged_pool: Vec::new(),
+            non_paged_pool: Vec::new(),
+            total_paged_bytes: 0,
+            total_non_paged_bytes: 0,
+        }
+    }
+
+    /// Allocate a block from the specific kernel pool with a pool tag (Inspired by Windows NT ExAllocatePoolWithTag)
+    pub fn allocate_pool(&mut self, pool_type: PoolType, size: usize, tag: &[u8; 4]) -> Result<PoolBlock, &'static str> {
+        if size == 0 {
+            return Err("Cannot allocate 0-byte pool block");
+        }
+
+        // Emulate allocating pool virtual address range
+        let addr = match pool_type {
+            PoolType::Paged => 0xD000_0000 + self.total_paged_bytes,
+            PoolType::NonPaged => 0xF000_0000 + self.total_non_paged_bytes,
+        };
+
+        let block = PoolBlock {
+            addr,
+            size,
+            pool_type,
+            tag: *tag,
+        };
+
+        match pool_type {
+            PoolType::Paged => {
+                self.paged_pool.push(block.clone());
+                self.total_paged_bytes += size;
+            }
+            PoolType::NonPaged => {
+                self.non_paged_pool.push(block.clone());
+                self.total_non_paged_bytes += size;
+            }
+        }
+
+        println!(
+            "Windows NT Pool Alloc: Allocated {:?} pool block of {} bytes with tag '{}' at address 0x{:X}",
+            pool_type, size, core::str::from_utf8(tag).unwrap_or("????"), addr
+        );
+
+        Ok(block)
+    }
+
+    /// Free a block from the kernel pool (Inspired by Windows NT ExFreePool)
+    pub fn free_pool(&mut self, addr: usize) -> Result<(), &'static str> {
+        if let Some(pos) = self.paged_pool.iter().position(|b| b.addr == addr) {
+            let block = self.paged_pool.remove(pos);
+            self.total_paged_bytes -= block.size;
+            Ok(())
+        } else if let Some(pos) = self.non_paged_pool.iter().position(|b| b.addr == addr) {
+            let block = self.non_paged_pool.remove(pos);
+            self.total_non_paged_bytes -= block.size;
+            Ok(())
+        } else {
+            Err("Invalid pool address; double free or corruption detected")
+        }
+    }
+}
+
+impl Default for KernelPoolManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct Zone {
@@ -62,6 +154,22 @@ impl BuddyAllocator {
                 self.free_lists[order].push(block);
             }
         }
+    }
+
+    /// Create a checkpoint of the allocator's current free list state (Phase 1.1)
+    pub fn create_checkpoint(&self) -> [Vec<MemoryBlock>; 12] {
+        let mut checkpoint: [Vec<MemoryBlock>; 12] = Default::default();
+        for order in 0..12 {
+            for block in &self.free_lists[order] {
+                checkpoint[order].push(*block);
+            }
+        }
+        checkpoint
+    }
+
+    /// Restore the allocator to a previously checkpointed state to recover from crash exceptions (Phase 1.1)
+    pub fn restore_checkpoint(&mut self, checkpoint: [Vec<MemoryBlock>; 12]) {
+        self.free_lists = checkpoint;
     }
 
     pub fn get_free_memory(&self) -> usize {
@@ -356,6 +464,110 @@ impl VirtualMemoryManager {
     }
 }
 
+// =========================================================================
+// MEMORY DESCRIPTOR LIST (MDL) & ANCIENT ISA DMA BUFFER ABSTRACTIONS
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MemoryProtection {
+    ReadOnly,
+    ReadWrite,
+    ExecuteRead,
+    ExecuteReadWrite,
+}
+
+#[derive(Debug, Clone)]
+pub struct MemoryDescriptorList {
+    pub start_virtual_addr: u64,
+    pub byte_length: usize,
+    pub is_locked_pinned: bool,
+    pub protection_flags: MemoryProtection,
+    pub physical_page_offsets: Vec<u64>,
+}
+
+impl MemoryDescriptorList {
+    pub fn new(virtual_addr: u64, length: usize, protection: MemoryProtection) -> Self {
+        Self {
+            start_virtual_addr: virtual_addr,
+            byte_length: length,
+            is_locked_pinned: false,
+            protection_flags: protection,
+            physical_page_offsets: Vec::new(),
+        }
+    }
+
+    pub fn lock_pages_and_pin(&mut self, physical_pages: &[u64]) -> Result<(), &'static str> {
+        if self.is_locked_pinned {
+            return Err("MDL pages are already pinned in physical memory");
+        }
+        self.physical_page_offsets = physical_pages.to_vec();
+        self.is_locked_pinned = true;
+        Ok(())
+    }
+
+    pub fn unlock_pages(&mut self) {
+        self.is_locked_pinned = false;
+        self.physical_page_offsets.clear();
+    }
+}
+
+pub const ISA_DMA_MAX_PHYSICAL_ADDR: u64 = 16 * 1024 * 1024; // Strict 16MB physical boundary for ancient ISA DMA
+
+pub struct FloppyDiskDmaBuffer {
+    pub physical_addr: u64,
+    pub channel: u8, // ISA DMA Channel 2
+    pub buffer_length: usize, // Max 64KB
+}
+
+impl FloppyDiskDmaBuffer {
+    pub fn allocate_below_16mb(phys_addr: u64, length: usize) -> Result<Self, &'static str> {
+        if phys_addr >= ISA_DMA_MAX_PHYSICAL_ADDR {
+            return Err("Floppy Disk ISA DMA allocation exceeds 16MB physical RAM boundary");
+        }
+        if length > 64 * 1024 {
+            return Err("Floppy Disk DMA buffer exceeds 64KB transfer limit");
+        }
+        Ok(Self {
+            physical_addr: phys_addr,
+            channel: 2,
+            buffer_length: length,
+        })
+    }
+}
+
+pub struct SoundBlaster16DmaBuffer {
+    pub physical_addr: u64,
+    pub channel: u8, // ISA DMA Channel 5 (16-bit audio)
+    pub is_double_buffered: bool,
+}
+
+impl SoundBlaster16DmaBuffer {
+    pub fn allocate_ping_pong_buffer(phys_addr: u64) -> Result<Self, &'static str> {
+        if phys_addr >= ISA_DMA_MAX_PHYSICAL_ADDR {
+            return Err("Sound Blaster 16 ISA DMA allocation exceeds 16MB physical RAM boundary");
+        }
+        Ok(Self {
+            physical_addr: phys_addr,
+            channel: 5,
+            is_double_buffered: true,
+        })
+    }
+}
+
+pub struct Ne2000DmaBuffer {
+    pub shared_ram_base: u16,
+    pub ring_buffer_size: usize,
+}
+
+impl Ne2000DmaBuffer {
+    pub fn new(ram_base: u16, size: usize) -> Self {
+        Self {
+            shared_ram_base: ram_base,
+            ring_buffer_size: size,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -384,5 +596,104 @@ mod tests {
         // For now, just test the interface
         let _result = allocator.allocate(4096);
         // Will fail without actual memory, but tests the flow
+    }
+
+    #[test]
+    fn test_checkpoint_and_state_recovery() {
+        let mut allocator = BuddyAllocator::new();
+        allocator.initialize_memory(0x1000, 4096); // 1 page (order 0)
+        allocator.initialize_memory(0x3000, 8192); // 2 pages (order 1)
+        assert_eq!(allocator.get_free_memory(), 12288);
+
+        // Checkpoint original state
+        let checkpoint = allocator.create_checkpoint();
+
+        // Perform mock allocations which modify state
+        let _block1 = allocator.allocate(4096).unwrap();
+        let _block2 = allocator.allocate(8192).unwrap();
+        assert_eq!(allocator.get_free_memory(), 0);
+
+        // Simulated crash/unwinding: Restore from checkpoint to recover state
+        allocator.restore_checkpoint(checkpoint);
+
+        // State is perfectly restored
+        assert_eq!(allocator.get_free_memory(), 12288);
+
+        // Verify we can allocate the same blocks again successfully
+        let block_retry = allocator.allocate(4096).unwrap();
+        assert_eq!(block_retry.size, 4096);
+    }
+
+    #[test]
+    fn test_windows_nt_pool_allocator() {
+        let mut pool_manager = KernelPoolManager::new();
+
+        // Allocate Paged Pool Block with Tag 'File'
+        let paged_block = pool_manager.allocate_pool(PoolType::Paged, 1024, b"File").unwrap();
+        assert_eq!(paged_block.size, 1024);
+        assert_eq!(paged_block.pool_type, PoolType::Paged);
+        assert_eq!(&paged_block.tag, b"File");
+        assert_eq!(pool_manager.total_paged_bytes, 1024);
+
+        // Allocate NonPaged Pool Block with Tag 'Net '
+        let non_paged_block = pool_manager.allocate_pool(PoolType::NonPaged, 2048, b"Net ").unwrap();
+        assert_eq!(non_paged_block.size, 2048);
+        assert_eq!(non_paged_block.pool_type, PoolType::NonPaged);
+        assert_eq!(&non_paged_block.tag, b"Net ");
+        assert_eq!(pool_manager.total_non_paged_bytes, 2048);
+
+        // Verify Address Separation
+        assert!(paged_block.addr != non_paged_block.addr);
+
+        // Free Paged Pool Block
+        assert!(pool_manager.free_pool(paged_block.addr).is_ok());
+        assert_eq!(pool_manager.total_paged_bytes, 0);
+
+        // Free NonPaged Pool Block
+        assert!(pool_manager.free_pool(non_paged_block.addr).is_ok());
+        assert_eq!(pool_manager.total_non_paged_bytes, 0);
+
+        // Double Free (Should Fail)
+        assert!(pool_manager.free_pool(paged_block.addr).is_err());
+    }
+
+    #[test]
+    fn test_memory_descriptor_list_mdl_pinning() {
+        let mut mdl = MemoryDescriptorList::new(0x7FFF_0000, 8192, MemoryProtection::ReadWrite);
+        assert!(!mdl.is_locked_pinned);
+
+        let phys_pages = [0x1000, 0x2000];
+        assert!(mdl.lock_pages_and_pin(&phys_pages).is_ok());
+        assert!(mdl.is_locked_pinned);
+        assert_eq!(mdl.physical_page_offsets, vec![0x1000, 0x2000]);
+
+        // Attempting to lock twice fails
+        assert!(mdl.lock_pages_and_pin(&phys_pages).is_err());
+
+        mdl.unlock_pages();
+        assert!(!mdl.is_locked_pinned);
+        assert!(mdl.physical_page_offsets.is_empty());
+    }
+
+    #[test]
+    fn test_ancient_isa_dma_buffer_boundaries() {
+        // Floppy Disk ISA DMA test (<16MB and <=64KB)
+        let floppy = FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 32 * 1024).unwrap();
+        assert_eq!(floppy.channel, 2);
+
+        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(17 * 1024 * 1024, 1024).is_err()); // > 16MB
+        assert!(FloppyDiskDmaBuffer::allocate_below_16mb(0x00A0_0000, 128 * 1024).is_err()); // > 64KB
+
+        // Sound Blaster 16 ISA DMA test (<16MB)
+        let sb16 = SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(0x00B0_0000).unwrap();
+        assert_eq!(sb16.channel, 5);
+        assert!(sb16.is_double_buffered);
+
+        assert!(SoundBlaster16DmaBuffer::allocate_ping_pong_buffer(18 * 1024 * 1024).is_err()); // > 16MB
+
+        // NE2000 Shared RAM Ring Buffer test
+        let ne2000 = Ne2000DmaBuffer::new(0x300, 16384);
+        assert_eq!(ne2000.shared_ram_base, 0x300);
+        assert_eq!(ne2000.ring_buffer_size, 16384);
     }
 }
