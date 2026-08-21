@@ -65,6 +65,7 @@ pub mod scheduler {
 pub mod crypto {
     pub mod vectorized_pqc;
 }
+pub mod open_source_obsoletion;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -261,4 +262,10 @@ pub use unimplemented_tools::{
     SecureFileShredder, SmartCleanup, SmartNotificationManager, StartupOptimizer,
     StaticAnalysisWarning, StaticAnalyzer, StreamingOverlayManager, SubtitleEditor, SubtitleLine,
     SystemRestoreSnapshot, VoiceControl, VrArRuntime, VrPose, WebcamEffects, ZeroTrustTpmBoot,
+};
+
+pub use open_source_obsoletion::{
+    SovereignApiTestSuite, SovereignInitSupervisor, SovereignKnowledgeGraph,
+    SovereignObservabilitySuite, SovereignPartitionEngine, SovereignPqcVpnFirewall,
+    SovereignVcsEngine,
 };

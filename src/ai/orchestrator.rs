@@ -112,65 +112,6 @@ impl AIAgent for SimpleAIAgent {
     }
 }
 
-pub trait AgentOrchestrator {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
-    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
-    fn list_agents(&self) -> Vec<AgentID>;
-}
-
-pub struct SimpleAgentOrchestrator {
-    pub agents: Vec<Box<dyn AIAgent>>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleAgentOrchestrator {
-    pub fn new() -> Self {
-        SimpleAgentOrchestrator {
-            agents: Vec::new(),
-            next_id: AtomicUsize::new(1),
-        }
-    }
-}
-
-impl Default for SimpleAgentOrchestrator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl AgentOrchestrator for SimpleAgentOrchestrator {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
-        let id = agent.id();
-        self.agents.push(agent);
-        Ok(id)
-    }
-
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
-        if let Some(target_id) = agent_id {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
-                agent.execute(task)
-            } else {
-                Err(AgentError::NotFound)
-            }
-        } else {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
-                agent.execute(task)
-            } else {
-                Err(AgentError::NotFound)
-            }
-        }
-    }
-
-    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
-    }
-
-    fn list_agents(&self) -> Vec<AgentID> {
-        self.agents.iter().map(|a| a.id()).collect()
-    }
-}
-
 /// Local LLM and deep learning model resource orchestrator
 pub struct LocalLlmOrchestrator {
     pub active_models: Vec<Option<ModelResource>>,
@@ -261,6 +202,79 @@ impl LocalLlmOrchestrator {
     }
 }
 
+pub trait AgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError>;
+    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
+    fn list_agents(&self) -> Vec<AgentID>;
+}
+
+pub struct SimpleAgentOrchestrator {
+    pub agents: Vec<Box<dyn AIAgent>>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleAgentOrchestrator {
+    pub fn new() -> Self {
+        SimpleAgentOrchestrator {
+            agents: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AgentOrchestrator for SimpleAgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
+        let id = agent.id();
+        self.agents.push(agent);
+        Ok(id)
+    }
+
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError> {
+        if let Some(target_id) = agent_id {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+            }
+        } else {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+            }
+        }
+    }
+
+    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
+        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
+    }
+
+    fn list_agents(&self) -> Vec<AgentID> {
+        self.agents.iter().map(|a| a.id()).collect()
+    }
+}
+
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn size(&self) -> usize;
+}
+
 pub struct ContextWindowPruner {
     pub history: Vec<[u8; 128]>,
     pub max_lines: usize,
@@ -286,12 +300,6 @@ impl ContextWindowPruner {
             self.history.remove(0);
         }
     }
-}
-
-pub trait TaskQueue {
-    fn enqueue(&mut self, task: &[u8], priority: u8);
-    fn dequeue(&mut self) -> Option<[u8; 256]>;
-    fn size(&self) -> usize;
 }
 
 pub struct SimpleTaskQueue {
@@ -386,7 +394,10 @@ mod tests {
         orchestrator.register_agent(Box::new(agent)).unwrap();
 
         let response = orchestrator.dispatch_task(b"RELOAD_CORES", Some(1)).unwrap();
-        assert_eq!(core::str::from_utf8(&response).unwrap(), "TaskAgent: RELOAD_CORES");
+        assert_eq!(
+            core::str::from_utf8(&response).unwrap(),
+            "TaskAgent: RELOAD_CORES"
+        );
 
         let mut queue = SimpleTaskQueue::new();
         queue.enqueue(b"TASK_PRIO_HIGH", 10);

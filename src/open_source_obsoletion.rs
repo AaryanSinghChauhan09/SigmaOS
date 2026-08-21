@@ -58,6 +58,7 @@ impl SovereignVcsEngine {
         for (i, &b) in payload.iter().enumerate() {
             hash[i % 32] ^= b.wrapping_mul(31);
         }
+        // Remove old staged version if exists
         self.staging_area.retain(|b| b.path != path);
         self.staging_area.push(VcsBlob {
             path: path.to_string(),
@@ -70,9 +71,11 @@ impl SovereignVcsEngine {
         if self.staging_area.is_empty() {
             return Err("Vcs: Nothing staged for commit");
         }
+
         let parent = self.get_head_commit_id();
         let commit_num = self.commit_history.len() + 1;
         let commit_id = format!("sha256_commit_{:04x}", commit_num);
+
         let commit = VcsCommit {
             commit_id: commit_id.clone(),
             parent_id: parent,
@@ -81,14 +84,18 @@ impl SovereignVcsEngine {
             timestamp_secs: timestamp,
             blobs: self.staging_area.clone(),
         };
+
         self.commit_history.push(commit);
         self.staging_area.clear();
+
+        // Update active branch HEAD
         for branch in &mut self.branches {
             if branch.0 == self.active_branch {
                 branch.1 = commit_id.clone();
                 break;
             }
         }
+
         Ok(commit_id)
     }
 
@@ -118,7 +125,9 @@ impl SovereignVcsEngine {
 }
 
 impl Default for SovereignVcsEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // =========================================================================
@@ -146,7 +155,7 @@ pub struct ServiceUnit {
 
 pub struct SovereignInitSupervisor {
     pub registered_units: Vec<ServiceUnit>,
-    pub socket_activation_listeners: Vec<(u16, String)>,
+    pub socket_activation_listeners: Vec<(u16, String)>, // (Port, target_service_name)
 }
 
 impl SovereignInitSupervisor {
@@ -166,29 +175,42 @@ impl SovereignInitSupervisor {
     }
 
     pub fn bind_socket_activation(&mut self, port: u16, service_name: &str) {
-        self.socket_activation_listeners.push((port, service_name.to_string()));
+        self.socket_activation_listeners
+            .push((port, service_name.to_string()));
     }
 
     pub fn start_service(&mut self, service_name: &str) -> Result<(), &'static str> {
-        let idx = self.registered_units.iter().position(|u| u.name == service_name)
+        let idx = self
+            .registered_units
+            .iter()
+            .position(|u| u.name == service_name)
             .ok_or("InitSupervisor: Service unit not found")?;
+
+        // Verify dependencies are active first
         let deps = self.registered_units[idx].dependencies.clone();
         for dep in &deps {
-            let dep_unit = self.registered_units.iter().find(|u| &u.name == dep)
+            let dep_unit = self
+                .registered_units
+                .iter()
+                .find(|u| &u.name == dep)
                 .ok_or("InitSupervisor: Missing dependency unit")?;
             if dep_unit.current_state != SupervisorServiceState::ActiveRunning {
                 return Err("InitSupervisor: Dependency service not active");
             }
         }
+
         self.registered_units[idx].current_state = SupervisorServiceState::ActiveRunning;
         Ok(())
     }
 
     pub fn trigger_socket_event(&mut self, port: u16) -> Result<String, &'static str> {
-        let target_service = self.socket_activation_listeners.iter()
+        let target_service = self
+            .socket_activation_listeners
+            .iter()
             .find(|(p, _)| *p == port)
             .map(|(_, s)| s.clone())
             .ok_or("InitSupervisor: No socket listener for port")?;
+
         self.start_service(&target_service)?;
         Ok(format!("Activated service '{}' on socket event port {}", target_service, port))
     }
@@ -205,7 +227,9 @@ impl SovereignInitSupervisor {
 }
 
 impl Default for SovereignInitSupervisor {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // =========================================================================
@@ -213,7 +237,11 @@ impl Default for SovereignInitSupervisor {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FirewallAction { Allow, Deny, Quarantine }
+pub enum FirewallAction {
+    Allow,
+    Deny,
+    Quarantine,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FirewallRule {
@@ -232,7 +260,12 @@ pub struct SovereignPqcVpnFirewall {
 
 impl SovereignPqcVpnFirewall {
     pub fn new() -> Self {
-        Self { vpn_active: false, pqc_shared_secret: None, firewall_rules: Vec::new(), blocked_ip_count: 0 }
+        Self {
+            vpn_active: false,
+            pqc_shared_secret: None,
+            firewall_rules: Vec::new(),
+            blocked_ip_count: 0,
+        }
     }
 
     pub fn establish_pqc_vpn_tunnel(&mut self, kyber_kem_key: &[u8; 32]) {
@@ -250,16 +283,20 @@ impl SovereignPqcVpnFirewall {
                 && port >= rule.port_range.0
                 && port <= rule.port_range.1
             {
-                if rule.action == FirewallAction::Deny { self.blocked_ip_count += 1; }
+                if rule.action == FirewallAction::Deny {
+                    self.blocked_ip_count += 1;
+                }
                 return rule.action;
             }
         }
-        FirewallAction::Allow
+        FirewallAction::Allow // Default permissive fallback
     }
 }
 
 impl Default for SovereignPqcVpnFirewall {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // =========================================================================
@@ -281,11 +318,19 @@ pub struct SovereignObservabilitySuite {
 
 impl SovereignObservabilitySuite {
     pub fn new() -> Self {
-        Self { metrics_time_series: Vec::new(), alert_threshold_cpu_pct: 90.0, alert_threshold_mem_pct: 85.0 }
+        Self {
+            metrics_time_series: Vec::new(),
+            alert_threshold_cpu_pct: 90.0,
+            alert_threshold_mem_pct: 85.0,
+        }
     }
 
     pub fn record_metric(&mut self, name: &str, value: f64, timestamp: u64) {
-        self.metrics_time_series.push(TelemetryMetric { metric_name: name.to_string(), value, timestamp_ms: timestamp });
+        self.metrics_time_series.push(TelemetryMetric {
+            metric_name: name.to_string(),
+            value,
+            timestamp_ms: timestamp,
+        });
     }
 
     pub fn detect_anomalies(&self) -> Vec<String> {
@@ -302,7 +347,9 @@ impl SovereignObservabilitySuite {
 }
 
 impl Default for SovereignObservabilitySuite {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // =========================================================================
@@ -321,25 +368,39 @@ pub struct SovereignKnowledgeGraph {
 }
 
 impl SovereignKnowledgeGraph {
-    pub fn new() -> Self { Self { notes: Vec::new() } }
+    pub fn new() -> Self {
+        Self { notes: Vec::new() }
+    }
 
     pub fn add_note(&mut self, title: &str, content: &str) {
         let mut backlinks = Vec::new();
         for existing in &self.notes {
             let pattern = format!("[[{}]]", existing.title);
-            if content.contains(&pattern) { backlinks.push(existing.title.clone()); }
+            if content.contains(&pattern) {
+                backlinks.push(existing.title.clone());
+            }
         }
-        self.notes.push(KnowledgeNote { title: title.to_string(), content: content.to_string(), backlinks });
+        self.notes.push(KnowledgeNote {
+            title: title.to_string(),
+            content: content.to_string(),
+            backlinks,
+        });
     }
 
     pub fn query_backlinks(&self, note_title: &str) -> Vec<String> {
         let target_pattern = format!("[[{}]]", note_title);
-        self.notes.iter().filter(|n| n.content.contains(&target_pattern)).map(|n| n.title.clone()).collect()
+        self.notes
+            .iter()
+            .filter(|n| n.content.contains(&target_pattern))
+            .map(|n| n.title.clone())
+            .collect()
     }
 }
 
 impl Default for SovereignKnowledgeGraph {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // =========================================================================
@@ -359,9 +420,13 @@ pub struct SovereignApiTestSuite {
 }
 
 impl SovereignApiTestSuite {
-    pub fn new() -> Self { Self { requests: Vec::new() } }
+    pub fn new() -> Self {
+        Self { requests: Vec::new() }
+    }
 
-    pub fn add_request(&mut self, req: ApiRequestSpec) { self.requests.push(req); }
+    pub fn add_request(&mut self, req: ApiRequestSpec) {
+        self.requests.push(req);
+    }
 
     pub fn execute_suite(&self) -> (usize, usize) {
         let mut passed = 0;
@@ -378,7 +443,9 @@ impl SovereignApiTestSuite {
 }
 
 impl Default for SovereignApiTestSuite {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // =========================================================================
@@ -386,7 +453,13 @@ impl Default for SovereignApiTestSuite {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SovereignFsType { SigmaFs, Ext4, Btrfs, Fat32, NtfsCompat }
+pub enum SovereignFsType {
+    SigmaFs,
+    Ext4,
+    Btrfs,
+    Fat32,
+    NtfsCompat,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PartitionSector {
@@ -404,21 +477,37 @@ pub struct SovereignPartitionEngine {
 
 impl SovereignPartitionEngine {
     pub fn new(disk_sectors: u64) -> Self {
-        Self { total_disk_sectors: disk_sectors, partitions: Vec::new() }
+        Self {
+            total_disk_sectors: disk_sectors,
+            partitions: Vec::new(),
+        }
     }
 
-    pub fn create_partition(&mut self, fs: SovereignFsType, sectors: u64, label: &str) -> Result<u32, &'static str> {
+    pub fn create_partition(
+        &mut self,
+        fs: SovereignFsType,
+        sectors: u64,
+        label: &str,
+    ) -> Result<u32, &'static str> {
         let used_sectors: u64 = self.partitions.iter().map(|p| p.total_sectors).sum();
         if used_sectors + sectors > self.total_disk_sectors {
             return Err("PartitionEngine: Insufficient unallocated disk space");
         }
+
         let num = (self.partitions.len() + 1) as u32;
         let start = used_sectors;
-        self.partitions.push(PartitionSector { part_num: num, fs_type: fs, start_lba: start, total_sectors: sectors, label: label.to_string() });
+        self.partitions.push(PartitionSector {
+            part_num: num,
+            fs_type: fs,
+            start_lba: start,
+            total_sectors: sectors,
+            label: label.to_string(),
+        });
         Ok(num)
     }
 
     pub fn verify_alignment(&self) -> bool {
+        // Enforce 4KB (8 sectors @ 512 bytes) alignment
         self.partitions.iter().all(|p| p.start_lba % 8 == 0)
     }
 }
@@ -438,9 +527,11 @@ mod tests {
         let commit1 = vcs.commit("Jules", "Initial commit", 1700000000).unwrap();
         assert!(commit1.contains("sha256_commit"));
         assert_eq!(vcs.get_head_commit_id(), Some(commit1.clone()));
+
         assert!(vcs.create_branch("feature/pqc").is_ok());
         assert!(vcs.checkout("feature/pqc").is_ok());
         assert_eq!(vcs.active_branch, "feature/pqc");
+
         vcs.stage_file("src/pqc.rs", b"pub fn kyber() {}");
         let commit2 = vcs.commit("Jules", "Add Kyber", 1700000100).unwrap();
         assert_eq!(vcs.get_head_commit_id(), Some(commit2));
@@ -457,10 +548,28 @@ mod tests {
             current_state: SupervisorServiceState::Stopped,
             restart_count: 0,
         };
+        let web_service = ServiceUnit {
+            name: "sigmaweb".to_string(),
+            exec_start: "/usr/bin/sigmaweb".to_string(),
+            dependencies: Vec::from(["sigmadb".to_string()]),
+            auto_restart_on_failure: true,
+            current_state: SupervisorServiceState::Stopped,
+            restart_count: 0,
+        };
+
         assert!(init.register_service(db_service).is_ok());
+        assert!(init.register_service(web_service).is_ok());
+
         init.bind_socket_activation(8080, "sigmadb");
-        let res = init.trigger_socket_event(8080).unwrap();
-        assert!(res.contains("sigmadb"));
+        let activation_res = init.trigger_socket_event(8080).unwrap();
+        assert!(activation_res.contains("sigmadb"));
+
+        assert!(init.start_service("sigmaweb").is_ok());
+        assert_eq!(init.registered_units[1].current_state, SupervisorServiceState::ActiveRunning);
+
+        init.handle_service_failure("sigmaweb");
+        assert_eq!(init.registered_units[1].restart_count, 1);
+        assert_eq!(init.registered_units[1].current_state, SupervisorServiceState::ActiveRunning);
     }
 
     #[test]
@@ -468,30 +577,62 @@ mod tests {
         let mut firewall = SovereignPqcVpnFirewall::new();
         firewall.establish_pqc_vpn_tunnel(&[0x42; 32]);
         assert!(firewall.vpn_active);
+
         firewall.add_firewall_rule(FirewallRule {
             rule_id: 1,
             source_cidr: "192.168.1.50".to_string(),
             port_range: (22, 22),
             action: FirewallAction::Deny,
         });
+
         assert_eq!(firewall.inspect_incoming_packet("192.168.1.50", 22), FirewallAction::Deny);
         assert_eq!(firewall.blocked_ip_count, 1);
+        assert_eq!(firewall.inspect_incoming_packet("192.168.1.100", 80), FirewallAction::Allow);
     }
 
     #[test]
     fn test_sovereign_observability_suite() {
         let mut obs = SovereignObservabilitySuite::new();
         obs.record_metric("cpu_utilization", 95.5, 1000);
+        obs.record_metric("memory_utilization", 50.0, 1000);
+
         let anomalies = obs.detect_anomalies();
         assert_eq!(anomalies.len(), 1);
         assert!(anomalies[0].contains("HIGH CPU ANOMALY"));
     }
 
     #[test]
+    fn test_sovereign_knowledge_graph_backlinks() {
+        let mut graph = SovereignKnowledgeGraph::new();
+        graph.add_note("Kernel_Architecture", "Core microkernel design");
+        graph.add_note("Pqc_Enclave", "Security enclave based on [[Kernel_Architecture]]");
+
+        let backlinks = graph.query_backlinks("Kernel_Architecture");
+        assert_eq!(backlinks.len(), 1);
+        assert_eq!(backlinks[0], "Pqc_Enclave");
+    }
+
+    #[test]
+    fn test_sovereign_api_test_suite() {
+        let mut api = SovereignApiTestSuite::new();
+        api.add_request(ApiRequestSpec {
+            method: "GET".to_string(),
+            endpoint_url: "https://api.sigmaos.org/v1/status".to_string(),
+            headers: Vec::new(),
+            body_json: String::new(),
+        });
+
+        let (passed, failed) = api.execute_suite();
+        assert_eq!(passed, 1);
+        assert_eq!(failed, 0);
+    }
+
+    #[test]
     fn test_sovereign_partition_engine() {
-        let mut pe = SovereignPartitionEngine::new(100_000);
+        let mut pe = SovereignPartitionEngine::new(100_000); // 100,000 sectors
         let p1 = pe.create_partition(SovereignFsType::SigmaFs, 20_000, "root").unwrap();
         assert_eq!(p1, 1);
+
         assert!(pe.verify_alignment());
     }
 }
