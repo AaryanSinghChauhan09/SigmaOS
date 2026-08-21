@@ -19,4 +19,4 @@ jobs:
 
       - name: Test ISO Build Script
         run: |
-          bash scripts/sovereign_builder.py x86_64 || true
+          python3 scripts/sovereign_build_backend.py || true
