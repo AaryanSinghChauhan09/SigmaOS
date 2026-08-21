@@ -1,11 +1,11 @@
-// OOP-driven High-Performance Graphics Compositor for SigmaOS
-// Implements screen composition, double buffering, screen capturing, window animations, and transition effects.
+// Custom, OOP-driven High-Performance Graphics Compositor for SigmaOS
+// Implements screen composition, double buffering, and screen capturing
 
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-use std::sync::atomic::{AtomicBool, Ordering};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
 #[repr(C)]
@@ -94,8 +94,47 @@ impl Color {
     }
 }
 
+/// Surface trait (OOP interface)
+pub trait Surface {
+    /// Get surface size
+    fn size(&self) -> Size;
+    /// Get surface data
+    fn data(&self) -> &[u32];
+    /// Get mutable surface data
+    fn data_mut(&mut self) -> &mut [u32];
+    /// Clear surface with color
+    fn clear(&mut self, color: Color);
+    /// Fill rectangle with color
+    fn fill_rect(&mut self, rect: Rectangle, color: Color);
+    /// Get surface info
+    fn info(&self) -> SurfaceInfo;
+}
+
+/// Surface info
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SurfaceInfo {
+    pub width: u32,
+    pub height: u32,
+    pub stride: u32,
+    pub format: PixelFormat,
+    pub capability: SurfaceCapability,
+}
+
+impl SurfaceInfo {
+    pub fn new(width: u32, height: u32) -> Self {
+        SurfaceInfo {
+            width,
+            height,
+            stride: width * 4,
+            format: PixelFormat::RGBA32,
+            capability: SurfaceCapability::new(),
+        }
+    }
+}
+
 /// Pixel format
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PixelFormat {
     RGB24 = 0,
@@ -137,40 +176,7 @@ impl Default for SurfaceCapability {
     }
 }
 
-/// Surface info
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SurfaceInfo {
-    pub width: u32,
-    pub height: u32,
-    pub stride: u32,
-    pub format: PixelFormat,
-    pub capability: SurfaceCapability,
-}
-
-impl SurfaceInfo {
-    pub fn new(width: u32, height: u32) -> Self {
-        SurfaceInfo {
-            width,
-            height,
-            stride: width * 4,
-            format: PixelFormat::RGBA32,
-            capability: SurfaceCapability::new(),
-        }
-    }
-}
-
-/// Surface trait (OOP interface)
-pub trait Surface {
-    fn size(&self) -> Size;
-    fn data(&self) -> &[u32];
-    fn data_mut(&mut self) -> &mut [u32];
-    fn clear(&mut self, color: Color);
-    fn fill_rect(&mut self, rect: Rectangle, color: Color);
-    fn info(&self) -> SurfaceInfo;
-}
-
-/// Bitmap surface (Concrete surface class)
+/// Bitmap surface (OOP: Concrete surface class)
 pub struct BitmapSurface {
     pub id: usize,
     pub data: Vec<u32>,
@@ -239,6 +245,7 @@ impl Surface for BitmapSurface {
         let stride = self.stride as usize / 4;
         let limit_y = (rect.position.y + rect.size.height as i32).min(self.size.height as i32);
         let limit_x = (rect.position.x + rect.size.width as i32).min(self.size.width as i32);
+
         let data = self.data_mut();
 
         for y in rect.position.y.max(0) as usize..limit_y.max(0) as usize {
@@ -262,12 +269,60 @@ impl Surface for BitmapSurface {
     }
 }
 
-/// Window transition and switcher animation types
+/// Window transition and switcher animation types (macOS / Cinnamon inspired)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnimationType {
     Fade,
     Slide,
     Minimize,
+}
+
+/// Window trait (OOP interface)
+pub trait Window {
+    /// Get window ID
+    fn id(&self) -> usize;
+    /// Get window rectangle
+    fn rect(&self) -> Rectangle;
+    /// Set window position
+    fn set_position(&mut self, position: Position) -> Result<(), GraphicsError>;
+    /// Set window size
+    fn set_size(&mut self, size: Size) -> Result<(), GraphicsError>;
+    /// Get window surface
+    fn surface(&mut self) -> Option<&mut dyn Surface>;
+    /// Show window
+    fn show(&mut self);
+    /// Hide window
+    fn hide(&mut self);
+    /// Get window info
+    fn info(&self) -> WindowInfo;
+
+    // Custom window animations (Cinnamon/macOS inspired)
+    fn apply_transition(&mut self, anim: AnimationType, progress: f32);
+    fn get_opacity(&self) -> f32;
+    fn get_scale(&self) -> f32;
+}
+
+/// Window info
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WindowInfo {
+    pub id: usize,
+    pub title: [u8; 128],
+    pub visible: bool,
+    pub focused: bool,
+    pub capability: WindowCapability,
+}
+
+impl WindowInfo {
+    pub fn new(id: usize) -> Self {
+        WindowInfo {
+            id,
+            title: [0; 128],
+            visible: false,
+            focused: false,
+            capability: WindowCapability::new(),
+        }
+    }
 }
 
 /// Window capability
@@ -309,46 +364,7 @@ impl Default for WindowCapability {
     }
 }
 
-/// Window info
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct WindowInfo {
-    pub id: usize,
-    pub title: [u8; 128],
-    pub visible: bool,
-    pub focused: bool,
-    pub capability: WindowCapability,
-}
-
-impl WindowInfo {
-    pub fn new(id: usize) -> Self {
-        WindowInfo {
-            id,
-            title: [0; 128],
-            visible: false,
-            focused: false,
-            capability: WindowCapability::new(),
-        }
-    }
-}
-
-/// Window trait (OOP interface)
-pub trait Window {
-    fn id(&self) -> usize;
-    fn rect(&self) -> Rectangle;
-    fn set_position(&mut self, position: Position) -> Result<(), GraphicsError>;
-    fn set_size(&mut self, size: Size) -> Result<(), GraphicsError>;
-    fn surface(&mut self) -> Option<&mut dyn Surface>;
-    fn show(&mut self);
-    fn hide(&mut self);
-    fn info(&self) -> WindowInfo;
-
-    fn apply_transition(&mut self, anim: AnimationType, progress: f32);
-    fn get_opacity(&self) -> f32;
-    fn get_scale(&self) -> f32;
-}
-
-/// Simple window (Concrete window class)
+/// Simple window (OOP: Concrete window class)
 pub struct SimpleWindow {
     pub id: usize,
     pub rect: Rectangle,
@@ -357,8 +373,9 @@ pub struct SimpleWindow {
     pub focused: AtomicBool,
     pub capability: WindowCapability,
 
-    pub animation_opacity: f32,
-    pub animation_scale: f32,
+    // Animation properties
+    pub animation_opacity: f32, // 0.0 to 1.0
+    pub animation_scale: f32,   // 0.0 to 1.0
     pub current_animation: Option<AnimationType>,
 }
 
@@ -462,8 +479,30 @@ impl Window for SimpleWindow {
     }
 }
 
+/// Compositor trait (OOP interface)
+pub trait Compositor {
+    /// Add window
+    fn add_window(&mut self, window: Box<dyn Window>) -> Result<usize, GraphicsError>;
+    /// Remove window
+    fn remove_window(&mut self, id: usize) -> Result<(), GraphicsError>;
+    /// Get window
+    fn get_window(&mut self, id: usize) -> Option<&mut Box<dyn Window>>;
+    /// Bring window to front
+    fn bring_to_front(&mut self, id: usize) -> Result<(), GraphicsError>;
+    /// Send window to back
+    fn send_to_back(&mut self, id: usize) -> Result<(), GraphicsError>;
+    /// Compose frame to front buffer (supporting double buffering)
+    fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError>;
+    /// Get compositor statistics
+    fn stats(&self) -> CompositorStats;
+    /// Dynamic double buffering: Swap front and back display buffers
+    fn swap_buffers(&mut self) -> Result<(), GraphicsError>;
+    /// Captures a screenshot of the currently composed frame
+    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError>;
+}
+
 /// Graphics error types
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GraphicsError {
     Success = 0,
@@ -535,20 +574,7 @@ impl Default for CompositorCapability {
     }
 }
 
-/// Compositor trait (OOP interface)
-pub trait Compositor {
-    fn add_window(&mut self, window: Box<dyn Window>) -> Result<usize, GraphicsError>;
-    fn remove_window(&mut self, id: usize) -> Result<(), GraphicsError>;
-    fn get_window(&mut self, id: usize) -> Option<&mut Box<dyn Window>>;
-    fn bring_to_front(&mut self, id: usize) -> Result<(), GraphicsError>;
-    fn send_to_back(&mut self, id: usize) -> Result<(), GraphicsError>;
-    fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError>;
-    fn stats(&self) -> CompositorStats;
-    fn swap_buffers(&mut self) -> Result<(), GraphicsError>;
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError>;
-}
-
-/// Simple compositor (Concrete compositor class)
+/// Simple compositor (OOP: Concrete compositor class)
 pub struct SimpleCompositor {
     pub windows: Vec<Box<dyn Window>>,
     pub window_order: Vec<usize>,
@@ -634,75 +660,37 @@ impl Compositor for SimpleCompositor {
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError> {
         self.stats.frame_count += 1;
 
-        let use_double_buffering =
-            self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
+        let output_stride = output.info().stride as usize / 4;
 
-        if use_double_buffering {
-            let back = self.back_buffer.as_mut().unwrap();
-            back.clear(Color::rgb(0, 0, 0));
+        for &window_id in &self.window_order {
+            if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                if !window.info().visible {
+                    continue;
+                }
+                let window_rect = window.rect();
 
-            for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                    let window_rect = window.rect();
+                if let Some(surface) = window.surface() {
+                    let window_stride = surface.info().stride as usize / 4;
+                    let window_data = surface.data();
+                    let output_data = output.data_mut();
 
-                    if let Some(surface) = window.surface() {
-                        let window_stride = surface.info().stride as usize / 4;
-                        let window_data = surface.data();
+                    for y in 0..window_rect.size.height as usize {
+                        for x in 0..window_rect.size.width as usize {
+                            let output_x = (window_rect.position.x + x as i32) as usize;
+                            let output_y = (window_rect.position.y + y as i32) as usize;
 
-                        let back_stride = back.info().stride as usize / 4;
-                        let back_data = back.data_mut();
+                            let output_index = output_y * output_stride + output_x;
+                            let window_index = y * window_stride + x;
 
-                        for y in 0..window_rect.size.height as usize {
-                            for x in 0..window_rect.size.width as usize {
-                                let output_x = (window_rect.position.x + x as i32) as usize;
-                                let output_y = (window_rect.position.y + y as i32) as usize;
-
-                                let output_index = output_y * back_stride + output_x;
-                                let window_index = y * window_stride + x;
-
-                                if output_index < back_data.len()
-                                    && window_index < window_data.len()
-                                {
-                                    back_data[output_index] = window_data[window_index];
-                                }
+                            if output_index < output_data.len()
+                                && window_index < window_data.len()
+                            {
+                                output_data[output_index] = window_data[window_index];
                             }
                         }
                     }
                 }
             }
-        } else {
-            for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                    let window_rect = window.rect();
-                    let output_stride = output.info().stride as usize / 4;
-
-                    if let Some(surface) = window.surface() {
-                        let window_stride = surface.info().stride as usize / 4;
-                        let window_data = surface.data();
-                        let output_data = output.data_mut();
-
-                        for y in 0..window_rect.size.height as usize {
-                            for x in 0..window_rect.size.width as usize {
-                                let output_x = (window_rect.position.x + x as i32) as usize;
-                                let output_y = (window_rect.position.y + y as i32) as usize;
-
-                                let output_index = output_y * output_stride + output_x;
-                                let window_index = y * window_stride + x;
-
-                                if output_index < output_data.len()
-                                    && window_index < window_data.len()
-                                {
-                                    output_data[output_index] = window_data[window_index];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if self.double_buffering.load(Ordering::SeqCst) {
-            self.swap_buffers()?;
         }
 
         Ok(())
@@ -721,7 +709,7 @@ impl Compositor for SimpleCompositor {
     }
 
     fn stats(&self) -> CompositorStats {
-        let mut stats = self.stats.clone();
+        let mut stats = self.stats;
         stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
         stats
     }
@@ -730,14 +718,6 @@ impl Compositor for SimpleCompositor {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_compositor_flow() {
-        let mut comp = SimpleCompositor::new(CompositorCapability::full());
-        let window = SimpleWindow::new(1, Rectangle::new(0, 0, 10, 10), WindowCapability::full());
-        comp.add_window(Box::new(window)).unwrap();
-        assert_eq!(comp.stats().total_windows, 1);
-    }
 
     #[test]
     fn test_window_minimization_and_fade_animations() {
@@ -750,5 +730,13 @@ mod tests {
         window.apply_transition(AnimationType::Minimize, 0.5f32);
         assert_eq!(window.get_scale(), 0.75f32);
         assert_eq!(window.get_opacity(), 0.5f32);
+    }
+
+    #[test]
+    fn test_compositor_flow() {
+        let mut comp = SimpleCompositor::new(CompositorCapability::full());
+        let window = SimpleWindow::new(1, Rectangle::new(0, 0, 10, 10), WindowCapability::full());
+        comp.add_window(Box::new(window)).unwrap();
+        assert_eq!(comp.stats().total_windows, 1);
     }
 }

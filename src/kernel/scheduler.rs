@@ -13,59 +13,6 @@ pub enum Priority {
     Realtime = 4,
 }
 
-impl PartialEq for Task {
-    fn eq(&self, other: &Self) -> bool {
-        self.vruntime == other.vruntime
-    }
-}
-
-/// Process state
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProcessState {
-    Running,
-    Ready,
-    Blocked,
-    Terminated,
-}
-
-/// Process control block
-#[derive(Debug, Clone)]
-pub struct Process {
-    pub pid: u64,
-    pub name: String,
-    pub priority: Priority,
-    pub state: ProcessState,
-    pub runtime: Duration,
-    pub virtual_deadline: u64,
-    pub time_slice: Duration,
-}
-
-impl Process {
-    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
-        Self {
-            pid,
-            name,
-            priority,
-            state: ProcessState::Ready,
-            runtime: Duration::from_secs(0),
-            virtual_deadline: 0,
-            time_slice: Duration::from_millis(10),
-        }
-    }
-
-    pub fn update_virtual_deadline(&mut self, current_time: u64) {
-        // EEVDF virtual deadline calculation
-        let weight = match self.priority {
-            Priority::Idle => 1024,
-            Priority::Low => 512,
-            Priority::Normal => 256,
-            Priority::High => 128,
-            Priority::Realtime => 64,
-        };
-        self.virtual_deadline = current_time + (1000 / weight);
-    }
-}
-
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
@@ -88,6 +35,38 @@ pub struct Process {
     pub virtual_runtime: u64,  // EEVDF vruntime (ticks)
     pub virtual_deadline: u64, // EEVDF virtual deadline
     pub time_slice: Duration,
+}
+
+impl Process {
+    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
+        Self {
+            pid,
+            name,
+            priority,
+            state: ProcessState::Ready,
+            runtime: Duration::from_secs(0),
+            virtual_runtime: 0,
+            virtual_deadline: 0,
+            time_slice: Duration::from_millis(10),
+        }
+    }
+
+    pub fn get_weight(&self) -> u64 {
+        match self.priority {
+            Priority::Idle => 1,
+            Priority::Low => 2,
+            Priority::Normal => 4,
+            Priority::High => 8,
+            Priority::Realtime => 16,
+        }
+    }
+
+    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
+        let weight = self.get_weight();
+        // deadline = vruntime + (q / w) where q is time slice equivalent ticks (10)
+        let q = 10;
+        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -130,99 +109,6 @@ impl WorkStealingQueue {
     }
 }
 
-impl Process {
-    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
-        Self {
-            pid,
-            name,
-            priority,
-            state: ProcessState::Ready,
-            runtime: Duration::from_secs(0),
-            virtual_runtime: 0,
-            virtual_deadline: 0,
-            time_slice: Duration::from_millis(10),
-        }
-    }
-
-    pub fn get_weight(&self) -> u64 {
-        match self.priority {
-            Priority::Idle => 1,
-            Priority::Low => 2,
-            Priority::Normal => 4,
-            Priority::High => 8,
-            Priority::Realtime => 16,
-        }
-    }
-
-    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
-        let weight = self.get_weight();
-        // deadline = vruntime + (q / w) where q is time slice slice equivalent ticks (10)
-        let q = 10;
-        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
-    }
-}
-
-impl Eq for Task {}
-
-impl PartialOrd for Task {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Task {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.vruntime.cmp(&other.vruntime)
-    }
-}
-
-pub struct CfsScheduler {
-    tasks: [Option<Task>; 64],
-    task_count: usize,
-    current_time: u64,
-}
-
-impl CfsScheduler {
-    pub const fn new() -> Self {
-        CfsScheduler {
-            tasks: [None; 64],
-            task_count: 0,
-            current_time: 0,
-        }
-    }
-
-    pub fn add_task(&mut self, task: Task) {
-        if self.task_count < 64 {
-            self.tasks[self.task_count] = Some(task);
-            self.task_count += 1;
-            self.sort_tasks();
-        }
-    }
-
-    pub fn pick_next_task(&mut self) -> Option<Task> {
-        if self.task_count > 0 {
-            let task = self.tasks[0].take();
-            self.tasks[0] = self.tasks[self.task_count - 1];
-            self.tasks[self.task_count - 1] = None;
-            self.task_count -= 1;
-            self.sort_tasks();
-            task
-        } else {
-            None
-        }
-    }
-
-    fn sort_tasks(&mut self) {
-        for i in 1..self.task_count {
-            let mut j = i;
-            while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
-                self.tasks.swap(j - 1, j);
-                j -= 1;
-            }
-        }
-    }
-}
-
 /// EEVDF Scheduler Engine
 pub struct Scheduler {
     pub processes: Vec<Process>,
@@ -244,12 +130,14 @@ impl Scheduler {
     }
 
     pub fn add_process(&mut self, mut process: Process) {
+        // Set initial vruntime to system virtual time to prevent newly spawned process from hogging CPU
         process.virtual_runtime = self.system_vtime;
         process.update_virtual_deadline(self.system_vtime);
         self.processes.push(process);
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
+        // 1. Filter ready processes
         let mut ready_indices = Vec::new();
         for (idx, p) in self.processes.iter().enumerate() {
             if p.state == ProcessState::Ready {
@@ -261,6 +149,7 @@ impl Scheduler {
             return None;
         }
 
+        // 2. Identify eligible processes (virtual_runtime <= system_vtime)
         let mut eligible_indices = Vec::new();
         for &idx in &ready_indices {
             let p = &self.processes[idx];
@@ -269,6 +158,10 @@ impl Scheduler {
             }
         }
 
+        // 3. Selection rules:
+        // - Standard EEVDF: pick the eligible process with the EARLIEST virtual deadline
+        // - Starvation Prevention: if no processes are currently eligible (e.g. system_vtime is lagging),
+        //   fallback to selecting the process with the minimum virtual_runtime
         let selected_idx = if !eligible_indices.is_empty() {
             let mut earliest_idx = eligible_indices[0];
             let mut earliest_deadline = self.processes[earliest_idx].virtual_deadline;
@@ -301,6 +194,7 @@ impl Scheduler {
     pub fn tick(&mut self) {
         self.current_time += 1;
 
+        // Advance system virtual time (V) based on active threads vruntime progress
         let mut active_count = 0;
         let mut total_vruntime = 0;
 
@@ -313,12 +207,15 @@ impl Scheduler {
 
         if active_count > 0 {
             let avg_vtime = total_vruntime / active_count;
+            // System virtual time advances gracefully
             self.system_vtime = self.system_vtime.max(avg_vtime);
         }
         self.system_vtime += 1;
     }
 
     pub fn execute_process_ticks(&mut self, pid: u64, ticks_executed: u64) {
+        // Simulates thread execution and updates its vruntime based on priority weight:
+        // vruntime_delta = executed_ticks / weight
         if let Some(p) = self.processes.iter_mut().find(|p| p.pid == pid) {
             let weight = p.get_weight();
             let delta = (ticks_executed / weight).max(1);
@@ -351,55 +248,6 @@ impl Default for Scheduler {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_scheduler_creation() {
-        let scheduler = Scheduler::new();
-        assert!(scheduler.processes.is_empty());
-    }
-
-    #[test]
-    fn test_add_process() {
-        let mut scheduler = Scheduler::new();
-        let process = Process::new(1, "test".to_string(), Priority::Normal);
-        scheduler.add_process(process);
-        assert_eq!(scheduler.processes.len(), 1);
-    }
-
-    #[test]
-    fn test_schedule() {
-        let mut scheduler = Scheduler::new();
-        let process = Process::new(1, "test".to_string(), Priority::Normal);
-        scheduler.add_process(process);
-
-        for _ in 0..5 {
-            scheduler.tick();
-        }
-
-        let scheduled = scheduler.schedule();
-        assert!(scheduled.is_some());
-    }
-
-    #[test]
-    fn test_priority_ordering() {
-        let p1 = Priority::Low;
-        let p2 = Priority::High;
-        assert!(p2 > p1);
-    }
-
-    pub fn remove_process(&mut self, pid: u64) {
-        self.processes.retain(|p| p.pid != pid);
-    }
-}
-
-impl Default for Scheduler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
 
     #[test]
     fn test_scheduler_creation() {
