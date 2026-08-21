@@ -4,9 +4,10 @@
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub type AgentID = u64;
+pub type AgentID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
