@@ -46,6 +46,7 @@ pub struct Task {
     pub state: TaskState,
     pub virtual_deadline: u64,
     pub execution_time: u64,
+    pub expected_service_time: u64, // Linux EEVDF service expectation
     pub compute_unit: Option<ComputeUnit>,
     pub priority: u8,
 }
@@ -57,6 +58,7 @@ impl Task {
             state: TaskState::Ready,
             virtual_deadline,
             execution_time: 0,
+            expected_service_time: 0,
             compute_unit: None,
             priority,
         }
@@ -66,8 +68,13 @@ impl Task {
         self.compute_unit = Some(unit);
     }
 
+    /// Calculate task lag: positive if task received less service than expected
+    pub fn calculate_lag(&self) -> i64 {
+        self.expected_service_time as i64 - self.execution_time as i64
+    }
+
     pub fn is_eligible(&self, current_time: u64) -> bool {
-        self.state == TaskState::Ready && self.virtual_deadline >= current_time
+        self.state == TaskState::Ready && (self.virtual_deadline >= current_time || self.calculate_lag() >= 0)
     }
 }
 
@@ -357,9 +364,15 @@ mod tests {
 
     #[test]
     fn test_task_eligibility() {
-        let task = Task::new(1, 100, 1);
+        let mut task = Task::new(1, 100, 1);
         assert!(task.is_eligible(50));
+
+        task.execution_time = 120;
+        task.expected_service_time = 100; // lag = -20
         assert!(!task.is_eligible(150));
+
+        task.expected_service_time = 130; // lag = +10
+        assert!(task.is_eligible(150));
     }
 
     #[test]
