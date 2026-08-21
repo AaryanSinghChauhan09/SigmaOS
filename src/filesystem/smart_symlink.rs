@@ -257,13 +257,13 @@ pub enum SymlinkError {
     InvalidPath = 4,
 }
 
-pub struct SmartSymlink {
+pub struct DynamicSmartSymlink {
     pub target_pattern: String, // e.g. "/home/$USER/.config" or "../etc/shadow"
 }
 
-impl SmartSymlink {
+impl DynamicSmartSymlink {
     pub fn new(target: &str) -> Self {
-        SmartSymlink {
+        DynamicSmartSymlink {
             target_pattern: target.to_string(),
         }
     }
@@ -282,7 +282,7 @@ impl SmartSymlink {
         lang_context: &str,
         sandbox_root: &str,
         mut current_depth: u32,
-        active_symlinks_map: &HashMap<String, SmartSymlink>,
+        active_symlinks_map: &HashMap<String, DynamicSmartSymlink>,
         mut visited_paths: Vec<String>,
     ) -> Result<String, SymlinkError> {
         // Enforce max recursion depth limits (Linux standard limits to 40 traversals)

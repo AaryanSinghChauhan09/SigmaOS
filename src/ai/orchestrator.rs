@@ -2,11 +2,12 @@
 // Dynamically schedules models, checks device bounds, and prunes context windows.
 
 extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub type AgentID = u64;
+pub type AgentID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -69,6 +70,23 @@ impl SimpleAIAgent {
             name: name.to_string(),
             state: AgentState::Idle,
         }
+    }
+}
+
+impl AIAgent for SimpleAIAgent {
+    fn id(&self) -> AgentID { self.id }
+    fn name(&self) -> &str { &self.name }
+    fn state(&self) -> AgentState { self.state }
+
+    fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
+        self.state = AgentState::Busy;
+        let mut result = Vec::new();
+        for &byte in self.name.as_bytes() { result.push(byte); }
+        result.push(b':');
+        result.push(b' ');
+        for &byte in task { result.push(byte); }
+        self.state = AgentState::Idle;
+        Ok(result)
     }
 }
 
@@ -162,10 +180,63 @@ impl LocalLlmOrchestrator {
     }
 }
 
-pub trait TaskQueue {
-    fn enqueue(&mut self, task: &[u8], priority: u8);
-    fn dequeue(&mut self) -> Option<[u8; 256]>;
-    fn size(&self) -> usize;
+pub trait AgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
+    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
+    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
+    fn list_agents(&self) -> Vec<AgentID>;
+}
+
+pub struct SimpleAgentOrchestrator {
+    pub agents: Vec<Box<dyn AIAgent>>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleAgentOrchestrator {
+    pub fn new() -> Self {
+        SimpleAgentOrchestrator {
+            agents: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AgentOrchestrator for SimpleAgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
+        let id = agent.id();
+        self.agents.push(agent);
+        Ok(id)
+    }
+
+    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
+        if let Some(target_id) = agent_id {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+            }
+        } else {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+            }
+        }
+    }
+
+    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
+        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
+    }
+
+    fn list_agents(&self) -> Vec<AgentID> {
+        self.agents.iter().map(|a| a.id()).collect()
+    }
 }
 
 pub struct ContextWindowPruner {
@@ -192,6 +263,58 @@ impl ContextWindowPruner {
         while self.history.len() > self.max_lines {
             self.history.remove(0);
         }
+    }
+}
+
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn size(&self) -> usize;
+}
+
+pub struct SimpleTaskQueue {
+    pub tasks: Vec<([u8; 256], u8)>,
+}
+
+impl SimpleTaskQueue {
+    pub fn new() -> Self {
+        SimpleTaskQueue { tasks: Vec::new() }
+    }
+}
+
+impl Default for SimpleTaskQueue {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl TaskQueue for SimpleTaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8) {
+        let mut task_array = [0u8; 256];
+        let task_len = task.len().min(255);
+        task_array[..task_len].copy_from_slice(&task[..task_len]);
+        self.tasks.push((task_array, priority));
+    }
+
+    fn dequeue(&mut self) -> Option<[u8; 256]> {
+        if self.tasks.is_empty() {
+            return None;
+        }
+        let mut highest_idx = 0;
+        let mut highest_priority = 0;
+
+        for (i, (_, priority)) in self.tasks.iter().enumerate() {
+            if *priority > highest_priority {
+                highest_priority = *priority;
+                highest_idx = i;
+            }
+        }
+
+        Some(self.tasks.remove(highest_idx).0)
+    }
+
+    fn size(&self) -> usize {
+        self.tasks.len()
     }
 }
 
@@ -232,5 +355,23 @@ mod tests {
         let mut turn_first = [0u8; 14];
         turn_first.copy_from_slice(&pruner.history[0][..14]);
         assert_eq!(&turn_first, b"Context turn 2");
+    }
+
+    #[test]
+    fn test_orchestrator_and_queue() {
+        let mut orchestrator = SimpleAgentOrchestrator::new();
+        let agent = SimpleAIAgent::new(1, "TaskAgent");
+        orchestrator.register_agent(Box::new(agent)).unwrap();
+
+        let response = orchestrator.dispatch_task(b"RELOAD_CORES", Some(1)).unwrap();
+        assert_eq!(std::str::from_utf8(&response).unwrap(), "TaskAgent: RELOAD_CORES");
+
+        let mut queue = SimpleTaskQueue::new();
+        queue.enqueue(b"TASK_PRIO_HIGH", 10);
+        queue.enqueue(b"TASK_PRIO_LOW", 1);
+        assert_eq!(queue.size(), 2);
+
+        let task = queue.dequeue().unwrap();
+        assert_eq!(std::str::from_utf8(&task[..14]).unwrap(), "TASK_PRIO_HIGH");
     }
 }

@@ -1,17 +1,16 @@
-#![no_std]
-#![no_main]
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-use core::mem;
+
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 63: Secrets management
+
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
+use core::mem;
 
 /// Secret ID
 pub type SecretID = usize;
@@ -117,12 +116,7 @@ pub struct SimpleSecret {
 }
 
 impl SimpleSecret {
-    pub fn new(
-        id: SecretID,
-        name: &[u8],
-        secret_type: SecretType,
-        capability: SecretCapability,
-    ) -> Self {
+    pub fn new(id: SecretID, name: &[u8], secret_type: SecretType, capability: SecretCapability) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -352,13 +346,10 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        for i in 0..self.secrets.len() {
-            unsafe {
-                let slot = &mut *self.secrets.data.add(i);
-                if let Some(ref mut secret) = *slot {
-                    if secret.id() == id {
-                        return Some(secret);
-                    }
+        for slot in self.secrets.iter_mut() {
+            if let Some(ref mut secret) = slot {
+                if secret.id() == id {
+                    return Some(secret);
                 }
             }
         }
@@ -404,10 +395,11 @@ mod tests {
         let mut keyring = SimpleKeyring::new(cap);
         let secret_cap = SecretCapability::full();
         let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.store_secret(Box::new(secret)).unwrap();
+        let id = keyring.add_secret(Box::new(secret)).unwrap();
         assert_eq!(id, 1);
 
         let retrieved = keyring.get_secret(1).unwrap();
         assert_eq!(retrieved.name(), b"TestSecret");
     }
 }
+

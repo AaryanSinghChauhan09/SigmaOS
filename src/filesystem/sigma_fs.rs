@@ -309,6 +309,7 @@ impl SigmaFhsRouter {
                 return format!("{}/{}", routed_dir, filename);
             }
         }
+        format!("/usr/share/{}", filename)
     }
 }
 

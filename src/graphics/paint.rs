@@ -1,10 +1,6 @@
 // SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)
 // Designed for high-performance raster image canvas and layer filtering
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
-
 /// Image processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PhotoError {
@@ -200,7 +196,6 @@ impl ImageFilter for GrayscaleConversionFilter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
 
     #[test]
     fn test_raster_layer_creation() {
@@ -220,3 +215,4 @@ mod tests {
         assert_eq!(p.g, p.b);
     }
 }
+// SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)

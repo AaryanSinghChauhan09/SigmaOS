@@ -1,5 +1,8 @@
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
+
+/// OOP-based UEFI Bootloader for SigmaOS
+/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 /// Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
 /// Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
 
@@ -10,7 +13,6 @@ use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type BootStatus = usize;
 
-/// Standard UEFI Boot Phases
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootPhase {
@@ -79,12 +81,6 @@ impl SimpleUEFIBootloader {
             kernel_loaded: AtomicU32::new(0),
             secure_boot_active: true,
         }
-    }
-}
-
-impl Default for SimpleUEFIBootloader {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -160,12 +156,6 @@ impl SimpleSecureBoot {
         SimpleSecureBoot {
             bootloader: SimpleUEFIBootloader::new(),
         }
-    }
-}
-
-impl Default for SimpleSecureBoot {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
