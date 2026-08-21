@@ -57,17 +57,8 @@
  *  KRN  Kernel-level panics (self-healing)
  * ------------------------------------------------------------------------- */
 
-/* Driver codes */
-#define ZEN_DRV_GPU_INIT_FAILED       0xD001
-#define ZEN_DRV_GPU_FALLBACK_VGA      0xD002
-#define ZEN_DRV_RECIPE_SIG_INVALID    0xD003
-#define ZEN_DRV_RELOAD_FAIL           0xD004
-#define ZEN_DRV_CRASH                 0xD005
-#define ZEN_DRV_GPU_FIRMWARE_MISSING  0xD006
-#define ZEN_DRV_NET_LINK_DOWN         0xD007
-#define ZEN_DRV_NET_FIRMWARE_MISSING  0xD008
-#define ZEN_DRV_AUDIO_CODEC_NOT_FOUND 0xD009
-#define ZEN_DRV_REGISTRY_FETCH_FAILED 0xD00A
+/* Driver codes are defined in "sigma_driver_codes.h" */
+#include "sigma_driver_codes.h"
 
 /* 1xx: Container Errors */
 #define ZEN_101_CONTAINER_RUNTIME_FAILED  101
