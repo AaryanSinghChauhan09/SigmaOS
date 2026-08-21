@@ -13,10 +13,6 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
-pub mod boot_init;
-pub mod dde;
-pub mod flipper_gpio_sensor;
-pub mod intel_e1000;
 
 pub use gpu::{
     GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,

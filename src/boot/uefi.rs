@@ -123,7 +123,25 @@ impl SecureBoot for SimpleSecureBoot {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct AcpiParser;
+pub struct GopFramebuffer;
+pub struct GopSplashCanvas;
+pub struct MicrokernelProfile;
+pub struct MultiKernelBootSelector;
+pub struct SovereignBootWatchdog;
+pub struct UsbHostController;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_uefi_load_kernel_raw() {
+        let mut bootloader = SimpleUEFIBootloader::new();
+        assert_eq!(bootloader.phase(), BootPhase::Init);
+
+        let kernel_src = [0x7F, 0x45, 0x4C, 0x46, 0x01, 0x02, 0x03]; // ELF signature
+        let mut kernel_dst = [0u8; 7];
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }

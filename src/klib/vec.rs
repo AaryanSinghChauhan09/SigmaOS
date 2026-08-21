@@ -113,7 +113,20 @@ impl<T> SigmaVec<T> {
                 return true;
             }
         }
-        false
+    }
+
+    pub fn remove(&mut self, index: usize) -> T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
     }
 
     pub fn insert(&mut self, index: usize, item: T) {

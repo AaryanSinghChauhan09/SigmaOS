@@ -140,15 +140,152 @@ impl Driver for SimpleStorageDriver {
     }
 }
 
+impl StorageDriver for SimpleStorageDriver {
+    fn read_blocks(&mut self, _block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError> {
+        if self.state() != DriverState::Active {
+            return Err(DriverError::LoadFailed);
+        }
+        for byte in buf.iter_mut() {
+            *byte = 0xAA;
+        }
+        Ok(buf.len())
+    }
+    fn write_blocks(&mut self, _block_idx: u64, buf: &[u8]) -> Result<usize, DriverError> {
+        if self.state() != DriverState::Active {
+            return Err(DriverError::LoadFailed);
+        }
+        Ok(buf.len())
+    }
+}
+
+pub struct SimpleNetworkDriver {
+    pub id: DriverID,
+    pub state: AtomicUsize,
+    pub deps: &'static [DriverType],
+}
+
+impl SimpleNetworkDriver {
+    pub fn new(id: DriverID, deps: &'static [DriverType]) -> Self {
+        Self {
+            id,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+            deps,
+        }
+    }
+}
+
+impl Driver for SimpleNetworkDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        DriverType::Network
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Active);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Unloaded);
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        self.deps
+    }
+}
+
+impl NetworkDriver for SimpleNetworkDriver {
+    fn send_packet(&mut self, _packet: &[u8]) -> Result<(), DriverError> {
+        if self.state() != DriverState::Active {
+            return Err(DriverError::LoadFailed);
+        }
+        Ok(())
+    }
+    fn receive_packet(&mut self, buf: &mut [u8]) -> Result<usize, DriverError> {
+        if self.state() != DriverState::Active {
+            return Err(DriverError::LoadFailed);
+        }
+        if !buf.is_empty() {
+            buf[0] = 0xFF;
+            Ok(1)
+        } else {
+            Ok(0)
+        }
+    }
+}
+
+// Hardware Abstraction (Bus Abstraction Classes)
+
+pub trait Bus {
+    fn name(&self) -> &'static str;
+    fn discover_devices(&self) -> Vec<u32>;
+}
+
+pub struct PciBus;
+impl Bus for PciBus {
+    fn name(&self) -> &'static str {
+        "PCI Bus"
+    }
+    fn discover_devices(&self) -> Vec<u32> {
+        let mut dev = Vec::new();
+        dev.push(0x10DE); // Simulated GPU Vendor ID
+        dev.push(0x1AF4); // Simulated VirtIO Storage
+        dev
+    }
+}
+
+pub struct UsbBus;
+impl Bus for UsbBus {
+    fn name(&self) -> &'static str {
+        "USB Bus"
+    }
+    fn discover_devices(&self) -> Vec<u32> {
+        let mut dev = Vec::new();
+        dev.push(0x046D); // Simulated Logitech Mouse
+        dev
+    }
+}
+
+// Factory Pattern (Dynamic Driver Factory Instantiation)
+
+pub struct DriverFactory;
+
+impl DriverFactory {
+    pub fn create_driver_box(id: DriverID, driver_type: DriverType) -> std::boxed::Box<dyn Driver> {
+        match driver_type {
+            DriverType::Storage => std::boxed::Box::new(SimpleStorageDriver::new(id)),
+            DriverType::Network => std::boxed::Box::new(SimpleNetworkDriver::new(id, &[])),
+            _ => std::boxed::Box::new(SimpleStorageDriver::new(id)), // Fallback
+        }
+    }
+}
+
+// Core OOP Driver Framework with Dependency Resolution & Hot-Swapping
+
 pub trait DriverFramework {
-    fn register_driver(&mut self, driver: Box<dyn Driver>) -> Result<DriverID, DriverError>;
+    fn register_driver(&mut self, driver: std::boxed::Box<dyn Driver>) -> Result<DriverID, DriverError>;
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
 }
 
 pub struct SimpleDriverFramework {
-    drivers: Vec<Option<Box<dyn Driver>>>,
+    drivers: Vec<Option<std::boxed::Box<dyn Driver>>>,
     next_id: AtomicUsize,
 }
 
@@ -162,7 +299,7 @@ impl SimpleDriverFramework {
 }
 
 impl DriverFramework for SimpleDriverFramework {
-    fn register_driver(&mut self, driver: Box<dyn Driver>) -> Result<DriverID, DriverError> {
+    fn register_driver(&mut self, driver: std::boxed::Box<dyn Driver>) -> Result<DriverID, DriverError> {
         let id = driver.id();
         self.drivers.push(Some(driver));
         Ok(id)
@@ -364,7 +501,24 @@ mod tests {
         let mut framework = SimpleDriverFramework::new();
         let driver = Box::new(SimpleStorageDriver::new(100));
 
-        assert!(framework.register_driver(driver).is_ok());
+        // Declare a network driver that relies on Storage being Active
+        let static_deps: &'static [DriverType] = &[DriverType::Storage];
+        let network_dep = std::boxed::Box::new(SimpleNetworkDriver::new(100, static_deps));
+        let storage = std::boxed::Box::new(SimpleStorageDriver::new(200));
+
+        assert!(framework.register_driver(network_dep).is_ok());
+        assert!(framework.register_driver(storage).is_ok());
+
+        // Try to load network_dep -> should fail since Storage isn't loaded/Active
+        assert_eq!(
+            framework.load_driver(100),
+            Err(DriverError::DependencyMissing)
+        );
+
+        // Load storage first
+        assert!(framework.load_driver(200).is_ok());
+
+        // Now load network_dep -> should succeed as dependencies are satisfied
         assert!(framework.load_driver(100).is_ok());
 
         let loaded = framework.get_driver(100).unwrap();
