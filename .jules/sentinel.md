@@ -43,3 +43,8 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 ## 2026-08-10 - Multi-Stage PAM Authentication and BSD Securelevels
 **Learning:** Single-factor authentication or static permission checks leave systems vulnerable to brute-force attacks and root level modifications. Implementing Linux-style Pluggable Authentication Modules (PAM) with account lockouts (`pam_tally2`) and pwquality password rules alongside BSD monotonically non-decreasing Securelevels creates a hardened defense-in-depth framework.
 **Action:** Enforce multi-stage PAM authentication for user access and gate critical network/storage operations behind BSD Securelevels and capability bitmasks.
+
+## 2026-08-20 - CRLF Sanitization in Structured Log Attributes
+**Vulnerability:** Permitting unescaped carriage returns (`\r`) or line feeds (`\n`) in key-value attributes passed to structured syslog entries allows malicious log entries to split log frames and inject spoofed syslog headers or fake log entries.
+**Learning:** Unsanitized newlines in log fields break message framing in line-oriented log sinks like rsyslog and systemd-journald.
+**Prevention:** Explicitly strip or escape CRLF characters (`\r`, `\n`) from dynamic key and value attributes before adding them to log structures.

@@ -7,7 +7,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub type AgentID = u64;
+pub type AgentID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,10 +18,22 @@ pub enum DeviceTarget {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AgentState { Idle = 0, Active = 1, Busy = 2, Error = 3, Learning = 4 }
+pub enum AgentState {
+    Idle = 0,
+    Active = 1,
+    Busy = 2,
+    Error = 3,
+    Learning = 4,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AgentError { Success = 0, NotFound = 1, ExecutionFailed = 2, Timeout = 3, InvalidInput = 4 }
+pub enum AgentError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    Timeout = 3,
+    InvalidInput = 4,
+}
 
 pub trait AIAgent {
     fn id(&self) -> AgentID;
@@ -74,17 +86,27 @@ impl SimpleAIAgent {
 }
 
 impl AIAgent for SimpleAIAgent {
-    fn id(&self) -> AgentID { self.id }
-    fn name(&self) -> &str { &self.name }
-    fn state(&self) -> AgentState { self.state }
+    fn id(&self) -> AgentID {
+        self.id
+    }
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn state(&self) -> AgentState {
+        self.state
+    }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
         self.state = AgentState::Busy;
         let mut result = Vec::new();
-        for &byte in self.name.as_bytes() { result.push(byte); }
+        for &byte in self.name.as_bytes() {
+            result.push(byte);
+        }
         result.push(b':');
         result.push(b' ');
-        for &byte in task { result.push(byte); }
+        for &byte in task {
+            result.push(byte);
+        }
         self.state = AgentState::Idle;
         Ok(result)
     }
@@ -180,36 +202,13 @@ impl LocalLlmOrchestrator {
     }
 }
 
-pub struct ContextWindowPruner {
-    pub history: Vec<[u8; 128]>,
-    pub max_lines: usize,
-}
-
-impl ContextWindowPruner {
-    pub fn new(max_lines: usize) -> Self {
-        ContextWindowPruner {
-            history: Vec::new(),
-            max_lines,
-        }
-    }
-
-    /// Add a dialogue turn context string and prune old turns once exceeding limit (FIFO)
-    pub fn append_context(&mut self, text: &[u8]) {
-        let mut entry = [0u8; 128];
-        let len = text.len().min(127);
-        entry[..len].copy_from_slice(&text[..len]);
-
-        self.history.push(entry);
-
-        while self.history.len() > self.max_lines {
-            self.history.remove(0);
-        }
-    }
-}
-
 pub trait AgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError>;
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
     fn list_agents(&self) -> Vec<AgentID>;
 }
@@ -241,17 +240,23 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         Ok(id)
     }
 
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError> {
         if let Some(target_id) = agent_id {
             if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
                 agent.execute(task)
             } else {
                 Err(AgentError::NotFound)
             }
-        } else if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
-            agent.execute(task)
         } else {
-            Err(AgentError::NotFound)
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+            }
         }
     }
 
@@ -268,6 +273,33 @@ pub trait TaskQueue {
     fn enqueue(&mut self, task: &[u8], priority: u8);
     fn dequeue(&mut self) -> Option<[u8; 256]>;
     fn size(&self) -> usize;
+}
+
+pub struct ContextWindowPruner {
+    pub history: Vec<[u8; 128]>,
+    pub max_lines: usize,
+}
+
+impl ContextWindowPruner {
+    pub fn new(max_lines: usize) -> Self {
+        ContextWindowPruner {
+            history: Vec::new(),
+            max_lines,
+        }
+    }
+
+    /// Add a dialogue turn context string and prune old turns once exceeding limit (FIFO)
+    pub fn append_context(&mut self, text: &[u8]) {
+        let mut entry = [0u8; 128];
+        let len = text.len().min(127);
+        entry[..len].copy_from_slice(&text[..len]);
+
+        self.history.push(entry);
+
+        while self.history.len() > self.max_lines {
+            self.history.remove(0);
+        }
+    }
 }
 
 pub struct SimpleTaskQueue {
@@ -362,7 +394,10 @@ mod tests {
         orchestrator.register_agent(Box::new(agent)).unwrap();
 
         let response = orchestrator.dispatch_task(b"RELOAD_CORES", Some(1)).unwrap();
-        assert_eq!(core::str::from_utf8(&response).unwrap(), "TaskAgent: RELOAD_CORES");
+        assert_eq!(
+            core::str::from_utf8(&response).unwrap(),
+            "TaskAgent: RELOAD_CORES"
+        );
 
         let mut queue = SimpleTaskQueue::new();
         queue.enqueue(b"TASK_PRIO_HIGH", 10);
@@ -370,6 +405,9 @@ mod tests {
         assert_eq!(queue.size(), 2);
 
         let task = queue.dequeue().unwrap();
-        assert_eq!(core::str::from_utf8(&task[..14]).unwrap(), "TASK_PRIO_HIGH");
+        assert_eq!(
+            core::str::from_utf8(&task[..14]).unwrap(),
+            "TASK_PRIO_HIGH"
+        );
     }
 }

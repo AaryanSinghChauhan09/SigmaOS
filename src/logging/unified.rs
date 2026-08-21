@@ -120,8 +120,11 @@ pub struct UnifiedLogEntry {
     pub facility: SyslogFacility,
     pub pid: u32,
     pub component: [u8; 64],
+    pub component_len: u8, // Cached byte length for O(1) slice access without O(N) linear scanning
     pub message: [u8; 512],
+    pub message_len: u16,  // Cached byte length for O(1) slice access without O(N) linear scanning
     pub module: [u8; 128],
+    pub module_len: u8,    // Cached byte length for O(1) slice access without O(N) linear scanning
     pub line: u32,
     pub fields: Vec<LogField>,
 }
@@ -138,13 +141,13 @@ impl UnifiedLogEntry {
         let mut message_array = [0u8; 512];
         let mut module_array = [0u8; 128];
 
-        let component_len = component.len().min(63);
-        let message_len = message.len().min(511);
-        let module_len = module.len().min(127);
+        let component_len = component.len().min(63) as u8;
+        let message_len = message.len().min(511) as u16;
+        let module_len = module.len().min(127) as u8;
 
-        component_array[..component_len].copy_from_slice(&component[..component_len]);
-        message_array[..message_len].copy_from_slice(&message[..message_len]);
-        module_array[..module_len].copy_from_slice(&module[..module_len]);
+        component_array[..component_len as usize].copy_from_slice(&component[..component_len as usize]);
+        message_array[..message_len as usize].copy_from_slice(&message[..message_len as usize]);
+        module_array[..module_len as usize].copy_from_slice(&module[..module_len as usize]);
 
         UnifiedLogEntry {
             timestamp: get_current_time(),
@@ -152,8 +155,11 @@ impl UnifiedLogEntry {
             facility: SyslogFacility::User,
             pid: 1,
             component: component_array,
+            component_len,
             message: message_array,
+            message_len,
             module: module_array,
+            module_len,
             line,
             fields: Vec::new(),
         }
@@ -170,23 +176,26 @@ impl UnifiedLogEntry {
     }
 
     pub fn with_field(mut self, key: &str, value: &str) -> Self {
-        self.fields.push(LogField::new(key, value));
+        // Sentinel 🛡️: Strip CR/LF bytes to prevent syslog header splitting / log injection attacks
+        let safe_key = key.replace(['\r', '\n'], "");
+        let safe_val = value.replace(['\r', '\n'], "");
+        self.fields.push(LogField::new(&safe_key, &safe_val));
         self
     }
 
     pub fn get_message_str(&self) -> String {
-        let msg_len = self.message.iter().position(|&b| b == 0).unwrap_or(512);
-        String::from_utf8_lossy(&self.message[..msg_len]).into_owned()
+        // Fast path slicing: O(1) instantaneous lookup using stored byte length
+        String::from_utf8_lossy(&self.message[..self.message_len as usize]).into_owned()
     }
 
     pub fn get_component_str(&self) -> String {
-        let comp_len = self.component.iter().position(|&b| b == 0).unwrap_or(64);
-        String::from_utf8_lossy(&self.component[..comp_len]).into_owned()
+        // Fast path slicing: O(1) instantaneous lookup using stored byte length
+        String::from_utf8_lossy(&self.component[..self.component_len as usize]).into_owned()
     }
 
     pub fn get_module_str(&self) -> String {
-        let mod_len = self.module.iter().position(|&b| b == 0).unwrap_or(128);
-        String::from_utf8_lossy(&self.module[..mod_len]).into_owned()
+        // Fast path slicing: O(1) instantaneous lookup using stored byte length
+        String::from_utf8_lossy(&self.module[..self.module_len as usize]).into_owned()
     }
 
     /// Calculate RFC 5424 Syslog Priority field (Facility * 8 + Severity)
@@ -400,14 +409,7 @@ impl LogTarget for MemoryLogTarget {
             return Err(LogError::BufferFull);
         }
 
-        let mut entry_copy = UnifiedLogEntry::new(
-            entry.level,
-            &entry.component,
-            &entry.message,
-            &entry.module,
-            entry.line,
-        );
-        entry_copy.timestamp = entry.timestamp;
+        let entry_copy = entry.clone();
 
         self.entries.push(Some(entry_copy));
         self.entries_written.fetch_add(1, Ordering::SeqCst);
@@ -541,8 +543,7 @@ impl LogTarget for ConsoleLogTarget {
             return Err(LogError::PermissionDenied);
         }
 
-        let msg_len = entry.message.iter().position(|&b| b == 0).unwrap_or(512);
-        let msg_str = String::from_utf8_lossy(&entry.message[..msg_len]);
+        let msg_str = entry.get_message_str();
 
         let formatted = alloc::format!("[STDOUT][{:?}]: {}", entry.level, msg_str);
         self.output_history.push(formatted);
@@ -1025,5 +1026,20 @@ mod tests {
             logger.stats().entries_by_level[LogLevel::Warning as usize],
             1
         );
+    }
+
+    #[test]
+    fn test_crlf_log_injection_sanitization() {
+        let entry = UnifiedLogEntry::new(
+            LogLevel::Info,
+            b"AUTH",
+            b"User login",
+            b"auth.rs",
+            100,
+        )
+        .with_field("user\r\ninjected_key", "admin\r\nCRLF_INJECTION_PAYLOAD");
+
+        assert_eq!(entry.fields[0].key, "userinjected_key");
+        assert_eq!(entry.fields[0].value, "adminCRLF_INJECTION_PAYLOAD");
     }
 }
