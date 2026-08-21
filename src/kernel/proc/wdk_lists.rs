@@ -131,15 +131,8 @@ impl ListHead {
         }
     }
 
-    /// Check if this doubly-linked list is empty.
-    ///
-    /// # Safety
-    ///
-    /// - The caller must ensure `self` is a valid, initialized `ListHead`
-    /// - The `head.flink` pointer must not be dangling
-    /// - Must not be called concurrently with mutable operations on this list
     pub unsafe fn is_empty(&self) -> bool {
-        core::ptr::eq(self.head.flink, &self.head as *const ListEntry as *mut ListEntry)
+        self.head.flink == (&self.head as *const ListEntry as *mut ListEntry)
     }
 }
 

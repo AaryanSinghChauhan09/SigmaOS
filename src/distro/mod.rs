@@ -10,23 +10,19 @@ pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
-pub mod transformation_engine;
-pub mod preseed;
-pub mod linux_bsd_inspirations;
-pub mod arch_parity;
-pub mod chakra_parity;
+pub mod parity;
+pub mod arch;
 
-pub use linux_bsd_inspirations::{
-    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService,
+pub use arch::{
+    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
+    ArchRepoType,
 };
-pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
-pub use preseed::{SovereignPreseedParser, PreseedVariable};
-pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
-pub use manjaro::{
-    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease, ManjaroKernelSwitcher,
-    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
+
+pub use parity::{
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -49,6 +45,10 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
+pub use manjaro::{
+    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
+    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
+};
 pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
     NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
@@ -64,9 +64,4 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-};
-pub use transformation_engine::{
-    AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,
-    ForensicReadinessAuditor, GlobalComplianceDashboard, DeveloperToolkitConverter,
-    IotDeviceMeshOrchestrator, IotMeshDevice,
 };

@@ -557,65 +557,6 @@ impl PresentationProcessor {
     }
 }
 
-/// Translator to bridge LibreOffice (ODF/XML) format gaps with SigmaOffice semantic trees
-pub struct LibreOfficeTranslator;
-
-impl LibreOfficeTranslator {
-    /// Translates LibreOffice .odt or .docx raw XML format to SigmaOffice semantic text nodes
-    pub fn import_text_document(xml_content: &str) -> Vec<DocumentNode> {
-        let mut nodes = Vec::new();
-        // Simulates high-fidelity XML parser for bridge translation
-        for line in xml_content.lines() {
-            let trimmed = line.trim();
-            if trimmed.contains("<text:h") || trimmed.contains("<h1>") {
-                // heading parsing
-                let heading_content = trimmed
-                    .replace("<text:h>", "")
-                    .replace("</text:h>", "")
-                    .replace("<h1>", "")
-                    .replace("</h1>", "");
-                nodes.push(DocumentNode::Heading {
-                    level: 1,
-                    content: heading_content,
-                });
-            } else if trimmed.contains("<text:p") || trimmed.contains("<p>") {
-                // paragraph parsing
-                let paragraph_content = trimmed
-                    .replace("<text:p>", "")
-                    .replace("</text:p>", "")
-                    .replace("<p>", "")
-                    .replace("</p>", "");
-                nodes.push(DocumentNode::Text {
-                    content: paragraph_content,
-                    bold: false,
-                    italic: false,
-                    underline: false,
-                    font_size: 11,
-                    color: [0, 0, 0, 255],
-                });
-                nodes.push(DocumentNode::Paragraph);
-            }
-        }
-        nodes
-    }
-
-    /// Translates LibreOffice .ods or .xlsx spreadsheet range to CellValues
-    pub fn import_spreadsheet_cells(csv_or_xml: &str) -> HashMap<(u32, u32), CellValue> {
-        let mut cells = HashMap::new();
-        for (r, line) in csv_or_xml.lines().enumerate() {
-            for (c, item) in line.split(',').enumerate() {
-                let trimmed = item.trim();
-                if let Ok(num) = trimmed.parse::<f64>() {
-                    cells.insert((r as u32, c as u32), CellValue::Number(num));
-                } else if !trimmed.is_empty() {
-                    cells.insert((r as u32, c as u32), CellValue::Text(trimmed.to_string()));
-                }
-            }
-        }
-        cells
-    }
-}
-
 /// Native typography renderer for Zenith compositor
 pub struct TypographyRenderer {
     font_cache: HashMap<String, Vec<u8>>,
@@ -1022,22 +963,5 @@ mod tests {
 
         let ods_out = sheet_proc.export_to_ods();
         assert!(ods_out.starts_with(b"ODF-SPREADSHEET-XML"));
-    }
-
-    #[test]
-    fn test_libreoffice_interoperability_translator() {
-        let xml_doc = "<h1>Introduction</h1>\n<p>This is a converted paragraph from LibreOffice ODT.</p>";
-        let nodes = LibreOfficeTranslator::import_text_document(xml_doc);
-        assert_eq!(nodes.len(), 3); // Heading + Text + Paragraph
-
-        if let DocumentNode::Heading { level, content } = &nodes[0] {
-            assert_eq!(*level, 1);
-            assert_eq!(content, "Introduction");
-        }
-
-        let csv_sheet = "10.5, 20.0\n30.1, Label";
-        let cells = LibreOfficeTranslator::import_spreadsheet_cells(csv_sheet);
-        assert_eq!(cells.get(&(0, 0)), Some(&CellValue::Number(10.5)));
-        assert_eq!(cells.get(&(1, 1)), Some(&CellValue::Text("Label".to_string())));
     }
 }

@@ -1,7 +1,58 @@
+// SigmaOS Glary Utilities & Advanced SystemCare Parity Resource Optimizer
+// Zero-dependency, #![no_std] compliant, zero-allocation
+// Dynamically tunes CPU cores, compacts memory page fragmentation, and adjusts disk I/O priorities under live workloads.
+
+#![no_std]
+
+extern crate alloc;
+
+#[cfg(not(test))]
 use crate::kernel::{Priority, Process, ProcessState};
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Priority {
+    Idle = 0,
+    Low = 1,
+    Normal = 2,
+    High = 3,
+    Realtime = 4,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessState {
+    Running,
+    Ready,
+    Blocked,
+    Terminated,
+}
+
+#[cfg(test)]
+pub struct Process {
+    pub pid: u64,
+    pub name: alloc::string::String,
+    pub priority: Priority,
+    pub state: ProcessState,
+}
+
+#[cfg(test)]
+impl Process {
+    pub fn new(pid: u64, name: alloc::string::String, priority: Priority) -> Self {
+        Self {
+            pid,
+            name,
+            priority,
+            state: ProcessState::Ready,
+        }
+    }
+}
+
 use core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 
+// ==========================================
 // 1. CPU Core Thread-Priority Optimizer
+// ==========================================
 
 pub struct CpuPriorityOptimizer {
     pub boost_active: AtomicBool,
@@ -48,7 +99,9 @@ impl CpuPriorityOptimizer {
     }
 }
 
+// ==========================================
 // 2. RAM Cleaner & Smart Defragmentation (ASC Parity)
+// ==========================================
 
 pub struct RamDefragmenter {
     pub cleanup_count: AtomicUsize,
@@ -89,7 +142,9 @@ impl RamDefragmenter {
     }
 }
 
+// ==========================================
 // 3. I/O Priority & Disk Access Optimizer
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IoTaskPriority {
@@ -127,7 +182,9 @@ impl IoPriorityOptimizer {
     }
 }
 
+// ==========================================
 // 4. Performance Profile Scheduler Rules (UDF Triggers)
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SmartPerformanceProfile {
@@ -185,7 +242,9 @@ impl PerformanceProfileRule for GlarySmartRule {
     }
 }
 
+// ==========================================
 // Unified Smart Resource Optimizer Manager
+// ==========================================
 
 pub struct SmartResourceOptimizer {
     pub cpu_opt: CpuPriorityOptimizer,
@@ -224,11 +283,12 @@ impl SmartResourceOptimizer {
 pub static GLOBAL_SMART_OPTIMIZER: SmartResourceOptimizer = SmartResourceOptimizer::new();
 pub static GLOBAL_GLARY_RULE: GlarySmartRule = GlarySmartRule;
 
+// ==========================================
 // Unit Tests
+// ==========================================
 
 #[cfg(test)]
 mod tests {
-    extern crate alloc;
     use super::*;
 
     #[test]
