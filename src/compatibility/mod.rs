@@ -1,4 +1,7 @@
-// SigmaOS Compatibility Module
+// Compatibility Layer for Foreign Subsystems
+// Provides translation layers, ABI adapters, and distro parity engines
+
+// Existing comprehensive compatibility modules
 pub mod constellation_mesh;
 pub mod cross_platform;
 pub mod india_stack;
@@ -19,26 +22,29 @@ pub mod garuda_zen;
 pub mod gentoo;
 pub mod tiny_core;
 pub mod localsend;
+pub mod historic_linux;
+pub mod relay_nexus;
+pub mod solid_kernel;
+pub mod india_stack_localization;
+pub mod legacy_adapters;
+pub mod canonical;
+pub mod fedora;
+pub mod arch_linux;
+pub mod gap_closure;
+pub mod superiority;
 
+// New ABI and domination modules from activity manager branch
+pub mod abi_extended;
+pub mod abi_translator;
+pub mod fedora_domination;
+
+// Existing exports
 pub use zorin::{
     ZorinLayoutSwitcher,
     ZorinChameleonEngine,
     ZorinConnectManager,
     ZorinWindowsAppSupport,
 };
-pub mod historic_linux;
-pub mod mint_linux;
-pub mod chimera_linux;
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod india_professional_tools;
-pub mod canonical;
-pub mod fedora;
-pub mod arch_linux;
-pub mod gap_closure;
-pub mod superiority;
 
 pub use gap_closure::{
     KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
@@ -124,3 +130,7 @@ pub use lubuntu::{
 pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};
+
+// New exports from activity manager branch
+pub use abi_extended::*;
+pub use fedora_domination::*;
