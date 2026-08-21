@@ -50,7 +50,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Driver development guide - OOP-based driver framework documented
 - [x] Package manager usage guide - Dependency resolver documented
 - [x] POSIX layer overview - Syscall handler with POSIX compatibility documented
-- [x] Arch Wiki-style knowledge base - Offline indexed search engine with category filters and relevance ranking (`ArchWikiSearchEngine`)
+- [ ] Arch Wiki-style knowledge base
 - [x] Audio driver documentation - HDA/ALSA driver documented
 - [x] Storage driver documentation - NVMe/AHCI driver documented
 - [x] Network driver documentation - e1000e driver documented
@@ -87,7 +87,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ### Documentation Gaps
 - [x] SECURITY.md has placeholder contact info - Updated PGP key fingerprint reference
 - [x] Missing docs/security/pgp-key.asc - File exists with placeholder PGP key
-- [x] Missing scripts/sign_release.sh
+- [x] Missing scripts/sign_release.sh - Implemented `scripts/sign_release.sh`
 - [x] MAINTAINERS file has formatting errors - File verified, no formatting errors found
 
 ### Testing

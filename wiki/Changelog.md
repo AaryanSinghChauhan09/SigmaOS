@@ -1,63 +1,51 @@
-# SigmaOS Changelog
+# ðŸ“œ SigmaOS Change Log
 
-All notable changes to SigmaOS are documented here.
-Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+All notable changes to the SigmaOS Sovereign Lattice will be documented in this file.
 
-## [Unreleased]
+## [v15.0.0 Zenith] - 2026-05-15
 
 ### Added
-- S-AI multi-agent orchestrator with local LLM routing engine
-- Activity manager paging and segmentation support
-- CachyOS-inspired performance optimizations (EEVDF, THP, zRAM)
-- OKR/Governance engine (`src/governance/okr.rs`)
-- 3-Year Strategic Vision Roadmap
-- Comprehensive wiki documentation suite
-- Components reference table
-- Linux distro ideas catalog
-- Security policy and reporting procedures
-- Package manager documentation
-- Networking stack documentation
-- Kernel scheduler documentation
+
+- **QEMU Emulation Support**: Added `make qemu` target for kernel verification.
+
+- **Serial Boot Tracing**: Direct silicon logging to COM1 for kernel-level debugging.
+
+- **QBMP Allocator**: Functional bump allocator with 8-byte alignment and assertions.
+
+- **CI/CD Pipeline**: GitHub Actions workflow for automated build and security auditing.
+
+- **Architecture Documentation**: New `docs/architecture.md` explaining the lattice sharding model.
+
+- **Verification Assertions**: Added `sigma_assert` for kernel-level sanity checks.
+
+- **Phase 2 Utilities Parity**: Integrated `SovereignRecovery`, `SovereignIoT`, `SovereignGPUSched`, and `SovereignOptimizer` shards.
+
+- **Unified Sovereign CLI**: Deployed `sigma-cli` and `telemetry-cli` for professional lattice orchestration.
+
+- **Adaptive Scheduling (NPWO)**: Implemented Neural Predictive Workload Orchestration in `SovereignAISched`.
+
+- **UI Toolkit & Accessibility**: Added `SovereignUIToolkit` with theme engine and SSR (Sovereign Screen Reader) support.
 
 ### Changed
-- Merged all feature branches into main (clean single-branch repo)
-- Enhanced wiki with 12+ structured pages
-- Updated branch consolidation reports
+
+- **Build System**: Standardized on `kernel/sigma.ld` and enabled `-Werror` for strict compilation.
+
+- **Documentation**: Updated README with boot instructions and architecture diagrams.
+
+- **Include Strategy**: Consolidated include paths to use flat `include/` directory.
+
+- **Modularization**: Refactored core subsystems to the `SovereignEngine` singleton pattern for enhanced state isolation and ABI stability. Newly hardened engines: `SovereignSyscallEngine`, `SovereignEntropyEngine`, `SovereignAuditEngine`, `SovereignCryptoEngine`, `SovereignGUIEngine`, `SovereignEditEngine`, `SovereignDashEngine`, `SovereignTunerEngine`, `SovereignAllocatorEngine` â€” eliminating all static global state from these critical shards.
+
+- **CI/CD Hardening**: Corrected GitHub Actions audit paths and synchronized the Makefile with the expanded 600-shard modular lattice to ensure production-grade build stability.
 
 ### Fixed
-- Merge conflicts resolved across all feature branches
-- Branch cleanup completed (only main remains)
 
-## [0.5.0-beta] - 2026-Q2
+- Resolved `sigma_hardened_strcpy` undeclared error in `SovereignTuner.cpp`.
 
-### Added
-- Sigma Shell (Wayland compositor)
-- Palette Theme Engine v1
-- Sentinel Security daemon v1
-- eBPF firewall (XDP/TC)
-- WireGuard built-in VPN
-- AUR compatibility layer
-- Flatpak runtime integration
-- sigma-pkg v1.0
-- SELinux enforcing mode
-- AppArmor profiles
-- Btrfs auto-snapshots
-- UEFI Secure Boot
+- Fixed various markdown linting violations (MD012, MD022, MD058) in developer guides.
 
-### Changed
-- Migrated kernel core to Rust (safety-critical paths)
-- Updated EEVDF scheduler config
-- Enhanced S-AI Orchestrator v0.5
+- Removed stale/unused header includes across 15+ kernel files.
 
-## [0.1.0-alpha] - 2026-Q1
+---
 
-### Added
-- Initial hybrid kernel implementation
-- Basic EEVDF scheduler
-- Memory manager (NUMA-aware)
-- VFS layer
-- eBPF runtime
-- sigma-init (systemd fork)
-- Basic package manager
-- x86_64 support
-- ARM64 initial port
+### Î£ SIGMAOS: Sovereign Versioning. Absolute Continuity

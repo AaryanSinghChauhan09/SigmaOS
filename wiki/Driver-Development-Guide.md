@@ -224,6 +224,6 @@ make usb-test
 ---
 
 *See also:*
-- [DRIVER_DEVELOPMENT_PLAN_2026.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DRIVER_DEVELOPMENT_PLAN_2026.md)
-- [UNIVERSAL_DRIVER_SUPPORT_PLAN.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/UNIVERSAL_DRIVER_SUPPORT_PLAN.md)
-- [DRIVER_MANAGEMENT_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DRIVER_MANAGEMENT_ROADMAP.md)
+- [DRIVER_DEVELOPMENT_PLAN_2026.md](file:///home/aaryansinghchauhan/SigmaOS/DRIVER_DEVELOPMENT_PLAN_2026.md)
+- [UNIVERSAL_DRIVER_SUPPORT_PLAN.md](file:///home/aaryansinghchauhan/SigmaOS/UNIVERSAL_DRIVER_SUPPORT_PLAN.md)
+- [DRIVER_MANAGEMENT_ROADMAP.md](file:///home/aaryansinghchauhan/SigmaOS/DRIVER_MANAGEMENT_ROADMAP.md)
