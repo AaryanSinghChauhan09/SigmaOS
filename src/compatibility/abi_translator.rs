@@ -1,12 +1,12 @@
-// SigmaOS Cross-Kernel ABI Translator
-// Designed to translate function register calling conventions, C struct layouts, and packet alignments across x86, ARM, RISC-V, and BSD ABIs
+// SigmaOS Cross-Kernel ABI & System Alignment Checker
+// Designed to translate function register calling conventions, stack alignments,
+// page boundaries, ISA DMA limits, and SIMD memory operand alignment.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchitecture {
     X86,
     Arm,
     Mips,
-    Riscv64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -19,7 +19,6 @@ pub enum CallingConvention {
     SystemVAmd64,
     AArch32AAPCS,
     AArch64AAPCS,
-    RiscvLP64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -139,18 +138,6 @@ impl ABITranslator {
                 stack_cleaning_authority = "CALLER";
                 stack_alignment_bytes = 16;
             }
-            CallingConvention::RiscvLP64 => {
-                let gprs = ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"];
-                for i in 0..params.len() {
-                    if i < 8 {
-                        register_params.push((gprs[i].to_string(), params[i]));
-                    } else {
-                        stack_params.push(params[i]);
-                    }
-                }
-                stack_cleaning_authority = "CALLER";
-                stack_alignment_bytes = 16;
-            }
         }
 
         InvocationStackLayout {
@@ -166,12 +153,10 @@ impl ABITranslator {
         let mut modern_registers = Vec::new();
         match self.target_arch {
             CpuArchitecture::X86 => {
-                // Translate legacy fastcall/stdcall register passing (e.g. EAX, EDX, ECX)
-                // into modern System V AMD64 ABI (RDI, RSI, RDX, RCX, R8, R9)
                 if old_registers.len() >= 3 {
-                    modern_registers.push(old_registers[0]); // RDI = old param 1 (EAX)
-                    modern_registers.push(old_registers[1]); // RSI = old param 2 (EDX)
-                    modern_registers.push(old_registers[2]); // RDX = old param 3 (ECX)
+                    modern_registers.push(old_registers[0]);
+                    modern_registers.push(old_registers[1]);
+                    modern_registers.push(old_registers[2]);
                     for &reg in &old_registers[3..] {
                         modern_registers.push(reg);
                     }
@@ -181,7 +166,12 @@ impl ABITranslator {
                     }
                 }
             }
-            CpuArchitecture::Arm | CpuArchitecture::Mips | CpuArchitecture::Riscv64 => {
+            CpuArchitecture::Arm => {
+                for &reg in old_registers {
+                    modern_registers.push(reg);
+                }
+            }
+            CpuArchitecture::Mips => {
                 for &reg in old_registers {
                     modern_registers.push(reg);
                 }
@@ -191,89 +181,58 @@ impl ABITranslator {
     }
 }
 
-// =========================================================================
-// POSIX / BSD System Call & C Struct Layout Alignment Subsystem
-// =========================================================================
+// ─────────────────────────────────────────────────────────────────────────────
+// SYSTEM ALIGNMENT VERIFICATION SUBSYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OsAbiStandard {
-    LinuxGlibc,
-    FreeBsd,
-    OpenBsd,
-}
+pub struct SovereignAlignmentChecker;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct StructFieldOffset {
-    pub name: &'static str,
-    pub offset_bytes: usize,
-    pub size_bytes: usize,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SyscallStructLayout {
-    pub struct_name: &'static str,
-    pub total_size_bytes: usize,
-    pub fields: Vec<StructFieldOffset>,
-}
-
-impl SyscallStructLayout {
-    pub fn compute_stat_layout(abi: OsAbiStandard) -> Self {
-        let mut fields = Vec::new();
-        let total_size_bytes;
-
-        match abi {
-            OsAbiStandard::LinuxGlibc => {
-                // Linux x86_64 struct stat layout (144 bytes)
-                fields.push(StructFieldOffset { name: "st_dev", offset_bytes: 0, size_bytes: 8 });
-                fields.push(StructFieldOffset { name: "st_ino", offset_bytes: 8, size_bytes: 8 });
-                fields.push(StructFieldOffset { name: "st_nlink", offset_bytes: 16, size_bytes: 8 });
-                fields.push(StructFieldOffset { name: "st_mode", offset_bytes: 24, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_uid", offset_bytes: 28, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_gid", offset_bytes: 32, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_size", offset_bytes: 48, size_bytes: 8 });
-                total_size_bytes = 144;
-            }
-            OsAbiStandard::FreeBsd => {
-                // FreeBSD struct stat layout (120 bytes)
-                fields.push(StructFieldOffset { name: "st_dev", offset_bytes: 0, size_bytes: 8 });
-                fields.push(StructFieldOffset { name: "st_ino", offset_bytes: 8, size_bytes: 8 });
-                fields.push(StructFieldOffset { name: "st_nlink", offset_bytes: 16, size_bytes: 8 });
-                fields.push(StructFieldOffset { name: "st_mode", offset_bytes: 24, size_bytes: 2 });
-                fields.push(StructFieldOffset { name: "st_uid", offset_bytes: 28, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_gid", offset_bytes: 32, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_size", offset_bytes: 48, size_bytes: 8 });
-                total_size_bytes = 120;
-            }
-            OsAbiStandard::OpenBsd => {
-                // OpenBSD struct stat layout (128 bytes)
-                fields.push(StructFieldOffset { name: "st_dev", offset_bytes: 0, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_ino", offset_bytes: 8, size_bytes: 8 });
-                fields.push(StructFieldOffset { name: "st_mode", offset_bytes: 16, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_nlink", offset_bytes: 20, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_uid", offset_bytes: 24, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_gid", offset_bytes: 28, size_bytes: 4 });
-                fields.push(StructFieldOffset { name: "st_size", offset_bytes: 48, size_bytes: 8 });
-                total_size_bytes = 128;
-            }
+impl SovereignAlignmentChecker {
+    /// Verifies System V / ARM stack pointer alignment (e.g. 16-byte for x86-64 / AAPCS64, 8-byte for AArch32)
+    pub fn check_stack_alignment(stack_ptr: usize, required_alignment: usize) -> bool {
+        if required_alignment == 0 {
+            return true;
         }
-
-        SyscallStructLayout {
-            struct_name: "stat",
-            total_size_bytes,
-            fields,
-        }
+        stack_ptr % required_alignment == 0
     }
 
-    pub fn compute_timespec_layout() -> Self {
-        let mut fields = Vec::new();
-        fields.push(StructFieldOffset { name: "tv_sec", offset_bytes: 0, size_bytes: 8 });
-        fields.push(StructFieldOffset { name: "tv_nsec", offset_bytes: 8, size_bytes: 8 });
-
-        SyscallStructLayout {
-            struct_name: "timespec",
-            total_size_bytes: 16,
-            fields,
+    /// Verifies Virtual/Physical memory page boundary alignment (4KB, 2MB, 1GB)
+    pub fn check_page_alignment(addr: usize, page_byte_size: usize) -> bool {
+        if page_byte_size == 0 {
+            return true;
         }
+        addr % page_byte_size == 0
+    }
+
+    /// Verifies Ancient Hardware ISA DMA boundary constraint (Sub-16MB memory limit and 64KB boundary cross)
+    pub fn check_isa_dma_alignment(phys_addr: usize, size: usize) -> bool {
+        let isa_16mb_limit = 16 * 1024 * 1024;
+        let isa_64kb_boundary = 64 * 1024;
+
+        if phys_addr + size > isa_16mb_limit {
+            return false; // Exceeds 16MB ISA physical limit
+        }
+
+        // Check if buffer crosses a 64KB physical page boundary
+        let start_page = phys_addr / isa_64kb_boundary;
+        let end_page = (phys_addr + size - 1) / isa_64kb_boundary;
+        start_page == end_page
+    }
+
+    /// Verifies 4KB Advanced Format (AF) disk sector alignment (8-sector boundary checks)
+    pub fn check_disk_sector_alignment(start_sector: u64, align_sectors: u64) -> bool {
+        if align_sectors == 0 {
+            return true;
+        }
+        start_sector % align_sectors == 0
+    }
+
+    /// Verifies SIMD / Vector instruction memory operand alignment (64-byte AVX-512, 32-byte AVX2, 16-byte SSE)
+    pub fn check_simd_alignment(ptr: usize, align_bytes: usize) -> bool {
+        if align_bytes == 0 {
+            return true;
+        }
+        ptr % align_bytes == 0
     }
 }
 
@@ -282,11 +241,35 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_sovereign_alignment_checker() {
+        // Stack alignment test (x86_64 16-byte alignment requirement)
+        assert!(SovereignAlignmentChecker::check_stack_alignment(0x7FFF_FFFF_F000, 16));
+        assert!(!SovereignAlignmentChecker::check_stack_alignment(0x7FFF_FFFF_F008, 16));
+
+        // Memory page alignment test (4KB, 2MB, 1GB)
+        assert!(SovereignAlignmentChecker::check_page_alignment(0x1000, 4096));
+        assert!(!SovereignAlignmentChecker::check_page_alignment(0x1080, 4096));
+        assert!(SovereignAlignmentChecker::check_page_alignment(0x200000, 2 * 1024 * 1024));
+
+        // Ancient ISA DMA 16MB & 64KB boundary test
+        assert!(SovereignAlignmentChecker::check_isa_dma_alignment(0x10000, 4096)); // Valid 64KB page
+        assert!(!SovereignAlignmentChecker::check_isa_dma_alignment(0xFF0001, 65536)); // Crosses 16MB limit
+        assert!(!SovereignAlignmentChecker::check_isa_dma_alignment(0x0F00, 65536)); // Crosses 64KB boundary
+
+        // Disk 4KB AF sector alignment test (8 sectors)
+        assert!(SovereignAlignmentChecker::check_disk_sector_alignment(2048, 8)); // 2048 % 8 == 0
+        assert!(!SovereignAlignmentChecker::check_disk_sector_alignment(2049, 8));
+
+        // SIMD vector alignment test (AVX-512 64-byte alignment)
+        assert!(SovereignAlignmentChecker::check_simd_alignment(0x1000, 64));
+        assert!(!SovereignAlignmentChecker::check_simd_alignment(0x1020, 64));
+    }
+
+    #[test]
     fn test_x86_abi_translation() {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let old_regs = vec![10, 20, 30];
         let modern_regs = translator.translate_register_map(&old_regs).unwrap();
-        // Modern registers should map sequentially
         assert_eq!(modern_regs[0], 10);
         assert_eq!(modern_regs[1], 20);
         assert_eq!(modern_regs[2], 30);
@@ -297,19 +280,16 @@ mod tests {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let params = vec![100, 200, 300, 400];
 
-        // cdecl: all on stack
         let cdecl_layout = translator.compute_invocation_layout(&params, CallingConvention::Cdecl);
         assert_eq!(cdecl_layout.stack_params, vec![100, 200, 300, 400]);
         assert!(cdecl_layout.register_params.is_empty());
         assert_eq!(cdecl_layout.stack_cleaning_authority, "CALLER");
         assert_eq!(cdecl_layout.stack_alignment_bytes, 4);
 
-        // stdcall: all on stack, callee cleans
         let stdcall_layout = translator.compute_invocation_layout(&params, CallingConvention::Stdcall);
         assert_eq!(stdcall_layout.stack_params, vec![100, 200, 300, 400]);
         assert_eq!(stdcall_layout.stack_cleaning_authority, "CALLEE");
 
-        // fastcall: ECX, EDX, rest on stack
         let fastcall_layout = translator.compute_invocation_layout(&params, CallingConvention::Fastcall32);
         assert_eq!(fastcall_layout.register_params, vec![
             ("ECX".to_string(), 100),
@@ -324,7 +304,6 @@ mod tests {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let params = vec![1, 2, 3, 4, 5, 6, 7];
 
-        // Microsoft x64: RCX, RDX, R8, R9, rest on stack, 32-byte shadow
         let ms_layout = translator.compute_invocation_layout(&params, CallingConvention::MicrosoftX64);
         assert_eq!(ms_layout.register_params, vec![
             ("RCX".to_string(), 1),
@@ -336,7 +315,6 @@ mod tests {
         assert_eq!(ms_layout.shadow_space_bytes, 32);
         assert_eq!(ms_layout.stack_alignment_bytes, 16);
 
-        // System V AMD64: RDI, RSI, RDX, RCX, R8, R9, rest on stack
         let sysv_layout = translator.compute_invocation_layout(&params, CallingConvention::SystemVAmd64);
         assert_eq!(sysv_layout.register_params, vec![
             ("RDI".to_string(), 1),
@@ -352,34 +330,29 @@ mod tests {
     }
 
     #[test]
-    fn test_compute_invocation_layout_riscv() {
-        let translator = ABITranslator::new(CpuArchitecture::Riscv64);
-        let params = vec![10, 20, 30, 40, 50, 60, 70, 80, 90];
+    fn test_compute_invocation_layout_arm() {
+        let translator = ABITranslator::new(CpuArchitecture::Arm);
+        let params = vec![11, 22, 33, 44, 55];
 
-        let riscv_layout = translator.compute_invocation_layout(&params, CallingConvention::RiscvLP64);
-        assert_eq!(riscv_layout.register_params, vec![
-            ("a0".to_string(), 10),
-            ("a1".to_string(), 20),
-            ("a2".to_string(), 30),
-            ("a3".to_string(), 40),
-            ("a4".to_string(), 50),
-            ("a5".to_string(), 60),
-            ("a6".to_string(), 70),
-            ("a7".to_string(), 80),
+        let aapcs32 = translator.compute_invocation_layout(&params, CallingConvention::AArch32AAPCS);
+        assert_eq!(aapcs32.register_params, vec![
+            ("R0".to_string(), 11),
+            ("R1".to_string(), 22),
+            ("R2".to_string(), 33),
+            ("R3".to_string(), 44),
         ]);
-        assert_eq!(riscv_layout.stack_params, vec![90]);
-        assert_eq!(riscv_layout.stack_alignment_bytes, 16);
-    }
+        assert_eq!(aapcs32.stack_params, vec![55]);
+        assert_eq!(aapcs32.stack_alignment_bytes, 8);
 
-    #[test]
-    fn test_syscall_struct_layouts() {
-        let linux_stat = SyscallStructLayout::compute_stat_layout(OsAbiStandard::LinuxGlibc);
-        assert_eq!(linux_stat.total_size_bytes, 144);
-
-        let freebsd_stat = SyscallStructLayout::compute_stat_layout(OsAbiStandard::FreeBsd);
-        assert_eq!(freebsd_stat.total_size_bytes, 120);
-
-        let timespec = SyscallStructLayout::compute_timespec_layout();
-        assert_eq!(timespec.total_size_bytes, 16);
+        let aapcs64 = translator.compute_invocation_layout(&params, CallingConvention::AArch64AAPCS);
+        assert_eq!(aapcs64.register_params, vec![
+            ("X0".to_string(), 11),
+            ("X1".to_string(), 22),
+            ("X2".to_string(), 33),
+            ("X3".to_string(), 44),
+            ("X4".to_string(), 55),
+        ]);
+        assert!(aapcs64.stack_params.is_empty());
+        assert_eq!(aapcs64.stack_alignment_bytes, 16);
     }
 }

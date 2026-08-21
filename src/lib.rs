@@ -13,7 +13,6 @@ pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
-pub mod legal;
 pub mod ml;
 pub mod network;
 pub mod observability;
@@ -27,6 +26,9 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
+
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
@@ -39,6 +41,7 @@ pub mod hardware {
 pub mod power {
     pub mod governor;
 }
+
 pub mod ai {
     pub mod agent;
     pub mod orchestrator;
@@ -67,6 +70,11 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre, ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager,
+    ZorinWindowsAppSupport,
     ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
     CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime, CorebootGatewayMesh,
     DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
@@ -159,12 +167,6 @@ pub use productivity::{
     SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
     TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
-pub use legal::{
-    ComplianceCert as LegalComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
-    GlobalStandard, ComplianceStatus as LegalComplianceStatus, RegulatoryControl, InternationalComplianceTracker,
-    LabourLawConfig, StatutoryPayrollBreakdown, LabourLawCompliance, StatutoryFiling,
-    StatutoryFilingDashboard,
-};
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
@@ -179,10 +181,12 @@ pub use shell::{
 };
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter as SigpkgPackageFormatAdapter, UniversalPackageManager as SigpkgUniversalPackageManager, AdapterError,
+    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, UniversalPackageManager, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
+pub use unimplemented_features::*;
+pub use unimplemented_tools::*;

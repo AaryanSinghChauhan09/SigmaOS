@@ -1,13 +1,12 @@
-// OOP-based Container Runtime Support for SigmaOS
-// Implements OCI runtime and sandboxed container primitives with Kata Containers & Qubes RPC integration.
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use core::mem;
+/// OOP-based Container Runtime Support for SigmaOS
+/// Based on Ideas-999-Structured: Core System Item 17
+/// Implements OCI runtime and sandboxed container primitives with Kata Containers & Qubes RPC integration.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ContainerID = usize;
 
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
@@ -17,6 +16,7 @@ pub enum ContainerState {
     Deleting = 4,
 }
 
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
     Success = 0,
@@ -37,10 +37,10 @@ pub trait Container {
     fn resume(&mut self) -> Result<(), ContainerError>;
 }
 
+#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
-    pub name_len: u8,
     pub state: AtomicUsize,
     pub pid: AtomicUsize,
 }
@@ -49,12 +49,12 @@ impl SimpleContainer {
     pub fn new(id: ContainerID, name: &[u8]) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        }
         SimpleContainer {
             id,
             name: name_array,
-            name_len: name_len as u8,
             state: AtomicUsize::new(ContainerState::Created as usize),
             pid: AtomicUsize::new(0),
         }
@@ -66,17 +66,11 @@ impl Container for SimpleContainer {
         self.id
     }
     fn name(&self) -> &[u8] {
-        // Performance optimization: explicit name_len field enables O(1) direct slice access, eliminating O(N) null-byte linear scans.
-        &self.name[..self.name_len as usize]
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.name[..len]
     }
     fn state(&self) -> ContainerState {
-        match self.state.load(Ordering::SeqCst) {
-            1 => ContainerState::Running,
-            2 => ContainerState::Paused,
-            3 => ContainerState::Stopped,
-            4 => ContainerState::Deleting,
-            _ => ContainerState::Created,
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     fn start(&mut self) -> Result<(), ContainerError> {
@@ -117,15 +111,10 @@ pub trait OCISpec {
     fn validate_spec(&self, spec: &[u8]) -> Result<(), ContainerError>;
 }
 
+#[repr(C)]
 pub struct SimpleOCISpec {
     pub containers: Vec<Option<Box<dyn Container>>>,
     pub next_id: AtomicUsize,
-}
-
-impl Default for SimpleOCISpec {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleOCISpec {
@@ -140,7 +129,7 @@ impl SimpleOCISpec {
 impl OCISpec for SimpleOCISpec {
     fn create_from_spec(&mut self, spec: &[u8]) -> Result<ContainerID, ContainerError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let name = if !spec.is_empty() { spec } else { b"container" };
+        let name = if spec.len() > 0 { spec } else { b"container" };
         let container = SimpleContainer::new(id, name);
         self.containers.push(Some(Box::new(container)));
         Ok(id)
@@ -148,71 +137,6 @@ impl OCISpec for SimpleOCISpec {
 
     fn validate_spec(&self, _spec: &[u8]) -> Result<(), ContainerError> {
         Ok(())
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct OciContainerSpec {
-    pub oci_version: [u8; 16],
-    pub root_path: [u8; 128],
-    pub readonly_rootfs: bool,
-    pub uid_mapping: (u32, u32, u32),
-    pub gid_mapping: (u32, u32, u32),
-    pub apparmor_profile: [u8; 64],
-    pub landlock_paths: Vec<[u8; 128]>,
-}
-
-impl OciContainerSpec {
-    pub fn new(root_fs: &[u8], readonly: bool) -> Self {
-        let mut ver_arr = [0u8; 16];
-        ver_arr[..5].copy_from_slice(b"1.1.0");
-
-        let mut root_arr = [0u8; 128];
-        let len = root_fs.len().min(127);
-        root_arr[..len].copy_from_slice(&root_fs[..len]);
-
-        let mut apparmor = [0u8; 64];
-        apparmor[..19].copy_from_slice(b"docker-default-prof");
-
-        Self {
-            oci_version: ver_arr,
-            root_path: root_arr,
-            readonly_rootfs: readonly,
-            uid_mapping: (1000, 0, 65536),
-            gid_mapping: (1000, 0, 65536),
-            apparmor_profile: apparmor,
-            landlock_paths: Vec::new(),
-        }
-    }
-}
-
-pub struct SandboxedContainerEngine {
-    pub active_containers: Vec<(ContainerID, OciContainerSpec)>,
-}
-
-impl SandboxedContainerEngine {
-    pub fn new() -> Self {
-        Self {
-            active_containers: Vec::new(),
-        }
-    }
-
-    pub fn spawn_sandboxed_container(
-        &mut self,
-        container_id: ContainerID,
-        spec: OciContainerSpec,
-    ) -> Result<(), ContainerError> {
-        if spec.landlock_paths.is_empty() && !spec.readonly_rootfs {
-            return Err(ContainerError::InvalidConfig);
-        }
-        self.active_containers.push((container_id, spec));
-        Ok(())
-    }
-}
-
-impl Default for SandboxedContainerEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -235,6 +159,7 @@ pub trait Sandbox {
     ) -> Result<(), ContainerError>;
 }
 
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum Namespace {
     PID = 0,
@@ -245,16 +170,11 @@ pub enum Namespace {
     User = 5,
 }
 
+#[repr(C)]
 pub struct SimpleSandbox {
     pub namespaces: Vec<(ContainerID, Namespace)>,
     pub cgroups: Vec<(ContainerID, (usize, usize))>,
     pub seccomp_profiles: Vec<(ContainerID, [u8; 256])>,
-}
-
-impl Default for SimpleSandbox {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleSandbox {
@@ -294,7 +214,9 @@ impl Sandbox for SimpleSandbox {
     ) -> Result<(), ContainerError> {
         let mut profile_array = [0u8; 256];
         let len = profile.len().min(255);
-        profile_array[..len].copy_from_slice(&profile[..len]);
+        for i in 0..len {
+            profile_array[i] = profile[i];
+        }
         self.seccomp_profiles.push((container_id, profile_array));
         Ok(())
     }
@@ -306,14 +228,9 @@ pub trait ImageManager {
     fn remove_image(&mut self, name: &[u8], tag: &[u8]) -> Result<(), ContainerError>;
 }
 
+#[repr(C)]
 pub struct SimpleImageManager {
-    pub images: Vec<([u8; 128], u8, [u8; 32])>,
-}
-
-impl Default for SimpleImageManager {
-    fn default() -> Self {
-        Self::new()
-    }
+    pub images: Vec<([u8; 128], [u8; 32])>,
 }
 
 impl SimpleImageManager {
@@ -327,31 +244,34 @@ impl ImageManager for SimpleImageManager {
         let mut name_array = [0u8; 128];
         let mut digest_array = [0u8; 32];
         let name_len = name.len().min(127);
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-        for (i, item) in digest_array.iter_mut().enumerate() {
-            *item = ((i * 17 + 31) % 256) as u8;
+        for i in 0..name_len {
+            name_array[i] = name[i];
         }
-        self.images.push((name_array, name_len as u8, digest_array));
+        for i in 0..32 {
+            digest_array[i] = ((i * 17 + 31) % 256) as u8;
+        }
+        self.images.push((name_array, digest_array));
         Ok(())
     }
 
     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])> {
-        self.images.iter().map(|img| (img.0, img.2)).collect()
+        self.images.clone()
     }
 
     fn remove_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
-        // Performance optimization: explicit stored name_len enables direct O(1) slice lookup, eliminating O(N) null-byte scans.
-        if let Some(pos) = self.images.iter().position(|img| {
-            &img.0[..img.1 as usize] == name
-        }) {
-            self.images.remove(pos);
-            Ok(())
-        } else {
-            Err(ContainerError::InvalidConfig)
+        for i in 0..self.images.len() {
+            let img_name = &self.images[i].0;
+            let len = img_name.iter().position(|&b| b == 0).unwrap_or(128);
+            if &img_name[..len] == name {
+                self.images.remove(i);
+                return Ok(());
+            }
         }
+        Err(ContainerError::InvalidConfig)
     }
 }
 
+/// Qubes + Kata Containers Adapter bridging OCI runtimes with microVM hypervisors
 pub struct QubesKataAdapter {
     pub is_hypervisor_backed: bool,
     pub allocated_vcpus: u32,
@@ -371,7 +291,7 @@ impl QubesKataAdapter {
         if container_name.is_empty() {
             return Err(ContainerError::InvalidConfig);
         }
-        Ok(1001)
+        Ok(1001) // Hypervisor wrapped Container ID
     }
 }
 
@@ -387,16 +307,11 @@ pub trait ContainerRuntime {
     fn list_containers(&self) -> Vec<ContainerID>;
 }
 
+#[repr(C)]
 pub struct SimpleContainerRuntime {
     pub oci_spec: SimpleOCISpec,
     pub sandbox: SimpleSandbox,
     pub image_manager: SimpleImageManager,
-}
-
-impl Default for SimpleContainerRuntime {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleContainerRuntime {
@@ -450,15 +365,15 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
     fn remove_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
         self.stop_container(id)?;
-        if let Some(pos) = self.oci_spec.containers.iter().position(|c| match c {
-            Some(cont) => cont.id() == id,
-            None => false,
-        }) {
-            self.oci_spec.containers[pos] = None;
-            Ok(())
-        } else {
-            Err(ContainerError::InvalidConfig)
+        for i in 0..self.oci_spec.containers.len() {
+            if let Some(ref container) = self.oci_spec.containers[i] {
+                if container.id() == id {
+                    self.oci_spec.containers[i] = None;
+                    return Ok(());
+                }
+            }
         }
+        Err(ContainerError::InvalidConfig)
     }
 
     fn list_containers(&self) -> Vec<ContainerID> {
@@ -472,19 +387,85 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
-    #[test]
-    fn test_oci_sandboxed_container_engine() {
-        let mut engine = SandboxedContainerEngine::new();
-        let mut spec = OciContainerSpec::new(b"/var/lib/sigma/rootfs", false);
-
-        assert!(engine.spawn_sandboxed_container(1, spec.clone()).is_err());
-
-        spec.readonly_rootfs = true;
-        assert!(engine.spawn_sandboxed_container(1, spec).is_ok());
-        assert_eq!(engine.active_containers.len(), 1);
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
     }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn clone(&self) -> Vec<T> {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                let item = core::ptr::read(self.data.add(i));
+                new_vec.push(item);
+            }
+        }
+        new_vec
+    }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
