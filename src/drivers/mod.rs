@@ -37,4 +37,3 @@ pub use modern_nvme::ModernNvmeDriver;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::ModernWifiDriver;
 pub use touch_jingos::TouchJingosDriver;
-pub use peripheral::{PeripheralDevice, PeripheralManager, DeviceGeneration, PowerState};

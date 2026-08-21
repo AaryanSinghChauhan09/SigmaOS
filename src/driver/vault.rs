@@ -6,7 +6,7 @@ use klib::collections::HashMap;
 #[derive(Debug, Clone)]
 pub struct VaultEntry {
     pub driver_name: klib::string::SigmaString,
-    pub encrypted_payload: klib::vec::Vec<u8>,
+    pub encrypted_payload: Vec<u8>,
     pub hash_signature: klib::string::SigmaString,
 }
 
@@ -24,7 +24,7 @@ impl DriverArchiveVault {
     }
 
     pub fn store_driver(&mut self, name: &str, raw_binary: &[u8]) {
-        let encrypted: klib::vec::Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
+        let encrypted: Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
         let sig = klib::string::SigmaString::from(format!("SIGMA_{}_OK", name));
 
         let entry = VaultEntry {
@@ -35,9 +35,9 @@ impl DriverArchiveVault {
         self.archive.insert(klib::string::SigmaString::from(name), entry);
     }
 
-    pub fn retrieve_driver(&self, name: &str) -> Option<klib::vec::Vec<u8>> {
+    pub fn retrieve_driver(&self, name: &str) -> Option<Vec<u8>> {
         if let Some(entry) = self.archive.get(&klib::string::SigmaString::from(name)) {
-            let decrypted: klib::vec::Vec<u8> = entry
+            let decrypted: Vec<u8> = entry
                 .encrypted_payload
                 .iter()
                 .map(|b| b ^ self.secret_key)

@@ -2,7 +2,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-extern crate alloc;
 
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs

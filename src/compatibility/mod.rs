@@ -1,4 +1,6 @@
 // SigmaOS Compatibility Module
+pub mod antix;
+pub mod zorin;
 pub mod chimera_linux;
 pub mod cross_platform;
 pub mod interim;
@@ -21,6 +23,17 @@ pub mod fedora;
 pub mod void_linux;
 pub mod pop_os;
 pub mod clear_linux;
+pub mod historic_linux;
+
+pub use antix::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
+};
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher, ZorinChameleonColor,
+    ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager, ZorinWindowsAppSupport,
+};
 
 pub use void_linux::{
     XbpsDatabase, RinitInitSystem, VoidMuslToolchain, XbpsPackageVerifier, RunitStageManager,

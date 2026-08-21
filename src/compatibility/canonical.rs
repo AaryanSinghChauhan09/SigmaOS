@@ -246,12 +246,12 @@ pub enum DesktopMode {
     TouchTabletMode,
 }
 
-pub struct ZorinAppearanceSwitcher {
+pub struct LegacyDesktopAppearanceSwitcher {
     pub active_mode: DesktopMode,
     pub compositor_animations_enabled: bool,
 }
 
-impl ZorinAppearanceSwitcher {
+impl LegacyDesktopAppearanceSwitcher {
     pub fn new() -> Self {
         Self {
             active_mode: DesktopMode::ClassicDE,

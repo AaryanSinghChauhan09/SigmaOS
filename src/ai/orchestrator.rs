@@ -2,9 +2,12 @@
 // Dynamically schedules models, checks device bounds, and prunes context windows.
 
 extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+pub type AgentID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -66,30 +69,10 @@ impl SimpleAIAgent {
             id,
             name: name.to_string(),
             state: AgentState::Idle,
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
         }
     }
 }
 
-<<<<<<< HEAD
-/// Local LLM and deep learning model resource orchestrator
-pub struct LocalLlmOrchestrator {
-    pub active_models: Vec<Option<ModelResource>>,
-    pub total_gpu_memory_mb: usize,
-    pub total_tpu_memory_mb: usize,
-    pub allocated_gpu_memory_mb: AtomicUsize,
-    pub allocated_tpu_memory_mb: AtomicUsize,
-}
-
-impl LocalLlmOrchestrator {
-    pub fn new(gpu_mem: usize, tpu_mem: usize) -> Self {
-        LocalLlmOrchestrator {
-            active_models: Vec::new(),
-            total_gpu_memory_mb: gpu_mem,
-            total_tpu_memory_mb: tpu_mem,
-            allocated_gpu_memory_mb: AtomicUsize::new(0),
-            allocated_tpu_memory_mb: AtomicUsize::new(0),
-=======
 impl AIAgent for SimpleAIAgent {
     fn id(&self) -> AgentID { self.id }
     fn name(&self) -> &str { &self.name }
@@ -107,29 +90,26 @@ impl AIAgent for SimpleAIAgent {
     }
 }
 
-pub trait AgentOrchestrator {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
-    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
-    fn list_agents(&self) -> Vec<AgentID>;
+/// Local LLM and deep learning model resource orchestrator
+pub struct LocalLlmOrchestrator {
+    pub active_models: Vec<Option<ModelResource>>,
+    pub total_gpu_memory_mb: usize,
+    pub total_tpu_memory_mb: usize,
+    pub allocated_gpu_memory_mb: AtomicUsize,
+    pub allocated_tpu_memory_mb: AtomicUsize,
 }
 
-pub struct SimpleAgentOrchestrator {
-    pub agents: Vec<Box<dyn AIAgent>>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleAgentOrchestrator {
-    pub fn new() -> Self {
-        SimpleAgentOrchestrator {
-            agents: Vec::new(),
-            next_id: AtomicUsize::new(1),
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
+impl LocalLlmOrchestrator {
+    pub fn new(gpu_mem: usize, tpu_mem: usize) -> Self {
+        LocalLlmOrchestrator {
+            active_models: Vec::new(),
+            total_gpu_memory_mb: gpu_mem,
+            total_tpu_memory_mb: tpu_mem,
+            allocated_gpu_memory_mb: AtomicUsize::new(0),
+            allocated_tpu_memory_mb: AtomicUsize::new(0),
         }
     }
-}
 
-<<<<<<< HEAD
     /// Schedule and allocate resources for a local LLM model
     pub fn schedule_model(
         &mut self,
@@ -197,7 +177,36 @@ impl SimpleAgentOrchestrator {
             }
         }
         Err(OrchestratorError::ModelNotFound)
-=======
+    }
+}
+
+pub trait AgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
+    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
+    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
+    fn list_agents(&self) -> Vec<AgentID>;
+}
+
+pub struct SimpleAgentOrchestrator {
+    pub agents: Vec<Box<dyn AIAgent>>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleAgentOrchestrator {
+    pub fn new() -> Self {
+        SimpleAgentOrchestrator {
+            agents: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AgentOrchestrator for SimpleAgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
         let id = agent.id();
@@ -227,17 +236,14 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
 
     fn list_agents(&self) -> Vec<AgentID> {
         self.agents.iter().map(|a| a.id()).collect()
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
     }
 }
 
-pub trait TaskQueue {
-    fn enqueue(&mut self, task: &[u8], priority: u8);
-    fn dequeue(&mut self) -> Option<[u8; 256]>;
-    fn size(&self) -> usize;
+pub struct ContextWindowPruner {
+    pub history: Vec<[u8; 128]>,
+    pub max_lines: usize,
 }
 
-<<<<<<< HEAD
 impl ContextWindowPruner {
     pub fn new(max_lines: usize) -> Self {
         ContextWindowPruner {
@@ -260,7 +266,12 @@ impl ContextWindowPruner {
     }
 }
 
-=======
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn size(&self) -> usize;
+}
+
 pub struct SimpleTaskQueue {
     pub tasks: Vec<([u8; 256], u8)>,
 }
@@ -268,6 +279,12 @@ pub struct SimpleTaskQueue {
 impl SimpleTaskQueue {
     pub fn new() -> Self {
         SimpleTaskQueue { tasks: Vec::new() }
+    }
+}
+
+impl Default for SimpleTaskQueue {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -301,13 +318,11 @@ impl TaskQueue for SimpleTaskQueue {
     }
 }
 
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-<<<<<<< HEAD
     fn test_model_scheduling() {
         let mut orchestrator = LocalLlmOrchestrator::new(4096, 8192);
 
@@ -340,7 +355,9 @@ mod tests {
         let mut turn_first = [0u8; 14];
         turn_first.copy_from_slice(&pruner.history[0][..14]);
         assert_eq!(&turn_first, b"Context turn 2");
-=======
+    }
+
+    #[test]
     fn test_orchestrator_and_queue() {
         let mut orchestrator = SimpleAgentOrchestrator::new();
         let agent = SimpleAIAgent::new(1, "TaskAgent");
@@ -356,6 +373,5 @@ mod tests {
 
         let task = queue.dequeue().unwrap();
         assert_eq!(std::str::from_utf8(&task[..14]).unwrap(), "TASK_PRIO_HIGH");
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
     }
 }

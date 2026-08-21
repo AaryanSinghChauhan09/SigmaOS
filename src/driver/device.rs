@@ -10,8 +10,253 @@ use core::mem;
 /// No dependency on external driver frameworks
 use core::ptr::NonNull;
 
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PortAddress {
+    PortIO(u16),
+    MemoryMapped(u64),
+}
+
+pub trait UnifiedPeripheral {
+    fn query_channel(&self) -> PortAddress;
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError>;
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError>;
+}
+
+pub struct LegacyDevice {
+    pub id: usize,
+    pub name: [u8; 32],
+    pub base_port: u16,
+    pub registers: [u8; 256],
+}
+
+impl LegacyDevice {
+    pub fn new(id: usize, name: &[u8], base_port: u16) -> Self {
+        let mut name_arr = [0u8; 32];
+        let len = name.len().min(31);
+        name_arr[..len].copy_from_slice(&name[..len]);
+        Self {
+            id,
+            name: name_arr,
+            base_port,
+            registers: [0; 256],
+        }
+    }
+}
+
+impl UnifiedPeripheral for LegacyDevice {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::PortIO(self.base_port)
+    }
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+        Ok(self.registers[(offset as usize) % 256])
+    }
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+        self.registers[(offset as usize) % 256] = value;
+        Ok(())
+    }
+}
+
+pub struct ModernDevice {
+    pub id: usize,
+    pub name: [u8; 32],
+    pub base_addr: u64,
+    pub memory: [u8; 256],
+}
+
+impl ModernDevice {
+    pub fn new(id: usize, name: &[u8], base_addr: u64) -> Self {
+        let mut name_arr = [0u8; 32];
+        let len = name.len().min(31);
+        name_arr[..len].copy_from_slice(&name[..len]);
+        Self {
+            id,
+            name: name_arr,
+            base_addr,
+            memory: [0; 256],
+        }
+    }
+}
+
+impl UnifiedPeripheral for ModernDevice {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_addr)
+    }
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+        Ok(self.memory[(offset as usize) % 256])
+    }
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+        self.memory[(offset as usize) % 256] = value;
+        Ok(())
+    }
+}
+
+pub struct UdfInterpreter<'a> {
+    pub bytecode: &'a [u8],
+}
+
+impl<'a> UdfInterpreter<'a> {
+    pub fn new(bytecode: &'a [u8]) -> Self {
+        Self { bytecode }
+    }
+
+    pub fn execute<D: UnifiedPeripheral>(&self, device: &mut D, regs: &mut [usize; 4]) -> Result<(), DeviceError> {
+        let mut pc = 0;
+        while pc < self.bytecode.len() {
+            let op = self.bytecode[pc];
+            match op {
+                0x01 => {
+                    if pc + 2 < self.bytecode.len() {
+                        let reg = self.bytecode[pc + 1] as usize;
+                        let offset = self.bytecode[pc + 2] as u32;
+                        if reg < 4 {
+                            regs[reg] = device.read_byte(offset)? as usize;
+                        }
+                        pc += 3;
+                    } else {
+                        break;
+                    }
+                }
+                0x02 => {
+                    if pc + 2 < self.bytecode.len() {
+                        let offset = self.bytecode[pc + 1] as u32;
+                        let reg = self.bytecode[pc + 2] as usize;
+                        if reg < 4 {
+                            device.write_byte(offset, regs[reg] as u8)?;
+                        }
+                        pc += 3;
+                    } else {
+                        break;
+                    }
+                }
+                0x03 => {
+                    if pc + 2 < self.bytecode.len() {
+                        let reg = self.bytecode[pc + 1] as usize;
+                        let factor = self.bytecode[pc + 2] as usize;
+                        if reg < 4 {
+                            regs[reg] *= factor;
+                        }
+                        pc += 3;
+                    } else {
+                        break;
+                    }
+                }
+                _ => break,
+            }
+        }
+        Ok(())
+    }
+}
+
+pub struct DdeDeviceWrapper {
+    pub id: usize,
+    pub name: [u8; 32],
+    pub base_addr: u64,
+    pub os_type: [u8; 16],
+    pub pci_bar: [u8; 256],
+    pub buffer: [u8; 256],
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(id: usize, name: &[u8], base_addr: u64, os: &[u8]) -> Self {
+        let mut name_arr = [0u8; 32];
+        let len = name.len().min(31);
+        name_arr[..len].copy_from_slice(&name[..len]);
+
+        let mut os_arr = [0u8; 16];
+        let os_len = os.len().min(15);
+        os_arr[..os_len].copy_from_slice(&os[..os_len]);
+
+        Self {
+            id,
+            name: name_arr,
+            base_addr,
+            os_type: os_arr,
+            pci_bar: [0; 256],
+            buffer: [0; 256],
+        }
+    }
+
+    pub fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_addr)
+    }
+
+    pub fn info(&self) -> DeviceInfo {
+        let mut info = DeviceInfo::new(DeviceType::Network);
+        info.vendor_id = 0x8086;
+        info.device_id = 0x100e;
+        info
+    }
+
+    pub fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+        Ok(self.pci_bar[(offset as usize) % 256])
+    }
+
+    pub fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+        self.pci_bar[(offset as usize) % 256] = value;
+        Ok(())
+    }
+
+    pub fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(256);
+        buffer[..len].copy_from_slice(&self.buffer[..len]);
+        Ok(len)
+    }
+
+    pub fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(256);
+        self.buffer[..len].copy_from_slice(&buffer[..len]);
+        Ok(len)
+    }
+
+    pub fn ioctl(&mut self, _cmd: u32, _arg: usize) -> Result<usize, DeviceError> {
+        Ok(1)
+    }
+}
+
+pub struct DriverObject {
+    pub driver_name: [u8; 32],
+    pub registry_path: [u8; 128],
+}
+
+pub struct IoManager {
+    pub active_drivers: Vec<DriverObject>,
+}
+
+impl IoManager {
+    pub fn new() -> Self {
+        Self {
+            active_drivers: Vec::new(),
+        }
+    }
+
+    pub fn normal_driver_installation_process(&mut self, name: &[u8], reg_path: &[u8]) -> Result<usize, DeviceError> {
+        let mut name_arr = [0u8; 32];
+        let nlen = name.len().min(31);
+        name_arr[..nlen].copy_from_slice(&name[..nlen]);
+
+        let mut reg_arr = [0u8; 128];
+        let rlen = reg_path.len().min(127);
+        reg_arr[..rlen].copy_from_slice(&reg_path[..rlen]);
+
+        let obj = DriverObject {
+            driver_name: name_arr,
+            registry_path: reg_arr,
+        };
+
+        let idx = self.active_drivers.len();
+        self.active_drivers.push(obj);
+        Ok(idx)
+    }
+}
+
+impl Default for IoManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Device trait (OOP interface)
 pub trait Device {
@@ -2177,6 +2422,7 @@ impl UnifiedPeripheral for ImuSensorDriver {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_legacy_device_oop() {

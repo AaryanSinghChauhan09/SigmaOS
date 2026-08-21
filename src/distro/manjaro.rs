@@ -22,9 +22,9 @@ use klib::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {
-    pub name: klib::string::SigmaString,
-    pub pkgbuild_url: klib::string::SigmaString,
-    pub dependencies: klib::vec::Vec<klib::string::SigmaString>,
+    pub name: String,
+    pub pkgbuild_url: String,
+    pub dependencies: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
