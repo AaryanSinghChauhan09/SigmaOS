@@ -1,100 +1,24 @@
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
-#[cfg(not(test))]
 use crate::sigpkg::{Package, Version, VersionConstraint};
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
-}
-
-#[cfg(test)]
-impl Version {
-    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self {
-            major,
-            minor,
-            patch,
-        }
-    }
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum VersionConstraint {
-    Exact(Version),
-    GreaterThan(Version),
-    LessThan(Version),
-    GreaterOrEqual(Version),
-    LessOrEqual(Version),
-    Any,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone)]
-pub struct Dependency {
-    pub name: String,
-    pub version_constraint: VersionConstraint,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone)]
-pub struct Package {
-    pub name: String,
-    pub version: Version,
-    pub description: String,
-    pub dependencies: Vec<Dependency>,
-    pub checksum: String,
-}
-
-#[cfg(test)]
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
-
 use std::collections::{HashMap, HashSet};
 
-/// elementaryOS-inspired strict reverse-domain and layout validator
+/// Debian-style APT Pinning Rule representing release and priority weighting
 #[derive(Debug, Clone)]
-pub struct DebianElementaryAppPackage {
-    pub app_id: String, // e.g. "io.elementary.calculator"
-    pub has_csd_decorations: bool,
-    pub prefers_dark_theme: bool,
+pub struct AptPinRule {
+    pub package_name_pattern: String,
+    pub release_target: String,
+    pub priority: i32,
 }
 
-impl DebianElementaryAppPackage {
-    pub fn new(app_id: &str, csd: bool, dark: bool) -> Self {
+impl AptPinRule {
+    pub fn new(pattern: &str, release: &str, priority: i32) -> Self {
         Self {
-            app_id: app_id.to_string(),
-            has_csd_decorations: csd,
-            prefers_dark_theme: dark,
+            package_name_pattern: pattern.to_string(),
+            release_target: release.to_string(),
+            priority,
         }
-    }
-
-    /// Validates reverse-domain naming and elementary design standards
-    pub fn is_elementary_compliant(&self) -> bool {
-        // App ID must be reverse domain starting with "io.elementary." or "org.sigmaos."
-        let valid_prefix =
-            self.app_id.starts_with("io.elementary.") || self.app_id.starts_with("org.sigmaos.");
-        valid_prefix && self.has_csd_decorations
     }
 }
 
@@ -131,11 +55,6 @@ impl SatSolver {
         self.resolve_recursive(package_name, version_constraint, &mut result, &mut visited)?;
 
         Ok(result)
-    }
-
-    /// Check if an elementaryOS package is fully compliant before resolution
-    pub fn is_debian_elementary_package_compliant(&self, app: &DebianElementaryAppPackage) -> bool {
-        app.is_elementary_compliant()
     }
 
     /// Recursive dependency resolution
@@ -182,6 +101,46 @@ impl SatSolver {
             VersionConstraint::LessOrEqual(v) => version <= v,
             VersionConstraint::Any => true,
         }
+    }
+
+    /// Resolves the optimal package version using Debian-style APT pinning priorities
+    pub fn resolve_with_pinning(
+        &self,
+        package_name: &str,
+        constraint: &VersionConstraint,
+        pin_rules: &[AptPinRule],
+    ) -> Result<Package, ResolveError> {
+        let candidates = self
+            .packages
+            .get(package_name)
+            .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
+
+        let mut best_candidate: Option<(&Package, i32)> = None;
+
+        for candidate in candidates {
+            if self.satisfies_constraint(&candidate.version, constraint) {
+                // Determine priority score based on pinning rules
+                let mut priority = 500; // Default Debian priority for installed packages
+                for rule in pin_rules {
+                    if rule.package_name_pattern == "*" || rule.package_name_pattern == package_name {
+                        // Priority is matched by release targets or patterns
+                        priority = rule.priority;
+                    }
+                }
+
+                if let Some((_, best_priority)) = best_candidate {
+                    if priority > best_priority {
+                        best_candidate = Some((candidate, priority));
+                    }
+                } else {
+                    best_candidate = Some((candidate, priority));
+                }
+            }
+        }
+
+        best_candidate
+            .map(|(p, _)| p.clone())
+            .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))
     }
 
     /// Detect circular dependencies
@@ -237,6 +196,7 @@ pub enum ResolveError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sigpkg::Dependency;
 
     #[test]
     fn test_sat_solver_creation() {
@@ -300,21 +260,5 @@ mod tests {
         solver.add_package(pkg_b);
 
         assert!(solver.detect_circular("A"));
-    }
-
-    #[test]
-    fn test_debian_elementary_compliance() {
-        let app1 = DebianElementaryAppPackage::new("io.elementary.calculator", true, true);
-        assert!(app1.is_elementary_compliant());
-
-        let app2 = DebianElementaryAppPackage::new("io.elementary.calculator", false, true); // No CSD
-        assert!(!app2.is_elementary_compliant());
-
-        let app3 = DebianElementaryAppPackage::new("org.gnome.builder", true, true); // Not elementary or sigmaos
-        assert!(!app3.is_elementary_compliant());
-
-        let solver = SatSolver::new();
-        assert!(solver.is_debian_elementary_package_compliant(&app1));
-        assert!(!solver.is_debian_elementary_package_compliant(&app3));
     }
 }

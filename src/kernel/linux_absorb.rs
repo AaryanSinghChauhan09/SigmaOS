@@ -170,7 +170,7 @@ impl LinuxAbsorptionEngine {
         let converted_code = self.apply_conversion_rules(source_code)?;
 
         // Apply security hardening
-        let hardened_code = self.apply_security_hardening(&converted_code)?;
+        let _hardened_code = self.apply_security_hardening(&converted_code)?;
 
         let info = AbsorbedDriverInfo {
             linux_module: String::from(linux_module),
@@ -270,13 +270,13 @@ pub enum AbsorptionError {
 /// Absorbed Linux USB HID driver converted to SigmaOS
 pub struct AbsorbedUsbHidDriver {
     metadata: DriverMetadata,
-    capabilities: CapabilityToken,
-    connected: bool,
-    report_descriptor: Vec<u8>,
+    _capabilities: CapabilityToken,
+    _connected: bool,
+    _report_descriptor: Vec<u8>,
 }
 
 impl AbsorbedUsbHidDriver {
-    pub fn new(vendor_id: u16, product_id: u16) -> Self {
+    pub fn new(_vendor_id: u16, _product_id: u16) -> Self {
         Self {
             metadata: DriverMetadata {
                 name: String::from("AbsorbedUsbHidDriver"),
@@ -297,26 +297,26 @@ impl AbsorbedUsbHidDriver {
                 capabilities: vec![0x3000, 0x3001],
                 required_capabilities: vec![0x1000],
             },
-            capabilities: CapabilityToken::new(),
-            connected: false,
-            report_descriptor: Vec::new(),
+            _capabilities: CapabilityToken::new(),
+            _connected: false,
+            _report_descriptor: Vec::new(),
         }
     }
 }
 
 impl DeviceDriver for AbsorbedUsbHidDriver {
     fn init(&mut self) -> Result<(), DriverError> {
-        self.connected = true;
+        self._connected = true;
         Ok(())
     }
 
     fn handle_io(&mut self, operation: IoOperation) -> Result<IoResult, DriverError> {
         match operation {
-            IoOperation::Read { offset, size } => {
+            IoOperation::Read { offset: _, size } => {
                 let data = vec![0u8; size];
                 Ok(IoResult::ReadComplete { data })
             }
-            IoOperation::Write { offset, data } => Ok(IoResult::WriteComplete {
+            IoOperation::Write { offset: _, data } => Ok(IoResult::WriteComplete {
                 bytes_written: data.len(),
             }),
             _ => Err(DriverError::NotSupported),
@@ -324,7 +324,7 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
     }
 
     fn shutdown(&mut self) -> Result<(), DriverError> {
-        self.connected = false;
+        self._connected = false;
         Ok(())
     }
 
@@ -345,8 +345,8 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
 pub struct AbsorbedExt4Driver {
     metadata: DriverMetadata,
     fs_metadata: crate::kernel::subsystem::FilesystemMetadata,
-    mounted: bool,
-    mount_point: String,
+    _mounted: bool,
+    _mount_point: String,
 }
 
 impl AbsorbedExt4Driver {
@@ -383,8 +383,8 @@ impl AbsorbedExt4Driver {
                     crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
                 ],
             },
-            mounted: false,
-            mount_point: String::new(),
+            _mounted: false,
+            _mount_point: String::new(),
         }
     }
 }
@@ -394,43 +394,43 @@ impl FileSystem for AbsorbedExt4Driver {
         Ok(())
     }
 
-    fn mount(&mut self, device: &str, mount_point: &str) -> Result<(), FsError> {
-        self.mounted = true;
-        self.mount_point = String::from(mount_point);
+    fn mount(&mut self, _device: &str, mount_point: &str) -> Result<(), FsError> {
+        self._mounted = true;
+        self._mount_point = String::from(mount_point);
         Ok(())
     }
 
     fn unmount(&mut self) -> Result<(), FsError> {
-        self.mounted = false;
-        self.mount_point.clear();
+        self._mounted = false;
+        self._mount_point.clear();
         Ok(())
     }
 
-    fn open_file(&mut self, path: &str, flags: FileFlags) -> Result<FileHandle, FsError> {
+    fn open_file(&mut self, _path: &str, _flags: FileFlags) -> Result<FileHandle, FsError> {
         Ok(FileHandle(1))
     }
 
-    fn close_file(&mut self, handle: FileHandle) -> Result<(), FsError> {
+    fn close_file(&mut self, _handle: FileHandle) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn read_file(&mut self, handle: FileHandle, buffer: &mut [u8]) -> Result<usize, FsError> {
+    fn read_file(&mut self, _handle: FileHandle, buffer: &mut [u8]) -> Result<usize, FsError> {
         Ok(buffer.len())
     }
 
-    fn write_file(&mut self, handle: FileHandle, data: &[u8]) -> Result<usize, FsError> {
+    fn write_file(&mut self, _handle: FileHandle, data: &[u8]) -> Result<usize, FsError> {
         Ok(data.len())
     }
 
-    fn create_directory(&mut self, path: &str) -> Result<(), FsError> {
+    fn create_directory(&mut self, _path: &str) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn remove(&mut self, path: &str) -> Result<(), FsError> {
+    fn remove(&mut self, _path: &str) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn get_metadata(&self, path: &str) -> Result<crate::kernel::subsystem::FileMetadata, FsError> {
+    fn get_metadata(&self, _path: &str) -> Result<crate::kernel::subsystem::FileMetadata, FsError> {
         Ok(crate::kernel::subsystem::FileMetadata {
             size: 0,
             created: 0,
@@ -496,19 +496,19 @@ impl NetworkStack for AbsorbedTcpStack {
         Ok(())
     }
 
-    fn receive_packet(&mut self, packet: Vec<u8>) -> Result<(), NetworkError> {
+    fn receive_packet(&mut self, _packet: Vec<u8>) -> Result<(), NetworkError> {
         Ok(())
     }
 
-    fn send_packet(&mut self, packet: Vec<u8>) -> Result<(), NetworkError> {
+    fn send_packet(&mut self, _packet: Vec<u8>) -> Result<(), NetworkError> {
         Ok(())
     }
 
     fn create_socket(
         &mut self,
-        domain: crate::kernel::subsystem::SocketDomain,
-        socket_type: crate::kernel::subsystem::SocketType,
-        protocol: crate::kernel::subsystem::SocketProtocol,
+        _domain: crate::kernel::subsystem::SocketDomain,
+        _socket_type: crate::kernel::subsystem::SocketType,
+        _protocol: crate::kernel::subsystem::SocketProtocol,
     ) -> Result<crate::kernel::subsystem::SocketHandle, NetworkError> {
         let handle = crate::kernel::subsystem::SocketHandle(self.connections.len() as u64 + 1);
         self.connections.push(handle);
@@ -602,15 +602,15 @@ impl MemoryManager for AbsorbedBuddyAllocator {
 
     fn map_memory(
         &mut self,
-        virtual_addr: u64,
-        physical_addr: u64,
-        size: usize,
-        flags: MapFlags,
+        _virtual_addr: u64,
+        _physical_addr: u64,
+        _size: usize,
+        _flags: MapFlags,
     ) -> Result<(), MemoryError> {
         Ok(())
     }
 
-    fn unmap_memory(&mut self, virtual_addr: u64, size: usize) -> Result<(), MemoryError> {
+    fn unmap_memory(&mut self, _virtual_addr: u64, _size: usize) -> Result<(), MemoryError> {
         Ok(())
     }
 
@@ -726,11 +726,7 @@ impl SovereignEbpfEngine {
     }
 
     /// Executes eBPF instructions on a network packet buffer or kernel probe context
-    pub fn execute_program(
-        &mut self,
-        program: &[u64],
-        context: &mut [u8],
-    ) -> Result<u64, &'static str> {
+    pub fn execute_program(&mut self, program: &[u64], context: &mut [u8]) -> Result<u64, &'static str> {
         self.program_loaded = true;
         self.registers[1] = context.as_ptr() as u64;
         self.registers[2] = context.len() as u64;
@@ -747,47 +743,33 @@ impl SovereignEbpfEngine {
             }
 
             match opcode {
-                0x07 => {
-                    // ADD immediate
+                0x07 => { // ADD immediate
                     self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(imm);
                 }
-                0x0F => {
-                    // ADD register
-                    self.registers[dst_reg] =
-                        self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
+                0x0F => { // ADD register
+                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
                 }
-                0x17 => {
-                    // SUB immediate
+                0x17 => { // SUB immediate
                     self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(imm);
                 }
-                0x1F => {
-                    // SUB register
-                    self.registers[dst_reg] =
-                        self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
+                0x1F => { // SUB register
+                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
                 }
-                0x27 => {
-                    // MOV immediate
+                0x27 => { // MOV immediate
                     self.registers[dst_reg] = imm;
                 }
-                0x2F => {
-                    // MOV register
+                0x2F => { // MOV register
                     self.registers[dst_reg] = self.registers[src_reg];
                 }
-                0x35 => {
-                    // LOAD from context with offset (packet parsing helper)
-                    let idx = if offset != 0 {
-                        offset as usize
-                    } else {
-                        imm as usize
-                    };
+                0x35 => { // LOAD from context with offset (packet parsing helper)
+                    let idx = if offset != 0 { offset as usize } else { imm as usize };
                     if idx < context.len() {
                         self.registers[dst_reg] = context[idx] as u64;
                     } else {
                         return Err("Context offset out of bounds");
                     }
                 }
-                0x95 => {
-                    // EXIT
+                0x95 => { // EXIT
                     return Ok(self.registers[0]);
                 }
                 _ => {}
@@ -861,39 +843,14 @@ pub struct Plan9Server {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NinePMessage {
-    Tversion {
-        msize: u32,
-        version: String,
-    },
-    Rversion {
-        msize: u32,
-        version: String,
-    },
-    Tattach {
-        fid: u32,
-        afid: u32,
-        uname: String,
-        aname: String,
-    },
-    Rattach {
-        qid_path: u64,
-    },
-    Twalk {
-        fid: u32,
-        newfid: u32,
-        names: Vec<String>,
-    },
-    Rwalk {
-        qids: Vec<u64>,
-    },
-    Tread {
-        fid: u32,
-        offset: u64,
-        count: u32,
-    },
-    Rread {
-        data: Vec<u8>,
-    },
+    Tversion { msize: u32, version: String },
+    Rversion { msize: u32, version: String },
+    Tattach { fid: u32, afid: u32, uname: String, aname: String },
+    Rattach { qid_path: u64 },
+    Twalk { fid: u32, new_fid: u32, names: Vec<String> },
+    Rwalk { qids: Vec<u64> },
+    Tread { fid: u32, offset: u64, count: u32 },
+    Rread { data: Vec<u8> },
 }
 
 impl Plan9Server {
@@ -907,30 +864,25 @@ impl Plan9Server {
     /// Handles a 9P message, routing resource-oriented commands
     pub fn handle_request(&mut self, request: NinePMessage) -> Result<NinePMessage, &'static str> {
         match request {
-            NinePMessage::Tversion { msize, version } => {
+            NinePMessage::Tversion { msize, version: _ } => {
                 self.max_message_size = msize.min(8192);
                 Ok(NinePMessage::Rversion {
                     msize: self.max_message_size,
                     version: String::from("9P2000"),
                 })
             }
-            NinePMessage::Tattach {
-                fid,
-                afid,
-                uname,
-                aname,
-            } => {
+            NinePMessage::Tattach { fid, afid: _, uname: _, aname: _ } => {
                 if !self.active_fids.contains(&fid) {
                     self.active_fids.push(fid);
                 }
                 Ok(NinePMessage::Rattach { qid_path: 0xFF10 })
             }
-            NinePMessage::Twalk { fid, newfid, names } => {
+            NinePMessage::Twalk { fid, new_fid, names } => {
                 if !self.active_fids.contains(&fid) {
                     return Err("Fid not attached");
                 }
-                if !self.active_fids.contains(&newfid) {
-                    self.active_fids.push(newfid);
+                if !self.active_fids.contains(&new_fid) {
+                    self.active_fids.push(new_fid);
                 }
                 let mut qids = Vec::new();
                 for _ in &names {
@@ -938,7 +890,7 @@ impl Plan9Server {
                 }
                 Ok(NinePMessage::Rwalk { qids })
             }
-            NinePMessage::Tread { fid, offset, count } => {
+            NinePMessage::Tread { fid, offset: _, count } => {
                 if !self.active_fids.contains(&fid) {
                     return Err("Fid not valid");
                 }
@@ -1059,25 +1011,17 @@ mod tests {
     #[test]
     fn test_sovereign_capsicum() {
         let mut sandbox = SovereignCapsicum::new();
-        assert!(sandbox
-            .check_capability(SovereignCapsicum::CAP_READ)
-            .is_ok());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
 
         // Restrict capabilities to READ and SEEK only
         sandbox.enter_capability_mode(SovereignCapsicum::CAP_READ | SovereignCapsicum::CAP_SEEK);
         assert!(sandbox.is_sandboxed);
 
-        assert!(sandbox
-            .check_capability(SovereignCapsicum::CAP_READ)
-            .is_ok());
-        assert!(sandbox
-            .check_capability(SovereignCapsicum::CAP_SEEK)
-            .is_ok());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_SEEK).is_ok());
 
         // WRITE is not allowed
-        assert!(sandbox
-            .check_capability(SovereignCapsicum::CAP_WRITE)
-            .is_err());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_WRITE).is_err());
     }
 
     #[test]
@@ -1085,10 +1029,7 @@ mod tests {
         let mut server = Plan9Server::new();
 
         // 1. Tversion
-        let version_req = NinePMessage::Tversion {
-            msize: 4096,
-            version: String::from("9P2000"),
-        };
+        let version_req = NinePMessage::Tversion { msize: 4096, version: String::from("9P2000") };
         let version_resp = server.handle_request(version_req).unwrap();
         if let NinePMessage::Rversion { msize, ref version } = version_resp {
             assert_eq!(msize, 4096);
@@ -1098,12 +1039,7 @@ mod tests {
         }
 
         // 2. Tattach
-        let attach_req = NinePMessage::Tattach {
-            fid: 10,
-            afid: 0,
-            uname: String::from("root"),
-            aname: String::from("root"),
-        };
+        let attach_req = NinePMessage::Tattach { fid: 10, afid: 0, uname: String::from("root"), aname: String::from("root") };
         let attach_resp = server.handle_request(attach_req).unwrap();
         if let NinePMessage::Rattach { qid_path } = attach_resp {
             assert_eq!(qid_path, 0xFF10);
@@ -1113,11 +1049,7 @@ mod tests {
         assert!(server.active_fids.contains(&10));
 
         // 3. Tread
-        let read_req = NinePMessage::Tread {
-            fid: 10,
-            offset: 0,
-            count: 5,
-        };
+        let read_req = NinePMessage::Tread { fid: 10, offset: 0, count: 5 };
         let read_resp = server.handle_request(read_req).unwrap();
         if let NinePMessage::Rread { ref data } = read_resp {
             assert_eq!(data.len(), 5);

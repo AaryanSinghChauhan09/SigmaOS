@@ -1,5 +1,6 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -171,7 +172,7 @@ impl PKIManager for SimplePKIManager {
         _issuer_id: CertificateID,
     ) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
-            if self.revoked.contains(id) {
+            if self.revoked.contains(&id) {
                 return Ok(false);
             }
             Ok(cert.is_valid())

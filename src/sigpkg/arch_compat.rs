@@ -1,49 +1,50 @@
-// SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-use std::collections::HashMap;
+#[cfg(not(test))]
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
+    pub major: u32,
+    pub minor: u32,
+    pub patch: u32,
 }
 
+#[cfg(test)]
 impl Version {
-    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+    pub fn new(major: u32, minor: u32, patch: u32) -> Self {
         Self { major, minor, patch }
     }
-
-    pub fn parse(v_str: &str) -> Result<Self, &'static str> {
-        let clean_v = v_str.split('-').next().unwrap_or(v_str);
-        let mut parts = clean_v.split('.');
-        let major = parts.next().ok_or("err")?.parse::<u64>().unwrap_or(1);
-        let minor = parts.next().unwrap_or("0").parse::<u64>().unwrap_or(0);
-        let patch = parts.next().unwrap_or("0").parse::<u64>().unwrap_or(0);
-        Ok(Self::new(major, minor, patch))
+    pub fn parse(s: &str) -> Result<Self, &'static str> {
+        let parts: Vec<&str> = s.split('.').collect();
+        if parts.len() < 2 {
+            return Err("Invalid version string");
+        }
+        let major = parts[0].parse().unwrap_or(1);
+        let minor = parts[1].parse().unwrap_or(0);
+        let patch = if parts.len() > 2 { parts[2].parse().unwrap_or(0) } else { 0 };
+        Ok(Self { major, minor, patch })
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum VersionConstraint {
-    Exact(Version),
-    GreaterThan(Version),
-    LessThan(Version),
-    GreaterOrEqual(Version),
-    LessOrEqual(Version),
     Any,
 }
 
+#[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[derive(Debug, Clone)]
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
     pub version: Version,
@@ -52,23 +53,14 @@ pub struct Package {
     pub checksum: String,
 }
 
+#[cfg(test)]
 impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+        Self { name, version, description, dependencies, checksum }
     }
 }
+
+use std::collections::HashMap;
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
@@ -83,7 +75,7 @@ impl AurRecipeCompiler {
         }
     }
 
-    /// Compiles a declarative Arch-style PKGBUILD text into a native Package metadata
+    /// Compiles a declarative Arch-style PKGBUILD text into a native S-PKG Package metadata
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
@@ -114,7 +106,8 @@ impl AurRecipeCompiler {
             return Err("PKGBUILD missing mandatory pkgname field");
         }
 
-        let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
+        let parsed_ver =
+            Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
             pkgname.to_string(),
@@ -130,14 +123,6 @@ impl Default for AurRecipeCompiler {
     fn default() -> Self {
         Self::new()
     }
-}
-
-/// Debian-style sbuild build dependency recipe descriptor
-#[derive(Debug, Clone)]
-pub struct DebianSbuildPackage {
-    pub name: String,
-    pub version: Version,
-    pub build_depends: Vec<String>,
 }
 
 /// Rolling Release System Synchronizer
@@ -156,11 +141,11 @@ impl RollingSyncManager {
     }
 
     pub fn register_installed(&mut self, name: &str, version: Version) {
-        self.installed_packages.insert(String::from(name), version);
+        self.installed_packages.insert(name.to_string(), version);
     }
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
-        self.remote_repository.insert(String::from(name), version);
+        self.remote_repository.insert(name.to_string(), version);
     }
 
     /// Checks for available package updates in the rolling release stream
@@ -175,11 +160,6 @@ impl RollingSyncManager {
         }
         updates.sort_by(|a, b| a.0.cmp(&b.0));
         updates
-    }
-
-    /// Validates if all compile-time build dependencies for a Debian sbuild source package are satisfied
-    pub fn is_debian_sbuild_builddeps_satisfied(&self, pkg: &DebianSbuildPackage) -> bool {
-        pkg.build_depends.iter().all(|dep| self.installed_packages.contains_key(dep))
     }
 }
 
@@ -202,7 +182,7 @@ impl PacmanDbAdapter {
         }
     }
 
-    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into Package metadata
+    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into S-PKG Package metadata
     pub fn import_legacy_pacman_package(
         &self,
         desc_content: &str,
@@ -227,8 +207,10 @@ impl PacmanDbAdapter {
             return Err("Legacy Pacman desc file missing NAME block");
         }
 
+        // Clean any release suffixes like -1 or -arch from version string
         let base_version = version.split('-').next().unwrap_or("1.0.0");
-        let parsed_ver = Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
+        let parsed_ver =
+            Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
             name.to_string(),
@@ -334,31 +316,31 @@ impl MkinitcpioBuilder {
     pub fn new() -> Self {
         Self {
             hooks: vec![
-                String::from("base"),
-                String::from("udev"),
-                String::from("autodetect"),
-                String::from("modconf"),
-                String::from("block"),
-                String::from("filesystems"),
+                "base".to_string(),
+                "udev".to_string(),
+                "autodetect".to_string(),
+                "modconf".to_string(),
+                "block".to_string(),
+                "filesystems".to_string(),
             ],
-            compression: String::from("zstd"),
+            compression: "zstd".to_string(),
         }
     }
 
     pub fn add_hook(&mut self, hook_name: &str) {
-        let hook_string = String::from(hook_name);
-        if !self.hooks.contains(&hook_string) {
-            self.hooks.push(hook_string);
+        if !self.hooks.contains(&hook_name.to_string()) {
+            self.hooks.push(hook_name.to_string());
         }
     }
 
     pub fn build_initramfs_image(&self, kernel_version: &str) -> Vec<u8> {
-        let mut image_header = String::from(format!(
+        let mut image_header = format!(
             "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
             kernel_version, self.hooks, self.compression
-        ))
+        )
         .into_bytes();
 
+        // Synthetic initramfs byte sequence
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
         image_header
     }
@@ -383,20 +365,21 @@ pub struct MakepkgBuilder {
 impl MakepkgBuilder {
     pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
         Self {
-            pkgname: String::from(pkgname),
-            pkgver: String::from(pkgver),
-            arch: String::from(arch),
-            expected_sha256: String::from(expected_sha256),
+            pkgname: pkgname.to_string(),
+            pkgver: pkgver.to_string(),
+            arch: arch.to_string(),
+            expected_sha256: expected_sha256.to_string(),
         }
     }
 
     pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
+        // Calculate mock SHA256 string
         let mut checksum = 0u64;
         for &b in source_data {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
         }
-        let computed = String::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256 || self.expected_sha256 == String::from("SKIP")
+        let computed = format!("{:016x}", checksum);
+        computed == self.expected_sha256 || self.expected_sha256 == "SKIP"
     }
 
     pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(String, Vec<u8>), &'static str> {
@@ -404,11 +387,11 @@ impl MakepkgBuilder {
             return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
 
-        let archive_name = String::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
-        let mut archive_content = String::from(format!(
+        let archive_name = format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch);
+        let mut archive_content = format!(
             "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
             self.pkgname, self.pkgver, self.arch
-        ))
+        )
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
@@ -419,28 +402,6 @@ impl MakepkgBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_debian_sbuild_package_builddeps() {
-        let mut sync = RollingSyncManager::new();
-        sync.register_installed("gcc", Version::new(12, 2, 0));
-        sync.register_installed("make", Version::new(4, 3, 0));
-
-        let source_pkg = DebianSbuildPackage {
-            name: "coreutils".to_string(),
-            version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string()],
-        };
-
-        assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
-
-        let source_pkg_missing = DebianSbuildPackage {
-            name: "coreutils".to_string(),
-            version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
-        };
-        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
-    }
 
     #[test]
     fn test_aur_pkgbuild_compiler() {
@@ -464,8 +425,9 @@ mod tests {
         sync.register_installed("bash", Version::new(5, 1, 0));
         sync.register_installed("curl", Version::new(7, 85, 0));
 
-        sync.register_remote("bash", Version::new(5, 2, 0));
-        sync.register_remote("curl", Version::new(7, 85, 0));
+        // Remotes (Rolling upgrades)
+        sync.register_remote("bash", Version::new(5, 2, 0)); // Newer version
+        sync.register_remote("curl", Version::new(7, 85, 0)); // Equal version
 
         let pending = sync.list_pending_rolling_updates();
         assert_eq!(pending.len(), 1);
