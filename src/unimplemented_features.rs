@@ -2866,7 +2866,7 @@ mod competitor_absorption_tests {
     }
 
     #[test]
-    fn test_handle_table_ NT_offsets() {
+    fn test_handle_table_nt_offsets() {
         let mut table = Win32HandleTable::new();
         let h1 = table.allocate_handle(0x000F).unwrap();
         let h2 = table.allocate_handle(0x00F0).unwrap();
