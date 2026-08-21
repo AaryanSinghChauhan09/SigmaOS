@@ -1,4 +1,13 @@
-use crate::driver::device::DdeDeviceWrapper;
+pub struct DdeDeviceWrapper {
+    pub simulated_pci_bar: [u8; 256],
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
+        Self { simulated_pci_bar: [0; 256] }
+    }
+}
+
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.

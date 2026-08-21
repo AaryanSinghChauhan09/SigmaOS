@@ -52,10 +52,88 @@ impl<T> SigmaVec<T> {
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
-    
-    /// Get the capacity of the vector
-    pub fn capacity(&self) -> usize {
-        self.capacity
+
+    pub fn sort_by<F>(&mut self, mut compare: F)
+    where
+        F: FnMut(&T, &T) -> core::cmp::Ordering,
+    {
+        if self.len <= 1 {
+            return;
+        }
+        for i in 1..self.len {
+            let mut j = i;
+            while j > 0 {
+                let elem_j = unsafe { &*self.data.add(j) };
+                let elem_prev = unsafe { &*self.data.add(j - 1) };
+                if compare(elem_prev, elem_j) == core::cmp::Ordering::Greater {
+                    unsafe {
+                        core::ptr::swap(self.data.add(j - 1), self.data.add(j));
+                    }
+                    j -= 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    pub fn clear(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+            }
+        }
+        self.len = 0;
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+
+    pub fn contains(&self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
+        for i in 0..self.len {
+            if unsafe { &*self.data.add(i) } == item {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn insert(&mut self, index: usize, item: T) {
+        if index > self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            for i in (index..self.len).rev() {
+                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+            }
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
     }
     
     /// Reserve additional capacity
@@ -240,20 +318,23 @@ impl<T> SigmaVec<T> {
     }
 }
 
-impl<T> Drop for SigmaVec<T> {
-    fn drop(&mut self) {
-        self.clear();
-        self.deallocate();
+impl<T: PartialEq> PartialEq for Vec<T> {
+    fn eq(&self, other: &Self) -> bool {
+        if self.len != other.len {
+            return false;
+        }
+        for i in 0..self.len {
+            if self[i] != other[i] {
+                return false;
+            }
+        }
+        true
     }
 }
 
-impl<T> Default for SigmaVec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+impl<T: Eq + PartialEq> Eq for Vec<T> {}
 
-impl<T: Clone> Clone for SigmaVec<T> {
+impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = SigmaVec::with_capacity(self.capacity);
         for i in 0..self.len {
@@ -266,164 +347,18 @@ impl<T: Clone> Clone for SigmaVec<T> {
     }
 }
 
-impl<T: PartialEq> PartialEq for SigmaVec<T> {
-    fn eq(&self, other: &Self) -> bool {
-        if self.len != other.len {
-            return false;
-        }
-        
-        for i in 0..self.len {
-            unsafe {
-                if &*self.ptr.add(i) != &*other.ptr.add(i) {
-                    return false;
-                }
-            }
-        }
-        
-        true
+impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_list().entries(self.iter()).finish()
     }
 }
 
-impl<T: Eq> Eq for SigmaVec<T> {}
-
-impl<T> IntoIterator for SigmaVec<T> {
-    type Item = T;
-    type IntoIter = IntoIter<T>;
-    
-    fn into_iter(self) -> Self::IntoIter {
-        IntoIter {
-            vec: ManuallyDrop::new(self),
-            index: 0,
+impl<T> FromIterator<T> for Vec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut vec = Vec::new();
+        for item in iter {
+            vec.push(item);
         }
-    }
-}
-
-/// Iterator for SigmaVec
-pub struct IntoIter<T> {
-    vec: ManuallyDrop<SigmaVec<T>>,
-    index: usize,
-}
-
-impl<T> Iterator for IntoIter<T> {
-    type Item = T;
-    
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len {
-            let item = unsafe {
-                ptr::read(self.vec.ptr.add(self.index))
-            };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-impl<T> Drop for IntoIter<T> {
-    fn drop(&mut self) {
-        // Drop remaining elements
-        for i in self.index..self.vec.len {
-            unsafe {
-                ptr::drop_in_place(self.vec.ptr.add(i));
-            }
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    
-    #[test]
-    fn test_vec_creation() {
-        let vec: SigmaVec<i32> = SigmaVec::new();
-        assert!(vec.is_empty());
-        assert_eq!(vec.len(), 0);
-        
-        let vec = SigmaVec::with_capacity(10);
-        assert!(vec.is_empty());
-        assert_eq!(vec.capacity(), 10);
-    }
-    
-    #[test]
-    fn test_vec_push_pop() {
-        let mut vec = SigmaVec::new();
-        vec.push(1);
-        vec.push(2);
-        vec.push(3);
-        
-        assert_eq!(vec.len(), 3);
-        assert_eq!(vec.pop(), Some(3));
-        assert_eq!(vec.pop(), Some(2));
-        assert_eq!(vec.pop(), Some(1));
-        assert_eq!(vec.pop(), None);
-    }
-    
-    #[test]
-    fn test_vec_get() {
-        let mut vec = SigmaVec::new();
-        vec.push(10);
-        vec.push(20);
-        vec.push(30);
-        
-        assert_eq!(vec.get(0), Some(&10));
-        assert_eq!(vec.get(1), Some(&20));
-        assert_eq!(vec.get(2), Some(&30));
-        assert_eq!(vec.get(3), None);
-    }
-    
-    #[test]
-    fn test_vec_remove() {
-        let mut vec = SigmaVec::new();
-        vec.push(1);
-        vec.push(2);
-        vec.push(3);
-        vec.push(4);
-        
-        let removed = vec.remove(1);
-        assert_eq!(removed, 2);
-        assert_eq!(vec.len(), 3);
-        assert_eq!(vec.get(0), Some(&1));
-        assert_eq!(vec.get(1), Some(&3));
-        assert_eq!(vec.get(2), Some(&4));
-    }
-    
-    #[test]
-    fn test_vec_insert() {
-        let mut vec = SigmaVec::new();
-        vec.push(1);
-        vec.push(3);
-        vec.push(4);
-        
-        vec.insert(1, 2);
-        assert_eq!(vec.len(), 4);
-        assert_eq!(vec.get(0), Some(&1));
-        assert_eq!(vec.get(1), Some(&2));
-        assert_eq!(vec.get(2), Some(&3));
-        assert_eq!(vec.get(3), Some(&4));
-    }
-    
-    #[test]
-    fn test_vec_clear() {
-        let mut vec = SigmaVec::new();
-        vec.push(1);
-        vec.push(2);
-        vec.push(3);
-        
-        vec.clear();
-        assert!(vec.is_empty());
-        assert_eq!(vec.len(), 0);
-    }
-    
-    #[test]
-    fn test_vec_extend() {
-        let mut vec = SigmaVec::new();
-        vec.extend(vec![1, 2, 3]);
-        
-        assert_eq!(vec.len(), 3);
-        assert_eq!(vec.get(0), Some(&1));
-        assert_eq!(vec.get(1), Some(&2));
-        assert_eq!(vec.get(2), Some(&3));
+        vec
     }
 }

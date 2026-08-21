@@ -83,17 +83,25 @@ impl Default for SmartTelemetry {
 }
 
 /// Simulated AHCI SATA Command Header structure (HBA memory layout)
+#[repr(C, packed)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SimulatedAhciCommandHeader {
     pub opts: u16,
     pub prdtl: u16,
     pub prdbc: u32,
     pub ctba: u64,
+    pub reserved: [u32; 4],
 }
 
 impl SimulatedAhciCommandHeader {
     pub const fn new() -> Self {
-        Self { opts: 0, prdtl: 0, prdbc: 0, ctba: 0 }
+        Self {
+            opts: 0,
+            prdtl: 0,
+            prdbc: 0,
+            ctba: 0,
+            reserved: [0; 4],
+        }
     }
 }
 
@@ -164,16 +172,6 @@ pub struct AhciPrdtEntry {
     pub dbc: u32, // Data Byte Count & Interrupt-on-Completion
 }
 
-/// AHCI SATA Command Header
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct AhciCommandHeader {
-    pub opts: u16, // Description flags, PRDT length
-    pub prdtl: u16, // PRDT Length
-    pub prdbc: u32, // PRD Byte Count
-    pub ctba: u64, // Command Table Base Address
-    pub reserved: [u32; 4],
-}
 
 /// AHCI Serial ATA Storage Controller Driver
 pub struct AhciStorageDriver {

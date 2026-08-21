@@ -39,14 +39,54 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct SigmaString {
     data: String,
+}
+
+impl PartialEq<&str> for SigmaString {
+    fn eq(&self, other: &&str) -> bool {
+        self.data == *other
+    }
+}
+
+impl From<&str> for SigmaString {
+    fn from(s: &str) -> Self {
+        SigmaString::from_str(s)
+    }
+}
+
+impl From<String> for SigmaString {
+    fn from(s: String) -> Self {
+        Self { data: s }
+    }
+}
+
+impl PartialEq<str> for SigmaString {
+    fn eq(&self, other: &str) -> bool {
+        self.data == *other
+    }
+}
+
+impl PartialEq<String> for SigmaString {
+    fn eq(&self, other: &String) -> bool {
+        self.data == *other
+    }
+}
+
+impl core::fmt::Display for SigmaString {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.data)
+    }
 }
 
 impl SigmaString {
     pub fn new() -> Self {
         Self { data: String::new() }
+    }
+
+    pub fn into_bytes(self) -> Vec<u8> {
+        self.data.into_bytes()
     }
 
     pub fn empty() -> Self {
@@ -60,17 +100,22 @@ impl SigmaString {
     pub fn as_str(&self) -> &str {
         &self.data
     }
-    
-    pub fn push(&mut self, c: char) {
-        self.data.push(c);
+
+    pub fn push(&mut self, ch: char) {
+        self.data.push(ch);
     }
-    
-    pub fn len(&self) -> usize {
-        self.data.len()
+
+    pub fn push_str(&mut self, s: &str) {
+        self.data.push_str(s);
     }
-    
-    pub fn is_empty(&self) -> bool {
-        self.data.is_empty()
+
+    pub fn join(&self, path: &str) -> SigmaString {
+        let mut new_path = self.data.clone();
+        if !new_path.ends_with('/') && !path.starts_with('/') {
+            new_path.push('/');
+        }
+        new_path.push_str(path);
+        SigmaString { data: new_path }
     }
 }
 

@@ -1,6 +1,11 @@
 // SigmaOS Kernel Scheduler
 // Implements EEVDF (Earliest Eligible Virtual Deadline First) scheduler
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
 use core::time::Duration;
 
 /// Process priority levels

@@ -15,7 +15,6 @@ pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
 pub mod linux_bsd_inspirations;
-pub mod ecosystem_dimensions;
 
 pub use ecosystem_dimensions::{
     BareMetalTelemetryRing, CommunityRemixBuilder, CommunityRemixConfig,

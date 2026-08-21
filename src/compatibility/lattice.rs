@@ -1,9 +1,12 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS Kernel Feature Lattice & Syscall Tracker
 // Encapsulates fine-grained feature path selection and lifecycle-aware syscall tracking
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum LatticeFeature {
     LegacyMemoryModel,
     PredictiveScheduling,

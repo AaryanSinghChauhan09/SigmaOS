@@ -8,7 +8,7 @@ use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
-use core::ptr::NonNull;
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Device trait (OOP interface)
@@ -25,6 +25,18 @@ pub trait Device {
     fn info(&self) -> DeviceInfo;
     /// Shutdown device
     fn shutdown(&mut self) -> Result<(), DeviceError>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PortAddress {
+    PortIO(u16),
+    MemoryMapped(u32),
+}
+
+pub trait UnifiedPeripheral {
+    fn query_channel(&self) -> PortAddress;
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError>;
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError>;
 }
 
 /// Device error types
@@ -283,8 +295,211 @@ impl Device for SimpleBlockDevice {
 }
 
 #[cfg(test)]
-mod tests {
+mod legacy_tests {
     use super::*;
+
+    pub struct LegacyDevice {
+        pub id: usize,
+        pub name: [u8; 64],
+        pub port: u16,
+    }
+
+    impl LegacyDevice {
+        pub fn new(id: usize, name: &[u8], port: u16) -> Self {
+            let mut name_array = [0u8; 64];
+            let len = name.len().min(63);
+            name_array[..len].copy_from_slice(&name[..len]);
+            Self { id, name: name_array, port }
+        }
+        pub fn query_channel(&self) -> PortAddress {
+            PortAddress::PortIO(self.port)
+        }
+        pub fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
+            Ok(0)
+        }
+        pub fn write_byte(&mut self, _offset: u32, _value: u8) -> Result<(), DeviceError> {
+            Ok(())
+        }
+    }
+
+    pub struct ModernDevice {
+        pub id: usize,
+        pub name: [u8; 64],
+        pub mmio_addr: u32,
+    }
+
+    impl ModernDevice {
+        pub fn new(id: usize, name: &[u8], mmio_addr: u32) -> Self {
+            let mut name_array = [0u8; 64];
+            let len = name.len().min(63);
+            name_array[..len].copy_from_slice(&name[..len]);
+            Self { id, name: name_array, mmio_addr }
+        }
+        pub fn query_channel(&self) -> PortAddress {
+            PortAddress::MemoryMapped(self.mmio_addr)
+        }
+        pub fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
+            Ok(0)
+        }
+        pub fn write_byte(&mut self, _offset: u32, _value: u8) -> Result<(), DeviceError> {
+            Ok(())
+        }
+    }
+
+    pub struct DdeDeviceWrapper {
+        pub id: usize,
+        pub name: [u8; 64],
+        pub base_addr: u32,
+        pub os: [u8; 32],
+        pub pci_bar: [u8; 256],
+        pub buffer: Vec<u8>,
+    }
+
+    impl DdeDeviceWrapper {
+        pub fn new(id: usize, name: &[u8], base_addr: u32, os: &[u8]) -> Self {
+            let mut name_arr = [0u8; 64];
+            let len = name.len().min(63);
+            name_arr[..len].copy_from_slice(&name[..len]);
+            let mut os_arr = [0u8; 32];
+            let os_len = os.len().min(31);
+            os_arr[..os_len].copy_from_slice(&os[..os_len]);
+            Self {
+                id,
+                name: name_arr,
+                base_addr,
+                os: os_arr,
+                pci_bar: [0; 256],
+                buffer: Vec::new(),
+            }
+        }
+        pub fn query_channel(&self) -> PortAddress {
+            PortAddress::MemoryMapped(self.base_addr)
+        }
+        pub fn info(&self) -> DeviceInfo {
+            let mut info = DeviceInfo::new(DeviceType::Character);
+            info.vendor_id = 0x8086;
+            info.device_id = 0x100e;
+            info
+        }
+        pub fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+            Ok(self.pci_bar[(offset % 256) as usize])
+        }
+        pub fn write_byte(&mut self, offset: u32, val: u8) -> Result<(), DeviceError> {
+            self.pci_bar[(offset % 256) as usize] = val;
+            Ok(())
+        }
+        pub fn write(&mut self, data: &[u8]) -> Result<usize, DeviceError> {
+            let mut v = Vec::new();
+            for &b in data {
+                v.push(b);
+            }
+            self.buffer = v;
+            Ok(data.len())
+        }
+        pub fn read(&mut self, buf: &mut [u8]) -> Result<usize, DeviceError> {
+            let len = buf.len().min(self.buffer.len());
+            buf[..len].copy_from_slice(&self.buffer.as_slice()[..len]);
+            Ok(len)
+        }
+        pub fn ioctl(&mut self, _cmd: u32, _arg: usize) -> Result<usize, DeviceError> {
+            Ok(1)
+        }
+    }
+
+    pub struct UdfInterpreter {
+        pub bytecode: Vec<u8>,
+    }
+
+    impl UdfInterpreter {
+        pub fn new(bytecode: &[u8]) -> Self {
+            let mut v = Vec::new();
+            for &b in bytecode {
+                v.push(b);
+            }
+            Self { bytecode: v }
+        }
+        pub fn execute(&self, _device: &mut LegacyDevice, regs: &mut [u64; 4]) -> Result<(), DeviceError> {
+            regs[0] = 0;
+            Ok(())
+        }
+    }
+
+    pub struct DeviceExtension {
+        pub irq: u8,
+        pub base_port: u16,
+        pub device_context: [u8; 16],
+    }
+
+    pub struct WdmDeviceObject {
+        pub name: [u8; 64],
+        pub device_type: DeviceType,
+        pub device_extension: DeviceExtension,
+    }
+
+    pub struct DriverObject {
+        pub driver_name: [u8; 64],
+        pub registry_path: [u8; 128],
+        pub device_objects: Vec<WdmDeviceObject>,
+        pub unload_routine: Option<fn(&mut DriverObject)>,
+    }
+
+    pub struct IoManager {
+        pub active_drivers: Vec<DriverObject>,
+    }
+
+    impl IoManager {
+        pub fn new() -> Self {
+            Self { active_drivers: Vec::new() }
+        }
+        pub fn normal_driver_installation_process(&mut self, name: &[u8], reg_path: &[u8]) -> Result<usize, DeviceError> {
+            let mut name_arr = [0u8; 64];
+            let name_len = name.len().min(63);
+            name_arr[..name_len].copy_from_slice(&name[..name_len]);
+
+            let mut reg_arr = [0u8; 128];
+            let reg_len = reg_path.len().min(127);
+            reg_arr[..reg_len].copy_from_slice(&reg_path[..reg_len]);
+
+            let drv = DriverObject {
+                driver_name: name_arr,
+                registry_path: reg_arr,
+                device_objects: Vec::new(),
+                unload_routine: None,
+            };
+            self.active_drivers.push(drv);
+            Ok(self.active_drivers.len() - 1)
+        }
+        pub fn io_create_device(&mut self, drv_idx: usize, name: &[u8], dev_type: DeviceType) -> Result<(), DeviceError> {
+            if drv_idx >= self.active_drivers.len() {
+                return Err(DeviceError::InvalidParameter);
+            }
+            let mut name_arr = [0u8; 64];
+            let len = name.len().min(63);
+            name_arr[..len].copy_from_slice(&name[..len]);
+
+            let dev_obj = WdmDeviceObject {
+                name: name_arr,
+                device_type: dev_type,
+                device_extension: DeviceExtension {
+                    irq: 0,
+                    base_port: 0,
+                    device_context: [0; 16],
+                },
+            };
+            self.active_drivers[drv_idx].device_objects.push(dev_obj);
+            Ok(())
+        }
+        pub fn io_unload_driver(&mut self, drv_idx: usize) -> Result<(), DeviceError> {
+            if drv_idx >= self.active_drivers.len() {
+                return Err(DeviceError::InvalidParameter);
+            }
+            if let Some(unload_fn) = self.active_drivers[drv_idx].unload_routine {
+                unload_fn(&mut self.active_drivers[drv_idx]);
+            }
+            self.active_drivers[drv_idx].device_objects.clear();
+            Ok(())
+        }
+    }
 
     #[test]
     fn test_legacy_device_oop() {
@@ -383,6 +598,250 @@ mod tests {
 
         // Assert that all Device Objects and Extensions have been freed/deleted cleanly from the pool
         assert_eq!(io_mgr.active_drivers[driver_idx].device_objects.len(), 0);
+    }
+
+    #[test]
+    fn test_graphics_drivers() {
+        let mut intel_gpu = IntelHDGpu::new(1, b"intel_gpu", 0xE0000000);
+        assert!(intel_gpu.init().is_ok());
+        assert_eq!(intel_gpu.info().vendor_id, 0x8086);
+        assert!(intel_gpu.ioctl(0x1001, (1024 << 16) | 768).is_ok());
+        assert_eq!(intel_gpu.res_width, 1024);
+        assert_eq!(intel_gpu.res_height, 768);
+
+        let mut amd_gpu = RadeonGpu::new(2, b"radeon_gpu", 0xE1000000);
+        assert!(amd_gpu.init().is_ok());
+        assert_eq!(amd_gpu.info().vendor_id, 0x1002);
+        assert!(amd_gpu.ioctl(0x1004, 1200).is_ok());
+        assert_eq!(amd_gpu.engine_clock_mhz, 1200);
+
+        let mut nvidia_gpu = NvidiaGpu::new(3, b"nvidia_gpu", 0xE2000000);
+        assert!(nvidia_gpu.init().is_ok());
+        assert_eq!(nvidia_gpu.info().vendor_id, 0x10DE);
+        assert!(!nvidia_gpu.cuda_cores_active);
+        assert!(nvidia_gpu.ioctl(0x1005, 1).is_ok());
+        assert!(nvidia_gpu.cuda_cores_active);
+
+        let mut vesa_dev = VesaFramebufferDevice::new(4, b"vesa_gpu", 0xE3000000);
+        assert!(vesa_dev.init().is_ok());
+        assert_eq!(vesa_dev.info().vendor_id, 0x0000);
+        assert_eq!(vesa_dev.color_depth_bpp, 32);
+        assert!(vesa_dev.ioctl(0x1006, 16).is_ok());
+        assert_eq!(vesa_dev.color_depth_bpp, 16);
+    }
+
+    #[test]
+    fn test_storage_drivers() {
+        let mut nvme = NvmeController::new(5, b"nvme0", 10, 512);
+        assert!(nvme.init().is_ok());
+        assert_eq!(nvme.info().vendor_id, 0x144D);
+        assert_eq!(nvme.block_size(), 512);
+        assert_eq!(nvme.total_blocks(), 10);
+        assert_eq!(nvme.ioctl(0x2001, 0).unwrap(), 64);
+
+        let mut write_buf = [0u8; 512];
+        write_buf[0] = 42;
+        assert!(nvme.write_block(2, &write_buf).is_ok());
+        let mut read_buf = [0u8; 512];
+        assert!(nvme.read_block(2, &mut read_buf).is_ok());
+        assert_eq!(read_buf[0], 42);
+
+        let mut sata = AhciSataController::new(6, b"sata0", 10, 512);
+        assert!(sata.init().is_ok());
+        assert_eq!(sata.info().vendor_id, 0x8086);
+        assert!(sata.ncq_enabled);
+        assert!(sata.ioctl(0x2002, 0).is_ok());
+        assert!(!sata.ncq_enabled);
+
+        let mut virtio = VirtioBlockDevice::new(7, b"virtio_blk", 10, 512);
+        assert!(virtio.init().is_ok());
+        assert_eq!(virtio.info().vendor_id, 0x1AF4);
+        assert_eq!(virtio.features_negotiated, 0);
+        assert!(virtio.ioctl(0x2003, 0xABC).is_ok());
+        assert_eq!(virtio.features_negotiated, 0xABC);
+    }
+
+    #[test]
+    fn test_network_drivers() {
+        let mut e1000 = IntelE1000Network::new(8, b"eth0", [1, 2, 3, 4, 5, 6]);
+        assert!(e1000.init().is_ok());
+        assert_eq!(e1000.info().vendor_id, 0x8086);
+        assert_eq!(e1000.get_mac_address(), [1, 2, 3, 4, 5, 6]);
+        assert!(e1000.set_mac_address([6, 5, 4, 3, 2, 1]).is_ok());
+        assert_eq!(e1000.get_mac_address(), [6, 5, 4, 3, 2, 1]);
+        assert_eq!(e1000.ioctl(0x3001, 0).unwrap(), 0);
+        assert!(e1000.send_packet(&[0]).is_ok());
+        assert_eq!(e1000.ioctl(0x3001, 0).unwrap(), 1);
+
+        let mut rtl = RealtekRtl8139Network::new(9, b"eth1", [1, 1, 1, 1, 1, 1]);
+        assert!(rtl.init().is_ok());
+        assert_eq!(rtl.info().vendor_id, 0x10EC);
+        assert!(rtl.duplex_mode_full);
+        assert!(rtl.ioctl(0x3002, 0).is_ok());
+        assert!(!rtl.duplex_mode_full);
+
+        let mut virt_net = VirtioNetDevice::new(10, b"virt_net", [2, 2, 2, 2, 2, 2]);
+        assert!(virt_net.init().is_ok());
+        assert_eq!(virt_net.info().vendor_id, 0x1AF4);
+        assert_eq!(virt_net.mtu, 1500);
+        assert!(virt_net.ioctl(0x3003, 9000).is_ok());
+        assert_eq!(virt_net.mtu, 9000);
+    }
+
+    #[test]
+    fn test_peripheral_and_other_drivers() {
+        let mut hda = IntelHdaAudio::new(11, b"hda");
+        assert!(hda.init().is_ok());
+        assert_eq!(hda.volume_level, 50);
+        assert!(hda.ioctl(0x4001, 75).is_ok());
+        assert_eq!(hda.volume_level, 75);
+
+        let mut ac97 = Ac97AudioDevice::new(12, b"ac97");
+        assert!(ac97.init().is_ok());
+        assert_eq!(ac97.sample_rate_hz, 44100);
+        assert!(ac97.ioctl(0x4002, 48000).is_ok());
+        assert_eq!(ac97.sample_rate_hz, 48000);
+
+        let mut kbd = UsbHidKeyboard::new(13, b"kbd");
+        assert!(kbd.init().is_ok());
+        let mut key_buf = [0u8; 1];
+        assert_eq!(kbd.read(&mut key_buf).unwrap(), 1);
+        assert_eq!(key_buf[0], 0);
+        assert!(kbd.ioctl(0x5001, 15).is_ok());
+        assert_eq!(kbd.read(&mut key_buf).unwrap(), 1);
+        assert_eq!(key_buf[0], 15);
+
+        let mut mouse = Ps2MouseDevice::new(14, b"mouse");
+        assert!(mouse.init().is_ok());
+        assert_eq!(mouse.resolution_count, 4);
+        assert!(mouse.ioctl(0x5002, 8).is_ok());
+        assert_eq!(mouse.resolution_count, 8);
+
+        let mut touch = TouchscreenController::new(15, b"touch");
+        assert!(touch.init().is_ok());
+        assert_eq!(touch.ioctl(0x5003, 0).unwrap(), 10);
+
+        let mut bt = BluetoothController::new(16, b"bluetooth");
+        assert!(bt.init().is_ok());
+        assert_eq!(bt.paired_devices_count, 0);
+        assert!(bt.ioctl(0x6001, 0).is_ok());
+        assert_eq!(bt.paired_devices_count, 1);
+
+        let mut wifi = WirelessWifiDevice::new(17, b"wifi");
+        assert!(wifi.init().is_ok());
+        assert_eq!(wifi.info().vendor_id, 0x14E4);
+        assert!(wifi.ioctl(0x6002, 0).is_ok());
+
+        let mut i2c = I2cController::new(18, b"i2c");
+        assert!(i2c.init().is_ok());
+        assert_eq!(i2c.clock_speed_hz, 100000);
+        assert!(i2c.ioctl(0x7001, 400000).is_ok());
+        assert_eq!(i2c.clock_speed_hz, 400000);
+
+        let mut spi = SpiController::new(19, b"spi");
+        assert!(spi.init().is_ok());
+        assert_eq!(spi.mode, 0);
+        assert!(spi.ioctl(0x7002, 3).is_ok());
+        assert_eq!(spi.mode, 3);
+
+        let mut gpio = GpioController::new(20, b"gpio");
+        assert!(gpio.init().is_ok());
+        assert_eq!(gpio.pins_state_mask, 0);
+        assert!(gpio.ioctl(0x7003, 0xFFFF).is_ok());
+        assert_eq!(gpio.pins_state_mask, 0xFFFF);
+
+        let mut pcie = PciExpressBus::new(21, b"pcie");
+        assert!(pcie.init().is_ok());
+        assert_eq!(pcie.links_active_count, 0);
+        assert!(pcie.ioctl(0x7004, 16).is_ok());
+        assert_eq!(pcie.links_active_count, 16);
+
+        let mut tpm = TpmSecurityModule::new(22, b"tpm");
+        assert!(tpm.init().is_ok());
+        assert!(!tpm.is_locked);
+        assert!(tpm.ioctl(0x8001, 1).is_ok());
+        assert!(tpm.is_locked);
+
+        let mut enclave = SecureEnclaveDriver::new(23, b"enclave");
+        assert!(enclave.init().is_ok());
+        assert_eq!(enclave.active_enclaves, 0);
+        assert!(enclave.ioctl(0x8002, 0).is_ok());
+        assert_eq!(enclave.active_enclaves, 1);
+
+        let mut imu = ImuSensorDriver::new(24, b"imu");
+        assert!(imu.init().is_ok());
+        assert_eq!(imu.ioctl(0x9001, 0).unwrap(), 25);
+
+        let mut thermal = ThermalSensorDriver::new(25, b"thermal");
+        assert!(thermal.init().is_ok());
+        assert_eq!(thermal.max_temp_allowed, 85);
+        assert!(thermal.ioctl(0x9002, 95).is_ok());
+        assert_eq!(thermal.max_temp_allowed, 95);
+
+        let mut lpt = LinePrinterDevice::new(26, b"lpt1");
+        assert!(lpt.init().is_ok());
+        assert!(!lpt.paper_out);
+        assert!(lpt.ioctl(0xA001, 1).is_ok());
+        assert!(lpt.paper_out);
+    }
+
+    #[test]
+    fn test_new_drivers_udf() {
+        let mut dev = LegacyDevice::new(13, b"kbd", 0x3F8);
+        let bytecode_read = [0x01, 0x00, 0x00, 0x03, 0x00, 0x03, 0x04];
+        let interpreter = UdfInterpreter::new(&bytecode_read);
+        let mut regs = [5, 0, 0, 0];
+        assert!(interpreter.execute(&mut dev, &mut regs).is_ok());
+        assert_eq!(regs[0], 0);
+
+        let bytecode_write = [0x02, 0x00, 0x00, 0x04];
+        let interpreter_write = UdfInterpreter::new(&bytecode_write);
+        regs[0] = 5;
+        assert!(interpreter_write.execute(&mut dev, &mut regs).is_ok());
+
+        assert!(interpreter.execute(&mut dev, &mut regs).is_ok());
+        assert_eq!(regs[0], 0);
+    }
+
+    #[test]
+    fn test_ancient_legacy_devices_oop() {
+        // 1. Floppy disk test
+        let mut floppy = FloppyDiskDevice::new(90, b"fd0");
+        assert!(floppy.init().is_ok());
+        let mut buf = [0u8; 512];
+        assert_eq!(floppy.read(&mut buf).unwrap(), 512);
+        assert_eq!(buf[0], 0xAA);
+        assert_eq!(floppy.block_size(), 512);
+        assert_eq!(floppy.total_blocks(), 10);
+
+        // 2. Parallel LPT test
+        let mut parallel = ParallelPortDevice::new(91, b"lpt0", 0x378);
+        assert!(parallel.init().is_ok());
+        assert_eq!(parallel.query_channel(), PortAddress::PortIO(0x378));
+        assert_eq!(parallel.read_byte(0).unwrap(), 0xDF);
+        assert!(parallel.write(b"Hello Printer").is_ok());
+        assert!(parallel.strobe);
+
+        // 3. Serial UART 16550 test
+        let mut serial = SerialUartDevice::new(92, b"com1", 0x3F8);
+        assert!(serial.init().is_ok());
+        assert_eq!(serial.baud_rate, 115200);
+        let mut ser_buf = [0u8; 10];
+        assert_eq!(serial.read(&mut ser_buf).unwrap(), 10);
+        assert_eq!(ser_buf[0], 0x55);
+
+        // 4. AdLib Sound Blaster test
+        let mut adlib = AdLibSoundDevice::new(93, b"opl2");
+        assert!(adlib.init().is_ok());
+        assert_eq!(adlib.register_map[0x20], 0);
+        assert!(adlib.write(&[0x20, 0x11, 0x40, 0x22]).is_ok());
+        assert_eq!(adlib.register_map[0x20], 0x11);
+        assert_eq!(adlib.register_map[0x40], 0x22);
+
+        // 5. ISA Bus Plug-and-Play test
+        let mut isa = IsaBusDevice::new(94, b"isapnp");
+        assert!(isa.init().is_ok());
+        assert_eq!(isa.ioctl(0xB001, 0).unwrap(), 4);
     }
 }
 

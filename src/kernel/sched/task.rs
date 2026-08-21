@@ -1,4 +1,21 @@
-#![no_std]
+// SPDX-License-Identifier: MIT
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
 
 extern crate alloc;
 use alloc::string::String;
@@ -15,6 +32,9 @@ pub const INIT_PID: u64 = 1;
 pub enum ProcessState {
     Running,
     Runnable,
+    Blocked,
+    BlockedWaiting,
+    BlockedSuspended,
     Stopped,
     Traced,
     Zombie,
@@ -84,6 +104,12 @@ impl Cred {
 
     pub fn capable(&self, cap: u64) -> bool {
         (self.cap_effective & cap) != 0
+    }
+}
+
+impl Default for Cred {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -167,6 +193,12 @@ impl MmStruct {
             context: 0,
             pgtables_bytes: 0,
         }
+    }
+}
+
+impl Default for MmStruct {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -255,5 +287,52 @@ impl Task {
 
     pub fn is_alive(&self) -> bool {
         !self.is_zombie()
+    }
+
+    pub fn is_blocked(&self) -> bool {
+        matches!(
+            self.state,
+            ProcessState::Blocked | ProcessState::BlockedWaiting | ProcessState::BlockedSuspended
+        )
+    }
+
+    pub fn workload_type(&self) -> TaskWorkloadType {
+        match self.policy {
+            SchedPolicy::Deadline | SchedPolicy::Fifo => TaskWorkloadType::RealTimePeriodic,
+            SchedPolicy::Batch => TaskWorkloadType::Batch,
+            SchedPolicy::Idle => TaskWorkloadType::Batch,
+            _ => {
+                if self.pid == INIT_PID || self.parent_pid == 0 {
+                    TaskWorkloadType::SystemKernelDaemon
+                } else if self.nivcsw > self.nvcsw * 2 {
+                    TaskWorkloadType::CpuBound
+                } else {
+                    TaskWorkloadType::Interactive
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_task_workload_classification() {
+        let mut t1 = Task::new(1, "systemd");
+        assert_eq!(t1.workload_type(), TaskWorkloadType::SystemKernelDaemon);
+
+        let mut t2 = Task::new(100, "ffmpeg");
+        t2.nivcsw = 1000;
+        t2.nvcsw = 10;
+        assert_eq!(t2.workload_type(), TaskWorkloadType::CpuBound);
+
+        let mut t3 = Task::new(101, "realtime_audio");
+        t3.policy = SchedPolicy::Fifo;
+        assert_eq!(t3.workload_type(), TaskWorkloadType::RealTimePeriodic);
+
+        t3.state = ProcessState::BlockedWaiting;
+        assert!(t3.is_blocked());
     }
 }

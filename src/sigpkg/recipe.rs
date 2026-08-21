@@ -67,6 +67,15 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.build_commands.insert(0, command);
+        self
+    }
+
+    pub fn with_pkgrel(self, _rel: u32) -> Self {
+        self
+    }
+
     pub fn with_build_command(mut self, command: String) -> Self {
         self.build_commands.push(command);
         self
@@ -233,5 +242,41 @@ mod tests {
 
         let script = recipe.get_build_script();
         assert!(script.contains("cargo build"));
+    }
+
+    #[test]
+    fn test_portage_style_use_flags() {
+        let mut recipe = PackageRecipe::new("libcurl".to_string(), Version::new(8, 2, 1))
+            .with_source("https://example.com/curl".to_string(), "99aa88".to_string())
+            .with_build_command("make".to_string());
+
+        // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
+        let ssl_dependency = Dependency {
+            name: "openssl".to_string(),
+            version_constraint: crate::sigpkg::VersionConstraint::Exact(Version::new(3, 0, 0)),
+        };
+
+        recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);
+
+        // 1. By default, "Ssl" is inactive, so no conditional dependency is fetched
+        assert!(!recipe.is_use_active(UseFlag::Ssl));
+        assert_eq!(recipe.get_active_dependencies().len(), 0);
+
+        // 2. Toggle "Ssl" active
+        recipe = recipe.with_use_flag(UseFlag::Ssl);
+        assert!(recipe.is_use_active(UseFlag::Ssl));
+
+        let active_deps = recipe.get_active_dependencies();
+        assert_eq!(active_deps.len(), 1);
+        assert_eq!(active_deps[0].name, "openssl");
+    }
+
+    #[test]
+    fn test_portage_stage_optimization_flags() {
+        let mut recipe = PackageRecipe::new("kernel".to_string(), Version::new(6, 1, 0));
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O2 -pipe"); // default Stage2
+
+        recipe = recipe.with_compilation_profile(StageProfile::Stage3Optimized);
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O3 -march=native -flto=fat -funroll-loops");
     }
 }

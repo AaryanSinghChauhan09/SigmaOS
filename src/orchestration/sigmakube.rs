@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-
-use crate::klib::{Vec, String};
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Cluster state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

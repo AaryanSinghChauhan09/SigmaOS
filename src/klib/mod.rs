@@ -16,9 +16,9 @@ pub mod console;
 
 // For now, we use our custom Vec and HashMap (aliased to our bucket-based BTreeMap)
 pub use vec::Vec;
-pub use hashmap::BTreeMap as HashMap;
-pub use hashmap::BTreeMap;
-pub use adt::{SplayTree, RadixTree, SovereignPriorityQueue};
+pub use hashmap::{HashMap, BTreeMap, Entry};
+pub use hashset::HashSet;
+pub use vecdeque::VecDeque;
 pub use custom_string::SigmaString;
 pub use io::{KlibRead, KlibWrite};
 pub use custom_allocator::SIGMA_ALLOCATOR;

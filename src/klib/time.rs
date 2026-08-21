@@ -63,22 +63,8 @@ impl Duration {
         self.secs * 1000 + (self.nanos / 1_000_000) as u64
     }
 
-    pub fn as_micros(&self) -> u64 {
-        self.secs * 1_000_000 + (self.nanos / 1_000) as u64
-    }
-
-    pub fn as_nanos(&self) -> u64 {
-        self.secs * 1_000_000_000 + self.nanos as u64
-    }
-
-    pub fn checked_add(self, rhs: Duration) -> Option<Duration> {
-        let mut secs = self.secs.checked_add(rhs.secs)?;
-        let mut nanos = self.nanos + rhs.nanos;
-        if nanos >= 1_000_000_000 {
-            nanos -= 1_000_000_000;
-            secs = secs.checked_add(1)?;
-        }
-        Some(Duration { secs, nanos })
+    pub fn as_secs_f64(&self) -> f64 {
+        (self.secs as f64) + (self.nanos as f64 / 1_000_000_000.0)
     }
 }
 

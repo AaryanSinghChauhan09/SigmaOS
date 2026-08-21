@@ -3,6 +3,8 @@
 
 extern crate alloc;
 
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
 use core::sync::atomic::{AtomicU32, Ordering};
@@ -15,6 +17,11 @@ pub type Port = u16;
 pub enum Protocol {
     Tcp = 0,
     Udp = 1,
+}
+
+impl Protocol {
+    pub const TCP: Protocol = Protocol::Tcp;
+    pub const UDP: Protocol = Protocol::Udp;
 }
 
 /// Standard RFC-793 TCP States

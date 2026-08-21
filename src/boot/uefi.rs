@@ -1,18 +1,62 @@
-/// OOP-based UEFI Bootloader for SigmaOS
-/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
+// SPDX-License-Identifier: MIT
+//! OOP-based UEFI Bootloader for SigmaOS
+//! Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
+//! Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
+//! Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+extern crate alloc;
+
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type BootStatus = usize;
 
-#[repr(usize)]
+/// Standard UEFI Boot Phases
+#[repr(u32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
+pub enum BootPhase {
+    Init = 0,
+    LoadKernel = 1,
+    Handoff = 2,
+    Complete = 3,
+}
 
+/// UEFI Boot Errors
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BootError {
+    Success = 0,
+    LoadFailed = 1,
+    HandoffFailed = 2,
+    SignatureInvalid = 3,
+}
+
+/// Simulated raw UEFI Memory Descriptor conforming to UEFI spec
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2 }
+pub struct UefiMemoryDescriptor {
+    pub memory_type: u32,
+    pub physical_start: u64,
+    pub virtual_start: u64,
+    pub number_of_pages: u64,
+    pub attribute: u64,
+}
+
+/// Simulated UEFI System Table containing raw pointers to boot services
+#[repr(C)]
+pub struct UefiSystemTable {
+    pub firmware_vendor_ptr: *const u16,
+    pub firmware_revision: u32,
+    pub console_out_handle: *mut core::ffi::c_void,
+    pub boot_services_ptr: *const UefiBootServices,
+}
+
+/// Simulated UEFI Boot Services with raw pointer function hooks
+#[repr(C)]
+pub struct UefiBootServices {
+    pub get_memory_map_fn: *const core::ffi::c_void,
+    pub allocate_pages_fn: *const core::ffi::c_void,
+}
 
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;

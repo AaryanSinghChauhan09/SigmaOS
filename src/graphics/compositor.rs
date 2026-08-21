@@ -3,6 +3,7 @@
 // No dependency on external graphics frameworks
 
 extern crate alloc;
+use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
 use std::sync::atomic::{AtomicBool, Ordering};

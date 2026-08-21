@@ -1,77 +1,48 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
+// SPDX-License-Identifier: MIT
 // SigmaOS Manjaro Distro Integration Module
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use std::collections::HashMap;
+use crate::klib::collections::HashMap;
+use crate::klib::{SigmaString, Vec};
 
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {
-    pub name: String,
-    pub pkgbuild_url: String,
-    pub dependencies: Vec<String>,
+    pub name: SigmaString,
+    pub pkgbuild_url: SigmaString,
+    pub dependencies: Vec<SigmaString>,
 }
 
 /// A Flatpak sandboxed application representation
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FlatpakPackage {
-    pub app_id: String,
-    pub runtime_version: String,
-    pub sandbox_permissions: Vec<String>,
-}
-
-/// A Snap sandboxed application representation
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SnapPackage {
-    pub name: String,
-    pub channel: String,     // stable, beta, edge
-    pub confinement: String, // classic, strict
+pub struct ManjaroKernelRelease {
+    pub version: SigmaString,
+    pub is_lts: bool,
+    pub dkms_modules: Vec<SigmaString>,
 }
 
 
 /// Hardware GPU types detected on the system bus
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuType {
-    IntelIntegrated,
-    AmdRadeon,
-    NvidiaDiscrete,
-    HybridIntelNvidia,
-}
-
-/// A driver module configuration managed by MHWD
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MhwdDriverConfig {
-    pub name: String,
-    pub version: String,
-    pub open_source: bool,
-    pub hybrid_supported: bool,
+    Nvidia,
+    Amd,
+    Intel,
+    Virtio,
 }
 
 /// Manjaro Hardware Detection (MHWD) - Auto-detects optimal open/proprietary drivers
 #[derive(Debug, Clone)]
+pub struct MhwdDriverConfig {
+    pub gpu_type: GpuType,
+    pub driver_name: SigmaString,
+    pub is_free_driver: bool,
+}
+
 pub struct ManjaroHardwareDetection {
-    pub detected_gpus: Vec<GpuType>,
-    pub installed_drivers: Vec<MhwdDriverConfig>,
+    pub detected_gpus: Vec<MhwdDriverConfig>,
+    pub installed_drivers: Vec<SigmaString>,
 }
 
 impl ManjaroHardwareDetection {
@@ -83,58 +54,34 @@ impl ManjaroHardwareDetection {
         }
     }
 
-    pub fn scan_pci_bus(&mut self, gpus: &[GpuType]) {
-        self.detected_gpus = gpus.to_vec();
+    pub fn auto_detect_hardware(&mut self, vendor_id: u16) {
+        let config = match vendor_id {
+            0x10DE => MhwdDriverConfig {
+                gpu_type: GpuType::Nvidia,
+                driver_name: SigmaString::from("video-nvidia"),
+                is_free_driver: false,
+            },
+            0x1002 => MhwdDriverConfig {
+                gpu_type: GpuType::Amd,
+                driver_name: SigmaString::from("video-amdgpu"),
+                is_free_driver: true,
+            },
+            _ => MhwdDriverConfig {
+                gpu_type: GpuType::Intel,
+                driver_name: SigmaString::from("video-modesetting"),
+                is_free_driver: true,
+            },
+        };
+        self.detected_gpus.push(config);
     }
 
-    /// Auto-configures and installs optimal driver configurations
-    pub fn auto_configure(&mut self) -> Result<usize, &'static str> {
-        if self.detected_gpus.is_empty() {
-            return Err("No compatible graphic processing units detected on PCI bus.");
+    pub fn install_mhwd_driver(&mut self, driver_name: &str) -> Result<(), &'static str> {
+        let sig = SigmaString::from(driver_name);
+        if self.installed_drivers.contains(&sig) {
+            return Err("Driver already installed");
         }
-
-        let mut config_count = 0;
-        for gpu in &self.detected_gpus {
-            match gpu {
-                GpuType::IntelIntegrated => {
-                    self.installed_drivers.push(MhwdDriverConfig {
-                        name: "video-linux-intel".to_string(),
-                        version: "2026.04".to_string(),
-                        open_source: true,
-                        hybrid_supported: false,
-                    });
-                    config_count += 1;
-                }
-                GpuType::AmdRadeon => {
-                    self.installed_drivers.push(MhwdDriverConfig {
-                        name: "video-mesa-amdgpu".to_string(),
-                        version: "2026.04".to_string(),
-                        open_source: true,
-                        hybrid_supported: false,
-                    });
-                    config_count += 1;
-                }
-                GpuType::NvidiaDiscrete => {
-                    self.installed_drivers.push(MhwdDriverConfig {
-                        name: "video-nvidia-proprietary".to_string(),
-                        version: "555.22".to_string(),
-                        open_source: false,
-                        hybrid_supported: true,
-                    });
-                    config_count += 1;
-                }
-                GpuType::HybridIntelNvidia => {
-                    self.installed_drivers.push(MhwdDriverConfig {
-                        name: "video-hybrid-intel-nvidia-prime".to_string(),
-                        version: "555.22-prime".to_string(),
-                        open_source: false,
-                        hybrid_supported: true,
-                    });
-                    config_count += 1;
-                }
-            }
-        }
-        Ok(config_count)
+        self.installed_drivers.push(sig);
+        Ok(())
     }
 }
 
@@ -144,46 +91,52 @@ impl Default for ManjaroHardwareDetection {
     }
 }
 
-/// Represents different available kernel releases to switch dynamically
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ManjaroKernelRelease {
-    LinuxStable,
-    LinuxLts,
-    LinuxRealtimeRt,
-    LinuxExperimental,
-}
-
-/// Manjaro-inspired: Dynamic Kernel Module Support (DKMS) auto-module rebuilder on host kernel swaps
-#[derive(Debug, Clone)]
 pub struct MhwdDkmsRebuilder {
-    pub registered_modules: Vec<String>,
-    pub compiled_modules_for_kernels: BTreeMap<String, Vec<String>>,
+    pub active_kernel: ManjaroKernelRelease,
 }
 
 impl MhwdDkmsRebuilder {
-    pub fn new() -> Self {
+    pub fn new(kernel_ver: &str, is_lts: bool) -> Self {
         Self {
-            registered_modules: Vec::new(),
-            compiled_modules_for_kernels: BTreeMap::new(),
+            active_kernel: ManjaroKernelRelease {
+                version: SigmaString::from(kernel_ver),
+                is_lts,
+                dkms_modules: Vec::new(),
+            },
         }
     }
 
-    pub fn register_module(&mut self, module_name: &str) {
-        if !self.registered_modules.contains(&module_name.to_string()) {
-            self.registered_modules.push(module_name.to_string());
-        }
+    pub fn register_dkms_module(&mut self, module_name: &str) {
+        self.active_kernel.dkms_modules.push(SigmaString::from(module_name));
     }
 
-    /// Rebuilds and recompiles registered modules dynamically for target kernel version
-    pub fn trigger_rebuild(&mut self, kernel_version: &str) -> usize {
-        let mut compiled = Vec::new();
-        for module in &self.registered_modules {
-            compiled.push(module.clone());
-        }
-        let count = compiled.len();
-        self.compiled_modules_for_kernels
-            .insert(kernel_version.to_string(), compiled);
-        count
+    pub fn rebuild_all_dkms_modules(&self) -> usize {
+        self.active_kernel.dkms_modules.len()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_mhwd_detection() {
+        let mut mhwd = ManjaroHardwareDetection::new();
+        mhwd.auto_detect_hardware(0x10DE);
+        assert_eq!(mhwd.detected_gpus.len(), 1);
+        assert_eq!(mhwd.detected_gpus[0].gpu_type, GpuType::Nvidia);
+
+        assert!(mhwd.install_mhwd_driver("video-nvidia").is_ok());
+        assert!(mhwd.install_mhwd_driver("video-nvidia").is_err());
+    }
+
+    #[test]
+    fn test_dkms_rebuilder() {
+        let mut dkms = MhwdDkmsRebuilder::new("linux65", true);
+        dkms.register_dkms_module("nvidia-dkms");
+        dkms.register_dkms_module("virtualbox-guest-dkms");
+
+        assert_eq!(dkms.rebuild_all_dkms_modules(), 2);
     }
 }
 

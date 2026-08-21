@@ -2,6 +2,7 @@
 // Inspired by OpenBSD pledge but capability-based
 
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

@@ -73,7 +73,7 @@ impl SigmaFormatter {
     }
 
     /// Format integer to string
-    pub fn format_int(&mut self, value: i32) -> String {
+    pub fn format_int(&mut self, value: i32) -> SigmaString {
         let mut result = Vec::new();
         let mut num = value;
         

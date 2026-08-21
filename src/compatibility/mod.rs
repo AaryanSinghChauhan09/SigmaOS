@@ -23,13 +23,42 @@ pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
+pub mod cross_platform_kernel;
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
+pub mod canonical;
+pub mod fedora;
+pub mod void_linux;
+pub mod pop_os;
+pub mod clear_linux;
+pub mod historic_linux;
+pub mod antix;
+pub mod zorin;
 
+pub use antix::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
+};
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState,
+    ZorinConnectManager, ZorinWindowsAppSupport,
+};
 pub use legacy_adapters::{
-    KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
-    APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
-    WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
-    LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
-    GLOBAL_WORKLOAD_OPTIMIZER,
+    KernelPersona, SyscallAbi,
+};
+pub use void_linux::{
+    XbpsDatabase, RinitInitSystem, VoidMuslToolchain, XbpsPackageVerifier, RunitStageManager,
+};
+pub use pop_os::{
+    PopOsBspTiler, PopOsCosmicScheduler, CosmicWindowNode,
+};
+pub use clear_linux::{
+    ClearLinuxStatelessEngine, CpuIsaLevel,
 };
 
 pub use constellation_mesh::{
@@ -46,9 +75,13 @@ pub use cross_platform::{
     ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
-pub use endeavour::{
-    EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
-    YayAurHelper,
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
+pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
+
+pub use cross_platform_kernel::{
+    PageAccessMode, MemoryArch, PageTableEntry, PageDirectory, DeferredProcedureCall,
+    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
+    UmsThreadState, UmsContext, SovereignKernelInternals,
 };
 
 pub use mint_linux::{
