@@ -249,6 +249,7 @@ impl VirtualFilesystem {
     pub fn create_hard_link(&mut self, source_inode_id: u64) -> Result<(), FsError> {
         if let Some(inode) = self.inodes.get_mut(&source_inode_id) {
             inode.link_count += 1;
+            inode.hard_links_count += 1;
             Ok(())
         } else {
             Err(FsError::NotFound)
@@ -266,7 +267,8 @@ impl VirtualFilesystem {
 
         let link_reached_zero = if let Some(inode) = self.inodes.get_mut(&inode_id) {
             inode.link_count = inode.link_count.saturating_sub(1);
-            inode.link_count == 0
+            inode.hard_links_count = inode.hard_links_count.saturating_sub(1);
+            inode.link_count == 0 || inode.hard_links_count == 0
         } else {
             false
         };
@@ -274,6 +276,7 @@ impl VirtualFilesystem {
         if link_reached_zero {
             self.inodes.remove(&inode_id);
         }
+
         Ok(())
     }
 

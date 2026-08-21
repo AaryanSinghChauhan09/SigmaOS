@@ -21,6 +21,15 @@ pub mod processor_management;
 pub mod cpufreq;
 pub mod structures;
 pub mod object;
+pub mod unix_primitives;
+
+pub use unix_primitives::{
+    BsdSecureNtpConstraintSync as UnixSecureNtpConstraintSync, CalloutWheel, CapMode, CapRights,
+    DaxMemoryRegion, FutexTable, GeomClass, GeomMesh, GeomProvider, KqFilter, Kqueue,
+    NetlinkBus, NlFamily, NlMessage, PerCpu, RbTree, RcuEpoch, Sbuf, SeqLock, SparseMap,
+    SysctlOid, SysctlTree, SysctlType, SysctlValue, Turnstile, UmaCache, UmaZone, UnixKernelHub,
+    WaitQueue, Witness,
+};
 
 pub use vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
 
