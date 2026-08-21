@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 //! SigmaOS Fdisk Compatibility
 //! Disk partitioning (fdisk command)
 //! Zero external dependencies
