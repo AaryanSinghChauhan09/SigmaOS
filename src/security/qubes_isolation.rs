@@ -97,9 +97,6 @@ pub struct QrexecRule {
     pub action: QrexecPolicyAction,
 }
 
-/// Dynamic Qrexec Policy Engine (RPC verification)
-pub struct DomainOrchestrator;
-
 pub struct QrexecPolicyEngine {
     pub rules: Vec<QrexecRule>,
 }

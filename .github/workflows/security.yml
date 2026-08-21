@@ -19,12 +19,10 @@ jobs:
       security-events: write
 
     steps:
-    - uses: actions/checkout@11bd5193b48c4b3c7778881999d4b1d7e0ba3a8c # v4.2.2
+    - uses: actions/checkout@v4
     
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@b77805b0cba5f4923cc3ca22b4c2c5104891fa4b # v1.80.0
-      with:
-        toolchain: stable
+      uses: dtolnay/rust-toolchain@stable
 
     - name: Install cargo-audit
       run: cargo install cargo-audit
@@ -36,11 +34,11 @@ jobs:
       run: cargo tree -d
     
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@8685613e7270999a0b60a2bb20a5666b789c9b0e # v3.27.9
+      uses: github/codeql-action/init@v3
       with:
         languages: rust
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@32c0b3f6954e68f4826d8057f4c005477b119e5f # v3.27.9
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:rust"
