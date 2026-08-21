@@ -60,6 +60,18 @@ impl SigmaString {
     pub fn as_str(&self) -> &str {
         &self.data
     }
+    
+    pub fn push(&mut self, c: char) {
+        self.data.push(c);
+    }
+    
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+    
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
 }
 
 impl Default for SigmaString {

@@ -153,10 +153,79 @@ impl Default for SigmaFormatter {
 pub trait KlibRead {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, SigmaIoError>;
     fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), SigmaIoError>;
+    fn read_to_string(&mut self, s: &mut SigmaString) -> Result<usize, SigmaIoError>;
 }
 
 /// Custom Write trait for klib
 pub trait KlibWrite {
     fn write(&mut self, buf: &[u8]) -> Result<usize, SigmaIoError>;
+    fn write_all(&mut self, buf: &[u8]) -> Result<(), SigmaIoError>;
     fn flush(&mut self) -> Result<(), SigmaIoError>;
+}
+
+/// Default implementation for SigmaBuffer
+impl KlibRead for SigmaBuffer {
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, SigmaIoError> {
+        let bytes_read = self.read(buf);
+        if bytes_read == 0 && !buf.is_empty() {
+            Err(SigmaIoError::UnexpectedEof)
+        } else {
+            Ok(bytes_read)
+        }
+    }
+    
+    fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), SigmaIoError> {
+        let mut total_read = 0;
+        while total_read < buf.len() {
+            let bytes_read = self.read(&mut buf[total_read..])?;
+            if bytes_read == 0 {
+                return Err(SigmaIoError::UnexpectedEof);
+            }
+            total_read += bytes_read;
+        }
+        Ok(())
+    }
+    
+    fn read_to_string(&mut self, s: &mut SigmaString) -> Result<usize, SigmaIoError> {
+        let mut buffer = [0u8; 4096];
+        let mut total_read = 0;
+        
+        loop {
+            let bytes_read = self.read(&mut buffer)?;
+            if bytes_read == 0 {
+                break;
+            }
+            
+            for byte in &buffer[..bytes_read] {
+                s.push(*byte as char);
+            }
+            total_read += bytes_read;
+        }
+        
+        Ok(total_read)
+    }
+}
+
+impl KlibWrite for SigmaBuffer {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, SigmaIoError> {
+        let bytes_written = self.write(buf);
+        Ok(bytes_written)
+    }
+    
+    fn write_all(&mut self, buf: &[u8]) -> Result<(), SigmaIoError> {
+        let mut total_written = 0;
+        while total_written < buf.len() {
+            let bytes_written = self.write(&buf[total_written..]);
+            if bytes_written == 0 {
+                return Err(SigmaIoError::WriteZero);
+            }
+            total_written += bytes_written;
+        }
+        Ok(())
+    }
+    
+    fn flush(&mut self) -> Result<(), SigmaIoError> {
+        // Buffer-based, no flush needed
+        Ok(())
+    }
 }

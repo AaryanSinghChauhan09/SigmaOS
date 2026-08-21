@@ -340,6 +340,15 @@ pub static SIGMA_ALLOCATOR: SigmaBumpAllocator = SigmaBumpAllocator::new();
 #[cfg(not(target_os = "none"))]
 pub static SIGMA_ALLOCATOR: SigmaBumpAllocator = SigmaBumpAllocator::new();
 
+/// Simple wrapper type for module consistency
+pub struct SigmaAllocator;
+
+impl SigmaAllocator {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
 pub unsafe fn alloc(size: usize) -> *mut u8 {
     let layout = Layout::from_size_align(size, MIN_ALIGN).unwrap_or(Layout::from_size_align_unchecked(size, 1));
     GlobalAlloc::alloc(&SIGMA_ALLOCATOR, layout)
