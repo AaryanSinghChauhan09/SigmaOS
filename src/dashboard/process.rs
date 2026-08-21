@@ -207,10 +207,12 @@ impl ProcessManager {
 
         // Update history
         for process in &processes {
-            self.process_history
-                .entry(process.pid)
-                .or_insert_with(Vec::new)
-                .push(process.clone());
+            if !self.process_history.contains_key(&process.pid) {
+                self.process_history.insert(process.pid, Vec::new());
+            }
+            if let Some(history) = self.process_history.get_mut(&process.pid) {
+                history.push(process.clone());
+            }
         }
 
         Ok(processes)

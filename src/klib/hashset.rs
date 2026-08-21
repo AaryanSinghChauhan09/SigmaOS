@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: MIT
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
 use super::BTreeMap;
-use super::hashmap::BTreeMapIter;
+use super::btreemap::BTreeMapIter;
 
 pub struct HashSet<T>
 where
@@ -58,12 +59,6 @@ where
         }
     }
 
-    pub fn with_capacity(capacity: usize) -> Self {
-        HashSet {
-            map: BTreeMap::with_capacity(capacity),
-        }
-    }
-
     pub fn insert(&mut self, item: T) -> bool {
         let was_present = self.map.contains_key(&item);
         self.map.insert(item, ());
@@ -99,39 +94,6 @@ where
 {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl<T> Clone for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone,
-{
-    fn clone(&self) -> Self {
-        HashSet {
-            map: self.map.clone(),
-        }
-    }
-}
-
-impl<T> core::fmt::Debug for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone + core::fmt::Debug,
-{
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_set().entries(self.iter()).finish()
-    }
-}
-
-impl<T> FromIterator<T> for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone,
-{
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut set = HashSet::new();
-        for item in iter {
-            set.insert(item);
-        }
-        set
     }
 }
 

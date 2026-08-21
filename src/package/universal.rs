@@ -499,7 +499,7 @@ pub enum FeatureType {
     Source,
 }
 
-pub trait PackageAdapter {
+pub trait UniversalAdapter {
     fn adapter_name(&self) -> &str;
 }
 
