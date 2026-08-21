@@ -234,6 +234,28 @@ pub unsafe extern "C" fn cron_validate_user_privileges(job_index: usize, executi
     }
 }
 
+/// Evaluates whether a cron job satisfies zero-trust master blueprint security policies
+#[no_mangle]
+pub unsafe extern "C" fn cron_evaluate_master_blueprint_policy(job_index: usize) -> isize {
+    if job_index >= CRON_JOB_COUNT as usize {
+        return -1;
+    }
+
+    let job = &CRON_JOBS[job_index];
+
+    // Zero-trust check 1: Disabled jobs fail policy check
+    if !job.enabled {
+        return -2;
+    }
+
+    // Zero-trust check 2: CPU load average must not exceed maximum threshold
+    if job.max_load_average > 0 && SYSTEM_LOAD_AVERAGE > job.max_load_average {
+        return -3;
+    }
+
+    0 // Compliant
+}
+
 /// Reset log buffer for testing
 #[no_mangle]
 pub unsafe extern "C" fn cron_reset_logs() {
@@ -1205,5 +1227,11 @@ mod tests {
         assert_eq!(cron_validate_user_privileges(0, 0), 0);    // Root allowed
         assert_eq!(cron_validate_user_privileges(0, 1001), 0); // Assigned user allowed
         assert_eq!(cron_validate_user_privileges(0, 1002), -1); // Unassigned user denied
+
+        // 4. Test Master Blueprint Policy Evaluation
+        assert_eq!(cron_evaluate_master_blueprint_policy(0), 0); // Compliant under normal load
+        cron_set_system_load(500); // High load spike
+        CRON_JOBS[0].max_load_average = 200;
+        assert_eq!(cron_evaluate_master_blueprint_policy(0), -3); // Disallowed due to CPU load
     }
 }
