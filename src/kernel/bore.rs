@@ -1,7 +1,7 @@
 // Burst-Oriented Response Enhancer (BORE) Scheduler for SigmaOS
 // Inspired by CachyOS BORE, Linux EEVDF/CFS, and FreeBSD ULE schedulers.
 // Implements starvation-avoidance (aging), nice-value weighting, sliding window burst score decay,
-// FreeBSD ULE interactivity ranking, CachyOS interactive wakeup boost, and Real-Time priority lanes.
+// FreeBSD ULE interactivity ranking, and Real-Time priority lanes.
 
 extern crate alloc;
 
@@ -29,7 +29,6 @@ pub struct BoreTask {
     pub wait_ticks: u64,    // For FreeBSD-style starvation-avoidance aging
     pub is_real_time: bool, // Real-Time task bypass lane
     pub burst_history: u64, // CachyOS BORE sliding window burst history
-    pub wakeup_boost_ms: u64, // CachyOS BORE interactive thread wakeup time-slice grant
 }
 
 impl BoreTask {
@@ -44,7 +43,6 @@ impl BoreTask {
             wait_ticks: 0,
             is_real_time: false,
             burst_history: 0,
-            wakeup_boost_ms: 0,
         }
     }
 
@@ -58,11 +56,6 @@ impl BoreTask {
     pub fn with_real_time(mut self, rt: bool) -> Self {
         self.is_real_time = rt;
         self
-    }
-
-    /// Grants CachyOS interactive wakeup boost time-slice
-    pub fn apply_wakeup_boost(&mut self, boost_ms: u64) {
-        self.wakeup_boost_ms = boost_ms;
     }
 
     /// Calculates task "burstiness" score:
@@ -93,7 +86,7 @@ impl BoreTask {
     }
 
     /// Dynamically scales virtual deadline based on burst score and nice weight to prioritize interactive tasks.
-    /// Incorporates starvation aging factor and CachyOS BORE wakeup boost to maintain fairness.
+    /// Incorporates starvation aging factor to maintain fairness.
     pub fn update_deadline(&mut self, current_time: u64) {
         if self.is_real_time {
             // Real-Time tasks always run on the earliest possible deadline
@@ -110,11 +103,6 @@ impl BoreTask {
         let interactivity = self.interactivity_score();
         if interactivity > 70 {
             penalty = penalty.saturating_sub(interactivity as u64);
-        }
-
-        // Apply CachyOS BORE wakeup boost reduction
-        if self.wakeup_boost_ms > 0 {
-            penalty = penalty.saturating_sub(self.wakeup_boost_ms * 2);
         }
 
         // Nice-value weight adjustment (Linux CFS inspired):
@@ -151,17 +139,6 @@ impl BoreScheduler {
     pub fn add_task(&mut self, mut task: BoreTask) {
         task.update_deadline(self.current_time.load(Ordering::SeqCst));
         self.tasks.push(task);
-    }
-
-    /// Triggers an interactive thread wakeup boost upon I/O or timer interrupt
-    pub fn trigger_thread_wakeup(&mut self, pid: u64, boost_ms: u64) -> bool {
-        let curr_time = self.current_time.load(Ordering::SeqCst);
-        if let Some(task) = self.tasks.iter_mut().find(|t| t.pid == pid) {
-            task.apply_wakeup_boost(boost_ms);
-            task.update_deadline(curr_time);
-            return true;
-        }
-        false
     }
 
     /// Dispatches the next task with the earliest virtual deadline.
@@ -202,9 +179,8 @@ impl BoreScheduler {
                 task.wait_ticks += 1;
                 task.update_deadline(curr_time);
             } else if i == best_idx {
-                // Reset waiting ticks and consume wakeup boost for the scheduled task
+                // Reset waiting ticks for the scheduled task
                 task.wait_ticks = 0;
-                task.wakeup_boost_ms = 0;
             }
         }
 
@@ -289,26 +265,6 @@ mod tests {
         // Interactive task (t2) should be scheduled first due to low burstiness & early deadline
         let scheduled = scheduler.schedule().unwrap();
         assert_eq!(scheduled.pid, 2);
-    }
-
-    #[test]
-    fn test_cachyos_wakeup_boost() {
-        let mut scheduler = BoreScheduler::new();
-
-        let mut t1 = BoreTask::new(1, "batch-job-1");
-        t1.cpu_runtime_ms = 100;
-
-        let mut t2 = BoreTask::new(2, "desktop-compositor");
-        t2.cpu_runtime_ms = 100;
-
-        scheduler.add_task(t1);
-        scheduler.add_task(t2);
-
-        // Wakeup boost granted to desktop compositor thread
-        assert!(scheduler.trigger_thread_wakeup(2, 15));
-
-        // Task 2 should now have an earlier deadline than Task 1
-        assert!(scheduler.tasks[1].virtual_deadline < scheduler.tasks[0].virtual_deadline);
     }
 
     #[test]

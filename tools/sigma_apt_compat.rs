@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // SigmaOS Debian APT & DPKG Package Management Compatibility Utility (sigma_apt_compat)
 // Clean-room representation of Debian's core package utility suite (apt, apt-get, apt-cache, dpkg)
 
