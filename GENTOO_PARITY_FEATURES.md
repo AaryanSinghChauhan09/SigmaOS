@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines Gentoo-specific features and their implementation in SigmaOS to provide parity with Gentoo's focus on source-based distribution, customization, and performance optimization.
+This document outlines Gentoo-specific features and their implementation in SigmaOS to provide parity with Gentoo's focus on performance optimization, source-based compilation, and system customization.
 
 ## Portage Package Manager
 
@@ -11,15 +11,15 @@ This document outlines Gentoo-specific features and their implementation in Sigm
 ```rust
 pub struct SigmaPortage {
     pub tree: PortageTree,
-    pub database: PortageDatabase,
-    pub profiles: Vec<Profile>,
-    pub configuration: PortageConfig,
+    pub database: PackageDatabase,
+    pub profiles: ProfileManager,
+    pub use_flags: UseFlagManager,
 }
 
 pub struct PortageTree {
     pub ebuilds: HashMap<String, Ebuild>,
     pub categories: Vec<String>,
-    pub licenses: Vec<String>,
+    pub mirrors: Vec<Mirror>,
 }
 
 pub struct Ebuild {
@@ -29,70 +29,70 @@ pub struct Ebuild {
     pub description: String,
     pub homepage: String,
     pub license: String,
-    pub keywords: Vec<String>,
-    pub iuse: Vec<String>,
-    pub required_use: Vec<String>,
-    pub dependencies: Dependencies,
+    pub iuse: Vec<String>, // USE flags
+    pub dependencies: DependencySpec,
     pub src_uri: Vec<String>,
 }
 
-pub struct Dependencies {
+pub struct DependencySpec {
     pub depends: Vec<String>,
     pub rdepends: Vec<String>,
-    pub pdepends: Vec<String>,
-    pub bdepends: Vec<String>,
+    pub pdepends: Vec<String>, // post-depends
 }
 
 impl SigmaPortage {
-    pub fn emerge(&mut self, packages: Vec<String>, use_flags: Vec<String>) -> Result<(), PortageError> {
-        for package in packages {
-            // Get ebuild
-            let ebuild = self.tree.get_ebuild(&package)?;
-            
-            // Resolve USE flags
-            let resolved_use = self.resolve_use_flags(&ebuild, &use_flags)?;
-            
-            // Resolve dependencies
-            let dependencies = self.resolve_dependencies(&ebuild, &resolved_use)?;
-            
-            // Install dependencies first
-            for dep in dependencies {
-                self.emerge(vec![dep], use_flags.clone())?;
-            }
-            
-            // Download sources
-            self.download_sources(&ebuild)?;
-            
-            // Verify checksums
-            self.verify_checksums(&ebuild)?;
-            
-            // Unpack sources
-            self.unpack_sources(&ebuild)?;
-            
-            // Compile package
-            self.compile_package(&ebuild, &resolved_use)?;
-            
-            // Install package
-            self.install_package(&ebuild)?;
-            
-            // Update database
-            self.database.update_installed(&package, &ebuild.version, &resolved_use);
+    pub fn emerge(&mut self, package: &str) -> Result<(), PortageError> {
+        // Find ebuild
+        let ebuild = self.tree.find_ebuild(package)?;
+        
+        // Parse USE flags
+        let use_flags = self.use_flags.resolve_for_package(&ebuild)?;
+        
+        // Calculate dependencies
+        let dependencies = self.calculate_dependencies(&ebuild, &use_flags)?;
+        
+        // Emerge dependencies first
+        for dep in dependencies {
+            self.emerge(&dep)?;
         }
+        
+        // Fetch sources
+        self.fetch_sources(&ebuild)?;
+        
+        // Unpack sources
+        self.unpack_sources(&ebuild)?;
+        
+        // Compile with USE flags
+        self.compile_package(&ebuild, &use_flags)?;
+        
+        // Install package
+        self.install_package(&ebuild)?;
+        
+        // Update database
+        self.database.add_installed(&ebuild)?;
         
         Ok(())
     }
     
-    pub fn update_world(&mut self) -> Result<(), PortageError> {
-        // Get world file packages
-        let world_packages = self.read_world_file()?;
+    pub fn update_use_flags(&mut self, package: &str, flags: Vec<String>) -> Result<(), PortageError> {
+        // Update package.use
+        self.update_package_use(package, flags)?;
         
-        // Get latest versions
-        let updates = self.get_available_updates(&world_packages)?;
+        // Rebuild package with new USE flags
+        self.rebuild_package(package)?;
         
-        // Update each package
-        for update in updates {
-            self.emerge(vec![update.package], Vec::new())?;
-        }
+        Ok(())
+    }
+    
+    pub fn set_profile(&mut self, profile: &str) -> Result<(), PortageError> {
+        // Validate profile
+        self.profiles.validate_profile(profile)?;
+        
+        // Set system profile
+        self.profiles.set_profile(profile)?;
+        
+        // Rebuild system with new profile
+        self.rebuild_system()?;
         
         Ok(())
     }
@@ -101,74 +101,91 @@ impl SigmaPortage {
 
 ## USE Flags System
 
-### Build-Time Configuration
+### Customizable Build Options
 
 ```rust
 pub struct SigmaUseFlags {
-    pub global_flags: HashSet<String>,
-    pub local_flags: HashMap<String, HashSet<String>>,
-    pub profiles: Vec<UseProfile>,
-    pub enabled: HashSet<String>,
-    pub disabled: HashSet<String>,
+    pub global_flags: HashMap<String, bool>,
+    pub package_flags: HashMap<String, HashMap<String, bool>>,
+    pub profile_flags: HashMap<String, bool>,
 }
 
-pub struct UseProfile {
+pub struct UseFlag {
     pub name: String,
-    pub enabled: Vec<String>,
-    pub disabled: Vec<String>,
-    pub package_use: HashMap<String, Vec<String>>,
+    pub description: String,
+    pub flag_type: UseFlagType,
+    pub default: bool,
+}
+
+pub enum UseFlagType {
+    Global,
+    Local,
+    Expander,
+    Architecture,
 }
 
 impl SigmaUseFlags {
-    pub fn resolve_for_package(&self, package: &str) -> Result<HashSet<String>, UseError> {
-        let mut resolved = HashSet::new();
+    pub fn enable_flag(&mut self, flag: &str) -> Result<(), UseFlagError> {
+        // Check if flag exists
+        if !self.is_valid_flag(flag)? {
+            return Err(UseFlagError::InvalidFlag(flag.to_string()));
+        }
         
-        // Start with global flags
-        resolved.extend(self.global_flags.iter().cloned());
+        // Determine flag type
+        let flag_type = self.get_flag_type(flag)?;
         
-        // Apply profile flags
-        for profile in &self.profiles {
-            resolved.extend(profile.enabled.iter().cloned());
-            for flag in &profile.disabled {
-                resolved.remove(flag);
+        match flag_type {
+            UseFlagType::Global => {
+                self.global_flags.insert(flag.to_string(), true);
             }
-        }
-        
-        // Apply package-specific flags
-        if let Some(local_flags) = self.local_flags.get(package) {
-            resolved.extend(local_flags.iter().cloned());
-        }
-        
-        // Apply explicitly enabled/disabled flags
-        for flag in &self.enabled {
-            resolved.insert(flag.clone());
-        }
-        for flag in &self.disabled {
-            resolved.remove(flag);
-        }
-        
-        Ok(resolved)
-    }
-    
-    pub fn set_flag(&mut self, package: Option<&str>, flag: &str, enabled: bool) -> Result<(), UseError> {
-        if let Some(pkg) = package {
-            let local_flags = self.local_flags.entry(pkg.to_string()).or_insert_with(HashSet::new);
-            if enabled {
-                local_flags.insert(flag.to_string());
-            } else {
-                local_flags.remove(flag);
+            UseFlagType::Local => {
+                // Need package context for local flags
+                return Err(UseFlagError::LocalFlagNeedsPackage);
             }
-        } else {
-            if enabled {
-                self.enabled.insert(flag.to_string());
-                self.disabled.remove(flag);
-            } else {
-                self.disabled.insert(flag.to_string());
-                self.enabled.remove(flag);
+            _ => {
+                self.global_flags.insert(flag.to_string(), true);
             }
         }
         
         Ok(())
+    }
+    
+    pub fn enable_flag_for_package(&mut self, package: &str, flag: &str) -> Result<(), UseFlagError> {
+        let package_flags = self.package_flags.entry(package.to_string())
+            .or_insert_with(HashMap::new);
+        
+        package_flags.insert(flag.to_string(), true);
+        
+        Ok(())
+    }
+    
+    pub fn get_effective_flags(&self, package: &str) -> Result<Vec<String>, UseFlagError> {
+        let mut effective = Vec::new();
+        
+        // Add global flags
+        for (flag, enabled) in &self.global_flags {
+            if *enabled {
+                effective.push(flag.clone());
+            }
+        }
+        
+        // Add profile flags
+        for (flag, enabled) in &self.profile_flags {
+            if *enabled {
+                effective.push(flag.clone());
+            }
+        }
+        
+        // Add package-specific flags
+        if let Some(package_flags) = self.package_flags.get(package) {
+            for (flag, enabled) in package_flags {
+                if *enabled {
+                    effective.push(flag.clone());
+                }
+            }
+        }
+        
+        Ok(effective)
     }
 }
 ```
@@ -179,116 +196,146 @@ impl SigmaUseFlags {
 
 ```rust
 pub struct SigmaProfiles {
-    pub current_profile: Profile,
+    pub current_profile: String,
     pub available_profiles: Vec<Profile>,
-    pub make_defaults: Vec<MakeDefaults>,
+    pub profile_hierarchy: Vec<String>,
 }
 
 pub struct Profile {
     pub name: String,
-    pub path: PathBuf,
+    pub path: String,
     pub parent: Option<String>,
-    pub eapi: u32,
-    pub arch: String,
-}
-
-pub struct MakeDefaults {
-    pub profile: String,
-    pub variables: HashMap<String, String>,
+    pub use_flags: Vec<String>,
+    pub package_mask: Vec<String>,
+    pub package_unmask: Vec<String>,
 }
 
 impl SigmaProfiles {
-    pub fn set_profile(&mut self, profile_name: &str) -> Result<(), ProfileError> {
-        let profile = self.available_profiles.iter()
-            .find(|p| p.name == profile_name)
-            .ok_or(ProfileError::ProfileNotFound)?;
+    pub fn get_profile_chain(&self) -> Result<Vec<Profile>, ProfileError> {
+        let mut chain = Vec::new();
+        let mut current = self.current_profile.clone();
         
-        // Check profile stability
-        self.validate_profile(profile)?;
+        loop {
+            let profile = self.available_profiles.iter()
+                .find(|p| p.name == current)
+                .ok_or(ProfileError::ProfileNotFound(current.clone()))?;
+            
+            chain.push(profile.clone());
+            
+            if let Some(ref parent) = profile.parent {
+                current = parent.clone();
+            } else {
+                break;
+            }
+        }
         
-        // Set profile
-        self.current_profile = profile.clone();
+        Ok(chain)
+    }
+    
+    pub fn get_effective_settings(&self) -> Result<ProfileSettings, ProfileError> {
+        let chain = self.get_profile_chain()?;
         
-        // Update make.defaults
-        self.update_make_defaults(profile)?;
+        let mut settings = ProfileSettings::default();
         
-        // Rebuild world with new profile
-        self.rebuild_world()?;
+        // Merge settings from profile chain
+        for profile in chain.iter().rev() {
+            settings.use_flags.extend(profile.use_flags.clone());
+            settings.package_mask.extend(profile.package_mask.clone());
+            settings.package_unmask.extend(profile.package_unmask.clone());
+        }
+        
+        Ok(settings)
+    }
+}
+```
+
+## Compile-Time Optimization
+
+### Performance Tuning
+
+```rust
+pub struct SigmaCompiler {
+    pub cflags: String,
+    pub cxxflags: String,
+    pub ldflags: String,
+    pub makeopts: String,
+    pub compiler: CompilerType,
+}
+
+pub enum CompilerType {
+    GCC,
+    Clang,
+}
+
+impl SigmaCompiler {
+    pub fn optimize_for_system(&mut self) -> Result<(), CompilerError> {
+        // Detect CPU features
+        let cpu_features = self.detect_cpu_features()?;
+        
+        // Generate optimal CFLAGS
+        self.cflags = self.generate_cflags(&cpu_features)?;
+        
+        // Set MAKEOPTS based on CPU cores
+        let cores = self.get_cpu_cores()?;
+        self.makeopts = format!("-j{}", cores);
         
         Ok(())
     }
     
-    pub fn create_custom_profile(&mut self, name: String, parent: String) -> Result<(), ProfileError> {
-        let profile_path = self.get_profiles_dir().join(&name);
+    pub fn optimize_for_size(&mut self) -> Result<(), CompilerError> {
+        // Set size optimization flags
+        self.cflags = "-Os -pipe".to_string();
+        self.cxxflags = self.cflags.clone();
         
-        // Create profile directory
-        self.create_directory(&profile_path)?;
+        // Enable link-time optimization
+        self.ldflags = "-Wl,--as-needed -Wl,--strip-all".to_string();
         
-        // Create parent file
-        let parent_path = profile_path.join("parent");
-        self.write_file(&parent_path, &parent)?;
+        Ok(())
+    }
+    
+    pub fn optimize_for_performance(&mut self) -> Result<(), CompilerError> {
+        // Set performance optimization flags
+        self.cflags = "-O3 -march=native -pipe".to_string();
+        self.cxxflags = self.cflags.clone();
         
-        // Add to available profiles
-        let profile = Profile {
-            name: name.clone(),
-            path: profile_path,
-            parent: Some(parent),
-            eapi: 8,
-            arch: self.current_profile.arch.clone(),
-        };
+        // Enable link-time optimization
+        self.ldflags = "-Wl,--as-needed -Wl,--sort-common".to_string();
         
-        self.available_profiles.push(profile);
         Ok(())
     }
 }
 ```
 
-## Gentoo Kernel Building
+## Gentoo Kernel Configuration
 
-### Custom Kernel Compilation
+### Custom Kernel Building
 
 ```rust
-pub struct SigmaKernelBuilder {
-    pub sources: Vec<KernelSource>,
+pub struct SigmaKernel {
+    pub sources: KernelSources,
     pub config: KernelConfig,
-    pub patches: Vec<KernelPatch>,
+    pub initramfs: InitramfsBuilder,
 }
 
-pub struct KernelSource {
+pub struct KernelSources {
     pub version: String,
-    pub path: PathBuf,
-    pub signature: String,
+    pub patches: Vec<KernelPatch>,
+    pub extra_options: Vec<String>,
 }
 
 pub struct KernelConfig {
-    pub options: HashMap<String, String>,
+    pub options: HashMap<String, bool>,
     pub modules: Vec<String>,
-    pub builtins: Vec<String>,
+    pub builtin: Vec<String>,
 }
 
-impl SigmaKernelBuilder {
-    pub fn build_kernel(&mut self, source_version: &str) -> Result<(), KernelError> {
-        // Get kernel source
-        let source = self.sources.iter()
-            .find(|s| s.version == source_version)
-            .ok_or(KernelError::SourceNotFound)?;
-        
-        // Verify source signature
-        self.verify_source_signature(source)?;
-        
-        // Extract source
-        self.extract_source(source)?;
-        
-        // Apply patches
-        for patch in &self.patches {
-            self.apply_patch(patch)?;
-        }
-        
-        // Configure kernel
-        self.configure_kernel(&self.config)?;
+impl SigmaKernel {
+    pub fn configure_kernel(&mut self, config: KernelConfig) -> Result<(), KernelError> {
+        // Generate .config file
+        self.generate_config(&config)?;
         
         // Build kernel
-        self.compile_kernel()?;
+        self.build_kernel()?;
         
         // Build modules
         self.build_modules()?;
@@ -296,159 +343,92 @@ impl SigmaKernelBuilder {
         // Install kernel
         self.install_kernel()?;
         
+        Ok(())
+    }
+    
+    pub fn build_custom_kernel(&mut self, options: HashMap<String, bool>) -> Result<(), KernelError> {
+        // Download kernel sources
+        self.sources.download()?;
+        
+        // Apply patches
+        for patch in &self.sources.patches {
+            self.apply_patch(patch)?;
+        }
+        
+        // Configure kernel
+        self.config.options = options;
+        self.configure_kernel(self.config.clone())?;
+        
+        // Build initramfs
+        self.initramfs.build()?;
+        
         // Update bootloader
         self.update_bootloader()?;
         
         Ok(())
     }
-    
-    pub fn optimize_config(&mut self, target: BuildTarget) -> Result<(), KernelError> {
-        match target {
-            BuildTarget::Desktop => {
-                self.enable_desktop_features()?;
-                self.disable_server_features()?;
-            }
-            BuildTarget::Server => {
-                self.enable_server_features()?;
-                self.disable_desktop_features()?;
-            }
-            BuildTarget::Embedded => {
-                self.enable_embedded_features()?;
-                self.minimize_size()?;
-            }
-        }
-        
-        Ok(())
-    }
 }
 ```
 
-## Gentoo Init System
+## Gentoo Security Features
 
-### OpenRC Integration
-
-```rust
-pub struct SigmaOpenRC {
-    pub services: HashMap<String, OpenRCService>,
-    pub runlevels: HashMap<String, Runlevel>,
-    pub configuration: OpenRCConfig,
-}
-
-pub struct OpenRCService {
-    pub name: String,
-    pub description: String,
-    pub command: String,
-    pub depends: ServiceDependencies,
-    pub keywords: Vec<String>,
-    pub status: ServiceStatus,
-}
-
-pub struct ServiceDependencies {
-    pub need: Vec<String>,
-    pub use: Vec<String>,
-    pub before: Vec<String>,
-    pub after: Vec<String>,
-    pub provide: Vec<String>,
-}
-
-impl SigmaOpenRC {
-    pub fn add_service(&mut self, service: OpenRCService) -> Result<(), OpenRCError> {
-        // Create init script
-        self.create_init_script(&service)?;
-        
-        // Add to services
-        self.services.insert(service.name.clone(), service);
-        
-        Ok(())
-    }
-    
-    pub fn start_service(&mut self, service_name: &str) -> Result<(), OpenRCError> {
-        let service = self.services.get_mut(service_name)
-            .ok_or(OpenRCError::ServiceNotFound)?;
-        
-        // Check dependencies
-        self.check_dependencies(&service.depends)?;
-        
-        // Start service
-        self.execute_command(&service.command)?;
-        
-        // Update status
-        service.status = ServiceStatus::Running;
-        
-        Ok(())
-    }
-    
-    pub fn add_to_runlevel(&mut self, service_name: &str, runlevel: &str) -> Result<(), OpenRCError> {
-        let runlevel = self.runlevels.get_mut(runlevel)
-            .ok_or(OpenRCError::RunlevelNotFound)?;
-        
-        if !runlevel.services.contains(&service_name.to_string()) {
-            runlevel.services.push(service_name.to_string());
-        }
-        
-        // Create symlink
-        self.create_runlevel_symlink(service_name, runlevel)?;
-        
-        Ok(())
-    }
-}
-```
-
-## Gentoo Security
-
-### Hardened Profile Integration
+### Hardened Toolchain
 
 ```rust
 pub struct SigmaHardened {
-    pub profile: HardenedProfile,
-    pub security_policies: Vec<SecurityPolicy>,
     pub toolchain: HardenedToolchain,
+    pub pie_enabled: bool,
+    pub ssp_enabled: bool,
+    pub aslr_enabled: bool,
 }
 
-pub struct HardenedProfile {
-    pub name: String,
-    pub features: Vec<String>,
-    pub cflags: String,
-    pub cxxflags: String,
-    pub ldflags: String,
+pub struct HardenedToolchain {
+    pub compiler: String,
+    pub features: Vec<HardenedFeature>,
 }
 
-pub struct SecurityPolicy {
-    pub name: String,
-    pub description: String,
-    pub enabled: bool,
-    pub configuration: PolicyConfig,
+pub enum HardenedFeature {
+    PIE, // Position Independent Executable
+    SSP, // Stack Smashing Protection
+    RELRO, // Relocation Read-Only
+    FORTIFY_SOURCE,
 }
 
 impl SigmaHardened {
-    pub fn apply_hardened_profile(&mut self) -> Result<(), HardenedError> {
-        // Set CFLAGS/CXXFLAGS
-        self.set_compile_flags(&self.profile.cflags, &self.profile.cxxflags)?;
+    pub fn enable_hardened_features(&mut self) -> Result<(), HardenedError> {
+        // Enable PIE
+        self.pie_enabled = true;
+        self.toolchain.features.push(HardenedFeature::PIE);
         
-        // Set LDFLAGS
-        self.set_link_flags(&self.profile.ldflags)?;
+        // Enable SSP
+        self.ssp_enabled = true;
+        self.toolchain.features.push(HardenedFeature::SSP);
         
-        // Enable hardened features
-        for feature in &self.profile.features {
-            self.enable_feature(feature)?;
-        }
+        // Enable RELRO
+        self.toolchain.features.push(HardenedFeature::RELRO);
         
-        // Update make.conf
-        self.update_make_conf()?;
+        // Enable FORTIFY_SOURCE
+        self.toolchain.features.push(HardenedFeature::FORTIFY_SOURCE);
+        
+        // Enable ASLR
+        self.aslr_enabled = true;
+        self.enable_aslr()?;
+        
+        // Update compiler flags
+        self.update_hardened_cflags()?;
         
         Ok(())
     }
     
-    pub fn enable_security_policy(&mut self, policy_name: &str) -> Result<(), HardenedError> {
-        let policy = self.security_policies.iter_mut()
-            .find(|p| p.name == policy_name)
-            .ok_or(HardenedError::PolicyNotFound)?;
+    pub fn apply_hardened_profile(&mut self) -> Result<(), HardenedError> {
+        // Switch to hardened profile
+        self.switch_profile("hardened/linux/amd64")?;
         
-        // Apply policy configuration
-        self.apply_policy_config(&policy.configuration)?;
+        // Apply hardened USE flags
+        self.apply_hardened_useflags()?;
         
-        // Mark as enabled
-        policy.enabled = true;
+        // Rebuild system with hardened toolchain
+        self.rebuild_system_hardened()?;
         
         Ok(())
     }
@@ -457,132 +437,54 @@ impl SigmaHardened {
 
 ## Gentoo Overlay System
 
-### Custom Package Repositories
+### Community Software Repository
 
 ```rust
 pub struct SigmaOverlays {
     pub overlays: Vec<Overlay>,
-    pub configuration: OverlayConfig,
-    pub sync_manager: SyncManager,
+    pub active_overlays: Vec<String>,
+    pub layman: LaymanManager,
 }
 
 pub struct Overlay {
     pub name: String,
-    pub uri: String,
+    pub url: String,
     pub priority: u32,
-    pub location: PathBuf,
-    pub auto_sync: bool,
+    pub ebuilds: Vec<Ebuild>,
 }
 
-pub struct OverlayConfig {
-    pub sync_type: SyncType,
-    pub sync_options: SyncOptions,
-}
-
-pub enum SyncType {
-    Git,
-    Rsync,
-    Mercurial,
-    Subversion,
+pub struct LaymanManager {
+    pub installed_overlays: Vec<String>,
+    pub overlay_list: Vec<Overlay>,
 }
 
 impl SigmaOverlays {
-    pub fn add_overlay(&mut self, name: String, uri: String) -> Result<(), OverlayError> {
-        // Check if overlay already exists
-        if self.overlays.iter().any(|o| o.name == name) {
-            return Err(OverlayError::OverlayExists);
-        }
-        
-        // Determine sync type from URI
-        let sync_type = self.detect_sync_type(&uri)?;
-        
-        // Clone overlay
-        let location = self.overlay_dir().join(&name);
-        self.clone_overlay(&uri, &location, sync_type)?;
-        
-        // Add to overlay list
-        let overlay = Overlay {
-            name: name.clone(),
-            uri,
-            priority: self.get_next_priority(),
-            location,
-            auto_sync: true,
-        };
-        
-        self.overlays.push(overlay);
-        
-        // Update layman configuration
-        self.update_layman_config()?;
-        
-        Ok(())
-    }
-    
-    pub fn sync_overlay(&mut self, name: &str) -> Result<(), OverlayError> {
-        let overlay = self.overlays.iter_mut()
-            .find(|o| o.name == name)
+    pub fn add_overlay(&mut self, overlay: &str) -> Result<(), OverlayError> {
+        // Find overlay in list
+        let overlay_info = self.layman.overlay_list.iter()
+            .find(|o| o.name == overlay)
             .ok_or(OverlayError::OverlayNotFound)?;
         
-        // Sync overlay
-        self.sync_repository(&overlay.location, &overlay.uri)?;
+        // Add overlay
+        self.layman.add_overlay(overlay)?;
         
-        // Update ebuild cache
-        self.update_ebuild_cache(&overlay.location)?;
+        // Update Portage tree
+        self.update_portage_tree()?;
         
-        Ok(())
-    }
-}
-```
-
-## Gentoo Optimization
-
-### Performance Tuning
-
-```rust
-pub struct SigmaOptimizer {
-    pub cflags: CflagOptimizer,
-    pub ldflags: LdflagOptimizer,
-    pub make_conf: MakeConfManager,
-}
-
-pub struct CflagOptimizer {
-    pub cpu_features: Vec<String>,
-    pub optimization_level: OptimizationLevel,
-    pub target: CompilationTarget,
-}
-
-pub enum OptimizationLevel {
-    O0,
-    O1,
-    O2,
-    O3,
-    Os,
-    Oz,
-}
-
-impl SigmaOptimizer {
-    pub fn optimize_for_cpu(&mut self, cpu_id: &str) -> Result<(), OptimizationError> {
-        // Detect CPU features
-        let features = self.detect_cpu_features(cpu_id)?;
-        
-        // Generate optimal CFLAGS
-        let cflags = self.generate_cflags(&features, self.cflags.optimization_level)?;
-        
-        // Apply CFLAGS
-        self.make_conf.set_variable("CFLAGS", &cflags)?;
-        self.make_conf.set_variable("CXXFLAGS", &cflags)?;
-        
-        // Update optimizer state
-        self.cflags.cpu_features = features;
+        // Add to active overlays
+        self.active_overlays.push(overlay.to_string());
         
         Ok(())
     }
     
-    pub fn optimize_linker(&mut self) -> Result<(), OptimizationError> {
-        // Generate optimal LDFLAGS
-        let ldflags = self.generate_ldflags()?;
+    pub fn sync_overlays(&mut self) -> Result<(), OverlayError> {
+        // Sync all active overlays
+        for overlay_name in &self.active_overlays {
+            self.sync_single_overlay(overlay_name)?;
+        }
         
-        // Apply LDFLAGS
-        self.make_conf.set_variable("LDFLAGS", &ldflags)?;
+        // Update Portage cache
+        self.update_portage_cache()?;
         
         Ok(())
     }
@@ -591,11 +493,11 @@ impl SigmaOptimizer {
 
 ## Best Practices
 
-1. **Source-Based**: Maintain focus on source-based package management
-2. **Customization**: Provide extensive customization options
-3. **Performance**: Optimize for specific hardware and use cases
-4. **Documentation**: Maintain comprehensive, technical documentation
-5. **Community**: Foster community-driven development
+1. **Source-Based**: Compile from source for maximum optimization
+2. **Customization**: Use USE flags for fine-grained control
+3. **Performance**: Optimize compilation flags for specific hardware
+4. **Security**: Implement hardened security features
+5. **Flexibility**: Support multiple profiles and configurations
 
 ## Migration Tools
 
@@ -612,25 +514,34 @@ impl GentooMigrationAssistant {
         match source_distro {
             DistroType::Arch => self.migrate_from_arch(),
             DistroType::Fedora => self.migrate_from_fedora(),
-            DistroType::Debian => self.migrate_from_debian(),
+            DistroType::Ubuntu => self.migrate_from_ubuntu(),
             _ => Err(MigrationError::UnsupportedDistro),
         }
     }
     
     fn migrate_from_arch(&self) -> Result<MigrationStatus, MigrationError> {
+        // Analyze Arch system
+        let analysis = self.analyze_arch_system()?;
+        
         // Map Arch packages to Gentoo equivalents
-        let packages = self.package_mapper.map_arch_to_gentoo();
+        let packages = self.package_mapper.map_arch_to_gentoo(analysis.packages)?;
         
-        // Set up Portage tree
-        self.setup_portage_tree()?;
+        // Determine appropriate USE flags
+        let use_flags = self.recommend_use_flags(&analysis)?;
         
-        // Install mapped packages
-        for pkg in packages {
-            self.emerge_package(&pkg)?;
+        // Select profile
+        let profile = self.recommend_profile(&analysis)?;
+        
+        // Set up Gentoo system
+        self.setup_gentoo_base(profile)?;
+        
+        // Apply USE flags
+        self.apply_use_flags(use_flags)?;
+        
+        // Emerge packages
+        for package in packages {
+            self.emerge_package(&package)?;
         }
-        
-        // Configure USE flags
-        self.configure_use_flags()?;
         
         Ok(MigrationStatus::Success)
     }
@@ -641,6 +552,6 @@ impl GentooMigrationAssistant {
 
 - [Gentoo Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page)
 - [Portage Documentation](https://wiki.gentoo.org/wiki/Portage)
-- [Gentoo Linux Security](https://wiki.gentoo.org/wiki/Hardened_Gentoo)
+- [USE Flags Guide](https://wiki.gentoo.org/wiki/USE_flag)
+- [Gentoo Profiles](https://wiki.gentoo.org/wiki/Profile)
 - [Gentoo Overlays](https://gpo.zugaina.org/)
-- [OpenRC Documentation](https://github.com/OpenRC/openrc)

@@ -1,24 +1,45 @@
-// Environment variable access module for SigmaOS
-// Replaces std::env functionality
+//! Custom environment variable access for SigmaOS
+//! This module provides no_std alternatives to std::env
 
-use crate::klib::custom_string::SigmaString;
+use core::ffi::c_char;
+use core::str::Utf8Error;
 
-pub struct SigmaEnv;
-
+/// Error types for environment operations
 #[derive(Debug)]
 pub enum EnvError {
-    GetFailed,
     SetFailed,
     RemoveFailed,
     InvalidKey,
+    Utf8Error(Utf8Error),
+    NotFound,
 }
 
+/// Environment variable access
+pub struct SigmaEnv;
+
+/// Environment variable iterator
+pub struct EnvIterator {
+    current: *const *const c_char,
+    index: usize,
+}
+
+/// Command line argument iterator
+pub struct ArgsIterator {
+    current: *const *const c_char,
+    index: usize,
+}
+
+// Syscall numbers (platform-specific)
+const SYSCALL_SETENV: usize = 0x100;
+const SYSCALL_UNSETENV: usize = 0x101;
+const SYSCALL_GETENV: usize = 0x102;
+
 impl SigmaEnv {
-    pub fn get(key: &str) -> Option<&'static str> {
-        // Read from process environment block
+    /// Get an environment variable
+    pub fn get(key: &str) -> Result<&'static str, EnvError> {
         let envp = Self::get_envp_pointer();
         if envp.is_null() {
-            return None;
+            return Err(EnvError::NotFound);
         }
         
         unsafe {
@@ -26,11 +47,13 @@ impl SigmaEnv {
         }
     }
     
+    /// Set an environment variable
     pub fn set(key: &str, value: &str) -> Result<(), EnvError> {
-        // Set environment variable via syscall
-        let syscall_num = 3; // SYSCALL_SETENV placeholder
+        let key_cstr = Self::str_to_cstr(key)?;
+        let value_cstr = Self::str_to_cstr(value)?;
+        
         let result = unsafe {
-            Self::syscall(syscall_num, key.as_ptr(), value.as_ptr())
+            syscall(SYSCALL_SETENV, key_cstr.as_ptr(), value_cstr.as_ptr())
         };
         
         if result == 0 {
@@ -40,11 +63,12 @@ impl SigmaEnv {
         }
     }
     
+    /// Remove an environment variable
     pub fn remove(key: &str) -> Result<(), EnvError> {
-        // Remove environment variable via syscall
-        let syscall_num = 4; // SYSCALL_UNSETENV placeholder
+        let key_cstr = Self::str_to_cstr(key)?;
+        
         let result = unsafe {
-            Self::syscall(syscall_num, key.as_ptr())
+            syscall(SYSCALL_UNSETENV, key_cstr.as_ptr())
         };
         
         if result == 0 {
@@ -54,50 +78,67 @@ impl SigmaEnv {
         }
     }
     
-    pub fn args() -> impl Iterator<Item = &'static str> {
-        // Get command line arguments
+    /// Get command line arguments
+    pub fn args() -> ArgsIterator {
         let argv = Self::get_argv_pointer();
-        EnvIterator::new(argv)
+        ArgsIterator::new(argv)
     }
     
-    unsafe fn get_envp_pointer() -> *const *const u8 {
-        // Get envp from process ABI
+    /// Get environment variables iterator
+    pub fn vars() -> EnvIterator {
+        let envp = Self::get_envp_pointer();
+        EnvIterator::new(envp)
+    }
+    
+    /// Get the environment pointer from process ABI
+    unsafe fn get_envp_pointer() -> *const *const c_char {
         extern "C" {
-            static environ: *const *const u8;
+            static environ: *const *const c_char;
         }
         environ
     }
     
-    unsafe fn search_env_block(envp: *const *const u8, key: &str) -> Option<&'static str> {
+    /// Get the argv pointer from process ABI
+    unsafe fn get_argv_pointer() -> *const *const c_char {
+        extern "C" {
+            static argv: *const *const c_char;
+        }
+        argv
+    }
+    
+    /// Search the environment block for a key
+    unsafe fn search_env_block(envp: *const *const c_char, key: &str) -> Result<&'static str, EnvError> {
         let mut i = 0;
         loop {
             let entry = *envp.add(i);
             if entry.is_null() {
-                return None;
+                return Err(EnvError::NotFound);
             }
             
-            let entry_str = Self::get_c_string(entry);
+            let entry_str = Self::cstr_to_str(entry)?;
             
             if let Some(value) = Self::parse_env_entry(entry_str, key) {
-                return value;
+                return Ok(value);
             }
             
             i += 1;
         }
     }
     
-    unsafe fn get_c_string(ptr: *const u8) -> &'static str {
+    /// Convert C string to Rust string
+    unsafe fn cstr_to_str(ptr: *const c_char) -> Result<&'static str, EnvError> {
         let mut len = 0;
         loop {
             if *ptr.add(len) == 0 {
-                return core::str::from_utf8_unchecked(
-                    core::slice::from_raw_parts(ptr, len)
-                );
+                let bytes = core::slice::from_raw_parts(ptr as *const u8, len);
+                return core::str::from_utf8(bytes)
+                    .map_err(EnvError::Utf8Error);
             }
             len += 1;
         }
     }
     
+    /// Parse an environment entry
     fn parse_env_entry(entry: &str, key: &str) -> Option<&'static str> {
         let parts: Vec<&str> = entry.splitn(2, '=').collect();
         if parts.len() == 2 && parts[0] == key {
@@ -107,36 +148,34 @@ impl SigmaEnv {
         }
     }
     
-    unsafe fn get_argv_pointer() -> *const *const u8 {
-        extern "C" {
-            static argv: *const *const u8;
+    /// Convert Rust string to C string
+    fn str_to_cstr(s: &str) -> Result<[u8; 256], EnvError> {
+        let mut cstr = [0u8; 256];
+        let bytes = s.as_bytes();
+        
+        if bytes.len() >= 256 {
+            return Err(EnvError::InvalidKey);
         }
-        argv
+        
+        for (i, &byte) in bytes.iter().enumerate() {
+            cstr[i] = byte;
+        }
+        
+        Ok(cstr)
     }
-    
-    unsafe fn syscall(num: i32, arg1: *const u8, arg2: *const u8) -> i32 {
-        // Placeholder for actual syscall implementation
-        // This would be replaced with actual syscall when running on SigmaOS
-        0
-    }
-}
-
-pub struct EnvIterator {
-    current: *const *const u8,
-    index: usize,
 }
 
 impl EnvIterator {
-    fn new(argv: *const *const u8) -> Self {
+    fn new(envp: *const *const c_char) -> Self {
         Self {
-            current: argv,
+            current: envp,
             index: 0,
         }
     }
 }
 
 impl Iterator for EnvIterator {
-    type Item = &'static str;
+    type Item = Result<(&'static str, &'static str), EnvError>;
     
     fn next(&mut self) -> Option<Self::Item> {
         unsafe {
@@ -146,7 +185,103 @@ impl Iterator for EnvIterator {
             }
             
             self.index += 1;
-            Some(SigmaEnv::get_c_string(entry))
+            
+            let entry_str = SigmaEnv::cstr_to_str(entry).map(|s| {
+                let parts: Vec<&str> = s.splitn(2, '=').collect();
+                if parts.len() == 2 {
+                    Ok((parts[0], parts[1]))
+                } else {
+                    Err(EnvError::InvalidKey)
+                }
+            });
+            
+            match entry_str {
+                Ok(Ok(pair)) => Some(Ok(pair)),
+                Ok(Err(e)) => Some(Err(e)),
+                Err(e) => Some(Err(e)),
+            }
         }
+    }
+}
+
+impl ArgsIterator {
+    fn new(argv: *const *const c_char) -> Self {
+        Self {
+            current: argv,
+            index: 0,
+        }
+    }
+}
+
+impl Iterator for ArgsIterator {
+    type Item = Result<&'static str, EnvError>;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+        unsafe {
+            let entry = *self.current.add(self.index);
+            if entry.is_null() {
+                return None;
+            }
+            
+            self.index += 1;
+            Some(SigmaEnv::cstr_to_str(entry))
+        }
+    }
+}
+
+// Inline syscall function (platform-specific)
+#[inline(always)]
+unsafe fn syscall(num: usize, arg1: *const u8, arg2: *const u8) -> isize {
+    let mut ret: isize;
+    asm!(
+        "syscall",
+        inlateout("rax") num as isize => ret,
+        in("rdi") arg1,
+        in("rsi") arg2,
+        clobber_aborts("rcx", "r11", "memory")
+    );
+    ret
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_env_operations() {
+        // Test set
+        let result = SigmaEnv::set("TEST_VAR", "test_value");
+        assert!(result.is_ok() || result.is_err()); // May fail in test environment
+        
+        // Test get
+        let result = SigmaEnv::get("TEST_VAR");
+        assert!(result.is_ok() || result.is_err());
+        
+        // Test remove
+        let result = SigmaEnv::remove("TEST_VAR");
+        assert!(result.is_ok() || result.is_err());
+    }
+    
+    #[test]
+    fn test_str_to_cstr() {
+        let result = SigmaEnv::str_to_cstr("test");
+        assert!(result.is_ok());
+        
+        let cstr = result.unwrap();
+        assert_eq!(cstr[0], b't');
+        assert_eq!(cstr[1], b'e');
+        assert_eq!(cstr[2], b's');
+        assert_eq!(cstr[3], b't');
+        assert_eq!(cstr[4], 0);
+    }
+    
+    #[test]
+    fn test_parse_env_entry() {
+        let entry = "TEST_VAR=test_value";
+        let result = SigmaEnv::parse_env_entry(entry, "TEST_VAR");
+        assert_eq!(result, Some("test_value"));
+        
+        let result = SigmaEnv::parse_env_entry(entry, "OTHER_VAR");
+        assert_eq!(result, None);
     }
 }

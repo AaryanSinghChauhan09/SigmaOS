@@ -2,616 +2,603 @@
 
 ## Overview
 
-This document outlines Linux Mint-specific features and their implementation in SigmaOS to provide parity with Mint's user-friendly approach, multimedia support, and desktop-focused design.
+This document outlines Linux Mint-specific features and their implementation in SigmaOS to provide parity with Mint's focus on user-friendliness, multimedia support, and out-of-the-box functionality.
 
 ## Mint Update Manager
 
-### Update Management System
+### User-Friendly Update System
 
 ```rust
-pub struct SigmaUpdateManager {
+pub struct SigmaMintUpdate {
+    pub update_manager: UpdateManager,
+    pub kernel_manager: KernelManager,
+    pub safety_levels: HashMap<String, SafetyLevel>,
+    pub update_history: Vec<UpdateRecord>,
+}
+
+pub struct UpdateManager {
     pub updates: Vec<Update>,
-    pub cache: UpdateCache,
-    pub configuration: UpdateConfig,
-    pub notification_system: NotificationSystem,
+    pub mirror_system: MirrorSystem,
+    pub auto_update_config: AutoUpdateConfig,
 }
 
 pub struct Update {
-    pub id: String,
     pub package: String,
     pub old_version: String,
     pub new_version: String,
     pub size: u64,
-    pub source: UpdateSource,
-    pub urgency: UpdateUrgency,
+    pub safety_level: SafetyLevel,
     pub description: String,
+    pub changelog: String,
 }
 
-pub enum UpdateSource {
-    Mint,
-    Ubuntu,
-    Debian,
-    ThirdParty,
-}
-
-pub enum UpdateUrgency {
-    Security,
+pub enum SafetyLevel {
+    Safe,
     Recommended,
-    Optional,
+    Unsafe,
+    Dangerous,
 }
 
-impl SigmaUpdateManager {
-    pub fn check_for_updates(&mut self) -> Result<Vec<Update>, UpdateError> {
-        let mut updates = Vec::new();
+impl SigmaMintUpdate {
+    pub fn check_updates(&mut self) -> Result<Vec<Update>, MintUpdateError> {
+        // Sync with mirrors
+        self.update_manager.mirror_system.sync()?;
         
-        // Check SigmaOS repository
-        updates.extend(self.check_repository_updates(&self.configuration.sigma_repo)?);
+        // Get available updates
+        let updates = self.get_available_updates()?;
         
-        // Check Mint repository
-        updates.extend(self.check_repository_updates(&self.configuration.mint_repo)?);
+        // Categorize by safety level
+        let categorized = self.categorize_updates(updates)?;
         
-        // Check Ubuntu repository
-        updates.extend(self.check_repository_updates(&self.configuration.ubuntu_repo)?);
-        
-        // Sort by urgency
-        updates.sort_by_key(|u| match u.urgency {
-            UpdateUrgency::Security => 0,
-            UpdateUrgency::Recommended => 1,
-            UpdateUrgency::Optional => 2,
-        });
-        
-        self.updates = updates.clone();
-        Ok(updates)
+        Ok(categorized)
     }
     
-    pub fn apply_update(&mut self, update_id: &str) -> Result<(), UpdateError> {
-        let update = self.updates.iter()
-            .find(|u| u.id == update_id)
-            .ok_or(UpdateError::UpdateNotFound)?;
+    pub fn apply_updates(&mut self, updates: Vec<String>) -> Result<(), MintUpdateError> {
+        // Check safety levels
+        for update in &updates {
+            let safety = self.safety_levels.get(update)
+                .ok_or(MintUpdateError::UpdateNotFound)?;
+            
+            if matches!(safety, SafetyLevel::Dangerous) {
+                return Err(MintUpdateError::DangerousUpdate(update.clone()));
+            }
+        }
         
-        // Create restore point
-        self.create_restore_point(&update.package)?;
+        // Apply updates in order
+        for update in updates {
+            self.apply_single_update(&update)?;
+            
+            // Record in history
+            self.record_update(update)?;
+        }
         
-        // Download update
-        let package = self.download_update(update)?;
+        Ok(())
+    }
+    
+    pub fn configure_auto_updates(&mut self, config: AutoUpdateConfig) -> Result<(), MintUpdateError> {
+        self.update_manager.auto_update_config = config;
         
-        // Verify package
-        self.verify_package(&package)?;
-        
-        // Install update
-        self.install_update(&package)?;
-        
-        // Clean up
-        self.cleanup_update(&update.package)?;
+        // Set up automatic update timer
+        self.setup_auto_update_timer(config)?;
         
         Ok(())
     }
 }
 ```
 
-## Mint Drivers Manager
+## Mint Tools Integration
 
-### Hardware Driver Management
+### User-Friendly System Tools
 
 ```rust
-pub struct SigmaDriversManager {
-    pub available_drivers: Vec<Driver>,
-    pub installed_drivers: HashMap<String, InstalledDriver>,
-    pub hardware_devices: Vec<HardwareDevice>,
+pub struct SigmaMintTools {
+    pub mint_install: MintInstall,
+    pub mint_driver_manager: DriverManager,
+    pub mint_stick: MintStick,
+    pub mint_upload: MintUpload,
+}
+
+pub struct MintInstall {
+    pub catalog: SoftwareCatalog,
+    pub categories: Vec<Category>,
+    pub featured: Vec<Application>,
+}
+
+pub struct DriverManager {
+    pub drivers: HashMap<String, Driver>,
+    pub installed_drivers: Vec<String>,
+    pub recommended_drivers: Vec<String>,
 }
 
 pub struct Driver {
     pub name: String,
-    pub description: String,
     pub version: String,
-    pub repository: String,
-    pub supported_devices: Vec<DeviceId>,
-    pub proprietary: bool,
+    pub status: DriverStatus,
     pub recommended: bool,
+    pub proprietary: bool,
 }
 
-pub struct HardwareDevice {
-    pub id: DeviceId,
-    pub name: String,
-    pub vendor: String,
-    pub device_type: DeviceType,
-    pub current_driver: Option<String>,
+pub enum DriverStatus {
+    Available,
+    Installed,
+    NotAvailable,
 }
 
-pub enum DeviceType {
-    Graphics,
-    Network,
-    Audio,
-    Bluetooth,
-    Webcam,
-    Printer,
-    Scanner,
-}
-
-impl SigmaDriversManager {
-    pub fn detect_hardware(&mut self) -> Result<(), DriverError> {
-        // Scan PCI devices
-        self.scan_pci_devices()?;
+impl SigmaMintTools {
+    pub fn install_software(&mut self, app_name: &str) -> Result<(), MintToolsError> {
+        // Get application from catalog
+        let app = self.mint_install.catalog.get_application(app_name)?;
         
-        // Scan USB devices
-        self.scan_usb_devices()?;
+        // Check dependencies
+        self.check_dependencies(&app)?;
         
-        // Scan for compatible drivers
-        self.match_drivers_to_devices()?;
+        // Install application
+        self.install_application(&app)?;
+        
+        // Add to menu
+        self.add_to_menu(&app)?;
         
         Ok(())
     }
     
-    pub fn install_driver(&mut self, driver_name: &str) -> Result<(), DriverError> {
-        let driver = self.available_drivers.iter()
-            .find(|d| d.name == driver_name)
-            .ok_or(DriverError::DriverNotFound)?;
+    pub fn manage_drivers(&mut self) -> Result<(), MintToolsError> {
+        // Detect hardware
+        let hardware = self.detect_hardware()?;
         
-        // Check if driver is compatible
-        self.check_compatibility(driver)?;
+        // Find recommended drivers
+        let recommended = self.find_recommended_drivers(&hardware)?;
         
-        // Install driver package
+        // Update driver manager
+        self.mint_driver_manager.recommended_drivers = recommended;
+        
+        Ok(())
+    }
+    
+    pub fn install_driver(&mut self, driver_name: &str) -> Result<(), MintToolsError> {
+        let driver = self.mint_driver_manager.drivers.get(driver_name)
+            .ok_or(MintToolsError::DriverNotFound)?;
+        
+        // Check if driver is proprietary
+        if driver.proprietary {
+            // Show warning to user
+            self.show_proprietary_warning(driver)?;
+        }
+        
+        // Install driver
         self.install_driver_package(driver)?;
         
-        // Load driver
-        self.load_driver(driver)?;
+        // Update installed drivers list
+        self.mint_driver_manager.installed_drivers.push(driver_name.to_string());
         
-        // Update installed drivers
-        self.update_installed_drivers(driver)?;
-        
-        Ok(())
-    }
-}
-```
-
-## Mint Software Manager
-
-### Application Management
-
-```rust
-pub struct SigmaSoftwareManager {
-    pub database: SoftwareDatabase,
-    pub categories: Vec<Category>,
-    pub featured_apps: Vec<Application>,
-    pub installed_apps: HashMap<String, InstalledApplication>,
-}
-
-pub struct Application {
-    pub name: String,
-    pub description: String,
-    pub category: String,
-    pub version: String,
-    pub license: String,
-    pub website: String,
-    pub icon: String,
-    pub screenshots: Vec<String>,
-    pub packages: Vec<String>,
-    pub flatpak: Option<String>,
-    pub snap: Option<String>,
-}
-
-pub struct Category {
-    pub name: String,
-    pub icon: String,
-    pub description: String,
-}
-
-impl SigmaSoftwareManager {
-    pub fn search_applications(&self, query: &str) -> Result<Vec<Application>, SoftwareError> {
-        let results = self.database.search(query)?;
-        
-        // Filter by query
-        let filtered: Vec<_> = results.iter()
-            .filter(|app| {
-                app.name.to_lowercase().contains(&query.to_lowercase()) ||
-                app.description.to_lowercase().contains(&query.to_lowercase())
-            })
-            .cloned()
-            .collect();
-        
-        Ok(filtered)
-    }
-    
-    pub fn install_application(&mut self, app_name: &str) -> Result<(), SoftwareError> {
-        let app = self.database.get_app(app_name)?;
-        
-        // Try Flatpak first
-        if let Some(ref flatpak) = app.flatpak {
-            self.install_flatpak(flatpak)?;
-            return Ok(());
-        }
-        
-        // Try Snap next
-        if let Some(ref snap) = app.snap {
-            self.install_snap(snap)?;
-            return Ok(());
-        }
-        
-        // Fall back to package manager
-        for package in &app.packages {
-            self.install_package(package)?;
-        }
+        // Reload kernel modules
+        self.reload_kernel_modules()?;
         
         Ok(())
     }
 }
 ```
 
-## Mint Welcome Screen
+## Cinnamon Desktop Integration
 
-### New User Experience
+### Modern Desktop Environment
 
 ```rust
-pub struct SigmaWelcomeScreen {
-    pub current_step: WelcomeStep,
-    pub configuration: WelcomeConfig,
-    pub language: String,
-    pub timezone: String,
-    pub keyboard_layout: String,
+pub struct SigmaCinnamon {
+    pub desktop: CinnamonDesktop,
+    pub settings: CinnamonSettings,
+    pub spices: SpicesManager,
+    pub desklets: DeskletManager,
+    pub applets: AppletManager,
 }
 
-pub enum WelcomeStep {
-    Welcome,
-    Language,
-    Timezone,
-    Keyboard,
-    DriverInstallation,
-    MultimediaCodecs,
-    SoftwareSources,
-    SystemUpdates,
-    Complete,
+pub struct CinnamonDesktop {
+    pub panels: Vec<Panel>,
+    pub desklets: Vec<Desklet>,
+    pub extensions: Vec<Extension>,
+    pub themes: Vec<Theme>,
 }
 
-impl SigmaWelcomeScreen {
-    pub fn show(&mut self) -> Result<(), WelcomeError> {
-        self.current_step = WelcomeStep::Welcome;
-        
-        loop {
-            match self.current_step {
-                WelcomeStep::Welcome => self.show_welcome()?,
-                WelcomeStep::Language => self.show_language_selection()?,
-                WelcomeStep::Timezone => self.show_timezone_selection()?,
-                WelcomeStep::Keyboard => self.show_keyboard_layout()?,
-                WelcomeStep::DriverInstallation => self.show_driver_installation()?,
-                WelcomeStep::MultimediaCodecs => self.show_multimedia_codecs()?,
-                WelcomeStep::SoftwareSources => self.show_software_sources()?,
-                WelcomeStep::SystemUpdates => self.show_system_updates()?,
-                WelcomeStep::Complete => {
-                    self.show_complete()?;
-                    break;
-                }
+pub struct Panel {
+    pub position: PanelPosition,
+    pub size: u32,
+    pub applets: Vec<Applet>,
+    pub autohide: bool,
+}
+
+pub enum PanelPosition {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
+impl SigmaCinnamon {
+    pub fn install_spice(&mut self, spice_type: SpiceType, spice_id: &str) -> Result<(), CinnamonError> {
+        match spice_type {
+            SpiceType::Applet => {
+                let applet = self.spices.download_applet(spice_id)?;
+                self.applets.install_applet(applet)?;
+            }
+            SpiceType::Desklet => {
+                let desklet = self.spices.download_desklet(spice_id)?;
+                this.desklets.install_desklet(desklet)?;
+            }
+            SpiceType::Extension => {
+                let extension = self.spices.download_extension(spice_id)?;
+                self.install_extension(extension)?;
+            }
+            SpiceType::Theme => {
+                let theme = self.spices.download_theme(spice_id)?;
+                self.install_theme(theme)?;
             }
         }
         
         Ok(())
     }
     
-    fn show_driver_installation(&mut self) -> Result<(), WelcomeError> {
-        let driver_manager = SigmaDriversManager::new();
-        driver_manager.detect_hardware()?;
-        
-        let available = driver_manager.get_available_drivers();
-        
-        // Show recommended drivers
-        for driver in available.iter().filter(|d| d.recommended) {
-            self.display_driver_option(driver)?;
-            
-            if self.confirm_installation(driver)? {
-                driver_manager.install_driver(&driver.name)?;
-            }
+    pub fn configure_desktop(&mut self, config: DesktopConfig) -> Result<(), CinnamonError> {
+        // Configure panels
+        for panel_config in config.panels {
+            self.configure_panel(panel_config)?;
         }
         
-        self.current_step = WelcomeStep::MultimediaCodecs;
+        // Set desktop theme
+        self.set_theme(&config.theme)?;
+        
+        // Configure fonts
+        self.set_fonts(&config.fonts)?;
+        
+        // Set background
+        self.set_background(&config.background)?;
+        
         Ok(())
     }
 }
 ```
 
-## Mint Multimedia Support
+## Multimedia Support
 
-### Codec Installation
+### Out-of-the-Box Multimedia
 
 ```rust
-pub struct SigmaMultimediaManager {
-    pub codecs: Vec<Codec>,
-    pub installed_codecs: HashMap<String, InstalledCodec>,
-    pub formats: Vec<MediaFormat>,
+pub struct SigmaMultimedia {
+    pub codecs: CodecManager,
+    pub media_players: Vec<MediaPlayer>,
+    pub streaming: StreamingManager,
+}
+
+pub struct CodecManager {
+    pub installed_codecs: Vec<Codec>,
+    pub available_codecs: Vec<Codec>,
+    pub restricted_codecs: Vec<Codec>,
 }
 
 pub struct Codec {
     pub name: String,
-    pub description: String,
-    pub formats: Vec<String>,
-    pub proprietary: bool,
-    pub repository: String,
-    pub packages: Vec<String>,
+    pub format: String,
+    pub restricted: bool,
+    pub installed: bool,
 }
 
-pub struct MediaFormat {
+pub struct MediaPlayer {
     pub name: String,
-    pub extension: String,
-    pub mime_type: String,
-    pub required_codecs: Vec<String>,
+    pub supported_formats: Vec<String>,
+    pub default_for: Vec<String>,
 }
 
-impl SigmaMultimediaManager {
-    pub fn install_codec(&mut self, codec_name: &str) -> Result<(), MultimediaError> {
-        let codec = self.codecs.iter()
-            .find(|c| c.name == codec_name)
-            .ok_or(MultimediaError::CodecNotFound)?;
+impl SigmaMultimedia {
+    pub fn install_multimedia_codecs(&mut self) -> Result<(), MultimediaError> {
+        // Check for restricted codecs
+        self.check_restricted_codecs()?;
         
-        // Check if codec is proprietary
-        if codec.proprietary {
-            self.confirm_proprietary_installation(codec)?;
+        // Install common codecs
+        let common_codecs = vec![
+            "mp3", "aac", "h264", "h265", "vp9", "av1",
+            "mkv", "mp4", "webm", "flac", "ogg"
+        ];
+        
+        for codec in common_codecs {
+            self.install_codec(codec)?;
         }
         
-        // Install codec packages
-        for package in &codec.packages {
-            self.install_package(package)?;
-        }
+        // Install DVD playback support
+        self.install_dvd_support()?;
         
-        // Update installed codecs
-        self.update_installed_codecs(codec)?;
+        // Install Blu-ray playback support
+        self.install_bluray_support()?;
         
         Ok(())
     }
     
-    pub fn detect_missing_codecs(&self, file_path: &Path) -> Result<Vec<String>, MultimediaError> {
-        let format = self.detect_format(file_path)?;
-        let mut missing = Vec::new();
+    pub fn configure_media_players(&mut self) -> Result<(), MultimediaError> {
+        // Install default media players
+        self.install_media_player("vlc")?;
+        self.install_media_player("mpv")?;
         
-        for codec_name in &format.required_codecs {
-            if !self.installed_codecs.contains_key(codec_name) {
-                missing.push(codec_name.clone());
-            }
-        }
+        // Configure file associations
+        self.configure_file_associations()?;
         
-        Ok(missing)
+        // Set default players
+        self.set_default_players()?;
+        
+        Ok(())
     }
 }
 ```
 
-## Mint Backup Tool
+## Mint Security Features
 
-### System Backup and Restore
+### User-Friendly Security
 
 ```rust
-pub struct SigmaBackupTool {
-    pub backups: Vec<Backup>,
-    pub configuration: BackupConfig,
-    pub storage: BackupStorage,
+pub struct SigmaMintSecurity {
+    pub firewall: SimpleFirewall,
+    pub updates: SecurityUpdateManager,
+    pub ransomware_protection: RansomwareProtection,
 }
 
-pub struct Backup {
-    pub id: String,
+pub struct SimpleFirewall {
+    pub rules: Vec<FirewallRule>,
+    pub profiles: Vec<FirewallProfile>,
+    pub active_profile: String,
+}
+
+pub struct FirewallProfile {
     pub name: String,
+    pub description: String,
+    pub rules: Vec<FirewallRule>,
+}
+
+pub struct RansomwareProtection {
+    pub protected_directories: Vec<String>,
+    pub backup_config: BackupConfig,
+    pub monitoring: bool,
+}
+
+impl SigmaMintSecurity {
+    pub fn configure_firewall(&mut self, profile: &str) -> Result<(), MintSecurityError> {
+        let firewall_profile = self.firewall.profiles.iter()
+            .find(|p| p.name == profile)
+            .ok_or(MintSecurityError::ProfileNotFound)?;
+        
+        // Apply profile rules
+        self.firewall.rules = firewall_profile.rules.clone();
+        
+        // Set active profile
+        self.firewall.active_profile = profile.to_string();
+        
+        // Apply firewall rules
+        self.apply_firewall_rules()?;
+        
+        Ok(())
+    }
+    
+    pub fn setup_ransomware_protection(&mut self, config: RansomwareConfig) -> Result<(), MintSecurityError> {
+        // Configure protected directories
+        self.ransomware_protection.protected_directories = config.protected_directories;
+        
+        // Set up backup
+        self.configure_backup(&config.backup)?;
+        
+        // Enable monitoring
+        self.ransomware_protection.monitoring = true;
+        
+        // Start monitoring service
+        self.start_monitoring_service()?;
+        
+        Ok(())
+    }
+}
+```
+
+## System Tweaks
+
+### Performance and Usability Tweaks
+
+```rust
+pub struct SigmaSystemTweaks {
+    pub performance: PerformanceTweaks,
+    pub accessibility: AccessibilityTweaks,
+    pub startup: StartupManager,
+}
+
+pub struct PerformanceTweaks {
+    pub swappiness: u8,
+    pub filesystem_scheduler: String,
+    pub cpu_governor: String,
+}
+
+pub struct AccessibilityTweaks {
+    pub screen_reader: bool,
+    pub high_contrast: bool,
+    pub large_text: bool,
+    pub screen_magnifier: bool,
+}
+
+pub struct StartupManager {
+    pub startup_apps: Vec<StartupApp>,
+    pub services: Vec<StartupService>,
+}
+
+impl SigmaSystemTweaks {
+    pub fn apply_performance_tweaks(&mut self, config: PerformanceConfig) -> Result<(), SystemTweaksError> {
+        // Set swappiness
+        self.set_swappiness(config.swappiness)?;
+        
+        // Configure filesystem scheduler
+        self.set_filesystem_scheduler(&config.filesystem_scheduler)?;
+        
+        // Set CPU governor
+        self.set_cpu_governor(&config.cpu_governor)?;
+        
+        // Apply I/O scheduler
+        self.apply_io_scheduler(&config.io_scheduler)?;
+        
+        Ok(())
+    }
+    
+    pub fn configure_accessibility(&mut self, config: AccessibilityConfig) -> Result<(), SystemTweaksError> {
+        // Enable screen reader if requested
+        if config.screen_reader {
+            self.enable_screen_reader()?;
+        }
+        
+        // Set high contrast mode
+        if config.high_contrast {
+            self.set_high_contrast_mode()?;
+        }
+        
+        // Configure text scaling
+        self.set_text_scaling(config.text_scaling)?;
+        
+        // Enable screen magnifier if requested
+        if config.screen_magnifier {
+            self.enable_screen_magnifier()?;
+        }
+        
+        Ok(())
+    }
+}
+```
+
+## Backup and Migration
+
+### Timeshift Integration
+
+```rust
+pub struct SigmaTimeshift {
+    pub snapshots: Vec<Snapshot>,
+    pub schedule: Schedule,
+    pub storage: StorageConfig,
+}
+
+pub struct Snapshot {
+    pub id: String,
     pub timestamp: DateTime<Utc>,
     pub size: u64,
-    pub location: BackupLocation,
-    pub included_paths: Vec<PathBuf>,
-    pub excluded_paths: Vec<PathBuf>,
+    pub type_: SnapshotType,
 }
 
-pub enum BackupLocation {
-    Local(PathBuf),
-    Network(String),
-    Cloud(String),
+pub enum SnapshotType {
+    Manual,
+    Hourly,
+    Daily,
+    Weekly,
+    Monthly,
+    Boot,
 }
 
-impl SigmaBackupTool {
-    pub fn create_backup(&mut self, name: String, paths: Vec<PathBuf>) -> Result<BackupId, BackupError> {
-        let backup_id = BackupId::new();
+pub struct Schedule {
+    pub hourly: bool,
+    pub daily: bool,
+    pub weekly: bool,
+    pub monthly: bool,
+    pub boot: bool,
+}
+
+impl SigmaTimeshift {
+    pub fn create_snapshot(&mut self, type_: SnapshotType) -> Result<(), TimeshiftError> {
+        // Check storage space
+        self.check_storage_space()?;
         
-        // Calculate backup size
-        let size = self.calculate_backup_size(&paths)?;
+        // Create snapshot
+        let snapshot = self.create_system_snapshot(type_)?;
         
-        // Create backup
-        let backup = Backup {
-            id: backup_id.clone(),
-            name,
-            timestamp: Utc::now(),
-            size,
-            location: self.configuration.default_location.clone(),
-            included_paths: paths.clone(),
-            excluded_paths: self.configuration.excluded_paths.clone(),
-        };
+        // Add to snapshots list
+        self.snapshots.push(snapshot);
         
-        // Perform backup
-        self.perform_backup(&backup)?;
+        // Clean old snapshots if needed
+        self.clean_old_snapshots()?;
         
-        self.backups.push(backup);
-        Ok(backup_id)
+        Ok(())
     }
     
-    pub fn restore_backup(&self, backup_id: &BackupId) -> Result<(), BackupError> {
-        let backup = self.backups.iter()
-            .find(|b| &b.id == backup_id)
-            .ok_or(BackupError::BackupNotFound)?;
+    pub fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<(), TimeshiftError> {
+        let snapshot = self.snapshots.iter()
+            .find(|s| s.id == snapshot_id)
+            .ok_or(TimeshiftError::SnapshotNotFound)?;
         
-        // Confirm restore
-        self.confirm_restore(backup)?;
+        // Confirm with user
+        self.confirm_restore(snapshot)?;
         
-        // Perform restore
-        self.perform_restore(backup)?;
+        // Create backup snapshot
+        self.create_snapshot(SnapshotType::Manual)?;
+        
+        // Restore snapshot
+        self.restore_system(snapshot)?;
+        
+        // Reboot system
+        self.schedule_reboot()?;
+        
+        Ok(())
+    }
+    
+    pub fn configure_schedule(&mut self, schedule: Schedule) -> Result<(), TimeshiftError> {
+        self.schedule = schedule;
+        
+        // Update systemd timers
+        self.update_timers(schedule)?;
         
         Ok(())
     }
 }
 ```
 
-## Mint System Reports
+## Mint User Guide Integration
 
-### System Information and Diagnostics
+### Onboarding and Help
 
 ```rust
-pub struct SigmaSystemReporter {
-    pub system_info: SystemInfo,
-    pub hardware_info: HardwareInfo,
-    pub software_info: SoftwareInfo,
-    pub diagnostic_tools: Vec<DiagnosticTool>,
+pub struct SigmaUserGuide {
+    pub welcome_screen: WelcomeScreen,
+    pub tutorials: Vec<Tutorial>,
+    pub documentation: Documentation,
 }
 
-pub struct SystemInfo {
-    pub os_name: String,
-    pub os_version: String,
-    pub kernel_version: String,
-    pub uptime: Duration,
-    pub hostname: String,
-    pub username: String,
+pub struct WelcomeScreen {
+    pub steps: Vec<WelcomeStep>,
+    pub completed_steps: Vec<String>,
 }
 
-pub struct HardwareInfo {
-    pub cpu: CpuInfo,
-    pub memory: MemoryInfo,
-    pub storage: Vec<StorageInfo>,
-    pub graphics: Vec<GraphicsInfo>,
-    pub network: Vec<NetworkInfo>,
+pub struct WelcomeStep {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub action: WelcomeAction,
 }
 
-impl SigmaSystemReporter {
-    pub fn generate_report(&self) -> Result<SystemReport, ReportError> {
-        let report = SystemReport {
-            system_info: self.system_info.clone(),
-            hardware_info: self.hardware_info.clone(),
-            software_info: self.software_info.clone(),
-            diagnostics: self.run_diagnostics()?,
-            generated_at: Utc::now(),
-        };
+pub enum WelcomeAction {
+    InstallCodecs,
+    ConfigureUpdates,
+    SetupFirewall,
+    CustomizeDesktop,
+    Complete,
+}
+
+impl SigmaUserGuide {
+    pub fn show_welcome(&mut self) -> Result<(), UserGuideError> {
+        // Show welcome screen
+        self.display_welcome_screen()?;
         
-        Ok(report)
-    }
-    
-    pub fn run_diagnostics(&self) -> Result<Vec<DiagnosticResult>, ReportError> {
-        let mut results = Vec::new();
-        
-        for tool in &self.diagnostic_tools {
-            let result = tool.run()?;
-            results.push(result);
+        // Guide user through steps
+        for step in &self.welcome_screen.steps {
+            self.execute_step(step)?;
+            self.welcome_screen.completed_steps.push(step.id.clone());
         }
         
-        Ok(results)
-    }
-}
-```
-
-## Mint Customization Tools
-
-### System Personalization
-
-```rust
-pub struct SigmaCustomizationManager {
-    pub themes: Vec<Theme>,
-    pub icons: Vec<IconTheme>,
-    pub fonts: Vec<Font>,
-    pub cursors: Vec<CursorTheme>,
-    pub current_config: DesktopConfig,
-}
-
-pub struct Theme {
-    pub name: String,
-    pub description: String,
-    pub variant: ThemeVariant,
-    pub colors: ColorScheme,
-    pub gtk_theme: String,
-    pub window_border_theme: String,
-}
-
-pub struct DesktopConfig {
-    pub theme: String,
-    pub icon_theme: String,
-    pub font: String,
-    pub cursor_theme: String,
-    pub background: PathBuf,
-}
-
-impl SigmaCustomizationManager {
-    pub fn apply_theme(&mut self, theme_name: &str) -> Result<(), CustomizationError> {
-        let theme = self.themes.iter()
-            .find(|t| t.name == theme_name)
-            .ok_or(CustomizationError::ThemeNotFound)?;
-        
-        // Apply GTK theme
-        self.apply_gtk_theme(&theme.gtk_theme)?;
-        
-        // Apply window border theme
-        self.apply_window_theme(&theme.window_border_theme)?;
-        
-        // Apply color scheme
-        self.apply_color_scheme(&theme.colors)?;
-        
-        // Update current config
-        self.current_config.theme = theme_name.to_string();
+        // Mark welcome as completed
+        self.mark_welcome_completed()?;
         
         Ok(())
     }
     
-    pub fn set_background(&mut self, background_path: &Path) -> Result<(), CustomizationError> {
-        // Validate image
-        self.validate_image(background_path)?;
+    pub fn show_tutorial(&self, tutorial_id: &str) -> Result<(), UserGuideError> {
+        let tutorial = self.tutorials.iter()
+            .find(|t| t.id == tutorial_id)
+            .ok_or(UserGuideError::TutorialNotFound)?;
         
-        // Set background
-        self.set_wallpaper(background_path)?;
-        
-        // Update current config
-        self.current_config.background = background_path.to_path_buf();
-        
-        Ok(())
-    }
-}
-```
-
-## Mint Desktop Integration
-
-### Cinnamon Compatibility
-
-```rust
-pub struct SigmaCinnamonIntegration {
-    pub desklets: Vec<Desklet>,
-    pub applets: Vec<Applet>,
-    pub extensions: Vec<Extension>,
-    pub spices: SpicesRepository,
-}
-
-pub struct Desklet {
-    pub name: String,
-    pub description: String,
-    pub uuid: String,
-    pub version: String,
-    pub enabled: bool,
-}
-
-pub struct Applet {
-    pub name: String,
-    pub description: String,
-    pub uuid: String,
-    pub version: String,
-    pub enabled: bool,
-    pub position: PanelPosition,
-}
-
-impl SigmaCinnamonIntegration {
-    pub fn install_applet(&mut self, applet_uuid: &str) -> Result<(), CinnamonError> {
-        let applet = self.spices.get_applet(applet_uuid)?;
-        
-        // Download applet
-        let applet_data = self.download_applet(&applet)?;
-        
-        // Install to applets directory
-        self.install_applet_files(&applet_data, applet_uuid)?;
-        
-        // Enable applet
-        self.enable_applet(applet_uuid)?;
-        
-        self.applets.push(applet);
-        Ok(())
-    }
-    
-    pub fn configure_applet(&mut self, applet_uuid: &str, config: AppletConfig) -> Result<(), CinnamonError> {
-        // Update applet configuration
-        self.update_applet_config(applet_uuid, &config)?;
-        
-        // Reload applet
-        self.reload_applet(applet_uuid)?;
+        // Display tutorial
+        self.display_tutorial(tutorial)?;
         
         Ok(())
     }
@@ -620,11 +607,11 @@ impl SigmaCinnamonIntegration {
 
 ## Best Practices
 
-1. **User-Friendly**: Prioritize ease of use and intuitive interfaces
-2. **Multimedia**: Ensure comprehensive multimedia support out of the box
-3. **Stability**: Focus on stability and reliability over cutting-edge features
-4. **Customization**: Provide extensive customization options
-5. **Backup**: Include robust backup and restore functionality
+1. **User-Friendly**: Prioritize ease of use over technical complexity
+2. **Multimedia Ready**: Include multimedia codecs out of the box
+3. **Safety First**: Implement safety levels for updates
+4. **Backup Solutions**: Provide easy backup and restore functionality
+5. **Customization**: Allow extensive desktop customization
 
 ## Migration Tools
 
@@ -640,26 +627,46 @@ impl MintMigrationAssistant {
     pub fn migrate_from(&self, source_distro: DistroType) -> Result<MigrationStatus, MigrationError> {
         match source_distro {
             DistroType::Ubuntu => self.migrate_from_ubuntu(),
-            DistroType::Debian => self.migrate_from_debian(),
-            DistroType::Fedora => self.migrate_from_fedora(),
+            DistroType::Windows => self.migrate_from_windows(),
+            DistroType::MacOS => self.migrate_from_macos(),
             _ => Err(MigrationError::UnsupportedDistro),
         }
     }
     
     fn migrate_from_ubuntu(&self) -> Result<MigrationStatus, MigrationError> {
-        // Map Ubuntu packages to Mint equivalents
-        let packages = self.package_mapper.map_ubuntu_to_mint();
+        // Mint is based on Ubuntu, so direct migration is simpler
+        // Install Mint-specific packages
+        self.install_mint_packages()?;
         
-        // Install mapped packages
-        for pkg in packages {
-            self.install_package(&pkg)?;
+        // Configure Mint repositories
+        self.configure_mint_repos()?;
+        
+        // Install Mint tools
+        self.install_mint_tools()?;
+        
+        // Set up Cinnamon desktop
+        self.setup_cinnamon_desktop()?;
+        
+        Ok(MigrationStatus::Success)
+    }
+    
+    fn migrate_from_windows(&self) -> Result<MigrationStatus, MigrationError> {
+        // Scan Windows system for data
+        let windows_data = self.scan_windows_system()?;
+        
+        // Map Windows software to Linux equivalents
+        let software_map = self.map_windows_software(windows_data)?;
+        
+        // Install mapped software
+        for software in software_map {
+            self.install_software(&software)?;
         }
         
-        // Migrate user settings
-        self.migrate_user_settings()?;
+        // Migrate user data
+        self.migrate_user_data(windows_data)?;
         
-        // Install Mint-specific tools
-        self.install_mint_tools()?;
+        // Set up similar desktop environment
+        self.setup_windows_like_desktop()?;
         
         Ok(MigrationStatus::Success)
     }
@@ -669,6 +676,7 @@ impl MintMigrationAssistant {
 ## References
 
 - [Linux Mint Documentation](https://linuxmint.com/documentation.php)
-- [Cinnamon Spice Documentation](https://cinnamon-spices.linuxmint.com/)
-- [Mint Update Manager Guide](https://github.com/linuxmint/mintupdate)
-- [Mint Drivers Guide](https://github.com/linuxmint/mintdrivers)
+- [Cinnamon Spices](https://cinnamon-spices.linuxmint.com/)
+- [Timeshift Documentation](https://github.com/teejee2008/timeshift)
+- [Mint User Guide](https://linuxmint.com/download.php)
+- [Mint Community](https://forums.linuxmint.com/)

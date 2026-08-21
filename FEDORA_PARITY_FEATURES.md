@@ -2,270 +2,381 @@
 
 ## Overview
 
-This document outlines Fedora-specific features and their implementation in SigmaOS to provide parity with Fedora's focus on cutting-edge technology, security-first approach, and innovative system architecture.
+This document outlines Fedora-specific features and their implementation in SigmaOS to provide parity with Fedora's focus on cutting-edge technology, security innovation, and developer-friendly ecosystem.
+
+## DNF Package Manager Integration
+
+### Modern Package Management
+
+```rust
+pub struct SigmaDNF {
+    pub database: DnfDatabase,
+    pub repositories: Vec<Repository>,
+    pub sack: PackageSack,
+    pub transaction: Transaction,
+}
+
+pub struct PackageSack {
+    pub packages: HashMap<String, Package>,
+    pub groups: HashMap<String, PackageGroup>,
+    pub modules: HashMap<String, Module>,
+}
+
+pub struct Transaction {
+    pub operations: Vec<TransactionOperation>,
+    pub dependencies: Vec<Dependency>,
+    pub problems: Vec<TransactionProblem>,
+}
+
+pub enum TransactionOperation {
+    Install { package: String, version: String },
+    Remove { package: String },
+    Update { package: String, from_version: String, to_version: String },
+    Obsolete { package: String },
+}
+
+impl SigmaDNF {
+    pub fn install(&mut self, specs: Vec<String>) -> Result<(), DnfError> {
+        // Resolve package specifications
+        let packages = self.resolve_specs(specs)?;
+        
+        // Create transaction
+        let mut transaction = self.create_transaction()?;
+        
+        // Add install operations
+        for package in packages {
+            transaction.operations.push(TransactionOperation::Install {
+                package: package.name.clone(),
+                version: package.version,
+            });
+        }
+        
+        // Resolve dependencies
+        self.resolve_dependencies(&mut transaction)?;
+        
+        // Check for problems
+        if !transaction.problems.is_empty() {
+            return Err(DnfError::TransactionProblems(transaction.problems));
+        }
+        
+        // Execute transaction
+        self.execute_transaction(transaction)?;
+        
+        Ok(())
+    }
+    
+    pub fn update(&mut self, specs: Vec<String>) -> Result<(), DnfError> {
+        // Get installed packages
+        let installed = self.database.get_installed_packages()?;
+        
+        // Resolve update specifications
+        let updates = self.resolve_update_specs(specs, &installed)?;
+        
+        // Create transaction
+        let mut transaction = self.create_transaction()?;
+        
+        // Add update operations
+        for update in updates {
+            transaction.operations.push(TransactionOperation::Update {
+                package: update.name.clone(),
+                from_version: update.installed_version,
+                to_version: update.available_version,
+            });
+        }
+        
+        // Resolve dependencies
+        self.resolve_dependencies(&mut transaction)?;
+        
+        // Execute transaction
+        self.execute_transaction(transaction)?;
+        
+        Ok(())
+    }
+    
+    pub fn module_enable(&mut self, module_name: &str, stream: &str) -> Result<(), DnfError> {
+        let module = self.sack.modules.get(module_name)
+            .ok_or(DnfError::ModuleNotFound)?;
+        
+        // Enable module stream
+        self.enable_module_stream(module, stream)?;
+        
+        // Install module packages
+        let packages = self.get_module_packages(module, stream)?;
+        self.install(packages)?;
+        
+        Ok(())
+    }
+}
+```
 
 ## SELinux Integration
 
-### Enhanced SELinux Implementation
+### Enhanced Security Architecture
 
 ```rust
 pub struct SigmaSELinux {
     pub policy: SELinuxPolicy,
     pub contexts: HashMap<String, SecurityContext>,
     pub booleans: HashMap<String, bool>,
-    pub modules: Vec<PolicyModule>,
+    pub enforcement: bool,
 }
 
 pub struct SELinuxPolicy {
-    pub version: u32,
-    pub mls: bool,
-    pub mcs: bool,
-    pub type_enforcement: bool,
+    pub rules: Vec<PolicyRule>,
+    pub types: HashMap<String, Type>,
+    pub attributes: HashMap<String, Attribute>,
+    pub roles: HashMap<String, Role>,
+    pub users: HashMap<String, SELinuxUser>,
+}
+
+pub struct SecurityContext {
+    pub user: String,
+    pub role: String,
+    pub type_: String,
+    pub level: String,
+}
+
+pub enum PolicyRule {
+    Allow {
+        source_type: String,
+        target_type: String,
+        target_class: String,
+        permissions: Vec<String>,
+    },
+    TypeTransition {
+        source_type: String,
+        target_type: String,
+        target_class: String,
+        default_type: String,
+    },
 }
 
 impl SigmaSELinux {
-    pub fn enforce_policy(&mut self, domain: &str, operation: &Operation) -> Result<bool, SELinuxError> {
-        let context = self.contexts.get(domain)
-            .ok_or(SELinuxError::ContextNotFound)?;
+    pub fn load_policy(&mut self, policy: SELinuxPolicy) -> Result<(), SELinuxError> {
+        // Validate policy
+        self.validate_policy(&policy)?;
         
-        // Check permission
-        let allowed = self.check_permission(context, operation)?;
+        // Load into kernel
+        self.load_policy_to_kernel(&policy)?;
         
-        if !allowed {
-            self.log_denial(domain, operation)?;
-            return Ok(false);
+        // Update policy reference
+        self.policy = policy;
+        
+        Ok(())
+    }
+    
+    pub fn set_enforcement(&mut self, enabled: bool) -> Result<(), SELinuxError> {
+        self.enforcement = enabled;
+        
+        // Update kernel enforcement mode
+        self.set_kernel_enforcement(enabled)?;
+        
+        Ok(())
+    }
+    
+    pub fn set_boolean(&mut self, name: &str, value: bool) -> Result<(), SELinuxError> {
+        self.booleans.insert(name.to_string(), value);
+        
+        // Update kernel boolean
+        self.set_kernel_boolean(name, value)?;
+        
+        Ok(())
+    }
+    
+    pub fn get_context(&self, path: &str) -> Result<SecurityContext, SELinuxError> {
+        self.contexts.get(path)
+            .cloned()
+            .ok_or(SELinuxError::ContextNotFound)
+    }
+    
+    pub fn set_context(&mut self, path: &str, context: SecurityContext) -> Result<(), SELinuxError> {
+        // Validate context
+        self.validate_context(&context)?;
+        
+        // Set file context
+        self.set_file_context(path, &context)?;
+        
+        // Update context mapping
+        self.contexts.insert(path.to_string(), context);
+        
+        Ok(())
+    }
+}
+```
+
+## Fedora Workstation Features
+
+### GNOME Desktop Integration
+
+```rust
+pub struct SigmaGNOME {
+    pub shell: GnomeShell,
+    pub settings: GnomeSettings,
+    pub applications: ApplicationManager,
+    pub extensions: ExtensionManager,
+}
+
+pub struct GnomeShell {
+    pub extensions: Vec<ShellExtension>,
+    pub dash: Dash,
+    pub overview: Overview,
+    pub workspaces: WorkspaceManager,
+}
+
+pub struct ShellExtension {
+    pub uuid: String,
+    pub name: String,
+    pub description: String,
+    pub version: String,
+    pub enabled: bool,
+    pub preferences: Option<String>,
+}
+
+impl SigmaGNOME {
+    pub fn install_extension(&mut self, extension_uuid: &str) -> Result<(), GnomeError> {
+        // Download extension
+        let extension = self.download_extension(extension_uuid)?;
+        
+        // Install to user directory
+        self.install_extension_to_user(&extension)?;
+        
+        // Enable extension
+        this.enable_extension(extension_uuid)?;
+        
+        // Reload shell
+        this.reload_shell()?;
+        
+        Ok(())
+    }
+    
+    pub fn configure_desktop(&mut self, config: DesktopConfig) -> Result<(), GnomeError> {
+        // Apply background
+        self.set_background(&config.background)?;
+        
+        // Configure fonts
+        self.set_font_config(&config.fonts)?;
+        
+        // Set theme
+        self.set_theme(&config.theme)?;
+        
+        // Configure power settings
+        self.set_power_settings(&config.power)?;
+        
+        Ok(())
+    }
+}
+```
+
+## Fedora Silverblue Features
+
+### Immutable Desktop System
+
+```rust
+pub struct SigmaSilverblue {
+    pub base_system: ImmutableBase,
+    pub layered_packages: Vec<LayeredPackage>,
+    pub toolbox: ToolboxManager,
+    pub ostree: OstreeManager,
+}
+
+pub struct ImmutableBase {
+    pub commit: String,
+    pub version: String,
+    pub packages: Vec<String>,
+}
+
+pub struct LayeredPackage {
+    pub name: String,
+    pub version: String,
+    pub checksum: String,
+}
+
+pub struct ToolboxManager {
+    pub toolboxes: Vec<Toolbox>,
+}
+
+pub struct Toolbox {
+    pub name: String,
+    pub image: String,
+    pub created: DateTime<Utc>,
+}
+
+impl SigmaSilverblue {
+    pub fn rebase(&mut self, new_commit: &str) -> Result<(), SilverblueError> {
+        // Download new commit
+        let commit = self.ostree.pull_commit(new_commit)?;
+        
+        // Verify commit
+        self.verify_commit(&commit)?;
+        
+        // Deploy new commit
+        self.deploy_commit(&commit)?;
+        
+        // Update base system reference
+        self.base_system.commit = new_commit.to_string();
+        
+        Ok(())
+    }
+    
+    pub fn add_layered_package(&mut self, package: &str) -> Result<(), SilverblueError> {
+        // Check if package is already layered
+        if self.layered_packages.iter().any(|p| p.name == package) {
+            return Err(SilverblueError::PackageAlreadyLayered);
         }
         
-        Ok(true)
-    }
-    
-    pub fn load_policy(&mut self, policy_path: &Path) -> Result<(), SELinuxError> {
-        let policy_data = self.read_policy_file(policy_path)?;
-        let policy = self.parse_policy(&policy_data)?;
+        // Install package using rpm-ostree
+        let pkg = self.install_with_rpm_ostree(package)?;
         
-        self.policy = policy;
-        self.rebuild_contexts()?;
+        // Add to layered packages
+        self.layered_packages.push(pkg);
         
         Ok(())
     }
-}
-```
-
-## Wayland Display Server
-
-### Native Wayland Implementation
-
-```rust
-pub struct SigmaWayland {
-    pub compositor: Compositor,
-    pub shell: WaylandShell,
-    pub input: InputManager,
-    pub outputs: Vec<Output>,
-}
-
-pub struct Compositor {
-    pub surfaces: HashMap<SurfaceId, Surface>,
-    pub regions: Vec<Region>,
-}
-
-impl SigmaWayland {
-    pub fn create_surface(&mut self) -> Result<SurfaceId, WaylandError> {
-        let id = SurfaceId::new();
-        let surface = Surface::new(id);
-        
-        self.surfaces.insert(id, surface);
-        Ok(id)
-    }
     
-    pub fn commit_surface(&mut self, id: SurfaceId) -> Result<(), WaylandError> {
-        let surface = self.surfaces.get_mut(&id)
-            .ok_or(WaylandError::SurfaceNotFound)?;
+    pub fn create_toolbox(&mut self, name: &str, image: &str) -> Result<(), SilverblueError> {
+        // Pull container image
+        self.pull_image(image)?;
         
-        surface.commit();
-        self.compositor.schedule_render(id);
-        
-        Ok(())
-    }
-}
-```
-
-## PackageKit Integration
-
-### Package Management Backend
-
-```rust
-pub struct SigmaPackageKit {
-    pub backend: PackageBackend,
-    pub transactions: Vec<Transaction>,
-    pub filters: Vec<PackageFilter>,
-}
-
-pub enum PackageBackend {
-    SigmaPacman,
-    SigmaDNF,
-    SigmaAPT,
-}
-
-impl SigmaPackageKit {
-    pub fn search_packages(&self, query: &str) -> Result<Vec<Package>, PackageError> {
-        let results = self.backend.search(query)?;
-        
-        // Apply filters
-        let filtered = self.apply_filters(results);
-        
-        Ok(filtered)
-    }
-    
-    pub fn install_packages(&mut self, packages: Vec<String>) -> Result<TransactionId, PackageError> {
-        let transaction = Transaction::new(TransactionType::Install, packages);
-        let id = transaction.id;
-        
-        self.transactions.push(transaction);
-        self.backend.install(&packages)?;
-        
-        Ok(id)
-    }
-}
-```
-
-## PipeWire Multimedia Framework
-
-### Audio/Video Processing
-
-```rust
-pub struct SigmaPipeWire {
-    pub core: PipeWireCore,
-    pub nodes: HashMap<NodeId, Node>,
-    pub links: Vec<Link>,
-    pub ports: HashMap<PortId, Port>,
-}
-
-pub struct Node {
-    pub id: NodeId,
-    pub name: String,
-    pub node_type: NodeType,
-    pub ports: Vec<PortId>,
-}
-
-pub enum NodeType {
-    Source,
-    Sink,
-    Filter,
-    Device,
-}
-
-impl SigmaPipeWire {
-    pub fn create_node(&mut self, name: String, node_type: NodeType) -> Result<NodeId, PipeWireError> {
-        let id = NodeId::new();
-        let node = Node {
-            id,
-            name,
-            node_type,
-            ports: Vec::new(),
+        // Create toolbox container
+        let toolbox = Toolbox {
+            name: name.to_string(),
+            image: image.to_string(),
+            created: Utc::now(),
         };
         
-        self.nodes.insert(id, node);
-        Ok(id)
-    }
-    
-    pub fn link_nodes(&mut self, output_port: PortId, input_port: PortId) -> Result<(), PipeWireError> {
-        let link = Link::new(output_port, input_port);
-        self.links.push(link);
+        // Add to toolbox manager
+        self.toolbox.toolboxes.push(toolbox);
         
         Ok(())
     }
 }
 ```
 
-## Systemd-boot
+## Fedora Server Features
 
-### UEFI Boot Manager
-
-```rust
-pub struct SigmaSystemdBoot {
-    pub entries: Vec<BootEntry>,
-    pub loader: LoaderConfig,
-    pub entries_path: PathBuf,
-}
-
-pub struct BootEntry {
-    pub title: String,
-    pub version: String,
-    pub machine_id: String,
-    pub options: String,
-    pub linux: PathBuf,
-    pub initrd: Option<PathBuf>,
-    pub devicetree: Option<PathBuf>,
-}
-
-impl SigmaSystemdBoot {
-    pub fn add_entry(&mut self, entry: BootEntry) -> Result<(), BootError> {
-        let filename = format!("{}.conf", entry.title.replace(' ', "-"));
-        let path = self.entries_path.join(filename);
-        
-        let config = self.generate_entry_config(&entry);
-        self.write_entry_file(&path, &config)?;
-        
-        self.entries.push(entry);
-        Ok(())
-    }
-    
-    fn generate_entry_config(&self, entry: &BootEntry) -> String {
-        let mut config = String::new();
-        
-        config.push_str("title ");
-        config.push_str(&entry.title);
-        config.push_str("\n");
-        
-        config.push_str("version ");
-        config.push_str(&entry.version);
-        config.push_str("\n");
-        
-        config.push_str("machine-id ");
-        config.push_str(&entry.machine_id);
-        config.push_str("\n");
-        
-        config.push_str("options ");
-        config.push_str(&entry.options);
-        config.push_str("\n");
-        
-        config.push_str("linux ");
-        config.push_str(entry.linux.to_str().unwrap());
-        config.push_str("\n");
-        
-        if let Some(ref initrd) = entry.initrd {
-            config.push_str("initrd ");
-            config.push_str(initrd.to_str().unwrap());
-            config.push_str("\n");
-        }
-        
-        config
-    }
-}
-```
-
-## Firewalld Integration
-
-### Dynamic Firewall Management
+### Server Management Tools
 
 ```rust
-pub struct SigmaFirewalld {
+pub struct SigmaServerAdmin {
+    pub firewall: FirewalldManager,
+    pub cockpit: CockpitManager,
+    pub podman: PodmanManager,
+    pub services: SystemdManager,
+}
+
+pub struct FirewalldManager {
     pub zones: HashMap<String, Zone>,
-    pub services: HashMap<String, Service>,
-    pub icmptypes: HashMap<String, IcmpType>,
+    pub services: HashMap<String, FirewalldService>,
     pub default_zone: String,
 }
 
 pub struct Zone {
     pub name: String,
-    pub target: ZoneTarget,
     pub interfaces: Vec<String>,
     pub sources: Vec<String>,
     pub services: Vec<String>,
     pub ports: Vec<Port>,
-    pub protocols: Vec<String>,
-    pub masquerade: bool,
-    pub forward_ports: Vec<ForwardPort>,
+    pub target: ZoneTarget,
 }
 
 pub enum ZoneTarget {
@@ -275,266 +386,315 @@ pub enum ZoneTarget {
     Reject,
 }
 
-impl SigmaFirewalld {
-    pub fn add_service_to_zone(&mut self, zone: &str, service: &str) -> Result<(), FirewallError> {
-        let zone = self.zones.get_mut(zone)
-            .ok_or(FirewallError::ZoneNotFound)?;
+impl SigmaServerAdmin {
+    pub fn configure_firewall(&mut self, zone: &str, config: ZoneConfig) -> Result<(), ServerAdminError> {
+        let zone_obj = self.firewall.zones.get_mut(zone)
+            .ok_or(ServerAdminError::ZoneNotFound)?;
         
-        if !zone.services.contains(&service.to_string()) {
-            zone.services.push(service.to_string());
+        // Add services
+        for service in config.services {
+            zone_obj.services.push(service);
         }
         
+        // Add ports
+        for port in config.ports {
+            zone_obj.ports.push(port);
+        }
+        
+        // Apply firewall configuration
+        self.apply_firewall_config(zone)?;
+        
         Ok(())
     }
     
-    pub fn add_port_to_zone(&mut self, zone: &str, port: u16, protocol: &str) -> Result<(), FirewallError> {
-        let zone = self.zones.get_mut(zone)
-            .ok_or(FirewallError::ZoneNotFound)?;
+    pub fn setup_cockpit(&mut self) -> Result<(), ServerAdminError> {
+        // Install cockpit packages
+        self.install_cockpit_packages()?;
         
-        let port_entry = Port {
-            port,
-            protocol: protocol.to_string(),
-        };
+        // Enable cockpit service
+        self.services.enable_service("cockpit")?;
         
-        zone.ports.push(port_entry);
+        // Configure firewall for cockpit
+        self.configure_cockpit_firewall()?;
+        
+        // Start cockpit service
+        self.services.start_service("cockpit")?;
+        
         Ok(())
     }
 }
 ```
 
-## Cockpit Web Console
+## Fedora Cloud Features
 
-### Web-based Administration
-
-```rust
-pub struct SigmaCockpit {
-    pub bridges: HashMap<String, Bridge>,
-    pub sessions: HashMap<SessionId, Session>,
-    pub auth: AuthenticationService,
-}
-
-pub struct Bridge {
-    pub name: String,
-    pub endpoint: String,
-    pub packages: Vec<String>,
-    pub privileged: bool,
-}
-
-impl SigmaCockpit {
-    pub fn handle_request(&mut self, request: &CockpitRequest) -> Result<CockpitResponse, CockpitError> {
-        // Authenticate session
-        let session = self.auth.authenticate(&request.auth_token)?;
-        
-        // Route to appropriate bridge
-        let bridge = self.bridges.get(&request.bridge)
-            .ok_or(CockpitError::BridgeNotFound)?;
-        
-        // Execute command
-        let result = self.execute_bridge_command(bridge, &request.command)?;
-        
-        Ok(CockpitResponse {
-            result,
-            session_id: session.id,
-        })
-    }
-}
-```
-
-## Silverblue Integration
-
-### Immutable Core System
+### Cloud-Optimized Images
 
 ```rust
-pub struct SigmaSilverblue {
-    pub base_system: BaseSystem,
-    pub layered_packages: Vec<LayeredPackage>,
-    pub toolbox_containers: Vec<ToolboxContainer>,
+pub struct SigmaCloud {
+    pub image_builder: ImageBuilder,
+    pub cloud_init: CloudInitManager,
+    pub metrics: MetricsCollector,
 }
 
-pub struct BaseSystem {
-    pub version: Version,
-    pub commit: String,
-    pub checksum: String,
+pub struct ImageBuilder {
+    pub base_images: Vec<BaseImage>,
+    pub customizations: Vec<Customization>,
 }
 
-pub struct LayeredPackage {
+pub struct BaseImage {
     pub name: String,
     pub version: String,
-    pub layer_path: PathBuf,
+    pub arch: String,
+    pub size: u64,
 }
 
-impl SigmaSilverblue {
-    pub fn add_layered_package(&mut self, package: &str) -> Result<(), SilverblueError> {
-        // Install package in layer
-        let layer_path = self.create_layer(package)?;
-        self.install_to_layer(&layer_path, package)?;
+pub struct Customization {
+    pub packages: Vec<String>,
+    pub users: Vec<UserCustomization>,
+    pub files: Vec<FileCustomization>,
+    pub services: Vec<ServiceCustomization>,
+}
+
+impl SigmaCloud {
+    pub fn build_cloud_image(&mut self, base: &str, customizations: Customization) -> Result<Vec<u8>, CloudError> {
+        // Get base image
+        let base_image = self.image_builder.base_images.iter()
+            .find(|img| img.name == base)
+            .ok_or(CloudError::BaseImageNotFound)?;
         
-        let layered = LayeredPackage {
-            name: package.to_string(),
-            version: self.get_package_version(package)?,
-            layer_path,
-        };
+        // Create build environment
+        let build_env = self.create_build_environment(base_image)?;
         
-        self.layered_packages.push(layered);
-        Ok(())
+        // Apply customizations
+        self.apply_customizations(&build_env, &customizations)?;
+        
+        // Build image
+        let image_data = self.build_image(&build_env)?;
+        
+        // Cleanup build environment
+        self.cleanup_build_environment(build_env)?;
+        
+        Ok(image_data)
     }
     
-    pub fn create_toolbox(&mut self, name: &str) -> Result<(), SilverblueError> {
-        let container = self.create_container(name)?;
-        self.install_base_tools(&container)?;
+    pub fn optimize_for_cloud(&mut self, image: &mut Vec<u8>) -> Result<(), CloudError> {
+        // Remove unnecessary packages
+        self.strip_packages(image)?;
         
-        self.toolbox_containers.push(container);
+        // Optimize filesystem
+        self.optimize_filesystem(image)?;
+        
+        // Configure cloud-init
+        self.configure_cloud_init(image)?;
+        
+        // Set up cloud-specific optimizations
+        self.apply_cloud_optimizations(image)?;
+        
         Ok(())
     }
 }
 ```
 
-## Fedora-Specific Security Features
+## Fedora Security Innovations
 
-### Crypto Policies
+### Advanced Security Features
 
 ```rust
-pub struct SigmaCryptoPolicy {
+pub struct SigmaSecurity {
+    pub crypto_policy: CryptoPolicyManager,
+    pub fips_mode: FipsManager,
+    pub audit: AuditManager,
+    pub integrity: IntegrityManager,
+}
+
+pub struct CryptoPolicyManager {
     pub current_policy: CryptoPolicy,
     pub available_policies: Vec<CryptoPolicy>,
 }
 
-pub struct CryptoPolicy {
-    pub name: String,
-    pub tls_version: TlsVersion,
-    pub cipher_suites: Vec<String>,
-    pub mac_algorithms: Vec<String>,
-    pub key_exchange: Vec<String>,
-    pub signature_algorithms: Vec<String>,
+pub enum CryptoPolicy {
+    Default,
+    Legacy,
+    Next,
+    FIPS,
 }
 
-impl SigmaCryptoPolicy {
-    pub fn apply_policy(&mut self, policy: &CryptoPolicy) -> Result<(), CryptoError> {
-        // Update TLS configuration
-        self.update_tls_config(policy)?;
-        
-        // Update SSH configuration
-        self.update_ssh_config(policy)?;
-        
-        // Update system-wide crypto settings
-        self.update_system_crypto(policy)?;
-        
-        self.current_policy = policy.clone();
-        Ok(())
-    }
-}
-```
-
-## Fedora Modularity
-
-### Module Lifecycle Management
-
-```rust
-pub struct SigmaModularity {
-    pub modules: HashMap<String, Module>,
-    pub module_streams: HashMap<String, Vec<ModuleStream>>,
-    pub profiles: HashMap<String, ModuleProfile>,
+pub struct FipsManager {
+    pub enabled: bool,
+    pub validated_modules: Vec<String>,
 }
 
-pub struct Module {
-    pub name: String,
-    pub stream: String,
-    pub version: String,
-    pub context: String,
-    pub profiles: Vec<String>,
-}
-
-pub struct ModuleStream {
-    pub name: String,
-    pub version: String,
-    pub context: String,
-    pub packages: Vec<String>,
-}
-
-impl SigmaModularity {
-    pub fn enable_module(&mut self, module: &str, stream: &str) -> Result<(), ModuleError> {
-        let module_stream = self.find_stream(module, stream)?
-            .ok_or(ModuleError::StreamNotFound)?;
+impl SigmaSecurity {
+    pub fn set_crypto_policy(&mut self, policy: CryptoPolicy) -> Result<(), SecurityError> {
+        // Validate policy
+        self.validate_crypto_policy(&policy)?;
         
-        // Enable module stream
-        self.enable_stream(&module_stream)?;
+        // Update system crypto policy
+        self.update_crypto_policy(&policy)?;
         
-        // Install packages from stream
-        for package in &module_stream.packages {
-            self.install_package(package)?;
-        }
+        // Update current policy reference
+        self.crypto_policy.current_policy = policy;
+        
+        // Restart affected services
+        self.restart_crypto_services()?;
         
         Ok(())
     }
     
-    pub fn create_profile(&mut self, module: &str, profile: &str) -> Result<(), ModuleError> {
-        let module_profile = ModuleProfile {
-            name: profile.to_string(),
-            module: module.to_string(),
-            packages: self.get_profile_packages(module, profile)?,
-        };
+    pub fn enable_fips_mode(&mut self) -> Result<(), SecurityError> {
+        // Validate FIPS modules
+        self.validate_fips_modules()?;
         
-        self.profiles.insert(format!("{}_{}", module, profile), module_profile);
+        // Enable FIPS mode in kernel
+        self.enable_kernel_fips()?;
+        
+        // Update crypto policy to FIPS
+        self.set_crypto_policy(CryptoPolicy::FIPS)?;
+        
+        // Update FIPS manager state
+        self.fips_mode.enabled = true;
+        
+        Ok(())
+    }
+    
+    pub fn setup_audit_rules(&mut self, rules: Vec<AuditRule>) -> Result<(), SecurityError> {
+        // Validate audit rules
+        self.validate_audit_rules(&rules)?;
+        
+        // Load audit rules
+        for rule in rules {
+            self.load_audit_rule(rule)?;
+        }
+        
+        // Enable audit daemon
+        self.enable_auditd()?;
+        
         Ok(())
     }
 }
 ```
 
-## Performance Tuning
+## Fedora Developer Tools
 
-### Tuned Profiles
+### Developer-Friendly Environment
 
 ```rust
-pub struct SigmaTuned {
-    pub profiles: HashMap<String, TunedProfile>,
-    pub active_profile: Option<String>,
-    pub plugins: Vec<TunedPlugin>,
+pub struct SigmaDevEnvironment {
+    pub toolchains: ToolchainManager,
+    pub containers: ContainerManager,
+    pub flatpak: FlatpakManager,
+    pub debug: DebuggingTools,
 }
 
-pub struct TunedProfile {
+pub struct ToolchainManager {
+    pub toolchains: HashMap<String, Toolchain>,
+    pub profiles: HashMap<String, Profile>,
+}
+
+pub struct Toolchain {
     pub name: String,
-    pub description: String,
-    pub settings: ProfileSettings,
-    pub plugins: Vec<String>,
+    pub languages: Vec<String>,
+    pub packages: Vec<String>,
+    pub environment: HashMap<String, String>,
 }
 
-pub struct ProfileSettings {
-    pub cpu: CpuSettings,
-    pub memory: MemorySettings,
-    pub disk: DiskSettings,
-    pub network: NetworkSettings,
-}
-
-impl SigmaTuned {
-    pub fn apply_profile(&mut self, profile_name: &str) -> Result<(), TunedError> {
-        let profile = self.profiles.get(profile_name)
-            .ok_or(TunedError::ProfileNotFound)?;
+impl SigmaDevEnvironment {
+    pub fn setup_rust_development(&mut self) -> Result<(), DevEnvError> {
+        // Install Rust toolchain
+        self.install_rust_toolchain()?;
         
-        // Apply CPU settings
-        self.apply_cpu_settings(&profile.settings.cpu)?;
+        // Install common Rust packages
+        self.install_rust_packages(vec![
+            "cargo", "rustc", "rustfmt", "clippy", "rust-analyzer"
+        ])?;
         
-        // Apply memory settings
-        self.apply_memory_settings(&profile.settings.memory)?;
+        // Set up Rust environment
+        self.configure_rust_environment()?;
         
-        // Apply disk settings
-        self.apply_disk_settings(&profile.settings.disk)?;
-        
-        // Apply network settings
-        self.apply_network_settings(&profile.settings.network)?;
-        
-        self.active_profile = Some(profile_name.to_string());
         Ok(())
+    }
+    
+    pub fn setup_container_development(&mut self) -> Result<(), DevEnvError> {
+        // Install Podman
+        self.install_podman()?;
+        
+        // Install Buildah
+        self.install_buildah()?;
+        
+        // Install Skopeo
+        self.install_skopeo()?;
+        
+        // Configure container registries
+        self.configure_registries()?;
+        
+        Ok(())
+    }
+}
+```
+
+## System Updates and Maintenance
+
+### Automatic Update System
+
+```rust
+pub struct SigmaUpdateManager {
+    pub automatic_updates: bool,
+    pub update_schedule: UpdateSchedule,
+    pub kernel_updates: KernelUpdatePolicy,
+}
+
+pub enum UpdateSchedule {
+    Daily { time: NaiveTime },
+    Weekly { day: Weekday, time: NaiveTime },
+    Monthly { day: u32, time: NaiveTime },
+    Never,
+}
+
+pub enum KernelUpdatePolicy {
+    Automatic,
+    Manual,
+    Skip,
+}
+
+impl SigmaUpdateManager {
+    pub fn configure_automatic_updates(&mut self, schedule: UpdateSchedule) -> Result<(), UpdateError> {
+        self.update_schedule = schedule;
+        
+        // Create systemd timer
+        self.create_update_timer(schedule)?;
+        
+        // Enable automatic updates
+        self.automatic_updates = true;
+        
+        Ok(())
+    }
+    
+    pub fn check_for_updates(&self) -> Result<Vec<Update>, UpdateError> {
+        // Sync repositories
+        self.sync_repos()?;
+        
+        // Check for package updates
+        let package_updates = self.check_package_updates()?;
+        
+        // Check for kernel updates
+        let kernel_updates = self.check_kernel_updates()?;
+        
+        // Combine results
+        let mut updates = package_updates;
+        updates.extend(kernel_updates);
+        
+        Ok(updates)
     }
 }
 ```
 
 ## Best Practices
 
-1. **Security First**: Always implement security features following Fedora's security-first approach
-2. **Cutting Edge**: Incorporate latest technologies while maintaining stability
-3. **Modularity**: Design systems with clear module boundaries
-4. **Container-Ready**: Support container-based workflows out of the box
-5. **Performance**: Optimize for desktop and server workloads
+1. **Security First**: Implement SELinux and other security features by default
+2. **Cutting Edge**: Use latest technologies while maintaining stability
+3. **Developer Friendly**: Provide comprehensive development tools
+4. **Container Ready**: Optimize for container-based workflows
+5. **Cloud Native**: Support cloud deployment scenarios
 
 ## Migration Tools
 
@@ -549,27 +709,27 @@ pub struct FedoraMigrationAssistant {
 impl FedoraMigrationAssistant {
     pub fn migrate_from(&self, source_distro: DistroType) -> Result<MigrationStatus, MigrationError> {
         match source_distro {
+            DistroType::RHEL => self.migrate_from_rhel(),
+            DistroType::CentOS => self.migrate_from_centos(),
             DistroType::Ubuntu => self.migrate_from_ubuntu(),
-            DistroType::Debian => self.migrate_from_debian(),
-            DistroType::Arch => self.migrate_from_arch(),
             _ => Err(MigrationError::UnsupportedDistro),
         }
     }
     
-    fn migrate_from_ubuntu(&self) -> Result<MigrationStatus, MigrationError> {
-        // Map Ubuntu packages to Fedora equivalents
-        let packages = self.package_mapper.map_ubuntu_to_fedora();
+    fn migrate_from_rhel(&self) -> Result<MigrationStatus, MigrationError> {
+        // Map RHEL packages to Fedora equivalents
+        let packages = self.package_mapper.map_rhel_to_fedora();
         
         // Install mapped packages
         for pkg in packages {
             self.install_package(&pkg)?;
         }
         
-        // Migrate SELinux contexts
-        self.migrate_selinux_contexts()?;
+        // Configure Fedora repositories
+        self.configure_fedora_repos()?;
         
-        // Migrate firewall rules
-        self.migrate_firewall_rules()?;
+        // Migrate SELinux policies
+        self.migrate_selinux_policies()?;
         
         Ok(MigrationStatus::Success)
     }
@@ -579,7 +739,7 @@ impl FedoraMigrationAssistant {
 ## References
 
 - [Fedora Documentation](https://docs.fedoraproject.org/)
+- [DNF Documentation](https://dnf.readthedocs.io/)
 - [SELinux Project Wiki](https://selinuxproject.org/)
-- [Wayland Documentation](https://wayland.freedesktop.org/)
-- [PipeWire Documentation](https://docs.pipewire.org/)
-- [systemd Documentation](https://www.freedesktop.org/software/systemd/man/)
+- [Fedora Silverblue Documentation](https://docs.fedoraproject.org/en-US/fedora-silverblue/)
+- [Podman Documentation](https://docs.podman.io/)
