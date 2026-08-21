@@ -4,3 +4,17 @@
 *.log
 *.tmp
 SigmaOS.wiki/
+
+# Build artifacts and compiled binaries
+build/
+*.iso
+*.bin
+*.img
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.elf
+test_runner

@@ -33,6 +33,12 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod tracing;
+pub mod crash;
+pub mod media;
+pub mod graphics;
+pub mod gpu;
+pub mod installer;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -109,6 +115,23 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
+pub use graphics::{
+    PixelRgba, VideoFrame, BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
+    Surface, Window, VideoClip, VideoEffect, VideoTimeline, VideoTrack as GraphicsVideoTrack,
+};
+pub use gpu::driver::{GPUDeviceID, GPUVendor};
+pub use media::{
+    SovereignScreenRecorder, CaptureSource, GpuEncoderType, RecorderState, RecordingStats,
+    AdBlockFilter, BrowserProcess, BrowserProcessType, SearchEngineType, SearchSwitcher,
+    SecureStorageContainer, SovereignBrowserEngine,
+    CGroup, CGroupController, CodecType, DnsResolver, InitService, NtpClient, PageTable,
+    PlayerState, SecureBootKeyring, SigmaSystemd, SovereignVideoPlayer, SovereignVmm,
+    SovereignVideoEditor, VideoTrack, TimelineClip, AscCdl, EditorError,
+};
+pub use installer::{
+    GuiInstallerWizard, InstallerStep, PartitionStrategy, UserAccountConfig, PrivacySettings,
+    DetectedOperatingSystem,
+};
 
 pub mod init {
     pub mod systemd_init;
@@ -120,6 +143,7 @@ pub use init::systemd_init::{
 pub mod ai {
     pub mod next_gen;
     pub mod wandr;
+    pub mod developer_platform;
 }
 pub use ai::next_gen::{
     WorkloadType, AdaptiveKernelPersona, PredictiveSyscallTranslator, DeviceTargetType,
@@ -128,6 +152,11 @@ pub use ai::next_gen::{
 };
 pub use ai::wandr::{
     WandrTask, WandrDocument, ResearchResult, WandrEvaluator, SigmaWandrAgent, WandrResearchAgent,
+};
+pub use ai::developer_platform::{
+    DeviceTarget, LocalLlmOrchestrator, ModelAllocation, PrivacyRouter,
+    DefaultDenyNetworkPolicy, OpenShellAgentSandbox, ExperimentRun, MlExperimentTracker,
+    AiSafetyPolicyEngine, MarketplaceModel, SignedModelMarketplace, compute_blake3_simulated,
 };
 
 pub mod virt;

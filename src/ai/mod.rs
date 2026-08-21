@@ -11,6 +11,7 @@ pub mod voice;
 pub mod lift_engine;
 pub mod wiki;
 pub mod apm;
+pub mod developer_platform;
 
 pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
 
@@ -45,4 +46,9 @@ pub use wiki::{SovereignWikiEngine, WikiArticle};
 pub use apm::{
     ApmDependency, ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, McpServer,
     SovereignApmEngine,
+};
+pub use developer_platform::{
+    DeviceTarget, LocalLlmOrchestrator, ModelAllocation, PrivacyRouter,
+    DefaultDenyNetworkPolicy, OpenShellAgentSandbox, ExperimentRun, MlExperimentTracker,
+    AiSafetyPolicyEngine, MarketplaceModel, SignedModelMarketplace, compute_blake3_simulated,
 };
