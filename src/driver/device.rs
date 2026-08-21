@@ -653,17 +653,27 @@ impl<T> Vec<T> {
         self.len = 0;
     }
 
-    pub fn iter(&self) -> VecIterator<'_, T> {
-        VecIterator {
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
             vec: self,
             index: 0,
         }
     }
 
-    pub fn iter_mut(&mut self) -> VecIteratorMut<'_, T> {
-        VecIteratorMut {
-            vec: self,
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
             index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
 
@@ -784,6 +794,247 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
+/// Unified representation of communication channels (OOP Abstraction)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PortAddress {
+    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
+    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+}
+
+/// Unified Peripheral Object-Oriented Interface (OOP Principle)
+pub trait UnifiedPeripheral: Device {
+    fn query_channel(&self) -> PortAddress;
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError>;
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError>;
+}
+
+/// Legacy implementation of a peripheral using Port I/O
+pub struct LegacyDevice {
+    pub base_port: u16,
+    pub id: usize,
+    pub name: [u8; 64],
+}
+
+impl LegacyDevice {
+    pub fn new(id: usize, name: &[u8], base_port: u16) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+        LegacyDevice { base_port, id, name: name_array }
+    }
+}
+
+impl Device for LegacyDevice {
+    fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        // Simulate reading from legacy Port I/O
+        for b in buffer.iter_mut() {
+            *b = 0; // Stub reading legacy port
+        }
+        Ok(buffer.len())
+    }
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> { Ok(buffer.len()) }
+    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> { Ok(0) }
+    fn info(&self) -> DeviceInfo { DeviceInfo::new(DeviceType::Character) }
+    fn shutdown(&mut self) -> Result<(), DeviceError> { Ok(()) }
+}
+
+impl UnifiedPeripheral for LegacyDevice {
+    fn query_channel(&self) -> PortAddress { PortAddress::PortIO(self.base_port) }
+    fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
+        // Simulate inb instruction
+        Ok(0)
+    }
+    fn write_byte(&mut self, _offset: u32, _value: u8) -> Result<(), DeviceError> {
+        // Simulate outb instruction
+        Ok(())
+    }
+}
+
+/// Modern implementation of a peripheral using MMIO
+pub struct ModernDevice {
+    pub base_address: u32,
+    pub memory_size: usize,
+    pub device_context: [u8; 128], // Driver-specific context information buffer
+}
+
+impl ModernDevice {
+    pub fn new(base_address: u32, memory_size: usize) -> Self {
+        Self {
+            base_address,
+            memory_size,
+            device_context: [0; 128],
+        }
+    }
+}
+
+/// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
+#[derive(Debug, Clone)]
+pub struct DeviceExtension {
+    pub irq: u8,
+    pub base_port: u16,
+    pub base_address: u32,
+    pub memory_size: usize,
+    pub device_context: [u8; 128],
+}
+
+impl DeviceExtension {
+    pub fn new() -> Self {
+        Self {
+            irq: 0,
+            base_port: 0,
+            base_address: 0,
+            memory_size: 0,
+            device_context: [0; 128],
+        }
+    }
+}
+
+/// Windows NT-style Device Object representing a logical, physical, or virtual device instance
+pub struct DeviceObject {
+    pub name: [u8; 64],
+    pub device_type: DeviceType,
+    pub device_extension: DeviceExtension,
+}
+
+impl DeviceObject {
+    pub fn new(name: &[u8], device_type: DeviceType) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+        Self {
+            name: name_array,
+            device_type,
+            device_extension: DeviceExtension::new(),
+        }
+    }
+}
+
+impl Device for ModernDevice {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        for b in buffer.iter_mut() {
+            *b = 0;
+        }
+        Ok(buffer.len())
+    }
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        Ok(buffer.len())
+    }
+    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        Ok(0)
+    }
+    fn info(&self) -> DeviceInfo {
+        DeviceInfo::new(DeviceType::Character)
+    }
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+}
+
+impl UnifiedPeripheral for ModernDevice {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_address)
+    }
+    fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
+        Ok(0)
+    }
+    fn write_byte(&mut self, _offset: u32, _val: u8) -> Result<(), DeviceError> {
+        Ok(())
+    }
+}
+
+/// Windows NT-style Driver Object representing a loaded driver image
+pub struct DriverObject {
+    pub driver_name: [u8; 64],
+    pub registry_path: [u8; 128], // Registry path config lookup (e.g. \Registry\Machine\System\CurrentControlSet\Services\...)
+    pub device_objects: Vec<DeviceObject>,
+    pub unload_routine: Option<fn(&mut DriverObject)>, // Unload Routine (DRIVERUNLOAD)
+}
+
+impl DriverObject {
+    pub fn new(name: &[u8], reg_path: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+
+        let mut reg_array = [0u8; 128];
+        let reg_len = reg_path.len().min(127);
+        unsafe {
+            core::ptr::copy_nonoverlapping(reg_path.as_ptr(), reg_array.as_mut_ptr(), reg_len);
+        }
+
+        Self {
+            driver_name: name_array,
+            registry_path: reg_array,
+            device_objects: Vec::new(),
+            unload_routine: None,
+        }
+    }
+}
+
+/// Windows NT-style I/O Manager Subsystem coordinating driver lifecycles, creation, and unload tasks
+pub struct IoManager {
+    pub active_drivers: Vec<DriverObject>,
+}
+
+impl IoManager {
+    pub fn new() -> Self {
+        Self {
+            active_drivers: Vec::new(),
+        }
+    }
+
+    /// Emulate the normal driver installation process (creates a registered DriverObject)
+    pub fn normal_driver_installation_process(&mut self, driver_name: &[u8], registry_path: &[u8]) -> Result<usize, DeviceError> {
+        let driver = DriverObject::new(driver_name, registry_path);
+        self.active_drivers.push(driver);
+        Ok(self.active_drivers.len() - 1)
+    }
+
+    /// IoCreateDevice: Create a Device Object associated with the specific Driver Object
+    pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
+        if driver_idx >= self.active_drivers.len() {
+            return Err(DeviceError::InvalidParameter);
+        }
+        let device = DeviceObject::new(name, device_type);
+        self.active_drivers[driver_idx].device_objects.push(device);
+        Ok(())
+    }
+
+    /// IoUnloadDriver: Executes driver-specific cleanup tasks and calls the DRIVERUNLOAD unload routine
+    pub fn io_unload_driver(&mut self, driver_idx: usize) -> Result<(), DeviceError> {
+        if driver_idx >= self.active_drivers.len() {
+            return Err(DeviceError::InvalidParameter);
+        }
+
+        let driver = &mut self.active_drivers[driver_idx];
+
+        if let Some(unload) = driver.unload_routine {
+            (unload)(driver);
+        }
+
+        driver.device_objects = Vec::new();
+
+        Ok(())
+    }
+}
+
+impl Default for IoManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+>>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
 #[cfg(test)]
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {

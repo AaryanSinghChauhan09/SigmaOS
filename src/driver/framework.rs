@@ -105,6 +105,18 @@ impl SimpleStorageDriver {
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
+
+    pub fn init(&self) -> Result<(), DriverError> {
+        Ok(())
+    }
+
+    pub fn probe(&self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+
+    pub fn shutdown(&self) -> Result<(), DriverError> {
+        Ok(())
+    }
 }
 
 impl Driver for SimpleStorageDriver {

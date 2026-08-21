@@ -234,6 +234,7 @@ impl CongestionControl for RenoCongestionControl {
     fn get_cwnd(&self) -> usize { self.cwnd.load(Ordering::SeqCst) }
 }
 
+=======
 #[repr(C)]
 pub struct BBRCongestionControl {
     pub cwnd: AtomicUsize,
@@ -303,7 +304,6 @@ pub trait ZeroCopy {
 pub struct ZeroCopyNetwork {
     pub dma_buffer: AtomicUsize,
 }
-
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
         ZeroCopyNetwork { dma_buffer: AtomicUsize::new(0) }
@@ -321,6 +321,71 @@ impl ZeroCopy for ZeroCopyNetwork {
             buffer[i] = ((i * 13 + 19) % 256) as u8;
         }
         Ok(len)
+=======
+        let current = self.cwnd.load(Ordering::SeqCst);
+        self.cwnd.store(current / 2, Ordering::SeqCst);
+    }
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
+}
+
+/// Linux-Grade Netfilter/iptables Firewall
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterChain {
+    Input,
+    Output,
+    Forward,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterAction {
+    Accept,
+    Drop,
+    Reject,
+}
+
+#[derive(Debug, Clone)]
+pub struct NetfilterRule {
+    pub chain: NetfilterChain,
+    pub source_ip: [u8; 4],
+    pub dest_ip: [u8; 4],
+    pub protocol: Protocol,
+    pub port: Port,
+    pub action: NetfilterAction,
+}
+
+pub struct NetfilterFirewall {
+    pub rules: Vec<NetfilterRule>,
+}
+
+impl Default for NetfilterFirewall {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl NetfilterFirewall {
+    pub fn new() -> Self {
+        NetfilterFirewall { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: NetfilterRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn match_packet(&self, chain: NetfilterChain, src: [u8; 4], dest: [u8; 4], proto: Protocol, port: Port) -> NetfilterAction {
+        for rule in &self.rules {
+            if rule.chain == chain
+                && (rule.source_ip == [0, 0, 0, 0] || rule.source_ip == src)
+                && (rule.dest_ip == [0, 0, 0, 0] || rule.dest_ip == dest)
+                && rule.protocol == proto
+                && (rule.port == 0 || rule.port == port)
+            {
+                return rule.action;
+            }
+        }
+        NetfilterAction::Accept
     }
 }
 
@@ -359,20 +424,22 @@ impl NetworkStack for SimpleNetworkStack {
         self.sockets.push(Some(Box::new(socket)));
         Ok(id)
     }
+
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        for socket_option in &mut self.sockets {
-            if let Some(ref socket) = *socket_option {
-                if socket.id() == id {
-                    return Ok(());
-                }
-            }
+        if let Some(pos) = self.sockets.iter().position(|s| s.as_ref().map_or(false, |sock| sock.id() == id)) {
+            self.sockets.remove(pos);
+            Ok(())
+        } else {
+            Err(NetworkError::InvalidSocket)
         }
-        Err(NetworkError::InvalidSocket)
     }
+
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket_option in &self.sockets {
             if let Some(ref socket) = *socket_option {
-                if socket.id() == id { return Some(socket.as_ref()); }
+                if socket.id() == id {
+                    return Some(socket.as_ref());
+                }
             }
         }
         None
@@ -380,6 +447,8 @@ impl NetworkStack for SimpleNetworkStack {
 }
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
@@ -391,6 +460,39 @@ impl<T> Vec<T> {
                 self.len += 1;
             }
         }
+    }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn len(&self) -> usize { self.len }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter { vec: self, index: 0 }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
+    pub fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
+        let mut write_idx = 0;
+        for i in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(i);
+                if f(item) {
+                    if write_idx != i {
+                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
+                    }
+                    write_idx += 1;
+                }
+            }
+        }
+        self.len = write_idx;
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };

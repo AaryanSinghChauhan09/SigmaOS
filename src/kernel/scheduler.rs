@@ -1,6 +1,10 @@
 // SigmaOS Kernel Scheduler
 // Implements EEVDF (Earliest Eligible Virtual Deadline First) & EDF (Earliest Deadline First) hybrid real-time scheduler
 
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
 use core::time::Duration;
 
 /// Process priority levels
@@ -69,6 +73,31 @@ impl Process {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct Task {
+    pub task_id: u64,
+    pub vruntime: u64,
+}
+
+impl PartialEq for Task {
+    fn eq(&self, other: &Self) -> bool {
+        self.vruntime == other.vruntime
+    }
+}
+
+impl Eq for Task {}
+
+impl PartialOrd for Task {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Task {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.vruntime.cmp(&other.vruntime)
+    }
+}
 #[derive(Debug, Clone)]
 pub struct NumaNode {
     pub node_id: u32,
@@ -77,7 +106,7 @@ pub struct NumaNode {
 
 pub struct WorkStealingQueue {
     pub processor_id: u32,
-    pub tasks: Vec<u64>, // List of process pids in the queue
+    pub tasks: Vec<u64>,
 }
 
 impl WorkStealingQueue {
@@ -116,6 +145,8 @@ pub struct Scheduler {
     pub system_vtime: u64, // EEVDF System Virtual Time (V)
     pub numa_nodes: Vec<NumaNode>,
     pub run_queues: Vec<WorkStealingQueue>,
+    tasks: [Option<Task>; 64],
+    task_count: usize,
 }
 
 impl Scheduler {
@@ -126,6 +157,8 @@ impl Scheduler {
             system_vtime: 0,
             numa_nodes: Vec::new(),
             run_queues: Vec::new(),
+            tasks: [None; 64],
+            task_count: 0,
         }
     }
 
@@ -134,6 +167,43 @@ impl Scheduler {
         process.virtual_runtime = self.system_vtime;
         process.update_virtual_deadline(self.system_vtime);
         self.processes.push(process);
+    }
+
+    pub fn add_task(&mut self, task: Task) {
+        if self.task_count < 64 {
+            self.tasks[self.task_count] = Some(task);
+            self.task_count += 1;
+            self.sort_tasks();
+        }
+    }
+
+    pub fn pick_next_task(&mut self) -> Option<Task> {
+        if self.task_count > 0 {
+            let task = self.tasks[0].take();
+            self.tasks.copy_within(1..self.task_count, 0);
+            self.tasks[self.task_count - 1] = None;
+            self.task_count -= 1;
+            self.sort_tasks();
+            task
+        } else {
+            None
+        }
+    }
+
+    fn sort_tasks(&mut self) {
+        for i in 1..self.task_count {
+            let mut j = i;
+            while j > 0 {
+                let prev = self.tasks[j - 1].unwrap().vruntime;
+                let curr = self.tasks[j].unwrap().vruntime;
+                if prev > curr {
+                    self.tasks.swap(j - 1, j);
+                    j -= 1;
+                } else {
+                    break;
+                }
+            }
+        }
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
@@ -149,7 +219,6 @@ impl Scheduler {
             return None;
         }
 
-        // 2. Identify eligible processes (virtual_runtime <= system_vtime)
         let mut eligible_indices = Vec::new();
         for &idx in &ready_indices {
             let p = &self.processes[idx];
@@ -158,10 +227,6 @@ impl Scheduler {
             }
         }
 
-        // 3. Selection rules:
-        // - Standard EEVDF: pick the eligible process with the EARLIEST virtual deadline
-        // - Starvation Prevention: if no processes are currently eligible (e.g. system_vtime is lagging),
-        //   fallback to selecting the process with the minimum virtual_runtime
         let selected_idx = if !eligible_indices.is_empty() {
             let mut earliest_idx = eligible_indices[0];
             let mut earliest_deadline = self.processes[earliest_idx].virtual_deadline;
@@ -194,7 +259,6 @@ impl Scheduler {
     pub fn tick(&mut self) {
         self.current_time += 1;
 
-        // Advance system virtual time (V) based on active threads vruntime progress
         let mut active_count = 0;
         let mut total_vruntime = 0;
 
@@ -207,15 +271,12 @@ impl Scheduler {
 
         if active_count > 0 {
             let avg_vtime = total_vruntime / active_count;
-            // System virtual time advances gracefully
             self.system_vtime = self.system_vtime.max(avg_vtime);
         }
         self.system_vtime += 1;
     }
 
     pub fn execute_process_ticks(&mut self, pid: u64, ticks_executed: u64) {
-        // Simulates thread execution and updates its vruntime based on priority weight:
-        // vruntime_delta = executed_ticks / weight
         if let Some(p) = self.processes.iter_mut().find(|p| p.pid == pid) {
             let weight = p.get_weight();
             let delta = (ticks_executed / weight).max(1);
@@ -296,18 +357,15 @@ mod tests {
         p1.update_virtual_deadline(0);
         p2.update_virtual_deadline(0);
 
-        // High priority must have a tighter/earlier virtual deadline for the same vruntime!
         assert!(p2.virtual_deadline < p1.virtual_deadline);
     }
 
     #[test]
     fn test_work_stealing_and_numa_alignment() {
-        // 1. Assert CPU cache line alignment sizing (Process aligned to 64 bytes)
         assert_eq!(core::mem::align_of::<Process>(), 64);
 
         let mut scheduler = Scheduler::new();
 
-        // 2. Setup NUMA nodes
         let node0 = NumaNode {
             node_id: 0,
             processor_ids: vec![0, 1],
@@ -319,19 +377,16 @@ mod tests {
         scheduler.numa_nodes.push(node0);
         scheduler.numa_nodes.push(node1);
 
-        // 3. Setup work stealing run queues
         let mut q0 = WorkStealingQueue::new(0);
         let mut q1 = WorkStealingQueue::new(1);
 
-        // Populate q1 with multiple tasks
         q1.push_task(101);
         q1.push_task(102);
         q1.push_task(103);
 
-        // Let queue 0 steal a task from queue 1 to balance load
         assert_eq!(q0.tasks.len(), 0);
         let stolen_pid = q0.steal_task_from(&mut q1).unwrap();
-        assert_eq!(stolen_pid, 101); // oldest task is stolen from bottom of deque
+        assert_eq!(stolen_pid, 101);
         assert_eq!(q0.tasks.len(), 1);
         assert_eq!(q1.tasks.len(), 2);
     }

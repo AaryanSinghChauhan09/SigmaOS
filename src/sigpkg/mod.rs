@@ -9,6 +9,23 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod zero_alloc_resolver;
+pub mod declarative_build;
+pub mod aur;
+pub mod aur_helper;
+pub mod importer;
+pub mod linux_compat;
+pub mod makepkg;
+pub mod nix_shell;
+pub mod pacman;
+pub mod portage;
+pub mod repository_manager;
+pub mod spec;
+pub mod sovereign_sigpkg;
+pub mod transaction_log;
+pub mod universal_adapter;
+pub mod universal_engine;
+pub mod universal_oop_system;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use debian_defeater::{
@@ -30,6 +47,14 @@ pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub use aur::{AurHelper, AurPackage};
+pub use aur_helper::AurHelper;
+pub use repository_manager::{RepositoryManager, Package, VersionConstraint, Version};
+pub use linux_compat::{LinuxDistroAdapter, DistroType};
+pub use makepkg::{MakePkgBuilder, MakePkgError};
+pub use nix_shell::NixShell;
+pub use pacman::Pacman;
+pub use portage::Portage;
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
@@ -40,6 +65,7 @@ pub use universal_oop_system::{
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
     UserDefinedHook, ParseError, InstallError, HookError,
 };
+pub use sovereign_sigpkg::*;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
