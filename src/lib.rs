@@ -53,6 +53,8 @@ pub mod toolchain {
     pub mod bootstrap;
 }
 pub mod scheduler {
+    pub mod distro_schedulers;
+    pub mod ebpf_scheduler;
     pub mod numa_scheduler;
 }
 pub mod crypto {
