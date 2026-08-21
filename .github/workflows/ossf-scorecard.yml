@@ -18,18 +18,18 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v4
+        uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
         with:
           persist-credentials: false
 
       - name: "Run scorecard"
-        uses: ossf/scorecard-action@v2.4.0
+        uses: ossf/scorecard-action@dc5088702f4f31805f9c8498836b35af44f776d8
         with:
           results_file: results.sarif
           results_format: sarif
           publish_results: true
 
       - name: "Upload SARIF"
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
         with:
           sarif_file: results.sarif
