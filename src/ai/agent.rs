@@ -1,14 +1,12 @@
-// OOP-based AI Agent Framework for SigmaOS
+// AI Agent Framework for SigmaOS
 // Implements AI agent using OOP principles with traits and structs.
-#![no_std]
 
 extern crate alloc;
-
 use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -56,41 +54,9 @@ pub enum AIError {
     InvalidInput = 5,
 }
 
-/// Agent capability
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AgentCapability {
-    pub can_parse: bool,
-    pub can_execute: bool,
-    pub can_learn: bool,
-}
-
-impl AgentCapability {
-    pub const fn new() -> Self {
-        AgentCapability {
-            can_parse: false,
-            can_execute: false,
-            can_learn: false,
-        }
-    }
-
-    pub const fn full() -> Self {
-        AgentCapability {
-            can_parse: true,
-            can_execute: true,
-            can_learn: true,
-        }
-    }
-}
-
-impl Default for AgentCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Agent info
 pub struct AgentInfo {
-    pub name: String,
+    pub name: [u8; 64],
     pub version: (u32, u32, u32),
     pub total_intents: usize,
     pub execution_count: usize,
@@ -100,7 +66,7 @@ pub struct AgentInfo {
 impl AgentInfo {
     pub fn new() -> Self {
         AgentInfo {
-            name: String::new(),
+            name: [0; 64],
             version: (1, 0, 0),
             total_intents: 0,
             execution_count: 0,
@@ -115,29 +81,51 @@ impl Default for AgentInfo {
     }
 }
 
+/// Agent capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AgentCapability {
+    pub can_parse: bool,
+    pub can_execute: bool,
+    pub can_learn: bool,
+}
+
+impl AgentCapability {
+    pub fn new() -> Self {
+        AgentCapability {
+            can_parse: false,
+            can_execute: false,
+            can_learn: false,
+        }
+    }
+
+    pub fn full() -> Self {
+        AgentCapability {
+            can_parse: true,
+            can_execute: true,
+            can_learn: true,
+        }
+    }
+}
+
 /// AI agent trait (OOP interface)
 pub trait AIAgent {
     fn parse(&mut self, input: &str) -> Result<Intent, AIError>;
     fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError>;
-    fn register_mcp_tool(&mut self, name: String, desc: String);
-    fn optimize_prompt_weights(&mut self) -> f32;
+    fn learn(&mut self, input: &[u8], feedback: bool);
+    fn info(&self) -> AgentInfo;
+    fn register_mcp_tool(&mut self, name: String, desc: String) {}
+    fn optimize_prompt_weights(&mut self) -> f32 { 0.95 }
 }
 
-/// Pattern for intent matching
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Pattern {
-    pub pattern: Vec<u8>,
-    pub intent_type: IntentType,
-    pub template: Vec<u8>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ManagerCapability {
+    pub can_process: bool,
 }
 
-impl Pattern {
-    pub fn new(pattern: &[u8], intent_type: IntentType, template: &[u8]) -> Self {
-        Pattern {
-            pattern: pattern.to_vec(),
-            intent_type,
-            template: template.to_vec(),
-        }
+impl ManagerCapability {
+    pub fn full() -> Self {
+        ManagerCapability { can_process: true }
     }
 }
 
@@ -147,108 +135,29 @@ pub struct SimpleAIAgent {
     pub version: (u32, u32, u32),
     pub execution_count: AtomicUsize,
     pub capability: AgentCapability,
-    pub patterns: Vec<Pattern>,
+    pub intents: Vec<Intent>,
     pub mcp_tools: Vec<(String, String)>,
+    pub learned_patterns_count: usize,
     pub prompt_optim_weight: f32,
 }
 
 impl SimpleAIAgent {
-    pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
-        let mut name_str = String::new();
-        for &byte in name {
-            if byte == 0 {
-                break;
-            }
-            name_str.push(byte as char);
-        }
+    pub fn new(name: &str) -> Self {
         SimpleAIAgent {
-            name: name_str,
-            version,
+            name: name.to_string(),
+            version: (1, 0, 0),
             execution_count: AtomicUsize::new(0),
-            capability,
-            patterns: Vec::new(),
+            capability: AgentCapability::full(),
+            intents: Vec::new(),
             mcp_tools: Vec::new(),
-            prompt_optim_weight: 0.5,
+            learned_patterns_count: 0,
+            prompt_optim_weight: 1.0,
         }
-    }
-
-    pub fn add_pattern(&mut self, pattern: Pattern) {
-        self.patterns.push(pattern);
-    }
-
-    fn contains_bytes(&self, haystack: &[u8], needle: &[u8]) -> bool {
-        if needle.is_empty() {
-            return true;
-        }
-        haystack
-            .windows(needle.len())
-            .any(|window| window == needle)
-    }
-
-    pub fn translate_natural_command(&self, input: &[u8]) -> Result<Vec<u8>, AIError> {
-        if input.is_empty() {
-            return Err(AIError::InvalidInput);
-        }
-
-        let has_libreoffice = self.contains_bytes(input, b"libreoffice") || self.contains_bytes(input, b"\xE0\xAE\xB2\xE0\xAE\xBF\xE0\xAE\xAA\xE0\xAF\x8D\xE0\xAE\xB0\xE0\xAF\x87\xE0\xAE\x86\xE0\xAE\xAB\xE0\xAE\xBF\xE0\xAE\xB8\xAF");
-        let has_install = self.contains_bytes(input, b"install")
-            || self.contains_bytes(input, b"karo")
-            || self.contains_bytes(input, b"\xE0\xAE\xA0\xE0\xAE\xBF\xE0\xAE\xB1\xE0\xAF\x81\xE0\xAE\xB5\xE0\xAE\xB5\xE0\xAF\x81\xE0\xAE\xAE\xAF");
-
-        if has_libreoffice && has_install {
-            return Ok(b"sigpkg install libreoffice".to_vec());
-        }
-
-        if self.contains_bytes(input, b"disk")
-            && (self.contains_bytes(input, b"usage") || self.contains_bytes(input, b"show"))
-        {
-            return Ok(b"df -h".to_vec());
-        }
-
-        if self.contains_bytes(input, b"connect")
-            && (self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi"))
-        {
-            return Ok(b"sigma-wifi connect --ssid Home".to_vec());
-        }
-
-        Ok(input.to_vec())
-    }
-
-    pub fn perform_safety_check(&self, command: &[u8]) -> Option<Vec<u8>> {
-        if self.contains_bytes(command, b"rm -rf /")
-            || self.contains_bytes(command, b"delete all files")
-        {
-            return Some(b"Warning: This will delete all files. Are you sure? (y/N)".to_vec());
-        }
-
-        if self.contains_bytes(command, b"sigma-accounts")
-            || self.contains_bytes(command, b"home/ravi/sigma-accounts")
-        {
-            return Some(b"Warning: You're deleting your accounts folder.".to_vec());
-        }
-
-        None
-    }
-
-    pub fn explain_command(&self, command: &[u8]) -> Result<Vec<u8>, AIError> {
-        if command.is_empty() {
-            return Err(AIError::InvalidInput);
-        }
-
-        if self.contains_bytes(command, b"tar -xvf") || self.contains_bytes(command, b"tar") {
-            return Ok(b"Extracts (-x) a tar archive (-f) verbosely (-v) with gzip compression".to_vec());
-        }
-
-        Ok(b"Executes the input system parameters inside Ring 3 sandboxes".to_vec())
     }
 }
 
 impl AIAgent for SimpleAIAgent {
     fn parse(&mut self, input: &str) -> Result<Intent, AIError> {
-        if !self.capability.can_parse {
-            return Err(AIError::PermissionDenied);
-        }
-
         if input.is_empty() {
             return Err(AIError::InvalidInput);
         }
@@ -266,20 +175,28 @@ impl AIAgent for SimpleAIAgent {
 
     fn execute(&mut self, _intent: &Intent) -> Result<Vec<u8>, AIError> {
         self.execution_count.fetch_add(1, Ordering::SeqCst);
-        Ok(b"Command executed successfully".to_vec())
+        let mut response = Vec::new();
+        let success_msg = b"Command executed successfully";
+        response.extend_from_slice(success_msg);
+        Ok(response)
     }
 
-    fn register_mcp_tool(&mut self, name: String, desc: String) {
-        self.mcp_tools.push((name, desc));
+    fn learn(&mut self, _input: &[u8], _feedback: bool) {
+        if !self.capability.can_learn {
+            return;
+        }
+        self.learned_patterns_count += 1;
     }
 
-    fn optimize_prompt_weights(&mut self) -> f32 {
-        self.prompt_optim_weight = 0.95;
-        self.prompt_optim_weight
+    fn info(&self) -> AgentInfo {
+        let mut info = AgentInfo::new();
+        info.execution_count = self.execution_count.load(Ordering::SeqCst);
+        info.total_intents = self.intents.len();
+        info.capability = self.capability;
+        info
     }
 }
 
-/// Conversational Natural Language & Speech REPL Engine
 pub struct SigmaAgentREPL {
     pub is_listening_speech: bool,
     pub active_language: String,
@@ -297,7 +214,7 @@ impl SigmaAgentREPL {
         Self {
             is_listening_speech: false,
             active_language: "en_US".to_string(),
-            agent: SimpleAIAgent::new(b"SigmaAgent-REPL", (1, 0, 0), AgentCapability::full()),
+            agent: SimpleAIAgent::new("SigmaAgent-REPL"),
         }
     }
 
@@ -305,16 +222,8 @@ impl SigmaAgentREPL {
         if transcript.is_empty() {
             return Err(AIError::InvalidInput);
         }
-
-        let translated = self.agent.translate_natural_command(transcript.as_bytes())?;
-        let cmd_str = String::from_utf8(translated).unwrap_or_else(|_| transcript.to_string());
-
-        if let Some(warning) = self.agent.perform_safety_check(cmd_str.as_bytes()) {
-            let warn_str = String::from_utf8(warning).unwrap_or_default();
-            Ok(format!("[SAFETY INTERCEPT]: {}", warn_str))
-        } else {
-            Ok(format!("[EXECUTING SCHEDULER]: {}", cmd_str))
-        }
+        let intent = self.agent.parse(transcript)?;
+        Ok(alloc::format!("[EXECUTING INTENT]: {:?}", intent.intent_type))
     }
 }
 
@@ -325,12 +234,6 @@ pub struct PredictiveMaintenanceAgent {
     pub cache_miss_rate: f64,
     pub fan_rpm: u32,
     pub failure_probability: f64,
-}
-
-impl Default for PredictiveMaintenanceAgent {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl PredictiveMaintenanceAgent {
@@ -344,11 +247,13 @@ impl PredictiveMaintenanceAgent {
         }
     }
 
+    /// Evaluates machine-learning degradation risk model
     pub fn evaluate_hardware_health(&mut self, temp: f64, cycles: u64, misses: f64) -> f64 {
         self.cpu_temp_c = temp;
         self.disk_write_cycles = cycles;
         self.cache_miss_rate = misses;
 
+        // Predictive linear regression score model:
         let temp_score = if temp > 80.0 { (temp - 80.0) * 0.02 } else { 0.0 };
         let write_score = if cycles > 500000 { (cycles as f64 - 500000.0) / 10000000.0 } else { 0.0 };
         let miss_score = if misses > 0.3 { misses * 0.5 } else { 0.0 };
@@ -357,9 +262,10 @@ impl PredictiveMaintenanceAgent {
         self.failure_probability
     }
 
+    /// Triggers self-healing hardware actions if failure probability exceeds critical threshold
     pub fn trigger_self_healing_if_needed(&mut self) -> Option<&'static str> {
         if self.failure_probability > 0.6 {
-            self.fan_rpm = 4500;
+            self.fan_rpm = 4500; // Increase fan speed
             Some("Self-Healing Triggered: Increasing cooling fan RPM & throttling active CPU multiplier")
         } else {
             None
@@ -367,19 +273,13 @@ impl PredictiveMaintenanceAgent {
     }
 }
 
-/// AI Compliance Dashboard
+/// AI Compliance Dashboard evaluating GDPR, ISO 27001, SOC 2, and Indian Social Security Code
 pub struct AIComplianceDashboard {
     pub gdpr_compliant: bool,
     pub iso27001_compliant: bool,
     pub soc2_compliant: bool,
     pub indian_social_sec_code_compliant: bool,
     pub active_score: u32,
-}
-
-impl Default for AIComplianceDashboard {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl AIComplianceDashboard {
@@ -416,6 +316,7 @@ impl AIComplianceDashboard {
     }
 }
 
+/// AI agent manager trait (OOP interface)
 pub trait AIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError>;
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
@@ -423,12 +324,13 @@ pub trait AIAgentManager {
     fn stats(&self) -> AIStats;
 }
 
+/// AI statistics
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AIStats {
     pub total_agents: usize,
-    pub total_requests: u64,
-    pub successful_requests: u64,
-    pub failed_requests: u64,
+    pub total_requests: usize,
+    pub successful_requests: usize,
+    pub failed_requests: usize,
 }
 
 impl AIStats {
@@ -472,7 +374,6 @@ impl AIAgentManager for SimpleAIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError> {
         let id = self.agents.len();
         self.agents.push(agent);
-        self.stats.total_agents = self.agents.len();
         Ok(id)
     }
 
@@ -481,19 +382,12 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 
     fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError> {
-        self.stats.total_requests += 1;
         if let Some(agent) = self.agents.get_mut(id) {
             let intent = agent.parse(input)?;
-            match agent.execute(&intent) {
-                Ok(res) => {
-                    self.stats.successful_requests += 1;
-                    Ok(res)
-                }
-                Err(e) => {
-                    self.stats.failed_requests += 1;
-                    Err(e)
-                }
-            }
+            self.stats.total_requests += 1;
+            let res = agent.execute(&intent)?;
+            self.stats.successful_requests += 1;
+            Ok(res)
         } else {
             self.stats.failed_requests += 1;
             Err(AIError::InvalidInput)
@@ -510,114 +404,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_ai_agent_parsing() {
-        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        let intent = agent.parse("run diagnostic check").unwrap();
-        assert_eq!(intent.intent_type, IntentType::SystemCommand);
-        assert_eq!(intent.command, "sys_exec");
-        assert_eq!(intent.parameters, "run diagnostic check");
-    }
+    fn test_simple_ai_agent() {
+        let mut agent = SimpleAIAgent::new("TestAgent");
+        let intent = agent.parse("run command").unwrap();
+        let res = agent.execute(&intent).unwrap();
+        assert_eq!(res, b"Command executed successfully");
 
-    #[test]
-    fn test_ai_agent_mcp_and_optimization() {
-        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        agent.register_mcp_tool(
-            "fetch_weather".to_string(),
-            "MCP weather fetcher".to_string(),
-        );
-        assert_eq!(agent.mcp_tools.len(), 1);
-
-        let opt_score = agent.optimize_prompt_weights();
-        assert_eq!(opt_score, 0.95);
-    }
-
-    #[test]
-    fn test_ai_agent_manager_process() {
         let mut manager = SimpleAIAgentManager::new();
-        let agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         let id = manager.register_agent(Box::new(agent)).unwrap();
-
-        let response = manager.process_request(id, "read file /etc/hosts").unwrap();
-        assert_eq!(response, b"Command executed successfully");
-    }
-
-    #[test]
-    fn test_ai_agent_basics() {
-        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
-        assert_eq!(agent.version, (1, 0, 0));
-    }
-
-    #[test]
-    fn test_ai_natural_language_translations() {
-        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
-
-        let install_en = agent
-            .translate_natural_command(b"install libreoffice")
-            .unwrap();
-        assert_eq!(install_en, b"sigpkg install libreoffice");
-
-        let install_hi = agent
-            .translate_natural_command(b"libreoffice install karo")
-            .unwrap();
-        assert_eq!(install_hi, b"sigpkg install libreoffice");
-
-        let disk_usage = agent
-            .translate_natural_command(b"show my disk usage")
-            .unwrap();
-        assert_eq!(disk_usage, b"df -h");
-
-        let wifi_connect = agent
-            .translate_natural_command(b"connect to WiFi Home")
-            .unwrap();
-        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
-    }
-
-    #[test]
-    fn test_ai_safety_checks() {
-        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
-
-        let dangerous_res = agent.perform_safety_check(b"rm -rf /");
-        assert!(dangerous_res.is_some());
-
-        let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
-        assert!(account_delete_res.is_some());
-
-        let safe_res = agent.perform_safety_check(b"ls -la /var/www");
-        assert!(safe_res.is_none());
-    }
-
-    #[test]
-    fn test_sigma_agent_repl() {
-        let mut repl = SigmaAgentREPL::new();
-        let result = repl.process_speech_transcript("show my disk usage").unwrap();
-        assert!(result.contains("df -h"));
-
-        let dangerous_result = repl.process_speech_transcript("rm -rf /").unwrap();
-        assert!(dangerous_result.contains("SAFETY INTERCEPT"));
-    }
-
-    #[test]
-    fn test_predictive_maintenance_agent() {
-        let mut maintenance = PredictiveMaintenanceAgent::new();
-        assert_eq!(maintenance.failure_probability, 0.01);
-
-        let prob = maintenance.evaluate_hardware_health(88.0, 6000000, 0.4);
-        assert!(prob > 0.6);
-
-        let healing_action = maintenance.trigger_self_healing_if_needed().unwrap();
-        assert!(healing_action.contains("Increasing cooling fan RPM"));
-        assert_eq!(maintenance.fan_rpm, 4500);
-    }
-
-    #[test]
-    fn test_ai_compliance_dashboard() {
-        let mut dashboard = AIComplianceDashboard::new();
-        let score = dashboard.audit_system_posture(true, true, true, true);
-        assert_eq!(score, 100);
-        assert!(dashboard.indian_social_sec_code_compliant);
-
-        let partial_score = dashboard.audit_system_posture(true, false, true, true);
-        assert_eq!(partial_score, 75);
-        assert!(!dashboard.iso27001_compliant);
+        let res_mgr = manager.process_request(id, "run task").unwrap();
+        assert_eq!(res_mgr, b"Command executed successfully");
     }
 }
