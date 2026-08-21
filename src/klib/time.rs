@@ -208,52 +208,6 @@ pub fn monotonic_ms() -> u64 {
 }
 
 impl Duration {
-    /// Creates a zero duration
-    pub fn zero() -> Self {
-        Duration { secs: 0, nanos: 0 }
-    }
-
-    /// Creates a new Duration from seconds and nanoseconds.
-    /// Performance note: Uses direct division/modulo arithmetic for fast O(1) nanosecond normalization
-    pub fn new(secs: u64, nanos: u32) -> Self {
-        let extra_secs = (nanos / 1_000_000_000) as u64;
-        let nanos = nanos % 1_000_000_000;
-        Duration {
-            secs: secs + extra_secs,
-            nanos,
-        }
-    }
-
-    /// Creates a new Duration from total nanoseconds in O(1) time
-    pub fn from_nanos(nanos: u64) -> Self {
-        Duration {
-            secs: nanos / 1_000_000_000,
-            nanos: (nanos % 1_000_000_000) as u32,
-        }
-    }
-
-    /// Returns total nanoseconds in O(1) time
-    pub fn as_nanos(&self) -> u64 {
-        self.secs * 1_000_000_000 + self.nanos as u64
-    }
-
-    /// Returns total microseconds in O(1) time
-    pub fn as_micros(&self) -> u64 {
-        self.secs * 1_000_000 + (self.nanos / 1000) as u64
-    }
-
-    /// Checked duration addition with nanosecond overflow carry calculation in O(1) time
-    pub fn checked_add(self, rhs: Duration) -> Option<Duration> {
-        let mut secs = self.secs.checked_add(rhs.secs)?;
-        let mut nanos = self.nanos + rhs.nanos;
-        if nanos >= 1_000_000_000 {
-            nanos -= 1_000_000_000;
-            secs = secs.checked_add(1)?;
-        }
-        Some(Duration { secs, nanos })
-    }
-
-    /// Checked duration subtraction with nanosecond borrow handling in O(1) time
     pub fn checked_sub(self, rhs: Duration) -> Option<Duration> {
         let mut secs = self.secs.checked_sub(rhs.secs)?;
         let nanos = if self.nanos >= rhs.nanos {

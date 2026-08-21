@@ -2,6 +2,7 @@
 pub mod user;
 pub mod access;
 pub mod identity;
+pub mod att_security;
 
 pub use user::{
     UserID, UserState, User, AuthError, SimpleUser, AuthService, SimpleAuthService,
@@ -16,4 +17,10 @@ pub use identity::{
     IdentityID, IdentityType, IdentityError, DigitalIdentity, SimpleDigitalIdentity,
     IdentityManager, SimpleIdentityManager, CredentialManager, SimpleCredentialManager,
     DecentralizedAuth, SimpleDecentralizedAuth,
+};
+
+pub use att_security::{
+    SensitivityLevel, IdentificationStep, AttSecurityError, UserIdentityClaim,
+    AdtAttributeRecord, AttributesDefinitionTable, AuthenticityVerifier,
+    AllocatedUserSession, AutomaticResourceManager, AttSecurityEngine,
 };
