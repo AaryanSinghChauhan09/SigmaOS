@@ -52,6 +52,7 @@ pub enum DriverType {
     Char = 1,
     Network = 2,
     Storage = 3,
+    Input = 4,
 }
 
 #[repr(usize)]
@@ -104,6 +105,18 @@ impl SimpleStorageDriver {
             driver_type: DriverType::Storage,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
+    }
+
+    pub fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+
+    pub fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+
+    pub fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
     }
 }
 

@@ -623,16 +623,14 @@ impl DependencyResolver {
 
         for (i, pkg1_name) in packages.iter().enumerate() {
             for pkg2_name in packages.iter().skip(i + 1) {
-                let pkg1: &UnifiedPackage = match self.packages.get(pkg1_name) {
-                    Some(p) => p,
-                    None => continue,
-                };
-                let pkg2: &UnifiedPackage = match self.packages.get(pkg2_name) {
-                    Some(p) => p,
-                    None => continue,
-                };
-                if pkg1.has_conflict_with(pkg2) {
-                    conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+                if let (Some(pkg1), Some(pkg2)) =
+                    (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
+                {
+                    let pkg1: &UnifiedPackage = pkg1;
+                    let pkg2: &UnifiedPackage = pkg2;
+                    if pkg1.has_conflict_with(pkg2) {
+                        conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+                    }
                 }
             }
         }
@@ -885,12 +883,11 @@ impl UniversalPackageManager {
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
         if let Some(package) = self.installed_packages.get(package_name) {
             for format in &package.formats {
-                let adapter = match self.adapters.get(format) {
-                    Some(a) => a,
-                    None => continue,
-                };
-                adapter.remove(package)?;
-                break;
+                if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
+                    adapter.remove(package)?;
+                    break;
+                }
             }
             self.installed_packages.remove(package_name);
         }
@@ -900,12 +897,11 @@ impl UniversalPackageManager {
     pub fn update(&mut self, package_name: &str) -> Result<(), PackageError> {
         if let Some(package) = self.installed_packages.get(package_name) {
             for format in &package.formats {
-                let adapter = match self.adapters.get(format) {
-                    Some(a) => a,
-                    None => continue,
-                };
-                adapter.update(package)?;
-                break;
+                if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
+                    adapter.update(package)?;
+                    break;
+                }
             }
         }
         Ok(())

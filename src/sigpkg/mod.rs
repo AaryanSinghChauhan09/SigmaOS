@@ -9,6 +9,8 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod universal_adapter;
+pub mod debian_crusher;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use debian_defeater::{
@@ -124,6 +126,24 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
+        }
+    }
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
         }
     }
 }
