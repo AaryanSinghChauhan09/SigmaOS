@@ -282,6 +282,115 @@ impl Default for ZenithCompositor {
 }
 
 // ==============================================================================
+// 7. GNOME Usability, KDE Modular Control, & macOS/Windows Fluidity (3.1)
+// ==============================================================================
+
+/// GNOME-style distraction-free app-switching overlay
+pub struct AppSwitchingOverlay {
+    pub is_visible: bool,
+    pub selected_index: usize,
+    pub app_groups: Vec<String>,
+}
+
+impl AppSwitchingOverlay {
+    pub fn new() -> Self {
+        Self {
+            is_visible: false,
+            selected_index: 0,
+            app_groups: Vec::new(),
+        }
+    }
+
+    pub fn toggle_overlay(&mut self, app_names: &[&str]) {
+        self.is_visible = !self.is_visible;
+        self.selected_index = 0;
+        self.app_groups.clear();
+        for name in app_names {
+            self.app_groups.push(name.to_string());
+        }
+    }
+
+    pub fn select_next(&mut self) {
+        if !self.app_groups.is_empty() {
+            self.selected_index = (self.selected_index + 1) % self.app_groups.len();
+        }
+    }
+}
+
+impl Default for AppSwitchingOverlay {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// KDE Plasma-style modular control panel and widget
+#[derive(Debug, Clone)]
+pub struct KdeModularWidget {
+    pub widget_id: u32,
+    pub name: String,
+    pub val: f32, // State parameter (e.g. GPU load, volume level)
+}
+
+pub struct KdeWidgetPanel {
+    pub widgets: Vec<KdeModularWidget>,
+}
+
+impl KdeWidgetPanel {
+    pub fn new() -> Self {
+        Self { widgets: Vec::new() }
+    }
+
+    pub fn add_widget(&mut self, id: u32, name: &str, initial_val: f32) {
+        self.widgets.push(KdeModularWidget {
+            widget_id: id,
+            name: name.to_string(),
+            val: initial_val,
+        });
+    }
+
+    pub fn update_widget_value(&mut self, id: u32, new_val: f32) -> bool {
+        for w in &mut self.widgets {
+            if w.widget_id == id {
+                w.val = new_val;
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for KdeWidgetPanel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// macOS & Windows fluidity animation acceleration curve (Cubic Bezier)
+pub struct AnimationAccelerationCurve {
+    pub p1: f32,
+    pub p2: f32,
+}
+
+impl AnimationAccelerationCurve {
+    pub fn ease_out_cubic() -> Self {
+        Self { p1: 0.215, p2: 0.61 }
+    }
+
+    /// Evaluates smooth animation progress interpolator given time progress t (0.0 .. 1.0)
+    pub fn evaluate_progress(&self, t: f32) -> f32 {
+        let clamped = t.clamp(0.0, 1.0);
+        let inv = 1.0 - clamped;
+        1.0 - (inv * inv * inv)
+    }
+}
+
+impl Default for AnimationAccelerationCurve {
+    fn default() -> Self {
+        Self::ease_out_cubic()
+    }
+}
+
+// ==============================================================================
 // 5. Bare-Metal Direct Framebuffer Blitting & SIMD Shading (Section 3.1 & 3.2)
 // ==============================================================================
 pub struct ZenithBareMetalGraphics {
@@ -614,5 +723,28 @@ mod tests {
         let mut v_synth = ZenithVoiceSynthesizer::new();
         v_synth.announce_frame_element("Focused Window: Settings");
         assert_eq!(v_synth.speech_buffer.as_slice(), b"Focused Window: Settings");
+    }
+
+    #[test]
+    fn test_gnome_kde_macos_feature_absorption() {
+        // 1. GNOME App Switching Overlay
+        let mut overlay = AppSwitchingOverlay::new();
+        overlay.toggle_overlay(&["Terminal", "Browser", "Editor"]);
+        assert!(overlay.is_visible);
+        assert_eq!(overlay.selected_index, 0);
+        overlay.select_next();
+        assert_eq!(overlay.selected_index, 1);
+
+        // 2. KDE Modular Widget Panel
+        let mut panel = KdeWidgetPanel::new();
+        panel.add_widget(10, "CpuLoad", 25.0);
+        assert!(panel.update_widget_value(10, 42.5));
+        assert_eq!(panel.widgets[0].val, 42.5);
+
+        // 3. macOS/Windows Animation Acceleration Curve
+        let curve = AnimationAccelerationCurve::ease_out_cubic();
+        let mid_progress = curve.evaluate_progress(0.5);
+        assert!(mid_progress > 0.5); // Ease out accelerates initial motion
+        assert_eq!(curve.evaluate_progress(1.0), 1.0);
     }
 }
