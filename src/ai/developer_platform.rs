@@ -1,198 +1,323 @@
-// SigmaOS AI, Automation & Developer Platform Suite (Roadmap Items 81-100)
-// Zero-dependency, pure Rust implementation of ML experiment tracking,
-// AI safety guardrails, signed model marketplace, and developer platform suites.
+//! SigmaOS AI Developer Platform & Automation Suite
+//! Zero-dependency #![no_std] implementation of AI orchestration, ML experiment tracking,
+//! safety policy engine, signed model marketplace, multi-device model scheduling,
+//! privacy prompt redaction, default-deny network policy, and OpenShell sandboxing.
 
-use std::collections::{HashMap, HashSet};
+#![no_std]
 
-/// 1. ML Experiment Tracker (Roadmap Item 85: Experiment tracking)
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+
+// =========================================================================
+// 1. MULTI-DEVICE MODEL SCHEDULING (LocalLlmOrchestrator)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceTarget {
+    TpuSlot(u8),
+    GpuMemory { vram_offset: u64, size_bytes: usize },
+    CpuDemandPaging { use_thp: bool },
+}
+
 #[derive(Debug, Clone)]
-pub struct MlExperimentRun {
-    pub run_id: String,
-    pub experiment_name: String,
-    pub parameters: HashMap<String, String>,
-    pub metrics: HashMap<String, f64>,
-    pub model_checkpoint_hash: String,
-    pub timestamp: u64,
+pub struct ModelAllocation {
+    pub model_name: String,
+    pub target: DeviceTarget,
+    pub allocated_size_bytes: usize,
+}
+
+pub struct LocalLlmOrchestrator {
+    pub tpu_capacity_bytes: usize,
+    pub tpu_used_bytes: usize,
+    pub gpu_vram_capacity_bytes: usize,
+    pub gpu_vram_used_bytes: usize,
+    pub allocations: Vec<ModelAllocation>,
+}
+
+impl LocalLlmOrchestrator {
+    pub fn new(tpu_bytes: usize, gpu_bytes: usize) -> Self {
+        Self {
+            tpu_capacity_bytes: tpu_bytes,
+            tpu_used_bytes: 0,
+            gpu_vram_capacity_bytes: gpu_bytes,
+            gpu_vram_used_bytes: 0,
+            allocations: Vec::new(),
+        }
+    }
+
+    /// Attempts TPU allocation first, falls back to GPU with bounds checking,
+    /// and defaults to CPU demand paging with Transparent Huge Pages (THP).
+    pub fn schedule_model(&mut self, model_name: &str, required_bytes: usize) -> DeviceTarget {
+        // 1. Try TPU slot allocation
+        if self.tpu_used_bytes + required_bytes <= self.tpu_capacity_bytes {
+            let slot_id = (self.allocations.len() % 4) as u8;
+            self.tpu_used_bytes += required_bytes;
+            let target = DeviceTarget::TpuSlot(slot_id);
+            self.allocations.push(ModelAllocation {
+                model_name: model_name.to_string(),
+                target,
+                allocated_size_bytes: required_bytes,
+            });
+            return target;
+        }
+
+        // 2. Fallback to GPU VRAM with strict bounds checking
+        if self.gpu_vram_used_bytes + required_bytes <= self.gpu_vram_capacity_bytes {
+            let offset = self.gpu_vram_used_bytes as u64;
+            self.gpu_vram_used_bytes += required_bytes;
+            let target = DeviceTarget::GpuMemory {
+                vram_offset: offset,
+                size_bytes: required_bytes,
+            };
+            self.allocations.push(ModelAllocation {
+                model_name: model_name.to_string(),
+                target,
+                allocated_size_bytes: required_bytes,
+            });
+            return target;
+        }
+
+        // 3. Fallback to CPU virtual memory demand paging with Transparent Huge Pages (THP)
+        let target = DeviceTarget::CpuDemandPaging { use_thp: true };
+        self.allocations.push(ModelAllocation {
+            model_name: model_name.to_string(),
+            target,
+            allocated_size_bytes: required_bytes,
+        });
+        target
+    }
+}
+
+// =========================================================================
+// 2. OPENSHELL SANDBOXING & PRIVACY GUARDRAILS
+// =========================================================================
+
+pub struct PrivacyRouter;
+
+impl PrivacyRouter {
+    /// Scans prompt bytes, redacting confidential markers (Credit Card numbers, Aadhaar IDs).
+    pub fn redact_prompt(input: &str) -> String {
+        let bytes = input.as_bytes();
+        let mut sanitized = Vec::new();
+        let mut i = 0;
+
+        while i < bytes.len() {
+            // Check for 16 contiguous digits first (Credit Card number)
+            if i + 16 <= bytes.len() && bytes[i..i+16].iter().all(|b| b.is_ascii_digit()) {
+                sanitized.extend_from_slice(b"[REDACTED_CREDIT_CARD]");
+                i += 16;
+            } else if i + 12 <= bytes.len() && bytes[i..i+12].iter().all(|b| b.is_ascii_digit()) {
+                // Check for 12 contiguous digits (Aadhaar number)
+                sanitized.extend_from_slice(b"[REDACTED_AADHAAR]");
+                i += 12;
+            } else {
+                sanitized.push(bytes[i]);
+                i += 1;
+            }
+        }
+
+        String::from_utf8(sanitized).unwrap_or_else(|_| input.to_string())
+    }
+}
+
+pub struct DefaultDenyNetworkPolicy {
+    pub whitelisted_endpoints: Vec<String>,
+}
+
+impl DefaultDenyNetworkPolicy {
+    pub fn new() -> Self {
+        Self {
+            whitelisted_endpoints: Vec::new(),
+        }
+    }
+
+    pub fn allow_endpoint(&mut self, endpoint: &str) {
+        self.whitelisted_endpoints.push(endpoint.to_string());
+    }
+
+    /// Default-denies outbound access from agent processes unless whitelisted.
+    pub fn is_allowed(&self, target_endpoint: &str) -> bool {
+        for allowed in &self.whitelisted_endpoints {
+            if allowed == target_endpoint || target_endpoint.starts_with(allowed) {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+pub struct OpenShellAgentSandbox;
+
+impl OpenShellAgentSandbox {
+    /// Filters output commands against shell-escaping injection sequences (sudo, chmod, rm -rf).
+    pub fn is_command_safe(command: &str) -> bool {
+        let blacklisted = ["sudo", "chmod", "rm -rf", "dd if=/dev/zero", "mkfs", "chown", "> /dev/sd"];
+        for bad in blacklisted {
+            if command.contains(bad) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+// =========================================================================
+// 3. ML EXPERIMENT TRACKER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ExperimentRun {
+    pub run_id: usize,
+    pub name: String,
+    pub params: Vec<(String, String)>,
+    pub metrics: Vec<(String, f32)>,
+    pub checkpoint_path: String,
+    pub is_best: bool,
 }
 
 pub struct MlExperimentTracker {
-    pub active_experiment: String,
-    pub runs: HashMap<String, MlExperimentRun>,
+    pub runs: Vec<ExperimentRun>,
+    pub next_run_id: usize,
 }
 
 impl MlExperimentTracker {
-    pub fn new(experiment_name: &str) -> Self {
-        Self {
-            active_experiment: experiment_name.to_string(),
-            runs: HashMap::new(),
-        }
-    }
-
-    pub fn log_run(
-        &mut self,
-        run_id: &str,
-        params: HashMap<String, String>,
-        metrics: HashMap<String, f64>,
-        checkpoint_hash: &str,
-    ) -> String {
-        let run = MlExperimentRun {
-            run_id: run_id.to_string(),
-            experiment_name: self.active_experiment.clone(),
-            parameters: params,
-            metrics,
-            model_checkpoint_hash: checkpoint_hash.to_string(),
-            timestamp: 1716000000,
-        };
-        self.runs.insert(run_id.to_string(), run);
-        run_id.to_string()
-    }
-
-    pub fn get_best_run(&self, metric_name: &str, higher_is_better: bool) -> Option<&MlExperimentRun> {
-        if higher_is_better {
-            self.runs.values().max_by(|a, b| {
-                a.metrics.get(metric_name).unwrap_or(&f64::MIN)
-                    .partial_cmp(b.metrics.get(metric_name).unwrap_or(&f64::MIN))
-                    .unwrap_or(std::cmp::Ordering::Equal)
-            })
-        } else {
-            self.runs.values().min_by(|a, b| {
-                a.metrics.get(metric_name).unwrap_or(&f64::MAX)
-                    .partial_cmp(b.metrics.get(metric_name).unwrap_or(&f64::MAX))
-                    .unwrap_or(std::cmp::Ordering::Equal)
-            })
-        }
-    }
-}
-
-/// 2. AI Safety Guardrails Policy Engine (Roadmap Item 91: AI safety guardrails)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SafetyViolationType {
-    DestructiveFileWipe,
-    UnauthorizedNetworkExfiltration,
-    PrivilegeEscalationAttempt,
-    ResourceExhaustion,
-}
-
-pub struct AiSafetyGuardrails {
-    pub blocked_commands: HashSet<String>,
-    pub max_file_write_bytes: usize,
-    pub enforce_sandbox: bool,
-}
-
-impl AiSafetyGuardrails {
     pub fn new() -> Self {
-        let mut blocked = HashSet::new();
-        blocked.insert("rm -rf /".to_string());
-        blocked.insert("mkfs.ext4 /dev/sda".to_string());
-        blocked.insert("dd if=/dev/zero of=/dev/sda".to_string());
-
         Self {
-            blocked_commands: blocked,
-            max_file_write_bytes: 100 * 1024 * 1024, // 100MB limit
-            enforce_sandbox: true,
+            runs: Vec::new(),
+            next_run_id: 1,
         }
     }
 
-    pub fn evaluate_command(&self, command: &str) -> Result<(), SafetyViolationType> {
-        let cmd_clean = command.trim();
-        if self.blocked_commands.contains(cmd_clean) || cmd_clean.contains("rm -rf /") {
-            return Err(SafetyViolationType::DestructiveFileWipe);
-        }
-        if cmd_clean.contains("curl ") && cmd_clean.contains("/etc/shadow") {
-            return Err(SafetyViolationType::UnauthorizedNetworkExfiltration);
-        }
-        Ok(())
-    }
-}
-
-/// 3. Curated Signed Model Marketplace (Roadmap Item 92: Model marketplace)
-#[derive(Debug, Clone)]
-pub struct CuratedAiModel {
-    pub model_id: String,
-    pub name: String,
-    pub task_category: String, // e.g. "NL2CLI", "CodeCompletion", "Vision"
-    pub size_mb: usize,
-    pub dilithium_signature: String,
-    pub is_verified: bool,
-}
-
-pub struct ModelMarketplace {
-    pub models: HashMap<String, CuratedAiModel>,
-}
-
-impl ModelMarketplace {
-    pub fn new() -> Self {
-        let mut models = HashMap::new();
-        models.insert(
-            "sigma-llm-1.5b".to_string(),
-            CuratedAiModel {
-                model_id: "sigma-llm-1.5b".to_string(),
-                name: "SigmaOS Local Assistant 1.5B".to_string(),
-                task_category: "NL2CLI".to_string(),
-                size_mb: 850,
-                dilithium_signature: "PQC-DILITHIUM5-VALID-SIG-SIGMA-1.5B".to_string(),
-                is_verified: true,
-            },
-        );
-        Self { models }
-    }
-
-    pub fn verify_and_install_model(&self, model_id: &str) -> Result<String, &'static str> {
-        if let Some(model) = self.models.get(model_id) {
-            if model.is_verified && model.dilithium_signature.starts_with("PQC-DILITHIUM5") {
-                Ok(format!("Successfully installed signed model '{}' ({})", model.name, model.model_id))
-            } else {
-                Err("Model signature verification failed!")
-            }
-        } else {
-            Err("Model not found in curated marketplace")
-        }
-    }
-}
-
-/// 4. Developer Platform & Incubator Suite (Roadmap Items 86, 88, 97, 100)
-#[derive(Debug, Clone)]
-pub struct DevWorkspace {
-    pub workspace_id: String,
-    pub language: String,
-    pub is_ephemeral: bool,
-    pub is_active: bool,
-}
-
-pub struct DeveloperPlatformSuite {
-    pub workspaces: HashMap<String, DevWorkspace>,
-    pub plugin_marketplace: HashSet<String>,
-    pub incubator_projects: Vec<String>,
-}
-
-impl DeveloperPlatformSuite {
-    pub fn new() -> Self {
-        let mut plugins = HashSet::new();
-        plugins.insert("sigma-lsp-rust".to_string());
-        plugins.insert("sigma-jupyter-notebook".to_string());
-
-        Self {
-            workspaces: HashMap::new(),
-            plugin_marketplace: plugins,
-            incubator_projects: Vec::new(),
-        }
-    }
-
-    pub fn create_ephemeral_sandbox(&mut self, language: &str) -> String {
-        let id = format!("sandbox-{}", self.workspaces.len() + 1);
-        let ws = DevWorkspace {
-            workspace_id: id.clone(),
-            language: language.to_string(),
-            is_ephemeral: true,
-            is_active: true,
-        };
-        self.workspaces.insert(id.clone(), ws);
+    pub fn start_run(&mut self, name: &str) -> usize {
+        let id = self.next_run_id;
+        self.next_run_id += 1;
+        self.runs.push(ExperimentRun {
+            run_id: id,
+            name: name.to_string(),
+            params: Vec::new(),
+            metrics: Vec::new(),
+            checkpoint_path: String::new(),
+            is_best: false,
+        });
         id
     }
 
-    pub fn register_incubator_app(&mut self, project_name: &str) {
-        self.incubator_projects.push(project_name.to_string());
+    pub fn log_param(&mut self, run_id: usize, key: &str, value: &str) {
+        if let Some(run) = self.runs.iter_mut().find(|r| r.run_id == run_id) {
+            run.params.push((key.to_string(), value.to_string()));
+        }
     }
+
+    pub fn log_metric(&mut self, run_id: usize, key: &str, value: f32) {
+        if let Some(run) = self.runs.iter_mut().find(|r| r.run_id == run_id) {
+            run.metrics.push((key.to_string(), value));
+        }
+    }
+
+    pub fn set_checkpoint(&mut self, run_id: usize, path: &str) {
+        if let Some(run) = self.runs.iter_mut().find(|r| r.run_id == run_id) {
+            run.checkpoint_path = path.to_string();
+        }
+    }
+
+    pub fn mark_best_run(&mut self, run_id: usize) {
+        for run in &mut self.runs {
+            run.is_best = run.run_id == run_id;
+        }
+    }
+}
+
+// =========================================================================
+// 4. AI SAFETY GUARDRAILS POLICY ENGINE
+// =========================================================================
+
+pub struct AiSafetyPolicyEngine {
+    pub max_file_write_bytes: usize,
+    pub enforce_sandbox: bool,
+    pub blocked_commands: Vec<String>,
+}
+
+impl AiSafetyPolicyEngine {
+    pub fn default_policy() -> Self {
+        let mut blocked = Vec::new();
+        blocked.push("rm -rf /".to_string());
+        blocked.push("dd if=/dev/zero".to_string());
+        blocked.push("sudo".to_string());
+        blocked.push("chmod 777".to_string());
+        Self {
+            max_file_write_bytes: 100 * 1024 * 1024, // 100 MB default
+            enforce_sandbox: true,
+            blocked_commands: blocked,
+        }
+    }
+
+    pub fn validate_file_write(&self, write_bytes: usize) -> bool {
+        write_bytes <= self.max_file_write_bytes
+    }
+
+    pub fn validate_command(&self, cmd: &str) -> bool {
+        for blocked in &self.blocked_commands {
+            if cmd.contains(blocked) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+// =========================================================================
+// 5. SIGNED MODEL MARKETPLACE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct MarketplaceModel {
+    pub model_id: String,
+    pub name: String,
+    pub expected_blake3_hash: [u8; 32],
+    pub is_verified: bool,
+}
+
+pub struct SignedModelMarketplace {
+    pub models: Vec<MarketplaceModel>,
+}
+
+impl SignedModelMarketplace {
+    pub fn new() -> Self {
+        Self { models: Vec::new() }
+    }
+
+    pub fn register_model(&mut self, id: &str, name: &str, blake3_hash: [u8; 32]) {
+        self.models.push(MarketplaceModel {
+            model_id: id.to_string(),
+            name: name.to_string(),
+            expected_blake3_hash: blake3_hash,
+            is_verified: false,
+        });
+    }
+
+    /// Computes a lightweight checksum over binary bytes and verifies against registered hash.
+    pub fn verify_and_load(&mut self, id: &str, model_bytes: &[u8]) -> Result<(), &'static str> {
+        let model = self.models.iter_mut().find(|m| m.model_id == id)
+            .ok_or("Model not found in marketplace")?;
+
+        let computed_hash = compute_blake3_simulated(model_bytes);
+        if computed_hash == model.expected_blake3_hash {
+            model.is_verified = true;
+            Ok(())
+        } else {
+            Err("Model signature verification failed: BLAKE3 hash mismatch!")
+        }
+    }
+}
+
+pub fn compute_blake3_simulated(data: &[u8]) -> [u8; 32] {
+    let mut hash = [0u8; 32];
+    for (i, &b) in data.iter().enumerate() {
+        hash[i % 32] ^= b.wrapping_add(i as u8);
+    }
+    hash
 }
 
 #[cfg(test)]
@@ -200,46 +325,71 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_local_llm_orchestrator_scheduling() {
+        let mut orch = LocalLlmOrchestrator::new(1000, 2000);
+
+        let target1 = orch.schedule_model("phi-3", 500);
+        assert_eq!(target1, DeviceTarget::TpuSlot(0));
+
+        let target2 = orch.schedule_model("llama-3-8b", 800); // Exceeds TPU (500+800 > 1000)
+        assert!(matches!(target2, DeviceTarget::GpuMemory { .. }));
+
+        let target3 = orch.schedule_model("mistral-7b", 3000); // Exceeds GPU VRAM (800+3000 > 2000)
+        assert_eq!(target3, DeviceTarget::CpuDemandPaging { use_thp: true });
+    }
+
+    #[test]
+    fn test_privacy_router_redaction() {
+        let prompt = "My Aadhaar is 123456789012 and Card is 1111222233334444";
+        let redacted = PrivacyRouter::redact_prompt(prompt);
+        assert!(redacted.contains("[REDACTED_AADHAAR]"));
+        assert!(redacted.contains("[REDACTED_CREDIT_CARD]"));
+        assert!(!redacted.contains("123456789012"));
+    }
+
+    #[test]
+    fn test_default_deny_network_policy() {
+        let mut policy = DefaultDenyNetworkPolicy::new();
+        policy.allow_endpoint("https://api.sigmaos.org");
+
+        assert!(policy.is_allowed("https://api.sigmaos.org/v1/models"));
+        assert!(!policy.is_allowed("https://malicious.external.site"));
+    }
+
+    #[test]
+    fn test_openshell_agent_sandbox() {
+        assert!(OpenShellAgentSandbox::is_command_safe("ls -la /var/log"));
+        assert!(!OpenShellAgentSandbox::is_command_safe("sudo rm -rf /"));
+    }
+
+    #[test]
     fn test_ml_experiment_tracker() {
-        let mut tracker = MlExperimentTracker::new("mnist-classification");
-        let mut params = HashMap::new();
-        params.insert("lr".to_string(), "0.001".to_string());
+        let mut tracker = MlExperimentTracker::new();
+        let id = tracker.start_run("resnet50_baseline");
+        tracker.log_param(id, "lr", "0.001");
+        tracker.log_metric(id, "accuracy", 0.94);
+        tracker.mark_best_run(id);
 
-        let mut metrics = HashMap::new();
-        metrics.insert("accuracy".to_string(), 0.985);
-
-        tracker.log_run("run-1", params, metrics, "sha256-checkpoint-001");
-        let best = tracker.get_best_run("accuracy", true).unwrap();
-        assert_eq!(best.run_id, "run-1");
-        assert_eq!(*best.metrics.get("accuracy").unwrap(), 0.985);
+        assert_eq!(tracker.runs[0].params[0].1, "0.001");
+        assert!(tracker.runs[0].is_best);
     }
 
     #[test]
-    fn test_ai_safety_guardrails() {
-        let guardrails = AiSafetyGuardrails::new();
-        assert_eq!(
-            guardrails.evaluate_command("rm -rf /"),
-            Err(SafetyViolationType::DestructiveFileWipe)
-        );
-        assert!(guardrails.evaluate_command("cargo check --lib").is_ok());
+    fn test_ai_safety_policy_engine() {
+        let policy = AiSafetyPolicyEngine::default_policy();
+        assert!(policy.validate_file_write(10 * 1024 * 1024));
+        assert!(!policy.validate_file_write(200 * 1024 * 1024));
+        assert!(!policy.validate_command("dd if=/dev/zero of=/dev/sda"));
     }
 
     #[test]
-    fn test_model_marketplace() {
-        let marketplace = ModelMarketplace::new();
-        let res = marketplace.verify_and_install_model("sigma-llm-1.5b");
-        assert!(res.is_ok());
-        assert!(res.unwrap().contains("Successfully installed"));
-    }
+    fn test_signed_model_marketplace() {
+        let mut market = SignedModelMarketplace::new();
+        let model_data = b"MODEL_WEIGHTS_BINARY_DATA";
+        let hash = compute_blake3_simulated(model_data);
 
-    #[test]
-    fn test_developer_platform_suite() {
-        let mut suite = DeveloperPlatformSuite::new();
-        let ws_id = suite.create_ephemeral_sandbox("rust");
-        assert!(ws_id.contains("sandbox-1"));
-        assert!(suite.workspaces.get(&ws_id).unwrap().is_ephemeral);
-
-        suite.register_incubator_app("Sovereign-Calc");
-        assert_eq!(suite.incubator_projects.len(), 1);
+        market.register_model("model-01", "Sigma-Llama-3", hash);
+        assert!(market.verify_and_load("model-01", model_data).is_ok());
+        assert!(market.models[0].is_verified);
     }
 }

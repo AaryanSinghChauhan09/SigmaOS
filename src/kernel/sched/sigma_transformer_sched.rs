@@ -1,22 +1,4 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -24,7 +6,7 @@ use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-use crate::filesystem::vfs::FsError;
+use crate::filesystem::FsError;
 
 /// Transformer-based Scheduler
 ///
@@ -55,7 +37,7 @@ impl TransformerScheduler {
             num_heads,
             d_model,
             max_seq_len,
-            history: vec![Vec::new(); max_seq_len],
+            history: (0..max_seq_len).map(|_| Vec::new()).collect(),
             weights,
             current_pos: 0,
         }
@@ -66,7 +48,8 @@ impl TransformerScheduler {
         features.push(task_pid as f32);
         features.push(cpu as f32);
         features.push(latency_us as f32);
-        self.history[self.current_pos % self.max_seq_len] = features;
+        let idx = self.current_pos % self.max_seq_len;
+        self.history[idx] = features;
         self.current_pos += 1;
     }
 
@@ -88,7 +71,7 @@ impl TransformerScheduler {
             }
             if score > best_score {
                 best_score = score;
-                best_cpu = cpu;
+                best_cpu = cpu as u32;
             }
         }
         Some(best_cpu)
@@ -110,7 +93,7 @@ impl TransformerScheduler {
         for s in &mut scores {
             *s /= sum;
         }
-        let mut output = vec![0.0f32; d];
+        let mut output: Vec<f32> = (0..d).map(|_| 0.0f32).collect();
         for i in 0..d {
             for j in 0..d {
                 output[i] += scores[j] * value[j];
@@ -133,13 +116,11 @@ impl TransformerSchedClass {
 }
 
 impl SchedClass for TransformerSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
-        rq.nr_running.fetch_add(1, Ordering::SeqCst);
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
-        rq.nr_running.fetch_sub(1, Ordering::SeqCst);
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
@@ -199,9 +180,9 @@ mod tests {
     #[test]
     fn test_attention_mechanism() {
         let sched = TransformerScheduler::new(4, 64, 128);
-        let q = vec![1.0, 0.0, 0.0];
-        let k = vec![0.0, 1.0, 0.0];
-        let v = vec![0.0, 0.0, 1.0];
+        let q = alloc::vec![1.0, 0.0, 0.0];
+        let k = alloc::vec![0.0, 1.0, 0.0];
+        let v = alloc::vec![0.0, 0.0, 1.0];
         let output = sched.attention(&q, &k, &v);
         assert_eq!(output.len(), 3);
     }

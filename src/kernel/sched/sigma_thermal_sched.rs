@@ -1,30 +1,13 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;
+use alloc::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-use crate::filesystem::vfs::FsError;
+use crate::filesystem::FsError;
 
 /// Thermal zone reading
 #[derive(Debug, Clone, Copy)]
@@ -57,7 +40,6 @@ pub struct ThermalScheduler {
 }
 
 impl ThermalScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ThermalScheduler {
             zones: Vec::new(),
@@ -123,7 +105,6 @@ pub struct ThermalSchedClass {
 }
 
 impl ThermalSchedClass {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ThermalSchedClass {
             thermal: ThermalScheduler::new(),
@@ -132,13 +113,11 @@ impl ThermalSchedClass {
 }
 
 impl SchedClass for ThermalSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
-        rq.nr_running.fetch_add(1, Ordering::SeqCst);
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
-        rq.nr_running.fetch_sub(1, Ordering::SeqCst);
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
@@ -201,6 +180,7 @@ mod tests {
             critical_temp_c: 100.0,
             passive_delay_ms: 100,
         });
+        sched.update_temperature(0, 95.0);
         assert!(sched.is_throttling());
     }
 
@@ -248,6 +228,6 @@ mod tests {
             seccomp_filter: None,
         };
         let decision = sched.adjust_scheduling(&task);
-        matches!(decision, SchedulingDecision::Normal);
+        assert!(matches!(decision, SchedulingDecision::Normal));
     }
 }

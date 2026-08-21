@@ -1,22 +1,4 @@
-#![allow(unused_variables)]
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -24,7 +6,7 @@ use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-use crate::filesystem::vfs::FsError;
+use crate::filesystem::FsError;
 
 /// Multi-Level Feedback Queue (MLFQ) Scheduler
 ///
@@ -38,7 +20,6 @@ pub struct MlfqScheduler {
     pub current_queue: usize,
     pub aging_threshold: u64,
     pub ticks: AtomicU32,
-    pub vruntimes: alloc::collections::BTreeMap<u64, u64>,
 }
 
 impl MlfqScheduler {
@@ -50,18 +31,16 @@ impl MlfqScheduler {
         MlfqScheduler {
             nr_queues,
             time_slices,
-            queues: vec![Vec::new(); nr_queues],
+            queues: (0..nr_queues).map(|_| Vec::new()).collect(),
             current_queue: 0,
             aging_threshold: 1000,
             ticks: AtomicU32::new(0),
-            vruntimes: alloc::collections::BTreeMap::new(),
         }
     }
 
     pub fn enqueue(&mut self, pid: u64, priority: usize) {
         let queue_idx = priority.min(self.nr_queues - 1);
         self.queues[queue_idx].push(pid);
-        self.vruntimes.entry(pid).or_insert(0);
     }
 
     pub fn dequeue(&mut self) -> Option<u64> {
@@ -98,10 +77,11 @@ impl MlfqScheduler {
     }
 
     pub fn aging(&mut self) {
-        if self.ticks.fetch_add(1, Ordering::SeqCst) >= self.aging_threshold {
+        if u64::from(self.ticks.fetch_add(1, Ordering::SeqCst)) >= self.aging_threshold {
             self.ticks.store(0, Ordering::SeqCst);
             for q in (1..self.nr_queues).rev() {
-                for &pid in &self.queues[q] {
+                for i in 0..self.queues[q].len() {
+                    let pid = self.queues[q][i];
                     self.promote(pid);
                 }
             }
@@ -145,7 +125,6 @@ impl SchedClass for MlfqSchedClass {
     }
 
     fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
-        // Pick task with the lowest vruntime
         None
     }
 
