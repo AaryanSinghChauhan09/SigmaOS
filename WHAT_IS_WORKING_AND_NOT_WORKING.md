@@ -333,3 +333,14 @@ When making changes to SigmaOS algorithms or fixing bug reports, follow this man
 
 5. **Run Tests:**
    Run `cargo test --lib` to verify that all core unit tests pass without regressions.
+
+### Gap I: Classic Operating System Algorithms & Subsystems Parity
+- **Linux/BSD Parity Source:** `drivers/virtio/virtio_balloon.c`, `kernel/locking/spinlock.rs`, `security/selinux/`, `kernel/sched/`
+- **Implemented Subsystem:** `src/kernel/classic_os.rs`
+- **Features Included:**
+  1. `VirtioBalloonManager`: Dynamic VirtIO memory balloon inflation/deflation.
+  2. `BankersAlgorithm`: Safe state checking & resource request validation for deadlock avoidance.
+  3. `SleepingBarberQueue`: Synchronization primitive for capacity-constrained barber queue problems.
+  4. `TicketSpinlock`: Fair FIFO ticket spinlock with exponential backoff.
+  5. `StackCanaryProtector`: XOR-seeded global stack canary buffer overflow protection.
+  6. `BatchSystemQueue`: Multiprogrammed batch job scheduler queue with concurrency limits.
