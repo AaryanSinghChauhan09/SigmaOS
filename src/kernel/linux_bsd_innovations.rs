@@ -99,6 +99,165 @@ impl OpenBsdPledge {
     }
 }
 
+// ================= Bounded Buffer Producer/Consumer Monitor =================
+
+pub struct BoundedBufferProducerConsumer<T, const N: usize> {
+    pub buffer: [Option<T>; N],
+    pub head: usize,
+    pub tail: usize,
+    pub count: usize,
+}
+
+impl<T: Copy, const N: usize> BoundedBufferProducerConsumer<T, N> {
+    pub fn new() -> Self {
+        Self {
+            buffer: [None; N],
+            head: 0,
+            tail: 0,
+            count: 0,
+        }
+    }
+
+    pub fn produce(&mut self, item: T) -> Result<(), &'static str> {
+        if self.count >= N {
+            return Err("Bounded Buffer Full: Producer blocked!");
+        }
+        self.buffer[self.tail] = Some(item);
+        self.tail = (self.tail + 1) % N;
+        self.count += 1;
+        Ok(())
+    }
+
+    pub fn consume(&mut self) -> Result<T, &'static str> {
+        if self.count == 0 {
+            return Err("Bounded Buffer Empty: Consumer blocked!");
+        }
+        let item = self.buffer[self.head].take().ok_or("Buffer slot unpopulated")?;
+        self.head = (self.head + 1) % N;
+        self.count -= 1;
+        Ok(item)
+    }
+
+    pub fn len(&self) -> usize {
+        self.count
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.count == 0
+    }
+}
+
+impl<T: Copy, const N: usize> Default for BoundedBufferProducerConsumer<T, N> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ================= Bottom-Half Kernel Thread & SoftIRQ Handler =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SoftIrqType {
+    Timer,
+    NetTx,
+    NetRx,
+    Block,
+    Tasklet,
+}
+
+pub struct BottomHalfKernelThread {
+    pub pending_softirqs: Vec<SoftIrqType>,
+    pub tasklet_queue: Vec<String>,
+}
+
+impl BottomHalfKernelThread {
+    pub fn new() -> Self {
+        Self {
+            pending_softirqs: Vec::new(),
+            tasklet_queue: Vec::new(),
+        }
+    }
+
+    pub fn raise_softirq(&mut self, irq: SoftIrqType) {
+        if !self.pending_softirqs.contains(&irq) {
+            self.pending_softirqs.push(irq);
+        }
+    }
+
+    pub fn schedule_tasklet(&mut self, tasklet_name: &str) {
+        self.tasklet_queue.push(tasklet_name.to_string());
+        self.raise_softirq(SoftIrqType::Tasklet);
+    }
+
+    pub fn process_bottom_half(&mut self) -> usize {
+        let count = self.pending_softirqs.len() + self.tasklet_queue.len();
+        self.pending_softirqs.clear();
+        self.tasklet_queue.clear();
+        count
+    }
+}
+
+impl Default for BottomHalfKernelThread {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ================= Android Broadcast Receiver Registry =================
+
+#[derive(Debug, Clone)]
+pub struct BroadcastReceiver {
+    pub name: String,
+    pub intent_filter: String,
+    pub priority: i32,
+}
+
+pub struct AndroidBroadcastReceiverRegistry {
+    pub receivers: Vec<BroadcastReceiver>,
+}
+
+impl AndroidBroadcastReceiverRegistry {
+    pub fn new() -> Self {
+        Self {
+            receivers: Vec::new(),
+        }
+    }
+
+    pub fn register_receiver(&mut self, name: &str, intent_filter: &str, priority: i32) {
+        self.receivers.push(BroadcastReceiver {
+            name: name.to_string(),
+            intent_filter: intent_filter.to_string(),
+            priority,
+        });
+        // Sort descending by priority
+        let n = self.receivers.len();
+        for i in 0..n {
+            for j in 0..n.saturating_sub(1).saturating_sub(i) {
+                if self.receivers[j].priority < self.receivers[j + 1].priority {
+                    let tmp = self.receivers[j].clone();
+                    self.receivers[j] = self.receivers[j + 1].clone();
+                    self.receivers[j + 1] = tmp;
+                }
+            }
+        }
+    }
+
+    pub fn send_broadcast(&self, action: &str) -> Vec<String> {
+        let mut dispatched = Vec::new();
+        for recv in &self.receivers {
+            if recv.intent_filter == action {
+                dispatched.push(recv.name.clone());
+            }
+        }
+        dispatched
+    }
+}
+
+impl Default for AndroidBroadcastReceiverRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ================= Multikernel/Barrelfish Inter-Core Mailbox =================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -890,6 +1049,29 @@ impl NetBsdRumpKernel {
             Ok(alloc::format!("Bootstrap Anykernel component: {} running in Ring 0 Monolithic Space", name))
         }
     }
+
+    pub fn execute_rump_hypercall(
+        &self,
+        component_name: &str,
+        hypercall_id: u32,
+        payload: u64,
+    ) -> Result<u64, &'static str> {
+        let comp = self.components.get(component_name).ok_or("Component not found")?;
+        if !comp.run_in_userspace {
+            return Err("Hypercall allowed only for userspace rump microthreads");
+        }
+        Ok(payload ^ (hypercall_id as u64))
+    }
+
+    pub fn isolate_rump_vfs(&mut self, fs_name: &str) -> Result<String, &'static str> {
+        self.register_component(fs_name, true);
+        Ok(alloc::format!("Isolated Rump VFS driver '{}' in userspace microthread", fs_name))
+    }
+
+    pub fn virtualize_rump_network(&mut self, net_dev: &str) -> Result<String, &'static str> {
+        self.register_component(net_dev, true);
+        Ok(alloc::format!("Virtualised Rumpnet network stack driver '{}' in userspace microthread", net_dev))
+    }
 }
 
 // ================= Monolithic Kernel Inspirations =================
@@ -1146,6 +1328,15 @@ mod tests {
 
         let res_e1000 = rump.bootstrap_component("e1000").unwrap();
         assert!(res_e1000.contains("Ring 0 Monolithic Space"));
+
+        let hyper_res = rump.execute_rump_hypercall("ext4fs", 0x10, 0xAA00).unwrap();
+        assert_eq!(hyper_res, 0xAA00 ^ 0x10);
+
+        let vfs_res = rump.isolate_rump_vfs("zfs").unwrap();
+        assert!(vfs_res.contains("Isolated Rump VFS driver 'zfs'"));
+
+        let net_res = rump.virtualize_rump_network("iwlwifi").unwrap();
+        assert!(net_res.contains("Virtualised Rumpnet network stack driver 'iwlwifi'"));
     }
 
     #[test]
@@ -1360,6 +1551,41 @@ mod tests {
         assert_eq!(irq2.priority, 10);
 
         assert!(broker.dispatch_next_irq().is_none());
+    }
+
+    #[test]
+    fn test_bounded_buffer_producer_consumer() {
+        let mut bb: BoundedBufferProducerConsumer<u32, 4> = BoundedBufferProducerConsumer::new();
+        assert!(bb.is_empty());
+
+        bb.produce(10).unwrap();
+        bb.produce(20).unwrap();
+        assert_eq!(bb.len(), 2);
+
+        assert_eq!(bb.consume().unwrap(), 10);
+        assert_eq!(bb.consume().unwrap(), 20);
+        assert!(bb.is_empty());
+    }
+
+    #[test]
+    fn test_bottom_half_kernel_thread() {
+        let mut bh = BottomHalfKernelThread::new();
+        bh.raise_softirq(SoftIrqType::NetRx);
+        bh.schedule_tasklet("e1000_rx_tasklet");
+
+        let processed = bh.process_bottom_half();
+        assert_eq!(processed, 2);
+    }
+
+    #[test]
+    fn test_android_broadcast_receiver_registry() {
+        let mut reg = AndroidBroadcastReceiverRegistry::new();
+        reg.register_receiver("BatteryReceiver", "android.intent.action.BATTERY_LOW", 100);
+        reg.register_receiver("WifiReceiver", "android.intent.action.BATTERY_LOW", 10);
+
+        let res = reg.send_broadcast("android.intent.action.BATTERY_LOW");
+        assert_eq!(res.len(), 2);
+        assert_eq!(res[0], "BatteryReceiver");
     }
 
     #[test]
