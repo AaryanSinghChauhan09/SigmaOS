@@ -3,7 +3,7 @@
 // - FreeBSD Jails & sysctl MIB
 // - NetBSD Rump Kernel hypercall routing
 // - OpenBSD sysctl MIB
-// - Linux LSB / fstab parsing
+// - Linux eBPF VM & OSTree Engine & Declarative System Engine
 
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
@@ -46,25 +46,39 @@ fn test_openbsd_sysctl_mib_inspection() {
 }
 
 #[test]
-fn test_sovereign_auxiliary_carry_and_system_awareness_inspection() {
-    let mut af = SovereignAuxiliaryCarryEngine::new();
-    let res = af.evaluate_add_af(0x0E, 0x05); // 14 + 5 = 19 > 15 -> AF set
-    assert!(af.rflags_af);
+fn test_sovereign_ebpf_and_ostree_inspection() {
+    let mut engine = SovereignEbpfEngine::new(64);
+    let instrs = vec![
+        EbpfInstruction {
+            opcode: EbpfOpcode::Add,
+            dst: 0,
+            src: 0,
+            offset: 0,
+            imm: 42,
+            use_imm: true,
+        },
+        EbpfInstruction {
+            opcode: EbpfOpcode::Exit,
+            dst: 0,
+            src: 0,
+            offset: 0,
+            imm: 0,
+            use_imm: false,
+        },
+    ];
+    let res = engine.execute(&instrs).unwrap();
+    assert_eq!(res, 42);
 
-    let mut awareness = SovereignSystemAwarenessEngine::new(AwarenessDegree::Omniscient);
-    assert!(awareness.compute_availability_score() > 0);
+    let mut ostree = SovereignOstreeEngine::new();
+    let idx = ostree.stage_commit("commit1", "1.0.0", "vmlinuz-1.0", 0x1234);
+    assert_eq!(idx, 0);
+    assert_eq!(ostree.get_active_deployment().unwrap().version, "1.0.0");
 }
 
 #[test]
-fn test_sovereign_avoidance_backbone_balloon_inspection() {
-    let mut avoidance = SovereignDeadlockStarvationAvoidanceEngine::new(vec![5, 5]);
-    avoidance.register_process(1, vec![3, 3]);
-    assert!(avoidance.is_safe_state_request(1, &[1, 1]));
-
-    let mut backbone = SovereignBackboneNetworkEngine::new();
-    backbone.add_route([10, 0, 0, 0], 8, [192, 168, 1, 1], 10, RouteProtocol::Bgp);
-    assert!(backbone.lookup_backbone_route([10, 1, 2, 3]).is_some());
-
-    let mut balloon = SovereignMemoryBallooningBalancer::new(2048);
-    assert_eq!(balloon.inflate_balloon(512), 512);
+fn test_sovereign_declarative_engine_inspection() {
+    let mut decl = SovereignDeclarativeSystemEngine::new();
+    let gen1 = decl.build_generation("sigma-node", &["coreutils"], &["syslogd"]);
+    assert_eq!(gen1, 1);
+    assert!(decl.generations[0].active);
 }
