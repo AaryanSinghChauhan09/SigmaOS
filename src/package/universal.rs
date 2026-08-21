@@ -815,42 +815,6 @@ impl UniversalPackageManager {
             .insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
     }
 
-        // Advanced Open-Source Adapters:
-        let portage_adapter =
-            PackageAdapter::new(PackageFormat::Portage, "portage_ebuild".to_string());
-        let freebsd_adapter =
-            PackageAdapter::new(PackageFormat::FreeBsdPkg, "freebsd_pkg".to_string());
-        let arch_pkgbuild_adapter =
-            PackageAdapter::new(PackageFormat::ArchPkgBuild, "arch_pkgbuild".to_string());
-        let nix_adapter = PackageAdapter::new(PackageFormat::NixStore, "nix_store".to_string());
-        let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
-        let homebrew_adapter =
-            PackageAdapter::new(PackageFormat::Homebrew, "homebrew_formula".to_string());
-
-        self.adapters.insert(PackageFormat::Deb, apt_adapter);
-        self.adapters.insert(PackageFormat::Rpm, yum_adapter);
-        self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
-        self.adapters.insert(PackageFormat::Snap, snap_adapter);
-        self.adapters
-            .insert(PackageFormat::Flatpak, flatpak_adapter);
-        self.adapters
-            .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
-
-        self.adapters
-            .insert(PackageFormat::Portage, portage_adapter);
-        self.adapters
-            .insert(PackageFormat::FreeBsdPkg, freebsd_adapter);
-        self.adapters
-            .insert(PackageFormat::ArchPkgBuild, arch_pkgbuild_adapter);
-        self.adapters.insert(PackageFormat::NixStore, nix_adapter);
-        self.adapters
-            .insert(PackageFormat::AppImage, appimage_adapter);
-        self.adapters
-            .insert(PackageFormat::Homebrew, homebrew_adapter);
-        self.adapters
-            .insert(PackageFormat::Apk, apk_adapter);
-    }
-
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
         self.metadata_cache

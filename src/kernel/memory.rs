@@ -432,12 +432,6 @@ impl VirtualMemoryManager {
     /// Free pages using buddy allocator (wires free_pages to VMM)
     pub fn free_pages(&mut self, block: MemoryBlock) {
         self.buddy_allocator.deallocate(block);
-        Self { root_directory }
-        Self {
-            root_directory,
-            page_ref_counts: HashMap::new(),
-            shadow_snapshots: HashMap::new(),
-        }
     }
 
     /// Translates a virtual address into a physical address
