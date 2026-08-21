@@ -270,18 +270,16 @@ impl Default for ScreenshotTool {
     }
 }
 
-/// Vector annotation element types
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnnotationType {
     Rectangle,
     Arrow,
     Highlight,
-    BlurPixelate,
+    Pixelate,
     Text,
     StepNumber,
 }
 
-/// Annotation object
 #[derive(Debug, Clone)]
 pub struct Annotation {
     pub annotation_type: AnnotationType,
@@ -291,7 +289,6 @@ pub struct Annotation {
     pub step_index: Option<u32>,
 }
 
-/// Specialized annotator & vector editing engine
 pub struct AnnotationEngine {
     pub annotations: Vec<Annotation>,
     pub next_step_number: u32,
