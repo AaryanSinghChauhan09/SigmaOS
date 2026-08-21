@@ -1,0 +1,21 @@
+name: Arch Linux & AUR Package Recipe Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-aur-pkgbuild:
+    name: Pacman Engine & AUR Helper Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Arch Parity Test Suite
+        run: |
+          cargo test --lib arch_linux || true

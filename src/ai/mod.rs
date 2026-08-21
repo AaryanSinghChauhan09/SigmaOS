@@ -11,6 +11,7 @@ pub mod system;
 pub mod voice;
 pub mod wiki;
 pub mod qwenpaw;
+pub mod developer_platform;
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
@@ -29,6 +30,7 @@ pub use orchestrator::{AgentOrchestrator, AgentState, SimpleAgentOrchestrator};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+    SovereignGpuAiAccelerator,
 };
 pub use sai::{Agent, AgentRole, AgentTask as Task, TaskStatus};
 pub use system::{
@@ -45,4 +47,8 @@ pub use qwenpaw::{
     PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentMessage,
     PawAgentCommunicationProtocol, SemanticSkillFunction, NativeSkillFunction,
     SovereignSkillKernel,
+};
+pub use developer_platform::{
+    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
+    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };

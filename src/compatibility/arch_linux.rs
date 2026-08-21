@@ -837,6 +837,237 @@ impl Default for AurPatchEngine {
 }
 
 // ==========================================
+// 17. Mkinitcpio Initramfs Generator Parity
+// ==========================================
+
+pub struct MkinitcpioGenerator {
+    pub hooks: Vec<String>,
+    pub modules: Vec<String>,
+    pub compression: String,
+}
+
+impl MkinitcpioGenerator {
+    pub fn new() -> Self {
+        let mut hooks = Vec::new();
+        hooks.push("base".to_string());
+        hooks.push("udev".to_string());
+        hooks.push("autodetect".to_string());
+        hooks.push("modconf".to_string());
+        hooks.push("block".to_string());
+        hooks.push("filesystems".to_string());
+        hooks.push("fsck".to_string());
+
+        Self {
+            hooks,
+            modules: Vec::new(),
+            compression: "zstd".to_string(),
+        }
+    }
+
+    pub fn add_hook(&mut self, hook: &str) {
+        if !self.hooks.contains(&hook.to_string()) {
+            self.hooks.push(hook.to_string());
+        }
+    }
+
+    pub fn add_module(&mut self, module: &str) {
+        if !self.modules.contains(&module.to_string()) {
+            self.modules.push(module.to_string());
+        }
+    }
+
+    pub fn generate_preset_config(&self) -> String {
+        let mut config = String::new();
+        config.push_str("HOOKS=(");
+        for (i, h) in self.hooks.iter().enumerate() {
+            if i > 0 { config.push(' '); }
+            config.push_str(h);
+        }
+        config.push_str(")\nCOMPRESSION=\"");
+        config.push_str(&self.compression);
+        config.push_str("\"\n");
+        config
+    }
+}
+
+impl Default for MkinitcpioGenerator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 18. Arch News Feed & Security Advisory Feed
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct NewsItem {
+    pub title: String,
+    pub date: String,
+    pub content: String,
+    pub is_critical: bool,
+}
+
+pub struct ArchNewsFeedParser {
+    pub news: Vec<NewsItem>,
+}
+
+impl ArchNewsFeedParser {
+    pub fn new() -> Self {
+        Self { news: Vec::new() }
+    }
+
+    pub fn add_item(&mut self, title: &str, date: &str, content: &str, is_critical: bool) {
+        self.news.push(NewsItem {
+            title: title.to_string(),
+            date: date.to_string(),
+            content: content.to_string(),
+            is_critical,
+        });
+    }
+
+    pub fn get_latest_advisories(&self) -> Vec<&NewsItem> {
+        let mut advisories = Vec::new();
+        for item in &self.news {
+            if item.is_critical {
+                advisories.push(item);
+            }
+        }
+        advisories
+    }
+}
+
+impl Default for ArchNewsFeedParser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 19. Pacman Cache Trimmer (paccache parity)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct CachedPackage {
+    pub name: String,
+    pub version: u32,
+}
+
+pub struct PacmanDbCleaner {
+    pub cache: Vec<CachedPackage>,
+}
+
+impl PacmanDbCleaner {
+    pub fn new() -> Self {
+        Self { cache: Vec::new() }
+    }
+
+    pub fn add_cached_pkg(&mut self, name: &str, version: u32) {
+        self.cache.push(CachedPackage {
+            name: name.to_string(),
+            version,
+        });
+    }
+
+    pub fn clean_cache(&mut self, keep_versions: usize) -> usize {
+        let mut removed_count = 0;
+        let mut unique_names = Vec::<String>::new();
+        for pkg in &self.cache {
+            if !unique_names.contains(&pkg.name) {
+                unique_names.push(pkg.name.clone());
+            }
+        }
+
+        let mut kept_cache = Vec::new();
+        for name in &unique_names {
+            let mut versions: Vec<u32> = self
+                .cache
+                .iter()
+                .filter(|p| p.name == *name)
+                .map(|p| p.version)
+                .collect();
+
+            // Sort ascending
+            let n = versions.len();
+            for i in 0..n {
+                for j in 0..n - 1 - i {
+                    if versions[j] > versions[j + 1] {
+                        let tmp = versions[j];
+                        versions[j] = versions[j + 1];
+                        versions[j + 1] = tmp;
+                    }
+                }
+            }
+
+            let split_idx = if versions.len() > keep_versions {
+                versions.len() - keep_versions
+            } else {
+                0
+            };
+
+            removed_count += split_idx;
+            for v in &versions[split_idx..] {
+                kept_cache.push(CachedPackage {
+                    name: name.clone(),
+                    version: *v,
+                });
+            }
+        }
+        self.cache = kept_cache;
+        removed_count
+    }
+}
+
+impl Default for PacmanDbCleaner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 20. Arch Wiki Offline Search Engine
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct WikiPage {
+    pub title: String,
+    pub content: String,
+}
+
+pub struct ArchWikiSearchEngine {
+    pub pages: Vec<WikiPage>,
+}
+
+impl ArchWikiSearchEngine {
+    pub fn new() -> Self {
+        Self { pages: Vec::new() }
+    }
+
+    pub fn index_page(&mut self, title: &str, content: &str) {
+        self.pages.push(WikiPage {
+            title: title.to_string(),
+            content: content.to_string(),
+        });
+    }
+
+    pub fn search_topics(&self, query: &str) -> Vec<&WikiPage> {
+        let mut results = Vec::new();
+        for page in &self.pages {
+            if page.title.contains(query) || page.content.contains(query) {
+                results.push(page);
+            }
+        }
+        results
+    }
+}
+
+impl Default for ArchWikiSearchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
 // 16. Integration Tests Module
 // ==========================================
 
@@ -1012,6 +1243,48 @@ mod tests {
 
         assert!(keyring.verify_signature("0x9E5A86A21B607B76"));
         assert!(!keyring.verify_signature("0xBAD_KEY_ID"));
+    }
+
+    #[test]
+    fn test_mkinitcpio_generator() {
+        let mut gen = MkinitcpioGenerator::new();
+        gen.add_hook("encrypt");
+        gen.add_module("ext4");
+        let conf = gen.generate_preset_config();
+        assert!(conf.contains("encrypt"));
+        assert!(conf.contains("COMPRESSION=\"zstd\""));
+    }
+
+    #[test]
+    fn test_arch_news_feed_parser() {
+        let mut news = ArchNewsFeedParser::new();
+        news.add_item("Manual intervention required", "2024-05-01", "Update glibc manually", true);
+        news.add_item("Regular update", "2024-05-02", "Minor patches", false);
+        let advisories = news.get_latest_advisories();
+        assert_eq!(advisories.len(), 1);
+        assert_eq!(advisories[0].title, "Manual intervention required");
+    }
+
+    #[test]
+    fn test_pacman_db_cleaner() {
+        let mut cleaner = PacmanDbCleaner::new();
+        cleaner.add_cached_pkg("linux", 1);
+        cleaner.add_cached_pkg("linux", 2);
+        cleaner.add_cached_pkg("linux", 3);
+        cleaner.add_cached_pkg("linux", 4);
+        let removed = cleaner.clean_cache(2);
+        assert_eq!(removed, 2);
+        assert_eq!(cleaner.cache.len(), 2);
+    }
+
+    #[test]
+    fn test_arch_wiki_search_engine() {
+        let mut wiki = ArchWikiSearchEngine::new();
+        wiki.index_page("Systemd", "Systemd service manager guide.");
+        wiki.index_page("Pacman", "Pacman package manager syntax.");
+        let results = wiki.search_topics("Pacman");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].title, "Pacman");
     }
 
     #[test]

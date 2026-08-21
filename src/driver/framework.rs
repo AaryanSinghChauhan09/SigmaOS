@@ -366,6 +366,30 @@ impl IoManager {
     }
 }
 
+/// Fast procedural driver dispatch table for zero-overhead runtime kernel execution
+#[derive(Debug, Clone, Copy)]
+pub struct ProceduralDriverDispatchTable {
+    pub p_init: fn(driver_id: usize) -> i32,
+    pub p_open: fn(device_id: usize) -> i32,
+    pub p_close: fn(device_id: usize) -> i32,
+    pub p_read: fn(device_id: usize, buf: *mut u8, len: usize) -> isize,
+    pub p_write: fn(device_id: usize, buf: *const u8, len: usize) -> isize,
+    pub p_ioctl: fn(device_id: usize, cmd: u32, arg: u64) -> i32,
+}
+
+impl ProceduralDriverDispatchTable {
+    pub const fn empty() -> Self {
+        Self {
+            p_init: |_| 0,
+            p_open: |_| 0,
+            p_close: |_| 0,
+            p_read: |_, _, _| 0,
+            p_write: |_, _, _| 0,
+            p_ioctl: |_, _, _| 0,
+        }
+    }
+}
+
 /// Standard Linux Driver Operations (file_operations parity)
 #[derive(Debug, Clone, Copy)]
 pub struct LinuxFileOperations {
@@ -891,5 +915,16 @@ mod tests {
 
         assert!(shim.unload().is_ok());
         unsafe { assert_eq!(RELEASE_CALLED, 1); }
+    }
+
+    #[test]
+    fn test_procedural_driver_dispatch_table() {
+        let table = ProceduralDriverDispatchTable::empty();
+        assert_eq!((table.p_init)(10), 0);
+        assert_eq!((table.p_open)(10), 0);
+        assert_eq!((table.p_close)(10), 0);
+        assert_eq!((table.p_read)(10, core::ptr::null_mut(), 0), 0);
+        assert_eq!((table.p_write)(10, core::ptr::null(), 0), 0);
+        assert_eq!((table.p_ioctl)(10, 0x1234, 0), 0);
     }
 }
