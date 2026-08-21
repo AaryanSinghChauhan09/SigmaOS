@@ -7,13 +7,7 @@
 #![allow(unused_imports)]
 #![allow(clippy::new_without_default)]
 
-extern crate alloc;
 use crate::klib::Vec;
-use alloc::string::String;
-use crate::klib::{Vec, String};
-#[cfg(not(test))]
-#[cfg(test)]
-use std::vec::Vec;
 use std::string::String;
 
 // ─── 1. ARCH LINUX: Pacman-style rolling dependency resolver ──────────────────
@@ -328,22 +322,11 @@ pub struct RunitService {
 
 impl RunitService {
     pub fn new(name: String) -> Self {
-        Self {
-            name,
-            status: ServiceStatus::Down,
-            restart_count: 0,
-            max_restarts: 5,
-            log_enabled: true,
-        }
         Self { name, status: ServiceStatus::Down, restart_count: 0, max_restarts: 5, log_enabled: true }
     }
 
     pub fn start(&mut self, pid: u32) {
         self.status = ServiceStatus::Starting;
-        self.status = ServiceStatus::Up {
-            pid,
-            uptime_secs: 0,
-        };
         self.status = ServiceStatus::Up { pid, uptime_secs: 0 };
     }
 
@@ -408,26 +391,14 @@ impl YastConfigStore {
     pub fn new() -> Self { Self { entries: Vec::new() } }
 
     pub fn set(&mut self, key: &str, val: ConfigValue) {
-        for i in 0..self.entries.len() {
-            let entry = &mut self.entries[i];
-            if entry.0.as_str() == key {
-                entry.1 = val;
-                return;
-            }
+        for (k, v) in self.entries.iter_mut() {
+            if k.as_str() == key { *v = val; return; }
         }
-        let mut k = String::new();
-        for &b in key.as_bytes() { k.push(b); }
-        self.entries.push((k, val));
+        self.entries.push((String::from(key), val));
     }
 
     pub fn get(&self, key: &str) -> Option<&ConfigValue> {
-        for i in 0..self.entries.len() {
-            let entry = &self.entries[i];
-            if entry.0.as_str() == key {
-                return Some(&entry.1);
-            }
-        }
-        None
+        self.entries.iter().find(|(k, _)| k.as_str() == key).map(|(_, v)| v)
     }
 
     pub fn get_bool(&self, key: &str) -> Option<bool> {
@@ -440,21 +411,18 @@ impl YastConfigStore {
 
     pub fn serialize(&self) -> String {
         let mut out = String::new();
-        for i in 0..self.entries.len() {
-            let entry = &self.entries[i];
-            let k = &entry.0;
-            let v = &entry.1;
+        for (k, v) in &self.entries {
             out.push_str(k.as_str());
             out.push_str(" = ");
             match v {
-                ConfigValue::Bool(b) => out.push_str(if b { "true" } else { "false" }),
-                ConfigValue::Int(i) => { let s = format_int(i); out.push_str(&s); }
+                ConfigValue::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
+                ConfigValue::Int(i) => { let s = format_int(*i); out.push_str(&s); }
                 ConfigValue::Text(t) => { out.push('"'); out.push_str(t.as_str()); out.push('"'); }
                 ConfigValue::List(l) => {
                     out.push('[');
-                    for j in 0..l.len() {
-                        if j > 0 { out.push_str(", "); }
-                        out.push_str(l[j].as_str());
+                    for (i, item) in l.iter().enumerate() {
+                        if i > 0 { out.push_str(", "); }
+                        out.push_str(item.as_str());
                     }
                     out.push(']');
                 }
@@ -575,9 +543,9 @@ mod tests {
     fn test_dep_resolver() {
         let mut r = NativeDependencyResolver::new();
         r.add_package(String::from("libssl"), Vec::new());
-        let mut curl_deps = Vec::new();
-        curl_deps.push(String::from("libssl"));
-        r.add_package(String::from("curl"), curl_deps);
+        let mut deps = Vec::new();
+        deps.push(String::from("libssl"));
+        r.add_package(String::from("curl"), deps);
         let order = r.resolve_order().unwrap();
         assert_eq!(order[0].as_str(), "libssl");
         assert_eq!(order[1].as_str(), "curl");

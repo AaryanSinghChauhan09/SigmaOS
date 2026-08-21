@@ -454,6 +454,32 @@ impl NetfilterFirewall {
     }
 }
 
+pub struct NetfilterFirewall {
+    pub inner: SimpleFirewall,
+}
+
+impl NetfilterFirewall {
+    pub fn new() -> Self {
+        NetfilterFirewall {
+            inner: SimpleFirewall::new(),
+        }
+    }
+}
+
+impl Firewall for NetfilterFirewall {
+    fn allow_port(&mut self, port: Port) {
+        self.inner.allow_port(port);
+    }
+
+    fn block_port(&mut self, port: Port) {
+        self.inner.block_port(port);
+    }
+
+    fn is_allowed(&self, port: Port) -> bool {
+        self.inner.is_allowed(port)
+    }
+}
+
 pub trait ZeroCopy {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError>;
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError>;
