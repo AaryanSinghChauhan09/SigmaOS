@@ -2365,456 +2365,399 @@ impl Default for SovereignPrivSepSandbox {
 }
 
 // ==========================================
-// 24. AUXILIARY CARRY FLAG & BCD ARITHMETIC EMULATION (SovereignAuxiliaryCarryEngine)
+// 24. SERPENT OS / SOLUS MOSS PACKAGE ENGINE (SerpentMossEngine)
 // ==========================================
 
-/// x86 / 8086 Auxiliary Carry Flag (AF, bit 4 of RFLAGS) and Binary Coded Decimal (BCD) engine
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SovereignAuxiliaryCarryEngine {
-    pub rflags_af: bool,
-}
-
-impl SovereignAuxiliaryCarryEngine {
-    pub fn new() -> Self {
-        Self { rflags_af: false }
-    }
-
-    /// Evaluates Auxiliary Carry Flag (AF) for 8-bit addition (half-carry from bit 3 to bit 4)
-    pub fn evaluate_add_af(&mut self, op1: u8, op2: u8) -> u8 {
-        let result = op1.wrapping_add(op2);
-        self.rflags_af = ((op1 & 0x0F) + (op2 & 0x0F)) > 0x0F;
-        result
-    }
-
-    /// Evaluates Auxiliary Carry Flag (AF) for 8-bit subtraction (half-borrow from bit 4)
-    pub fn evaluate_sub_af(&mut self, op1: u8, op2: u8) -> u8 {
-        let result = op1.wrapping_sub(op2);
-        self.rflags_af = (op1 & 0x0F) < (op2 & 0x0F);
-        result
-    }
-
-    /// Emulates x86 Decimal Adjust AL after Addition (DAA)
-    pub fn daa_adjust(&mut self, mut al: u8, cf: &mut bool) -> u8 {
-        let old_al = al;
-        let old_af = self.rflags_af;
-
-        if (al & 0x0F) > 9 || old_af {
-            al = al.wrapping_add(6);
-            self.rflags_af = true;
-        } else {
-            self.rflags_af = false;
-        }
-
-        if old_al > 0x99 || *cf {
-            al = al.wrapping_add(0x60);
-            *cf = true;
-        } else {
-            *cf = false;
-        }
-
-        al
-    }
-
-    /// Emulates x86 Decimal Adjust AL after Subtraction (DAS)
-    pub fn das_adjust(&mut self, mut al: u8, cf: &mut bool) -> u8 {
-        let old_al = al;
-        let old_af = self.rflags_af;
-
-        if (al & 0x0F) > 9 || old_af {
-            al = al.wrapping_sub(6);
-            self.rflags_af = true;
-        } else {
-            self.rflags_af = false;
-        }
-
-        if old_al > 0x99 || *cf {
-            al = al.wrapping_sub(0x60);
-            *cf = true;
-        }
-
-        al
-    }
-}
-
-impl Default for SovereignAuxiliaryCarryEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 25. SYSTEM INFORMATION & AVAILABILITY STATE ENGINE (SovereignSystemAwarenessEngine)
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AwarenessDegree {
-    Minimal,    // Basic CPU/Memory status
-    Standard,   // Process/I/O state tracking
-    Omniscient, // Full real-time kernel & hardware MIB telemetry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MossTransactionState {
+    Pending,
+    Active,
+    Committed,
+    RolledBack,
 }
 
 #[derive(Debug, Clone)]
-pub struct SystemTelemetryState {
-    pub active_cpus: usize,
-    pub total_memory_bytes: u64,
-    pub free_memory_bytes: u64,
-    pub thermal_temp_celsius: u32,
-    pub active_processes: usize,
-    pub uptime_seconds: u64,
-}
-
-pub struct SovereignSystemAwarenessEngine {
-    pub degree: AwarenessDegree,
-    pub state: SystemTelemetryState,
-}
-
-impl SovereignSystemAwarenessEngine {
-    pub fn new(degree: AwarenessDegree) -> Self {
-        Self {
-            degree,
-            state: SystemTelemetryState {
-                active_cpus: 1,
-                total_memory_bytes: 1024 * 1024 * 1024,
-                free_memory_bytes: 512 * 1024 * 1024,
-                thermal_temp_celsius: 45,
-                active_processes: 10,
-                uptime_seconds: 100,
-            },
-        }
-    }
-
-    pub fn update_telemetry(&mut self, free_mem: u64, temp: u32, procs: usize, uptime: u64) {
-        self.state.free_memory_bytes = free_mem;
-        self.state.thermal_temp_celsius = temp;
-        self.state.active_processes = procs;
-        self.state.uptime_seconds = uptime;
-    }
-
-    /// Computes system availability score (0 to 100 percentage)
-    pub fn compute_availability_score(&self) -> u32 {
-        let mem_avail_ratio = (self.state.free_memory_bytes as f64 / self.state.total_memory_bytes as f64) * 100.0;
-        let thermal_score = if self.state.thermal_temp_celsius > 90 {
-            10
-        } else if self.state.thermal_temp_celsius > 75 {
-            50
-        } else {
-            100
-        };
-
-        ((mem_avail_ratio as u32) + thermal_score) / 2
-    }
-}
-
-// ==========================================
-// 26. OS DEADLOCK & STARVATION AVOIDANCE ENGINE (SovereignDeadlockStarvationAvoidanceEngine)
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct ProcessResourceRequest {
-    pub pid: u64,
-    pub allocated: Vec<usize>,
-    pub max_claim: Vec<usize>,
-}
-
-pub struct SovereignDeadlockStarvationAvoidanceEngine {
-    pub available_resources: Vec<usize>,
-    pub requests: Vec<ProcessResourceRequest>,
-}
-
-impl SovereignDeadlockStarvationAvoidanceEngine {
-    pub fn new(available_resources: Vec<usize>) -> Self {
-        Self {
-            available_resources,
-            requests: Vec::new(),
-        }
-    }
-
-    pub fn register_process(&mut self, pid: u64, max_claim: Vec<usize>) {
-        let alloc_zeros = vec![0; max_claim.len()];
-        self.requests.push(ProcessResourceRequest {
-            pid,
-            allocated: alloc_zeros,
-            max_claim,
-        });
-    }
-
-    /// Banker's Algorithm for Deadlock Avoidance: determines if allocation leaves system in a Safe State
-    pub fn is_safe_state_request(&self, pid: u64, request: &[usize]) -> bool {
-        let mut work = self.available_resources.clone();
-        let num_resources = work.len();
-
-        for (i, &req) in request.iter().enumerate() {
-            if i >= num_resources || req > work[i] {
-                return false;
-            }
-        }
-
-        let mut temp_requests = self.requests.clone();
-        if let Some(proc_req) = temp_requests.iter_mut().find(|p| p.pid == pid) {
-            for i in 0..num_resources {
-                let need = proc_req.max_claim[i].saturating_sub(proc_req.allocated[i]);
-                if request[i] > need {
-                    return false;
-                }
-                proc_req.allocated[i] += request[i];
-                work[i] -= request[i];
-            }
-        } else {
-            return false;
-        }
-
-        let mut finish = vec![false; temp_requests.len()];
-        let mut progress = true;
-
-        while progress {
-            progress = false;
-            for (idx, proc_req) in temp_requests.iter().enumerate() {
-                if !finish[idx] {
-                    let mut can_finish = true;
-                    for r in 0..num_resources {
-                        let need = proc_req.max_claim[r].saturating_sub(proc_req.allocated[r]);
-                        if need > work[r] {
-                            can_finish = false;
-                            break;
-                        }
-                    }
-
-                    if can_finish {
-                        for r in 0..num_resources {
-                            work[r] += proc_req.allocated[r];
-                        }
-                        finish[idx] = true;
-                        progress = true;
-                    }
-                }
-            }
-        }
-
-        finish.iter().all(|&f| f)
-    }
-
-    /// FreeBSD-style Priority Aging Starvation Avoidance: increases priority for waiting threads
-    pub fn calculate_starvation_aging_boost(&self, wait_ticks: u64, current_priority: u32) -> u32 {
-        let boost = (wait_ticks / 10) as u32;
-        current_priority.saturating_add(boost)
-    }
-}
-
-// ==========================================
-// 27. BACKBONE NETWORK ENGINE (SovereignBackboneNetworkEngine)
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RouteProtocol {
-    Static,
-    Bgp,
-    Ospf,
-}
-
-#[derive(Debug, Clone)]
-pub struct BackboneRoute {
-    pub prefix: [u8; 4],
-    pub prefix_len: u8,
-    pub next_hop: [u8; 4],
-    pub metric: u32,
-    pub protocol: RouteProtocol,
-    pub active: bool,
-}
-
-pub struct SovereignBackboneNetworkEngine {
-    pub routes: Vec<BackboneRoute>,
-    pub link_failover_active: bool,
-}
-
-impl SovereignBackboneNetworkEngine {
-    pub fn new() -> Self {
-        Self {
-            routes: Vec::new(),
-            link_failover_active: false,
-        }
-    }
-
-    pub fn add_route(&mut self, prefix: [u8; 4], prefix_len: u8, next_hop: [u8; 4], metric: u32, protocol: RouteProtocol) {
-        self.routes.push(BackboneRoute {
-            prefix,
-            prefix_len,
-            next_hop,
-            metric,
-            protocol,
-            active: true,
-        });
-    }
-
-    /// Simulates link failure and triggers automated dynamic path failover to backup routes
-    pub fn trigger_link_failover(&mut self, failed_next_hop: [u8; 4]) {
-        self.link_failover_active = true;
-        for route in self.routes.iter_mut() {
-            if route.next_hop == failed_next_hop {
-                route.active = false;
-            }
-        }
-    }
-
-    /// Backbone longest-prefix-match route lookup
-    pub fn lookup_backbone_route(&self, dest_ip: [u8; 4]) -> Option<&BackboneRoute> {
-        let mut best_route: Option<&BackboneRoute> = None;
-
-        for route in self.routes.iter().filter(|r| r.active) {
-            let mask = if route.prefix_len == 0 {
-                0u32
-            } else {
-                !((1u64 << (32 - route.prefix_len)) - 1) as u32
-            };
-            let dest_u32 = u32::from_be_bytes(dest_ip);
-            let prefix_u32 = u32::from_be_bytes(route.prefix);
-
-            if (dest_u32 & mask) == (prefix_u32 & mask) {
-                if best_route.is_none() || route.prefix_len > best_route.unwrap().prefix_len {
-                    best_route = Some(route);
-                }
-            }
-        }
-
-        best_route
-    }
-}
-
-impl Default for SovereignBackboneNetworkEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 28. BACKGROUND WORK & BACKUP ENGINE (SovereignBackgroundBackupEngine)
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct BackgroundWorkItem {
-    pub id: u64,
-    pub description: String,
-    pub completed: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct SystemBackupSnapshot {
-    pub snapshot_id: u64,
+pub struct MossPackageSpec {
     pub name: String,
-    pub timestamp: u64,
-    pub state_checksum: u64,
+    pub version: String,
+    pub release: u32,
+    pub payload_hash: String,
+    pub dependencies: Vec<String>,
+    pub system_triggers: Vec<String>,
 }
 
-pub struct SovereignBackgroundBackupEngine {
-    pub work_queue: Vec<BackgroundWorkItem>,
-    pub snapshots: Vec<SystemBackupSnapshot>,
-    pub next_work_id: u64,
+#[derive(Debug, Clone)]
+pub struct MossTransaction {
+    pub id: u64,
+    pub install_queue: Vec<MossPackageSpec>,
+    pub remove_queue: Vec<String>,
+    pub state: MossTransactionState,
 }
 
-impl SovereignBackgroundBackupEngine {
+pub struct SerpentMossEngine {
+    pub installed_packages: Vec<MossPackageSpec>,
+    pub active_transactions: Vec<MossTransaction>,
+    pub executed_triggers: Vec<String>,
+    pub next_tx_id: u64,
+}
+
+impl SerpentMossEngine {
     pub fn new() -> Self {
         Self {
-            work_queue: Vec::new(),
-            snapshots: Vec::new(),
-            next_work_id: 1,
+            installed_packages: Vec::new(),
+            active_transactions: Vec::new(),
+            executed_triggers: Vec::new(),
+            next_tx_id: 1,
         }
     }
 
-    pub fn enqueue_background_work(&mut self, description: &str) -> u64 {
-        let id = self.next_work_id;
-        self.next_work_id += 1;
-        self.work_queue.push(BackgroundWorkItem {
+    pub fn create_transaction(&mut self) -> u64 {
+        let id = self.next_tx_id;
+        self.next_tx_id += 1;
+        self.active_transactions.push(MossTransaction {
             id,
-            description: description.to_string(),
-            completed: false,
+            install_queue: Vec::new(),
+            remove_queue: Vec::new(),
+            state: MossTransactionState::Pending,
         });
         id
     }
 
-    pub fn process_background_work(&mut self) -> usize {
-        let mut processed = 0;
-        for item in self.work_queue.iter_mut().filter(|i| !i.completed) {
-            item.completed = true;
-            processed += 1;
+    pub fn stage_install(&mut self, tx_id: u64, pkg: MossPackageSpec) -> Result<(), &'static str> {
+        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+            .ok_or("Transaction not found")?;
+        if tx.state != MossTransactionState::Pending {
+            return Err("Transaction is not in Pending state");
         }
-        processed
+        tx.install_queue.push(pkg);
+        Ok(())
     }
 
-    pub fn create_backup_snapshot(&mut self, snapshot_id: u64, name: &str, state_bytes: &[u8]) {
-        let mut checksum: u64 = 0;
-        for &b in state_bytes {
-            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
+    pub fn stage_remove(&mut self, tx_id: u64, pkg_name: &str) -> Result<(), &'static str> {
+        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+            .ok_or("Transaction not found")?;
+        if tx.state != MossTransactionState::Pending {
+            return Err("Transaction is not in Pending state");
         }
-
-        self.snapshots.push(SystemBackupSnapshot {
-            snapshot_id,
-            name: name.to_string(),
-            timestamp: self.snapshots.len() as u64 + 1,
-            state_checksum: checksum,
-        });
+        tx.remove_queue.push(pkg_name.to_string());
+        Ok(())
     }
 
-    pub fn verify_backup_integrity(&self, snapshot_id: u64, state_bytes: &[u8]) -> bool {
-        if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
-            let mut checksum: u64 = 0;
-            for &b in state_bytes {
-                checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
+    pub fn commit_transaction(&mut self, tx_id: u64) -> Result<(), &'static str> {
+        let tx_idx = self.active_transactions.iter().position(|t| t.id == tx_id)
+            .ok_or("Transaction not found")?;
+
+        self.active_transactions[tx_idx].state = MossTransactionState::Active;
+
+        // Execute removals
+        let remove_queue = self.active_transactions[tx_idx].remove_queue.clone();
+        self.installed_packages.retain(|p| !remove_queue.contains(&p.name));
+
+        // Execute installations & trigger registration
+        let install_queue = self.active_transactions[tx_idx].install_queue.clone();
+        for pkg in install_queue {
+            for trigger in &pkg.system_triggers {
+                if !self.executed_triggers.contains(trigger) {
+                    self.executed_triggers.push(trigger.clone());
+                }
             }
-            checksum == snap.state_checksum
-        } else {
-            false
+            self.installed_packages.push(pkg);
         }
+
+        self.active_transactions[tx_idx].state = MossTransactionState::Committed;
+        Ok(())
+    }
+
+    pub fn rollback_transaction(&mut self, tx_id: u64) -> Result<(), &'static str> {
+        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+            .ok_or("Transaction not found")?;
+
+        if tx.state != MossTransactionState::Committed && tx.state != MossTransactionState::Active {
+            return Err("Cannot rollback transaction that is not active or committed");
+        }
+
+        // Revert installations
+        let installed_names: Vec<String> = tx.install_queue.iter().map(|p| p.name.clone()).collect();
+        self.installed_packages.retain(|p| !installed_names.contains(&p.name));
+
+        tx.state = MossTransactionState::RolledBack;
+        Ok(())
     }
 }
 
-impl Default for SovereignBackgroundBackupEngine {
+impl Default for SerpentMossEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ==========================================
-// 29. RESOURCE BALANCING & VIRTIO BALLOONING ENGINE (SovereignMemoryBallooningBalancer)
+// 25. CACHYOS / LINUX BORE SCHEDULER HYPER-OPTIMIZER (CachyBoreScheduler)
 // ==========================================
 
-pub struct SovereignMemoryBallooningBalancer {
-    pub host_free_memory_mb: usize,
-    pub guest_balloon_target_mb: usize,
-    pub actual_ballooned_mb: usize,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CoreTypePreference {
+    PerformancePCore,
+    EfficiencyECore,
+    AnyCore,
 }
 
-impl SovereignMemoryBallooningBalancer {
-    pub fn new(host_free_mem_mb: usize) -> Self {
+#[derive(Debug, Clone)]
+pub struct BoreTaskProfile {
+    pub task_id: u64,
+    pub name: String,
+    pub priority: u8, // 0..255 (lower = higher urgency)
+    pub interactive_score: u8, // 0..100 (higher = user-facing latency sensitive)
+    pub burst_time_ns: u64,
+    pub preferred_core: CoreTypePreference,
+    pub ipc_intensity: u8,
+}
+
+pub struct CachyBoreScheduler {
+    pub task_queue: Vec<BoreTaskProfile>,
+    pub system_latency_target_ns: u64,
+}
+
+impl CachyBoreScheduler {
+    pub fn new(latency_target_ns: u64) -> Self {
         Self {
-            host_free_memory_mb: host_free_mem_mb,
-            guest_balloon_target_mb: 0,
-            actual_ballooned_mb: 0,
+            task_queue: Vec::new(),
+            system_latency_target_ns: latency_target_ns,
         }
     }
 
-    /// Inflates VirtIO memory balloon (reclaims memory from guest VM back to host)
-    pub fn inflate_balloon(&mut self, target_mb: usize) -> usize {
-        self.guest_balloon_target_mb = target_mb;
-        self.actual_ballooned_mb = target_mb;
-        self.host_free_memory_mb += target_mb;
-        self.actual_ballooned_mb
+    pub fn register_task(&mut self, profile: BoreTaskProfile) {
+        self.task_queue.push(profile);
     }
 
-    /// Deflates VirtIO memory balloon (returns memory to guest VM)
-    pub fn deflate_balloon(&mut self, release_mb: usize) -> usize {
-        let actual_release = release_mb.min(self.actual_ballooned_mb);
-        self.actual_ballooned_mb -= actual_release;
-        self.host_free_memory_mb = self.host_free_memory_mb.saturating_sub(actual_release);
-        self.actual_ballooned_mb
-    }
-
-    /// Dynamically balances resource load across NUMA nodes
-    pub fn balance_numa_load(&self, numa_loads: &[usize]) -> Vec<usize> {
-        let total: usize = numa_loads.iter().sum();
-        if numa_loads.is_empty() {
-            return Vec::new();
+    /// Calculates dynamic quantum time slice for BORE scheduling algorithm
+    pub fn calculate_timeslice_ns(&self, task_id: u64) -> u64 {
+        if let Some(task) = self.task_queue.iter().find(|t| t.task_id == task_id) {
+            // Interactive high-priority tasks receive shorter, fast-turnaround slices
+            let base_slice = self.system_latency_target_ns / (self.task_queue.len().max(1) as u64);
+            let score_bonus = (100 - task.interactive_score as u64) * 10;
+            base_slice + score_bonus
+        } else {
+            self.system_latency_target_ns
         }
-        let avg = total / numa_loads.len();
-        vec![avg; numa_loads.len()]
+    }
+
+    /// Picks the next optimal task considering core type affinity and latency score
+    pub fn schedule_next_task(&mut self, available_core_type: CoreTypePreference) -> Option<BoreTaskProfile> {
+        if self.task_queue.is_empty() {
+            return None;
+        }
+
+        // Sort by interactive_score desc, priority asc
+        let mut best_idx = 0;
+        let mut best_score = -1000i32;
+
+        for (idx, task) in self.task_queue.iter().enumerate() {
+            let mut score = task.interactive_score as i32 * 2 - task.priority as i32;
+            if task.preferred_core == available_core_type || available_core_type == CoreTypePreference::AnyCore {
+                score += 50;
+            }
+            if score > best_score {
+                best_score = score;
+                best_idx = idx;
+            }
+        }
+
+        Some(self.task_queue.remove(best_idx))
+    }
+
+    pub fn update_burst_score(&mut self, task_id: u64, new_burst_ns: u64) {
+        if let Some(task) = self.task_queue.iter_mut().find(|t| t.task_id == task_id) {
+            task.burst_time_ns = new_burst_ns;
+            // Adjust interactive score based on burst pattern
+            if new_burst_ns < 1_000_000 {
+                task.interactive_score = (task.interactive_score + 10).min(100);
+            } else if new_burst_ns > 10_000_000 {
+                task.interactive_score = task.interactive_score.saturating_sub(10);
+            }
+        }
+    }
+}
+
+// ==========================================
+// 26. FREEBSD RACCT/RCTL & VNET RESOURCE GUARD (FreeBsdRacctVnetGuard)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct RacctResourceLimits {
+    pub max_cpu_time_pct: u32,
+    pub max_rss_bytes: u64,
+    pub max_pids: u32,
+    pub bandwidth_limit_bps: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct VnetStack {
+    pub vnet_id: u32,
+    pub virtual_interfaces: Vec<String>,
+    pub default_gateway: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct JailGuardRecord {
+    pub jail_id: u64,
+    pub limits: RacctResourceLimits,
+    pub current_rss_bytes: u64,
+    pub current_pids: u32,
+    pub vnet: Option<VnetStack>,
+    pub throttled: bool,
+}
+
+pub struct FreeBsdRacctVnetGuard {
+    pub guards: Vec<JailGuardRecord>,
+    pub violations_log: Vec<String>,
+}
+
+impl FreeBsdRacctVnetGuard {
+    pub fn new() -> Self {
+        Self {
+            guards: Vec::new(),
+            violations_log: Vec::new(),
+        }
+    }
+
+    pub fn register_jail_guard(&mut self, jail_id: u64, limits: RacctResourceLimits, vnet: Option<VnetStack>) {
+        self.guards.push(JailGuardRecord {
+            jail_id,
+            limits,
+            current_rss_bytes: 0,
+            current_pids: 0,
+            vnet,
+            throttled: false,
+        });
+    }
+
+    pub fn update_usage(&mut self, jail_id: u64, rss_bytes: u64, pids: u32) -> Result<bool, &'static str> {
+        let guard = self.guards.iter_mut().find(|g| g.jail_id == jail_id)
+            .ok_or("Jail guard record not found")?;
+
+        guard.current_rss_bytes = rss_bytes;
+        guard.current_pids = pids;
+
+        if rss_bytes > guard.limits.max_rss_bytes || pids > guard.limits.max_pids {
+            guard.throttled = true;
+            self.violations_log.push(format!("RACCT/RCTL Violation: Jail {} exceeded resource limits (RSS: {}/{}, PIDs: {}/{})",
+                jail_id, rss_bytes, guard.limits.max_rss_bytes, pids, guard.limits.max_pids));
+            Ok(false) // Resource limit violated
+        } else {
+            guard.throttled = false;
+            Ok(true) // Within limits
+        }
+    }
+}
+
+impl Default for FreeBsdRacctVnetGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 27. OPENBSD DYNAMIC PLEDGE & UNVEIL AUDIT SENTINEL (OpenBsdPledgeUnveilSentinel)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AuditViolationType {
+    PledgeViolation,
+    UnveilViolation,
+}
+
+#[derive(Debug, Clone)]
+pub struct AuditViolationEvent {
+    pub pid: u64,
+    pub timestamp_ns: u64,
+    pub target: String,
+    pub violation_type: AuditViolationType,
+    pub terminated: bool,
+}
+
+pub struct OpenBsdPledgeUnveilSentinel {
+    pub pledged_processes: Vec<(u64, OpenBSDPledge)>,
+    pub unveiled_processes: Vec<(u64, OpenBSDUnveil)>,
+    pub audit_log: Vec<AuditViolationEvent>,
+}
+
+impl OpenBsdPledgeUnveilSentinel {
+    pub fn new() -> Self {
+        Self {
+            pledged_processes: Vec::new(),
+            unveiled_processes: Vec::new(),
+            audit_log: Vec::new(),
+        }
+    }
+
+    pub fn pledge_process(&mut self, pid: u64, operations: &[&str]) -> Result<(), &'static str> {
+        if let Some((_, pledge)) = self.pledged_processes.iter_mut().find(|(p, _)| *p == pid) {
+            pledge.pledge(operations)
+        } else {
+            let mut pledge = OpenBSDPledge::new();
+            pledge.pledge(operations)?;
+            self.pledged_processes.push((pid, pledge));
+            Ok(())
+        }
+    }
+
+    pub fn unveil_process(&mut self, pid: u64, path: &str, perms: &str) -> Result<(), &'static str> {
+        if let Some((_, unveil)) = self.unveiled_processes.iter_mut().find(|(p, _)| *p == pid) {
+            unveil.unveil(path, perms)
+        } else {
+            let mut unveil = OpenBSDUnveil::new();
+            unveil.unveil(path, perms)?;
+            self.unveiled_processes.push((pid, unveil));
+            Ok(())
+        }
+    }
+
+    pub fn audit_syscall(&mut self, pid: u64, timestamp_ns: u64, operation: &str, target_path: Option<&str>) -> bool {
+        // Check pledge
+        if let Some((_, pledge)) = self.pledged_processes.iter().find(|(p, _)| *p == pid) {
+            if !pledge.check_operation(operation) {
+                self.audit_log.push(AuditViolationEvent {
+                    pid,
+                    timestamp_ns,
+                    target: operation.to_string(),
+                    violation_type: AuditViolationType::PledgeViolation,
+                    terminated: true,
+                });
+                return false;
+            }
+        }
+
+        // Check unveil
+        if let Some(path) = target_path {
+            if let Some((_, unveil)) = self.unveiled_processes.iter().find(|(p, _)| *p == pid) {
+                let req_perm = match operation {
+                    "rpath" | "read" => 'r',
+                    "wpath" | "write" => 'w',
+                    "exec" => 'x',
+                    "cpath" | "create" => 'c',
+                    _ => 'r',
+                };
+                if !unveil.check_permission(path, req_perm) {
+                    self.audit_log.push(AuditViolationEvent {
+                        pid,
+                        timestamp_ns,
+                        target: path.to_string(),
+                        violation_type: AuditViolationType::UnveilViolation,
+                        terminated: true,
+                    });
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+}
+
+impl Default for OpenBsdPledgeUnveilSentinel {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -3562,93 +3505,110 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_auxiliary_carry_engine() {
-        let mut af_engine = SovereignAuxiliaryCarryEngine::new();
+    fn test_serpent_moss_engine() {
+        let mut moss = SerpentMossEngine::new();
+        let tx = moss.create_transaction();
 
-        // 5 + 12 = 17 (0x05 + 0x0C = 0x11). 5 + 12 = 17 > 15, half carry from bit 3
-        let res_add = af_engine.evaluate_add_af(0x05, 0x0C);
-        assert_eq!(res_add, 0x11);
-        assert!(af_engine.rflags_af);
+        let pkg = MossPackageSpec {
+            name: "glibc".to_string(),
+            version: "2.38".to_string(),
+            release: 1,
+            payload_hash: "blake3-hash-123".to_string(),
+            dependencies: vec![],
+            system_triggers: vec!["ldconfig".to_string()],
+        };
 
-        // Subtraction borrow test: 0x10 - 0x01 -> 0x00 - 0x01 in lower nibbles -> half borrow
-        let res_sub = af_engine.evaluate_sub_af(0x10, 0x01);
-        assert_eq!(res_sub, 0x0F);
-        assert!(af_engine.rflags_af);
+        assert!(moss.stage_install(tx, pkg).is_ok());
+        assert!(moss.commit_transaction(tx).is_ok());
 
-        // DAA test
-        let mut cf = false;
-        let daa_res = af_engine.daa_adjust(0x0A, &mut cf); // 10 decimal -> adjusts lower nibble by +6 to get 0x10
-        assert_eq!(daa_res, 0x10);
+        assert_eq!(moss.installed_packages.len(), 1);
+        assert_eq!(moss.executed_triggers, vec!["ldconfig".to_string()]);
+
+        // Test rollback
+        assert!(moss.rollback_transaction(tx).is_ok());
+        assert_eq!(moss.installed_packages.len(), 0);
     }
 
     #[test]
-    fn test_sovereign_system_awareness_engine() {
-        let mut awareness = SovereignSystemAwarenessEngine::new(AwarenessDegree::Omniscient);
-        let score = awareness.compute_availability_score();
-        assert!(score > 0 && score <= 100);
+    fn test_cachy_bore_scheduler() {
+        let mut sched = CachyBoreScheduler::new(10_000_000); // 10ms target
 
-        awareness.update_telemetry(100 * 1024 * 1024, 80, 25, 500);
-        let updated_score = awareness.compute_availability_score();
-        assert!(updated_score < score); // Higher thermal temp and lower free mem drops availability score
+        sched.register_task(BoreTaskProfile {
+            task_id: 1,
+            name: "game_engine".to_string(),
+            priority: 10,
+            interactive_score: 90,
+            burst_time_ns: 500_000,
+            preferred_core: CoreTypePreference::PerformancePCore,
+            ipc_intensity: 80,
+        });
+
+        sched.register_task(BoreTaskProfile {
+            task_id: 2,
+            name: "background_indexing".to_string(),
+            priority: 100,
+            interactive_score: 10,
+            burst_time_ns: 20_000_000,
+            preferred_core: CoreTypePreference::EfficiencyECore,
+            ipc_intensity: 20,
+        });
+
+        // Time slice check
+        let slice1 = sched.calculate_timeslice_ns(1);
+        let slice2 = sched.calculate_timeslice_ns(2);
+        assert!(slice1 < slice2); // Interactive gets shorter, faster slices
+
+        // Next task scheduling
+        let next_task = sched.schedule_next_task(CoreTypePreference::PerformancePCore).unwrap();
+        assert_eq!(next_task.task_id, 1);
     }
 
     #[test]
-    fn test_sovereign_deadlock_starvation_avoidance() {
-        let mut avoidance = SovereignDeadlockStarvationAvoidanceEngine::new(vec![10, 5, 7]);
-        avoidance.register_process(1, vec![7, 5, 3]);
+    fn test_freebsd_racct_vnet_guard() {
+        let mut guard = FreeBsdRacctVnetGuard::new();
 
-        // Request within safe bounds
-        assert!(avoidance.is_safe_state_request(1, &[0, 2, 2]));
+        let limits = RacctResourceLimits {
+            max_cpu_time_pct: 80,
+            max_rss_bytes: 1024 * 1024 * 100, // 100MB
+            max_pids: 50,
+            bandwidth_limit_bps: 1_000_000,
+        };
 
-        // Request exceeding available resources
-        assert!(!avoidance.is_safe_state_request(1, &[11, 0, 0]));
+        let vnet = VnetStack {
+            vnet_id: 1,
+            virtual_interfaces: vec!["vnet0".to_string()],
+            default_gateway: "192.168.1.1".to_string(),
+        };
 
-        // FreeBSD starvation aging calculation
-        let boosted = avoidance.calculate_starvation_aging_boost(100, 10);
-        assert_eq!(boosted, 20); // 10 + (100 / 10) = 20
+        guard.register_jail_guard(1001, limits, Some(vnet));
+
+        // Normal usage passes
+        assert_eq!(guard.update_usage(1001, 1024 * 1024 * 50, 20), Ok(true));
+
+        // Exceeding memory fails guard and triggers violation logging
+        assert_eq!(guard.update_usage(1001, 1024 * 1024 * 200, 20), Ok(false));
+        assert_eq!(guard.violations_log.len(), 1);
+        assert!(guard.violations_log[0].contains("RACCT/RCTL Violation"));
     }
 
     #[test]
-    fn test_sovereign_backbone_network_engine() {
-        let mut backbone = SovereignBackboneNetworkEngine::new();
-        backbone.add_route([10, 0, 0, 0], 8, [192, 168, 1, 1], 10, RouteProtocol::Bgp);
-        backbone.add_route([10, 10, 0, 0], 16, [192, 168, 1, 2], 5, RouteProtocol::Ospf);
+    fn test_openbsd_pledge_unveil_sentinel() {
+        let mut sentinel = OpenBsdPledgeUnveilSentinel::new();
 
-        let match1 = backbone.lookup_backbone_route([10, 10, 5, 5]).unwrap();
-        assert_eq!(match1.prefix_len, 16); // Longest prefix match
+        assert!(sentinel.pledge_process(501, &["stdio", "rpath"]).is_ok());
+        assert!(sentinel.unveil_process(501, "/etc", "r").is_ok());
 
-        // Failover test
-        backbone.trigger_link_failover([192, 168, 1, 2]);
-        let match2 = backbone.lookup_backbone_route([10, 10, 5, 5]).unwrap();
-        assert_eq!(match2.prefix_len, 8); // Failover to 10.0.0.0/8 backup route
-    }
+        // Valid syscall passes
+        assert!(sentinel.audit_syscall(501, 1000, "rpath", Some("/etc/hosts")));
 
-    #[test]
-    fn test_sovereign_background_backup_engine() {
-        let mut engine = SovereignBackgroundBackupEngine::new();
-        let _w1 = engine.enqueue_background_work("Index database");
-        let _w2 = engine.enqueue_background_work("Reclaim cached pages");
+        // Invalid pledge operation fails and logs violation
+        assert!(!sentinel.audit_syscall(501, 1001, "wpath", Some("/etc/hosts")));
+        assert_eq!(sentinel.audit_log.len(), 1);
+        assert_eq!(sentinel.audit_log[0].violation_type, AuditViolationType::PledgeViolation);
 
-        assert_eq!(engine.process_background_work(), 2);
-
-        let state_data = b"CRITICAL_OS_STATE_METADATA";
-        engine.create_backup_snapshot(100, "snap_initial", state_data);
-        assert!(engine.verify_backup_integrity(100, state_data));
-        assert!(!engine.verify_backup_integrity(100, b"CORRUPTED_DATA"));
-    }
-
-    #[test]
-    fn test_sovereign_memory_ballooning_balancer() {
-        let mut balloon = SovereignMemoryBallooningBalancer::new(4096);
-        let ballooned = balloon.inflate_balloon(1024);
-        assert_eq!(ballooned, 1024);
-        assert_eq!(balloon.host_free_memory_mb, 5120);
-
-        let deflated = balloon.deflate_balloon(512);
-        assert_eq!(deflated, 512);
-        assert_eq!(balloon.host_free_memory_mb, 4608);
-
-        let numa_balanced = balloon.balance_numa_load(&[100, 300, 200]);
-        assert_eq!(numa_balanced, vec![200, 200, 200]);
+        // Invalid unveil path fails and logs violation
+        assert!(!sentinel.audit_syscall(501, 1002, "rpath", Some("/var/log/syslog")));
+        assert_eq!(sentinel.audit_log.len(), 2);
+        assert_eq!(sentinel.audit_log[1].violation_type, AuditViolationType::UnveilViolation);
     }
 }

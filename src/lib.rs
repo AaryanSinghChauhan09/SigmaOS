@@ -137,6 +137,13 @@ pub use distro::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
     MpiCommunicator,
+    BsdStatefulPacketFilter, PfStateEntry, PfRuleAction,
+    DragonFlyHammerFs, Hammer2Snapshot, PfsClusterNode,
+    VoidRunitManager, RunitService, RunitServiceState, SovereignAnonScrubber,
+    SerpentMossEngine, MossPackageSpec, MossTransaction, MossTransactionState,
+    CachyBoreScheduler, BoreTaskProfile, CoreTypePreference,
+    FreeBsdRacctVnetGuard, RacctResourceLimits, VnetStack, JailGuardRecord,
+    OpenBsdPledgeUnveilSentinel, AuditViolationEvent, AuditViolationType,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,

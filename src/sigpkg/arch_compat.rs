@@ -3,7 +3,7 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-use klib::collections::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
