@@ -67,7 +67,7 @@ pub unsafe extern "C" fn tar_create(
     file_count: SigmaU32,
     options: TarOptions,
 ) -> SigmaI32 {
-    if !TAR_INITIALIZED || archive_name.isnull() || files.isnull() {
+    if !TAR_INITIALIZED || archive_name.is_null() || files.is_null() {
         return -1;
     }
     
@@ -84,7 +84,7 @@ pub unsafe extern "C" fn tar_create(
         }
         
         let file = *files.add(i);
-        if file.isnull() {
+        if file.is_null() {
             continue;
         }
         
@@ -117,7 +117,7 @@ pub unsafe extern "C" fn tar_extract(
     archive_name: *const u8,
     options: TarOptions,
 ) -> SigmaI32 {
-    if !TAR_INITIALIZED || archive_name.isnull() {
+    if !TAR_INITIALIZED || archive_name.is_null() {
         return -1;
     }
     
@@ -136,7 +136,7 @@ pub unsafe extern "C" fn tar_list(
     entries: *mut TarEntry,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !TAR_INITIALIZED || archive_name.isnull() || entries.isnull() {
+    if !TAR_INITIALIZED || archive_name.is_null() || entries.is_null() {
         return 0;
     }
     
@@ -157,7 +157,7 @@ pub unsafe extern "C" fn tar_list(
 pub unsafe extern "C" fn tar_add_file(
     file_name: *const u8,
 ) -> SigmaI32 {
-    if !TAR_INITIALIZED || file_name.isnull() || TAR_ENTRY_COUNT >= MAX_TAR_ENTRIES as SigmaU32 {
+    if !TAR_INITIALIZED || file_name.is_null() || TAR_ENTRY_COUNT >= MAX_TAR_ENTRIES as SigmaU32 {
         return -1;
     }
     

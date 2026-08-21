@@ -93,7 +93,7 @@ pub unsafe extern "C" fn fdisk_init() -> SigmaI32 {
 /// List disks
 #[no_mangle]
 pub unsafe extern "C" fn fdisk_list_disks(disks: *mut DiskDevice, max_count: SigmaU32) -> SigmaU32 {
-    if !FDISK_INITIALIZED || disks.isnull() {
+    if !FDISK_INITIALIZED || disks.is_null() {
         return 0;
     }
     
@@ -116,7 +116,7 @@ pub unsafe extern "C" fn fdisk_list_partitions(
     partitions: *mut Partition,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !FDISK_INITIALIZED || disk_name.isnull() || partitions.isnull() {
+    if !FDISK_INITIALIZED || disk_name.is_null() || partitions.is_null() {
         return 0;
     }
     
@@ -186,7 +186,7 @@ pub unsafe extern "C" fn fdisk_create_partition(
 /// Delete partition
 #[no_mangle]
 pub unsafe extern "C" fn fdisk_delete_partition(disk_name: *const u8, partition_number: SigmaU32) -> SigmaI32 {
-    if !FDISK_INITIALIZED || disk_name.isnull() {
+    if !FDISK_INITIALIZED || disk_name.is_null() {
         return -1;
     }
     

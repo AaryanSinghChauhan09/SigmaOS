@@ -1,0 +1,54 @@
+name: "07 ⚙️ Compatibility & Portability Verification"
+
+on:
+  push:
+    branches: [ "main", "dev", "jules-*" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-compatibility:
+    name: "Run Cross-Platform Compatibility Test Suites"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Rust Toolchain"
+        uses: rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: "1. Run Standalone POSIX & Libc compatibility tests"
+        run: |
+          echo "Compiling and executing POSIX libc shim unit tests..."
+          rustc --test src/boot/firmware.rs -o build/firmware_tests && ./build/firmware_tests
+
+      - name: "2. Run Standalone Qubes-style Domain Isolation & IPC tests"
+        run: |
+          echo "Compiling and executing Qubes-defeating S-Compartment & S-Qrexec tests..."
+          rustc --test src/security/qubes_isolation.rs -o build/qubes_tests && ./build/qubes_tests
+
+      - name: "3. Run Standalone Zenith Wayland & Profile switcher tests"
+        run: |
+          echo "Compiling and executing Zenith profile & power governor tests..."
+          rustc --test src/desktop/zenith_compositor.rs -o build/zenith_tests && ./build/zenith_tests
+
+      - name: "4. Run Sovereign Core Modules & Healthcare/Education/Fintech sector tests"
+        run: |
+          echo "Compiling and executing multi-OS, WASM, and vertical sector tests..."
+          rustc --test src/kernel/subsystems/sovereign_modules.rs -o build/sovereign_tests && ./build/sovereign_tests
+
+      - name: "5. Run C++ Microkernel Driver manager and udev/modprobe tests"
+        run: |
+          echo "Executing native microkernel driver dependency tests..."
+          make -C tests regress
+          cat tests/regress-kernel.log
+
+      - name: "6. Check Git Workspace Purity"
+        run: |
+          echo "Ensuring that no binary artifacts or compiled objects are leaked into the git stage..."
+          git status -s

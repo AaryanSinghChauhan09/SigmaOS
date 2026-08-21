@@ -33,6 +33,7 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod cluster;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
