@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 //! SigmaOS Dual Boot & OS Prober Manager Tool
 //! Safe, zero-dependency, `#![no_std]` compliant utility for detecting operating systems
 //! and managing multi-boot loader configurations.
