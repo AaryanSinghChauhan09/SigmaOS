@@ -295,6 +295,132 @@ impl ServiceMonitor for SimpleServiceMonitor {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerDaemonType {
+    SystemDaemon, // PID 1 System Docker equivalent managing core OS containers
+    UserDaemon,   // User Docker equivalent managing user workloads
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerState {
+    Created,
+    Running,
+    Exited,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SovereignSystemContainer {
+    pub container_id: u32,
+    pub name: [u8; 32],
+    pub image_name: [u8; 32],
+    pub state: ContainerState,
+}
+
+/// RancherOS-style Dual Container Daemon Init System
+pub struct RancherContainerInit {
+    pub system_daemon_active: bool,
+    pub user_daemon_active: bool,
+    pub system_containers: Vec<SovereignSystemContainer>,
+    pub user_containers: Vec<SovereignSystemContainer>,
+}
+
+impl RancherContainerInit {
+    pub fn new() -> Self {
+        Self {
+            system_daemon_active: false,
+            user_daemon_active: false,
+            system_containers: Vec::new(),
+            user_containers: Vec::new(),
+        }
+    }
+
+    /// Initializes PID 1 System Daemon managing system containers (syslog, udev, etc.)
+    pub fn start_system_daemon(&mut self) {
+        self.system_daemon_active = true;
+        // Seed default RancherOS system-level containers
+        let mut sys_log = SovereignSystemContainer {
+            container_id: 1,
+            name: [0; 32],
+            image_name: [0; 32],
+            state: ContainerState::Running,
+        };
+        sys_log.name[..6].copy_from_slice(b"syslog");
+        sys_log.image_name[..13].copy_from_slice(b"system-syslog");
+
+        let mut sys_udev = SovereignSystemContainer {
+            container_id: 2,
+            name: [0; 32],
+            image_name: [0; 32],
+            state: ContainerState::Running,
+        };
+        sys_udev.name[..4].copy_from_slice(b"udev");
+        sys_udev.image_name[..11].copy_from_slice(b"system-udev");
+
+        self.system_containers.push(sys_log);
+        self.system_containers.push(sys_udev);
+    }
+
+    /// System Docker starts the secondary User Docker daemon to host user applications
+    pub fn start_user_daemon(&mut self) -> Result<(), &'static str> {
+        if !self.system_daemon_active {
+            return Err("Cannot start User Daemon: System Daemon (PID 1) must be active first");
+        }
+        self.user_daemon_active = true;
+        Ok(())
+    }
+
+    /// Spawn a new container managed by either the System or User daemon
+    pub fn launch_container(
+        &mut self,
+        name: &str,
+        image: &str,
+        daemon: ContainerDaemonType,
+    ) -> Result<u32, &'static str> {
+        let mut name_arr = [0u8; 32];
+        let mut img_arr = [0u8; 32];
+
+        let n_len = name.len().min(31);
+        let i_len = image.len().min(31);
+        name_arr[..n_len].copy_from_slice(&name.as_bytes()[..n_len]);
+        img_arr[..i_len].copy_from_slice(&image.as_bytes()[..i_len]);
+
+        match daemon {
+            ContainerDaemonType::SystemDaemon => {
+                if !self.system_daemon_active {
+                    return Err("System Daemon inactive");
+                }
+                let id = (self.system_containers.len() + 1) as u32;
+                self.system_containers.push(SovereignSystemContainer {
+                    container_id: id,
+                    name: name_arr,
+                    image_name: img_arr,
+                    state: ContainerState::Running,
+                });
+                Ok(id)
+            }
+            ContainerDaemonType::UserDaemon => {
+                if !self.user_daemon_active {
+                    return Err("User Daemon inactive");
+                }
+                let id = (self.user_containers.len() + 1) as u32;
+                self.user_containers.push(SovereignSystemContainer {
+                    container_id: id,
+                    name: name_arr,
+                    image_name: img_arr,
+                    state: ContainerState::Running,
+                });
+                Ok(id)
+            }
+        }
+    }
+}
+
+impl Default for RancherContainerInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
@@ -344,3 +470,37 @@ impl<T> Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rancher_container_init() {
+        let mut r_init = RancherContainerInit::new();
+        assert!(!r_init.system_daemon_active);
+        assert!(!r_init.user_daemon_active);
+
+        // Try launching a container before starting System daemon -> should fail
+        assert!(r_init.launch_container("test", "img", ContainerDaemonType::SystemDaemon).is_err());
+
+        // Start system daemon (PID 1)
+        r_init.start_system_daemon();
+        assert!(r_init.system_daemon_active);
+        assert_eq!(r_init.system_containers.len(), 2); // syslog and udev seeded
+
+        // Launch system-level container (e.g. ntp daemon)
+        let ntp_id = r_init.launch_container("ntpd", "system-ntpd", ContainerDaemonType::SystemDaemon).unwrap();
+        assert_eq!(ntp_id, 3);
+        assert_eq!(r_init.system_containers.len(), 3);
+
+        // Try starting user daemon before starting system daemon -> should succeed now
+        assert!(r_init.start_user_daemon().is_ok());
+        assert!(r_init.user_daemon_active);
+
+        // Launch user-level workload container
+        let web_id = r_init.launch_container("nginx", "user-nginx", ContainerDaemonType::UserDaemon).unwrap();
+        assert_eq!(web_id, 1);
+        assert_eq!(r_init.user_containers.len(), 1);
+    }
+}

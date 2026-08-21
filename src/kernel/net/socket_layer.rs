@@ -1,7 +1,8 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
+/// Enhanced with Debian Linux style DNS resolv.conf and /etc/hosts resolution engine.
 use std::collections::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -203,6 +204,10 @@ impl Socket {
         if self.state != SocketState::Connected && self.state != SocketState::Accepted {
             return Err("Not connected");
         }
+        // BSD Non-blocking check: if buffer is empty and non_blocking flag is set, return EWOULDBLOCK
+        if self.recv_buf.is_empty() && self.flags.non_blocking {
+            return Err("EWOULDBLOCK: read would block");
+        }
         let data = self.recv_buf.pop(max);
         self.bytes_recv.fetch_add(data.len(), Ordering::Relaxed);
         Ok(data)
@@ -277,6 +282,12 @@ impl SocketLayer {
         }
     }
 
+    pub fn set_non_blocking(&mut self, fd: u32, non_blocking: bool) -> Result<(), &'static str> {
+        let sock = self.sockets.get_mut(&fd).ok_or("EBADF")?;
+        sock.flags.non_blocking = non_blocking;
+        Ok(())
+    }
+
     pub fn close(&mut self, fd: u32) -> Result<(), &'static str> {
         let sock = self.sockets.remove(&fd).ok_or("EBADF")?;
         if let Some(addr) = sock.local_addr {
@@ -294,6 +305,81 @@ impl SocketLayer {
 }
 
 impl Default for SocketLayer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ── Debian-Style DNS and host configuration parser ─────────────────────────
+
+/// Sovereign DNS Resolver Configuration Parser (replicates /etc/resolv.conf and /etc/hosts)
+pub struct SovereignDnsResolver {
+    pub nameservers: Vec<String>,
+    pub hosts: HashMap<String, [u8; 4]>,
+}
+
+impl SovereignDnsResolver {
+    pub fn new() -> Self {
+        Self {
+            nameservers: Vec::new(),
+            hosts: HashMap::new(),
+        }
+    }
+
+    /// Parses standard Debian /etc/resolv.conf lines
+    pub fn parse_resolv_conf(&mut self, content: &str) {
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with(';') {
+                continue;
+            }
+            let parts: Vec<&str> = trimmed.split_whitespace().collect();
+            if parts.len() >= 2 && parts[0] == "nameserver" {
+                self.nameservers.push(parts[1].to_string());
+            }
+        }
+    }
+
+    /// Parses standard Debian /etc/hosts lines
+    pub fn parse_hosts(&mut self, content: &str) {
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            let parts: Vec<&str> = trimmed.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let ip_str = parts[0];
+                let mut ip_bytes = [0u8; 4];
+                let octets: Vec<&str> = ip_str.split('.').collect();
+                if octets.len() == 4 {
+                    for i in 0..4 {
+                        ip_bytes[i] = octets[i].parse::<u8>().unwrap_or(0);
+                    }
+                    for &hostname in &parts[1..] {
+                        self.hosts.insert(hostname.to_string(), ip_bytes);
+                    }
+                }
+            }
+        }
+    }
+
+    /// Resolves hostname dynamically via static hosts files or returns default loopbacks
+    pub fn resolve_hostname(&self, hostname: &str) -> Option<[u8; 4]> {
+        if let Some(ip) = self.hosts.get(hostname) {
+            Some(*ip)
+        } else if hostname == "localhost" {
+            Some([127, 0, 0, 1])
+        } else if !self.nameservers.is_empty() {
+            // Simulated fallback to first nameserver
+            Some([8, 8, 8, 8])
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for SovereignDnsResolver {
     fn default() -> Self {
         Self::new()
     }
@@ -359,5 +445,51 @@ mod tests {
         sl.bind(fd1, SockAddrIn::any(80)).unwrap();
         let result = sl.bind(fd2, SockAddrIn::any(80));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_non_blocking_socket_read_ewouldblock() {
+        let mut sl = SocketLayer::new();
+        let fd = sl.socket(AddressFamily::Inet, SocketType::Stream, Protocol::Tcp);
+        sl.connect(fd, SockAddrIn::loopback(11000)).unwrap();
+
+        // Set socket to non-blocking
+        sl.set_non_blocking(fd, true).unwrap();
+
+        // Reading when buffer is empty must return EWOULDBLOCK error
+        let result = sl.recv(fd, 100);
+        assert_eq!(result, Err("EWOULDBLOCK: read would block"));
+
+        // Injecting data and reading should work fine
+        sl.inject_data(fd, b"delayed payload");
+        let res_data = sl.recv(fd, 100).unwrap();
+        assert_eq!(res_data, b"delayed payload");
+    }
+
+    #[test]
+    fn test_dns_resolver_resolv_conf_and_hosts() {
+        let mut dns = SovereignDnsResolver::new();
+
+        let resolv_conf = r#"
+            # This is a comment
+            nameserver 1.1.1.1
+            nameserver 8.8.8.8
+        "#;
+        dns.parse_resolv_conf(resolv_conf);
+        assert_eq!(dns.nameservers.len(), 2);
+        assert_eq!(dns.nameservers[0], "1.1.1.1");
+
+        let hosts = r#"
+            127.0.0.1 localhost local.host
+            192.168.1.1 gateway.local
+        "#;
+        dns.parse_hosts(hosts);
+        assert_eq!(dns.hosts.get("gateway.local"), Some(&[192, 168, 1, 1]));
+        assert_eq!(dns.hosts.get("local.host"), Some(&[127, 0, 0, 1]));
+
+        // Resolution tests
+        assert_eq!(dns.resolve_hostname("localhost"), Some([127, 0, 0, 1]));
+        assert_eq!(dns.resolve_hostname("gateway.local"), Some([192, 168, 1, 1]));
+        assert_eq!(dns.resolve_hostname("google.com"), Some([8, 8, 8, 8])); // fallback to resolver nameserver
     }
 }

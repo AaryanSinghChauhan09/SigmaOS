@@ -252,7 +252,7 @@ pub trait PackageManager {
 
 /// Package error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageError {
     Success = 0,
     PackageNotFound = 1,
@@ -493,8 +493,86 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
+// ==========================================
+// CachyOS-style x86-64 Microarchitecture Parity
+// ==========================================
+
+/// Supported x86-64 microarchitecture levels (comparable to glibc hwcaps)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum CpuArchLevel {
+    V1, // Baseline x86-64 (SSE, SSE2)
+    V2, // SSE4.2, SSSE3, POPCNT
+    V3, // AVX, AVX2, BMI1, BMI2
+    V4, // AVX-512
+}
+
+/// Simulated CPU instruction capabilities detector
+pub struct CachyCpuDetector {
+    pub has_sse4_2: bool,
+    pub has_avx2: bool,
+    pub has_avx512: bool,
+}
+
+impl CachyCpuDetector {
+    pub fn new(sse4_2: bool, avx2: bool, avx512: bool) -> Self {
+        Self {
+            has_sse4_2: sse4_2,
+            has_avx2: avx2,
+            has_avx512: avx512,
+        }
+    }
+
+    /// Evaluates instruction flags to yield matching microarchitecture levels
+    pub fn detect_x86_64_level(&self) -> CpuArchLevel {
+        if self.has_avx512 {
+            CpuArchLevel::V4
+        } else if self.has_avx2 {
+            CpuArchLevel::V3
+        } else if self.has_sse4_2 {
+            CpuArchLevel::V2
+        } else {
+            CpuArchLevel::V1
+        }
+    }
+}
+
+/// CachyOS-style Package format adapter selecting optimal optimized binaries
+pub struct CachyosPackageAdapter {
+    pub level: CpuArchLevel,
+}
+
+impl CachyosPackageAdapter {
+    pub fn new(detector: &CachyCpuDetector) -> Self {
+        Self {
+            level: detector.detect_x86_64_level(),
+        }
+    }
+
+    /// Appends the target microarchitecture suffix to package requests to optimize execution efficiency
+    pub fn resolve_optimized_package_suffix(&self, base_name: &[u8], out_buf: &mut [u8]) -> usize {
+        let suffix = match self.level {
+            CpuArchLevel::V4 => b"-v4",
+            CpuArchLevel::V3 => b"-v3",
+            CpuArchLevel::V2 => b"-v2",
+            CpuArchLevel::V1 => b"",
+        };
+
+        let len1 = base_name.len().min(out_buf.len());
+        unsafe {
+            core::ptr::copy_nonoverlapping(base_name.as_ptr(), out_buf.as_mut_ptr(), len1);
+        }
+
+        let len2 = suffix.len().min(out_buf.len() - len1);
+        unsafe {
+            core::ptr::copy_nonoverlapping(suffix.as_ptr(), out_buf.as_mut_ptr().add(len1), len2);
+        }
+
+        len1 + len2
+    }
+}
+
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
@@ -569,4 +647,35 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cachy_cpu_detector() {
+        let det_v1 = CachyCpuDetector::new(false, false, false);
+        assert_eq!(det_v1.detect_x86_64_level(), CpuArchLevel::V1);
+
+        let det_v2 = CachyCpuDetector::new(true, false, false);
+        assert_eq!(det_v2.detect_x86_64_level(), CpuArchLevel::V2);
+
+        let det_v3 = CachyCpuDetector::new(true, true, false);
+        assert_eq!(det_v3.detect_x86_64_level(), CpuArchLevel::V3);
+
+        let det_v4 = CachyCpuDetector::new(true, true, true);
+        assert_eq!(det_v4.detect_x86_64_level(), CpuArchLevel::V4);
+    }
+
+    #[test]
+    fn test_cachy_package_adapter() {
+        let det = CachyCpuDetector::new(true, true, false); // v3 CPU
+        let adapter = CachyosPackageAdapter::new(&det);
+        assert_eq!(adapter.level, CpuArchLevel::V3);
+
+        let mut buf = [0u8; 32];
+        let len = adapter.resolve_optimized_package_suffix(b"linux-kernel", &mut buf);
+        assert_eq!(&buf[..len], b"linux-kernel-v3");
+    }
 }

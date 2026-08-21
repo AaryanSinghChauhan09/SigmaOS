@@ -1,7 +1,11 @@
+// SigmaOS CFS and custom scheduler classes
+// Inspired by Linux schedulers, including the legendary CachyOS BORE (Burst-Oriented Response Enhancer)
+
 #![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task, PID_MAX_LIMIT};
@@ -80,11 +84,11 @@ pub struct FairSchedClass;
 pub struct IdleSchedClass;
 
 impl SchedClass for StopSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.stop_rq.nr_running += 1;
         Ok(())
     }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.stop_rq.nr_running -= 1;
         Ok(())
     }
@@ -94,7 +98,7 @@ impl SchedClass for StopSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         true
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -115,12 +119,12 @@ impl SchedClass for StopSchedClass {
 }
 
 impl SchedClass for FairSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.cfs_rq.nr_running += 1;
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.cfs_rq.nr_running -= 1;
         rq.nr_running.fetch_sub(1, Ordering::SeqCst);
         Ok(())
@@ -132,7 +136,7 @@ impl SchedClass for FairSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -152,11 +156,68 @@ impl SchedClass for FairSchedClass {
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
-impl SchedClass for DeadlineSchedClass {
+/// CachyOS-style BORE (Burst-Oriented Response Enhancer) Scheduler Class
+pub struct BoreSchedClass {
+    pub base: FairSchedClass,
+}
+
+impl BoreSchedClass {
+    pub fn new() -> Self {
+        Self { base: FairSchedClass }
+    }
+
+    /// Computes BORE scaled vruntime bonus based on process burstiness metrics (sleep vs run ratio)
+    pub fn compute_bore_vruntime(&self, runtime: u64, sleep_time: u64) -> u64 {
+        // High sleep time -> bursty/interactive -> smaller vruntime increment (interactive boost)
+        if sleep_time > runtime {
+            runtime / 2 // Award 2x boost (half vruntime increment)
+        } else {
+            runtime * 2 // Background/batch task -> double vruntime increment (penalized)
+        }
+    }
+}
+
+impl SchedClass for BoreSchedClass {
     fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        Ok(())
+        self.base.enqueue_task(rq, task)
     }
     fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        self.base.dequeue_task(rq, task)
+    }
+    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        self.base.yield_task(rq, task)
+    }
+    fn check_preempt_curr(&self, rq: &mut RunQueue, task: &Task) -> bool {
+        self.base.check_preempt_curr(rq, task)
+    }
+    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+        self.base.pick_next_task(rq)
+    }
+    fn put_prev_task(&self, rq: &mut RunQueue, task: &mut Task) {
+        self.base.put_prev_task(rq, task)
+    }
+    fn set_curr_task(&self, rq: &mut RunQueue, task: &mut Task) {
+        self.base.set_curr_task(rq, task)
+    }
+    fn task_tick(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+        self.base.task_tick(rq, task)
+    }
+    fn task_fork(&self, rq: &mut RunQueue, child: &mut Task, parent: &Task) -> Result<(), FsError> {
+        self.base.task_fork(rq, child, parent)
+    }
+    fn task_dead(&self, rq: &mut RunQueue, task: &mut Task) {
+        self.base.task_dead(rq, task)
+    }
+    fn prio_changed(&self, rq: &mut RunQueue, task: &mut Task) {
+        self.base.prio_changed(rq, task)
+    }
+}
+
+impl SchedClass for DeadlineSchedClass {
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
+        Ok(())
+    }
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
     fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
@@ -165,7 +226,7 @@ impl SchedClass for DeadlineSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -186,10 +247,10 @@ impl SchedClass for DeadlineSchedClass {
 }
 
 impl SchedClass for RealtimeSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
     fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
@@ -198,7 +259,7 @@ impl SchedClass for RealtimeSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -219,10 +280,10 @@ impl SchedClass for RealtimeSchedClass {
 }
 
 impl SchedClass for IdleSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
     fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
@@ -231,7 +292,7 @@ impl SchedClass for IdleSchedClass {
     fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
     fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
@@ -313,5 +374,23 @@ impl Scheduler {
 
     pub fn schedule(&mut self) -> Option<u64> {
         None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_bore_scheduler_scale() {
+        let bore = BoreSchedClass::new();
+
+        // Test highly interactive/bursty task: sleep_time = 1000, runtime = 100
+        let interactive_vruntime = bore.compute_bore_vruntime(100, 1000);
+        assert_eq!(interactive_vruntime, 50); // scaled down -> gets scheduled sooner
+
+        // Test background batch task: sleep_time = 10, runtime = 500
+        let batch_vruntime = bore.compute_bore_vruntime(500, 10);
+        assert_eq!(batch_vruntime, 1000); // scaled up -> gets penalized
     }
 }

@@ -8,7 +8,7 @@ pub mod uefi;
 pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
 pub use uefi::{
-    SimpleUEFIBootloader, UEFIBootloader, SecureBoot, SimpleSecureBoot, GopFramebuffer,
-    AcpiParser, UsbHostController, MultiKernelBootSelector, SovereignBootWatchdog,
-    GopSplashCanvas, MicrokernelProfile, BootError,
+    AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
+    MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
+    SovereignBootWatchdog, UEFIBootloader, UsbHostController,
 };

@@ -1,18 +1,22 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
 /// Implements command parsing, execution, and built-in commands
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type CommandID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CommandError { Success = 0, NotFound = 1, InvalidArgs = 2, ExecutionFailed = 3 }
+pub enum CommandError {
+    Success = 0,
+    NotFound = 1,
+    InvalidArgs = 2,
+    ExecutionFailed = 3,
+}
 
 pub trait ShellCommand {
     fn name(&self) -> &[u8];
@@ -121,7 +125,9 @@ impl ShellCommand for SimpleShellCommand {
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
         let mut output = ShellVec::new();
         let name = self.name();
-        for &byte in name { output.push(byte); }
+        for &byte in name {
+            output.push(byte);
+        }
         output.push(b':');
         output.push(b' ');
         output.push(b'o');
@@ -268,10 +274,7 @@ impl ShellCommand for SigmaFindCommand {
         }
 
         // Simulate fd color/style matching
-        let matches: &[&[u8]] = &[
-            b"src/package/universal.rs",
-            b"tests/integration_test.rs",
-        ];
+        let matches: &[&[u8]] = &[b"src/package/universal.rs", b"tests/integration_test.rs"];
 
         for text in matches {
             for &b in *text {
@@ -365,7 +368,9 @@ pub trait CommandParser {
 pub struct SimpleCommandParser;
 
 impl SimpleCommandParser {
-    pub fn new() -> Self { SimpleCommandParser }
+    pub fn new() -> Self {
+        SimpleCommandParser
+    }
 }
 
 impl CommandParser for SimpleCommandParser {
@@ -559,8 +564,12 @@ impl ShellSession for SimpleShellSession {
         let mut value_array = [0u8; 128];
         let key_len = key.len().min(63);
         let value_len = value.len().min(127);
-        for i in 0..key_len { key_array[i] = key[i]; }
-        for i in 0..value_len { value_array[i] = value[i]; }
+        for i in 0..key_len {
+            key_array[i] = key[i];
+        }
+        for i in 0..value_len {
+            value_array[i] = value[i];
+        }
         self.environment.push((key_array, value_array));
     }
 
@@ -604,9 +613,12 @@ impl CommandHistory for SimpleCommandHistory {
     fn add(&mut self, command: &[u8]) {
         let mut cmd_array = [0u8; 256];
         let cmd_len = command.len().min(255);
-        for i in 0..cmd_len { cmd_array[i] = command[i]; }
+        for i in 0..cmd_len {
+            cmd_array[i] = command[i];
+        }
         self.history.push(cmd_array);
-        self.current_index.store(self.history.len(), Ordering::SeqCst);
+        self.current_index
+            .store(self.history.len(), Ordering::SeqCst);
     }
 
     fn get_previous(&self) -> Option<&[u8]> {
@@ -663,14 +675,18 @@ impl<T> ShellVec<T> {
     }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    fn len(&self) -> usize { self.len }
+    fn len(&self) -> usize {
+        self.len
+    }
     fn get(&self, index: usize) -> Option<&T> {
         if index < self.len {
             unsafe { Some(&*self.data.add(index)) }
@@ -686,11 +702,19 @@ impl<T> ShellVec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
