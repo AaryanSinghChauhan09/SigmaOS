@@ -219,7 +219,7 @@ impl VintageDriverTranslator {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
             let idx = (port % 256) as usize;
-            self.wrapper.simulated_pci_bar[idx] = val;
+            self.wrapper.simulated_pci_bar[idx] = val as u32;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)
@@ -250,6 +250,8 @@ pub enum HistoricError {
     UnsupportedPackageFormat,
     LfsBuildFailure,
 }
+
+pub struct LegacyDriver;
 
 /// Simulated LFS Stage 1 and 2 Toolchain builder
 pub struct LfsToolchainBuilder {

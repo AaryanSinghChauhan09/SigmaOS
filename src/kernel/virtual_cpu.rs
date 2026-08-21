@@ -1,13 +1,10 @@
 // Sovereign Virtual CPU and Ring Privilege Separation Simulator
-// Implements x86 CPU Modes, Ring privilege isolation (Rings 0-3), Register Sets, and Instruction Data Movement.
-// Enhanced with Model Specific Registers (MSRs), lazy FP/SSE state saving (Linux/BSD style), and Exception trap vector routines.
-// Extended to support Windows-inspired NT kernel abstractions: APCs, DPCs, IRQL preemption, and Thread dispatcher.
-// Extended to support CISC-style block memory movement, bitwise shifts, and memory barrier instructions.
+// Implements x86 and ARM CPU Modes, Ring privilege isolation (Ring 0, 1, 2, 3), Register Sets, and Instruction Data Movement.
 
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuError {
@@ -16,273 +13,82 @@ pub enum CpuError {
     PrivilegeViolation = 2,
     StackOverflow = 3,
     PagingDisabled = 4,
-    InvalidInstruction = 5,
-    FloatingPointStateNotSaved = 6,
+    MemoryAccessViolation = 5,
+    InvalidAddressingMode = 6,
     AlignmentFault = 7,
-    InvalidAddress = 8,
-    IrqlViolation = 9,
-    ThreadSuspended = 10,
-    ApcDeliveryFailed = 11,
 }
 
-/// ARM-inspired addressing modes for LDR & STR instructions
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AddressingMode {
-    Immediate,   // Immediate address or value load
-    Offset,      // base + offset, base unchanged
-    PreIndexed,  // base + offset, base updated before access
-    PostIndexed, // base, base updated after access
-}
-
-/// ARM-inspired block data transfer modes for LDM & STM instructions
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BlockTransferMode {
-    IncrementAfter,  // IA: Increment address after each transfer
-    IncrementBefore, // IB: Increment address before each transfer
-    DecrementAfter,  // DA: Decrement address after each transfer
-    DecrementBefore, // DB: Decrement address before each transfer
-}
-
-/// x86 CPU Execution Modes
+/// x86/ARM CPU Execution Modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuMode {
     RealMode,      // 16-bit real addressing
     ProtectedMode, // 32-bit protected segments
     LongMode,      // 64-bit paging active
+    ArmMode,       // ARM mode execution active
 }
 
-/// CPU Ring Privilege Separation levels
+/// CPU Ring Privilege Separation levels (Inspiration: x86 Rings & ARM EL levels)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CpuRing {
-    Ring0 = 0, // Kernel Core (unrestricted)
+    Ring0 = 0, // Kernel Core (unrestricted - EL1/EL2/EL3 equivalent)
     Ring1 = 1, // Device Drivers (SDF / isolated)
     Ring2 = 2, // System Services (init system)
-    Ring3 = 3, // Userland Applications (most restricted)
+    Ring3 = 3, // Userland Applications (most restricted - EL0 equivalent)
 }
 
-/// Complete hybrid Virtual Register Set
-#[derive(Debug, Clone, Copy)]
-pub struct RegisterSet {
-    pub rax: u64,
-    pub rbx: u64,
-    pub rcx: u64,
-    pub rdx: u64,
-    pub rdi: u64, // General Purpose / Destination Index (Syscall arg 1)
-    pub rsi: u64, // General Purpose / Source Index (Syscall arg 2)
-    pub rbp: u64, // Base Frame Pointer (x86_64 / Linux / BSD stack unwinding)
-    pub r8: u64,  // General Purpose x86_64 64-bit Extension Register 8
-    pub r9: u64,  // General Purpose x86_64 64-bit Extension Register 9
-    pub r10: u64, // General Purpose x86_64 64-bit Extension Register 10
-    pub r11: u64, // General Purpose x86_64 64-bit Extension Register 11
-    pub r12: u64, // General Purpose x86_64 64-bit Extension Register 12
-    pub r13: u64, // General Purpose x86_64 64-bit Extension Register 13
-    pub r14: u64, // General Purpose x86_64 64-bit Extension Register 14
-    pub r15: u64, // General Purpose x86_64 64-bit Extension Register 15
-    pub cr0: u64, // Control Register 0: Bit 0 is PE (Protection Enable), Bit 3 is TS (Task Switched)
-    pub cr3: u64, // Control Register 3: Page Table Base Address
-    pub cr4: u64, // Control Register 4: Os Support for SSE/XSAVE
-    pub rip: u64, // Instruction Pointer
-    pub rsp: u64, // Stack Pointer
-    pub rsi: u64,
-    pub rdi: u64,
-    pub rbp: u64,
-    pub r8: u64,
-    pub r9: u64,
-    pub r10: u64,
-    pub r11: u64,
-    pub r12: u64,
-    pub r13: u64,
-    pub r14: u64,
-    pub r15: u64,
-    // CPU Status Flags
-    pub zf: bool, // Zero Flag
-    pub cf: bool, // Carry Flag
-    pub sf: bool, // Sign Flag
-    // 128-bit Vector SIMD Registers (xmm0..xmm7 / v0..v7)
-    pub xmm: [[u8; 16]; 8],
-}
-
-/// Windows NT inspired Interrupt Request Levels (IRQLs)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Irql {
-    PassiveLevel = 0,  // PASSIVE_LEVEL: Normal thread execution, user/kernel APCs active
-    ApcLevel = 1,      // APC_LEVEL: Thread APC delivery level, thread scheduling disabled
-    DispatchLevel = 2, // DISPATCH_LEVEL: DPC execution and thread scheduler level, no thread context
-    Dirql = 3,         // DIRQL: Device Interrupt Request Level (hardware drivers)
-}
-
-/// Windows NT inspired Asynchronous Procedure Call (APC) Type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ApcType {
-    SpecialKernel, // Kernel-mode, bypasses thread state & alert restrictions, high priority
-    NormalKernel,  // Kernel-mode, runs in kernel-mode, runs below special kernel APCs
-    User,          // User-mode, runs only when thread enters alertable state
-}
-
-/// Windows NT inspired Processor Mode
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProcessorMode {
-    KernelMode,
-    UserMode,
-}
-
-/// Windows NT inspired Thread State
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ThreadState {
-    Running,
-    Suspended,
-    Terminated,
-}
-
-/// Windows NT inspired Asynchronous Procedure Call (APC) structure
-#[derive(Clone)]
-pub struct SovereignApc {
-    pub apc_type: ApcType,
-    pub kernel_routine: fn(&mut SovereignVirtualCPU, u64) -> Result<(), CpuError>,
-    pub rundown_routine: Option<fn(&mut SovereignVirtualCPU, u64) -> Result<(), CpuError>>,
-    pub normal_routine: Option<fn(&mut SovereignVirtualCPU, u64, u64) -> Result<(), CpuError>>,
-    pub normal_context: u64,
-    pub system_argument1: u64,
-    pub system_argument2: u64,
-    pub freed_on_delivery: bool, // Simulates allocation from non-paged pool
-}
-
-/// Windows NT inspired Deferred Procedure Call (DPC) structure
-#[derive(Clone)]
-pub struct SovereignDpc {
-    pub deferred_routine: fn(&mut SovereignVirtualCPU, u64, u64, u64) -> Result<(), CpuError>,
-    pub deferred_context: u64,
-    pub system_argument1: u64,
-    pub system_argument2: u64,
-    pub importance: u32, // Priority/importance: higher value = higher precedence
-}
-
-/// Windows NT inspired Work Item (kernel worker task)
-#[derive(Clone, Copy)]
-pub struct WorkItem {
-    pub worker_routine: fn(&mut SovereignVirtualCPU, u64) -> Result<(), CpuError>,
-    pub parameter: u64,
-    pub is_queued: bool,
-}
-
-/// Windows NT inspired KTHREAD equivalent structure inside SigmaOS CPU Context
-#[derive(Clone)]
-pub struct SovereignThread {
-    pub id: u64,
-    pub parent_id: u64,
-    pub state: ThreadState,
-    pub suspend_count: u32,
-    pub alertable: bool,
-    pub kernel_apc_disable: bool,
-    pub apc_queue: Vec<SovereignApc>,
-}
-
-/// Linux Kernel inspired `pt_regs` context frame saved on the kernel stack during syscall/exception entries
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub struct PtRegs {
-    pub r15: u64,
-    pub r14: u64,
-    pub r13: u64,
-    pub r12: u64,
-    pub rbp: u64,
-    pub rbx: u64,
-    pub r11: u64,
-    pub r10: u64,
-    pub r9: u64,
-    pub r8: u64,
-    pub rax: u64,
-    pub rcx: u64,
-    pub rdx: u64,
-    pub rsi: u64,
-    pub rdi: u64,
-    pub orig_rax: u64,
-    pub rip: u64,
-    pub cs: u64,
-    pub rflags: u64,
-    pub rsp: u64,
-    pub ss: u64,
-}
-
-/// Windows NT inspired KPRCB (Kernel Processor Control Block) equivalent
-#[derive(Clone)]
-pub struct SovereignKprcb {
-    pub current_irql: Irql,
-    pub dpc_queue: Vec<SovereignDpc>,
-    pub work_item_queue: Vec<WorkItem>,
-    pub active_thread_id: u64,
-    pub interrupt_mask: u32,
-    pub active_vector: Option<u8>,
-}
-
-/// Model Specific Registers (MSRs) for Fast System Call routing (Intel/AMD standard)
-#[derive(Debug, Clone, Copy)]
-pub struct ModelSpecificRegisters {
-    pub efer: u64,   // Extended Feature Enable Register
-    pub star: u64,   // Segment selector for SYSENTER/SYSEXIT
-    pub lstar: u64,  // Target RIP for 64-bit SYSCALL
-    pub sfmask: u64, // RFLAGS mask for SYSCALL
-    pub fs_base: u64, // Thread Local Storage (TLS) pointer (Linux/BSD standard)
-    pub gs_base: u64, // Per-CPU data block pointer
-    pub kernel_gs_base: u64, // Saved kernel GS base pointer (swapped on transition)
-}
-
-/// System Bus Special Function Registers: MAR, MBR, I/OAR, I/OBR
+/// Extended Register Set incorporating both x86/x64 and ARM architecture registers
 #[derive(Debug, Clone, Copy, Default)]
-pub struct SystemBusRegisters {
-    pub mar: u64,  // Memory Address Register
-    pub mbr: u64,  // Memory Buffer Register
-    pub ioar: u16, // I/O Address Register
-    pub iobr: u32, // I/O Buffer Register
+pub struct RegisterSet {
+    // --- x86/x64 general-purpose registers ---
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64, // Source Index (string instructions)
+    pub rdi: u64, // Destination Index (string instructions)
+    pub rbp: u64, // Base Pointer
+    pub rflags: u64, // Status flags register (ZF, SF, CF, OF)
+
+    // --- x86 Segments ---
+    pub cs: u16,
+    pub ds: u16,
+    pub es: u16,
+    pub ss: u16,
+
+    // --- x86 Control Registers ---
+    pub cr0: u64, // Control Register 0: Bit 0 is PE (Protection Enable)
+    pub cr3: u64, // Control Register 3: Page Table Base Address
+
+    // --- ARM general-purpose registers ---
+    pub r0: u32,
+    pub r1: u32,
+    pub r2: u32,
+    pub r3: u32,
+    pub r4: u32,
+    pub r5: u32,
+    pub r6: u32,
+    pub r7: u32,
+    pub r8: u32,
+    pub r9: u32,
+    pub r10: u32,
+    pub r11: u32,
+    pub r12: u32,
+    pub lr: u32,   // Link Register (R14)
+    pub pc: u32,   // Program Counter (R15)
+    pub cpsr: u32, // Current Program Status Register
+
+    // --- Common registers ---
+    pub rip: u64, // x86 Instruction Pointer
+    pub rsp: u64, // Stack Pointer
 }
 
-/// System Bus Controller managing memory and I/O bus transactions
-pub struct SystemBusController {
-    pub bus_regs: SystemBusRegisters,
-}
-
-impl SystemBusController {
-    pub fn new() -> Self {
-        Self {
-            bus_regs: SystemBusRegisters::default(),
-        }
-    }
-
-    pub fn write_memory_bus(&mut self, addr: u64, data: u64) {
-        self.bus_regs.mar = addr;
-        self.bus_regs.mbr = data;
-    }
-
-    pub fn read_memory_bus(&mut self, addr: u64) -> u64 {
-        self.bus_regs.mar = addr;
-        self.bus_regs.mbr
-    }
-
-    pub fn write_io_bus(&mut self, port: u16, data: u32) {
-        self.bus_regs.ioar = port;
-        self.bus_regs.iobr = data;
-    }
-
-    pub fn read_io_bus(&mut self, port: u16) -> u32 {
-        self.bus_regs.ioar = port;
-        self.bus_regs.iobr
-    }
-}
-
-/// Sovereign Virtual CPU managing execution state and privilege boundaries
+/// Sovereign Virtual CPU managing execution state, privilege boundaries, and simulated physical memory
 pub struct SovereignVirtualCPU {
     pub mode: CpuMode,
     pub ring: CpuRing,
     pub registers: RegisterSet,
-    pub msrs: ModelSpecificRegisters,
     pub stack_memory: Vec<u64>,
-    // Lazy FP/SSE Context Tracking (Linux/BSD style)
-    pub fp_dirty: bool,
-    pub fp_save_area: [u64; 64], // Simulated 512-byte FXSAVE/XSAVE area
-    // Windows NT kernel abstractions
-    pub memory: Vec<u8>,
-    pub kprcb: SovereignKprcb,
-    pub threads: Vec<SovereignThread>,
+    pub memory: Vec<u8>, // Simulated 64KB physical/virtual memory space
 }
 
 impl SovereignVirtualCPU {
@@ -295,368 +101,344 @@ impl SovereignVirtualCPU {
                 rbx: 0,
                 rcx: 0,
                 rdx: 0,
-                rdi: 0,
                 rsi: 0,
+                rdi: 0,
                 rbp: 0,
-                r8: 0,
-                r9: 0,
-                r10: 0,
-                r11: 0,
-                r12: 0,
-                r13: 0,
-                r14: 0,
-                r15: 0,
+                rflags: 0,
+                cs: 0,
+                ds: 0,
+                es: 0,
+                ss: 0,
                 cr0: 0,
                 cr3: 0,
-                cr4: 0,
-                rip: 0,
-                rsp: 1024, // High stack pointer
-                rsi: 0,
-                rdi: 0,
-                rbp: 0,
+                r0: 0,
+                r1: 0,
+                r2: 0,
+                r3: 0,
+                r4: 0,
+                r5: 0,
+                r6: 0,
+                r7: 0,
                 r8: 0,
                 r9: 0,
                 r10: 0,
                 r11: 0,
                 r12: 0,
-                r13: 0,
-                r14: 0,
-                r15: 0,
-                zf: false,
-                cf: false,
-                sf: false,
-                xmm: [[0u8; 16]; 8],
-            },
-            msrs: ModelSpecificRegisters {
-                efer: 0,
-                star: 0,
-                lstar: 0,
-                sfmask: 0,
-                fs_base: 0,
-                gs_base: 0,
-                kernel_gs_base: 0,
+                lr: 0,
+                pc: 0,
+                cpsr: 0,
+                rip: 0,
+                rsp: 1024, // High stack pointer
             },
             stack_memory: vec![0; 128], // 128 stack frames
-            fp_dirty: false,
-            fp_save_area: [0; 64],
-            memory: vec![0; 4096],     // 4096 bytes of simulated RAM
-            kprcb: SovereignKprcb {
-                current_irql: Irql::PassiveLevel,
-                dpc_queue: Vec::new(),
-                work_item_queue: Vec::new(),
-                active_thread_id: 1,
-                interrupt_mask: 0,
-                active_vector: None,
-            },
-            threads: vec![
-                SovereignThread {
-                    id: 1,
-                    parent_id: 0,
-                    state: ThreadState::Running,
-                    suspend_count: 0,
-                    alertable: false,
-                    kernel_apc_disable: false,
-                    apc_queue: Vec::new(),
-                }
-            ],
+            memory: vec![0; 65536],     // 64KB main memory space
         }
     }
 
-    /// Helper to get a register's value dynamically by string name
-    pub fn get_register(&self, name: &str) -> Result<u64, CpuError> {
-        match name {
-            "rax" => Ok(self.registers.rax),
-            "rbx" => Ok(self.registers.rbx),
-            "rcx" => Ok(self.registers.rcx),
-            "rdx" => Ok(self.registers.rdx),
-            "cr0" => Ok(self.registers.cr0),
-            "cr3" => Ok(self.registers.cr3),
-            "rip" => Ok(self.registers.rip),
-            "rsp" => Ok(self.registers.rsp),
-            "rsi" => Ok(self.registers.rsi),
-            "rdi" => Ok(self.registers.rdi),
-            "rbp" => Ok(self.registers.rbp),
-            "r8" => Ok(self.registers.r8),
-            "r9" => Ok(self.registers.r9),
-            "r10" => Ok(self.registers.r10),
-            "r11" => Ok(self.registers.r11),
-            "r12" => Ok(self.registers.r12),
-            "r13" => Ok(self.registers.r13),
-            "r14" => Ok(self.registers.r14),
-            "r15" => Ok(self.registers.r15),
-            _ => Err(CpuError::InvalidRegister),
+    // --- Addressing Mode Simulators ---
+
+    /// Simulates x86 CISC Complex Addressing Mode: Base + Index * Scale + Displacement
+    pub fn calculate_cisc_address(
+        &self,
+        base: u64,
+        index: u64,
+        scale: u64,
+        displacement: i64,
+    ) -> Result<u64, CpuError> {
+        if scale != 1 && scale != 2 && scale != 4 && scale != 8 {
+            return Err(CpuError::InvalidAddressingMode);
         }
+        let scaled_index = index.wrapping_mul(scale);
+        let final_addr = if displacement >= 0 {
+            base.wrapping_add(scaled_index).wrapping_add(displacement as u64)
+        } else {
+            base.wrapping_add(scaled_index).wrapping_sub((-displacement) as u64)
+        };
+        if final_addr >= self.memory.len() as u64 {
+            return Err(CpuError::MemoryAccessViolation);
+        }
+        Ok(final_addr)
     }
 
-    /// Helper to set a register's value dynamically by string name
-    pub fn set_register(&mut self, name: &str, val: u64) -> Result<(), CpuError> {
-        match name {
+    /// Simulates ARM Post-Indexed Addressing Mode: [Rn], #offset
+    /// Returns the address, then increments/decrements Rn.
+    pub fn arm_post_indexed(&mut self, reg_num: usize, offset: i32) -> Result<u32, CpuError> {
+        let base_addr = self.get_arm_reg(reg_num)?;
+        let updated_addr = if offset >= 0 {
+            base_addr.wrapping_add(offset as u32)
+        } else {
+            base_addr.wrapping_sub((-offset) as u32)
+        };
+        self.set_arm_reg(reg_num, updated_addr)?;
+        Ok(base_addr)
+    }
+
+    /// Simulates ARM Pre-Indexed Addressing Mode: [Rn, #offset]!
+    /// Updates Rn first, then returns the updated address.
+    pub fn arm_pre_indexed(&mut self, reg_num: usize, offset: i32) -> Result<u32, CpuError> {
+        let base_addr = self.get_arm_reg(reg_num)?;
+        let updated_addr = if offset >= 0 {
+            base_addr.wrapping_add(offset as u32)
+        } else {
+            base_addr.wrapping_sub((-offset) as u32)
+        };
+        self.set_arm_reg(reg_num, updated_addr)?;
+        Ok(updated_addr)
+    }
+
+    // --- General General-Purpose Register Access ---
+
+    pub fn mov_val_to_reg(&mut self, dest: &str, val: u64) -> Result<(), CpuError> {
+        match dest {
             "rax" => self.registers.rax = val,
             "rbx" => self.registers.rbx = val,
             "rcx" => self.registers.rcx = val,
             "rdx" => self.registers.rdx = val,
-            "cr0" => self.registers.cr0 = val,
-            "cr3" => self.registers.cr3 = val,
-            "rip" => self.registers.rip = val,
-            "rsp" => self.registers.rsp = val,
             "rsi" => self.registers.rsi = val,
             "rdi" => self.registers.rdi = val,
             "rbp" => self.registers.rbp = val,
-            "r8" => self.registers.r8 = val,
-            "r9" => self.registers.r9 = val,
-            "r10" => self.registers.r10 = val,
-            "r11" => self.registers.r11 = val,
-            "r12" => self.registers.r12 = val,
-            "r13" => self.registers.r13 = val,
-            "r14" => self.registers.r14 = val,
-            "r15" => self.registers.r15 = val,
             _ => return Err(CpuError::InvalidRegister),
         }
         Ok(())
     }
 
-    /// Simulates standard x86 assembly data movement: `mov <dest>, <src_val>`
-    pub fn mov_val_to_reg(&mut self, dest: &str, val: u64) -> Result<(), CpuError> {
-        self.set_register(dest, val)
-    }
-
-    /// Helper for checking address boundary and privilege violations
-    /// Addresses >= 2048 are kernel-protected and restricted from Ring 3
-    pub fn check_memory_privilege(&self, addr: u64, size: u64) -> Result<(), CpuError> {
-        let limit = addr.checked_add(size).ok_or(CpuError::InvalidAddress)?;
-        if limit > self.memory.len() as u64 {
-            return Err(CpuError::InvalidAddress);
+    pub fn get_arm_reg(&self, reg_num: usize) -> Result<u32, CpuError> {
+        match reg_num {
+            0 => Ok(self.registers.r0),
+            1 => Ok(self.registers.r1),
+            2 => Ok(self.registers.r2),
+            3 => Ok(self.registers.r3),
+            4 => Ok(self.registers.r4),
+            5 => Ok(self.registers.r5),
+            6 => Ok(self.registers.r6),
+            7 => Ok(self.registers.r7),
+            8 => Ok(self.registers.r8),
+            9 => Ok(self.registers.r9),
+            10 => Ok(self.registers.r10),
+            11 => Ok(self.registers.r11),
+            12 => Ok(self.registers.r12),
+            14 => Ok(self.registers.lr),
+            15 => Ok(self.registers.pc),
+            _ => Err(CpuError::InvalidRegister),
         }
-        if self.ring == CpuRing::Ring3 {
-            // Access in kernel zone denied to User Ring 3
-            if addr >= 2048 || limit > 2048 {
-                return Err(CpuError::PrivilegeViolation);
-            }
-        }
-        Ok(())
     }
 
-    /// Helper to read a u64 in little-endian format from simulated memory
-    pub fn read_mem_u64(&self, addr: u64) -> Result<u64, CpuError> {
-        self.check_memory_privilege(addr, 8)?;
-        let idx = addr as usize;
-        let bytes = [
-            self.memory[idx],
-            self.memory[idx + 1],
-            self.memory[idx + 2],
-            self.memory[idx + 3],
-            self.memory[idx + 4],
-            self.memory[idx + 5],
-            self.memory[idx + 6],
-            self.memory[idx + 7],
-        ];
-        Ok(u64::from_le_bytes(bytes))
-    }
-
-    /// Helper to write a u64 in little-endian format to simulated memory
-    pub fn write_mem_u64(&mut self, addr: u64, val: u64) -> Result<(), CpuError> {
-        self.check_memory_privilege(addr, 8)?;
-        let bytes = val.to_le_bytes();
-        let idx = addr as usize;
-        self.memory[idx..idx + 8].copy_from_slice(&bytes);
-        Ok(())
-    }
-
-    /// Emulates load register: `LDR <dest_reg>, [<base_reg>, #offset]`
-    pub fn ldr(&mut self, dest_reg: &str, base_reg: &str, offset: i64, mode: AddressingMode) -> Result<(), CpuError> {
-        let base_val = self.get_register(base_reg)?;
-        let target_addr = match mode {
-            AddressingMode::Immediate => {
-                let val = offset as u64;
-                self.set_register(dest_reg, val)?;
-                return Ok(());
-            }
-            AddressingMode::Offset => {
-                (base_val as i64).checked_add(offset).ok_or(CpuError::InvalidAddress)? as u64
-            }
-            AddressingMode::PreIndexed => {
-                let addr = (base_val as i64).checked_add(offset).ok_or(CpuError::InvalidAddress)? as u64;
-                self.set_register(base_reg, addr)?;
-                addr
-            }
-            AddressingMode::PostIndexed => {
-                let addr = base_val;
-                let next_base = (base_val as i64).checked_add(offset).ok_or(CpuError::InvalidAddress)? as u64;
-                self.set_register(base_reg, next_base)?;
-                addr
-            }
-        };
-
-        let val = self.read_mem_u64(target_addr)?;
-        self.set_register(dest_reg, val)?;
-        Ok(())
-    }
-
-    /// Emulates load register with CISC/RISC scaled index displacement addressing:
-    /// `LDR <dest_reg>, [<base_reg> + <index_reg> * <scale> + <disp>]`
-    pub fn ldr_scaled(
-        &mut self,
-        dest_reg: &str,
-        base_reg: &str,
-        index_reg: &str,
-        scale: u64,
-        disp: i64,
-    ) -> Result<(), CpuError> {
-        if scale != 1 && scale != 2 && scale != 4 && scale != 8 {
-            return Err(CpuError::InvalidAddress);
-        }
-        let base_val = self.get_register(base_reg)?;
-        let index_val = self.get_register(index_reg)?;
-        let scaled_offset = index_val.checked_mul(scale).ok_or(CpuError::InvalidAddress)?;
-        let effective_addr = (base_val as i64)
-            .checked_add(scaled_offset as i64)
-            .ok_or(CpuError::InvalidAddress)?
-            .checked_add(disp)
-            .ok_or(CpuError::InvalidAddress)? as u64;
-
-        let val = self.read_mem_u64(effective_addr)?;
-        self.set_register(dest_reg, val)?;
-        Ok(())
-    }
-
-    /// Emulates store register with CISC/RISC scaled index displacement addressing:
-    /// `STR <src_reg>, [<base_reg> + <index_reg> * <scale> + <disp>]`
-    pub fn str_scaled(
-        &mut self,
-        src_reg: &str,
-        base_reg: &str,
-        index_reg: &str,
-        scale: u64,
-        disp: i64,
-    ) -> Result<(), CpuError> {
-        if scale != 1 && scale != 2 && scale != 4 && scale != 8 {
-            return Err(CpuError::InvalidAddress);
-        }
-        let base_val = self.get_register(base_reg)?;
-        let index_val = self.get_register(index_reg)?;
-        let src_val = self.get_register(src_reg)?;
-
-        let scaled_offset = index_val.checked_mul(scale).ok_or(CpuError::InvalidAddress)?;
-        let effective_addr = (base_val as i64)
-            .checked_add(scaled_offset as i64)
-            .ok_or(CpuError::InvalidAddress)?
-            .checked_add(disp)
-            .ok_or(CpuError::InvalidAddress)? as u64;
-
-        self.write_mem_u64(effective_addr, src_val)?;
-        Ok(())
-    }
-
-    /// Emulates store register: `STR <src_reg>, [<base_reg>, #offset]`
-    pub fn str(&mut self, src_reg: &str, base_reg: &str, offset: i64, mode: AddressingMode) -> Result<(), CpuError> {
-        let base_val = self.get_register(base_reg)?;
-        let src_val = self.get_register(src_reg)?;
-
-        let target_addr = match mode {
-            AddressingMode::Immediate => {
-                offset as u64
-            }
-            AddressingMode::Offset => {
-                (base_val as i64).checked_add(offset).ok_or(CpuError::InvalidAddress)? as u64
-            }
-            AddressingMode::PreIndexed => {
-                let addr = (base_val as i64).checked_add(offset).ok_or(CpuError::InvalidAddress)? as u64;
-                self.set_register(base_reg, addr)?;
-                addr
-            }
-            AddressingMode::PostIndexed => {
-                let addr = base_val;
-                let next_base = (base_val as i64).checked_add(offset).ok_or(CpuError::InvalidAddress)? as u64;
-                self.set_register(base_reg, next_base)?;
-                addr
-            }
-        };
-
-        self.write_mem_u64(target_addr, src_val)?;
-        Ok(())
-    }
-
-    /// Emulates load multiple: `LDM <base_reg>[!], {reg_list}`
-    pub fn ldm(&mut self, base_reg: &str, regs: &[&str], mode: BlockTransferMode, writeback: bool) -> Result<(), CpuError> {
-        if regs.is_empty() {
-            return Ok(());
-        }
-        let base_val = self.get_register(base_reg)?;
-        let mut current_addr = base_val;
-
-        for reg in regs {
-            match mode {
-                BlockTransferMode::IncrementAfter => {
-                    let val = self.read_mem_u64(current_addr)?;
-                    self.set_register(reg, val)?;
-                    current_addr = current_addr.checked_add(8).ok_or(CpuError::InvalidAddress)?;
-                }
-                BlockTransferMode::IncrementBefore => {
-                    current_addr = current_addr.checked_add(8).ok_or(CpuError::InvalidAddress)?;
-                    let val = self.read_mem_u64(current_addr)?;
-                    self.set_register(reg, val)?;
-                }
-                BlockTransferMode::DecrementAfter => {
-                    let val = self.read_mem_u64(current_addr)?;
-                    self.set_register(reg, val)?;
-                    current_addr = current_addr.checked_sub(8).ok_or(CpuError::InvalidAddress)?;
-                }
-                BlockTransferMode::DecrementBefore => {
-                    current_addr = current_addr.checked_sub(8).ok_or(CpuError::InvalidAddress)?;
-                    let val = self.read_mem_u64(current_addr)?;
-                    self.set_register(reg, val)?;
-                }
-            }
-        }
-
-        if writeback {
-            self.set_register(base_reg, current_addr)?;
+    pub fn set_arm_reg(&mut self, reg_num: usize, val: u32) -> Result<(), CpuError> {
+        match reg_num {
+            0 => self.registers.r0 = val,
+            1 => self.registers.r1 = val,
+            2 => self.registers.r2 = val,
+            3 => self.registers.r3 = val,
+            4 => self.registers.r4 = val,
+            5 => self.registers.r5 = val,
+            6 => self.registers.r6 = val,
+            7 => self.registers.r7 = val,
+            8 => self.registers.r8 = val,
+            9 => self.registers.r9 = val,
+            10 => self.registers.r10 = val,
+            11 => self.registers.r11 = val,
+            12 => self.registers.r12 = val,
+            14 => self.registers.lr = val,
+            15 => self.registers.pc = val,
+            _ => return Err(CpuError::InvalidRegister),
         }
         Ok(())
     }
 
-    /// Emulates store multiple: `STM <base_reg>[!], {reg_list}`
-    pub fn stm(&mut self, base_reg: &str, regs: &[&str], mode: BlockTransferMode, writeback: bool) -> Result<(), CpuError> {
-        if regs.is_empty() {
-            return Ok(());
-        }
-        let base_val = self.get_register(base_reg)?;
-        let mut current_addr = base_val;
+    // --- Memory Operations ---
 
-        for reg in regs {
-            let val = self.get_register(reg)?;
-            match mode {
-                BlockTransferMode::IncrementAfter => {
-                    self.write_mem_u64(current_addr, val)?;
-                    current_addr = current_addr.checked_add(8).ok_or(CpuError::InvalidAddress)?;
-                }
-                BlockTransferMode::IncrementBefore => {
-                    current_addr = current_addr.checked_add(8).ok_or(CpuError::InvalidAddress)?;
-                    self.write_mem_u64(current_addr, val)?;
-                }
-                BlockTransferMode::DecrementAfter => {
-                    self.write_mem_u64(current_addr, val)?;
-                    current_addr = current_addr.checked_sub(8).ok_or(CpuError::InvalidAddress)?;
-                }
-                BlockTransferMode::DecrementBefore => {
-                    current_addr = current_addr.checked_sub(8).ok_or(CpuError::InvalidAddress)?;
-                    self.write_mem_u64(current_addr, val)?;
-                }
-            }
+    pub fn read_mem_u8(&self, addr: u64) -> Result<u8, CpuError> {
+        if addr >= self.memory.len() as u64 {
+            return Err(CpuError::MemoryAccessViolation);
         }
+        Ok(self.memory[addr as usize])
+    }
 
-        if writeback {
-            self.set_register(base_reg, current_addr)?;
+    pub fn write_mem_u8(&mut self, addr: u64, val: u8) -> Result<(), CpuError> {
+        if addr >= self.memory.len() as u64 {
+            return Err(CpuError::MemoryAccessViolation);
         }
+        self.memory[addr as usize] = val;
         Ok(())
     }
 
-    /// Simulates standard x86 assembly stack pushing: `push <val>`
-    pub fn push_stack(&mut self, val: u64) -> Result<(), CpuError> {
-        if self.registers.rsp % 8 != 0 {
+    pub fn read_mem_u32(&self, addr: u64) -> Result<u32, CpuError> {
+        if addr % 4 != 0 {
             return Err(CpuError::AlignmentFault);
         }
-        if self.registers.rsp < 8 {
+        if addr + 3 >= self.memory.len() as u64 {
+            return Err(CpuError::MemoryAccessViolation);
+        }
+        let b0 = self.memory[addr as usize] as u32;
+        let b1 = self.memory[addr as usize + 1] as u32;
+        let b2 = self.memory[addr as usize + 2] as u32;
+        let b3 = self.memory[addr as usize + 3] as u32;
+        Ok(b0 | (b1 << 8) | (b2 << 16) | (b3 << 24))
+    }
+
+    pub fn write_mem_u32(&mut self, addr: u64, val: u32) -> Result<(), CpuError> {
+        if addr % 4 != 0 {
+            return Err(CpuError::AlignmentFault);
+        }
+        if addr + 3 >= self.memory.len() as u64 {
+            return Err(CpuError::MemoryAccessViolation);
+        }
+        self.memory[addr as usize] = (val & 0xFF) as u8;
+        self.memory[addr as usize + 1] = ((val >> 8) & 0xFF) as u8;
+        self.memory[addr as usize + 2] = ((val >> 16) & 0xFF) as u8;
+        self.memory[addr as usize + 3] = ((val >> 24) & 0xFF) as u8;
+        Ok(())
+    }
+
+    // --- Complex CISC Instructions ---
+
+    /// Bitwise Shifts & Rotates: SHL, SHR, SAR, ROL, ROR
+    pub fn exec_shift_rotate(&mut self, opcode: &str, val: u64, amount: u32) -> Result<u64, CpuError> {
+        let amount = amount % 64;
+        let result = match opcode {
+            "SHL" => val.wrapping_shl(amount),
+            "SHR" => val.wrapping_shr(amount),
+            "SAR" => {
+                let signed = val as i64;
+                signed.wrapping_shr(amount) as u64
+            }
+            "ROL" => val.rotate_left(amount),
+            "ROR" => val.rotate_right(amount),
+            _ => return Err(CpuError::InvalidAddressingMode),
+        };
+
+        // Update status flags: ZF (Zero Flag), SF (Sign Flag), CF (Carry Flag), OF (Overflow Flag)
+        let mut flags = 0u64;
+        if result == 0 {
+            flags |= 1 << 6; // ZF (Bit 6)
+        }
+        if (result as i64) < 0 {
+            flags |= 1 << 7; // SF (Bit 7)
+        }
+        self.registers.rflags = flags;
+        Ok(result)
+    }
+
+    /// Block transfer/string instructions: REP MOVS / REP STOS
+    pub fn exec_string_op(&mut self, opcode: &str) -> Result<(), CpuError> {
+        let mut count = self.registers.rcx;
+        let mut rsi = self.registers.rsi;
+        let mut rdi = self.registers.rdi;
+
+        match opcode {
+            "REP MOVS" => {
+                while count > 0 {
+                    let val = self.read_mem_u8(rsi)?;
+                    self.write_mem_u8(rdi, val)?;
+                    rsi = rsi.wrapping_add(1);
+                    rdi = rdi.wrapping_add(1);
+                    count -= 1;
+                }
+            }
+            "REP STOS" => {
+                let fill_val = (self.registers.rax & 0xFF) as u8;
+                while count > 0 {
+                    self.write_mem_u8(rdi, fill_val)?;
+                    rdi = rdi.wrapping_add(1);
+                    count -= 1;
+                }
+            }
+            _ => return Err(CpuError::InvalidAddressingMode),
+        }
+
+        self.registers.rcx = count;
+        self.registers.rsi = rsi;
+        self.registers.rdi = rdi;
+        Ok(())
+    }
+
+    // --- ARM Block / Multi-Register Transfer Instructions ---
+
+    /// ARM Store Multiple (STM) - simulates writing a set of registers to memory starting at base
+    pub fn exec_stm(&mut self, base_reg: usize, reg_mask: u16) -> Result<(), CpuError> {
+        let mut addr = self.get_arm_reg(base_reg)? as u64;
+        for i in 0..16 {
+            if (reg_mask & (1 << i)) != 0 {
+                let val = self.get_arm_reg(i)?;
+                self.write_mem_u32(addr, val)?;
+                addr = addr.wrapping_add(4);
+            }
+        }
+        self.set_arm_reg(base_reg, addr as u32)?;
+        Ok(())
+    }
+
+    /// ARM Load Multiple (LDM) - simulates reading a set of registers from memory starting at base
+    pub fn exec_ldm(&mut self, base_reg: usize, reg_mask: u16) -> Result<(), CpuError> {
+        let mut addr = self.get_arm_reg(base_reg)? as u64;
+        for i in 0..16 {
+            if (reg_mask & (1 << i)) != 0 {
+                let val = self.read_mem_u32(addr)?;
+                self.set_arm_reg(i, val)?;
+                addr = addr.wrapping_add(4);
+            }
+        }
+        self.set_arm_reg(base_reg, addr as u32)?;
+        Ok(())
+    }
+
+    // --- Hardware and Memory Barriers ---
+
+    pub fn exec_barrier(&mut self, barrier_type: &str) {
+        match barrier_type {
+            "MFENCE" => {
+                // Ensure all load and store instructions preceding MFENCE are globally visible
+                core::sync::atomic::compiler_fence(Ordering::SeqCst);
+            }
+            "DMB" => {
+                // Data Memory Barrier
+                core::sync::atomic::compiler_fence(Ordering::Release);
+            }
+            "DSB" => {
+                // Data Synchronization Barrier
+                core::sync::atomic::compiler_fence(Ordering::SeqCst);
+            }
+            _ => {}
+        }
+    }
+
+    // --- Privilege Transitions and Software Traps ---
+
+    /// Simulates x86 software trap `syscall` or ARM `svc #imm`
+    /// escalates ring to Ring0 and handles kernel trap.
+    pub fn trigger_trap(&mut self, syscall_num: u64) -> Result<u64, CpuError> {
+        // Elevate ring privilege to Ring0
+        let original_ring = self.ring;
+        self.ring = CpuRing::Ring0;
+
+        let ret_val = match syscall_num {
+            1 => {
+                // sys_write (RAX is buffer address, RCX is len)
+                let addr = self.registers.rax;
+                let len = self.registers.rcx;
+                let mut checksum = 0u64;
+                for i in 0..len {
+                    let b = self.read_mem_u8(addr.wrapping_add(i))? as u64;
+                    checksum = checksum.wrapping_add(b);
+                }
+                checksum
+            }
+            2 => {
+                // sys_get_cpu_id
+                42
+            }
+            _ => 0xFFFFFFFFFFFFFFFF,
+        };
+
+        // Return privilege back to original ring level
+        self.ring = original_ring;
+        Ok(ret_val)
+    }
+
+    // --- Existing CPU Stack & Mode Functions ---
+
+    pub fn push_stack(&mut self, val: u64) -> Result<(), CpuError> {
+        if self.registers.rsp == 0 {
             return Err(CpuError::StackOverflow);
         }
         self.registers.rsp -= 8;
@@ -669,73 +451,6 @@ impl SovereignVirtualCPU {
         }
     }
 
-    /// Simulates standard x86 assembly stack popping: `pop`
-    pub fn pop_stack(&mut self) -> Result<u64, CpuError> {
-        let index = (self.registers.rsp / 8) as usize;
-        if index >= self.stack_memory.len() {
-            return Err(CpuError::StackOverflow);
-        }
-        let val = self.stack_memory[index];
-        self.registers.rsp += 8;
-        Ok(val)
-    }
-
-    /// Simulates standard x86 assembly stack popping: `pop <dest>`
-    pub fn pop_stack_to(&mut self, dest: &str) -> Result<(), CpuError> {
-        if self.registers.rsp % 8 != 0 {
-            return Err(CpuError::AlignmentFault);
-        }
-        let index = (self.registers.rsp / 8) as usize;
-        if index >= self.stack_memory.len() {
-            return Err(CpuError::StackOverflow);
-        }
-        let val = self.stack_memory[index];
-        self.registers.rsp += 8;
-        self.set_register(dest, val)?;
-        Ok(())
-    }
-
-    /// Pushes multiple registers onto the stack.
-    /// Alignment of Stack Pointer (rsp) is validated.
-    pub fn push_multiple(&mut self, regs: &[&str]) -> Result<(), CpuError> {
-        if self.registers.rsp % 8 != 0 {
-            return Err(CpuError::AlignmentFault);
-        }
-        for &reg in regs.iter().rev() {
-            let val = self.get_register(reg)?;
-            if self.registers.rsp < 8 {
-                return Err(CpuError::StackOverflow);
-            }
-            self.registers.rsp -= 8;
-            let index = (self.registers.rsp / 8) as usize;
-            if index < self.stack_memory.len() {
-                self.stack_memory[index] = val;
-            } else {
-                return Err(CpuError::StackOverflow);
-            }
-        }
-        Ok(())
-    }
-
-    /// Pops multiple registers from the stack.
-    /// Alignment of Stack Pointer (rsp) is validated.
-    pub fn pop_multiple(&mut self, regs: &[&str]) -> Result<(), CpuError> {
-        if self.registers.rsp % 8 != 0 {
-            return Err(CpuError::AlignmentFault);
-        }
-        for &reg in regs {
-            let index = (self.registers.rsp / 8) as usize;
-            if index >= self.stack_memory.len() {
-                return Err(CpuError::StackOverflow);
-            }
-            let val = self.stack_memory[index];
-            self.registers.rsp += 8;
-            self.set_register(reg, val)?;
-        }
-        Ok(())
-    }
-
-    /// Transitions between x86 Execution Modes (Alters PE bits dynamically)
     pub fn transition_mode(&mut self, target: CpuMode) -> Result<(), CpuError> {
         if self.ring != CpuRing::Ring0 {
             return Err(CpuError::PrivilegeViolation); // Only Ring 0 can alter CPU modes!
@@ -757,13 +472,13 @@ impl SovereignVirtualCPU {
                 self.registers.cr0 |= 1; // PE bit 0 must be active
                 self.mode = CpuMode::LongMode;
             }
+            CpuMode::ArmMode => {
+                self.mode = CpuMode::ArmMode;
+            }
         }
         Ok(())
     }
 
-    /// Transitions the active thread across CPU Rings (Privilege Separation)
-    /// - Ring 0 can transition down to Ring 1, 2, or 3.
-    /// - Restricted Rings (Ring 3) CANNOT escalate back to Ring 0 directly (must trigger software trap).
     pub fn transition_ring(&mut self, target: CpuRing) -> Result<(), CpuError> {
         if target > self.ring {
             // Lowering privileges is always allowed
@@ -781,686 +496,6 @@ impl SovereignVirtualCPU {
             }
         }
     }
-
-    /// Write to Model Specific Register (rdmsr/wrmsr emulation)
-    pub fn write_msr(&mut self, reg: u32, value: u64) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        match reg {
-            0xC0000080 => self.msrs.efer = value,
-            0xC0000081 => self.msrs.star = value,
-            0xC0000082 => self.msrs.lstar = value,
-            0xC0000084 => self.msrs.sfmask = value,
-            _ => return Err(CpuError::InvalidRegister),
-        }
-        Ok(())
-    }
-
-    /// Emulates the fast 64-bit `SYSCALL` instruction used by Linux and BSD for low-overhead user space transitions
-    pub fn execute_syscall(&mut self) -> Result<(), CpuError> {
-        if self.mode != CpuMode::LongMode {
-            return Err(CpuError::InvalidInstruction);
-        }
-
-        // 1. Save current RIP to RCX, and save RFLAGS to R11 (simulated)
-        self.registers.rcx = self.registers.rip;
-
-        // 2. Load syscall target RIP from LSTAR MSR
-        self.registers.rip = self.msrs.lstar;
-
-        // 3. Elevate privilege to Ring 0
-        self.ring = CpuRing::Ring0;
-
-        Ok(())
-    }
-
-    /// Emulates x86 software trap / CPU exception interrupt handling (e.g. GPF, Page Fault, Soft Traps)
-    /// Automatically pushes RIP, CS, and registers onto the kernel stack, and escalates ring to Ring 0.
-    pub fn trigger_interrupt_trap(&mut self, vector: u8, handler_rip: u64) -> Result<(), CpuError> {
-        // Save current instruction pointer and stack context
-        let old_rip = self.registers.rip;
-        let old_rsp = self.registers.rsp;
-        let old_ring = self.ring as u64;
-
-        // Escapes to Ring 0 first (privilege elevation)
-        self.ring = CpuRing::Ring0;
-
-        // Push execution context onto kernel stack frame (standard hardware frame)
-        self.push_stack(old_rsp)?;
-        self.push_stack(old_rip)?;
-        self.push_stack(old_ring)?;
-        self.push_stack(vector as u64)?;
-
-        // Jump to exception service handler address
-        self.registers.rip = handler_rip;
-
-        Ok(())
-    }
-
-    /// Emulates the x86 `SWAPGS` instruction (Linux/BSD transition from user space to kernel space).
-    pub fn swapgs(&mut self) {
-        let temp = self.msrs.gs_base;
-        self.msrs.gs_base = self.msrs.kernel_gs_base;
-        self.msrs.kernel_gs_base = temp;
-    }
-
-    /// Lazily handles floating-point/vector register context switches (Linux/BSD style).
-    /// If TS (Task Switched) bit in CR0 is set, accessing FP registers triggers a Device Not Available exception.
-    /// The kernel then clears TS, saves/restores the FP area, and proceeds.
-    pub fn handle_lazy_fp_state_restore(
-        &mut self,
-        is_fp_instruction: bool,
-    ) -> Result<(), CpuError> {
-        let ts_bit_active = (self.registers.cr0 & (1 << 3)) != 0;
-        if is_fp_instruction && ts_bit_active {
-            // Trigger Device Not Available (#NM exception trap)
-            // Clear TS bit in CR0
-            self.registers.cr0 &= !(1 << 3);
-
-            // Simulates copying FP state from memory (XSAVE)
-            if self.fp_dirty {
-                // Restore state
-                self.fp_dirty = false;
-            }
-            Ok(())
-        } else if is_fp_instruction {
-            Ok(())
-        } else {
-            Err(CpuError::InvalidInstruction)
-        }
-    }
-    /// Initializes a simulated physical thread object (KeInitThread Windows equivalent)
-    pub fn ke_init_thread(&mut self, thread_id: u64, parent_id: u64) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        // Check if thread already exists
-        if self.threads.iter().any(|t| t.id == thread_id) {
-            return Ok(());
-        }
-        let thread = SovereignThread {
-            id: thread_id,
-            parent_id,
-            state: ThreadState::Running,
-            suspend_count: 0,
-            alertable: false,
-            kernel_apc_disable: false,
-            apc_queue: Vec::new(),
-        };
-        self.threads.push(thread);
-        Ok(())
-    }
-
-    /// Suspends a thread (KeSuspendThread Windows equivalent), incrementing suspend_count
-    pub fn ke_suspend_thread(&mut self, thread_id: u64) -> Result<u32, CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        // Cannot suspend if processor runs at DISPATCH_LEVEL or above
-        if self.kprcb.current_irql >= Irql::DispatchLevel {
-            return Err(CpuError::IrqlViolation);
-        }
-        let pos = self.threads.iter().position(|t| t.id == thread_id).ok_or(CpuError::InvalidAddress)?;
-        let thread = &mut self.threads[pos];
-        thread.suspend_count += 1;
-        thread.state = ThreadState::Suspended;
-        Ok(thread.suspend_count)
-    }
-
-    /// Resumes a thread (KeResumeThread Windows equivalent), decrementing suspend_count
-    pub fn ke_resume_thread(&mut self, thread_id: u64) -> Result<u32, CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        if self.kprcb.current_irql >= Irql::DispatchLevel {
-            return Err(CpuError::IrqlViolation);
-        }
-        let pos = self.threads.iter().position(|t| t.id == thread_id).ok_or(CpuError::InvalidAddress)?;
-        let thread = &mut self.threads[pos];
-        if thread.suspend_count > 0 {
-            thread.suspend_count -= 1;
-        }
-        if thread.suspend_count == 0 {
-            thread.state = ThreadState::Running;
-        }
-        Ok(thread.suspend_count)
-    }
-
-    /// Raises CPU Interrupt Request Level (KeRaiseIrql equivalent)
-    /// Validates environment (e.g. Ring 3 cannot modify hardware IRQLs, preventing rootkits)
-    pub fn ke_raise_irql(&mut self, target_irql: Irql) -> Result<Irql, CpuError> {
-        if self.ring == CpuRing::Ring3 {
-            return Err(CpuError::PrivilegeViolation); // Block rootkits in user context
-        }
-        if target_irql < self.kprcb.current_irql {
-            return Err(CpuError::IrqlViolation); // Cannot raise to lower level!
-        }
-        let old = self.kprcb.current_irql;
-        self.kprcb.current_irql = target_irql;
-        Ok(old)
-    }
-
-    /// Lowers CPU Interrupt Request Level (KeLowerIrql equivalent)
-    pub fn ke_lower_irql(&mut self, target_irql: Irql) -> Result<(), CpuError> {
-        if self.ring == CpuRing::Ring3 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        if target_irql > self.kprcb.current_irql {
-            return Err(CpuError::IrqlViolation); // Lowering to higher IRQL is invalid!
-        }
-        self.kprcb.current_irql = target_irql;
-        Ok(())
-    }
-
-    /// Queues an APC onto a specified thread's queue (KiScheduleApc equivalent)
-    pub fn ki_schedule_apc(&mut self, thread_id: u64, apc: SovereignApc) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        let pos = self.threads.iter().position(|t| t.id == thread_id).ok_or(CpuError::InvalidAddress)?;
-        self.threads[pos].apc_queue.push(apc);
-        Ok(())
-    }
-
-    /// Delivers pending APCs on the active thread context (KiDeliverApc / SchedulerApc equivalent)
-    /// Respects thread states, alertable environments, and current CPU IRQL (must be < APC_LEVEL)
-    pub fn scheduler_apc(&mut self) -> Result<u32, CpuError> {
-        if self.kprcb.current_irql >= Irql::ApcLevel {
-            return Ok(0); // APC delivery is disabled when IRQL >= APC_LEVEL
-        }
-
-        let active_id = self.kprcb.active_thread_id;
-        let pos = self.threads.iter().position(|t| t.id == active_id).ok_or(CpuError::InvalidAddress)?;
-
-        if self.threads[pos].state == ThreadState::Suspended {
-            return Err(CpuError::ThreadSuspended);
-        }
-
-        // Elevate IRQL to APC_LEVEL during delivery
-        let old_irql = self.ke_raise_irql(Irql::ApcLevel)?;
-
-        let mut delivered = 0;
-        let mut remaining = Vec::new();
-        // Take APC queue to execute
-        let queue = core::mem::take(&mut self.threads[pos].apc_queue);
-
-        for apc in queue {
-            let mut deliver = false;
-            match apc.apc_type {
-                ApcType::SpecialKernel => {
-                    // Special Kernel APC is always delivered regardless of kernel_apc_disable
-                    deliver = true;
-                }
-                ApcType::NormalKernel => {
-                    if !self.threads[pos].kernel_apc_disable {
-                        deliver = true;
-                    }
-                }
-                ApcType::User => {
-                    // User APCs delivered only if thread is explicitly alertable
-                    if self.threads[pos].alertable {
-                        deliver = true;
-                    }
-                }
-            }
-
-            if deliver {
-                // Call kernel routine
-                (apc.kernel_routine)(self, apc.system_argument1)?;
-                // Call normal routine if present
-                if let Some(normal) = apc.normal_routine {
-                    (normal)(self, apc.normal_context, apc.system_argument2)?;
-                }
-                delivered += 1;
-            } else {
-                // Keep in queue or run rundown routine on process shutdown/exit
-                if self.threads[pos].state == ThreadState::Terminated {
-                    if let Some(rundown) = apc.rundown_routine {
-                        (rundown)(self, apc.system_argument1)?;
-                    }
-                } else {
-                    remaining.push(apc);
-                }
-            }
-        }
-
-        self.threads[pos].apc_queue = remaining;
-        self.ke_lower_irql(old_irql)?;
-        Ok(delivered)
-    }
-
-    /// Queues a Deferred Procedure Call (KeInsertQueueDpc equivalent)
-    pub fn ke_insert_queue_dpc(&mut self, dpc: SovereignDpc) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        // Insert into queue and sort by importance (priority queuing)
-        self.kprcb.dpc_queue.push(dpc);
-        self.kprcb.dpc_queue.sort_by(|a, b| b.importance.cmp(&a.importance));
-        Ok(())
-    }
-
-    /// Executes queued Deferred Procedure Calls at DISPATCH_LEVEL (KiRetireDpcList equivalent)
-    pub fn ki_retire_dpc_list(&mut self) -> Result<u32, CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        if self.kprcb.current_irql < Irql::DispatchLevel {
-            // Must raise IRQL to DISPATCH_LEVEL to execute DPCs
-            let old_irql = self.ke_raise_irql(Irql::DispatchLevel)?;
-            let count = self.execute_dpcs_internal()?;
-            self.ke_lower_irql(old_irql)?;
-            Ok(count)
-        } else {
-            self.execute_dpcs_internal()
-        }
-    }
-
-    fn execute_dpcs_internal(&mut self) -> Result<u32, CpuError> {
-        let queue = core::mem::take(&mut self.kprcb.dpc_queue);
-        let mut count = 0;
-        for dpc in queue {
-            (dpc.deferred_routine)(
-                self,
-                dpc.deferred_context,
-                dpc.system_argument1,
-                dpc.system_argument2,
-            )?;
-            count += 1;
-        }
-        Ok(count)
-    }
-
-    /// Queues a system Work Item to the worker queue (ExQueueWorkItem equivalent)
-    pub fn ex_queue_work_item(&mut self, mut item: WorkItem) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        item.is_queued = true;
-        self.kprcb.work_item_queue.push(item);
-        Ok(())
-    }
-
-    /// Process queued system Work Items inside exp_worker_thread (ExWorkerThread equivalent)
-    /// Runs at PASSIVE_LEVEL inside system thread contexts
-    pub fn exp_worker_thread(&mut self) -> Result<u32, CpuError> {
-        if self.kprcb.current_irql != Irql::PassiveLevel {
-            return Err(CpuError::IrqlViolation); // Worker threads must execute at PASSIVE_LEVEL
-        }
-        let queue = core::mem::take(&mut self.kprcb.work_item_queue);
-        let mut count = 0;
-        for item in queue {
-            (item.worker_routine)(self, item.parameter)?;
-            count += 1;
-        }
-        Ok(count)
-    }
-
-    /// Emulates CISC string copy operation: `REP MOVSB`
-    /// Copies `rcx` bytes of memory from source `rsi` to destination `rdi`
-    pub fn rep_movsb(&mut self) -> Result<(), CpuError> {
-        let count = self.registers.rcx;
-        let mut src = self.registers.rsi;
-        let mut dest = self.registers.rdi;
-
-        if count == 0 {
-            return Ok(());
-        }
-
-        self.check_memory_privilege(src, count)?;
-        self.check_memory_privilege(dest, count)?;
-
-        // Perform safe non-overlapping or overlapping copies
-        for _ in 0..count {
-            let val = self.memory[src as usize];
-            self.memory[dest as usize] = val;
-            src = src.checked_add(1).ok_or(CpuError::InvalidAddress)?;
-            dest = dest.checked_add(1).ok_or(CpuError::InvalidAddress)?;
-        }
-
-        self.registers.rcx = 0;
-        self.registers.rsi = src;
-        self.registers.rdi = dest;
-        self.registers.zf = true; // Complete execution sets ZF to true
-        Ok(())
-    }
-
-    /// Emulates CISC memory fill operation: `REP STOSB`
-    /// Fills `rcx` bytes starting at `rdi` with the lower byte of `rax` (AL)
-    pub fn rep_stosb(&mut self) -> Result<(), CpuError> {
-        let count = self.registers.rcx;
-        let mut dest = self.registers.rdi;
-        let fill_byte = (self.registers.rax & 0xFF) as u8;
-
-        if count == 0 {
-            return Ok(());
-        }
-
-        self.check_memory_privilege(dest, count)?;
-
-        for _ in 0..count {
-            self.memory[dest as usize] = fill_byte;
-            dest = dest.checked_add(1).ok_or(CpuError::InvalidAddress)?;
-        }
-
-        self.registers.rcx = 0;
-        self.registers.rdi = dest;
-        self.registers.zf = true;
-        Ok(())
-    }
-
-    // =====================================
-    // 2. Bitwise Shift and Rotation Methods
-    // =====================================
-
-    /// Emulates logical shift left: `SHL <dest_reg>, <count>`
-    pub fn shl(&mut self, reg_name: &str, count: u32) -> Result<(), CpuError> {
-        let val = self.get_register(reg_name)?;
-        if count == 0 {
-            return Ok(());
-        }
-        let count_mod = count % 64;
-        let carry = if count_mod > 0 {
-            ((val >> (64 - count_mod)) & 1) == 1
-        } else {
-            false
-        };
-        let res = val << count_mod;
-        self.set_register(reg_name, res)?;
-
-        // Update Status Flags
-        self.registers.cf = carry;
-        self.registers.zf = res == 0;
-        self.registers.sf = (res >> 63) == 1;
-        Ok(())
-    }
-
-    /// Emulates logical shift right: `SHR <dest_reg>, <count>`
-    pub fn shr(&mut self, reg_name: &str, count: u32) -> Result<(), CpuError> {
-        let val = self.get_register(reg_name)?;
-        if count == 0 {
-            return Ok(());
-        }
-        let count_mod = count % 64;
-        let carry = if count_mod > 0 {
-            ((val >> (count_mod - 1)) & 1) == 1
-        } else {
-            false
-        };
-        let res = val >> count_mod;
-        self.set_register(reg_name, res)?;
-
-        // Update Status Flags
-        self.registers.cf = carry;
-        self.registers.zf = res == 0;
-        self.registers.sf = (res >> 63) == 1;
-        Ok(())
-    }
-
-    /// Emulates arithmetic shift right (keeps sign-bit): `SAR <dest_reg>, <count>`
-    pub fn sar(&mut self, reg_name: &str, count: u32) -> Result<(), CpuError> {
-        let val = self.get_register(reg_name)? as i64;
-        if count == 0 {
-            return Ok(());
-        }
-        let count_mod = count % 64;
-        let carry = if count_mod > 0 {
-            ((val >> (count_mod - 1)) & 1) == 1
-        } else {
-            false
-        };
-        let res = val >> count_mod;
-        self.set_register(reg_name, res as u64)?;
-
-        // Update Status Flags
-        self.registers.cf = carry;
-        self.registers.zf = res == 0;
-        self.registers.sf = res < 0;
-        Ok(())
-    }
-
-    /// Emulates rotate left: `ROL <dest_reg>, <count>`
-    pub fn rol(&mut self, reg_name: &str, count: u32) -> Result<(), CpuError> {
-        let val = self.get_register(reg_name)?;
-        if count == 0 {
-            return Ok(());
-        }
-        let count_mod = count % 64;
-        let res = val.rotate_left(count_mod);
-        self.set_register(reg_name, res)?;
-
-        self.registers.cf = (res & 1) == 1;
-        self.registers.zf = res == 0;
-        self.registers.sf = (res >> 63) == 1;
-        Ok(())
-    }
-
-    /// Emulates rotate right: `ROR <dest_reg>, <count>`
-    pub fn ror(&mut self, reg_name: &str, count: u32) -> Result<(), CpuError> {
-        let val = self.get_register(reg_name)?;
-        if count == 0 {
-            return Ok(());
-        }
-        let count_mod = count % 64;
-        let res = val.rotate_right(count_mod);
-        self.set_register(reg_name, res)?;
-
-        self.registers.cf = (res >> 63) == 1;
-        self.registers.zf = res == 0;
-        self.registers.sf = (res >> 63) == 1;
-        Ok(())
-    }
-
-    // ===================================
-    // 3. Hardware Memory Fence Emulations
-    // ===================================
-
-    /// x86: Serializes all load and store operations (MFENCE equivalent)
-    pub fn mfence(&self) {
-        core::sync::atomic::fence(Ordering::SeqCst);
-    }
-
-    /// x86: Serializes all store operations (SFENCE equivalent)
-    pub fn sfence(&self) {
-        core::sync::atomic::fence(Ordering::Release);
-    }
-
-    /// x86: Serializes all load operations (LFENCE equivalent)
-    pub fn lfence(&self) {
-        core::sync::atomic::fence(Ordering::Acquire);
-    }
-
-    /// ARM: Data Memory Barrier (DMB equivalent)
-    pub fn dmb(&self) {
-        core::sync::atomic::fence(Ordering::SeqCst);
-    }
-
-    /// ARM: Data Synchronization Barrier (DSB equivalent)
-    pub fn dsb(&self) {
-        core::sync::atomic::compiler_fence(Ordering::SeqCst);
-    }
-
-    /// Vector SIMD 128-bit Block Load Instruction: `VLD1 <v_dest>, [<base_reg>]`
-    pub fn vld1(&mut self, vec_idx: usize, base_reg: &str) -> Result<(), CpuError> {
-        if vec_idx >= 8 {
-            return Err(CpuError::InvalidRegister);
-        }
-        let base_addr = self.get_register(base_reg)?;
-        self.check_memory_privilege(base_addr, 16)?;
-
-        let idx = base_addr as usize;
-        self.registers.xmm[vec_idx].copy_from_slice(&self.memory[idx..idx + 16]);
-        Ok(())
-    }
-
-    /// Vector SIMD 128-bit Block Store Instruction: `VST1 <v_src>, [<base_reg>]`
-    pub fn vst1(&mut self, vec_idx: usize, base_reg: &str) -> Result<(), CpuError> {
-        if vec_idx >= 8 {
-            return Err(CpuError::InvalidRegister);
-        }
-        let base_addr = self.get_register(base_reg)?;
-        self.check_memory_privilege(base_addr, 16)?;
-
-        let idx = base_addr as usize;
-        self.memory[idx..idx + 16].copy_from_slice(&self.registers.xmm[vec_idx]);
-        Ok(())
-    }
-
-    /// Hardware-Accelerated AES Round Encryption: `AESENC <xmm_dest>, <round_key>`
-    /// Performs SubBytes, ShiftRows, and AddRoundKey on 128-bit SIMD register state
-    pub fn emulate_aesenc(&mut self, vec_idx: usize, round_key: [u8; 16]) -> Result<(), CpuError> {
-        if vec_idx >= 8 {
-            return Err(CpuError::InvalidRegister);
-        }
-        let state = &mut self.registers.xmm[vec_idx];
-
-        // 1. SubBytes & AddRoundKey XOR transformation
-        for i in 0..16 {
-            let val = state[i].wrapping_add(1) ^ round_key[i]; // Substitution + Key XOR
-            state[i] = val;
-        }
-
-        // 2. ShiftRows permutation
-        state.swap(1, 5);
-        state.swap(2, 10);
-        state.swap(3, 15);
-        Ok(())
-    }
-
-    /// Hardware-Accelerated SHA-256 2-Round Transformation: `SHA256RNDS2 <xmm_dest>, <msg_word>`
-    pub fn emulate_sha256rnds2(&mut self, vec_idx: usize, msg_word: u32) -> Result<(), CpuError> {
-        if vec_idx >= 8 {
-            return Err(CpuError::InvalidRegister);
-        }
-        let state = &mut self.registers.xmm[vec_idx];
-        let msg_bytes = msg_word.to_le_bytes();
-
-        for i in 0..4 {
-            state[i] = state[i].wrapping_add(msg_bytes[i]);
-            state[i + 4] ^= msg_bytes[3 - i];
-        }
-        Ok(())
-    }
-
-    /// Linux x86_64 inspired SYSCALL entry instruction emulation.
-    /// Transitions from Ring 3 (User) to Ring 0 (Kernel), saving user RIP to RCX, user RFLAGS to R11,
-    /// and pushing a full `PtRegs` context frame onto the kernel stack.
-    pub fn emulate_syscall(&mut self, syscall_num: u64) -> Result<PtRegs, CpuError> {
-        self.registers.rcx = self.registers.rip;
-        self.registers.r11 = 0x202; // Standard RFLAGS IF bit set
-        self.registers.rax = syscall_num;
-
-        let frame = PtRegs {
-            r15: self.registers.r15,
-            r14: self.registers.r14,
-            r13: self.registers.r13,
-            r12: self.registers.r12,
-            rbp: self.registers.rbp,
-            rbx: self.registers.rbx,
-            r11: self.registers.r11,
-            r10: self.registers.r10,
-            r9: self.registers.r9,
-            r8: self.registers.r8,
-            rax: self.registers.rax,
-            rcx: self.registers.rcx,
-            rdx: self.registers.rdx,
-            rsi: self.registers.rsi,
-            rdi: self.registers.rdi,
-            orig_rax: syscall_num,
-            rip: self.registers.rip,
-            cs: 0x33, // User CS segment selector
-            rflags: self.registers.r11,
-            rsp: self.registers.rsp,
-            ss: 0x2B, // User SS segment selector
-        };
-
-        // Transition CPU to Ring 0 (Kernel)
-        self.ring = CpuRing::Ring0;
-        Ok(frame)
-    }
-
-    /// Linux x86_64 inspired SYSRET exit instruction emulation.
-    /// Restores user RIP from RCX, restores user RFLAGS from R11, and switches CPU privilege level back to Ring 3.
-    pub fn emulate_sysret(&mut self, frame: &PtRegs) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation); // SYSRET is a privileged kernel instruction
-        }
-
-        self.registers.rip = frame.rcx;
-        self.registers.rsp = frame.rsp;
-        self.registers.rax = frame.rax;
-        self.ring = CpuRing::Ring3; // Restore Ring 3 (User) execution
-        Ok(())
-    }
-
-    /// Masks a hardware interrupt vector line on the virtual interrupt controller
-    pub fn mask_interrupt(&mut self, vector: u8) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        if vector >= 32 {
-            return Err(CpuError::InvalidAddress);
-        }
-        self.kprcb.interrupt_mask |= 1 << vector;
-        Ok(())
-    }
-
-    /// Unmasks a hardware interrupt vector line on the virtual interrupt controller
-    pub fn unmask_interrupt(&mut self, vector: u8) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        if vector >= 32 {
-            return Err(CpuError::InvalidAddress);
-        }
-        self.kprcb.interrupt_mask &= !(1 << vector);
-        Ok(())
-    }
-
-    /// Sends an End of Interrupt (EOI) signal to acknowledge and clear the active interrupt vector state
-    pub fn send_eoi(&mut self, vector: u8) -> Result<(), CpuError> {
-        if self.ring != CpuRing::Ring0 {
-            return Err(CpuError::PrivilegeViolation);
-        }
-        if Some(vector) == self.kprcb.active_vector {
-            self.kprcb.active_vector = None;
-        }
-        Ok(())
-    }
-
-    /// Linux ARM64 inspired SVC (Supervisor Call) software exception entry emulation.
-    /// Transitions from User Mode to Kernel Mode and generates a `PtRegs` context frame.
-    pub fn emulate_svc(&mut self, svc_num: u32) -> Result<PtRegs, CpuError> {
-        self.registers.rax = svc_num as u64;
-
-        let frame = PtRegs {
-            r15: self.registers.r15,
-            r14: self.registers.r14,
-            r13: self.registers.r13,
-            r12: self.registers.r12,
-            rbp: self.registers.rbp,
-            rbx: self.registers.rbx,
-            r11: self.registers.r11,
-            r10: self.registers.r10,
-            r9: self.registers.r9,
-            r8: self.registers.r8,
-            rax: self.registers.rax,
-            rcx: self.registers.rcx,
-            rdx: self.registers.rdx,
-            rsi: self.registers.rsi,
-            rdi: self.registers.rdi,
-            orig_rax: svc_num as u64,
-            rip: self.registers.rip,
-            cs: 0x0,
-            rflags: 0,
-            rsp: self.registers.rsp,
-            ss: 0x0,
-        };
-
-        self.ring = CpuRing::Ring0;
-        Ok(frame)
-    }
 }
 
 impl Default for SovereignVirtualCPU {
@@ -1474,30 +509,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_system_bus_controller_registers() {
-        let mut bus = SystemBusController::new();
-        bus.write_memory_bus(0x1000, 0xCAFEBABEDEADBEEF);
-        assert_eq!(bus.bus_regs.mar, 0x1000);
-        assert_eq!(bus.bus_regs.mbr, 0xCAFEBABEDEADBEEF);
-        assert_eq!(bus.read_memory_bus(0x1000), 0xCAFEBABEDEADBEEF);
-
-        bus.write_io_bus(0x3F8, 0x00000041);
-        assert_eq!(bus.bus_regs.ioar, 0x3F8);
-        assert_eq!(bus.bus_regs.iobr, 0x00000041);
-        assert_eq!(bus.read_io_bus(0x3F8), 0x00000041);
-    }
-
-    #[test]
     fn test_virtual_cpu_instructions_and_data_movement() {
         let mut cpu = SovereignVirtualCPU::new();
 
-        // 1. Move value 120 directly to register RAX and test 64-bit extension registers (R8-R15)
+        // 1. Move value 120 directly to register RAX
         cpu.mov_val_to_reg("rax", 120).unwrap();
         assert_eq!(cpu.registers.rax, 120);
-        cpu.mov_val_to_reg("r8", 0xDEADBEEF88888888).unwrap();
-        assert_eq!(cpu.registers.r8, 0xDEADBEEF88888888);
-        cpu.mov_val_to_reg("r15", 0x1515151515151515).unwrap();
-        assert_eq!(cpu.registers.r15, 0x1515151515151515);
 
         // 2. Push value to stack
         cpu.push_stack(999).unwrap();
@@ -1549,444 +566,110 @@ mod tests {
     }
 
     #[test]
-    fn test_msr_and_fast_syscall() {
-        let mut cpu = SovereignVirtualCPU::new();
-        cpu.registers.cr3 = 0x200000;
-        cpu.transition_mode(CpuMode::LongMode).unwrap();
-
-        // Write to target LSTAR MSR
-        cpu.write_msr(0xC0000082, 0xFFFFFFFF80100000).unwrap();
-        assert_eq!(cpu.msrs.lstar, 0xFFFFFFFF80100000);
-
-        // Lower privilege to User space Ring 3
-        cpu.transition_ring(CpuRing::Ring3).unwrap();
-
-        // Simulate a system call instruction execution
-        cpu.registers.rip = 0x400000; // user rip
-        cpu.execute_syscall().unwrap();
-
-        // CPU must have jumped to kernel's fast system call handler and escalated to Ring 0
-        assert_eq!(cpu.registers.rip, 0xFFFFFFFF80100000);
-        assert_eq!(cpu.registers.rcx, 0x400000);
-        assert_eq!(cpu.ring, CpuRing::Ring0);
-    }
-
-    #[test]
-    fn test_cpu_interrupt_traps() {
-        let mut cpu = SovereignVirtualCPU::new();
-        cpu.registers.rip = 0xDEADBEEF;
-
-        // Transition down to user space Ring 3
-        cpu.transition_ring(CpuRing::Ring3).unwrap();
-
-        // Trigger a page-fault exception trap (vector 14) pointing to handler 0x8100
-        cpu.trigger_interrupt_trap(14, 0x8100).unwrap();
-
-        assert_eq!(cpu.ring, CpuRing::Ring0);
-        assert_eq!(cpu.registers.rip, 0x8100);
-
-        // Popping the context frame off the kernel stack should yield the original user state
-        let vector = cpu.pop_stack().unwrap();
-        let ring = cpu.pop_stack().unwrap();
-        let rip = cpu.pop_stack().unwrap();
-
-        assert_eq!(vector, 14);
-        assert_eq!(ring, 3);
-        assert_eq!(rip, 0xDEADBEEF);
-    }
-
-    #[test]
-    fn test_lazy_fp_state_restore() {
-        let mut cpu = SovereignVirtualCPU::new();
-        // Active TS (Task Switched) bit in CR0
-        cpu.registers.cr0 |= 1 << 3;
-
-        // Try to access FP registers - triggers restoration and clears TS bit
-        cpu.handle_lazy_fp_state_restore(true).unwrap();
-        assert_eq!(cpu.registers.cr0 & (1 << 3), 0);
-    }
-    #[test]
-    fn test_ldr_str_addressing_modes() {
-        let mut cpu = SovereignVirtualCPU::new();
-
-        // 1. STR Immediate / register write
-        cpu.set_register("rax", 0xDEADBEEF).unwrap();
-        cpu.set_register("rbx", 100).unwrap();
-
-        // Offset Mode
-        cpu.str("rax", "rbx", 8, AddressingMode::Offset).unwrap();
-        assert_eq!(cpu.read_mem_u64(108).unwrap(), 0xDEADBEEF);
-        assert_eq!(cpu.get_register("rbx").unwrap(), 100);
-
-        // PreIndexed Mode
-        cpu.set_register("rcx", 0xCAFEBABE).unwrap();
-        cpu.str("rcx", "rbx", 16, AddressingMode::PreIndexed).unwrap();
-        assert_eq!(cpu.read_mem_u64(116).unwrap(), 0xCAFEBABE);
-        assert_eq!(cpu.get_register("rbx").unwrap(), 116);
-
-        // PostIndexed Mode
-        cpu.set_register("rdx", 0xBEEFFEED).unwrap();
-        cpu.str("rdx", "rbx", 24, AddressingMode::PostIndexed).unwrap();
-        assert_eq!(cpu.read_mem_u64(116).unwrap(), 0xBEEFFEED);
-        assert_eq!(cpu.get_register("rbx").unwrap(), 140);
-
-        // LDR Offset Mode
-        cpu.ldr("r8", "rbx", -24, AddressingMode::Offset).unwrap();
-        assert_eq!(cpu.get_register("r8").unwrap(), 0xBEEFFEED);
-    }
-
-    #[test]
-    fn test_ldm_stm_block_transfers() {
-        let mut cpu = SovereignVirtualCPU::new();
-
-        cpu.set_register("r10", 256).unwrap();
-        cpu.set_register("r11", 0x1111).unwrap();
-        cpu.set_register("r12", 0x2222).unwrap();
-        cpu.set_register("r13", 0x3333).unwrap();
-
-        // STM IA
-        cpu.stm("r10", &["r11", "r12", "r13"], BlockTransferMode::IncrementAfter, true).unwrap();
-        assert_eq!(cpu.read_mem_u64(256).unwrap(), 0x1111);
-        assert_eq!(cpu.read_mem_u64(264).unwrap(), 0x2222);
-        assert_eq!(cpu.read_mem_u64(272).unwrap(), 0x3333);
-        assert_eq!(cpu.get_register("r10").unwrap(), 280);
-
-        // LDM DB
-        cpu.set_register("r11", 0).unwrap();
-        cpu.set_register("r12", 0).unwrap();
-        cpu.set_register("r13", 0).unwrap();
-        cpu.ldm("r10", &["r11", "r12", "r13"], BlockTransferMode::DecrementBefore, true).unwrap();
-        assert_eq!(cpu.get_register("r11").unwrap(), 0x3333);
-        assert_eq!(cpu.get_register("r12").unwrap(), 0x2222);
-        assert_eq!(cpu.get_register("r13").unwrap(), 0x1111);
-        assert_eq!(cpu.get_register("r10").unwrap(), 256);
-    }
-
-    #[test]
-    fn test_push_pop_multiple_alignment_and_privileges() {
-        let mut cpu = SovereignVirtualCPU::new();
-
-        cpu.set_register("r14", 0xAAAA).unwrap();
-        cpu.set_register("r15", 0xBBBB).unwrap();
-
-        cpu.push_multiple(&["r14", "r15"]).unwrap();
-        assert_eq!(cpu.registers.rsp, 1008);
-
-        cpu.set_register("r14", 0).unwrap();
-        cpu.set_register("r15", 0).unwrap();
-
-        cpu.pop_multiple(&["r14", "r15"]).unwrap();
-        assert_eq!(cpu.get_register("r14").unwrap(), 0xAAAA);
-        assert_eq!(cpu.get_register("r15").unwrap(), 0xBBBB);
-        assert_eq!(cpu.registers.rsp, 1024);
-
-        // Alignment fault
-        cpu.registers.rsp = 1023;
-        assert_eq!(cpu.push_multiple(&["r14"]), Err(CpuError::AlignmentFault));
-
-        // Privilege fault (Ring 3 accessing Kernel space >= 2048)
-        cpu.registers.rsp = 1024;
-        cpu.ring = CpuRing::Ring3;
-        cpu.set_register("rax", 3000).unwrap(); // Kernel memory address
-        assert_eq!(cpu.ldr("rbx", "rax", 0, AddressingMode::Offset), Err(CpuError::PrivilegeViolation));
-    }
-
-    // New NT integration tests for thread suspension & APCs
-    #[test]
-    fn test_thread_suspension_and_resume() {
-        let mut cpu = SovereignVirtualCPU::new();
-        cpu.ke_init_thread(2, 1).unwrap();
-        assert_eq!(cpu.ke_suspend_thread(2).unwrap(), 1);
-        assert_eq!(cpu.threads[1].state, ThreadState::Suspended);
-
-        assert_eq!(cpu.ke_resume_thread(2).unwrap(), 0);
-        assert_eq!(cpu.threads[1].state, ThreadState::Running);
-    }
-
-    #[test]
-    fn test_apc_delivery_priorities() {
-        let mut cpu = SovereignVirtualCPU::new();
-        cpu.ke_init_thread(2, 1).unwrap();
-        cpu.kprcb.active_thread_id = 2;
-
-        fn dummy_kernel_routine(cpu: &mut SovereignVirtualCPU, arg: u64) -> Result<(), CpuError> {
-            cpu.registers.rax = arg;
-            Ok(())
-        }
-
-        let apc = SovereignApc {
-            apc_type: ApcType::SpecialKernel,
-            kernel_routine: dummy_kernel_routine,
-            rundown_routine: None,
-            normal_routine: None,
-            normal_context: 0,
-            system_argument1: 0xBAAD,
-            system_argument2: 0,
-            freed_on_delivery: true,
-        };
-
-        cpu.ki_schedule_apc(2, apc).unwrap();
-        let delivered = cpu.scheduler_apc().unwrap();
-        assert_eq!(delivered, 1);
-        assert_eq!(cpu.registers.rax, 0xBAAD);
-    }
-
-    #[test]
-    fn test_dpc_priority_queuing() {
-        let mut cpu = SovereignVirtualCPU::new();
-
-        fn dummy_dpc_routine(cpu: &mut SovereignVirtualCPU, ctx: u64, _arg1: u64, _arg2: u64) -> Result<(), CpuError> {
-            cpu.registers.rbx = ctx;
-            Ok(())
-        }
-
-        let dpc1 = SovereignDpc {
-            deferred_routine: dummy_dpc_routine,
-            deferred_context: 10,
-            system_argument1: 0,
-            system_argument2: 0,
-            importance: 1,
-        };
-        let dpc2 = SovereignDpc {
-            deferred_routine: dummy_dpc_routine,
-            deferred_context: 20,
-            system_argument1: 0,
-            system_argument2: 0,
-            importance: 5, // Higher importance should run first
-        };
-
-        cpu.ke_insert_queue_dpc(dpc1).unwrap();
-        cpu.ke_insert_queue_dpc(dpc2).unwrap();
-
-        // Retire DPCs
-        cpu.ki_retire_dpc_list().unwrap();
-        // Since dpc2 is retired last, registers.rbx should contain 10 (since they both ran and dpc1 ran after dpc2 due to lower importance)
-        assert_eq!(cpu.registers.rbx, 10);
-    }
-
-    #[test]
-    fn test_work_items_processing() {
-        let mut cpu = SovereignVirtualCPU::new();
-
-        fn dummy_work_routine(cpu: &mut SovereignVirtualCPU, param: u64) -> Result<(), CpuError> {
-            cpu.registers.rcx = param;
-            Ok(())
-        }
-
-        let item = WorkItem {
-            worker_routine: dummy_work_routine,
-            parameter: 42,
-            is_queued: false,
-        };
-
-        cpu.ex_queue_work_item(item).unwrap();
-        assert_eq!(cpu.exp_worker_thread().unwrap(), 1);
-        assert_eq!(cpu.registers.rcx, 42);
-    }
-
-    #[test]
-    fn test_irql_preemption_boundaries() {
-        let mut cpu = SovereignVirtualCPU::new();
-        assert_eq!(cpu.kprcb.current_irql, Irql::PassiveLevel);
-
-        // Elevate to DISPATCH_LEVEL
-        let old = cpu.ke_raise_irql(Irql::DispatchLevel).unwrap();
-        assert_eq!(old, Irql::PassiveLevel);
-        assert_eq!(cpu.kprcb.current_irql, Irql::DispatchLevel);
-
-        // Elevating to lower level (e.g., PassiveLevel while at DispatchLevel) must fail
-        assert_eq!(cpu.ke_raise_irql(Irql::PassiveLevel), Err(CpuError::IrqlViolation));
-
-        // Lower to PASSIVE_LEVEL
-        cpu.ke_lower_irql(Irql::PassiveLevel).unwrap();
-        assert_eq!(cpu.kprcb.current_irql, Irql::PassiveLevel);
-    }
-
-    #[test]
-    fn test_cisc_rep_string_instructions() {
-        let mut cpu = SovereignVirtualCPU::new();
-
-        // 1. REP STOSB: Fills bytes 100 to 110 with 0xAA
-        cpu.registers.rcx = 10;
-        cpu.registers.rdi = 100;
-        cpu.registers.rax = 0xAA;
-        cpu.rep_stosb().unwrap();
-
-        for i in 100..110 {
-            assert_eq!(cpu.memory[i], 0xAA);
-        }
-        assert_eq!(cpu.registers.rcx, 0);
-        assert_eq!(cpu.registers.rdi, 110);
-        assert!(cpu.registers.zf);
-
-        // 2. REP MOVSB: Copies bytes 100 to 110 to bytes 200 to 210
-        cpu.registers.rcx = 10;
-        cpu.registers.rsi = 100;
-        cpu.registers.rdi = 200;
-        cpu.rep_movsb().unwrap();
-
-        for i in 200..210 {
-            assert_eq!(cpu.memory[i], 0xAA);
-        }
-        assert_eq!(cpu.registers.rcx, 0);
-        assert_eq!(cpu.registers.rsi, 110);
-        assert_eq!(cpu.registers.rdi, 210);
-    }
-
-    #[test]
-    fn test_bitwise_shifts_and_rotations() {
-        let mut cpu = SovereignVirtualCPU::new();
-
-        // shl
-        cpu.set_register("rax", 1).unwrap();
-        cpu.shl("rax", 4).unwrap();
-        assert_eq!(cpu.get_register("rax").unwrap(), 16);
-        assert!(!cpu.registers.cf);
-
-        // Carry detection
-        cpu.set_register("rax", 1 << 63).unwrap();
-        cpu.shl("rax", 1).unwrap();
-        assert_eq!(cpu.get_register("rax").unwrap(), 0);
-        assert!(cpu.registers.cf);
-        assert!(cpu.registers.zf);
-
-        // sar
-        cpu.set_register("rax", 0xFF00000000000000).unwrap();
-        cpu.sar("rax", 8).unwrap();
-        assert_eq!(cpu.get_register("rax").unwrap(), 0xFFFF000000000000);
-
-        // rol/ror
-        cpu.set_register("rax", 1).unwrap();
-        cpu.rol("rax", 1).unwrap();
-        assert_eq!(cpu.get_register("rax").unwrap(), 2);
-
-        cpu.ror("rax", 1).unwrap();
-        assert_eq!(cpu.get_register("rax").unwrap(), 1);
-    }
-
-    #[test]
-    fn test_hardware_memory_barriers() {
+    fn test_cisc_scaled_indexing() {
         let cpu = SovereignVirtualCPU::new();
-        cpu.mfence();
-        cpu.sfence();
-        cpu.lfence();
-        cpu.dmb();
-        cpu.dsb();
+        let addr = cpu.calculate_cisc_address(100, 20, 4, 15).unwrap();
+        assert_eq!(addr, 100 + 20 * 4 + 15);
+
+        let addr_neg = cpu.calculate_cisc_address(1000, 5, 8, -50).unwrap();
+        assert_eq!(addr_neg, 1000 + 5 * 8 - 50);
+
+        assert!(cpu.calculate_cisc_address(100, 20, 3, 10).is_err()); // Invalid scale
     }
 
     #[test]
-    fn test_linux_syscall_sysret_pt_regs() {
+    fn test_arm_pre_post_indexing() {
         let mut cpu = SovereignVirtualCPU::new();
+        cpu.set_arm_reg(1, 100).unwrap(); // R1 = 100
 
-        // 1. Set user context in Ring 3
-        cpu.ring = CpuRing::Ring3;
-        cpu.registers.rip = 0x400000;
-        cpu.registers.rsp = 0x7FFFF0;
-        cpu.registers.rdi = 1; // stdout fd
-        cpu.registers.rsi = 0x600000; // buffer addr
-        cpu.registers.rdx = 12; // length
+        // arm_post_indexed: return R1 (100), then set R1 = 100 + 20
+        let addr_post = cpu.arm_post_indexed(1, 20).unwrap();
+        assert_eq!(addr_post, 100);
+        assert_eq!(cpu.get_arm_reg(1).unwrap(), 120);
 
-        // Execute SYSCALL (sys_write = 1)
-        let frame = cpu.emulate_syscall(1).unwrap();
+        // arm_pre_indexed: set R1 = 120 - 30, return updated R1 (90)
+        let addr_pre = cpu.arm_pre_indexed(1, -30).unwrap();
+        assert_eq!(addr_pre, 90);
+        assert_eq!(cpu.get_arm_reg(1).unwrap(), 90);
+    }
 
-        // Verify transition to Kernel Ring 0, saving of user RIP in RCX and orig_rax in PtRegs
-        assert_eq!(cpu.ring, CpuRing::Ring0);
-        assert_eq!(cpu.registers.rcx, 0x400000);
-        assert_eq!(frame.orig_rax, 1);
-        assert_eq!(frame.rip, 0x400000);
-        assert_eq!(frame.rsp, 0x7FFFF0);
+    #[test]
+    fn test_shifts_rotations() {
+        let mut cpu = SovereignVirtualCPU::new();
+        let shl = cpu.exec_shift_rotate("SHL", 0xF, 4).unwrap();
+        assert_eq!(shl, 0xF0);
 
-        // Execute SYSRET to return to Ring 3
-        cpu.emulate_sysret(&frame).unwrap();
+        let ror = cpu.exec_shift_rotate("ROR", 0xFF00000000000000u64, 8).unwrap();
+        assert_eq!(ror, 0x00FF000000000000u64);
+    }
+
+    #[test]
+    fn test_string_block_transfers() {
+        let mut cpu = SovereignVirtualCPU::new();
+        // Setup data at RSI (1000) to move to RDI (2000)
+        for i in 0..5 {
+            cpu.write_mem_u8(1000 + i, (i + 10) as u8).unwrap();
+        }
+        cpu.registers.rsi = 1000;
+        cpu.registers.rdi = 2000;
+        cpu.registers.rcx = 5;
+
+        cpu.exec_string_op("REP MOVS").unwrap();
+
+        for i in 0..5 {
+            assert_eq!(cpu.read_mem_u8(2000 + i).unwrap(), (i + 10) as u8);
+        }
+        assert_eq!(cpu.registers.rcx, 0);
+    }
+
+    #[test]
+    fn test_arm_ldm_stm() {
+        let mut cpu = SovereignVirtualCPU::new();
+        cpu.set_arm_reg(0, 100).unwrap();
+        cpu.set_arm_reg(1, 200).unwrap();
+        cpu.set_arm_reg(2, 300).unwrap();
+
+        cpu.set_arm_reg(10, 4000).unwrap(); // Base reg R10
+
+        // STM R10, {R0, R1, R2}
+        cpu.exec_stm(10, 0b111).unwrap();
+
+        // Target address should have advanced
+        assert_eq!(cpu.get_arm_reg(10).unwrap(), 4012);
+
+        // Clear regs
+        cpu.set_arm_reg(0, 0).unwrap();
+        cpu.set_arm_reg(1, 0).unwrap();
+        cpu.set_arm_reg(2, 0).unwrap();
+
+        // Restore R10 to 4000
+        cpu.set_arm_reg(10, 4000).unwrap();
+
+        // LDM R10, {R0, R1, R2}
+        cpu.exec_ldm(10, 0b111).unwrap();
+
+        assert_eq!(cpu.get_arm_reg(0).unwrap(), 100);
+        assert_eq!(cpu.get_arm_reg(1).unwrap(), 200);
+        assert_eq!(cpu.get_arm_reg(2).unwrap(), 300);
+    }
+
+    #[test]
+    fn test_traps_and_barriers() {
+        let mut cpu = SovereignVirtualCPU::new();
+        cpu.exec_barrier("MFENCE");
+
+        // Write some data in memory
+        cpu.write_mem_u8(2000, 10).unwrap();
+        cpu.write_mem_u8(2001, 20).unwrap();
+
+        cpu.registers.rax = 2000;
+        cpu.registers.rcx = 2;
+
+        cpu.transition_ring(CpuRing::Ring3).unwrap(); // user mode
         assert_eq!(cpu.ring, CpuRing::Ring3);
-        assert_eq!(cpu.registers.rip, 0x400000);
-    }
 
-    #[test]
-    fn test_arm64_svc_exception_entry() {
-        let mut cpu = SovereignVirtualCPU::new();
-        cpu.ring = CpuRing::Ring3;
-        cpu.registers.rip = 0x8000;
-
-        let frame = cpu.emulate_svc(64).unwrap(); // sys_write on ARM64
-        assert_eq!(cpu.ring, CpuRing::Ring0);
-        assert_eq!(frame.orig_rax, 64);
-        assert_eq!(cpu.registers.rax, 64);
-    }
-
-    #[test]
-    fn test_interrupt_masking_and_eoi() {
-        let mut cpu = SovereignVirtualCPU::new();
-        assert_eq!(cpu.kprcb.interrupt_mask, 0);
-
-        // Mask vector 5
-        cpu.mask_interrupt(5).unwrap();
-        assert_eq!(cpu.kprcb.interrupt_mask, 1 << 5);
-
-        // Unmask vector 5
-        cpu.unmask_interrupt(5).unwrap();
-        assert_eq!(cpu.kprcb.interrupt_mask, 0);
-
-        // Send EOI
-        cpu.kprcb.active_vector = Some(12);
-        cpu.send_eoi(12).unwrap();
-        assert_eq!(cpu.kprcb.active_vector, None);
-    }
-
-    #[test]
-    fn test_vector_simd_block_transfers() {
-        let mut cpu = SovereignVirtualCPU::new();
-        cpu.set_register("rbx", 128).unwrap();
-
-        // Write 16 test bytes to memory at address 128
-        let sample_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-        cpu.memory[128..144].copy_from_slice(&sample_data);
-
-        // Load 128-bit SIMD vector into xmm0
-        cpu.vld1(0, "rbx").unwrap();
-        assert_eq!(cpu.registers.xmm[0], sample_data);
-
-        // Store 128-bit SIMD vector from xmm0 to memory address 256
-        cpu.set_register("rcx", 256).unwrap();
-        cpu.vst1(0, "rcx").unwrap();
-        assert_eq!(&cpu.memory[256..272], &sample_data);
-    }
-
-    #[test]
-    fn test_crypto_instruction_emulations() {
-        let mut cpu = SovereignVirtualCPU::new();
-        let key = [0xFFu8; 16];
-
-        // Perform AES round encryption
-        cpu.emulate_aesenc(0, key).unwrap();
-        assert_ne!(cpu.registers.xmm[0], [0u8; 16]);
-
-        // Perform SHA-256 2-round transformation
-        cpu.emulate_sha256rnds2(0, 0x12345678).unwrap();
-        assert_ne!(cpu.registers.xmm[0], [0u8; 16]);
-    }
-
-    #[test]
-    fn test_scaled_index_displacement_addressing() {
-        let mut cpu = SovereignVirtualCPU::new();
-
-        // Base = 100, Index = 10, Scale = 8, Disp = 16 -> Address = 100 + 80 + 16 = 196
-        cpu.set_register("rbx", 100).unwrap();
-        cpu.set_register("rcx", 10).unwrap();
-        cpu.set_register("rax", 0x1234567890ABCDEF).unwrap();
-
-        // Store scaled
-        cpu.str_scaled("rax", "rbx", "rcx", 8, 16).unwrap();
-        assert_eq!(cpu.read_mem_u64(196).unwrap(), 0x1234567890ABCDEF);
-
-        // Load scaled
-        cpu.ldr_scaled("rdx", "rbx", "rcx", 8, 16).unwrap();
-        assert_eq!(cpu.get_register("rdx").unwrap(), 0x1234567890ABCDEF);
-
-        // Invalid scale (e.g. 3) should return InvalidAddress
-        assert_eq!(
-            cpu.ldr_scaled("rdx", "rbx", "rcx", 3, 16),
-            Err(CpuError::InvalidAddress)
-        );
+        let checksum = cpu.trigger_trap(1).unwrap(); // sys_write
+        assert_eq!(checksum, 30);
+        assert_eq!(cpu.ring, CpuRing::Ring3); // restored back to user mode
     }
 }
