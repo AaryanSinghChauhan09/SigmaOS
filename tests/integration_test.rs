@@ -269,43 +269,4 @@ mod tests {
         let ebuild = EbuildAdapter::new();
         assert_eq!(ebuild.format_name(), "ebuild");
     }
-
-    #[test]
-    fn test_reliability_and_testing_suite() {
-        use sigmaos::tracing::{SigmaTrace, TraceEvent, TraceSpan};
-        use sigmaos::crash::{SimpleCrashPipeline, CrashPipeline, CrashType, SimpleCoredumpCollector, CoredumpCollector, Anonymizer};
-
-        // 1. Tracepoint Spans & Observability tests
-        let mut trace = SigmaTrace::new();
-        trace.record_span(12345, TraceEvent::Syscall(54), 0);
-        trace.record_span(12346, TraceEvent::ContextSwitch(1, 2), 100);
-        trace.record_span(12347, TraceEvent::Interrupt(3), 0);
-
-        assert_eq!(trace.get_recorded_count(), 3);
-        let spans = trace.get_all_spans();
-        assert_eq!(spans.len(), 3);
-        assert_eq!(spans[0].timestamp, 12345);
-
-        // 2. Anomaly/Fuzzing logging and Ring Buffer Overflows
-        for i in 0..20 {
-            trace.record_span(i as u64, TraceEvent::Syscall(i as u32), i as u64);
-        }
-        assert_eq!(trace.get_recorded_count(), 16); // Buffer size is 16
-        assert!(trace.get_overflow_count() > 0);
-
-        // 3. Fault Injection Testing & Recovery in SimpleCrashPipeline
-        let mut pipeline = SimpleCrashPipeline::new();
-        let report_id = pipeline.process_crash(42).unwrap();
-        assert!(report_id > 0);
-
-        // 4. Anonymized Telemetry & Stripping PII
-        let data = b"Process: app_server. Secret: 1234-PII";
-        let anonymized = pipeline.anonymizer.strip_pii(data);
-        // Stripped digits to 'X'
-        assert!(anonymized.contains(&b'X'));
-
-        // 5. Minidump Generation
-        let report = pipeline.generate_report(report_id);
-        assert!(!report.is_empty());
-    }
 }

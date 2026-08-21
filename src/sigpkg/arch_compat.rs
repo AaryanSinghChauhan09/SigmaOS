@@ -4,7 +4,6 @@
 
 #[cfg(not(test))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use klib::collections::HashMap;
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
