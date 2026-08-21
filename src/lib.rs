@@ -32,6 +32,8 @@ pub mod community;
 pub mod memory;
 pub mod tools;
 pub mod virtualization;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
@@ -224,4 +226,33 @@ pub use tools::{
     SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
     SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
     SovereignIsWebsiteDown,
+};
+
+pub use unimplemented_features::{
+    GenerationManager, PciBusScanner, SovereignIpcBus, SignalDispatcher as UnimplSignalDispatcher,
+    PagingController, PackageDependencyResolver as UnimplPackageDependencyResolver,
+    SecurityEnforcer as UnimplSecurityEnforcer, ZenithCompositor as UnimplZenithCompositor,
+    MultiCallShell, GdtEntry, NimPOSTManager, SigmaTrace as UnimplSigmaTrace,
+    SigmaFsCasEngine, SovereignCleanupEngine, AutoResourceOptimizer,
+    FedoraSELinuxMacEngine, FedoraSystemdSupervisor, FedoraDeltaRpmEngine,
+    VirtualMemoryManager, ZeroCopyNetworkStack, SovereignVmm, ContainerIsolationGuard,
+    SchedMlfq, SchedCfs, VirtioGpu, NvmeController, ApicTimer, HpetController,
+};
+
+pub use unimplemented_tools::{
+    AudioEditor, PodcastRecorder, GifConverter, StreamingOverlayManager, WebcamEffects, SubtitleEditor,
+    SmartCleanup, PerformanceOptimizer, DiskDefragmenter, DuplicateFileFinder, BatterySaver,
+    MemoryLeakDetector, ProcessSandbox, StartupOptimizer as UnimplStartupOptimizer, SecureFileShredder,
+    SystemRestoreSnapshot, AccessibilitySuite, PredictiveMaintenance, ApiTestingTool, GitGuiClient,
+    GamifiedTodo, MindMapCreator, KanbanBoard, GameHubLauncher, EmulatorManager, GameRecorder,
+    GamePerformanceBooster, CloudGaming, VrArRuntime, ControllerMapper, GameModManager,
+    AiDifficultyDirector, GamifiedDesktop, GanttChartPlanner, PdfEditor, DocumentScanner, CodeProfiler,
+    StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent, AiSearchAssistant, NaturalLanguageShell,
+    AiCodeAssistant, AiFileOrganizer, SmartNotificationManager, RemoteDesktop, MeshNetworking,
+    IotDeviceManager, CloudBackupUtility, SecureFileSharing, AiScheduler, AiComplianceDashboard,
+    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar, CrossDeviceSync,
+    FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, ZeroTrustTpmBoot, ForensicSnapshot,
+    AiAnomalyFirewall, SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing,
+    CrossLanguageBuildTool, PluginMarketplace, MusicLibraryManager, PacketSniffer, VpnTunnelManager,
+    ZeroKnowledgeVault, MarkdownNotebook, PartitionManager, VectorDraftEngine, VmGuestSupervisor, EmailClient,
 };
