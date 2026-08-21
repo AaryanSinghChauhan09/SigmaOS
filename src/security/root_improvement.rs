@@ -590,8 +590,12 @@ impl PamEngine {
     }
 
     pub fn add_rule(&mut self, group: PamGroup, rule: PamRule) {
-        let chain = self.chains.entry(group).or_insert(Vec::new());
-        chain.push(rule);
+        if !self.chains.contains_key(&group) {
+            self.chains.insert(group, Vec::new());
+        }
+        if let Some(chain) = self.chains.get_mut(&group) {
+            chain.push(rule);
+        }
     }
 
     /// Evaluates the complete PAM configuration stack for a specific management group.

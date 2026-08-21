@@ -7,6 +7,20 @@ use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 pub const MAX_SNAPSHOT_ENTRIES: usize = 4;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BackupError {
+    Success,
+    NotFound,
+    CreationFailed,
+    RestoreFailed,
+}
+
+#[derive(Debug, Clone)]
+pub struct BackupSnapshot {
+    pub id: usize,
+    pub timestamp: u64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FsSnapshot {
     pub id: usize,
     pub timestamp: u64,
