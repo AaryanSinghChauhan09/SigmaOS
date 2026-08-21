@@ -31,6 +31,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
       - name: Black Duck SCA scan
+        if: ${{ vars.BLACKDUCKSCA_URL != '' || vars.COVERITY_URL != '' || vars.POLARIS_SERVER_URL != '' || vars.SRM_URL != '' }}
         uses: blackduck-inc/black-duck-security-scan@805cbd09e806b01907bbea0f990723c2bb85abe9
         with:
           ### ---------- BLACKDUCK SCA SCANNING: REQUIRED FIELDS ----------
