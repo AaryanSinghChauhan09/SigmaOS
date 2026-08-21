@@ -35,3 +35,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-20 - Storing Cached Byte Lengths for Fixed-Size Log Buffers
 **Learning:** In fixed-size string/byte arrays (`[u8; 64]`, `[u8; 128]`, `[u8; 512]`), converting to string representations via `.position(|&b| b == 0)` causes $O(N)$ linear byte scans on every log message output, serialization, or network dispatch. Storing explicit length fields (`component_len`, `message_len`, `module_len`) during struct instantiation turns slice operations into instantaneous $O(1)$ lookups.
 **Action:** Store cached length fields alongside fixed-size buffer fields to avoid linear zero-byte scans during frequent display, formatting, or serialization routines.
+
+## 2026-08-21 - Single-Pass Process Candidate Selection in EEVDF Scheduler
+**Learning:** In scheduler loops (`Scheduler::schedule_on_core` and `Scheduler::check_preemption`), running sequential filtering passes over the process vector (`self.processes.iter().filter(...).min_by_key(...)`) multiplies CPU iteration cycles per tick when distinguishing real-time tasks from standard tasks or finding candidate processes for preemption. Performing a single linear pass that simultaneously tracks the best real-time candidate (`best_rt`), standard candidate (`best_eligible`), and running process eliminates up to 50% of vector traversal overhead during scheduling ticks.
+**Action:** Replace sequential multi-pass vector iterations with single-pass accumulator loops when evaluating process candidates in kernel scheduler hot paths.
