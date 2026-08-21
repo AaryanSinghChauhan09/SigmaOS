@@ -20,8 +20,9 @@ pub use network_bbr::{BbrEngine, BbrState};
 pub use eevdf::{EevdfScheduler, EevdfTask, MAX_SCHED_TASKS};
 pub use zero_copy_ipc::{ZeroCopyQueue, IPCError, QUEUE_SIZE};
 pub use cachy_opt::{
-    BoreScheduler, AnanicyRule, AnanicyCppDaemon, UltraKernelSamepageMerger,
-    X86v3v4OptimizationDetector, CachyKernelManager, IoSchedClass, PhysicalPageFrame,
+    BoreScheduler, CachyBoreWakeupBooster, InteractiveThreadMetric, AnanicyRule, AnanicyCppDaemon,
+    UltraKernelSamepageMerger, CachyMemoryCompactor, X86v3v4OptimizationDetector, CachySimdDispatcher,
+    CachyPStateGovernor, PStateEppMode, CachySysctlTuner, CachyKernelManager, IoSchedClass, PhysicalPageFrame,
 };
 pub use smart_optimizer::{
     CpuPriorityOptimizer, RamDefragmenter, IoPriorityOptimizer, IoTaskPriority,
