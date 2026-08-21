@@ -38,7 +38,7 @@ pub mod flags {
 
 // ── TCP Segment ───────────────────────────────────────────────────────────
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TcpSegment {
     pub src_port: u16,
     pub dst_port: u16,
@@ -346,6 +346,71 @@ impl TcpConnection {
 }
 
 // =================================================================────────
+// Deterministic TCP Fuzzer PRNG & Generator (Property 16: Seed Reproducibility)
+// =================================================================────────
+
+pub struct TcpFuzzerPrng {
+    state: u64,
+}
+
+impl TcpFuzzerPrng {
+    pub fn new(seed: u64) -> Self {
+        Self { state: seed }
+    }
+
+    pub fn next_u32(&mut self) -> u32 {
+        self.state = self.state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        (self.state >> 32) as u32
+    }
+
+    pub fn next_u16(&mut self) -> u16 {
+        self.next_u32() as u16
+    }
+
+    pub fn next_u8(&mut self) -> u8 {
+        self.next_u32() as u8
+    }
+}
+
+pub struct TcpFuzzer;
+
+impl TcpFuzzer {
+    /// Generates a deterministic sequence of random TCP segments for fuzzing given a seed
+    pub fn generate_packet_sequence(seed: u64, count: usize) -> Vec<TcpSegment> {
+        let mut prng = TcpFuzzerPrng::new(seed);
+        let mut segments = Vec::with_capacity(count);
+
+        for _ in 0..count {
+            let src = prng.next_u16();
+            let dst = prng.next_u16();
+            let seq = prng.next_u32();
+            let ack = prng.next_u32();
+            let flags = prng.next_u8();
+            let window = prng.next_u16();
+            let payload_len = (prng.next_u8() % 32) as usize;
+            let mut payload = Vec::with_capacity(payload_len);
+            for _ in 0..payload_len {
+                payload.push(prng.next_u8());
+            }
+
+            segments.push(TcpSegment {
+                src_port: src,
+                dst_port: dst,
+                seq,
+                ack,
+                flags,
+                window,
+                checksum: 0,
+                urgent_ptr: 0,
+                payload,
+            });
+        }
+
+        segments
+    }
+}
+
+// =================================================================────────
 // 20. SOVEREIGN SOCKMAP DIRECT REDIRECTION ENGINE (CILIUM/LINUX STYLE)
 // =================================================================────────
 
@@ -525,6 +590,23 @@ mod tests {
         let fin = conn.close().unwrap();
         assert!(fin.has_flag(flags::FIN));
         assert_eq!(conn.state, TcpState::FinWait1);
+    }
+
+    #[test]
+    fn test_tcp_fuzzer_seed_reproducibility() {
+        let seed = 0x1234_5678_9ABC_DEF0u64;
+        let count = 100;
+
+        let seq_a = TcpFuzzer::generate_packet_sequence(seed, count);
+        let seq_b = TcpFuzzer::generate_packet_sequence(seed, count);
+
+        // Property 16: Two runs with identical seed S MUST produce identical packet sequences
+        assert_eq!(seq_a.len(), count);
+        assert_eq!(seq_a, seq_b);
+
+        // Different seed produces different packet sequence
+        let seq_diff = TcpFuzzer::generate_packet_sequence(seed + 1, count);
+        assert_ne!(seq_a, seq_diff);
     }
 
     #[test]
