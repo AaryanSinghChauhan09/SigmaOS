@@ -193,6 +193,14 @@ impl SecureBoot for SimpleSecureBoot {
     }
 }
 
+pub struct AcpiParser;
+pub struct GopFramebuffer;
+pub struct GopSplashCanvas;
+pub struct MicrokernelProfile;
+pub struct MultiKernelBootSelector;
+pub struct SovereignBootWatchdog;
+pub struct UsbHostController;
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -66,7 +66,7 @@ impl ShareXFlameshotEngine {
 
         // Add ShareX-style auto upload if enabled
         if self.auto_upload_enabled {
-            screenshot.cloud_url = Some(format!("{}/capture_{}.png", self.target_cloud_destination, uuid::Uuid::new_v4()));
+            screenshot.cloud_url = Some(format!("{}/capture_{}.png", self.target_cloud_destination, self.screenshot_history.len() + 1));
         }
 
         self.screenshot_history.push_back(screenshot.clone());
