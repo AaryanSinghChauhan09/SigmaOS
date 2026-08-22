@@ -24,19 +24,19 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      uses: actions/checkout@v4
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         queries: security-extended,security-and-quality
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+      uses: github/codeql-action/autobuild@v3
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
 
@@ -50,10 +50,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      uses: actions/checkout@v4
 
     - name: Dependency Review
-      uses: actions/dependency-review-action@5f1ce9c37e174475a914a598765ac9e4f4f0490a
+      uses: actions/dependency-review-action@v4
       with:
         fail-on-severity: moderate
         allow-licenses: GPL-3.0-or-later, MIT, Apache-2.0, BSD-3-Clause, BSD-2-Clause
@@ -64,17 +64,14 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      uses: actions/checkout@v4
 
     - name: Install Rust toolchain
-      uses: actions-rs/toolchain@16437dce0d1cbde1a44b8bcb1502e33d034c264c
+      uses: actions-rs/toolchain@v1
       with:
         profile: minimal
         toolchain: stable
         override: true
-
-    - name: Install cargo-audit
-      run: cargo install cargo-audit
 
     - name: Run cargo audit
       run: cargo audit
@@ -86,10 +83,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      uses: actions/checkout@v4
 
     - name: Install Rust toolchain
-      uses: actions-rs/toolchain@16437dce0d1cbde1a44b8bcb1502e33d034c264c
+      uses: actions-rs/toolchain@v1
       with:
         profile: minimal
         toolchain: stable
@@ -105,10 +102,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      uses: actions/checkout@v4
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@f1b33cf6ff13815a543b5f762d4be4b4c4839e68
+      uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         scan-ref: '.'
@@ -116,7 +113,7 @@ jobs:
         output: 'trivy-results.sarif'
 
     - name: Upload Trivy results to GitHub Security
-      uses: github/codeql-action/upload-sarif@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: 'trivy-results.sarif'
 
@@ -126,10 +123,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@0a5c615c1f8b2e34badcd18ac31f349e4f463d29
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -146,12 +143,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Run TruffleHog
-      uses: trufflesecurity/trufflehog@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      uses: trufflesecurity/trufflehog@main
       with:
         path: ./
         base: ${{ github.event.repository.default_branch }}
