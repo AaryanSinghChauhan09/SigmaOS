@@ -24,11 +24,8 @@ impl SymlinkResolverRule for LinuxPersonaRule {
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
         match persona {
-            KernelPersona::Linux_2_6
-            | KernelPersona::Linux_3_x
-            | KernelPersona::Linux_4_x
-            | KernelPersona::Linux_5_x
-            | KernelPersona::Linux_6_x => true,
+            KernelPersona::Linux2_6
+            | KernelPersona::Linux6X => true,
         }
     }
 }
@@ -40,7 +37,7 @@ impl SymlinkResolverRule for LegacyLinuxRule {
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
         match persona {
-            KernelPersona::Linux_2_6 => true,
+            KernelPersona::Linux2_6 => true,
             _ => false,
         }
     }
@@ -144,11 +141,11 @@ impl SmartSymlink {
     /// Routes the symlink path to /lib32 or /lib64 automatically depending on the active ABI
     pub fn resolve_multi_lib_routing(&self, syscall_abi: SyscallAbi) -> &'static str {
         match syscall_abi {
-            SyscallAbi::Oabi_32 => {
+            SyscallAbi::Oabi32 | SyscallAbi::Eabi32 => {
                 // Route to legacy 32-bit library directory (multi-lib parity)
                 "/lib32/libc.so"
             }
-            SyscallAbi::Eabi_64 => {
+            SyscallAbi::Eabi64 => {
                 // Route to modern 64-bit library directory
                 "/lib64/libc.so"
             }
