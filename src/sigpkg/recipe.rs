@@ -39,6 +39,8 @@ pub enum UseFlag {
 pub struct PackageRecipe {
     pub name: String,
     pub version: Version,
+    pub arch: String,
+    pub pkgrel: u32,
     pub description: String,
     pub build_system: BuildSystem,
     pub dependencies: Vec<Dependency>,
@@ -59,6 +61,8 @@ impl PackageRecipe {
         Self {
             name,
             version,
+            arch: "x86_64".to_string(),
+            pkgrel: 1,
             description: String::new(),
             build_system: BuildSystem::Cargo,
             dependencies: Vec::new(),
@@ -71,6 +75,11 @@ impl PackageRecipe {
             compilation_profile: StageProfile::Stage2Bootstrap,
             conditional_dependencies: Vec::new(),
         }
+    }
+
+    pub fn with_arch(mut self, arch: String) -> Self {
+        self.arch = arch;
+        self
     }
 
     pub fn with_description(mut self, description: String) -> Self {
@@ -104,7 +113,8 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
         self
     }
 

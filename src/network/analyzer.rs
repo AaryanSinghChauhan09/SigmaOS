@@ -304,10 +304,10 @@ impl AnalysisStrategy for KaliSnoopAnalysis {
             .fingerprinter
             .fingerprint_packet(packet, inferred_ttl, inferred_win);
 
-        let ports = self
-            .scan_history
-            .entry(packet.source_ip)
-            .or_insert_with(Vec::new);
+        if !self.scan_history.contains_key(&packet.source_ip) {
+            self.scan_history.insert(packet.source_ip, Vec::new());
+        }
+        let ports = self.scan_history.get_mut(&packet.source_ip).unwrap();
         if !ports.contains(&packet.destination_port) {
             ports.push(packet.destination_port);
         }
@@ -451,10 +451,11 @@ impl ClearLinuxFlowLoadBalancer {
     pub fn steer_packet(&mut self, packet: &TrafficPacket) -> usize {
         let hash = self.calculate_flow_hash(packet);
         let core_count = self.core_count;
-        *self
-            .flow_affinity
-            .entry(hash)
-            .or_insert_with(|| (hash % core_count as u64) as usize)
+        if !self.flow_affinity.contains_key(&hash) {
+            let core = (hash % core_count as u64) as usize;
+            self.flow_affinity.insert(hash, core);
+        }
+        *self.flow_affinity.get(&hash).unwrap()
     }
 
     pub fn get_active_flows_count(&self) -> usize {

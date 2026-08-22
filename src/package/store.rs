@@ -53,19 +53,26 @@ impl SigmaSoftwareStore {
             if let Some(ref entry) = entry_slot {
                 if entry.name == name {
                     if entry.safety_score < 50 {
-                        println!("SoftwareStore: SECURITY BLOCKED: Package '{}' has a critical low safety score of {}!", entry.name, entry.safety_score);
                         return Err("SecurityBlocked: Package safety threshold not met.");
-                    }
-                    if !entry.is_sandboxed {
-                        println!("SoftwareStore: WARNING: Installing unsandboxed application '{}'. Sandbox policies degraded.", entry.name);
-                    } else {
-                        println!("SoftwareStore: Package '{}' validated (Safety: {}, Sandboxed: true). Installation granted.", entry.name, entry.safety_score);
                     }
                     return Ok(());
                 }
             }
         }
         Err("ENOENT: Package not registered in the Software Store.")
+    }
+
+    pub fn check_for_updates(&mut self) -> usize {
+        let registry = self.registry.borrow();
+        let mut count = 0;
+        for entry_slot in registry.iter() {
+            if let Some(ref entry) = entry_slot {
+                if entry.update_available {
+                    count += 1;
+                }
+            }
+        }
+        count
     }
 
     /// Automatically scans and triggers update routines for registered packages

@@ -1,90 +1,13 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::ToString;
-
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
 /// Implements command parsing, execution, and built-in commands
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-#[cfg(not(target_os = "none"))]
-unsafe fn sys_alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn sys_free(_ptr: *mut u8) {
-    // No-op for test/dev allocations
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 pub type CommandID = usize;
-
-#[repr(C)]
-pub struct ShellVec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-}
-
-impl<T> ShellVec<T> {
-    pub fn new() -> Self {
-        ShellVec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = sys_alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                sys_free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -105,10 +28,6 @@ pub trait ShellCommand {
 pub struct SimpleShellCommand {
     pub name: [u8; 32],
     pub description: [u8; 128],
-    /// Cached length of the command name to avoid linear zero-byte scans.
-    pub name_len: u8,
-    /// Cached length of the command description to avoid linear zero-byte scans.
-    pub description_len: u8,
 }
 
 impl SimpleShellCommand {
@@ -124,31 +43,9 @@ impl SimpleShellCommand {
         SimpleShellCommand {
             name: name_array,
             description: desc_array,
-            name_len: name_len as u8,
-            description_len: desc_len as u8,
         }
     }
 }
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 
 impl<'a, T> IntoIterator for &'a ShellVec<T> {
     type Item = &'a T;
@@ -194,21 +91,16 @@ impl<T> Drop for ShellVec<T> {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
-                sys_free(self.data as *mut u8);
+                free(self.data as *mut u8);
             }
         }
     }
 }
 
+
 impl ShellCommand for SimpleShellCommand {
     fn name(&self) -> &[u8] {
-        // Bolt performance optimization: Use cached name_len for O(1) slice access
-        // instead of O(N) linear zero-byte scans over the 32-byte array.
-        let len = if self.name_len > 0 {
-            self.name_len as usize
-        } else {
-            self.name.iter().position(|&b| b == 0).unwrap_or(32)
-        };
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
         &self.name[..len]
     }
 
@@ -227,13 +119,7 @@ impl ShellCommand for SimpleShellCommand {
     }
 
     fn help(&self) -> &[u8] {
-        // Bolt performance optimization: Use cached description_len for O(1) slice access
-        // instead of O(N) linear zero-byte scans over the 128-byte array.
-        let len = if self.description_len > 0 {
-            self.description_len as usize
-        } else {
-            self.description.iter().position(|&b| b == 0).unwrap_or(128)
-        };
+        let len = self.description.iter().position(|&b| b == 0).unwrap_or(128);
         &self.description[..len]
     }
 }
@@ -370,10 +256,7 @@ impl ShellCommand for SigmaFindCommand {
         }
 
         // Simulate fd color/style matching
-        let matches: &[&[u8]] = &[
-            b"src/package/universal.rs",
-            b"tests/integration_test.rs",
-        ];
+        let matches: &[&[u8]] = &[b"src/package/universal.rs", b"tests/integration_test.rs"];
 
         for text in matches {
             for &b in *text {
@@ -566,6 +449,15 @@ impl SimpleCommandRegistry {
 
         let sigsched = SimpleShellCommand::new(b"sigsched", b"Set Scheduler RT and HPC profiles");
         self.commands.push(Some(Box::new(sigsched)));
+
+        let sigmagrep = SigmaGrepCommand;
+        self.commands.push(Some(Box::new(sigmagrep)));
+
+        let sigmafind = SigmaFindCommand;
+        self.commands.push(Some(Box::new(sigmafind)));
+
+        let sigmadiff = SigmaDiffCommand;
+        self.commands.push(Some(Box::new(sigmadiff)));
     }
 }
 
@@ -577,9 +469,11 @@ impl CommandRegistry for SimpleCommandRegistry {
 
     fn unregister(&mut self, name: &[u8]) -> Result<(), CommandError> {
         for i in 0..self.commands.len() {
-            if let Some(ref cmd) = self.commands[i] {
+            if let Some(Some(ref cmd)) = self.commands.get(i) {
                 if cmd.name() == name {
-                    self.commands[i] = None;
+                    if let Some(slot) = self.commands.get_mut(i) {
+                        *slot = None;
+                    }
                     return Ok(());
                 }
             }
@@ -588,11 +482,9 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
-        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
-        let trimmed_name = &name[..name_len];
-        for command_option in &*self.commands {
-            if let Some(ref command) = command_option {
-                if command.name() == trimmed_name {
+        for i in 0..self.commands.len() {
+            if let Some(Some(ref command)) = self.commands.get(i) {
+                if command.name() == name {
                     return Some(command.as_ref());
                 }
             }
@@ -642,7 +534,8 @@ impl ShellSession for SimpleShellSession {
 
         if let Some(command) = self.registry.get(&command_name) {
             let mut cmd = SimpleShellCommand::new(command.name(), command.help());
-            cmd.execute(&args)
+            let slice = unsafe { core::slice::from_raw_parts(args.data, args.len) };
+            cmd.execute(slice)
         } else {
             Err(CommandError::NotFound)
         }
@@ -663,11 +556,13 @@ impl ShellSession for SimpleShellSession {
     }
 
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
-        for &(ref k, ref v) in &*self.environment {
-            let len = k.iter().position(|&b| b == 0).unwrap_or(64);
-            if &k[..len] == key {
-                let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
-                return Some(&v[..vlen]);
+        for i in 0..self.environment.len() {
+            if let Some(&(ref k, ref v)) = self.environment.get(i) {
+                let len = k.iter().position(|&b| b == 0).unwrap_or(64);
+                if &k[..len] == key {
+                    let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
+                    return Some(&v[..vlen]);
+                }
             }
         }
         None
@@ -711,11 +606,12 @@ impl CommandHistory for SimpleCommandHistory {
     fn get_previous(&self) -> Option<&[u8]> {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx > 0 && idx <= self.history.len() {
-            let len = self.history[idx - 1]
-                .iter()
-                .position(|&b| b == 0)
-                .unwrap_or(256);
-            Some(&self.history[idx - 1][..len])
+            if let Some(cmd) = self.history.get(idx - 1) {
+                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+                Some(&cmd[..len])
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -724,11 +620,12 @@ impl CommandHistory for SimpleCommandHistory {
     fn get_next(&self) -> Option<&[u8]> {
         let idx = self.current_index.load(Ordering::SeqCst);
         if idx < self.history.len() {
-            let len = self.history[idx]
-                .iter()
-                .position(|&b| b == 0)
-                .unwrap_or(256);
-            Some(&self.history[idx][..len])
+            if let Some(cmd) = self.history.get(idx) {
+                let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+                Some(&cmd[..len])
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -744,6 +641,86 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
+struct ShellVec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> ShellVec<T> {
+    fn new() -> Self {
+        ShellVec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn len(&self) -> usize {
+        self.len
+    }
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 #[cfg(test)]
 mod tests {
@@ -775,5 +752,67 @@ mod tests {
         history.add(b"sigtrace trace task 256");
         assert_eq!(history.list().len(), 1);
         assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
+    }
+
+    #[test]
+    fn test_sigmagrep_execution() {
+        let mut cmd = SigmaGrepCommand;
+        assert_eq!(cmd.name(), b"sigmagrep");
+
+        let mut arg1 = [0u8; 64];
+        let mut arg2 = [0u8; 64];
+        let mut arg3 = [0u8; 64];
+        arg1[..14].copy_from_slice(b"my-search-term");
+        arg2[..2].copy_from_slice(b"-i");
+        arg3[..2].copy_from_slice(b"-n");
+
+        let args = vec![arg1, arg2, arg3];
+        let output = cmd.execute(&args).unwrap();
+        let output_str = std::str::from_utf8(&output).unwrap();
+
+        assert!(output_str.contains("my-search-term"));
+        assert!(output_str.contains("case-insensitive"));
+        assert!(output_str.contains("line-numbers"));
+    }
+
+    #[test]
+    fn test_sigmafind_execution() {
+        let mut cmd = SigmaFindCommand;
+        assert_eq!(cmd.name(), b"sigmafind");
+
+        let mut arg1 = [0u8; 64];
+        let mut arg2 = [0u8; 64];
+        let mut arg3 = [0u8; 64];
+        let mut arg4 = [0u8; 64];
+        arg1[..2].copy_from_slice(b"-e");
+        arg2[..2].copy_from_slice(b"-d");
+        arg3[..1].copy_from_slice(b"5");
+        arg4[..9].copy_from_slice(b"test-file");
+
+        let args = vec![arg1, arg2, arg3, arg4];
+        let output = cmd.execute(&args).unwrap();
+        let output_str = std::str::from_utf8(&output).unwrap();
+
+        assert!(output_str.contains("test-file"));
+        assert!(output_str.contains("regex-mode"));
+        assert!(output_str.contains("max-depth: 5"));
+    }
+
+    #[test]
+    fn test_sigmadiff_execution() {
+        let mut cmd = SigmaDiffCommand;
+        assert_eq!(cmd.name(), b"sigmadiff");
+
+        let mut arg1 = [0u8; 64];
+        let mut arg2 = [0u8; 64];
+        arg1[..2].copy_from_slice(b"-w");
+        arg2[..2].copy_from_slice(b"-y");
+
+        let args = vec![arg1, arg2];
+        let output = cmd.execute(&args).unwrap();
+        let output_str = std::str::from_utf8(&output).unwrap();
+
+        assert!(output_str.contains("ignoring whitespace"));
+        assert!(output_str.contains("side-by-side"));
     }
 }
