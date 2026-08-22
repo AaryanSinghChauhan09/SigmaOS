@@ -97,24 +97,6 @@ impl<T> Drop for ShellVec<T> {
     }
 }
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
 
 impl ShellCommand for SimpleShellCommand {
     fn name(&self) -> &[u8] {
