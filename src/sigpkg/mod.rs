@@ -18,8 +18,8 @@ pub mod verifier;
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
-    SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox,
-    SovereignMirrorSelector, AptPinningResolver, SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus,
+    SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer,
+    SovereignTransactionManager, TransactionStatus,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use spec::{

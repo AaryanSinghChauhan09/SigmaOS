@@ -60,6 +60,7 @@ pub mod scheduler {
 pub mod crypto {
     pub mod vectorized_pqc;
 }
+pub mod open_source_obsoletion;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -170,21 +171,18 @@ pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction, Version,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub use thread::management::{
-    ThreadID, ThreadState as LibThreadState, ThreadAlertableState, Thread, ThreadError, SimpleThread, ThreadManager, SimpleThreadManager,
-};
+pub use thread::{Thread, ThreadError};
 
 pub use process::spawn::{
-    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
+    ProcessID, ProcessState as LibProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter,
     CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
 };
 pub use process::activity_manager::{
@@ -197,7 +195,7 @@ pub use memory::segmentation_paging::{
 };
 
 pub use community::toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle,
     RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
     SecurityProfileTemplateStore, SecurityTemplate,
 };
@@ -209,4 +207,10 @@ pub use tools::{
     SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
     SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
     SovereignIsWebsiteDown,
+};
+
+pub use open_source_obsoletion::{
+    SovereignApiTestSuite, SovereignInitSupervisor, SovereignKnowledgeGraph,
+    SovereignObservabilitySuite, SovereignPartitionEngine, SovereignPqcVpnFirewall,
+    SovereignVcsEngine,
 };

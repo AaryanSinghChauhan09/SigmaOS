@@ -21,8 +21,14 @@ pub use hashset::HashSet;
 pub use btreemap::BTreeMap;
 pub use vecdeque::VecDeque;
 pub use custom_string::SigmaString;
+pub use custom_string::SigmaString as String;
+pub use custom_string::SigmaString as ToString;
+pub use custom_string::SigmaString as PathBuf;
+
 pub mod string {
     pub use super::SigmaString as String;
+    pub use super::SigmaString as ToString;
+    pub use super::SigmaString;
 }
 pub mod collections {
     pub use super::{HashMap, HashSet, BTreeMap, VecDeque};

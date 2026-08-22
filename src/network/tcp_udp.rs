@@ -1,6 +1,7 @@
 //! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 //! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
@@ -13,8 +14,6 @@ pub type Port = u16;
 pub enum Protocol {
     Tcp = 0,
     Udp = 1,
-    TCP = 0,
-    UDP = 1,
 }
 
 /// Standard RFC-793 TCP States

@@ -246,29 +246,6 @@ pub enum DesktopMode {
     TouchTabletMode,
 }
 
-pub struct ZorinAppearanceSwitcher {
-    pub active_mode: DesktopMode,
-    pub compositor_animations_enabled: bool,
-}
-
-impl ZorinAppearanceSwitcher {
-    pub fn new() -> Self {
-        Self {
-            active_mode: DesktopMode::ClassicDE,
-            compositor_animations_enabled: true,
-        }
-    }
-
-    pub fn switch_mode(&mut self, mode: DesktopMode) {
-        self.active_mode = mode;
-        if mode == DesktopMode::TouchTabletMode {
-            self.compositor_animations_enabled = false; // Disable complex animations to save power
-        } else {
-            self.compositor_animations_enabled = true;
-        }
-        println!("[compositor] Switching active appearance layout context to: {:?}.", mode);
-    }
-}
 
 // ==========================================
 // 7. AI Resource Scheduler (iOS / Windows kernel style)
@@ -926,6 +903,8 @@ pub enum ZorinLayoutPreset {
 }
 
 pub struct ZorinAppearanceSwitcher {
+    pub active_mode: DesktopMode,
+    pub compositor_animations_enabled: bool,
     pub active_layout: ZorinLayoutPreset,
     pub panel_height_pixels: u32,
     pub app_launcher_columns: u32,
@@ -935,11 +914,23 @@ pub struct ZorinAppearanceSwitcher {
 impl ZorinAppearanceSwitcher {
     pub fn new() -> Self {
         ZorinAppearanceSwitcher {
+            active_mode: DesktopMode::ClassicDE,
+            compositor_animations_enabled: true,
             active_layout: ZorinLayoutPreset::WindowsClassic,
             panel_height_pixels: 40,
             app_launcher_columns: 2,
             taskbar_docked: true,
         }
+    }
+
+    pub fn switch_mode(&mut self, mode: DesktopMode) {
+        self.active_mode = mode;
+        if mode == DesktopMode::TouchTabletMode {
+            self.compositor_animations_enabled = false; // Disable complex animations to save power
+        } else {
+            self.compositor_animations_enabled = true;
+        }
+        println!("[compositor] Switching active appearance layout context to: {:?}.", mode);
     }
 
     /// CCleaner & BleachBit parity: scans and purges bloated/temporary file caches

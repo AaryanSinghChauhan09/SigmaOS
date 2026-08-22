@@ -20,7 +20,7 @@ pub mod modern_wifi;
 pub mod touch_jingos;
 
 pub use gpu::{
-    DrmError, DrmPlaneType, GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
+    DrmCrtc, DrmConnector, DrmModeInfo, GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
     GpuResetState, GpuShader, ShaderStage,
 };
 pub use input::{InputDriver, InputEvent, InputType};
@@ -37,4 +37,3 @@ pub use modern_nvme::ModernNvmeDriver;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::ModernWifiDriver;
 pub use touch_jingos::TouchJingosDriver;
-pub use peripheral::{PeripheralDevice, PeripheralManager, DeviceGeneration, PowerState};
