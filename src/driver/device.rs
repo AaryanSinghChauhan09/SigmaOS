@@ -402,11 +402,6 @@ pub enum PortAddress {
     MemoryMapped(u32),
 }
 
-pub trait UnifiedPeripheral {
-    fn query_channel(&self) -> PortAddress;
-    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError>;
-    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError>;
-}
 
 /// Device error types
 #[repr(C)]
@@ -1738,117 +1733,7 @@ impl DeviceExtension {
     }
 }
 
-/// Windows NT-style Device Object representing a logical, physical, or virtual device instance
-pub struct DeviceObject {
-    pub name: [u8; 64],
-    pub device_type: DeviceType,
-    pub device_extension: DeviceExtension,
-}
 
-impl DeviceObject {
-    pub fn new(name: &[u8], device_type: DeviceType) -> Self {
-        let mut name_array = [0u8; 64];
-        let len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        Self {
-            name: name_array,
-            device_type,
-            device_extension: DeviceExtension::new(),
-        }
-    }
-}
-
-/// Windows NT-style Driver Object representing a loaded driver image
-pub struct DriverObject {
-    pub driver_name: [u8; 64],
-    pub registry_path: [u8; 128], // Registry path config lookup (e.g. \Registry\Machine\System\CurrentControlSet\Services\...)
-    pub device_objects: Vec<DeviceObject>,
-    pub unload_routine: Option<fn(&mut DriverObject)>, // Unload Routine (DRIVERUNLOAD)
-}
-
-impl DriverObject {
-    pub fn new(name: &[u8], reg_path: &[u8]) -> Self {
-        let mut name_array = [0u8; 64];
-        let len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        let mut reg_array = [0u8; 128];
-        let reg_len = reg_path.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(reg_path.as_ptr(), reg_array.as_mut_ptr(), reg_len);
-        }
-
-        Self {
-            driver_name: name_array,
-            registry_path: reg_array,
-            device_objects: Vec::new(),
-            unload_routine: None,
-        }
-    }
-}
-
-/// Windows NT-style I/O Manager Subsystem coordinating driver lifecycles, creation, and unload tasks
-pub struct IoManager {
-    pub active_drivers: Vec<DriverObject>,
-}
-
-impl IoManager {
-    pub fn new() -> Self {
-        Self {
-            active_drivers: Vec::new(),
-        }
-    }
-
-    /// Emulate the normal driver installation process (creates a registered DriverObject)
-    pub fn normal_driver_installation_process(&mut self, driver_name: &[u8], registry_path: &[u8]) -> Result<usize, DeviceError> {
-        let driver = DriverObject::new(driver_name, registry_path);
-        self.active_drivers.push(driver);
-        Ok(self.active_drivers.len() - 1)
-    }
-
-    /// IoCreateDevice: Create a Device Object associated with the specific Driver Object
-    pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
-        if driver_idx >= self.active_drivers.len() {
-            return Err(DeviceError::InvalidParameter);
-        }
-
-        let device_obj = DeviceObject::new(name, device_type);
-        self.active_drivers[driver_idx].device_objects.push(device_obj);
-        Ok(())
-    }
-
-    /// IoUnloadDriver: Executes driver-specific cleanup tasks and calls the DRIVERUNLOAD unload routine
-    pub fn io_unload_driver(&mut self, driver_idx: usize) -> Result<(), DeviceError> {
-        if driver_idx >= self.active_drivers.len() {
-            return Err(DeviceError::InvalidParameter);
-        }
-
-        // Get mutable borrow of the driver object
-        let driver = &mut self.active_drivers[driver_idx];
-
-        // Execute the unload routine if registered (DRIVERUNLOAD)
-        if let Some(unload) = driver.unload_routine {
-            (unload)(driver);
-        }
-
-        // Perform Driver-Specific Cleanup Tasks: Delete/Free all associated Device Objects and Extensions
-        println!("I/O Manager: Executing driver-specific cleanup tasks for driver.");
-        driver.device_objects = Vec::new(); // Drop/Delete all Device Objects
-
-        Ok(())
-    }
-}
-
-impl Default for IoManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Unified representation of communication channels (OOP Abstraction)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

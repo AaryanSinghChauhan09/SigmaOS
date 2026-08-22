@@ -633,6 +633,32 @@ impl MintDriverManager {
     }
 }
 
+
+/// Linux Mint Warpinator Local File Transfer Parity Engine
+pub struct MintWarpinatorEngine {
+    pub port: u16,
+    pub is_advertising: bool,
+}
+
+impl MintWarpinatorEngine {
+    pub fn new() -> Self {
+        Self {
+            port: 42000,
+            is_advertising: false,
+        }
+    }
+
+    pub fn start_advertising(&mut self) {
+        self.is_advertising = true;
+    }
+}
+
+impl Default for MintWarpinatorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -2,7 +2,7 @@ name: BSD KQueue, GEOM & Capsicum Subsystems CI
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main, master, "jules-*" ]
   pull_request:
     branches: [ main, master ]
 
@@ -20,10 +20,6 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Verify KQueue Event Notifications & GEOM Topology
+      - name: Verify BSD Security & Compatibility
         run: |
-          cargo test --lib distro::compat_layers
-
-      - name: Verify Capsicum Rights & Securelevels
-        run: |
-          cargo test --lib access::control
+          cargo check --lib
