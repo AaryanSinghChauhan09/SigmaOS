@@ -10,12 +10,12 @@ A core engineering principle of SigmaOS is **self-sufficiency and minimal extern
 
 | Traditional Component | SigmaOS Native Implementation | Zero-Dependency Benefits |
 |-----------------------|------------------------------|--------------------------|
-| **glibc / musl** | [`src/klib/`](file:///home/aaryansinghchauhan/SigmaOS/src/klib/) + `sigma_libc.h` | Embedded memory allocator, string operations, no runtime heap bloat |
-| **systemd** | [`src/init/systemd_init.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/init/systemd_init.rs) + [`src/init/sigma_init.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/init/sigma_init.rs) | Service unit dependency graph, cgroup simulation, socket activation |
-| **OpenSSL / libcrypto** | [`src/crypto/`](file:///home/aaryansinghchauhan/SigmaOS/src/crypto/) + [`kernel/crypto/`](file:///home/aaryansinghchauhan/SigmaOS/kernel/crypto/) | ChaCha20-Poly1305, Argon2id, BLAKE3, Ed25519, Kyber/Dilithium PQC |
-| **libcap / SELinux** | [`src/security/capability.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/security/capability.rs) + [`src/security/mac.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/security/mac.rs) | In-kernel capability check with $O(1)$ bitmask matching |
-| **DPKG / APT / RPM** | [`src/sigpkg/`](file:///home/aaryansinghchauhan/SigmaOS/src/sigpkg/) | In-memory DAG solver with cycle elimination and atomic filesystem rollback |
-| **libevent / libuv** | [`src/distro/linux_bsd_inspirations.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/distro/linux_bsd_inspirations.rs) | SPSC lock-free ring buffer and `io_uring` kernel emulation |
+| **glibc / musl** | [`src/klib/`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/klib/) + `sigma_libc.h` | Embedded memory allocator, string operations, no runtime heap bloat |
+| **systemd** | [`src/init/systemd_init.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/init/systemd_init.rs) + [`src/init/sigma_init.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/init/sigma_init.rs) | Service unit dependency graph, cgroup simulation, socket activation |
+| **OpenSSL / libcrypto** | [`src/crypto/`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/crypto/) + [`kernel/crypto/`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/kernel/crypto/) | ChaCha20-Poly1305, Argon2id, BLAKE3, Ed25519, Kyber/Dilithium PQC |
+| **libcap / SELinux** | [`src/security/capability.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/security/capability.rs) + [`src/security/mac.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/security/mac.rs) | In-kernel capability check with $O(1)$ bitmask matching |
+| **DPKG / APT / RPM** | [`src/sigpkg/`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/) | In-memory DAG solver with cycle elimination and atomic filesystem rollback |
+| **libevent / libuv** | [`src/distro/linux_bsd_inspirations.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/distro/linux_bsd_inspirations.rs) | SPSC lock-free ring buffer and `io_uring` kernel emulation |
 
 ---
 
