@@ -33,6 +33,7 @@ pub mod graphics {
 }
 pub mod hardware {
     pub mod compatibility;
+    pub mod universal_optimization;
     pub mod win32;
 }
 pub mod power {
@@ -44,6 +45,7 @@ pub mod observability {
 pub mod ai {
     pub mod agent;
     pub mod orchestrator;
+    pub mod sigma_ai_suite;
 }
 pub mod boot;
 pub mod toolchain {
@@ -53,6 +55,8 @@ pub mod toolchain {
     pub mod bootstrap;
 }
 pub mod scheduler {
+    pub mod distro_schedulers;
+    pub mod ebpf_scheduler;
     pub mod numa_scheduler;
 }
 pub mod crypto {

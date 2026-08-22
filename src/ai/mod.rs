@@ -13,6 +13,13 @@ pub mod open_computer;
 pub mod tensor_memory;
 pub mod compute_scheduler;
 pub mod quantization;
+pub mod sigma_ai_suite;
+
+pub use sigma_ai_suite::{
+    CommandTranslation, ErrorExplanation, IndicLanguage, SafetyLevel, SigmaAiAdaptiveSuggestions,
+    SigmaAiAssistant, SigmaAiErrorExplanation, SigmaAiNaturalLanguageTranslator,
+    SigmaAiWorkflowAutomation, WorkflowStep, WorkflowTrigger,
+};
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
