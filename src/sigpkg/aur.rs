@@ -2,8 +2,6 @@
 // Zero-dependency, safe, and OOP-centric
 
 use std::cell::RefCell;
-use crate::klib::HashSet;
-use std::path::PathBuf;
 
 const MAX_DEPS: usize = 8;
 const MAX_PREPARE_CMDS: usize = 4;
@@ -114,12 +112,7 @@ impl AurSandboxOrchestrator {
         }
 
         // Simulate compiling source files inside isolated namespace boundaries
-        println!("AurCompiler: Compiling package (hash: 0x{:X}) inside isolated sandbox path: 0x{:X}",
-                 meta.name_hash, sandbox.restricted_source_path_hash);
-
-        // Compute simulated target output package hash
         let final_package_hash = meta.name_hash ^ 0xAAAAAAAA;
-        println!("AurCompiler: Attested package build successfully. Output CAS hash: 0x{:X}", final_package_hash);
 
         Ok(final_package_hash)
     }

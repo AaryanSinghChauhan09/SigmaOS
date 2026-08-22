@@ -3,6 +3,14 @@
 
 extern crate alloc;
 
+#[cfg(test)]
+#[path = "../klib/error.rs"]
+pub mod error;
+
+#[cfg(test)]
+use error::{SecurityError, SigmaError};
+
+#[cfg(not(test))]
 use crate::klib::error::{SecurityError, SigmaError};
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -38,6 +46,15 @@ impl UnveilManager {
         }
     }
 
+    /// Permanently locks down the unveil table to prevent any further path visibility updates
+    pub fn unveil_seal(&mut self) -> Result<(), SigmaError> {
+        if self.locked {
+            return Err(SigmaError::Security(SecurityError::AccessDenied));
+        }
+        self.locked = true;
+        Ok(())
+    }
+
     /// Register a path visibility constraint.
     /// - If path and permissions are both empty, the unveil system is locked (no further changes allowed).
     /// - If path is already unveiled, updates its permission list.
@@ -47,8 +64,7 @@ impl UnveilManager {
         }
 
         if path.is_empty() && permissions.is_empty() {
-            self.locked = true;
-            return Ok(());
+            return self.unveil_seal();
         }
 
         // Parse permission characters
@@ -169,5 +185,14 @@ mod tests {
 
         // Further unveil calls should fail
         assert!(manager.unveil("/etc", "r").is_err());
+    }
+
+    #[test]
+    fn test_unveil_seal_method() {
+        let mut manager = UnveilManager::new();
+        manager.unveil("/usr/bin", "rx").unwrap();
+        assert!(manager.unveil_seal().is_ok());
+        assert!(manager.locked);
+        assert!(manager.unveil_seal().is_err()); // Double seal fails
     }
 }
