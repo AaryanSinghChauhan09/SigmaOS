@@ -14,11 +14,22 @@ use core::mem;
 /// Implements command parsing, execution, and built-in commands
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+#[cfg(not(target_os = "none"))]
+unsafe fn sys_alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn sys_free(_ptr: *mut u8) {
+    // No-op for test/dev allocations
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
-    #[link_name = "alloc"]
-    fn sys_alloc(size: usize) -> *mut u8;
-    #[link_name = "free"]
-    fn sys_free(ptr: *mut u8);
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
 pub type CommandID = usize;

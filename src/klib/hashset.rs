@@ -2,7 +2,6 @@
 //! Reduces dependency on std::collections::HashSet
 
 use super::BTreeMap;
-use super::hashmap::BTreeMapIter;
 
 pub struct HashSet<T>
 where
@@ -58,9 +57,9 @@ where
         }
     }
 
-    pub fn with_capacity(capacity: usize) -> Self {
+    pub fn with_capacity(_capacity: usize) -> Self {
         HashSet {
-            map: BTreeMap::with_capacity(capacity),
+            map: BTreeMap::new(),
         }
     }
 
@@ -103,7 +102,7 @@ where
 }
 
 pub struct HashSetIter<'a, T> {
-    map_iter: BTreeMapIter<'a, T, ()>,
+    map_iter: alloc::collections::btree_map::Iter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>

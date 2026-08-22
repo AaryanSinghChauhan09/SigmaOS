@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS AI Agent & Intent Parser
 // Custom, OOP-driven AI subsystem for intent parsing, agent execution, and command synthesis.
 
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -13,31 +15,35 @@ pub enum IntentType {
     ResourceAllocation = 2,
     CustomCommand = 3,
     Unknown = 4,
+    SystemCommand = 5,
+    FileOperation = 6,
+    NetworkRequest = 7,
+    InformationQuery = 8,
 }
 
 #[derive(Debug, Clone)]
 pub struct Intent {
     pub intent_type: IntentType,
     pub command: String,
-    pub parameters: Vec<String>,
+    pub parameters: String,
     pub confidence: f32,
 }
 
 impl Intent {
-    pub fn new(intent_type: IntentType, command: String) -> Self {
+    pub fn new(intent_type: IntentType, command: impl Into<String>) -> Self {
         Intent {
             intent_type,
-            command,
-            parameters: Vec::new(),
+            command: command.into(),
+            parameters: String::new(),
             confidence: 1.0,
         }
     }
 
     pub fn with_parameter(mut self, param: String) -> Self {
-        self.parameters.push(param);
+        self.parameters = param;
         self
     }
-    
+
     pub fn with_parameters(mut self, params: &str) -> Self {
         self.parameters = params.to_string();
         self
@@ -57,7 +63,6 @@ pub enum AIError {
     UnknownIntent = 3,
     PermissionDenied = 4,
     InvalidInput = 5,
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
 }
 
 pub struct SimpleIntentParser;
@@ -66,34 +71,34 @@ impl IntentParser for SimpleIntentParser {
     fn parse(&self, input: &str) -> Intent {
         let trimmed = input.trim();
         if trimmed.starts_with("optimize") {
-            Intent::new(IntentType::SystemOptimization, trimmed.to_string())
+            Intent::new(IntentType::SystemOptimization, trimmed)
         } else if trimmed.starts_with("audit") || trimmed.starts_with("scan") {
-            Intent::new(IntentType::SecurityAudit, trimmed.to_string())
+            Intent::new(IntentType::SecurityAudit, trimmed)
         } else if trimmed.starts_with("allocate") || trimmed.starts_with("memory") {
-            Intent::new(IntentType::ResourceAllocation, trimmed.to_string())
+            Intent::new(IntentType::ResourceAllocation, trimmed)
         } else {
-            Intent::new(IntentType::CustomCommand, trimmed.to_string())
+            Intent::new(IntentType::CustomCommand, trimmed)
         }
     }
 }
 
-<<<<<<< HEAD
-pub trait AIAgent {
-    fn name(&self) -> &str;
-    fn execute_intent(&mut self, intent: &Intent) -> Result<String, &'static str>;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AgentInfo {
+    pub execution_count: usize,
+    pub total_intents: usize,
+    pub capability: AgentCapability,
 }
 
-pub struct SystemOptimizerAgent {
-    pub name: String,
-    pub execution_count: AtomicUsize,
-}
-
-impl SystemOptimizerAgent {
+impl AgentInfo {
     pub fn new() -> Self {
-        SystemOptimizerAgent {
-            name: "SystemOptimizer".to_string(),
-            execution_count: AtomicUsize::new(0),
-=======
+        AgentInfo {
+            execution_count: 0,
+            total_intents: 0,
+            capability: AgentCapability::new(),
+        }
+    }
+}
+
 impl Default for AgentInfo {
     fn default() -> Self {
         Self::new()
@@ -127,14 +132,32 @@ impl AgentCapability {
     }
 }
 
+impl Default for AgentCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// AI agent trait (OOP interface)
 pub trait AIAgent {
-    fn parse(&mut self, input: &str) -> Result<Intent, AIError>;
-    fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError>;
-    fn learn(&mut self, input: &[u8], feedback: bool);
-    fn info(&self) -> AgentInfo;
-    fn register_mcp_tool(&mut self, name: String, desc: String) {}
-    fn optimize_prompt_weights(&mut self) -> f32 { 0.95 }
+    fn name(&self) -> &str;
+    fn parse(&mut self, input: &str) -> Result<Intent, AIError> {
+        Ok(Intent::new(IntentType::CustomCommand, input))
+    }
+    fn execute(&mut self, _intent: &Intent) -> Result<Vec<u8>, AIError> {
+        Ok(b"Command executed successfully".to_vec())
+    }
+    fn execute_intent(&mut self, intent: &Intent) -> Result<String, &'static str> {
+        Ok("Task executed successfully.".to_string())
+    }
+    fn learn(&mut self, _input: &[u8], _feedback: bool) {}
+    fn info(&self) -> AgentInfo {
+        AgentInfo::new()
+    }
+    fn register_mcp_tool(&mut self, _name: String, _desc: String) {}
+    fn optimize_prompt_weights(&mut self) -> f32 {
+        0.95
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -145,6 +168,42 @@ pub struct ManagerCapability {
 impl ManagerCapability {
     pub fn full() -> Self {
         ManagerCapability { can_process: true }
+    }
+}
+
+pub struct SystemOptimizerAgent {
+    pub name: String,
+    pub execution_count: AtomicUsize,
+}
+
+impl SystemOptimizerAgent {
+    pub fn new() -> Self {
+        SystemOptimizerAgent {
+            name: "SystemOptimizer".to_string(),
+            execution_count: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl Default for SystemOptimizerAgent {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AIAgent for SystemOptimizerAgent {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn execute_intent(&mut self, intent: &Intent) -> Result<String, &'static str> {
+        self.execution_count.fetch_add(1, Ordering::SeqCst);
+        match intent.intent_type {
+            IntentType::SystemOptimization => Ok("System optimization executed successfully.".to_string()),
+            IntentType::SecurityAudit => Ok("Security audit executed successfully.".to_string()),
+            IntentType::ResourceAllocation => Ok("Resource allocation updated.".to_string()),
+            _ => Ok("Custom agent task completed.".to_string()),
+        }
     }
 }
 
@@ -161,33 +220,59 @@ pub struct SimpleAIAgent {
 }
 
 impl SimpleAIAgent {
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl AsRef<[u8]>, version: (u32, u32, u32), capability: AgentCapability) -> Self {
+        let name_bytes = name.as_ref();
+        let name_str = core::str::from_utf8(name_bytes).unwrap_or("Agent").to_string();
         SimpleAIAgent {
-            name: name.to_string(),
-            version: (1, 0, 0),
+            name: name_str,
+            version,
             execution_count: AtomicUsize::new(0),
-            capability: AgentCapability::full(),
+            capability,
             intents: Vec::new(),
             mcp_tools: Vec::new(),
             learned_patterns_count: 0,
             prompt_optim_weight: 1.0,
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
+        }
+    }
+
+    pub fn register_mcp_tool(&mut self, name: String, desc: String) {
+        self.mcp_tools.push((name, desc));
+    }
+
+    pub fn optimize_prompt_weights(&mut self) -> f32 {
+        self.prompt_optim_weight = 0.95;
+        0.95
+    }
+
+    pub fn translate_natural_command(&self, input: &[u8]) -> Result<Vec<u8>, AIError> {
+        let text = core::str::from_utf8(input).unwrap_or("");
+        if text.contains("install") && text.contains("libreoffice") {
+            Ok(b"sigpkg install libreoffice".to_vec())
+        } else if text.contains("disk usage") {
+            Ok(b"df -h".to_vec())
+        } else if text.contains("connect to WiFi") {
+            let ssid = text.split("connect to WiFi ").nth(1).unwrap_or("Home");
+            Ok(format!("sigma-wifi connect --ssid {}", ssid).into_bytes())
+        } else {
+            Ok(input.to_vec())
+        }
+    }
+
+    pub fn perform_safety_check(&self, input: &[u8]) -> Option<Vec<u8>> {
+        let text = core::str::from_utf8(input).unwrap_or("");
+        if text.contains("rm -rf") {
+            Some(b"Potentially destructive command intercepted".to_vec())
+        } else {
+            None
         }
     }
 }
 
-<<<<<<< HEAD
-impl Default for SystemOptimizerAgent {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl AIAgent for SystemOptimizerAgent {
+impl AIAgent for SimpleAIAgent {
     fn name(&self) -> &str {
         &self.name
-=======
-impl AIAgent for SimpleAIAgent {
+    }
+
     fn parse(&mut self, input: &str) -> Result<Intent, AIError> {
         if input.is_empty() {
             return Err(AIError::InvalidInput);
@@ -202,22 +287,11 @@ impl AIAgent for SimpleAIAgent {
         } else {
             Ok(Intent::new(IntentType::InformationQuery, "query").with_parameters(input))
         }
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
     }
 
-    fn execute_intent(&mut self, intent: &Intent) -> Result<String, &'static str> {
+    fn execute(&mut self, _intent: &Intent) -> Result<Vec<u8>, AIError> {
         self.execution_count.fetch_add(1, Ordering::SeqCst);
-<<<<<<< HEAD
-        match intent.intent_type {
-            IntentType::SystemOptimization => Ok("System optimization executed successfully.".to_string()),
-            IntentType::SecurityAudit => Ok("Security audit executed successfully.".to_string()),
-            IntentType::ResourceAllocation => Ok("Resource allocation updated.".to_string()),
-            _ => Ok("Custom agent task completed.".to_string()),
-=======
-        let mut response = Vec::new();
-        let success_msg = b"Command executed successfully";
-        response.extend_from_slice(success_msg);
-        Ok(response)
+        Ok(b"Command executed successfully".to_vec())
     }
 
     fn learn(&mut self, _input: &[u8], _feedback: bool) {
@@ -233,6 +307,14 @@ impl AIAgent for SimpleAIAgent {
         info.total_intents = self.intents.len();
         info.capability = self.capability;
         info
+    }
+
+    fn register_mcp_tool(&mut self, name: String, desc: String) {
+        self.register_mcp_tool(name, desc);
+    }
+
+    fn optimize_prompt_weights(&mut self) -> f32 {
+        self.optimize_prompt_weights()
     }
 }
 
@@ -262,24 +344,18 @@ impl SigmaAgentREPL {
             return Err(AIError::InvalidInput);
         }
 
-        // Translate spoken natural language to capability-checked shell command
         let translated = self.agent.translate_natural_command(transcript.as_bytes())?;
         let cmd_str = String::from_utf8(translated).unwrap_or_else(|_| transcript.to_string());
 
-        // Run safety check
         if let Some(warning) = self.agent.perform_safety_check(cmd_str.as_bytes()) {
             let warn_str = String::from_utf8(warning).unwrap_or_default();
             Ok(format!("[SAFETY INTERCEPT]: {}", warn_str))
         } else {
             Ok(format!("[EXECUTING SCHEDULER]: {}", cmd_str))
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
         }
     }
 }
 
-<<<<<<< HEAD
-pub struct AgentOrchestrator {
-=======
 /// Predictive Maintenance Agent monitoring hardware telemetry & mitigating degradation
 pub struct PredictiveMaintenanceAgent {
     pub cpu_temp_c: f64,
@@ -300,13 +376,11 @@ impl PredictiveMaintenanceAgent {
         }
     }
 
-    /// Evaluates machine-learning degradation risk model
     pub fn evaluate_hardware_health(&mut self, temp: f64, cycles: u64, misses: f64) -> f64 {
         self.cpu_temp_c = temp;
         self.disk_write_cycles = cycles;
         self.cache_miss_rate = misses;
 
-        // Predictive linear regression score model:
         let temp_score = if temp > 80.0 { (temp - 80.0) * 0.02 } else { 0.0 };
         let write_score = if cycles > 500000 { (cycles as f64 - 500000.0) / 10000000.0 } else { 0.0 };
         let miss_score = if misses > 0.3 { misses * 0.5 } else { 0.0 };
@@ -315,14 +389,19 @@ impl PredictiveMaintenanceAgent {
         self.failure_probability
     }
 
-    /// Triggers self-healing hardware actions if failure probability exceeds critical threshold
     pub fn trigger_self_healing_if_needed(&mut self) -> Option<&'static str> {
         if self.failure_probability > 0.6 {
-            self.fan_rpm = 4500; // Increase fan speed
+            self.fan_rpm = 4500;
             Some("Self-Healing Triggered: Increasing cooling fan RPM & throttling active CPU multiplier")
         } else {
             None
         }
+    }
+}
+
+impl Default for PredictiveMaintenanceAgent {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -369,6 +448,12 @@ impl AIComplianceDashboard {
     }
 }
 
+impl Default for AIComplianceDashboard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// AI agent manager trait (OOP interface)
 pub trait AIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError>;
@@ -404,61 +489,33 @@ impl Default for AIStats {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AIStats {
-    pub total_requests: usize,
-    pub successful_requests: usize,
-    pub failed_requests: usize,
-}
-
 pub struct SimpleAIAgentManager {
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
     pub agents: Vec<Box<dyn AIAgent>>,
     pub parser: SimpleIntentParser,
+    pub stats: AIStats,
 }
 
-impl AgentOrchestrator {
+impl SimpleAIAgentManager {
     pub fn new() -> Self {
-        AgentOrchestrator {
+        SimpleAIAgentManager {
             agents: Vec::new(),
-<<<<<<< HEAD
             parser: SimpleIntentParser,
-        }
-    }
-
-    pub fn register_agent(&mut self, agent: Box<dyn AIAgent>) {
-        self.agents.push(agent);
-    }
-
-    pub fn process_input(&mut self, input: &str) -> Result<String, &'static str> {
-        let intent = self.parser.parse(input);
-        if let Some(agent) = self.agents.first_mut() {
-            agent.execute_intent(&intent)
-        } else {
-            Err("No active AI agent registered to process intent.")
-=======
-            stats: AIStats {
-                total_requests: 0,
-                successful_requests: 0,
-                failed_requests: 0,
-            },
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
+            stats: AIStats::new(),
         }
     }
 }
 
-impl Default for AgentOrchestrator {
+impl Default for SimpleAIAgentManager {
     fn default() -> Self {
         Self::new()
     }
 }
 
-<<<<<<< HEAD
-=======
 impl AIAgentManager for SimpleAIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError> {
         let id = self.agents.len();
         self.agents.push(agent);
+        self.stats.total_agents = self.agents.len();
         Ok(id)
     }
 
@@ -484,7 +541,39 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 }
 
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
+pub struct AgentOrchestrator {
+    pub agents: Vec<Box<dyn AIAgent>>,
+    pub parser: SimpleIntentParser,
+}
+
+impl AgentOrchestrator {
+    pub fn new() -> Self {
+        AgentOrchestrator {
+            agents: Vec::new(),
+            parser: SimpleIntentParser,
+        }
+    }
+
+    pub fn register_agent(&mut self, agent: Box<dyn AIAgent>) {
+        self.agents.push(agent);
+    }
+
+    pub fn process_input(&mut self, input: &str) -> Result<String, &'static str> {
+        let intent = self.parser.parse(input);
+        if let Some(agent) = self.agents.first_mut() {
+            agent.execute_intent(&intent)
+        } else {
+            Err("No active AI agent registered to process intent.")
+        }
+    }
+}
+
+impl Default for AgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -495,7 +584,6 @@ mod tests {
         let intent = parser.parse("optimize memory");
         assert_eq!(intent.intent_type, IntentType::SystemOptimization);
 
-<<<<<<< HEAD
         let intent_sec = parser.parse("audit security");
         assert_eq!(intent_sec.intent_type, IntentType::SecurityAudit);
     }
@@ -507,77 +595,7 @@ mod tests {
 
         let res = orchestrator.process_input("optimize kernel").unwrap();
         assert_eq!(res, "System optimization executed successfully.");
-=======
-        manager.register_agent(Box::new(agent)).unwrap();
-        assert_eq!(manager.stats().total_agents, 1);
-
-        let mut agent = SimpleAIAgent::new("SovereignAssistant");
-        let id = manager.register_agent(Box::new(agent)).unwrap();
-        let response = manager.process_request(id, "run task").unwrap();
-        assert_eq!(response, b"Command executed successfully");
     }
-}
-
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
 
     #[test]
     fn test_ai_agent_parsing() {
@@ -608,7 +626,7 @@ mod tests {
         let id = manager.register_agent(Box::new(agent)).unwrap();
 
         let response = manager.process_request(id, "read file /etc/hosts").unwrap();
-        let response_str = std::str::from_utf8(&response).unwrap();
+        let response_str = core::str::from_utf8(&response).unwrap();
         assert_eq!(response_str, "Command executed successfully");
     }
 
@@ -672,7 +690,6 @@ mod tests {
         let mut maintenance = PredictiveMaintenanceAgent::new();
         assert_eq!(maintenance.failure_probability, 0.01);
 
-        // High temperature & high write cycles trigger degradation alert
         let prob = maintenance.evaluate_hardware_health(88.0, 6000000, 0.4);
         assert!(prob > 0.6);
 
@@ -691,6 +708,5 @@ mod tests {
         let partial_score = dashboard.audit_system_posture(true, false, true, true);
         assert_eq!(partial_score, 75);
         assert!(!dashboard.iso27001_compliant);
->>>>>>> origin/feat/activity-manager-paging-segmentation-613287197188639572
     }
 }

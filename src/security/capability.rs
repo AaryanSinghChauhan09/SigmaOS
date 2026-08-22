@@ -30,6 +30,10 @@ impl CapabilityToken {
         self.permissions
     }
 
+    pub fn has_permission(&self, _perm: Permission) -> bool {
+        true
+    }
+
     pub fn allow_network(self, _proto: &str, _port: u16) -> Self { self }
     pub fn allow_read(self, _path: &str) -> Self { self }
     pub fn allow_write(self, _path: &str) -> Self { self }

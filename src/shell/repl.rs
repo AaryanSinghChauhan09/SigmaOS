@@ -1,7 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
-use klib::io::{self, KlibRead, KlibWrite};
+use std::io::{self, BufRead, Write};
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -217,6 +217,26 @@ impl ShellRepl {
             "help" => ShellCommand::Help,
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
+            "echo" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Echo {
+                        message: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Echo {
+                        message: String::new(),
+                    }
+                }
+            }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "exit" | "quit" => ShellCommand::Exit,
             "pwd" => ShellCommand::Pwd,
             "whoami" => ShellCommand::WhoAmI,

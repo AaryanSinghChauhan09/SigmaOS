@@ -4,7 +4,6 @@ extern crate alloc;
 #![cfg_attr(target_os = "none", no_main)]
 #![allow(clippy::all, unused)]
 
-extern crate alloc;
 use alloc::string::ToString;
 
 use core::sync::atomic::{AtomicUsize, Ordering};

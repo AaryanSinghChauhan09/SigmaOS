@@ -1,5 +1,8 @@
 // SigmaOS Linux-inspired Memory Control Groups (memcg) and OOM Killer Subsystem
 
+extern crate alloc;
+
+
 use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;

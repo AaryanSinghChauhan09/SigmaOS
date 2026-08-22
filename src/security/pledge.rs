@@ -1,6 +1,7 @@
 // SigmaOS Pledge - Process Privilege Reduction Mechanism
 // Inspired by OpenBSD pledge but capability-based
 
+extern crate alloc;
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

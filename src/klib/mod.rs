@@ -15,17 +15,18 @@ pub mod io;
 pub mod time;
 pub mod net;
 
-pub use vec::Vec;
+pub use alloc::vec::Vec;
+pub use alloc::collections::BTreeMap;
 pub use hashmap::{HashMap, Entry};
 pub use hashset::HashSet;
-pub use btreemap::BTreeMap;
 pub use vecdeque::VecDeque;
 pub use custom_string::SigmaString;
 pub mod string {
-    pub use super::SigmaString as String;
+    pub use alloc::string::String;
 }
 pub mod collections {
-    pub use super::{HashMap, HashSet, BTreeMap, VecDeque};
+    pub use alloc::collections::BTreeMap;
+    pub use super::{HashMap, HashSet, VecDeque};
 }
 pub mod path {
     pub use super::custom_string::SigmaString as PathBuf;

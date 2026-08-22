@@ -318,6 +318,7 @@ mod tests {
         assert_eq!(t1.workload_type(), TaskWorkloadType::SystemKernelDaemon);
 
         let mut t2 = Task::new(100, "ffmpeg");
+        t2.parent_pid = 1;
         t2.nivcsw = 1000;
         t2.nvcsw = 10;
         assert_eq!(t2.workload_type(), TaskWorkloadType::CpuBound);

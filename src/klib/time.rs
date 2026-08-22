@@ -29,6 +29,14 @@ pub struct Duration {
 }
 
 impl Duration {
+    pub const fn new(secs: u64, nanos: u32) -> Self {
+        Duration { secs, nanos }
+    }
+
+    pub const fn zero() -> Self {
+        Duration { secs: 0, nanos: 0 }
+    }
+
     pub fn from_secs(secs: u64) -> Self {
         Duration { secs, nanos: 0 }
     }
@@ -40,12 +48,48 @@ impl Duration {
         }
     }
 
+    pub fn from_nanos(nanos: u64) -> Self {
+        Duration {
+            secs: nanos / 1_000_000_000,
+            nanos: (nanos % 1_000_000_000) as u32,
+        }
+    }
+
     pub fn as_secs(&self) -> u64 {
         self.secs
     }
 
     pub fn as_millis(&self) -> u64 {
         self.secs * 1000 + (self.nanos / 1_000_000) as u64
+    }
+
+    pub fn as_micros(&self) -> u64 {
+        self.secs * 1_000_000 + (self.nanos / 1_000) as u64
+    }
+
+    pub fn as_nanos(&self) -> u64 {
+        self.secs * 1_000_000_000 + self.nanos as u64
+    }
+
+    pub fn checked_add(self, rhs: Duration) -> Option<Duration> {
+        let mut nanos = self.nanos + rhs.nanos;
+        let mut secs = self.secs.checked_add(rhs.secs)?;
+        if nanos >= 1_000_000_000 {
+            nanos -= 1_000_000_000;
+            secs = secs.checked_add(1)?;
+        }
+        Some(Duration { secs, nanos })
+    }
+
+    pub fn checked_sub(self, rhs: Duration) -> Option<Duration> {
+        let mut secs = self.secs.checked_sub(rhs.secs)?;
+        let nanos = if self.nanos >= rhs.nanos {
+            self.nanos - rhs.nanos
+        } else {
+            secs = secs.checked_sub(1)?;
+            self.nanos + 1_000_000_000 - rhs.nanos
+        };
+        Some(Duration { secs, nanos })
     }
 }
 
@@ -205,20 +249,6 @@ pub fn uptime_ms() -> u64 {
 pub fn monotonic_ms() -> u64 {
     // In a real implementation, this would return monotonic time
     0
-}
-        Some(Duration { secs, nanos })
-    }
-
-    pub fn checked_sub(self, rhs: Duration) -> Option<Duration> {
-        let mut secs = self.secs.checked_sub(rhs.secs)?;
-        let nanos = if self.nanos >= rhs.nanos {
-            self.nanos - rhs.nanos
-        } else {
-            secs = secs.checked_sub(1)?;
-            self.nanos + 1_000_000_000 - rhs.nanos
-        };
-        Some(Duration { secs, nanos })
-    }
 }
 
 impl Default for Duration {

@@ -88,7 +88,7 @@ impl TransformerScheduler {
             }
             if score > best_score {
                 best_score = score;
-                best_cpu = cpu;
+                best_cpu = cpu as u32;
             }
         }
         Some(best_cpu)

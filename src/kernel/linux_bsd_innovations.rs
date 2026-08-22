@@ -1,13 +1,8 @@
 extern crate alloc;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::{Vec, String, HashMap};
-
-#[cfg(feature = "standalone_test")]
-use alloc::{vec::Vec, string::String};
-
-#[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
+use alloc::vec::Vec;
+use alloc::string::String;
+use crate::klib::collections::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {

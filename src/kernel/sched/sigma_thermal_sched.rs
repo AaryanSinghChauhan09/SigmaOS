@@ -69,6 +69,9 @@ impl ThermalScheduler {
     }
 
     pub fn register_zone(&mut self, zone: ThermalZone) {
+        if zone.temperature_c > self.current_temp {
+            self.current_temp = zone.temperature_c;
+        }
         self.zones.push(zone);
     }
 

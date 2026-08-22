@@ -12,20 +12,11 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-/// OOP-based Graphics Compositor for SigmaOS
-/// Implements graphics composition using OOP principles with traits and structs
-/// No dependency on external graphics frameworks
-
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use std::sync::atomic::{AtomicBool, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Position
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Position {
     pub x: i32,
@@ -40,9 +31,6 @@ impl Position {
 
 /// Size
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Size {
     pub width: u32,
@@ -60,8 +48,6 @@ impl Size {
 }
 
 /// Rectangle
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rectangle {
@@ -94,9 +80,6 @@ impl Rectangle {
 
 /// Color (RGBA)
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Color {
     pub r: u8,
@@ -137,8 +120,6 @@ pub trait Surface {
 
 /// Surface info
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SurfaceInfo {
     pub width: u32,
@@ -163,9 +144,6 @@ impl SurfaceInfo {
 /// Pixel format
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PixelFormat {
     RGB24 = 0,
     RGBA32 = 1,
@@ -175,9 +153,6 @@ pub enum PixelFormat {
 
 /// Surface capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SurfaceCapability {
     pub can_read: bool,
@@ -223,18 +198,6 @@ impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
         let size = (width * height) as usize;
         let mut data = Vec::new();
-        data.resize(size, 0);
-        let data = unsafe {
-            let size = (width * height) as usize;
-            let ptr = alloc(size * mem::size_of::<u32>()) as *mut u32;
-            if ptr.is_null() {
-                None
-            } else {
-                Some(NonNull::new_unchecked(ptr))
-            }
-        };
-        let size = (width * height) as usize;
-        let mut data = Vec::with_capacity(size);
         data.resize(size, 0);
 
         BitmapSurface {
@@ -314,6 +277,7 @@ impl Surface for BitmapSurface {
 }
 
 /// Window transition and switcher animation types (macOS / Cinnamon inspired)
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnimationType {
     Fade,
@@ -348,8 +312,6 @@ pub trait Window {
 
 /// Window info
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowInfo {
     pub id: usize,
@@ -373,9 +335,6 @@ impl WindowInfo {
 
 /// Window capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowCapability {
     pub can_move: bool,
@@ -553,9 +512,6 @@ pub trait Compositor {
 /// Graphics error types
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GraphicsError {
     Success = 0,
     InvalidParameter = 1,
@@ -567,8 +523,6 @@ pub enum GraphicsError {
 }
 
 /// Compositor statistics
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompositorStats {
@@ -597,29 +551,16 @@ impl Default for CompositorStats {
 
 /// Simple compositor (OOP: Concrete compositor class)
 pub struct SimpleCompositor {
-    pub windows: Vec<Option<Box<dyn Window>>>,
+    pub windows: Vec<Box<dyn Window>>,
     pub window_order: Vec<usize>,
     pub stats: CompositorStats,
     pub capability: CompositorCapability,
-    pub back_buffer: Option<BitmapSurface>,
-    pub double_buffering: AtomicBool,
-    windows: Vec<Option<Box<dyn Window>>>,
-    window_order: Vec<usize>,
-    stats: CompositorStats,
-    capability: CompositorCapability,
-    windows: Vec<Box<dyn Window>>,
-    window_order: Vec<usize>,
-    stats: CompositorStats,
-    capability: CompositorCapability,
     pub back_buffer: Option<BitmapSurface>,
     pub double_buffering: AtomicBool,
 }
 
 /// Compositor capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompositorCapability {
     pub can_add_windows: bool,
@@ -837,126 +778,6 @@ mod additional_compositor_tests {
         window.apply_transition(AnimationType::Minimize, 0.5f32);
         assert_eq!(window.get_scale(), 0.75f32); // 1.0 - (0.5 * 0.5)
         assert_eq!(window.get_opacity(), 0.5f32); // 1.0 - 0.5
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
-            self.len -= 1;
-            item
-        }
-    }
-
-    fn retain<F>(&mut self, mut f: F)
-    where
-        F: FnMut(&T) -> bool,
-    {
-        let mut write = 0;
-        for read in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(read);
-                if f(item) {
-                    if write != read {
-                        let item_copy = core::ptr::read(self.data.add(read));
-                        core::ptr::write(self.data.add(write), item_copy);
-                    }
-                    write += 1;
-                }
-            }
-        }
-        self.len = write;
-    }
-
-    fn insert(&mut self, index: usize, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if index < self.len {
-                core::ptr::copy(self.data.add(index), self.data.add(index + 1), self.len - index);
-            }
-
-            core::ptr::write(self.data.add(index), item);
-            self.len += 1;
-        }
-    }
-
-    fn iter(&self) -> Iter<T> {
-        Iter {
-            data: self.data,
-            len: self.len,
-            index: 0,
-        }
-    }
-
-    fn iter_mut(&mut self) -> IterMut<T> {
-        IterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-        }
-    }
-
-    fn position<F>(&self, mut f: F) -> Option<usize>
-    where
-        F: FnMut(&T) -> bool,
-    {
-        for i in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(i);
-                if f(item) {
-                    return Some(i);
-                }
-            }
-        }
-        None
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
     }
 }
 

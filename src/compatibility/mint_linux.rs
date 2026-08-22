@@ -396,7 +396,7 @@ impl TimeshiftSystemRestorer {
 
     pub fn rollback_system(&mut self, id: u32) -> Result<(), MintError> {
         let mut found = false;
-        for i in 0..self.restore_points.len {
+        for i in 0..self.restore_points.len() {
             if let Some(ref rp) = self.restore_points[i] {
                 if rp.id == id {
                     found = true;
@@ -721,7 +721,7 @@ mod tests {
         assert_eq!(&new_theme, b"Mint-Y-Light");
 
         engine.add_desklet(101, 200, 200);
-        assert_eq!(engine.desklets.len, 1);
+        assert_eq!(engine.desklets.len(), 1);
         assert_eq!(engine.desklets[0].unwrap().id, 101);
     }
 
@@ -732,7 +732,7 @@ mod tests {
 
         restorer.create_restore_point(101, true); // rsync snapshot
         restorer.create_restore_point(102, false); // btrfs snapshot
-        assert_eq!(restorer.restore_points.len, 2);
+        assert_eq!(restorer.restore_points.len(), 2);
 
         // Rollback succeeds for existing restore point
         assert!(restorer.rollback_system(102).is_ok());

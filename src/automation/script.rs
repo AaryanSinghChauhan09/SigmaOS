@@ -1,18 +1,18 @@
-#[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
-#[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
-
 /// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
 /// Implements interactive scripting, dynamic script-like functions, positional arguments,
 /// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
+use alloc::format;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type ScriptID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScriptLanguage { Python = 0, JavaScript = 1, Lua = 2, Shell = 3 }
 
@@ -357,90 +357,6 @@ impl StringDescrambler {
             cleartext.push(byte ^ self.xor_key);
         }
         cleartext
-    }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    fn len(&self) -> usize { self.len }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
     }
 }
 

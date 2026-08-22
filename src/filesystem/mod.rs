@@ -14,6 +14,5 @@ pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, Symlink
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
 pub use sigma_fs::{
     Blake3BlockDeduplicationEngine, JournalState, PfsType, PseudoFilesystemNamespace,
-    RaidLevel, SigmaFS, SigmaFhsAuditor, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsRouter,
-    SigmaFsCow, SigmaFsCrypt, SigmaFsJournal, SigmaFsRaid, SigmaFsVirtio, SigmaFsVolume,
+    SigmaFS, SigmaFhsAuditor, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsRouter,
 };

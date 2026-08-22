@@ -262,6 +262,7 @@ mod tests {
         // 1. Process 101 - Sandboxed web application (restricted read, allowed network)
         let web_app_token = CapabilityToken::new(101)
             .allow_network()
+            .grant_posix_capability(CAP_NET_BIND_SERVICE)
             .allow_fs_read()
             .add_port(80)
             .add_port(443);
@@ -282,7 +283,7 @@ mod tests {
     fn test_token_revocation() {
         let mut enforcer = SecurityEnforcer::new();
 
-        let token = CapabilityToken::new(101).allow_network();
+        let token = CapabilityToken::new(101).allow_network().grant_posix_capability(CAP_NET_BIND_SERVICE);
         enforcer.assign_token(token).unwrap();
 
         assert!(enforcer.validate_network_access(101, 80));

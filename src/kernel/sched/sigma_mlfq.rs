@@ -36,7 +36,7 @@ pub struct MlfqScheduler {
     pub time_slices: Vec<u64>,
     pub queues: Vec<Vec<u64>>,
     pub current_queue: usize,
-    pub aging_threshold: u64,
+    pub aging_threshold: u32,
     pub ticks: AtomicU32,
     pub vruntimes: alloc::collections::BTreeMap<u64, u64>,
 }
@@ -101,7 +101,8 @@ impl MlfqScheduler {
         if self.ticks.fetch_add(1, Ordering::SeqCst) >= self.aging_threshold {
             self.ticks.store(0, Ordering::SeqCst);
             for q in (1..self.nr_queues).rev() {
-                for &pid in &self.queues[q] {
+                let pids = self.queues[q].clone();
+                for pid in pids {
                     self.promote(pid);
                 }
             }

@@ -1,17 +1,19 @@
 // SigmaOS Driver Archive Vault (DriverArchiveVault)
 // Encrypts driver binaries for cold storage to prevent unauthorized driver injection and tamper attacks
 
-use klib::collections::HashMap;
+use crate::klib::collections::HashMap;
+use crate::klib::custom_string::SigmaString;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct VaultEntry {
-    pub driver_name: klib::string::SigmaString,
-    pub encrypted_payload: klib::vec::Vec<u8>,
-    pub hash_signature: klib::string::SigmaString,
+    pub driver_name: SigmaString,
+    pub encrypted_payload: Vec<u8>,
+    pub hash_signature: SigmaString,
 }
 
 pub struct DriverArchiveVault {
-    pub archive: HashMap<klib::string::SigmaString, VaultEntry>,
+    pub archive: HashMap<SigmaString, VaultEntry>,
     pub secret_key: u8,
 }
 
@@ -24,20 +26,20 @@ impl DriverArchiveVault {
     }
 
     pub fn store_driver(&mut self, name: &str, raw_binary: &[u8]) {
-        let encrypted: klib::vec::Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
-        let sig = klib::string::SigmaString::from(format!("SIGMA_{}_OK", name));
+        let encrypted: Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
+        let sig = SigmaString::from(format!("SIGMA_{}_OK", name));
 
         let entry = VaultEntry {
-            driver_name: klib::string::SigmaString::from(name),
+            driver_name: SigmaString::from(name),
             encrypted_payload: encrypted,
             hash_signature: sig,
         };
-        self.archive.insert(klib::string::SigmaString::from(name), entry);
+        self.archive.insert(SigmaString::from(name), entry);
     }
 
-    pub fn retrieve_driver(&self, name: &str) -> Option<klib::vec::Vec<u8>> {
-        if let Some(entry) = self.archive.get(&klib::string::SigmaString::from(name)) {
-            let decrypted: klib::vec::Vec<u8> = entry
+    pub fn retrieve_driver(&self, name: &str) -> Option<Vec<u8>> {
+        if let Some(entry) = self.archive.get(&SigmaString::from(name)) {
+            let decrypted: Vec<u8> = entry
                 .encrypted_payload
                 .iter()
                 .map(|b| b ^ self.secret_key)

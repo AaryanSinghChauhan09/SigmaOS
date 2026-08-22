@@ -2,7 +2,7 @@
 // Build recipes for package compilation and installation
 // Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
-use crate::sigpkg::{Dependency, Version};
+use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use std::collections::HashMap;
 
 /// Build system type
@@ -96,6 +96,15 @@ impl PackageRecipe {
 
     pub fn with_build_command(mut self, command: String) -> Self {
         self.build_commands.push(command);
+        self
+    }
+
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.build_commands.push(command);
+        self
+    }
+
+    pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
         self
     }
 
@@ -302,7 +311,7 @@ mod tests {
         // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
         let ssl_dependency = Dependency {
             name: "openssl".to_string(),
-            version: Version::new(3, 0, 0),
+            version_constraint: VersionConstraint::Exact(Version::new(3, 0, 0)),
         };
 
         recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);

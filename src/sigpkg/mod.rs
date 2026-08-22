@@ -13,13 +13,18 @@ pub mod rpm_compat;
 pub mod spec;
 pub mod store;
 pub mod transaction;
+pub mod universal_adapter;
 pub mod verifier;
 
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
-    SovereignAlternativesSystem, SovereignDeltaGenerator, SovereignMaintainerSandbox,
-    SovereignMirrorSelector, AptPinningResolver, SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus,
+    SovereignDeltaGenerator, SovereignMirrorSelector,
+    SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus,
+};
+pub use universal_adapter::{
+    AdapterError, ApkAdapter, DebAdapter, EbuildAdapter, NixAdapter, PacmanAdapter,
+    RpmAdapter, UniversalPackageManager,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use spec::{
@@ -41,6 +46,12 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {

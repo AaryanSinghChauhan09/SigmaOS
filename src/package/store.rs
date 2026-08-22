@@ -62,14 +62,9 @@ impl HardwareStore {
         Err("ENOENT: Package not registered in the Software Store.")
     }
 
-    pub fn check_for_updates(&mut self) -> usize {
-        self.pending_updates.clear();
-        for (name, app) in &self.catalog {
-            if app.is_installed && app.version != "1.5.0" {
-                self.pending_updates.push(name.clone());
-            }
-        }
-        self.pending_updates.len()
+    pub fn check_for_updates(&self) -> usize {
+        let registry = self.registry.borrow();
+        registry.iter().filter(|e| e.as_ref().map_or(false, |x| x.update_available)).count()
     }
 
     /// Automatically scans and triggers update routines for registered packages
@@ -103,6 +98,7 @@ pub static GLOBAL_SOFTWARE_STORE: HardwareStore = HardwareStore::new();
 // SigmaOS Polish-Parity Software Store & Update Manager (SigmaStore)
 // Designed for software installation, package upgrades, and security auditing
 
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap as HashMap;

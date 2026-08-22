@@ -173,13 +173,15 @@ pub struct Component {
 
 impl Component {
     pub fn new(id: ComponentId, name: &str, parent: Option<ComponentId>) -> Self {
+        let mut capabilities = BTreeMap::new();
+        capabilities.insert(0, CapabilityRights::full());
         Component {
             id,
             name: String::from(name),
             state: ComponentState::Created,
             parent,
             children: Vec::new(),
-            capabilities: BTreeMap::new(),
+            capabilities,
             resources: Vec::new(),
             capability_space: BTreeMap::new(),
             next_capability_id: AtomicUsize::new(1),
@@ -225,11 +227,11 @@ impl Component {
     /// Check if component has specific capability rights
     pub fn has_capability_rights(&self, handle_id: u32, required_rights: CapabilityRights) -> bool {
         if let Some(&rights) = self.capabilities.get(&handle_id) {
-            (required_rights.can_read || !rights.can_read) &&
-            (required_rights.can_write || !rights.can_write) &&
-            (required_rights.can_execute || !rights.can_execute) &&
-            (required_rights.can_delegate || !rights.can_delegate) &&
-            (required_rights.can_create_child || !rights.can_create_child)
+            (!required_rights.can_read || rights.can_read) &&
+            (!required_rights.can_write || rights.can_write) &&
+            (!required_rights.can_execute || rights.can_execute) &&
+            (!required_rights.can_delegate || rights.can_delegate) &&
+            (!required_rights.can_create_child || rights.can_create_child)
         } else {
             false
         }
@@ -476,7 +478,7 @@ mod tests {
 
     #[test]
     fn test_component_creation() {
-        let tree = ComponentTree::new();
+        let mut tree = ComponentTree::new();
         let child_id = tree.create_component(0, "test_child").unwrap();
         assert!(tree.get_component(child_id).is_ok());
     }

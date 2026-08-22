@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -31,6 +33,8 @@ pub mod community;
 pub mod memory;
 pub mod tools;
 pub mod virtualization;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
@@ -106,7 +110,7 @@ pub use filesystem::{
 pub use kernel::{
     AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
     InterruptMechanism, IpcError, IpcManager,
-    MemoryBlock, Message, PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
+    MemoryBlock, Message, PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, ProcessState,
     ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
     UserDefinedKernelFunctions,
@@ -170,8 +174,8 @@ pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction, Version, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{
@@ -179,12 +183,12 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub use thread::management::{
-    ThreadID, ThreadState as LibThreadState, ThreadAlertableState, Thread, ThreadError, SimpleThread, ThreadManager, SimpleThreadManager,
+pub use thread::{
+    Thread, ThreadError, Mutex,
 };
 
 pub use process::spawn::{
-    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
+    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter,
     CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
 };
 pub use process::activity_manager::{
@@ -197,7 +201,7 @@ pub use memory::segmentation_paging::{
 };
 
 pub use community::toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle,
     RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
     SecurityProfileTemplateStore, SecurityTemplate,
 };
@@ -209,4 +213,33 @@ pub use tools::{
     SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
     SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
     SovereignIsWebsiteDown,
+};
+
+pub use unimplemented_features::{
+    GenerationManager, PciBusScanner, SovereignIpcBus, SignalDispatcher as UnimplSignalDispatcher,
+    PagingController, PackageDependencyResolver as UnimplPackageDependencyResolver,
+    SecurityEnforcer as UnimplSecurityEnforcer, ZenithCompositor as UnimplZenithCompositor,
+    MultiCallShell, GdtEntry, NimPOSTManager, SigmaTrace as UnimplSigmaTrace,
+    SigmaFsCasEngine, SovereignCleanupEngine, AutoResourceOptimizer,
+    FedoraSELinuxMacEngine, FedoraSystemdSupervisor, FedoraDeltaRpmEngine,
+    VirtualMemoryManager, ZeroCopyNetworkStack, SovereignVmm, ContainerIsolationGuard,
+    SchedMlfq, SchedCfs, VirtioGpu, NvmeController, ApicTimer, HpetController,
+};
+
+pub use unimplemented_tools::{
+    AudioEditor, PodcastRecorder, GifConverter, StreamingOverlayManager, WebcamEffects, SubtitleEditor,
+    SmartCleanup, PerformanceOptimizer, DiskDefragmenter, DuplicateFileFinder, BatterySaver,
+    MemoryLeakDetector, ProcessSandbox, StartupOptimizer as UnimplStartupOptimizer, SecureFileShredder,
+    SystemRestoreSnapshot, AccessibilitySuite, PredictiveMaintenance, ApiTestingTool, GitGuiClient,
+    GamifiedTodo, MindMapCreator, KanbanBoard, GameHubLauncher, EmulatorManager, GameRecorder,
+    GamePerformanceBooster, CloudGaming, VrArRuntime, ControllerMapper, GameModManager,
+    AiDifficultyDirector, GamifiedDesktop, GanttChartPlanner, PdfEditor, DocumentScanner, CodeProfiler,
+    StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent, AiSearchAssistant, NaturalLanguageShell,
+    AiCodeAssistant, AiFileOrganizer, SmartNotificationManager, RemoteDesktop, MeshNetworking,
+    IotDeviceManager, CloudBackupUtility, SecureFileSharing, AiScheduler, AiComplianceDashboard,
+    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar, CrossDeviceSync,
+    FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, ZeroTrustTpmBoot, ForensicSnapshot,
+    AiAnomalyFirewall, SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing,
+    CrossLanguageBuildTool, PluginMarketplace, MusicLibraryManager, PacketSniffer, VpnTunnelManager,
+    ZeroKnowledgeVault, MarkdownNotebook, PartitionManager, VectorDraftEngine, VmGuestSupervisor, EmailClient,
 };

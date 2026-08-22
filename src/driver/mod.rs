@@ -10,6 +10,7 @@ pub mod shims;
 pub mod gpu_framework;
 pub mod network_framework;
 
+pub use device::{BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice};
 pub use mapper::{DriverMapper, MapperCategory};
 pub use pods::{PeripheralPod, PodType};
 pub use vault::{DriverArchiveVault, VaultEntry};

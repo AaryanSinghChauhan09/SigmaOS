@@ -19,9 +19,12 @@
 // Content-Addressed Store for SigmaPkg
 // Stores packages by SHA3-256 hash for reproducibility
 
-use crate::klib::BTreeMap;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::String;
+use std::path::PathBuf;
 use crate::sigpkg::Package;
-use crate::klib::PathBuf;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
