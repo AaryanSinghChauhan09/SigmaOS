@@ -35,6 +35,7 @@ permissions:
 jobs:
   mayhem-for-api:
     name: Mayhem for API
+    if: ${{ secrets.MAYHEM_TOKEN != '' }}
     # Mayhem for API runs on linux, mac and windows
     runs-on: ubuntu-latest
     permissions:
