@@ -2,7 +2,7 @@
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Bypasses standard resource overhead through a systemd-free init model, custom task trimmers, and zero-allocation visual swap profiles.
 
-use std::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicU8, Ordering};
 
 // ==========================================
 // 1. Systemd-Free Init Manager (Runit/SysV Parity)
@@ -175,14 +175,6 @@ impl Default for AntiXControlCentre {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();
-pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();
-pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntixControlCenter::new();
-pub static GLOBAL_MEMORY_TRIMMER: LegacyMemoryTrimmer = LegacyMemoryTrimmer::new();
 
 // ==========================================
 // 5. Live USB Persistence Manager (Inspiration: antiX Live-USB Persistence)
