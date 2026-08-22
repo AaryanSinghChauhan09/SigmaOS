@@ -100,6 +100,19 @@ pub enum ContainerError {
     ResourceLimit = 6,
 }
 
+/// Container info
+#[repr(C)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
+}
+
 impl ContainerInfo {
     pub fn new(id: ContainerID) -> Self {
         ContainerInfo {
@@ -115,6 +128,35 @@ impl ContainerInfo {
     }
 }
 
+/// Container capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
+}
+
+impl ContainerCapability {
+    pub const fn new() -> Self {
+        ContainerCapability {
+            can_start: false,
+            can_stop: false,
+            can_pause: false,
+            can_modify: false,
+        }
+    }
+
+    pub const fn full() -> Self {
+        ContainerCapability {
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
+            can_modify: true,
+        }
+    }
+}
 
 impl Default for ContainerCapability {
     fn default() -> Self {
@@ -170,6 +212,13 @@ impl ContainerNamespace {
             Ok(container_gid)
         }
     }
+}
+
+/// Container seccomp profiles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
 }
 
 impl ContainerNamespace {
@@ -859,7 +908,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std::alloc::alloc(layout)
+    std_alloc(layout)
 }
 
 
