@@ -246,9 +246,10 @@ impl PasswordManager {
     pub fn get_password(&mut self, id: &str) -> Result<PasswordEntry, PasswordError> {
         self.check_auto_lock()?;
 
+        let key = id.to_string();
         let entry = self
             .passwords
-            .get(id)
+            .get(&key)
             .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
 
         let decrypted_password = self.decrypt_password(&entry.encrypted_password)?;
@@ -295,8 +296,9 @@ impl PasswordManager {
     pub fn delete_password(&mut self, id: &str) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
+        let key = id.to_string();
         self.passwords
-            .remove(id)
+            .remove(&key)
             .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
 
         self.last_access = Some(std::time::Instant::now());

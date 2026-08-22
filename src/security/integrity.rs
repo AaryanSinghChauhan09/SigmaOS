@@ -252,6 +252,15 @@ impl SimpleIntegrityMonitor {
             capability,
         }
     }
+
+    fn update_stats(&mut self, status: IntegrityStatus) {
+        match status {
+            IntegrityStatus::Valid => self.stats.valid_files += 1,
+            IntegrityStatus::Modified => self.stats.modified_files += 1,
+            IntegrityStatus::Corrupted => self.stats.corrupted_files += 1,
+            IntegrityStatus::Missing => {}
+        }
+    }
 }
 
 impl IntegrityMonitor for SimpleIntegrityMonitor {
@@ -416,6 +425,10 @@ impl<T> Vec<T> {
 
     fn len(&self) -> usize {
         self.len
+    }
+
+    fn is_empty(&self) -> bool {
+        self.len == 0
     }
 
     fn get(&self, index: usize) -> Option<&T> {

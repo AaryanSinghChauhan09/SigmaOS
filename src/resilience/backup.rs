@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS Timeshift-Parity Recovery & Snapshot Shard
 // Permitting instant system-wide rollbacks of the root file system hierarchy if user updates damage any system file.
 
@@ -12,16 +13,19 @@ pub const MAX_SNAPSHOT_ENTRIES: usize = 4;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BackupError {
-    Success,
-    NotFound,
-    CreationFailed,
-    RestoreFailed,
+    Success = 0,
+    NotFound = 1,
+    CreationFailed = 2,
+    RestoreFailed = 3,
+    NoBackupFound = 4,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BackupSnapshot {
-    pub id: usize,
+    pub id: String,
     pub timestamp: u64,
+    pub label: String,
+    pub files_hash: BTreeMap<String, String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -89,30 +93,11 @@ impl HardwareTimeshift {
 
 pub static GLOBAL_TIMESHIFT: HardwareTimeshift = HardwareTimeshift::new();
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BackupError {
-    Success = 0,
-    SnapshotFailed = 1,
-    RestoreFailed = 2,
-    NoBackupFound = 3,
-}
-
-pub struct BackupSnapshot {
-    pub id: String,
-    pub timestamp: u64,
-    pub label: String,
-    pub files_hash: BTreeMap<String, String>,
-}
-
-pub type FsSnapshot = BackupSnapshot;
-
 pub struct SigmaTimeshift {
     pub snapshots: Vec<BackupSnapshot>,
     pub backup_schedule_enabled: bool,
     pub last_scheduled_run: u64,
 }
-
-pub static GLOBAL_TIMESHIFT: () = ();
 
 impl SigmaTimeshift {
     pub fn new() -> Self {

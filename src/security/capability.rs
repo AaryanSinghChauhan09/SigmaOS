@@ -1,18 +1,21 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS Capability-Based Security System
 // Implements 64-bit hardware-enforced capability model
 
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering};
 
+/// Permission types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    Ipc,
+    NetworkTcp = 0,
+    NetworkUdp = 1,
+    FileRead = 2,
+    FileWrite = 3,
+    ProcessExec = 4,
+    Ipc = 5,
 }
 
 /// A cryptographic capability token required for any privileged action.
@@ -36,6 +39,16 @@ impl CapabilityToken {
         }
     }
 
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            id: 0,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
+            is_revoked: false,
+            bits,
+        }
+    }
+
     pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
         CapabilityToken {
             id,
@@ -46,7 +59,6 @@ impl CapabilityToken {
         }
     }
 
-    /// Verifies if the token permits access to a given path.
     pub fn can_access_path(&self, path: &str) -> bool {
         if self.is_revoked {
             return false;
@@ -54,7 +66,6 @@ impl CapabilityToken {
         self.allowed_paths.iter().any(|p| path.starts_with(p))
     }
 
-    /// Verifies if the token permits binding to a network port.
     pub fn can_bind_port(&self, port: u16) -> bool {
         if self.is_revoked {
             return false;
@@ -66,12 +77,24 @@ impl CapabilityToken {
         self.is_revoked = true;
     }
 
+    pub fn revoke_all(&mut self) {
+        self.is_revoked = true;
+        self.bits = 0;
+    }
+
     pub fn bits(&self) -> u64 {
         self.bits
     }
 
+    pub fn has_permission(&self, permission: Permission) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        (self.bits & (1 << permission as u64)) != 0
+    }
+
     pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
-        self.bits |= 1;
+        self.bits |= 1 << (Permission::NetworkTcp as u64);
         if port != 0 {
             self.allowed_ports.push(port);
         }
@@ -79,24 +102,24 @@ impl CapabilityToken {
     }
 
     pub fn allow_read(mut self, path: &str) -> Self {
-        self.bits |= 2;
+        self.bits |= 1 << (Permission::FileRead as u64);
         self.allowed_paths.push(String::from(path));
         self
     }
 
     pub fn allow_write(mut self, path: &str) -> Self {
-        self.bits |= 4;
+        self.bits |= 1 << (Permission::FileWrite as u64);
         self.allowed_paths.push(String::from(path));
         self
     }
 
     pub fn allow_exec(mut self) -> Self {
-        self.bits |= 8;
+        self.bits |= 1 << (Permission::ProcessExec as u64);
         self
     }
 
     pub fn allow_ipc(mut self) -> Self {
-        self.bits |= 16;
+        self.bits |= 1 << (Permission::Ipc as u64);
         self
     }
 }
@@ -107,31 +130,8 @@ impl Default for CapabilityToken {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct CapabilityGate {
-    pub token: CapabilityToken,
-}
-
-impl CapabilityGate {
-    pub fn new() -> Self {
-        Self {
-            token: CapabilityToken::new(),
-        }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.token = token;
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct SecurityEnforcer {
-    active_tokens: Vec<CapabilityToken>,
+    pub bits: u64,
 }
 
 impl SecurityEnforcer {
@@ -147,100 +147,89 @@ impl SecurityEnforcer {
         self.bits |= bit;
     }
 
-    /// Allow network access
     pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
         match protocol {
-            "tcp" => self.bits |= 1 << 0,
-            "udp" => self.bits |= 1 << 1,
+            "tcp" => self.bits |= 1 << (Permission::NetworkTcp as u64),
+            "udp" => self.bits |= 1 << (Permission::NetworkUdp as u64),
             _ => {}
         }
         self.bits |= (port as u64) << 16;
         self
     }
 
-    /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
         if path.starts_with("/var/www") {
-            self.bits |= 1 << 2;
+            self.bits |= 1 << (Permission::FileRead as u64);
         }
         self
     }
 
-    /// Allow file write access
     pub fn allow_write(mut self, path: &str) -> Self {
         if path.starts_with("/tmp") || path.starts_with("/home") {
-            self.bits |= 1 << 3;
+            self.bits |= 1 << (Permission::FileWrite as u64);
         }
         self
     }
 
-    /// Allow process execution
     pub fn allow_exec(mut self) -> Self {
-        self.bits |= 1 << 4;
+        self.bits |= 1 << (Permission::ProcessExec as u64);
         self
     }
 
-    /// Allow IPC communication
     pub fn allow_ipc(mut self) -> Self {
-        self.bits |= 1 << 5;
+        self.bits |= 1 << (Permission::Ipc as u64);
         self
     }
 
-    /// Check if capability has specific permission
     pub fn has_permission(&self, permission: Permission) -> bool {
         (self.bits & (1 << permission as u64)) != 0
     }
 
-    /// Revoke all permissions
     pub fn revoke_all(&mut self) {
         self.bits = 0;
     }
 
-    /// Get raw capability bits
     pub fn bits(&self) -> u64 {
         self.bits
     }
 }
 
-/// Permission types
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp = 0,
-    NetworkUdp = 1,
-    FileRead = 2,
-    FileWrite = 3,
-    ProcessExec = 4,
-    Ipc = 5,
+impl Default for SecurityEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Capability gate for syscall validation
 pub struct CapabilityGate {
-    /// Current capability token
+    pub token: CapabilityToken,
     current: AtomicU64,
 }
 
 impl CapabilityGate {
-    /// Create new capability gate
     pub fn new() -> Self {
         Self {
+            token: CapabilityToken::new(),
             current: AtomicU64::new(0),
         }
     }
 
-    /// Set current capability
-    pub fn set_capability(&self, token: CapabilityToken) {
+    pub fn set_capability(&mut self, token: CapabilityToken) {
         self.current.store(token.bits(), Ordering::SeqCst);
+        self.token = token;
     }
 
-    /// Validate syscall against current capability
     pub fn validate_syscall(&self, permission: Permission) -> bool {
         let current = self.current.load(Ordering::SeqCst);
         (current & (1 << permission as u64)) != 0
     }
 
-    /// Get current capability
     pub fn current_capability(&self) -> CapabilityToken {
         CapabilityToken {
+            id: 0,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
+            is_revoked: false,
             bits: self.current.load(Ordering::SeqCst),
         }
     }
@@ -283,7 +272,7 @@ mod tests {
 
     #[test]
     fn test_capability_gate_validation() {
-        let gate = CapabilityGate::new();
+        let mut gate = CapabilityGate::new();
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));

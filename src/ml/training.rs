@@ -1,21 +1,23 @@
+// SPDX-License-Identifier: MIT
+//! OOP-based ML Training for SigmaOS
+//! Based on Ideas-999-Structured: AI & Machine Learning Item 936
+//! Implements model training and optimization
+
 #![no_std]
-#![no_main]
 
-/// OOP-based ML Training for SigmaOS
-/// Based on Ideas-999-Structured: AI & Machine Learning Item 936
-/// Implements model training and optimization
+extern crate alloc;
 
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type TrainingID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizerType { SGD = 0, Adam = 1, RMSProp = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TrainingError { Success = 0, InvalidData = 1, ConvergenceFailed = 2 }
 
 pub trait TrainingSession {
@@ -47,7 +49,7 @@ impl SimpleTrainingSession {
 impl TrainingSession for SimpleTrainingSession {
     fn id(&self) -> TrainingID { self.id }
     fn epoch(&self) -> usize { self.epoch.load(Ordering::SeqCst) }
-    fn loss(&self) -> f32 { self.loss.load(Ordering::SeqCst) as f32 }
+    fn loss(&self) -> f32 { (self.loss.load(Ordering::SeqCst) as f32) / 10000.0 }
     fn is_complete(&self) -> bool { self.complete.load(Ordering::SeqCst) == 1 }
 }
 
@@ -74,7 +76,14 @@ impl SimpleOptimizer {
 }
 
 impl Optimizer for SimpleOptimizer {
-    fn optimizer_type(&self) -> OptimizerType { unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst) as u32) } }
+    fn optimizer_type(&self) -> OptimizerType {
+        match self.optimizer_type.load(Ordering::SeqCst) {
+            0 => OptimizerType::SGD,
+            1 => OptimizerType::Adam,
+            _ => OptimizerType::RMSProp,
+        }
+    }
+
     fn learning_rate(&self) -> f32 { (self.learning_rate.load(Ordering::SeqCst) as f32) / 10000.0 }
 
     fn set_learning_rate(&mut self, rate: f32) {
@@ -97,7 +106,7 @@ pub trait Trainer {
 
 #[repr(C)]
 pub struct SimpleTrainer {
-    pub sessions: Vec<Option<Box<dyn TrainingSession>>>,
+    pub sessions: Vec<Option<SimpleTrainingSession>>,
     pub optimizer: SimpleOptimizer,
     pub next_id: AtomicUsize,
 }
@@ -116,7 +125,7 @@ impl Trainer for SimpleTrainer {
     fn create_session(&mut self) -> Result<TrainingID, TrainingError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let session = SimpleTrainingSession::new(id);
-        self.sessions.push(Some(Box::new(session)));
+        self.sessions.push(Some(session));
         Ok(id)
     }
 
@@ -127,11 +136,13 @@ impl Trainer for SimpleTrainer {
                     let epoch = session.epoch.fetch_add(1, Ordering::SeqCst);
 
                     let mut loss: f32 = 0.0;
-                    for i in 0..inputs.len().min(targets.len()) {
-                        let diff = inputs[i] - targets[i];
-                        loss += diff * diff;
+                    if !inputs.is_empty() && !targets.is_empty() {
+                        for i in 0..inputs.len().min(targets.len()) {
+                            let diff = inputs[i] - targets[i];
+                            loss += diff * diff;
+                        }
+                        loss /= inputs.len() as f32;
                     }
-                    loss /= inputs.len() as f32;
 
                     session.loss.store((loss * 10000.0) as usize, Ordering::SeqCst);
 
@@ -149,7 +160,7 @@ impl Trainer for SimpleTrainer {
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession> {
         for session_option in &self.sessions {
             if let Some(ref session) = *session_option {
-                if session.id() == id { return Some(session.as_ref()); }
+                if session.id() == id { return Some(session); }
             }
         }
         None
@@ -208,30 +219,3 @@ impl DataLoader for SimpleDataLoader {
         self.index.store(0, Ordering::SeqCst);
     }
 }
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

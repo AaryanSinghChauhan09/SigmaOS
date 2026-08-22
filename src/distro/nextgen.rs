@@ -104,7 +104,8 @@ impl PqcSelfHealing {
 
     /// Verifies path and triggers self-healing if signature mismatch is detected
     pub fn verify_and_heal(&mut self, path: &str, actual_hash: &str) -> IntegrityState {
-        match self.active_signed_hashes.get(path) {
+        let key = path.to_string();
+        match self.active_signed_hashes.get(&key) {
             Some(expected_sig) => {
                 if expected_sig == actual_hash {
                     IntegrityState::VerifiedSecure
@@ -251,7 +252,7 @@ impl NetplanManager {
     /// Apply declarative settings to interfaces
     pub fn apply_all(&self) -> Result<usize, &'static str> {
         let mut count = 0;
-        for (interface, config) in &self.configurations {
+        for (interface, config) in self.configurations.iter() {
             println!(
                 "[Ubuntu Netplan]: Applying interface={} ip={:?} gateway={} dns={:?}",
                 interface, config.ip_addresses, config.gateway, config.dns_servers
@@ -310,8 +311,9 @@ impl LivepatchManager {
 
     /// Simulates redirecting a function call dynamically
     pub fn redirect_call(&self, target_symbol: &str) -> Option<usize> {
+        let key = target_symbol.to_string();
         self.active_patches
-            .get(target_symbol)
+            .get(&key)
             .map(|patch| patch.new_function_address)
     }
 }
