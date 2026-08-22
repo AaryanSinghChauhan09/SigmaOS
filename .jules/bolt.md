@@ -43,3 +43,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-21 - Caching Byte Lengths in User Authentication Structs
 **Learning:** In authentication and user management routines (`SimpleUser`), calling `User::username(&self)` repeatedly executed an $O(N)$ linear scan (`.position(|&b| b == 0)`) over 32 bytes on every username comparison and access. Caching `username_len: u8` during `SimpleUser::new()` instantiation reduces slice retrieval to an instantaneous $O(1)$ constant-time lookup `&self.username[..self.username_len as usize]`, eliminating linear scanning overhead in user authentication routines.
 **Action:** Store `username_len: u8` during struct creation when managing fixed-size username byte arrays to ensure $O(1)$ constant-time username slicing.
+
+## 2026-08-22 - Caching Stored Byte Lengths for SimpleShellCommand
+**Learning:** In command resolution and execution hot paths (`SimpleShellCommand`), calling `cmd.name()` or `cmd.help()` repeatedly executed an $O(N)$ linear byte scan (`.position(|&b| b == 0)`) over 32-byte name and 128-byte description arrays. Caching `name_len: u8` and `description_len: u8` during `SimpleShellCommand::new()` initialization turns slice retrieval into an instantaneous $O(1)$ constant-time lookup, eliminating linear scanning overhead during shell command lookup and dispatch.
+**Action:** Always store explicit byte lengths alongside fixed-size byte array fields in shell command structures to guarantee $O(1)$ constant-time slice lookups.

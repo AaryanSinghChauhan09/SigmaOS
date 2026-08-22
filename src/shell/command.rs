@@ -28,6 +28,10 @@ pub trait ShellCommand {
 pub struct SimpleShellCommand {
     pub name: [u8; 32],
     pub description: [u8; 128],
+    /// Cached length of the command name to avoid linear zero-byte scans.
+    pub name_len: u8,
+    /// Cached length of the command description to avoid linear zero-byte scans.
+    pub description_len: u8,
 }
 
 impl SimpleShellCommand {
@@ -43,6 +47,8 @@ impl SimpleShellCommand {
         SimpleShellCommand {
             name: name_array,
             description: desc_array,
+            name_len: name_len as u8,
+            description_len: desc_len as u8,
         }
     }
 }
@@ -100,7 +106,13 @@ impl<T> Drop for ShellVec<T> {
 
 impl ShellCommand for SimpleShellCommand {
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
+        // Bolt performance optimization: Use cached name_len for O(1) slice access
+        // instead of O(N) linear zero-byte scans over the 32-byte array.
+        let len = if self.name_len > 0 {
+            self.name_len as usize
+        } else {
+            self.name.iter().position(|&b| b == 0).unwrap_or(32)
+        };
         &self.name[..len]
     }
 
@@ -119,7 +131,13 @@ impl ShellCommand for SimpleShellCommand {
     }
 
     fn help(&self) -> &[u8] {
-        let len = self.description.iter().position(|&b| b == 0).unwrap_or(128);
+        // Bolt performance optimization: Use cached description_len for O(1) slice access
+        // instead of O(N) linear zero-byte scans over the 128-byte array.
+        let len = if self.description_len > 0 {
+            self.description_len as usize
+        } else {
+            self.description.iter().position(|&b| b == 0).unwrap_or(128)
+        };
         &self.description[..len]
     }
 }
