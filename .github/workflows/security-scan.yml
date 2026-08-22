@@ -129,7 +129,7 @@ jobs:
       uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
 
     - name: Set up Python
-      uses: actions/setup-python@3974166073a6f6614d9053289224962e58c4eaa4
+      uses: actions/setup-python@0a5c615c1f8b2e34badcd18ac31f349e4f463d29
       with:
         python-version: '3.x'
 
@@ -151,7 +151,7 @@ jobs:
         fetch-depth: 0
 
     - name: Run TruffleHog
-      uses: trufflesecurity/trufflehog@e397de5f2a4d2c1f194d562f34c4f58692df48a9
+      uses: trufflesecurity/trufflehog@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
       with:
         path: ./
         base: ${{ github.event.repository.default_branch }}
