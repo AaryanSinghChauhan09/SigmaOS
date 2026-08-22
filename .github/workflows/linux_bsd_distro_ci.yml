@@ -7,6 +7,9 @@ on:
     branches: [ "disabled-branch" ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   kernel-subsystem-audit:
     name: Kernel & Distro Subsystem Audit

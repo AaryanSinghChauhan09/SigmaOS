@@ -52,4 +52,4 @@ jobs:
         with:
           token: ${{ secrets.NS_TOKEN }}
           app_file: app-debug.apk                 # Update this to a path to your .ipa or .apk
-          group_id: {{ groupId }}                 # Update this to your desired Platform group ID
+          group_id: "MY_GROUP_ID"                 # Update this to your desired Platform group ID
