@@ -314,10 +314,6 @@ impl DomainOrchestrator {
         }
     }
 
-<<<<<<< HEAD
-    /// Spawns a compartmentalized secure domain with custom hardware capability tokens
-    pub fn spawn_domain(&mut self, name: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Result<DomainID, IsolationError> {
-=======
     /// Spawns a compartmentalized secure domain with custom hardware capability tokens (S-Compartment)
     pub fn spawn_domain(
         &mut self,
