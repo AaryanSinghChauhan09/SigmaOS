@@ -268,11 +268,6 @@ pub trait TaskQueue {
     fn size(&self) -> usize;
 }
 
-pub struct ContextWindowPruner {
-    pub history: Vec<[u8; 128]>,
-    pub max_lines: usize,
-}
-
 impl ContextWindowPruner {
     pub fn new(max_lines: usize) -> Self {
         ContextWindowPruner {

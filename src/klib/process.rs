@@ -65,7 +65,7 @@ impl SigmaProcess {
                 );
             }
             // Should not reach here
-            unsafe { core::hint::unreachable_unchecked(); }
+            core::hint::unreachable_unchecked();
         } else if pid < 0 {
             return Err(ProcessError::ForkFailed);
         }

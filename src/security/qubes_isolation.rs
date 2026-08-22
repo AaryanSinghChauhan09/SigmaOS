@@ -120,46 +120,6 @@ impl IsolatedDomain {
     }
 }
 
-pub struct DomainOrchestrator {
-    pub domains: Vec<IsolatedDomain>,
-    pub policy_engine: QrexecPolicyEngine,
-}
-
-impl DomainOrchestrator {
-    pub fn new() -> Self {
-        Self {
-            domains: Vec::new(),
-            policy_engine: QrexecPolicyEngine::new(),
-        }
-    }
-
-    pub fn create_domain(
-        &mut self,
-        id: DomainID,
-        name: &[u8],
-        domain_type: DomainType,
-        caps: CapabilityToken,
-    ) -> Result<DomainID, IsolationError> {
-        let domain = IsolatedDomain::new(id, name, domain_type, caps);
-        self.domains.push(domain);
-        Ok(id)
-    }
-
-    pub fn destroy_domain(&mut self, id: DomainID) -> Result<(), IsolationError> {
-        if let Some(pos) = self.domains.iter().position(|d| d.id == id) {
-            self.domains.remove(pos);
-            Ok(())
-        } else {
-            Err(IsolationError::DomainNotFound)
-        }
-    }
-}
-
-impl Default for DomainOrchestrator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Qrexec policy action
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

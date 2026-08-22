@@ -1,65 +1,91 @@
-#![no_std]
-#![no_main]
+//! Custom vector implementation for SigmaOS
+//! This module provides no_std alternatives to std::vec with reduced dependency on predefined functions
 
-use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::alloc::{Layout, alloc, dealloc};
+use core::mem::{ManuallyDrop, MaybeUninit};
+use core::ptr;
+use core::slice;
 
-pub struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
+/// Custom vector type for SigmaOS with reduced dependency on predefined functions
+pub struct SigmaVec<T> {
+    ptr: *mut T,
+    capacity: usize,
+    len: usize,
 }
 
-impl<T: PartialEq> Vec<T> {
-    pub fn contains(&self, item: &T) -> bool {
-        for i in 0..self.len {
-            if &self[i] == item {
-                return true;
+impl<T> SigmaVec<T> {
+    /// Create a new empty vector
+    pub fn new() -> Self {
+        Self {
+            ptr: ptr::null_mut(),
+            capacity: 0,
+            len: 0,
+        }
+    }
+    
+    /// Create a new vector with specified capacity
+    pub fn with_capacity(capacity: usize) -> Self {
+        if capacity == 0 {
+            return Self::new();
+        }
+        
+        let layout = Layout::array::<T>(capacity).unwrap();
+        let ptr = unsafe { alloc(layout) as *mut T };
+        
+        if ptr.is_null() {
+            panic!("Allocation failed");
+        }
+        
+        Self {
+            ptr,
+            capacity,
+            len: 0,
+        }
+    }
+    
+    /// Get the length of the vector
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    
+    /// Check if the vector is empty
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn sort_by<F>(&mut self, mut compare: F)
+    where
+        F: FnMut(&T, &T) -> core::cmp::Ordering,
+    {
+        if self.len <= 1 {
+            return;
+        }
+        for i in 1..self.len {
+            let mut j = i;
+            while j > 0 {
+                let elem_j = unsafe { &*self.data.add(j) };
+                let elem_prev = unsafe { &*self.data.add(j - 1) };
+                if compare(elem_prev, elem_j) == core::cmp::Ordering::Greater {
+                    unsafe {
+                        core::ptr::swap(self.data.add(j - 1), self.data.add(j));
+                    }
+                    j -= 1;
+                } else {
+                    break;
+                }
             }
         }
-        false
-    }
-}
-
-impl<T> Vec<T> {
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        self.as_slice().iter()
     }
 
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        self.as_mut_slice().iter_mut()
-    }
-    pub fn get(&self, index: usize) -> Option<&T> {
-        if index < self.len {
-            unsafe { Some(&*self.data.add(index)) }
-        } else {
-            None
+    pub fn clear(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+            }
         }
-    }
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-        if index < self.len {
-            unsafe { Some(&mut *self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-    pub fn first(&self) -> Option<&T> {
-        self.get(0)
-    }
-    pub fn last(&self) -> Option<&T> {
-        if self.len > 0 {
-            self.get(self.len - 1)
-        } else {
-            None
-        }
-    }
-    pub fn pop(&mut self) -> Option<T> {
-        if self.len == 0 {
-            None
-        } else {
-            self.len -= 1;
-            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
-        }
+        self.len = 0;
     }
 
     pub fn as_slice(&self) -> &[T] {
@@ -78,22 +104,13 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+    pub fn contains(&self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
+        for i in 0..self.len {
+            if unsafe { &*self.data.add(i) } == item {
+                return true;
             }
         }
     }
@@ -128,183 +145,233 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn retain<F>(&mut self, mut f: F)
-    where
-        F: FnMut(&T) -> bool,
-    {
-        let mut write_idx = 0;
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+    
+    /// Reserve additional capacity
+    pub fn reserve(&mut self, additional: usize) {
+        if self.capacity - self.len >= additional {
+            return;
+        }
+        
+        let new_capacity = self.capacity.max(1) * 2;
+        self.resize(new_capacity);
+    }
+    
+    /// Push an element to the vector
+    pub fn push(&mut self, item: T) {
+        if self.len == self.capacity {
+            self.reserve(1);
+        }
+        
+        unsafe {
+            ptr::write(self.ptr.add(self.len), item);
+        }
+        self.len += 1;
+    }
+    
+    /// Pop an element from the vector
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            return None;
+        }
+        
+        self.len -= 1;
+        unsafe {
+            Some(ptr::read(self.ptr.add(self.len)))
+        }
+    }
+    
+    /// Remove an element at a specific index
+    pub fn remove(&mut self, index: usize) -> T {
+        assert!(index < self.len);
+        
+        unsafe {
+            let item = ptr::read(self.ptr.add(index));
+            
+            // Shift remaining elements
+            for i in index..self.len - 1 {
+                ptr::copy(self.ptr.add(i + 1), self.ptr.add(i), 1);
+            }
+            
+            self.len -= 1;
+            item
+        }
+    }
+    
+    /// Insert an element at a specific index
+    pub fn insert(&mut self, index: usize, item: T) {
+        assert!(index <= self.len);
+        
+        if self.len == self.capacity {
+            self.reserve(1);
+        }
+        
+        unsafe {
+            // Shift elements to make space
+            for i in (index..self.len).rev() {
+                ptr::copy(self.ptr.add(i), self.ptr.add(i + 1), 1);
+            }
+            
+            ptr::write(self.ptr.add(index), item);
+            self.len += 1;
+        }
+    }
+    
+    /// Clear the vector
+    pub fn clear(&mut self) {
+        // Drop all elements
         for i in 0..self.len {
-            let item = &self[i];
-            if f(item) {
-                if write_idx != i {
-                    unsafe {
-                        core::ptr::copy_nonoverlapping(
-                            self.data.add(i),
-                            self.data.add(write_idx),
-                            1,
-                        );
-                    }
-                }
-                write_idx += 1;
-            } else {
-                unsafe {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
+            unsafe {
+                ptr::drop_in_place(self.ptr.add(i));
             }
         }
-        self.len = write_idx;
+        self.len = 0;
     }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
+    
+    /// Resize the vector
+    fn resize(&mut self, new_capacity: usize) {
+        if new_capacity == 0 {
+            self.deallocate();
+            self.ptr = ptr::null_mut();
+            self.capacity = 0;
+            return;
+        }
+        
+        let new_layout = Layout::array::<T>(new_capacity).unwrap();
+        let new_ptr = unsafe { alloc(new_layout) as *mut T };
+        
+        if new_ptr.is_null() {
+            panic!("Allocation failed");
+        }
+        
+        // Copy existing elements
+        unsafe {
             for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+                ptr::copy_nonoverlapping(self.ptr.add(i), new_ptr.add(i), 1);
             }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
         }
+        
+        // Deallocate old memory
+        self.deallocate();
+        
+        self.ptr = new_ptr;
+        self.capacity = new_capacity;
+    }
+    
+    /// Deallocate the vector's memory
+    fn deallocate(&mut self) {
+        if !self.ptr.is_null() && self.capacity > 0 {
+            unsafe {
+                let layout = Layout::array::<T>(self.capacity).unwrap();
+                dealloc(self.ptr as *mut u8, layout);
+            }
+        }
+    }
+    
+    /// Get a reference to an element
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe {
+                Some(&*self.ptr.add(index))
+            }
+        } else {
+            None
+        }
+    }
+    
+    /// Get a mutable reference to an element
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe {
+                Some(&mut *self.ptr.add(index))
+            }
+        } else {
+            None
+        }
+    }
+    
+    /// Get a slice of the vector
+    pub fn as_slice(&self) -> &[T] {
+        unsafe {
+            slice::from_raw_parts(self.ptr, self.len)
+        }
+    }
+    
+    /// Get a mutable slice of the vector
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        unsafe {
+            slice::from_raw_parts_mut(self.ptr, self.len)
+        }
+    }
+    
+    /// Extend the vector with an iterator
+    pub fn extend<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = T>,
+    {
+        for item in iter {
+            self.push(item);
+        }
+    }
+    
+    /// Truncate the vector to a new length
+    pub fn truncate(&mut self, new_len: usize) {
+        assert!(new_len <= self.len);
+        
+        // Drop elements beyond new_len
+        for i in new_len..self.len {
+            unsafe {
+                ptr::drop_in_place(self.ptr.add(i));
+            }
+        }
+        
+        self.len = new_len;
     }
 }
 
-impl<T: Clone> Clone for Vec<T> {
+impl<T: PartialEq> PartialEq for SigmaVec<T> {
+    fn eq(&self, other: &Self) -> bool {
+        if self.len != other.len {
+            return false;
+        }
+        for i in 0..self.len {
+            if self[i] != other[i] {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+impl<T: Eq + PartialEq> Eq for SigmaVec<T> {}
+
+impl<T: Clone> Clone for SigmaVec<T> {
     fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for item in self.iter() {
-            new_vec.push(item.clone());
+        let mut new_vec = SigmaVec::with_capacity(self.capacity);
+        for i in 0..self.len {
+            unsafe {
+                let item = (&*self.ptr.add(i)).clone();
+                new_vec.push(item);
+            }
         }
         new_vec
     }
 }
 
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+impl<T: core::fmt::Debug> core::fmt::Debug for SigmaVec<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        self.as_slice().fmt(f)
+        f.debug_list().entries(self.iter()).finish()
     }
 }
 
-impl<T: PartialEq> PartialEq for Vec<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.as_slice() == other.as_slice()
-    }
-}
-
-impl<T: Eq> Eq for Vec<T> {}
-
-impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
-    fn eq(&self, other: &[U]) -> bool {
-        self.as_slice() == other
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-impl<T: PartialEq<U>, U> PartialEq<std::vec::Vec<U>> for Vec<T> {
-    fn eq(&self, other: &std::vec::Vec<U>) -> bool {
-        self.as_slice() == other.as_slice()
-    }
-}
-
-impl<T> core::iter::FromIterator<T> for Vec<T> {
+impl<T> FromIterator<T> for SigmaVec<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut vec = Vec::new();
+        let mut vec = SigmaVec::new();
         for item in iter {
             vec.push(item);
         }
         vec
     }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        self.as_slice()
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_mut_slice()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
