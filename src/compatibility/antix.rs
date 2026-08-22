@@ -175,9 +175,89 @@ impl Default for AntiXControlCentre {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicroServiceState {
+    Stopped = 0,
+    Running = 1,
+}
+
+#[derive(Debug, Clone)]
+pub struct MicroService {
+    pub name: &'static str,
+    pub state: MicroServiceState,
+}
+
+pub struct AntixInitManager {
+    pub active: AtomicBool,
+}
+
+impl AntixInitManager {
+    pub const fn new() -> Self {
+        Self { active: AtomicBool::new(true) }
+    }
+}
+
+impl Default for AntixInitManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopProfile {
+    RoxIceWM = 0,
+    RoxFluxbox = 1,
+    Herbstluftwm = 2,
+    HeadlessCLI = 3,
+}
+
+pub struct AntixDesktopProfiler {
+    pub current_profile: AtomicU8,
+}
+
+impl AntixDesktopProfiler {
+    pub const fn new() -> Self {
+        Self { current_profile: AtomicU8::new(DesktopProfile::RoxIceWM as u8) }
+    }
+}
+
+impl Default for AntixDesktopProfiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct AntixControlCenter {
+    pub low_ram_mode: AtomicBool,
+}
+
+impl AntixControlCenter {
+    pub const fn new() -> Self {
+        Self { low_ram_mode: AtomicBool::new(true) }
+    }
+}
+
+impl Default for AntixControlCenter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct LegacyMemoryTrimmer {
+    pub trimmed_mb: AtomicUsize,
+}
+
+impl LegacyMemoryTrimmer {
+    pub const fn new() -> Self {
+        Self { trimmed_mb: AtomicUsize::new(0) }
+    }
+}
+
+impl Default for LegacyMemoryTrimmer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();
 pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();

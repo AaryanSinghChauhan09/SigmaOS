@@ -2,11 +2,8 @@
 /// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
 extern crate alloc;
-
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use alloc::boxed::Box;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type SocketID = usize;

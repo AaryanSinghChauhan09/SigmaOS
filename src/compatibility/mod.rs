@@ -27,8 +27,10 @@ pub mod linux_security;
 pub mod standards;
 pub mod overtake;
 pub mod arch_linux;
-pub mod antix;
 pub mod chakra;
+pub mod interim;
+pub mod lubuntu;
+pub mod cross_platform_kernel;
 
 pub use constellation_mesh::{
     BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,

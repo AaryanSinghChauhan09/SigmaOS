@@ -1,31 +1,32 @@
+extern crate alloc;
+
 pub mod vec;
 pub mod paging;
 pub mod buddy_allocator;
 pub mod hashmap;
+pub mod hashset;
+pub mod vecdeque;
 pub mod hash;
 pub mod adt;
 pub mod io;
 pub mod custom_string;
 pub mod custom_allocator;
-
-// New modules for std elimination
+pub mod collections;
 pub mod env;
 pub mod fs;
 pub mod process;
 pub mod console;
+pub mod net;
+pub mod time;
+pub mod conversion;
+pub mod string;
 
-// For now, we use our custom Vec and HashMap (aliased to our bucket-based BTreeMap)
-pub use vec::Vec;
+pub use alloc::string::{String, ToString};
+pub use alloc::vec::Vec;
+pub use vec::SigmaVec;
 pub use hashmap::{HashMap, BTreeMap, Entry};
 pub use hashset::HashSet;
 pub use vecdeque::VecDeque;
 pub use custom_string::SigmaString;
 pub use io::{KlibRead, KlibWrite};
 pub use custom_allocator::SIGMA_ALLOCATOR;
-
-// For other collections, use std when available
-#[cfg(not(target_os = "none"))]
-pub use std::collections::BTreeMap as StdBTreeMap;
-
-#[cfg(not(target_os = "none"))]
-pub use std::string::String;

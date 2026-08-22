@@ -331,7 +331,7 @@ impl<T> SigmaVec<T> {
     }
 }
 
-impl<T: PartialEq> PartialEq for Vec<T> {
+impl<T: PartialEq> PartialEq for SigmaVec<T> {
     fn eq(&self, other: &Self) -> bool {
         if self.len != other.len {
             return false;
@@ -345,9 +345,9 @@ impl<T: PartialEq> PartialEq for Vec<T> {
     }
 }
 
-impl<T: Eq + PartialEq> Eq for Vec<T> {}
+impl<T: Eq + PartialEq> Eq for SigmaVec<T> {}
 
-impl<T: Clone> Clone for Vec<T> {
+impl<T: Clone> Clone for SigmaVec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = SigmaVec::with_capacity(self.capacity);
         for i in 0..self.len {
@@ -360,15 +360,15 @@ impl<T: Clone> Clone for Vec<T> {
     }
 }
 
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+impl<T: core::fmt::Debug> core::fmt::Debug for SigmaVec<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_list().entries(self.iter()).finish()
     }
 }
 
-impl<T> FromIterator<T> for Vec<T> {
+impl<T> FromIterator<T> for SigmaVec<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut vec = Vec::new();
+        let mut vec = SigmaVec::new();
         for item in iter {
             vec.push(item);
         }
