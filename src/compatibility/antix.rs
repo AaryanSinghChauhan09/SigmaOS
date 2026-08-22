@@ -175,8 +175,6 @@ impl Default for AntiXControlCentre {
     }
 }
 
-
-
 // Note: Global static instances commented out due to undefined types
 // These should be implemented with proper type definitions
 // pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();

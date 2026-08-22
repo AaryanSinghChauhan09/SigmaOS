@@ -33,6 +33,7 @@ permissions:
 jobs:
   appknox:
     runs-on: ubuntu-latest
+    if: ${{ secrets.APPKNOX_ACCESS_TOKEN != '' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

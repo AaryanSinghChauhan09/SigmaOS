@@ -3,9 +3,7 @@
 
 extern crate alloc;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
 use core::time::Duration;
 
 /// Process priority levels
@@ -103,43 +101,56 @@ impl Scheduler {
     }
 
     pub fn schedule_on_core(&self, target_core: usize) -> Option<&Process> {
-        // Find process with earliest eligible virtual deadline matching core affinity
+        // Single-pass scan to locate the process with the earliest eligible virtual deadline,
+        // eliminating multi-pass vector iterations when evaluating realtime vs standard processes.
         let now = self.current_time;
+        let mut best_rt: Option<&Process> = None;
+        let mut best_eligible: Option<&Process> = None;
 
-        if self.is_realtime_profile {
-            // Prioritize Realtime priority tasks immediately under realtime profile
-            let rt_proc = self
-                .processes
-                .iter()
-                .filter(|p| {
-                    p.state == ProcessState::Ready
-                        && p.priority == Priority::Realtime
-                        && p.core_affinity.map_or(true, |c| c == target_core)
-                })
-                .min_by_key(|p| p.virtual_deadline);
-            if rt_proc.is_some() {
-                return rt_proc;
+        for proc in &self.processes {
+            if proc.state != ProcessState::Ready {
+                continue;
+            }
+            if !proc.core_affinity.map_or(true, |c| c == target_core) {
+                continue;
+            }
+
+            if self.is_realtime_profile && proc.priority == Priority::Realtime {
+                if best_rt.map_or(true, |best| proc.virtual_deadline < best.virtual_deadline) {
+                    best_rt = Some(proc);
+                }
+            }
+
+            if proc.virtual_deadline <= now {
+                if best_eligible.map_or(true, |best| proc.virtual_deadline < best.virtual_deadline) {
+                    best_eligible = Some(proc);
+                }
             }
         }
 
-        self.processes
-            .iter()
-            .filter(|p| {
-                p.state == ProcessState::Ready
-                    && p.virtual_deadline <= now
-                    && p.core_affinity.map_or(true, |c| c == target_core)
-            })
-            .min_by_key(|p| p.virtual_deadline)
+        if self.is_realtime_profile && best_rt.is_some() {
+            best_rt
+        } else {
+            best_eligible
+        }
     }
 
     /// Check if a higher-priority task can preempt the currently running process
     pub fn check_preemption(&self, running_pid: u64) -> bool {
-        let running_proc = self.processes.iter().find(|p| p.pid == running_pid);
-        let highest_ready = self
-            .processes
-            .iter()
-            .filter(|p| p.state == ProcessState::Ready)
-            .max_by_key(|p| p.priority);
+        // Single-pass scan to locate the running process and highest priority ready process simultaneously
+        let mut running_proc: Option<&Process> = None;
+        let mut highest_ready: Option<&Process> = None;
+
+        for proc in &self.processes {
+            if proc.pid == running_pid {
+                running_proc = Some(proc);
+            }
+            if proc.state == ProcessState::Ready {
+                if highest_ready.map_or(true, |best| proc.priority > best.priority) {
+                    highest_ready = Some(proc);
+                }
+            }
+        }
 
         match (running_proc, highest_ready) {
             (Some(run), Some(ready)) => ready.priority > run.priority,
