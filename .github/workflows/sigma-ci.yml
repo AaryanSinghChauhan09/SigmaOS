@@ -20,11 +20,11 @@ jobs:
           - arch: x86_64
             os: ubuntu-latest
             qemu_arch: x86_64
-            toolchain: x86_64-unknown-none-elf
+            toolchain: x86_64-unknown-none
           - arch: aarch64
             os: ubuntu-latest
             qemu_arch: aarch64
-            toolchain: aarch64-unknown-none-elf
+            toolchain: aarch64-unknown-none
           - arch: riscv64
             os: ubuntu-latest
             qemu_arch: riscv64
@@ -177,7 +177,7 @@ jobs:
       with:
         profile: minimal
         toolchain: stable
-        target: x86_64-unknown-none-elf
+        target: x86_64-unknown-none
         override: true
 
     - name: Build first image
@@ -221,7 +221,7 @@ jobs:
           "branch": "${{ github.ref_name }}",
           "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
           "builder": "GitHub Actions",
-          "toolchain": "x86_64-unknown-none-elf",
+          "toolchain": "x86_64-unknown-none",
           "reproducible": true
         }
         EOF
@@ -308,7 +308,7 @@ jobs:
 
     - name: Run static analysis
       run: |
-        cargo install clippy
+        rustup component add clippy
         cargo clippy --all-targets --all-features -- -D warnings
 
     - name: Check for secrets

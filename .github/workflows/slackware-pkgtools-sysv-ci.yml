@@ -1,5 +1,8 @@
 name: Slackware Linux Pkgtools & SysV Init CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master, "feat/**" ]

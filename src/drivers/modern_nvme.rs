@@ -164,17 +164,6 @@ pub struct AhciPrdtEntry {
     pub dbc: u32, // Data Byte Count & Interrupt-on-Completion
 }
 
-/// AHCI SATA Command Header
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct AhciCommandHeader {
-    pub opts: u16, // Description flags, PRDT length
-    pub prdtl: u16, // PRDT Length
-    pub prdbc: u32, // PRD Byte Count
-    pub ctba: u64, // Command Table Base Address
-    pub reserved: [u32; 4],
-}
-
 /// AHCI Serial ATA Storage Controller Driver
 pub struct AhciStorageDriver {
     pub is_initialized: bool,

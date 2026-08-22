@@ -30,6 +30,8 @@ pub mod process;
 pub mod community;
 pub mod memory;
 pub mod tools;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
 pub mod virtualization;
 pub mod graphics {
     pub mod compositor;

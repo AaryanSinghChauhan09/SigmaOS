@@ -4,6 +4,7 @@
 
 use klib::collections::{BTreeMap, HashMap, VecDeque};
 use klib::path::PathBuf;
+use std::path::Path;
 use crate::klib::Uuid;
 
 // =========================================================================
