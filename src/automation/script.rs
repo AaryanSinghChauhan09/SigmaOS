@@ -3,12 +3,10 @@
 
 extern crate alloc;
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ScriptID = usize;
@@ -42,7 +40,7 @@ pub trait Script {
 pub struct SimpleScript {
     pub id: ScriptID,
     pub name: [u8; 128],
-    pub language: core::sync::atomic::AtomicU32,
+    pub language: AtomicUsize,
     pub source: Vec<u8>,
 }
 
@@ -60,7 +58,7 @@ impl SimpleScript {
         SimpleScript {
             id,
             name: name_array,
-            language: core::sync::atomic::AtomicU32::new(language as u32),
+            language: AtomicUsize::new(language as usize),
             source: source_vec,
         }
     }
@@ -310,10 +308,6 @@ impl Default for SimpleScriptEnvironment {
     }
 }
 
-// ==========================================
-// ADDITIONAL DIAGNOSTICS & SYSTEM UTILITIES
-// ==========================================
-
 pub struct UpxUnpacker {
     pub magic_header: [u8; 4],
 }
@@ -394,13 +388,59 @@ impl StringDescrambler {
     }
 }
 
+pub struct ScriptArgumentRouter {
+    pub shebang_interpreter: String,
+}
+
+impl ScriptArgumentRouter {
+    pub fn new(shebang_line: &str) -> Self {
+        let interp = if shebang_line.starts_with("#!") {
+            shebang_line.trim_start_matches("#!").trim()
+        } else {
+            "/bin/sh"
+        };
+        Self {
+            shebang_interpreter: interp.to_string(),
+        }
+    }
+
+    pub fn substitute_arguments(&self, script: &str, args: &[&str]) -> String {
+        let mut result = script.to_string();
+        for (i, arg) in args.iter().enumerate() {
+            let var_name = format!("${}", i);
+            result = result.replace(&var_name, arg);
+        }
+
+        let mut all_args = String::new();
+        for (i, arg) in args.iter().skip(1).enumerate() {
+            if i > 0 {
+                all_args.push(' ');
+            }
+            all_args.push_str(arg);
+        }
+        result = result.replace("$@", &all_args);
+        result
+    }
+}
+
+impl Default for ScriptArgumentRouter {
+    fn default() -> Self {
+        Self::new("#!/bin/sh")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_script_positional_arguments_expansion() {
-        let script = SimpleScript::new(1, b"greet.sh", ScriptLanguage::Shell, b"echo hello $1, welcome back $2!");
+        let script = SimpleScript::new(
+            1,
+            b"greet.sh",
+            ScriptLanguage::Shell,
+            b"echo hello $1, welcome back $2!",
+        );
 
         let script_id = 1;
         let mut scripts = Vec::new();
@@ -483,55 +523,5 @@ mod tests {
         let res = router.substitute_arguments("Echo $1 then $2 all $@", &args);
         assert!(res.contains("arg1"));
         assert!(res.contains("arg2"));
-    }
-
-    #[test]
-    fn test_script_argument_router() {
-        let router = ScriptArgumentRouter::new("#!/bin/sh -x");
-        assert_eq!(router.shebang_interpreter, "/bin/sh -x");
-
-        let args = ["app", "arg1", "arg2"];
-        let res = router.substitute_arguments("Echo $1 then $2 all $@", &args);
-        assert!(res.contains("arg1"));
-        assert!(res.contains("arg2"));
-    }
-}
-
-pub struct ScriptArgumentRouter {
-    pub shebang_interpreter: String,
-}
-
-impl ScriptArgumentRouter {
-    pub fn new(shebang_line: &str) -> Self {
-        let interp = if shebang_line.starts_with("#!") {
-            shebang_line.trim_start_matches("#!").trim()
-        } else {
-            "/bin/sh"
-        };
-        Self {
-            shebang_interpreter: interp.to_string(),
-        }
-    }
-
-    pub fn substitute_arguments(&self, script: &str, args: &[&str]) -> String {
-        let mut result = script.to_string();
-        for (i, arg) in args.iter().enumerate() {
-            let var_name = format!("${}", i);
-            result = result.replace(&var_name, arg);
-        }
-
-        let mut all_args = String::new();
-        for (i, arg) in args.iter().skip(1).enumerate() {
-            if i > 0 { all_args.push(' '); }
-            all_args.push_str(arg);
-        }
-        result = result.replace("$@", &all_args);
-        result
-    }
-}
-
-impl Default for ScriptArgumentRouter {
-    fn default() -> Self {
-        Self::new("#!/bin/sh")
     }
 }

@@ -1,10 +1,11 @@
+// SPDX-License-Identifier: MIT
 //! Custom BTreeMap implementation for SigmaOS
 //! Reduces dependency on std::collections::BTreeMap
 //! Simple implementation using sorted Vec for now
 
 use super::Vec;
+use core::borrow::Borrow;
 
-#[derive(Debug)]
 pub struct BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -22,6 +23,16 @@ where
         BTreeMap {
             entries: self.entries.clone(),
         }
+    }
+}
+
+impl<K, V> core::fmt::Debug for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord + core::fmt::Debug,
+    V: Clone + core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_map().entries(self.iter()).finish()
     }
 }
 
@@ -55,10 +66,12 @@ where
 
     pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
     where
-        K: PartialEq<Q>,
+        K: Borrow<Q>,
+        Q: Ord + PartialEq,
     {
         for (k, v) in self.entries.iter() {
-            if k == key {
+            let k_ref: &Q = k.borrow();
+            if k_ref == key {
                 return Some(v);
             }
         }
@@ -67,10 +80,12 @@ where
 
     pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
     where
-        K: PartialEq<Q>,
+        K: Borrow<Q>,
+        Q: Ord + PartialEq,
     {
         for (k, v) in self.entries.iter_mut() {
-            if k == key {
+            let k_ref: &Q = (k as &K).borrow();
+            if k_ref == key {
                 return Some(v);
             }
         }
@@ -79,10 +94,12 @@ where
 
     pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
     where
-        K: PartialEq<Q>,
+        K: Borrow<Q>,
+        Q: Ord + PartialEq,
     {
         for i in 0..self.entries.len() {
-            if &self.entries[i].0 == key {
+            let k_ref: &Q = self.entries[i].0.borrow();
+            if k_ref == key {
                 return Some(self.entries.remove(i).1);
             }
         }
@@ -91,7 +108,8 @@ where
 
     pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
     where
-        K: PartialEq<Q>,
+        K: Borrow<Q>,
+        Q: Ord + PartialEq,
     {
         self.get(key).is_some()
     }
@@ -104,19 +122,19 @@ where
         self.entries.is_empty()
     }
 
+    pub fn values(&self) -> impl Iterator<Item = &V> {
+        self.entries.iter().map(|(_, v)| v)
+    }
+
+    pub fn values_mut(&mut self) -> impl Iterator<Item = &mut V> {
+        self.entries.iter_mut().map(|(_, v)| v)
+    }
+
     pub fn iter(&self) -> BTreeMapIter<'_, K, V> {
         BTreeMapIter {
             entries: &self.entries,
             idx: 0,
         }
-    }
-
-    pub fn values(&self) -> impl Iterator<Item = &V> {
-        self.entries.iter().map(|(_, v)| v)
-    }
-
-    pub fn keys(&self) -> impl Iterator<Item = &K> {
-        self.entries.iter().map(|(k, _)| k)
     }
 }
 
@@ -150,6 +168,19 @@ where
         } else {
             None
         }
+    }
+}
+
+impl<'a, K, V> IntoIterator for &'a BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = (&'a K, &'a V);
+    type IntoIter = BTreeMapIter<'a, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

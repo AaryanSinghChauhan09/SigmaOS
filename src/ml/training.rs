@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: MIT
+//! OOP-based ML Training for SigmaOS
+//! Based on Ideas-999-Structured: AI & Machine Learning Item 936
+//! Implements model training and optimization
+
 #![no_std]
 
-/// OOP-based ML Training for SigmaOS
-/// Based on Ideas-999-Structured: AI & Machine Learning Item 936
-/// Implements model training and optimization
-
 extern crate alloc;
-use alloc::boxed::Box;
+
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type TrainingID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizerType { SGD = 0, Adam = 1, RMSProp = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TrainingError { Success = 0, InvalidData = 1, ConvergenceFailed = 2 }
 
 pub trait TrainingSession {
@@ -49,7 +49,7 @@ impl SimpleTrainingSession {
 impl TrainingSession for SimpleTrainingSession {
     fn id(&self) -> TrainingID { self.id }
     fn epoch(&self) -> usize { self.epoch.load(Ordering::SeqCst) }
-    fn loss(&self) -> f32 { self.loss.load(Ordering::SeqCst) as f32 }
+    fn loss(&self) -> f32 { (self.loss.load(Ordering::SeqCst) as f32) / 10000.0 }
     fn is_complete(&self) -> bool { self.complete.load(Ordering::SeqCst) == 1 }
 }
 
@@ -76,7 +76,14 @@ impl SimpleOptimizer {
 }
 
 impl Optimizer for SimpleOptimizer {
-    fn optimizer_type(&self) -> OptimizerType { unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst) as u32) } }
+    fn optimizer_type(&self) -> OptimizerType {
+        match self.optimizer_type.load(Ordering::SeqCst) {
+            0 => OptimizerType::SGD,
+            1 => OptimizerType::Adam,
+            _ => OptimizerType::RMSProp,
+        }
+    }
+
     fn learning_rate(&self) -> f32 { (self.learning_rate.load(Ordering::SeqCst) as f32) / 10000.0 }
 
     fn set_learning_rate(&mut self, rate: f32) {
@@ -125,15 +132,15 @@ impl Trainer for SimpleTrainer {
     fn train_step(&mut self, session_id: TrainingID, inputs: &[f32], targets: &[f32]) -> Result<(), TrainingError> {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
-                if session.id == session_id {
+                if session.id() == session_id {
                     let epoch = session.epoch.fetch_add(1, Ordering::SeqCst);
 
                     let mut loss: f32 = 0.0;
-                    for i in 0..inputs.len().min(targets.len()) {
-                        let diff = inputs[i] - targets[i];
-                        loss += diff * diff;
-                    }
-                    if !inputs.is_empty() {
+                    if !inputs.is_empty() && !targets.is_empty() {
+                        for i in 0..inputs.len().min(targets.len()) {
+                            let diff = inputs[i] - targets[i];
+                            loss += diff * diff;
+                        }
                         loss /= inputs.len() as f32;
                     }
 
@@ -153,7 +160,7 @@ impl Trainer for SimpleTrainer {
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession> {
         for session_option in &self.sessions {
             if let Some(ref session) = *session_option {
-                if session.id == id { return Some(session as &dyn TrainingSession); }
+                if session.id() == id { return Some(session); }
             }
         }
         None
