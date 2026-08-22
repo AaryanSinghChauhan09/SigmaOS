@@ -1341,12 +1341,6 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
-extern "C" {
-    fn malloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 /// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
 #[derive(Debug, Clone)]
 pub struct DeviceExtension {
