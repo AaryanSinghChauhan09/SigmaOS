@@ -21,6 +21,9 @@ on:
           - staging
           - production
 
+permissions:
+  contents: read
+
 jobs:
   deploy-cloud:
     name: Deploy to Cloud Infrastructure

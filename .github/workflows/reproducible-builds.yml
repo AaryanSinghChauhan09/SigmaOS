@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   verify-reproducibility:
     name: Dual-Runner Bit-for-Bit Hash Verification

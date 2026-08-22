@@ -6,6 +6,9 @@ on:
       - 'v*.*.*'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   production-deploy:
     name: Production Release & Helm Package Deployment
