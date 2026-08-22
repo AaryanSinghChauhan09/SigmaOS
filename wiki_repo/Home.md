@@ -231,6 +231,6 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 ---
 
-## 📄 License
+## 🏛️ Design Specification & Architecture Layers (Zenith Release Microkernel)
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.

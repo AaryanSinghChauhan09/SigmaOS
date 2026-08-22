@@ -8,10 +8,10 @@ SigmaOS implements a clean-room hierarchical resource controller architecture in
 
 ## Key Modules
 
-- [`src/resource/cgroup.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/resource/cgroup.rs): Unified resource hierarchy and tree controller.
-- [`src/resource/quota.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/resource/quota.rs): Bandwidth, I/O, and disk usage enforcement.
-- [`src/resource/rlimit.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/resource/rlimit.rs): POSIX-compliant resource limits (`RLIMIT_NOFILE`, `RLIMIT_AS`, `RLIMIT_CPU`).
-- [`src/kernel/sched/sigma_mlfq.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/kernel/sched/sigma_mlfq.rs): MLFQ weight allocation per cgroup node.
+- [`src/resource/cgroup.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/resource/cgroup.rs): Unified resource hierarchy and tree controller.
+- [`src/resource/quota.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/resource/quota.rs): Bandwidth, I/O, and disk usage enforcement.
+- [`src/resource/rlimit.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/resource/rlimit.rs): POSIX-compliant resource limits (`RLIMIT_NOFILE`, `RLIMIT_AS`, `RLIMIT_CPU`).
+- [`src/kernel/sched/sigma_mlfq.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/kernel/sched/sigma_mlfq.rs): MLFQ weight allocation per cgroup node.
 
 ---
 

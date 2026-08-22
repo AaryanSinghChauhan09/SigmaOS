@@ -1,166 +1,109 @@
 # Contributing to SigmaOS
 
-Thank you for your interest in contributing to SigmaOS! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to SigmaOS! This document provides guidelines for contributing.
 
 ## Code of Conduct
 
-- Be respectful and inclusive
-- Focus on what is best for the community
-- Show empathy towards other community members
+All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md). Be respectful, inclusive, and constructive.
 
-## Getting Started
+## Ways to Contribute
 
-### Prerequisites
+### 1. Code Contributions
+- Bug fixes
+- New features
+- Performance improvements
+- Security hardening
+- Driver support
 
-- Rust (latest stable version)
-- Cargo (comes with Rust)
-- Git
-- QEMU (for testing)
-- Make
+### 2. Documentation
+- Wiki pages
+- API documentation
+- Tutorial writing
+- Translation/localization
 
-### Setting Up Development Environment
+### 3. Testing
+- Bug reports with reproduction steps
+- Hardware compatibility testing
+- Performance benchmarking
+- Security auditing
+
+### 4. Community
+- Answer questions in issues
+- Review pull requests
+- Write blog posts
+- Speak at conferences
+
+## Development Setup
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
-# Build the project
-cargo build
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+rustup component add rust-src clippy rustfmt
+rustup target add x86_64-unknown-none aarch64-unknown-none
+
+# Build
+cargo build --workspace
 
 # Run tests
-cargo test
+cargo test --workspace
 
-# Run the project
-cargo run
+# Lint
+cargo clippy -- -D warnings
+cargo fmt --check
 ```
-
-## Development Workflow
-
-### Branching Strategy
-
-- `main` - The main development branch
-- All changes should be made through pull requests
-- Feature branches should be named `feature/description`
-- Bugfix branches should be named `fix/description`
-
-### Commit Guidelines
-
-- Use clear, descriptive commit messages
-- Follow conventional commit format: `type(scope): description`
-- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-
-### Code Style
-
-- Follow Rust standard formatting: `cargo fmt`
-- Use clippy for linting: `cargo clippy`
-- Write tests for new functionality
-- Document public APIs with rustdoc
-
-## Testing
-
-### Running Tests
-
-```bash
-# Run all tests
-cargo test
-
-# Run specific test
-cargo test test_name
-
-# Run tests with output
-cargo test -- --nocapture
-```
-
-### Test Coverage
-
-- Aim for high test coverage
-- Write unit tests for individual functions
-- Write integration tests for component interactions
-- Use property-based testing where appropriate
-
-## Documentation
-
-### Code Documentation
-
-- Document all public functions and structs
-- Use `///` for item documentation
-- Use `//!` for module documentation
-- Include examples where helpful
-
-### Wiki Documentation
-
-- Update the wiki for major features
-- Add tutorials and guides
-- Keep architecture diagrams up to date
-- Document API changes
 
 ## Pull Request Process
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Update documentation
-6. Submit a pull request
-7. Address review feedback
-8. Get approval and merge
+1. **Fork** the repository
+2. **Branch** from `main` using naming convention:
+   - `feat/<description>` for features
+   - `fix/<description>` for bug fixes
+   - `perf/<description>` for performance
+   - `docs/<description>` for documentation
+   - `sec/<description>` for security
+3. **Commit** with conventional commit format:
+   - `feat(scope): description`
+   - `fix(scope): description`
+   - `perf(scope): description`
+   - `docs(scope): description`
+4. **Test** your changes thoroughly
+5. **Submit** PR with description of changes
+6. **Respond** to review feedback
 
-## Project Structure
+## Commit Message Format
 
 ```
-SigmaOS/
-├── src/              # Source code
-├── tests/            # Integration tests
-├── docs/             # Documentation
-├── scripts/          # Utility scripts
-├── .github/          # GitHub configuration
-├── Cargo.toml        # Rust dependencies
-└── README.md         # Project overview
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
 ```
 
-## Module Guidelines
+Types: `feat`, `fix`, `perf`, `docs`, `style`, `refactor`, `test`, `chore`, `sec`
+Scopes: `kernel`, `ai`, `security`, `desktop`, `networking`, `fs`, `pkg`, `docs`
 
-### Security Module
+## Review Process
 
-- Capability-based security model
-- No unsafe code without justification
-- Audit all security-sensitive operations
+- All PRs require at least 1 review from a maintainer
+- Security-related PRs require 2 reviews
+- Architectural changes require TSC approval
+- CI must pass before merge
 
-### Kernel Module
+## Security Reporting
 
-- No_std compatible where possible
-- Minimal dependencies
-- Clear error handling
+Do NOT open public issues for security vulnerabilities.
+Use GitHub Security Advisories instead.
+See [SECURITY.md](SECURITY.md) for details.
 
-### Package Manager
+## Recognition
 
-- Zero-dependency where possible
-- Cryptographic verification
-- Atomic transactions
-
-## Issue Reporting
-
-- Use GitHub Issues for bug reports
-- Provide reproduction steps
-- Include environment details
-- Tag relevant maintainers
-
-## Feature Requests
-
-- Use GitHub Issues for feature requests
-- Describe the use case
-- Propose a solution
-- Consider implementation complexity
-
-## License
-
-By contributing to SigmaOS, you agree that your contributions will be licensed under the same license as the project.
-
-## Questions?
-
-- Open an issue for questions
-- Contact maintainers via GitHub
-- Check existing documentation
-
-Thank you for contributing to SigmaOS!
+All contributors are recognized in:
+- `CONTRIBUTORS.md` file
+- Release notes
+- Annual contributor report
+- SigmaOS project website

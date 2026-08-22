@@ -221,33 +221,6 @@ pub struct SeccompProfile {
     pub blocked_syscalls_mask: u32,
 }
 
-<<<<<<< HEAD
-impl ContainerNamespace {
-    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_uid == 0 {
-                Ok(self.uid_mapping)
-            } else {
-                Ok(self.uid_mapping + container_uid)
-            }
-        } else {
-            Ok(container_uid)
-        }
-    }
-
-    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_gid == 0 {
-                Ok(self.gid_mapping)
-            } else {
-                Ok(self.gid_mapping + container_gid)
-            }
-        } else {
-            Ok(container_gid)
-        }
-    }
-}
-
 /// Namespace configuration flags for a container
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NamespaceConfig {
@@ -277,16 +250,6 @@ impl NamespaceConfig {
         self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
     }
 }
-
-/// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
-
-=======
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {
@@ -791,12 +754,7 @@ impl<T> Vec<T> {
         }
     }
 
-<<<<<<< HEAD
     pub fn len(&self) -> usize {
-=======
-    #[allow(dead_code)]
-    fn len(&self) -> usize {
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
         self.len
     }
 
@@ -941,11 +899,7 @@ extern "C" {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-<<<<<<< HEAD
     use super::super::*;
-=======
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
     use alloc::string::ToString;
     use alloc::vec;
 

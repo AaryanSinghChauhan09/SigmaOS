@@ -1,170 +1,86 @@
-# Security Policy
+# SigmaOS Security Policy
 
-## Security Features
+## Supported Versions
 
-SigmaOS implements a comprehensive security architecture designed to protect against modern threats while maintaining performance and usability.
+| Version | Security Support |
+|---------|----------------|
+| 0.9.x (RC) | ✅ Active |
+| 0.5.x (Beta) | ⚠️ Critical only |
+| < 0.5 | ❌ Unsupported |
 
-### Core Security Components
+## Reporting a Vulnerability
 
-#### 1. Capability-Based Security System
-- **Fine-grained Permissions**: Each process has specific capabilities (NetworkTcp, NetworkUdp, FileRead, FileWrite, ProcessExec, Ipc)
-- **Capability Gates**: Kernel-level validation of system calls against current capabilities
-- **Process Isolation**: Strong separation between processes with controlled communication channels
-- **Secure IPC**: Inter-process communication with capability verification
+**DO NOT** open a public GitHub issue for security vulnerabilities.
 
-#### 2. Post-Quantum Cryptography
-- **PQC Signature Verification**: Dilithium signature algorithm for secure authentication
-- **Hardware Attestation**: Verification of trusted execution environments
-- **Secure Key Management**: Protection of cryptographic keys with hardware backing
-- **Quantum-Resistant Algorithms**: Future-proof cryptographic implementations
+Instead, use one of these private channels:
+1. **GitHub Security Advisories** (preferred): https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories
+2. **Email**: security@sigmaos.dev (GPG key available)
 
-#### 3. Audit and Compliance
-- **Comprehensive Logging**: All security-relevant events are logged with timestamps
-- **Real-time Monitoring**: Security events can be monitored in real-time
-- **Compliance Dashboard**: Visual interface for regulatory compliance tracking
-- **Audit Trail**: Complete history of security-relevant actions
+Include in your report:
+- Vulnerability type (e.g., buffer overflow, privilege escalation)
+- Component affected
+- Steps to reproduce
+- Potential impact
+- Suggested fix (optional)
 
-#### 4. Vulnerability Management
-- **Automatic Scanning**: Built-in vulnerability scanner for packages and system components
-- **Security Advisory Integration**: Integration with security advisory feeds
-- **Patch Management**: Automated security patch application
-- **Risk Assessment**: Automated risk scoring for vulnerabilities
+## Response Timeline
 
-### Security Architecture
+| Severity | Acknowledgment | Fix Target | Public Disclosure |
+|----------|---------------|------------|------------------|
+| Critical | < 24 hours | 7 days | 30 days |
+| High | < 48 hours | 14 days | 45 days |
+| Medium | < 72 hours | 30 days | 60 days |
+| Low | < 1 week | 90 days | 90 days |
 
-#### Kernel Security
-- **Memory Protection**: Separate address spaces with controlled sharing
-- **System Call Filtering**: Capability-based system call validation
-- **Driver Isolation**: Drivers run in restricted contexts
-- **Hardware Protection**: Use of hardware security features (NX, SMEP, etc.)
+## Security Architecture
 
-#### User Space Security
-- **Sandboxing**: Applications can be run in restricted sandboxes
-- **Filesystem Protection**: Permission-based access control
-- **Network Security**: Firewall rules and traffic monitoring
-- **Process Management**: Controlled process creation and termination
+### Defense-in-Depth Layers
 
-## Security Best Practices
+```
+Layer 7: Application Sandbox (Flatpak/seccomp)
+Layer 6: AppArmor Profiles
+Layer 5: SELinux Mandatory Access Control
+Layer 4: Kernel Hardening (KASLR/CFI/Stack Canaries)
+Layer 3: Secure Boot Chain (UEFI/TPM 2.0/MOK)
+Layer 2: Sentinel Real-time Detection
+Layer 1: eBPF Firewall (XDP/TC)
+```
 
-### For Users
-1. **Keep System Updated**: Regularly apply security updates
-2. **Use Strong Authentication**: Enable multi-factor authentication when available
-3. **Review Permissions**: Be cautious about granting capabilities to applications
-4. **Monitor Logs**: Regularly review security logs for suspicious activity
-5. **Use Encryption**: Encrypt sensitive data at rest and in transit
+### CVE Response Process
 
-### For Developers
-1. **Follow Security Guidelines**: Adhere to security coding standards
-2. **Use Safe Languages**: Prefer Rust and other memory-safe languages
-3. **Validate Input**: Always validate and sanitize user input
-4. **Principle of Least Privilege**: Request only necessary capabilities
-5. **Secure Defaults**: Default to secure configurations
+1. Vulnerability reported privately
+2. Security team triages and assesses severity
+3. Fix developed in private branch
+4. Fix reviewed by 2+ security team members
+5. Fix backported to supported versions
+6. Coordinated disclosure with reporter
+7. Public advisory published
+8. CVE ID requested/assigned
 
-### For System Administrators
-1. **Hardening**: Apply security hardening guidelines
-2. **Network Segmentation**: Implement proper network segmentation
-3. **Backup and Recovery**: Maintain secure backup and recovery procedures
-4. **Incident Response**: Have a documented incident response plan
-5. **Regular Audits**: Conduct regular security audits
+## Security Hall of Fame
 
-## Vulnerability Reporting
+We recognize responsible security researchers who help keep SigmaOS secure. See [SECURITY-HALL-OF-FAME.md](SECURITY-HALL-OF-FAME.md).
 
-### Reporting a Vulnerability
+## Kernel Hardening Config
 
-If you discover a security vulnerability in SigmaOS, please report it responsibly:
+SigmaOS kernel is built with these security-critical options:
 
-1. **Do Not Publicly Disclose**: Keep the vulnerability confidential until fixed
-2. **Provide Details**: Include steps to reproduce, expected vs actual behavior
-3. **Allow Time**: Give us reasonable time to fix the issue before disclosure
-4. **Contact Us**: Report via GitHub Security Advisory or private message
+```
+# Mandatory
+CONFIG_STACKPROTECTOR_STRONG=y
+CONFIG_RANDOMIZE_BASE=y          # KASLR
+CONFIG_STRICT_KERNEL_RWX=y
+CONFIG_STRICT_MODULE_RWX=y
+CONFIG_FORTIFY_SOURCE=y
+CONFIG_HARDENED_USERCOPY=y
+CONFIG_SLAB_FREELIST_RANDOM=y
+CONFIG_SHUFFLE_PAGE_ALLOCATOR=y
+CONFIG_INIT_ON_ALLOC_DEFAULT_ON=y
 
-### Security Response Process
-
-1. **Acknowledgment**: We will acknowledge receipt within 48 hours
-2. **Assessment**: We will assess the severity and impact within 1 week
-3. **Fix Development**: We will develop a fix based on severity
-4. **Testing**: We will thoroughly test the fix
-5. **Release**: We will release the fix with appropriate security advisory
-6. **Disclosure**: We will coordinate public disclosure with the reporter
-
-### Security Advisory Timeline
-
-- **Critical**: Fix within 7 days, release within 14 days
-- **High**: Fix within 14 days, release within 30 days
-- **Medium**: Fix within 30 days, release within 60 days
-- **Low**: Fix within 90 days, release within 120 days
-
-## Security Testing
-
-### Automated Security Testing
-- **Static Analysis**: Regular static code analysis with security-focused tools
-- **Dynamic Analysis**: Runtime security testing and fuzzing
-- **Dependency Scanning**: Regular scanning of dependencies for vulnerabilities
-- **CodeQL**: GitHub Advanced Security code scanning
-
-### Manual Security Review
-- **Code Review**: Security-focused code reviews for all changes
-- **Architecture Review**: Regular security architecture reviews
-- **Penetration Testing**: Periodic penetration testing
-- **Threat Modeling**: Threat modeling for new features
-
-## Compliance
-
-SigmaOS aims to comply with relevant security standards and regulations:
-
-- **GDPR**: General Data Protection Regulation compliance
-- **SOC 2**: Service Organization Control 2 compliance
-- **ISO 27001**: Information Security Management
-- **NIST**: National Institute of Standards and Technology guidelines
-- **OWASP**: Open Web Application Security Project guidelines
-
-## Security Resources
-
-### Documentation
-- [Architecture Security](./ARCHITECTURE.md#security)
-- [Capability System](./src/security/capability.rs)
-- [Audit System](./src/security/audit.rs)
-- [Vulnerability Scanner](./src/security/vulnerability.rs)
-
-### Tools
-- **Security Dashboard**: Built-in security monitoring interface
-- **Audit Log Viewer**: Tool for viewing and analyzing security logs
-- **Vulnerability Scanner**: Automated vulnerability scanning tool
-- **Security Configurator**: Tool for configuring security settings
-
-### External Resources
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [CWE/Common Weakness Enumeration](https://cwe.mitre.org/)
-- [CVE/Common Vulnerabilities and Exposures](https://cve.mitre.org/)
-- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
-
-## Security Updates
-
-### Update Policy
-- **Critical Updates**: Automatic installation recommended
-- **High Priority Updates**: Prompt installation recommended
-- **Regular Updates**: Install within 1 week
-- **Optional Updates**: Install at convenience
-
-### Update Channels
-- **Stable**: Thoroughly tested updates
-- **Testing**: Pre-release updates for testing
-- **Development**: Latest development builds
-
-## Contact
-
-### Security Team
-- **Security Issues**: security@sigmaos.org
-- **General Questions**: security-discuss@sigmaos.org
-- **PGP Key**: Available on request
-
-### Emergency Contact
-For critical security issues requiring immediate attention:
-- **Emergency**: security-emergency@sigmaos.org
-- **Phone**: Available to enterprise customers
-
----
-
-**Last Updated**: August 17, 2026
-
-**Version**: 1.0.0
+# KSPP Recommendations
+CONFIG_BUG_ON_DATA_CORRUPTION=y
+CONFIG_DEBUG_CREDENTIALS=y
+CONFIG_DEBUG_NOTIFIERS=y
+CONFIG_REFCOUNT_FULL=y
+CONFIG_ZERO_CALL_USED_REGS=y
+```

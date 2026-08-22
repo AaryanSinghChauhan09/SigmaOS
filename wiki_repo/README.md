@@ -1,258 +1,3 @@
-# SigmaOS
-
-A next-generation operating system built with Rust, focusing on security, performance, and modularity. SigmaOS aims to provide a modern, secure, and efficient computing environment while maintaining compatibility with existing Linux applications and drivers.
-
-## 🌟 Key Features
-
-- **Security-First Design**: Post-quantum cryptography, capability-based security, and comprehensive auditing
-- **Zero-Dependency Architecture**: Custom implementations of core libraries to reduce external dependencies
-- **Linux Compatibility**: Comprehensive package translation layer for .deb, .rpm, and pacman packages
-- **AI-Native Runtime**: Built-in machine learning inference and training capabilities
-- **Microkernel Architecture**: Modular design with clear separation between kernel and userspace
-- **Energy-Aware Scheduling**: Intelligent CPU scheduling based on power consumption and performance needs
-- **Advanced Filesystem**: Custom filesystem with content-addressed storage and efficient caching
-
-## 🏗️ Architecture
-
-SigmaOS follows a microkernel architecture with the following major components:
-
-### Core Components
-- **Kernel**: Lightweight microkernel with process management, memory management, and IPC
-- **Security Module**: Capability-based access control, audit logging, and vulnerability scanning
-- **Filesystem**: Content-addressed storage with deduplication and efficient caching
-- **Network Stack**: TCP/UDP networking with zero-copy buffers and advanced congestion control
-- **Graphics System**: Hardware-accelerated compositor with double buffering and window management
-- **Package Manager**: Universal package manager supporting multiple Linux package formats
-
-### Advanced Features
-- **AI Subsystem**: Machine learning inference and training with hardware acceleration
-- **Container Runtime**: Lightweight containerization with sandboxing
-- **Remote Desktop**: Built-in remote desktop capabilities
-- **Productivity Tools**: Media playback, document editing, and collaboration tools
-- **Accessibility**: Screen readers, magnifiers, and input method editors
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Rust 1.70 or later
-- Cargo
-- For kernel development: QEMU or similar emulator
-- For cross-compilation: appropriate toolchains
-
-### Building SigmaOS
-
-```bash
-# Clone the repository
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-
-# Build the userspace components
-cargo build --release
-
-# Build the kernel (requires cross-compilation)
-cargo build --release --target x86_64-unknown-none
-
-# Run in QEMU
-qemu-system-x86_64 -kernel target/x86_64-unknown-none/release/sigmaos -m 512M
-```
-
-### Development Setup
-
-```bash
-# Install development dependencies
-cargo install cargo-make
-cargo install cross
-
-# Set up the development environment
-cargo make dev-setup
-
-# Run tests
-cargo test
-
-# Run benchmarks
-cargo bench
-```
-
-## 📦 Package Management
-
-SigmaOS includes a universal package manager that can translate and install packages from multiple Linux distributions:
-
-### Supported Package Formats
-- **Debian/Ubuntu**: .deb packages with APT metadata
-- **Fedora/RHEL**: .rpm packages with SPEC files
-- **Arch Linux**: PKGBUILD files with pacman database
-- **Snap**: Snapcraft.yaml manifests
-- **Flatpak**: Flatpak manifests
-- **AppImage**: AppImage bundles
-- **Nix**: Nix derivations
-
-### Package Installation
-
-```bash
-# Install a Debian package
-sigpkg install neofetch.deb
-
-# Install an Arch package
-sigpkg install neofetch
-
-# Search for packages
-sigpkg search editor
-
-# Update all packages
-sigpkg update
-```
-
-## 🔒 Security Features
-
-### Capability-Based Security
-- Fine-grained permission system
-- Process isolation and sandboxing
-- Secure IPC mechanisms
-
-### Post-Quantum Cryptography
-- PQC signature verification (Dilithium)
-- Secure key management
-- Hardware attestation
-
-### Audit and Compliance
-- Comprehensive audit logging
-- Real-time security monitoring
-- Compliance dashboard for regulatory requirements
-
-### Vulnerability Management
-- Automatic vulnerability scanning
-- Security advisory integration
-- Patch management system
-
-## 🎯 Development Roadmap
-
-### Current Focus
-- [x] Core kernel functionality
-- [x] Basic filesystem implementation
-- [x] Network stack (TCP/UDP)
-- [x] Package translation layer
-- [x] Security framework
-- [ ] Graphics system completion
-- [ ] Driver framework expansion
-- [ ] AI subsystem optimization
-
-### Future Goals
-- Enhanced Linux compatibility layer
-- Advanced power management
-- GPU acceleration for AI workloads
-- Cloud-native features
-- Mobile device support
-
-## 🤝 Contributing
-
-We welcome contributions to SigmaOS! Please see our contributing guidelines for more information.
-
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and benchmarks
-5. Submit a pull request
-
-### Code Style
-- Follow Rust best practices
-- Use `cargo fmt` for formatting
-- Use `cargo clippy` for linting
-- Write comprehensive tests
-- Document public APIs
-
-## 📚 Documentation
-
-- [Architecture Overview](./ARCHITECTURE.md)
-- [API Reference](./API_REFERENCE.md)
-- [Security Guide](./SECURITY.md)
-- [Package Management](./PACKAGE_MANAGEMENT.md)
-- [Driver Development](./DRIVER_DEVELOPMENT.md)
-- [AI Subsystem](./AI_SUBSYSTEM.md)
-
-## 🐛 Bug Reporting
-
-Please report bugs using our [issue tracker](https://github.com/AaryanSinghChauhan09/SigmaOS/issues) with the following information:
-- SigmaOS version
-- Hardware configuration
-- Steps to reproduce
-- Expected behavior
-- Actual behavior
-- Log files (if applicable)
-
-## 📄 License
-
-Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
-# SigmaOS Sovereign Wiki
-
-## 🙏 Acknowledgments
-
-- The Rust community for excellent tooling and libraries
-- Linux distributions for inspiration and compatibility targets
-- Security researchers for vulnerability disclosures
-- All contributors who have helped make SigmaOS better
-
-## 📞 Contact
-
-- GitHub: https://github.com/AaryanSinghChauhan09/SigmaOS
-- Issues: https://github.com/AaryanSinghChauhan09/SigmaOS/issues
-- Wiki: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
-
----
-
-## 🌍 Community-Building Plan for SigmaOS
-
-To grow a healthy, thriving, and highly technical open-source ecosystem around SigmaOS, we have established a clear and structured framework for contributor onboarding, communication, incentives, hackathons, partnerships, and developer SDKs.
-
-### 1. Developer Onboarding
-* **Clear Documentation:** Maintain comprehensive guides on how to build, compile, unit-test, and contribute to both the C++ microkernel core and the Rust-based boot, initialization, and networking compatibility layers.
-* **Starter Issues:** Actively curate and label newcomer-friendly tasks with the `good first issue` tag to significantly lower entry barriers for new contributors.
-
-### 2. Communication Channels
-* **Real-time Collaboration:** Host a dedicated Discord/Matrix server for direct real-time communication between system architects, driver developers, and contributors.
-* **GitHub Discussions:** Utilize GitHub Discussions as the primary forum for long-form technical Q&A, architectural RFCs, and platform proposals.
-* **Monthly Newsletters:** Publish monthly updates summarizing core development progress, highlighting new drivers, and celebrating community-driven milestones.
-
-### 3. Contribution Incentives
-* **Recognition:** Commemorate top contributors prominently in the release notes of each milestone release.
-* **Mentorship:** Run a dedicated mentorship program matching experienced system engineers with new Rust and OS-dev enthusiasts.
-* **Subsystem Grants/Bounties:** Sponsor financial grants or developer bounties targeting crucial subsystem implementations, including next-gen network virtualization, advanced storage subsystems, and missing device drivers.
-
-### 4. Hackathons & Sprints
-* **Themed Sprints:** Sponsor virtual hackathons targeting specific subsystem needs (e.g., *“SigmaOS Networking Sprint”* focusing on native IPv6 integration, high-performance zero-copy DMA sockets, or TLS protocol wrappers).
-* **Developer Swag:** Reward participants with custom project merchandise, certificates of recognition, and sponsored server credits.
-
-### 5. Partnerships & Collaborations
-* **Academic Outreach:** Partner with university computer science departments for low-level systems research projects, thesis sponsorships, and microkernel verification studies.
-* **OS-Dev Communities:** Cross-pollinate ideas with larger Rust and alternative OS development communities (such as OSDev forums, Redox OS, and SeL4 mailing lists).
-* **Hardware Vendors:** Seek strategic hardware testing and development kits from FPGA, accelerator, and CPU vendors to accelerate physical hardware verification.
-
-### 6. Ecosystem Bootstrapping
-* **SDKs & Application APIs:** Build clean, multi-language SDKs facilitating streamlined app creation for userland desktop applications.
-* **Compatibility Layers:** Maintain and extend robust Linux and POSIX-compatible translation enclaves to attract early-stage power users.
-* **Porting Initiatives:** Work hand-in-hand with prominent open-source maintainers to port crucial, everyday tools and software to run natively inside Zenith Desktop.
-
----
-
-## 📊 Suggested Roadmap for Community Growth
-
-We divide the expansion of our collaborative ecosystem into four sequential, target-driven stages:
-
-| Stage | Focus Area | Intended Strategic Outcome |
-| :--- | :--- | :--- |
-| **Stage 1** | Documentation + Starter Issues | Attract first wave of contributors and build foundation |
-| **Stage 2** | Communication Channels + Hackathons | Foster real-time collaboration and establish an active dev base |
-| **Stage 3** | Incentives + Partnerships | Scale specialized subsystem contributions via grants & academia |
-| **Stage 4** | SDKs + App Ecosystem | Attract end-user application developers and bootstrap daily-usage |
-
----
-
-## 🚀 Recommended Next Steps
-1. **Infrastructure Provisioning:** Initialize GitHub Discussions and host the Matrix workspace.
-2. **Contributor Onboarding Guide:** Write down step-by-step build and containerization instructions within `wiki/README.md`.
-3. **Issue Curation:** Label 10–15 pre-existing issues across the repositories as `"good first issue"`.
-4. **Networking Sprint Launch:** Announce the first online virtual sprint (focused on high-throughput socket layers).
-5. **Community Outreach:** Reach out directly to system forums and social channels for cross-pollination.
 # 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
 > **"Sovereignty is the ultimate efficiency."**
@@ -363,6 +108,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 ### Current Status
 
+**Kernel Core:**
 - ✅ Kernel scheduler (MLFQ+CFS+EDF)
 - ✅ Syscalls (I/O + Process)
 - ✅ Physical MM (buddy allocator)
@@ -370,11 +116,68 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ APIC + timer
 - ✅ sigma_pledge + sigma_unveil
 - ✅ Kyber-1024 KEM + Dilithium-5
+- ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
+- ✅ Linux Driver Absorption Engine
+- ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
+
+**Networking & Storage:**
+- 🔄 TCP/UDP stack - Partial
+- ✅ Ext4 + FAT32 filesystems
+- ✅ NVMe + USB xHCI drivers
+
+**Desktop & Productivity:**
+- ✅ Zenith Desktop prototype
+- 🔄 Screen recorder with GPU acceleration
+- 🔄 Screenshot tool with annotation
+- 🔄 Calendar + task manager
+- 🔄 Email client with IMAP/SMTP
+- 🔄 Note-taking app with Markdown
+- 🔄 Code editor with LSP support
+- ✅ Integrated terminal
+- ✅ Clipboard manager with history
+- 🔄 Task manager
+
+**Security:**
+- ✅ Encrypted file vault
+- 🔄 Password manager with biometric unlock
+- ✅ Intrusion detection system
+- 🔄 Secure VPN client
+- ✅ Capability-based security framework
+
+**System Tools:**
+- ✅ File manager
+- ✅ Archive manager
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- 🔄 Virtual machine manager (QEMU/KVM)
+- 🔄 Container manager (Docker/Podman)
+
+**Package Management:**
+- ✅ sigma-pkg CLI
+- 🔄 Universal package manager
+- 🔄 Rollback package snapshots
+
+**Networking:**
+- 🔄 Cloud sync engine
+- 🔄 Built-in torrent client
+- 🔄 Network traffic analyzer
+
+**AI & Automation:**
+- 🔄 AI orchestrator for system optimization
+
+**Customization:**
+- 🔄 Unified control center
+- ✅ Declarative theming engine
+
+**Boot & Deployment:**
+=======
 - 🔄 TCP/UDP stack - Partial
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
 - ✅ Zenith Desktop prototype
 - ✅ sigma-pkg CLI
+>>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
 - ⬜ Bootable ISO (Phase G)
 
 
@@ -400,6 +203,8 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Repository Documentation
 
+- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
+- [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
 - [Roadmap](Roadmap.md) — Development plan
 - [INSTALL.md](INSTALL.md) — Build instructions
@@ -414,10 +219,21 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 - **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
+- **Kernel Evolution**: [Kernel Evolution Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Kernel_Evolution_Architecture)
+- **Driver Ecosystem**: [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
+- **Strategic Planning**: [Gap Filling Strategic Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/GAP_FILLING_STRATEGIC_PLAN)
 - **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
 - **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
 - **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
 - **Local AI Daemon**: [Sigma AI Agents](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sigma_AI_Agents)
+- **Linux Distro Absorption**: [Strategic Distro Absorption Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/LINUX_DISTRO_ABSORPTION_SPEC)
+- **S-Boot Firmware**: [Sovereign BIOS & UEFI Firmware Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BIOS_FIRMWARE_SPEC)
+- **Zenith Compositor**: [Wayland Zenith UI Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/WAYLAND_ZENITH_SPEC)
+- **Portable Apps**: [Portable Application Format Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PORTABLE_APP_FORMAT_PLAN)
+- **Custom Personalization**: [Custom Personalization & Theme Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CUSTOM_PERSONALIZATION_SPEC)
+- **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
+- **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
+- **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
 
 
 ---
