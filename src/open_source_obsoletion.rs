@@ -1198,13 +1198,14 @@ impl SovereignSecretVault {
             return Err("SecretVault: Admin token required for secret rotation");
         }
 
+        let encrypted = self.xor_encrypt_decrypt(new_payload);
         let secret = self
             .secrets
             .iter_mut()
             .find(|s| s.key_path == path)
             .ok_or("SecretVault: Secret not found")?;
 
-        secret.encrypted_payload = self.xor_encrypt_decrypt(new_payload);
+        secret.encrypted_payload = encrypted;
         secret.created_timestamp = now;
         secret.rotation_count += 1;
 
