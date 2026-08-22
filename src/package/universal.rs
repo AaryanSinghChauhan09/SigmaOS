@@ -946,10 +946,6 @@ pub enum FeatureType {
     Source,
 }
 
-pub trait UniversalPackageAdapter {
-    fn adapter_name(&self) -> &str;
-}
-
 pub struct TabularSchema {
     pub fields: Vec<String>,
 }
