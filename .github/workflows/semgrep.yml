@@ -22,10 +22,10 @@ jobs:
       image: semgrep/semgrep
 
     steps:
-      - uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      - uses: actions/checkout@v4
       - run: semgrep scan --config auto --sarif --output=semgrep.sarif
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
         if: always()
