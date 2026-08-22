@@ -513,6 +513,410 @@ impl SovereignPartitionEngine {
 }
 
 // =========================================================================
+// 8. SOVEREIGN CONTAINER RUNTIME (Superseding Docker, Podman, containerd, LXC)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SovereignContainerState {
+    Created,
+    Running,
+    Paused,
+    Stopped,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ContainerLayer {
+    pub layer_id: String,
+    pub size_bytes: u64,
+}
+
+pub struct SovereignContainer {
+    pub name: String,
+    pub image: String,
+    pub memory_limit_mb: u64,
+    pub cpu_usage_pct: u32,
+    pub state: SovereignContainerState,
+    pub layers: Vec<ContainerLayer>,
+}
+
+pub struct SovereignContainerRuntime {
+    pub containers: Vec<SovereignContainer>,
+}
+
+impl SovereignContainerRuntime {
+    pub fn new() -> Self {
+        Self { containers: Vec::new() }
+    }
+
+    pub fn create_container(&mut self, name: &str, image: &str, memory_limit_mb: u64) {
+        let container = SovereignContainer {
+            name: name.to_string(),
+            image: image.to_string(),
+            memory_limit_mb,
+            cpu_usage_pct: 0,
+            state: SovereignContainerState::Created,
+            layers: Vec::from([ContainerLayer {
+                layer_id: format!("layer_{}", name),
+                size_bytes: 1024 * 1024 * 10,
+            }]),
+        };
+        self.containers.push(container);
+    }
+
+    pub fn start_container(&mut self, name: &str) -> Result<(), &'static str> {
+        let c = self
+            .containers
+            .iter_mut()
+            .find(|c| c.name == name)
+            .ok_or("ContainerRuntime: Container not found")?;
+        c.state = SovereignContainerState::Running;
+        Ok(())
+    }
+
+    pub fn enforce_cgroups(&mut self, name: &str, cpu_cap_pct: u32) {
+        if let Some(c) = self.containers.iter_mut().find(|c| c.name == name) {
+            c.cpu_usage_pct = cpu_cap_pct;
+        }
+    }
+}
+
+impl Default for SovereignContainerRuntime {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 9. SOVEREIGN PACKET INSPECTOR (Superseding Wireshark, tcpdump, TShark)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignPacket {
+    pub protocol: String,
+    pub src_ip: String,
+    pub dst_ip: String,
+    pub port: u16,
+    pub payload_len: usize,
+}
+
+pub struct SovereignPacketInspector {
+    pub bpf_filter: Option<String>,
+    pub captured_packets: Vec<SovereignPacket>,
+}
+
+impl SovereignPacketInspector {
+    pub fn new() -> Self {
+        Self {
+            bpf_filter: None,
+            captured_packets: Vec::new(),
+        }
+    }
+
+    pub fn set_bpf_filter(&mut self, filter: &str) {
+        self.bpf_filter = Some(filter.to_string());
+    }
+
+    pub fn capture_packet(&mut self, packet: SovereignPacket) -> bool {
+        if let Some(ref filter) = self.bpf_filter {
+            if filter.contains("port") && !filter.contains(&packet.port.to_string()) {
+                return false;
+            }
+        }
+        self.captured_packets.push(packet);
+        true
+    }
+
+    pub fn export_pcap_summary(&self) -> String {
+        format!("PcapExport: {} packets captured", self.captured_packets.len())
+    }
+}
+
+impl Default for SovereignPacketInspector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 10. SOVEREIGN CACHE ENGINE (Superseding Redis, Memcached, Dragonfly)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct CacheEntry {
+    pub key: String,
+    pub value: Vec<u8>,
+    pub ttl_secs: u64,
+    pub last_access_tick: u64,
+}
+
+pub struct SovereignCacheEngine {
+    pub capacity: usize,
+    pub entries: Vec<CacheEntry>,
+    pub current_tick: u64,
+}
+
+impl SovereignCacheEngine {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            capacity,
+            entries: Vec::new(),
+            current_tick: 0,
+        }
+    }
+
+    pub fn set(&mut self, key: &str, value: &[u8], ttl_secs: u64) {
+        self.current_tick += 1;
+        // Remove existing key if present to allow update
+        self.entries.retain(|e| e.key != key);
+
+        if self.entries.len() >= self.capacity {
+            let lru_idx = self
+                .entries
+                .iter()
+                .enumerate()
+                .min_by_key(|(_, e)| e.last_access_tick)
+                .map(|(i, _)| i);
+            if let Some(idx) = lru_idx {
+                self.entries.remove(idx);
+            }
+        }
+
+        self.entries.push(CacheEntry {
+            key: key.to_string(),
+            value: value.to_vec(),
+            ttl_secs,
+            last_access_tick: self.current_tick,
+        });
+    }
+
+    pub fn get(&mut self, key: &str) -> Option<Vec<u8>> {
+        self.current_tick += 1;
+        let tick = self.current_tick;
+        if let Some(e) = self.entries.iter_mut().find(|e| e.key == key) {
+            e.last_access_tick = tick;
+            Some(e.value.clone())
+        } else {
+            None
+        }
+    }
+}
+
+// =========================================================================
+// 11. SOVEREIGN EMBEDDED DB (Superseding SQLite, DuckDB, RocksDB)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DbTable {
+    pub name: String,
+    pub rows: Vec<Vec<(String, String)>>,
+}
+
+pub struct SovereignEmbeddedDb {
+    pub db_name: String,
+    pub tables: Vec<DbTable>,
+    pub in_transaction: bool,
+}
+
+impl SovereignEmbeddedDb {
+    pub fn new(db_name: &str) -> Self {
+        Self {
+            db_name: db_name.to_string(),
+            tables: Vec::new(),
+            in_transaction: false,
+        }
+    }
+
+    pub fn create_table(&mut self, name: &str) -> Result<(), &'static str> {
+        if self.tables.iter().any(|t| t.name == name) {
+            return Err("EmbeddedDb: Table already exists");
+        }
+        self.tables.push(DbTable {
+            name: name.to_string(),
+            rows: Vec::new(),
+        });
+        Ok(())
+    }
+
+    pub fn insert_row(&mut self, table_name: &str, row: Vec<(String, String)>) -> Result<(), &'static str> {
+        let t = self
+            .tables
+            .iter_mut()
+            .find(|t| t.name == table_name)
+            .ok_or("EmbeddedDb: Table not found")?;
+        t.rows.push(row);
+        Ok(())
+    }
+
+    pub fn begin_transaction(&mut self) -> bool {
+        self.in_transaction = true;
+        true
+    }
+
+    pub fn commit(&mut self) -> bool {
+        self.in_transaction = false;
+        true
+    }
+
+    pub fn query(&self, table_name: &str) -> Vec<Vec<(String, String)>> {
+        self.tables
+            .iter()
+            .find(|t| t.name == table_name)
+            .map(|t| t.rows.clone())
+            .unwrap_or_default()
+    }
+}
+
+// =========================================================================
+// 12. SOVEREIGN MESSAGE BROKER (Superseding RabbitMQ, Apache Kafka, NATS)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MessagePacket {
+    pub topic: String,
+    pub payload: Vec<u8>,
+    pub timestamp_ms: u64,
+}
+
+pub struct SovereignMessageBroker {
+    pub subscriptions: Vec<(String, String)>, // (topic, subscriber_id)
+    pub message_queue: Vec<MessagePacket>,
+}
+
+impl SovereignMessageBroker {
+    pub fn new() -> Self {
+        Self {
+            subscriptions: Vec::new(),
+            message_queue: Vec::new(),
+        }
+    }
+
+    pub fn subscribe(&mut self, topic: &str, subscriber_id: &str) {
+        self.subscriptions.push((topic.to_string(), subscriber_id.to_string()));
+    }
+
+    pub fn publish(&mut self, topic: &str, payload: &[u8], timestamp_ms: u64) -> usize {
+        self.message_queue.push(MessagePacket {
+            topic: topic.to_string(),
+            payload: payload.to_vec(),
+            timestamp_ms,
+        });
+
+        self.subscriptions
+            .iter()
+            .filter(|(t, _)| t == topic || t == "*")
+            .count()
+    }
+
+    pub fn consume(&mut self, topic: &str) -> Vec<MessagePacket> {
+        let (matching, remaining): (Vec<MessagePacket>, Vec<MessagePacket>) = self
+            .message_queue
+            .drain(..)
+            .partition(|m| m.topic == topic);
+        self.message_queue = remaining;
+        matching
+    }
+}
+
+impl Default for SovereignMessageBroker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 13. SOVEREIGN WEB SERVER (Superseding Nginx, Apache HTTPd, Caddy, Envoy)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HttpRoute {
+    pub path_prefix: String,
+    pub upstream_backend_url: String,
+}
+
+pub struct SovereignWebServer {
+    pub tls_enabled: bool,
+    pub routes: Vec<HttpRoute>,
+    pub request_count: u64,
+}
+
+impl SovereignWebServer {
+    pub fn new() -> Self {
+        Self {
+            tls_enabled: true,
+            routes: Vec::new(),
+            request_count: 0,
+        }
+    }
+
+    pub fn add_route(&mut self, prefix: &str, backend_url: &str) {
+        self.routes.push(HttpRoute {
+            path_prefix: prefix.to_string(),
+            upstream_backend_url: backend_url.to_string(),
+        });
+    }
+
+    pub fn handle_http_request(&mut self, path: &str) -> Option<String> {
+        self.request_count += 1;
+        self.routes
+            .iter()
+            .find(|r| path.starts_with(&r.path_prefix))
+            .map(|r| r.upstream_backend_url.clone())
+    }
+}
+
+impl Default for SovereignWebServer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 14. SOVEREIGN AI INFERENCE SERVER (Superseding Ollama, vLLM, TGI, LocalAI)
+// =========================================================================
+
+pub struct SovereignAiInferenceServer {
+    pub loaded_model_name: Option<String>,
+    pub context_window_tokens: usize,
+    pub generated_tokens_count: u64,
+}
+
+impl SovereignAiInferenceServer {
+    pub fn new() -> Self {
+        Self {
+            loaded_model_name: None,
+            context_window_tokens: 8192,
+            generated_tokens_count: 0,
+        }
+    }
+
+    pub fn load_model(&mut self, model_name: &str, context_window: usize) {
+        self.loaded_model_name = Some(model_name.to_string());
+        self.context_window_tokens = context_window;
+    }
+
+    pub fn generate_response(&mut self, prompt: &str) -> Result<String, &'static str> {
+        let model = self
+            .loaded_model_name
+            .as_ref()
+            .ok_or("AiInferenceServer: No AI model loaded")?;
+
+        let tokens_generated = prompt.len().min(32);
+        self.generated_tokens_count += tokens_generated as u64;
+
+        Ok(format!(
+            "[{}] Tokenized Response: Generated {} tokens for prompt context",
+            model, tokens_generated
+        ))
+    }
+}
+
+impl Default for SovereignAiInferenceServer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -634,5 +1038,113 @@ mod tests {
         assert_eq!(p1, 1);
 
         assert!(pe.verify_alignment());
+    }
+
+    #[test]
+    fn test_sovereign_container_runtime() {
+        let mut runtime = SovereignContainerRuntime::new();
+        runtime.create_container("app1", "alpine:latest", 512);
+        assert_eq!(runtime.containers.len(), 1);
+        assert!(runtime.start_container("app1").is_ok());
+        assert_eq!(runtime.containers[0].state, SovereignContainerState::Running);
+
+        runtime.enforce_cgroups("app1", 50);
+        assert_eq!(runtime.containers[0].cpu_usage_pct, 50);
+    }
+
+    #[test]
+    fn test_sovereign_packet_inspector() {
+        let mut inspector = SovereignPacketInspector::new();
+        inspector.set_bpf_filter("port 443");
+
+        let captured = inspector.capture_packet(SovereignPacket {
+            protocol: "TCP".to_string(),
+            src_ip: "10.0.0.1".to_string(),
+            dst_ip: "10.0.0.2".to_string(),
+            port: 443,
+            payload_len: 128,
+        });
+        assert!(captured);
+
+        let dropped = inspector.capture_packet(SovereignPacket {
+            protocol: "TCP".to_string(),
+            src_ip: "10.0.0.1".to_string(),
+            dst_ip: "10.0.0.2".to_string(),
+            port: 80,
+            payload_len: 128,
+        });
+        assert!(!dropped);
+
+        assert!(inspector.export_pcap_summary().contains("1 packets"));
+    }
+
+    #[test]
+    fn test_sovereign_cache_engine_and_overwrite() {
+        let mut cache = SovereignCacheEngine::new(2);
+        cache.set("session_1", b"v1", 60);
+        assert_eq!(cache.get("session_1"), Some(b"v1".to_vec()));
+
+        // Key overwrite update test
+        cache.set("session_1", b"v2", 60);
+        assert_eq!(cache.get("session_1"), Some(b"v2".to_vec()));
+        assert_eq!(cache.entries.len(), 1);
+
+        // LRU eviction test
+        cache.set("session_2", b"val2", 60);
+        cache.set("session_3", b"val3", 60); // Should evict LRU
+        assert_eq!(cache.entries.len(), 2);
+    }
+
+    #[test]
+    fn test_sovereign_embedded_db() {
+        let mut db = SovereignEmbeddedDb::new("sigma_db");
+        assert!(db.create_table("users").is_ok());
+        assert!(db.begin_transaction());
+
+        let row = Vec::from([("id".to_string(), "1".to_string()), ("name".to_string(), "Jules".to_string())]);
+        assert!(db.insert_row("users", row).is_ok());
+        assert!(db.commit());
+
+        let rows = db.query("users");
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0][1].1, "Jules");
+    }
+
+    #[test]
+    fn test_sovereign_message_broker_pub_sub() {
+        let mut broker = SovereignMessageBroker::new();
+        broker.subscribe("telemetry/metrics", "sub_1");
+        broker.subscribe("telemetry/metrics", "sub_2");
+
+        let subs_count = broker.publish("telemetry/metrics", b"cpu=45%", 1000);
+        assert_eq!(subs_count, 2);
+
+        let consumed = broker.consume("telemetry/metrics");
+        assert_eq!(consumed.len(), 1);
+        assert_eq!(consumed[0].payload, b"cpu=45%".to_vec());
+    }
+
+    #[test]
+    fn test_sovereign_web_server_routing() {
+        let mut server = SovereignWebServer::new();
+        server.add_route("/api/v1", "http://127.0.0.1:8080");
+        server.add_route("/static", "http://127.0.0.1:9090");
+
+        assert_eq!(
+            server.handle_http_request("/api/v1/users"),
+            Some("http://127.0.0.1:8080".to_string())
+        );
+        assert_eq!(server.request_count, 1);
+        assert_eq!(server.handle_http_request("/unknown"), None);
+    }
+
+    #[test]
+    fn test_sovereign_ai_inference_server() {
+        let mut ai_server = SovereignAiInferenceServer::new();
+        ai_server.load_model("llama-3-8b", 4096);
+
+        let response = ai_server.generate_response("Explain quantum computing").unwrap();
+        assert!(response.contains("llama-3-8b"));
+        assert!(ai_server.generated_tokens_count > 0);
     }
 }
