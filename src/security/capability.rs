@@ -1,13 +1,31 @@
 // SigmaOS Capability-Based Security System
-// Implements 64-bit hardware-enforced capability model
+// Implements 64-bit hardware-enforced capability model, delegation, auditing, and time-limited tokens.
 
+#![no_std]
+
+#[cfg(test)]
+extern crate std;
+
+extern crate alloc;
+
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
+
+#[cfg(not(test))]
+use crate::klib::HashMap;
+
+#[cfg(test)]
+use std::collections::HashMap;
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     /// 64-bit capability bitmask
-    bits: u64,
+    pub bits: u64,
+    pub expiry_timestamp: u64, // 0 for infinite, or timestamp
+    pub delegated_from: u64,   // ID of parent token if delegated
 }
 
 impl Default for CapabilityToken {
@@ -19,12 +37,20 @@ impl Default for CapabilityToken {
 impl CapabilityToken {
     /// Create a new capability token with no permissions
     pub fn new() -> Self {
-        Self { bits: 0 }
+        Self {
+            bits: 0,
+            expiry_timestamp: 0,
+            delegated_from: 0,
+        }
     }
 
     /// Create capability token from raw bits
     pub fn from_bits(bits: u64) -> Self {
-        Self { bits }
+        Self {
+            bits,
+            expiry_timestamp: 0,
+            delegated_from: 0,
+        }
     }
 
     /// Allow network access
@@ -42,7 +68,7 @@ impl CapabilityToken {
 
     /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") {
+        if path.starts_with("/var/www") || path.starts_with("/etc") || path.starts_with("/home") {
             self.bits |= 1 << 2;
         }
         self
@@ -50,7 +76,7 @@ impl CapabilityToken {
 
     /// Allow file write access
     pub fn allow_write(mut self, path: &str) -> Self {
-        if path.starts_with("/tmp") || path.starts_with("/home") {
+        if path.starts_with("/tmp") || path.starts_with("/home") || path.starts_with("/var/log") {
             self.bits |= 1 << 3;
         }
         self
@@ -82,6 +108,17 @@ impl CapabilityToken {
     pub fn bits(&self) -> u64 {
         self.bits
     }
+
+    /// Capability Delegation: create a subset child capability token with restricted permissions
+    pub fn delegate_sub_capability(&self, mask: u64, expiry: u64, parent_id: u64) -> Result<CapabilityToken, &'static str> {
+        // Child can only inherit permissions present in parent token
+        let child_bits = self.bits & mask;
+        Ok(CapabilityToken {
+            bits: child_bits,
+            expiry_timestamp: expiry,
+            delegated_from: parent_id,
+        })
+    }
 }
 
 /// Permission types
@@ -93,6 +130,106 @@ pub enum Permission {
     FileWrite = 3,
     ProcessExec = 4,
     Ipc = 5,
+}
+
+/// Capability audit log event types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AuditEventType {
+    Granted,
+    Delegated,
+    Revoked,
+    ViolationDetected,
+}
+
+/// Audit log record tracking capability activity
+#[derive(Debug, Clone)]
+pub struct CapabilityAuditRecord {
+    pub token_id: u64,
+    pub event_type: AuditEventType,
+    pub details: String,
+}
+
+/// Capability Manager maintaining global capability registries and audit trails
+pub struct CapabilityManager {
+    pub registered_tokens: HashMap<u64, CapabilityToken>,
+    pub audit_trail: Vec<CapabilityAuditRecord>,
+}
+
+impl CapabilityManager {
+    pub fn new() -> Self {
+        Self {
+            registered_tokens: HashMap::new(),
+            audit_trail: Vec::new(),
+        }
+    }
+
+    pub fn grant_token(&mut self, token_id: u64, token: CapabilityToken) {
+        self.registered_tokens.insert(token_id, token);
+        self.audit_trail.push(CapabilityAuditRecord {
+            token_id,
+            event_type: AuditEventType::Granted,
+            details: "Capability token granted successfully".to_string(),
+        });
+    }
+
+    pub fn delegate_token(&mut self, parent_id: u64, child_id: u64, mask: u64, expiry: u64) -> Result<CapabilityToken, &'static str> {
+        let parent = self.registered_tokens.get(&parent_id).ok_or("Parent token not found")?;
+        let child = parent.delegate_sub_capability(mask, expiry, parent_id)?;
+        self.registered_tokens.insert(child_id, child);
+
+        self.audit_trail.push(CapabilityAuditRecord {
+            token_id: child_id,
+            event_type: AuditEventType::Delegated,
+            details: "Capability delegated to child with mask".to_string(),
+        });
+
+        Ok(child)
+    }
+
+    pub fn revoke_token(&mut self, token_id: u64) -> bool {
+        if let Some(token) = self.registered_tokens.get_mut(&token_id) {
+            token.revoke_all();
+            self.audit_trail.push(CapabilityAuditRecord {
+                token_id,
+                event_type: AuditEventType::Revoked,
+                details: "Token permissions completely revoked".to_string(),
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn validate_access(&mut self, token_id: u64, permission: Permission, current_time: u64) -> bool {
+        if let Some(token) = self.registered_tokens.get(&token_id) {
+            if token.expiry_timestamp > 0 && current_time > token.expiry_timestamp {
+                self.audit_trail.push(CapabilityAuditRecord {
+                    token_id,
+                    event_type: AuditEventType::ViolationDetected,
+                    details: "Access denied: Token expired".to_string(),
+                });
+                return false;
+            }
+            if token.has_permission(permission) {
+                true
+            } else {
+                self.audit_trail.push(CapabilityAuditRecord {
+                    token_id,
+                    event_type: AuditEventType::ViolationDetected,
+                    details: "Access denied: Missing capability permission bit".to_string(),
+                });
+                false
+            }
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for CapabilityManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Capability gate for syscall validation
@@ -124,6 +261,8 @@ impl CapabilityGate {
     pub fn current_capability(&self) -> CapabilityToken {
         CapabilityToken {
             bits: self.current.load(Ordering::SeqCst),
+            expiry_timestamp: 0,
+            delegated_from: 0,
         }
     }
 }
@@ -173,13 +312,45 @@ mod tests {
 
     #[test]
     fn test_bitmask_overlap_prevention() {
-        // Registering port 80 and then 443 should not result in a corrupted port 507,
-        // but rather only store the latest port 443 cleanly.
         let token = CapabilityToken::new()
             .allow_network("tcp", 80)
             .allow_network("tcp", 443);
-        // Extracts port stored in bits 16-31
         let port = (token.bits() >> 16) & 0xFFFF;
         assert_eq!(port, 443);
+    }
+
+    #[test]
+    fn test_capability_manager_delegation_and_auditing() {
+        let mut mgr = CapabilityManager::new();
+
+        // 1. Grant parent token (all permissions)
+        let parent_token = CapabilityToken::new()
+            .allow_network("tcp", 80)
+            .allow_read("/var/www")
+            .allow_write("/tmp");
+        mgr.grant_token(1001, parent_token);
+
+        // 2. Delegate child token with subset mask (only read & network, no write)
+        let child_mask = (1 << Permission::NetworkTcp as u64) | (1 << Permission::FileRead as u64);
+        let child_token = mgr.delegate_token(1001, 1002, child_mask, 5000).unwrap();
+
+        assert!(child_token.has_permission(Permission::NetworkTcp));
+        assert!(child_token.has_permission(Permission::FileRead));
+        assert!(!child_token.has_permission(Permission::FileWrite)); // Restricted subset
+
+        // 3. Access validation and expiry check
+        assert!(mgr.validate_access(1002, Permission::FileRead, 1000)); // Valid time (1000 < 5000)
+        assert!(!mgr.validate_access(1002, Permission::FileRead, 6000)); // Expired time (6000 > 5000)
+
+        // 4. Revocation
+        assert!(mgr.revoke_token(1001));
+        assert!(!mgr.registered_tokens.get(&1001).unwrap().has_permission(Permission::FileRead));
+
+        // Audit trail assertions
+        assert_eq!(mgr.audit_trail.len(), 4); // Granted, Delegated, Expired Violation, Revoked
+        assert_eq!(mgr.audit_trail[0].event_type, AuditEventType::Granted);
+        assert_eq!(mgr.audit_trail[1].event_type, AuditEventType::Delegated);
+        assert_eq!(mgr.audit_trail[2].event_type, AuditEventType::ViolationDetected);
+        assert_eq!(mgr.audit_trail[3].event_type, AuditEventType::Revoked);
     }
 }
