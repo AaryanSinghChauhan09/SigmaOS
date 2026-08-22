@@ -1,19 +1,11 @@
 // Custom, OOP-driven High-Performance Graphics Compositor for SigmaOS
 // Implements screen composition, double buffering, and screen capturing
-#![no_std]
-#![no_main]
-// OOP-based Graphics Compositor for SigmaOS
-// Implements graphics composition using OOP principles with traits and structs
-// No dependency on external graphics frameworks
-// Improved with custom window animations, transition effects, and dynamic pixel-clipping.
 
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-use core::ptr::{self, NonNull};
-use core::mem;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
 #[repr(C)]
@@ -142,7 +134,7 @@ impl SurfaceInfo {
 }
 
 /// Pixel format
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PixelFormat {
     RGB24 = 0,
@@ -197,7 +189,7 @@ pub struct BitmapSurface {
 impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
         let size = (width * height) as usize;
-        let mut data = Vec::new();
+        let mut data = Vec::with_capacity(size);
         data.resize(size, 0);
 
         BitmapSurface {
@@ -253,6 +245,7 @@ impl Surface for BitmapSurface {
         let stride = self.stride as usize / 4;
         let limit_y = (rect.position.y + rect.size.height as i32).min(self.size.height as i32);
         let limit_x = (rect.position.x + rect.size.width as i32).min(self.size.width as i32);
+
         let data = self.data_mut();
 
         for y in rect.position.y.max(0) as usize..limit_y.max(0) as usize {
@@ -277,7 +270,6 @@ impl Surface for BitmapSurface {
 }
 
 /// Window transition and switcher animation types (macOS / Cinnamon inspired)
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnimationType {
     Fade,
@@ -510,7 +502,7 @@ pub trait Compositor {
 }
 
 /// Graphics error types
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GraphicsError {
     Success = 0,
@@ -549,16 +541,6 @@ impl Default for CompositorStats {
     }
 }
 
-/// Simple compositor (OOP: Concrete compositor class)
-pub struct SimpleCompositor {
-    pub windows: Vec<Box<dyn Window>>,
-    pub window_order: Vec<usize>,
-    pub stats: CompositorStats,
-    pub capability: CompositorCapability,
-    pub back_buffer: Option<BitmapSurface>,
-    pub double_buffering: AtomicBool,
-}
-
 /// Compositor capability
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -592,6 +574,16 @@ impl Default for CompositorCapability {
     }
 }
 
+/// Simple compositor (OOP: Concrete compositor class)
+pub struct SimpleCompositor {
+    pub windows: Vec<Box<dyn Window>>,
+    pub window_order: Vec<usize>,
+    pub stats: CompositorStats,
+    pub capability: CompositorCapability,
+    pub back_buffer: Option<BitmapSurface>,
+    pub double_buffering: AtomicBool,
+}
+
 impl SimpleCompositor {
     pub fn new(capability: CompositorCapability) -> Self {
         SimpleCompositor {
@@ -600,7 +592,7 @@ impl SimpleCompositor {
             stats: CompositorStats::new(),
             capability,
             back_buffer: None,
-            double_buffering: core::sync::atomic::AtomicBool::new(false),
+            double_buffering: AtomicBool::new(false),
         }
     }
 }
@@ -668,75 +660,37 @@ impl Compositor for SimpleCompositor {
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError> {
         self.stats.frame_count += 1;
 
-        let use_double_buffering =
-            self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
+        let output_stride = output.info().stride as usize / 4;
 
-        if use_double_buffering {
-            let back = self.back_buffer.as_mut().unwrap();
-            back.clear(Color::rgb(0, 0, 0));
+        for &window_id in &self.window_order {
+            if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                if !window.info().visible {
+                    continue;
+                }
+                let window_rect = window.rect();
 
-            for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                    let window_rect = window.rect();
+                if let Some(surface) = window.surface() {
+                    let window_stride = surface.info().stride as usize / 4;
+                    let window_data = surface.data();
+                    let output_data = output.data_mut();
 
-                    if let Some(surface) = window.surface() {
-                        let window_stride = surface.info().stride as usize / 4;
-                        let window_data = surface.data();
+                    for y in 0..window_rect.size.height as usize {
+                        for x in 0..window_rect.size.width as usize {
+                            let output_x = (window_rect.position.x + x as i32) as usize;
+                            let output_y = (window_rect.position.y + y as i32) as usize;
 
-                        let back_stride = back.info().stride as usize / 4;
-                        let back_data = back.data_mut();
+                            let output_index = output_y * output_stride + output_x;
+                            let window_index = y * window_stride + x;
 
-                        for y in 0..window_rect.size.height as usize {
-                            for x in 0..window_rect.size.width as usize {
-                                let output_x = (window_rect.position.x + x as i32) as usize;
-                                let output_y = (window_rect.position.y + y as i32) as usize;
-
-                                let output_index = output_y * back_stride + output_x;
-                                let window_index = y * window_stride + x;
-
-                                if output_index < back_data.len()
-                                    && window_index < window_data.len()
-                                {
-                                    back_data[output_index] = window_data[window_index];
-                                }
+                            if output_index < output_data.len()
+                                && window_index < window_data.len()
+                            {
+                                output_data[output_index] = window_data[window_index];
                             }
                         }
                     }
                 }
             }
-        } else {
-            for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                    let window_rect = window.rect();
-                    let output_stride = output.info().stride as usize / 4;
-
-                    if let Some(surface) = window.surface() {
-                        let window_stride = surface.info().stride as usize / 4;
-                        let window_data = surface.data();
-                        let output_data = output.data_mut();
-
-                        for y in 0..window_rect.size.height as usize {
-                            for x in 0..window_rect.size.width as usize {
-                                let output_x = (window_rect.position.x + x as i32) as usize;
-                                let output_y = (window_rect.position.y + y as i32) as usize;
-
-                                let output_index = output_y * output_stride + output_x;
-                                let window_index = y * window_stride + x;
-
-                                if output_index < output_data.len()
-                                    && window_index < window_data.len()
-                                {
-                                    output_data[output_index] = window_data[window_index];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if self.double_buffering.load(Ordering::SeqCst) {
-            self.swap_buffers()?;
         }
 
         Ok(())
@@ -755,14 +709,14 @@ impl Compositor for SimpleCompositor {
     }
 
     fn stats(&self) -> CompositorStats {
-        let mut stats = self.stats.clone();
+        let mut stats = self.stats;
         stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
         stats
     }
 }
 
 #[cfg(test)]
-mod additional_compositor_tests {
+mod tests {
     use super::*;
 
     #[test]
@@ -770,20 +724,13 @@ mod additional_compositor_tests {
         let rect = Rectangle::new(0, 0, 100, 100);
         let mut window = SimpleWindow::new(1, rect, WindowCapability::full());
 
-        // Default scale and opacity should be 1.0
         assert_eq!(window.get_scale(), 1.0f32);
         assert_eq!(window.get_opacity(), 1.0f32);
 
-        // Apply 50% progress Minimize transition
         window.apply_transition(AnimationType::Minimize, 0.5f32);
-        assert_eq!(window.get_scale(), 0.75f32); // 1.0 - (0.5 * 0.5)
-        assert_eq!(window.get_opacity(), 0.5f32); // 1.0 - 0.5
+        assert_eq!(window.get_scale(), 0.75f32);
+        assert_eq!(window.get_opacity(), 0.5f32);
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
 
     #[test]
     fn test_compositor_flow() {
