@@ -31,16 +31,16 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Build the Docker image
-      run: |
-        IMAGE_TAG=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        docker build . --file Dockerfile --tag ${IMAGE_TAG}:latest
-        echo "LOWER_IMAGE_TAG=${IMAGE_TAG}:latest" >> $GITHUB_ENV
+      # Tag image to be built
+      # Ensure image tag uses lowercase name as required by Docker
+      run: docker build . --file Dockerfile --tag aaryansinghchauhan09/sigmaos:latest
 
     - name: Sysdig Secure Inline Scan
       id: scan
-      uses: sysdiglabs/scan-action@768d7626a14897e0948ea89c8437dd46a814b163
+      uses: sysdiglabs/scan-action@v5
       with:
-        image-tag: ${{ env.LOWER_IMAGE_TAG }}
+        # Tag of the image to analyse.
+        image-tag: aaryansinghchauhan09/sigmaos:latest
         # API token for Sysdig Scanning auth
         sysdig-secure-token: ${{ secrets.SYSDIG_SECURE_TOKEN}}
         # Sysdig secure endpoint. Please read: https://docs.sysdig.com/en/docs/administration/saas-regions-and-ip-ranges/

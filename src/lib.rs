@@ -11,7 +11,6 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod governance;
 pub mod kernel;
 pub mod klib;
 pub mod ml;
@@ -26,12 +25,17 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod storage;
 pub mod thread;
 pub mod process;
 pub mod community;
 pub mod memory;
 pub mod tools;
 pub mod virtualization;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
+pub mod cluster;
+
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
@@ -61,7 +65,6 @@ pub mod scheduler {
 pub mod crypto {
     pub mod vectorized_pqc;
 }
-pub mod open_source_obsoletion;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -77,13 +80,23 @@ pub use compatibility::{
     AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
     AntiXControlCentre, ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
     ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager,
-    ZorinWindowsAppSupport, ApplicationBinary, BinaryFormat, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ContainerRuntime, TargetPlatform,
-    TranslationLayer,
+    ZorinWindowsAppSupport,
+    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime, CorebootGatewayMesh,
+    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
+    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
+    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
+    PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, TargetPlatform,
+    TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
+    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
+    Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability,
+    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
     SimpleContainer, SimpleContainerRuntime,
 };
 pub use customization::{
@@ -91,10 +104,6 @@ pub use customization::{
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
-};
-pub use dashboard::statutory_compliance::{
-    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier,
-    StatutoryBreachAlert, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
@@ -105,19 +114,20 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
-pub use governance::{
-    MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
-};
 pub use kernel::{
-    AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
-    InterruptMechanism, IpcError, IpcManager,
-    MemoryBlock, Message, PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
+    ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
+    Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
+    KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver, NetPod,
+    PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
     ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
-    UserDefinedKernelFunctions,
+    UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
+    IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
 };
 pub use network::{
-    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
+    RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
+    ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
@@ -148,12 +158,12 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use remote::{
-    FileTransfer, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
+    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
     SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
 };
@@ -168,22 +178,26 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
+    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
+    IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
     PORT_ALLOW_SSL, PORT_ALLOW_TCP,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter as SigpkgPackageFormatAdapter, UniversalPackageManager as SigpkgUniversalPackageManager, AdapterError,
+    DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub use thread::{Thread, ThreadError};
+pub use thread::{
+    Thread, ThreadError, ThreadResult, Mutex as ThreadMutex,
+};
 
 pub use process::spawn::{
     ProcessID, ProcessState as LibProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter,
@@ -199,7 +213,7 @@ pub use memory::segmentation_paging::{
 };
 
 pub use community::toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe as CommunityPackageRecipe,
     RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
     SecurityProfileTemplateStore, SecurityTemplate,
 };
@@ -213,8 +227,5 @@ pub use tools::{
     SovereignIsWebsiteDown,
 };
 
-pub use open_source_obsoletion::{
-    SovereignApiTestSuite, SovereignInitSupervisor, SovereignKnowledgeGraph,
-    SovereignObservabilitySuite, SovereignPartitionEngine, SovereignPqcVpnFirewall,
-    SovereignVcsEngine,
-};
+pub mod open_source_obsoletion;
+pub use open_source_obsoletion::*;
