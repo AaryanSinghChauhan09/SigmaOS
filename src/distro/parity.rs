@@ -7,9 +7,26 @@ pub enum InstallationTarget {
     VirtualDisk,      // Sandboxed VM partition
 }
 
+/// Installation Mode (Calamares-style selection)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InstallationMode {
+    CleanInstall,       // Erase disk and install SigmaOS
+    DualBootSovereign,  // Install alongside existing OS
+    CustomPartitioning, // Manual partition mapping
+}
+
+/// Detected Operating System for Dual-Boot Chainloading
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DetectedOs {
+    pub name: String,
+    pub partition_id: u32,
+    pub efi_boot_path: String,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstallerStep {
     DetectingHardware,
+    ScanningExistingOs,
     Partitioning,
     StreamingImage,
     ConfiguringBootloader,
@@ -22,6 +39,7 @@ pub enum InstallerError {
     WriteFailed,
     InvalidPartitionTable,
     BootloaderError,
+    NoOsDetected,
 }
 
 pub trait LiveInstaller {
@@ -34,6 +52,8 @@ pub trait LiveInstaller {
 pub struct SovereignInstaller {
     pub target: Option<InstallationTarget>,
     pub current_step: InstallerStep,
+    pub mode: InstallationMode,
+    pub detected_systems: Vec<DetectedOs>,
     pub bytes_written: u64,
     pub total_bytes: u64,
 }
@@ -43,9 +63,53 @@ impl SovereignInstaller {
         Self {
             target: None,
             current_step: InstallerStep::DetectingHardware,
+            mode: InstallationMode::CleanInstall,
+            detected_systems: Vec::new(),
             bytes_written: 0,
             total_bytes: 1024 * 1024 * 1024, // 1 GB simulated image
         }
+    }
+
+    /// Detects existing operating systems on attached block storage (Calamares parity)
+    pub fn detect_existing_operating_systems(&mut self) -> Vec<DetectedOs> {
+        self.current_step = InstallerStep::ScanningExistingOs;
+        let mut detected = Vec::new();
+
+        // Simulate probing EFI System Partition (ESP) for Windows & Linux bootloaders
+        detected.push(DetectedOs {
+            name: "Windows 11 Pro".to_string(),
+            partition_id: 1,
+            efi_boot_path: "/EFI/Microsoft/Boot/bootmgfw.efi".to_string(),
+        });
+
+        detected.push(DetectedOs {
+            name: "Debian GNU/Linux 12 (bookworm)".to_string(),
+            partition_id: 2,
+            efi_boot_path: "/EFI/debian/grubx64.efi".to_string(),
+        });
+
+        self.detected_systems = detected.clone();
+        detected
+    }
+
+    /// Sets Calamares-style installation mode
+    pub fn set_installation_mode(&mut self, mode: InstallationMode) {
+        self.mode = mode;
+    }
+
+    /// Configures dual-boot UEFI chainloader entries in sigma-boot
+    pub fn configure_dual_boot_chainloader(&mut self) -> Result<usize, InstallerError> {
+        if self.mode != InstallationMode::DualBootSovereign {
+            return Ok(0);
+        }
+
+        if self.detected_systems.is_empty() {
+            return Err(InstallerError::NoOsDetected);
+        }
+
+        // Simulates generating UEFI chainloader entries for each detected OS
+        let count = self.detected_systems.len();
+        Ok(count)
     }
 }
 
@@ -77,6 +141,9 @@ impl LiveInstaller for SovereignInstaller {
 
     fn install_bootloader(&mut self) -> Result<(), InstallerError> {
         self.current_step = InstallerStep::ConfiguringBootloader;
+        if self.mode == InstallationMode::DualBootSovereign {
+            self.configure_dual_boot_chainloader()?;
+        }
         self.current_step = InstallerStep::Finalizing;
         Ok(())
     }
@@ -278,6 +345,14 @@ mod tests {
     fn test_sovereign_installer() {
         let mut installer = SovereignInstaller::new();
         assert_eq!(installer.get_current_step(), InstallerStep::DetectingHardware);
+
+        // Detect OS & set dual-boot mode
+        let os_list = installer.detect_existing_operating_systems();
+        assert_eq!(os_list.len(), 2);
+        assert_eq!(os_list[0].name, "Windows 11 Pro");
+
+        installer.set_installation_mode(InstallationMode::DualBootSovereign);
+        assert_eq!(installer.mode, InstallationMode::DualBootSovereign);
 
         let init_res = installer.initialize_target(InstallationTarget::VirtualDisk);
         assert!(init_res.is_ok());
