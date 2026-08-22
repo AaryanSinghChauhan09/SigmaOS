@@ -46,6 +46,9 @@ impl fmt::Display for EventError {
 }
 
 /// Result type alias for Event operations
+pub mod epoll;
+pub use epoll::*;
+
 pub type EventResult<T> = Result<T, EventError>;
 
 /// Event - primary abstraction for this module

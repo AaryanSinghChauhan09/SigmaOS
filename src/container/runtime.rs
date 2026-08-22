@@ -221,7 +221,6 @@ pub struct SeccompProfile {
     pub blocked_syscalls_mask: u32,
 }
 
-<<<<<<< HEAD
 impl ContainerNamespace {
     pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
         if self.rootless {
@@ -285,8 +284,6 @@ pub struct SeccompProfile {
     pub blocked_syscalls_mask: u32,
 }
 
-=======
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {
@@ -791,12 +788,7 @@ impl<T> Vec<T> {
         }
     }
 
-<<<<<<< HEAD
     pub fn len(&self) -> usize {
-=======
-    #[allow(dead_code)]
-    fn len(&self) -> usize {
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
         self.len
     }
 
@@ -942,10 +934,7 @@ extern "C" {
 #[cfg(test)]
 mod tests {
     use super::*;
-<<<<<<< HEAD
     use super::super::*;
-=======
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
     use alloc::string::ToString;
     use alloc::vec;
 
