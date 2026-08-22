@@ -27,45 +27,6 @@ pub enum ContainerState {
     Failed = 4,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
-impl ContainerCapability {
-    pub fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
-}
 
 /// Container trait (OOP interface)
 pub trait Container {
@@ -188,6 +149,14 @@ pub struct ContainerNamespace {
     pub rootless: bool,
 }
 
+
+/// Container seccomp profiles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
 impl ContainerNamespace {
     pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
         if self.rootless {
@@ -212,13 +181,6 @@ impl ContainerNamespace {
             Ok(container_gid)
         }
     }
-}
-
-/// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
 }
 
 /// Namespace configuration flags for a container
@@ -899,7 +861,12 @@ extern "C" {
 
 #[cfg(test)]
 mod tests {
+<<<<<<< HEAD
     use super::super::*;
+=======
+    use super::*;
+
+>>>>>>> remotes/origin/fix-git-merge-conflict-markers-1552127063433715956
     use alloc::string::ToString;
     use alloc::vec;
 
