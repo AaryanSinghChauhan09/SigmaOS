@@ -366,7 +366,7 @@ impl DomainOrchestrator {
             clone_id,
             &clone_name,
             DomainType::Disposable,
-            temp.capabilities,
+            temp.capabilities.clone(),
         );
         clone_domain.parent_id = Some(template_id);
         // Copy-on-Write page table replication: reference parent's baseline physical memory mapping

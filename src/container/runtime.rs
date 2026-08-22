@@ -5,7 +5,6 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based Container Runtime for SigmaOS
@@ -26,7 +25,6 @@ pub enum ContainerState {
     Stopped = 3,
     Failed = 4,
 }
-
 
 /// Container trait (OOP interface)
 pub trait Container {
@@ -182,7 +180,6 @@ impl ContainerNamespace {
         }
     }
 }
-
 /// Namespace configuration flags for a container
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NamespaceConfig {
@@ -212,6 +209,12 @@ impl NamespaceConfig {
         self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
     }
 }
+
+impl Default for NamespaceConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {
@@ -228,14 +231,14 @@ impl SeccompProfile {
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
 pub struct OverlayFS {
-    pub lower_dirs: alloc::vec::Vec<String>,
+    pub lower_dirs: Vec<String>,
     pub upper_dir: String,
     pub work_dir: String,
     pub mounted: bool,
 }
 
 impl OverlayFS {
-    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
+    pub fn new(lower_dirs: Vec<String>, upper_dir: String, work_dir: String) -> Self {
         Self {
             lower_dirs,
             upper_dir,
@@ -252,26 +255,20 @@ impl OverlayFS {
             return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
         }
         self.mounted = true;
-        println!(
-            "OverlayFS mounted successfully: lowerdirs={:?}, upperdir={}, workdir={}",
-            self.lower_dirs, self.upper_dir, self.work_dir
-        );
         Ok(())
     }
 
     pub fn umount(&mut self) {
         self.mounted = false;
-        println!("OverlayFS unmounted successfully.");
     }
 }
 
 /// Simple container (OOP: Concrete container class)
-#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
     pub image: [u8; 128],
-    pub state: AtomicUsize, // ContainerState as usize
+    pub state: AtomicUsize,
     pub pid: AtomicUsize,
     pub memory_limit: u64,
     pub cpu_limit: u32,
@@ -283,10 +280,6 @@ pub struct SimpleContainer {
 impl SimpleContainer {
     pub fn execute_syscall(&self, syscall_id: u32) -> Result<(), ContainerError> {
         if self.seccomp.is_syscall_blocked(syscall_id) {
-            println!(
-                "Container Seccomp Violation: Syscall {} is strictly prohibited by security profile",
-                syscall_id
-            );
             return Err(ContainerError::PermissionDenied);
         }
         Ok(())
@@ -365,7 +358,7 @@ impl Container for SimpleContainer {
         }
 
         self.set_state(ContainerState::Running);
-        self.pid.store(1, Ordering::SeqCst); // Simulated PID
+        self.pid.store(1, Ordering::SeqCst);
         Ok(())
     }
 
@@ -433,28 +426,20 @@ impl Container for SimpleContainer {
 
 /// Container runtime trait (OOP interface)
 pub trait ContainerRuntime {
-    /// Create container
     fn create_container(
         &mut self,
         name: &[u8],
         image: &[u8],
         capability: ContainerCapability,
     ) -> Result<ContainerID, ContainerError>;
-    /// Remove container
+
     fn remove_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
-    /// Start container
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
-    /// Stop container
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
-    /// Pause container
     fn pause_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
-    /// Resume container
     fn resume_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
-    /// Get container
     fn get_container(&self, id: ContainerID) -> Option<&dyn Container>;
-    /// List containers
     fn list_containers(&self) -> Vec<ContainerID>;
-    /// Get runtime statistics
     fn stats(&self) -> RuntimeStats;
 }
 
@@ -476,6 +461,12 @@ impl RuntimeStats {
             paused_containers: 0,
             stopped_containers: 0,
         }
+    }
+}
+
+impl Default for RuntimeStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -514,6 +505,12 @@ impl RuntimeCapability {
     }
 }
 
+impl Default for RuntimeCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleContainerRuntime {
     pub fn new(capability: RuntimeCapability) -> Self {
         SimpleContainerRuntime {
@@ -522,6 +519,17 @@ impl SimpleContainerRuntime {
             stats: RuntimeStats::new(),
             capability,
         }
+    }
+
+    fn get_container_mut(&mut self, id: ContainerID) -> Option<&mut Box<dyn Container>> {
+        for container_option in &mut self.containers {
+            if let Some(ref mut container) = *container_option {
+                if container.id() == id {
+                    return Some(container);
+                }
+            }
+        }
+        None
     }
 }
 
@@ -674,215 +682,12 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 }
 
-impl SimpleContainerRuntime {
-    fn get_container_mut(&mut self, id: ContainerID) -> Option<&mut Box<dyn Container>> {
-        for container_option in &mut self.containers {
-            if let Some(ref mut container) = *container_option {
-                if container.id() == id {
-                    return Some(container);
-                }
-            }
-        }
-        None
-    }
-}
-
-/// Simple Vec implementation for no_std
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    pub fn iter(&self) -> RuntimeVecIter<'_, T> {
-        RuntimeVecIter { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-
-    pub fn iter_mut(&mut self) -> RuntimeVecIterMut<'_, T> {
-        RuntimeVecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-
-    pub fn enumerate(&self) -> RuntimeVecEnumerate<'_, T> {
-        RuntimeVecEnumerate { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let layout =
-            std::alloc::Layout::from_size_align(new_capacity * mem::size_of::<T>(), 8).unwrap();
-        let new_data = std::alloc::alloc(layout) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        assert!(index < self.len, "index out of bounds");
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        assert!(index < self.len, "index out of bounds");
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-pub struct RuntimeVecIter<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a T>,
-}
-
-impl<'a, T> Iterator for RuntimeVecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &*self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct RuntimeVecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for RuntimeVecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct RuntimeVecEnumerate<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a T>,
-}
-
-impl<'a, T> Iterator for RuntimeVecEnumerate<'a, T> {
-    type Item = (usize, &'a Option<T>);
-    fn next(&mut self) -> Option<Self::Item> { None }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = RuntimeVecIter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-
 
 pub mod oci {
     extern crate alloc;
-    use crate::container::ContainerError;
-    use alloc::string::String;
-    use alloc::string::ToString;
+    use super::{ContainerError, NamespaceConfig};
+    use alloc::string::{String, ToString};
     use alloc::vec::Vec;
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-<<<<<<< HEAD
-    use super::super::*;
-=======
-    use super::*;
-
->>>>>>> remotes/origin/fix-git-merge-conflict-markers-1552127063433715956
-    use alloc::string::ToString;
-    use alloc::vec;
-
-    #[test]
-    fn test_container_creation() {
-        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
-        let id = runtime
-            .create_container(
-                b"sovereign_container",
-                b"ubuntu-pqc",
-                ContainerCapability::full(),
-            )
-            .unwrap();
-        assert_eq!(id, 1);
-    }
-
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
         pub mntns: Option<usize>,
@@ -905,17 +710,11 @@ mod tests {
                 cgroupns: None,
             }
         }
+    }
 
-        pub fn clone(&self) -> Self {
-            NamespaceSet {
-                pidns: self.pidns,
-                mntns: self.mntns,
-                netns: self.netns,
-                utsns: self.utsns,
-                ipcns: self.ipcns,
-                userns: self.userns,
-                cgroupns: self.cgroupns,
-            }
+    impl Default for NamespaceSet {
+        fn default() -> Self {
+            Self::new()
         }
     }
 
@@ -955,6 +754,7 @@ mod tests {
         pub options: Vec<String>,
     }
 
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ContainerState {
         Created,
         Running,
@@ -1040,127 +840,83 @@ mod tests {
         }
     }
 
-    #[test]
-    #[test]
-    fn test_overlayfs_stacking() {
-        let mut overlay = OverlayFS::new(
-            vec!["/lower1".to_string(), "/lower2".to_string()],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(!overlay.mounted);
-        assert!(overlay.mount().is_ok());
-        assert!(overlay.mounted);
-        overlay.umount();
-        assert!(!overlay.mounted);
-
-        // Mount failure on empty lowerdirs
-        let mut invalid_overlay = OverlayFS::new(
-            vec![],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(invalid_overlay.mount().is_err());
-    }
-
-    #[test]
-    fn test_rootless_user_namespace_mapping() {
-        let ns = ContainerNamespace {
-            uid_mapping: 1000,
-            gid_mapping: 1000,
-            rootless: true,
-        };
-
-        // Container root (UID 0) maps to host unprivileged user (UID 1000)
-        assert_eq!(ns.map_uid(0).unwrap(), 1000);
-        assert_eq!(ns.map_gid(0).unwrap(), 1000);
-
-        // Regular container users offset accordingly
-        assert_eq!(ns.map_uid(10).unwrap(), 1010);
-    }
-
-    #[test]
-    fn test_hardened_seccomp_syscall_filtering() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"hardened_ct",
-            b"alpine",
-            ContainerCapability::full(),
-        );
-        container.seccomp = SeccompProfile {
-            hardened: true,
-            blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)
-        };
-
-        // Allowed syscall (e.g. syscall 1)
-        assert!(container.execute_syscall(1).is_ok());
-
-        // Prohibited syscall (syscall 0)
-        assert_eq!(
-            container.execute_syscall(0).unwrap_err(),
-            ContainerError::PermissionDenied
-        );
-    }
-
-    #[test]
-    fn test_overlayfs_stacking() {
-        let mut overlay = OverlayFS::new(
-            vec!["/lower1".to_string(), "/lower2".to_string()],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(!overlay.mounted);
-        assert!(overlay.mount().is_ok());
-        assert!(overlay.mounted);
-        overlay.umount();
-        assert!(!overlay.mounted);
-
-        // Mount failure on empty lowerdirs
-        let mut invalid_overlay = OverlayFS::new(
-            vec![],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(invalid_overlay.mount().is_err());
-    }
-
-    #[test]
-    fn test_rootless_user_namespace_mapping() {
-        let ns = ContainerNamespace {
-            uid_mapping: 1000,
-            gid_mapping: 1000,
-            rootless: true,
-        };
-
-        // Container root (UID 0) maps to host unprivileged user (UID 1000)
-        assert_eq!(ns.map_uid(0).unwrap(), 1000);
-        assert_eq!(ns.map_gid(0).unwrap(), 1000);
-
-        // Regular container users offset accordingly
-        assert_eq!(ns.map_uid(10).unwrap(), 1010);
-    }
-
-    #[test]
-    fn test_hardened_seccomp_syscall_filtering() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"hardened_ct",
-            b"alpine",
-            ContainerCapability::full(),
-        );
-        container.seccomp = SeccompProfile {
-            hardened: true,
-            blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)
-        };
-
-        // Allowed syscall (e.g. syscall 1)
-        assert!(container.execute_syscall(1).is_ok());
-
-        // Prohibited syscall (syscall 0)
-        assert_eq!(
-            container.execute_syscall(0).unwrap_err(),
-            ContainerError::PermissionDenied
-        );
+    impl Default for ContainerManager {
+        fn default() -> Self {
+            Self::new()
+        }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
+
+    #[test]
+    fn test_container_creation() {
+        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
+        let id = runtime
+            .create_container(
+                b"sovereign_container",
+                b"ubuntu-pqc",
+                ContainerCapability::full(),
+            )
+            .unwrap();
+        assert_eq!(id, 1);
+    }
+
+    #[test]
+    fn test_overlayfs_stacking() {
+        let mut overlay = OverlayFS::new(
+            vec!["/lower1".to_string(), "/lower2".to_string()],
+            "/upper".to_string(),
+            "/work".to_string(),
+        );
+        assert!(!overlay.mounted);
+        assert!(overlay.mount().is_ok());
+        assert!(overlay.mounted);
+        overlay.umount();
+        assert!(!overlay.mounted);
+
+        let mut invalid_overlay = OverlayFS::new(
+            vec![],
+            "/upper".to_string(),
+            "/work".to_string(),
+        );
+        assert!(invalid_overlay.mount().is_err());
+    }
+
+    #[test]
+    fn test_rootless_user_namespace_mapping() {
+        let ns = ContainerNamespace {
+            uid_mapping: 1000,
+            gid_mapping: 1000,
+            rootless: true,
+        };
+
+        assert_eq!(ns.map_uid(0).unwrap(), 1000);
+        assert_eq!(ns.map_gid(0).unwrap(), 1000);
+        assert_eq!(ns.map_uid(10).unwrap(), 1010);
+    }
+
+    #[test]
+    fn test_hardened_seccomp_syscall_filtering() {
+        let mut container = SimpleContainer::new(
+            1,
+            b"hardened_ct",
+            b"alpine",
+            ContainerCapability::full(),
+        );
+        container.seccomp = SeccompProfile {
+            hardened: true,
+            blocked_syscalls_mask: 1 << 0,
+        };
+
+        assert!(container.execute_syscall(1).is_ok());
+        assert_eq!(
+            container.execute_syscall(0).unwrap_err(),
+            ContainerError::PermissionDenied
+        );
+    }
 }

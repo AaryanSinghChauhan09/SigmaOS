@@ -182,7 +182,7 @@ impl SigmaFile {
     }
     
     /// Convert open mode to flags
-    fn mode_to_flags(mode: OpenMode) -> u32 {
+    fn mode_to_flags(mode: OpenMode) -> i32 {
         match mode {
             OpenMode::ReadOnly => O_RDONLY,
             OpenMode::WriteOnly => O_WRONLY,

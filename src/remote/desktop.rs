@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 #![no_std]
 
+extern crate alloc;
+use alloc::vec::Vec;
+
 /// OOP-based Remote Desktop for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 956
 /// Implements remote desktop access
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

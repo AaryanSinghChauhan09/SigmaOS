@@ -36,10 +36,11 @@ const SYSCALL_GETENV: usize = 0x102;
 
 impl SigmaEnv {
     /// Get an environment variable
-    pub fn get(key: &str) -> Result<&'static str, EnvError> {
-        let envp = Self::get_envp_pointer();
+    pub fn get(key: &str) -> Option<&'static str> {
+        // Read from process environment block
+        let envp = unsafe { Self::get_envp_pointer() };
         if envp.is_null() {
-            return Err(EnvError::NotFound);
+            return None;
         }
         
         unsafe {
@@ -79,9 +80,10 @@ impl SigmaEnv {
     }
     
     /// Get command line arguments
-    pub fn args() -> ArgsIterator {
-        let argv = Self::get_argv_pointer();
-        ArgsIterator::new(argv)
+    pub fn args() -> impl Iterator<Item = &'static str> {
+        // Get command line arguments
+        let argv = unsafe { Self::get_argv_pointer() };
+        EnvIterator::new(argv)
     }
     
     /// Get environment variables iterator
@@ -107,18 +109,18 @@ impl SigmaEnv {
     }
     
     /// Search the environment block for a key
-    unsafe fn search_env_block(envp: *const *const c_char, key: &str) -> Result<&'static str, EnvError> {
+    unsafe fn search_env_block(envp: *const *const c_char, key: &str) -> Option<&'static str> {
         let mut i = 0;
         loop {
             let entry = *envp.add(i);
             if entry.is_null() {
-                return Err(EnvError::NotFound);
+                return None;
             }
             
-            let entry_str = Self::cstr_to_str(entry)?;
+            let entry_str = Self::cstr_to_str(entry).ok()?;
             
             if let Some(value) = Self::parse_env_entry(entry_str, key) {
-                return Ok(value);
+                return Some(value);
             }
             
             i += 1;
@@ -139,13 +141,14 @@ impl SigmaEnv {
     }
     
     /// Parse an environment entry
-    fn parse_env_entry(entry: &str, key: &str) -> Option<&'static str> {
-        let parts: Vec<&str> = entry.splitn(2, '=').collect();
-        if parts.len() == 2 && parts[0] == key {
-            Some(parts[1])
-        } else {
-            None
+    fn parse_env_entry(entry: &'static str, key: &str) -> Option<&'static str> {
+        if let Some(eq_idx) = entry.find('=') {
+            let (k, v) = entry.split_at(eq_idx);
+            if k == key {
+                return Some(&v[1..]);
+            }
         }
+        None
     }
     
     /// Convert Rust string to C string
@@ -255,7 +258,7 @@ mod tests {
         
         // Test get
         let result = SigmaEnv::get("TEST_VAR");
-        assert!(result.is_ok() || result.is_err());
+        assert!(result.is_some() || result.is_none());
         
         // Test remove
         let result = SigmaEnv::remove("TEST_VAR");
