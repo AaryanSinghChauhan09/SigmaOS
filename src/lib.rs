@@ -226,3 +226,6 @@ pub use tools::{
     SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
     SovereignIsWebsiteDown,
 };
+
+pub mod open_source_obsoletion;
+pub use open_source_obsoletion::*;
