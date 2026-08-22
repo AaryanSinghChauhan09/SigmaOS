@@ -30,5 +30,5 @@ pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE
 pub use universal::{
     ConflictResolution, DependencyResolver, FeatureType, PackageAdapter, PackageError,
     PackageFormat, PackageSource, SovereignTabFm, TabularDataset, TabularRow, TabularSchema,
-    UnifiedPackage, UniversalPackageManager,
+    UnifiedPackage, UniversalPackageManager, PackageFormatAdapter,
 };

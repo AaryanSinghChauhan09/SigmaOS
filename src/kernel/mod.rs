@@ -8,6 +8,8 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod traits;
+pub mod gap_closing;
+pub mod generation_manager;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
@@ -25,5 +27,10 @@ pub use policy_mechanism::{
     ResourceBroker,
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use traits::SchedulerError;
+pub use scheduler::{Priority, Process, ProcessState};
+pub use traits::{Scheduler, SchedulerError};
+pub use gap_closing::{
+    GapError, Pml4PageTableEntry, VirtualMemoryPagingManager, IrqRoutingTable,
+    AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+};
+pub use generation_manager::{Generation, GenerationManager};
