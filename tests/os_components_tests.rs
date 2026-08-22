@@ -78,7 +78,7 @@ use statutory_compliance::{
 use system_user::{UserManager as TestUserManager};
 
 use access_control::{
-    NtfsAce as Nfs4Ace, NtfsAceType as Nfs4AceType,
+    PosixAcl, AclType,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
