@@ -17,3 +17,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 pub mod elf_loader;
+pub mod relocation;
+
+pub use relocation::*;

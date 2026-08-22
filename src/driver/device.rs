@@ -845,7 +845,6 @@ mod legacy_tests {
     }
 }
 
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
 impl BlockDevice for SimpleBlockDevice {
     fn read_block(&mut self, block: u64, buffer: &mut [u8]) -> Result<(), DeviceError> {
         let block_index = block as usize;
@@ -1487,7 +1486,6 @@ impl Default for IoManager {
 pub enum PortAddress {
     PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
     MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
 }
 
 #[cfg(test)]

@@ -184,13 +184,13 @@ impl SigmaFile {
     /// Convert open mode to flags
     fn mode_to_flags(mode: OpenMode) -> u32 {
         match mode {
-            OpenMode::ReadOnly => 0o_RDONLY,
-            OpenMode::WriteOnly => 0o_WRONLY,
-            OpenMode::ReadWrite => 0o_RDWR,
-            OpenMode::Append => 0o_WRONLY | 0o_APPEND,
-            OpenMode::Create => 0o_CREAT | 0o_WRONLY | 0o_TRUNC,
-            OpenMode::CreateNew => 0o_CREAT | 0o_WRONLY | 0o_EXCL,
-            OpenMode::Truncate => 0o_WRONLY | 0o_TRUNC,
+            OpenMode::ReadOnly => O_RDONLY,
+            OpenMode::WriteOnly => O_WRONLY,
+            OpenMode::ReadWrite => O_RDWR,
+            OpenMode::Append => O_WRONLY | O_APPEND,
+            OpenMode::Create => O_CREAT | O_WRONLY | O_TRUNC,
+            OpenMode::CreateNew => O_CREAT | O_WRONLY | O_EXCL,
+            OpenMode::Truncate => O_WRONLY | O_TRUNC,
         }
     }
     
