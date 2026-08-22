@@ -1,3 +1,4 @@
+use crate::ai::AgentAutomationEngine;
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 

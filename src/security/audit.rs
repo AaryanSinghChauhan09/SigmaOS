@@ -1,15 +1,9 @@
-// SPDX-License-Identifier: MIT
-//! OOP-based Security Audit for SigmaOS
-//! Based on Ideas-999-Structured: Security & Sovereignty Item 542
-//! Implements security event logging and audit trails
-
-#![no_std]
-
-extern crate alloc;
-
+/// OOP-based Security Audit for SigmaOS
+/// Based on Ideas-999-Structured: Security & Sovereignty Item 542
+/// Implements security event logging and audit trails
+use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type EventID = usize;
 
@@ -68,24 +62,15 @@ impl AuditEvent for SimpleAuditEvent {
     fn id(&self) -> EventID {
         self.id
     }
-
     fn event_type(&self) -> EventType {
-        match self.event_type.load(Ordering::SeqCst) {
-            0 => EventType::Authentication,
-            1 => EventType::Authorization,
-            2 => EventType::FileAccess,
-            _ => EventType::SystemChange,
-        }
+        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
     }
-
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64
     }
-
     fn user_id(&self) -> usize {
         self.user_id.load(Ordering::SeqCst)
     }
-
     fn description(&self) -> &[u8] {
         let len = self.description.iter().position(|&b| b == 0).unwrap_or(256);
         &self.description[..len]
@@ -99,6 +84,7 @@ pub trait AuditLogger {
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError>;
 }
 
+#[repr(C)]
 pub struct SimpleAuditLogger {
     pub events: Vec<Option<Box<dyn AuditEvent>>>,
     pub next_id: AtomicUsize,
@@ -128,9 +114,10 @@ impl AuditLogger for SimpleAuditLogger {
 
     fn get_event(&self, id: EventID) -> Option<&dyn AuditEvent> {
         for event_option in &self.events {
-            if let Some(ref event) = *event_option {
-                if event.id() == id {
-                    return Some(event.as_ref());
+            if let Some(ref event) = event_option {
+                let event_ref: &dyn AuditEvent = &**event;
+                if event_ref.id() == id {
+                    return Some(event_ref);
                 }
             }
         }
@@ -140,9 +127,10 @@ impl AuditLogger for SimpleAuditLogger {
     fn query_events(&self, event_type: EventType, user_id: usize) -> Vec<EventID> {
         let mut ids = Vec::new();
         for event_option in &self.events {
-            if let Some(ref event) = *event_option {
-                if event.event_type() == event_type && event.user_id() == user_id {
-                    ids.push(event.id());
+            if let Some(ref event) = event_option {
+                let event_ref: &dyn AuditEvent = &**event;
+                if event_ref.event_type() == event_type && event_ref.user_id() == user_id {
+                    ids.push(event_ref.id());
                 }
             }
         }
@@ -153,7 +141,8 @@ impl AuditLogger for SimpleAuditLogger {
         let mut i = 0;
         while i < self.events.len() {
             if let Some(ref event) = self.events[i] {
-                if event.timestamp() < older_than {
+                let event_ref: &dyn AuditEvent = &**event;
+                if event_ref.timestamp() < older_than {
                     self.events.remove(i);
                 } else {
                     i += 1;
@@ -167,10 +156,11 @@ impl AuditLogger for SimpleAuditLogger {
 }
 
 pub trait AuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> bool;
+    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError>;
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError>;
 }
 
+#[repr(C)]
 pub struct SimpleAuditPolicy {
     pub require_authentication: AtomicUsize,
 }
@@ -190,16 +180,16 @@ impl Default for SimpleAuditPolicy {
 }
 
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
         if self.require_authentication.load(Ordering::SeqCst) == 1 {
-            event.event_type() == EventType::Authentication
+            Ok(event.event_type() == EventType::Authentication)
         } else {
-            true
+            Ok(true)
         }
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event) {
+        if self.check_compliance(event).unwrap_or(false) {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)
