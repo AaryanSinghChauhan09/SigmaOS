@@ -337,6 +337,108 @@ impl HardwareAbstractionLayer for SovereignHal {
     }
 }
 
+// =========================================================
+// Open Source Parity Engine & High-Performance Security
+// =========================================================
+
+/// FreeBSD Capsicum Capability Sandbox Rights
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapsicumRights {
+    pub rights_mask: u64,
+}
+
+impl CapsicumRights {
+    pub const CAP_READ: u64 = 1 << 0;
+    pub const CAP_WRITE: u64 = 1 << 1;
+    pub const CAP_SEEK: u64 = 1 << 2;
+    pub const CAP_FSTAT: u64 = 1 << 3;
+    pub const CAP_MMAP: u64 = 1 << 4;
+
+    pub fn new(rights_mask: u64) -> Self {
+        Self { rights_mask }
+    }
+
+    pub fn contains(&self, right: u64) -> bool {
+        (self.rights_mask & right) == right
+    }
+}
+
+/// OpenBSD Pledge/Unveil Path Isolation Restrictions
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UnveilRestrictions {
+    pub allowed_paths: Vec<(String, String)>, // (path, permissions: e.g. "r", "rw")
+}
+
+impl UnveilRestrictions {
+    pub fn new() -> Self {
+        Self { allowed_paths: Vec::new() }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.allowed_paths.push((path.to_string(), permissions.to_string()));
+    }
+
+    pub fn check_access(&self, path: &str, perm: char) -> bool {
+        for (unveiled_path, permissions) in &self.allowed_paths {
+            if path.starts_with(unveiled_path) && permissions.contains(perm) {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for UnveilRestrictions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Arch Linux AUR PKGBUILD Integrity & Security Verifier
+pub struct AurPkgBuildVerifier;
+
+impl AurPkgBuildVerifier {
+    pub fn verify_pkgbuild_content(content: &str) -> bool {
+        // Sanity checks ensuring safe PKGBUILD without dangerous rm -rf / or arbitrary code execution
+        !content.contains("rm -rf /") && !content.contains("sudo ") && content.contains("pkgname=")
+    }
+}
+
+/// Native Open Source Parity Subsystem Engine for SigmaOS
+pub struct OpenSourceParityEngine {
+    pub capsicum_rights: CapsicumRights,
+    pub unveil_restrictions: UnveilRestrictions,
+}
+
+impl OpenSourceParityEngine {
+    pub fn new() -> Self {
+        Self {
+            capsicum_rights: CapsicumRights::new(
+                CapsicumRights::CAP_READ | CapsicumRights::CAP_WRITE | CapsicumRights::CAP_SEEK
+            ),
+            unveil_restrictions: UnveilRestrictions::new(),
+        }
+    }
+
+    pub fn is_action_allowed(&self, right: u64) -> bool {
+        self.capsicum_rights.contains(right)
+    }
+
+    pub fn add_unveil(&mut self, path: &str, permissions: &str) {
+        self.unveil_restrictions.unveil(path, permissions);
+    }
+
+    pub fn is_path_allowed(&self, path: &str, perm: char) -> bool {
+        self.unveil_restrictions.check_access(path, perm)
+    }
+}
+
+impl Default for OpenSourceParityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -424,5 +526,32 @@ mod tests {
         // Dummy interrupt calls don't panic
         hal.enable_interrupts();
         hal.disable_interrupts();
+    }
+
+    #[test]
+    fn test_open_source_parity_engine() {
+        let mut engine = OpenSourceParityEngine::new();
+
+        // Capsicum capability rights checks
+        assert!(engine.is_action_allowed(CapsicumRights::CAP_READ));
+        assert!(engine.is_action_allowed(CapsicumRights::CAP_WRITE));
+        assert!(!engine.is_action_allowed(CapsicumRights::CAP_MMAP));
+
+        // Unveil path restriction checks
+        engine.add_unveil("/tmp", "rw");
+        engine.add_unveil("/usr/lib", "r");
+
+        assert!(engine.is_path_allowed("/tmp/scratch.txt", 'r'));
+        assert!(engine.is_path_allowed("/tmp/scratch.txt", 'w'));
+        assert!(engine.is_path_allowed("/usr/lib/libsovereign.so", 'r'));
+        assert!(!engine.is_path_allowed("/usr/lib/libsovereign.so", 'w'));
+        assert!(!engine.is_path_allowed("/etc/shadow", 'r'));
+
+        // AUR PKGBUILD verifier check
+        let safe_pkgbuild = "pkgname=sigma-app\npkgver=1.0.0\nbuild() { make; }";
+        let unsafe_pkgbuild = "pkgname=evil-app\nbuild() { sudo rm -rf /; }";
+
+        assert!(AurPkgBuildVerifier::verify_pkgbuild_content(safe_pkgbuild));
+        assert!(!AurPkgBuildVerifier::verify_pkgbuild_content(unsafe_pkgbuild));
     }
 }

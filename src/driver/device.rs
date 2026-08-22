@@ -1475,12 +1475,6 @@ impl Default for IoManager {
     }
 }
 
-/// Unified representation of communication channels (OOP Abstraction)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortAddress {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
-}
 
 #[cfg(test)]
 #[no_mangle]
