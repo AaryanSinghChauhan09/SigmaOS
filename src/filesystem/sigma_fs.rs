@@ -681,5 +681,3 @@ mod tests {
         assert!(!encryptor.pqc_verify_signature(b"Sovereign data at rest modified", &sig));
     }
 }
-// SigmaOS Composable Filesystem (SigmaFS++)
-// Deploys plugin-based storage, deduplication, semantic indexers, and blockchain audit logs

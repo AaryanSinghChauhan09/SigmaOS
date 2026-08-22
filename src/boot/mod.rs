@@ -10,6 +10,5 @@ pub mod uefi;
 pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
 pub use uefi::{
-    BootError, BootPhase, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
-    UEFIBootloader, UefiBootServices, UefiMemoryDescriptor, UefiSystemTable,
+    SimpleSecureBoot, SimpleUEFIBootloader,
 };

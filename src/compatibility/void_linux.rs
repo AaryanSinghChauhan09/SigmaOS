@@ -297,6 +297,7 @@ pub enum RunitSignal {
     Kill,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RunitService {
     pub name: String,
     pub state: RunitServiceState,

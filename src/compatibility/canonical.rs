@@ -246,58 +246,6 @@ pub enum DesktopMode {
     TouchTabletMode,
 }
 
-pub struct DesktopModeSwitcher {
-    pub active_mode: DesktopMode,
-    pub compositor_animations_enabled: bool,
-    pub active_layout: ZorinLayoutPreset,
-    pub panel_height_pixels: u32,
-    pub app_launcher_columns: u32,
-    pub taskbar_docked: bool,
-}
-
-impl DesktopModeSwitcher {
-    pub fn new() -> Self {
-        Self {
-            active_mode: DesktopMode::ClassicDE,
-            compositor_animations_enabled: true,
-            active_layout: ZorinLayoutPreset::WindowsClassic,
-            panel_height_pixels: 40,
-            app_launcher_columns: 2,
-            taskbar_docked: true,
-        }
-    }
-
-    pub fn switch_mode(&mut self, mode: DesktopMode) {
-        self.active_mode = mode;
-        if mode == DesktopMode::TouchTabletMode {
-            self.compositor_animations_enabled = false; // Disable complex animations to save power
-        } else {
-            self.compositor_animations_enabled = true;
-        }
-        println!("[compositor] Switching active appearance layout context to: {:?}.", mode);
-    }
-
-    pub fn switch_layout_preset(&mut self, preset: ZorinLayoutPreset) {
-        self.active_layout = preset;
-        match preset {
-            ZorinLayoutPreset::WindowsClassic => {
-                self.panel_height_pixels = 40;
-                self.app_launcher_columns = 2;
-                self.taskbar_docked = true;
-            }
-            ZorinLayoutPreset::MacOsLike => {
-                self.panel_height_pixels = 64;
-                self.app_launcher_columns = 1; // single linear app dock
-                self.taskbar_docked = false;
-            }
-            ZorinLayoutPreset::GnomeDefault => {
-                self.panel_height_pixels = 32;
-                self.app_launcher_columns = 4;
-                self.taskbar_docked = true;
-            }
-        }
-    }
-}
 
 // ==========================================
 // 7. AI Resource Scheduler (iOS / Windows kernel style)
@@ -647,33 +595,9 @@ impl CloudOrchestrator {
         self.active_containers.push(container);
         Ok(id)
     }
-
-    #[test]
-    fn test_sigma_livepatch() {
-        let mut patcher = SigmaLivepatch::new();
-        let patch = SigmaLivepatchPatch {
-            target_symbol: "sys_read".to_string(),
-            old_function_address: 0xffffffff8122c400,
-            new_function_address: 0xffffffffc0300100,
-            checksum: "livepatch-sha256-abcde".to_string(),
-        };
-
-        assert!(patcher.register_patch(patch).is_ok());
-        assert_eq!(patcher.redirect_call("sys_read").unwrap(), 0xffffffffc0300100);
-        assert!(patcher.redirect_call("sys_write").is_none());
-        assert_eq!(patcher.redirection_log.len(), 1);
-
-        let invalid_patch = SigmaLivepatchPatch {
-            target_symbol: "sys_write".to_string(),
-            old_function_address: 0,
-            new_function_address: 0,
-            checksum: "invalid-checksum".to_string(),
-        };
-        assert!(patcher.register_patch(invalid_patch).is_err());
-    }
 }
 // SigmaOS Canonical Clean-Room Absorption Daemons
-// Independent, zero-dependency reimplementations of Ubuntu's core tooling
+// Independent, zero-dependency reimplementations of Ubuntu's and derived distros' (Bodhi Linux, Zorin OS, antiX, EndeavourOS) core tooling
 
 use std::collections::HashMap;
 
@@ -809,36 +733,58 @@ impl SigmaCurtin {
     }
 }
 
-pub struct SigmaLivepatchPatch {
-    pub target_symbol: String,
-    pub old_function_address: usize,
-    pub new_function_address: usize,
-    pub checksum: String,
+// =========================================================================
+// 1. SigmaEcosystemShell (Moksha Desktop Parity - shelves, gadgets, edge flips)
+// =========================================================================
+
+pub struct SigmaEcosystemShell {
+    pub shelves_count: usize,
+    pub active_gadgets: Vec<String>,
+    pub edge_flip_enabled: bool,
 }
 
-pub struct SigmaLivepatch {
-    pub active_patches: HashMap<String, SigmaLivepatchPatch>,
-    pub redirection_log: Vec<String>,
-}
-
-impl SigmaLivepatch {
+impl SigmaEcosystemShell {
     pub fn new() -> Self {
-        SigmaLivepatch {
-            active_patches: HashMap::new(),
-            redirection_log: Vec::new(),
+        SigmaEcosystemShell {
+            shelves_count: 1, // Default main shelf
+            active_gadgets: Vec::new(),
+            edge_flip_enabled: true,
         }
     }
 
-    pub fn register_patch(&mut self, patch: SigmaLivepatchPatch) -> Result<(), &'static str> {
-        if patch.old_function_address == 0 || patch.new_function_address == 0 {
-            return Err("Invalid memory address offset");
+    pub fn register_shelf(&mut self) -> usize {
+        self.shelves_count += 1;
+        self.shelves_count
+    }
+
+    pub fn load_gadget(&mut self, gadget: &str) {
+        self.active_gadgets.push(gadget.to_string());
+    }
+
+    pub fn trigger_screen_edge_flip(&self, cursor_x: i32, screen_width: i32) -> bool {
+        if !self.edge_flip_enabled {
+            return false;
         }
-        self.redirection_log.push(format!(
-            "LIVEPATCH: Redirecting calls of '{}' (0x{:x}) to patched body (0x{:x}). Checksum={}.",
-            patch.target_symbol, patch.old_function_address, patch.new_function_address, patch.checksum
-        ));
-        self.active_patches.insert(patch.target_symbol.clone(), patch);
-        Ok(())
+        // Flip to next desktop if cursor touches horizontal boundaries
+        cursor_x <= 0 || cursor_x >= screen_width - 1
+    }
+}
+
+// =========================================================================
+// 2. SigmaAppPackResolver (Bodhi AppPack resolver parity)
+// =========================================================================
+
+pub struct SigmaAppPackResolver {
+    pub resolved_apps: Vec<String>,
+    pub metadata_cache_loaded: bool,
+}
+
+impl SigmaAppPackResolver {
+    pub fn new() -> Self {
+        SigmaAppPackResolver {
+            resolved_apps: Vec::new(),
+            metadata_cache_loaded: false,
+        }
     }
 
     pub fn load_apppack_bundle_manifest(&mut self, manifest: &str) -> Result<usize, String> {
@@ -954,6 +900,60 @@ pub enum ZorinLayoutPreset {
     WindowsClassic,
     MacOsLike,
     GnomeDefault,
+}
+
+pub struct ZorinAppearanceSwitcher {
+    pub active_mode: DesktopMode,
+    pub compositor_animations_enabled: bool,
+    pub active_layout: ZorinLayoutPreset,
+    pub panel_height_pixels: u32,
+    pub app_launcher_columns: u32,
+    pub taskbar_docked: bool,
+}
+
+impl ZorinAppearanceSwitcher {
+    pub fn new() -> Self {
+        ZorinAppearanceSwitcher {
+            active_mode: DesktopMode::ClassicDE,
+            compositor_animations_enabled: true,
+            active_layout: ZorinLayoutPreset::WindowsClassic,
+            panel_height_pixels: 40,
+            app_launcher_columns: 2,
+            taskbar_docked: true,
+        }
+    }
+
+    pub fn switch_mode(&mut self, mode: DesktopMode) {
+        self.active_mode = mode;
+        if mode == DesktopMode::TouchTabletMode {
+            self.compositor_animations_enabled = false; // Disable complex animations to save power
+        } else {
+            self.compositor_animations_enabled = true;
+        }
+        println!("[compositor] Switching active appearance layout context to: {:?}.", mode);
+    }
+
+    /// CCleaner & BleachBit parity: scans and purges bloated/temporary file caches
+    pub fn switch_layout_preset(&mut self, preset: ZorinLayoutPreset) {
+        self.active_layout = preset;
+        match preset {
+            ZorinLayoutPreset::WindowsClassic => {
+                self.panel_height_pixels = 40;
+                self.app_launcher_columns = 2;
+                self.taskbar_docked = true;
+            }
+            ZorinLayoutPreset::MacOsLike => {
+                self.panel_height_pixels = 64;
+                self.app_launcher_columns = 1; // single linear app dock
+                self.taskbar_docked = false;
+            }
+            ZorinLayoutPreset::GnomeDefault => {
+                self.panel_height_pixels = 32;
+                self.app_launcher_columns = 4;
+                self.taskbar_docked = true;
+            }
+        }
+    }
 }
 
 // =========================================================================
@@ -1217,6 +1217,31 @@ impl SigmaOnboardingLog {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sigma_livepatch() {
+        let mut patcher = SigmaLivepatch::new();
+        let patch = SigmaLivepatchPatch {
+            target_symbol: "sys_read".to_string(),
+            old_function_address: 0xffffffff8122c400,
+            new_function_address: 0xffffffffc0300100,
+            checksum: "livepatch-sha256-abcde".to_string(),
+        };
+
+        assert!(patcher.register_patch(patch).is_ok());
+        assert_eq!(patcher.redirect_call("sys_read").unwrap(), 0xffffffffc0300100);
+        assert!(patcher.redirect_call("sys_write").is_none());
+        assert_eq!(patcher.redirection_log.len(), 1);
+
+        let invalid_patch = SigmaLivepatchPatch {
+            target_symbol: "sys_write".to_string(),
+            old_function_address: 0,
+            new_function_address: 0,
+            checksum: "invalid-checksum".to_string(),
+        };
+        assert!(patcher.register_patch(invalid_patch).is_err());
+    }
 
     #[test]
     fn test_sigma_subiquity_installer() {
@@ -1241,26 +1266,145 @@ mod tests {
     }
 
     #[test]
-    fn test_sigma_livepatch() {
-        let mut patcher = SigmaLivepatch::new();
-        let patch = SigmaLivepatchPatch {
-            target_symbol: "sys_read".to_string(),
-            old_function_address: 0xffffffff8122c400,
-            new_function_address: 0xffffffffc0300100,
-            checksum: "livepatch-sha256-abcde".to_string(),
-        };
+    fn test_sigma_ecosystem_shell_desktop() {
+        let mut shell = SigmaEcosystemShell::new();
+        assert_eq!(shell.register_shelf(), 2);
 
-        assert!(patcher.register_patch(patch).is_ok());
-        assert_eq!(patcher.redirect_call("sys_read").unwrap(), 0xffffffffc0300100);
-        assert!(patcher.redirect_call("sys_write").is_none());
-        assert_eq!(patcher.redirection_log.len(), 1);
+        shell.load_gadget("cpu_monitor");
+        shell.load_gadget("battery_indicator");
+        assert_eq!(shell.active_gadgets.len(), 2);
 
-        let invalid_patch = SigmaLivepatchPatch {
-            target_symbol: "sys_write".to_string(),
-            old_function_address: 0,
-            new_function_address: 0,
-            checksum: "invalid-checksum".to_string(),
-        };
-        assert!(patcher.register_patch(invalid_patch).is_err());
+        assert!(shell.trigger_screen_edge_flip(0, 1920));
+        assert!(!shell.trigger_screen_edge_flip(500, 1920));
+    }
+
+    #[test]
+    fn test_sigma_apppack_resolver() {
+        let mut resolver = SigmaAppPackResolver::new();
+        let manifest = "apppack: true\n- midori\n- leafpad\n- pcmanfm\n";
+
+        let count = resolver.load_apppack_bundle_manifest(manifest).unwrap();
+        assert_eq!(count, 3);
+        assert_eq!(resolver.resolved_apps[0], "midori");
+    }
+
+    #[test]
+    fn test_sigma_quickstart_wizard() {
+        let mut wizard = SigmaQuickstartWizard::new();
+        assert_eq!(wizard.current_step, WizardStep::LanguageSelection);
+
+        wizard.select_language("es_ES");
+        wizard.select_theme("MokshaGreen");
+
+        assert_eq!(wizard.advance_step(), WizardStep::ThemeProfileSelection);
+        assert_eq!(wizard.selected_language, "es_ES");
+        assert_eq!(wizard.selected_theme, "MokshaGreen");
+    }
+
+    #[test]
+    fn test_sigma_live_remaster() {
+        let mut builder = SigmaLiveRemasterBuilder::new("sigma-remaster-v1");
+        assert!(builder.generate_bootable_rescue_iso().is_err());
+
+        builder.add_system_file_to_live_image("/etc/shadow", 2048);
+        builder.add_system_file_to_live_image("/bin/sh", 102400);
+
+        let iso_path = builder.generate_bootable_rescue_iso().unwrap();
+        assert_eq!(iso_path, "/var/lib/remaster/live-rescue-sigma-remaster-v1.iso");
+        assert!(builder.live_iso_generated);
+    }
+
+    #[test]
+    fn test_zorin_appearance_preset_switch() {
+        let mut zorin_app = ZorinAppearanceSwitcher::new();
+        assert_eq!(zorin_app.panel_height_pixels, 40);
+
+        zorin_app.switch_layout_preset(ZorinLayoutPreset::MacOsLike);
+        assert_eq!(zorin_app.panel_height_pixels, 64);
+        assert_eq!(zorin_app.app_launcher_columns, 1);
+        assert!(!zorin_app.taskbar_docked);
+    }
+
+    #[test]
+    fn test_zorin_connect_sync() {
+        let mut hub = ZorinConnectHub::new();
+        hub.pair_new_device("phone-abc", "Sovereign Mobile");
+
+        let notification_sent = hub.push_notification_to_all_devices("Alert", "Common Criteria Certification updated!");
+        assert_eq!(notification_sent, 1);
+
+        hub.sync_clipboard("Copied text from SigmaOS");
+        assert_eq!(hub.synchronized_clipboard, "Copied text from SigmaOS");
+    }
+
+    #[test]
+    fn test_zorin_windows_wine_support() {
+        let mut wine = ZorinWineLayer::new("~/.wine32");
+        assert!(wine.launch_windows_executable("notepad.exe").is_ok());
+        assert_eq!(wine.active_windows_processes[0], "notepad.exe");
+        assert!(wine.launch_windows_executable("installer.msi").is_ok());
+        assert!(wine.launch_windows_executable("unsafe.txt").is_err());
+    }
+
+    #[test]
+    fn test_zorin_lite_compositor_optimizer() {
+        let mut opt = ZorinLiteOptimizer::new();
+        assert_eq!(opt.compositor_blur_radius, 12);
+        assert!(opt.window_shadows_enabled);
+
+        opt.enable_zorin_lite_profile(true);
+        assert_eq!(opt.compositor_blur_radius, 0);
+        assert!(!opt.window_shadows_enabled);
+        assert_eq!(opt.transition_duration_ms, 50);
+    }
+
+    #[test]
+    fn test_sigma_ecosystem_init() {
+        let mut init = SigmaEcosystemInit::new();
+        assert_eq!(init.active_runlevel, FhsRunlevel::SingleUser);
+
+        init.sequence_runlevel_transition(FhsRunlevel::Graphical);
+        assert_eq!(init.active_runlevel, FhsRunlevel::Graphical);
+        assert_eq!(init.running_services.len(), 5);
+        assert_eq!(init.running_services[4], "zenith_desktop");
+    }
+
+    #[test]
+    fn test_sigma_ecosystem_profiler() {
+        let mut prof = SigmaEcosystemProfiler::new();
+        assert_eq!(prof.max_texture_resolutions, 4096);
+
+        // Low memory check
+        prof.apply_legacy_preset_rules(128);
+        assert_eq!(prof.graphic_preset, GraphicPresetMode::JwmPreset);
+        assert_eq!(prof.max_texture_resolutions, 512);
+
+        // Mid memory check
+        prof.apply_legacy_preset_rules(512);
+        assert_eq!(prof.graphic_preset, GraphicPresetMode::FluxboxPreset);
+        assert_eq!(prof.max_texture_resolutions, 1024);
+    }
+
+    #[test]
+    fn test_sigma_onboarding_welcome() {
+        let mut welcome = SigmaOnboardingWelcome::new();
+        assert_eq!(welcome.current_slide_idx, 0);
+
+        let mut latencies = HashMap::new();
+        latencies.insert("https://mirror.us.sigmaos.org".to_string(), 120);
+        latencies.insert("https://mirror.de.sigmaos.org".to_string(), 45);
+
+        welcome.rank_package_mirrors(latencies);
+        assert_eq!(welcome.mirrors_ranked[0], "https://mirror.de.sigmaos.org");
+    }
+
+    #[test]
+    fn test_sigma_onboarding_log() {
+        let log_tool = SigmaOnboardingLog::new();
+        let raw_log = "Connection established.\nAuthorization details: password=admin1234_secret\nSending data...\n";
+
+        let sanitized = log_tool.sanitize_system_log(raw_log);
+        assert!(sanitized.contains("password= [REDACTED_FOR_SECURITY_COMPLIANCE]"));
+        assert!(!sanitized.contains("admin1234"));
     }
 }

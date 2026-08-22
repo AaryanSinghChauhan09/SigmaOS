@@ -20,8 +20,8 @@
 // OOP-based network traffic monitoring and analysis
 
 use crate::klib::collections::HashMap;
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::time::{Duration, Instant};
+use crate::klib::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use crate::klib::time::{Duration, Instant};
 
 /// Network security alert classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

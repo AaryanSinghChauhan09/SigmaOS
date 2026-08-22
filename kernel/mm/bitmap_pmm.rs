@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Kernel Physical Memory Bitmap Allocator, Self-Referential Page Tables, and Syscall Trampoline.
 
 #![allow(dead_code)]

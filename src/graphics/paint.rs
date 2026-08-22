@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 // SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)
 // Designed for high-performance raster image canvas and layer filtering
 
@@ -216,3 +215,5 @@ mod tests {
         assert_eq!(p.g, p.b);
     }
 }
+// SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)
+// Designed for high-performance raster image canvas and layer filtering

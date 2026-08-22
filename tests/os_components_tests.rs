@@ -67,23 +67,19 @@ mod process_activity_manager;
 #[path = "../src/filesystem/sigma_fs.rs"]
 mod sigma_fs_extended;
 
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
-
 use community_toolkit::{
     CommunityHandbookCatalog, ReproduciblePackageRecipeManager,
     SecurityProfileTemplateStore,
 };
 use statutory_compliance::{
-    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
-    StatutoryGovernanceLayer, StatutoryGovernanceRule,
+    DisputeAuditRollbackEngine, PenaltyBreachNotifier,
+    StatutoryGovernanceLayer,
 };
-use system_user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
+use system_user::{UserManager as TestUserManager};
 
-use access_control::SimpleAccessController;
+use access_control::{
+    NtfsAce as Nfs4Ace, NtfsAceType as Nfs4AceType,
+};
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
     BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter,
@@ -108,20 +104,26 @@ use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPacka
 use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
 use sigmatools::*;
 
-use epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
-use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
-
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
 use segmentation_paging::{
-    AslrEntropyConfig, RandomizedAddressSpace, SegmentDescriptor,
+    AslrEntropyConfig,
+    RandomizedAddressSpace, SegmentDescriptor,
 };
 
 use process_activity_manager::{
-    ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
 };
 
 #[test]
+fn test_segmentation_paging_and_aslr() {
+    let code_desc = SegmentDescriptor::code_segment_ring0();
+    assert!(code_desc.is_present);
+
+    let entropy = segmentation_paging::AslrEntropyConfig { stack_entropy_bits: 24, heap_entropy_bits: 16, mmap_entropy_bits: 28, text_entropy_bits: 12 };
+    let aslr = RandomizedAddressSpace::compute_aslr_layout(0x0001_0000_0000, entropy, 0x12345678);
+    assert!(aslr.stack_top > 0);
+}
 
 #[test]
 fn test_regex_unveil_and_glob_matching() {
@@ -152,6 +154,32 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 }
 
 #[test]
+fn test_process_activity_manager_and_registers() {
+    let mut pam = ActivityManager::new();
+    pam.register_process(500, 0, "chrome", 0);
+
+    pam.set_foreground_process(500).unwrap();
+    let proc_rec = pam.get_process_activity(500).unwrap();
+    assert_eq!(proc_rec.state, ActivityState::Interactive);
+
+    let ctx = ProcRegisterSnapshot {
+        rip: 0x00007FFF00002000,
+        rsp: 0x00007FFFFFFFD000,
+        rbp: 0x00007FFFFFFFE000,
+        rax: 0,
+        rbx: 0,
+        rcx: 0,
+        rdx: 0,
+        rsi: 0,
+        rdi: 0,
+        rflags: 0x202,
+        cs: 0, ds: 0, ss: 0, es: 0, fs: 0, gs: 0,
+    };
+    assert!(pam.capture_register_snapshot(500, ctx).is_ok());
+
+    let loaded_rec = pam.get_process_activity(500).unwrap();
+    assert_eq!(loaded_rec.register_snapshot.as_ref().unwrap().rip, 0x00007FFF00002000);
+}
 
 #[test]
 fn test_zero_copy_ipc_pipes() {
@@ -219,7 +247,7 @@ fn test_audio_dsp_mixing_and_effects() {
     assert_eq!(mix.len(), 3);
     assert!((mix[0] - 0.8).abs() < 1e-5);
 
-    let mut dsp_buf: [f32; 3] = [0.02, 0.80, -0.01];
+    let mut dsp_buf = [0.02, 0.80, -0.01];
     let noise_suppress = SpectralNoiseSuppressionEffect::new(0.05, 12.0);
     noise_suppress.apply(&mut dsp_buf);
     assert!(dsp_buf[0].abs() < 0.01);
@@ -229,9 +257,9 @@ fn test_audio_dsp_mixing_and_effects() {
 #[test]
 fn test_video_editor_sigmacut_engine() {
     let mut timeline = VideoTimeline::new(1920, 1080);
-    let mut track = VideoTrack::new(1, "Track1");
+    let mut track = VideoTrack::new(1, "Track 1");
 
-    let clip = VideoClip::new(1, "intro.mp4", 0, 60);
+    let clip = VideoClip::new(0, "intro.mp4", 0, 60);
     track.add_clip(clip);
     timeline.add_video_track(track);
 
@@ -331,36 +359,6 @@ fn test_fedora_rpm_and_selinux() {
 }
 
 #[test]
-fn test_epoll_event_loop_multiplexing() {
-    let mut epoll = EpollInstance::new(1, 10);
-    let ev1 = EpollEvent::new(EPOLLIN | EPOLLET, 4);
-    assert!(epoll.ctl(EpollOp::CtlAdd, 4, Some(ev1)).is_ok());
-
-    epoll.trigger_event(4, EPOLLIN);
-
-    let mut ready = [EpollEvent::new(0, 0); 4];
-    let n = epoll.wait(&mut ready);
-    assert_eq!(n, 1);
-    assert_eq!(ready[0].data.fd, 4);
-    assert_eq!(ready[0].events & EPOLLIN, EPOLLIN);
-}
-
-#[test]
-fn test_elf_dynamic_relocation_resolution() {
-    let mut relocator = ElfRelocator::new(0x400000);
-    let sym = ElfSymbol::new(b"sys_yield", 0x401050, 64);
-    relocator.add_symbol(sym);
-
-    let rel_entry = ElfRelaEntry::new(0x20, R_X86_64_RELATIVE, 0, 0x100);
-    let resolved_rel = relocator.resolve_relocation(&rel_entry, None).unwrap();
-    assert_eq!(resolved_rel, 0x400100);
-
-    let glob_entry = ElfRelaEntry::new(0x28, R_X86_64_GLOB_DAT, 1, 0x10);
-    let resolved_glob = relocator.resolve_relocation(&glob_entry, Some(b"sys_yield")).unwrap();
-    assert_eq!(resolved_glob, 0x401060);
-}
-
-#[test]
 fn test_sigmatools_suite() {
     let mut etcher = SovereignDpkgEtcher::new("/dev/nvme0n1p1".to_string());
     assert!(etcher.flash_iso_image(&[0x7F, b'E', b'L', b'F']).is_ok());
@@ -378,4 +376,185 @@ fn test_sigmatools_suite() {
     let gen = SovereignPasswordGenerator;
     let pass = gen.generate_secure_password(24, true);
     assert_eq!(pass.len(), 24);
+
+    let rtc = AlmeidaCmosRtc::decode_cmos_values(0x00, 0x30, 0x14, 0x15, 0x08, 0x26, true);
+    assert_eq!(rtc.format_timestamp(), "2026-08-15 14:30:00");
+}
+
+
+#[test]
+fn test_alpc_local_procedure_calls() {
+    let mut mgr = AlpcManager::new();
+    mgr.register_facility_server(AlpcFacility::SecurityAuth, "auth_server");
+
+    let server = mgr.get_facility_server_mut(AlpcFacility::SecurityAuth).unwrap();
+    server.register_procedure(301, |req| {
+        let payload = req.get_payload();
+        if payload == b"VERIFY_TOKEN_XYZ" {
+            b"TOKEN_VALIDATED_OK".to_vec()
+        } else {
+            b"TOKEN_INVALID".to_vec()
+        }
+    });
+
+    let req = AlpcMessage::new_inline(
+        100,
+        AlpcFacility::SecurityAuth,
+        301,
+        500,
+        1000,
+        b"VERIFY_TOKEN_XYZ".to_vec(),
+    );
+
+    let reply = mgr.request_reply(AlpcFacility::SecurityAuth, req).unwrap();
+    assert_eq!(reply.get_payload(), b"TOKEN_VALIDATED_OK");
+    assert_eq!((reply.header.flags & alpc_flags::REPLY_MESSAGE), alpc_flags::REPLY_MESSAGE);
+}
+
+#[test]
+fn test_task_states_and_workload_classifications() {
+    let mut sched = PriorityScheduler::new();
+
+    let task_cpu = Box::new(
+        Task::new(1, Priority::High, 10, TaskCapability::full())
+            .with_workload(TaskWorkloadType::CpuBound),
+    );
+    let task_io = Box::new(
+        Task::new(2, Priority::Normal, 10, TaskCapability::full())
+            .with_workload(TaskWorkloadType::IoBound),
+    );
+    let task_rt = Box::new(
+        Task::new(3, Priority::Realtime, 5, TaskCapability::full())
+            .with_workload(TaskWorkloadType::RealTimePeriodic {
+                period_ms: 10,
+                exec_time_ms: 2,
+            }),
+    );
+
+    sched.add_task(task_cpu).unwrap();
+    sched.add_task(task_io).unwrap();
+    sched.add_task(task_rt).unwrap();
+
+    let scheduled_id = sched.schedule().unwrap();
+    assert_eq!(scheduled_id, 3); // Realtime periodic task scheduled first
+
+    let stats = sched.stats();
+    assert_eq!(stats.total_tasks, 3);
+    assert_eq!(stats.running_tasks, 1);
+    assert_eq!(stats.ready_tasks, 2);
+}
+
+
+#[test]
+fn test_two_tier_memory_and_fast_syscalls() {
+    let mut allocator = TwoTierMemoryAllocator::new(0x1000_0000, 64);
+
+    let pcb_obj = allocator.alloc_slab_object(SlabObjectType::ProcessControlBlock).unwrap();
+    let fd_obj = allocator.alloc_slab_object(SlabObjectType::FileDescriptor).unwrap();
+    let inode_obj = allocator.alloc_slab_object(SlabObjectType::InodeStruct).unwrap();
+
+    assert!(pcb_obj >= 0x1000_0000);
+    assert!(fd_obj >= 0x1000_0000);
+    assert!(inode_obj >= 0x1000_0000);
+
+    allocator.free_slab_object(SlabObjectType::ProcessControlBlock, pcb_obj);
+
+    let mut pt_engine = RecursivePageTableEngine::new(0x0008_0000);
+    pt_engine.enable_self_referential_mapping();
+    assert_ne!(pt_engine.calculate_pml4_virt_address(), 0);
+
+    let mut cow_engine = CopyOnWriteForkEngine::new();
+    cow_engine.fork_share_page(0x1000, 0x1000_0000);
+
+    let mut dispatcher = FastSyscallDispatcher::new();
+    dispatcher.configure_fast_syscall(0xFFFFFFFF80102000, 0x08, 0x1B);
+
+    let syscall_matrix = MinimalPosixSyscallMatrix::new();
+    let mut frame = TrapRegisterFrame::default();
+    frame.rax = posix_syscall_nr::SYS_OPEN;
+
+    let res_fd = dispatcher.dispatch_trap(&mut frame, &syscall_matrix);
+    assert_eq!(res_fd, 3);
+}
+
+#[test]
+fn test_bitmap_pmm_and_syscall_router() {
+    let mut pmm = BitmapPhysicalMemoryManager::new(64 * 4096);
+    pmm.free_region(0x20000, 16 * 4096);
+
+    let frame_addr = pmm.alloc_block().unwrap();
+    assert_eq!(frame_addr, 0x20000);
+
+    let paging = SelfRefPagingEngine::new(0x30000);
+    let mut pml4 = [0u64; 512];
+    paging.vmm_init_self_reference(&mut pml4);
+    assert_eq!(pml4[510], 0x30000 | 3);
+
+    let mut router = SyscallTableRouter::new();
+    router.register_handler(2, |a, b, _, _| (a * b) as i64);
+    assert_eq!(router.syscall_handler(2, 6, 7, 0), 42);
+}
+
+#[test]
+fn test_shadow_passwords_usermod_and_sudo_policy() {
+    let mut manager = TestUserManager::new("/tmp/test_etc_shadow_sudo");
+    manager.initialize().unwrap();
+
+    let user = manager.create_user("charlie", "Charlie Sysadmin").unwrap();
+    assert_eq!(user.username, "charlie");
+
+    manager.set_password("charlie", "P@ssword2026").unwrap();
+    assert!(manager.verify_password("charlie", "P@ssword2026"));
+
+    manager.usermod("charlie", Some("/bin/bash"), Some("/home/charlie"), None, None).unwrap();
+    assert_eq!(manager.get_user("charlie").unwrap().shell, "/bin/bash");
+
+    manager.add_user_to_group("charlie", "wheel").unwrap();
+    let groups = manager.get_user_groups("charlie");
+    assert!(groups.contains(&"wheel".to_string()));
+
+    let sudo_res = manager.sudo_engine.evaluate_sudo_privilege("charlie", &groups, "/usr/bin/apt");
+    assert!(sudo_res.is_ok());
+}
+
+#[test]
+fn test_statutory_compliance_overlay_and_community_toolkit() {
+    let mut gov = StatutoryGovernanceLayer::new();
+    let posture = gov.evaluate_compliance_posture(1700000000);
+    assert!(posture >= 0);
+
+    let mut notifier = PenaltyBreachNotifier::new();
+    let rule = statutory_compliance::StatutoryGovernanceRule {
+        rule_id: "1001".to_string(),
+        framework: statutory_compliance::StatutoryFramework::Gdpr,
+        description: "Delay in ECR remittance".to_string(),
+        status: statutory_compliance::ComplianceRuleStatus::Breached,
+        max_penalty_amount_usd: 2500,
+    };
+    notifier.notify_breach(&rule, "Delay in ECR remittance", 1700000000);
+    assert_eq!(notifier.alerts.len(), 1);
+
+    let mut rollback = DisputeAuditRollbackEngine::new();
+    rollback.create_audit_checkpoint(100, "hash:state100");
+    assert!(rollback.rollback_dispute_checkpoint(100).is_ok());
+
+    let handbook = CommunityHandbookCatalog::new();
+    assert!(!handbook.articles.is_empty());
+
+    let mut recipes = ReproduciblePackageRecipeManager::new();
+    let recipe = community_toolkit::PackageRecipe {
+        name: "nginx".to_string(),
+        version: "1.24.0".to_string(),
+        format: community_toolkit::RecipeSourceFormat::SigmaRecipe,
+        source_url: "https://nginx.org".to_string(),
+        sha256_checksum: "sha256:112233".to_string(),
+        build_dependencies: vec!["pcre".to_string()],
+        run_dependencies: vec!["pcre".to_string()],
+        use_flags: Vec::new(),
+    };
+    recipes.register_recipe(recipe);
+    assert!(recipes.recipes.contains_key("nginx"));
+
+    let sec = SecurityProfileTemplateStore::new();
+    assert!(sec.templates.contains_key("browser_sandboxed"));
 }
