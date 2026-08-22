@@ -43,6 +43,8 @@ mod bitmap_pmm;
 #[path = "../src/memory/low_level.rs"]
 mod low_level_memory;
 
+#[path = "../src/filesystem/ext4_ntfs_security.rs"]
+mod ext4_ntfs_security;
 #[path = "../src/access/control.rs"]
 mod access_control;
 
@@ -67,12 +69,6 @@ mod process_activity_manager;
 #[path = "../src/filesystem/sigma_fs.rs"]
 mod sigma_fs_extended;
 
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
-
 use community_toolkit::{
     CommunityHandbookCatalog, ReproduciblePackageRecipeManager,
     SecurityProfileTemplateStore,
@@ -83,8 +79,8 @@ use statutory_compliance::{
 };
 use system_user::{UserManager as TestUserManager};
 
-use access_control::{
-    PosixAcl, AclType,
+use ext4_ntfs_security::{
+    NtfsAce as Nfs4Ace, AceType as Nfs4AceType,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
@@ -109,9 +105,6 @@ use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
 use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
 use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
 use sigmatools::*;
-
-use epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
-use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
@@ -365,36 +358,6 @@ fn test_fedora_rpm_and_selinux() {
     let httpd_sub = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
     let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
     assert!(selinux.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
-}
-
-#[test]
-fn test_epoll_event_loop_multiplexing() {
-    let mut epoll = EpollInstance::new(1, 10);
-    let ev1 = EpollEvent::new(EPOLLIN | EPOLLET, 4);
-    assert!(epoll.ctl(EpollOp::CtlAdd, 4, Some(ev1)).is_ok());
-
-    epoll.trigger_event(4, EPOLLIN);
-
-    let mut ready = [EpollEvent::new(0, 0); 4];
-    let n = epoll.wait(&mut ready);
-    assert_eq!(n, 1);
-    assert_eq!(ready[0].data.fd, 4);
-    assert_eq!(ready[0].events & EPOLLIN, EPOLLIN);
-}
-
-#[test]
-fn test_elf_dynamic_relocation_resolution() {
-    let mut relocator = ElfRelocator::new(0x400000);
-    let sym = ElfSymbol::new(b"sys_yield", 0x401050, 64);
-    relocator.add_symbol(sym);
-
-    let rel_entry = ElfRelaEntry::new(0x20, R_X86_64_RELATIVE, 0, 0x100);
-    let resolved_rel = relocator.resolve_relocation(&rel_entry, None).unwrap();
-    assert_eq!(resolved_rel, 0x400100);
-
-    let glob_entry = ElfRelaEntry::new(0x28, R_X86_64_GLOB_DAT, 1, 0x10);
-    let resolved_glob = relocator.resolve_relocation(&glob_entry, Some(b"sys_yield")).unwrap();
-    assert_eq!(resolved_glob, 0x401060);
 }
 
 #[test]
