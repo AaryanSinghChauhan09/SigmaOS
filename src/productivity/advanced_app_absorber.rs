@@ -2,8 +2,10 @@
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use std::collections::{HashMap, VecDeque};
-use std::path::{Path, PathBuf};
+use klib::collections::{BTreeMap, HashMap, VecDeque};
+use klib::path::PathBuf;
+use std::path::Path;
+use crate::klib::Uuid;
 
 // =========================================================================
 // 1. FLAMESHOT & SHAREX PARITY: ADVANCED SCREENSHOT ENGINE
@@ -22,7 +24,7 @@ pub enum AnnotationType {
 pub struct Annotation {
     pub r#type: AnnotationType,
     pub color: String,
-    pub coordinates: (u32, u32, u32, u32), // (x1, y1, x2, y2)
+    pub coordinates: (u32, u32, u32, u32),
     pub text: Option<String>,
 }
 
@@ -39,6 +41,12 @@ pub struct ShareXFlameshotEngine {
     pub target_cloud_destination: String,
 }
 
+impl Default for ShareXFlameshotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ShareXFlameshotEngine {
     pub fn new() -> Self {
         Self {
@@ -48,7 +56,6 @@ impl ShareXFlameshotEngine {
         }
     }
 
-    /// Capture with Flameshot-style annotation capabilities
     pub fn capture_with_annotations(&mut self, base_data: Vec<u8>) -> AdvancedScreenshot {
         let mut screenshot = AdvancedScreenshot {
             raw_data: base_data,
@@ -56,7 +63,6 @@ impl ShareXFlameshotEngine {
             cloud_url: None,
         };
 
-        // Add instant Flameshot-style blur annotation for privacy
         screenshot.annotations.push(Annotation {
             r#type: AnnotationType::Blur,
             color: "0x000000".to_string(),
@@ -64,9 +70,12 @@ impl ShareXFlameshotEngine {
             text: None,
         });
 
-        // Add ShareX-style auto upload if enabled
         if self.auto_upload_enabled {
-            screenshot.cloud_url = Some(format!("{}/capture_{}.png", self.target_cloud_destination, self.screenshot_history.len() + 1));
+            screenshot.cloud_url = Some(format!(
+                "{}/capture_{}.png",
+                self.target_cloud_destination,
+                Uuid::new_v4()
+            ));
         }
 
         self.screenshot_history.push_back(screenshot.clone());
@@ -86,16 +95,22 @@ pub struct Subtitle {
 }
 
 pub struct PotPlayerVlcEngine {
-    pub playback_speed: f32, // 0.25x to 4.0x
-    pub equalizer_presets: HashMap<String, Vec<f32>>, // Frequency gain settings
+    pub playback_speed: f32,
+    pub equalizer_presets: BTreeMap<String, Vec<f32>>,
     pub subtitle_delay_ms: i32,
     pub subtitles: Vec<Subtitle>,
     pub playlist: Vec<PathBuf>,
 }
 
+impl Default for PotPlayerVlcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PotPlayerVlcEngine {
     pub fn new() -> Self {
-        let mut eq = HashMap::new();
+        let mut eq = BTreeMap::new();
         eq.insert("BassBoost".to_string(), vec![6.0, 4.0, 2.0, 0.0, 0.0, 0.0]);
         eq.insert("VocalClear".to_string(), vec![0.0, 0.0, 2.0, 4.0, 4.0, 2.0]);
 
@@ -109,7 +124,7 @@ impl PotPlayerVlcEngine {
     }
 
     pub fn set_speed(&mut self, speed: f32) {
-        self.playback_speed = speed.max(0.25).min(4.0);
+        self.playback_speed = speed.clamp(0.25, 4.0);
     }
 
     pub fn add_to_playlist(&mut self, file: PathBuf) {
@@ -134,7 +149,13 @@ pub struct IndexedFile {
 }
 
 pub struct EverythingSearchEngine {
-    pub index: HashMap<String, Vec<IndexedFile>>, // Index by name for instantaneous lookup
+    pub index: HashMap<String, Vec<IndexedFile>>,
+}
+
+impl Default for EverythingSearchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl EverythingSearchEngine {
@@ -145,7 +166,6 @@ impl EverythingSearchEngine {
     }
 
     pub fn index_directory(&mut self, base_path: &Path) {
-        // Populates instant database mapping
         let file_record = IndexedFile {
             name: "kernel_signing_key.pem".to_string(),
             path: base_path.join("kernel_signing_key.pem"),
@@ -165,15 +185,21 @@ impl EverythingSearchEngine {
 // =========================================================================
 
 pub struct SevenZipCompressor {
-    pub compression_level: u8, // 1 to 9 (Ultra)
+    pub compression_level: u8,
     pub lzma_dictionary_size_mb: u32,
     pub encrypt_archive: bool,
+}
+
+impl Default for SevenZipCompressor {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SevenZipCompressor {
     pub fn new() -> Self {
         Self {
-            compression_level: 9, // Defaut to Ultra compression level
+            compression_level: 9,
             lzma_dictionary_size_mb: 64,
             encrypt_archive: true,
         }
@@ -181,11 +207,9 @@ impl SevenZipCompressor {
 
     pub fn compress_deterministic(&self, raw_input: &[u8], password: Option<&str>) -> Vec<u8> {
         let mut archive = Vec::from(raw_input);
-        // Prepend 7-Zip header
         archive.insert(0, 0x37);
         archive.insert(1, 0x7A);
         if self.encrypt_archive && password.is_some() {
-            // Simulated AES-256 wrapping
             archive.iter_mut().for_each(|b| *b ^= 0x5A);
         }
         archive
@@ -198,13 +222,19 @@ impl SevenZipCompressor {
 
 pub struct AppAudioSession {
     pub process_name: String,
-    pub volume: f32, // 0.0 to 1.0
+    pub volume: f32,
     pub output_device: String,
 }
 
 pub struct EarTrumpetAudioRouter {
     pub sessions: Vec<AppAudioSession>,
     pub system_default_output: String,
+}
+
+impl Default for EarTrumpetAudioRouter {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl EarTrumpetAudioRouter {
@@ -220,7 +250,7 @@ impl EarTrumpetAudioRouter {
 
     pub fn set_per_app_volume(&mut self, app: &str, volume: f32) {
         if let Some(session) = self.sessions.iter_mut().find(|s| s.process_name == app) {
-            session.volume = volume.max(0.0).min(1.0);
+            session.volume = volume.clamp(0.0, 1.0);
         }
     }
 
@@ -254,6 +284,12 @@ pub struct BraveBrowserEngine {
     pub adblock_definitions: Vec<String>,
 }
 
+impl Default for BraveBrowserEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BraveBrowserEngine {
     pub fn new() -> Self {
         Self {
@@ -273,7 +309,7 @@ impl BraveBrowserEngine {
         self.tabs.push(SandboxedTab {
             id: tab_id,
             url: url.to_string(),
-            memory_limit_mb: 512, // Strict sandboxed container size
+            memory_limit_mb: 512,
         });
         tab_id
     }
@@ -281,7 +317,7 @@ impl BraveBrowserEngine {
     pub fn should_block_request(&self, request_url: &str) -> bool {
         if self.shields.block_ads {
             for pattern in &self.adblock_definitions {
-                if request_url.contains(pattern.trim_start_matches("||").trim_end_matches("^")) {
+                if request_url.contains(pattern.trim_start_matches("||").trim_end_matches('^')) {
                     return true;
                 }
             }
@@ -331,16 +367,22 @@ impl AudacityEditor {
 // =========================================================================
 
 pub struct NotepadPlusWorkspace {
-    pub tabs: Vec<(String, String)>, // (File name, content)
-    pub macros: HashMap<String, Vec<String>>, // Recorded keyboard macro sequences
+    pub tabs: Vec<(String, String)>,
+    pub macros: BTreeMap<String, Vec<String>>,
     pub active_tab_index: usize,
+}
+
+impl Default for NotepadPlusWorkspace {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl NotepadPlusWorkspace {
     pub fn new() -> Self {
         Self {
             tabs: vec![("untitled.txt".to_string(), "".to_string())],
-            macros: HashMap::new(),
+            macros: BTreeMap::new(),
             active_tab_index: 0,
         }
     }
@@ -352,7 +394,6 @@ impl NotepadPlusWorkspace {
 
     pub fn search_and_replace_regex(&mut self, index: usize, find: &str, replace: &str) {
         if let Some((_, content)) = self.tabs.get_mut(index) {
-            // Simple replace-all shim
             *content = content.replace(find, replace);
         }
     }
@@ -370,15 +411,27 @@ pub struct OneCommanderPane {
 pub struct OneCommanderDualPane {
     pub left_pane: OneCommanderPane,
     pub right_pane: OneCommanderPane,
-    pub tags_colors: HashMap<PathBuf, String>, // Color-coded system file tagging
+    pub tags_colors: BTreeMap<PathBuf, String>,
+}
+
+impl Default for OneCommanderDualPane {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl OneCommanderDualPane {
     pub fn new() -> Self {
         Self {
-            left_pane: OneCommanderPane { current_directory: PathBuf::from("/"), selected_files: Vec::new() },
-            right_pane: OneCommanderPane { current_directory: PathBuf::from("/home"), selected_files: Vec::new() },
-            tags_colors: HashMap::new(),
+            left_pane: OneCommanderPane {
+                current_directory: PathBuf::from("/"),
+                selected_files: Vec::new(),
+            },
+            right_pane: OneCommanderPane {
+                current_directory: PathBuf::from("/home"),
+                selected_files: Vec::new(),
+            },
+            tags_colors: BTreeMap::new(),
         }
     }
 
@@ -404,6 +457,12 @@ pub struct ObsStudioMixer {
     pub record_format: String,
 }
 
+impl Default for ObsStudioMixer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ObsStudioMixer {
     pub fn new() -> Self {
         Self {
@@ -411,8 +470,8 @@ impl ObsStudioMixer {
                 MediaSource { name: "Desktop Video Capture".to_string(), volume_db: 0.0, enabled: true },
                 EarTrumpetAudioRouter::new().sessions.first().map(|s| MediaSource { name: s.process_name.clone(), volume_db: -3.0, enabled: true }).unwrap_or(MediaSource { name: "System Mic".to_string(), volume_db: -6.0, enabled: true }),
             ],
-            stream_bitrate: 6000, // 6000 kbps (1080p60 target)
-            record_format: "mkv".to_string(), // Robust crash-resistant format
+            stream_bitrate: 6000,
+            record_format: "mkv".to_string(),
         }
     }
 
@@ -429,58 +488,48 @@ mod tests {
 
     #[test]
     fn test_all_absorbed_app_mechanisms() {
-        // Flameshot & ShareX annotation + auto upload verification
         let mut flameshot = ShareXFlameshotEngine::new();
         let shot = flameshot.capture_with_annotations(vec![1, 2, 3]);
         assert_eq!(shot.annotations.len(), 1);
         assert!(shot.cloud_url.is_some());
 
-        // PotPlayer & VLC sync speed verification
         let mut player = PotPlayerVlcEngine::new();
         player.set_speed(1.5);
         assert_eq!(player.playback_speed, 1.5);
 
-        // Everything engine instant index search verification
         let mut indexer = EverythingSearchEngine::new();
         indexer.index_directory(Path::new("/usr/bin"));
         let results = indexer.query_everything("kernel_signing_key.pem");
         assert_eq!(results.len(), 1);
 
-        // 7-Zip secure high-compression header verification
         let compressor = SevenZipCompressor::new();
         let archived = compressor.compress_deterministic(&[1, 2, 3, 4], Some("master-password"));
         assert_eq!(archived[0], 0x37 ^ 0x5A);
         assert_eq!(archived[1], 0x7A ^ 0x5A);
 
-        // EarTrumpet volume routing validation
         let mut router = EarTrumpetAudioRouter::new();
         router.set_per_app_volume("Brave.exe", 0.35);
         assert!((router.sessions[0].volume - 0.35).abs() < 1e-5);
 
-        // Brave Shield filtering adblocker request checking
         let brave = BraveBrowserEngine::new();
         assert!(brave.should_block_request("https://doubleclick.net/ad.js"));
         assert!(!brave.should_block_request("https://sigmaos.org/index.html"));
 
-        // Audacity waveform fade in editing math
         let mut audacity = AudacityEditor::new(44100);
         audacity.audio_track.samples = vec![1.0; 100];
         audacity.apply_fade_in(50);
         assert_eq!(audacity.audio_track.samples[0], 0.0);
         assert!((audacity.audio_track.samples[25] - 0.5).abs() < 1e-2);
 
-        // Notepad++ Tab search editing verification
         let mut npp = NotepadPlusWorkspace::new();
         npp.open_file("settings.conf", "theme=dark\nfont=Consolas");
         npp.search_and_replace_regex(1, "theme=dark", "theme=light");
         assert!(npp.tabs[1].1.contains("theme=light"));
 
-        // OneCommander visual color tags labeling
         let mut explorer = OneCommanderDualPane::new();
         explorer.tag_file_with_color(PathBuf::from("/etc/fstab"), "Red");
         assert_eq!(explorer.tags_colors.get(&PathBuf::from("/etc/fstab")), Some(&"Red".to_string()));
 
-        // OBS Studio video/audio channel mixer test
         let mut obs = ObsStudioMixer::new();
         obs.set_source_volume("Desktop Video Capture", -2.0);
         assert_eq!(obs.sources[0].volume_db, -2.0);

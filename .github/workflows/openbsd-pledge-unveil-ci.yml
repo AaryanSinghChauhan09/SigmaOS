@@ -1,5 +1,8 @@
 name: OpenBSD pledge & unveil Kernel Security Audit CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master, "feat/**" ]

@@ -380,11 +380,11 @@ mod tests {
 
         let node0 = NumaNode {
             node_id: 0,
-            processor_ids: vec![0, 1],
+            processor_ids: std::vec![0, 1],
         };
         let node1 = NumaNode {
             node_id: 1,
-            processor_ids: vec![2, 3],
+            processor_ids: std::vec![2, 3],
         };
         scheduler.numa_nodes.push(node0);
         scheduler.numa_nodes.push(node1);

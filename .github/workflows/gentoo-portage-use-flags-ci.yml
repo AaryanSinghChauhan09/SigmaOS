@@ -1,5 +1,8 @@
 name: Gentoo Linux Portage & USE Flags Compilation Matrix CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master, "feat/**" ]
