@@ -5300,9 +5300,129 @@ impl AurDependencySolver {
     }
 }
 
+// =========================================================================
+// 39. ADDITIONAL LINUX & BSD DISTRO PARITY INSPIRATIONS
+// =========================================================================
+
+pub struct AlpineApkPackageIndex {
+    pub package_entries: Vec<(String, String, u64)>, // (name, sha256_checksum, size_bytes)
+}
+
+impl AlpineApkPackageIndex {
+    pub fn new() -> Self {
+        Self {
+            package_entries: Vec::new(),
+        }
+    }
+
+    pub fn register_package(&mut self, name: &str, checksum: &str, size: u64) {
+        self.package_entries.push((name.to_string(), checksum.to_string(), size));
+    }
+
+    pub fn find_package(&self, name: &str) -> Option<&(String, String, u64)> {
+        self.package_entries.iter().find(|(n, _, _)| n == name)
+    }
+
+    pub fn verify_checksum(&self, name: &str, expected_checksum: &str) -> bool {
+        if let Some((_, checksum, _)) = self.find_package(name) {
+            checksum == expected_checksum
+        } else {
+            false
+        }
+    }
+}
+
+pub struct DragonFlyHammer2FsSnapshot {
+    pub pfs_snapshots: Vec<(u32, String, u64)>, // (snapshot_id, pfs_name, timestamp)
+    pub active_pfs_id: u32,
+}
+
+impl DragonFlyHammer2FsSnapshot {
+    pub fn new(root_pfs_name: &str) -> Self {
+        let mut snap = Self {
+            pfs_snapshots: Vec::new(),
+            active_pfs_id: 1,
+        };
+        snap.pfs_snapshots.push((1, root_pfs_name.to_string(), 1000));
+        snap
+    }
+
+    pub fn create_pfs_snapshot(&mut self, name: &str, timestamp: u64) -> u32 {
+        let next_id = (self.pfs_snapshots.len() + 1) as u32;
+        self.pfs_snapshots.push((next_id, name.to_string(), timestamp));
+        next_id
+    }
+
+    pub fn switch_active_pfs(&mut self, snapshot_id: u32) -> Result<&str, &'static str> {
+        if let Some((_, name, _)) = self.pfs_snapshots.iter().find(|(id, _, _)| *id == snapshot_id) {
+            self.active_pfs_id = snapshot_id;
+            Ok(name.as_str())
+        } else {
+            Err("Target HAMMER2 PFS snapshot not found")
+        }
+    }
+}
+
+pub struct NixOsDeclarativeConfigEngine {
+    pub key_value_store: HashMap<String, String>,
+    pub current_generation: u32,
+}
+
+impl NixOsDeclarativeConfigEngine {
+    pub fn new() -> Self {
+        Self {
+            key_value_store: HashMap::new(),
+            current_generation: 1,
+        }
+    }
+
+    pub fn set_config_option(&mut self, key: &str, val: &str) {
+        self.key_value_store.insert(key.to_string(), val.to_string());
+    }
+
+    pub fn get_config_option(&self, key: &str) -> Option<&str> {
+        self.key_value_store.get(&key.to_string()).map(|s| s.as_str())
+    }
+
+    pub fn rebuild_generation(&mut self) -> u32 {
+        self.current_generation += 1;
+        self.current_generation
+    }
+}
+
 #[cfg(test)]
 mod distro_parity_tests {
     use super::*;
+
+    #[test]
+    fn test_alpine_apk_package_index() {
+        let mut apk = AlpineApkPackageIndex::new();
+        apk.register_package("musl", "abc123sha256", 102400);
+        assert!(apk.verify_checksum("musl", "abc123sha256"));
+        assert!(!apk.verify_checksum("musl", "invalid_hash"));
+        assert!(!apk.verify_checksum("glibc", "abc123sha256"));
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_pfs_snapshots() {
+        let mut hammer = DragonFlyHammer2FsSnapshot::new("@ROOT");
+        let snap_id = hammer.create_pfs_snapshot("@ROOT_SNAP_2026", 2000);
+        assert_eq!(snap_id, 2);
+        assert_eq!(hammer.switch_active_pfs(2).unwrap(), "@ROOT_SNAP_2026");
+        assert_eq!(hammer.active_pfs_id, 2);
+        assert!(hammer.switch_active_pfs(99).is_err());
+    }
+
+    #[test]
+    fn test_nixos_declarative_config() {
+        let mut nix = NixOsDeclarativeConfigEngine::new();
+        nix.set_config_option("services.openssh.enable", "true");
+        assert_eq!(nix.get_config_option("services.openssh.enable"), Some("true"));
+        assert_eq!(nix.get_config_option("boot.loader.grub.enable"), None);
+
+        let gen = nix.rebuild_generation();
+        assert_eq!(gen, 2);
+    }
 
     #[test]
     fn test_gentoo_use_flags() {
