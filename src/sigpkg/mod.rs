@@ -3,26 +3,34 @@
 
 pub mod arch_compat;
 pub mod debian_defeater;
+pub mod importer;
+pub mod makepkg;
+pub mod nix_shell;
+pub mod portage;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
-pub mod verifier;
 pub mod universal_adapter;
-pub mod debian_crusher;
+pub mod verifier;
 
-pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
-    SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer,
-    SovereignTransactionManager, TransactionStatus,
+    SovereignDeltaGenerator, SovereignMirrorSelector,
+    SovereignSandboxEnforcer, SovereignTransactionManager, TransactionStatus,
 };
+pub use universal_adapter::{
+    AdapterError, ApkAdapter, DebAdapter, EbuildAdapter, NixAdapter, PacmanAdapter,
+    RpmAdapter, UniversalPackageManager,
+};
+pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use spec::{
-    AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
+    ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
-    NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
-    TxzPackageAdapter, XbpsPackageAdapter,
+    SimplePackage, SimplePackageManager,
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
@@ -31,17 +39,6 @@ pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
-};
-pub use universal_oop_system::{
-    IPackage, IPackageParser, PackageFormat, PackageMetadata,
-    PackageParserFactory, UniversalPackageManager,
-    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError, InstallError, HookError,
-};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -66,7 +63,6 @@ impl Version {
         }
     }
 
-    /// Parses version input safely with a zero-allocation, stateless next() token iterator over '.' separators
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
         let mut parts = version_str.split('.');
 
@@ -111,7 +107,6 @@ pub struct Package {
     pub licenses: Vec<String>,
     pub maintainers: Vec<String>,
     pub changelogs: Vec<String>,
-    pub source: String,
 }
 
 impl Package {
@@ -133,25 +128,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-            source: String::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }

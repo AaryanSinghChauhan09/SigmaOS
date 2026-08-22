@@ -163,14 +163,13 @@ impl MakepkgSandbox {
         };
         let version = Version::parse(&cleaned_ver).unwrap_or(Version::new(1, 0, 0));
 
-        let mut pkg = Package::new(
+        let pkg = Package::new(
             pkgname,
             version,
             pkgdesc,
             Vec::new(),
             String::new(),
         );
-        pkg.source = String::from("arch");
         Ok(pkg)
     }
 

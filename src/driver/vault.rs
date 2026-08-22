@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: MIT
 // SigmaOS Driver Archive Vault (DriverArchiveVault)
 // Encrypts driver binaries for cold storage to prevent unauthorized driver injection and tamper attacks
 
 use crate::klib::collections::HashMap;
-use crate::klib::{SigmaString, Vec};
+use crate::klib::custom_string::SigmaString;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct VaultEntry {

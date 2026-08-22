@@ -19,9 +19,12 @@
 // Content-Addressed Store for SigmaPkg
 // Stores packages by SHA3-256 hash for reproducibility
 
-use crate::klib::BTreeMap;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::String;
+use std::path::PathBuf;
 use crate::sigpkg::Package;
-use crate::klib::path::PathBuf;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
@@ -49,7 +52,7 @@ impl ContentAddressedStore {
     /// Add package to store
     pub fn add(&mut self, package: Package, data: &[u8]) -> Result<String, StoreError> {
         let hash = self.compute_hash(data);
-        let package_path = self.base_path.join(&format!("{}-{}", hash, package.name));
+        let package_path = self.base_path.join(format!("{}-{}", hash, package.name));
 
         let stored = StoredPackage {
             package: package.clone(),
@@ -64,8 +67,7 @@ impl ContentAddressedStore {
 
     /// Get package by name
     pub fn get(&self, name: &str) -> Option<&Package> {
-        let key = name.to_string();
-        self.packages.get(&key).map(|s| &s.package)
+        self.packages.get(name).map(|s| &s.package)
     }
 
     /// Get package by hash
@@ -78,9 +80,8 @@ impl ContentAddressedStore {
 
     /// Remove package from store
     pub fn remove(&mut self, name: &str) -> Result<(), StoreError> {
-        let key = name.to_string();
         self.packages
-            .remove(&key)
+            .remove(name)
             .ok_or(StoreError::PackageNotFound(name.to_string()))?;
         Ok(())
     }

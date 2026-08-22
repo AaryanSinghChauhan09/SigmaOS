@@ -658,17 +658,20 @@ impl NetworkDevice for WindowsNdisAdapter {
         Err(DeviceError::NotSupported)
     }
 
-    fn receive_packet(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    fn receive_packet(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
+    }
+
+    fn mac_address(&self) -> [u8; 6] {
+        self.mac_address
     }
 
     fn get_mac_address(&self) -> [u8; 6] {
         self.mac_address
     }
 
-    fn set_mac_address(&mut self, mac: [u8; 6]) -> Result<(), DeviceError> {
+    fn set_mac_address(&mut self, mac: [u8; 6]) {
         self.mac_address = mac;
-        Ok(())
     }
 }
 

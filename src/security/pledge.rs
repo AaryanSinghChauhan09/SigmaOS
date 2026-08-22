@@ -1,17 +1,8 @@
 // SigmaOS Pledge - Process Privilege Reduction Mechanism
 // Inspired by OpenBSD pledge but capability-based
 
-#[cfg(test)]
-#[path = "capability.rs"]
-pub mod capability;
-
-#[cfg(test)]
-use capability::{CapabilityGate, CapabilityToken, Permission};
-
-#[cfg(not(test))]
-use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
-
 extern crate alloc;
+use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -92,8 +83,6 @@ pub struct UnveilEntry {
 pub struct PledgeManager {
     /// Current pledge promise
     pledge: Option<PledgePromise>,
-    /// Pre-configured pledge promise for exec child process
-    exec_pledge: Option<PledgePromise>,
     /// Capability gate for validation
     gate: CapabilityGate,
     /// Unveiled paths for filesystem sandboxing
@@ -107,7 +96,6 @@ impl PledgeManager {
     pub fn new() -> Self {
         Self {
             pledge: None,
-            exec_pledge: None,
             gate: CapabilityGate::new(),
             unveiled_paths: Vec::new(),
             thread_sub_pledges: BTreeMap::new(),
@@ -187,20 +175,6 @@ impl PledgeManager {
         } else {
             false // Not in unveiled paths, block access!
         }
-    }
-
-    /// Pre-configures execpledge promise for process child execution
-    pub fn execpledge(&mut self, promise: PledgePromise) -> Result<(), PledgeError> {
-        if self.exec_pledge.is_some() {
-            return Err(PledgeError::AlreadyActive);
-        }
-        self.exec_pledge = Some(promise);
-        Ok(())
-    }
-
-    /// Retrieves active exec_pledge promise if configured
-    pub fn active_execpledge(&self) -> Option<&PledgePromise> {
-        self.exec_pledge.as_ref()
     }
 
     /// Set pledge promise for process
@@ -386,16 +360,5 @@ mod tests {
 
         // Prefix bypasses must be blocked
         assert!(!manager.validate_unveil_access("/var/www-secret", 'r'));
-    }
-
-    #[test]
-    fn test_execpledge_manager() {
-        let mut manager = PledgeManager::new();
-        assert!(manager.active_execpledge().is_none());
-
-        let exec_p = stdio();
-        assert!(manager.execpledge(exec_p).is_ok());
-        assert!(manager.active_execpledge().is_some());
-        assert!(manager.execpledge(stdio()).is_err()); // Already set
     }
 }

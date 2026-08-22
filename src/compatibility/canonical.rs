@@ -246,7 +246,7 @@ pub enum DesktopMode {
     TouchTabletMode,
 }
 
-pub struct ZorinAppearanceSwitcher {
+pub struct DesktopModeSwitcher {
     pub active_mode: DesktopMode,
     pub compositor_animations_enabled: bool,
     pub active_layout: ZorinLayoutPreset,
@@ -255,7 +255,7 @@ pub struct ZorinAppearanceSwitcher {
     pub taskbar_docked: bool,
 }
 
-impl ZorinAppearanceSwitcher {
+impl DesktopModeSwitcher {
     pub fn new() -> Self {
         Self {
             active_mode: DesktopMode::ClassicDE,

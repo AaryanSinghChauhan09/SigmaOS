@@ -1,16 +1,19 @@
-// SPDX-License-Identifier: MIT
 #![no_std]
+#![no_main]
 
 extern crate alloc;
-
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+use core::mem;
+/// OOP-based Remote Desktop for SigmaOS
+/// Based on Ideas-999-Structured: Cloud & Remote Item 956
+/// Implements remote desktop access
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SessionID = usize;
 
 #[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum SessionState {
     Disconnected = 0,
     Connecting = 1,
@@ -19,7 +22,7 @@ pub enum SessionState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum RemoteError {
     Success = 0,
     NotFound = 1,
@@ -30,7 +33,6 @@ pub trait RemoteSession {
     fn id(&self) -> SessionID;
     fn host(&self) -> &[u8];
     fn state(&self) -> SessionState;
-    fn set_state(&self, state: SessionState);
 }
 
 #[repr(C)]
@@ -59,23 +61,12 @@ impl RemoteSession for SimpleRemoteSession {
     fn id(&self) -> SessionID {
         self.id
     }
-
     fn host(&self) -> &[u8] {
         let len = self.host.iter().position(|&b| b == 0).unwrap_or(128);
         &self.host[..len]
     }
-
     fn state(&self) -> SessionState {
-        match self.state.load(Ordering::SeqCst) {
-            0 => SessionState::Disconnected,
-            1 => SessionState::Connecting,
-            2 => SessionState::Connected,
-            _ => SessionState::Error,
-        }
-    }
-
-    fn set_state(&self, state: SessionState) {
-        self.state.store(state as usize, Ordering::SeqCst);
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 }
 
@@ -87,6 +78,7 @@ pub trait RemoteDesktop {
     fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession>;
 }
 
+#[repr(C)]
 pub struct SimpleRemoteDesktop {
     pub sessions: Vec<Option<Box<dyn RemoteSession>>>,
     pub next_id: AtomicUsize,
@@ -101,12 +93,6 @@ impl SimpleRemoteDesktop {
     }
 }
 
-impl Default for SimpleRemoteDesktop {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl RemoteDesktop for SimpleRemoteDesktop {
     fn connect(&mut self, host: &[u8], _port: u16) -> Result<SessionID, RemoteError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
@@ -116,15 +102,12 @@ impl RemoteDesktop for SimpleRemoteDesktop {
     }
 
     fn disconnect(&mut self, id: SessionID) -> Result<(), RemoteError> {
-        for session_option in &mut self.sessions {
-            if let Some(ref mut session) = *session_option {
-                if session.id() == id {
-                    session.set_state(SessionState::Disconnected);
-                    return Ok(());
-                }
-            }
+        if let Some(pos) = self.sessions.iter().position(|s| s.as_ref().map_or(false, |sess| sess.id() == id)) {
+            self.sessions.remove(pos);
+            Ok(())
+        } else {
+            Err(RemoteError::NotFound)
         }
-        Err(RemoteError::NotFound)
     }
 
     fn send_input(&self, id: SessionID, _input: &[u8]) -> Result<(), RemoteError> {
@@ -178,12 +161,6 @@ impl SimpleScreenSharing {
     }
 }
 
-impl Default for SimpleScreenSharing {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ScreenSharing for SimpleScreenSharing {
     fn start_sharing(&mut self) -> Result<(), RemoteError> {
         self.sharing.store(1, Ordering::SeqCst);
@@ -199,3 +176,4 @@ impl ScreenSharing for SimpleScreenSharing {
         self.sharing.load(Ordering::SeqCst) == 1
     }
 }
+

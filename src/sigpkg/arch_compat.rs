@@ -1,50 +1,54 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
 use crate::klib::collections::HashMap;
-use crate::klib::{SigmaString, Vec};
+use crate::klib::custom_string::SigmaString;
 
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
-    pub major: u32,
-    pub minor: u32,
-    pub patch: u32,
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
 }
 
-#[cfg(test)]
 impl Version {
-    pub fn new(major: u32, minor: u32, patch: u32) -> Self {
+    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self { major, minor, patch }
     }
-    pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let parts: Vec<&str> = s.split('.').collect();
-        if parts.len() < 2 {
-            return Err("Invalid version string");
-        }
-        let major = parts[0].parse().unwrap_or(1);
-        let minor = parts[1].parse().unwrap_or(0);
-        let patch = if parts.len() > 2 { parts[2].parse().unwrap_or(0) } else { 0 };
-        Ok(Self { major, minor, patch })
+
+    pub fn parse(v_str: &str) -> Result<Self, &'static str> {
+        let clean_v = v_str.split('-').next().unwrap_or(v_str);
+        let mut parts = clean_v.split('.');
+        let major = parts.next().ok_or("err")?.parse::<u64>().unwrap_or(1);
+        let minor = parts.next().unwrap_or("0").parse::<u64>().unwrap_or(0);
+        let patch = parts.next().unwrap_or("0").parse::<u64>().unwrap_or(0);
+        Ok(Self::new(major, minor, patch))
     }
 }
 
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
+    Exact(Version),
+    GreaterThan(Version),
+    LessThan(Version),
+    GreaterOrEqual(Version),
+    LessOrEqual(Version),
     Any,
 }
 
-#[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: SigmaString,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct Package {
     pub name: SigmaString,
     pub version: Version,
@@ -53,7 +57,6 @@ pub struct Package {
     pub checksum: SigmaString,
 }
 
-#[cfg(test)]
 impl Package {
     pub fn new(
         name: SigmaString,
@@ -72,8 +75,6 @@ impl Package {
     }
 }
 
-use crate::klib::HashMap;
-
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
 pub struct AurRecipeCompiler {
@@ -87,7 +88,7 @@ impl AurRecipeCompiler {
         }
     }
 
-    /// Compiles a declarative Arch-style PKGBUILD text into a native S-PKG Package metadata
+    /// Compiles a declarative Arch-style PKGBUILD text into a native Package metadata
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
@@ -118,8 +119,7 @@ impl AurRecipeCompiler {
             return Err("PKGBUILD missing mandatory pkgname field");
         }
 
-        let parsed_ver =
-            Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
+        let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
             SigmaString::from(pkgname),
@@ -181,6 +181,11 @@ impl RollingSyncManager {
         updates.sort_by(|a, b| a.0.cmp(&b.0));
         updates
     }
+
+    /// Validates if all compile-time build dependencies for a Debian sbuild source package are satisfied
+    pub fn is_debian_sbuild_builddeps_satisfied(&self, pkg: &DebianSbuildPackage) -> bool {
+        pkg.build_depends.iter().all(|dep| self.installed_packages.contains_key(dep))
+    }
 }
 
 impl Default for RollingSyncManager {
@@ -202,7 +207,7 @@ impl PacmanDbAdapter {
         }
     }
 
-    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into S-PKG Package metadata
+    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into Package metadata
     pub fn import_legacy_pacman_package(
         &self,
         desc_content: &str,
@@ -227,10 +232,8 @@ impl PacmanDbAdapter {
             return Err("Legacy Pacman desc file missing NAME block");
         }
 
-        // Clean any release suffixes like -1 or -arch from version string
         let base_version = version.split('-').next().unwrap_or("1.0.0");
-        let parsed_ver =
-            Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
+        let parsed_ver = Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
             SigmaString::from(name),
@@ -308,8 +311,8 @@ impl AlpmHookManager {
         let mut triggered_cmds = Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
-                let pattern = hook.target_pattern.as_str().trim_end_matches('*');
-                if hook.target_pattern.as_str().is_empty() || changed_file.contains(pattern) {
+                let pattern = hook.target_pattern.trim_end_matches('*');
+                if hook.target_pattern.is_empty() || changed_file.contains(pattern) {
                     triggered_cmds.push(hook.exec_cmd.as_str().to_string());
                 }
             }
@@ -334,15 +337,15 @@ pub struct MkinitcpioBuilder {
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
-        let mut hooks = Vec::new();
-        hooks.push(SigmaString::from("base"));
-        hooks.push(SigmaString::from("udev"));
-        hooks.push(SigmaString::from("autodetect"));
-        hooks.push(SigmaString::from("modconf"));
-        hooks.push(SigmaString::from("block"));
-        hooks.push(SigmaString::from("filesystems"));
         Self {
-            hooks,
+            hooks: vec![
+                SigmaString::from("base"),
+                SigmaString::from("udev"),
+                SigmaString::from("autodetect"),
+                SigmaString::from("modconf"),
+                SigmaString::from("block"),
+                SigmaString::from("filesystems"),
+            ],
             compression: SigmaString::from("zstd"),
         }
     }
@@ -355,17 +358,13 @@ impl MkinitcpioBuilder {
     }
 
     pub fn build_initramfs_image(&self, kernel_version: &str) -> Vec<u8> {
-        let mut image_header = Vec::new();
-        let header_str = format!(
+        let mut image_header = SigmaString::from(format!(
             "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
             kernel_version, self.hooks, self.compression
-        );
-        for &b in header_str.as_bytes() {
-            image_header.push(b);
-        }
-        for &b in b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES" {
-            image_header.push(b);
-        }
+        ))
+        .into_bytes();
+
+        image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
         image_header
     }
 }
@@ -397,7 +396,6 @@ impl MakepkgBuilder {
     }
 
     pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
-        // Calculate mock SHA256 string
         let mut checksum = 0u64;
         for &b in source_data {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
@@ -412,17 +410,13 @@ impl MakepkgBuilder {
         }
 
         let archive_name = SigmaString::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
-        let mut archive_content = Vec::new();
-        let header_str = format!(
+        let mut archive_content = SigmaString::from(format!(
             "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
             self.pkgname, self.pkgver, self.arch
-        );
-        for &b in header_str.as_bytes() {
-            archive_content.push(b);
-        }
-        for &b in source_data {
-            archive_content.push(b);
-        }
+        ))
+        .into_bytes();
+
+        archive_content.extend_from_slice(source_data);
         Ok((archive_name, archive_content))
     }
 }
@@ -437,27 +431,18 @@ mod tests {
         sync.register_installed("gcc", Version::new(12, 2, 0));
         sync.register_installed("make", Version::new(4, 3, 0));
 
-        let mut bd1 = Vec::new();
-        bd1.push(SigmaString::from("gcc"));
-        bd1.push(SigmaString::from("make"));
-
         let source_pkg = DebianSbuildPackage {
             name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: bd1,
+            build_depends: vec![SigmaString::from("gcc"), SigmaString::from("make")],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
-        let mut bd2 = Vec::new();
-        bd2.push(SigmaString::from("gcc"));
-        bd2.push(SigmaString::from("make"));
-        bd2.push(SigmaString::from("libc-dev"));
-
         let source_pkg_missing = DebianSbuildPackage {
             name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: bd2,
+            build_depends: vec![SigmaString::from("gcc"), SigmaString::from("make"), SigmaString::from("libc-dev")],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }
@@ -484,9 +469,8 @@ mod tests {
         sync.register_installed("bash", Version::new(5, 1, 0));
         sync.register_installed("curl", Version::new(7, 85, 0));
 
-        // Remotes (Rolling upgrades)
-        sync.register_remote("bash", Version::new(5, 2, 0)); // Newer version
-        sync.register_remote("curl", Version::new(7, 85, 0)); // Equal version
+        sync.register_remote("bash", Version::new(5, 2, 0));
+        sync.register_remote("curl", Version::new(7, 85, 0));
 
         let pending = sync.list_pending_rolling_updates();
         assert_eq!(pending.len(), 1);
@@ -544,7 +528,7 @@ mod tests {
         builder.add_hook("lvm2");
 
         let img = builder.build_initramfs_image("6.5.0-arch1-1");
-        let header_str = String::from_utf8_lossy(img.as_slice());
+        let header_str = String::from_utf8_lossy(&img);
         assert!(header_str.contains("6.5.0-arch1-1"));
         assert!(header_str.contains("encrypt"));
         assert!(header_str.contains("lvm2"));

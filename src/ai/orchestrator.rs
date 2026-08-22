@@ -1,13 +1,12 @@
+// SPDX-License-Identifier: MIT
 // Local LLM Orchestrator for SigmaOS
 // Dynamically schedules models, checks device bounds, and prunes context windows.
 
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type AgentID = usize;
 
@@ -62,9 +61,7 @@ impl ModelResource {
     pub fn new(name: &[u8], memory_required_mb: usize, target: DeviceTarget) -> Self {
         let mut name_array = [0u8; 32];
         let len = name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
+        name_array[..len].copy_from_slice(&name[..len]);
         ModelResource {
             name: name_array,
             memory_required_mb,
@@ -116,71 +113,6 @@ impl AIAgent for SimpleAIAgent {
     }
 }
 
-pub trait AgentOrchestrator {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
-    fn dispatch_task(
-        &mut self,
-        task: &[u8],
-        agent_id: Option<AgentID>,
-    ) -> Result<Vec<u8>, AgentError>;
-    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
-    fn list_agents(&self) -> Vec<AgentID>;
-}
-
-pub struct SimpleAgentOrchestrator {
-    pub agents: Vec<Box<dyn AIAgent>>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleAgentOrchestrator {
-    pub fn new() -> Self {
-        SimpleAgentOrchestrator {
-            agents: Vec::new(),
-            next_id: AtomicUsize::new(1),
-        }
-    }
-}
-
-impl Default for SimpleAgentOrchestrator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl AgentOrchestrator for SimpleAgentOrchestrator {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
-        let id = agent.id();
-        self.agents.push(agent);
-        Ok(id)
-    }
-
-    fn dispatch_task(
-        &mut self,
-        task: &[u8],
-        agent_id: Option<AgentID>,
-    ) -> Result<Vec<u8>, AgentError> {
-        if let Some(target_id) = agent_id {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
-                agent.execute(task)
-            } else {
-                Err(AgentError::NotFound)
-            }
-        } else if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
-            agent.execute(task)
-        } else {
-            Err(AgentError::NotFound)
-        }
-    }
-
-    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
-    }
-
-    fn list_agents(&self) -> Vec<AgentID> {
-        self.agents.iter().map(|a| a.id()).collect()
-    }
-}
-
 /// Local LLM and deep learning model resource orchestrator
 pub struct LocalLlmOrchestrator {
     pub active_models: Vec<Option<ModelResource>>,
@@ -217,7 +149,6 @@ impl LocalLlmOrchestrator {
                     self.allocated_gpu_memory_mb
                         .store(current_gpu + size_mb, Ordering::SeqCst);
                 } else {
-                    // Fallback to CPU
                     final_device = DeviceTarget::Cpu;
                 }
             }
@@ -227,7 +158,6 @@ impl LocalLlmOrchestrator {
                     self.allocated_tpu_memory_mb
                         .store(current_tpu + size_mb, Ordering::SeqCst);
                 } else {
-                    // Fallback to GPU if available, else CPU
                     let current_gpu = self.allocated_gpu_memory_mb.load(Ordering::SeqCst);
                     if current_gpu + size_mb <= self.total_gpu_memory_mb {
                         self.allocated_gpu_memory_mb
@@ -238,9 +168,7 @@ impl LocalLlmOrchestrator {
                     }
                 }
             }
-            DeviceTarget::Cpu => {
-                // CPU is always standard fallback with VM paging bounds
-            }
+            DeviceTarget::Cpu => {}
         }
 
         let resource = ModelResource::new(name, size_mb, final_device);
@@ -251,7 +179,7 @@ impl LocalLlmOrchestrator {
 
     /// Evict model resources on shutdown/unload
     pub fn evict_model(&mut self, name: &[u8]) -> Result<(), OrchestratorError> {
-        for i in 0..self.active_models.len {
+        for i in 0..self.active_models.len() {
             if let Some(ref res) = self.active_models[i] {
                 let len = res.name.iter().position(|&b| b == 0).unwrap_or(32);
                 if &res.name[..len] == name {
@@ -275,10 +203,69 @@ impl LocalLlmOrchestrator {
     }
 }
 
-/// A sliding context window history pruner
-pub struct ContextWindowPruner {
-    pub history: Vec<[u8; 128]>,
-    pub max_lines: usize,
+pub trait AgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
+    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
+    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
+    fn list_agents(&self) -> Vec<AgentID>;
+}
+
+pub struct SimpleAgentOrchestrator {
+    pub agents: Vec<Box<dyn AIAgent>>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleAgentOrchestrator {
+    pub fn new() -> Self {
+        SimpleAgentOrchestrator {
+            agents: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AgentOrchestrator for SimpleAgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
+        let id = agent.id();
+        self.agents.push(agent);
+        Ok(id)
+    }
+
+    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
+        if let Some(target_id) = agent_id {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+            }
+        } else {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+            }
+        }
+    }
+
+    fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
+        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
+    }
+
+    fn list_agents(&self) -> Vec<AgentID> {
+        self.agents.iter().map(|a| a.id()).collect()
+    }
+}
+
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn size(&self) -> usize;
 }
 
 pub struct ContextWindowPruner {
@@ -298,14 +285,11 @@ impl ContextWindowPruner {
     pub fn append_context(&mut self, text: &[u8]) {
         let mut entry = [0u8; 128];
         let len = text.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(text.as_ptr(), entry.as_mut_ptr(), len);
-        }
+        entry[..len].copy_from_slice(&text[..len]);
 
         self.history.push(entry);
 
-        // Slide window by removing the oldest context if exceeding max lines limit
-        while self.history.len > self.max_lines {
+        while self.history.len() > self.max_lines {
             self.history.remove(0);
         }
     }
@@ -339,45 +323,21 @@ impl TaskQueue for SimpleTaskQueue {
         if self.tasks.is_empty() {
             return None;
         }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+        let mut highest_idx = 0;
+        let mut highest_priority = 0;
+
+        for (i, (_, priority)) in self.tasks.iter().enumerate() {
+            if *priority > highest_priority {
+                highest_priority = *priority;
+                highest_idx = i;
             }
         }
+
+        Some(self.tasks.remove(highest_idx).0)
     }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    fn size(&self) -> usize {
+        self.tasks.len()
     }
 }
 
@@ -389,19 +349,15 @@ mod tests {
     fn test_model_scheduling() {
         let mut orchestrator = LocalLlmOrchestrator::new(4096, 8192);
 
-        // Schedule model preferring TPU
         let target_res = orchestrator.schedule_model(b"phi-3", 2048, DeviceTarget::Tpu);
         assert_eq!(target_res.unwrap(), DeviceTarget::Tpu);
 
-        // Schedule model preferring GPU
         let target_res_gpu = orchestrator.schedule_model(b"mistral-7b", 3072, DeviceTarget::Gpu);
         assert_eq!(target_res_gpu.unwrap(), DeviceTarget::Gpu);
 
-        // Schedule model exceeding GPU limit - should fallback to CPU
         let target_res_cpu = orchestrator.schedule_model(b"llama-13b", 2048, DeviceTarget::Gpu);
         assert_eq!(target_res_cpu.unwrap(), DeviceTarget::Cpu);
 
-        // Evict Mistral GPU model
         assert!(orchestrator.evict_model(b"mistral-7b").is_ok());
         assert_eq!(
             orchestrator.allocated_gpu_memory_mb.load(Ordering::SeqCst),
@@ -414,16 +370,13 @@ mod tests {
         let mut pruner = ContextWindowPruner::new(2);
         pruner.append_context(b"Context turn 1");
         pruner.append_context(b"Context turn 2");
-        assert_eq!(pruner.history.len, 2);
+        assert_eq!(pruner.history.len(), 2);
 
-        // Turn 3 should displace Turn 1 (FIFO)
         pruner.append_context(b"Context turn 3");
-        assert_eq!(pruner.history.len, 2);
+        assert_eq!(pruner.history.len(), 2);
 
         let mut turn_first = [0u8; 14];
-        for i in 0..14 {
-            turn_first[i] = pruner.history[0][i];
-        }
+        turn_first.copy_from_slice(&pruner.history[0][..14]);
         assert_eq!(&turn_first, b"Context turn 2");
     }
 
@@ -434,7 +387,7 @@ mod tests {
         orchestrator.register_agent(Box::new(agent)).unwrap();
 
         let response = orchestrator.dispatch_task(b"RELOAD_CORES", Some(1)).unwrap();
-        assert_eq!(std::str::from_utf8(&response).unwrap(), "TaskAgent: RELOAD_CORES");
+        assert_eq!(core::str::from_utf8(&response).unwrap(), "TaskAgent: RELOAD_CORES");
 
         let mut queue = SimpleTaskQueue::new();
         queue.enqueue(b"TASK_PRIO_HIGH", 10);
@@ -442,6 +395,6 @@ mod tests {
         assert_eq!(queue.size(), 2);
 
         let task = queue.dequeue().unwrap();
-        assert_eq!(std::str::from_utf8(&task[..14]).unwrap(), "TASK_PRIO_HIGH");
+        assert_eq!(core::str::from_utf8(&task[..14]).unwrap(), "TASK_PRIO_HIGH");
     }
 }

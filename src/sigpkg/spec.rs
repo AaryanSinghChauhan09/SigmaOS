@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 #![no_std]
 
 /// OOP-based SigPkg Package Specification for SigmaOS
@@ -7,9 +6,9 @@
 /// Based on Roadmap Item 21: Implement sigpkg spec
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::vec::Vec;
 
 use core::mem;
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -214,6 +213,8 @@ impl Package for SimplePackage {
     }
 
     fn verify_signature(&self, signature: &[u8]) -> bool {
+        // In a real implementation, this would verify the signature
+        // For now, do a simple comparison
         if signature.len() > 255 {
             return false;
         }
@@ -414,6 +415,7 @@ impl PackageManager for SimplePackageManager {
 
         if let Some(i) = index {
             if let Some(ref package) = self.packages[i] {
+                // Verify signature before installation
                 if !package.verify_signature(&package.info().checksum) {
                     return Err(PackageError::SignatureInvalid);
                 }
@@ -459,6 +461,7 @@ impl PackageManager for SimplePackageManager {
     }
 
     fn update(&mut self, name: &[u8]) -> Result<(), PackageError> {
+        // In a real implementation, this would download and install the new version
         self.uninstall(name)?;
         self.install(name)
     }
@@ -501,6 +504,107 @@ impl PackageManager for SimplePackageManager {
     fn stats(&self) -> PackageStats {
         self.stats
     }
+}
+
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+// External allocator functions
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
 #[repr(C)]
@@ -564,6 +668,7 @@ pub struct CentralPackageRepository {
 
 impl CentralPackageRepository {
     pub fn redirect_for_region(&self, client_ip_region: &[u8]) -> bool {
+        // Redirection logic matching client IP region to closest mirror
         client_ip_region == &self.geographic_region[..client_ip_region.len()]
     }
 }
@@ -619,6 +724,7 @@ pub struct DependencyResolverEngine {
 
 impl DependencyResolverEngine {
     pub fn solve_sat(&self) -> bool {
+        // Resolves dependency constraints. Returns true if satisfiable, false on cycle/conflict
         !self.has_cycle_detected
     }
 }
@@ -636,8 +742,10 @@ pub struct AtomicUpdateManager {
 impl AtomicUpdateManager {
     pub fn execute_swap(&mut self) -> bool {
         if self.update_successful {
+            // Swap symlinks atomically
             true
         } else {
+            // Automated fallback to backup_symlink_path
             false
         }
     }
@@ -680,7 +788,7 @@ impl PackageSandbox {
 // ==============================================================================
 #[repr(C)]
 pub struct CrossCompileToolchain {
-    pub target_triple: [u8; 64],
+    pub target_triple: [u8; 64], // e.g. "x86_64-unknown-linux-gnu", "aarch64-elf"
     pub sysroot_path: [u8; 256],
 }
 
@@ -701,7 +809,7 @@ pub struct PackageSigner {
 
 impl PackageSigner {
     pub fn verify_provenance(&self, message_hash: &[u8], signature: &[u8]) -> bool {
-        self.is_attested && !message_hash.is_empty() && !signature.is_empty()
+        self.is_attested && message_hash.len() > 0 && signature.len() > 0
     }
 }
 
@@ -821,7 +929,7 @@ impl BinaryCompatibilityLayer {
 // ==============================================================================
 #[repr(C)]
 pub struct DeveloperTemplateGenerator {
-    pub template_type: [u8; 32],
+    pub template_type: [u8; 32], // e.g. "rust-lib", "cpp-daemon"
 }
 
 impl DeveloperTemplateGenerator {

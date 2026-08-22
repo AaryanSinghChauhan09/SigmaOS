@@ -1,16 +1,16 @@
 // SigmaOS Driver Module
 pub mod device;
 pub mod framework;
-pub mod grid;
+pub mod windows_compat;
+pub mod simulation;
 pub mod mapper;
 pub mod pods;
-pub mod simulation;
 pub mod vault;
 pub mod shims;
 pub mod gpu_framework;
 pub mod network_framework;
 
-pub use grid::{GridSlotType, PeripheralArchiveGrid};
+pub use device::{BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice};
 pub use mapper::{DriverMapper, MapperCategory};
 pub use pods::{PeripheralPod, PodType};
 pub use vault::{DriverArchiveVault, VaultEntry};

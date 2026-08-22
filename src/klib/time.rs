@@ -63,8 +63,33 @@ impl Duration {
         self.secs * 1000 + (self.nanos / 1_000_000) as u64
     }
 
-    pub fn as_secs_f64(&self) -> f64 {
-        (self.secs as f64) + (self.nanos as f64 / 1_000_000_000.0)
+    pub fn as_micros(&self) -> u64 {
+        self.secs * 1_000_000 + (self.nanos / 1_000) as u64
+    }
+
+    pub fn as_nanos(&self) -> u64 {
+        self.secs * 1_000_000_000 + self.nanos as u64
+    }
+
+    pub fn checked_add(self, rhs: Duration) -> Option<Duration> {
+        let mut nanos = self.nanos + rhs.nanos;
+        let mut secs = self.secs.checked_add(rhs.secs)?;
+        if nanos >= 1_000_000_000 {
+            nanos -= 1_000_000_000;
+            secs = secs.checked_add(1)?;
+        }
+        Some(Duration { secs, nanos })
+    }
+
+    pub fn checked_sub(self, rhs: Duration) -> Option<Duration> {
+        let mut secs = self.secs.checked_sub(rhs.secs)?;
+        let nanos = if self.nanos >= rhs.nanos {
+            self.nanos - rhs.nanos
+        } else {
+            secs = secs.checked_sub(1)?;
+            self.nanos + 1_000_000_000 - rhs.nanos
+        };
+        Some(Duration { secs, nanos })
     }
 }
 
@@ -224,19 +249,6 @@ pub fn uptime_ms() -> u64 {
 pub fn monotonic_ms() -> u64 {
     // In a real implementation, this would return monotonic time
     0
-}
-
-impl Duration {
-    pub fn checked_sub(self, rhs: Duration) -> Option<Duration> {
-        let mut secs = self.secs.checked_sub(rhs.secs)?;
-        let nanos = if self.nanos >= rhs.nanos {
-            self.nanos - rhs.nanos
-        } else {
-            secs = secs.checked_sub(1)?;
-            self.nanos + 1_000_000_000 - rhs.nanos
-        };
-        Some(Duration { secs, nanos })
-    }
 }
 
 impl Default for Duration {

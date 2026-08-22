@@ -1,9 +1,7 @@
-// SPDX-License-Identifier: MIT
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
 use super::BTreeMap;
-use super::btreemap::BTreeMapIter;
 
 pub struct HashSet<T>
 where
@@ -59,6 +57,12 @@ where
         }
     }
 
+    pub fn with_capacity(_capacity: usize) -> Self {
+        HashSet {
+            map: BTreeMap::new(),
+        }
+    }
+
     pub fn insert(&mut self, item: T) -> bool {
         let was_present = self.map.contains_key(&item);
         self.map.insert(item, ());
@@ -98,7 +102,7 @@ where
 }
 
 pub struct HashSetIter<'a, T> {
-    map_iter: BTreeMapIter<'a, T, ()>,
+    map_iter: alloc::collections::btree_map::Iter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>
