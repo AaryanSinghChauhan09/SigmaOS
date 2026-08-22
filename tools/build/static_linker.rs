@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 // Static Linker Optimization Engine for SigmaOS
 // Location: tools/build/static_linker.rs
 

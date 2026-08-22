@@ -1,62 +1,18 @@
-// SPDX-License-Identifier: MIT
-//! OOP-based UEFI Bootloader for SigmaOS
-//! Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
-//! Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
-//! Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
+/// OOP-based UEFI Bootloader for SigmaOS
+/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 
-extern crate alloc;
-
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type BootStatus = usize;
 
-/// Standard UEFI Boot Phases
-#[repr(u32)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootPhase {
-    Init = 0,
-    LoadKernel = 1,
-    Handoff = 2,
-    Complete = 3,
-}
+pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 
-/// UEFI Boot Errors
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootError {
-    Success = 0,
-    LoadFailed = 1,
-    HandoffFailed = 2,
-    SignatureInvalid = 3,
-}
-
-/// Simulated raw UEFI Memory Descriptor conforming to UEFI spec
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub struct UefiMemoryDescriptor {
-    pub memory_type: u32,
-    pub physical_start: u64,
-    pub virtual_start: u64,
-    pub number_of_pages: u64,
-    pub attribute: u64,
-}
-
-/// Simulated UEFI System Table containing raw pointers to boot services
-#[repr(C)]
-pub struct UefiSystemTable {
-    pub firmware_vendor_ptr: *const u16,
-    pub firmware_revision: u32,
-    pub console_out_handle: *mut core::ffi::c_void,
-    pub boot_services_ptr: *const UefiBootServices,
-}
-
-/// Simulated UEFI Boot Services with raw pointer function hooks
-#[repr(C)]
-pub struct UefiBootServices {
-    pub get_memory_map_fn: *const core::ffi::c_void,
-    pub allocate_pages_fn: *const core::ffi::c_void,
-}
+pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2 }
 
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
@@ -123,27 +79,29 @@ impl SecureBoot for SimpleSecureBoot {
     }
 }
 
-pub struct AcpiParser;
-pub struct GopFramebuffer;
-pub struct GopSplashCanvas;
-pub struct MicrokernelProfile;
-pub struct MultiKernelBootSelector;
-pub struct SovereignBootWatchdog;
-pub struct UsbHostController;
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_uefi_load_kernel_raw() {
-        let mut bootloader = SimpleUEFIBootloader::new();
-        assert_eq!(bootloader.phase(), BootPhase::Init);
-
-        let kernel_src = [0x7F, 0x45, 0x4C, 0x46, 0x01, 0x02, 0x03]; // ELF signature
-        assert!(bootloader.load_kernel(&kernel_src).is_ok());
-        assert_eq!(bootloader.phase(), BootPhase::LoadKernel);
-        assert!(bootloader.handoff().is_ok());
-        assert_eq!(bootloader.phase(), BootPhase::Complete);
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
     }
 }
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

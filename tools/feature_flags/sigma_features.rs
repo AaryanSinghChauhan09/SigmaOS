@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 // Gentoo USE-inspired Feature Flag Definition System for SigmaOS
 // Location: tools/feature_flags/sigma_features.rs
 

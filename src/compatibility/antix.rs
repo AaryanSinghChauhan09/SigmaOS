@@ -1,12 +1,8 @@
-// SigmaOS antiX-Linux Parity & Legacy Hardware Optimization Shard
-// Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
-// Bypasses standard resource overhead through a systemd-free init model, custom task trimmers, and zero-allocation visual swap profiles.
-
-use std::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
-
-// ==========================================
-// 1. Systemd-Free Init Manager (Runit/SysV Parity)
-// ==========================================
+extern crate alloc;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+use alloc::vec;
 
 /// Non-systemd lightweight init system types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -175,269 +171,54 @@ impl Default for AntiXControlCentre {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MicroServiceState {
-    Stopped = 0,
-    Running = 1,
-}
-
-#[derive(Debug, Clone)]
-pub struct MicroService {
-    pub name: &'static str,
-    pub state: MicroServiceState,
-}
-
-pub struct AntixInitManager {
-    pub active: AtomicBool,
-}
-
-impl AntixInitManager {
-    pub const fn new() -> Self {
-        Self { active: AtomicBool::new(true) }
-    }
-}
-
-impl Default for AntixInitManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DesktopProfile {
-    RoxIceWM = 0,
-    RoxFluxbox = 1,
-    Herbstluftwm = 2,
-    HeadlessCLI = 3,
-}
-
-pub struct AntixDesktopProfiler {
-    pub current_profile: AtomicU8,
-}
-
-impl AntixDesktopProfiler {
-    pub const fn new() -> Self {
-        Self { current_profile: AtomicU8::new(DesktopProfile::RoxIceWM as u8) }
-    }
-}
-
-impl Default for AntixDesktopProfiler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct AntixControlCenter {
-    pub low_ram_mode: AtomicBool,
-}
-
-impl AntixControlCenter {
-    pub const fn new() -> Self {
-        Self { low_ram_mode: AtomicBool::new(true) }
-    }
-}
-
-impl Default for AntixControlCenter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct LegacyMemoryTrimmer {
-    pub trimmed_mb: AtomicUsize,
-}
-
-impl LegacyMemoryTrimmer {
-    pub const fn new() -> Self {
-        Self { trimmed_mb: AtomicUsize::new(0) }
-    }
-}
-
-impl Default for LegacyMemoryTrimmer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();
-pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();
-pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntixControlCenter::new();
-pub static GLOBAL_MEMORY_TRIMMER: LegacyMemoryTrimmer = LegacyMemoryTrimmer::new();
-
-// ==========================================
-// 5. Live USB Persistence Manager (Inspiration: antiX Live-USB Persistence)
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PersistenceMode {
-    ReadonlyNoSave = 0,
-    HomeOnly = 1,
-    RootOverlay = 2,
-    SemiAutomatic = 3,
-}
-
-pub struct AntixLiveUsbPersistence {
-    pub mode: AtomicU8,
-    pub usb_flash_health_pct: AtomicU8,
-}
-
-impl AntixLiveUsbPersistence {
-    pub const fn new() -> Self {
-        Self {
-            mode: AtomicU8::new(PersistenceMode::SemiAutomatic as u8),
-            usb_flash_health_pct: AtomicU8::new(100),
-        }
-    }
-
-    pub fn set_mode(&self, mode: PersistenceMode) {
-        self.mode.store(mode as u8, Ordering::SeqCst);
-    }
-
-    pub fn get_mode(&self) -> PersistenceMode {
-        match self.mode.load(Ordering::SeqCst) {
-            0 => PersistenceMode::ReadonlyNoSave,
-            1 => PersistenceMode::HomeOnly,
-            2 => PersistenceMode::RootOverlay,
-            _ => PersistenceMode::SemiAutomatic,
-        }
-    }
-
-    pub fn mount_persistent_overlay(&self) -> Result<&'static str, &'static str> {
-        match self.get_mode() {
-            PersistenceMode::ReadonlyNoSave => Ok("antiX-LiveUSB: Mounted read-only live session (zero persistent storage writes)."),
-            PersistenceMode::HomeOnly => Ok("antiX-LiveUSB: Mounted /home persistence overlay on USB flash sector."),
-            PersistenceMode::RootOverlay => Ok("antiX-LiveUSB: Mounted full rootfs overlay persistence on USB flash sector."),
-            PersistenceMode::SemiAutomatic => Ok("antiX-LiveUSB: Mounted RAM-buffered semi-automatic persistence (saves to flash on demand/shutdown)."),
-        }
-    }
-
-    pub fn save_session_changes(&self) -> usize {
-        let health = self.usb_flash_health_pct.load(Ordering::SeqCst);
-        if health < 20 {
-            println!("antiX-LiveUSB: Flash wear warning! USB health at {}%. Delaying flush to preserve NAND flash.", health);
-            0
-        } else {
-            println!("antiX-LiveUSB: Persisting RAM session overlay buffers to USB flash storage...");
-            1024 * 1024 // 1MB written
-        }
-    }
-}
-
-// ==========================================
-// 6. Lightweight Meta-Package Installer Shim (Inspiration: antiX Package Installer)
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LightweightApp {
-    DilloBrowser,
-    PaleMoon,
-    SMTube,
-    GeanyEditor,
-    RoxFiler,
-}
-
-pub struct AntixPackageInstallerShim;
-
-impl AntixPackageInstallerShim {
-    pub fn install_app(app: LightweightApp) -> &'static str {
-        match app {
-            LightweightApp::DilloBrowser => "antiX-PackageInstaller: Installed Dillo ultra-lightweight web browser (~2MB RAM footprint).",
-            LightweightApp::PaleMoon => "antiX-PackageInstaller: Installed Pale Moon independent lightweight browser.",
-            LightweightApp::SMTube => "antiX-PackageInstaller: Installed SMTube YouTube browser for legacy CPU playback.",
-            LightweightApp::GeanyEditor => "antiX-PackageInstaller: Installed Geany lightweight IDE/text editor.",
-            LightweightApp::RoxFiler => "antiX-PackageInstaller: Installed ROX-Filer minimal file manager.",
-        }
-    }
-}
-
-// ==========================================
-// 7. Headless Low-RAM CLI Tools Suite (Inspiration: antiX cli-tools)
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CliTool {
-    CliApti,
-    CliShellCheck,
-    CliWifiManager,
-    CliPartitionManager,
-}
-
-pub struct AntixCliToolsSuite;
-
-impl AntixCliToolsSuite {
-    pub fn execute_cli_tool(tool: CliTool) -> &'static str {
-        match tool {
-            CliTool::CliApti => "antiX-CliTools: Executed cli-apti terminal package manager interface.",
-            CliTool::CliShellCheck => "antiX-CliTools: Executed cli-shell-check system health diagnostic tool.",
-            CliTool::CliWifiManager => "antiX-CliTools: Executed CWR (cli-wifi-ref) lightweight terminal network selector.",
-            CliTool::CliPartitionManager => "antiX-CliTools: Executed cli-installer terminal disk partition manager.",
-        }
-    }
-}
-
-// ==========================================
-// 8. Legacy Kernel Selector & Manager (Inspiration: antiX Kernel Manager)
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KernelVariant {
-    Kernel486NonPae = 0, // For ancient 32-bit Pentium/i486 CPUs
-    Kernel64Lts = 1,     // Modern 64-bit Long-Term Support kernel
-    Kernel64Rt = 2,      // Real-Time low-latency kernel
-}
-
-pub struct AntixKernelUpdater {
-    pub active_kernel: AtomicU8,
-}
-
-impl AntixKernelUpdater {
-    pub const fn new() -> Self {
-        Self {
-            active_kernel: AtomicU8::new(KernelVariant::Kernel486NonPae as u8),
-        }
-    }
-
-    pub fn switch_kernel_variant(&self, variant: KernelVariant) -> &'static str {
-        self.active_kernel.store(variant as u8, Ordering::SeqCst);
-        match variant {
-            KernelVariant::Kernel486NonPae => "antiX-KernelManager: Activated 32-bit non-PAE i486/Pentium legacy kernel variant.",
-            KernelVariant::Kernel64Lts => "antiX-KernelManager: Activated 64-bit LTS modern kernel variant.",
-            KernelVariant::Kernel64Rt => "antiX-KernelManager: Activated 64-bit Real-Time low-latency kernel variant.",
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_antix_live_usb_persistence() {
-        let live_usb = AntixLiveUsbPersistence::new();
-        live_usb.set_mode(PersistenceMode::HomeOnly);
-        assert_eq!(live_usb.get_mode(), PersistenceMode::HomeOnly);
-        let status = live_usb.mount_persistent_overlay().unwrap();
-        assert!(status.contains("/home"));
-        let bytes_saved = live_usb.save_session_changes();
-        assert_eq!(bytes_saved, 1024 * 1024);
+    fn test_antix_init_switcher() {
+        let mut switcher = AntiXInitSwitcher::new(AntiXInitSystem::Runit);
+        switcher.register_service("networking");
+
+        assert!(switcher.start_service("networking"));
+        assert_eq!(switcher.services[0].state, AntiXServiceState::Running);
+
+        switcher.switch_init_system(AntiXInitSystem::Dinit);
+        assert_eq!(switcher.active_init, AntiXInitSystem::Dinit);
+        assert_eq!(switcher.services[0].init_type, AntiXInitSystem::Dinit);
     }
 
     #[test]
-    fn test_antix_package_installer() {
-        let msg = AntixPackageInstallerShim::install_app(LightweightApp::DilloBrowser);
-        assert!(msg.contains("Dillo"));
+    fn test_antix_persistence() {
+        let mut persistence = AntiXPersistenceManager::new(AntiXPersistenceMode::RootPersistence);
+        assert!(!persistence.overlay_mounted);
+
+        assert!(persistence.mount_overlay());
+        persistence.save_state_snapshot(2048);
+        assert_eq!(persistence.saved_bytes, 2048);
     }
 
     #[test]
-    fn test_antix_cli_tools_suite() {
-        let msg = AntixCliToolsSuite::execute_cli_tool(CliTool::CliWifiManager);
-        assert!(msg.contains("cli-wifi-ref"));
+    fn test_antix_system_remaster() {
+        let files = vec![
+            "/etc/hostname",
+            "/bin/bash",
+            "/var/log/syslog",
+            "/tmp/cache.tmp",
+        ];
+        let manifest = AntiXSystemRemasterEngine::generate_remaster_manifest(&files);
+        assert_eq!(manifest.len(), 2);
+        assert_eq!(manifest[0], "/etc/hostname");
+        assert_eq!(manifest[1], "/bin/bash");
     }
 
     #[test]
-    fn test_antix_kernel_updater() {
-        let updater = AntixKernelUpdater::new();
-        let msg = updater.switch_kernel_variant(KernelVariant::Kernel64Rt);
-        assert!(msg.contains("Real-Time"));
+    fn test_antix_control_centre() {
+        let mut control = AntiXControlCentre::new();
+        assert!(!control.low_mem_mode);
+
+        control.enable_ultra_low_memory_profile();
+        assert!(control.low_mem_mode);
+        assert!(control.power_save_active);
     }
 }

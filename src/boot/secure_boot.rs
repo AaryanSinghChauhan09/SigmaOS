@@ -55,7 +55,7 @@ impl SecureBootVerifier {
         self.dbx.push(key_id);
     }
 
-    pub fn verify_kernel_signature(&self, key_id: u64, _payload_hash: &[u8; 32], signature: &[u8; 64]) -> VerificationResult {
+    pub fn verify_kernel_signature(&self, key_id: u64, payload_hash: &[u8; 32], signature: &[u8; 64]) -> VerificationResult {
         if self.state == SecureBootState::Disabled {
             return VerificationResult::Verified;
         }

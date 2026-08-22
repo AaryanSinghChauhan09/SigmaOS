@@ -1,40 +1,12 @@
 /// Access Control Matrix (ACM), Extended POSIX ACLs, Capability Bounding Sets,
 /// Mandatory Access Control (MAC - Bell-LaPadula), and Hardware Network Filters for SigmaOS.
 
-#[cfg(test)]
-use std::vec::Vec;
-#[cfg(not(test))]
-extern crate alloc;
-#[cfg(not(test))]
-use alloc::vec::Vec;
-
 pub type RoleID = usize;
 pub type PermissionID = usize;
 pub type UserID = u32;
 pub type GroupID = u32;
 pub type SubjectID = u64;
 pub type ObjectID = u64;
-
-#[derive(Debug, Clone, Default)]
-pub struct SimpleAccessController {
-    pub allowed_users: Vec<u32>,
-}
-
-impl SimpleAccessController {
-    pub fn new() -> Self {
-        Self { allowed_users: Vec::new() }
-    }
-
-    pub fn allow_user(&mut self, uid: u32) {
-        if !self.allowed_users.contains(&uid) {
-            self.allowed_users.push(uid);
-        }
-    }
-
-    pub fn is_allowed(&self, uid: u32) -> bool {
-        self.allowed_users.contains(&uid)
-    }
-}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
