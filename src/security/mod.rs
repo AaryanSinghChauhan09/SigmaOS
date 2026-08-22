@@ -3,6 +3,11 @@
 
 pub mod audit;
 pub mod capability;
+pub mod pqc_enclave;
+
+pub use pqc_enclave::{
+    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
+};
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;

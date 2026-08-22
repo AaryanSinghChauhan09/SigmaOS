@@ -1,6 +1,21 @@
 // SigmaOS Compatibility Module
 pub mod constellation_mesh;
 pub mod cross_platform;
+pub mod zorin;
+pub mod antix;
+
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine,
+    ZorinConnectState, ZorinConnectManager,
+    ZorinWindowsAppSupport,
+};
+
+pub use antix::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
+};
 pub mod historic_linux;
 pub mod mint_linux;
 pub mod chimera_linux;
@@ -16,6 +31,25 @@ pub use legacy_adapters::{
     LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
     GLOBAL_WORKLOAD_OPTIMIZER,
 };
+
+pub mod fedora;
+pub mod chakra;
+pub mod endeavour;
+pub mod gap_closure;
+pub mod innovations;
+pub mod persona;
+pub mod scosmos;
+pub mod sigmawin;
+pub mod templeos;
+
+pub use fedora::*;
+pub use chakra::*;
+pub use gap_closure::*;
+pub use innovations::*;
+pub use persona::*;
+pub use scosmos::*;
+pub use sigmawin::*;
+pub use templeos::*;
 
 pub use constellation_mesh::{
     BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
