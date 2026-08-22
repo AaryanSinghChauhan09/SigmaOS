@@ -60,6 +60,10 @@ pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
     TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
     LivepatchPatch, LivepatchManager,
+    CapabilityRight, PathAccessRule, UniversalCapabilityMatrix,
+    EnclaveMeasurement, SovereignAttestationEnclave,
+    KernelRelinkRecord, AutonomousKernelRelinker,
+    ZfsConsensusBlock, HammerZfsConsensusStore,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
