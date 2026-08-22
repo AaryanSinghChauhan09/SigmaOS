@@ -16,22 +16,14 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Snyk CLI
-        uses: snyk/actions/setup@master
       - name: Run Snyk to check for vulnerabilities
-        id: snyk-test
+        uses: snyk/actions/setup@master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: |
-          if [ -n "$SNYK_TOKEN" ]; then
-            snyk test --sarif-file-output=snyk.sarif || true
-          else
-            echo "SNYK_TOKEN not available; generating empty SARIF report"
-            echo '{"$schema":"https://json.schemastore.org/sarif-2.1.0.json","version":"2.1.0","runs":[]}' > snyk.sarif
-          fi
+        with:
+          args: --sarif-file-output=snyk.sarif
       - name: Upload result to GitHub Code Scanning
-        if: ${{ secrets.SNYK_TOKEN != '' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk.sarif
