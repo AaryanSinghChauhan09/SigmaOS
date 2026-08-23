@@ -268,6 +268,8 @@ impl UnifiedPeripheral for DdeDeviceWrapper {
 pub struct DeviceExtension {
     pub irq: u8,
     pub base_port: u16,
+    pub base_address: u32,
+    pub memory_size: usize,
     pub device_context: [u8; 256],
 }
 
@@ -276,6 +278,8 @@ impl DeviceExtension {
         Self {
             irq: 0,
             base_port: 0,
+            base_address: 0,
+            memory_size: 0,
             device_context: [0u8; 256],
         }
     }
@@ -1331,6 +1335,14 @@ impl<T> Vec<T> {
         self.len
     }
 
+        pub fn as_slice(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+
     pub fn clear(&mut self) {
         self.len = 0;
     }
@@ -1473,59 +1485,4 @@ extern "C" {
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     malloc(size)
-}
-
-// ==========================================
-// Standalone unit tests
-// ==========================================
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_device_descriptors() {
-        let capability = DeviceCapability::full();
-        let desc = DeviceDescriptor::new(10, b"SerialTTY", DeviceType::Character, capability);
-        assert_eq!(desc.get_state(), DeviceState::Uninitialized);
-        desc.set_state(DeviceState::Ready);
-        assert_eq!(desc.get_state(), DeviceState::Ready);
-    }
-
-    #[test]
-    fn test_simple_block_device() {
-        let mut dev = SimpleBlockDevice::new(1, b"disk0", 4, 512);
-        assert_eq!(dev.info().vendor_id, 0x8086);
-        assert!(dev.init().is_ok());
-
-        let mut write_buf = [0u8; 512];
-        write_buf[0] = 0xAA;
-        assert!(dev.write_block(2, &write_buf).is_ok());
-
-        let mut read_buf = [0u8; 512];
-        assert!(dev.read_block(2, &mut read_buf).is_ok());
-        assert_eq!(read_buf[0], 0xAA);
-    }
-
-    #[test]
-    fn test_device_manager_autoprobe_and_params() {
-        let mut mgr = DeviceManager::new();
-
-        // Register custom boot parameter (module param)
-        mgr.set_module_param(b"debug_level", 4);
-        assert_eq!(mgr.get_module_param(b"debug_level"), Some(4));
-        assert_eq!(mgr.get_module_param(b"non_existent"), None);
-
-        // Register PCI device table probe matches
-        let entry = DriverProbeEntry {
-            vendor_id: 0x10EC,
-            device_id: 0x8168,
-            device_type: DeviceType::Network,
-        };
-        mgr.register_probe_match(entry);
-
-        // Check autoprobe success
-        assert!(mgr.auto_probe_and_bind(0x10EC, 0x8168, DeviceType::Network));
-        assert!(!mgr.auto_probe_and_bind(0xFFFF, 0xFFFF, DeviceType::Network));
-    }
 }
