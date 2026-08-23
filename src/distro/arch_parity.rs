@@ -3,10 +3,10 @@ extern crate alloc;
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-use alloc::collections::BTreeMap;
-use crate::klib::SigmaString;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+extern crate alloc;
+
+use crate::klib::{BTreeMap, String, ToString, Vec};
+use alloc::format;
 use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards

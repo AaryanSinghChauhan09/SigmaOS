@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: MIT
-
 extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
@@ -391,6 +389,47 @@ impl StringDescrambler {
             cleartext.push(byte ^ self.xor_key);
         }
         cleartext
+    }
+}
+
+pub struct ScriptArgumentRouter {
+    pub shebang_interpreter: String,
+}
+
+impl ScriptArgumentRouter {
+    pub fn new(shebang_line: &str) -> Self {
+        let interp = if shebang_line.starts_with("#!") {
+            shebang_line.trim_start_matches("#!").trim()
+        } else {
+            "/bin/sh"
+        };
+        Self {
+            shebang_interpreter: interp.to_string(),
+        }
+    }
+
+    pub fn substitute_arguments(&self, script: &str, args: &[&str]) -> String {
+        let mut result = script.to_string();
+        for (i, arg) in args.iter().enumerate() {
+            let var_name = format!("${}", i);
+            result = result.replace(&var_name, arg);
+        }
+
+        let mut all_args = String::new();
+        for (i, arg) in args.iter().skip(1).enumerate() {
+            if i > 0 {
+                all_args.push(' ');
+            }
+            all_args.push_str(arg);
+        }
+        result = result.replace("$@", &all_args);
+        result
+    }
+}
+
+impl Default for ScriptArgumentRouter {
+    fn default() -> Self {
+        Self::new("#!/bin/sh")
     }
 }
 

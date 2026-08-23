@@ -15,10 +15,10 @@ pub mod intel_hda;
 pub mod nvme_storage;
 pub mod usb_hid;
 
-// Working exports
-pub use gpu::{
-    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline, GpuShader, ShaderStage,
-};
+// Exposing additional audio, printer, wifi drivers
+pub mod legacy_parallel_printer;
+
+pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;
