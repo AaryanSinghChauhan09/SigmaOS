@@ -8,6 +8,7 @@ pub mod transaction;
 pub mod verifier;
 pub mod rpm_compat;
 pub mod universal_adapter;
+pub mod debian_crusher;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
@@ -76,6 +77,24 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
 }
 
 /// Package dependency
