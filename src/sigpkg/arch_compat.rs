@@ -332,88 +332,13 @@ pub struct MkinitcpioBuilder {
     pub compression: String,
 }
 
-impl MkinitcpioBuilder {
-    pub fn new() -> Self {
-        let mut hooks = Vec::new();
-        hooks.push("base".to_string());
-        hooks.push("udev".to_string());
-        hooks.push("autodetect".to_string());
-        hooks.push("modconf".to_string());
-        hooks.push("block".to_string());
-        hooks.push("filesystems".to_string());
+impl DebianSbuildPackage {
+    pub fn new(name: &str, build_depends: Vec<String>) -> Self {
         Self {
-            hooks,
-            compression: "zstd".to_string(),
+            name: name.to_string(),
+            version: Version::new(1, 0, 0),
+            build_depends,
         }
-    }
-
-    pub fn add_hook(&mut self, hook_name: &str) {
-        let hook_string = hook_name.to_string();
-        if !self.hooks.contains(&hook_string) {
-            self.hooks.push(hook_string);
-        }
-    }
-
-    pub fn build_initramfs_image(&self, kernel_version: &str) -> Vec<u8> {
-        let image_header = format!(
-            "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
-            kernel_version, self.hooks, self.compression
-        );
-
-        let mut bytes = image_header.into_bytes();
-        bytes.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        bytes
-    }
-}
-
-impl Default for MkinitcpioBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// --- makepkg Package Builder ---
-
-#[derive(Debug, Clone)]
-pub struct MakepkgBuilder {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub arch: String,
-    pub expected_sha256: String,
-}
-
-impl MakepkgBuilder {
-    pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
-        Self {
-            pkgname: pkgname.to_string(),
-            pkgver: pkgver.to_string(),
-            arch: arch.to_string(),
-            expected_sha256: expected_sha256.to_string(),
-        }
-    }
-
-    pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
-        let mut checksum = 0u64;
-        for &b in source_data {
-            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
-        }
-        let computed = format!("{:016x}", checksum);
-        computed == self.expected_sha256 || self.expected_sha256 == "SKIP"
-    }
-
-    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(String, Vec<u8>), &'static str> {
-        if !self.verify_source_integrity(source_data) {
-            return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
-        }
-
-        let archive_name = format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch);
-        let archive_content = format!(
-            "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
-            self.pkgname, self.pkgver, self.arch
-        );
-        let mut bytes = archive_content.into_bytes();
-        bytes.extend_from_slice(source_data);
-        Ok((archive_name, bytes))
     }
 }
 

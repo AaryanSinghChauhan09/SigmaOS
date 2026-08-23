@@ -15,18 +15,9 @@ pub mod transaction;
 pub mod universal_adapter;
 pub mod debian_crusher;
 
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
-};
-pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
-pub use debian_defeater::{
-    SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer,
-    SovereignTransactionManager, TransactionStatus,
-};
-pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
+pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use debian_defeater::{SovereignMirrorSelector, SovereignTransactionManager, SovereignSandboxEnforcer, SovereignDeltaGenerator, TransactionStatus};
+pub mod spec;
 pub use spec::{
     ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
@@ -39,8 +30,19 @@ pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
+pub use verifier::CryptoVerifier;
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub mod universal_adapter;
+pub mod universal_oop_system;
 pub use universal_adapter::{
-    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
+    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
+    DebAdapter, RpmAdapter, PacmanAdapter,
+};
+pub use universal_oop_system::{
+    IPackage, IPackageParser, PackageFormat, PackageMetadata,
+    PackageParserFactory, UniversalPackageManager,
+    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
+    UserDefinedHook, ParseError as OopParseError, InstallError, HookError,
 };
 pub use verifier::CryptoVerifier;
 
@@ -51,7 +53,6 @@ pub struct Version {
     pub minor: u64,
     pub patch: u64,
 }
-
 
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

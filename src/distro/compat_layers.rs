@@ -1,4 +1,29 @@
-use std::collections::HashMap;
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
+extern crate alloc;
+use alloc::collections::BTreeMap as HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::BTreeMap;
+
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap;
 
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -252,7 +277,7 @@ impl Default for PosixTranslation {
 // NetBSD/FreeBSD kqueue & kevent event notification framework
 // ==========================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum KFilter {
     Read,
     Write,

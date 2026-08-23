@@ -162,9 +162,9 @@ pub enum LibcVersion {
 /// Syscall Application Binary Interfaces
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SyscallAbi {
-    Oabi32,
-    Eabi32,
-    Eabi64,
+    Oabi_32,
+    Eabi_32,
+    Eabi_64,
 }
 
 /// Matrix that maps old libc calls to modern equivalents

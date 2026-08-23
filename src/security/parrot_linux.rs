@@ -71,3 +71,67 @@ impl ParrotSniffer {
         self.captured_packets.push_back(packet);
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnonymityMode {
+    Tor,
+    I2P,
+    Direct,
+}
+
+pub struct AnonsurfEngine {
+    pub mode: AnonymityMode,
+}
+
+impl AnonsurfEngine {
+    pub fn new() -> Self {
+        Self { mode: AnonymityMode::Direct }
+    }
+}
+
+pub struct ForensicsAuditTool;
+impl ForensicsAuditTool {
+    pub fn new() -> Self { Self }
+}
+
+#[derive(Debug, Clone)]
+pub struct RecoveredFile {
+    pub path: String,
+    pub size: usize,
+}
+
+pub type KaliSniffer = ParrotSniffer;
+
+pub struct PentestAssistant;
+impl PentestAssistant {
+    pub fn new() -> Self { Self }
+}
+
+pub struct SecureWipeTool;
+impl SecureWipeTool {
+    pub fn new() -> Self { Self }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntrusionSeverity {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+#[derive(Debug, Clone)]
+pub struct IntrusionAlert {
+    pub severity: IntrusionSeverity,
+    pub message: String,
+}
+
+pub struct SigmaIDS {
+    pub alerts: Vec<IntrusionAlert>,
+}
+
+impl SigmaIDS {
+    pub fn new() -> Self {
+        Self { alerts: Vec::new() }
+    }
+}

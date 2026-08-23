@@ -30,6 +30,8 @@ pub use linux_bsd_inspirations::{
     SovereignRaidSelfHealer, RaidLevel, ScrubResult, SovereignDeclarativeSystemEngine,
     RollbackStatus, SovereignPrivSepSandbox, PrivSepProcessRole,
 };
+pub mod arch_parity;
+pub mod chakra_parity;
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};

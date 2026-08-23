@@ -10,6 +10,12 @@ pub mod sigma_fs;
 pub mod smart_symlink;
 pub mod tmpfs;
 pub mod vfs;
+pub mod legacy_fs;
+pub mod sigma_fs;
+pub mod smart_symlink;
+pub use smart_symlink::{
+    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
+};
 
 pub use geom::{GeomClass, GeomProvider, GeomConsumer, GeomAccessRights};
 

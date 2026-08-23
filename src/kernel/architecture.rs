@@ -17,6 +17,28 @@ pub enum InstructionCyclePhase {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchitectureClass {
+    X86_64,
+    AArch64,
+    RiscV64,
+    Wasm32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InterruptClass {
+    Hardware,
+    Software,
+    Exception,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoWaitProfile {
+    LowLatency,
+    HighThroughput,
+    Balanced,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessorInitState {
     Offline,
     RealMode,

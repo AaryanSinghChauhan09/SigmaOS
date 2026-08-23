@@ -22,7 +22,8 @@ use crate::klib::HashMap;
 use std::collections::HashMap;
 
 #[cfg(test)]
-mod mock_scheduler {
+pub mod mock_scheduler {
+    extern crate alloc;
     use core::time::Duration;
     use alloc::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

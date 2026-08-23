@@ -1,14 +1,41 @@
 // SigmaOS Compatibility Module
-pub mod historic_linux;
-pub mod chimera_linux;
+pub mod constellation_mesh;
 pub mod cross_platform;
-pub mod historic_linux;
+pub mod india_stack;
+pub mod india_professional_tools;
+pub mod alpine_linux;
+pub mod interim;
+pub mod jehanne;
 pub mod mint_linux;
+pub mod reactos;
+pub use reactos::{
+    NtHandle, NtObjectManager, NtObjectType, NtStatus,
+    PortableExecutableLoader, RegistryHive,
+};
+pub mod lubuntu;
+pub mod antix;
+pub mod bodhi_moksha;
+pub mod cachy_os;
+pub mod chakra;
+pub mod chimera_linux;
+pub mod endeavour;
+pub mod garuda_zen;
+pub mod gentoo;
+pub mod tiny_core;
+pub mod localsend;
+
+pub mod zorin;
+pub use zorin::{
+    ZorinLayoutSwitcher,
+    ZorinChameleonEngine,
+    ZorinConnectManager,
+    ZorinWindowsAppSupport,
+};
+pub mod historic_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
-pub mod india_professional_tools;
 pub mod canonical;
 pub mod fedora;
 pub mod gap_closure;

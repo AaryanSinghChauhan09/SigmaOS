@@ -120,8 +120,60 @@ impl From<String> for SigmaString {
 
 impl core::ops::Deref for SigmaString {
     type Target = str;
-    fn deref(&self) -> &Self::Target {
-        &self.data
+    fn deref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+// ------------------------------------------------------------------
+// fmt::Display / fmt::Debug
+// ------------------------------------------------------------------
+
+impl fmt::Display for SigmaString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl fmt::Debug for SigmaString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "SigmaString({:?})", self.as_str())
+    }
+}
+
+// ------------------------------------------------------------------
+// PartialEq, Eq
+// ------------------------------------------------------------------
+
+impl PartialOrd for SigmaString {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for SigmaString {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.as_str().cmp(other.as_str())
+    }
+}
+
+impl PartialEq for SigmaString {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+
+impl Eq for SigmaString {}
+
+impl core::hash::Hash for SigmaString {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        self.as_str().hash(state);
+    }
+}
+
+impl PartialEq<str> for SigmaString {
+    fn eq(&self, other: &str) -> bool {
+        self.as_str() == other
     }
 }
 

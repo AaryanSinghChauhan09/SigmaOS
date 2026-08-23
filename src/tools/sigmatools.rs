@@ -26,7 +26,6 @@ use alloc::collections::BTreeMap;
 use alloc::collections::BTreeMap as HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigmaToolError {

@@ -307,6 +307,7 @@ impl ComponentTree {
         // Create new component
         let new_id = self.next_component_id.fetch_add(1, Ordering::SeqCst);
         let mut new_component = Component::new(new_id, name, Some(parent_id));
+        new_component.allocate_capability(CapabilityRights::full());
 
         // Inherit some capabilities from parent (basic rights)
         if let Some(parent_component) = self.components.get(&parent_id) {
@@ -350,8 +351,8 @@ impl ComponentTree {
         }
 
         // Remove from parent's children
-        if let Some(p_id) = parent_id {
-            if let Some(parent_component) = self.components.get_mut(&p_id) {
+        if let Some(parent_id) = parent_id {
+            if let Some(parent_component) = self.components.get_mut(&parent_id) {
                 parent_component.remove_child(component_id);
             }
         }
@@ -381,14 +382,8 @@ impl ComponentTree {
     pub fn delegate_capability(&mut self, parent_id: ComponentId, child_id: ComponentId, handle: CapabilityHandle) -> Result<(), ComponentError> {
         let parent = self.components.get(&parent_id).ok_or(ComponentError::ParentNotFound)?;
         
-        // Check parent has delegation rights
-        if !parent.has_capability_rights(handle.id, CapabilityRights {
-            can_read: false,
-            can_write: false,
-            can_execute: false,
-            can_delegate: true,
-            can_create_child: false,
-        }) {
+        // Check parent has capability in capability_space and has delegation rights
+        if !parent.has_capability_rights(handle.id, CapabilityRights::none().with_delegate()) {
             return Err(ComponentError::PermissionDenied);
         }
 
@@ -441,18 +436,19 @@ impl ComponentTree {
 
     /// Propagate resource limits from parent to children
     pub fn propagate_resource_limits(&mut self, parent_id: ComponentId) -> Result<(), ComponentError> {
-        let (parent_resources, children) = {
+        let (parent_resources, parent_children) = {
             let parent = self.components.get(&parent_id).ok_or(ComponentError::NotFound)?;
             (parent.resources.clone(), parent.children.clone())
         };
+        let children_count = parent_children.len().max(1);
 
-        for &child_id in &children {
+        for child_id in parent_children {
             if let Some(child) = self.components.get_mut(&child_id) {
                 // Distribute parent resources among children
                 for resource in &parent_resources {
                     let child_allocation = ResourceAllocation::new(
                         resource.resource_type,
-                        resource.amount / children.len().max(1),
+                        resource.amount / children_count,
                         resource.start,
                         resource.end,
                     );

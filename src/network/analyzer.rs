@@ -43,8 +43,84 @@ pub enum AlertSeverity {
     High,
     Critical,
 }
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::time::{Duration, Instant};
 
-/// Network security alert
+pub trait AnalysisStrategy {
+    fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;
+    fn name(&self) -> &str;
+}
+
+#[derive(Debug, Clone)]
+pub struct BandwidthAnalysis {
+    pub bytes_per_sec: u64,
+    pub packets_per_sec: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConnectionInfo {
+    pub source: IpAddr,
+    pub destination: IpAddr,
+    pub port: u16,
+    pub state: ConnectionState,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConnectionState {
+    Established,
+    Listening,
+    Closed,
+    Connecting,
+}
+
+#[derive(Debug, Clone)]
+pub struct SecurityAnalysis {
+    pub threat_score: usize,
+    pub warnings: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct TrafficAlert {
+    pub alert_type: AlertType,
+    pub severity: AlertSeverity,
+    pub message: String,
+    pub timestamp: Instant,
+    pub related_ips: Vec<IpAddr>,
+}
+
+#[derive(Debug, Clone)]
+pub struct TrafficStatistics {
+    pub total_packets: u64,
+    pub total_bytes: u64,
+}
+
+pub struct NetworkTrafficAnalyzer {
+    pub buffer: AlpineZeroAllocCaptureBuffer<1024>,
+    pub statistics: TrafficStatistics,
+}
+
+impl NetworkTrafficAnalyzer {
+    pub fn new() -> Self {
+        NetworkTrafficAnalyzer {
+            buffer: AlpineZeroAllocCaptureBuffer::new(),
+            statistics: TrafficStatistics {
+                total_packets: 0,
+                total_bytes: 0,
+            },
+        }
+    }
+
+    pub fn process_packet(&mut self, packet: TrafficPacket) {
+        self.statistics.total_packets += 1;
+        self.statistics.total_bytes += packet.size_bytes;
+        self.buffer.push(packet);
+    }
+}
+
+/// Traffic packet
 #[derive(Debug, Clone)]
 pub struct TrafficAlert {
     pub alert_type: AlertType,

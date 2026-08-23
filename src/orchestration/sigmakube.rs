@@ -414,6 +414,10 @@ impl SigmaKube {
         }
     }
 
+    pub fn list_clusters(&self) -> Vec<String> {
+        self.clusters.iter().map(|c| c.name.clone()).collect()
+    }
+
     pub fn get_cluster_stats(&self) -> ClusterStats {
         ClusterStats {
             total_clusters: self.clusters.len(),

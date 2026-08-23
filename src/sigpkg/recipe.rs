@@ -145,8 +145,13 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_compilation_profile(mut self, profile: StageProfile) -> Self {
-        self.compilation_profile = profile;
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
+        self
+    }
+
+    pub fn with_package_command(mut self, command: String) -> Self {
+        self.package_commands.push(command);
         self
     }
 

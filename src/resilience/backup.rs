@@ -28,72 +28,11 @@ pub struct BackupSnapshot {
     pub files_hash: BTreeMap<String, String>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct FsSnapshot {
-    pub id: usize,
-    pub timestamp: u64,
-    pub active: bool,
-    pub root_hash: u32,
-}
+pub type FsSnapshot = BackupSnapshot;
 
-pub struct HardwareTimeshift {
-    pub snapshots: core::cell::RefCell<[Option<FsSnapshot>; MAX_SNAPSHOT_ENTRIES]>,
-    pub backup_active: AtomicBool,
-    pub next_id: AtomicUsize,
-}
+pub static GLOBAL_TIMESHIFT: std::sync::Mutex<Option<SigmaTimeshift>> = std::sync::Mutex::new(None);
 
-unsafe impl Sync for HardwareTimeshift {}
-
-impl HardwareTimeshift {
-    pub const fn new() -> Self {
-        const EMPTY_SNAPSHOT: Option<FsSnapshot> = None;
-        Self {
-            snapshots: core::cell::RefCell::new([EMPTY_SNAPSHOT; MAX_SNAPSHOT_ENTRIES]),
-            backup_active: AtomicBool::new(true),
-            next_id: AtomicUsize::new(1),
-        }
-    }
-
-    pub fn create_snapshot(
-        &self,
-        timestamp: u64,
-        current_fhs_hash: u32,
-    ) -> Result<usize, &'static str> {
-        if !self.backup_active.load(Ordering::SeqCst) {
-            return Err("Timeshift: Backup service is currently deactivated.");
-        }
-
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let snapshot = FsSnapshot {
-            id,
-            timestamp,
-            active: true,
-            root_hash: current_fhs_hash,
-        };
-
-        let mut list = self.snapshots.borrow_mut();
-        let idx = (id - 1) % MAX_SNAPSHOT_ENTRIES;
-        list[idx] = Some(snapshot);
-
-        Ok(id)
-    }
-
-    pub fn rollback_to_snapshot(&self, snapshot_id: usize) -> Result<u32, &'static str> {
-        let list = self.snapshots.borrow();
-        for slot in list.iter() {
-            if let Some(ref snapshot) = slot {
-                if snapshot.id == snapshot_id {
-                    return Ok(snapshot.root_hash);
-                }
-            }
-        }
-        Err("Timeshift: Selected snapshot ID not found in system registers.")
-    }
-}
-
-pub static GLOBAL_TIMESHIFT: HardwareTimeshift = HardwareTimeshift::new();
-
-pub struct SigmaTimeshiftManager {
+pub struct SigmaTimeshift {
     pub snapshots: Vec<BackupSnapshot>,
     pub backup_schedule_enabled: bool,
     pub last_scheduled_run: u64,

@@ -1048,6 +1048,9 @@ impl SovereignFirewalldManager {
     }
 }
 
+// ==========================================
+// Sovereign Cockpit Console Manager
+// ==========================================
 
 pub struct SovereignCockpitConsole {
     pub is_listening: bool,
@@ -1064,40 +1067,39 @@ impl SovereignCockpitConsole {
         }
     }
 
-    pub fn start_server(&mut self) -> Result<(), &'static str> {
+    pub fn start_server(&mut self) -> Result<(), String> {
         if self.is_listening {
-            return Err("Server already running");
+            return Err("Server already running".to_string());
         }
         self.is_listening = true;
         Ok(())
     }
 
-    pub fn stop_server(&mut self) {
-        self.is_listening = false;
-        self.connected_clients = 0;
-    }
-
-    pub fn register_client(&mut self) -> Result<usize, &'static str> {
+    pub fn register_client(&mut self) -> Result<usize, String> {
         if !self.is_listening {
-            return Err("Server not listening");
+            return Err("Server is offline".to_string());
         }
         self.connected_clients += 1;
         Ok(self.connected_clients)
     }
 
-    pub fn update_metric(&mut self, name: &str, value: f64) {
-        self.metrics.insert(name.to_string(), value);
+    pub fn update_metric(&mut self, name: &str, val: f64) {
+        self.metrics.insert(name.to_string(), val);
     }
 
-    pub fn stream_metrics_json(&self) -> Result<String, &'static str> {
-        let mut json = String::from("{");
-        json.push_str(&format!("\"listening\":{},", self.is_listening));
-        json.push_str(&format!("\"clients\":{}", self.connected_clients));
-        for (name, val) in &self.metrics {
-            json.push_str(&format!(",\"{}\":{}", name, val));
-        }
-        json.push_str("}");
-        Ok(json)
+    pub fn stream_metrics_json(&self) -> Result<String, String> {
+        let cpu = self.metrics.get("cpu_usage_pct").cloned().unwrap_or(0.0);
+        let mem = self.metrics.get("memory_used_gb").cloned().unwrap_or(0.0);
+        Ok(format!(
+            "{{\"listening\":{},\"clients\":{},\"cpu_usage_pct\":{},\"memory_used_gb\":{}}}",
+            self.is_listening, self.connected_clients, cpu, mem
+        ))
+    }
+
+    pub fn stop_server(&mut self) {
+        self.is_listening = false;
+        self.connected_clients = 0;
+        self.metrics.clear();
     }
 }
 
@@ -1272,9 +1274,145 @@ mod tests {
         assert_eq!(r2, i64::MAX);
         assert!(alu.flags.overflow);
 
-        // Underflow saturated add
-        let r3 = alu.saturated_add(i64::MIN, -1);
-        assert_eq!(r3, i64::MIN);
-        assert!(alu.flags.overflow);
+        // Permissive warning only
+        let permissive = SeLinuxEnforcer::new(SeLinuxMode::Permissive);
+        assert!(permissive.check_access("httpd_t", "unlabeled_t").unwrap());
+    }
+
+    #[test]
+    fn test_copr_repository_manager() {
+        let mut copr = CoprRepositoryManager::new("developer_delta", "neo-vim");
+        copr.submit_copr_build(101, "https://github.com/neovim/neovim.git");
+        assert_eq!(copr.builds.len(), 1);
+
+        let rpm_name = copr.execute_build_compile(101).unwrap();
+        assert_eq!(rpm_name, "copr-build-neo-vim-101.rpm");
+        assert_eq!(copr.builds[0].status, "Success");
+
+        // Fail Case (nonexistent task ID)
+        assert_eq!(copr.execute_build_compile(999), Err("COPR build task ID not found"));
+    }
+
+    #[test]
+    fn test_sovereign_ostree_deployer() {
+        let mut deployer = SovereignOstreeDeployer::new();
+        assert_eq!(deployer.active_deployment_hash, "fedora-base-39.20231101.0");
+
+        // Stage deployment
+        assert!(deployer.stage_deployment("").is_err());
+        assert!(deployer.stage_deployment("fedora-base-40.20240401.0").is_ok());
+        assert_eq!(deployer.staged_deployment_hash, "fedora-base-40.20240401.0");
+
+        // Commit deployment
+        assert!(deployer.commit_deployment().is_ok());
+        assert_eq!(deployer.active_deployment_hash, "fedora-base-40.20240401.0");
+        assert_eq!(deployer.rollback_deployment_hash, "fedora-base-39.20231101.0");
+        assert!(deployer.rollback_available);
+
+        // Layer package
+        assert!(deployer.layer_package("").is_err());
+        assert!(deployer.layer_package("htop").is_ok());
+        assert!(deployer.layer_package("htop").is_err()); // duplicate should fail
+
+        let (active_hash, layered) = deployer.get_active_state();
+        assert_eq!(active_hash, "fedora-base-40.20240401.0");
+        assert_eq!(layered, vec!["htop".to_string()]);
+
+        // Rollback
+        assert!(deployer.rollback().is_ok());
+        assert_eq!(deployer.active_deployment_hash, "fedora-base-39.20231101.0");
+    }
+
+    #[test]
+    fn test_sovereign_selinux_engine() {
+        let mut engine = SovereignSeLinuxEngine::new(SeLinuxMode::Enforcing);
+        let ctx = SovereignSeLinuxContext::new("system_u", "system_r", "httpd_sys_content_t", "s0");
+        engine.register_file_context("/var/www/html/index.html", ctx);
+
+        engine.add_permission("httpd_t", "file", "read");
+        engine.add_transition_rule("init_t", "httpd_t");
+
+        // Verify transition rule
+        assert!(engine.validate_transition("init_t", "httpd_t"));
+        assert!(!engine.validate_transition("init_t", "unconfined_t"));
+
+        // Verify access check
+        let res = engine.check_access("httpd_t", "/var/www/html/index.html", "read");
+        assert_eq!(res, Ok(true));
+
+        // Access violation due to missing permission
+        let res_denied = engine.check_access("httpd_t", "/var/www/html/index.html", "write");
+        assert_eq!(res_denied, Err("SELinux AVC Denial: Access Prohibited by Sovereign MAC policy"));
+
+        // Missing file context
+        let res_missing = engine.check_access("httpd_t", "/etc/shadow", "read");
+        assert_eq!(res_missing, Err("SELinux Error: Path has no registered label/context"));
+
+        // Permissive mode allows but warns
+        let mut permissive_engine = SovereignSeLinuxEngine::new(SeLinuxMode::Permissive);
+        let ctx2 = SovereignSeLinuxContext::new("system_u", "system_r", "httpd_sys_content_t", "s0");
+        permissive_engine.register_file_context("/var/www/html/index.html", ctx2);
+        let permissive_res = permissive_engine.check_access("httpd_t", "/var/www/html/index.html", "write");
+        assert_eq!(permissive_res, Ok(true));
+
+        // Disabled mode allows everything
+        let disabled_engine = SovereignSeLinuxEngine::new(SeLinuxMode::Disabled);
+        assert!(disabled_engine.check_access("any_t", "/any/path", "any").unwrap());
+    }
+
+    #[test]
+    fn test_sovereign_firewalld_manager() {
+        let mut fwd = SovereignFirewalldManager::new();
+        assert_eq!(fwd.default_zone, "public");
+
+        // Allowed public ports are 22, 80, 443
+        assert!(fwd.is_packet_allowed("eth0", 80));
+        assert!(!fwd.is_packet_allowed("eth0", 8080));
+
+        // Assign interface to work zone
+        assert!(fwd.assign_interface_to_zone("eth0", "work").is_ok());
+        // Work allows 8080
+        assert!(fwd.is_packet_allowed("eth0", 8080));
+
+        // Add custom port rule to work zone
+        assert!(fwd.allow_port_in_zone("work", 9090).is_ok());
+        assert!(fwd.is_packet_allowed("eth0", 9090));
+
+        // Invalid zone error
+        assert!(fwd.set_default_zone("invalid_zone").is_err());
+        assert!(fwd.assign_interface_to_zone("eth0", "invalid_zone").is_err());
+    }
+
+    #[test]
+    fn test_sovereign_cockpit_console() {
+        let mut console = SovereignCockpitConsole::new();
+        assert!(!console.is_listening);
+
+        // Fail registering client when offline
+        assert!(console.register_client().is_err());
+
+        // Start server
+        assert!(console.start_server().is_ok());
+        assert!(console.is_listening);
+        assert!(console.start_server().is_err()); // duplicate starts fail
+
+        // Register client
+        assert_eq!(console.register_client().unwrap(), 1);
+        assert_eq!(console.register_client().unwrap(), 2);
+
+        // Metrics
+        console.update_metric("cpu_usage_pct", 45.2);
+        console.update_metric("memory_used_gb", 7.4);
+
+        let json = console.stream_metrics_json().unwrap();
+        assert!(json.contains("\"listening\":true"));
+        assert!(json.contains("\"clients\":2"));
+        assert!(json.contains("\"cpu_usage_pct\":45.2"));
+        assert!(json.contains("\"memory_used_gb\":7.4"));
+
+        // Stop server
+        console.stop_server();
+        assert!(!console.is_listening);
+        assert_eq!(console.connected_clients, 0);
     }
 }

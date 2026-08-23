@@ -23,4 +23,10 @@ pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
     TextNode,
 };
-pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
+pub mod utility_suite;
+pub use utility_suite::{
+    AnnotationShape, AudacityWaveEditor, CompressionMethod, DaVinciTimeline,
+    EarTrumpetVolumeMatrix, FlameshotAnnotator, IrfanViewEngine, ItemAgeColor,
+    NotepadPlusPlusBuffer, OneCommanderFileGrid, SevenZipEngine, SovereignBrowserEngine,
+    VlcCodecPipeline,
+};

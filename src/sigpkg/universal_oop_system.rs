@@ -76,11 +76,7 @@ pub struct Package;
 // ============================================================================
 
 /// Core package trait - defines the contract for all package operations
-pub trait IPathTrigger: Send + Sync {
-    fn pattern(&self) -> &str;
-    fn execute(&self, files: &[String]) -> Result<(), HookError>;
-}
-
+#[derive(Debug, Clone)]
 pub struct ConditionalDependency {
     pub required_use_flag: String,
     pub dependency: Dependency,
@@ -155,6 +151,11 @@ pub struct PackageMetadata {
 // ============================================================================
 
 /// Package parser trait - Strategy pattern for different parsing algorithms
+pub trait IPathTrigger: Send + Sync {
+    fn pattern(&self) -> &str;
+    fn execute(&self, matched_files: &[String]) -> Result<(), HookError>;
+}
+
 pub trait IPackageParser: Send + Sync {
     fn format(&self) -> PackageFormat;
     fn can_parse(&self, data: &[u8]) -> bool;

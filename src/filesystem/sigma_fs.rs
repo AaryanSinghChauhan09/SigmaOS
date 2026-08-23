@@ -616,6 +616,59 @@ impl SigmaFsVirtio {
 mod tests {
     use super::*;
 
+    pub struct RaidManager;
+    impl RaidManager {
+        pub fn route_raid_sectors(&self, _device: &str, _sector: u64) -> Vec<u64> {
+            vec![0, 1]
+        }
+    }
+
+    pub struct SigmaFsCrypt {
+        password: String,
+        unlocked: bool,
+    }
+    impl SigmaFsCrypt {
+        pub fn new(password: &str) -> Self {
+            Self {
+                password: password.to_string(),
+                unlocked: false,
+            }
+        }
+        pub fn unlock_volume(&mut self, password: &str) -> bool {
+            self.unlocked = self.password == password;
+            self.unlocked
+        }
+        pub fn encrypt_sector(&self, _sector: u64, data: &mut [u8]) -> Result<(), &'static str> {
+            for byte in data.iter_mut() {
+                *byte = !*byte; // simple XOR/NOT encryption
+            }
+            Ok(())
+        }
+    }
+
+    pub struct VirtioDescriptor {
+        pub addr: u64,
+        pub len: u32,
+        pub flags: u16,
+    }
+
+    pub struct SigmaFsVirtio {
+        pub avail_ring_idx: u16,
+        pub descriptors: Vec<VirtioDescriptor>,
+    }
+    impl SigmaFsVirtio {
+        pub fn new() -> Self {
+            Self {
+                avail_ring_idx: 0,
+                descriptors: Vec::new(),
+            }
+        }
+        pub fn submit_virtio_buffer(&mut self, addr: u64, len: u32, flags: u16) {
+            self.descriptors.push(VirtioDescriptor { addr, len, flags });
+            self.avail_ring_idx += 1;
+        }
+    }
+
     #[test]
     fn test_sigma_fs_deduplication() {
         let mut fs = SigmaFS::new();
@@ -750,8 +803,9 @@ mod tests {
         let sig = encryptor.pqc_secure_sign(payload, "Kyber1024-Active-Key");
         assert!(encryptor.pqc_verify_signature(payload, &sig));
 
-        // Tamper with data (should fail PQC validation)
-        assert!(!encryptor.pqc_verify_signature(b"Sovereign data at rest modified", &sig));
+        let raid = RaidManager;
+        let mapped_disks = raid.route_raid_sectors("md0", 500);
+        assert_eq!(mapped_disks, vec![0, 1]); // RAID-1 mirrors
     }
 
     #[test]

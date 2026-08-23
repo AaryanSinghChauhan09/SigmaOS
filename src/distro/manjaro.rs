@@ -17,11 +17,12 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Manjaro Distro Integration Module
-
 extern crate alloc;
-use crate::klib::collections::HashMap;
-use crate::klib::custom_string::SigmaString;
-use alloc::vec::Vec;
+// Models advanced rolling-release, automatic hardware configuration,
+// kernel switching, and mirror-ranked transactional packaging.
+
+use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {

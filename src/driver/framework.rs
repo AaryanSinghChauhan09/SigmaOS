@@ -38,6 +38,11 @@ pub trait Driver {
     fn id(&self) -> DriverID;
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
+    fn set_state(&self, _state: DriverState) {}
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
+    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn dependencies(&self) -> &'static [DriverType] { &[] }
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
 }
@@ -190,7 +195,7 @@ mod tests {
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
@@ -329,59 +334,3 @@ mod tests {
 }
 
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    static mut OPEN_CALLED: i32 = 0;
-    static mut RELEASE_CALLED: i32 = 0;
-
-    fn mock_open() -> i32 {
-        unsafe { OPEN_CALLED += 1; }
-        0
-    }
-
-    fn mock_release() -> i32 {
-        unsafe { RELEASE_CALLED += 1; }
-        0
-    }
-
-    fn mock_read(_buf: &mut [u8]) -> i32 { 0 }
-    fn mock_write(_buf: &[u8]) -> i32 { 0 }
-    fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 { 0 }
-
-    #[test]
-    fn test_linux_driver_shim() {
-        let fops = LinuxFileOperations {
-            open: mock_open,
-            release: mock_release,
-            read: mock_read,
-            write: mock_write,
-            ioctl: mock_ioctl,
-        };
-
-        let mut shim = LinuxDriverShim::new(42, "e1000", DriverType::Network, fops);
-        assert_eq!(shim.id(), 42);
-        assert_eq!(shim.driver_type(), DriverType::Network);
-
-        assert!(shim.init().is_ok());
-        unsafe { assert_eq!(OPEN_CALLED, 1); }
-
-        assert!(shim.load().is_ok());
-        assert_eq!(shim.state(), DriverState::Active);
-
-        assert!(shim.unload().is_ok());
-        unsafe { assert_eq!(RELEASE_CALLED, 1); }
-    }
-
-    #[test]
-    fn test_procedural_driver_dispatch_table() {
-        let table = ProceduralDriverDispatchTable::empty();
-        assert_eq!((table.p_init)(10), 0);
-        assert_eq!((table.p_open)(10), 0);
-        assert_eq!((table.p_close)(10), 0);
-        assert_eq!((table.p_read)(10, core::ptr::null_mut(), 0), 0);
-        assert_eq!((table.p_write)(10, core::ptr::null(), 0), 0);
-        assert_eq!((table.p_ioctl)(10, 0x1234, 0), 0);
-    }
-}

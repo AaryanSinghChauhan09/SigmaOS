@@ -264,6 +264,7 @@ mod tests {
             .allow_network()
             .grant_posix_capability(CAP_NET_BIND_SERVICE)
             .allow_fs_read()
+            .grant_posix_capability(CAP_NET_BIND_SERVICE)
             .add_port(80)
             .add_port(443);
 

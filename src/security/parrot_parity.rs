@@ -1,7 +1,9 @@
 // SigmaOS Parrot Security Parity Implementation
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use core::cell::Cell;
+extern crate alloc;
+use crate::klib::SigmaString;
 
 /// Routing modes for network traffic
 #[repr(usize)]
@@ -18,6 +20,8 @@ pub struct AnonSurfShunt {
     pub dns_leak_protection: AtomicBool,
     pub anonymized_packets_routed: AtomicU64,
 }
+
+unsafe impl Sync for AnonSurfShunt {}
 
 impl AnonSurfShunt {
     pub const fn new() -> Self {
@@ -60,7 +64,7 @@ impl AnonSurfShunt {
 }
 
 /// Sandbox policy for application security
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct SandboxPolicy {
     pub allow_network: bool,
     pub allow_raw_sockets: bool,
@@ -75,19 +79,33 @@ pub struct AppSandboxEngine {
     pub allow_filesystem_write: AtomicBool,
 }
 
+unsafe impl Sync for AppSandboxEngine {}
+
 impl AppSandboxEngine {
     pub const fn new() -> Self {
         AppSandboxEngine {
-            allow_network: AtomicBool::new(false),
-            allow_raw_sockets: AtomicBool::new(false),
-            allow_filesystem_write: AtomicBool::new(false),
+            current_policy: Cell::new(SandboxPolicy {
+                allow_network: false,
+                allow_raw_sockets: false,
+                allow_filesystem_write: false,
+                permitted_subpath: "/sandbox/tmp",
+            }),
         }
     }
+}
 
+impl Default for AppSandboxEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AppSandboxEngine {
     /// Validate filesystem write access
     pub fn validate_filesystem_write(&self, path: &str) -> bool {
-        if !self.allow_filesystem_write.load(Ordering::SeqCst) {
-            path.starts_with("/sandbox/tmp")
+        let policy = self.current_policy.get();
+        if !policy.allow_filesystem_write {
+            path.starts_with(policy.permitted_subpath)
         } else {
             true
         }
@@ -127,6 +145,8 @@ pub struct ForensicStorageFilter {
     pub is_write_blocked: AtomicBool,
 }
 
+unsafe impl Sync for ForensicStorageFilter {}
+
 impl ForensicStorageFilter {
     pub const fn new() -> Self {
         ForensicStorageFilter {
@@ -165,12 +185,6 @@ impl Default for AnonSurfShunt {
     }
 }
 
-impl Default for AppSandboxEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Default for ForensicStorageFilter {
     fn default() -> Self {
         Self::new()
@@ -189,5 +203,5 @@ impl Default for SandboxPolicy {
 }
 
 pub static GLOBAL_ANONSURF: AnonSurfShunt = AnonSurfShunt::new();
-pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter::new();
 pub static GLOBAL_SANDBOX: AppSandboxEngine = AppSandboxEngine::new();
+pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter::new();

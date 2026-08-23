@@ -4,6 +4,7 @@
 
 extern crate alloc;
 use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
+extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
@@ -69,32 +70,6 @@ impl SigmaMediaEngine {
             format: None,
             duration_seconds: 0,
         }
-    }
-
-    pub fn play(&mut self) -> Result<(), &'static str> {
-        if !self.has_track && self.active_track.is_none() {
-            return Err("No track loaded");
-        }
-        self.state = PlaybackState::Playing;
-        Ok(())
-    }
-
-    pub fn load_track(&mut self, name: String, format: MediaFormat, duration: usize) {
-        self.has_track = true;
-        self.active_track = Some(name);
-        self.format = Some(format);
-        self.duration_seconds = duration;
-        self.state = PlaybackState::Stopped;
-    }
-
-    pub fn pause(&mut self) {
-        if self.state == PlaybackState::Playing {
-            self.state = PlaybackState::Paused;
-        }
-    }
-
-    pub fn stop(&mut self) {
-        self.state = PlaybackState::Stopped;
     }
 
     /// Plays a raw chiptune sound buffer over an active audio channel

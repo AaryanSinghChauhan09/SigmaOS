@@ -8,9 +8,32 @@ use alloc::vec::Vec;
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::boxed::Box;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use core::sync::atomic::AtomicU32;
+use crate::network::NetworkInterface;
+
+#[derive(Debug, Clone)]
+pub struct NetfilterFirewall {
+    pub enabled: bool,
+}
+
+impl NetfilterFirewall {
+    pub fn new() -> Self { Self { enabled: true } }
+}
+
+#[derive(Debug, Clone)]
+pub struct RoutingTable {
+    pub routes: Vec<String>,
+}
+
+impl RoutingTable {
+    pub fn new() -> Self { Self { routes: Vec::new() } }
+}
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -36,6 +59,7 @@ pub enum TCPState {
     CloseWait = 7,
     Closing = 8,
     TimeWait = 9,
+    LastAck = 10,
 }
 
 /// Network Errors
@@ -68,13 +92,13 @@ pub enum SocketOption {
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
-    pub local_port: AtomicU32,
-    pub remote_port: AtomicU32,
-    pub state: AtomicU32,
-    pub reuse_addr: AtomicU32,
-    pub tcp_nodelay: AtomicU32,
-    pub rcv_buf: AtomicU32,
-    pub snd_buf: AtomicU32,
+    pub local_port: AtomicUsize,
+    pub remote_port: AtomicUsize,
+    pub state: AtomicUsize,
+    pub reuse_addr: AtomicUsize,
+    pub tcp_nodelay: AtomicUsize,
+    pub rcvbuf: AtomicUsize,
+    pub sndbuf: AtomicUsize,
 }
 
 impl SimpleSocket {
@@ -82,13 +106,13 @@ impl SimpleSocket {
         SimpleSocket {
             id,
             protocol,
-            local_port: AtomicU32::new(local_port as u32),
-            remote_port: AtomicU32::new(0),
-            state: AtomicU32::new(TCPState::Closed as u32),
-            reuse_addr: AtomicU32::new(0),
-            tcp_nodelay: AtomicU32::new(0),
-            rcv_buf: AtomicU32::new(8192),
-            snd_buf: AtomicU32::new(8192),
+            local_port: AtomicUsize::new(local_port as usize),
+            remote_port: AtomicUsize::new(0),
+            state: AtomicUsize::new(TCPState::Closed as usize),
+            reuse_addr: AtomicUsize::new(0),
+            tcp_nodelay: AtomicUsize::new(0),
+            rcvbuf: AtomicUsize::new(65536),
+            sndbuf: AtomicUsize::new(65536),
         }
     }
 }
@@ -200,8 +224,7 @@ impl TCPConnection for SimpleSocket {
     }
 
     fn get_state(&self) -> TCPState {
-        let raw = self.state.load(Ordering::SeqCst);
-        match raw {
+        match self.state.load(Ordering::SeqCst) {
             0 => TCPState::Closed,
             1 => TCPState::Listen,
             2 => TCPState::SynSent,
@@ -211,7 +234,9 @@ impl TCPConnection for SimpleSocket {
             6 => TCPState::FinWait2,
             7 => TCPState::CloseWait,
             8 => TCPState::Closing,
-            _ => TCPState::TimeWait,
+            9 => TCPState::LastAck,
+            10 => TCPState::TimeWait,
+            _ => TCPState::Closed,
         }
     }
 }
@@ -335,19 +360,9 @@ pub struct SimpleFirewall {
 
 impl SimpleFirewall {
     pub fn new() -> Self {
-        let mut allowed = Vec::new();
-        for _ in 0..65536 {
-            allowed.push(false);
-        }
-        SimpleFirewall {
-            allowed_ports: allowed,
-        }
-    }
-}
-
-impl Default for SimpleFirewall {
-    fn default() -> Self {
-        Self::new()
+        const ATOMIC_ZERO: AtomicUsize = AtomicUsize::new(0);
+        let allowed_ports = [ATOMIC_ZERO; 65536];
+        SimpleFirewall { allowed_ports }
     }
 }
 
@@ -644,6 +659,9 @@ impl SimpleNetworkStack {
             next_id: AtomicU32::new(1),
             firewall: SimpleFirewall::new(),
             congestion: RenoCongestionControl::new(),
+            netfilter: NetfilterFirewall::new(),
+            routing_table: RoutingTable::new(),
+            interfaces: Vec::new(),
         }
     }
 }
@@ -679,279 +697,5 @@ impl NetworkStack for SimpleNetworkStack {
         }
         None
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_tcp_socket_flow() {
-        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 80);
-        assert_eq!(socket.id(), 1);
-        assert_eq!(socket.protocol(), Protocol::Tcp);
-        assert!(socket.listen().is_ok());
-        assert!(socket.connect(8080).is_ok());
-        assert_eq!(socket.get_state(), TCPState::Established);
-
-        let data = b"hello";
-        assert_eq!(socket.send(data).unwrap(), 5);
-
-        let mut buf = [0u8; 10];
-        assert_eq!(socket.recv(&mut buf).unwrap(), 10);
-        assert_eq!(buf[0], 13);
-
-        assert!(socket.close().is_ok());
-        assert_eq!(socket.get_state(), TCPState::Closed);
-    }
-
-    #[test]
-    fn test_tcp_state_machine_handshake() {
-        let mut socket = SimpleSocket::new(1, Protocol::TCP, 443);
-        assert_eq!(socket.get_state(), TCPState::Closed);
-
-        socket.connect(55120).unwrap();
-        assert_eq!(socket.get_state(), TCPState::Established);
-
-        socket.close().unwrap();
-        assert_eq!(socket.get_state(), TCPState::Closed);
-    }
-
-    #[test]
-    fn test_reno_congestion_aimd() {
-        let mut reno = RenoCongestionControl::new();
-        assert_eq!(reno.get_cwnd(), 10);
-
-        reno.update_cwnd(2);
-        assert_eq!(reno.get_cwnd(), 12);
-
-        reno.on_loss();
-        assert_eq!(reno.get_cwnd(), 1);
-        assert_eq!(reno.ssthresh, 6);
-    }
-
-    #[test]
-    fn test_bbr_congestion_pacing() {
-        let mut bbr = BBRCongestionControl::new();
-        bbr.update_cwnd(0);
-        assert_eq!(bbr.get_cwnd(), 100);
-
-        bbr.on_loss();
-        assert_eq!(bbr.get_cwnd(), 80);
-    }
-
-    #[test]
-    fn test_firewall_allowed_ports() {
-        let mut fw = SimpleFirewall::new();
-        assert!(!fw.is_allowed(80));
-
-        fw.allow_port(80);
-        assert!(fw.is_allowed(80));
-
-        fw.block_port(80);
-        assert!(!fw.is_allowed(80));
-    }
-
-    #[test]
-    fn test_congestion_control() {
-        let mut reno = RenoCongestionControl::new();
-        let initial_cwnd = reno.get_cwnd();
-        reno.update_cwnd(2);
-        assert!(reno.get_cwnd() > initial_cwnd);
-
-        reno.on_loss();
-        assert_eq!(reno.get_cwnd(), 1);
-    }
-
-    #[test]
-    fn test_bsd_socket_options() {
-        let socket = SimpleSocket::new(100, Protocol::TCP, 80);
-        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 0);
-
-        socket.set_opt(SocketOption::ReuseAddr, 1).unwrap();
-        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 1);
-
-        socket.set_opt(SocketOption::RcvBuf, 131072).unwrap();
-        assert_eq!(socket.get_opt(SocketOption::RcvBuf).unwrap(), 131072);
-    }
-
-    #[test]
-    fn test_netfilter_iptables() {
-        let mut fw = NetfilterFirewall::new();
-        let rule = NetfilterRule {
-            chain: NetfilterChain::Input,
-            source_ip: [192, 168, 1, 100],
-            dest_ip: [0, 0, 0, 0],
-            protocol: Protocol::TCP,
-            port: 22,
-            action: NetfilterAction::Drop,
-        };
-        fw.add_rule(rule);
-
-        // Packet matches rule: should be dropped
-        let action = fw.match_packet(
-            NetfilterChain::Input,
-            [192, 168, 1, 100],
-            [10, 0, 0, 1],
-            Protocol::TCP,
-            22,
-        );
-        assert_eq!(action, NetfilterAction::Drop);
-
-        // Different IP: should be accepted (by default policy)
-        let action_other = fw.match_packet(
-            NetfilterChain::Input,
-            [192, 168, 1, 101],
-            [10, 0, 0, 1],
-            Protocol::TCP,
-            22,
-        );
-        assert_eq!(action_other, NetfilterAction::Accept);
-    }
-
-    #[test]
-    fn test_ip_routing_cidr() {
-        let mut routing = RoutingTable::new();
-        let entry = RoutingEntry {
-            dest_network: [192, 168, 1, 0],
-            subnet_mask: [255, 255, 255, 0],
-            gateway: [192, 168, 1, 1],
-            interface_name: [b'e', b't', b'h', b'0', 0, 0, 0, 0],
-        };
-        routing.add_route(entry);
-
-        // Route matches subnet
-        let route = routing.lookup([192, 168, 1, 50]).unwrap();
-        assert_eq!(route.gateway, [192, 168, 1, 1]);
-
-        // Route does not match
-        assert!(routing.lookup([10, 0, 0, 5]).is_none());
-    }
-
-    #[test]
-    fn test_epoll_event_loop() {
-        let mut epoll = EpollInstance::new(1);
-        let event = EpollEvent {
-            events: 1,
-            data: 999,
-        };
-        epoll.ctl(EpollOp::Add, 10, event).unwrap();
-
-        let mut events_out = [EpollEvent { events: 0, data: 0 }; 4];
-        let triggered = epoll.wait(&mut events_out).unwrap();
-        assert_eq!(triggered, 1);
-        assert_eq!(events_out[0].data, 999);
-    }
-}
