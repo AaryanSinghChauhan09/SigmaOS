@@ -125,6 +125,19 @@ impl VirtualFilesystem {
         Ok(inode_id)
     }
 
+    /// Create a hard link to an existing inode (Linux & BSD FHS standard)
+    pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
+        if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            if inode.file_type == FileType::Directory {
+                return Err(FsError::IsDirectory);
+            }
+            inode.link_count += 1;
+            Ok(())
+        } else {
+            Err(FsError::NotFound)
+        }
+    }
+
     pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
         if !self.inodes.contains_key(&inode_id) {
             return Err(FsError::NotFound);
