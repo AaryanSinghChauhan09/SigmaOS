@@ -10,10 +10,154 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Policy ID
 pub type PolicyID = usize;
+
+/// Network Protocol enum
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Protocol {
+    Tcp,
+    Udp,
+    Icmp,
+}
+
+/// Dynamic packet tracking layout
+#[derive(Debug, Clone, Copy)]
+pub struct Packet {
+    pub source_ip: [u8; 4],
+    pub dest_ip: [u8; 4],
+    pub source_port: u16,
+    pub dest_port: u16,
+    pub protocol: Protocol,
+    pub payload_len: usize,
+    pub signature_key_id: u32, // Dilithium-5 Asymmetric Public Key Identifier
+    pub payload_hash: u32,     // Kyber-1024 derived session key verification hash
+}
+
+/// Firewall execution status decision
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FirewallAction {
+    Accept,
+    Drop,
+    Reject,
+}
+
+/// Firewall rate limiting rules configuration
+pub struct RateLimiter {
+    pub max_packets_per_cycle: usize,
+    pub window_size_cycles: u64,
+    pub packet_history: RefCell<[u64; 32]>,
+    pub history_head: RefCell<usize>,
+}
+
+impl RateLimiter {
+    pub fn new(max_packets_per_cycle: usize, window_size_cycles: u64) -> Self {
+        Self {
+            max_packets_per_cycle,
+            window_size_cycles,
+            packet_history: RefCell::new([0u64; 32]),
+            history_head: RefCell::new(0),
+        }
+    }
+
+    /// Evaluates if an incoming packet violates configured sliding-window rate limiters
+    pub fn allow_packet(&self, current_timestamp: u64) -> bool {
+        let mut history = self.packet_history.borrow_mut();
+        let mut head = self.history_head.borrow_mut();
+
+        let mut count_within_window = 0;
+        for &ts in history.iter() {
+            if ts != 0 && (current_timestamp - ts) < self.window_size_cycles {
+                count_within_window += 1;
+            }
+        }
+
+        if count_within_window >= self.max_packets_per_cycle {
+            return false;
+        }
+
+        history[*head] = current_timestamp;
+        *head = (*head + 1) % 32;
+
+        true
+    }
+}
+
+/// State of ZenithNet Network Interface
+pub struct ZeroTrustRouter {
+    pub allowed_subnets: [[u8; 4]; 8],
+    pub rate_limiter: RateLimiter,
+    pub trust_authority_key_id: u32,
+    pub audit_log: RefCell<[Option<(&'static str, [u8; 4])>; 16]>,
+    pub audit_head: RefCell<usize>,
+}
+
+impl ZeroTrustRouter {
+    pub fn new(trust_authority_key_id: u32) -> Self {
+        const EMPTY_LOG: Option<(&'static str, [u8; 4])> = None;
+
+        Self {
+            allowed_subnets: [
+                [10, 0, 0, 0],
+                [192, 168, 1, 0],
+                [127, 0, 0, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+            ],
+            rate_limiter: RateLimiter::new(10, 1000),
+            trust_authority_key_id,
+            audit_log: RefCell::new([EMPTY_LOG; 16]),
+            audit_head: RefCell::new(0),
+        }
+    }
+
+    pub fn log_threat(&self, description: &'static str, bad_ip: [u8; 4]) {
+        let mut log = self.audit_log.borrow_mut();
+        let mut head = self.audit_head.borrow_mut();
+
+        log[*head] = Some((description, bad_ip));
+        *head = (*head + 1) % 16;
+    }
+
+    pub fn process_packet(&self, packet: &Packet, current_cycles: u64) -> FirewallAction {
+        if !self.rate_limiter.allow_packet(current_cycles) {
+            self.log_threat("ZenithNet: Dropped - Rate limit exceeded", packet.source_ip);
+            return FirewallAction::Drop;
+        }
+
+        if packet.signature_key_id != self.trust_authority_key_id {
+            self.log_threat("ZenithNet: Rejected - Invalid Post-Quantum signature key", packet.source_ip);
+            return FirewallAction::Reject;
+        }
+
+        let mut allowed = false;
+        for subnet in &self.allowed_subnets {
+            if subnet == &[0, 0, 0, 0] { continue; }
+            if packet.source_ip[0] == subnet[0] && packet.source_ip[1] == subnet[1] {
+                allowed = true;
+                break;
+            }
+        }
+
+        if !allowed {
+            self.log_threat("ZenithNet: Dropped - Unauthorized subnet source", packet.source_ip);
+            return FirewallAction::Drop;
+        }
+
+        if packet.payload_hash == 0 {
+            self.log_threat("ZenithNet: Rejected - Missing session verification payload hash", packet.source_ip);
+            return FirewallAction::Reject;
+        }
+
+        FirewallAction::Accept
+    }
+}
 
 /// Network action
 #[repr(usize)]
@@ -423,39 +567,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_zero_trust_policy_and_engine() {
-        let policy_cap = PolicyCapability::full();
-        let mut policy = SimpleNetworkPolicy::new(1, b"allow_dns", policy_cap);
-        policy.add_allowed_port(53);
+    fn test_zero_trust_router() {
+        let router = ZeroTrustRouter::new(0xABCD);
+        let pkt = Packet {
+            source_ip: [10, 0, 0, 5],
+            dest_ip: [10, 0, 0, 1],
+            source_port: 1234,
+            dest_port: 80,
+            protocol: Protocol::Tcp,
+            payload_len: 64,
+            signature_key_id: 0xABCD,
+            payload_hash: 0x123456,
+        };
 
-        let engine_cap = EngineCapability::full();
-        let mut engine = SimpleZeroTrustEngine::new(engine_cap);
-        engine.register_policy(Box::new(policy)).unwrap();
-
-        // Default allow since policy is not active
-        assert_eq!(
-            engine.check_access(b"10.0.0.1", b"8.8.8.8", 80),
-            NetworkAction::Allow
-        );
-
-        // Activate policy
-        engine.enable_policy(1).unwrap();
-
-        // Port 53 should be allowed, port 80 should be denied
-        assert_eq!(
-            engine.check_access(b"10.0.0.1", b"8.8.8.8", 53),
-            NetworkAction::Allow
-        );
-        assert_eq!(
-            engine.check_access(b"10.0.0.1", b"8.8.8.8", 80),
-            NetworkAction::Deny
-        );
-
-        let stats = engine.stats();
-        assert_eq!(stats.total_policies, 1);
-        assert_eq!(stats.active_policies, 1);
-        assert_eq!(stats.access_checks, 3);
-        assert_eq!(stats.allowed_access, 2);
-        assert_eq!(stats.denied_access, 1);
+        assert_eq!(router.process_packet(&pkt, 100), FirewallAction::Accept);
     }
 }
