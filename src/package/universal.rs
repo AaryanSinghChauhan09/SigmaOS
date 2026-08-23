@@ -751,30 +751,6 @@ pub enum FeatureType {
     Source,
 }
 
-pub struct TabularSchema {
-    pub fields: Vec<String>,
-}
-
-pub struct TabularRow {
-    pub values: Vec<String>,
-}
-
-pub struct TabularDataset {
-    pub schema: TabularSchema,
-    pub rows: Vec<TabularRow>,
-}
-
-pub struct SovereignTabFm {
-    pub datasets: Vec<TabularDataset>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureType {
-    Binary,
-    Library,
-    Source,
-}
-
 pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
 }
