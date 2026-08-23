@@ -534,7 +534,7 @@ mod tests {
         let builder = MakepkgBuilder::new("ripgrep", "13.0.0", "x86_64", "SKIP");
         let source_bytes = b"cargo build --release";
 
-        let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
+        let (pkg_file, pkg_data): (klib::string::SigmaString, klib::vec::Vec<u8>) = builder.build_package_archive(source_bytes).unwrap();
         assert_eq!(pkg_file, "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }

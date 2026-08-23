@@ -35,9 +35,10 @@ pub use zone::{BsdZoneAllocator, Zone, ZoneStats, Slab};
 pub use kswapd::{LinuxKswapd, PageState};
 pub use cgroups::{MemCgroupManager, MemCgroup};
 pub use segmentation_paging::{
-    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
-    SpaceProtectionFlags, SystemControlRegisters,
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuPrivilegeMode, CpuRing, ExecutableAddressBinding,
+    GlobalDescriptorTable, MultiLevelPagingEngine, ProtectionLevel, ProtectionViolationType,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentType, SegmentedAddress,
+    SegmentationPagingEngine, SpaceProtectionFlags, SystemControlRegisters,
 };
 pub use tlb_associative::{
     AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags,

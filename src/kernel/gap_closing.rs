@@ -476,6 +476,36 @@ impl X86RootkitAuditor {
 
         Ok(())
     }
+
+    /// Audit device stack drivers against allowed driver whitelist
+    pub fn audit_device_stack(&self, device: &DeviceObject, allowed_drivers: &[&str]) -> Result<(), &'static str> {
+        let mut curr: Option<&DeviceObject> = Some(device);
+        while let Some(dev) = curr {
+            if !allowed_drivers.contains(&dev.driver_name) {
+                return Err("Rootkit filter driver detected in device stack!");
+            }
+            curr = dev.next_device.as_deref();
+        }
+        Ok(())
+    }
+
+    /// Audit driver major function dispatch table for out-of-bounds hook redirection
+    pub fn audit_driver_dispatch_table(&self, driver: &DriverObject, min_addr: usize, max_addr: usize) -> Result<(), &'static str> {
+        for func in &driver.major_function {
+            if let Some(f) = func {
+                let addr = *f as usize;
+                if addr < min_addr || addr > max_addr {
+                    return Err("Rootkit hook detected in DriverObject major function dispatch table!");
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+pub fn io_attach_device_to_device_stack(source_device: &mut DeviceObject, target_device: &mut DeviceObject) {
+    source_device.next_device = Some(Box::new(target_device.clone()));
+    target_device.attached_device = Some(Box::new(source_device.clone()));
 }
 
 // ==========================================
@@ -491,11 +521,53 @@ pub enum IrpMajorFunction {
     DeviceControl = 4, // equivalent to IOCTL
 }
 
+#[derive(Debug, Clone)]
+pub struct IrpStackLocation {
+    pub major_function: IrpMajorFunction,
+    pub ioctl_code: u32,
+}
+
 pub struct Irp {
     pub major_function: IrpMajorFunction,
     pub ioctl_code: u32,
     pub system_buffer: Vec<u8>,
     pub status: u32, // Status codes (NTSTATUS/errno-like)
+    pub current_stack_index: usize,
+    pub stack_locations: Vec<IrpStackLocation>,
+}
+
+impl Irp {
+    pub fn new(major_function: IrpMajorFunction, ioctl_code: u32, system_buffer: Vec<u8>) -> Self {
+        Self {
+            major_function,
+            ioctl_code,
+            system_buffer,
+            status: 0,
+            current_stack_index: 0,
+            stack_locations: Vec::new(),
+        }
+    }
+
+    pub fn new_with_stack(
+        major_function: IrpMajorFunction,
+        ioctl_code: u32,
+        system_buffer: Vec<u8>,
+        stack_count: usize,
+    ) -> Self {
+        let mut stack = Vec::new();
+        for _ in 0..stack_count {
+            stack.push(IrpStackLocation { major_function, ioctl_code });
+        }
+        let current_index = if stack_count > 0 { stack_count - 1 } else { 0 };
+        Self {
+            major_function,
+            ioctl_code,
+            system_buffer,
+            status: 0,
+            current_stack_index: current_index,
+            stack_locations: stack,
+        }
+    }
 }
 
 pub struct IrpHandler {

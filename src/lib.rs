@@ -30,6 +30,7 @@ pub mod thread;
 pub mod process;
 pub mod community;
 pub mod memory;
+pub mod access;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
@@ -106,6 +107,10 @@ pub use customization::{
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use dashboard::statutory_compliance::{
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryBreachAlert,
+    StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
@@ -217,7 +222,7 @@ pub use memory::segmentation_paging::{
 pub use community::toolkit::{
     ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe as CommunityPackageRecipe,
     RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
-    SecurityProfileTemplateStore, SecurityTemplate,
+    SecurityProfileTemplateStore, SecurityTemplate, HybridFirewallTemplateStore, VirtualizationBlueprintStore,
 };
 
 pub use tools::{
