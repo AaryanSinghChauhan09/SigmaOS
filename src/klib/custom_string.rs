@@ -39,7 +39,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone)]
 pub struct SigmaString {
     data: String,
 }

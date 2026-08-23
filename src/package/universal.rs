@@ -526,13 +526,6 @@ pub struct PackageCheckpoint {
     pub installed_keys: Vec<String>,
 }
 
-/// Universal package manager with transaction-safe snapshots & rollback mechanisms
-#[derive(Debug, Clone)]
-pub struct PackageCheckpoint {
-    pub checkpoint_id: usize,
-    pub installed_keys: Vec<String>,
-}
-
 /// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
 #[derive(Debug, Clone)]
 pub struct TransactionalHistory {
@@ -980,13 +973,6 @@ pub struct TabularDataset {
 
 pub struct SovereignTabFm {
     pub datasets: Vec<TabularDataset>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureType {
-    Binary,
-    Library,
-    Source,
 }
 
 pub trait PackageAdapterTrait {
