@@ -18,6 +18,4 @@ typedef int                sigma_bool;
 #define SIGMA_TRUE         1
 #define SIGMA_FALSE        0
 
-typedef int                sigma_status;
-
 #endif // SIGMA_KERNEL_TYPES_H
