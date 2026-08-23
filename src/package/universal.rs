@@ -308,6 +308,16 @@ impl PackageFormatAdapter for YumRpmAdapter {
             "Removing {} using {} adapter",
             package.name, self.adapter_name()
         );
+        // Simulate removal
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Erasing RPM package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
@@ -532,7 +542,7 @@ pub struct TransactionalHistory {
 
 impl TransactionalHistory {
     pub fn new() -> Self {
-        TransactionalHistory {
+        Self {
             checkpoints: Vec::new(),
             next_checkpoint_id: 1,
         }
@@ -946,6 +956,30 @@ pub enum PackageError {
     AdapterNotFound,
     InstallationFailed(String),
     ConflictDetected(Vec<(String, String)>),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FeatureType {
+    Binary,
+    Library,
+    Source,
+}
+
+pub struct TabularSchema {
+    pub fields: Vec<String>,
+}
+
+pub struct TabularRow {
+    pub values: Vec<String>,
+}
+
+pub struct TabularDataset {
+    pub schema: TabularSchema,
+    pub rows: Vec<TabularRow>,
+}
+
+pub struct SovereignTabFm {
+    pub datasets: Vec<TabularDataset>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

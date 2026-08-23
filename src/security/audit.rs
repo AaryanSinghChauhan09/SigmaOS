@@ -1,7 +1,12 @@
-/// OOP-based Security Audit for SigmaOS
-/// Based on Ideas-999-Structured: Security & Sovereignty Item 542
-/// Implements security event logging and audit trails
+// SPDX-License-Identifier: GPL-3.0-or-later
+//! OOP-based Security Audit for SigmaOS
+//! Implements security event logging and audit trails
+
+#![no_std]
+
 extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -25,13 +30,6 @@ pub enum EventType {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogFormat {
-    PlainText,
-    Json,
-    Binary,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuditError {
     Success = 0,
@@ -161,17 +159,9 @@ impl AuditLogger for SimpleAuditLogger {
     }
 
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
-        let mut i = 0;
-        while i < self.events.len() {
-            let mut remove = false;
-            if let Some(ref event) = self.events[i] {
-                let event: &Box<dyn AuditEvent> = event;
-                if event.timestamp() < older_than {
-                    remove = true;
-                }
-            }
-            if remove {
-                self.events.remove(i);
+        self.events.retain(|event_opt| {
+            if let Some(ref event) = *event_opt {
+                event.timestamp() >= older_than
             } else {
                 false
             }

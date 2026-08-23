@@ -14,28 +14,6 @@ impl AgentAutomationEngine {
     }
 }
 
-impl Default for AgentAutomationEngine {
-    fn default() -> Self { Self::new() }
-}
-
-
-
-use crate::accessibility::{
-    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
-    AccessibilitySetting,
-};
-use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
-};
-use crate::customization::{CustomizationEngine, Theme};
-use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
-use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
-use crate::virtualization::{
-    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
-    VmState,
-};
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {

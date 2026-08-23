@@ -699,3 +699,117 @@ impl NetworkStack for SimpleNetworkStack {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tcp_socket_flow() {
+        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 80);
+        assert_eq!(socket.id(), 1);
+        assert_eq!(socket.protocol(), Protocol::Tcp);
+        assert!(socket.listen().is_ok());
+        assert!(socket.connect(8080).is_ok());
+        assert_eq!(socket.get_state(), TCPState::Established);
+
+        let data = b"hello";
+        assert_eq!(socket.send(data).unwrap(), 5);
+
+        let mut buf = [0u8; 10];
+        assert_eq!(socket.recv(&mut buf).unwrap(), 10);
+        assert_eq!(buf[0], 13);
+
+        assert!(socket.close().is_ok());
+        assert_eq!(socket.get_state(), TCPState::Closed);
+    }
+
+    #[test]
+    fn test_socket_options() {
+        let socket = SimpleSocket::new(1, Protocol::Tcp, 80);
+        socket.set_opt(SocketOption::TcpNoDelay, 1).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::TcpNoDelay).unwrap(), 1);
+
+        socket.set_opt(SocketOption::RcvBuf, 16384).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::RcvBuf).unwrap(), 16384);
+    }
+
+    #[test]
+    fn test_udp_socket_flow() {
+        let mut socket = SimpleSocket::new(2, Protocol::Udp, 53);
+        assert_eq!(socket.id(), 2);
+        assert_eq!(socket.protocol(), Protocol::Udp);
+
+        let data = b"dnsreq";
+        assert_eq!(socket.sendto(data, 53).unwrap(), 6);
+
+        let mut buf = [0u8; 10];
+        let (len, rport) = socket.recvfrom(&mut buf).unwrap();
+        assert_eq!(len, 10);
+        assert_eq!(rport, 53);
+        assert_eq!(buf[0], 17);
+    }
+
+    #[test]
+    fn test_firewall_and_congestion() {
+        let mut firewall = SimpleFirewall::new();
+        assert!(!firewall.is_allowed(80));
+        firewall.allow_port(80);
+        assert!(firewall.is_allowed(80));
+        firewall.block_port(80);
+        assert!(!firewall.is_allowed(80));
+
+        let mut cc = RenoCongestionControl::new();
+        assert_eq!(cc.get_cwnd(), 10);
+        cc.update_cwnd(2);
+        assert_eq!(cc.get_cwnd(), 12);
+        cc.on_loss();
+        assert_eq!(cc.get_cwnd(), 1);
+    }
+
+    #[test]
+    fn test_tcp_state_machine_handshake() {
+        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 443);
+        assert_eq!(socket.get_state(), TCPState::Closed);
+
+        socket.connect(55120).unwrap();
+        assert_eq!(socket.get_state(), TCPState::Established);
+
+        socket.close().unwrap();
+        assert_eq!(socket.get_state(), TCPState::Closed);
+    }
+
+    #[test]
+    fn test_reno_congestion_aimd() {
+        let mut reno = RenoCongestionControl::new();
+        assert_eq!(reno.get_cwnd(), 10);
+
+        reno.update_cwnd(2);
+        assert_eq!(reno.get_cwnd(), 12);
+
+        reno.on_loss();
+        assert_eq!(reno.get_cwnd(), 1);
+        assert_eq!(reno.ssthresh, 6);
+    }
+
+    #[test]
+    fn test_bbr_congestion_pacing() {
+        let mut bbr = BBRCongestionControl::new();
+        bbr.update_cwnd(0);
+        assert_eq!(bbr.get_cwnd(), 100);
+
+        bbr.on_loss();
+        assert_eq!(bbr.get_cwnd(), 80);
+    }
+
+    #[test]
+    fn test_firewall_allowed_ports() {
+        let mut fw = SimpleFirewall::new();
+        assert!(!fw.is_allowed(80));
+
+        fw.allow_port(80);
+        assert!(fw.is_allowed(80));
+
+        fw.block_port(80);
+        assert!(!fw.is_allowed(80));
+    }
+}
