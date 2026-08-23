@@ -1,0 +1,35 @@
+name: Linux & BSD Distro Parity CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify-distro-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@e13a48e7e31d9b3297a78370d03588975a610b06
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+
+      - name: Verify Mint Linux Parity Module
+        run: cargo test --lib compatibility::mint_linux
+
+      - name: Verify OpenSource Distro Parity
+        run: cargo test --lib distro::parity
+
+      - name: Verify FreeBSD Security & Securelevels
+        run: cargo test --lib security::securelevels
+
+      - name: Verify FreeBSD Jails Virtualization
+        run: cargo test --lib security::jails
+
+      - name: Verify Btrfs Advanced Filesystem Subsystem
+        run: cargo test --lib fs::btrfs

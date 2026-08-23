@@ -22,6 +22,7 @@ extern crate alloc;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use std::collections::HashMap;
 use std::sync::Arc;
