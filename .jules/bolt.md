@@ -55,3 +55,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-23 - Sliding-Window Rate Limiting via Ring Buffers
 **Learning:** Using a fixed-size circular ring buffer `[u64; 32]` with saturating timestamp subtraction `current_timestamp.saturating_sub(ts)` for sliding-window packet rate limiting avoids heap allocation and complex timer heap traversals.
 **Action:** Use fixed-size ring buffers with saturating arithmetic for high-throughput network rate limiters in bare-metal routers.
+
+## 2026-08-24 - Caching Byte Lengths in SimplePermission Structs
+**Learning:** In privacy management and permission checking routines (`SimplePermission`), calling `name()` and `category()` repeatedly executed $O(N)$ linear scans (`.position(|&b| b == 0)`) over 64-byte name and category arrays during category indexing and permission checks. Caching `name_len: u8` and `category_len: u8` during `SimplePermission::new()` initialization turns slice retrieval into instantaneous $O(1)$ constant-time lookups `&self.name[..self.name_len as usize]`, eliminating linear scanning overhead in permission verification hot paths.
+**Action:** Store `name_len: u8` and `category_len: u8` during struct creation when managing fixed-size byte arrays in security and privacy permission models.
