@@ -396,13 +396,6 @@ pub trait Device {
     fn shutdown(&mut self) -> Result<(), DeviceError>;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortAddress {
-    PortIO(u16),
-    MemoryMapped(u32),
-}
-
-
 /// Device error types
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1734,13 +1727,6 @@ impl DeviceExtension {
 }
 
 
-
-/// Unified representation of communication channels (OOP Abstraction)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortAddress {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
-}
 
 #[cfg(test)]
 #[no_mangle]

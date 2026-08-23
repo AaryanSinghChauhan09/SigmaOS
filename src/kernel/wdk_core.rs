@@ -605,6 +605,80 @@ impl BugCheckRegistry {
 }
 
 // =========================================================================
+// MACH / ALPC ZERO-COPY MESSAGE PORT RIGHTS (macOS XNU & Windows NT Parity)
+// =========================================================================
+
+/// Capability-based Mach/ALPC Message Port Rights (inspired by macOS Mach IPC ports)
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MachPortRight {
+    None = 0,
+    Receive = 1,
+    Send = 2,
+    SendOnce = 3,
+    PortSet = 4,
+}
+
+/// Zero-copy Message Payload descriptor (inspired by Windows NT ALPC shared section messages)
+#[derive(Debug, Clone)]
+pub struct AlpcMessagePayload {
+    pub msg_id: u64,
+    pub sender_pid: u64,
+    pub section_base: usize,
+    pub section_size: usize,
+    pub inline_data: [u8; 128],
+    pub inline_len: usize,
+    pub right: MachPortRight,
+}
+
+/// ALPC Priority-Boosted Zero-Copy Port Queue (combines Mach IPC rights and Windows NT ALPC completion ports)
+pub struct AlpcZeroCopyPortQueue {
+    pub port_id: u64,
+    pub owner_right: MachPortRight,
+    pub messages: Vec<AlpcMessagePayload>,
+    pub priority_boost: u32,
+    pub send_count: usize,
+    pub recv_count: usize,
+}
+
+impl AlpcZeroCopyPortQueue {
+    pub fn new(port_id: u64, owner_right: MachPortRight) -> Self {
+        Self {
+            port_id,
+            owner_right,
+            messages: Vec::new(),
+            priority_boost: 0,
+            send_count: 0,
+            recv_count: 0,
+        }
+    }
+
+    /// Enqueues a message payload if the caller holds a valid Send or SendOnce port right
+    pub fn send_message(&mut self, payload: AlpcMessagePayload) -> Result<(), &'static str> {
+        if payload.right != MachPortRight::Send && payload.right != MachPortRight::SendOnce {
+            return Err("ALPC: Insufficient port rights to send message");
+        }
+        self.send_count += 1;
+        self.priority_boost = self.priority_boost.saturating_add(1);
+        self.messages.push(payload);
+        Ok(())
+    }
+
+    /// Receives the next priority-dequeued message payload if caller holds Receive right
+    pub fn receive_message(&mut self, caller_right: MachPortRight) -> Result<AlpcMessagePayload, &'static str> {
+        if caller_right != MachPortRight::Receive {
+            return Err("ALPC: Caller lacks Receive right for this port");
+        }
+        if self.messages.is_empty() {
+            return Err("ALPC: Message queue is empty");
+        }
+        self.recv_count += 1;
+        self.priority_boost = self.priority_boost.saturating_sub(1);
+        Ok(self.messages.remove(0))
+    }
+}
+
+// =========================================================================
 // UNIT TESTS MODULE
 // =========================================================================
 
@@ -864,5 +938,43 @@ mod tests {
         bsod.ke_bug_check_ex(0x0000000A, 0x11, 0x22, 0x33, 0x44); // IRQL_NOT_LESS_OR_EQUAL
         let report = bsod.bug_check.unwrap();
         assert_eq!(report.code, 0x0000000A);
+    }
+
+    #[test]
+    fn test_mach_alpc_zero_copy_port_rights() {
+        let mut port_queue = AlpcZeroCopyPortQueue::new(101, MachPortRight::Receive);
+
+        let msg = AlpcMessagePayload {
+            msg_id: 1,
+            sender_pid: 1000,
+            section_base: 0x7FFF0000,
+            section_size: 4096,
+            inline_data: [0u8; 128],
+            inline_len: 0,
+            right: MachPortRight::Send,
+        };
+
+        // Send with Send right should succeed
+        assert!(port_queue.send_message(msg).is_ok());
+
+        // Send with None right should fail
+        let bad_msg = AlpcMessagePayload {
+            msg_id: 2,
+            sender_pid: 1000,
+            section_base: 0,
+            section_size: 0,
+            inline_data: [0u8; 128],
+            inline_len: 0,
+            right: MachPortRight::None,
+        };
+        assert!(port_queue.send_message(bad_msg).is_err());
+
+        // Receive without Receive right should fail
+        assert!(port_queue.receive_message(MachPortRight::Send).is_err());
+
+        // Receive with Receive right should succeed
+        let received = port_queue.receive_message(MachPortRight::Receive).unwrap();
+        assert_eq!(received.msg_id, 1);
+        assert_eq!(received.section_base, 0x7FFF0000);
     }
 }
