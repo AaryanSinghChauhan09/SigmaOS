@@ -4,6 +4,10 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::boxed::Box;
+
+extern crate alloc;
+use alloc::string::String;
+use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -12,6 +16,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
 pub type ContainerID = usize;
@@ -174,7 +179,7 @@ impl ContainerNamespace {
     }
 }
 
-/// Namespace configuration flags for a container
+/// Container seccomp profiles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NamespaceConfig {
     pub pid: bool,
@@ -254,6 +259,59 @@ impl OverlayFS {
     }
 }
 
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if !self.hardened {
+            return false;
+        }
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            false
+        }
+    }
+}
+
+/// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
+#[derive(Debug, Clone)]
+pub struct OverlayFS {
+    pub lower_dirs: alloc::vec::Vec<String>,
+    pub upper_dir: String,
+    pub work_dir: String,
+    pub mounted: bool,
+}
+
+impl OverlayFS {
+    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
+        Self {
+            lower_dirs,
+            upper_dir,
+            work_dir,
+            mounted: false,
+        }
+    }
+
+    pub fn mount(&mut self) -> Result<(), &'static str> {
+        if self.lower_dirs.is_empty() {
+            return Err("OverlayFS mount failed: lower_dirs cannot be empty");
+        }
+        if self.upper_dir.is_empty() || self.work_dir.is_empty() {
+            return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
+        }
+        self.mounted = true;
+        println!(
+            "OverlayFS mounted successfully: lowerdirs={:?}, upperdir={}, workdir={}",
+            self.lower_dirs, self.upper_dir, self.work_dir
+        );
+        Ok(())
+    }
+
+    pub fn umount(&mut self) {
+        self.mounted = false;
+        println!("OverlayFS unmounted successfully.");
+    }
+}
+
 /// Simple container (OOP: Concrete container class)
 pub struct SimpleContainer {
     pub id: ContainerID,
@@ -271,6 +329,10 @@ pub struct SimpleContainer {
 impl SimpleContainer {
     pub fn execute_syscall(&self, syscall_id: u32) -> Result<(), ContainerError> {
         if self.seccomp.is_syscall_blocked(syscall_id) {
+            println!(
+                "Container Seccomp Violation: Syscall {} is strictly prohibited by security profile",
+                syscall_id
+            );
             return Err(ContainerError::PermissionDenied);
         }
         Ok(())
@@ -703,16 +765,22 @@ pub mod oci {
         }
     }
 
-    impl Clone for NamespaceSet {
-        fn clone(&self) -> Self {
-            NamespaceSet {
-                pidns: self.pidns,
-                mntns: self.mntns,
-                netns: self.netns,
-                utsns: self.utsns,
-                ipcns: self.ipcns,
-                userns: self.userns,
-                cgroupns: self.cgroupns,
+    #[allow(dead_code)]
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
         }
     }
@@ -856,6 +924,67 @@ mod tests {
             )
             .unwrap();
         assert_eq!(id, 1);
+    }
+
+    #[test]
+    fn test_overlayfs_stacking() {
+        let mut overlay = OverlayFS::new(
+            vec!["/lower1".to_string(), "/lower2".to_string()],
+            "/upper".to_string(),
+            "/work".to_string(),
+        );
+        assert!(!overlay.mounted);
+        assert!(overlay.mount().is_ok());
+        assert!(overlay.mounted);
+        overlay.umount();
+        assert!(!overlay.mounted);
+
+        // Mount failure on empty lowerdirs
+        let mut invalid_overlay = OverlayFS::new(
+            vec![],
+            "/upper".to_string(),
+            "/work".to_string(),
+        );
+        assert!(invalid_overlay.mount().is_err());
+    }
+
+    #[test]
+    fn test_rootless_user_namespace_mapping() {
+        let ns = ContainerNamespace {
+            uid_mapping: 1000,
+            gid_mapping: 1000,
+            rootless: true,
+        };
+
+        // Container root (UID 0) maps to host unprivileged user (UID 1000)
+        assert_eq!(ns.map_uid(0).unwrap(), 1000);
+        assert_eq!(ns.map_gid(0).unwrap(), 1000);
+
+        // Regular container users offset accordingly
+        assert_eq!(ns.map_uid(10).unwrap(), 1010);
+    }
+
+    #[test]
+    fn test_hardened_seccomp_syscall_filtering() {
+        let mut container = SimpleContainer::new(
+            1,
+            b"hardened_ct",
+            b"alpine",
+            ContainerCapability::full(),
+        );
+        container.seccomp = SeccompProfile {
+            hardened: true,
+            blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)
+        };
+
+        // Allowed syscall (e.g. syscall 1)
+        assert!(container.execute_syscall(1).is_ok());
+
+        // Prohibited syscall (syscall 0)
+        assert_eq!(
+            container.execute_syscall(0).unwrap_err(),
+            ContainerError::PermissionDenied
+        );
     }
 
     #[test]

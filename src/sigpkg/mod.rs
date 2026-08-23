@@ -13,10 +13,7 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
-pub mod verifier;
-pub mod universal_adapter;
-pub mod zero_alloc_resolver;
-pub mod universal_oop_system;
+pub mod debian_crusher;
 
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use universal_adapter::{
@@ -142,6 +139,24 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
+        }
+    }
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
         }
     }
 }

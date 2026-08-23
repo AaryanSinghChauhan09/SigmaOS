@@ -22,10 +22,8 @@ pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
-    Filter = 3,
-    MiniFilter = 4,
-    Storage = 5,
-    Input = 6,
+    Storage = 3,
+    Input = 4,
 }
 
 #[repr(usize)]
@@ -50,11 +48,7 @@ pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
     UnloadFailed = 2,
-    InvalidDevice = 3,
-    IrpNotHandled = 4,
-    AccessDenied = 5,
-    InvalidParameter = 6,
-    ProbeFailed = 7,
+    ProbeFailed = 3,
 }
 
 pub trait NetworkDriver: Driver {
@@ -92,7 +86,7 @@ impl SimpleDriver {
         Ok(())
     }
 
-    pub fn probe(&self) -> Result<bool, DriverError> {
+    pub fn probe(&mut self) -> Result<bool, DriverError> {
         Ok(true)
     }
 

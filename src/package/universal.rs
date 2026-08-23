@@ -395,10 +395,11 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
-        let mut resolved = Vec::new();
-        let mut to_visit = vec![package_name.to_string()];
-        let mut visited = Vec::<String>::new();
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
+        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+        to_visit.push(package_name.to_string());
+        let mut visited = std::collections::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;
@@ -534,7 +535,7 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys = Vec::<String>::new();
+        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
         for key in installed.keys() {
             let key: &String = key;
             keys.push(key.clone());
@@ -666,9 +667,9 @@ impl UniversalPackageManager {
             if let Some(package) = package_opt {
                 // Find appropriate adapter
                 for format in &package.formats {
-                    let adapter_opt = self.adapters.get(format);
-                    if let Some(adapter) = adapter_opt {
-                        adapter.install(&package)?;
+                    if let Some(adapter) = self.adapters.get(format) {
+                        let adapter: &PackageAdapter = adapter;
+                        adapter.install(package)?;
                         break;
                     }
                 }
@@ -686,9 +687,9 @@ impl UniversalPackageManager {
         let package_opt = self.installed_packages.get(package_name).cloned();
         if let Some(package) = package_opt {
             for format in &package.formats {
-                let adapter_opt = self.adapters.get(format);
-                if let Some(adapter) = adapter_opt {
-                    adapter.remove(&package)?;
+                if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
+                    adapter.remove(package)?;
                     break;
                 }
             }
@@ -701,9 +702,9 @@ impl UniversalPackageManager {
         let package_opt = self.installed_packages.get(package_name).cloned();
         if let Some(package) = package_opt {
             for format in &package.formats {
-                let adapter_opt = self.adapters.get(format);
-                if let Some(adapter) = adapter_opt {
-                    adapter.update(&package)?;
+                if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
+                    adapter.update(package)?;
                     break;
                 }
             }

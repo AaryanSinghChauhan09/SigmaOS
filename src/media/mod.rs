@@ -4,7 +4,6 @@
 pub mod browser;
 pub mod sovereign_screen_recorder;
 pub mod sovereign_video_player;
-pub mod sovereign_video_editor;
 pub mod sigmacut;
 
 pub use sovereign_screen_recorder::{

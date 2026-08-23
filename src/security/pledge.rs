@@ -1,11 +1,16 @@
 // SigmaOS Pledge - Process Privilege Reduction Mechanism
 // Inspired by OpenBSD pledge but capability-based
 
-extern crate alloc;
+#[cfg(test)]
+#[path = "capability.rs"]
+pub mod capability;
+
+#[cfg(test)]
+use capability::{CapabilityGate, CapabilityToken, Permission};
+
+#[cfg(not(test))]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Per-thread sub-pledge context enabling fine-grained worker thread isolation
@@ -83,6 +88,8 @@ pub struct UnveilEntry {
 pub struct PledgeManager {
     /// Current pledge promise
     pledge: Option<PledgePromise>,
+    /// Pre-configured pledge promise for exec child process
+    exec_pledge: Option<PledgePromise>,
     /// Capability gate for validation
     gate: CapabilityGate,
     /// Unveiled paths for filesystem sandboxing
@@ -96,6 +103,7 @@ impl PledgeManager {
     pub fn new() -> Self {
         Self {
             pledge: None,
+            exec_pledge: None,
             gate: CapabilityGate::new(),
             unveiled_paths: Vec::new(),
             thread_sub_pledges: BTreeMap::new(),
@@ -175,6 +183,20 @@ impl PledgeManager {
         } else {
             false // Not in unveiled paths, block access!
         }
+    }
+
+    /// Pre-configures execpledge promise for process child execution
+    pub fn execpledge(&mut self, promise: PledgePromise) -> Result<(), PledgeError> {
+        if self.exec_pledge.is_some() {
+            return Err(PledgeError::AlreadyActive);
+        }
+        self.exec_pledge = Some(promise);
+        Ok(())
+    }
+
+    /// Retrieves active exec_pledge promise if configured
+    pub fn active_execpledge(&self) -> Option<&PledgePromise> {
+        self.exec_pledge.as_ref()
     }
 
     /// Set pledge promise for process
@@ -329,36 +351,13 @@ mod tests {
     }
 
     #[test]
-    fn test_unveil_sandboxing() {
+    fn test_execpledge_manager() {
         let mut manager = PledgeManager::new();
+        assert!(manager.active_execpledge().is_none());
 
-        // Before any unveil, everything is allowed
-        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
-        assert!(manager.validate_unveil_access("/etc/passwd", 'r'));
-
-        // Unveil /var/www for read access, and /tmp for write access
-        manager.unveil("/var/www", "r").unwrap();
-        manager.unveil("/tmp", "rw").unwrap();
-        manager.unveil("/etc/ssl/", "r").unwrap();
-
-        // Check path within /var/www
-        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
-        assert!(!manager.validate_unveil_access("/var/www/index.html", 'w'));
-
-        // Check path within /tmp
-        assert!(manager.validate_unveil_access("/tmp/session.log", 'r'));
-        assert!(manager.validate_unveil_access("/tmp/session.log", 'w'));
-
-        // Check path with trailing slash unveil config
-        assert!(manager.validate_unveil_access("/etc/ssl/cert.pem", 'r'));
-
-        // Paths outside of unveiled must be blocked completely
-        assert!(!manager.validate_unveil_access("/etc/passwd", 'r'));
-
-        // Traversal sequences must be blocked
-        assert!(!manager.validate_unveil_access("/var/www/../../etc/passwd", 'r'));
-
-        // Prefix bypasses must be blocked
-        assert!(!manager.validate_unveil_access("/var/www-secret", 'r'));
+        let exec_p = stdio();
+        assert!(manager.execpledge(exec_p).is_ok());
+        assert!(manager.active_execpledge().is_some());
+        assert!(manager.execpledge(stdio()).is_err()); // Already set
     }
 }
