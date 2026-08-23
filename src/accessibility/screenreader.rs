@@ -127,8 +127,8 @@ impl SimpleScreenReader {
     pub fn get_voice(&self, id: VoiceID) -> Option<&dyn Voice> {
         for voice_option in &self.voices {
             if let Some(ref voice) = *voice_option {
-                if voice.id() == id {
-                    return Some(voice.as_ref());
+                if (&**voice).id() == id {
+                    return Some(&**voice);
                 }
             }
         }

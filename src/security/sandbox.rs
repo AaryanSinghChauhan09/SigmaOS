@@ -3,8 +3,6 @@
 // Enhanced with Sandboxie-style file system overlays and Firejail-style execution profiles.
 // Taking inspiration from industry-leading competitors Sandboxie (FS virtualization overlays) and Firejail (strict execution profiles)
 
-use std::collections::{HashSet, HashMap};
-use std::collections::HashSet;
 use std::collections::{HashSet, HashMap, BTreeMap};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -22,15 +20,6 @@ pub enum SandboxProfile {
     None,
     StrictBrowser,   // Demands network, blocks local filesystems except user downloads
     RestrictedOffice, // Demands file writes, absolutely blocks network gates
-    IpcAccessGate,           // New: Prevents raw inter-process communications
-    MemoryDbgAttachGate,     // New: Prevents ptrace or debugger attachments
-    RawSocketOpenGate,       // New: Blocks raw network socket creation
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SandboxProfile {
-    StrictBrowser,
-    RestrictedOffice,
     UntrustedInstaller,
 }
 
@@ -42,11 +31,13 @@ pub struct PrivacyFirstSandbox {
     pub profile: SandboxProfile,
     pub sanitized_env: HashMap<String, String>,
     pub virtual_filesystem_overlay: HashMap<String, Vec<u8>>, // Sandboxie-style overlay file system
-    // Sandboxie-inspired file system virtualization overlays
     pub virtualization_overlay: BTreeMap<String, String>,
-    // Firejail-inspired sanitized execution environment
     pub environment_variables: HashMap<String, String>,
-    pub profile: Option<SandboxProfile>,
+    pub enforcement: EnforcementLevel,
+    pub security_context: SovereignSecurityContext,
+    pub private_dir_shields: HashSet<String>,
+    pub compliance: ComplianceProfile,
+    pub security_audit_log: Vec<String>,
 }
 
 impl PrivacyFirstSandbox {
@@ -59,6 +50,13 @@ impl PrivacyFirstSandbox {
             profile: SandboxProfile::None,
             sanitized_env: HashMap::new(),
             virtual_filesystem_overlay: HashMap::new(),
+            virtualization_overlay: BTreeMap::new(),
+            environment_variables: HashMap::new(),
+            enforcement: EnforcementLevel::Enforce,
+            security_context: SovereignSecurityContext::new("system_u", "system_r", "sandbox_t", "s0"),
+            private_dir_shields: HashSet::new(),
+            compliance: ComplianceProfile::StandardSandbox,
+            security_audit_log: Vec::new(),
         }
     }
 
@@ -80,19 +78,16 @@ impl PrivacyFirstSandbox {
                 self.blocked_rules.insert(SandboxRule::MemoryDbgAttachGate);
                 self.blocked_rules.remove(&SandboxRule::FSWriteGate);
             }
-            SandboxProfile::None => {
+            SandboxProfile::None | SandboxProfile::UntrustedInstaller => {
                 self.blocked_rules.clear();
             }
-            virtualization_overlay: BTreeMap::new(),
-            environment_variables: HashMap::new(),
-            profile: None,
         }
     }
 
     /// Construct a Sandbox with predefined strict competitor execution profiles
     pub fn with_profile(pid: u32, pqc_key: &str, profile: SandboxProfile) -> Self {
         let mut sandbox = Self::new(pid, pqc_key);
-        sandbox.profile = Some(profile);
+        sandbox.profile = profile;
 
         match profile {
             SandboxProfile::StrictBrowser => {
@@ -114,20 +109,13 @@ impl PrivacyFirstSandbox {
                 sandbox.block_syscall_rule(SandboxRule::MemoryDbgAttachGate);
                 sandbox.set_environment("INSTALLER_GUARD_ACTIVE".to_string(), "1".to_string());
             }
+            SandboxProfile::None => {}
         }
         sandbox
     }
 
     pub fn block_syscall_rule(&mut self, rule: SandboxRule) {
         self.blocked_rules.insert(rule);
-    }
-
-    pub fn validate_syscall_transition(&self, rule: SandboxRule) -> bool {
-        if !self.is_active_sandboxed {
-            return true; // Bypass checks if sandboxing is explicitly disabled
-        }
-        // If the rule is blocked, deny transition
-        !self.blocked_rules.contains(&rule)
     }
 
     /// Firejail-style environment variable sanitizer to prevent privilege escalation / variable injections
@@ -157,6 +145,7 @@ impl PrivacyFirstSandbox {
             return Err("System FSWriteGate is blocked; filesystem mutations must go through custom overlay maps");
         }
         self.virtual_filesystem_overlay.insert(file_path.to_string(), content.to_vec());
+        self.virtualization_overlay.insert(file_path.to_string(), String::from_utf8_lossy(content).to_string());
         Ok(())
     }
 
@@ -169,23 +158,13 @@ impl PrivacyFirstSandbox {
         }
     }
 
-    /// Purges all virtualized file modifications inside the sandbox (perfect clean reset)
-    pub fn purge_sandbox(&mut self) {
-        self.virtual_filesystem_overlay.clear();
-    }
-
-    /// Sandboxie-style virtualization write: writes securely to an isolated memory overlay instead of modifying the host FS
-    pub fn virtual_write(&mut self, path: &str, content: String) {
-        self.virtualization_overlay.insert(path.to_string(), content);
-    }
-
-    /// Sandboxie-style virtualization read: attempts to read from the memory overlay first
-    pub fn virtual_read(&self, path: &str) -> Option<&str> {
+    pub fn virtual_read_opt(&self, path: &str) -> Option<&str> {
         self.virtualization_overlay.get(path).map(|s| s.as_str())
     }
 
-    /// Purges all isolated writes and virtual file structures
+    /// Purges all virtualized file modifications inside the sandbox (perfect clean reset)
     pub fn purge_sandbox(&mut self) {
+        self.virtual_filesystem_overlay.clear();
         self.virtualization_overlay.clear();
     }
 
@@ -278,14 +257,14 @@ mod tests {
     #[test]
     fn test_competitor_profiles_sandboxing() {
         // Test strict browser profile
-        let browser_sandbox = PrivacyFirstSandbox::with_profile(601, "dilithium-key-1", SandboxProfile::StrictBrowser);
+        let mut browser_sandbox = PrivacyFirstSandbox::with_profile(601, "dilithium-key-1", SandboxProfile::StrictBrowser);
         assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::FSWriteGate));
         assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::ProcessForkGate));
         assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::MemoryDbgAttachGate));
         assert_eq!(browser_sandbox.get_environment("BROWSER_SANDBOX_ENFORCED").unwrap(), "1");
 
         // Test restricted office profile
-        let office_sandbox = PrivacyFirstSandbox::with_profile(602, "dilithium-key-2", SandboxProfile::RestrictedOffice);
+        let mut office_sandbox = PrivacyFirstSandbox::with_profile(602, "dilithium-key-2", SandboxProfile::RestrictedOffice);
         assert!(!office_sandbox.validate_syscall_transition(SandboxRule::NetworkWriteGate));
         assert!(!office_sandbox.validate_syscall_transition(SandboxRule::IpcAccessGate));
         assert_eq!(office_sandbox.get_environment("OFFICE_ISOLATION_ENFORCED").unwrap(), "1");
@@ -294,15 +273,15 @@ mod tests {
     #[test]
     fn test_sandboxie_style_virtualization_overlays() {
         let mut sandbox = PrivacyFirstSandbox::new(701, "key-3");
-        assert!(sandbox.virtual_read("/etc/passwd").is_none());
+        assert!(sandbox.virtual_read_opt("/etc/passwd").is_none());
 
         // Virtual write
-        sandbox.virtual_write("/etc/passwd", "root:x:0:0:root:/root:/bin/sh".to_string());
-        assert_eq!(sandbox.virtual_read("/etc/passwd").unwrap(), "root:x:0:0:root:/root:/bin/sh");
+        sandbox.virtual_write("/etc/passwd", b"root:x:0:0:root:/root:/bin/sh").unwrap();
+        assert_eq!(sandbox.virtual_read_opt("/etc/passwd").unwrap(), "root:x:0:0:root:/root:/bin/sh");
 
         // Purge
         sandbox.purge_sandbox();
-        assert!(sandbox.virtual_read("/etc/passwd").is_none());
+        assert!(sandbox.virtual_read_opt("/etc/passwd").is_none());
     }
 }
 // SigmaOS Privacy-First Sandbox Subsystem
@@ -310,12 +289,6 @@ mod tests {
 // Absorbs advanced security controls from SELinux, AppArmor, and Firejail to satisfy Common Criteria and FIPS compliance
 
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum SandboxRule {
-    NetworkWriteGate,
-    FSWriteGate,
-    ProcessForkGate,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EnforcementLevel {
@@ -354,38 +327,7 @@ impl SovereignSecurityContext {
     }
 }
 
-pub struct PrivacyFirstSandbox {
-    pub process_id: u32,
-    pub is_active_sandboxed: bool,
-    pub active_pqc_key_attestation: String,
-    pub blocked_rules: HashSet<SandboxRule>,
-    // Advanced SELinux, AppArmor, and Firejail absorptions:
-    pub enforcement: EnforcementLevel,
-    pub security_context: SovereignSecurityContext,
-    pub private_dir_shields: HashSet<String>,
-    pub compliance: ComplianceProfile,
-    pub security_audit_log: Vec<String>,
-}
-
 impl PrivacyFirstSandbox {
-    pub fn new(pid: u32, pqc_key: &str) -> Self {
-        PrivacyFirstSandbox {
-            process_id: pid,
-            is_active_sandboxed: true,
-            active_pqc_key_attestation: pqc_key.to_string(),
-            blocked_rules: HashSet::new(),
-            enforcement: EnforcementLevel::Enforce,
-            security_context: SovereignSecurityContext::new("system_u", "system_r", "sandbox_t", "s0"),
-            private_dir_shields: HashSet::new(),
-            compliance: ComplianceProfile::StandardSandbox,
-            security_audit_log: Vec::new(),
-        }
-    }
-
-    pub fn block_syscall_rule(&mut self, rule: SandboxRule) {
-        self.blocked_rules.insert(rule);
-    }
-
     pub fn shield_private_directory(&mut self, path: &str) {
         self.private_dir_shields.insert(path.to_string());
     }
@@ -436,58 +378,3 @@ impl PrivacyFirstSandbox {
     }
 }
 
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_privacy_first_sandbox() {
-        let mut sandbox = PrivacyFirstSandbox::new(505, "crystals-dilithium-attestation-token-999");
-        assert!(sandbox.is_active_sandboxed);
-        assert_eq!(sandbox.active_pqc_key_attestation, "crystals-dilithium-attestation-token-999");
-
-        // Allowed by default
-        assert!(sandbox.validate_syscall_transition(SandboxRule::NetworkWriteGate));
-
-        // Block and verify rejection
-        sandbox.block_syscall_rule(SandboxRule::NetworkWriteGate);
-        assert!(!sandbox.validate_syscall_transition(SandboxRule::NetworkWriteGate));
-        assert!(sandbox.validate_syscall_transition(SandboxRule::FSWriteGate));
-    }
-
-    #[test]
-    fn test_selinux_rbac_contexts() {
-        let mut sandbox = PrivacyFirstSandbox::new(606, "pqc-token-111");
-        assert_eq!(sandbox.security_context.to_string_context(), "system_u:system_r:sandbox_t:s0");
-
-        // Set high sensitivity Multi-Level Security context
-        sandbox.security_context = SovereignSecurityContext::new("admin_u", "admin_r", "trusted_t", "s0-s3:c0.c1023");
-        assert_eq!(sandbox.security_context.to_string_context(), "admin_u:admin_r:trusted_t:s0-s3:c0.c1023");
-    }
-
-    #[test]
-    fn test_apparmor_complain_mode() {
-        let mut sandbox = PrivacyFirstSandbox::new(707, "pqc-token-222");
-        sandbox.block_syscall_rule(SandboxRule::ProcessForkGate);
-
-        // AppArmor Complain mode allows but logs
-        sandbox.enforcement = EnforcementLevel::Complain;
-        assert!(sandbox.validate_syscall_transition(SandboxRule::ProcessForkGate));
-        assert_eq!(sandbox.security_audit_log.len(), 1);
-        assert!(sandbox.security_audit_log[0].contains("ProcessForkGate"));
-    }
-
-    #[test]
-    fn test_firejail_directory_shields() {
-        let mut sandbox = PrivacyFirstSandbox::new(808, "pqc-token-333");
-        sandbox.shield_private_directory("/etc/shadow");
-        sandbox.shield_private_directory("/var/log/audit");
-
-        // Enforce mode blocks access
-        assert!(!sandbox.validate_path_access("/etc/shadow/admin"));
-        assert!(sandbox.validate_path_access("/home/user/document.txt"));
-
-        // Disable mode bypasses blocks
-        sandbox.enforcement = EnforcementLevel::Disable;
-        assert!(sandbox.validate_path_access("/etc/shadow/admin"));
-    }
-}

@@ -21,7 +21,7 @@
 
 use crate::klib::BTreeMap;
 use crate::sigpkg::Package;
-use crate::klib::PathBuf;
+use std::path::PathBuf;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {

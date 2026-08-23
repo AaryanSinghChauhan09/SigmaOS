@@ -26,6 +26,7 @@ pub enum LogFormat {
     Binary,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuditError {
     Success = 0,
     LogFull = 1,
@@ -124,6 +125,7 @@ impl AuditLogger for SimpleAuditLogger {
     fn get_event(&self, id: EventID) -> Option<&dyn AuditEvent> {
         for i in 0..self.events.len() {
             if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
                 if event.id() == id {
                     return Some(event.as_ref());
                 }
@@ -136,6 +138,7 @@ impl AuditLogger for SimpleAuditLogger {
         let mut ids = Vec::new();
         for i in 0..self.events.len() {
             if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
                 if event.event_type() == event_type && event.user_id() == user_id {
                     ids.push(event.id());
                 }
@@ -149,6 +152,7 @@ impl AuditLogger for SimpleAuditLogger {
         while i < self.events.len() {
             let mut remove = false;
             if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
                 if event.timestamp() < older_than {
                     remove = true;
                 }

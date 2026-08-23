@@ -10,7 +10,7 @@
 pub mod control;
 
 pub use control::{
-    AclEntry, AclTag, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, nfs4_flags, nfs4_mask,
+    PosixAclEntry, PosixAclTable, PosixAclTag,
 };
 
 extern crate alloc;
