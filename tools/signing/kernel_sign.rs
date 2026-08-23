@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Kernel and Module Signing Tool for SigmaOS
 // Location: tools/signing/kernel_sign.rs
 

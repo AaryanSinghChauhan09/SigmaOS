@@ -1,12 +1,10 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! OOP-based Security Audit for SigmaOS
-//! Based on Ideas-999-Structured: Security & Sovereignty Item 542
 //! Implements security event logging and audit trails
 
 #![no_std]
 
 extern crate alloc;
-
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -154,18 +152,13 @@ impl AuditLogger for SimpleAuditLogger {
     }
 
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
-        let mut i = 0;
-        while i < self.events.len() {
-            if let Some(ref event) = self.events[i] {
-                if event.timestamp() < older_than {
-                    self.events.remove(i);
-                } else {
-                    i += 1;
-                }
+        self.events.retain(|event_opt| {
+            if let Some(ref event) = *event_opt {
+                event.timestamp() >= older_than
             } else {
-                i += 1;
+                false
             }
-        }
+        });
         Ok(())
     }
 }

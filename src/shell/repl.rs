@@ -4,12 +4,14 @@ use crate::ai::AgentAutomationEngine;
 
 use std::io::{self, BufRead, Write};
 
-#[derive(Debug, Default, Clone)]
-pub struct AgentAutomationEngine;
+#[derive(Debug, Clone, Default)]
+pub struct AgentAutomationEngine {
+    pub active: bool,
+}
 
 impl AgentAutomationEngine {
     pub fn new() -> Self {
-        Self
+        Self { active: false }
     }
 }
 

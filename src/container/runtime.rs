@@ -101,6 +101,48 @@ pub enum ContainerError {
 }
 
 /// Container info
+#[repr(C)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
+}
+
+impl ContainerInfo {
+    pub fn new(id: ContainerID) -> Self {
+        ContainerInfo {
+            id,
+            name: [0; 64],
+            image: [0; 128],
+            state: ContainerState::Created,
+            pid: None,
+            memory_limit: 0,
+            cpu_limit: 0,
+            capability: ContainerCapability::new(),
+        }
+    }
+}
+
+/// Container capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
+}
+
+impl Default for ContainerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Container network configuration type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -158,8 +200,6 @@ pub struct SeccompProfile {
     pub hardened: bool,
     pub blocked_syscalls_mask: u32,
 }
-
-/// Namespace configuration flags for a container
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NamespaceConfig {
     pub pid: bool,

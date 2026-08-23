@@ -141,11 +141,11 @@ impl SmartSymlink {
     /// Routes the symlink path to /lib32 or /lib64 automatically depending on the active ABI
     pub fn resolve_multi_lib_routing(&self, syscall_abi: SyscallAbi) -> &'static str {
         match syscall_abi {
-            SyscallAbi::Oabi32 | SyscallAbi::Eabi32 => {
+            SyscallAbi::Oabi32 => {
                 // Route to legacy 32-bit library directory (multi-lib parity)
                 "/lib32/libc.so"
             }
-            SyscallAbi::Eabi64 => {
+            SyscallAbi::Eabi32 | SyscallAbi::Eabi64 => {
                 // Route to modern 64-bit library directory
                 "/lib64/libc.so"
             }

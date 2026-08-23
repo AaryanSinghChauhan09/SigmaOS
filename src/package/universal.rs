@@ -9,6 +9,15 @@ use std::collections::HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackagePriority {
+    Essential,
+    Required,
+    Important,
+    Standard,
+    Optional,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
     Deb,      // apt/dpkg
     Rpm,      // yum/dnf/zypper
@@ -193,10 +202,111 @@ impl PackageAdapter {
         Ok(())
     }
 
-    pub fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Purging DEB package {}",
+            self.adapter_name,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Refreshing and updating DEB package {}",
+            self.adapter_name,
+            package.name
+        );
+        Ok(())
+    }
+}
+
+/// AptDebAdapter handles Debian/Ubuntu package formats (`.deb`)
+pub struct AptDebAdapter {
+    pub dpkg_status_path: String,
+}
+
+impl AptDebAdapter {
+    pub fn new() -> Self {
+        Self {
+            dpkg_status_path: "/var/lib/dpkg/status".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for AptDebAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Deb
+    }
+
+    fn adapter_name(&self) -> &str {
+        "apt"
+    }
+
+    fn parse_manifest(&self, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        let manifest = String::from_utf8(raw_data.to_vec())
+            .map_err(|_| "Failed to parse UTF-8 DEB manifest")?;
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in manifest.lines() {
+            if line.starts_with("Package: ") {
+                name = line["Package: ".len()..].trim().to_string();
+            } else if line.starts_with("Version: ") {
+                version = line["Version: ".len()..].trim().to_string();
+            } else if line.starts_with("Depends: ") {
+                let deps = line["Depends: ".len()..].trim();
+                for d in deps.split(',') {
+                    dependencies.push(d.trim().to_string());
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Invalid DEB manifest");
+        }
+
+        let mut pkg = UnifiedPackage::new(name.clone(), version.clone())
+            .with_format(PackageFormat::Deb);
+        for dep in dependencies {
+            pkg = pkg.with_dependency(dep);
+        }
+        Ok(pkg)
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("AptDebAdapter: Installing Debian package {}", package.name);
+        Ok(())
+    }
+}
+
+/// YumRpmAdapter handles RedHat/Fedora package formats (`.rpm`)
+pub struct YumRpmAdapter {
+    pub repo_metadata_path: String,
+}
+
+impl YumRpmAdapter {
+    pub fn new() -> Self {
+        Self {
+            repo_metadata_path: "/var/lib/yum/repos".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for YumRpmAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Rpm
+    }
+
+    fn adapter_name(&self) -> &str {
+        "yum"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Removing {} using {} adapter",
-            package.name, self.adapter_name
+            package.name, self.adapter_name()
         );
         Ok(())
     }
@@ -204,7 +314,7 @@ impl PackageAdapter {
     pub fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
-            package.name, self.adapter_name
+            package.name, self.adapter_name()
         );
         Ok(())
     }
@@ -414,7 +524,7 @@ pub struct TransactionalHistory {
 
 impl TransactionalHistory {
     pub fn new() -> Self {
-        TransactionalHistory {
+        Self {
             checkpoints: Vec::new(),
             next_checkpoint_id: 1,
         }
@@ -493,11 +603,17 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
         self.adapters.insert(PackageFormat::Snap, snap_adapter);
         self.adapters
-            .insert(PackageFormat::Flatpak, flatpak_adapter);
+            .insert(PackageFormat::Deb, PackageAdapter::new(PackageFormat::Deb, String::from("AptDeb")));
         self.adapters
-            .insert(PackageFormat::AppImage, appimage_adapter);
+            .insert(PackageFormat::Rpm, PackageAdapter::new(PackageFormat::Rpm, String::from("YumRpm")));
         self.adapters
-            .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
+            .insert(PackageFormat::Pacman, PackageAdapter::new(PackageFormat::Pacman, String::from("Pacman")));
+        self.adapters
+            .insert(PackageFormat::Snap, PackageAdapter::new(PackageFormat::Snap, String::from("Snap")));
+        self.adapters
+            .insert(PackageFormat::Flatpak, PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")));
+        self.adapters
+            .insert(PackageFormat::SigmaPkg, PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -634,7 +750,31 @@ pub enum FeatureType {
     Source,
 }
 
-pub trait UniversalAdapter {
+pub struct TabularSchema {
+    pub fields: Vec<String>,
+}
+
+pub struct TabularRow {
+    pub values: Vec<String>,
+}
+
+pub struct TabularDataset {
+    pub schema: TabularSchema,
+    pub rows: Vec<TabularRow>,
+}
+
+pub struct SovereignTabFm {
+    pub datasets: Vec<TabularDataset>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FeatureType {
+    Binary,
+    Library,
+    Source,
+}
+
+pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
 }
 
