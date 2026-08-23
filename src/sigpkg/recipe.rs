@@ -150,6 +150,11 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
+        self
+    }
+
     pub fn with_package_command(mut self, command: String) -> Self {
         self.package_commands.push(command);
         self

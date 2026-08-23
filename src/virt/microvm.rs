@@ -258,6 +258,77 @@ impl MicroVM for SimpleMicroVM {
     }
 }
 
+/// KVM-inspired vCPU Register State representation
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct VcpuRegisterState {
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rip: u64,
+    pub rflags: u64,
+    pub cr0: u64,
+    pub cr3: u64,
+    pub cr4: u64,
+}
+
+impl VcpuRegisterState {
+    pub fn new() -> Self {
+        Self {
+            rax: 0, rbx: 0, rcx: 0, rdx: 0,
+            rip: 0x1000,
+            rflags: 0x202, // Interrupts enabled
+            cr0: 0x80000001, // Paging + Protected mode enabled
+            cr3: 0x2000,
+            cr4: 0x20, // PAE enabled
+        }
+    }
+}
+
+impl Default for VcpuRegisterState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// KVM-inspired Hypervisor ioctl dispatch interface
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KvmIoctl {
+    CreateVm,
+    CreateVcpu(u32),
+    SetUserMemoryRegion { slot: u32, guest_phys_addr: u64, memory_size: u64 },
+    RunVcpu(u32),
+    GetRegs(u32),
+    SetRegs(u32),
+}
+
+/// Virtio-Net zero-copy accelerator for MicroVMs
+#[derive(Debug, Clone)]
+pub struct VirtioNetAccelerator {
+    pub rx_ring_head: usize,
+    pub tx_ring_head: usize,
+    pub packets_processed: usize,
+}
+
+impl VirtioNetAccelerator {
+    pub fn new() -> Self {
+        Self { rx_ring_head: 0, tx_ring_head: 0, packets_processed: 0 }
+    }
+
+    pub fn process_tx_ring(&mut self, descriptor_chain_len: usize) -> usize {
+        self.tx_ring_head = (self.tx_ring_head + descriptor_chain_len) % 256;
+        self.packets_processed += descriptor_chain_len;
+        descriptor_chain_len
+    }
+}
+
+impl Default for VirtioNetAccelerator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Sandbox manager trait (OOP interface)
 pub trait SandboxManager {
     /// Create microVM
@@ -680,5 +751,17 @@ mod tests {
         let microvm_strict = manager.get_microvm(microvm_strict_id).unwrap();
         assert_eq!(microvm_strict.state(), MicroVMState::Running);
         assert_eq!(microvm_strict.sandbox_policy(), SandboxPolicy::Strict);
+    }
+
+    #[test]
+    fn test_kvm_vcpu_virtio_acceleration() {
+        let vcpu_regs = VcpuRegisterState::new();
+        assert_eq!(vcpu_regs.rip, 0x1000);
+        assert_ne!(vcpu_regs.cr0, 0);
+
+        let mut virtio_net = VirtioNetAccelerator::new();
+        let count = virtio_net.process_tx_ring(16);
+        assert_eq!(count, 16);
+        assert_eq!(virtio_net.packets_processed, 16);
     }
 }

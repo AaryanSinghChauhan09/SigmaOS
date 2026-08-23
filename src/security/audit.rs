@@ -10,6 +10,13 @@ use crate::klib::Vec;
 
 pub type EventID = usize;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    Text,
+    Json,
+    Binary,
+}
+
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {

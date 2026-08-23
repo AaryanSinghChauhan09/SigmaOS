@@ -1,18 +1,62 @@
 // SigmaOS Productivity Module
+pub mod advanced_app_absorber;
 pub mod gamification;
-pub mod subtitle_editor;
-pub mod sigmadev;
-pub mod mint_competitor;
+pub mod media;
+pub mod notes;
+pub mod screen_recorder;
+pub mod screenshot;
+pub mod sigma_office;
+pub mod tasks;
+pub mod terminal;
 pub mod tmux;
-pub mod sovereign_apps;
+pub mod editor;
 
-pub use tmux::*;
+pub use advanced_app_absorber::{
+    AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter, EverythingSearchEngine,
+    NotepadPlusWorkspace, ObsStudioMixer, OneCommanderDualPane, PotPlayerVlcEngine,
+    SevenZipCompressor, ShareXFlameshotEngine,
+};
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
-pub use sovereign_apps::{
-    ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
-    TextNode,
+pub use notes::{
+    ContentType, Folder, InMemoryNoteStorage, Note, NoteError, NoteSearchResult, NoteStorage,
+    NoteTakingApp, Notebook,
 };
-pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
+pub use screen_recorder::{
+    AudioQuality, FfmpegBackend, GStreamerBackend, RecorderError, RecordingBackend,
+    RecordingConfig, RecordingFormat, RecordingProgress, RecordingRegion, RecordingState,
+    ScreenRecorder, VideoQuality,
+};
+pub use screenshot::{
+    CaptureRegion, ImageFormat, MacOsBackend, ScreenshotBackend, ScreenshotConfig, ScreenshotError,
+    ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
+};
+pub use sigma_office::{
+    CellValue, ChartType, DocumentMetadata as SigmaOfficeDocumentMetadata, DocumentNode,
+    DocumentType, PresentationProcessor, ShapeType, SigmaDocument, SigmaOffice, SlideElementType,
+    SpreadsheetProcessor, TextProcessor, TypographyRenderer,
+};
+pub use tasks::{
+    InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,
+    TaskError, TaskManager, TaskPriority, TaskStatus, TaskStorage,
+};
+pub use terminal::{
+    BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
+    SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
+};
+pub use tmux::{
+    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+};
+pub use editor::{
+    CodeEditor, Document as EditorDocument, EditorConfig, EditorError, Language as EditorLanguage,
+    LspClient, SyntaxHighlighter,
+};
+pub mod utility_suite;
+pub use utility_suite::{
+    AnnotationShape, AudacityWaveEditor, CompressionMethod, DaVinciTimeline,
+    EarTrumpetVolumeMatrix, FlameshotAnnotator, IrfanViewEngine, ItemAgeColor,
+    NotepadPlusPlusBuffer, OneCommanderFileGrid, SevenZipEngine, SovereignBrowserEngine,
+    VlcCodecPipeline,
+};

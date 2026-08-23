@@ -2,7 +2,7 @@
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use std::collections::{HashMap, VecDeque, BTreeMap};
+use std::collections::{BTreeMap, VecDeque};
 use std::path::{Path, PathBuf};
 
 // =========================================================================
@@ -66,12 +66,7 @@ impl ShareXFlameshotEngine {
 
         // Add ShareX-style auto upload if enabled
         if self.auto_upload_enabled {
-            let capture_id = self.screenshot_history.len() + 1;
-            screenshot.cloud_url = Some(format!(
-                "{}/capture_{}.png",
-                self.target_cloud_destination,
-                capture_id
-            ));
+            screenshot.cloud_url = Some(format!("{}/capture_{}.png", self.target_cloud_destination, self.screenshot_history.len()));
         }
 
         self.screenshot_history.push_back(screenshot.clone());
@@ -91,7 +86,7 @@ pub struct Subtitle {
 }
 
 pub struct PotPlayerVlcEngine {
-    pub playback_speed: f32,                          // 0.25x to 4.0x
+    pub playback_speed: f32, // 0.25x to 4.0x
     pub equalizer_presets: BTreeMap<String, Vec<f32>>, // Frequency gain settings
     pub subtitle_delay_ms: i32,
     pub subtitles: Vec<Subtitle>,
@@ -139,13 +134,13 @@ pub struct IndexedFile {
 }
 
 pub struct EverythingSearchEngine {
-    pub index: HashMap<String, Vec<IndexedFile>>, // Index by name for instantaneous lookup
+    pub index: BTreeMap<String, Vec<IndexedFile>>, // Index by name for instantaneous lookup
 }
 
 impl EverythingSearchEngine {
     pub fn new() -> Self {
         Self {
-            index: HashMap::new(),
+            index: BTreeMap::new(),
         }
     }
 
@@ -336,7 +331,7 @@ impl AudacityEditor {
 // =========================================================================
 
 pub struct NotepadPlusWorkspace {
-    pub tabs: Vec<(String, String)>,          // (File name, content)
+    pub tabs: Vec<(String, String)>, // (File name, content)
     pub macros: BTreeMap<String, Vec<String>>, // Recorded keyboard macro sequences
     pub active_tab_index: usize,
 }
@@ -375,21 +370,15 @@ pub struct OneCommanderPane {
 pub struct OneCommanderDualPane {
     pub left_pane: OneCommanderPane,
     pub right_pane: OneCommanderPane,
-    pub tags_colors: HashMap<PathBuf, String>, // Color-coded system file tagging
+    pub tags_colors: BTreeMap<PathBuf, String>, // Color-coded system file tagging
 }
 
 impl OneCommanderDualPane {
     pub fn new() -> Self {
         Self {
-            left_pane: OneCommanderPane {
-                current_directory: PathBuf::from("/"),
-                selected_files: Vec::new(),
-            },
-            right_pane: OneCommanderPane {
-                current_directory: PathBuf::from("/home"),
-                selected_files: Vec::new(),
-            },
-            tags_colors: HashMap::new(),
+            left_pane: OneCommanderPane { current_directory: PathBuf::from("/"), selected_files: Vec::new() },
+            right_pane: OneCommanderPane { current_directory: PathBuf::from("/home"), selected_files: Vec::new() },
+            tags_colors: BTreeMap::new(),
         }
     }
 
