@@ -205,6 +205,8 @@ impl<T: PartialEq> PartialEq for Vec<T> {
     }
 }
 
+impl<T: Eq> Eq for Vec<T> {}
+
 impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
     fn eq(&self, other: &[U]) -> bool {
         self.as_slice() == other

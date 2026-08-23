@@ -64,7 +64,8 @@ impl ContentAddressedStore {
 
     /// Get package by name
     pub fn get(&self, name: &str) -> Option<&Package> {
-        self.packages.get(name).map(|s| &s.package)
+        let key = name.to_string();
+        self.packages.get(&key).map(|s| &s.package)
     }
 
     /// Get package by hash
@@ -77,8 +78,9 @@ impl ContentAddressedStore {
 
     /// Remove package from store
     pub fn remove(&mut self, name: &str) -> Result<(), StoreError> {
+        let key = name.to_string();
         self.packages
-            .remove(name)
+            .remove(&key)
             .ok_or(StoreError::PackageNotFound(name.to_string()))?;
         Ok(())
     }

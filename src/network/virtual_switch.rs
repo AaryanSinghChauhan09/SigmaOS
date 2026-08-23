@@ -148,8 +148,8 @@ impl VirtualSwitchEngine {
         }
 
         // 3. Evaluate 802.1Q VLAN Access vs Trunk rules
-        let active_vlan = match &in_port.mode {
-            SwitchPortMode::Access { vlan_id: port_vlan } => *port_vlan,
+        let active_vlan = match in_port.mode {
+            SwitchPortMode::Access { vlan_id: port_vlan } => port_vlan,
             SwitchPortMode::Trunk { allowed_vlans } => {
                 if let Some(v) = vlan_id {
                     if !allowed_vlans.contains(&v) {
@@ -182,7 +182,7 @@ impl VirtualSwitchEngine {
             }
 
             let p_vlan_match = match &p.mode {
-                SwitchPortMode::Access { vlan_id: port_vlan } => *port_vlan == active_vlan,
+                SwitchPortMode::Access { vlan_id: port_vlan } => port_vlan == active_vlan,
                 SwitchPortMode::Trunk { allowed_vlans } => allowed_vlans.contains(&active_vlan),
             };
 

@@ -63,15 +63,16 @@ impl SigmaSoftwareStore {
     }
 
     pub fn check_for_updates(&mut self) -> usize {
-        self.pending_updates.clear();
-        for (name, app) in &self.catalog {
-            let name: &String = name;
-            let app: &StoreApp = app;
-            if app.is_installed && app.version != "1.5.0" {
-                self.pending_updates.push(name.clone());
+        let registry = self.registry.borrow();
+        let mut count = 0;
+        for entry_slot in registry.iter() {
+            if let Some(ref entry) = entry_slot {
+                if entry.update_available {
+                    count += 1;
+                }
             }
         }
-        self.pending_updates.len()
+        count
     }
 
     /// Automatically scans and triggers update routines for registered packages
