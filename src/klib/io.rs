@@ -19,7 +19,7 @@ impl SigmaBuffer {
 
     pub fn with_capacity(capacity: usize) -> Self {
         SigmaBuffer {
-            data: Vec::with_capacity(capacity),
+            data: Vec::new(),
             position: 0,
         }
     }
@@ -55,7 +55,7 @@ impl SigmaBuffer {
 
     /// Clear buffer data
     pub fn clear(&mut self) {
-        self.data.clear();
+        self.data = Vec::new();
         self.position = 0;
     }
 }
@@ -177,7 +177,7 @@ impl KlibRead for SigmaBuffer {
     fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), SigmaIoError> {
         let mut total_read = 0;
         while total_read < buf.len() {
-            let bytes_read = self.read(&mut buf[total_read..])?;
+            let bytes_read = self.read(&mut buf[total_read..]);
             if bytes_read == 0 {
                 return Err(SigmaIoError::UnexpectedEof);
             }
@@ -191,7 +191,7 @@ impl KlibRead for SigmaBuffer {
         let mut total_read = 0;
         
         loop {
-            let bytes_read = self.read(&mut buffer)?;
+            let bytes_read = self.read(&mut buffer);
             if bytes_read == 0 {
                 break;
             }
