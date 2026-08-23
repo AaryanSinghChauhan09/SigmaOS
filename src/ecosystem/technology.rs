@@ -587,38 +587,29 @@ impl SpatialNavigationEngine {
         let active_id = self.current_focus_id?;
         let active_node = self.focusable_rects.iter().find(|r| r.id == active_id)?;
 
-        let mut closest_node_id: Option<u32> = None;
-        let mut min_distance = f32::MAX;
+        // Bolt Optimization: Pre-calculate active node center coordinates outside the candidate loop
+        // to avoid recalculating active center coordinates on every element iteration.
+        let active_cx = active_node.x as f32 + (active_node.width as f32 / 2.0);
+        let active_cy = active_node.y as f32 + (active_node.height as f32 / 2.0);
 
-        for node in &self.focusable_rects {
-            if node.id == active_id { continue; }
-
-            // Filter candidates based on direction quadrants
-            let is_candidate = match direction {
+        // Bolt Optimization: Single-pass map and min_by evaluation ensures candidate node center coordinates
+        // and squared spatial distances are computed exactly once per candidate node.
+        let closest_node_id = self.focusable_rects.iter()
+            .filter(|node| node.id != active_id)
+            .filter(|node| match direction {
                 NavigationDirection::Up => node.y < active_node.y,
                 NavigationDirection::Down => node.y > active_node.y,
                 NavigationDirection::Left => node.x < active_node.x,
                 NavigationDirection::Right => node.x > active_node.x,
-            };
-
-            if is_candidate {
-                // Calculate center-to-center Euclidean spatial distance
-                let active_cx = active_node.x as f32 + (active_node.width as f32 / 2.0);
-                let active_cy = active_node.y as f32 + (active_node.height as f32 / 2.0);
+            })
+            .map(|node| {
                 let node_cx = node.x as f32 + (node.width as f32 / 2.0);
                 let node_cy = node.y as f32 + (node.height as f32 / 2.0);
-
-                let dx = node_cx - active_cx;
-                let dy = node_cy - active_cy;
-                let distance = dx * dx + dy * dy;
-
-                if distance < min_distance {
-                    min_distance = distance;
-                    closest_node_id = Some(node.id);
-                }
-            }
-        }
-
+                let dist_sq = (node_cx - active_cx).powi(2) + (node_cy - active_cy).powi(2);
+                (dist_sq, node.id)
+            })
+            .min_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(core::cmp::Ordering::Equal))
+            .map(|(_, id)| id);
         if let Some(target_id) = closest_node_id {
             self.current_focus_id = Some(target_id);
         }
