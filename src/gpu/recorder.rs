@@ -186,7 +186,7 @@ mod tests {
     #[test]
     fn test_recorder_authorized_success() {
         // Capability bit 0x4 permits recording
-        let token = CapabilityToken::new().allow_read("/var/www");
+        let token = CapabilityToken::new().allow_read_path("/var/www");
         let mut recorder = GpuScreenRecorder::new(640, 480, FrameFormat::Rgb888, token);
 
         assert!(recorder.start_recording().is_ok());
@@ -195,7 +195,7 @@ mod tests {
 
     #[test]
     fn test_yuv420_conversion_rendering() {
-        let token = CapabilityToken::new().allow_read("/var/www");
+        let token = CapabilityToken::new().allow_read_path("/var/www");
         let mut recorder = GpuScreenRecorder::new(100, 100, FrameFormat::Yuv420p, token);
         recorder.start_recording().unwrap();
 
@@ -213,7 +213,7 @@ mod tests {
 
     #[test]
     fn test_nv12_conversion_rendering() {
-        let token = CapabilityToken::new().allow_read("/var/www");
+        let token = CapabilityToken::new().allow_read_path("/var/www");
         let mut recorder = GpuScreenRecorder::new(100, 100, FrameFormat::Nv12, token);
         recorder.start_recording().unwrap();
 

@@ -188,7 +188,9 @@ pub use unimplemented_tools::{
     CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
     SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
     PluginMarketplace, MusicLibraryManager, TimeMachineBackup, SysinternalsProcMon, SystemdCgTop,
-    TrussSyscallTracer, NetworkQualityProbe, WindowsPowercfg,
+    TrussSyscallTracer, NetworkQualityProbe, WindowsPowercfg, BtopSystemMonitor, FastFetchInfo,
+    BatSyntaxViewer, FastFileSearchEngine, EbpfSystemTracer, OmarchyDotfileEngine,
+    OmarchyWorkspaceManager, OmarchyAppletEngine, OmarchySelfHealingConfig,
 };
 
 pub mod init {

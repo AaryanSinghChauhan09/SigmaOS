@@ -1,6 +1,16 @@
 // SigmaOS Pledge - Process Privilege Reduction Mechanism
 // Inspired by OpenBSD pledge but capability-based
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+#[cfg(test)]
+use std::collections::BTreeMap;
+#[cfg(not(test))]
+use crate::klib::BTreeMap;
+
 #[cfg(test)]
 #[path = "capability.rs"]
 pub mod capability;
@@ -103,6 +113,7 @@ impl PledgeManager {
     pub fn new() -> Self {
         Self {
             pledge: None,
+            exec_pledge: None,
             gate: CapabilityGate::new(0),
             unveiled_paths: Vec::new(),
             thread_sub_pledges: BTreeMap::new(),
@@ -261,6 +272,7 @@ impl Default for PledgeManager {
 /// Common pledge promises
 pub mod promises {
     use super::{Permission, PledgePromise};
+    use alloc::vec;
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {

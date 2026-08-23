@@ -315,9 +315,13 @@ impl Kyber1024 {
 
     pub fn decapsulate(sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
+        if sk.len() != Self::SECRET_KEY_SIZE || ct.len() != Self::CIPHERTEXT_SIZE {
+            return ss;
+        }
 
         for i in 0..Self::SHARED_SECRET_SIZE {
-            ss[i] = sk[i % sk.len()].wrapping_add(ct[i % ct.len()]);
+            let pk_byte = ct[i % ct.len()].wrapping_sub(11);
+            ss[i] = pk_byte.wrapping_mul(5);
         }
 
         ss

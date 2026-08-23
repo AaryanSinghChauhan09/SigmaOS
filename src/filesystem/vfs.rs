@@ -361,11 +361,11 @@ mod tests {
         let fd = vfs.open_file(inode_id, 0).unwrap();
 
         let bad_token = CapabilityToken::new(); // no read or write permissions
-        let read_token = CapabilityToken::new().allow_read("/var/www");
-        let write_token = CapabilityToken::new().allow_write("/tmp");
+        let read_token = CapabilityToken::new().allow_read_path("/var/www");
+        let write_token = CapabilityToken::new().allow_write_path("/tmp");
         let _all_token = CapabilityToken::new()
-            .allow_read("/var/www")
-            .allow_write("/tmp");
+            .allow_read_path("/var/www")
+            .allow_write_path("/tmp");
 
         // 2. Zero-sized read should return Ok(0) immediately even if file is empty
         let mut buf = [];
