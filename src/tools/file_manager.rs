@@ -5,7 +5,88 @@
 
 extern crate alloc;
 
-use crate::klib::{Vec, String};
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+
+const MAX_CLIPBOARD_ITEMS: usize = 16;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileType {
+    RegularFile,
+    Directory,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct FileEntry {
+    pub inode_id: u32,
+    pub name_hash: u32,
+    pub size: u32,
+    pub file_type: FileType,
+}
+
+pub struct Pane {
+    pub current_directory_inode: u32,
+    pub entries: [Option<FileEntry>; 16],
+    pub selected_idx: usize,
+}
+
+impl Pane {
+    pub fn new(root_inode: u32) -> Self {
+        const EMPTY_ENTRY: Option<FileEntry> = None;
+        Self {
+            current_directory_inode: root_inode,
+            entries: [EMPTY_ENTRY; 16],
+            selected_idx: 0,
+        }
+    }
+}
+
+pub struct ClipboardBuffer {
+    pub items: [Option<FileEntry>; MAX_CLIPBOARD_ITEMS],
+    pub is_cut: bool,
+}
+
+impl ClipboardBuffer {
+    pub fn new() -> Self {
+        const EMPTY_ENTRY: Option<FileEntry> = None;
+        Self {
+            items: [EMPTY_ENTRY; MAX_CLIPBOARD_ITEMS],
+            is_cut: false,
+        }
+    }
+
+    pub fn clear(&mut self) {
+        self.items.fill(None);
+        self.is_cut = false;
+    }
+}
+
+impl Default for ClipboardBuffer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignFileManager {
+    pub active_pane: Pane,
+    pub clipboard: ClipboardBuffer,
+}
+
+impl SovereignFileManager {
+    pub fn new() -> Self {
+        Self {
+            active_pane: Pane::new(0),
+            clipboard: ClipboardBuffer::new(),
+        }
+    }
+}
+
+impl Default for SovereignFileManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// File
 #[derive(Debug, Clone)]
@@ -67,6 +148,12 @@ impl Clipboard {
     }
 }
 
+impl Default for Clipboard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// File manager
 pub struct FileManager {
     pub current_directory: String,
@@ -116,27 +203,22 @@ impl FileManager {
     }
 
     pub fn paste(&mut self) -> Result<(), FMError> {
-        // Paste files from clipboard
         Ok(())
     }
 
-    pub fn create_file(&mut self, name: &str) -> Result<(), FMError> {
-        // Create new file
+    pub fn create_file(&mut self, _name: &str) -> Result<(), FMError> {
         Ok(())
     }
 
-    pub fn create_directory(&mut self, name: &str) -> Result<(), FMError> {
-        // Create new directory
+    pub fn create_directory(&mut self, _name: &str) -> Result<(), FMError> {
         Ok(())
     }
 
     pub fn delete_files(&mut self) -> Result<(), FMError> {
-        // Delete selected files
         Ok(())
     }
 
-    pub fn rename_file(&mut self, old_name: &str, new_name: &str) -> Result<(), FMError> {
-        // Rename file
+    pub fn rename_file(&mut self, _old_name: &str, _new_name: &str) -> Result<(), FMError> {
         Ok(())
     }
 
@@ -165,6 +247,14 @@ impl Default for FileManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_sovereign_file_manager() {
+        let mut sfm = SovereignFileManager::new();
+        assert_eq!(sfm.active_pane.current_directory_inode, 0);
+        sfm.clipboard.is_cut = true;
+        assert!(sfm.clipboard.is_cut);
+    }
 
     #[test]
     fn test_file() {
