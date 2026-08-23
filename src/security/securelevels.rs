@@ -3,7 +3,16 @@
 
 extern crate alloc;
 
-use crate::security::unveil::{SecurityError, SigmaError};
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::error::{SecurityError, SigmaError};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, PartialEq, Eq)]
+pub enum SecurityError { AccessDenied, PrivilegeEscalationDetected }
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, PartialEq, Eq)]
+pub enum SigmaError { Security(SecurityError) }
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU8, Ordering};
 

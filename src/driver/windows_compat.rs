@@ -670,7 +670,7 @@ impl NetworkDevice for WindowsNdisAdapter {
         self.mac_address
     }
 
-    fn set_mac_address(&mut self, mac: [u8; 6]) -> Result<(), DeviceError> {
+    fn set_mac_address(&mut self, mac: [u8; 6]) -> Result<(), crate::driver::device::DeviceError> {
         self.mac_address = mac;
         Ok(())
     }

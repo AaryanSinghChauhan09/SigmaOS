@@ -2,13 +2,9 @@
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{BTreeMap, String, ToString, Vec};
-use alloc::string::String;
-use alloc::vec::Vec;
 use alloc::format;
 use core::cell::Cell;
 
