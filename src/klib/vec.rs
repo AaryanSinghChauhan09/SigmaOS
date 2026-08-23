@@ -54,6 +54,25 @@ impl<T> Vec<T> {
         self.len == 0
     }
 
+    pub fn first(&self) -> Option<&T> {
+        if self.len == 0 {
+            None
+        } else {
+            unsafe { Some(&*self.data) }
+        }
+    }
+
+    pub fn swap(&mut self, i: usize, j: usize) {
+        if i >= self.len || j >= self.len {
+            panic!("swap index out of bounds");
+        }
+        if i != j {
+            unsafe {
+                core::ptr::swap(self.data.add(i), self.data.add(j));
+            }
+        }
+    }
+
     pub fn iter(&self) -> core::slice::Iter<'_, T> {
         unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
     }
