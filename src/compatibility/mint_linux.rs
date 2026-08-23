@@ -214,6 +214,12 @@ pub struct MintSoftwareManager {
     pub apps_catalog: Vec<MintAppMetadata>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintError {
+    LayoutFailed,
+    UpdateError,
+}
+
 impl Default for MintSoftwareManager {
     fn default() -> Self {
         Self::new()
@@ -229,6 +235,28 @@ impl MintSoftwareManager {
 
     pub fn add_app_to_catalog(&mut self, app: MintAppMetadata) {
         self.apps_catalog.push(app);
+    }
+
+    pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
+        let mut filtered = Vec::new();
+        for app in self.apps_catalog.iter() {
+            if app.category.starts_with(category) {
+                filtered.push(app.clone());
+            }
+        }
+        filtered
+    }
+
+    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
+        let mut sorted = self.apps_catalog.clone();
+        for i in 0..sorted.len() {
+            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
+                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
+                    sorted.swap(j, j + 1);
+                }
+            }
+        }
+        sorted
     }
 
     /// Arrange windows using Stacking layout (Cascaded coordinations)
@@ -336,7 +364,7 @@ impl TimeshiftSystemRestorer {
 
     pub fn rollback_system(&mut self, id: u32) -> Result<(), MintError> {
         let mut found = false;
-        for i in 0..self.restore_points.len {
+        for i in 0..self.restore_points.len() {
             if let Some(ref rp) = self.restore_points[i] {
                 if rp.id == id {
                     found = true;
@@ -359,97 +387,35 @@ impl Default for TimeshiftSystemRestorer {
     }
 }
 
-struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
+#[derive(Debug, Clone)]
+pub struct WindowCoordinates {
+    pub x: usize,
+    pub y: usize,
+    pub width: usize,
+    pub height: usize,
 }
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
+#[derive(Debug, Clone)]
+pub struct MintUpdateItem {
+    pub package_name: [u8; 32],
+    pub version: [u8; 16],
+    pub level: MintUpdateLevel,
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
+#[derive(Debug, Clone)]
+pub struct SoftwareMeta {
+    pub name: [u8; 32],
+    pub rating: usize,
 }
 
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
+#[derive(Debug, Clone)]
+pub struct ZenithDisplayCompositor {
+    pub active_layout: [u8; 32],
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-            }
-            if matches {
-                filtered.push(app.clone());
-            }
-        }
-        filtered
-    }
-
-    /// Returns apps ranked by user ratings (Featured Apps).
-    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
-        let mut sorted = self.apps_catalog.clone();
-        // Simple bubble sort over vector to rank featured apps without external traits
-        for i in 0..sorted.len() {
-            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
-                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
-                    sorted.swap(j, j + 1);
-                }
-            }
-        }
-        sorted
+impl ZenithDisplayCompositor {
+    pub fn new() -> Self {
+        Self { active_layout: [0u8; 32] }
     }
 }
 
@@ -755,7 +721,7 @@ mod tests {
         assert_eq!(&new_theme, b"Mint-Y-Light");
 
         engine.add_desklet(101, 200, 200);
-        assert_eq!(engine.desklets.len, 1);
+        assert_eq!(engine.desklets.len(), 1);
         assert_eq!(engine.desklets[0].unwrap().id, 101);
     }
 
@@ -766,7 +732,7 @@ mod tests {
 
         restorer.create_restore_point(101, true); // rsync snapshot
         restorer.create_restore_point(102, false); // btrfs snapshot
-        assert_eq!(restorer.restore_points.len, 2);
+        assert_eq!(restorer.restore_points.len(), 2);
 
         // Rollback succeeds for existing restore point
         assert!(restorer.rollback_system(102).is_ok());

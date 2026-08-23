@@ -53,3 +53,10 @@ pub use editor::{
     CodeEditor, Document as EditorDocument, EditorConfig, EditorError, Language as EditorLanguage,
     LspClient, SyntaxHighlighter,
 };
+pub mod utility_suite;
+pub use utility_suite::{
+    AnnotationShape, AudacityWaveEditor, CompressionMethod, DaVinciTimeline,
+    EarTrumpetVolumeMatrix, FlameshotAnnotator, IrfanViewEngine, ItemAgeColor,
+    NotepadPlusPlusBuffer, OneCommanderFileGrid, SevenZipEngine, SovereignBrowserEngine,
+    VlcCodecPipeline,
+};

@@ -8,6 +8,115 @@ extern crate alloc;
 
 use std::collections::{HashMap, HashSet};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ObjectType {
+    File,
+    Process,
+    Socket,
+    Ipc,
+    Capability,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SelinuxPermission {
+    Read,
+    Write,
+    Execute,
+    Append,
+    Transition,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SecurityLabel {
+    pub label: String,
+}
+
+impl SecurityLabel {
+    pub fn new(label: &str) -> Self {
+        Self { label: label.to_string() }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SecurityRule {
+    pub source_type: String,
+    pub target_type: String,
+    pub object_type: ObjectType,
+    pub permission: SelinuxPermission,
+    pub allow: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SecurityPolicy {
+    pub rules: Vec<SecurityRule>,
+}
+
+impl SecurityPolicy {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: SecurityRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn check_permission(&self, source_type: &str, target_type: &str, obj_type: ObjectType, perm: SelinuxPermission) -> bool {
+        for rule in &self.rules {
+            if rule.source_type == source_type && rule.target_type == target_type && rule.object_type == obj_type && rule.permission == perm {
+                return rule.allow;
+            }
+        }
+        false
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorProfile {
+    pub name: String,
+    pub attachments: Vec<String>, // path attachments
+    pub allow_rules: HashSet<String>,
+}
+
+impl AppArmorProfile {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            attachments: Vec::new(),
+            allow_rules: HashSet::new(),
+        }
+    }
+
+    pub fn add_allow_rule(&mut self, rule: &str) {
+        self.allow_rules.insert(rule.to_string());
+    }
+
+    pub fn is_allowed(&self, path: &str) -> bool {
+        self.allow_rules.contains(path)
+    }
+}
+
+pub struct AppArmorManager {
+    pub profiles: HashMap<String, AppArmorProfile>,
+}
+
+impl AppArmorManager {
+    pub fn new() -> Self {
+        Self { profiles: HashMap::new() }
+    }
+
+    pub fn load_profile(&mut self, profile: AppArmorProfile) {
+        self.profiles.insert(profile.name.clone(), profile);
+    }
+
+    pub fn check_access(&self, profile_name: &str, path: &str) -> bool {
+        if let Some(profile) = self.profiles.get(profile_name) {
+            profile.is_allowed(path)
+        } else {
+            false
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SeLinuxMode {
     Enforcing,
@@ -145,6 +254,7 @@ impl SelinuxEngine {
 
     pub fn set_mode(&mut self, mode: SeLinuxMode) {
         self.mode = mode;
+        self.avc.clear();
     }
 
     /// Verifies access between a source context and target context
@@ -257,5 +367,31 @@ mod tests {
         let allowed_d = engine.has_permission(src, tgt, "file", "write").unwrap();
         assert!(allowed_d);
         assert_eq!(engine.audit_logs.len(), 2); // No new audit log added
+    }
+
+    #[test]
+    fn test_app_armor_and_policy() {
+        // AppArmor Manager check
+        let mut am = AppArmorManager::new();
+        let mut profile = AppArmorProfile::new("firefox");
+        profile.add_allow_rule("/usr/bin/firefox");
+        profile.add_allow_rule("/etc/resolv.conf");
+        am.load_profile(profile);
+
+        assert!(am.check_access("firefox", "/usr/bin/firefox"));
+        assert!(!am.check_access("firefox", "/etc/shadow"));
+
+        // SecurityPolicy rule check
+        let mut policy = SecurityPolicy::new();
+        policy.add_rule(SecurityRule {
+            source_type: "unconfined_t".to_string(),
+            target_type: "etc_t".to_string(),
+            object_type: ObjectType::File,
+            permission: SelinuxPermission::Read,
+            allow: true,
+        });
+
+        assert!(policy.check_permission("unconfined_t", "etc_t", ObjectType::File, SelinuxPermission::Read));
+        assert!(!policy.check_permission("unconfined_t", "shadow_t", ObjectType::File, SelinuxPermission::Read));
     }
 }

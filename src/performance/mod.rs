@@ -13,3 +13,15 @@ pub use io_scheduler::{AdaptiveIOScheduler, DeviceType, IOSchedulerPolicy, IOReq
 pub use network_bbr::{BbrEngine, BbrState};
 pub use eevdf::{EevdfScheduler, EevdfTask, MAX_SCHED_TASKS};
 pub use zero_copy_ipc::{ZeroCopyQueue, IPCError, QUEUE_SIZE};
+pub mod cachy_opt;
+pub mod smart_optimizer;
+
+pub use cachy_opt::{
+    AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, IoSchedClass, PhysicalPageFrame,
+    UltraKernelSamepageMerger, X86v3v4OptimizationDetector,
+};
+pub use smart_optimizer::{
+    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
+    PerformanceProfileRule, RamDefragmenter, SmartPerformanceProfile,
+    SmartResourceOptimizer, GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+};

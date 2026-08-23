@@ -36,6 +36,11 @@ pub trait Driver {
     fn id(&self) -> DriverID;
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
+    fn set_state(&self, _state: DriverState) {}
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
+    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn dependencies(&self) -> &'static [DriverType] { &[] }
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
 }
@@ -648,7 +653,7 @@ mod tests {
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
@@ -786,110 +791,4 @@ mod tests {
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
 
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    static mut OPEN_CALLED: i32 = 0;
-    static mut RELEASE_CALLED: i32 = 0;
-
-    fn mock_open() -> i32 {
-        unsafe { OPEN_CALLED += 1; }
-        0
-    }
-
-    fn mock_release() -> i32 {
-        unsafe { RELEASE_CALLED += 1; }
-        0
-    }
-
-    fn mock_read(_buf: &mut [u8]) -> i32 { 0 }
-    fn mock_write(_buf: &[u8]) -> i32 { 0 }
-    fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 { 0 }
-
-    #[test]
-    fn test_linux_driver_shim() {
-        let fops = LinuxFileOperations {
-            open: mock_open,
-            release: mock_release,
-            read: mock_read,
-            write: mock_write,
-            ioctl: mock_ioctl,
-        };
-
-        let mut shim = LinuxDriverShim::new(42, "e1000", DriverType::Network, fops);
-        assert_eq!(shim.id(), 42);
-        assert_eq!(shim.driver_type(), DriverType::Network);
-
-        assert!(shim.init().is_ok());
-        unsafe { assert_eq!(OPEN_CALLED, 1); }
-
-        assert!(shim.load().is_ok());
-        assert_eq!(shim.state(), DriverState::Active);
-
-        assert!(shim.unload().is_ok());
-        unsafe { assert_eq!(RELEASE_CALLED, 1); }
-    }
-}

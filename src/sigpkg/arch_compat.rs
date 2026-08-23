@@ -337,16 +337,13 @@ pub struct DebianSbuildPackage {
     pub build_depends: Vec<String>, // e.g. ["gcc", "make", "libc-dev"]
 }
 
-impl RollingSyncManager {
-    /// Validates if a Debian sbuild source package's build dependencies (Build-Depends)
-    /// are fully satisfied by currently installed system packages.
-    pub fn is_debian_sbuild_builddeps_satisfied(&self, package: &DebianSbuildPackage) -> bool {
-        for dep in &package.build_depends {
-            if !self.installed_packages.contains_key(dep) {
-                return false;
-            }
+impl DebianSbuildPackage {
+    pub fn new(name: &str, build_depends: Vec<String>) -> Self {
+        Self {
+            name: name.to_string(),
+            version: Version::new(1, 0, 0),
+            build_depends,
         }
-        true
     }
 }
 

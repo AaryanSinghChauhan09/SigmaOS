@@ -76,6 +76,12 @@ pub struct Package;
 // ============================================================================
 
 /// Core package trait - defines the contract for all package operations
+#[derive(Debug, Clone)]
+pub struct ConditionalDependency {
+    pub required_use_flag: String,
+    pub dependency: Dependency,
+}
+
 pub trait IPackage: Send + Sync {
     fn name(&self) -> &str;
     fn version(&self) -> &Version;
@@ -83,6 +89,8 @@ pub trait IPackage: Send + Sync {
     fn format(&self) -> PackageFormat;
     fn metadata(&self) -> &PackageMetadata;
     fn metadata_mut(&mut self) -> &mut PackageMetadata;
+    fn files(&self) -> &[String] { &[] }
+    fn conditional_dependencies(&self) -> &[ConditionalDependency] { &[] }
 }
 
 /// Package format enumeration
@@ -143,6 +151,11 @@ pub struct PackageMetadata {
 // ============================================================================
 
 /// Package parser trait - Strategy pattern for different parsing algorithms
+pub trait IPathTrigger: Send + Sync {
+    fn pattern(&self) -> &str;
+    fn execute(&self, matched_files: &[String]) -> Result<(), HookError>;
+}
+
 pub trait IPackageParser: Send + Sync {
     fn format(&self) -> PackageFormat;
     fn can_parse(&self, data: &[u8]) -> bool;
@@ -2122,6 +2135,8 @@ pub struct UniversalPackageManager {
     factory: PackageParserFactory,
     installed_packages: HashMap<String, Box<dyn IPackage>>,
     pub global_hooks: Vec<Arc<dyn UserDefinedHook>>,
+    pub path_triggers: Vec<Arc<dyn IPathTrigger>>,
+    pub active_use_flags: HashMap<String, bool>,
 }
 
 impl UniversalPackageManager {
@@ -2131,6 +2146,8 @@ impl UniversalPackageManager {
             factory: PackageParserFactory::new(),
             installed_packages: HashMap::new(),
             global_hooks: Vec::new(),
+            path_triggers: Vec::new(),
+            active_use_flags: HashMap::new(),
         }
     }
 
