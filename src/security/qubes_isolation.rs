@@ -2,7 +2,11 @@
 // Enables ultra-lightweight, compartmentalized zero-trust secure domains (MicroVMs)
 // Running natively in user-space with microsecond-level IPC latencies and hypervisor isolation.
 
+#[cfg(not(test))]
 use core::cell::RefCell;
+
+#[cfg(test)]
+use std::cell::RefCell;
 
 #[cfg(not(test))]
 use crate::security::CapabilityToken;
@@ -211,8 +215,9 @@ impl SovereignIsolationManager {
             assigned_pci_slot: pci_slot,
         };
 
-        let mut domains = self.domains.borrow_mut();
-        for slot in domains.iter_mut() {
+        let mut domains_guard = self.domains.borrow_mut();
+        let domains_array: &mut [Option<VirtualDomain>; MAX_DOMAINS] = &mut *domains_guard;
+        for slot in domains_array.iter_mut() {
             if slot.is_none() {
                 *slot = Some(domain);
                 self.next_dom_id += 1;
