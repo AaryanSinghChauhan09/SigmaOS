@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: MIT
-
 extern crate alloc;
 
 #[cfg(not(target_os = "none"))]

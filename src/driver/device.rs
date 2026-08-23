@@ -1141,6 +1141,14 @@ mod legacy_tests {
         // 3. Unload Driver and perform driver-specific cleanup tasks
         assert!(io_mgr.io_unload_driver(driver_idx).is_ok());
 
+        // Assert that all Device Objects and Extensions have been freed/deleted cleanly from the pool
+        assert_eq!(io_mgr.active_drivers[driver_idx].device_objects.len(), 0);
+    }
+
+    #[test]
+    fn test_storage_drivers() {
+        let mut virtio = SimpleBlockDevice::new(7, b"virtio_blk", 10, 512);
+        assert!(virtio.init().is_ok());
     }
 }
 
@@ -1661,6 +1669,9 @@ extern "C" {
     fn malloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+
+
+
 
 #[cfg(test)]
 #[no_mangle]
