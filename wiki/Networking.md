@@ -1,103 +1,70 @@
-# SigmaOS Networking Stack
+# SigmaOS Networking
 
-## Architecture
+## TCP/IP Stack
 
-SigmaOS uses a modern, eBPF-first networking architecture:
+Pure-Rust TCP implementation with RFC-793/7323 compliance.
+
+### TCP State Machine
 
 ```
-Application Layer
-    │
-    ▼
-Socket API (AF_INET, AF_INET6, AF_UNIX, io_uring)
-    │
-    ▼
-NetworkBolt Daemon (sigma-net)
-    │
-    ├── WireGuard VPN
-    ├── DNS Resolver (DoH/DoT)
-    ├── Network Manager
-    └── Zero-Trust Agent
-    │
-    ▼
-Kernel Network Stack
-    │
-    ├── eBPF TC (Traffic Control)
-    ├── eBPF XDP (Express Data Path)
-    └── netfilter (legacy compat)
-    │
-    ▼
-Network Hardware Drivers
-    │
-    └── (WiFi/Ethernet/Bluetooth)
+CLOSED → LISTEN → SYN_RECEIVED → ESTABLISHED → FIN_WAIT_1 → FIN_WAIT_2 → TIME_WAIT → CLOSED
 ```
 
-## NetworkBolt (`sigma-net`)
+### TCP Features
 
-The primary network management daemon:
-
-```bash
-# Configure network interface
-sigma-net connect eth0 dhcp
-sigma-net connect wlan0 ssid "MyWiFi" --password
-
-# Static IP
-sigma-net set eth0 ip 192.168.1.100/24 gateway 192.168.1.1
-
-# VPN
-sigma-net vpn connect wg0 /etc/wireguard/wg0.conf
-sigma-net vpn status
-
-# DNS
-sigma-net dns set 1.1.1.1 8.8.8.8 --doh
-sigma-net dns status
-
-# Firewall
-sigma-net fw allow in port 22 proto tcp
-sigma-net fw deny out dst 10.0.0.0/8
-sigma-net fw status
-```
+| Feature | Status | RFC |
+|---------|--------|-----|
+| SACK | ✅ | RFC 2018 |
+| Window scaling | ✅ | RFC 7323 |
+| Timestamps | ✅ | RFC 7323 |
+| CUBIC congestion | ✅ | RFC 8312 |
+| BBRv3 | 🔬 | Google |
+| TCP Fast Open | ✅ | RFC 7413 |
+| ECN | ✅ | RFC 3168 |
+| MPTCP | 📋 | RFC 8684 |
 
 ## eBPF Firewall
 
-SigmaOS replaces iptables with a pure eBPF XDP/TC firewall:
+### XDP (eXpress Data Path)
 
-| Feature | iptables | SigmaOS eBPF |
-|---------|----------|-------------|
-| Packet rate | ~11 Mpps | ~14.8 Mpps |
-| Rule evaluation | Linear | Hash table O(1) |
-| Dynamic updates | Requires flush | Hot-reload |
-| DDoS mitigation | Limited | XDP drop at NIC |
-| Observability | Poor | Full eBPF metrics |
+Runs at NIC driver level before kernel network stack — up to 24 Mpps/core.
 
-## WireGuard Integration
-
-WireGuard is built into the kernel as a native module:
-
-```bash
-# Generate keypair
-sigma-net wg genkey > private.key
-sigma-net wg pubkey < private.key > public.key
-
-# Configure peer
-sigma-net wg add-peer wg0 \
-  --pubkey <peer-pubkey> \
-  --endpoint peer.example.com:51820 \
-  --allowed-ips 10.0.0.0/8
+```c
+SEC("xdp")
+int sigma_firewall(struct xdp_md *ctx) {
+    struct iphdr *ip = ...;
+    struct tcphdr *tcp = ...;
+    if (tcp->dest == htons(22) || tcp->dest == htons(443))
+        return XDP_PASS;
+    return XDP_DROP;
+}
 ```
 
-## Zero-Trust Network Access
+## WireGuard VPN
 
-SigmaOS implements Zero-Trust principles:
-- Every connection authenticated and authorized
-- Mutual TLS for all internal services
-- Policy-based access control via Sentinel
-- Continuous verification (not just at login)
+Kernel-level WireGuard integration:
+- **Key exchange**: Curve25519
+- **AEAD cipher**: ChaCha20-Poly1305
+- **Hash**: BLAKE2s
+- **Handshake**: 1-RTT
 
-## DNS Resolution
+## Zero-Trust Networking
 
-Multi-layer DNS with privacy protection:
-1. Local cache (dnsmasq)
-2. DNS-over-HTTPS (Cloudflare/Quad9/custom)
-3. DNS-over-TLS fallback
-4. DNSSEC validation
-5. Split-horizon DNS for VPN
+- Never trust, always verify
+- mTLS for service-to-service
+- Identity-based (not IP-based)
+- Micro-segmentation
+
+## DNS
+
+Local caching resolver with DNS-over-HTTPS (DoH), DNS-over-TLS (DoT), DNSSEC validation.
+
+## Network Interfaces
+
+| Type | Description |
+|------|-------------|
+| eth0/ens* | Physical Ethernet |
+| wlan0 | WiFi 802.11ax |
+| lo | Loopback |
+| wg0 | WireGuard VPN |
+| veth* | Virtual Ethernet (containers) |
