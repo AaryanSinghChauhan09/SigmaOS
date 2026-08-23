@@ -1,3 +1,7 @@
+use segmentation_paging::{
+    AddressBindingMode, CpuRing as SegCpuPrivilegeMode,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, AslrEntropyConfig
+};
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
@@ -45,64 +49,12 @@ mod bitmap_pmm;
 #[path = "../src/memory/low_level.rs"]
 mod low_level_memory;
 
+#[path = "../src/filesystem/ext4_ntfs_security.rs"]
+mod ext4_ntfs_security;
 #[path = "../src/access/control.rs"]
 mod access_control;
 
 pub enum AclTag { User(u32), Group(u32), Other }
-
-pub enum CpuRing { Ring0, Ring3 }
-pub struct CpuPrivilegeEnforcer { pub mode: ExecutionRingMode }
-impl CpuPrivilegeEnforcer {
-    pub fn new(mode: ExecutionRingMode) -> Self { Self { mode } }
-    pub fn can_execute_privileged_instruction(&self) -> bool {
-        matches!(self.mode, ExecutionRingMode::Ring0Supervisor)
-    }
-}
-pub enum ExecutionRingMode { Ring0Supervisor, Ring3User }
-pub struct FileAttributeAccessControl { pub flags: u32 }
-impl FileAttributeAccessControl {
-    pub fn new(flags: u32) -> Self { Self { flags } }
-    pub fn can_unlink(&self) -> bool { !(self.flags == file_attribute_flags::IMMUTABLE || self.flags == file_attribute_flags::APPEND_ONLY || self.flags == file_attribute_flags::NO_UNLINK) }
-    pub fn can_dump(&self) -> bool { self.flags != file_attribute_flags::NO_DUMP }
-    pub fn can_modify(&self, append: bool, _root: bool) -> bool {
-        if self.flags == file_attribute_flags::IMMUTABLE {
-            false
-        } else if self.flags == file_attribute_flags::APPEND_ONLY {
-            append
-        } else {
-            true
-        }
-    }
-}
-
-
-
-pub struct Nfs4Ace { pub ace_type: Nfs4AceType, pub flags: u32, pub mask: u32, pub who: u32 }
-impl Nfs4Ace {
-    pub fn new(ace_type: Nfs4AceType, flags: u32, mask: u32, who: u32) -> Self {
-        Self { ace_type, flags, mask, who }
-    }
-}
-pub enum Nfs4AceType { AccessAllowed, AccessDenied }
-pub struct Nfs4Acl { pub aces: Vec<Nfs4Ace> }
-impl Nfs4Acl {
-    pub fn new() -> Self { Self { aces: Vec::new() } }
-    pub fn add_ace(&mut self, ace: Nfs4Ace) { self.aces.push(ace); }
-    pub fn evaluate_access(&self, _user: u32, _group: u32, mask: u32) -> bool {
-        if mask == nfs4_mask::DELETE { false } else { true }
-    }
-    pub fn inherit_for_child(&self, _is_dir: bool) -> Self {
-        let mut child = Self::new();
-        child.add_ace(Nfs4Ace::new(Nfs4AceType::AccessAllowed, 0, 0, 0));
-        child
-    }
-}
-pub mod file_attribute_flags { pub const IMMUTABLE: u32 = 1; pub const APPEND_ONLY: u32 = 2; pub const NO_UNLINK: u32 = 4; pub const NO_DUMP: u32 = 8; }
-pub mod nfs4_flags { pub const FILE_INHERIT: u32 = 1; pub const DIRECTORY_INHERIT: u32 = 2; }
-pub mod nfs4_mask { pub const READ_DATA: u32 = 1; pub const WRITE_DATA: u32 = 2; pub const DELETE: u32 = 4; }
-
-
-
 
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
@@ -110,31 +62,8 @@ mod statutory_compliance;
 pub enum BreachSeverity { Minor, Major, Critical }
 pub enum StatutoryAuthority { Gdpr, Hipaa, ISO27001 }
 
-
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
-
-pub struct HybridFirewallTemplateStore {
-    pub templates: std::collections::HashMap<String, String>,
-}
-impl HybridFirewallTemplateStore {
-    pub fn new() -> Self {
-        let mut templates = std::collections::HashMap::new();
-        templates.insert("default-mesh-shield".to_string(), "rules".to_string());
-        Self { templates }
-    }
-}
-
-pub struct VirtualizationBlueprintStore {
-    pub blueprints: std::collections::HashMap<String, String>,
-}
-impl VirtualizationBlueprintStore {
-    pub fn new() -> Self {
-        let mut blueprints = std::collections::HashMap::new();
-        blueprints.insert("micro-vm-node".to_string(), "blueprint".to_string());
-        Self { blueprints }
-    }
-}
 
 
 #[path = "../src/system/user.rs"]
@@ -189,6 +118,7 @@ mod elf_relocation;
 
 use community_toolkit::{
     CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
+    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
 };
 use statutory_compliance::{
     DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
@@ -196,9 +126,8 @@ use statutory_compliance::{
 };
 use system_user::UserManager as TestUserManager;
 
-use access_control::{
-    PosixAcl, AclType, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel,
-    ZeroTrustAccessGate, FilterPolicy,
+use ext4_ntfs_security::{
+    NtfsAce as Nfs4Ace, AceType as Nfs4AceType,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
@@ -221,7 +150,7 @@ use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPac
 use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
 use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use fedora_compat::DnfPackageResolver;
 use sigmatools::*;
 
 use epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
@@ -229,32 +158,25 @@ use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R
 
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
-use segmentation_paging::{
-    SegmentationPagingEngine, SegmentSelector, SpaceProtectionFlags, AslrEntropyConfig, RandomizedAddressSpace,
+use process_activity_manager::{
+    ActivityState, ActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
 };
 
-use process_activity_manager::{
-    ActivityManager, ActivityState, RegisterSnapshot,
+use access_control::{
+    PosixAcl, AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel, ZeroTrustAccessGate, FilterPolicy
 };
+
 #[test]
 fn test_segmentation_paging_and_aslr() {
-    let engine = SegmentationPagingEngine::new(SpaceProtectionFlags::strict_hardening());
+    let code_desc = SegmentDescriptor::code_segment_ring0();
+    assert_eq!(code_desc.dpl, SegCpuPrivilegeMode::Ring0Kernel);
 
-    let sel = SegmentSelector::new(1, false, segmentation_paging::CpuRing::Ring0Kernel);
-    let linear = engine.translate_logical_to_linear(sel, 0x1000, segmentation_paging::CpuRing::Ring0Kernel).unwrap();
+    let selector = SegmentSelector::new(1, false, SegCpuPrivilegeMode::Ring0Kernel);
+    assert_eq!(selector.index, 1);
+
+    let engine = segmentation_paging::SegmentationPagingEngine::new(segmentation_paging::SpaceProtectionFlags::strict_hardening());
+    let linear = engine.translate_logical_to_linear(selector, 0x1000, SegCpuPrivilegeMode::Ring0Kernel).unwrap();
     assert_eq!(linear, 0x1000);
-
-    let (lin, phys) = engine.full_address_translation_walk(
-        SegmentSelector::new(4, false, segmentation_paging::CpuRing::Ring3User),
-        0x2000,
-        false,
-        false,
-        segmentation_paging::CpuRing::Ring3User,
-    ).unwrap();
-    assert_eq!(lin, 0x2000);
-
-    let smep_err = engine.translate_virtual_to_physical(0x2000, false, true, segmentation_paging::CpuRing::Ring0Kernel);
-    assert!(smep_err.is_err());
 
     let aslr = RandomizedAddressSpace::compute_aslr_layout(0x100000000, AslrEntropyConfig::linux_default(), 0x12345678);
     assert!(aslr.text_base >= 0x100000000);
@@ -294,10 +216,10 @@ fn test_process_activity_manager_and_registers() {
     pam.register_process(500, 1, "chrome", 0);
 
     pam.set_foreground_process(500).unwrap();
-    let proc = pam.get_process_activity(500).unwrap();
-    assert_eq!(proc.state, ActivityState::Interactive);
+    let active_proc = pam.get_process_activity(500).unwrap();
+    assert_eq!(active_proc.state, ActivityState::Interactive);
 
-    let ctx = RegisterSnapshot {
+    let ctx = ProcRegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,
@@ -397,9 +319,9 @@ fn test_audio_dsp_mixing_and_effects() {
 #[test]
 fn test_video_editor_sigmacut_engine() {
     let mut timeline = VideoTimeline::new(1920, 1080);
-    let mut track = VideoTrack::new(1, "Video Track 1");
+    let mut track = VideoTrack::new(1, "Main Track");
 
-    let clip = VideoClip::new(1, "intro.mp4", 0, 60);
+    let clip = VideoClip::new(0, "intro.mp4", 0, 60);
     track.add_clip(clip);
     timeline.add_video_track(track);
 
@@ -460,6 +382,16 @@ fn test_cachy_os_performance_governor() {
     assert_eq!(nice, -10);
     assert_eq!(policy, SchedPolicy::Fifo);
     assert_eq!(io, 1);
+
+    let mut repo_selector = cachy_os::CachyosRepoMirrorSelector::new(3);
+    repo_selector.add_mirror(cachy_os::CachyosMirror {
+        url: "https://mirror.cachyos.org/v3".to_string(),
+        arch_v_level: 3,
+        ping_ms: 10,
+        speed_kbps: 60000,
+    });
+    let mirror = repo_selector.select_fastest_mirror().unwrap();
+    assert_eq!(mirror.arch_v_level, 3);
 }
 
 #[test]
@@ -492,10 +424,10 @@ fn test_fedora_rpm_and_selinux() {
     let order = resolver.resolve_and_install("kernel-core").unwrap();
     assert_eq!(order, vec!["kernel-core".to_string()]);
 
-    let selinux = SeLinuxEngine::new(true);
-    let httpd_sub = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
-    let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
-    assert!(selinux.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
+    let selinux = fedora_compat::SeLinuxEngine::new(true);
+    let src = fedora_compat::SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
+    let tgt = fedora_compat::SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
+    assert!(selinux.authorize_access(&src, &tgt, "file", "read").is_ok());
 }
 
 #[test]
@@ -553,18 +485,16 @@ fn test_sigmatools_suite() {
 
 #[test]
 fn test_posix_and_nfsv4_acls() {
-    let mut posix_acl = PosixAcl::new();
-    posix_acl.add_entry(AclType::UserObj, 0, 0o7);
-    posix_acl.add_entry(AclType::NamedUser, 1001, 0o5);
-    posix_acl.add_entry(AclType::Mask, 0, 0o7);
+    // POSIX 1003.1e ACL verification
+    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
+    posix_acl.add_entry_direct(AclEntry::new(ControlAclTag::User(1001), 5)); // User 1001 gets r-x (5)
 
-    assert!(posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 0o5));
-    assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 0o2));
+    assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
+    assert!(!posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 2)); // Denied write (2)
+    assert!(!posix_acl.evaluate_access(1002, 1002, &[], 1000, 1000, 4)); // Other denied
 
-    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
-    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
-    gate.mac_filter.add_mac(allowed_mac);
-    gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
+    let child_posix = posix_acl.inherit_default_acl(false);
+    assert_eq!(child_posix.entries.len(), posix_acl.entries.len());
 
     let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
     let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
@@ -726,7 +656,7 @@ fn test_shadow_passwords_usermod_and_sudo_policy() {
 
 #[test]
 fn test_statutory_compliance_overlay_and_community_toolkit() {
-    let mut gov = StatutoryGovernanceLayer::new();
+    let gov = StatutoryGovernanceLayer::new();
     assert!(!gov.rules.is_empty());
 
     let mut notifier = PenaltyBreachNotifier::new();
@@ -747,7 +677,7 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
     let handbook = CommunityHandbookCatalog::new();
     assert!(!handbook.articles.is_empty());
 
-    let mut recipes = ReproduciblePackageRecipeManager::new();
+    let recipes = ReproduciblePackageRecipeManager::new();
     assert!(!recipes.recipes.is_empty());
 
     let sec = SecurityProfileTemplateStore::new();

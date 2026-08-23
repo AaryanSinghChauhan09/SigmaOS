@@ -48,36 +48,6 @@ pub trait AnalysisStrategy {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;
     fn name(&self) -> &str;
 }
-
-#[derive(Debug, Clone)]
-pub struct BandwidthAnalysis {
-    pub bytes_per_sec: u64,
-    pub packets_per_sec: u64,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConnectionInfo {
-    pub source: IpAddr,
-    pub destination: IpAddr,
-    pub port: u16,
-    pub state: ConnectionState,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ConnectionState {
-    Established,
-    Listening,
-    Closed,
-    Connecting,
-}
-
-#[derive(Debug, Clone)]
-pub struct SecurityAnalysis {
-    pub threat_score: usize,
-    pub warnings: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
 pub struct TrafficAlert {
     pub alert_type: AlertType,
     pub severity: AlertSeverity,
@@ -86,11 +56,7 @@ pub struct TrafficAlert {
     pub related_ips: Vec<IpAddr>,
 }
 
-#[derive(Debug, Clone)]
-pub struct TrafficStatistics {
-    pub total_packets: u64,
-    pub total_bytes: u64,
-}
+
 
 pub struct NetworkTrafficAnalyzer {
     pub buffer: AlpineZeroAllocCaptureBuffer<1024>,

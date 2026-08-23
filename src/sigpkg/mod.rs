@@ -15,18 +15,9 @@ pub mod transaction;
 pub mod universal_adapter;
 pub mod debian_crusher;
 
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
-};
-pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
-pub use debian_defeater::{
-    SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer,
-    SovereignTransactionManager, TransactionStatus,
-};
-pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
+pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use debian_defeater::{SovereignMirrorSelector, SovereignTransactionManager, SovereignSandboxEnforcer, SovereignDeltaGenerator, TransactionStatus};
+pub mod spec;
 pub use spec::{
     ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
@@ -39,8 +30,19 @@ pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
+pub use verifier::CryptoVerifier;
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub mod universal_adapter;
+pub mod universal_oop_system;
 pub use universal_adapter::{
-    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageManager as UniversalPackageAdapter,
+    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
+    DebAdapter, RpmAdapter, PacmanAdapter,
+};
+pub use universal_oop_system::{
+    IPackage, IPackageParser, PackageFormat, PackageMetadata,
+    PackageParserFactory, UniversalPackageManager,
+    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
+    UserDefinedHook, ParseError as OopParseError, InstallError, HookError,
 };
 pub use verifier::CryptoVerifier;
 
@@ -52,9 +54,8 @@ pub struct Version {
     pub patch: u64,
 }
 
-
 impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
@@ -69,29 +70,34 @@ impl Version {
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        let mut parts = version_str.split('.');
-
-        let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-        let minor_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-        let patch_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-
-        if parts.next().is_some() {
+        let parts: Vec<&str> = version_str.split('.').collect();
+        if parts.is_empty() || parts.len() > 3 {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = major_str
+        let major = parts[0]
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = minor_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = patch_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
+        let minor = if parts.len() >= 2 {
+            parts[1]
+                .parse::<u64>()
+                .map_err(|_| ParseError::InvalidNumber)?
+        } else {
+            0
+        };
+        let patch = if parts.len() >= 3 {
+            parts[2]
+                .parse::<u64>()
+                .map_err(|_| ParseError::InvalidNumber)?
+        } else {
+            0
+        };
 
         Ok(Version::new(major, minor, patch))
     }
 }
+
+
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParseError {
@@ -133,24 +139,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }

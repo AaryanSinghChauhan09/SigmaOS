@@ -1,10 +1,12 @@
-//! EEVDF & BORE Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
+//! EEVDF Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
 
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::cmp::Ordering;
 use core::time::Duration;
+
+
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -34,19 +36,6 @@ impl PartialEq for Task {
     }
 }
 
-impl Eq for Task {}
-
-impl PartialOrd for Task {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Task {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.vruntime.cmp(&other.vruntime)
-    }
-}
 
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,7 +46,7 @@ pub enum ProcessState {
     Terminated,
 }
 
-/// Process control block (PCB) enhanced with EEVDF vruntime and BORE deadline models
+/// Process control block (PCB) enhanced with EEVDF vruntime and deadline models
 /// Cache-line aligned to 64 bytes to prevent cache bouncing on SMP systems
 #[derive(Debug, Clone)]
 #[repr(C, align(64))]
@@ -103,7 +92,15 @@ impl Process {
     }
 
     pub fn update_virtual_deadline(&mut self, current_time: u64) {
-        self.update_virtual_deadline_bore(current_time);
+        // EEVDF virtual deadline calculation
+        let weight = match self.priority {
+            Priority::Idle => 64,
+            Priority::Low => 128,
+            Priority::Normal => 256,
+            Priority::High => 512,
+            Priority::Realtime => 1024,
+        };
+        self.virtual_deadline = current_time + (1000 / weight);
     }
 
     pub fn update_virtual_deadline_bore(&mut self, current_time: u64) {
@@ -114,6 +111,7 @@ impl Process {
             Priority::High => 512,
             Priority::Realtime => 1024,
         };
+        // CachyOS-style BORE burst penalty: higher burst score means higher virtual deadline (less eligibility)
         let bore_penalty = self.burst_score / 2;
         self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
     }
@@ -158,23 +156,72 @@ impl WorkStealingQueue {
     }
 }
 
-/// BORE / EEVDF Scheduler
-pub struct Scheduler {
-    pub processes: Vec<Process>,
-    pub current_time: u64,
+impl Process {
+    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
+        Self {
+            pid,
+            name,
+            priority,
+            state: ProcessState::Ready,
+            runtime: Duration::from_secs(0),
+            virtual_runtime: 0,
+            virtual_deadline: 0,
+            time_slice: Duration::from_millis(10),
+        }
+    }
+
+    pub fn get_weight(&self) -> u64 {
+        match self.priority {
+            Priority::Idle => 1,
+            Priority::Low => 2,
+            Priority::Normal => 4,
+            Priority::High => 8,
+            Priority::Realtime => 16,
+        }
+    }
+
+    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
+        let weight = self.get_weight();
+        // deadline = vruntime + (q / w) where q is time slice slice equivalent ticks (10)
+        let q = 10;
+        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
+    }
+}
+
+impl Eq for Task {}
+
+impl PartialOrd for Task {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Task {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.vruntime.cmp(&other.vruntime)
+    }
+}
+
+pub struct CfsScheduler {
+    tasks: [Option<Task>; 64],
+    task_count: usize,
+    current_time: u64,
 }
 
 impl Scheduler {
     pub fn new() -> Self {
-        Self {
+        Scheduler {
             processes: Vec::new(),
             current_time: 0,
         }
     }
 
-    pub fn add_process(&mut self, mut process: Process) {
-        process.update_virtual_deadline_bore(self.current_time);
-        self.processes.push(process);
+    pub fn add_task(&mut self, task: Task) {
+        if self.task_count < 64 {
+            self.tasks[self.task_count] = Some(task);
+            self.task_count += 1;
+            self.sort_tasks();
+        }
     }
 
     pub fn charge_process_burst(&mut self, pid: u64, burst_amount: u64) {
@@ -184,33 +231,25 @@ impl Scheduler {
         }
     }
 
-    pub fn decay_process_bursts(&mut self) {
-        for process in self.processes.iter_mut() {
-            process.burst_score = process.burst_score.saturating_sub(1);
-            process.update_virtual_deadline_bore(self.current_time);
+    fn sort_tasks(&mut self) {
+        // Simple insertion sort for now since we don't have BTreeMap in no_std
+        for i in 1..self.task_count {
+            let mut j = i;
+            while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
+                self.tasks.swap(j - 1, j);
+                j -= 1;
+            }
         }
     }
-
-    pub fn tick(&mut self) {
-        self.current_time += 1;
-    }
-
-    pub fn schedule(&self) -> Option<&Process> {
-        self.processes.iter().min_by_key(|p| p.virtual_deadline)
-    }
 }
 
-impl Default for Scheduler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+
 
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
-    pub tasks: [Option<Task>; 64],
-    pub task_count: usize,
-    pub current_time: u64,
+    tasks: [Option<Task>; 64],
+    task_count: usize,
+    current_time: u64,
 }
 
 impl CfsScheduler {

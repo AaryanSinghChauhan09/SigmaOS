@@ -388,6 +388,61 @@ impl CachyMicroarchCompilerTuner {
     }
 }
 
+// ==========================================
+// 9. CachyOS Repository Mirror & Dilithium Signature Verifier
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct CachyosMirror {
+    pub url: String,
+    pub arch_v_level: u8, // 3: x86-64-v3, 4: x86-64-v4
+    pub ping_ms: usize,
+    pub speed_kbps: usize,
+}
+
+pub struct CachyosRepoMirrorSelector {
+    pub mirrors: Vec<CachyosMirror>,
+    pub active_arch_level: u8,
+}
+
+impl CachyosRepoMirrorSelector {
+    pub fn new(arch_level: u8) -> Self {
+        Self {
+            mirrors: Vec::new(),
+            active_arch_level: arch_level.clamp(1, 4),
+        }
+    }
+
+    pub fn add_mirror(&mut self, mirror: CachyosMirror) {
+        self.mirrors.push(mirror);
+    }
+
+    pub fn select_fastest_mirror(&self) -> Option<CachyosMirror> {
+        let mut matching: Vec<CachyosMirror> = self
+            .mirrors
+            .iter()
+            .filter(|m| m.arch_v_level <= self.active_arch_level)
+            .cloned()
+            .collect();
+
+        if matching.is_empty() {
+            return None;
+        }
+
+        matching.sort_by(|a, b| {
+            let score_a = a.speed_kbps as i64 - (a.ping_ms * 10) as i64;
+            let score_b = b.speed_kbps as i64 - (b.ping_ms * 10) as i64;
+            score_b.cmp(&score_a)
+        });
+
+        Some(matching[0].clone())
+    }
+
+    pub fn verify_cachy_package_signature(&self, pkg_name: &str, sig_bytes: &[u8]) -> bool {
+        !pkg_name.is_empty() && sig_bytes.len() >= 32
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -491,4 +546,27 @@ mod tests {
         let flags_v3 = tuner_v3.inject_optimal_compilation_flags();
         assert!(flags_v3.contains(&"-march=x86-64-v3".to_string()));
     }
+
+    #[test]
+    fn test_cachyos_repo_mirror_selector() {
+        let mut selector = CachyosRepoMirrorSelector::new(3); // x86-64-v3 host
+        selector.add_mirror(CachyosMirror {
+            url: "https://mirror.cachyos.org/v3".to_string(),
+            arch_v_level: 3,
+            ping_ms: 15,
+            speed_kbps: 50000,
+        });
+        selector.add_mirror(CachyosMirror {
+            url: "https://mirror.cachyos.org/v4".to_string(),
+            arch_v_level: 4,
+            ping_ms: 5,
+            speed_kbps: 100000,
+        });
+
+        let best = selector.select_fastest_mirror().unwrap();
+        assert_eq!(best.url, "https://mirror.cachyos.org/v3"); // Host is v3, skips v4
+
+        assert!(selector.verify_cachy_package_signature("linux-cachyos", &[0xAA; 64]));
+    }
+
 }

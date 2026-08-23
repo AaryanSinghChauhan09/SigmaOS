@@ -1,5 +1,7 @@
 // 1. Instructions and CPU Initialization
 
+
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstructionCyclePhase {
     Fetch,
