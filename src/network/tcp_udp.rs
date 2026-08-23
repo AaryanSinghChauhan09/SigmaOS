@@ -38,6 +38,7 @@ pub enum TCPState {
     CloseWait = 7,
     Closing = 8,
     TimeWait = 9,
+    LastAck = 10,
 }
 
 pub trait Socket {

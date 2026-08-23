@@ -420,10 +420,40 @@ impl HypervisorBackend for KvmHypervisor {
     }
 }
 
+/// QEMU/KVM Memory Ballooning configuration
+#[derive(Debug, Clone)]
+pub struct MemoryBalloonConfig {
+    pub current_balloon_mb: u64,
+    pub target_balloon_mb: u64,
+}
+
+impl MemoryBalloonConfig {
+    pub fn new(initial_mb: u64) -> Self {
+        Self {
+            current_balloon_mb: initial_mb,
+            target_balloon_mb: initial_mb,
+        }
+    }
+
+    pub fn set_target(&mut self, target_mb: u64) {
+        self.target_balloon_mb = target_mb;
+    }
+
+    pub fn inflate_deflate_step(&mut self) -> u64 {
+        if self.current_balloon_mb < self.target_balloon_mb {
+            self.current_balloon_mb = (self.current_balloon_mb + 256).min(self.target_balloon_mb);
+        } else if self.current_balloon_mb > self.target_balloon_mb {
+            self.current_balloon_mb = self.current_balloon_mb.saturating_sub(256).max(self.target_balloon_mb);
+        }
+        self.current_balloon_mb
+    }
+}
+
 /// QEMU/KVM backend
 pub struct QemuBackend {
     vms: HashMap<String, VmConfig>,
     vm_states: HashMap<String, VmState>,
+    balloons: HashMap<String, MemoryBalloonConfig>,
 }
 
 impl QemuBackend {
@@ -431,6 +461,16 @@ impl QemuBackend {
         Self {
             vms: HashMap::new(),
             vm_states: HashMap::new(),
+            balloons: HashMap::new(),
+        }
+    }
+
+    pub fn set_vm_balloon_target(&mut self, vm_id: &str, target_mb: u64) -> Result<u64, VmError> {
+        if let Some(balloon) = self.balloons.get_mut(vm_id) {
+            balloon.set_target(target_mb);
+            Ok(balloon.inflate_deflate_step())
+        } else {
+            Err(VmError::VmNotFound(vm_id.to_string()))
         }
     }
 }
@@ -440,6 +480,7 @@ impl HypervisorBackend for QemuBackend {
         let vm_id = format!("vm_{}", self.vms.len());
         self.vms.insert(vm_id.clone(), config.clone());
         self.vm_states.insert(vm_id.clone(), VmState::Stopped);
+        self.balloons.insert(vm_id.clone(), MemoryBalloonConfig::new(config.memory_mb));
         Ok(vm_id)
     }
 

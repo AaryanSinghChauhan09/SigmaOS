@@ -39,6 +39,11 @@ pub trait Driver {
     fn id(&self) -> DriverID;
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
+    fn set_state(&self, _state: DriverState) {}
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
+    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn dependencies(&self) -> &'static [DriverType] { &[] }
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
 }
@@ -492,7 +497,7 @@ mod tests {
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);

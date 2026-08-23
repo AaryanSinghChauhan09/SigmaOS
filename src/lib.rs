@@ -17,7 +17,6 @@ pub mod klib;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod productivity;
 pub mod remote;
@@ -169,7 +168,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use remote::{
@@ -195,7 +194,7 @@ pub use security::{
     ForensicStorageFilter, Permission, PledgeManager,
     PledgePromise, RoutingMode, SandboxPolicy,
 };
-pub use shell::{ShellCommand, ShellRepl};
+pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
     PackageRecipe, RecipeError, RecipeManager, SatSolver,

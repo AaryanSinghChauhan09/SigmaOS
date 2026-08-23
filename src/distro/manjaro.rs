@@ -17,6 +17,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Manjaro Distro Integration Module
+extern crate alloc;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 

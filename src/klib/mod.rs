@@ -46,6 +46,8 @@ pub mod vec;
 pub mod btreemap;
 pub mod hashmap;
 pub mod hash;
+pub mod custom_allocator;
+pub mod custom_string;
 
 pub use vec::Vec;
 pub use btreemap::BTreeMap;

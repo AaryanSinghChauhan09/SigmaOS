@@ -1,0 +1,24 @@
+name: "FreeBSD Jails & RACCT Resource Limits CI"
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  freebsd-jail-verification:
+    name: FreeBSD Jails & VNET Isolation Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Run FreeBSD Jails & RACCT Limits Test
+        run: |
+          cargo test --lib distro::linux_bsd_inspirations::tests::test_freebsd_jail_vnet_and_racct -- --nocapture
