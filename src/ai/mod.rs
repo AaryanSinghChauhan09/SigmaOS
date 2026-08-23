@@ -40,23 +40,6 @@ pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
 };
-pub use open_computer::{
-    OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
-    AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
-};
-pub use tensor_memory::{
-    AiTensorMemoryManager, MemoryPinMode, TensorBuffer, TensorDtype, TensorMemoryStats,
-};
-pub use compute_scheduler::{
-    AiComputeQuota, AiComputeScheduler, AiComputeTask, AiTaskPriority, AiTaskState, ComputeDeviceTarget,
-};
-pub use quantization::{
-    AiExecutionDispatcher, DeviceFallbackRoute, QuantizedMatrix,
-};
-pub use developer_platform::{
-    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
-    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
-};
 pub use developer_platform::{
     AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
     MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
