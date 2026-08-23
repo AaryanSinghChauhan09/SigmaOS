@@ -259,7 +259,7 @@ public:
 
         drv.device_list_head = nullptr;
         drv.driver_unload = unload_cb;
-        drv.is_loaded = true;
+        drv.is_loaded = SIGMA_TRUE;
 
         sys_print("[IoManager] ✅ DriverObject '%s' allocated and registered successfully in Non-Paged Pool.\n", name);
         return SIGMA_SUCCESS;
@@ -285,7 +285,7 @@ public:
         // Allocate DeviceObject
         DeviceObject& dev = g_device_pool[g_device_pool_count++];
         dev.driver_object = drv;
-        dev.is_active = true;
+        dev.is_active = SIGMA_TRUE;
 
         // Initialize DeviceExtension Context Information
         sigma_size_t i = 0;
@@ -298,7 +298,7 @@ public:
         dev.device_extension.context_data = nullptr; // Simulated dynamic context block
         dev.device_extension.irq = 0;
         dev.device_extension.io_port_base = 0;
-        dev.device_extension.resources_assigned = false;
+        dev.device_extension.resources_assigned = SIGMA_FALSE;
 
         // Insert into Driver's device list (linked list representation)
         dev.next_device = drv->device_list_head;
@@ -325,7 +325,7 @@ public:
                   irq, io_port_base, device_name);
         dev->device_extension.irq = irq;
         dev->device_extension.io_port_base = io_port_base;
-        dev->device_extension.resources_assigned = true;
+        dev->device_extension.resources_assigned = SIGMA_TRUE;
         return SIGMA_SUCCESS;
     }
 
@@ -352,12 +352,12 @@ public:
         while (current != nullptr) {
             sys_print("[IoManager]   Cleaning up DeviceObject '%s' (releasing IRQ %u)...\n",
                       current->device_extension.device_name, current->device_extension.irq);
-            current->is_active = false;
-            current->device_extension.resources_assigned = false;
+            current->is_active = SIGMA_FALSE;
+            current->device_extension.resources_assigned = SIGMA_FALSE;
             current = current->next_device;
         }
         drv->device_list_head = nullptr;
-        drv->is_loaded = false;
+        drv->is_loaded = SIGMA_FALSE;
 
         sys_print("[IoManager] ✅ Driver '%s' completely unloaded from memory pool.\n", driver_name);
         return SIGMA_SUCCESS;

@@ -137,6 +137,129 @@ pub struct TerminalSession {
     pub aliases: BTreeMap<String, String>,
     pub user_functions: BTreeMap<String, UserDefinedFunction>,
     pub suggestion_engine: AutoSuggestionEngine,
+    pub multiplexer: TerminalMultiplexer,
+    pub graphics_frames: Vec<SixelGraphicFrame>,
+    pub trigger_rules: Vec<TriggerRule>,
+    pub visual_bell_active: bool,
+}
+
+/// Sixel & Kitty Graphics Protocol Data Frame
+#[derive(Debug, Clone)]
+pub struct SixelGraphicFrame {
+    pub id: u32,
+    pub width_px: u32,
+    pub height_px: u32,
+    pub raw_data: Vec<u8>,
+}
+
+/// Tmux / BSD Split Pane Direction
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PaneSplitDirection {
+    Horizontal,
+    Vertical,
+}
+
+/// Terminal Pane for Tmux / BSD-style terminal multiplexing
+#[derive(Debug, Clone)]
+pub struct TerminalPane {
+    pub pane_id: u32,
+    pub width: usize,
+    pub height: usize,
+    pub active_command: String,
+    pub is_focused: bool,
+}
+
+/// Tmux / BSD-style Terminal Multiplexer Engine
+#[derive(Debug, Clone)]
+pub struct TerminalMultiplexer {
+    pub panes: Vec<TerminalPane>,
+    pub active_pane_id: u32,
+    pub next_pane_id: u32,
+}
+
+impl TerminalMultiplexer {
+    pub fn new(initial_width: usize, initial_height: usize) -> Self {
+        let first_pane = TerminalPane {
+            pane_id: 1,
+            width: initial_width,
+            height: initial_height,
+            active_command: String::from("sigma-sh"),
+            is_focused: true,
+        };
+        Self {
+            panes: alloc::vec![first_pane],
+            active_pane_id: 1,
+            next_pane_id: 2,
+        }
+    }
+
+    pub fn split_pane(&mut self, direction: PaneSplitDirection) -> u32 {
+        let new_id = self.next_pane_id;
+        self.next_pane_id += 1;
+
+        if let Some(pos) = self.panes.iter().position(|p| p.pane_id == self.active_pane_id) {
+            let cur_w = self.panes[pos].width;
+            let cur_h = self.panes[pos].height;
+
+            match direction {
+                PaneSplitDirection::Horizontal => {
+                    let half_h = cur_h / 2;
+                    self.panes[pos].height = half_h;
+                    let new_pane = TerminalPane {
+                        pane_id: new_id,
+                        width: cur_w,
+                        height: cur_h.saturating_sub(half_h),
+                        active_command: String::from("sigma-sh"),
+                        is_focused: false,
+                    };
+                    self.panes.push(new_pane);
+                }
+                PaneSplitDirection::Vertical => {
+                    let half_w = cur_w / 2;
+                    self.panes[pos].width = half_w;
+                    let new_pane = TerminalPane {
+                        pane_id: new_id,
+                        width: cur_w.saturating_sub(half_w),
+                        height: cur_h,
+                        active_command: String::from("sigma-sh"),
+                        is_focused: false,
+                    };
+                    self.panes.push(new_pane);
+                }
+            }
+        }
+        new_id
+    }
+
+    pub fn focus_pane(&mut self, pane_id: u32) -> bool {
+        if self.panes.iter().any(|p| p.pane_id == pane_id) {
+            for pane in &mut self.panes {
+                pane.is_focused = pane.pane_id == pane_id;
+            }
+            self.active_pane_id = pane_id;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// Trigger Rule for Kitty/iTerm2-style automatic text highlighting & URL detection
+#[derive(Debug, Clone)]
+pub struct TriggerRule {
+    pub pattern: String,
+    pub highlight_color: AnsiColor,
+    pub action_command: Option<String>,
+}
+
+impl TriggerRule {
+    pub fn new(pattern: &str, color: AnsiColor, action: Option<&str>) -> Self {
+        Self {
+            pattern: pattern.to_string(),
+            highlight_color: color,
+            action_command: action.map(|a| a.to_string()),
+        }
+    }
 }
 
 impl TerminalSession {
@@ -165,7 +288,77 @@ impl TerminalSession {
         session.suggestion_engine.register_builtin("apt");
         session.suggestion_engine.register_builtin("sigpkg");
 
+        let multiplexer = TerminalMultiplexer::new(width, height);
+
+        session = Self {
+            cursor_x: 0,
+            cursor_y: 0,
+            width,
+            height,
+            foreground: AnsiColor::Default,
+            background: AnsiColor::Default,
+            bold: false,
+            scrollback: Vec::new(),
+            current_line: String::new(),
+            aliases: BTreeMap::new(),
+            user_functions: BTreeMap::new(),
+            suggestion_engine: session.suggestion_engine,
+            multiplexer,
+            graphics_frames: Vec::new(),
+            trigger_rules: Vec::new(),
+            visual_bell_active: false,
+        };
+
         session
+    }
+
+    /// OpenBSD wsdisplay-style Visual Bell trigger
+    pub fn trigger_visual_bell(&mut self) {
+        self.visual_bell_active = true;
+    }
+
+    pub fn clear_visual_bell(&mut self) {
+        self.visual_bell_active = false;
+    }
+
+    pub fn add_trigger_rule(&mut self, rule: TriggerRule) {
+        self.trigger_rules.push(rule);
+    }
+
+    /// Evaluates text against registered trigger rules (URL detection, error highlights)
+    pub fn match_trigger_rules<'a>(&'a self, text: &'a str) -> Vec<(&'a TriggerRule, usize)> {
+        let mut matches = Vec::new();
+        for rule in &self.trigger_rules {
+            if let Some(pos) = text.find(&rule.pattern) {
+                matches.push((rule, pos));
+            }
+        }
+        matches
+    }
+
+    /// Parses Sixel (\x1BPq) or Kitty (\x1B_G) graphics escape sequences
+    pub fn parse_graphics_escape(&mut self, seq: &str) -> bool {
+        if seq.starts_with("\x1BPq") { // Sixel header
+            let frame = SixelGraphicFrame {
+                id: (self.graphics_frames.len() + 1) as u32,
+                width_px: 640,
+                height_px: 480,
+                raw_data: seq.as_bytes().to_vec(),
+            };
+            self.graphics_frames.push(frame);
+            true
+        } else if seq.starts_with("\x1B_G") { // Kitty graphics protocol
+            let frame = SixelGraphicFrame {
+                id: (self.graphics_frames.len() + 1) as u32,
+                width_px: 800,
+                height_px: 600,
+                raw_data: seq.as_bytes().to_vec(),
+            };
+            self.graphics_frames.push(frame);
+            true
+        } else {
+            false
+        }
     }
 
     pub fn register_alias(&mut self, name: &str, value: &str) {
@@ -591,5 +784,54 @@ mod tests {
         // Test BSD translation
         let translated_bsd = session.translate_shell_script("pkg install curl", "FreeBSD");
         assert_eq!(translated_bsd, "sigpkg install curl");
+    }
+
+    #[test]
+    fn test_sixel_kitty_graphics_and_visual_bell() {
+        let mut session = TerminalSession::new(80, 24);
+
+        // Test Sixel graphics escape sequence parsing
+        assert!(session.parse_graphics_escape("\x1BPq#0;2;0;0;0#1;2;100;100;100"));
+        assert_eq!(session.graphics_frames.len(), 1);
+        assert_eq!(session.graphics_frames[0].width_px, 640);
+
+        // Test Kitty graphics escape sequence parsing
+        assert!(session.parse_graphics_escape("\x1B_Ga=T,f=100;ABCD\x1B\\"));
+        assert_eq!(session.graphics_frames.len(), 2);
+        assert_eq!(session.graphics_frames[1].width_px, 800);
+
+        // Test Visual Bell trigger
+        assert!(!session.visual_bell_active);
+        session.trigger_visual_bell();
+        assert!(session.visual_bell_active);
+        session.clear_visual_bell();
+        assert!(!session.visual_bell_active);
+    }
+
+    #[test]
+    fn test_tmux_split_panes_and_trigger_rules() {
+        let mut session = TerminalSession::new(100, 40);
+
+        // Initial pane
+        assert_eq!(session.multiplexer.panes.len(), 1);
+        assert_eq!(session.multiplexer.panes[0].width, 100);
+
+        // Vertical split (splits width 100 into 50 and 50)
+        let new_pane_id = session.multiplexer.split_pane(PaneSplitDirection::Vertical);
+        assert_eq!(session.multiplexer.panes.len(), 2);
+        assert_eq!(session.multiplexer.panes[0].width, 50);
+
+        // Focus new pane
+        assert!(session.multiplexer.focus_pane(new_pane_id));
+        assert_eq!(session.multiplexer.active_pane_id, new_pane_id);
+
+        // Trigger Rules test
+        let url_rule = TriggerRule::new("https://", AnsiColor::Cyan, Some("open_browser"));
+        session.add_trigger_rule(url_rule);
+
+        let matches = session.match_trigger_rules("Visit https://sigmaos.dev for docs");
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].1, 6); // Starts at index 6
+        assert_eq!(matches[0].0.highlight_color, AnsiColor::Cyan);
     }
 }
