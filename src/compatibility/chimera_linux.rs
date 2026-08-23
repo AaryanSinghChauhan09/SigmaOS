@@ -1,4 +1,5 @@
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
 /// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
@@ -103,6 +104,16 @@ impl BsdUserlandCompat {
         // BSD df reports blocks, we translate to standardized byte structures
         let block_size = 512;
         (total * block_size, used * block_size)
+    }
+
+    pub fn pgrep_filter_by_name(&self, processes: &[(&[u8], usize)], needle: &[u8]) -> Vec<usize> {
+        let mut matched_pids = Vec::new();
+        for &(name, pid) in processes {
+            if name.windows(needle.len()).any(|w| w == needle) {
+                matched_pids.push(pid);
+            }
+        }
+        matched_pids
     }
 }
 
