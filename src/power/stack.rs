@@ -1,20 +1,18 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-
 /// OOP-based Power Management Stack for SigmaOS
 /// Implements power management using OOP principles with traits and structs
 /// No dependency on external power management frameworks
 /// Based on Roadmap Item 8: Power management stack
 
+extern crate alloc;
 use alloc::boxed::Box;
-use core::ptr::{self, NonNull};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Power profile
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerProfile {
     Performance = 0,
@@ -24,7 +22,7 @@ pub enum PowerProfile {
 }
 
 /// CPU governor
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CPUGovernor {
     Performance = 0,
@@ -55,13 +53,6 @@ pub enum PowerError {
     InvalidProfile = 1,
     InvalidGovernor = 2,
     PermissionDenied = 3,
-}
-
-/// Power event represent transitions
-#[derive(Debug, Clone, Copy)]
-pub struct PowerEvent {
-    pub event_id: u32,
-    pub event_type: u32,
 }
 
 /// Power info
@@ -128,8 +119,11 @@ impl SimplePowerManager {
     }
 
     pub fn get_profile(&self) -> PowerProfile {
-        unsafe {
-            core::mem::transmute(self.profile.load(Ordering::SeqCst))
+        match self.profile.load(Ordering::SeqCst) {
+            0 => PowerProfile::Performance,
+            1 => PowerProfile::Balanced,
+            2 => PowerProfile::PowerSaver,
+            _ => PowerProfile::Custom,
         }
     }
 
@@ -138,8 +132,11 @@ impl SimplePowerManager {
     }
 
     pub fn get_cpu_governor(&self) -> CPUGovernor {
-        unsafe {
-            core::mem::transmute(self.cpu_governor.load(Ordering::SeqCst))
+        match self.cpu_governor.load(Ordering::SeqCst) {
+            0 => CPUGovernor::Performance,
+            1 => CPUGovernor::Ondemand,
+            2 => CPUGovernor::Conservative,
+            _ => CPUGovernor::Powersave,
         }
     }
 

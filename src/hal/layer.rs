@@ -32,7 +32,7 @@ pub type DeviceID = usize;
 pub enum DeviceType { CPU = 0, Memory = 1, Storage = 2, Network = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState { Uninitialized = 0, Initialized = 1, Active = 2 }
 
 pub trait Device {
@@ -62,7 +62,13 @@ impl SimpleDevice {
 impl Device for SimpleDevice {
     fn id(&self) -> DeviceID { self.id }
     fn device_type(&self) -> DeviceType { self.device_type }
-    fn state(&self) -> DeviceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> DeviceState {
+        match self.state.load(Ordering::SeqCst) {
+            1 => DeviceState::Initialized,
+            2 => DeviceState::Active,
+            _ => DeviceState::Uninitialized,
+        }
+    }
     fn initialize(&mut self) -> Result<(), HALError> {
         self.state.store(DeviceState::Initialized as usize, Ordering::SeqCst);
         Ok(())
@@ -125,8 +131,20 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
 
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -158,7 +176,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

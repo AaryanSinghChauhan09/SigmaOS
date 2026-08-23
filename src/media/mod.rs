@@ -4,7 +4,7 @@
 pub mod browser;
 pub mod sovereign_screen_recorder;
 pub mod sovereign_video_player;
-pub mod sigmacut;
+pub mod sovereign_video_editor;
 
 pub use sovereign_screen_recorder::{
     CaptureSource, GpuEncoderType, RecorderState, RecordingStats, SovereignScreenRecorder,

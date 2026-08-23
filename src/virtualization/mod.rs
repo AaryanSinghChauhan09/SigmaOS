@@ -1,12 +1,7 @@
 // SigmaOS Virtualization Module
-pub mod oci_pod;
 pub mod orchestration;
-pub mod kvm_vcpu;
-
-pub use kvm_vcpu::{
-    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs,
-    VirtioDeviceBackend, VirtioDeviceType,
-};
+pub mod oci_pod;
+pub mod advanced_virt;
 
 pub use orchestration::{
     Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,
@@ -14,4 +9,8 @@ pub use orchestration::{
     VirtualizationStrategy, VirtualizationStrategyFactory, VirtualizationTech, VmState,
 };
 
-pub use oci_pod::{ContainerConfig, OciPod, OciPodManager, PodState};
+pub use oci_pod::{
+    ContainerConfig, OciPod, OciPodManager, PodState,
+};
+
+pub use advanced_virt::{VirtualMachine as AdvancedVirtualMachine, VirtualizationManager as AdvancedVirtualizationManager, VmState as AdvancedVmState};

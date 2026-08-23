@@ -1,42 +1,30 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-
 /// OOP-based Battery Management for SigmaOS
-/// Based on 100-Improvement-Ideas.md #15: Battery saver mode
-/// Implements comprehensive battery monitoring, health tracking,
-/// and intelligent power saving for optimal battery life
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 251
+/// Implements battery monitoring and power management
 
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BatteryID = usize;
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3, Critical = 4 }
+pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum BatteryError { Success = 0, NotFound = 1, ReadFailed = 2 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct BatteryInfo {
-    pub id: BatteryID,
-    pub capacity: u32,
-    pub current_charge: u32,
-    pub voltage: u32,
-    pub state: BatteryState,
-    pub health: u32,
-}
-
 pub trait Battery {
     fn id(&self) -> BatteryID;
     fn capacity(&self) -> u32;
     fn current_charge(&self) -> u32;
-    fn set_charge(&self, charge: u32);
+    fn set_current_charge(&self, charge: u32);
     fn voltage(&self) -> u32;
     fn state(&self) -> BatteryState;
     fn health(&self) -> u32;
@@ -69,9 +57,16 @@ impl Battery for SimpleBattery {
     fn id(&self) -> BatteryID { self.id }
     fn capacity(&self) -> u32 { self.capacity.load(Ordering::SeqCst) as u32 }
     fn current_charge(&self) -> u32 { self.current_charge.load(Ordering::SeqCst) as u32 }
-    fn set_charge(&self, charge: u32) { self.current_charge.store(charge as usize, Ordering::SeqCst); }
+    fn set_current_charge(&self, charge: u32) { self.current_charge.store(charge as usize, Ordering::SeqCst); }
     fn voltage(&self) -> u32 { self.voltage.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> BatteryState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> BatteryState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => BatteryState::Charging,
+            1 => BatteryState::Discharging,
+            2 => BatteryState::Full,
+            _ => BatteryState::NotPresent,
+        }
+    }
     fn health(&self) -> u32 { self.health.load(Ordering::SeqCst) as u32 }
 }
 
@@ -143,7 +138,7 @@ impl BatteryManager for SimpleBatteryManager {
         for battery_option in &mut self.batteries {
             if let Some(ref mut battery) = *battery_option {
                 if battery.id() == id {
-                    battery.set_charge(charge);
+                    battery.set_current_charge(charge);
                     return Ok(());
                 }
             }

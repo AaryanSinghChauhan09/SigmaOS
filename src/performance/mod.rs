@@ -17,6 +17,7 @@ pub use eevdf::{EevdfScheduler, EevdfTask, MAX_SCHED_TASKS};
 pub use zero_copy_ipc::{ZeroCopyQueue, IPCError, QUEUE_SIZE};
 pub mod cachy_opt;
 pub mod smart_optimizer;
+pub mod tuned;
 
 pub use cachy_opt::{
     AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, IoSchedClass, PhysicalPageFrame,
@@ -27,3 +28,5 @@ pub use smart_optimizer::{
     PerformanceProfileRule, RamDefragmenter, SmartPerformanceProfile,
     SmartResourceOptimizer, GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
 };
+
+pub use tuned::{BootStageMetrics, PerformanceTuner, TuningProfileKind};
