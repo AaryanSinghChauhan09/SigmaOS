@@ -1,0 +1,26 @@
+name: Alpine APK & Musl Subsystem Verification CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-alpine-musl-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Distro Inspection Tests
+        run: |
+          mkdir -p build
+          rustc --edition 2021 --test tests/distro_inspection_and_security_tests.rs -o build/distro_inspection_test
+          ./build/distro_inspection_test
