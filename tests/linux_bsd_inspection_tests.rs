@@ -94,7 +94,7 @@ fn test_zorin_gap_closure_inspection() {
 
 
 #[test]
-fn test_kvm_qemu_vcpu_inspection() {
+fn test_vm_manager_kvm_qemu_inspection() {
     use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
     use std::path::PathBuf;
 
