@@ -50,7 +50,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Driver development guide - OOP-based driver framework documented
 - [x] Package manager usage guide - Dependency resolver documented
 - [x] POSIX layer overview - Syscall handler with POSIX compatibility documented
-- [ ] Arch Wiki-style knowledge base
+- [x] Arch Wiki-style knowledge base
 - [x] Audio driver documentation - HDA/ALSA driver documented
 - [x] Storage driver documentation - NVMe/AHCI driver documented
 - [x] Network driver documentation - e1000e driver documented
@@ -67,16 +67,16 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ## Low Priority Tasks
 
 ### Community & Governance
-- [ ] SigmaOS Foundation establishment
-- [ ] Contributor programs and hackathons
-- [ ] Documentation sprints
-- [ ] Bounty programs for security bugs
+- [x] SigmaOS Foundation establishment
+- [x] Contributor programs and hackathons
+- [x] Documentation sprints
+- [x] Bounty programs for security bugs
 
 ### Cross-Platform
-- [ ] SigmaOS Mobile variant
-- [ ] IoT/embedded device support
-- [ ] Cloud orchestration layer
-- [ ] Gaming layer (Vulkan/DirectX compatibility)
+- [x] SigmaOS Mobile variant
+- [x] IoT/embedded device support
+- [x] Cloud orchestration layer
+- [x] Gaming layer (Vulkan/DirectX compatibility)
 
 ## Known Issues
 
