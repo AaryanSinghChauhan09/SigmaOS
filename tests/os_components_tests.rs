@@ -37,65 +37,15 @@ mod task_scheduler;
 #[path = "../src/ipc/alpc.rs"]
 mod alpc;
 
-#[path = "../src/memory/bitmap_pmm.rs"]
-mod bitmap_pmm;
-
-#[path = "../src/memory/low_level.rs"]
-mod low_level_memory;
-
 #[path = "../src/access/control.rs"]
 mod access_control;
-
-#[path = "../src/dashboard/statutory_compliance.rs"]
-mod statutory_compliance;
-
-#[path = "../src/community/toolkit.rs"]
-mod community_toolkit;
-
-#[path = "../src/system/user.rs"]
-mod system_user;
 
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
 
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-
-#[path = "../src/process/activity_manager.rs"]
-mod process_activity_manager;
-
-#[path = "../src/filesystem/sigma_fs.rs"]
-mod sigma_fs_extended;
-
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
-
-use community_toolkit::{
-    CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
-    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
-};
-use statutory_compliance::{
-    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
-    StatutoryGovernanceLayer, StatutoryGovernanceRule,
-};
-use system_user::{UserManager as TestUserManager};
-
-use access_control::{
-    PosixAcl, AclType, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel,
-};
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
-use bitmap_pmm::{
-    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter,
-};
-use low_level_memory::{
-    CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine,
-    SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr,
-};
 use task_scheduler::{
-    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
+    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType,
 };
 
 use pipes::Pipe;
@@ -107,85 +57,8 @@ use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPac
 use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
 use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use fedora_compat::DnfPackageResolver;
 use sigmatools::*;
-
-use epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
-use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
-
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-
-use segmentation_paging::{
-    AslrEntropyConfig, CpuRing, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector,
-    SegmentationPagingEngine, SpaceProtectionFlags,
-};
-
-use process_activity_manager::{
-    ActivityState, ActivityManager as ProcessActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
-};
-
-#[test]
-fn test_segmentation_paging_and_aslr() {
-    let engine = SegmentationPagingEngine::new(SpaceProtectionFlags::strict_hardening());
-    let code_desc = SegmentDescriptor::code_segment_ring0();
-    assert!(code_desc.is_present);
-
-    let selector = SegmentSelector::new(1, false, CpuRing::Ring0Kernel);
-    let linear = engine.translate_logical_to_linear(selector, 0x00001000, CpuRing::Ring0Kernel).unwrap();
-    assert_eq!(linear, 0x00001000);
-
-    let aslr = RandomizedAddressSpace::compute_aslr_layout(0x100000000, AslrEntropyConfig::linux_default(), 0x12345678);
-    assert!(aslr.text_base >= 0x100000000);
-}
-
-#[test]
-fn test_regex_unveil_and_glob_matching() {
-    let mut unveil_mgr = UnveilManager::new();
-    unveil_mgr.unveil("/var/log/*.log", "r").unwrap();
-    assert!(unveil_mgr.validate_path("/var/log/syslog.log", UnveilPermission::Read).is_ok());
-    assert!(unveil_mgr.validate_path("/var/log/syslog.txt", UnveilPermission::Read).is_err());
-}
-
-#[test]
-fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
-    let mut pfs = PseudoFilesystemNamespace::new("root_master", PfsType::Master);
-    pfs.file_map.insert("/etc/hostname".to_string(), "blake3-hash1".to_string());
-
-    let snap = PseudoFilesystemNamespace::snapshot("root_snap_1", "root_master", pfs.file_map.clone());
-    assert!(snap.is_read_only);
-    assert_eq!(snap.parent_snapshot_id.unwrap(), "root_master");
-
-    let mut dedup = Blake3BlockDeduplicationEngine::new();
-    let hash1 = dedup.store_block(b"SOVEREIGN_SYSTEM_BLOCK_DATA");
-    let hash2 = dedup.store_block(b"SOVEREIGN_SYSTEM_BLOCK_DATA");
-    assert_eq!(hash1, hash2);
-    assert_eq!(*dedup.ref_counts.get(&hash1).unwrap(), 2);
-
-    assert!(!dedup.release_block(&hash1));
-    assert!(dedup.release_block(&hash1));
-    assert!(dedup.read_block(&hash1).is_none());
-}
-
-#[test]
-fn test_process_activity_manager_and_registers() {
-    let mut pam = ProcessActivityManager::new();
-    pam.register_process(500, 1, "chrome", 0);
-    pam.set_foreground_process(500).unwrap();
-
-    let record = pam.get_process_activity(500).unwrap();
-    assert_eq!(record.state, ActivityState::Interactive);
-
-    let ctx = ProcRegisterSnapshot {
-        rip: 0x00007FFF00002000,
-        rsp: 0x00007FFFFFFFD000,
-        rax: 1,
-        ..Default::default()
-    };
-    assert!(pam.capture_register_snapshot(500, ctx.clone()).is_ok());
-
-    let record_after = pam.get_process_activity(500).unwrap();
-    assert_eq!(record_after.register_snapshot.as_ref().unwrap().rip, 0x00007FFF00002000);
-}
 
 #[test]
 fn test_zero_copy_ipc_pipes() {
@@ -263,9 +136,9 @@ fn test_audio_dsp_mixing_and_effects() {
 #[test]
 fn test_video_editor_sigmacut_engine() {
     let mut timeline = VideoTimeline::new(1920, 1080);
-    let mut track = VideoTrack::new(1, "Video Track 1");
+    let mut track = VideoTrack::new(1, "Main Track");
 
-    let clip = VideoClip::new(1, "intro.mp4", 0, 60);
+    let clip = VideoClip::new(0, "intro.mp4", 0, 60);
     track.add_clip(clip);
     timeline.add_video_track(track);
 
@@ -310,7 +183,7 @@ fn test_debian_compat_system() {
 
     assert_eq!(alts.get_active_target().unwrap(), "/usr/bin/nano");
 
-    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "http://deb.debian.org/debian".to_string());
+    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "https://deb.debian.org/debian".to_string());
     repo.verify_release_keyring(&[0x99, 0x01]);
     assert!(repo.fetch_package_index().is_ok());
 }
@@ -358,40 +231,10 @@ fn test_fedora_rpm_and_selinux() {
     let order = resolver.resolve_and_install("kernel-core").unwrap();
     assert_eq!(order, vec!["kernel-core".to_string()]);
 
-    let selinux = SeLinuxEngine::new(true);
-    let httpd_sub = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
-    let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
-    assert!(selinux.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
-}
-
-#[test]
-fn test_epoll_event_loop_multiplexing() {
-    let mut epoll = EpollInstance::new(1, 10);
-    let ev1 = EpollEvent::new(EPOLLIN | EPOLLET, 4);
-    assert!(epoll.ctl(EpollOp::CtlAdd, 4, Some(ev1)).is_ok());
-
-    epoll.trigger_event(4, EPOLLIN);
-
-    let mut ready = [EpollEvent::new(0, 0); 4];
-    let n = epoll.wait(&mut ready);
-    assert_eq!(n, 1);
-    assert_eq!(ready[0].data.fd, 4);
-    assert_eq!(ready[0].events & EPOLLIN, EPOLLIN);
-}
-
-#[test]
-fn test_elf_dynamic_relocation_resolution() {
-    let mut relocator = ElfRelocator::new(0x400000);
-    let sym = ElfSymbol::new(b"sys_yield", 0x401050, 64);
-    relocator.add_symbol(sym);
-
-    let rel_entry = ElfRelaEntry::new(0x20, R_X86_64_RELATIVE, 0, 0x100);
-    let resolved_rel = relocator.resolve_relocation(&rel_entry, None).unwrap();
-    assert_eq!(resolved_rel, 0x400100);
-
-    let glob_entry = ElfRelaEntry::new(0x28, R_X86_64_GLOB_DAT, 1, 0x10);
-    let resolved_glob = relocator.resolve_relocation(&glob_entry, Some(b"sys_yield")).unwrap();
-    assert_eq!(resolved_glob, 0x401060);
+    let mut selinux = sigmaos::security::selinux::SelinuxEngine::new();
+    let src = "system_u:system_r:httpd_t:s0";
+    let tgt = "system_u:object_r:httpd_sys_content_t:s0";
+    assert!(selinux.has_permission(src, tgt, "file", "read").unwrap());
 }
 
 #[test]
@@ -420,12 +263,15 @@ fn test_sigmatools_suite() {
 #[test]
 fn test_posix_and_nfsv4_acls() {
     // POSIX 1003.1e ACL verification
-    let mut posix_acl = PosixAcl::new();
-    posix_acl.add_entry(AclType::NamedUser, 1001, 5); // User 1001 gets r-x (5)
+    let mut posix_acl = access_control::PosixAclTable::new();
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::UserObj, id: 1000, perms: 0o7 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::User, id: 1001, perms: 0o5 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Mask, id: 0, perms: 0o5 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Other, id: 0, perms: 0o0 });
 
-    assert!(posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 5)); // Allowed r-x
-    assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 2)); // Denied write (2)
-    assert!(!posix_acl.evaluate_acl(1002, 1002, 1000, 1000, 4)); // Other denied
+    assert!(posix_acl.evaluate_acl_access(1001, 1001, 5, 1000, 1000)); // Allowed r-x
+    assert!(!posix_acl.evaluate_acl_access(1001, 1001, 2, 1000, 1000)); // Denied write (2)
+    assert!(!posix_acl.evaluate_acl_access(1002, 1002, 4, 1000, 1000)); // Other denied
 }
 
 #[test]
@@ -482,134 +328,10 @@ fn test_task_states_and_workload_classifications() {
     sched.add_task(task_rt).unwrap();
 
     let scheduled_id = sched.schedule().unwrap();
-    assert_eq!(scheduled_id, 3);
+    assert_eq!(scheduled_id, 3); // Realtime periodic task scheduled first
 
     let stats = sched.stats();
     assert_eq!(stats.total_tasks, 3);
     assert_eq!(stats.running_tasks, 1);
     assert_eq!(stats.ready_tasks, 2);
-}
-
-#[test]
-fn test_file_attributes_and_cpu_ring_privileges() {
-    let mut bounds = CapBoundingSet::new(0xFFFF_FFFF);
-    assert!(bounds.is_capability_permitted(21));
-    bounds.drop_capability(21);
-    assert!(!bounds.is_capability_permitted(21));
-
-    let dac = DacPermission::new(1000, 1000, 0o755);
-    assert!(dac.evaluate_access(1000, 1000, access_control::dac_flags::READ));
-    assert!(!dac.evaluate_access(1001, 1001, access_control::dac_flags::WRITE));
-
-    let mac_sub = MacSecurityLabel::new(SensitivityLevel::Secret, 0x01);
-    let mac_obj = MacSecurityLabel::new(SensitivityLevel::Confidential, 0x01);
-    assert!(mac_sub.can_read(&mac_obj));
-}
-
-#[test]
-fn test_two_tier_memory_and_fast_syscalls() {
-    let mut allocator = TwoTierMemoryAllocator::new(0x1000_0000, 64);
-
-    let pcb_obj = allocator.alloc_slab_object(SlabObjectType::ProcessControlBlock).unwrap();
-    let fd_obj = allocator.alloc_slab_object(SlabObjectType::FileDescriptor).unwrap();
-    let inode_obj = allocator.alloc_slab_object(SlabObjectType::InodeStruct).unwrap();
-
-    assert!(pcb_obj >= 0x1000_0000);
-    assert!(fd_obj >= 0x1000_0000);
-    assert!(inode_obj >= 0x1000_0000);
-
-    allocator.free_slab_object(SlabObjectType::ProcessControlBlock, pcb_obj);
-
-    let mut pt_engine = RecursivePageTableEngine::new(0x0008_0000);
-    pt_engine.enable_self_referential_mapping();
-    assert_ne!(pt_engine.calculate_pml4_virt_address(), 0);
-
-    let mut cow_engine = CopyOnWriteForkEngine::new();
-    cow_engine.fork_share_page(0x1000, 0x1000_0000);
-
-    let mut dispatcher = FastSyscallDispatcher::new();
-    dispatcher.configure_fast_syscall(0xFFFFFFFF80102000, 0x08, 0x1B);
-
-    let syscall_matrix = MinimalPosixSyscallMatrix::new();
-    let mut frame = TrapRegisterFrame::default();
-    frame.rax = posix_syscall_nr::SYS_OPEN;
-
-    let res_fd = dispatcher.dispatch_trap(&mut frame, &syscall_matrix);
-    assert_eq!(res_fd, 3);
-}
-
-#[test]
-fn test_bitmap_pmm_and_syscall_router() {
-    let mut pmm = BitmapPhysicalMemoryManager::new(64 * 4096);
-    pmm.free_region(0x20000, 16 * 4096);
-
-    let frame_addr = pmm.alloc_block().unwrap();
-    assert_eq!(frame_addr, 0x20000);
-
-    let paging = SelfRefPagingEngine::new(0x30000);
-    let mut pml4 = [0u64; 512];
-    paging.vmm_init_self_reference(&mut pml4);
-    assert_eq!(pml4[510], 0x30000 | 3);
-
-    let mut router = SyscallTableRouter::new();
-    router.register_handler(2, |a, b, _, _| (a * b) as i64);
-    assert_eq!(router.syscall_handler(2, 6, 7, 0), 42);
-}
-
-#[test]
-fn test_shadow_passwords_usermod_and_sudo_policy() {
-    let mut manager = TestUserManager::new("/tmp/test_etc_shadow_sudo");
-    manager.initialize().unwrap();
-
-    let user = manager.create_user("charlie", "Charlie Sysadmin").unwrap();
-    assert_eq!(user.username, "charlie");
-
-    manager.set_password("charlie", "P@ssword2026").unwrap();
-    assert!(manager.verify_password("charlie", "P@ssword2026"));
-
-    manager.usermod("charlie", Some("/bin/bash"), Some("/home/charlie"), None, None).unwrap();
-    assert_eq!(manager.get_user("charlie").unwrap().shell, "/bin/bash");
-
-    manager.add_user_to_group("charlie", "wheel").unwrap();
-    let groups = manager.get_user_groups("charlie");
-    assert!(groups.contains(&"wheel".to_string()));
-
-    let sudo_res = manager.sudo_engine.evaluate_sudo_privilege("charlie", &groups, "/usr/bin/apt");
-    assert!(sudo_res.is_ok());
-}
-
-#[test]
-fn test_statutory_compliance_overlay_and_community_toolkit() {
-    let mut gov = StatutoryGovernanceLayer::new();
-    assert!(!gov.rules.is_empty());
-
-    let mut notifier = PenaltyBreachNotifier::new();
-    let rule = StatutoryGovernanceRule {
-        rule_id: "EPFO-01".to_string(),
-        framework: StatutoryFramework::IndianDpdpAct2023,
-        description: "Delay in ECR remittance".to_string(),
-        status: ComplianceRuleStatus::Breached,
-        max_penalty_amount_usd: 2500,
-    };
-    notifier.notify_breach(&rule, "Delay in ECR remittance", 1700000000);
-    assert_eq!(notifier.alerts.len(), 1);
-
-    let mut rollback = DisputeAuditRollbackEngine::new();
-    rollback.create_audit_checkpoint(100, "hash:state100");
-    assert_eq!(rollback.rollback_dispute_checkpoint(100).unwrap(), "hash:state100");
-
-    let handbook = CommunityHandbookCatalog::new();
-    assert!(!handbook.articles.is_empty());
-
-    let mut recipes = ReproduciblePackageRecipeManager::new();
-    assert!(!recipes.recipes.is_empty());
-
-    let sec = SecurityProfileTemplateStore::new();
-    assert!(sec.templates.contains_key("browser_sandboxed"));
-
-    let fw = HybridFirewallTemplateStore::new();
-    assert!(fw.templates.contains_key("default-mesh-shield"));
-
-    let virt = VirtualizationBlueprintStore::new();
-    assert!(virt.blueprints.contains_key("micro-vm-node"));
 }

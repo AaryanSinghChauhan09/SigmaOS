@@ -17,20 +17,20 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Manjaro Distro Integration Module
-extern crate alloc;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-use alloc::collections::BTreeMap;
 use std::collections::HashMap;
 
+/// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {
-    pub name: SigmaString,
-    pub pkgbuild_url: SigmaString,
-    pub dependencies: Vec<SigmaString>,
+    pub name: String,
+    pub pkgbuild_url: String,
+    pub dependencies: Vec<String>,
 }
 
+/// A Flatpak sandboxed application representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FlatpakPackage {
     pub app_id: String,
@@ -38,11 +38,12 @@ pub struct FlatpakPackage {
     pub sandbox_permissions: Vec<String>,
 }
 
+/// A Snap sandboxed application representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SnapPackage {
     pub name: String,
-    pub channel: String,
-    pub confinement: String,
+    pub channel: String,     // stable, beta, edge
+    pub confinement: String, // classic, strict
 }
 
 /// Hardware GPU types detected on the system bus
@@ -54,6 +55,7 @@ pub enum GpuType {
     HybridIntelNvidia,
 }
 
+/// A driver module configuration managed by MHWD
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MhwdDriverConfig {
     pub name: String,
@@ -62,6 +64,7 @@ pub struct MhwdDriverConfig {
     pub hybrid_supported: bool,
 }
 
+/// Manjaro Hardware Detection (MHWD) - Auto-detects optimal open/proprietary drivers
 #[derive(Debug, Clone)]
 pub struct ManjaroHardwareDetection {
     pub detected_gpus: Vec<GpuType>,
@@ -69,6 +72,7 @@ pub struct ManjaroHardwareDetection {
 }
 
 impl ManjaroHardwareDetection {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             detected_gpus: Vec::new(),
@@ -80,6 +84,7 @@ impl ManjaroHardwareDetection {
         self.detected_gpus = gpus.to_vec();
     }
 
+    /// Auto-configures and installs optimal driver configurations
     pub fn auto_configure(&mut self) -> Result<usize, &'static str> {
         if self.detected_gpus.is_empty() {
             return Err("No compatible graphic processing units detected on PCI bus.");
@@ -136,6 +141,7 @@ impl Default for ManjaroHardwareDetection {
     }
 }
 
+/// Represents different available kernel releases to switch dynamically
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ManjaroKernelRelease {
     LinuxStable,
@@ -144,16 +150,11 @@ pub enum ManjaroKernelRelease {
     LinuxExperimental,
 }
 
+/// Manjaro-inspired: Dynamic Kernel Module Support (DKMS) auto-module rebuilder on host kernel swaps
 #[derive(Debug, Clone)]
 pub struct MhwdDkmsRebuilder {
     pub registered_modules: Vec<String>,
     pub compiled_modules_for_kernels: HashMap<String, Vec<String>>,
-}
-
-impl Default for MhwdDkmsRebuilder {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl MhwdDkmsRebuilder {
@@ -170,6 +171,7 @@ impl MhwdDkmsRebuilder {
         }
     }
 
+    /// Rebuilds and recompiles registered modules dynamically for target kernel version
     pub fn trigger_rebuild(&mut self, kernel_version: &str) -> usize {
         let mut compiled = Vec::new();
         for module in &self.registered_modules {

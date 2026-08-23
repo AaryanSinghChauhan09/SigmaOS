@@ -1,5 +1,4 @@
 // SigmaOS Productivity Module
-pub mod advanced_app_absorber;
 pub mod gamification;
 pub mod media;
 pub mod notes;
@@ -8,14 +7,13 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
+pub mod advanced_app_absorber;
 pub mod tmux;
-pub mod editor;
+pub mod utility_suite;
+pub mod mind_map;
 
-pub use advanced_app_absorber::{
-    AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter, EverythingSearchEngine,
-    NotepadPlusWorkspace, ObsStudioMixer, OneCommanderDualPane, PotPlayerVlcEngine,
-    SevenZipCompressor, ShareXFlameshotEngine,
-};
+pub use mind_map::MindMapCreator;
+
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
@@ -47,16 +45,21 @@ pub use terminal::{
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
 pub use tmux::{
-    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
-pub use editor::{
-    CodeEditor, Document as EditorDocument, EditorConfig, EditorError, Language as EditorLanguage,
-    LspClient, SyntaxHighlighter,
+pub use media::{
+    MediaFormat, PlaybackState, AudioTrack, SigmaMediaEngine,
 };
-pub mod utility_suite;
 pub use utility_suite::{
-    AnnotationShape, AudacityWaveEditor, CompressionMethod, DaVinciTimeline,
-    EarTrumpetVolumeMatrix, FlameshotAnnotator, IrfanViewEngine, ItemAgeColor,
-    NotepadPlusPlusBuffer, OneCommanderFileGrid, SevenZipEngine, SovereignBrowserEngine,
+    FileIndexEntry, EverythingSearchEngine, TextTab, NotepadPlusPlusBuffer,
+    BrowserContainerType, BrowserTabInstance, SovereignBrowserEngine,
+    CompressionMethod, ArchiveVolume, SevenZipEngine,
+    AnnotationShape, ScreenshotAnnotation, FlameshotAnnotator,
+    VideoSourceLayer, ObsStudioMixer,
+    AudacityWaveEditor,
     VlcCodecPipeline,
+    VideoTrackClip, DaVinciTimeline,
+    ItemAgeColor, OneCommanderFileGrid,
+    AppVolumeChannel, EarTrumpetVolumeMatrix,
+    ExifMetadata, IrfanViewEngine,
 };

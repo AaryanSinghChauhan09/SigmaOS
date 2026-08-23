@@ -126,7 +126,7 @@ impl Default for ClawVoiceTranscriber {
 // 3. ClawChatIntegrator
 // ==========================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AlertPlatform {
     Telegram,
     Discord,

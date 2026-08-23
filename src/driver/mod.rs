@@ -4,7 +4,7 @@ pub mod framework;
 pub mod grid;
 pub mod mapper;
 pub mod pods;
-pub mod simulation;
+pub mod grid;
 pub mod vault;
 pub mod shims;
 pub mod gpu_framework;
