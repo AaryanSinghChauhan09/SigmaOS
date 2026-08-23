@@ -6,6 +6,7 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
+pub mod ext4_ntfs_security;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,

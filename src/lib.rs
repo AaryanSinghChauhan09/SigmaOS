@@ -191,11 +191,10 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken,
     ArithmeticSubstitutionDeobfuscator,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    ForensicStorageFilter, Permission, PledgeManager,
+    PledgePromise, RoutingMode, SandboxPolicy,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
@@ -217,8 +216,7 @@ pub use unimplemented_tools::{
     AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
     CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
     SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
-    PluginMarketplace, MusicLibraryManager, TimeMachineBackup, SysinternalsProcMon, SystemdCgTop,
-    TrussSyscallTracer, NetworkQualityProbe, WindowsPowercfg,
+    PluginMarketplace, MusicLibraryManager,
 };
 
 pub mod init {

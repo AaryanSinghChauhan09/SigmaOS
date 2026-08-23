@@ -12,6 +12,12 @@ pub mod voice;
 pub mod wiki;
 pub mod qwenpaw;
 pub mod developer_platform;
+pub mod open_computer;
+pub mod tensor_memory;
+pub mod compute_scheduler;
+pub mod quantization;
+pub mod next_gen;
+pub mod wandr;
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,

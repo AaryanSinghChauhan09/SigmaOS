@@ -221,6 +221,15 @@ impl PackageAdapter {
     }
 }
 
+pub trait PackageFormatAdapter {
+    fn format(&self) -> PackageFormat;
+    fn adapter_name(&self) -> &str { "unknown" }
+    fn parse_manifest(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> { Err("Not implemented") }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+}
+
 /// AptDebAdapter handles Debian/Ubuntu package formats (`.deb`)
 pub struct AptDebAdapter {
     pub dpkg_status_path: String,
@@ -310,11 +319,12 @@ impl PackageFormatAdapter for YumRpmAdapter {
         );
         Ok(())
     }
+}
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
-            package.name, self.adapter_name()
+            package.name, self.adapter_name
         );
         Ok(())
     }

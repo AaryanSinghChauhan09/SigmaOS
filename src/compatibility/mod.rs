@@ -113,3 +113,6 @@ pub use sovereign_suite::{
     CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
+pub use antix::*;
+pub use zorin::*;
+pub use legacy_adapters::*;
