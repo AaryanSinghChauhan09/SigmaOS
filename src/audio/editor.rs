@@ -1,7 +1,9 @@
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct AudioTrack {
@@ -145,6 +147,31 @@ impl AudioEffect for AmplifyEffect {
         let multiplier = self.db_to_linear();
         for sample in samples.iter_mut() {
             *sample = (*sample * multiplier).clamp(-1.0, 1.0);
+        }
+    }
+}
+
+/// Spectral Noise Suppression Effect
+pub struct SpectralNoiseSuppressionEffect {
+    pub threshold: f32,
+    pub reduction_db: f32,
+}
+
+impl SpectralNoiseSuppressionEffect {
+    pub fn new(threshold: f32, reduction_db: f32) -> Self {
+        SpectralNoiseSuppressionEffect {
+            threshold,
+            reduction_db,
+        }
+    }
+}
+
+impl AudioEffect for SpectralNoiseSuppressionEffect {
+    fn apply(&self, samples: &mut [f32]) {
+        for sample in samples.iter_mut() {
+            if sample.abs() < self.threshold {
+                *sample *= 0.1;
+            }
         }
     }
 }
