@@ -2,10 +2,400 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Zenith Web UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σ SigmaOS Calamares-Style Graphical Installer</title>
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
-    <div class="glass">Welcome to SigmaOS Zenith Web UI</div>
+    <div class="background-decor"></div>
+    <div class="glass installer-container" role="main">
+        <!-- Header -->
+        <header class="installer-header">
+            <div class="logo">Σ</div>
+            <div class="title-area">
+                <h1>SigmaOS Sovereign Installer</h1>
+                <p class="subtitle">Calamares-Style Graphical Installation Wizard with Dual-Boot Support</p>
+            </div>
+        </header>
+
+        <!-- Stepper Indicator -->
+        <div class="stepper" role="navigation" aria-label="Installation Steps">
+            <div class="step active" id="step-ind-1">
+                <span class="step-num">1</span>
+                <span class="step-label">Welcome</span>
+            </div>
+            <div class="step" id="step-ind-2">
+                <span class="step-num">2</span>
+                <span class="step-label">Target Disk</span>
+            </div>
+            <div class="step" id="step-ind-3">
+                <span class="step-num">3</span>
+                <span class="step-label">Partitioning</span>
+            </div>
+            <div class="step" id="step-ind-4">
+                <span class="step-num">4</span>
+                <span class="step-label">Settings</span>
+            </div>
+            <div class="step" id="step-ind-5">
+                <span class="step-num">5</span>
+                <span class="step-label">Install</span>
+            </div>
+            <div class="step" id="step-ind-6">
+                <span class="step-num">6</span>
+                <span class="step-label">Ready</span>
+            </div>
+        </div>
+
+        <!-- Wizard Panel Content -->
+        <div class="wizard-body">
+            <!-- Step 1: Welcome -->
+            <section class="panel active" id="panel-1" aria-labelledby="step-1-title">
+                <h2 id="step-1-title">Welcome to the Future of Computing</h2>
+                <p class="panel-desc">You are about to install SigmaOS — a sovereign, AI-native operating system built for post-quantum security and bare-metal performance.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🛡️ Post-Quantum Security</h3>
+                        <p>Fully secured with Kyber-1024 key encapsulation and Dilithium-5 signatures.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⚡ Bare-Metal Speed</h3>
+                        <p>Zero-dependency, capability-gated microkernel bypassing heavy POSIX layers.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⚙️ Local Intelligence</h3>
+                        <p>Embedded S-AI optimization daemon routing workloads natively on physical cores.</p>
+                    </div>
+                </div>
+
+                <div class="license-agreement">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="accept-license" aria-required="true">
+                        <span class="checkmark"></span>
+                        I accept the Sovereign Digital Autonomy Agreement and Licensing Terms.
+                    </label>
+                </div>
+            </section>
+
+            <!-- Step 2: Disk Selection -->
+            <section class="panel" id="panel-2" aria-labelledby="step-2-title">
+                <h2 id="step-2-title">Select Target Storage Device</h2>
+                <p class="panel-desc">Choose the physical disk drive to use for SigmaOS installation.</p>
+
+                <div class="disk-list" role="radiogroup" aria-label="Select Target Disk">
+                    <div class="disk-card active" onclick="selectDisk(this, 'sda')" role="radio" aria-checked="true" tabindex="0">
+                        <div class="disk-icon">💾</div>
+                        <div class="disk-info">
+                            <span class="disk-name">/dev/sda - Sovereign Primary NVMe SSD</span>
+                            <span class="disk-meta">Size: 512 GB | Detected OS: Windows 11 Pro, Debian Linux 12</span>
+                        </div>
+                    </div>
+                    <div class="disk-card" onclick="selectDisk(this, 'sdb')" role="radio" aria-checked="false" tabindex="0">
+                        <div class="disk-icon">💾</div>
+                        <div class="disk-info">
+                            <span class="disk-name">/dev/sdb - Auxiliary Block Storage</span>
+                            <span class="disk-meta">Size: 1 TB | Interface: USB4 / Thunderbolt</span>
+                        </div>
+                    </div>
+                    <div class="disk-card" onclick="selectDisk(this, 'vdisk')" role="radio" aria-checked="false" tabindex="0">
+                        <div class="disk-icon">🖥️</div>
+                        <div class="disk-info">
+                            <span class="disk-name">/dev/vdisk - Sandboxed Virtual VM Drive</span>
+                            <span class="disk-meta">Size: 64 GB | Interface: VirtIO Storage Ring</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Calamares-Style Partitioning & Dual-Boot Mode -->
+            <section class="panel" id="panel-3" aria-labelledby="step-3-title">
+                <h2 id="step-3-title">Installation Type & Partition Layout</h2>
+                <p class="panel-desc">Select how you want to partition the storage drive. Dual-boot mode allows running SigmaOS alongside your current OS.</p>
+
+                <div class="mode-list" role="radiogroup" aria-label="Partitioning Mode">
+                    <!-- Option 1: Install Alongside (Dual-Boot) -->
+                    <div class="mode-card active" id="mode-card-dual" onclick="selectInstallMode(this, 'dual')" role="radio" aria-checked="true" tabindex="0">
+                        <div class="mode-header">
+                            <span class="mode-icon">🔀</span>
+                            <div class="mode-title">
+                                <strong>Install Alongside Existing OS (Dual-Boot Mode)</strong>
+                                <span class="mode-sub">Safely shrinks <span id="detected-os-label">Windows 11 / Debian Linux</span> partition and installs SigmaOS in new space.</span>
+                            </div>
+                        </div>
+                        <div class="partition-preview-box">
+                            <div class="partition-title">Proposed Partition Split Preview:</div>
+                            <div class="partition-bar-outer">
+                                <div class="partition-bar-segment os-existing" style="width: 50%;">
+                                    <span>Existing OS (256 GB)</span>
+                                </div>
+                                <div class="partition-bar-segment os-sigma" style="width: 50%;">
+                                    <span>Σ SigmaOS (256 GB)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option 2: Erase Disk (Clean Install) -->
+                    <div class="mode-card" id="mode-card-clean" onclick="selectInstallMode(this, 'clean')" role="radio" aria-checked="false" tabindex="0">
+                        <div class="mode-header">
+                            <span class="mode-icon">🗑️</span>
+                            <div class="mode-title">
+                                <strong>Erase Entire Disk (Clean SovereignFS Install)</strong>
+                                <span class="mode-sub">Deletes all data on /dev/<span class="selected-disk-name">sda</span> and formats entire drive for SigmaOS.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option 3: Custom Partitioning -->
+                    <div class="mode-card" id="mode-card-custom" onclick="selectInstallMode(this, 'custom')" role="radio" aria-checked="false" tabindex="0">
+                        <div class="mode-header">
+                            <span class="mode-icon">⚙️</span>
+                            <div class="mode-title">
+                                <strong>Manual / Custom Partitioning</strong>
+                                <span class="mode-sub">Manually create, resize, or assign mount points for custom drive layouts.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Settings -->
+            <section class="panel" id="panel-4" aria-labelledby="step-4-title">
+                <h2 id="step-4-title">System Settings & Release Channels</h2>
+                <p class="panel-desc">Configure your locale, host parameters, and select your rolling system release stream.</p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="locale-select">System Locale</label>
+                        <select id="locale-select">
+                            <option value="en-US">English (United States)</option>
+                            <option value="en-IN">English (India - Sovereign Stack)</option>
+                            <option value="hi-IN">Hindi (India - Standard Devnagari)</option>
+                            <option value="de-DE">Deutsch (Germany)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timezone-select">Timezone</label>
+                        <select id="timezone-select">
+                            <option value="UTC">UTC (Coordinated Universal Time)</option>
+                            <option value="IST">IST (Indian Standard Time - UTC+5:30)</option>
+                            <option value="EST">EST (Eastern Standard Time - UTC-5:00)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hostname-input">Hostname</label>
+                        <input type="text" id="hostname-input" value="sigmaos-node" placeholder="Enter system name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="channel-select">Rolling Update Stream</label>
+                        <select id="channel-select">
+                            <option value="LTS">Long-Term Stable (Quarterly-vetted, highly secure)</option>
+                            <option value="Rolling" selected>Sovereign Rolling (Weekly rolling synchronized packages)</option>
+                            <option value="Experimental">Experimental (Bleeding edge daily automated integration)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 5: Interactive Progress -->
+            <section class="panel" id="panel-5" aria-labelledby="step-5-title">
+                <h2 id="step-5-title">Extracting Base Image & Packaging Shards</h2>
+                <p class="panel-desc">Please wait while the automated installer formats partitions and extracts the base system image.</p>
+
+                <div class="progress-container">
+                    <div class="progress-bar-outer">
+                        <div class="progress-bar-inner" id="installation-progress" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progress-status">Formatting SovereignFS partitions...</span>
+                        <span id="progress-percentage">0%</span>
+                    </div>
+                </div>
+
+                <div class="terminal-log" role="log" aria-live="polite">
+                    <div class="terminal-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="terminal-title">sigma-install-logs</span>
+                    </div>
+                    <div class="terminal-body" id="log-console">
+                        <div class="log-line text-blue">[install] Initializing Calamares GUI installation pipeline...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 6: Ready -->
+            <section class="panel" id="panel-6" aria-labelledby="step-6-title">
+                <div class="success-screen">
+                    <div class="success-icon">✓</div>
+                    <h2 id="step-6-title">Lattice Integration Complete!</h2>
+                    <p class="panel-desc">SigmaOS has been successfully written to disk, and dual-boot bootloader chainloading entries are configured in sigma-boot.</p>
+
+                    <div class="summary-box">
+                        <h3>Installation Summary</h3>
+                        <ul>
+                            <li><strong>Device:</strong> <span id="summary-device">/dev/sda</span></li>
+                            <li><strong>Installation Mode:</strong> <span id="summary-mode">Dual-Boot (Install Alongside)</span></li>
+                            <li><strong>Filesystem:</strong> SovereignFS (Lattice-Optimized)</li>
+                            <li><strong>Bootloader:</strong> sigma-boot UEFI Chainloader</li>
+                            <li><strong>System Identity:</strong> Kyber-1024 Generated (/etc/sigma/identity.pub)</li>
+                        </ul>
+                    </div>
+
+                    <p class="reboot-note">Remove the installation media and reboot the node to enter the Zenith desktop environment.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer Navigation Controls -->
+        <footer class="installer-footer">
+            <button class="btn btn-secondary" id="btn-back" disabled onclick="prevStep()" aria-label="Go Back to Previous Step">Back</button>
+            <button class="btn btn-primary" id="btn-next" onclick="nextStep()" aria-label="Continue to Next Step">Next</button>
+        </footer>
+    </div>
+
+    <!-- Installer Script Logic -->
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+        let selectedDiskId = 'sda';
+        let selectedInstallMode = 'dual';
+
+        function selectDisk(element, diskId) {
+            document.querySelectorAll('.disk-card').forEach(card => {
+                card.classList.remove('active');
+                card.setAttribute('aria-checked', 'false');
+            });
+            element.classList.add('active');
+            element.setAttribute('aria-checked', 'true');
+            selectedDiskId = diskId;
+            document.querySelectorAll('.selected-disk-name').forEach(el => el.innerText = diskId);
+        }
+
+        function selectInstallMode(element, mode) {
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.classList.remove('active');
+                card.setAttribute('aria-checked', 'false');
+            });
+            element.classList.add('active');
+            element.setAttribute('aria-checked', 'true');
+            selectedInstallMode = mode;
+        }
+
+        function updateStepIndicators() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const indicator = document.getElementById(`step-ind-${i}`);
+                if (i < currentStep) {
+                    indicator.className = 'step completed';
+                } else if (i === currentStep) {
+                    indicator.className = 'step active';
+                } else {
+                    indicator.className = 'step';
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`panel-${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`panel-${currentStep}`).classList.add('active');
+                updateStepIndicators();
+
+                document.getElementById('btn-next').innerText = 'Next';
+                document.getElementById('btn-next').disabled = false;
+
+                if (currentStep === 1) {
+                    document.getElementById('btn-back').disabled = true;
+                }
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 1) {
+                const accepted = document.getElementById('accept-license').checked;
+                if (!accepted) {
+                    alert('Please accept the licensing terms and sovereign autonomy agreement to proceed.');
+                    return;
+                }
+            }
+
+            if (currentStep < totalSteps) {
+                document.getElementById(`panel-${currentStep}`).classList.remove('active');
+                currentStep++;
+                document.getElementById(`panel-${currentStep}`).classList.add('active');
+                updateStepIndicators();
+
+                document.getElementById('btn-back').disabled = false;
+
+                if (currentStep === 5) {
+                    document.getElementById('btn-next').disabled = true;
+                    document.getElementById('btn-back').disabled = true;
+                    startInstallationSimulation();
+                } else if (currentStep === totalSteps) {
+                    document.getElementById('btn-next').innerText = 'Reboot';
+                    document.getElementById('btn-next').onclick = () => alert('Rebooting node... Entering Zenith.');
+                    document.getElementById('btn-back').disabled = true;
+                }
+            }
+        }
+
+        function appendLog(text, className = '') {
+            const consoleEl = document.getElementById('log-console');
+            const line = document.createElement('div');
+            line.className = `log-line ${className}`;
+            line.innerText = text;
+            consoleEl.appendChild(line);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function startInstallationSimulation() {
+            let progress = 0;
+            const progressBar = document.getElementById('installation-progress');
+            const progressPct = document.getElementById('progress-percentage');
+            const progressStatus = document.getElementById('progress-status');
+
+            document.getElementById('summary-device').innerText = `/dev/${selectedDiskId}`;
+            const modeText = selectedInstallMode === 'dual' ? 'Dual-Boot (Install Alongside)' : (selectedInstallMode === 'clean' ? 'Erase Entire Disk' : 'Custom Partitioning');
+            document.getElementById('summary-mode').innerText = modeText;
+
+            const logs = [
+                { prg: 5, msg: "Quering hardware buses... Detected CPU topology matching x86_64 standard.", class: "text-blue" },
+                { prg: 12, msg: "Probing existing partitions... Detected Windows 11 Pro and Debian Linux 12.", class: "text-yellow" },
+                { prg: 20, msg: selectedInstallMode === 'dual' ? "Resizing target partition SAFELY to create 256GB SovereignFS slice..." : "Formatting entire target drive in SovereignFS layout...", class: "text-blue" },
+                { prg: 30, msg: "Initializing CoW multi-layered SovereignFS partition root.", class: "" },
+                { prg: 40, msg: "Connecting to sovereign mirror... Handshaking with Kyber-1024 certificates.", class: "text-blue" },
+                { prg: 52, msg: "Streaming base architecture payload (387 MB image target)...", class: "" },
+                { prg: 65, msg: "Validating download hashes against Dilithium-5 digital signature.", class: "text-green" },
+                { prg: 78, msg: "Configuring sigma-boot UEFI chainloader entries for detected operating systems.", class: "text-yellow" },
+                { prg: 90, msg: "Generating machine cryptographic post-quantum keypair... Registered on mesh.", class: "text-blue" },
+                { prg: 100, msg: "✅ Installation completed successfully! Dual-boot boot records linked.", class: "text-green" }
+            ];
+
+            let logIndex = 0;
+            const interval = setInterval(() => {
+                if (logIndex < logs.length) {
+                    const currentLog = logs[logIndex];
+                    if (progress < currentLog.prg) {
+                        progress = currentLog.prg;
+                        progressBar.style.width = `${progress}%`;
+                        progressPct.innerText = `${progress}%`;
+                        progressStatus.innerText = currentLog.msg;
+                        appendLog(currentLog.msg, currentLog.class);
+                        logIndex++;
+                    }
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        nextStep();
+                    }, 1000);
+                }
+            }, 600);
+        }
+    </script>
 </body>
 </html>

@@ -279,12 +279,18 @@ impl Directory {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
@@ -312,6 +318,9 @@ impl<T> Vec<T> {
     }
 
     pub fn remove(&mut self, index: usize) -> T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);

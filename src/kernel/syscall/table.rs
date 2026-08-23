@@ -2,6 +2,9 @@ use core::sync::atomic::{AtomicU64, Ordering};
 /// SigmaOS System Call Table — Phase K expansion
 /// Absorbs Linux syscall interface: POSIX-complete table with 300+ syscalls
 /// Categories: fs, mm, proc, net, time, signal, ipc, sched, crypto, io_uring
+/// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
+/// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
+
 use crate::klib::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -316,6 +319,105 @@ impl Default for SyscallTable {
     }
 }
 
+// ── Kernel Exporter, SSDT & Anti-Rootkit Guard (Windows/Linux/BSD inspired) ──
+
+/// Represents a compiled kernel function symbol (PE export or /proc/kallsyms equivalent)
+#[derive(Debug, Clone)]
+pub struct KernelSymbol {
+    pub name: String,
+    pub address: u64,
+    pub module_owner: String,
+}
+
+/// System Service Descriptor Table (SSDT) element mapping
+#[derive(Debug, Clone, Copy)]
+pub struct SsdtEntry {
+    pub service_number: u32,
+    pub service_routine_address: u64,
+}
+
+/// Interrupt Descriptor Table (IDT) handler entry
+#[derive(Debug, Clone, Copy)]
+pub struct IdtEntry {
+    pub interrupt_vector: u8,
+    pub handler_address: u64,
+}
+
+/// Anti-Rootkit System Call tampering detector
+pub struct AntiRootkitGuard {
+    pub shadow_ssdt: HashMap<u32, u64>, // Pristine service_number -> address copy
+    pub shadow_idt: HashMap<u8, u64>,   // Pristine interrupt_vector -> handler_address copy
+}
+
+impl Default for AntiRootkitGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AntiRootkitGuard {
+    pub fn new() -> Self {
+        AntiRootkitGuard {
+            shadow_ssdt: HashMap::new(),
+            shadow_idt: HashMap::new(),
+        }
+    }
+
+    /// Backups a pristine snapshot of the SSDT pointers
+    pub fn snapshot_pristine_table(&mut self, active_ssdt: &[SsdtEntry]) {
+        for entry in active_ssdt {
+            self.shadow_ssdt.insert(entry.service_number, entry.service_routine_address);
+        }
+    }
+
+    /// Backups a pristine snapshot of the IDT handler pointers (anti IDT hooking)
+    pub fn snapshot_pristine_idt(&mut self, active_idt: &[IdtEntry]) {
+        for entry in active_idt {
+            self.shadow_idt.insert(entry.interrupt_vector, entry.handler_address);
+        }
+    }
+
+    /// Audits the active SSDT pointer addresses against the shadow snapshot to detect rootkit hooking!
+    /// Returns a list of corrupted / hooked service numbers.
+    pub fn audit_system_service_table(&self, active_ssdt: &[SsdtEntry]) -> Vec<u32> {
+        let mut hijacked_services = Vec::new();
+        for entry in active_ssdt {
+            if let Some(&pristine_address) = self.shadow_ssdt.get(&entry.service_number) {
+                if entry.service_routine_address != pristine_address {
+                    hijacked_services.push(entry.service_number); // Tampering detected!
+                }
+            }
+        }
+        hijacked_services
+    }
+
+    /// Audits the active IDT handler addresses to detect IDT hijacking (keyboard/interrupt snorters)
+    pub fn audit_interrupt_table(&self, active_idt: &[IdtEntry]) -> Vec<u8> {
+        let mut hijacked_interrupts = Vec::new();
+        for entry in active_idt {
+            if let Some(&pristine_handler) = self.shadow_idt.get(&entry.interrupt_vector) {
+                if entry.handler_address != pristine_handler {
+                    hijacked_interrupts.push(entry.interrupt_vector);
+                }
+            }
+        }
+        hijacked_interrupts
+    }
+
+    /// Detects Direct Kernel Object Manipulation (DKOM) process-hiding rootkits.
+    /// Walks the active scheduler thread queue and verifies if any process is missing
+    /// from the high-level process manager catalog.
+    pub fn audit_dkom_process_hiding(&self, scheduler_pids: &[u64], catalog_pids: &[u64]) -> Vec<u64> {
+        let mut hidden_pids = Vec::new();
+        for &pid in scheduler_pids {
+            if !catalog_pids.contains(&pid) {
+                hidden_pids.push(pid); // Process resides in execution queue but is hidden from catalog!
+            }
+        }
+        hidden_pids
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -416,4 +518,83 @@ mod tests {
         assert!(names.contains(&"exit".to_string()));
         assert!(names.contains(&"brk".to_string()));
     }
+
+    #[test]
+    fn test_kernel_symbol_exporters() {
+        let sym = KernelSymbol {
+            name: "NtCreateFile".to_string(),
+            address: 0xFFFFFFFF80012000,
+            module_owner: "ntoskrnl.exe".to_string(),
+        };
+        assert_eq!(sym.name, "NtCreateFile");
+        assert_eq!(sym.address, 0xFFFFFFFF80012000);
+        assert_eq!(sym.module_owner, "ntoskrnl.exe");
+    }
+
+    #[test]
+    fn test_ssdt_anti_rootkit_tampering_guard() {
+        let pristine_ssdt = [
+            SsdtEntry { service_number: 0, service_routine_address: 0x801000 }, // NtRead
+            SsdtEntry { service_number: 1, service_routine_address: 0x802000 }, // NtWrite
+        ];
+
+        let mut guard = AntiRootkitGuard::new();
+        guard.snapshot_pristine_table(&pristine_ssdt);
+
+        // Audit clean SSDT -> should return no hijacked service numbers
+        let clean_violations = guard.audit_system_service_table(&pristine_ssdt);
+        assert!(clean_violations.is_empty());
+
+        // Simulate rootkit hooking NtWrite (service_number 1 redirecting address to rootkit_jmp_cave)
+        let hooked_ssdt = [
+            SsdtEntry { service_number: 0, service_routine_address: 0x801000 },
+            SsdtEntry { service_number: 1, service_routine_address: 0x909090 }, // Redirection!
+        ];
+
+        let hooked_violations = guard.audit_system_service_table(&hooked_ssdt);
+        assert_eq!(hooked_violations.len(), 1);
+        assert_eq!(hooked_violations[0], 1); // TAMPERING DETECTED ON SERVICE_NUMBER 1!
+    }
+
+    #[test]
+    fn test_idt_hooking_audits() {
+        let pristine_idt = [
+            IdtEntry { interrupt_vector: 0x03, handler_address: 0x1010 }, // Breakpoint
+            IdtEntry { interrupt_vector: 0x0E, handler_address: 0x2020 }, // Page Fault
+        ];
+
+        let mut guard = AntiRootkitGuard::new();
+        guard.snapshot_pristine_idt(&pristine_idt);
+
+        let clean_idt_violations = guard.audit_interrupt_table(&pristine_idt);
+        assert!(clean_idt_violations.is_empty());
+
+        // Simulate IDT Hooking of Breakpoint handler by a rootkit
+        let hooked_idt = [
+            IdtEntry { interrupt_vector: 0x03, handler_address: 0x6660 }, // Redirected!
+            IdtEntry { interrupt_vector: 0x0E, handler_address: 0x2020 },
+        ];
+
+        let hooked_idt_violations = guard.audit_interrupt_table(&hooked_idt);
+        assert_eq!(hooked_idt_violations.len(), 1);
+        assert_eq!(hooked_idt_violations[0], 0x03);
+    }
+
+    #[test]
+    fn test_dkom_process_hiding_detection() {
+        let guard = AntiRootkitGuard::new();
+
+        // 1. Clean state: Scheduler active PIDs match high-level Process Catalog
+        let scheduler_pids = [1, 100, 501];
+        let catalog_pids = [1, 100, 501];
+        let clean_dkom = guard.audit_dkom_process_hiding(&scheduler_pids, &catalog_pids);
+        assert!(clean_dkom.is_empty());
+
+        // 2. DKOM active: Rootkit unlinked process 501 from high-level catalog, but process is still running/executing in scheduler queues!
+        let catalog_pids_hooked = [1, 100];
+        let hijacked_dkom = guard.audit_dkom_process_hiding(&scheduler_pids, &catalog_pids_hooked);
+        assert_eq!(hijacked_dkom.len(), 1);
+        assert_eq!(hijacked_dkom[0], 501); // HIDDEN/DKOM TAMPERED PROCESS DETECTED!
+    }
+}
 }
