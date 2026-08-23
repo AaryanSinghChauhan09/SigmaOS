@@ -1,19 +1,35 @@
 // SigmaOS Distro/Ecosystem Maturity Module
+pub mod arch;
 pub mod arch_parity;
+pub mod bsd_linux_innovations;
+pub mod bsd_parity;
 pub mod certification;
 pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
+pub mod debian_parity;
 pub mod developer;
+pub mod ecosystem_dimensions;
+pub mod endeavour_os;
 pub mod enterprise;
+pub mod fedora_parity;
+pub mod gentoo;
 pub mod i18n;
+pub mod improvements;
+pub mod linux_bsd_inspirations;
+pub mod linux_bsd_parity;
+pub mod linux_ideas;
 pub mod manjaro;
 pub mod nextgen;
+pub mod parity;
+pub mod power_network_tools;
+pub mod preseed;
+pub mod ready_to_use;
 pub mod recovery;
 pub mod specialized;
+pub mod stable_components;
 pub mod tiny_core;
-pub mod parity;
-pub mod arch;
+pub mod transformation_engine;
 
 pub use arch::{
     ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,

@@ -2,18 +2,30 @@
 // S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, and quantization
 
 pub mod agent;
+pub mod apm;
 pub mod autogen;
-pub mod llm;
-pub mod orchestrator;
-pub mod sai;
-pub mod openclaw;
-pub mod system;
-pub mod voice;
-pub mod open_computer;
-pub mod tensor_memory;
+pub mod autonomous_agents;
+pub mod awesome_ai;
 pub mod compute_scheduler;
+pub mod developer_platform;
+pub mod lift_engine;
+pub mod llm;
+pub mod next_gen;
+pub mod open_computer;
+pub mod openclaw;
+pub mod orchestrator;
+pub mod perplexity;
 pub mod quantization;
+pub mod qwenpaw;
+pub mod runtime;
+pub mod sai;
 pub mod sigma_ai_suite;
+pub mod system;
+pub mod system_ai;
+pub mod tensor_memory;
+pub mod voice;
+pub mod wandr;
+pub mod wiki;
 
 pub use sigma_ai_suite::{
     CommandTranslation, ErrorExplanation, IndicLanguage, SafetyLevel, SigmaAiAdaptiveSuggestions,

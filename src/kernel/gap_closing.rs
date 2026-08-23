@@ -415,6 +415,18 @@ impl SectionObject {
 // 7. X86 Rootkit Audit Engine
 // ==========================================
 
+#[derive(Debug, Clone)]
+pub struct DeviceObject {
+    pub driver_name: String,
+    pub next_device: Option<Box<DeviceObject>>,
+    pub attached_device: Option<Box<DeviceObject>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DriverObject {
+    pub major_function: [Option<usize>; 28],
+}
+
 pub struct X86RootkitAuditor {
     // Reference hashes/signatures of protected system memory spaces
     pub expected_kernel_text_checksum: u64,

@@ -39,7 +39,7 @@ jobs:
         markdownlint docs/*.md *.md
 
     - name: Upload cppcheck report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4.3.6
       if: always()
       with:
         name: cppcheck-report

@@ -1,8 +1,8 @@
 #![no_std]
-#![no_main]
 
 use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
+
+pub type SigmaVec<T> = Vec<T>;
 
 pub struct Vec<T> {
     data: *mut T,
@@ -13,8 +13,10 @@ pub struct Vec<T> {
 impl<T: PartialEq> Vec<T> {
     pub fn contains(&self, item: &T) -> bool {
         for i in 0..self.len {
-            if &self[i] == item {
-                return true;
+            unsafe {
+                if &*self.data.add(i) == item {
+                    return true;
+                }
             }
         }
         false
@@ -29,6 +31,7 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
+
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -40,9 +43,11 @@ impl<T> Vec<T> {
             }
         }
     }
+
     pub fn len(&self) -> usize {
         self.len
     }
+
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
@@ -63,25 +68,13 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn contains(&self, item: &T) -> bool
-    where
-        T: PartialEq,
-    {
-        for i in 0..self.len {
-            unsafe {
-                if &*self.data.add(i) == item {
-                    return true;
-                }
-            }
-        }
-        false
-    }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
             vec: self,
             index: 0,
         }
     }
+
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
         VecIterMut {
             data: self.data,
@@ -104,6 +97,7 @@ impl<T> Vec<T> {
             item
         }
     }
+
     pub fn retain<F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> bool,
@@ -120,23 +114,13 @@ impl<T> Vec<T> {
                             1,
                         );
                     }
-                }
-                write_idx += 1;
-            } else {
-                unsafe {
+                    write_idx += 1;
+                } else {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
             }
         }
         self.len = write_idx;
-    }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
 
     unsafe fn grow(&mut self) {
@@ -147,11 +131,11 @@ impl<T> Vec<T> {
         };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+            if self.capacity > 0 && !self.data.is_null() {
+                for i in 0..self.len {
+                    core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+                }
+                free(self.data as *mut u8);
             }
             self.data = new_data;
             self.capacity = new_capacity;
@@ -221,7 +205,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
 
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+    type IntoIter = VecIter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
     }
@@ -229,9 +213,47 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
+    type IntoIter = VecIterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
         self.iter_mut()
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
     }
 }
 
@@ -256,7 +278,7 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
 
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
-        if self.capacity > 0 {
+        if self.capacity > 0 && !self.data.is_null() {
             unsafe {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));

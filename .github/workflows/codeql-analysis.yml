@@ -102,7 +102,7 @@ jobs:
         cat security_report.md
 
     - name: Upload security report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4.3.6
       with:
         name: security-report
         path: security_report.md

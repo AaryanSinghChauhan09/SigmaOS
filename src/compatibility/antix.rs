@@ -175,10 +175,6 @@ impl Default for AntiXControlCentre {
     }
 }
 
-pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();
-pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();
-pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntixControlCenter::new();
-pub static GLOBAL_MEMORY_TRIMMER: LegacyMemoryTrimmer = LegacyMemoryTrimmer::new();
 
 // ==========================================
 // 5. Live USB Persistence Manager (Inspiration: antiX Live-USB Persistence)

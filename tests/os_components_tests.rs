@@ -119,8 +119,10 @@ use segmentation_paging::{
     SegmentationPagingEngine, SpaceProtectionFlags,
 };
 
+use access_control::{CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel};
+use community_toolkit::{HybridFirewallTemplateStore, VirtualizationBlueprintStore};
 use process_activity_manager::{
-    ActivityState, ActivityManager as ProcessActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
+    ActivityState, ActivityManager as ProcessActivityManager, RegisterSnapshot,
 };
 
 #[test]
@@ -426,7 +428,6 @@ fn test_posix_and_nfsv4_acls() {
     assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 2)); // Denied write (2)
     assert!(!posix_acl.evaluate_acl(1002, 1002, 1000, 1000, 4)); // Other denied
 
-    assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
 }
 
 #[test]

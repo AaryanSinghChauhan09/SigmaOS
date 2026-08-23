@@ -396,11 +396,6 @@ pub trait Device {
     fn shutdown(&mut self) -> Result<(), DeviceError>;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortAddress {
-    PortIO(u16),
-    MemoryMapped(u32),
-}
 
 
 /// Device error types
@@ -1711,36 +1706,9 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-/// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
-#[derive(Debug, Clone)]
-pub struct DeviceExtension {
-    pub irq: u8,
-    pub base_port: u16,
-    pub base_address: u32,
-    pub memory_size: usize,
-    pub device_context: [u8; 128], // Driver-specific context information buffer
-}
-
-impl DeviceExtension {
-    pub fn new() -> Self {
-        Self {
-            irq: 0,
-            base_port: 0,
-            base_address: 0,
-            memory_size: 0,
-            device_context: [0; 128],
-        }
-    }
-}
 
 
 
-/// Unified representation of communication channels (OOP Abstraction)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortAddress {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
-}
 
 #[cfg(test)]
 #[no_mangle]

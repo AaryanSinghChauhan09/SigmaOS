@@ -50,7 +50,7 @@ jobs:
           ./build_sovereign.sh
 
       - name: Upload kernel binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.3.6
         if: success()
         with:
           name: sigmaos_zenith_linux
