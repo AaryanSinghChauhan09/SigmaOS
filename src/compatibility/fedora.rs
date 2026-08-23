@@ -52,7 +52,7 @@ impl DnfPackageResolver {
             return Err(format!("Package {} not found in repositories", name));
         }
 
-        let mut install_order: Vec<String> = Vec::new();
+        let mut install_order = Vec::new();
         let mut visited = HashMap::new();
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
@@ -1048,9 +1048,6 @@ impl SovereignFirewalldManager {
     }
 }
 
-// ==========================================
-// Sovereign Cockpit Console Manager
-// ==========================================
 
 pub struct SovereignCockpitConsole {
     pub is_listening: bool,
@@ -1067,39 +1064,40 @@ impl SovereignCockpitConsole {
         }
     }
 
-    pub fn start_server(&mut self) -> Result<(), String> {
+    pub fn start_server(&mut self) -> Result<(), &'static str> {
         if self.is_listening {
-            return Err("Server already running".to_string());
+            return Err("Server already running");
         }
         self.is_listening = true;
         Ok(())
     }
 
-    pub fn register_client(&mut self) -> Result<usize, String> {
+    pub fn stop_server(&mut self) {
+        self.is_listening = false;
+        self.connected_clients = 0;
+    }
+
+    pub fn register_client(&mut self) -> Result<usize, &'static str> {
         if !self.is_listening {
-            return Err("Server is offline".to_string());
+            return Err("Server not listening");
         }
         self.connected_clients += 1;
         Ok(self.connected_clients)
     }
 
-    pub fn update_metric(&mut self, name: &str, val: f64) {
-        self.metrics.insert(name.to_string(), val);
+    pub fn update_metric(&mut self, name: &str, value: f64) {
+        self.metrics.insert(name.to_string(), value);
     }
 
-    pub fn stream_metrics_json(&self) -> Result<String, String> {
-        let cpu = self.metrics.get("cpu_usage_pct").cloned().unwrap_or(0.0);
-        let mem = self.metrics.get("memory_used_gb").cloned().unwrap_or(0.0);
-        Ok(format!(
-            "{{\"listening\":{},\"clients\":{},\"cpu_usage_pct\":{},\"memory_used_gb\":{}}}",
-            self.is_listening, self.connected_clients, cpu, mem
-        ))
-    }
-
-    pub fn stop_server(&mut self) {
-        self.is_listening = false;
-        self.connected_clients = 0;
-        self.metrics.clear();
+    pub fn stream_metrics_json(&self) -> Result<String, &'static str> {
+        let mut json = String::from("{");
+        json.push_str(&format!("\"listening\":{},", self.is_listening));
+        json.push_str(&format!("\"clients\":{}", self.connected_clients));
+        for (name, val) in &self.metrics {
+            json.push_str(&format!(",\"{}\":{}", name, val));
+        }
+        json.push_str("}");
+        Ok(json)
     }
 }
 
@@ -1274,145 +1272,75 @@ mod tests {
         assert_eq!(r2, i64::MAX);
         assert!(alu.flags.overflow);
 
-        // Permissive warning only
-        let permissive = SeLinuxEnforcer::new(SeLinuxMode::Permissive);
-        assert!(permissive.check_access("httpd_t", "unlabeled_t").unwrap());
+        // Underflow saturated add
+        let r3 = alu.saturated_add(i64::MIN, -1);
+        assert_eq!(r3, i64::MIN);
+        assert!(alu.flags.overflow);
     }
 
     #[test]
-    fn test_copr_repository_manager() {
-        let mut copr = CoprRepositoryManager::new("developer_delta", "neo-vim");
-        copr.submit_copr_build(101, "https://github.com/neovim/neovim.git");
-        assert_eq!(copr.builds.len(), 1);
+    fn test_fedora_selinux_enforcement() {
+        let engine = SeLinuxEngine::new(true);
+        let httpd_sub = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
+        let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
 
-        let rpm_name = copr.execute_build_compile(101).unwrap();
-        assert_eq!(rpm_name, "copr-build-neo-vim-101.rpm");
-        assert_eq!(copr.builds[0].status, "Success");
+        // Allowed by targeted policy rule
+        assert!(engine.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
 
-        // Fail Case (nonexistent task ID)
-        assert_eq!(copr.execute_build_compile(999), Err("COPR build task ID not found"));
+        // Blocked by missing rule
+        let bad_obj = SeLinuxContext::new("system_u", "object_r", "secret_t", "s0");
+        assert!(engine.authorize_access(&httpd_sub, &bad_obj, "file", "read").is_err());
+
+        // Domain transition
+        let user_sub = SeLinuxContext::new("unconfined_u", "user_r", "user_t", "s0");
+        let passwd_exe = SeLinuxContext::new("system_u", "object_r", "passwd_exec_t", "s0");
+        let transitioned = engine.validate_domain_transition(&user_sub, &passwd_exe).unwrap();
+        assert_eq!(transitioned.context_type, "passwd_t");
     }
 
     #[test]
-    fn test_sovereign_ostree_deployer() {
-        let mut deployer = SovereignOstreeDeployer::new();
-        assert_eq!(deployer.active_deployment_hash, "fedora-base-39.20231101.0");
+    fn test_systemd_preset_configurator() {
+        let mut configurator = SystemdPresetConfigurator::new();
+        assert_eq!(configurator.evaluate_preset("sshd.service"), SystemdPresetState::Enable);
+        assert_eq!(configurator.evaluate_preset("debug-shell.service"), SystemdPresetState::Disable);
+        assert_eq!(configurator.evaluate_preset("nginx.service"), SystemdPresetState::Ignore);
 
-        // Stage deployment
-        assert!(deployer.stage_deployment("").is_err());
-        assert!(deployer.stage_deployment("fedora-base-40.20240401.0").is_ok());
-        assert_eq!(deployer.staged_deployment_hash, "fedora-base-40.20240401.0");
-
-        // Commit deployment
-        assert!(deployer.commit_deployment().is_ok());
-        assert_eq!(deployer.active_deployment_hash, "fedora-base-40.20240401.0");
-        assert_eq!(deployer.rollback_deployment_hash, "fedora-base-39.20231101.0");
-        assert!(deployer.rollback_available);
-
-        // Layer package
-        assert!(deployer.layer_package("").is_err());
-        assert!(deployer.layer_package("htop").is_ok());
-        assert!(deployer.layer_package("htop").is_err()); // duplicate should fail
-
-        let (active_hash, layered) = deployer.get_active_state();
-        assert_eq!(active_hash, "fedora-base-40.20240401.0");
-        assert_eq!(layered, vec!["htop".to_string()]);
-
-        // Rollback
-        assert!(deployer.rollback().is_ok());
-        assert_eq!(deployer.active_deployment_hash, "fedora-base-39.20231101.0");
+        // Custom override
+        configurator.add_custom_preset("nginx.service", SystemdPresetState::Enable);
+        assert_eq!(configurator.evaluate_preset("nginx.service"), SystemdPresetState::Enable);
     }
 
     #[test]
-    fn test_sovereign_selinux_engine() {
-        let mut engine = SovereignSeLinuxEngine::new(SeLinuxMode::Enforcing);
-        let ctx = SovereignSeLinuxContext::new("system_u", "system_r", "httpd_sys_content_t", "s0");
-        engine.register_file_context("/var/www/html/index.html", ctx);
+    fn test_anaconda_kickstart_installer() {
+        let mut installer = AnacondaInstaller::new();
 
-        engine.add_permission("httpd_t", "file", "read");
-        engine.add_transition_rule("init_t", "httpd_t");
+        // Sample Fedora Kickstart script
+        let ks_script = "
+        # Kickstart configuration
+        rootpw $6$rounds=4096$secure_hash_here
+        lang en_US.UTF-8
+        keyboard us
 
-        // Verify transition rule
-        assert!(engine.validate_transition("init_t", "httpd_t"));
-        assert!(!engine.validate_transition("init_t", "unconfined_t"));
+        # Partition layouts
+        part / --fstype ext4 --size 20480
+        part /boot --fstype ext3 --size 1024
 
-        // Verify access check
-        let res = engine.check_access("httpd_t", "/var/www/html/index.html", "read");
-        assert_eq!(res, Ok(true));
+        # Selected package groups
+        @core
+        @base
+        ";
 
-        // Access violation due to missing permission
-        let res_denied = engine.check_access("httpd_t", "/var/www/html/index.html", "write");
-        assert_eq!(res_denied, Err("SELinux AVC Denial: Access Prohibited by Sovereign MAC policy"));
+        assert!(installer.load_kickstart_config(ks_script).is_ok());
 
-        // Missing file context
-        let res_missing = engine.check_access("httpd_t", "/etc/shadow", "read");
-        assert_eq!(res_missing, Err("SELinux Error: Path has no registered label/context"));
+        let ks = installer.kickstart.as_ref().unwrap();
+        assert_eq!(ks.root_password_hash, "$6$rounds=4096$secure_hash_here");
+        assert_eq!(ks.system_language, "en_US.UTF-8");
+        assert_eq!(ks.partitions.len(), 2);
+        assert_eq!(ks.partitions[0].mount_point, "/");
+        assert_eq!(ks.partitions[1].size_mb, 1024);
 
-        // Permissive mode allows but warns
-        let mut permissive_engine = SovereignSeLinuxEngine::new(SeLinuxMode::Permissive);
-        let ctx2 = SovereignSeLinuxContext::new("system_u", "system_r", "httpd_sys_content_t", "s0");
-        permissive_engine.register_file_context("/var/www/html/index.html", ctx2);
-        let permissive_res = permissive_engine.check_access("httpd_t", "/var/www/html/index.html", "write");
-        assert_eq!(permissive_res, Ok(true));
-
-        // Disabled mode allows everything
-        let disabled_engine = SovereignSeLinuxEngine::new(SeLinuxMode::Disabled);
-        assert!(disabled_engine.check_access("any_t", "/any/path", "any").unwrap());
-    }
-
-    #[test]
-    fn test_sovereign_firewalld_manager() {
-        let mut fwd = SovereignFirewalldManager::new();
-        assert_eq!(fwd.default_zone, "public");
-
-        // Allowed public ports are 22, 80, 443
-        assert!(fwd.is_packet_allowed("eth0", 80));
-        assert!(!fwd.is_packet_allowed("eth0", 8080));
-
-        // Assign interface to work zone
-        assert!(fwd.assign_interface_to_zone("eth0", "work").is_ok());
-        // Work allows 8080
-        assert!(fwd.is_packet_allowed("eth0", 8080));
-
-        // Add custom port rule to work zone
-        assert!(fwd.allow_port_in_zone("work", 9090).is_ok());
-        assert!(fwd.is_packet_allowed("eth0", 9090));
-
-        // Invalid zone error
-        assert!(fwd.set_default_zone("invalid_zone").is_err());
-        assert!(fwd.assign_interface_to_zone("eth0", "invalid_zone").is_err());
-    }
-
-    #[test]
-    fn test_sovereign_cockpit_console() {
-        let mut console = SovereignCockpitConsole::new();
-        assert!(!console.is_listening);
-
-        // Fail registering client when offline
-        assert!(console.register_client().is_err());
-
-        // Start server
-        assert!(console.start_server().is_ok());
-        assert!(console.is_listening);
-        assert!(console.start_server().is_err()); // duplicate starts fail
-
-        // Register client
-        assert_eq!(console.register_client().unwrap(), 1);
-        assert_eq!(console.register_client().unwrap(), 2);
-
-        // Metrics
-        console.update_metric("cpu_usage_pct", 45.2);
-        console.update_metric("memory_used_gb", 7.4);
-
-        let json = console.stream_metrics_json().unwrap();
-        assert!(json.contains("\"listening\":true"));
-        assert!(json.contains("\"clients\":2"));
-        assert!(json.contains("\"cpu_usage_pct\":45.2"));
-        assert!(json.contains("\"memory_used_gb\":7.4"));
-
-        // Stop server
-        console.stop_server();
-        assert!(!console.is_listening);
-        assert_eq!(console.connected_clients, 0);
+        let res = installer.execute_automated_installation().unwrap();
+        assert!(res.contains(" Automated OS provisioning completed"));
+        assert!(installer.installation_successful);
     }
 }

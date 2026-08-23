@@ -122,7 +122,7 @@ impl AclEntry {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 #[derive(Debug, Clone)]
 pub struct PosixAcl {
     pub entries: Vec<AclEntry>,
