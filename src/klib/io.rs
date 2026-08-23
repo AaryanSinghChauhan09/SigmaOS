@@ -177,7 +177,7 @@ impl KlibRead for SigmaBuffer {
     fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), SigmaIoError> {
         let mut total_read = 0;
         while total_read < buf.len() {
-            let bytes_read = self.read(&mut buf[total_read..])?;
+            let bytes_read = KlibRead::read(self, &mut buf[total_read..])?;
             if bytes_read == 0 {
                 return Err(SigmaIoError::UnexpectedEof);
             }
@@ -191,7 +191,7 @@ impl KlibRead for SigmaBuffer {
         let mut total_read = 0;
         
         loop {
-            let bytes_read = self.read(&mut buffer)?;
+            let bytes_read = KlibRead::read(self, &mut buffer)?;
             if bytes_read == 0 {
                 break;
             }

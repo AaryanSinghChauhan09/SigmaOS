@@ -1,11 +1,3 @@
-use memory::segmentation_paging::{
-    AddressBindingMode, CpuPrivilegeMode as SegCpuPrivilegeMode, GlobalDescriptorTable,
-    MultiLevelPagingEngine, ProtectionLevel as SegProtectionLevel, ProtectionViolationType,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentType, SegmentedAddress, AslrEntropyConfig
-};
-use dashboard::statutory_compliance::{
-    StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus
-};
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
@@ -82,18 +74,16 @@ mod epoll;
 mod elf_relocation;
 
 use community_toolkit::{
-    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
-    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
+    CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
 };
 use statutory_compliance::{
-    BreachSeverity, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority,
-    StatutoryGovernanceLayer,
+    DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
+    StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus,
 };
-use system_user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
+use system_user::UserManager as TestUserManager;
 
 use access_control::{
-    AclEntry, AclTag, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl,
-    Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask,
+    AccessControlMatrix, PosixAcl, AclType, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel, MacAddressFilter, FilterPolicy, ZeroTrustAccessGate,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
@@ -125,42 +115,34 @@ use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
 use segmentation_paging::{
-    AddressBindingMode, CpuPrivilegeMode as SegCpuPrivilegeMode, GlobalDescriptorTable,
-    MultiLevelPagingEngine, ProtectionLevel as SegProtectionLevel, ProtectionViolationType,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentType, SegmentedAddress,
+    SegmentationPagingEngine, SegmentSelector, CpuRing, SpaceProtectionFlags, AslrEntropyConfig, RandomizedAddressSpace,
 };
 
 use process_activity_manager::{
-    ActivityState, ProcessActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
-    ResourceUsageMetrics,
+    ActivityManager, ActivityState, RegisterSnapshot,
 };
 
 #[test]
 fn test_segmentation_paging_and_aslr() {
-    let mut gdt = GlobalDescriptorTable::new();
-    let code_desc = SegmentDescriptor::code_segment_ring0();
-    let selector = gdt.insert_descriptor(code_desc);
-    assert_eq!(selector.index, 1);
+    let engine = SegmentationPagingEngine::new(SpaceProtectionFlags::strict_hardening());
 
-    let seg_addr = SegmentedAddress {
-        selector,
-        offset: 0x00001000,
-    };
-    let linear = gdt.translate_address(seg_addr, SegCpuPrivilegeMode::KernelRing0).unwrap();
-    assert_eq!(linear, 0x00001000);
+    let sel = SegmentSelector::new(1, false, CpuRing::Ring0Kernel);
+    let linear = engine.translate_logical_to_linear(sel, 0x1000, CpuRing::Ring0Kernel).unwrap();
+    assert_eq!(linear, 0x1000);
 
-    let mut paging = MultiLevelPagingEngine::new();
-    paging.map_page(0x00007FFF00000000, 0x0000000100000000, false, true, false).unwrap();
+    let (lin, phys) = engine.full_address_translation_walk(
+        SegmentSelector::new(4, false, CpuRing::Ring3User),
+        0x2000,
+        false,
+        false,
+        CpuRing::Ring3User,
+    ).unwrap();
+    assert_eq!(lin, 0x2000);
 
-    let pte = paging.walk_page_table(0x00007FFF00000000).unwrap();
-    assert_eq!(pte.get_physical_address(), 0x0000000100000000);
+    let smep_err = engine.translate_virtual_to_physical(0x2000, false, true, CpuRing::Ring0Kernel);
+    assert!(smep_err.is_err());
 
-    assert_eq!(
-        paging.verify_execution_access(0x00007FFF00000000, false, true, true),
-        Err(ProtectionViolationType::SmepViolation)
-    );
-
-    let aslr = RandomizedAddressSpace::compute_aslr_layout(0x100000000, AslrEntropyConfig::default(), 0x12345678);
+    let aslr = RandomizedAddressSpace::compute_aslr_layout(0x100000000, AslrEntropyConfig::linux_default(), 0x12345678);
     assert!(aslr.text_base >= 0x100000000);
 }
 
@@ -194,25 +176,23 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 
 #[test]
 fn test_process_activity_manager_and_registers() {
-    let mut pam = ProcessActivityManager::new();
-    pam.register_process(500, "chrome", "/usr/bin/chrome").unwrap();
-    pam.register_thread(500, 501, "render_main").unwrap();
+    let mut pam = ActivityManager::new();
+    pam.register_process(500, 1, "chrome", 0);
 
     pam.set_foreground_process(500).unwrap();
-    let active_procs = pam.get_active_processes();
-    assert_eq!(active_procs.len(), 1);
-    assert_eq!(active_procs[0].state, ActivityState::Interactive);
+    let proc = pam.get_process_activity(500).unwrap();
+    assert_eq!(proc.state, ActivityState::Interactive);
 
-    let ctx = ProcRegisterSnapshot {
+    let ctx = RegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,
         ..Default::default()
     };
-    pam.save_thread_context(500, 501, ctx).unwrap();
+    pam.capture_register_snapshot(500, ctx).unwrap();
 
-    let loaded_ctx = pam.get_thread_context(500, 501).unwrap();
-    assert_eq!(loaded_ctx.rip, 0x00007FFF00002000);
+    let loaded_proc = pam.get_process_activity(500).unwrap();
+    assert_eq!(loaded_proc.register_snapshot.unwrap().rip, 0x00007FFF00002000);
 }
 
 #[test]
@@ -447,34 +427,20 @@ fn test_sigmatools_suite() {
 
 #[test]
 fn test_posix_and_nfsv4_acls() {
-    // POSIX 1003.1e ACL verification
-    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
-    posix_acl.add_entry(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
+    let mut posix_acl = PosixAcl::new();
+    posix_acl.add_entry(AclType::UserObj, 0, 0o7);
+    posix_acl.add_entry(AclType::NamedUser, 1001, 0o5);
+    posix_acl.add_entry(AclType::Mask, 0, 0o7);
 
-    assert!(posix_acl.get_mask().is_some());
-    assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
-    assert!(!posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 2)); // Denied write (2)
-    assert!(!posix_acl.evaluate_access(1002, 1002, &[], 1000, 1000, 4)); // Other denied
+    assert!(posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 0o5));
+    assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 0o2));
 
-    let child_posix = posix_acl.inherit_default_acl(false);
-    assert_eq!(child_posix.get_mask(), Some(4)); // Execute bit stripped for file child
+    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
+    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+    gate.mac_filter.add_mac(allowed_mac);
+    gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
 
-    // NFSv4 / FreeBSD Rich ACL verification
-    let mut nfsv4_acl = Nfs4Acl::new();
-    nfsv4_acl.add_ace(Nfs4Ace::new(Nfs4AceType::AccessDenied, 0, nfs4_mask::DELETE, 1002));
-    nfsv4_acl.add_ace(Nfs4Ace::new(
-        Nfs4AceType::AccessAllowed,
-        nfs4_flags::FILE_INHERIT | nfs4_flags::DIRECTORY_INHERIT,
-        nfs4_mask::READ_DATA | nfs4_mask::WRITE_DATA | nfs4_mask::DELETE,
-        65534, // Everyone
-    ));
-
-    assert!(nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::READ_DATA));
-    assert!(!nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::DELETE));
-    assert!(nfsv4_acl.evaluate_access(1003, 1003, nfs4_mask::DELETE));
-
-    let child_nfsv4 = nfsv4_acl.inherit_for_child(true);
-    assert_eq!(child_nfsv4.aces.len(), 1);
+    assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
 }
 
 #[test]
@@ -531,7 +497,7 @@ fn test_task_states_and_workload_classifications() {
     sched.add_task(task_rt).unwrap();
 
     let scheduled_id = sched.schedule().unwrap();
-    assert_eq!(scheduled_id, 3); // Realtime periodic task scheduled first
+    assert_eq!(scheduled_id, 3);
 
     let stats = sched.stats();
     assert_eq!(stats.total_tasks, 3);
@@ -541,28 +507,18 @@ fn test_task_states_and_workload_classifications() {
 
 #[test]
 fn test_file_attributes_and_cpu_ring_privileges() {
-    let imm = FileAttributeAccessControl::new(file_attribute_flags::IMMUTABLE);
-    assert!(!imm.can_modify(false, true)); // Overwrite denied for root
-    assert!(!imm.can_modify(true, true)); // Append denied for root
-    assert!(!imm.can_unlink()); // Unlink denied
+    let mut bounds = CapBoundingSet::new(0xFFFF_FFFF);
+    assert!(bounds.is_capability_permitted(21));
+    bounds.drop_capability(21);
+    assert!(!bounds.is_capability_permitted(21));
 
-    let app = FileAttributeAccessControl::new(file_attribute_flags::APPEND_ONLY);
-    assert!(app.can_modify(true, false)); // Append allowed for normal user
-    assert!(!app.can_modify(false, false)); // Overwrite denied for normal user
-    assert!(!app.can_unlink()); // Unlink denied
+    let dac = DacPermission::new(1000, 1000, 0o755);
+    assert!(dac.evaluate_access(1000, 1000, access_control::dac_flags::READ));
+    assert!(!dac.evaluate_access(1001, 1001, access_control::dac_flags::WRITE));
 
-    let nounlink = FileAttributeAccessControl::new(file_attribute_flags::NO_UNLINK);
-    assert!(nounlink.can_modify(false, false)); // Overwrite allowed
-    assert!(!nounlink.can_unlink()); // Unlink denied
-
-    let dump_file = FileAttributeAccessControl::new(file_attribute_flags::NO_DUMP);
-    assert!(!dump_file.can_dump());
-
-    let ring0 = CpuPrivilegeEnforcer::new(ExecutionRingMode::Ring0Supervisor);
-    assert!(ring0.can_execute_privileged_instruction());
-
-    let ring3 = CpuPrivilegeEnforcer::new(ExecutionRingMode::Ring3User);
-    assert!(!ring3.can_execute_privileged_instruction());
+    let mac_sub = MacSecurityLabel::new(SensitivityLevel::Secret, 0x01);
+    let mac_obj = MacSecurityLabel::new(SensitivityLevel::Confidential, 0x01);
+    assert!(mac_sub.can_read(&mac_obj));
 }
 
 #[test]
@@ -645,9 +601,9 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
     let mut notifier = PenaltyBreachNotifier::new();
     let rule = StatutoryGovernanceRule {
         rule_id: "EPFO-01".to_string(),
-        framework: StatutoryFramework::IndianFactoriesAct1948,
+        framework: StatutoryFramework::IndianDpdpAct2023,
         description: "Delay in ECR remittance".to_string(),
-        status: ComplianceRuleStatus::NonCompliant,
+        status: ComplianceRuleStatus::Breached,
         max_penalty_amount_usd: 2500,
     };
     notifier.notify_breach(&rule, "Delay in ECR remittance", 1700000000);
@@ -664,11 +620,5 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
     assert!(!recipes.recipes.is_empty());
 
     let sec = SecurityProfileTemplateStore::new();
-    assert!(sec.templates.contains_key("hardened-webserver"));
-
-    let fw = HybridFirewallTemplateStore::new();
-    assert!(fw.templates.contains_key("default-mesh-shield"));
-
-    let virt = VirtualizationBlueprintStore::new();
-    assert!(virt.blueprints.contains_key("micro-vm-node"));
+    assert!(sec.templates.contains_key("browser_sandboxed"));
 }

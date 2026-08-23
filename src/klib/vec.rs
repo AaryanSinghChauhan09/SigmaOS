@@ -86,6 +86,28 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn with_capacity(capacity: usize) -> Self {
+        let data = if capacity > 0 {
+            unsafe { alloc(capacity * mem::size_of::<T>()) as *mut T }
+        } else {
+            core::ptr::null_mut()
+        };
+        Vec {
+            data,
+            len: 0,
+            capacity,
+        }
+    }
+
+    pub fn clear(&mut self) {
+        for i in 0..self.len {
+            unsafe {
+                core::ptr::drop_in_place(self.data.add(i));
+            }
+        }
+        self.len = 0;
+    }
+
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {

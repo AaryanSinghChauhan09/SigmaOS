@@ -33,9 +33,11 @@ jobs:
     - name: Build the Docker image
       # Tag image to be built
       # Ensure image tag uses lowercase name as required by Docker
+      if: hashFiles('Dockerfile') != ''
       run: docker build . --file Dockerfile --tag aaryansinghchauhan09/sigmaos:latest
 
     - name: Sysdig Secure Inline Scan
+      if: hashFiles('Dockerfile') != ''
       id: scan
       uses: sysdiglabs/scan-action@v5
       with:
@@ -56,6 +58,6 @@ jobs:
 
     - uses: github/codeql-action/upload-sarif@v3
       #Upload SARIF file
-      if: always()
+      if: always() && steps.scan.outputs.sarifReport != ''
       with:
         sarif_file: ${{ steps.scan.outputs.sarifReport }}

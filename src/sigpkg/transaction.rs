@@ -139,7 +139,7 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::klib::path::PathBuf;
+    use std::path::PathBuf;
 
     #[test]
     fn test_transaction_creation() {

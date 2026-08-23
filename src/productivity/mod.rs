@@ -3,7 +3,9 @@ pub mod gamification;
 pub mod subtitle_editor;
 pub mod sigmadev;
 pub mod mint_competitor;
+pub mod tmux;
 
+pub use tmux::*;
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,

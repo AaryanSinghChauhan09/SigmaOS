@@ -3,7 +3,7 @@ pub mod desktop;
 pub mod shell;
 
 pub use desktop::{
-    RemoteError, RemoteSession, SessionID,
+    RemoteDesktop, RemoteError, RemoteSession, SessionID, InputAuthGate, PqcVideoCipher, SigmaRendezvous,
     SessionState, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
 };
 pub use shell::{

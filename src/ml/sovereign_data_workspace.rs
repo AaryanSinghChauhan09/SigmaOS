@@ -316,6 +316,9 @@ pub struct SchemaMetadata {
 }
 
 /// Unified Metadata Management Layer over Memory-Mapped Merkle Tables
+#[derive(Debug, Clone, Default)]
+pub struct SovereignML;
+
 pub struct SovereignCatalog {
     pub dataset_registry: BTreeMap<String, SchemaMetadata>,
 }

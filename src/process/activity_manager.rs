@@ -64,6 +64,29 @@ pub struct AddressSpaceBinding {
     pub bound_libraries: Vec<String>,
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ApplicationPerformanceProfile {
+    pub latency_score: f32,
+    pub throughput_score: f32,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ProcessPledgePromises {
+    pub promises: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ProcessResourceLimits {
+    pub max_memory: usize,
+    pub max_fds: usize,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PsiMetrics {
+    pub some_avg10: f32,
+    pub full_avg10: f32,
+}
+
 /// Process activity metric record
 #[derive(Debug, Clone)]
 pub struct ProcessActivityRecord {

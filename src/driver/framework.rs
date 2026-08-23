@@ -91,28 +91,28 @@ pub trait InputDriver: Driver {
 
 // Concrete Driver Classes (OOP Implementation)
 
-pub struct SimpleStorageDriver {
+pub struct SimpleDriver {
     pub id: DriverID,
     pub driver_type: DriverType,
     pub state: AtomicUsize,
 }
 
-impl SimpleStorageDriver {
-    pub fn new(id: DriverID) -> Self {
-        SimpleStorageDriver {
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver {
             id,
-            driver_type: DriverType::Storage,
+            driver_type,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
 }
 
-impl Driver for SimpleStorageDriver {
+impl Driver for SimpleDriver {
     fn id(&self) -> DriverID {
         self.id
     }
     fn driver_type(&self) -> DriverType {
-        DriverType::Storage
+        self.driver_type
     }
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
@@ -126,6 +126,8 @@ impl Driver for SimpleStorageDriver {
         Ok(())
     }
 }
+
+pub type SimpleStorageDriver = SimpleDriver;
 
 pub trait DriverFramework {
     fn register_driver(&mut self, driver: Box<dyn Driver>) -> Result<DriverID, DriverError>;
@@ -349,7 +351,7 @@ mod tests {
     #[test]
     fn test_simple_driver_framework() {
         let mut framework = SimpleDriverFramework::new();
-        let driver = Box::new(SimpleStorageDriver::new(100));
+        let driver = Box::new(SimpleStorageDriver::new(100, DriverType::Storage));
 
         assert!(framework.register_driver(driver).is_ok());
         assert!(framework.load_driver(100).is_ok());

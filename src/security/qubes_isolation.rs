@@ -2,6 +2,8 @@
 // Enables ultra-lightweight, compartmentalized zero-trust secure domains (MicroVMs)
 // Running natively in user-space with microsecond-level IPC latencies and hypervisor isolation.
 
+extern crate alloc;
+
 #[cfg(not(test))]
 use crate::security::CapabilityToken;
 
@@ -257,7 +259,8 @@ pub struct SQrexecChannel {
 
 impl SQrexecChannel {
     pub fn new(size: usize) -> Self {
-        let buffer = unsafe { alloc(size) };
+        let layout = core::alloc::Layout::from_size_align(size.max(1), 8).unwrap();
+        let buffer = unsafe { alloc::alloc::alloc(layout) };
         Self {
             buffer,
             size,
@@ -300,7 +303,8 @@ impl SQrexecChannel {
         unsafe {
             // Memory scrubbing: securely zero out shared memory pages before releasing to prevent side-channel leaks
             core::ptr::write_bytes(self.buffer, 0, self.size);
-            free(self.buffer);
+            let layout = core::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
+            alloc::alloc::dealloc(self.buffer, layout);
         }
     }
 }

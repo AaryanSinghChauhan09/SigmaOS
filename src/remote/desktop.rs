@@ -166,6 +166,15 @@ pub trait ScreenSharing {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct InputAuthGate;
+
+#[derive(Debug, Clone, Default)]
+pub struct PqcVideoCipher;
+
+#[derive(Debug, Clone, Default)]
+pub struct SigmaRendezvous;
+
 pub struct SimpleScreenSharing {
     pub sharing: AtomicUsize,
 }

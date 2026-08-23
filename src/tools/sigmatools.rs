@@ -987,6 +987,28 @@ impl SovereignIPCalculator {
 /// Creates robust secure passphrases with custom sets of symbols and lengths
 pub struct SovereignPasswordGenerator;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnsiColor {
+    Black, Red, Green, Yellow, Blue, Magenta, Cyan, White, Reset,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct AnsiTextCompositor;
+
+#[derive(Debug, Clone, Default)]
+pub struct CliCommandTool;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TerminalError {
+    BufferFull,
+    InvalidAnsiSequence,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct TerminalLineBuffer {
+    pub buffer: String,
+}
+
 impl SovereignPasswordGenerator {
     pub fn generate_secure_password(&self, length: usize, include_symbols: bool) -> String {
         let mut password = String::new();
