@@ -65,6 +65,79 @@ fn test_sovereign_ostree_and_io_uring_inspection() {
 }
 
 #[test]
+fn test_openbsd_pledge_unveil_sentinel_inspection() {
+    let mut sentinel = OpenBsdPledgeUnveilSentinel::new();
+    assert!(sentinel.pledge_process(101, &["stdio", "rpath"]).is_ok());
+    assert!(sentinel.unveil_process(101, "/usr/share", "r").is_ok());
+
+    assert!(sentinel.audit_syscall(101, 100, "rpath", Some("/usr/share/doc")));
+    assert!(!sentinel.audit_syscall(101, 101, "wpath", Some("/usr/share/doc")));
+    assert_eq!(sentinel.audit_log.len(), 1);
+}
+
+#[test]
+fn test_ebpf_verification_and_interpreter_inspection() {
+    let mut engine = SovereignEbpfEngine::new(64);
+    let instrs = vec![
+        EbpfInstruction {
+            opcode: EbpfOpcode::Add,
+            dst: 1,
+            src: 0,
+            offset: 0,
+            imm: 15,
+            use_imm: true,
+        },
+        EbpfInstruction {
+            opcode: EbpfOpcode::Add,
+            dst: 0,
+            src: 1,
+            offset: 0,
+            imm: 0,
+            use_imm: false,
+        },
+        EbpfInstruction {
+            opcode: EbpfOpcode::Exit,
+            dst: 0,
+            src: 0,
+            offset: 0,
+            imm: 0,
+            use_imm: false,
+        },
+    ];
+
+    assert_eq!(engine.execute(&instrs).unwrap(), 15);
+}
+
+#[test]
+fn test_nix_store_gc_and_dedup_inspection() {
+    let mut store = NixStyleStore::new("/sigma/store".to_string());
+    let path1 = store.register_path(b"core-lib", Vec::new());
+    let path2 = store.register_path(b"cli-app", vec![path1.clone()]);
+    let path3 = store.register_path(b"unused-dep", Vec::new());
+
+    store.add_gc_root(path2.clone());
+    let collected = store.garbage_collect();
+
+    assert!(collected.contains(&path3));
+    assert!(!collected.contains(&path1));
+    assert!(!collected.contains(&path2));
+}
+
+#[test]
+fn test_gentoo_use_flags_and_conflicts_inspection() {
+    let mut pm = GentooUseFlagsManager::new();
+    pm.set_global_flags(&["ssl", "nls", "wayland"]);
+    pm.set_package_override("gui-libs/gtk", &["-x11", "opengl"]);
+
+    assert!(pm.is_flag_enabled("gui-libs/gtk", "wayland"));
+    assert!(!pm.is_flag_enabled("gui-libs/gtk", "x11"));
+    assert!(pm.is_flag_enabled("gui-libs/gtk", "opengl"));
+
+    let reqs = vec!["opengl", "!x11"];
+    assert!(pm.verify_requirements("gui-libs/gtk", &reqs).is_ok());
+}
+
+#[test]
 fn test_sovereign_landlock_and_runit_inspection() {
     let mut landlock = SovereignLandlockLsm::new();
     assert!(landlock.add_rule("/etc/sigma/config", LandlockAccess::ReadOnly).is_ok());

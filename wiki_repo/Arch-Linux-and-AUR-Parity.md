@@ -8,9 +8,9 @@ SigmaOS includes a zero-dependency, clean-room subsystem providing comprehensive
 
 ## Key Modules
 
-- [`src/sigpkg/arch_compat.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/sigpkg/arch_compat.rs): PKGBUILD parser, dependency graph builder, and `makepkg` environment simulation.
-- [`src/sigpkg/mod.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/sigpkg/mod.rs): Unified package orchestrator integrating native `.spkg`, Arch `.pkg.tar.zst`, and Debian `.deb`.
-- [`src/sigpkg/portage.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/sigpkg/portage.rs): Source-based build and optimization system.
+- [`src/sigpkg/arch_compat.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/arch_compat.rs): PKGBUILD parser, dependency graph builder, and `makepkg` environment simulation.
+- [`src/sigpkg/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/mod.rs): Unified package orchestrator integrating native `.spkg`, Arch `.pkg.tar.zst`, and Debian `.deb`.
+- [`src/sigpkg/portage.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/portage.rs): Source-based build and optimization system.
 
 ---
 

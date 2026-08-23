@@ -95,6 +95,7 @@ pub enum PackagePriority {
     Optional,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
     Deb,      // apt
     Rpm,      // yum
@@ -232,7 +233,7 @@ impl PackageAdapter {
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "[{}] Purging DEB package {}",
-            self.adapter_name(),
+            self.adapter_name,
             package.name
         );
         Ok(())
@@ -241,7 +242,7 @@ impl PackageAdapter {
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "[{}] Refreshing and updating DEB package {}",
-            self.adapter_name(),
+            self.adapter_name,
             package.name
         );
         Ok(())
@@ -294,13 +295,12 @@ impl PackageFormatAdapter for AptDebAdapter {
             return Err("Invalid DEB manifest");
         }
 
-        Ok(UnifiedPackage::new(
-            &name,
-            &version,
-            PackageFormat::Deb,
-            dependencies,
-            vec!["/usr/bin/".to_string() + &name],
-        ))
+        let mut pkg = UnifiedPackage::new(name.clone(), version.clone())
+            .with_format(PackageFormat::Deb);
+        for dep in dependencies {
+            pkg = pkg.with_dependency(dep);
+        }
+        Ok(pkg)
     }
 
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
@@ -334,7 +334,7 @@ impl PackageFormatAdapter for YumRpmAdapter {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Removing {} using {} adapter",
-            package.name, self.adapter_name
+            package.name, self.adapter_name()
         );
         // Simulate removal
         Ok(())
@@ -384,7 +384,7 @@ impl PackageFormatAdapter for PacmanAdapter {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
-            package.name, self.adapter_name
+            package.name, self.adapter_name()
         );
         Ok(())
     }
@@ -735,7 +735,8 @@ pub struct TransactionalHistory {
 impl TransactionalHistory {
     pub fn new() -> Self {
         Self {
-            cache: HashMap::new(),
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 1,
         }
     }
 
@@ -800,17 +801,17 @@ impl UniversalPackageManager {
 
     fn add_default_adapters(&mut self) {
         self.adapters
-            .insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
+            .insert(PackageFormat::Deb, PackageAdapter::new(PackageFormat::Deb, String::from("AptDeb")));
         self.adapters
-            .insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
+            .insert(PackageFormat::Rpm, PackageAdapter::new(PackageFormat::Rpm, String::from("YumRpm")));
         self.adapters
-            .insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
+            .insert(PackageFormat::Pacman, PackageAdapter::new(PackageFormat::Pacman, String::from("Pacman")));
         self.adapters
-            .insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
+            .insert(PackageFormat::Snap, PackageAdapter::new(PackageFormat::Snap, String::from("Snap")));
         self.adapters
-            .insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
+            .insert(PackageFormat::Flatpak, PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")));
         self.adapters
-            .insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
+            .insert(PackageFormat::SigmaPkg, PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -970,7 +971,7 @@ pub enum FeatureType {
     Source,
 }
 
-pub trait PackageAdapter {
+pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
 }
 
