@@ -99,41 +99,6 @@ impl Default for CommunityHandbookCatalog {
     }
 }
 
-pub struct HybridFirewallTemplateStore {
-    pub templates: HashMap<String, String>,
-}
-
-impl HybridFirewallTemplateStore {
-    pub fn new() -> Self {
-        let mut store = Self { templates: HashMap::new() };
-        store.templates.insert("default-mesh-shield".to_string(), "table inet filter { chain input { type filter hook input priority 0; policy drop; } }".to_string());
-        store
-    }
-}
-
-impl Default for HybridFirewallTemplateStore {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct VirtualizationBlueprintStore {
-    pub blueprints: HashMap<String, String>,
-}
-
-impl VirtualizationBlueprintStore {
-    pub fn new() -> Self {
-        let mut store = Self { blueprints: HashMap::new() };
-        store.blueprints.insert("micro-vm-node".to_string(), "virtio-net,virtio-blk,memory=512M,vcpu=2".to_string());
-        store
-    }
-}
-
-impl Default for VirtualizationBlueprintStore {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Recipe source format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

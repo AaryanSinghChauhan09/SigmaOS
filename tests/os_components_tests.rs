@@ -50,106 +50,14 @@ mod access_control;
 
 pub enum AclTag { User(u32), Group(u32), Other }
 
-pub enum CpuRing { Ring0, Ring3 }
-pub struct CpuPrivilegeEnforcer { pub mode: ExecutionRingMode }
-impl CpuPrivilegeEnforcer {
-    pub fn new(mode: ExecutionRingMode) -> Self { Self { mode } }
-    pub fn can_execute_privileged_instruction(&self) -> bool {
-        matches!(self.mode, ExecutionRingMode::Ring0Supervisor)
-    }
-}
-pub enum ExecutionRingMode { Ring0Supervisor, Ring3User }
-pub struct FileAttributeAccessControl { pub flags: u32 }
-impl FileAttributeAccessControl {
-    pub fn new(flags: u32) -> Self { Self { flags } }
-    pub fn can_unlink(&self) -> bool { !(self.flags == file_attribute_flags::IMMUTABLE || self.flags == file_attribute_flags::APPEND_ONLY || self.flags == file_attribute_flags::NO_UNLINK) }
-    pub fn can_dump(&self) -> bool { self.flags != file_attribute_flags::NO_DUMP }
-    pub fn can_modify(&self, append: bool, _root: bool) -> bool {
-        if self.flags == file_attribute_flags::IMMUTABLE {
-            false
-        } else if self.flags == file_attribute_flags::APPEND_ONLY {
-            append
-        } else {
-            true
-        }
-    }
-}
-
-
-
-pub struct Nfs4Ace { pub ace_type: Nfs4AceType, pub flags: u32, pub mask: u32, pub who: u32 }
-impl Nfs4Ace {
-    pub fn new(ace_type: Nfs4AceType, flags: u32, mask: u32, who: u32) -> Self {
-        Self { ace_type, flags, mask, who }
-    }
-}
-pub enum Nfs4AceType { AccessAllowed, AccessDenied }
-pub struct Nfs4Acl { pub aces: Vec<Nfs4Ace> }
-impl Nfs4Acl {
-    pub fn new() -> Self { Self { aces: Vec::new() } }
-    pub fn add_ace(&mut self, ace: Nfs4Ace) { self.aces.push(ace); }
-    pub fn evaluate_access(&self, _user: u32, _group: u32, mask: u32) -> bool {
-        if mask == nfs4_mask::DELETE { false } else { true }
-    }
-    pub fn inherit_for_child(&self, _is_dir: bool) -> Self {
-        let mut child = Self::new();
-        child.add_ace(Nfs4Ace::new(Nfs4AceType::AccessAllowed, 0, 0, 0));
-        child
-    }
-}
-pub mod file_attribute_flags { pub const IMMUTABLE: u32 = 1; pub const APPEND_ONLY: u32 = 2; pub const NO_UNLINK: u32 = 4; pub const NO_DUMP: u32 = 8; }
-pub mod nfs4_flags { pub const FILE_INHERIT: u32 = 1; pub const DIRECTORY_INHERIT: u32 = 2; }
-pub mod nfs4_mask { pub const READ_DATA: u32 = 1; pub const WRITE_DATA: u32 = 2; pub const DELETE: u32 = 4; }
-
-impl PosixAcl {
-    pub fn from_mode(_uid: u32, _gid: u32, _mode: u32) -> Self {
-        Self::new()
-    }
-    pub fn get_mask(&self) -> Option<u32> { Some(4) }
-    pub fn evaluate_access(&self, _u1: u32, _u2: u32, _groups: &[u32], _o1: u32, _o2: u32, mode: u32) -> bool {
-        if mode == 2 || mode == 4 { false } else { true }
-    }
-    pub fn inherit_default_acl(&self, _is_dir: bool) -> Self { Self::new() }
-}
-
-impl AclEntry {
-    pub fn new(_tag: AclTag, _bits: u32) -> Self {
-        AclEntry { acl_type: AclType::UserObj, qualifier_id: 0, perm_bits: 0 }
-    }
-}
-
-
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
 
 pub enum BreachSeverity { Minor, Major, Critical }
 pub enum StatutoryAuthority { Gdpr, Hipaa, ISO27001 }
 
-
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
-
-pub struct HybridFirewallTemplateStore {
-    pub templates: std::collections::HashMap<String, String>,
-}
-impl HybridFirewallTemplateStore {
-    pub fn new() -> Self {
-        let mut templates = std::collections::HashMap::new();
-        templates.insert("default-mesh-shield".to_string(), "rules".to_string());
-        Self { templates }
-    }
-}
-
-pub struct VirtualizationBlueprintStore {
-    pub blueprints: std::collections::HashMap<String, String>,
-}
-impl VirtualizationBlueprintStore {
-    pub fn new() -> Self {
-        let mut blueprints = std::collections::HashMap::new();
-        blueprints.insert("micro-vm-node".to_string(), "blueprint".to_string());
-        Self { blueprints }
-    }
-}
 
 
 #[path = "../src/system/user.rs"]
@@ -165,7 +73,7 @@ pub enum CpuPrivilegeMode { KernelRing0, UserRing3 }
 pub struct GlobalDescriptorTable;
 impl GlobalDescriptorTable {
     pub fn new() -> Self { Self }
-    pub fn insert_descriptor(&mut self, _desc: SegmentDescriptor) -> SegmentSelector {
+    pub fn insert_descriptor(&mut self, _desc: segmentation_paging::SegmentDescriptor) -> SegmentSelector {
         SegmentSelector { index: 1, rpl: segmentation_paging::CpuRing::Ring0Kernel, is_ldt: false }
     }
     pub fn translate_address(&self, seg_addr: SegmentedAddress, _mode: CpuPrivilegeMode) -> Result<u64, &'static str> {
@@ -313,7 +221,7 @@ fn test_process_activity_manager_and_registers() {
     let proc = pam.get_process_activity(500).unwrap();
     assert_eq!(proc.state, ActivityState::Interactive);
 
-    let ctx = ProcRegisterSnapshot {
+    let ctx = RegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,

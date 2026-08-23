@@ -87,39 +87,6 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 ---
 
-## 📋 SigmaOS Components
-
-See the **[Components Table](COMPONENTS-TABLE)** for a full list of all 102+ OS components with module paths, descriptions, and statuses.
-
----
-
-## 🐧 Linux Distro Inspirations
-
-SigmaOS implements ideas from 10+ Linux distributions. See **[Linux Distro Ideas & Inspirations](LINUX-DISTRO-IDEAS-AND-INSPIRATIONS)** for a complete breakdown.
-
----
-
-## 📝 Branch & PR History
-
-- **[Pull Requests and Merge History](Pull-Requests-and-Merge-History)** — Full history of all merged PRs
-- **[Branch Consolidation Phase 6 (2026-08-23)](Branch-Consolidation-August-2026-Phase6)** — Latest consolidation report
-
----
-
-## 🔗 Key Wiki Pages
-
-| Category | Pages |
-|----------|-------|
-| **Architecture** | [Kernel Architecture](Kernel-Architecture), [Cross-Platform HAL](Cross-Platform-Kernel-HAL), [Zero-Dependency Subsystems](Zero-Dependency-Subsystems) |
-| **Security** | [Security Architecture](Security-Architecture), [Post-Quantum Crypto](Post-Quantum-Cryptography-and-TLS-1.3), [Sovereign Cryptography](Sovereign-Cryptography-Guide) |
-| **Package Mgmt** | [Package Manager](Package-Manager), [Arch Linux Parity](Arch-Linux-and-AUR-Parity), [Portage/Gentoo](Portage-and-Gentoo-Clean-Room) |
-| **Distro Parity** | [AntiX Linux](antiX-Linux-Compatibility-Parity), [BSD Inspirations](BSD-Inspirations-and-Parity), [CachyOS BORE](CachyOS-BORE-Scheduler-Architecture) |
-| **Performance** | [Performance Guide](PERFORMANCE_OPTIMIZATION_GUIDE), [Resource Management](Resource-Management-and-Cgroups), [Hardware GPU](Hardware-Acceleration-and-GPU) |
-| **Development** | [Driver Guide](Driver-Development-Guide), [KMS/USB Architecture](KMS-and-USB-HCD-Driver-Architecture) |
-| **Repository** | [Components Table](COMPONENTS-TABLE), [PR History](Pull-Requests-and-Merge-History), [Linux Ideas](LINUX-DISTRO-IDEAS-AND-INSPIRATIONS) |
-
----
-
 ## 🤝 Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

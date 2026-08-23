@@ -535,12 +535,107 @@ pub struct KvmVcpuRegisters {
     pub rflags: u64,
 }
 
+/// KVM dirty page tracking ring (KVM_GET_DIRTY_LOG parity)
+pub struct KvmDirtyRing {
+    pub ring_size: u32,
+    pub dirty_bitmap: Vec<u64>,
+}
+
+impl KvmDirtyRing {
+    pub fn new(ring_size: u32) -> Self {
+        let entries = (ring_size as usize).div_ceil(64);
+        Self {
+            ring_size,
+            dirty_bitmap: vec![0; entries],
+        }
+    }
+
+    pub fn mark_page_dirty(&mut self, page_index: u64) {
+        let entry_idx = (page_index / 64) as usize;
+        let bit_offset = page_index % 64;
+        if entry_idx < self.dirty_bitmap.len() {
+            self.dirty_bitmap[entry_idx] |= 1 << bit_offset;
+        }
+    }
+
+    pub fn is_page_dirty(&self, page_index: u64) -> bool {
+        let entry_idx = (page_index / 64) as usize;
+        let bit_offset = page_index % 64;
+        if entry_idx < self.dirty_bitmap.len() {
+            (self.dirty_bitmap[entry_idx] & (1 << bit_offset)) != 0
+        } else {
+            false
+        }
+    }
+
+    pub fn clear(&mut self) {
+        for entry in self.dirty_bitmap.iter_mut() {
+            *entry = 0;
+        }
+    }
+}
+
+/// VirtIO Block / Net ring queue buffer descriptor
+#[derive(Debug, Clone, Default)]
+pub struct VirtioQueueDescriptor {
+    pub addr: u64,
+    pub len: u32,
+    pub flags: u16,
+    pub next: u16,
+}
+
+/// VirtIO split virtqueue implementation
+pub struct VirtioVirtqueue {
+    pub queue_size: u16,
+    pub descriptors: Vec<VirtioQueueDescriptor>,
+    pub avail_idx: u16,
+    pub used_idx: u16,
+}
+
+impl VirtioVirtqueue {
+    pub fn new(queue_size: u16) -> Self {
+        Self {
+            queue_size,
+            descriptors: vec![VirtioQueueDescriptor::default(); queue_size as usize],
+            avail_idx: 0,
+            used_idx: 0,
+        }
+    }
+
+    pub fn submit_descriptor(&mut self, desc_id: u16, addr: u64, len: u32, flags: u16) -> Result<(), &'static str> {
+        if desc_id >= self.queue_size {
+            return Err("Descriptor ID out of queue bounds");
+        }
+        self.descriptors[desc_id as usize] = VirtioQueueDescriptor {
+            addr,
+            len,
+            flags,
+            next: 0,
+        };
+        self.avail_idx = self.avail_idx.wrapping_add(1);
+        Ok(())
+    }
+
+    pub fn complete_descriptor(&mut self) {
+        self.used_idx = self.used_idx.wrapping_add(1);
+    }
+}
+
+/// vCPU state snapshot for QEMU/KVM live migration
+#[derive(Debug, Clone, Default)]
+pub struct VcpuMigrationSnapshot {
+    pub vcpu_id: u32,
+    pub registers: KvmVcpuRegisters,
+    pub dirty_pages_count: usize,
+}
+
 /// KVM-inspired virtual CPU core context
 pub struct KvmVirtualCpu {
     pub vcpu_id: u32,
     pub registers: KvmVcpuRegisters,
     pub pending_irqs: Vec<u32>,
     pub exit_reason: KvmExitReason,
+    pub dirty_ring: KvmDirtyRing,
 }
 
 impl KvmVirtualCpu {
@@ -550,6 +645,7 @@ impl KvmVirtualCpu {
             registers: KvmVcpuRegisters::default(),
             pending_irqs: Vec::new(),
             exit_reason: KvmExitReason::Hlt,
+            dirty_ring: KvmDirtyRing::new(1024),
         }
     }
 
@@ -568,18 +664,93 @@ impl KvmVirtualCpu {
     pub fn inject_interrupt(&mut self, irq: u32) {
         self.pending_irqs.push(irq);
     }
+
+    /// Save state snapshot for live migration
+    pub fn save_migration_state(&self) -> VcpuMigrationSnapshot {
+        let dirty_count = self.dirty_ring.dirty_bitmap.iter().map(|b| b.count_ones() as usize).sum();
+        VcpuMigrationSnapshot {
+            vcpu_id: self.vcpu_id,
+            registers: self.registers.clone(),
+            dirty_pages_count: dirty_count,
+        }
+    }
+
+    /// Restore state snapshot from live migration
+    pub fn restore_migration_state(&mut self, snapshot: VcpuMigrationSnapshot) {
+        self.vcpu_id = snapshot.vcpu_id;
+        self.registers = snapshot.registers;
+    }
+}
+
+/// KVM ioctl command numbers
+pub mod kvm_ioctl {
+    pub const KVM_GET_API_VERSION: u64 = 0xAE00;
+    pub const KVM_CREATE_VM: u64 = 0xAE01;
+    pub const KVM_CREATE_VCPU: u64 = 0xAE41;
+    pub const KVM_RUN: u64 = 0xAE80;
+    pub const KVM_SET_USER_MEMORY_REGION: u64 = 0x4020AE46;
+    pub const KVM_GET_DIRTY_LOG: u64 = 0x4010AE42;
+}
+
+/// KVM Ioctl Emulation Dispatcher
+pub struct KvmIoctlDispatcher {
+    pub api_version: u32,
+    pub created_vcpus: Vec<u32>,
+    pub user_memory_regions: HashMap<u32, u64>,
+}
+
+impl KvmIoctlDispatcher {
+    pub fn new() -> Self {
+        Self {
+            api_version: 12, // Standard KVM API version
+            created_vcpus: Vec::new(),
+            user_memory_regions: HashMap::new(),
+        }
+    }
+
+    pub fn dispatch_ioctl(&mut self, cmd: u64, arg: u64) -> Result<i64, VmError> {
+        match cmd {
+            kvm_ioctl::KVM_GET_API_VERSION => Ok(self.api_version as i64),
+            kvm_ioctl::KVM_CREATE_VM => Ok(0), // Returns VM fd
+            kvm_ioctl::KVM_CREATE_VCPU => {
+                let vcpu_id = arg as u32;
+                self.created_vcpus.push(vcpu_id);
+                Ok(vcpu_id as i64)
+            }
+            kvm_ioctl::KVM_RUN => Ok(0),
+            kvm_ioctl::KVM_SET_USER_MEMORY_REGION => {
+                let slot = (arg & 0xFFFF) as u32;
+                let size = arg >> 16;
+                self.user_memory_regions.insert(slot, size);
+                Ok(0)
+            }
+            _ => Err(VmError::FeatureNotSupported(format!("Ioctl command 0x{:X}", cmd))),
+        }
+    }
+}
+
+impl Default for KvmIoctlDispatcher {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// QEMU Monitor Protocol (QMP) command engine for live VM management
 pub struct QemuMonitorEngine {
     pub command_history: Vec<String>,
+    pub event_subscribers: Vec<String>,
 }
 
 impl QemuMonitorEngine {
     pub fn new() -> Self {
         Self {
             command_history: Vec::new(),
+            event_subscribers: Vec::new(),
         }
+    }
+
+    pub fn subscribe_event(&mut self, event_name: &str) {
+        self.event_subscribers.push(event_name.to_string());
     }
 
     /// Parse and execute JSON-like QMP management command
@@ -989,6 +1160,20 @@ mod tests {
         vcpu.inject_interrupt(32);
         let irq_exit = vcpu.run_vcpu();
         assert_eq!(irq_exit, KvmExitReason::Interrupt);
+
+        // KVM dirty page tracking test
+        assert!(!vcpu.dirty_ring.is_page_dirty(12));
+        vcpu.dirty_ring.mark_page_dirty(12);
+        assert!(vcpu.dirty_ring.is_page_dirty(12));
+        vcpu.dirty_ring.clear();
+        assert!(!vcpu.dirty_ring.is_page_dirty(12));
+
+        // VirtIO virtqueue test
+        let mut vq = VirtioVirtqueue::new(256);
+        assert!(vq.submit_descriptor(0, 0x1000_0000, 4096, 0).is_ok());
+        assert_eq!(vq.avail_idx, 1);
+        vq.complete_descriptor();
+        assert_eq!(vq.used_idx, 1);
     }
 
     #[test]
