@@ -654,4 +654,65 @@ mod tests {
         assert_eq!(partial_score, 75);
         assert!(!dashboard.iso27001_compliant);
     }
+
+    #[test]
+    fn test_sigma_sovereign_copilot() {
+        let mut copilot = SigmaSovereignCopilot::new();
+        copilot.set_persona_memory("theme", "cyber");
+        assert_eq!(copilot.get_persona_memory("theme"), Some(&"cyber".to_string()));
+
+        let cmd = copilot.dispatch_gui_cli_command("sigma-agent gui theme cyber").unwrap();
+        assert!(cmd.contains("Updated Zenith GUI theme"));
+    }
+}
+
+/// Sigma Sovereign Copilot - Sovereign CLI-First Agent for Zenith Desktop GUI
+pub struct SigmaSovereignCopilot {
+    pub l3_persona_memory: BTreeMap<String, String>,
+    pub active_theme: String,
+    pub active_layout: String,
+}
+
+impl SigmaSovereignCopilot {
+    pub fn new() -> Self {
+        let mut mem = BTreeMap::new();
+        mem.insert("theme".to_string(), "obsidian".to_string());
+        mem.insert("layout".to_string(), "mosaic".to_string());
+
+        Self {
+            l3_persona_memory: mem,
+            active_theme: "obsidian".to_string(),
+            active_layout: "mosaic".to_string(),
+        }
+    }
+
+    pub fn set_persona_memory(&mut self, key: &str, value: &str) {
+        self.l3_persona_memory.insert(key.to_string(), value.to_string());
+    }
+
+    pub fn get_persona_memory(&self, key: &str) -> Option<&String> {
+        self.l3_persona_memory.get(key)
+    }
+
+    pub fn dispatch_gui_cli_command(&mut self, cli_cmd: &str) -> Result<String, &'static str> {
+        if cli_cmd.starts_with("sigma-agent gui theme ") {
+            let theme = &cli_cmd[22..];
+            self.active_theme = theme.to_string();
+            self.set_persona_memory("theme", theme);
+            Ok(format!("Updated Zenith GUI theme to '{}'", theme))
+        } else if cli_cmd.starts_with("sigma-agent gui layout ") {
+            let layout = &cli_cmd[23..];
+            self.active_layout = layout.to_string();
+            self.set_persona_memory("layout", layout);
+            Ok(format!("Updated Zenith GUI layout to '{}'", layout))
+        } else {
+            Ok(format!("Executed Zenith CLI action: '{}'", cli_cmd))
+        }
+    }
+}
+
+impl Default for SigmaSovereignCopilot {
+    fn default() -> Self {
+        Self::new()
+    }
 }
