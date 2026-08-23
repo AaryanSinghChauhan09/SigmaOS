@@ -2,7 +2,8 @@
 //! Haiku OS (app_server UI responsiveness), Redox OS (Microkernel Scheme IPC Grants),
 //! illumos/ZFS (Adaptive Replacement Cache - ARC), and Plan 9 (9P2000.u GPU device sharing).
 
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 
 /// 1. Haiku OS app_server Window Damage & UI Priority Booster
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -202,7 +203,7 @@ impl IllumosZfsArcCache {
 
         // Evict if over capacity
         if self.mru_list.len() + self.mfu_list.len() >= self.target_capacity {
-            if self.mru_list.len() > self.p_mru_target && !self.mru_list.is_empty() {
+            if self.mru_list.len() >= self.p_mru_target && !self.mru_list.is_empty() {
                 let evicted = self.mru_list.remove(0);
                 self.mru_ghost.push(evicted.block_id);
             } else if !self.mfu_list.is_empty() {

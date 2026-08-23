@@ -1,10 +1,5 @@
-#[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
-#[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
-
-#![no_std]
-#![no_main]
+extern crate alloc;
+use alloc::boxed::Box;
 
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
@@ -229,8 +224,19 @@ impl Shell for SimpleShell {
         }
         
         // 1. Resolve Command Aliases (udev/bash inspiration)
-        let resolved_cmd_name = if let Some(alias_target) = self.get_alias(args[0]) {
-            alias_target
+        let mut target_buf = [0u8; 128];
+        let mut target_len = 0;
+        let is_aliased = if let Some(alias_target) = self.get_alias(args[0]) {
+            let len = alias_target.len().min(127);
+            target_buf[..len].copy_from_slice(&alias_target[..len]);
+            target_len = len;
+            true
+        } else {
+            false
+        };
+
+        let resolved_cmd_name: &[u8] = if is_aliased {
+            &target_buf[..target_len]
         } else {
             args[0]
         };
@@ -249,7 +255,7 @@ impl Shell for SimpleShell {
             }
         }
 
-        let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
+        let cmd_args: Vec<&[u8]> = expanded_args.clone();
         
         for cmd_option in &mut self.commands {
             if let Some(ref mut cmd) = *cmd_option {
@@ -319,11 +325,7 @@ impl ShellHistory for SimpleShellHistory {
         Some(&self.history[index][..len])
     }
     
-    fn get_last(&self) -> Option<&[u8]>;
-}
-
-impl SimpleShellHistory {
-    fn get_last_impl(&self) -> Option<&[u8]> {
+    fn get_last(&self) -> Option<&[u8]> {
         if self.history.is_empty() {
             return None;
         }
@@ -332,9 +334,93 @@ impl SimpleShellHistory {
     }
 }
 
-impl ShellHistory for SimpleShellHistory {
-    fn get_last(&self) -> Option<&[u8]> {
-        self.get_last_impl()
+/// Fish Shell Inspired Auto-Suggestion Engine
+pub struct ShellAutoSuggestEngine {
+    pub suggestions: Vec<[u8; 128]>,
+    pub suggestion_lens: Vec<usize>,
+}
+
+impl ShellAutoSuggestEngine {
+    pub fn new() -> Self {
+        ShellAutoSuggestEngine {
+            suggestions: Vec::new(),
+            suggestion_lens: Vec::new(),
+        }
+    }
+
+    pub fn add_candidate(&mut self, suggestion: &[u8]) {
+        let len = suggestion.len().min(127);
+        let mut entry = [0u8; 128];
+        for i in 0..len {
+            entry[i] = suggestion[i];
+        }
+        self.suggestions.push(entry);
+        self.suggestion_lens.push(len);
+    }
+
+    /// Fish-style prefix match suggestion lookup
+    pub fn predict_completion<'a>(&'a self, input_prefix: &[u8]) -> Option<&'a [u8]> {
+        if input_prefix.is_empty() {
+            return None;
+        }
+        for i in 0..self.suggestions.len() {
+            let len = self.suggestion_lens[i];
+            let cand = &self.suggestions[i][..len];
+            if cand.starts_with(input_prefix) {
+                return Some(cand);
+            }
+        }
+        None
+    }
+}
+
+/// OpenBSD Ksh Inspired Pledge & Unveil Sandbox Guard for Subshells
+pub struct ShellPledgeUnveilGuard {
+    pub pledge_mask: u32, // Bitmask: 0x1 (stdio), 0x2 (rpath), 0x4 (wpath), 0x8 (exec), 0x10 (proc)
+}
+
+impl ShellPledgeUnveilGuard {
+    pub fn new(pledge_mask: u32) -> Self {
+        ShellPledgeUnveilGuard { pledge_mask }
+    }
+
+    pub fn is_pledge_permitted(&self, req_flag: u32) -> bool {
+        (self.pledge_mask & req_flag) != 0
+    }
+
+    pub fn restrict_pledge(&mut self, new_mask: u32) -> Result<(), ShellError> {
+        if (new_mask & !self.pledge_mask) != 0 {
+            // Cannot gain privileges
+            return Err(ShellError::PermissionDenied);
+        }
+        self.pledge_mask &= new_mask;
+        Ok(())
+    }
+}
+
+/// Zsh Inspired Colorized Syntax Highlighter Tokenizer
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TokenClass {
+    Command,
+    OptionFlag,
+    Argument,
+    Variable,
+    Unknown,
+}
+
+pub struct ShellSyntaxHighlighter;
+
+impl ShellSyntaxHighlighter {
+    pub fn classify_token(token: &[u8], is_first: bool) -> TokenClass {
+        if is_first {
+            TokenClass::Command
+        } else if token.starts_with(b"-") {
+            TokenClass::OptionFlag
+        } else if token.starts_with(b"$") {
+            TokenClass::Variable
+        } else {
+            TokenClass::Argument
+        }
     }
 }
 
@@ -459,20 +545,22 @@ impl<T> Vec<T> {
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let layout = core::alloc::Layout::array::<T>(new_capacity).unwrap();
+        let new_data = alloc::alloc::alloc(layout) as *mut T;
         if new_data.is_null() {
             panic!("out of memory");
         }
         if !self.data.is_null() {
             for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            if self.capacity > 0 {
+                let old_layout = core::alloc::Layout::array::<T>(self.capacity).unwrap();
+                alloc::alloc::dealloc(self.data as *mut u8, old_layout);
+            }
         }
         self.data = new_data;
         self.capacity = new_capacity;
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 
 impl<T> core::ops::Deref for Vec<T> {
@@ -533,28 +621,27 @@ mod tests {
     fn test_shell_variable_expansion_and_alias_resolution() {
         let mut shell = SimpleShell::new();
 
+        static mut CAPTURED_BUF: [u8; 128] = [0; 128];
+        static mut CAPTURED_LEN: usize = 0;
+
         // 1. Create spy command to capture expanded parameters
-        struct SpyCommand {
-            captured_arg: [u8; 128],
-            captured_len: usize,
-        }
+        struct SpyCommand;
         impl ShellCommand for SpyCommand {
             fn name(&self) -> &[u8] { b"spy" }
             fn help(&self) -> &[u8] { b"spy" }
             fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
                 if !args.is_empty() {
                     let len = args[0].len().min(127);
-                    self.captured_arg[..len].copy_from_slice(&args[0][..len]);
-                    self.captured_len = len;
+                    unsafe {
+                        CAPTURED_BUF[..len].copy_from_slice(&args[0][..len]);
+                        CAPTURED_LEN = len;
+                    }
                 }
                 Ok(())
             }
         }
 
-        let spy = Box::new(SpyCommand {
-            captured_arg: [0; 128],
-            captured_len: 0,
-        });
+        let spy = Box::new(SpyCommand);
 
         // Register spy
         let _ = shell.register_command(spy);
@@ -566,29 +653,56 @@ mod tests {
         shell.execute_line(b"spy $SECRET_KEY").unwrap();
 
         // Inspect captured variable inside spy command
-        if let Some(ref cmd_box) = shell.commands[0] {
-            // Unsafe cast to access captured properties (since we can't downcast Box<dyn ShellCommand>)
-            let spy_ptr = cmd_box as *const Box<dyn ShellCommand> as *const SpyCommand;
-            unsafe {
-                let captured = &(*spy_ptr).captured_arg[..(*spy_ptr).captured_len];
-                assert_eq!(captured, b"sovereign_pass_123");
-            }
+        unsafe {
+            assert_eq!(&CAPTURED_BUF[..CAPTURED_LEN], b"sovereign_pass_123");
         }
 
         // 3. Setup and verify alias resolution
         shell.set_alias(b"reveal", b"spy");
         shell.execute_line(b"reveal $USER").unwrap();
 
-        if let Some(ref cmd_box) = shell.commands[0] {
-            let spy_ptr = cmd_box as *const Box<dyn ShellCommand> as *const SpyCommand;
-            unsafe {
-                let captured = &(*spy_ptr).captured_arg[..(*spy_ptr).captured_len];
-                assert_eq!(captured, b"sovereign");
-            }
+        unsafe {
+            assert_eq!(&CAPTURED_BUF[..CAPTURED_LEN], b"sovereign");
         }
 
         // 4. Remove alias
         shell.unset_alias(b"reveal");
         assert!(shell.execute_line(b"reveal $USER").is_err()); // Command reveal not found
+    }
+
+    #[test]
+    fn test_fish_auto_suggest_engine() {
+        let mut engine = ShellAutoSuggestEngine::new();
+        engine.add_candidate(b"systemctl status nginx");
+        engine.add_candidate(b"sysctl -a");
+
+        assert_eq!(engine.predict_completion(b"system"), Some(b"systemctl status nginx" as &[u8]));
+        assert_eq!(engine.predict_completion(b"sysc"), Some(b"sysctl -a" as &[u8]));
+        assert_eq!(engine.predict_completion(b"unknown"), None);
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_shell_guard() {
+        // Pledge: stdio (0x1) | rpath (0x2) | exec (0x8)
+        let mut guard = ShellPledgeUnveilGuard::new(0x1 | 0x2 | 0x8);
+
+        assert!(guard.is_pledge_permitted(0x1)); // stdio allowed
+        assert!(guard.is_pledge_permitted(0x2)); // rpath allowed
+        assert!(!guard.is_pledge_permitted(0x4)); // wpath not permitted
+
+        // Restrict pledge to stdio | rpath
+        assert!(guard.restrict_pledge(0x1 | 0x2).is_ok());
+        assert!(!guard.is_pledge_permitted(0x8)); // exec dropped
+
+        // Attempting to regain exec (0x8) fails
+        assert!(guard.restrict_pledge(0x1 | 0x8).is_err());
+    }
+
+    #[test]
+    fn test_zsh_syntax_highlighter_tokens() {
+        assert_eq!(ShellSyntaxHighlighter::classify_token(b"grep", true), TokenClass::Command);
+        assert_eq!(ShellSyntaxHighlighter::classify_token(b"-rn", false), TokenClass::OptionFlag);
+        assert_eq!(ShellSyntaxHighlighter::classify_token(b"$HOME", false), TokenClass::Variable);
+        assert_eq!(ShellSyntaxHighlighter::classify_token(b"src/", false), TokenClass::Argument);
     }
 }

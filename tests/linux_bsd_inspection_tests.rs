@@ -11,10 +11,19 @@
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 
+#[path = "../src/virtualization/kvm_vcpu.rs"]
+mod kvm_vcpu;
+
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+
+#[path = "../src/compatibility/gap_closure.rs"]
+mod gap_closure;
+
 use bsd::*;
-use sigmaos::virtualization::kvm_vcpu::{KvmVcpu, KvmExitCode, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
-use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
-use sigmaos::compatibility::gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
+use kvm_vcpu::{KvmVcpu, KvmExitCode, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
+use unveil::{UnveilManager, UnveilPermission};
+use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
