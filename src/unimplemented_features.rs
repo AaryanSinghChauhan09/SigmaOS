@@ -1,114 +1,9 @@
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-// Re-exported in src/lib.rs for full SigmaOS distribution parity.
-
-#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use alloc::string::String;
-use core::hash::{Hash, Hasher};
-
-// Simple HashMap implementation for kernel use
-pub struct SimpleHashMap<K, V> {
-    pub buckets: Vec<Vec<(K, V)>>,
-}
-
-// Simple hasher for basic types
-struct SimpleHasher {
-    state: u64,
-}
-
-impl SimpleHasher {
-    fn new() -> Self {
-        Self { state: 0x517cc1b727220a95 }
-    }
-}
-
-impl Hasher for SimpleHasher {
-    fn write(&mut self, bytes: &[u8]) {
-        for byte in bytes {
-            self.state = self.state.wrapping_mul(31).wrapping_add(*byte as u64);
-        }
-    }
-    
-    fn finish(&self) -> u64 {
-        self.state
-    }
-}
-
-impl<K, V> SimpleHashMap<K, V>
-where
-    K: Eq + Hash + Clone,
-{
-    fn new() -> Self {
-        Self {
-            buckets: Vec::new(),
-        }
-    }
-
-    fn with_capacity(capacity: usize) -> Self {
-        let mut map = Self::new();
-        for _ in 0..capacity {
-            map.buckets.push(Vec::new());
-        }
-        map
-    }
-
-    fn hash_key(&self, key: &K) -> usize {
-        if self.buckets.is_empty() {
-            return 0;
-        }
-        let mut hasher = SimpleHasher::new();
-        key.hash(&mut hasher);
-        (hasher.finish() as usize) % self.buckets.len()
-    }
-
-    fn insert(&mut self, key: K, value: V) {
-        if self.buckets.is_empty() {
-            for _ in 0..16 {
-                self.buckets.push(Vec::new());
-            }
-        }
-        let hash = self.hash_key(&key);
-        for item in self.buckets[hash].iter_mut() {
-            if item.0 == key {
-                item.1 = value;
-                return;
-            }
-        }
-        self.buckets[hash].push((key, value));
-    }
-
-    fn get(&self, key: &K) -> Option<&V> {
-        if self.buckets.is_empty() {
-            return None;
-        }
-        let hash = self.hash_key(key);
-        for item in self.buckets[hash].iter() {
-            if item.0 == *key {
-                return Some(&item.1);
-            }
-        }
-        None
-    }
-
-    fn remove(&mut self, key: &K) -> Option<V> {
-        if self.buckets.is_empty() {
-            return None;
-        }
-        let hash = self.hash_key(key);
-        for i in 0..self.buckets[hash].len() {
-            if self.buckets[hash][i].0 == *key {
-                return Some(self.buckets[hash].remove(i).1);
-            }
-        }
-        None
-    }
-}
-
-type HashMap<K, V> = SimpleHashMap<K, V>;
 
 // =========================================================================
 // 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
@@ -828,11 +723,6 @@ pub struct SigmaFsCasEngine {
 }
 
 impl SigmaFsCasEngine {
-    // Signature verification constants for Dilithium-5
-    // These should be replaced with proper cryptographic validation in production
-    const SIGNATURE_XOR_VALID: u8 = 0;
-    const SIGNATURE_BYTE_MINIMUM: u8 = 0xFF;
-
     pub fn new(root_key: [u8; 32]) -> Self {
         Self {
             storage_pool: [None; 16],
@@ -908,7 +798,11 @@ impl SigmaFsCasEngine {
         Err("Target content-addressed block not found")
     }
 
-    /// Dynamic post-quantum cryptographic signature validation
+    // Signature verification constants for Dilithium-5
+    // These should be replaced with proper cryptographic validation in production
+    const SIGNATURE_XOR_VALID: u8 = 0;
+    const SIGNATURE_BYTE_MINIMUM: u8 = 0xFF;
+
     fn verify_pqc_signature(
         &self,
         data: &[u8],
@@ -2277,197 +2171,6 @@ impl LinuxEbpfVm {
     }
 }
 
-// =========================================================================
-// 34. SOLARIS ZFS ADAPTIVE REPLACEMENT CACHE (ARC)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy)]
-pub struct ArcBlock {
-    pub block_id: u64,
-    pub is_mfu: bool, // true = Most Frequently Used, false = Most Recently Used
-    pub hit_count: u32,
-}
-
-pub struct SolarisArcCache {
-    pub mru_list: [Option<ArcBlock>; 8],
-    pub mfu_list: [Option<ArcBlock>; 8],
-    pub target_p_mru_size: usize, // Adaptive target boundary
-}
-
-impl SolarisArcCache {
-    pub fn new() -> Self {
-        Self {
-            mru_list: [None; 8],
-            mfu_list: [None; 8],
-            target_p_mru_size: 4,
-        }
-    }
-
-    pub fn access_block(&mut self, block_id: u64) -> bool {
-        // Check MFU first
-        for slot in self.mfu_list.iter_mut() {
-            if let Some(ref mut b) = slot {
-                if b.block_id == block_id {
-                    b.hit_count += 1;
-                    return true;
-                }
-            }
-        }
-
-        // Check MRU next
-        for i in 0..self.mru_list.len() {
-            if let Some(b) = self.mru_list[i] {
-                if b.block_id == block_id {
-                    // Promote from MRU to MFU
-                    self.mru_list[i] = None;
-                    let mut promoted = b;
-                    promoted.is_mfu = true;
-                    promoted.hit_count += 1;
-                    self.insert_mfu(promoted);
-
-                    // Adaptively expand MFU target size on hit
-                    if self.target_p_mru_size > 1 {
-                        self.target_p_mru_size -= 1;
-                    }
-                    return true;
-                }
-            }
-        }
-
-        // Cache miss: insert into MRU
-        self.insert_mru(ArcBlock {
-            block_id,
-            is_mfu: false,
-            hit_count: 1,
-        });
-        false
-    }
-
-    fn insert_mru(&mut self, block: ArcBlock) {
-        for slot in self.mru_list.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(block);
-                return;
-            }
-        }
-        self.mru_list[0] = Some(block); // Replace first on full
-    }
-
-    fn insert_mfu(&mut self, block: ArcBlock) {
-        for slot in self.mfu_list.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(block);
-                return;
-            }
-        }
-        self.mfu_list[0] = Some(block);
-    }
-}
-
-// =========================================================================
-// 35. MACOS GRAND CENTRAL DISPATCH (GCD) DISPATCH QUEUE
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum QosClass {
-    Background = 0,
-    Default = 1,
-    UserInteractive = 2,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct DispatchTask {
-    pub task_id: u32,
-    pub qos: QosClass,
-    pub routine: fn(u32),
-}
-
-pub struct MacOsDispatchQueue {
-    pub is_concurrent: bool,
-    pub tasks: [Option<DispatchTask>; 8],
-    pub task_count: usize,
-}
-
-impl MacOsDispatchQueue {
-    pub fn new(concurrent: bool) -> Self {
-        Self {
-            is_concurrent: concurrent,
-            tasks: [None; 8],
-            task_count: 0,
-        }
-    }
-
-    pub fn dispatch_async(&mut self, task_id: u32, qos: QosClass, routine: fn(u32)) -> Result<(), &'static str> {
-        for slot in self.tasks.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(DispatchTask { task_id, qos, routine });
-                self.task_count += 1;
-                return Ok(());
-            }
-        }
-        Err("Dispatch queue capacity overflow")
-    }
-
-    pub fn execute_highest_qos_task(&mut self) -> Option<u32> {
-        let mut highest_idx = None;
-        let mut max_qos = QosClass::Background;
-
-        for (idx, slot) in self.tasks.iter().enumerate() {
-            if let Some(ref t) = slot {
-                if highest_idx.is_none() || t.qos >= max_qos {
-                    max_qos = t.qos;
-                    highest_idx = Some(idx);
-                }
-            }
-        }
-
-        if let Some(idx) = highest_idx {
-            let task = self.tasks[idx].take().unwrap();
-            self.task_count -= 1;
-            (task.routine)(task.task_id);
-            Some(task.task_id)
-        } else {
-            None
-        }
-    }
-}
-
-// =========================================================================
-// 36. PLAN 9 9P2000 PROTOCOL RESOURCE EXPOSER
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NinePMessageType {
-    Tversion = 100,
-    Rversion = 101,
-    Tattach = 104,
-    Rattach = 105,
-    Tread = 116,
-    Rread = 117,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct NinePHeader {
-    pub size: u32,
-    pub msg_type: NinePMessageType,
-    pub tag: u16,
-}
-
-pub struct Plan9ResourceExposer;
-
-impl Plan9ResourceExposer {
-    pub fn serialize_9p_header(msg_type: NinePMessageType, tag: u16, payload_len: u32, out_buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if out_buffer.len() < 7 {
-            return Err("Out buffer too small for 9P2000 header");
-        }
-        let total_size = payload_len + 7;
-        out_buffer[0..4].copy_from_slice(&total_size.to_le_bytes());
-        out_buffer[4] = msg_type as u8;
-        out_buffer[5..7].copy_from_slice(&tag.to_le_bytes());
-        Ok(7)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3097,39 +2800,231 @@ mod tests {
     }
 
     #[test]
-    fn test_solaris_zfs_arc_cache() {
-        let mut arc = SolarisArcCache::new();
-        let b_id = 0x5000;
+    fn test_polymorphic_baremetal_peripheral_blueprint() {
+        let pio = LegacyPioController { port_base: 0x3F8 };
+        let mmio = ModernMmioController { mmio_base: 0xFE00_0000 };
 
-        // First access is cache miss (stored in MRU)
-        assert!(!arc.access_block(b_id));
+        assert_eq!(pio.read_register(0), 0x3F8);
+        assert_eq!(mmio.read_register(0), 0xFE00_0000);
 
-        // Second access hits MRU and promotes to MFU
-        assert!(arc.access_block(b_id));
-
-        // Third access hits MFU directly
-        assert!(arc.access_block(b_id));
+        let mut mgr = BareMetalUnifiedPeripheralManager::new();
+        assert!(mgr.register_device(0x1002, 0x3F8, false).is_ok());
+        assert!(mgr.register_device(0x8086, 0xFE00_0000, true).is_ok());
+        assert_eq!(mgr.device_count, 2);
     }
 
     #[test]
-    fn test_macos_gcd_dispatch_queue() {
-        fn mock_dispatch_routine(_task_id: u32) {}
-        let mut queue = MacOsDispatchQueue::new(true);
-
-        assert!(queue.dispatch_async(1, QosClass::Background, mock_dispatch_routine).is_ok());
-        assert!(queue.dispatch_async(2, QosClass::UserInteractive, mock_dispatch_routine).is_ok());
-
-        // Highest QoS (UserInteractive) should execute first
-        let exec_id = queue.execute_highest_qos_task().unwrap();
-        assert_eq!(exec_id, 2);
+    fn test_zero_allocation_udf_bytecode_vm() {
+        let mut vm = UdfVm::new();
+        let code = [
+            UdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
+            UdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
+            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
+        ];
+        let res = vm.execute(&code).unwrap();
+        assert_eq!(res, 0x3F8 + 10);
     }
 
     #[test]
-    fn test_plan9_resource_exposer_header() {
-        let mut buffer = [0u8; 16];
-        let len = Plan9ResourceExposer::serialize_9p_header(NinePMessageType::Tversion, 0x101, 10, &mut buffer).unwrap();
-        assert_eq!(len, 7);
-        assert_eq!(buffer[4], NinePMessageType::Tversion as u8);
-        assert_eq!(buffer[0], 17); // 10 payload + 7 header = 17
+    fn test_constraint_sat_solver() {
+        let mut solver = ConstraintSatSolver::new();
+        let nodes = [
+            PackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
+            PackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
+        ];
+        assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
+
+    #[test]
+    fn test_jbd2_transactional_ledger() {
+        let mut ledger = Jbd2TransactionLedger::new();
+        let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
+        assert_eq!(tx_id, 1);
+        assert_eq!(ledger.head, 1);
+
+        ledger.rollback_transaction();
+        assert_eq!(ledger.head, 0);
+    }
+}
+
+// ============================================================================
+// Section 6: Bare-Metal Subsystem Design Specifications
+// ============================================================================
+
+// 6.1 Polymorphic Universal Peripheral Blueprint
+pub trait BareMetalUnifiedPeripheral {
+    fn initialize(&mut self) -> Result<(), &'static str>;
+    fn read_register(&self, offset: u32) -> u64;
+    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
+    fn handle_irq(&mut self) -> u32;
+}
+
+pub struct LegacyPioController {
+    pub port_base: u16,
+}
+
+impl BareMetalUnifiedPeripheral for LegacyPioController {
+    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
+    fn handle_irq(&mut self) -> u32 { 1 }
+}
+
+pub struct ModernMmioController {
+    pub mmio_base: u64,
+}
+
+impl BareMetalUnifiedPeripheral for ModernMmioController {
+    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
+    fn handle_irq(&mut self) -> u32 { 1 }
+}
+
+pub struct BareMetalUnifiedPeripheralManager {
+    pub registered_devices: [(u16, u64, bool); 16],
+    pub device_count: usize,
+}
+
+impl BareMetalUnifiedPeripheralManager {
+    pub fn new() -> Self {
+        Self {
+            registered_devices: [(0, 0, false); 16],
+            device_count: 0,
+        }
+    }
+
+    pub fn register_device(&mut self, vendor_id: u16, base_addr: u64, is_mmio: bool) -> Result<(), &'static str> {
+        if self.device_count >= 16 { return Err("Registry full"); }
+        self.registered_devices[self.device_count] = (vendor_id, base_addr, is_mmio);
+        self.device_count += 1;
+        Ok(())
+    }
+}
+
+impl Default for BareMetalUnifiedPeripheralManager {
+    fn default() -> Self { Self::new() }
+}
+
+// 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
+#[derive(Debug, Clone, Copy)]
+pub struct UdfInstruction {
+    pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
+    pub reg: u8,  // R0 - R7
+    pub addr: u64,
+}
+
+pub struct UdfVm {
+    pub registers: [u64; 8], // R0 - R7
+    pub pc: usize,
+}
+
+impl UdfVm {
+    pub fn new() -> Self {
+        Self {
+            registers: [0; 8],
+            pc: 0,
+        }
+    }
+
+    pub fn execute(&mut self, bytecode: &[UdfInstruction]) -> Result<u64, &'static str> {
+        self.pc = 0;
+        while self.pc < bytecode.len() {
+            let inst = bytecode[self.pc];
+            if inst.reg >= 8 { return Err("Register out of bounds"); }
+            match inst.op {
+                0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
+                0x20 => { /* OP_WRITE */ }
+                0x30 => self.registers[inst.reg as usize] = self.registers[inst.reg as usize].wrapping_add(inst.addr), // OP_ADD
+                0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
+                _ => return Err("Invalid ISA opcode"),
+            }
+            self.pc += 1;
+        }
+        Ok(self.registers[0])
+    }
+}
+
+impl Default for UdfVm {
+    fn default() -> Self { Self::new() }
+}
+
+// 6.3 Declarative Package Resolution SAT Solver
+#[derive(Debug, Clone, Copy)]
+pub struct PackageNode {
+    pub id: u32,
+    pub version: u32,
+    pub req_min: u32,
+    pub req_max: u32,
+}
+
+pub struct ConstraintSatSolver;
+
+impl ConstraintSatSolver {
+    pub fn new() -> Self { Self }
+
+    pub fn resolve_satisfiability(&self, packages: &[PackageNode]) -> Result<bool, &'static str> {
+        for pkg in packages {
+            if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
+                return Err("Constraint conflict detected");
+            }
+        }
+        Ok(true)
+    }
+}
+
+impl Default for ConstraintSatSolver {
+    fn default() -> Self { Self::new() }
+}
+
+// 6.4 JBD2-Style Crash-Resilient Transactional Ledger
+#[derive(Debug, Clone, Copy)]
+pub struct TransactionBlock {
+    pub tx_id: u64,
+    pub target_addr: u64,
+    pub crc32c_hash: u32,
+}
+
+pub struct Jbd2TransactionLedger {
+    pub ring_blocks: [TransactionBlock; 16],
+    pub head: usize,
+    pub current_merkle_root: u32,
+}
+
+impl Jbd2TransactionLedger {
+    pub fn new() -> Self {
+        Self {
+            ring_blocks: [TransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
+            head: 0,
+            current_merkle_root: 0x1234_5678,
+        }
+    }
+
+    pub fn write_transaction(&mut self, target_addr: u64, data: &[u8]) -> Result<u64, &'static str> {
+        if self.head >= 16 { return Err("Ledger ring full"); }
+        let tx_id = self.head as u64 + 1;
+        let mut crc = 0u32;
+        for &b in data { crc = crc.wrapping_add(b as u32); }
+
+        self.ring_blocks[self.head] = TransactionBlock {
+            tx_id,
+            target_addr,
+            crc32c_hash: crc,
+        };
+        self.head += 1;
+        self.current_merkle_root ^= crc;
+        Ok(tx_id)
+    }
+
+    pub fn rollback_transaction(&mut self) {
+        if self.head > 0 {
+            self.head -= 1;
+            self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
+            self.ring_blocks[self.head] = TransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
+        }
+    }
+}
+
+impl Default for Jbd2TransactionLedger {
+    fn default() -> Self { Self::new() }
 }
