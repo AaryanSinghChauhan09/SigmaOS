@@ -490,7 +490,7 @@ mod tests {
     #[test]
     fn test_driver_framework_lifecycle() {
         let mut framework = SimpleDriverFramework::new();
-        let driver = Box::new(SimpleDriver::new(101, DriverType::Block));
+        let driver = Box::new(SimpleStorageDriver::new(101, DriverType::Block));
 
         let reg_id = framework.register_driver(driver).unwrap();
         assert_eq!(reg_id, 101);
