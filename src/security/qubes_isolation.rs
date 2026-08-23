@@ -11,6 +11,12 @@ use core::cell::RefCell;
 use std::cell::RefCell;
 
 #[cfg(not(test))]
+use core::cell::RefCell;
+
+#[cfg(test)]
+use std::cell::RefCell;
+
+#[cfg(not(test))]
 use crate::security::CapabilityToken;
 
 #[cfg(test)]

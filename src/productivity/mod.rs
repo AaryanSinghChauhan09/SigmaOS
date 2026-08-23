@@ -3,6 +3,7 @@ pub mod gamification;
 pub mod subtitle_editor;
 pub mod sigmadev;
 pub mod mint_competitor;
+pub mod sovereign_apps;
 
 pub use tmux::*;
 pub use gamification::{
