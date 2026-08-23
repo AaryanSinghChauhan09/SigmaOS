@@ -1,6 +1,8 @@
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
+extern crate alloc;
+
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
 
@@ -75,6 +77,7 @@ mod elf_relocation;
 
 use community_toolkit::{
     CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
+    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
 };
 use statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
@@ -83,7 +86,8 @@ use statutory_compliance::{
 use system_user::{UserManager as TestUserManager};
 
 use access_control::{
-    PosixAcl, AclType,
+    PosixAcl, AclType, ZeroTrustAccessGate, FilterPolicy, CapBoundingSet, DacPermission,
+    MacSecurityLabel, SensitivityLevel, acm_rights, dac_flags,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
@@ -121,6 +125,7 @@ use segmentation_paging::{
 
 use process_activity_manager::{
     ActivityState, ActivityManager as ProcessActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
+    RegisterSnapshot,
 };
 
 #[test]
@@ -426,7 +431,12 @@ fn test_posix_and_nfsv4_acls() {
     assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 2)); // Denied write (2)
     assert!(!posix_acl.evaluate_acl(1002, 1002, 1000, 1000, 4)); // Other denied
 
-    assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
+    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
+    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+    gate.mac_filter.add_mac(allowed_mac);
+    gate.matrix.grant_right(1, 10, acm_rights::READ);
+
+    assert_eq!(gate.evaluate_request(1, 10, acm_rights::READ, 2, &allowed_mac), Ok(()));
 }
 
 #[test]
