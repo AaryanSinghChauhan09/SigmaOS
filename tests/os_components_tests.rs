@@ -24,6 +24,12 @@ mod chimera_linux;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
 
+#[path = "../src/compatibility/bsd.rs"]
+mod bsd;
+
+#[path = "../src/distro/linux_bsd_inspirations.rs"]
+mod distro_inspirations;
+
 #[path = "../src/compatibility/cachy_os.rs"]
 mod cachy_os;
 
@@ -48,76 +54,10 @@ mod low_level_memory;
 #[path = "../src/access/control.rs"]
 mod access_control;
 
-pub enum AclTag { User(u32), Group(u32), Other }
-
-pub enum CpuRing { Ring0, Ring3 }
-pub struct CpuPrivilegeEnforcer { pub mode: ExecutionRingMode }
-impl CpuPrivilegeEnforcer {
-    pub fn new(mode: ExecutionRingMode) -> Self { Self { mode } }
-    pub fn can_execute_privileged_instruction(&self) -> bool {
-        matches!(self.mode, ExecutionRingMode::Ring0Supervisor)
-    }
-}
-pub enum ExecutionRingMode { Ring0Supervisor, Ring3User }
-pub struct FileAttributeAccessControl { pub flags: u32 }
-impl FileAttributeAccessControl {
-    pub fn new(flags: u32) -> Self { Self { flags } }
-    pub fn can_unlink(&self) -> bool { !(self.flags == file_attribute_flags::IMMUTABLE || self.flags == file_attribute_flags::APPEND_ONLY || self.flags == file_attribute_flags::NO_UNLINK) }
-    pub fn can_dump(&self) -> bool { self.flags != file_attribute_flags::NO_DUMP }
-    pub fn can_modify(&self, append: bool, _root: bool) -> bool {
-        if self.flags == file_attribute_flags::IMMUTABLE {
-            false
-        } else if self.flags == file_attribute_flags::APPEND_ONLY {
-            append
-        } else {
-            true
-        }
-    }
-}
-
-
-
-pub struct Nfs4Ace { pub ace_type: Nfs4AceType, pub flags: u32, pub mask: u32, pub who: u32 }
-impl Nfs4Ace {
-    pub fn new(ace_type: Nfs4AceType, flags: u32, mask: u32, who: u32) -> Self {
-        Self { ace_type, flags, mask, who }
-    }
-}
-pub enum Nfs4AceType { AccessAllowed, AccessDenied }
-pub struct Nfs4Acl { pub aces: Vec<Nfs4Ace> }
-impl Nfs4Acl {
-    pub fn new() -> Self { Self { aces: Vec::new() } }
-    pub fn add_ace(&mut self, ace: Nfs4Ace) { self.aces.push(ace); }
-    pub fn evaluate_access(&self, _user: u32, _group: u32, mask: u32) -> bool {
-        if mask == nfs4_mask::DELETE { false } else { true }
-    }
-    pub fn inherit_for_child(&self, _is_dir: bool) -> Self {
-        let mut child = Self::new();
-        child.add_ace(Nfs4Ace::new(Nfs4AceType::AccessAllowed, 0, 0, 0));
-        child
-    }
-}
-pub mod file_attribute_flags { pub const IMMUTABLE: u32 = 1; pub const APPEND_ONLY: u32 = 2; pub const NO_UNLINK: u32 = 4; pub const NO_DUMP: u32 = 8; }
-pub mod nfs4_flags { pub const FILE_INHERIT: u32 = 1; pub const DIRECTORY_INHERIT: u32 = 2; }
-pub mod nfs4_mask { pub const READ_DATA: u32 = 1; pub const WRITE_DATA: u32 = 2; pub const DELETE: u32 = 4; }
-
-impl PosixAcl {
-    pub fn from_mode(_uid: u32, _gid: u32, _mode: u32) -> Self {
-        Self::new()
-    }
-    pub fn get_mask(&self) -> Option<u32> { Some(4) }
-    pub fn evaluate_access(&self, _u1: u32, _u2: u32, _groups: &[u32], _o1: u32, _o2: u32, mode: u32) -> bool {
-        if mode == 2 || mode == 4 { false } else { true }
-    }
-    pub fn inherit_default_acl(&self, _is_dir: bool) -> Self { Self::new() }
-}
-
-impl AclEntry {
-    pub fn new(_tag: AclTag, _bits: u32) -> Self {
-        AclEntry { acl_type: AclType::UserObj, qualifier_id: 0, perm_bits: 0 }
-    }
-}
-
+use access_control::{
+    AclEntry, AclTag, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl,
+    Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask,
+};
 
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
@@ -128,28 +68,6 @@ pub enum StatutoryAuthority { Gdpr, Hipaa, ISO27001 }
 
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
-
-pub struct HybridFirewallTemplateStore {
-    pub templates: std::collections::HashMap<String, String>,
-}
-impl HybridFirewallTemplateStore {
-    pub fn new() -> Self {
-        let mut templates = std::collections::HashMap::new();
-        templates.insert("default-mesh-shield".to_string(), "rules".to_string());
-        Self { templates }
-    }
-}
-
-pub struct VirtualizationBlueprintStore {
-    pub blueprints: std::collections::HashMap<String, String>,
-}
-impl VirtualizationBlueprintStore {
-    pub fn new() -> Self {
-        let mut blueprints = std::collections::HashMap::new();
-        blueprints.insert("micro-vm-node".to_string(), "blueprint".to_string());
-        Self { blueprints }
-    }
-}
 
 
 #[path = "../src/system/user.rs"]
@@ -165,7 +83,7 @@ pub enum CpuPrivilegeMode { KernelRing0, UserRing3 }
 pub struct GlobalDescriptorTable;
 impl GlobalDescriptorTable {
     pub fn new() -> Self { Self }
-    pub fn insert_descriptor(&mut self, _desc: SegmentDescriptor) -> SegmentSelector {
+    pub fn insert_descriptor(&mut self, _desc: segmentation_paging::SegmentDescriptor) -> SegmentSelector {
         SegmentSelector { index: 1, rpl: segmentation_paging::CpuRing::Ring0Kernel, is_ldt: false }
     }
     pub fn translate_address(&self, seg_addr: SegmentedAddress, _mode: CpuPrivilegeMode) -> Result<u64, &'static str> {
@@ -213,7 +131,7 @@ use statutory_compliance::{
 use system_user::UserManager as TestUserManager;
 
 use access_control::{
-    PosixAcl, AclType, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel,
+    AclType, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel,
     ZeroTrustAccessGate, FilterPolicy,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
@@ -313,7 +231,7 @@ fn test_process_activity_manager_and_registers() {
     let proc = pam.get_process_activity(500).unwrap();
     assert_eq!(proc.state, ActivityState::Interactive);
 
-    let ctx = ProcRegisterSnapshot {
+    let ctx = RegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,
@@ -768,4 +686,65 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
 
     let sec = SecurityProfileTemplateStore::new();
     assert!(sec.templates.contains_key("browser_sandboxed"));
+}
+
+#[test]
+fn test_freebsd_jail_manager_inspection() {
+    let mut mgr = bsd::FreeBsdJailManager::new();
+    let jid = mgr.create_jail("web1.jail.local", "192.168.1.100", "/jails/web1").unwrap();
+    assert_eq!(jid, 1);
+    assert!(mgr.check_network_allowed(jid, "192.168.1.100"));
+    assert!(mgr.stop_jail(jid).is_ok());
+    assert!(!mgr.check_network_allowed(jid, "192.168.1.100"));
+}
+
+#[test]
+fn test_openbsd_sysctl_mib_inspection() {
+    let mut mib = bsd::OpenBsdSysctlKernelMib::new();
+    assert_eq!(mib.query_mib("kern.securelevel").unwrap(), "0");
+    assert!(mib.is_raw_disk_write_allowed());
+
+    assert!(mib.write_mib("kern.securelevel", "1").is_ok());
+    assert!(!mib.is_raw_disk_write_allowed());
+    assert!(mib.write_mib("kern.securelevel", "0").is_err());
+}
+
+#[test]
+fn test_netbsd_rump_router_inspection() {
+    let mut router = distro_inspirations::NetBsdRumpRouter::new();
+    router.register_driver(distro_inspirations::RumpDriver {
+        name: "pci_net".to_string(),
+        context: distro_inspirations::DriverContext::KernelSpace,
+        operations_handled: vec!["send_packet".to_string()],
+    });
+    let res = router.dispatch_hypercall("pci_net", "send_packet");
+    assert!(res.is_ok());
+}
+
+#[test]
+fn test_sovereign_landlock_and_runit_inspection() {
+    let mut sandbox = distro_inspirations::SovereignLandlockLsm::new();
+    assert!(sandbox.add_rule("/usr/share", distro_inspirations::LandlockAccess::ReadOnly).is_ok());
+
+    let mut runit = distro_inspirations::SovereignRunitSupervisor::new(distro_inspirations::RunitRunlevel::Default);
+    runit.register_service("nginx", distro_inspirations::RunitRunlevel::Default, &[], 3);
+    assert_eq!(runit.tick_supervision(), 1);
+    assert_eq!(runit.get_service_status("nginx").unwrap(), distro_inspirations::RunitServiceStatus::Running);
+}
+
+#[test]
+fn test_sovereign_ostree_and_io_uring_inspection() {
+    let mut ostree = distro_inspirations::SovereignOstreeEngine::new();
+    let idx = ostree.stage_commit("commit-1.0.0", "1.0.0", "vmlinuz-6.8", 0x123456);
+    assert_eq!(idx, 0);
+
+    let mut io_ring = distro_inspirations::SovereignIoUring::new(64);
+    assert!(io_ring.submit_entry(distro_inspirations::SubmissionQueueEntry {
+        opcode: distro_inspirations::IoUringOpcode::Read,
+        fd: 1,
+        offset: 0,
+        user_data: 100,
+        data: vec![0u8; 512],
+    }).is_ok());
+    assert_eq!(io_ring.submit_and_wait(), 1);
 }

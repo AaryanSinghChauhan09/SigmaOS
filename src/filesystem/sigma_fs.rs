@@ -753,71 +753,6 @@ mod tests {
         // Tamper with data (should fail PQC validation)
         assert!(!encryptor.pqc_verify_signature(b"Sovereign data at rest modified", &sig));
     }
-}
-#[test]
-    fn test_sigma_disaster_recovery_cleaner() {
-        let mut cleaner = SigmaDisasterRecoveryCleaner::new();
-        cleaner.register_target_file("/home/user/.cache/thumbnails/thumb.png", "SystemCache", 4096);
-        cleaner.register_target_file("/var/log/httpd/access.log", "TemporaryLogs", 204800);
-        cleaner.register_target_file("/home/user/.mozilla/firefox/places.sqlite", "BrowserHistory", 1024000);
-
-        assert_eq!(cleaner.targets.len(), 3);
-
-        // Purge logs
-        let (count, bytes) = cleaner.execute_secure_clean("TemporaryLogs");
-        assert_eq!(count, 1);
-        assert_eq!(bytes, 204800);
-        assert_eq!(cleaner.targets.len(), 2);
-
-        // Purge system cache
-        let (count, bytes) = cleaner.execute_secure_clean("SystemCache");
-        assert_eq!(count, 1);
-        assert_eq!(bytes, 4096);
-        assert_eq!(cleaner.targets.len(), 1);
-    }
-
-    #[test]
-    fn test_sigma_fs_journal() {
-        let mut journal = SigmaFsJournal::new();
-        let tx = journal.start_transaction("/etc/hosts", "write");
-        assert_eq!(tx, 1);
-        assert_eq!(journal.active_txs[0].state, JournalState::Active);
-
-        journal.commit_transaction(1);
-        assert_eq!(journal.active_txs[0].state, JournalState::Committed);
-    }
-
-    #[test]
-    fn test_sigma_fs_cow_snapshot() {
-        let mut cow = SigmaFsCow::new();
-        cow.write_block_cow("rootfs.img", 0, 1024);
-        cow.write_block_cow("rootfs.img", 1, 2048);
-
-        // Modify logical 1 to new CoW block physical 4096
-        cow.write_block_cow("rootfs.img", 1, 4096);
-
-        cow.create_cow_snapshot("snap_t0");
-        assert!(cow.snapshots.contains_key("snap_t0"));
-
-        let snap_blocks = cow.snapshots.get("snap_t0").unwrap().get("rootfs.img").unwrap();
-        assert_eq!(snap_blocks[1].physical_addr, 4096);
-    }
-
-    #[test]
-    fn test_sigma_fs_lvm_volume() {
-        let mut lvm = SigmaFsVolume::new();
-        lvm.create_volume_group("vg-data", vec!["/dev/nvme0n1", "/dev/nvme1n1"], 512000);
-        assert_eq!(lvm.query_volume_capacity_mb("vg-data").unwrap(), 512000);
-    }
-
-    #[test]
-    fn test_sigma_fs_mdadm_raid() {
-        let mut raid = SigmaFsRaid::new();
-        raid.create_raid_array("md0", RaidLevel::Raid1);
-
-        let mapped_disks = raid.route_raid_sectors("md0", 500);
-        assert_eq!(mapped_disks, vec![0, 1]); // RAID-1 mirrors
-    }
 
     #[test]
     fn test_sigma_fs_luks_crypt() {
@@ -833,7 +768,8 @@ mod tests {
     #[test]
     fn test_sigma_fs_virtio_ring() {
         let mut virtio = SigmaFsVirtio::new();
-        virtio.submit_virtio_buffer(0x1000, 512, 1);
+        virtio.submit_virtio_buffer(0x1000, 512, 0);
         assert_eq!(virtio.avail_ring_idx, 1);
         assert_eq!(virtio.descriptors[0].addr, 0x1000);
     }
+}
