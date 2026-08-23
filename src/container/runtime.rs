@@ -6,6 +6,8 @@ use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -61,6 +63,33 @@ pub enum ContainerError {
 }
 
 /// Container info
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
+}
+
+impl ContainerInfo {
+    pub fn new(id: ContainerID) -> Self {
+        ContainerInfo {
+            id,
+            name: [0; 64],
+            image: [0; 128],
+            state: ContainerState::Created,
+            pid: None,
+            memory_limit: 0,
+            cpu_limit: 0,
+            capability: RuntimeCapability::new(),
+        }
+    }
+}
 
 /// Container network configuration type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -84,6 +113,32 @@ pub struct ContainerNamespace {
     pub uid_mapping: u32,
     pub gid_mapping: u32,
     pub rootless: bool,
+}
+
+impl ContainerNamespace {
+    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
+        if self.rootless {
+            if container_uid == 0 {
+                Ok(self.uid_mapping)
+            } else {
+                Ok(self.uid_mapping + container_uid)
+            }
+        } else {
+            Ok(container_uid)
+        }
+    }
+
+    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
+        if self.rootless {
+            if container_gid == 0 {
+                Ok(self.gid_mapping)
+            } else {
+                Ok(self.gid_mapping + container_gid)
+            }
+        } else {
+            Ok(container_gid)
+        }
+    }
 }
 
 impl ContainerNamespace {
@@ -143,6 +198,19 @@ impl NamespaceConfig {
 }
 
 /// Container seccomp profiles
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if !self.hardened {
+            return false;
+        }
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            false
+        }
+    }
+}
 
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
@@ -624,12 +692,13 @@ impl SimpleContainerRuntime {
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std::alloc::alloc(layout)
+    std_alloc(layout)
 }
 
 
 
 pub mod oci {
+    extern crate alloc;
     use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
     use alloc::string::String;
@@ -660,6 +729,25 @@ pub mod oci {
         }
     }
 
+    #[allow(dead_code)]
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+        }
+    }
 
     pub struct OciSpec {
         pub version: String,
@@ -835,7 +923,7 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            ContainerCapability::full(),
+            RuntimeCapability::full(),
         );
         container.seccomp = SeccompProfile {
             hardened: true,

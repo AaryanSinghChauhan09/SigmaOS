@@ -1,0 +1,30 @@
+name: QEMU & KVM Virtualization Subsystem CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  virtualization-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Run Virtual Machine Manager Unit Tests
+        run: |
+          cargo test --lib virtualization::vm_manager
+
+      - name: Run Full Sovereign Atomic & Virtualization Test Suite
+        run: |
+          ./run_sigma_tests.sh

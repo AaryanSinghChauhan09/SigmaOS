@@ -22,7 +22,7 @@ use crate::klib::HashMap;
 use std::collections::HashMap;
 
 #[cfg(test)]
-mod mock_scheduler {
+pub(crate) mod mock_scheduler {
     use core::time::Duration;
     use alloc::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -108,13 +108,10 @@ pub struct ProcessExtendedContext {
     pub cpu_time_accumulated_secs: u64,
 }
 
-#[cfg(test)]
-use std::collections::HashMap as StdHashMap;
-
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(not(test))]
-use crate::kernel::scheduler::{Priority as SchedPriority, Process as SchedProcess, ProcessState as SchedProcessState};
+use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
