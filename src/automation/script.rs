@@ -68,7 +68,6 @@ impl Script for SimpleScript {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(128);
         &self.name[..len]
     }
-
     fn language(&self) -> ScriptLanguage {
         match self.language.load(Ordering::SeqCst) {
             0 => ScriptLanguage::Python,
@@ -77,10 +76,7 @@ impl Script for SimpleScript {
             _ => ScriptLanguage::Shell,
         }
     }
-
-    fn source(&self) -> &[u8] {
-        &self.source
-    }
+    fn source(&self) -> &[u8] { &self.source }
 }
 
 pub trait ScriptEngine {
@@ -396,47 +392,6 @@ impl StringDescrambler {
     }
 }
 
-pub struct ScriptArgumentRouter {
-    pub shebang_interpreter: String,
-}
-
-impl ScriptArgumentRouter {
-    pub fn new(shebang_line: &str) -> Self {
-        let interp = if shebang_line.starts_with("#!") {
-            shebang_line.trim_start_matches("#!").trim()
-        } else {
-            "/bin/sh"
-        };
-        Self {
-            shebang_interpreter: interp.to_string(),
-        }
-    }
-
-    pub fn substitute_arguments(&self, script: &str, args: &[&str]) -> String {
-        let mut result = script.to_string();
-        for (i, arg) in args.iter().enumerate() {
-            let var_name = format!("${}", i);
-            result = result.replace(&var_name, arg);
-        }
-
-        let mut all_args = String::new();
-        for (i, arg) in args.iter().skip(1).enumerate() {
-            if i > 0 {
-                all_args.push(' ');
-            }
-            all_args.push_str(arg);
-        }
-        result = result.replace("$@", &all_args);
-        result
-    }
-}
-
-impl Default for ScriptArgumentRouter {
-    fn default() -> Self {
-        Self::new("#!/bin/sh")
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -460,10 +415,8 @@ mod tests {
             aliases: SimpleScriptEnvironment::new(),
         };
 
-        let result = engine_with_script
-            .execute_script_with_args(script_id, &[b"alice", b"sovereign"])
-            .unwrap();
-        assert_eq!(result, b"echo hello alice, welcome back sovereign!");
+        let result = engine_with_script.execute_script_with_args(script_id, &[b"alice", b"sovereign"]).unwrap();
+        assert_eq!(&result[..], b"echo hello alice, welcome back sovereign!");
     }
 
     #[test]
@@ -474,10 +427,8 @@ mod tests {
         engine.load_script(Box::new(script)).unwrap();
         engine.set_script_alias(b"backup", b"backup.sh");
 
-        let res = engine
-            .execute_by_alias(b"backup", &[b"/home/state"])
-            .unwrap();
-        assert_eq!(res, b"tar -cvf /home/state");
+        let res = engine.execute_by_alias(b"backup", &[b"/home/state"]).unwrap();
+        assert_eq!(&res[..], b"tar -cvf /home/state");
     }
 
     #[test]
@@ -500,7 +451,7 @@ mod tests {
         ];
 
         let decompressed = unpacker.decompress_payload(&compressed_payload).unwrap();
-        assert_eq!(decompressed, b"HELLO");
+        assert_eq!(&decompressed[..], b"HELLO");
     }
 
     #[test]
@@ -519,7 +470,7 @@ mod tests {
         let scrambled = [b'A' ^ 0x33, b'B' ^ 0x33, b'C' ^ 0x33];
 
         let descrambled = descrambler.descramble_string(&scrambled);
-        assert_eq!(descrambled, b"ABC");
+        assert_eq!(&descrambled[..], b"ABC");
     }
 
     #[test]

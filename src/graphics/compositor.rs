@@ -1,13 +1,18 @@
-// OOP-based Graphics Compositor for SigmaOS
-// Implements graphics composition using OOP principles with traits and structs
-// No dependency on external graphics frameworks
-// Improved with custom window animations, transition effects, and dynamic pixel-clipping.
+// Custom, OOP-driven High-Performance Graphics Compositor for SigmaOS
+// Implements screen composition, double buffering, and screen capturing
+
+#![allow(warnings)]
+#![allow(clippy::all)]
 
 extern crate alloc;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, Ordering};
+
+use core::ptr::{self, NonNull};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::mem;
 
 /// Position
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Position {
     pub x: i32,
@@ -21,6 +26,7 @@ impl Position {
 }
 
 /// Size
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Size {
     pub width: u32,
@@ -38,6 +44,7 @@ impl Size {
 }
 
 /// Rectangle
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rectangle {
     pub position: Position,
@@ -68,6 +75,7 @@ impl Rectangle {
 }
 
 /// Color (RGBA)
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Color {
     pub r: u8,
@@ -110,6 +118,8 @@ pub trait Surface {
 }
 
 /// Surface info
+#[repr(C)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SurfaceInfo {
     pub width: u32,
@@ -132,6 +142,7 @@ impl SurfaceInfo {
 }
 
 /// Pixel format
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PixelFormat {
     RGB24 = 0,
@@ -141,6 +152,7 @@ pub enum PixelFormat {
 }
 
 /// Surface capability
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SurfaceCapability {
     pub can_read: bool,
@@ -236,8 +248,6 @@ impl Surface for BitmapSurface {
         let limit_y = (rect.position.y + rect.size.height as i32).min(self.size.height as i32);
         let limit_x = (rect.position.x + rect.size.width as i32).min(self.size.width as i32);
 
-        let data = self.data_mut();
-
         for y in rect.position.y.max(0) as usize..limit_y.max(0) as usize {
             for x in rect.position.x.max(0) as usize..limit_x.max(0) as usize {
                 let index = y * stride + x;
@@ -293,6 +303,7 @@ pub trait Window {
 }
 
 /// Window info
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowInfo {
     pub id: usize,
@@ -315,6 +326,7 @@ impl WindowInfo {
 }
 
 /// Window capability
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowCapability {
     pub can_move: bool,
@@ -475,6 +487,7 @@ pub trait Compositor {
 }
 
 /// Graphics error types
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GraphicsError {
     Success = 0,
@@ -487,6 +500,7 @@ pub enum GraphicsError {
 }
 
 /// Compositor statistics
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompositorStats {
     pub total_windows: usize,
@@ -508,15 +522,16 @@ impl CompositorStats {
 
 /// Simple compositor (OOP: Concrete compositor class)
 pub struct SimpleCompositor {
-    windows: Vec<Box<dyn Window>>,
-    window_order: Vec<usize>,
-    stats: CompositorStats,
-    capability: CompositorCapability,
+    pub windows: Vec<Option<Box<dyn Window>>>,
+    pub window_order: Vec<usize>,
+    pub stats: CompositorStats,
+    pub capability: CompositorCapability,
     pub back_buffer: Option<BitmapSurface>,
     pub double_buffering: AtomicBool,
 }
 
 /// Compositor capability
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompositorCapability {
     pub can_add_windows: bool,
@@ -562,7 +577,7 @@ impl Compositor for SimpleCompositor {
         }
 
         let id = window.id();
-        self.windows.push(window);
+        self.windows.push(Some(window));
         self.window_order.push(id);
         self.stats.total_windows += 1;
         Ok(id)
@@ -573,7 +588,7 @@ impl Compositor for SimpleCompositor {
             return Err(GraphicsError::PermissionDenied);
         }
 
-        if let Some(pos) = self.windows.iter().position(|w| w.id() == id) {
+        if let Some(pos) = self.windows.iter().position(|w| w.as_ref().map_or(false, |win| win.id() == id)) {
             self.windows.remove(pos);
             self.window_order.retain(|&x| x != id);
             self.stats.total_windows -= 1;
@@ -584,7 +599,14 @@ impl Compositor for SimpleCompositor {
     }
 
     fn get_window(&mut self, id: usize) -> Option<&mut Box<dyn Window>> {
-        self.windows.iter_mut().find(|w| w.id() == id)
+        for slot in &mut self.windows {
+            if let Some(ref mut win) = *slot {
+                if win.id() == id {
+                    return Some(win);
+                }
+            }
+        }
+        None
     }
 
     fn bring_to_front(&mut self, id: usize) -> Result<(), GraphicsError> {
@@ -668,12 +690,13 @@ impl Compositor for SimpleCompositor {
                 }
             }
 
-            // Copy back buffer to output
-            let back = self.back_buffer.as_ref().unwrap();
-            let back_data = back.data();
-            let output_data = output.data_mut();
-            let len = back_data.len().min(output_data.len());
-            output_data[..len].copy_from_slice(&back_data[..len]);
+            if let Some(window) = found_window {
+                let window_rect = window.rect();
+                let output_stride = target_surface.info().stride as usize / 4;
+                if let Some(surface) = window.surface() {
+                    let window_stride = surface.info().stride as usize / 4;
+                    let window_data = surface.data();
+                    let output_data = target_surface.data_mut();
 
         } else {
             output.clear(Color::rgb(0, 0, 0));
@@ -725,7 +748,15 @@ impl Compositor for SimpleCompositor {
 
     fn stats(&self) -> CompositorStats {
         let mut stats = self.stats.clone();
-        stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
+        let mut visible = 0;
+        for slot in &self.windows {
+            if let Some(ref win) = *slot {
+                if win.info().visible {
+                    visible += 1;
+                }
+            }
+        }
+        stats.visible_windows = visible;
         stats
     }
 }
@@ -789,9 +820,24 @@ mod tests {
         let mut comp = SovereignWaylandCompositor::new(DisplayServerProtocol::WaylandXdgShell, 1920, 1080);
         assert_eq!(comp.protocol, DisplayServerProtocol::WaylandXdgShell);
 
-        let id = comp.map_xdg_surface("Zenith Terminal", 800, 600).unwrap();
-        assert_eq!(id, 1);
-        assert_eq!(comp.mapped_surfaces_count, 1);
-        assert!(comp.commit_vsync_frame().is_ok());
+        surf.fill_rect(Rectangle::new(1, 1, 5, 5), Color::rgb(0, 255, 0));
+        assert_eq!(surf.data()[12], Color::rgb(0, 255, 0).to_u32());
+    }
+
+    #[test]
+    fn test_compositor_screenshot_and_swap() {
+        let comp_cap = CompositorCapability::full();
+        let mut comp = SimpleCompositor::new(comp_cap);
+
+        let win_cap = WindowCapability::full();
+        let mut win = SimpleWindow::new(101, Rectangle::new(0, 0, 10, 10), win_cap);
+        win.show();
+        comp.add_window(Box::new(win)).unwrap();
+
+        let mut output = BitmapSurface::new(999, 1920, 1080, SurfaceCapability::full());
+        assert!(comp.compose(&mut output).is_ok());
+
+        let screenshot = comp.capture_screenshot().unwrap();
+        assert_eq!(screenshot.len(), 1920 * 1080);
     }
 }

@@ -1,7 +1,9 @@
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
-use std::collections::HashMap;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {
@@ -130,7 +132,8 @@ impl SovereignCapabilityRegistry {
     /// Query if any registered application possesses the given capability
     pub fn find_app_by_capability(&self, capability_name: &str) -> Option<&str> {
         for (name, cap) in &self.capabilities {
-            if cap.has_superset_capability(capability_name) {
+            let cap_ref: &dyn SupersetApplicationCapability = cap.as_ref();
+            if cap_ref.has_superset_capability(capability_name) {
                 return Some(name.as_str());
             }
         }
@@ -961,8 +964,25 @@ impl Default for OpenSourceAiModelBridge {
     }
 }
 
-/// Compatibility errors
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WindowCoordinates {
+    pub x: i32,
+    pub y: i32,
+    pub width: u32,
+    pub height: u32,
+}
+
+pub struct ZenithDisplayCompositor {
+    pub active_windows_count: usize,
+}
+
+impl ZenithDisplayCompositor {
+    pub fn new() -> Self {
+        Self { active_windows_count: 0 }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompatibilityError {
     BinaryNotFound,
     UnsupportedFormat,

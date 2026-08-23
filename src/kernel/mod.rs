@@ -8,9 +8,13 @@ pub mod policy_mechanism;
 pub mod perf_mm;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod cpu_features;
-pub mod architecture;
-pub mod io_uring;
+pub mod subsystem;
+pub mod vmm_paging;
+pub mod processor_management;
+pub mod cpufreq;
+pub mod structures;
+pub mod object;
+pub mod performance;
 
 pub use cpu_features::{ApsrFlags, ArmExecutionState};
 pub mod linux_bsd_innovations;
@@ -37,5 +41,11 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
+pub use scheduler::{Priority, Process, ProcessState};
+pub use structures::{
+    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
+    CpuContext, EdfTask, IrqlLevel, IrqlState, LcgRandom, LotteryTask,
+    SequencedSinglyLinkedList, SinglyLinkedList, SystemThread, WorkItem,
+};
+pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};

@@ -2,58 +2,7 @@
 // Build recipes for package compilation and installation
 // Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
-#![no_std]
-
-#[cfg(test)]
-extern crate std;
-
-extern crate alloc;
-
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::format;
-use alloc::vec::Vec;
-
-#[cfg(test)]
-mod test_types {
-    use alloc::string::String;
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-    pub struct Version {
-        pub major: u64,
-        pub minor: u64,
-        pub patch: u64,
-    }
-    impl Version {
-        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
-        }
-    }
-    impl core::fmt::Display for Version {
-        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-        }
-    }
-    #[derive(Debug, Clone)]
-    pub struct Dependency {
-        pub name: String,
-        pub version_constraint: VersionConstraint,
-    }
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum VersionConstraint {
-        Any,
-    }
-}
-
-#[cfg(test)]
-use test_types::{Version, Dependency, VersionConstraint};
-
-#[cfg(not(test))]
-use crate::sigpkg::{Dependency, Version};
-
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
+use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use std::collections::HashMap;
 
 /// Build system type
@@ -394,7 +343,7 @@ mod tests {
         // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
         let ssl_dependency = Dependency {
             name: "openssl".to_string(),
-            version: Version::new(3, 0, 0),
+            version_constraint: VersionConstraint::GreaterOrEqual(Version::new(3, 0, 0)),
         };
 
         recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);

@@ -55,14 +55,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_driver_vault_encryption_decryption() {
-        let mut vault = DriverArchiveVault::new(0xAA);
-        let raw_driver = b"ELF_DRIVER_BINARY_DATA";
-
-        vault.store_driver("e1000", raw_driver);
-        let retrieved = vault.retrieve_driver("e1000").unwrap();
-
-        assert_eq!(retrieved.as_slice(), raw_driver);
-        assert!(vault.retrieve_driver("nonexistent").is_none());
+    fn test_driver_archive_vault() {
+        let vault = DriverArchiveVault::new();
+        let entry = vault.query_driver(10).unwrap();
+        assert_eq!(entry.name, "ne2000_isa_nic");
+        assert_eq!(entry.lineage_version, "Linux 2.2 NIC");
+        assert_eq!(entry.dependencies[0], "isa_bus_device");
     }
 }
+// SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)

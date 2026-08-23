@@ -31,6 +31,7 @@
 // 10. High-impact HID keyboard/mouse and VESA Framebuffer graphics drivers
 // 11. Local AI task orchestration scheduler (S-AI)
 
+extern crate alloc;
 use alloc::collections::{BTreeMap, BTreeSet};
 
 // ==========================================

@@ -200,7 +200,6 @@ impl ImageFilter for GrayscaleConversionFilter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
 
     #[test]
     fn test_raster_layer_creation() {

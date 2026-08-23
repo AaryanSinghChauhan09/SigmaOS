@@ -15,6 +15,7 @@ pub mod filesystem;
 pub mod governance;
 pub mod kernel;
 pub mod klib;
+pub mod logging;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
@@ -85,20 +86,15 @@ pub use automation::{
     ScriptArgumentRouter,
 };
 pub use compatibility::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
-    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
-    AntiXControlCentre, ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
-    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager,
-    ZorinWindowsAppSupport,
-    ApplicationBinary, BinaryFormat, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ContainerRuntime,
-    LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, TargetPlatform, TranslationLayer,
-};
-pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+    ApplicationBinary, BinaryFormat, BodhiUpdateTriage, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ContainerRuntime, DnfPackageResolver,
+    FedoraAlu, FedoraAluFlags, KojiBuildServer, MockChrootBuilder, SigmaChangeProposal,
+    SigmaChangeProcessEngine, SigmaNextChannel, TargetPlatform, TranslationLayer,
+    ZorinAppearanceSwitcher, ZorinLayoutPreset, ZorinConnectHub, ZorinWineLayer,
+    ZorinLiteOptimizer, SigmaEcosystemInit, FhsRunlevel, SigmaEcosystemProfiler,
+    GraphicPresetMode, SigmaOnboardingWelcome, SigmaOnboardingLog,
+    SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, SubtitleFormat,
+    SigmaSupportResourceOptimizer, SigmaSupportPriorityOptimizer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -119,56 +115,20 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
-pub use governance::{
-    MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
-};
 pub use kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,
-    BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
-    AndroidBroadcastReceiverRegistry,
-    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
-    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
+    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList,
+    CpuRegisters, EdfTask, HardwareException,
+    IpcError, IpcManager, Irql,
+    LcgRandom, LookasideList, LotteryTask, MemoryBlock,
+    MemoryDescriptorList, Message, Pcb, PoolType, Priority, Process,
+    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler,
+    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
     Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
-pub use kernel::io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};
+pub use logging::*;
 pub use network::{
-    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
-    RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
-    ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
-};
-pub use observability::{
-    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
-    SimpleObservabilityStack,
-};
-pub use distro::{
-    AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
-    HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
-    ReleaseStage, SoftwareCertificationProgram,
-    BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
-    ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
-    DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
-    RegistryValue, Win32Gdi, WindowsRegistry,
-    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
-    TargetArch,
-    AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
-    ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings,
-    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
-    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
-    LivepatchPatch, LivepatchManager,
-    BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator,
-    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
-    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
-    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitService, RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
-    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -197,13 +157,42 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ArithmeticSubstitutionDeobfuscator,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    PrivacyFirstSandbox, SandboxRule, secure_zeroize, AuditLogEntry, HardenedAuditTrail,
+    IntrusionMonitor, IntrusionSeverity,
+};
+pub use plugin::{
+    ExtensionType, ManagerCapability, MarketplaceItem, Plugin, PluginCapability, PluginError,
+    PluginID, PluginInfo, PluginManager, PluginMarketplace, PluginState, PluginStats, SimplePlugin,
+    SimplePluginManager,
 };
 pub use shell::{ShellCommand, ShellRepl};
+pub use tools::{
+    AlmeidaCmosRtc, AlmeidaCoreDump, ClusterNode, NodeState, SigmaAccess,
+    SigmaCluster, SigmaDeploy, SigmaIdentity, SigmaMonitor, SigmaPatch, SigmaRescue, SigmaToolError,
+    SovereignAptDuo, SovereignDpkgEtcher, SovereignIPCalculator, SovereignImeConvertCase,
+    SovereignImageToDataUri, SovereignJsonPrettifier, SovereignKeyboardTester, SovereignIsWebsiteDown,
+    SovereignPasswordGenerator, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity,
+};
+pub use unimplemented_tools::{
+    AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiComplianceDashboard, AiDependencyResolver,
+    AiDifficultyDirector, AiFileOrganizer, AiScheduler, AiSearchAssistant, AiTaskbar, ApiTestingTool,
+    AppSandboxing, AudioEditor, AudioTrack, BatterySaver, CameraFilter, CloudBackupUtility,
+    CloudGaming, ControllerMapper, CrossDeviceSync, CrossLanguageBuildTool, DeclarativeBuildSystem,
+    DiskDefragmenter, DocumentScanner, DuplicateFileFinder, EmailClient, EmulatorManager,
+    FlatpakSnapLayer, ForensicSnapshot, GameHubLauncher, GameModManager, GamePerformanceBooster,
+    GameRecorder, GamifiedDesktop, GamifiedTodo, GanttChartPlanner, GestureControl, GifConverter,
+    GitGuiClient, GuiAppStore, IotDeviceManager, KanbanBoard, KanbanColumn, MarkdownNotebook,
+    MemoryLeakDetector, MeshNetworking, MultiMonitorManager, MusicLibraryManager,
+    NaturalLanguageShell, OfflinePackageInstaller, PacketSniffer, PartitionManager, PdfEditor,
+    PerformanceOptimizer, PodcastRecorder, PredictiveMaintenance, PrivacyDashboard,
+    ProcessSandbox, ProfileSample, RemoteDesktop, SecureContainer, SecureFileSharing,
+    SecureFileShredder, SmartCleanup, SmartNotificationManager, StartupOptimizer, StaticAnalyzer,
+    StreamingOverlayManager, SubtitleEditor, SystemRestoreSnapshot, VectorDraftEngine,
+    VirtualMachineGuest, VmGuestSupervisor, VoiceControl, VpnTunnelManager, VrArRuntime,
+    WebcamEffects, ZeroKnowledgeVault, ZeroTrustTpmBoot,
+};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
     PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,

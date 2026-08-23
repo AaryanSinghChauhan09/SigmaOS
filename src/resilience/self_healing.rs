@@ -539,4 +539,23 @@ mod tests {
         assert_eq!(status_after_clear, "ATTEMPTING_RECOVERY");
         assert!(!monitor.in_safe_mode);
     }
+
+    #[test]
+    fn test_double_fault_guard_and_heartbeats() {
+        let mut monitor = SystemStabilityMonitor::new();
+        assert_eq!(monitor.system_stability_score as u32, 100);
+
+        // Report normal heartbeats
+        monitor.ping_shard("kernel", 10, true);
+        assert!(monitor.system_stability_score > 80.0);
+        assert!(!monitor.in_safe_mode);
+
+        // Report unresponsive on all shards
+        monitor.ping_shard("kernel", 600, false);
+        monitor.ping_shard("vfs", 600, false);
+        monitor.ping_shard("scheduler", 600, false);
+        monitor.ping_shard("ipc", 600, false);
+
+        assert!(monitor.in_safe_mode);
+    }
 }

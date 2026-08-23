@@ -69,25 +69,28 @@ impl Version {
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        let mut parts = version_str.split('.');
-
-        let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-        let minor_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-        let patch_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-
-        if parts.next().is_some() {
+        let parts: Vec<&str> = version_str.split('.').collect();
+        if parts.is_empty() || parts.len() > 3 {
             return Err(ParseError::InvalidFormat);
         }
 
         let major = major_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = minor_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = patch_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
+        let minor = if parts.len() >= 2 {
+            parts[1]
+                .parse::<u64>()
+                .map_err(|_| ParseError::InvalidNumber)?
+        } else {
+            0
+        };
+        let patch = if parts.len() >= 3 {
+            parts[2]
+                .parse::<u64>()
+                .map_err(|_| ParseError::InvalidNumber)?
+        } else {
+            0
+        };
 
         Ok(Version::new(major, minor, patch))
     }
@@ -151,6 +154,18 @@ impl Package {
         dependencies: Vec<Dependency>,
         checksum: String,
     ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
+}
+
+impl Package {
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
         Self {
             name,
             version,

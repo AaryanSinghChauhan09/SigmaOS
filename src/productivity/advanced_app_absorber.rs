@@ -2,10 +2,8 @@
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use klib::collections::{BTreeMap, HashMap, VecDeque};
-use klib::path::PathBuf;
-use std::path::Path;
-use crate::klib::Uuid;
+use std::collections::{HashMap, VecDeque, BTreeMap};
+use std::path::{Path, PathBuf};
 
 // =========================================================================
 // 1. FLAMESHOT & SHAREX PARITY: ADVANCED SCREENSHOT ENGINE
@@ -71,10 +69,11 @@ impl ShareXFlameshotEngine {
         });
 
         if self.auto_upload_enabled {
+            let capture_id = self.screenshot_history.len() + 1;
             screenshot.cloud_url = Some(format!(
                 "{}/capture_{}.png",
                 self.target_cloud_destination,
-                Uuid::new_v4()
+                capture_id
             ));
         }
 
@@ -431,7 +430,7 @@ impl OneCommanderDualPane {
                 current_directory: PathBuf::from("/home"),
                 selected_files: Vec::new(),
             },
-            tags_colors: BTreeMap::new(),
+            tags_colors: HashMap::new(),
         }
     }
 

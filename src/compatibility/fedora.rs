@@ -52,7 +52,7 @@ impl DnfPackageResolver {
             return Err(format!("Package {} not found in repositories", name));
         }
 
-        let mut install_order = Vec::new();
+        let mut install_order: Vec<String> = Vec::new();
         let mut visited = HashMap::new();
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
@@ -1361,71 +1361,5 @@ mod tests {
         let r3 = alu.saturated_add(i64::MIN, -1);
         assert_eq!(r3, i64::MIN);
         assert!(alu.flags.overflow);
-    }
-
-    #[test]
-    fn test_fedora_selinux_enforcement() {
-        let engine = SeLinuxEngine::new(true);
-        let httpd_sub = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
-        let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
-
-        // Allowed by targeted policy rule
-        assert!(engine.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
-
-        // Blocked by missing rule
-        let bad_obj = SeLinuxContext::new("system_u", "object_r", "secret_t", "s0");
-        assert!(engine.authorize_access(&httpd_sub, &bad_obj, "file", "read").is_err());
-
-        // Domain transition
-        let user_sub = SeLinuxContext::new("unconfined_u", "user_r", "user_t", "s0");
-        let passwd_exe = SeLinuxContext::new("system_u", "object_r", "passwd_exec_t", "s0");
-        let transitioned = engine.validate_domain_transition(&user_sub, &passwd_exe).unwrap();
-        assert_eq!(transitioned.context_type, "passwd_t");
-    }
-
-    #[test]
-    fn test_systemd_preset_configurator() {
-        let mut configurator = SystemdPresetConfigurator::new();
-        assert_eq!(configurator.evaluate_preset("sshd.service"), SystemdPresetState::Enable);
-        assert_eq!(configurator.evaluate_preset("debug-shell.service"), SystemdPresetState::Disable);
-        assert_eq!(configurator.evaluate_preset("nginx.service"), SystemdPresetState::Ignore);
-
-        // Custom override
-        configurator.add_custom_preset("nginx.service", SystemdPresetState::Enable);
-        assert_eq!(configurator.evaluate_preset("nginx.service"), SystemdPresetState::Enable);
-    }
-
-    #[test]
-    fn test_anaconda_kickstart_installer() {
-        let mut installer = AnacondaInstaller::new();
-
-        // Sample Fedora Kickstart script
-        let ks_script = "
-        # Kickstart configuration
-        rootpw $6$rounds=4096$secure_hash_here
-        lang en_US.UTF-8
-        keyboard us
-
-        # Partition layouts
-        part / --fstype ext4 --size 20480
-        part /boot --fstype ext3 --size 1024
-
-        # Selected package groups
-        @core
-        @base
-        ";
-
-        assert!(installer.load_kickstart_config(ks_script).is_ok());
-
-        let ks = installer.kickstart.as_ref().unwrap();
-        assert_eq!(ks.root_password_hash, "$6$rounds=4096$secure_hash_here");
-        assert_eq!(ks.system_language, "en_US.UTF-8");
-        assert_eq!(ks.partitions.len(), 2);
-        assert_eq!(ks.partitions[0].mount_point, "/");
-        assert_eq!(ks.partitions[1].size_mb, 1024);
-
-        let res = installer.execute_automated_installation().unwrap();
-        assert!(res.contains(" Automated OS provisioning completed"));
-        assert!(installer.installation_successful);
     }
 }

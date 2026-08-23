@@ -5,6 +5,7 @@ pub mod windows_compat;
 pub mod simulation;
 pub mod mapper;
 pub mod pods;
+pub mod grid;
 pub mod vault;
 pub mod rootkit;
 

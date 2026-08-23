@@ -21,16 +21,7 @@ pub mod deobfuscation;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod prism;
 pub mod sandbox;
-pub mod qubes_isolation;
-pub mod scanner;
-pub mod secrets;
 pub mod selinux;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
-pub mod vault;
-pub mod vpn;
-pub mod vulnerability;
-pub mod qubes_isolation;
 
 pub use qubes_isolation::*;
 
@@ -54,9 +45,11 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule,
+pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+pub use vulnerability::{ExploitPayload, PenetrationAssistant, ScanSummary, Severity, SimpleVulnerabilityScanner};
+pub use hardening::{
+    secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};

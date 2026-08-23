@@ -2,10 +2,7 @@
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-extern crate alloc;
-
-use crate::klib::{BTreeMap, String, ToString, Vec};
-use alloc::format;
+use crate::klib::{BTreeMap, String, Vec};
 use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards
@@ -88,7 +85,10 @@ impl AurClient {
         }
     }
 
+    /// Search for packages in AUR (simplified)
     pub fn search(&self, _query: &str) -> Vec<String> {
+        // In production, this would make actual HTTP requests to AUR
+        // For now, return empty vector
         Vec::new()
     }
 
@@ -96,12 +96,8 @@ impl AurClient {
         None
     }
 
-    pub fn download_and_compile_aur_package(
-        &self,
-        pkgname: &str,
-        compiler: &SandboxedCompiler,
-        db: &mut AlpmDatabase,
-    ) -> Result<(), String> {
+    /// Downloads, parses, and compiles an AUR package using SandboxedCompiler safely on-the-fly
+    pub fn download_and_compile_aur_package(&self, pkgname: &str, compiler: &SandboxedCompiler, db: &mut AlpmDatabase) -> Result<(), String> {
         let mut pkg = PkgBuild::new();
         pkg.pkgname = String::from(pkgname);
         pkg.pkgver = String::from("1.0.0");
@@ -134,6 +130,7 @@ impl SandboxedCompiler {
         }
     }
 
+    /// Compile package in sandboxed environment
     pub fn compile_package(&self, _pkgbuild: &PkgBuild) -> Result<(), String> {
         if self.is_isolated.get() {
             Ok(())
@@ -174,7 +171,9 @@ impl AlpmDatabase {
         self.packages.get(&String::from(name))
     }
 
+    /// Sync with remote repository (simplified)
     pub fn sync(&mut self) -> Result<(), String> {
+        // In production, this would fetch metadata from remote
         Ok(())
     }
 }

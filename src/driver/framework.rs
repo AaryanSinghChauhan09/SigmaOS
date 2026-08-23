@@ -51,11 +51,6 @@ pub enum DriverError {
     ProbeFailed = 3,
 }
 
-pub trait NetworkDriver: Driver {
-    fn send_packet(&mut self, packet: &[u8]) -> Result<(), DriverError>;
-    fn receive_packet(&mut self, buf: &mut [u8]) -> Result<usize, DriverError>;
-}
-
 pub trait GraphicsDriver: Driver {
     fn set_resolution(&mut self, width: u32, height: u32) -> Result<(), DriverError>;
     fn flip_buffers(&mut self) -> Result<(), DriverError>;

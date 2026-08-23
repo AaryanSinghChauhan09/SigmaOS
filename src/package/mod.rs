@@ -28,7 +28,12 @@ pub use linux_translation::{
 };
 pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE};
 pub use universal::{
-    ConflictResolution, DependencyResolver, FeatureType, PackageAdapter, PackageError,
-    PackageFormat, PackageSource, SovereignTabFm, TabularDataset, TabularRow, TabularSchema,
-    UnifiedPackage, UniversalPackageManager, UniversalAdapter as PackageFormatAdapter,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use debian::{
+    DebControl, DebPackage, AptSource, DpkgStatusEntry, parse_sources_list, parse_dpkg_status,
+};
+pub use store::{
+    StoreError, StoreApp,
 };

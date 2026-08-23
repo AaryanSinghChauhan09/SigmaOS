@@ -1019,7 +1019,7 @@ impl SovereignPasswordGenerator {
         let mut seed = length as u32 * 31;
         for _ in 0..length {
             seed = seed.wrapping_mul(1103515245).wrapping_add(12345);
-            let pool: &[u8] = if include_symbols && (seed % 3 == 0) {
+            let selection_pool: &[u8] = if include_symbols && (seed % 3 == 0) {
                 symbols
             } else {
                 letters
@@ -1034,6 +1034,7 @@ impl SovereignPasswordGenerator {
 #[cfg(test)]
 mod replicated_tests {
     use super::*;
+    use crate::*;
 
     #[test]
     fn test_dpkg_etcher() {

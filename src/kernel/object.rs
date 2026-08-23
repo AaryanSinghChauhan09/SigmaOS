@@ -457,6 +457,7 @@ impl ObpObjectManager {
 
     pub fn resolve_path(&self, path: &str) -> String {
         if let Some(real_path) = self.symbolic_links.get(path) {
+            let real_path: &String = real_path;
             real_path.clone()
         } else {
             path.to_string()
@@ -472,6 +473,7 @@ impl Default for ObpObjectManager {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use super::*;
 
     static mut MOCK_UNLOAD_CALLED: bool = false;
@@ -546,5 +548,183 @@ mod tests {
         unsafe {
             assert!(MOCK_UNLOAD_CALLED);
         }
+    }
+}
+
+// ==========================================
+// Windows NT-Style Object Manager Subsystem
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NtObjectType {
+    Directory,
+    Device,
+    SymbolicLink,
+    Driver,
+    Section,
+}
+
+#[derive(Clone, Debug)]
+pub struct NtObject {
+    pub name: String,
+    pub object_type: NtObjectType,
+    pub target_path: Option<String>, // Symbolic link pointing to real object
+}
+
+#[derive(Clone)]
+pub struct NtObjectDirectory {
+    pub name: String,
+    pub objects: HashMap<String, NtObject>,
+    pub subdirectories: HashMap<String, NtObjectDirectory>,
+}
+
+pub struct NtObjectManager {
+    pub root: NtObjectDirectory,
+}
+
+impl NtObjectManager {
+    pub fn new() -> Self {
+        let mut root = NtObjectDirectory {
+            name: String::from("\\"),
+            objects: HashMap::new(),
+            subdirectories: HashMap::new(),
+        };
+        // Pre-populate standard Windows-style directories
+        root.subdirectories.insert(
+            String::from("Device"),
+            NtObjectDirectory {
+                name: String::from("Device"),
+                objects: HashMap::new(),
+                subdirectories: HashMap::new(),
+            },
+        );
+        root.subdirectories.insert(
+            String::from("DosDevices"),
+            NtObjectDirectory {
+                name: String::from("DosDevices"),
+                objects: HashMap::new(),
+                subdirectories: HashMap::new(),
+            },
+        );
+        NtObjectManager { root }
+    }
+
+    /// Insert an object into the object manager namespace at a specific path (e.g. "\Device\Keyboard")
+    pub fn insert_object(&mut self, path: &str, obj: NtObject) -> Result<(), &'static str> {
+        let parts: Vec<&str> = path.split('\\').filter(|s| !s.is_empty()).collect();
+        if parts.is_empty() {
+            return Err("Invalid path");
+        }
+
+        let mut current_dir = &mut self.root;
+        for i in 0..parts.len() - 1 {
+            let part = parts[i];
+            if !current_dir.subdirectories.contains_key(part) {
+                current_dir.subdirectories.insert(
+                    part.to_string(),
+                    NtObjectDirectory {
+                        name: part.to_string(),
+                        objects: HashMap::new(),
+                        subdirectories: HashMap::new(),
+                    },
+                );
+            }
+            current_dir = current_dir.subdirectories.get_mut(part).unwrap();
+        }
+
+        let name = parts.last().unwrap().to_string();
+        current_dir.objects.insert(name, obj);
+        Ok(())
+    }
+
+    /// Retrieve an object by its absolute path, resolving symbolic links/aliases recursively
+    pub fn lookup_object(&self, path: &str) -> Option<NtObject> {
+        let parts: Vec<&str> = path.split('\\').filter(|s| !s.is_empty()).collect();
+        if parts.is_empty() {
+            return None;
+        }
+
+        let mut current_dir = &self.root;
+        for i in 0..parts.len() - 1 {
+            let part = parts[i];
+            current_dir = current_dir.subdirectories.get(part)?;
+        }
+
+        let name = *parts.last().unwrap();
+        let obj = current_dir.objects.get(name)?;
+
+        if obj.object_type == NtObjectType::SymbolicLink {
+            if let Some(ref target) = obj.target_path {
+                let target_str: &str = target.as_str();
+                return self.lookup_object(target_str);
+            }
+        }
+        Some(obj.clone())
+    }
+}
+
+impl Default for NtObjectManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
+#[cfg(test)]
+mod tests_extended {
+    use super::*;
+
+    #[test]
+    fn test_nt_object_manager_directories_and_symlinks() {
+        let mut manager = NtObjectManager::new();
+
+        // 1. Create a real device object and insert it into \Device\Keyboard
+        let keyboard_dev = NtObject {
+            name: String::from("Keyboard"),
+            object_type: NtObjectType::Device,
+            target_path: None,
+        };
+        manager.insert_object("\\Device\\Keyboard", keyboard_dev).unwrap();
+
+        // 2. Create a symbolic link in \DosDevices\KeyboardAlias pointing to \Device\Keyboard
+        let keyboard_link = NtObject {
+            name: String::from("KeyboardAlias"),
+            object_type: NtObjectType::SymbolicLink,
+            target_path: Some(String::from("\\Device\\Keyboard")),
+        };
+        manager.insert_object("\\DosDevices\\KeyboardAlias", keyboard_link).unwrap();
+
+        // 3. Look up \DosDevices\KeyboardAlias and verify it resolves to the real Keyboard Device object
+        let resolved = manager.lookup_object("\\DosDevices\\KeyboardAlias").unwrap();
+        assert_eq!(resolved.name, "Keyboard");
+        assert_eq!(resolved.object_type, NtObjectType::Device);
+    }
+
+    #[test]
+    fn test_non_paged_pool_allocation() {
+        let mut pool = NonPagedPoolMemory::new(0xFFFF800000000000, 1024);
+        assert_eq!(pool.allocated_size, 1024);
+
+        let addr1 = pool.allocate_block("tag1", 256).unwrap();
+        assert_eq!(addr1, 0xFFFF800000000000);
+
+        let addr2 = pool.allocate_block("tag2", 512).unwrap();
+        assert_eq!(addr2, 0xFFFF800000000100);
+
+        // Allocating beyond capacity should fail
+        assert!(pool.allocate_block("tag3", 512).is_err());
+    }
+
+    #[test]
+    fn test_driver_entry_context() {
+        let driver = DriverEntryContext {
+            driver_name: "AcpiBattery".to_string(),
+            driver_entry_address: 0xFFFF800000000000,
+            unload_routine: None,
+            is_loaded: true,
+        };
+
+        assert!(driver.is_loaded);
+        assert_eq!(driver.driver_name, "AcpiBattery");
     }
 }

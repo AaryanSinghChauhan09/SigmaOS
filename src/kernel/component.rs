@@ -487,6 +487,7 @@ mod tests {
     fn test_capability_delegation() {
         let mut tree = ComponentTree::new();
         let parent_id = tree.create_component(0, "parent").unwrap();
+        tree.allocate_capability(parent_id, CapabilityRights::full()).unwrap();
         let child_id = tree.create_component(parent_id, "child").unwrap();
 
         let rights = CapabilityRights::full();
@@ -500,6 +501,7 @@ mod tests {
     fn test_resource_propagation() {
         let mut tree = ComponentTree::new();
         let parent_id = tree.create_component(0, "parent").unwrap();
+        tree.allocate_capability(parent_id, CapabilityRights::full()).unwrap();
         let child_id = tree.create_component(parent_id, "child").unwrap();
 
         let resource = ResourceAllocation::new(ResourceType::Memory, 1024, 0, 1024);

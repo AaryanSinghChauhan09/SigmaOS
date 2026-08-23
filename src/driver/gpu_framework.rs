@@ -5,9 +5,8 @@
 
 extern crate alloc;
 
-use crate::klib::ToString;
 use alloc::boxed::Box;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// GPU device types

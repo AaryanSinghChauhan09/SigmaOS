@@ -19,6 +19,13 @@ pub enum EventType {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    PlainText,
+    Json,
+    Binary,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuditError {
     Success = 0,
     LogFull = 1,
@@ -122,11 +129,11 @@ impl AuditLogger for SimpleAuditLogger {
     }
 
     fn get_event(&self, id: EventID) -> Option<&dyn AuditEvent> {
-        for event_option in &self.events {
-            if let Some(ref event) = event_option {
-                let event_ref: &dyn AuditEvent = &**event;
-                if event_ref.id() == id {
-                    return Some(event_ref);
+        for i in 0..self.events.len() {
+            if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
+                if event.id() == id {
+                    return Some(event.as_ref());
                 }
             }
         }
@@ -135,11 +142,11 @@ impl AuditLogger for SimpleAuditLogger {
 
     fn query_events(&self, event_type: EventType, user_id: usize) -> Vec<EventID> {
         let mut ids = Vec::new();
-        for event_option in &self.events {
-            if let Some(ref event) = event_option {
-                let event_ref: &dyn AuditEvent = &**event;
-                if event_ref.event_type() == event_type && event_ref.user_id() == user_id {
-                    ids.push(event_ref.id());
+        for i in 0..self.events.len() {
+            if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
+                if event.event_type() == event_type && event.user_id() == user_id {
+                    ids.push(event.id());
                 }
             }
         }
@@ -147,9 +154,17 @@ impl AuditLogger for SimpleAuditLogger {
     }
 
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
-        self.events.retain(|event_opt| {
-            if let Some(ref event) = *event_opt {
-                event.timestamp() >= older_than
+        let mut i = 0;
+        while i < self.events.len() {
+            let mut remove = false;
+            if let Some(ref event) = self.events[i] {
+                let event: &Box<dyn AuditEvent> = event;
+                if event.timestamp() < older_than {
+                    remove = true;
+                }
+            }
+            if remove {
+                self.events.remove(i);
             } else {
                 false
             }

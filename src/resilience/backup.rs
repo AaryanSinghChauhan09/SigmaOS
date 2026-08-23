@@ -93,15 +93,15 @@ impl HardwareTimeshift {
 
 pub static GLOBAL_TIMESHIFT: HardwareTimeshift = HardwareTimeshift::new();
 
-pub struct SigmaTimeshift {
+pub struct SigmaTimeshiftManager {
     pub snapshots: Vec<BackupSnapshot>,
     pub backup_schedule_enabled: bool,
     pub last_scheduled_run: u64,
 }
 
-impl SigmaTimeshift {
+impl SigmaTimeshiftManager {
     pub fn new() -> Self {
-        SigmaTimeshift {
+        SigmaTimeshiftManager {
             snapshots: Vec::new(),
             backup_schedule_enabled: true,
             last_scheduled_run: 0,
@@ -153,8 +153,8 @@ mod tests {
 
     #[test]
     fn test_timeshift_backup() {
-        let mut timeshift = SigmaTimeshift::new();
-        let mut files = BTreeMap::new();
+        let mut timeshift = SigmaTimeshiftManager::new();
+        let mut files = HashMap::new();
         files.insert("/etc/hosts".to_string(), "hash123".to_string());
         files.insert("/bin/sigma-sh".to_string(), "hash456".to_string());
 

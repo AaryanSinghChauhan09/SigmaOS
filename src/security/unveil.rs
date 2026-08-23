@@ -3,30 +3,15 @@
 
 extern crate alloc;
 
-#[cfg(test)]
-#[path = "../klib/error.rs"]
-pub mod error;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SecurityError {
+    AccessDenied,
+    PrivilegeEscalationDetected,
+}
 
-#[cfg(test)]
-use error::{SecurityError, SigmaError};
-
-#[cfg(not(test))]
-use crate::klib::error::{SecurityError, SigmaError};
-
-#[cfg(test)]
-pub use test_stub::*;
-
-#[cfg(test)]
-mod test_stub {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum SecurityError {
-        AccessDenied,
-        PrivilegeEscalationDetected,
-    }
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum SigmaError {
-        Security(SecurityError),
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SigmaError {
+    Security(SecurityError),
 }
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

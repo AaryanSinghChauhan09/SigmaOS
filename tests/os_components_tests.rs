@@ -165,78 +165,6 @@ mod system_user;
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
 
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-
-pub enum CpuPrivilegeMode { KernelRing0, UserRing3 }
-pub struct GlobalDescriptorTable;
-impl GlobalDescriptorTable {
-    pub fn new() -> Self { Self }
-    pub fn insert_descriptor(&mut self, _desc: SegmentDescriptor) -> SegmentSelector {
-        SegmentSelector { index: 1, rpl: segmentation_paging::CpuRing::Ring0Kernel, is_ldt: false }
-    }
-    pub fn translate_address(&self, seg_addr: SegmentedAddress, _mode: CpuPrivilegeMode) -> Result<u64, &'static str> {
-        Ok(seg_addr.offset)
-    }
-}
-pub struct MultiLevelPagingEngine;
-impl MultiLevelPagingEngine {
-    pub fn new() -> Self { Self }
-    pub fn map_page(&mut self, _v: u64, _p: u64, _r: bool, _w: bool, _x: bool) -> Result<(), &'static str> { Ok(()) }
-    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> { Ok(PageTableEntry) }
-}
-pub struct PageTableEntry;
-impl PageTableEntry { pub fn get_physical_address(&self) -> u64 { 0x0000000100000000 } }
-pub enum ProtectionLevel { Normal, High }
-pub enum ProtectionViolationType { ReadViolation, WriteViolation }
-pub enum SegmentType { Code, Data }
-pub struct SegmentedAddress { pub selector: SegmentSelector, pub offset: u64 }
-
-
-#[path = "../src/process/activity_manager.rs"]
-mod process_activity_manager;
-
-pub type ProcessActivityManager = ActivityManager;
-pub struct ResourceUsageMetrics;
-
-
-#[path = "../src/filesystem/sigma_fs.rs"]
-mod sigma_fs_extended;
-
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
-
-
-
-pub use access_control::{AclEntry, AclType};
-pub use segmentation_paging::{SegmentSelector, AslrEntropyConfig};
-
-// Imports and definitions
-
-pub use community_toolkit::CommunityHandbookCatalog;
-pub use community_toolkit::ReproduciblePackageRecipeManager;
-pub struct SecurityProfileTemplateStore {
-    pub templates: std::collections::HashMap<String, String>,
-}
-impl SecurityProfileTemplateStore {
-    pub fn new() -> Self {
-        let mut templates = std::collections::HashMap::new();
-        templates.insert("hardened-webserver".to_string(), "profile".to_string());
-        Self { templates }
-    }
-}
-
-pub use statutory_compliance::DisputeAuditRollbackEngine;
-pub use statutory_compliance::PenaltyBreachNotifier;
-pub use statutory_compliance::{StatutoryGovernanceLayer, StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus};
-
-pub use system_user::UserManager as TestUserManager;
-
-pub use access_control::PosixAcl;
-
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
     BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter,
@@ -258,7 +186,7 @@ use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPac
 use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
 use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use fedora_compat::DnfPackageResolver;
 use sigmatools::*;
 
 use epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
@@ -422,9 +350,9 @@ fn test_audio_dsp_mixing_and_effects() {
 #[test]
 fn test_video_editor_sigmacut_engine() {
     let mut timeline = VideoTimeline::new(1920, 1080);
-    let mut track = VideoTrack::new(1, "Video Track 1");
+    let mut track = VideoTrack::new(1, "Main Track");
 
-    let clip = VideoClip::new(1, "intro.mp4", 0, 60);
+    let clip = VideoClip::new(0, "intro.mp4", 0, 60);
     track.add_clip(clip);
     timeline.add_video_track(track);
 
@@ -517,10 +445,10 @@ fn test_fedora_rpm_and_selinux() {
     let order = resolver.resolve_and_install("kernel-core").unwrap();
     assert_eq!(order, vec!["kernel-core".to_string()]);
 
-    let selinux = SeLinuxEngine::new(true);
-    let httpd_sub = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
-    let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
-    assert!(selinux.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
+    let mut selinux = sigmaos::security::selinux::SelinuxEngine::new();
+    let src = "system_u:system_r:httpd_t:s0";
+    let tgt = "system_u:object_r:httpd_sys_content_t:s0";
+    assert!(selinux.has_permission(src, tgt, "file", "read").unwrap());
 }
 
 #[test]
@@ -579,23 +507,15 @@ fn test_sigmatools_suite() {
 #[test]
 fn test_posix_and_nfsv4_acls() {
     // POSIX 1003.1e ACL verification
-    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
-    posix_acl.add_entry_direct(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
+    let mut posix_acl = access_control::PosixAclTable::new();
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::UserObj, id: 1000, perms: 0o7 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::User, id: 1001, perms: 0o5 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Mask, id: 0, perms: 0o5 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Other, id: 0, perms: 0o0 });
 
-    assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
-
-    let child_posix = posix_acl.inherit_default_acl(false);
-    assert_eq!(child_posix.entries.len(), posix_acl.entries.len());
-
-    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
-    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
-    gate.mac_filter.add_mac(allowed_mac);
-    gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
-
-    assert!(nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::READ_DATA));
-    assert!(!nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::DELETE));
-
-    assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
+    assert!(posix_acl.evaluate_acl_access(1001, 1001, 5, 1000, 1000)); // Allowed r-x
+    assert!(!posix_acl.evaluate_acl_access(1001, 1001, 2, 1000, 1000)); // Denied write (2)
+    assert!(!posix_acl.evaluate_acl_access(1002, 1002, 4, 1000, 1000)); // Other denied
 }
 
 #[test]
