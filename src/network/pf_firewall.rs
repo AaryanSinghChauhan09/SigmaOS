@@ -1,8 +1,5 @@
 // OpenBSD pf-Inspired Firewall with Stateful Packet Filtering
 // Provides comprehensive packet filtering, NAT, traffic shaping, and state tracking
-
-#![no_std]
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 #[cfg(not(target_os = "none"))]
 extern crate alloc;
 #[cfg(not(target_os = "none"))]

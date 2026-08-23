@@ -1,7 +1,5 @@
 // Musl C Library Compatibility Layer for SigmaOS
 // Location: src/userland/libc/sigma_musl_compat.rs
-
-#![no_std]
 extern crate alloc;
 use alloc::string::String;
 

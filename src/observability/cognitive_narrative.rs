@@ -1,8 +1,5 @@
 //! Sovereign Cognitive OS Narratives and Future-Ready Innovation Engine
 //! Implements a comprehensive, seven-vector system of cutting-edge OS innovations.
-
-#![no_std]
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;

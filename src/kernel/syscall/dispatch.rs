@@ -1,9 +1,6 @@
 //! SigmaOS Syscall Dispatch
 //! 30+ Essential Syscalls with pledge/unveil and PQC syscalls
 //! Core syscalls: read, write, open, close, mmap, munmap, fork, execve, exit, etc.
-
-#![no_std]
-
 pub mod ioctl_helper;
 
 use core::sync::atomic::{AtomicUsize, Ordering};

@@ -1,8 +1,5 @@
 //! Performance Tuning Functions (tuned Inspiration)
 //! Performance tuner, I/O tuner, and network tuner
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

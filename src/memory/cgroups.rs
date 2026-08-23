@@ -2,11 +2,10 @@
 
 extern crate alloc;
 
-
-use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct MemCgroup {
@@ -143,7 +142,10 @@ mod tests {
         assert_eq!(manager.groups.get(&0).unwrap().usage, 400 * 1024); // Root also charged
 
         // Charge 700KB - exceeds 1MB limit! Should fail and roll back
-        assert_eq!(manager.charge_memory(container_cg, 700 * 1024), Err(container_cg));
+        assert_eq!(
+            manager.charge_memory(container_cg, 700 * 1024),
+            Err(container_cg)
+        );
         assert_eq!(manager.groups.get(&container_cg).unwrap().usage, 400 * 1024);
         assert_eq!(manager.groups.get(&0).unwrap().usage, 400 * 1024); // Root rolled back
 
@@ -153,9 +155,12 @@ mod tests {
             (102, 250 * 1024, true), // pid 102, 250KB (largest)
         ];
 
-        let killed = manager.trigger_oom_killer(container_cg, &mut processes).unwrap();
+        let killed = manager
+            .trigger_oom_killer(container_cg, &mut processes)
+            .unwrap();
         assert_eq!(killed, 102);
         assert_eq!(processes[1].2, false); // pid 102 is now terminated
-        assert_eq!(manager.groups.get(&container_cg).unwrap().usage, 150 * 1024); // Memory uncharged from 400KB to 150KB
+        assert_eq!(manager.groups.get(&container_cg).unwrap().usage, 150 * 1024);
+        // Memory uncharged from 400KB to 150KB
     }
 }

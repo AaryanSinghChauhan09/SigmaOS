@@ -1,8 +1,5 @@
 // OOP-based Desktop Notification for SigmaOS with elementaryOS Human Interface Guidelines (HIG)
 // Implements focus-first notifications (Do Not Disturb) and silent notification centers
-
-#![no_std]
-
 use core::sync::atomic::AtomicUsize;
 
 pub type NotificationID = usize;

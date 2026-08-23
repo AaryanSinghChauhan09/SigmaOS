@@ -207,7 +207,8 @@ impl EnhancedVirtualMachine {
     }
 
     pub fn attach_vfio_device(&mut self, group_id: u32, pci_addr: &str) {
-        self.vfio_devices.push(VfioIommuGroup::new(group_id, pci_addr));
+        self.vfio_devices
+            .push(VfioIommuGroup::new(group_id, pci_addr));
     }
 
     pub fn start(&mut self) -> Result<(), VirtError> {
@@ -387,8 +388,16 @@ impl EnhancedVirtManager {
         self.templates.push(template);
     }
 
-    pub fn clone_from_template(&mut self, template_id: &str, vm_name: &str) -> Result<String, VirtError> {
-        if let Some(template) = self.templates.iter().find(|t| t.id == template_id || t.name == template_id) {
+    pub fn clone_from_template(
+        &mut self,
+        template_id: &str,
+        vm_name: &str,
+    ) -> Result<String, VirtError> {
+        if let Some(template) = self
+            .templates
+            .iter()
+            .find(|t| t.id == template_id || t.name == template_id)
+        {
             let vm = template.create_vm(vm_name);
             let id = vm.id.clone();
             self.add_vm(vm);
@@ -425,7 +434,11 @@ impl EnhancedVirtManager {
     pub fn get_virt_stats(&self) -> VirtStats {
         VirtStats {
             total_vms: self.vms.len(),
-            running_vms: self.vms.iter().filter(|v| v.state == VMState::Running).count(),
+            running_vms: self
+                .vms
+                .iter()
+                .filter(|v| v.state == VMState::Running)
+                .count(),
             total_snapshots: self.snapshots.len(),
             total_templates: self.templates.len(),
             total_networks: self.networks.len(),
@@ -487,7 +500,9 @@ mod tests {
         let vm = EnhancedVirtualMachine::new("test-gpu-vm", 2, 4096);
         manager.add_vm(vm);
 
-        assert!(manager.enable_gpu_passthrough("test-gpu-vm", "0000:01:00.0").is_ok());
+        assert!(manager
+            .enable_gpu_passthrough("test-gpu-vm", "0000:01:00.0")
+            .is_ok());
         assert!(manager.enable_nested_virtualization("test-gpu-vm").is_ok());
 
         let target_vm = manager.get_vm("test-gpu-vm").unwrap();

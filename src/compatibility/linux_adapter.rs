@@ -1,17 +1,14 @@
 // SigmaOS Legacy Linux Kernel & System Compatibility Adapter
 // Enables ancient and modern software compiled for Linux 2.x, 3.x, 4.x, 5.x, and 6.x to run securely
 // Supports System V IPC, ProcFS emulation, GLIBC environment shims, and ELF binary Aux Vectors loading.
-
-#![no_std]
-
 #[cfg(test)]
 extern crate std;
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::format;
 use alloc::vec::Vec;
 
 #[cfg(not(test))]
@@ -97,8 +94,15 @@ impl ProcFsEmulator {
     pub fn new() -> Self {
         let mut mock = HashMap::new();
         mock.insert("/proc/cpuinfo".to_string(), "processor: 0\nvendor_id: GenuineIntel\ncpu family: 6\nmodel name: SigmaOS Quantum Core\n".to_string());
-        mock.insert("/proc/meminfo".to_string(), "MemTotal:       32768000 kB\nMemFree:        28991000 kB\n".to_string());
-        mock.insert("/proc/version".to_string(), "Linux version 6.1.0-sigma-hardened (gcc version 12.2.0) #1 SMP PREEMPT_DYNAMIC\n".to_string());
+        mock.insert(
+            "/proc/meminfo".to_string(),
+            "MemTotal:       32768000 kB\nMemFree:        28991000 kB\n".to_string(),
+        );
+        mock.insert(
+            "/proc/version".to_string(),
+            "Linux version 6.1.0-sigma-hardened (gcc version 12.2.0) #1 SMP PREEMPT_DYNAMIC\n"
+                .to_string(),
+        );
         Self { mocked_files: mock }
     }
 
@@ -122,9 +126,9 @@ pub struct ElfLoader {
 impl ElfLoader {
     pub fn new(interpreter: &str) -> Self {
         let mut aux = HashMap::new();
-        aux.insert(ElfAuxType::AtPagesz, 4096);       // standard 4KB page size
+        aux.insert(ElfAuxType::AtPagesz, 4096); // standard 4KB page size
         aux.insert(ElfAuxType::AtEntry, 0x4000_1000); // entry point offset
-        aux.insert(ElfAuxType::AtPhnum, 8);           // number of program headers
+        aux.insert(ElfAuxType::AtPhnum, 8); // number of program headers
         Self {
             dynamic_interpreter: interpreter.to_string(),
             aux_vectors: aux,
@@ -221,7 +225,9 @@ pub struct LegacySecurityAdapter {
 
 impl LegacySecurityAdapter {
     pub fn new(perm: u32) -> Self {
-        LegacySecurityAdapter { dac_permissions: perm }
+        LegacySecurityAdapter {
+            dac_permissions: perm,
+        }
     }
 
     pub fn check_permission(&self, mode: u32) -> bool {
@@ -244,7 +250,10 @@ impl LegacyUIAdapter {
 
     pub fn map_x11_to_zenith(&mut self, window_id: u32) -> String {
         self.active_windows += 1;
-        format!("Mapped X11 Window ID {} to Zenith Desktop Surface", window_id)
+        format!(
+            "Mapped X11 Window ID {} to Zenith Desktop Surface",
+            window_id
+        )
     }
 }
 
@@ -261,14 +270,20 @@ mod tests {
     #[test]
     fn test_legacy_kernel_syscalls() {
         let adapter = LegacyKernelAdapter::new(LinuxKernelVersion::Kernel3x);
-        assert_eq!(adapter.dispatch_syscall(4).unwrap(), "Executing shim: sys_write");
+        assert_eq!(
+            adapter.dispatch_syscall(4).unwrap(),
+            "Executing shim: sys_write"
+        );
         assert!(adapter.dispatch_syscall(999).is_err());
     }
 
     #[test]
     fn test_legacy_package_converter() {
         let adapter = LegacyPackageAdapter::new();
-        assert_eq!(adapter.convert_package("old-app.deb").unwrap(), "Converted old-app.deb to unified .spkg format");
+        assert_eq!(
+            adapter.convert_package("old-app.deb").unwrap(),
+            "Converted old-app.deb to unified .spkg format"
+        );
         assert!(adapter.convert_package("unsupported.zip").is_err());
     }
 
@@ -281,7 +296,10 @@ mod tests {
     #[test]
     fn test_legacy_ui_mapping() {
         let mut adapter = LegacyUIAdapter::new();
-        assert_eq!(adapter.map_x11_to_zenith(4567), "Mapped X11 Window ID 4567 to Zenith Desktop Surface");
+        assert_eq!(
+            adapter.map_x11_to_zenith(4567),
+            "Mapped X11 Window ID 4567 to Zenith Desktop Surface"
+        );
         assert_eq!(adapter.active_windows, 1);
     }
 

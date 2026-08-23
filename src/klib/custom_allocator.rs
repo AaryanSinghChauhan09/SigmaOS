@@ -21,7 +21,6 @@
 // Designed to minimize dependency on predefined library allocators.
 
 #[allow(dead_code)]
-
 use core::alloc::{GlobalAlloc, Layout};
 use core::cell::UnsafeCell;
 use core::ptr;
@@ -84,7 +83,11 @@ unsafe impl Sync for RecycleBin {}
 
 impl RecycleBin {
     const fn new() -> Self {
-        let empty = RecycleEntry { ptr: ptr::null_mut(), size: 0, align: 0 };
+        let empty = RecycleEntry {
+            ptr: ptr::null_mut(),
+            size: 0,
+            align: 0,
+        };
         RecycleBin {
             entries: UnsafeCell::new([empty; RECYCLE_BIN_CAPACITY]),
             head: AtomicUsize::new(0),
@@ -119,7 +122,11 @@ impl RecycleBin {
         let tail = self.tail.load(Ordering::Acquire);
         let mut idx = head;
         let entries = unsafe { &mut *self.entries.get() };
-        let live = if tail >= head { tail - head } else { RECYCLE_BIN_CAPACITY - head + tail };
+        let live = if tail >= head {
+            tail - head
+        } else {
+            RECYCLE_BIN_CAPACITY - head + tail
+        };
         for _ in 0..live {
             let entry = entries[idx];
             if entry.size >= layout.size() && entry.align >= layout.align() {
@@ -253,7 +260,11 @@ unsafe impl GlobalAlloc for SigmaBumpAllocator {
                 return ptr::null_mut();
             }
 
-            if self.bump.compare_exchange(current, end, Ordering::AcqRel, Ordering::Relaxed).is_ok() {
+            if self
+                .bump
+                .compare_exchange(current, end, Ordering::AcqRel, Ordering::Relaxed)
+                .is_ok()
+            {
                 let ptr = heap_start.add(aligned);
                 self.live_count.fetch_add(1, Ordering::Relaxed);
                 self.total_allocated.fetch_add(size, Ordering::Relaxed);
@@ -362,13 +373,15 @@ impl SigmaAllocator {
 }
 
 pub unsafe fn alloc(size: usize) -> *mut u8 {
-    let layout = Layout::from_size_align(size, MIN_ALIGN).unwrap_or(Layout::from_size_align_unchecked(size, 1));
+    let layout = Layout::from_size_align(size, MIN_ALIGN)
+        .unwrap_or(Layout::from_size_align_unchecked(size, 1));
     GlobalAlloc::alloc(&SIGMA_ALLOCATOR, layout)
 }
 
 pub unsafe fn free(ptr: *mut u8, size: usize) {
     if !ptr.is_null() && size > 0 {
-        let layout = Layout::from_size_align(size, MIN_ALIGN).unwrap_or(Layout::from_size_align_unchecked(size, 1));
+        let layout = Layout::from_size_align(size, MIN_ALIGN)
+            .unwrap_or(Layout::from_size_align_unchecked(size, 1));
         GlobalAlloc::dealloc(&SIGMA_ALLOCATOR, ptr, layout);
     }
 }

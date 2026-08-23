@@ -1,8 +1,5 @@
 //! IoT Platform (IoT Device Management Inspiration)
 //! Large-scale device management, protocol support, and digital twin integration
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

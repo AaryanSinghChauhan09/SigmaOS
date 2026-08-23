@@ -4,17 +4,22 @@ pub mod arc;
 pub mod async_runtime;
 pub mod bitmap;
 pub mod btreemap;
+pub mod btreemap;
 pub mod buddy_allocator;
 pub mod collections;
 pub mod console;
 pub mod conversion;
 pub mod custom_allocator;
+pub mod custom_allocator;
+pub mod custom_string;
 pub mod custom_string;
 pub mod env;
 pub mod error;
 pub mod ffi;
 pub mod fs;
 pub mod hash;
+pub mod hash;
+pub mod hashmap;
 pub mod hashmap;
 pub mod hashset;
 pub mod io;
@@ -43,17 +48,12 @@ pub mod time_impl;
 pub mod uuid;
 pub mod uvm;
 pub mod vec;
-pub mod btreemap;
-pub mod hashmap;
-pub mod hash;
-pub mod custom_allocator;
-pub mod custom_string;
 
-pub use vec::Vec;
 pub use btreemap::BTreeMap;
 pub use hashmap::HashMap;
+pub use vec::Vec;
 
 pub mod collections {
-    pub use crate::klib::hashmap::HashMap;
     pub use crate::klib::btreemap::BTreeMap;
+    pub use crate::klib::hashmap::HashMap;
 }

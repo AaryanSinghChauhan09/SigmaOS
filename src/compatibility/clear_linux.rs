@@ -60,11 +60,13 @@ impl ClearLinuxStatelessEngine {
 
         let level = if has_avx512 {
             self.compile_opt_flags.push("-march=x86-64-v4".to_string());
-            self.compile_opt_flags.push("-mprefer-vector-width=512".to_string());
+            self.compile_opt_flags
+                .push("-mprefer-vector-width=512".to_string());
             CpuIsaLevel::SkylakeV4
         } else if has_avx2 {
             self.compile_opt_flags.push("-march=x86-64-v3".to_string());
-            self.compile_opt_flags.push("-mprefer-vector-width=256".to_string());
+            self.compile_opt_flags
+                .push("-mprefer-vector-width=256".to_string());
             CpuIsaLevel::HaswellV3
         } else {
             self.compile_opt_flags.push("-march=x86-64-v2".to_string());
@@ -123,7 +125,10 @@ mod tests {
     #[test]
     fn test_clear_linux_governor() {
         let mut engine = ClearLinuxStatelessEngine::new();
-        assert_eq!(engine.apply_low_latency_governor(), "CLEAR_PERFORMANCE_GOVERNOR_ACTIVE");
+        assert_eq!(
+            engine.apply_low_latency_governor(),
+            "CLEAR_PERFORMANCE_GOVERNOR_ACTIVE"
+        );
         assert!(engine.governor_performance_active);
     }
 }

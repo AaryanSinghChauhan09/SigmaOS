@@ -5,8 +5,9 @@
 mod vm_manager;
 
 use vm_manager::{
-    AmdViIommuManager, HypervisorBackend, IntelVtxBackend, KvmDirtyRing, KvmExitReason, KvmIoctlDispatcher, KvmVirtualCpu,
-    OsType, QemuBackend, QemuMonitorEngine, VirtioVirtqueue, VmConfig, VmManager, VmState, kvm_ioctl,
+    kvm_ioctl, AmdViIommuManager, HypervisorBackend, IntelVtxBackend, KvmDirtyRing, KvmExitReason,
+    KvmIoctlDispatcher, KvmVirtualCpu, OsType, QemuBackend, QemuMonitorEngine, VirtioVirtqueue,
+    VmConfig, VmManager, VmState,
 };
 
 #[test]
@@ -87,10 +88,14 @@ fn test_qemu_monitor_protocol_qmp() {
     qmp.subscribe_event("SHUTDOWN");
     assert_eq!(qmp.event_subscribers.len(), 1);
 
-    let query_res = qmp.execute_qmp_command("{\"execute\": \"query-status\"}").unwrap();
+    let query_res = qmp
+        .execute_qmp_command("{\"execute\": \"query-status\"}")
+        .unwrap();
     assert!(query_res.contains("\"running\": true"));
 
-    let balloon_res = qmp.execute_qmp_command("{\"execute\": \"balloon\", \"arguments\": {\"value\": 2048}}").unwrap();
+    let balloon_res = qmp
+        .execute_qmp_command("{\"execute\": \"balloon\", \"arguments\": {\"value\": 2048}}")
+        .unwrap();
     assert!(balloon_res.contains("\"return\": {}"));
 
     assert_eq!(qmp.command_history.len(), 2);
@@ -99,7 +104,9 @@ fn test_qemu_monitor_protocol_qmp() {
 #[test]
 fn test_kvm_ioctl_dispatcher() {
     let mut kvm = KvmIoctlDispatcher::new();
-    let version = kvm.dispatch_ioctl(kvm_ioctl::KVM_GET_API_VERSION, 0).unwrap();
+    let version = kvm
+        .dispatch_ioctl(kvm_ioctl::KVM_GET_API_VERSION, 0)
+        .unwrap();
     assert_eq!(version, 12);
 
     let vm_fd = kvm.dispatch_ioctl(kvm_ioctl::KVM_CREATE_VM, 0).unwrap();
@@ -109,7 +116,9 @@ fn test_kvm_ioctl_dispatcher() {
     assert_eq!(vcpu_fd, 1);
     assert_eq!(kvm.created_vcpus, vec![1]);
 
-    let mem_res = kvm.dispatch_ioctl(kvm_ioctl::KVM_SET_USER_MEMORY_REGION, (1024 << 16) | 0).unwrap();
+    let mem_res = kvm
+        .dispatch_ioctl(kvm_ioctl::KVM_SET_USER_MEMORY_REGION, (1024 << 16) | 0)
+        .unwrap();
     assert_eq!(mem_res, 0);
     assert_eq!(*kvm.user_memory_regions.get(&0).unwrap(), 1024);
 }

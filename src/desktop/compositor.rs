@@ -1,8 +1,5 @@
 //! Desktop Compositor Framework (GNOME + KDE + macOS Inspiration)
 //! Implements modern desktop environment with compositor, window management, and accessibility
-
-#![no_std]
-
 extern crate alloc;
 
 use alloc::vec::Vec;

@@ -74,7 +74,8 @@ impl Task {
     }
 
     pub fn is_eligible(&self, current_time: u64) -> bool {
-        self.state == TaskState::Ready && (self.virtual_deadline >= current_time || self.calculate_lag() >= 0)
+        self.state == TaskState::Ready
+            && (self.virtual_deadline >= current_time || self.calculate_lag() >= 0)
     }
 }
 

@@ -332,7 +332,10 @@ impl DoubleFaultGuard {
 
     /// Increments recovery attempt. Returns true if recursive fault threshold is breached (Double Fault detected)
     pub fn register_attempt(&mut self, resource: &str) -> bool {
-        let count = self.recovery_counts.entry(resource.to_string()).or_insert(0);
+        let count = self
+            .recovery_counts
+            .entry(resource.to_string())
+            .or_insert(0);
         *count += 1;
         *count >= self.threshold_limit
     }

@@ -31,11 +31,7 @@ impl SigmaTimestamp {
     pub fn add(&self, duration: SigmaDuration) -> SigmaTimestamp {
         let new_seconds = self.seconds + duration.seconds;
         let new_nanos = self.nanoseconds + duration.nanoseconds;
-        let carry = if new_nanos >= 1_000_000_000 {
-            1
-        } else {
-            0
-        };
+        let carry = if new_nanos >= 1_000_000_000 { 1 } else { 0 };
         SigmaTimestamp {
             seconds: new_seconds + carry as u64,
             nanoseconds: new_nanos % 1_000_000_000,
@@ -95,11 +91,7 @@ impl SigmaDuration {
     pub fn add(&self, other: SigmaDuration) -> SigmaDuration {
         let new_seconds = self.seconds + other.seconds;
         let new_nanos = self.nanoseconds + other.nanoseconds;
-        let carry = if new_nanos >= 1_000_000_000 {
-            1
-        } else {
-            0
-        };
+        let carry = if new_nanos >= 1_000_000_000 { 1 } else { 0 };
         SigmaDuration {
             seconds: new_seconds + carry as u64,
             nanoseconds: new_nanos % 1_000_000_000,
@@ -140,21 +132,21 @@ impl SigmaTimer {
     pub fn stop(&self) -> SigmaDuration {
         let now = SigmaTimestamp::now();
         let start = self.start_time.get();
-        
+
         // Calculate elapsed time
         let mut elapsed_seconds = now.seconds - start.seconds;
         let mut elapsed_nanos = now.nanoseconds as i64 - start.nanoseconds as i64;
-        
+
         if elapsed_nanos < 0 {
             elapsed_seconds -= 1;
             elapsed_nanos += 1_000_000_000;
         }
-        
+
         let elapsed = SigmaDuration {
             seconds: elapsed_seconds,
             nanoseconds: elapsed_nanos as u32,
         };
-        
+
         self.elapsed.set(elapsed);
         elapsed
     }
@@ -163,16 +155,16 @@ impl SigmaTimer {
     pub fn elapsed(&self) -> SigmaDuration {
         let now = SigmaTimestamp::now();
         let start = self.start_time.get();
-        
+
         // Calculate elapsed time
         let mut elapsed_seconds = now.seconds - start.seconds;
         let mut elapsed_nanos = now.nanoseconds as i64 - start.nanoseconds as i64;
-        
+
         if elapsed_nanos < 0 {
             elapsed_seconds -= 1;
             elapsed_nanos += 1_000_000_000;
         }
-        
+
         SigmaDuration {
             seconds: elapsed_seconds,
             nanoseconds: elapsed_nanos as u32,

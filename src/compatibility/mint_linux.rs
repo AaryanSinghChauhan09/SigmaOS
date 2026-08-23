@@ -1,11 +1,10 @@
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::Vec;
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::Vec;
 
 #[cfg(feature = "standalone_test")]
 extern crate alloc;
@@ -195,14 +194,20 @@ pub struct MintAppMetadata {
     pub rating_stars: usize, // 1 to 5 (calculated as average of reviews)
     pub reviews_count: usize,
     pub is_flatpak: bool,
-    pub category: [u8; 16],   // e.g. "System", "Games", "Office"
-    pub license: [u8; 16],    // e.g. "GPL-3.0", "MIT"
+    pub category: [u8; 16], // e.g. "System", "Games", "Office"
+    pub license: [u8; 16],  // e.g. "GPL-3.0", "MIT"
     pub size_bytes: u64,
     pub reviews: Vec<AppReview>,
 }
 
 impl MintAppMetadata {
-    pub fn new(name: &[u8], category: &[u8], license: &[u8], size_bytes: u64, is_flatpak: bool) -> Self {
+    pub fn new(
+        name: &[u8],
+        category: &[u8],
+        license: &[u8],
+        size_bytes: u64,
+        is_flatpak: bool,
+    ) -> Self {
         let mut name_arr = [0u8; 32];
         let mut category_arr = [0u8; 16];
         let mut license_arr = [0u8; 16];
@@ -584,7 +589,8 @@ mod tests {
     #[test]
     fn test_mint_timeshift_restore_points() {
         let mut timeshift = MintTimeshiftEngine::new();
-        let snap_id = timeshift.create_checkpoint(1690000000, b"Fresh boot restore point", 0xDEADBEEF);
+        let snap_id =
+            timeshift.create_checkpoint(1690000000, b"Fresh boot restore point", 0xDEADBEEF);
         assert_eq!(snap_id, 1);
 
         let hash = timeshift.restore_checkpoint(1).unwrap();
@@ -615,7 +621,9 @@ mod tests {
         assert_eq!(drivers.available_drivers.len(), 1);
         assert!(!drivers.available_drivers[0].active);
 
-        drivers.toggle_driver(b"Broadcom BCM4360 WiFi", true).unwrap();
+        drivers
+            .toggle_driver(b"Broadcom BCM4360 WiFi", true)
+            .unwrap();
         assert!(drivers.available_drivers[0].active);
     }
 }

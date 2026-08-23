@@ -45,7 +45,10 @@ impl SnapshotManager {
         self.snapshots.push(snapshot);
         let id = self.next_id;
         self.next_id += 1;
-        println!("[snapshot] Btrfs-style snapshot #{} created: '{}'.", id, description);
+        println!(
+            "[snapshot] Btrfs-style snapshot #{} created: '{}'.",
+            id, description
+        );
         id
     }
 
@@ -94,7 +97,11 @@ impl CompatibilityLayer {
         }
     }
 
-    pub fn load_and_map_binary(&mut self, name: &str, format: CompatBinaryFormat) -> Result<u32, &'static str> {
+    pub fn load_and_map_binary(
+        &mut self,
+        name: &str,
+        format: CompatBinaryFormat,
+    ) -> Result<u32, &'static str> {
         let payload_hash = match format {
             CompatBinaryFormat::LinuxElf => 0x011a011a,
             CompatBinaryFormat::WindowsPe => 0x022b022b,
@@ -139,7 +146,10 @@ impl BsdJailSandbox {
 
     pub fn validate_operation(&self, path: &str, is_raw_socket_req: bool) -> bool {
         if is_raw_socket_req && !self.allow_raw_sockets {
-            println!("[bsd-jail] SecurityViolation: Raw sockets are blocked inside jail #{}.", self.jail_id);
+            println!(
+                "[bsd-jail] SecurityViolation: Raw sockets are blocked inside jail #{}.",
+                self.jail_id
+            );
             return false;
         }
         for blocked in &self.blocked_directories {
@@ -183,7 +193,10 @@ impl UnifiedAppStore {
             is_verified,
         };
         self.registered_recipes.push(app);
-        println!("[app-store] Recipe registered: app '{}' -> url: {}.", app_id, recipe_url);
+        println!(
+            "[app-store] Recipe registered: app '{}' -> url: {}.",
+            app_id, recipe_url
+        );
     }
 
     pub fn get_app_recipe(&self, app_id: &str) -> Option<&FlatpakApp> {
@@ -221,7 +234,10 @@ impl ContinuityCoordinator {
 
     pub fn sync_clipboard(&mut self, clipboard_text: &str) {
         self.local_clipboard = String::from(clipboard_text);
-        println!("[continuity] Clipboard synced across ecosystem: '{}'.", clipboard_text);
+        println!(
+            "[continuity] Clipboard synced across ecosystem: '{}'.",
+            clipboard_text
+        );
     }
 
     pub fn push_task_state(&mut self, task_name: &str, cursor_pos: usize, payload: &str) {
@@ -231,7 +247,10 @@ impl ContinuityCoordinator {
             payload: String::from(payload),
         };
         self.active_handoff_task = Some(task);
-        println!("[continuity] Ecosystem Handoff: Task '{}' state pushed to cloud.", task_name);
+        println!(
+            "[continuity] Ecosystem Handoff: Task '{}' state pushed to cloud.",
+            task_name
+        );
     }
 }
 
@@ -266,7 +285,10 @@ impl LayeredDesktopModeSwitcher {
         } else {
             self.compositor_animations_enabled = true;
         }
-        println!("[compositor] Switching active appearance layout context to: {:?}.", mode);
+        println!(
+            "[compositor] Switching active appearance layout context to: {:?}.",
+            mode
+        );
     }
 }
 
@@ -275,8 +297,8 @@ impl LayeredDesktopModeSwitcher {
 // ==========================================
 
 pub struct AiResourceScheduler {
-    pub thermal_level: u32,       // CPU temperature in Celsius
-    pub battery_percentage: u32,  // Battery level
+    pub thermal_level: u32,      // CPU temperature in Celsius
+    pub battery_percentage: u32, // Battery level
     pub target_cpu_load: usize,
 }
 
@@ -445,7 +467,10 @@ impl SigmaLivepatch {
         }
         self.redirection_log.push(format!(
             "LIVEPATCH: Redirecting calls of '{}' (0x{:x}) to patched body (0x{:x}). Checksum={}.",
-            patch.target_symbol, patch.old_function_address, patch.new_function_address, patch.checksum
+            patch.target_symbol,
+            patch.old_function_address,
+            patch.new_function_address,
+            patch.checksum
         ));
         self.active_patches = Some(patch.target_symbol);
         Ok(())
@@ -507,8 +532,10 @@ impl LocaleManager {
     /// Validates contrast ratio for WCAG AA compliance (e.g., minimum 4.5 ratio)
     pub fn validate_wcag_contrast(&self, fg_hex: u32, bg_hex: u32) -> bool {
         // Hex relative luminance approximation (simulated)
-        let fg_lum = ((fg_hex & 0xFF) + ((fg_hex >> 8) & 0xFF) + ((fg_hex >> 16) & 0xFF)) as f64 / 3.0;
-        let bg_lum = ((bg_hex & 0xFF) + ((bg_hex >> 8) & 0xFF) + ((bg_hex >> 16) & 0xFF)) as f64 / 3.0;
+        let fg_lum =
+            ((fg_hex & 0xFF) + ((fg_hex >> 8) & 0xFF) + ((fg_hex >> 16) & 0xFF)) as f64 / 3.0;
+        let bg_lum =
+            ((bg_hex & 0xFF) + ((bg_hex >> 8) & 0xFF) + ((bg_hex >> 16) & 0xFF)) as f64 / 3.0;
 
         let lighter = fg_lum.max(bg_lum);
         let darker = fg_lum.min(bg_lum);
@@ -548,7 +575,9 @@ pub struct SuiteRegistry {
 
 impl SuiteRegistry {
     pub fn new() -> Self {
-        Self { bundles: Vec::new() }
+        Self {
+            bundles: Vec::new(),
+        }
     }
 
     pub fn register_suite(&mut self, bundle: AppSuiteBundle) {
@@ -563,9 +592,15 @@ impl SuiteRegistry {
         for bundle in &self.bundles {
             if bundle.name == name {
                 if bundle.is_sandboxed {
-                    println!("[app-suite] Securely launching '{}' within isolated sandbox jail.", name);
+                    println!(
+                        "[app-suite] Securely launching '{}' within isolated sandbox jail.",
+                        name
+                    );
                 } else {
-                    println!("[app-suite] Launching '{}' without isolated sandbox jail.", name);
+                    println!(
+                        "[app-suite] Launching '{}' without isolated sandbox jail.",
+                        name
+                    );
                 }
                 return Ok(format!("RUNNING: {}", name));
             }
@@ -607,7 +642,11 @@ impl CloudOrchestrator {
         }
     }
 
-    pub fn deploy_container(&mut self, name: &str, namespace_isolated: bool) -> Result<usize, &'static str> {
+    pub fn deploy_container(
+        &mut self,
+        name: &str,
+        namespace_isolated: bool,
+    ) -> Result<usize, &'static str> {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -641,7 +680,10 @@ mod tests {
         };
 
         assert!(patcher.register_patch(patch).is_ok());
-        assert_eq!(patcher.redirect_call("sys_read").unwrap(), 0xffffffffc0300100);
+        assert_eq!(
+            patcher.redirect_call("sys_read").unwrap(),
+            0xffffffffc0300100
+        );
         assert!(patcher.redirect_call("sys_write").is_none());
         assert_eq!(patcher.redirection_log.len(), 1);
 

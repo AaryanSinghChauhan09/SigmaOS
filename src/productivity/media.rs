@@ -1,13 +1,11 @@
 // SigmaOS Media Audio Engine Shard
-// Zero-dependency, #![no_std] compliant, zero-allocation
+// Zero-dependency, zero-allocation
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
 extern crate alloc;
-use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
-extern crate alloc;
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
 
 pub const MAX_AUDIO_CHANNELS: usize = 4;
 
@@ -23,6 +21,7 @@ pub enum MediaFormat {
     Mp3,
     Wav,
     Flac,
+    Pcm,
 }
 
 pub struct AudioChannel {
@@ -118,24 +117,6 @@ impl SigmaMediaEngine {
     }
 }
 
-pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
-// SigmaOS Polish-Parity Out-of-the-Box Codecs & Multimedia Engine (SigmaMedia)
-// Designed for chiptune synthesizers, audio playing, and decoders with zero dependencies
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MediaFormat {
-    Mp3,
-    Wav,
-    Pcm,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PlaybackState {
-    Stopped,
-    Playing,
-    Paused,
-}
-
 pub struct AudioTrack {
     pub name: String,
     pub format: MediaFormat,
@@ -184,6 +165,12 @@ impl SigmaMediaPlayer {
 
     pub fn stop(&mut self) {
         self.state = PlaybackState::Stopped;
+    }
+}
+
+impl Default for SigmaMediaPlayer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -241,6 +228,12 @@ impl SigmaSupportSubtitleSync {
             text: text.to_string(),
             duration_centiseconds: duration_cs,
         });
+    }
+}
+
+impl Default for SigmaSupportSubtitleSync {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -320,7 +313,8 @@ mod tests {
         let mut aegisub = SigmaSupportSubtitleSync::new();
         assert_eq!(aegisub.font_name, "Arial");
 
-        let body = aegisub.parse_ass_styling_tags("{\\fnHelvetica\\fs28\\c&H00FFFF&}Welcome to SigmaOS");
+        let body =
+            aegisub.parse_ass_styling_tags("{\\fnHelvetica\\fs28\\c&H00FFFF&}Welcome to SigmaOS");
         assert_eq!(body, "Welcome to SigmaOS");
         assert_eq!(aegisub.font_name, "Helvetica");
         assert_eq!(aegisub.font_size, 28);
@@ -342,4 +336,5 @@ mod tests {
         assert_eq!(edit.entries[0].end_ms, 2500);
     }
 }
+
 pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();

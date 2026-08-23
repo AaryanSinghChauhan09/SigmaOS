@@ -609,7 +609,11 @@ impl Compositor for SimpleCompositor {
             return Err(GraphicsError::PermissionDenied);
         }
 
-        if let Some(pos) = self.windows.iter().position(|w| w.as_ref().map_or(false, |win| win.id() == id)) {
+        if let Some(pos) = self
+            .windows
+            .iter()
+            .position(|w| w.as_ref().map_or(false, |win| win.id() == id))
+        {
             self.windows.remove(pos);
             self.window_order.retain(|&x| x != id);
             self.stats.total_windows -= 1;
@@ -700,7 +704,10 @@ impl Compositor for SimpleCompositor {
                                         let r = ((pixel >> 16) & 0xFF) as f32 * opacity;
                                         let g = ((pixel >> 8) & 0xFF) as f32 * opacity;
                                         let b = (pixel & 0xFF) as f32 * opacity;
-                                        back_data[output_index] = ((a as u32) << 24) | ((r as u32) << 16) | ((g as u32) << 8) | (b as u32);
+                                        back_data[output_index] = ((a as u32) << 24)
+                                            | ((r as u32) << 16)
+                                            | ((g as u32) << 8)
+                                            | (b as u32);
                                     } else {
                                         back_data[output_index] = pixel;
                                     }
@@ -759,7 +766,7 @@ impl Compositor for SimpleCompositor {
         Ok(())
     }
 
-    fn capture_screenshot(&mut self) -> Result<Vec<u32>, GraphicsError> {
+    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> {
         if let Some(ref back) = self.back_buffer {
             Ok(back.data.clone())
         } else {

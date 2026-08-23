@@ -1,8 +1,5 @@
 //! File Manager (Nautilus/Thunar Inspiration)
 //! File navigation, operations, and file properties
-
-#![no_std]
-
 extern crate alloc;
 
 use alloc::string::{String, ToString};

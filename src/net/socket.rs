@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Socket API for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
 /// Implements socket creation, BSD-style Socket Options, and network communication

@@ -1,8 +1,5 @@
 //! System Recovery and Backup (Timeshift/Borg Inspiration)
 //! System snapshots, incremental backups, and disaster recovery
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

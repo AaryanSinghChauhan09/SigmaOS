@@ -255,7 +255,12 @@ impl StreamingOverlayManager {
         self.scenes.insert(scene.name.clone(), scene);
     }
 
-    pub fn switch_scene(&mut self, scene_name: &str, transition: &str, duration_frames: u32) -> Result<(), &'static str> {
+    pub fn switch_scene(
+        &mut self,
+        scene_name: &str,
+        transition: &str,
+        duration_frames: u32,
+    ) -> Result<(), &'static str> {
         if !self.scenes.contains_key(scene_name) {
             return Err("Scene not registered in overlay manager");
         }
@@ -368,15 +373,26 @@ impl ElementaryHigChecker {
         }
     }
 
-    pub fn evaluate_window_compliance(&self, window: &ZenithAppWindow) -> Result<bool, &'static str> {
+    pub fn evaluate_window_compliance(
+        &self,
+        window: &ZenithAppWindow,
+    ) -> Result<bool, &'static str> {
         if self.enforce_csd && !window.has_csd_titlebar {
-            return Err("elementaryOS HIG Violation: Must use Client-Side Decorations (CSD) titlebar");
+            return Err(
+                "elementaryOS HIG Violation: Must use Client-Side Decorations (CSD) titlebar",
+            );
         }
         if self.enforce_pure_black_dark_mode && !window.has_pure_black_dark_mode {
-            return Err("elementaryOS HIG Violation: Missing toggleable pure-black dark mode support");
+            return Err(
+                "elementaryOS HIG Violation: Missing toggleable pure-black dark mode support",
+            );
         }
-        if window.tap_target_width < self.min_tap_target_size || window.tap_target_height < self.min_tap_target_size {
-            return Err("elementaryOS HIG Violation: Touch/tap target size must be at least 44x44px");
+        if window.tap_target_width < self.min_tap_target_size
+            || window.tap_target_height < self.min_tap_target_size
+        {
+            return Err(
+                "elementaryOS HIG Violation: Touch/tap target size must be at least 44x44px",
+            );
         }
         Ok(true)
     }

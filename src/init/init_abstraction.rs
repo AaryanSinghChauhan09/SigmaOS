@@ -1,7 +1,5 @@
 // Init System Abstraction Layer for SigmaOS
 // Location: src/init/init_abstraction.rs
-
-#![no_std]
 extern crate alloc;
 use alloc::string::String;
 

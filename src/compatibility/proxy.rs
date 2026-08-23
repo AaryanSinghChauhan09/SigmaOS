@@ -20,7 +20,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 use crate::klib::BTreeMap;
 
 // =========================================================================
@@ -48,22 +47,32 @@ impl KernelProxy {
         }
     }
 
-    pub fn route_syscall(&mut self, syscall_num: u32, args: &[u64]) -> Result<String, &'static str> {
+    pub fn route_syscall(
+        &mut self,
+        syscall_num: u32,
+        args: &[u64],
+    ) -> Result<String, &'static str> {
         self.routed_count += 1;
         match self.active_personality {
             KernelPersonality::Linux2_6 => {
                 // Emulate Linux 2.6 personality behavior
-                Ok(format!("Routed legacy Linux 2.6 syscall {} with args {:?}", syscall_num, args))
+                Ok(format!(
+                    "Routed legacy Linux 2.6 syscall {} with args {:?}",
+                    syscall_num, args
+                ))
             }
-            KernelPersonality::Linux3_x => {
-                Ok(format!("Routed Linux 3.x syscall {} with args {:?}", syscall_num, args))
-            }
-            KernelPersonality::Linux4_x => {
-                Ok(format!("Routed Linux 4.x syscall {} with args {:?}", syscall_num, args))
-            }
-            KernelPersonality::POSIXLegacy => {
-                Ok(format!("Routed POSIX legacy syscall {} with args {:?}", syscall_num, args))
-            }
+            KernelPersonality::Linux3_x => Ok(format!(
+                "Routed Linux 3.x syscall {} with args {:?}",
+                syscall_num, args
+            )),
+            KernelPersonality::Linux4_x => Ok(format!(
+                "Routed Linux 4.x syscall {} with args {:?}",
+                syscall_num, args
+            )),
+            KernelPersonality::POSIXLegacy => Ok(format!(
+                "Routed POSIX legacy syscall {} with args {:?}",
+                syscall_num, args
+            )),
         }
     }
 }
@@ -491,14 +500,20 @@ impl ISyscallTranslator for BsdSyscallTranslator {
 pub struct WindowsSyscallTranslator;
 impl ISyscallTranslator for WindowsSyscallTranslator {
     fn translate_syscall(&self, sys_num: u32, args: &[u64]) -> String {
-        format!("Translated Windows NT-Syscall #{} with args {:?}", sys_num, args)
+        format!(
+            "Translated Windows NT-Syscall #{} with args {:?}",
+            sys_num, args
+        )
     }
 }
 
 pub struct MacosSyscallTranslator;
 impl ISyscallTranslator for MacosSyscallTranslator {
     fn translate_syscall(&self, sys_num: u32, args: &[u64]) -> String {
-        format!("Translated macOS Mach-Syscall #{} with args {:?}", sys_num, args)
+        format!(
+            "Translated macOS Mach-Syscall #{} with args {:?}",
+            sys_num, args
+        )
     }
 }
 
@@ -583,7 +598,9 @@ pub struct SigmaFSPlus {
 impl SigmaFSPlus {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SigmaFSPlus { plugins: Vec::new() }
+        SigmaFSPlus {
+            plugins: Vec::new(),
+        }
     }
 
     pub fn add_plugin(&mut self, plugin: Box<dyn IFilesystemPlugin>) {
@@ -610,21 +627,30 @@ pub trait IRecoveryStrategy {
 pub struct RollbackRecovery;
 impl IRecoveryStrategy for RollbackRecovery {
     fn recover(&self, error: &str) -> String {
-        format!("State rollback successful. Reverted state prior to crash: {}", error)
+        format!(
+            "State rollback successful. Reverted state prior to crash: {}",
+            error
+        )
     }
 }
 
 pub struct AutoPatchRecovery;
 impl IRecoveryStrategy for AutoPatchRecovery {
     fn recover(&self, error: &str) -> String {
-        format!("Hot patch applied successfully to address exception: {}", error)
+        format!(
+            "Hot patch applied successfully to address exception: {}",
+            error
+        )
     }
 }
 
 pub struct ProcessQuarantine;
 impl IRecoveryStrategy for ProcessQuarantine {
     fn recover(&self, error: &str) -> String {
-        format!("Process quarantined cleanly. Prevented crash replication: {}", error)
+        format!(
+            "Process quarantined cleanly. Prevented crash replication: {}",
+            error
+        )
     }
 }
 
@@ -660,7 +686,10 @@ pub struct LlmModelRuntime {
 
 impl IModelRuntime for LlmModelRuntime {
     fn run_inference(&self, input: &str) -> String {
-        format!("LLM ({}GB) inferred response for: '{}'", self.size_gb, input)
+        format!(
+            "LLM ({}GB) inferred response for: '{}'",
+            self.size_gb, input
+        )
     }
 }
 
@@ -670,7 +699,10 @@ pub struct VisionModelRuntime {
 
 impl IModelRuntime for VisionModelRuntime {
     fn run_inference(&self, input: &str) -> String {
-        format!("Vision Processor analyzed frame '{}' at {} FPS", input, self.frame_rate)
+        format!(
+            "Vision Processor analyzed frame '{}' at {} FPS",
+            input, self.frame_rate
+        )
     }
 }
 
@@ -815,7 +847,9 @@ mod tests {
 
     #[test]
     fn test_driver_personality_proxy() {
-        let legacy_storage = Box::new(StorageProxy { capacity: 1440 * 1024 });
+        let legacy_storage = Box::new(StorageProxy {
+            capacity: 1440 * 1024,
+        });
         let mut proxy = DriverProxy::new("Storage", legacy_storage);
         let mut buf = vec![0u8; 12];
         let bytes_written = proxy.execute_io(1, &mut buf).unwrap();

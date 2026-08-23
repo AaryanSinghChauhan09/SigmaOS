@@ -3,10 +3,10 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::format;
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. OPENSUSE YAST (YET ANOTHER SETUP TOOL) CONTROL CENTER
@@ -96,7 +96,10 @@ impl SlackwarePkgTools {
         raw_tar_contents: &[&str],
         slack_desc: &str,
     ) -> Result<(), &'static str> {
-        if self.installed_packages_db.contains_key(&package_name.to_string()) {
+        if self
+            .installed_packages_db
+            .contains_key(&package_name.to_string())
+        {
             return Err("installpkg: Package already installed on Slackware system");
         }
 
@@ -112,7 +115,8 @@ impl SlackwarePkgTools {
         };
 
         // Write package metadata to Slackware's system registry
-        self.installed_packages_db.insert(package_name.to_string(), pkg);
+        self.installed_packages_db
+            .insert(package_name.to_string(), pkg);
         Ok(())
     }
 
@@ -182,7 +186,9 @@ mod tests {
         ";
 
         // Install Slackware Package
-        assert!(pkgtools.installpkg("slackpkg", &tar_contents, slack_desc).is_ok());
+        assert!(pkgtools
+            .installpkg("slackpkg", &tar_contents, slack_desc)
+            .is_ok());
         assert_eq!(pkgtools.installed_packages_db.len(), 1);
 
         // Parse slack-desc description line
@@ -190,7 +196,9 @@ mod tests {
         assert_eq!(desc, "slackpkg (automated package manager)");
 
         // Try installing duplicate (fails)
-        assert!(pkgtools.installpkg("slackpkg", &tar_contents, slack_desc).is_err());
+        assert!(pkgtools
+            .installpkg("slackpkg", &tar_contents, slack_desc)
+            .is_err());
 
         // Remove Slackware Package
         let count = pkgtools.removepkg("slackpkg").unwrap();

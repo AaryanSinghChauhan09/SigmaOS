@@ -2,9 +2,6 @@
 //! Dilithium-5 signature algorithm (NIST PQC standard)
 //! HKDF-SHA3-256 key derivation
 //! Integration with FDE, TLS, code signing
-
-#![no_std]
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[repr(C)]

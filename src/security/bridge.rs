@@ -24,7 +24,10 @@ impl SecurityBridge {
                 rules.insert("owner_write".to_string(), "sigma_pledge_write".to_string());
             }
             LegacySecurityType::SELinux => {
-                rules.insert("unconfined_t".to_string(), "sigma_unconfined_sandbox".to_string());
+                rules.insert(
+                    "unconfined_t".to_string(),
+                    "sigma_unconfined_sandbox".to_string(),
+                );
             }
             LegacySecurityType::AppArmor => {
                 rules.insert("/bin/ping".to_string(), "sigma_network_pledge".to_string());

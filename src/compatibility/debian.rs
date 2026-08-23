@@ -1,14 +1,12 @@
 //! SigmaOS Debian Linux Compatibility Adapter
 //! Implements APT repositories, SysVinit runlevels, debian alternatives, and debootstrap logic.
 //! Zero external dependencies.
-
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==============================================================================
@@ -118,8 +116,8 @@ impl Default for SysVInitEngine {
 // ==============================================================================
 #[derive(Clone)]
 pub struct AlternativeLink {
-    pub symlink: String,  // e.g. "/usr/bin/editor"
-    pub target: String,   // e.g. "/usr/bin/nano"
+    pub symlink: String, // e.g. "/usr/bin/editor"
+    pub target: String,  // e.g. "/usr/bin/nano"
     pub priority: u32,
 }
 
@@ -170,7 +168,9 @@ impl DebianAlternativesSystem {
     }
 
     pub fn get_active_target(&self) -> Option<&str> {
-        self.active_index.and_then(|idx| self.links.get(idx)).map(|link| link.target.as_str())
+        self.active_index
+            .and_then(|idx| self.links.get(idx))
+            .map(|link| link.target.as_str())
     }
 }
 

@@ -1,8 +1,6 @@
 // SigmaOS Mandatory Access Control (MAC) System
 // Inspired by SELinux and AppArmor
 // Provides fine-grained access control beyond traditional Unix permissions
-
-#![no_std]
 extern crate alloc;
 
 use alloc::vec::Vec;

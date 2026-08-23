@@ -5,14 +5,13 @@ extern crate alloc;
 // No external dependencies - fully sovereign implementation
 
 #[allow(dead_code)]
-
 use core::alloc::Layout;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A slab cache for fixed-size allocations.
 /// Inspired by Linux's SLAB/SLUB allocator and FreeBSD's UMA (Universal Memory Allocator).
-/// 
+///
 /// Key design choices from Linux SLUB:
 /// - Per-cache object size (no wasted padding beyond alignment)
 /// - Free list stored inside free objects (no metadata overhead per object)
@@ -40,13 +39,17 @@ unsafe impl Sync for SlabCache {}
 
 const FREE_END: usize = usize::MAX;
 
-
 impl SlabCache {
     /// Create a new slab cache.
     /// `object_size`: size of each object, must be >= size_of::<usize>()
     /// `capacity`: maximum number of objects
     /// `name`: debugging name (like Linux kmem_cache_create)
-    pub unsafe fn new(object_size: usize, align: usize, capacity: usize, name: &'static str) -> Option<Self> {
+    pub unsafe fn new(
+        object_size: usize,
+        align: usize,
+        capacity: usize,
+        name: &'static str,
+    ) -> Option<Self> {
         let obj_size = object_size.max(core::mem::size_of::<usize>());
         // Align the object size to the required alignment
         let obj_size = (obj_size + align - 1) & !(align - 1);
@@ -91,13 +94,19 @@ impl SlabCache {
 
             // CAS to claim this slot
             match self.free_head.compare_exchange_weak(
-                head, next, Ordering::AcqRel, Ordering::Relaxed
+                head,
+                next,
+                Ordering::AcqRel,
+                Ordering::Relaxed,
             ) {
                 Ok(_) => {
                     self.allocated.fetch_add(1, Ordering::Relaxed);
-                    let ptr = unsafe { NonNull::new_unchecked(self.pool.add(head * self.object_size)) };
+                    let ptr =
+                        unsafe { NonNull::new_unchecked(self.pool.add(head * self.object_size)) };
                     // Zero-initialize (like Linux's kmem_cache_zalloc)
-                    unsafe { core::ptr::write_bytes(ptr.as_ptr(), 0, self.object_size); }
+                    unsafe {
+                        core::ptr::write_bytes(ptr.as_ptr(), 0, self.object_size);
+                    }
                     return Some(ptr);
                 }
                 Err(_) => continue, // Retry on contention
@@ -107,7 +116,7 @@ impl SlabCache {
 
     /// Free an object back to the slab cache.
     /// Like Linux's kmem_cache_free().
-    /// 
+    ///
     /// # Safety
     /// `ptr` must have been allocated from this cache and not yet freed.
     pub unsafe fn free(&self, ptr: NonNull<u8>) {
@@ -120,7 +129,10 @@ impl SlabCache {
             // Store next-free index in the freed slot
             *(ptr.as_ptr() as *mut usize) = head;
             match self.free_head.compare_exchange_weak(
-                head, index, Ordering::AcqRel, Ordering::Relaxed
+                head,
+                index,
+                Ordering::AcqRel,
+                Ordering::Relaxed,
             ) {
                 Ok(_) => {
                     self.allocated.fetch_sub(1, Ordering::Relaxed);
@@ -160,9 +172,7 @@ impl SlabCache {
 impl Drop for SlabCache {
     fn drop(&mut self) {
         let total_bytes = self.object_size * self.total;
-        let layout = unsafe {
-            Layout::from_size_align_unchecked(total_bytes, self.align)
-        };
+        let layout = unsafe { Layout::from_size_align_unchecked(total_bytes, self.align) };
         unsafe {
             alloc::alloc::dealloc(self.pool, layout);
         }
@@ -187,14 +197,19 @@ impl<T> TypedSlabCache<T> {
                 name,
             )?
         };
-        Some(Self { inner, _marker: core::marker::PhantomData })
+        Some(Self {
+            inner,
+            _marker: core::marker::PhantomData,
+        })
     }
 
     /// Allocate and initialize an object.
     pub fn alloc_with(&self, value: T) -> Option<NonNull<T>> {
         let ptr = self.inner.alloc()?;
         let typed_ptr = ptr.as_ptr() as *mut T;
-        unsafe { typed_ptr.write(value); }
+        unsafe {
+            typed_ptr.write(value);
+        }
         Some(unsafe { NonNull::new_unchecked(typed_ptr) })
     }
 
@@ -206,9 +221,15 @@ impl<T> TypedSlabCache<T> {
         self.inner.free(ptr.cast());
     }
 
-    pub fn allocated(&self) -> usize { self.inner.allocated() }
-    pub fn capacity(&self) -> usize { self.inner.capacity() }
-    pub fn name(&self) -> &str { self.inner.name() }
+    pub fn allocated(&self) -> usize {
+        self.inner.allocated()
+    }
+    pub fn capacity(&self) -> usize {
+        self.inner.capacity()
+    }
+    pub fn name(&self) -> &str {
+        self.inner.name()
+    }
 }
 
 #[cfg(test)]
@@ -242,7 +263,9 @@ mod tests {
         // Should be full now
         assert!(cache.alloc_with(99u32).is_none());
         // Free one
-        unsafe { cache.free(ptrs[0]); }
+        unsafe {
+            cache.free(ptrs[0]);
+        }
         // Should work now
         let new_ptr = cache.alloc_with(100u32);
         assert!(new_ptr.is_some());

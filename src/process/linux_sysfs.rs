@@ -97,7 +97,10 @@ impl SysfsRegistry {
     /// Write and update sysfs hardware parameters (e.g. hot-unplugging a CPU)
     pub fn write_attribute(&mut self, path: &str, new_value: &str) -> Result<(), &'static str> {
         let clean_path = path.trim_start_matches('/');
-        let attr = self.attributes.get_mut(clean_path).ok_or("sysfs attribute not found")?;
+        let attr = self
+            .attributes
+            .get_mut(clean_path)
+            .ok_or("sysfs attribute not found")?;
         if !attr.is_writable {
             return Err("Permission denied: sysfs attribute is read-only");
         }
@@ -106,7 +109,11 @@ impl SysfsRegistry {
     }
 
     /// Configure and mount a new loopback device /dev/loopX
-    pub fn mount_loop_device(&mut self, dev_index: usize, backing_file_path: &str) -> Result<(), &'static str> {
+    pub fn mount_loop_device(
+        &mut self,
+        dev_index: usize,
+        backing_file_path: &str,
+    ) -> Result<(), &'static str> {
         if self.loop_devices.contains_key(&dev_index) {
             return Err("Loopback device index already in use");
         }
@@ -133,15 +140,23 @@ mod tests {
         let mut registry = SysfsRegistry::new();
 
         // 1. Read battery status
-        let bat = registry.read_attribute("/sys/class/power_supply/BAT0/capacity").unwrap();
+        let bat = registry
+            .read_attribute("/sys/class/power_supply/BAT0/capacity")
+            .unwrap();
         assert_eq!(bat, "84");
 
         // 2. Write to read-only attribute -> fails
-        assert!(registry.write_attribute("/sys/class/power_supply/BAT0/capacity", "90").is_err());
+        assert!(registry
+            .write_attribute("/sys/class/power_supply/BAT0/capacity", "90")
+            .is_err());
 
         // 3. Write to writable attribute -> succeeds
-        assert!(registry.write_attribute("/sys/devices/system/cpu/cpu1/online", "0").is_ok());
-        let cpu_state = registry.read_attribute("/sys/devices/system/cpu/cpu1/online").unwrap();
+        assert!(registry
+            .write_attribute("/sys/devices/system/cpu/cpu1/online", "0")
+            .is_ok());
+        let cpu_state = registry
+            .read_attribute("/sys/devices/system/cpu/cpu1/online")
+            .unwrap();
         assert_eq!(cpu_state, "0");
     }
 
@@ -150,9 +165,13 @@ mod tests {
         let mut registry = SysfsRegistry::new();
 
         // Mount a custom system overlay image
-        assert!(registry.mount_loop_device(0, "/var/images/ubuntu_root.img").is_ok());
+        assert!(registry
+            .mount_loop_device(0, "/var/images/ubuntu_root.img")
+            .is_ok());
         // Duplicate mount index -> fails
-        assert!(registry.mount_loop_device(0, "/var/images/other.img").is_err());
+        assert!(registry
+            .mount_loop_device(0, "/var/images/other.img")
+            .is_err());
 
         let dev = registry.loop_devices.get(&0).unwrap();
         assert_eq!(dev.backing_file_path, "/var/images/ubuntu_root.img");

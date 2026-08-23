@@ -359,7 +359,10 @@ impl TcpFuzzerPrng {
     }
 
     pub fn next_u32(&mut self) -> u32 {
-        self.state = self.state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.state = self
+            .state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         (self.state >> 32) as u32
     }
 
@@ -427,18 +430,27 @@ impl SovereignSockmapBypass {
 
     /// Registers a peer-to-peer socket map link for dynamic stack bypass
     pub fn register_link(&mut self, src_port: u16, dst_port: u16, peer_src: u16, peer_dst: u16) {
-        self.socket_map.insert((src_port, dst_port), (peer_src, peer_dst));
+        self.socket_map
+            .insert((src_port, dst_port), (peer_src, peer_dst));
     }
 
     /// Determines if a packet payload should bypass the standard TCP stack and redirect directly
-    pub fn redirect_payload(&self, src_port: u16, dst_port: u16, payload: &[u8], peer_receiver: &mut TcpConnection) -> bool {
+    pub fn redirect_payload(
+        &self,
+        src_port: u16,
+        dst_port: u16,
+        payload: &[u8],
+        peer_receiver: &mut TcpConnection,
+    ) -> bool {
         if let Some(&(peer_src, peer_dst)) = self.socket_map.get(&(src_port, dst_port)) {
             if peer_receiver.local_port == peer_src && peer_receiver.remote_port == peer_dst {
                 for &b in payload {
                     peer_receiver.rcv_buf.push_back(b);
                 }
                 peer_receiver.segments_rx.fetch_add(1, Ordering::Relaxed);
-                peer_receiver.bytes_rx.fetch_add(payload.len(), Ordering::Relaxed);
+                peer_receiver
+                    .bytes_rx
+                    .fetch_add(payload.len(), Ordering::Relaxed);
                 return true;
             }
         }
@@ -466,7 +478,13 @@ impl SynCookieEngine {
     }
 
     /// Generates a cryptographic SYN cookie sequence number based on connection tuple
-    pub fn generate_cookie(&self, src_port: u16, dst_port: u16, client_isn: u32, mss_idx: u8) -> u32 {
+    pub fn generate_cookie(
+        &self,
+        src_port: u16,
+        dst_port: u16,
+        client_isn: u32,
+        mss_idx: u8,
+    ) -> u32 {
         let hash = (src_port as u32)
             .wrapping_mul(31)
             .wrapping_add(dst_port as u32)
@@ -479,7 +497,13 @@ impl SynCookieEngine {
     }
 
     /// Verifies if a returned ACK number corresponds to a valid SYN cookie
-    pub fn verify_cookie(&self, src_port: u16, dst_port: u16, client_isn: u32, ack_num: u32) -> bool {
+    pub fn verify_cookie(
+        &self,
+        src_port: u16,
+        dst_port: u16,
+        client_isn: u32,
+        ack_num: u32,
+    ) -> bool {
         let expected_cookie = ack_num.wrapping_sub(1);
         let computed_hash = (src_port as u32)
             .wrapping_mul(31)

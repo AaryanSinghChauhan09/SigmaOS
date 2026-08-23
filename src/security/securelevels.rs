@@ -8,11 +8,16 @@ use crate::klib::error::{SecurityError, SigmaError};
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, PartialEq, Eq)]
-pub enum SecurityError { AccessDenied, PrivilegeEscalationDetected }
+pub enum SecurityError {
+    AccessDenied,
+    PrivilegeEscalationDetected,
+}
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, PartialEq, Eq)]
-pub enum SigmaError { Security(SecurityError) }
+pub enum SigmaError {
+    Security(SecurityError),
+}
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU8, Ordering};
 

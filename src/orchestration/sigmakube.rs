@@ -1,12 +1,9 @@
 //! Cloud-Native Features (Kubernetes/OpenShift Inspiration)
 //! Container orchestration, service mesh, and cloud integration
-
-#![no_std]
-
 extern crate alloc;
 
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Cluster state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -68,7 +65,10 @@ impl Cluster {
     }
 
     pub fn get_ready_nodes(&self) -> Vec<&Node> {
-        self.nodes.iter().filter(|n| n.state == NodeState::Ready).collect()
+        self.nodes
+            .iter()
+            .filter(|n| n.state == NodeState::Ready)
+            .collect()
     }
 }
 
@@ -350,10 +350,16 @@ impl SigmaKube {
     }
 
     pub fn get_cluster(&mut self, id: &str) -> Option<&mut Cluster> {
-        self.clusters.iter_mut().find(|c| c.cluster_id == id || c.name == id)
+        self.clusters
+            .iter_mut()
+            .find(|c| c.cluster_id == id || c.name == id)
     }
 
-    pub fn add_node_to_cluster(&mut self, cluster_id: &str, node: Node) -> Result<(), OrchestrationError> {
+    pub fn add_node_to_cluster(
+        &mut self,
+        cluster_id: &str,
+        node: Node,
+    ) -> Result<(), OrchestrationError> {
         if let Some(cluster) = self.get_cluster(cluster_id) {
             cluster.add_node(node);
             Ok(())
@@ -362,7 +368,12 @@ impl SigmaKube {
         }
     }
 
-    pub fn create_deployment(&mut self, name: &str, namespace: &str, replicas: u32) -> Result<String, OrchestrationError> {
+    pub fn create_deployment(
+        &mut self,
+        name: &str,
+        namespace: &str,
+        replicas: u32,
+    ) -> Result<String, OrchestrationError> {
         let deployment = Deployment::new(name, namespace, replicas);
         let deployment_id = deployment.deployment_id.clone();
         self.deployments.push(deployment);
@@ -370,7 +381,9 @@ impl SigmaKube {
     }
 
     pub fn get_deployment(&mut self, id: &str) -> Option<&mut Deployment> {
-        self.deployments.iter_mut().find(|d| d.deployment_id == id || d.name == id)
+        self.deployments
+            .iter_mut()
+            .find(|d| d.deployment_id == id || d.name == id)
     }
 
     pub fn scale_deployment(&mut self, id: &str, replicas: u32) -> Result<(), OrchestrationError> {
@@ -382,7 +395,12 @@ impl SigmaKube {
         }
     }
 
-    pub fn create_service(&mut self, name: &str, namespace: &str, service_type: ServiceType) -> Result<String, OrchestrationError> {
+    pub fn create_service(
+        &mut self,
+        name: &str,
+        namespace: &str,
+        service_type: ServiceType,
+    ) -> Result<String, OrchestrationError> {
         let service = Service::new(name, namespace, service_type);
         let service_id = service.service_id.clone();
         self.services.push(service);
@@ -390,10 +408,16 @@ impl SigmaKube {
     }
 
     pub fn get_service(&mut self, id: &str) -> Option<&mut Service> {
-        self.services.iter_mut().find(|s| s.service_id == id || s.name == id)
+        self.services
+            .iter_mut()
+            .find(|s| s.service_id == id || s.name == id)
     }
 
-    pub fn create_pod(&mut self, name: &str, namespace: &str) -> Result<String, OrchestrationError> {
+    pub fn create_pod(
+        &mut self,
+        name: &str,
+        namespace: &str,
+    ) -> Result<String, OrchestrationError> {
         let pod = Pod::new(name, namespace);
         let pod_id = pod.pod_id.clone();
         self.pods.push(pod);
@@ -401,10 +425,16 @@ impl SigmaKube {
     }
 
     pub fn get_pod(&mut self, id: &str) -> Option<&mut Pod> {
-        self.pods.iter_mut().find(|p| p.pod_id == id || p.name == id)
+        self.pods
+            .iter_mut()
+            .find(|p| p.pod_id == id || p.name == id)
     }
 
-    pub fn schedule_pod(&mut self, pod_id: &str, node_name: &str) -> Result<(), OrchestrationError> {
+    pub fn schedule_pod(
+        &mut self,
+        pod_id: &str,
+        node_name: &str,
+    ) -> Result<(), OrchestrationError> {
         if let Some(pod) = self.get_pod(pod_id) {
             pod.set_node(node_name);
             pod.set_phase(PodPhase::Running);
@@ -425,7 +455,11 @@ impl SigmaKube {
             total_deployments: self.deployments.len(),
             total_services: self.services.len(),
             total_pods: self.pods.len(),
-            running_pods: self.pods.iter().filter(|p| p.phase == PodPhase::Running).count(),
+            running_pods: self
+                .pods
+                .iter()
+                .filter(|p| p.phase == PodPhase::Running)
+                .count(),
         }
     }
 }

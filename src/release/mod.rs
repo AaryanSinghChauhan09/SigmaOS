@@ -1,8 +1,5 @@
 //! Release Management System (Debian/Arch Release Cycle Inspiration)
 //! Manages versioning, release channels, and release processes
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

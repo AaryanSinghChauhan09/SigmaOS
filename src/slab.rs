@@ -13,9 +13,6 @@
 //! - Linux SLUB: `mm/slub.c` (Christoph Lameter, 2007)
 //! - FreeBSD UMA: `sys/vm/uma_core.c`
 //! - NetBSD pool allocator: `sys/kern/subr_pool.c`
-
-#![no_std]
-
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 use core::mem;

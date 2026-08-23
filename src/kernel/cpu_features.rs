@@ -1,8 +1,5 @@
 // CPU Feature Detection - Gentoo-style compiler-assisted target optimizations
 // Dynamic CPU feature detection and JIT optimization selector
-
-#![cfg_attr(target_os = "none", no_std)]
-
 extern crate alloc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,7 +46,7 @@ pub struct CpuState {
     pub rax: u64,
     pub rbx: u64,
     // ARM Registers
-    pub apsr: u32, // Application Program Status Register (E, T, M flags etc)
+    pub apsr: u32,    // Application Program Status Register (E, T, M flags etc)
     pub r: [u32; 13], // r0 to r12
     pub lr: u32,
     pub pc: u32,
@@ -74,7 +71,14 @@ impl CpuState {
 
     /// CP15 Coprocessor Emulation: MRC (Move to ARM Register from Coprocessor)
     /// Emulates: mrc p15, 0, <reg>, c1, c0, 0 (Read MMU/Cache control register)
-    pub fn mrc(&self, coproc: u8, opcode1: u8, cr_n: u8, cr_m: u8, opcode2: u8) -> Result<u32, &'static str> {
+    pub fn mrc(
+        &self,
+        coproc: u8,
+        opcode1: u8,
+        cr_n: u8,
+        cr_m: u8,
+        opcode2: u8,
+    ) -> Result<u32, &'static str> {
         if self.arch != CpuArch::Arm64 {
             return Err("MRC instruction is only valid on ARM architecture");
         }
@@ -93,7 +97,15 @@ impl CpuState {
 
     /// CP15 Coprocessor Emulation: MCR (Move to Coprocessor from ARM Register)
     /// Emulates: mcr p15, 0, <reg>, c1, c0, 0 (Write MMU/Cache control register)
-    pub fn mcr(&mut self, coproc: u8, opcode1: u8, _value: u32, cr_n: u8, cr_m: u8, opcode2: u8) -> Result<(), &'static str> {
+    pub fn mcr(
+        &mut self,
+        coproc: u8,
+        opcode1: u8,
+        _value: u32,
+        cr_n: u8,
+        cr_m: u8,
+        opcode2: u8,
+    ) -> Result<(), &'static str> {
         if self.arch != CpuArch::Arm64 {
             return Err("MCR instruction is only valid on ARM architecture");
         }
@@ -124,7 +136,10 @@ impl CpuState {
         self.r[0] = svc_number;
 
         #[cfg(not(target_os = "none"))]
-        std::println!("ARM: SVC software interrupt triggered (SVC #{}). System transitioned to SVC mode.", svc_number);
+        std::println!(
+            "ARM: SVC software interrupt triggered (SVC #{}). System transitioned to SVC mode.",
+            svc_number
+        );
         Ok(())
     }
 
@@ -133,7 +148,9 @@ impl CpuState {
         self.arm_mode = ArmPrivilegeMode::Undefined;
         self.ring = CpuRing::Ring0;
         #[cfg(not(target_os = "none"))]
-        std::println!("ARM: Undefined Instruction Abort vector triggered! Kernel entered panic state.");
+        std::println!(
+            "ARM: Undefined Instruction Abort vector triggered! Kernel entered panic state."
+        );
     }
 }
 

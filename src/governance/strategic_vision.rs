@@ -1,18 +1,21 @@
 // SigmaOS Strategic Vision Roadmap & OKR Engine
 // Pure Rust implementation of 3-Year Strategic Vision and Milestone Evaluators.
-
-#![no_std]
-
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
-use alloc::{vec::Vec, string::{String, ToString}};
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
 
 #[cfg(feature = "standalone_test")]
 extern crate std;
 
 #[cfg(feature = "standalone_test")]
-use alloc::{vec::Vec, string::{String, ToString}};
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
 
 /// Strategic evaluation error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,14 +60,37 @@ pub struct StrategicOkrEvaluator {
 
 impl StrategicOkrEvaluator {
     pub fn new() -> Self {
-        let mut evaluator = StrategicOkrEvaluator { milestones: Vec::new() };
-        evaluator.register_milestone(1, "Phase G Kernel".to_string(), MilestoneCategory::CoreKernel, 100.0);
-        evaluator.register_milestone(2, "Local AI Serving".to_string(), MilestoneCategory::AiOrchestration, 100.0);
-        evaluator.register_milestone(3, "Dev Studio".to_string(), MilestoneCategory::DeveloperExperience, 100.0);
+        let mut evaluator = StrategicOkrEvaluator {
+            milestones: Vec::new(),
+        };
+        evaluator.register_milestone(
+            1,
+            "Phase G Kernel".to_string(),
+            MilestoneCategory::CoreKernel,
+            100.0,
+        );
+        evaluator.register_milestone(
+            2,
+            "Local AI Serving".to_string(),
+            MilestoneCategory::AiOrchestration,
+            100.0,
+        );
+        evaluator.register_milestone(
+            3,
+            "Dev Studio".to_string(),
+            MilestoneCategory::DeveloperExperience,
+            100.0,
+        );
         evaluator
     }
 
-    pub fn register_milestone(&mut self, id: u32, title: String, category: MilestoneCategory, progress: f64) {
+    pub fn register_milestone(
+        &mut self,
+        id: u32,
+        title: String,
+        category: MilestoneCategory,
+        progress: f64,
+    ) {
         let clamped_progress = if progress < 0.0 {
             0.0
         } else if progress > 100.0 {
@@ -85,7 +111,11 @@ impl StrategicOkrEvaluator {
         if self.milestones.is_empty() {
             return 100.0;
         }
-        let sum: f64 = self.milestones.iter().map(|m| m.completion_percentage).sum();
+        let sum: f64 = self
+            .milestones
+            .iter()
+            .map(|m| m.completion_percentage)
+            .sum();
         sum / self.milestones.len() as f64
     }
 }
@@ -116,7 +146,12 @@ mod tests {
         assert_eq!(evaluator.milestones.len(), 3);
         assert_eq!(evaluator.compute_roadmap_completion(), 100.0);
 
-        evaluator.register_milestone(4, "Enterprise AD/LDAP".to_string(), MilestoneCategory::SecurityEnterprise, 50.0);
+        evaluator.register_milestone(
+            4,
+            "Enterprise AD/LDAP".to_string(),
+            MilestoneCategory::SecurityEnterprise,
+            50.0,
+        );
         assert_eq!(evaluator.milestones.len(), 4);
         assert_eq!(evaluator.compute_roadmap_completion(), 87.5); // (100+100+100+50)/4
     }

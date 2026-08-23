@@ -8,10 +8,10 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// AI Task Priority Class.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AiTaskPriority {
-    RealTimeLLM = 0,       // Top priority, minimal latency
-    InteractiveVision = 1, // Medium-high priority
-    BatchEmbedding = 2,    // Medium priority
-    BackgroundTraining = 3,// Low priority, opportunistic execution
+    RealTimeLLM = 0,        // Top priority, minimal latency
+    InteractiveVision = 1,  // Medium-high priority
+    BatchEmbedding = 2,     // Medium priority
+    BackgroundTraining = 3, // Low priority, opportunistic execution
 }
 
 /// Execution Target Device for AI tasks.
@@ -133,7 +133,9 @@ impl AiComputeScheduler {
             let task = &self.pending_tasks[i];
 
             // Check cgroups v2 memory & compute quota limit
-            if self.quota.current_memory_bytes + task.memory_bytes_required <= self.quota.max_memory_bytes {
+            if self.quota.current_memory_bytes + task.memory_bytes_required
+                <= self.quota.max_memory_bytes
+            {
                 // Check preemption: if RealTimeLLM task arrives, preemption logic triggers if needed
                 if task.priority == AiTaskPriority::RealTimeLLM {
                     self.preempt_low_priority_if_needed();
@@ -166,7 +168,10 @@ impl AiComputeScheduler {
 
         for idx in preempted_indices.into_iter().rev() {
             let mut task = self.running_tasks.remove(idx);
-            self.quota.current_memory_bytes = self.quota.current_memory_bytes.saturating_sub(task.memory_bytes_required);
+            self.quota.current_memory_bytes = self
+                .quota
+                .current_memory_bytes
+                .saturating_sub(task.memory_bytes_required);
             task.state = AiTaskState::Preempted;
             self.pending_tasks.push(task);
         }
@@ -192,7 +197,10 @@ impl AiComputeScheduler {
 
         for idx in finished_indices.into_iter().rev() {
             let task = self.running_tasks.remove(idx);
-            self.quota.current_memory_bytes = self.quota.current_memory_bytes.saturating_sub(task.memory_bytes_required);
+            self.quota.current_memory_bytes = self
+                .quota
+                .current_memory_bytes
+                .saturating_sub(task.memory_bytes_required);
             self.completed_tasks.push(task);
         }
     }
@@ -216,8 +224,22 @@ mod tests {
     #[test]
     fn test_ai_compute_scheduler_priorities() {
         let mut sched = AiComputeScheduler::new(AiComputeQuota::default());
-        let id1 = sched.enqueue_task("background_train", AiTaskPriority::BackgroundTraining, ComputeDeviceTarget::CpuSimd, 500, 4, 1024 * 1024);
-        let id2 = sched.enqueue_task("realtime_llm", AiTaskPriority::RealTimeLLM, ComputeDeviceTarget::DiscreteGpu, 50, 8, 2048 * 1024);
+        let id1 = sched.enqueue_task(
+            "background_train",
+            AiTaskPriority::BackgroundTraining,
+            ComputeDeviceTarget::CpuSimd,
+            500,
+            4,
+            1024 * 1024,
+        );
+        let id2 = sched.enqueue_task(
+            "realtime_llm",
+            AiTaskPriority::RealTimeLLM,
+            ComputeDeviceTarget::DiscreteGpu,
+            50,
+            8,
+            2048 * 1024,
+        );
 
         assert_eq!(sched.schedule_next_tick(), 2);
         sched.advance_execution(100, 32);

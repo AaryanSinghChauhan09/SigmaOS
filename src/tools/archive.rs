@@ -1,8 +1,5 @@
 //! Archive Tools (tar/zip Inspiration)
 //! Archive manager, compression tools, and archive operations
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

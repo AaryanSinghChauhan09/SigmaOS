@@ -1,8 +1,5 @@
 // SigmaOS Windows WDK / Linux Kernel List & PCB Subsystem
 // Zero-dependency, #![no_std] compliant kernel structures.
-
-#![no_std]
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;

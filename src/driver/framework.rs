@@ -1,8 +1,5 @@
 // Windows Driver Model (WDM) / Kernel-Mode Driver Framework (KMDF) & UMDF
 // Zero-dependency, #![no_std] compliant, highly compatible driver architecture.
-
-#![no_std]
-
 #[cfg(test)]
 extern crate std;
 
@@ -40,10 +37,18 @@ pub trait Driver {
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
     fn set_state(&self, _state: DriverState) {}
-    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
-    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
-    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
-    fn dependencies(&self) -> &'static [DriverType] { &[] }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        &[]
+    }
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
 }
@@ -148,10 +153,10 @@ pub enum IrpMajorFunction {
 /// Buffer transfer methods for user-kernel communication
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IoctlTransferMethod {
-    MethodBuffered, // Copies input/output via system-allocated kernel buffer
-    MethodInDirect, // Maps input buffer directly via MDL (read access)
+    MethodBuffered,  // Copies input/output via system-allocated kernel buffer
+    MethodInDirect,  // Maps input buffer directly via MDL (read access)
     MethodOutDirect, // Maps output buffer directly via MDL (write access)
-    MethodNeither,  // Uses raw user-mode virtual addresses directly (unsafe/requires validation)
+    MethodNeither,   // Uses raw user-mode virtual addresses directly (unsafe/requires validation)
 }
 
 /// Simulated IOCTL Control Code structure
@@ -165,7 +170,12 @@ pub struct IoctlCode {
 
 impl IoctlCode {
     /// CTL_CODE macro equivalent: packs control parameters into a single 32-bit integer
-    pub const fn build(device_type: u32, function: u32, method: IoctlTransferMethod, access: u32) -> Self {
+    pub const fn build(
+        device_type: u32,
+        function: u32,
+        method: IoctlTransferMethod,
+        access: u32,
+    ) -> Self {
         Self {
             device_type,
             function,
@@ -242,7 +252,7 @@ pub struct DeviceObject {
     pub driver_object: *mut DriverObject,
     pub next_device: *mut DeviceObject, // Attached filters/minifilters (Device Stack)
     pub current_power_state: DevicePowerState,
-    pub is_kernel_mode: bool, // True for KMDF, False for UMDF
+    pub is_kernel_mode: bool,  // True for KMDF, False for UMDF
     pub device_extension: u64, // Device-specific state representation
 }
 
@@ -327,7 +337,8 @@ pub fn usb_forensic_filter_dispatch(device: &mut DeviceObject, irp: &mut Irp) ->
                         // Buffered I/O: read input from system kernel buffer, safely write output
                         if !irp.input_buffer.is_empty() {
                             let cmd = irp.input_buffer[0];
-                            if cmd == 0x99 { // Mock unlock command
+                            if cmd == 0x99 {
+                                // Mock unlock command
                                 irp.output_buffer.push(0x01); // Success code
                             }
                         }
@@ -391,8 +402,15 @@ impl InterruptDescriptorTable {
     }
 
     /// Simulates triggering a hardware interrupt. Validates IDT presence and rings privilege
-    pub fn trigger_interrupt(&self, vector: u8, current_ring_privilege: u8, isr: PisrHandler, context: u64) -> Result<bool, &'static str> {
-        let entry = self.entries[vector as usize].ok_or("Interrupt vector not registered in IDT")?;
+    pub fn trigger_interrupt(
+        &self,
+        vector: u8,
+        current_ring_privilege: u8,
+        isr: PisrHandler,
+        context: u64,
+    ) -> Result<bool, &'static str> {
+        let entry =
+            self.entries[vector as usize].ok_or("Interrupt vector not registered in IDT")?;
         if !entry.is_present {
             return Err("Interrupt gate is disabled");
         }
@@ -494,13 +512,22 @@ mod tests {
         let reg_id = framework.register_driver(driver).unwrap();
         assert_eq!(reg_id, 101);
 
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
+        assert_eq!(
+            framework.get_driver(101).unwrap().state(),
+            DriverState::Unloaded
+        );
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
+        assert_eq!(
+            framework.get_driver(101).unwrap().state(),
+            DriverState::Active
+        );
 
         framework.unload_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
+        assert_eq!(
+            framework.get_driver(101).unwrap().state(),
+            DriverState::Unloaded
+        );
     }
 
     #[test]
@@ -563,44 +590,73 @@ mod tests {
     fn test_ioctl_buffered_direct_neither_io() {
         unsafe {
             let mut usb_drv = DriverObject::new("UsbIOCTL");
-            usb_drv.register_dispatch(IrpMajorFunction::DeviceControl, usb_forensic_filter_dispatch);
+            usb_drv.register_dispatch(
+                IrpMajorFunction::DeviceControl,
+                usb_forensic_filter_dispatch,
+            );
 
             let mut usb_dev = DeviceObject::new(&mut usb_drv as *mut DriverObject, true);
             let mut io_mgr = IoManager::new();
 
             // 1. Test METHOD_BUFFERED (valid unlock command)
             let mut irp_buffered = Irp::new(IrpMajorFunction::DeviceControl);
-            irp_buffered.ioctl_code = Some(IoctlCode::build(0x00000022, 0x801, IoctlTransferMethod::MethodBuffered, 0x01));
+            irp_buffered.ioctl_code = Some(IoctlCode::build(
+                0x00000022,
+                0x801,
+                IoctlTransferMethod::MethodBuffered,
+                0x01,
+            ));
             irp_buffered.input_buffer.push(0x99); // Unlock code
 
-            let res_buffered = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_buffered);
+            let res_buffered =
+                io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_buffered);
             assert_eq!(res_buffered, DriverError::Success);
             assert_eq!(irp_buffered.output_buffer[0], 0x01);
 
             // 2. Test METHOD_IN_DIRECT with locked MDL pages
             let mut irp_direct = Irp::new(IrpMajorFunction::DeviceControl);
-            irp_direct.ioctl_code = Some(IoctlCode::build(0x00000022, 0x802, IoctlTransferMethod::MethodInDirect, 0x01));
+            irp_direct.ioctl_code = Some(IoctlCode::build(
+                0x00000022,
+                0x802,
+                IoctlTransferMethod::MethodInDirect,
+                0x01,
+            ));
             irp_direct.physical_pages_mdl.push(0x1000_1000); // Mock MDL page
 
-            let res_direct = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_direct);
+            let res_direct =
+                io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_direct);
             assert_eq!(res_direct, DriverError::Success);
             assert_eq!(irp_direct.output_buffer[0], 0xAB);
 
             // 3. Test METHOD_NEITHER (safe user address)
             let mut irp_neither_safe = Irp::new(IrpMajorFunction::DeviceControl);
-            irp_neither_safe.ioctl_code = Some(IoctlCode::build(0x00000022, 0x803, IoctlTransferMethod::MethodNeither, 0x01));
+            irp_neither_safe.ioctl_code = Some(IoctlCode::build(
+                0x00000022,
+                0x803,
+                IoctlTransferMethod::MethodNeither,
+                0x01,
+            ));
             irp_neither_safe.user_mode_virtual_address = Some(0x0000_7FFF_FFFF_F000); // User space
 
-            let res_neither_safe = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_neither_safe);
+            let res_neither_safe =
+                io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_neither_safe);
             assert_eq!(res_neither_safe, DriverError::Success);
             assert_eq!(irp_neither_safe.output_buffer[0], 0xFE);
 
             // 4. Test METHOD_NEITHER (malicious address in kernel space)
             let mut irp_neither_malicious = Irp::new(IrpMajorFunction::DeviceControl);
-            irp_neither_malicious.ioctl_code = Some(IoctlCode::build(0x00000022, 0x803, IoctlTransferMethod::MethodNeither, 0x01));
+            irp_neither_malicious.ioctl_code = Some(IoctlCode::build(
+                0x00000022,
+                0x803,
+                IoctlTransferMethod::MethodNeither,
+                0x01,
+            ));
             irp_neither_malicious.user_mode_virtual_address = Some(0xFFFF_8000_0000_0000); // Kernel space
 
-            let res_neither_malicious = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_neither_malicious);
+            let res_neither_malicious = io_mgr.dispatch_irp(
+                &mut usb_dev as *mut DeviceObject,
+                &mut irp_neither_malicious,
+            );
             assert_eq!(res_neither_malicious, DriverError::AccessDenied);
         }
     }
@@ -631,6 +687,9 @@ mod tests {
         // 2. Trigger from User space (Ring 3) to Ring 0 Gate -> Fails with privilege error!
         let res_user = idt.trigger_interrupt(0x21, 3, mock_keyboard_isr, 0x99AA);
         assert!(res_user.is_err());
-        assert_eq!(res_user.unwrap_err(), "General Protection Fault: Privilege violation accessing IDT gate");
+        assert_eq!(
+            res_user.unwrap_err(),
+            "General Protection Fault: Privilege violation accessing IDT gate"
+        );
     }
 }

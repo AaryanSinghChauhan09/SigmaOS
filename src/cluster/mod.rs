@@ -7,9 +7,9 @@
 #![allow(unused_imports)]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
 use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::fmt;
 
 /// Error type for the Cluster module
@@ -65,19 +65,19 @@ impl ClusterNode {
             enabled: false,
         }
     }
-    
+
     /// Enable this resource
     pub fn enable(&mut self) -> ClusterResult<()> {
         self.enabled = true;
         Ok(())
     }
-    
+
     /// Disable this resource
     pub fn disable(&mut self) -> ClusterResult<()> {
         self.enabled = false;
         Ok(())
     }
-    
+
     /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
@@ -99,13 +99,13 @@ impl ClusterManager {
             initialized: false,
         }
     }
-    
+
     /// Initialize the Cluster subsystem
     pub fn init(&mut self) -> ClusterResult<()> {
         self.initialized = true;
         Ok(())
     }
-    
+
     /// Add a resource
     pub fn add(&mut self, resource: ClusterNode) -> ClusterResult<u64> {
         if !self.initialized {
@@ -115,27 +115,27 @@ impl ClusterManager {
         self.resources.push(resource);
         Ok(id)
     }
-    
+
     /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&ClusterNode> {
         self.resources.get(id as usize)
     }
-    
+
     /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut ClusterNode> {
         self.resources.get_mut(id as usize)
     }
-    
+
     /// List all resources
     pub fn list(&self) -> &[ClusterNode] {
         &self.resources
     }
-    
+
     /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
-    
+
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> ClusterResult<()> {
         self.initialized = false;
@@ -153,7 +153,7 @@ impl Default for ClusterManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_cluster_manager_init() {
         let mut manager = ClusterManager::new();
@@ -161,7 +161,7 @@ mod tests {
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
     }
-    
+
     #[test]
     fn test_cluster_resource_add() {
         let mut manager = ClusterManager::new();

@@ -1,8 +1,5 @@
 // SigmaOS Distro-Inspired Clean-Room Drivers
 // Replicates key drivers, device nodes, and audio/crypto subsystems from Linux & BSD distributions
-
-#![no_std]
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -350,7 +347,13 @@ impl OpenBsdAutoconfProbe {
         }
     }
 
-    pub fn register_driver_match(&mut self, vendor_id: u16, device_id: u16, driver_name: &'static str, priority: u32) {
+    pub fn register_driver_match(
+        &mut self,
+        vendor_id: u16,
+        device_id: u16,
+        driver_name: &'static str,
+        priority: u32,
+    ) {
         self.registered_matches.push(AutoconfDeviceMatch {
             vendor_id,
             device_id,
@@ -501,7 +504,7 @@ mod tests {
         #[allow(clippy::all)]
         let mut key = [0u8; 32];
         let mut iv = [0u8; 12];
-        
+
         let seed: u64 = 0x1234_5678_9abc_def0;
         for i in 0..32 {
             let mut val = seed.wrapping_mul(i as u64 + 1);
@@ -510,7 +513,7 @@ mod tests {
             val ^= val >> 33;
             key[i] = (val & 0xFF) as u8;
         }
-        
+
         // Initialize IV with non-zero values for test security
         for i in 0..12 {
             let mut val = seed.wrapping_add(i as u64 * 7);
@@ -544,7 +547,11 @@ mod tests {
     #[test]
     fn test_linux_udev_and_freebsd_devd() {
         let mut udev = LinuxUdevEventGovernor::new();
-        let seq = udev.emit_uevent(UeventAction::Add, "/sys/devices/pci0000:00/0000:00:1f.2/host0", "scsi_host");
+        let seq = udev.emit_uevent(
+            UeventAction::Add,
+            "/sys/devices/pci0000:00/0000:00:1f.2/host0",
+            "scsi_host",
+        );
         assert_eq!(seq, 1000);
 
         let polled = udev.poll_uevent();

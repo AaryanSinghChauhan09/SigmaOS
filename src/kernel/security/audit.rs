@@ -1,8 +1,5 @@
 // Capability Audit Logging Subsystem for SigmaOS Security
 // Location: src/kernel/security/audit.rs
-
-#![no_std]
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CapabilityAuditEventType {
     Grant,

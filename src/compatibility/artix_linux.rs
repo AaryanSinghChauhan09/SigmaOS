@@ -2,7 +2,7 @@
 // Independent, zero-dependency implementations of Artix Linux core tooling
 // Implements OpenRC, Runit, and S6 init systems (systemd-free Arch Linux fork)
 
-use crate::klib::{BTreeMap, Vec, String, ToString};
+use crate::klib::{BTreeMap, String, ToString, Vec};
 
 // =========================================================================
 // 1. PACMAN PACKAGE MANAGER (Arch-compatible)
@@ -154,8 +154,9 @@ impl ArtixPacman {
 
         for (name, installed_pkg) in &self.installed {
             if let Some(available_pkg) = self.available.get(name) {
-                if available_pkg.version != installed_pkg.version || 
-                   available_pkg.release != installed_pkg.release {
+                if available_pkg.version != installed_pkg.version
+                    || available_pkg.release != installed_pkg.release
+                {
                     to_upgrade.push(name.clone());
                 }
             }
@@ -208,7 +209,7 @@ pub struct OpenRCInit {
 impl OpenRCInit {
     pub fn new() -> Self {
         let mut services = BTreeMap::new();
-        
+
         services.insert(
             String::from("sshd"),
             OpenRCService {
@@ -263,7 +264,12 @@ impl OpenRCInit {
         }
     }
 
-    pub fn rc_update(&mut self, service: &str, runlevel: &str, operation: &str) -> Result<(), &'static str> {
+    pub fn rc_update(
+        &mut self,
+        service: &str,
+        runlevel: &str,
+        operation: &str,
+    ) -> Result<(), &'static str> {
         if let Some(svc) = self.services.get_mut(service) {
             match operation {
                 "add" => {
@@ -404,10 +410,16 @@ mod tests {
     fn test_openrc_service_control() {
         let mut openrc = OpenRCInit::new();
         assert!(openrc.rc_service("sshd", "stop").is_ok());
-        assert_eq!(openrc.services.get("sshd").unwrap().state, OpenRCServiceState::Stopped);
-        
+        assert_eq!(
+            openrc.services.get("sshd").unwrap().state,
+            OpenRCServiceState::Stopped
+        );
+
         assert!(openrc.rc_service("sshd", "start").is_ok());
-        assert_eq!(openrc.services.get("sshd").unwrap().state, OpenRCServiceState::Started);
+        assert_eq!(
+            openrc.services.get("sshd").unwrap().state,
+            OpenRCServiceState::Started
+        );
     }
 
     #[test]
@@ -415,7 +427,7 @@ mod tests {
         let mut openrc = OpenRCInit::new();
         assert!(openrc.rc_update("sshd", "default", "del").is_ok());
         assert!(!openrc.services.get("sshd").unwrap().enabled);
-        
+
         assert!(openrc.rc_update("sshd", "default", "add").is_ok());
         assert!(openrc.services.get("sshd").unwrap().enabled);
     }
@@ -425,7 +437,7 @@ mod tests {
         let config = ArtixConfig::new(InitSystemType::Runit);
         assert_eq!(config.init_system, InitSystemType::Runit);
         assert_eq!(config.mirror_list.len(), 3);
-        
+
         let conf = config.get_pacman_conf();
         assert!(conf.contains("[options]"));
         assert!(conf.contains("[system]"));

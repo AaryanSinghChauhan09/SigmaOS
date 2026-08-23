@@ -133,7 +133,9 @@ impl Default for GamifiedProductivity {
 
 /// Simple square root emulator for #![no_std] environments
 fn sqrt_emulated(val: f64) -> f64 {
-    if val <= 0.0 { return 0.0; }
+    if val <= 0.0 {
+        return 0.0;
+    }
     let mut x = val;
     for _ in 0..10 {
         x = 0.5 * (x + val / x);
@@ -156,7 +158,7 @@ impl GameDifficultyBalancer {
         Self {
             player_actions_count: 0,
             total_wins_count: 0,
-            avg_reaction_time_ms: 250.0, // Default average in ms
+            avg_reaction_time_ms: 250.0,     // Default average in ms
             base_difficulty_multiplier: 0.5, // Standard Medium difficulty
         }
     }
@@ -169,8 +171,7 @@ impl GameDifficultyBalancer {
         }
 
         // Running average calculation for reaction time
-        self.avg_reaction_time_ms =
-            (self.avg_reaction_time_ms * 0.9) + (action_time_ms * 0.1);
+        self.avg_reaction_time_ms = (self.avg_reaction_time_ms * 0.9) + (action_time_ms * 0.1);
 
         // Adjust difficulty: if reaction time is low (<200ms) and wins are high, increase difficulty
         let win_ratio = self.total_wins_count as f64 / self.player_actions_count as f64;

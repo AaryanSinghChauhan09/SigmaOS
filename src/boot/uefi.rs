@@ -1,22 +1,29 @@
-#![no_std]
-#![no_main]
-
+use core::mem;
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 /// Inspired by systemd-boot, GRUB2, and Plymouth from popular Linux distributions.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type BootStatus = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
+pub enum BootPhase {
+    Init = 0,
+    LoadKernel = 1,
+    Handoff = 2,
+    Complete = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2, SignatureRevoked = 3, Unverified = 4 }
+pub enum BootError {
+    Success = 0,
+    LoadFailed = 1,
+    HandoffFailed = 2,
+    SignatureRevoked = 3,
+    Unverified = 4,
+}
 
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
@@ -31,7 +38,6 @@ pub struct SimpleUEFIBootloader {
 }
 
 impl SimpleUEFIBootloader {
-
     pub fn load_kernel_raw(&self, kernel_data: &[u8], dst: &mut [u8]) -> Result<usize, BootError> {
         let len = kernel_data.len().min(dst.len());
         dst[..len].copy_from_slice(&kernel_data[..len]);
@@ -47,9 +53,12 @@ impl SimpleUEFIBootloader {
 }
 
 impl UEFIBootloader for SimpleUEFIBootloader {
-    fn phase(&self) -> BootPhase { unsafe { core::mem::transmute(self.phase.load(Ordering::SeqCst) as u32) } }
+    fn phase(&self) -> BootPhase {
+        unsafe { core::mem::transmute(self.phase.load(Ordering::SeqCst) as u32) }
+    }
     fn load_kernel(&mut self, _kernel_data: &[u8]) -> Result<BootStatus, BootError> {
-        self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
+        self.phase
+            .store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
         self.kernel_loaded.store(1, Ordering::SeqCst);
         Ok(1)
     }
@@ -57,8 +66,10 @@ impl UEFIBootloader for SimpleUEFIBootloader {
         if self.kernel_loaded.load(Ordering::SeqCst) == 0 {
             return Err(BootError::LoadFailed);
         }
-        self.phase.store(BootPhase::Handoff as usize, Ordering::SeqCst);
-        self.phase.store(BootPhase::Complete as usize, Ordering::SeqCst);
+        self.phase
+            .store(BootPhase::Handoff as usize, Ordering::SeqCst);
+        self.phase
+            .store(BootPhase::Complete as usize, Ordering::SeqCst);
         Ok(2)
     }
 }
@@ -84,10 +95,10 @@ pub trait SecureBoot {
 #[repr(C)]
 pub struct SimpleSecureBoot {
     pub bootloader: SimpleUEFIBootloader,
-    pub pk_cert: UefiCertificate,          // Platform Key (PK)
-    pub kek_store: Vec<UefiCertificate>,   // Key Exchange Key (KEK)
-    pub db_store: Vec<UefiCertificate>,    // Authorized Signature Database (db)
-    pub dbx_store: Vec<UefiCertificate>,   // Forbidden/Revoked Signature Database (dbx)
+    pub pk_cert: UefiCertificate,        // Platform Key (PK)
+    pub kek_store: Vec<UefiCertificate>, // Key Exchange Key (KEK)
+    pub db_store: Vec<UefiCertificate>,  // Authorized Signature Database (db)
+    pub dbx_store: Vec<UefiCertificate>, // Forbidden/Revoked Signature Database (dbx)
 }
 
 impl SimpleSecureBoot {
@@ -184,34 +195,61 @@ impl SecureBoot for SimpleSecureBoot {
 // ==============================================================================
 // Vec Implementation
 // ==============================================================================
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn len(&self) -> usize { self.len }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 // ==============================================================================
 // 2. GopFramebuffer & GopSplashCanvas (Plymouth-style animated bootsplash)
@@ -231,7 +269,10 @@ pub struct GopSplashCanvas {
 
 impl GopSplashCanvas {
     pub fn new(fb: GopFramebuffer) -> Self {
-        Self { framebuffer: fb, loading_percent: 0 }
+        Self {
+            framebuffer: fb,
+            loading_percent: 0,
+        }
     }
 
     pub fn draw_pixel(&self, _x: u32, _y: u32, _color: u32) {
@@ -309,7 +350,9 @@ impl MultiKernelBootSelector {
     pub fn get_boot_cmdline_args(&self) -> &[u8] {
         match self.current_profile {
             MicrokernelProfile::Performance => b"loglevel=debug init=/bin/sigma-sh scheduler=eevdf",
-            MicrokernelProfile::Security => b"loglevel=info init=/bin/sigma-sh security=pledge-unveil",
+            MicrokernelProfile::Security => {
+                b"loglevel=info init=/bin/sigma-sh security=pledge-unveil"
+            }
             MicrokernelProfile::Minimalist => b"loglevel=crit init=/bin/sigma-sh minimalist=true",
             MicrokernelProfile::Recovery => b"loglevel=debug init=/bin/sigma-sh recovery_mode=true",
         }

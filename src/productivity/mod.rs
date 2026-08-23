@@ -12,10 +12,9 @@ pub mod linux_bsd_tools;
 pub mod media;
 pub mod mind_map;
 pub mod mint_competitor;
-pub mod tmux;
 pub mod sovereign_apps;
+pub mod tmux;
 
-pub use tmux::*;
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
@@ -25,6 +24,7 @@ pub use sovereign_apps::{
     TextNode,
 };
 pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
+pub use tmux::*;
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };

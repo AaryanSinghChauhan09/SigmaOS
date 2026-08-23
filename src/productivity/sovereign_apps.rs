@@ -29,7 +29,12 @@ impl SigmaOfficeDocument {
         }
     }
 
-    pub fn add_node(&mut self, parent_id: u32, formatting_flags: u8, content_hash: u32) -> Result<u32, &'static str> {
+    pub fn add_node(
+        &mut self,
+        parent_id: u32,
+        formatting_flags: u8,
+        content_hash: u32,
+    ) -> Result<u32, &'static str> {
         let id = self.next_node_id;
         let node = TextNode {
             node_id: id,
@@ -86,7 +91,11 @@ impl SigmaTasksBoard {
         }
     }
 
-    pub fn add_task(&mut self, title_hash: u32, priority: TaskPriority) -> Result<u32, &'static str> {
+    pub fn add_task(
+        &mut self,
+        title_hash: u32,
+        priority: TaskPriority,
+    ) -> Result<u32, &'static str> {
         let id = self.next_task_id;
         let task = ProductivityTask {
             task_id: id,

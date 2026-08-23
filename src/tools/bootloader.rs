@@ -1,8 +1,5 @@
 //! Bootloader & Dual-Boot Manager (GRUB2 / systemd-boot / Calamares Inspiration)
 //! Boot menu, multi-OS detection, chainloading, and UEFI support
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String, ToString};

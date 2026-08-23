@@ -7,9 +7,9 @@
 #![allow(unused_variables)]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 // =========================================================================
@@ -201,13 +201,17 @@ impl RecursivePageTableEngine {
         if !self.is_self_mapped {
             return self.pml4_phys_addr;
         }
-        0xFFFF_0000_0000_0000 | (PML4_SELF_REF_SLOT << 39) | (PML4_SELF_REF_SLOT << 30) | (PML4_SELF_REF_SLOT << 21) | (PML4_SELF_REF_SLOT << 12)
+        0xFFFF_0000_0000_0000
+            | (PML4_SELF_REF_SLOT << 39)
+            | (PML4_SELF_REF_SLOT << 30)
+            | (PML4_SELF_REF_SLOT << 21)
+            | (PML4_SELF_REF_SLOT << 12)
     }
 
     pub fn get_pt_virt_for_page(&self, vaddr: usize) -> usize {
         let pml4_idx = (vaddr >> 39) & 0x1FF;
         let pdpt_idx = (vaddr >> 30) & 0x1FF;
-        let pd_idx   = (vaddr >> 21) & 0x1FF;
+        let pd_idx = (vaddr >> 21) & 0x1FF;
 
         0xFFFF_0000_0000_0000
             | (PML4_SELF_REF_SLOT << 39)
@@ -254,7 +258,11 @@ impl CopyOnWriteForkEngine {
         entry.is_cow = true;
     }
 
-    pub fn handle_page_fault(&mut self, paddr: usize, allocator: &mut TwoTierMemoryAllocator) -> Option<usize> {
+    pub fn handle_page_fault(
+        &mut self,
+        paddr: usize,
+        allocator: &mut TwoTierMemoryAllocator,
+    ) -> Option<usize> {
         if let Some(entry) = self.shared_pages.get_mut(&paddr) {
             if entry.is_cow {
                 if entry.ref_count > 1 {
@@ -284,9 +292,9 @@ impl Default for CopyOnWriteForkEngine {
 // =========================================================================
 
 pub mod x86_msrs {
-    pub const IA32_STAR: u32   = 0xC0000081;
-    pub const IA32_LSTAR: u32  = 0xC0000082;
-    pub const IA32_FMASK: u32  = 0xC0000084;
+    pub const IA32_STAR: u32 = 0xC0000081;
+    pub const IA32_LSTAR: u32 = 0xC0000082;
+    pub const IA32_FMASK: u32 = 0xC0000084;
 }
 
 #[repr(C)]
@@ -300,8 +308,8 @@ pub struct TrapRegisterFrame {
     pub rdi: u64,
     pub rbp: u64,
     pub rsp: u64,
-    pub r8:  u64,
-    pub r9:  u64,
+    pub r8: u64,
+    pub r9: u64,
     pub r10: u64,
     pub r11: u64,
     pub r12: u64,
@@ -333,7 +341,11 @@ impl FastSyscallDispatcher {
         self.star_segments = ((user_cs as u64) << 48) | ((kernel_cs as u64) << 32);
     }
 
-    pub fn dispatch_trap(&self, frame: &mut TrapRegisterFrame, syscall_matrix: &MinimalPosixSyscallMatrix) -> i64 {
+    pub fn dispatch_trap(
+        &self,
+        frame: &mut TrapRegisterFrame,
+        syscall_matrix: &MinimalPosixSyscallMatrix,
+    ) -> i64 {
         let syscall_nr = frame.rax;
         let arg1 = frame.rdi;
         let arg2 = frame.rsi;
@@ -355,13 +367,13 @@ impl Default for FastSyscallDispatcher {
 // =========================================================================
 
 pub mod posix_syscall_nr {
-    pub const SYS_READ: u64   = 0;
-    pub const SYS_WRITE: u64  = 1;
-    pub const SYS_OPEN: u64   = 2;
-    pub const SYS_CLOSE: u64  = 3;
+    pub const SYS_READ: u64 = 0;
+    pub const SYS_WRITE: u64 = 1;
+    pub const SYS_OPEN: u64 = 2;
+    pub const SYS_CLOSE: u64 = 3;
     pub const SYS_EXECVE: u64 = 59;
-    pub const SYS_EXIT: u64   = 60;
-    pub const SYS_FORK: u64   = 57;
+    pub const SYS_EXIT: u64 = 60;
+    pub const SYS_FORK: u64 = 57;
 }
 
 pub struct MinimalPosixSyscallMatrix {
@@ -405,7 +417,9 @@ mod tests {
     #[test]
     fn test_two_tier_allocator() {
         let mut allocator = TwoTierMemoryAllocator::new(0x1000_0000, 128);
-        let pcb_addr = allocator.alloc_slab_object(SlabObjectType::ProcessControlBlock).unwrap();
+        let pcb_addr = allocator
+            .alloc_slab_object(SlabObjectType::ProcessControlBlock)
+            .unwrap();
         assert!(pcb_addr >= 0x1000_0000);
 
         allocator.free_slab_object(SlabObjectType::ProcessControlBlock, pcb_addr);
@@ -431,7 +445,9 @@ mod tests {
         let mut cow_engine = CopyOnWriteForkEngine::new();
 
         cow_engine.fork_share_page(0x4000, first_page);
-        let duplicated_paddr = cow_engine.handle_page_fault(first_page, &mut allocator).unwrap();
+        let duplicated_paddr = cow_engine
+            .handle_page_fault(first_page, &mut allocator)
+            .unwrap();
         assert_ne!(duplicated_paddr, first_page);
 
         let syscall_matrix = MinimalPosixSyscallMatrix::new();

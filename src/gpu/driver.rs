@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based GPU Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements GPU device management and rendering

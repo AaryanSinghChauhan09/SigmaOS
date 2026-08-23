@@ -1,8 +1,5 @@
 // SigmaOS 4-Level Page Table Walking & Paging Subsystem
 // Zero-dependency, #![no_std] compliant x86_64 paging implementation.
-
-#![no_std]
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::ptr::NonNull;
@@ -222,7 +219,8 @@ impl MemoryDescriptorList {
         let start_page = self.virtual_address & !0xFFF;
         for i in 0..self.physical_pages.len() {
             let virt = start_page + (i * 4096) as u64;
-            let phys = unsafe { vmm.translate(virt) }.ok_or("Virtual address page fault during probe")?;
+            let phys =
+                unsafe { vmm.translate(virt) }.ok_or("Virtual address page fault during probe")?;
             self.physical_pages[i] = phys & !0xFFF;
         }
 
@@ -251,7 +249,8 @@ impl MemoryDescriptorList {
             kernel_start_virt += 4096;
         }
 
-        let mapped_address = kernel_start_virt - (self.physical_pages.len() * 4096) as u64 + self.byte_offset as u64;
+        let mapped_address =
+            kernel_start_virt - (self.physical_pages.len() * 4096) as u64 + self.byte_offset as u64;
         self.mapped_kernel_address = Some(mapped_address);
         self.is_mapped = true;
         Ok(mapped_address)
@@ -364,8 +363,19 @@ mod tests {
         let phys_frame2 = 0x1000_1000;
         let flags = PageTableFlags(PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
 
-        assert!(unsafe { vmm.map_page(virt_user_addr, phys_frame1, flags, &mut user_allocator).is_ok() });
-        assert!(unsafe { vmm.map_page(virt_user_addr + 4096, phys_frame2, flags, &mut user_allocator).is_ok() });
+        assert!(unsafe {
+            vmm.map_page(virt_user_addr, phys_frame1, flags, &mut user_allocator)
+                .is_ok()
+        });
+        assert!(unsafe {
+            vmm.map_page(
+                virt_user_addr + 4096,
+                phys_frame2,
+                flags,
+                &mut user_allocator,
+            )
+            .is_ok()
+        });
 
         // Initialize MDL
         let mut mdl = MemoryDescriptorList::new(virt_user_addr + 256, 5000);
@@ -383,7 +393,10 @@ mod tests {
 
         // Map locked MDL to a contiguous kernel virtual address range (requires allocation of kernel mapping space page directories)
         let kernel_start_virt = 0x0000_2000_0000_0000;
-        let mapped_address = unsafe { mdl.map_to_kernel_space(kernel_start_virt, &mut vmm, &mut kern_allocator).unwrap() };
+        let mapped_address = unsafe {
+            mdl.map_to_kernel_space(kernel_start_virt, &mut vmm, &mut kern_allocator)
+                .unwrap()
+        };
         assert!(mdl.is_mapped);
         assert_eq!(mapped_address, kernel_start_virt + 256);
 

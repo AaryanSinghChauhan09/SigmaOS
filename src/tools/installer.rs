@@ -1,8 +1,5 @@
 //! System Installer (Ubiquity/Calamares Inspiration)
 //! Graphical installer with partitioning and user setup
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

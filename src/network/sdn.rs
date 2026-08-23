@@ -1,8 +1,5 @@
 //! Advanced Networking (SDN/NFV Inspiration)
 //! Software-defined networking, network virtualization, and network function virtualization
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

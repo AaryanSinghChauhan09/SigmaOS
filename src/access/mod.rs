@@ -9,19 +9,19 @@
 
 pub mod control;
 
-pub use control::{
-    Ext4AccessCheckEngine, Ext4FileType, Ext4InodeMode, Ext4Xattr, PosixAclEntry,
-    PosixAclTable, PosixAclTag, SecurityIdentifier, dac_flags, ext4_special_bits,
-    ntfs_access_rights, ntfs_ace_flags,
-};
 pub use crate::filesystem::ext4_ntfs_security::{
     NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
 };
+pub use control::{
+    dac_flags, ext4_special_bits, ntfs_access_rights, ntfs_ace_flags, Ext4AccessCheckEngine,
+    Ext4FileType, Ext4InodeMode, Ext4Xattr, PosixAclEntry, PosixAclTable, PosixAclTag,
+    SecurityIdentifier,
+};
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
 use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::fmt;
 
 /// Error type for the Access module
@@ -86,19 +86,19 @@ impl AccessRule {
             enabled: false,
         }
     }
-    
+
     /// Enable this resource
     pub fn enable(&mut self) -> AccessResult<()> {
         self.enabled = true;
         Ok(())
     }
-    
+
     /// Disable this resource
     pub fn disable(&mut self) -> AccessResult<()> {
         self.enabled = false;
         Ok(())
     }
-    
+
     /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
@@ -227,7 +227,11 @@ impl AccessTimeTracker {
     }
 
     /// Calculate effective access time in nanoseconds based on access mode
-    pub fn calculate_effective_access_time(&mut self, pattern: AccessPattern, read_op: bool) -> u64 {
+    pub fn calculate_effective_access_time(
+        &mut self,
+        pattern: AccessPattern,
+        read_op: bool,
+    ) -> u64 {
         if read_op {
             self.total_reads += 1;
         } else {
@@ -236,15 +240,29 @@ impl AccessTimeTracker {
         self.last_pattern = pattern;
 
         match (self.device_type, pattern) {
-            (DeviceAccessType::RandomAccessDevice, AccessPattern::Sequential) => self.base_latency_ns,
-            (DeviceAccessType::RandomAccessDevice, AccessPattern::Random) => self.base_latency_ns + (self.seek_penalty_ns / 10),
+            (DeviceAccessType::RandomAccessDevice, AccessPattern::Sequential) => {
+                self.base_latency_ns
+            }
+            (DeviceAccessType::RandomAccessDevice, AccessPattern::Random) => {
+                self.base_latency_ns + (self.seek_penalty_ns / 10)
+            }
             (DeviceAccessType::RandomAccessDevice, AccessPattern::Direct) => self.base_latency_ns,
-            (DeviceAccessType::RandomAccessDevice, AccessPattern::Relative) => self.base_latency_ns + 5,
+            (DeviceAccessType::RandomAccessDevice, AccessPattern::Relative) => {
+                self.base_latency_ns + 5
+            }
 
-            (DeviceAccessType::SequentialAccessDevice, AccessPattern::Sequential) => self.base_latency_ns,
-            (DeviceAccessType::SequentialAccessDevice, AccessPattern::Random) => self.base_latency_ns + self.seek_penalty_ns,
-            (DeviceAccessType::SequentialAccessDevice, AccessPattern::Direct) => self.base_latency_ns + self.seek_penalty_ns,
-            (DeviceAccessType::SequentialAccessDevice, AccessPattern::Relative) => self.base_latency_ns + (self.seek_penalty_ns / 2),
+            (DeviceAccessType::SequentialAccessDevice, AccessPattern::Sequential) => {
+                self.base_latency_ns
+            }
+            (DeviceAccessType::SequentialAccessDevice, AccessPattern::Random) => {
+                self.base_latency_ns + self.seek_penalty_ns
+            }
+            (DeviceAccessType::SequentialAccessDevice, AccessPattern::Direct) => {
+                self.base_latency_ns + self.seek_penalty_ns
+            }
+            (DeviceAccessType::SequentialAccessDevice, AccessPattern::Relative) => {
+                self.base_latency_ns + (self.seek_penalty_ns / 2)
+            }
         }
     }
 }
@@ -496,7 +514,11 @@ impl AnonymousAccessPolicy {
     pub fn new() -> Self {
         Self {
             allow_guest_login: true,
-            restricted_paths: alloc::vec!["/etc/shadow".to_string(), "/root".to_string(), "/sys/kernel/security".to_string()],
+            restricted_paths: alloc::vec![
+                "/etc/shadow".to_string(),
+                "/root".to_string(),
+                "/sys/kernel/security".to_string()
+            ],
             max_anonymous_sessions: 5,
             active_anonymous_sessions: 0,
         }
@@ -545,13 +567,13 @@ impl AccessManager {
             anonymous_policy: AnonymousAccessPolicy::new(),
         }
     }
-    
+
     /// Initialize the Access subsystem
     pub fn init(&mut self) -> AccessResult<()> {
         self.initialized = true;
         Ok(())
     }
-    
+
     /// Add a resource
     pub fn add(&mut self, resource: AccessRule) -> AccessResult<u64> {
         if !self.initialized {
@@ -561,27 +583,27 @@ impl AccessManager {
         self.resources.push(resource);
         Ok(id)
     }
-    
+
     /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&AccessRule> {
         self.resources.get(id as usize)
     }
-    
+
     /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut AccessRule> {
         self.resources.get_mut(id as usize)
     }
-    
+
     /// List all resources
     pub fn list(&self) -> &[AccessRule] {
         &self.resources
     }
-    
+
     /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
-    
+
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> AccessResult<()> {
         self.initialized = false;
@@ -599,7 +621,7 @@ impl Default for AccessManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_access_manager_init() {
         let mut manager = AccessManager::new();
@@ -607,7 +629,7 @@ mod tests {
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
     }
-    
+
     #[test]
     fn test_access_resource_add() {
         let mut manager = AccessManager::new();
@@ -628,7 +650,10 @@ mod tests {
         assert!(root_token.has_privilege("CAP_SYS_ADMIN"));
         assert!(!user_token.has_privilege("CAP_SYS_ADMIN"));
 
-        assert_eq!(user_token.can_access_process(&protected_token), Err(AccessError::ProcessProtected));
+        assert_eq!(
+            user_token.can_access_process(&protected_token),
+            Err(AccessError::ProcessProtected)
+        );
         assert_eq!(root_token.can_access_process(&protected_token), Ok(true));
     }
 
@@ -648,7 +673,8 @@ mod tests {
         let mut ldap = LdapAccessClient::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
         assert!(ldap.search_user("alice").is_err()); // Not bound yet
 
-        ldap.bind("cn=admin,dc=sigmaos,dc=org", "secret_pass").unwrap();
+        ldap.bind("cn=admin,dc=sigmaos,dc=org", "secret_pass")
+            .unwrap();
         let user = ldap.search_user("alice").unwrap();
         assert_eq!(user.uid, "alice");
         assert_eq!(user.mail, "alice@sigmaos.org");

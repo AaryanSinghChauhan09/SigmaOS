@@ -1,9 +1,6 @@
 // SigmaOS Linux & BSD Inspired Advanced Drivers Subsystem
 // Zero-dependency, #![no_std] compliant, providing Linux evdev, FreeBSD DRM/KMS,
 // OpenBSD driver pledge/unveil sandboxing, NetBSD rump virtual drivers, and Linux URB USB transfer queues.
-
-#![no_std]
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;

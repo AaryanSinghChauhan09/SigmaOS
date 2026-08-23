@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
 /// Implements minimal init system with service management, dependency resolution, parallel startup

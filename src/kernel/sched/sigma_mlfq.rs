@@ -3,11 +3,11 @@ use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 #[cfg(feature = "kernel")]
-use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
-#[cfg(feature = "kernel")]
-use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-#[cfg(feature = "kernel")]
 use crate::filesystem::FsError;
+#[cfg(feature = "kernel")]
+use crate::kernel::sched::scheduler::{RunQueue, SchedClass};
+#[cfg(feature = "kernel")]
+use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 
 /// Multi-Level Feedback Queue (MLFQ) Scheduler
 ///

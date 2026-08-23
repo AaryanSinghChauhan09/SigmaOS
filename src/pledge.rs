@@ -11,9 +11,6 @@
 //! - OpenBSD pledge(2): https://man.openbsd.org/pledge.2
 //! - OpenBSD source: sys/kern/kern_pledge.c
 //! - Fuchsia job policy: fuchsia.dev/fuchsia-src/concepts/process/jobs
-
-#![no_std]
-
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Pledge promise bits — each bit enables a category of syscalls.

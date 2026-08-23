@@ -1,8 +1,5 @@
 // India Stack - Professional Utility Engines for Indian Krishi, Vyapaar, and Kanoon
 // Core calculators for Indian farmers, CAs/retailers, medical practitioners, structural engineers, and legal advocates
-
-#![no_std]
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;

@@ -1,9 +1,9 @@
 //! Pure Declarative Build System (Nix & Bazel Inspired) with Curated Ratings/Reviews Subsystem
 //! Implements deterministic build derivations, hermetic dependency graphs, and package reputation validation.
 
-use std::vec::Vec;
 use std::collections::HashMap;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ==========================================
 // 1. Nix-Style Store Derivations
@@ -132,11 +132,18 @@ impl PackageRatingsRegistry {
     }
 
     /// Adds a peer review score for a deterministic store output path
-    pub fn submit_review(&mut self, store_path: &str, review: PackageReview) -> Result<(), &'static str> {
+    pub fn submit_review(
+        &mut self,
+        store_path: &str,
+        review: PackageReview,
+    ) -> Result<(), &'static str> {
         if review.score < 1 || review.score > 5 {
             return Err("Score must be between 1 and 5 stars");
         }
-        let entry = self.store_reviews.entry(store_path.to_string()).or_default();
+        let entry = self
+            .store_reviews
+            .entry(store_path.to_string())
+            .or_default();
         entry.push(review);
         Ok(())
     }
@@ -173,13 +180,17 @@ mod tests {
         deriv1.env.insert("VERSION".to_string(), "1.25".to_string());
         deriv1.args.push("-c".to_string());
         deriv1.args.push("make build".to_string());
-        deriv1.input_sources_hashes.push("sha256-abc123xyz".to_string());
+        deriv1
+            .input_sources_hashes
+            .push("sha256-abc123xyz".to_string());
 
         let mut deriv2 = NixDerivation::new("nginx", "bash");
         deriv2.env.insert("VERSION".to_string(), "1.25".to_string());
         deriv2.args.push("-c".to_string());
         deriv2.args.push("make build".to_string());
-        deriv2.input_sources_hashes.push("sha256-abc123xyz".to_string());
+        deriv2
+            .input_sources_hashes
+            .push("sha256-abc123xyz".to_string());
 
         // Same derivation inputs -> identical output store paths (Pure reproducibility)
         assert_eq!(deriv1.compute_store_path(), deriv2.compute_store_path());

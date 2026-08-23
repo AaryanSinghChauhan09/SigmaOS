@@ -1,8 +1,5 @@
 // S-SEC CAPABILITY-BASED SANDBOX
 // Android/AOSP-style permissions and capability-based security enforcement
-
-#![no_std]
-
 extern crate alloc;
 
 pub const PORT_ALLOW_TCP: u16 = 80;

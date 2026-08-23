@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// Custom File I/O for SigmaOS
 /// Implements file operations without relying on std::fs
 /// Uses capability-based access control

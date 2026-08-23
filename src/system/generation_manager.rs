@@ -2,8 +2,8 @@
 // Implements sub-millisecond, zero-copy system rollbacks via content-addressed nodes
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Generation {
@@ -16,9 +16,9 @@ pub struct Generation {
 #[derive(Debug, Clone)]
 pub struct NixDerivation {
     pub name: &'static str,
-    pub inputs: Vec<&'static str>, // Input derivation hashes/paths
+    pub inputs: Vec<&'static str>,    // Input derivation hashes/paths
     pub builder_script: &'static str, // Build instructions
-    pub output_path: &'static str, // Computed unique content-addressed path
+    pub output_path: &'static str,    // Computed unique content-addressed path
 }
 
 impl NixDerivation {

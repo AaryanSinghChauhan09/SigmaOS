@@ -1,7 +1,5 @@
 // S6 Supervision Engine for SigmaOS
 // Location: src/init/s6.rs
-
-#![no_std]
 extern crate alloc;
 use alloc::string::String;
 use alloc::collections::BTreeMap;

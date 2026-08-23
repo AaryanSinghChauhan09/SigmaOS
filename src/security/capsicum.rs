@@ -1,8 +1,5 @@
 // FreeBSD Capsicum-Inspired Capability-Based Security Framework
 // Fine-grained capability restriction for processes, limiting access to system resources
-
-#![no_std]
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

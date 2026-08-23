@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Power Management Stack for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 8
 /// Implements advanced power profiles, CPU governor tuning, thermal management

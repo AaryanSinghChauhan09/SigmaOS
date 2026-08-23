@@ -1,10 +1,6 @@
-#![no_std]
-#![no_main]
-
 /// Zorin OS Compatibility Subsystem for SigmaOS
 /// Implements familiarity-first layout switching, Chameleon dynamic auto-theming,
 /// Zorin Connect smartphone integration, and Windows App support.
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -100,7 +96,11 @@ impl ZorinChameleonEngine {
     /// Adapts the active accent hue based on dominant wallpaper color samples
     pub fn calculate_accent_from_wallpaper(rgb_samples: &[(u8, u8, u8)]) -> ZorinChameleonColor {
         if rgb_samples.is_empty() {
-            return ZorinChameleonColor { r: 18, g: 119, b: 211 }; // Zorin OS blue
+            return ZorinChameleonColor {
+                r: 18,
+                g: 119,
+                b: 211,
+            }; // Zorin OS blue
         }
 
         let mut sum_r: u32 = 0;
@@ -121,7 +121,11 @@ impl ZorinChameleonEngine {
         // Enhance color saturation to calculate optimal vibrant accent
         let max_val = avg_r.max(avg_g).max(avg_b);
         if max_val == 0 {
-            return ZorinChameleonColor { r: 18, g: 119, b: 211 };
+            return ZorinChameleonColor {
+                r: 18,
+                g: 119,
+                b: 211,
+            };
         }
 
         let scale = 255.0 / (max_val as f32);
@@ -133,9 +137,16 @@ impl ZorinChameleonEngine {
     }
 
     /// Evaluates readability using W3C contrast ratio formula
-    pub fn adaptive_contrast_ratio(background: ZorinChameleonColor, accent: ZorinChameleonColor) -> f32 {
-        let l1 = 0.2126 * (background.r as f32 / 255.0) + 0.7152 * (background.g as f32 / 255.0) + 0.0722 * (background.b as f32 / 255.0);
-        let l2 = 0.2126 * (accent.r as f32 / 255.0) + 0.7152 * (accent.g as f32 / 255.0) + 0.0722 * (accent.b as f32 / 255.0);
+    pub fn adaptive_contrast_ratio(
+        background: ZorinChameleonColor,
+        accent: ZorinChameleonColor,
+    ) -> f32 {
+        let l1 = 0.2126 * (background.r as f32 / 255.0)
+            + 0.7152 * (background.g as f32 / 255.0)
+            + 0.0722 * (background.b as f32 / 255.0);
+        let l2 = 0.2126 * (accent.r as f32 / 255.0)
+            + 0.7152 * (accent.g as f32 / 255.0)
+            + 0.0722 * (accent.b as f32 / 255.0);
 
         let max_l = l1.max(l2);
         let min_l = l1.min(l2);
@@ -252,18 +263,18 @@ mod tests {
 
     #[test]
     fn test_zorin_chameleon_engine() {
-        let samples = vec![
-            (10, 10, 10),
-            (20, 20, 20),
-            (30, 30, 30),
-        ];
+        let samples = vec![(10, 10, 10), (20, 20, 20), (30, 30, 30)];
         let color = ZorinChameleonEngine::calculate_accent_from_wallpaper(&samples);
         assert_eq!(color.r, 255); // Scaled saturation
         assert_eq!(color.g, 255);
         assert_eq!(color.b, 255);
 
         let bg = ZorinChameleonColor { r: 0, g: 0, b: 0 };
-        let accent = ZorinChameleonColor { r: 255, g: 255, b: 255 };
+        let accent = ZorinChameleonColor {
+            r: 255,
+            g: 255,
+            b: 255,
+        };
         let ratio = ZorinChameleonEngine::adaptive_contrast_ratio(bg, accent);
         assert!(ratio > 4.5); // Readable high-contrast ratio
     }
@@ -301,7 +312,8 @@ mod tests {
 
     #[test]
     fn test_zorin_windows_app_recommendations() {
-        let res_office = ZorinWindowsAppSupport::inspect_package_format("ms_office_installer.exe").unwrap();
+        let res_office =
+            ZorinWindowsAppSupport::inspect_package_format("ms_office_installer.exe").unwrap();
         assert!(res_office.contains("libreoffice"));
 
         let res_generic = ZorinWindowsAppSupport::inspect_package_format("game.msi").unwrap();

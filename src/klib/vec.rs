@@ -1,5 +1,3 @@
-#![no_std]
-
 use core::mem;
 
 pub type SigmaVec<T> = Vec<T>;

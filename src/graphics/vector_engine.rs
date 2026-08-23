@@ -1,9 +1,6 @@
 // Vector Graphics Engine (SigmaDraw)
 // Defines 2D paths, Bézier curves, layers, groups, masks, SVG import/export, and real-time path manipulation.
 // Inspiration: Inkscape, Blender's grease pencil.
-
-#![no_std]
-
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;

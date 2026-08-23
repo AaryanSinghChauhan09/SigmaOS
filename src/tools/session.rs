@@ -1,8 +1,5 @@
 //! Session Manager (systemd-logind Inspiration)
 //! Session tracking, seat management, and device assignment
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

@@ -11,11 +11,10 @@
 #[allow(unused_variables)]
 #[allow(unused_mut)]
 #[allow(unused_imports)]
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Development environment configuration
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -54,7 +53,7 @@ impl DevEnvironment {
     /// Create a temporary shell with this environment
     pub fn spawn_shell(&self) -> Result<(), &'static str> {
         println!("Spawning shell for environment: {}", self.name);
-        
+
         // Set environment variables
         for (key, value) in &self.environment_vars {
             println!("export {}={}", key, value);
@@ -114,7 +113,9 @@ impl NixShellManager {
 
     /// Get the active environment
     pub fn get_active(&self) -> Option<&DevEnvironment> {
-        self.active_environment.as_ref().and_then(|name| self.environments.get(name))
+        self.active_environment
+            .as_ref()
+            .and_then(|name| self.environments.get(name))
     }
 
     /// List all environments
@@ -198,7 +199,7 @@ mod tests {
         let mut env = DevEnvironment::new(String::from("test"));
         env.add_package(String::from("test-package"));
         env.set_env(String::from("TEST_VAR"), String::from("test-value"));
-        
+
         assert_eq!(env.packages.len(), 1);
         assert_eq!(env.environment_vars.len(), 1);
     }
@@ -207,7 +208,7 @@ mod tests {
     fn test_nix_shell_manager() {
         let mut manager = NixShellManager::new();
         manager.create_environment(String::from("test"));
-        
+
         assert!(manager.activate("test").is_ok());
         assert!(manager.get_active().is_some());
     }

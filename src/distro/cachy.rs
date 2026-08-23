@@ -1,8 +1,5 @@
 // SigmaOS CachyOS Compatibility & Performance Suite (CachyOS Parity)
 // Implements x86-64-v3/v4 Microarchitecture detection, BORE CPU Scheduler Governor, and CachyOS Kernel Variant Selector.
-
-#![no_std]
-
 #[cfg(test)]
 extern crate std;
 

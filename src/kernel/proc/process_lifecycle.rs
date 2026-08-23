@@ -1,8 +1,5 @@
 // SigmaOS Advanced Process Control & Lifecycle Management
 // Absorbs Linux fork/exec/exit/waitpid, copy-on-write namespaces, BSD rlimits, Windows Priority Classes, and Orphan Re-parenting.
-
-#![no_std]
-
 #[cfg(test)]
 extern crate std;
 

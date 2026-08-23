@@ -283,7 +283,9 @@ impl GeomTopology {
         let start = offset as usize;
         let end = start + size as usize;
         if end <= parent.raw_buffer.len() {
-            child_provider.raw_buffer.copy_from_slice(&parent.raw_buffer[start..end]);
+            child_provider
+                .raw_buffer
+                .copy_from_slice(&parent.raw_buffer[start..end]);
         }
 
         self.partitions.push(entry);
@@ -406,7 +408,9 @@ mod tests {
             .create_partition("ada0", "ada0p1", 0, 4096, "freebsd-ufs")
             .is_ok());
 
-        assert!(geom.create_eli("ada0p1", "ada0p1.eli", "secretpass").is_ok());
+        assert!(geom
+            .create_eli("ada0p1", "ada0p1.eli", "secretpass")
+            .is_ok());
 
         let mut write_bio = BioRequest::new_write(0, b"SOVEREIGN_DATA".to_vec());
         geom.dispatch_bio("ada0p1.eli", &mut write_bio);

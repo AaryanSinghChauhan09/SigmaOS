@@ -17,10 +17,10 @@ impl AgentAutomationEngine {
 }
 
 impl Default for AgentAutomationEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
-
-
 
 use crate::accessibility::{
     AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
@@ -286,8 +286,8 @@ impl ShellRepl {
     pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
         let mut suggestions = Vec::new();
         let commands = [
-            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
-            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+            "help", "ps", "ls", "pwd", "whoami", "uname", "clear", "touch", "mkdir", "theme",
+            "profile", "a11y", "set", "get", "alias",
         ];
         for cmd in &commands {
             if cmd.starts_with(prefix) {
@@ -377,11 +377,9 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "echo" => {
-                ShellCommand::Echo {
-                    message: parts[1..].join(" "),
-                }
-            }
+            "echo" => ShellCommand::Echo {
+                message: parts[1..].join(" "),
+            },
             "rm" => {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {
@@ -463,8 +461,7 @@ impl ShellRepl {
                             profile: parts[2].to_string(),
                         }
                     } else if parts[1] == "set" && parts.len() >= 4 {
-                        let enabled =
-                            parts[3] == "on" || parts[3] == "true" || parts[3] == "1";
+                        let enabled = parts[3] == "on" || parts[3] == "true" || parts[3] == "1";
                         ShellCommand::A11ySet {
                             setting: parts[2].to_string(),
                             enabled,
@@ -518,7 +515,9 @@ impl ShellRepl {
             }
             "rm" => {
                 if parts.len() >= 2 {
-                    ShellCommand::Rm { filename: parts[1].to_string() }
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
@@ -538,7 +537,9 @@ impl ShellRepl {
             }
             "cat" => {
                 if parts.len() >= 2 {
-                    ShellCommand::Cat { filename: parts[1..].join(" ") }
+                    ShellCommand::Cat {
+                        filename: parts[1..].join(" "),
+                    }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
@@ -559,9 +560,20 @@ impl ShellRepl {
                 }
             }
             "apt" => {
-                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { String::new() };
-                let package = if parts.len() >= 3 { Some(parts[2].to_string()) } else { None };
-                ShellCommand::Apt { subcommand, package }
+                let subcommand = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    String::new()
+                };
+                let package = if parts.len() >= 3 {
+                    Some(parts[2].to_string())
+                } else {
+                    None
+                };
+                ShellCommand::Apt {
+                    subcommand,
+                    package,
+                }
             }
             "livepatch" => {
                 let args = parts[1..].iter().map(|s| s.to_string()).collect();
@@ -1535,7 +1547,10 @@ mod tests {
 
         // 3. VM Command Test
         let cmd_vm = repl.parse_command("vm start Intel-VM");
-        assert!(matches!(cmd_vm, ShellCommand::Vm { .. } | ShellCommand::VmStart { .. }));
+        assert!(matches!(
+            cmd_vm,
+            ShellCommand::Vm { .. } | ShellCommand::VmStart { .. }
+        ));
         let out_vm = repl.execute_command(cmd_vm).unwrap();
         assert!(out_vm.contains("Starting VM") || out_vm.contains("Booting guest VM"));
 

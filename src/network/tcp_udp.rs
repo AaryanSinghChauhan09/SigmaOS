@@ -266,6 +266,9 @@ impl CongestionControl for RenoCongestionControl {
         self.ssthresh.store(cwnd / 2, Ordering::SeqCst);
         self.cwnd.store(1, Ordering::SeqCst);
     }
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
 }
 
 #[repr(C)]
@@ -430,7 +433,7 @@ impl Default for ZeroCopyNetwork {
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
         ZeroCopyNetwork {
-            dma_buffer_address: 0,
+            dma_buffer: AtomicUsize::new(0),
         }
     }
 }
@@ -667,7 +670,6 @@ impl NetworkStack for SimpleNetworkStack {
         None
     }
 }
-
 
 #[cfg(test)]
 mod tests {

@@ -1,4 +1,3 @@
-#![no_std]
 use alloc::vec::Vec;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::string::String;

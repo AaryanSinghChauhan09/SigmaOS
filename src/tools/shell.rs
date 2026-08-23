@@ -1,8 +1,5 @@
 //! Shell/Command Interpreter (bash/zsh Inspiration)
 //! Advanced shell with history, completion, aliases, and job control
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -397,4 +394,3 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
-

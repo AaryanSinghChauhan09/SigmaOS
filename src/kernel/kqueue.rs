@@ -44,21 +44,21 @@ pub enum KFilter {
 /// Flags that control kevent lifecycle.
 pub mod flags {
     /// Add the event to the kqueue (create if absent).
-    pub const ADD:     u16 = 0x0001;
+    pub const ADD: u16 = 0x0001;
     /// Remove the event from the kqueue.
-    pub const DELETE:  u16 = 0x0002;
+    pub const DELETE: u16 = 0x0002;
     /// Enable the event (default after ADD).
-    pub const ENABLE:  u16 = 0x0004;
+    pub const ENABLE: u16 = 0x0004;
     /// Disable the event without removing it.
     pub const DISABLE: u16 = 0x0008;
     /// Auto-remove after first trigger (one-shot).
     pub const ONESHOT: u16 = 0x0010;
     /// Edge-triggered: clear the event after return.
-    pub const CLEAR:   u16 = 0x0020;
+    pub const CLEAR: u16 = 0x0020;
     /// Event error — returned in `flags` when an error occurs.
-    pub const ERROR:   u16 = 0x4000;
+    pub const ERROR: u16 = 0x4000;
     /// Event was triggered — set when returning from kevent().
-    pub const EOF:     u16 = 0x8000;
+    pub const EOF: u16 = 0x8000;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ pub mod vnote {
     /// File was deleted.
     pub const DELETE: u32 = 0x0001;
     /// File was written to.
-    pub const WRITE:  u32 = 0x0002;
+    pub const WRITE: u32 = 0x0002;
     /// File was extended.
     pub const EXTEND: u32 = 0x0004;
     /// File attributes changed.
@@ -86,28 +86,28 @@ pub mod vnote {
 #[derive(Debug, Clone)]
 pub struct KEvent {
     /// Identifier: fd, pid, signal number, timer id, or user id.
-    pub ident:  u64,
+    pub ident: u64,
     /// Filter type (see `KFilter`).
     pub filter: KFilter,
     /// Control flags (see `flags` module).
-    pub flags:  u16,
+    pub flags: u16,
     /// Filter-specific flags (e.g. `vnote::WRITE`).
     pub fflags: u32,
     /// Filter-specific data (e.g. bytes available to read).
-    pub data:   i64,
+    pub data: i64,
     /// Opaque user-defined value, returned unchanged in ready events.
-    pub udata:  u64,
+    pub udata: u64,
 }
 
 impl KEvent {
     /// Convenience constructor for a readable-fd event.
     pub fn read_fd(fd: i32, udata: u64) -> Self {
         Self {
-            ident:  fd as u64,
+            ident: fd as u64,
             filter: KFilter::Read,
-            flags:  flags::ADD | flags::ENABLE,
+            flags: flags::ADD | flags::ENABLE,
             fflags: 0,
-            data:   0,
+            data: 0,
             udata,
         }
     }
@@ -115,11 +115,11 @@ impl KEvent {
     /// Convenience constructor for a one-shot timer (milliseconds).
     pub fn timer_ms(id: u64, ms: i64, udata: u64) -> Self {
         Self {
-            ident:  id,
+            ident: id,
             filter: KFilter::Timer,
-            flags:  flags::ADD | flags::ENABLE | flags::ONESHOT,
+            flags: flags::ADD | flags::ENABLE | flags::ONESHOT,
             fflags: 0,
-            data:   ms,
+            data: ms,
             udata,
         }
     }
@@ -127,11 +127,11 @@ impl KEvent {
     /// Convenience constructor for a process-exit event.
     pub fn proc_exit(pid: u64, udata: u64) -> Self {
         Self {
-            ident:  pid,
+            ident: pid,
             filter: KFilter::Proc,
-            flags:  flags::ADD | flags::ENABLE | flags::ONESHOT,
+            flags: flags::ADD | flags::ENABLE | flags::ONESHOT,
             fflags: 0,
-            data:   0,
+            data: 0,
             udata,
         }
     }
@@ -228,7 +228,10 @@ impl Kqueue {
             // Swap-remove (O(1)) — order of interest list is not significant.
             let last = self.interests.len() - 1;
             if idx != last {
-                if let (Some(last_ev), Some(slot)) = (self.interests.get(last).cloned(), self.interests.get_mut(idx)) {
+                if let (Some(last_ev), Some(slot)) = (
+                    self.interests.get(last).cloned(),
+                    self.interests.get_mut(idx),
+                ) {
                     *slot = last_ev;
                 }
             }
@@ -255,9 +258,15 @@ impl Kqueue {
 
     // ── Query ─────────────────────────────────────────────────────────────────
 
-    pub fn interest_count(&self) -> usize { self.interests.len() }
-    pub fn ready_count(&self) -> usize    { self.ready.len() }
-    pub fn fired_total(&self) -> u64      { self.fired_total }
+    pub fn interest_count(&self) -> usize {
+        self.interests.len()
+    }
+    pub fn ready_count(&self) -> usize {
+        self.ready.len()
+    }
+    pub fn fired_total(&self) -> u64 {
+        self.fired_total
+    }
 
     // ── Internal helpers ──────────────────────────────────────────────────────
 
@@ -279,7 +288,9 @@ impl Kqueue {
                 if ev.ident == ident && ev.filter == filter {
                     let last = self.interests.len() - 1;
                     if i != last {
-                        if let (Some(last_ev), Some(slot)) = (self.interests.get(last).cloned(), self.interests.get_mut(i)) {
+                        if let (Some(last_ev), Some(slot)) =
+                            (self.interests.get(last).cloned(), self.interests.get_mut(i))
+                        {
                             *slot = last_ev;
                         }
                     }
@@ -327,7 +338,11 @@ mod tests {
         assert_eq!(kq.interest_count(), 1);
         kq.fire(1, KFilter::Timer, 0);
         let _ = kq.drain_ready();
-        assert_eq!(kq.interest_count(), 0, "oneshot should be removed after fire");
+        assert_eq!(
+            kq.interest_count(),
+            0,
+            "oneshot should be removed after fire"
+        );
     }
 
     #[test]
@@ -335,9 +350,14 @@ mod tests {
         let mut kq = Kqueue::new();
         kq.kevent_ctl(KEvent::read_fd(5, 0)).unwrap();
         kq.kevent_ctl(KEvent {
-            ident: 5, filter: KFilter::Read,
-            flags: flags::DELETE, fflags: 0, data: 0, udata: 0,
-        }).unwrap();
+            ident: 5,
+            filter: KFilter::Read,
+            flags: flags::DELETE,
+            fflags: 0,
+            data: 0,
+            udata: 0,
+        })
+        .unwrap();
         kq.fire(5, KFilter::Read, 0);
         assert_eq!(kq.drain_ready().len(), 0, "deleted event should not fire");
     }

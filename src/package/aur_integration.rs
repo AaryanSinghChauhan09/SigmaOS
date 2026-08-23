@@ -1,7 +1,5 @@
 // Enhanced AUR Integration for SigmaOS
 // Inspired by Arch Linux AUR with modern security features
-
-#![no_std]
 extern crate alloc;
 
 use alloc::string::String;

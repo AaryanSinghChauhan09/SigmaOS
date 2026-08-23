@@ -6,11 +6,11 @@ use std::collections::HashMap;
 /// Distro Service Init Manager Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ServiceInitType {
-    Systemd, // Linux systemd (.service unit files)
-    OpenRc,  // Gentoo OpenRC (/etc/init.d/ scripts)
-    SysVInit,// Traditional SysV init (/etc/inittab)
-    Runit,   // Void Linux runit (/etc/runit/runsvdir)
-    BsdRc,   // FreeBSD /etc/rc.d
+    Systemd,  // Linux systemd (.service unit files)
+    OpenRc,   // Gentoo OpenRC (/etc/init.d/ scripts)
+    SysVInit, // Traditional SysV init (/etc/inittab)
+    Runit,    // Void Linux runit (/etc/runit/runsvdir)
+    BsdRc,    // FreeBSD /etc/rc.d
 }
 
 /// Translated Service Unit Status
@@ -38,7 +38,11 @@ impl ServiceUnitTranslator {
     }
 
     /// Parse and translate Systemd .service unit content
-    pub fn translate_systemd_service(&mut self, name: &str, content: &str) -> Result<String, &'static str> {
+    pub fn translate_systemd_service(
+        &mut self,
+        name: &str,
+        content: &str,
+    ) -> Result<String, &'static str> {
         let mut exec_start = String::new();
         let mut dependencies = Vec::new();
         let mut env_vars = HashMap::new();
@@ -56,7 +60,10 @@ impl ServiceUnitTranslator {
                 let env_pair = line["Environment=".len()..].trim();
                 let mut parts = env_pair.splitn(2, '=');
                 if let (Some(k), Some(v)) = (parts.next(), parts.next()) {
-                    env_vars.insert(k.trim_matches('"').to_string(), v.trim_matches('"').to_string());
+                    env_vars.insert(
+                        k.trim_matches('"').to_string(),
+                        v.trim_matches('"').to_string(),
+                    );
                 }
             }
         }
@@ -75,11 +82,18 @@ impl ServiceUnitTranslator {
         };
 
         self.services.insert(name.to_string(), service);
-        Ok(format!("Successfully translated Systemd unit '{}' into SigmaOS native service lifecycle.", name))
+        Ok(format!(
+            "Successfully translated Systemd unit '{}' into SigmaOS native service lifecycle.",
+            name
+        ))
     }
 
     /// Parse and translate Gentoo OpenRC init script
-    pub fn translate_openrc_script(&mut self, name: &str, content: &str) -> Result<String, &'static str> {
+    pub fn translate_openrc_script(
+        &mut self,
+        name: &str,
+        content: &str,
+    ) -> Result<String, &'static str> {
         let mut command = String::new();
         let mut dependencies = Vec::new();
 
@@ -122,10 +136,10 @@ impl Default for ServiceUnitTranslator {
 /// Linux & BSD Binary ABI Format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryAbiFormat {
-    LinuxElf64,    // Standard Linux ELF x86_64
-    FreeBsdElf64,  // FreeBSD ELF64 (brand 0x09)
-    OpenBsdElf64,  // OpenBSD ELF64
-    Win64Pe,       // Windows PE-64 via NT subsystem
+    LinuxElf64,   // Standard Linux ELF x86_64
+    FreeBsdElf64, // FreeBSD ELF64 (brand 0x09)
+    OpenBsdElf64, // OpenBSD ELF64
+    Win64Pe,      // Windows PE-64 via NT subsystem
 }
 
 /// Linux/BSD ABI Dynamic Linker Bridge
@@ -169,11 +183,11 @@ impl LinuxBsdAbiBridge {
     pub fn dispatch_syscall(&mut self, syscall_num: usize) -> Result<u64, &'static str> {
         self.sys_call_count += 1;
         match (self.active_abi, syscall_num) {
-            (BinaryAbiFormat::LinuxElf64, 0) => Ok(0),  // SYS_read
-            (BinaryAbiFormat::LinuxElf64, 1) => Ok(1),  // SYS_write
+            (BinaryAbiFormat::LinuxElf64, 0) => Ok(0),     // SYS_read
+            (BinaryAbiFormat::LinuxElf64, 1) => Ok(1),     // SYS_write
             (BinaryAbiFormat::LinuxElf64, 39) => Ok(1000), // SYS_getpid
-            (BinaryAbiFormat::FreeBsdElf64, 3) => Ok(0), // SYS_read (FreeBSD)
-            (BinaryAbiFormat::FreeBsdElf64, 4) => Ok(1), // SYS_write (FreeBSD)
+            (BinaryAbiFormat::FreeBsdElf64, 3) => Ok(0),   // SYS_read (FreeBSD)
+            (BinaryAbiFormat::FreeBsdElf64, 4) => Ok(1),   // SYS_write (FreeBSD)
             _ => Ok(0),
         }
     }

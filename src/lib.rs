@@ -1,9 +1,12 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod access;
 pub mod accessibility;
 pub mod ai;
 pub mod automation;
+pub mod cluster;
+pub mod community;
 pub mod compatibility;
 pub mod container;
 pub mod customization;
@@ -15,10 +18,12 @@ pub mod filesystem;
 pub mod governance;
 pub mod kernel;
 pub mod klib;
+pub mod memory;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub mod process;
 pub mod productivity;
 pub mod remote;
 pub mod resilience;
@@ -27,15 +32,10 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
-pub mod process;
-pub mod community;
-pub mod memory;
-pub mod access;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod virtualization;
-pub mod cluster;
 
 pub mod graphics {
     pub mod compositor;
@@ -52,9 +52,9 @@ pub mod power {
 pub mod boot;
 pub mod toolchain {
     pub mod adapter;
+    pub mod bootstrap;
     pub mod capsule;
     pub mod codex;
-    pub mod bootstrap;
 }
 pub mod scheduler {
     pub mod numa_scheduler;
@@ -73,20 +73,18 @@ pub use accessibility::{
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
-    OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
-    SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
-    ScriptArgumentRouter,
+    OptimizationRecommendation, PerformanceProfile, PredictiveModel, ScriptArgumentRouter,
+    SystemAction, SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction,
+    SystemState,
 };
 pub use compatibility::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
-    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
-    AntiXControlCentre, ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
-    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager,
+    AntiXControlCentre, AntiXInitSwitcher, AntiXInitSystem, AntiXPersistenceManager,
+    AntiXPersistenceMode, AntiXService, AntiXServiceState, AntiXSystemRemasterEngine,
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, TargetPlatform, TranslationLayer, ZorinChameleonColor, ZorinChameleonEngine,
+    ZorinConnectManager, ZorinConnectState, ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
     ZorinWindowsAppSupport,
-    ApplicationBinary, BinaryFormat, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ContainerRuntime,
-    LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, TargetPlatform, TranslationLayer,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -96,12 +94,32 @@ pub use container::{
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
 };
-pub use dashboard::{
-    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
-};
 pub use dashboard::statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryBreachAlert,
     StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
+pub use dashboard::{
+    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use distro::{
+    AdminAction, AiSysAdmin, AppManifest, AuditResult, AuditRule, BackupSnapshot, BackupSystem,
+    BountyStatus, BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, BugBountyProgram,
+    BugBountyReport, BuildJob, BuildStatus, CanFrame, CertificationStatus, CommunityConference,
+    ComplianceAuditor, ComponentType, ConferenceTalk, ConfigHook, CrossBuildPipeline,
+    DaxMemoryRegion, DevTool, DeveloperToolkit, DirectoryService, DirectoryUser, DllLoader,
+    DllModule, DragonFlyHammerFs, EcuController, EduChallenge, EduPlayground, ForumChannel,
+    ForumPost, GdiObjectType, Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord,
+    HardwareCertificate, HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite,
+    HelpSystem, HowToGuide, HpcClusterJob, HpcJobState, ImeCandidate, InputMethodEngine,
+    IntegrityState, KernelTrace, LanguagePack, LinuxSyscall, LiveDebugger, LivepatchManager,
+    LivepatchPatch, LocaleManager, ManPage, MpiCommunicator, NetplanConfig, NetplanManager,
+    P2pNode, PackageBuildService, PfRuleAction, PfStateEntry, PfStateSynchronizationEngine,
+    PfSyncMessage, PfSyncMsgType, PfsClusterNode, PosixTranslation, PqcSelfHealing,
+    QAStagedRelease, RegionalSettings, RegistryType, RegistryValue, ReleaseStage, RescueISO,
+    RescueISOManager, RunitService, RunitServiceState, SoftwareCertificationProgram,
+    SovereignAnonScrubber, SovereignDeltaPackageSigner, SovereignDeltaPatch, SovereignP2PSync,
+    TargetArch, TimeTravelCheckpoint, TimeTravelEngine, TlsConstraint, VirtioFsZeroCopyBridge,
+    VoidRunitManager, WikiPage, Win32Gdi, WindowsRegistry,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
@@ -115,21 +133,22 @@ pub use filesystem::{
 pub use governance::{
     MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
 };
-pub use kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,
-    BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
-    AndroidBroadcastReceiverRegistry,
-    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
-    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
-    Tcb, ThreadState, WorkItem, PAGE_SIZE,
+pub use kernel::io_uring::{
+    CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry,
 };
-pub use kernel::io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};
+pub use kernel::{
+    AdaptivePolicy, AdvancedAlgorithmsManager, AndroidBroadcastReceiverRegistry, Apc, ApcMode,
+    ApcQueue, ApsrFlags, ArchitectureEngine, ArmExecutionState, AuditBlock, BottomHalfKernelThread,
+    BoundedBufferProducerConsumer, BroadcastReceiver, BuddyAllocator, Channel,
+    CircularDoublyLinkedList, CpuArchitectureClass, CpuRegisters, EdfTask, HardwareException,
+    InstructionCyclePhase as ArchInstructionCyclePhase, InstructionCyclePhase, InterruptClass,
+    IoModuleController, IoWaitProfile, IpcError, IpcManager, Irql, KernelMechanism, KernelPolicy,
+    LcgRandom, LookasideList, LotteryTask, MemoryBlock, MemoryDescriptorList, Message, Pcb,
+    PolicyMechanismCoordinator, PoolType, Priority, Process, ProcessState, ProcessorInitState,
+    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SequencedSinglyLinkedList,
+    SinglyLinkedList, SoftIrqType, SovereignMechanism, SovereignSystemBus, SystemThread, Tcb,
+    ThreadState, WorkItem, PAGE_SIZE,
+};
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
@@ -138,30 +157,6 @@ pub use network::{
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
-};
-pub use distro::{
-    AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
-    HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
-    ReleaseStage, SoftwareCertificationProgram,
-    BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
-    ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
-    DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
-    RegistryValue, Win32Gdi, WindowsRegistry,
-    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
-    TargetArch,
-    AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
-    ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings,
-    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
-    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
-    LivepatchPatch, LivepatchManager,
-    BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator,
-    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
-    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
-    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitService, RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
-    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -172,17 +167,15 @@ pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use remote::{
-    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
-    SimpleShellManager,
-};
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore,
-    SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
-    TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+    Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
+    PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
+    TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+};
+pub use remote::{
+    FileTransfer, RemoteDesktop, RemoteError, RemoteSession, RemoteShell, SessionID, SessionState,
+    ShellError, ShellID, ShellManager, SimpleFileTransfer, SimpleRemoteDesktop,
+    SimpleRemoteSession, SimpleScreenSharing, SimpleShellManager,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -190,32 +183,30 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken,
-    ArithmeticSubstitutionDeobfuscator,
-    ForensicStorageFilter, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy,
+    AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
+    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
+    SandboxPolicy,
 };
 pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
-    PackageRecipe, RecipeError, RecipeManager, SatSolver,
-    Transaction, UniversalPackageAdapterManager,
+    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
+    RecipeManager, SatSolver, Transaction, UniversalPackageAdapterManager,
+};
+pub use unimplemented_tools::{
+    AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiDependencyResolver,
+    AiDifficultyDirector, AiFileOrganizer, AiScheduler, AiSearchAssistant, AiTaskbar,
+    AppSandboxing, AudioEditor, CloudBackupUtility, CloudGaming, CodeProfiler, ControllerMapper,
+    CrossDeviceSync, CrossLanguageBuildTool, DeclarativeBuildSystem, DocumentScanner,
+    EmulatorManager, FlatpakSnapLayer, GameHubLauncher, GameModManager, GamePerformanceBooster,
+    GameRecorder, GamifiedTodo, GanttChartPlanner, GestureControl, GuiAppStore, IotDeviceManager,
+    MemoryLeakDetector, MeshNetworking, MindMapCreator, MultiMonitorManager, MusicLibraryManager,
+    NaturalLanguageShell, OfflinePackageInstaller, PackagePublishingHub, PdfEditor,
+    PluginMarketplace, PodcastRecorder, PrivacyDashboard, SecureContainer, SecureFileSharing,
+    SmartNotificationManager, StaticAnalyzer, SubtitleEditor, VoiceControl, VrArRuntime,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-pub use unimplemented_tools::{
-    AudioEditor, PodcastRecorder, SubtitleEditor, MemoryLeakDetector, GamifiedTodo, MindMapCreator,
-    GameHubLauncher, EmulatorManager, GameRecorder, GamePerformanceBooster, CloudGaming, VrArRuntime,
-    ControllerMapper, GameModManager, AiDifficultyDirector, GanttChartPlanner, PdfEditor,
-    DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
-    AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
-    MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
-    CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
-    SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
-    PluginMarketplace, MusicLibraryManager,
 };
 
 pub mod init {
@@ -224,27 +215,28 @@ pub mod init {
 pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
 pub use ai::next_gen::{
-    AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType,
-    EnergyGovernorMode, ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator,
-    WorkloadType,
+    AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType, EnergyGovernorMode,
+    ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
 };
 pub use ai::wandr::{
     ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
 };
 
 pub use community::toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe as CommunityPackageRecipe,
-    RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
-    SecurityProfileTemplateStore, SecurityTemplate, HybridFirewallTemplateStore, VirtualizationBlueprintStore,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, HybridFirewallTemplateStore,
+    PackageRecipe as CommunityPackageRecipe, RecipeSourceFormat, ReproduciblePackageRecipeManager,
+    SecurityModelType, SecurityProfileTemplateStore, SecurityTemplate,
+    VirtualizationBlueprintStore,
 };
 
 pub use tools::{
-    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode, NodeState as LibNodeState,
-    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
-    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, UserIdentity as LibUserIdentity,
-    SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
-    SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
-    SovereignIsWebsiteDown,
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
+    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
+    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
+    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
+    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
+    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity as LibUserIdentity,
 };
 
 pub mod open_source_obsoletion;

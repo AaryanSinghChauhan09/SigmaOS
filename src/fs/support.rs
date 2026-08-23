@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Filesystem Support for SigmaOS
 /// Implements filesystem using OOP principles with traits and structs
 /// No dependency on external filesystem frameworks

@@ -1,9 +1,6 @@
 // SigmaOS Unified Subsystem Architecture
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
-
-#![no_std]
-
 extern crate alloc;
 
 use alloc::boxed::Box;

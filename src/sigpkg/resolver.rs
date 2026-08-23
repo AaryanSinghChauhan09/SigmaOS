@@ -122,7 +122,8 @@ impl SatSolver {
                 // Determine priority score based on pinning rules
                 let mut priority = 500; // Default Debian priority for installed packages
                 for rule in pin_rules {
-                    if rule.package_name_pattern == "*" || rule.package_name_pattern == package_name {
+                    if rule.package_name_pattern == "*" || rule.package_name_pattern == package_name
+                    {
                         // Priority is matched by release targets or patterns
                         priority = rule.priority;
                     }

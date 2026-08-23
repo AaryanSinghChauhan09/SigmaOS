@@ -229,7 +229,8 @@ impl CachyThpTuner {
         // Every 512 contiguous 4KB pages can be merged into a 2MB huge page (2048KB)
         let potential_huge_pages = size_kb / 2048;
         if potential_huge_pages > 0 {
-            self.huge_pages_allocated.fetch_add(potential_huge_pages, Ordering::SeqCst);
+            self.huge_pages_allocated
+                .fetch_add(potential_huge_pages, Ordering::SeqCst);
         }
         potential_huge_pages
     }
@@ -329,7 +330,10 @@ impl CachyLatencyGovernor {
     }
 
     /// Dynamically ramps up frequency performance when micro-stutters or interactive peaks are predicted
-    pub fn evaluate_frequency_boost(&mut self, is_ui_thread_active: bool) -> GovernorPerformanceState {
+    pub fn evaluate_frequency_boost(
+        &mut self,
+        is_ui_thread_active: bool,
+    ) -> GovernorPerformanceState {
         let syscalls = self.syscalls_last_window.load(Ordering::SeqCst);
         if is_ui_thread_active || syscalls > 1000 {
             self.active_state = GovernorPerformanceState::UltraPerformance;
@@ -358,7 +362,9 @@ pub struct CachyMicroarchCompilerTuner {
 
 impl CachyMicroarchCompilerTuner {
     pub fn new(level: usize) -> Self {
-        Self { target_level: level }
+        Self {
+            target_level: level,
+        }
     }
 
     pub fn inject_optimal_compilation_flags(&self) -> Vec<String> {
@@ -524,15 +530,27 @@ mod tests {
     fn test_cachy_latency_governor() {
         let mut gov = CachyLatencyGovernor::new();
         gov.record_syscalls(2000);
-        assert_eq!(gov.evaluate_frequency_boost(false), GovernorPerformanceState::UltraPerformance);
+        assert_eq!(
+            gov.evaluate_frequency_boost(false),
+            GovernorPerformanceState::UltraPerformance
+        );
 
         gov.record_syscalls(5);
-        assert_eq!(gov.evaluate_frequency_boost(false), GovernorPerformanceState::PowerSave);
+        assert_eq!(
+            gov.evaluate_frequency_boost(false),
+            GovernorPerformanceState::PowerSave
+        );
 
         gov.record_syscalls(200);
-        assert_eq!(gov.evaluate_frequency_boost(false), GovernorPerformanceState::Balanced);
+        assert_eq!(
+            gov.evaluate_frequency_boost(false),
+            GovernorPerformanceState::Balanced
+        );
 
-        assert_eq!(gov.evaluate_frequency_boost(true), GovernorPerformanceState::UltraPerformance); // UI active overrides all
+        assert_eq!(
+            gov.evaluate_frequency_boost(true),
+            GovernorPerformanceState::UltraPerformance
+        ); // UI active overrides all
     }
 
     #[test]
@@ -568,5 +586,4 @@ mod tests {
 
         assert!(selector.verify_cachy_package_signature("linux-cachyos", &[0xAA; 64]));
     }
-
 }

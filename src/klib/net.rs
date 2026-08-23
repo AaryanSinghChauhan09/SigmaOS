@@ -9,7 +9,9 @@ pub struct Ipv4Addr {
 
 impl Ipv4Addr {
     pub fn new(a: u8, b: u8, c: u8, d: u8) -> Self {
-        Ipv4Addr { octets: [a, b, c, d] }
+        Ipv4Addr {
+            octets: [a, b, c, d],
+        }
     }
 
     pub fn octets(&self) -> [u8; 4] {
@@ -81,7 +83,11 @@ impl IpAddr {
 
 impl core::fmt::Display for Ipv4Addr {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}.{}.{}.{}", self.octets[0], self.octets[1], self.octets[2], self.octets[3])
+        write!(
+            f,
+            "{}.{}.{}.{}",
+            self.octets[0], self.octets[1], self.octets[2], self.octets[3]
+        )
     }
 }
 
@@ -90,8 +96,14 @@ impl core::fmt::Display for Ipv6Addr {
         write!(
             f,
             "{:x}:{:x}:{:x}:{:x}:{:x}:{:x}:{:x}:{:x}",
-            self.segments[0], self.segments[1], self.segments[2], self.segments[3],
-            self.segments[4], self.segments[5], self.segments[6], self.segments[7]
+            self.segments[0],
+            self.segments[1],
+            self.segments[2],
+            self.segments[3],
+            self.segments[4],
+            self.segments[5],
+            self.segments[6],
+            self.segments[7]
         )
     }
 }

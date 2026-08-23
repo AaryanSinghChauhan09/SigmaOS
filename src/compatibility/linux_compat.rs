@@ -144,7 +144,8 @@ impl OpenBsdPledgeUnveilFilter {
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
-        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
         Ok(())
     }
 
@@ -350,7 +351,10 @@ impl LinuxElfLoaderShim {
         Self
     }
 
-    pub fn parse_elf_binary(&self, binary_bytes: &[u8]) -> Result<(String, u64, AuxVector), &'static str> {
+    pub fn parse_elf_binary(
+        &self,
+        binary_bytes: &[u8],
+    ) -> Result<(String, u64, AuxVector), &'static str> {
         if binary_bytes.len() < 64 {
             return Err("Binary too small to contain ELF header");
         }
@@ -401,7 +405,12 @@ mod tests {
     fn test_bsd_kqueue_and_pledge() {
         let mut mux = BsdKqueueMultiplexer::new();
         mux.kevent_register(BsdKevent {
-            ident: 1, filter: BsdKqueueFilter::EvfiltRead, flags: 0, fflags: 0, data: 0, udata: 0
+            ident: 1,
+            filter: BsdKqueueFilter::EvfiltRead,
+            flags: 0,
+            fflags: 0,
+            data: 0,
+            udata: 0,
         });
         assert_eq!(mux.kevent_poll(), 1);
 

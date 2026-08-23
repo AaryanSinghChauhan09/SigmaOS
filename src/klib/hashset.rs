@@ -2,8 +2,8 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::BTreeMap;
 use super::hashmap::BTreeMapIter;
+use super::BTreeMap;
 
 pub struct HashSet<T>
 where
@@ -121,7 +121,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         set.insert(2);
-        
+
         assert!(set.contains(&1));
         assert!(set.contains(&2));
         assert!(!set.contains(&3));
@@ -140,7 +140,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         set.insert(2);
-        
+
         let items: Vec<i32> = set.iter().cloned().collect();
         assert_eq!(items.len(), 2);
     }

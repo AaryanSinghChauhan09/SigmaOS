@@ -1,8 +1,5 @@
 //! Text Editor (gedit/nano Inspiration)
 //! Document management, syntax highlighting, and editor features
-
-#![no_std]
-
 extern crate alloc;
 
 use crate::klib::{Vec, String};

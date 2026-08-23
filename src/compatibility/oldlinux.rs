@@ -20,7 +20,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 use crate::klib::BTreeMap;
 
 /// Historical early Linux release metadata
@@ -44,54 +43,78 @@ impl OldLinuxCompatManager {
     pub fn new() -> Self {
         let mut releases = BTreeMap::new();
 
-        releases.insert("0.01", OldLinuxRelease {
-            version: "0.01",
-            date: "Sept 17, 1991",
-            primary_advance: "First raw shell, task switching, harddisk & console driver",
-            min_ram_mb: 2,
-        });
-        releases.insert("0.11", OldLinuxRelease {
-            version: "0.11",
-            date: "Dec 8, 1991",
-            primary_advance: "Self-hosting capability, floppy disk driver & virtual consoles",
-            min_ram_mb: 2,
-        });
-        releases.insert("0.12", OldLinuxRelease {
-            version: "0.12",
-            date: "Jan 15, 1992",
-            primary_advance: "Math co-processor emulation & virtual memory paging support",
-            min_ram_mb: 4,
-        });
-        releases.insert("0.95", OldLinuxRelease {
-            version: "0.95",
-            date: "March 8, 1992",
-            primary_advance: "First Virtual Filesystem (VFS) & basic networking foundation",
-            min_ram_mb: 4,
-        });
-        releases.insert("0.96", OldLinuxRelease {
-            version: "0.96",
-            date: "May 22, 1992",
-            primary_advance: "X Window System support & TCP/IP loopback",
-            min_ram_mb: 4,
-        });
-        releases.insert("0.97", OldLinuxRelease {
-            version: "0.97",
-            date: "July 24, 1992",
-            primary_advance: "Introduction of the Ext filesystem & early sound card drivers",
-            min_ram_mb: 4,
-        });
-        releases.insert("0.98", OldLinuxRelease {
-            version: "0.98",
-            date: "Oct 29, 1992",
-            primary_advance: "Sound Blaster 16 & Ethernet card support (NE2000)",
-            min_ram_mb: 4,
-        });
-        releases.insert("0.99", OldLinuxRelease {
-            version: "0.99",
-            date: "Dec 13, 1992",
-            primary_advance: "High stability, pre-1.0 series with TCP/IP standard stack",
-            min_ram_mb: 4,
-        });
+        releases.insert(
+            "0.01",
+            OldLinuxRelease {
+                version: "0.01",
+                date: "Sept 17, 1991",
+                primary_advance: "First raw shell, task switching, harddisk & console driver",
+                min_ram_mb: 2,
+            },
+        );
+        releases.insert(
+            "0.11",
+            OldLinuxRelease {
+                version: "0.11",
+                date: "Dec 8, 1991",
+                primary_advance: "Self-hosting capability, floppy disk driver & virtual consoles",
+                min_ram_mb: 2,
+            },
+        );
+        releases.insert(
+            "0.12",
+            OldLinuxRelease {
+                version: "0.12",
+                date: "Jan 15, 1992",
+                primary_advance: "Math co-processor emulation & virtual memory paging support",
+                min_ram_mb: 4,
+            },
+        );
+        releases.insert(
+            "0.95",
+            OldLinuxRelease {
+                version: "0.95",
+                date: "March 8, 1992",
+                primary_advance: "First Virtual Filesystem (VFS) & basic networking foundation",
+                min_ram_mb: 4,
+            },
+        );
+        releases.insert(
+            "0.96",
+            OldLinuxRelease {
+                version: "0.96",
+                date: "May 22, 1992",
+                primary_advance: "X Window System support & TCP/IP loopback",
+                min_ram_mb: 4,
+            },
+        );
+        releases.insert(
+            "0.97",
+            OldLinuxRelease {
+                version: "0.97",
+                date: "July 24, 1992",
+                primary_advance: "Introduction of the Ext filesystem & early sound card drivers",
+                min_ram_mb: 4,
+            },
+        );
+        releases.insert(
+            "0.98",
+            OldLinuxRelease {
+                version: "0.98",
+                date: "Oct 29, 1992",
+                primary_advance: "Sound Blaster 16 & Ethernet card support (NE2000)",
+                min_ram_mb: 4,
+            },
+        );
+        releases.insert(
+            "0.99",
+            OldLinuxRelease {
+                version: "0.99",
+                date: "Dec 13, 1992",
+                primary_advance: "High stability, pre-1.0 series with TCP/IP standard stack",
+                min_ram_mb: 4,
+            },
+        );
         releases.insert("1.0", OldLinuxRelease {
             version: "1.0",
             date: "March 14, 1994",
@@ -125,32 +148,51 @@ impl OldLinuxCompatManager {
 
     /// Emulates execution of an old syscall with customized routing based on the active personality
     pub fn emulate_syscall(&self, num: u32, args: &[u64]) -> Result<String, &'static str> {
-        let release = self.releases.get(self.active_version).ok_or("No active release loaded")?;
+        let release = self
+            .releases
+            .get(self.active_version)
+            .ok_or("No active release loaded")?;
 
         match num {
-            1 => { // sys_exit
-                Ok(format!("Linux v{} (released {}): Handled exit with code {}", release.version, release.date, args[0]))
+            1 => {
+                // sys_exit
+                Ok(format!(
+                    "Linux v{} (released {}): Handled exit with code {}",
+                    release.version, release.date, args[0]
+                ))
             }
-            2 => { // sys_fork
+            2 => {
+                // sys_fork
                 if release.min_ram_mb <= 2 {
-                    Ok(format!("Linux v{} (released {}): Spawned lightweight single-segment thread", release.version, release.date))
+                    Ok(format!(
+                        "Linux v{} (released {}): Spawned lightweight single-segment thread",
+                        release.version, release.date
+                    ))
                 } else {
-                    Ok(format!("Linux v{} (released {}): Spawned full virtual-paged child process", release.version, release.date))
+                    Ok(format!(
+                        "Linux v{} (released {}): Spawned full virtual-paged child process",
+                        release.version, release.date
+                    ))
                 }
             }
-            4 => { // sys_write
-                Ok(format!("Linux v{} (released {}): Emulated write to descriptor {} of len {}", release.version, release.date, args[0], args[2]))
+            4 => {
+                // sys_write
+                Ok(format!(
+                    "Linux v{} (released {}): Emulated write to descriptor {} of len {}",
+                    release.version, release.date, args[0], args[2]
+                ))
             }
-            _ => {
-                Err("Syscall not supported in this legacy personality")
-            }
+            _ => Err("Syscall not supported in this legacy personality"),
         }
     }
 
     /// Emulates hardware port access for obsolete devices based on the historical context
     pub fn handle_port_io(&self, port: u16, data: u8) -> Result<String, &'static str> {
         if let Some(device) = self.port_routing.get(&port) {
-            Ok(format!("Personality v{} routed port 0x{:X} to: '{}' with data 0x{:X}", self.active_version, port, device, data))
+            Ok(format!(
+                "Personality v{} routed port 0x{:X} to: '{}' with data 0x{:X}",
+                self.active_version, port, device, data
+            ))
         } else {
             Err("Port not registered in ancient peripheral routing list")
         }

@@ -1,6 +1,3 @@
-#![no_std]
-#![cfg_attr(target_os = "none", no_main)]
-
 /// OOP-based Cloud Sync for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 936
 /// Implements cloud synchronization

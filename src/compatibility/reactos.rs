@@ -1,4 +1,3 @@
-#![no_std]
 #![cfg_attr(not(test), no_main)]
 
 #[cfg(not(target_os = "none"))]
@@ -142,7 +141,11 @@ impl NtVirtualMemoryManager {
     }
 
     /// NtAllocateVirtualMemory equivalent
-    pub fn allocate_virtual_memory(&mut self, size: usize, protection: PageProtection) -> Result<usize, NtStatus> {
+    pub fn allocate_virtual_memory(
+        &mut self,
+        size: usize,
+        protection: PageProtection,
+    ) -> Result<usize, NtStatus> {
         let addr = self.next_free_address;
         self.next_free_address += (size + 4095) & !4095; // Align to 4KB page boundary
 
@@ -169,7 +172,11 @@ impl NtVirtualMemoryManager {
     }
 
     /// NtProtectVirtualMemory equivalent
-    pub fn protect_virtual_memory(&mut self, base_address: usize, new_protection: PageProtection) -> Result<PageProtection, NtStatus> {
+    pub fn protect_virtual_memory(
+        &mut self,
+        base_address: usize,
+        new_protection: PageProtection,
+    ) -> Result<PageProtection, NtStatus> {
         for i in 0..self.allocations.len {
             if let Some(ref mut alloc) = self.allocations[i] {
                 if alloc.base_address == base_address {
@@ -481,13 +488,18 @@ impl Win32DllSubsystem {
     }
 
     /// kernel32.dll -> VirtualAlloc
-    pub fn win32_virtual_alloc(&mut self, size: usize, protection: PageProtection) -> Result<usize, NtStatus> {
+    pub fn win32_virtual_alloc(
+        &mut self,
+        size: usize,
+        protection: PageProtection,
+    ) -> Result<usize, NtStatus> {
         self.vm_manager.allocate_virtual_memory(size, protection)
     }
 
     /// kernel32.dll -> CreateFileA
     pub fn win32_create_file_a(&mut self, filename: &[u8]) -> NtHandle {
-        self.object_manager.create_object(NtObjectType::File, filename)
+        self.object_manager
+            .create_object(NtObjectType::File, filename)
     }
 
     /// kernel32.dll -> CloseHandle
@@ -497,7 +509,8 @@ impl Win32DllSubsystem {
 
     /// user32.dll -> CreateWindowExA
     pub fn win32_create_window_ex_a(&mut self, window_name: &[u8]) -> NtHandle {
-        self.object_manager.create_object(NtObjectType::Event, window_name)
+        self.object_manager
+            .create_object(NtObjectType::Event, window_name)
     }
 }
 
@@ -838,14 +851,20 @@ pub struct WinDbgExtensionSdk;
 impl WinDbgExtensionSdk {
     pub fn inspect_process_ext(proc: &NtProcess) -> [u8; 64] {
         let mut buffer = [0u8; 64];
-        buffer[0] = b'P'; buffer[1] = b'R'; buffer[2] = b'O'; buffer[3] = b'C';
+        buffer[0] = b'P';
+        buffer[1] = b'R';
+        buffer[2] = b'O';
+        buffer[3] = b'C';
         buffer[4] = (proc.pid & 0xFF) as u8;
         buffer
     }
 
     pub fn inspect_thread_ext(thread: &NtThread) -> [u8; 64] {
         let mut buffer = [0u8; 64];
-        buffer[0] = b'T'; buffer[1] = b'H'; buffer[2] = b'R'; buffer[3] = b'D';
+        buffer[0] = b'T';
+        buffer[1] = b'H';
+        buffer[2] = b'R';
+        buffer[3] = b'D';
         buffer[4] = (thread.tid & 0xFF) as u8;
         buffer
     }
@@ -854,10 +873,10 @@ impl WinDbgExtensionSdk {
 /// 6. Application Program Status Register (APSR) Model
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ApsrRegister {
-    pub negative: bool,  // N flag
-    pub zero: bool,      // Z flag
-    pub carry: bool,     // C flag
-    pub overflow: bool,  // V flag
+    pub negative: bool,   // N flag
+    pub zero: bool,       // Z flag
+    pub carry: bool,      // C flag
+    pub overflow: bool,   // V flag
     pub saturation: bool, // Q flag
 }
 
@@ -928,7 +947,9 @@ pub struct ArbitraryKernelContext {
 
 impl ArbitraryKernelContext {
     pub fn new(page_dir: u64) -> Self {
-        Self { active_cr3_page_dir: page_dir }
+        Self {
+            active_cr3_page_dir: page_dir,
+        }
     }
 
     pub fn switch_context(&mut self, new_page_dir: u64) -> u64 {
@@ -1014,10 +1035,14 @@ mod tests {
     fn test_nt_virtual_memory_apis() {
         let mut vmm = NtVirtualMemoryManager::new();
         let size = 8192; // 2 pages
-        let addr = vmm.allocate_virtual_memory(size, PageProtection::ReadWrite).unwrap();
+        let addr = vmm
+            .allocate_virtual_memory(size, PageProtection::ReadWrite)
+            .unwrap();
         assert_eq!(addr, 0x00400000);
 
-        let old_prot = vmm.protect_virtual_memory(addr, PageProtection::ExecuteRead).unwrap();
+        let old_prot = vmm
+            .protect_virtual_memory(addr, PageProtection::ExecuteRead)
+            .unwrap();
         assert_eq!(old_prot, PageProtection::ReadWrite);
 
         assert!(vmm.free_virtual_memory(addr).is_ok());
@@ -1031,10 +1056,16 @@ mod tests {
         sync.create_event(handle, false, true);
         assert_eq!(sync.wait_for_single_object(handle, 100), NtStatus::Success);
         // Auto-reset check
-        assert_eq!(sync.wait_for_single_object(handle, 100), NtStatus::WaitTimeout);
+        assert_eq!(
+            sync.wait_for_single_object(handle, 100),
+            NtStatus::WaitTimeout
+        );
 
         sync.create_semaphore(handle + 4, 3, 5);
-        assert_eq!(sync.wait_for_single_object(handle + 4, 100), NtStatus::Success);
+        assert_eq!(
+            sync.wait_for_single_object(handle + 4, 100),
+            NtStatus::Success
+        );
     }
 
     #[test]
@@ -1076,7 +1107,9 @@ mod tests {
         let h_file = win32.win32_create_file_a(b"C:\\sigma_config.ini");
         assert_eq!(h_file, 0x10);
 
-        let addr = win32.win32_virtual_alloc(4096, PageProtection::ReadWrite).unwrap();
+        let addr = win32
+            .win32_virtual_alloc(4096, PageProtection::ReadWrite)
+            .unwrap();
         assert_eq!(addr, 0x00400000);
 
         assert!(win32.win32_close_handle(h_file).is_ok());

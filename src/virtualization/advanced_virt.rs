@@ -1,9 +1,6 @@
 //! Virtualization Enhancements inspired by KVM, QEMU, and Libvirt
 //! KVM hardware acceleration, live VM migration, GPU passthrough,
 //! and Libvirt-compatible management APIs.
-
-#![no_std]
-
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
