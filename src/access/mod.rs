@@ -10,7 +10,12 @@
 pub mod control;
 
 pub use control::{
-    PosixAclEntry, PosixAclTable, PosixAclTag,
+    Ext4AccessCheckEngine, Ext4FileType, Ext4InodeMode, Ext4Xattr, PosixAclEntry,
+    PosixAclTable, PosixAclTag, SecurityIdentifier, dac_flags, ext4_special_bits,
+    ntfs_access_rights, ntfs_ace_flags,
+};
+pub use crate::filesystem::ext4_ntfs_security::{
+    NtfsAce, NtfsAceFlags, NtfsAceType, NtfsAccessRights, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
 };
 
 extern crate alloc;

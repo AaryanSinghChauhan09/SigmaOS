@@ -37,6 +37,3 @@ Integrated alongside `io_uring` to provide scalable event dispatching for file d
 
 ### 3. Capsicum-Style Capability Rights
 Integrated into [`src/security/capability.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/security/capability.rs) and [`src/security/capability_enforcer.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/security/capability_enforcer.rs), assigning explicit rights matrices directly to descriptors.
-
-### 4. Sovereign Subsystems Inspection Test Coverage
-Fully verified in [`tests/sovereign_subsystems_inspection_tests.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/tests/sovereign_subsystems_inspection_tests.rs), validating Open Source Obsoletion, Sovereign Data Workspace, POSIX capabilities, and OpenBSD pledge/unveil functionality.

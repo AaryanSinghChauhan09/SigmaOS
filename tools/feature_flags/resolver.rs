@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Feature Flag Resolution Engine for SigmaOS
 // Location: tools/feature_flags/resolver.rs
 
