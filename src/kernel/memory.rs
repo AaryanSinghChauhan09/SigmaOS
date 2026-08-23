@@ -2,8 +2,15 @@
 // Implements buddy allocator and paging with zero std dependency
 
 extern crate alloc;
+use alloc::string::String;
 use alloc::vec::Vec;
+use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[cfg(test)]
+use std::collections::HashMap;
+#[cfg(not(test))]
+use crate::klib::HashMap;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -76,6 +83,7 @@ impl KernelPoolManager {
             }
         }
 
+        #[cfg(test)]
         println!(
             "Windows NT Pool Alloc: Allocated {:?} pool block of {} bytes with tag '{}' at address 0x{:X}",
             pool_type, size, core::str::from_utf8(tag).unwrap_or("????"), addr
@@ -155,18 +163,6 @@ impl BuddyAllocator {
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
                 let block = MemoryBlock { addr, size };
-                self.free_lists[order].push(block);
-            }
-            let block = MemoryBlock {
-                addr: NonNull::new(base_addr as *mut u8).unwrap(),
-                size,
-            };
-            self.free_lists[order].push(block);
-            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
                 self.free_lists[order].push(block);
             }
         }

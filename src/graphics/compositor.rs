@@ -689,15 +689,6 @@ impl Compositor for SimpleCompositor {
                     }
                 }
             }
-
-            if let Some(window) = found_window {
-                let window_rect = window.rect();
-                let output_stride = target_surface.info().stride as usize / 4;
-                if let Some(surface) = window.surface() {
-                    let window_stride = surface.info().stride as usize / 4;
-                    let window_data = surface.data();
-                    let output_data = target_surface.data_mut();
-
         } else {
             output.clear(Color::rgb(0, 0, 0));
 

@@ -75,7 +75,7 @@ impl Version {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = major_str
+        let major = parts[0]
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
         let minor = if parts.len() >= 2 {
@@ -94,12 +94,6 @@ impl Version {
         };
 
         Ok(Version::new(major, minor, patch))
-    }
-}
-
-impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
