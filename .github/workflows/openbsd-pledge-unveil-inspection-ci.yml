@@ -1,0 +1,27 @@
+name: OpenBSD Pledge & Unveil Security Inspection CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  openbsd-pledge-unveil-test:
+    name: Validate OpenBSD Pledge & Unveil Sandbox Inspection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Run OpenBSD Pledge & Unveil Inspection Tests
+        run: |
+          cargo test --test linux_bsd_inspection_tests test_openbsd

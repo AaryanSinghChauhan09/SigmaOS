@@ -331,6 +331,10 @@ impl AdvancedWindowManager {
                 confidence: 0.60,
             });
         }
+
+        if !self.ai_suggestions.is_empty() {
+            self.ai_suggestions_enabled = true;
+        }
     }
 
     /// Get current workspace configuration
@@ -350,8 +354,126 @@ impl Default for AdvancedWindowManager {
     }
 }
 
-/// Adaptive profile manager for different usage scenarios
+
+/// Desktop Panel Applet Categories (Cinnamon / Pantheon / KDE inspired)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppletCategory {
+    SystemTray,
+    Network,
+    AudioVolume,
+    PowerBattery,
+    WorkspaceSwitcher,
+    Weather,
+    ClockCalendar,
+    NotificationCenter,
+}
+
+/// Desktop Applet Model
+#[derive(Debug, Clone)]
+pub struct DesktopApplet {
+    pub id: String,
+    pub name: String,
+    pub category: AppletCategory,
+    pub enabled: bool,
+    pub position_index: u32,
+}
+
+/// Modular Desktop Applet Engine (Linux Mint Cinnamon & Elementary OS Granite inspired)
+pub struct DesktopAppletEngine {
+    pub applets: BTreeMap<String, DesktopApplet>,
+}
+
+impl DesktopAppletEngine {
+    pub fn new() -> Self {
+        let mut applets = BTreeMap::new();
+        applets.insert("systray".to_string(), DesktopApplet {
+            id: "systray".to_string(),
+            name: "System Tray".to_string(),
+            category: AppletCategory::SystemTray,
+            enabled: true,
+            position_index: 0,
+        });
+        applets.insert("workspace_switcher".to_string(), DesktopApplet {
+            id: "workspace_switcher".to_string(),
+            name: "Workspace Switcher".to_string(),
+            category: AppletCategory::WorkspaceSwitcher,
+            enabled: true,
+            position_index: 1,
+        });
+        applets.insert("weather".to_string(), DesktopApplet {
+            id: "weather".to_string(),
+            name: "Weather Indicator".to_string(),
+            category: AppletCategory::Weather,
+            enabled: true,
+            position_index: 2,
+        });
+        Self { applets }
+    }
+
+    pub fn register_applet(&mut self, applet: DesktopApplet) {
+        self.applets.insert(applet.id.clone(), applet);
+    }
+
+    pub fn get_active_applets(&self) -> Vec<&DesktopApplet> {
+        self.applets.values().filter(|a| a.enabled).collect()
+    }
+}
+
+/// Zenith Theme Presets
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZenithThemePreset {
+    CinnamonModern,
+    PantheonGranite,
+    Dark,
+    Light,
+    HighContrast,
+    Glassmorphism,
+}
+
+/// Zenith Theme Manager (GNOME / KDE / Cinnamon aesthetic presets)
+pub struct ZenithThemePresetManager {
+    pub current_preset: ZenithThemePreset,
+    pub accent_color_hex: String,
+    pub rounded_corners_radius: u32,
+    pub font_scale: f32,
+}
+
+impl ZenithThemePresetManager {
+    pub fn new() -> Self {
+        Self {
+            current_preset: ZenithThemePreset::CinnamonModern,
+            accent_color_hex: "#3584E4".to_string(),
+            rounded_corners_radius: 12,
+            font_scale: 1.0,
+        }
+    }
+
+    pub fn apply_preset(&mut self, preset: ZenithThemePreset) {
+        self.current_preset = preset;
+        match preset {
+            ZenithThemePreset::CinnamonModern => {
+                self.accent_color_hex = "#2080D0".to_string();
+                self.rounded_corners_radius = 8;
+            }
+            ZenithThemePreset::PantheonGranite => {
+                self.accent_color_hex = "#3852A4".to_string();
+                self.rounded_corners_radius = 10;
+            }
+            ZenithThemePreset::Dark => {
+                self.accent_color_hex = "#78AEED".to_string();
+                self.rounded_corners_radius = 12;
+            }
+            ZenithThemePreset::HighContrast => {
+                self.accent_color_hex = "#FFFF00".to_string();
+                self.rounded_corners_radius = 0;
+            }
+            _ => {}
+        }
+    }
+}
+
+/// Adaptive profile manager for different usage scenarios
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum UsageProfile {
     Development,
     Gaming,
@@ -536,6 +658,27 @@ mod tests {
         
         assert!(!manager.ai_suggestions.is_empty());
         assert!(manager.ai_suggestions_enabled);
+    }
+
+
+    #[test]
+    fn test_desktop_applet_and_theme_engine() {
+        let mut engine = DesktopAppletEngine::new();
+        assert_eq!(engine.get_active_applets().len(), 3);
+
+        engine.register_applet(DesktopApplet {
+            id: "battery".to_string(),
+            name: "Power & Battery".to_string(),
+            category: AppletCategory::PowerBattery,
+            enabled: true,
+            position_index: 3,
+        });
+        assert_eq!(engine.get_active_applets().len(), 4);
+
+        let mut themes = ZenithThemePresetManager::new();
+        themes.apply_preset(ZenithThemePreset::PantheonGranite);
+        assert_eq!(themes.current_preset, ZenithThemePreset::PantheonGranite);
+        assert_eq!(themes.accent_color_hex, "#3852A4");
     }
 
     #[test]

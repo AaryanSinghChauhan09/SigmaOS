@@ -143,7 +143,7 @@ mod tests {
 
     #[test]
     fn test_transaction_creation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new(SigmaString::from("/tmp/test"));
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
         assert!(transaction.operations.is_empty());
@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn test_install_operation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new(SigmaString::from("/tmp/test"));
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -170,7 +170,7 @@ mod tests {
 
     #[test]
     fn test_remove_operation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new(SigmaString::from("/tmp/test"));
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -180,7 +180,7 @@ mod tests {
 
     #[test]
     fn test_preview() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new(SigmaString::from("/tmp/test"));
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
 
