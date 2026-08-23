@@ -290,11 +290,16 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
 mod tests {
     use super::*;
     use std::path::PathBuf;
+    #[cfg(not(feature = "standalone_test"))]
     use crate::klib::custom_string::SigmaString;
 
     #[test]
     fn test_transaction_creation() {
+        #[cfg(not(feature = "standalone_test"))]
         let store = ContentAddressedStore::new(SigmaString::from("/tmp/test"));
+        #[cfg(feature = "standalone_test")]
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
         assert!(transaction.operations.is_empty());
@@ -302,7 +307,11 @@ mod tests {
 
     #[test]
     fn test_install_operation() {
+        #[cfg(not(feature = "standalone_test"))]
         let store = ContentAddressedStore::new(SigmaString::from("/tmp/test"));
+        #[cfg(feature = "standalone_test")]
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -326,7 +335,11 @@ mod tests {
 
     #[test]
     fn test_remove_operation() {
+        #[cfg(not(feature = "standalone_test"))]
         let store = ContentAddressedStore::new(SigmaString::from("/tmp/test"));
+        #[cfg(feature = "standalone_test")]
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -336,7 +349,11 @@ mod tests {
 
     #[test]
     fn test_preview() {
+        #[cfg(not(feature = "standalone_test"))]
         let store = ContentAddressedStore::new(SigmaString::from("/tmp/test"));
+        #[cfg(feature = "standalone_test")]
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
 
