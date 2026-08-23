@@ -1,43 +1,29 @@
 // SigmaOS Compatibility Module
 pub mod absorb_tools;
+pub mod antix;
 pub mod apache_ossie;
+pub mod arch_linux;
+pub mod canonical;
 pub mod chimera_linux;
 pub mod cross_platform;
+pub mod cross_platform_kernel;
+pub mod fedora;
+pub mod gap_closure;
 pub mod historic_linux;
+pub mod india_professional_tools;
+pub mod india_stack_localization;
+pub mod interim;
+pub mod legacy_adapters;
+pub mod lubuntu;
 pub mod mint_linux;
+pub mod open_source_tier1;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod india_professional_tools;
-pub mod canonical;
-pub mod fedora;
-pub mod arch_linux;
-pub mod gap_closure;
+pub mod sovereign_suite;
 pub mod superiority;
-
-pub use gap_closure::{
-    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
-    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
-    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
-    HidGraphicsDriver, AiTaskOrchestrator,
-};
-pub use superiority::{
-    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
-    SovereignTimeMachine, NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine,
-    SovereignForensics, SovereignRecoverUtility, ShardIgnitor,
-};
-
-pub use arch_linux::{
-    ProcFileType, ProcFile, DevFileType, DevFile, ArchPackage, PacmanError, PacmanEngine,
-    RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule, ArchFirewall,
-    LsmMode, LsmSentinel, PamGate, PaneLayout, TmuxMultiplexer, SovereignEnvRegistry,
-    AurRepoStatus, YayParuAdapter, ArchMirror, ReflectorMirrorlist, SubvolumeConfig,
-    ArchinstallConfig, ArchinstallParity, ArtixInitSystemType, ServiceState, ArtixInitBridge,
-    KeyTrustLevel, PacmanKey, PacmanKeyring, AurPatch, AurPatchEngine,
-    MkinitcpioGenerator, NewsItem, ArchNewsFeedParser, CachedPackage, PacmanDbCleaner,
-    WikiPage, ArchWikiSearchEngine,
-};
+pub mod tiny_core;
+pub mod wasm_sandbox;
+pub mod zorin;
 
 pub use gap_closure::{
     KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
@@ -118,6 +104,9 @@ pub use absorb_tools::{
     PledgeUnveilSandbox, PqcSecureChannel,
 };
 
+pub use antix::*;
+pub use zorin::*;
+pub use legacy_adapters::*;
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 
 pub use apache_ossie::{

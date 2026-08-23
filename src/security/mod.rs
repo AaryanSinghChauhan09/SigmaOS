@@ -1,4 +1,5 @@
 // SigmaOS Security Subsystem
+pub mod audit;
 pub mod capability;
 pub mod hardening;
 
@@ -30,7 +31,6 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod qubes_isolation;
 
 pub use qubes_isolation::*;
 

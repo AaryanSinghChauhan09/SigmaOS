@@ -4,10 +4,6 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::boxed::Box;
-
-extern crate alloc;
-use alloc::string::String;
-use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -16,7 +12,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
 pub type ContainerID = usize;
@@ -216,40 +211,6 @@ impl SeccompProfile {
     }
 }
 
-/// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
-#[derive(Debug, Clone)]
-pub struct OverlayFS {
-    pub lower_dirs: alloc::vec::Vec<String>,
-    pub upper_dir: String,
-    pub work_dir: String,
-    pub mounted: bool,
-}
-
-impl OverlayFS {
-    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
-        Self {
-            lower_dirs,
-            upper_dir,
-            work_dir,
-            mounted: false,
-        }
-    }
-
-    pub fn mount(&mut self) -> Result<(), &'static str> {
-        if self.lower_dirs.is_empty() {
-            return Err("OverlayFS mount failed: lower_dirs cannot be empty");
-        }
-        if self.upper_dir.is_empty() || self.work_dir.is_empty() {
-            return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
-        }
-        self.mounted = true;
-        Ok(())
-    }
-
-    pub fn umount(&mut self) {
-        self.mounted = false;
-    }
-}
 
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
@@ -915,8 +876,6 @@ mod tests {
     use super::*;
     use alloc::string::ToString;
     use alloc::vec;
-
-    #[test]
 
     #[test]
     fn test_overlayfs_stacking() {
