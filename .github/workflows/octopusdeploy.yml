@@ -93,7 +93,7 @@ jobs:
 
     steps:
       - name: Log in to Octopus Deploy
-        uses: OctopusDeploy/login@34b6dcc1e86fa373c14e6a28c5507d221e4de629  #v1.0.2
+        uses: OctopusDeploy/login@e39e03d07630f363bdccd6c7ad4eb28e0ea8a184  #v2.0.0
         with:
           server: '${{ env.OCTOPUS_URL }}'
           service_account_id: '${{ env.OCTOPUS_SERVICE_ACCOUNT }}'
