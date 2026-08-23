@@ -39,6 +39,29 @@ pub use arch_linux::{
     WikiPage, ArchWikiSearchEngine,
 };
 
+pub use gap_closure::{
+    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
+    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
+    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
+    HidGraphicsDriver, AiTaskOrchestrator,
+};
+pub use superiority::{
+    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
+    SovereignTimeMachine, NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine,
+    SovereignForensics, SovereignRecoverUtility, ShardIgnitor,
+};
+
+pub use arch_linux::{
+    ProcFileType, ProcFile, DevFileType, DevFile, ArchPackage, PacmanError, PacmanEngine,
+    RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule, ArchFirewall,
+    LsmMode, LsmSentinel, PamGate, PaneLayout, TmuxMultiplexer, SovereignEnvRegistry,
+    AurRepoStatus, YayParuAdapter, ArchMirror, ReflectorMirrorlist, SubvolumeConfig,
+    ArchinstallConfig, ArchinstallParity, ArtixInitSystemType, ServiceState, ArtixInitBridge,
+    KeyTrustLevel, PacmanKey, PacmanKeyring, AurPatch, AurPatchEngine,
+    MkinitcpioGenerator, NewsItem, ArchNewsFeedParser, CachedPackage, PacmanDbCleaner,
+    WikiPage, ArchWikiSearchEngine,
+};
+
 pub use open_source_tier1::{
     WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
 };
