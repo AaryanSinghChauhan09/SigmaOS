@@ -1,13 +1,6 @@
 // 1. Instructions and CPU Initialization
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86_64,
-    AArch64,
-    RiscV64,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstructionCyclePhase {
     Fetch,
     Decode,

@@ -72,6 +72,7 @@ pub struct ConnectionInfo {
 pub enum ConnectionState {
     Established,
     Listening,
+    TimeWait,
     Closed,
     Connecting,
 }
@@ -120,15 +121,6 @@ impl NetworkTrafficAnalyzer {
     }
 }
 
-/// Traffic packet
-#[derive(Debug, Clone)]
-pub struct TrafficAlert {
-    pub alert_type: AlertType,
-    pub severity: AlertSeverity,
-    pub message: String,
-    pub timestamp: Instant,
-    pub related_ips: Vec<IpAddr>,
-}
 
 /// Network protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -539,40 +531,7 @@ impl ClearLinuxFlowLoadBalancer {
     }
 }
 
-/// Traffic statistics
-#[derive(Debug, Clone)]
-pub struct TrafficStatistics {
-    pub total_packets: u64,
-    pub total_bytes: u64,
-    pub upload_bytes: u64,
-    pub download_bytes: u64,
-    pub protocols: HashMap<Protocol, u64>,
-    pub top_talkers: Vec<IpAddr>,
-    pub start_time: Instant,
-}
 
-/// Connection info
-#[derive(Debug, Clone)]
-pub struct ConnectionInfo {
-    pub source_ip: IpAddr,
-    pub destination_ip: IpAddr,
-    pub source_port: u16,
-    pub destination_port: u16,
-    pub protocol: Protocol,
-    pub state: ConnectionState,
-    pub bytes_sent: u64,
-    pub bytes_received: u64,
-    pub duration: Duration,
-}
-
-/// Connection state
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ConnectionState {
-    Established,
-    Listening,
-    TimeWait,
-    Closed,
-}
 
 /// Bandwidth analysis strategy
 pub struct BandwidthAnalysis {

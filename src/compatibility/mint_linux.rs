@@ -29,14 +29,33 @@ pub struct WindowCoordinates {
 #[derive(Debug, Clone)]
 pub struct SoftwareMeta {
     pub name: [u8; 32],
+    pub rating: usize,
 }
 
 #[derive(Debug, Clone)]
 pub struct MintUpdateItem {
     pub name: [u8; 32],
+    pub package_name: [u8; 32],
+    pub version: [u8; 16],
+    pub level: MintUpdateLevel,
 }
 
-pub struct ZenithDisplayCompositor;
+#[derive(Debug, Clone)]
+pub struct ZenithDisplayCompositor {
+    pub active_layout: [u8; 32],
+}
+
+impl ZenithDisplayCompositor {
+    pub fn new() -> Self {
+        Self { active_layout: [0u8; 32] }
+    }
+}
+
+impl Default for ZenithDisplayCompositor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintUpdateLevel {
@@ -58,36 +77,34 @@ pub struct MintUpdatePackage {
 
 impl MintUpdatePackage {
     pub fn new(name: &[u8], old: &[u8], new: &[u8], level: MintUpdateLevel) -> Self {
-        let mut name_arr = [0u8; 32];
-        let mut old_arr = [0u8; 16];
-        let mut new_arr = [0u8; 16];
-        name_arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
-        old_arr[..old.len().min(15)].copy_from_slice(&old[..old.len().min(15)]);
-        new_arr[..new.len().min(15)].copy_from_slice(&new[..new.len().min(15)]);
+        let mut n = [0u8; 32];
+        let mut o = [0u8; 16];
+        let mut v = [0u8; 16];
+        n[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
+        o[..old.len().min(15)].copy_from_slice(&old[..old.len().min(15)]);
+        v[..new.len().min(15)].copy_from_slice(&new[..new.len().min(15)]);
 
-        let safety_score = match level {
-            MintUpdateLevel::Level1Safe => 99,
-            MintUpdateLevel::Level2Tested => 95,
-            MintUpdateLevel::Level3Normal => 85,
-            MintUpdateLevel::Level4Sensitive => 65,
-            MintUpdateLevel::Level5Critical => 30,
+        let score = match level {
+            MintUpdateLevel::Level1Safe => 100,
+            MintUpdateLevel::Level2Tested => 90,
+            MintUpdateLevel::Level3Normal => 75,
+            MintUpdateLevel::Level4Sensitive => 50,
+            MintUpdateLevel::Level5Critical => 25,
         };
 
         MintUpdatePackage {
-            name: name_arr,
-            version_old: old_arr,
-            version_new: new_arr,
+            name: n,
+            version_old: o,
+            version_new: v,
             level,
-            safety_score,
+            safety_score: score,
         }
     }
 }
 
-/// MintUpdate: Safe update managers, mirror selection, and kernel swapping
 pub struct MintUpdateManager {
-    pub pending_updates: Vec<MintUpdatePackage>,
-    pub selected_mirror_speed_ms: usize,
-    pub current_kernel_ver: [u8; 16],
+    pub available_updates: Vec<MintUpdatePackage>,
+    pub selected_blacklists: Vec<[u8; 32]>,
 }
 
 impl Default for MintUpdateManager {
@@ -98,134 +115,136 @@ impl Default for MintUpdateManager {
 
 impl MintUpdateManager {
     pub fn new() -> Self {
-        let mut current_kernel_ver = [0u8; 16];
-        let version = b"6.5.6-sigma";
-        current_kernel_ver[..version.len()].copy_from_slice(version);
-
         MintUpdateManager {
-            pending_updates: Vec::new(),
-            selected_mirror_speed_ms: 9999,
-            current_kernel_ver,
+            available_updates: Vec::new(),
+            selected_blacklists: Vec::new(),
         }
     }
 
-    pub fn add_update(&mut self, update: MintUpdatePackage) {
-        self.pending_updates.push(update);
+    pub fn add_update(&mut self, pkg: MintUpdatePackage) {
+        self.available_updates.push(pkg);
     }
 
-    pub fn auto_select_fastest_mirror(&mut self, mirrors: &[(&[u8], usize)]) {
-        let mut best_speed = 9999;
-        for &(_, speed) in mirrors {
-            if speed < best_speed {
-                best_speed = speed;
+    pub fn blacklist_package(&mut self, name: &[u8]) {
+        let mut arr = [0u8; 32];
+        arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
+        self.selected_blacklists.push(arr);
+    }
+
+    pub fn get_installable_updates(&self) -> Vec<MintUpdatePackage> {
+        let mut list = Vec::new();
+        for update in self.available_updates.iter() {
+            let mut is_blacklisted = false;
+            for bl in self.selected_blacklists.iter() {
+                if update.name == *bl {
+                    is_blacklisted = true;
+                    break;
+                }
+            }
+            if !is_blacklisted {
+                list.push(update.clone());
             }
         }
-        self.selected_mirror_speed_ms = best_speed;
+        list
     }
+}
 
-    pub fn hot_swap_active_kernel(&mut self, new_version: &[u8]) -> Result<(), &'static str> {
-        if new_version.is_empty() {
-            return Err("Invalid kernel version");
+#[derive(Debug, Clone)]
+pub struct MintDriverInfo {
+    pub name: [u8; 32],
+    pub category: [u8; 32],
+    pub is_proprietary: bool,
+    pub active: bool,
+}
+
+impl MintDriverInfo {
+    pub fn new(name: &[u8], category: &[u8], proprietary: bool) -> Self {
+        let mut n = [0u8; 32];
+        let mut c = [0u8; 32];
+        n[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
+        c[..category.len().min(31)].copy_from_slice(&category[..category.len().min(31)]);
+
+        MintDriverInfo {
+            name: n,
+            category: c,
+            is_proprietary: proprietary,
+            active: false,
         }
-        let len = new_version.len().min(15);
-        self.current_kernel_ver = [0u8; 16];
-        self.current_kernel_ver[..len].copy_from_slice(&new_version[..len]);
-        Ok(())
     }
 }
 
-/// MintBackup: Incremental user-data backup and profile state archiver
-pub struct MintBackupTool {
-    pub user_backups_count: AtomicUsize,
-    pub active_backup_path: [u8; 64],
+pub struct MintDriverManager {
+    pub available_drivers: Vec<MintDriverInfo>,
 }
 
-impl Default for MintBackupTool {
+impl Default for MintDriverManager {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl MintBackupTool {
+impl MintDriverManager {
     pub fn new() -> Self {
-        MintBackupTool {
-            user_backups_count: AtomicUsize::new(0),
-            active_backup_path: [0u8; 64],
+        MintDriverManager {
+            available_drivers: Vec::new(),
         }
     }
 
-    pub fn perform_user_backup(&mut self, backup_dir: &[u8]) -> Result<usize, &'static str> {
-        if backup_dir.is_empty() {
-            return Err("Backup target directory is invalid");
+    pub fn register_driver(&mut self, driver: MintDriverInfo) {
+        self.available_drivers.push(driver);
+    }
+
+    pub fn toggle_driver(&mut self, name: &[u8], enable: bool) -> Result<(), &'static str> {
+        for drv in self.available_drivers.iter_mut() {
+            if drv.name.starts_with(name) {
+                drv.active = enable;
+                return Ok(());
+            }
         }
-        let len = backup_dir.len().min(63);
-        self.active_backup_path[..len].copy_from_slice(&backup_dir[..len]);
-        let id = self.user_backups_count.fetch_add(1, Ordering::SeqCst);
-        Ok(id)
+        Err("Driver not found")
     }
 }
 
-/// App review structure representing user feedback (GNOME Software / Google Play inspired)
 #[derive(Debug, Clone)]
 pub struct AppReview {
     pub reviewer: [u8; 32],
     pub stars: usize, // 1 to 5
-    pub comment: [u8; 64],
 }
 
-impl AppReview {
-    pub fn new(reviewer: &[u8], stars: usize, comment: &[u8]) -> Self {
-        let mut reviewer_arr = [0u8; 32];
-        let mut comment_arr = [0u8; 64];
-        reviewer_arr[..reviewer.len().min(31)].copy_from_slice(&reviewer[..reviewer.len().min(31)]);
-        comment_arr[..comment.len().min(63)].copy_from_slice(&comment[..comment.len().min(63)]);
-
-        AppReview {
-            reviewer: reviewer_arr,
-            stars: stars.clamp(1, 5),
-            comment: comment_arr,
-        }
-    }
-}
-
-/// MintInstall: High-level application software ratings, reviews, and categories metadata
 #[derive(Debug, Clone)]
 pub struct MintAppMetadata {
     pub name: [u8; 32],
-    pub rating_stars: usize, // 1 to 5 (calculated as average of reviews)
+    pub category: [u8; 16],
+    pub rating_stars: usize,
     pub reviews_count: usize,
-    pub is_flatpak: bool,
-    pub category: [u8; 16],   // e.g. "System", "Games", "Office"
-    pub license: [u8; 16],    // e.g. "GPL-3.0", "MIT"
-    pub size_bytes: u64,
     pub reviews: Vec<AppReview>,
 }
 
 impl MintAppMetadata {
-    pub fn new(name: &[u8], category: &[u8], license: &[u8], size_bytes: u64, is_flatpak: bool) -> Self {
-        let mut name_arr = [0u8; 32];
-        let mut category_arr = [0u8; 16];
-        let mut license_arr = [0u8; 16];
-        name_arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
-        category_arr[..category.len().min(15)].copy_from_slice(&category[..category.len().min(15)]);
-        license_arr[..license.len().min(15)].copy_from_slice(&license[..license.len().min(15)]);
+    pub fn new(name: &[u8], category: &[u8]) -> Self {
+        let mut n = [0u8; 32];
+        let mut c = [0u8; 16];
+        n[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
+        c[..category.len().min(15)].copy_from_slice(&category[..category.len().min(15)]);
 
         MintAppMetadata {
-            name: name_arr,
-            rating_stars: 5, // Default perfect score prior to reviews
+            name: n,
+            category: c,
+            rating_stars: 0,
             reviews_count: 0,
-            is_flatpak,
-            category: category_arr,
-            license: license_arr,
-            size_bytes,
             reviews: Vec::new(),
         }
     }
 
-    /// Appends a new user rating/review dynamically and recalculates the average stars rating.
-    pub fn add_review(&mut self, review: AppReview) {
-        self.reviews.push(review);
-        self.reviews_count = self.reviews.len();
+    pub fn add_review(&mut self, reviewer: &[u8], stars: usize) {
+        let mut r = [0u8; 32];
+        r[..reviewer.len().min(31)].copy_from_slice(&reviewer[..reviewer.len().min(31)]);
+
+        self.reviews.push(AppReview {
+            reviewer: r,
+            stars: stars.clamp(1, 5),
+        });
+        self.reviews_count += 1;
 
         let mut sum = 0;
         for rev in self.reviews.iter() {
@@ -237,12 +256,6 @@ impl MintAppMetadata {
 
 pub struct MintSoftwareManager {
     pub apps_catalog: Vec<MintAppMetadata>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MintError {
-    LayoutFailed,
-    UpdateError,
 }
 
 impl Default for MintSoftwareManager {
@@ -260,47 +273,6 @@ impl MintSoftwareManager {
 
     pub fn add_app_to_catalog(&mut self, app: MintAppMetadata) {
         self.apps_catalog.push(app);
-    }
-
-    pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
-        let mut filtered = Vec::new();
-        for app in self.apps_catalog.iter() {
-            if app.category.starts_with(category) {
-                filtered.push(app.clone());
-            }
-        }
-        filtered
-    }
-
-    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
-        let mut sorted = self.apps_catalog.clone();
-        for i in 0..sorted.len() {
-            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
-                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
-                    sorted.swap(j, j + 1);
-                }
-            }
-        }
-        sorted
-    }
-
-    /// Arrange windows using Stacking layout (Cascaded coordinations)
-    pub fn arrange_stacking(
-        num_windows: usize,
-        coords: &mut [WindowCoordinates],
-    ) -> Result<(), &'static str> {
-        for i in 0..num_windows {
-            if i >= coords.len() {
-                return Err("Layout failed");
-            }
-            coords[i] = WindowCoordinates {
-                x: i * 30,
-                y: i * 30,
-                width: 800,
-                height: 600,
-            };
-        }
-        Ok(())
     }
 
     pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
@@ -331,6 +303,24 @@ impl MintSoftwareManager {
             }
         }
         sorted
+    }
+
+    pub fn arrange_stacking(
+        num_windows: usize,
+        coords: &mut [WindowCoordinates],
+    ) -> Result<(), &'static str> {
+        for i in 0..num_windows {
+            if i >= coords.len() {
+                return Err("Layout failed");
+            }
+            coords[i] = WindowCoordinates {
+                x: i * 30,
+                y: i * 30,
+                width: 800,
+                height: 600,
+            };
+        }
+        Ok(())
     }
 }
 
@@ -442,38 +432,6 @@ impl Default for TimeshiftSystemRestorer {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct WindowCoordinates {
-    pub x: usize,
-    pub y: usize,
-    pub width: usize,
-    pub height: usize,
-}
-
-#[derive(Debug, Clone)]
-pub struct MintUpdateItem {
-    pub package_name: [u8; 32],
-    pub version: [u8; 16],
-    pub level: MintUpdateLevel,
-}
-
-#[derive(Debug, Clone)]
-pub struct SoftwareMeta {
-    pub name: [u8; 32],
-    pub rating: usize,
-}
-
-#[derive(Debug, Clone)]
-pub struct ZenithDisplayCompositor {
-    pub active_layout: [u8; 32],
-}
-
-impl ZenithDisplayCompositor {
-    pub fn new() -> Self {
-        Self { active_layout: [0u8; 32] }
-    }
-}
-
 /// MintReport: Detects system crashes, memory warnings, and provides direct advice remedies
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintReportAlertSeverity {
@@ -543,27 +501,25 @@ pub struct TimeshiftSnapshot {
     pub id: usize,
     pub timestamp_epoch: u64,
     pub description: [u8; 64],
-    pub system_state_hash: u64, // Simulated Merkle root hash of systems
+    pub system_state_hash: u64,
 }
 
 impl TimeshiftSnapshot {
     pub fn new(id: usize, timestamp_epoch: u64, desc: &[u8], hash: u64) -> Self {
-        let mut desc_arr = [0u8; 64];
-        let len = desc.len().min(63);
-        desc_arr[..len].copy_from_slice(&desc[..len]);
+        let mut d = [0u8; 64];
+        d[..desc.len().min(63)].copy_from_slice(&desc[..desc.len().min(63)]);
         TimeshiftSnapshot {
             id,
             timestamp_epoch,
-            description: desc_arr,
+            description: d,
             system_state_hash: hash,
         }
     }
 }
 
-/// Timeshift-inspired System Restore point manager
 pub struct MintTimeshiftEngine {
     pub snapshots: Vec<TimeshiftSnapshot>,
-    pub next_snapshot_id: AtomicUsize,
+    pub next_id: AtomicUsize,
 }
 
 impl Default for MintTimeshiftEngine {
@@ -576,115 +532,38 @@ impl MintTimeshiftEngine {
     pub fn new() -> Self {
         MintTimeshiftEngine {
             snapshots: Vec::new(),
-            next_snapshot_id: AtomicUsize::new(1),
+            next_id: AtomicUsize::new(1),
         }
     }
 
     pub fn create_checkpoint(&mut self, timestamp: u64, desc: &[u8], state_hash: u64) -> usize {
-        let id = self.next_snapshot_id.fetch_add(1, Ordering::SeqCst);
-        let checkpoint = TimeshiftSnapshot::new(id, timestamp, desc, state_hash);
-        self.snapshots.push(checkpoint);
+        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
+        let snap = TimeshiftSnapshot::new(id, timestamp, desc, state_hash);
+        self.snapshots.push(snap);
         id
     }
 
-    pub fn restore_checkpoint(&self, snapshot_id: usize) -> Result<u64, &'static str> {
+    pub fn restore_checkpoint(&self, snapshot_id: usize) -> Option<u64> {
         for snap in self.snapshots.iter() {
             if snap.id == snapshot_id {
-                return Ok(snap.system_state_hash);
+                return Some(snap.system_state_hash);
             }
         }
-        Err("Timeshift: Target system restore point not found.")
+        None
     }
 }
 
-/// Cinnamon-inspired desktop styling configuration
-#[derive(Debug, Clone, Copy)]
 pub struct MintCinnamonStyling {
-    pub panel_height: u32,
-    pub menu_layout_compact: bool,
-    pub opacity_percent: u32,
+    pub panel_height: usize,
     pub window_effects_enabled: bool,
 }
 
-impl MintCinnamonStyling {
-    pub fn default() -> Self {
-        MintCinnamonStyling {
+impl Default for MintCinnamonStyling {
+    fn default() -> Self {
+        Self {
             panel_height: 40,
-            menu_layout_compact: false,
-            opacity_percent: 100,
             window_effects_enabled: true,
         }
-    }
-
-    pub fn configure_workspace(&mut self, height: u32, compact: bool, opacity: u32, effects: bool) {
-        self.panel_height = height;
-        self.menu_layout_compact = compact;
-        self.opacity_percent = opacity.min(100);
-        self.window_effects_enabled = effects;
-    }
-}
-
-/// Hardware Driver metadata managed by the MintDrivers-equivalent system
-#[derive(Debug, Clone)]
-pub struct MintDriverInfo {
-    pub name: [u8; 48],
-    pub hardware_class: [u8; 32],
-    pub proprietary: bool,
-    pub active: bool,
-}
-
-impl MintDriverInfo {
-    pub fn new(name: &[u8], class: &[u8], proprietary: bool) -> Self {
-        let mut name_arr = [0u8; 48];
-        let mut class_arr = [0u8; 32];
-        name_arr[..name.len().min(47)].copy_from_slice(&name[..name.len().min(47)]);
-        class_arr[..class.len().min(31)].copy_from_slice(&class[..class.len().min(31)]);
-        MintDriverInfo {
-            name: name_arr,
-            hardware_class: class_arr,
-            proprietary,
-            active: false,
-        }
-    }
-}
-
-/// MintDrivers-inspired Hardware Driver Manager
-pub struct MintDriverManager {
-    pub available_drivers: Vec<MintDriverInfo>,
-}
-
-impl Default for MintDriverManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl MintDriverManager {
-    pub fn new() -> Self {
-        MintDriverManager {
-            available_drivers: Vec::new(),
-        }
-    }
-
-    pub fn register_driver(&mut self, driver: MintDriverInfo) {
-        self.available_drivers.push(driver);
-    }
-
-    pub fn toggle_driver(&mut self, name: &[u8], active: bool) -> Result<(), &'static str> {
-        for driver in self.available_drivers.iter_mut() {
-            let mut matches = true;
-            for i in 0..name.len().min(47) {
-                if driver.name[i] != name[i] {
-                    matches = false;
-                    break;
-                }
-            }
-            if matches {
-                driver.active = active;
-                return Ok(());
-            }
-        }
-        Err("MintDrivers: Specified driver not found.")
     }
 }
 
@@ -693,70 +572,50 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_mint_update_manager() {
-        let mut manager = MintUpdateManager::new();
-        let pkg =
-            MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe);
-        manager.add_update(pkg);
+    fn test_mint_update_manager_levels_and_blacklist() {
+        let mut mgr = MintUpdateManager::new();
 
-        assert_eq!(manager.pending_updates.len(), 1);
-        assert_eq!(manager.pending_updates[0].safety_score, 99);
+        let pkg1 = MintUpdatePackage::new(b"kernel", b"5.15", b"6.12", MintUpdateLevel::Level5Critical);
+        let pkg2 = MintUpdatePackage::new(b"nano", b"5.0", b"6.0", MintUpdateLevel::Level1Safe);
 
-        // Fast mirror selection
-        manager.auto_select_fastest_mirror(&[(b"us-mirror", 45), (b"eu-mirror", 120)]);
-        assert_eq!(manager.selected_mirror_speed_ms, 45);
+        mgr.add_update(pkg1);
+        mgr.add_update(pkg2);
 
-        // Hot swap active kernel version
-        manager.hot_swap_active_kernel(b"6.6.0").unwrap();
-        assert!(manager.current_kernel_ver.starts_with(b"6.6.0"));
+        assert_eq!(mgr.get_installable_updates().len(), 2);
+
+        mgr.blacklist_package(b"kernel");
+        let filtered = mgr.get_installable_updates();
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(&filtered[0].name[..4], b"nano");
     }
 
     #[test]
-    fn test_mint_backup_tool() {
-        let mut backup = MintBackupTool::new();
-        let backup_id = backup.perform_user_backup(b"/backup/user_state").unwrap();
-        assert_eq!(backup_id, 0);
+    fn test_mint_software_store_reviews_and_featured() {
+        let mut store = MintSoftwareManager::new();
+
+        let mut app1 = MintAppMetadata::new(b"GIMP", b"Graphics");
+        app1.add_review(b"user1", 5);
+        app1.add_review(b"user2", 4);
+
+        let mut app2 = MintAppMetadata::new(b"VLC", b"Multimedia");
+        app2.add_review(b"user3", 3);
+
+        store.add_app_to_catalog(app1);
+        store.add_app_to_catalog(app2);
+
+        assert_eq!(store.search_by_category(b"Graphics").len(), 1);
+
+        let featured = store.get_featured_apps();
+        assert_eq!(&featured[0].name[..4], b"GIMP");
     }
 
     #[test]
-    fn test_mint_software_manager_with_reviews() {
-        let mut software = MintSoftwareManager::new();
-
-        // 1. Create app metadata and add reviews
-        let mut app1 = MintAppMetadata::new(b"alacritty", b"System", b"Apache-2.0", 4500000, true);
-        app1.add_review(AppReview::new(b"gamer1", 5, b"Fast terminal!"));
-        app1.add_review(AppReview::new(b"dev1", 3, b"Nice, but lacks tabs."));
-
-        // Average should be (5 + 3) / 2 = 4 stars
-        assert_eq!(app1.rating_stars, 4);
-        assert_eq!(app1.reviews_count, 2);
-
-        let mut app2 = MintAppMetadata::new(b"flipper", b"Games", b"GPL-3.0", 12000000, false);
-        app2.add_review(AppReview::new(b"gamer2", 5, b"Pristine retro gameplay!"));
-
-        software.add_app_to_catalog(app1);
-        software.add_app_to_catalog(app2);
-
-        // 2. Test Category Search
-        let system_apps = software.search_by_category(b"System");
-        assert_eq!(system_apps.len(), 1);
-        assert!(system_apps[0].name.starts_with(b"alacritty"));
-
-        // 3. Test Featured (Ranked) Apps
-        let featured = software.get_featured_apps();
-        assert_eq!(featured.len(), 2);
-        assert!(featured[0].name.starts_with(b"flipper")); // 5 stars > 4 stars
-    }
-
-    #[test]
-    fn test_mint_report_system() {
+    fn test_mint_report_crashes() {
         let mut report = MintReportSystem::new();
-        report.register_crash_alert(b"launcher");
+        report.register_crash_alert(b"Firefox");
+
         assert_eq!(report.active_alerts.len(), 1);
-        assert_eq!(
-            report.active_alerts[0].severity,
-            MintReportAlertSeverity::Critical
-        );
+        assert_eq!(report.active_alerts[0].severity, MintReportAlertSeverity::Critical);
     }
 
     #[test]
@@ -770,26 +629,10 @@ mod tests {
     }
 
     #[test]
-    fn test_cinnamon_theme_engine() {
-        let mut engine = CinnamonThemeEngine::new();
-        engine.add_desklet(101, 200, 200);
-        assert_eq!(engine.desklets.len(), 1);
-        assert_eq!(engine.desklets[0].unwrap().id, 101);
-    }
-
-    #[test]
     fn test_mint_cinnamon_styling_options() {
-        let mut style = MintCinnamonStyling::default();
+        let style = MintCinnamonStyling::default();
         assert_eq!(style.panel_height, 40);
         assert!(style.window_effects_enabled);
-    }
-
-    #[test]
-    fn test_timeshift_system_restorer() {
-        let mut restorer = TimeshiftSystemRestorer::new();
-        restorer.create_restore_point(101, true); // rsync snapshot
-        restorer.create_restore_point(102, false); // btrfs snapshot
-        assert_eq!(restorer.restore_points.len(), 2);
     }
 
     #[test]
