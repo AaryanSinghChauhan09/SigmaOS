@@ -30,7 +30,6 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod qubes_isolation;
 
 pub use qubes_isolation::*;
 
@@ -71,3 +70,4 @@ pub use vpn::{
     WireGuardHandler,
 };
 pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+pub use forensics::*;

@@ -101,22 +101,7 @@ pub mod file_attribute_flags { pub const IMMUTABLE: u32 = 1; pub const APPEND_ON
 pub mod nfs4_flags { pub const FILE_INHERIT: u32 = 1; pub const DIRECTORY_INHERIT: u32 = 2; }
 pub mod nfs4_mask { pub const READ_DATA: u32 = 1; pub const WRITE_DATA: u32 = 2; pub const DELETE: u32 = 4; }
 
-impl PosixAcl {
-    pub fn from_mode(_uid: u32, _gid: u32, _mode: u32) -> Self {
-        Self::new()
-    }
-    pub fn get_mask(&self) -> Option<u32> { Some(4) }
-    pub fn evaluate_access(&self, _u1: u32, _u2: u32, _groups: &[u32], _o1: u32, _o2: u32, mode: u32) -> bool {
-        if mode == 2 || mode == 4 { false } else { true }
-    }
-    pub fn inherit_default_acl(&self, _is_dir: bool) -> Self { Self::new() }
-}
 
-impl AclEntry {
-    pub fn new(_tag: AclTag, _bits: u32) -> Self {
-        AclEntry { acl_type: AclType::UserObj, qualifier_id: 0, perm_bits: 0 }
-    }
-}
 
 
 #[path = "../src/dashboard/statutory_compliance.rs"]
@@ -165,7 +150,7 @@ pub enum CpuPrivilegeMode { KernelRing0, UserRing3 }
 pub struct GlobalDescriptorTable;
 impl GlobalDescriptorTable {
     pub fn new() -> Self { Self }
-    pub fn insert_descriptor(&mut self, _desc: SegmentDescriptor) -> SegmentSelector {
+    pub fn insert_descriptor(&mut self, _desc: segmentation_paging::SegmentDescriptor) -> SegmentSelector {
         SegmentSelector { index: 1, rpl: segmentation_paging::CpuRing::Ring0Kernel, is_ldt: false }
     }
     pub fn translate_address(&self, seg_addr: SegmentedAddress, _mode: CpuPrivilegeMode) -> Result<u64, &'static str> {
@@ -204,7 +189,6 @@ mod elf_relocation;
 
 use community_toolkit::{
     CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
-    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
 };
 use statutory_compliance::{
     DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
@@ -246,7 +230,7 @@ use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
 use segmentation_paging::{
-    SegmentationPagingEngine, SegmentSelector, CpuRing, SpaceProtectionFlags, AslrEntropyConfig, RandomizedAddressSpace,
+    SegmentationPagingEngine, SegmentSelector, SpaceProtectionFlags, AslrEntropyConfig, RandomizedAddressSpace,
 };
 
 use process_activity_manager::{
@@ -256,20 +240,20 @@ use process_activity_manager::{
 fn test_segmentation_paging_and_aslr() {
     let engine = SegmentationPagingEngine::new(SpaceProtectionFlags::strict_hardening());
 
-    let sel = SegmentSelector::new(1, false, CpuRing::Ring0Kernel);
-    let linear = engine.translate_logical_to_linear(sel, 0x1000, CpuRing::Ring0Kernel).unwrap();
+    let sel = SegmentSelector::new(1, false, segmentation_paging::CpuRing::Ring0Kernel);
+    let linear = engine.translate_logical_to_linear(sel, 0x1000, segmentation_paging::CpuRing::Ring0Kernel).unwrap();
     assert_eq!(linear, 0x1000);
 
     let (lin, phys) = engine.full_address_translation_walk(
-        SegmentSelector::new(4, false, CpuRing::Ring3User),
+        SegmentSelector::new(4, false, segmentation_paging::CpuRing::Ring3User),
         0x2000,
         false,
         false,
-        CpuRing::Ring3User,
+        segmentation_paging::CpuRing::Ring3User,
     ).unwrap();
     assert_eq!(lin, 0x2000);
 
-    let smep_err = engine.translate_virtual_to_physical(0x2000, false, true, CpuRing::Ring0Kernel);
+    let smep_err = engine.translate_virtual_to_physical(0x2000, false, true, segmentation_paging::CpuRing::Ring0Kernel);
     assert!(smep_err.is_err());
 
     let aslr = RandomizedAddressSpace::compute_aslr_layout(0x100000000, AslrEntropyConfig::linux_default(), 0x12345678);
@@ -313,7 +297,7 @@ fn test_process_activity_manager_and_registers() {
     let proc = pam.get_process_activity(500).unwrap();
     assert_eq!(proc.state, ActivityState::Interactive);
 
-    let ctx = ProcRegisterSnapshot {
+    let ctx = RegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,

@@ -4,6 +4,7 @@ use crate::security::Permission;
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+pub use crate::package::universal::{FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -13,6 +14,15 @@ pub enum PackagePriority {
     Important = 2,
     Required = 3,
     Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+}
+
+pub trait PackageFormatAdapter {
+    fn format_name(&self) -> &str;
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError>;
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> { Err(AdapterError::ParseError("Unsupported".to_string())) }
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> { Ok(true) }
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> { Ok(Vec::new()) }
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> { Ok(()) }
 }
 
 #[derive(Debug, Clone)]

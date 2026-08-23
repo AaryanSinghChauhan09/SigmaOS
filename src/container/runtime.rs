@@ -4,10 +4,6 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::boxed::Box;
-
-extern crate alloc;
-use alloc::string::String;
-use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -90,7 +86,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: ContainerCapability::new(),
+            capability: RuntimeCapability::new(),
         }
     }
 }
@@ -213,41 +209,6 @@ impl SeccompProfile {
         } else {
             false
         }
-    }
-}
-
-/// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
-#[derive(Debug, Clone)]
-pub struct OverlayFS {
-    pub lower_dirs: alloc::vec::Vec<String>,
-    pub upper_dir: String,
-    pub work_dir: String,
-    pub mounted: bool,
-}
-
-impl OverlayFS {
-    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
-        Self {
-            lower_dirs,
-            upper_dir,
-            work_dir,
-            mounted: false,
-        }
-    }
-
-    pub fn mount(&mut self) -> Result<(), &'static str> {
-        if self.lower_dirs.is_empty() {
-            return Err("OverlayFS mount failed: lower_dirs cannot be empty");
-        }
-        if self.upper_dir.is_empty() || self.work_dir.is_empty() {
-            return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
-        }
-        self.mounted = true;
-        Ok(())
-    }
-
-    pub fn umount(&mut self) {
-        self.mounted = false;
     }
 }
 
@@ -962,7 +923,7 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            ContainerCapability::full(),
+            RuntimeCapability::full(),
         );
         container.seccomp = SeccompProfile {
             hardened: true,

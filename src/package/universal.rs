@@ -221,6 +221,15 @@ impl PackageAdapter {
     }
 }
 
+pub trait PackageFormatAdapter {
+    fn format(&self) -> PackageFormat;
+    fn adapter_name(&self) -> &str { "unknown" }
+    fn parse_manifest(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> { Err("Not implemented") }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+}
+
 /// AptDebAdapter handles Debian/Ubuntu package formats (`.deb`)
 pub struct AptDebAdapter {
     pub dpkg_status_path: String,
@@ -310,11 +319,13 @@ impl PackageFormatAdapter for YumRpmAdapter {
         );
         Ok(())
     }
+}
 
+impl PackageAdapter {
     pub fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
-            package.name, self.adapter_name()
+            package.name, self.adapter_name
         );
         Ok(())
     }
@@ -768,32 +779,8 @@ pub struct SovereignTabFm {
     pub datasets: Vec<TabularDataset>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureType {
-    Binary,
-    Library,
-    Source,
-}
-
 pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
-}
-
-pub struct TabularSchema {
-    pub fields: Vec<String>,
-}
-
-pub struct TabularRow {
-    pub values: Vec<String>,
-}
-
-pub struct TabularDataset {
-    pub schema: TabularSchema,
-    pub rows: Vec<TabularRow>,
-}
-
-pub struct SovereignTabFm {
-    pub datasets: Vec<TabularDataset>,
 }
 
 #[cfg(test)]

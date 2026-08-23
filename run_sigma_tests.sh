@@ -35,5 +35,9 @@ echo -e "${CYAN}:: Running Comprehensive OS Subsystems & Components Unit Tests..
 rustc --edition 2021 --test tests/os_components_tests.rs -o build/os_components_test
 ./build/os_components_test
 
+echo -e "${CYAN}:: Running Algorithm & Component Inspection Unit Tests...${RESET}"
+rustc --edition 2021 --test tests/algorithm_and_subsystem_inspection_tests.rs -o build/algorithm_inspection_test
+./build/algorithm_inspection_test
+
 echo -e "${GREEN}[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]${RESET}"
 exit 0
