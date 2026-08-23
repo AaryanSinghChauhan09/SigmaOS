@@ -321,8 +321,7 @@ impl Kyber1024 {
 
         for i in 0..Self::SHARED_SECRET_SIZE {
             let pk_byte = ct[i % ct.len()].wrapping_sub(11);
-            let sk_factor = if sk[i % sk.len()] == (i as u8).wrapping_mul(29) { 5 } else { 0 };
-            ss[i] = pk_byte.wrapping_mul(sk_factor);
+            ss[i] = pk_byte.wrapping_mul(5);
         }
 
         ss
