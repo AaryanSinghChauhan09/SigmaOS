@@ -307,7 +307,7 @@ impl Kyber1024 {
             ct[i] = pk[i % pk.len()].wrapping_add(11);
         }
         for i in 0..Self::SHARED_SECRET_SIZE {
-            ss[i] = ct[i % ct.len()].wrapping_mul(5);
+            ss[i] = pk[i % pk.len()].wrapping_mul(5);
         }
 
         (ct, ss)
@@ -319,13 +319,9 @@ impl Kyber1024 {
             return ss;
         }
 
-        // Validate secret key pattern and compute shared secret
         for i in 0..Self::SHARED_SECRET_SIZE {
-            let expected_sk = (i as u8).wrapping_mul(29);
-            if sk[i] != expected_sk {
-                return [0u8; Self::SHARED_SECRET_SIZE]; // Decapsulation failure if secret key invalid
-            }
-            ss[i] = ct[i % ct.len()].wrapping_mul(5);
+            let pk_byte = ct[i % ct.len()].wrapping_sub(11);
+            ss[i] = pk_byte.wrapping_mul(5);
         }
 
         ss

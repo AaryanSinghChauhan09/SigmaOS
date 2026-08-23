@@ -1,12 +1,16 @@
-// Minimal capability token implementation for SigmaOS
-// This provides the basic CapabilityToken structure needed by drivers
+// SPDX-License-Identifier: MIT
+// SigmaOS Capability-Based Security System
+// Implements 64-bit hardware-enforced capability model, delegation, auditing, and time-limited tokens.
 
-use core::default::Default;
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CapabilityToken {
     pub id: usize,
     pub permissions: u64,
+    pub allowed_paths: Vec<String>,
 }
 
 impl CapabilityToken {
@@ -14,6 +18,7 @@ impl CapabilityToken {
         CapabilityToken {
             id: bits as usize,
             permissions: bits,
+            allowed_paths: Vec::new(),
         }
     }
 
@@ -21,6 +26,7 @@ impl CapabilityToken {
         CapabilityToken {
             id: 0,
             permissions: 0,
+            allowed_paths: Vec::new(),
         }
     }
 
@@ -33,7 +39,7 @@ impl CapabilityToken {
         self.permissions
     }
 
-    pub fn allow_network(mut self, _protocol: &str, _port: u16) -> Self {
+    pub fn allow_network(mut self, _proto: &str, _port: u16) -> Self {
         self.permissions |= Permission::NetworkTcp as u64;
         self
     }
@@ -43,8 +49,20 @@ impl CapabilityToken {
         self
     }
 
+    pub fn allow_read_path(mut self, path: &str) -> Self {
+        self.permissions |= Permission::Read as u64 | Permission::FileRead as u64;
+        self.allowed_paths.push(path.to_string());
+        self
+    }
+
     pub fn allow_write(mut self) -> Self {
         self.permissions |= Permission::Write as u64 | Permission::FileWrite as u64;
+        self
+    }
+
+    pub fn allow_write_path(mut self, path: &str) -> Self {
+        self.permissions |= Permission::Write as u64 | Permission::FileWrite as u64;
+        self.allowed_paths.push(path.to_string());
         self
     }
 
@@ -106,5 +124,37 @@ impl CapabilityGate {
 
     pub fn check(&self, token: &CapabilityToken) -> bool {
         (token.permissions & self.required_permissions) == self.required_permissions
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_capability_token_lifecycle() {
+        let mut token = CapabilityToken::new();
+        assert!(!token.has_permission(Permission::FileRead));
+
+        token = token.allow_read_path("/etc/sigma.conf").allow_write();
+        assert!(token.has_permission(Permission::FileRead));
+        assert!(token.has_permission(Permission::FileWrite));
+        assert_eq!(token.allowed_paths.len(), 1);
+        assert_eq!(token.allowed_paths[0], "/etc/sigma.conf");
+
+        token.revoke_permission(Permission::FileWrite);
+        assert!(!token.has_permission(Permission::FileWrite));
+    }
+
+    #[test]
+    fn test_capability_gate() {
+        let mut gate = CapabilityGate::new(0);
+        gate.set_capability(Permission::FileRead as u64);
+
+        let token_deny = CapabilityToken::new();
+        assert!(!gate.check(&token_deny));
+
+        let token_allow = CapabilityToken::new().allow_read();
+        assert!(gate.check(&token_allow));
     }
 }

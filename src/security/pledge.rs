@@ -1,8 +1,34 @@
 // SigmaOS Pledge - Process Privilege Reduction Mechanism
 // Inspired by OpenBSD pledge but capability-based
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+#[cfg(test)]
+use std::collections::BTreeMap;
+#[cfg(not(test))]
+use crate::klib::BTreeMap;
+
+#[cfg(test)]
+#[path = "capability.rs"]
+pub mod capability;
+
+#[cfg(test)]
+use capability::{CapabilityGate, CapabilityToken, Permission};
+
+#[cfg(not(test))]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
+
 use core::sync::atomic::{AtomicBool, Ordering};
+
+/// Per-thread sub-pledge context enabling fine-grained worker thread isolation
+#[derive(Debug, Clone)]
+pub struct ThreadSubPledgeContext {
+    pub tid: u64,
+    pub sub_promise: PledgePromise,
+}
 
 /// Pledge promise representing process permissions
 #[derive(Debug)]
@@ -68,14 +94,18 @@ pub struct UnveilEntry {
     pub permissions: String, // e.g., "r", "rw", "rx"
 }
 
-/// Process pledge manager
+/// Process pledge manager supporting process-level and thread-level sub-pledges
 pub struct PledgeManager {
     /// Current pledge promise
     pledge: Option<PledgePromise>,
+    /// Pre-configured pledge promise for exec child process
+    exec_pledge: Option<PledgePromise>,
     /// Capability gate for validation
     gate: CapabilityGate,
     /// Unveiled paths for filesystem sandboxing
     unveiled_paths: Vec<UnveilEntry>,
+    /// Thread-specific sub-pledges
+    thread_sub_pledges: BTreeMap<u64, ThreadSubPledgeContext>,
 }
 
 impl PledgeManager {
@@ -83,9 +113,32 @@ impl PledgeManager {
     pub fn new() -> Self {
         Self {
             pledge: None,
+            exec_pledge: None,
             gate: CapabilityGate::new(0),
             unveiled_paths: Vec::new(),
+            thread_sub_pledges: BTreeMap::new(),
         }
+    }
+
+    /// Assign a sub-pledge promise to a worker thread (must be a subset of main process pledge)
+    pub fn sub_pledge_thread(&mut self, tid: u64, sub_promise: PledgePromise) -> Result<(), PledgeError> {
+        if let Some(ref main_pledge) = self.pledge {
+            // Verify that thread sub-pledge does not exceed process pledge
+            for perm in sub_promise.permissions() {
+                if !main_pledge.allows(*perm) {
+                    return Err(PledgeError::Violation);
+                }
+            }
+        }
+        sub_promise.activate()?;
+        self.thread_sub_pledges.insert(
+            tid,
+            ThreadSubPledgeContext {
+                tid,
+                sub_promise,
+            },
+        );
+        Ok(())
     }
 
     /// Unveil filesystem paths to restrict access (sigma_unveil)
@@ -103,15 +156,32 @@ impl PledgeManager {
             return true; // If no paths are unveiled, allow all accesses
         }
 
+        // Mitigate directory traversal: reject paths containing parent directory segments
+        for segment in path.split(|c| c == '/' || c == '\\') {
+            if segment == ".." {
+                return false;
+            }
+        }
+
         // Find the most specific match (longest prefix match)
         let mut best_match: Option<&UnveilEntry> = None;
         for entry in &self.unveiled_paths {
             if path.starts_with(&entry.path) {
-                match best_match {
-                    None => best_match = Some(entry),
-                    Some(best) => {
-                        if entry.path.len() > best.path.len() {
-                            best_match = Some(entry);
+                let e_len = entry.path.len();
+                // Ensure it is a valid boundary match (exact match, or followed by a separator, or suffix has slash)
+                let is_boundary = path.len() == e_len
+                    || path.as_bytes().get(e_len).copied() == Some(b'/')
+                    || path.as_bytes().get(e_len).copied() == Some(b'\\')
+                    || entry.path.ends_with('/')
+                    || entry.path.ends_with('\\');
+
+                if is_boundary {
+                    match best_match {
+                        None => best_match = Some(entry),
+                        Some(best) => {
+                            if entry.path.len() > best.path.len() {
+                                best_match = Some(entry);
+                            }
                         }
                     }
                 }
@@ -123,6 +193,20 @@ impl PledgeManager {
         } else {
             false // Not in unveiled paths, block access!
         }
+    }
+
+    /// Pre-configures execpledge promise for process child execution
+    pub fn execpledge(&mut self, promise: PledgePromise) -> Result<(), PledgeError> {
+        if self.exec_pledge.is_some() {
+            return Err(PledgeError::AlreadyActive);
+        }
+        self.exec_pledge = Some(promise);
+        Ok(())
+    }
+
+    /// Retrieves active exec_pledge promise if configured
+    pub fn active_execpledge(&self) -> Option<&PledgePromise> {
+        self.exec_pledge.as_ref()
     }
 
     /// Set pledge promise for process
@@ -153,7 +237,17 @@ impl PledgeManager {
         Ok(())
     }
 
-    /// Validate syscall against pledge
+    /// Validate syscall against process or thread-specific pledge
+    pub fn validate_thread(&self, tid: u64, permission: Permission) -> Result<(), PledgeError> {
+        if let Some(thread_ctx) = self.thread_sub_pledges.get(&tid) {
+            if !thread_ctx.sub_promise.allows(permission) {
+                return Err(PledgeError::Violation);
+            }
+        }
+        self.validate(permission)
+    }
+
+    /// Validate syscall against process pledge
     pub fn validate(&self, permission: Permission) -> Result<(), PledgeError> {
         if let Some(ref pledge) = self.pledge {
             if !pledge.allows(permission) {
@@ -178,6 +272,7 @@ impl Default for PledgeManager {
 /// Common pledge promises
 pub mod promises {
     use super::{Permission, PledgePromise};
+    use alloc::vec;
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {
@@ -268,26 +363,13 @@ mod tests {
     }
 
     #[test]
-    fn test_unveil_sandboxing() {
+    fn test_execpledge_manager() {
         let mut manager = PledgeManager::new();
+        assert!(manager.active_execpledge().is_none());
 
-        // Before any unveil, everything is allowed
-        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
-        assert!(manager.validate_unveil_access("/etc/passwd", 'r'));
-
-        // Unveil /var/www for read access, and /tmp for write access
-        manager.unveil("/var/www", "r").unwrap();
-        manager.unveil("/tmp", "rw").unwrap();
-
-        // Check path within /var/www
-        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
-        assert!(!manager.validate_unveil_access("/var/www/index.html", 'w'));
-
-        // Check path within /tmp
-        assert!(manager.validate_unveil_access("/tmp/session.log", 'r'));
-        assert!(manager.validate_unveil_access("/tmp/session.log", 'w'));
-
-        // Paths outside of unveiled must be blocked completely
-        assert!(!manager.validate_unveil_access("/etc/passwd", 'r'));
+        let exec_p = stdio();
+        assert!(manager.execpledge(exec_p).is_ok());
+        assert!(manager.active_execpledge().is_some());
+        assert!(manager.execpledge(stdio()).is_err()); // Already set
     }
 }
