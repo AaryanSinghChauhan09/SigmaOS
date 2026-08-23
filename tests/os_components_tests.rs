@@ -83,9 +83,7 @@ use statutory_compliance::{
 use system_user::{UserManager as TestUserManager};
 
 use access_control::{
-    AclType, CapBoundingSet, CpuPrivilegeEnforcer, DacPermission, ExecutionRingMode,
-    FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, dac_flags,
-    file_attribute_flags, nfs4_flags, nfs4_mask,
+    PosixAcl, AclType,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
