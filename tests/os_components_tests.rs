@@ -216,7 +216,7 @@ fn test_process_activity_manager_and_registers() {
     let active_proc = pam.get_process_activity(500).unwrap();
     assert_eq!(active_proc.state, ActivityState::Interactive);
 
-    let ctx = RegisterSnapshot {
+    let ctx = ProcRegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,
@@ -479,9 +479,16 @@ fn test_posix_and_nfsv4_acls() {
     posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Mask, id: 0, perms: 0o5 });
     posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Other, id: 0, perms: 0o0 });
 
-    assert!(posix_acl.evaluate_acl_access(1001, 1001, 5, 1000, 1000)); // Allowed r-x
-    assert!(!posix_acl.evaluate_acl_access(1001, 1001, 2, 1000, 1000)); // Denied write (2)
-    assert!(!posix_acl.evaluate_acl_access(1002, 1002, 4, 1000, 1000)); // Other denied
+    assert!(posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 5)); // Allowed r-x
+    assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 2)); // Denied write (2)
+    assert!(!posix_acl.evaluate_acl(1002, 1002, 1000, 1000, 4)); // Other denied
+
+    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
+    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+    gate.mac_filter.add_mac(allowed_mac);
+    gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
+
+    assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
 }
 
 #[test]
