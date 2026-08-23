@@ -247,6 +247,7 @@ impl Surface for BitmapSurface {
         let stride = self.stride as usize / 4;
         let limit_y = (rect.position.y + rect.size.height as i32).min(self.size.height as i32);
         let limit_x = (rect.position.x + rect.size.width as i32).min(self.size.width as i32);
+        let data = self.data_mut();
 
         for y in rect.position.y.max(0) as usize..limit_y.max(0) as usize {
             for x in rect.position.x.max(0) as usize..limit_x.max(0) as usize {
@@ -568,6 +569,18 @@ impl SimpleCompositor {
             double_buffering: core::sync::atomic::AtomicBool::new(false),
         }
     }
+
+    pub fn swap_buffers(&mut self) -> Result<(), GraphicsError> {
+        Ok(())
+    }
+
+    pub fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> {
+        if let Some(ref back) = self.back_buffer {
+            Ok(back.data.clone())
+        } else {
+            Err(GraphicsError::OutOfMemory)
+        }
+    }
 }
 
 impl Compositor for SimpleCompositor {
@@ -649,7 +662,7 @@ impl Compositor for SimpleCompositor {
 
             // Compose windows in order (back to front)
             for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                if let Some(Some(window)) = self.windows.iter_mut().find(|w| w.as_ref().map_or(false, |win| win.id() == window_id)) {
                     let window_rect = window.rect();
                     let opacity = window.get_opacity(); // animation opacity factor
 
@@ -690,20 +703,12 @@ impl Compositor for SimpleCompositor {
                 }
             }
 
-            if let Some(window) = found_window {
-                let window_rect = window.rect();
-                let output_stride = target_surface.info().stride as usize / 4;
-                if let Some(surface) = window.surface() {
-                    let window_stride = surface.info().stride as usize / 4;
-                    let window_data = surface.data();
-                    let output_data = target_surface.data_mut();
-
         } else {
             output.clear(Color::rgb(0, 0, 0));
 
             // Compose windows in order (back to front)
             for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                if let Some(Some(window)) = self.windows.iter_mut().find(|w| w.as_ref().map_or(false, |win| win.id() == window_id)) {
                     let window_rect = window.rect();
                     if let Some(surface) = window.surface() {
                         let window_stride = surface.info().stride as usize / 4;
@@ -734,17 +739,7 @@ impl Compositor for SimpleCompositor {
         Ok(())
     }
 
-    fn swap_buffers(&mut self) -> Result<(), GraphicsError> {
-        Ok(())
-    }
 
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> {
-        if let Some(ref back) = self.back_buffer {
-            Ok(back.data.clone())
-        } else {
-            Err(GraphicsError::OutOfMemory)
-        }
-    }
 
     fn stats(&self) -> CompositorStats {
         let mut stats = self.stats.clone();
@@ -799,7 +794,7 @@ impl SovereignWaylandCompositor {
 
     pub fn commit_vsync_frame(&mut self) -> Result<(), GraphicsError> {
         if !self.vsync_enabled {
-            return Err(GraphicsError::RenderFailed);
+            return Err(GraphicsError::OutOfMemory);
         }
         Ok(())
     }
