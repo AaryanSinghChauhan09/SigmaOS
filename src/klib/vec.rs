@@ -120,10 +120,8 @@ impl<T> Vec<T> {
                             1,
                         );
                     }
-                }
-                write_idx += 1;
-            } else {
-                unsafe {
+                    write_idx += 1;
+                } else {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
             }
