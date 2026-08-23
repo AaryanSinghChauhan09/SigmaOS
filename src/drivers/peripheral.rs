@@ -1,6 +1,7 @@
-extern crate alloc;
-// SigmaOS Peripheral Device Framework
-// Provides OOP-based peripheral device management
+// SigmaOS Unified Peripheral Device Architecture
+// Implements OOP principles for robust, low footprint device management
+// Improved with Windows Driver Model (WDM), WDF/KMDF/UMDF concepts,
+// Filter/Minifilter drivers, I/O Request Packets (IRPs), and Plug-and-Play (PnP) states.
 
 extern crate alloc;
 

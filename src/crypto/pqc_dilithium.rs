@@ -75,7 +75,7 @@ impl PQCContext {
         // In real implementation, would use Dilithium-5 signing algorithm
         // This is a stub that generates deterministic signatures
         for i in 0..2592 {
-            signature.data[i] = message[i % message.len()].wrapping_add(i as u8);
+            signature.data[i] = message[i % message.len()].wrapping_add((i as u8));
         }
 
         self.operation_count.fetch_add(1, Ordering::SeqCst);
@@ -84,7 +84,7 @@ impl PQCContext {
     }
 
     /// Verify Dilithium-5 signature
-    pub fn verify(&self, _message: &[u8], _signature: &Dilithium5Signature, public_key: &[u8]) -> Result<bool, PQCError> {
+    pub fn verify(&self, message: &[u8], signature: &Dilithium5Signature, public_key: &[u8]) -> Result<bool, PQCError> {
         if public_key.len() != 1312 {
             return Err(PQCError::InvalidPublicKey);
         }
@@ -258,18 +258,18 @@ impl Kyber512 {
             ct[i] = pk[i % pk.len()].wrapping_add(7);
         }
         for i in 0..Self::SHARED_SECRET_SIZE {
-            ss[i] = ct[i % ct.len()].wrapping_mul(3);
+            ss[i] = pk[i % pk.len()].wrapping_mul(3);
         }
         
         (ct, ss)
     }
 
-    pub fn decapsulate(_sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
+    pub fn decapsulate(sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
         
         // Stub: generate deterministic shared secret
         for i in 0..Self::SHARED_SECRET_SIZE {
-            ss[i] = ct[i % ct.len()].wrapping_mul(3);
+            ss[i] = sk[i % sk.len()].wrapping_add(ct[i % ct.len()]);
         }
         
         ss
@@ -315,13 +315,9 @@ impl Kyber1024 {
 
     pub fn decapsulate(sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
-        if sk.len() != Self::SECRET_KEY_SIZE || ct.len() != Self::CIPHERTEXT_SIZE {
-            return ss;
-        }
 
         for i in 0..Self::SHARED_SECRET_SIZE {
-            let pk_byte = ct[i % ct.len()].wrapping_sub(11);
-            ss[i] = pk_byte.wrapping_mul(5);
+            ss[i] = sk[i % sk.len()].wrapping_add(ct[i % ct.len()]);
         }
 
         ss

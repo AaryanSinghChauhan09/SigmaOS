@@ -1560,8 +1560,11 @@ impl<T> Vec<T> {
             self.capacity * 2
         };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if new_data.is_null() {
+            panic!("out of memory");
+        }
 
-        if !new_data.is_null() {
+        if !self.data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
@@ -1569,10 +1572,10 @@ impl<T> Vec<T> {
             if self.capacity > 0 {
                 free(self.data as *mut u8);
             }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
         }
+
+        self.data = new_data;
+        self.capacity = new_capacity;
     }
 }
 

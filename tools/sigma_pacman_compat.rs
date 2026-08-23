@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Pacman & AUR Helper Compatibility Utility (sigma_pacman_compat)
 // Clean-room representation of Arch Linux's core package utility suite (pacman, yay, paru)
 

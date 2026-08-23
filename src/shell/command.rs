@@ -1,5 +1,8 @@
+#![no_std]
+#![no_main]
 #![allow(clippy::all, warnings)]
 
+use crate::sigpkg::PackageImporter;
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
@@ -81,9 +84,19 @@ impl ShellCommand for ImportDebCommand {
 
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError> {
         let mut output = Vec::new();
-        let msg = "Debian package successfully imported to SigmaOS recipe: neofetch\n";
-        for &b in msg.as_bytes() {
-            output.push(b);
+        let raw_control = "Package: neofetch\nVersion: 7.1.0\nDepends: bash, libc6\nDescription: System info script";
+        let importer = crate::sigpkg::DebPackageImporter::new();
+        if let Ok(recipe) = importer.translate_metadata(raw_control) {
+            let msg = "Debian package successfully imported to SigmaOS recipe: ";
+            for &b in msg.as_bytes() {
+                output.push(b);
+            }
+            for &b in recipe.name.as_bytes() {
+                output.push(b);
+            }
+            output.push(b'\n');
+        } else {
+            return Err(CommandError::ExecutionFailed);
         }
         Ok(output)
     }
@@ -102,9 +115,19 @@ impl ShellCommand for ImportRpmCommand {
 
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError> {
         let mut output = Vec::new();
-        let msg = "RPM package successfully imported to SigmaOS recipe: curl\n";
-        for &b in msg.as_bytes() {
-            output.push(b);
+        let raw_spec = "Name: curl\nVersion: 8.4.0\nSummary: Command line tool for transferring data with URLs";
+        let importer = crate::sigpkg::RpmPackageImporter::new();
+        if let Ok(recipe) = importer.translate_metadata(raw_spec) {
+            let msg = "RPM package successfully imported to SigmaOS recipe: ";
+            for &b in msg.as_bytes() {
+                output.push(b);
+            }
+            for &b in recipe.name.as_bytes() {
+                output.push(b);
+            }
+            output.push(b'\n');
+        } else {
+            return Err(CommandError::ExecutionFailed);
         }
         Ok(output)
     }
@@ -123,9 +146,20 @@ impl ShellCommand for ImportPacmanCommand {
 
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError> {
         let mut output = Vec::new();
-        let msg = "Arch Pacman package successfully imported to SigmaOS recipe: neovim\n";
-        for &b in msg.as_bytes() {
-            output.push(b);
+        let raw_pkgbuild =
+            "pkgname=neovim\npkgver=0.9.4\npkgdesc=Vim-fork focused on extensibility and usability";
+        let importer = crate::sigpkg::PacmanPackageImporter::new();
+        if let Ok(recipe) = importer.translate_metadata(raw_pkgbuild) {
+            let msg = "Arch Pacman package successfully imported to SigmaOS recipe: ";
+            for &b in msg.as_bytes() {
+                output.push(b);
+            }
+            for &b in recipe.name.as_bytes() {
+                output.push(b);
+            }
+            output.push(b'\n');
+        } else {
+            return Err(CommandError::ExecutionFailed);
         }
         Ok(output)
     }
@@ -678,5 +712,209 @@ impl CommandHistory for SimpleCommandHistory {
             commands.push(&cmd[..len]);
         }
         commands
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if !self.data.is_null() && self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_size = new_capacity * mem::size_of::<T>();
+        let new_data = alloc(new_size) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                if self.capacity > 0 {
+                    free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                }
+            }
+            self.data = core::ptr::null_mut();
+            self.len = 0;
+            self.capacity = 0;
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8, size: usize) {
+    use std::alloc::{dealloc, Layout};
+    if !ptr.is_null() && size > 0 {
+        let layout = Layout::from_size_align(size, 8).unwrap();
+        dealloc(ptr, layout);
+    }
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8, size: usize);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_builtins_registration() {
+        let mut session = SimpleShellSession::new();
+
+        // Verify all built-ins are registered successfully
+        assert!(session.registry.get(b"sigpkg").is_some());
+        assert!(session.registry.get(b"sigtrace").is_some());
+        assert!(session.registry.get(b"sigmetrics").is_some());
+        assert!(session.registry.get(b"sigstandards").is_some());
+        assert!(session.registry.get(b"sigsched").is_some());
+        assert!(session.registry.get(b"import-deb").is_some());
+        assert!(session.registry.get(b"import-rpm").is_some());
+        assert!(session.registry.get(b"import-pacman").is_some());
+    }
+
+    #[test]
+    fn test_execute_sigpkg() {
+        let mut session = SimpleShellSession::new();
+        let result = session.execute_line(b"sigpkg").unwrap();
+        assert_eq!(&result[..6], b"sigpkg");
+    }
+
+    #[test]
+    fn test_command_history_add_and_list() {
+        let mut history = SimpleCommandHistory::new();
+        history.add(b"sigtrace trace task 256");
+        assert_eq!(history.list().len(), 1);
+        assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
+    }
+
+    #[test]
+    fn test_shell_aliases() {
+        let mut session = SimpleShellSession::new();
+        session.alias_manager.set_alias(b"sp", b"sigpkg install");
+
+        let expanded = session.alias_manager.expand(b"sp nano");
+        assert_eq!(&*expanded, b"sigpkg install nano");
+    }
+
+    #[test]
+    fn test_user_defined_functions() {
+        let mut session = SimpleShellSession::new();
+        session
+            .function_manager
+            .define_function(b"sysup", &[b"sigstandards", b"sigmetrics"]);
+
+        let output = session.execute_line(b"sysup").unwrap();
+        // Since both sub-commands run:
+        assert!(output.contains(&b's'));
+    }
+
+    #[test]
+    fn test_autocomplete_suggestions() {
+        let mut session = SimpleShellSession::new();
+        let suggestions = session.autocomplete.suggest(b"sigs");
+        assert_eq!(suggestions.len(), 2); // sigstandards, sigsched
+    }
+
+    #[test]
+    fn test_shell_optimizer_telemetry() {
+        let mut session = SimpleShellSession::new();
+        let advice_fast = session.optimizer.record_execution(12);
+        assert!(advice_fast.contains("Optimal"));
+
+        let advice_slow = session.optimizer.record_execution(1200);
+        assert!(advice_slow.contains("significant ticks"));
+    }
+
+    #[test]
+    fn test_import_commands() {
+        let mut session = SimpleShellSession::new();
+        let output_deb = session.execute_line(b"import-deb").unwrap();
+        assert!(output_deb.contains(&b'n'));
+
+        let output_rpm = session.execute_line(b"import-rpm").unwrap();
+        assert!(output_rpm.contains(&b'c'));
+
+        let output_pacman = session.execute_line(b"import-pacman").unwrap();
+        assert!(output_pacman.contains(&b'n'));
     }
 }

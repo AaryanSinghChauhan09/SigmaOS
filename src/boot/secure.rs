@@ -84,6 +84,129 @@ impl ComponentInfo {
     }
 }
 
+/// Windows/Linux-inspired Unified Kernel Image (UKI) single-binary payload
+#[derive(Debug, Clone)]
+pub struct UnifiedKernelImage {
+    pub kernel_payload: Vec<u8>,
+    pub initramfs_payload: Vec<u8>,
+    pub cmdline: Vec<u8>,
+    pub signature_dilithium5: [u8; 2592], // Post-quantum signed hash over unified binary
+}
+
+impl UnifiedKernelImage {
+    pub fn new(kernel: Vec<u8>, initramfs: Vec<u8>, cmdline: Vec<u8>) -> Self {
+        UnifiedKernelImage {
+            kernel_payload: kernel,
+            initramfs_payload: initramfs,
+            cmdline,
+            signature_dilithium5: [0u8; 2592],
+        }
+    }
+
+    /// Sign the unified kernel image payload
+    pub fn sign_image(&mut self, signature: [u8; 2592]) {
+        self.signature_dilithium5 = signature;
+    }
+
+    /// Compute raw payload hash
+    pub fn compute_hash(&self) -> u64 {
+        let mut hash = 0u64;
+        for &b in self.kernel_payload.iter() { hash = hash.wrapping_add(b as u64); }
+        for &b in self.initramfs_payload.iter() { hash = hash.wrapping_add(b as u64); }
+        for &b in self.cmdline.iter() { hash = hash.wrapping_add(b as u64); }
+        hash
+    }
+}
+
+/// TPM 2.0 Simulator supporting PCR (Platform Configuration Register) measurements
+pub struct Tpm2Simulator {
+    pub pcr_registers: [u64; 24], // PCR 0 through 23
+}
+
+impl Default for Tpm2Simulator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Tpm2Simulator {
+    pub fn new() -> Self {
+        Tpm2Simulator {
+            pcr_registers: [0u64; 24],
+        }
+    }
+
+    /// Extend PCR register with a new measurement hash (standard TPM 2.0 sha256-like extend)
+    pub fn extend_pcr(&mut self, pcr_index: usize, measurement_hash: u64) -> Result<(), &'static str> {
+        if pcr_index >= 24 {
+            return Err("TPM 2.0: Invalid PCR register index");
+        }
+        let current_val = self.pcr_registers[pcr_index];
+        // PCR extension equation: New_PCR_Value = Hash(Current_PCR_Value || New_Measurement)
+        let extended_val = current_val.wrapping_add(measurement_hash).wrapping_mul(1099511628211);
+        self.pcr_registers[pcr_index] = extended_val;
+        Ok(())
+    }
+
+    /// Sealed secret key release based on PCR policy checks
+    pub fn unseal_key_policy(&self, pcr_index: usize, expected_hash: u64) -> Result<[u8; 32], &'static str> {
+        if pcr_index >= 24 {
+            return Err("TPM 2.0: Invalid PCR index");
+        }
+        if self.pcr_registers[pcr_index] == expected_hash {
+            Ok([0x5A; 32]) // Returns simulated unlocked full-disk encryption key
+        } else {
+            Err("TPM 2.0: PCR verification failed. Sealed secrets cannot be released.")
+        }
+    }
+}
+
+#[cfg(test)]
+mod additional_secure_boot_tests {
+    use super::*;
+
+    #[test]
+    fn test_unified_kernel_image_signing_and_hashing() {
+        let mut uki = UnifiedKernelImage::new(
+            crate::klib::Vec::new(),
+            crate::klib::Vec::new(),
+            crate::klib::Vec::new(),
+        );
+
+        uki.kernel_payload.push(0xDE);
+        uki.initramfs_payload.push(0xAD);
+        uki.cmdline.push(0xBE);
+
+        let hash = uki.compute_hash();
+        assert_eq!(hash, 0xDE + 0xAD + 0xBE);
+
+        // Sign with mock Dilithium-5 signature
+        let mut mock_sig = [0u8; 2592];
+        mock_sig[0] = 0x99;
+        uki.sign_image(mock_sig);
+
+        assert_eq!(uki.signature_dilithium5[0], 0x99);
+    }
+
+    #[test]
+    fn test_tpm2_pcr_measurements_and_policy_sealing() {
+        let mut tpm = Tpm2Simulator::new();
+        assert_eq!(tpm.pcr_registers[0], 0);
+
+        // Extend PCR 0 with firmware hash measurement
+        tpm.extend_pcr(0, 0xABCDE).unwrap();
+        let first_pcr = tpm.pcr_registers[0];
+        assert_ne!(first_pcr, 0);
+
+        // Verify unseal works flawlessly with exact expected policy hash
+        let unsealed_key = tpm.unseal_key_policy(0, first_pcr).unwrap();
+        assert_eq!(unsealed_key, [0x5A; 32]);
+
+        // Verify unseal fails with invalid hash (tampered boot detected)
+        assert!(tpm.unseal_key_policy(0, 0xBADHASH).is_err());
+    }
+}
+
 /// Component capability
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

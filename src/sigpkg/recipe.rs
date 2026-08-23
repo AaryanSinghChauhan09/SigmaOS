@@ -1,58 +1,8 @@
-// SigmaOS Package Recipes (Gentoo Ebuild, Arch PKGBUILD, and FreeBSD Ports parity)
-// Build recipes for package compilation, USE flags, conditional dependencies, checksum arrays, and licenses.
+// SigmaOS Package Recipes
+// Build recipes for package compilation and installation
+// Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
-#![no_std]
-
-#[cfg(test)]
-extern crate std;
-
-extern crate alloc;
-
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::format;
-use alloc::vec::Vec;
-
-#[cfg(test)]
-mod test_types {
-    use alloc::string::String;
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-    pub struct Version {
-        pub major: u64,
-        pub minor: u64,
-        pub patch: u64,
-    }
-    impl Version {
-        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
-        }
-    }
-    impl core::fmt::Display for Version {
-        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-        }
-    }
-    #[derive(Debug, Clone)]
-    pub struct Dependency {
-        pub name: String,
-        pub version_constraint: VersionConstraint,
-    }
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum VersionConstraint {
-        Any,
-    }
-}
-
-#[cfg(test)]
-use test_types::{Version, Dependency, VersionConstraint};
-
-#[cfg(not(test))]
 use crate::sigpkg::{Dependency, Version};
-
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
 use std::collections::HashMap;
 
 /// Build system type
@@ -66,7 +16,25 @@ pub enum BuildSystem {
     Ninja,
 }
 
-/// Package recipe with Gentoo, Arch, and Ports capabilities
+/// Gentoo-inspired compilation optimization profiles (stages)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StageProfile {
+    Stage1Minimal,      // Basic fallback bootstrap flags (-O1, -mno-sse)
+    Stage2Bootstrap,    // Balanced standard optimization (-O2)
+    Stage3Optimized,    // Maximum architecture-targeted performance (-O3 -march=native -flto)
+}
+
+/// Gentoo-style Portage USE flags representing conditional package compilation features
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UseFlag {
+    Ssl,
+    Threads,
+    X11,
+    Gpu,
+    Sound,
+}
+
+/// Package recipe
 #[derive(Debug, Clone)]
 pub struct PackageRecipe {
     pub name: String,
@@ -80,16 +48,10 @@ pub struct PackageRecipe {
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
 
-    // Gentoo-style USE flags and conditional dependencies
-    pub use_flags: HashMap<String, bool>,
-    pub conditional_dependencies: Vec<(String, Dependency)>, // use_flag -> conditional dependency
-
-    // Arch Linux-style checksum arrays & supported architectures
-    pub sha256sums: Vec<String>,
-    pub supported_archs: Vec<String>,
-
-    // FreeBSD ports-style licenses and config options
-    pub license: String,
+    // Gentoo-inspired features
+    pub active_use_flags: Vec<UseFlag>,
+    pub compilation_profile: StageProfile,
+    pub conditional_dependencies: Vec<(UseFlag, Dependency)>, // Dependency unlocked ONLY if USE flag is active
 }
 
 impl PackageRecipe {
@@ -105,11 +67,9 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
-            use_flags: HashMap::new(),
+            active_use_flags: Vec::new(),
+            compilation_profile: StageProfile::Stage2Bootstrap,
             conditional_dependencies: Vec::new(),
-            sha256sums: Vec::new(),
-            supported_archs: Vec::new(),
-            license: "MIT".to_string(),
         }
     }
 
@@ -125,7 +85,6 @@ impl PackageRecipe {
 
     pub fn with_source(mut self, url: String, hash: String) -> Self {
         self.source_url = url;
-        self.sha256sums.push(hash.clone());
         self.hash = hash;
         self
     }
@@ -145,42 +104,49 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.build_commands.insert(0, command);
-        self
-    }
-
-    pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
-        self
-    }
-
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
         self
     }
 
-    /// Gentoo ebuild builder helper: registers a USE flag with its default state
-    pub fn with_use_flag(mut self, flag_name: &str, enabled: bool) -> Self {
-        self.use_flags.insert(flag_name.to_string(), enabled);
+    // Builder helpers for USE flags and compilation profiles
+    pub fn with_use_flag(mut self, flag: UseFlag) -> Self {
+        self.active_use_flags.push(flag);
         self
     }
 
-    /// Gentoo ebuild builder helper: registers a dependency activated only if a specific USE flag is enabled
-    pub fn with_conditional_dependency(mut self, use_flag: &str, dep: Dependency) -> Self {
-        self.conditional_dependencies.push((use_flag.to_string(), dep));
+    pub fn with_compilation_profile(mut self, profile: StageProfile) -> Self {
+        self.compilation_profile = profile;
         self
     }
 
-    /// Arch-style builder helper: registers multiple supported architectures
-    pub fn with_arch(mut self, arch: &str) -> Self {
-        self.supported_archs.push(arch.to_string());
+    pub fn with_conditional_dependency(mut self, flag: UseFlag, dependency: Dependency) -> Self {
+        self.conditional_dependencies.push((flag, dependency));
         self
     }
 
-    /// Ports-style builder helper: configures package license type
-    pub fn with_license(mut self, lic: &str) -> Self {
-        self.license = lic.to_string();
-        self
+    pub fn is_use_active(&self, flag: UseFlag) -> bool {
+        self.active_use_flags.contains(&flag)
+    }
+
+    /// Evaluates and returns all active dependencies including conditional USE-flag targets
+    pub fn get_active_dependencies(&self) -> Vec<Dependency> {
+        let mut deps = self.dependencies.clone();
+        for (flag, dep) in self.conditional_dependencies.iter() {
+            if self.is_use_active(*flag) {
+                deps.push(dep.clone());
+            }
+        }
+        deps
+    }
+
+    /// Returns CFLAGS/CXXFLAGS compilation flags matching the active Stage Profile
+    pub fn get_stage_optimization_flags(&self) -> &'static str {
+        match self.compilation_profile {
+            StageProfile::Stage1Minimal => "-O1 -mno-sse2",
+            StageProfile::Stage2Bootstrap => "-O2 -pipe",
+            StageProfile::Stage3Optimized => "-O3 -march=native -flto=fat -funroll-loops",
+        }
     }
 
     pub fn validate(&self) -> Result<(), RecipeError> {
@@ -212,17 +178,6 @@ impl PackageRecipe {
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
         }
-    }
-
-    /// Returns all active dependencies, consolidating static and active conditional USE flag dependencies
-    pub fn resolve_active_dependencies(&self) -> Vec<Dependency> {
-        let mut active: Vec<Dependency> = self.dependencies.clone();
-        for (flag, dep) in &self.conditional_dependencies {
-            if let Some(&true) = self.use_flags.get(flag) {
-                active.push(dep.clone());
-            }
-        }
-        active
     }
 }
 
@@ -339,37 +294,38 @@ mod tests {
     }
 
     #[test]
-    fn test_distro_inspired_ebuild_ports_features() {
-        let ssl_dep = Dependency {
-            name: "openssl".to_string(),
-            version_constraint: VersionConstraint::Any,
-        };
-        let mut recipe = PackageRecipe::new("nginx-sovereign".to_string(), Version::new(1, 25, 0))
-            .with_source("https://nginx.org/nginx-1.25.0.tar.gz".to_string(), "sha-abc-123".to_string())
-            .with_build_command("make".to_string())
-            .with_license("BSD-2-Clause")
-            .with_arch("x86_64")
-            .with_arch("aarch64")
-            // 1. Gentoo ebuild USE flags
-            .with_use_flag("ssl", true)
-            .with_use_flag("http2", false)
-            // 2. Conditional ebuild dependencies
-            .with_conditional_dependency("ssl", ssl_dep);
+    fn test_portage_style_use_flags() {
+        let mut recipe = PackageRecipe::new("libcurl".to_string(), Version::new(8, 2, 1))
+            .with_source("https://example.com/curl".to_string(), "99aa88".to_string())
+            .with_build_command("make".to_string());
 
-        // Under enabled 'ssl' flag, should pull in openssl dependency
-        let active_deps = recipe.resolve_active_dependencies();
+        // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
+        let ssl_dependency = Dependency {
+            name: "openssl".to_string(),
+            version: Version::new(3, 0, 0),
+        };
+
+        recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);
+
+        // 1. By default, "Ssl" is inactive, so no conditional dependency is fetched
+        assert!(!recipe.is_use_active(UseFlag::Ssl));
+        assert_eq!(recipe.get_active_dependencies().len(), 0);
+
+        // 2. Toggle "Ssl" active
+        recipe = recipe.with_use_flag(UseFlag::Ssl);
+        assert!(recipe.is_use_active(UseFlag::Ssl));
+
+        let active_deps = recipe.get_active_dependencies();
         assert_eq!(active_deps.len(), 1);
         assert_eq!(active_deps[0].name, "openssl");
+    }
 
-        // Toggle 'ssl' flag off -> conditional dependency is no longer active
-        recipe.use_flags.insert("ssl".to_string(), false);
-        let active_deps_off = recipe.resolve_active_dependencies();
-        assert_eq!(active_deps_off.len(), 0);
+    #[test]
+    fn test_portage_stage_optimization_flags() {
+        let mut recipe = PackageRecipe::new("kernel".to_string(), Version::new(6, 1, 0));
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O2 -pipe"); // default Stage2
 
-        // Verify Arch & Ports metadata
-        assert_eq!(recipe.license, "BSD-2-Clause");
-        assert_eq!(recipe.supported_archs.len(), 2);
-        assert_eq!(recipe.supported_archs[1], "aarch64");
-        assert_eq!(recipe.sha256sums[0], "sha-abc-123");
+        recipe = recipe.with_compilation_profile(StageProfile::Stage3Optimized);
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O3 -march=native -flto=fat -funroll-loops");
     }
 }

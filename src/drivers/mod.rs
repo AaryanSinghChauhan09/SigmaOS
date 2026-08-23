@@ -22,6 +22,13 @@ pub mod touch_jingos;
 // Exposing additional audio, printer, wifi drivers
 pub mod legacy_parallel_printer;
 
+// Exposing additional audio, printer, wifi drivers
+pub mod legacy_audio_ac97;
+pub mod modern_audio_intel_hda;
+pub mod legacy_parallel_printer;
+pub mod modern_usb_printer;
+pub mod modern_wifi;
+
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_keyboard::LegacyKeyboard;

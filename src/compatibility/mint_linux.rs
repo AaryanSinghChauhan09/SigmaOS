@@ -4,57 +4,7 @@
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(feature = "standalone_test"))]
 use crate::klib::Vec;
-
-#[cfg(feature = "standalone_test")]
-extern crate alloc;
-#[cfg(feature = "standalone_test")]
-use alloc::vec::Vec;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MintError {
-    LayoutFailed,
-    UpdateError,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct WindowCoordinates {
-    pub x: usize,
-    pub y: usize,
-    pub width: usize,
-    pub height: usize,
-}
-
-#[derive(Debug, Clone)]
-pub struct SoftwareMeta {
-    pub name: [u8; 32],
-    pub rating: usize,
-}
-
-#[derive(Debug, Clone)]
-pub struct MintUpdateItem {
-    pub package_name: [u8; 32],
-    pub version: [u8; 16],
-    pub level: MintUpdateLevel,
-}
-
-#[derive(Debug, Clone)]
-pub struct ZenithDisplayCompositor {
-    pub active_layout: [u8; 32],
-}
-
-impl ZenithDisplayCompositor {
-    pub fn new() -> Self {
-        Self { active_layout: [0u8; 32] }
-    }
-}
-
-impl Default for ZenithDisplayCompositor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintUpdateLevel {
@@ -274,11 +224,13 @@ impl MintSoftwareManager {
         self.apps_catalog.push(app);
     }
 
+    /// Filters catalog by category.
     pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
         let mut filtered = Vec::new();
+        let cat_len = category.len().min(15);
         for app in self.apps_catalog.iter() {
             let mut matches = true;
-            for i in 0..category.len().min(15) {
+            for i in 0..cat_len {
                 if app.category[i] != category[i] {
                     matches = false;
                     break;
@@ -291,144 +243,18 @@ impl MintSoftwareManager {
         filtered
     }
 
+    /// Returns apps ranked by user ratings (Featured Apps).
     pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
         let mut sorted = self.apps_catalog.clone();
-        let len = sorted.len();
-        for i in 0..len {
-            for j in 0..len.saturating_sub(i).saturating_sub(1) {
+        // Simple bubble sort over vector to rank featured apps without external traits
+        for i in 0..sorted.len() {
+            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
                 if sorted[j].rating_stars < sorted[j + 1].rating_stars {
                     sorted.swap(j, j + 1);
                 }
             }
         }
         sorted
-    }
-
-    /// Arrange windows using Stacking layout (Cascaded coordinations)
-    pub fn arrange_stacking(
-        num_windows: usize,
-        coords: &mut [WindowCoordinates],
-    ) -> Result<(), &'static str> {
-        for i in 0..num_windows {
-            if i >= coords.len() {
-                return Err("Layout failed");
-            }
-            coords[i] = WindowCoordinates {
-                x: i * 30,
-                y: i * 30,
-                width: 800,
-                height: 600,
-            };
-        }
-        Ok(())
-    }
-}
-
-// ==========================================
-// Cinnamon Desktop Theme Engine
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CinnamonDesklet {
-    pub id: u32,
-    pub x: usize,
-    pub y: usize,
-}
-
-pub struct CinnamonThemeEngine {
-    pub active_gtk_theme: [u8; 32],
-    pub desklets: Vec<Option<CinnamonDesklet>>,
-    pub is_panel_enabled: bool,
-}
-
-impl CinnamonThemeEngine {
-    pub fn new() -> Self {
-        let mut theme = [0u8; 32];
-        let default_name = b"Mint-Y-Dark";
-        unsafe {
-            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
-        }
-        Self {
-            active_gtk_theme: theme,
-            desklets: Vec::new(),
-            is_panel_enabled: true,
-        }
-    }
-
-    pub fn set_gtk_theme(&mut self, theme_name: &[u8]) {
-        let mut theme = [0u8; 32];
-        let len = theme_name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(theme_name.as_ptr(), theme.as_mut_ptr(), len);
-        }
-        self.active_gtk_theme = theme;
-    }
-
-    pub fn add_desklet(&mut self, id: u32, x: usize, y: usize) {
-        self.desklets.push(Some(CinnamonDesklet { id, x, y }));
-    }
-}
-
-impl Default for CinnamonThemeEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// Timeshift-style System Restorer
-// ==========================================
-
-#[derive(Debug, Clone, Copy)]
-pub struct SystemRestorePoint {
-    pub id: u32,
-    pub is_rsync: bool,
-    pub timestamp_ms: u64,
-}
-
-pub struct TimeshiftSystemRestorer {
-    pub restore_points: Vec<Option<SystemRestorePoint>>,
-    pub active_restore_point_id: u32,
-}
-
-impl TimeshiftSystemRestorer {
-    pub fn new() -> Self {
-        Self {
-            restore_points: Vec::new(),
-            active_restore_point_id: 0,
-        }
-    }
-
-    pub fn create_restore_point(&mut self, id: u32, is_rsync: bool) {
-        self.restore_points.push(Some(SystemRestorePoint {
-            id,
-            is_rsync,
-            timestamp_ms: 0,
-        }));
-    }
-
-    pub fn rollback_system(&mut self, id: u32) -> Result<(), &'static str> {
-        let mut found = false;
-        for i in 0..self.restore_points.len() {
-            if let Some(ref rp) = self.restore_points[i] {
-                if rp.id == id {
-                    found = true;
-                    break;
-                }
-            }
-        }
-        if found {
-            self.active_restore_point_id = id;
-            Ok(())
-        } else {
-            Err("Update error")
-        }
-    }
-}
-
-impl Default for TimeshiftSystemRestorer {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -726,22 +552,20 @@ mod tests {
         let hash = timeshift.restore_checkpoint(1).unwrap();
         assert_eq!(hash, 0xDEADBEEF);
 
-        let mut engine = CinnamonThemeEngine::new();
-        engine.add_desklet(101, 200, 200);
-        assert_eq!(engine.desklets.len(), 1);
-        assert_eq!(engine.desklets[0].unwrap().id, 101);
+        assert!(timeshift.restore_checkpoint(99).is_err());
     }
 
     #[test]
     fn test_mint_cinnamon_styling_options() {
-        let style = MintCinnamonStyling::default();
+        let mut style = MintCinnamonStyling::default();
         assert_eq!(style.panel_height, 40);
         assert!(style.window_effects_enabled);
 
-        let mut restorer = TimeshiftSystemRestorer::new();
-        restorer.create_restore_point(101, true); // rsync snapshot
-        restorer.create_restore_point(102, false); // btrfs snapshot
-        assert_eq!(restorer.restore_points.len(), 2);
+        style.configure_workspace(36, true, 85, false);
+        assert_eq!(style.panel_height, 36);
+        assert!(style.menu_layout_compact);
+        assert_eq!(style.opacity_percent, 85);
+        assert!(!style.window_effects_enabled);
     }
 
     #[test]

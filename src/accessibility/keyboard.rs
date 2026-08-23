@@ -110,7 +110,7 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
     fn press_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError> {
         for key_option in &mut self.keys {
             if let Some(ref mut key) = *key_option {
-                if (&**key).id() == key_id {
+                if key.id() == key_id {
                     key.set_pressed(true);
                     return Ok(());
                 }
@@ -122,7 +122,7 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
     fn release_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError> {
         for key_option in &mut self.keys {
             if let Some(ref mut key) = *key_option {
-                if (&**key).id() == key_id {
+                if key.id() == key_id {
                     key.set_pressed(false);
                     return Ok(());
                 }
@@ -134,8 +134,8 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
     fn get_key(&self, id: KeyID) -> Option<&dyn VirtualKey> {
         for key_option in &self.keys {
             if let Some(ref key) = *key_option {
-                if (&**key).id() == id {
-                    return Some(&**key);
+                if key.id() == id {
+                    return Some(key.as_ref());
                 }
             }
         }

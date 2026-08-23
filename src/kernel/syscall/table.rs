@@ -1,14 +1,11 @@
-use core::sync::atomic::{AtomicU64, AtomicBool, Ordering};
+use core::sync::atomic::{AtomicU64, Ordering};
 /// SigmaOS System Call Table — Phase K expansion
 /// Absorbs Linux syscall interface: POSIX-complete table with 300+ syscalls
 /// Categories: fs, mm, proc, net, time, signal, ipc, sched, crypto, io_uring
+/// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
+/// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-
-#[cfg(test)]
-use std::collections::HashMap;
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -256,136 +253,12 @@ impl SyscallHandler for BrkHandler {
     }
 }
 
-// =========================================================================
-// WDK-Style Control Registers, SSDT, and PatchGuard Subsystems
-// =========================================================================
-
-/// x86_64 CR0 Register simulation. Specifically tracks the Write Protect (WP) bit
-pub struct ControlRegister0 {
-    pub value: AtomicU64,
-}
-
-impl ControlRegister0 {
-    pub const WP_BIT: u64 = 1 << 16;
-
-    pub const fn new() -> Self {
-        Self {
-            value: AtomicU64::new(Self::WP_BIT), // WP enabled by default (standard secure kernel)
-        }
-    }
-
-    pub fn set_write_protect(&self, enabled: bool) {
-        if enabled {
-            self.value.fetch_or(Self::WP_BIT, Ordering::SeqCst);
-        } else {
-            self.value.fetch_and(!Self::WP_BIT, Ordering::SeqCst);
-        }
-    }
-
-    pub fn is_write_protect_active(&self) -> bool {
-        (self.value.load(Ordering::SeqCst) & Self::WP_BIT) != 0
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BugCheckCode {
-    CriticalStructureCorruption = 0x109,       // KPP / PatchGuard trigger
-    AttemptedWriteToReadonlyMemory = 0xBE,       // MMU WP protection trigger
-}
-
-/// Simulated KeServiceDescriptorTable (SSDT) mapping Service IDs to function pointer handlers
-pub struct ServiceDescriptorTableEntry {
-    pub service_table_base: Vec<u64>, // Simulated pointer table to registered syscalls
-    pub number_of_services: usize,
-}
-
-pub struct KeServiceDescriptorTable {
-    pub entry: ServiceDescriptorTableEntry,
-    pub original_checksum: u64,
-}
-
-impl KeServiceDescriptorTable {
-    pub fn new() -> Self {
-        let mut table_base = vec![0u64; 600];
-        // Pre-fill indices with dummy original entry addresses
-        for i in 0..600 {
-            table_base[i] = 0x1000_0000 + (i * 0x1000) as u64;
-        }
-
-        let checksum = Self::calculate_checksum_base(&table_base);
-
-        Self {
-            entry: ServiceDescriptorTableEntry {
-                service_table_base: table_base,
-                number_of_services: 600,
-            },
-            original_checksum: checksum,
-        }
-    }
-
-    fn calculate_checksum_base(table: &[u64]) -> u64 {
-        let mut sum = 0;
-        for (i, &addr) in table.iter().enumerate() {
-            sum ^= addr.wrapping_add(i as u64);
-        }
-        sum
-    }
-
-    pub fn calculate_checksum(&self) -> u64 {
-        Self::calculate_checksum_base(&self.entry.service_table_base)
-    }
-
-    /// Attempts to write/patch the SSDT. Respects CR0 WP bit, triggering a Bug Check if violated!
-    pub fn patch_service_routine(&mut self, service_id: usize, new_address: u64, cr0: &ControlRegister0) -> Result<(), BugCheckCode> {
-        if cr0.is_write_protect_active() {
-            // Memory is Read-Only! Modifying it triggers immediate ATTEMPTED_WRITE_TO_READONLY_MEMORY
-            return Err(BugCheckCode::AttemptedWriteToReadonlyMemory);
-        }
-
-        if service_id < self.entry.number_of_services {
-            self.entry.service_table_base[service_id] = new_address;
-        }
-        Ok(())
-    }
-}
-
-/// Kernel Patch Protection (KPP / PatchGuard) Daemon
-pub struct PatchGuard {
-    pub is_active: AtomicBool,
-}
-
-impl PatchGuard {
-    pub const fn new() -> Self {
-        Self {
-            is_active: AtomicBool::new(true),
-        }
-    }
-
-    /// Verifies critical kernel SSDT structures, triggering a Bug Check on unauthorized corruption!
-    pub fn verify_integrity(&self, ssdt: &KeServiceDescriptorTable) -> Result<(), BugCheckCode> {
-        if !self.is_active.load(Ordering::SeqCst) {
-            return Ok(());
-        }
-
-        let current_checksum = ssdt.calculate_checksum();
-        if current_checksum != ssdt.original_checksum {
-            // Unauthorized system hook detected! Trigger CRITICAL_STRUCTURE_CORRUPTION
-            return Err(BugCheckCode::CriticalStructureCorruption);
-        }
-        Ok(())
-    }
-}
-
 // ── Syscall dispatch table ────────────────────────────────────────────────
 
 pub struct SyscallTable {
     handlers: HashMap<u64, Box<dyn SyscallHandler>>,
     calls_dispatched: AtomicU64,
     calls_unsupported: AtomicU64,
-    // Native WDK objects
-    pub cr0: ControlRegister0,
-    pub ssdt: KeServiceDescriptorTable,
-    pub patch_guard: PatchGuard,
 }
 
 impl SyscallTable {
@@ -394,9 +267,6 @@ impl SyscallTable {
             handlers: HashMap::new(),
             calls_dispatched: AtomicU64::new(0),
             calls_unsupported: AtomicU64::new(0),
-            cr0: ControlRegister0::new(),
-            ssdt: KeServiceDescriptorTable::new(),
-            patch_guard: PatchGuard::new(),
         };
         // Register built-ins
         table.register(Box::new(GetpidHandler { pid: 1 }));
@@ -413,7 +283,7 @@ impl SyscallTable {
 
     pub fn dispatch(&self, args: &SyscallArgs) -> SyscallResult {
         self.calls_dispatched.fetch_add(1, Ordering::Relaxed);
-        if let Some(ref handler) = self.handlers.get(&(args.nr as u64)) {
+        if let Some(handler) = self.handlers.get(&(args.nr as u64)) {
             handler.handle(args)
         } else {
             self.calls_unsupported.fetch_add(1, Ordering::Relaxed);
@@ -436,7 +306,7 @@ impl SyscallTable {
         let mut names: Vec<String> = self
             .handlers
             .values()
-            .map(|h: &Box<dyn SyscallHandler>| h.name().to_string())
+            .map(|h| h.name().to_string())
             .collect();
         names.sort();
         names
@@ -446,6 +316,105 @@ impl SyscallTable {
 impl Default for SyscallTable {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ── Kernel Exporter, SSDT & Anti-Rootkit Guard (Windows/Linux/BSD inspired) ──
+
+/// Represents a compiled kernel function symbol (PE export or /proc/kallsyms equivalent)
+#[derive(Debug, Clone)]
+pub struct KernelSymbol {
+    pub name: String,
+    pub address: u64,
+    pub module_owner: String,
+}
+
+/// System Service Descriptor Table (SSDT) element mapping
+#[derive(Debug, Clone, Copy)]
+pub struct SsdtEntry {
+    pub service_number: u32,
+    pub service_routine_address: u64,
+}
+
+/// Interrupt Descriptor Table (IDT) handler entry
+#[derive(Debug, Clone, Copy)]
+pub struct IdtEntry {
+    pub interrupt_vector: u8,
+    pub handler_address: u64,
+}
+
+/// Anti-Rootkit System Call tampering detector
+pub struct AntiRootkitGuard {
+    pub shadow_ssdt: HashMap<u32, u64>, // Pristine service_number -> address copy
+    pub shadow_idt: HashMap<u8, u64>,   // Pristine interrupt_vector -> handler_address copy
+}
+
+impl Default for AntiRootkitGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AntiRootkitGuard {
+    pub fn new() -> Self {
+        AntiRootkitGuard {
+            shadow_ssdt: HashMap::new(),
+            shadow_idt: HashMap::new(),
+        }
+    }
+
+    /// Backups a pristine snapshot of the SSDT pointers
+    pub fn snapshot_pristine_table(&mut self, active_ssdt: &[SsdtEntry]) {
+        for entry in active_ssdt {
+            self.shadow_ssdt.insert(entry.service_number, entry.service_routine_address);
+        }
+    }
+
+    /// Backups a pristine snapshot of the IDT handler pointers (anti IDT hooking)
+    pub fn snapshot_pristine_idt(&mut self, active_idt: &[IdtEntry]) {
+        for entry in active_idt {
+            self.shadow_idt.insert(entry.interrupt_vector, entry.handler_address);
+        }
+    }
+
+    /// Audits the active SSDT pointer addresses against the shadow snapshot to detect rootkit hooking!
+    /// Returns a list of corrupted / hooked service numbers.
+    pub fn audit_system_service_table(&self, active_ssdt: &[SsdtEntry]) -> Vec<u32> {
+        let mut hijacked_services = Vec::new();
+        for entry in active_ssdt {
+            if let Some(&pristine_address) = self.shadow_ssdt.get(&entry.service_number) {
+                if entry.service_routine_address != pristine_address {
+                    hijacked_services.push(entry.service_number); // Tampering detected!
+                }
+            }
+        }
+        hijacked_services
+    }
+
+    /// Audits the active IDT handler addresses to detect IDT hijacking (keyboard/interrupt snorters)
+    pub fn audit_interrupt_table(&self, active_idt: &[IdtEntry]) -> Vec<u8> {
+        let mut hijacked_interrupts = Vec::new();
+        for entry in active_idt {
+            if let Some(&pristine_handler) = self.shadow_idt.get(&entry.interrupt_vector) {
+                if entry.handler_address != pristine_handler {
+                    hijacked_interrupts.push(entry.interrupt_vector);
+                }
+            }
+        }
+        hijacked_interrupts
+    }
+
+    /// Detects Direct Kernel Object Manipulation (DKOM) process-hiding rootkits.
+    /// Walks the active scheduler thread queue and verifies if any process is missing
+    /// from the high-level process manager catalog.
+    pub fn audit_dkom_process_hiding(&self, scheduler_pids: &[u64], catalog_pids: &[u64]) -> Vec<u64> {
+        let mut hidden_pids = Vec::new();
+        for &pid in scheduler_pids {
+            if !catalog_pids.contains(&pid) {
+                hidden_pids.push(pid); // Process resides in execution queue but is hidden from catalog!
+            }
+        }
+        hidden_pids
     }
 }
 
@@ -550,56 +519,82 @@ mod tests {
         assert!(names.contains(&"brk".to_string()));
     }
 
-    // =====================================================================
-    // WDK-Style Subsystem Tests
-    // =====================================================================
-
     #[test]
-    fn test_cr0_wp_toggling() {
-        let cr0 = ControlRegister0::new();
-        assert!(cr0.is_write_protect_active());
-
-        // Toggle WP off (permitting hooks / updates)
-        cr0.set_write_protect(false);
-        assert!(!cr0.is_write_protect_active());
-
-        // Toggle WP back on
-        cr0.set_write_protect(true);
-        assert!(cr0.is_write_protect_active());
+    fn test_kernel_symbol_exporters() {
+        let sym = KernelSymbol {
+            name: "NtCreateFile".to_string(),
+            address: 0xFFFFFFFF80012000,
+            module_owner: "ntoskrnl.exe".to_string(),
+        };
+        assert_eq!(sym.name, "NtCreateFile");
+        assert_eq!(sym.address, 0xFFFFFFFF80012000);
+        assert_eq!(sym.module_owner, "ntoskrnl.exe");
     }
 
     #[test]
-    fn test_ssdt_hook_protection_and_bug_check() {
-        let cr0 = ControlRegister0::new();
-        let mut ssdt = KeServiceDescriptorTable::new();
+    fn test_ssdt_anti_rootkit_tampering_guard() {
+        let pristine_ssdt = [
+            SsdtEntry { service_number: 0, service_routine_address: 0x801000 }, // NtRead
+            SsdtEntry { service_number: 1, service_routine_address: 0x802000 }, // NtWrite
+        ];
 
-        // 1. With CR0 WP active, patching SSDT should fail with ATTEMPTED_WRITE_TO_READONLY_MEMORY
-        assert_eq!(cr0.is_write_protect_active(), true);
-        let res_blocked = ssdt.patch_service_routine(12, 0x1000_9000, &cr0);
-        assert_eq!(res_blocked, Err(BugCheckCode::AttemptedWriteToReadonlyMemory));
+        let mut guard = AntiRootkitGuard::new();
+        guard.snapshot_pristine_table(&pristine_ssdt);
 
-        // 2. Disable CR0 WP, patch SSDT successfully
-        cr0.set_write_protect(false);
-        let res_allowed = ssdt.patch_service_routine(12, 0x1000_9000, &cr0);
-        assert!(res_allowed.is_ok());
-        assert_eq!(ssdt.entry.service_table_base[12], 0x1000_9000);
+        // Audit clean SSDT -> should return no hijacked service numbers
+        let clean_violations = guard.audit_system_service_table(&pristine_ssdt);
+        assert!(clean_violations.is_empty());
+
+        // Simulate rootkit hooking NtWrite (service_number 1 redirecting address to rootkit_jmp_cave)
+        let hooked_ssdt = [
+            SsdtEntry { service_number: 0, service_routine_address: 0x801000 },
+            SsdtEntry { service_number: 1, service_routine_address: 0x909090 }, // Redirection!
+        ];
+
+        let hooked_violations = guard.audit_system_service_table(&hooked_ssdt);
+        assert_eq!(hooked_violations.len(), 1);
+        assert_eq!(hooked_violations[0], 1); // TAMPERING DETECTED ON SERVICE_NUMBER 1!
     }
 
     #[test]
-    fn test_patch_guard_and_integrity_checks() {
-        let cr0 = ControlRegister0::new();
-        let mut ssdt = KeServiceDescriptorTable::new();
-        let pg = PatchGuard::new();
+    fn test_idt_hooking_audits() {
+        let pristine_idt = [
+            IdtEntry { interrupt_vector: 0x03, handler_address: 0x1010 }, // Breakpoint
+            IdtEntry { interrupt_vector: 0x0E, handler_address: 0x2020 }, // Page Fault
+        ];
 
-        // Verify initial state is clean
-        assert!(pg.verify_integrity(&ssdt).is_ok());
+        let mut guard = AntiRootkitGuard::new();
+        guard.snapshot_pristine_idt(&pristine_idt);
 
-        // Disable write protection and patch/hook SSDT
-        cr0.set_write_protect(false);
-        ssdt.patch_service_routine(50, 0xAA55_BB66, &cr0).unwrap();
+        let clean_idt_violations = guard.audit_interrupt_table(&pristine_idt);
+        assert!(clean_idt_violations.is_empty());
 
-        // Integrity check should now detect the rootkit hook and trigger CRITICAL_STRUCTURE_CORRUPTION
-        let integrity_res = pg.verify_integrity(&ssdt);
-        assert_eq!(integrity_res, Err(BugCheckCode::CriticalStructureCorruption));
+        // Simulate IDT Hooking of Breakpoint handler by a rootkit
+        let hooked_idt = [
+            IdtEntry { interrupt_vector: 0x03, handler_address: 0x6660 }, // Redirected!
+            IdtEntry { interrupt_vector: 0x0E, handler_address: 0x2020 },
+        ];
+
+        let hooked_idt_violations = guard.audit_interrupt_table(&hooked_idt);
+        assert_eq!(hooked_idt_violations.len(), 1);
+        assert_eq!(hooked_idt_violations[0], 0x03);
     }
+
+    #[test]
+    fn test_dkom_process_hiding_detection() {
+        let guard = AntiRootkitGuard::new();
+
+        // 1. Clean state: Scheduler active PIDs match high-level Process Catalog
+        let scheduler_pids = [1, 100, 501];
+        let catalog_pids = [1, 100, 501];
+        let clean_dkom = guard.audit_dkom_process_hiding(&scheduler_pids, &catalog_pids);
+        assert!(clean_dkom.is_empty());
+
+        // 2. DKOM active: Rootkit unlinked process 501 from high-level catalog, but process is still running/executing in scheduler queues!
+        let catalog_pids_hooked = [1, 100];
+        let hijacked_dkom = guard.audit_dkom_process_hiding(&scheduler_pids, &catalog_pids_hooked);
+        assert_eq!(hijacked_dkom.len(), 1);
+        assert_eq!(hijacked_dkom[0], 501); // HIDDEN/DKOM TAMPERED PROCESS DETECTED!
+    }
+}
 }
