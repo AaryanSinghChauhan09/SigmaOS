@@ -248,7 +248,6 @@ impl Default for SecurityProfileTemplateStore {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

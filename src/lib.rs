@@ -1,6 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod ai;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -48,12 +49,6 @@ pub mod hardware {
 }
 pub mod power {
     pub mod governor;
-}
-pub mod ai {
-    pub mod agent;
-    pub mod next_gen;
-    pub mod orchestrator;
-    pub mod wandr;
 }
 pub mod boot;
 pub mod toolchain {
@@ -219,7 +214,7 @@ pub use unimplemented_tools::{
     DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
     AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
     MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
+    AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
     CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
     SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
     PluginMarketplace, MusicLibraryManager, TimeMachineBackup, SysinternalsProcMon, SystemdCgTop,

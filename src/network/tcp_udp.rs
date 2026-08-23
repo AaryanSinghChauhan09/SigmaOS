@@ -1,9 +1,10 @@
-use core::mem;
-/// OOP-based Networking Stack (TCP/UDP) for SigmaOS
-/// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
-/// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
-/// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
-use core::sync::atomic::{AtomicUsize, Ordering};
+//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -432,6 +433,7 @@ impl NetfilterFirewall {
     }
 }
 
+
 pub trait ZeroCopy {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError>;
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError>;
@@ -672,7 +674,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self.sockets.iter().position(|s| s.id() == id) {
+        if let Some(pos) = self.sockets.iter().position(|s: &Box<dyn Socket>| s.id() == id) {
             self.sockets.remove(pos);
             Ok(())
         } else {
@@ -681,14 +683,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        for socket_option in &self.sockets {
-            if let Some(ref socket) = *socket_option {
-                if socket.id() == id {
-                    return Some(socket.as_ref());
-                }
-            }
-        }
-        None
+        self.sockets.iter().find(|s: &Box<dyn Socket>| s.id() == id).map(|s: &Box<dyn Socket>| s.as_ref())
     }
 }
 
@@ -699,9 +694,9 @@ mod tests {
 
     #[test]
     fn test_tcp_socket_flow() {
-        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
+        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 80);
         assert_eq!(socket.id(), 1);
-        assert_eq!(socket.protocol(), Protocol::TCP);
+        assert_eq!(socket.protocol(), Protocol::Tcp);
         assert!(socket.listen().is_ok());
         assert!(socket.connect(8080).is_ok());
         assert_eq!(socket.get_state(), TCPState::Established);
@@ -729,9 +724,9 @@ mod tests {
 
     #[test]
     fn test_udp_socket_flow() {
-        let mut socket = SimpleSocket::new(2, Protocol::UDP, 53);
+        let mut socket = SimpleSocket::new(2, Protocol::Udp, 53);
         assert_eq!(socket.id(), 2);
-        assert_eq!(socket.protocol(), Protocol::UDP);
+        assert_eq!(socket.protocol(), Protocol::Udp);
 
         let data = b"dnsreq";
         assert_eq!(socket.sendto(data, 53).unwrap(), 6);

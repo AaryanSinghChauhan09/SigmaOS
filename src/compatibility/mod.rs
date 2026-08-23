@@ -1,29 +1,27 @@
 // SigmaOS Compatibility Module
 pub mod absorb_tools;
-pub mod antix;
 pub mod apache_ossie;
-pub mod arch_linux;
-pub mod canonical;
 pub mod chimera_linux;
 pub mod cross_platform;
-pub mod cross_platform_kernel;
-pub mod fedora;
-pub mod gap_closure;
 pub mod historic_linux;
-pub mod india_professional_tools;
-pub mod india_stack_localization;
-pub mod interim;
-pub mod legacy_adapters;
-pub mod lubuntu;
 pub mod mint_linux;
-pub mod open_source_tier1;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod sovereign_suite;
+pub mod india_stack_localization;
+pub mod legacy_adapters;
+pub mod india_professional_tools;
+pub mod canonical;
+pub mod fedora;
+pub mod arch_linux;
+pub mod gap_closure;
 pub mod superiority;
-pub mod tiny_core;
+pub mod open_source_tier1;
+pub mod interim;
+pub mod lubuntu;
+pub mod cross_platform_kernel;
 pub mod wasm_sandbox;
-pub mod zorin;
+pub mod tiny_core;
+pub mod sovereign_suite;
 
 pub use gap_closure::{
     KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
@@ -104,9 +102,6 @@ pub use absorb_tools::{
     PledgeUnveilSandbox, PqcSecureChannel,
 };
 
-pub use antix::*;
-pub use zorin::*;
-pub use legacy_adapters::*;
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 
 pub use apache_ossie::{

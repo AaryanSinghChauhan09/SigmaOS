@@ -6,8 +6,6 @@ use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
-
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -112,32 +110,6 @@ pub struct ContainerNamespace {
     pub uid_mapping: u32,
     pub gid_mapping: u32,
     pub rootless: bool,
-}
-
-impl ContainerNamespace {
-    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_uid == 0 {
-                Ok(self.uid_mapping)
-            } else {
-                Ok(self.uid_mapping + container_uid)
-            }
-        } else {
-            Ok(container_uid)
-        }
-    }
-
-    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_gid == 0 {
-                Ok(self.gid_mapping)
-            } else {
-                Ok(self.gid_mapping + container_gid)
-            }
-        } else {
-            Ok(container_gid)
-        }
-    }
 }
 
 impl ContainerNamespace {
@@ -698,7 +670,6 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 
 pub mod oci {
-    extern crate alloc;
     use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
     use alloc::string::String;
@@ -729,25 +700,6 @@ pub mod oci {
         }
     }
 
-    #[allow(dead_code)]
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-        }
-    }
 
     pub struct OciSpec {
         pub version: String,

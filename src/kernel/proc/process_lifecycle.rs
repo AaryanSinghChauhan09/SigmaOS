@@ -22,7 +22,7 @@ use crate::klib::HashMap;
 use std::collections::HashMap;
 
 #[cfg(test)]
-pub mod mock_scheduler {
+mod mock_scheduler {
     use core::time::Duration;
     use alloc::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -64,10 +64,10 @@ pub mod mock_scheduler {
 }
 
 #[cfg(test)]
-pub use mock_scheduler::{Priority, Process, ProcessState};
+use mock_scheduler::{Priority, Process, ProcessState};
 
 #[cfg(not(test))]
-pub use crate::kernel::scheduler::{Priority, Process, ProcessState};
+use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
 /// Windows-style Process Creation Priority Classes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -109,12 +109,12 @@ pub struct ProcessExtendedContext {
 }
 
 #[cfg(test)]
-use std::collections::HashMap;
-#[cfg(test)]
-use std::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(test)]
-use std::time::Duration;
+use std::collections::HashMap as StdHashMap;
 
+#[cfg(not(test))]
+use crate::klib::HashMap;
+#[cfg(not(test))]
+use crate::kernel::scheduler::{Priority as SchedPriority, Process as SchedProcess, ProcessState as SchedProcessState};
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
