@@ -43,19 +43,21 @@ pub trait SyscallEntry {
 pub struct SimpleSyscallEntry {
     pub number: SyscallNumber,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub handler: SyscallHandler,
 }
 
 impl SimpleSyscallEntry {
     pub fn new(number: SyscallNumber, name: &[u8], handler: SyscallHandler) -> Self {
         let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
+        let name_len = name.len().min(63) as u8;
         unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len as usize);
         }
         SimpleSyscallEntry {
             number,
             name: name_array,
+            name_len,
             handler,
         }
     }
@@ -64,8 +66,7 @@ impl SimpleSyscallEntry {
 impl SyscallEntry for SimpleSyscallEntry {
     fn number(&self) -> SyscallNumber { self.number }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        &self.name[..self.name_len as usize]
     }
     fn handler(&self) -> SyscallHandler { self.handler }
 }
@@ -193,13 +194,13 @@ impl SyscallFilter for SimpleSyscallFilter {
         self.denied.push(number);
     }
 
-    fn is_allowed(&self, number: SyscallNumber) -> Result<bool, SyscallError> {
+    fn is_allowed(&self, number: SyscallNumber) -> bool {
         for &n in &self.denied {
             if n == number {
-                return Ok(false);
+                return false;
             }
         }
-        Ok(true)
+        true
     }
 }
 
@@ -232,82 +233,32 @@ impl SyscallAuditor for SimpleSyscallAuditor {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+use std::vec::Vec;
+use std::boxed::Box;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_syscall_entry_cached_len() {
+        let handler: SyscallHandler = |a, b, c, d, e, f| (a + b) as i64;
+        let entry = SimpleSyscallEntry::new(10, b"sys_read", handler);
+
+        assert_eq!(entry.number(), 10);
+        assert_eq!(entry.name(), b"sys_read");
+        assert_eq!(entry.name_len, 8);
+        assert_eq!(entry.handler()(2, 3, 0, 0, 0, 0), 5);
     }
-    fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
-        }
-        new_vec
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    #[test]
+    fn test_simple_syscall_filter() {
+        let mut filter = SimpleSyscallFilter::new();
+        filter.allow(1);
+        filter.deny(2);
 
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        assert!(filter.is_allowed(1));
+        assert!(!filter.is_allowed(2));
+        assert!(filter.is_allowed(3));
     }
 }

@@ -42,9 +42,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build your application
+        if: hashFiles('gradlew') != ''
         run: ./gradlew assembleDebug              # Update this to build your Android or iOS application
 
       - name: Run NowSecure
+        if: hashFiles('app-debug.apk') != '' || hashFiles('gradlew') != ''
         uses: nowsecure/nowsecure-action@3b439db31b6dce857b09f5222fd13ffc3159ad26
         with:
           token: ${{ secrets.NS_TOKEN }}
@@ -52,6 +54,7 @@ jobs:
           group_id: "MY_GROUP_ID"                 # Update this to your desired Platform group ID
 
       - name: Upload SARIF file
+        if: hashFiles('NowSecure.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: NowSecure.sarif

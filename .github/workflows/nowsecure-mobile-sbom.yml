@@ -45,9 +45,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build your application
+        if: hashFiles('gradlew') != ''
         run: ./gradlew assembleDebug              # Update this to build your Android or iOS application
 
       - name: NowSecure upload app
+        if: hashFiles('app-debug.apk') != '' || hashFiles('gradlew') != ''
         uses: nowsecure/nowsecure-sbom-action@ecb731b6f17a83fa53f756f9dae2ec7034c5ed7c
         with:
           token: ${{ secrets.NS_TOKEN }}
