@@ -174,8 +174,8 @@ pub use package::{
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use remote::{
-    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
+    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
     SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
 };
@@ -198,9 +198,9 @@ pub use security::{
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
-    PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
-    Transaction, UniversalPackageAdapter,
+    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
+    PackageRecipe, RecipeError, RecipeManager, SatSolver,
+    Transaction, UniversalPackageAdapterManager,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

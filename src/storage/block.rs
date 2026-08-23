@@ -500,6 +500,27 @@ mod tests {
     }
 }
 
+pub trait BlockManager {
+    fn register_device(&mut self, device: Box<dyn BlockDevice>) -> Result<BlockDeviceID, BlockError>;
+    fn unregister_device(&mut self, id: BlockDeviceID) -> Result<(), BlockError>;
+    fn get_device(&self, id: BlockDeviceID) -> Option<&dyn BlockDevice>;
+    fn list_devices(&self) -> Vec<BlockDeviceID>;
+}
+
+pub struct SimpleBlockManager {
+    pub devices: Vec<Option<Box<dyn BlockDevice>>>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleBlockManager {
+    pub fn new() -> Self {
+        SimpleBlockManager {
+            devices: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+}
+
 impl BlockManager for SimpleBlockManager {
     fn register_device(
         &mut self,

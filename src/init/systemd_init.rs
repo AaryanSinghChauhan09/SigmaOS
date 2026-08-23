@@ -39,9 +39,15 @@ impl InitSystemBridge {
 
     pub fn convert_runit_service_script(&self, service_name: &str) -> Vec<u8> {
         let mut script = Vec::new();
-        script.extend_from_slice(b"#!/bin/sh\nexec ");
-        script.extend_from_slice(service_name.as_bytes());
-        script.extend_from_slice(b" --foreground\n");
+        for &b in b"#!/bin/sh\nexec " {
+            script.push(b);
+        }
+        for &b in service_name.as_bytes() {
+            script.push(b);
+        }
+        for &b in b" --foreground\n" {
+            script.push(b);
+        }
         script
     }
 }
@@ -158,7 +164,7 @@ impl SystemdEngine {
     }
 
     pub fn find_unit(&self, id: UnitID) -> Option<&SystemdUnit> {
-        for unit in &self.units {
+        for unit in self.units.iter() {
             if unit.id == id {
                 return Some(unit);
             }
@@ -167,7 +173,7 @@ impl SystemdEngine {
     }
 
     pub fn find_unit_mut(&mut self, id: UnitID) -> Option<&mut SystemdUnit> {
-        for unit in &mut self.units {
+        for unit in self.units.iter_mut() {
             if unit.id == id {
                 return Some(unit);
             }
@@ -191,16 +197,12 @@ impl SystemdEngine {
 
         let _idx = target_idx.ok_or("Target unit not found")?;
 
-        // In Systemd, isolating a target starts that target and all its dependencies,
-        // and deactivates units not required/wanted by it.
         self.units[_idx].state = UnitState::Activating;
 
-        // Collect all required/wanted units recursively
         let mut active_set = Vec::new();
         self.collect_dependencies(target_id, &mut active_set);
 
-        // Deactivate units not in active_set
-        for unit in &mut self.units {
+        for unit in self.units.iter_mut() {
             if !active_set.contains(&unit.id) && unit.id != target_id {
                 unit.state = UnitState::Inactive;
             } else if active_set.contains(&unit.id) {
@@ -218,13 +220,13 @@ impl SystemdEngine {
             return;
         }
 
-        for unit in &self.units {
+        for unit in self.units.iter() {
             if unit.id == unit_id {
-                for &req in &unit.requires {
+                for &req in unit.requires.iter() {
                     set.push(req);
                     self.collect_dependencies(req, set);
                 }
-                for &want in &unit.wants {
+                for &want in unit.wants.iter() {
                     set.push(want);
                     self.collect_dependencies(want, set);
                 }
@@ -291,7 +293,6 @@ impl SystemdEngine {
             return Err("Unit is disabled");
         }
 
-        // Handle conflicts: stop conflicting units
         for &conflict_id in conflicts.iter() {
             if let Some(conf_unit) = self.find_unit(conflict_id) {
                 if conf_unit.state == UnitState::Active {
@@ -300,7 +301,6 @@ impl SystemdEngine {
             }
         }
 
-        // Also stop units that conflict with this unit
         let mut units_to_stop = Vec::new();
         for u in self.units.iter() {
             if u.conflicts.contains(&id) && u.state == UnitState::Active {
@@ -311,9 +311,8 @@ impl SystemdEngine {
             self.systemctl_stop(stop_id)?;
         }
 
-        // Start requires dependencies (must succeed)
         for &req_id in requires.iter() {
-            if let Err(_) = self.systemctl_start(req_id) {
+            if self.systemctl_start(req_id).is_err() {
                 if let Some(u) = self.find_unit_mut(id) {
                     u.state = UnitState::Failed;
                 }
@@ -322,21 +321,18 @@ impl SystemdEngine {
             }
         }
 
-        // Start wants dependencies (failures are ignored)
         for &want_id in wants.iter() {
             let _ = self.systemctl_start(want_id);
         }
 
-        // Update unit state to Activating
         if let Some(u) = self.find_unit_mut(id) {
             u.state = UnitState::Activating;
         }
         self.log_journal(id, b"Unit starting/activating", UnitState::Inactive, UnitState::Activating);
 
-        // Transition to Active, record timings
         if let Some(u) = self.find_unit_mut(id) {
             u.state = UnitState::Active;
-            u.startup_time_ms = 100; // Mock timing for analyze compatibility
+            u.startup_time_ms = 100;
             u.duration_ms = 150;
         }
         self.log_journal(id, b"Unit started successfully", UnitState::Activating, UnitState::Active);
@@ -350,7 +346,6 @@ impl SystemdEngine {
             return Err("Unit not found");
         }
 
-        // Update state to Deactivating
         if let Some(u) = self.find_unit_mut(id) {
             if u.state == UnitState::Inactive {
                 return Ok(());
@@ -359,13 +354,11 @@ impl SystemdEngine {
         }
         self.log_journal(id, b"Unit stopping/deactivating", UnitState::Active, UnitState::Deactivating);
 
-        // Transition to Inactive
         if let Some(u) = self.find_unit_mut(id) {
             u.state = UnitState::Inactive;
         }
         self.log_journal(id, b"Unit stopped successfully", UnitState::Deactivating, UnitState::Inactive);
 
-        // BindsTo dependency handling
         let mut bound_units = Vec::new();
         for u in self.units.iter() {
             if u.binds_to.contains(&id) && u.state == UnitState::Active {
@@ -430,7 +423,6 @@ impl SystemdEngine {
         self.find_unit(id).map(|u| u.state)
     }
 
-    // Restart Policy handling
     pub fn handle_unit_failure(&mut self, id: UnitID) -> Result<bool, &'static str> {
         let mut should_restart = false;
         let (policy, count) = if let Some(unit) = self.find_unit(id) {
@@ -439,7 +431,7 @@ impl SystemdEngine {
             return Err("Unit not found");
         };
 
-        if policy == RestartPolicy::Always || (policy == RestartPolicy::OnFailure) {
+        if policy == RestartPolicy::Always || policy == RestartPolicy::OnFailure {
             if count < 3 {
                 should_restart = true;
             }
@@ -462,7 +454,6 @@ impl SystemdEngine {
         }
     }
 
-    // Trigger Activations
     pub fn trigger_socket_activation(&mut self, socket_id: UnitID) -> Result<(), &'static str> {
         let mut triggered_id = None;
         if let Some(unit) = self.find_unit(socket_id) {
@@ -517,7 +508,6 @@ impl SystemdEngine {
         }
     }
 
-    // systemd-analyze blame
     pub fn systemd_analyze_blame(&self) -> Vec<(UnitID, u64)> {
         let mut blame_list = Vec::new();
         for unit in self.units.iter() {
@@ -528,8 +518,8 @@ impl SystemdEngine {
         for i in 0..blame_list.len() {
             for j in 0..blame_list.len() - 1 - i {
                 if blame_list[j].1 < blame_list[j + 1].1 {
-                    let temp = blame_list[j];
-                    blame_list[j] = blame_list[j + 1];
+                    let temp = blame_list[j].clone();
+                    blame_list[j] = blame_list[j + 1].clone();
                     blame_list[j + 1] = temp;
                 }
             }
@@ -537,7 +527,6 @@ impl SystemdEngine {
         blame_list
     }
 
-    /// Query and track a standard system target by matching its raw byte name string
     pub fn query_target_by_name(&self, name: &[u8]) -> Option<UnitID> {
         for unit in self.units.iter() {
             if unit.unit_type == UnitType::Target {
@@ -551,6 +540,213 @@ impl SystemdEngine {
     }
 }
 
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T: PartialEq> Vec<T> {
+    pub fn contains(&self, item: &T) -> bool {
+        for i in 0..self.len {
+            unsafe {
+                if &*self.data.add(i) == item {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for item in self.iter() {
+            new_vec.push(item.clone());
+        }
+        new_vec
+    }
+}
+
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
+        let mut write_idx = 0;
+        for i in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(i);
+                if f(item) {
+                    if write_idx != i {
+                        core::ptr::copy_nonoverlapping(
+                            self.data.add(i),
+                            self.data.add(write_idx),
+                            1,
+                        );
+                    }
+                    write_idx += 1;
+                } else {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+            }
+        }
+        self.len = write_idx;
+    }
+
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            if self.capacity > 0 && !self.data.is_null() {
+                for i in 0..self.len {
+                    core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+                }
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 && !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -559,18 +755,12 @@ mod tests {
     fn test_systemd_engine_dependency_isolation() {
         let mut engine = SystemdEngine::new();
 
-        // 1. Create graphical.target
         let mut graphical = SystemdUnit::new(100, b"graphical.target", UnitType::Target);
-        graphical.requires.push(200); // requires multi-user.target
-        graphical.wants.push(300); // wants network.target
+        graphical.requires.push(200);
+        graphical.wants.push(300);
 
-        // 2. Create multi-user.target
         let multi_user = SystemdUnit::new(200, b"multi-user.target", UnitType::Target);
-
-        // 3. Create network.target
         let network = SystemdUnit::new(300, b"network.target", UnitType::Target);
-
-        // 4. Create an independent service
         let service = SystemdUnit::new(400, b"apache.service", UnitType::Service);
 
         engine.register_unit(graphical);
@@ -578,13 +768,11 @@ mod tests {
         engine.register_unit(network);
         engine.register_unit(service);
 
-        // Isolate graphical.target
         engine.isolate_target(100).unwrap();
 
         assert_eq!(engine.get_active_target_id(), 100);
 
-        // dependencies should be active
-        for unit in &engine.units {
+        for unit in engine.units.iter() {
             if unit.id == 200 || unit.id == 300 || unit.id == 100 {
                 assert_eq!(unit.state, UnitState::Active);
             } else if unit.id == 400 {
@@ -598,10 +786,10 @@ mod tests {
         let mut engine = SystemdEngine::new();
 
         let mut a = SystemdUnit::new(1, b"a.service", UnitType::Service);
-        a.before.push(2); // a must run before b
+        a.before.push(2);
 
         let mut b = SystemdUnit::new(2, b"b.service", UnitType::Service);
-        b.before.push(3); // b must run before c
+        b.before.push(3);
 
         let c = SystemdUnit::new(3, b"c.service", UnitType::Service);
 
@@ -620,12 +808,11 @@ mod tests {
         assert_eq!(sorted[1], 2);
         assert_eq!(sorted[2], 3);
 
-        // Now inject a cycle
         let mut engine_cycle = SystemdEngine::new();
         let mut u1 = SystemdUnit::new(10, b"u1.service", UnitType::Service);
         u1.before.push(20);
         let mut u2 = SystemdUnit::new(20, b"u2.service", UnitType::Service);
-        u2.before.push(10); // cycle: 10 -> 20 -> 10
+        u2.before.push(10);
 
         engine_cycle.register_unit(u1);
         engine_cycle.register_unit(u2);
@@ -641,14 +828,12 @@ mod tests {
     fn test_systemd_conflicts_and_binds_to() {
         let mut engine = SystemdEngine::new();
 
-        // Conflicts: a conflicts with b. Starting a should stop b.
         let mut a = SystemdUnit::new(1, b"a.service", UnitType::Service);
         a.conflicts.push(2);
 
         let mut b = SystemdUnit::new(2, b"b.service", UnitType::Service);
-        b.state = UnitState::Active; // b starts active
+        b.state = UnitState::Active;
 
-        // BindsTo: c binds to a. If a stops, c stops.
         let mut c = SystemdUnit::new(3, b"c.service", UnitType::Service);
         c.binds_to.push(1);
         c.state = UnitState::Active;
@@ -657,14 +842,11 @@ mod tests {
         engine.register_unit(b);
         engine.register_unit(c);
 
-        // Start a
         engine.systemctl_start(1).unwrap();
 
-        // Check a is active, b is inactive (conflict resolution)
         assert_eq!(engine.systemctl_status(1), Some(UnitState::Active));
         assert_eq!(engine.systemctl_status(2), Some(UnitState::Inactive));
 
-        // Stop a, check that c also stops (BindsTo dependency resolution)
         engine.systemctl_stop(1).unwrap();
         assert_eq!(engine.systemctl_status(1), Some(UnitState::Inactive));
         assert_eq!(engine.systemctl_status(3), Some(UnitState::Inactive));
@@ -674,7 +856,6 @@ mod tests {
     fn test_systemd_activation_triggers() {
         let mut engine = SystemdEngine::new();
 
-        // Socket activations
         let mut socket = SystemdUnit::new(1, b"test.socket", UnitType::Socket);
         socket.triggered_unit = Some(10);
 
@@ -685,7 +866,6 @@ mod tests {
 
         assert_eq!(engine.systemctl_status(10), Some(UnitState::Inactive));
 
-        // Trigger socket
         engine.trigger_socket_activation(1).unwrap();
         assert_eq!(engine.systemctl_status(10), Some(UnitState::Active));
     }
@@ -699,7 +879,6 @@ mod tests {
 
         engine.register_unit(fail_srv);
 
-        // Fail service, should trigger restart policy
         let restarted = engine.handle_unit_failure(1).unwrap();
         assert!(restarted);
         assert_eq!(engine.find_unit(1).unwrap().restart_count, 1);
@@ -723,7 +902,7 @@ mod tests {
 
         let blame = engine.systemd_analyze_blame();
         assert_eq!(blame.len(), 2);
-        assert_eq!(blame[0].0, 2); // b.service longest
+        assert_eq!(blame[0].0, 2);
         assert_eq!(blame[0].1, 1200);
         assert_eq!(blame[1].0, 1);
         assert_eq!(blame[1].1, 500);
@@ -733,12 +912,11 @@ mod tests {
     fn test_advanced_dependency_sorting() {
         let mut engine = SystemdEngine::new();
 
-        // Setup a standard multi-target tree (no cycles)
         let mut basic = SystemdUnit::new(1, b"basic.target", UnitType::Target);
-        basic.before.push(2); // basic before network
+        basic.before.push(2);
 
         let mut network = SystemdUnit::new(2, b"network.target", UnitType::Target);
-        network.before.push(3); // network before multi-user
+        network.before.push(3);
 
         let multi_user = SystemdUnit::new(3, b"multi-user.target", UnitType::Target);
 
@@ -777,6 +955,6 @@ mod tests {
         assert_eq!(bridge.active_init, InitSystemType::Runit);
 
         let runit_script = bridge.convert_runit_service_script("apache2");
-        assert!(runit_script.starts_with(b"#!/bin/sh\nexec apache2 --foreground\n"));
+        assert!(&runit_script[..].starts_with(b"#!/bin/sh\nexec apache2 --foreground\n"));
     }
 }

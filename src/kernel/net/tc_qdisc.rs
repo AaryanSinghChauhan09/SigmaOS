@@ -69,6 +69,12 @@ pub struct Pfifo {
     stats: QDiscStats,
 }
 
+unsafe impl Send for Sfq {}
+unsafe impl Sync for Sfq {}
+
+unsafe impl Send for Pfifo {}
+unsafe impl Sync for Pfifo {}
+
 impl Pfifo {
     pub fn new(limit: usize) -> Self {
         Pfifo {
@@ -115,6 +121,9 @@ pub struct PfifoFast {
     total: usize,
     stats: QDiscStats,
 }
+
+unsafe impl Send for PfifoFast {}
+unsafe impl Sync for PfifoFast {}
 
 impl PfifoFast {
     pub fn new(limit: usize) -> Self {

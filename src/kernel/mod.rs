@@ -1,8 +1,38 @@
 // SigmaOS Kernel Module
+pub mod architecture;
+pub mod atomic_extended;
+pub mod block_dev;
+pub mod bore;
+pub mod breakthrough;
 pub mod breakthroughs;
+pub mod breakthroughs_v2;
+pub mod bus;
+pub mod classic_os;
+pub mod component;
+pub mod console;
+pub mod cpu_features;
+pub mod cpufreq;
+pub mod device;
+pub mod driver;
+pub mod dtrace_compat;
+pub mod ebpf;
+pub mod exports;
+pub mod gap_closing;
+pub mod gap_filling;
+pub mod generation_manager;
+pub mod io_uring;
 pub mod ipc;
+pub mod kqueue;
+pub mod linux_absorb;
+pub mod linux_bsd_innovations;
+pub mod linux_parity;
 pub mod memory;
 pub mod meta;
+pub mod net;
+pub mod numa_allocator;
+pub mod numa_scheduler;
+pub mod object;
+pub mod os_innovations;
 pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
@@ -13,6 +43,11 @@ pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
+pub use gap_closing::{
+    AcpiInterruptManager, GapError, IrqRoutingTable, JournalBlock, JournalState, MetadataJournal,
+    Pml4PageTableEntry, VirtualMemoryPagingManager,
+};
+pub use generation_manager::{Generation, GenerationManager};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use meta::{
@@ -26,3 +61,5 @@ pub use policy_mechanism::{
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
+pub use vmm_paging::{PageTableManager, VirtualMemoryManager};

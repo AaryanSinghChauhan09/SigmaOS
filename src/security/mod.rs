@@ -1,4 +1,5 @@
 // SigmaOS Security Subsystem
+pub mod audit;
 pub mod capability;
 pub mod hardening;
 
@@ -10,6 +11,7 @@ pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
 pub mod forensics;
+pub mod hardening;
 pub mod integrity;
 pub mod intrusion;
 pub mod mac;
@@ -44,6 +46,9 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
@@ -54,8 +59,8 @@ pub use password::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule,
+    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
+    SecurityRule, SelinuxPermission,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};

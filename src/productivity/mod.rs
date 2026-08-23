@@ -1,7 +1,16 @@
 // SigmaOS Productivity Module
+pub mod advanced_app_absorber;
+pub mod calendar;
+pub mod clipboard_manager;
+pub mod document_engine;
+pub mod editor;
+pub mod email;
+pub mod finance;
+pub mod flint_chart;
 pub mod gamification;
-pub mod subtitle_editor;
-pub mod sigmadev;
+pub mod linux_bsd_tools;
+pub mod media;
+pub mod mind_map;
 pub mod mint_competitor;
 pub mod tmux;
 pub mod sovereign_apps;
@@ -16,3 +25,6 @@ pub use sovereign_apps::{
     TextNode,
 };
 pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
+pub use tmux::{
+    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+};

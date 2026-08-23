@@ -7,9 +7,9 @@
 //! - Sovereign Environment Variables Registry supporting Linux default configurations
 
 extern crate alloc;
-use alloc::string::String;
-use alloc::string::ToString;
-use crate::klib::{Vec, HashMap};
+use alloc::collections::BTreeMap as HashMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // ==========================================
 // 1. Virtual Filesystem Parity (/proc & /dev)

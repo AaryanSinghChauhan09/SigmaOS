@@ -5,10 +5,7 @@
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct PackageDerivation {
     pub name: String,
     pub version: String,
@@ -18,7 +15,7 @@ pub struct PackageDerivation {
     pub hash: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct PackageInput {
     pub name: String,
     pub hash: String,
@@ -48,18 +45,16 @@ impl NixLikeStore {
         inputs: Vec<PackageInput>,
         build_script: &str,
     ) -> Result<PackageDerivation, Box<dyn std::error::Error>> {
-        // Calculate deterministic hash based on all inputs
-        let mut hasher = Sha256::new();
-        hasher.update(name.as_bytes());
-        hasher.update(version.as_bytes());
-        hasher.update(build_script.as_bytes());
-        
-        for input in &inputs {
-            hasher.update(input.name.as_bytes());
-            hasher.update(input.hash.as_bytes());
+        let mut h: u64 = 0xcbf29ce484222325;
+        for &b in name.as_bytes().iter().chain(version.as_bytes()).chain(build_script.as_bytes()) {
+            h = (h ^ (b as u64)).wrapping_mul(0x100000001b3);
         }
-        
-        let hash = format!("{:x}", hasher.finalize());
+        for input in &inputs {
+            for &b in input.name.as_bytes().iter().chain(input.hash.as_bytes()) {
+                h = (h ^ (b as u64)).wrapping_mul(0x100000001b3);
+            }
+        }
+        let hash = format!("{:016x}", h);
         
         let derivation = PackageDerivation {
             name: name.to_string(),
@@ -199,18 +194,17 @@ impl NixLikeStore {
 
     /// Verify build output matches expected hash
     fn verify_build_output(&self, output_path: &Path, derivation: &PackageDerivation) -> Result<(), Box<dyn std::error::Error>> {
-        // Calculate hash of build output
-        let mut hasher = Sha256::new();
-        
-        for entry in walkdir::WalkDir::new(output_path) {
-            let entry = entry?;
-            if entry.file_type().is_file() {
-                let contents = std::fs::read(entry.path())?;
-                hasher.update(&contents);
+        let mut h: u64 = 0xcbf29ce484222325;
+        if let Ok(entries) = std::fs::read_dir(output_path) {
+            for entry in entries.flatten() {
+                if let Ok(contents) = std::fs::read(entry.path()) {
+                    for &b in &contents {
+                        h = (h ^ (b as u64)).wrapping_mul(0x100000001b3);
+                    }
+                }
             }
         }
-        
-        let actual_hash = format!("{:x}", hasher.finalize());
+        let actual_hash = format!("{:016x}", h);
         
         // In a real implementation, we would store expected output hashes
         // For now, just log the computed hash
@@ -279,9 +273,8 @@ impl NixLikeStore {
     }
 
     fn find_references(&self, path: PathBuf, referenced: &mut std::collections::HashSet<String>) -> Result<(), Box<dyn std::error::Error>> {
-        for entry in walkdir::WalkDir::new(path) {
-            let entry = entry?;
-            if entry.file_type().is_symlink() {
+        if let Ok(entries) = std::fs::read_dir(path) {
+            for entry in entries.flatten() {
                 if let Ok(target) = std::fs::read_link(entry.path()) {
                     if let Some(hash) = self.extract_hash_from_path(&target) {
                         referenced.insert(hash);
@@ -321,7 +314,7 @@ pub struct CommunityPackage {
     pub build_script: String,
     pub dependencies: Vec<String>,
     pub votes: u32,
-    pub last_updated: chrono::DateTime<chrono::Utc>,
+    pub last_updated: u64,
 }
 
 impl CommunityPackageRegistry {
@@ -426,7 +419,7 @@ mod tests {
             build_script: "make && make install".to_string(),
             dependencies: vec!["gcc".to_string()],
             votes: 0,
-            last_updated: chrono::Utc::now(),
+            last_updated: 0,
         };
 
         assert!(registry.submit_package(package).is_ok());

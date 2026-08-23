@@ -20,6 +20,7 @@
 pub mod accessibility_gamification;
 pub mod control_center;
 pub mod monitor;
+pub mod privacy;
 pub mod process;
 pub mod statutory_compliance;
 

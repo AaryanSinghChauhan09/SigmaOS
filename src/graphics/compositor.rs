@@ -752,7 +752,7 @@ impl Compositor for SimpleCompositor {
         Ok(())
     }
 
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> {
+    fn capture_screenshot(&mut self) -> Result<Vec<u32>, GraphicsError> {
         if let Some(ref back) = self.back_buffer {
             Ok(back.data.clone())
         } else {

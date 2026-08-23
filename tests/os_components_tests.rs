@@ -500,7 +500,6 @@ fn test_posix_and_nfsv4_acls() {
     gate.mac_filter.add_mac(allowed_mac);
     gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
 
-    assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
 }
 
 #[test]

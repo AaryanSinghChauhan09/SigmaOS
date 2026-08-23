@@ -40,50 +40,6 @@ unsafe impl Sync for SlabCache {}
 
 const FREE_END: usize = usize::MAX;
 
-#[derive(Debug)]
-pub struct TypedSlabCache<T> {
-    cache: SlabCache,
-    _phantom: core::marker::PhantomData<T>,
-}
-
-impl<T> TypedSlabCache<T> {
-    pub fn new(obj_size: usize, capacity: usize) -> Self {
-        Self {
-            cache: SlabCache::new(obj_size, capacity),
-            _phantom: core::marker::PhantomData,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct TypedSlabCache<T> {
-    cache: SlabCache,
-    _phantom: core::marker::PhantomData<T>,
-}
-
-impl<T> TypedSlabCache<T> {
-    pub fn new(obj_size: usize, capacity: usize) -> Self {
-        Self {
-            cache: SlabCache::new(obj_size, capacity),
-            _phantom: core::marker::PhantomData,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct TypedSlabCache<T> {
-    cache: SlabCache,
-    _phantom: core::marker::PhantomData<T>,
-}
-
-impl<T> TypedSlabCache<T> {
-    pub fn new(obj_size: usize, capacity: usize) -> Self {
-        Self {
-            cache: SlabCache::new(obj_size, capacity),
-            _phantom: core::marker::PhantomData,
-        }
-    }
-}
 
 impl SlabCache {
     /// Create a new slab cache.

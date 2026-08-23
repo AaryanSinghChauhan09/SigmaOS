@@ -9,8 +9,8 @@ use crate::klib::Vec;
 
 #[cfg(feature = "standalone_test")]
 extern crate alloc;
-#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintError {

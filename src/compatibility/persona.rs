@@ -17,6 +17,7 @@ pub enum PersonaVersion {
     Linux5x,
 }
 
+#[derive(Debug, Clone)]
 pub struct KernelPersonaContainer {
     pub version: PersonaVersion,
     pub active_processes: usize,

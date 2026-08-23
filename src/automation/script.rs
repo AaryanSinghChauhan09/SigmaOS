@@ -18,11 +18,21 @@ pub type ScriptID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptLanguage { Python = 0, JavaScript = 1, Lua = 2, Shell = 3 }
+pub enum ScriptLanguage {
+    Python = 0,
+    JavaScript = 1,
+    Lua = 2,
+    Shell = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptError { Success = 0, NotFound = 1, ExecutionFailed = 2, InvalidArgument = 3 }
+pub enum ScriptError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    InvalidArgument = 3,
+}
 
 pub trait Script {
     fn id(&self) -> ScriptID;
@@ -149,6 +159,12 @@ impl SimpleScriptEngine {
         }
 
         Err(ScriptError::NotFound)
+    }
+}
+
+impl Default for SimpleScriptEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -293,6 +309,12 @@ impl SimpleScriptEnvironment {
     }
 }
 
+impl Default for SimpleScriptEnvironment {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ==========================================
 // ADDITIONAL DIAGNOSTICS & SYSTEM UTILITIES
 // ==========================================
@@ -318,7 +340,6 @@ impl UpxUnpacker {
             return Err("UPX: Signature mismatch (not compressed with UPX).");
         }
 
-        // Simple decompressive decryption: XOR shift with offset bytes
         let mut decompressed = Vec::new();
         for i in 4..compressed.len() {
             decompressed.push(compressed[i] ^ 0x5A);

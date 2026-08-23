@@ -5,9 +5,7 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct JailConfig {
     pub name: String,
     pub hostname: String,
@@ -415,13 +413,6 @@ pub struct JailInfo {
     pub process_count: usize,
 }
 
-impl std::str::FromStr for std::net::Ipv4Addr {
-    type Err = std::net::AddrParseError;
-    
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        s.parse()
-    }
-}
 
 #[cfg(test)]
 mod tests {
