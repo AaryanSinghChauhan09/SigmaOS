@@ -400,8 +400,6 @@ pub trait Device {
     fn shutdown(&mut self) -> Result<(), DeviceError>;
 }
 
-
-
 /// Device error types
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1146,6 +1144,12 @@ mod legacy_tests {
         // Assert that all Device Objects and Extensions have been freed/deleted cleanly from the pool
         assert_eq!(io_mgr.active_drivers[driver_idx].device_objects.len(), 0);
     }
+
+    #[test]
+    fn test_storage_drivers() {
+        let mut virtio = SimpleBlockDevice::new(7, b"virtio_blk", 10, 512);
+        assert!(virtio.init().is_ok());
+    }
 }
 
 impl BlockDevice for SimpleBlockDevice {
@@ -1660,27 +1664,12 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-/// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
-#[derive(Debug, Clone)]
-pub struct DeviceExtension {
-    pub irq: u8,
-    pub base_port: u16,
-    pub base_address: u32,
-    pub memory_size: usize,
-    pub device_context: [u8; 128], // Driver-specific context information buffer
+#[cfg(test)]
+extern "C" {
+    fn malloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
-impl DeviceExtension {
-    pub fn new() -> Self {
-        Self {
-            irq: 0,
-            base_port: 0,
-            base_address: 0,
-            memory_size: 0,
-            device_context: [0; 128],
-        }
-    }
-}
 
 /// Windows NT-style Device Object representing a logical, physical, or virtual device instance
 pub struct DeviceObject {
@@ -1793,14 +1782,6 @@ impl Default for IoManager {
         Self::new()
     }
 }
-
-/// Unified representation of communication channels (OOP Abstraction)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortAddress {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
-}
-
 
 #[cfg(test)]
 #[no_mangle]

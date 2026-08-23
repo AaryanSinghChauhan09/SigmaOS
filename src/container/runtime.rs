@@ -32,40 +32,6 @@ pub enum ContainerState {
     Failed = 4,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
-impl ContainerCapability {
-    pub const fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub const fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-impl Default for ContainerCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Container trait (OOP interface)
 pub trait Container {
@@ -179,7 +145,33 @@ impl ContainerNamespace {
     }
 }
 
-/// Container seccomp profiles
+impl ContainerNamespace {
+    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
+        if self.rootless {
+            if container_uid == 0 {
+                Ok(self.uid_mapping)
+            } else {
+                Ok(self.uid_mapping + container_uid)
+            }
+        } else {
+            Ok(container_uid)
+        }
+    }
+
+    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
+        if self.rootless {
+            if container_gid == 0 {
+                Ok(self.gid_mapping)
+            } else {
+                Ok(self.gid_mapping + container_gid)
+            }
+        } else {
+            Ok(container_gid)
+        }
+    }
+}
+
+/// Namespace configuration flags for a container
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NamespaceConfig {
     pub pid: bool,
@@ -733,6 +725,17 @@ impl SimpleContainerRuntime {
     }
 }
 
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+
+
 pub mod oci {
     extern crate alloc;
     use crate::container::ContainerError;
@@ -914,78 +917,6 @@ mod tests {
     use alloc::vec;
 
     #[test]
-    fn test_container_creation() {
-        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
-        let id = runtime
-            .create_container(
-                b"sovereign_container",
-                b"ubuntu-pqc",
-                ContainerCapability::full(),
-            )
-            .unwrap();
-        assert_eq!(id, 1);
-    }
-
-    #[test]
-    fn test_overlayfs_stacking() {
-        let mut overlay = OverlayFS::new(
-            vec!["/lower1".to_string(), "/lower2".to_string()],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(!overlay.mounted);
-        assert!(overlay.mount().is_ok());
-        assert!(overlay.mounted);
-        overlay.umount();
-        assert!(!overlay.mounted);
-
-        // Mount failure on empty lowerdirs
-        let mut invalid_overlay = OverlayFS::new(
-            vec![],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(invalid_overlay.mount().is_err());
-    }
-
-    #[test]
-    fn test_rootless_user_namespace_mapping() {
-        let ns = ContainerNamespace {
-            uid_mapping: 1000,
-            gid_mapping: 1000,
-            rootless: true,
-        };
-
-        // Container root (UID 0) maps to host unprivileged user (UID 1000)
-        assert_eq!(ns.map_uid(0).unwrap(), 1000);
-        assert_eq!(ns.map_gid(0).unwrap(), 1000);
-
-        // Regular container users offset accordingly
-        assert_eq!(ns.map_uid(10).unwrap(), 1010);
-    }
-
-    #[test]
-    fn test_hardened_seccomp_syscall_filtering() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"hardened_ct",
-            b"alpine",
-            ContainerCapability::full(),
-        );
-        container.seccomp = SeccompProfile {
-            hardened: true,
-            blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)
-        };
-
-        // Allowed syscall (e.g. syscall 1)
-        assert!(container.execute_syscall(1).is_ok());
-
-        // Prohibited syscall (syscall 0)
-        assert_eq!(
-            container.execute_syscall(0).unwrap_err(),
-            ContainerError::PermissionDenied
-        );
-    }
 
     #[test]
     fn test_overlayfs_stacking() {

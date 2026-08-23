@@ -1,8 +1,14 @@
-// SPDX-License-Identifier: MIT
-
 extern crate alloc;
 
-use alloc::boxed::Box;
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+#[cfg(not(target_os = "none"))]
+use std_alloc::boxed::Box;
+
+/// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
+/// Implements interactive scripting, dynamic script-like functions, positional arguments,
+/// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
+
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -136,8 +142,8 @@ impl SimpleScriptEngine {
 
         for script_option in &self.scripts {
             if let Some(ref script) = *script_option {
-                if script.name() == target_name {
-                    return self.execute_script_with_args(script.id(), args);
+                if script.as_ref().name() == target_name {
+                    return self.execute_script_with_args(script.as_ref().id(), args);
                 }
             }
         }
@@ -162,7 +168,7 @@ impl ScriptEngine for SimpleScriptEngine {
     fn unload_script(&mut self, id: ScriptID) -> Result<(), ScriptError> {
         for script_option in &mut self.scripts {
             if let Some(ref script) = *script_option {
-                if script.id() == id {
+                if script.as_ref().id() == id {
                     return Ok(());
                 }
             }
@@ -185,7 +191,7 @@ impl ScriptEngine for SimpleScriptEngine {
     fn get_script(&self, id: ScriptID) -> Option<&dyn Script> {
         for script_option in &self.scripts {
             if let Some(ref script) = *script_option {
-                if script.id() == id {
+                if script.as_ref().id() == id {
                     return Some(script.as_ref());
                 }
             }
@@ -525,55 +531,5 @@ mod tests {
         let res = router.substitute_arguments("Echo $1 then $2 all $@", &args);
         assert!(res.contains("arg1"));
         assert!(res.contains("arg2"));
-    }
-
-    #[test]
-    fn test_script_argument_router() {
-        let router = ScriptArgumentRouter::new("#!/bin/sh -x");
-        assert_eq!(router.shebang_interpreter, "/bin/sh -x");
-
-        let args = ["app", "arg1", "arg2"];
-        let res = router.substitute_arguments("Echo $1 then $2 all $@", &args);
-        assert!(res.contains("arg1"));
-        assert!(res.contains("arg2"));
-    }
-}
-
-pub struct ScriptArgumentRouter {
-    pub shebang_interpreter: String,
-}
-
-impl ScriptArgumentRouter {
-    pub fn new(shebang_line: &str) -> Self {
-        let interp = if shebang_line.starts_with("#!") {
-            shebang_line.trim_start_matches("#!").trim()
-        } else {
-            "/bin/sh"
-        };
-        Self {
-            shebang_interpreter: interp.to_string(),
-        }
-    }
-
-    pub fn substitute_arguments(&self, script: &str, args: &[&str]) -> String {
-        let mut result = script.to_string();
-        for (i, arg) in args.iter().enumerate() {
-            let var_name = format!("${}", i);
-            result = result.replace(&var_name, arg);
-        }
-
-        let mut all_args = String::new();
-        for (i, arg) in args.iter().skip(1).enumerate() {
-            if i > 0 { all_args.push(' '); }
-            all_args.push_str(arg);
-        }
-        result = result.replace("$@", &all_args);
-        result
-    }
-}
-
-impl Default for ScriptArgumentRouter {
-    fn default() -> Self {
-        Self::new("#!/bin/sh")
     }
 }

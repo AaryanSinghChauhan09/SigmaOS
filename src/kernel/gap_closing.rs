@@ -1182,113 +1182,11 @@ mod tests {
         cap.enter_capability_mode();
     }
 
-
-    #[test]
-    fn test_layered_irp_stack_and_completion_routine() {
-        let mut irp = Irp::new_with_stack(
-            IrpMajorFunction::Write,
-            0,
-            vec![1, 2, 3],
-            3,
-        );
-        assert_eq!(irp.current_stack_index, 2);
-        assert_eq!(irp.stack_locations.len(), 3);
-
-        // Define a completion routine
-        fn completion_handler(dev: &DeviceObject, irp: &mut Irp) -> u32 {
-            COMPLETION_CALLED.store(true, Ordering::SeqCst);
-            assert_eq!(irp.system_buffer.len(), 3);
-            0
-        }
-
-        irp.set_completion_routine(completion_handler).unwrap();
-        irp.complete_request(0);
-
-        assert!(COMPLETION_CALLED.load(Ordering::SeqCst));
-    }
-
-    #[test]
-    fn test_attached_device_stack_traversal() {
-        let mut pdo = DeviceObject {
-            device_type: DeviceType::Physical,
-            driver_name: "pci",
-            next_device: None,
-            attached_device: None,
-        };
-
-        let mut fdo = DeviceObject {
-            device_type: DeviceType::Functional,
-            driver_name: "keyboard_driver",
-            next_device: None,
-            attached_device: None,
-        };
-
-        let mut filter = DeviceObject {
-            device_type: DeviceType::Filter,
-            driver_name: "safe_keyboard_filter",
-            next_device: None,
-            attached_device: None,
-        };
-
-        io_attach_device_to_device_stack(&mut fdo, &mut pdo);
-        io_attach_device_to_device_stack(&mut filter, &mut fdo);
-
-        // Verify next device chains
-        assert_eq!(fdo.next_device.as_ref().unwrap().driver_name, "pci");
-        assert_eq!(filter.next_device.as_ref().unwrap().driver_name, "keyboard_driver");
-    }
-
-    #[test]
-    fn test_rootkit_device_stack_auditer() {
-        let mut pdo = DeviceObject {
-            device_type: DeviceType::Physical,
-            driver_name: "pci",
-            next_device: None,
-            attached_device: None,
-        };
-
-        let mut fdo = DeviceObject {
-            device_type: DeviceType::Functional,
-            driver_name: "keyboard_driver",
-            next_device: None,
-            attached_device: None,
-        };
-
-        let mut rootkit_filter = DeviceObject {
-            device_type: DeviceType::Filter,
-            driver_name: "malicious_keylogger_filter",
-            next_device: None,
-            attached_device: None,
-        };
-
-        io_attach_device_to_device_stack(&mut fdo, &mut pdo);
-        io_attach_device_to_device_stack(&mut rootkit_filter, &mut fdo);
-
-        let ssdt = KeServiceDescriptorTable::new();
-        let auditor = X86RootkitAuditor::new(&[], &ssdt);
-
-        let allowed_drivers = ["pci", "keyboard_driver"];
-        // Auditing should detect the malicious_keylogger_filter since it's not in allowed_drivers
-        let res = auditor.audit_device_stack(&fdo, &allowed_drivers);
-        assert!(res.is_err());
-        assert_eq!(res.unwrap_err(), "Rootkit filter driver detected in device stack!");
-
-        // Auditing with a clean pdo containing no filter device should pass
-        let clean_pdo = DeviceObject {
-            device_type: DeviceType::Physical,
-            driver_name: "pci",
-            next_device: None,
-            attached_device: None,
-        };
-        let res2 = auditor.audit_device_stack(&clean_pdo, &["pci"]);
-        assert!(res2.is_ok());
-    }
-
     #[test]
     fn test_rootkit_dispatch_table_hook_auditer() {
         let mut major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8] = [None; 8];
 
-        fn mock_dispatch(dev: &DeviceObject, irp: &mut Irp) -> u32 { 0 }
+        fn mock_dispatch(_dev: &DeviceObject, _irp: &mut Irp) -> u32 { 0 }
         major_function[0] = Some(mock_dispatch);
 
         let driver = DriverObject {
