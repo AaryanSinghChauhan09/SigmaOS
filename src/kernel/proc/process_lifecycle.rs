@@ -64,10 +64,10 @@ pub(crate) mod mock_scheduler {
 }
 
 #[cfg(test)]
-use mock_scheduler::{Priority, Process, ProcessState};
+pub use mock_scheduler::{Priority, Process, ProcessState};
 
 #[cfg(not(test))]
-use crate::kernel::scheduler::{Priority, Process, ProcessState};
+pub use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
 /// Windows-style Process Creation Priority Classes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

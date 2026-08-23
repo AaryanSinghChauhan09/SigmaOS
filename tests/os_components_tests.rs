@@ -28,6 +28,12 @@ mod chimera_linux;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
 
+#[path = "../src/compatibility/bsd.rs"]
+mod bsd;
+
+#[path = "../src/distro/linux_bsd_inspirations.rs"]
+mod distro_inspirations;
+
 #[path = "../src/compatibility/cachy_os.rs"]
 mod cachy_os;
 
@@ -680,4 +686,65 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
 
     let sec = SecurityProfileTemplateStore::new();
     assert!(sec.templates.contains_key("browser_sandboxed"));
+}
+
+#[test]
+fn test_freebsd_jail_manager_inspection() {
+    let mut mgr = bsd::FreeBsdJailManager::new();
+    let jid = mgr.create_jail("web1.jail.local", "192.168.1.100", "/jails/web1").unwrap();
+    assert_eq!(jid, 1);
+    assert!(mgr.check_network_allowed(jid, "192.168.1.100"));
+    assert!(mgr.stop_jail(jid).is_ok());
+    assert!(!mgr.check_network_allowed(jid, "192.168.1.100"));
+}
+
+#[test]
+fn test_openbsd_sysctl_mib_inspection() {
+    let mut mib = bsd::OpenBsdSysctlKernelMib::new();
+    assert_eq!(mib.query_mib("kern.securelevel").unwrap(), "0");
+    assert!(mib.is_raw_disk_write_allowed());
+
+    assert!(mib.write_mib("kern.securelevel", "1").is_ok());
+    assert!(!mib.is_raw_disk_write_allowed());
+    assert!(mib.write_mib("kern.securelevel", "0").is_err());
+}
+
+#[test]
+fn test_netbsd_rump_router_inspection() {
+    let mut router = distro_inspirations::NetBsdRumpRouter::new();
+    router.register_driver(distro_inspirations::RumpDriver {
+        name: "pci_net".to_string(),
+        context: distro_inspirations::DriverContext::KernelSpace,
+        operations_handled: vec!["send_packet".to_string()],
+    });
+    let res = router.dispatch_hypercall("pci_net", "send_packet");
+    assert!(res.is_ok());
+}
+
+#[test]
+fn test_sovereign_landlock_and_runit_inspection() {
+    let mut sandbox = distro_inspirations::SovereignLandlockLsm::new();
+    assert!(sandbox.add_rule("/usr/share", distro_inspirations::LandlockAccess::ReadOnly).is_ok());
+
+    let mut runit = distro_inspirations::SovereignRunitSupervisor::new(distro_inspirations::RunitRunlevel::Default);
+    runit.register_service("nginx", distro_inspirations::RunitRunlevel::Default, &[], 3);
+    assert_eq!(runit.tick_supervision(), 1);
+    assert_eq!(runit.get_service_status("nginx").unwrap(), distro_inspirations::RunitServiceStatus::Running);
+}
+
+#[test]
+fn test_sovereign_ostree_and_io_uring_inspection() {
+    let mut ostree = distro_inspirations::SovereignOstreeEngine::new();
+    let idx = ostree.stage_commit("commit-1.0.0", "1.0.0", "vmlinuz-6.8", 0x123456);
+    assert_eq!(idx, 0);
+
+    let mut io_ring = distro_inspirations::SovereignIoUring::new(64);
+    assert!(io_ring.submit_entry(distro_inspirations::SubmissionQueueEntry {
+        opcode: distro_inspirations::IoUringOpcode::Read,
+        fd: 1,
+        offset: 0,
+        user_data: 100,
+        data: vec![0u8; 512],
+    }).is_ok());
+    assert_eq!(io_ring.submit_and_wait(), 1);
 }

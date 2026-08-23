@@ -10,7 +10,6 @@ use core::mem;
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
 pub type ContainerID = usize;
@@ -828,8 +827,6 @@ mod tests {
     use super::*;
     use alloc::string::ToString;
     use alloc::vec;
-
-    #[test]
 
     #[test]
     fn test_overlayfs_stacking() {
