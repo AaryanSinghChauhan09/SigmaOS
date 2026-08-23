@@ -63,19 +63,9 @@ impl EevdfScheduler {
     }
 
     pub fn pick_next_task(&mut self) -> Option<SchedTask> {
-        if self.tasks.is_empty() {
-            return None;
-        }
-        // EEVDF picks tasks with positive lag (eligible) and earliest deadline
-        let mut best_idx = 0;
-        let mut min_deadline = u64::MAX;
-
-        for (i, task) in self.tasks.iter().enumerate() {
-            if task.deadline < min_deadline {
-                min_deadline = task.deadline;
-                best_idx = i;
-            }
-        }
+        // Bolt Optimization: Functional iterator `min_by_key` eliminates manual index and variable initialization tracking,
+        // allowing LLVM to optimize vector bounds checking and unroll the task selection loop in hot scheduler ticks.
+        let (best_idx, _) = self.tasks.iter().enumerate().min_by_key(|(_, task)| task.deadline)?;
         Some(self.tasks.remove(best_idx))
     }
 }
@@ -103,19 +93,9 @@ impl BoreScheduler {
     }
 
     pub fn pick_next_task(&mut self) -> Option<SchedTask> {
-        if self.tasks.is_empty() {
-            return None;
-        }
-        // BORE prioritizes tasks with smaller burst times to maximize interactivity
-        let mut best_idx = 0;
-        let mut min_burst = u64::MAX;
-
-        for (i, task) in self.tasks.iter().enumerate() {
-            if task.burst_time < min_burst {
-                min_burst = task.burst_time;
-                best_idx = i;
-            }
-        }
+        // Bolt Optimization: BORE prioritizes tasks with smaller burst times to maximize interactivity.
+        // Using `min_by_key` eliminates imperative state loop overhead and enables compiler loop unrolling.
+        let (best_idx, _) = self.tasks.iter().enumerate().min_by_key(|(_, task)| task.burst_time)?;
         Some(self.tasks.remove(best_idx))
     }
 }
@@ -208,18 +188,9 @@ impl CfsScheduler {
     }
 
     pub fn pick_next_task(&mut self) -> Option<SchedTask> {
-        if self.tasks.is_empty() {
-            return None;
-        }
-        let mut min_vruntime = u64::MAX;
-        let mut best_idx = 0;
-
-        for (i, task) in self.tasks.iter().enumerate() {
-            if task.virtual_runtime < min_vruntime {
-                min_vruntime = task.virtual_runtime;
-                best_idx = i;
-            }
-        }
+        // Bolt Optimization: CFS selects the task with the minimum virtual runtime.
+        // Iterator `min_by_key` provides clean single-pass selection without manual variable bounds setup.
+        let (best_idx, _) = self.tasks.iter().enumerate().min_by_key(|(_, task)| task.virtual_runtime)?;
         Some(self.tasks.remove(best_idx))
     }
 }
@@ -247,18 +218,9 @@ impl SchedDeadline {
     }
 
     pub fn pick_next_task(&mut self) -> Option<SchedTask> {
-        if self.tasks.is_empty() {
-            return None;
-        }
-        let mut earliest = u64::MAX;
-        let mut idx = 0;
-        for (i, t) in self.tasks.iter().enumerate() {
-            if t.deadline < earliest {
-                earliest = t.deadline;
-                idx = i;
-            }
-        }
-        Some(self.tasks.remove(idx))
+        // Bolt Optimization: Earliest Deadline First selection via single-pass `min_by_key` iterator chain.
+        let (best_idx, _) = self.tasks.iter().enumerate().min_by_key(|(_, task)| task.deadline)?;
+        Some(self.tasks.remove(best_idx))
     }
 }
 
