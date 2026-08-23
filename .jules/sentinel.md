@@ -48,3 +48,7 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 **Vulnerability:** Permitting unescaped carriage returns (`\r`) or line feeds (`\n`) in key-value attributes passed to structured syslog entries allows malicious log entries to split log frames and inject spoofed syslog headers or fake log entries.
 **Learning:** Unsanitized newlines in log fields break message framing in line-oriented log sinks like rsyslog and systemd-journald.
 **Prevention:** Explicitly strip or escape CRLF characters (`\r`, `\n`) from dynamic key and value attributes before adding them to log structures.
+
+## 2026-08-23 - Multi-Layer Packet Inspection with Post-Quantum Signatures and Hash Verification
+**Learning:** Combining sliding-window rate limiting, asymmetric post-quantum public key signature checking (Dilithium-5), zero-trust subnet filtering, and deep packet session hash matching prevents spoofing, replay attacks, and denial-of-service vectors at the network layer.
+**Action:** Enforce strict 4-stage validation (rate limit -> PQC signature -> subnet check -> payload hash) on all zero-trust network router interfaces.

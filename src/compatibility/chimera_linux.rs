@@ -1,4 +1,5 @@
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
 /// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.

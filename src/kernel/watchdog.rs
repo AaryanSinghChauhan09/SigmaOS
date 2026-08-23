@@ -78,6 +78,32 @@ pub enum DaemonState {
     Halted,
 }
 
+/// Restart Backoff Policy inspired by systemd, OpenRC, and runit
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DaemonRestartPolicy {
+    Always,
+    OnFailure,
+    ExponentialBackoff,
+    Never,
+}
+
+/// Socket Activation descriptor inspired by systemd & macOS launchd
+#[derive(Debug, Clone)]
+pub struct SocketActivationConfig {
+    pub port: u16,
+    pub is_bound: bool,
+    pub active_connections: usize,
+    pub auto_activate: bool,
+}
+
+/// Heartbeat Watchdog inspired by Linux watchdog and systemd WatchdogSec
+#[derive(Debug, Clone)]
+pub struct HeartbeatWatchdog {
+    pub timeout_seconds: u64,
+    pub last_heartbeat_timestamp: u64,
+    pub is_alive: bool,
+}
+
 /// Represents an advanced autonomous daemon/service shard (defeating legacy Linux systemd daemons)
 pub struct SovereignDaemonShard {
     pub name: String,
@@ -86,6 +112,10 @@ pub struct SovereignDaemonShard {
     pub restart_limit: u32,
     pub cpu_budget: f32, // percentage cap
     pub memory_budget: f32, // percentage cap
+    pub restart_policy: DaemonRestartPolicy,
+    pub restart_delay_sec: u32,
+    pub socket_activation: Option<SocketActivationConfig>,
+    pub heartbeat: HeartbeatWatchdog,
 }
 
 impl SovereignDaemonShard {
@@ -97,7 +127,59 @@ impl SovereignDaemonShard {
             restart_limit: 3,
             cpu_budget,
             memory_budget,
+            restart_policy: DaemonRestartPolicy::ExponentialBackoff,
+            restart_delay_sec: 2,
+            socket_activation: None,
+            heartbeat: HeartbeatWatchdog {
+                timeout_seconds: 10,
+                last_heartbeat_timestamp: 0,
+                is_alive: true,
+            },
         }
+    }
+
+    /// Sends a periodic heartbeat ping to the daemon watchdog supervisor
+    pub fn send_heartbeat(&mut self, timestamp: u64) {
+        self.heartbeat.last_heartbeat_timestamp = timestamp;
+        self.heartbeat.is_alive = true;
+    }
+
+    /// Checks if the daemon has missed its heartbeat timeout deadline
+    pub fn check_heartbeat_timeout(&mut self, current_time: u64) -> bool {
+        if self.state != DaemonState::Running {
+            return false;
+        }
+        let elapsed = current_time.saturating_sub(self.heartbeat.last_heartbeat_timestamp);
+        if elapsed > self.heartbeat.timeout_seconds {
+            self.heartbeat.is_alive = false;
+            self.trigger_failure()
+        } else {
+            true
+        }
+    }
+
+    /// Calculates the exponential backoff restart delay in seconds
+    pub fn calculate_backoff_delay(&self) -> u32 {
+        match self.restart_policy {
+            DaemonRestartPolicy::ExponentialBackoff => {
+                let shift = self.fail_count.min(10);
+                self.restart_delay_sec.saturating_mul(1 << shift)
+            }
+            _ => self.restart_delay_sec,
+        }
+    }
+
+    /// Triggers socket activation for the daemon upon incoming traffic
+    pub fn trigger_socket_activity(&mut self) -> bool {
+        if let Some(ref mut socket) = self.socket_activation {
+            socket.active_connections += 1;
+            if socket.auto_activate && self.state != DaemonState::Running {
+                self.state = DaemonState::Running;
+                self.fail_count = 0;
+                return true;
+            }
+        }
+        false
     }
 
     /// Simulates a failure and initiates user-defined self-healing loops (OOP strategy)
@@ -115,6 +197,7 @@ impl SovereignDaemonShard {
     pub fn reset_health(&mut self) {
         self.state = DaemonState::Running;
         self.fail_count = 0;
+        self.heartbeat.is_alive = true;
     }
 }
 
@@ -475,5 +558,45 @@ mod tests {
         let healed3 = daemon.trigger_failure();
         assert!(!healed3);
         assert_eq!(daemon.state, DaemonState::Halted);
+    }
+
+    #[test]
+    fn test_daemon_heartbeat_timeout() {
+        let mut daemon = SovereignDaemonShard::new("audit_daemon".to_string(), 5.0, 256.0);
+        daemon.send_heartbeat(100);
+
+        // Check before timeout (elapsed 5s <= 10s)
+        assert!(daemon.check_heartbeat_timeout(105));
+        assert!(daemon.heartbeat.is_alive);
+
+        // Check after timeout (elapsed 12s > 10s)
+        let healed = daemon.check_heartbeat_timeout(117);
+        assert!(healed); // Self-healing triggered
+        assert_eq!(daemon.state, DaemonState::SelfHealing);
+        assert!(!daemon.heartbeat.is_alive);
+    }
+
+    #[test]
+    fn test_daemon_exponential_backoff_and_socket_activation() {
+        let mut daemon = SovereignDaemonShard::new("httpd_shard".to_string(), 15.0, 1024.0);
+        daemon.state = DaemonState::Stopped;
+
+        daemon.socket_activation = Some(SocketActivationConfig {
+            port: 80,
+            is_bound: true,
+            active_connections: 0,
+            auto_activate: true,
+        });
+
+        // Exponential backoff verification
+        assert_eq!(daemon.calculate_backoff_delay(), 2); // 2 * 2^0
+        daemon.fail_count = 2;
+        assert_eq!(daemon.calculate_backoff_delay(), 8); // 2 * 2^2
+
+        // Socket activation auto-starts daemon
+        let activated = daemon.trigger_socket_activity();
+        assert!(activated);
+        assert_eq!(daemon.state, DaemonState::Running);
+        assert_eq!(daemon.socket_activation.as_ref().unwrap().active_connections, 1);
     }
 }
