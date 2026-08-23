@@ -103,6 +103,15 @@ pub struct PolicyRule {
     pub permission: String,
 }
 
+pub struct AppArmorManager;
+pub struct AppArmorProfile;
+pub enum ObjectType { File, Directory }
+pub struct SecurityLabel;
+pub struct SecurityPolicy;
+pub struct SecurityRule;
+pub enum SelinuxPermission { Read, Write, Execute }
+pub type Permission = SelinuxPermission;
+
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,
     pub policies: HashSet<AvcKey>,
@@ -198,7 +207,6 @@ impl SelinuxEngine {
         Ok(true)
     }
 }
-
 
 /// Multi-Level Security (MLS) sensitivity levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

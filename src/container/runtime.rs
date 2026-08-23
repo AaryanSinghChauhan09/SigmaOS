@@ -6,12 +6,11 @@ use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
-
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
 pub type ContainerID = usize;
@@ -62,33 +61,6 @@ pub enum ContainerError {
 }
 
 /// Container info
-#[repr(C)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
-}
-
-impl ContainerInfo {
-    pub fn new(id: ContainerID) -> Self {
-        ContainerInfo {
-            id,
-            name: [0; 64],
-            image: [0; 128],
-            state: ContainerState::Created,
-            pid: None,
-            memory_limit: 0,
-            cpu_limit: 0,
-            capability: ContainerCapability::new(),
-        }
-    }
-}
-
 
 /// Container network configuration type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -112,32 +84,6 @@ pub struct ContainerNamespace {
     pub uid_mapping: u32,
     pub gid_mapping: u32,
     pub rootless: bool,
-}
-
-impl ContainerNamespace {
-    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_uid == 0 {
-                Ok(self.uid_mapping)
-            } else {
-                Ok(self.uid_mapping + container_uid)
-            }
-        } else {
-            Ok(container_uid)
-        }
-    }
-
-    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_gid == 0 {
-                Ok(self.gid_mapping)
-            } else {
-                Ok(self.gid_mapping + container_gid)
-            }
-        } else {
-            Ok(container_gid)
-        }
-    }
 }
 
 impl ContainerNamespace {
@@ -196,6 +142,20 @@ impl NamespaceConfig {
     }
 }
 
+/// Container seccomp profiles
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if !self.hardened {
+            return false;
+        }
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            false
+        }
+    }
+}
 
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
@@ -238,7 +198,6 @@ impl OverlayFS {
 }
 
 /// Simple container (OOP: Concrete container class)
-#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -665,48 +624,17 @@ impl SimpleContainerRuntime {
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
-    alloc::alloc::alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 
 
 pub mod oci {
-    extern crate alloc;
     use crate::container::ContainerError;
+    use crate::container::runtime::NamespaceConfig;
     use alloc::string::String;
     use alloc::string::ToString;
     use alloc::vec::Vec;
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use super::super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
-
-    #[test]
-    fn test_container_creation() {
-        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
-        let id = runtime
-            .create_container(
-                b"sovereign_container",
-                b"ubuntu-pqc",
-                ContainerCapability::full(),
-            )
-            .unwrap();
-        assert_eq!(id, 1);
-    }
 
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
@@ -730,19 +658,8 @@ mod tests {
                 cgroupns: None,
             }
         }
-
-        pub fn clone(&self) -> Self {
-            NamespaceSet {
-                pidns: self.pidns,
-                mntns: self.mntns,
-                netns: self.netns,
-                utsns: self.utsns,
-                ipcns: self.ipcns,
-                userns: self.userns,
-                cgroupns: self.cgroupns,
-            }
-        }
     }
+
 
     pub struct OciSpec {
         pub version: String,
@@ -864,6 +781,13 @@ mod tests {
             ContainerManager
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
 
@@ -927,5 +851,4 @@ mod tests {
             ContainerError::PermissionDenied
         );
     }
-}
 }
