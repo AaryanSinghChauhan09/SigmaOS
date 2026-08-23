@@ -43,6 +43,8 @@ mod bitmap_pmm;
 #[path = "../src/memory/low_level.rs"]
 mod low_level_memory;
 
+#[path = "../src/filesystem/ext4_ntfs_security.rs"]
+mod ext4_ntfs_security;
 #[path = "../src/access/control.rs"]
 mod access_control;
 
@@ -77,8 +79,8 @@ use statutory_compliance::{
 };
 use system_user::{UserManager as TestUserManager};
 
-use access_control::{
-    NtfsAce as Nfs4Ace, NtfsAceType as Nfs4AceType,
+use ext4_ntfs_security::{
+    NtfsAce as Nfs4Ace, AceType as Nfs4AceType,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{

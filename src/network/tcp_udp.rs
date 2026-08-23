@@ -464,9 +464,9 @@ mod tests {
 
     #[test]
     fn test_tcp_socket_flow() {
-        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
+        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 80);
         assert_eq!(socket.id(), 1);
-        assert_eq!(socket.protocol(), Protocol::TCP);
+        assert_eq!(socket.protocol(), Protocol::Tcp);
         assert!(socket.listen().is_ok());
         assert!(socket.connect(8080).is_ok());
         assert_eq!(socket.get_state(), TCPState::Established);
@@ -494,9 +494,9 @@ mod tests {
 
     #[test]
     fn test_udp_socket_flow() {
-        let mut socket = SimpleSocket::new(2, Protocol::UDP, 53);
+        let mut socket = SimpleSocket::new(2, Protocol::Udp, 53);
         assert_eq!(socket.id(), 2);
-        assert_eq!(socket.protocol(), Protocol::UDP);
+        assert_eq!(socket.protocol(), Protocol::Udp);
 
         let data = b"dnsreq";
         assert_eq!(socket.sendto(data, 53).unwrap(), 6);

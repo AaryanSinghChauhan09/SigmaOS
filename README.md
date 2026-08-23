@@ -171,13 +171,11 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Declarative theming engine
 
 **Boot & Deployment:**
-=======
 - 🔄 TCP/UDP stack - Partial
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
 - ✅ Zenith Desktop prototype
 - ✅ sigma-pkg CLI
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
 - ⬜ Bootable ISO (Phase G)
 
 

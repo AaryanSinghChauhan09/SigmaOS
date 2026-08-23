@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Parallel Build Graph Optimizer for SigmaOS
 // Location: tools/build/parallel.rs
 

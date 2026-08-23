@@ -1,4 +1,4 @@
-# Welcome to the SigmaOS Wiki
+# 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
 > **"Sovereignty is the ultimate efficiency."**
 > The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.
@@ -171,6 +171,11 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Declarative theming engine
 
 **Boot & Deployment:**
+- 🔄 TCP/UDP stack - Partial
+- ✅ Ext4 + FAT32 filesystems
+- ✅ NVMe + USB xHCI drivers
+- ✅ Zenith Desktop prototype
+- ✅ sigma-pkg CLI
 - ⬜ Bootable ISO (Phase G)
 
 

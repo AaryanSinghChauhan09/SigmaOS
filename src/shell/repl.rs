@@ -3,6 +3,17 @@
 
 use std::io::{self, BufRead, Write};
 
+#[derive(Debug, Clone, Default)]
+pub struct AgentAutomationEngine {
+    pub active: bool,
+}
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        Self { active: false }
+    }
+}
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
