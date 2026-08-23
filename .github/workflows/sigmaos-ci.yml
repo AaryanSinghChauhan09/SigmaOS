@@ -86,7 +86,7 @@ jobs:
       run: sudo apt-get install -y -q qemu-system-x86
 
     - name: Download x86_64 Build
-      uses: actions/download-artifact@v4.2.1
+      uses: actions/download-artifact@v4
       with:
         name: sigmaos-x86_64-build
         path: build/x86_64/
