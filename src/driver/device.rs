@@ -268,8 +268,6 @@ impl UnifiedPeripheral for DdeDeviceWrapper {
 pub struct DeviceExtension {
     pub irq: u8,
     pub base_port: u16,
-    pub base_address: u32,
-    pub memory_size: usize,
     pub device_context: [u8; 256],
 }
 
@@ -278,8 +276,6 @@ impl DeviceExtension {
         Self {
             irq: 0,
             base_port: 0,
-            base_address: 0,
-            memory_size: 0,
             device_context: [0u8; 256],
         }
     }
@@ -862,190 +858,6 @@ mod legacy_tests {
         }
     }
 
-    struct MockGpu {
-        id: usize,
-        vendor_id: u16,
-        pub res_width: u32,
-        pub res_height: u32,
-        pub engine_clock_mhz: u32,
-        pub cuda_cores_active: bool,
-        pub color_depth_bpp: u32,
-    }
-    impl MockGpu {
-        fn new(id: usize, _name: &[u8], _mmio: u32) -> Self {
-            let vendor_id = match id {
-                1 => 0x8086,
-                2 => 0x1002,
-                3 => 0x10DE,
-                _ => 0x0000,
-            };
-            Self { id, vendor_id, res_width: 800, res_height: 600, engine_clock_mhz: 1000, cuda_cores_active: false, color_depth_bpp: 32 }
-        }
-        fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
-        fn info(&self) -> DeviceInfo { let mut i = DeviceInfo::new(DeviceType::Graphics); i.vendor_id = self.vendor_id; i }
-        fn ioctl(&mut self, cmd: u32, arg: usize) -> Result<usize, DeviceError> {
-            if cmd == 0x1001 { self.res_width = (arg >> 16) as u32; self.res_height = (arg & 0xFFFF) as u32; }
-            if cmd == 0x1004 { self.engine_clock_mhz = arg as u32; }
-            if cmd == 0x1005 { self.cuda_cores_active = arg != 0; }
-            if cmd == 0x1006 { self.color_depth_bpp = arg as u32; }
-            Ok(0)
-        }
-    }
-
-    type IntelHDGpu = MockGpu;
-    type RadeonGpu = MockGpu;
-    type NvidiaGpu = MockGpu;
-    type VesaFramebufferDevice = MockGpu;
-
-    struct MockStorage {
-        vendor_id: u16,
-        block_size: usize,
-        total_blocks: u64,
-        pub ncq_enabled: bool,
-        pub features_negotiated: usize,
-        buffer: [u8; 512],
-    }
-    impl MockStorage {
-        fn new(vendor_id: u16) -> Self {
-            let mut b = [0u8; 512];
-            b[0] = 0xAA;
-            Self { vendor_id, block_size: 512, total_blocks: 10, ncq_enabled: true, features_negotiated: 0, buffer: b }
-        }
-        fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
-        fn info(&self) -> DeviceInfo { let mut i = DeviceInfo::new(DeviceType::Block); i.vendor_id = self.vendor_id; i }
-        fn block_size(&self) -> usize { self.block_size }
-        fn total_blocks(&self) -> u64 { self.total_blocks }
-        fn ioctl(&mut self, cmd: u32, arg: usize) -> Result<usize, DeviceError> {
-            if cmd == 0x2001 { return Ok(64); }
-            if cmd == 0x2002 { self.ncq_enabled = false; }
-            if cmd == 0x2003 { self.features_negotiated = arg; }
-            Ok(0)
-        }
-        fn write_block(&mut self, _blk: u64, buf: &[u8]) -> Result<(), DeviceError> { self.buffer.copy_from_slice(&buf[..512]); Ok(()) }
-        fn read_block(&mut self, _blk: u64, buf: &mut [u8]) -> Result<(), DeviceError> { buf[..512].copy_from_slice(&self.buffer); Ok(()) }
-        fn read(&mut self, buf: &mut [u8]) -> Result<usize, DeviceError> {
-            let len = buf.len().min(512);
-            buf[..len].copy_from_slice(&self.buffer[..len]);
-            Ok(len)
-        }
-    }
-
-    struct NvmeController;
-    impl NvmeController { fn new(_id: usize, _name: &[u8], _blocks: u64, _bs: usize) -> MockStorage { MockStorage::new(0x144D) } }
-    struct AhciSataController;
-    impl AhciSataController { fn new(_id: usize, _name: &[u8], _blocks: u64, _bs: usize) -> MockStorage { MockStorage::new(0x8086) } }
-    struct VirtioBlockDevice;
-    impl VirtioBlockDevice { fn new(_id: usize, _name: &[u8], _blocks: u64, _bs: usize) -> MockStorage { MockStorage::new(0x1AF4) } }
-
-    struct MockNet {
-        vendor_id: u16,
-        mac: [u8; 6],
-        pub duplex_mode_full: bool,
-        pub mtu: u32,
-        send_count: usize,
-    }
-    impl MockNet {
-        fn new(vendor_id: u16, mac: [u8; 6]) -> Self { Self { vendor_id, mac, duplex_mode_full: true, mtu: 1500, send_count: 0 } }
-        fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
-        fn info(&self) -> DeviceInfo { let mut i = DeviceInfo::new(DeviceType::Network); i.vendor_id = self.vendor_id; i }
-        fn get_mac_address(&self) -> [u8; 6] { self.mac }
-        fn set_mac_address(&mut self, mac: [u8; 6]) -> Result<(), DeviceError> { self.mac = mac; Ok(()) }
-        fn ioctl(&mut self, cmd: u32, _arg: usize) -> Result<usize, DeviceError> {
-            if cmd == 0x3001 { return Ok(self.send_count); }
-            if cmd == 0x3002 { self.duplex_mode_full = false; }
-            if cmd == 0x3003 { self.mtu = _arg as u32; }
-            Ok(0)
-        }
-        fn send_packet(&mut self, _pkt: &[u8]) -> Result<(), DeviceError> { self.send_count += 1; Ok(()) }
-    }
-
-    struct IntelE1000Network;
-    impl IntelE1000Network { fn new(_id: usize, _name: &[u8], mac: [u8; 6]) -> MockNet { MockNet::new(0x8086, mac) } }
-    struct RealtekRtl8139Network;
-    impl RealtekRtl8139Network { fn new(_id: usize, _name: &[u8], mac: [u8; 6]) -> MockNet { MockNet::new(0x10EC, mac) } }
-    struct VirtioNetDevice;
-    impl VirtioNetDevice { fn new(_id: usize, _name: &[u8], mac: [u8; 6]) -> MockNet { MockNet::new(0x1AF4, mac) } }
-
-    struct MockPeripheral {
-        vendor_id: u16,
-        pub port: u16,
-        pub strobe: bool,
-        pub baud_rate: u32,
-        pub register_map: [u8; 256],
-        pub volume_level: u32,
-        pub sample_rate_hz: u32,
-        pub resolution_count: u32,
-        pub paired_devices_count: u32,
-        pub clock_speed_hz: u32,
-        pub mode: u32,
-        pub pins_state_mask: u32,
-        pub links_active_count: u32,
-        pub is_locked: bool,
-        pub active_enclaves: u32,
-        pub max_temp_allowed: u32,
-        pub paper_out: bool,
-        read_val: u8,
-    }
-    impl MockPeripheral {
-        fn new(vendor_id: u16) -> Self { Self { vendor_id, port: 0, strobe: false, baud_rate: 9600, register_map: [0; 256], volume_level: 50, sample_rate_hz: 44100, resolution_count: 4, paired_devices_count: 0, clock_speed_hz: 100000, mode: 0, pins_state_mask: 0, links_active_count: 0, is_locked: false, active_enclaves: 0, max_temp_allowed: 85, paper_out: false, read_val: 0x55 } }
-        fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
-        fn info(&self) -> DeviceInfo { let mut i = DeviceInfo::new(DeviceType::Character); i.vendor_id = self.vendor_id; i }
-        fn query_channel(&self) -> PortAddress { PortAddress::PortIO(self.port) }
-        fn read_byte(&mut self, _off: u32) -> Result<u8, DeviceError> { Ok(0xDF) }
-        fn write_byte(&mut self, _off: u32, _val: u8) -> Result<(), DeviceError> { Ok(()) }
-        fn write(&mut self, buf: &[u8]) -> Result<usize, DeviceError> {
-            self.strobe = true;
-            if buf.len() >= 4 {
-                self.register_map[buf[0] as usize] = buf[1];
-                self.register_map[buf[2] as usize] = buf[3];
-            }
-            Ok(buf.len())
-        }
-        fn read(&mut self, buf: &mut [u8]) -> Result<usize, DeviceError> { if !buf.is_empty() { buf[0] = self.read_val; } Ok(buf.len()) }
-        fn ioctl(&mut self, cmd: u32, arg: usize) -> Result<usize, DeviceError> {
-            if cmd == 0x4001 { self.volume_level = arg as u32; }
-            if cmd == 0x4002 { self.sample_rate_hz = arg as u32; }
-            if cmd == 0x5001 { self.read_val = arg as u8; }
-            if cmd == 0x5002 { self.resolution_count = arg as u32; }
-            if cmd == 0x5003 { return Ok(10); }
-            if cmd == 0x6001 { self.paired_devices_count += 1; }
-            if cmd == 0x7001 { self.clock_speed_hz = arg as u32; }
-            if cmd == 0x7002 { self.mode = arg as u32; }
-            if cmd == 0x7003 { self.pins_state_mask = arg as u32; }
-            if cmd == 0x7004 { self.links_active_count = arg as u32; }
-            if cmd == 0x8001 { self.is_locked = arg != 0; }
-            if cmd == 0x8002 { self.active_enclaves += 1; }
-            if cmd == 0x9001 { return Ok(25); }
-            if cmd == 0x9002 { self.max_temp_allowed = arg as u32; }
-            if cmd == 0xA001 { self.paper_out = arg != 0; }
-            if cmd == 0xB001 { return Ok(4); }
-            Ok(0)
-        }
-    }
-
-    struct FloppyDiskDevice; impl FloppyDiskDevice { fn new(_id: usize, _name: &[u8]) -> MockStorage { MockStorage::new(0) } }
-    struct ParallelPortDevice; impl ParallelPortDevice { fn new(_id: usize, _name: &[u8], base_port: u16) -> MockPeripheral { let mut p = MockPeripheral::new(0); p.port = base_port; p } }
-    struct SerialUartDevice; impl SerialUartDevice { fn new(_id: usize, _name: &[u8], base_port: u16) -> MockPeripheral { let mut p = MockPeripheral::new(0); p.port = base_port; p.baud_rate = 115200; p } }
-    struct AdLibSoundDevice; impl AdLibSoundDevice { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct IsaBusDevice; impl IsaBusDevice { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-
-    struct IntelHdaAudio; impl IntelHdaAudio { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0x8086) } }
-    struct Ac97AudioDevice; impl Ac97AudioDevice { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0x8086) } }
-    struct UsbHidKeyboard; impl UsbHidKeyboard { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0x046D) } }
-    struct Ps2MouseDevice; impl Ps2MouseDevice { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct TouchscreenController; impl TouchscreenController { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct BluetoothController; impl BluetoothController { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct WirelessWifiDevice; impl WirelessWifiDevice { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0x14E4) } }
-    struct I2cController; impl I2cController { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct SpiController; impl SpiController { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct GpioController; impl GpioController { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct PciExpressBus; impl PciExpressBus { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct TpmSecurityModule; impl TpmSecurityModule { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct SecureEnclaveDriver; impl SecureEnclaveDriver { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct ImuSensorDriver; impl ImuSensorDriver { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct ThermalSensorDriver; impl ThermalSensorDriver { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-    struct LinePrinterDevice; impl LinePrinterDevice { fn new(_id: usize, _name: &[u8]) -> MockPeripheral { MockPeripheral::new(0) } }
-
     #[test]
     fn test_legacy_device_oop() {
         let mut legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
@@ -1519,24 +1331,8 @@ impl<T> Vec<T> {
         self.len
     }
 
-        pub fn as_slice(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-
     pub fn clear(&mut self) {
         self.len = 0;
-    }
-
-    pub fn as_slice(&self) -> &[T] {
-        if self.len == 0 {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
     }
 
     pub fn iter(&self) -> VecIterator<'_, T> {
@@ -1560,11 +1356,8 @@ impl<T> Vec<T> {
             self.capacity * 2
         };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if new_data.is_null() {
-            panic!("out of memory");
-        }
 
-        if !self.data.is_null() {
+        if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
@@ -1572,10 +1365,10 @@ impl<T> Vec<T> {
             if self.capacity > 0 {
                 free(self.data as *mut u8);
             }
-        }
 
-        self.data = new_data;
-        self.capacity = new_capacity;
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
     }
 }
 
@@ -1660,3 +1453,79 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
+// External allocator functions
+#[cfg(not(test))]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+extern "C" {
+    fn malloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+
+
+
+#[cfg(test)]
+#[no_mangle]
+pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
+    malloc(size)
+}
+
+// ==========================================
+// Standalone unit tests
+// ==========================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_device_descriptors() {
+        let capability = DeviceCapability::full();
+        let desc = DeviceDescriptor::new(10, b"SerialTTY", DeviceType::Character, capability);
+        assert_eq!(desc.get_state(), DeviceState::Uninitialized);
+        desc.set_state(DeviceState::Ready);
+        assert_eq!(desc.get_state(), DeviceState::Ready);
+    }
+
+    #[test]
+    fn test_simple_block_device() {
+        let mut dev = SimpleBlockDevice::new(1, b"disk0", 4, 512);
+        assert_eq!(dev.info().vendor_id, 0x8086);
+        assert!(dev.init().is_ok());
+
+        let mut write_buf = [0u8; 512];
+        write_buf[0] = 0xAA;
+        assert!(dev.write_block(2, &write_buf).is_ok());
+
+        let mut read_buf = [0u8; 512];
+        assert!(dev.read_block(2, &mut read_buf).is_ok());
+        assert_eq!(read_buf[0], 0xAA);
+    }
+
+    #[test]
+    fn test_device_manager_autoprobe_and_params() {
+        let mut mgr = DeviceManager::new();
+
+        // Register custom boot parameter (module param)
+        mgr.set_module_param(b"debug_level", 4);
+        assert_eq!(mgr.get_module_param(b"debug_level"), Some(4));
+        assert_eq!(mgr.get_module_param(b"non_existent"), None);
+
+        // Register PCI device table probe matches
+        let entry = DriverProbeEntry {
+            vendor_id: 0x10EC,
+            device_id: 0x8168,
+            device_type: DeviceType::Network,
+        };
+        mgr.register_probe_match(entry);
+
+        // Check autoprobe success
+        assert!(mgr.auto_probe_and_bind(0x10EC, 0x8168, DeviceType::Network));
+        assert!(!mgr.auto_probe_and_bind(0xFFFF, 0xFFFF, DeviceType::Network));
+    }
+}

@@ -309,7 +309,7 @@ mod tests {
 
     #[test]
     fn test_apt_control_parsing_and_translation() {
-        let adapter = UniversalPackageAdapter::new();
+        let adapter = UniversalPackageManager::new();
         let manifest_text = r#"
             Package: curl
             Version: 8.2.1
@@ -510,7 +510,7 @@ mod additional_adapter_tests {
 
     #[test]
     fn test_rpm_spec_parsing_and_native_translation() {
-        let adapter = UniversalPackageAdapter::new();
+        let adapter = UniversalPackageManager::new();
         let spec_text = r#"
             Name: custom_service
             Version: 2.1

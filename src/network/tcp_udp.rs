@@ -16,21 +16,6 @@ pub enum Protocol {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TCPState {
-    Closed = 0,
-    Listen = 1,
-    SynSent = 2,
-    SynReceived = 3,
-    Established = 4,
-    FinWait1 = 5,
-    FinWait2 = 6,
-    CloseWait = 7,
-    Closing = 8,
-    TimeWait = 9,
-}
-
-#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum NetworkError {
     Success = 0,

@@ -6,6 +6,7 @@
 // - PCIe ECAM configuration space & BAR decoding
 // - PackageSnapshotRollbackEngine pre/post transaction rollbacks
 // - QEMU/KVM Qcow2 image overlays, vCPU context & VirtIO virtqueue ring buffers
+// - Classic OS Algorithms (VirtIO Ballooning, Banker's Algorithm, Sleeping Barber, Ticket Spinlocks, Stack Canaries, Batch Queue)
 
 #[path = "../src/kernel/pci_scanner.rs"]
 mod pci_scanner;
@@ -25,12 +26,16 @@ mod securelevels;
 #[path = "../src/security/jails.rs"]
 mod jails;
 
+#[path = "../src/kernel/classic_os.rs"]
+mod classic_os;
+
 use pci_scanner::*;
 use transaction::*;
 use virt::*;
 use btrfs::*;
 use securelevels::*;
 use jails::*;
+use classic_os::*;
 
 #[test]
 fn test_inspection_pcie_ecam_and_bar_decoder() {
@@ -129,4 +134,48 @@ fn test_inspection_freebsd_jails_and_vnet() {
     let jail = mgr.active_jails.iter().find(|j| j.jid == jid).unwrap();
     assert_eq!(jail.name, "isolated_web_jail");
     assert!(!jail.capabilities.allow_mounting);
+}
+
+#[test]
+fn test_inspection_classic_os_algorithms() {
+    // 1. VirtIO Memory Ballooning
+    let mut balloon = VirtioBalloonManager::new(10);
+    balloon.set_target_pages(15);
+    let inflated = balloon.inflate(&[100, 101, 102]);
+    assert_eq!(inflated, 3);
+    assert_eq!(balloon.current_pages(), 13);
+
+    // 2. Banker's Algorithm (Deadlock Avoidance)
+    let available = vec![3, 3, 2];
+    let max_matrix = vec![vec![3, 3, 2], vec![3, 2, 2]];
+    let allocation = vec![vec![0, 1, 0], vec![2, 0, 0]];
+    let mut banker = BankersAlgorithm::new(2, 3, available, max_matrix, allocation);
+    assert!(banker.is_safe_state());
+    assert!(banker.request_resources(1, &[1, 0, 2]));
+
+    // 3. Sleeping Barber Synchronization
+    let mut barber = SleepingBarberQueue::new(2);
+    assert!(barber.is_barber_sleeping());
+    assert!(barber.customer_arrives(1)); // Served immediately
+    assert!(!barber.is_barber_sleeping());
+    assert!(barber.customer_arrives(2));
+    assert_eq!(barber.service_next_customer(), Some(2));
+
+    // 4. Ticket Spinlock with Exponential Backoff
+    let spinlock = TicketSpinlock::new();
+    let ticket = spinlock.lock();
+    spinlock.unlock(ticket);
+
+    // 5. Stack Canary Protection
+    let protector = StackCanaryProtector::new(0x1234_5678_9ABC_DEF0);
+    let canary = protector.generate_canary();
+    assert!(protector.verify_canary(canary));
+    assert!(!protector.verify_canary(canary ^ 0xFF));
+
+    // 6. Multiprogrammed Batch Queue Processor
+    let mut batch_queue = BatchSystemQueue::new(2);
+    batch_queue.submit_job(BatchJob { job_id: 1, priority: 1, estimated_time_ms: 100 });
+    batch_queue.submit_job(BatchJob { job_id: 2, priority: 2, estimated_time_ms: 200 });
+    assert_eq!(batch_queue.running_count(), 2);
+    assert!(batch_queue.complete_job(1));
 }
