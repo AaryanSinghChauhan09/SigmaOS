@@ -1,6 +1,6 @@
-/// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
-/// Implements interactive scripting, dynamic script-like functions, positional arguments,
-/// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
+// SPDX-License-Identifier: MIT
+
+extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::format;
