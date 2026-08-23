@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MIT
 // Module definitions for Feature Flags System
 pub mod sigma_features;
 pub mod resolver;
