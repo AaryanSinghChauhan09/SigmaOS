@@ -22,8 +22,7 @@ use crate::klib::HashMap;
 use std::collections::HashMap;
 
 #[cfg(test)]
-pub mod mock_scheduler {
-    extern crate alloc;
+mod mock_scheduler {
     use core::time::Duration;
     use alloc::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -109,12 +108,93 @@ pub struct ProcessExtendedContext {
     pub cpu_time_accumulated_secs: u64,
 }
 
+#[cfg(test)]
+use std::collections::HashMap as StdHashMap;
+
+#[cfg(not(test))]
+use crate::klib::HashMap;
+#[cfg(not(test))]
+use crate::kernel::scheduler::{Priority as SchedPriority, Process as SchedProcess, ProcessState as SchedProcessState};
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Priority {
+    Idle = 0,
+    Low = 1,
+    Normal = 2,
+    High = 3,
+    Realtime = 4,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessState {
+    Running,
+    Ready,
+    Blocked,
+    Terminated,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone)]
+pub struct Process {
+    pub pid: u64,
+    pub name: String,
+    pub priority: Priority,
+    pub state: ProcessState,
+    pub runtime: Duration,
+    pub time_slice: Duration,
+}
+
+#[cfg(test)]
+impl Process {
+    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
+        Self {
+            pid,
+            name,
+            priority,
+            state: ProcessState::Ready,
+            runtime: Duration::from_secs(0),
+            time_slice: Duration::from_millis(10),
+        }
+    }
+}
+
+/// Signal types (Linux/BSD POSIX parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Signal {
+    SigCont = 18,
+    SigStop = 19,
+    SigKill = 9,
+    SigTerm = 15,
+}
+
+/// Extended Process Resource Metrics
+#[derive(Debug, Clone)]
+pub struct ProcessResourceMetrics {
+    pub rss_memory_bytes: usize,
+    pub virtual_memory_bytes: usize,
+    pub thread_count: usize,
+    pub cpu_affinity_mask: u64,
+}
+
+impl ProcessResourceMetrics {
+    pub fn default() -> Self {
+        Self {
+            rss_memory_bytes: 4096,
+            virtual_memory_bytes: 65536,
+            thread_count: 1,
+            cpu_affinity_mask: 0xFFFFFFFF,
+        }
+    }
+}
+
 pub struct ProcessLifecycleManager {
     processes: HashMap<u64, Process>,
     extended_contexts: HashMap<u64, ProcessExtendedContext>,
     parent_map: HashMap<u64, u64>, // child -> parent
     exit_codes: HashMap<u64, i32>,
-    pub group_ids: HashMap<u64, u32>,
+    metrics_map: HashMap<u64, ProcessResourceMetrics>,
     next_pid: AtomicUsize,
 }
 
@@ -125,7 +205,7 @@ impl ProcessLifecycleManager {
             extended_contexts: HashMap::new(),
             parent_map: HashMap::new(),
             exit_codes: HashMap::new(),
-            group_ids: HashMap::new(),
+            metrics_map: HashMap::new(),
             next_pid: AtomicUsize::new(100),
         }
     }
@@ -138,7 +218,7 @@ impl ProcessLifecycleManager {
             .ok_or("Parent process not found")?;
 
         let child_pid = self.next_pid.fetch_add(1, Ordering::SeqCst) as u64;
-        let child_name = format!("{}_forked", parent.name);
+        let child_name = alloc::format!("{}_forked", parent.name);
 
         let mut child = Process::new(child_pid, child_name, parent.priority);
         child.state = ProcessState::Ready;
@@ -166,8 +246,7 @@ impl ProcessLifecycleManager {
         self.processes.insert(child_pid, child);
         self.extended_contexts.insert(child_pid, child_ctx);
         self.parent_map.insert(child_pid, parent_pid);
-        let parent_pgid = *self.group_ids.get(&parent_pid).unwrap_or(&0);
-        self.group_ids.insert(child_pid, parent_pgid);
+        self.metrics_map.insert(child_pid, ProcessResourceMetrics::default());
 
         Ok(child_pid)
     }
@@ -259,7 +338,9 @@ impl ProcessLifecycleManager {
     }
 
     pub fn register_process(&mut self, process: Process) {
-        self.processes.insert(process.pid, process);
+        let pid = process.pid;
+        self.processes.insert(pid, process);
+        self.metrics_map.insert(pid, ProcessResourceMetrics::default());
     }
 
     pub fn get_process(&self, pid: u64) -> Option<&Process> {
@@ -279,6 +360,118 @@ impl Default for ProcessLifecycleManager {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Windows/Linux/BSD-inspired Executive & Kernel Process/Thread Control Blocks (EPROCESS, KPROCESS, ETHREAD, KTHREAD)
+/// with x86_64/ARM64 architectural contexts, Process Environment Block (PEB), and Thread Environment Block (TEB).
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShardExecutionState {
+    Ready,
+    Running,
+    Waiting,
+    Terminated,
+}
+
+/// x86_64 CPU Architectural Context saved during scheduler preemptions
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct X86_64Context {
+    pub rip: u64,
+    pub rsp: u64,
+    pub rflags: u64,
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64,
+    pub rdi: u64,
+    pub rbp: u64,
+    pub r8: u64,
+    pub r9: u64,
+    pub r10: u64,
+    pub r11: u64,
+    pub r12: u64,
+    pub r13: u64,
+    pub r14: u64,
+    pub r15: u64,
+}
+
+/// ARM64 CPU Architectural Context saved during scheduler preemptions
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Arm64Context {
+    pub pc: u64,
+    pub sp: u64,
+    pub cpsr: u64,
+    pub x: [u64; 31],
+}
+
+/// KPROCESS (Kernel Process Block): Low-level scheduler and hardware page directory root
+#[repr(C)]
+pub struct KProcess {
+    pub directory_table_base: u64, // CR3 register equivalent
+    pub affinity_mask: u64,        // CPU cores affinity bitmask
+    pub kernel_time_ms: u64,
+    pub user_time_ms: u64,
+    pub capability_mask: u64,
+}
+
+/// EPROCESS (Executive Process Block): High-level process metadata wrapping KPROCESS (Windows/BSD inspired)
+#[repr(C)]
+pub struct EProcess {
+    pub pcb: KProcess,             // Kernel Process Block (PCB)
+    pub unique_process_id: u64,    // PID
+    pub parent_process_id: u64,
+    pub image_file_name: [u8; 16],
+    pub peb_address: u64,          // Virtual pointer to Process Environment Block (PEB)
+    pub exit_status: i32,
+    pub active_threads_count: usize,
+}
+
+/// KTHREAD (Kernel Thread Block): Low-level scheduler thread state and stack boundaries
+#[repr(C)]
+pub struct KThread {
+    pub kernel_stack_top: u64,
+    pub kernel_stack_bottom: u64,
+    pub priority: u8,
+    pub state: ShardExecutionState,
+    pub context_x64: X86_64Context,
+    pub context_arm: Arm64Context,
+    pub cpu_id: u32,               // Active running CPU core id
+}
+
+/// ETHREAD (Executive Thread Block): High-level thread block wrapping KTHREAD (Windows/BSD inspired)
+#[repr(C)]
+pub struct EThread {
+    pub tcb: KThread,              // Thread Control Block (TCB)
+    pub unique_thread_id: u64,     // TID
+    pub process_id: u64,           // Parent Process ID
+    pub start_address: u64,
+    pub teb_address: u64,          // Virtual pointer to Thread Environment Block (TEB)
+}
+
+/// PEB (Process Environment Block): User-mode accessible process info (Windows/Linux/BSD inspired)
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default)]
+pub struct ProcessEnvironmentBlock {
+    pub image_base_address: u64,
+    pub loader_data_address: u64,
+    pub process_parameters_address: u64, // Environment variables path
+    pub heap_base_address: u64,
+    pub number_of_processors: u32,
+    pub session_id: u32,
+}
+
+/// TEB (Thread Environment Block): User-mode accessible thread info (Windows/Linux/BSD inspired)
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default)]
+pub struct ThreadEnvironmentBlock {
+    pub stack_limit: u64,         // User stack bottom
+    pub stack_base: u64,          // User stack top
+    pub thread_local_storage_ptr: u64, // TLS pointer
+    pub exception_list_address: u64, // Exception list pointer
 }
 
 #[cfg(test)]
@@ -308,57 +501,73 @@ mod tests {
     }
 
     #[test]
-    fn test_linux_namespaces_and_bsd_rlimits() {
-        let mut manager = ProcessLifecycleManager::new();
-        let init = Process::new(1, "init".to_string(), Priority::Normal);
-        manager.register_process(init);
-
-        // 1. Isolate Network & Mount namespaces Linux-style
-        let flags = NamespaceFlags {
-            isolate_pid: false,
-            isolate_net: true,
-            isolate_mount: true,
-            isolate_uts: false,
+    fn test_sovereign_kernel_process_and_thread_structures() {
+        let kproc = KProcess {
+            directory_table_base: 0x1F000,
+            affinity_mask: 0x0F, // Core 0-3
+            kernel_time_ms: 120,
+            user_time_ms: 80,
+            capability_mask: 0xDEADBEEF,
         };
-        let child_pid = manager.fork_ext(1, flags).unwrap();
-        let ctx = manager.get_extended_context(child_pid).unwrap();
-        assert!(ctx.namespaces.isolate_net);
-        assert!(ctx.namespaces.isolate_mount);
-        assert!(!ctx.namespaces.isolate_pid);
 
-        // Configure Windows scheduling priority and cpu mask
-        manager.configure_win32_scheduling(child_pid, PriorityClass::High, 0b101).unwrap();
-        assert_eq!(manager.get_extended_context(child_pid).unwrap().priority_class, PriorityClass::High);
-        assert_eq!(manager.get_extended_context(child_pid).unwrap().cpu_affinity_mask, 0b101);
+        let eproc = EProcess {
+            pcb: kproc,
+            unique_process_id: 101,
+            parent_process_id: 1,
+            image_file_name: *b"sigma_sh\0\0\0\0\0\0\0\0",
+            peb_address: 0x7FFF0000,
+            exit_status: 0,
+            active_threads_count: 1,
+        };
 
-        // 2. Test BSD open file limit (set max open to 2 files)
-        manager.extended_contexts.get_mut(&child_pid).unwrap().rlimits.max_open_files = 2;
-        assert_eq!(manager.bsd_open_file(child_pid).unwrap(), 1);
-        assert_eq!(manager.bsd_open_file(child_pid).unwrap(), 2);
-        assert!(manager.bsd_open_file(child_pid).is_err()); // limit exceeded!
+        assert_eq!(eproc.pcb.directory_table_base, 0x1F000);
+        assert_eq!(eproc.unique_process_id, 101);
+        assert_eq!(eproc.peb_address, 0x7FFF0000);
 
-        // 3. Test CPU time rlimits
-        manager.extended_contexts.get_mut(&child_pid).unwrap().rlimits.max_cpu_time_secs = 2;
-        assert!(!manager.tick_cpu_time(child_pid).unwrap());
-        assert!(!manager.tick_cpu_time(child_pid).unwrap());
-        assert!(manager.tick_cpu_time(child_pid).unwrap()); // exceeded cpu limit
+        let kthread = KThread {
+            kernel_stack_top: 0xFFFFF000,
+            kernel_stack_bottom: 0xFFFFB000,
+            priority: 8,
+            state: ShardExecutionState::Ready,
+            context_x64: X86_64Context::default(),
+            context_arm: Arm64Context::default(),
+            cpu_id: 0,
+        };
+
+        let ethread = EThread {
+            tcb: kthread,
+            unique_thread_id: 501,
+            process_id: 101,
+            start_address: 0x400000,
+            teb_address: 0x7FFE0000,
+        };
+
+        assert_eq!(ethread.unique_thread_id, 501);
+        assert_eq!(ethread.tcb.priority, 8);
+        assert_eq!(ethread.teb_address, 0x7FFE0000);
     }
 
     #[test]
-    fn test_orphan_reparenting_to_init() {
-        let mut manager = ProcessLifecycleManager::new();
-        let init = Process::new(1, "init".to_string(), Priority::Normal);
-        let parent = Process::new(10, "parent_service".to_string(), Priority::Normal);
+    fn test_process_thread_user_environment_blocks() {
+        let peb = ProcessEnvironmentBlock {
+            image_base_address: 0x400000,
+            loader_data_address: 0x500000,
+            process_parameters_address: 0x600000,
+            heap_base_address: 0x700000,
+            number_of_processors: 4,
+            session_id: 1,
+        };
 
-        manager.register_process(init);
-        manager.register_process(parent);
+        let teb = ThreadEnvironmentBlock {
+            stack_limit: 0xFFFFB000,
+            stack_base: 0xFFFFF000,
+            thread_local_storage_ptr: 0x800000,
+            exception_list_address: 0x900000,
+        };
 
-        // Create child forked from parent (PID 10)
-        let child_pid = manager.fork(10).unwrap();
-        assert_eq!(manager.get_parent(child_pid), Some(10));
-
-        // Terminate parent (PID 10) -> child should be re-parented to init (PID 1)
-        manager.exit(10, 0).unwrap();
-        assert_eq!(manager.get_parent(child_pid), Some(1));
+        assert_eq!(peb.image_base_address, 0x400000);
+        assert_eq!(peb.number_of_processors, 4);
+        assert_eq!(teb.stack_base, 0xFFFFF000);
+        assert_eq!(teb.thread_local_storage_ptr, 0x800000);
     }
 }

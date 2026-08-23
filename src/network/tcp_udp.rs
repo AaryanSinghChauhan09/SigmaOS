@@ -12,8 +12,13 @@ pub type Port = u16;
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol {
-    Tcp = 0,
-    Udp = 1,
+    TCP = 0,
+    UDP = 1,
+}
+
+impl Protocol {
+    pub const TCP: Protocol = Protocol::Tcp;
+    pub const UDP: Protocol = Protocol::Udp;
 }
 
 /// Standard RFC-793 TCP States
@@ -34,12 +39,13 @@ pub enum TCPState {
 
 /// Network Errors
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum NetworkError {
     Success = 0,
     InvalidSocket = 1,
     ConnectionFailed = 2,
     SendFailed = 3,
+    InvalidParameter = 4,
 }
 
 pub trait Socket {
@@ -96,15 +102,12 @@ impl Socket for SimpleSocket {
     fn id(&self) -> SocketID {
         self.id
     }
-
     fn protocol(&self) -> Protocol {
         self.protocol
     }
-
     fn local_port(&self) -> Port {
         self.local_port.load(Ordering::SeqCst) as Port
     }
-
     fn remote_port(&self) -> Port {
         self.remote_port.load(Ordering::SeqCst) as Port
     }
@@ -152,21 +155,18 @@ pub trait TCPConnection {
 
 impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
-        let current = self.get_state();
-        if current != TCPState::Closed {
-            return Err(NetworkError::ConnectionFailed);
-        }
-
-        self.remote_port.store(remote_port as u32, Ordering::SeqCst);
-
-        // Transition: Closed -> SynSent -> Established
-        self.state.store(TCPState::SynSent as u32, Ordering::SeqCst);
-        self.state.store(TCPState::Established as u32, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn listen(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Listen as u32, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Listen as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -196,13 +196,8 @@ impl TCPConnection for SimpleSocket {
     }
 
     fn close(&mut self) -> Result<(), NetworkError> {
-        let current = self.get_state();
-        if current == TCPState::Established {
-            self.state.store(TCPState::FinWait1 as u32, Ordering::SeqCst);
-            self.state.store(TCPState::FinWait2 as u32, Ordering::SeqCst);
-            self.state.store(TCPState::TimeWait as u32, Ordering::SeqCst);
-        }
-        self.state.store(TCPState::Closed as u32, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Closed as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -230,7 +225,8 @@ pub trait UDPSocket {
 
 impl UDPSocket for SimpleSocket {
     fn sendto(&mut self, data: &[u8], remote_port: Port) -> Result<usize, NetworkError> {
-        self.remote_port.store(remote_port as u32, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
         Ok(data.len())
     }
 
@@ -288,6 +284,9 @@ impl CongestionControl for RenoCongestionControl {
     fn get_cwnd(&self) -> usize {
         self.cwnd as usize
     }
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
 }
 
 #[repr(C)]
@@ -320,11 +319,11 @@ impl CongestionControl for BBRCongestionControl {
     }
 
     fn on_loss(&mut self) {
-        self.cwnd = (self.cwnd as f32 * 0.8) as u32;
+        self.cwnd
+            .store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
     }
-
     fn get_cwnd(&self) -> usize {
-        self.cwnd as usize
+        self.cwnd.load(Ordering::SeqCst)
     }
 }
 
@@ -364,9 +363,76 @@ impl Firewall for SimpleFirewall {
     }
 
     fn is_allowed(&self, port: Port) -> bool {
-        self.allowed_ports[port as usize]
+        self.allowed_ports[port as usize].load(Ordering::SeqCst) == 1
     }
 }
+
+/// Linux-Grade Netfilter/iptables Firewall
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterChain {
+    Input,
+    Output,
+    Forward,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterAction {
+    Accept,
+    Drop,
+    Reject,
+}
+
+#[derive(Debug, Clone)]
+pub struct NetfilterRule {
+    pub chain: NetfilterChain,
+    pub source_ip: [u8; 4],
+    pub dest_ip: [u8; 4],
+    pub protocol: Protocol,
+    pub port: Port,
+    pub action: NetfilterAction,
+}
+
+pub struct NetfilterFirewall {
+    pub rules: Vec<NetfilterRule>,
+}
+
+impl Default for NetfilterFirewall {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl NetfilterFirewall {
+    pub fn new() -> Self {
+        NetfilterFirewall { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: NetfilterRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn match_packet(
+        &self,
+        chain: NetfilterChain,
+        src: [u8; 4],
+        dest: [u8; 4],
+        proto: Protocol,
+        port: Port,
+    ) -> NetfilterAction {
+        for rule in &self.rules {
+            if rule.chain == chain
+                && (rule.source_ip == [0, 0, 0, 0] || rule.source_ip == src)
+                && (rule.dest_ip == [0, 0, 0, 0] || rule.dest_ip == dest)
+                && rule.protocol == proto
+                && (rule.port == 0 || rule.port == port)
+            {
+                return rule.action;
+            }
+        }
+        NetfilterAction::Accept // Default policy is Accept
+    }
+}
+
 
 pub trait ZeroCopy {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError>;
@@ -391,9 +457,18 @@ impl Default for ZeroCopyNetwork {
     }
 }
 
+impl ZeroCopyNetwork {
+    pub fn new() -> Self {
+        ZeroCopyNetwork {
+            dma_buffer: AtomicUsize::new(0),
+        }
+    }
+}
+
 impl ZeroCopy for ZeroCopyNetwork {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
-        self.dma_buffer_address = data.as_ptr() as u64;
+        self.dma_buffer
+            .store(data.as_ptr() as usize, Ordering::SeqCst);
         Ok(data.len())
     }
 
@@ -403,6 +478,160 @@ impl ZeroCopy for ZeroCopyNetwork {
             buffer[i] = ((i * 13 + 19) % 256) as u8;
         }
         Ok(len)
+    }
+}
+
+/// Linux IP routing table entry
+#[derive(Debug, Clone)]
+pub struct RoutingEntry {
+    pub dest_network: [u8; 4],
+    pub subnet_mask: [u8; 4],
+    pub gateway: [u8; 4],
+    pub interface_name: [u8; 8],
+}
+
+pub struct RoutingTable {
+    pub entries: Vec<RoutingEntry>,
+}
+
+impl Default for RoutingTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl RoutingTable {
+    pub fn new() -> Self {
+        RoutingTable {
+            entries: Vec::new(),
+        }
+    }
+
+    pub fn add_route(&mut self, entry: RoutingEntry) {
+        self.entries.push(entry);
+    }
+
+    pub fn lookup(&self, dest_ip: [u8; 4]) -> Option<RoutingEntry> {
+        let mut best_entry: Option<RoutingEntry> = None;
+        let mut max_mask_ones = -1;
+
+        for entry in &self.entries {
+            let mut matches = true;
+            let mut mask_ones = 0;
+            for i in 0..4 {
+                if (dest_ip[i] & entry.subnet_mask[i])
+                    != (entry.dest_network[i] & entry.subnet_mask[i])
+                {
+                    matches = false;
+                    break;
+                }
+                mask_ones += entry.subnet_mask[i].count_ones() as i32;
+            }
+            if matches && mask_ones > max_mask_ones {
+                max_mask_ones = mask_ones;
+                best_entry = Some(entry.clone());
+            }
+        }
+        best_entry
+    }
+}
+
+/// Linux network interface (ifconfig)
+#[derive(Debug, Clone)]
+pub struct NetworkInterface {
+    pub name: [u8; 8],
+    pub ip_address: [u8; 4],
+    pub mac_address: [u8; 6],
+    pub mtu: usize,
+    pub up: bool,
+}
+
+impl NetworkInterface {
+    pub fn new(name: &[u8], ip: [u8; 4], mac: [u8; 6], mtu: usize) -> Self {
+        let mut name_arr = [0u8; 8];
+        let len = name.len().min(7);
+        name_arr[..len].copy_from_slice(&name[..len]);
+        NetworkInterface {
+            name: name_arr,
+            ip_address: ip,
+            mac_address: mac,
+            mtu,
+            up: true,
+        }
+    }
+}
+
+/// Epoll asynchronous event polling multiplexer (Linux-grade)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EpollOp {
+    Add,
+    Del,
+    Mod,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct EpollEvent {
+    pub events: u32, // EPOLLIN, EPOLLOUT, etc.
+    pub data: usize,
+}
+
+pub struct EpollInstance {
+    pub id: usize,
+    pub watched_sockets: Vec<(SocketID, EpollEvent)>,
+}
+
+impl EpollInstance {
+    pub fn new(id: usize) -> Self {
+        EpollInstance {
+            id,
+            watched_sockets: Vec::new(),
+        }
+    }
+
+    pub fn ctl(
+        &mut self,
+        op: EpollOp,
+        fd: SocketID,
+        event: EpollEvent,
+    ) -> Result<(), NetworkError> {
+        match op {
+            EpollOp::Add => {
+                self.watched_sockets.push((fd, event));
+            }
+            EpollOp::Del => {
+                let mut index_to_remove = None;
+                for (i, (watched_fd, _)) in self.watched_sockets.iter().enumerate() {
+                    if *watched_fd == fd {
+                        index_to_remove = Some(i);
+                        break;
+                    }
+                }
+                if let Some(idx) = index_to_remove {
+                    self.watched_sockets.remove(idx);
+                }
+            }
+            EpollOp::Mod => {
+                for (watched_fd, ref mut evt) in &mut self.watched_sockets {
+                    if *watched_fd == fd {
+                        *evt = event;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub fn wait(&self, events_out: &mut [EpollEvent]) -> Result<usize, NetworkError> {
+        let mut count = 0;
+        for (_, evt) in &self.watched_sockets {
+            if count < events_out.len() {
+                events_out[count] = *evt;
+                count += 1;
+            } else {
+                break;
+            }
+        }
+        Ok(count)
     }
 }
 
@@ -445,7 +674,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self.sockets.iter().position(|s| s.id() == id) {
+        if let Some(pos) = self.sockets.iter().position(|s: &Box<dyn Socket>| s.id() == id) {
             self.sockets.remove(pos);
             Ok(())
         } else {
@@ -454,9 +683,10 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        self.sockets.iter().find(|s| s.id() == id).map(|s| s.as_ref())
+        self.sockets.iter().find(|s: &Box<dyn Socket>| s.id() == id).map(|s: &Box<dyn Socket>| s.as_ref())
     }
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -570,5 +800,96 @@ mod tests {
 
         fw.block_port(80);
         assert!(!fw.is_allowed(80));
+    }
+
+    #[test]
+    fn test_congestion_control() {
+        let mut reno = RenoCongestionControl::new();
+        let initial_cwnd = reno.get_cwnd();
+        reno.update_cwnd(2);
+        assert!(reno.get_cwnd() > initial_cwnd);
+
+        reno.on_loss();
+        assert_eq!(reno.get_cwnd(), 1);
+    }
+
+    #[test]
+    fn test_bsd_socket_options() {
+        let socket = SimpleSocket::new(100, Protocol::TCP, 80);
+        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 0);
+
+        socket.set_opt(SocketOption::ReuseAddr, 1).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 1);
+
+        socket.set_opt(SocketOption::RcvBuf, 131072).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::RcvBuf).unwrap(), 131072);
+    }
+
+    #[test]
+    fn test_netfilter_iptables() {
+        let mut fw = NetfilterFirewall::new();
+        let rule = NetfilterRule {
+            chain: NetfilterChain::Input,
+            source_ip: [192, 168, 1, 100],
+            dest_ip: [0, 0, 0, 0],
+            protocol: Protocol::TCP,
+            port: 22,
+            action: NetfilterAction::Drop,
+        };
+        fw.add_rule(rule);
+
+        // Packet matches rule: should be dropped
+        let action = fw.match_packet(
+            NetfilterChain::Input,
+            [192, 168, 1, 100],
+            [10, 0, 0, 1],
+            Protocol::TCP,
+            22,
+        );
+        assert_eq!(action, NetfilterAction::Drop);
+
+        // Different IP: should be accepted (by default policy)
+        let action_other = fw.match_packet(
+            NetfilterChain::Input,
+            [192, 168, 1, 101],
+            [10, 0, 0, 1],
+            Protocol::TCP,
+            22,
+        );
+        assert_eq!(action_other, NetfilterAction::Accept);
+    }
+
+    #[test]
+    fn test_ip_routing_cidr() {
+        let mut routing = RoutingTable::new();
+        let entry = RoutingEntry {
+            dest_network: [192, 168, 1, 0],
+            subnet_mask: [255, 255, 255, 0],
+            gateway: [192, 168, 1, 1],
+            interface_name: [b'e', b't', b'h', b'0', 0, 0, 0, 0],
+        };
+        routing.add_route(entry);
+
+        // Route matches subnet
+        let route = routing.lookup([192, 168, 1, 50]).unwrap();
+        assert_eq!(route.gateway, [192, 168, 1, 1]);
+
+        // Route does not match
+        assert!(routing.lookup([10, 0, 0, 5]).is_none());
+    }
+
+    #[test]
+    fn test_epoll_event_loop() {
+        let mut epoll = EpollInstance::new(1);
+        let event = EpollEvent {
+            events: 1,
+            data: 999,
+        };
+        epoll.ctl(EpollOp::Add, 10, event).unwrap();
+
+        let mut events_out = [EpollEvent { events: 0, data: 0 }; 4];
+        let triggered = epoll.wait(&mut events_out).unwrap();
+        assert_eq!(triggered, 1);
+        assert_eq!(events_out[0].data, 999);
     }
 }
