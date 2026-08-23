@@ -1,0 +1,27 @@
+name: FreeBSD Jail & VNET Network Stack Inspection CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  freebsd-jail-vnet-test:
+    name: Validate FreeBSD Jail & VNET Network Stack Inspection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Run FreeBSD Jail & VNET Inspection Tests
+        run: |
+          cargo test --test linux_bsd_inspection_tests test_freebsd

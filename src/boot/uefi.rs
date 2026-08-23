@@ -71,6 +71,13 @@ pub struct SimpleUEFIBootloader {
 }
 
 impl SimpleUEFIBootloader {
+
+    pub fn load_kernel_raw(&self, kernel_data: &[u8], dst: &mut [u8]) -> Result<usize, BootError> {
+        let len = kernel_data.len().min(dst.len());
+        dst[..len].copy_from_slice(&kernel_data[..len]);
+        Ok(len)
+    }
+
     pub fn new() -> Self {
         SimpleUEFIBootloader {
             phase: AtomicUsize::new(BootPhase::Init as usize),

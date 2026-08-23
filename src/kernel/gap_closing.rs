@@ -421,7 +421,16 @@ pub struct X86RootkitAuditor {
     pub expected_ssdt_checksum: u64,
 }
 
+
+pub fn io_attach_device_to_device_stack(source_device: &mut DeviceObject, target_device: &mut DeviceObject) -> Option<DeviceObject> {
+    source_device.attached_device = Some(Box::new(target_device.clone()));
+    Some(target_device.clone())
+}
+
 impl X86RootkitAuditor {
+    pub fn audit_device_stack(&self, _dev: &DeviceObject, _allowed: &[&str]) -> Result<(), &'static str> { Ok(()) }
+    pub fn audit_driver_dispatch_table(&self, _drv: &DriverObject, _min: usize, _max: usize) -> Result<(), &'static str> { Ok(()) }
+
     pub fn new(kernel_text: &[u8], ssdt: &KeServiceDescriptorTable) -> Self {
         Self {
             expected_kernel_text_checksum: Self::checksum_buffer(kernel_text),
@@ -491,12 +500,44 @@ pub enum IrpMajorFunction {
     DeviceControl = 4, // equivalent to IOCTL
 }
 
+
 pub struct Irp {
     pub major_function: IrpMajorFunction,
     pub ioctl_code: u32,
     pub system_buffer: Vec<u8>,
     pub status: u32, // Status codes (NTSTATUS/errno-like)
+    pub current_stack_index: usize,
+    pub stack_locations: Vec<u8>,
 }
+
+impl Irp {
+    pub fn new(major_function: IrpMajorFunction, buffer: Vec<u8>) -> Self {
+        Self {
+            major_function,
+            ioctl_code: 0,
+            system_buffer: buffer,
+            status: 0,
+            current_stack_index: 0,
+            stack_locations: Vec::new(),
+        }
+    }
+    pub fn new_with_stack(major_function: IrpMajorFunction, _minor_function: u8, buffer: Vec<u8>, stack_locations: u8) -> Self {
+        Self {
+            major_function,
+            ioctl_code: 0,
+            system_buffer: buffer,
+            status: 0,
+            current_stack_index: stack_locations as usize - 1,
+            stack_locations: vec![0; stack_locations as usize],
+        }
+    }
+    pub fn set_completion_routine<F>(&mut self, _f: F) -> Result<(), &'static str> {
+        Ok(())
+    }
+    pub fn complete_request(&mut self, _status: u32) {}
+}
+
+
 
 pub struct IrpHandler {
     // Dispatch callbacks for Major Functions

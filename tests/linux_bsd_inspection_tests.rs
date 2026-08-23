@@ -11,6 +11,15 @@ mod bsd;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod distro_inspirations;
 
+#[path = "../src/virtualization/vm_manager.rs"]
+mod vm_manager;
+
+#[path = "../src/scheduler/eevdf.rs"]
+mod eevdf;
+
+#[path = "../src/memory/tlb_associative.rs"]
+mod tlb_associative;
+
 use bsd::*;
 use distro_inspirations::*;
 
@@ -76,4 +85,85 @@ fn test_sovereign_landlock_and_runit_inspection() {
     supervisor.register_service("network-daemon", RunitRunlevel::Boot, &[], 3);
     assert_eq!(supervisor.services.len(), 1);
     assert_eq!(supervisor.services[0].name, "network-daemon");
+}
+
+
+#[test]
+fn test_kvm_qemu_vcpu_inspection() {
+    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
+    use std::path::PathBuf;
+
+    let mut kvm = KvmHypervisor::new();
+    assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
+    assert!(kvm.capabilities().irqchip_supported);
+
+    let config = VmConfig {
+        name: "KVM Inspection VM".to_string(),
+        cpu_cores: 2,
+        memory_mb: 4096,
+        disk_size_gb: 40,
+        network_enabled: true,
+        gpu_passthrough: false,
+        os_type: OsType::Linux,
+        cpu_pinning_cores: vec![0, 1],
+        hugepages_enabled: true,
+        vfio_pci_passthrough_address: None,
+        memory_balloon_mb: 1024,
+        virtio_net_queues: 2,
+        cpu_model: "host".to_string(),
+        machine_type: "q35".to_string(),
+        nested_virtualization: true,
+        io_uring_enabled: true,
+        kvm_dirty_ring_size: 2048,
+    };
+
+    let vm_id = kvm.create_vm(&config).unwrap();
+    assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
+
+    kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
+        image_path: PathBuf::from("/var/lib/images/rootfs.qcow2"),
+        read_only: false,
+        direct_io: true,
+        queue_size: 256,
+        block_size: 512,
+    }).unwrap();
+
+    kvm.attach_virtio_net(&vm_id, VirtioNetDeviceConfig {
+        mac_address: [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
+        tap_interface: "tap0".to_string(),
+        queues: 2,
+        offload_tso: true,
+        offload_csum: true,
+    }).unwrap();
+
+    kvm.start_vm(&vm_id).unwrap();
+    assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Running);
+
+    let exit = kvm.run_vcpu(&vm_id, 0).unwrap();
+    assert_eq!(exit, KvmExitReason::Hlt);
+
+    kvm.stop_vm(&vm_id).unwrap();
+    assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
+}
+
+
+#[test]
+fn test_kernel_classic_algorithms_inspection() {
+    use eevdf::{EevdfScheduler, Task, ComputeUnit};
+    use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbPageFlags};
+
+    let mut sched = EevdfScheduler::new();
+    let mut task = Task::new(1, 100, 10);
+    task.assign_compute_unit(ComputeUnit::CpuCore(0));
+    sched.add_task(task);
+    assert_eq!(sched.ready_count(), 1);
+
+    let scheduled = sched.schedule();
+    assert_eq!(scheduled, Some(1));
+
+    let mut tlb = AssociativeTlbCache::new(TlbAssociativityMode::FullyAssociative, 16);
+    tlb.insert_translation(0x10, 0x50, TlbPageFlags::rw_user(), 1);
+    let translated = tlb.lookup_page_translation(0x10, 1, false, false);
+    assert_eq!(translated, Ok(0x50));
+    assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
 }

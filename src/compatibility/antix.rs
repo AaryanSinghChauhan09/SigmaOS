@@ -175,9 +175,21 @@ impl Default for AntiXControlCentre {
     }
 }
 
+
+pub struct AntixInitManager;
+impl AntixInitManager { pub const fn new() -> Self { Self } }
+
+pub struct AntixDesktopProfiler;
+impl AntixDesktopProfiler { pub const fn new() -> Self { Self } }
+
+pub type AntixControlCenter = AntiXControlCentre;
+
+pub struct LegacyMemoryTrimmer;
+impl LegacyMemoryTrimmer { pub const fn new() -> Self { Self } }
+
 pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();
 pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();
-pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntixControlCenter::new();
+// pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntixControlCenter::new();
 pub static GLOBAL_MEMORY_TRIMMER: LegacyMemoryTrimmer = LegacyMemoryTrimmer::new();
 
 // ==========================================
