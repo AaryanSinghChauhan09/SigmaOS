@@ -258,13 +258,30 @@ impl MintSoftwareManager {
         self.apps_catalog.push(app);
     }
 
-    /// Filters catalog by category.
+    /// Arrange windows using Stacking layout (Cascaded coordinations)
+    pub fn arrange_stacking(
+        num_windows: usize,
+        coords: &mut [WindowCoordinates],
+    ) -> Result<(), &'static str> {
+        for i in 0..num_windows {
+            if i >= coords.len() {
+                return Err("Layout failed");
+            }
+            coords[i] = WindowCoordinates {
+                x: i * 30,
+                y: i * 30,
+                width: 800,
+                height: 600,
+            };
+        }
+        Ok(())
+    }
+
     pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
         let mut filtered = Vec::new();
-        let cat_len = category.len().min(15);
         for app in self.apps_catalog.iter() {
             let mut matches = true;
-            for i in 0..cat_len {
+            for i in 0..category.len().min(15) {
                 if app.category[i] != category[i] {
                     matches = false;
                     break;
@@ -277,12 +294,11 @@ impl MintSoftwareManager {
         filtered
     }
 
-    /// Returns apps ranked by user ratings (Featured Apps).
     pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
         let mut sorted = self.apps_catalog.clone();
-        // Simple bubble sort over vector to rank featured apps without external traits
-        for i in 0..sorted.len() {
-            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
+        let len = sorted.len();
+        for i in 0..len {
+            for j in 0..len.saturating_sub(i).saturating_sub(1) {
                 if sorted[j].rating_stars < sorted[j + 1].rating_stars {
                     sorted.swap(j, j + 1);
                 }
@@ -291,6 +307,115 @@ impl MintSoftwareManager {
         sorted
     }
 }
+
+// ==========================================
+// Cinnamon Desktop Theme Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CinnamonDesklet {
+    pub id: u32,
+    pub x: usize,
+    pub y: usize,
+}
+
+pub struct CinnamonThemeEngine {
+    pub active_gtk_theme: [u8; 32],
+    pub desklets: Vec<Option<CinnamonDesklet>>,
+    pub is_panel_enabled: bool,
+}
+
+impl CinnamonThemeEngine {
+    pub fn new() -> Self {
+        let mut theme = [0u8; 32];
+        let default_name = b"Mint-Y-Dark";
+        unsafe {
+            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+        }
+        Self {
+            active_gtk_theme: theme,
+            desklets: Vec::new(),
+            is_panel_enabled: true,
+        }
+    }
+
+    pub fn set_gtk_theme(&mut self, theme_name: &[u8]) {
+        let mut theme = [0u8; 32];
+        let len = theme_name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(theme_name.as_ptr(), theme.as_mut_ptr(), len);
+        }
+        self.active_gtk_theme = theme;
+    }
+
+    pub fn add_desklet(&mut self, id: u32, x: usize, y: usize) {
+        self.desklets.push(Some(CinnamonDesklet { id, x, y }));
+    }
+}
+
+impl Default for CinnamonThemeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Timeshift-style System Restorer
+// ==========================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct SystemRestorePoint {
+    pub id: u32,
+    pub is_rsync: bool,
+    pub timestamp_ms: u64,
+}
+
+pub struct TimeshiftSystemRestorer {
+    pub restore_points: Vec<Option<SystemRestorePoint>>,
+    pub active_restore_point_id: u32,
+}
+
+impl TimeshiftSystemRestorer {
+    pub fn new() -> Self {
+        Self {
+            restore_points: Vec::new(),
+            active_restore_point_id: 0,
+        }
+    }
+
+    pub fn create_restore_point(&mut self, id: u32, is_rsync: bool) {
+        self.restore_points.push(Some(SystemRestorePoint {
+            id,
+            is_rsync,
+            timestamp_ms: 0,
+        }));
+    }
+
+    pub fn rollback_system(&mut self, id: u32) -> Result<(), &'static str> {
+        let mut found = false;
+        for i in 0..self.restore_points.len() {
+            if let Some(ref rp) = self.restore_points[i] {
+                if rp.id == id {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if found {
+            self.active_restore_point_id = id;
+            Ok(())
+        } else {
+            Err("Update error")
+        }
+    }
+}
+
+impl Default for TimeshiftSystemRestorer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 
 /// MintReport: Detects system crashes, memory warnings, and provides direct advice remedies
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

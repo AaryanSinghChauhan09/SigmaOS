@@ -8,9 +8,19 @@ pub mod policy_mechanism;
 pub mod perf_mm;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod traits;
-pub mod gap_closing;
-pub mod generation_manager;
+pub mod cpu_features;
+pub mod architecture;
+pub mod io_uring;
+
+pub use cpu_features::{ApsrFlags, ArmExecutionState};
+pub mod linux_bsd_innovations;
+pub use linux_bsd_innovations::{
+    BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
+    AndroidBroadcastReceiverRegistry,
+};
+pub use architecture::{SovereignSystemBus, IoModuleController};
+pub mod object;
+pub mod proc;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,

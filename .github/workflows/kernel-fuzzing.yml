@@ -8,9 +8,6 @@ on:
   schedule:
     - cron: '0 2 * * *' # Nightly fuzzing run
 
-permissions:
-  contents: read
-
 jobs:
   fuzz-kernel-ipc-vfs:
     name: Syzkaller & Cargo-Fuzz IPC/VFS Suite

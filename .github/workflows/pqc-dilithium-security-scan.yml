@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions:
-  contents: read
-
 jobs:
   pqc-security-audit:
     name: Post-Quantum Cryptography & Dependency Vulnerability Audit

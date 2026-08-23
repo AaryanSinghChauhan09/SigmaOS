@@ -29,6 +29,55 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
+
+    pub fn with_capacity(capacity: usize) -> Self {
+        if capacity == 0 {
+            Self::new()
+        } else {
+            let data = unsafe { alloc(capacity * mem::size_of::<T>()) as *mut T };
+            Vec {
+                data: if data.is_null() { core::ptr::null_mut() } else { data },
+                len: 0,
+                capacity: if data.is_null() { 0 } else { capacity },
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn first(&self) -> Option<&T> {
+        if self.len == 0 {
+            None
+        } else {
+            unsafe { Some(&*self.data) }
+        }
+    }
+
+    pub fn swap(&mut self, i: usize, j: usize) {
+        if i >= self.len || j >= self.len {
+            panic!("swap index out of bounds");
+        }
+        if i != j {
+            unsafe {
+                core::ptr::swap(self.data.add(i), self.data.add(j));
+            }
+        }
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
+    }
+
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {

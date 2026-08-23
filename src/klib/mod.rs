@@ -1,17 +1,13 @@
 // SigmaOS Kernel Library
 pub mod buddy_allocator;
-pub mod paging;
-pub mod vec;
+pub mod hashmap;
+pub mod hash;
+pub mod adt;
 
 pub use vec::Vec;
-pub use hashmap::{HashMap, Entry};
-pub use hashset::HashSet;
-pub use btreemap::BTreeMap;
-pub use vecdeque::VecDeque;
-pub use custom_string::SigmaString;
-pub use custom_string::SigmaString as String;
-pub use custom_string::SigmaString as ToString;
-pub use custom_string::SigmaString as PathBuf;
+pub use hashmap::BTreeMap as HashMap;
+pub use hashmap::BTreeMap;
+pub use adt::{SplayTree, RadixTree, SovereignPriorityQueue};
 
 pub mod string {
     pub use super::SigmaString as String;

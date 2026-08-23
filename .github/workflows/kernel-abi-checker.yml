@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions:
-  contents: read
-
 jobs:
   kernel-abi-check:
     name: Linux/BSD Syscall ABI Compatibility Verification

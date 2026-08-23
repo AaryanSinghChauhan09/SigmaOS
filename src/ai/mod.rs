@@ -9,17 +9,9 @@ pub mod sai;
 pub mod openclaw;
 pub mod system;
 pub mod voice;
-pub mod open_computer;
-pub mod tensor_memory;
-pub mod compute_scheduler;
-pub mod quantization;
-pub mod sigma_ai_suite;
-
-pub use sigma_ai_suite::{
-    CommandTranslation, ErrorExplanation, IndicLanguage, SafetyLevel, SigmaAiAdaptiveSuggestions,
-    SigmaAiAssistant, SigmaAiErrorExplanation, SigmaAiNaturalLanguageTranslator,
-    SigmaAiWorkflowAutomation, WorkflowStep, WorkflowTrigger,
-};
+pub mod wiki;
+pub mod qwenpaw;
+pub mod developer_platform;
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
@@ -60,4 +52,8 @@ pub use compute_scheduler::{
 };
 pub use quantization::{
     AiExecutionDispatcher, DeviceFallbackRoute, QuantizedMatrix,
+};
+pub use developer_platform::{
+    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
+    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };

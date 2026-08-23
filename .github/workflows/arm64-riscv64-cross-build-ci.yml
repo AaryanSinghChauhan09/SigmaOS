@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions:
-  contents: read
-
 jobs:
   cross-compile-arm-riscv:
     name: Toolchain Cross-Build & Sysroot Test
