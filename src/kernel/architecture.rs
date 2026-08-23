@@ -96,6 +96,108 @@ impl LookasideList {
     }
 }
 
+// 7. Multi-Architecture HAL Abstractions (x86_64, AArch64, RISC-V 64)
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct X86_64Hal {
+    pub lapic_base: u64,
+    pub ioapic_base: u64,
+    pub cr0: u64,
+    pub cr4: u64,
+    pub efer: u64,
+}
+
+impl X86_64Hal {
+    pub fn new() -> Self {
+        Self {
+            lapic_base: 0xFEE0_0000,
+            ioapic_base: 0xFEC0_0000,
+            cr0: 0x8001_0033, // PE, WP, PG set
+            cr4: 0x0000_06B0, // PAE, PGE, OSFXSR, OSXMMEXCPT
+            efer: 0x0000_0D01, // LME, LMA, NXE
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AArch64Hal {
+    pub gicd_base: u64, // GIC Distributor
+    pub gicc_base: u64, // GIC Cpu Interface
+    pub ttbr0: u64,     // User Page Table Base
+    pub ttbr1: u64,     // Kernel Page Table Base
+    pub sctlr_el1: u64, // System Control Register EL1
+}
+
+impl AArch64Hal {
+    pub fn new() -> Self {
+        Self {
+            gicd_base: 0x0800_0000,
+            gicc_base: 0x0801_0000,
+            ttbr0: 0x0000_4000,
+            ttbr1: 0x0000_8000,
+            sctlr_el1: 0x30D0_0800, // MMU, Caches enabled
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RiscV64Hal {
+    pub plic_base: u64,  // Platform Level Interrupt Controller
+    pub clint_base: u64, // Core Local Interruptor (Timers/IPI)
+    pub satp: u64,       // Supervisor Address Translation and Protection (Sv39/Sv48)
+    pub sstatus: u64,    // Supervisor Status Register
+}
+
+impl RiscV64Hal {
+    pub fn new() -> Self {
+        Self {
+            plic_base: 0x0C00_0000,
+            clint_base: 0x0200_0000,
+            satp: (8u64 << 60) | 0x0000_8000, // Sv39 mode (MODE = 8)
+            sstatus: 0x0000_0020,             // SIE (Supervisor Interrupt Enable)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_multi_arch_hal_initialization() {
+        let x86 = X86_64Hal::new();
+        assert_eq!(x86.lapic_base, 0xFEE0_0000);
+        assert_ne!(x86.cr0 & (1 << 31), 0); // Paging enabled bit
+
+        let arm = AArch64Hal::new();
+        assert_eq!(arm.gicd_base, 0x0800_0000);
+
+        let riscv = RiscV64Hal::new();
+        assert_eq!(riscv.satp >> 60, 8); // Sv39 mode bit
+    }
+
+    #[test]
+    fn test_irql_transition_and_pool_validation() {
+        let mut engine = ArchitectureEngine::new();
+        assert_eq!(engine.current_irql, Irql::PassiveLevel);
+
+        let old_irql = engine.raise_irql(Irql::DispatchLevel).unwrap();
+        assert_eq!(old_irql, Irql::PassiveLevel);
+        assert_eq!(engine.current_irql, Irql::DispatchLevel);
+
+        // PagedPool allocation at DispatchLevel must trigger fault exception
+        let err = engine.allocate_pool(PoolType::PagedPool);
+        assert!(err.is_err());
+        assert_eq!(err.unwrap_err(), HardwareException::DoubleFault);
+
+        // NonPagedPool allocation succeeds at DispatchLevel
+        assert!(engine.allocate_pool(PoolType::NonPagedPool).is_ok());
+
+        assert!(engine.lower_irql(Irql::PassiveLevel).is_ok());
+        assert_eq!(engine.current_irql, Irql::PassiveLevel);
+    }
+}
+
 /// Memory Descriptor List (MDL) mapping virtual buffer to locked physical pages
 pub struct MemoryDescriptorList {
     pub virtual_address: usize,
