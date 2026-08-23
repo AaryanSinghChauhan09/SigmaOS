@@ -3,6 +3,8 @@ use alloc::vec::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
 /// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
+extern crate alloc;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -86,7 +88,7 @@ impl DinitServiceManager {
         // Recursively start dependencies first (Dinit logic)
         let deps = self.services[idx].dependencies.clone();
         for dep in &deps {
-            let dep_name = &dep[..dep.iter().position(|&b| b == 0).unwrap_or(32)];
+            let dep_name = &dep[..dep.iter().position(|b: &u8| *b == 0).unwrap_or(32)];
             self.start_service(dep_name)?;
         }
 

@@ -35,6 +35,10 @@ echo -e "${CYAN}:: Running Algorithm & Subsystem Component Inspection Unit Tests
 rustc --edition 2021 --test tests/algorithm_and_components_inspection_tests.rs -o build/algo_components_test
 ./build/algo_components_test
 
+echo -e "${CYAN}:: Running Comprehensive OS Core Algorithms Inspection Unit Tests...${RESET}"
+rustc --edition 2021 --test tests/os_algorithms_inspection_tests.rs -o build/os_algo_test
+./build/os_algo_test
+
 echo -e "${CYAN}:: Running Clean-Room Compatibility Harness Tests...${RESET}"
 rustc --edition 2021 --test tests/compat_harness.rs -o build/compat_harness_test
 ./build/compat_harness_test
