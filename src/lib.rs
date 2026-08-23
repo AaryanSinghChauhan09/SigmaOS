@@ -1,7 +1,6 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod ai;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -213,17 +212,14 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-pub use governance::strategic_vision::{
-    MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
-};
 pub use unimplemented_tools::{
     AudioEditor, PodcastRecorder, SubtitleEditor, MemoryLeakDetector, GamifiedTodo, MindMapCreator,
     GameHubLauncher, EmulatorManager, GameRecorder, GamePerformanceBooster, CloudGaming, VrArRuntime,
     ControllerMapper, GameModManager, AiDifficultyDirector, GanttChartPlanner, PdfEditor,
     DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
     AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
-    RemoteDesktop, MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
+    MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
+    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
     CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
     SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
     PluginMarketplace, MusicLibraryManager, TimeMachineBackup, SysinternalsProcMon, SystemdCgTop,

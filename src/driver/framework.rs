@@ -335,7 +335,7 @@ mod tests {
 
 
 #[cfg(test)]
-mod tests {
+mod shim_tests {
     use super::*;
 
     static mut OPEN_CALLED: i32 = 0;
