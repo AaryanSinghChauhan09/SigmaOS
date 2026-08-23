@@ -1,48 +1,48 @@
 // SigmaOS Parrot Security Parity Implementation
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
-use core::cell::Cell;
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Routing modes for network traffic
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RoutingMode {
-    DirectCleartext,
-    TorAnonymized,
-    I2pAnonymized,
+    DirectCleartext = 0,
+    TorAnonymized = 1,
+    I2pAnonymized = 2,
 }
 
 /// AnonSurf routing shunt for anonymous network routing
 pub struct AnonSurfShunt {
-    pub current_mode: Cell<RoutingMode>,
-    pub dns_leak_protection: Cell<bool>,
-    pub anonymized_packets_routed: Cell<u64>,
+    pub current_mode: AtomicUsize,
+    pub dns_leak_protection: AtomicBool,
+    pub anonymized_packets_routed: AtomicU64,
 }
 
 impl AnonSurfShunt {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         AnonSurfShunt {
-            current_mode: Cell::new(RoutingMode::DirectCleartext),
-            dns_leak_protection: Cell::new(true),
-            anonymized_packets_routed: Cell::new(0),
+            current_mode: AtomicUsize::new(RoutingMode::DirectCleartext as usize),
+            dns_leak_protection: AtomicBool::new(true),
+            anonymized_packets_routed: AtomicU64::new(0),
         }
     }
 
     /// Enable anonymized routing
     pub fn enable_anonsurf(&self) {
-        self.current_mode.set(RoutingMode::TorAnonymized);
-        self.dns_leak_protection.set(true);
+        self.current_mode.store(RoutingMode::TorAnonymized as usize, Ordering::SeqCst);
+        self.dns_leak_protection.store(true, Ordering::SeqCst);
     }
 
     /// Disable anonymized routing
     pub fn disable_anonsurf(&self) {
-        self.current_mode.set(RoutingMode::DirectCleartext);
+        self.current_mode.store(RoutingMode::DirectCleartext as usize, Ordering::SeqCst);
     }
 
     /// Route packet through anonymized network
     pub fn shunt_packet(&self, _packet_id: u32, _size_bytes: usize) -> bool {
-        if self.current_mode.get() != RoutingMode::DirectCleartext {
-            let count = self.anonymized_packets_routed.get();
-            self.anonymized_packets_routed.set(count + 1);
+        if self.current_mode.load(Ordering::SeqCst) != RoutingMode::DirectCleartext as usize {
+            self.anonymized_packets_routed.fetch_add(1, Ordering::SeqCst);
             true
         } else {
             false
@@ -51,41 +51,43 @@ impl AnonSurfShunt {
 
     /// Get current routing mode
     pub fn current_mode(&self) -> RoutingMode {
-        self.current_mode.get()
+        match self.current_mode.load(Ordering::SeqCst) {
+            1 => RoutingMode::TorAnonymized,
+            2 => RoutingMode::I2pAnonymized,
+            _ => RoutingMode::DirectCleartext,
+        }
     }
 }
 
 /// Sandbox policy for application security
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SandboxPolicy {
     pub allow_network: bool,
     pub allow_raw_sockets: bool,
     pub allow_filesystem_write: bool,
-    pub permitted_subpath: SigmaString,
+    pub permitted_subpath: &'static str,
 }
 
 /// AppSandbox engine for process security
 pub struct AppSandboxEngine {
-    pub current_policy: Cell<SandboxPolicy>,
+    pub allow_network: AtomicBool,
+    pub allow_raw_sockets: AtomicBool,
+    pub allow_filesystem_write: AtomicBool,
 }
 
 impl AppSandboxEngine {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         AppSandboxEngine {
-            current_policy: Cell::new(SandboxPolicy {
-                allow_network: false,
-                allow_raw_sockets: false,
-                allow_filesystem_write: false,
-                permitted_subpath: SigmaString::from_str("/sandbox/tmp"),
-            }),
+            allow_network: AtomicBool::new(false),
+            allow_raw_sockets: AtomicBool::new(false),
+            allow_filesystem_write: AtomicBool::new(false),
         }
     }
 
     /// Validate filesystem write access
     pub fn validate_filesystem_write(&self, path: &str) -> bool {
-        let policy = self.current_policy.get();
-        if !policy.allow_filesystem_write {
-            path.starts_with(policy.permitted_subpath.as_str())
+        if !self.allow_filesystem_write.load(Ordering::SeqCst) {
+            path.starts_with("/sandbox/tmp")
         } else {
             true
         }
@@ -93,10 +95,9 @@ impl AppSandboxEngine {
 
     /// Validate network socket creation
     pub fn validate_network_socket(&self, is_raw: bool) -> bool {
-        let policy = self.current_policy.get();
-        if is_raw && !policy.allow_raw_sockets {
+        if is_raw && !self.allow_raw_sockets.load(Ordering::SeqCst) {
             false
-        } else if !is_raw && !policy.allow_network {
+        } else if !is_raw && !self.allow_network.load(Ordering::SeqCst) {
             false
         } else {
             true
@@ -105,35 +106,42 @@ impl AppSandboxEngine {
 
     /// Set sandbox policy
     pub fn set_policy(&self, policy: SandboxPolicy) {
-        self.current_policy.set(policy);
+        self.allow_network.store(policy.allow_network, Ordering::SeqCst);
+        self.allow_raw_sockets.store(policy.allow_raw_sockets, Ordering::SeqCst);
+        self.allow_filesystem_write.store(policy.allow_filesystem_write, Ordering::SeqCst);
     }
 
     /// Get current policy
     pub fn current_policy(&self) -> SandboxPolicy {
-        self.current_policy.get()
+        SandboxPolicy {
+            allow_network: self.allow_network.load(Ordering::SeqCst),
+            allow_raw_sockets: self.allow_raw_sockets.load(Ordering::SeqCst),
+            allow_filesystem_write: self.allow_filesystem_write.load(Ordering::SeqCst),
+            permitted_subpath: "/sandbox/tmp",
+        }
     }
 }
 
 /// Forensic storage filter for write protection
 pub struct ForensicStorageFilter {
-    pub is_write_blocked: Cell<bool>,
+    pub is_write_blocked: AtomicBool,
 }
 
 impl ForensicStorageFilter {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         ForensicStorageFilter {
-            is_write_blocked: Cell::new(true),
+            is_write_blocked: AtomicBool::new(true),
         }
     }
 
     /// Set write blocker state
     pub fn set_write_blocker(&self, enabled: bool) {
-        self.is_write_blocked.set(enabled);
+        self.is_write_blocked.store(enabled, Ordering::SeqCst);
     }
 
     /// Intercept device write operations
     pub fn intercept_device_write(&self, _sector_id: u64, _buffer: &[u8]) -> bool {
-        !self.is_write_blocked.get()
+        !self.is_write_blocked.load(Ordering::SeqCst)
     }
 
     /// Secure memory wipe
@@ -147,7 +155,7 @@ impl ForensicStorageFilter {
 
     /// Check if write blocking is enabled
     pub fn is_write_blocked(&self) -> bool {
-        self.is_write_blocked.get()
+        self.is_write_blocked.load(Ordering::SeqCst)
     }
 }
 
@@ -175,7 +183,11 @@ impl Default for SandboxPolicy {
             allow_network: false,
             allow_raw_sockets: false,
             allow_filesystem_write: false,
-            permitted_subpath: SigmaString::from_str("/sandbox/tmp"),
+            permitted_subpath: "/sandbox/tmp",
         }
     }
 }
+
+pub static GLOBAL_ANONSURF: AnonSurfShunt = AnonSurfShunt::new();
+pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter::new();
+pub static GLOBAL_SANDBOX: AppSandboxEngine = AppSandboxEngine::new();

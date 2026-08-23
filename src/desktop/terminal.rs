@@ -109,8 +109,20 @@ impl TerminalTab {
         self.color_scheme = scheme;
     }
 
+    pub fn search_command_history(&self, query: &str) -> Vec<String> {
+        self.history
+            .iter()
+            .filter(|cmd| cmd.contains(query))
+            .cloned()
+            .collect()
+    }
+
     pub fn set_working_directory(&mut self, path: &str) {
         self.working_directory = String::from(path);
+    }
+
+    pub fn get_working_directory(&self) -> &str {
+        &self.working_directory
     }
 
     pub fn add_to_history(&mut self, command: &str) {
@@ -522,6 +534,24 @@ impl TabManager {
             .filter_map(|tab| self.get_tab_stats(tab.id).ok())
             .collect()
     }
+
+    pub fn helenos_async_ipc_dispatch(&mut self, tab_id: TabID, msg: &str) -> Result<(), TerminalError> {
+        if let Some(tab) = self.tabs.iter_mut().find(|t| t.id == tab_id) {
+            tab.scrollback_lines.push(format!("[HelenOS-IPC]: {}", msg));
+            Ok(())
+        } else {
+            Err(TerminalError::TabNotFound)
+        }
+    }
+
+    pub fn kuroko_script_control(&mut self, tab_id: TabID, script: &str) -> Result<String, TerminalError> {
+        if let Some(tab) = self.tabs.iter_mut().find(|t| t.id == tab_id) {
+            tab.history.push(script.to_string());
+            Ok(format!("Kuroko Executed: '{}' on tab {}", script, tab_id))
+        } else {
+            Err(TerminalError::TabNotFound)
+        }
+    }
 }
 
 /// Tab statistics for monitoring and debugging
@@ -612,6 +642,26 @@ impl TerminalManager for SimpleTerminalManager {
             Ok(output)
         } else {
             Err(TerminalError::NotFound)
+        }
+    }
+
+    /// Create a split terminal pane vertically or horizontally (SerenityOS Terminal Parity)
+    pub fn create_split_terminal(&mut self, parent_tab_id: TabID, is_vertical: bool) -> Result<TabID, TerminalError> {
+        let title = b"Split Terminal";
+        let new_term_id = self.create_terminal(title)?;
+
+        let direction = if is_vertical {
+            SplitDirection::Vertical
+        } else {
+            SplitDirection::Horizontal
+        };
+
+        let new_tab_id = self.tab_manager.tabs.last().map(|t| t.id).unwrap_or(0);
+        if let Some(parent_tab) = self.tab_manager.tabs.iter_mut().find(|t| t.id == parent_tab_id) {
+            parent_tab.split_tab(direction, 0.5, new_tab_id);
+            Ok(new_tab_id)
+        } else {
+            Err(TerminalError::TabNotFound)
         }
     }
 }
@@ -734,6 +784,31 @@ impl AnsiEscapeInterpreter {
 impl Default for AnsiEscapeInterpreter {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_serenity_terminal_tab_management() {
+        let mut manager = SimpleTerminalManager::new();
+        let term_id = manager.create_terminal(b"Development").unwrap();
+        let active_tab = manager.tab_manager.get_active_tab().unwrap();
+        let tab_id = active_tab.id;
+
+        // Split terminal vertically
+        let split_tab_id = manager.create_split_terminal(tab_id, true).unwrap();
+        assert!(split_tab_id > 0);
+
+        // Tab group management
+        let group_id = manager.tab_manager.create_group("DevGroup");
+        assert!(manager.tab_manager.add_tab_to_group(tab_id, group_id).is_ok());
+
+        // Tab statistics
+        let stats = manager.tab_manager.get_tab_stats(tab_id).unwrap();
+        assert_eq!(stats.id, tab_id);
     }
 }
 

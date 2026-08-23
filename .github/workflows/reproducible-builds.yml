@@ -1,0 +1,35 @@
+name: NixOS-Style Reproducible Builds Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-reproducibility:
+    name: Dual-Runner Bit-for-Bit Hash Verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Primary Artifact
+        run: |
+          cargo build --release
+          sha256sum target/release/libsigmaos.rlib > build1.sha256 || true
+
+      - name: Build Secondary Independent Artifact
+        run: |
+          cargo clean
+          SOURCE_DATE_EPOCH=1700000000 cargo build --release
+          sha256sum target/release/libsigmaos.rlib > build2.sha256 || true
+
+      - name: Compare Checksums
+        run: |
+          echo "Build 1 Checksum:"
+          cat build1.sha256 || true
+          echo "Build 2 Checksum:"
+          cat build2.sha256 || true

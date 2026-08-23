@@ -2,10 +2,14 @@
 // Foundation Model, Democratic Voting, and Release Roadmaps
 
 pub mod rfc;
+pub mod strategic_vision;
 
 pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,
+};
+pub use strategic_vision::{
+    MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
 };
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
