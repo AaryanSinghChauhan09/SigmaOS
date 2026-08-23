@@ -321,7 +321,7 @@ impl PackageFormatAdapter for YumRpmAdapter {
         Ok(())
     }
 
-    pub fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
             package.name, self.adapter_name()
@@ -977,23 +977,6 @@ pub struct SovereignTabFm {
 
 pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
-}
-
-pub struct TabularSchema {
-    pub fields: Vec<String>,
-}
-
-pub struct TabularRow {
-    pub values: Vec<String>,
-}
-
-pub struct TabularDataset {
-    pub schema: TabularSchema,
-    pub rows: Vec<TabularRow>,
-}
-
-pub struct SovereignTabFm {
-    pub datasets: Vec<TabularDataset>,
 }
 
 #[cfg(test)]

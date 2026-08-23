@@ -1,46 +1,54 @@
 // SigmaOS Compatibility Module
-pub mod constellation_mesh;
-pub mod cross_platform;
-pub mod india_stack;
-pub mod india_professional_tools;
-pub mod alpine_linux;
-pub mod interim;
-pub mod jehanne;
-pub mod mint_linux;
-pub mod reactos;
-pub use reactos::{
-    NtHandle, NtObjectManager, NtObjectType, NtStatus,
-    PortableExecutableLoader, RegistryHive,
-};
-pub mod lubuntu;
-pub mod antix;
-pub mod bodhi_moksha;
-pub mod cachy_os;
-pub mod chakra;
+pub mod absorb_tools;
+pub mod apache_ossie;
 pub mod chimera_linux;
-pub mod endeavour;
-pub mod garuda_zen;
-pub mod gentoo;
-pub mod tiny_core;
-pub mod localsend;
-
-pub mod zorin;
-pub use zorin::{
-    ZorinLayoutSwitcher,
-    ZorinChameleonEngine,
-    ZorinConnectManager,
-    ZorinWindowsAppSupport,
-};
+pub mod cross_platform;
 pub mod historic_linux;
+pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
+pub mod india_professional_tools;
 pub mod canonical;
 pub mod fedora;
+pub mod arch_linux;
 pub mod gap_closure;
+pub mod superiority;
+pub mod open_source_tier1;
+pub mod interim;
+pub mod lubuntu;
+pub mod cross_platform_kernel;
+pub mod wasm_sandbox;
+pub mod tiny_core;
+pub mod sovereign_suite;
 
-pub use gap_closure::*;
+pub use gap_closure::{
+    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
+    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
+    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
+    HidGraphicsDriver, AiTaskOrchestrator,
+};
+pub use superiority::{
+    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
+    SovereignTimeMachine, NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine,
+    SovereignForensics, SovereignRecoverUtility, ShardIgnitor,
+};
+
+pub use arch_linux::{
+    ProcFileType, ProcFile, DevFileType, DevFile, ArchPackage, PacmanError, PacmanEngine,
+    RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule, ArchFirewall,
+    LsmMode, LsmSentinel, PamGate, PaneLayout, TmuxMultiplexer, SovereignEnvRegistry,
+    AurRepoStatus, YayParuAdapter, ArchMirror, ReflectorMirrorlist, SubvolumeConfig,
+    ArchinstallConfig, ArchinstallParity, ArtixInitSystemType, ServiceState, ArtixInitBridge,
+    KeyTrustLevel, PacmanKey, PacmanKeyring, AurPatch, AurPatchEngine,
+    MkinitcpioGenerator, NewsItem, ArchNewsFeedParser, CachedPackage, PacmanDbCleaner,
+    WikiPage, ArchWikiSearchEngine,
+};
+
+pub use open_source_tier1::{
+    WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
+};
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -50,16 +58,15 @@ pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
 pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
 
 pub use cross_platform_kernel::{
-    PageAccessMode, MemoryArch, PageTableEntry, PageDirectory, DeferredProcedureCall,
+    PageAccessMode, MemoryArch, PageDirectory, DeferredProcedureCall,
     Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
     UmsThreadState, UmsContext, SovereignKernelInternals,
 };
 
 pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError,
-    ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
+    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
+    VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
 pub use mint_linux::{
@@ -94,10 +101,15 @@ pub use absorb_tools::{
     CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
     PledgeUnveilSandbox, PqcSecureChannel,
 };
-pub use canonical::{
-    SigmaLivepatch, SigmaLivepatchPatch, CloudOrchestrator, ContinuityCoordinator, EcosystemSnapshot, SnapshotManager,
+
+pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
+
+pub use apache_ossie::{
+    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
+    OssieRelationship, SemanticRow,
 };
-pub use fedora::{
-    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
-    FedoraAlu, FedoraAluFlags, SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel,
+
+pub use sovereign_suite::{
+    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
+    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };

@@ -122,6 +122,142 @@ impl AclEntry {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. FILE ATTRIBUTES & CPU RING PRIVILEGE ENFORCEMENT & NFSv4 ACLs
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub mod file_attribute_flags {
+    pub const IMMUTABLE: u32 = 0x01;
+    pub const APPEND_ONLY: u32 = 0x02;
+    pub const NO_UNLINK: u32 = 0x04;
+    pub const NO_DUMP: u32 = 0x08;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FileAttributeAccessControl {
+    pub flags: u32,
+}
+
+impl FileAttributeAccessControl {
+    pub fn new(flags: u32) -> Self {
+        Self { flags }
+    }
+
+    pub fn can_modify(&self, is_append: bool, _is_root: bool) -> bool {
+        if (self.flags & file_attribute_flags::IMMUTABLE) != 0 {
+            return false;
+        }
+        if (self.flags & file_attribute_flags::APPEND_ONLY) != 0 {
+            return is_append;
+        }
+        true
+    }
+
+    pub fn can_unlink(&self) -> bool {
+        (self.flags & (file_attribute_flags::IMMUTABLE | file_attribute_flags::APPEND_ONLY | file_attribute_flags::NO_UNLINK)) == 0
+    }
+
+    pub fn can_dump(&self) -> bool {
+        (self.flags & file_attribute_flags::NO_DUMP) == 0
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExecutionRingMode {
+    Ring0Supervisor,
+    Ring1Driver,
+    Ring2Service,
+    Ring3User,
+}
+
+pub struct CpuPrivilegeEnforcer {
+    pub ring: ExecutionRingMode,
+}
+
+impl CpuPrivilegeEnforcer {
+    pub fn new(ring: ExecutionRingMode) -> Self {
+        Self { ring }
+    }
+
+    pub fn can_execute_privileged_instruction(&self) -> bool {
+        self.ring == ExecutionRingMode::Ring0Supervisor
+    }
+}
+
+pub mod nfs4_mask {
+    pub const READ_DATA: u32 = 0x01;
+    pub const WRITE_DATA: u32 = 0x02;
+    pub const DELETE: u32 = 0x04;
+}
+
+pub mod nfs4_flags {
+    pub const FILE_INHERIT: u32 = 0x01;
+    pub const DIRECTORY_INHERIT: u32 = 0x02;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Nfs4AceType {
+    AccessAllowed,
+    AccessDenied,
+}
+
+#[derive(Debug, Clone)]
+pub struct Nfs4Ace {
+    pub ace_type: Nfs4AceType,
+    pub flags: u32,
+    pub mask: u32,
+    pub who: u32,
+}
+
+impl Nfs4Ace {
+    pub fn new(ace_type: Nfs4AceType, flags: u32, mask: u32, who: u32) -> Self {
+        Self {
+            ace_type,
+            flags,
+            mask,
+            who,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct Nfs4Acl {
+    pub aces: Vec<Nfs4Ace>,
+}
+
+impl Nfs4Acl {
+    pub fn new() -> Self {
+        Self { aces: Vec::new() }
+    }
+
+    pub fn add_ace(&mut self, ace: Nfs4Ace) {
+        self.aces.push(ace);
+    }
+
+    pub fn evaluate_access(&self, uid: u32, _gid: u32, requested_mask: u32) -> bool {
+        for ace in &self.aces {
+            if ace.who == uid || ace.who == 65534 {
+                if (ace.mask & requested_mask) != 0 {
+                    match ace.ace_type {
+                        Nfs4AceType::AccessAllowed => return true,
+                        Nfs4AceType::AccessDenied => return false,
+                    }
+                }
+            }
+        }
+        true
+    }
+
+    pub fn inherit_for_child(&self, _is_directory: bool) -> Self {
+        let mut child = Self::new();
+        for ace in &self.aces {
+            if (ace.flags & (nfs4_flags::FILE_INHERIT | nfs4_flags::DIRECTORY_INHERIT)) != 0 {
+                child.add_ace(ace.clone());
+            }
+        }
+        child
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct PosixAcl {
@@ -419,49 +555,6 @@ impl ZeroTrustAccessGate {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 8. NFSv4 / FREEBSD RICH ACLs & FILE ATTRIBUTES
-// ─────────────────────────────────────────────────────────────────────────────
-
-pub mod nfs4_flags {
-    pub const FILE_INHERIT: u32 = 0x01;
-    pub const DIRECTORY_INHERIT: u32 = 0x02;
-    pub const NO_PROPAGATE_INHERIT: u32 = 0x04;
-    pub const INHERIT_ONLY: u32 = 0x08;
-}
-
-pub mod nfs4_mask {
-    pub const READ_DATA: u32 = 0x01;
-    pub const WRITE_DATA: u32 = 0x02;
-    pub const APPEND_DATA: u32 = 0x04;
-    pub const READ_NAMED_ATTRS: u32 = 0x08;
-    pub const WRITE_NAMED_ATTRS: u32 = 0x10;
-    pub const EXECUTE: u32 = 0x20;
-    pub const DELETE_CHILD: u32 = 0x40;
-    pub const READ_ATTRIBUTES: u32 = 0x80;
-    pub const WRITE_ATTRIBUTES: u32 = 0x100;
-    pub const DELETE: u32 = 0x10000;
-    pub const READ_ACL: u32 = 0x20000;
-    pub const WRITE_ACL: u32 = 0x40000;
-    pub const WRITE_OWNER: u32 = 0x80000;
-    pub const SYNCHRONIZE: u32 = 0x100000;
-}
-
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CpuPrivilegeEnforcer {
-    pub ring_mode: ExecutionRingMode,
-}
-
-impl CpuPrivilegeEnforcer {
-    pub fn new(ring_mode: ExecutionRingMode) -> Self {
-        Self { ring_mode }
-    }
-
-    pub fn can_execute_privileged_instruction(&self) -> bool {
-        matches!(self.ring_mode, ExecutionRingMode::Ring0Supervisor)
-    }
-}
 
 #[cfg(test)]
 mod tests {

@@ -121,6 +121,74 @@ pub trait HypervisorBackend {
 }
 
 
+/// Live migration status protocol (QEMU / KVM parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VmMigrationState {
+    None,
+    Setup,
+    Active,
+    PostcopyActive,
+    Completed,
+    Failed,
+    Cancelled,
+}
+
+/// KVM Dirty Ring Logging Tracker
+#[derive(Debug, Clone)]
+pub struct KvmDirtyRingTracker {
+    pub ring_entries: Vec<u64>, // Physical page frame numbers (PFNs) marked dirty
+    pub ring_size: usize,
+}
+
+impl KvmDirtyRingTracker {
+    pub fn new(ring_size: usize) -> Self {
+        Self {
+            ring_entries: Vec::with_capacity(ring_size),
+            ring_size,
+        }
+    }
+
+    pub fn mark_dirty(&mut self, pfn: u64) {
+        if self.ring_entries.len() < self.ring_size {
+            self.ring_entries.push(pfn);
+        }
+    }
+
+    pub fn harvest_dirty_pages(&mut self) -> Vec<u64> {
+        let dirty = self.ring_entries.clone();
+        self.ring_entries.clear();
+        dirty
+    }
+}
+
+/// vHost-user VirtIO device backend protocol
+#[derive(Debug, Clone)]
+pub struct VhostUserDevice {
+    pub socket_path: String,
+    pub feature_bits: u64,
+    pub num_queues: u16,
+    pub is_connected: bool,
+}
+
+impl VhostUserDevice {
+    pub fn new(socket_path: &str, num_queues: u16) -> Self {
+        Self {
+            socket_path: socket_path.to_string(),
+            feature_bits: 0x100000001, // VHOST_USER_F_PROTOCOL_FEATURES | VIRTIO_F_VERSION_1
+            num_queues,
+            is_connected: false,
+        }
+    }
+
+    pub fn connect(&mut self) -> Result<(), VmError> {
+        if self.socket_path.is_empty() {
+            return Err(VmError::CreationFailed("Invalid vHost socket path".to_string()));
+        }
+        self.is_connected = true;
+        Ok(())
+    }
+}
+
 /// KVM Exit Reasons (QEMU/KVM parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KvmExitReason {
@@ -1504,5 +1572,34 @@ mod tests {
         // 4. Test hugepages setting (Fedora inspired)
         manager.set_hugepages(&vm_id, false).unwrap();
         assert!(!manager.get_vm_config(&vm_id).unwrap().hugepages_enabled);
+    }
+
+    #[test]
+    fn test_kvm_dirty_ring_logging() {
+        let mut dirty_ring = KvmDirtyRingTracker::new(4);
+        dirty_ring.mark_dirty(0x1000);
+        dirty_ring.mark_dirty(0x2000);
+        assert_eq!(dirty_ring.ring_entries.len(), 2);
+
+        let harvested = dirty_ring.harvest_dirty_pages();
+        assert_eq!(harvested, vec![0x1000, 0x2000]);
+        assert!(dirty_ring.ring_entries.is_empty());
+    }
+
+    #[test]
+    fn test_vhost_user_virtio_device() {
+        let mut dev = VhostUserDevice::new("/var/run/vhost-user-net.sock", 4);
+        assert!(!dev.is_connected);
+        dev.connect().unwrap();
+        assert!(dev.is_connected);
+        assert_eq!(dev.num_queues, 4);
+    }
+
+    #[test]
+    fn test_live_migration_states() {
+        let state = VmMigrationState::Setup;
+        assert_eq!(state, VmMigrationState::Setup);
+        let active = VmMigrationState::Active;
+        assert_ne!(active, VmMigrationState::Completed);
     }
 }
