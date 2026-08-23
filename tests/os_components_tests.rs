@@ -224,7 +224,7 @@ fn test_process_activity_manager_and_registers() {
     let active_proc = pam.get_process_activity(500).unwrap();
     assert_eq!(active_proc.state, ActivityState::Interactive);
 
-    let ctx = ProcRegisterSnapshot {
+    let ctx = RegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,

@@ -28,7 +28,15 @@ pub enum InitSystemType {
     OpenRC,
 }
 
-/// Multi-init abstraction bridge allowing boot-time switching
+/// FreeBSD & OpenBSD rc.d boot execution ordering level
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BsdRcOrder {
+    EarlyBoot, // e.g. REQUIRE: mountcritlocal, BEFORE: DAEMON
+    CoreBoot,  // e.g. REQUIRE: NETWORKING, BEFORE: LOGIN
+    LateBoot,  // e.g. REQUIRE: LOGIN
+}
+
+/// Multi-init abstraction bridge allowing boot-time switching across Linux & BSD init models
 pub struct InitSystemBridge {
     pub active_init: InitSystemType,
 }
@@ -49,6 +57,38 @@ impl InitSystemBridge {
         for &b in b" --foreground\n" {
             script.push(b);
         }
+        script
+    }
+
+    /// Converts service configuration to OpenRC runlevel script format (Gentoo/Alpine parity)
+    pub fn convert_openrc_service_script(&self, service_name: &str, runlevel: &str) -> Vec<u8> {
+        let mut script = Vec::new();
+        script.extend_from_slice(b"#!/sbin/openrc-run\n# OpenRC Service Script for ");
+        script.extend_from_slice(service_name.as_bytes());
+        script.extend_from_slice(b"\nrunlevel=");
+        script.extend_from_slice(runlevel.as_bytes());
+        script.extend_from_slice(b"\ncommand=\"/usr/bin/");
+        script.extend_from_slice(service_name.as_bytes());
+        script.extend_from_slice(b"\"\ncommand_args=\"--daemon\"\n");
+        script
+    }
+
+    /// Converts service configuration to FreeBSD / OpenBSD rc.d script format (BSD rc.d parity)
+    pub fn convert_bsd_rc_script(&self, service_name: &str, order: BsdRcOrder) -> Vec<u8> {
+        let mut script = Vec::new();
+        script.extend_from_slice(b"#!/bin/sh\n# PROVIDE: ");
+        script.extend_from_slice(service_name.as_bytes());
+        script.extend_from_slice(b"\n");
+        match order {
+            BsdRcOrder::EarlyBoot => script.extend_from_slice(b"# REQUIRE: mountcritlocal\n# BEFORE: DAEMON\n"),
+            BsdRcOrder::CoreBoot => script.extend_from_slice(b"# REQUIRE: NETWORKING\n# BEFORE: LOGIN\n"),
+            BsdRcOrder::LateBoot => script.extend_from_slice(b"# REQUIRE: LOGIN\n"),
+        }
+        script.extend_from_slice(b"name=\"");
+        script.extend_from_slice(service_name.as_bytes());
+        script.extend_from_slice(b"\"\nrcvar=\"");
+        script.extend_from_slice(service_name.as_bytes());
+        script.extend_from_slice(b"_enable\"\nload_rc_config $name\nrun_rc_command \"$1\"\n");
         script
     }
 }
