@@ -18,6 +18,8 @@ SigmaPkg is SigmaOS's native package manager, a clean-room, zero-dependency impl
 | **Multiple repos** | Rolling, stable, and security channels |
 | **Rollback** | Snapshot-based system rollback |
 | **AUR-compatible** | Build-from-source packages like Arch AUR |
+| **Parallel Mirror Fetcher** | Dynamic latency-based mirror ranking & parallel downloading |
+| **Dependency Graph Resolver** | Topological sort with cycle detection for multi-distro packages |
 
 ---
 

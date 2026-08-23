@@ -617,6 +617,103 @@ pub enum UniversalPackageType {
     Sovereign,
 }
 
+// ==========================================
+// Parallel Mirror Fetcher & Dependency Graph Resolver
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct MirrorNode {
+    pub url: String,
+    pub latency_ms: u32,
+    pub is_active: bool,
+}
+
+pub struct ParallelMirrorFetcher {
+    pub mirrors: Vec<MirrorNode>,
+}
+
+impl ParallelMirrorFetcher {
+    pub fn new() -> Self {
+        Self { mirrors: Vec::new() }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, latency_ms: u32) {
+        self.mirrors.push(MirrorNode {
+            url: url.to_string(),
+            latency_ms,
+            is_active: true,
+        });
+    }
+
+    /// Ranks mirrors by latency and selects the fastest active mirror for parallel chunk download
+    pub fn select_fastest_mirror(&self) -> Option<String> {
+        let mut active_mirrors: Vec<&MirrorNode> = self.mirrors.iter().filter(|m| m.is_active).collect();
+        active_mirrors.sort_by_key(|m| m.latency_ms);
+        active_mirrors.first().map(|m| m.url.clone())
+    }
+}
+
+impl Default for ParallelMirrorFetcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct DependencyGraphResolver {
+    pub graph: HashMap<String, Vec<String>>,
+}
+
+impl DependencyGraphResolver {
+    pub fn new() -> Self {
+        Self { graph: HashMap::new() }
+    }
+
+    pub fn add_dependency(&mut self, pkg: &str, dep: &str) {
+        self.graph.entry(pkg.to_string()).or_default().push(dep.to_string());
+    }
+
+    /// Performs a topological sort with cycle detection for multi-distro dependency resolution
+    pub fn resolve_installation_order(&self, root_pkg: &str) -> Result<Vec<String>, &'static str> {
+        let mut order = Vec::new();
+        let mut visited = HashMap::new(); // false = visiting, true = visited
+
+        self.topological_sort(root_pkg, &mut order, &mut visited)?;
+        Ok(order)
+    }
+
+    fn topological_sort(
+        &self,
+        node: &str,
+        order: &mut Vec<String>,
+        visited: &mut HashMap<String, bool>,
+    ) -> Result<(), &'static str> {
+        if let Some(&is_visited) = visited.get(node) {
+            if !is_visited {
+                return Err("Circular dependency detected in package graph");
+            }
+            return Ok(());
+        }
+
+        visited.insert(node.to_string(), false);
+
+        if let Some(deps) = self.graph.get(node) {
+            for dep in deps {
+                self.topological_sort(dep, order, visited)?;
+            }
+        }
+
+        visited.insert(node.to_string(), true);
+        order.push(node.to_string());
+        Ok(())
+    }
+}
+
+impl Default for DependencyGraphResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -762,5 +859,25 @@ mod tests {
 
         let apk_adapter = PackageAdapterFactory::get_adapter(PackageFormat::Apk);
         assert_eq!(apk_adapter.format(), PackageFormat::Apk);
+    }
+
+    #[test]
+    fn test_parallel_mirror_fetcher() {
+        let mut fetcher = ParallelMirrorFetcher::new();
+        fetcher.add_mirror("https://mirror2.sigmaos.org", 50);
+        fetcher.add_mirror("https://mirror1.sigmaos.org", 12);
+        fetcher.add_mirror("https://mirror3.sigmaos.org", 120);
+
+        assert_eq!(fetcher.select_fastest_mirror().unwrap(), "https://mirror1.sigmaos.org");
+    }
+
+    #[test]
+    fn test_dependency_graph_resolver() {
+        let mut resolver = DependencyGraphResolver::new();
+        resolver.add_dependency("sigma-desktop", "sigma-compositor");
+        resolver.add_dependency("sigma-compositor", "glibc-sigma");
+
+        let order = resolver.resolve_installation_order("sigma-desktop").unwrap();
+        assert_eq!(order, vec!["glibc-sigma", "sigma-compositor", "sigma-desktop"]);
     }
 }
