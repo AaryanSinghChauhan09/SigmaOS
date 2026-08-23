@@ -2,9 +2,6 @@ use segmentation_paging::{
     AddressBindingMode, CpuRing as SegCpuPrivilegeMode,
     RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, AslrEntropyConfig
 };
-use statutory_compliance::{
-    StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus
-};
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
@@ -164,6 +161,11 @@ use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesyste
 use process_activity_manager::{
     ActivityState, ActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
 };
+
+use access_control::{
+    PosixAcl, AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel, ZeroTrustAccessGate, FilterPolicy
+};
+
 #[test]
 fn test_segmentation_paging_and_aslr() {
     let code_desc = SegmentDescriptor::code_segment_ring0();
@@ -412,10 +414,10 @@ fn test_fedora_rpm_and_selinux() {
     let order = resolver.resolve_and_install("kernel-core").unwrap();
     assert_eq!(order, vec!["kernel-core".to_string()]);
 
-    let mut selinux = sigmaos::security::selinux::SelinuxEngine::new();
-    let src = "system_u:system_r:httpd_t:s0";
-    let tgt = "system_u:object_r:httpd_sys_content_t:s0";
-    assert!(selinux.has_permission(src, tgt, "file", "read").unwrap());
+    let selinux = fedora_compat::SeLinuxEngine::new(true);
+    let src = fedora_compat::SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
+    let tgt = fedora_compat::SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
+    assert!(selinux.authorize_access(&src, &tgt, "file", "read").is_ok());
 }
 
 #[test]
@@ -475,7 +477,7 @@ fn test_sigmatools_suite() {
 fn test_posix_and_nfsv4_acls() {
     // POSIX 1003.1e ACL verification
     let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
-    posix_acl.add_entry_direct(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
+    posix_acl.add_entry_direct(AclEntry::new(ControlAclTag::User(1001), 5)); // User 1001 gets r-x (5)
 
     assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
     assert!(!posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 2)); // Denied write (2)
@@ -483,6 +485,11 @@ fn test_posix_and_nfsv4_acls() {
 
     let child_posix = posix_acl.inherit_default_acl(false);
     assert_eq!(child_posix.entries.len(), posix_acl.entries.len());
+
+    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
+    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+    gate.mac_filter.add_mac(allowed_mac);
+    gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
 
     assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
 }
@@ -639,7 +646,7 @@ fn test_shadow_passwords_usermod_and_sudo_policy() {
 
 #[test]
 fn test_statutory_compliance_overlay_and_community_toolkit() {
-    let mut gov = StatutoryGovernanceLayer::new();
+    let gov = StatutoryGovernanceLayer::new();
     assert!(!gov.rules.is_empty());
 
     let mut notifier = PenaltyBreachNotifier::new();
@@ -660,7 +667,7 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
     let handbook = CommunityHandbookCatalog::new();
     assert!(!handbook.articles.is_empty());
 
-    let mut recipes = ReproduciblePackageRecipeManager::new();
+    let recipes = ReproduciblePackageRecipeManager::new();
     assert!(!recipes.recipes.is_empty());
 
     let sec = SecurityProfileTemplateStore::new();
