@@ -765,7 +765,7 @@ impl NetworkTrafficAnalyzer {
     }
 
     pub fn current_bandwidth_mbps(&self) -> f64 {
-        let duration = self.statistics.start_time.elapsed().as_secs_f64();
+        let duration = self.statistics.start_time.elapsed().as_secs() as f64;
         if duration > 0.0 {
             (self.statistics.total_bytes as f64 * 8.0) / (duration * 1_000_000.0)
         } else {
