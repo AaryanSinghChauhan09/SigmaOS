@@ -204,6 +204,7 @@ mod elf_relocation;
 
 use community_toolkit::{
     CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
+    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
 };
 use statutory_compliance::{
     DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
@@ -212,7 +213,8 @@ use statutory_compliance::{
 use system_user::UserManager as TestUserManager;
 
 use access_control::{
-    AccessControlMatrix, PosixAcl, AclType, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel, MacAddressFilter, FilterPolicy, ZeroTrustAccessGate,
+    PosixAcl, AclType, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel,
+    ZeroTrustAccessGate, FilterPolicy,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
@@ -311,7 +313,7 @@ fn test_process_activity_manager_and_registers() {
     let proc = pam.get_process_activity(500).unwrap();
     assert_eq!(proc.state, ActivityState::Interactive);
 
-    let ctx = RegisterSnapshot {
+    let ctx = ProcRegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,
@@ -574,6 +576,11 @@ fn test_posix_and_nfsv4_acls() {
 
     assert!(posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 0o5));
     assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 0o2));
+
+    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
+    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+    gate.mac_filter.add_mac(allowed_mac);
+    gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
 
     let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
     let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
