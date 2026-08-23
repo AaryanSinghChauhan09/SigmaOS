@@ -356,61 +356,26 @@ impl PackageFormatAdapter for YumRpmAdapter {
 
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
+            "Installing {} using {} adapter",
+            package.name, self.adapter_name()
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
             "Removing {} using {} adapter",
             package.name, self.adapter_name()
         );
         Ok(())
     }
-}
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
-            package.name, self.adapter_name
+            package.name, self.adapter_name()
         );
         Ok(())
-    }
-
-    /// Dynamically parses and enforces Flatpak/Snap sandboxing policy constraints onto SigmaOS sandboxes
-    fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
-        let mut enforced_pledges = Vec::new();
-        for arg in &manifest.finish_args {
-            if arg.contains("--share=network") {
-                enforced_pledges.push(String::from("network"));
-            } else if arg.contains("--share=ipc") {
-                enforced_pledges.push(String::from("ipc"));
-            } else if arg.contains("--filesystem=host") {
-                enforced_pledges.push(String::from("unveil_all"));
-            }
-        }
-        enforced_pledges
-    }
-
-    /// Translates Snap squashfs confinement settings to native capability restrictions
-    fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> &'static str {
-        match manifest.confinement.as_str() {
-            "strict" => "strict_pledge_sandbox",
-            "classic" => "unrestricted_legacy",
-            _ => "devmode_permissive",
-        }
-    }
-
-    /// Simulates mounting the AppImage's internal squashfs payload region
-    fn mount_appimage_squashfs(&self, appimage: &AppImageRuntime) -> Result<String, PackageError> {
-        if appimage.squashfs_offset == 0 {
-            return Err(PackageError::InstallationFailed(String::from("Invalid squashfs offset inside AppImage payload")));
-        }
-        Ok(format!("/tmp/.mount_{}_squashfs", appimage.app_name))
-    }
-
-    /// Simulates querying APT repository sources
-    fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
-        config.enabled_components().len() > 0 && !config.sourcelist_url.is_empty()
-    }
-
-    /// Simulates querying DNF repository sources
-    fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
-        config.enabled && !config.baseurl.is_empty()
     }
 }
 
