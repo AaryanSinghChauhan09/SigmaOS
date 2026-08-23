@@ -658,6 +658,8 @@ impl Device for SimpleBlockDevice {
 #[cfg(test)]
 mod legacy_tests {
     use super::*;
+    use crate::compatibility::historic_linux::DdeDeviceWrapper;
+    use crate::drivers::dde::UdfInterpreter;
 
     pub struct LegacyDevice {
         pub id: usize,
@@ -1247,8 +1249,9 @@ impl DeviceManager {
 
     pub fn find_device_by_name(&self, name: &[u8]) -> Option<usize> {
         for (id, desc_option) in self.descriptors.iter().enumerate() {
-            if let Some(desc_ptr) = *desc_option {
-                let desc = unsafe { &*desc_ptr.as_ptr() };
+            if let Some(desc_ptr) = desc_option {
+                let ptr: *mut DeviceDescriptor = desc_ptr.as_ptr();
+                let desc: &DeviceDescriptor = unsafe { &*ptr };
                 let desc_name_len = desc.name.iter().position(|&b| b == 0).unwrap_or(64);
                 if &desc.name[..desc_name_len] == name {
                     return Some(id);
@@ -1261,8 +1264,9 @@ impl DeviceManager {
     pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<usize> {
         let mut ids = Vec::new();
         for (id, desc_option) in self.descriptors.iter().enumerate() {
-            if let Some(desc_ptr) = *desc_option {
-                let desc = unsafe { &*desc_ptr.as_ptr() };
+            if let Some(desc_ptr) = desc_option {
+                let ptr: *mut DeviceDescriptor = desc_ptr.as_ptr();
+                let desc: &DeviceDescriptor = unsafe { &*ptr };
                 if desc.device_type == device_type {
                     ids.push(id);
                 }
@@ -1354,10 +1358,11 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn iter_mut(&mut self) -> VecIteratorMut<'_, T> {
-        VecIteratorMut {
-            vec: self,
-            index: 0,
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
 
@@ -1422,7 +1427,7 @@ impl<'a, T> Iterator for VecIteratorMut<'a, T> {
 }
 
 pub struct Enumerate<'a, T> {
-    iter: VecIterator<'a, T>,
+    iter: VecIter<'a, T>,
     index: usize,
 }
 

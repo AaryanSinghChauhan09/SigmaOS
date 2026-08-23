@@ -598,7 +598,7 @@ impl Compositor for SimpleCompositor {
         }
 
         let id = window.id();
-        self.windows.push(window);
+        self.windows.push(Some(window));
         self.window_order.push(id);
         self.stats.total_windows += 1;
         Ok(id)
@@ -609,7 +609,7 @@ impl Compositor for SimpleCompositor {
             return Err(GraphicsError::PermissionDenied);
         }
 
-        if let Some(pos) = self.windows.iter().position(|w| w.id() == id) {
+        if let Some(pos) = self.windows.iter().position(|w| w.as_ref().map_or(false, |win| win.id() == id)) {
             self.windows.remove(pos);
             self.window_order.retain(|&x| x != id);
             self.stats.total_windows -= 1;
@@ -620,7 +620,14 @@ impl Compositor for SimpleCompositor {
     }
 
     fn get_window(&mut self, id: usize) -> Option<&mut Box<dyn Window>> {
-        self.windows.iter_mut().find(|w| w.id() == id)
+        for slot in &mut self.windows {
+            if let Some(ref mut win) = *slot {
+                if win.id() == id {
+                    return Some(win);
+                }
+            }
+        }
+        None
     }
 
     fn bring_to_front(&mut self, id: usize) -> Result<(), GraphicsError> {
@@ -762,7 +769,15 @@ impl Compositor for SimpleCompositor {
 
     fn stats(&self) -> CompositorStats {
         let mut stats = self.stats.clone();
-        stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
+        let mut visible = 0;
+        for slot in &self.windows {
+            if let Some(ref win) = *slot {
+                if win.info().visible {
+                    visible += 1;
+                }
+            }
+        }
+        stats.visible_windows = visible;
         stats
     }
 }

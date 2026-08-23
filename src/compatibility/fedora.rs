@@ -52,7 +52,7 @@ impl DnfPackageResolver {
             return Err(format!("Package {} not found in repositories", name));
         }
 
-        let mut install_order = Vec::new();
+        let mut install_order: Vec<String> = Vec::new();
         let mut visited = HashMap::new();
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;

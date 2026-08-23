@@ -126,7 +126,7 @@ impl SovereignSpliceEngine {
     ) -> Result<usize, IpcError> {
         let mut moved = 0;
         while moved < max_elements {
-            if let Some(payload) = source.read_structure() {
+            if let Ok(Some(payload)) = source.read_structure() {
                 let size = payload.len();
                 if let Err(e) = destination.write_structure(payload) {
                     return Err(e);

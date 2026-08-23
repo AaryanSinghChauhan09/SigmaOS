@@ -94,7 +94,7 @@ impl MagnifierManager for SimpleMagnifierManager {
     fn destroy_magnifier(&mut self, id: MagnifierID) -> Result<(), MagnifierError> {
         for magnifier_option in &mut self.magnifiers {
             if let Some(ref magnifier) = *magnifier_option {
-                if magnifier.id() == id {
+                if (&**magnifier).id() == id {
                     *magnifier_option = None;
                     return Ok(());
                 }

@@ -184,9 +184,6 @@ impl Scheduler {
         Self {
             processes: Vec::new(),
             current_time: 0,
-            system_vtime: 0,
-            numa_nodes: Vec::new(),
-            run_queues: Vec::new(),
         }
     }
 
@@ -304,7 +301,7 @@ impl Scheduler {
     }
 }
 
-impl Default for Scheduler {
+impl Default for CfsScheduler {
     fn default() -> Self {
         Self::new()
     }

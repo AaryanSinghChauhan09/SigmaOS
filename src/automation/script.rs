@@ -509,7 +509,7 @@ mod tests {
         ];
 
         let decompressed = unpacker.decompress_payload(&compressed_payload).unwrap();
-        assert_eq!(decompressed, b"HELLO");
+        assert_eq!(&decompressed[..], b"HELLO");
     }
 
     #[test]
@@ -528,7 +528,7 @@ mod tests {
         let scrambled = [b'A' ^ 0x33, b'B' ^ 0x33, b'C' ^ 0x33];
 
         let descrambled = descrambler.descramble_string(&scrambled);
-        assert_eq!(descrambled, b"ABC");
+        assert_eq!(&descrambled[..], b"ABC");
     }
 
     #[test]

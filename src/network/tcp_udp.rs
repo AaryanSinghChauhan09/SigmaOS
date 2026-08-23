@@ -430,7 +430,7 @@ impl Default for ZeroCopyNetwork {
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
         ZeroCopyNetwork {
-            dma_buffer: AtomicUsize::new(0),
+            dma_buffer_address: 0,
         }
     }
 }
@@ -659,11 +659,9 @@ impl NetworkStack for SimpleNetworkStack {
         Err(NetworkError::InvalidSocket)
     }
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        for socket_option in &self.sockets {
-            if let Some(ref socket) = *socket_option {
-                if socket.id() == id {
-                    return Some(socket.as_ref());
-                }
+        for socket in &self.sockets {
+            if socket.id() == id {
+                return Some(socket.as_ref());
             }
         }
         None
