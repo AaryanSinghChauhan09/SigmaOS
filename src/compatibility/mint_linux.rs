@@ -767,7 +767,11 @@ mod tests {
 
         let hash = timeshift.restore_checkpoint(1).unwrap();
         assert_eq!(hash, 0xDEADBEEF);
+    }
 
+    #[test]
+    fn test_cinnamon_theme_engine() {
+        let mut engine = CinnamonThemeEngine::new();
         engine.add_desklet(101, 200, 200);
         assert_eq!(engine.desklets.len(), 1);
         assert_eq!(engine.desklets[0].unwrap().id, 101);
@@ -778,10 +782,15 @@ mod tests {
         let mut style = MintCinnamonStyling::default();
         assert_eq!(style.panel_height, 40);
         assert!(style.window_effects_enabled);
+    }
 
+    #[test]
+    fn test_timeshift_system_restorer() {
+        let mut restorer = TimeshiftSystemRestorer::new();
         restorer.create_restore_point(101, true); // rsync snapshot
         restorer.create_restore_point(102, false); // btrfs snapshot
         assert_eq!(restorer.restore_points.len(), 2);
+    }
 
     #[test]
     fn test_mint_driver_manager_flows() {
