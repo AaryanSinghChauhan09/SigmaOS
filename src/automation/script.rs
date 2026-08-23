@@ -1,14 +1,8 @@
+// SPDX-License-Identifier: MIT
+
 extern crate alloc;
 
-#[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
-#[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
-
-/// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
-/// Implements interactive scripting, dynamic script-like functions, positional arguments,
-/// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
-
+use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -18,11 +12,21 @@ pub type ScriptID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptLanguage { Python = 0, JavaScript = 1, Lua = 2, Shell = 3 }
+pub enum ScriptLanguage {
+    Python = 0,
+    JavaScript = 1,
+    Lua = 2,
+    Shell = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptError { Success = 0, NotFound = 1, ExecutionFailed = 2, InvalidArgument = 3 }
+pub enum ScriptError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    InvalidArgument = 3,
+}
 
 pub trait Script {
     fn id(&self) -> ScriptID;
@@ -68,6 +72,7 @@ impl Script for SimpleScript {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(128);
         &self.name[..len]
     }
+
     fn language(&self) -> ScriptLanguage {
         match self.language.load(Ordering::SeqCst) {
             0 => ScriptLanguage::Python,
@@ -76,7 +81,10 @@ impl Script for SimpleScript {
             _ => ScriptLanguage::Shell,
         }
     }
-    fn source(&self) -> &[u8] { &self.source }
+
+    fn source(&self) -> &[u8] {
+        &self.source
+    }
 }
 
 pub trait ScriptEngine {
@@ -89,7 +97,7 @@ pub trait ScriptEngine {
 pub struct SimpleScriptEngine {
     pub scripts: Vec<Option<Box<dyn Script>>>,
     pub next_id: AtomicUsize,
-    pub aliases: SimpleScriptEnvironment, // maps @call alias -> target script name
+    pub aliases: SimpleScriptEnvironment,
 }
 
 impl SimpleScriptEngine {
@@ -101,12 +109,10 @@ impl SimpleScriptEngine {
         }
     }
 
-    /// Register a @call alias for a script
     pub fn set_script_alias(&mut self, alias: &[u8], script_name: &[u8]) {
         self.aliases.set(alias, script_name);
     }
 
-    /// Executes a loaded script after performing positional parameter expansion (e.g., replacing $1, $2 with arguments)
     pub fn execute_script_with_args(&self, id: ScriptID, args: &[&[u8]]) -> Result<Vec<u8>, ScriptError> {
         let script = self.get_script(id).ok_or(ScriptError::NotFound)?;
         let source = script.source();
@@ -114,7 +120,6 @@ impl SimpleScriptEngine {
         let mut expanded = Vec::new();
         let mut i = 0;
         while i < source.len() {
-            // Check for positional arguments: e.g. $1, $2
             if source[i] == b'$' && i + 1 < source.len() && source[i + 1] >= b'1' && source[i + 1] <= b'9' {
                 let arg_index = (source[i + 1] - b'1') as usize;
                 if arg_index < args.len() {
@@ -132,14 +137,13 @@ impl SimpleScriptEngine {
         Ok(expanded)
     }
 
-    /// Resolve and execute script via @call alias
     pub fn execute_by_alias(&self, alias: &[u8], args: &[&[u8]]) -> Result<Vec<u8>, ScriptError> {
         let target_name = self.aliases.get(alias).ok_or(ScriptError::NotFound)?;
 
         for script_option in &self.scripts {
             if let Some(ref script) = *script_option {
-                if script.as_ref().name() == target_name {
-                    return self.execute_script_with_args(script.as_ref().id(), args);
+                if script.name() == target_name {
+                    return self.execute_script_with_args(script.id(), args);
                 }
             }
         }
@@ -164,7 +168,7 @@ impl ScriptEngine for SimpleScriptEngine {
     fn unload_script(&mut self, id: ScriptID) -> Result<(), ScriptError> {
         for script_option in &mut self.scripts {
             if let Some(ref script) = *script_option {
-                if script.as_ref().id() == id {
+                if script.id() == id {
                     return Ok(());
                 }
             }
@@ -187,7 +191,7 @@ impl ScriptEngine for SimpleScriptEngine {
     fn get_script(&self, id: ScriptID) -> Option<&dyn Script> {
         for script_option in &self.scripts {
             if let Some(ref script) = *script_option {
-                if script.as_ref().id() == id {
+                if script.id() == id {
                     return Some(script.as_ref());
                 }
             }
@@ -240,8 +244,6 @@ impl ScriptAPI for SimpleScriptAPI {
     }
 }
 
-/// Simple ShellEnvironment helper recycled for scripts alias maps
-#[repr(C)]
 pub struct SimpleScriptEnvironment {
     pub keys: Vec<[u8; 64]>,
     pub values: Vec<[u8; 64]>,
@@ -266,8 +268,12 @@ impl SimpleScriptEnvironment {
         let mut key_entry = [0u8; 64];
         let mut value_entry = [0u8; 64];
 
-        for i in 0..key_len { key_entry[i] = key[i]; }
-        for i in 0..value_len { value_entry[i] = value[i]; }
+        for i in 0..key_len {
+            key_entry[i] = key[i];
+        }
+        for i in 0..value_len {
+            value_entry[i] = value[i];
+        }
 
         for i in 0..self.keys.len() {
             if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
@@ -301,13 +307,8 @@ impl Default for SimpleScriptEnvironment {
     }
 }
 
-// ==========================================
-// ADDITIONAL DIAGNOSTICS & SYSTEM UTILITIES
-// ==========================================
-
-/// Basic UPX-style dynamic payload decompressor (XOR/header-shift unpacker)
 pub struct UpxUnpacker {
-    pub magic_header: [u8; 4], // e.g. b"UPX!"
+    pub magic_header: [u8; 4],
 }
 
 impl UpxUnpacker {
@@ -317,7 +318,6 @@ impl UpxUnpacker {
         }
     }
 
-    /// Decompresses / Unpacks a raw binary chunk if it contains the valid signature header
     pub fn decompress_payload(&self, compressed: &[u8]) -> Result<Vec<u8>, &'static str> {
         if compressed.len() < 8 {
             return Err("UPX: Payload is too small.");
@@ -326,7 +326,6 @@ impl UpxUnpacker {
             return Err("UPX: Signature mismatch (not compressed with UPX).");
         }
 
-        // Simple decompressive decryption: XOR shift with offset bytes
         let mut decompressed = Vec::new();
         for i in 4..compressed.len() {
             decompressed.push(compressed[i] ^ 0x5A);
@@ -348,7 +347,6 @@ pub enum FsEvent {
     Deleted,
 }
 
-/// Basic File Monitor (fs watcher) tracking directory and folder additions/modifications
 pub struct FileMonitor {
     pub monitored_path: [u8; 64],
     pub events_count: u32,
@@ -365,14 +363,12 @@ impl FileMonitor {
         }
     }
 
-    /// Polls/simulates a modification event on a file name
     pub fn simulate_event(&mut self, _file_name: &str, event: FsEvent) -> (FsEvent, u32) {
         self.events_count += 1;
         (event, self.events_count)
     }
 }
 
-/// Basic String Descrambler (XOR key anti-obfuscation utility)
 pub struct StringDescrambler {
     pub xor_key: u8,
 }
@@ -382,7 +378,6 @@ impl StringDescrambler {
         StringDescrambler { xor_key: key }
     }
 
-    /// Descrambles an obfuscated byte sequence on-the-fly
     pub fn descramble_string(&self, scrambled: &[u8]) -> Vec<u8> {
         let mut cleartext = Vec::new();
         for &byte in scrambled {
@@ -456,8 +451,10 @@ mod tests {
             aliases: SimpleScriptEnvironment::new(),
         };
 
-        let result = engine_with_script.execute_script_with_args(script_id, &[b"alice", b"sovereign"]).unwrap();
-        assert_eq!(&result[..], b"echo hello alice, welcome back sovereign!");
+        let result = engine_with_script
+            .execute_script_with_args(script_id, &[b"alice", b"sovereign"])
+            .unwrap();
+        assert_eq!(result, b"echo hello alice, welcome back sovereign!");
     }
 
     #[test]
@@ -468,8 +465,10 @@ mod tests {
         engine.load_script(Box::new(script)).unwrap();
         engine.set_script_alias(b"backup", b"backup.sh");
 
-        let res = engine.execute_by_alias(b"backup", &[b"/home/state"]).unwrap();
-        assert_eq!(&res[..], b"tar -cvf /home/state");
+        let res = engine
+            .execute_by_alias(b"backup", &[b"/home/state"])
+            .unwrap();
+        assert_eq!(res, b"tar -cvf /home/state");
     }
 
     #[test]
@@ -492,7 +491,7 @@ mod tests {
         ];
 
         let decompressed = unpacker.decompress_payload(&compressed_payload).unwrap();
-        assert_eq!(&decompressed[..], b"HELLO");
+        assert_eq!(decompressed, b"HELLO");
     }
 
     #[test]
@@ -511,7 +510,7 @@ mod tests {
         let scrambled = [b'A' ^ 0x33, b'B' ^ 0x33, b'C' ^ 0x33];
 
         let descrambled = descrambler.descramble_string(&scrambled);
-        assert_eq!(&descrambled[..], b"ABC");
+        assert_eq!(descrambled, b"ABC");
     }
 
     #[test]
