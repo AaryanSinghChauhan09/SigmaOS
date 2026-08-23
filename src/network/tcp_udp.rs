@@ -447,6 +447,7 @@ impl NetfilterFirewall {
     }
 }
 
+
 pub trait ZeroCopy {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError>;
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError>;

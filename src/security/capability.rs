@@ -14,19 +14,118 @@ use alloc::string::ToString;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
-use std::collections::HashMap;
-
-/// Capability token representing access rights
+/// Permission types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp = 0,
+    NetworkUdp = 1,
+    FileRead = 2,
+    FileWrite = 3,
+    ProcessExec = 4,
+    Ipc = 5,
+}
+
+/// A cryptographic capability token required for any privileged action.
+#[derive(Debug, Clone)]
 pub struct CapabilityToken {
     /// 64-bit capability bitmask
     pub bits: u64,
-    pub expiry_timestamp: u64, // 0 for infinite, or timestamp
-    pub delegated_from: u64,   // ID of parent token if delegated
+}
+
+impl CapabilityToken {
+    pub fn new() -> Self {
+        CapabilityToken {
+            id: 0,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
+            is_revoked: false,
+            bits: 0,
+        }
+    }
+
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            id: 0,
+            allowed_paths: Vec::new(),
+            allowed_ports: Vec::new(),
+            is_revoked: false,
+            bits,
+        }
+    }
+
+    pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
+        CapabilityToken {
+            id,
+            allowed_paths: paths.iter().map(|&s| String::from(s)).collect(),
+            allowed_ports: ports.to_vec(),
+            is_revoked: false,
+            bits: 0,
+        }
+    }
+
+    pub fn can_access_path(&self, path: &str) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        self.allowed_paths.iter().any(|p| path.starts_with(p))
+    }
+
+    pub fn can_bind_port(&self, port: u16) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        self.allowed_ports.contains(&port)
+    }
+
+    pub fn revoke(&mut self) {
+        self.is_revoked = true;
+    }
+
+    pub fn revoke_all(&mut self) {
+        self.is_revoked = true;
+        self.bits = 0;
+    }
+
+    pub fn bits(&self) -> u64 {
+        self.bits
+    }
+
+    pub fn has_permission(&self, permission: Permission) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        (self.bits & (1 << permission as u64)) != 0
+    }
+
+    pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
+        self.bits |= 1 << (Permission::NetworkTcp as u64);
+        if port != 0 {
+            self.allowed_ports.push(port);
+        }
+        self
+    }
+
+    pub fn allow_read(mut self, path: &str) -> Self {
+        self.bits |= 1 << (Permission::FileRead as u64);
+        self.allowed_paths.push(String::from(path));
+        self
+    }
+
+    pub fn allow_write(mut self, path: &str) -> Self {
+        self.bits |= 1 << (Permission::FileWrite as u64);
+        self.allowed_paths.push(String::from(path));
+        self
+    }
+
+    pub fn allow_exec(mut self) -> Self {
+        self.bits |= 1 << (Permission::ProcessExec as u64);
+        self
+    }
+
+    pub fn allow_ipc(mut self) -> Self {
+        self.bits |= 1 << (Permission::Ipc as u64);
+        self
+    }
 }
 
 impl Default for CapabilityToken {
@@ -35,17 +134,15 @@ impl Default for CapabilityToken {
     }
 }
 
-impl CapabilityToken {
-    /// Create a new capability token with no permissions
+pub struct SecurityEnforcer {
+    pub bits: u64,
+}
+
+impl SecurityEnforcer {
     pub fn new() -> Self {
-        Self {
-            bits: 0,
-            expiry_timestamp: 0,
-            delegated_from: 0,
-        }
+        Self { bits: 0 }
     }
 
-    /// Create capability token from raw bits
     pub fn from_bits(bits: u64) -> Self {
         Self {
             bits,
@@ -54,11 +151,10 @@ impl CapabilityToken {
         }
     }
 
-    /// Allow network access
     pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
         match protocol {
-            "tcp" => self.bits |= 1 << 0,
-            "udp" => self.bits |= 1 << 1,
+            "tcp" => self.bits |= 1 << (Permission::NetworkTcp as u64),
+            "udp" => self.bits |= 1 << (Permission::NetworkUdp as u64),
             _ => {}
         }
         // Mask and clear target bit ranges (bits 16-31) to prevent bitmask overlap privilege escalation
@@ -67,45 +163,38 @@ impl CapabilityToken {
         self
     }
 
-    /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") || path.starts_with("/etc") || path.starts_with("/home") {
-            self.bits |= 1 << 2;
+        if path.starts_with("/var/www") {
+            self.bits |= 1 << (Permission::FileRead as u64);
         }
         self
     }
 
-    /// Allow file write access
     pub fn allow_write(mut self, path: &str) -> Self {
-        if path.starts_with("/tmp") || path.starts_with("/home") || path.starts_with("/var/log") {
-            self.bits |= 1 << 3;
+        if path.starts_with("/tmp") || path.starts_with("/home") {
+            self.bits |= 1 << (Permission::FileWrite as u64);
         }
         self
     }
 
-    /// Allow process execution
     pub fn allow_exec(mut self) -> Self {
-        self.bits |= 1 << 4;
+        self.bits |= 1 << (Permission::ProcessExec as u64);
         self
     }
 
-    /// Allow IPC communication
     pub fn allow_ipc(mut self) -> Self {
-        self.bits |= 1 << 5;
+        self.bits |= 1 << (Permission::Ipc as u64);
         self
     }
 
-    /// Check if capability has specific permission
     pub fn has_permission(&self, permission: Permission) -> bool {
         (self.bits & (1 << permission as u64)) != 0
     }
 
-    /// Revoke all permissions
     pub fn revoke_all(&mut self) {
         self.bits = 0;
     }
 
-    /// Get raw capability bits
     pub fn bits(&self) -> u64 {
         self.bits
     }
@@ -119,15 +208,10 @@ impl CapabilityToken {
     }
 }
 
-/// Permission types
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp = 0,
-    NetworkUdp = 1,
-    FileRead = 2,
-    FileWrite = 3,
-    ProcessExec = 4,
-    Ipc = 5,
+impl Default for SecurityEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Capability audit log event types
