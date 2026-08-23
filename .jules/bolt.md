@@ -51,3 +51,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-23 - Functional Iterator min_by_key in CPU Scheduler Task Selection
 **Learning:** In CPU scheduler task selection loops (`EevdfScheduler`, `BoreScheduler`, `CfsScheduler`, `SchedDeadline`), using manual imperative indexing loops with conditional tracking variables introduces bounds-checking overhead and manually updated state registers. Replacing imperative loops with functional `tasks.iter().enumerate().min_by_key(...)` iterator chains allows LLVM to eliminate unnecessary bounds checking branch instructions and unroll minimum element search loops efficiently during high-frequency scheduler ticks.
 **Action:** Prefer functional iterator chains like `.iter().enumerate().min_by_key(...)` over manual loop indexing state trackers for task selection loops in kernel scheduling algorithms.
+
+## 2026-08-23 - Sliding-Window Rate Limiting via Ring Buffers
+**Learning:** Using a fixed-size circular ring buffer `[u64; 32]` with saturating timestamp subtraction `current_timestamp.saturating_sub(ts)` for sliding-window packet rate limiting avoids heap allocation and complex timer heap traversals.
+**Action:** Use fixed-size ring buffers with saturating arithmetic for high-throughput network rate limiters in bare-metal routers.

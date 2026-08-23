@@ -19,3 +19,7 @@ This journal logs CRITICAL usability enhancements, accessibility standard compli
 ## 2026-08-10 - EndeavourOS Calamares & EOS Welcome Application Parity
 **Learning:** Desktop installers and welcome applications without clear progress feedback cause user frustration. Implementing `CalamaresInstaller` and `EosWelcomeApp` with structured status messages and pastebin log diagnostics provides a seamless setup and maintenance experience.
 **Action:** Ensure all installation and maintenance wizards provide explicit status messages and clear diagnostic feedback.
+
+## 2026-08-23 - Clear Threat Action Feedback in Zero-Trust Security Loggers
+**Learning:** In zero-trust network packet filters and routers, printing human-readable threat event summaries (e.g. `ZenithNet: Dropped - Rate limit exceeded on subnet interface`) directly alongside numerical source IPs ensures security audit logs remain instantly interpretable in terminal GUIs and log viewers.
+**Action:** Pair structured error categories with clear, plain-language threat descriptions in forensic audit logs.
