@@ -20,6 +20,7 @@
 pub mod linux_translation;
 pub mod store;
 pub mod universal;
+pub mod debian;
 
 pub use linux_translation::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,

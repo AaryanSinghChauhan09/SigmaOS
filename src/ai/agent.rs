@@ -298,18 +298,6 @@ impl Default for SigmaSovereignCopilot {
     fn default() -> Self {
         Self::new()
     }
-
-    #[test]
-    fn test_model_marketplace_pqc_verification() {
-        let mut marketplace = ModelMarketplace::new();
-        let model_id = marketplace.register_signed_model(
-            "DeepSeek-R1-Distill",
-            "1.5B",
-            "Dilithium5_Verified_Signature",
-        );
-        assert_eq!(model_id, 1);
-        assert!(marketplace.verify_model_provenance(1));
-    }
 }
 
 /// Curated AI Model Marketplace supporting PQC-signed provenance verification (Roadmap Item 92)
@@ -352,5 +340,22 @@ impl ModelMarketplace {
 impl Default for ModelMarketplace {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_model_marketplace_pqc_verification() {
+        let mut marketplace = ModelMarketplace::new();
+        let model_id = marketplace.register_signed_model(
+            "DeepSeek-R1-Distill",
+            "1.5B",
+            "Dilithium5_Verified_Signature",
+        );
+        assert_eq!(model_id, 1);
+        assert!(marketplace.verify_model_provenance(1));
     }
 }

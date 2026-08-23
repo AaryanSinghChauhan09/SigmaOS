@@ -124,9 +124,6 @@ impl Default for PageTable {
 }
 
 #[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
     pub huge_entries: Vec<Option<PageTableEntry>>, // Holds 2MB huge page entries
@@ -173,9 +170,6 @@ impl Default for PageDirectory {
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,
@@ -394,10 +388,8 @@ impl SimpleVMM {
         &mut self,
         virt: VirtualAddress,
     ) -> Result<PhysicalAddress, MemoryError> {
-        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
-        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
-        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
-        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
+        self.get_physical_address_with_access(virt, false, false)
+    }
 
     /// Resolves virtual address while validating and recording access permissions (Read/Write/Execute)
     /// Incorporates Copy-on-Write (CoW) page-splitting for KSM merged pages upon write intents.

@@ -56,6 +56,17 @@ pub enum SchedPolicy {
     Deadline,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskWorkloadType {
+    CpuBound,
+    IoBound,
+    Interactive,
+    Batch,
+    RealTimePeriodic,
+    RealTimeAperiodic,
+    SystemKernelDaemon,
+}
+
 #[derive(Debug, Clone)]
 pub struct Cred {
     pub pid: u32,

@@ -203,7 +203,7 @@ mod additional_secure_boot_tests {
         assert_eq!(unsealed_key, [0x5A; 32]);
 
         // Verify unseal fails with invalid hash (tampered boot detected)
-        assert!(tpm.unseal_key_policy(0, 0xBADHASH).is_err());
+        assert!(tpm.unseal_key_policy(0, 0xBAD11111).is_err());
     }
 }
 
