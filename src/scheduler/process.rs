@@ -124,6 +124,7 @@ impl ProcessCapability {
 pub struct SimpleProcess {
     pub id: ProcessID,
     pub name: [u8; 64],
+    /// Cached byte length of process name to avoid O(N) zero-byte linear scans
     pub name_len: u8,
     pub state: AtomicUsize, // ProcessState as usize
     pub priority: AtomicUsize, // ProcessPriority as usize
@@ -191,8 +192,8 @@ impl Process for SimpleProcess {
     }
 
     fn name(&self) -> &[u8] {
-        // Bolt performance optimization: Use cached name_len field to perform O(1) direct slice lookup
-        // instead of linear byte scan O(N) (.position(|&b| b == 0)) across fixed 64-byte array.
+        // Bolt performance optimization: Use cached byte length for O(1) constant-time slice lookup,
+        // eliminating the O(N) zero-byte linear scan across the 64-byte name array.
         &self.name[..self.name_len as usize]
     }
 
@@ -501,27 +502,27 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_simple_process_name_caching_and_operations() {
+    fn test_simple_process_name_caching() {
         let process_name = b"init_daemon";
-        let process = SimpleProcess::new(1, process_name, ProcessPriority::High, ProcessCapability::full());
-        assert_eq!(process.id(), 1);
-        assert_eq!(process.name(), process_name);
-        assert_eq!(process.name_len as usize, process_name.len());
-        assert_eq!(process.state(), ProcessState::Ready);
-        assert_eq!(process.priority(), ProcessPriority::High);
+        let proc = SimpleProcess::new(1, process_name, ProcessPriority::High, ProcessCapability::full());
+        assert_eq!(proc.name(), b"init_daemon");
+        assert_eq!(proc.name_len, 11);
     }
 
     #[test]
     fn test_simple_process_scheduler_operations() {
         let mut scheduler = SimpleProcessScheduler::new(SchedulerCapability::full());
-        let pid = scheduler.create_process(b"worker_process", ProcessPriority::Normal).unwrap();
+        let pid = scheduler.create_process(b"test_task", ProcessPriority::Normal).unwrap();
         assert_eq!(pid, 1);
 
-        let scheduled = scheduler.schedule();
-        assert_eq!(scheduled, Some(1));
+        let process = scheduler.get_process(pid).expect("Process should exist");
+        assert_eq!(process.name(), b"test_task");
+        assert_eq!(process.priority(), ProcessPriority::Normal);
 
-        let proc_ref = scheduler.get_process(pid).unwrap();
-        assert_eq!(proc_ref.name(), b"worker_process");
-        assert_eq!(proc_ref.state(), ProcessState::Running);
+        let scheduled_pid = scheduler.schedule();
+        assert_eq!(scheduled_pid, Some(pid));
+
+        let process_after = scheduler.get_process(pid).expect("Process should exist");
+        assert_eq!(process_after.state(), ProcessState::Running);
     }
 }

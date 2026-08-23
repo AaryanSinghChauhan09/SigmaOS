@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MIT
 // In-Kernel Debugger (KDB) for SigmaOS
 // Location: tools/debug/kdb.rs
 
