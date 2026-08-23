@@ -166,9 +166,9 @@ pub use plugin::{
 };
 pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
-    PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
-    Transaction, UniversalPackageAdapter,
+    AptDebManifest, BsdPkgRepositoryMirror, BuildSystem, ContentAddressedStore, CryptoVerifier,
+    FlatpakManifest, GentooPortageUseFlagMask, NixOsHermeticCasStore, PackageRecipe, PacmanPkgbuild,
+    RecipeError, RecipeManager, SatSolver, SnapcraftManifest, Transaction, UniversalPackageAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
