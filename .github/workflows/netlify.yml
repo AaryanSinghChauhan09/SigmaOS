@@ -21,7 +21,7 @@ jobs:
           npm run build || true
 
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v2.0
+        uses: nwtgck/actions-netlify@v4.0
         with:
           publish-dir: './dashboard/dist'
           production-branch: main
