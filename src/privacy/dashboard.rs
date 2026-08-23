@@ -107,6 +107,10 @@ pub struct SimplePermission {
     pub category: [u8; 64],
     pub state: AtomicUsize, // PermissionState as usize
     pub capability: PermissionCapability,
+    // Performance optimization: Store explicit byte lengths to enable O(1) slicing
+    // and eliminate O(N) linear zero-byte scans in high-frequency permission lookups.
+    pub name_len: u8,
+    pub category_len: u8,
 }
 
 impl SimplePermission {
@@ -128,6 +132,8 @@ impl SimplePermission {
             category: category_array,
             state: AtomicUsize::new(PermissionState::Denied as usize),
             capability,
+            name_len: name_len as u8,
+            category_len: category_len as u8,
         }
     }
 
@@ -151,13 +157,13 @@ impl Permission for SimplePermission {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Performance optimization: O(1) constant-time slice retrieval using pre-cached name length
+        &self.name[..self.name_len as usize]
     }
 
     fn category(&self) -> &[u8] {
-        let len = self.category.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.category[..len]
+        // Performance optimization: O(1) constant-time slice retrieval using pre-cached category length
+        &self.category[..self.category_len as usize]
     }
 
     fn grant(&mut self) -> Result<(), PrivacyError> {
@@ -603,5 +609,25 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_permission_slice_retrieval() {
+        let perm = SimplePermission::new(
+            1,
+            b"camera_access",
+            b"hardware",
+            PermissionCapability::full(),
+        );
+        assert_eq!(perm.id(), 1);
+        assert_eq!(perm.name(), b"camera_access");
+        assert_eq!(perm.category(), b"hardware");
+        assert_eq!(perm.name_len, 13);
+        assert_eq!(perm.category_len, 8);
     }
 }
