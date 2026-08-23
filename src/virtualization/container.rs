@@ -29,6 +29,175 @@ impl Default for SovereignJailConfig {
     }
 }
 
+/// Podman-inspired SubUID/SubGID Mapping entry for rootless container execution
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RootlessUidMap {
+    pub container_id: u32,
+    pub host_id: u32,
+    pub count: u32,
+}
+
+impl RootlessUidMap {
+    pub fn new(container_id: u32, host_id: u32, count: u32) -> Self {
+        Self {
+            container_id,
+            host_id,
+            count,
+        }
+    }
+
+    pub fn translate_container_to_host(&self, container_uid: u32) -> Option<u32> {
+        if container_uid >= self.container_id && container_uid < self.container_id + self.count {
+            Some(self.host_id + (container_uid - self.container_id))
+        } else {
+            None
+        }
+    }
+}
+
+/// Docker/Podman style Event Types
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ContainerEventType {
+    Create,
+    Start,
+    Stop,
+    Pause,
+    Unpause,
+    Restart,
+    Die,
+    HealthStatusChange(HealthStatus),
+}
+
+/// Event structure for Docker/Podman event stream
+#[derive(Debug, Clone)]
+pub struct ContainerEvent {
+    pub timestamp_secs: u64,
+    pub container_id: String,
+    pub event_type: ContainerEventType,
+    pub attributes: HashMap<String, String>,
+}
+
+/// Live Container Event Bus
+pub struct ContainerEventBus {
+    pub events: Vec<ContainerEvent>,
+}
+
+impl ContainerEventBus {
+    pub fn new() -> Self {
+        Self { events: Vec::new() }
+    }
+
+    pub fn emit(&mut self, container_id: &str, event_type: ContainerEventType) {
+        let event = ContainerEvent {
+            timestamp_secs: 10000,
+            container_id: container_id.to_string(),
+            event_type,
+            attributes: HashMap::new(),
+        };
+        self.events.push(event);
+    }
+
+    pub fn filter_by_container(&self, container_id: &str) -> Vec<ContainerEvent> {
+        self.events
+            .iter()
+            .filter(|e| e.container_id == container_id)
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for ContainerEventBus {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OCI Image Layer representing a diff tarball / filesystem layer
+#[derive(Debug, Clone)]
+pub struct ImageLayer {
+    pub layer_id: String,
+    pub parent_id: Option<String>,
+    pub size_bytes: u64,
+    pub media_type: String,
+}
+
+/// OCI Image Manifest combining multiple layers
+#[derive(Debug, Clone)]
+pub struct ImageManifest {
+    pub schema_version: u32,
+    pub media_type: String,
+    pub config_digest: String,
+    pub layers: Vec<ImageLayer>,
+}
+
+/// Copy-on-Write OverlayFS Storage Driver for OCI container images
+pub struct OverlayFsStorageDriver {
+    pub base_dir: PathBuf,
+    pub layers: HashMap<String, ImageLayer>,
+    pub manifests: HashMap<String, ImageManifest>,
+}
+
+impl OverlayFsStorageDriver {
+    pub fn new(base_dir: PathBuf) -> Self {
+        Self {
+            base_dir,
+            layers: HashMap::new(),
+            manifests: HashMap::new(),
+        }
+    }
+
+    pub fn register_layer(&mut self, layer: ImageLayer) {
+        self.layers.insert(layer.layer_id.clone(), layer);
+    }
+
+    pub fn register_manifest(&mut self, image_ref: &str, manifest: ImageManifest) {
+        self.manifests.insert(image_ref.to_string(), manifest);
+    }
+
+    pub fn calculate_image_size(&self, image_ref: &str) -> u64 {
+        if let Some(manifest) = self.manifests.get(image_ref) {
+            manifest.layers.iter().map(|l| l.size_bytes).sum()
+        } else {
+            0
+        }
+    }
+
+    pub fn prepare_rw_overlay_dir(&self, container_id: &str) -> PathBuf {
+        self.base_dir.join("containers").join(container_id).join("diff")
+    }
+}
+
+/// Container health status
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HealthStatus {
+    Starting,
+    Healthy,
+    Unhealthy,
+    None,
+}
+
+/// Docker / Podman style Healthcheck Probe Configuration
+#[derive(Debug, Clone)]
+pub struct HealthcheckConfig {
+    pub test_cmd: Vec<String>,
+    pub interval_secs: u64,
+    pub timeout_secs: u64,
+    pub retries: u32,
+    pub start_period_secs: u64,
+}
+
+impl HealthcheckConfig {
+    pub fn new(cmd: &[&str]) -> Self {
+        Self {
+            test_cmd: cmd.iter().map(|s| s.to_string()).collect(),
+            interval_secs: 30,
+            timeout_secs: 30,
+            retries: 3,
+            start_period_secs: 0,
+        }
+    }
+}
+
 /// Container configuration
 #[derive(Debug, Clone)]
 pub struct ContainerConfig {
@@ -45,6 +214,8 @@ pub struct ContainerConfig {
     pub is_rootless: bool,
     // FreeBSD Jail-inspired network & capability configuration
     pub jail_config: Option<SovereignJailConfig>,
+    // Docker / Podman healthcheck probe config
+    pub healthcheck: Option<HealthcheckConfig>,
 }
 
 /// Port mapping
@@ -629,6 +800,114 @@ impl Default for ContainerRuntimeManager {
     }
 }
 
+/// Podman-inspired Pod status
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PodState {
+    Created,
+    Running,
+    Degraded,
+    Stopped,
+    Exited,
+}
+
+/// Podman-inspired Sovereign Pod holding multiple containers sharing network, IPC, and volume namespaces
+#[derive(Debug, Clone)]
+pub struct SovereignPod {
+    pub id: String,
+    pub name: String,
+    pub state: PodState,
+    pub infra_container_id: String,
+    pub container_ids: Vec<String>,
+    pub shared_network_mode: NetworkMode,
+    pub shared_volumes: Vec<VolumeMapping>,
+}
+
+impl SovereignPod {
+    pub fn new(id: String, name: String, infra_container_id: String, shared_network_mode: NetworkMode) -> Self {
+        Self {
+            id,
+            name,
+            state: PodState::Created,
+            infra_container_id,
+            container_ids: Vec::new(),
+            shared_network_mode,
+            shared_volumes: Vec::new(),
+        }
+    }
+
+    pub fn add_container(&mut self, container_id: String) {
+        if !self.container_ids.contains(&container_id) {
+            self.container_ids.push(container_id);
+        }
+    }
+
+    pub fn remove_container(&mut self, container_id: &str) -> bool {
+        if let Some(pos) = self.container_ids.iter().position(|id| id == container_id) {
+            self.container_ids.remove(pos);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// Manager for Podman-style pods
+pub struct PodManager {
+    pods: HashMap<String, SovereignPod>,
+}
+
+impl PodManager {
+    pub fn new() -> Self {
+        Self {
+            pods: HashMap::new(),
+        }
+    }
+
+    pub fn create_pod(&mut self, name: &str, shared_net: NetworkMode) -> Result<String, ContainerError> {
+        let pod_id = format!("pod_{}", self.pods.len() + 1);
+        let infra_id = format!("infra_{}", pod_id);
+        let pod = SovereignPod::new(pod_id.clone(), name.to_string(), infra_id, shared_net);
+        self.pods.insert(pod_id.clone(), pod);
+        Ok(pod_id)
+    }
+
+    pub fn get_pod(&self, pod_id: &str) -> Result<&SovereignPod, ContainerError> {
+        self.pods
+            .get(pod_id)
+            .ok_or_else(|| ContainerError::ContainerNotFound(format!("Pod '{}' not found", pod_id)))
+    }
+
+    pub fn get_pod_mut(&mut self, pod_id: &str) -> Result<&mut SovereignPod, ContainerError> {
+        self.pods
+            .get_mut(pod_id)
+            .ok_or_else(|| ContainerError::ContainerNotFound(format!("Pod '{}' not found", pod_id)))
+    }
+
+    pub fn add_container_to_pod(&mut self, pod_id: &str, container_id: String) -> Result<(), ContainerError> {
+        let pod = self.get_pod_mut(pod_id)?;
+        pod.add_container(container_id);
+        Ok(())
+    }
+
+    pub fn list_pods(&self) -> Vec<SovereignPod> {
+        self.pods.values().cloned().collect()
+    }
+
+    pub fn remove_pod(&mut self, pod_id: &str) -> Result<(), ContainerError> {
+        if self.pods.remove(pod_id).is_some() {
+            Ok(())
+        } else {
+            Err(ContainerError::ContainerNotFound(format!("Pod '{}' not found", pod_id)))
+        }
+    }
+}
+
+impl Default for PodManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Container errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ContainerError {
@@ -666,6 +945,7 @@ mod tests {
             },
             is_rootless: false,
             jail_config: None,
+            healthcheck: None,
         };
         assert_eq!(config.name, "Test Container");
     }
@@ -707,6 +987,7 @@ mod tests {
             },
             is_rootless: false,
             jail_config: None,
+            healthcheck: None,
         };
         let container_id = manager.create_container(config).unwrap();
         assert!(!container_id.is_empty());
@@ -731,6 +1012,7 @@ mod tests {
             },
             is_rootless: false,
             jail_config: None,
+            healthcheck: None,
         };
         let container_id = manager.create_container(config).unwrap();
         manager.start_container(&container_id).unwrap();
@@ -757,6 +1039,7 @@ mod tests {
             },
             is_rootless: false,
             jail_config: None,
+            healthcheck: None,
         };
 
         // Create & verify event logged
@@ -806,6 +1089,7 @@ mod tests {
             },
             is_rootless: true,
             jail_config: Some(jail_cfg.clone()),
+            healthcheck: None,
         };
 
         assert!(config.is_rootless);
@@ -813,5 +1097,106 @@ mod tests {
         assert!(jail.allow_raw_sockets);
         assert!(!jail.sysv_ipc_isolated);
         assert_eq!(jail.ip_address_bindings[0], "192.168.1.100");
+    }
+
+    #[test]
+    fn test_sovereign_pod_lifecycle() {
+        let mut pod_mgr = PodManager::new();
+        let pod_id = pod_mgr
+            .create_pod("web_app_pod", NetworkMode::Bridge)
+            .unwrap();
+
+        assert_eq!(pod_mgr.list_pods().len(), 1);
+
+        pod_mgr
+            .add_container_to_pod(&pod_id, "container_frontend".to_string())
+            .unwrap();
+        pod_mgr
+            .add_container_to_pod(&pod_id, "container_backend".to_string())
+            .unwrap();
+
+        let pod = pod_mgr.get_pod(&pod_id).unwrap();
+        assert_eq!(pod.container_ids.len(), 2);
+        assert_eq!(pod.container_ids[0], "container_frontend");
+
+        let mut bus = ContainerEventBus::new();
+        bus.emit(&pod_id, ContainerEventType::Create);
+        bus.emit(&pod_id, ContainerEventType::Start);
+
+        let events = bus.filter_by_container(&pod_id);
+        assert_eq!(events.len(), 2);
+        assert_eq!(events[0].event_type, ContainerEventType::Create);
+
+        assert!(pod_mgr.remove_pod(&pod_id).is_ok());
+        assert_eq!(pod_mgr.list_pods().len(), 0);
+    }
+
+    #[test]
+    fn test_container_healthcheck_probes() {
+        let hc = HealthcheckConfig::new(&["CMD-SHELL", "curl -f http://localhost/health || exit 1"]);
+        assert_eq!(hc.interval_secs, 30);
+        assert_eq!(hc.retries, 3);
+
+        let config = ContainerConfig {
+            name: "ProbedContainer".to_string(),
+            image: "nginx:latest".to_string(),
+            command: None,
+            env_vars: HashMap::new(),
+            ports: Vec::new(),
+            volumes: Vec::new(),
+            network_mode: NetworkMode::Bridge,
+            restart_policy: RestartPolicy::Always,
+            resource_limits: ResourceLimits {
+                cpu_shares: 1024,
+                memory_mb: 512,
+                memory_swap_mb: 1024,
+            },
+            is_rootless: true,
+            jail_config: None,
+            healthcheck: Some(hc),
+        };
+
+        assert!(config.healthcheck.is_some());
+        let probe = config.healthcheck.unwrap();
+        assert_eq!(probe.test_cmd[1], "curl -f http://localhost/health || exit 1");
+    }
+
+    #[test]
+    fn test_overlayfs_and_rootless_subuid_translation() {
+        let mut overlay = OverlayFsStorageDriver::new(PathBuf::from("/var/lib/sigmaos/overlay2"));
+
+        let layer1 = ImageLayer {
+            layer_id: "sha256:layer100".to_string(),
+            parent_id: None,
+            size_bytes: 10485760, // 10MB
+            media_type: "application/vnd.oci.image.layer.v1.tar+gzip".to_string(),
+        };
+        let layer2 = ImageLayer {
+            layer_id: "sha256:layer200".to_string(),
+            parent_id: Some("sha256:layer100".to_string()),
+            size_bytes: 5242880, // 5MB
+            media_type: "application/vnd.oci.image.layer.v1.tar+gzip".to_string(),
+        };
+
+        overlay.register_layer(layer1.clone());
+        overlay.register_layer(layer2.clone());
+
+        let manifest = ImageManifest {
+            schema_version: 2,
+            media_type: "application/vnd.oci.image.manifest.v1+json".to_string(),
+            config_digest: "sha256:config123".to_string(),
+            layers: vec![layer1, layer2],
+        };
+
+        overlay.register_manifest("ubuntu:latest", manifest);
+        assert_eq!(overlay.calculate_image_size("ubuntu:latest"), 15728640);
+
+        let diff_dir = overlay.prepare_rw_overlay_dir("ctr_123");
+        assert_eq!(diff_dir, PathBuf::from("/var/lib/sigmaos/overlay2/containers/ctr_123/diff"));
+
+        let subuid_map = RootlessUidMap::new(0, 100000, 65536);
+        assert_eq!(subuid_map.translate_container_to_host(0), Some(100000));
+        assert_eq!(subuid_map.translate_container_to_host(1000), Some(101000));
+        assert_eq!(subuid_map.translate_container_to_host(70000), None);
     }
 }
