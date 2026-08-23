@@ -292,6 +292,7 @@ impl UniversalPackageAdapter {
         }
 
         Ok(FlatpakManifest {
+            id: app_id.clone(),
             app_id,
             command,
             finish_args,

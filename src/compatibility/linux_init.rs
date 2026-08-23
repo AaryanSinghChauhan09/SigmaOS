@@ -127,17 +127,25 @@ impl InitSystem {
         self.current_runlevel = new_level;
         
         // Stop services not in new runlevel
-        for service in &mut self.services {
-            if !service.runlevels.contains(&new_level) {
-                self.stop_service(&service.name)?;
-            }
+        let to_stop: Vec<String> = self
+            .services
+            .iter()
+            .filter(|s| !s.runlevels.contains(&new_level))
+            .map(|s| s.name.clone())
+            .collect();
+        for name in to_stop {
+            self.stop_service(&name)?;
         }
-        
+
         // Start services in new runlevel
-        for service in &mut self.services {
-            if service.runlevels.contains(&new_level) && service.enabled {
-                self.start_service(&service.name)?;
-            }
+        let to_start: Vec<String> = self
+            .services
+            .iter()
+            .filter(|s| s.runlevels.contains(&new_level) && s.enabled)
+            .map(|s| s.name.clone())
+            .collect();
+        for name in to_start {
+            self.start_service(&name)?;
         }
         
         Ok(())

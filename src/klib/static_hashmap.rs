@@ -55,30 +55,36 @@ where
         let start_idx = self.hash_index(&key);
         let mut idx = start_idx;
 
-        loop {
-            let entry = unsafe { self.get_entry_mut(idx) };
-            match entry {
-                Some(ref mut pair) => {
-                    if pair.0 == key {
-                        let old_val = core::mem::replace(&mut pair.1, value);
-                        return Ok(Some(old_val));
-                    }
+        for _ in 0..N {
+            let entry_ptr = self.entries[idx].as_mut_ptr();
+            let is_match = unsafe {
+                if let Some(ref mut pair) = *entry_ptr {
+                    pair.0 == key
+                } else {
+                    false
                 }
-                None => {
-                    if self.len >= N {
-                        return Err("StaticHashMap capacity exceeded");
-                    }
-                    *entry = Some((key, value));
-                    self.len += 1;
-                    return Ok(None);
+            };
+
+            if is_match {
+                let pair = unsafe { (*entry_ptr).as_mut().unwrap() };
+                let old_val = core::mem::replace(&mut pair.1, value);
+                return Ok(Some(old_val));
+            }
+
+            let is_none = unsafe { (*entry_ptr).is_none() };
+            if is_none {
+                if self.len >= N {
+                    return Err("StaticHashMap capacity exceeded");
                 }
+                unsafe { *entry_ptr = Some((key, value)); }
+                self.len += 1;
+                return Ok(None);
             }
 
             idx = (idx + 1) % N;
-            if idx == start_idx {
-                return Err("StaticHashMap capacity exceeded");
-            }
         }
+
+        Err("StaticHashMap capacity exceeded")
     }
 
     /// Returns a reference to the value corresponding to the key.
@@ -115,22 +121,29 @@ where
         let start_idx = self.hash_index(key);
         let mut idx = start_idx;
 
-        loop {
-            let entry = unsafe { self.get_entry_mut(idx) };
-            match entry {
-                Some(ref mut pair) => {
-                    if pair.0.borrow() == key {
-                        return Some(&mut pair.1);
-                    }
+        for _ in 0..N {
+            let entry_ptr = self.entries[idx].as_mut_ptr();
+            let is_none = unsafe { (*entry_ptr).is_none() };
+            if is_none {
+                return None;
+            }
+
+            let is_match = unsafe {
+                if let Some(ref pair) = *entry_ptr {
+                    pair.0.borrow() == key
+                } else {
+                    false
                 }
-                None => return None,
+            };
+
+            if is_match {
+                let pair = unsafe { (*entry_ptr).as_mut().unwrap() };
+                return Some(&mut pair.1);
             }
 
             idx = (idx + 1) % N;
-            if idx == start_idx {
-                return None;
-            }
         }
+        None
     }
 
     /// Removes a key from the map, returning the value at the key if the key was previously in the map.

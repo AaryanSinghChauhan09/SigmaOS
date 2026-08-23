@@ -137,7 +137,7 @@ impl SmartSymlink {
             *depth
         };
 
-        let result = self.resolve_internal(persona, primary_exists, fallback_existence, rule);
+        let result = self.resolve_internal(persona.clone(), primary_exists, fallback_existence, rule);
 
         match result {
             Ok(target) => {

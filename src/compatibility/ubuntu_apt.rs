@@ -126,12 +126,14 @@ impl SigmaApt {
         println!("Updating package lists...");
 
         // Update from main sources
-        for source in &self.sources_list {
+        let sources = self.sources_list.clone();
+        for source in &sources {
             self.fetch_package_list(source)?;
         }
 
         // Update from PPAs
-        for ppa in &self.ppas {
+        let ppas = self.ppas.clone();
+        for ppa in &ppas {
             self.fetch_ppa_package_list(ppa)?;
         }
 
@@ -146,7 +148,7 @@ impl SigmaApt {
             return Ok(());
         }
 
-        if let Some(package) = self.available_packages.get(package_name) {
+        if let Some(package) = self.available_packages.get(package_name).cloned() {
             println!("Installing {}...", package_name);
 
             // Resolve dependencies
@@ -160,11 +162,11 @@ impl SigmaApt {
             }
 
             // Download and install package
-            self.download_package(package)?;
-            self.extract_and_install_package(package)?;
+            self.download_package(&package)?;
+            self.extract_and_install_package(&package)?;
             
             // Mark as installed
-            self.installed_packages.insert(package_name.to_string(), package.clone());
+            self.installed_packages.insert(package_name.to_string(), package);
             
             println!("Package {} installed successfully", package_name);
             Ok(())

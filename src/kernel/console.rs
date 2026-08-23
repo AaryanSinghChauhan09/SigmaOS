@@ -97,7 +97,7 @@ impl KernelConsole {
         Ok(())
     }
 
-    fn write_banner(&self) {
+    fn write_banner(&mut self) {
         self.println(LogLevel::Info, "SigmaOS Kernel v0.1.0");
         self.println(LogLevel::Info, "-------------------");
         self.println(LogLevel::Info, "Sovereign Rust Microkernel");

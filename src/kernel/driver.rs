@@ -140,18 +140,21 @@ impl DriverRegistry {
     }
 
     pub fn probe_and_bind(&mut self) -> Result<(), DriverError> {
+        let mut bindings = Vec::new();
         for device in self.device_manager.devices() {
             for reg in &mut self.drivers {
                 if !reg.loaded && reg.driver.probe(device) {
                     if let Some(driver) = reg.driver.as_driver_impl_mut() {
                         driver.init()?;
-                        self.device_manager
-                            .bind_driver(device.name(), reg.driver.driver_name())?;
+                        bindings.push((device.name().to_string(), reg.driver.driver_name().to_string()));
                         reg.loaded = true;
                         break;
                     }
                 }
             }
+        }
+        for (dev_name, drv_name) in bindings {
+            self.device_manager.bind_driver(&dev_name, &drv_name)?;
         }
         Ok(())
     }
