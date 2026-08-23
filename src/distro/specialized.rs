@@ -1,4 +1,8 @@
+#[cfg(not(test))]
 use crate::klib::HashMap;
+
+#[cfg(test)]
+use std::collections::HashMap;
 
 /// HPC Cluster Job State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -550,7 +554,8 @@ impl ThreeTierReleaseModel {
         sorted_keys.sort(); // Consistent ordering
         for key in sorted_keys {
             let desc = &self.channels[key];
-            let name_alias = match key.as_str() {
+            let k: &String = key;
+            let name_alias = match k.as_str() {
                 "sigma.next" => "Σ-next",
                 "sigma.beta" => "Σ-beta",
                 _ => "Σ-stable",

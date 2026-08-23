@@ -10,6 +10,18 @@ pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
+pub mod parity;
+pub mod arch;
+pub mod cachy;
+
+pub use cachy::{
+    MicroArchLevel, CachyKernelVariant, CpuCapabilities, BoreSchedulerGovernor, CachyPackageRepo,
+};
+
+pub use arch::{
+    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
+    ArchRepoType,
+};
 
 pub use parity::{
     InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
