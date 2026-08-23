@@ -27,13 +27,9 @@ echo -e "${CYAN}:: Running Linux & BSD Parity Inspection Unit Tests...${RESET}"
 rustc --edition 2021 --test tests/linux_bsd_inspection_tests.rs -o build/linux_bsd_test
 ./build/linux_bsd_test
 
-echo -e "${CYAN}:: Running Distro Inspection & Security Unit Tests...${RESET}"
-rustc --edition 2021 --test tests/distro_inspection_and_security_tests.rs -o build/distro_inspection_test
-./build/distro_inspection_test
-
-echo -e "${CYAN}:: Running Virtualization, QEMU & KVM Inspection Unit Tests...${RESET}"
-rustc --edition 2021 --test tests/virtualization_qemu_kvm_inspection_tests.rs -o build/qemu_kvm_test
-./build/qemu_kvm_test
+echo -e "${CYAN}:: Running Ecosystem & Compliance Inspection Unit Tests...${RESET}"
+rustc --edition 2021 --test tests/ecosystem_and_compliance_inspection_tests.rs -o build/eco_compliance_test
+./build/eco_compliance_test
 
 echo -e "${CYAN}:: Running Clean-Room Compatibility Harness Tests...${RESET}"
 rustc --edition 2021 --test tests/compat_harness.rs -o build/compat_harness_test
@@ -42,10 +38,6 @@ rustc --edition 2021 --test tests/compat_harness.rs -o build/compat_harness_test
 echo -e "${CYAN}:: Running Comprehensive OS Subsystems & Components Unit Tests...${RESET}"
 rustc --edition 2021 --test tests/os_components_tests.rs -o build/os_components_test
 ./build/os_components_test
-
-echo -e "${CYAN}:: Running Sovereign Subsystems Inspection Unit Tests...${RESET}"
-rustc --edition 2021 --test tests/sovereign_subsystems_inspection_tests.rs -o build/sovereign_subsystems_test
-./build/sovereign_subsystems_test
 
 echo -e "${GREEN}[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]${RESET}"
 exit 0
