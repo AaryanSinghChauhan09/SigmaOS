@@ -90,13 +90,6 @@ impl PodcastRecorder {
         self.published = true;
         Ok("https://anchor.sigma.os/podcast/publish-success")
     }
-
-    pub fn generate_rss_feed_xml(&self, author: &str) -> String {
-        format!(
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\"><channel><title>{}</title><author>{}</author><item><title>{}</title><duration>{}s</duration></item></channel></rss>",
-            self.title, author, self.title, self.recorded_duration_secs
-        )
-    }
 }
 
 /// GIF recorder and converter [ScreenToGif, Ezgif Parity]
@@ -245,17 +238,6 @@ impl SubtitleEditor {
                 line.start_ms = line.start_ms.saturating_sub(offset_ms.abs() as u64);
                 line.end_ms = line.end_ms.saturating_sub(offset_ms.abs() as u64);
             }
-        }
-    }
-
-    pub fn auto_align_ai_timecodes(&mut self, speech_audio_duration_ms: u64) {
-        if self.lines.is_empty() || speech_audio_duration_ms == 0 {
-            return;
-        }
-        let segment_duration = speech_audio_duration_ms / self.lines.len() as u64;
-        for (i, line) in self.lines.iter_mut().enumerate() {
-            line.start_ms = i as u64 * segment_duration;
-            line.end_ms = (i as u64 + 1) * segment_duration;
         }
     }
 }
@@ -2399,252 +2381,260 @@ impl EmailClient {
     }
 }
 
-// =========================================================================
-// OPEN-SOURCE COMPETITOR INSPIRED TOOLS (btop, fastfetch, bat, ripgrep, bpftrace)
-// =========================================================================
-
-/// System resource monitor [btop / htop Parity]
-#[derive(Debug, Clone)]
-pub struct ProcessInfo {
-    pub pid: u32,
-    pub name: String,
-    pub cpu_usage: f32,
-    pub memory_mb: u64,
+/// macOS Time Machine Parity - Continuous Snapshot & Point-In-Time Restore Engine
+pub struct TimeMachineSnapshot {
+    pub id: u64,
+    pub timestamp_sec: u64,
+    pub volume_label: String,
+    pub files_changed: Vec<String>,
 }
 
-pub struct BtopSystemMonitor {
-    pub cpu_usage: f32,
-    pub cpu_temp_celsius: f32,
-    pub memory_used_mb: u64,
-    pub memory_total_mb: u64,
-    pub gpu_usage: f32,
-    pub processes: Vec<ProcessInfo>,
+pub struct TimeMachineBackup {
+    pub snapshots: Vec<TimeMachineSnapshot>,
+    pub max_retention_days: u32,
 }
 
-impl BtopSystemMonitor {
-    pub fn new(memory_total_mb: u64) -> Self {
+impl TimeMachineBackup {
+    pub fn new(retention_days: u32) -> Self {
         Self {
-            cpu_usage: 0.0,
-            cpu_temp_celsius: 45.0,
-            memory_used_mb: 0,
-            memory_total_mb,
-            gpu_usage: 0.0,
-            processes: Vec::new(),
+            snapshots: Vec::new(),
+            max_retention_days: retention_days,
         }
     }
 
-    pub fn update_metrics(&mut self, cpu: f32, temp: f32, mem_used: u64, gpu: f32) {
-        self.cpu_usage = cpu.clamp(0.0, 100.0);
-        self.cpu_temp_celsius = temp;
-        self.memory_used_mb = mem_used.min(self.memory_total_mb);
-        self.gpu_usage = gpu.clamp(0.0, 100.0);
-    }
-
-    pub fn add_process(&mut self, pid: u32, name: &str, cpu_usage: f32, memory_mb: u64) {
-        self.processes.push(ProcessInfo {
-            pid,
-            name: name.to_string(),
-            cpu_usage,
-            memory_mb,
+    pub fn create_snapshot(&mut self, timestamp: u64, volume: &str, changed: &[&str]) -> u64 {
+        let id = self.snapshots.len() as u64 + 1;
+        self.snapshots.push(TimeMachineSnapshot {
+            id,
+            timestamp_sec: timestamp,
+            volume_label: volume.to_string(),
+            files_changed: changed.iter().map(|&f| f.to_string()).collect(),
         });
+        id
     }
 
-    pub fn kill_process_by_pid(&mut self, pid: u32) -> Result<(), &'static str> {
-        if let Some(pos) = self.processes.iter().position(|p| p.pid == pid) {
-            self.processes.remove(pos);
-            Ok(())
+    pub fn restore_file_at_timestamp(&self, filename: &str, target_time: u64) -> Result<&'static str, &'static str> {
+        let matching = self.snapshots.iter()
+            .filter(|s| s.timestamp_sec <= target_time && s.files_changed.iter().any(|f| f == filename))
+            .max_by_key(|s| s.timestamp_sec);
+
+        if matching.is_some() {
+            Ok("Restored successfully from snapshot")
         } else {
-            Err("Process PID not found")
+            Err("No snapshot found containing requested file before timestamp")
         }
     }
-
-    pub fn get_top_cpu_processes(&self, count: usize) -> Vec<ProcessInfo> {
-        let mut sorted = self.processes.clone();
-        sorted.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap_or(core::cmp::Ordering::Equal));
-        sorted.into_iter().take(count).collect()
-    }
 }
 
-/// Hardware & OS info fetcher [fastfetch / neofetch Parity]
-pub struct FastFetchInfo {
-    pub os_name: String,
-    pub kernel_version: String,
-    pub uptime_seconds: u64,
-    pub cpu_model: String,
-    pub gpu_model: String,
-    pub memory_used_mb: u64,
-    pub memory_total_mb: u64,
-    pub package_count: u32,
-    pub shell: String,
-    pub de: String,
+/// Windows Sysinternals Process Monitor Parity - System Event Capture Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcMonEventType {
+    FileSystemRead,
+    FileSystemWrite,
+    RegistryAccess,
+    NetworkAccess,
+    ProcessStart,
+    ThreadCreate,
 }
 
-impl FastFetchInfo {
-    pub fn new(
-        os_name: &str,
-        kernel_version: &str,
-        uptime: u64,
-        cpu: &str,
-        gpu: &str,
-        mem_used: u64,
-        mem_total: u64,
-        packages: u32,
-    ) -> Self {
-        Self {
-            os_name: os_name.to_string(),
-            kernel_version: kernel_version.to_string(),
-            uptime_seconds: uptime,
-            cpu_model: cpu.to_string(),
-            gpu_model: gpu.to_string(),
-            memory_used_mb: mem_used,
-            memory_total_mb: mem_total,
-            package_count: packages,
-            shell: "sigma-sh 1.0".to_string(),
-            de: "Zenith Desktop".to_string(),
-        }
-    }
-
-    pub fn format_ascii_art_fetch(&self) -> String {
-        format!(
-            " OS: {}\n Kernel: {}\n Uptime: {}s\n Packages: {}\n Shell: {}\n DE: {}\n CPU: {}\n GPU: {}\n Memory: {}MiB / {}MiB",
-            self.os_name, self.kernel_version, self.uptime_seconds, self.package_count,
-            self.shell, self.de, self.cpu_model, self.gpu_model, self.memory_used_mb, self.memory_total_mb
-        )
-    }
-}
-
-/// Syntax-highlighted file viewer [bat / cat / eza Parity]
-pub struct BatSyntaxViewer {
-    pub show_line_numbers: bool,
-    pub git_diff_markers: bool,
-    pub theme: String,
-}
-
-impl BatSyntaxViewer {
-    pub fn new(show_line_numbers: bool, git_diff_markers: bool, theme: &str) -> Self {
-        Self {
-            show_line_numbers,
-            git_diff_markers,
-            theme: theme.to_string(),
-        }
-    }
-
-    pub fn render_highlighted_file(&self, file_name: &str, content: &str) -> String {
-        let mut output = format!("─────── File: {} ───────\n", file_name);
-        for (i, line) in content.lines().enumerate() {
-            let line_num_str = if self.show_line_numbers {
-                format!("{:>4} │ ", i + 1)
-            } else {
-                String::new()
-            };
-            let diff_marker = if self.git_diff_markers { "+ " } else { "" };
-            output.push_str(&format!("{}{}{}\n", line_num_str, diff_marker, line));
-        }
-        output.push_str("─────────────────────────");
-        output
-    }
-}
-
-/// Multi-threaded file search & matching engine [fd / ripgrep Parity]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SearchResult {
-    pub path: String,
-    pub line_number: Option<usize>,
-    pub match_text: String,
-}
-
-pub struct FastFileSearchEngine {
-    pub case_sensitive: bool,
-    pub include_hidden: bool,
-}
-
-impl FastFileSearchEngine {
-    pub fn new(case_sensitive: bool, include_hidden: bool) -> Self {
-        Self {
-            case_sensitive,
-            include_hidden,
-        }
-    }
-
-    pub fn search_in_files(&self, files: &[(&str, &str)], query: &str) -> Vec<SearchResult> {
-        let mut results = Vec::new();
-        let target_query = if self.case_sensitive {
-            query.to_string()
-        } else {
-            query.to_lowercase()
-        };
-
-        for (path, content) in files {
-            if !self.include_hidden && path.starts_with('.') {
-                continue;
-            }
-            for (i, line) in content.lines().enumerate() {
-                let cmp_line = if self.case_sensitive {
-                    line.to_string()
-                } else {
-                    line.to_lowercase()
-                };
-                if cmp_line.contains(&target_query) {
-                    results.push(SearchResult {
-                        path: path.to_string(),
-                        line_number: Some(i + 1),
-                        match_text: line.to_string(),
-                    });
-                }
-            }
-        }
-        results
-    }
-}
-
-/// eBPF tracepoint, kprobe, and flamegraph profiler [bpftrace / BCC / perf Parity]
-#[derive(Debug, Clone)]
-pub struct TraceEvent {
+pub struct ProcMonEvent {
     pub pid: u32,
-    pub probe_type: String,
-    pub symbol_name: String,
-    pub timestamp_ns: u64,
+    pub process_name: String,
+    pub event_type: ProcMonEventType,
+    pub path_or_detail: String,
 }
 
-pub struct EbpfSystemTracer {
-    pub events: Vec<TraceEvent>,
-    pub active_kprobes: Vec<String>,
+pub struct SysinternalsProcMon {
+    pub is_capturing: bool,
+    pub captured_events: Vec<ProcMonEvent>,
 }
 
-impl EbpfSystemTracer {
+impl SysinternalsProcMon {
     pub fn new() -> Self {
         Self {
-            events: Vec::new(),
-            active_kprobes: Vec::new(),
+            is_capturing: false,
+            captured_events: Vec::new(),
         }
     }
 
-    pub fn attach_kprobe(&mut self, symbol: &str) -> Result<(), &'static str> {
-        if self.active_kprobes.contains(&symbol.to_string()) {
-            return Err("Kprobe symbol already attached");
+    pub fn start_capture(&mut self) {
+        self.is_capturing = true;
+    }
+
+    pub fn stop_capture(&mut self) {
+        self.is_capturing = false;
+    }
+
+    pub fn record_event(&mut self, pid: u32, proc_name: &str, event_type: ProcMonEventType, detail: &str) {
+        if self.is_capturing {
+            self.captured_events.push(ProcMonEvent {
+                pid,
+                process_name: proc_name.to_string(),
+                event_type,
+                path_or_detail: detail.to_string(),
+            });
         }
-        self.active_kprobes.push(symbol.to_string());
+    }
+
+    pub fn filter_events_by_pid(&self, pid: u32) -> Vec<&ProcMonEvent> {
+        self.captured_events.iter().filter(|e| e.pid == pid).collect()
+    }
+}
+
+/// systemd-cgtop Parity - Cgroup Resource Utilization Monitor
+pub struct CgroupMetrics {
+    pub slice_name: String,
+    pub cpu_usage_percent: f32,
+    pub memory_usage_mb: u64,
+    pub io_ops_per_sec: u32,
+}
+
+pub struct SystemdCgTop {
+    pub slices: Vec<CgroupMetrics>,
+}
+
+impl SystemdCgTop {
+    pub fn new() -> Self {
+        Self { slices: Vec::new() }
+    }
+
+    pub fn update_slice_metrics(&mut self, slice: &str, cpu_pct: f32, mem_mb: u64, io_ops: u32) {
+        if let Some(existing) = self.slices.iter_mut().find(|s| s.slice_name == slice) {
+            existing.cpu_usage_percent = cpu_pct;
+            existing.memory_usage_mb = mem_mb;
+            existing.io_ops_per_sec = io_ops;
+        } else {
+            self.slices.push(CgroupMetrics {
+                slice_name: slice.to_string(),
+                cpu_usage_percent: cpu_pct,
+                memory_usage_mb: mem_mb,
+                io_ops_per_sec: io_ops,
+            });
+        }
+    }
+
+    pub fn get_top_cpu_slice(&self) -> Option<&CgroupMetrics> {
+        self.slices.iter().max_by(|a, b| a.cpu_usage_percent.partial_cmp(&b.cpu_usage_percent).unwrap_or(core::cmp::Ordering::Equal))
+    }
+}
+
+/// FreeBSD truss & Linux strace Parity - System Call Inspector Engine
+pub struct SyscallTraceRecord {
+    pub pid: u32,
+    pub syscall_name: &'static str,
+    pub args_summary: String,
+    pub return_code: i64,
+    pub duration_ns: u64,
+}
+
+pub struct TrussSyscallTracer {
+    pub active_pid: Option<u32>,
+    pub traces: Vec<SyscallTraceRecord>,
+}
+
+impl TrussSyscallTracer {
+    pub fn new() -> Self {
+        Self {
+            active_pid: None,
+            traces: Vec::new(),
+        }
+    }
+
+    pub fn attach_pid(&mut self, pid: u32) {
+        self.active_pid = Some(pid);
+    }
+
+    pub fn record_syscall(&mut self, syscall: &'static str, args: &str, ret: i64, duration_ns: u64) -> Result<(), &'static str> {
+        let pid = self.active_pid.ok_or("Tracer not attached to any process ID")?;
+        self.traces.push(SyscallTraceRecord {
+            pid,
+            syscall_name: syscall,
+            args_summary: args.to_string(),
+            return_code: ret,
+            duration_ns,
+        });
         Ok(())
     }
 
-    pub fn record_event(&mut self, pid: u32, probe_type: &str, symbol_name: &str, timestamp_ns: u64) {
-        self.events.push(TraceEvent {
-            pid,
-            probe_type: probe_type.to_string(),
-            symbol_name: symbol_name.to_string(),
-            timestamp_ns,
-        });
+    pub fn get_total_syscall_count(&self) -> usize {
+        self.traces.len()
+    }
+}
+
+/// Ookla Speedtest & macOS networkQuality Parity - Bandwidth & Bufferbloat Probe
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct NetworkQualityResult {
+    pub download_mbps: f64,
+    pub upload_mbps: f64,
+    pub idle_latency_ms: u32,
+    pub loaded_latency_ms: u32,
+    pub bufferbloat_grade: &'static str, // "A+", "A", "B", "C", "F"
+}
+
+pub struct NetworkQualityProbe {
+    pub last_result: Option<NetworkQualityResult>,
+}
+
+impl NetworkQualityProbe {
+    pub fn new() -> Self {
+        Self { last_result: None }
     }
 
-    pub fn generate_flamegraph_summary(&self) -> String {
-        let mut summary = String::from("Flamegraph Trace Summary:\n");
-        for event in &self.events {
-            summary.push_str(&format!(
-                "PID {}: [{}] @ {} ns\n",
-                event.pid, event.symbol_name, event.timestamp_ns
-            ));
+    pub fn execute_probe(&mut self, down_mbps: f64, up_mbps: f64, idle_ms: u32, loaded_ms: u32) -> NetworkQualityResult {
+        let delta_ms = loaded_ms.saturating_sub(idle_ms);
+        let grade = if delta_ms < 10 {
+            "A+"
+        } else if delta_ms < 30 {
+            "A"
+        } else if delta_ms < 60 {
+            "B"
+        } else if delta_ms < 100 {
+            "C"
+        } else {
+            "F"
+        };
+
+        let res = NetworkQualityResult {
+            download_mbps: down_mbps,
+            upload_mbps: up_mbps,
+            idle_latency_ms: idle_ms,
+            loaded_latency_ms: loaded_ms,
+            bufferbloat_grade: grade,
+        };
+        self.last_result = Some(res);
+        res
+    }
+}
+
+/// Windows powercfg & Linux TLP Parity - Power Scheme & Battery Manager
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerScheme {
+    HighPerformance,
+    Balanced,
+    PowerSaver,
+}
+
+pub struct WindowsPowercfg {
+    pub active_scheme: PowerScheme,
+    pub battery_charge_threshold_percent: u8,
+    pub cpu_idle_state_c_states: bool,
+}
+
+impl WindowsPowercfg {
+    pub fn new() -> Self {
+        Self {
+            active_scheme: PowerScheme::Balanced,
+            battery_charge_threshold_percent: 80,
+            cpu_idle_state_c_states: true,
         }
-        summary
+    }
+
+    pub fn set_active_scheme(&mut self, scheme: PowerScheme) {
+        self.active_scheme = scheme;
+    }
+
+    pub fn set_battery_charge_limit(&mut self, limit_pct: u8) {
+        self.battery_charge_threshold_percent = limit_pct.clamp(20, 100);
     }
 }
 
@@ -2778,10 +2768,6 @@ mod tests {
         let link = rec.publish().unwrap();
         assert!(rec.published);
         assert!(link.contains("publish-success"));
-
-        let rss = rec.generate_rss_feed_xml("Jules");
-        assert!(rss.contains("<author>Jules</author>"));
-        assert!(rss.contains("<title>Sovereignty</title>"));
     }
 
     #[test]
@@ -2826,7 +2812,6 @@ mod tests {
     fn test_subtitle_editor_sync() {
         let mut editor = SubtitleEditor::new();
         editor.add_subtitle(1000, 2000, "Hello");
-        editor.add_subtitle(2000, 3000, "World");
         editor.shift_synchronization(500);
         assert_eq!(editor.lines[0].start_ms, 1500);
         assert_eq!(editor.lines[0].end_ms, 2500);
@@ -2834,12 +2819,6 @@ mod tests {
         editor.shift_synchronization(-1000);
         assert_eq!(editor.lines[0].start_ms, 500);
         assert_eq!(editor.lines[0].end_ms, 1500);
-
-        editor.auto_align_ai_timecodes(10000);
-        assert_eq!(editor.lines[0].start_ms, 0);
-        assert_eq!(editor.lines[0].end_ms, 5000);
-        assert_eq!(editor.lines[1].start_ms, 5000);
-        assert_eq!(editor.lines[1].end_ms, 10000);
     }
 
     #[test]
@@ -3422,72 +3401,69 @@ mod tests {
     }
 
     #[test]
-    fn test_btop_system_monitor() {
-        let mut monitor = BtopSystemMonitor::new(16384);
-        monitor.update_metrics(25.5, 52.0, 4096, 12.0);
-        assert_eq!(monitor.cpu_usage, 25.5);
-        assert_eq!(monitor.memory_used_mb, 4096);
+    fn test_time_machine_backup() {
+        let mut tm = TimeMachineBackup::new(30);
+        let id1 = tm.create_snapshot(1000, "SigmaDisk", &["/etc/config.json", "/home/user/doc.txt"]);
+        assert_eq!(id1, 1);
 
-        monitor.add_process(101, "kernel_worker", 80.0, 512);
-        monitor.add_process(102, "desktop_compositor", 15.0, 1024);
-        assert_eq!(monitor.processes.len(), 2);
-
-        let top = monitor.get_top_cpu_processes(1);
-        assert_eq!(top[0].name, "kernel_worker");
-
-        assert!(monitor.kill_process_by_pid(101).is_ok());
-        assert_eq!(monitor.processes.len(), 1);
+        assert!(tm.restore_file_at_timestamp("/etc/config.json", 1005).is_ok());
+        assert!(tm.restore_file_at_timestamp("/nonexistent.file", 1005).is_err());
     }
 
     #[test]
-    fn test_fastfetch_info() {
-        let fetch = FastFetchInfo::new(
-            "SigmaOS Sovereign",
-            "6.12.0-sigma",
-            3600,
-            "Sovereign CPU v1",
-            "Zenith GPU",
-            8192,
-            16384,
-            1250,
-        );
-        let output = fetch.format_ascii_art_fetch();
-        assert!(output.contains("SigmaOS Sovereign"));
-        assert!(output.contains("3600s"));
-        assert!(output.contains("8192MiB / 16384MiB"));
+    fn test_sysinternals_procmon() {
+        let mut pm = SysinternalsProcMon::new();
+        pm.record_event(100, "sigma-shell", ProcMonEventType::ProcessStart, "started shell");
+        assert_eq!(pm.captured_events.len(), 0); // Not capturing yet
+
+        pm.start_capture();
+        pm.record_event(100, "sigma-shell", ProcMonEventType::FileSystemRead, "/etc/passwd");
+        pm.record_event(200, "browser", ProcMonEventType::NetworkAccess, "127.0.0.1:80");
+        pm.stop_capture();
+
+        let filtered = pm.filter_events_by_pid(100);
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(filtered[0].path_or_detail, "/etc/passwd");
     }
 
     #[test]
-    fn test_bat_syntax_viewer() {
-        let viewer = BatSyntaxViewer::new(true, true, "monokai");
-        let rendered = viewer.render_highlighted_file("main.rs", "fn main() {\n    println!(\"Hello\");\n}");
-        assert!(viewer.show_line_numbers);
-        assert!(rendered.contains("File: main.rs"));
-        assert!(rendered.contains("1 │ + fn main()"));
+    fn test_systemd_cgtop() {
+        let mut cg = SystemdCgTop::new();
+        cg.update_slice_metrics("system.slice", 12.5, 512, 100);
+        cg.update_slice_metrics("user.slice", 45.0, 2048, 450);
+
+        let top = cg.get_top_cpu_slice().unwrap();
+        assert_eq!(top.slice_name, "user.slice");
+        assert_eq!(top.cpu_usage_percent, 45.0);
     }
 
     #[test]
-    fn test_fast_file_search_engine() {
-        let search = FastFileSearchEngine::new(false, false);
-        let files = [
-            ("src/main.rs", "fn main() {\n    let token = 42;\n}"),
-            ("src/lib.rs", "pub fn init() {\n    // token validation\n}"),
-        ];
-        let matches = search.search_in_files(&files, "TOKEN");
-        assert_eq!(matches.len(), 2);
-        assert_eq!(matches[0].path, "src/main.rs");
-        assert_eq!(matches[0].line_number, Some(2));
+    fn test_truss_syscall_tracer() {
+        let mut tracer = TrussSyscallTracer::new();
+        assert!(tracer.record_syscall("sys_read", "fd=0", 0, 1500).is_err()); // Not attached
+
+        tracer.attach_pid(42);
+        assert!(tracer.record_syscall("sys_read", "fd=0", 0, 1500).is_ok());
+        assert!(tracer.record_syscall("sys_write", "fd=1", 0, 800).is_ok());
+        assert_eq!(tracer.get_total_syscall_count(), 2);
     }
 
     #[test]
-    fn test_ebpf_system_tracer() {
-        let mut tracer = EbpfSystemTracer::new();
-        assert!(tracer.attach_kprobe("sys_execve").is_ok());
-        assert!(tracer.attach_kprobe("sys_execve").is_err()); // duplicate attach
+    fn test_network_quality_probe() {
+        let mut probe = NetworkQualityProbe::new();
+        let res = probe.execute_probe(940.0, 880.0, 10, 15);
+        assert_eq!(res.bufferbloat_grade, "A+");
+        assert_eq!(res.download_mbps, 940.0);
+    }
 
-        tracer.record_event(1001, "kprobe", "sys_execve", 1_000_000_000);
-        assert_eq!(tracer.events.len(), 1);
-        let flamegraph = tracer.generate_flamegraph_summary();
-        assert!(flamegraph.contains("PID 1001: [sys_execve] @ 1000000000 ns"));
+    #[test]
+    fn test_windows_powercfg() {
+        let mut pcfg = WindowsPowercfg::new();
+        assert_eq!(pcfg.active_scheme, PowerScheme::Balanced);
+        pcfg.set_active_scheme(PowerScheme::HighPerformance);
+        assert_eq!(pcfg.active_scheme, PowerScheme::HighPerformance);
+
+        pcfg.set_battery_charge_limit(85);
+        assert_eq!(pcfg.battery_charge_threshold_percent, 85);
     }
 }

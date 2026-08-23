@@ -6,7 +6,6 @@
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::vec;
 
 // =========================================================================
 // 1. SOVEREIGN VIDEO PLAYER CORE (VLC & MPV Equivalent)
