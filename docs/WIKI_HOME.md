@@ -1,139 +1,84 @@
-# SigmaOS - A Next-Generation Operating System
+# 🏠 SigmaOS Wiki — Home
 
-## Overview
+> **SigmaOS** is the world's most advanced sovereign, bare-metal operating system for the next generation of silicon sovereignty. Built 100% in Rust with a zero-dependency architecture targeting x86_64, AArch64, and RISC-V 64.
 
-SigmaOS is a modern, secure, and feature-rich operating system inspired by the best practices of Linux and BSD distributions. Built with Rust for safety and performance, SigmaOS aims to provide a production-ready alternative to traditional operating systems.
+---
 
-## Key Features
+## 🚀 Quick Navigation
 
-### 🔒 Security
-- **Post-quantum cryptography**: Kyber-1024, Dilithium-5
-- **Mandatory Access Control**: SELinux-inspired policies
-- **Sandboxing**: Application containers with resource limits
-- **Secure boot**: UEFI secure boot support
-- **ASLR**: Address space layout randomization
-- **Stack protection**: Stack canaries and DEP
+### Getting Started
+| Page | Description |
+|------|-------------|
+| [Getting Started](Getting-Started) | First steps with SigmaOS |
+| [Building SigmaOS](Building-SigmaOS) | How to build from source |
+| [Quick Start Guide](Quick-Start-Guide) | 5-minute setup guide |
+| [Installation Guide](Installation-Guide) | Full installation walkthrough |
+| [FAQ](FAQ) | Frequently asked questions |
 
-### 📦 Package Management
-- **SigmaPkg**: Native package manager with content-addressed storage
-- **Multi-format support**: Debian (.deb), Arch (.pkg.tar.xz), RPM (.rpm), Flatpak, AppImage
-- **Declarative builds**: Nix-style derivations and Bazel target rules
-- **Package ratings**: Built-in reputation system with reviews
-- **Transaction rollback**: Atomic package operations
+### Core Architecture
+| Page | Description |
+|------|-------------|
+| [Architecture Overview](Architecture-Overview) | High-level architecture diagram |
+| [Kernel Internals](Kernel-Internals) | Microkernel deep-dive |
+| [Boot Process](Boot-Process-Architecture) | From UEFI to userspace |
+| [Filesystem Spec](Filesystem-Spec-and-Virtual-FS) | SigmaFS and VFS layer |
+| [AI Subsystem](AI-Subsystem) | S-AI integration details |
 
-### 🖥️ Desktop Environment
-- **Zenith Desktop**: Modern compositor with Wayland-inspired architecture
-- **Window management**: Tiling, stacking, floating, and dynamic modes
-- **Accessibility**: Screen reader, magnifier, high contrast, screen keyboard
-- **Theme system**: Customizable themes and fonts
-- **Workspace management**: Multiple workspaces with seamless switching
+### Components
+| Page | Description |
+|------|-------------|
+| [**Components Master Table**](Components-Master-Table) | 🆕 Full component table with status, source files |
+| [Components & Inspirations](Components-and-Inspirations) | Component inspiration sources |
 
-### 🎮 Driver Ecosystem
-- **GPU drivers**: AMD, Intel, NVIDIA (nouveau), and virtual GPU support
-- **Network drivers**: Ethernet, wireless, Bluetooth with Linux-inspired stack
-- **Hardware detection**: Automatic driver loading based on hardware IDs
-- **PCI/USB support**: Comprehensive hardware detection
+---
 
-### ⚙️ System Administration
-- **SigmaInit**: Modern init system with systemd/OpenRC inspiration
-- **Service management**: Service units, targets, sockets, timers
-- **Logging**: Structured logging with journald inspiration
-- **Network management**: NetworkManager-inspired configuration
-- **Performance tuning**: CPU governors, zram, swap optimization
+## 📊 Current Build Status
 
-## Documentation
-
-- [Installation Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Installation-Guide)
-- [Configuration Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Configuration-Guide)
-- [Package Management Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Package-Management-Guide)
-- [Security Hardening Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security-Hardening-Guide)
-- [Development Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Development-Guide)
-
-## Architecture
-
-SigmaOS is built with a microkernel-inspired architecture:
-
-- **Kernel**: Written in Rust with safety guarantees
-- **Userspace**: Minimal standard library with SigmaLib
-- **Drivers**: Modular driver framework with hardware abstraction
-- **Desktop**: Modern compositor with GPU acceleration
-- **Package system**: Content-addressed storage with declarative builds
-
-## Development Roadmap
-
-### Phase 1: Foundation (Completed ✅)
-- Package manager enhancement
-- Basic driver expansion
-- Documentation framework
-- Security scanning fixes
-
-### Phase 2: Core Features (Completed ✅)
-- Desktop environment polish
-- System administration tools
-- Security hardening
-- Zero-dependency library
-
-### Phase 3: Advanced Features (In Progress 🚧)
-- GPU driver support
-- Advanced networking
-- Testing infrastructure
-- GitHub integration
-
-### Phase 4: Production Ready (Planned 📋)
-- Comprehensive testing
-- Performance optimization
-- Documentation completion
-- Stable release
-
-## Contributing
-
-We welcome contributions to SigmaOS! Please see our [Contributing Guidelines](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing-Guidelines) for more information.
-
-### Development Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-
-# Build the project
-cargo build --release
-
-# Run tests
-cargo test
+```
+Kernel Core:           ████████████████████  95% ✅
+Security Subsystem:    ████████████████████  90% ✅
+Package Management:    ████████████████░░░░  80% ✅
+Desktop (Zenith):      ████████████████░░░░  80% ✅
+Networking:            ████████████░░░░░░░░  60% 🔄
+Driver Ecosystem:      ████████████░░░░░░░░  60% 🔄
+Virtualization:        ██████████░░░░░░░░░░  50% 🔄
+AI Orchestration:      ████░░░░░░░░░░░░░░░░  20% 📋
+Cloud / Enterprise:    ████░░░░░░░░░░░░░░░░  20% 📋
 ```
 
-### Code Style
+---
 
-- Follow Rust best practices
-- Use meaningful variable names
-- Add comments for complex logic
-- Write tests for new features
-- Update documentation
+## 🐧 Linux & BSD Integration
 
-## Community
+SigmaOS implements ideas and compatibility layers from **13+ Linux distributions and BSDs**:
 
-- **GitHub**: [https://github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)
-- **Discussions**: [https://github.com/AaryanSinghChauhan09/SigmaOS/discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
-- **Issues**: [https://github.com/AaryanSinghChauhan09/SigmaOS/issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+| Distro | Key Features Adopted | Status |
+|--------|---------------------|--------|
+| Arch Linux | AUR, rolling release, ALPM hooks | ✅ |
+| Debian/Ubuntu | APT parity, AppArmor, netplan | ✅ |
+| Fedora/RHEL | SELinux, podman, firewalld | ✅ |
+| Gentoo | USE flags, hardened kernel, portage | ✅ |
+| NixOS | Declarative config, atomic rollback | ✅ |
+| Alpine Linux | musl-libc, apk speed, tiny footprint | ✅ |
+| CachyOS | BORE scheduler, LTO, zstd | ✅ |
+| Void Linux | runit, XBPS, no-systemd | ✅ |
+| Artix Linux | Init choice, OpenRC/s6 compat | ✅ |
+| OpenSUSE | snapper, transactional-update | ✅ |
+| Parrot/Kali | Security tools, hardened kernel | 🔄 |
+| QubesOS | VM compartmentalization, domains | 🔄 |
+| FreeBSD/BSDs | pledge/unveil, jails, ZFS, pf | ✅ |
 
-## License
+📄 Full details: [Linux Distro Ideas Implementation](Linux-Distro-Ideas-Implementation)
 
-SigmaOS is released under the MIT License. See [LICENSE](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE) for details.
+---
 
-## Acknowledgments
+## 🔗 Quick Links
 
-SigmaOS draws inspiration from many excellent projects:
+- **Repository**: [github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)
+- **Issues**: [Report a bug or request a feature](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
+- **Pull Requests**: [Contribute code](https://github.com/AaryanSinghChauhan09/SigmaOS/pulls)
+- **Discussions**: [Community forum](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
 
-- **Arch Linux**: Pacman package manager, rolling release model
-- **Debian**: APT package management, stable release cycle
-- **OpenBSD**: Security features, secure by default philosophy
-- **FreeBSD**: Documentation, comprehensive handbook
-- **systemd**: Service management, logging system
-- **GNOME/KDE**: Desktop environment, accessibility features
-- **Nix**: Declarative package management, content-addressed storage
-- **Bazel**: Build system, target rules
+---
 
-## Contact
-
-For questions, suggestions, or support, please open an issue on GitHub or join our discussions.
+*SigmaOS — Silicon Sovereignty. Built in Rust. Built to Last.*
