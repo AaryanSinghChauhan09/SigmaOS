@@ -339,15 +339,64 @@ mod tests {
         let recovered = deobf.unflatten_control_flow(0x2000, &blocks);
         assert_eq!(recovered, 3);
 
-        let mut binder = MetasmCodeBinder::new();
-        let code = [0x90, 0xCC, 0xC3]; // NOP, INT3, RET
-        let bound_len = binder.assemble_and_bind(&code);
-        assert_eq!(bound_len, 3);
-    }
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
-    #[test]
-    fn test_windbg_scripting_comments() {
-        let mut windbg = WinDbgScriptEngine::new();
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
 
         // $$ comment should be logged and skipped
         let comment_out = windbg.execute_command("$$ This is a WinDbg comment");

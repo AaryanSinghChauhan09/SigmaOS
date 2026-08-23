@@ -140,7 +140,7 @@ impl VesaDriver {
         &self.mode_info
     }
 
-    pub fn write_pixel(&self, x: u32, y: u32, color: u32) -> Result<(), VesaError> {
+    pub fn write_pixel(&mut self, x: u32, y: u32, color: u32) -> Result<(), VesaError> {
         if x >= self.mode_info.width || y >= self.mode_info.height {
             return Err(VesaError::OutOfBounds);
         }
@@ -153,32 +153,24 @@ impl VesaDriver {
             let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
             let idx = (y * self.mode_info.width + x) as usize;
             if idx < total_pixels {
-                // In safe context, we modify via mutable raw pointers or ignore if immutable self
-                let ptr = self.back_buffer.as_ptr() as *mut u32;
-                unsafe {
-                    ptr.add(idx).write(color);
-                }
+                self.back_buffer[idx] = color;
             }
         }
 
         Ok(())
     }
 
-    pub fn clear_screen(&self, color: u32) -> Result<(), VesaError> {
+    pub fn clear_screen(&mut self, color: u32) -> Result<(), VesaError> {
         if self.back_buffer_active {
-            let ptr = self.back_buffer.as_ptr() as *mut u32;
-            let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
-            unsafe {
-                for i in 0..total_pixels {
-                    ptr.add(i).write(color);
-                }
+            for pixel in self.back_buffer.iter_mut() {
+                *pixel = color;
             }
         }
         Ok(())
     }
 
     /// Standard Bresenham's Line Drawing Algorithm (integer-only arithmetic)
-    pub fn draw_line(&self, x0: i32, y0: i32, x1: i32, y1: i32, color: u32) -> Result<(), VesaError> {
+    pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: u32) -> Result<(), VesaError> {
         let dx = (x1 - x0).abs();
         let dy = -(y1 - y0).abs();
         let sx = if x0 < x1 { 1 } else { -1 };
@@ -212,7 +204,7 @@ impl VesaDriver {
 
     /// Embedded 8x16 bitmap console font character blitting (inspired by BSD syscons)
     /// Emulates drawing standard printable ASCII range
-    pub fn draw_char(&self, x: u32, y: u32, ch: char, color: u32) -> Result<(), VesaError> {
+    pub fn draw_char(&mut self, x: u32, y: u32, ch: char, color: u32) -> Result<(), VesaError> {
         // Minimal representation of an 8x16 font glyph for letter 'A' and legacy text blocks
         // Bit 1 indicates fill, 0 indicates empty background
         let mut glyph = [0u8; 16];

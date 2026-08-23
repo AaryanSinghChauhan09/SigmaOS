@@ -28,10 +28,4 @@ pub use policy_mechanism::{
     ResourceBroker,
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
-pub use scheduler::{Priority, Process, ProcessState};
-pub use traits::{Scheduler, SchedulerError};
-pub use gap_closing::{
-    GapError, Pml4PageTableEntry, VirtualMemoryPagingManager, IrqRoutingTable,
-    AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
-};
-pub use generation_manager::{Generation, GenerationManager};
+pub use scheduler::{Priority, Process, ProcessState, Scheduler};

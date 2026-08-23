@@ -1,47 +1,19 @@
 // SigmaOS Compatibility Module
+pub mod absorb_tools;
+pub mod apache_ossie;
 pub mod chimera_linux;
 pub mod cross_platform;
-pub mod interim;
-pub mod lubuntu;
+pub mod historic_linux;
 pub mod mint_linux;
-pub mod reactos;
-pub mod sigmawin;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod cross_platform_kernel;
-pub mod linux_adapter;
-pub mod persona;
-pub mod abi_translator;
-pub mod lattice;
-pub mod prism;
-pub mod canonical;
-pub mod fedora;
-pub mod void_linux;
-pub mod pop_os;
-pub mod clear_linux;
-pub mod historic_linux;
-pub mod antix;
-pub mod zorin;
+pub mod sovereign_suite;
+pub mod tiny_core;
+pub mod wasm_sandbox;
+pub mod open_source_tier1;
 
-pub use antix::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
-    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine, AntiXControlCentre,
-};
-pub use zorin::{
-    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
-    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager, ZorinWindowsAppSupport,
-};
-
-pub use void_linux::{
-    XbpsDatabase, RinitInitSystem, VoidMuslToolchain, XbpsPackageVerifier, RunitStageManager,
-};
-pub use pop_os::{
-    PopOsBspTiler, PopOsCosmicScheduler, CosmicWindowNode,
-};
-pub use clear_linux::{
-    ClearLinuxStatelessEngine, CpuIsaLevel,
+pub use open_source_tier1::{
+    WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
 };
 
 pub use cross_platform::{
@@ -58,32 +30,52 @@ pub use cross_platform_kernel::{
 };
 
 pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
-    ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
+    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
+    VintagePackageConverter, VintageVirtualizationSandbox,
 };
-pub use legacy_adapters::{
-    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
+
+pub use mint_linux::{
+    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
 };
-pub use linux_adapter::{
-    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+
+pub use chimera_linux::{
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+    DinitServiceState,
 };
-pub use persona::{
-    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
+
+pub use relay_nexus::{
+    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
+    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
+    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
+    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
+    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
+    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
+    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
+    ZeroTrustNexus,
 };
-pub use abi_translator::{
-    CpuArchitecture, ABITranslator,
+
+pub use solid_kernel::{
+    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
+    SigmaFSPlusPlus, SolidKernelCore,
 };
-pub use lattice::{
-    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+
+pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
+
+pub use absorb_tools::{
+    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
+    PledgeUnveilSandbox, PqcSecureChannel,
 };
-pub use prism::{
-    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+
+pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
+
+pub use apache_ossie::{
+    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
+    OssieRelationship, SemanticRow,
 };
-pub use canonical::{
-    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
-};
-pub use fedora::{
-    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+
+pub use sovereign_suite::{
+    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
+    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };

@@ -1,9 +1,6 @@
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,
 /// and target states to defeat Fedora's Systemd initialization.
-
-extern crate alloc;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -239,11 +236,11 @@ impl SystemdEngine {
         self.current_target.load(Ordering::SeqCst)
     }
 
-    // Topological sorting with cycle detection
-    pub fn topological_sort(&self, unit_ids: &Vec<UnitID>) -> Result<Vec<UnitID>, &'static str> {
-        let mut sorted = Vec::new();
-        let mut visiting = Vec::new();
-        let mut visited = Vec::new();
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
         for &id in unit_ids.iter() {
             if !visited.contains(&id) {
@@ -270,24 +267,22 @@ impl SystemdEngine {
 
         visiting.push(id);
 
-        if let Some(unit) = self.find_unit(id) {
-            for &other_id in all_ids.iter() {
-                if other_id == id {
-                    continue;
-                }
-                let mut is_before = false;
-                if unit.after.contains(&other_id) || unit.requires.contains(&other_id) || unit.wants.contains(&other_id) {
-                    is_before = true;
-                }
-                if let Some(other) = self.find_unit(other_id) {
-                    if other.before.contains(&id) {
-                        is_before = true;
-                    }
-                }
-
-                if is_before {
-                    self.topo_visit(other_id, all_ids, sorted, visiting, visited)?;
-                }
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
             }
         }
 
@@ -296,14 +291,108 @@ impl SystemdEngine {
         sorted.push(id);
         Ok(())
     }
-
-    // systemctl controls
-    pub fn systemctl_start(&mut self, id: UnitID) -> Result<(), &'static str> {
-        let (is_enabled, conflicts, requires, wants) = if let Some(unit) = self.find_unit(id) {
-            if unit.state == UnitState::Active {
-                return Ok(()); // Already running
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+    pub fn contains(&self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
+        for i in 0..self.len {
+            unsafe {
+                if &*self.data.add(i) == item {
+                    return true;
+                }
             }
-            (unit.is_enabled, unit.conflicts.clone(), unit.requires.clone(), unit.wants.clone())
+        }
+        false
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
         } else {
             return Err("Unit not found");
         };

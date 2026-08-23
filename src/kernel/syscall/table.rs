@@ -2,8 +2,9 @@ use core::sync::atomic::{AtomicU64, AtomicBool, Ordering};
 /// SigmaOS System Call Table — Phase K expansion
 /// Absorbs Linux syscall interface: POSIX-complete table with 300+ syscalls
 /// Categories: fs, mm, proc, net, time, signal, ipc, sched, crypto, io_uring
+/// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
+/// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
 
 #[cfg(test)]
@@ -649,56 +650,82 @@ mod tests {
         assert!(names.contains(&"brk".to_string()));
     }
 
-    // =====================================================================
-    // WDK-Style Subsystem Tests
-    // =====================================================================
-
     #[test]
-    fn test_cr0_wp_toggling() {
-        let cr0 = ControlRegister0::new();
-        assert!(cr0.is_write_protect_active());
-
-        // Toggle WP off (permitting hooks / updates)
-        cr0.set_write_protect(false);
-        assert!(!cr0.is_write_protect_active());
-
-        // Toggle WP back on
-        cr0.set_write_protect(true);
-        assert!(cr0.is_write_protect_active());
+    fn test_kernel_symbol_exporters() {
+        let sym = KernelSymbol {
+            name: "NtCreateFile".to_string(),
+            address: 0xFFFFFFFF80012000,
+            module_owner: "ntoskrnl.exe".to_string(),
+        };
+        assert_eq!(sym.name, "NtCreateFile");
+        assert_eq!(sym.address, 0xFFFFFFFF80012000);
+        assert_eq!(sym.module_owner, "ntoskrnl.exe");
     }
 
     #[test]
-    fn test_ssdt_hook_protection_and_bug_check() {
-        let cr0 = ControlRegister0::new();
-        let mut ssdt = KeServiceDescriptorTable::new();
+    fn test_ssdt_anti_rootkit_tampering_guard() {
+        let pristine_ssdt = [
+            SsdtEntry { service_number: 0, service_routine_address: 0x801000 }, // NtRead
+            SsdtEntry { service_number: 1, service_routine_address: 0x802000 }, // NtWrite
+        ];
 
-        // 1. With CR0 WP active, patching SSDT should fail with ATTEMPTED_WRITE_TO_READONLY_MEMORY
-        assert_eq!(cr0.is_write_protect_active(), true);
-        let res_blocked = ssdt.patch_service_routine(12, 0x1000_9000, &cr0);
-        assert_eq!(res_blocked, Err(BugCheckCode::AttemptedWriteToReadonlyMemory));
+        let mut guard = AntiRootkitGuard::new();
+        guard.snapshot_pristine_table(&pristine_ssdt);
 
-        // 2. Disable CR0 WP, patch SSDT successfully
-        cr0.set_write_protect(false);
-        let res_allowed = ssdt.patch_service_routine(12, 0x1000_9000, &cr0);
-        assert!(res_allowed.is_ok());
-        assert_eq!(ssdt.entry.service_table_base[12], 0x1000_9000);
+        // Audit clean SSDT -> should return no hijacked service numbers
+        let clean_violations = guard.audit_system_service_table(&pristine_ssdt);
+        assert!(clean_violations.is_empty());
+
+        // Simulate rootkit hooking NtWrite (service_number 1 redirecting address to rootkit_jmp_cave)
+        let hooked_ssdt = [
+            SsdtEntry { service_number: 0, service_routine_address: 0x801000 },
+            SsdtEntry { service_number: 1, service_routine_address: 0x909090 }, // Redirection!
+        ];
+
+        let hooked_violations = guard.audit_system_service_table(&hooked_ssdt);
+        assert_eq!(hooked_violations.len(), 1);
+        assert_eq!(hooked_violations[0], 1); // TAMPERING DETECTED ON SERVICE_NUMBER 1!
     }
 
     #[test]
-    fn test_patch_guard_and_integrity_checks() {
-        let cr0 = ControlRegister0::new();
-        let mut ssdt = KeServiceDescriptorTable::new();
-        let pg = PatchGuard::new();
+    fn test_idt_hooking_audits() {
+        let pristine_idt = [
+            IdtEntry { interrupt_vector: 0x03, handler_address: 0x1010 }, // Breakpoint
+            IdtEntry { interrupt_vector: 0x0E, handler_address: 0x2020 }, // Page Fault
+        ];
 
-        // Verify initial state is clean
-        assert!(pg.verify_integrity(&ssdt).is_ok());
+        let mut guard = AntiRootkitGuard::new();
+        guard.snapshot_pristine_idt(&pristine_idt);
 
-        // Disable write protection and patch/hook SSDT
-        cr0.set_write_protect(false);
-        ssdt.patch_service_routine(50, 0xAA55_BB66, &cr0).unwrap();
+        let clean_idt_violations = guard.audit_interrupt_table(&pristine_idt);
+        assert!(clean_idt_violations.is_empty());
 
-        // Integrity check should now detect the rootkit hook and trigger CRITICAL_STRUCTURE_CORRUPTION
-        let integrity_res = pg.verify_integrity(&ssdt);
-        assert_eq!(integrity_res, Err(BugCheckCode::CriticalStructureCorruption));
+        // Simulate IDT Hooking of Breakpoint handler by a rootkit
+        let hooked_idt = [
+            IdtEntry { interrupt_vector: 0x03, handler_address: 0x6660 }, // Redirected!
+            IdtEntry { interrupt_vector: 0x0E, handler_address: 0x2020 },
+        ];
+
+        let hooked_idt_violations = guard.audit_interrupt_table(&hooked_idt);
+        assert_eq!(hooked_idt_violations.len(), 1);
+        assert_eq!(hooked_idt_violations[0], 0x03);
     }
+
+    #[test]
+    fn test_dkom_process_hiding_detection() {
+        let guard = AntiRootkitGuard::new();
+
+        // 1. Clean state: Scheduler active PIDs match high-level Process Catalog
+        let scheduler_pids = [1, 100, 501];
+        let catalog_pids = [1, 100, 501];
+        let clean_dkom = guard.audit_dkom_process_hiding(&scheduler_pids, &catalog_pids);
+        assert!(clean_dkom.is_empty());
+
+        // 2. DKOM active: Rootkit unlinked process 501 from high-level catalog, but process is still running/executing in scheduler queues!
+        let catalog_pids_hooked = [1, 100];
+        let hijacked_dkom = guard.audit_dkom_process_hiding(&scheduler_pids, &catalog_pids_hooked);
+        assert_eq!(hijacked_dkom.len(), 1);
+        assert_eq!(hijacked_dkom[0], 501); // HIDDEN/DKOM TAMPERED PROCESS DETECTED!
+    }
+}
 }

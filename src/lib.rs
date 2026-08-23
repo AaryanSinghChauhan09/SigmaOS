@@ -1,6 +1,19 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod audio {
+    pub mod driver;
+    pub mod editor;
+}
+pub use audio::driver::{
+    AudioDevice, AudioDeviceID, AudioError, AudioManager, AudioMixer, AudioStream, AudioType,
+    SimpleAudioDevice, SimpleAudioManager, SimpleAudioMixer, SimpleAudioStream,
+};
+pub use audio::editor::{
+    AmplifyEffect, AudioEditor, AudioEffect, AudioTrack, EchoEffect, LowPassFilter,
+    MultiTrackSession, NoiseGateEffect,
+};
+
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -13,7 +26,6 @@ pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
-pub mod ml;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
@@ -71,7 +83,11 @@ pub mod crypto {
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
-    AccessibilityProfile, AccessibilitySetting,
+    AccessibilityProfile, AccessibilitySetting, BrailleDisplay, ColorFilter, KeyID, KeyType,
+    Magnifier, MagnifierID, MagnifierManager, OnScreenKeyboard, ScreenReader, SimpleBrailleDisplay,
+    SimpleColorFilter, SimpleMagnifier, SimpleMagnifierManager, SimpleOnScreenKeyboard,
+    SimpleScreenReader, SimpleStickyKeys, SimpleVirtualKey, SimpleVoice, StickyKeys, VirtualKey,
+    Voice, VoiceGender, VoiceID,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -79,28 +95,14 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
-    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
-    AntiXControlCentre, ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
-    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager,
-    ZorinWindowsAppSupport,
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime, CorebootGatewayMesh,
-    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
-    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
-    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
-    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
-    PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
-    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, TargetPlatform,
-    TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
-    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
-    Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
-};
-pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+    ApplicationBinary, BinaryFormat, CasObject, Clause, CompatibilityError, CompatibilityManager,
+    CompatibilityMode, ContainerRuntime, ContentAddressedStorage, CreativeMatrix, DpllSatSolver,
+    EverySearch, FancyZonesManager, FiletoolOverlay, FrugalLoader, ImageLayer, JoplinE2ee,
+    LayoutZone, Literal, MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter,
+    OssieMetric, OssieOntology, OssieRelationship, PledgePermission, PledgeUnveilSandbox,
+    PqcSecureChannel, ProcMonitor, ProcessExplorerState, SemanticRow, SpreadsheetCore, SysDiag,
+    TargetPlatform, TceLoader, TczExtension, TinyCoreBootConfig, TranslationLayer, WasmModule,
+    WasmSandboxEngine, WasmState,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -184,39 +186,39 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
+pub use security::hardening;
 pub use security::{
-    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
-    IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
-    PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+    secure_zeroize, AuditLogEntry, CapabilityGate, CapabilityToken, ExploitPayload,
+    HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, PenetrationAssistant, Permission,
+    PledgeManager, PledgePromise, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };
-pub use shell::{
-    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
-};
+pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter as SigpkgPackageFormatAdapter, UniversalPackageManager as SigpkgUniversalPackageManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
+    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
+    PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
+    Transaction, UniversalPackageAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub use thread::{
-    Thread, ThreadError, ThreadResult, Mutex as ThreadMutex,
-};
+pub mod init {
+    pub mod systemd_init;
+}
+pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
-pub use process::spawn::{
-    ProcessID, ProcessState as LibProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter,
-    CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
+pub mod ai {
+    pub mod next_gen;
+    pub mod wandr;
+}
+pub use ai::next_gen::{
+    AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType, EnergyAwareScheduler,
+    EnergyGovernorMode, ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator,
+    WorkloadType,
 };
-pub use process::activity_manager::{
-    ActivityManager, ActivityState, ProcessActivityRecord, RegisterSnapshot, AddressSpaceBinding,
-};
-pub use memory::segmentation_paging::{
-    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
-    SpaceProtectionFlags, SystemControlRegisters,
+pub use ai::wandr::{
+    ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
 };
 
 pub use community::toolkit::{

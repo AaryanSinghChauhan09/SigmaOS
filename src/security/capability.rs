@@ -110,15 +110,12 @@ impl CapabilityToken {
         self.bits
     }
 
-    /// Capability Delegation: create a subset child capability token with restricted permissions
-    pub fn delegate_sub_capability(&self, mask: u64, expiry: u64, parent_id: u64) -> Result<CapabilityToken, &'static str> {
-        // Child can only inherit permissions present in parent token
-        let child_bits = self.bits & mask;
-        Ok(CapabilityToken {
-            bits: child_bits,
-            expiry_timestamp: expiry,
-            delegated_from: parent_id,
-        })
+    pub fn allow_capability(&mut self, bitmask: u64) {
+        self.bits |= bitmask;
+    }
+
+    pub fn contains(&self, bitmask: u64) -> bool {
+        (self.bits & bitmask) == bitmask
     }
 }
 

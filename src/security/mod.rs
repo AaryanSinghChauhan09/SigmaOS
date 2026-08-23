@@ -1,12 +1,16 @@
-// SigmaOS Security Module
-// Capability-based security, pledge, and access control
-
-pub mod audit;
+// SigmaOS Security Subsystem
 pub mod capability;
-pub mod pqc_enclave;
+pub mod hardening;
+pub mod pledge;
+pub mod vulnerability;
 
-pub use pqc_enclave::{
-    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
+pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+};
+pub use pledge::{PledgeError, PledgeManager, PledgePromise};
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };
 pub mod capability_enforcer;
 pub mod capability_token;

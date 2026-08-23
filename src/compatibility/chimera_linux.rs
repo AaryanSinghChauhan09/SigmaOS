@@ -1,10 +1,4 @@
-#[cfg(test)]
-use std::vec::Vec;
-
-#[cfg(not(test))]
-extern crate alloc;
-#[cfg(not(test))]
-use alloc::vec::Vec;
+use crate::klib::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
 /// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.

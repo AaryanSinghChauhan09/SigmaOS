@@ -1,19 +1,12 @@
-// SPDX-License-Identifier: MIT
-//! OOP-based Buddy Allocator for SigmaOS
-//! Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
-//! Implements 2^n page frames with free list per order, split/coalesce
-
-#![no_std]
-
-extern crate alloc;
-
-use alloc::vec::Vec;
+/// OOP-based Buddy Allocator for SigmaOS
+/// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
+/// Implements 2^n page frames with free list per order, split/coalesce
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BlockID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum AllocError {
     Success = 0,
     OutOfMemory = 1,
@@ -54,7 +47,7 @@ pub struct SimpleBuddyAllocator {
 
 impl SimpleBuddyAllocator {
     pub fn new(max_order: usize, _total_frames: usize) -> Self {
-        let free_lists: [Vec<BlockID>; 12] = [
+        let mut free_lists: [Vec<BlockID>; 12] = [
             Vec::new(),
             Vec::new(),
             Vec::new(),
@@ -69,14 +62,15 @@ impl SimpleBuddyAllocator {
             Vec::new(),
         ];
         let mut blocks = Vec::new();
-        let next_id = AtomicUsize::new(1);
+        let next_id = AtomicUsize::new(0);
 
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
         let initial_block = Block::new(initial_order);
         blocks.push(Some(initial_block));
+        free_lists[initial_order].push(initial_block_id);
 
-        let mut allocator = SimpleBuddyAllocator {
+        SimpleBuddyAllocator {
             max_order: AtomicUsize::new(max_order),
             free_lists,
             blocks,
@@ -97,9 +91,8 @@ impl BuddyAllocator for SimpleBuddyAllocator {
             if !self.free_lists[current_order].is_empty() {
                 let block_id = self.free_lists[current_order].remove(0);
 
-                let mut curr = current_order;
-                while curr > order {
-                    let new_order = curr - 1;
+                if current_order > order {
+                    let new_order = current_order - 1;
                     let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
 
@@ -123,7 +116,8 @@ impl BuddyAllocator for SimpleBuddyAllocator {
                     self.blocks[right_id] = Some(right_block);
 
                     self.free_lists[new_order].push(right_id);
-                    curr -= 1;
+
+                    return Ok(left_id);
                 }
 
                 if let Some(ref mut block) = self.blocks[block_id] {
