@@ -5,7 +5,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
+use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -466,6 +467,71 @@ impl Default for SaiEngine {
     }
 }
 
+/// Sovereign Workflow Engine for DAG pipelines
+pub struct SovereignWorkflowEngine {
+    pub nodes: Vec<WorkflowNode>,
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowNode {
+    pub id: usize,
+    pub name: String,
+    pub depends_on: Option<usize>,
+    pub state_executed: bool,
+}
+
+impl SovereignWorkflowEngine {
+    pub fn new() -> Self {
+        Self { nodes: Vec::new() }
+    }
+
+    pub fn add_node(&mut self, id: usize, name: &str, depends_on: Option<usize>) {
+        self.nodes.push(WorkflowNode {
+            id,
+            name: name.to_string(),
+            depends_on,
+            state_executed: false,
+        });
+    }
+
+    pub fn execute_workflow(&mut self) -> Result<usize, &'static str> {
+        let mut executed_count = 0;
+        let node_len = self.nodes.len();
+
+        // Snapshot initial execution states before this pass
+        let initial_states: Vec<bool> = self.nodes.iter().map(|n| n.state_executed).collect();
+
+        for i in 0..node_len {
+            // If already executed, skip running but count as executed
+            if initial_states[i] {
+                executed_count += 1;
+                continue;
+            }
+
+            // Check if independent or its dependency was already executed before this pass started
+            let can_execute = match self.nodes[i].depends_on {
+                None => true,
+                Some(dep_id) => {
+                    let mut dep_ok = false;
+                    for j in 0..node_len {
+                        if self.nodes[j].id == dep_id && initial_states[j] {
+                            dep_ok = true;
+                            break;
+                        }
+                    }
+                    dep_ok
+                }
+            };
+
+            if can_execute {
+                self.nodes[i].state_executed = true;
+                executed_count += 1;
+            }
+        }
+        Ok(executed_count)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -588,5 +654,23 @@ mod tests {
 
         assert!(core.allocate_tensor(50).is_ok());
         assert!(core.allocate_tensor(200).is_err());
+    }
+
+    #[test]
+    fn test_roadmap_phase2_workflows() {
+        let mut engine = SovereignWorkflowEngine::new();
+        engine.add_node(1, "Compile Base Kernel", None);
+        engine.add_node(2, "Link Dilithium Drivers", Some(1));
+
+        // Pass 1: Node 1 executes, Node 2 remains pending
+        let run1 = engine.execute_workflow().unwrap();
+        assert_eq!(run1, 1);
+        assert!(engine.nodes[0].state_executed);
+        assert!(!engine.nodes[1].state_executed);
+
+        // Pass 2: Node 2 now executes since its dependency (Node 1) was completed prior to pass 2
+        let run2 = engine.execute_workflow().unwrap();
+        assert_eq!(run2, 2);
+        assert!(engine.nodes[1].state_executed);
     }
 }

@@ -813,7 +813,7 @@ impl SigmaFsCasEngine {
         if data.is_empty() {
             return false;
         }
-        signature[0] ^ self.trusted_root_dilithium_key[0] == SIGNATURE_XOR_VALID || signature[0] != SIGNATURE_BYTE_MINIMUM
+        signature[0] ^ self.trusted_root_dilithium_key[0] == Self::SIGNATURE_XOR_VALID || signature[0] != Self::SIGNATURE_BYTE_MINIMUM
     }
 }
 
