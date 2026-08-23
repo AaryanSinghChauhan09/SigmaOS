@@ -1,6 +1,7 @@
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,
 /// and target states to defeat Fedora's Systemd initialization.
+use crate::klib::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -236,7 +237,7 @@ impl SystemdEngine {
         self.current_target.load(Ordering::SeqCst)
     }
 
-    pub fn topological_sort(&self, unit_ids: &Vec<UnitID>) -> Result<Vec<UnitID>, &'static str> {
+    pub fn topological_sort(&self, unit_ids: &[UnitID]) -> Result<Vec<UnitID>, &'static str> {
         let mut sorted = Vec::new();
         let mut visiting = Vec::new();
         let mut visited = Vec::new();
@@ -252,7 +253,7 @@ impl SystemdEngine {
     fn topo_visit(
         &self,
         id: UnitID,
-        all_ids: &Vec<UnitID>,
+        all_ids: &[UnitID],
         sorted: &mut Vec<UnitID>,
         visiting: &mut Vec<UnitID>,
         visited: &mut Vec<UnitID>,
@@ -267,10 +268,11 @@ impl SystemdEngine {
         visiting.push(id);
 
         if let Some(unit) = self.find_unit(id) {
-            for &before_id in unit.before.iter() {
-                if all_ids.contains(&before_id) && !visited.contains(&before_id) {
-                    self.topo_visit(before_id, all_ids, sorted, visiting, visited)?;
-                }
+            for &req in &unit.requires {
+                self.topo_visit(req, all_ids, sorted, visiting, visited)?;
+            }
+            for &after in &unit.after {
+                self.topo_visit(after, all_ids, sorted, visiting, visited)?;
             }
         }
 
@@ -282,7 +284,7 @@ impl SystemdEngine {
 
     pub fn systemctl_start(&mut self, id: UnitID) -> Result<(), &'static str> {
         let (is_enabled, conflicts, requires, wants) = if let Some(u) = self.find_unit(id) {
-            (u.enabled, u.conflicts.clone(), u.requires.clone(), u.wants.clone())
+            (u.is_enabled, u.conflicts.clone(), u.requires.clone(), u.wants.clone())
         } else {
             return Err("Unit not found");
         };

@@ -1,14 +1,11 @@
-extern crate alloc;
-
 #[cfg(not(target_os = "none"))]
 extern crate alloc as std_alloc;
-#[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
 
 /// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
 /// Implements interactive scripting, dynamic script-like functions, positional arguments,
 /// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
 
+use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -142,13 +139,19 @@ impl SimpleScriptEngine {
 
         for script_option in &self.scripts {
             if let Some(ref script) = *script_option {
-                if script.as_ref().name() == target_name {
-                    return self.execute_script_with_args(script.as_ref().id(), args);
+                if script.name() == target_name {
+                    return self.execute_script_with_args(script.id(), args);
                 }
             }
         }
 
         Err(ScriptError::NotFound)
+    }
+}
+
+impl Default for SimpleScriptEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -162,7 +165,7 @@ impl ScriptEngine for SimpleScriptEngine {
     fn unload_script(&mut self, id: ScriptID) -> Result<(), ScriptError> {
         for script_option in &mut self.scripts {
             if let Some(ref script) = *script_option {
-                if script.as_ref().id() == id {
+                if script.id() == id {
                     return Ok(());
                 }
             }
@@ -185,7 +188,7 @@ impl ScriptEngine for SimpleScriptEngine {
     fn get_script(&self, id: ScriptID) -> Option<&dyn Script> {
         for script_option in &self.scripts {
             if let Some(ref script) = *script_option {
-                if script.as_ref().id() == id {
+                if script.id() == id {
                     return Some(script.as_ref());
                 }
             }
@@ -290,6 +293,12 @@ impl SimpleScriptEnvironment {
             }
         }
         None
+    }
+}
+
+impl Default for SimpleScriptEnvironment {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

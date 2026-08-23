@@ -662,11 +662,15 @@ impl NetworkDevice for WindowsNdisAdapter {
         Ok(0)
     }
 
+    fn mac_address(&self) -> [u8; 6] {
+        self.mac_address
+    }
+
     fn get_mac_address(&self) -> [u8; 6] {
         self.mac_address
     }
 
-    fn set_mac_address(&mut self, mac: [u8; 6]) -> Result<(), crate::driver::device::DeviceError> {
+    fn set_mac_address(&mut self, mac: [u8; 6]) -> Result<(), DeviceError> {
         self.mac_address = mac;
         Ok(())
     }
