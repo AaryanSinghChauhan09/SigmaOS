@@ -1,9 +1,6 @@
 use segmentation_paging::{
-    AddressBindingMode, CpuRing as SegCpuPrivilegeMode,
+    CpuRing as SegCpuPrivilegeMode,
     RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, AslrEntropyConfig
-};
-use statutory_compliance::{
-    StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus
 };
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
@@ -121,17 +118,12 @@ mod elf_relocation;
 
 use community_toolkit::{
     CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
-    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
 };
 use statutory_compliance::{
     DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
     StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus,
 };
 use system_user::UserManager as TestUserManager;
-
-use ext4_ntfs_security::{
-    NtfsAce as Nfs4Ace, AceType as Nfs4AceType,
-};
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
     BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter,
@@ -412,10 +404,10 @@ fn test_fedora_rpm_and_selinux() {
     let order = resolver.resolve_and_install("kernel-core").unwrap();
     assert_eq!(order, vec!["kernel-core".to_string()]);
 
-    let mut selinux = sigmaos::security::selinux::SelinuxEngine::new();
-    let src = "system_u:system_r:httpd_t:s0";
-    let tgt = "system_u:object_r:httpd_sys_content_t:s0";
-    assert!(selinux.has_permission(src, tgt, "file", "read").unwrap());
+    let selinux = fedora_compat::SeLinuxEngine::new(true);
+    let src = fedora_compat::SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
+    let tgt = fedora_compat::SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
+    assert!(selinux.authorize_access(&src, &tgt, "file", "read").is_ok());
 }
 
 #[test]
@@ -474,8 +466,8 @@ fn test_sigmatools_suite() {
 #[test]
 fn test_posix_and_nfsv4_acls() {
     // POSIX 1003.1e ACL verification
-    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
-    posix_acl.add_entry_direct(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
+    let mut posix_acl = access_control::PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
+    posix_acl.add_entry_direct(access_control::AclEntry::new(access_control::AclTag::User(1001), 5)); // User 1001 gets r-x (5)
 
     assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
     assert!(!posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 2)); // Denied write (2)
@@ -484,7 +476,9 @@ fn test_posix_and_nfsv4_acls() {
     let child_posix = posix_acl.inherit_default_acl(false);
     assert_eq!(child_posix.entries.len(), posix_acl.entries.len());
 
-    assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
+    let gate = access_control::ZeroTrustAccessGate::new(access_control::FilterPolicy::Whitelist, 0xFFFF);
+    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+    assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Err(access_control::AccessError::MacAddressBlocked));
 }
 
 #[test]
@@ -551,17 +545,17 @@ fn test_task_states_and_workload_classifications() {
 
 #[test]
 fn test_file_attributes_and_cpu_ring_privileges() {
-    let mut bounds = CapBoundingSet::new(0xFFFF_FFFF);
+    let mut bounds = access_control::CapBoundingSet::new(0xFFFF_FFFF);
     assert!(bounds.is_capability_permitted(21));
     bounds.drop_capability(21);
     assert!(!bounds.is_capability_permitted(21));
 
-    let dac = DacPermission::new(1000, 1000, 0o755);
+    let dac = access_control::DacPermission::new(1000, 1000, 0o755);
     assert!(dac.evaluate_access(1000, 1000, access_control::dac_flags::READ));
     assert!(!dac.evaluate_access(1001, 1001, access_control::dac_flags::WRITE));
 
-    let mac_sub = MacSecurityLabel::new(SensitivityLevel::Secret, 0x01);
-    let mac_obj = MacSecurityLabel::new(SensitivityLevel::Confidential, 0x01);
+    let mac_sub = access_control::MacSecurityLabel::new(access_control::SensitivityLevel::Secret, 0x01);
+    let mac_obj = access_control::MacSecurityLabel::new(access_control::SensitivityLevel::Confidential, 0x01);
     assert!(mac_sub.can_read(&mac_obj));
 }
 
