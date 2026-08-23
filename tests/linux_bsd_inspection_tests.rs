@@ -77,3 +77,51 @@ fn test_sovereign_landlock_and_runit_inspection() {
     assert_eq!(supervisor.services.len(), 1);
     assert_eq!(supervisor.services[0].name, "network-daemon");
 }
+
+#[test]
+fn test_gentoo_use_flags_and_arch_deps_inspection() {
+    let mut use_mgr = GentooUseFlagsManager::new();
+    use_mgr.set_global_flags(&["wayland", "vulkan"]);
+    assert!(use_mgr.is_flag_enabled("zenith-desktop", "wayland"));
+    assert!(use_mgr.is_flag_enabled("zenith-desktop", "vulkan"));
+    assert!(!use_mgr.is_flag_enabled("zenith-desktop", "x11"));
+
+    let mut resolver = ArchDependencyResolver::new();
+    resolver.add_package(PackageNode {
+        name: "zenith-desktop".to_string(),
+        version: "1.0.0".to_string(),
+        dependencies: vec!["wayland-protocols".to_string(), "pixman".to_string()],
+        provides: vec![],
+    });
+    resolver.add_package(PackageNode {
+        name: "wayland-protocols".to_string(),
+        version: "1.32".to_string(),
+        dependencies: vec![],
+        provides: vec![],
+    });
+    resolver.add_package(PackageNode {
+        name: "pixman".to_string(),
+        version: "0.42.2".to_string(),
+        dependencies: vec![],
+        provides: vec![],
+    });
+
+    let order = resolver.resolve_dependencies("zenith-desktop").unwrap();
+    assert_eq!(order.len(), 3);
+    assert_eq!(order.last().unwrap(), &"zenith-desktop".to_string());
+}
+
+#[test]
+fn test_hammer2_and_zfs_cow_snapshots_inspection() {
+    let mut hammer2 = Hammer2MultiVersionEngine::new();
+    hammer2.write_inode(100, "/etc/sovereign.conf", b"HASH_PAYLOAD_100");
+    assert_eq!(hammer2.inodes.len(), 1);
+
+    let snap_txg = hammer2.create_snapshot();
+    assert_eq!(snap_txg, 1);
+
+    let mut zfs = SovereignZfsPoolEngine::new("rpool", ZfsVdevType::Mirror);
+    zfs.create_dataset("ds0");
+    let res = zfs.write_block_cow("ds0", 1, b"BLOCK_DATA");
+    assert!(res.is_ok());
+}
