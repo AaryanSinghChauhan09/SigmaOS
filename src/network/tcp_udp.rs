@@ -683,7 +683,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        self.sockets.iter().find(|s: &&Box<dyn Socket>| s.id() == id).map(|s: &Box<dyn Socket>| s.as_ref())
+        self.sockets.iter().find(|s: &Box<dyn Socket>| s.id() == id).map(|s: &Box<dyn Socket>| s.as_ref())
     }
 }
 

@@ -40,7 +40,7 @@ pub struct SyscallTable {
     pub entries: [SyscallEntry; 512],
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct SyscallEntry {
     pub number: u32,
     pub handler: unsafe extern "C" fn(),

@@ -422,30 +422,10 @@ pub struct X86RootkitAuditor {
     pub expected_ssdt_checksum: u64,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceType {
-    Physical,
-    Functional,
-    Filter,
-}
 
-#[derive(Debug, Clone)]
-pub struct DeviceObject {
-    pub device_type: DeviceType,
-    pub driver_name: &'static str,
-    pub next_device: Option<Box<DeviceObject>>,
-    pub attached_device: Option<Box<DeviceObject>>,
-}
-
-pub fn io_attach_device_to_device_stack(source: &mut DeviceObject, target: &mut DeviceObject) {
-    source.next_device = Some(Box::new(target.clone()));
-    target.attached_device = Some(Box::new(source.clone()));
-}
-
-#[derive(Debug, Clone)]
-pub struct DriverObject {
-    pub driver_name: &'static str,
-    pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
+pub fn io_attach_device_to_device_stack(source_device: &mut DeviceObject, target_device: &mut DeviceObject) -> Option<DeviceObject> {
+    source_device.attached_device = Some(Box::new(target_device.clone()));
+    Some(target_device.clone())
 }
 
 impl X86RootkitAuditor {
@@ -581,11 +561,6 @@ pub enum IrpMajorFunction {
     DeviceControl = 4, // equivalent to IOCTL
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct IrpStackLocation {
-    pub major_function: IrpMajorFunction,
-    pub ioctl_code: u32,
-}
 
 pub struct Irp {
     pub major_function: IrpMajorFunction,
@@ -593,55 +568,37 @@ pub struct Irp {
     pub system_buffer: Vec<u8>,
     pub status: u32, // Status codes (NTSTATUS/errno-like)
     pub current_stack_index: usize,
-    pub stack_locations: Vec<IrpStackLocation>,
+    pub stack_locations: Vec<u8>,
 }
 
-pub static COMPLETION_CALLED: core::sync::atomic::AtomicBool = core::sync::atomic::AtomicBool::new(false);
-
 impl Irp {
-    pub fn new(major_function: IrpMajorFunction, ioctl_code: u32, system_buffer: Vec<u8>) -> Self {
+    pub fn new(major_function: IrpMajorFunction, buffer: Vec<u8>) -> Self {
         Self {
             major_function,
-            ioctl_code,
-            system_buffer,
+            ioctl_code: 0,
+            system_buffer: buffer,
             status: 0,
             current_stack_index: 0,
             stack_locations: Vec::new(),
         }
     }
-
-    pub fn new_with_stack(
-        major_function: IrpMajorFunction,
-        ioctl_code: u32,
-        system_buffer: Vec<u8>,
-        stack_size: usize,
-    ) -> Self {
-        let mut stack_locations = Vec::new();
-        for _ in 0..stack_size {
-            stack_locations.push(IrpStackLocation {
-                major_function,
-                ioctl_code,
-            });
-        }
-        let current_stack_index = if stack_size > 0 { stack_size - 1 } else { 0 };
+    pub fn new_with_stack(major_function: IrpMajorFunction, _minor_function: u8, buffer: Vec<u8>, stack_locations: u8) -> Self {
         Self {
             major_function,
-            ioctl_code,
-            system_buffer,
+            ioctl_code: 0,
+            system_buffer: buffer,
             status: 0,
-            current_stack_index,
-            stack_locations,
+            current_stack_index: stack_locations as usize - 1,
+            stack_locations: vec![0; stack_locations as usize],
         }
     }
-
-    pub fn set_completion_routine(&mut self, _routine: fn(&DeviceObject, &mut Irp) -> u32) -> Result<(), &'static str> {
+    pub fn set_completion_routine<F>(&mut self, _f: F) -> Result<(), &'static str> {
         Ok(())
     }
-
-    pub fn complete_request(&mut self, _status: u32) {
-        COMPLETION_CALLED.store(true, Ordering::SeqCst);
-    }
+    pub fn complete_request(&mut self, _status: u32) {}
 }
+
+
 
 pub struct IrpHandler {
     // Dispatch callbacks for Major Functions
