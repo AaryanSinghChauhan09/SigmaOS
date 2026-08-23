@@ -70,6 +70,16 @@ pub enum MaintainerScriptPhase {
     PostRm,
 }
 
+pub type SovereignTransactionManager = SovereignAlternativesSystem;
+pub type SovereignSandboxEnforcer = SovereignMaintainerSandbox;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TransactionStatus {
+    Committed,
+    RolledBack,
+    InProgress,
+}
+
 /// Sandboxed Maintainer Script Enforcer
 #[derive(Debug, Clone)]
 pub struct SovereignMaintainerSandbox {

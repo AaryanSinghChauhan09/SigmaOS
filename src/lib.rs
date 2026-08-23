@@ -36,10 +36,37 @@ pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod virtualization;
-pub mod unimplemented_features;
-pub mod unimplemented_tools;
-pub mod klib;
-pub use klib::{SplayTree, RadixTree, SovereignPriorityQueue};
+pub mod cluster;
+
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+}
+pub mod boot;
+pub mod toolchain {
+    pub mod adapter;
+    pub mod capsule;
+    pub mod codex;
+    pub mod bootstrap;
+}
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -56,25 +83,20 @@ pub use automation::{
     ScriptArgumentRouter,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
-    InterimLispVM, JehanneError, JehanneNamespace, LispVal, MintBackupTool, MintSoftwareManager,
-    MintUpdateItem, MintUpdateLevel, MintUpdateManager, MntReformLpcDriver, MockUPIService,
-    MultilingualSupport, NamespaceBindEntry, NtHandle, NtObjectManager, NtObjectType, NtStatus,
-    Plan9pMessage, Plan9pMsgType, PortableExecutableLoader, ReformPowerStats, RegistryHive,
-    SoftwareMeta, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
-    Literal, SpacSatResolver,
-    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
-    AlpineSyslogManager, BusyBoxMulticall,
-    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
-    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
-    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
-    HidGraphicsDriver, AiTaskOrchestrator,
-    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
-    SovereignTimeMachine, NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine,
-    SovereignForensics, SovereignRecoverUtility, ShardIgnitor,
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre, ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager,
+    ZorinWindowsAppSupport,
+    ApplicationBinary, BinaryFormat, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ContainerRuntime,
+    LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, TargetPlatform, TranslationLayer,
+};
+pub use container::{
+    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
+    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
+    SimpleContainer, SimpleContainerRuntime,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

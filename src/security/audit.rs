@@ -1,12 +1,7 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
-//! OOP-based Security Audit for SigmaOS
-//! Implements security event logging and audit trails
-
-#![no_std]
-
+/// OOP-based Security Audit for SigmaOS
+/// Based on Ideas-999-Structured: Security & Sovereignty Item 542
+/// Implements security event logging and audit trails
 extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::boxed::Box;
 use alloc::vec::Vec;

@@ -110,6 +110,7 @@ pub struct SecurityLabel;
 pub struct SecurityPolicy;
 pub struct SecurityRule;
 pub enum SelinuxPermission { Read, Write, Execute }
+pub type Permission = SelinuxPermission;
 
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,

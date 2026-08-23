@@ -33,6 +33,7 @@ jobs:
     - name: Build the Docker image
       # Tag image to be built
       # Ensure image tag uses lowercase name as required by Docker
+      if: hashFiles('Dockerfile') != ''
       run: docker build . --file Dockerfile --tag aaryansinghchauhan09/sigmaos:latest
 
     - name: Sysdig Secure Inline Scan

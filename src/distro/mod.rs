@@ -13,13 +13,10 @@ pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
-pub mod parity;
-pub mod arch;
-
-pub use arch::{
-    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
-    ArchRepoType,
-};
+pub mod transformation_engine;
+pub mod preseed;
+pub mod linux_bsd_inspirations;
+pub mod ecosystem_dimensions;
 
 pub use ecosystem_dimensions::{
     BareMetalTelemetryRing, CommunityRemixBuilder, CommunityRemixConfig,

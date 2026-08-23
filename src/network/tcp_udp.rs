@@ -1,9 +1,10 @@
-use core::mem;
-/// OOP-based Networking Stack (TCP/UDP) for SigmaOS
-/// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
-/// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
-/// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
-use core::sync::atomic::{AtomicUsize, Ordering};
+//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -697,7 +698,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        self.sockets.iter().find(|s: &Box<dyn Socket>| s.id() == id).map(|s: &Box<dyn Socket>| s.as_ref())
+        self.sockets.iter().find(|s: &&Box<dyn Socket>| s.id() == id).map(|s: &Box<dyn Socket>| s.as_ref())
     }
 }
 

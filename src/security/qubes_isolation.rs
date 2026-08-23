@@ -2,6 +2,8 @@
 // Enables ultra-lightweight, compartmentalized zero-trust secure domains (MicroVMs)
 // Running natively in user-space with microsecond-level IPC latencies and hypervisor isolation.
 
+extern crate alloc;
+
 #[cfg(not(test))]
 use core::cell::RefCell;
 
@@ -456,7 +458,8 @@ pub struct SQrexecChannel {
 
 impl SQrexecChannel {
     pub fn new(size: usize) -> Self {
-        let buffer = unsafe { alloc(size) };
+        let layout = core::alloc::Layout::from_size_align(size.max(1), 8).unwrap();
+        let buffer = unsafe { alloc::alloc::alloc(layout) };
         Self {
             buffer,
             size,
@@ -498,7 +501,8 @@ impl SQrexecChannel {
     pub fn destroy(&self) {
         unsafe {
             core::ptr::write_bytes(self.buffer, 0, self.size);
-            free(self.buffer);
+            let layout = core::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
+            alloc::alloc::dealloc(self.buffer, layout);
         }
     }
 }

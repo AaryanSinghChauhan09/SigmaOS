@@ -7,12 +7,12 @@
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type BootStatus = usize;
 
 /// Standard UEFI Boot Phases
-#[repr(u32)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootPhase {
     Init = 0,

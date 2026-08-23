@@ -20,6 +20,7 @@
 // OOP-based AI system optimization with predictive modeling
 
 use crate::klib::BTreeMap;
+use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
 /// System state

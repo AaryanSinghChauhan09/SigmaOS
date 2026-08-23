@@ -50,7 +50,7 @@ jobs:
 
       - name: Appknox GitHub action
         if: hashFiles('gradlew') != '' || hashFiles('app/build/outputs/apk/debug/app-debug.apk') != ''
-        uses: appknox/appknox-github-action@13f49a986fc0f12e103650ab36a35334f02969af
+        uses: appknox/appknox-github-action@b7d2bfb2321d5544e97bffcba48557234ab953a4
         with:
           appknox_access_token: ${{ secrets.APPKNOX_ACCESS_TOKEN }}
           file_path: app/build/outputs/apk/debug/app-debug.apk        # Specify the path to your .ipa or .apk here
