@@ -688,7 +688,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self.sockets.iter().position(|s| s.id() == id) {
+        if let Some(pos) = self.sockets.iter().position(|s: &Box<dyn Socket>| s.id() == id) {
             self.sockets.remove(pos);
             Ok(())
         } else {
@@ -697,14 +697,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        for socket_option in &self.sockets {
-            if let Some(ref socket) = *socket_option {
-                if socket.id() == id {
-                    return Some(socket.as_ref());
-                }
-            }
-        }
-        None
+        self.sockets.iter().find(|s: &Box<dyn Socket>| s.id() == id).map(|s: &Box<dyn Socket>| s.as_ref())
     }
 }
 

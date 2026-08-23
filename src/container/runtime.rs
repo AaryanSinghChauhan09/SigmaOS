@@ -101,68 +101,6 @@ pub enum ContainerError {
 }
 
 /// Container info
-#[repr(C)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
-}
-
-impl ContainerInfo {
-    pub fn new(id: ContainerID) -> Self {
-        ContainerInfo {
-            id,
-            name: [0; 64],
-            image: [0; 128],
-            state: ContainerState::Created,
-            pid: None,
-            memory_limit: 0,
-            cpu_limit: 0,
-            capability: ContainerCapability::new(),
-        }
-    }
-}
-
-/// Container capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
-impl ContainerCapability {
-    pub const fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub const fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-impl Default for ContainerCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Container network configuration type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -221,32 +159,6 @@ pub struct SeccompProfile {
     pub blocked_syscalls_mask: u32,
 }
 
-impl ContainerNamespace {
-    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_uid == 0 {
-                Ok(self.uid_mapping)
-            } else {
-                Ok(self.uid_mapping + container_uid)
-            }
-        } else {
-            Ok(container_uid)
-        }
-    }
-
-    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_gid == 0 {
-                Ok(self.gid_mapping)
-            } else {
-                Ok(self.gid_mapping + container_gid)
-            }
-        } else {
-            Ok(container_gid)
-        }
-    }
-}
-
 /// Namespace configuration flags for a container
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NamespaceConfig {
@@ -278,11 +190,6 @@ impl NamespaceConfig {
 }
 
 /// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
 
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
@@ -896,6 +803,15 @@ impl<'a, T> Iterator for RuntimeVecEnumerate<'a, T> {
     fn next(&mut self) -> Option<Self::Item> { None }
 }
 
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = RuntimeVecIterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = RuntimeVecIter<'a, T>;
@@ -908,7 +824,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 
