@@ -208,8 +208,6 @@ impl SelinuxEngine {
     }
 }
 
-use std::collections::HashSet;
-
 /// Multi-Level Security (MLS) sensitivity levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SensitivityLevel {

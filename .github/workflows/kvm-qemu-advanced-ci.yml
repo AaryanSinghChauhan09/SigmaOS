@@ -1,0 +1,28 @@
+name: KVM & QEMU Advanced Virtualization CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  virtualization-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install QEMU and KVM utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils libvirt-daemon-system
+
+      - name: Test Virtual Machine Manager module
+        run: |
+          cargo test --lib virtualization::vm_manager::tests

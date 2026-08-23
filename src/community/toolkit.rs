@@ -248,42 +248,6 @@ impl Default for SecurityProfileTemplateStore {
     }
 }
 
-pub struct HybridFirewallTemplateStore {
-    pub templates: HashMap<String, String>,
-}
-
-impl HybridFirewallTemplateStore {
-    pub fn new() -> Self {
-        let mut store = HashMap::new();
-        store.insert("default-mesh-shield".to_string(), "drop all; accept 80,443".to_string());
-        Self { templates: store }
-    }
-}
-
-impl Default for HybridFirewallTemplateStore {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct VirtualizationBlueprintStore {
-    pub blueprints: HashMap<String, String>,
-}
-
-impl VirtualizationBlueprintStore {
-    pub fn new() -> Self {
-        let mut store = HashMap::new();
-        store.insert("micro-vm-node".to_string(), "vcpus: 2, mem: 512MB".to_string());
-        Self { blueprints: store }
-    }
-}
-
-impl Default for VirtualizationBlueprintStore {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
