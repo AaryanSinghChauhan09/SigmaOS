@@ -1,6 +1,7 @@
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,
 /// and target states to defeat Fedora's Systemd initialization.
+use crate::klib::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -254,7 +255,7 @@ impl SystemdEngine {
     fn topo_visit(
         &self,
         id: UnitID,
-        all_ids: &Vec<UnitID>,
+        all_ids: &[UnitID],
         sorted: &mut Vec<UnitID>,
         visiting: &mut Vec<UnitID>,
         visited: &mut Vec<UnitID>,

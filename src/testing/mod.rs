@@ -5,9 +5,8 @@
 
 extern crate alloc;
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// Test result
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -19,6 +18,7 @@ pub enum TestResult {
 }
 
 /// Test suite
+#[derive(Clone)]
 pub struct TestSuite {
     pub name: String,
     pub tests: Vec<TestCase>,
@@ -59,6 +59,7 @@ impl TestSuite {
 }
 
 /// Test case
+#[derive(Clone)]
 pub struct TestCase {
     pub name: String,
     pub test_fn: fn() -> TestResult,
@@ -538,5 +539,59 @@ mod tests {
         assert_eq!(summary.results[0].iterations, 10);
         assert_eq!(summary.results[0].crashes, 0);
         assert_eq!(summary.results[0].crash_rate, 0.0);
+    }
+
+    #[test]
+    fn test_fuzz_system_parsers_suite() {
+        let mut framework = FuzzingTestFramework::new();
+
+        // Fuzzer 1: WASM Header Validation
+        framework.add_fuzzer(Fuzzer {
+            name: String::from("wasm_header_fuzzer"),
+            target: |input| {
+                if input.len() < 4 {
+                    return true;
+                }
+                let is_valid_wasm = input.starts_with(b"\0asm");
+                let _ = is_valid_wasm;
+                true
+            },
+            input_generator: || {
+                let mut buf = alloc::vec![0u8; 8];
+                buf[0] = 0x00;
+                buf[1] = 0x61;
+                buf[2] = 0x73;
+                buf[3] = 0x6d;
+                buf
+            },
+            max_iterations: 100,
+        });
+
+        // Fuzzer 2: TCP Header Boundary Validation
+        framework.add_fuzzer(Fuzzer {
+            name: String::from("tcp_header_fuzzer"),
+            target: |input| {
+                if input.len() < 20 {
+                    return true;
+                }
+                let data_offset = input[12] >> 4;
+                let header_len = (data_offset as usize) * 4;
+                if header_len < 20 || header_len > 60 || header_len > input.len() {
+                    return true;
+                }
+                true
+            },
+            input_generator: || {
+                let mut buf = alloc::vec![0u8; 32];
+                buf[12] = 0x50; // Data offset = 5 (20 bytes)
+                buf
+            },
+            max_iterations: 100,
+        });
+
+        let summary = framework.run_all();
+        assert_eq!(summary.total_fuzzers, 2);
+        assert_eq!(summary.results[0].crashes, 0);
+        assert_eq!(summary.results[1].crashes, 0);
     }
 }

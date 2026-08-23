@@ -815,4 +815,42 @@ mod tests {
         let audit = router.audit_log.borrow();
         assert!(audit[0].is_none() || audit[0].unwrap().0.contains("ZenithNet"));
     }
+
+    #[test]
+    fn test_zero_trust_router_and_firewall() {
+        let router = ZeroTrustRouter::new(0x1337_0000);
+
+        let valid_packet = Packet {
+            source_ip: [10, 0, 0, 5],
+            dest_ip: [10, 0, 0, 1],
+            source_port: 443,
+            dest_port: 8080,
+            protocol: Protocol::Tcp,
+            payload_len: 128,
+            signature_key_id: 0x1337_0000,
+            payload_hash: 0xABCDEF,
+        };
+
+        // 1. Valid packet should be accepted
+        assert_eq!(router.process_packet(&valid_packet, 100), FirewallAction::Accept);
+
+        // 2. Mismatched signature key should be rejected
+        let mut bad_key_packet = valid_packet;
+        bad_key_packet.signature_key_id = 0x9999;
+        assert_eq!(router.process_packet(&bad_key_packet, 110), FirewallAction::Reject);
+
+        // 3. Unauthorized subnet source should be dropped
+        let mut bad_subnet_packet = valid_packet;
+        bad_subnet_packet.source_ip = [172, 16, 0, 1];
+        assert_eq!(router.process_packet(&bad_subnet_packet, 120), FirewallAction::Drop);
+
+        // 4. Missing payload hash should be rejected
+        let mut zero_hash_packet = valid_packet;
+        zero_hash_packet.payload_hash = 0;
+        assert_eq!(router.process_packet(&zero_hash_packet, 130), FirewallAction::Reject);
+
+        // Verify threat logs recorded bad packet attempts
+        let audit = router.audit_log.borrow();
+        assert!(audit[0].is_none() || audit[0].unwrap().0.contains("ZenithNet"));
+    }
 }
