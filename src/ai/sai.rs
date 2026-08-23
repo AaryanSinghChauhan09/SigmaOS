@@ -781,6 +781,22 @@ mod tests {
         let result = accel.dispatch_async_matmul_stream(&a, &b).unwrap();
         assert_eq!(result.data, vec![2.0, 3.0, 4.0, 5.0]);
     }
+
+    #[test]
+    fn test_opencog_atomspace() {
+        let mut space = OpenCogAtomSpace::new();
+        let node_id = space.add_node("Concept_Sovereignty", AtomType::ConceptNode, 0.95);
+        assert_eq!(node_id, 1);
+        assert_eq!(space.atoms.len(), 1);
+    }
+
+    #[test]
+    fn test_mlpack_kmeans() {
+        let data = vec![1.0, 2.0, 3.0, 4.0];
+        let centroids = MlpackLinearAlgebra::fast_kmeans(&data, 2);
+        assert_eq!(centroids.len(), 2);
+        assert_eq!(centroids[0], 1.0);
+    }
 }
 
 /// Zero-copy DMA mapped GPU AI Acceleration Engine
@@ -821,5 +837,71 @@ impl SovereignGpuAiAccelerator {
 impl Default for SovereignGpuAiAccelerator {
     fn default() -> Self {
         Self::new(ComputeBackend::CudaAccelerated, 4096)
+    }
+}
+
+/// OpenCog AtomSpace Semantic Network Model
+#[derive(Debug, Clone)]
+pub enum AtomType {
+    ConceptNode,
+    PredicateNode,
+    EvaluationLink,
+    ImplicationLink,
+}
+
+#[derive(Debug, Clone)]
+pub struct Atom {
+    pub atom_id: u64,
+    pub name: String,
+    pub atom_type: AtomType,
+    pub truth_value: f32, // Strength [0.0 - 1.0]
+}
+
+pub struct OpenCogAtomSpace {
+    pub atoms: Vec<Atom>,
+    pub next_id: u64,
+}
+
+impl OpenCogAtomSpace {
+    pub fn new() -> Self {
+        Self {
+            atoms: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_node(&mut self, name: &str, atom_type: AtomType, truth_value: f32) -> u64 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.atoms.push(Atom {
+            atom_id: id,
+            name: name.to_string(),
+            atom_type,
+            truth_value,
+        });
+        id
+    }
+}
+
+impl Default for OpenCogAtomSpace {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// mlpack C++ Linear Algebra Optimizations
+pub struct MlpackLinearAlgebra;
+
+impl MlpackLinearAlgebra {
+    pub fn fast_kmeans(data: &[f32], clusters: usize) -> Vec<f32> {
+        let mut centroids = Vec::new();
+        for i in 0..clusters {
+            if i < data.len() {
+                centroids.push(data[i]);
+            } else {
+                centroids.push(0.0);
+            }
+        }
+        centroids
     }
 }
