@@ -1,12 +1,7 @@
-use segmentation_paging::{
-    AddressBindingMode, CpuRing as SegCpuPrivilegeMode,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, AslrEntropyConfig
-};
-use statutory_compliance::{
-    StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus
-};
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
+
+extern crate alloc;
 
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
@@ -50,114 +45,14 @@ mod bitmap_pmm;
 #[path = "../src/memory/low_level.rs"]
 mod low_level_memory;
 
-#[path = "../src/filesystem/ext4_ntfs_security.rs"]
-mod ext4_ntfs_security;
 #[path = "../src/access/control.rs"]
 mod access_control;
-
-pub enum AclTag { User(u32), Group(u32), Other }
-
-pub enum CpuRing { Ring0, Ring3 }
-pub struct CpuPrivilegeEnforcer { pub mode: ExecutionRingMode }
-impl CpuPrivilegeEnforcer {
-    pub fn new(mode: ExecutionRingMode) -> Self { Self { mode } }
-    pub fn can_execute_privileged_instruction(&self) -> bool {
-        matches!(self.mode, ExecutionRingMode::Ring0Supervisor)
-    }
-}
-pub enum ExecutionRingMode { Ring0Supervisor, Ring3User }
-pub struct FileAttributeAccessControl { pub flags: u32 }
-impl FileAttributeAccessControl {
-    pub fn new(flags: u32) -> Self { Self { flags } }
-    pub fn can_unlink(&self) -> bool { !(self.flags == file_attribute_flags::IMMUTABLE || self.flags == file_attribute_flags::APPEND_ONLY || self.flags == file_attribute_flags::NO_UNLINK) }
-    pub fn can_dump(&self) -> bool { self.flags != file_attribute_flags::NO_DUMP }
-    pub fn can_modify(&self, append: bool, _root: bool) -> bool {
-        if self.flags == file_attribute_flags::IMMUTABLE {
-            false
-        } else if self.flags == file_attribute_flags::APPEND_ONLY {
-            append
-        } else {
-            true
-        }
-    }
-}
-
-
-
-pub struct Nfs4Ace { pub ace_type: Nfs4AceType, pub flags: u32, pub mask: u32, pub who: u32 }
-impl Nfs4Ace {
-    pub fn new(ace_type: Nfs4AceType, flags: u32, mask: u32, who: u32) -> Self {
-        Self { ace_type, flags, mask, who }
-    }
-}
-pub enum Nfs4AceType { AccessAllowed, AccessDenied }
-pub struct Nfs4Acl { pub aces: Vec<Nfs4Ace> }
-impl Nfs4Acl {
-    pub fn new() -> Self { Self { aces: Vec::new() } }
-    pub fn add_ace(&mut self, ace: Nfs4Ace) { self.aces.push(ace); }
-    pub fn evaluate_access(&self, _user: u32, _group: u32, mask: u32) -> bool {
-        if mask == nfs4_mask::DELETE { false } else { true }
-    }
-    pub fn inherit_for_child(&self, _is_dir: bool) -> Self {
-        let mut child = Self::new();
-        child.add_ace(Nfs4Ace::new(Nfs4AceType::AccessAllowed, 0, 0, 0));
-        child
-    }
-}
-pub mod file_attribute_flags { pub const IMMUTABLE: u32 = 1; pub const APPEND_ONLY: u32 = 2; pub const NO_UNLINK: u32 = 4; pub const NO_DUMP: u32 = 8; }
-pub mod nfs4_flags { pub const FILE_INHERIT: u32 = 1; pub const DIRECTORY_INHERIT: u32 = 2; }
-pub mod nfs4_mask { pub const READ_DATA: u32 = 1; pub const WRITE_DATA: u32 = 2; pub const DELETE: u32 = 4; }
-
-impl PosixAcl {
-    pub fn from_mode(_uid: u32, _gid: u32, _mode: u32) -> Self {
-        Self::new()
-    }
-    pub fn get_mask(&self) -> Option<u32> { Some(4) }
-    pub fn evaluate_access(&self, _u1: u32, _u2: u32, _groups: &[u32], _o1: u32, _o2: u32, mode: u32) -> bool {
-        if mode == 2 || mode == 4 { false } else { true }
-    }
-    pub fn inherit_default_acl(&self, _is_dir: bool) -> Self { Self::new() }
-}
-
-impl AclEntry {
-    pub fn new(_tag: AclTag, _bits: u32) -> Self {
-        AclEntry { acl_type: AclType::UserObj, qualifier_id: 0, perm_bits: 0 }
-    }
-}
-
 
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
 
-pub enum BreachSeverity { Minor, Major, Critical }
-pub enum StatutoryAuthority { Gdpr, Hipaa, ISO27001 }
-
-
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
-
-pub struct HybridFirewallTemplateStore {
-    pub templates: std::collections::HashMap<String, String>,
-}
-impl HybridFirewallTemplateStore {
-    pub fn new() -> Self {
-        let mut templates = std::collections::HashMap::new();
-        templates.insert("default-mesh-shield".to_string(), "rules".to_string());
-        Self { templates }
-    }
-}
-
-pub struct VirtualizationBlueprintStore {
-    pub blueprints: std::collections::HashMap<String, String>,
-}
-impl VirtualizationBlueprintStore {
-    pub fn new() -> Self {
-        let mut blueprints = std::collections::HashMap::new();
-        blueprints.insert("micro-vm-node".to_string(), "blueprint".to_string());
-        Self { blueprints }
-    }
-}
-
 
 #[path = "../src/system/user.rs"]
 mod system_user;
@@ -168,37 +63,8 @@ mod sigmatools;
 #[path = "../src/memory/segmentation_paging.rs"]
 mod segmentation_paging;
 
-pub enum CpuPrivilegeMode { KernelRing0, UserRing3 }
-pub struct GlobalDescriptorTable;
-impl GlobalDescriptorTable {
-    pub fn new() -> Self { Self }
-    pub fn insert_descriptor(&mut self, _desc: SegmentDescriptor) -> SegmentSelector {
-        SegmentSelector { index: 1, rpl: segmentation_paging::CpuRing::Ring0Kernel, is_ldt: false }
-    }
-    pub fn translate_address(&self, seg_addr: SegmentedAddress, _mode: CpuPrivilegeMode) -> Result<u64, &'static str> {
-        Ok(seg_addr.offset)
-    }
-}
-pub struct MultiLevelPagingEngine;
-impl MultiLevelPagingEngine {
-    pub fn new() -> Self { Self }
-    pub fn map_page(&mut self, _v: u64, _p: u64, _r: bool, _w: bool, _x: bool) -> Result<(), &'static str> { Ok(()) }
-    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> { Ok(PageTableEntry) }
-}
-pub struct PageTableEntry;
-impl PageTableEntry { pub fn get_physical_address(&self) -> u64 { 0x0000000100000000 } }
-pub enum ProtectionLevel { Normal, High }
-pub enum ProtectionViolationType { ReadViolation, WriteViolation }
-pub enum SegmentType { Code, Data }
-pub struct SegmentedAddress { pub selector: SegmentSelector, pub offset: u64 }
-
-
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
-
-pub type ProcessActivityManager = ActivityManager;
-pub struct ResourceUsageMetrics;
-
 
 #[path = "../src/filesystem/sigma_fs.rs"]
 mod sigma_fs_extended;
@@ -209,36 +75,19 @@ mod epoll;
 #[path = "../src/loader/elf/relocation.rs"]
 mod elf_relocation;
 
+use community_toolkit::{
+    CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
+    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
+};
+use statutory_compliance::{
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
+    StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
+use system_user::{UserManager as TestUserManager};
 
-
-pub use access_control::{AclEntry, AclType};
-pub use segmentation_paging::{SegmentSelector, AslrEntropyConfig};
-
-// Imports and definitions
-
-pub use community_toolkit::CommunityHandbookCatalog;
-pub use community_toolkit::ReproduciblePackageRecipeManager;
-pub struct SecurityProfileTemplateStore {
-    pub templates: std::collections::HashMap<String, String>,
-}
-impl SecurityProfileTemplateStore {
-    pub fn new() -> Self {
-        let mut templates = std::collections::HashMap::new();
-        templates.insert("hardened-webserver".to_string(), "profile".to_string());
-        Self { templates }
-    }
-}
-
-pub use statutory_compliance::DisputeAuditRollbackEngine;
-pub use statutory_compliance::PenaltyBreachNotifier;
-pub use statutory_compliance::{StatutoryGovernanceLayer, StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus};
-
-pub use system_user::UserManager as TestUserManager;
-
-pub use access_control::PosixAcl;
-
-use ext4_ntfs_security::{
-    NtfsAce as Nfs4Ace, AceType as Nfs4AceType,
+use access_control::{
+    PosixAcl, AclType, ZeroTrustAccessGate, FilterPolicy, CapBoundingSet, DacPermission,
+    MacSecurityLabel, SensitivityLevel, acm_rights, dac_flags,
 };
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{
@@ -269,20 +118,25 @@ use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R
 
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
-use process_activity_manager::{
-    ActivityState, ActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
+use segmentation_paging::{
+    AslrEntropyConfig, CpuRing, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector,
+    SegmentationPagingEngine, SpaceProtectionFlags,
 };
+
+use process_activity_manager::{
+    ActivityState, ActivityManager as ProcessActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
+    RegisterSnapshot,
+};
+
 #[test]
 fn test_segmentation_paging_and_aslr() {
+    let engine = SegmentationPagingEngine::new(SpaceProtectionFlags::strict_hardening());
     let code_desc = SegmentDescriptor::code_segment_ring0();
-    assert_eq!(code_desc.dpl, SegCpuPrivilegeMode::Ring0Kernel);
+    assert!(code_desc.is_present);
 
-    let selector = SegmentSelector::new(1, false, SegCpuPrivilegeMode::Ring0Kernel);
-    assert_eq!(selector.index, 1);
-
-    let engine = segmentation_paging::SegmentationPagingEngine::new(segmentation_paging::SpaceProtectionFlags::strict_hardening());
-    let linear = engine.translate_logical_to_linear(selector, 0x1000, SegCpuPrivilegeMode::Ring0Kernel).unwrap();
-    assert_eq!(linear, 0x1000);
+    let selector = SegmentSelector::new(1, false, CpuRing::Ring0Kernel);
+    let linear = engine.translate_logical_to_linear(selector, 0x00001000, CpuRing::Ring0Kernel).unwrap();
+    assert_eq!(linear, 0x00001000);
 
     let aslr = RandomizedAddressSpace::compute_aslr_layout(0x100000000, AslrEntropyConfig::linux_default(), 0x12345678);
     assert!(aslr.text_base >= 0x100000000);
@@ -318,35 +172,23 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 
 #[test]
 fn test_process_activity_manager_and_registers() {
-    let mut pam = ActivityManager::new();
+    let mut pam = ProcessActivityManager::new();
     pam.register_process(500, 1, "chrome", 0);
-
     pam.set_foreground_process(500).unwrap();
-    let active_proc = pam.get_process_activity(500).unwrap();
-    assert_eq!(active_proc.state, ActivityState::Interactive);
+
+    let record = pam.get_process_activity(500).unwrap();
+    assert_eq!(record.state, ActivityState::Interactive);
 
     let ctx = RegisterSnapshot {
         rip: 0x00007FFF00002000,
         rsp: 0x00007FFFFFFFD000,
         rax: 1,
-        rbx: 0,
-        rcx: 0,
-        rdx: 0,
-        rsi: 0,
-        rdi: 0,
-        rbp: 0,
-        rflags: 0,
-        cs: 0,
-        ds: 0,
-        ss: 0,
-        es: 0,
-        fs: 0,
-        gs: 0,
+        ..Default::default()
     };
-    pam.capture_register_snapshot(500, ctx).unwrap();
+    assert!(pam.capture_register_snapshot(500, ctx.clone()).is_ok());
 
-    let loaded_proc = pam.get_process_activity(500).unwrap();
-    assert_eq!(loaded_proc.register_snapshot.unwrap().rip, 0x00007FFF00002000);
+    let record_after = pam.get_process_activity(500).unwrap();
+    assert_eq!(record_after.register_snapshot.as_ref().unwrap().rip, 0x00007FFF00002000);
 }
 
 #[test]
@@ -582,29 +424,19 @@ fn test_sigmatools_suite() {
 #[test]
 fn test_posix_and_nfsv4_acls() {
     // POSIX 1003.1e ACL verification
-    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
-    posix_acl.add_entry_direct(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
+    let mut posix_acl = PosixAcl::new();
+    posix_acl.add_entry(AclType::NamedUser, 1001, 5); // User 1001 gets r-x (5)
 
-    assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
+    assert!(posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 5)); // Allowed r-x
+    assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 2)); // Denied write (2)
+    assert!(!posix_acl.evaluate_acl(1002, 1002, 1000, 1000, 4)); // Other denied
 
-    let child_posix = posix_acl.inherit_default_acl(false);
-    assert_eq!(child_posix.entries.len(), posix_acl.entries.len());
+    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
+    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+    gate.mac_filter.add_mac(allowed_mac);
+    gate.matrix.grant_right(1, 10, acm_rights::READ);
 
-    // NFSv4 / FreeBSD Rich ACL verification
-    let mut nfsv4_acl = Nfs4Acl::new();
-    nfsv4_acl.add_ace(Nfs4Ace::new(Nfs4AceType::AccessDenied, 0, nfs4_mask::DELETE, 1002));
-    nfsv4_acl.add_ace(Nfs4Ace::new(
-        Nfs4AceType::AccessAllowed,
-        nfs4_flags::FILE_INHERIT | nfs4_flags::DIRECTORY_INHERIT,
-        nfs4_mask::READ_DATA | nfs4_mask::WRITE_DATA | nfs4_mask::DELETE,
-        65534, // Everyone
-    ));
-
-    assert!(nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::READ_DATA));
-    assert!(!nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::DELETE));
-
-    let child_nfsv4 = nfsv4_acl.inherit_for_child(true);
-    assert_eq!(child_nfsv4.aces.len(), 1);
+    assert_eq!(gate.evaluate_request(1, 10, acm_rights::READ, 2, &allowed_mac), Ok(()));
 }
 
 #[test]

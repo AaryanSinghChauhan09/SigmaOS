@@ -1,7 +1,6 @@
-// SPDX-License-Identifier: MIT
-#![no_std]
-
-extern crate alloc;
+/// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
+/// Implements interactive scripting, dynamic script-like functions, positional arguments,
+/// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
 
 use alloc::boxed::Box;
 use alloc::format;
@@ -13,21 +12,11 @@ pub type ScriptID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptLanguage {
-    Python = 0,
-    JavaScript = 1,
-    Lua = 2,
-    Shell = 3,
-}
+pub enum ScriptLanguage { Python = 0, JavaScript = 1, Lua = 2, Shell = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptError {
-    Success = 0,
-    NotFound = 1,
-    ExecutionFailed = 2,
-    InvalidArgument = 3,
-}
+pub enum ScriptError { Success = 0, NotFound = 1, ExecutionFailed = 2, InvalidArgument = 3 }
 
 pub trait Script {
     fn id(&self) -> ScriptID;
@@ -98,7 +87,7 @@ pub trait ScriptEngine {
 pub struct SimpleScriptEngine {
     pub scripts: Vec<Option<Box<dyn Script>>>,
     pub next_id: AtomicUsize,
-    pub aliases: SimpleScriptEnvironment,
+    pub aliases: SimpleScriptEnvironment, // maps @call alias -> target script name
 }
 
 impl SimpleScriptEngine {
@@ -110,10 +99,12 @@ impl SimpleScriptEngine {
         }
     }
 
+    /// Register a @call alias for a script
     pub fn set_script_alias(&mut self, alias: &[u8], script_name: &[u8]) {
         self.aliases.set(alias, script_name);
     }
 
+    /// Executes a loaded script after performing positional parameter expansion (e.g., replacing $1, $2 with arguments)
     pub fn execute_script_with_args(&self, id: ScriptID, args: &[&[u8]]) -> Result<Vec<u8>, ScriptError> {
         let script = self.get_script(id).ok_or(ScriptError::NotFound)?;
         let source = script.source();
@@ -121,6 +112,7 @@ impl SimpleScriptEngine {
         let mut expanded = Vec::new();
         let mut i = 0;
         while i < source.len() {
+            // Check for positional arguments: e.g. $1, $2
             if source[i] == b'$' && i + 1 < source.len() && source[i + 1] >= b'1' && source[i + 1] <= b'9' {
                 let arg_index = (source[i + 1] - b'1') as usize;
                 if arg_index < args.len() {
@@ -138,6 +130,7 @@ impl SimpleScriptEngine {
         Ok(expanded)
     }
 
+    /// Resolve and execute script via @call alias
     pub fn execute_by_alias(&self, alias: &[u8], args: &[&[u8]]) -> Result<Vec<u8>, ScriptError> {
         let target_name = self.aliases.get(alias).ok_or(ScriptError::NotFound)?;
 
@@ -245,6 +238,8 @@ impl ScriptAPI for SimpleScriptAPI {
     }
 }
 
+/// Simple ShellEnvironment helper recycled for scripts alias maps
+#[repr(C)]
 pub struct SimpleScriptEnvironment {
     pub keys: Vec<[u8; 64]>,
     pub values: Vec<[u8; 64]>,
@@ -269,12 +264,8 @@ impl SimpleScriptEnvironment {
         let mut key_entry = [0u8; 64];
         let mut value_entry = [0u8; 64];
 
-        for i in 0..key_len {
-            key_entry[i] = key[i];
-        }
-        for i in 0..value_len {
-            value_entry[i] = value[i];
-        }
+        for i in 0..key_len { key_entry[i] = key[i]; }
+        for i in 0..value_len { value_entry[i] = value[i]; }
 
         for i in 0..self.keys.len() {
             if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
@@ -308,8 +299,13 @@ impl Default for SimpleScriptEnvironment {
     }
 }
 
+// ==========================================
+// ADDITIONAL DIAGNOSTICS & SYSTEM UTILITIES
+// ==========================================
+
+/// Basic UPX-style dynamic payload decompressor (XOR/header-shift unpacker)
 pub struct UpxUnpacker {
-    pub magic_header: [u8; 4],
+    pub magic_header: [u8; 4], // e.g. b"UPX!"
 }
 
 impl UpxUnpacker {
@@ -319,6 +315,7 @@ impl UpxUnpacker {
         }
     }
 
+    /// Decompresses / Unpacks a raw binary chunk if it contains the valid signature header
     pub fn decompress_payload(&self, compressed: &[u8]) -> Result<Vec<u8>, &'static str> {
         if compressed.len() < 8 {
             return Err("UPX: Payload is too small.");
@@ -327,6 +324,7 @@ impl UpxUnpacker {
             return Err("UPX: Signature mismatch (not compressed with UPX).");
         }
 
+        // Simple decompressive decryption: XOR shift with offset bytes
         let mut decompressed = Vec::new();
         for i in 4..compressed.len() {
             decompressed.push(compressed[i] ^ 0x5A);
@@ -348,6 +346,7 @@ pub enum FsEvent {
     Deleted,
 }
 
+/// Basic File Monitor (fs watcher) tracking directory and folder additions/modifications
 pub struct FileMonitor {
     pub monitored_path: [u8; 64],
     pub events_count: u32,
@@ -364,12 +363,14 @@ impl FileMonitor {
         }
     }
 
+    /// Polls/simulates a modification event on a file name
     pub fn simulate_event(&mut self, _file_name: &str, event: FsEvent) -> (FsEvent, u32) {
         self.events_count += 1;
         (event, self.events_count)
     }
 }
 
+/// Basic String Descrambler (XOR key anti-obfuscation utility)
 pub struct StringDescrambler {
     pub xor_key: u8,
 }
@@ -379,6 +380,7 @@ impl StringDescrambler {
         StringDescrambler { xor_key: key }
     }
 
+    /// Descrambles an obfuscated byte sequence on-the-fly
     pub fn descramble_string(&self, scrambled: &[u8]) -> Vec<u8> {
         let mut cleartext = Vec::new();
         for &byte in scrambled {
@@ -421,6 +423,7 @@ impl ScriptArgumentRouter {
         result = result.replace("$@", &all_args);
         result
     }
+}
 
 impl Default for ScriptArgumentRouter {
     fn default() -> Self {
@@ -522,55 +525,5 @@ mod tests {
         let res = router.substitute_arguments("Echo $1 then $2 all $@", &args);
         assert!(res.contains("arg1"));
         assert!(res.contains("arg2"));
-    }
-
-    #[test]
-    fn test_script_argument_router() {
-        let router = ScriptArgumentRouter::new("#!/bin/sh -x");
-        assert_eq!(router.shebang_interpreter, "/bin/sh -x");
-
-        let args = ["app", "arg1", "arg2"];
-        let res = router.substitute_arguments("Echo $1 then $2 all $@", &args);
-        assert!(res.contains("arg1"));
-        assert!(res.contains("arg2"));
-    }
-}
-
-pub struct ScriptArgumentRouter {
-    pub shebang_interpreter: String,
-}
-
-impl ScriptArgumentRouter {
-    pub fn new(shebang_line: &str) -> Self {
-        let interp = if shebang_line.starts_with("#!") {
-            shebang_line.trim_start_matches("#!").trim()
-        } else {
-            "/bin/sh"
-        };
-        Self {
-            shebang_interpreter: interp.to_string(),
-        }
-    }
-
-    pub fn substitute_arguments(&self, script: &str, args: &[&str]) -> String {
-        let mut result = script.to_string();
-        for (i, arg) in args.iter().enumerate() {
-            let var_name = format!("${}", i);
-            result = result.replace(&var_name, arg);
-        }
-
-        let mut all_args = String::new();
-        for (i, arg) in args.iter().skip(1).enumerate() {
-            if i > 0 { all_args.push(' '); }
-            all_args.push_str(arg);
-        }
-        result = result.replace("$@", &all_args);
-        result
-    }
-}
-
-impl Default for ScriptArgumentRouter {
-    fn default() -> Self {
-        Self::new("#!/bin/sh")
     }
 }
