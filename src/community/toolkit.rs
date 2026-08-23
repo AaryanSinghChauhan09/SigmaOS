@@ -226,6 +226,7 @@ impl SecurityProfileTemplateStore {
             templates: HashMap::new(),
         };
         store.register_template("browser_sandboxed", SecurityModelType::OpenBsdPledgeUnveil, "pledge: stdio rpath wpath cpath inet dns tty; unveil: /usr/share r, /home/user/Downloads rwc");
+        store.register_template("hardened-webserver", SecurityModelType::LinuxAppArmor, "profile hardened-webserver");
         store
     }
 
@@ -242,6 +243,42 @@ impl SecurityProfileTemplateStore {
 }
 
 impl Default for SecurityProfileTemplateStore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct HybridFirewallTemplateStore {
+    pub templates: HashMap<String, String>,
+}
+
+impl HybridFirewallTemplateStore {
+    pub fn new() -> Self {
+        let mut store = HashMap::new();
+        store.insert("default-mesh-shield".to_string(), "drop all; accept 80,443".to_string());
+        Self { templates: store }
+    }
+}
+
+impl Default for HybridFirewallTemplateStore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct VirtualizationBlueprintStore {
+    pub blueprints: HashMap<String, String>,
+}
+
+impl VirtualizationBlueprintStore {
+    pub fn new() -> Self {
+        let mut store = HashMap::new();
+        store.insert("micro-vm-node".to_string(), "vcpus: 2, mem: 512MB".to_string());
+        Self { blueprints: store }
+    }
+}
+
+impl Default for VirtualizationBlueprintStore {
     fn default() -> Self {
         Self::new()
     }

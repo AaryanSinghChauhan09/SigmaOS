@@ -44,6 +44,20 @@ pub struct StatutoryGovernanceRule {
     pub max_penalty_amount_usd: u64,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BreachSeverity {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+#[derive(Debug, Clone)]
+pub struct StatutoryAuthority {
+    pub name: String,
+    pub region: String,
+}
+
 /// Breach Alert notification
 #[derive(Debug, Clone)]
 pub struct StatutoryBreachAlert {

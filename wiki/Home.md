@@ -1,4 +1,4 @@
-# 🛡️ SigmaOS — Sovereign, AI-Native Operating System
+# 🚀 SigmaOS Operating System
 
 [![Build Status](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml/badge.svg)](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -77,13 +77,11 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Declarative theming engine
 
 **Boot & Deployment:**
-=======
 - 🔄 TCP/UDP stack - Partial
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
 - ✅ Zenith Desktop prototype
 - ✅ sigma-pkg CLI
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660
 - ⬜ Bootable ISO (Phase G)
 
 
@@ -132,15 +130,9 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - Buddy allocator completion
 - sigma-sh REPL
 - USB HID keyboard driver
-- Bootable ISO image (Phase G)
-- Container manager (Docker/Podman parity)
 
 ---
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-*Last updated: 2026-08-23 | Branch consolidation phase 6 complete — only `main` branch remains*
