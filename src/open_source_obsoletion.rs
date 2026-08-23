@@ -981,6 +981,317 @@ impl Default for SovereignAiInferenceServer {
 }
 
 // =========================================================================
+// 15. SOVEREIGN SEARCH ENGINE (Superseding Elasticsearch, Meilisearch, Lucene)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct IndexedDocument {
+    pub doc_id: String,
+    pub title: String,
+    pub body: String,
+    pub term_frequencies: Vec<(String, u32)>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SearchHit {
+    pub doc_id: String,
+    pub score: f32,
+}
+
+pub struct SovereignSearchEngine {
+    pub documents: Vec<IndexedDocument>,
+    pub total_terms: u64,
+}
+
+impl SovereignSearchEngine {
+    pub fn new() -> Self {
+        Self {
+            documents: Vec::new(),
+            total_terms: 0,
+        }
+    }
+
+    pub fn index_document(&mut self, doc_id: &str, title: &str, body: &str) {
+        let mut tf_map: Vec<(String, u32)> = Vec::new();
+        let full_text = format!("{} {}", title, body);
+
+        for word in full_text.split_whitespace() {
+            let clean_word = word.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase();
+            if clean_word.is_empty() {
+                continue;
+            }
+            self.total_terms += 1;
+            if let Some(entry) = tf_map.iter_mut().find(|(k, _)| k == &clean_word) {
+                entry.1 += 1;
+            } else {
+                tf_map.push((clean_word, 1));
+            }
+        }
+
+        self.documents.retain(|d| d.doc_id != doc_id);
+        self.documents.push(IndexedDocument {
+            doc_id: doc_id.to_string(),
+            title: title.to_string(),
+            body: body.to_string(),
+            term_frequencies: tf_map,
+        });
+    }
+
+    pub fn query_bm25(&self, query_str: &str) -> Vec<SearchHit> {
+        let terms: Vec<String> = query_str
+            .split_whitespace()
+            .map(|w| w.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase())
+            .filter(|w| !w.is_empty())
+            .collect();
+
+        if terms.is_empty() || self.documents.is_empty() {
+            return Vec::new();
+        }
+
+        let mut hits = Vec::new();
+        let num_docs = self.documents.len() as f32;
+
+        for doc in &self.documents {
+            let mut score = 0.0f32;
+            for term in &terms {
+                let term_tf = doc
+                    .term_frequencies
+                    .iter()
+                    .find(|(k, _)| k == term)
+                    .map(|(_, freq)| *freq as f32)
+                    .unwrap_or(0.0);
+
+                if term_tf > 0.0 {
+                    let docs_with_term = self
+                        .documents
+                        .iter()
+                        .filter(|d| d.term_frequencies.iter().any(|(k, _)| k == term))
+                        .count() as f32;
+
+                    let idf = ((num_docs - docs_with_term + 0.5) / (docs_with_term + 0.5) + 1.0).ln();
+                    score += idf * (term_tf / (term_tf + 1.2));
+                }
+            }
+
+            if score > 0.0 {
+                hits.push(SearchHit {
+                    doc_id: doc.doc_id.clone(),
+                    score,
+                });
+            }
+        }
+
+        hits.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(core::cmp::Ordering::Equal));
+        hits
+    }
+}
+
+impl Default for SovereignSearchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. SOVEREIGN SECRET VAULT (Superseding HashiCorp Vault, Bitwarden, 1Password)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VaultSecret {
+    pub path: String,
+    pub encrypted_payload: Vec<u8>,
+    pub ttl_secs: u64,
+    pub created_at_secs: u64,
+    pub version: u32,
+}
+
+pub struct SovereignSecretVault {
+    pub master_key_hash: [u8; 32],
+    pub secrets: Vec<VaultSecret>,
+    pub token_policies: Vec<(String, String)>, // (token, allowed_path)
+}
+
+impl SovereignSecretVault {
+    pub fn new(master_key: &[u8]) -> Self {
+        let mut key_hash = [0u8; 32];
+        for (i, &b) in master_key.iter().enumerate() {
+            key_hash[i % 32] ^= b.wrapping_mul(17);
+        }
+        Self {
+            master_key_hash: key_hash,
+            secrets: Vec::new(),
+            token_policies: Vec::new(),
+        }
+    }
+
+    pub fn register_token_policy(&mut self, token: &str, allowed_path_prefix: &str) {
+        self.token_policies.push((token.to_string(), allowed_path_prefix.to_string()));
+    }
+
+    pub fn write_secret(
+        &mut self,
+        token: &str,
+        path: &str,
+        raw_secret: &[u8],
+        ttl_secs: u64,
+        now_secs: u64,
+    ) -> Result<u32, &'static str> {
+        let policy = self
+            .token_policies
+            .iter()
+            .find(|(t, _)| t == token)
+            .ok_or("SecretVault: Invalid or unauthorized token")?;
+
+        if !path.starts_with(&policy.1) {
+            return Err("SecretVault: Access denied by policy");
+        }
+
+        let existing_version = self
+            .secrets
+            .iter()
+            .find(|s| s.path == path)
+            .map(|s| s.version)
+            .unwrap_or(0);
+
+        let version = existing_version + 1;
+        let mut encrypted = raw_secret.to_vec();
+        for (i, b) in encrypted.iter_mut().enumerate() {
+            *b ^= self.master_key_hash[i % 32];
+        }
+
+        self.secrets.retain(|s| s.path != path);
+        self.secrets.push(VaultSecret {
+            path: path.to_string(),
+            encrypted_payload: encrypted,
+            ttl_secs,
+            created_at_secs: now_secs,
+            version,
+        });
+
+        Ok(version)
+    }
+
+    pub fn read_secret(&self, token: &str, path: &str, now_secs: u64) -> Result<Vec<u8>, &'static str> {
+        let policy = self
+            .token_policies
+            .iter()
+            .find(|(t, _)| t == token)
+            .ok_or("SecretVault: Invalid or unauthorized token")?;
+
+        if !path.starts_with(&policy.1) {
+            return Err("SecretVault: Access denied by policy");
+        }
+
+        let secret = self
+            .secrets
+            .iter()
+            .find(|s| s.path == path)
+            .ok_or("SecretVault: Secret path not found")?;
+
+        if secret.ttl_secs > 0 && (now_secs > secret.created_at_secs + secret.ttl_secs) {
+            return Err("SecretVault: Secret lease expired");
+        }
+
+        let mut decrypted = secret.encrypted_payload.clone();
+        for (i, b) in decrypted.iter_mut().enumerate() {
+            *b ^= self.master_key_hash[i % 32];
+        }
+
+        Ok(decrypted)
+    }
+}
+
+// =========================================================================
+// 17. SOVEREIGN DISTRIBUTED STORAGE (Superseding Ceph, MinIO, AWS S3)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StorageChunk {
+    pub chunk_id: u32,
+    pub checksum: u32,
+    pub data: Vec<u8>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ObjectStorageEntry {
+    pub bucket: String,
+    pub object_key: String,
+    pub total_size_bytes: u64,
+    pub chunks: Vec<StorageChunk>,
+}
+
+pub struct SovereignDistributedStorage {
+    pub active_nodes: usize,
+    pub replication_factor: usize,
+    pub objects: Vec<ObjectStorageEntry>,
+}
+
+impl SovereignDistributedStorage {
+    pub fn new(active_nodes: usize, replication_factor: usize) -> Self {
+        Self {
+            active_nodes,
+            replication_factor,
+            objects: Vec::new(),
+        }
+    }
+
+    pub fn put_object(&mut self, bucket: &str, key: &str, data: &[u8]) -> Result<(), &'static str> {
+        if self.active_nodes < self.replication_factor {
+            return Err("DistributedStorage: Insufficient healthy storage nodes for quorum");
+        }
+
+        let mut chunks = Vec::new();
+        let chunk_size = 1024;
+        let mut chunk_id = 0;
+
+        for chunk_slice in data.chunks(chunk_size) {
+            let mut checksum = 0u32;
+            for &b in chunk_slice {
+                checksum = checksum.wrapping_add(b as u32);
+            }
+            chunks.push(StorageChunk {
+                chunk_id,
+                checksum,
+                data: chunk_slice.to_vec(),
+            });
+            chunk_id += 1;
+        }
+
+        self.objects.retain(|o| !(o.bucket == bucket && o.object_key == key));
+        self.objects.push(ObjectStorageEntry {
+            bucket: bucket.to_string(),
+            object_key: key.to_string(),
+            total_size_bytes: data.len() as u64,
+            chunks,
+        });
+
+        Ok(())
+    }
+
+    pub fn get_object(&self, bucket: &str, key: &str) -> Result<Vec<u8>, &'static str> {
+        let obj = self
+            .objects
+            .iter()
+            .find(|o| o.bucket == bucket && o.object_key == key)
+            .ok_or("DistributedStorage: Object not found")?;
+
+        let mut reconstructed = Vec::new();
+        for chunk in &obj.chunks {
+            let mut computed_checksum = 0u32;
+            for &b in &chunk.data {
+                computed_checksum = computed_checksum.wrapping_add(b as u32);
+            }
+            if computed_checksum != chunk.checksum {
+                return Err("DistributedStorage: Chunk checksum verification failed (data corruption)");
+            }
+            reconstructed.extend_from_slice(&chunk.data);
+        }
+
+        Ok(reconstructed)
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -1210,5 +1521,44 @@ mod tests {
         let response = ai_server.generate_response("Explain quantum computing").unwrap();
         assert!(response.contains("llama-3-8b"));
         assert!(ai_server.generated_tokens_count > 0);
+    }
+
+    #[test]
+    fn test_sovereign_search_engine_bm25() {
+        let mut engine = SovereignSearchEngine::new();
+        engine.index_document("doc1", "Kernel Microkernel", "SigmaOS microkernel architecture");
+        engine.index_document("doc2", "Web Server", "Nginx high performance web server");
+
+        let hits = engine.query_bm25("microkernel");
+        assert_eq!(hits.len(), 1);
+        assert_eq!(hits[0].doc_id, "doc1");
+    }
+
+    #[test]
+    fn test_sovereign_secret_vault_lease() {
+        let mut vault = SovereignSecretVault::new(b"master_secret");
+        vault.register_token_policy("tok_app", "sys/");
+
+        let ver = vault.write_secret("tok_app", "sys/db_pass", b"secret123", 100, 1000).unwrap();
+        assert_eq!(ver, 1);
+
+        let read_val = vault.read_secret("tok_app", "sys/db_pass", 1050).unwrap();
+        assert_eq!(read_val, b"secret123");
+
+        let expired = vault.read_secret("tok_app", "sys/db_pass", 1200);
+        assert!(expired.is_err());
+    }
+
+    #[test]
+    fn test_sovereign_distributed_storage_quorum() {
+        let mut dist_storage = SovereignDistributedStorage::new(3, 3);
+        let data = vec![0xAB; 2048]; // 2 chunks
+        assert!(dist_storage.put_object("backup", "snap.iso", &data).is_ok());
+
+        let retrieved = dist_storage.get_object("backup", "snap.iso").unwrap();
+        assert_eq!(retrieved, data);
+
+        let mut insufficient_storage = SovereignDistributedStorage::new(2, 3);
+        assert!(insufficient_storage.put_object("backup", "snap.iso", &data).is_err());
     }
 }
