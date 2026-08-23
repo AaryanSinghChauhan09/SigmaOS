@@ -27,6 +27,10 @@ echo -e "${CYAN}:: Running Linux & BSD Parity Inspection Unit Tests...${RESET}"
 rustc --edition 2021 --test tests/linux_bsd_inspection_tests.rs -o build/linux_bsd_test
 ./build/linux_bsd_test
 
+echo -e "${CYAN}:: Running Distro Inspection & Security Unit Tests...${RESET}"
+rustc --edition 2021 --test tests/distro_inspection_and_security_tests.rs -o build/distro_inspection_test
+./build/distro_inspection_test
+
 echo -e "${CYAN}:: Running Virtualization, QEMU & KVM Inspection Unit Tests...${RESET}"
 rustc --edition 2021 --test tests/virtualization_qemu_kvm_inspection_tests.rs -o build/qemu_kvm_test
 ./build/qemu_kvm_test
