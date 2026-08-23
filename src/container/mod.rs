@@ -1,4 +1,5 @@
 // SigmaOS Container Module
+pub mod distro_sandbox;
 pub mod oci_runtime;
 pub mod runtime;
 pub mod oci_orchestrator;

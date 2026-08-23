@@ -2,6 +2,7 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod debian_crusher;
 pub mod debian_defeater;
 pub mod importer;
 pub mod makepkg;
@@ -10,11 +11,18 @@ pub mod portage;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
 pub mod verifier;
+pub mod zero_alloc_resolver;
 
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub use universal_adapter::{
+    UniversalPackageManager, AdapterError,
+    DebAdapter, RpmAdapter, PacmanAdapter,
+};
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
@@ -34,8 +42,8 @@ pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
-pub use universal_adapter::{
-    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
+pub use crate::package::universal::{
+    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest,
 };
 pub use verifier::CryptoVerifier;
 
@@ -74,7 +82,7 @@ impl Version {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = parts[0]
+        let major = major_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
         let minor = minor_str

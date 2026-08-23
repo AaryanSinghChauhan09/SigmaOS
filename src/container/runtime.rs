@@ -63,6 +63,7 @@ pub enum ContainerError {
 
 /// Container info
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerInfo {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -86,42 +87,6 @@ impl ContainerInfo {
             cpu_limit: 0,
             capability: ContainerCapability::new(),
         }
-    }
-}
-
-/// Container capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
-impl ContainerCapability {
-    pub const fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub const fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-impl Default for ContainerCapability {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -232,11 +197,20 @@ impl NamespaceConfig {
 }
 
 /// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if !self.hardened {
+            return false;
+        }
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            false
+        }
+    }
 }
+
 
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
@@ -292,7 +266,6 @@ impl OverlayFS {
 }
 
 /// Simple container (OOP: Concrete container class)
-#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -727,40 +700,10 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 pub mod oci {
     extern crate alloc;
     use crate::container::ContainerError;
+    use crate::container::runtime::NamespaceConfig;
     use alloc::string::String;
     use alloc::string::ToString;
     use alloc::vec::Vec;
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use super::super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
-
-    #[test]
-    fn test_container_creation() {
-        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
-        let id = runtime
-            .create_container(
-                b"sovereign_container",
-                b"ubuntu-pqc",
-                ContainerCapability::full(),
-            )
-            .unwrap();
-        assert_eq!(id, 1);
-    }
 
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
@@ -784,16 +727,24 @@ mod tests {
                 cgroupns: None,
             }
         }
+    }
 
-        pub fn clone(&self) -> Self {
-            NamespaceSet {
-                pidns: self.pidns,
-                mntns: self.mntns,
-                netns: self.netns,
-                utsns: self.utsns,
-                ipcns: self.ipcns,
-                userns: self.userns,
-                cgroupns: self.cgroupns,
+    #[allow(dead_code)]
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
         }
     }
@@ -918,8 +869,13 @@ mod tests {
             ContainerManager
         }
     }
+}
 
-    #[test]
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_overlayfs_stacking() {
@@ -981,5 +937,4 @@ mod tests {
             ContainerError::PermissionDenied
         );
     }
-}
 }

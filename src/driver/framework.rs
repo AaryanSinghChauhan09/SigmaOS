@@ -22,10 +22,8 @@ pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
-    Filter = 3,
-    MiniFilter = 4,
-    Storage = 5,
-    Input = 6,
+    Storage = 3,
+    Input = 4,
 }
 
 #[repr(usize)]
@@ -50,11 +48,7 @@ pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
     UnloadFailed = 2,
-    InvalidDevice = 3,
-    IrpNotHandled = 4,
-    AccessDenied = 5,
-    InvalidParameter = 6,
-    ProbeFailed = 7,
+    ProbeFailed = 3,
 }
 
 pub trait NetworkDriver: Driver {
@@ -73,17 +67,17 @@ pub trait InputDriver: Driver {
 
 // Concrete Driver Classes (OOP Implementation)
 
-pub struct SimpleStorageDriver {
+pub struct SimpleDriver {
     pub id: DriverID,
     pub driver_type: DriverType,
     pub state: AtomicUsize,
 }
 
-impl SimpleStorageDriver {
-    pub fn new(id: DriverID) -> Self {
-        SimpleStorageDriver {
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver {
             id,
-            driver_type: DriverType::Storage,
+            driver_type,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
@@ -92,7 +86,7 @@ impl SimpleStorageDriver {
         Ok(())
     }
 
-    pub fn probe(&self) -> Result<bool, DriverError> {
+    pub fn probe(&mut self) -> Result<bool, DriverError> {
         Ok(true)
     }
 
@@ -101,12 +95,12 @@ impl SimpleStorageDriver {
     }
 }
 
-impl Driver for SimpleStorageDriver {
+impl Driver for SimpleDriver {
     fn id(&self) -> DriverID {
         self.id
     }
     fn driver_type(&self) -> DriverType {
-        DriverType::Storage
+        self.driver_type
     }
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
@@ -121,304 +115,7 @@ impl Driver for SimpleStorageDriver {
     }
 }
 
-// =========================================================================
-// WDM & WDF (KMDF / UMDF) Specification Subsystems
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DevicePowerState {
-    D0 = 0, // Fully working
-    D1 = 1, // Low power sleeping
-    D2 = 2, // Deeper sleep
-    D3 = 3, // Off / unpowered
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PnpMinorFunction {
-    StartDevice,
-    QueryStopDevice,
-    StopDevice,
-    CancelStopDevice,
-    QueryRemoveDevice,
-    RemoveDevice,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IrpMajorFunction {
-    Create,        // IRP_MJ_CREATE
-    Close,         // IRP_MJ_CLOSE
-    Read,          // IRP_MJ_READ
-    Write,         // IRP_MJ_WRITE
-    DeviceControl, // IRP_MJ_DEVICE_CONTROL (IOCTL)
-    Power,         // IRP_MJ_POWER
-    Pnp,           // IRP_MJ_PNP
-}
-
-/// Buffer transfer methods for user-kernel communication
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IoctlTransferMethod {
-    MethodBuffered, // Copies input/output via system-allocated kernel buffer
-    MethodInDirect, // Maps input buffer directly via MDL (read access)
-    MethodOutDirect, // Maps output buffer directly via MDL (write access)
-    MethodNeither,  // Uses raw user-mode virtual addresses directly (unsafe/requires validation)
-}
-
-/// Simulated IOCTL Control Code structure
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct IoctlCode {
-    pub device_type: u32,
-    pub function: u32,
-    pub method: IoctlTransferMethod,
-    pub access: u32,
-}
-
-impl IoctlCode {
-    /// CTL_CODE macro equivalent: packs control parameters into a single 32-bit integer
-    pub const fn build(device_type: u32, function: u32, method: IoctlTransferMethod, access: u32) -> Self {
-        Self {
-            device_type,
-            function,
-            method,
-            access,
-        }
-    }
-
-    pub fn to_u32(&self) -> u32 {
-        (self.device_type << 16) | (self.access << 14) | (self.function << 2) | (self.method as u32)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct Irp {
-    pub major_function: IrpMajorFunction,
-    pub io_status: DriverError,
-    pub byte_offset: u64,
-    pub power_state: Option<DevicePowerState>,
-    pub pnp_function: Option<PnpMinorFunction>,
-
-    // User-Kernel memory buffers
-    pub ioctl_code: Option<IoctlCode>,
-    pub input_buffer: Vec<u8>,
-    pub output_buffer: Vec<u8>,
-    pub user_mode_virtual_address: Option<u64>,
-    pub physical_pages_mdl: Vec<u64>, // Simulated locked physical frames for Direct I/O
-}
-
-impl Irp {
-    pub fn new(major: IrpMajorFunction) -> Self {
-        Self {
-            major_function: major,
-            io_status: DriverError::Success,
-            byte_offset: 0,
-            power_state: None,
-            pnp_function: None,
-            ioctl_code: None,
-            input_buffer: Vec::new(),
-            output_buffer: Vec::new(),
-            user_mode_virtual_address: None,
-            physical_pages_mdl: Vec::new(),
-        }
-    }
-}
-
-pub type PdriverDispatch = fn(device: &mut DeviceObject, irp: &mut Irp) -> DriverError;
-
-pub struct DriverObject {
-    pub driver_name: String,
-    pub driver_start: u64,
-    pub driver_size: usize,
-    pub major_function: [Option<PdriverDispatch>; 10], // Registered Dispatch Routines
-    pub driver_unload: Option<fn(&mut DriverObject)>,
-}
-
-impl DriverObject {
-    pub fn new(name: &str) -> Self {
-        Self {
-            driver_name: String::from(name),
-            driver_start: 0,
-            driver_size: 0,
-            major_function: [None; 10],
-            driver_unload: None,
-        }
-    }
-
-    pub fn register_dispatch(&mut self, func: IrpMajorFunction, callback: PdriverDispatch) {
-        self.major_function[func as usize] = Some(callback);
-    }
-}
-
-pub struct DeviceObject {
-    pub driver_object: *mut DriverObject,
-    pub next_device: *mut DeviceObject, // Attached filters/minifilters (Device Stack)
-    pub current_power_state: DevicePowerState,
-    pub is_kernel_mode: bool, // True for KMDF, False for UMDF
-    pub device_extension: u64, // Device-specific state representation
-}
-
-impl DeviceObject {
-    pub fn new(drv: *mut DriverObject, is_kernel: bool) -> Self {
-        Self {
-            driver_object: drv,
-            next_device: core::ptr::null_mut(),
-            current_power_state: DevicePowerState::D0,
-            is_kernel_mode: is_kernel,
-            device_extension: 0,
-        }
-    }
-}
-
-pub struct IoManager {
-    pub devices: Vec<*mut DeviceObject>,
-}
-
-impl IoManager {
-    pub fn new() -> Self {
-        Self {
-            devices: Vec::new(),
-        }
-    }
-
-    pub fn register_device(&mut self, device: *mut DeviceObject) {
-        self.devices.push(device);
-    }
-
-    /// Dispatches an I/O Request Packet (IRP) down the registered device stack
-    pub unsafe fn dispatch_irp(&mut self, device: *mut DeviceObject, irp: &mut Irp) -> DriverError {
-        if device.is_null() {
-            return DriverError::InvalidDevice;
-        }
-
-        let drv_ptr = (*device).driver_object;
-        if drv_ptr.is_null() {
-            return DriverError::InvalidDevice;
-        }
-
-        let major_fn = irp.major_function;
-        if let Some(dispatch_fn) = (*drv_ptr).major_function[major_fn as usize] {
-            let res = dispatch_fn(&mut *device, irp);
-            if res == DriverError::Success && !(*device).next_device.is_null() {
-                // Pass the IRP down the attached filter/device stack
-                return self.dispatch_irp((*device).next_device, irp);
-            }
-            res
-        } else {
-            DriverError::IrpNotHandled
-        }
-    }
-}
-
-// =========================================================================
-// Real-world Legacy, IOCTL, and Filter Driver Simulators
-// =========================================================================
-
-/// Keyboard Filter Driver (captures key logs securely, like PS/2 filter)
-pub fn keyboard_filter_dispatch(device: &mut DeviceObject, irp: &mut Irp) -> DriverError {
-    if irp.major_function == IrpMajorFunction::Read {
-        // Intercept keys, append high entropy codes
-        irp.input_buffer.push(0x41); // Simulated keystroke scan-code
-    }
-    device.current_power_state = DevicePowerState::D0;
-    DriverError::Success
-}
-
-/// USB Storage Filter Driver (enforces forensic write-blocking and IOCTL handlers)
-pub fn usb_forensic_filter_dispatch(device: &mut DeviceObject, irp: &mut Irp) -> DriverError {
-    match irp.major_function {
-        IrpMajorFunction::Write => {
-            // Return write-protected failure simulating the forensic write-blocker
-            irp.io_status = DriverError::UnloadFailed;
-            return DriverError::UnloadFailed;
-        }
-        IrpMajorFunction::DeviceControl => {
-            if let Some(code) = irp.ioctl_code {
-                match code.method {
-                    IoctlTransferMethod::MethodBuffered => {
-                        // Buffered I/O: read input from system kernel buffer, safely write output
-                        if !irp.input_buffer.is_empty() {
-                            let cmd = irp.input_buffer[0];
-                            if cmd == 0x99 { // Mock unlock command
-                                irp.output_buffer.push(0x01); // Success code
-                            }
-                        }
-                    }
-                    IoctlTransferMethod::MethodInDirect | IoctlTransferMethod::MethodOutDirect => {
-                        // Direct I/O: safely access mapped physical pages via MDL
-                        if irp.physical_pages_mdl.is_empty() {
-                            return DriverError::InvalidParameter;
-                        }
-                        irp.output_buffer.push(0xAB);
-                    }
-                    IoctlTransferMethod::MethodNeither => {
-                        // Neither I/O: raw user virtual address requires explicit validation
-                        if let Some(user_addr) = irp.user_mode_virtual_address {
-                            if user_addr >= 0xFFFF_8000_0000_0000 {
-                                return DriverError::AccessDenied; // Attempted kernel space access!
-                            }
-                            irp.output_buffer.push(0xFE);
-                        }
-                    }
-                }
-            }
-        }
-        _ => {}
-    }
-    device.current_power_state = DevicePowerState::D0;
-    DriverError::Success
-}
-
-// =========================================================================
-// Interrupt Handling & Interrupt Descriptor Table (IDT) Subsystems
-// =========================================================================
-
-pub type PisrHandler = fn(vector: u8, context: u64) -> bool;
-
-#[derive(Debug, Clone, Copy)]
-pub struct IdtEntry {
-    pub handler_address: u64,
-    pub privilege_level: u8, // DPL: 0 for Kernel-Mode, 3 for User-Mode
-    pub is_present: bool,
-}
-
-pub struct InterruptDescriptorTable {
-    pub entries: [Option<IdtEntry>; 256],
-}
-
-impl InterruptDescriptorTable {
-    pub fn new() -> Self {
-        Self {
-            entries: [None; 256],
-        }
-    }
-
-    pub fn register_isr(&mut self, vector: u8, handler: u64, privilege: u8) {
-        let entry = IdtEntry {
-            handler_address: handler,
-            privilege_level: privilege,
-            is_present: true,
-        };
-        self.entries[vector as usize] = Some(entry);
-    }
-
-    /// Simulates triggering a hardware interrupt. Validates IDT presence and rings privilege
-    pub fn trigger_interrupt(&self, vector: u8, current_ring_privilege: u8, isr: PisrHandler, context: u64) -> Result<bool, &'static str> {
-        let entry = self.entries[vector as usize].ok_or("Interrupt vector not registered in IDT")?;
-        if !entry.is_present {
-            return Err("Interrupt gate is disabled");
-        }
-
-        if current_ring_privilege > entry.privilege_level {
-            return Err("General Protection Fault: Privilege violation accessing IDT gate");
-        }
-
-        // Call Custom Interrupt Handler
-        let handled = isr(vector, context);
-        Ok(handled)
-    }
-}
-
-// =========================================================================
-// Existing DriverFramework implementation & extensions
-// =========================================================================
+pub type SimpleStorageDriver = SimpleDriver;
 
 pub trait DriverFramework {
     fn register_driver(&mut self, driver: Box<dyn Driver>) -> Result<DriverID, DriverError>;
@@ -633,5 +330,63 @@ mod tests {
         let res_user = idt.trigger_interrupt(0x21, 3, mock_keyboard_isr, 0x99AA);
         assert!(res_user.is_err());
         assert_eq!(res_user.unwrap_err(), "General Protection Fault: Privilege violation accessing IDT gate");
+    }
+}
+
+
+#[cfg(test)]
+mod shim_tests {
+    use super::*;
+
+    static mut OPEN_CALLED: i32 = 0;
+    static mut RELEASE_CALLED: i32 = 0;
+
+    fn mock_open() -> i32 {
+        unsafe { OPEN_CALLED += 1; }
+        0
+    }
+
+    fn mock_release() -> i32 {
+        unsafe { RELEASE_CALLED += 1; }
+        0
+    }
+
+    fn mock_read(_buf: &mut [u8]) -> i32 { 0 }
+    fn mock_write(_buf: &[u8]) -> i32 { 0 }
+    fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 { 0 }
+
+    #[test]
+    fn test_linux_driver_shim() {
+        let fops = LinuxFileOperations {
+            open: mock_open,
+            release: mock_release,
+            read: mock_read,
+            write: mock_write,
+            ioctl: mock_ioctl,
+        };
+
+        let mut shim = LinuxDriverShim::new(42, "e1000", DriverType::Network, fops);
+        assert_eq!(shim.id(), 42);
+        assert_eq!(shim.driver_type(), DriverType::Network);
+
+        assert!(shim.init().is_ok());
+        unsafe { assert_eq!(OPEN_CALLED, 1); }
+
+        assert!(shim.load().is_ok());
+        assert_eq!(shim.state(), DriverState::Active);
+
+        assert!(shim.unload().is_ok());
+        unsafe { assert_eq!(RELEASE_CALLED, 1); }
+    }
+
+    #[test]
+    fn test_procedural_driver_dispatch_table() {
+        let table = ProceduralDriverDispatchTable::empty();
+        assert_eq!((table.p_init)(10), 0);
+        assert_eq!((table.p_open)(10), 0);
+        assert_eq!((table.p_close)(10), 0);
+        assert_eq!((table.p_read)(10, core::ptr::null_mut(), 0), 0);
+        assert_eq!((table.p_write)(10, core::ptr::null(), 0), 0);
+        assert_eq!((table.p_ioctl)(10, 0x1234, 0), 0);
     }
 }
