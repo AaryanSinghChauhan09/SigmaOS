@@ -555,6 +555,49 @@ impl ZeroTrustAccessGate {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. NFSv4 / FREEBSD RICH ACLs & FILE ATTRIBUTES
+// ─────────────────────────────────────────────────────────────────────────────
+
+pub mod nfs4_flags {
+    pub const FILE_INHERIT: u32 = 0x01;
+    pub const DIRECTORY_INHERIT: u32 = 0x02;
+    pub const NO_PROPAGATE_INHERIT: u32 = 0x04;
+    pub const INHERIT_ONLY: u32 = 0x08;
+}
+
+pub mod nfs4_mask {
+    pub const READ_DATA: u32 = 0x01;
+    pub const WRITE_DATA: u32 = 0x02;
+    pub const APPEND_DATA: u32 = 0x04;
+    pub const READ_NAMED_ATTRS: u32 = 0x08;
+    pub const WRITE_NAMED_ATTRS: u32 = 0x10;
+    pub const EXECUTE: u32 = 0x20;
+    pub const DELETE_CHILD: u32 = 0x40;
+    pub const READ_ATTRIBUTES: u32 = 0x80;
+    pub const WRITE_ATTRIBUTES: u32 = 0x100;
+    pub const DELETE: u32 = 0x10000;
+    pub const READ_ACL: u32 = 0x20000;
+    pub const WRITE_ACL: u32 = 0x40000;
+    pub const WRITE_OWNER: u32 = 0x80000;
+    pub const SYNCHRONIZE: u32 = 0x100000;
+}
+
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CpuPrivilegeEnforcer {
+    pub ring_mode: ExecutionRingMode,
+}
+
+impl CpuPrivilegeEnforcer {
+    pub fn new(ring_mode: ExecutionRingMode) -> Self {
+        Self { ring_mode }
+    }
+
+    pub fn can_execute_privileged_instruction(&self) -> bool {
+        matches!(self.ring_mode, ExecutionRingMode::Ring0Supervisor)
+    }
+}
 
 #[cfg(test)]
 mod tests {

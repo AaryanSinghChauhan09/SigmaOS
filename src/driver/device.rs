@@ -651,6 +651,12 @@ impl Device for SimpleBlockDevice {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PortAddress {
+    PortIO(u16),
+    MemoryMapped(u32),
+}
+
 #[cfg(test)]
 mod legacy_tests {
     use super::*;
@@ -1329,6 +1335,14 @@ impl<T> Vec<T> {
 
     pub fn len(&self) -> usize {
         self.len
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        if self.data.is_null() || self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
     }
 
     pub fn clear(&mut self) {

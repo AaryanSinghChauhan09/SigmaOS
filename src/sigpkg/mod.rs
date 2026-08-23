@@ -74,7 +74,7 @@ impl Version {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = major_str
+        let major = parts[0]
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
         let minor = minor_str
