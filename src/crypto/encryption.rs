@@ -57,7 +57,7 @@ pub trait EncryptionService {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CryptoError { Success = 0, KeyNotFound = 1, EncryptionFailed = 2 }
+pub enum CryptoError { Success = 0, KeyNotFound = 1, EncryptionFailed = 2, InvalidKey = 3 }
 
 pub struct SimpleEncryptionService {
     keys: Vec<Option<Box<dyn EncryptionKey>>>,
@@ -77,8 +77,11 @@ impl EncryptionService for SimpleEncryptionService {
                     if key.id() == key_id {
                         let mut encrypted = Vec::new();
                         let key_bytes = key.key_data();
+                        if key_bytes.is_empty() {
+                            return Err(CryptoError::InvalidKey);
+                        }
                         for (idx, byte) in data.iter().enumerate() {
-                            let mask = if key_bytes.is_empty() { 0x42 } else { key_bytes[idx % key_bytes.len()] };
+                            let mask = key_bytes[idx % key_bytes.len()];
                             encrypted.push(*byte ^ mask);
                         }
                         return Ok(encrypted);
@@ -96,8 +99,11 @@ impl EncryptionService for SimpleEncryptionService {
                     if key.id() == key_id {
                         let mut decrypted = Vec::new();
                         let key_bytes = key.key_data();
+                        if key_bytes.is_empty() {
+                            return Err(CryptoError::InvalidKey);
+                        }
                         for (idx, byte) in data.iter().enumerate() {
-                            let mask = if key_bytes.is_empty() { 0x42 } else { key_bytes[idx % key_bytes.len()] };
+                            let mask = key_bytes[idx % key_bytes.len()];
                             decrypted.push(*byte ^ mask);
                         }
                         return Ok(decrypted);
@@ -113,33 +119,6 @@ impl EncryptionService for SimpleEncryptionService {
         Ok(id)
     }
 }
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 #[cfg(test)]
 mod tests {
@@ -158,38 +137,10 @@ mod tests {
 
         // Ensure it did not use the hardcoded 0x42 constant
         let bad_ciphertext: Vec<u8> = plaintext.iter().map(|&b| b ^ 0x42).collect();
-        let mut mismatch = false;
-        for i in 0..plaintext.len() {
-            if ciphertext.data.is_null() || unsafe { *ciphertext.data.add(i) } != unsafe { *bad_ciphertext.data.add(i) } {
-                mismatch = true;
-                break;
-            }
-        }
-        assert!(mismatch, "Should not use the hardcoded 0x42 XOR mask");
+        assert_ne!(ciphertext, bad_ciphertext);
 
         // Decrypt and verify
-        let decrypted = service.decrypt(&ciphertext.to_slice(), 101).unwrap();
-        assert_eq!(decrypted.to_slice(), plaintext);
-    }
-}
-
-// Add helpful conversion for testing
-impl<T: Clone> Vec<T> {
-    fn to_slice(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T: Clone> core::iter::FromIterator<T> for Vec<T> {
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut vec = Vec::new();
-        for item in iter {
-            vec.push(item);
-        }
-        vec
+        let decrypted = service.decrypt(&ciphertext, 101).unwrap();
+        assert_eq!(decrypted, plaintext);
     }
 }
