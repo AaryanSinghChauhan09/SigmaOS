@@ -1032,6 +1032,7 @@ impl Default for PacmanDbCleaner {
 pub struct WikiPage {
     pub title: String,
     pub content: String,
+    pub category: String,
 }
 
 pub struct ArchWikiSearchEngine {
@@ -1044,20 +1045,52 @@ impl ArchWikiSearchEngine {
     }
 
     pub fn index_page(&mut self, title: &str, content: &str) {
+        self.index_page_with_category(title, content, "General");
+    }
+
+    pub fn index_page_with_category(&mut self, title: &str, content: &str, category: &str) {
         self.pages.push(WikiPage {
             title: title.to_string(),
             content: content.to_string(),
+            category: category.to_string(),
         });
     }
 
     pub fn search_topics(&self, query: &str) -> Vec<&WikiPage> {
         let mut results = Vec::new();
         for page in &self.pages {
-            if page.title.contains(query) || page.content.contains(query) {
+            if page.title.contains(query) || page.content.contains(query) || page.category.contains(query) {
                 results.push(page);
             }
         }
         results
+    }
+
+    pub fn search_by_category(&self, category: &str) -> Vec<&WikiPage> {
+        self.pages.iter().filter(|p| p.category == category).collect()
+    }
+
+    pub fn search_with_ranking(&self, query: &str) -> Vec<(&WikiPage, usize)> {
+        let mut scored: Vec<(&WikiPage, usize)> = self.pages.iter().filter_map(|page| {
+            let mut score = 0;
+            if page.title.contains(query) {
+                score += 10;
+            }
+            if page.category.contains(query) {
+                score += 5;
+            }
+            if page.content.contains(query) {
+                score += 1;
+            }
+            if score > 0 {
+                Some((page, score))
+            } else {
+                None
+            }
+        }).collect();
+
+        scored.sort_by(|a, b| b.1.cmp(&a.1));
+        scored
     }
 }
 
