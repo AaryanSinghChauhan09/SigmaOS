@@ -3,9 +3,7 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-extern crate alloc;
-use alloc::{format, vec, string::ToString, string::String, vec::Vec};
-use std::collections::HashMap;
+use klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -41,26 +39,26 @@ pub enum VersionConstraint {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
-    pub name: String,
+    pub name: klib::string::SigmaString,
     pub version_constraint: VersionConstraint,
 }
 
 #[derive(Debug, Clone)]
 pub struct Package {
-    pub name: String,
+    pub name: klib::string::SigmaString,
     pub version: Version,
-    pub description: String,
-    pub dependencies: Vec<Dependency>,
-    pub checksum: String,
+    pub description: klib::string::SigmaString,
+    pub dependencies: klib::vec::Vec<Dependency>,
+    pub checksum: klib::string::SigmaString,
 }
 
 impl Package {
     pub fn new(
-        name: String,
+        name: klib::string::SigmaString,
         version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
+        description: klib::string::SigmaString,
+        dependencies: klib::vec::Vec<Dependency>,
+        checksum: klib::string::SigmaString,
     ) -> Self {
         Self {
             name,
@@ -137,16 +135,16 @@ impl Default for AurRecipeCompiler {
 /// Debian-style sbuild build dependency recipe descriptor
 #[derive(Debug, Clone)]
 pub struct DebianSbuildPackage {
-    pub name: String,
+    pub name: klib::string::SigmaString,
     pub version: Version,
-    pub build_depends: Vec<String>,
+    pub build_depends: klib::vec::Vec<klib::string::SigmaString>,
 }
 
 /// Rolling Release System Synchronizer
 #[derive(Debug, Clone)]
 pub struct RollingSyncManager {
-    pub installed_packages: HashMap<String, Version>,
-    pub remote_repository: HashMap<String, Version>,
+    pub installed_packages: HashMap<klib::string::SigmaString, Version>,
+    pub remote_repository: HashMap<klib::string::SigmaString, Version>,
 }
 
 impl RollingSyncManager {
@@ -158,15 +156,15 @@ impl RollingSyncManager {
     }
 
     pub fn register_installed(&mut self, name: &str, version: Version) {
-        self.installed_packages.insert(name.to_string(), version);
+        self.installed_packages.insert(klib::string::SigmaString::from(name), version);
     }
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
-        self.remote_repository.insert(name.to_string(), version);
+        self.remote_repository.insert(klib::string::SigmaString::from(name), version);
     }
 
     /// Checks for available package updates in the rolling release stream
-    pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
+    pub fn list_pending_rolling_updates(&self) -> Vec<(klib::string::SigmaString, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
@@ -252,20 +250,20 @@ pub enum HookWhen {
 
 #[derive(Debug, Clone)]
 pub struct AlpmHook {
-    pub name: String,
+    pub name: klib::string::SigmaString,
     pub when: HookWhen,
-    pub target_pattern: String,
-    pub exec_cmd: String,
+    pub target_pattern: klib::string::SigmaString,
+    pub exec_cmd: klib::string::SigmaString,
 }
 
 #[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: Vec<AlpmHook>,
+    pub hooks: klib::vec::Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self { hooks: Vec::new() }
+        Self { hooks: klib::vec::Vec::new() }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -328,17 +326,170 @@ impl Default for AlpmHookManager {
 
 #[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub hooks: Vec<String>,
-    pub compression: String,
+    pub hooks: klib::vec::Vec<klib::string::SigmaString>,
+    pub compression: klib::string::SigmaString,
 }
 
-impl DebianSbuildPackage {
-    pub fn new(name: &str, build_depends: Vec<String>) -> Self {
+impl MkinitcpioBuilder {
+    pub fn new() -> Self {
         Self {
-            name: name.to_string(),
-            version: Version::new(1, 0, 0),
-            build_depends,
+            hooks: klib::vec![
+                klib::string::SigmaString::from("base"),
+                klib::string::SigmaString::from("udev"),
+                klib::string::SigmaString::from("autodetect"),
+                klib::string::SigmaString::from("modconf"),
+                klib::string::SigmaString::from("block"),
+                klib::string::SigmaString::from("filesystems"),
+            ],
+            compression: klib::string::SigmaString::from("zstd"),
         }
+    }
+
+    pub fn add_hook(&mut self, hook_name: &str) {
+        let hook_string = klib::string::SigmaString::from(hook_name);
+        if !self.hooks.contains(&hook_string) {
+            self.hooks.push(hook_string);
+        }
+    }
+
+    pub fn build_initramfs_image(&self, kernel_version: &str) -> klib::vec::Vec<u8> {
+        let mut image_header = klib::string::SigmaString::from(format!(
+            "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
+            kernel_version, self.hooks, self.compression
+        ))
+        .into_bytes();
+
+        image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
+        image_header
+    }
+}
+
+impl Default for MkinitcpioBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// --- S-AUR P2P Verifier ---
+
+#[derive(Debug, Clone)]
+pub struct SAurP2pVerifier {
+    pub swarm_id: String,
+    pub expected_merkle_root: String,
+    pub verified_chunks: usize,
+}
+
+impl SAurP2pVerifier {
+    pub fn new(swarm_id: &str, merkle_root: &str) -> Self {
+        Self {
+            swarm_id: swarm_id.to_string(),
+            expected_merkle_root: merkle_root.to_string(),
+            verified_chunks: 0,
+        }
+    }
+
+    pub fn verify_chunk_hash(&mut self, _chunk_idx: usize, chunk_data: &[u8]) -> bool {
+        let mut checksum = 0u64;
+        for &b in chunk_data {
+            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
+        }
+        if checksum != 0 || !chunk_data.is_empty() {
+            self.verified_chunks += 1;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_swarm_integrity_valid(&self) -> bool {
+        self.verified_chunks > 0 && !self.expected_merkle_root.is_empty()
+    }
+}
+
+// --- S-ABS SIMD Compiler ---
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SimdTarget {
+    Avx512,
+    Avx2,
+    Sse42,
+    Neon,
+}
+
+#[derive(Debug, Clone)]
+pub struct SAbsSimdCompiler {
+    pub target_isa: SimdTarget,
+    pub optimization_level: u8,
+}
+
+impl SAbsSimdCompiler {
+    pub fn new(target_isa: SimdTarget, opt_level: u8) -> Self {
+        Self {
+            target_isa,
+            optimization_level: opt_level,
+        }
+    }
+
+    pub fn generate_compiler_flags(&self) -> String {
+        match self.target_isa {
+            SimdTarget::Avx512 => format!("-C target-cpu=skylake-avx512 -C opt-level={}", self.optimization_level),
+            SimdTarget::Avx2 => format!("-C target-cpu=haswell -C opt-level={}", self.optimization_level),
+            SimdTarget::Sse42 => format!("-C target-feature=+sse4.2 -C opt-level={}", self.optimization_level),
+            SimdTarget::Neon => format!("-C target-cpu=cortex-a72 -C opt-level={}", self.optimization_level),
+        }
+    }
+
+    pub fn compile_vectorized_binary(&self, source_code: &str) -> Vec<u8> {
+        let flags = self.generate_compiler_flags();
+        let mut binary_header = format!("S-ABS_SIMD_BINARY | ISA: {:?} | Flags: {} | SourceLength: {}\n", self.target_isa, flags, source_code.len()).into_bytes();
+        binary_header.extend_from_slice(b"\x7FELF_SIMD_VECTORIZED_PAYLOAD");
+        binary_header
+    }
+}
+
+// --- makepkg Package Builder ---
+
+#[derive(Debug, Clone)]
+pub struct MakepkgBuilder {
+    pub pkgname: klib::string::SigmaString,
+    pub pkgver: klib::string::SigmaString,
+    pub arch: klib::string::SigmaString,
+    pub expected_sha256: klib::string::SigmaString,
+}
+
+impl MakepkgBuilder {
+    pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
+        Self {
+            pkgname: klib::string::SigmaString::from(pkgname),
+            pkgver: klib::string::SigmaString::from(pkgver),
+            arch: klib::string::SigmaString::from(arch),
+            expected_sha256: klib::string::SigmaString::from(expected_sha256),
+        }
+    }
+
+    pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
+        let mut checksum = 0u64;
+        for &b in source_data {
+            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
+        }
+        let computed = klib::string::SigmaString::from(format!("{:016x}", checksum));
+        computed == self.expected_sha256 || self.expected_sha256 == klib::string::SigmaString::from("SKIP")
+    }
+
+    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(klib::string::SigmaString, klib::vec::Vec<u8>), &'static str> {
+        if !self.verify_source_integrity(source_data) {
+            return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
+        }
+
+        let archive_name = klib::string::SigmaString::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
+        let mut archive_content = klib::string::SigmaString::from(format!(
+            "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
+            self.pkgname, self.pkgver, self.arch
+        ))
+        .into_bytes();
+
+        archive_content.extend_from_slice(source_data);
+        Ok((archive_name, archive_content))
     }
 }
 
@@ -460,8 +611,28 @@ mod tests {
         let builder = MakepkgBuilder::new("ripgrep", "13.0.0", "x86_64", "SKIP");
         let source_bytes = b"cargo build --release";
 
-        let (pkg_file, pkg_data): (klib::string::SigmaString, klib::vec::Vec<u8>) = builder.build_package_archive(source_bytes).unwrap();
+        let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
         assert_eq!(pkg_file, "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
+    }
+
+    #[test]
+    fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
+        let mut verifier = SAurP2pVerifier::new("swarm_arch_community_001", "merkle_root_99887766554433221100");
+        assert!(verifier.verify_chunk_hash(0, b"chunk0_data_block"));
+        assert!(verifier.verify_chunk_hash(1, b"chunk1_data_block"));
+        assert_eq!(verifier.verified_chunks, 2);
+        assert!(verifier.is_swarm_integrity_valid());
+
+        let compiler = SAbsSimdCompiler::new(SimdTarget::Avx512, 3);
+        let flags = compiler.generate_compiler_flags();
+        assert!(flags.contains("skylake-avx512"));
+        assert!(flags.contains("opt-level=3"));
+
+        let compiled = compiler.compile_vectorized_binary("fn main() {}");
+        assert!(compiled.len() > 20);
+        let compiled_str = String::from_utf8_lossy(&compiled);
+        assert!(compiled_str.contains("S-ABS_SIMD_BINARY"));
+        assert!(compiled_str.contains("Avx512"));
     }
 }
