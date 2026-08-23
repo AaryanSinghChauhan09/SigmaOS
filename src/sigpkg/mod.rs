@@ -38,19 +38,27 @@ impl Version {
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
         let parts: Vec<&str> = version_str.split('.').collect();
-        if parts.len() != 3 {
+        if parts.is_empty() || parts.len() > 3 {
             return Err(ParseError::InvalidFormat);
         }
 
         let major = parts[0]
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = parts[1]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = parts[2]
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
+        let minor = if parts.len() >= 2 {
+            parts[1]
+                .parse::<u64>()
+                .map_err(|_| ParseError::InvalidNumber)?
+        } else {
+            0
+        };
+        let patch = if parts.len() >= 3 {
+            parts[2]
+                .parse::<u64>()
+                .map_err(|_| ParseError::InvalidNumber)?
+        } else {
+            0
+        };
 
         Ok(Version::new(major, minor, patch))
     }
@@ -76,6 +84,18 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
+}
+
+impl Package {
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
 }
 
 /// Package dependency

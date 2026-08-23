@@ -84,7 +84,8 @@ impl BsdPfStateTable {
             state.packets_passed += 1;
             state.last_seen_timestamp_sec = now_sec;
 
-            if let (Some(nat_ip), Some(nat_port)) = (&state.translated_src_ip, state.translated_src_port) {
+            if let (Some(ref nat_ip), Some(nat_port)) = (&state.translated_src_ip, state.translated_src_port) {
+                let nat_ip: &String = nat_ip;
                 Ok(Some((nat_ip.clone(), nat_port)))
             } else {
                 Ok(None)
@@ -95,7 +96,7 @@ impl BsdPfStateTable {
     }
 
     pub fn expire_states(&mut self, now_sec: u64) -> usize {
-        let mut expired_keys = Vec::new();
+        let mut expired_keys: Vec<PfFiveTuple> = Vec::new();
         for (tuple, state) in &self.states {
             if now_sec > state.last_seen_timestamp_sec.saturating_add(state.timeout_sec) {
                 expired_keys.push(tuple.clone());
@@ -157,7 +158,8 @@ impl LinuxFutexEngine {
     pub fn futex_wake(&mut self, uaddr: u64, val_wake: usize) -> usize {
         let mut woken = 0;
         if let Some(waiters) = self.buckets.get_mut(&uaddr) {
-            let count = val_wake.min(waiters.len());
+            let waiters_len = waiters.len();
+            let count = val_wake.min(waiters_len);
             for _ in 0..count {
                 if !waiters.is_empty() {
                     waiters.remove(0);
@@ -209,7 +211,8 @@ impl FreeBsdVfsNullfs {
 
     pub fn resolve_overlay_path(&self, overlay_path: &str, is_write: bool) -> Result<(String, Option<u32>), &'static str> {
         for (mp, node) in &self.mounts {
-            if overlay_path == mp || (overlay_path.starts_with(mp) && overlay_path.as_bytes().get(mp.len()) == Some(&b'/')) {
+            let mp: &String = mp;
+            if overlay_path == mp || (overlay_path.starts_with(mp.as_str()) && overlay_path.as_bytes().get(mp.len()) == Some(&b'/')) {
                 if is_write && node.read_only {
                     return Err("Nullfs: EROFS - Read-only file system layer");
                 }
@@ -281,6 +284,7 @@ impl OpenBsdPledge {
             return true;
         }
         for promise in &self.promises {
+            let promise: &String = promise;
             if promise.as_str() == operation {
                 return true;
             }
@@ -1919,6 +1923,7 @@ impl VoidRunitInit {
     
     pub fn is_running(&self, service: &str) -> bool {
         for s in &self.services {
+            let s: &String = s;
             if s.as_str() == service {
                 return true;
             }

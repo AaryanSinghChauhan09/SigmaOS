@@ -1,9 +1,8 @@
-use crate::klib::Uuid;
 // SigmaOS Multi-Application Parity Integration Layer (advanced_app_absorber)
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, VecDeque, BTreeMap};
 use std::path::{Path, PathBuf};
 
 // =========================================================================
@@ -67,10 +66,11 @@ impl ShareXFlameshotEngine {
 
         // Add ShareX-style auto upload if enabled
         if self.auto_upload_enabled {
+            let capture_id = self.screenshot_history.len() + 1;
             screenshot.cloud_url = Some(format!(
                 "{}/capture_{}.png",
                 self.target_cloud_destination,
-                Uuid::new_v4()
+                capture_id
             ));
         }
 
@@ -100,7 +100,7 @@ pub struct PotPlayerVlcEngine {
 
 impl PotPlayerVlcEngine {
     pub fn new() -> Self {
-        let mut eq = HashMap::new();
+        let mut eq = BTreeMap::new();
         eq.insert("BassBoost".to_string(), vec![6.0, 4.0, 2.0, 0.0, 0.0, 0.0]);
         eq.insert("VocalClear".to_string(), vec![0.0, 0.0, 2.0, 4.0, 4.0, 2.0]);
 
@@ -345,7 +345,7 @@ impl NotepadPlusWorkspace {
     pub fn new() -> Self {
         Self {
             tabs: vec![("untitled.txt".to_string(), "".to_string())],
-            macros: HashMap::new(),
+            macros: BTreeMap::new(),
             active_tab_index: 0,
         }
     }
@@ -389,7 +389,7 @@ impl OneCommanderDualPane {
                 current_directory: PathBuf::from("/home"),
                 selected_files: Vec::new(),
             },
-            tags_colors: BTreeMap::new(),
+            tags_colors: HashMap::new(),
         }
     }
 

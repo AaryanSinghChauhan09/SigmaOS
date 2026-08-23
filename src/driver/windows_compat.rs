@@ -3,9 +3,9 @@
 
 extern crate alloc;
 
-// use crate::driver::device::{
-//     BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
-// };
+use crate::driver::device::{
+    BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
+};
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;

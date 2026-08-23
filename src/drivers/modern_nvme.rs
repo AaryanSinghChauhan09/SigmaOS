@@ -82,20 +82,6 @@ impl Default for SmartTelemetry {
     }
 }
 
-/// Simulated AHCI SATA Command Header structure (HBA memory layout)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AhciCommandHeader {
-    pub opts: u16,
-    pub prdtl: u16,
-    pub prdbc: u32,
-    pub ctba: u64,
-}
-
-impl AhciCommandHeader {
-    pub const fn new() -> Self {
-        Self { opts: 0, prdtl: 0, prdbc: 0, ctba: 0 }
-    }
-}
 
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
@@ -107,7 +93,7 @@ impl AhciPort {
     pub const fn new() -> Self {
         Self {
             cmd_issue: 0,
-            cmd_headers: [AhciCommandHeader::new(); 32],
+            cmd_headers: [AhciCommandHeader { opts: 0, prdtl: 0, prdbc: 0, ctba: 0, reserved: [0; 4] }; 32],
         }
     }
 

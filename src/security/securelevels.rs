@@ -3,7 +3,7 @@
 
 extern crate alloc;
 
-use crate::klib::error::{SecurityError, SigmaError};
+use crate::security::unveil::{SecurityError, SigmaError};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU8, Ordering};
 

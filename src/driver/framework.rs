@@ -14,14 +14,6 @@ pub enum DriverType {
     Storage = 3,
     Input = 4,
 }
-#[derive(Debug, Clone, Copy)]
-pub enum DriverType { Block = 0, Char = 1, Network = 2 }
-#[derive(Debug, Clone, Copy)]
-pub enum DriverType {
-    Block = 0,
-    Char = 1,
-    Network = 2,
-}
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,18 +32,12 @@ pub trait Driver {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
     UnloadFailed = 2,
     ProbeFailed = 3,
-}
-pub enum DriverError { Success = 0, LoadFailed = 1, UnloadFailed = 2 }
-pub enum DriverError {
-    Success = 0,
-    LoadFailed = 1,
-    UnloadFailed = 2,
 }
 
 #[repr(C)]
@@ -80,12 +66,6 @@ impl SimpleDriver {
 
     pub fn shutdown(&mut self) -> Result<(), DriverError> {
         Ok(())
-        SimpleDriver { id, driver_type, state: AtomicUsize::new(DriverState::Unloaded as usize) }
-        SimpleDriver {
-            id,
-            driver_type,
-            state: AtomicUsize::new(DriverState::Unloaded as usize),
-        }
     }
 }
 
