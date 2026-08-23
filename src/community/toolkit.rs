@@ -99,6 +99,9 @@ impl Default for CommunityHandbookCatalog {
     }
 }
 
+pub struct HybridFirewallTemplateStore {
+    pub templates: HashMap<String, String>,
+}
 
 impl HybridFirewallTemplateStore {
     pub fn new() -> Self {
@@ -243,10 +246,6 @@ impl Default for SecurityProfileTemplateStore {
     fn default() -> Self {
         Self::new()
     }
-}
-
-pub struct HybridFirewallTemplateStore {
-    pub templates: HashMap<String, String>,
 }
 
 #[cfg(test)]

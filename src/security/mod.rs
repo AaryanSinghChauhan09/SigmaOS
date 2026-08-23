@@ -16,6 +16,12 @@ pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
+pub mod bridge;
+pub mod deobfuscation;
+pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
+pub mod prism;
+pub mod sandbox;
+pub mod qubes_isolation;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
@@ -24,6 +30,8 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+
+pub use qubes_isolation::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};

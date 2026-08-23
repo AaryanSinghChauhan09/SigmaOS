@@ -7,10 +7,44 @@ pub mod historic_linux;
 pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod sovereign_suite;
-pub mod tiny_core;
-pub mod wasm_sandbox;
+pub mod india_stack_localization;
+pub mod legacy_adapters;
+pub mod india_professional_tools;
+pub mod canonical;
+pub mod fedora;
+pub mod arch_linux;
+pub mod gap_closure;
+pub mod superiority;
 pub mod open_source_tier1;
+pub mod interim;
+pub mod lubuntu;
+pub mod cross_platform_kernel;
+pub mod wasm_sandbox;
+pub mod tiny_core;
+pub mod sovereign_suite;
+
+pub use gap_closure::{
+    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
+    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
+    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
+    HidGraphicsDriver, AiTaskOrchestrator,
+};
+pub use superiority::{
+    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
+    SovereignTimeMachine, NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine,
+    SovereignForensics, SovereignRecoverUtility, ShardIgnitor,
+};
+
+pub use arch_linux::{
+    ProcFileType, ProcFile, DevFileType, DevFile, ArchPackage, PacmanError, PacmanEngine,
+    RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule, ArchFirewall,
+    LsmMode, LsmSentinel, PamGate, PaneLayout, TmuxMultiplexer, SovereignEnvRegistry,
+    AurRepoStatus, YayParuAdapter, ArchMirror, ReflectorMirrorlist, SubvolumeConfig,
+    ArchinstallConfig, ArchinstallParity, ArtixInitSystemType, ServiceState, ArtixInitBridge,
+    KeyTrustLevel, PacmanKey, PacmanKeyring, AurPatch, AurPatchEngine,
+    MkinitcpioGenerator, NewsItem, ArchNewsFeedParser, CachedPackage, PacmanDbCleaner,
+    WikiPage, ArchWikiSearchEngine,
+};
 
 pub use open_source_tier1::{
     WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
@@ -19,6 +53,14 @@ pub use open_source_tier1::{
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
+};
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
+pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
+
+pub use cross_platform_kernel::{
+    PageAccessMode, MemoryArch, PageDirectory, DeferredProcedureCall,
+    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
+    UmsThreadState, UmsContext, SovereignKernelInternals,
 };
 
 pub use historic_linux::{
@@ -71,34 +113,3 @@ pub use sovereign_suite::{
     CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
-
-pub mod debian;
-pub use debian::{
-    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
-    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
-};
-
-pub mod innovations;
-pub use innovations::{
-    WorkloadCategory, ISchedulerPolicy, MlAcceleratedPolicy, GreenComputingPolicy,
-    SigmaScheduler, ISyscallTranslator, LinuxTranslator, WindowsTranslator,
-    UniversalAbiTranslator, IFileSystemCore, ISemanticSearchPlugin, ICasDeduplicator,
-    SigmaFsPlusPlus, IRecoveryStrategy, RollbackRecovery, SelfHealingOS,
-};
-
-pub mod fedora;
-pub use fedora::{
-    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
-};
-
-pub mod india_professional_tools;
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, PMWaniHotspotController,
-    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker,
-};
-
-pub mod india_stack;
-pub use india_stack::{MockUPIService, IndiaStackError};
-
-pub mod india_stack_localization;
-pub use india_stack_localization::{IndianLanguage, LocalizationProvider, LocalizationManager};
