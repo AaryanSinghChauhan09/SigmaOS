@@ -109,20 +109,12 @@ pub struct ProcessExtendedContext {
 }
 
 #[cfg(test)]
-use std::collections::HashMap;
-#[cfg(test)]
-use std::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(test)]
-use std::time::Duration;
+use std::collections::HashMap as StdHashMap;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(not(test))]
-use crate::kernel::scheduler::{Priority, Process, ProcessState};
-#[cfg(not(test))]
-use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(test))]
-use core::time::Duration;
+use crate::kernel::scheduler::{Priority as SchedPriority, Process as SchedProcess, ProcessState as SchedProcessState};
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
