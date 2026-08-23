@@ -5,18 +5,20 @@
 /// Based on Ideas-999-Structured: Core System Item 8
 /// Implements advanced power profiles, CPU governor tuning, thermal management
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type PowerProfileID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PowerProfile { Performance = 0, Balanced = 1, PowerSaver = 2, Custom = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerProfileType { Performance = 0, Balanced = 1, PowerSaver = 2, Custom = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum CPUGovernor { Performance = 0, Ondemand = 1, Conservative = 2, Powersave = 3, Userspace = 4 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CPUGovernorType { Performance = 0, Ondemand = 1, Conservative = 2, Powersave = 3, Userspace = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -25,8 +27,8 @@ pub enum PowerError { Success = 0, InvalidProfile = 1, GovernorFailed = 2, Therm
 pub trait PowerProfile {
     fn id(&self) -> PowerProfileID;
     fn name(&self) -> &[u8];
-    fn profile_type(&self) -> PowerProfile;
-    fn cpu_governor(&self) -> CPUGovernor;
+    fn profile_type(&self) -> PowerProfileType;
+    fn cpu_governor(&self) -> CPUGovernorType;
     fn max_cpu_freq(&self) -> usize;
     fn min_cpu_freq(&self) -> usize;
 }
@@ -42,7 +44,7 @@ pub struct SimplePowerProfile {
 }
 
 impl SimplePowerProfile {
-    pub fn new(id: PowerProfileID, name: &[u8], profile_type: PowerProfile, governor: CPUGovernor) -> Self {
+    pub fn new(id: PowerProfileID, name: &[u8], profile_type: PowerProfileType, governor: CPUGovernorType) -> Self {
         let mut name_array = [0u8; 32];
         let name_len = name.len().min(31);
         unsafe {
@@ -65,15 +67,30 @@ impl PowerProfile for SimplePowerProfile {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
         &self.name[..len]
     }
-    fn profile_type(&self) -> PowerProfile { unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) } }
-    fn cpu_governor(&self) -> CPUGovernor { unsafe { core::mem::transmute(self.cpu_governor.load(Ordering::SeqCst)) } }
+    fn profile_type(&self) -> PowerProfileType {
+        match self.profile_type.load(Ordering::SeqCst) {
+            0 => PowerProfileType::Performance,
+            1 => PowerProfileType::Balanced,
+            2 => PowerProfileType::PowerSaver,
+            _ => PowerProfileType::Custom,
+        }
+    }
+    fn cpu_governor(&self) -> CPUGovernorType {
+        match self.cpu_governor.load(Ordering::SeqCst) {
+            0 => CPUGovernorType::Performance,
+            1 => CPUGovernorType::Ondemand,
+            2 => CPUGovernorType::Conservative,
+            3 => CPUGovernorType::Powersave,
+            _ => CPUGovernorType::Userspace,
+        }
+    }
     fn max_cpu_freq(&self) -> usize { self.max_cpu_freq.load(Ordering::SeqCst) }
     fn min_cpu_freq(&self) -> usize { self.min_cpu_freq.load(Ordering::SeqCst) }
 }
 
 pub trait CPUGovernor {
-    fn set_governor(&mut self, governor: CPUGovernor) -> Result<(), PowerError>;
-    fn get_governor(&self) -> CPUGovernor;
+    fn set_governor(&mut self, governor: CPUGovernorType) -> Result<(), PowerError>;
+    fn get_governor(&self) -> CPUGovernorType;
     fn set_frequency(&mut self, freq_khz: usize) -> Result<(), PowerError>;
     fn get_frequency(&self) -> usize;
 }
@@ -89,7 +106,7 @@ pub struct SimpleCPUGovernor {
 impl SimpleCPUGovernor {
     pub fn new() -> Self {
         SimpleCPUGovernor {
-            current_governor: AtomicUsize::new(CPUGovernor::Balanced as usize),
+            current_governor: AtomicUsize::new(CPUGovernorType::Ondemand as usize),
             current_freq: AtomicUsize::new(2000000),
             max_freq: AtomicUsize::new(3500000),
             min_freq: AtomicUsize::new(800000),
@@ -98,18 +115,26 @@ impl SimpleCPUGovernor {
 }
 
 impl CPUGovernor for SimpleCPUGovernor {
-    fn set_governor(&mut self, governor: CPUGovernor) -> Result<(), PowerError> {
+    fn set_governor(&mut self, governor: CPUGovernorType) -> Result<(), PowerError> {
         self.current_governor.store(governor as usize, Ordering::SeqCst);
         match governor {
-            CPUGovernor::Performance => self.current_freq.store(self.max_freq.load(Ordering::SeqCst), Ordering::SeqCst),
-            CPUGovernor::Powersave => self.current_freq.store(self.min_freq.load(Ordering::SeqCst), Ordering::SeqCst),
-            CPUGovernor::Balanced => self.current_freq.store(2000000, Ordering::SeqCst),
+            CPUGovernorType::Performance => self.current_freq.store(self.max_freq.load(Ordering::SeqCst), Ordering::SeqCst),
+            CPUGovernorType::Powersave => self.current_freq.store(self.min_freq.load(Ordering::SeqCst), Ordering::SeqCst),
+            CPUGovernorType::Ondemand => self.current_freq.store(2000000, Ordering::SeqCst),
             _ => self.current_freq.store(1500000, Ordering::SeqCst),
         }
         Ok(())
     }
 
-    fn get_governor(&self) -> CPUGovernor { unsafe { core::mem::transmute(self.current_governor.load(Ordering::SeqCst)) } }
+    fn get_governor(&self) -> CPUGovernorType {
+        match self.current_governor.load(Ordering::SeqCst) {
+            0 => CPUGovernorType::Performance,
+            1 => CPUGovernorType::Ondemand,
+            2 => CPUGovernorType::Conservative,
+            3 => CPUGovernorType::Powersave,
+            _ => CPUGovernorType::Userspace,
+        }
+    }
 
     fn set_frequency(&mut self, freq_khz: usize) -> Result<(), PowerError> {
         let max = self.max_freq.load(Ordering::SeqCst);
@@ -191,15 +216,15 @@ impl SimplePowerManager {
 
     pub fn create_default_profiles(&mut self) {
         let perf_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let perf_profile = SimplePowerProfile::new(perf_id, b"performance", PowerProfile::Performance, CPUGovernor::Performance);
+        let perf_profile = SimplePowerProfile::new(perf_id, b"performance", PowerProfileType::Performance, CPUGovernorType::Performance);
         self.profiles.push(Some(Box::new(perf_profile)));
 
         let balanced_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let balanced_profile = SimplePowerProfile::new(balanced_id, b"balanced", PowerProfile::Balanced, CPUGovernor::Ondemand);
+        let balanced_profile = SimplePowerProfile::new(balanced_id, b"balanced", PowerProfileType::Balanced, CPUGovernorType::Ondemand);
         self.profiles.push(Some(Box::new(balanced_profile)));
 
         let powersave_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let powersave_profile = SimplePowerProfile::new(powersave_id, b"powersave", PowerProfile::PowerSaver, CPUGovernor::Powersave);
+        let powersave_profile = SimplePowerProfile::new(powersave_id, b"powersave", PowerProfileType::PowerSaver, CPUGovernorType::Powersave);
         self.profiles.push(Some(Box::new(powersave_profile)));
     }
 }
@@ -270,7 +295,14 @@ impl SimpleBatteryManager {
 impl BatteryManager for SimpleBatteryManager {
     fn get_capacity(&self) -> i32 { self.capacity.load(Ordering::SeqCst) as i32 }
 
-    fn get_status(&self) -> BatteryStatus { unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) } }
+    fn get_status(&self) -> BatteryStatus {
+        match self.status.load(Ordering::SeqCst) {
+            1 => BatteryStatus::Charging,
+            2 => BatteryStatus::Discharging,
+            3 => BatteryStatus::Full,
+            _ => BatteryStatus::Unknown,
+        }
+    }
 
     fn is_charging(&self) -> bool { self.is_charging_flag.load(Ordering::SeqCst) == 1 }
 
@@ -278,75 +310,5 @@ impl BatteryManager for SimpleBatteryManager {
         let capacity = self.capacity.load(Ordering::SeqCst) as i32;
         if capacity <= 0 { return 0; }
         capacity * 5
-    }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
     }
 }

@@ -1,10 +1,12 @@
-use crate::klib::Vec;
-use core::ops::{Deref, DerefMut};
+#![no_std]
 
 /// OOP-based Verified Boot for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 561
 /// Implements secure boot chain with signature verification
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -55,7 +57,7 @@ impl SimpleBootStage {
 
 impl BootStage for SimpleBootStage {
     fn id(&self) -> BootStageID { self.id }
-    fn stage_type(&self) -> BootStageEnum { {
+    fn stage_type(&self) -> BootStageEnum {
         let raw = self.stage_type.load(Ordering::SeqCst) as u32;
         match raw {
             1 => BootStageEnum::Bootloader,
@@ -64,7 +66,7 @@ impl BootStage for SimpleBootStage {
             4 => BootStageEnum::Userspace,
             _ => BootStageEnum::Firmware,
         }
-    } }
+    }
     fn hash(&self) -> &[u8] { &self.hash }
     fn signature(&self) -> &[u8] { &self.signature }
 
@@ -101,7 +103,7 @@ impl BootChain for SimpleBootChain {
     }
 
     fn verify_chain(&self, public_key: &[u8]) -> Result<bool, BootError> {
-        for stage_option in &*self.stages {
+        for stage_option in &self.stages {
             if let Some(ref stage) = *stage_option {
                 if !stage.verify(public_key)? {
                     return Ok(false);
@@ -112,7 +114,7 @@ impl BootChain for SimpleBootChain {
     }
 
     fn get_stage(&self, id: BootStageID) -> Option<&dyn BootStage> {
-        for stage_option in &*self.stages {
+        for stage_option in &self.stages {
             if let Some(ref stage) = *stage_option {
                 if stage.id() == id { return Some(stage.as_ref()); }
             }
@@ -259,4 +261,3 @@ impl BootMeasurement for SimpleBootMeasurement {
         }
     }
 }
-

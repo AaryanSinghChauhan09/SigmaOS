@@ -6,7 +6,7 @@ use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-use crate::kernel::vfs::inode::FsError;
+use crate::filesystem::FsError;
 
 /// Transformer-based Scheduler
 ///
@@ -37,7 +37,7 @@ impl TransformerScheduler {
             num_heads,
             d_model,
             max_seq_len,
-            history: vec![Vec::new(); max_seq_len],
+            history: (0..max_seq_len).map(|_| Vec::new()).collect(),
             weights,
             current_pos: 0,
         }
@@ -48,7 +48,8 @@ impl TransformerScheduler {
         features.push(task_pid as f32);
         features.push(cpu as f32);
         features.push(latency_us as f32);
-        self.history[self.current_pos % self.max_seq_len] = features;
+        let idx = self.current_pos % self.max_seq_len;
+        self.history[idx] = features;
         self.current_pos += 1;
     }
 
@@ -70,7 +71,7 @@ impl TransformerScheduler {
             }
             if score > best_score {
                 best_score = score;
-                best_cpu = cpu;
+                best_cpu = cpu as u32;
             }
         }
         Some(best_cpu)
@@ -92,7 +93,7 @@ impl TransformerScheduler {
         for s in &mut scores {
             *s /= sum;
         }
-        let mut output = vec![0.0f32; d];
+        let mut output: Vec<f32> = (0..d).map(|_| 0.0f32).collect();
         for i in 0..d {
             for j in 0..d {
                 output[i] += scores[j] * value[j];
@@ -115,48 +116,46 @@ impl TransformerSchedClass {
 }
 
 impl SchedClass for TransformerSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        rq.nr_running.fetch_add(1, Ordering::SeqCst);
+    fn enqueue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
-        rq.nr_running.fetch_sub(1, Ordering::SeqCst);
+    fn dequeue_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn check_preempt_curr(&self, rq: &mut RunQueue, task: &Task) -> bool {
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
 
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
 
-    fn put_prev_task(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn set_curr_task(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn task_tick(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
     fn task_fork(
         &self,
-        rq: &mut RunQueue,
-        child: &mut Task,
-        parent: &Task,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
     ) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn task_dead(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn prio_changed(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
 #[cfg(test)]
@@ -181,9 +180,9 @@ mod tests {
     #[test]
     fn test_attention_mechanism() {
         let sched = TransformerScheduler::new(4, 64, 128);
-        let q = vec![1.0, 0.0, 0.0];
-        let k = vec![0.0, 1.0, 0.0];
-        let v = vec![0.0, 0.0, 1.0];
+        let q = alloc::vec![1.0, 0.0, 0.0];
+        let k = alloc::vec![0.0, 1.0, 0.0];
+        let v = alloc::vec![0.0, 0.0, 1.0];
         let output = sched.attention(&q, &k, &v);
         assert_eq!(output.len(), 3);
     }

@@ -10,6 +10,7 @@ pub mod secure;
 pub mod verified;
 pub mod bridge_grid;
 pub mod firmware_bridge;
+pub mod sigma_boot;
 
 pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
@@ -18,3 +19,4 @@ pub use uefi::{
     MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
 };
+pub use sigma_boot::{BootEntry, BootManager, BootTheme};

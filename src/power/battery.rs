@@ -5,13 +5,15 @@
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 251
 /// Implements battery monitoring and power management
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type BatteryID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3 }
 
 #[repr(C)]
@@ -22,6 +24,7 @@ pub trait Battery {
     fn id(&self) -> BatteryID;
     fn capacity(&self) -> u32;
     fn current_charge(&self) -> u32;
+    fn set_current_charge(&self, charge: u32);
     fn voltage(&self) -> u32;
     fn state(&self) -> BatteryState;
     fn health(&self) -> u32;
@@ -54,8 +57,16 @@ impl Battery for SimpleBattery {
     fn id(&self) -> BatteryID { self.id }
     fn capacity(&self) -> u32 { self.capacity.load(Ordering::SeqCst) as u32 }
     fn current_charge(&self) -> u32 { self.current_charge.load(Ordering::SeqCst) as u32 }
+    fn set_current_charge(&self, charge: u32) { self.current_charge.store(charge as usize, Ordering::SeqCst); }
     fn voltage(&self) -> u32 { self.voltage.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> BatteryState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> BatteryState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => BatteryState::Charging,
+            1 => BatteryState::Discharging,
+            2 => BatteryState::Full,
+            _ => BatteryState::NotPresent,
+        }
+    }
     fn health(&self) -> u32 { self.health.load(Ordering::SeqCst) as u32 }
 }
 
@@ -127,7 +138,7 @@ impl BatteryManager for SimpleBatteryManager {
         for battery_option in &mut self.batteries {
             if let Some(ref mut battery) = *battery_option {
                 if battery.id() == id {
-                    battery.current_charge.store(charge as usize, Ordering::SeqCst);
+                    battery.set_current_charge(charge);
                     return Ok(());
                 }
             }
@@ -167,74 +178,4 @@ impl PowerSaver for SimplePowerSaver {
     }
 
     fn get_threshold(&self) -> u32 { self.threshold.load(Ordering::SeqCst) as u32 }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
 }

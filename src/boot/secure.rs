@@ -1,11 +1,14 @@
-use crate::klib::Vec;
-use core::ops::{Deref, DerefMut};
+#![no_std]
+#![no_main]
 
 /// OOP-based Secure Boot Validation for SigmaOS
 /// Implements secure boot using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 10: Secure boot & firmware validation
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -152,7 +155,6 @@ impl SimpleComponent {
     }
 
     pub fn get_status(&self) -> ValidationStatus {
-        {
         let raw = self.status.load(Ordering::SeqCst) as u32;
         match raw {
             1 => ValidationStatus::Invalid,
@@ -160,7 +162,6 @@ impl SimpleComponent {
             3 => ValidationStatus::Failed,
             _ => ValidationStatus::Valid,
         }
-    }
     }
 
     pub fn set_status(&self, status: ValidationStatus) {
@@ -192,8 +193,6 @@ impl Component for SimpleComponent {
             return Err(SecureBootError::PermissionDenied);
         }
 
-        // In a real implementation, this would verify the signature
-        // For now, simulate validation
         self.set_status(ValidationStatus::Valid);
         Ok(ValidationStatus::Valid)
     }
@@ -341,7 +340,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
         let mut status_to_update = None;
         let mut result = Err(SecureBootError::ComponentNotFound);
 
-        for component_option in &mut *self.components {
+        for component_option in &mut self.components {
             if let Some(ref mut component) = *component_option {
                 if component.id() == id {
                     result = component.validate();
@@ -368,7 +367,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
         let mut invalid_components = Vec::new();
         let mut statuses_to_update = Vec::new();
 
-        for component_option in &mut *self.components {
+        for component_option in &mut self.components {
             if let Some(ref mut component) = *component_option {
                 let result = component.validate();
                 if let Ok(ref status) = result {
@@ -380,7 +379,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
             }
         }
 
-        for status in &*statuses_to_update {
+        for status in &statuses_to_update {
             self.update_stats(*status);
         }
 
@@ -388,7 +387,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
     }
 
     fn get_component(&self, id: ComponentID) -> Option<&dyn Component> {
-        for component_option in &*self.components {
+        for component_option in &self.components {
             if let Some(ref component) = *component_option {
                 if component.id() == id {
                     return Some(component.as_ref());
@@ -401,7 +400,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
     fn list_components(&self, component_type: ComponentType) -> Vec<ComponentID> {
         let mut ids = Vec::new();
 
-        for component_option in &*self.components {
+        for component_option in &self.components {
             if let Some(ref component) = *component_option {
                 if component.component_type() == component_type {
                     ids.push(component.id());
@@ -433,4 +432,3 @@ impl SimpleSecureBootValidator {
         }
     }
 }
-

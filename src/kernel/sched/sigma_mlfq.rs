@@ -6,7 +6,7 @@ use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-use crate::kernel::vfs::inode::FsError;
+use crate::filesystem::FsError;
 
 /// Multi-Level Feedback Queue (MLFQ) Scheduler
 ///
@@ -31,7 +31,7 @@ impl MlfqScheduler {
         MlfqScheduler {
             nr_queues,
             time_slices,
-            queues: vec![Vec::new(); nr_queues],
+            queues: (0..nr_queues).map(|_| Vec::new()).collect(),
             current_queue: 0,
             aging_threshold: 1000,
             ticks: AtomicU32::new(0),
@@ -77,10 +77,11 @@ impl MlfqScheduler {
     }
 
     pub fn aging(&mut self) {
-        if self.ticks.fetch_add(1, Ordering::SeqCst) >= self.aging_threshold {
+        if u64::from(self.ticks.fetch_add(1, Ordering::SeqCst)) >= self.aging_threshold {
             self.ticks.store(0, Ordering::SeqCst);
             for q in (1..self.nr_queues).rev() {
-                for &pid in &self.queues[q] {
+                for i in 0..self.queues[q].len() {
+                    let pid = self.queues[q][i];
                     self.promote(pid);
                 }
             }
@@ -105,48 +106,48 @@ impl MlfqSchedClass {
 }
 
 impl SchedClass for MlfqSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
 
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.nr_running.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
 
-    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn check_preempt_curr(&self, rq: &mut RunQueue, task: &Task) -> bool {
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
 
-    fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+    fn pick_next_task(&self, _rq: &mut RunQueue) -> Option<u64> {
         None
     }
 
-    fn put_prev_task(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn put_prev_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn set_curr_task(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn set_curr_task(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn task_tick(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn task_tick(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
     fn task_fork(
         &self,
-        rq: &mut RunQueue,
-        child: &mut Task,
-        parent: &Task,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
     ) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn task_dead(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn task_dead(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 
-    fn prio_changed(&self, rq: &mut RunQueue, task: &mut Task) {}
+    fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
 #[cfg(test)]

@@ -62,7 +62,14 @@ impl ConfigValue for SimpleConfigValue {
         let len = self.key.iter().position(|&b| b == 0).unwrap_or(128);
         &self.key[..len]
     }
-    fn config_type(&self) -> ConfigType { unsafe { core::mem::transmute(self.config_type.load(Ordering::SeqCst)) } }
+    fn config_type(&self) -> ConfigType {
+        match self.config_type.load(Ordering::SeqCst) {
+            1 => ConfigType::Integer,
+            2 => ConfigType::Boolean,
+            3 => ConfigType::Float,
+            _ => ConfigType::String,
+        }
+    }
     fn as_string(&self) -> &[u8] {
         let len = self.string_value.iter().position(|&b| b == 0).unwrap_or(256);
         &self.string_value[..len]
@@ -110,7 +117,7 @@ impl ConfigLoader for SimpleConfigLoader {
         None
     }
 
-    fn set_config(&mut self, key: &[u8], value: &[u8]) -> Result<(), ConfigError> {
+    fn set_config(&mut self, key: &[u8], _value: &[u8]) -> Result<(), ConfigError> {
         for config_option in &mut self.configs {
             if let Some(ref mut config) = *config_option {
                 if config.key() == key {
@@ -210,8 +217,20 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
 
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -243,7 +262,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

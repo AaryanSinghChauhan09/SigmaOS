@@ -49,7 +49,13 @@ impl SimpleSnapshot {
 
 impl Snapshot for SimpleSnapshot {
     fn id(&self) -> SnapshotID { self.id }
-    fn snapshot_type(&self) -> SnapshotType { unsafe { core::mem::transmute(self.snapshot_type.load(Ordering::SeqCst)) } }
+    fn snapshot_type(&self) -> SnapshotType {
+        match self.snapshot_type.load(Ordering::SeqCst) {
+            1 => SnapshotType::Incremental,
+            2 => SnapshotType::Differential,
+            _ => SnapshotType::Full,
+        }
+    }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn is_valid(&self) -> bool { self.valid.load(Ordering::SeqCst) == 1 }
@@ -165,7 +171,7 @@ impl BackupScheduler for SimpleBackupScheduler {
 
     fn run_scheduled_backups(&mut self) -> Vec<SnapshotID> {
         let mut created = Vec::new();
-        for &(id, _, snapshot_type) in &self.schedules {
+        for &(id, _, _snapshot_type) in &self.schedules {
             let snapshot_id = id + 1000;
             created.push(snapshot_id);
         }
@@ -208,8 +214,20 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
 
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -241,7 +259,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

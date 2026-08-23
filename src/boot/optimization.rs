@@ -144,7 +144,6 @@ impl SimpleBootService {
     }
 
     pub fn get_status(&self) -> ServiceStatus {
-        {
         let raw = self.status.load(Ordering::SeqCst) as u32;
         match raw {
             1 => ServiceStatus::Initializing,
@@ -152,7 +151,6 @@ impl SimpleBootService {
             3 => ServiceStatus::Failed,
             _ => ServiceStatus::Pending,
         }
-    }
     }
 
     pub fn set_status(&self, status: ServiceStatus) {
@@ -329,7 +327,7 @@ impl BootOptimizer for SimpleBootOptimizer {
             return Err(BootError::InitializationFailed);
         }
 
-        for service_option in &mut *self.services {
+        for service_option in &mut self.services {
             if let Some(ref mut service) = *service_option {
                 if service.id() == id {
                     let result = service.initialize();
@@ -356,7 +354,7 @@ impl BootOptimizer for SimpleBootOptimizer {
         // Collect all service IDs with their priorities
         let mut services_with_priority: Vec<(ServiceID, ServicePriority)> = Vec::new();
 
-        for service_option in &*self.services {
+        for service_option in &self.services {
             if let Some(ref service) = *service_option {
                 services_with_priority.push((service.id(), service.priority()));
             }
@@ -373,7 +371,7 @@ impl BootOptimizer for SimpleBootOptimizer {
             }
         }
 
-        for (id, _) in &*services_with_priority {
+        for (id, _) in &services_with_priority {
             ordered_ids.push(*id);
         }
 
@@ -387,7 +385,7 @@ impl BootOptimizer for SimpleBootOptimizer {
 
         let optimized_order = self.optimize_boot_order()?;
 
-        for id in &*optimized_order {
+        for id in &optimized_order {
             let _ = self.initialize_service(*id);
         }
 
@@ -395,7 +393,7 @@ impl BootOptimizer for SimpleBootOptimizer {
     }
 
     fn get_service(&self, id: ServiceID) -> Option<&dyn BootService> {
-        for service_option in &*self.services {
+        for service_option in &self.services {
             if let Some(ref service) = *service_option {
                 if service.id() == id {
                     return Some(service.as_ref());
@@ -409,4 +407,3 @@ impl BootOptimizer for SimpleBootOptimizer {
         self.stats
     }
 }
-
