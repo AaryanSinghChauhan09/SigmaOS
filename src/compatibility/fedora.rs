@@ -921,124 +921,62 @@ impl SovereignFirewalldManager {
 }
 
 // ==========================================
-// SELinux State and Policy Enforcer
+// Sovereign Cockpit Console Manager
 // ==========================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SeLinuxMode {
-    Enforcing,
-    Permissive,
-    Disabled,
+pub struct SovereignCockpitConsole {
+    pub is_listening: bool,
+    pub connected_clients: usize,
+    pub metrics: HashMap<String, f64>,
 }
 
-#[derive(Debug, Clone)]
-pub struct SeLinuxContext {
-    pub user: String,
-    pub role: String,
-    pub domain_type: String,
-    pub sensitivity: String,
-}
-
-impl SeLinuxContext {
-    pub fn parse(context_str: &str) -> Result<Self, &'static str> {
-        let parts: Vec<&str> = context_str.split(':').collect();
-        if parts.len() < 4 {
-            return Err("Invalid SELinux context string format");
-        }
-        Ok(Self {
-            user: parts[0].to_string(),
-            role: parts[1].to_string(),
-            domain_type: parts[2].to_string(),
-            sensitivity: parts[3].to_string(),
-        })
-    }
-}
-
-pub struct SeLinuxEnforcer {
-    pub mode: SeLinuxMode,
-    pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
-}
-
-impl SeLinuxEnforcer {
-    pub fn new(mode: SeLinuxMode) -> Self {
-        let mut transitions = HashMap::new();
-        transitions.insert("httpd_t".to_string(), vec!["httpd_sys_content_t".to_string()]);
+impl SovereignCockpitConsole {
+    pub fn new() -> Self {
         Self {
-            mode,
-            allowed_transitions: transitions,
+            is_listening: false,
+            connected_clients: 0,
+            metrics: HashMap::new(),
         }
     }
 
-    /// Validates transition or access check between subject context type and target file context type
-    pub fn check_access(&self, subject_type: &str, target_type: &str) -> Result<bool, &'static str> {
-        if self.mode == SeLinuxMode::Disabled {
-            return Ok(true);
+    pub fn start_server(&mut self) -> Result<(), String> {
+        if self.is_listening {
+            return Err("Server already running".to_string());
         }
-
-        let is_allowed = if let Some(allowed) = self.allowed_transitions.get(subject_type) {
-            allowed.contains(&target_type.to_string())
-        } else {
-            false
-        };
-
-        if !is_allowed {
-            if self.mode == SeLinuxMode::Enforcing {
-                return Err("SELinux AVC Denial: Access Prohibited");
-            } else if self.mode == SeLinuxMode::Permissive {
-                println!("SELinux AVC Warning (Permissive): Access Prohibited but allowed");
-            }
-        }
-        Ok(true)
-    }
-}
-
-// ==========================================
-// COPR User Repositories Build Manager
-// ==========================================
-
-pub struct CoprBuildTask {
-    pub task_id: u32,
-    pub git_url: String,
-    pub status: String,
-}
-
-pub struct CoprRepositoryManager {
-    pub owner: String,
-    pub project_name: String,
-    pub builds: Vec<CoprBuildTask>,
-}
-
-impl CoprRepositoryManager {
-    pub fn new(owner: &str, project_name: &str) -> Self {
-        Self {
-            owner: owner.to_string(),
-            project_name: project_name.to_string(),
-            builds: Vec::new(),
-        }
+        self.is_listening = true;
+        Ok(())
     }
 
-    pub fn submit_copr_build(&mut self, id: u32, git_url: &str) {
-        self.builds.push(CoprBuildTask {
-            task_id: id,
-            git_url: git_url.to_string(),
-            status: "Pending".to_string(),
-        });
+    pub fn register_client(&mut self) -> Result<usize, String> {
+        if !self.is_listening {
+            return Err("Server is offline".to_string());
+        }
+        self.connected_clients += 1;
+        Ok(self.connected_clients)
     }
 
-    pub fn execute_build_compile(&mut self, task_id: u32) -> Result<String, &'static str> {
-        for build in &mut self.builds {
-            if build.task_id == task_id {
-                build.status = "Success".to_string();
-                return Ok(format!("copr-build-{}-{}.rpm", self.project_name, task_id));
-            }
-        }
-        Err("COPR build task ID not found")
+    pub fn update_metric(&mut self, name: &str, val: f64) {
+        self.metrics.insert(name.to_string(), val);
+    }
+
+    pub fn stream_metrics_json(&self) -> Result<String, String> {
+        let cpu = self.metrics.get("cpu_usage_pct").cloned().unwrap_or(0.0);
+        let mem = self.metrics.get("memory_used_gb").cloned().unwrap_or(0.0);
+        Ok(format!(
+            "{{\"listening\":{},\"clients\":{},\"cpu_usage_pct\":{},\"memory_used_gb\":{}}}",
+            self.is_listening, self.connected_clients, cpu, mem
+        ))
+    }
+
+    pub fn stop_server(&mut self) {
+        self.is_listening = false;
+        self.connected_clients = 0;
+        self.metrics.clear();
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::*;
 
     #[test]
@@ -1337,39 +1275,5 @@ mod tests {
         console.stop_server();
         assert!(!console.is_listening);
         assert_eq!(console.connected_clients, 0);
-    }
-
-    #[test]
-    fn test_selinux_context_and_enforcer() {
-        let context = SeLinuxContext::parse("system_u:system_r:httpd_t:s0").unwrap();
-        assert_eq!(context.user, "system_u");
-        assert_eq!(context.domain_type, "httpd_t");
-
-        let enforcer = SeLinuxEnforcer::new(SeLinuxMode::Enforcing);
-        assert!(enforcer.check_access("httpd_t", "httpd_sys_content_t").unwrap());
-
-        // Enforcing AVC Denial
-        assert_eq!(
-            enforcer.check_access("httpd_t", "unlabeled_t"),
-            Err("SELinux AVC Denial: Access Prohibited")
-        );
-
-        // Permissive warning only
-        let permissive = SeLinuxEnforcer::new(SeLinuxMode::Permissive);
-        assert!(permissive.check_access("httpd_t", "unlabeled_t").unwrap());
-    }
-
-    #[test]
-    fn test_copr_repository_manager() {
-        let mut copr = CoprRepositoryManager::new("developer_delta", "neo-vim");
-        copr.submit_copr_build(101, "https://github.com/neovim/neovim.git");
-        assert_eq!(copr.builds.len(), 1);
-
-        let rpm_name = copr.execute_build_compile(101).unwrap();
-        assert_eq!(rpm_name, "copr-build-neo-vim-101.rpm");
-        assert_eq!(copr.builds[0].status, "Success");
-
-        // Fail Case (nonexistent task ID)
-        assert_eq!(copr.execute_build_compile(999), Err("COPR build task ID not found"));
     }
 }

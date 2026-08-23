@@ -5,6 +5,33 @@ use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+#[derive(Debug, Clone)]
+pub struct DdeDeviceWrapper {
+    pub id: u32,
+    pub name: [u8; 32],
+    pub io_base: u16,
+    pub persona: [u8; 16],
+    pub simulated_pci_bar: u32,
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(id: u32, name: &[u8], io_base: u16, persona: &[u8]) -> Self {
+        let mut name_arr = [0u8; 32];
+        let mut persona_arr = [0u8; 16];
+        let nlen = name.len().min(31);
+        let plen = persona.len().min(15);
+        name_arr[..nlen].copy_from_slice(&name[..nlen]);
+        persona_arr[..plen].copy_from_slice(&persona[..plen]);
+        Self {
+            id,
+            name: name_arr,
+            io_base,
+            persona: persona_arr,
+            simulated_pci_bar: io_base as u32,
+        }
+    }
+}
+
 /// Device trait (OOP interface)
 pub trait Device {
     /// Initialize device

@@ -2,6 +2,8 @@
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
 use core::cell::Cell;
+extern crate alloc;
+use crate::klib::SigmaString;
 
 /// Routing modes for network traffic
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,8 +20,10 @@ pub struct AnonSurfShunt {
     pub anonymized_packets_routed: Cell<u64>,
 }
 
+unsafe impl Sync for AnonSurfShunt {}
+
 impl AnonSurfShunt {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         AnonSurfShunt {
             current_mode: Cell::new(RoutingMode::DirectCleartext),
             dns_leak_protection: Cell::new(true),
@@ -56,12 +60,12 @@ impl AnonSurfShunt {
 }
 
 /// Sandbox policy for application security
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct SandboxPolicy {
     pub allow_network: bool,
     pub allow_raw_sockets: bool,
     pub allow_filesystem_write: bool,
-    pub permitted_subpath: SigmaString,
+    pub permitted_subpath: &'static str,
 }
 
 /// AppSandbox engine for process security
@@ -69,23 +73,33 @@ pub struct AppSandboxEngine {
     pub current_policy: Cell<SandboxPolicy>,
 }
 
+unsafe impl Sync for AppSandboxEngine {}
+
 impl AppSandboxEngine {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         AppSandboxEngine {
             current_policy: Cell::new(SandboxPolicy {
                 allow_network: false,
                 allow_raw_sockets: false,
                 allow_filesystem_write: false,
-                permitted_subpath: SigmaString::from_str("/sandbox/tmp"),
+                permitted_subpath: "/sandbox/tmp",
             }),
         }
     }
+}
 
+impl Default for AppSandboxEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AppSandboxEngine {
     /// Validate filesystem write access
     pub fn validate_filesystem_write(&self, path: &str) -> bool {
         let policy = self.current_policy.get();
         if !policy.allow_filesystem_write {
-            path.starts_with(policy.permitted_subpath.as_str())
+            path.starts_with(policy.permitted_subpath)
         } else {
             true
         }
@@ -119,8 +133,10 @@ pub struct ForensicStorageFilter {
     pub is_write_blocked: Cell<bool>,
 }
 
+unsafe impl Sync for ForensicStorageFilter {}
+
 impl ForensicStorageFilter {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         ForensicStorageFilter {
             is_write_blocked: Cell::new(true),
         }
@@ -157,12 +173,6 @@ impl Default for AnonSurfShunt {
     }
 }
 
-impl Default for AppSandboxEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Default for ForensicStorageFilter {
     fn default() -> Self {
         Self::new()
@@ -175,7 +185,11 @@ impl Default for SandboxPolicy {
             allow_network: false,
             allow_raw_sockets: false,
             allow_filesystem_write: false,
-            permitted_subpath: SigmaString::from_str("/sandbox/tmp"),
+            permitted_subpath: "/sandbox/tmp",
         }
     }
 }
+
+pub static GLOBAL_ANONSURF: AnonSurfShunt = AnonSurfShunt::new();
+pub static GLOBAL_SANDBOX: AppSandboxEngine = AppSandboxEngine::new();
+pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter::new();

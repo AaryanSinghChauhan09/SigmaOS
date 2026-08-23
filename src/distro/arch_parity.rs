@@ -1,7 +1,11 @@
+extern crate alloc;
 // SigmaOS Arch Linux Parity Implementation
 // Implements PKGBUILD parsing, makepkg compiler parity, and AUR integration
 
-use crate::klib::{BTreeMap, SigmaString, ToString, Vec};
+use alloc::collections::BTreeMap;
+use crate::klib::SigmaString;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards

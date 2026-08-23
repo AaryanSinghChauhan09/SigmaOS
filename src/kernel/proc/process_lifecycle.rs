@@ -23,6 +23,7 @@ use std::collections::HashMap;
 
 #[cfg(test)]
 pub mod mock_scheduler {
+    extern crate alloc;
     use core::time::Duration;
     use alloc::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

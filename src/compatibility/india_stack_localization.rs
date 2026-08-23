@@ -23,7 +23,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Based on Roadmap Item: India-first architecture
 use std::string::{String, ToString};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum IndianLanguage {
     Assamese,
     Bengali,

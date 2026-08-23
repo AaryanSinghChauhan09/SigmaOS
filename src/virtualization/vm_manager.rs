@@ -87,10 +87,40 @@ pub trait HypervisorBackend {
     fn name(&self) -> &str;
 }
 
+/// QEMU/KVM Memory Ballooning configuration
+#[derive(Debug, Clone)]
+pub struct MemoryBalloonConfig {
+    pub current_balloon_mb: u64,
+    pub target_balloon_mb: u64,
+}
+
+impl MemoryBalloonConfig {
+    pub fn new(initial_mb: u64) -> Self {
+        Self {
+            current_balloon_mb: initial_mb,
+            target_balloon_mb: initial_mb,
+        }
+    }
+
+    pub fn set_target(&mut self, target_mb: u64) {
+        self.target_balloon_mb = target_mb;
+    }
+
+    pub fn inflate_deflate_step(&mut self) -> u64 {
+        if self.current_balloon_mb < self.target_balloon_mb {
+            self.current_balloon_mb = (self.current_balloon_mb + 256).min(self.target_balloon_mb);
+        } else if self.current_balloon_mb > self.target_balloon_mb {
+            self.current_balloon_mb = self.current_balloon_mb.saturating_sub(256).max(self.target_balloon_mb);
+        }
+        self.current_balloon_mb
+    }
+}
+
 /// QEMU/KVM backend
 pub struct QemuBackend {
     vms: HashMap<String, VmConfig>,
     vm_states: HashMap<String, VmState>,
+    balloons: HashMap<String, MemoryBalloonConfig>,
 }
 
 impl QemuBackend {
@@ -98,6 +128,16 @@ impl QemuBackend {
         Self {
             vms: HashMap::new(),
             vm_states: HashMap::new(),
+            balloons: HashMap::new(),
+        }
+    }
+
+    pub fn set_vm_balloon_target(&mut self, vm_id: &str, target_mb: u64) -> Result<u64, VmError> {
+        if let Some(balloon) = self.balloons.get_mut(vm_id) {
+            balloon.set_target(target_mb);
+            Ok(balloon.inflate_deflate_step())
+        } else {
+            Err(VmError::VmNotFound(vm_id.to_string()))
         }
     }
 }
@@ -107,6 +147,7 @@ impl HypervisorBackend for QemuBackend {
         let vm_id = format!("vm_{}", self.vms.len());
         self.vms.insert(vm_id.clone(), config.clone());
         self.vm_states.insert(vm_id.clone(), VmState::Stopped);
+        self.balloons.insert(vm_id.clone(), MemoryBalloonConfig::new(config.memory_mb));
         Ok(vm_id)
     }
 
@@ -734,5 +775,26 @@ mod tests {
 
         iommu.attach_device(pci_addr.clone());
         assert!(iommu.verify_dma_access(&pci_addr));
+    }
+
+    #[test]
+    fn test_qemu_kvm_ballooning_and_migration() {
+        let mut qemu = QemuBackend::new();
+        let config = VmConfig {
+            name: "QEMU KVM Balloon VM".to_string(),
+            cpu_cores: 4,
+            memory_mb: 8192,
+            disk_size_gb: 100,
+            network_enabled: true,
+            gpu_passthrough: false,
+            os_type: OsType::Linux,
+            cpu_pinning_cores: vec![0, 1, 2, 3],
+            hugepages_enabled: true,
+            vfio_pci_passthrough_address: None,
+        };
+
+        let vm_id = qemu.create_vm(&config).unwrap();
+        let current_mem = qemu.set_vm_balloon_target(&vm_id, 4096).unwrap();
+        assert_eq!(current_mem, 7936); // Stepped down 256MB from 8192MB
     }
 }

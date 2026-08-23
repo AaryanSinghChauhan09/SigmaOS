@@ -306,6 +306,18 @@ impl AllocStats {
 #[global_allocator]
 pub static SIGMA_ALLOCATOR: SigmaBumpAllocator = SigmaBumpAllocator::new();
 
+pub unsafe fn alloc(size: usize) -> *mut u8 {
+    let layout = core::alloc::Layout::from_size_align(size, 8).unwrap();
+    SIGMA_ALLOCATOR.alloc(layout)
+}
+
+pub unsafe fn free(ptr: *mut u8) {
+    if !ptr.is_null() {
+        let layout = core::alloc::Layout::from_size_align(8, 8).unwrap();
+        SIGMA_ALLOCATOR.dealloc(ptr, layout);
+    }
+}
+
 /// The global instance of the SigmaOS bump allocator (not registered as global on host targets).
 #[cfg(not(target_os = "none"))]
 pub static SIGMA_ALLOCATOR: SigmaBumpAllocator = SigmaBumpAllocator::new();

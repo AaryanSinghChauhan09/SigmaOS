@@ -66,7 +66,7 @@ impl ShareXFlameshotEngine {
 
         // Add ShareX-style auto upload if enabled
         if self.auto_upload_enabled {
-            screenshot.cloud_url = Some(format!("{}/capture_{}.png", self.target_cloud_destination, crate::klib::uuid::Uuid::new().to_string()));
+            screenshot.cloud_url = Some(format!("{}/capture_{}.png", self.target_cloud_destination, self.screenshot_history.len()));
         }
 
         self.screenshot_history.push_back(screenshot.clone());

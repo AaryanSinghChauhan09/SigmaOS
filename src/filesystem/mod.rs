@@ -9,6 +9,10 @@ pub mod tmpfs;
 pub mod vfs;
 pub mod legacy_fs;
 pub mod sigma_fs;
+pub mod smart_symlink;
+pub use smart_symlink::{
+    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
+};
 
 pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{

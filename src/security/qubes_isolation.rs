@@ -218,6 +218,34 @@ impl TemplateVmManager {
     }
 }
 
+pub struct DomainOrchestrator {
+    pub domains: Vec<IsolatedDomain>,
+    pub policy_engine: QrexecPolicyEngine,
+}
+
+impl DomainOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            domains: Vec::new(),
+            policy_engine: QrexecPolicyEngine::new(),
+        }
+    }
+
+    pub fn create_domain(&mut self, name: &str, dom_type: DomainType, cap: CapabilityToken) -> Result<DomainID, IsolationError> {
+        let id = self.domains.len() + 1;
+        let mut name_bytes = [0u8; 32];
+        let bytes = name.as_bytes();
+        let len = bytes.len().min(31);
+        name_bytes[..len].copy_from_slice(&bytes[..len]);
+        self.domains.push(IsolatedDomain::new(id, &name_bytes, dom_type, cap));
+        Ok(id)
+    }
+
+    pub fn get_domain(&self, id: DomainID) -> Option<&IsolatedDomain> {
+        self.domains.iter().find(|d| d.id == id)
+    }
+}
+
 #[cfg(not(test))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     crate::klib::custom_allocator::alloc(size)
