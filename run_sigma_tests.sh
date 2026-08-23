@@ -31,6 +31,10 @@ echo -e "${CYAN}:: Running Ecosystem & Compliance Inspection Unit Tests...${RESE
 rustc --edition 2021 --test tests/ecosystem_and_compliance_inspection_tests.rs -o build/eco_compliance_test
 ./build/eco_compliance_test
 
+echo -e "${CYAN}:: Running Algorithm & Subsystem Component Inspection Unit Tests...${RESET}"
+rustc --edition 2021 --test tests/algorithm_and_components_inspection_tests.rs -o build/algo_components_test
+./build/algo_components_test
+
 echo -e "${CYAN}:: Running Clean-Room Compatibility Harness Tests...${RESET}"
 rustc --edition 2021 --test tests/compat_harness.rs -o build/compat_harness_test
 ./build/compat_harness_test
