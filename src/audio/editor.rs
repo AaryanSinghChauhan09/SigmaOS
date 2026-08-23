@@ -5,6 +5,11 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+#[cfg(feature = "standalone_test")]
+extern crate alloc;
+#[cfg(feature = "standalone_test")]
+use alloc::vec::Vec;
+
 #[derive(Debug, Clone)]
 pub struct AudioTrack {
     pub id: usize,
