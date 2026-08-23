@@ -1,87 +1,74 @@
-# Linux Distro Ideas Implemented in SigmaOS
+# 🐧 Linux & BSD Distro Ideas
 
-This document catalogs ideas and features borrowed, inspired by, or improved upon from various Linux distributions.
+SigmaOS draws inspiration from the best features of major Linux distributions and BSDs.
 
-## Arch Linux
-- **Rolling Release Model**: SigmaOS adopts a rolling release for core system components
-- **AUR Compatibility**: Full AUR (Arch User Repository) compatibility layer
-- **pacman-style CLI**: sigma-pkg uses pacman-inspired syntax (`sigma-pkg -S package`)
-- **PKGBUILD Support**: Native PKGBUILD file support for building from source
-- **Minimalist Base**: Lean base installation with user-driven additions
+## Implementation Status
 
-## CachyOS
-- **BORE/EEVDF Scheduler**: Energy-efficient virtual deadline-first scheduler integration
-- **x86-64-v3/v4 Optimization**: CPU microarchitecture-specific build optimizations
-- **Performance Kernel Config**: CachyOS-inspired kernel configuration for maximum performance
-- **Transparent Huge Pages**: Aggressive THP settings for improved performance
-- **zRAM Auto-configuration**: Automatic zRAM setup based on system RAM
+| Distribution | Feature Borrowed | Implementation | Status |
+|-------------|-----------------|----------------|--------|
+| **Arch Linux** | Rolling release model | sigma-pkg continuous updates | ✅ |
+| **Arch Linux** | AUR (Arch User Repository) | AUR compatibility layer | 🚧 |
+| **CachyOS** | BORE scheduler (burst-oriented) | BORE + EEVDF hybrid | ✅ |
+| **CachyOS** | LTO/PGO optimized builds | Build system optimization | ✅ |
+| **Fedora** | DNF package resolver | DNF/RPM bridge | 🚧 |
+| **Fedora** | Bleeding edge tech adoption | Always-latest kernel | ✅ |
+| **Debian** | APT package management | dpkg/APT bridge | 🚧 |
+| **Debian** | Stable LTS releases | LTS release channels | 📋 |
+| **Ubuntu** | AppArmor profiles | AppArmor integration | 🚧 |
+| **Ubuntu** | Snap packages | Snap bridge | 📋 |
+| **openSUSE** | Btrfs snapshotting | Auto Btrfs snapshots | ✅ |
+| **openSUSE** | YaST-like config | sigma-control-center | 📋 |
+| **NixOS** | Declarative config | Nix expression support | 🔬 |
+| **NixOS** | Atomic upgrades | Content-addressed store | ✅ |
+| **Gentoo** | Source-based compilation | Portage bridge | 🔬 |
+| **Gentoo** | USE flags optimization | Feature flag system | 📋 |
+| **Void Linux** | runit init system | runit bridge | ✅ |
+| **Void Linux** | XBPS package manager | XBPS compatibility | 📋 |
+| **Alpine Linux** | Security-first minimal base | Minimal kernel mode | ✅ |
+| **Alpine Linux** | musl libc | musl compatibility | 📋 |
+| **Pop!_OS** | Auto-tiling window manager | Tiling WM | ✅ |
+| **Pop!_OS** | System76 firmware tools | Firmware manager | 📋 |
+| **Garuda Linux** | Dr460nized theme | Dark/blur theme | ✅ |
+| **Garuda Linux** | Gaming optimizations | Gaming mode | 📋 |
+| **antiX/MX Linux** | Lightweight tools | Busybox-style tools | ✅ |
+| **antiX** | systemd-free option | runit/OpenRC bridge | ✅ |
+| **Zorin OS** | Windows-like layout | Layout switcher | ✅ |
+| **Zorin OS** | Windows app support | Wine/Proton bridge | 🔬 |
+| **EndeavourOS** | Calamares installer | Guided installer | 📋 |
+| **Kali Linux** | Penetration testing tools | PenTest engine | 🔬 |
+| **Parrot OS** | AnonSurf anonymization | AnonSurf module | 🔬 |
+| **FreeBSD** | pf firewall | eBPF + pf rules | ✅ |
+| **OpenBSD** | pledge/unveil syscall | pledge/unveil impl | ✅ |
+| **OpenBSD** | Secure by default | Hardened defaults | ✅ |
+| **DragonFly BSD** | HAMMER2 filesystem | HAMMER2 driver | 🔬 |
 
-## Fedora
-- **SELinux Enforcement**: SELinux enabled by default in enforcing mode
-- **Flatpak-first Apps**: System apps delivered as Flatpaks where possible
-- **DNF-inspired Solver**: Dependency resolution algorithms inspired by DNF/libsolv
-- **Cockpit Web Console**: Web-based system management interface
-- **Toolbox Integration**: Development container workflow (Fedora Toolbox concept)
+## Detailed Feature Implementations
 
-## Ubuntu/Debian
-- **APT Compatibility**: Can consume .deb packages via compatibility layer
-- **snap-like Sandboxing**: Application sandboxing with snap-inspired confinement
-- **AppArmor Default**: AppArmor profiles enabled by default (Ubuntu approach)
-- **LTS Support Model**: Long-term support versions for enterprise users
-- **Apport Crash Reporter**: Crash reporting inspired by Ubuntu's Apport
+### Arch Linux Parity
+- **AUR client**: Resolve, download, build, and install AUR packages natively
+- **Pacman compatibility**: pacman-style CLI wrapper around sigma-pkg
+- **Rolling release**: Continuous package updates without version pinning
 
-## openSUSE
-- **YaST-inspired TUI**: Terminal UI for system configuration (YaST concept)
-- **Btrfs as Default**: Btrfs with snapper-like automatic snapshots
-- **OBS Integration**: Open Build Service integration for package building
-- **Zypper-inspired Rollback**: System rollback via filesystem snapshots
-- **Transactional Updates**: Read-only root with transactional update system
+### CachyOS Parity
+- **BORE scheduler**: Burst-Oriented Response Enhancer reduces latency for interactive workloads
+- **EEVDF scheduler**: Earliest Eligible Virtual Deadline First for fairness
+- **LTO builds**: Link-time optimization for kernel and userspace
+- **zstd compression**: Fast compression for initramfs and packages
 
-## NixOS
-- **Declarative Configuration**: System configuration as code (sigma-config.toml)
-- **Atomic Upgrades**: Atomic system updates with rollback capability
-- **Nix Package Integration**: Optional Nix package manager integration
-- **Reproducible Builds**: Deterministic build system inspired by Nix
-- **Flake-style Environments**: Development environment isolation
+### NixOS Parity
+- **Declarative system**: Define entire system state in Nix expressions
+- **Atomic rollback**: Every update is atomic; rollback to any generation
+- **Content-addressed store**: Packages stored by hash for reproducibility
+- **Dependency isolation**: No DLL hell — packages carry their own dependencies
 
-## Gentoo
-- **Source-based Options**: Optional source compilation with USE flag equivalents
-- **Portage Concepts**: Feature flags for granular package customization
-- **Stage3 Bootstrap**: Minimal bootstrap image for advanced installation
-- **Hardened Profile**: Security-hardened build profile option
+### OpenBSD Parity
+- **pledge()**: Processes declare capability requirements upfront
+- **unveil()**: Filesystem access restricted to declared paths
+- **Secure levels**: Kernel hardening levels (securelevel 0-3)
+- **W^X enforcement**: Writable XOR executable memory pages
 
-## Void Linux
-- **runit-compatible Services**: Service management compatible with runit style
-- **XBPS Concepts**: Independent package manager design philosophy
-- **Musl libc Option**: Optional musl libc for security-sensitive deployments
-- **No systemd Dependency**: Core system designed to be init-agnostic
-
-## antiX / MX Linux
-- **Legacy Hardware Support**: Optimized profiles for older hardware
-- **Live Session Quality**: Excellent live session experience
-- **Persistence Support**: Persistent live USB with encryption
-- **Low RAM Mode**: Special kernel and DE configuration for <1GB RAM systems
-
-## Zorin OS
-- **Windows/macOS Parity UX**: Familiar desktop layouts for switchers
-- **Touch Optimization**: Tablet/touch-optimized desktop mode
-- **Lite Edition**: Minimal edition for older hardware
-- **Gaming Mode**: Dedicated gaming profile with WINE/Proton integration
-
-## Alpine Linux
-- **musl + BusyBox base**: Ultra-minimal base system option
-- **Container-first Design**: First-class container runtime support
-- **diskless Mode**: RAM-based diskless operation mode
-- **Security Focus**: Mandatory security hardening in all profiles
-
-## Pop!_OS
-- **Auto-tiling WM**: Optional automatic tiling window management
-- **NVIDIA Support**: Seamless NVIDIA driver integration
-- **Recovery Partition**: System recovery and reinstall partition
-- **Flatpak Store**: Curated application storefront
-
-## EndeavourOS / Garuda Linux
-- **Garuda-style Dr460nized**: Eye-candy desktop with blur/transparency
-- **Welcome App**: First-boot welcome and setup application
-- **Gaming Tools Hub**: Centralized gaming tools installer
-- **Performance Presets**: One-click performance profiles
+### FreeBSD Parity
+- **pf firewall**: Packet Filter with stateful inspection
+- **Jails**: Lightweight OS-level virtualization (via namespaces)
+- **ZFS**: Advanced storage with checksums and snapshots
+- **bhyve-inspired VMM**: Type-2 hypervisor model

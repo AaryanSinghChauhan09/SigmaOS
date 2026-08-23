@@ -1,261 +1,143 @@
-# SigmaOS Quick Start Guide
+# SigmaOS Quick Start
 
-> Get SigmaOS running in under 10 minutes.
-
----
-
-## 🚀 Prerequisites
-
-| Requirement | Minimum | Recommended |
-|-------------|---------|-------------|
-| **CPU** | x86_64, AArch64, or RISC-V | AMD Zen 3+ / Intel Alder Lake+ |
-| **RAM** | 512 MB | 8 GB+ |
-| **Storage** | 4 GB | 50 GB+ NVMe |
-| **GPU** | Any (software rendering) | Vulkan-capable |
-| **Rust** | 1.75+ | Latest stable |
+> New here? Start here. This gets you from zero to running SigmaOS in under 10 minutes.
 
 ---
 
-## 💾 Installation Options
+## Option A — Run the QEMU Demo (works today)
 
-### Option 1: ISO (Recommended for Hardware)
+SigmaOS v15.0 has a kernel stub you can build and run in QEMU right now.
+
 ```bash
-# Download latest ISO
-wget https://github.com/AaryanSinghChauhan09/SigmaOS/releases/latest/SigmaOS-x86_64.iso
 
-# Verify integrity
-sha256sum SigmaOS-x86_64.iso
+# 1. Install prerequisites (Ubuntu/Debian)
 
-# Flash to USB (Linux)
-dd if=SigmaOS-x86_64.iso of=/dev/sdX bs=4M status=progress
+sudo apt install -y build-essential nasm cmake qemu-system-x86 \
+  golang-go xorriso mtools grub-pc-bin grub-efi-amd64-bin
 
-# Flash to USB (macOS)
-diskutil unmountDisk /dev/diskN
-dd if=SigmaOS-x86_64.iso of=/dev/rdiskN bs=4m
-```
+# 2. Clone
 
-### Option 2: QEMU Virtual Machine
-```bash
-# Install QEMU
-apt install qemu-system-x86  # Debian/Ubuntu
-brew install qemu             # macOS
-
-# Run SigmaOS in QEMU
-qemu-system-x86_64 \
-  -m 2G \
-  -enable-kvm \
-  -cdrom SigmaOS-x86_64.iso \
-  -boot d \
-  -display gtk \
-  -net nic -net user
-```
-
-### Option 3: Build from Source
-```bash
-# Clone repository
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
-# Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.cargo/env
-rustup toolchain install nightly
-rustup component add rust-src llvm-tools-preview
+# 3. Build
 
-# Install build dependencies
-sudo apt install -y nasm grub-pc-bin grub-efi-amd64-bin xorriso mtools
+make clean && make all -j$(nproc)
 
-# Build SigmaOS
-cargo build --release
+# 4. Run
 
-# Build bootable ISO
-bash scripts/build-iso.sh
+qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
+```
 
-# Run in QEMU
-bash scripts/run-qemu.sh
+> **Note:** The current build is a kernel stub — it boots to early init output.
+> A full interactive shell (`sigma-sh`) is coming in v0.1.
+> Track progress: [docs/Minimal_SigmaOS_v0.1.md](docs/Minimal_SigmaOS_v0.1.md)
+
+---
+
+## Option B — Run the Web Desktop Demo (works today)
+
+No install needed. Open `index.html` in your browser:
+
+```bash
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
+
+# Open the Zenith Desktop prototype
+
+start index.html        # Windows
+
+open index.html         # macOS
+
+xdg-open index.html     # Linux
+
+```
+
+You'll see: the full Zenith Desktop UI, OmniShell terminal, file manager,
+telemetry HUD — all running as a web app.
+
+---
+
+## Option C — Browse the Download Page
+
+All 50+ distribution formats are documented at:
+
+```
+download.html   ← open this in your browser
+```
+
+Formats include: Native ELF, Electron, AppImage, WASM, APK/IPA, Docker/OCI,
+RTOS images, Cloud QCOW2, and more.
+
+---
+
+## Build Profiles
+
+Once the v0.1 bootable ISO ships, you can build any profile:
+
+```bash
+make PROFILE=standalone    all -j$(nproc)   # Full Zenith Desktop
+
+make PROFILE=minimal       all -j$(nproc)   # v0.1 shell-only
+
+make PROFILE=microkernel   all -j$(nproc)   # <512KB kernel
+
+make PROFILE=cloud         all -j$(nproc)   # Headless cloud
+
+make PROFILE=rtos          all -j$(nproc)   # Hard real-time
+
+make PROFILE=mobile ARCH=arm64 all -j$(nproc)  # ARM64
+
+make PROFILE=browser       all -j$(nproc)   # WASM bundle
+
 ```
 
 ---
 
-## 📱 First Boot Experience
+## Want to Contribute?
 
-### 1. Language & Locale
-```
-Welcome to SigmaOS!
-> Select language: [English] [Hindi] [Spanish] [French] [German] [Chinese]
-> Select timezone: [Auto-detect] [Manual]
-> Select keyboard layout: [US QWERTY] [DVORAK] [AZERTY]
-```
+The highest-impact tasks right now are:
 
-### 2. User Setup
-```
-> Create username: sigma_user
-> Set password: ***
-> Enable sudo: [Yes] [No]
-> Full disk encryption: [Yes (recommended)] [No]
-```
+| Task | Skill | File |
+|------|-------|------|
+| Round-robin scheduler | C++ / Rust (no_std) | `kernel/core/sigma_sched.cpp` |
+| Buddy allocator | C++ / Rust (no_std) | `kernel/core/sigma_mm.cpp` |
+| sigma-sh REPL | Rust | `userland/shell/sigma_shell.cpp` |
+| sigma-pkg local mode | Rust | `userland/pkg/sigma_registry.cpp` |
+| USB HID keyboard | Rust (driver) | `drivers/input/sigma_hid.rs` |
+| VESA framebuffer | C / Rust | `drivers/display/sigma_vesa.cpp` |
+| Package recipes | Any | `packages/` (new sigpkg specs) |
+| Wiki pages | Markdown | `wiki_repo/` |
 
-### 3. Desktop Selection
-```
-Choose desktop environment:
-> [1] Pantheon Desktop (Elementary-inspired, recommended)
-> [2] Minimal (no desktop, CLI only)
-> [3] GNOME Compatibility Mode
-> [4] KDE Plasma Compatibility Mode
-```
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for technical mandates (Rust, no_std, no third-party crates).
 
 ---
 
-## 📦 Package Management
+## Key Docs
 
-```bash
-# Update system
-sigma-pkg update
-sigma-pkg upgrade
-
-# Search packages
-sigma-pkg search firefox
-
-# Install package
-sigma-pkg install firefox
-
-# Install from User Package Store (AUR-equivalent)
-sigma-ups install visual-studio-code
-
-# Install Flatpak (sandboxed)
-sigma-pkg install --flatpak com.spotify.Client
-
-# Remove package
-sigma-pkg remove firefox
-
-# Clean cache
-sigma-pkg clean
-```
+| Document | What it covers |
+|----------|---------------|
+| [README.md](README.md) | Project overview + download links |
+| [ROADMAP.md](ROADMAP.md) | Phase 1→4 execution plan |
+| [DOWNLOAD.md](DOWNLOAD.md) | All 50+ format tables + build flags |
+| [Architecture.md](Architecture.md) | System layers, subsystems, directory map |
+| [INSTALL.md](INSTALL.md) | QEMU demo + build profiles + troubleshooting |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Code standards, PR process, CI requirements |
+| [docs/Minimal_SigmaOS_v0.1.md](docs/Minimal_SigmaOS_v0.1.md) | v0.1 bootable ISO spec |
+| [docs/Competitive_Analysis.md](docs/Competitive_Analysis.md) | How SigmaOS compares to Alpine/Arch/Ubuntu |
+| [docs/Open_Source_Drivers.md](docs/Open_Source_Drivers.md) | Driver strategy + SDF guide |
+| [STRATEGIC_VISION.md](STRATEGIC_VISION.md) | Long-term vision and positioning |
 
 ---
 
-## 🔧 Essential Configuration
+## Community
 
-### Network
-```bash
-# Configure wired network (DHCP)
-sigma-net connect --dhcp eth0
+- **GitHub Issues** → [Report bugs / request features](https://github.com/AaryanSinghChauhan09/SigmaOS/issues)
 
-# Configure WiFi
-sigma-net wifi list
-sigma-net wifi connect "MyNetwork" --password "mypassword"
+- **GitHub Discussions** → [Ask questions / share ideas](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
 
-# Configure VPN
-sigma-net vpn add wireguard my-vpn /path/to/wg0.conf
-sigma-net vpn connect my-vpn
-```
-
-### Audio
-```bash
-# List audio devices
-sigma-audio list
-
-# Set default output
-sigma-audio set-default --output "Built-in Audio"
-
-# Volume control
-sigma-audio volume set 75
-```
-
-### Display
-```bash
-# List displays
-sigma-display list
-
-# Set resolution
-sigma-display set --monitor HDMI-1 --resolution 1920x1080 --rate 144
-
-# Multi-monitor setup
-sigma-display extend --left HDMI-1 --right DP-1
-```
+- **Wiki** → [Full documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
 
 ---
 
-## 🧠 AI Features
-
-```bash
-# Start AI assistant
-sigma-ai start
-
-# Ask a question
-sigma-ai ask "How do I configure firewall rules?"
-
-# Enable voice interface
-sigma-ai voice --enable
-
-# Run local LLM (Llama 3)
-sigma-ai llm --model llama3-8b --interactive
-```
-
----
-
-## 🛠️ Developer Setup
-
-```bash
-# Install development tools
-sigma-pkg install --group development
-
-# Enable dev container
-code .  # VS Code detects .devcontainer automatically
-
-# Run tests
-cargo test
-
-# Build in release mode
-cargo build --release
-
-# Generate documentation
-cargo doc --open
-```
-
----
-
-## 🧪 Virtualization
-
-```bash
-# Create VM
-sigma-vm create ubuntu-24 \
-  --image ubuntu-24.04.iso \
-  --ram 4G \
-  --disk 50G \
-  --type kvm
-
-# Start VM
-sigma-vm start ubuntu-24
-
-# Connect to VM console
-sigma-vm console ubuntu-24
-
-# Live snapshot
-sigma-vm snapshot ubuntu-24 --name pre-upgrade
-
-# Restore snapshot
-sigma-vm restore ubuntu-24 --snapshot pre-upgrade
-```
-
----
-
-## 📚 Getting Help
-
-| Resource | Link |
-|----------|------|
-| **Documentation** | [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) |
-| **Issues** | [GitHub Issues](https://github.com/AaryanSinghChauhan09/SigmaOS/issues) |
-| **Discussions** | [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions) |
-| **Source** | [Repository](https://github.com/AaryanSinghChauhan09/SigmaOS) |
-
-```bash
-# Built-in help
-sigma-ctl help
-sigma-pkg --help
-man sigma-net
-```
-
----
-
-*SigmaOS Quick Start Guide | Updated: 2026-08-23*
+### SigmaOS — Sovereign by Design. One codebase. Every format.
