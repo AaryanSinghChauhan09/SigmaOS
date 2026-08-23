@@ -1,0 +1,26 @@
+name: FreeBSD Jail & VNET Virtualization Inspection CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  freebsd-jail-vnet-audit:
+    name: FreeBSD Jail & VNET Network Stack Inspection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Run Sovereign Atomic Test Harness
+        run: |
+          chmod +x ./run_sigma_tests.sh
+          ./run_sigma_tests.sh

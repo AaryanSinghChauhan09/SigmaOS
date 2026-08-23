@@ -2,6 +2,7 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod debian_crusher;
 pub mod debian_defeater;
 pub mod importer;
 pub mod makepkg;
@@ -10,14 +11,16 @@ pub mod portage;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
-pub mod debian_crusher;
+pub mod verifier;
+pub mod zero_alloc_resolver;
 
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    UniversalPackageManager, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
@@ -39,8 +42,8 @@ pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
-pub use universal_adapter::{
-    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
+pub use crate::package::universal::{
+    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest,
 };
 pub use verifier::CryptoVerifier;
 
@@ -93,12 +96,6 @@ impl Version {
     }
 }
 
-impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParseError {
     InvalidFormat,
@@ -139,24 +136,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }
