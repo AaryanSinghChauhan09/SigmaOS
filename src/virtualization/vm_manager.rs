@@ -125,11 +125,15 @@ pub trait HypervisorBackend {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KvmExitReason {
     Unknown,
+    Io,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
+    Mmio,
     MmioRead { addr: u64, len: u8 },
     MmioWrite { addr: u64, len: u8, data: u64 },
+    Hypercall,
     Hlt,
+    Interrupt,
     Shutdown,
     InternalError,
 }
@@ -147,6 +151,7 @@ pub struct KvmVcpuState {
     pub rsp: u64,
     pub rbp: u64,
     pub rip: u64,
+    pub cs: u64,
     pub rflags: u64,
     pub cr0: u64,
     pub cr3: u64,
@@ -739,18 +744,6 @@ impl AmdViIommuManager {
 // ==============================================================================
 // KVM & QEMU INSPIRED ADVANCED VIRTUALIZATION ENGINE
 // ==============================================================================
-
-/// KVM-inspired vCPU execution exit reasons
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KvmExitReason {
-    Unknown,
-    Io,
-    Mmio,
-    Hypercall,
-    Hlt,
-    InternalError,
-    Interrupt,
-}
 
 /// KVM vCPU register state
 #[derive(Debug, Clone, Default)]
