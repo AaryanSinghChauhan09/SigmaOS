@@ -335,3 +335,26 @@ fn test_task_states_and_workload_classifications() {
     assert_eq!(stats.running_tasks, 1);
     assert_eq!(stats.ready_tasks, 2);
 }
+
+#[test]
+fn test_ai_algorithms_inspection() {
+    use sigmaos::ai::{
+        KMeansClustering, LocalLlmWrapper, LocalQuantizationType,
+        PrincipalComponentAnalysis, WhisperSpeechToText,
+    };
+
+    let mut kmeans = KMeansClustering::new(2, 10);
+    kmeans.fit(&[vec![1.0, 2.0], vec![10.0, 10.0]]).unwrap();
+    assert_eq!(kmeans.predict(&[1.1, 1.9]), 0);
+
+    let pca = PrincipalComponentAnalysis::new(2);
+    let reduced = pca.transform(&[1.0, 2.0, 3.0, 4.0]);
+    assert_eq!(reduced.len(), 2);
+
+    let llm = LocalLlmWrapper::new("/models/llama3-8b.gguf", LocalQuantizationType::Q4_K_M);
+    assert!(llm.generate_response("system status").contains("100% Sovereign"));
+
+    let whisper = WhisperSpeechToText::new("/models/whisper-tiny.gguf");
+    let text = whisper.transcribe_audio_pcm(&[0.1f32; 1000]).unwrap();
+    assert_eq!(text, "System command: open terminal");
+}
