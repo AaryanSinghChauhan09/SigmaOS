@@ -1,0 +1,26 @@
+name: Void Linux XBPS & Runit Inspection CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-xbps-runit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Full SigmaOS Harness Tests
+        run: |
+          mkdir -p build
+          chmod +x run_sigma_tests.sh
+          ./run_sigma_tests.sh

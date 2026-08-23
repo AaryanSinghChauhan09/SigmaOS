@@ -2,7 +2,8 @@
 // Zero-dependency, safe, robust package adapter and transaction orchestrator
 // Integrates User-Defined Functions (UDF) and instant O(1) transaction rollbacks
 
-use crate::klib::HashMap;
+extern crate alloc;
+use alloc::collections::BTreeMap as HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
@@ -192,7 +193,7 @@ impl IPackageAdapter for SovereignPackageAdapter {
 // User Defined Functions (UDF) Hook Engine
 // ==========================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum HookType {
     PreInstall,
     PostInstall,
