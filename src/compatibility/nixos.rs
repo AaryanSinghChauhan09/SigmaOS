@@ -286,7 +286,7 @@ impl NixosConfig {
             ConfigOption::Attrs(attrs) => {
                 let attrs_str: Vec<String> = attrs.iter()
                     .map(|(k, v)| format!("{} = {}", k, self.config_option_to_string(v)))
-                let mut result = String::from("{ ");
+                    .collect();
                 format!("{{ {} }}", attrs_str.join("; "))
             }
         }

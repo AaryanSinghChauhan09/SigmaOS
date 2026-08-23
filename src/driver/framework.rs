@@ -67,6 +67,36 @@ pub trait GraphicsDriver: Driver {
     fn flip_buffers(&mut self) -> Result<(), DriverError>;
 }
 
+pub struct SimpleDriver {
+    pub id: DriverID,
+    pub driver_type: DriverType,
+    pub state: DriverState,
+}
+
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver {
+            id,
+            driver_type,
+            state: DriverState::Unloaded,
+        }
+    }
+}
+
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID { self.id }
+    fn driver_type(&self) -> DriverType { self.driver_type }
+    fn state(&self) -> DriverState { self.state }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.state = DriverState::Loaded;
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.state = DriverState::Unloaded;
+        Ok(())
+    }
+}
+
 pub trait InputDriver: Driver {
     fn poll_events(&mut self) -> Result<usize, DriverError>;
 }

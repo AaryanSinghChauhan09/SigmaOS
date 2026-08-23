@@ -1,4 +1,5 @@
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 /// OOP-based Screen Reader for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 816
 /// Implements text-to-speech and accessibility
@@ -128,7 +129,7 @@ impl SimpleScreenReader {
         for voice_option in &self.voices {
             if let Some(ref voice) = *voice_option {
                 if voice.id() == id {
-                    return Some(voice.as_ref());
+                    return Some(&**voice);
                 }
             }
         }

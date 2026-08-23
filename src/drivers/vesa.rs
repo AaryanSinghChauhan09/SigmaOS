@@ -415,7 +415,7 @@ mod tests {
 
     #[test]
     fn test_out_of_bounds() {
-        let vesa = VesaDriver::new();
+        let mut vesa = VesaDriver::new();
         assert!(vesa.write_pixel(9999, 9999, 0xFFFFFF).is_err());
     }
 }

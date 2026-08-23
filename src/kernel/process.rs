@@ -370,27 +370,31 @@ impl ProcessManager {
     }
 
     pub fn exit_process(&mut self, pid: ProcessId, code: i32) {
-        if let Some(p) = self.processes.get_mut(&pid) {
+        let mut children = Vec::new();
+        let ppid = if let Some(p) = self.processes.get_mut(&pid) {
             p.state = ProcessState::Zombie;
             p.exit_code = Some(code);
-            let children = p.children.clone();
+            children = p.children.clone();
             p.children.clear();
-            for cpid in children {
-                if let Some(child) = self.processes.get_mut(&cpid) {
-                    child.ppid = ProcessId(1);
-                    if let Some(init) = self.processes.get_mut(&ProcessId(1)) {
-                        init.children.push(cpid);
-                    }
-                }
+            p.ppid
+        } else {
+            return;
+        };
+
+        for cpid in children {
+            if let Some(child) = self.processes.get_mut(&cpid) {
+                child.ppid = ProcessId(1);
             }
-            
-            let ppid = p.ppid;
-            if let Some(q) = self.wait_queues.get_mut(&ppid) {
-                while let Some(tid) = q.pop_front() {
-                    if let Some(t) = self.threads.get_mut(&tid) {
-                        t.state = ProcessState::Ready;
-                        self.ready_queue.push_back(tid);
-                    }
+            if let Some(init) = self.processes.get_mut(&ProcessId(1)) {
+                init.children.push(cpid);
+            }
+        }
+
+        if let Some(q) = self.wait_queues.get_mut(&ppid) {
+            while let Some(tid) = q.pop_front() {
+                if let Some(t) = self.threads.get_mut(&tid) {
+                    t.state = ProcessState::Ready;
+                    self.ready_queue.push_back(tid);
                 }
             }
         }

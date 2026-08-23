@@ -284,17 +284,19 @@ impl SovereignMonitor {
     }
 
     pub fn check_agent_health(&mut self) {
+        let mut crashed = Vec::new();
         for agent_opt in &self.agents {
             if let Some(ref agent) = agent_opt {
-                let status = agent.get_status();
-                if status == AgentStatus::Crashed {
+                if agent.get_status() == AgentStatus::Crashed {
                     let agent_id = agent.agent_id();
                     if !self.watchdog.report_crash(agent_id) {
-                        // Agent is unstable, initiate recovery
-                        self.initiate_recovery(agent_id);
+                        crashed.push(agent_id);
                     }
                 }
             }
+        }
+        for agent_id in crashed {
+            self.initiate_recovery(agent_id);
         }
     }
 

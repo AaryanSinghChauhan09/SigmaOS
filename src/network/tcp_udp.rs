@@ -3,7 +3,7 @@ use core::mem;
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -22,22 +22,6 @@ impl Protocol {
 
 /// Standard RFC-793 TCP States
 #[repr(u32)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TCPState {
-    Closed = 0,
-    Listen = 1,
-    SynSent = 2,
-    SynReceived = 3,
-    Established = 4,
-    FinWait1 = 5,
-    FinWait2 = 6,
-    CloseWait = 7,
-    Closing = 8,
-    TimeWait = 9,
-}
-
-/// Network Errors
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
@@ -297,9 +281,6 @@ impl CongestionControl for RenoCongestionControl {
 
     fn get_cwnd(&self) -> usize {
         self.cwnd as usize
-    }
-    fn get_cwnd(&self) -> usize {
-        self.cwnd.load(Ordering::SeqCst)
     }
 }
 

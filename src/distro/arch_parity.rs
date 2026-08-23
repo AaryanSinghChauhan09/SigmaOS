@@ -7,8 +7,7 @@
 extern crate alloc;
 
 use crate::klib::{BTreeMap, String, ToString, Vec};
-use alloc::string::String;
-use alloc::vec::Vec;
+use alloc::string::String as AllocString;
 use alloc::format;
 use core::cell::Cell;
 

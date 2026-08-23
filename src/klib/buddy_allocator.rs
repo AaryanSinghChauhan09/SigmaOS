@@ -75,9 +75,7 @@ impl SimpleBuddyAllocator {
             free_lists,
             blocks,
             next_id,
-        };
-        allocator.free_lists[initial_order].push(initial_block_id);
-        allocator
+        }
     }
 }
 

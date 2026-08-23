@@ -9,6 +9,8 @@ use alloc::collections::BTreeSet as AllocBTreeSet;
 use alloc::collections::VecDeque as AllocVecDeque;
 use core::cell::Cell;
 
+pub use super::hashmap::{Entry, HashMap};
+
 /// Simple BTreeMap implementation for klib
 pub struct BTreeMap<K, V> {
     inner: AllocBTreeMap<K, V>,

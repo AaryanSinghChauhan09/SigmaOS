@@ -8,13 +8,6 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Memory Module
 // Virtual memory management, paging, physical memory allocation, and TLB caching
@@ -35,9 +28,8 @@ pub use zone::{BsdZoneAllocator, Zone, ZoneStats, Slab};
 pub use kswapd::{LinuxKswapd, PageState};
 pub use cgroups::{MemCgroupManager, MemCgroup};
 pub use segmentation_paging::{
-    AddressBindingMode, AddressType, AslrEntropyConfig, CpuPrivilegeMode, CpuRing, ExecutableAddressBinding,
-    GlobalDescriptorTable, MultiLevelPagingEngine, ProtectionLevel, ProtectionViolationType,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentType, SegmentedAddress,
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector,
     SegmentationPagingEngine, SpaceProtectionFlags, SystemControlRegisters,
 };
 pub use tlb_associative::{

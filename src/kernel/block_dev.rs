@@ -24,15 +24,6 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 #[cfg(not(test))]
 use crate::klib::{BTreeMap, Vec, VecDeque};
 
-#[cfg(test)]
-use std::collections::{BTreeMap, VecDeque};
-
-#[cfg(not(test))]
-use crate::klib::Vec;
-
-#[cfg(test)]
-use alloc::vec::Vec;
-
 use alloc::string::String;
 
 pub const SECTOR_SIZE: usize = 512;
@@ -207,6 +198,9 @@ pub struct RamDisk {
     reads: AtomicU64,
     writes: AtomicU64,
 }
+
+unsafe impl Send for RamDisk {}
+unsafe impl Sync for RamDisk {}
 
 impl RamDisk {
     pub fn new(name: &str, size_bytes: usize) -> Self {
