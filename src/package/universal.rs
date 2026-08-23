@@ -9,15 +9,6 @@ use std::collections::HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PackagePriority {
-    Essential,
-    Required,
-    Important,
-    Standard,
-    Optional,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
     Deb,      // apt/dpkg
     Rpm,      // yum/dnf/zypper
@@ -202,121 +193,10 @@ impl PackageAdapter {
         Ok(())
     }
 
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Purging DEB package {}",
-            self.adapter_name,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Refreshing and updating DEB package {}",
-            self.adapter_name,
-            package.name
-        );
-        Ok(())
-    }
-}
-
-/// AptDebAdapter handles Debian/Ubuntu package formats (`.deb`)
-pub struct AptDebAdapter {
-    pub dpkg_status_path: String,
-}
-
-impl AptDebAdapter {
-    pub fn new() -> Self {
-        Self {
-            dpkg_status_path: "/var/lib/dpkg/status".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for AptDebAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Deb
-    }
-
-    fn adapter_name(&self) -> &str {
-        "apt"
-    }
-
-    fn parse_manifest(&self, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
-        let manifest = String::from_utf8(raw_data.to_vec())
-            .map_err(|_| "Failed to parse UTF-8 DEB manifest")?;
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut dependencies = Vec::new();
-
-        for line in manifest.lines() {
-            if line.starts_with("Package: ") {
-                name = line["Package: ".len()..].trim().to_string();
-            } else if line.starts_with("Version: ") {
-                version = line["Version: ".len()..].trim().to_string();
-            } else if line.starts_with("Depends: ") {
-                let deps = line["Depends: ".len()..].trim();
-                for d in deps.split(',') {
-                    dependencies.push(d.trim().to_string());
-                }
-            }
-        }
-
-        if name.is_empty() || version.is_empty() {
-            return Err("Invalid DEB manifest");
-        }
-
-        let mut pkg = UnifiedPackage::new(name.clone(), version.clone())
-            .with_format(PackageFormat::Deb);
-        for dep in dependencies {
-            pkg = pkg.with_dependency(dep);
-        }
-        Ok(pkg)
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("AptDebAdapter: Installing Debian package {}", package.name);
-        Ok(())
-    }
-}
-
-/// YumRpmAdapter handles RedHat/Fedora package formats (`.rpm`)
-pub struct YumRpmAdapter {
-    pub repo_metadata_path: String,
-}
-
-impl YumRpmAdapter {
-    pub fn new() -> Self {
-        Self {
-            repo_metadata_path: "/var/lib/yum/repos".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for YumRpmAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Rpm
-    }
-
-    fn adapter_name(&self) -> &str {
-        "yum"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    pub fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Removing {} using {} adapter",
-            package.name, self.adapter_name()
-        );
-        // Simulate removal
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Erasing RPM package {}",
-            self.adapter_name(),
-            package.name
+            package.name, self.adapter_name
         );
         Ok(())
     }
@@ -324,7 +204,7 @@ impl PackageFormatAdapter for YumRpmAdapter {
     pub fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
-            package.name, self.adapter_name()
+            package.name, self.adapter_name
         );
         Ok(())
     }
@@ -405,14 +285,12 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
-        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
-        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
-        to_visit.push(package_name.to_string());
-        let mut visited = std::collections::HashSet::<String>::new();
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
+        let mut resolved = Vec::new();
+        let mut to_visit = vec![package_name.to_string()];
+        let mut visited = Vec::<String>::new();
 
         while let Some(current) = to_visit.pop() {
-            let current: String = current;
             if visited.contains(&current) {
                 continue;
             }
@@ -421,7 +299,6 @@ impl DependencyResolver {
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
-                    let dep: &String = dep;
                     if !visited.contains(dep) {
                         to_visit.push(dep.clone());
                     }
@@ -443,8 +320,6 @@ impl DependencyResolver {
                 if let (Some(pkg1), Some(pkg2)) =
                     (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
                 {
-                    let pkg1: &UnifiedPackage = pkg1;
-                    let pkg2: &UnifiedPackage = pkg2;
                     if pkg1.has_conflict_with(pkg2) {
                         conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
                     }
@@ -520,9 +395,6 @@ impl Default for DependencyResolver {
 }
 
 /// Transactional package manager checkpoint
-
-
-/// Universal package manager with transaction-safe snapshots & rollback mechanisms
 #[derive(Debug, Clone)]
 pub struct PackageCheckpoint {
     pub checkpoint_id: usize,
@@ -538,7 +410,7 @@ pub struct TransactionalHistory {
 
 impl TransactionalHistory {
     pub fn new() -> Self {
-        Self {
+        TransactionalHistory {
             checkpoints: Vec::new(),
             next_checkpoint_id: 1,
         }
@@ -548,7 +420,7 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys = Vec::new();
+        let mut keys = Vec::<String>::new();
         for key in installed.keys() {
             keys.push(key.clone());
         }
@@ -616,17 +488,11 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
         self.adapters.insert(PackageFormat::Snap, snap_adapter);
         self.adapters
-            .insert(PackageFormat::Deb, PackageAdapter::new(PackageFormat::Deb, String::from("AptDeb")));
+            .insert(PackageFormat::Flatpak, flatpak_adapter);
         self.adapters
-            .insert(PackageFormat::Rpm, PackageAdapter::new(PackageFormat::Rpm, String::from("YumRpm")));
+            .insert(PackageFormat::AppImage, appimage_adapter);
         self.adapters
-            .insert(PackageFormat::Pacman, PackageAdapter::new(PackageFormat::Pacman, String::from("Pacman")));
-        self.adapters
-            .insert(PackageFormat::Snap, PackageAdapter::new(PackageFormat::Snap, String::from("Snap")));
-        self.adapters
-            .insert(PackageFormat::Flatpak, PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")));
-        self.adapters
-            .insert(PackageFormat::SigmaPkg, PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")));
+            .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -679,9 +545,9 @@ impl UniversalPackageManager {
             if let Some(package) = package_opt {
                 // Find appropriate adapter
                 for format in &package.formats {
-                    if let Some(adapter) = self.adapters.get(format) {
-                        let adapter: &PackageAdapter = adapter;
-                        adapter.install(package)?;
+                    let adapter_opt = self.adapters.get(format);
+                    if let Some(adapter) = adapter_opt {
+                        adapter.install(&package)?;
                         break;
                     }
                 }
@@ -699,9 +565,9 @@ impl UniversalPackageManager {
         let package_opt = self.installed_packages.get(package_name).cloned();
         if let Some(package) = package_opt {
             for format in &package.formats {
-                if let Some(adapter) = self.adapters.get(format) {
-                    let adapter: &PackageAdapter = adapter;
-                    adapter.remove(package)?;
+                let adapter_opt = self.adapters.get(format);
+                if let Some(adapter) = adapter_opt {
+                    adapter.remove(&package)?;
                     break;
                 }
             }
@@ -714,9 +580,9 @@ impl UniversalPackageManager {
         let package_opt = self.installed_packages.get(package_name).cloned();
         if let Some(package) = package_opt {
             for format in &package.formats {
-                if let Some(adapter) = self.adapters.get(format) {
-                    let adapter: &PackageAdapter = adapter;
-                    adapter.update(package)?;
+                let adapter_opt = self.adapters.get(format);
+                if let Some(adapter) = adapter_opt {
+                    adapter.update(&package)?;
                     break;
                 }
             }
@@ -746,204 +612,6 @@ impl Default for UniversalPackageManager {
     }
 }
 
-// =========================================================================
-// 1. MultiDistroPackageAdapter (Multi-format RPM, DEB, APK, Arch, Snap, Flatpak)
-// =========================================================================
-
-pub struct MultiDistroPackageAdapter {
-    pub registered_formats: Vec<PackageFormat>,
-}
-
-impl MultiDistroPackageAdapter {
-    pub fn new() -> Self {
-        MultiDistroPackageAdapter {
-            registered_formats: vec![
-                PackageFormat::Deb,
-                PackageFormat::Rpm,
-                PackageFormat::Pacman,
-                PackageFormat::Snap,
-                PackageFormat::Flatpak,
-                PackageFormat::Apk,
-                PackageFormat::SigmaPkg,
-            ],
-        }
-    }
-
-    /// Dynamically parses package spec/control file headers from any Linux distro package format
-    pub fn parse_package_headers(&self, raw_metadata: &str, format: PackageFormat) -> Result<UnifiedPackage, String> {
-        if !self.registered_formats.contains(&format) {
-            return Err("Unsupported package format".to_string());
-        }
-
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut dependencies = Vec::new();
-
-        for line in raw_metadata.lines() {
-            let line = line.trim();
-            if line.is_empty() {
-                continue;
-            }
-
-            match format {
-                PackageFormat::Deb => {
-                    // Debian Control format (e.g. Package: libc6, Version: 2.31, Depends: libcrypt1)
-                    if line.starts_with("Package:") {
-                        name = line["Package:".len()..].trim().to_string();
-                    } else if line.starts_with("Version:") {
-                        version = line["Version:".len()..].trim().to_string();
-                    } else if line.starts_with("Depends:") {
-                        let deps_str = line["Depends:".len()..].trim();
-                        for d in deps_str.split(',') {
-                            dependencies.push(d.trim().to_string());
-                        }
-                    }
-                }
-                PackageFormat::Rpm => {
-                    // RPM spec format (e.g. Name: coreutils, Version: 8.32, Requires: glibc)
-                    if line.starts_with("Name:") {
-                        name = line["Name:".len()..].trim().to_string();
-                    } else if line.starts_with("Version:") {
-                        version = line["Version:".len()..].trim().to_string();
-                    } else if line.starts_with("Requires:") {
-                        let deps_str = line["Requires:".len()..].trim();
-                        for d in deps_str.split(',') {
-                            dependencies.push(d.trim().to_string());
-                        }
-                    }
-                }
-                PackageFormat::Pacman => {
-                    // Arch PKGBUILD / .PKGINFO format (e.g. pkgname = pacman, pkgver = 6.0, depend = openssl)
-                    if line.starts_with("pkgname =") {
-                        name = line["pkgname =".len()..].trim().to_string();
-                    } else if line.starts_with("pkgver =") {
-                        version = line["pkgver =".len()..].trim().to_string();
-                    } else if line.starts_with("depend =") {
-                        let dep = line["depend =".len()..].trim().to_string();
-                        dependencies.push(dep);
-                    }
-                }
-                PackageFormat::Apk => {
-                    // Alpine APKINDEX format (e.g. P:musl, V:1.2, D:so:libc)
-                    if line.starts_with("P:") {
-                        name = line["P:".len()..].trim().to_string();
-                    } else if line.starts_with("V:") {
-                        version = line["V:".len()..].trim().to_string();
-                    } else if line.starts_with("D:") {
-                        let deps_str = line["D:".len()..].trim();
-                        for d in deps_str.split(' ') {
-                            dependencies.push(d.trim().to_string());
-                        }
-                    }
-                }
-                PackageFormat::Flatpak | PackageFormat::Snap => {
-                    // YAML/JSON Manifest (e.g. id: org.kde.Platform, version: 5.15)
-                    if line.starts_with("id:") {
-                        name = line["id:".len()..].trim().to_string();
-                    } else if line.starts_with("version:") {
-                        version = line["version:".len()..].trim().to_string();
-                    }
-                }
-                PackageFormat::SigmaPkg => {
-                    if line.starts_with("name:") {
-                        name = line["name:".len()..].trim().to_string();
-                    } else if line.starts_with("version:") {
-                        version = line["version:".len()..].trim().to_string();
-                    }
-                }
-                _ => {
-                    if line.contains(':') {
-                        let mut parts = line.splitn(2, ':');
-                        let k = parts.next().unwrap_or("").trim();
-                        let v = parts.next().unwrap_or("").trim();
-                        if name.is_empty() && (k.eq_ignore_ascii_case("name") || k.eq_ignore_ascii_case("package") || k.eq_ignore_ascii_case("pkgname")) {
-                            name = v.to_string();
-                        } else if version.is_empty() && (k.eq_ignore_ascii_case("version") || k.eq_ignore_ascii_case("pkgver")) {
-                            version = v.to_string();
-                        }
-                    }
-                }
-            }
-        }
-
-        if name.is_empty() || version.is_empty() {
-            return Err("Missing required metadata headers".to_string());
-        }
-
-        let mut pkg = UnifiedPackage::new(name, version).with_format(format);
-        for d in dependencies {
-            pkg = pkg.with_dependency(d);
-        }
-
-        Ok(pkg)
-    }
-}
-
-// =========================================================================
-// 2. PackageInstallHook (User-defined trigger functions)
-// =========================================================================
-
-pub struct PackageInstallHook {
-    pub hook_name: String,
-    pub run_counter: u64,
-}
-
-impl PackageInstallHook {
-    pub fn new(name: &str) -> Self {
-        PackageInstallHook {
-            hook_name: name.to_string(),
-            run_counter: 0,
-        }
-    }
-
-    /// Trigger hook function executed before a distro application runs to pre-configure sandboxed directories
-    pub fn execute_pre_install_hook(&mut self, pkg: &UnifiedPackage) -> bool {
-        self.run_counter += 1;
-        // User-defined validation hook check: block untrusted third-party apps unless GPG signed
-        if pkg.name.contains("untrusted") {
-            return false;
-        }
-        true
-    }
-}
-
-// =========================================================================
-// 3. MultiFormatExtractor (Emulated package extraction)
-// =========================================================================
-
-pub struct MultiFormatExtractor {
-    pub extracted_paths: Vec<String>,
-}
-
-impl MultiFormatExtractor {
-    pub fn new() -> Self {
-        MultiFormatExtractor {
-            extracted_paths: Vec::new(),
-        }
-    }
-
-    /// Simulates package file payload extraction and automatically routes them to the correct comopsable FHS system directories
-    pub fn extract_payload(&mut self, pkg: &UnifiedPackage) -> Result<usize, String> {
-        let mut files_created = 0;
-
-        // Emulates extracting files from the package format layers (ar / cpio / tar.zst)
-        let simulated_files = match pkg.formats.first().unwrap_or(&PackageFormat::SigmaPkg) {
-            PackageFormat::Deb => vec!["usr/bin/apt-app", "etc/apt-app.conf", "usr/lib/libapt.so"],
-            PackageFormat::Rpm => vec!["usr/bin/rpm-app", "etc/rpm-app.conf"],
-            PackageFormat::Pacman => vec!["usr/bin/pacman-app", "usr/lib/libpacman.so"],
-            PackageFormat::Apk => vec!["sbin/apk-app", "etc/apk-app.conf"],
-            _ => vec!["usr/bin/app"],
-        };
-
-        for f in simulated_files {
-            self.extracted_paths.push(f.to_string());
-            files_created += 1;
-        }
-
-        Ok(files_created)
-    }
-}
-
 /// Package errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PackageError {
@@ -954,53 +622,6 @@ pub enum PackageError {
     ConflictDetected(Vec<(String, String)>),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureType {
-    Binary,
-    Library,
-    Source,
-}
-
-pub struct TabularSchema {
-    pub fields: Vec<String>,
-}
-
-pub struct TabularRow {
-    pub values: Vec<String>,
-}
-
-pub struct TabularDataset {
-    pub schema: TabularSchema,
-    pub rows: Vec<TabularRow>,
-}
-
-pub struct SovereignTabFm {
-    pub datasets: Vec<TabularDataset>,
-}
-
-
-
-pub trait PackageAdapterTrait {
-    fn adapter_name(&self) -> &str;
-}
-
-pub struct TabularSchema {
-    pub fields: Vec<String>,
-}
-
-pub struct TabularRow {
-    pub values: Vec<String>,
-}
-
-pub struct TabularDataset {
-    pub schema: TabularSchema,
-    pub rows: Vec<TabularRow>,
-}
-
-pub struct SovereignTabFm {
-    pub datasets: Vec<TabularDataset>,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1008,7 +629,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 13); // Includes all 13 package format adapters
+        assert_eq!(manager.adapters.len(), 7); // updated to 7 to include AppImage
     }
 
     #[test]

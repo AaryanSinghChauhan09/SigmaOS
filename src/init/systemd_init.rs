@@ -1,6 +1,9 @@
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,
 /// and target states to defeat Fedora's Systemd initialization.
+
+extern crate alloc;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -236,6 +239,7 @@ impl SystemdEngine {
         self.current_target.load(Ordering::SeqCst)
     }
 
+    // Topological sorting with cycle detection
     pub fn topological_sort(&self, unit_ids: &Vec<UnitID>) -> Result<Vec<UnitID>, &'static str> {
         let mut sorted = Vec::new();
         let mut visiting = Vec::new();
@@ -267,9 +271,22 @@ impl SystemdEngine {
         visiting.push(id);
 
         if let Some(unit) = self.find_unit(id) {
-            for &before_id in unit.before.iter() {
-                if all_ids.contains(&before_id) && !visited.contains(&before_id) {
-                    self.topo_visit(before_id, all_ids, sorted, visiting, visited)?;
+            for &other_id in all_ids.iter() {
+                if other_id == id {
+                    continue;
+                }
+                let mut is_before = false;
+                if unit.after.contains(&other_id) || unit.requires.contains(&other_id) || unit.wants.contains(&other_id) {
+                    is_before = true;
+                }
+                if let Some(other) = self.find_unit(other_id) {
+                    if other.before.contains(&id) {
+                        is_before = true;
+                    }
+                }
+
+                if is_before {
+                    self.topo_visit(other_id, all_ids, sorted, visiting, visited)?;
                 }
             }
         }
@@ -280,9 +297,13 @@ impl SystemdEngine {
         Ok(())
     }
 
+    // systemctl controls
     pub fn systemctl_start(&mut self, id: UnitID) -> Result<(), &'static str> {
-        let (is_enabled, conflicts, requires, wants) = if let Some(u) = self.find_unit(id) {
-            (u.enabled, u.conflicts.clone(), u.requires.clone(), u.wants.clone())
+        let (is_enabled, conflicts, requires, wants) = if let Some(unit) = self.find_unit(id) {
+            if unit.state == UnitState::Active {
+                return Ok(()); // Already running
+            }
+            (unit.is_enabled, unit.conflicts.clone(), unit.requires.clone(), unit.wants.clone())
         } else {
             return Err("Unit not found");
         };
@@ -562,7 +583,7 @@ mod tests {
         // 1. Create graphical.target
         let mut graphical = SystemdUnit::new(100, b"graphical.target", UnitType::Target);
         graphical.requires.push(200); // requires multi-user.target
-        graphical.wants.push(300); // wants network.target
+        graphical.wants.push(300);    // wants network.target
 
         // 2. Create multi-user.target
         let multi_user = SystemdUnit::new(200, b"multi-user.target", UnitType::Target);

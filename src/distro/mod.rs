@@ -1,8 +1,5 @@
 // SigmaOS Distro/Ecosystem Maturity Module
-pub mod arch_parity;
-pub mod bsd_linux_innovations;
 pub mod certification;
-pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
 pub mod developer;
@@ -13,31 +10,24 @@ pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
-pub mod transformation_engine;
-pub mod preseed;
-pub mod linux_bsd_inspirations;
-pub mod ecosystem_dimensions;
+pub mod parity;
+pub mod arch;
+pub mod cachy;
 
-pub use ecosystem_dimensions::{
-    BareMetalTelemetryRing, CommunityRemixBuilder, CommunityRemixConfig,
-    CryptographicBountyLedger, CryptographicMatrixVoting, IndiaStackPublicIntegration,
-    MerkleTransactionalBackupEngine, PqcVulnerabilityAdvisoryStream, SigmaAppImageFormat,
-    SigmaReleaseBranch, SovereignEdition, SovereignGuardTunPqc, ZenithWiFiBroker,
+pub use cachy::{
+    MicroArchLevel, CachyKernelVariant, CpuCapabilities, BoreSchedulerGovernor, CachyPackageRepo,
 };
-pub use linux_bsd_inspirations::{
-    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService, SovereignDTraceEngine, DTraceProvider, DTraceAggregation,
-    SovereignRaidSelfHealer, RaidLevel, ScrubResult, SovereignDeclarativeSystemEngine,
-    RollbackStatus, SovereignPrivSepSandbox, PrivSepProcessRole,
+
+pub use arch::{
+    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
+    ArchRepoType,
 };
-pub mod arch_parity;
-pub mod chakra_parity;
-pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
-pub use preseed::{SovereignPreseedParser, PreseedVariable};
-pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
-pub use manjaro::{
-    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease, MhwdDkmsRebuilder,
+
+pub use parity::{
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -60,14 +50,14 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
+pub use manjaro::{
+    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
+    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
+};
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
-    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
-    LivepatchPatch, LivepatchManager,
-    CapabilityRight, PathAccessRule, UniversalCapabilityMatrix,
-    EnclaveMeasurement, SovereignAttestationEnclave,
-    KernelRelinkRecord, AutonomousKernelRelinker,
-    ZfsConsensusBlock, HammerZfsConsensusStore,
+    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
+    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
+    TimeTravelEngine,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
@@ -79,16 +69,4 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-};
-pub use bsd_linux_innovations::{
-    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
-    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
-    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitService, RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
-    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
-};
-pub use transformation_engine::{
-    AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,
-    ForensicReadinessAuditor, GlobalComplianceDashboard, DeveloperToolkitConverter,
-    IotDeviceMeshOrchestrator, IotMeshDevice,
 };

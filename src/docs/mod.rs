@@ -7,10 +7,28 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
 use alloc::format;
 use alloc::string::ToString;
+
+/// Safely escapes HTML special characters to prevent DOM text reinterpretation / XSS
+pub fn escape_html(input: &str) -> String {
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '&' => escaped.push_str("&amp;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
 
 /// Documentation format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -140,7 +158,7 @@ impl DocGenerator {
         Ok(output)
     }
 
-    /// Generate HTML documentation
+    /// Generate HTML documentation with XSS sanitization to prevent DOM text reinterpretation as HTML
     fn generate_html(&self) -> Result<String, String> {
         let mut output = String::new();
 
@@ -162,11 +180,10 @@ impl DocGenerator {
         let mut sorted_entries = self.entries.clone();
         sorted_entries.sort_by_key(|e| e.order);
 
-        // Generate content
+        // Generate content with html entity escaping
         for entry in &sorted_entries {
-            output.push_str(&format!("<h2>{}</h2>\n", entry.title));
-            output.push_str(&entry.content);
-            output.push_str("\n");
+            output.push_str(&format!("<h2>{}</h2>\n", escape_html(&entry.title)));
+            output.push_str(&format!("<p>{}</p>\n", escape_html(&entry.content)));
         }
 
         output.push_str("</body>\n</html>");
@@ -342,6 +359,26 @@ mod tests {
         let html = result.unwrap();
         assert!(html.contains("<html>"));
         assert!(html.contains("Test Section"));
+    }
+
+    #[test]
+    fn test_html_escaping_xss_prevention() {
+        let mut generator = DocGenerator::new();
+
+        let entry = DocEntry::new(
+            "<script>alert('XSS')</script>".to_string(),
+            "<img src=x onerror=alert(1)> & 'quote'".to_string(),
+            SectionType::Overview,
+            1,
+        );
+        generator.add_entry(entry);
+
+        let html = generator.generate_html().unwrap();
+        // Assert raw dangerous HTML tags are escaped and neutralized
+        assert!(!html.contains("<script>"));
+        assert!(html.contains("&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;"));
+        assert!(!html.contains("<img"));
+        assert!(html.contains("&lt;img src=x onerror=alert(1)&gt; &amp; &#39;quote&#39;"));
     }
 
     #[test]

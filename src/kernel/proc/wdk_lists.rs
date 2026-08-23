@@ -77,10 +77,18 @@ impl ListHead {
         self.head.blink = list_head;
     }
 
+    /// Automatically ensures list pointers are initialized to self
+    pub unsafe fn ensure_initialized(&mut self) {
+        if self.head.flink.is_null() || self.head.blink.is_null() {
+            self.initialize();
+        }
+    }
+
     pub unsafe fn insert_tail(&mut self, entry: *mut ListEntry) {
         if entry.is_null() {
             return;
         }
+        self.ensure_initialized();
         let list_head = &mut self.head as *mut ListEntry;
         let old_blink = (*list_head).blink;
 
@@ -95,6 +103,7 @@ impl ListHead {
         if entry.is_null() {
             return;
         }
+        self.ensure_initialized();
         let list_head = &mut self.head as *mut ListEntry;
         let old_flink = (*list_head).flink;
 
@@ -109,11 +118,16 @@ impl ListHead {
         if entry.is_null() || entry == (&mut self.head as *mut ListEntry) {
             return false;
         }
+        self.ensure_initialized();
         let next = (*entry).flink;
         let prev = (*entry).blink;
 
-        (*prev).flink = next;
-        (*next).blink = prev;
+        if !prev.is_null() {
+            (*prev).flink = next;
+        }
+        if !next.is_null() {
+            (*next).blink = prev;
+        }
 
         (*entry).flink = core::ptr::null_mut();
         (*entry).blink = core::ptr::null_mut();
@@ -121,6 +135,7 @@ impl ListHead {
     }
 
     pub unsafe fn pop_head(&mut self) -> Option<*mut ListEntry> {
+        self.ensure_initialized();
         let list_head = &mut self.head as *mut ListEntry;
         let first = (*list_head).flink;
         if first == list_head {
@@ -132,6 +147,9 @@ impl ListHead {
     }
 
     pub unsafe fn is_empty(&self) -> bool {
+        if self.head.flink.is_null() {
+            return true;
+        }
         self.head.flink == (&self.head as *const ListEntry as *mut ListEntry)
     }
 }
