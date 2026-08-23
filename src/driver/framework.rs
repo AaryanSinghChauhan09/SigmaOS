@@ -331,12 +331,6 @@ mod tests {
         assert!(res_user.is_err());
         assert_eq!(res_user.unwrap_err(), "General Protection Fault: Privilege violation accessing IDT gate");
     }
-}
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
 
     static mut OPEN_CALLED: i32 = 0;
     static mut RELEASE_CALLED: i32 = 0;
