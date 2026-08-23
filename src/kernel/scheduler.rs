@@ -6,14 +6,7 @@ use alloc::vec::Vec;
 use core::cmp::Ordering;
 use core::time::Duration;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Priority {
-    Idle,
-    Low,
-    Normal,
-    High,
-    Realtime,
-}
+
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -250,11 +243,7 @@ impl Scheduler {
     }
 }
 
-impl Default for CfsScheduler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+
 
 /// CFS Scheduler implementation
 pub struct CfsScheduler {

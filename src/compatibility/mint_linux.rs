@@ -29,14 +29,32 @@ pub struct WindowCoordinates {
 #[derive(Debug, Clone)]
 pub struct SoftwareMeta {
     pub name: [u8; 32],
+    pub rating: usize,
 }
 
 #[derive(Debug, Clone)]
 pub struct MintUpdateItem {
-    pub name: [u8; 32],
+    pub package_name: [u8; 32],
+    pub version: [u8; 16],
+    pub level: MintUpdateLevel,
 }
 
-pub struct ZenithDisplayCompositor;
+#[derive(Debug, Clone)]
+pub struct ZenithDisplayCompositor {
+    pub active_layout: [u8; 32],
+}
+
+impl ZenithDisplayCompositor {
+    pub fn new() -> Self {
+        Self { active_layout: [0u8; 32] }
+    }
+}
+
+impl Default for ZenithDisplayCompositor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintUpdateLevel {
@@ -239,12 +257,6 @@ pub struct MintSoftwareManager {
     pub apps_catalog: Vec<MintAppMetadata>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MintError {
-    LayoutFailed,
-    UpdateError,
-}
-
 impl Default for MintSoftwareManager {
     fn default() -> Self {
         Self::new()
@@ -260,47 +272,6 @@ impl MintSoftwareManager {
 
     pub fn add_app_to_catalog(&mut self, app: MintAppMetadata) {
         self.apps_catalog.push(app);
-    }
-
-    pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
-        let mut filtered = Vec::new();
-        for app in self.apps_catalog.iter() {
-            if app.category.starts_with(category) {
-                filtered.push(app.clone());
-            }
-        }
-        filtered
-    }
-
-    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
-        let mut sorted = self.apps_catalog.clone();
-        for i in 0..sorted.len() {
-            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
-                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
-                    sorted.swap(j, j + 1);
-                }
-            }
-        }
-        sorted
-    }
-
-    /// Arrange windows using Stacking layout (Cascaded coordinations)
-    pub fn arrange_stacking(
-        num_windows: usize,
-        coords: &mut [WindowCoordinates],
-    ) -> Result<(), &'static str> {
-        for i in 0..num_windows {
-            if i >= coords.len() {
-                return Err("Layout failed");
-            }
-            coords[i] = WindowCoordinates {
-                x: i * 30,
-                y: i * 30,
-                width: 800,
-                height: 600,
-            };
-        }
-        Ok(())
     }
 
     pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
@@ -331,6 +302,25 @@ impl MintSoftwareManager {
             }
         }
         sorted
+    }
+
+    /// Arrange windows using Stacking layout (Cascaded coordinations)
+    pub fn arrange_stacking(
+        num_windows: usize,
+        coords: &mut [WindowCoordinates],
+    ) -> Result<(), &'static str> {
+        for i in 0..num_windows {
+            if i >= coords.len() {
+                return Err("Layout failed");
+            }
+            coords[i] = WindowCoordinates {
+                x: i * 30,
+                y: i * 30,
+                width: 800,
+                height: 600,
+            };
+        }
+        Ok(())
     }
 }
 
@@ -439,38 +429,6 @@ impl TimeshiftSystemRestorer {
 impl Default for TimeshiftSystemRestorer {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WindowCoordinates {
-    pub x: usize,
-    pub y: usize,
-    pub width: usize,
-    pub height: usize,
-}
-
-#[derive(Debug, Clone)]
-pub struct MintUpdateItem {
-    pub package_name: [u8; 32],
-    pub version: [u8; 16],
-    pub level: MintUpdateLevel,
-}
-
-#[derive(Debug, Clone)]
-pub struct SoftwareMeta {
-    pub name: [u8; 32],
-    pub rating: usize,
-}
-
-#[derive(Debug, Clone)]
-pub struct ZenithDisplayCompositor {
-    pub active_layout: [u8; 32],
-}
-
-impl ZenithDisplayCompositor {
-    pub fn new() -> Self {
-        Self { active_layout: [0u8; 32] }
     }
 }
 
@@ -768,6 +726,7 @@ mod tests {
         let hash = timeshift.restore_checkpoint(1).unwrap();
         assert_eq!(hash, 0xDEADBEEF);
 
+        let mut engine = CinnamonThemeEngine::new();
         engine.add_desklet(101, 200, 200);
         assert_eq!(engine.desklets.len(), 1);
         assert_eq!(engine.desklets[0].unwrap().id, 101);
@@ -775,13 +734,15 @@ mod tests {
 
     #[test]
     fn test_mint_cinnamon_styling_options() {
-        let mut style = MintCinnamonStyling::default();
+        let style = MintCinnamonStyling::default();
         assert_eq!(style.panel_height, 40);
         assert!(style.window_effects_enabled);
 
+        let mut restorer = TimeshiftSystemRestorer::new();
         restorer.create_restore_point(101, true); // rsync snapshot
         restorer.create_restore_point(102, false); // btrfs snapshot
         assert_eq!(restorer.restore_points.len(), 2);
+    }
 
     #[test]
     fn test_mint_driver_manager_flows() {

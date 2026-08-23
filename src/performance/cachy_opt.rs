@@ -508,6 +508,136 @@ impl Default for CachyKernelManager {
     }
 }
 
+// ==========================================
+// 7. CACHYOS ZRAM MEMORY OPTIMIZER
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZramCompressionAlgo {
+    Zstd,
+    Lz4,
+    Lzo,
+}
+
+pub struct CachyosZramMemoryOptimizer {
+    pub algorithm: ZramCompressionAlgo,
+    pub total_zram_size_mb: u64,
+    pub swappiness: u32,
+    pub watermark_boost_factor: u32,
+    pub dirty_bytes: u64,
+}
+
+impl CachyosZramMemoryOptimizer {
+    pub fn new(ram_mb: u64) -> Self {
+        Self {
+            algorithm: ZramCompressionAlgo::Zstd,
+            total_zram_size_mb: ram_mb,
+            swappiness: 150,
+            watermark_boost_factor: 0,
+            dirty_bytes: 268435456,
+        }
+    }
+
+    pub fn configure_low_latency_sysctls(&mut self) {
+        self.swappiness = 150;
+        self.watermark_boost_factor = 0;
+        self.dirty_bytes = 268435456;
+    }
+}
+
+impl Default for CachyosZramMemoryOptimizer {
+    fn default() -> Self {
+        Self::new(8192)
+    }
+}
+
+// ==========================================
+// 8. CACHYOS GAMEMODE & LATENCY BOOSTER
+// ==========================================
+
+pub struct CachyGameMode {
+    pub active: AtomicBool,
+    pub target_pid: AtomicU64,
+    pub pcore_mask: u64,
+    pub bypass_compositor: AtomicBool,
+}
+
+impl CachyGameMode {
+    pub fn new(pcore_mask: u64) -> Self {
+        Self {
+            active: AtomicBool::new(false),
+            target_pid: AtomicU64::new(0),
+            pcore_mask,
+            bypass_compositor: AtomicBool::new(false),
+        }
+    }
+
+    pub fn engage_gamemode(&self, pid: u64) -> (bool, i32, u64) {
+        self.target_pid.store(pid, Ordering::SeqCst);
+        self.active.store(true, Ordering::SeqCst);
+        self.bypass_compositor.store(true, Ordering::SeqCst);
+        (true, -15, self.pcore_mask)
+    }
+
+    pub fn disengage_gamemode(&self) {
+        self.active.store(false, Ordering::SeqCst);
+        self.target_pid.store(0, Ordering::SeqCst);
+        self.bypass_compositor.store(false, Ordering::SeqCst);
+    }
+}
+
+// ==========================================
+// 9. CACHYOS BORE SMP BALANCER (P-CORE / E-CORE TOPOLOGY)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuCoreType {
+    PerformancePCore,
+    EfficiencyECore,
+}
+
+#[derive(Debug, Clone)]
+pub struct CpuCoreTopology {
+    pub core_id: u32,
+    pub core_type: CpuCoreType,
+}
+
+pub struct CachyBoreSMPBalancer {
+    pub cores: Vec<CpuCoreTopology>,
+}
+
+impl CachyBoreSMPBalancer {
+    pub fn new() -> Self {
+        Self { cores: Vec::new() }
+    }
+
+    pub fn register_core(&mut self, core_id: u32, core_type: CpuCoreType) {
+        self.cores.push(CpuCoreTopology { core_id, core_type });
+    }
+
+    pub fn select_optimal_core_for_task(&self, is_interactive: bool) -> u32 {
+        let target_type = if is_interactive {
+            CpuCoreType::PerformancePCore
+        } else {
+            CpuCoreType::EfficiencyECore
+        };
+
+        for core in &self.cores {
+            if core.core_type == target_type {
+                return core.core_id;
+            }
+        }
+
+        0
+    }
+}
+
+impl Default for CachyBoreSMPBalancer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -572,4 +702,32 @@ mod tests {
         assert_eq!(tuner.vfs_cache_pressure, 20);
         assert_eq!(tuner.sched_cfs_bandwidth_slice_us, 1000);
     }
+
+    #[test]
+    fn test_cachyos_zram_gamemode_and_smp_balancer() {
+        let mut zram = CachyosZramMemoryOptimizer::new(16384);
+        zram.configure_low_latency_sysctls();
+        assert_eq!(zram.swappiness, 150);
+        assert_eq!(zram.watermark_boost_factor, 0);
+
+        let gamemode = CachyGameMode::new(0x00FF);
+        let (active, boost, mask) = gamemode.engage_gamemode(1234);
+        assert!(active);
+        assert_eq!(boost, -15);
+        assert_eq!(mask, 0x00FF);
+        assert!(gamemode.active.load(Ordering::SeqCst));
+
+        gamemode.disengage_gamemode();
+        assert!(!gamemode.active.load(Ordering::SeqCst));
+
+        let mut balancer = CachyBoreSMPBalancer::new();
+        balancer.register_core(0, CpuCoreType::PerformancePCore);
+        balancer.register_core(1, CpuCoreType::PerformancePCore);
+        balancer.register_core(2, CpuCoreType::EfficiencyECore);
+        balancer.register_core(3, CpuCoreType::EfficiencyECore);
+
+        assert_eq!(balancer.select_optimal_core_for_task(true), 0); // P-core
+        assert_eq!(balancer.select_optimal_core_for_task(false), 2); // E-core
+    }
+
 }

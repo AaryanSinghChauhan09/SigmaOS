@@ -1023,8 +1023,8 @@ impl SovereignPasswordGenerator {
             } else {
                 letters
             };
-            let idx = (seed as usize) % pool.len();
-            password.push(pool[idx] as char);
+            let idx = (seed as usize) % selection_pool.len();
+            password.push(selection_pool[idx] as char);
         }
         password
     }

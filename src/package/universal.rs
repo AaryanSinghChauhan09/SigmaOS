@@ -520,11 +520,7 @@ impl Default for DependencyResolver {
 }
 
 /// Transactional package manager checkpoint
-#[derive(Debug, Clone)]
-pub struct PackageCheckpoint {
-    pub checkpoint_id: usize,
-    pub installed_keys: Vec<String>,
-}
+
 
 /// Universal package manager with transaction-safe snapshots & rollback mechanisms
 #[derive(Debug, Clone)]
@@ -982,12 +978,7 @@ pub struct SovereignTabFm {
     pub datasets: Vec<TabularDataset>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureType {
-    Binary,
-    Library,
-    Source,
-}
+
 
 pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
