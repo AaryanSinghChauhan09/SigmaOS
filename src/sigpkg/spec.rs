@@ -9,9 +9,6 @@ use alloc::boxed::Box;
 
 use core::mem;
 
-extern crate alloc;
-use alloc::boxed::Box;
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -117,6 +114,7 @@ impl PackageCapability {
 #[repr(C)]
 pub struct SimplePackage {
     pub name: [u8; 64],
+    pub name_len: u8,
     pub version: PackageVersion,
     pub description: [u8; 256],
     pub size: u64,
@@ -140,6 +138,7 @@ impl SimplePackage {
 
         SimplePackage {
             name: name_array,
+            name_len: name_len as u8,
             version,
             description: [0; 256],
             size: 0,
@@ -203,8 +202,8 @@ impl SimplePackage {
 
 impl Package for SimplePackage {
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt performance optimization: use cached name_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        &self.name[..self.name_len as usize]
     }
 
     fn version(&self) -> PackageVersion {
@@ -485,7 +484,7 @@ impl PackageManager for SimplePackageManager {
                     let pkg_name = p_ref.name();
                     
                     let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
-                    let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
+                    let pkg_len = pkg_name.len();
 
                     if &dep_name[..dep_len] == &pkg_name[..pkg_len] {
                         found = true;
