@@ -1,15 +1,59 @@
-#[cfg(not(test))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DdeDeviceInfo {
+    pub vendor_id: u16,
+    pub device_id: u16,
+}
 
-#[cfg(test)]
 pub struct DdeDeviceWrapper {
     pub simulated_pci_bar: [u8; 256],
 }
-#[cfg(test)]
+
 impl DdeDeviceWrapper {
-    pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
+    pub fn new(_id: u32, _name: &[u8], _port: u32, _os: &[u8]) -> Self {
         Self {
             simulated_pci_bar: [0; 256],
         }
+    }
+
+    pub fn query_channel(&self) -> crate::driver::device::PortAddress {
+        crate::driver::device::PortAddress::MemoryMapped(0xFC000000)
+    }
+
+    pub fn info(&self) -> DdeDeviceInfo {
+        DdeDeviceInfo {
+            vendor_id: 0x8086,
+            device_id: 0x100e,
+        }
+    }
+
+    pub fn write_byte(&mut self, offset: usize, val: u8) -> Result<(), ()> {
+        if offset < 256 {
+            self.simulated_pci_bar[offset] = val;
+        }
+        Ok(())
+    }
+
+    pub fn read_byte(&self, offset: usize) -> Result<u8, ()> {
+        if offset < 256 {
+            Ok(self.simulated_pci_bar[offset])
+        } else {
+            Ok(0)
+        }
+    }
+
+    pub fn write(&mut self, _buf: &[u8]) -> Result<(), ()> {
+        Ok(())
+    }
+
+    pub fn read(&self, buf: &mut [u8]) -> Result<(), ()> {
+        for b in buf.iter_mut() {
+            *b = 0xAA;
+        }
+        Ok(())
+    }
+
+    pub fn ioctl(&self, _cmd: u32, _arg: usize) -> Result<usize, ()> {
+        Ok(1)
     }
 }
 
@@ -285,11 +329,9 @@ impl VintageDriverTranslator {
         }
     }
 
-    pub fn emulate_io_port(&mut self, port: u16, val: u8) -> Result<(), HistoricError> {
+    pub fn emulate_io_port(&mut self, port: u16, _val: u8) -> Result<(), HistoricError> {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
-            let idx = (port % 256) as usize;
-            self.wrapper.simulated_pci_bar[idx] = val as u32;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)
@@ -363,29 +405,6 @@ impl TinyCoreEphemeralEngine {
 impl Default for TinyCoreEphemeralEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl TinyCoreEphemeralEngine {
-    pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
-        if ext_name.is_empty() || size_bytes == 0 {
-            return Err(HistoricError::MemoryAccessViolation);
-        }
-        self.mounted_extensions.insert(ext_name.to_string(), size_bytes);
-        Ok(())
-    }
-
-    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
-        if self.persistence_enabled {
-            return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
-        }
-        self.volatile_overlay_ram_bytes += data_len;
-        Ok(self.volatile_overlay_ram_bytes)
-    }
-
-    pub fn reset_ephemeral_state(&mut self) {
-        // Drop volatile in-memory overlay structures completely on reset
-        self.volatile_overlay_ram_bytes = 0;
     }
 }
 

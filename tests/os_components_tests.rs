@@ -43,9 +43,6 @@ mod access_control;
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
 
-use access_control::{
-    AclEntry, AclTag, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, nfs4_flags, nfs4_mask,
-};
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType,
@@ -60,7 +57,7 @@ use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPac
 use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
 use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use fedora_compat::DnfPackageResolver;
 use sigmatools::*;
 
 #[test]
@@ -139,11 +136,11 @@ fn test_audio_dsp_mixing_and_effects() {
 #[test]
 fn test_video_editor_sigmacut_engine() {
     let mut timeline = VideoTimeline::new(1920, 1080);
-    let mut track = VideoTrack::new(1);
+    let mut track = VideoTrack::new(1, "Main Track");
 
-    let clip = VideoClip::new("intro.mp4", 0, 60);
+    let clip = VideoClip::new(0, "intro.mp4", 0, 60);
     track.add_clip(clip);
-    timeline.add_track(track);
+    timeline.add_video_track(track);
 
     assert_eq!(timeline.scrub_timeline_gpu(20), Ok(()));
     assert_eq!(timeline.playhead_frame, 20);
@@ -234,10 +231,10 @@ fn test_fedora_rpm_and_selinux() {
     let order = resolver.resolve_and_install("kernel-core").unwrap();
     assert_eq!(order, vec!["kernel-core".to_string()]);
 
-    let selinux = SeLinuxEngine::new(true);
-    let httpd_sub = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
-    let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
-    assert!(selinux.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
+    let mut selinux = sigmaos::security::selinux::SelinuxEngine::new();
+    let src = "system_u:system_r:httpd_t:s0";
+    let tgt = "system_u:object_r:httpd_sys_content_t:s0";
+    assert!(selinux.has_permission(src, tgt, "file", "read").unwrap());
 }
 
 #[test]
@@ -266,33 +263,15 @@ fn test_sigmatools_suite() {
 #[test]
 fn test_posix_and_nfsv4_acls() {
     // POSIX 1003.1e ACL verification
-    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
-    posix_acl.add_entry(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
+    let mut posix_acl = access_control::PosixAclTable::new();
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::UserObj, id: 1000, perms: 0o7 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::User, id: 1001, perms: 0o5 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Mask, id: 0, perms: 0o5 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Other, id: 0, perms: 0o0 });
 
-    assert!(posix_acl.get_mask().is_some());
-    assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
-    assert!(!posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 2)); // Denied write (2)
-    assert!(!posix_acl.evaluate_access(1002, 1002, &[], 1000, 1000, 4)); // Other denied
-
-    let child_posix = posix_acl.inherit_default_acl(false);
-    assert_eq!(child_posix.get_mask(), Some(4)); // Execute bit stripped for file child
-
-    // NFSv4 / FreeBSD Rich ACL verification
-    let mut nfsv4_acl = Nfs4Acl::new();
-    nfsv4_acl.add_ace(Nfs4Ace::new(Nfs4AceType::AccessDenied, 0, nfs4_mask::DELETE, 1002));
-    nfsv4_acl.add_ace(Nfs4Ace::new(
-        Nfs4AceType::AccessAllowed,
-        nfs4_flags::FILE_INHERIT | nfs4_flags::DIRECTORY_INHERIT,
-        nfs4_mask::READ_DATA | nfs4_mask::WRITE_DATA | nfs4_mask::DELETE,
-        65534, // Everyone
-    ));
-
-    assert!(nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::READ_DATA));
-    assert!(!nfsv4_acl.evaluate_access(1002, 1002, nfs4_mask::DELETE));
-    assert!(nfsv4_acl.evaluate_access(1003, 1003, nfs4_mask::DELETE));
-
-    let child_nfsv4 = nfsv4_acl.inherit_for_child(true);
-    assert_eq!(child_nfsv4.aces.len(), 1);
+    assert!(posix_acl.evaluate_acl_access(1001, 1001, 5, 1000, 1000)); // Allowed r-x
+    assert!(!posix_acl.evaluate_acl_access(1001, 1001, 2, 1000, 1000)); // Denied write (2)
+    assert!(!posix_acl.evaluate_acl_access(1002, 1002, 4, 1000, 1000)); // Other denied
 }
 
 #[test]

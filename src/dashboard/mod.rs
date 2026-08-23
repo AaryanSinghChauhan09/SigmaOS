@@ -21,6 +21,7 @@ pub mod accessibility_gamification;
 pub mod control_center;
 pub mod monitor;
 pub mod process;
+pub mod privacy;
 
 pub use accessibility_gamification::{
     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,

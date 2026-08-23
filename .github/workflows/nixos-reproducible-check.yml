@@ -1,0 +1,20 @@
+name: Verify NixOS Declarative Profile Generations & Reproducibility
+
+on:
+  push:
+    branches: [ main, master, "feature/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  nixos-declarative-verify:
+    name: Verify NixOS Declarative Profile Generations & Reproducibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run NixOS Declarative & Reproducibility Tests
+        run: cargo test --lib nixos

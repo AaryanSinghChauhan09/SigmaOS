@@ -197,10 +197,6 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor
-            .offset
-            .checked_add(buffer.len() as u64)
-        let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
         let _new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
@@ -278,10 +274,7 @@ impl VirtualFilesystem {
         if link_reached_zero {
             self.inodes.remove(&inode_id);
         }
-        
-        self.inodes.remove(&inode_id);
 
-        self.inodes.remove(&inode_id);
         Ok(())
     }
 

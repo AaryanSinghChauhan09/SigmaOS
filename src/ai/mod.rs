@@ -12,6 +12,17 @@ pub mod voice;
 pub mod wiki;
 pub mod qwenpaw;
 pub mod developer_platform;
+pub mod sigma_logic;
+pub mod local_llm;
+pub mod sigma_data;
+pub mod sigma_jupyter;
+pub mod mlflow_dvc;
+
+pub use sigma_logic::{ModelFormat, SigmaLogicInferenceEngine, TensorBuffer};
+pub use local_llm::{LocalLlmWrapper, QuantizationType as LocalQuantizationType, WhisperSpeechToText};
+pub use sigma_data::{KMeansClustering, PrincipalComponentAnalysis};
+pub use sigma_jupyter::{CellType, JupyterCell, JupyterNotebook};
+pub use mlflow_dvc::{DvcDataVersionControl, MlflowRun, MlflowTracker};
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
