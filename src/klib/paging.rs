@@ -8,6 +8,24 @@ pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageSize {
+    Standard4KB,
+    Huge2MB,
+    Giant1GB,
+}
+
+impl PageSize {
+    pub fn byte_size(&self) -> usize {
+        match self {
+            PageSize::Standard4KB => 4096,
+            PageSize::Huge2MB => 2 * 1024 * 1024,
+            PageSize::Giant1GB => 1024 * 1024 * 1024,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum PageTableLevel {
     PML4 = 0,
@@ -396,20 +414,23 @@ impl VirtualMemoryManager for SimpleVMM {
                 self.pd_tables[pdpt_idx] = Some(pd_table);
                 pdpt.set_entry(pdpt_idx, pd_entry);
             }
+        }
 
-            if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
-                let pd_present = pd.get_entry_ref(pd_idx).is_present();
+        if pd_idx_in_vec >= self.pd_tables.len() {
+            while self.pd_tables.len() <= pd_idx_in_vec {
+                self.pd_tables.push(None);
+            }
+        }
 
-                if !pd_present {
-                    let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
-                    let mut pt_entry = SimplePageTableEntry::new();
-                    pt_entry.set_present(true);
-                    pt_entry.set_writable(true);
-                    pt_entry.set_user_accessible(false);
-                    pt_entry.set_physical_address(pt_phys);
+        let pt_idx_in_vec = pd_idx_in_vec * 512 + pd_idx;
+        let pd_table_mut: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
+        let pd_present = if let Some(ref mut pd) = pd_table_mut {
+            pd.get_entry(pd_idx).is_present()
+        } else {
+            false
+        };
 
         if !pd_present {
-            let pd_table_mut: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
             if let Some(ref mut pd) = pd_table_mut {
                 let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
                 let mut pt_entry = SimplePageTableEntry::new();
@@ -422,6 +443,8 @@ impl VirtualMemoryManager for SimpleVMM {
                 while self.pt_tables.len() <= pt_idx_in_vec {
                     self.pt_tables.push(None);
                 }
+                self.pt_tables[pt_idx_in_vec] = Some(pt_table);
+                pd.set_entry(pd_idx, pt_entry);
             }
         }
 
