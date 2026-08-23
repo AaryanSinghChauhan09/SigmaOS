@@ -474,20 +474,15 @@ fn test_sigmatools_suite() {
 #[test]
 fn test_posix_and_nfsv4_acls() {
     // POSIX 1003.1e ACL verification
-    let mut posix_acl = access_control::PosixAclTable::new();
-    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::UserObj, id: 1000, perms: 0o7 });
-    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::User, id: 1001, perms: 0o5 });
-    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Mask, id: 0, perms: 0o5 });
-    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Other, id: 0, perms: 0o0 });
+    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
+    posix_acl.add_entry_direct(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
 
-    assert!(posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 5)); // Allowed r-x
-    assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 2)); // Denied write (2)
-    assert!(!posix_acl.evaluate_acl(1002, 1002, 1000, 1000, 4)); // Other denied
+    assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
+    assert!(!posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 2)); // Denied write (2)
+    assert!(!posix_acl.evaluate_access(1002, 1002, &[], 1000, 1000, 4)); // Other denied
 
-    let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
-    let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
-    gate.mac_filter.add_mac(allowed_mac);
-    gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
+    let child_posix = posix_acl.inherit_default_acl(false);
+    assert_eq!(child_posix.entries.len(), posix_acl.entries.len());
 
     assert_eq!(gate.evaluate_request(1, 10, access_control::acm_rights::READ, 2, &allowed_mac), Ok(()));
 }

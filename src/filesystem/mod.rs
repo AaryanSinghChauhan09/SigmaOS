@@ -10,11 +10,13 @@ pub mod sigma_fs;
 pub mod smart_symlink;
 pub mod tmpfs;
 pub mod vfs;
-pub mod legacy_fs;
-pub mod sigma_fs;
-pub mod smart_symlink;
-pub use smart_symlink::{
-    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
+
+pub use self_healing_fs::{JournalEntry, SovereignFilesystem, TransactionStatus};
+pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use sigma_fs::{
+    Blake3BlockDeduplicationEngine, JournalState, PseudoFilesystemNamespace,
+    SigmaFS, SigmaFhsAuditor, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsRouter,
 };
 
 pub use geom::{GeomClass, GeomProvider, GeomConsumer, GeomAccessRights};
