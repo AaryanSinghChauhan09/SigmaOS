@@ -1,7 +1,9 @@
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone)]
 pub struct AudioTrack {
