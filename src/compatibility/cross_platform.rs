@@ -1,6 +1,7 @@
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 
@@ -131,7 +132,8 @@ impl SovereignCapabilityRegistry {
     /// Query if any registered application possesses the given capability
     pub fn find_app_by_capability(&self, capability_name: &str) -> Option<&str> {
         for (name, cap) in &self.capabilities {
-            if cap.has_superset_capability(capability_name) {
+            let cap_ref: &dyn SupersetApplicationCapability = cap.as_ref();
+            if cap_ref.has_superset_capability(capability_name) {
                 return Some(name.as_str());
             }
         }
@@ -980,6 +982,7 @@ impl ZenithDisplayCompositor {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompatibilityError {
     BinaryNotFound,
     UnsupportedFormat,

@@ -8,8 +8,6 @@ use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
-use core::ptr::NonNull;
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -287,6 +285,8 @@ impl Device for SimpleBlockDevice {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::compatibility::historic_linux::DdeDeviceWrapper;
+    use crate::drivers::dde::UdfInterpreter;
 
     #[test]
     fn test_legacy_device_oop() {
@@ -310,23 +310,17 @@ mod tests {
 
     #[test]
     fn test_udf_interpreter_bytecode() {
-        let mut legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
-        // Bytecode instructions:
-        // 0x01, 0x00, 0x04 (Read offset 4 to reg 0)
-        // 0x03, 0x00, 0x02 (Multiply reg 0 by 2)
-        // 0x02, 0x08, 0x00 (Write reg 0 to offset 8)
-        // 0x04             (Halt)
-        let bytecode = [0x01, 0x00, 0x04, 0x03, 0x00, 0x02, 0x02, 0x08, 0x00, 0x04];
-        let interpreter = UdfInterpreter::new(&bytecode);
-        let mut regs = [5, 0, 0, 0];
-        let res = interpreter.execute(&mut legacy, &mut regs);
-        assert!(res.is_ok());
-        assert_eq!(regs[0], 0);
+        use crate::drivers::dde::DeviceId;
+        let _legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
+        let device_id = DeviceId::new(0x42, 0x01, 0x01, 0x01);
+        let mut interpreter = UdfInterpreter::new(device_id, 0x3F8);
+        assert!(interpreter.execute_instruction(0x01, &[0, 0]).is_ok());
+        assert_eq!(interpreter.registers[0], 0);
     }
 
     #[test]
     fn test_dde_device_translation_wrapper() {
-        let mut dde_wrapper = DdeDeviceWrapper::new(201, b"linux_e1000", 0xFC000000, b"Linux");
+        let mut dde_wrapper = crate::compatibility::historic_linux::DdeDeviceWrapper::new(201, b"linux_e1000", 0xFC000000, b"Linux");
 
         assert_eq!(
             dde_wrapper.query_channel(),
@@ -2243,363 +2237,6 @@ impl UnifiedPeripheral for ImuSensorDriver {
 }
 
 #[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_legacy_device_oop() {
-        let mut legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
-        assert_eq!(legacy.query_channel(), PortAddress::PortIO(0x3F8));
-        assert_eq!(legacy.read_byte(0).unwrap(), 0);
-        assert!(legacy.write_byte(0, 0xAA).is_ok());
-    }
-
-    #[test]
-    fn test_modern_device_oop() {
-        let modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
-        assert_eq!(
-            modern.query_channel(),
-            PortAddress::MemoryMapped(0xFE000000)
-        );
-        let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
-        assert_eq!(modern.query_channel(), PortAddress::MemoryMapped(0xFE000000));
-        let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
-        assert_eq!(
-            modern.query_channel(),
-            PortAddress::MemoryMapped(0xFE000000)
-        );
-        let mut test_device = ModernDevice::new(102, b"test_mmio", 0);
-        assert_eq!(test_device.read_byte(4).unwrap(), 0);
-        assert!(test_device.write_byte(4, 0xFF).is_ok());
-    }
-
-    #[test]
-    fn test_udf_interpreter_bytecode() {
-        let mut legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
-        // Bytecode instructions:
-        // 0x01, 0x00, 0x04 (Read offset 4 to reg 0)
-        // 0x03, 0x00, 0x02 (Multiply reg 0 by 2)
-        // 0x02, 0x08, 0x00 (Write reg 0 to offset 8)
-        // 0x04             (Halt)
-        let bytecode = [0x01, 0x00, 0x04, 0x03, 0x00, 0x02, 0x02, 0x08, 0x00, 0x04];
-        let interpreter = UdfInterpreter::new(&bytecode);
-        let mut regs = [5, 0, 0, 0];
-        let res = interpreter.execute(&mut legacy, &mut regs);
-        assert!(res.is_ok());
-        assert_eq!(regs[0], 0);
-    }
-
-    #[test]
-    fn test_dde_device_translation_wrapper() {
-        let mut dde_wrapper = DdeDeviceWrapper::new(201, b"linux_e1000", 0xFC000000, b"Linux");
-
-        assert_eq!(
-            dde_wrapper.query_channel(),
-            PortAddress::MemoryMapped(0xFC000000)
-        );
-        assert_eq!(dde_wrapper.info().vendor_id, 0x8086);
-        assert_eq!(dde_wrapper.info().device_id, 0x100e);
-
-        // Test simulated PCI BAR configuration register writing and reading
-        assert!(dde_wrapper.write_byte(0x10, 0x55).is_ok());
-        assert_eq!(dde_wrapper.read_byte(0x10).unwrap(), 0x55);
-
-        // Test block-like reads/writes simulating DMA descriptors
-        let test_buffer = [0xAA; 16];
-        assert!(dde_wrapper.write(&test_buffer).is_ok());
-
-        let mut read_buffer = [0u8; 16];
-        assert!(dde_wrapper.read(&mut read_buffer).is_ok());
-        assert_eq!(read_buffer, test_buffer);
-
-        // Test translated ioctl call
-        assert_eq!(dde_wrapper.ioctl(0xFF, 0).unwrap(), 1);
-    }
-
-    #[test]
-    fn test_wdm_driver_lifecycle() {
-        let mut io_mgr = IoManager::new();
-
-        // 1. Emulate normal driver installation process
-        let driver_idx = io_mgr.normal_driver_installation_process(b"MySerialDriver", b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver").unwrap();
-        assert_eq!(io_mgr.active_drivers.len(), 1);
-
-        let driver = &mut io_mgr.active_drivers[driver_idx];
-        assert_eq!(&driver.driver_name[..14], b"MySerialDriver");
-        assert_eq!(&driver.registry_path[..66], b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver");
-
-        // Set DRIVERUNLOAD unload routine callback
-        driver.unload_routine = Some(|_drv| {});
-
-        // 2. Create Device associated with the Driver Object
-        assert!(io_mgr.io_create_device(driver_idx, b"COM1", DeviceType::Character).is_ok());
-
-        let driver_updated = &io_mgr.active_drivers[driver_idx];
-        assert_eq!(driver_updated.device_objects.len(), 1);
-        assert_eq!(&driver_updated.device_objects[0].name[..4], b"COM1");
-        assert_eq!(driver_updated.device_objects[0].device_type, DeviceType::Character);
-
-        // Configure HW Resource allocations inside Device Extension
-        let ext = &mut io_mgr.active_drivers[driver_idx].device_objects[0].device_extension;
-        ext.irq = 4;
-        ext.base_port = 0x3F8;
-        ext.device_context[0] = 0xFF; // Write custom driver context information
-
-        // 3. Unload Driver and perform driver-specific cleanup tasks
-        assert!(io_mgr.io_unload_driver(driver_idx).is_ok());
-
-        // Assert that all Device Objects and Extensions have been freed/deleted cleanly from the pool
-        assert_eq!(io_mgr.active_drivers[driver_idx].device_objects.len(), 0);
-    }
-
-    #[test]
-    fn test_graphics_drivers() {
-        let mut intel_gpu = IntelHDGpu::new(1, b"intel_gpu", 0xE0000000);
-        assert!(intel_gpu.init().is_ok());
-        assert_eq!(intel_gpu.info().vendor_id, 0x8086);
-        assert!(intel_gpu.ioctl(0x1001, (1024 << 16) | 768).is_ok());
-        assert_eq!(intel_gpu.res_width, 1024);
-        assert_eq!(intel_gpu.res_height, 768);
-
-        let mut amd_gpu = RadeonGpu::new(2, b"radeon_gpu", 0xE1000000);
-        assert!(amd_gpu.init().is_ok());
-        assert_eq!(amd_gpu.info().vendor_id, 0x1002);
-        assert!(amd_gpu.ioctl(0x1004, 1200).is_ok());
-        assert_eq!(amd_gpu.engine_clock_mhz, 1200);
-
-        let mut nvidia_gpu = NvidiaGpu::new(3, b"nvidia_gpu", 0xE2000000);
-        assert!(nvidia_gpu.init().is_ok());
-        assert_eq!(nvidia_gpu.info().vendor_id, 0x10DE);
-        assert!(!nvidia_gpu.cuda_cores_active);
-        assert!(nvidia_gpu.ioctl(0x1005, 1).is_ok());
-        assert!(nvidia_gpu.cuda_cores_active);
-
-        let mut vesa_dev = VesaFramebufferDevice::new(4, b"vesa_gpu", 0xE3000000);
-        assert!(vesa_dev.init().is_ok());
-        assert_eq!(vesa_dev.info().vendor_id, 0x0000);
-        assert_eq!(vesa_dev.color_depth_bpp, 32);
-        assert!(vesa_dev.ioctl(0x1006, 16).is_ok());
-        assert_eq!(vesa_dev.color_depth_bpp, 16);
-    }
-
-    #[test]
-    fn test_storage_drivers() {
-        let mut nvme = NvmeController::new(5, b"nvme0", 10, 512);
-        assert!(nvme.init().is_ok());
-        assert_eq!(nvme.info().vendor_id, 0x144D);
-        assert_eq!(nvme.block_size(), 512);
-        assert_eq!(nvme.total_blocks(), 10);
-        assert_eq!(nvme.ioctl(0x2001, 0).unwrap(), 64);
-
-        let mut write_buf = [0u8; 512];
-        write_buf[0] = 42;
-        assert!(nvme.write_block(2, &write_buf).is_ok());
-        let mut read_buf = [0u8; 512];
-        assert!(nvme.read_block(2, &mut read_buf).is_ok());
-        assert_eq!(read_buf[0], 42);
-
-        let mut sata = AhciSataController::new(6, b"sata0", 10, 512);
-        assert!(sata.init().is_ok());
-        assert_eq!(sata.info().vendor_id, 0x8086);
-        assert!(sata.ncq_enabled);
-        assert!(sata.ioctl(0x2002, 0).is_ok());
-        assert!(!sata.ncq_enabled);
-
-        let mut virtio = VirtioBlockDevice::new(7, b"virtio_blk", 10, 512);
-        assert!(virtio.init().is_ok());
-        assert_eq!(virtio.info().vendor_id, 0x1AF4);
-        assert_eq!(virtio.features_negotiated, 0);
-        assert!(virtio.ioctl(0x2003, 0xABC).is_ok());
-        assert_eq!(virtio.features_negotiated, 0xABC);
-    }
-
-    #[test]
-    fn test_network_drivers() {
-        let mut e1000 = IntelE1000Network::new(8, b"eth0", [1, 2, 3, 4, 5, 6]);
-        assert!(e1000.init().is_ok());
-        assert_eq!(e1000.info().vendor_id, 0x8086);
-        assert_eq!(e1000.get_mac_address(), [1, 2, 3, 4, 5, 6]);
-        assert!(e1000.set_mac_address([6, 5, 4, 3, 2, 1]).is_ok());
-        assert_eq!(e1000.get_mac_address(), [6, 5, 4, 3, 2, 1]);
-        assert_eq!(e1000.ioctl(0x3001, 0).unwrap(), 0);
-        assert!(e1000.send_packet(&[0]).is_ok());
-        assert_eq!(e1000.ioctl(0x3001, 0).unwrap(), 1);
-
-        let mut rtl = RealtekRtl8139Network::new(9, b"eth1", [1, 1, 1, 1, 1, 1]);
-        assert!(rtl.init().is_ok());
-        assert_eq!(rtl.info().vendor_id, 0x10EC);
-        assert!(rtl.duplex_mode_full);
-        assert!(rtl.ioctl(0x3002, 0).is_ok());
-        assert!(!rtl.duplex_mode_full);
-
-        let mut virt_net = VirtioNetDevice::new(10, b"virt_net", [2, 2, 2, 2, 2, 2]);
-        assert!(virt_net.init().is_ok());
-        assert_eq!(virt_net.info().vendor_id, 0x1AF4);
-        assert_eq!(virt_net.mtu, 1500);
-        assert!(virt_net.ioctl(0x3003, 9000).is_ok());
-        assert_eq!(virt_net.mtu, 9000);
-    }
-
-    #[test]
-    fn test_peripheral_and_other_drivers() {
-        let mut hda = IntelHdaAudio::new(11, b"hda");
-        assert!(hda.init().is_ok());
-        assert_eq!(hda.volume_level, 50);
-        assert!(hda.ioctl(0x4001, 75).is_ok());
-        assert_eq!(hda.volume_level, 75);
-
-        let mut ac97 = Ac97AudioDevice::new(12, b"ac97");
-        assert!(ac97.init().is_ok());
-        assert_eq!(ac97.sample_rate_hz, 44100);
-        assert!(ac97.ioctl(0x4002, 48000).is_ok());
-        assert_eq!(ac97.sample_rate_hz, 48000);
-
-        let mut kbd = UsbHidKeyboard::new(13, b"kbd");
-        assert!(kbd.init().is_ok());
-        let mut key_buf = [0u8; 1];
-        assert_eq!(kbd.read(&mut key_buf).unwrap(), 1);
-        assert_eq!(key_buf[0], 0);
-        assert!(kbd.ioctl(0x5001, 15).is_ok());
-        assert_eq!(kbd.read(&mut key_buf).unwrap(), 1);
-        assert_eq!(key_buf[0], 15);
-
-        let mut mouse = Ps2MouseDevice::new(14, b"mouse");
-        assert!(mouse.init().is_ok());
-        assert_eq!(mouse.resolution_count, 4);
-        assert!(mouse.ioctl(0x5002, 8).is_ok());
-        assert_eq!(mouse.resolution_count, 8);
-
-        let mut touch = TouchscreenController::new(15, b"touch");
-        assert!(touch.init().is_ok());
-        assert_eq!(touch.ioctl(0x5003, 0).unwrap(), 10);
-
-        let mut bt = BluetoothController::new(16, b"bluetooth");
-        assert!(bt.init().is_ok());
-        assert_eq!(bt.paired_devices_count, 0);
-        assert!(bt.ioctl(0x6001, 0).is_ok());
-        assert_eq!(bt.paired_devices_count, 1);
-
-        let mut wifi = WirelessWifiDevice::new(17, b"wifi");
-        assert!(wifi.init().is_ok());
-        assert_eq!(wifi.info().vendor_id, 0x14E4);
-        assert!(wifi.ioctl(0x6002, 0).is_ok());
-
-        let mut i2c = I2cController::new(18, b"i2c");
-        assert!(i2c.init().is_ok());
-        assert_eq!(i2c.clock_speed_hz, 100000);
-        assert!(i2c.ioctl(0x7001, 400000).is_ok());
-        assert_eq!(i2c.clock_speed_hz, 400000);
-
-        let mut spi = SpiController::new(19, b"spi");
-        assert!(spi.init().is_ok());
-        assert_eq!(spi.mode, 0);
-        assert!(spi.ioctl(0x7002, 3).is_ok());
-        assert_eq!(spi.mode, 3);
-
-        let mut gpio = GpioController::new(20, b"gpio");
-        assert!(gpio.init().is_ok());
-        assert_eq!(gpio.pins_state_mask, 0);
-        assert!(gpio.ioctl(0x7003, 0xFFFF).is_ok());
-        assert_eq!(gpio.pins_state_mask, 0xFFFF);
-
-        let mut pcie = PciExpressBus::new(21, b"pcie");
-        assert!(pcie.init().is_ok());
-        assert_eq!(pcie.links_active_count, 0);
-        assert!(pcie.ioctl(0x7004, 16).is_ok());
-        assert_eq!(pcie.links_active_count, 16);
-
-        let mut tpm = TpmSecurityModule::new(22, b"tpm");
-        assert!(tpm.init().is_ok());
-        assert!(!tpm.is_locked);
-        assert!(tpm.ioctl(0x8001, 1).is_ok());
-        assert!(tpm.is_locked);
-
-        let mut enclave = SecureEnclaveDriver::new(23, b"enclave");
-        assert!(enclave.init().is_ok());
-        assert_eq!(enclave.active_enclaves, 0);
-        assert!(enclave.ioctl(0x8002, 0).is_ok());
-        assert_eq!(enclave.active_enclaves, 1);
-
-        let mut imu = ImuSensorDriver::new(24, b"imu");
-        assert!(imu.init().is_ok());
-        assert_eq!(imu.ioctl(0x9001, 0).unwrap(), 25);
-
-        let mut thermal = ThermalSensorDriver::new(25, b"thermal");
-        assert!(thermal.init().is_ok());
-        assert_eq!(thermal.max_temp_allowed, 85);
-        assert!(thermal.ioctl(0x9002, 95).is_ok());
-        assert_eq!(thermal.max_temp_allowed, 95);
-
-        let mut lpt = LinePrinterDevice::new(26, b"lpt1");
-        assert!(lpt.init().is_ok());
-        assert!(!lpt.paper_out);
-        assert!(lpt.ioctl(0xA001, 1).is_ok());
-        assert!(lpt.paper_out);
-    }
-
-    #[test]
-    fn test_new_drivers_udf() {
-        let mut kbd = UsbHidKeyboard::new(13, b"kbd");
-        let bytecode_read = [0x01, 0x00, 0x00, 0x03, 0x00, 0x03, 0x04]; // Read offset 0 -> reg 0, Multiply reg 0 by 3, Halt
-        let interpreter = UdfInterpreter::new(&bytecode_read);
-        let mut regs = [5, 0, 0, 0];
-        // last keycode is 0. 0 * 3 = 0.
-        assert!(interpreter.execute(&mut kbd, &mut regs).is_ok());
-        assert_eq!(regs[0], 0);
-
-        // Set last_keycode via write bytecode
-        let bytecode_write = [0x02, 0x00, 0x00, 0x04]; // Write reg 0 value (5) -> offset 0, Halt
-        let interpreter_write = UdfInterpreter::new(&bytecode_write);
-        regs[0] = 5; // Reset regs[0] to 5
-        assert!(interpreter_write.execute(&mut kbd, &mut regs).is_ok());
-        assert_eq!(kbd.last_keycode, 5);
-
-        // Read last_keycode again: 5 * 3 = 15.
-        assert!(interpreter.execute(&mut kbd, &mut regs).is_ok());
-        assert_eq!(regs[0], 15);
-    }
-
-    #[test]
-    fn test_ancient_legacy_devices_oop() {
-        // 1. Floppy disk test
-        let mut floppy = FloppyDiskDevice::new(90, b"fd0");
-        assert!(floppy.init().is_ok());
-        let mut buf = [0u8; 512];
-        assert_eq!(floppy.read(&mut buf).unwrap(), 512);
-        assert_eq!(buf[0], 0xAA);
-        assert_eq!(floppy.block_size(), 512);
-        assert_eq!(floppy.total_blocks(), 10);
-
-        // 2. Parallel LPT test
-        let mut parallel = ParallelPortDevice::new(91, b"lpt0", 0x378);
-        assert!(parallel.init().is_ok());
-        assert_eq!(parallel.query_channel(), PortAddress::PortIO(0x378));
-        assert_eq!(parallel.read_byte(0).unwrap(), 0xDF);
-        assert!(parallel.write(b"Hello Printer").is_ok());
-        assert!(parallel.strobe);
-
-        // 3. Serial UART 16550 test
-        let mut serial = SerialUartDevice::new(92, b"com1", 0x3F8);
-        assert!(serial.init().is_ok());
-        assert_eq!(serial.baud_rate, 115200);
-        let mut ser_buf = [0u8; 10];
-        assert_eq!(serial.read(&mut ser_buf).unwrap(), 10);
-        assert_eq!(ser_buf[0], 0x55);
-
-        // 4. AdLib Sound Blaster test
-        let mut adlib = AdLibSoundDevice::new(93, b"opl2");
-        assert!(adlib.init().is_ok());
-        assert_eq!(adlib.register_map[0x20], 0);
-        assert!(adlib.write(&[0x20, 0x11, 0x40, 0x22]).is_ok());
-        assert_eq!(adlib.register_map[0x20], 0x11);
-        assert_eq!(adlib.register_map[0x40], 0x22);
-
-        // 5. ISA Bus Plug-and-Play test
-        let mut isa = IsaBusDevice::new(94, b"isapnp");
-        assert!(isa.init().is_ok());
-        assert_eq!(isa.ioctl(0xB001, 0).unwrap(), 4);
-    }
-}
-
 impl BlockDevice for SimpleBlockDevice {
     fn read_block(&mut self, block: u64, buffer: &mut [u8]) -> Result<(), DeviceError> {
         let block_index = block as usize;
@@ -2879,8 +2516,9 @@ impl DeviceManager {
 
     pub fn find_device_by_name(&self, name: &[u8]) -> Option<usize> {
         for (id, desc_option) in self.descriptors.iter().enumerate() {
-            if let Some(desc_ptr) = *desc_option {
-                let desc = unsafe { &*desc_ptr.as_ptr() };
+            if let Some(desc_ptr) = desc_option {
+                let ptr: *mut DeviceDescriptor = desc_ptr.as_ptr();
+                let desc: &DeviceDescriptor = unsafe { &*ptr };
                 let desc_name_len = desc.name.iter().position(|&b| b == 0).unwrap_or(64);
                 if &desc.name[..desc_name_len] == name {
                     return Some(id);
@@ -2893,8 +2531,9 @@ impl DeviceManager {
     pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<usize> {
         let mut ids = Vec::new();
         for (id, desc_option) in self.descriptors.iter().enumerate() {
-            if let Some(desc_ptr) = *desc_option {
-                let desc = unsafe { &*desc_ptr.as_ptr() };
+            if let Some(desc_ptr) = desc_option {
+                let ptr: *mut DeviceDescriptor = desc_ptr.as_ptr();
+                let desc: &DeviceDescriptor = unsafe { &*ptr };
                 if desc.device_type == device_type {
                     ids.push(id);
                 }
@@ -2969,8 +2608,8 @@ impl<T> Vec<T> {
 
     pub fn clear(&mut self) {
         self.len = 0;
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
+    }
+
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
             vec: self,
@@ -2978,19 +2617,6 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn iter(&self) -> VecIterator<'_, T> {
-        VecIterator {
-            vec: self,
-            index: 0,
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-
-    pub fn as_slice(&self) -> &[T] {
-        if self.len == 0 {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
         VecIterMut {
             data: self.data,
@@ -3008,10 +2634,11 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn iter_mut(&mut self) -> VecIteratorMut<'_, T> {
-        VecIteratorMut {
-            vec: self,
-            index: 0,
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
 
@@ -3076,7 +2703,7 @@ impl<'a, T> Iterator for VecIteratorMut<'a, T> {
 }
 
 pub struct Enumerate<'a, T> {
-    iter: VecIterator<'a, T>,
+    iter: VecIter<'a, T>,
     index: usize,
 }
 
@@ -3120,7 +2747,6 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
 }
 
 // External allocator functions
-#[cfg(not(test))]
 pub struct VecIter<'a, T> {
     vec: &'a Vec<T>,
     index: usize,
@@ -3175,95 +2801,18 @@ unsafe fn free(ptr: *mut u8) {
 }
 
 #[cfg(target_os = "none")]
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    if let Ok(layout) = Layout::from_size_align(size, 8) {
-        std_alloc(layout)
-    } else {
-        core::ptr::null_mut()
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    // We don't track sizes here; for the custom Vec this is a best-effort stub.
-    // A real implementation would need to pass layout. This is safe for tests.
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
-extern "C" {
-    fn malloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-/// Unified representation of communication channels (OOP Abstraction)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortAddress {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+
 /// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
 #[derive(Debug, Clone)]
 pub struct DeviceExtension {
     pub irq: u8,
-    PortIO(u16),      // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32) // Modern 32/64-bit Memory Mapped I/O (newer generations)
-}
-
-/// Unified Peripheral Object-Oriented Interface (OOP Principle)
-pub trait UnifiedPeripheral: Device {
-    fn query_channel(&self) -> PortAddress;
-    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError>;
-    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError>;
-}
-
-/// Legacy implementation of a peripheral using Port I/O
-pub struct LegacyDevice {
-    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
-    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+    pub io_base: u16,
+    pub mmio_base: usize,
 }
 
 /// Unified Peripheral Object-Oriented Interface (OOP Principle)
@@ -3320,79 +2869,28 @@ impl UnifiedPeripheral for LegacyDevice {
 
 /// Modern implementation of a peripheral using MMIO
 pub struct ModernDevice {
+    pub base_address: u32,
     pub id: usize,
     pub name: [u8; 64],
 }
 
-impl LegacyDevice {
-    pub fn new(id: usize, name: &[u8], base_port: u16) -> Self {
+impl ModernDevice {
+    pub fn new(id: usize, name: &[u8], base_address: u32) -> Self {
         let mut name_array = [0u8; 64];
         let len = name.len().min(63);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        LegacyDevice {
-            base_port,
-            id,
-            name: name_array,
-        }
+        ModernDevice { base_address, id, name: name_array }
     }
-}
-
-impl Device for LegacyDevice {
-    fn init(&mut self) -> Result<(), DeviceError> {
-        Ok(())
-    }
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        // Simulate reading from legacy Port I/O
-        for b in buffer.iter_mut() {
-            *b = 0; // Stub reading legacy port
-        }
-        Ok(buffer.len())
-    }
-    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
-        Ok(buffer.len())
-    }
-    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
-        Ok(0)
-    }
-    fn info(&self) -> DeviceInfo {
-        DeviceInfo::new(DeviceType::Character)
-    }
-    fn shutdown(&mut self) -> Result<(), DeviceError> {
-        Ok(())
-    }
-}
-
-impl UnifiedPeripheral for LegacyDevice {
-    fn query_channel(&self) -> PortAddress {
-        PortAddress::PortIO(self.base_port)
-    }
-    fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
-        // Simulate inb instruction
-        Ok(0)
-    }
-    fn write_byte(&mut self, _offset: u32, _value: u8) -> Result<(), DeviceError> {
-        // Simulate outb instruction
-        Ok(())
-    }
-}
-
-/// Modern implementation of a peripheral using MMIO
-pub struct ModernDevice {
-    pub base_address: u32,
-    pub memory_size: usize,
-    pub device_context: [u8; 128], // Driver-specific context information buffer
 }
 
 impl DeviceExtension {
     pub fn new() -> Self {
         Self {
             irq: 0,
-            base_port: 0,
-            base_address: 0,
-            memory_size: 0,
-            device_context: [0; 128],
+            io_base: 0,
+            mmio_base: 0,
         }
     }
 }
@@ -3411,27 +2909,14 @@ impl DeviceObject {
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        ModernDevice { base_address, id, name: name_array }
-    }
-}
-        ModernDevice {
-            base_address,
-            id,
+        DeviceObject {
             name: name_array,
+            device_type,
+            device_extension: DeviceExtension::new(),
         }
     }
 }
 
-        Self {
-            name: name_array,
-            device_type,
-            device_extension: DeviceExtension::new(),
-impl Device for ModernDevice {
-    fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        // Simulate reading MMIO
-        for b in buffer.iter_mut() {
-            *b = 0;
 impl Device for ModernDevice {
     fn init(&mut self) -> Result<(), DeviceError> {
         Ok(())
@@ -3441,11 +2926,8 @@ impl Device for ModernDevice {
         for b in buffer.iter_mut() {
             *b = 0;
         }
+        Ok(buffer.len())
     }
-    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> { Ok(buffer.len()) }
-    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> { Ok(0) }
-    fn info(&self) -> DeviceInfo { DeviceInfo::new(DeviceType::Character) }
-    fn shutdown(&mut self) -> Result<(), DeviceError> { Ok(()) }
     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
@@ -3456,6 +2938,18 @@ impl Device for ModernDevice {
         DeviceInfo::new(DeviceType::Character)
     }
     fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+}
+
+impl UnifiedPeripheral for ModernDevice {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_address)
+    }
+    fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
+        Ok(0)
+    }
+    fn write_byte(&mut self, _offset: u32, _value: u8) -> Result<(), DeviceError> {
         Ok(())
     }
 }
@@ -3472,14 +2966,6 @@ impl DriverObject {
     pub fn new(name: &[u8], reg_path: &[u8]) -> Self {
         let mut name_array = [0u8; 64];
         let len = name.len().min(63);
-impl UnifiedPeripheral for ModernDevice {
-    fn query_channel(&self) -> PortAddress { PortAddress::MemoryMapped(self.base_address) }
-    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
-impl UnifiedPeripheral for ModernDevice {
-    fn query_channel(&self) -> PortAddress {
-        PortAddress::MemoryMapped(self.base_address)
-    }
-    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
@@ -3522,6 +3008,22 @@ impl IoManager {
     pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
         if driver_idx >= self.active_drivers.len() {
             return Err(DeviceError::InvalidParameter);
+        }
+        let dev_obj = DeviceObject::new(name, device_type);
+        self.active_drivers[driver_idx].device_objects.push(dev_obj);
+        Ok(())
+    }
+}
+
+pub struct UserDefinedFunctionEngine {
+    pub bytecode: Vec<u8>,
+}
+
+impl UserDefinedFunctionEngine {
+    pub fn new(bytecode: Vec<u8>) -> Self {
+        Self { bytecode }
+    }
+
     /// Execute the sandboxed User-Defined Function bytecode
     /// Bytecode instructions:
     /// - 0x01: Read Port IO / MMIO
@@ -3572,73 +3074,12 @@ impl IoManager {
                     return Err(DeviceError::NotSupported);
                 }
             }
-    /// Execute the sandboxed User-Defined Function bytecode
-    /// Bytecode instructions:
-    /// - 0x01: Read Port IO / MMIO
-    /// - 0x02: Write Port IO / MMIO
-    /// - 0x03: Custom scaling transformation
-    /// - 0x04: Terminate with success
-    pub fn execute(
-        &self,
-        peripheral: &mut dyn UnifiedPeripheral,
-        registers: &mut [u32; 4],
-    ) -> Result<(), DeviceError> {
-        let mut pc = 0;
-        while pc < self.bytecode.len() {
-            let op = self.bytecode[pc];
-            match op {
-                0x01 => {
-                    // Read operation. Register index in bytecode[pc+1], offset in bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() {
-                        return Err(DeviceError::InvalidParameter);
-                    }
-                    let reg_idx = self.bytecode[pc + 1] as usize;
-                    let offset = self.bytecode[pc + 2] as u32;
-                    if reg_idx < registers.len() {
-                        registers[reg_idx] = peripheral.read_byte(offset)? as u32;
-                    }
-                    pc += 3;
-                }
-                0x02 => {
-                    // Write operation. Offset in bytecode[pc+1], register index holding value in bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() {
-                        return Err(DeviceError::InvalidParameter);
-                    }
-                    let offset = self.bytecode[pc + 1] as u32;
-                    let reg_idx = self.bytecode[pc + 2] as usize;
-                    if reg_idx < registers.len() {
-                        peripheral.write_byte(offset, registers[reg_idx] as u8)?;
-                    }
-                    pc += 3;
-                }
-                0x03 => {
-                    // Custom scale/transformation operation. Multiply register[pc+1] by factor bytecode[pc+2]
-                    if pc + 2 >= self.bytecode.len() {
-                        return Err(DeviceError::InvalidParameter);
-                    }
-                    let reg_idx = self.bytecode[pc + 1] as usize;
-                    let factor = self.bytecode[pc + 2] as u32;
-                    if reg_idx < registers.len() {
-                        registers[reg_idx] = registers[reg_idx].wrapping_mul(factor);
-                    }
-                    pc += 3;
-                }
-                0x04 => {
-                    // Halt with success
-                    return Ok(());
-                }
-                _ => {
-                    // Unknown opcode
-                    return Err(DeviceError::NotSupported);
-                }
-            }
         }
-
-        let device_obj = DeviceObject::new(name, device_type);
-        self.active_drivers[driver_idx].device_objects.push(device_obj);
         Ok(())
     }
+}
 
+impl IoManager {
     /// IoUnloadDriver: Executes driver-specific cleanup tasks and calls the DRIVERUNLOAD unload routine
     pub fn io_unload_driver(&mut self, driver_idx: usize) -> Result<(), DeviceError> {
         if driver_idx >= self.active_drivers.len() {
@@ -3674,62 +3115,8 @@ pub enum PortAddress {
     MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
 }
 
-#[cfg(test)]
-#[no_mangle]
-pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    malloc(size)
-}
 
 // ==========================================
 // Standalone unit tests
 // ==========================================
 
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_device_descriptors() {
-        let capability = DeviceCapability::full();
-        let desc = DeviceDescriptor::new(10, b"SerialTTY", DeviceType::Character, capability);
-        assert_eq!(desc.get_state(), DeviceState::Uninitialized);
-        desc.set_state(DeviceState::Ready);
-        assert_eq!(desc.get_state(), DeviceState::Ready);
-    }
-
-    #[test]
-    fn test_simple_block_device() {
-        let mut dev = SimpleBlockDevice::new(1, b"disk0", 4, 512);
-        assert_eq!(dev.info().vendor_id, 0x8086);
-        assert!(dev.init().is_ok());
-
-        let mut write_buf = [0u8; 512];
-        write_buf[0] = 0xAA;
-        assert!(dev.write_block(2, &write_buf).is_ok());
-
-        let mut read_buf = [0u8; 512];
-        assert!(dev.read_block(2, &mut read_buf).is_ok());
-        assert_eq!(read_buf[0], 0xAA);
-    }
-
-    #[test]
-    fn test_device_manager_autoprobe_and_params() {
-        let mut mgr = DeviceManager::new();
-
-        // Register custom boot parameter (module param)
-        mgr.set_module_param(b"debug_level", 4);
-        assert_eq!(mgr.get_module_param(b"debug_level"), Some(4));
-        assert_eq!(mgr.get_module_param(b"non_existent"), None);
-
-        // Register PCI device table probe matches
-        let entry = DriverProbeEntry {
-            vendor_id: 0x10EC,
-            device_id: 0x8168,
-            device_type: DeviceType::Network,
-        };
-        mgr.register_probe_match(entry);
-
-        // Check autoprobe success
-        assert!(mgr.auto_probe_and_bind(0x10EC, 0x8168, DeviceType::Network));
-        assert!(!mgr.auto_probe_and_bind(0xFFFF, 0xFFFF, DeviceType::Network));
-    }
-}

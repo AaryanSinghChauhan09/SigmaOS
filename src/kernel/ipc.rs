@@ -158,7 +158,7 @@ impl SovereignSpliceEngine {
     ) -> Result<usize, IpcError> {
         let mut moved = 0;
         while moved < max_elements {
-            if let Some(payload) = source.read_structure() {
+            if let Ok(Some(payload)) = source.read_structure() {
                 let size = payload.len();
                 if let Err(e) = destination.write_structure(payload) {
                     return Err(e);
@@ -348,6 +348,10 @@ impl IpcManager {
         Ok(channel.receive())
     }
 
+    pub fn get_channel(&self, channel_id: u64) -> Option<&Channel> {
+        self.channels.iter().find(|c| c.id == channel_id)
+    }
+
     pub fn remove_channel(&mut self, channel_id: u64) {
         self.channels.retain(|c| c.id != channel_id);
     }
@@ -478,163 +482,6 @@ mod tests {
         assert_eq!(sendfile_engine.total_bytes_sent, 4);
         assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![30, 40]));
         assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![50, 60]));
-    }
-
-    #[test]
-    fn test_sovereign_ool_remapper() {
-        let mut remapper = SovereignOolRemapper::new();
-        let buffer = vec![0u8; 9000]; // Multi-page buffer
-        let remapped = remapper.remap_ool(10, 20, buffer.clone()).unwrap();
-
-        assert_eq!(remapped.len(), 9000);
-        assert_eq!(remapper.pages_remapped, 3); // 9000 bytes spans 3 pages (each 4096)
-    }
-
-    #[test]
-    fn test_shared_page_ring_buffer() {
-        let mut ring = SharedPageRingBuffer::new(5);
-        assert!(ring.pop_item().is_none());
-
-        ring.push_item(vec![5, 10]).unwrap();
-        ring.push_item(vec![15, 20]).unwrap();
-        ring.trigger_ipi();
-
-        assert_eq!(ring.interrupts_triggered, 1);
-        assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
-        assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
-        assert!(ring.pop_item().is_none());
-    }
-
-    #[test]
-    fn test_sovereign_splice_engine() {
-        let mut source_pipe = SovereignPipe::new(1, 100, 200, 10);
-        let mut dest_pipe = SovereignPipe::new(2, 200, 300, 10);
-
-        source_pipe.write_structure(vec![1, 1, 1]).unwrap();
-        source_pipe.write_structure(vec![2, 2, 2]).unwrap();
-
-        let mut splice_engine = SovereignSpliceEngine::new();
-        let spliced = splice_engine.splice(&mut source_pipe, &mut dest_pipe, 2).unwrap();
-
-        assert_eq!(spliced, 2);
-        assert_eq!(splice_engine.bytes_spliced, 6);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![1, 1, 1]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![2, 2, 2]);
-    }
-
-    #[test]
-    fn test_sovereign_sendfile_engine() {
-        let mut dest_pipe = SovereignPipe::new(3, 100, 200, 10);
-        let file_cache = vec![
-            vec![10, 20],
-            vec![30, 40],
-            vec![50, 60],
-        ];
-
-        let mut sendfile_engine = SovereignSendfileEngine::new();
-        let sent = sendfile_engine.send_file_to_pipe(&file_cache, &mut dest_pipe, 1, 2).unwrap();
-
-        assert_eq!(sent, 4);
-        assert_eq!(sendfile_engine.files_sent, 1);
-        assert_eq!(sendfile_engine.total_bytes_sent, 4);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![30, 40]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![50, 60]);
-    }
-
-    #[test]
-    fn test_sovereign_ool_remapper() {
-        let mut remapper = SovereignOolRemapper::new();
-        let buffer = vec![0u8; 9000]; // Multi-page buffer
-        let remapped = remapper.remap_ool(10, 20, buffer.clone()).unwrap();
-
-        assert_eq!(remapped.len(), 9000);
-        assert_eq!(remapper.pages_remapped, 3); // 9000 bytes spans 3 pages (each 4096)
-    }
-
-    #[test]
-    fn test_shared_page_ring_buffer() {
-        let mut ring = SharedPageRingBuffer::new(5);
-        assert!(ring.pop_item().is_none());
-
-        ring.push_item(vec![5, 10]).unwrap();
-        ring.push_item(vec![15, 20]).unwrap();
-        ring.trigger_ipi();
-
-        assert_eq!(ring.interrupts_triggered, 1);
-        assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
-        assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
-        assert!(ring.pop_item().is_none());
-    }
-
-    #[test]
-    fn test_zero_copy_latency_and_capability_delegation() {
-        let mut channel = Channel::new(5, 100, 200);
-
-        // 1. Test delegated capability path message
-        let token = CapabilityToken::new().allow_ipc();
-        let msg = Message::DelegatedCapability {
-            token,
-            delegator: 100,
-            delegatee: 200,
-            delegation_path: vec![100, 150, 200],
-        };
-        assert!(channel.send(msg).is_ok());
-
-        // 2. Test zero-copy pointer transmission and latency checking (must be <100μs)
-        let virtual_ptr = 0x7FFF_0000;
-        let transfer_id = channel.send_zero_copy(virtual_ptr, 4096).unwrap();
-
-        let resolved_desc = channel.receive_zero_copy(transfer_id).unwrap();
-        assert_eq!(resolved_desc.source_virtual_addr, virtual_ptr);
-        assert_eq!(resolved_desc.length, 4096);
-        assert!(resolved_desc.latency_microseconds < 100); // verify <100μs latency
-    }
-
-    #[test]
-    fn test_ipc_fuzzing_harness() {
-        let mut manager = IpcManager::new();
-        let channel_id = manager.create_channel(10, 20);
-
-        // Run fuzz harness with various random seeds and check that all signals map correctly
-        for seed in 0..50 {
-            assert!(manager.fuzz_ipc_message_passing(channel_id, seed, 10).is_ok());
-        }
-    }
-
-    #[test]
-    fn test_sovereign_splice_engine() {
-        let mut source_pipe = SovereignPipe::new(1, 100, 200, 10);
-        let mut dest_pipe = SovereignPipe::new(2, 200, 300, 10);
-
-        source_pipe.write_structure(vec![1, 1, 1]).unwrap();
-        source_pipe.write_structure(vec![2, 2, 2]).unwrap();
-
-        let mut splice_engine = SovereignSpliceEngine::new();
-        let spliced = splice_engine.splice(&mut source_pipe, &mut dest_pipe, 2).unwrap();
-
-        assert_eq!(spliced, 2);
-        assert_eq!(splice_engine.bytes_spliced, 6);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![1, 1, 1]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![2, 2, 2]);
-    }
-
-    #[test]
-    fn test_sovereign_sendfile_engine() {
-        let mut dest_pipe = SovereignPipe::new(3, 100, 200, 10);
-        let file_cache = vec![
-            vec![10, 20],
-            vec![30, 40],
-            vec![50, 60],
-        ];
-
-        let mut sendfile_engine = SovereignSendfileEngine::new();
-        let sent = sendfile_engine.send_file_to_pipe(&file_cache, &mut dest_pipe, 1, 2).unwrap();
-
-        assert_eq!(sent, 4);
-        assert_eq!(sendfile_engine.files_sent, 1);
-        assert_eq!(sendfile_engine.total_bytes_sent, 4);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![30, 40]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![50, 60]);
     }
 
     #[test]

@@ -10,6 +10,9 @@ pub mod terminal;
 pub mod advanced_app_absorber;
 pub mod tmux;
 pub mod utility_suite;
+pub mod mind_map;
+
+pub use mind_map::MindMapCreator;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,

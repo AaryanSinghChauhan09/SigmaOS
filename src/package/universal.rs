@@ -287,6 +287,12 @@ pub struct PackageSnapshot {
 }
 
 /// Universal package manager with transaction-safe snapshots & rollback mechanisms
+#[derive(Debug, Clone)]
+pub struct PackageCheckpoint {
+    pub checkpoint_id: usize,
+    pub installed_keys: Vec<String>,
+}
+
 /// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
 #[derive(Debug, Clone)]
 pub struct TransactionalHistory {
@@ -308,56 +314,6 @@ impl TransactionalHistory {
 
         let mut keys = Vec::new();
         for key in installed.keys() {
-            keys.push(key.clone());
-        }
-
-        self.checkpoints.push(PackageCheckpoint {
-            checkpoint_id: id,
-            installed_keys: keys,
-        });
-
-        id
-    }
-
-    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
-        for i in 0..self.checkpoints.len() {
-            if self.checkpoints[i].checkpoint_id == id {
-                return Some(&self.checkpoints[i]);
-            }
-        }
-        None
-    }
-}
-
-impl Default for TransactionalHistory {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Universal package manager
-/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
-#[derive(Debug, Clone)]
-pub struct TransactionalHistory {
-    pub checkpoints: Vec<PackageCheckpoint>,
-    pub next_checkpoint_id: usize,
-}
-
-impl TransactionalHistory {
-    pub fn new() -> Self {
-        TransactionalHistory {
-            checkpoints: Vec::new(),
-            next_checkpoint_id: 1,
-        }
-    }
-
-    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
-        let id = self.next_checkpoint_id;
-        self.next_checkpoint_id += 1;
-
-        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
-        for key in installed.keys() {
-            let key: &String = key;
             keys.push(key.clone());
         }
 
@@ -720,6 +676,18 @@ impl MultiDistroPackageAdapter {
                         version = line["version:".len()..].trim().to_string();
                     }
                 }
+                _ => {
+                    if line.contains(':') {
+                        let mut parts = line.splitn(2, ':');
+                        let k = parts.next().unwrap_or("").trim();
+                        let v = parts.next().unwrap_or("").trim();
+                        if name.is_empty() && (k.eq_ignore_ascii_case("name") || k.eq_ignore_ascii_case("package") || k.eq_ignore_ascii_case("pkgname")) {
+                            name = v.to_string();
+                        } else if version.is_empty() && (k.eq_ignore_ascii_case("version") || k.eq_ignore_ascii_case("pkgver")) {
+                            version = v.to_string();
+                        }
+                    }
+                }
             }
         }
 
@@ -818,9 +786,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 12); // Includes all 12 formats now!
-        assert_eq!(manager.adapters.len(), 6);
-        assert_eq!(manager.adapters.len(), 7); // Deb, Rpm, Pacman, Snap, Flatpak, SigmaPkg, Apk
+        assert_eq!(manager.adapters.len(), 13); // Includes all 13 package format adapters
     }
 
     #[test]

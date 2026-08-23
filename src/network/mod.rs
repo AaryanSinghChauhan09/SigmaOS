@@ -11,9 +11,7 @@ pub mod revival;
 
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use analyzer::{
-    NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
-    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
-    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
+    TrafficPacket, Protocol, TrafficAlert, AlertType, AlertSeverity,
     AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
     KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
     ClearLinuxFlowLoadBalancer,

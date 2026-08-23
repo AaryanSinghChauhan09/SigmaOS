@@ -526,7 +526,7 @@ impl CrossDeviceOrchestrator {
     }
 
     pub fn get_connected_devices(&self) -> Vec<&ConnectedDevice> {
-        self.devices.values().filter(|d| d.is_connected()).collect()
+        self.devices.values().filter(|d: &&ConnectedDevice| d.is_connected()).collect()
     }
 
     pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<&ConnectedDevice> {
