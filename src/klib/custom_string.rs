@@ -334,6 +334,18 @@ impl fmt::Debug for SigmaString {
 // PartialEq, Eq
 // ------------------------------------------------------------------
 
+impl PartialOrd for SigmaString {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for SigmaString {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.as_str().cmp(other.as_str())
+    }
+}
+
 impl PartialEq for SigmaString {
     fn eq(&self, other: &Self) -> bool {
         self.as_str() == other.as_str()

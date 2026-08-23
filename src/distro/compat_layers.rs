@@ -16,6 +16,9 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+use alloc::collections::BTreeMap as HashMap;
+
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::BTreeMap;
 
@@ -277,7 +280,7 @@ impl Default for PosixTranslation {
 // NetBSD/FreeBSD kqueue & kevent event notification framework
 // ==========================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum KFilter {
     Read,
     Write,

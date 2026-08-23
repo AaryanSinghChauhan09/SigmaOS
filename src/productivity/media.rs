@@ -3,6 +3,7 @@
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
 use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
+extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
@@ -33,6 +34,9 @@ pub struct SigmaMediaEngine {
     pub master_mute: AtomicBool,
     pub state: PlaybackState,
     pub has_track: bool,
+    pub active_track: Option<String>,
+    pub format: Option<MediaFormat>,
+    pub duration_seconds: usize,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -61,30 +65,10 @@ impl SigmaMediaEngine {
             master_mute: AtomicBool::new(false),
             state: PlaybackState::Stopped,
             has_track: false,
+            active_track: None,
+            format: None,
+            duration_seconds: 0,
         }
-    }
-
-    pub fn play(&mut self) -> Result<(), &'static str> {
-        if !self.has_track {
-            return Err("No track loaded");
-        }
-        self.state = PlaybackState::Playing;
-        Ok(())
-    }
-
-    pub fn load_track(&mut self, name: alloc::string::String, format: MediaFormat, duration: u32) {
-        self.has_track = true;
-        self.state = PlaybackState::Stopped;
-    }
-
-    pub fn pause(&mut self) {
-        if self.state == PlaybackState::Playing {
-            self.state = PlaybackState::Paused;
-        }
-    }
-
-    pub fn stop(&mut self) {
-        self.state = PlaybackState::Stopped;
     }
 
     /// Plays a raw chiptune sound buffer over an active audio channel

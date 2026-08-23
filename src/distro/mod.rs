@@ -18,6 +18,8 @@ pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
     PinRule, AptPinStore, OpenRCService,
 };
+pub mod arch_parity;
+pub mod chakra_parity;
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
@@ -47,10 +49,6 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
-pub use manjaro::{
-    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
-    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
-};
 pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
     NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,

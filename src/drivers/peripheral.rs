@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Peripheral Device Framework
 // Provides OOP-based peripheral device management
 

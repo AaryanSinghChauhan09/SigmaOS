@@ -13,9 +13,9 @@ pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod performance;
 pub mod productivity;
@@ -95,7 +95,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use performance::{
@@ -123,7 +123,7 @@ pub use security::{
     PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
     MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
-pub use shell::{ShellCommand, ShellRepl};
+pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,

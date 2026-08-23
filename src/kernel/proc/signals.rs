@@ -20,6 +20,7 @@
 /// Based on early and modern Linux signals design
 use crate::klib::BTreeMap;
 use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
+extern crate alloc;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

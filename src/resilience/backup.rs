@@ -19,6 +19,10 @@ pub struct BackupSnapshot {
     pub files_hash: HashMap<String, String>,
 }
 
+pub type FsSnapshot = BackupSnapshot;
+
+pub static GLOBAL_TIMESHIFT: std::sync::Mutex<Option<SigmaTimeshift>> = std::sync::Mutex::new(None);
+
 pub struct SigmaTimeshift {
     pub snapshots: Vec<BackupSnapshot>,
     pub backup_schedule_enabled: bool,

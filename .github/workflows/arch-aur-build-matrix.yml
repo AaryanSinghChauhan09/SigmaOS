@@ -1,0 +1,23 @@
+name: "Arch Linux PKGBUILD & AUR Recipe Compiler CI"
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  aur-compiler-matrix:
+    name: Arch Linux PKGBUILD & ALPM Test Matrix
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test AUR Compiler and Rolling Sync Manager
+        run: |
+          cargo test --lib sigpkg::arch_compat::tests -- --nocapture
+          cargo test --lib distro::arch_parity::tests -- --nocapture

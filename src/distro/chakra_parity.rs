@@ -1,7 +1,9 @@
+extern crate alloc;
 // SigmaOS Chakra Linux Parity Implementation
 // Implements Akabei package bundling, Kapudan configuration, and Tribe installer
 
-use crate::klib::{SigmaString, Vec};
+use crate::klib::SigmaString;
+use alloc::vec::Vec;
 use core::cell::Cell;
 
 /// Bundle types for Chakra-inspired package management
