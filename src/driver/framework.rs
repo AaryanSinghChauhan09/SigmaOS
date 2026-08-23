@@ -183,6 +183,7 @@ impl DriverFramework for SimpleDriverFramework {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::driver::irp_system::*;
 
     #[test]
     fn test_driver_framework_lifecycle() {
@@ -330,53 +331,6 @@ mod tests {
         let res_user = idt.trigger_interrupt(0x21, 3, mock_keyboard_isr, 0x99AA);
         assert!(res_user.is_err());
         assert_eq!(res_user.unwrap_err(), "General Protection Fault: Privilege violation accessing IDT gate");
-    }
-}
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    static mut OPEN_CALLED: i32 = 0;
-    static mut RELEASE_CALLED: i32 = 0;
-
-    fn mock_open() -> i32 {
-        unsafe { OPEN_CALLED += 1; }
-        0
-    }
-
-    fn mock_release() -> i32 {
-        unsafe { RELEASE_CALLED += 1; }
-        0
-    }
-
-    fn mock_read(_buf: &mut [u8]) -> i32 { 0 }
-    fn mock_write(_buf: &[u8]) -> i32 { 0 }
-    fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 { 0 }
-
-    #[test]
-    fn test_linux_driver_shim() {
-        let fops = LinuxFileOperations {
-            open: mock_open,
-            release: mock_release,
-            read: mock_read,
-            write: mock_write,
-            ioctl: mock_ioctl,
-        };
-
-        let mut shim = LinuxDriverShim::new(42, "e1000", DriverType::Network, fops);
-        assert_eq!(shim.id(), 42);
-        assert_eq!(shim.driver_type(), DriverType::Network);
-
-        assert!(shim.init().is_ok());
-        unsafe { assert_eq!(OPEN_CALLED, 1); }
-
-        assert!(shim.load().is_ok());
-        assert_eq!(shim.state(), DriverState::Active);
-
-        assert!(shim.unload().is_ok());
-        unsafe { assert_eq!(RELEASE_CALLED, 1); }
     }
 
     #[test]

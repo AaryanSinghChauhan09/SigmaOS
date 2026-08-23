@@ -15,7 +15,7 @@ pub use control::{
     ntfs_access_rights, ntfs_ace_flags,
 };
 pub use crate::filesystem::ext4_ntfs_security::{
-    NtfsAce, NtfsAceFlags, NtfsAceType, NtfsAccessRights, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
+    NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
 };
 
 extern crate alloc;

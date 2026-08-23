@@ -472,6 +472,10 @@ pub trait Compositor {
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError>;
     /// Get compositor statistics
     fn stats(&self) -> CompositorStats;
+    /// Swap buffers
+    fn swap_buffers(&mut self) -> Result<(), GraphicsError> { Ok(()) }
+    /// Capture screenshot
+    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> { Ok(Vec::new()) }
 }
 
 /// Graphics error types

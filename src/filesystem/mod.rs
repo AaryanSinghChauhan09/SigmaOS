@@ -10,6 +10,7 @@ pub mod sigma_fs;
 pub mod smart_symlink;
 pub mod tmpfs;
 pub mod vfs;
+pub mod ext4_ntfs_security;
 
 pub use self_healing_fs::{JournalEntry, SovereignFilesystem, TransactionStatus};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
