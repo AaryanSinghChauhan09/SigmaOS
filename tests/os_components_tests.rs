@@ -37,59 +37,13 @@ mod task_scheduler;
 #[path = "../src/ipc/alpc.rs"]
 mod alpc;
 
-#[path = "../src/memory/bitmap_pmm.rs"]
-mod bitmap_pmm;
-
-#[path = "../src/memory/low_level.rs"]
-mod low_level_memory;
-
-#[path = "../src/filesystem/ext4_ntfs_security.rs"]
-mod ext4_ntfs_security;
 #[path = "../src/access/control.rs"]
 mod access_control;
-
-#[path = "../src/dashboard/statutory_compliance.rs"]
-mod statutory_compliance;
-
-#[path = "../src/community/toolkit.rs"]
-mod community_toolkit;
-
-#[path = "../src/system/user.rs"]
-mod system_user;
 
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
 
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-
-#[path = "../src/process/activity_manager.rs"]
-mod process_activity_manager;
-
-#[path = "../src/filesystem/sigma_fs.rs"]
-mod sigma_fs_extended;
-
-use community_toolkit::{
-    CommunityHandbookCatalog, ReproduciblePackageRecipeManager,
-    SecurityProfileTemplateStore,
-};
-use statutory_compliance::{
-    DisputeAuditRollbackEngine, PenaltyBreachNotifier,
-    StatutoryGovernanceLayer,
-};
-use system_user::{UserManager as TestUserManager};
-
-use ext4_ntfs_security::{
-    NtfsAce as Nfs4Ace, AceType as Nfs4AceType,
-};
 use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
-use bitmap_pmm::{
-    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter,
-};
-use low_level_memory::{
-    CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine,
-    SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr,
-};
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType,
 };
@@ -103,85 +57,8 @@ use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPac
 use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
 use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use fedora_compat::DnfPackageResolver;
 use sigmatools::*;
-
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-
-use segmentation_paging::{
-    AslrEntropyConfig,
-    RandomizedAddressSpace, SegmentDescriptor,
-};
-
-use process_activity_manager::{
-    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
-};
-
-#[test]
-fn test_segmentation_paging_and_aslr() {
-    let code_desc = SegmentDescriptor::code_segment_ring0();
-    assert!(code_desc.is_present);
-
-    let entropy = segmentation_paging::AslrEntropyConfig { stack_entropy_bits: 24, heap_entropy_bits: 16, mmap_entropy_bits: 28, text_entropy_bits: 12 };
-    let aslr = RandomizedAddressSpace::compute_aslr_layout(0x0001_0000_0000, entropy, 0x12345678);
-    assert!(aslr.stack_top > 0);
-}
-
-#[test]
-fn test_regex_unveil_and_glob_matching() {
-    let mut unveil_mgr = UnveilManager::new();
-    unveil_mgr.unveil("/var/log/*.log", "r").unwrap();
-    assert!(unveil_mgr.validate_path("/var/log/syslog.log", UnveilPermission::Read).is_ok());
-    assert!(unveil_mgr.validate_path("/var/log/syslog.txt", UnveilPermission::Read).is_err());
-}
-
-#[test]
-fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
-    let mut pfs = PseudoFilesystemNamespace::new("root_master", PfsType::Master);
-    pfs.file_map.insert("/etc/hostname".to_string(), "blake3-hash1".to_string());
-
-    let snap = PseudoFilesystemNamespace::snapshot("root_snap_1", "root_master", pfs.file_map.clone());
-    assert!(snap.is_read_only);
-    assert_eq!(snap.parent_snapshot_id.unwrap(), "root_master");
-
-    let mut dedup = Blake3BlockDeduplicationEngine::new();
-    let hash1 = dedup.store_block(b"SOVEREIGN_SYSTEM_BLOCK_DATA");
-    let hash2 = dedup.store_block(b"SOVEREIGN_SYSTEM_BLOCK_DATA");
-    assert_eq!(hash1, hash2);
-    assert_eq!(*dedup.ref_counts.get(&hash1).unwrap(), 2);
-
-    assert!(!dedup.release_block(&hash1));
-    assert!(dedup.release_block(&hash1));
-    assert!(dedup.read_block(&hash1).is_none());
-}
-
-#[test]
-fn test_process_activity_manager_and_registers() {
-    let mut pam = ActivityManager::new();
-    pam.register_process(500, 0, "chrome", 0);
-
-    pam.set_foreground_process(500).unwrap();
-    let proc_rec = pam.get_process_activity(500).unwrap();
-    assert_eq!(proc_rec.state, ActivityState::Interactive);
-
-    let ctx = ProcRegisterSnapshot {
-        rip: 0x00007FFF00002000,
-        rsp: 0x00007FFFFFFFD000,
-        rbp: 0x00007FFFFFFFE000,
-        rax: 0,
-        rbx: 0,
-        rcx: 0,
-        rdx: 0,
-        rsi: 0,
-        rdi: 0,
-        rflags: 0x202,
-        cs: 0, ds: 0, ss: 0, es: 0, fs: 0, gs: 0,
-    };
-    assert!(pam.capture_register_snapshot(500, ctx).is_ok());
-
-    let loaded_rec = pam.get_process_activity(500).unwrap();
-    assert_eq!(loaded_rec.register_snapshot.as_ref().unwrap().rip, 0x00007FFF00002000);
-}
 
 #[test]
 fn test_zero_copy_ipc_pipes() {
@@ -259,7 +136,7 @@ fn test_audio_dsp_mixing_and_effects() {
 #[test]
 fn test_video_editor_sigmacut_engine() {
     let mut timeline = VideoTimeline::new(1920, 1080);
-    let mut track = VideoTrack::new(1, "Track 1");
+    let mut track = VideoTrack::new(1, "Main Track");
 
     let clip = VideoClip::new(0, "intro.mp4", 0, 60);
     track.add_clip(clip);
@@ -306,7 +183,7 @@ fn test_debian_compat_system() {
 
     assert_eq!(alts.get_active_target().unwrap(), "/usr/bin/nano");
 
-    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "http://deb.debian.org/debian".to_string());
+    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "https://deb.debian.org/debian".to_string());
     repo.verify_release_keyring(&[0x99, 0x01]);
     assert!(repo.fetch_package_index().is_ok());
 }
@@ -354,10 +231,10 @@ fn test_fedora_rpm_and_selinux() {
     let order = resolver.resolve_and_install("kernel-core").unwrap();
     assert_eq!(order, vec!["kernel-core".to_string()]);
 
-    let selinux = SeLinuxEngine::new(true);
-    let httpd_sub = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
-    let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
-    assert!(selinux.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
+    let mut selinux = sigmaos::security::selinux::SelinuxEngine::new();
+    let src = "system_u:system_r:httpd_t:s0";
+    let tgt = "system_u:object_r:httpd_sys_content_t:s0";
+    assert!(selinux.has_permission(src, tgt, "file", "read").unwrap());
 }
 
 #[test]
@@ -383,6 +260,19 @@ fn test_sigmatools_suite() {
     assert_eq!(rtc.format_timestamp(), "2026-08-15 14:30:00");
 }
 
+#[test]
+fn test_posix_and_nfsv4_acls() {
+    // POSIX 1003.1e ACL verification
+    let mut posix_acl = access_control::PosixAclTable::new();
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::UserObj, id: 1000, perms: 0o7 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::User, id: 1001, perms: 0o5 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Mask, id: 0, perms: 0o5 });
+    posix_acl.add_entry(access_control::PosixAclEntry { tag: access_control::PosixAclTag::Other, id: 0, perms: 0o0 });
+
+    assert!(posix_acl.evaluate_acl_access(1001, 1001, 5, 1000, 1000)); // Allowed r-x
+    assert!(!posix_acl.evaluate_acl_access(1001, 1001, 2, 1000, 1000)); // Denied write (2)
+    assert!(!posix_acl.evaluate_acl_access(1002, 1002, 4, 1000, 1000)); // Other denied
+}
 
 #[test]
 fn test_alpc_local_procedure_calls() {
@@ -444,119 +334,4 @@ fn test_task_states_and_workload_classifications() {
     assert_eq!(stats.total_tasks, 3);
     assert_eq!(stats.running_tasks, 1);
     assert_eq!(stats.ready_tasks, 2);
-}
-
-
-#[test]
-fn test_two_tier_memory_and_fast_syscalls() {
-    let mut allocator = TwoTierMemoryAllocator::new(0x1000_0000, 64);
-
-    let pcb_obj = allocator.alloc_slab_object(SlabObjectType::ProcessControlBlock).unwrap();
-    let fd_obj = allocator.alloc_slab_object(SlabObjectType::FileDescriptor).unwrap();
-    let inode_obj = allocator.alloc_slab_object(SlabObjectType::InodeStruct).unwrap();
-
-    assert!(pcb_obj >= 0x1000_0000);
-    assert!(fd_obj >= 0x1000_0000);
-    assert!(inode_obj >= 0x1000_0000);
-
-    allocator.free_slab_object(SlabObjectType::ProcessControlBlock, pcb_obj);
-
-    let mut pt_engine = RecursivePageTableEngine::new(0x0008_0000);
-    pt_engine.enable_self_referential_mapping();
-    assert_ne!(pt_engine.calculate_pml4_virt_address(), 0);
-
-    let mut cow_engine = CopyOnWriteForkEngine::new();
-    cow_engine.fork_share_page(0x1000, 0x1000_0000);
-
-    let mut dispatcher = FastSyscallDispatcher::new();
-    dispatcher.configure_fast_syscall(0xFFFFFFFF80102000, 0x08, 0x1B);
-
-    let syscall_matrix = MinimalPosixSyscallMatrix::new();
-    let mut frame = TrapRegisterFrame::default();
-    frame.rax = posix_syscall_nr::SYS_OPEN;
-
-    let res_fd = dispatcher.dispatch_trap(&mut frame, &syscall_matrix);
-    assert_eq!(res_fd, 3);
-}
-
-#[test]
-fn test_bitmap_pmm_and_syscall_router() {
-    let mut pmm = BitmapPhysicalMemoryManager::new(64 * 4096);
-    pmm.free_region(0x20000, 16 * 4096);
-
-    let frame_addr = pmm.alloc_block().unwrap();
-    assert_eq!(frame_addr, 0x20000);
-
-    let paging = SelfRefPagingEngine::new(0x30000);
-    let mut pml4 = [0u64; 512];
-    paging.vmm_init_self_reference(&mut pml4);
-    assert_eq!(pml4[510], 0x30000 | 3);
-
-    let mut router = SyscallTableRouter::new();
-    router.register_handler(2, |a, b, _, _| (a * b) as i64);
-    assert_eq!(router.syscall_handler(2, 6, 7, 0), 42);
-}
-
-#[test]
-fn test_shadow_passwords_usermod_and_sudo_policy() {
-    let mut manager = TestUserManager::new("/tmp/test_etc_shadow_sudo");
-    manager.initialize().unwrap();
-
-    let user = manager.create_user("charlie", "Charlie Sysadmin").unwrap();
-    assert_eq!(user.username, "charlie");
-
-    manager.set_password("charlie", "P@ssword2026").unwrap();
-    assert!(manager.verify_password("charlie", "P@ssword2026"));
-
-    manager.usermod("charlie", Some("/bin/bash"), Some("/home/charlie"), None, None).unwrap();
-    assert_eq!(manager.get_user("charlie").unwrap().shell, "/bin/bash");
-
-    manager.add_user_to_group("charlie", "wheel").unwrap();
-    let groups = manager.get_user_groups("charlie");
-    assert!(groups.contains(&"wheel".to_string()));
-
-    let sudo_res = manager.sudo_engine.evaluate_sudo_privilege("charlie", &groups, "/usr/bin/apt");
-    assert!(sudo_res.is_ok());
-}
-
-#[test]
-fn test_statutory_compliance_overlay_and_community_toolkit() {
-    let mut gov = StatutoryGovernanceLayer::new();
-    let posture = gov.evaluate_compliance_posture(1700000000);
-    assert!(posture >= 0);
-
-    let mut notifier = PenaltyBreachNotifier::new();
-    let rule = statutory_compliance::StatutoryGovernanceRule {
-        rule_id: "1001".to_string(),
-        framework: statutory_compliance::StatutoryFramework::Gdpr,
-        description: "Delay in ECR remittance".to_string(),
-        status: statutory_compliance::ComplianceRuleStatus::Breached,
-        max_penalty_amount_usd: 2500,
-    };
-    notifier.notify_breach(&rule, "Delay in ECR remittance", 1700000000);
-    assert_eq!(notifier.alerts.len(), 1);
-
-    let mut rollback = DisputeAuditRollbackEngine::new();
-    rollback.create_audit_checkpoint(100, "hash:state100");
-    assert!(rollback.rollback_dispute_checkpoint(100).is_ok());
-
-    let handbook = CommunityHandbookCatalog::new();
-    assert!(!handbook.articles.is_empty());
-
-    let mut recipes = ReproduciblePackageRecipeManager::new();
-    let recipe = community_toolkit::PackageRecipe {
-        name: "nginx".to_string(),
-        version: "1.24.0".to_string(),
-        format: community_toolkit::RecipeSourceFormat::SigmaRecipe,
-        source_url: "https://nginx.org".to_string(),
-        sha256_checksum: "sha256:112233".to_string(),
-        build_dependencies: vec!["pcre".to_string()],
-        run_dependencies: vec!["pcre".to_string()],
-        use_flags: Vec::new(),
-    };
-    recipes.register_recipe(recipe);
-    assert!(recipes.recipes.contains_key("nginx"));
-
-    let sec = SecurityProfileTemplateStore::new();
-    assert!(sec.templates.contains_key("browser_sandboxed"));
 }

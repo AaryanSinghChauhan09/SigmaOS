@@ -1,12 +1,7 @@
-extern crate alloc;
 // SigmaOS Arch Linux Parity Implementation
-// Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
-// Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
+// Implements PKGBUILD parsing, makepkg compiler parity, and AUR integration
 
-extern crate alloc;
-
-use crate::klib::{BTreeMap, String, ToString, Vec};
-use alloc::format;
+use crate::klib::{BTreeMap, String, Vec};
 use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards
@@ -48,10 +43,10 @@ impl PkgBuild {
         }
     }
 
-    /// Parse PKGBUILD content
+    /// Parse PKGBUILD content (simplified implementation)
     pub fn parse(content: &str) -> Option<Self> {
         let mut pkg = PkgBuild::new();
-
+        
         for line in content.lines() {
             let line = line.trim();
             if line.starts_with("pkgname=") {
@@ -65,15 +60,10 @@ impl PkgBuild {
             } else if line.starts_with("pkgdesc=") {
                 pkg.pkgdesc = String::from(line[8..].trim_matches('"'));
             }
+            // Add more parsing as needed
         }
-
+        
         Some(pkg)
-    }
-}
-
-impl Default for PkgBuild {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -96,7 +86,9 @@ impl AurClient {
         Vec::new()
     }
 
+    /// Get package info from AUR (simplified)
     pub fn get_info(&self, _pkgname: &str) -> Option<PkgBuild> {
+        // In production, this would fetch and parse .SRCINFO from AUR
         None
     }
 
@@ -108,15 +100,12 @@ impl AurClient {
         pkg.pkgrel = 1;
         pkg.pkgdesc = String::from("Downloaded and compiled safely from S-AUR.");
 
+        // Compile using the unprivileged sandboxed compiler
         compiler.compile_package(&pkg)?;
+
+        // Register/save into the sync ALPM local database
         db.add_package(pkg);
         Ok(())
-    }
-}
-
-impl Default for AurClient {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -137,20 +126,16 @@ impl SandboxedCompiler {
     /// Compile package in sandboxed environment
     pub fn compile_package(&self, _pkgbuild: &PkgBuild) -> Result<(), String> {
         if self.is_isolated.get() {
+            // Simulate sandboxed compilation
             Ok(())
         } else {
             Err(String::from("Compiler sandbox not enabled"))
         }
     }
 
+    /// Enable sandbox mode
     pub fn enable_sandbox(&self) {
         self.is_isolated.set(true);
-    }
-}
-
-impl Default for SandboxedCompiler {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -166,11 +151,13 @@ impl AlpmDatabase {
         }
     }
 
+    /// Add package to database
     pub fn add_package(&mut self, pkg: PkgBuild) {
         let name = pkg.pkgname.clone();
         self.packages.insert(name, pkg);
     }
 
+    /// Get package from database
     pub fn get_package(&self, name: &str) -> Option<&PkgBuild> {
         self.packages.get(&String::from(name))
     }
@@ -182,133 +169,7 @@ impl AlpmDatabase {
     }
 }
 
-impl Default for AlpmDatabase {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 1. Pacman Engine Parity (pacman -Syu, -Ss, -Qe, ALPM hooks)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct PacmanConfig {
-    pub root_dir: String,
-    pub db_path: String,
-    pub parallel_downloads: u32,
-    pub repositories: Vec<String>,
-}
-
-pub struct PacmanEngine {
-    pub config: PacmanConfig,
-    pub database: AlpmDatabase,
-    pub hooks_executed: usize,
-}
-
-impl PacmanEngine {
-    pub fn new() -> Self {
-        let mut repos = Vec::new();
-        repos.push("core".to_string());
-        repos.push("extra".to_string());
-        repos.push("multilib".to_string());
-
-        Self {
-            config: PacmanConfig {
-                root_dir: "/".to_string(),
-                db_path: "/var/lib/pacman/".to_string(),
-                parallel_downloads: 5,
-                repositories: repos,
-            },
-            database: AlpmDatabase::new(),
-            hooks_executed: 0,
-        }
-    }
-
-    /// Simulates `pacman -Syu` rolling release system upgrade
-    pub fn sync_and_upgrade(&mut self) -> Result<usize, String> {
-        self.database.sync()?;
-        // Execute ALPM Pre/Post Transaction Hooks
-        self.hooks_executed += 3;
-        Ok(self.database.packages.len())
-    }
-}
-
-impl Default for PacmanEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 2. Mkinitcpio Engine Parity
-// ============================================================================
-
-pub struct MkinitcpioEngine {
-    pub hooks: Vec<String>,
-    pub compression: String,
-}
-
-impl MkinitcpioEngine {
-    pub fn new() -> Self {
-        let mut hooks = Vec::new();
-        hooks.push("base".to_string());
-        hooks.push("udev".to_string());
-        hooks.push("autodetect".to_string());
-        hooks.push("modprobed-db".to_string());
-        hooks.push("kms".to_string());
-        hooks.push("block".to_string());
-        hooks.push("filesystems".to_string());
-        hooks.push("fsck".to_string());
-
-        Self {
-            hooks,
-            compression: "zstd".to_string(),
-        }
-    }
-
-    pub fn generate_initramfs(&self, output_path: &str) -> Result<String, String> {
-        Ok(format!(
-            "Generated initramfs image at {} with {} hooks using {}",
-            output_path,
-            self.hooks.len(),
-            self.compression
-        ))
-    }
-}
-
-impl Default for MkinitcpioEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 3. Archiso & Reflector Mirror Ranker Parity
-// ============================================================================
-
-pub struct ReflectorMirrorlistRanker {
-    pub mirrors: Vec<(String, u32)>, // (url, latency_ms)
-}
-
-impl ReflectorMirrorlistRanker {
-    pub fn new() -> Self {
-        let mut mirrors = Vec::new();
-        mirrors.push(("https://mirror.rackspace.com/archlinux/".to_string(), 18));
-        mirrors.push(("https://arch.mirror.constant.com/".to_string(), 25));
-        mirrors.push(("https://geo.mirror.pkgbuild.com/".to_string(), 12));
-
-        Self { mirrors }
-    }
-
-    pub fn rank_top_mirrors(&mut self) -> &[ (String, u32) ] {
-        // Sort by lowest latency
-        self.mirrors.sort_by(|a, b| a.1.cmp(&b.1));
-        &self.mirrors
-    }
-}
-
-impl Default for ReflectorMirrorlistRanker {
+impl Default for PkgBuild {
     fn default() -> Self {
         Self::new()
     }
@@ -320,8 +181,7 @@ mod tests {
 
     #[test]
     fn test_pkgbuild_parsing() {
-        let content =
-            "pkgname=\"neovim-git\"\npkgver=\"0.10.0\"\npkgrel=3\npkgdesc=\"Sovereign text editor\"\n";
+        let content = "pkgname=\"neovim-git\"\npkgver=\"0.10.0\"\npkgrel=3\npkgdesc=\"Sovereign text editor\"\n";
         let pkg = PkgBuild::parse(content).unwrap();
         assert_eq!(pkg.pkgname.as_str(), "neovim-git");
         assert_eq!(pkg.pkgver.as_str(), "0.10.0");
@@ -335,37 +195,31 @@ mod tests {
         let compiler = SandboxedCompiler::new();
         let client = AurClient::new();
 
-        assert!(client
-            .download_and_compile_aur_package("neovim-git", &compiler, &mut db)
-            .is_ok());
+        assert!(client.download_and_compile_aur_package("neovim-git", &compiler, &mut db).is_ok());
 
         let pkg = db.get_package("neovim-git").unwrap();
         assert_eq!(pkg.pkgname.as_str(), "neovim-git");
         assert_eq!(pkg.pkgver.as_str(), "1.0.0");
-        assert_eq!(
-            pkg.pkgdesc.as_str(),
-            "Downloaded and compiled safely from S-AUR."
-        );
+        assert_eq!(pkg.pkgdesc.as_str(), "Downloaded and compiled safely from S-AUR.");
 
         assert!(db.sync().is_ok());
     }
+}
 
-    #[test]
-    fn test_pacman_and_mkinitcpio() {
-        let mut pacman = PacmanEngine::new();
-        assert_eq!(pacman.config.repositories.len(), 3);
-        assert!(pacman.sync_and_upgrade().is_ok());
-        assert_eq!(pacman.hooks_executed, 3);
-
-        let mkinit = MkinitcpioEngine::new();
-        let res = mkinit.generate_initramfs("/boot/initramfs-linux.img").unwrap();
-        assert!(res.contains("zstd"));
+impl Default for AurClient {
+    fn default() -> Self {
+        Self::new()
     }
+}
 
-    #[test]
-    fn test_reflector_mirror_ranker() {
-        let mut reflector = ReflectorMirrorlistRanker::new();
-        let top = reflector.rank_top_mirrors();
-        assert_eq!(top[0].1, 12);
+impl Default for SandboxedCompiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Default for AlpmDatabase {
+    fn default() -> Self {
+        Self::new()
     }
 }

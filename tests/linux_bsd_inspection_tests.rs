@@ -3,16 +3,18 @@
 // - FreeBSD Jails & sysctl MIB
 // - NetBSD Rump Kernel hypercall routing
 // - OpenBSD sysctl MIB
-// - Linux LSB / fstab parsing
+// - KVM/QEMU vCPU execution loop & VirtIO device rings
+// - OpenBSD Pledge & Unveil sandboxing
+// - Gentoo Portage USE-flag dependency solver
+// - CachyOS BORE interactive scheduler
 
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod distro_inspirations;
-
 use bsd::*;
-use distro_inspirations::*;
+use sigmaos::virtualization::kvm_vcpu::{KvmVcpu, KvmExitCode, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
+use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
+use sigmaos::compatibility::gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -46,74 +48,28 @@ fn test_openbsd_sysctl_mib_inspection() {
 }
 
 #[test]
-fn test_sovereign_ostree_and_io_uring_inspection() {
-    let mut ostree = SovereignOstreeEngine::new();
-    let idx = ostree.stage_commit("commit_hash_123", "v1.0.0-release", "kernel-6.8", 0xABCDEF);
-    assert_eq!(idx, 0);
+fn test_kvm_qemu_vcpu_inspection() {
+    let mut vcpu = KvmVcpu::new(0);
+    vcpu.registers.rax = RAX_HLT_SIGNAL;
+    let exit = vcpu.run_vcpu_step();
+    assert_eq!(exit, KvmExitCode::ExitHlt);
 
-    let mut io_uring = SovereignIoUring::new(16);
-    let sqe = SubmissionQueueEntry {
-        opcode: IoUringOpcode::Nop,
-        fd: 0,
-        offset: 0,
-        data: vec![42],
-        user_data: 42,
-    };
-    assert!(io_uring.submit_entry(sqe).is_ok());
-    let processed = io_uring.submit_and_wait();
-    assert_eq!(processed, 1);
+    let mut virtio_net = VirtioDeviceBackend::new(VirtioDeviceType::Network);
+    let processed = virtio_net.process_virtqueue_ring();
+    assert_eq!(processed, 16);
 }
 
 #[test]
-fn test_sovereign_landlock_and_runit_inspection() {
-    let mut landlock = SovereignLandlockLsm::new();
-    assert!(landlock.add_rule("/etc/sigma/config", LandlockAccess::ReadOnly).is_ok());
-    landlock.restrict_self();
-    assert!(landlock.check_access("/etc/sigma/config", LandlockAccess::ReadOnly));
-    assert!(!landlock.check_access("/etc/sigma/config", LandlockAccess::ReadWrite));
-
-    let mut supervisor = SovereignRunitSupervisor::new(RunitRunlevel::Boot);
-    supervisor.register_service("network-daemon", RunitRunlevel::Boot, &[], 3);
-    assert_eq!(supervisor.services.len(), 1);
-    assert_eq!(supervisor.services[0].name, "network-daemon");
+fn test_openbsd_unveil_inspection() {
+    let mut unveil = UnveilManager::new();
+    assert!(unveil.unveil("/var/log", "r").is_ok());
+    assert!(unveil.validate_path("/var/log/syslog", UnveilPermission::Read).is_ok());
+    assert!(unveil.validate_path("/var/log/syslog", UnveilPermission::Write).is_err());
 }
 
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-
 #[test]
-fn test_qemu_kvm_hypervisor_inspection() {
-    use vm_manager::*;
-    let mut qemu = QemuBackend::new();
-    let config = VmConfig {
-        name: "QEMU-KVM-Node".to_string(),
-        cpu_cores: 8,
-        memory_mb: 16384,
-        disk_size_gb: 250,
-        network_enabled: true,
-        gpu_passthrough: true,
-        os_type: OsType::Linux,
-        cpu_pinning_cores: vec![0, 1, 2, 3],
-        hugepages_enabled: true,
-        vfio_pci_passthrough_address: Some("0000:01:00.0".to_string()),
-        memory_balloon_mb: 8192,
-        virtio_net_queues: 4,
-        cpu_model: "host-passthrough".to_string(),
-        machine_type: "q35".to_string(),
-        nested_virtualization: true,
-        io_uring_enabled: true,
-        kvm_dirty_ring_size: 4096,
-    };
-
-    let vm_id = qemu.create_vm(&config).unwrap();
-    assert!(qemu.start_vm(&vm_id).is_ok());
-
-    let state = qemu.get_vm_state(&vm_id).unwrap();
-    assert_eq!(state, VmState::Running);
-
-    let res = qemu.get_resource_usage(&vm_id).unwrap();
-    assert_eq!(res.cpu_percent, 25.0);
-
-    assert!(qemu.stop_vm(&vm_id).is_ok());
-    assert_eq!(qemu.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
+fn test_zorin_gap_closure_inspection() {
+    let mut zorin = ZorinAppearanceSwitcher::new();
+    zorin.switch_layout_preset(ZorinLayoutPreset::MacOsLike);
+    assert_eq!(zorin.panel_height_pixels, 64);
 }
