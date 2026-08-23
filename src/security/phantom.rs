@@ -1,7 +1,7 @@
 // Compile-time capability safety using Rust Phantom Types.
 // Prevents privilege escalation at compile-time by enforcing context rules on the types.
 
-use crate::klib::error::{SecurityError, SigmaError};
+use crate::security::unveil::{SecurityError, SigmaError};
 use core::marker::PhantomData;
 
 /// User-level privilege marker

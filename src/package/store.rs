@@ -63,20 +63,6 @@ impl SigmaSoftwareStore {
                     }
                     return Ok(());
                 }
-    pub fn check_for_updates(&mut self) -> usize {
-        self.pending_updates.clear();
-        for (name, app) in &self.catalog {
-            if app.is_installed && app.version != "1.5.0" {
-                // Assume latest stable is 1.5.0
-                self.pending_updates.push(name.clone());
-    pub fn check_for_updates(&mut self) -> usize {
-        self.pending_updates.clear();
-        for (name, app) in &self.catalog {
-            let name: &String = name;
-            let app: &StoreApp = app;
-            if app.is_installed && app.version != "1.5.0" {
-                // Assume latest stable is 1.5.0
-                self.pending_updates.push(name.clone());
             }
         }
         Err("ENOENT: Package not registered in the Software Store.")
@@ -130,14 +116,14 @@ pub struct StoreApp {
     pub safety_score: f32, // 0.0 to 1.0 (GDPR/Compliance check)
 }
 
-pub struct SigmaSoftwareStore {
+pub struct SoftwareStoreCatalog {
     pub catalog: HashMap<String, StoreApp>,
     pub pending_updates: Vec<String>,
 }
 
-impl SigmaSoftwareStore {
+impl SoftwareStoreCatalog {
     pub fn new() -> Self {
-        let mut store = SigmaSoftwareStore {
+        let mut store = SoftwareStoreCatalog {
             catalog: HashMap::new(),
             pending_updates: Vec::new(),
         };
@@ -191,7 +177,7 @@ mod tests {
 
     #[test]
     fn test_software_store_install() {
-        let mut store = SigmaSoftwareStore::new();
+        let mut store = SoftwareStoreCatalog::new();
         assert!(store.install_app("sigma-paint").is_ok());
         let app = store.catalog.get("sigma-paint").unwrap();
         assert!(app.is_installed);
@@ -199,7 +185,7 @@ mod tests {
 
     #[test]
     fn test_software_store_updates() {
-        let mut store = SigmaSoftwareStore::new();
+        let mut store = SoftwareStoreCatalog::new();
         store.install_app("sigma-browse").unwrap();
         let update_count = store.check_for_updates();
         assert_eq!(update_count, 1);

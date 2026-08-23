@@ -5,6 +5,7 @@
 
 pub mod access;
 pub mod accessibility;
+pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
@@ -15,6 +16,8 @@ pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
 pub mod kernel;
+pub mod klib;
+pub mod logging;
 pub mod network;
 pub mod orchestration;
 pub mod distro;
@@ -48,27 +51,15 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AlternativeLink,
-    AnanicyManager, AnacondaInstaller, AntixControlCenter, AntixDesktopProfiler, AntixInitManager,
-    AppSuiteBundle, AppSuiteType, ApplicationBinary, AptRepositorySync, BinaryCompatMatrix,
-    BinaryFormat, BodhiUpdateTriage, BoreSchedulerGovernor, BrailleMatrix, BsdJailSandbox,
-    BundleType, CachyInitramfs, CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat,
-    CompatibilityError, CompatibilityLayer, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, ContinuityCoordinator, DebianAlternativesSystem, DebianChannel,
-    DebootstrapEngine, DesktopMode, DesktopProfile, DesktopTheme, DiscontinuedFS,
-    DistroReleaseChannel, DnfPackageResolver, DriverBridge, EcosystemSnapshot, FSRevival,
-    FedoraAlu, FedoraAluFlags, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
-    KapudanAssistant, KernelPersona, KernelPersonaVM, KojiBuildServer, LanguageTranslationCatalog,
-    LegacyBus, LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
-    MicroService, MicroServiceState, MockChrootBuilder, NetworkBridge, ReleaseGovernanceCouncil,
-    ReproducibleBuildVerifier, SeLinuxContext, SeLinuxEngine, SchedPolicy, SigmaChangeProposal,
-    SigmaChangeProcessEngine, SigmaContainer, SigmaNextChannel, SnapshotManager, StorageBridge,
-    SuiteRegistry, SysVInitEngine, SysVRunlevel, SyscallAbi, SystemdPresetConfigurator,
-    TargetPlatform, TranslationLayer, TribeInstaller, TtsSynthesizer, UnifiedAppStore,
-    V4OptimizedPackageManager, WorkloadOptimizer, WorkloadProfile, ZorinAppearanceSwitcher,
-    GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN,
-    GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
-    GLOBAL_WORKLOAD_OPTIMIZER,
+    ApplicationBinary, BinaryFormat, BodhiUpdateTriage, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ContainerRuntime, DnfPackageResolver,
+    FedoraAlu, FedoraAluFlags, KojiBuildServer, MockChrootBuilder, SigmaChangeProposal,
+    SigmaChangeProcessEngine, SigmaNextChannel, TargetPlatform, TranslationLayer,
+    ZorinAppearanceSwitcher, ZorinLayoutPreset, ZorinConnectHub, ZorinWineLayer,
+    ZorinLiteOptimizer, SigmaEcosystemInit, FhsRunlevel, SigmaEcosystemProfiler,
+    GraphicPresetMode, SigmaOnboardingWelcome, SigmaOnboardingLog,
+    SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, SubtitleFormat,
+    SigmaSupportResourceOptimizer, SigmaSupportPriorityOptimizer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -89,24 +80,22 @@ pub use drivers::{
     TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
-    SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
-pub use graphics::paint::ColorRgba;
 pub use kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
-    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
+    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList,
+    CpuRegisters, EdfTask, HardwareException,
+    IpcError, IpcManager, Irql,
+    LcgRandom, LookasideList, LotteryTask, MemoryBlock,
+    MemoryDescriptorList, Message, Pcb, PoolType, Priority, Process,
+    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler,
+    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
     Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
+pub use logging::*;
 pub use network::{
-    CloudSyncManager, PeerInfo, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
-    TorrentClient, TorrentError, TorrentState,
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -132,18 +121,9 @@ pub use resilience::{
     SelfHealingModule, SigmaTimeshift, SystemSnapshot,
 };
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
-    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
-    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
-    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
-    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
-    secure_zeroize, AuditLogEntry, CpuMitigationFlags, HardenedAuditTrail,
-    HardenedSyscallDispatcher, IntrusionMonitor, IntrusionSeverity, KaslrConfig, KaslrError,
-    KaslrManager, KaslrSlide, KernelSection, MemoryRegionPermission, SmepSmapEngine,
-    SmepSmapViolation, SyscallHardeningConfig, SyscallHardeningError, SyscallRegisterState,
-    UserAccessGuard, UserPtr,
-    SecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    PrivacyFirstSandbox, SandboxRule, secure_zeroize, AuditLogEntry, HardenedAuditTrail,
+    IntrusionMonitor, IntrusionSeverity,
 };
 pub use plugin::{
     ExtensionType, ManagerCapability, MarketplaceItem, Plugin, PluginCapability, PluginError,
@@ -152,7 +132,7 @@ pub use plugin::{
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use tools::{
-    AccessibilityFeature, AlmeidaCmosRtc, AlmeidaCoreDump, ClusterNode, NodeState, SigmaAccess,
+    AlmeidaCmosRtc, AlmeidaCoreDump, ClusterNode, NodeState, SigmaAccess,
     SigmaCluster, SigmaDeploy, SigmaIdentity, SigmaMonitor, SigmaPatch, SigmaRescue, SigmaToolError,
     SovereignAptDuo, SovereignDpkgEtcher, SovereignIPCalculator, SovereignImeConvertCase,
     SovereignImageToDataUri, SovereignJsonPrettifier, SovereignKeyboardTester, SovereignIsWebsiteDown,
@@ -168,9 +148,9 @@ pub use unimplemented_tools::{
     FlatpakSnapLayer, ForensicSnapshot, GameHubLauncher, GameModManager, GamePerformanceBooster,
     GameRecorder, GamifiedDesktop, GamifiedTodo, GanttChartPlanner, GestureControl, GifConverter,
     GitGuiClient, GuiAppStore, IotDeviceManager, KanbanBoard, KanbanColumn, MarkdownNotebook,
-    MemoryLeakDetector, MeshNetworking, MindMapCreator, MultiMonitorManager, MusicLibraryManager,
+    MemoryLeakDetector, MeshNetworking, MultiMonitorManager, MusicLibraryManager,
     NaturalLanguageShell, OfflinePackageInstaller, PacketSniffer, PartitionManager, PdfEditor,
-    PerformanceOptimizer, PluginMarketplace, PodcastRecorder, PredictiveMaintenance, PrivacyDashboard,
+    PerformanceOptimizer, PodcastRecorder, PredictiveMaintenance, PrivacyDashboard,
     ProcessSandbox, ProfileSample, RemoteDesktop, SecureContainer, SecureFileSharing,
     SecureFileShredder, SmartCleanup, SmartNotificationManager, StartupOptimizer, StaticAnalyzer,
     StreamingOverlayManager, SubtitleEditor, SystemRestoreSnapshot, VectorDraftEngine,

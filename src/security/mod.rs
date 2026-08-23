@@ -18,6 +18,7 @@ pub mod qubes_isolation;
 pub mod bridge;
 pub mod prism;
 pub mod sandbox;
+pub mod selinux;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use obfuscator::{SovereignCodeHardener, SovereignThreatDetector};
@@ -25,8 +26,7 @@ pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel}
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
+pub use vulnerability::{ExploitPayload, PenetrationAssistant, ScanSummary, Severity, SimpleVulnerabilityScanner};
 pub use hardening::{
     secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
 };
