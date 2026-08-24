@@ -125,6 +125,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt-get install -y clang-tidy cmake
       - run: |
+          mkdir -p build
           cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON 2>/dev/null || true
           if [ -f build/compile_commands.json ]; then
             find kernel -name '*.c' | xargs clang-tidy -p build/ 2>&1 | tail -50 || true
