@@ -47,9 +47,7 @@ impl Pipe {
 
         for byte in data.iter_mut() {
             if read_pos == write_pos {
-                if self.is_nonblock {
-                    break;
-                }
+                break;
             }
             *byte = self.buffer[read_pos];
             read_pos = (read_pos + 1) % PIPE_BUF_SIZE;
@@ -107,6 +105,141 @@ impl Pipe {
     }
 }
 
+// =========================================================================
+// Standard Streams Management Engine (Linux glibc & BSD libc setvbuf Parity)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StandardStreamType {
+    Stdin = 0,
+    Stdout = 1,
+    Stderr = 2,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BufferingMode {
+    Unbuffered,
+    LineBuffered,
+    BlockBuffered(usize),
+}
+
+pub struct StandardStreamHandle {
+    pub stream_type: StandardStreamType,
+    pub buffering: BufferingMode,
+    pub pipe: Pipe,
+    pub line_buffer: [u8; 1024],
+    pub line_len: usize,
+    pub tty_echo_enabled: bool,
+    pub strip_ansi_codes: bool,
+}
+
+impl StandardStreamHandle {
+    pub fn new(stream_type: StandardStreamType, buffering: BufferingMode) -> Self {
+        let is_nonblock = match stream_type {
+            StandardStreamType::Stdin => true,
+            _ => false,
+        };
+
+        Self {
+            stream_type,
+            buffering,
+            pipe: Pipe::new(is_nonblock),
+            line_buffer: [0u8; 1024],
+            line_len: 0,
+            tty_echo_enabled: true,
+            strip_ansi_codes: false,
+        }
+    }
+
+    pub fn write_stream(&mut self, data: &[u8]) -> usize {
+        let mut written = 0;
+        match self.buffering {
+            BufferingMode::Unbuffered => {
+                written = self.pipe.write(data);
+            }
+            BufferingMode::LineBuffered => {
+                for &byte in data {
+                    if self.line_len < self.line_buffer.len() {
+                        self.line_buffer[self.line_len] = byte;
+                        self.line_len += 1;
+                    }
+                    written += 1;
+
+                    if byte == b'\n' || self.line_len == self.line_buffer.len() {
+                        self.flush_line_buffer();
+                    }
+                }
+            }
+            BufferingMode::BlockBuffered(cap) => {
+                let limit = cap.min(self.line_buffer.len());
+                for &byte in data {
+                    if self.line_len < limit {
+                        self.line_buffer[self.line_len] = byte;
+                        self.line_len += 1;
+                    }
+                    written += 1;
+
+                    if self.line_len >= limit {
+                        self.flush_line_buffer();
+                    }
+                }
+            }
+        }
+        written
+    }
+
+    pub fn flush_line_buffer(&mut self) -> usize {
+        if self.line_len == 0 {
+            return 0;
+        }
+
+        let flushed = self.pipe.write(&self.line_buffer[..self.line_len]);
+        self.line_len = 0;
+        flushed
+    }
+
+    pub fn read_stream(&mut self, buf: &mut [u8]) -> usize {
+        self.pipe.read(buf)
+    }
+}
+
+pub struct StandardStreamTable {
+    pub stdin: StandardStreamHandle,
+    pub stdout: StandardStreamHandle,
+    pub stderr: StandardStreamHandle,
+}
+
+impl StandardStreamTable {
+    pub fn new() -> Self {
+        Self {
+            stdin: StandardStreamHandle::new(StandardStreamType::Stdin, BufferingMode::Unbuffered),
+            stdout: StandardStreamHandle::new(StandardStreamType::Stdout, BufferingMode::LineBuffered),
+            stderr: StandardStreamHandle::new(StandardStreamType::Stderr, BufferingMode::Unbuffered),
+        }
+    }
+
+    pub fn write_fd(&mut self, fd: usize, data: &[u8]) -> Result<usize, &'static str> {
+        match fd {
+            1 => Ok(self.stdout.write_stream(data)),
+            2 => Ok(self.stderr.write_stream(data)),
+            _ => Err("Invalid descriptor for output stream"),
+        }
+    }
+
+    pub fn read_fd(&mut self, fd: usize, buf: &mut [u8]) -> Result<usize, &'static str> {
+        match fd {
+            0 => Ok(self.stdin.read_stream(buf)),
+            _ => Err("Invalid descriptor for input stream"),
+        }
+    }
+}
+
+impl Default for StandardStreamTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -158,5 +291,29 @@ mod tests {
         let read2 = pipe2.read(&mut buf2);
         assert_eq!(read2, 9);
         assert_eq!(&buf2[..9], b"teed data");
+    }
+
+    #[test]
+    fn test_standard_stream_table() {
+        let mut streams = StandardStreamTable::new();
+        assert_eq!(streams.stdout.buffering, BufferingMode::LineBuffered);
+
+        // Write without newline -> line buffered, stays in line_buffer until newline
+        streams.write_fd(1, b"hello ").unwrap();
+
+        let mut buf = [0u8; 32];
+        assert_eq!(streams.stdout.read_stream(&mut buf), 0); // Not flushed yet
+
+        // Write newline -> triggers flush to underlying pipe
+        streams.write_fd(1, b"world\n").unwrap();
+        let read_bytes = streams.stdout.read_stream(&mut buf);
+        assert_eq!(read_bytes, 12);
+        assert_eq!(&buf[..12], b"hello world\n");
+
+        // Stderr is unbuffered -> immediately readable
+        streams.write_fd(2, b"error message").unwrap();
+        let err_read = streams.stderr.read_stream(&mut buf);
+        assert_eq!(err_read, 13);
+        assert_eq!(&buf[..13], b"error message");
     }
 }
