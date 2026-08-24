@@ -16,30 +16,6 @@ pub trait PackageFormatAdapter {
     fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> { Ok(Vec::new()) }
 }
 
-#[derive(Debug, Clone)]
-pub struct PacmanPkgbuild {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub depends: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String,
-    pub plugs: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FlatpakManifest {
-    pub id: String,
-    pub app_id: String,
-    pub command: String,
-    pub finish_args: Vec<String>,
-}
-
 pub type UniversalPackageAdapter = UniversalPackageManager;
 
 /// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
@@ -75,29 +51,6 @@ pub struct AptDebManifest {
     pub depends: Vec<String>,
     pub description: String,
     pub priority: PackagePriority,
-}
-
-#[derive(Debug, Clone)]
-pub struct PacmanPkgbuild {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub depends: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String, // "strict", "classic", "devmode"
-    pub plugs: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FlatpakManifest {
-    pub app_id: String,
-    pub command: String,
-    pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
 }
 
 pub struct UniversalPackageAdapter;

@@ -10,13 +10,6 @@ use crate::klib::Vec;
 
 pub type EventID = usize;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogFormat {
-    Text,
-    Json,
-    Binary,
-}
-
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
@@ -175,7 +168,7 @@ impl AuditLogger for SimpleAuditLogger {
 }
 
 pub trait AuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> bool;
+    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError>;
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError>;
 }
 
