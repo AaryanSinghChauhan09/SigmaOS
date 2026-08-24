@@ -11,14 +11,8 @@
 //! - Ticket Spinlock with Exponential Backoff
 //! - Simple & Multiprogrammed Batch Queue Processor
 
-#[cfg(feature = "alloc")]
 extern crate alloc;
-
-#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
-
-#[cfg(not(feature = "alloc"))]
-use std::vec::Vec;
 
 /// Memory Ballooning Manager (VirtIO / Hypervisor Ballooning)
 pub struct VirtioBalloonManager {

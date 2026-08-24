@@ -983,7 +983,7 @@ mod tests {
         // 2. Test APT repository source query checks
         let apt_adapter = PackageAdapter::new(PackageFormat::Deb, "apt".to_string());
         let apt_config = AptRepoConfig {
-            sourcelist_url: "deb http://deb.debian.org/debian".to_string(),
+            sourcelist_url: "deb https://deb.debian.org/debian".to_string(),
             suite: "bookworm".to_string(),
             components: {
                 let mut v = Vec::new();

@@ -1692,12 +1692,12 @@ mod tests {
     #[test]
     fn test_sovereign_web_server_routing() {
         let mut server = SovereignWebServer::new();
-        server.add_route("/api/v1", "http://127.0.0.1:8080");
-        server.add_route("/static", "http://127.0.0.1:9090");
+        server.add_route("/api/v1", "https://127.0.0.1:8080");
+        server.add_route("/static", "https://127.0.0.1:9090");
 
         assert_eq!(
             server.handle_http_request("/api/v1/users"),
-            Some("http://127.0.0.1:8080".to_string())
+            Some("https://127.0.0.1:8080".to_string())
         );
         assert_eq!(server.request_count, 1);
         assert_eq!(server.handle_http_request("/unknown"), None);

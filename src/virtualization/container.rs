@@ -1135,7 +1135,7 @@ mod tests {
 
     #[test]
     fn test_container_healthcheck_probes() {
-        let hc = HealthcheckConfig::new(&["CMD-SHELL", "curl -f http://localhost/health || exit 1"]);
+        let hc = HealthcheckConfig::new(&["CMD-SHELL", "curl -f https://localhost/health || exit 1"]);
         assert_eq!(hc.interval_secs, 30);
         assert_eq!(hc.retries, 3);
 
@@ -1160,7 +1160,7 @@ mod tests {
 
         assert!(config.healthcheck.is_some());
         let probe = config.healthcheck.unwrap();
-        assert_eq!(probe.test_cmd[1], "curl -f http://localhost/health || exit 1");
+        assert_eq!(probe.test_cmd[1], "curl -f https://localhost/health || exit 1");
     }
 
     #[test]

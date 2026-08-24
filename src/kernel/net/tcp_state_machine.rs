@@ -3,8 +3,10 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// States: CLOSED → LISTEN → SYN_SENT / SYN_RCVD → ESTABLISHED →
 ///         FIN_WAIT_1 → FIN_WAIT_2 → TIME_WAIT → CLOSED
 ///         ESTABLISHED → CLOSE_WAIT → LAST_ACK → CLOSED
-use std::collections::{HashMap, VecDeque};
-use std::vec::Vec;
+
+extern crate alloc;
+use alloc::collections::{HashMap, VecDeque};
+use alloc::vec::Vec;
 
 // ── TCP States (RFC 793 §3.2) ─────────────────────────────────────────────
 

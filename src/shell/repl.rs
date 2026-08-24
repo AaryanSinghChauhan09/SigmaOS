@@ -846,8 +846,8 @@ impl ShellRepl {
             }
             ShellCommand::Apt { subcommand, package } => {
                 if subcommand == "update" {
-                    Ok("Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease\n\
-                        Get:2 http://security.ubuntu.com/ubuntu noble-security InRelease\n\
+                    Ok("Hit:1 https://archive.ubuntu.com/ubuntu noble InRelease\n\
+                        Get:2 https://security.ubuntu.com/ubuntu noble-security InRelease\n\
                         Reading package lists... Done\n\
                         Building dependency tree... Done\n\
                         All packages are up to date."

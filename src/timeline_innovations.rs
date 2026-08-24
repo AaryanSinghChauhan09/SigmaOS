@@ -874,8 +874,8 @@ mod tests {
         let mut resolver = AptPackageResolver::new("amd64");
 
         // 1. Add repository source
-        resolver.add_source_repository("deb http://deb.debian.org/debian bookworm main");
-        assert_eq!(resolver.sources_list[0], "deb http://deb.debian.org/debian bookworm main");
+        resolver.add_source_repository("deb https://deb.debian.org/debian bookworm main");
+        assert_eq!(resolver.sources_list[0], "deb https://deb.debian.org/debian bookworm main");
 
         // 2. Setup Multi-Arch foreign architecture support
         assert!(!resolver.multiarch.is_architecture_supported("i386"));

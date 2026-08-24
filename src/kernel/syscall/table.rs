@@ -5,9 +5,10 @@ use core::sync::atomic::{AtomicU64, Ordering};
 /// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
 /// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use crate::klib::HashMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
 
 // ── Syscall numbers (Linux-compatible subset + SigmaOS extensions) ────────
 
