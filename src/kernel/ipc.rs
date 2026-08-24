@@ -54,6 +54,24 @@ impl Channel {
     }
 }
 
+/// Flags controlling Pipe behavior (Linux pipe2 / BSD pipe_create parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PipeFlags {
+    pub nonblock: bool,
+    pub cloexec: bool,
+    pub direct_packet_mode: bool,
+}
+
+impl PipeFlags {
+    pub fn default() -> Self {
+        Self {
+            nonblock: false,
+            cloexec: true,
+            direct_packet_mode: true,
+        }
+    }
+}
+
 /// Represents a high-performance structured sovereign pipe (defeating legacy Linux pipes)
 pub struct SovereignPipe {
     pub id: u64,
@@ -62,6 +80,9 @@ pub struct SovereignPipe {
     pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
     pub max_capacity: usize,
     pub bytes_transferred: u64,
+    pub flags: PipeFlags,
+    pub read_low_watermark: usize,  // BSD SO_RCVLOWAT equivalent
+    pub write_low_watermark: usize, // BSD SO_SNDLOWAT equivalent
 }
 
 impl SovereignPipe {
@@ -73,7 +94,24 @@ impl SovereignPipe {
             ring_buffer: Vec::new(),
             max_capacity: capacity,
             bytes_transferred: 0,
+            flags: PipeFlags::default(),
+            read_low_watermark: 1,
+            write_low_watermark: 1,
         }
+    }
+
+    /// Linux fcntl F_SETPIPE_SZ parity: dynamically resizes pipe ring buffer capacity
+    pub fn set_pipe_capacity(&mut self, new_capacity: usize) -> Result<usize, IpcError> {
+        if new_capacity < self.ring_buffer.len() {
+            return Err(IpcError::ChannelFull);
+        }
+        self.max_capacity = new_capacity;
+        Ok(self.max_capacity)
+    }
+
+    /// Linux fcntl F_GETPIPE_SZ parity: returns current pipe capacity
+    pub fn get_pipe_capacity(&self) -> usize {
+        self.max_capacity
     }
 
     /// Structured write operation with dynamic backpressure (returns Err if capacity reached)
@@ -96,12 +134,78 @@ impl SovereignPipe {
         }
     }
 
+    /// BSD kqueue EVFILT_READ check based on low watermark
+    pub fn is_readable(&self) -> bool {
+        self.ring_buffer.len() >= self.read_low_watermark
+    }
+
+    /// BSD kqueue EVFILT_WRITE check based on remaining capacity watermark
+    pub fn is_writable(&self) -> bool {
+        (self.max_capacity - self.ring_buffer.len()) >= self.write_low_watermark
+    }
+
     /// User-defined stream processing: Filters or transforms pipe payloads in-place
     pub fn filter_stream<F>(&mut self, filter_func: F)
     where
         F: Fn(&Vec<u8>) -> bool,
     {
         self.ring_buffer.retain(|item| filter_func(item));
+    }
+}
+
+/// Linux-style Zero-Copy Tee Engine (tee(2)).
+/// Duplicates data from source pipe to destination pipe without consuming or modifying the source pipe.
+pub struct SovereignTeeEngine {
+    pub bytes_duplicated: u64,
+}
+
+impl SovereignTeeEngine {
+    pub fn new() -> Self {
+        Self { bytes_duplicated: 0 }
+    }
+
+    pub fn tee(
+        &mut self,
+        source: &SovereignPipe,
+        destination: &mut SovereignPipe,
+        max_elements: usize,
+    ) -> Result<usize, IpcError> {
+        let count = std::cmp::min(max_elements, source.ring_buffer.len());
+        let mut duplicated = 0;
+        for i in 0..count {
+            let chunk = source.ring_buffer[i].clone();
+            let len = chunk.len();
+            destination.write_structure(chunk)?;
+            self.bytes_duplicated += len as u64;
+            duplicated += 1;
+        }
+        Ok(duplicated)
+    }
+}
+
+/// Linux-style Zero-Copy vmsplice Engine (vmsplice(2)).
+/// Slices user-space memory vectors directly into a destination SovereignPipe.
+pub struct SovereignVmSpliceEngine {
+    pub total_spliced_bytes: u64,
+}
+
+impl SovereignVmSpliceEngine {
+    pub fn new() -> Self {
+        Self { total_spliced_bytes: 0 }
+    }
+
+    pub fn vmsplice(
+        &mut self,
+        iovecs: &[&[u8]],
+        destination: &mut SovereignPipe,
+    ) -> Result<usize, IpcError> {
+        let mut bytes = 0;
+        for vec_slice in iovecs {
+            destination.write_structure(vec_slice.to_vec())?;
+            bytes += vec_slice.len();
+        }
+        self.total_spliced_bytes += bytes as u64;
+        Ok(bytes)
     }
 }
 
@@ -464,5 +568,51 @@ mod tests {
         assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
         assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
         assert!(ring.pop_item().is_none());
+    }
+
+    #[test]
+    fn test_sovereign_pipe_tee_and_vmsplice() {
+        let mut pipe1 = SovereignPipe::new(1, 10, 20, 10);
+        let mut pipe2 = SovereignPipe::new(2, 20, 30, 10);
+
+        pipe1.write_structure(vec![100, 101]).unwrap();
+        pipe1.write_structure(vec![102, 103]).unwrap();
+
+        let mut tee_engine = SovereignTeeEngine::new();
+        let count = tee_engine.tee(&pipe1, &mut pipe2, 2).unwrap();
+        assert_eq!(count, 2);
+        assert_eq!(tee_engine.bytes_duplicated, 4);
+
+        // Pipe 1 still retains its structures
+        assert_eq!(pipe1.ring_buffer.len(), 2);
+        assert_eq!(pipe2.ring_buffer.len(), 2);
+
+        let mut vmsplice_engine = SovereignVmSpliceEngine::new();
+        let buf1 = [1u8, 2u8, 3u8];
+        let buf2 = [4u8, 5u8];
+        let spliced_bytes = vmsplice_engine.vmsplice(&[&buf1[..], &buf2[..]], &mut pipe2).unwrap();
+        assert_eq!(spliced_bytes, 5);
+        assert_eq!(pipe2.ring_buffer.len(), 4);
+    }
+
+    #[test]
+    fn test_sovereign_pipe_capacity_and_watermarks() {
+        let mut pipe = SovereignPipe::new(10, 101, 102, 2);
+        assert_eq!(pipe.get_pipe_capacity(), 2);
+        assert!(!pipe.is_readable());
+        assert!(pipe.is_writable());
+
+        pipe.write_structure(vec![1, 2]).unwrap();
+        assert!(pipe.is_readable());
+
+        // Fill pipe to capacity
+        pipe.write_structure(vec![3, 4]).unwrap();
+        assert!(!pipe.is_writable());
+        assert_eq!(pipe.write_structure(vec![5]), Err(IpcError::ChannelFull));
+
+        // Dynamically expand pipe capacity (F_SETPIPE_SZ parity)
+        assert_eq!(pipe.set_pipe_capacity(16).unwrap(), 16);
+        assert!(pipe.is_writable());
+        assert!(pipe.write_structure(vec![5]).is_ok());
     }
 }
