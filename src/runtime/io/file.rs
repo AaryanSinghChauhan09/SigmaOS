@@ -27,6 +27,8 @@ pub struct FileFlags {
     pub append: bool,
     pub create: bool,
     pub truncate: bool,
+    pub is_line_buffered: bool,
+    pub non_blocking: bool,
 }
 
 impl FileFlags {
@@ -37,6 +39,8 @@ impl FileFlags {
             append: false,
             create: false,
             truncate: false,
+            is_line_buffered: false,
+            non_blocking: false,
         }
     }
 
@@ -134,7 +138,11 @@ impl FileManager {
     /// Pre-allocates file descriptors 0, 1, 2 for stdin, stdout, stderr (mimics Linux standard streams)
     unsafe fn allocate_standard_streams(&mut self) {
         for fd in 0..3 {
-            let flags = if fd == 0 { FileFlags::read_only() } else { FileFlags::write_only() };
+            let mut flags = if fd == 0 { FileFlags::read_only() } else { FileFlags::write_only() };
+            // Set stdin/stdout as line buffered by default (Linux/BSD stdio paradigm)
+            if fd == 1 || fd == 2 {
+                flags.is_line_buffered = true;
+            }
             let descriptor = FileDescriptor {
                 fd: AtomicUsize::new(fd),
                 flags,

@@ -440,6 +440,14 @@ impl SovereignUtility for ThemeUtility {
 }
 
 // ==========================================
+// STANDARD STREAMS & I/O BUFFERING
+// ==========================================
+// Integrated in src/runtime/io/file.rs:
+// - Pre-allocated FDs 0 (stdin), 1 (stdout), 2 (stderr)
+// - Line-buffering (is_line_buffered) and non-blocking streaming
+// - Stream redirection via redirect_stream (dup2 parity)
+
+// ==========================================
 // MULTI-CALL BINARY DISPATCH MANAGER
 // ==========================================
 pub struct MultiCallManager {

@@ -786,6 +786,134 @@ impl HypervisorBackend for IntelVtxBackend {
     }
 }
 
+/// FreeBSD bhyve hypervisor model backend
+pub struct BhyveBsdBackend {
+    vms: HashMap<String, VmConfig>,
+    vm_states: HashMap<String, VmState>,
+    passthru_ppt_devices: Vec<String>,
+}
+
+impl BhyveBsdBackend {
+    pub fn new() -> Self {
+        Self {
+            vms: HashMap::new(),
+            vm_states: HashMap::new(),
+            passthru_ppt_devices: Vec::new(),
+        }
+    }
+
+    pub fn attach_ppt_passthrough(&mut self, ppt_pci_address: &str) {
+        self.passthru_ppt_devices.push(ppt_pci_address.to_string());
+    }
+}
+
+impl HypervisorBackend for BhyveBsdBackend {
+    fn create_vm(&mut self, config: &VmConfig) -> Result<String, VmError> {
+        let vm_id = format!("bhyve_{}", self.vms.len());
+        self.vms.insert(vm_id.clone(), config.clone());
+        self.vm_states.insert(vm_id.clone(), VmState::Stopped);
+        Ok(vm_id)
+    }
+
+    fn start_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Running);
+        Ok(())
+    }
+
+    fn stop_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Stopped);
+        Ok(())
+    }
+
+    fn pause_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Paused);
+        Ok(())
+    }
+
+    fn resume_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.insert(vm_id.to_string(), VmState::Running);
+        Ok(())
+    }
+
+    fn delete_vm(&mut self, vm_id: &str) -> Result<(), VmError> {
+        if self.vms.remove(vm_id).is_none() {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        self.vm_states.remove(vm_id);
+        Ok(())
+    }
+
+    fn get_vm_state(&self, vm_id: &str) -> Result<VmState, VmError> {
+        self.vm_states
+            .get(vm_id)
+            .copied()
+            .ok_or_else(|| VmError::VmNotFound(vm_id.to_string()))
+    }
+
+    fn get_resource_usage(&self, vm_id: &str) -> Result<VmResourceUsage, VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+
+        Ok(VmResourceUsage {
+            cpu_percent: 18.0,
+            memory_mb: 2048,
+            disk_read_mb: 120,
+            disk_write_mb: 60,
+            network_rx_mb: 40,
+            network_tx_mb: 20,
+        })
+    }
+
+    fn create_snapshot(&mut self, vm_id: &str, name: &str) -> Result<String, VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        Ok(format!("bhyve_snapshot_{}", name))
+    }
+
+    fn restore_snapshot(&mut self, vm_id: &str, _snapshot_id: &str) -> Result<(), VmError> {
+        if !self.vms.contains_key(vm_id) {
+            return Err(VmError::VmNotFound(vm_id.to_string()));
+        }
+        Ok(())
+    }
+
+    fn name(&self) -> &str {
+        "FreeBSD bhyve Hypervisor"
+    }
+}
+
+/// BSD Virtual Network Interface (tap / vmnet integration)
+#[derive(Debug, Clone)]
+pub struct BsdVirtualNetworkInterface {
+    pub if_name: String,
+    pub bridge_name: String,
+    pub mtu: u16,
+}
+
+impl BsdVirtualNetworkInterface {
+    pub fn new(if_name: &str, bridge_name: &str) -> Self {
+        Self {
+            if_name: if_name.to_string(),
+            bridge_name: bridge_name.to_string(),
+            mtu: 1500,
+        }
+    }
+}
+
 /// AMD-Vi IOMMU protection manager for devices
 pub struct AmdViIommuManager {
     pub devices_gated: HashMap<String, bool>,
@@ -1601,5 +1729,18 @@ mod tests {
         assert_eq!(state, VmMigrationState::Setup);
         let active = VmMigrationState::Active;
         assert_ne!(active, VmMigrationState::Completed);
+    }
+
+    #[test]
+    fn test_bhyve_bsd_backend() {
+        let mut bhyve = BhyveBsdBackend::new();
+        assert_eq!(bhyve.name(), "FreeBSD bhyve Hypervisor");
+
+        bhyve.attach_ppt_passthrough("ppt0");
+        assert_eq!(bhyve.passthru_ppt_devices.len(), 1);
+
+        let vnet = BsdVirtualNetworkInterface::new("vm-tap0", "vm-bridge0");
+        assert_eq!(vnet.if_name, "vm-tap0");
+        assert_eq!(vnet.bridge_name, "vm-bridge0");
     }
 }

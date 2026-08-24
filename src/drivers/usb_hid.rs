@@ -4,6 +4,15 @@
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use crate::security::CapabilityToken;
 
+/// Keyboard Layouts inspired by multi-distro Linux/BSD keyboard subsystem
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeyboardLayout {
+    UsQwerty,
+    UkQwerty,
+    DeQwertz,
+    FrAzerty,
+}
+
 /// USB HID report type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HidReportType {
@@ -42,6 +51,9 @@ pub struct UsbHidDriver {
 
     // Rollover tracking (N-Key Rollover / NKRO)
     pub active_held_keys: Vec<u8>,
+
+    // Keyboard layout selector
+    pub layout: KeyboardLayout,
 }
 
 impl UsbHidDriver {
@@ -61,7 +73,12 @@ impl UsbHidDriver {
             num_lock_active: false,
             scroll_lock_active: false,
             active_held_keys: Vec::new(),
+            layout: KeyboardLayout::UsQwerty,
         }
+    }
+
+    pub fn set_layout(&mut self, layout: KeyboardLayout) {
+        self.layout = layout;
     }
 
     pub fn connect(&mut self) -> Result<(), HidError> {
@@ -259,10 +276,42 @@ impl HidKeyboard {
         }
     }
 
+    /// Converts a USB HID scancode to ASCII character based on KeyboardLayout
+    pub fn scancode_to_ascii_layout(scancode: u8, shift: bool, layout: KeyboardLayout) -> Option<u8> {
+        let ascii = Self::scancode_to_ascii(scancode, shift)?;
+        match layout {
+            KeyboardLayout::UsQwerty | KeyboardLayout::UkQwerty => Some(ascii),
+            KeyboardLayout::DeQwertz => match ascii {
+                b'y' => Some(b'z'),
+                b'Y' => Some(b'Z'),
+                b'z' => Some(b'y'),
+                b'Z' => Some(b'Y'),
+                _ => Some(ascii),
+            },
+            KeyboardLayout::FrAzerty => match ascii {
+                b'q' => Some(b'a'),
+                b'Q' => Some(b'A'),
+                b'a' => Some(b'q'),
+                b'A' => Some(b'Q'),
+                b'w' => Some(b'z'),
+                b'W' => Some(b'Z'),
+                b'z' => Some(b'w'),
+                b'Z' => Some(b'W'),
+                _ => Some(ascii),
+            },
+        }
+    }
+
     /// Decode a keyboard event to a printable ASCII char
     pub fn decode_event(event: &HidKeyboardEvent) -> Option<char> {
         let shift = (event.modifiers & 0x22) != 0;
         Self::scancode_to_ascii(event.keycode, shift).map(|b| b as char)
+    }
+
+    /// Decode a keyboard event to a printable ASCII char with layout awareness
+    pub fn decode_event_layout(event: &HidKeyboardEvent, layout: KeyboardLayout) -> Option<char> {
+        let shift = (event.modifiers & 0x22) != 0;
+        Self::scancode_to_ascii_layout(event.keycode, shift, layout).map(|b| b as char)
     }
 }
 
@@ -383,6 +432,29 @@ mod tests {
         hid.push_event(caps_release);
         assert!(hid.caps_lock_active); // remains true (toggle)
         assert!(hid.active_held_keys.is_empty());
+    }
+
+    #[test]
+    fn test_multi_layout_decoding() {
+        let event_z = HidKeyboardEvent {
+            keycode: 0x1D, // 'z' in US QWERTY
+            pressed: true,
+            modifiers: 0,
+        };
+
+        let us_char = HidKeyboard::decode_event_layout(&event_z, KeyboardLayout::UsQwerty).unwrap();
+        assert_eq!(us_char, 'z');
+
+        let de_char = HidKeyboard::decode_event_layout(&event_z, KeyboardLayout::DeQwertz).unwrap();
+        assert_eq!(de_char, 'y'); // 'z' becomes 'y' in QWERTZ
+
+        let event_q = HidKeyboardEvent {
+            keycode: 0x14, // 'q' in US QWERTY
+            pressed: true,
+            modifiers: 0,
+        };
+        let fr_char = HidKeyboard::decode_event_layout(&event_q, KeyboardLayout::FrAzerty).unwrap();
+        assert_eq!(fr_char, 'a'); // 'q' becomes 'a' in AZERTY
     }
 
     #[test]
