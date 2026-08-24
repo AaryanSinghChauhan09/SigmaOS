@@ -29,6 +29,7 @@ pub struct NixOSFlakeEngine {
     pub inputs: Vec<FlakeInput>,
     pub active_closure: Option<SystemClosure>,
     pub generation_count: usize,
+    pub history: Vec<SystemClosure>,
 }
 
 impl NixOSFlakeEngine {
@@ -37,6 +38,7 @@ impl NixOSFlakeEngine {
             inputs: Vec::new(),
             active_closure: None,
             generation_count: 0,
+            history: Vec::new(),
         }
     }
 
@@ -61,6 +63,7 @@ impl NixOSFlakeEngine {
                 hash_accum = hash_accum.wrapping_add(byte as u64).wrapping_mul(31);
             }
         }
+        hash_accum = hash_accum.wrapping_add(self.generation_count as u64);
 
         let closure_hash = alloc::format!("{:016x}", hash_accum);
         let store_path = alloc::format!("/sigma/store/{}-system-closure", closure_hash);
@@ -71,9 +74,31 @@ impl NixOSFlakeEngine {
             packages: packages.iter().map(|&s| String::from(s)).collect(),
         };
 
+        if let Some(prev) = self.active_closure.take() {
+            self.history.push(prev);
+        }
+
         self.generation_count += 1;
         self.active_closure = Some(closure.clone());
         Ok(closure)
+    }
+
+    /// Roll back system closure to previous generation
+    pub fn rollback_generation(&mut self) -> Result<SystemClosure, &'static str> {
+        if let Some(prev) = self.history.pop() {
+            self.generation_count = self.generation_count.saturating_sub(1);
+            self.active_closure = Some(prev.clone());
+            Ok(prev)
+        } else {
+            Err("No previous generation history to rollback")
+        }
+    }
+
+    /// Collect unused store entries and return freed store count
+    pub fn garbage_collect(&mut self) -> usize {
+        let count = self.history.len();
+        self.history.clear();
+        count
     }
 }
 
@@ -223,6 +248,22 @@ impl VoidRunitSupervisor {
             Err("Service not found")
         }
     }
+
+    /// Restart a service by re-assigning a new PID
+    pub fn restart_service(&mut self, name: &str) -> Result<usize, &'static str> {
+        if let Some(svc) = self.services.iter_mut().find(|s| s.name == name) {
+            svc.state = ServiceState::Down;
+            svc.pid = None;
+        } else {
+            return Err("Service not found");
+        }
+        self.start_service(name)
+    }
+
+    /// Query the current status of a supervised service
+    pub fn get_service_status(&self, name: &str) -> Option<ServiceState> {
+        self.services.iter().find(|s| s.name == name).map(|s| s.state)
+    }
 }
 
 impl Default for VoidRunitSupervisor {
@@ -312,10 +353,24 @@ mod tests {
         let mut engine = NixOSFlakeEngine::new();
         engine.add_input("nixpkgs", "github:nixos/nixpkgs", "a1b2c3d4e5f6");
 
-        let closure = engine.build_closure(&["neovim", "git"]).unwrap();
-        assert!(closure.store_path.contains("/sigma/store/"));
-        assert_eq!(closure.packages.len(), 2);
+        let closure1 = engine.build_closure(&["neovim", "git"]).unwrap();
+        assert!(closure1.store_path.contains("/sigma/store/"));
+        assert_eq!(closure1.packages.len(), 2);
         assert_eq!(engine.generation_count, 1);
+
+        let closure2 = engine.build_closure(&["neovim", "git", "zsh"]).unwrap();
+        assert_eq!(engine.generation_count, 2);
+        assert_eq!(closure2.packages.len(), 3);
+
+        // Rollback check
+        let rolled_back = engine.rollback_generation().unwrap();
+        assert_eq!(rolled_back.packages.len(), 2);
+        assert_eq!(engine.generation_count, 1);
+
+        // Garbage collection check
+        engine.build_closure(&["htop"]).unwrap();
+        let freed = engine.garbage_collect();
+        assert_eq!(freed, 1);
     }
 
     #[test]
@@ -336,14 +391,20 @@ mod tests {
 
         // Cannot start iwd before dbus is up
         assert!(supervisor.start_service("iwd").is_err());
+        assert_eq!(supervisor.get_service_status("iwd"), Some(ServiceState::Down));
 
         // Start dbus first
         let dbus_pid = supervisor.start_service("dbus").unwrap();
         assert_eq!(dbus_pid, 1001);
+        assert_eq!(supervisor.get_service_status("dbus"), Some(ServiceState::Up));
 
         // Now iwd can start
         let iwd_pid = supervisor.start_service("iwd").unwrap();
         assert_eq!(iwd_pid, 1002);
+
+        // Test restart
+        let new_dbus_pid = supervisor.restart_service("dbus").unwrap();
+        assert_eq!(new_dbus_pid, 1003);
     }
 
     #[test]

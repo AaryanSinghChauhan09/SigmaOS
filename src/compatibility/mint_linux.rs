@@ -9,8 +9,8 @@ use crate::klib::Vec;
 
 #[cfg(feature = "standalone_test")]
 extern crate alloc;
+#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintError {
@@ -237,12 +237,6 @@ impl MintAppMetadata {
 
 pub struct MintSoftwareManager {
     pub apps_catalog: Vec<MintAppMetadata>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MintError {
-    LayoutFailed,
-    UpdateError,
 }
 
 impl Default for MintSoftwareManager {

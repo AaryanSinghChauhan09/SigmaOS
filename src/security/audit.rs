@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails
@@ -24,13 +21,6 @@ pub enum EventType {
     Authorization = 1,
     FileAccess = 2,
     SystemChange = 3,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogFormat {
-    PlainText,
-    Json,
-    Binary,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -193,17 +183,16 @@ impl SimpleAuditPolicy {
 }
 
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
-        let compliant = if self.require_authentication.load(Ordering::SeqCst) == 1 {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
+        if self.require_authentication.load(Ordering::SeqCst) == 1 {
             event.event_type() == EventType::Authentication
         } else {
             true
-        };
-        Ok(compliant)
+        }
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event)? {
+        if self.check_compliance(event) {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)

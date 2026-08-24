@@ -516,7 +516,7 @@ mod tests {
     #[test]
     fn test_sovereign_hal() {
         let hal = SovereignHal::new();
-        let arch = hal.get_arch();
+        let _arch = hal.get_arch();
 
         // Ensure default mapping is clean
         let mut test_hal = SovereignHal::new();
