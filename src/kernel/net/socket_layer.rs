@@ -4,7 +4,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
 
 extern crate alloc;
-use alloc::collections::HashMap;
+use crate::klib::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

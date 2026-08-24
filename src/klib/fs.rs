@@ -1,6 +1,7 @@
 //! Custom file system implementation for SigmaOS
 //! This module provides no_std alternatives to std::fs
 
+use core::arch::asm;
 use core::ffi::c_char;
 use core::fmt;
 
