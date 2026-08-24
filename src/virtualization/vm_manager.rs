@@ -1,8 +1,13 @@
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-use std::collections::HashMap;
-use std::path::PathBuf;
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+use crate::klib::collections::HashMap;
+
+#[cfg(test)]
+use std::time::{SystemTime, UNIX_EPOCH};
 
 /// VM configuration
 #[derive(Debug, Clone)]
@@ -54,7 +59,7 @@ pub struct VmSnapshot {
     pub id: String,
     pub name: String,
     pub created_at: u64,
-    pub snapshot_path: PathBuf,
+    pub snapshot_path: String,
 }
 
 /// VM resource usage
@@ -230,7 +235,7 @@ pub struct KvmVcpuState {
 /// VirtIO Block Device Configuration
 #[derive(Debug, Clone)]
 pub struct VirtioBlockDeviceConfig {
-    pub image_path: PathBuf,
+    pub image_path: String,
     pub read_only: bool,
     pub direct_io: bool,
     pub queue_size: u16,
@@ -1019,11 +1024,11 @@ impl VmManager {
             VmSnapshot {
                 id: snapshot_id.clone(),
                 name: name.to_string(),
-                created_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
+                created_at: SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
                     .unwrap()
                     .as_secs(),
-                snapshot_path: PathBuf::from(format!("/var/lib/vm/snapshots/{}", snapshot_id)),
+                snapshot_path: String::from("/var/lib/vm/snapshots/") + &snapshot_id,
             },
         );
 
@@ -1219,7 +1224,7 @@ mod tests {
         assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
         kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-            image_path: PathBuf::from("/var/lib/images/rootfs.qcow2"),
+            image_path: "/var/lib/images/rootfs.qcow2".to_string(),
             read_only: false,
             direct_io: true,
             queue_size: 256,
