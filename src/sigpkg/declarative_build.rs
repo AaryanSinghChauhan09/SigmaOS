@@ -1,9 +1,10 @@
 //! Pure Declarative Build System (Nix & Bazel Inspired) with Curated Ratings/Reviews Subsystem
 //! Implements deterministic build derivations, hermetic dependency graphs, and package reputation validation.
 
-use std::vec::Vec;
-use std::collections::HashMap;
-use std::string::{String, ToString};
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
+use crate::klib::collections::HashMap;
 
 // ==========================================
 // 1. Nix-Style Store Derivations

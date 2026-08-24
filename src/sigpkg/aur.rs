@@ -1,8 +1,6 @@
 // SigmaOS PKGBUILD Parser and AUR Sandbox Orchestration Shunts
 // Zero-dependency, safe, and OOP-centric
 
-use std::cell::RefCell;
-
 const MAX_DEPS: usize = 8;
 const MAX_PREPARE_CMDS: usize = 4;
 
@@ -176,8 +174,8 @@ impl PacmanTransactionHooks {
 /// AUR Compilation Orchestration Manager
 pub struct AurSandboxOrchestrator {
     pub active_build_pid: Option<u32>,
-    pub dependencies: RefCell<[Option<u32>; MAX_DEPS]>,
-    pub prepare_commands: RefCell<[Option<&'static str>; MAX_PREPARE_CMDS]>,
+    pub dependencies: [Option<u32>; MAX_DEPS],
+    pub prepare_commands: [Option<&'static str>; MAX_PREPARE_CMDS],
     pub dep_count: usize,
     pub cmd_count: usize,
 }
@@ -189,8 +187,8 @@ impl AurSandboxOrchestrator {
 
         Self {
             active_build_pid: None,
-            dependencies: RefCell::new([EMPTY_DEP; MAX_DEPS]),
-            prepare_commands: RefCell::new([EMPTY_CMD; MAX_PREPARE_CMDS]),
+            dependencies: [EMPTY_DEP; MAX_DEPS],
+            prepare_commands: [EMPTY_CMD; MAX_PREPARE_CMDS],
             dep_count: 0,
             cmd_count: 0,
         }
@@ -233,9 +231,8 @@ impl AurSandboxOrchestrator {
                 if !dep_clean.is_empty() {
                     let dep_hash = Self::calculate_name_hash(dep_clean);
 
-                    let mut deps = self.dependencies.borrow_mut();
                     if self.dep_count < MAX_DEPS {
-                        deps[self.dep_count] = Some(dep_hash);
+                        self.dependencies[self.dep_count] = Some(dep_hash);
                         self.dep_count += 1;
                     }
                 }
@@ -296,9 +293,8 @@ mod tests {
 
         orchestrator.parse_pkgbuild_line("depends=('libcurl' 'openssl')");
         assert_eq!(orchestrator.dep_count, 2);
-        let deps = orchestrator.dependencies.borrow();
-        assert_eq!(deps[0], Some(AurSandboxOrchestrator::calculate_name_hash("libcurl")));
-        assert_eq!(deps[1], Some(AurSandboxOrchestrator::calculate_name_hash("openssl")));
+        assert_eq!(orchestrator.dependencies[0], Some(AurSandboxOrchestrator::calculate_name_hash("libcurl")));
+        assert_eq!(orchestrator.dependencies[1], Some(AurSandboxOrchestrator::calculate_name_hash("openssl")));
     }
 
     #[test]

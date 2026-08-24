@@ -233,8 +233,8 @@ impl SyscallAuditor for SimpleSyscallAuditor {
     }
 }
 
-use std::vec::Vec;
-use std::boxed::Box;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 #[cfg(test)]
 mod tests {
