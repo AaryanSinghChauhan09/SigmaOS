@@ -2,11 +2,14 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod arch_pacman_engine;
 pub mod aur;
 pub mod aur_helper;
+pub mod debian_apt_engine;
 pub mod debian_crusher;
 pub mod debian_defeater;
 pub mod declarative_build;
+pub mod fedora_rpm_engine;
 pub mod importer;
 pub mod linux_compat;
 pub mod makepkg;
@@ -30,6 +33,9 @@ pub mod verifier;
 pub mod zero_alloc_resolver;
 
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
+pub use arch_pacman_engine::{ArchBuildSystem, AURHelper, PacmanDatabase, ArchPacmanPackage};
+pub use debian_apt_engine::{AptRepository, DebPackage};
+pub use fedora_rpm_engine::{DnfRepository, RpmPackage};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
