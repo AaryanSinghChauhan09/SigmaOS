@@ -3,6 +3,7 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
+extern crate alloc;
 use crate::klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -48,7 +49,7 @@ pub struct Package {
     pub name: crate::klib::string::SigmaString,
     pub version: Version,
     pub description: crate::klib::string::SigmaString,
-    pub dependencies: crate::klib::vec::Vec<Dependency>,
+    pub dependencies: alloc::vec::Vec<Dependency>,
     pub checksum: crate::klib::string::SigmaString,
 }
 
@@ -57,7 +58,7 @@ impl Package {
         name: crate::klib::string::SigmaString,
         version: Version,
         description: crate::klib::string::SigmaString,
-        dependencies: crate::klib::vec::Vec<Dependency>,
+        dependencies: alloc::vec::Vec<Dependency>,
         checksum: crate::klib::string::SigmaString,
     ) -> Self {
         Self {
@@ -137,7 +138,7 @@ impl Default for AurRecipeCompiler {
 pub struct DebianSbuildPackage {
     pub name: crate::klib::string::SigmaString,
     pub version: Version,
-    pub build_depends: crate::klib::vec::Vec<crate::klib::string::SigmaString>,
+    pub build_depends: alloc::vec::Vec<crate::klib::string::SigmaString>,
 }
 
 /// Rolling Release System Synchronizer
@@ -258,12 +259,12 @@ pub struct AlpmHook {
 
 #[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: crate::klib::vec::Vec<AlpmHook>,
+    pub hooks: alloc::vec::Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self { hooks: crate::klib::vec::Vec::new() }
+        Self { hooks: alloc::vec::Vec::new() }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -326,14 +327,14 @@ impl Default for AlpmHookManager {
 
 #[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub hooks: crate::klib::vec::Vec<crate::klib::string::SigmaString>,
+    pub hooks: alloc::vec::Vec<crate::klib::string::SigmaString>,
     pub compression: crate::klib::string::SigmaString,
 }
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
         Self {
-            hooks: crate::klib::vec![
+            hooks: alloc::vec![
                 crate::klib::string::SigmaString::from("base"),
                 crate::klib::string::SigmaString::from("udev"),
                 crate::klib::string::SigmaString::from("autodetect"),

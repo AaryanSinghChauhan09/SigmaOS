@@ -10,9 +10,9 @@
 pub mod control;
 
 pub use control::{
-    Ext4AccessCheckEngine, Ext4FileType, Ext4InodeMode, Ext4Xattr, PosixAclEntry,
-    PosixAclTable, PosixAclTag, SecurityIdentifier, dac_flags, ext4_special_bits,
-    ntfs_access_rights, ntfs_ace_flags,
+    AccessControlMatrix, AclType, AclTag, AclEntry, PosixAcl,
+    CapBoundingSet, DacPermission, SensitivityLevel, MacSecurityLabel,
+    FilterPolicy, MacAddressFilter, ZeroTrustAccessGate,
 };
 pub use crate::filesystem::ext4_ntfs_security::{
     NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
@@ -26,7 +26,7 @@ use core::fmt;
 
 /// Error type for the Access module
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AccessError {
+pub enum AccessManagerError {
     /// Operation not supported
     NotSupported,
     /// Invalid parameter
@@ -49,7 +49,7 @@ pub enum AccessError {
     Unknown,
 }
 
-impl fmt::Display for AccessError {
+impl fmt::Display for AccessManagerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NotSupported => write!(f, "Access: operation not supported"),
@@ -67,7 +67,7 @@ impl fmt::Display for AccessError {
 }
 
 /// Result type alias for Access operations
-pub type AccessResult<T> = Result<T, AccessError>;
+pub type AccessResult<T> = Result<T, AccessManagerError>;
 
 /// AccessRule - primary abstraction for resource rule checks
 #[derive(Debug, Clone)]
@@ -171,7 +171,7 @@ impl SecurityAccessToken {
 
     pub fn can_access_process(&self, target_token: &SecurityAccessToken) -> AccessResult<bool> {
         if target_token.protection_level == ProtectionLevel::KernelProtected && self.euid != 0 {
-            return Err(AccessError::ProcessProtected);
+            return Err(AccessManagerError::ProcessProtected);
         }
         if self.euid == 0 || self.euid == target_token.uid {
             Ok(true)
@@ -282,7 +282,7 @@ impl LdapAccessClient {
 
     pub fn bind(&mut self, bind_dn: &str, password: &str) -> AccessResult<()> {
         if bind_dn.is_empty() || password.is_empty() {
-            return Err(AccessError::AuthenticationFailed);
+            return Err(AccessManagerError::AuthenticationFailed);
         }
         self.bound_dn = Some(bind_dn.to_string());
         self.is_authenticated = true;
@@ -291,10 +291,10 @@ impl LdapAccessClient {
 
     pub fn search_user(&self, uid: &str) -> AccessResult<LdapUserEntry> {
         if !self.is_authenticated {
-            return Err(AccessError::PermissionDenied);
+            return Err(AccessManagerError::PermissionDenied);
         }
         if uid.is_empty() {
-            return Err(AccessError::NotFound);
+            return Err(AccessManagerError::NotFound);
         }
 
         let dn = alloc::format!("uid={},ou=users,{}", uid, self.base_dn);
@@ -345,7 +345,7 @@ impl WirelessAccessPointManager {
 
     pub fn connect(&mut self, ap: WirelessAccessPoint, passphrase: &str) -> AccessResult<()> {
         if passphrase.len() < 8 {
-            return Err(AccessError::AuthenticationFailed);
+            return Err(AccessManagerError::AuthenticationFailed);
         }
         self.connected_ap = Some(ap);
         Ok(())
@@ -424,7 +424,7 @@ impl RemoteAccessController {
         controlling: bool,
     ) -> AccessResult<u64> {
         if !token.has_privilege("CAP_NET_ADMIN") && token.euid != 0 {
-            return Err(AccessError::PermissionDenied);
+            return Err(AccessManagerError::PermissionDenied);
         }
         let session_id = (self.active_rat_sessions.len() as u64) + 100;
         self.active_rat_sessions.push(RemoteAccessSession {
@@ -470,10 +470,10 @@ impl ProcessMigrationControl {
         memory_pages_count: usize,
     ) -> AccessResult<usize> {
         if !token.has_privilege("CAP_PROCESS_MIGRATE") {
-            return Err(AccessError::PermissionDenied);
+            return Err(AccessManagerError::PermissionDenied);
         }
         if !self.allowed_migrating_pids.contains(&pid) {
-            return Err(AccessError::PermissionDenied);
+            return Err(AccessManagerError::PermissionDenied);
         }
         // Successfully migrated memory pages across nodes
         Ok(memory_pages_count)
@@ -504,10 +504,10 @@ impl AnonymousAccessPolicy {
 
     pub fn create_guest_session(&mut self) -> AccessResult<SecurityAccessToken> {
         if !self.allow_guest_login {
-            return Err(AccessError::PermissionDenied);
+            return Err(AccessManagerError::PermissionDenied);
         }
         if self.active_anonymous_sessions >= self.max_anonymous_sessions {
-            return Err(AccessError::PermissionDenied);
+            return Err(AccessManagerError::PermissionDenied);
         }
         self.active_anonymous_sessions += 1;
         let token_id = 9000 + (self.active_anonymous_sessions as u64);
@@ -555,7 +555,7 @@ impl AccessManager {
     /// Add a resource
     pub fn add(&mut self, resource: AccessRule) -> AccessResult<u64> {
         if !self.initialized {
-            return Err(AccessError::NotSupported);
+            return Err(AccessManagerError::NotSupported);
         }
         let id = self.resources.len() as u64;
         self.resources.push(resource);
@@ -628,7 +628,7 @@ mod tests {
         assert!(root_token.has_privilege("CAP_SYS_ADMIN"));
         assert!(!user_token.has_privilege("CAP_SYS_ADMIN"));
 
-        assert_eq!(user_token.can_access_process(&protected_token), Err(AccessError::ProcessProtected));
+        assert_eq!(user_token.can_access_process(&protected_token), Err(AccessManagerError::ProcessProtected));
         assert_eq!(root_token.can_access_process(&protected_token), Ok(true));
     }
 
@@ -687,7 +687,7 @@ mod tests {
         );
         assert_eq!(
             mig_ctrl.authorize_and_migrate(404, &unpriv_token, 1024),
-            Err(AccessError::PermissionDenied)
+            Err(AccessManagerError::PermissionDenied)
         );
     }
 }

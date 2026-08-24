@@ -1,9 +1,11 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
-//! SigmaOS Linux & BSD Distribution Compatibility & Userland Parity Subsystem (linux_compat)
-//! Linuxulator syscall translation, FreeBSD kqueue EVFILT multiplexing, OpenBSD pledge/unveil filtering, ProcFS, and ELF auxv loader.
+/// SigmaOS Linux & BSD Distribution Compatibility & Userland Parity Subsystem (linux_compat)
+/// Linuxulator syscall translation, FreeBSD kqueue EVFILT multiplexing, OpenBSD pledge/unveil filtering, ProcFS, and ELF auxv loader.
 
 use crate::klib::BTreeMap as HashMap;
-use crate::klib::{String, Vec};
+use crate::klib::Vec;
+use alloc::string::String;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TargetDistro {

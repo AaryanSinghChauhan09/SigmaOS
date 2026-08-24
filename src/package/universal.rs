@@ -29,7 +29,7 @@ pub enum PackageFormat {
 }
 
 /// Package source
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PackageSource {
     Repository { url: String },
     Local { path: String },
@@ -46,7 +46,7 @@ pub enum ConflictResolution {
 }
 
 /// Unified package
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UnifiedPackage {
     pub name: String,
     pub version: String,
@@ -103,7 +103,7 @@ impl UnifiedPackage {
 // =========================================================================
 
 /// Description of Debian / APT Control Manifest (.deb / dpkg parity)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AptDebManifest {
     pub package: String,
     pub version: String,
@@ -114,7 +114,7 @@ pub struct AptDebManifest {
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PacmanPkgbuild {
     pub pkgname: String,
     pub pkgver: String,
@@ -126,7 +126,7 @@ pub struct PacmanPkgbuild {
 }
 
 /// Description of Snapcraft YAML Manifest (Ubuntu Snap squashfs parity)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SnapcraftManifest {
     pub name: String,
     pub version: String,
@@ -137,7 +137,7 @@ pub struct SnapcraftManifest {
 }
 
 /// Description of Flatpak Metadata Manifest (Flatpak Sandboxed Sandbox parity)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FlatpakManifest {
     pub id: String,
     pub runtime: String,
@@ -148,7 +148,7 @@ pub struct FlatpakManifest {
 }
 
 /// APT Repository Source Configuration (sources.list / apt-get parity)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AptRepoConfig {
     pub sourcelist_url: String,
     pub suite: String,
@@ -157,7 +157,7 @@ pub struct AptRepoConfig {
 }
 
 /// DNF Repository Configuration (.repo files / dnf/yum parity)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DnfRepoConfig {
     pub repoid: String,
     pub baseurl: String,
@@ -166,7 +166,7 @@ pub struct DnfRepoConfig {
 }
 
 /// AppImage Single-File Executable Container metadata (AppImage runtime parity)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AppImageRuntime {
     pub app_name: String,
     pub signature_offset: u64,
@@ -527,14 +527,14 @@ impl Default for DependencyResolver {
 }
 
 /// Transactional package manager checkpoint
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackageCheckpoint {
     pub checkpoint_id: usize,
     pub installed_keys: Vec<String>,
 }
 
 /// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TransactionalHistory {
     pub checkpoints: Vec<PackageCheckpoint>,
     pub next_checkpoint_id: usize,

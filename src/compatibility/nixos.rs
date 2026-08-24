@@ -1,8 +1,10 @@
+extern crate alloc;
 // SigmaOS NixOS Parity Subsystem
 // Independent, zero-dependency implementations of NixOS core tooling
 // Implements Nix package manager, declarative configuration, and functional package management
 
-use crate::klib::{BTreeMap, Vec, String, ToString};
+use crate::klib::{BTreeMap, Vec};
+use alloc::string::{String, ToString};
 
 // =========================================================================
 // 1. NIX PACKAGE MANAGER (Functional Package Management)

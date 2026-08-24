@@ -9,6 +9,7 @@ pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
@@ -78,18 +79,12 @@ pub use automation::{
     ScriptArgumentRouter,
 };
 pub use compatibility::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
-    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
-    AntiXControlCentre, ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
-    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager,
-    ZorinWindowsAppSupport,
     ApplicationBinary, BinaryFormat, CompatibilityError,
     CompatibilityManager, CompatibilityMode, ContainerRuntime,
-    LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, TargetPlatform, TranslationLayer,
+    TargetPlatform, TranslationLayer,
 };
 pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
+    ContainerError, ContainerID, ContainerInfo,
     ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
     SimpleContainer, SimpleContainerRuntime,
 };
@@ -118,23 +113,16 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use governance::{
-    MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
+    FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
+    DemocraticProposal, DemocraticVoting,
 };
 pub use kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,
-    BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
-    AndroidBroadcastReceiverRegistry,
-    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
-    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
-    Tcb, ThreadState, WorkItem, PAGE_SIZE,
+    BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
+    Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
+    VirtualCpu,
+    IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry,
 };
-pub use kernel::io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};
+pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
@@ -150,22 +138,35 @@ pub use distro::{
     ReleaseStage, SoftwareCertificationProgram,
     BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
     ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
+    NixOSFlakeEngine, FlakeInput, SystemClosure,
+    ArchPacmanHooksManager, PacmanHook, HookWhen, HookAction,
+    VoidRunitSupervisor, RunitService, ServiceState,
+    GentooPortageUseFlagsEngine, PortagePackage,
+    MicroArchLevel, CachyKernelVariant, CpuCapabilities, BoreSchedulerGovernor, CachyPackageRepo,
+    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
+    ArchRepoType,
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
     DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
     RegistryValue, Win32Gdi, WindowsRegistry,
     BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
     TargetArch,
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
     ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings,
-    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
-    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
-    LivepatchPatch, LivepatchManager,
+    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
+    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
+    TimeTravelEngine,
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator,
+    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
+    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
     BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
     Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
     PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitService, RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
+    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
     SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
     SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
     ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
@@ -209,7 +210,7 @@ pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
     PackageRecipe, RecipeError, RecipeManager, SatSolver,
-    Transaction, UniversalPackageAdapterManager,
+    Transaction,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
@@ -234,7 +235,7 @@ pub mod init {
 pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
 pub use ai::next_gen::{
-    AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType,
+    AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType,
     EnergyGovernorMode, ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator,
     WorkloadType,
 };

@@ -1,8 +1,10 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 //! Ready-to-Use OS Usability Primitives
 //! Linux & BSD-inspired Service Supervision, Mount Management, User Session Environment, and Hotplug PnP Hardware Driver Binding.
 
-use crate::klib::{HashMap, String, Vec};
+use crate::klib::{HashMap, Vec};
+use alloc::string::String;
 
 /// Service execution state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -279,7 +279,7 @@ impl SystemdEngine {
         self.current_target.load(Ordering::SeqCst)
     }
 
-    pub fn topological_sort(&self, unit_ids: &Vec<UnitID>) -> Result<Vec<UnitID>, &'static str> {
+    pub fn topological_sort(&self, unit_ids: &SystemdVec<UnitID>) -> Result<SystemdVec<UnitID>, &'static str> {
         let mut sorted = Vec::new();
         let mut visiting = Vec::new();
         let mut visited = Vec::new();
@@ -549,7 +549,7 @@ impl SystemdEngine {
         }
     }
 
-    pub fn systemd_analyze_blame(&self) -> Vec<(UnitID, u64)> {
+    pub fn systemd_analyze_blame(&self) -> SystemdVec<(UnitID, u64)> {
         let mut blame_list = Vec::new();
         for unit in self.units.iter() {
             if unit.state == UnitState::Active {
@@ -581,13 +581,13 @@ impl SystemdEngine {
     }
 }
 
-pub struct Vec<T> {
+pub struct SystemdVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T: PartialEq> Vec<T> {
+impl<T: PartialEq> SystemdVec<T> {
     pub fn contains(&self, item: &T) -> bool {
         for i in 0..self.len {
             unsafe {
@@ -600,9 +600,9 @@ impl<T: PartialEq> Vec<T> {
     }
 }
 
-impl<T: Clone> Clone for Vec<T> {
+impl<T: Clone> Clone for SystemdVec<T> {
     fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
+        let mut new_vec = SystemdVec::new();
         for item in self.iter() {
             new_vec.push(item.clone());
         }
@@ -610,9 +610,9 @@ impl<T: Clone> Clone for Vec<T> {
     }
 }
 
-impl<T> Vec<T> {
+impl<T> SystemdVec<T> {
     pub fn new() -> Self {
-        Vec {
+        SystemdVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -700,7 +700,7 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
+impl<T> core::ops::Index<usize> for SystemdVec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {
         if index >= self.len {
@@ -710,7 +710,7 @@ impl<T> core::ops::Index<usize> for Vec<T> {
     }
 }
 
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
+impl<T> core::ops::IndexMut<usize> for SystemdVec<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         if index >= self.len {
             panic!("index out of bounds");
@@ -719,7 +719,7 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
+impl<T> Drop for SystemdVec<T> {
     fn drop(&mut self) {
         if self.capacity > 0 && !self.data.is_null() {
             unsafe {
@@ -733,7 +733,7 @@ impl<T> Drop for Vec<T> {
 }
 
 pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
+    vec: &'a SystemdVec<T>,
     index: usize,
 }
 
@@ -838,7 +838,7 @@ mod tests {
         engine.register_unit(b);
         engine.register_unit(c);
 
-        let mut ids = Vec::new();
+        let mut ids = SystemdVec::new();
         ids.push(3);
         ids.push(2);
         ids.push(1);
@@ -858,7 +858,7 @@ mod tests {
         engine_cycle.register_unit(u1);
         engine_cycle.register_unit(u2);
 
-        let mut cycle_ids = Vec::new();
+        let mut cycle_ids = SystemdVec::new();
         cycle_ids.push(10);
         cycle_ids.push(20);
 
@@ -965,7 +965,7 @@ mod tests {
         engine.register_unit(network);
         engine.register_unit(multi_user);
 
-        let mut ids = Vec::new();
+        let mut ids = SystemdVec::new();
         ids.push(3);
         ids.push(2);
         ids.push(1);

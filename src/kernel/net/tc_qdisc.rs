@@ -16,11 +16,13 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
-use crate::klib::VecDeque;
-use std::string::{String, ToString};
+use crate::klib::collections::VecDeque;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// A network packet in the qdisc layer (simplified)

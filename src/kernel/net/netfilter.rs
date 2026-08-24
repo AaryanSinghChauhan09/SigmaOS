@@ -16,8 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 /// SigmaOS Netfilter — stateless and stateful packet filtering
 /// Absorbs Linux netfilter hooks: PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING
 /// Supports: ACCEPT, DROP, REJECT, LOG actions; conntrack state matching

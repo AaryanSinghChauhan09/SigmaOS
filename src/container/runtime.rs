@@ -669,6 +669,7 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 
 pub mod oci {
+    extern crate alloc;
     use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
     use alloc::string::String;

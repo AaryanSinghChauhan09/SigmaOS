@@ -5,7 +5,7 @@ pub mod runtime;
 pub mod oci_orchestrator;
 
 pub use runtime::{
-    Container, ContainerCapability, ContainerID, ContainerInfo, ContainerRuntime,
+    Container, ContainerID, ContainerInfo, ContainerRuntime,
     ContainerState, RuntimeCapability, RuntimeStats, SimpleContainer, SimpleContainerRuntime,
 };
 pub use oci_runtime::ContainerError;

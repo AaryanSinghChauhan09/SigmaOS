@@ -9,7 +9,43 @@ use crate::klib::collections::HashMap;
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use crate::package::universal::{FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
+
+/// Description of Arch Linux PKGBUILD Manifest (pacman parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PacmanPkgbuild {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub arch: Vec<String>,
+    pub depends: Vec<String>,
+    pub makedepends: Vec<String>,
+    pub source_urls: Vec<String>,
+}
+
+/// Description of Snapcraft Manifest (snap parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub description: String,
+    pub confinement: String,
+    pub grade: String,
+    pub apps: Vec<String>,
+    pub plugs: Vec<String>,
+}
+
+/// Description of Flatpak Manifest (flatpak parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FlatpakManifest {
+    pub id: String,
+    pub runtime: String,
+    pub runtime_version: String,
+    pub sdk: String,
+    pub command: String,
+    pub finish_args: Vec<String>,
+}
+
 
 #[derive(Debug, Clone)]
 pub enum AdapterError {

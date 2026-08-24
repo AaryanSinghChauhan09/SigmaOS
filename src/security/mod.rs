@@ -72,5 +72,5 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+pub use vulnerability::{VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload, PenetrationAssistant};
 pub use forensics::*;

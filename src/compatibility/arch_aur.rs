@@ -1,8 +1,10 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
-//! Arch Linux & AUR Compatibility Subsystem
-//! Pacman/AUR package dependency resolution, PKGBUILD tar.zst payload extraction, and Archiso OverlayFS liveboot builder.
+/// Arch Linux & AUR Compatibility Subsystem
+/// Pacman/AUR package dependency resolution, PKGBUILD tar.zst payload extraction, and Archiso OverlayFS liveboot builder.
 
-use crate::klib::{HashMap, String, Vec};
+use crate::klib::{HashMap, Vec};
+use alloc::string::String;
 
 /// Arch Linux Package Metadata
 #[derive(Debug, Clone)]
