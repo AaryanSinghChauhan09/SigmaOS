@@ -50,10 +50,18 @@ pub struct ScheduledProcess {
     pub full_slice_depletions: u64,
     pub voluntary_yields: u64,
     pub interactive_score: i32,
+    pub posix_rt_priority: u8, // POSIX SCHED_RR real-time priority (1..99, 99 highest)
 }
 
 impl ScheduledProcess {
     pub fn new(process: Process) -> Self {
+        let posix_rt_priority = match process.priority {
+            Priority::Realtime => 99,
+            Priority::High => 70,
+            Priority::Normal => 50,
+            Priority::Low => 20,
+            Priority::Idle => 1,
+        };
         Self {
             process,
             context: CpuContext::new(),
@@ -63,6 +71,7 @@ impl ScheduledProcess {
             full_slice_depletions: 0,
             voluntary_yields: 0,
             interactive_score: 0,
+            posix_rt_priority,
         }
     }
 
@@ -149,16 +158,36 @@ impl RoundRobinScheduler {
         Ok(())
     }
 
+    /// POSIX SCHED_RR scheduling with strict static priority tier preemption
     pub fn schedule_on_cpu(&mut self, cpu_id: u8) -> Option<&Process> {
         if self.processes.is_empty() {
             return None;
         }
 
+        // Find highest POSIX RT priority level among ready tasks on this CPU
+        let mut highest_prio = 0u8;
+        for entry in &self.processes {
+            let is_affinity_matched = (entry.cpu_affinity & (1 << cpu_id)) != 0;
+            if entry.process.state == ProcessState::Ready && is_affinity_matched {
+                if entry.posix_rt_priority > highest_prio {
+                    highest_prio = entry.posix_rt_priority;
+                }
+            }
+        }
+
+        if highest_prio == 0 {
+            return None;
+        }
+
+        // Round-robin selection among tasks with highest_prio
         let start_index = self.current_index;
         loop {
             let entry = &self.processes[self.current_index];
             let is_affinity_matched = (entry.cpu_affinity & (1 << cpu_id)) != 0;
-            if entry.process.state == ProcessState::Ready && is_affinity_matched {
+            if entry.process.state == ProcessState::Ready
+                && is_affinity_matched
+                && entry.posix_rt_priority == highest_prio
+            {
                 return Some(&self.processes[self.current_index].process);
             }
             self.current_index = (self.current_index + 1) % self.processes.len();
@@ -166,6 +195,39 @@ impl RoundRobinScheduler {
                 return None;
             }
         }
+    }
+
+    /// POSIX sched_rr_get_interval(2) parity: returns time quantum in ticks for a given PID
+    pub fn sched_rr_get_interval(&self, pid: u64) -> Option<u64> {
+        self.processes
+            .iter()
+            .find(|e| e.process.pid == pid)
+            .map(|e| e.time_slice_ticks(self.config.time_slice))
+    }
+
+    /// FreeBSD ULE/4BSD style interactivity score decay over time
+    pub fn decay_interactivity_scores(&mut self) {
+        for entry in &mut self.processes {
+            if entry.interactive_score > 0 {
+                entry.interactive_score -= 1;
+            } else if entry.interactive_score < 0 {
+                entry.interactive_score += 1;
+            }
+        }
+    }
+
+    /// Linux/FreeBSD SMP load balancer: migrates a ready process to balance CPU load
+    pub fn balance_cpu_load(&mut self, source_cpu: u8, target_cpu: u8) -> bool {
+        for entry in &mut self.processes {
+            let matches_source = (entry.cpu_affinity & (1 << source_cpu)) != 0;
+            let matches_target = (entry.cpu_affinity & (1 << target_cpu)) != 0;
+            if entry.process.state == ProcessState::Ready && matches_source && matches_target {
+                // Re-pin process to target CPU
+                entry.cpu_affinity = 1 << target_cpu;
+                return true;
+            }
+        }
+        false
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
@@ -430,5 +492,53 @@ mod tests {
         let p_penalized = &scheduler.processes[0];
         assert!(p_penalized.interactive_score < 0);
         assert!(p_penalized.full_slice_depletions > 0);
+    }
+
+    #[test]
+    fn test_posix_sched_rr_static_priority_preemption() {
+        let mut scheduler = RoundRobinScheduler::new();
+        let p_low = Process::new(10, "normal_task".to_string(), Priority::Normal);
+        let p_high = Process::new(20, "realtime_task".to_string(), Priority::Realtime);
+
+        scheduler.add_process(p_low).unwrap();
+        scheduler.add_process(p_high).unwrap();
+
+        // POSIX SCHED_RR Realtime priority (99) strictly preempts Normal priority (50)
+        let scheduled = scheduler.schedule_on_cpu(0).unwrap();
+        assert_eq!(scheduled.pid, 20);
+        assert_eq!(scheduled.priority, Priority::Realtime);
+    }
+
+    #[test]
+    fn test_sched_rr_get_interval() {
+        let mut scheduler = RoundRobinScheduler::new();
+        let p1 = Process::new(1, "norm".to_string(), Priority::Normal);
+        let p2 = Process::new(2, "rt".to_string(), Priority::Realtime);
+
+        scheduler.add_process(p1).unwrap();
+        scheduler.add_process(p2).unwrap();
+
+        let quantum_norm = scheduler.sched_rr_get_interval(1).unwrap();
+        let quantum_rt = scheduler.sched_rr_get_interval(2).unwrap();
+
+        // Realtime priority gets 8x base slice (80), Normal gets 2x base slice (20)
+        assert_eq!(quantum_norm, 20);
+        assert_eq!(quantum_rt, 80);
+    }
+
+    #[test]
+    fn test_interactivity_decay_and_load_balancing() {
+        let mut scheduler = RoundRobinScheduler::new();
+        let p1 = Process::new(1, "task1".to_string(), Priority::Normal);
+        scheduler.add_process(p1).unwrap();
+
+        // Boost interactive score then decay it
+        scheduler.processes[0].interactive_score = 5;
+        scheduler.decay_interactivity_scores();
+        assert_eq!(scheduler.processes[0].interactive_score, 4);
+
+        // SMP load balancing migration
+        assert!(scheduler.balance_cpu_load(0, 1));
+        assert_eq!(scheduler.processes[0].cpu_affinity, 1 << 1);
     }
 }
