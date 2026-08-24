@@ -4,7 +4,10 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
+#[cfg(not(test))]
 use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 #[cfg(test)]
 use std::time::{SystemTime, UNIX_EPOCH};

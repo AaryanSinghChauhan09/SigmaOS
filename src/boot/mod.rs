@@ -20,3 +20,10 @@ pub use uefi::{
     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
 };
 pub use sigma_boot::{BootEntry, BootManager, BootTheme};
+pub use firmware::{
+    CpuMicrocodePatchEngine, EfiVariable, EfiVariableStore, EsrtEntry, EsrtFirmwareType,
+    FirmwareCapsuleUpdateManager, IommuArchitecture, IommuFirmwareEngine, MicrocodeHeader,
+    MicrocodeVendor, SmbiosFirmwareParser, SmbiosType0BiosInfo, SmbiosType1SystemInfo,
+    SmbiosType2BaseboardInfo, SmbiosType3ChassisInfo, EFI_GLOBAL_VARIABLE_GUID,
+    SECURITY_DATABASE_GUID, efi_attr,
+};

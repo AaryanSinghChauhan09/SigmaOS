@@ -20,7 +20,6 @@ mod unveil;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
 
-<<<<<<< HEAD
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 
@@ -29,14 +28,12 @@ mod eevdf;
 
 #[path = "../src/memory/tlb_associative.rs"]
 mod tlb_associative;
-=======
 
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
@@ -134,7 +131,7 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
     kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-        image_path: PathBuf::from("/var/lib/images/rootfs.qcow2"),
+        image_path: "/var/lib/images/rootfs.qcow2".to_string(),
         read_only: false,
         direct_io: true,
         queue_size: 256,
@@ -159,10 +156,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[test]
 fn test_kernel_classic_algorithms_inspection() {
     use eevdf::{EevdfScheduler, Task, ComputeUnit};
@@ -183,12 +176,6 @@ fn test_kernel_classic_algorithms_inspection() {
     assert_eq!(translated, Ok(0x50));
     assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
 }
-<<<<<<< HEAD
-=======
-
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
-
 
 #[test]
 fn test_zenith_desktop_applets_and_themes_inspection() {
@@ -212,4 +199,58 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     theme_mgr.apply_preset(ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.current_preset, ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
+}
+
+#[test]
+fn test_linux_bsd_firmware_innovations_inspection() {
+    use firmware::{
+        EfiVariableStore, CpuMicrocodePatchEngine, MicrocodeVendor,
+        FirmwareCapsuleUpdateManager, CapsuleUpdateStatus, SmbiosFirmwareParser,
+        IommuFirmwareEngine, IommuArchitecture, EFI_GLOBAL_VARIABLE_GUID,
+    };
+
+    // 1. UEFI NVRAM Variable Management (Linux efivarfs & FreeBSD efivar(8))
+    let mut efivars = EfiVariableStore::new();
+    assert!(efivars.get_variable("BootOrder", EFI_GLOBAL_VARIABLE_GUID).is_some());
+    efivars.set_variable("FastBoot", EFI_GLOBAL_VARIABLE_GUID, 7, &[0x01]);
+    assert_eq!(efivars.get_variable("FastBoot", EFI_GLOBAL_VARIABLE_GUID).unwrap().data, &[0x01]);
+    let manifest = efivars.export_efivarfs_manifest();
+    assert!(manifest.contains("BootOrder"));
+
+    // 2. CPU Microcode Patch Engine (Intel/AMD ucode & FreeBSD cpuctl(4))
+    let mut ucode_engine = CpuMicrocodePatchEngine::new(2);
+    let mut raw_intel = vec![0u8; 48];
+    raw_intel[0..4].copy_from_slice(&1u32.to_le_bytes());
+    raw_intel[4..8].copy_from_slice(&0x000000B0u32.to_le_bytes());
+    raw_intel[32..36].copy_from_slice(&2048u32.to_le_bytes());
+
+    let intel_hdr = ucode_engine.parse_intel_header(&raw_intel).unwrap();
+    assert_eq!(intel_hdr.vendor, MicrocodeVendor::Intel);
+    assert!(ucode_engine.apply_microcode_update(0, intel_hdr));
+    assert_eq!(ucode_engine.get_core_patch_level(0), Some(0x000000B0));
+
+    // 3. FWUPD / UEFI ESRT Capsule Manager
+    let mut capsule_mgr = FirmwareCapsuleUpdateManager::new();
+    let mut capsule_payload = vec![0u8; 32];
+    capsule_payload[0..11].copy_from_slice(b"CAPSULE_SIG");
+    capsule_payload[12..16].copy_from_slice(&0x02010000u32.to_le_bytes());
+
+    let sys_guid = "3b61b360-1e5b-4227-b50a-8d184713e2f5";
+    assert!(capsule_mgr.stage_capsule_payload(sys_guid, &capsule_payload).is_ok());
+    assert_eq!(capsule_mgr.current_status, CapsuleUpdateStatus::Staged);
+    assert!(capsule_mgr.process_reboot_capsules());
+    assert_eq!(capsule_mgr.current_status, CapsuleUpdateStatus::UpdateSuccess);
+
+    // 4. SMBIOS / DMI Firmware Parser
+    let mut smbios = SmbiosFirmwareParser::new();
+    assert!(smbios.parse_smbios_entry_point(b"_SM_123456789012"));
+    assert_eq!(smbios.bios_info.unwrap().vendor, "SigmaOS Sovereign Core UEFI");
+
+    // 5. IOMMU ACPI DMAR / IVRS Controller
+    let mut iommu = IommuFirmwareEngine::new();
+    let mut dmar_header = vec![0u8; 40];
+    dmar_header[0..4].copy_from_slice(b"DMAR");
+    assert!(iommu.parse_acpi_dmar(&dmar_header));
+    assert_eq!(iommu.architecture, IommuArchitecture::IntelVtD);
+    assert!(iommu.is_preboot_dma_protected);
 }
