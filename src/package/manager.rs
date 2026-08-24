@@ -43,6 +43,8 @@ pub struct SimplePackage {
     pub id: PackageID,
     pub name: [u8; 64],
     pub version: [u8; 32],
+    pub name_len: u8,
+    pub version_len: u8,
     pub state: AtomicUsize,
 }
 
@@ -60,6 +62,8 @@ impl SimplePackage {
             id,
             name: name_array,
             version: version_array,
+            name_len: name_len as u8,
+            version_len: version_len as u8,
             state: AtomicUsize::new(PackageState::Available as usize),
         }
     }
@@ -68,14 +72,12 @@ impl SimplePackage {
 impl Package for SimplePackage {
     fn id(&self) -> PackageID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        &self.name[..self.name_len as usize]
     }
     fn version(&self) -> &[u8] {
-        let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.version[..len]
+        &self.version[..self.version_len as usize]
     }
-    fn state(&self) -> PackageState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> PackageState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) } }
 }
 
 pub trait PackageManager {
@@ -246,5 +248,20 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_package_caching() {
+        let pkg = SimplePackage::new(1, b"curl", b"8.1.0");
+        assert_eq!(pkg.id(), 1);
+        assert_eq!(pkg.name(), b"curl");
+        assert_eq!(pkg.version(), b"8.1.0");
+        assert_eq!(pkg.name_len, 4);
+        assert_eq!(pkg.version_len, 5);
     }
 }
