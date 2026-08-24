@@ -22,6 +22,7 @@ pub mod message;
 pub mod unix_socket;
 pub mod signals;
 pub mod async_io;
+pub mod std_streams;
 
 pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
@@ -39,4 +40,9 @@ pub use signals::{
 
 pub use async_io::{
     AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, SubmissionQueueEntry,
+};
+
+pub use std_streams::{
+    StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
+    STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
 };

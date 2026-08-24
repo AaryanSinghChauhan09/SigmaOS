@@ -116,6 +116,10 @@ pub use filesystem::{
 pub use governance::{
     MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
 };
+pub use ipc::{
+    StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
+    STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
+};
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
     ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,

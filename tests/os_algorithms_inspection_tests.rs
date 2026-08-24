@@ -39,6 +39,9 @@ mod access_control;
 #[path = "../src/sigpkg/multi_distro.rs"]
 mod multi_distro;
 
+#[path = "../src/ipc/std_streams.rs"]
+mod std_streams;
+
 use structures::{
     AdvancedAlgorithmsManager, EdfTask, LotteryTask,
 };
@@ -285,4 +288,37 @@ fn test_multi_distro_package_manager_algorithm_inspection() {
     let xbps = XbpsCasExtractor::new();
     let hash = xbps.compute_cas_hash(b"test archive payload");
     assert!(xbps.verify_rsa_signature(b"test archive payload", &hash));
+}
+
+#[test]
+fn test_standard_streams_controller_algorithm_inspection() {
+    use std_streams::{
+        StandardStreamController, StreamBufferMode, STDOUT_FILENO, STDERR_FILENO,
+    };
+
+    let mut controller = StandardStreamController::new();
+
+    // 1. Verify standard streams initial setup
+    assert!(controller.handles.contains_key(&0)); // stdin
+    assert!(controller.handles.contains_key(&1)); // stdout
+    assert!(controller.handles.contains_key(&2)); // stderr
+
+    // 2. Unbuffered stderr output
+    let stderr_data = controller.write_to_fd(STDERR_FILENO, b"kernel warning").unwrap();
+    assert_eq!(stderr_data, b"kernel warning");
+
+    // 3. Line buffered stdout output
+    let partial = controller.write_to_fd(STDOUT_FILENO, b"line 1").unwrap();
+    assert_eq!(partial.len(), 0);
+    let flushed = controller.write_to_fd(STDOUT_FILENO, b"\n").unwrap();
+    assert_eq!(flushed, b"line 1\n");
+
+    // 4. POSIX dup2 file descriptor redirection
+    let dup_fd = controller.dup2(STDOUT_FILENO, 100).unwrap();
+    assert_eq!(dup_fd, 100);
+
+    // 5. OpenBSD pledge stdio enforcement
+    assert!(controller.validate_pledge_stdio().is_ok());
+    controller.active_pledges.clear();
+    assert!(controller.validate_pledge_stdio().is_err());
 }
