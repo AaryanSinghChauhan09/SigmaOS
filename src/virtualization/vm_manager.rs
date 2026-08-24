@@ -5,6 +5,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::collections::HashMap;
+use alloc::format;
 
 #[cfg(test)]
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -944,14 +945,14 @@ impl Default for QemuMonitorEngine {
 
 /// OOP-based Virtual Machine Manager
 pub struct VmManager {
-    backend: Box<dyn HypervisorBackend>,
+    backend: alloc::boxed::Box<dyn HypervisorBackend>,
     vms: HashMap<String, VmConfig>,
     snapshots: HashMap<String, VmSnapshot>,
     auto_start_enabled: bool,
 }
 
 impl VmManager {
-    pub fn new(backend: Box<dyn HypervisorBackend>) -> Self {
+    pub fn new(backend: alloc::boxed::Box<dyn HypervisorBackend>) -> Self {
         Self {
             backend,
             vms: HashMap::new(),
@@ -1024,10 +1025,7 @@ impl VmManager {
             VmSnapshot {
                 id: snapshot_id.clone(),
                 name: name.to_string(),
-                created_at: SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                created_at: 0,
                 snapshot_path: String::from("/var/lib/vm/snapshots/") + &snapshot_id,
             },
         );
@@ -1135,7 +1133,7 @@ impl VmManager {
 
 impl Default for VmManager {
     fn default() -> Self {
-        Self::new(Box::new(QemuBackend::new())).with_auto_start(false)
+        Self::new(alloc::boxed::Box::new(QemuBackend::new())).with_auto_start(false)
     }
 }
 

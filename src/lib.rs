@@ -122,6 +122,22 @@ pub use kernel::{
     Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
     VirtualCpu,
     IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry,
+    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,
+    BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
+    AndroidBroadcastReceiverRegistry,
+    AuditBlock, CircularDoublyLinkedList, CpuArchitectureClass,
+    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
+    InstructionCyclePhase, InterruptClass, IoWaitProfile, Irql,
+    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask,
+    MemoryDescriptorList, Pcb, PolicyMechanismCoordinator, PoolType,
+    ProcessorInitState, SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
+    Tcb, ThreadState, WorkItem,
+    KernelFastPacketEngine, FastPacketFrame, XdpAction,
+    KernelAccessController, LandlockPathRule, LandlockAccessRight,
+    InteractiveHybridScheduler, HybridTask,
+    CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
+    MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{
