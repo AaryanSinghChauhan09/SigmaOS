@@ -212,7 +212,6 @@ pub struct PolicyRule {
     pub permission: String,
 }
 
-pub struct AppArmorManager;
 pub struct AppArmorProfile;
 pub enum ObjectType { File, Directory }
 pub struct SecurityLabel;

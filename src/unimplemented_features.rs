@@ -675,6 +675,265 @@ impl SovereignIpcBus {
     }
 }
 
+// ============================================================================
+// SECTION 7: LINUX & BSD DISTRO PARITY & UNIMPLEMENTED IDEAS ENGINE
+// ============================================================================
+
+/// Fedora Silverblue / rpm-ostree Immutable OS Deployment State
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OstreeDeploymentState {
+    Staged,
+    Active,
+    RollbackTarget,
+}
+
+/// OSTree Deployment Commit Representation
+#[derive(Debug, Clone)]
+pub struct OstreeCommit {
+    pub treesum: [u8; 32],
+    pub version: String,
+    pub timestamp: u64,
+    pub layered_packages: Vec<String>,
+}
+
+/// Fedora rpm-ostree Immutable Deployment Manager
+pub struct RpmOstreeDeployEngine {
+    pub deployments: Vec<(OstreeCommit, OstreeDeploymentState)>,
+    pub current_active_index: Option<usize>,
+}
+
+impl RpmOstreeDeployEngine {
+    pub fn new() -> Self {
+        Self {
+            deployments: Vec::new(),
+            current_active_index: None,
+        }
+    }
+
+    pub fn stage_commit(&mut self, treesum: [u8; 32], version: &str, timestamp: u64) -> usize {
+        let commit = OstreeCommit {
+            treesum,
+            version: version.to_string(),
+            timestamp,
+            layered_packages: Vec::new(),
+        };
+        self.deployments.push((commit, OstreeDeploymentState::Staged));
+        self.deployments.len() - 1
+    }
+
+    pub fn add_layered_package(&mut self, index: usize, pkg_name: &str) -> bool {
+        if let Some((commit, _)) = self.deployments.get_mut(index) {
+            commit.layered_packages.push(pkg_name.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn switch_active_deployment(&mut self, index: usize) -> bool {
+        if index >= self.deployments.len() {
+            return false;
+        }
+
+        if let Some(prev) = self.current_active_index {
+            if prev < self.deployments.len() {
+                self.deployments[prev].1 = OstreeDeploymentState::RollbackTarget;
+            }
+        }
+
+        self.deployments[index].1 = OstreeDeploymentState::Active;
+        self.current_active_index = Some(index);
+        true
+    }
+
+    pub fn rollback(&mut self) -> Option<usize> {
+        let rollback_idx = self.deployments.iter().position(|(_, state)| *state == OstreeDeploymentState::RollbackTarget)?;
+        self.switch_active_deployment(rollback_idx);
+        Some(rollback_idx)
+    }
+}
+
+/// Netplan Interface Type
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NetplanInterfaceType {
+    Ethernet,
+    WiFi,
+    Bridge,
+    Bond,
+}
+
+/// Netplan Interface Definition
+#[derive(Debug, Clone)]
+pub struct NetplanInterface {
+    pub name: String,
+    pub if_type: NetplanInterfaceType,
+    pub dhcp4: bool,
+    pub addresses: Vec<String>,
+    pub gateway4: Option<String>,
+    pub nameservers: Vec<String>,
+}
+
+/// Ubuntu Netplan & Cloud-Init Declarative Configuration Engine
+pub struct NetplanConfigEngine {
+    pub interfaces: Vec<NetplanInterface>,
+    pub cloud_init_hostname: Option<String>,
+    pub cloud_init_ssh_keys: Vec<String>,
+}
+
+impl NetplanConfigEngine {
+    pub fn new() -> Self {
+        Self {
+            interfaces: Vec::new(),
+            cloud_init_hostname: None,
+            cloud_init_ssh_keys: Vec::new(),
+        }
+    }
+
+    pub fn add_interface(&mut self, iface: NetplanInterface) {
+        self.interfaces.push(iface);
+    }
+
+    pub fn set_cloud_init(&mut self, hostname: &str, ssh_keys: &[&str]) {
+        self.cloud_init_hostname = Some(hostname.to_string());
+        self.cloud_init_ssh_keys = ssh_keys.iter().map(|s| s.to_string()).collect();
+    }
+
+    pub fn render_systemd_networkd_config(&self, iface_name: &str) -> Option<String> {
+        let iface = self.interfaces.iter().find(|i| i.name == iface_name)?;
+        let dhcp_str = if iface.dhcp4 { "yes" } else { "no" };
+        Some(format!("[Match]\nName={}\n\n[Network]\nDHCP={}\n", iface.name, dhcp_str))
+    }
+}
+
+/// Multi-Architecture Target Matrix
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ArchitectureTarget {
+    X86_64,
+    AArch64,
+    I386,
+    RiscV64,
+}
+
+/// Debian Apt Repository Pin Preference Rule
+#[derive(Debug, Clone)]
+pub struct AptPinRule {
+    pub package_pattern: String,
+    pub release_channel: String,
+    pub priority_score: i32,
+}
+
+/// Debian Apt Multi-Arch & Priority Pinning Resolver
+pub struct MultiArchAptPinningResolver {
+    pub supported_architectures: Vec<ArchitectureTarget>,
+    pub pin_rules: Vec<AptPinRule>,
+}
+
+impl MultiArchAptPinningResolver {
+    pub fn new(native_arch: ArchitectureTarget) -> Self {
+        Self {
+            supported_architectures: vec![native_arch],
+            pin_rules: Vec::new(),
+        }
+    }
+
+    pub fn enable_foreign_architecture(&mut self, arch: ArchitectureTarget) {
+        if !self.supported_architectures.contains(&arch) {
+            self.supported_architectures.push(arch);
+        }
+    }
+
+    pub fn add_pin_rule(&mut self, rule: AptPinRule) {
+        self.pin_rules.push(rule);
+    }
+
+    pub fn evaluate_pin_priority(&self, pkg_name: &str, release: &str) -> i32 {
+        let mut highest = 500;
+        for rule in &self.pin_rules {
+            if (rule.package_pattern == "*" || rule.package_pattern == pkg_name) && rule.release_channel == release {
+                if rule.priority_score > highest {
+                    highest = rule.priority_score;
+                }
+            }
+        }
+        highest
+    }
+}
+
+/// Arch Linux PKGBUILD Build Pipeline Runner
+#[derive(Debug, Clone)]
+pub struct PkgBuildSpec {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgrel: u32,
+    pub source_url: String,
+    pub sha256_sum: [u8; 32],
+    pub build_commands: Vec<String>,
+}
+
+pub struct PkgBuildChrootRunner {
+    pub build_root: String,
+    pub clean_chroot: bool,
+}
+
+impl PkgBuildChrootRunner {
+    pub fn new(build_root: &str) -> Self {
+        Self {
+            build_root: build_root.to_string(),
+            clean_chroot: true,
+        }
+    }
+
+    pub fn execute_build(&self, spec: &PkgBuildSpec) -> Result<String, &'static str> {
+        if spec.pkgname.is_empty() || spec.pkgver.is_empty() {
+            return Err("Invalid PKGBUILD specification");
+        }
+        let artifact_name = format!("{}-{}-{}-x86_64.pkg.tar.zst", spec.pkgname, spec.pkgver, spec.pkgrel);
+        Ok(artifact_name)
+    }
+}
+
+/// OpenBSD CARP State Machine Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CarpState {
+    Init,
+    Backup,
+    Master,
+}
+
+/// OpenBSD CARP & pf Firewall High Availability Synchronizer
+pub struct BsdCarpFailoverEngine {
+    pub vhid: u8,
+    pub advbase: u8,
+    pub advskew: u8,
+    pub current_state: CarpState,
+    pub state_table_sync_count: u64,
+}
+
+impl BsdCarpFailoverEngine {
+    pub fn new(vhid: u8, advbase: u8, advskew: u8) -> Self {
+        Self {
+            vhid,
+            advbase,
+            advskew,
+            current_state: CarpState::Init,
+            state_table_sync_count: 0,
+        }
+    }
+
+    pub fn handle_advertisement(&mut self, peer_advskew: u8) {
+        // Lower advskew indicates higher master priority in OpenBSD CARP protocol
+        if peer_advskew < self.advskew {
+            self.current_state = CarpState::Backup;
+        } else {
+            self.current_state = CarpState::Master;
+        }
+    }
+
+    pub fn sync_pf_state_entry(&mut self) {
+        self.state_table_sync_count += 1;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -762,5 +1021,71 @@ mod tests {
 
         let rollback_merkle = ledger.rollback_last_transaction().unwrap();
         assert_eq!(rollback_merkle, 0x1000200030004000);
+    }
+
+    #[test]
+    fn test_section_7_distro_parity_innovations() {
+        // 1. Fedora rpm-ostree
+        let mut ostree = RpmOstreeDeployEngine::new();
+        let idx0 = ostree.stage_commit([1u8; 32], "6.8.0-sigma", 1700000000);
+        ostree.add_layered_package(idx0, "htop");
+        assert!(ostree.switch_active_deployment(idx0));
+        assert_eq!(ostree.deployments[idx0].1, OstreeDeploymentState::Active);
+
+        let idx1 = ostree.stage_commit([2u8; 32], "6.8.1-sigma", 1700000100);
+        assert!(ostree.switch_active_deployment(idx1));
+        assert_eq!(ostree.deployments[idx0].1, OstreeDeploymentState::RollbackTarget);
+        assert_eq!(ostree.rollback(), Some(idx0));
+
+        // 2. Ubuntu Netplan & Cloud-init
+        let mut netplan = NetplanConfigEngine::new();
+        netplan.add_interface(NetplanInterface {
+            name: "eth0".to_string(),
+            if_type: NetplanInterfaceType::Ethernet,
+            dhcp4: true,
+            addresses: vec![],
+            gateway4: None,
+            nameservers: vec!["1.1.1.1".to_string()],
+        });
+        netplan.set_cloud_init("sigma-server-1", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."]);
+        let rendered = netplan.render_systemd_networkd_config("eth0").unwrap();
+        assert!(rendered.contains("Name=eth0"));
+        assert!(rendered.contains("DHCP=yes"));
+
+        // 3. Debian Apt Pinning & Multiarch
+        let mut apt = MultiArchAptPinningResolver::new(ArchitectureTarget::X86_64);
+        apt.enable_foreign_architecture(ArchitectureTarget::I386);
+        assert_eq!(apt.supported_architectures.len(), 2);
+        apt.add_pin_rule(AptPinRule {
+            package_pattern: "*".to_string(),
+            release_channel: "experimental".to_string(),
+            priority_score: 990,
+        });
+        assert_eq!(apt.evaluate_pin_priority("libc6", "experimental"), 990);
+        assert_eq!(apt.evaluate_pin_priority("libc6", "stable"), 500);
+
+        // 4. Arch Linux PKGBUILD runner
+        let runner = PkgBuildChrootRunner::new("/var/lib/sigma_chroot");
+        let pkg_spec = PkgBuildSpec {
+            pkgname: "sigma-tool".to_string(),
+            pkgver: "1.0.0".to_string(),
+            pkgrel: 1,
+            source_url: "https://sigmaos.org/src.tar.gz".to_string(),
+            sha256_sum: [0u8; 32],
+            build_commands: vec!["cargo build --release".to_string()],
+        };
+        let artifact = runner.execute_build(&pkg_spec).unwrap();
+        assert_eq!(artifact, "sigma-tool-1.0.0-1-x86_64.pkg.tar.zst");
+
+        // 5. OpenBSD CARP & pf sync
+        let mut carp = BsdCarpFailoverEngine::new(1, 1, 100);
+        assert_eq!(carp.current_state, CarpState::Init);
+        carp.handle_advertisement(150); // peer skew 150 > local skew 100 -> local higher priority
+        assert_eq!(carp.current_state, CarpState::Master);
+
+        carp.handle_advertisement(50); // peer skew 50 < local skew 100 -> peer higher priority
+        assert_eq!(carp.current_state, CarpState::Backup);
+        carp.sync_pf_state_entry();
+        assert_eq!(carp.state_table_sync_count, 1);
     }
 }
