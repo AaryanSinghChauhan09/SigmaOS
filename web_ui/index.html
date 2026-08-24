@@ -83,21 +83,21 @@
                 <p class="panel-desc">Choose the physical disk drive to use for SigmaOS installation.</p>
 
                 <div class="disk-list" role="radiogroup" aria-label="Select Target Disk">
-                    <div class="disk-card active" onclick="selectDisk(this, 'sda')" role="radio" aria-checked="true" tabindex="0">
+                    <div class="disk-card active" onclick="selectDisk(this, 'sda')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="true" tabindex="0">
                         <div class="disk-icon">💾</div>
                         <div class="disk-info">
                             <span class="disk-name">/dev/sda - Sovereign Primary NVMe SSD</span>
                             <span class="disk-meta">Size: 512 GB | Detected OS: Windows 11 Pro, Debian Linux 12</span>
                         </div>
                     </div>
-                    <div class="disk-card" onclick="selectDisk(this, 'sdb')" role="radio" aria-checked="false" tabindex="0">
+                    <div class="disk-card" onclick="selectDisk(this, 'sdb')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
                         <div class="disk-icon">💾</div>
                         <div class="disk-info">
                             <span class="disk-name">/dev/sdb - Auxiliary Block Storage</span>
                             <span class="disk-meta">Size: 1 TB | Interface: USB4 / Thunderbolt</span>
                         </div>
                     </div>
-                    <div class="disk-card" onclick="selectDisk(this, 'vdisk')" role="radio" aria-checked="false" tabindex="0">
+                    <div class="disk-card" onclick="selectDisk(this, 'vdisk')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
                         <div class="disk-icon">🖥️</div>
                         <div class="disk-info">
                             <span class="disk-name">/dev/vdisk - Sandboxed Virtual VM Drive</span>
@@ -114,7 +114,7 @@
 
                 <div class="mode-list" role="radiogroup" aria-label="Partitioning Mode">
                     <!-- Option 1: Install Alongside (Dual-Boot) -->
-                    <div class="mode-card active" id="mode-card-dual" onclick="selectInstallMode(this, 'dual')" role="radio" aria-checked="true" tabindex="0">
+                    <div class="mode-card active" id="mode-card-dual" onclick="selectInstallMode(this, 'dual')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="true" tabindex="0">
                         <div class="mode-header">
                             <span class="mode-icon">🔀</span>
                             <div class="mode-title">
@@ -136,7 +136,7 @@
                     </div>
 
                     <!-- Option 2: Erase Disk (Clean Install) -->
-                    <div class="mode-card" id="mode-card-clean" onclick="selectInstallMode(this, 'clean')" role="radio" aria-checked="false" tabindex="0">
+                    <div class="mode-card" id="mode-card-clean" onclick="selectInstallMode(this, 'clean')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
                         <div class="mode-header">
                             <span class="mode-icon">🗑️</span>
                             <div class="mode-title">
@@ -147,7 +147,7 @@
                     </div>
 
                     <!-- Option 3: Custom Partitioning -->
-                    <div class="mode-card" id="mode-card-custom" onclick="selectInstallMode(this, 'custom')" role="radio" aria-checked="false" tabindex="0">
+                    <div class="mode-card" id="mode-card-custom" onclick="selectInstallMode(this, 'custom')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
                         <div class="mode-header">
                             <span class="mode-icon">⚙️</span>
                             <div class="mode-title">
@@ -264,6 +264,13 @@
         const totalSteps = 6;
         let selectedDiskId = 'sda';
         let selectedInstallMode = 'dual';
+
+        function handleCardKeydown(event, element) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                element.click();
+            }
+        }
 
         function selectDisk(element, diskId) {
             document.querySelectorAll('.disk-card').forEach(card => {
