@@ -298,7 +298,7 @@ Priority: optional"#;
     #[test]
     fn test_apt_repository_manager() {
         let mut manager = AptRepositoryManager::new();
-        let sources = "deb http://archive.ubuntu.com/ubuntu/ focal main restricted";
+        let sources = "deb https://archive.ubuntu.com/ubuntu/ focal main restricted";
         
         manager.parse_sources_list(sources).unwrap();
         assert_eq!(manager.sources.len(), 1);

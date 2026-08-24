@@ -11,6 +11,20 @@ use crate::klib::collections::HashMap;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use crate::package::universal::{FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
 
+#[derive(Debug, Clone)]
+pub enum AdapterError {
+    ParseError(String),
+    ValidationError(String),
+    UnsupportedFormat(String),
+}
+
+/// Permission structure for package format validation
+#[derive(Debug, Clone)]
+pub struct Permission {
+    pub name: String,
+    pub description: String,
+}
+
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
     fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
@@ -21,7 +35,8 @@ pub trait PackageFormatAdapter {
     fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> { Ok(Vec::new()) }
 }
 
-pub type UniversalPackageAdapter = UniversalPackageManager;
+/// Use universal_oop_system::UniversalPackageManager instead
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -31,15 +46,6 @@ pub enum PackagePriority {
     Important = 2,
     Required = 3,
     Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
-
-pub trait PackageFormatAdapter {
-    fn format_name(&self) -> &str;
-    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError>;
-    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> { Err(AdapterError::ParseError("Unsupported".to_string())) }
-    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> { Ok(true) }
-    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> { Ok(Vec::new()) }
-    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> { Ok(()) }
 }
 
 #[derive(Debug, Clone)]

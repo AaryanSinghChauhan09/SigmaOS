@@ -47,3 +47,4 @@ pub mod vec;
 pub use vec::Vec;
 pub use btreemap::BTreeMap;
 pub use hashmap::HashMap;
+pub use string::SigmaString;
