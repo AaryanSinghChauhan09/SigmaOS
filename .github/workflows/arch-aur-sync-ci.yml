@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+
+permissions:
+  contents: read
 jobs:
   validate-aur-pkgbuild:
     name: Pacman Engine & AUR Helper Test Suite
