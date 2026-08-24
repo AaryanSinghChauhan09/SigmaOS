@@ -249,7 +249,7 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::TooLong);
     }
     let mut octet_count = 0u8;
-    let mut octet_val: u16 = 0;
+    let mut octet_val: u32 = 0;
     let mut octet_len = 0u8;
     for &b in addr {
         if b == b'.' {
@@ -260,8 +260,11 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
             octet_val = 0;
             octet_len = 0;
         } else if b.is_ascii_digit() {
-            octet_val = octet_val * 10 + (b - b'0') as u16;
+            octet_val = octet_val.saturating_mul(10).saturating_add((b - b'0') as u32);
             octet_len += 1;
+            if octet_len > 3 {
+                return Err(ValidationError::OutOfRange);
+            }
         } else {
             return Err(ValidationError::InvalidChars);
         }
@@ -424,6 +427,8 @@ mod tests {
         assert!(validate_ipv4(b"0.0.0.0").is_ok());
         assert!(validate_ipv4(b"255.255.255.255").is_ok());
         assert!(validate_ipv4(b"256.0.0.1").is_err());
+        assert!(validate_ipv4(b"65536.0.0.1").is_err());
+        assert!(validate_ipv4(b"99999.0.0.1").is_err());
         assert!(validate_ipv4(b"192.168.1").is_err());
     }
 
