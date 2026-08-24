@@ -5,7 +5,8 @@
 
 extern crate alloc;
 
-use crate::klib::{Vec, String, BTreeMap, HashSet};
+use crate::klib::{Vec, BTreeMap, HashSet};
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::string::String;
 use core::time::Duration;

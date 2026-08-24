@@ -19,7 +19,7 @@
 use core::sync::atomic::{AtomicU32, Ordering};
 /// SigmaOS Softirq and tasklets deferred execution engine
 /// Handles lower-priority interrupt bottom-half processing
-use crate::klib::VecDeque;
+use crate::klib::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SoftirqType {

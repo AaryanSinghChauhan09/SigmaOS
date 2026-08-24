@@ -435,10 +435,6 @@ pub struct X86RootkitAuditor {
 }
 
 
-pub fn io_attach_device_to_device_stack(source_device: &mut DeviceObject, target_device: &mut DeviceObject) -> Option<DeviceObject> {
-    source_device.attached_device = Some(Box::new(target_device.clone()));
-    Some(target_device.clone())
-}
 
 impl X86RootkitAuditor {
     pub fn audit_device_stack(&self, _dev: &DeviceObject, _allowed: &[&str]) -> Result<(), &'static str> { Ok(()) }

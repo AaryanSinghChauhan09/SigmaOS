@@ -24,7 +24,6 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
-pub mod parity;
 pub mod arch;
 pub mod cachy;
 

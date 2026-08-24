@@ -23,7 +23,7 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux drivers/input/serio/i8042.c and AT keyboard driver
 /// Handles: scancode sets 1/2/3, XT compatibility, PS/2 mouse Intellimouse protocol
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::VecDeque;
+use crate::klib::vec::Vec;
 use alloc::vec::Vec;
 
 /// i8042 PS/2 controller I/O ports

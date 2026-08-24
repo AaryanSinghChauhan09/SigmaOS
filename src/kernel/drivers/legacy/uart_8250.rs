@@ -24,7 +24,7 @@ use crate::kernel::subsystems::registry::{
 /// Supports: 8250, 8250A, 16450, 16550, 16550A, 16750, 16950 UARTs
 /// COM1–COM4, baud rates 50–4,000,000, 5–8 data bits, 1–2 stop bits, parity
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::VecDeque;
+use crate::klib::vec::Vec;
 use alloc::vec::Vec;
 
 /// Standard COM port I/O bases and IRQs

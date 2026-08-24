@@ -1,7 +1,8 @@
 // SigmaOS Wireshark Parity Implementation
 // Implements network packet capture, analysis, and protocol dissection
 
-use crate::klib::{String, Vec};
+use crate::klib::{Vec};
+use alloc::string::{String, ToString};
 use core::cell::Cell;
 
 /// Packet capture interface

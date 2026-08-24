@@ -22,7 +22,7 @@
 use std::collections::VecDeque;
 
 #[cfg(not(test))]
-use crate::klib::VecDeque;
+use crate::klib::vec::Vec;
 
 extern crate alloc;
 use alloc::string::String;

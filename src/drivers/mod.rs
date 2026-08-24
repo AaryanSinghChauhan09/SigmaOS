@@ -19,7 +19,6 @@ pub mod storage;
 pub mod touch_jingos;
 
 // Exposing additional audio, printer, wifi drivers
-pub mod legacy_parallel_printer;
 
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};

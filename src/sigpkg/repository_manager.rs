@@ -1,7 +1,8 @@
 //! Repository Management System (Debian APT + Arch Pacman Inspiration)
 //! Manages package repositories, mirrors, and metadata
 
-use crate::klib::{BTreeMap, Vec, String};
+use crate::klib::{BTreeMap, Vec};
+use alloc::string::{String, ToString};
 use crate::sigpkg::{Package, Version, VersionConstraint};
 
 /// Repository configuration (Debian sources.list inspiration)

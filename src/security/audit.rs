@@ -10,13 +10,6 @@ use crate::klib::Vec;
 
 pub type EventID = usize;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogFormat {
-    Text,
-    Json,
-    Binary,
-}
-
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
@@ -28,6 +21,7 @@ pub enum EventType {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogFormat {
+    Text,
     PlainText,
     Json,
     Binary,
@@ -193,17 +187,16 @@ impl SimpleAuditPolicy {
 }
 
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
-        let compliant = if self.require_authentication.load(Ordering::SeqCst) == 1 {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
+        if self.require_authentication.load(Ordering::SeqCst) == 1 {
             event.event_type() == EventType::Authentication
         } else {
             true
-        };
-        Ok(compliant)
+        }
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event)? {
+        if self.check_compliance(event) {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)

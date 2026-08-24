@@ -3,7 +3,8 @@
 //! Linuxulator syscall translation, FreeBSD kqueue EVFILT multiplexing, OpenBSD pledge/unveil filtering, ProcFS, and ELF auxv loader.
 
 use crate::klib::BTreeMap as HashMap;
-use crate::klib::{String, Vec};
+use crate::klib::{Vec};
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TargetDistro {

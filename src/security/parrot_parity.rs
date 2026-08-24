@@ -3,7 +3,7 @@
 
 use core::cell::Cell;
 extern crate alloc;
-use crate::klib::SigmaString;
+use alloc::string::String;
 
 /// Routing modes for network traffic
 #[repr(usize)]

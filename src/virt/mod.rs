@@ -3,7 +3,8 @@
 //! VirtIO virtqueues, live migration, and nested virtualization
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{String, ToString, Vec};
+use crate::klib::{Vec};
+use alloc::string::{String, ToString};
 
 #[cfg(feature = "standalone_test")]
 extern crate alloc;

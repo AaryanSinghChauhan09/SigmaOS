@@ -204,7 +204,7 @@ impl AIAgentManager for SimpleAIAgentManager {
 }
 
 #[cfg(test)]
-mod tests {
+mod agent_tests {
     use super::*;
 
     #[test]
@@ -344,7 +344,7 @@ impl Default for ModelMarketplace {
 }
 
 #[cfg(test)]
-mod tests {
+mod marketplace_tests {
     use super::*;
 
     #[test]

@@ -1,7 +1,8 @@
 // SigmaOS BSD Parity Implementation
 // Implements OpenBSD/FreeBSD security features and system management
 
-use crate::klib::{String, Vec};
+use crate::klib::{Vec};
+use alloc::string::{String, ToString};
 use core::cell::Cell;
 
 /// OpenBSD pledge/unveil security system

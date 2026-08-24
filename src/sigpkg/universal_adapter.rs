@@ -6,48 +6,11 @@ use crate::klib::collections::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::Permission;
 
-pub trait PackageFormatAdapter {
-    fn format_name(&self) -> &str;
-    fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
-    fn parse_package(&self, raw: &[u8]) -> Result<Package, String> { self.parse_manifest(raw) }
-    fn validate_permissions(&self, raw: &[u8]) -> Result<Vec<Permission>, String>;
-    fn validate(&self, _raw: &[u8]) -> Result<bool, String> { Ok(true) }
-    fn process_hook(&self, _hook: &str) -> Result<(), String> { Ok(()) }
-    fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> { Ok(Vec::new()) }
-}
-
-#[derive(Debug, Clone)]
-pub struct PacmanPkgbuild {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub depends: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String,
-    pub plugs: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FlatpakManifest {
-    pub id: String,
-    pub app_id: String,
-    pub command: String,
-    pub finish_args: Vec<String>,
-}
-
-pub type UniversalPackageAdapter = UniversalPackageManager;
-
 /// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-pub use crate::package::universal::{FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -57,6 +20,12 @@ pub enum PackagePriority {
     Important = 2,
     Required = 3,
     Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AdapterError {
+    ParseError(String),
+    ValidationError(String),
 }
 
 pub trait PackageFormatAdapter {
@@ -95,6 +64,7 @@ pub struct SnapcraftManifest {
 
 #[derive(Debug, Clone)]
 pub struct FlatpakManifest {
+    pub id: String,
     pub app_id: String,
     pub command: String,
     pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"

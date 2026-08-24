@@ -5,7 +5,8 @@
 
 extern crate alloc;
 
-use crate::klib::{Vec, String};
+use crate::klib::{Vec};
+use alloc::string::{String, ToString};
 
 /// Command
 #[derive(Debug, Clone)]

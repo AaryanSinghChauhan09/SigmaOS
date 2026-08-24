@@ -353,7 +353,7 @@ impl MkinitcpioBuilder {
     }
 
     pub fn build_initramfs_image(&self, kernel_version: &str) -> crate::klib::Vec<u8> {
-        let mut image_header = crate::klib::SigmaString::from(format!(
+        let mut image_header = alloc::string::String::from(format!(
             "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
             kernel_version, self.hooks, self.compression
         ))
@@ -451,19 +451,19 @@ impl SAbsSimdCompiler {
 
 #[derive(Debug, Clone)]
 pub struct MakepkgBuilder {
-    pub pkgname: crate::klib::SigmaString,
-    pub pkgver: crate::klib::SigmaString,
-    pub arch: crate::klib::SigmaString,
-    pub expected_sha256: crate::klib::SigmaString,
+    pub pkgname: alloc::string::String,
+    pub pkgver: alloc::string::String,
+    pub arch: alloc::string::String,
+    pub expected_sha256: alloc::string::String,
 }
 
 impl MakepkgBuilder {
     pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
         Self {
-            pkgname: crate::klib::SigmaString::from(pkgname),
-            pkgver: crate::klib::SigmaString::from(pkgver),
-            arch: crate::klib::SigmaString::from(arch),
-            expected_sha256: crate::klib::SigmaString::from(expected_sha256),
+            pkgname: alloc::string::String::from(pkgname),
+            pkgver: alloc::string::String::from(pkgver),
+            arch: alloc::string::String::from(arch),
+            expected_sha256: alloc::string::String::from(expected_sha256),
         }
     }
 
@@ -472,17 +472,17 @@ impl MakepkgBuilder {
         for &b in source_data {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
         }
-        let computed = crate::klib::SigmaString::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256 || self.expected_sha256 == crate::klib::SigmaString::from("SKIP")
+        let computed = alloc::string::String::from(format!("{:016x}", checksum));
+        computed == self.expected_sha256 || self.expected_sha256 == alloc::string::String::from("SKIP")
     }
 
-    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(crate::klib::SigmaString, crate::klib::Vec<u8>), &'static str> {
+    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(alloc::string::String, crate::klib::Vec<u8>), &'static str> {
         if !self.verify_source_integrity(source_data) {
             return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
 
-        let archive_name = crate::klib::SigmaString::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
-        let mut archive_content = crate::klib::SigmaString::from(format!(
+        let archive_name = alloc::string::String::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
+        let mut archive_content = alloc::string::String::from(format!(
             "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
             self.pkgname, self.pkgver, self.arch
         ))
