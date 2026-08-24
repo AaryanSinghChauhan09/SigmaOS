@@ -372,6 +372,7 @@ pub struct Jbd2TransactionLedger {
     pub journal: [Option<TransactionBlock>; JOURNAL_CAPACITY],
     pub merkle_nodes: [MerkleJournalNode; JOURNAL_CAPACITY],
     pub head_ptr: usize,
+    pub initial_merkle_root: u64,
     pub current_merkle_root: u64,
     pub active_transaction_count: usize,
 }
@@ -382,6 +383,7 @@ impl Jbd2TransactionLedger {
             journal: [None; JOURNAL_CAPACITY],
             merkle_nodes: [MerkleJournalNode { transaction_id: 0, merkle_root_hash: initial_merkle_root }; JOURNAL_CAPACITY],
             head_ptr: 0,
+            initial_merkle_root,
             current_merkle_root: initial_merkle_root,
             active_transaction_count: 0,
         }
@@ -448,7 +450,7 @@ impl Jbd2TransactionLedger {
         self.active_transaction_count -= 1;
 
         if self.active_transaction_count == 0 {
-            self.current_merkle_root = self.merkle_nodes[0].merkle_root_hash;
+            self.current_merkle_root = self.initial_merkle_root;
         } else {
             let last_valid_ptr = if self.head_ptr == 0 {
                 JOURNAL_CAPACITY - 1
