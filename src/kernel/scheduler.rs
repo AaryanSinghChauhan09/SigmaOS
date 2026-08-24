@@ -300,14 +300,11 @@ impl Scheduler {
     }
 }
 
-<<<<<<< HEAD
 impl Default for Scheduler {
     fn default() -> Self {
         Self::new()
     }
 }
-=======
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
     tasks: [Option<Task>; 64],
