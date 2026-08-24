@@ -145,6 +145,223 @@ impl NohangOomGuard {
     }
 }
 
+impl Default for ZenInteractivityGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Default for TimeshiftBtrfsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 5. Garuda Performance Tuning Profile Manager
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GarudaTuningProfile {
+    GamingMode,
+    UltraLowLatency,
+    WorkstationThroughput,
+    BatterySaver,
+}
+
+pub struct GarudaTuningProfileManager {
+    pub current_profile: GarudaTuningProfile,
+    pub vfs_cache_pressure: AtomicUsize,
+    pub dirty_ratio: AtomicUsize,
+    pub swappiness: AtomicUsize,
+    pub sched_slice_us: AtomicUsize,
+    pub cpu_governor_performance: AtomicBool,
+}
+
+impl GarudaTuningProfileManager {
+    pub fn new() -> Self {
+        Self {
+            current_profile: GarudaTuningProfile::UltraLowLatency,
+            vfs_cache_pressure: AtomicUsize::new(50),
+            dirty_ratio: AtomicUsize::new(10),
+            swappiness: AtomicUsize::new(100),
+            sched_slice_us: AtomicUsize::new(1000), // 1ms
+            cpu_governor_performance: AtomicBool::new(true),
+        }
+    }
+
+    pub fn apply_profile(&mut self, profile: GarudaTuningProfile) {
+        self.current_profile = profile;
+        match profile {
+            GarudaTuningProfile::GamingMode => {
+                self.vfs_cache_pressure.store(20, Ordering::SeqCst);
+                self.dirty_ratio.store(5, Ordering::SeqCst);
+                self.swappiness.store(150, Ordering::SeqCst);
+                self.sched_slice_us.store(500, Ordering::SeqCst); // 0.5ms ultra responsive
+                self.cpu_governor_performance.store(true, Ordering::SeqCst);
+            }
+            GarudaTuningProfile::UltraLowLatency => {
+                self.vfs_cache_pressure.store(30, Ordering::SeqCst);
+                self.dirty_ratio.store(8, Ordering::SeqCst);
+                self.swappiness.store(100, Ordering::SeqCst);
+                self.sched_slice_us.store(1000, Ordering::SeqCst);
+                self.cpu_governor_performance.store(true, Ordering::SeqCst);
+            }
+            GarudaTuningProfile::WorkstationThroughput => {
+                self.vfs_cache_pressure.store(100, Ordering::SeqCst);
+                self.dirty_ratio.store(20, Ordering::SeqCst);
+                self.swappiness.store(60, Ordering::SeqCst);
+                self.sched_slice_us.store(5000, Ordering::SeqCst); // 5ms throughput
+                self.cpu_governor_performance.store(false, Ordering::SeqCst);
+            }
+            GarudaTuningProfile::BatterySaver => {
+                self.vfs_cache_pressure.store(150, Ordering::SeqCst);
+                self.dirty_ratio.store(30, Ordering::SeqCst);
+                self.swappiness.store(10, Ordering::SeqCst);
+                self.sched_slice_us.store(10000, Ordering::SeqCst); // 10ms power efficient
+                self.cpu_governor_performance.store(false, Ordering::SeqCst);
+            }
+        }
+    }
+}
+
+impl Default for GarudaTuningProfileManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 6. IRQ Balance & P-Core/E-Core Affinity Optimizer
+// ==========================================
+
+pub struct IrqBalanceOptimizer {
+    pub p_core_mask: u64,
+    pub e_core_mask: u64,
+    pub irq_count: AtomicUsize,
+}
+
+impl IrqBalanceOptimizer {
+    pub fn new(p_core_mask: u64, e_core_mask: u64) -> Self {
+        Self {
+            p_core_mask,
+            e_core_mask,
+            irq_count: AtomicUsize::new(0),
+        }
+    }
+
+    /// Selects optimal CPU core affinity mask for an IRQ based on real-time latency needs
+    pub fn assign_irq_affinity(&self, irq_number: u32, is_high_priority_device: bool) -> u64 {
+        self.irq_count.fetch_add(1, Ordering::SeqCst);
+        let _ = irq_number;
+        if is_high_priority_device {
+            self.p_core_mask // Route NVMe/GPU/Wi-Fi IRQs to P-cores
+        } else {
+            self.e_core_mask // Route background timer/USB IRQs to E-cores
+        }
+    }
+}
+
+// ==========================================
+// 7. Garuda Auto-Nice & Process Priority Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessIoClass {
+    Realtime,
+    BestEffort,
+    Idle,
+}
+
+pub struct GarudaAutoNiceRule {
+    pub process_name: &'static str,
+    pub nice_value: i32,
+    pub io_class: ProcessIoClass,
+}
+
+pub struct GarudaAutoNiceEngine {
+    pub rules: [GarudaAutoNiceRule; 4],
+}
+
+impl GarudaAutoNiceEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: [
+                GarudaAutoNiceRule { process_name: "steam", nice_value: -10, io_class: ProcessIoClass::Realtime },
+                GarudaAutoNiceRule { process_name: "pipewire", nice_value: -15, io_class: ProcessIoClass::Realtime },
+                GarudaAutoNiceRule { process_name: "obs", nice_value: -8, io_class: ProcessIoClass::BestEffort },
+                GarudaAutoNiceRule { process_name: "baloo", nice_value: 19, io_class: ProcessIoClass::Idle },
+            ],
+        }
+    }
+
+    pub fn lookup_rule(&self, name: &str) -> Option<(i32, ProcessIoClass)> {
+        for rule in &self.rules {
+            if rule.process_name == name {
+                return Some((rule.nice_value, rule.io_class));
+            }
+        }
+        None
+    }
+}
+
+impl Default for GarudaAutoNiceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 8. Garuda GPU Performance Governor
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpuPowerState {
+    PerformanceHigh,
+    BalancedMedium,
+    PowerSaveLow,
+}
+
+pub struct GarudaGpuPerformanceGovernor {
+    pub current_state: GpuPowerState,
+    pub clock_mhz: AtomicUsize,
+    pub fan_curve_percent: AtomicUsize,
+}
+
+impl GarudaGpuPerformanceGovernor {
+    pub fn new() -> Self {
+        Self {
+            current_state: GpuPowerState::BalancedMedium,
+            clock_mhz: AtomicUsize::new(1500),
+            fan_curve_percent: AtomicUsize::new(50),
+        }
+    }
+
+    pub fn set_power_state(&mut self, state: GpuPowerState) {
+        self.current_state = state;
+        match state {
+            GpuPowerState::PerformanceHigh => {
+                self.clock_mhz.store(2400, Ordering::SeqCst);
+                self.fan_curve_percent.store(85, Ordering::SeqCst);
+            }
+            GpuPowerState::BalancedMedium => {
+                self.clock_mhz.store(1500, Ordering::SeqCst);
+                self.fan_curve_percent.store(50, Ordering::SeqCst);
+            }
+            GpuPowerState::PowerSaveLow => {
+                self.clock_mhz.store(800, Ordering::SeqCst);
+                self.fan_curve_percent.store(25, Ordering::SeqCst);
+            }
+        }
+    }
+}
+
+impl Default for GarudaGpuPerformanceGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -191,5 +408,55 @@ mod tests {
 
         assert!(guard.kill_hung_process(1234));
         assert_eq!(guard.oom_count.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_garuda_tuning_profile_manager() {
+        let mut mgr = GarudaTuningProfileManager::new();
+        assert_eq!(mgr.current_profile, GarudaTuningProfile::UltraLowLatency);
+
+        mgr.apply_profile(GarudaTuningProfile::GamingMode);
+        assert_eq!(mgr.current_profile, GarudaTuningProfile::GamingMode);
+        assert_eq!(mgr.vfs_cache_pressure.load(Ordering::SeqCst), 20);
+        assert_eq!(mgr.sched_slice_us.load(Ordering::SeqCst), 500);
+
+        mgr.apply_profile(GarudaTuningProfile::BatterySaver);
+        assert_eq!(mgr.current_profile, GarudaTuningProfile::BatterySaver);
+        assert_eq!(mgr.vfs_cache_pressure.load(Ordering::SeqCst), 150);
+        assert!(!mgr.cpu_governor_performance.load(Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_irq_balance_optimizer() {
+        let optimizer = IrqBalanceOptimizer::new(0x000F, 0x00F0);
+        let p_core_mask = optimizer.assign_irq_affinity(16, true);
+        assert_eq!(p_core_mask, 0x000F);
+
+        let e_core_mask = optimizer.assign_irq_affinity(17, false);
+        assert_eq!(e_core_mask, 0x00F0);
+        assert_eq!(optimizer.irq_count.load(Ordering::SeqCst), 2);
+    }
+
+    #[test]
+    fn test_garuda_auto_nice_engine() {
+        let auto_nice = GarudaAutoNiceEngine::new();
+        let (nice, io_cls) = auto_nice.lookup_rule("pipewire").unwrap();
+        assert_eq!(nice, -15);
+        assert_eq!(io_cls, ProcessIoClass::Realtime);
+
+        assert!(auto_nice.lookup_rule("nonexistent").is_none());
+    }
+
+    #[test]
+    fn test_garuda_gpu_performance_governor() {
+        let mut gpu = GarudaGpuPerformanceGovernor::new();
+        assert_eq!(gpu.current_state, GpuPowerState::BalancedMedium);
+
+        gpu.set_power_state(GpuPowerState::PerformanceHigh);
+        assert_eq!(gpu.clock_mhz.load(Ordering::SeqCst), 2400);
+        assert_eq!(gpu.fan_curve_percent.load(Ordering::SeqCst), 85);
+
+        gpu.set_power_state(GpuPowerState::PowerSaveLow);
+        assert_eq!(gpu.clock_mhz.load(Ordering::SeqCst), 800);
     }
 }

@@ -1,8 +1,6 @@
 // SigmaOS Kernel-Mode Reverse Engineering & Hooking / Rootkit Subsystem
 // Zero-dependency, #![no_std] compliant kernel structures.
 
-#![no_std]
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;

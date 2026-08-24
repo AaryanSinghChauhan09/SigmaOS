@@ -29,6 +29,7 @@ jobs:
       - name: Rust Security & Memory Safety Audit
         run: |
           echo "Auditing Rust modules for memory leaks, privilege boundaries, and bounds checks..."
+          mkdir -p build
           rustc --test src/security/qubes_isolation.rs -o build/sec_qubes && ./build/sec_qubes
           rustc --test src/security/unveil.rs -o build/sec_unveil && ./build/sec_unveil
           rustc --test src/security/pledge.rs -o build/sec_pledge && ./build/sec_pledge
