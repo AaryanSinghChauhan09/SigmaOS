@@ -216,16 +216,11 @@ impl OverlayFS {
             return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
         }
         self.mounted = true;
-        println!(
-            "OverlayFS mounted successfully: lowerdirs={:?}, upperdir={}, workdir={}",
-            self.lower_dirs, self.upper_dir, self.work_dir
-        );
         Ok(())
     }
 
     pub fn umount(&mut self) {
         self.mounted = false;
-        println!("OverlayFS unmounted successfully.");
     }
 }
 
@@ -246,10 +241,6 @@ pub struct SimpleContainer {
 impl SimpleContainer {
     pub fn execute_syscall(&self, syscall_id: u32) -> Result<(), ContainerError> {
         if self.seccomp.is_syscall_blocked(syscall_id) {
-            println!(
-                "Container Seccomp Violation: Syscall {} is strictly prohibited by security profile",
-                syscall_id
-            );
             return Err(ContainerError::PermissionDenied);
         }
         Ok(())
