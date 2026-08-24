@@ -23,3 +23,7 @@ This journal logs CRITICAL usability enhancements, accessibility standard compli
 ## 2026-08-23 - Clear Threat Action Feedback in Zero-Trust Security Loggers
 **Learning:** In zero-trust network packet filters and routers, printing human-readable threat event summaries (e.g. `ZenithNet: Dropped - Rate limit exceeded on subnet interface`) directly alongside numerical source IPs ensures security audit logs remain instantly interpretable in terminal GUIs and log viewers.
 **Action:** Pair structured error categories with clear, plain-language threat descriptions in forensic audit logs.
+
+## 2026-08-23 - Keyboard Navigation and Focus Rings for Role Radio Selection Cards
+**Learning:** Custom selection cards (such as target disk or partitioning mode selectors) with `role="radio"` and `tabindex="0"` are unreachable by keyboard users unless explicit `Enter`/`Space` keydown event handlers (`handleCardKeydown`) and high-contrast `:focus-visible` outline rings are defined.
+**Action:** Pair custom interactive card components with keydown handlers for `Enter` and `Space` activation and explicit `:focus-visible` styles.

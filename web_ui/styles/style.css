@@ -329,6 +329,11 @@ h2 {
     outline: none;
 }
 
+.disk-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
 .disk-card.active {
     background: rgba(59, 130, 246, 0.08);
     border-color: var(--accent);
@@ -374,6 +379,11 @@ h2 {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.15);
     outline: none;
+}
+
+.mode-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 .mode-card.active {
@@ -621,6 +631,11 @@ h2 {
 }
 
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn:focus-visible, .checkbox-container input:focus-visible ~ .checkmark {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
 
 .btn-primary {
     background-color: var(--accent);
