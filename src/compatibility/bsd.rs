@@ -176,6 +176,131 @@ impl NetBsdRumpKernelRouter {
 }
 
 // =========================================================================
+// FreeBSD GEOM Modular Storage Framework
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeomClassType {
+    Label,
+    Mirror,
+    EliEncryption,
+    Partition,
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomProvider {
+    pub name: String,
+    pub class_type: GeomClassType,
+    pub media_size_bytes: u64,
+    pub sector_size: u32,
+}
+
+pub struct FreeBsdGeomManager {
+    pub providers: BTreeMap<String, GeomProvider>,
+}
+
+impl FreeBsdGeomManager {
+    pub fn new() -> Self {
+        Self {
+            providers: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_provider(
+        &mut self,
+        name: &str,
+        class_type: GeomClassType,
+        size_bytes: u64,
+        sector_size: u32,
+    ) {
+        self.providers.insert(
+            name.to_string(),
+            GeomProvider {
+                name: name.to_string(),
+                class_type,
+                media_size_bytes: size_bytes,
+                sector_size,
+            },
+        );
+    }
+
+    pub fn lookup_provider(&self, name: &str) -> Option<&GeomProvider> {
+        self.providers.get(name)
+    }
+}
+
+impl Default for FreeBsdGeomManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// OpenBSD Pledge & Unveil Sandbox Enforcement Engine
+// =========================================================================
+
+pub struct OpenBsdSandboxGuard {
+    pub promises: BTreeMap<String, bool>,
+    pub unveiled_paths: BTreeMap<String, String>, // path -> permissions (e.g. "r", "rw", "wc")
+    pub is_pledged: bool,
+}
+
+impl OpenBsdSandboxGuard {
+    pub fn new() -> Self {
+        let mut promises = BTreeMap::new();
+        promises.insert("stdio".to_string(), true);
+        promises.insert("rpath".to_string(), true);
+        promises.insert("wpath".to_string(), true);
+        promises.insert("cpath".to_string(), true);
+        promises.insert("inet".to_string(), true);
+
+        Self {
+            promises,
+            unveiled_paths: BTreeMap::new(),
+            is_pledged: false,
+        }
+    }
+
+    pub fn pledge(&mut self, promises_str: &str) -> Result<(), &'static str> {
+        let promised_list: alloc::vec::Vec<&str> = promises_str.split_whitespace().collect();
+        for (promise, enabled) in self.promises.iter_mut() {
+            if !promised_list.contains(&promise.as_str()) {
+                *enabled = false;
+            }
+        }
+        self.is_pledged = true;
+        Ok(())
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        Ok(())
+    }
+
+    pub fn check_permission(&self, category: &str, path: Option<&str>) -> bool {
+        if let Some(enabled) = self.promises.get(category) {
+            if !enabled {
+                return false;
+            }
+        }
+
+        if let Some(target_path) = path {
+            if !self.unveiled_paths.is_empty() {
+                return self.unveiled_paths.contains_key(target_path);
+            }
+        }
+
+        true
+    }
+}
+
+impl Default for OpenBsdSandboxGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS MODULE
 // =========================================================================
 
@@ -237,5 +362,28 @@ mod tests {
     fn test_netbsd_rump_router() {
         assert_eq!(NetBsdRumpKernelRouter::dispatch_hypercall(RumpHypercall::Syscall, 100), 101);
         assert_eq!(NetBsdRumpKernelRouter::dispatch_hypercall(RumpHypercall::MemoryAlloc, 5000), 8192);
+    }
+
+    #[test]
+    fn test_freebsd_geom_manager() {
+        let mut geom = FreeBsdGeomManager::new();
+        geom.register_provider("ada0p1", GeomClassType::Partition, 1073741824, 512);
+
+        let provider = geom.lookup_provider("ada0p1").unwrap();
+        assert_eq!(provider.class_type, GeomClassType::Partition);
+        assert_eq!(provider.media_size_bytes, 1073741824);
+    }
+
+    #[test]
+    fn test_openbsd_sandbox_guard() {
+        let mut guard = OpenBsdSandboxGuard::new();
+        assert!(guard.check_permission("inet", None));
+
+        guard.unveil("/etc", "r").unwrap();
+        assert!(guard.check_permission("rpath", Some("/etc")));
+        assert!(!guard.check_permission("rpath", Some("/var")));
+
+        guard.pledge("stdio rpath").unwrap();
+        assert!(!guard.check_permission("inet", None));
     }
 }
