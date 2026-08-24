@@ -345,6 +345,128 @@ impl Default for RoundRobinScheduler {
     }
 }
 
+// =========================================================================
+// Multi-Queue Linux (SCHED_RR) & BSD (ULE) Inspired Round-Robin Scheduler
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedPolicy {
+    SchedFifo,
+    SchedRr,
+    SchedOther,
+}
+
+#[derive(Debug, Clone)]
+pub struct MultiQueueTask {
+    pub pid: u64,
+    pub name: String,
+    pub policy: SchedPolicy,
+    pub priority: u8, // 0..99 for RT, 100..139 for Normal
+    pub rr_time_slice_ms: u32,
+    pub time_slice_remaining_ms: u32,
+    pub cpu_id: u8,
+    pub state: ProcessState,
+}
+
+pub struct SovereignMultiQueueRoundRobin {
+    pub realtime_queue: Vec<MultiQueueTask>,
+    pub high_queue: Vec<MultiQueueTask>,
+    pub normal_queue: Vec<MultiQueueTask>,
+    pub idle_queue: Vec<MultiQueueTask>,
+    pub num_cpus: u8,
+    pub total_switches: u64,
+}
+
+impl SovereignMultiQueueRoundRobin {
+    pub fn new(num_cpus: u8) -> Self {
+        Self {
+            realtime_queue: Vec::new(),
+            high_queue: Vec::new(),
+            normal_queue: Vec::new(),
+            idle_queue: Vec::new(),
+            num_cpus,
+            total_switches: 0,
+        }
+    }
+
+    pub fn enqueue_task(&mut self, mut task: MultiQueueTask) {
+        task.time_slice_remaining_ms = task.rr_time_slice_ms;
+        if task.priority < 100 {
+            self.realtime_queue.push(task);
+        } else if task.priority < 120 {
+            self.high_queue.push(task);
+        } else if task.priority < 139 {
+            self.normal_queue.push(task);
+        } else {
+            self.idle_queue.push(task);
+        }
+    }
+
+    pub fn pick_next_task(&mut self, cpu_id: u8) -> Option<MultiQueueTask> {
+        self.total_switches += 1;
+
+        // 1. Realtime SCHED_RR / SCHED_FIFO queue
+        if let Some(pos) = self.realtime_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
+            let mut task = self.realtime_queue.remove(pos);
+            if task.policy == SchedPolicy::SchedRr {
+                // Re-enqueue at back of RT queue after picking
+                let mut queued = task.clone();
+                queued.time_slice_remaining_ms = queued.rr_time_slice_ms;
+                self.realtime_queue.push(queued);
+            }
+            return Some(task);
+        }
+
+        // 2. High priority queue
+        if let Some(pos) = self.high_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
+            let task = self.high_queue.remove(pos);
+            let mut queued = task.clone();
+            self.high_queue.push(queued);
+            return Some(task);
+        }
+
+        // 3. Normal queue
+        if let Some(pos) = self.normal_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
+            let task = self.normal_queue.remove(pos);
+            let mut queued = task.clone();
+            self.normal_queue.push(queued);
+            return Some(task);
+        }
+
+        // 4. Idle queue
+        if let Some(pos) = self.idle_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
+            let task = self.idle_queue.remove(pos);
+            let mut queued = task.clone();
+            self.idle_queue.push(queued);
+            return Some(task);
+        }
+
+        None
+    }
+
+    pub fn tick_cpu(&mut self, cpu_id: u8) {
+        for queue in [&mut self.realtime_queue, &mut self.high_queue, &mut self.normal_queue] {
+            for task in queue.iter_mut() {
+                if task.cpu_id == cpu_id && task.state == ProcessState::Running {
+                    if task.time_slice_remaining_ms > 0 {
+                        task.time_slice_remaining_ms -= 1;
+                    }
+                    if task.time_slice_remaining_ms == 0 {
+                        task.time_slice_remaining_ms = task.rr_time_slice_ms;
+                        task.state = ProcessState::Ready;
+                    }
+                }
+            }
+        }
+    }
+}
+
+impl Default for SovereignMultiQueueRoundRobin {
+    fn default() -> Self {
+        Self::new(4)
+    }
+}
+
 /// Scheduler errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SchedulerError {
@@ -540,5 +662,43 @@ mod tests {
         // SMP load balancing migration
         assert!(scheduler.balance_cpu_load(0, 1));
         assert_eq!(scheduler.processes[0].cpu_affinity, 1 << 1);
+    }
+
+    #[test]
+    fn test_sovereign_multi_queue_round_robin() {
+        let mut mq_rr = SovereignMultiQueueRoundRobin::new(2);
+
+        let rt_task = MultiQueueTask {
+            pid: 10,
+            name: "audio_dsp".to_string(),
+            policy: SchedPolicy::SchedRr,
+            priority: 10, // Realtime
+            rr_time_slice_ms: 5,
+            time_slice_remaining_ms: 5,
+            cpu_id: 0,
+            state: ProcessState::Ready,
+        };
+
+        let normal_task = MultiQueueTask {
+            pid: 20,
+            name: "compiler".to_string(),
+            policy: SchedPolicy::SchedOther,
+            priority: 120, // Normal
+            rr_time_slice_ms: 20,
+            time_slice_remaining_ms: 20,
+            cpu_id: 0,
+            state: ProcessState::Ready,
+        };
+
+        mq_rr.enqueue_task(rt_task);
+        mq_rr.enqueue_task(normal_task);
+
+        assert_eq!(mq_rr.realtime_queue.len(), 1);
+        assert_eq!(mq_rr.normal_queue.len(), 1);
+
+        // Realtime SCHED_RR task should be picked first
+        let picked = mq_rr.pick_next_task(0).unwrap();
+        assert_eq!(picked.pid, 10);
+        assert_eq!(picked.policy, SchedPolicy::SchedRr);
     }
 }

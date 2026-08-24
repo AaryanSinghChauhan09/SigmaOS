@@ -86,7 +86,7 @@ jobs:
     - name: Build kernel
       run: |
         cd build
-        ninja kernel
+        ninja
 
     - name: Build userland
       run: |

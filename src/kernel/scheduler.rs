@@ -305,6 +305,7 @@ impl Default for Scheduler {
         Self::new()
     }
 }
+
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
     tasks: [Option<Task>; 64],
