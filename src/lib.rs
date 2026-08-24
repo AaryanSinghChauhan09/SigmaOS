@@ -224,7 +224,7 @@ pub mod init {
 pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
 pub use ai::next_gen::{
-    AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType,
+    AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType,
     EnergyGovernorMode, ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator,
     WorkloadType,
 };

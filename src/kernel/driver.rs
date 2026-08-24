@@ -207,13 +207,35 @@ mod tests {
     use super::*;
 
     struct MockDriver {
+        base: crate::kernel::object::KObject,
         owner: Option<String>,
         debug_level: String,
     }
 
+    impl MockDriver {
+        fn new() -> Self {
+            Self {
+                base: crate::kernel::object::KObject::new("mock_driver"),
+                owner: None,
+                debug_level: "3".to_string(),
+            }
+        }
+    }
+
     impl KernelObject for MockDriver {
-        fn id(&self) -> u64 { 1 }
-        fn name(&self) -> &str { "mock_driver" }
+        fn name(&self) -> &str { self.base.name() }
+        fn set_name(&mut self, name: &str) { self.base.set_name(name); }
+        fn parent(&self) -> Option<&dyn KernelObject> { self.base.parent() }
+        fn set_parent(&mut self, parent: Option<&dyn KernelObject>) { self.base.set_parent(parent); }
+        fn children(&self) -> Vec<&dyn KernelObject> { self.base.children() }
+        fn add_child(&mut self, child: &dyn KernelObject) { self.base.add_child(child); }
+        fn remove_child(&mut self, child_name: &str) -> Option<Box<dyn KernelObject>> { self.base.remove_child(child_name) }
+        fn kref(&self) -> &KRef { self.base.kref() }
+        fn as_any(&self) -> &dyn core::any::Any { self }
+        fn as_any_mut(&mut self) -> &mut dyn core::any::Any { self }
+        fn sysfs_attrs(&self) -> Vec<&str> { self.base.sysfs_attrs() }
+        fn sysfs_show(&self, attr: &str) -> Option<String> { self.base.sysfs_show(attr) }
+        fn sysfs_store(&mut self, attr: &str, value: &str) -> Result<(), crate::kernel::object::ObjectError> { self.base.sysfs_store(attr, value) }
     }
 
     impl Driver for MockDriver {
@@ -247,10 +269,7 @@ mod tests {
 
     #[test]
     fn test_driver_module_params_and_pqc_signing() {
-        let mut drv = MockDriver {
-            owner: None,
-            debug_level: "3".to_string(),
-        };
+        let mut drv = MockDriver::new();
 
         assert!(drv.is_pqc_signed());
         assert_eq!(drv.get_module_param("debug"), Some("3".to_string()));

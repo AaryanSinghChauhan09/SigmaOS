@@ -1,11 +1,6 @@
 // SigmaOS Security Subsystem
 pub mod audit;
 pub mod capability;
-pub mod hardening;
-
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
-};
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;

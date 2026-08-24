@@ -1,4 +1,3 @@
-#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 
@@ -212,13 +211,6 @@ pub struct PolicyRule {
     pub permission: String,
 }
 
-pub struct AppArmorManager;
-pub struct AppArmorProfile;
-pub enum ObjectType { File, Directory }
-pub struct SecurityLabel;
-pub struct SecurityPolicy;
-pub struct SecurityRule;
-pub enum SelinuxPermission { Read, Write, Execute }
 pub type Permission = SelinuxPermission;
 
 pub struct SelinuxEngine {

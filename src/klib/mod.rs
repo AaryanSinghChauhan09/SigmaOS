@@ -1,4 +1,6 @@
 // SigmaOS Kernel Library
+extern crate alloc;
+
 pub mod adt;
 pub mod arc;
 pub mod async_runtime;
@@ -43,17 +45,8 @@ pub mod time_impl;
 pub mod uuid;
 pub mod uvm;
 pub mod vec;
-pub mod btreemap;
-pub mod hashmap;
-pub mod hash;
-pub mod custom_allocator;
-pub mod custom_string;
 
 pub use vec::Vec;
 pub use btreemap::BTreeMap;
 pub use hashmap::HashMap;
-
-pub mod collections {
-    pub use crate::klib::hashmap::HashMap;
-    pub use crate::klib::btreemap::BTreeMap;
-}
+pub use alloc::string::{String, ToString};

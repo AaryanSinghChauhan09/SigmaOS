@@ -1,5 +1,3 @@
-#![no_std]
-
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
@@ -55,6 +53,7 @@ pub enum PowerState {
 pub struct SimpleDevice {
     pub id: DeviceID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub device_class: AtomicUsize,
     pub power_state: PowerState,
     pub capability_token: u64,
@@ -63,13 +62,15 @@ pub struct SimpleDevice {
 impl SimpleDevice {
     pub fn new(id: DeviceID, name: &[u8], device_class: DeviceClass) -> Self {
         let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
+        let len = name.len().min(63);
         unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
+        let name_len = len as u8;
         SimpleDevice {
             id,
             name: name_array,
+            name_len,
             device_class: AtomicUsize::new(device_class as usize),
             power_state: PowerState::D0,
             capability_token: 0,
@@ -82,7 +83,8 @@ impl Device for SimpleDevice {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        // O(1) constant-time slice lookup using pre-computed name_len
+        let len = (self.name_len as usize).min(64);
         &self.name[..len]
     }
     fn device_class(&self) -> DeviceClass {

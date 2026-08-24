@@ -85,13 +85,8 @@ pub mod sigmawin;
 pub mod solid_kernel;
 pub mod sovereign_suite;
 pub mod superiority;
-pub mod open_source_tier1;
-pub mod interim;
-pub mod lubuntu;
-pub mod cross_platform_kernel;
 pub mod wasm_sandbox;
 pub mod tiny_core;
-pub mod sovereign_suite;
 
 pub use gap_closure::{
     KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
@@ -186,6 +181,3 @@ pub use sovereign_suite::{
     CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
-pub use antix::*;
-pub use zorin::*;
-pub use legacy_adapters::*;
