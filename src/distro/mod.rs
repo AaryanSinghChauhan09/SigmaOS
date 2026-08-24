@@ -24,9 +24,15 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
-pub mod parity;
 pub mod arch;
 pub mod cachy;
+
+pub use linux_bsd_parity::{
+    NixOSFlakeEngine, FlakeInput, SystemClosure,
+    ArchPacmanHooksManager, PacmanHook, HookWhen, HookAction,
+    VoidRunitSupervisor, RunitService, ServiceState,
+    GentooPortageUseFlagsEngine, PortagePackage,
+};
 
 pub use cachy::{
     MicroArchLevel, CachyKernelVariant, CpuCapabilities, BoreSchedulerGovernor, CachyPackageRepo,
