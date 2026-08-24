@@ -811,3 +811,309 @@ mod tests {
         assert_eq!(restored, new_bin);
     }
 }
+
+// ============================================================================
+// 10. FreeBSD Capsicum Capability Sandboxed Application Subsystem
+// ============================================================================
+
+/// Rights mask for FreeBSD Capsicum capabilities
+pub const CAP_READ: u64 = 0x0000_0001;
+pub const CAP_WRITE: u64 = 0x0000_0002;
+pub const CAP_SEEK: u64 = 0x0000_0004;
+pub const CAP_FSTAT: u64 = 0x0000_0008;
+pub const CAP_FCNTL: u64 = 0x0000_0010;
+pub const CAP_ACCEPT: u64 = 0x0000_0020;
+
+/// FreeBSD Capsicum Sandboxed Process File Descriptor
+#[derive(Debug, Clone)]
+pub struct CapsicumFd {
+    pub fd: u32,
+    pub path: &'static str,
+    pub rights_mask: u64,
+}
+
+/// FreeBSD Capsicum Sandboxed Application Engine
+#[derive(Debug)]
+pub struct BsdCapsicumSandboxedApp {
+    pub app_name: &'static str,
+    pub pid: u32,
+    pub is_capability_mode: bool,
+    pub descriptors: Vec<CapsicumFd>,
+}
+
+impl BsdCapsicumSandboxedApp {
+    pub fn new(app_name: &'static str, pid: u32) -> Self {
+        Self {
+            app_name,
+            pid,
+            is_capability_mode: false,
+            descriptors: Vec::new(),
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.is_capability_mode = true;
+    }
+
+    pub fn open_descriptor(&mut self, fd: u32, path: &'static str, initial_rights: u64) {
+        if !self.descriptors.iter().any(|d| d.fd == fd) {
+            self.descriptors.push(CapsicumFd {
+                fd,
+                path,
+                rights_mask: initial_rights,
+            });
+        }
+    }
+
+    pub fn limit_rights(&mut self, fd: u32, target_rights: u64) -> Result<(), &'static str> {
+        if let Some(desc) = self.descriptors.iter_mut().find(|d| d.fd == fd) {
+            // Rights can only be monotonically decreased (subsetted)
+            if (target_rights & !desc.rights_mask) != 0 {
+                return Err("CAPSICUM: Cannot expand rights beyond existing capability mask");
+            }
+            desc.rights_mask = target_rights;
+            Ok(())
+        } else {
+            Err("CAPSICUM: Invalid file descriptor")
+        }
+    }
+
+    pub fn check_rights(&self, fd: u32, required_rights: u64) -> bool {
+        if let Some(desc) = self.descriptors.iter().find(|d| d.fd == fd) {
+            (desc.rights_mask & required_rights) == required_rights
+        } else {
+            false
+        }
+    }
+}
+
+// ============================================================================
+// 11. Gentoo Portage Dynamic USE Flag Dependency Solver
+// ============================================================================
+
+/// Gentoo USE flag definition
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UseFlag {
+    pub name: &'static str,
+    pub enabled: bool,
+}
+
+/// Gentoo Portage Package Target
+#[derive(Debug, Clone)]
+pub struct PortagePackage {
+    pub name: &'static str,
+    pub slot: &'static str,
+    pub use_flags: Vec<UseFlag>,
+    pub required_flags: Vec<&'static str>,
+}
+
+/// Gentoo Portage Dynamic USE Flag Solver
+#[derive(Debug)]
+pub struct GentooPortageUseFlagResolver {
+    pub global_use_flags: Vec<UseFlag>,
+    pub installed_packages: Vec<PortagePackage>,
+}
+
+impl GentooPortageUseFlagResolver {
+    pub fn new() -> Self {
+        Self {
+            global_use_flags: Vec::new(),
+            installed_packages: Vec::new(),
+        }
+    }
+
+    pub fn set_global_use_flag(&mut self, flag_name: &'static str, enabled: bool) {
+        if let Some(flag) = self.global_use_flags.iter_mut().find(|f| f.name == flag_name) {
+            flag.enabled = enabled;
+        } else {
+            self.global_use_flags.push(UseFlag {
+                name: flag_name,
+                enabled,
+            });
+        }
+    }
+
+    pub fn register_package(&mut self, package: PortagePackage) {
+        self.installed_packages.push(package);
+    }
+
+    pub fn is_flag_enabled(&self, package_name: &str, flag_name: &str) -> bool {
+        if let Some(pkg) = self.installed_packages.iter().find(|p| p.name == package_name) {
+            if let Some(f) = pkg.use_flags.iter().find(|f| f.name == flag_name) {
+                return f.enabled;
+            }
+        }
+
+        self.global_use_flags
+            .iter()
+            .find(|f| f.name == flag_name)
+            .map(|f| f.enabled)
+            .unwrap_or(false)
+    }
+
+    pub fn resolve_package_dependencies(&self, package_name: &str) -> Result<Vec<&'static str>, &'static str> {
+        if let Some(pkg) = self.installed_packages.iter().find(|p| p.name == package_name) {
+            for &req in &pkg.required_flags {
+                if !self.is_flag_enabled(package_name, req) {
+                    return Err("GENTOO_PORTAGE: Unsatisfied USE flag dependency for package compilation!");
+                }
+            }
+            Ok(pkg.required_flags.clone())
+        } else {
+            Err("GENTOO_PORTAGE: Package not found in Portage tree")
+        }
+    }
+}
+
+impl Default for GentooPortageUseFlagResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 12. Alpine Linux APK Atomic Package Transaction Engine
+// ============================================================================
+
+/// APK Transaction Step State
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ApkTransactionStep {
+    Pending,
+    Unpacking,
+    ExecutingHooks,
+    Committed,
+    RolledBack,
+}
+
+/// APK Package Transaction Record
+#[derive(Debug, Clone)]
+pub struct ApkTransactionRecord {
+    pub package_name: &'static str,
+    pub version: &'static str,
+    pub hash_sum: u64,
+    pub step: ApkTransactionStep,
+}
+
+/// Alpine Linux APK Atomic Transaction Engine
+#[derive(Debug)]
+pub struct AlpineApkAtomicTransactionEngine {
+    pub transaction_id: u64,
+    pub records: Vec<ApkTransactionRecord>,
+    pub is_committed: bool,
+}
+
+impl AlpineApkAtomicTransactionEngine {
+    pub fn new(transaction_id: u64) -> Self {
+        Self {
+            transaction_id,
+            records: Vec::new(),
+            is_committed: false,
+        }
+    }
+
+    pub fn add_step(&mut self, package_name: &'static str, version: &'static str, hash_sum: u64) {
+        self.records.push(ApkTransactionRecord {
+            package_name,
+            version,
+            hash_sum,
+            step: ApkTransactionStep::Pending,
+        });
+    }
+
+    pub fn commit_transaction(&mut self) -> Result<usize, &'static str> {
+        if self.is_committed {
+            return Err("APK_TRANSACTION: Transaction already committed");
+        }
+
+        for rec in &mut self.records {
+            rec.step = ApkTransactionStep::Unpacking;
+            rec.step = ApkTransactionStep::ExecutingHooks;
+            rec.step = ApkTransactionStep::Committed;
+        }
+
+        self.is_committed = true;
+        Ok(self.records.len())
+    }
+
+    pub fn rollback_transaction(&mut self) -> usize {
+        let mut rolled_back = 0;
+        for rec in &mut self.records {
+            if rec.step != ApkTransactionStep::RolledBack {
+                rec.step = ApkTransactionStep::RolledBack;
+                rolled_back += 1;
+            }
+        }
+        self.is_committed = false;
+        rolled_back
+    }
+}
+
+#[cfg(test)]
+mod additional_innovation_tests {
+    use super::*;
+
+    #[test]
+    fn test_bsd_capsicum_sandbox() {
+        let mut app = BsdCapsicumSandboxedApp::new("secure_daemon", 4096);
+        assert!(!app.is_capability_mode);
+
+        app.open_descriptor(3, "/var/log/syslog", CAP_READ | CAP_WRITE | CAP_SEEK);
+        assert!(app.check_rights(3, CAP_READ | CAP_WRITE));
+
+        // Enter Capsicum mode
+        app.enter_capability_mode();
+        assert!(app.is_capability_mode);
+
+        // Limit rights to Read only
+        assert!(app.limit_rights(3, CAP_READ).is_ok());
+        assert!(app.check_rights(3, CAP_READ));
+        assert!(!app.check_rights(3, CAP_WRITE));
+
+        // Attempting to expand rights must fail
+        assert!(app.limit_rights(3, CAP_READ | CAP_WRITE).is_err());
+    }
+
+    #[test]
+    fn test_gentoo_portage_use_flags() {
+        let mut portage = GentooPortageUseFlagResolver::new();
+        portage.set_global_use_flag("pqc", true);
+        portage.set_global_use_flag("lto", true);
+
+        let pkg = PortagePackage {
+            name: "sys-apps/sigma-core",
+            slot: "0",
+            use_flags: vec![UseFlag {
+                name: "systemd",
+                enabled: false,
+            }],
+            required_flags: vec!["pqc", "lto"],
+        };
+
+        portage.register_package(pkg);
+
+        assert!(portage.is_flag_enabled("sys-apps/sigma-core", "pqc"));
+        assert!(!portage.is_flag_enabled("sys-apps/sigma-core", "systemd"));
+
+        let deps = portage.resolve_package_dependencies("sys-apps/sigma-core").unwrap();
+        assert_eq!(deps.len(), 2);
+    }
+
+    #[test]
+    fn test_alpine_apk_atomic_transaction() {
+        let mut apk = AlpineApkAtomicTransactionEngine::new(5001);
+        apk.add_step("musl", "1.2.4", 0x12345678);
+        apk.add_step("busybox", "1.36.1", 0x87654321);
+
+        assert_eq!(apk.records.len(), 2);
+        assert!(!apk.is_committed);
+
+        let committed = apk.commit_transaction().unwrap();
+        assert_eq!(committed, 2);
+        assert!(apk.is_committed);
+
+        // Rollback transaction
+        let rolled_back = apk.rollback_transaction();
+        assert_eq!(rolled_back, 2);
+        assert_eq!(apk.records[0].step, ApkTransactionStep::RolledBack);
+    }
+}
