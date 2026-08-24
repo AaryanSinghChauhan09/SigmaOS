@@ -173,6 +173,7 @@ fn test_kernel_classic_algorithms_inspection() {
     assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
 }
 
+
 #[test]
 fn test_zenith_desktop_applets_and_themes_inspection() {
     use zenith_advanced::{DesktopAppletEngine, DesktopApplet, AppletCategory, ZenithThemePresetManager, ZenithThemePreset};

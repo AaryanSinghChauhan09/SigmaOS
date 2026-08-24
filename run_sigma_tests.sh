@@ -4,6 +4,8 @@
 
 set -e
 
+mkdir -p build
+
 # Linux & BSD ANSI Color Palette
 BOLD="\031[1m"
 GREEN="\033[1;32m"

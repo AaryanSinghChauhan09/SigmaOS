@@ -3,6 +3,7 @@ pub mod device;
 pub mod framework;
 pub mod grid;
 pub mod mapper;
+pub mod pci_bus;
 pub mod pods;
 pub mod vault;
 pub mod rootkit;
@@ -14,6 +15,11 @@ pub mod network_framework;
 pub mod shims;
 pub mod universal_support;
 
+pub use pci_bus::{
+    PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
+    PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity,
+    PcieAspmState, SimulatedPciHardwareAccess,
+};
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use mapper::{DriverMapper, MapperCategory};
 pub use pods::{PeripheralPod, PodType};
