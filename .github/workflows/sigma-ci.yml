@@ -91,7 +91,6 @@ jobs:
     - name: Build userland
       run: |
         cd build
-        ninja userland
 
     - name: Generate ISO
       run: |
