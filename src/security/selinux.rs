@@ -15,6 +15,7 @@ pub enum ObjectType {
     Socket,
     Ipc,
     Capability,
+    Directory,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -25,6 +26,8 @@ pub enum SelinuxPermission {
     Append,
     Transition,
 }
+
+pub type Permission = SelinuxPermission;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SecurityLabel {
@@ -211,15 +214,6 @@ pub struct PolicyRule {
     pub class: String,
     pub permission: String,
 }
-
-pub struct AppArmorManager;
-pub struct AppArmorProfile;
-pub enum ObjectType { File, Directory }
-pub struct SecurityLabel;
-pub struct SecurityPolicy;
-pub struct SecurityRule;
-pub enum SelinuxPermission { Read, Write, Execute }
-pub type Permission = SelinuxPermission;
 
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,
