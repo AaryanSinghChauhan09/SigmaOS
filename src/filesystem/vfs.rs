@@ -14,12 +14,92 @@ pub enum FileType {
     Symlink,
 }
 
-/// File permissions
-#[derive(Debug, Clone, Copy)]
+/// BSD File Flags (inspired by FreeBSD / OpenBSD chflags(2))
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct BsdFileFlags {
+    pub nodump: bool,      // UF_NODUMP: Do not dump file
+    pub immutable: bool,   // UF_IMMUTABLE / SF_IMMUTABLE: File cannot be modified, deleted, renamed
+    pub append_only: bool, // UF_APPEND / SF_APPEND: File can only be written in append mode
+    pub nounlink: bool,    // UF_NOUNLINK / SF_NOUNLINK: File cannot be removed/renamed
+    pub opaque: bool,      // UF_OPAQUE: Directory is opaque when viewed through union mount
+    pub archived: bool,    // SF_ARCHIVED: File is archived
+}
+
+impl BsdFileFlags {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn from_u32(raw: u32) -> Self {
+        Self {
+            nodump: (raw & 0x0001) != 0,
+            immutable: (raw & 0x0002) != 0 || (raw & 0x0002_0000) != 0,
+            append_only: (raw & 0x0004) != 0 || (raw & 0x0004_0000) != 0,
+            opaque: (raw & 0x0008) != 0,
+            nounlink: (raw & 0x0010) != 0 || (raw & 0x0010_0000) != 0,
+            archived: (raw & 0x0001_0000) != 0,
+        }
+    }
+
+    pub fn to_u32(&self) -> u32 {
+        let mut flags = 0u32;
+        if self.nodump { flags |= 0x0001; }
+        if self.immutable { flags |= 0x0002; }
+        if self.append_only { flags |= 0x0004; }
+        if self.opaque { flags |= 0x0008; }
+        if self.nounlink { flags |= 0x0010; }
+        if self.archived { flags |= 0x0001_0000; }
+        flags
+    }
+}
+
+/// POSIX Mode Bits constants (Linux & BSD standard permissions)
+pub mod mode_bits {
+    pub const S_ISUID: u16 = 0o4000; // Set-user-ID on execution
+    pub const S_ISGID: u16 = 0o2000; // Set-group-ID on execution
+    pub const S_ISVTX: u16 = 0o1000; // Sticky bit (restricted deletion)
+
+    pub const S_IRUSR: u16 = 0o0400; // User read
+    pub const S_IWUSR: u16 = 0o0200; // User write
+    pub const S_IXUSR: u16 = 0o0100; // User execute
+
+    pub const S_IRGRP: u16 = 0o0040; // Group read
+    pub const S_IWGRP: u16 = 0o0020; // Group write
+    pub const S_IXGRP: u16 = 0o0010; // Group execute
+
+    pub const S_IROTH: u16 = 0o0004; // Other read
+    pub const S_IWOTH: u16 = 0o0002; // Other write
+    pub const S_IXOTH: u16 = 0o0001; // Other execute
+
+    pub const S_IRWXU: u16 = 0o0700; // User read, write, execute
+    pub const S_IRWXG: u16 = 0o0070; // Group read, write, execute
+    pub const S_IRWXO: u16 = 0o0007; // Other read, write, execute
+}
+
+/// Comprehensive File Permissions combining Linux POSIX Mode Bits and BSD File Flags
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FilePermissions {
-    pub read: bool,
-    pub write: bool,
-    pub execute: bool,
+    pub read: bool,      // Legacy backward compatibility flag (reflects owner read)
+    pub write: bool,     // Legacy backward compatibility flag (reflects owner write)
+    pub execute: bool,   // Legacy backward compatibility flag (reflects owner execute)
+
+    pub user_read: bool,
+    pub user_write: bool,
+    pub user_execute: bool,
+
+    pub group_read: bool,
+    pub group_write: bool,
+    pub group_execute: bool,
+
+    pub other_read: bool,
+    pub other_write: bool,
+    pub other_execute: bool,
+
+    pub suid: bool,      // SUID bit (set-user-ID)
+    pub sgid: bool,      // SGID bit (set-group-ID)
+    pub sticky: bool,    // Sticky bit
+
+    pub bsd_flags: BsdFileFlags,
 }
 
 impl FilePermissions {
@@ -28,15 +108,149 @@ impl FilePermissions {
             read,
             write,
             execute,
+            user_read: read,
+            user_write: write,
+            user_execute: execute,
+            group_read: read,
+            group_write: false,
+            group_execute: execute,
+            other_read: read,
+            other_write: false,
+            other_execute: execute,
+            suid: false,
+            sgid: false,
+            sticky: false,
+            bsd_flags: BsdFileFlags::new(),
         }
     }
 
     pub fn all() -> Self {
-        Self::new(true, true, true)
+        Self::from_mode(0o777)
     }
 
     pub fn read_only() -> Self {
-        Self::new(true, false, false)
+        Self::from_mode(0o444)
+    }
+
+    pub fn from_mode(mode: u16) -> Self {
+        let user_r = (mode & mode_bits::S_IRUSR) != 0;
+        let user_w = (mode & mode_bits::S_IWUSR) != 0;
+        let user_x = (mode & mode_bits::S_IXUSR) != 0;
+
+        Self {
+            read: user_r,
+            write: user_w,
+            execute: user_x,
+
+            user_read: user_r,
+            user_write: user_w,
+            user_execute: user_x,
+
+            group_read: (mode & mode_bits::S_IRGRP) != 0,
+            group_write: (mode & mode_bits::S_IWGRP) != 0,
+            group_execute: (mode & mode_bits::S_IXGRP) != 0,
+
+            other_read: (mode & mode_bits::S_IROTH) != 0,
+            other_write: (mode & mode_bits::S_IWOTH) != 0,
+            other_execute: (mode & mode_bits::S_IXOTH) != 0,
+
+            suid: (mode & mode_bits::S_ISUID) != 0,
+            sgid: (mode & mode_bits::S_ISGID) != 0,
+            sticky: (mode & mode_bits::S_ISVTX) != 0,
+
+            bsd_flags: BsdFileFlags::new(),
+        }
+    }
+
+    pub fn to_mode(&self) -> u16 {
+        let mut mode = 0u16;
+
+        if self.suid { mode |= mode_bits::S_ISUID; }
+        if self.sgid { mode |= mode_bits::S_ISGID; }
+        if self.sticky { mode |= mode_bits::S_ISVTX; }
+
+        if self.user_read { mode |= mode_bits::S_IRUSR; }
+        if self.user_write { mode |= mode_bits::S_IWUSR; }
+        if self.user_execute { mode |= mode_bits::S_IXUSR; }
+
+        if self.group_read { mode |= mode_bits::S_IRGRP; }
+        if self.group_write { mode |= mode_bits::S_IWGRP; }
+        if self.group_execute { mode |= mode_bits::S_IXGRP; }
+
+        if self.other_read { mode |= mode_bits::S_IROTH; }
+        if self.other_write { mode |= mode_bits::S_IWOTH; }
+        if self.other_execute { mode |= mode_bits::S_IXOTH; }
+
+        mode
+    }
+
+    /// Formats file permissions into standard Unix/BSD string representation (e.g., "-rwxr-xr-x", "-rwsr-xr-x", "drwxrwxrwt")
+    pub fn to_symbolic_string(&self, is_dir: bool) -> String {
+        let mut s = String::with_capacity(10);
+        s.push(if is_dir { 'd' } else { '-' });
+
+        // User
+        s.push(if self.user_read { 'r' } else { '-' });
+        s.push(if self.user_write { 'w' } else { '-' });
+        s.push(match (self.user_execute, self.suid) {
+            (true, true) => 's',
+            (false, true) => 'S',
+            (true, false) => 'x',
+            (false, false) => '-',
+        });
+
+        // Group
+        s.push(if self.group_read { 'r' } else { '-' });
+        s.push(if self.group_write { 'w' } else { '-' });
+        s.push(match (self.group_execute, self.sgid) {
+            (true, true) => 's',
+            (false, true) => 'S',
+            (true, false) => 'x',
+            (false, false) => '-',
+        });
+
+        // Other
+        s.push(if self.other_read { 'r' } else { '-' });
+        s.push(if self.other_write { 'w' } else { '-' });
+        s.push(match (self.other_execute, self.sticky) {
+            (true, true) => 't',
+            (false, true) => 'T',
+            (true, false) => 'x',
+            (false, false) => '-',
+        });
+
+        s
+    }
+
+    /// Evaluates Discretionary Access Control (DAC) permission for a subject (UID, GID, supplementary GIDs)
+    pub fn evaluate_dac_access(
+        &self,
+        subject_uid: u64,
+        subject_gid: u64,
+        supplementary_gids: &[u64],
+        owner_uid: u64,
+        group_gid: u64,
+        req_read: bool,
+        req_write: bool,
+        req_execute: bool,
+    ) -> bool {
+        // Root (UID 0) bypasses standard DAC permission checks (except execution if no execute bit is set anywhere)
+        if subject_uid == 0 {
+            if req_execute && !self.user_execute && !self.group_execute && !self.other_execute {
+                return false;
+            }
+            return true;
+        }
+
+        let (allow_r, allow_w, allow_x) = if subject_uid == owner_uid {
+            (self.user_read, self.user_write, self.user_execute)
+        } else if subject_gid == group_gid || supplementary_gids.contains(&group_gid) {
+            (self.group_read, self.group_write, self.group_execute)
+        } else {
+            (self.other_read, self.other_write, self.other_execute)
+        };
+
+        (!req_read || allow_r) && (!req_write || allow_w) && (!req_execute || allow_x)
     }
 }
 
@@ -51,6 +265,7 @@ pub struct Inode {
     pub group: u64,
     pub created: u64,
     pub modified: u64,
+    pub link_count: u64,
     pub capabilities: CapabilityToken,
 }
 
@@ -65,8 +280,14 @@ impl Inode {
             group: 0,
             created: 0,
             modified: 0,
+            link_count: 1,
             capabilities: CapabilityToken::new(),
         }
+    }
+
+    pub fn with_mode(mut self, mode: u16) -> Self {
+        self.permissions = FilePermissions::from_mode(mode);
+        self
     }
 }
 
@@ -190,6 +411,58 @@ impl VirtualFilesystem {
         Ok(bytes_read)
     }
 
+    pub fn chmod(&mut self, inode_id: u64, mode: u16) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        if inode.permissions.bsd_flags.immutable {
+            return Err(FsError::ImmutableFile);
+        }
+        inode.permissions = FilePermissions::from_mode(mode);
+        Ok(())
+    }
+
+    pub fn chown(&mut self, inode_id: u64, owner: u64, group: u64) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        if inode.permissions.bsd_flags.immutable {
+            return Err(FsError::ImmutableFile);
+        }
+        inode.owner = owner;
+        inode.group = group;
+        Ok(())
+    }
+
+    pub fn chflags(&mut self, inode_id: u64, flags: u32) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.permissions.bsd_flags = BsdFileFlags::from_u32(flags);
+        Ok(())
+    }
+
+    pub fn evaluate_access(
+        &self,
+        inode_id: u64,
+        subject_uid: u64,
+        subject_gid: u64,
+        supplementary_gids: &[u64],
+        req_read: bool,
+        req_write: bool,
+        req_execute: bool,
+    ) -> Result<(), FsError> {
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+        if inode.permissions.evaluate_dac_access(
+            subject_uid,
+            subject_gid,
+            supplementary_gids,
+            inode.owner,
+            inode.group,
+            req_read,
+            req_write,
+            req_execute,
+        ) {
+            Ok(())
+        } else {
+            Err(FsError::PermissionDenied)
+        }
+    }
+
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
         let file_descriptor = self
             .file_descriptors
@@ -201,8 +474,13 @@ impl VirtualFilesystem {
             .get_mut(&file_descriptor.inode_id)
             .ok_or(FsError::NotFound)?;
 
+        // Check BSD File Flags (immutable files cannot be modified)
+        if inode.permissions.bsd_flags.immutable {
+            return Err(FsError::ImmutableFile);
+        }
+
         // Check write permission
-        if !inode.permissions.write {
+        if !inode.permissions.write && !inode.permissions.user_write {
             return Err(FsError::PermissionDenied);
         }
 
@@ -258,8 +536,11 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
-        if !self.inodes.contains_key(&inode_id) {
-            return Err(FsError::NotFound);
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+
+        // Check BSD File Flags (immutable or nounlink files cannot be deleted)
+        if inode.permissions.bsd_flags.immutable || inode.permissions.bsd_flags.nounlink {
+            return Err(FsError::ImmutableFile);
         }
 
         self.inodes.remove(&inode_id);
@@ -297,6 +578,7 @@ pub enum FsError {
     NotADirectory,
     IsDirectory,
     NoSpace,
+    ImmutableFile,
 }
 
 #[cfg(test)]
@@ -371,5 +653,70 @@ mod tests {
             Err(FsError::PermissionDenied)
         );
         assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
+    }
+
+    #[test]
+    fn test_posix_mode_bits_and_symbolic_formatting() {
+        let perms = FilePermissions::from_mode(0o755);
+        assert_eq!(perms.to_mode(), 0o755);
+        assert_eq!(perms.to_symbolic_string(false), "-rwxr-xr-x");
+        assert_eq!(perms.to_symbolic_string(true), "drwxr-xr-x");
+
+        // SUID bit test (0o4755)
+        let suid_perms = FilePermissions::from_mode(0o4755);
+        assert!(suid_perms.suid);
+        assert_eq!(suid_perms.to_symbolic_string(false), "-rwsr-xr-x");
+
+        // SGID bit test (0o2775)
+        let sgid_perms = FilePermissions::from_mode(0o2775);
+        assert!(sgid_perms.sgid);
+        assert_eq!(sgid_perms.to_symbolic_string(true), "drwxrwsr-x");
+
+        // Sticky bit test (0o1777)
+        let sticky_perms = FilePermissions::from_mode(0o1777);
+        assert!(sticky_perms.sticky);
+        assert_eq!(sticky_perms.to_symbolic_string(true), "drwxrwxrwt");
+    }
+
+    #[test]
+    fn test_dac_evaluation_and_root_bypass() {
+        // Mode 0o640: User rw-, Group r--, Other ---
+        let perms = FilePermissions::from_mode(0o640);
+
+        // Owner (UID 1000) requests read/write
+        assert!(perms.evaluate_dac_access(1000, 1000, &[], 1000, 1000, true, true, false));
+        // Owner requests execute -> Denied
+        assert!(!perms.evaluate_dac_access(1000, 1000, &[], 1000, 1000, false, false, true));
+
+        // Group member (GID 1000) requests read -> Allowed
+        assert!(perms.evaluate_dac_access(1001, 1000, &[], 1000, 1000, true, false, false));
+        // Group member requests write -> Denied
+        assert!(!perms.evaluate_dac_access(1001, 1000, &[], 1000, 1000, false, true, false));
+
+        // Other user (UID 2000, GID 2000) requests read -> Denied
+        assert!(!perms.evaluate_dac_access(2000, 2000, &[], 1000, 1000, true, false, false));
+
+        // Root user (UID 0) requests read/write -> Allowed
+        assert!(perms.evaluate_dac_access(0, 0, &[], 1000, 1000, true, true, false));
+    }
+
+    #[test]
+    fn test_bsd_chflags_immutable_enforcement() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
+        let fd = vfs.open_file(inode_id, 0).unwrap();
+
+        // Set BSD immutable flag (UF_IMMUTABLE = 0x0002)
+        vfs.chflags(inode_id, 0x0002).unwrap();
+
+        // Attempt write -> FsError::ImmutableFile
+        assert_eq!(vfs.write_file(fd, b"immutable test"), Err(FsError::ImmutableFile));
+
+        // Attempt delete -> FsError::ImmutableFile
+        assert_eq!(vfs.delete_file(inode_id), Err(FsError::ImmutableFile));
+
+        // Clear immutable flag
+        vfs.chflags(inode_id, 0).unwrap();
+        assert!(vfs.write_file(fd, b"immutable test").is_ok());
     }
 }
