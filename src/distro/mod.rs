@@ -11,6 +11,7 @@ pub mod fedora_parity;
 pub mod gentoo;
 pub mod i18n;
 pub mod improvements;
+pub mod bsd_linux_innovations;
 pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
 pub mod linux_ideas;
@@ -26,6 +27,7 @@ pub mod stable_components;
 pub mod tiny_core;
 pub mod arch;
 pub mod cachy;
+pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_parity::{
     NixOSFlakeEngine, FlakeInput, SystemClosure,
@@ -85,4 +87,23 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+};
+pub use bsd_linux_innovations::{
+    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
+    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
+    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
+    RunitService, RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
+    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
+};
+pub use linux_bsd_parity::{
+    FlakeInput, SystemClosure, NixOSFlakeEngine, HookWhen, HookAction, PacmanHook,
+    ArchPacmanHooksManager, ServiceState as RunitServiceStateEnum, VoidRunitSupervisor,
+    PortagePackage, GentooPortageUseFlagsEngine,
+};
+pub use linux_bsd_parity_extended::{
+    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
+    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
+    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
+    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
+    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
 };
