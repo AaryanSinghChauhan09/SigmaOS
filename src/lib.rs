@@ -133,6 +133,11 @@ pub use kernel::{
     ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
     SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
     Tcb, ThreadState, WorkItem, PAGE_SIZE,
+    KernelFastPacketEngine, FastPacketFrame, XdpAction,
+    KernelAccessController, LandlockPathRule, LandlockAccessRight,
+    InteractiveHybridScheduler, HybridTask,
+    CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
+    MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
 };
 pub use kernel::io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};
 pub use network::{

@@ -7,6 +7,11 @@
 // - OpenBSD Pledge & Unveil sandboxing
 // - Gentoo Portage USE-flag dependency solver
 // - CachyOS BORE interactive scheduler
+// - Linux XDP & Netmap fast packet engine
+// - Landlock VFS & OpenBSD Pledge access controller
+// - ULE & EEVDF/BORE interactive hybrid scheduler
+// - HAMMER2 PFS & Btrfs CoW storage engine
+// - Linux memory compaction & 2MB superpages allocator
 
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
@@ -20,7 +25,6 @@ mod unveil;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
 
-<<<<<<< HEAD
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 
@@ -29,14 +33,12 @@ mod eevdf;
 
 #[path = "../src/memory/tlb_associative.rs"]
 mod tlb_associative;
-=======
 
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
@@ -104,7 +106,6 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
-    use std::path::PathBuf;
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -134,7 +135,7 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
     kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-        image_path: PathBuf::from("/var/lib/images/rootfs.qcow2"),
+        image_path: "/var/lib/images/rootfs.qcow2".to_string(),
         read_only: false,
         direct_io: true,
         queue_size: 256,
@@ -159,10 +160,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[test]
 fn test_kernel_classic_algorithms_inspection() {
     use eevdf::{EevdfScheduler, Task, ComputeUnit};
@@ -183,12 +180,6 @@ fn test_kernel_classic_algorithms_inspection() {
     assert_eq!(translated, Ok(0x50));
     assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
 }
-<<<<<<< HEAD
-=======
-
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
-
 
 #[test]
 fn test_zenith_desktop_applets_and_themes_inspection() {
@@ -212,4 +203,62 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     theme_mgr.apply_preset(ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.current_preset, ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
+}
+
+#[test]
+fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
+    use linux_bsd_innovations::{
+        KernelFastPacketEngine, FastPacketFrame, XdpAction,
+        KernelAccessController, LandlockAccessRight, PLEDGE_STDIO, PLEDGE_RPATH, PLEDGE_EXEC,
+        InteractiveHybridScheduler, HybridTask,
+        CowStorageEngine, MemoryCompactionSuperpagesAllocator,
+    };
+
+    // 1. Fast packet ring engine
+    let mut packet_engine = KernelFastPacketEngine::new(10);
+    packet_engine.enqueue_rx(FastPacketFrame {
+        id: 100,
+        payload: vec![0xDE, 0xAD, 0xBE, 0xEF],
+        rx_timestamp_ns: 1_000_000,
+        ingress_ifindex: 1,
+    }).unwrap();
+    let processed = packet_engine.process_xdp_filter(|frame| {
+        if frame.id == 100 {
+            XdpAction::Pass
+        } else {
+            XdpAction::Drop
+        }
+    });
+    assert_eq!(processed, 1);
+    assert_eq!(packet_engine.pass_count, 1);
+
+    // 2. Access Controller (Landlock & Pledge)
+    let mut access_ctrl = KernelAccessController::new();
+    access_ctrl.add_path_rule("/usr/bin", vec![LandlockAccessRight::Read, LandlockAccessRight::Execute]);
+    access_ctrl.restrict_pledge(PLEDGE_STDIO | PLEDGE_RPATH);
+    assert!(access_ctrl.check_path_access("/usr/bin/cargo", LandlockAccessRight::Execute).is_ok());
+    assert!(access_ctrl.check_pledge(PLEDGE_STDIO).is_ok());
+    assert!(access_ctrl.check_pledge(PLEDGE_EXEC).is_err());
+
+    // 3. Interactive Hybrid Scheduler
+    let mut hybrid_sched = InteractiveHybridScheduler::new();
+    let mut t1 = HybridTask::new(1, 10);
+    t1.sleep_time_ms = 80;
+    t1.cpu_time_ms = 20;
+    hybrid_sched.add_task(t1);
+    let sched_pid = hybrid_sched.schedule_next().unwrap();
+    assert_eq!(sched_pid, 1);
+
+    // 4. CoW Storage Engine
+    let mut cow = CowStorageEngine::new();
+    let blk_id = cow.write_block(b"Kernel Data Block");
+    assert!(cow.verify_block_integrity(blk_id).unwrap());
+    let snap_id = cow.create_pfs_snapshot("PFS_SNAP_01", blk_id);
+    assert_eq!(snap_id, 1);
+
+    // 5. Memory Compaction Superpages Allocator
+    let mut mem_alloc = MemoryCompactionSuperpagesAllocator::new(1024);
+    assert_eq!(mem_alloc.compact_free_frames(), 1024);
+    let pfn = mem_alloc.allocate_2mb_superpage().unwrap();
+    assert_eq!(pfn, 0);
 }
