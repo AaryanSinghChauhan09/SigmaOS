@@ -52,6 +52,7 @@ pub mod power {
     pub mod governor;
 }
 pub mod boot;
+pub use boot::*;
 pub mod toolchain {
     pub mod adapter;
     pub mod capsule;
