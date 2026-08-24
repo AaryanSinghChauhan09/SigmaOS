@@ -13,6 +13,7 @@ use core::mem;
 
 /// Container ID
 pub type ContainerID = usize;
+pub type ContainerCapability = RuntimeCapability;
 
 /// Container state
 #[repr(usize)]

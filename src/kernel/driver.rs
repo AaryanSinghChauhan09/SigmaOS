@@ -209,11 +209,23 @@ mod tests {
     struct MockDriver {
         owner: Option<String>,
         debug_level: String,
+        kref: KRef,
     }
 
     impl KernelObject for MockDriver {
-        fn id(&self) -> u64 { 1 }
         fn name(&self) -> &str { "mock_driver" }
+        fn set_name(&mut self, _name: &str) {}
+        fn parent(&self) -> Option<&dyn KernelObject> { None }
+        fn set_parent(&mut self, _parent: Option<&dyn KernelObject>) {}
+        fn children(&self) -> Vec<&dyn KernelObject> { Vec::new() }
+        fn add_child(&mut self, _child: &dyn KernelObject) {}
+        fn remove_child(&mut self, _child_name: &str) -> Option<Box<dyn KernelObject>> { None }
+        fn kref(&self) -> &KRef { &self.kref }
+        fn as_any(&self) -> &dyn Any { self }
+        fn as_any_mut(&mut self) -> &mut dyn Any { self }
+        fn sysfs_attrs(&self) -> Vec<&str> { Vec::new() }
+        fn sysfs_show(&self, _attr: &str) -> Option<String> { None }
+        fn sysfs_store(&mut self, _attr: &str, _value: &str) -> Result<(), crate::kernel::object::ObjectError> { Ok(()) }
     }
 
     impl Driver for MockDriver {
@@ -250,6 +262,7 @@ mod tests {
         let mut drv = MockDriver {
             owner: None,
             debug_level: "3".to_string(),
+            kref: KRef::new(),
         };
 
         assert!(drv.is_pqc_signed());

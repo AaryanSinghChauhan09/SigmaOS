@@ -3,11 +3,10 @@
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
 extern crate alloc;
-use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
 
 pub const MAX_AUDIO_CHANNELS: usize = 4;
 
@@ -23,6 +22,7 @@ pub enum MediaFormat {
     Mp3,
     Wav,
     Flac,
+    Pcm,
 }
 
 pub struct AudioChannel {
@@ -121,20 +121,6 @@ impl SigmaMediaEngine {
 pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
 // SigmaOS Polish-Parity Out-of-the-Box Codecs & Multimedia Engine (SigmaMedia)
 // Designed for chiptune synthesizers, audio playing, and decoders with zero dependencies
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MediaFormat {
-    Mp3,
-    Wav,
-    Pcm,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PlaybackState {
-    Stopped,
-    Playing,
-    Paused,
-}
 
 pub struct AudioTrack {
     pub name: String,
@@ -342,4 +328,3 @@ mod tests {
         assert_eq!(edit.entries[0].end_ms, 2500);
     }
 }
-pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
