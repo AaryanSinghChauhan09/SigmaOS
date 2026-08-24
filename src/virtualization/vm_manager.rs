@@ -4,7 +4,7 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::klib::collections::HashMap;
+use std::collections::HashMap;
 
 #[cfg(test)]
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -477,7 +477,7 @@ impl QemuBackend {
 
     pub fn set_vm_balloon_target(&mut self, vm_id: &str, target_mb: u64) -> Result<u64, VmError> {
         if let Some(balloon) = self.balloons.get_mut(vm_id) {
-            balloon.set_target(target_mb);
+            MemoryBalloonConfig::set_target(balloon, target_mb);
             Ok(balloon.inflate_deflate_step())
         } else {
             Err(VmError::VmNotFound(vm_id.to_string()))
