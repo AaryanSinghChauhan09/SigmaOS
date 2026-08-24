@@ -658,8 +658,6 @@ impl Device for SimpleBlockDevice {
 #[cfg(test)]
 mod legacy_tests {
     use super::*;
-    use crate::compatibility::historic_linux::DdeDeviceWrapper;
-    use crate::drivers::dde::UdfInterpreter;
 
     pub struct LegacyDevice {
         pub id: usize,
@@ -709,14 +707,7 @@ mod legacy_tests {
         }
     }
 
-    pub struct DdeDeviceWrapper {
-        pub id: usize,
-        pub name: [u8; 64],
-        pub base_addr: u32,
-        pub os: [u8; 32],
-        pub pci_bar: [u8; 256],
-        pub buffer: Vec<u8>,
-    }
+
 
     impl DdeDeviceWrapper {
         pub fn new(id: usize, name: &[u8], base_addr: u32, os: &[u8]) -> Self {

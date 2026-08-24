@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// OOP-based Remote Shell for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 966

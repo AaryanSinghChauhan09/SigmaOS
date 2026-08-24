@@ -23,6 +23,7 @@ jobs:
 
       - name: Verify Post-Quantum Cryptography & Hardening
         run: |
+          mkdir -p build
           rustc --edition 2021 --test src/security/hardening.rs --cfg 'feature="standalone_test"' -o build/test_hardening
           ./build/test_hardening
 

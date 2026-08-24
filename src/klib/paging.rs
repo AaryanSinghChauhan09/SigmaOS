@@ -51,11 +51,6 @@ pub enum PrivilegeLevel {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PageSize {
-    Standard4KB,
-    Huge2MB,
-    Giant1GB,
-}
 
 impl PageSize {
     pub fn byte_size(&self) -> usize {
