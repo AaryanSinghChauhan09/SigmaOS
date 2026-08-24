@@ -103,6 +103,11 @@ pub use dashboard::statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryBreachAlert,
     StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };
+pub use driver::pci_bus::{
+    PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
+    PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity,
+    PcieAspmState, SimulatedPciHardwareAccess,
+};
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
