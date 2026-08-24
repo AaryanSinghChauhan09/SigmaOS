@@ -35,6 +35,14 @@ pub mod access;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
+
+pub use unimplemented_features::{
+    AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
+    GenerationManager, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
+    LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
+    SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
+    ZorinWinAppDbRegistry,
+};
 pub mod virtualization;
 pub mod cluster;
 

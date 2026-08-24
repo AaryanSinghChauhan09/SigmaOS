@@ -675,6 +675,202 @@ impl SovereignIpcBus {
     }
 }
 
+// =========================================================================
+// 4. ANTIX LINUX LIGHTWEIGHT SYSVINIT & LOW-RAM GOVERNOR
+// =========================================================================
+
+pub struct AntiXLowRamSysVInitGovernor {
+    pub max_ram_mb: u32,
+    pub disable_compositing: bool,
+    pub init_style_sequential: bool,
+    pub toram_persistence: bool,
+    pub active_runlevel: u8,
+}
+
+impl AntiXLowRamSysVInitGovernor {
+    pub fn new(max_ram_mb: u32) -> Self {
+        let is_low_ram = max_ram_mb <= 256;
+        Self {
+            max_ram_mb,
+            disable_compositing: is_low_ram,
+            init_style_sequential: is_low_ram,
+            toram_persistence: false,
+            active_runlevel: 1, // Default CLI minimal runlevel
+        }
+    }
+
+    pub fn configure_runlevel(&mut self, runlevel: u8) -> Result<(), &'static str> {
+        if runlevel > 5 {
+            return Err("Invalid SysVInit runlevel target");
+        }
+        self.active_runlevel = runlevel;
+        if self.max_ram_mb <= 256 && runlevel >= 5 {
+            // Keep compositing off in low-RAM profile even on graphical runlevel
+            self.disable_compositing = true;
+        }
+        Ok(())
+    }
+
+    pub fn enable_toram_persistence(&mut self) {
+        self.toram_persistence = true;
+    }
+
+    pub fn reclaim_memory(&self, current_allocated_mb: u32) -> u32 {
+        if current_allocated_mb > self.max_ram_mb {
+            current_allocated_mb - self.max_ram_mb
+        } else {
+            0
+        }
+    }
+}
+
+// =========================================================================
+// 5. ZORIN OS WINDOWS COMPATIBILITY & APP DB REGISTRY
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZorinAppMapping {
+    pub exe_name: &'static str,
+    pub compatibility_layer: &'static str,
+    pub wine_version: &'static str,
+    pub desktop_category: &'static str,
+    pub is_installed: bool,
+}
+
+pub struct ZorinWinAppDbRegistry {
+    pub registered_apps: Vec<ZorinAppMapping>,
+}
+
+impl ZorinWinAppDbRegistry {
+    pub fn new() -> Self {
+        Self {
+            registered_apps: Vec::new(),
+        }
+    }
+
+    pub fn register_app(&mut self, app: ZorinAppMapping) {
+        if !self.registered_apps.iter().any(|a| a.exe_name == app.exe_name) {
+            self.registered_apps.push(app);
+        }
+    }
+
+    pub fn lookup_compatibility(&self, exe_name: &str) -> Option<&ZorinAppMapping> {
+        self.registered_apps.iter().find(|a| a.exe_name == exe_name)
+    }
+
+    pub fn launch_win_app(&mut self, exe_name: &str) -> Result<&'static str, &'static str> {
+        if let Some(app) = self.registered_apps.iter_mut().find(|a| a.exe_name == exe_name) {
+            app.is_installed = true;
+            Ok("App launched successfully via Zorin compatibility layer")
+        } else {
+            Err("Unregistered Windows binary; no compatibility profile found")
+        }
+    }
+}
+
+// =========================================================================
+// 6. HAIKU OS DYNAMIC MEDIA TRANSLATOR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HaikuMediaTranslator {
+    pub name: &'static str,
+    pub input_mime: &'static str,
+    pub output_mime: &'static str,
+    pub quality_score: u8,
+}
+
+pub struct HaikuTranslatorEngine {
+    pub translators: Vec<HaikuMediaTranslator>,
+}
+
+impl HaikuTranslatorEngine {
+    pub fn new() -> Self {
+        Self {
+            translators: Vec::new(),
+        }
+    }
+
+    pub fn register_translator(&mut self, translator: HaikuMediaTranslator) {
+        self.translators.push(translator);
+    }
+
+    pub fn find_best_translator(&self, input_mime: &str, output_mime: &str) -> Option<&HaikuMediaTranslator> {
+        self.translators
+            .iter()
+            .filter(|t| t.input_mime == input_mime && t.output_mime == output_mime)
+            .max_by_key(|t| t.quality_score)
+    }
+
+    pub fn translate_stream(
+        &self,
+        input_mime: &str,
+        output_mime: &str,
+        data: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        if data.is_empty() {
+            return Err("Cannot translate empty input stream");
+        }
+        let translator = self
+            .find_best_translator(input_mime, output_mime)
+            .ok_or("No matching Haiku translator found for specified MIME pair")?;
+
+        let mut translated = Vec::with_capacity(data.len() + 16);
+        translated.extend_from_slice(translator.name.as_bytes());
+        translated.push(b':');
+        translated.extend_from_slice(data);
+        Ok(translated)
+    }
+}
+
+// =========================================================================
+// 7. SERENITYOS ASYNC IPC EVENT LOOP (LIBCORE INSPIRED)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SerenityIpcEvent {
+    pub client_id: u32,
+    pub event_type: u16,
+    pub payload: [u8; 32],
+}
+
+pub struct SerenityOsAsyncIpcLoop {
+    pub event_queue: Vec<SerenityIpcEvent>,
+    pub is_running: bool,
+    pub processed_count: usize,
+}
+
+impl SerenityOsAsyncIpcLoop {
+    pub fn new() -> Self {
+        Self {
+            event_queue: Vec::new(),
+            is_running: false,
+            processed_count: 0,
+        }
+    }
+
+    pub fn post_event(&mut self, event: SerenityIpcEvent) {
+        self.event_queue.push(event);
+    }
+
+    pub fn dispatch_next(&mut self) -> Option<SerenityIpcEvent> {
+        if self.event_queue.is_empty() {
+            None
+        } else {
+            self.processed_count += 1;
+            Some(self.event_queue.remove(0))
+        }
+    }
+
+    pub fn run_loop_step(&mut self) -> usize {
+        self.is_running = true;
+        let count = self.event_queue.len();
+        self.event_queue.clear();
+        self.processed_count += count;
+        count
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -762,5 +958,78 @@ mod tests {
 
         let rollback_merkle = ledger.rollback_last_transaction().unwrap();
         assert_eq!(rollback_merkle, 0x1000200030004000);
+    }
+
+    #[test]
+    fn test_antix_low_ram_sysvinit_governor() {
+        let mut gov = AntiXLowRamSysVInitGovernor::new(256);
+        assert!(gov.disable_compositing);
+        assert!(gov.init_style_sequential);
+        assert_eq!(gov.active_runlevel, 1);
+
+        assert!(gov.configure_runlevel(3).is_ok());
+        assert_eq!(gov.active_runlevel, 3);
+        assert!(gov.configure_runlevel(6).is_err());
+
+        gov.enable_toram_persistence();
+        assert!(gov.toram_persistence);
+        assert_eq!(gov.reclaim_memory(300), 44);
+    }
+
+    #[test]
+    fn test_zorin_win_app_db_registry() {
+        let mut reg = ZorinWinAppDbRegistry::new();
+        let app = ZorinAppMapping {
+            exe_name: "photoshop.exe",
+            compatibility_layer: "wine-ge",
+            wine_version: "8.20",
+            desktop_category: "Graphics",
+            is_installed: false,
+        };
+        reg.register_app(app);
+
+        let mapped = reg.lookup_compatibility("photoshop.exe").unwrap();
+        assert_eq!(mapped.wine_version, "8.20");
+
+        assert!(reg.launch_win_app("photoshop.exe").is_ok());
+        assert!(reg.launch_win_app("unknown.exe").is_err());
+    }
+
+    #[test]
+    fn test_haiku_translator_engine() {
+        let mut engine = HaikuTranslatorEngine::new();
+        let translator = HaikuMediaTranslator {
+            name: "PNG-Translator",
+            input_mime: "image/x-raw",
+            output_mime: "image/png",
+            quality_score: 95,
+        };
+        engine.register_translator(translator);
+
+        let best = engine.find_best_translator("image/x-raw", "image/png").unwrap();
+        assert_eq!(best.name, "PNG-Translator");
+
+        let translated = engine.translate_stream("image/x-raw", "image/png", b"RAWPIXELS").unwrap();
+        assert!(translated.starts_with(b"PNG-Translator:RAWPIXELS"));
+    }
+
+    #[test]
+    fn test_serenityos_async_ipc_loop() {
+        let mut loop_engine = SerenityOsAsyncIpcLoop::new();
+        let event = SerenityIpcEvent {
+            client_id: 42,
+            event_type: 101,
+            payload: [0u8; 32],
+        };
+        loop_engine.post_event(event);
+        assert_eq!(loop_engine.event_queue.len(), 1);
+
+        let dispatched = loop_engine.dispatch_next().unwrap();
+        assert_eq!(dispatched.client_id, 42);
+        assert_eq!(loop_engine.processed_count, 1);
+
+        loop_engine.post_event(event);
+        assert_eq!(loop_engine.run_loop_step(), 1);
+        assert!(loop_engine.is_running);
     }
 }
