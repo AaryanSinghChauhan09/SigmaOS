@@ -20,7 +20,6 @@ pub mod nextgen;
 pub mod parity;
 pub mod power_network_tools;
 pub mod preseed;
-pub mod ready_to_use;
 pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
@@ -99,6 +98,6 @@ pub use linux_bsd_parity_extended::{
     SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
     ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
-    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
+    NetBsdRumpKernel, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
 };

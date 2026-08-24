@@ -19,7 +19,7 @@
 // SigmaOS AI Orchestrator for System Optimization
 // OOP-based AI system optimization with predictive modeling
 
-use crate::klib::BTreeMap;
+use crate::klib::{BTreeMap, HashMap};
 use std::time::{Duration, Instant};
 
 /// System state

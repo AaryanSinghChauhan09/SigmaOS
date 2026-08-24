@@ -2,7 +2,7 @@
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
 extern crate alloc;
-use alloc::collections::BTreeMap;
+use crate::klib::{BTreeMap, HashMap};
 use alloc::string::String;
 
 /// OOP-based Superset Application Capability matching

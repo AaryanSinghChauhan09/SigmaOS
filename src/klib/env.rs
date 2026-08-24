@@ -1,6 +1,7 @@
 //! Custom environment variable access for SigmaOS
 //! This module provides no_std alternatives to std::env
 
+use core::arch::asm;
 use core::ffi::c_char;
 use core::str::Utf8Error;
 
@@ -241,7 +242,7 @@ unsafe fn syscall(num: usize, arg1: *const u8, arg2: *const u8) -> isize {
         inlateout("rax") num as isize => ret,
         in("rdi") arg1,
         in("rsi") arg2,
-        clobber_aborts("rcx", "r11", "memory")
+        clobber_abi("rcx", "r11", "memory")
     );
     ret
 }

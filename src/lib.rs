@@ -171,7 +171,7 @@ pub use distro::{
     SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
     ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
-    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
+    NetBsdRumpKernel, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
 };
 pub use orchestration::{

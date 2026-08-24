@@ -1,5 +1,7 @@
 // Custom String and Allocator types for klib
 
+use core::fmt;
+
 pub mod custom_allocator {
     pub struct CustomAllocator;
     pub static GLOBAL_CUSTOM_ALLOCATOR: CustomAllocator = CustomAllocator;
