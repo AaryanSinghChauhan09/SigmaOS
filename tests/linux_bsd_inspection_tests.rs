@@ -95,7 +95,6 @@ fn test_zorin_gap_closure_inspection() {
     assert_eq!(zorin.panel_height_pixels, 64);
 }
 
-
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
@@ -153,7 +152,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
     kvm.stop_vm(&vm_id).unwrap();
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 }
-
 
 #[test]
 fn test_kernel_classic_algorithms_inspection() {
