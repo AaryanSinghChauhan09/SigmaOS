@@ -44,7 +44,9 @@ pub trait CachedPackage {
 pub struct SimpleCachedPackage {
     pub id: PackageID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub version: [u8; 32],
+    pub version_len: u8,
     pub size: AtomicUsize,
     pub cached_at: AtomicUsize,
     pub data: [u8; 4096],
@@ -53,7 +55,7 @@ pub struct SimpleCachedPackage {
 impl SimpleCachedPackage {
     pub fn new(id: PackageID, name: &[u8], version: &[u8]) -> Self {
         let mut name_array = [0u8; 64];
-        let mut version_array = [u8; 32];
+        let mut version_array = [0u8; 32];
         let name_len = name.len().min(63);
         let version_len = version.len().min(31);
         unsafe {
@@ -63,7 +65,9 @@ impl SimpleCachedPackage {
         SimpleCachedPackage {
             id,
             name: name_array,
+            name_len: name_len as u8,
             version: version_array,
+            version_len: version_len as u8,
             size: AtomicUsize::new(0),
             cached_at: AtomicUsize::new(0),
             data: [0u8; 4096],
@@ -74,12 +78,12 @@ impl SimpleCachedPackage {
 impl CachedPackage for SimpleCachedPackage {
     fn id(&self) -> PackageID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt performance optimization: use cached name_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        &self.name[..self.name_len as usize]
     }
     fn version(&self) -> &[u8] {
-        let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.version[..len]
+        // Bolt performance optimization: use cached version_len for O(1) constant time lookup instead of O(N) zero-byte scan
+        &self.version[..self.version_len as usize]
     }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn cached_at(&self) -> u64 { self.cached_at.load(Ordering::SeqCst) as u64 }
