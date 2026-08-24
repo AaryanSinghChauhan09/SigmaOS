@@ -658,6 +658,7 @@ impl Device for SimpleBlockDevice {
 #[cfg(test)]
 mod legacy_tests {
     use super::*;
+    use core::ops::Deref;
 
     pub struct LegacyDevice {
         pub id: usize,
@@ -759,7 +760,7 @@ mod legacy_tests {
         }
         pub fn read(&mut self, buf: &mut [u8]) -> Result<usize, DeviceError> {
             let len = buf.len().min(self.buffer.len());
-            buf[..len].copy_from_slice(&self.buffer.as_slice()[..len]);
+            buf[..len].copy_from_slice(&self.buffer.deref()[..len]);
             Ok(len)
         }
         pub fn ioctl(&mut self, _cmd: u32, _arg: usize) -> Result<usize, DeviceError> {
@@ -1445,6 +1446,17 @@ impl<T> Vec<T> {
         Enumerate {
             iter: self.iter(),
             index: 0,
+        }
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
 }

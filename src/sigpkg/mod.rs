@@ -13,6 +13,7 @@ pub mod fedora_rpm_engine;
 pub mod importer;
 pub mod linux_compat;
 pub mod makepkg;
+pub mod multi_distro;
 pub mod nix_shell;
 pub mod pacman;
 pub mod portage;

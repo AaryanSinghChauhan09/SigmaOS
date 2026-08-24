@@ -126,6 +126,10 @@ pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
     DemocraticProposal, DemocraticVoting,
 };
+pub use ipc::{
+    StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
+    STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
+};
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
     Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler,

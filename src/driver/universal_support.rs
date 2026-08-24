@@ -7,7 +7,9 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use crate::driver::device::{Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice, CharacterDevice, PortAddress};
+#[path = "device.rs"]
+mod device;
+use device::{Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice, CharacterDevice, PortAddress};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
