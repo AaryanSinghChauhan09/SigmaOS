@@ -2,8 +2,10 @@
 // OOP-based container management with Docker and Podman support
 // Incorporating FreeBSD Jails (jail networking & IPC sandboxing) and Podman (rootless user namespaces) compatibility
 
-use std::collections::HashMap;
-use std::path::PathBuf;
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+use crate::klib::collections::HashMap;
 
 /// FreeBSD Jail-inspired security & network sandboxing configuration
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -132,13 +134,13 @@ pub struct ImageManifest {
 
 /// Copy-on-Write OverlayFS Storage Driver for OCI container images
 pub struct OverlayFsStorageDriver {
-    pub base_dir: PathBuf,
+    pub base_dir: String,
     pub layers: HashMap<String, ImageLayer>,
     pub manifests: HashMap<String, ImageManifest>,
 }
 
 impl OverlayFsStorageDriver {
-    pub fn new(base_dir: PathBuf) -> Self {
+    pub fn new(base_dir: String) -> Self {
         Self {
             base_dir,
             layers: HashMap::new(),
@@ -162,7 +164,7 @@ impl OverlayFsStorageDriver {
         }
     }
 
-    pub fn prepare_rw_overlay_dir(&self, container_id: &str) -> PathBuf {
+    pub fn prepare_rw_overlay_dir(&self, container_id: &str) -> String {
         self.base_dir.join("containers").join(container_id).join("diff")
     }
 }
@@ -236,8 +238,8 @@ pub enum PortProtocol {
 /// Volume mapping
 #[derive(Debug, Clone)]
 pub struct VolumeMapping {
-    pub host_path: PathBuf,
-    pub container_path: PathBuf,
+    pub host_path: String,
+    pub container_path: String,
     pub read_only: bool,
 }
 
@@ -1163,7 +1165,7 @@ mod tests {
 
     #[test]
     fn test_overlayfs_and_rootless_subuid_translation() {
-        let mut overlay = OverlayFsStorageDriver::new(PathBuf::from("/var/lib/sigmaos/overlay2"));
+        let mut overlay = OverlayFsStorageDriver::new(String::from("/var/lib/sigmaos/overlay2"));
 
         let layer1 = ImageLayer {
             layer_id: "sha256:layer100".to_string(),
@@ -1192,7 +1194,7 @@ mod tests {
         assert_eq!(overlay.calculate_image_size("ubuntu:latest"), 15728640);
 
         let diff_dir = overlay.prepare_rw_overlay_dir("ctr_123");
-        assert_eq!(diff_dir, PathBuf::from("/var/lib/sigmaos/overlay2/containers/ctr_123/diff"));
+        assert_eq!(diff_dir, String::from("/var/lib/sigmaos/overlay2/containers/ctr_123/diff"));
 
         let subuid_map = RootlessUidMap::new(0, 100000, 65536);
         assert_eq!(subuid_map.translate_container_to_host(0), Some(100000));
