@@ -12,6 +12,9 @@
 // - ULE & EEVDF/BORE interactive hybrid scheduler
 // - HAMMER2 PFS & Btrfs CoW storage engine
 // - Linux memory compaction & 2MB superpages allocator
+// - Alpine Linux APK Package Index parser & signature verifier
+// - DragonFly BSD HAMMER2 PFS snapshot & replication engine
+// - NixOS Declarative System Configuration & generation rollback switcher
 
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
@@ -40,10 +43,16 @@ mod zenith_advanced;
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unveil::{UnveilManager, UnveilPermission};
+use unimplemented_features::{
+    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
+};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -180,7 +189,6 @@ fn test_kernel_classic_algorithms_inspection() {
     assert_eq!(translated, Ok(0x50));
     assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
 }
-
 #[test]
 fn test_zenith_desktop_applets_and_themes_inspection() {
     use zenith_advanced::{DesktopAppletEngine, DesktopApplet, AppletCategory, ZenithThemePresetManager, ZenithThemePreset};
@@ -261,4 +269,51 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
     assert_eq!(mem_alloc.compact_free_frames(), 1024);
     let pfn = mem_alloc.allocate_2mb_superpage().unwrap();
     assert_eq!(pfn, 0);
+}
+
+#[test]
+fn test_alpine_apk_package_index_inspection() {
+    let mut apk_index = AlpineApkPackageIndex::new();
+    let key = [0x99; 32];
+    assert!(apk_index.verify_index_signature(&key));
+
+    apk_index.add_package(ApkPackageEntry {
+        name: "openssl".to_string(),
+        version: "3.1.0".to_string(),
+        arch: "x86_64".to_string(),
+        sha256_hash: [0xAB; 32],
+        dependencies: vec!["musl".to_string()],
+    });
+
+    let pkg = apk_index.find_package("openssl").unwrap();
+    assert_eq!(pkg.version, "3.1.0");
+    assert_eq!(apk_index.resolve_dependencies("openssl"), vec!["musl"]);
+}
+
+#[test]
+fn test_dragonfly_hammer2_snapshot_inspection() {
+    let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
+    hammer2.register_cluster_node(1, "192.168.1.50");
+
+    let snap_id = hammer2.create_pfs_snapshot("ROOT_PFS", 0x1234567887654321, 1680000000);
+    assert_eq!(snap_id, 1);
+    assert!(hammer2.replicate_snapshot_to_node(snap_id, 1).is_ok());
+
+    let rolled_back_merkle = hammer2.rollback_pfs("ROOT_PFS", snap_id).unwrap();
+    assert_eq!(rolled_back_merkle, 0x1234567887654321);
+}
+
+#[test]
+fn test_nixos_declarative_config_engine_inspection() {
+    let mut nix_engine = NixOsDeclarativeConfigEngine::new();
+    let gen1 = nix_engine.build_generation(0xDEADBEEF, 1680000000, 150, "quiet splash");
+    assert_eq!(gen1, 1);
+
+    let gen2 = nix_engine.build_generation(0xCAFEBABE, 1680001000, 155, "debug");
+    assert_eq!(gen2, 2);
+    assert_eq!(nix_engine.active_generation, 2);
+
+    let rolled_back = nix_engine.rollback_generation().unwrap();
+    assert_eq!(rolled_back.gen_number, 1);
+    assert_eq!(nix_engine.active_generation, 1);
 }
