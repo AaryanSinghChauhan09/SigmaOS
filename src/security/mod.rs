@@ -3,15 +3,11 @@ pub mod audit;
 pub mod capability;
 pub mod hardening;
 
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
-};
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
 pub mod forensics;
-pub mod hardening;
 pub mod integrity;
 pub mod intrusion;
 pub mod mac;

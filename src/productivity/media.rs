@@ -4,7 +4,6 @@
 
 extern crate alloc;
 use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
