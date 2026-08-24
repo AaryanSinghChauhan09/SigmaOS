@@ -4,7 +4,7 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::klib::collections::HashMap;
+use alloc::collections::BTreeMap as HashMap;
 
 #[cfg(test)]
 use std::time::{SystemTime, UNIX_EPOCH};

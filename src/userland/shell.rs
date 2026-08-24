@@ -3,8 +3,67 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+
+/// Comprehensive redirection specifications inspired by Linux (Bash/Zsh/Fish) and BSD (Ksh/Sh)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RedirectSpec {
+    /// Redirect output to file: > or >> or >| (FD, path, append mode, force overwrite/clobber)
+    Output {
+        fd: u32,
+        path: String,
+        append: bool,
+        force: bool,
+    },
+    /// Redirect input from file: < (FD, path)
+    Input {
+        fd: u32,
+        path: String,
+    },
+    /// Duplicate output file descriptor: N>&M (e.g. 2>&1)
+    DupOutput {
+        src_fd: u32,
+        target_fd: u32,
+    },
+    /// Duplicate input file descriptor: N<&M (e.g. 0<&3)
+    DupInput {
+        src_fd: u32,
+        target_fd: u32,
+    },
+    /// Close file descriptor: N>&- or N<&-
+    CloseFd {
+        fd: u32,
+    },
+    /// Here-document: << DELIM or <<- DELIM (FD, delimiter, strip leading tabs, body content)
+    HereDoc {
+        fd: u32,
+        delimiter: String,
+        strip_leading_tabs: bool,
+        content: String,
+    },
+    /// Here-string: <<< "string" (FD, inline string)
+    HereString {
+        fd: u32,
+        content: String,
+    },
+    /// Combined stdout and stderr output redirection: &> or >&
+    CombinedOutput {
+        path: String,
+        append: bool,
+    },
+    /// Process substitution input: <(cmd)
+    ProcessSubInput {
+        fd: u32,
+        command: Box<ShellCommand>,
+    },
+    /// Process substitution output: >(cmd)
+    ProcessSubOutput {
+        fd: u32,
+        command: Box<ShellCommand>,
+    },
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ShellCommand {
@@ -14,14 +73,252 @@ pub enum ShellCommand {
     Or(Box<ShellCommand>, Box<ShellCommand>),
     Sequence(Box<ShellCommand>, Box<ShellCommand>),
     Background(Box<ShellCommand>),
-    Redirect(Box<ShellCommand>, Redirect),
+    Redirect(Box<ShellCommand>, RedirectSpec),
 }
 
+/// Legacy alias for backward compatibility
+pub type Redirect = RedirectSpec;
+
+/// Target stream binding for file descriptor redirection
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Redirect {
-    pub fd: u32,
-    pub path: String,
-    pub append: bool,
+pub enum StreamTarget {
+    File { path: String, append: bool },
+    Buffer(Vec<u8>),
+    DuplicatedFd(u32),
+    Closed,
+    ProcessPipe { sub_command: String },
+}
+
+/// Advanced stream redirection engine for managing Linux & BSD style FD mappings
+#[derive(Debug, Clone)]
+pub struct RedirectionEngine {
+    pub active_bindings: BTreeMap<u32, StreamTarget>,
+    pub saved_snapshots: Vec<BTreeMap<u32, StreamTarget>>,
+    pub redirection_log: Vec<String>,
+    pub captured_outputs: BTreeMap<u32, Vec<u8>>,
+}
+
+impl RedirectionEngine {
+    pub fn new() -> Self {
+        let mut active_bindings = BTreeMap::new();
+        active_bindings.insert(0, StreamTarget::Buffer(Vec::new())); // stdin
+        active_bindings.insert(1, StreamTarget::Buffer(Vec::new())); // stdout
+        active_bindings.insert(2, StreamTarget::Buffer(Vec::new())); // stderr
+
+        Self {
+            active_bindings,
+            saved_snapshots: Vec::new(),
+            redirection_log: Vec::new(),
+            captured_outputs: BTreeMap::new(),
+        }
+    }
+
+    /// Save current FD bindings to state stack before executing subshell/child command
+    pub fn push_snapshot(&mut self) {
+        self.saved_snapshots.push(self.active_bindings.clone());
+    }
+
+    /// Restore previous FD bindings state stack
+    pub fn pop_snapshot(&mut self) -> bool {
+        if let Some(snapshot) = self.saved_snapshots.pop() {
+            self.active_bindings = snapshot;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Applies a redirection specification to the file descriptor table
+    pub fn apply_spec(&mut self, spec: &RedirectSpec) -> Result<(), &'static str> {
+        match spec {
+            RedirectSpec::Output { fd, path, append, force } => {
+                let mode_str = if *append {
+                    "append"
+                } else if *force {
+                    "clobber/force"
+                } else {
+                    "truncate"
+                };
+                self.redirection_log.push(format!(
+                    "REDIRECT: FD {} -> file '{}' ({})",
+                    fd, path, mode_str
+                ));
+                self.active_bindings.insert(
+                    *fd,
+                    StreamTarget::File {
+                        path: path.clone(),
+                        append: *append,
+                    },
+                );
+            }
+            RedirectSpec::Input { fd, path } => {
+                self.redirection_log
+                    .push(format!("REDIRECT: FD {} <- file '{}'", fd, path));
+                self.active_bindings.insert(
+                    *fd,
+                    StreamTarget::File {
+                        path: path.clone(),
+                        append: false,
+                    },
+                );
+            }
+            RedirectSpec::DupOutput { src_fd, target_fd } => {
+                self.redirection_log.push(format!(
+                    "REDIRECT: Dup Output FD {} -> FD {}",
+                    src_fd, target_fd
+                ));
+                self.active_bindings
+                    .insert(*src_fd, StreamTarget::DuplicatedFd(*target_fd));
+            }
+            RedirectSpec::DupInput { src_fd, target_fd } => {
+                self.redirection_log.push(format!(
+                    "REDIRECT: Dup Input FD {} <- FD {}",
+                    src_fd, target_fd
+                ));
+                self.active_bindings
+                    .insert(*src_fd, StreamTarget::DuplicatedFd(*target_fd));
+            }
+            RedirectSpec::CloseFd { fd } => {
+                self.redirection_log.push(format!("REDIRECT: Closed FD {}", fd));
+                self.active_bindings.insert(*fd, StreamTarget::Closed);
+            }
+            RedirectSpec::HereDoc {
+                fd,
+                delimiter,
+                strip_leading_tabs,
+                content,
+            } => {
+                self.redirection_log.push(format!(
+                    "REDIRECT: Here-Doc (delimiter '{}', strip_tabs={}) -> FD {}",
+                    delimiter, strip_leading_tabs, fd
+                ));
+                let body = if *strip_leading_tabs {
+                    content
+                        .lines()
+                        .map(|line| line.trim_start_matches('\t'))
+                        .collect::<Vec<&str>>()
+                        .join("\n")
+                } else {
+                    content.clone()
+                };
+                self.active_bindings
+                    .insert(*fd, StreamTarget::Buffer(body.into_bytes()));
+            }
+            RedirectSpec::HereString { fd, content } => {
+                self.redirection_log
+                    .push(format!("REDIRECT: Here-String -> FD {}", fd));
+                let mut data = content.as_bytes().to_vec();
+                if !data.ends_with(b"\n") {
+                    data.push(b'\n');
+                }
+                self.active_bindings
+                    .insert(*fd, StreamTarget::Buffer(data));
+            }
+            RedirectSpec::CombinedOutput { path, append } => {
+                self.redirection_log.push(format!(
+                    "REDIRECT: Combined stdout+stderr (FD 1 & 2) -> file '{}' (append={})",
+                    path, append
+                ));
+                self.active_bindings.insert(
+                    1,
+                    StreamTarget::File {
+                        path: path.clone(),
+                        append: *append,
+                    },
+                );
+                self.active_bindings
+                    .insert(2, StreamTarget::DuplicatedFd(1));
+            }
+            RedirectSpec::ProcessSubInput { fd, command } => {
+                self.redirection_log.push(format!(
+                    "REDIRECT: Process Substitution Input <({:?}) -> FD {}",
+                    command, fd
+                ));
+                self.active_bindings.insert(
+                    *fd,
+                    StreamTarget::ProcessPipe {
+                        sub_command: format!("{:?}", command),
+                    },
+                );
+            }
+            RedirectSpec::ProcessSubOutput { fd, command } => {
+                self.redirection_log.push(format!(
+                    "REDIRECT: Process Substitution Output >({:?}) -> FD {}",
+                    command, fd
+                ));
+                self.active_bindings.insert(
+                    *fd,
+                    StreamTarget::ProcessPipe {
+                        sub_command: format!("{:?}", command),
+                    },
+                );
+            }
+        }
+        Ok(())
+    }
+
+    /// Writes output data to a target file descriptor, respecting bindings
+    pub fn write_fd(&mut self, fd: u32, data: &[u8]) {
+        if let Some(target) = self.active_bindings.get(&fd).cloned() {
+            match target {
+                StreamTarget::Buffer(_) => {
+                    self.captured_outputs
+                        .entry(fd)
+                        .or_insert_with(Vec::new)
+                        .extend_from_slice(data);
+                }
+                StreamTarget::File { path, append: _ } => {
+                    self.redirection_log.push(format!(
+                        "WRITE FD {}: {} bytes -> '{}'",
+                        fd,
+                        data.len(),
+                        path
+                    ));
+                    self.captured_outputs
+                        .entry(fd)
+                        .or_insert_with(Vec::new)
+                        .extend_from_slice(data);
+                }
+                StreamTarget::DuplicatedFd(target_fd) => {
+                    self.write_fd(target_fd, data);
+                }
+                StreamTarget::Closed => {
+                    // Discard output for closed descriptor
+                }
+                StreamTarget::ProcessPipe { sub_command } => {
+                    self.redirection_log.push(format!(
+                        "WRITE FD {}: {} bytes -> Pipe('{}')",
+                        fd,
+                        data.len(),
+                        sub_command
+                    ));
+                    self.captured_outputs
+                        .entry(fd)
+                        .or_insert_with(Vec::new)
+                        .extend_from_slice(data);
+                }
+            }
+        } else {
+            self.captured_outputs
+                .entry(fd)
+                .or_insert_with(Vec::new)
+                .extend_from_slice(data);
+        }
+    }
+
+    /// Reads buffered data for input file descriptor
+    pub fn read_fd(&self, fd: u32) -> Option<&[u8]> {
+        if let Some(StreamTarget::Buffer(buf)) = self.active_bindings.get(&fd) {
+            Some(buf.as_slice())
+        } else {
+            None
+        }
+    }
+
+    /// Retrieves captured output buffer for a descriptor
+    pub fn get_captured_output(&self, fd: u32) -> Option<&[u8]> {
+        self.captured_outputs.get(&fd).map(|v| v.as_slice())
+    }
 }
 
 pub struct Environment {
@@ -71,7 +368,9 @@ impl<'a> Parser<'a> {
     }
 
     fn skip_whitespace(&mut self) {
-        while self.pos < self.input.len() && self.input[self.pos..].starts_with(char::is_whitespace) {
+        while self.pos < self.input.len()
+            && self.input[self.pos..].starts_with(char::is_whitespace)
+        {
             self.pos += self.input[self.pos..].chars().next().unwrap().len_utf8();
         }
     }
@@ -84,6 +383,10 @@ impl<'a> Parser<'a> {
         let c = self.peek()?;
         self.pos += c.len_utf8();
         Some(c)
+    }
+
+    fn starts_with(&self, s: &str) -> bool {
+        self.input[self.pos..].starts_with(s)
     }
 
     pub fn parse(&mut self) -> Option<ShellCommand> {
@@ -111,12 +414,12 @@ impl<'a> Parser<'a> {
         let mut cmd = self.parse_pipeline()?;
         self.skip_whitespace();
         while self.pos < self.input.len() {
-            if self.input[self.pos..].starts_with("&&") {
+            if self.starts_with("&&") {
                 self.pos += 2;
                 if let Some(next) = self.parse_pipeline() {
                     cmd = ShellCommand::And(Box::new(cmd), Box::new(next));
                 }
-            } else if self.input[self.pos..].starts_with("||") {
+            } else if self.starts_with("||") {
                 self.pos += 2;
                 if let Some(next) = self.parse_pipeline() {
                     cmd = ShellCommand::Or(Box::new(cmd), Box::new(next));
@@ -150,17 +453,51 @@ impl<'a> Parser<'a> {
             self.skip_whitespace();
             let p = self.peek();
             if p.is_none() || p == Some('|') || p == Some(';') || p == Some('&') {
-                break;
+                if p == Some('&') && !self.starts_with("&>") {
+                    break;
+                }
             }
-            
-            if p == Some('>') {
-                self.advance();
-                let append = self.peek() == Some('>');
-                if append { self.advance(); }
-                self.skip_whitespace();
-                let path = self.parse_word()?;
-                redirects.push(Redirect { fd: 1, path, append });
+
+            // Check for process substitution <(cmd) or >(cmd)
+            if self.starts_with("<(") || self.starts_with(">(") {
+                let is_input = self.starts_with("<(");
+                self.pos += 2;
+                let sub_str = self.parse_until_matching_paren()?;
+                let mut sub_parser = Parser::new(&sub_str);
+                if let Some(sub_cmd) = sub_parser.parse() {
+                    if is_input {
+                        redirects.push(RedirectSpec::ProcessSubInput {
+                            fd: 0,
+                            command: Box::new(sub_cmd),
+                        });
+                    } else {
+                        redirects.push(RedirectSpec::ProcessSubOutput {
+                            fd: 1,
+                            command: Box::new(sub_cmd),
+                        });
+                    }
+                }
                 continue;
+            }
+
+            // Check for explicit FD prefix e.g., "2>", "1>", "2>&1", "0<"
+            let mut explicit_fd: Option<u32> = None;
+            let current_pos = self.pos;
+            if let Some(fd_val) = self.try_parse_fd_prefix() {
+                explicit_fd = Some(fd_val);
+            }
+
+            let peek_c = self.peek();
+            if peek_c == Some('>') || peek_c == Some('<') || self.starts_with("&>") || self.starts_with(">&") {
+                if let Some(spec) = self.parse_redirect_operator(explicit_fd) {
+                    redirects.push(spec);
+                    continue;
+                } else {
+                    self.pos = current_pos;
+                }
+            } else if explicit_fd.is_some() {
+                // Not a redirection, rewind
+                self.pos = current_pos;
             }
 
             if let Some(word) = self.parse_word() {
@@ -181,9 +518,222 @@ impl<'a> Parser<'a> {
         Some(cmd)
     }
 
+    fn try_parse_fd_prefix(&mut self) -> Option<u32> {
+        let mut save_pos = self.pos;
+        let mut num: u32 = 0;
+        let mut digits = 0;
+
+        while save_pos < self.input.len() {
+            let c = self.input[save_pos..].chars().next().unwrap();
+            if c.is_ascii_digit() {
+                num = num * 10 + (c as u32 - '0' as u32);
+                digits += 1;
+                save_pos += c.len_utf8();
+            } else {
+                break;
+            }
+        }
+
+        if digits > 0 && save_pos < self.input.len() {
+            let next_c = self.input[save_pos..].chars().next().unwrap();
+            if next_c == '>' || next_c == '<' {
+                self.pos = save_pos;
+                return Some(num);
+            }
+        }
+
+        None
+    }
+
+    fn parse_redirect_operator(&mut self, explicit_fd: Option<u32>) -> Option<RedirectSpec> {
+        // Combined stdout & stderr: &> or &>>
+        if self.starts_with("&>") {
+            let append = self.starts_with("&>>");
+            self.pos += if append { 3 } else { 2 };
+            self.skip_whitespace();
+            let path = self.parse_word()?;
+            return Some(RedirectSpec::CombinedOutput { path, append });
+        }
+
+        // Here-string: <<<
+        if self.starts_with("<<<") {
+            self.pos += 3;
+            self.skip_whitespace();
+            let content = self.parse_word()?;
+            let fd = explicit_fd.unwrap_or(0);
+            return Some(RedirectSpec::HereString { fd, content });
+        }
+
+        // Here-doc: <<- or <<
+        if self.starts_with("<<-") || self.starts_with("<<") {
+            let strip_tabs = self.starts_with("<<-");
+            self.pos += if strip_tabs { 3 } else { 2 };
+            self.skip_whitespace();
+            let delimiter = self.parse_word()?;
+            let fd = explicit_fd.unwrap_or(0);
+            let content = self.collect_here_doc_body(&delimiter);
+            return Some(RedirectSpec::HereDoc {
+                fd,
+                delimiter,
+                strip_leading_tabs: strip_tabs,
+                content,
+            });
+        }
+
+        // FD duplication / closing: >&N, <&N, >&-, <&-
+        if self.starts_with(">&") || self.starts_with("<&") {
+            let is_output = self.starts_with(">&");
+            let op_pos = self.pos;
+            self.pos += 2;
+            self.skip_whitespace();
+
+            if self.peek() == Some('-') {
+                self.advance();
+                let fd = explicit_fd.unwrap_or(if is_output { 1 } else { 0 });
+                return Some(RedirectSpec::CloseFd { fd });
+            }
+
+            if let Some(target_fd) = self.parse_u32() {
+                let src_fd = explicit_fd.unwrap_or(if is_output { 1 } else { 0 });
+                if is_output {
+                    return Some(RedirectSpec::DupOutput { src_fd, target_fd });
+                } else {
+                    return Some(RedirectSpec::DupInput { src_fd, target_fd });
+                }
+            }
+
+            // If not followed by digits or `-`, rewind and treat `>& file` as CombinedOutput
+            self.pos = op_pos + 2;
+            self.skip_whitespace();
+            if let Some(path) = self.parse_word() {
+                return Some(RedirectSpec::CombinedOutput { path, append: false });
+            }
+        }
+
+        // Output redirection: >>, >|, >
+        if self.starts_with(">>") {
+            self.pos += 2;
+            self.skip_whitespace();
+            let path = self.parse_word()?;
+            let fd = explicit_fd.unwrap_or(1);
+            return Some(RedirectSpec::Output {
+                fd,
+                path,
+                append: true,
+                force: false,
+            });
+        }
+
+        if self.starts_with(">|") {
+            self.pos += 2;
+            self.skip_whitespace();
+            let path = self.parse_word()?;
+            let fd = explicit_fd.unwrap_or(1);
+            return Some(RedirectSpec::Output {
+                fd,
+                path,
+                append: false,
+                force: true,
+            });
+        }
+
+        // Standard output redirect: >
+        if self.peek() == Some('>') {
+            self.advance();
+            self.skip_whitespace();
+            let path = self.parse_word()?;
+            let fd = explicit_fd.unwrap_or(1);
+            return Some(RedirectSpec::Output {
+                fd,
+                path,
+                append: false,
+                force: false,
+            });
+        }
+
+        // Standard input redirect: <
+        if self.peek() == Some('<') {
+            self.advance();
+            self.skip_whitespace();
+            let path = self.parse_word()?;
+            let fd = explicit_fd.unwrap_or(0);
+            return Some(RedirectSpec::Input { fd, path });
+        }
+
+        None
+    }
+
+    fn parse_u32(&mut self) -> Option<u32> {
+        let mut num: u32 = 0;
+        let mut digits = 0;
+
+        while let Some(c) = self.peek() {
+            if c.is_ascii_digit() {
+                num = num * 10 + (c as u32 - '0' as u32);
+                digits += 1;
+                self.advance();
+            } else {
+                break;
+            }
+        }
+
+        if digits > 0 {
+            Some(num)
+        } else {
+            None
+        }
+    }
+
+    fn collect_here_doc_body(&mut self, delimiter: &str) -> String {
+        let mut body = String::new();
+        self.skip_whitespace();
+
+        while self.pos < self.input.len() {
+            let rest = &self.input[self.pos..];
+            if rest.starts_with(delimiter) {
+                let after = &rest[delimiter.len()..];
+                if after.is_empty() || after.starts_with('\n') || after.starts_with(';') {
+                    self.pos += delimiter.len();
+                    break;
+                }
+            }
+
+            if let Some(c) = self.advance() {
+                body.push(c);
+            }
+        }
+
+        body
+    }
+
+    fn parse_until_matching_paren(&mut self) -> Option<String> {
+        let mut depth = 1;
+        let mut result = String::new();
+
+        while let Some(c) = self.advance() {
+            if c == '(' {
+                depth += 1;
+            } else if c == ')' {
+                depth -= 1;
+                if depth == 0 {
+                    break;
+                }
+            }
+            result.push(c);
+        }
+
+        if depth == 0 {
+            Some(result)
+        } else {
+            None
+        }
+    }
+
     fn parse_word(&mut self) -> Option<String> {
         self.skip_whitespace();
-        if self.pos >= self.input.len() { return None; }
+        if self.pos >= self.input.len() {
+            return None;
+        }
         let mut word = String::new();
         let mut in_single = false;
         let mut in_double = false;
@@ -215,7 +765,10 @@ impl<'a> Parser<'a> {
                 continue;
             }
 
-            if !in_single && !in_double && (c.is_whitespace() || c == '|' || c == '&' || c == ';' || c == '>' || c == '<') {
+            if !in_single
+                && !in_double
+                && (c.is_whitespace() || c == '|' || c == '&' || c == ';' || c == '>' || c == '<')
+            {
                 break;
             }
 
@@ -223,17 +776,25 @@ impl<'a> Parser<'a> {
             self.advance();
         }
 
-        if word.is_empty() { None } else { Some(word) }
+        if word.is_empty() {
+            None
+        } else {
+            Some(word)
+        }
     }
 }
 
 pub struct Shell {
     pub env: Environment,
+    pub redirection_engine: RedirectionEngine,
 }
 
 impl Shell {
     pub fn new() -> Self {
-        Self { env: Environment::new() }
+        Self {
+            env: Environment::new(),
+            redirection_engine: RedirectionEngine::new(),
+        }
     }
 
     pub fn execute_line(&mut self, line: &str) -> Result<i32, &'static str> {
@@ -246,22 +807,53 @@ impl Shell {
         }
     }
 
-    fn execute_ast(&mut self, cmd: &ShellCommand) -> Result<i32, &'static str> {
+    pub fn execute_ast(&mut self, cmd: &ShellCommand) -> Result<i32, &'static str> {
         match cmd {
             ShellCommand::Simple(args) => {
-                if args.is_empty() { return Ok(0); }
+                if args.is_empty() {
+                    return Ok(0);
+                }
                 match args[0].as_str() {
                     "export" => {
                         if args.len() > 1 {
                             for arg in &args[1..] {
                                 if let Some(idx) = arg.find('=') {
-                                    self.env.vars.insert(arg[..idx].to_string(), arg[idx+1..].to_string());
+                                    self.env
+                                        .vars
+                                        .insert(arg[..idx].to_string(), arg[idx + 1..].to_string());
                                 }
                             }
                         }
                         Ok(0)
                     }
-                    _ => Ok(0) // Dispatch logic for real binaries
+                    "echo" => {
+                        let text = args[1..].join(" ");
+                        let out_str = format!("{}\n", text);
+                        self.redirection_engine.write_fd(1, out_str.as_bytes());
+                        Ok(0)
+                    }
+                    "cat" => {
+                        let stdin_bytes = self.redirection_engine.read_fd(0).map(|b| b.to_vec());
+                        if let Some(bytes) = stdin_bytes {
+                            self.redirection_engine.write_fd(1, &bytes);
+                        } else {
+                            self.redirection_engine
+                                .write_fd(1, b"[cat: reading standard input]\n");
+                        }
+                        Ok(0)
+                    }
+                    "pwd" => {
+                        let cwd = self
+                            .env
+                            .vars
+                            .get("PWD")
+                            .cloned()
+                            .unwrap_or_else(|| "/home/user".to_string());
+                        let out_str = format!("{}\n", cwd);
+                        self.redirection_engine.write_fd(1, out_str.as_bytes());
+                        Ok(0)
+                    }
+                    _ => Ok(0), // Builtin / external binary dispatch
                 }
             }
             ShellCommand::Pipe(left, right) => {
@@ -270,24 +862,153 @@ impl Shell {
             }
             ShellCommand::And(left, right) => {
                 let status = self.execute_ast(left)?;
-                if status == 0 { self.execute_ast(right) } else { Ok(status) }
+                if status == 0 {
+                    self.execute_ast(right)
+                } else {
+                    Ok(status)
+                }
             }
             ShellCommand::Or(left, right) => {
                 let status = self.execute_ast(left)?;
-                if status != 0 { self.execute_ast(right) } else { Ok(status) }
+                if status != 0 {
+                    self.execute_ast(right)
+                } else {
+                    Ok(status)
+                }
             }
             ShellCommand::Sequence(left, right) => {
                 self.execute_ast(left)?;
                 self.execute_ast(right)
             }
-            ShellCommand::Background(_child) => {
-                // Background execution logic
-                Ok(0)
-            }
-            ShellCommand::Redirect(child, _) => {
-                // Redirection logic
-                self.execute_ast(child)
+            ShellCommand::Background(child) => self.execute_ast(child),
+            ShellCommand::Redirect(child, spec) => {
+                self.redirection_engine.push_snapshot();
+                self.redirection_engine.apply_spec(spec)?;
+                let res = self.execute_ast(child);
+                // Retain redirection_log while popping FD snapshot state
+                let log = self.redirection_engine.redirection_log.clone();
+                self.redirection_engine.pop_snapshot();
+                self.redirection_engine.redirection_log = log;
+                res
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    extern crate std;
+    use super::*;
+
+    #[test]
+    fn test_output_redirection_parsing_and_execution() {
+        let mut shell = Shell::new();
+        let res = shell.execute_line("echo hello world > output.txt");
+        assert!(res.is_ok());
+
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
+            log.contains("REDIRECT: FD 1 -> file 'output.txt'")
+        }));
+        let captured = shell.redirection_engine.get_captured_output(1).unwrap();
+        assert_eq!(captured, b"hello world\n");
+    }
+
+    #[test]
+    fn test_explicit_fd_stderr_redirection() {
+        let mut shell = Shell::new();
+        let res = shell.execute_line("echo error_msg 2> err.log");
+        assert!(res.is_ok());
+
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
+            log.contains("REDIRECT: FD 2 -> file 'err.log'")
+        }));
+    }
+
+    #[test]
+    fn test_fd_duplication_2_to_1() {
+        let mut shell = Shell::new();
+        let res = shell.execute_line("echo test 2>&1");
+        assert!(res.is_ok());
+
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
+            log.contains("REDIRECT: Dup Output FD 2 -> FD 1")
+        }));
+    }
+
+    #[test]
+    fn test_here_string_parsing() {
+        let mut parser = Parser::new("cat <<< 'sovereign_data'");
+        let cmd = parser.parse().unwrap();
+
+        match cmd {
+            ShellCommand::Redirect(_, RedirectSpec::HereString { fd, content }) => {
+                assert_eq!(fd, 0);
+                assert_eq!(content, "sovereign_data");
+            }
+            _ => panic!("Expected HereString redirect"),
+        }
+    }
+
+    #[test]
+    fn test_here_doc_parsing() {
+        let mut parser = Parser::new("cat << EOF\nline 1\nline 2\nEOF");
+        let cmd = parser.parse().unwrap();
+
+        match cmd {
+            ShellCommand::Redirect(_, RedirectSpec::HereDoc { fd, delimiter, content, .. }) => {
+                assert_eq!(fd, 0);
+                assert_eq!(delimiter, "EOF");
+                assert!(content.contains("line 1"));
+                assert!(content.contains("line 2"));
+            }
+            _ => panic!("Expected HereDoc redirect"),
+        }
+    }
+
+    #[test]
+    fn test_combined_output_redirection() {
+        let mut parser = Parser::new("echo hello &> combined.log");
+        let cmd = parser.parse().unwrap();
+
+        match cmd {
+            ShellCommand::Redirect(_, RedirectSpec::CombinedOutput { path, append }) => {
+                assert_eq!(path, "combined.log");
+                assert!(!append);
+            }
+            _ => panic!("Expected CombinedOutput redirect"),
+        }
+    }
+
+    #[test]
+    fn test_process_substitution_parsing() {
+        let mut parser = Parser::new("cat <(echo internal_sub)");
+        let cmd = parser.parse().unwrap();
+
+        match cmd {
+            ShellCommand::Redirect(_, RedirectSpec::ProcessSubInput { fd, command }) => {
+                assert_eq!(fd, 0);
+                match *command {
+                    ShellCommand::Simple(args) => {
+                        assert_eq!(args, alloc::vec!["echo", "internal_sub"]);
+                    }
+                    _ => panic!("Expected simple subcommand"),
+                }
+            }
+            _ => panic!("Expected ProcessSubInput redirect"),
+        }
+    }
+
+    #[test]
+    fn test_multiple_chained_redirections() {
+        let mut shell = Shell::new();
+        let res = shell.execute_line("echo chained > out.txt 2>&1");
+        assert!(res.is_ok());
+
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
+            log.contains("file 'out.txt'")
+        }));
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
+            log.contains("Dup Output FD 2 -> FD 1")
+        }));
     }
 }
