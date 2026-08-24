@@ -304,14 +304,6 @@ impl Scheduler {
     }
 }
 
-impl Default for CfsScheduler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-
-
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
     tasks: [Option<Task>; 64],
@@ -360,6 +352,11 @@ impl CfsScheduler {
     }
 }
 
+impl Default for CfsScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(test)]
 mod tests {

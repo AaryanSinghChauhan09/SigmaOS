@@ -433,7 +433,7 @@ impl Default for ZeroCopyNetwork {
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
         ZeroCopyNetwork {
-            dma_buffer_address: 0,
+            dma_buffer: AtomicUsize::new(0),
         }
     }
 }

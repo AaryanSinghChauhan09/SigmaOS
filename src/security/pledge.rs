@@ -11,7 +11,9 @@ use std::collections::BTreeMap;
 #[cfg(not(test))]
 use crate::klib::BTreeMap;
 
-
+#[cfg(test)]
+#[path = "capability.rs"]
+pub mod capability;
 
 #[cfg(test)]
 use capability::{CapabilityGate, CapabilityToken, Permission};

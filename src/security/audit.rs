@@ -12,7 +12,7 @@ pub type EventID = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogFormat {
-    Text,
+    PlainText,
     Json,
     Binary,
 }
@@ -25,8 +25,6 @@ pub enum EventType {
     FileAccess = 2,
     SystemChange = 3,
 }
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuditError {

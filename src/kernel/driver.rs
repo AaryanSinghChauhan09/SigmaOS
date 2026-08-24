@@ -206,26 +206,28 @@ impl DriverRegistry {
 mod tests {
     use super::*;
 
+    use crate::kernel::object::{KObject, ObjectError};
+
     struct MockDriver {
         owner: Option<String>,
         debug_level: String,
+        base: KObject,
     }
 
     impl KernelObject for MockDriver {
-        fn id(&self) -> u64 { 1 }
-        fn name(&self) -> &str { "mock_driver" }
-        fn set_name(&mut self, _name: &str) {}
-        fn parent(&self) -> Option<&dyn KernelObject> { None }
-        fn set_parent(&mut self, _parent: Option<&dyn KernelObject>) {}
-        fn children(&self) -> Vec<&dyn KernelObject> { Vec::new() }
-        fn add_child(&mut self, _child: &dyn KernelObject) {}
-        fn remove_child(&mut self, _child_name: &str) -> Option<Box<dyn KernelObject>> { None }
-        fn kref(&self) -> &KRef { static KREF: KRef = KRef::new(); &KREF }
+        fn name(&self) -> &str { self.base.name() }
+        fn set_name(&mut self, name: &str) { self.base.set_name(name); }
+        fn parent(&self) -> Option<&dyn KernelObject> { self.base.parent() }
+        fn set_parent(&mut self, parent: Option<&dyn KernelObject>) { self.base.set_parent(parent); }
+        fn children(&self) -> Vec<&dyn KernelObject> { self.base.children() }
+        fn add_child(&mut self, child: &dyn KernelObject) { self.base.add_child(child); }
+        fn remove_child(&mut self, child_name: &str) -> Option<alloc::boxed::Box<dyn KernelObject>> { self.base.remove_child(child_name) }
+        fn kref(&self) -> &KRef { self.base.kref() }
         fn as_any(&self) -> &dyn core::any::Any { self }
         fn as_any_mut(&mut self) -> &mut dyn core::any::Any { self }
-        fn sysfs_attrs(&self) -> Vec<&str> { Vec::new() }
-        fn sysfs_show(&self, _attr: &str) -> Option<String> { None }
-        fn sysfs_store(&mut self, _attr: &str, _value: &str) -> Result<(), ObjectError> { Ok(()) }
+        fn sysfs_attrs(&self) -> Vec<&str> { self.base.sysfs_attrs() }
+        fn sysfs_show(&self, attr: &str) -> Option<String> { self.base.sysfs_show(attr) }
+        fn sysfs_store(&mut self, attr: &str, value: &str) -> Result<(), ObjectError> { self.base.sysfs_store(attr, value) }
     }
 
     impl Driver for MockDriver {
@@ -262,6 +264,7 @@ mod tests {
         let mut drv = MockDriver {
             owner: None,
             debug_level: "3".to_string(),
+            base: KObject::new("mock_driver"),
         };
 
         assert!(drv.is_pqc_signed());
