@@ -25,6 +25,7 @@ pub struct Permission {
     pub description: String,
 }
 
+<<<<<<< HEAD
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
     fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
@@ -37,6 +38,13 @@ pub trait PackageFormatAdapter {
 
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+=======
+/// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
+/// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
+/// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
+/// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+>>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

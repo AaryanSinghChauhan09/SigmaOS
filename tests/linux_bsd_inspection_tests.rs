@@ -20,6 +20,7 @@ mod unveil;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
 
+<<<<<<< HEAD
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 
@@ -28,6 +29,12 @@ mod eevdf;
 
 #[path = "../src/memory/tlb_associative.rs"]
 mod tlb_associative;
+=======
+
+#[path = "../src/virtualization/vm_manager.rs"]
+mod vm_manager;
+
+>>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 
@@ -152,6 +159,10 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[test]
 fn test_kernel_classic_algorithms_inspection() {
     use eevdf::{EevdfScheduler, Task, ComputeUnit};
@@ -172,6 +183,11 @@ fn test_kernel_classic_algorithms_inspection() {
     assert_eq!(translated, Ok(0x50));
     assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
 }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 
 
 #[test]
