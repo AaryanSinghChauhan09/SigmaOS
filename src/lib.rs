@@ -35,6 +35,7 @@ pub mod access;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
+pub mod userland;
 pub mod virtualization;
 pub mod cluster;
 
@@ -207,6 +208,10 @@ pub use security::{
     PledgePromise, RoutingMode, SandboxPolicy,
 };
 pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
+pub use userland::shell::{
+    Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
+    StreamTarget,
+};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
     PackageRecipe, RecipeError, RecipeManager, SatSolver,

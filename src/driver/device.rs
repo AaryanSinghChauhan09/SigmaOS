@@ -658,8 +658,6 @@ impl Device for SimpleBlockDevice {
 #[cfg(test)]
 mod legacy_tests {
     use super::*;
-    use crate::compatibility::historic_linux::DdeDeviceWrapper;
-    use crate::drivers::dde::UdfInterpreter;
 
     pub struct LegacyDevice {
         pub id: usize,
