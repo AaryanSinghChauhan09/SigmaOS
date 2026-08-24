@@ -1,6 +1,6 @@
 // SigmaOS Sovereign Subsystems Inspection Unit Test Suite
 // Verifies working mechanisms across Sovereign Subsystems:
-// - Open Source Obsoletion Subsystem (Vcs, Init, PqcVpn, Observability, KnowledgeGraph, ApiTest, Partition)
+// - Open Source Obsoletion Subsystem (Vcs, Init, PqcVpn, Observability, KnowledgeGraph, ApiTest, Partition, TerminalMux, SearchEngine, RemoteDesktop, FileTransfer, PackageRegistry, VirtualizationManager)
 // - Sovereign Data Workspace (SovereignML, SovereignCapture, SovereignQuery, SovereignGuard, SovereignCatalog)
 // - POSIX Capabilities & CapabilityToken
 // - OpenBSD Pledge Promises & Unveil Path Protections
@@ -70,6 +70,38 @@ fn test_open_source_obsoletion_subsystem_inspection() {
     let ok = part.create_partition(SovereignFsType::Ext4, 1000, "Primary-NVMe");
     assert!(ok.is_ok());
     assert!(part.verify_alignment());
+
+    let mut mux = SovereignTerminalMultiplexer::new("session_main");
+    let p2 = mux.split_pane("Build");
+    assert_eq!(p2, 2);
+
+    let mut search = SovereignSearchEngine::new();
+    search.index_document(SearchDocument {
+        doc_id: 1,
+        title: "Microkernel Specs".to_string(),
+        content: "Zero-dependency architecture".to_string(),
+        tags: vec!["kernel".to_string()],
+    });
+    assert_eq!(search.search("zero-dependency").len(), 1);
+
+    let mut rdp = SovereignRemoteDesktop::new("rdp_1", [0x01; 32]);
+    assert!(rdp.connect());
+
+    let mut sft = SovereignFileTransfer::new("dev1");
+    sft.track_file("data.bin", 2048, [0x11; 32]);
+    assert_eq!(sft.tracked_files.len(), 1);
+
+    let mut reg = SovereignPackageRegistry::new("sovereign-registry");
+    assert!(reg.publish(SovereignPackageVersion {
+        pkg_name: "sigma-rt".to_string(),
+        version: "1.0.0".to_string(),
+        license: "MIT".to_string(),
+        binary_hash: [0x22; 32],
+    }).is_ok());
+
+    let mut vm_mgr = SovereignVirtualizationManager::new();
+    let vmid = vm_mgr.create_vm("guest-1", 2, 4096);
+    assert_eq!(vmid, 1);
 }
 
 #[test]

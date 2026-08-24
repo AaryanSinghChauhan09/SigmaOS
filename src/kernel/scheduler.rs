@@ -6,8 +6,6 @@ use alloc::vec::Vec;
 use core::cmp::Ordering;
 use core::time::Duration;
 
-
-
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
@@ -35,7 +33,6 @@ impl PartialEq for Task {
         self.vruntime == other.vruntime
     }
 }
-
 
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -156,7 +153,6 @@ impl WorkStealingQueue {
     }
 }
 
-
 impl Eq for Task {}
 
 impl PartialOrd for Task {
@@ -184,6 +180,9 @@ impl Scheduler {
         Self {
             processes: Vec::new(),
             current_time: 0,
+            system_vtime: 0,
+            numa_nodes: Vec::new(),
+            run_queues: Vec::new(),
         }
     }
 
@@ -301,13 +300,11 @@ impl Scheduler {
     }
 }
 
-impl Default for CfsScheduler {
+impl Default for Scheduler {
     fn default() -> Self {
         Self::new()
     }
 }
-
-
 
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
