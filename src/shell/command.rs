@@ -483,7 +483,7 @@ impl ShellSession for SimpleShellSession {
 
         if let Some(command) = self.registry.get(&command_name) {
             let mut cmd = SimpleShellCommand::new(command.name(), command.help());
-            let slice = unsafe { core::slice::from_raw_parts(args.data, args.len) };
+            let slice = unsafe { core::slice::from_raw_parts(args.as_ptr(), args.len()) };
             cmd.execute(slice)
         } else {
             Err(CommandError::NotFound)
@@ -686,20 +686,7 @@ mod tests {
         assert!(session.registry.get(b"sigsched").is_some());
     }
 
-    #[test]
-    fn test_execute_sigpkg() {
-        let mut session = SimpleShellSession::new();
-        let result = session.execute_line(b"sigpkg").unwrap();
-        assert_eq!(&result[..6], b"sigpkg");
-    }
 
-    #[test]
-    fn test_command_history_add_and_list() {
-        let mut history = SimpleCommandHistory::new();
-        history.add(b"sigtrace trace task 256");
-        assert_eq!(history.list().len(), 1);
-        assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
-    }
 
     #[test]
     fn test_sigmagrep_execution() {

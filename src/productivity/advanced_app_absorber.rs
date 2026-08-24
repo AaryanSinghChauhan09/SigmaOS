@@ -2,8 +2,8 @@
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use klib::collections::{BTreeMap, HashMap, VecDeque};
-use klib::path::PathBuf;
+use crate::klib::collections::{BTreeMap, HashMap, VecDeque};
+use crate::klib::path::PathBuf;
 use std::path::Path;
 use crate::klib::Uuid;
 
@@ -168,7 +168,7 @@ impl EverythingSearchEngine {
     pub fn index_directory(&mut self, base_path: &Path) {
         let file_record = IndexedFile {
             name: "kernel_signing_key.pem".to_string(),
-            path: base_path.join("kernel_signing_key.pem"),
+            path: crate::klib::custom_string::SigmaString::from(base_path.join("kernel_signing_key.pem").to_str().unwrap()),
             size_bytes: 4096,
             last_modified: 1700000000,
         };

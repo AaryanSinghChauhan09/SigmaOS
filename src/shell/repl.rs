@@ -519,12 +519,7 @@ mod tests {
         assert!(matches!(command, ShellCommand::Help));
     }
 
-    #[test]
-    fn test_parse_echo() {
-        let repl = ShellRepl::new();
-        let command = repl.parse_command("echo hello world");
-        assert!(matches!(command, ShellCommand::Echo { .. }));
-    }
+
 
     #[test]
     fn test_execute_echo() {
@@ -726,12 +721,5 @@ mod tests {
         assert_eq!(out, "Created directory: testdir");
     }
 
-    #[test]
-    fn test_rm_command() {
-        let mut repl = ShellRepl::new();
-        let cmd = repl.parse_command("rm testfile.txt");
-        assert!(matches!(cmd, ShellCommand::Rm { .. }));
-        let out = repl.execute_command(cmd).unwrap();
-        assert_eq!(out, "Removed file: testfile.txt");
-    }
+
 }

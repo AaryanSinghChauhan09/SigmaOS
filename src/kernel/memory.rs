@@ -1,8 +1,9 @@
 // SigmaOS Kernel Memory Management
-// Implements buddy allocator and paging with zero std dependency
+// Implements buddy allocator and paging
 
 extern crate alloc;
 use alloc::vec::Vec;
+use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Memory page size (4KB)
@@ -13,97 +14,6 @@ pub const PAGE_SIZE: usize = 4096;
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PoolType {
-    Paged,    // Swappable (virtual pages can be swapped out to disk)
-    NonPaged, // Always resident in physical memory (for critical drivers and ISRs)
-}
-
-#[derive(Debug, Clone)]
-pub struct PoolBlock {
-    pub addr: usize,
-    pub size: usize,
-    pub pool_type: PoolType,
-    pub tag: [u8; 4], // 4-character driver tag (standard Windows NT Pool Tag, e.g. "File")
-}
-
-pub struct KernelPoolManager {
-    pub paged_pool: Vec<PoolBlock>,
-    pub non_paged_pool: Vec<PoolBlock>,
-    pub total_paged_bytes: usize,
-    pub total_non_paged_bytes: usize,
-}
-
-impl KernelPoolManager {
-    pub fn new() -> Self {
-        Self {
-            paged_pool: Vec::new(),
-            non_paged_pool: Vec::new(),
-            total_paged_bytes: 0,
-            total_non_paged_bytes: 0,
-        }
-    }
-
-    /// Allocate a block from the specific kernel pool with a pool tag (Inspired by Windows NT ExAllocatePoolWithTag)
-    pub fn allocate_pool(&mut self, pool_type: PoolType, size: usize, tag: &[u8; 4]) -> Result<PoolBlock, &'static str> {
-        if size == 0 {
-            return Err("Cannot allocate 0-byte pool block");
-        }
-
-        // Emulate allocating pool virtual address range
-        let addr = match pool_type {
-            PoolType::Paged => 0xD000_0000 + self.total_paged_bytes,
-            PoolType::NonPaged => 0xF000_0000 + self.total_non_paged_bytes,
-        };
-
-        let block = PoolBlock {
-            addr,
-            size,
-            pool_type,
-            tag: *tag,
-        };
-
-        match pool_type {
-            PoolType::Paged => {
-                self.paged_pool.push(block.clone());
-                self.total_paged_bytes += size;
-            }
-            PoolType::NonPaged => {
-                self.non_paged_pool.push(block.clone());
-                self.total_non_paged_bytes += size;
-            }
-        }
-
-        println!(
-            "Windows NT Pool Alloc: Allocated {:?} pool block of {} bytes with tag '{}' at address 0x{:X}",
-            pool_type, size, core::str::from_utf8(tag).unwrap_or("????"), addr
-        );
-
-        Ok(block)
-    }
-
-    /// Free a block from the kernel pool (Inspired by Windows NT ExFreePool)
-    pub fn free_pool(&mut self, addr: usize) -> Result<(), &'static str> {
-        if let Some(pos) = self.paged_pool.iter().position(|b| b.addr == addr) {
-            let block = self.paged_pool.remove(pos);
-            self.total_paged_bytes -= block.size;
-            Ok(())
-        } else if let Some(pos) = self.non_paged_pool.iter().position(|b| b.addr == addr) {
-            let block = self.non_paged_pool.remove(pos);
-            self.total_non_paged_bytes -= block.size;
-            Ok(())
-        } else {
-            Err("Invalid pool address; double free or corruption detected")
-        }
-    }
-}
-
-impl Default for KernelPoolManager {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -246,18 +156,6 @@ impl BuddyAllocator {
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
                 let block = MemoryBlock { addr, size };
-                self.free_lists[order].push(block);
-            }
-            let block = MemoryBlock {
-                addr: NonNull::new(base_addr as *mut u8).unwrap(),
-                size,
-            };
-            self.free_lists[order].push(block);
-            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
                 self.free_lists[order].push(block);
             }
         }
@@ -494,8 +392,6 @@ impl PageTable {
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
     pub buddy_allocator: BuddyAllocator,
-    pub page_ref_counts: HashMap<u64, u32>, // physical frame addr -> reference count (for Copy-on-Write)
-    pub shadow_snapshots: HashMap<u64, String>, // virtual_addr -> snapshot copy (for snapshot isolation)
 }
 
 impl VirtualMemoryManager {
@@ -503,8 +399,6 @@ impl VirtualMemoryManager {
         Self {
             root_directory,
             buddy_allocator: BuddyAllocator::new(),
-            page_ref_counts: HashMap::new(),
-            shadow_snapshots: HashMap::new(),
         }
     }
 
@@ -512,8 +406,6 @@ impl VirtualMemoryManager {
         Self {
             root_directory,
             buddy_allocator: allocator,
-            page_ref_counts: HashMap::new(),
-            shadow_snapshots: HashMap::new(),
         }
     }
 

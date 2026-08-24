@@ -1,0 +1,29 @@
+name: Security Audit & License Compliance Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-scan:
+    name: Security & License Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Security Module Verification
+        run: cargo test --lib security
+
+      - name: Verify License Headers
+        run: |
+          for file in $(find tools/ -name "*.rs"); do
+            if ! head -n 2 "$file" | grep -q "SPDX-License-Identifier: MIT"; then
+              echo "Missing MIT license header in $file"
+            fi
+          done

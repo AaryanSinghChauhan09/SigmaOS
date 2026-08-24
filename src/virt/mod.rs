@@ -39,6 +39,10 @@ pub enum VMSnapshotState {
 /// Enhanced virtual machine
 #[derive(Debug, Clone)]
 pub struct EnhancedVirtualMachine {
+    pub memory_slots: Vec<KvmMemorySlot>,
+    pub vcpus: Vec<KvmVcpuState>,
+    pub balloon: VirtioBalloon,
+    pub snapshot_mgr: VmSnapshotManager,
     pub id: String,
     pub name: String,
     pub state: VMState,
@@ -58,6 +62,10 @@ impl EnhancedVirtualMachine {
             memory,
             disk_size: 10240,
             network_interfaces: Vec::new(),
+            memory_slots: Vec::new(),
+            vcpus: Vec::new(),
+            balloon: VirtioBalloon::new(),
+            snapshot_mgr: VmSnapshotManager::new(),
         }
     }
 
@@ -302,6 +310,253 @@ impl Default for EnhancedVirtManager {
     }
 }
 
+
+
+/// KVM Memory Slot for mapping Guest Physical Addresses (GPA) to Host Virtual Addresses (HVA)
+#[derive(Debug, Clone)]
+pub struct KvmMemorySlot {
+    pub slot_id: u32,
+    pub guest_phys_addr: u64,
+    pub memory_size: u64,
+    pub host_virt_addr: u64,
+    pub flags: u32, // e.g. KVM_MEM_LOG_DIRTY_PAGES, KVM_MEM_READONLY
+}
+
+impl KvmMemorySlot {
+    pub fn new(slot_id: u32, guest_phys_addr: u64, memory_size: u64, host_virt_addr: u64, flags: u32) -> Self {
+        Self {
+            slot_id,
+            guest_phys_addr,
+            memory_size,
+            host_virt_addr,
+            flags,
+        }
+    }
+
+    pub fn contains_gpa(&self, gpa: u64) -> bool {
+        gpa >= self.guest_phys_addr && gpa < (self.guest_phys_addr + self.memory_size)
+    }
+}
+
+/// KVM vCPU General Purpose Registers
+#[derive(Debug, Clone, Default)]
+pub struct KvmRegs {
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64,
+    pub rdi: u64,
+    pub rsp: u64,
+    pub rbp: u64,
+    pub rip: u64,
+    pub rflags: u64,
+}
+
+/// KVM vCPU Segment Registers & Control Registers
+#[derive(Debug, Clone, Default)]
+pub struct KvmSregs {
+    pub cs_base: u64,
+    pub ds_base: u64,
+    pub cr0: u64,
+    pub cr3: u64,
+    pub cr4: u64,
+    pub efer: u64,
+}
+
+/// KVM vCPU Execution State
+#[derive(Debug, Clone)]
+pub struct KvmVcpuState {
+    pub vcpu_id: u32,
+    pub regs: KvmRegs,
+    pub sregs: KvmSregs,
+    pub halted: bool,
+    pub total_exits: u64,
+}
+
+impl KvmVcpuState {
+    pub fn new(vcpu_id: u32) -> Self {
+        Self {
+            vcpu_id,
+            regs: KvmRegs::default(),
+            sregs: KvmSregs::default(),
+            halted: false,
+            total_exits: 0,
+        }
+    }
+
+    pub fn run_vcpu_step(&mut self) -> Result<&'static str, &'static str> {
+        if self.halted {
+            return Ok("KVM_EXIT_HLT");
+        }
+        self.regs.rip += 2; // Simulate 2-byte instruction execution
+        self.total_exits += 1;
+        if self.total_exits % 100 == 0 {
+            Ok("KVM_EXIT_IO")
+        } else {
+            Ok("KVM_EXIT_MMIO")
+        }
+    }
+}
+
+/// VirtIO Memory Balloon Device for dynamic VM memory inflation/deflation
+#[derive(Debug, Clone)]
+pub struct VirtioBalloon {
+    pub num_pages: u32,
+    pub target_pages: u32,
+    pub inflated_mb: u64,
+}
+
+impl VirtioBalloon {
+    pub fn new() -> Self {
+        Self {
+            num_pages: 0,
+            target_pages: 0,
+            inflated_mb: 0,
+        }
+    }
+
+    pub fn set_target_mb(&mut self, target_mb: u64) {
+        self.target_pages = ((target_mb * 1024 * 1024) / 4096) as u32;
+        self.inflated_mb = target_mb;
+    }
+
+    pub fn inflate(&mut self, pages: u32) {
+        self.num_pages += pages;
+        self.inflated_mb += (pages as u64 * 4096) / (1024 * 1024);
+    }
+
+    pub fn deflate(&mut self, pages: u32) {
+        if self.num_pages >= pages {
+            self.num_pages -= pages;
+            self.inflated_mb = self.inflated_mb.saturating_sub((pages as u64 * 4096) / (1024 * 1024));
+        }
+    }
+}
+
+/// QEMU-inspired QCOW2 Backing File & Snapshot Manager
+#[derive(Debug, Clone)]
+pub struct VmSnapshot {
+    pub id: String,
+    pub name: String,
+    pub timestamp_sec: u64,
+    pub memory_snapshot_mb: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct VmSnapshotManager {
+    pub snapshots: Vec<VmSnapshot>,
+    pub backing_file: Option<String>,
+}
+
+impl VmSnapshotManager {
+    pub fn new() -> Self {
+        Self {
+            snapshots: Vec::new(),
+            backing_file: None,
+        }
+    }
+
+    pub fn set_backing_file(&mut self, path: &str) {
+        self.backing_file = Some(path.to_string());
+    }
+
+    pub fn create_snapshot(&mut self, name: &str, mem_mb: u64) -> VmSnapshot {
+        let snap = VmSnapshot {
+            id: name.to_string(),
+            name: name.to_string(),
+            timestamp_sec: 1700000000 + self.snapshots.len() as u64 * 100,
+            memory_snapshot_mb: mem_mb,
+        };
+        self.snapshots.push(snap.clone());
+        snap
+    }
+
+    pub fn restore_snapshot(&self, name: &str) -> Result<VmSnapshot, &'static str> {
+        for snap in &self.snapshots {
+            if snap.name == name {
+                return Ok(snap.clone());
+            }
+        }
+        Err("Snapshot not found")
+    }
+}
+
+
+#[cfg(test)]
+mod vmm_inspection_tests {
+    use super::*;
+
+    #[test]
+    fn test_kvm_memory_slot_inspection() {
+        let slot = KvmMemorySlot::new(0, 0x100000, 0x40000000, 0x7fff00000000, 1);
+        assert_eq!(slot.slot_id, 0);
+        assert!(slot.contains_gpa(0x100000));
+        assert!(slot.contains_gpa(0x200000));
+        assert!(!slot.contains_gpa(0x50100000));
+    }
+
+    #[test]
+    fn test_kvm_vcpu_registers_and_execution() {
+        let mut vcpu = KvmVcpuState::new(1);
+        assert_eq!(vcpu.vcpu_id, 1);
+        vcpu.regs.rip = 0xFFFF800000000000;
+        vcpu.regs.rax = 0x42;
+        assert_eq!(vcpu.regs.rax, 0x42);
+
+        let exit_reason = vcpu.run_vcpu_step().unwrap();
+        assert_eq!(exit_reason, "KVM_EXIT_MMIO");
+        assert_eq!(vcpu.regs.rip, 0xFFFF800000000002);
+        assert_eq!(vcpu.total_exits, 1);
+    }
+
+    #[test]
+    fn test_virtio_balloon_memory_scaling() {
+        let mut balloon = VirtioBalloon::new();
+        balloon.set_target_mb(1024);
+        assert_eq!(balloon.target_pages, 262144);
+
+        balloon.inflate(256); // Inflate 1MB
+        assert_eq!(balloon.num_pages, 256);
+        assert_eq!(balloon.inflated_mb, 1025);
+
+        balloon.deflate(256);
+        assert_eq!(balloon.num_pages, 0);
+        assert_eq!(balloon.inflated_mb, 1024);
+    }
+
+    #[test]
+    fn test_qemu_snapshot_manager_restore() {
+        let mut mgr = VmSnapshotManager::new();
+        mgr.set_backing_file("/var/lib/sigmaos/images/base_debian.qcow2");
+        assert_eq!(mgr.backing_file.as_deref(), Some("/var/lib/sigmaos/images/base_debian.qcow2"));
+
+        let snap1 = mgr.create_snapshot("clean_checkpoint", 2048);
+        assert_eq!(snap1.memory_snapshot_mb, 2048);
+
+        let restored = mgr.restore_snapshot("clean_checkpoint").unwrap();
+        assert_eq!(restored.id, "clean_checkpoint");
+        assert!(mgr.restore_snapshot("non_existent").is_err());
+    }
+
+    #[test]
+    fn test_enhanced_vm_kvm_integration() {
+        let mut vm = EnhancedVirtualMachine::new("sovereign-guest-01", 4, 8192);
+        assert_eq!(vm.name, "sovereign-guest-01");
+        assert_eq!(vm.state, VMState::Stopped);
+
+        vm.memory_slots.push(KvmMemorySlot::new(0, 0, 8192 * 1024 * 1024, 0x7f0000000000, 0));
+        assert_eq!(vm.memory_slots.len(), 1);
+
+        vm.vcpus.push(KvmVcpuState::new(0));
+        vm.vcpus.push(KvmVcpuState::new(1));
+        assert_eq!(vm.vcpus.len(), 2);
+
+        let snap = vm.snapshot_mgr.create_snapshot("initial_boot", 8192);
+        assert_eq!(snap.name, "initial_boot");
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -337,7 +592,7 @@ mod tests {
     #[test]
     fn test_live_migration() {
         let mut manager = EnhancedVirtManager::new(HypervisorType::KVM);
-        let mut vm = VirtualMachine::new("test-vm", 2, 4096);
+        let mut vm = EnhancedVirtualMachine::new("test-vm", 2, 4096);
         vm.start().unwrap();
         manager.add_vm(vm);
         assert!(manager.migrate_vm("test-vm", "target-host").is_ok());

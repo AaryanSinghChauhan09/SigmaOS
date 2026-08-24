@@ -1,17 +1,65 @@
 // SigmaOS Productivity Module
 pub mod gamification;
-pub mod subtitle_editor;
-pub mod sigmadev;
-pub mod mint_competitor;
-pub mod sovereign_apps;
+pub mod media;
+pub mod notes;
+pub mod screen_recorder;
+pub mod screenshot;
+pub mod sigma_office;
+pub mod tasks;
+pub mod terminal;
+pub mod advanced_app_absorber;
+pub mod tmux;
+pub mod utility_suite;
+pub mod mind_map;
 
-pub use tmux::*;
+pub use mind_map::MindMapCreator;
+
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
-pub use sovereign_apps::{
-    ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
-    TextNode,
+pub use notes::{
+    ContentType, Folder, InMemoryNoteStorage, Note, NoteError, NoteSearchResult, NoteStorage,
+    NoteTakingApp, Notebook,
 };
-pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
+pub use screen_recorder::{
+    AudioQuality, FfmpegBackend, GStreamerBackend, RecorderError, RecordingBackend,
+    RecordingConfig, RecordingFormat, RecordingProgress, RecordingRegion, RecordingState,
+    ScreenRecorder, VideoQuality,
+};
+pub use screenshot::{
+    CaptureRegion, ImageFormat, MacOsBackend, ScreenshotBackend, ScreenshotConfig, ScreenshotError,
+    ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
+};
+pub use sigma_office::{
+    CellValue, ChartType, DocumentMetadata as SigmaOfficeDocumentMetadata, DocumentNode,
+    DocumentType, PresentationProcessor, ShapeType, SigmaDocument, SigmaOffice, SlideElementType,
+    SpreadsheetProcessor, TextProcessor, TypographyRenderer,
+};
+pub use tasks::{
+    InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,
+    TaskError, TaskManager, TaskPriority, TaskStatus, TaskStorage,
+};
+pub use terminal::{
+    BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
+    SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
+};
+pub use tmux::{
+    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+};
+pub use media::{
+    MediaFormat, PlaybackState, SigmaMediaEngine,
+};
+pub use utility_suite::{
+    FileIndexEntry, EverythingSearchEngine, TextTab, NotepadPlusPlusBuffer,
+    BrowserContainerType, BrowserTabInstance, SovereignBrowserEngine,
+    CompressionMethod, ArchiveVolume, SevenZipEngine,
+    AnnotationShape, ScreenshotAnnotation, FlameshotAnnotator,
+    VideoSourceLayer, ObsStudioMixer,
+    AudacityWaveEditor,
+    VlcCodecPipeline,
+    VideoTrackClip, DaVinciTimeline,
+    ItemAgeColor, OneCommanderFileGrid,
+    AppVolumeChannel, EarTrumpetVolumeMatrix,
+    ExifMetadata, IrfanViewEngine,
+};

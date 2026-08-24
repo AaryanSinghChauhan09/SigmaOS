@@ -1,0 +1,24 @@
+name: VMM QEMU/KVM Virtualization & Parity CI
+
+on:
+  push:
+    branches: [ main, "feature/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  virtualization-ci:
+    name: VMM & Hypervisor Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Virtualization Unit & Integration Tests
+        run: cargo test --lib virt::vmm_inspection_tests
+
+      - name: Verify Virtualization Orchestration Tests
+        run: cargo test --lib virtualization::orchestration::tests

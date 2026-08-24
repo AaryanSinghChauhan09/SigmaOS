@@ -17,14 +17,12 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Memory Module
-// Virtual memory management, paging, physical memory allocation, and TLB caching
+// Virtual memory management, paging, and physical memory allocation
 
 pub mod paging;
 pub mod zone;
 pub mod kswapd;
 pub mod cgroups;
-pub mod segmentation_paging;
-pub mod tlb_associative;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
@@ -34,12 +32,3 @@ pub use paging::{
 pub use zone::{BsdZoneAllocator, Zone, ZoneStats, Slab};
 pub use kswapd::{LinuxKswapd, PageState};
 pub use cgroups::{MemCgroupManager, MemCgroup};
-pub use segmentation_paging::{
-    AddressBindingMode, AddressType, AslrEntropyConfig, CpuPrivilegeMode, CpuRing, ExecutableAddressBinding,
-    GlobalDescriptorTable, MultiLevelPagingEngine, ProtectionLevel, ProtectionViolationType,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentType, SegmentedAddress,
-    SegmentationPagingEngine, SpaceProtectionFlags, SystemControlRegisters,
-};
-pub use tlb_associative::{
-    AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags,
-};

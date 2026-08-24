@@ -1,4 +1,7 @@
-use crate::driver::device::DdeDeviceWrapper;
+pub struct DdeDeviceWrapper { pub simulated_pci_bar: [u32; 6] }
+impl DdeDeviceWrapper { pub fn new(_id: u32, _name: &[u8], _base: u16, _tag: &[u8]) -> Self { Self { simulated_pci_bar: [0; 6] } } }
+
+
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
@@ -218,8 +221,8 @@ impl VintageDriverTranslator {
     pub fn emulate_io_port(&mut self, port: u16, val: u8) -> Result<(), HistoricError> {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
-            let idx = (port % 256) as usize;
-            self.wrapper.simulated_pci_bar[idx] = val;
+            let idx = (port % 6) as usize;
+            self.wrapper.simulated_pci_bar[idx] = val as u32;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)

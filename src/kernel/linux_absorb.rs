@@ -564,7 +564,7 @@ impl AbsorbedUsbHidDriver {
 
 impl DeviceDriver for AbsorbedUsbHidDriver {
     fn init(&mut self) -> Result<(), DriverError> {
-        self._connected = true;
+        self.connected = true;
         Ok(())
     }
 
@@ -581,7 +581,7 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
     }
 
     fn shutdown(&mut self) -> Result<(), DriverError> {
-        self._connected = false;
+        self.connected = false;
         Ok(())
     }
 
@@ -653,8 +653,8 @@ impl AbsorbedExt4Driver {
                     v
                 },
             },
-            _mounted: false,
-            _mount_point: String::new(),
+            mounted: false,
+            mount_point: String::new(),
         }
     }
 }
@@ -671,8 +671,8 @@ impl FileSystem for AbsorbedExt4Driver {
     }
 
     fn unmount(&mut self) -> Result<(), FsError> {
-        self._mounted = false;
-        self._mount_point.clear();
+        self.mounted = false;
+        self.mount_point.clear();
         Ok(())
     }
 

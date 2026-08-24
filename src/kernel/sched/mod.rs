@@ -14,3 +14,6 @@ pub use sigma_mlfq::{MlfqSchedClass, MlfqScheduler};
 pub use sigma_transformer_sched::{TransformerSchedClass, TransformerScheduler};
 pub use sigma_thermal_sched::{SchedulingDecision, ThermalSchedClass, ThermalScheduler};
 pub use aperiodic::{AperiodicPriority, AperiodicScheduler, AperiodicServerKind, AperiodicTask, SchedulerMetrics};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskWorkloadType { Interactive, CpuBound, SystemKernelDaemon, RealTimePeriodic, Batch }

@@ -1,8 +1,13 @@
 extern crate alloc;
 
-use alloc::vec::Vec;
-use alloc::string::String;
-use crate::klib::collections::HashMap;
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::{Vec, String, HashMap};
+
+#[cfg(feature = "standalone_test")]
+use alloc::{vec::Vec, string::String};
+
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {
@@ -79,7 +84,8 @@ impl BsdPfStateTable {
             state.packets_passed += 1;
             state.last_seen_timestamp_sec = now_sec;
 
-            if let (Some(nat_ip), Some(nat_port)) = (&state.translated_src_ip, state.translated_src_port) {
+            if let (Some(ref nat_ip), Some(nat_port)) = (&state.translated_src_ip, state.translated_src_port) {
+                let nat_ip: &String = nat_ip;
                 Ok(Some((nat_ip.clone(), nat_port)))
             } else {
                 Ok(None)
@@ -90,7 +96,7 @@ impl BsdPfStateTable {
     }
 
     pub fn expire_states(&mut self, now_sec: u64) -> usize {
-        let mut expired_keys = Vec::new();
+        let mut expired_keys: Vec<PfFiveTuple> = Vec::new();
         for (tuple, state) in &self.states {
             if now_sec > state.last_seen_timestamp_sec.saturating_add(state.timeout_sec) {
                 expired_keys.push(tuple.clone());
@@ -152,7 +158,8 @@ impl LinuxFutexEngine {
     pub fn futex_wake(&mut self, uaddr: u64, val_wake: usize) -> usize {
         let mut woken = 0;
         if let Some(waiters) = self.buckets.get_mut(&uaddr) {
-            let count = val_wake.min(waiters.len());
+            let waiters_len = waiters.len();
+            let count = val_wake.min(waiters_len);
             for _ in 0..count {
                 if !waiters.is_empty() {
                     waiters.remove(0);
@@ -204,7 +211,8 @@ impl FreeBsdVfsNullfs {
 
     pub fn resolve_overlay_path(&self, overlay_path: &str, is_write: bool) -> Result<(String, Option<u32>), &'static str> {
         for (mp, node) in &self.mounts {
-            if overlay_path == mp || (overlay_path.starts_with(mp) && overlay_path.as_bytes().get(mp.len()) == Some(&b'/')) {
+            let mp: &String = mp;
+            if overlay_path == mp || (overlay_path.starts_with(mp.as_str()) && overlay_path.as_bytes().get(mp.len()) == Some(&b'/')) {
                 if is_write && node.read_only {
                     return Err("Nullfs: EROFS - Read-only file system layer");
                 }
@@ -276,6 +284,7 @@ impl OpenBsdPledge {
             return true;
         }
         for promise in &self.promises {
+            let promise: &String = promise;
             if promise.as_str() == operation {
                 return true;
             }
@@ -284,162 +293,101 @@ impl OpenBsdPledge {
     }
 }
 
-// ================= Bounded Buffer Producer/Consumer Monitor =================
+// ================= Linux Cgroups v2 Resource Controller =================
 
-pub struct BoundedBufferProducerConsumer<T, const N: usize> {
-    pub buffer: [Option<T>; N],
-    pub head: usize,
-    pub tail: usize,
-    pub count: usize,
+#[derive(Debug, Clone)]
+pub struct CgroupResourceLimits {
+    pub cpu_quota_us: u64,     // e.g. 50000 us per period (50% CPU)
+    pub cpu_period_us: u64,    // e.g. 100000 us
+    pub memory_max_bytes: u64,  // hard memory limit in bytes
+    pub memory_high_bytes: u64, // soft memory limit (throttle boundary)
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u16,        // 1 to 1000 (BFQ/io weight)
 }
 
-impl<T: Copy, const N: usize> BoundedBufferProducerConsumer<T, N> {
+impl Default for CgroupResourceLimits {
+    fn default() -> Self {
+        Self {
+            cpu_quota_us: u64::MAX,
+            cpu_period_us: 100_000,
+            memory_max_bytes: u64::MAX,
+            memory_high_bytes: u64::MAX,
+            memory_swap_max_bytes: u64::MAX,
+            io_weight: 100,
+        }
+    }
+}
+
+pub struct CgroupNode {
+    pub path: String,
+    pub limits: CgroupResourceLimits,
+    pub pids: Vec<u64>,
+    pub current_cpu_usage_us: u64,
+    pub current_memory_bytes: u64,
+}
+
+/// Linux Cgroups v2 unified hierarchy governor
+pub struct SovereignCgroupGovernor {
+    pub groups: HashMap<String, CgroupNode>,
+}
+
+impl SovereignCgroupGovernor {
     pub fn new() -> Self {
         Self {
-            buffer: [None; N],
-            head: 0,
-            tail: 0,
-            count: 0,
+            groups: HashMap::new(),
         }
     }
 
-    pub fn produce(&mut self, item: T) -> Result<(), &'static str> {
-        if self.count >= N {
-            return Err("Bounded Buffer Full: Producer blocked!");
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        if self.groups.contains_key(path) {
+            return Err("Cgroup: Group path already exists");
         }
-        self.buffer[self.tail] = Some(item);
-        self.tail = (self.tail + 1) % N;
-        self.count += 1;
+        self.groups.insert(path.to_string(), CgroupNode {
+            path: path.to_string(),
+            limits: CgroupResourceLimits::default(),
+            pids: Vec::new(),
+            current_cpu_usage_us: 0,
+            current_memory_bytes: 0,
+        });
         Ok(())
     }
 
-    pub fn consume(&mut self) -> Result<T, &'static str> {
-        if self.count == 0 {
-            return Err("Bounded Buffer Empty: Consumer blocked!");
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+        let node = self.groups.get_mut(path).ok_or("Cgroup: Group not found")?;
+        node.limits = limits;
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
+        let node = self.groups.get_mut(path).ok_or("Cgroup: Target group not found")?;
+        if !node.pids.contains(&pid) {
+            node.pids.push(pid);
         }
-        let item = self.buffer[self.head].take().ok_or("Buffer slot unpopulated")?;
-        self.head = (self.head + 1) % N;
-        self.count -= 1;
-        Ok(item)
+        Ok(())
     }
 
-    pub fn len(&self) -> usize {
-        self.count
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.count == 0
-    }
-}
-
-impl<T: Copy, const N: usize> Default for BoundedBufferProducerConsumer<T, N> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ================= Bottom-Half Kernel Thread & SoftIRQ Handler =================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SoftIrqType {
-    Timer,
-    NetTx,
-    NetRx,
-    Block,
-    Tasklet,
-}
-
-pub struct BottomHalfKernelThread {
-    pub pending_softirqs: Vec<SoftIrqType>,
-    pub tasklet_queue: Vec<String>,
-}
-
-impl BottomHalfKernelThread {
-    pub fn new() -> Self {
-        Self {
-            pending_softirqs: Vec::new(),
-            tasklet_queue: Vec::new(),
+    pub fn check_cpu_budget(&mut self, path: &str, proposed_usage_us: u64) -> Result<bool, &'static str> {
+        let node = self.groups.get_mut(path).ok_or("Cgroup: Target group not found")?;
+        if node.limits.cpu_quota_us == u64::MAX {
+            node.current_cpu_usage_us = node.current_cpu_usage_us.saturating_add(proposed_usage_us);
+            return Ok(true); // Unlimited
+        }
+        if node.current_cpu_usage_us.saturating_add(proposed_usage_us) > node.limits.cpu_quota_us {
+            Ok(false) // Throttled
+        } else {
+            node.current_cpu_usage_us = node.current_cpu_usage_us.saturating_add(proposed_usage_us);
+            Ok(true)
         }
     }
 
-    pub fn raise_softirq(&mut self, irq: SoftIrqType) {
-        if !self.pending_softirqs.contains(&irq) {
-            self.pending_softirqs.push(irq);
+    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
+        let node = self.groups.get_mut(path).ok_or("Cgroup: Target group not found")?;
+        let proposed = node.current_memory_bytes.saturating_add(bytes);
+        if proposed > node.limits.memory_max_bytes {
+            return Err("Cgroup: Out-of-memory! Maximum memory threshold exceeded (OOM killed)");
         }
-    }
-
-    pub fn schedule_tasklet(&mut self, tasklet_name: &str) {
-        self.tasklet_queue.push(tasklet_name.to_string());
-        self.raise_softirq(SoftIrqType::Tasklet);
-    }
-
-    pub fn process_bottom_half(&mut self) -> usize {
-        let count = self.pending_softirqs.len() + self.tasklet_queue.len();
-        self.pending_softirqs.clear();
-        self.tasklet_queue.clear();
-        count
-    }
-}
-
-impl Default for BottomHalfKernelThread {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ================= Android Broadcast Receiver Registry =================
-
-#[derive(Debug, Clone)]
-pub struct BroadcastReceiver {
-    pub name: String,
-    pub intent_filter: String,
-    pub priority: i32,
-}
-
-pub struct AndroidBroadcastReceiverRegistry {
-    pub receivers: Vec<BroadcastReceiver>,
-}
-
-impl AndroidBroadcastReceiverRegistry {
-    pub fn new() -> Self {
-        Self {
-            receivers: Vec::new(),
-        }
-    }
-
-    pub fn register_receiver(&mut self, name: &str, intent_filter: &str, priority: i32) {
-        self.receivers.push(BroadcastReceiver {
-            name: name.to_string(),
-            intent_filter: intent_filter.to_string(),
-            priority,
-        });
-        // Sort descending by priority
-        let n = self.receivers.len();
-        for i in 0..n {
-            for j in 0..n.saturating_sub(1).saturating_sub(i) {
-                if self.receivers[j].priority < self.receivers[j + 1].priority {
-                    let tmp = self.receivers[j].clone();
-                    self.receivers[j] = self.receivers[j + 1].clone();
-                    self.receivers[j + 1] = tmp;
-                }
-            }
-        }
-    }
-
-    pub fn send_broadcast(&self, action: &str) -> Vec<String> {
-        let mut dispatched = Vec::new();
-        for recv in &self.receivers {
-            if recv.intent_filter == action {
-                dispatched.push(recv.name.clone());
-            }
-        }
-        dispatched
-    }
-}
-
-impl Default for AndroidBroadcastReceiverRegistry {
-    fn default() -> Self {
-        Self::new()
+        node.current_memory_bytes = proposed;
+        Ok(())
     }
 }
 
@@ -1739,41 +1687,6 @@ mod tests {
     }
 
     #[test]
-    fn test_bounded_buffer_producer_consumer() {
-        let mut bb: BoundedBufferProducerConsumer<u32, 4> = BoundedBufferProducerConsumer::new();
-        assert!(bb.is_empty());
-
-        bb.produce(10).unwrap();
-        bb.produce(20).unwrap();
-        assert_eq!(bb.len(), 2);
-
-        assert_eq!(bb.consume().unwrap(), 10);
-        assert_eq!(bb.consume().unwrap(), 20);
-        assert!(bb.is_empty());
-    }
-
-    #[test]
-    fn test_bottom_half_kernel_thread() {
-        let mut bh = BottomHalfKernelThread::new();
-        bh.raise_softirq(SoftIrqType::NetRx);
-        bh.schedule_tasklet("e1000_rx_tasklet");
-
-        let processed = bh.process_bottom_half();
-        assert_eq!(processed, 2);
-    }
-
-    #[test]
-    fn test_android_broadcast_receiver_registry() {
-        let mut reg = AndroidBroadcastReceiverRegistry::new();
-        reg.register_receiver("BatteryReceiver", "android.intent.action.BATTERY_LOW", 100);
-        reg.register_receiver("WifiReceiver", "android.intent.action.BATTERY_LOW", 10);
-
-        let res = reg.send_broadcast("android.intent.action.BATTERY_LOW");
-        assert_eq!(res.len(), 2);
-        assert_eq!(res[0], "BatteryReceiver");
-    }
-
-    #[test]
     fn test_sovereign_zones_manager() {
         let mut manager = SovereignZonesManager::new();
         manager.create_zone("db_zone", 50, 1024 * 1024).unwrap();
@@ -2010,6 +1923,7 @@ impl VoidRunitInit {
     
     pub fn is_running(&self, service: &str) -> bool {
         for s in &self.services {
+            let s: &String = s;
             if s.as_str() == service {
                 return true;
             }

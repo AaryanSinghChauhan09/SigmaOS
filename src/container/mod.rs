@@ -8,7 +8,3 @@ pub use runtime::{
     ContainerState, RuntimeCapability, RuntimeStats, SimpleContainer, SimpleContainerRuntime,
 };
 pub use oci_runtime::ContainerError;
-pub use distro_sandbox::{
-    CgroupV2Limits, DistroSandboxEngine, DistroSandboxInstance, LandlockPathRules,
-    NamespaceFlags, SeccompAction, SeccompPolicy,
-};

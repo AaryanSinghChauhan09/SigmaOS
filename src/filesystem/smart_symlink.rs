@@ -3,7 +3,7 @@
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
 // Improved with dynamic env-var expansion, chroot-escape sandbox protection, and multi-lib target ABI routing.
 
-use crate::compatibility::{KernelPersona, SyscallAbi};
+use crate::compatibility::legacy_adapters::{KernelPersona, SyscallAbi};
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 
