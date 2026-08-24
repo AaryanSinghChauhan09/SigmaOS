@@ -2,26 +2,11 @@
 // Clean-room implementation taking inspiration from Linux (pci-sysfs, ECAM, BAR allocation, MSI/MSI-X, PCIe AER, PCIe ASPM)
 // and BSD distributions (FreeBSD devctl/pci ioctls, OpenBSD autoconf PCI matching).
 
-#![no_std]
-
-#[cfg(not(feature = "standalone_test"))]
-use alloc::format;
-#[cfg(not(feature = "standalone_test"))]
-use alloc::string::{String, ToString};
-#[cfg(not(feature = "standalone_test"))]
-use alloc::vec;
-#[cfg(not(feature = "standalone_test"))]
-use alloc::vec::Vec;
-
-#[cfg(feature = "standalone_test")]
 extern crate alloc;
-#[cfg(feature = "standalone_test")]
+
 use alloc::format;
-#[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
-#[cfg(feature = "standalone_test")]
 use alloc::vec;
-#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicU32, Ordering};
