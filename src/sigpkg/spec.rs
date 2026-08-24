@@ -1,3 +1,4 @@
+#![no_std]
 
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs

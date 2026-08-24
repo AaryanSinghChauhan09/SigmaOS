@@ -474,6 +474,7 @@ impl Default for ObpObjectManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::*;
 
     static mut MOCK_UNLOAD_CALLED: bool = false;
     fn mock_unload_routine(context_address: usize) -> Result<(), ObjectError> {

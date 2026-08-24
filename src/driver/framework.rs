@@ -484,6 +484,7 @@ impl DriverFramework for SimpleDriverFramework {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::driver::irp_system::*;
 
     #[test]
     fn test_driver_framework_lifecycle() {

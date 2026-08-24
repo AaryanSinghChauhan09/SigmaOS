@@ -9,9 +9,9 @@ include_directories(include .)
 file(GLOB_RECURSE SIGMA_C_SOURCES "kernel/*.c" "kernel/*.cpp" "tests/*.cpp")
 
 if(SIGMA_C_SOURCES)
-    add_executable(sigma_kernel ${SIGMA_C_SOURCES})
+    add_executable(kernel ${SIGMA_C_SOURCES})
 else()
-    add_custom_target(sigma_kernel ALL)
+    add_custom_target(kernel ALL)
 endif()
 
 enable_testing()

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Open Source Obsoletion Subsystem (`src/open_source_obsoletion.rs`)
-// Comprehensive, zero-dependency, AI-native `` implementations designed
+// Comprehensive, zero-dependency, AI-native `#![no_std]` implementations designed
 // to surpass and make legacy open-source projects (Git, Systemd, WireGuard,
 // Prometheus/Grafana, Postman, Obsidian, GParted) completely obsolete.
 

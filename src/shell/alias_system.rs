@@ -5,6 +5,7 @@
 //! 2. **Fixed-named aliases** (standards-based package manager and utility mappings from Linux & BSD)
 //! 3. **Automatic aliases** (typo auto-correction and zsh-style suffix-based file extensions)
 
+#![no_std]
 
 extern crate alloc;
 

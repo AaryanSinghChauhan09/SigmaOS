@@ -304,6 +304,12 @@ impl Scheduler {
     }
 }
 
+impl Default for CfsScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 
 
 /// CFS Scheduler implementation
@@ -354,11 +360,6 @@ impl CfsScheduler {
     }
 }
 
-impl Default for CfsScheduler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[cfg(test)]
 mod tests {

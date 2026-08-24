@@ -214,18 +214,6 @@ mod tests {
     impl KernelObject for MockDriver {
         fn id(&self) -> u64 { 1 }
         fn name(&self) -> &str { "mock_driver" }
-        fn set_name(&mut self, _name: &str) {}
-        fn parent(&self) -> Option<&dyn KernelObject> { None }
-        fn set_parent(&mut self, _parent: Option<&dyn KernelObject>) {}
-        fn children(&self) -> Vec<&dyn KernelObject> { Vec::new() }
-        fn add_child(&mut self, _child: &dyn KernelObject) {}
-        fn remove_child(&mut self, _child_name: &str) -> Option<Box<dyn KernelObject>> { None }
-        fn kref(&self) -> &KRef { static KREF: KRef = KRef::new(); &KREF }
-        fn as_any(&self) -> &dyn core::any::Any { self }
-        fn as_any_mut(&mut self) -> &mut dyn core::any::Any { self }
-        fn sysfs_attrs(&self) -> Vec<&str> { Vec::new() }
-        fn sysfs_show(&self, _attr: &str) -> Option<String> { None }
-        fn sysfs_store(&mut self, _attr: &str, _value: &str) -> Result<(), ObjectError> { Ok(()) }
     }
 
     impl Driver for MockDriver {

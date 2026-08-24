@@ -1,3 +1,5 @@
+#![no_std]
+#![no_main]
 
 use core::mem;
 /// Universal Linux Package Translation and Compatibility Shim for SigmaOS

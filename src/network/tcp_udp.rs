@@ -266,9 +266,6 @@ impl CongestionControl for RenoCongestionControl {
         self.ssthresh.store(cwnd / 2, Ordering::SeqCst);
         self.cwnd.store(1, Ordering::SeqCst);
     }
-    fn get_cwnd(&self) -> usize {
-        self.cwnd.load(Ordering::SeqCst)
-    }
 }
 
 #[repr(C)]
