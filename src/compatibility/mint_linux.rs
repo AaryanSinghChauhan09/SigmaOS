@@ -239,11 +239,7 @@ pub struct MintSoftwareManager {
     pub apps_catalog: Vec<MintAppMetadata>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MintError {
-    LayoutFailed,
-    UpdateError,
-}
+
 
 impl Default for MintSoftwareManager {
     fn default() -> Self {
