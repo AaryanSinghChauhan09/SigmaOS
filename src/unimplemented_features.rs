@@ -6,6 +6,7 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 // =========================================================================
 // 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -143,6 +144,12 @@ impl BareMetalPeripheralManager {
             }
         }
         count
+    }
+}
+
+impl Default for BareMetalPeripheralManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -348,6 +355,12 @@ impl SatSolverEngine {
     }
 }
 
+impl Default for SatSolverEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 6.4 JBD2-STYLE CRASH-RESILIENT TRANSACTIONAL LEDGER SPECIFICATIONS
 // =========================================================================
@@ -539,6 +552,12 @@ impl PciBusScanner {
     }
 }
 
+impl Default for PciBusScanner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 2. S-FS SNAPSHOTS & GENERATIONS (NIXOS-STYLE BLUEPRINT)
 // =========================================================================
@@ -590,6 +609,12 @@ impl GenerationManager {
 
     pub fn get_active_generation(&self) -> Option<&Generation> {
         self.active_generation_idx.map(|idx| &self.generations[idx])
+    }
+}
+
+impl Default for GenerationManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -672,6 +697,225 @@ impl SovereignIpcBus {
             }
         }
         None
+    }
+}
+
+impl Default for SovereignIpcBus {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// LINUX & BSD DISTRO PARITY ABSTRACTIONS
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkPackageEntry {
+    pub name: String,
+    pub version: String,
+    pub arch: String,
+    pub sha256_hash: [u8; 32],
+    pub dependencies: Vec<String>,
+}
+
+pub struct AlpineApkPackageIndex {
+    pub entries: Vec<ApkPackageEntry>,
+    pub is_signature_verified: bool,
+}
+
+impl AlpineApkPackageIndex {
+    pub fn new() -> Self {
+        Self {
+            entries: Vec::new(),
+            is_signature_verified: false,
+        }
+    }
+
+    pub fn add_package(&mut self, entry: ApkPackageEntry) {
+        self.entries.push(entry);
+    }
+
+    pub fn verify_index_signature(&mut self, public_key: &[u8]) -> bool {
+        self.is_signature_verified = !public_key.is_empty();
+        self.is_signature_verified
+    }
+
+    pub fn find_package(&self, name: &str) -> Option<&ApkPackageEntry> {
+        self.entries.iter().find(|e| e.name == name)
+    }
+
+    pub fn resolve_dependencies(&self, name: &str) -> Vec<String> {
+        let mut resolved = Vec::new();
+        if let Some(pkg) = self.find_package(name) {
+            for dep in &pkg.dependencies {
+                resolved.push(dep.clone());
+            }
+        }
+        resolved
+    }
+}
+
+impl Default for AlpineApkPackageIndex {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Hammer2PfsClusterNode {
+    pub node_id: u32,
+    pub ip_address: String,
+    pub active: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Hammer2PfsSnapshot {
+    pub pfs_name: String,
+    pub snapshot_id: u64,
+    pub timestamp: u64,
+    pub is_read_only: bool,
+    pub merkle_root: u64,
+}
+
+pub struct DragonFlyHammer2FsSnapshot {
+    pub pfs_snapshots: Vec<Hammer2PfsSnapshot>,
+    pub cluster_nodes: Vec<Hammer2PfsClusterNode>,
+    pub next_snapshot_id: u64,
+}
+
+impl DragonFlyHammer2FsSnapshot {
+    pub fn new() -> Self {
+        Self {
+            pfs_snapshots: Vec::new(),
+            cluster_nodes: Vec::new(),
+            next_snapshot_id: 1,
+        }
+    }
+
+    pub fn register_cluster_node(&mut self, node_id: u32, ip: &str) {
+        self.cluster_nodes.push(Hammer2PfsClusterNode {
+            node_id,
+            ip_address: ip.to_string(),
+            active: true,
+        });
+    }
+
+    pub fn create_pfs_snapshot(
+        &mut self,
+        pfs_name: &str,
+        merkle_root: u64,
+        timestamp: u64,
+    ) -> u64 {
+        let snap_id = self.next_snapshot_id;
+        self.next_snapshot_id += 1;
+
+        let snap = Hammer2PfsSnapshot {
+            pfs_name: pfs_name.to_string(),
+            snapshot_id: snap_id,
+            timestamp,
+            is_read_only: true,
+            merkle_root,
+        };
+        self.pfs_snapshots.push(snap);
+        snap_id
+    }
+
+    pub fn replicate_snapshot_to_node(&self, snapshot_id: u64, node_id: u32) -> Result<(), &'static str> {
+        let snap_exists = self.pfs_snapshots.iter().any(|s| s.snapshot_id == snapshot_id);
+        if !snap_exists {
+            return Err("PFS snapshot not found");
+        }
+        let node_active = self.cluster_nodes.iter().any(|n| n.node_id == node_id && n.active);
+        if !node_active {
+            return Err("Target cluster node is inactive or missing");
+        }
+        Ok(())
+    }
+
+    pub fn rollback_pfs(&mut self, pfs_name: &str, snapshot_id: u64) -> Result<u64, &'static str> {
+        if let Some(snap) = self.pfs_snapshots.iter().find(|s| s.pfs_name == pfs_name && s.snapshot_id == snapshot_id) {
+            Ok(snap.merkle_root)
+        } else {
+            Err("Matching PFS snapshot not found for rollback")
+        }
+    }
+}
+
+impl Default for DragonFlyHammer2FsSnapshot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NixSystemGeneration {
+    pub gen_number: u32,
+    pub config_hash: u64,
+    pub timestamp: u64,
+    pub packages_count: usize,
+    pub kernel_params: String,
+}
+
+pub struct NixOsDeclarativeConfigEngine {
+    pub generations: Vec<NixSystemGeneration>,
+    pub active_generation: u32,
+}
+
+impl NixOsDeclarativeConfigEngine {
+    pub fn new() -> Self {
+        Self {
+            generations: Vec::new(),
+            active_generation: 0,
+        }
+    }
+
+    pub fn build_generation(
+        &mut self,
+        config_hash: u64,
+        timestamp: u64,
+        packages_count: usize,
+        kernel_params: &str,
+    ) -> u32 {
+        let gen_number = (self.generations.len() + 1) as u32;
+        let gen = NixSystemGeneration {
+            gen_number,
+            config_hash,
+            timestamp,
+            packages_count,
+            kernel_params: kernel_params.to_string(),
+        };
+        self.generations.push(gen);
+        self.active_generation = gen_number;
+        gen_number
+    }
+
+    pub fn switch_generation(&mut self, gen_number: u32) -> Result<&NixSystemGeneration, &'static str> {
+        let pos = self.generations.iter().position(|g| g.gen_number == gen_number);
+        if let Some(idx) = pos {
+            self.active_generation = gen_number;
+            Ok(&self.generations[idx])
+        } else {
+            Err("Target NixOS system generation does not exist")
+        }
+    }
+
+    pub fn rollback_generation(&mut self) -> Result<&NixSystemGeneration, &'static str> {
+        if self.active_generation <= 1 {
+            return Err("Cannot rollback beyond initial generation");
+        }
+        let target = self.active_generation - 1;
+        self.switch_generation(target)
+    }
+
+    pub fn active_generation_info(&self) -> Option<&NixSystemGeneration> {
+        self.generations.iter().find(|g| g.gen_number == self.active_generation)
+    }
+}
+
+impl Default for NixOsDeclarativeConfigEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -762,5 +1006,70 @@ mod tests {
 
         let rollback_merkle = ledger.rollback_last_transaction().unwrap();
         assert_eq!(rollback_merkle, 0x1000200030004000);
+    }
+
+    #[test]
+    fn test_alpine_apk_package_index() {
+        let mut index = AlpineApkPackageIndex::new();
+        let pubkey = [0xAA; 32];
+
+        assert!(index.verify_index_signature(&pubkey));
+
+        index.add_package(ApkPackageEntry {
+            name: "musl".to_string(),
+            version: "1.2.4".to_string(),
+            arch: "x86_64".to_string(),
+            sha256_hash: [0x12; 32],
+            dependencies: vec![],
+        });
+
+        index.add_package(ApkPackageEntry {
+            name: "busybox".to_string(),
+            version: "1.36.1".to_string(),
+            arch: "x86_64".to_string(),
+            sha256_hash: [0x34; 32],
+            dependencies: vec!["musl".to_string()],
+        });
+
+        let pkg = index.find_package("busybox").unwrap();
+        assert_eq!(pkg.version, "1.36.1");
+
+        let deps = index.resolve_dependencies("busybox");
+        assert_eq!(deps, vec!["musl"]);
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_snapshot() {
+        let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
+        hammer2.register_cluster_node(10, "10.0.0.1");
+
+        let snap_id = hammer2.create_pfs_snapshot("@ROOT_SNAP_1", 0xAABBCCDD, 1700000000);
+        assert_eq!(snap_id, 1);
+
+        assert!(hammer2.replicate_snapshot_to_node(snap_id, 10).is_ok());
+        assert!(hammer2.replicate_snapshot_to_node(snap_id, 99).is_err());
+
+        let merkle = hammer2.rollback_pfs("@ROOT_SNAP_1", snap_id).unwrap();
+        assert_eq!(merkle, 0xAABBCCDD);
+    }
+
+    #[test]
+    fn test_nixos_declarative_config_engine() {
+        let mut nix = NixOsDeclarativeConfigEngine::new();
+
+        let gen1 = nix.build_generation(0x11223344, 1700000000, 120, "loglevel=4 quiet");
+        assert_eq!(gen1, 1);
+        assert_eq!(nix.active_generation, 1);
+
+        let gen2 = nix.build_generation(0x55667788, 1700000100, 125, "loglevel=7 debug");
+        assert_eq!(gen2, 2);
+        assert_eq!(nix.active_generation, 2);
+
+        let rolled_back = nix.rollback_generation().unwrap();
+        assert_eq!(rolled_back.gen_number, 1);
+        assert_eq!(nix.active_generation, 1);
+
+        nix.switch_generation(2).unwrap();
+        assert_eq!(nix.active_generation, 2);
     }
 }

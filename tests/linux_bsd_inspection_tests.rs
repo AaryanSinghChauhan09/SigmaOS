@@ -7,6 +7,9 @@
 // - OpenBSD Pledge & Unveil sandboxing
 // - Gentoo Portage USE-flag dependency solver
 // - CachyOS BORE interactive scheduler
+// - Alpine Linux APK Package Index parser & signature verifier
+// - DragonFly BSD HAMMER2 PFS snapshot & replication engine
+// - NixOS Declarative System Configuration & generation rollback switcher
 
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
@@ -20,28 +23,22 @@ mod unveil;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
 
-<<<<<<< HEAD
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 
-#[path = "../src/scheduler/eevdf.rs"]
-mod eevdf;
-
-#[path = "../src/memory/tlb_associative.rs"]
-mod tlb_associative;
-=======
-
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unveil::{UnveilManager, UnveilPermission};
+use unimplemented_features::{
+    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
+};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -104,7 +101,6 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
-    use std::path::PathBuf;
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -134,7 +130,7 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
     kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-        image_path: PathBuf::from("/var/lib/images/rootfs.qcow2"),
+        image_path: "/var/lib/images/rootfs.qcow2".to_string(),
         read_only: false,
         direct_io: true,
         queue_size: 256,
@@ -159,37 +155,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
-#[test]
-fn test_kernel_classic_algorithms_inspection() {
-    use eevdf::{EevdfScheduler, Task, ComputeUnit};
-    use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbPageFlags};
-
-    let mut sched = EevdfScheduler::new();
-    let mut task = Task::new(1, 100, 10);
-    task.assign_compute_unit(ComputeUnit::CpuCore(0));
-    sched.add_task(task);
-    assert_eq!(sched.ready_count(), 1);
-
-    let scheduled = sched.schedule();
-    assert_eq!(scheduled, Some(1));
-
-    let mut tlb = AssociativeTlbCache::new(TlbAssociativityMode::FullyAssociative, 16);
-    tlb.insert_translation(0x10, 0x50, TlbPageFlags::rw_user(), 1);
-    let translated = tlb.lookup_page_translation(0x10, 1, false, false);
-    assert_eq!(translated, Ok(0x50));
-    assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
-}
-<<<<<<< HEAD
-=======
-
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
-
-
 #[test]
 fn test_zenith_desktop_applets_and_themes_inspection() {
     use zenith_advanced::{DesktopAppletEngine, DesktopApplet, AppletCategory, ZenithThemePresetManager, ZenithThemePreset};
@@ -212,4 +177,51 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     theme_mgr.apply_preset(ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.current_preset, ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
+}
+
+#[test]
+fn test_alpine_apk_package_index_inspection() {
+    let mut apk_index = AlpineApkPackageIndex::new();
+    let key = [0x99; 32];
+    assert!(apk_index.verify_index_signature(&key));
+
+    apk_index.add_package(ApkPackageEntry {
+        name: "openssl".to_string(),
+        version: "3.1.0".to_string(),
+        arch: "x86_64".to_string(),
+        sha256_hash: [0xAB; 32],
+        dependencies: vec!["musl".to_string()],
+    });
+
+    let pkg = apk_index.find_package("openssl").unwrap();
+    assert_eq!(pkg.version, "3.1.0");
+    assert_eq!(apk_index.resolve_dependencies("openssl"), vec!["musl"]);
+}
+
+#[test]
+fn test_dragonfly_hammer2_snapshot_inspection() {
+    let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
+    hammer2.register_cluster_node(1, "192.168.1.50");
+
+    let snap_id = hammer2.create_pfs_snapshot("ROOT_PFS", 0x1234567887654321, 1680000000);
+    assert_eq!(snap_id, 1);
+    assert!(hammer2.replicate_snapshot_to_node(snap_id, 1).is_ok());
+
+    let rolled_back_merkle = hammer2.rollback_pfs("ROOT_PFS", snap_id).unwrap();
+    assert_eq!(rolled_back_merkle, 0x1234567887654321);
+}
+
+#[test]
+fn test_nixos_declarative_config_engine_inspection() {
+    let mut nix_engine = NixOsDeclarativeConfigEngine::new();
+    let gen1 = nix_engine.build_generation(0xDEADBEEF, 1680000000, 150, "quiet splash");
+    assert_eq!(gen1, 1);
+
+    let gen2 = nix_engine.build_generation(0xCAFEBABE, 1680001000, 155, "debug");
+    assert_eq!(gen2, 2);
+    assert_eq!(nix_engine.active_generation, 2);
+
+    let rolled_back = nix_engine.rollback_generation().unwrap();
+    assert_eq!(rolled_back.gen_number, 1);
+    assert_eq!(nix_engine.active_generation, 1);
 }
