@@ -3056,6 +3056,256 @@ impl OmarchySelfHealingConfig {
     }
 }
 
+// -------------------------------------------------------------------------
+// OpenBSD pledge(2) & unveil(2) Security Sandboxing Engine
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct BsdPledgeUnveilSecuritySandboxing {
+    pub active_promises: Vec<String>,
+    pub unveiled_paths: Vec<(String, String)>, // (path, permissions: "r", "w", "x", "c")
+    pub is_locked: bool,
+}
+
+impl BsdPledgeUnveilSecuritySandboxing {
+    pub fn new() -> Self {
+        Self {
+            active_promises: Vec::new(),
+            unveiled_paths: Vec::new(),
+            is_locked: false,
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &str) -> Result<(), &'static str> {
+        if self.is_locked {
+            return Err("Pledge promises already locked down");
+        }
+        for promise in promises.split_whitespace() {
+            if !self.active_promises.iter().any(|p| p == promise) {
+                self.active_promises.push(promise.to_string());
+            }
+        }
+        Ok(())
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if self.is_locked {
+            return Err("Unveil rules already locked");
+        }
+        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+        Ok(())
+    }
+
+    pub fn lock(&mut self) {
+        self.is_locked = true;
+    }
+
+    pub fn check_syscall(&self, syscall_category: &str) -> bool {
+        if self.active_promises.is_empty() {
+            return true; // No pledge restrictions applied
+        }
+        self.active_promises.iter().any(|p| p == syscall_category)
+    }
+
+    pub fn check_path_access(&self, path: &str, required_mode: &str) -> bool {
+        if self.unveiled_paths.is_empty() {
+            return true; // No unveil restrictions applied
+        }
+        for (unveiled_path, perm) in &self.unveiled_paths {
+            if path.starts_with(unveiled_path) {
+                if perm.contains(required_mode) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
+// -------------------------------------------------------------------------
+// Gentoo Portage USE-Flag Dependency Resolver
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct GentooPortageUseFlagResolver {
+    pub enabled_use_flags: Vec<String>,
+    pub package_profiles: Vec<(String, Vec<String>)>, // (pkg_name, required_use_flags)
+}
+
+impl GentooPortageUseFlagResolver {
+    pub fn new() -> Self {
+        Self {
+            enabled_use_flags: Vec::new(),
+            package_profiles: Vec::new(),
+        }
+    }
+
+    pub fn enable_use_flag(&mut self, flag: &str) {
+        if !self.is_use_flag_enabled(flag) {
+            self.enabled_use_flags.push(flag.to_string());
+        }
+    }
+
+    pub fn disable_use_flag(&mut self, flag: &str) {
+        self.enabled_use_flags.retain(|f| f != flag);
+    }
+
+    pub fn is_use_flag_enabled(&self, flag: &str) -> bool {
+        self.enabled_use_flags.iter().any(|f| f == flag)
+    }
+
+    pub fn register_package(&mut self, pkg_name: &str, req_flags: &[&str]) {
+        let flags = req_flags.iter().map(|s| s.to_string()).collect();
+        self.package_profiles.push((pkg_name.to_string(), flags));
+    }
+
+    pub fn resolve_package_dependencies(&self, pkg_name: &str) -> bool {
+        if let Some((_, req_flags)) = self.package_profiles.iter().find(|(p, _)| p == pkg_name) {
+            for flag in req_flags {
+                if !self.is_use_flag_enabled(flag) {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+}
+
+// -------------------------------------------------------------------------
+// Alpine Linux APK Package Manager & Musl Engine
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct AlpineMuslApkManager {
+    pub repository_urls: Vec<String>,
+    pub trusted_keys: Vec<String>,
+    pub installed_packages: Vec<String>,
+}
+
+impl AlpineMuslApkManager {
+    pub fn new() -> Self {
+        Self {
+            repository_urls: Vec::new(),
+            trusted_keys: Vec::new(),
+            installed_packages: Vec::new(),
+        }
+    }
+
+    pub fn add_repository(&mut self, url: &str) {
+        self.repository_urls.push(url.to_string());
+    }
+
+    pub fn add_trusted_key(&mut self, key_fingerprint: &str) {
+        self.trusted_keys.push(key_fingerprint.to_string());
+    }
+
+    pub fn verify_signature(&self, key_fingerprint: &str) -> bool {
+        self.trusted_keys.iter().any(|k| k == key_fingerprint)
+    }
+
+    pub fn install_apk(&mut self, pkg_name: &str, key_fingerprint: &str) -> Result<(), &'static str> {
+        if !self.verify_signature(key_fingerprint) {
+            return Err("APK signature verification failed: Key untrusted");
+        }
+        if !self.is_installed(pkg_name) {
+            self.installed_packages.push(pkg_name.to_string());
+        }
+        Ok(())
+    }
+
+    pub fn is_installed(&self, pkg_name: &str) -> bool {
+        self.installed_packages.iter().any(|p| p == pkg_name)
+    }
+}
+
+// -------------------------------------------------------------------------
+// openSUSE YaST System Setup & Configuration Engine
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct YaSTModule {
+    pub name: String,
+    pub category: String,
+    pub active: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct SuseYaSTConfigurationEngine {
+    pub modules: Vec<YaSTModule>,
+}
+
+impl SuseYaSTConfigurationEngine {
+    pub fn new() -> Self {
+        Self {
+            modules: Vec::new(),
+        }
+    }
+
+    pub fn register_module(&mut self, name: &str, category: &str) {
+        self.modules.push(YaSTModule {
+            name: name.to_string(),
+            category: category.to_string(),
+            active: true,
+        });
+    }
+
+    pub fn execute_module(&self, name: &str) -> Result<&'static str, &'static str> {
+        if let Some(m) = self.modules.iter().find(|m| m.name == name) {
+            if m.active {
+                return Ok("YaST module executed successfully");
+            }
+        }
+        Err("YaST module not found or disabled")
+    }
+
+    pub fn get_modules_count(&self) -> usize {
+        self.modules.len()
+    }
+}
+
+// -------------------------------------------------------------------------
+// Void Linux XBPS Package Manager Engine
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct VoidXbpsPackageEngine {
+    pub repo_synced: bool,
+    pub rsa_key_verified: bool,
+    pub installed_packages: Vec<String>,
+}
+
+impl VoidXbpsPackageEngine {
+    pub fn new() -> Self {
+        Self {
+            repo_synced: false,
+            rsa_key_verified: true,
+            installed_packages: Vec::new(),
+        }
+    }
+
+    pub fn sync_repository(&mut self) -> usize {
+        self.repo_synced = true;
+        42 // Simulates 42 package index metadata objects synced
+    }
+
+    pub fn install_package(&mut self, pkg_name: &str) -> Result<(), &'static str> {
+        if !self.repo_synced {
+            return Err("XBPS repo not synced. Run xbps-install -S first.");
+        }
+        if !self.rsa_key_verified {
+            return Err("XBPS package signature validation failed");
+        }
+        if !self.installed_packages.iter().any(|p| p == pkg_name) {
+            self.installed_packages.push(pkg_name.to_string());
+        }
+        Ok(())
+    }
+
+    pub fn is_installed(&self, pkg_name: &str) -> bool {
+        self.installed_packages.iter().any(|p| p == pkg_name)
+    }
+}
+
 // =========================================================================
 // UNIT TESTS
 // =========================================================================
@@ -4003,5 +4253,66 @@ mod tests {
         let healed = config.validate_and_heal(0x0000000000000000);
         assert!(!healed);
         assert!(config.is_valid);
+    }
+
+    #[test]
+    fn test_bsd_pledge_unveil_security_sandboxing() {
+        let mut sandbox = BsdPledgeUnveilSecuritySandboxing::new();
+        assert!(sandbox.pledge("rpath wpath stdio").is_ok());
+        assert!(sandbox.unveil("/var/log", "r").is_ok());
+
+        assert!(sandbox.check_syscall("rpath"));
+        assert!(!sandbox.check_syscall("exec"));
+
+        assert!(sandbox.check_path_access("/var/log/syslog", "r"));
+        assert!(!sandbox.check_path_access("/var/log/syslog", "w"));
+
+        sandbox.lock();
+        assert!(sandbox.pledge("inet").is_err());
+    }
+
+    #[test]
+    fn test_gentoo_portage_use_flag_resolver() {
+        let mut resolver = GentooPortageUseFlagResolver::new();
+        resolver.enable_use_flag("ssl");
+        resolver.enable_use_flag("wayland");
+
+        resolver.register_package("gui-app", &["ssl", "wayland"]);
+        assert!(resolver.resolve_package_dependencies("gui-app"));
+
+        resolver.disable_use_flag("wayland");
+        assert!(!resolver.resolve_package_dependencies("gui-app"));
+    }
+
+    #[test]
+    fn test_alpine_musl_apk_manager() {
+        let mut apk = AlpineMuslApkManager::new();
+        apk.add_repository("https://dl-cdn.alpinelinux.org/alpine/v3.19/main");
+        apk.add_trusted_key("alpine-devel@lists.alpinelinux.org-52431f0e.rsa.pub");
+
+        assert!(apk.install_apk("musl", "alpine-devel@lists.alpinelinux.org-52431f0e.rsa.pub").is_ok());
+        assert!(apk.is_installed("musl"));
+        assert!(apk.install_apk("bash", "untrusted-key").is_err());
+    }
+
+    #[test]
+    fn test_suse_yast_configuration_engine() {
+        let mut yast = SuseYaSTConfigurationEngine::new();
+        yast.register_module("network_settings", "Network");
+        yast.register_module("partitioner", "Storage");
+
+        assert_eq!(yast.get_modules_count(), 2);
+        let res = yast.execute_module("network_settings");
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_void_xbps_package_engine() {
+        let mut xbps = VoidXbpsPackageEngine::new();
+        assert!(xbps.install_package("void-repo-multilib").is_err());
+
+        assert_eq!(xbps.sync_repository(), 42);
+        assert!(xbps.install_package("void-repo-multilib").is_ok());
+        assert!(xbps.is_installed("void-repo-multilib"));
     }
 }
