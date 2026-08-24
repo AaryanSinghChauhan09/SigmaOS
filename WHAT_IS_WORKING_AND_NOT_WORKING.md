@@ -210,7 +210,170 @@ match command {
 
 ---
 
-## SECTION 3: LINUX & BSD VIRTUAL MM PARITY ARCHITECTURE & BLUEPRINTS
+## SECTION 3: 12 CRITICAL GAPS VS MATURE LINUX & BSD DISTRIBUTIONS
+
+Below is the exhaustive, technical status mapping and remediation roadmap for the **12 Critical Gap Domains** comparing SigmaOS against mature Linux (Arch, Fedora, Debian, Mint) and BSD (FreeBSD, OpenBSD, NetBSD) distributions:
+
+---
+
+### 🔴 Critical Gap 1: Boot & Installation Layer
+* **Current Status:** Phase G ~60% Complete (Kernel core stage).
+* **Gaps:**
+  - No production bootable ISO / hybrid installation media image generation.
+  - Missing complete UEFI Stage1/Stage2 Multiboot2 bootloader.
+  - Partitioning wizard & installer UI (Calamares/Anaconda equivalent) is incomplete for bare-metal deployment.
+* **Remediation Plan:**
+  - Implement ISO image generation target (`iso_root/`) using GRUB/limine Multiboot2 headers.
+  - Implement `InstallerWizard` in `installer/` supporting GPT/MBR partition table creation and filesystem formatting.
+
+---
+
+### 🔴 Critical Gap 2: Core Kernel Subsystems (HAL, NUMA, Realtime)
+* **Current Status:** EEVDF microkernel scheduler & zero-trust paging active.
+* **Gaps:**
+  - Multi-architecture HAL abstractions (`src/kernel/architecture.rs`) for x86_64, AArch64, and RISC-V 64 need full device tree (FDT) parsing.
+  - Full PCIe ECAM bus scanner parsing capabilities (MSI/MSI-X, PCIe caps) integrated into kernel initialization.
+  - NUMA topology multi-node awareness and memory distance matrices missing.
+  - Realtime PREEMPT_RT equivalent scheduling (EDF/FIFO preemptive priority inversion protection) incomplete.
+* **Remediation Plan:**
+  - Standardize `ArchitectureHal` trait across all architectures.
+  - Integrate `PciScanner` into `src/kernel/mod.rs` boot phase.
+  - Expand `NumaNode` memory affinity distance matrix in `src/kernel/scheduler.rs`.
+
+---
+
+### 🔴 Critical Gap 3: Device Driver Ecosystem
+* **Current Status:** VirtIO blk/net, e1000, HDA dummy drivers functional.
+* **Gaps:**
+  - NVMe 1.4 storage driver (submission/completion queueing, namespace management) basic support only.
+  - USB 3.0 xHCI host controller & HID keyboard/mouse stack incomplete.
+  - GPU drivers (AMD AMDGPU, NVIDIA, Intel Xe/i915) limited to DRM/KMS double-buffer framebuffers.
+  - Audio driver stack (ALSA/PulseAudio/PipeWire equivalent) missing multi-stream software mixer.
+  - Wireless networking (802.11 Wi-Fi stack) and Bluetooth stack (BlueZ equivalent) absent.
+* **Remediation Plan:**
+  - Extend `kernel/drivers/` with xHCI controller initialization and USB HID descriptor parser.
+  - Port open-source WiFi 802.11 frame parser into `src/drivers/net/wifi.rs`.
+
+---
+
+### 🔴 Critical Gap 4: Networking Stack & Infrastructure Services
+* **Current Status:** IPv4/IPv6 dual stack core and raw socket forwarding working.
+* **Gaps:**
+  - TCP congestion control (Reno, Cubic, BBR) and sliding window state machine incomplete.
+  - DNS resolution daemon (`systemd-resolved` equivalent) missing.
+  - DHCP client daemon (`dhcpcd` / `dhclient` equivalent) missing.
+  - Mesh network cloud sync engine incomplete.
+* **Remediation Plan:**
+  - Complete `TCPState` machine and `CongestionControl` trait implementations in `src/network/tcp_udp.rs`.
+  - Add native DNS packet generator/parser in `src/net/dns.rs`.
+
+---
+
+### 🔴 Critical Gap 5: Modern Filesystems & Storage Infrastructure
+* **Current Status:** Ext4 extent trees, JBD2 metadata journaling, and basic Btrfs subvolumes working.
+* **Gaps:**
+  - Btrfs, ZFS, and XFS advanced metadata features (RAID5/6 scrubbing, zpool vdevs, extent allocation groups).
+  - LUKS full disk encryption (FDE) and AES-XTS dm-crypt equivalent volume header manager missing.
+  - Subvolume snapshot recording & differential stream send/receive engine.
+  - User/group quota management missing.
+* **Remediation Plan:**
+  - Expand `PackageSnapshotRollbackEngine` in `src/sigpkg/transaction.rs` to support direct block-level diff streams.
+  - Implement LUKS2 header parser in `src/fs/luks.rs`.
+
+---
+
+### 🔴 Critical Gap 6: Package Management Infrastructure
+* **Current Status:** `sigma-pkg` CLI, dependency graph solver, and snapshot rollback engine active.
+* **Gaps:**
+  - Remote package repository infrastructure (mirror syncing, cryptographic signature distribution).
+  - Production-grade SAT dependency resolution solver for complex version constraints.
+  - Transactional rollbacks across system-wide package updates.
+* **Remediation Plan:**
+  - Implement remote HTTP package mirror synchronizer in `src/sigpkg/repository.rs`.
+  - Expand `DependencyResolver` with DPLL-based boolean satisfiability solver.
+
+---
+
+### 🔴 Critical Gap 7: Container & Virtualization Layer
+* **Current Status:** OCI runtime container prototype and KVM vCPU execution context working.
+* **Gaps:**
+  - Docker/Podman compatible CLI and daemon socket wrapper.
+  - Production QEMU/KVM hypervisor control loop (`VirtioBlockDeviceConfig`, `VirtioNetDeviceConfig`, `vhost-user`).
+  - FreeBSD Jails VNET network namespace integration missing.
+  - `systemd-nspawn` lightweight container spawn equivalent.
+* **Remediation Plan:**
+  - Integrate `KvmHypervisor` (`src/virtualization/vm_manager.rs`) with system CLI tools.
+  - Wire VNET virtual network interfaces into `FreeBsdJailManager` (`src/compatibility/bsd.rs`).
+
+---
+
+### 🔴 Critical Gap 8: System Administration & Governance Daemons
+* **Current Status:** `sinit` supervisor and FreeBSD Capsicum rights working.
+* **Gaps:**
+  - User and group account management tools (`adduser`, `userdel`, `/etc/shadow` policy enforcement).
+  - Service management daemon with dependency ordering (`systemd` / `runit` supervisor).
+  - Periodic job execution daemon (`cron` / `anacron` equivalent).
+  - Netfilter / iptables firewall rules engine.
+  - SELinux / AppArmor mandatory access control (MAC) policy compiler.
+* **Remediation Plan:**
+  - Add `UserManager` and `SudoersPolicy` in `src/system/user.rs`.
+  - Extend `RunitSupervisor` in `src/distro/linux_bsd_parity.rs` with socket-activation and restart loops.
+
+---
+
+### 🔴 Critical Gap 9: Userland & Desktop Infrastructure
+* **Current Status:** Zenith desktop applet engine & theme manager prototype functional.
+* **Gaps:**
+  - Zenith desktop compositor production readiness (Wayland / X11 server fallback layer).
+  - Full-featured terminal emulator (`vte` / `alacritty` equivalent backend).
+  - Graphical file manager, text editor (`vim` / `nano` / `emacs` core keybindings).
+  - Package manager GUI application.
+  - System tray notification daemon and window layout engine.
+* **Remediation Plan:**
+  - Implement VTE VT100/ANSI escape sequence decoder in `src/shell/terminal_emulator.rs`.
+  - Connect `DesktopAppletEngine` to DRM/KMS framebuffer compositor in `src/graphics/compositor.rs`.
+
+---
+
+### 🔴 Critical Gap 10: Development & Build Toolchain
+* **Current Status:** Cargo build system and C++ test runners functional.
+* **Gaps:**
+  - Self-hosting native compiler toolchain (GCC / LLVM / Clang support for SigmaOS target).
+  - Standard Unix build utilities (Make, CMake, Ninja, Cargo cross-compiling toolchains).
+  - Hosted language runtimes (Python, Node.js, Java, Ruby) for native userland execution.
+  - Core C/C++ development libraries (`OpenSSL`, `libcurl`, `glibc`/`musl` complete ABI wrapper).
+* **Remediation Plan:**
+  - Expand `sigma_libc.h` and POSIX dynamic syscall routing table.
+  - Implement C cross-compilation target spec in `tools/build_toolchain.sh`.
+
+---
+
+### 🔴 Critical Gap 11: Security Infrastructure & Hardware Security
+* **Current Status:** Post-quantum Dilithium-5 attestation & Kyber-1024 encryption functional.
+* **Gaps:**
+  - Secure Boot and Measured Boot signature verification in Stage1 bootloader.
+  - TPM 2.0 (Trusted Platform Module) PCR register reading and secret sealing/unsealing.
+  - Full Disk Encryption key management with key escrow and passphrase recovery.
+* **Remediation Plan:**
+  - Implement TPM 2.0 command protocol driver in `src/security/tpm.rs`.
+  - Enforce EFI signature verification during kernel header load.
+
+---
+
+### 🔴 Critical Gap 12: Testing, Stability & Compliance Verification
+* **Current Status:** Native C++ test runner and Rust inspection suites passing (62+ unit tests).
+* **Gaps:**
+  - Linux Test Project (LTP) full compatibility test execution harness.
+  - POSIX IEEE 1003.1 compliance certification suite.
+  - Kernel memory leak, I/O stress testing, and CPU fault injection suite.
+  - Continuous regression testing across release channels.
+* **Remediation Plan:**
+  - Add POSIX compliance test suite runner in `tests/posix_compliance_tests.rs`.
+  - Integrate LTP test result parser in `tests/ltp_harness.rs`.
+
+---
+
+## SECTION 4: LINUX & BSD VIRTUAL MM PARITY ARCHITECTURE & BLUEPRINTS
 
 To achieve full digital sovereignty and parity with Linux (`mm/`) and FreeBSD (`vm/`), any AI agent enhancing `src/klib/paging.rs` or `src/kernel/memory.rs` should implement the following four foundational virtual memory components:
 
@@ -315,7 +478,7 @@ impl OomPageReclaimer {
 
 ---
 
-## SECTION 4: CHECKLIST FOR AI AGENTS FIXING ALGORITHMS
+## SECTION 5: CHECKLIST FOR AI AGENTS FIXING ALGORITHMS
 
 When making changes to SigmaOS algorithms or fixing bug reports, follow this mandatory workflow:
 
