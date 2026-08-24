@@ -1,8 +1,24 @@
 /// Security Hardening & Cryptographic Intrusion Detection Suite for SigmaOS
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::Vec;
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::Permission;
+
+#[cfg(feature = "standalone_test")]
+extern crate alloc;
+#[cfg(feature = "standalone_test")]
+use alloc::vec::Vec;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp,
+    FileRead,
+    FileWrite,
+}
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
@@ -125,7 +141,7 @@ impl HardenedAuditTrail {
             return true;
         }
 
-        let mut expected_prev = 0x1337_C0DE_FA11_FACE;
+        let mut expected_prev: u64 = 0x1337_C0DE_FA11_FACE;
         for i in 0..self.logs.len() {
             let log = &self.logs[i];
             if log.previous_hash != expected_prev {

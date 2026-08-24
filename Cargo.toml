@@ -26,6 +26,7 @@ cloud = ["cloud-init"]
 cloud-init = []
 wasm = []
 browser = ["wasm"]
+standalone_test = []
 
 [profile.dev]
 opt-level = 0
