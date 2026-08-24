@@ -7,7 +7,7 @@
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type BootStatus = usize;
 
@@ -77,10 +77,18 @@ impl SimpleUEFIBootloader {
             kernel_loaded: AtomicUsize::new(0),
         }
     }
+
+    pub fn load_kernel_raw(&mut self, src: &[u8], dst: &mut [u8]) -> Result<usize, BootError> {
+        let len = src.len().min(dst.len());
+        dst[..len].copy_from_slice(&src[..len]);
+        self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
+        self.kernel_loaded.store(1, Ordering::SeqCst);
+        Ok(len)
+    }
 }
 
 impl UEFIBootloader for SimpleUEFIBootloader {
-    fn phase(&self) -> BootPhase { unsafe { core::mem::transmute(self.phase.load(Ordering::SeqCst)) } }
+    fn phase(&self) -> BootPhase { unsafe { core::mem::transmute(self.phase.load(Ordering::SeqCst) as u32) } }
     fn load_kernel(&mut self, _kernel_data: &[u8]) -> Result<BootStatus, BootError> {
         self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
         self.kernel_loaded.store(1, Ordering::SeqCst);

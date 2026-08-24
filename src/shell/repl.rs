@@ -1,4 +1,3 @@
-use crate::ai::AgentAutomationEngine;
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
@@ -238,6 +237,57 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "echo" => ShellCommand::Echo {
+                message: parts[1..].join(" "),
+            },
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "cat" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Cat {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "su" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Su {
+                        username: parts[1].to_string(),
+                        password: parts.get(2).map(|s| s.to_string()),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "systemctl" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Systemctl {
+                        action: parts[1].to_string(),
+                        service: parts.get(2).unwrap_or(&"").to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "apt" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Apt {
+                        subcommand: parts[1].to_string(),
+                        package: parts.get(2).map(|s| s.to_string()),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {

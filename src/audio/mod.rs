@@ -7,10 +7,8 @@ pub mod sigma_audio;
 
 pub use editor::{
     AmplifyEffect, AudioEditor, AudioEffect, AudioTrack as EditorAudioTrack,
-    AutomationEnvelope, CenterChannelExtractor, DistortionEffect, DynamicRangeCompressor,
-    EchoEffect, EnvelopePoint, FlangerEffect, GraphicEqualizer, HighPassFilter, LowPassFilter,
-    MultiTrackSession, NoiseGateEffect, PitchShifter, ReverbEffect, SignalGenerator,
-    SpectralNoiseSuppressionEffect, StereoMixdown, WaveformType,
+    EchoEffect, LowPassFilter, MultiTrackSession, NoiseGateEffect,
+    SpectralNoiseSuppressionEffect,
 };
 pub use podcast::{
     AudioClip, AudioMasteringEffect, AudioTrack, PodcastEpisode, PodcastFeed, PodcastRecorder,

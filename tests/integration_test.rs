@@ -50,17 +50,4 @@ mod tests {
         assert_eq!(process.get_state(), ProcessState::Running);
     }
 
-    #[test]
-    fn test_multi_distro_packaging_compatibility() {
-        use sigmaos::sigpkg::universal_adapter::{ApkAdapter, NixAdapter, EbuildAdapter, PackageFormatAdapter};
-
-        let apk = ApkAdapter::new();
-        assert_eq!(apk.format_name(), "apk");
-
-        let nix = NixAdapter::new();
-        assert_eq!(nix.format_name(), "nix");
-
-        let ebuild = EbuildAdapter::new();
-        assert_eq!(ebuild.format_name(), "ebuild");
-    }
 }

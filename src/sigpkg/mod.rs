@@ -14,12 +14,23 @@ pub mod spec;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod zero_alloc_resolver;
+pub mod universal_adapter;
+pub mod sovereign_sigpkg;
+
+pub use zero_alloc_resolver::{
+    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
+};
+pub use universal_adapter::{
+    PackageFormatAdapter, UniversalPackageManager, AdapterError, DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
+};
+pub use sovereign_sigpkg::*;
 
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
-    SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer,
-    SovereignTransactionManager, TransactionStatus,
+    AlternativeCandidate, AptMirror, MaintainerScriptPhase, SovereignAlternativesSystem,
+    SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use spec::{
@@ -45,7 +56,7 @@ pub struct Version {
 
 
 impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<"_">) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }

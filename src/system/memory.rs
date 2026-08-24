@@ -20,11 +20,7 @@
 // SigmaOS Memory Leak Detector
 // OOP-based memory leak detection with tracking and analysis
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::BTreeMap;
-
-#[cfg(feature = "standalone_test")]
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
 #[cfg(not(feature = "standalone_test"))]
 use std::time::{Duration, Instant};

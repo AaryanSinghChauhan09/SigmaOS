@@ -3,7 +3,9 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-use klib::collections::HashMap;
+extern crate alloc;
+use crate::klib;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -103,7 +105,7 @@ impl AurRecipeCompiler {
                     .trim_matches('"');
                 for d in dep_str.split_whitespace() {
                     depends.push(Dependency {
-                        name: d.replace('\'', "").replace('"', ""),
+                        name: klib::string::SigmaString::from(d.replace('\'', "").replace('"', "")),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -115,13 +117,14 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
+        let depends_klib = klib::vec::Vec::from_iter(depends);
 
         Ok(Package::new(
-            pkgname.to_string(),
+            klib::string::SigmaString::from(pkgname),
             parsed_ver,
-            format!("Compiled AUR Package: {}", pkgname),
-            depends,
-            "sha256_compiled_mock_hash_value".to_string(),
+            klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
+            depends_klib,
+            klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
 }
@@ -231,11 +234,11 @@ impl PacmanDbAdapter {
         let parsed_ver = Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
-            name.to_string(),
+            klib::string::SigmaString::from(name),
             parsed_ver,
-            desc.to_string(),
-            Vec::new(),
-            "sha256_imported_legacy_hash_value".to_string(),
+            klib::string::SigmaString::from(desc),
+            klib::vec::Vec::new(),
+            klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
 }
@@ -293,17 +296,17 @@ impl AlpmHookManager {
         }
 
         self.add_hook(AlpmHook {
-            name: name.to_string(),
+            name: klib::string::SigmaString::from(name),
             when,
-            target_pattern,
-            exec_cmd,
+            target_pattern: klib::string::SigmaString::from(target_pattern),
+            exec_cmd: klib::string::SigmaString::from(exec_cmd),
         });
 
         Ok(())
     }
 
-    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> Vec<String> {
-        let mut triggered_cmds = Vec::new();
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<klib::string::SigmaString> {
+        let mut triggered_cmds = alloc::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
                 let pattern = hook.target_pattern.trim_end_matches('*');
@@ -333,14 +336,14 @@ pub struct MkinitcpioBuilder {
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
         Self {
-            hooks: klib::vec![
+            hooks: klib::vec::Vec::from_iter(alloc::vec![
                 klib::string::SigmaString::from("base"),
                 klib::string::SigmaString::from("udev"),
                 klib::string::SigmaString::from("autodetect"),
                 klib::string::SigmaString::from("modconf"),
                 klib::string::SigmaString::from("block"),
                 klib::string::SigmaString::from("filesystems"),
-            ],
+            ]),
             compression: klib::string::SigmaString::from("zstd"),
         }
     }
@@ -360,7 +363,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        image_header
+        klib::vec::Vec::from_iter(image_header)
     }
 }
 
@@ -412,7 +415,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, archive_content))
+        Ok((archive_name, klib::vec::Vec::from_iter(archive_content)))
     }
 }
 
@@ -427,17 +430,17 @@ mod tests {
         sync.register_installed("make", Version::new(4, 3, 0));
 
         let source_pkg = DebianSbuildPackage {
-            name: "coreutils".to_string(),
+            name: klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string()],
+            build_depends: klib::vec::Vec::from_iter(alloc::vec![klib::string::SigmaString::from("gcc"), klib::string::SigmaString::from("make")]),
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
         let source_pkg_missing = DebianSbuildPackage {
-            name: "coreutils".to_string(),
+            name: klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
+            build_depends: klib::vec::Vec::from_iter(alloc::vec![klib::string::SigmaString::from("gcc"), klib::string::SigmaString::from("make"), klib::string::SigmaString::from("libc-dev")]),
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }

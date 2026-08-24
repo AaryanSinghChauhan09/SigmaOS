@@ -12,8 +12,7 @@ use core::sync::atomic::AtomicUsize;
 /// Based on Roadmap Item: Functional Kernel Scheduler Implementation (Critical Blocker)
 /// Implements MLFQ (Multi-Level Feedback Queue) and MCS (Machine-to-Core Scheduling)
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use core::sync::atomic::Ordering;
 
 pub type ThreadID = usize;
 

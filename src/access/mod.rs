@@ -8,8 +8,10 @@
 #![allow(unused_imports)]
 
 pub mod control;
+pub mod append_rights;
 
 pub use control::*;
+pub use append_rights::*;
 
 extern crate alloc;
 use alloc::vec::Vec;

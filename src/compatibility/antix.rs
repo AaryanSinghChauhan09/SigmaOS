@@ -156,7 +156,7 @@ pub struct AntiXControlCentre {
 }
 
 impl AntiXControlCentre {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         AntiXControlCentre {
             low_mem_mode: false,
             power_save_active: false,
@@ -173,6 +173,23 @@ impl Default for AntiXControlCentre {
     fn default() -> Self {
         Self::new()
     }
+}
+
+pub struct AntixInitManager;
+impl AntixInitManager {
+    pub const fn new() -> Self { Self }
+}
+
+pub struct AntixDesktopProfiler;
+impl AntixDesktopProfiler {
+    pub const fn new() -> Self { Self }
+}
+
+pub type AntixControlCenter = AntiXControlCentre;
+
+pub struct LegacyMemoryTrimmer;
+impl LegacyMemoryTrimmer {
+    pub const fn new() -> Self { Self }
 }
 
 pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();

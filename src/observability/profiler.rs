@@ -1,7 +1,7 @@
 // SigmaOS High-Performance eBPF Tracing & Latency Profiler (SigmaProfiler)
 // Designed for tracking scheduler task latency, system tracepoints, and CPU profiling
 
-use klib::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TracepointType {

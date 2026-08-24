@@ -2,34 +2,13 @@
 
 extern crate alloc;
 
-#[path = "../src/storage/block_device_extended.rs"]
-mod block_device_extended;
-
-#[path = "../src/process/blocked_state.rs"]
-mod blocked_state;
-
-#[path = "../src/auth/authentication_pipeline.rs"]
-mod authentication_pipeline;
-
-#[path = "../src/kernel/atomic_extended.rs"]
-mod atomic_extended;
-
-#[path = "../src/app/murano_catalogue.rs"]
-mod murano_catalogue;
-
-#[path = "../src/compatibility/abi_extended.rs"]
-mod abi_extended;
-
-#[path = "../src/access/append_rights.rs"]
-mod append_rights;
-
-use abi_extended::*;
-use append_rights::*;
-use atomic_extended::*;
-use authentication_pipeline::*;
-use block_device_extended::*;
-use blocked_state::*;
-use murano_catalogue::*;
+use sigmaos::compatibility::abi_extended::*;
+use sigmaos::access::append_rights::*;
+use sigmaos::kernel::atomic_extended::*;
+use sigmaos::auth::authentication_pipeline::*;
+use sigmaos::storage::block_device_extended::*;
+use sigmaos::process::blocked_state::*;
+use sigmaos::app::murano_catalogue::*;
 
 #[test]
 fn test_cinder_volume_extended() {

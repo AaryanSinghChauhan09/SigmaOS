@@ -25,13 +25,25 @@
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// State graph node representing a system configuration
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct StateNode {
     id: usize,
     name: &'static str,
     value: StateValue,
     dependencies: [usize; 8], // Up to 8 dependencies
     dependency_count: AtomicUsize,
+}
+
+impl Clone for StateNode {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id,
+            name: self.name,
+            value: self.value.clone(),
+            dependencies: self.dependencies,
+            dependency_count: AtomicUsize::new(self.dependency_count.load(Ordering::SeqCst)),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -51,10 +63,12 @@ pub struct DeclarativeStateGraph {
     generation_count: AtomicUsize,
 }
 
+const NONE_NODE: Option<StateNode> = None;
+
 impl DeclarativeStateGraph {
     pub const fn new() -> Self {
         DeclarativeStateGraph {
-            nodes: [None; 256],
+            nodes: [NONE_NODE; 256],
             node_count: AtomicUsize::new(0),
             current_generation: AtomicUsize::new(0),
             generations: [0; 32],
@@ -109,11 +123,10 @@ impl DeclarativeStateGraph {
             return Err(StateError::InvalidNodeId);
         }
 
-        let node = self.nodes[id].as_mut().ok_or(StateError::NodeNotFound)?;
-        
         // Create new generation before update
         self.create_generation()?;
         
+        let node = self.nodes[id].as_mut().ok_or(StateError::NodeNotFound)?;
         node.value = new_value;
         Ok(())
     }

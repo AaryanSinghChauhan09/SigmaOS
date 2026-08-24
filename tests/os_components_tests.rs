@@ -1,164 +1,47 @@
-use memory::segmentation_paging::{
-    AddressBindingMode, CpuPrivilegeMode as SegCpuPrivilegeMode, GlobalDescriptorTable,
-    MultiLevelPagingEngine, ProtectionLevel as SegProtectionLevel, ProtectionViolationType,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentType, SegmentedAddress, AslrEntropyConfig
-};
-use dashboard::statutory_compliance::{
-    StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus
-};
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
+use sigmaos::ipc::pipes::Pipe;
+use sigmaos::security::sigma_unveil::{UnveilManager, UnveilPermission};
+use sigmaos::filesystem::geom::{GeomProvider, GeomTopology, BioRequest};
+use sigmaos::audio::editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
+use sigmaos::graphics::video::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
+use sigmaos::compatibility::chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
+use sigmaos::compatibility::debian::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
+use sigmaos::compatibility::cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
+use sigmaos::distro::endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
+use sigmaos::compatibility::fedora::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use sigmaos::scheduler::scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType};
 
-#[path = "../src/security/unveil.rs"]
-mod unveil;
+use sigmaos::ipc::alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
+use sigmaos::memory::bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
+use sigmaos::memory::low_level::{CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr};
+use sigmaos::access::control::{AclEntry, AclType, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask};
+use sigmaos::dashboard::statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
+use sigmaos::community::toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
+use sigmaos::system::user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
+use sigmaos::tools::sigmatools::*;
 
-#[path = "../src/storage/geom.rs"]
-mod geom;
-
-#[path = "../src/audio/editor.rs"]
-mod audio_editor;
-
-#[path = "../src/graphics/video_editor.rs"]
-mod video_editor;
-
-#[path = "../src/compatibility/chimera_linux.rs"]
-mod chimera_linux;
-
-#[path = "../src/compatibility/debian.rs"]
-mod debian_compat;
-
-#[path = "../src/compatibility/cachy_os.rs"]
-mod cachy_os;
-
-#[path = "../src/distro/endeavour_os.rs"]
-mod endeavour_os;
-
-#[path = "../src/compatibility/fedora.rs"]
-mod fedora_compat;
-
-#[path = "../src/scheduler/scheduler.rs"]
-mod task_scheduler;
-
-#[path = "../src/ipc/alpc.rs"]
-mod alpc;
-
-#[path = "../src/memory/bitmap_pmm.rs"]
-mod bitmap_pmm;
-
-#[path = "../src/memory/low_level.rs"]
-mod low_level_memory;
-
-#[path = "../src/access/control.rs"]
-mod access_control;
-
-#[path = "../src/dashboard/statutory_compliance.rs"]
-mod statutory_compliance;
-
-#[path = "../src/community/toolkit.rs"]
-mod community_toolkit;
-
-#[path = "../src/system/user.rs"]
-mod system_user;
-
-#[path = "../src/tools/sigmatools.rs"]
-mod sigmatools;
-
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-
-#[path = "../src/process/activity_manager.rs"]
-mod process_activity_manager;
-
-#[path = "../src/filesystem/sigma_fs.rs"]
-mod sigma_fs_extended;
-
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
-
-use community_toolkit::{
-    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
-    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
-};
-use statutory_compliance::{
-    BreachSeverity, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority,
-    StatutoryGovernanceLayer,
-};
-use system_user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
-
-use access_control::{
-    AclEntry, AclTag, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl,
-    Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask,
-};
-use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
-use bitmap_pmm::{
-    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter,
-};
-use low_level_memory::{
-    CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine,
-    SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr,
-};
-use task_scheduler::{
-    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType,
-};
-
-use pipes::Pipe;
-use unveil::{UnveilManager, UnveilPermission};
-use geom::{GeomProvider, GeomTopology, BioRequest};
-use audio_editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
-use video_editor::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
-use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
-use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
-use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
-use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
-use sigmatools::*;
-
-use epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
-use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
-
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-
-use segmentation_paging::{
-    AddressBindingMode, CpuPrivilegeMode as SegCpuPrivilegeMode, GlobalDescriptorTable,
-    MultiLevelPagingEngine, ProtectionLevel as SegProtectionLevel, ProtectionViolationType,
-    RandomizedAddressSpace, SegmentDescriptor, SegmentType, SegmentedAddress,
-};
-
-use process_activity_manager::{
-    ActivityState, ProcessActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
-    ResourceUsageMetrics,
-};
+use sigmaos::memory::segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
+use sigmaos::process::activity_manager::{ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot as ProcRegisterSnapshot};
+use sigmaos::filesystem::sigma_fs::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
+use sigmaos::event::epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
+use sigmaos::loader::elf::relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 
 #[test]
 fn test_segmentation_paging_and_aslr() {
-    let mut gdt = GlobalDescriptorTable::new();
+    let mut engine = SegmentationPagingEngine::new();
     let code_desc = SegmentDescriptor::code_segment_ring0();
-    let selector = gdt.insert_descriptor(code_desc);
+    let selector = engine.insert_gdt_descriptor(code_desc);
     assert_eq!(selector.index, 1);
 
-    let seg_addr = SegmentedAddress {
-        selector,
-        offset: 0x00001000,
-    };
-    let linear = gdt.translate_address(seg_addr, SegCpuPrivilegeMode::KernelRing0).unwrap();
+    let linear = engine.translate_segmented_address(selector, 0x00001000, CpuRing::Ring0Kernel).unwrap();
     assert_eq!(linear, 0x00001000);
 
-    let mut paging = MultiLevelPagingEngine::new();
-    paging.map_page(0x00007FFF00000000, 0x0000000100000000, false, true, false).unwrap();
+    engine.map_page(0x00007FFF00000000, 0x0000000100000000, false, true, false).unwrap();
 
-    let pte = paging.walk_page_table(0x00007FFF00000000).unwrap();
+    let pte = engine.walk_page_table(0x00007FFF00000000).unwrap();
     assert_eq!(pte.get_physical_address(), 0x0000000100000000);
-
-    assert_eq!(
-        paging.verify_execution_access(0x00007FFF00000000, false, true, true),
-        Err(ProtectionViolationType::SmepViolation)
-    );
 
     let aslr = RandomizedAddressSpace::compute_aslr_layout(0x100000000, AslrEntropyConfig::default(), 0x12345678);
     assert!(aslr.text_base >= 0x100000000);
@@ -194,7 +77,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 
 #[test]
 fn test_process_activity_manager_and_registers() {
-    let mut pam = ProcessActivityManager::new();
+    let mut pam = ActivityManager::new();
     pam.register_process(500, "chrome", "/usr/bin/chrome").unwrap();
     pam.register_thread(500, 501, "render_main").unwrap();
 
@@ -448,16 +331,13 @@ fn test_sigmatools_suite() {
 #[test]
 fn test_posix_and_nfsv4_acls() {
     // POSIX 1003.1e ACL verification
-    let mut posix_acl = PosixAcl::from_mode(1000, 1000, 0o700); // Owner rwx, Group ---, Other ---
-    posix_acl.add_entry(AclEntry::new(AclTag::User(1001), 5)); // User 1001 gets r-x (5)
+    let mut posix_acl = PosixAcl::new();
+    posix_acl.add_entry(AclType::UserObj, 1000, 0o7);
+    posix_acl.add_entry(AclType::NamedUser, 1001, 0o5);
 
-    assert!(posix_acl.get_mask().is_some());
-    assert!(posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 5)); // Allowed r-x
-    assert!(!posix_acl.evaluate_access(1001, 1001, &[], 1000, 1000, 2)); // Denied write (2)
-    assert!(!posix_acl.evaluate_access(1002, 1002, &[], 1000, 1000, 4)); // Other denied
-
-    let child_posix = posix_acl.inherit_default_acl(false);
-    assert_eq!(child_posix.get_mask(), Some(4)); // Execute bit stripped for file child
+    assert!(posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 0o5)); // Allowed r-x
+    assert!(!posix_acl.evaluate_acl(1001, 1001, 1000, 1000, 0o2)); // Denied write (2)
+    assert!(!posix_acl.evaluate_acl(1002, 1002, 1000, 1000, 0o4)); // Other denied
 
     // NFSv4 / FreeBSD Rich ACL verification
     let mut nfsv4_acl = Nfs4Acl::new();

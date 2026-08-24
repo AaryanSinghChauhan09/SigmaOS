@@ -228,6 +228,26 @@ impl DacPermission {
         }
     }
 
+    pub fn from_octal(owner_uid: UserID, group_gid: GroupID, mode_octal: u16) -> Self {
+        Self {
+            owner_uid,
+            group_gid,
+            mode_bits: mode_octal,
+        }
+    }
+
+    pub fn is_suid(&self) -> bool {
+        (self.mode_bits & 0o4000) != 0
+    }
+
+    pub fn is_sgid(&self) -> bool {
+        (self.mode_bits & 0o2000) != 0
+    }
+
+    pub fn is_sticky(&self) -> bool {
+        (self.mode_bits & 0o1000) != 0
+    }
+
     pub fn evaluate_access(&self, subject_uid: UserID, subject_gid: GroupID, requested_mode: u16) -> bool {
         let allowed_bits = if subject_uid == 0 {
             0o777 // Root bypasses standard DAC
@@ -392,6 +412,26 @@ mod tests {
 
         // NamedUser 1002 requests Write (2) -> Mask restricts to r-- -> Denied
         assert!(!acl.evaluate_acl(1002, 2000, 1000, 2000, 0o2));
+    }
+
+    #[test]
+    fn test_dac_permission_special_bits() {
+        let suid_dac = DacPermission::from_octal(1000, 2000, 0o4755);
+        assert!(suid_dac.is_suid());
+        assert!(!suid_dac.is_sgid());
+        assert!(!suid_dac.is_sticky());
+        assert!(suid_dac.evaluate_access(1000, 2000, dac_flags::READ | dac_flags::WRITE | dac_flags::EXECUTE));
+        assert!(suid_dac.evaluate_access(1001, 2000, dac_flags::READ | dac_flags::EXECUTE));
+
+        let sgid_dac = DacPermission::from_octal(1000, 2000, 0o2770);
+        assert!(!sgid_dac.is_suid());
+        assert!(sgid_dac.is_sgid());
+        assert!(!sgid_dac.is_sticky());
+        assert!(sgid_dac.evaluate_access(1001, 2000, dac_flags::READ | dac_flags::WRITE | dac_flags::EXECUTE));
+        assert!(!sgid_dac.evaluate_access(1001, 2001, dac_flags::READ));
+
+        let sticky_dac = DacPermission::from_octal(0, 0, 0o1777);
+        assert!(sticky_dac.is_sticky());
     }
 
     #[test]

@@ -14,6 +14,7 @@ pub mod cross_platform_kernel;
 pub mod linux_adapter;
 pub mod persona;
 pub mod abi_translator;
+pub mod abi_extended;
 pub mod lattice;
 pub mod prism;
 pub mod canonical;
@@ -24,6 +25,26 @@ pub mod clear_linux;
 pub mod historic_linux;
 pub mod antix;
 pub mod zorin;
+pub mod constellation_mesh;
+pub mod endeavour;
+pub mod standards;
+
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+};
+
+pub use constellation_mesh::{
+    BIOSGatewayMesh, BuildCodexGrid, ConstellationNode, CorebootGatewayMesh, DACConstellation,
+    DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
+    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid, LegacyCCodexGrid,
+    LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh, ProcessAlmanacHub,
+    SELinuxConstellation, SecurityConstellation, StorageArchiveGridV2,
+    SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
+};
+
+pub use endeavour::{
+    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper, Mirror, WelcomeTab,
+};
 
 pub use antix::{
     AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
@@ -65,6 +86,7 @@ pub use historic_linux::{
 };
 pub use legacy_adapters::{
     KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
 };
 pub use linux_adapter::{
     LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,

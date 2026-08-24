@@ -11,6 +11,7 @@ pub mod scheduler;
 pub mod traits;
 pub mod gap_closing;
 pub mod generation_manager;
+pub mod atomic_extended;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,

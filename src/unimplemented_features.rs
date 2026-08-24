@@ -5302,6 +5302,262 @@ impl AurDependencySolver {
 }
 
 // =========================================================================
+// 40. TAILS-INSPIRED AMNESIC SECURITY & VOLATILE RAM SCRUBBING
+// =========================================================================
+
+pub struct SovereignAmnesicEngine {
+    pub is_amnesic_mode: bool,
+    pub mac_spoofed: bool,
+    pub spoofed_mac: [u8; 6],
+}
+
+impl SovereignAmnesicEngine {
+    pub fn new() -> Self {
+        Self {
+            is_amnesic_mode: true,
+            mac_spoofed: false,
+            spoofed_mac: [0u8; 6],
+        }
+    }
+
+    pub fn spoof_mac_address(&mut self, seed: u64) -> [u8; 6] {
+        let mut mac = [0x00, 0x16, 0x3E, 0x00, 0x00, 0x00]; // Xen/OUI prefix
+        mac[3] = (seed & 0xFF) as u8;
+        mac[4] = ((seed >> 8) & 0xFF) as u8;
+        mac[5] = ((seed >> 16) & 0xFF) as u8;
+        self.spoofed_mac = mac;
+        self.mac_spoofed = true;
+        mac
+    }
+
+    pub fn wipe_volatile_ram_patterns(&self, ram_buffer: &mut [u8]) -> usize {
+        let len = ram_buffer.len();
+        for byte in ram_buffer.iter_mut() {
+            *byte = 0x00;
+        }
+        len
+    }
+}
+
+// =========================================================================
+// 42. CLEAR LINUX-INSPIRED STATELESS ARCHITECTURE & ISA AUTO-DETECTION
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum X86IsaLevel {
+    V1Baseline, // Baseline x86-64
+    V2Nehalem,  // SSE4.2, Popcnt
+    V3Haswell,  // AVX2, BMI2
+    V4Sapphire, // AVX-512, AMX
+}
+
+pub struct SovereignStatelessArchitectureEngine {
+    pub factory_default_path: &'static str,
+    pub user_override_path: &'static str,
+    pub detected_isa_level: X86IsaLevel,
+}
+
+impl SovereignStatelessArchitectureEngine {
+    pub fn new() -> Self {
+        Self {
+            factory_default_path: "/usr/share/factory/etc",
+            user_override_path: "/etc",
+            detected_isa_level: X86IsaLevel::V3Haswell,
+        }
+    }
+
+    pub fn auto_detect_isa_level(&mut self, has_avx2: bool, has_avx512: bool) -> X86IsaLevel {
+        if has_avx512 {
+            self.detected_isa_level = X86IsaLevel::V4Sapphire;
+        } else if has_avx2 {
+            self.detected_isa_level = X86IsaLevel::V3Haswell;
+        } else {
+            self.detected_isa_level = X86IsaLevel::V1Baseline;
+        }
+        self.detected_isa_level
+    }
+
+    pub fn resolve_configuration_path(&self, config_key: &str, user_overrides_exist: bool) -> String {
+        if user_overrides_exist {
+            alloc::format!("{}/{}", self.user_override_path, config_key)
+        } else {
+            alloc::format!("{}/{}", self.factory_default_path, config_key)
+        }
+    }
+}
+
+// =========================================================================
+// 43. NIXOS-INSPIRED CAS GARBAGE COLLECTION & GENERATION PRUNING
+// =========================================================================
+
+pub struct NixGcNode {
+    pub path: String,
+    pub is_gc_root: bool,
+}
+
+pub struct SovereignNixGcEngine {
+    pub store_nodes: Vec<NixGcNode>,
+    pub reclaimed_bytes: usize,
+}
+
+impl SovereignNixGcEngine {
+    pub fn new() -> Self {
+        Self {
+            store_nodes: Vec::new(),
+            reclaimed_bytes: 0,
+        }
+    }
+
+    pub fn register_store_path(&mut self, path: &str, is_root: bool) {
+        self.store_nodes.push(NixGcNode {
+            path: path.to_string(),
+            is_gc_root: is_root,
+        });
+    }
+
+    pub fn collect_garbage(&mut self) -> usize {
+        let before_count = self.store_nodes.len();
+        self.store_nodes.retain(|node| node.is_gc_root);
+        let pruned_count = before_count - self.store_nodes.len();
+        self.reclaimed_bytes += pruned_count * 1024 * 1024; // 1MB per store path
+        pruned_count
+    }
+}
+
+// =========================================================================
+// 44. POP!_OS COSMIC-INSPIRED DYNAMIC BSP TILING & GPU ROUTING
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpuRenderPreference {
+    Integrated,
+    DiscreteNvidia,
+    DiscreteAmd,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BspSplitDirection {
+    Horizontal,
+    Vertical,
+}
+
+pub struct SovereignCosmicTilingEngine {
+    pub active_layout_direction: BspSplitDirection,
+    pub gpu_preference: GpuRenderPreference,
+    pub window_count: usize,
+}
+
+impl SovereignCosmicTilingEngine {
+    pub fn new() -> Self {
+        Self {
+            active_layout_direction: BspSplitDirection::Horizontal,
+            gpu_preference: GpuRenderPreference::Integrated,
+            window_count: 0,
+        }
+    }
+
+    pub fn set_gpu_offload(&mut self, pref: GpuRenderPreference) {
+        self.gpu_preference = pref;
+    }
+
+    pub fn split_tile(&mut self) -> BspSplitDirection {
+        self.window_count += 1;
+        if self.window_count % 2 == 0 {
+            self.active_layout_direction = BspSplitDirection::Vertical;
+        } else {
+            self.active_layout_direction = BspSplitDirection::Horizontal;
+        }
+        self.active_layout_direction
+    }
+}
+
+// =========================================================================
+// 41. VOID LINUX-INSPIRED RUNIT 3-STAGE SERVICE SUPERVISOR
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    OneOneTimeInit, // Stage 1: Initial boot mounts and initialization
+    TwoRunsvDir,     // Stage 2: Main supervision loop (runsvdir)
+    ThreeShutdown,   // Stage 3: System halt/reboot cleanup
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitServiceStatus {
+    Down,
+    Starting,
+    Up,
+    Stopping,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RunitServiceControl {
+    pub name: &'static str,
+    pub stage: RunitStage,
+    pub status: RunitServiceStatus,
+    pub pid: u32,
+}
+
+pub struct SovereignRunitSupervisor {
+    pub active_stage: RunitStage,
+    pub services: [Option<RunitServiceControl>; 8],
+}
+
+impl SovereignRunitSupervisor {
+    pub fn new() -> Self {
+        Self {
+            active_stage: RunitStage::OneOneTimeInit,
+            services: [None; 8],
+        }
+    }
+
+    pub fn transition_stage(&mut self, next_stage: RunitStage) {
+        self.active_stage = next_stage;
+    }
+
+    pub fn register_service(&mut self, name: &'static str) -> Result<(), &'static str> {
+        for slot in self.services.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(RunitServiceControl {
+                    name,
+                    stage: self.active_stage,
+                    status: RunitServiceStatus::Down,
+                    pid: 0,
+                });
+                return Ok(());
+            }
+        }
+        Err("Runit supervisor service table full")
+    }
+
+    pub fn start_service(&mut self, name: &'static str, pid: u32) -> Result<(), &'static str> {
+        for slot in self.services.iter_mut() {
+            if let Some(ref mut service) = slot {
+                if service.name == name {
+                    service.status = RunitServiceStatus::Up;
+                    service.pid = pid;
+                    return Ok(());
+                }
+            }
+        }
+        Err("Service not found in Runit supervisor table")
+    }
+
+    pub fn stop_service(&mut self, name: &'static str) -> Result<(), &'static str> {
+        for slot in self.services.iter_mut() {
+            if let Some(ref mut service) = slot {
+                if service.name == name {
+                    service.status = RunitServiceStatus::Down;
+                    service.pid = 0;
+                    return Ok(());
+                }
+            }
+        }
+        Err("Service not found in Runit supervisor table")
+    }
+}
+
+// =========================================================================
 // 39. ADDITIONAL LINUX & BSD DISTRO PARITY INSPIRATIONS
 // =========================================================================
 
@@ -5412,6 +5668,84 @@ mod distro_parity_tests {
         assert_eq!(hammer.switch_active_pfs(2).unwrap(), "@ROOT_SNAP_2026");
         assert_eq!(hammer.active_pfs_id, 2);
         assert!(hammer.switch_active_pfs(99).is_err());
+    }
+
+    #[test]
+    fn test_sovereign_amnesic_engine_ram_wipe() {
+        let mut amnesic = SovereignAmnesicEngine::new();
+        assert!(amnesic.is_amnesic_mode);
+
+        let spoofed = amnesic.spoof_mac_address(0x123456);
+        assert!(amnesic.mac_spoofed);
+        assert_eq!(spoofed[0..3], [0x00, 0x16, 0x3E]);
+
+        let mut buffer = [0xFFu8; 1024];
+        let wiped = amnesic.wipe_volatile_ram_patterns(&mut buffer);
+        assert_eq!(wiped, 1024);
+        assert!(buffer.iter().all(|&b| b == 0x00));
+    }
+
+    #[test]
+    fn test_sovereign_runit_supervisor_stages() {
+        let mut supervisor = SovereignRunitSupervisor::new();
+        assert_eq!(supervisor.active_stage, RunitStage::OneOneTimeInit);
+
+        supervisor.transition_stage(RunitStage::TwoRunsvDir);
+        assert_eq!(supervisor.active_stage, RunitStage::TwoRunsvDir);
+
+        assert!(supervisor.register_service("dbus").is_ok());
+        assert!(supervisor.start_service("dbus", 1001).is_ok());
+
+        assert_eq!(supervisor.services[0].as_ref().unwrap().status, RunitServiceStatus::Up);
+        assert_eq!(supervisor.services[0].as_ref().unwrap().pid, 1001);
+
+        assert!(supervisor.stop_service("dbus").is_ok());
+        assert_eq!(supervisor.services[0].as_ref().unwrap().status, RunitServiceStatus::Down);
+    }
+
+    #[test]
+    fn test_sovereign_stateless_architecture_isa() {
+        let mut engine = SovereignStatelessArchitectureEngine::new();
+        assert_eq!(
+            engine.resolve_configuration_path("hostname", false),
+            "/usr/share/factory/etc/hostname"
+        );
+        assert_eq!(
+            engine.resolve_configuration_path("hostname", true),
+            "/etc/hostname"
+        );
+
+        let level_v4 = engine.auto_detect_isa_level(true, true);
+        assert_eq!(level_v4, X86IsaLevel::V4Sapphire);
+
+        let level_v1 = engine.auto_detect_isa_level(false, false);
+        assert_eq!(level_v1, X86IsaLevel::V1Baseline);
+    }
+
+    #[test]
+    fn test_sovereign_nix_gc_engine() {
+        let mut gc = SovereignNixGcEngine::new();
+        gc.register_store_path("/nix/store/pkg1", true);
+        gc.register_store_path("/nix/store/pkg2", false);
+        gc.register_store_path("/nix/store/pkg3", false);
+
+        let pruned = gc.collect_garbage();
+        assert_eq!(pruned, 2);
+        assert_eq!(gc.store_nodes.len(), 1);
+        assert_eq!(gc.reclaimed_bytes, 2 * 1024 * 1024);
+    }
+
+    #[test]
+    fn test_sovereign_cosmic_tiling_engine() {
+        let mut tiling = SovereignCosmicTilingEngine::new();
+        tiling.set_gpu_offload(GpuRenderPreference::DiscreteNvidia);
+        assert_eq!(tiling.gpu_preference, GpuRenderPreference::DiscreteNvidia);
+
+        let dir1 = tiling.split_tile();
+        assert_eq!(dir1, BspSplitDirection::Horizontal);
+
+        let dir2 = tiling.split_tile();
+        assert_eq!(dir2, BspSplitDirection::Vertical);
     }
 
     #[test]

@@ -351,18 +351,6 @@ impl BuddyAllocator {
                 let block = MemoryBlock { addr, size };
                 self.free_lists[order].push(block);
             }
-            let block = MemoryBlock {
-                addr: NonNull::new(base_addr as *mut u8).unwrap(),
-                size,
-            };
-            self.free_lists[order].push(block);
-            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
-                self.free_lists[order].push(block);
-            }
         }
     }
 

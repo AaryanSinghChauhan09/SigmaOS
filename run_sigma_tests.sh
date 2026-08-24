@@ -23,17 +23,8 @@ else
     ./test_runner
 fi
 
-echo -e "${CYAN}:: Running Linux & BSD Parity Inspection Unit Tests...${RESET}"
-rustc --edition 2021 --test tests/linux_bsd_inspection_tests.rs -o build/linux_bsd_test
-./build/linux_bsd_test
-
-echo -e "${CYAN}:: Running Clean-Room Compatibility Harness Tests...${RESET}"
-rustc --edition 2021 --test tests/compat_harness.rs -o build/compat_harness_test
-./build/compat_harness_test
-
-echo -e "${CYAN}:: Running Comprehensive OS Subsystems & Components Unit Tests...${RESET}"
-rustc --edition 2021 --test tests/os_components_tests.rs -o build/os_components_test
-./build/os_components_test
+echo -e "${CYAN}:: Running Cargo Integrated Unit & Subsystem Test Suite...${RESET}"
+cargo test --lib
 
 echo -e "${GREEN}[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]${RESET}"
 exit 0

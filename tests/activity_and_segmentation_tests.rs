@@ -2,14 +2,8 @@
 
 extern crate alloc;
 
-#[path = "../src/process/activity_manager.rs"]
-mod activity_manager;
-
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-
-use activity_manager::*;
-use segmentation_paging::*;
+use sigmaos::process::activity_manager::*;
+use sigmaos::memory::segmentation_paging::*;
 
 #[test]
 fn test_activity_manager_complete_suite() {

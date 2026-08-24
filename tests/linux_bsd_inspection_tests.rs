@@ -5,14 +5,8 @@
 // - OpenBSD sysctl MIB
 // - Linux LSB / fstab parsing
 
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd;
-
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod distro_inspirations;
-
-use bsd::*;
-use distro_inspirations::*;
+use sigmaos::compatibility::bsd::*;
+use sigmaos::distro::linux_bsd_inspirations::*;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {

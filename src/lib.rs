@@ -28,14 +28,13 @@ pub mod sigpkg;
 pub mod storage;
 pub mod thread;
 pub mod process;
+pub mod runtime;
 pub mod community;
 pub mod memory;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod virtualization;
-pub mod unimplemented_features;
-pub mod unimplemented_tools;
 pub mod cluster;
 
 pub mod graphics {
@@ -61,9 +60,7 @@ pub mod toolchain {
     pub mod codex;
     pub mod bootstrap;
 }
-pub mod scheduler {
-    pub mod numa_scheduler;
-}
+pub mod scheduler;
 pub mod crypto {
     pub mod vectorized_pqc;
 }
@@ -164,8 +161,8 @@ pub use package::{
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use remote::{
-    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
+    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
     SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
 };
@@ -230,4 +227,12 @@ pub use tools::{
 };
 
 pub mod open_source_obsoletion;
+pub mod ipc;
+pub mod audio;
+pub mod access;
+pub mod system;
+pub mod event;
+pub mod loader;
+pub mod app;
+pub mod auth;
 pub use open_source_obsoletion::*;

@@ -25,11 +25,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(test)]
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-#[cfg(test)]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
 
 pub type DomainID = usize;
 
@@ -247,6 +242,24 @@ impl TemplateVmManager {
 }
 
 /// Simulated lock-free Shared Memory Channel for ultra-low latency inter-domain IPC (S-Qrexec equivalent)
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
 /// Bypasses virtual network cards (which cause bottlenecks in Qubes OS) to write directly into target buffer ranges.
 pub struct SQrexecChannel {
     pub buffer: *mut u8,

@@ -1,6 +1,7 @@
 //! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 //! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
@@ -157,7 +158,7 @@ pub trait TCPConnection {
 impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
         let current = self.get_state();
-        if current != TCPState::Closed {
+        if current != TCPState::Closed && current != TCPState::Listen {
             return Err(NetworkError::ConnectionFailed);
         }
 
@@ -449,7 +450,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self.sockets.iter().position(|s| s.id() == id) {
+        if let Some(pos) = self.sockets.iter().position(|s: &Box<dyn Socket>| s.id() == id) {
             self.sockets.remove(pos);
             Ok(())
         } else {
@@ -458,7 +459,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        self.sockets.iter().find(|s| s.id() == id).map(|s| s.as_ref())
+        self.sockets.iter().find(|s: &&Box<dyn Socket>| s.id() == id).map(|s: &Box<dyn Socket>| s.as_ref())
     }
 }
 

@@ -3,8 +3,6 @@ extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]
 use std_alloc::boxed::Box;
 
-#![no_std]
-#![no_main]
 
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
@@ -229,8 +227,16 @@ impl Shell for SimpleShell {
         }
         
         // 1. Resolve Command Aliases (udev/bash inspiration)
-        let resolved_cmd_name = if let Some(alias_target) = self.get_alias(args[0]) {
-            alias_target
+        let mut alias_buf = [0u8; 64];
+        let mut has_alias = false;
+        let mut alias_len = 0;
+        if let Some(alias_target) = self.get_alias(args[0]) {
+            has_alias = true;
+            alias_len = alias_target.len().min(64);
+            alias_buf[..alias_len].copy_from_slice(&alias_target[..alias_len]);
+        }
+        let resolved_cmd_name: &[u8] = if has_alias {
+            &alias_buf[..alias_len]
         } else {
             args[0]
         };
@@ -249,7 +255,7 @@ impl Shell for SimpleShell {
             }
         }
 
-        let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
+        let cmd_args: Vec<&[u8]> = expanded_args;
         
         for cmd_option in &mut self.commands {
             if let Some(ref mut cmd) = *cmd_option {
@@ -319,22 +325,12 @@ impl ShellHistory for SimpleShellHistory {
         Some(&self.history[index][..len])
     }
     
-    fn get_last(&self) -> Option<&[u8]>;
-}
-
-impl SimpleShellHistory {
-    fn get_last_impl(&self) -> Option<&[u8]> {
+    fn get_last(&self) -> Option<&[u8]> {
         if self.history.is_empty() {
             return None;
         }
         let index = self.history.len() - 1;
         self.get(index)
-    }
-}
-
-impl ShellHistory for SimpleShellHistory {
-    fn get_last(&self) -> Option<&[u8]> {
-        self.get_last_impl()
     }
 }
 
@@ -561,10 +557,10 @@ mod tests {
 
         // Inspect captured variable inside spy command
         if let Some(ref cmd_box) = shell.commands[0] {
-            // Unsafe cast to access captured properties (since we can't downcast Box<dyn ShellCommand>)
-            let spy_ptr = cmd_box as *const Box<dyn ShellCommand> as *const SpyCommand;
+            // Unsafe cast to access captured properties (extract data pointer from trait object)
+            let spy_ptr = (&**cmd_box) as *const dyn ShellCommand as *const () as *const SpyCommand;
             unsafe {
-                let captured = &(*spy_ptr).captured_arg[..(*spy_ptr).captured_len];
+                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
                 assert_eq!(captured, b"sovereign_pass_123");
             }
         }
@@ -574,9 +570,9 @@ mod tests {
         shell.execute_line(b"reveal $USER").unwrap();
 
         if let Some(ref cmd_box) = shell.commands[0] {
-            let spy_ptr = cmd_box as *const Box<dyn ShellCommand> as *const SpyCommand;
+            let spy_ptr = (&**cmd_box) as *const dyn ShellCommand as *const () as *const SpyCommand;
             unsafe {
-                let captured = &(*spy_ptr).captured_arg[..(*spy_ptr).captured_len];
+                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
                 assert_eq!(captured, b"sovereign");
             }
         }

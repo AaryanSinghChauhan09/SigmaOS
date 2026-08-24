@@ -27,6 +27,7 @@ pub mod nosql_engine;
 pub mod search;
 pub mod sql_engine;
 pub mod volume;
+pub mod block_device_extended;
 
 pub use block::{
     BlockError, BlockKind, BlockOpCode, BlockOperationEngine, BlockOrientedDevice,

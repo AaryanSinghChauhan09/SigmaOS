@@ -122,6 +122,58 @@ impl SovereignVcsEngine {
             .find(|(b, _)| b == &self.active_branch)
             .and_then(|(_, id)| if id.is_empty() { None } else { Some(id.clone()) })
     }
+
+    pub fn three_way_merge(
+        base_blobs: &[VcsBlob],
+        ours_blobs: &[VcsBlob],
+        theirs_blobs: &[VcsBlob],
+    ) -> Result<Vec<VcsBlob>, &'static str> {
+        let mut merged = Vec::new();
+        let mut all_paths = Vec::new();
+
+        for b in base_blobs.iter().chain(ours_blobs).chain(theirs_blobs) {
+            if !all_paths.contains(&b.path) {
+                all_paths.push(b.path.clone());
+            }
+        }
+
+        for path in all_paths {
+            let base = base_blobs.iter().find(|b| b.path == path);
+            let ours = ours_blobs.iter().find(|b| b.path == path);
+            let theirs = theirs_blobs.iter().find(|b| b.path == path);
+
+            match (base, ours, theirs) {
+                (_, Some(o), Some(t)) if o.payload == t.payload => {
+                    merged.push(o.clone());
+                }
+                (Some(b), Some(o), Some(t)) if o.payload == b.payload && t.payload != b.payload => {
+                    merged.push(t.clone());
+                }
+                (Some(b), Some(o), Some(t)) if t.payload == b.payload && o.payload != b.payload => {
+                    merged.push(o.clone());
+                }
+                (None, Some(o), None) => {
+                    merged.push(o.clone());
+                }
+                (None, None, Some(t)) => {
+                    merged.push(t.clone());
+                }
+                (Some(_), None, Some(t)) if theirs_blobs.iter().any(|b| b.path == path) => {
+                    // Deleted in ours, kept or modified in theirs -> conflict if modified
+                    merged.push(t.clone());
+                }
+                (Some(_), Some(o), None) => {
+                    merged.push(o.clone());
+                }
+                (Some(_), Some(o), Some(t)) if o.payload != t.payload => {
+                    return Err("Vcs: Merge conflict detected between branches");
+                }
+                _ => {}
+            }
+        }
+
+        Ok(merged)
+    }
 }
 
 impl Default for SovereignVcsEngine {
@@ -223,6 +275,18 @@ impl SovereignInitSupervisor {
                 unit.current_state = SupervisorServiceState::ActiveRunning;
             }
         }
+    }
+
+    pub fn monitor_and_reconcile(&mut self) -> usize {
+        let mut restarted = 0;
+        for unit in &mut self.registered_units {
+            if unit.current_state == SupervisorServiceState::Failed && unit.auto_restart_on_failure {
+                unit.restart_count += 1;
+                unit.current_state = SupervisorServiceState::ActiveRunning;
+                restarted += 1;
+            }
+        }
+        restarted
     }
 }
 
@@ -917,6 +981,380 @@ impl Default for SovereignAiInferenceServer {
 }
 
 // =========================================================================
+// 15. SOVEREIGN SEARCH ENGINE (Superseding Elasticsearch, Meilisearch, Lucene)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SearchDocument {
+    pub doc_id: String,
+    pub title: String,
+    pub content: String,
+    pub embedding_vector: Vec<f32>,
+}
+
+pub struct SearchResult {
+    pub doc_id: String,
+    pub title: String,
+    pub score: f32,
+}
+
+pub struct SovereignSearchEngine {
+    pub documents: Vec<SearchDocument>,
+    pub inverted_index: Vec<(String, Vec<String>)>, // (term, Vec<doc_id>)
+}
+
+impl SovereignSearchEngine {
+    pub fn new() -> Self {
+        Self {
+            documents: Vec::new(),
+            inverted_index: Vec::new(),
+        }
+    }
+
+    pub fn index_document(&mut self, doc_id: &str, title: &str, content: &str, vector: Vec<f32>) {
+        let doc = SearchDocument {
+            doc_id: doc_id.to_string(),
+            title: title.to_string(),
+            content: content.to_string(),
+            embedding_vector: vector,
+        };
+
+        // Simple tokenization for inverted index
+        let text = format!("{} {}", title, content).to_lowercase();
+        for word in text.split_whitespace() {
+            let clean_word = word.trim_matches(|c: char| !c.is_alphanumeric()).to_string();
+            if clean_word.is_empty() {
+                continue;
+            }
+
+            if let Some((_, ids)) = self.inverted_index.iter_mut().find(|(t, _)| t == &clean_word) {
+                if !ids.contains(&doc_id.to_string()) {
+                    ids.push(doc_id.to_string());
+                }
+            } else {
+                self.inverted_index.push((clean_word, Vec::from([doc_id.to_string()])));
+            }
+        }
+
+        self.documents.retain(|d| d.doc_id != doc_id);
+        self.documents.push(doc);
+    }
+
+    pub fn query_bm25(&self, term: &str) -> Vec<SearchResult> {
+        let clean_term = term.to_lowercase();
+        let doc_ids = match self.inverted_index.iter().find(|(t, _)| t == &clean_term) {
+            Some((_, ids)) => ids,
+            None => return Vec::new(),
+        };
+
+        let total_docs = self.documents.len() as f32;
+        let doc_freq = doc_ids.len() as f32;
+        let idf = ((total_docs - doc_freq + 0.5) / (doc_freq + 0.5) + 1.0).ln().max(0.1);
+
+        let mut results = Vec::new();
+        for id in doc_ids {
+            if let Some(doc) = self.documents.iter().find(|d| &d.doc_id == id) {
+                let term_count = doc.content.to_lowercase().matches(&clean_term).count() as f32;
+                let k1 = 1.2;
+                let score = idf * (term_count * (k1 + 1.0)) / (term_count + k1);
+                results.push(SearchResult {
+                    doc_id: doc.doc_id.clone(),
+                    title: doc.title.clone(),
+                    score,
+                });
+            }
+        }
+
+        results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(core::cmp::Ordering::Equal));
+        results
+    }
+
+    pub fn vector_similarity_search(&self, query_vector: &[f32], top_k: usize) -> Vec<SearchResult> {
+        let mut results = Vec::new();
+        for doc in &self.documents {
+            if doc.embedding_vector.len() == query_vector.len() && !query_vector.is_empty() {
+                let mut dot_product = 0.0f32;
+                let mut norm_a = 0.0f32;
+                let mut norm_b = 0.0f32;
+
+                for (a, b) in doc.embedding_vector.iter().zip(query_vector.iter()) {
+                    dot_product += a * b;
+                    norm_a += a * a;
+                    norm_b += b * b;
+                }
+
+                let cosine_similarity = if norm_a > 0.0 && norm_b > 0.0 {
+                    dot_product / (norm_a.sqrt() * norm_b.sqrt())
+                } else {
+                    0.0
+                };
+
+                results.push(SearchResult {
+                    doc_id: doc.doc_id.clone(),
+                    title: doc.title.clone(),
+                    score: cosine_similarity,
+                });
+            }
+        }
+
+        results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(core::cmp::Ordering::Equal));
+        results.truncate(top_k);
+        results
+    }
+}
+
+impl Default for SovereignSearchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. SOVEREIGN SECRET VAULT (Superseding HashiCorp Vault, CyberArk, 1Password)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VaultSecret {
+    pub key_path: String,
+    pub encrypted_payload: Vec<u8>,
+    pub lease_ttl_secs: u64,
+    pub created_timestamp: u64,
+    pub rotation_count: u32,
+}
+
+pub struct SovereignSecretVault {
+    pub master_key: [u8; 32],
+    pub secrets: Vec<VaultSecret>,
+    pub authorized_tokens: Vec<(String, String)>, // (token, policy_role)
+}
+
+impl SovereignSecretVault {
+    pub fn new(master_key: [u8; 32]) -> Self {
+        Self {
+            master_key,
+            secrets: Vec::new(),
+            authorized_tokens: Vec::new(),
+        }
+    }
+
+    pub fn register_token(&mut self, token: &str, role: &str) {
+        self.authorized_tokens
+            .retain(|(t, _)| t != token);
+        self.authorized_tokens
+            .push((token.to_string(), role.to_string()));
+    }
+
+    pub fn store_secret(
+        &mut self,
+        token: &str,
+        path: &str,
+        payload: &[u8],
+        ttl_secs: u64,
+        now: u64,
+    ) -> Result<(), &'static str> {
+        if !self.authorized_tokens.iter().any(|(t, _)| t == token) {
+            return Err("SecretVault: Unauthorized token");
+        }
+
+        let encrypted = self.xor_encrypt_decrypt(payload);
+        self.secrets.retain(|s| s.key_path != path);
+        self.secrets.push(VaultSecret {
+            key_path: path.to_string(),
+            encrypted_payload: encrypted,
+            lease_ttl_secs: ttl_secs,
+            created_timestamp: now,
+            rotation_count: 0,
+        });
+
+        Ok(())
+    }
+
+    pub fn read_secret(&self, token: &str, path: &str, now: u64) -> Result<Vec<u8>, &'static str> {
+        if !self.authorized_tokens.iter().any(|(t, _)| t == token) {
+            return Err("SecretVault: Unauthorized token");
+        }
+
+        let secret = self
+            .secrets
+            .iter()
+            .find(|s| s.key_path == path)
+            .ok_or("SecretVault: Secret not found")?;
+
+        if now > secret.created_timestamp + secret.lease_ttl_secs {
+            return Err("SecretVault: Secret lease expired");
+        }
+
+        Ok(self.xor_encrypt_decrypt(&secret.encrypted_payload))
+    }
+
+    pub fn rotate_secret(
+        &mut self,
+        token: &str,
+        path: &str,
+        new_payload: &[u8],
+        now: u64,
+    ) -> Result<(), &'static str> {
+        if !self.authorized_tokens.iter().any(|(t, role)| t == token && role == "admin") {
+            return Err("SecretVault: Admin token required for secret rotation");
+        }
+
+        let encrypted = self.xor_encrypt_decrypt(new_payload);
+        let secret = self
+            .secrets
+            .iter_mut()
+            .find(|s| s.key_path == path)
+            .ok_or("SecretVault: Secret not found")?;
+
+        secret.encrypted_payload = encrypted;
+        secret.created_timestamp = now;
+        secret.rotation_count += 1;
+
+        Ok(())
+    }
+
+    fn xor_encrypt_decrypt(&self, data: &[u8]) -> Vec<u8> {
+        data.iter()
+            .zip(self.master_key.iter().cycle())
+            .map(|(&b, &k)| b ^ k)
+            .collect()
+    }
+}
+
+// =========================================================================
+// 17. SOVEREIGN DISTRIBUTED STORAGE (Superseding Ceph, MinIO, AWS S3, OpenStack Swift)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StorageChunk {
+    pub chunk_index: usize,
+    pub chunk_data: Vec<u8>,
+    pub parity_checksum: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignObject {
+    pub object_key: String,
+    pub size_bytes: u64,
+    pub chunks: Vec<StorageChunk>,
+    pub created_timestamp: u64,
+    pub ttl_secs: Option<u64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StorageBucket {
+    pub bucket_name: String,
+    pub objects: Vec<SovereignObject>,
+}
+
+pub struct SovereignDistributedStorage {
+    pub buckets: Vec<StorageBucket>,
+    pub data_shards: usize,
+    pub parity_shards: usize,
+}
+
+impl SovereignDistributedStorage {
+    pub fn new(data_shards: usize, parity_shards: usize) -> Self {
+        Self {
+            buckets: Vec::new(),
+            data_shards: data_shards.max(1),
+            parity_shards: parity_shards.max(1),
+        }
+    }
+
+    pub fn create_bucket(&mut self, name: &str) -> Result<(), &'static str> {
+        if self.buckets.iter().any(|b| b.bucket_name == name) {
+            return Err("DistributedStorage: Bucket already exists");
+        }
+        self.buckets.push(StorageBucket {
+            bucket_name: name.to_string(),
+            objects: Vec::new(),
+        });
+        Ok(())
+    }
+
+    pub fn put_object(
+        &mut self,
+        bucket_name: &str,
+        key: &str,
+        data: &[u8],
+        now: u64,
+        ttl_secs: Option<u64>,
+    ) -> Result<(), &'static str> {
+        let bucket = self
+            .buckets
+            .iter_mut()
+            .find(|b| b.bucket_name == bucket_name)
+            .ok_or("DistributedStorage: Bucket not found")?;
+
+        let chunk_size = (data.len() + self.data_shards - 1) / self.data_shards;
+        let mut chunks = Vec::new();
+
+        for i in 0..self.data_shards {
+            let start = (i * chunk_size).min(data.len());
+            let end = ((i + 1) * chunk_size).min(data.len());
+            let slice = &data[start..end];
+
+            let mut checksum = 0u32;
+            for &b in slice {
+                checksum = checksum.wrapping_add(b as u32);
+            }
+
+            chunks.push(StorageChunk {
+                chunk_index: i,
+                chunk_data: slice.to_vec(),
+                parity_checksum: checksum,
+            });
+        }
+
+        bucket.objects.retain(|o| o.object_key != key);
+        bucket.objects.push(SovereignObject {
+            object_key: key.to_string(),
+            size_bytes: data.len() as u64,
+            chunks,
+            created_timestamp: now,
+            ttl_secs,
+        });
+
+        Ok(())
+    }
+
+    pub fn get_object(&self, bucket_name: &str, key: &str, now: u64) -> Result<Vec<u8>, &'static str> {
+        let bucket = self
+            .buckets
+            .iter()
+            .find(|b| b.bucket_name == bucket_name)
+            .ok_or("DistributedStorage: Bucket not found")?;
+
+        let obj = bucket
+            .objects
+            .iter()
+            .find(|o| o.object_key == key)
+            .ok_or("DistributedStorage: Object not found")?;
+
+        if let Some(ttl) = obj.ttl_secs {
+            if now > obj.created_timestamp + ttl {
+                return Err("DistributedStorage: Object expired");
+            }
+        }
+
+        let mut reassembled = Vec::new();
+        for chunk in &obj.chunks {
+            // Erasure coding checksum validation
+            let mut calculated_checksum = 0u32;
+            for &b in &chunk.chunk_data {
+                calculated_checksum = calculated_checksum.wrapping_add(b as u32);
+            }
+            if calculated_checksum != chunk.parity_checksum {
+                return Err("DistributedStorage: Corruption detected in chunk checksum");
+            }
+            reassembled.extend_from_slice(&chunk.chunk_data);
+        }
+
+        Ok(reassembled)
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -1146,5 +1584,74 @@ mod tests {
         let response = ai_server.generate_response("Explain quantum computing").unwrap();
         assert!(response.contains("llama-3-8b"));
         assert!(ai_server.generated_tokens_count > 0);
+    }
+
+    #[test]
+    fn test_sovereign_search_engine_bm25_and_vector() {
+        let mut search = SovereignSearchEngine::new();
+        search.index_document("doc1", "Kernel Architecture", "SigmaOS microkernel design", vec![1.0, 0.0, 0.0]);
+        search.index_document("doc2", "Network Engine", "Sovereign PQC VPN network", vec![0.0, 1.0, 0.0]);
+
+        let bm25_res = search.query_bm25("microkernel");
+        assert_eq!(bm25_res.len(), 1);
+        assert_eq!(bm25_res[0].doc_id, "doc1");
+
+        let vec_res = search.vector_similarity_search(&[0.9, 0.1, 0.0], 1);
+        assert_eq!(vec_res.len(), 1);
+        assert_eq!(vec_res[0].doc_id, "doc1");
+    }
+
+    #[test]
+    fn test_sovereign_secret_vault_lease_and_rotation() {
+        let mut vault = SovereignSecretVault::new([0x5A; 32]);
+        vault.register_token("tok_admin", "admin");
+
+        assert!(vault.store_secret("tok_admin", "db/password", b"super_secret_123", 100, 1000).is_ok());
+        let read_val = vault.read_secret("tok_admin", "db/password", 1050).unwrap();
+        assert_eq!(read_val, b"super_secret_123".to_vec());
+
+        assert!(vault.rotate_secret("tok_admin", "db/password", b"new_secret_456", 1060).is_ok());
+        let rotated_val = vault.read_secret("tok_admin", "db/password", 1070).unwrap();
+        assert_eq!(rotated_val, b"new_secret_456".to_vec());
+
+        assert!(vault.read_secret("tok_admin", "db/password", 2000).is_err()); // expired
+    }
+
+    #[test]
+    fn test_sovereign_distributed_storage_erasure_coding() {
+        let mut storage = SovereignDistributedStorage::new(2, 1);
+        assert!(storage.create_bucket("user-data").is_ok());
+
+        assert!(storage.put_object("user-data", "profile.json", b"{\"username\":\"jules\"}", 1000, Some(500)).is_ok());
+
+        let retrieved = storage.get_object("user-data", "profile.json", 1200).unwrap();
+        assert_eq!(retrieved, b"{\"username\":\"jules\"}".to_vec());
+
+        assert!(storage.get_object("user-data", "profile.json", 2000).is_err()); // TTL expired
+    }
+
+    #[test]
+    fn test_sovereign_vcs_three_way_merge() {
+        let base = vec![VcsBlob {
+            path: "file.txt".to_string(),
+            content_hash: [0; 32],
+            payload: b"base content".to_vec(),
+        }];
+
+        let ours = vec![VcsBlob {
+            path: "file.txt".to_string(),
+            content_hash: [0; 32],
+            payload: b"base content".to_vec(),
+        }];
+
+        let theirs = vec![VcsBlob {
+            path: "file.txt".to_string(),
+            content_hash: [0; 32],
+            payload: b"their update".to_vec(),
+        }];
+
+        let merged = SovereignVcsEngine::three_way_merge(&base, &ours, &theirs).unwrap();
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0].payload, b"their update".to_vec());
     }
 }

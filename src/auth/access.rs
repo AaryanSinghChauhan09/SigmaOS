@@ -109,7 +109,6 @@ impl AccessControl for SimpleAccessControl {
             if *perm_type == permission_type {
                 let res_len = res.iter().position(|&b| b == 0).unwrap_or(64);
                 if &res[..res_len] == resource {
-                    let _id = id;
                     return AccessResult::Granted;
                 }
             }

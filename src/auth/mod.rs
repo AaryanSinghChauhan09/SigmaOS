@@ -3,6 +3,7 @@ pub mod user;
 pub mod access;
 pub mod identity;
 pub mod att_security;
+pub mod authentication_pipeline;
 
 pub use user::{
     UserID, UserState, User, AuthError, SimpleUser, AuthService, SimpleAuthService,
