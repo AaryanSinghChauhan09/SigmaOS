@@ -617,6 +617,7 @@ mod tests {
     }
 
     #[test]
+<<<<<<< HEAD
     fn test_posix_sched_rr_static_priority_preemption() {
         let mut scheduler = RoundRobinScheduler::new();
         let p_low = Process::new(10, "normal_task".to_string(), Priority::Normal);
@@ -665,6 +666,8 @@ mod tests {
     }
 
     #[test]
+=======
+>>>>>>> origin/jules-17587418482810889040-8bcc8d81
     fn test_sovereign_multi_queue_round_robin() {
         let mut mq_rr = SovereignMultiQueueRoundRobin::new(2);
 

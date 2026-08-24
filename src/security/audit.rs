@@ -192,7 +192,7 @@ impl AuditPolicy for SimpleAuditPolicy {
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event)? {
+        if self.check_compliance(event) {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)

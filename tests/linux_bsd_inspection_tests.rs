@@ -40,6 +40,7 @@ mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 
+<<<<<<< HEAD
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 
@@ -49,6 +50,8 @@ mod unimplemented_features;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
+=======
+>>>>>>> origin/jules-17587418482810889040-8bcc8d81
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};

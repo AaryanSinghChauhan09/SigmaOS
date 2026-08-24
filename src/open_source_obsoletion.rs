@@ -1714,6 +1714,7 @@ mod tests {
     }
 
     #[test]
+<<<<<<< HEAD
     fn test_sovereign_scheme_router() {
         let mut router = SovereignSchemeRouter::new();
         assert!(router.register_scheme("ipc").is_ok());
@@ -1800,6 +1801,8 @@ mod tests {
     }
 
     #[test]
+=======
+>>>>>>> origin/jules-17587418482810889040-8bcc8d81
     fn test_sovereign_open_source_obsoletion_orchestrator() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();

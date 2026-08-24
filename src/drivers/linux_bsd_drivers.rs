@@ -314,6 +314,130 @@ impl LinuxUrbQueue {
 }
 
 // =========================================================================
+// 6. Universal Sovereign Peripheral Drivers & Device Manager
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceCategory {
+    Input,
+    Gpu,
+    Network,
+    Storage,
+    Audio,
+}
+
+pub struct SovereignInputDeviceDriver {
+    pub name: String,
+    pub is_bound: bool,
+    pub event_device: EvdevInputDevice,
+}
+
+impl SovereignInputDeviceDriver {
+    pub fn new(name: &str, vendor: u16, product: u16) -> Self {
+        Self {
+            name: name.to_string(),
+            is_bound: false,
+            event_device: EvdevInputDevice::new(name, vendor, product),
+        }
+    }
+
+    pub fn bind(&mut self) {
+        self.is_bound = true;
+    }
+}
+
+pub struct SovereignGpuDriver {
+    pub name: String,
+    pub is_bound: bool,
+    pub connector: FreeBsdDrmConnector,
+    pub vram_bytes: u64,
+}
+
+impl SovereignGpuDriver {
+    pub fn new(name: &str, vram_mb: u64) -> Self {
+        Self {
+            name: name.to_string(),
+            is_bound: false,
+            connector: FreeBsdDrmConnector::new(1, DrmConnectorType::DisplayPort),
+            vram_bytes: vram_mb * 1024 * 1024,
+        }
+    }
+
+    pub fn bind(&mut self) {
+        self.is_bound = true;
+    }
+}
+
+pub struct SovereignNetworkCardDriver {
+    pub name: String,
+    pub is_bound: bool,
+    pub mac_address: [u8; 6],
+    pub rx_queue: Vec<Vec<u8>>,
+    pub tx_queue: Vec<Vec<u8>>,
+}
+
+impl SovereignNetworkCardDriver {
+    pub fn new(name: &str, mac: [u8; 6]) -> Self {
+        Self {
+            name: name.to_string(),
+            is_bound: false,
+            mac_address: mac,
+            rx_queue: Vec::new(),
+            tx_queue: Vec::new(),
+        }
+    }
+
+    pub fn bind(&mut self) {
+        self.is_bound = true;
+    }
+
+    pub fn transmit_packet(&mut self, packet: &[u8]) {
+        self.tx_queue.push(packet.to_vec());
+    }
+}
+
+pub struct SovereignDeviceManager {
+    pub input_drivers: Vec<SovereignInputDeviceDriver>,
+    pub gpu_drivers: Vec<SovereignGpuDriver>,
+    pub net_drivers: Vec<SovereignNetworkCardDriver>,
+}
+
+impl SovereignDeviceManager {
+    pub fn new() -> Self {
+        Self {
+            input_drivers: Vec::new(),
+            gpu_drivers: Vec::new(),
+            net_drivers: Vec::new(),
+        }
+    }
+
+    pub fn register_input_device(&mut self, mut drv: SovereignInputDeviceDriver) {
+        drv.bind();
+        self.input_drivers.push(drv);
+    }
+
+    pub fn register_gpu_device(&mut self, mut drv: SovereignGpuDriver) {
+        drv.bind();
+        self.gpu_drivers.push(drv);
+    }
+
+    pub fn register_net_device(&mut self, mut drv: SovereignNetworkCardDriver) {
+        drv.bind();
+        self.net_drivers.push(drv);
+    }
+
+    pub fn total_bound_devices(&self) -> usize {
+        self.input_drivers.len() + self.gpu_drivers.len() + self.net_drivers.len()
+    }
+}
+
+impl Default for SovereignDeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // Unit Tests Module
 // =========================================================================
 
@@ -388,5 +512,26 @@ mod tests {
         assert_eq!(processed, 1);
         assert_eq!(queue.completed_urbs.len(), 1);
         assert_eq!(queue.completed_urbs[0].status, 0);
+    }
+
+    #[test]
+    fn test_sovereign_device_manager_and_drivers() {
+        let mut dev_mgr = SovereignDeviceManager::new();
+
+        let input_drv = SovereignInputDeviceDriver::new("keyboard0", 0x046D, 0xC077);
+        let gpu_drv = SovereignGpuDriver::new("radeon_rx6800", 16384);
+        let mut net_drv = SovereignNetworkCardDriver::new("eth0", [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
+
+        net_drv.transmit_packet(b"ping_packet");
+        assert_eq!(net_drv.tx_queue.len(), 1);
+
+        dev_mgr.register_input_device(input_drv);
+        dev_mgr.register_gpu_device(gpu_drv);
+        dev_mgr.register_net_device(net_drv);
+
+        assert_eq!(dev_mgr.total_bound_devices(), 3);
+        assert!(dev_mgr.input_drivers[0].is_bound);
+        assert!(dev_mgr.gpu_drivers[0].is_bound);
+        assert!(dev_mgr.net_drivers[0].is_bound);
     }
 }
