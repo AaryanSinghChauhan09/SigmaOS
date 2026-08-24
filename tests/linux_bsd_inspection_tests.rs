@@ -23,6 +23,12 @@ mod gap_closure;
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 
+#[path = "../src/scheduler/eevdf.rs"]
+mod eevdf;
+
+#[path = "../src/memory/tlb_associative.rs"]
+mod tlb_associative;
+
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 
@@ -146,6 +152,28 @@ fn test_vm_manager_kvm_qemu_inspection() {
 
     kvm.stop_vm(&vm_id).unwrap();
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
+}
+
+
+#[test]
+fn test_kernel_classic_algorithms_inspection() {
+    use eevdf::{EevdfScheduler, Task, ComputeUnit};
+    use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbPageFlags};
+
+    let mut sched = EevdfScheduler::new();
+    let mut task = Task::new(1, 100, 10);
+    task.assign_compute_unit(ComputeUnit::CpuCore(0));
+    sched.add_task(task);
+    assert_eq!(sched.ready_count(), 1);
+
+    let scheduled = sched.schedule();
+    assert_eq!(scheduled, Some(1));
+
+    let mut tlb = AssociativeTlbCache::new(TlbAssociativityMode::FullyAssociative, 16);
+    tlb.insert_translation(0x10, 0x50, TlbPageFlags::rw_user(), 1);
+    let translated = tlb.lookup_page_translation(0x10, 1, false, false);
+    assert_eq!(translated, Ok(0x50));
+    assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
 }
 
 
