@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// OOP-based Configuration Loader for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 201

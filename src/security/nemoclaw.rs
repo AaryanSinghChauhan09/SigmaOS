@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 use core::mem;
 /// NVIDIA NemoClaw-inspired AI Agent Security Stack for SigmaOS

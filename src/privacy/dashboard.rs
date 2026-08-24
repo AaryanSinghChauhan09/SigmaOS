@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// OOP-based Privacy Dashboard and Self-Healing system for SigmaOS
 /// Implements transparent privacy management, telemetry, and automated self-healing.

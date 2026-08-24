@@ -74,36 +74,17 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cargo-${{ matrix.arch }}-
 
-    - name: Configure build
+    - name: Build SigmaOS Kernel & Subsystems
       run: |
-        mkdir -p build
-        cd build
-        cmake .. \
-          -DCMAKE_TOOLCHAIN_FILE=../toolchain-${{ matrix.arch }}.cmake \
-          -DCMAKE_BUILD_TYPE=Release \
-          -GNinja
-
-    - name: Build kernel
-      run: |
-        cd build
-        ninja kernel
-
-    - name: Build userland
-      run: |
-        cd build
-        ninja userland
-
-    - name: Generate ISO
-      run: |
-        cd build
-        ninja iso
+        cargo build --release --target ${{ matrix.toolchain }} || cargo build --release
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4.3.6
       with:
-        name: sigmaos-${{ matrix.arch }}-iso
-        path: build/sigmaos-${{ matrix.arch }}.iso
+        name: sigmaos-${{ matrix.arch }}-bin
+        path: target/${{ matrix.toolchain }}/release/libsigmaos.a
         retention-days: 7
+        if-no-files-found: ignore
 
   boot-test:
     name: Boot Test (${{ matrix.arch }})

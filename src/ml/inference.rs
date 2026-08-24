@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// OOP-based ML Inference Engine for SigmaOS
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 926

@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// OOP-based Secure Boot Validation for SigmaOS
 /// Implements secure boot using OOP principles with traits and structs

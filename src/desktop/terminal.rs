@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// OOP-based Desktop Terminal for SigmaOS
 /// Implements terminal emulator, ANSI escape interpretation, and shell integration.

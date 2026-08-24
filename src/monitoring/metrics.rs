@@ -3,8 +3,6 @@ extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]
 use std_alloc::boxed::Box;
 
-#![no_std]
-#![no_main]
 
 /// OOP-based Advanced Metrics, Telemetry & Diagnostics Collection for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 151

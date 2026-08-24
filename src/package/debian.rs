@@ -1,7 +1,6 @@
 // Debian Linux Distro Compatibility Subsystem
 // Formats, parsers, and registry models matching Debian systems (dpkg, apt, .deb)
 
-#![no_std]
 
 extern crate alloc;
 use alloc::string::{String, ToString};

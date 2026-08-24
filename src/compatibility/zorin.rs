@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// Zorin OS Compatibility Subsystem for SigmaOS
 /// Implements familiarity-first layout switching, Chameleon dynamic auto-theming,

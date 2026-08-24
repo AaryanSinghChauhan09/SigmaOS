@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS

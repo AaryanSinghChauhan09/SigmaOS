@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 /// OOP-based Power Management Stack for SigmaOS
 /// Implements power management using OOP principles with traits and structs

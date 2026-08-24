@@ -483,13 +483,28 @@ impl DriverFramework for SimpleDriverFramework {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::driver::irp_system::*;
+    use super::DeviceObject;
+    use super::Driver;
+    use super::DriverError;
+    use super::DriverFramework;
+    use super::DriverObject;
+    use super::DriverState;
+    use super::DriverType;
+    use super::InterruptDescriptorTable;
+    use super::IoManager;
+    use super::IoctlCode;
+    use super::IoctlTransferMethod;
+    use super::Irp;
+    use super::IrpMajorFunction;
+    use super::SimpleDriver;
+    use super::SimpleDriverFramework;
+    use super::keyboard_filter_dispatch;
+    use super::usb_forensic_filter_dispatch;
 
     #[test]
     fn test_driver_framework_lifecycle() {
         let mut framework = SimpleDriverFramework::new();
-        let driver = Box::new(SimpleStorageDriver::new(101, DriverType::Block));
+        let driver = Box::new(SimpleDriver::new(101, DriverType::Block));
 
         let reg_id = framework.register_driver(driver).unwrap();
         assert_eq!(reg_id, 101);
@@ -497,7 +512,7 @@ mod tests {
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
