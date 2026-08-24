@@ -102,7 +102,7 @@ pub struct MemoryGrant {
 }
 
 pub struct RedoxSchemeChannel {
-    scheme_name: Vec<u8>,
+    pub scheme_name: Vec<u8>,
     grants: Vec<MemoryGrant>,
     next_grant_id: u64,
 }
@@ -309,7 +309,7 @@ mod tests {
         // Insert 103 -> evicts unpromoted MRU 102
         arc.insert_block(103, vec![7, 8, 9]);
 
-        let (mru_len, mfu_len, mru_ghost, mfu_ghost) = arc.stats();
+        let (_mru_len, mfu_len, mru_ghost, _mfu_ghost) = arc.stats();
         assert_eq!(mfu_len, 1); // 101
         assert_eq!(mru_ghost, 1); // 102
     }
