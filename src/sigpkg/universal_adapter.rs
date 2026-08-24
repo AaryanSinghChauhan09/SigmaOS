@@ -6,6 +6,13 @@ use crate::klib::collections::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::Permission;
 
+/// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
+/// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
+/// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
+/// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+pub use crate::package::universal::{FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
+
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
     fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
@@ -17,13 +24,6 @@ pub trait PackageFormatAdapter {
 }
 
 pub type UniversalPackageAdapter = UniversalPackageManager;
-
-/// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
-/// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
-/// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
-/// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-pub use crate::package::universal::{FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
