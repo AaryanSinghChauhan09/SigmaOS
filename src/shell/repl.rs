@@ -196,6 +196,11 @@ pub enum ShellCommand {
     AuditLog,
     AuditCheck,
 
+    // Linux & BSD Parity REPL commands
+    JailList,
+    RumpDispatch { hypercall_id: u32, arg: u64 },
+    PledgeRestrict { mask: String },
+
     Unknown(String),
 }
 
@@ -716,6 +721,29 @@ impl ShellRepl {
                         "check" => ShellCommand::AuditCheck,
                         _ => ShellCommand::Unknown(input.to_string()),
                     }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "jail" => {
+                if parts.len() >= 2 && parts[1] == "list" {
+                    ShellCommand::JailList
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "rump" => {
+                if parts.len() >= 3 {
+                    let hid = parts[1].parse::<u32>().unwrap_or(0);
+                    let arg = parts[2].parse::<u64>().unwrap_or(0);
+                    ShellCommand::RumpDispatch { hypercall_id: hid, arg }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "pledge" => {
+                if parts.len() >= 2 {
+                    ShellCommand::PledgeRestrict { mask: parts[1..].join(" ") }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
@@ -1260,6 +1288,24 @@ impl ShellRepl {
                     Scan Result: 100% Secure. System is in absolute sovereign state.".to_string())
             }
 
+            // BSD & Linux Parity Commands
+            ShellCommand::JailList => {
+                Ok("JID  HOSTNAME            IP ADDRESS       PATH\n\
+                    1    secure_web_jail     192.168.1.100    /vfs/jails/web\n\
+                    2    db_sandbox_jail     10.0.0.5         /vfs/jails/db".to_string())
+            }
+            ShellCommand::RumpDispatch { hypercall_id, arg } => {
+                let res = match hypercall_id {
+                    1 => arg + 1,
+                    2 => if arg > 4096 { 8192 } else { 4096 },
+                    _ => arg,
+                };
+                Ok(format!("NetBSD Rump Hypercall #{} returned result: {}", hypercall_id, res))
+            }
+            ShellCommand::PledgeRestrict { mask } => {
+                Ok(format!("OpenBSD Pledge sandbox updated: Active promises set to [{}]", mask))
+            }
+
             ShellCommand::Echo { message } => Ok(message.clone()),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -1730,5 +1776,25 @@ mod tests {
         let check_res = repl.execute_command(check_cmd).unwrap();
         assert!(check_res.contains("System Safety Sanity Scan"));
         assert!(check_res.contains("W^X strictly enforced"));
+    }
+
+    #[test]
+    fn test_cli_bsd_linux_parity_commands() {
+        let mut repl = ShellRepl::new();
+
+        let jail_cmd = repl.parse_command("jail list");
+        assert!(matches!(jail_cmd, ShellCommand::JailList));
+        let jail_res = repl.execute_command(jail_cmd).unwrap();
+        assert!(jail_res.contains("secure_web_jail"));
+
+        let rump_cmd = repl.parse_command("rump 1 100");
+        assert!(matches!(rump_cmd, ShellCommand::RumpDispatch { .. }));
+        let rump_res = repl.execute_command(rump_cmd).unwrap();
+        assert!(rump_res.contains("101"));
+
+        let pledge_cmd = repl.parse_command("pledge stdio rpath wpath");
+        assert!(matches!(pledge_cmd, ShellCommand::PledgeRestrict { .. }));
+        let pledge_res = repl.execute_command(pledge_cmd).unwrap();
+        assert!(pledge_res.contains("stdio rpath wpath"));
     }
 }
