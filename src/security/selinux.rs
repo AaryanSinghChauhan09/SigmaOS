@@ -15,6 +15,7 @@ pub enum ObjectType {
     Socket,
     Ipc,
     Capability,
+    Directory,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -25,6 +26,8 @@ pub enum SelinuxPermission {
     Append,
     Transition,
 }
+
+pub type Permission = SelinuxPermission;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SecurityLabel {
@@ -213,7 +216,6 @@ pub struct PolicyRule {
 }
 
 pub type Permission = SelinuxPermission;
-
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,
     pub policies: HashSet<AvcKey>,
