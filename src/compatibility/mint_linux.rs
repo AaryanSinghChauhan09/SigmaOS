@@ -4,6 +4,7 @@
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::Vec;
 

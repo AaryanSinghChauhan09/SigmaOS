@@ -22,6 +22,9 @@
 // (no_std only applicable at crate root - removed)
 
 extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -425,6 +428,7 @@ pub struct DeviceObject {
 
 #[derive(Debug, Clone)]
 pub struct DriverObject {
+    pub driver_name: String,
     pub major_function: [Option<usize>; 28],
 }
 
@@ -434,16 +438,12 @@ pub struct X86RootkitAuditor {
     pub expected_ssdt_checksum: u64,
 }
 
-
-pub fn io_attach_device_to_device_stack(source_device: &mut DeviceObject, target_device: &mut DeviceObject) -> Option<DeviceObject> {
-    source_device.attached_device = Some(Box::new(target_device.clone()));
-    Some(target_device.clone())
+pub fn io_attach_device_to_device_stack(source_device: &mut DeviceObject, target_device: &mut DeviceObject) {
+    source_device.next_device = Some(Box::new(target_device.clone()));
+    target_device.attached_device = Some(Box::new(source_device.clone()));
 }
 
 impl X86RootkitAuditor {
-    pub fn audit_device_stack(&self, _dev: &DeviceObject, _allowed: &[&str]) -> Result<(), &'static str> { Ok(()) }
-    pub fn audit_driver_dispatch_table(&self, _drv: &DriverObject, _min: usize, _max: usize) -> Result<(), &'static str> { Ok(()) }
-
     pub fn new(kernel_text: &[u8], ssdt: &KeServiceDescriptorTable) -> Self {
         Self {
             expected_kernel_text_checksum: Self::checksum_buffer(kernel_text),
@@ -529,35 +529,6 @@ impl X86RootkitAuditor {
         Ok(())
     }
 
-    /// Audit device stack drivers against allowed driver whitelist
-    pub fn audit_device_stack(&self, device: &DeviceObject, allowed_drivers: &[&str]) -> Result<(), &'static str> {
-        let mut curr: Option<&DeviceObject> = Some(device);
-        while let Some(dev) = curr {
-            if !allowed_drivers.contains(&dev.driver_name) {
-                return Err("Rootkit filter driver detected in device stack!");
-            }
-            curr = dev.next_device.as_deref();
-        }
-        Ok(())
-    }
-
-    /// Audit driver major function dispatch table for out-of-bounds hook redirection
-    pub fn audit_driver_dispatch_table(&self, driver: &DriverObject, min_addr: usize, max_addr: usize) -> Result<(), &'static str> {
-        for func in &driver.major_function {
-            if let Some(f) = func {
-                let addr = *f as usize;
-                if addr < min_addr || addr > max_addr {
-                    return Err("Rootkit hook detected in DriverObject major function dispatch table!");
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-pub fn io_attach_device_to_device_stack(source_device: &mut DeviceObject, target_device: &mut DeviceObject) {
-    source_device.next_device = Some(Box::new(target_device.clone()));
-    target_device.attached_device = Some(Box::new(source_device.clone()));
 }
 
 // ==========================================
@@ -1085,11 +1056,11 @@ mod tests {
         }
         let handler = IrpHandler::new(|_| 0, |_| 0, mock_ioctl_dispatch);
 
-        let irp = Irp::new(
+        let mut irp = Irp::new(
             IrpMajorFunction::DeviceControl,
-            0x222000,
             vec![0x11, 0x22],
         );
+        irp.ioctl_code = 0x222000;
 
         let res = handler.process_irp(irp);
         assert_eq!(res, 0);
@@ -1153,21 +1124,20 @@ mod tests {
 
     #[test]
     fn test_rootkit_dispatch_table_hook_auditer() {
-        let mut major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8] = [None; 8];
+        let mut major_function: [Option<usize>; 28] = [None; 28];
 
         fn mock_dispatch(_dev: &DeviceObject, _irp: &mut Irp) -> u32 { 0 }
-        major_function[0] = Some(mock_dispatch);
+        let addr = mock_dispatch as usize;
+        major_function[0] = Some(addr);
 
         let driver = DriverObject {
-            driver_name: "keyboard_driver",
+            driver_name: String::from("keyboard_driver"),
             major_function,
         };
-
         let ssdt = KeServiceDescriptorTable::new();
         let auditor = X86RootkitAuditor::new(&[], &ssdt);
 
         // Bounds audit passes because mock_dispatch is at its actual address
-        let addr = mock_dispatch as *const () as usize;
         let res = auditor.audit_driver_dispatch_table(&driver, addr - 100, addr + 100);
         assert!(res.is_ok());
 
