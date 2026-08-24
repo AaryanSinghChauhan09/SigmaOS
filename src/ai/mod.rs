@@ -4,17 +4,6 @@
 pub mod agent;
 pub mod apm;
 pub mod autogen;
-pub mod llm;
-pub mod orchestrator;
-pub mod sai;
-pub mod openclaw;
-pub mod system;
-pub mod voice;
-pub mod wiki;
-pub mod qwenpaw;
-pub mod developer_platform;
-pub mod open_computer;
-pub mod tensor_memory;
 pub mod compute_scheduler;
 pub mod developer_platform;
 pub mod lift_engine;
@@ -25,8 +14,13 @@ pub mod openclaw;
 pub mod orchestrator;
 pub mod perplexity;
 pub mod quantization;
-pub mod next_gen;
+pub mod qwenpaw;
+pub mod sai;
+pub mod system;
+pub mod tensor_memory;
+pub mod voice;
 pub mod wandr;
+pub mod wiki;
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
