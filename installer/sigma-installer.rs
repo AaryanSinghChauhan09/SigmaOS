@@ -25,6 +25,8 @@ pub struct InstallerConfig {
     pub encryption: bool,
     pub swap_size: u64, // MB
     pub preseed_file: Option<String>,
+    pub target_is_qemu: bool,
+    pub detected_disks: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -82,6 +84,39 @@ impl Default for InstallerConfig {
             encryption: false,
             swap_size: 2048,
             preseed_file: None,
+            target_is_qemu: false,
+            detected_disks: vec!["/dev/sda".to_string()],
+        }
+    }
+}
+
+impl InstallerConfig {
+    /// Auto-probe hardware targets for QEMU / KVM virtualization & NVMe drives
+    pub fn probe_qemu_hardware_targets(&mut self) {
+        let mut disks = Vec::new();
+        // Check for QEMU VirtIO block devices
+        if Path::new("/dev/vda").exists() {
+            disks.push("/dev/vda".to_string());
+            self.target_is_qemu = true;
+        }
+        // Check for NVMe drives
+        if Path::new("/dev/nvme0n1").exists() {
+            disks.push("/dev/nvme0n1".to_string());
+        }
+        // Default fallback to /dev/sda
+        if disks.is_empty() {
+            disks.push("/dev/sda".to_string());
+        }
+        self.disk = disks[0].clone();
+        self.detected_disks = disks;
+    }
+
+    /// Validates minimum RAM requirement for GUI installation
+    pub fn validate_system_ram_requirements(&self, available_ram_mb: u64) -> Result<(), String> {
+        if available_ram_mb < 2048 {
+            Err("Insufficient RAM: Minimum 2048 MB required for installation wizard".to_string())
+        } else {
+            Ok(())
         }
     }
 }
@@ -408,5 +443,15 @@ mod tests {
         let preseed = installer.generate_preseed();
         assert!(preseed.contains("language=en_US"));
         assert!(preseed.contains("hostname=sigmaos"));
+    }
+
+    #[test]
+    fn test_probe_qemu_hardware_targets_and_ram_checks() {
+        let mut config = InstallerConfig::default();
+        config.probe_qemu_hardware_targets();
+        assert!(!config.detected_disks.is_empty());
+
+        assert!(config.validate_system_ram_requirements(4096).is_ok());
+        assert!(config.validate_system_ram_requirements(1024).is_err());
     }
 }

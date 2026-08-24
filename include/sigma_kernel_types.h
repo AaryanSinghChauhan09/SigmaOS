@@ -1,6 +1,7 @@
 #ifndef SIGMA_KERNEL_TYPES_H
 #define SIGMA_KERNEL_TYPES_H
 
+typedef __SIZE_TYPE__ sigma_size_t;
 typedef unsigned int sigma_u32;
 typedef int sigma_i32;
 typedef unsigned char sigma_u8;

@@ -1,7 +1,8 @@
-use crate::klib::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
 /// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
+extern crate alloc;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -85,7 +86,7 @@ impl DinitServiceManager {
         // Recursively start dependencies first (Dinit logic)
         let deps = self.services[idx].dependencies.clone();
         for dep in &deps {
-            let dep_name = &dep[..dep.iter().position(|&b| b == 0).unwrap_or(32)];
+            let dep_name = &dep[..dep.iter().position(|b: &u8| *b == 0).unwrap_or(32)];
             self.start_service(dep_name)?;
         }
 
@@ -103,6 +104,16 @@ impl BsdUserlandCompat {
         // BSD df reports blocks, we translate to standardized byte structures
         let block_size = 512;
         (total * block_size, used * block_size)
+    }
+
+    pub fn pgrep_filter_by_name(&self, processes: &[(&[u8], usize)], pattern: &[u8]) -> Vec<usize> {
+        let mut pids = Vec::new();
+        for &(name, pid) in processes {
+            if name.windows(pattern.len()).any(|sub| sub == pattern) {
+                pids.push(pid);
+            }
+        }
+        pids
     }
 }
 

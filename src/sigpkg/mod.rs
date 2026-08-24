@@ -5,6 +5,7 @@ pub mod arch_compat;
 pub mod debian_defeater;
 pub mod importer;
 pub mod makepkg;
+pub mod multi_distro;
 pub mod nix_shell;
 pub mod portage;
 pub mod recipe;
@@ -16,6 +17,12 @@ pub mod universal_adapter;
 pub mod verifier;
 
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
+pub use multi_distro::{
+    AlpmHook as MultiDistroAlpmHook, AptPinPriority, DnfDeltaEngine, HookPhase,
+    PacmanAlpmHookRegistry, ParallelMirrorDownloader, PortageSlotResolver,
+    SovereignMultiDistroPackageManager, StagedTransaction, TransactionRollbackHandler,
+    XbpsCasExtractor,
+};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer,

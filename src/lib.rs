@@ -199,9 +199,11 @@ pub use security::{
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
-    PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
-    Transaction, UniversalPackageAdapter,
+    AptDebManifest, AptPinPriority, BuildSystem, ContentAddressedStore, CryptoVerifier,
+    DnfDeltaEngine, FlatpakManifest, MultiDistroAlpmHook, PackageRecipe, PacmanAlpmHookRegistry,
+    PacmanPkgbuild, ParallelMirrorDownloader, PortageSlotResolver, RecipeError, RecipeManager,
+    SatSolver, SnapcraftManifest, SovereignMultiDistroPackageManager, StagedTransaction,
+    Transaction, TransactionRollbackHandler, UniversalPackageAdapter, XbpsCasExtractor,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

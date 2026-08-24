@@ -156,38 +156,6 @@ impl WorkStealingQueue {
     }
 }
 
-impl Process {
-    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
-        Self {
-            pid,
-            name,
-            priority,
-            state: ProcessState::Ready,
-            runtime: Duration::from_secs(0),
-            virtual_runtime: 0,
-            virtual_deadline: 0,
-            time_slice: Duration::from_millis(10),
-        }
-    }
-
-    pub fn get_weight(&self) -> u64 {
-        match self.priority {
-            Priority::Idle => 1,
-            Priority::Low => 2,
-            Priority::Normal => 4,
-            Priority::High => 8,
-            Priority::Realtime => 16,
-        }
-    }
-
-    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
-        let weight = self.get_weight();
-        // deadline = vruntime + (q / w) where q is time slice slice equivalent ticks (10)
-        let q = 10;
-        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
-    }
-}
-
 impl Eq for Task {}
 
 impl PartialOrd for Task {
