@@ -2,7 +2,7 @@
 // Linux distro-inspired boot process and system initialization
 // Handles boot sequence, service startup, and system readiness
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

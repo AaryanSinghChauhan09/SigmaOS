@@ -1,7 +1,7 @@
 //! Service Management System (systemd + OpenRC + BSD rc Inspiration)
 //! Implements service management, logging, and network configuration
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

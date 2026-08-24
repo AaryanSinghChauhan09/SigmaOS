@@ -1,7 +1,7 @@
 //! System Update Functions (apt/dnf Inspiration)
 //! Package manager, update manager, and repository manager
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

@@ -1,7 +1,7 @@
 //! Edge Computing Platform (Edge Computing Inspiration)
 //! Lightweight edge runtime, distributed computing, and offline support
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

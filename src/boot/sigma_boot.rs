@@ -2,7 +2,7 @@
 //! Multi-boot entry management, measured boot TPM PCR registers, custom themes,
 //! and fallback boot recovery environments.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::string::{String, ToString};

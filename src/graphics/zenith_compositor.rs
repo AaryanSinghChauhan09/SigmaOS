@@ -2,7 +2,7 @@
 // Wayland-inspired compositor with OOP design
 // Inspired by Mutter, KWin, Sway, and wlroots from popular Linux distributions.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;

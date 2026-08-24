@@ -3,7 +3,7 @@
 // Inspired by Gentoo Portage USE flags, OpenBSD pledge/unveil, and FreeBSD Capsicum rights
 // Fine-grained control over package compilation, system configuration, and kernel sandboxing
 
-#![no_std]
+// #![no_std]
 extern crate alloc;
 
 use alloc::collections::BTreeMap;

@@ -2,7 +2,7 @@
 // Systematic absorption of Linux kernel drivers with OOP encapsulation and security hardening
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 
@@ -1571,10 +1571,10 @@ mod tests {
         // 4. EXIT: 0x9500000000000000
         let program = {
             let mut v = Vec::new();
-            v.push(0x27_0_0_0000_00000005); // MOV R0, 5
-            v.push(0x35_3_0_0000_00000002); // LOAD R3, context[2] (value: 0x30 = 48)
-            v.push(0x0F_0_3_0000_00000000); // ADD R0, R3
-            v.push(0x95_0_0_0000_00000000); // EXIT
+            v.push(0x2700_0000_0000_0005); // MOV R0, 5
+            v.push(0x3530_0000_0000_0002); // LOAD R3, context[2] (value: 0x30 = 48)
+            v.push(0x0F03_0000_0000_0000); // ADD R0, R3
+            v.push(0x9500_0000_0000_0000); // EXIT
             v
         };
 

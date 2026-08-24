@@ -1,7 +1,7 @@
 //! Real-Time Capabilities (PREEMPT_RT Inspiration)
 //! Real-time kernel, scheduling policies, and industrial support
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

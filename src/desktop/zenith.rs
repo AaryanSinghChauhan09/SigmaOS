@@ -3,7 +3,7 @@
 //! No dependency on external desktop frameworks
 //! Based on Roadmap Item 41: Zenith Desktop core
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

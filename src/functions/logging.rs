@@ -1,7 +1,7 @@
 //! Logging Functions (rsyslog/journald Inspiration)
 //! Log manager, journal manager, and log analyzer
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

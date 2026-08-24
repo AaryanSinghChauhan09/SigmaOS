@@ -2,7 +2,7 @@
 // Provides VGA and serial output for kernel logging and panic messages
 // Solves critical gap: no actual kernel output implementation
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

@@ -1,7 +1,7 @@
 // S-SIGNAL DISPATCHER (Capability-Gated Async Signals)
 // Asynchronous signal handling with capability-based access control
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

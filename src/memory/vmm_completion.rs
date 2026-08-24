@@ -2,7 +2,7 @@
 // Finalizes the remaining components for Phase G completion
 // This module completes the VMM implementation with advanced features
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;

@@ -2,7 +2,7 @@
 // Linux distro-inspired package repository handling
 // Manages package repositories, sources, and metadata
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

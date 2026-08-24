@@ -1,5 +1,5 @@
-#![no_std]
-#![cfg_attr(not(test), no_main)]
+// #![no_std]
+// #![cfg_attr(not(test), no_main)]
 
 /// Custom Compression Algorithms for SigmaOS
 /// Implements compression without relying on external compression libraries

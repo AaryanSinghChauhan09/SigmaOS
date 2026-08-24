@@ -1,7 +1,7 @@
 //! Security, Privacy & Governance Framework (Items 61-80)
 //! Comprehensive Security, Privacy, and Open-Source Governance Suite for SigmaOS
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

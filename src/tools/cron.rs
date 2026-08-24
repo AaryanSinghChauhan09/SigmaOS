@@ -1,7 +1,7 @@
 //! Cron/Scheduler (cronie/cron Inspiration)
 //! Cron daemon, job scheduling, and job execution
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

@@ -2,7 +2,7 @@
 // Linux/BSD distro-inspired process management
 // Handles process supervision, monitoring, and lifecycle management
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

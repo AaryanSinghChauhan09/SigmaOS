@@ -1,7 +1,7 @@
 //! Process Management Functions (systemd/ps Inspiration)
 //! Service manager, process manager, and system control
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

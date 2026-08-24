@@ -2,7 +2,7 @@
 // Finalizes the bootable ISO implementation with advanced features
 // Integrates with existing installer components
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::string::String;

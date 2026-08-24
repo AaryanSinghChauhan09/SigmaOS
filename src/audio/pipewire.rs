@@ -2,7 +2,7 @@
 //! Safe, zero-dependency `#![no_std]` audio graph, low-latency processing,
 //! spatial audio, and JACK client compatibility layer.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::string::{String, ToString};

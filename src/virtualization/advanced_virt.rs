@@ -2,7 +2,7 @@
 //! KVM hardware acceleration, live VM migration, GPU passthrough,
 //! and Libvirt-compatible management APIs.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::string::{String, ToString};

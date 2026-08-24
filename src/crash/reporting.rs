@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// #![no_std]
+// #![no_main]
 
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 14

@@ -1,7 +1,7 @@
 //! System Monitoring Functions (systemd-journalctl/htop Inspiration)
 //! System log viewer, system monitor, and system information tools
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

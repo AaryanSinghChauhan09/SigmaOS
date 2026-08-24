@@ -1,5 +1,5 @@
-#![no_std]
-#![cfg_attr(not(test), no_main)]
+// #![no_std]
+// #![cfg_attr(not(test), no_main)]
 
 /// Post-Quantum Cryptographic Secure Enclave and Token-Rotation IPC Bus
 /// Outclasses standard Linux/BSD security with rotatable, ephemeral post-quantum

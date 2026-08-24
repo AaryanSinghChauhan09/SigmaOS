@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// #![no_std]
+// #![no_main]
 
 use core::mem;
 /// OOP-based Container Runtime Support for SigmaOS

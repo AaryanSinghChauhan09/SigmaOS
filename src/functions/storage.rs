@@ -1,7 +1,7 @@
 //! Storage Management Functions (lsblk/parted Inspiration)
 //! Block device management, partition manager, and filesystem tools
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

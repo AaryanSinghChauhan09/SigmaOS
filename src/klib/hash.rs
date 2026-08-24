@@ -1,7 +1,7 @@
 // SigmaOS Custom Hash Library
 // Reduces dependency on predefined hashing functions
 
-#![no_std]
+// #![no_std]
 
 /// Simple hash function for strings (DJB2 algorithm)
 pub fn djb2_hash(s: &str) -> u64 {

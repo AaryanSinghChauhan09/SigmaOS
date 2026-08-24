@@ -1,7 +1,7 @@
 // SigmaInit - Modern Init System
 // Inspired by OpenRC, runit, s6 (systemd alternatives)
 
-#![no_std]
+// #![no_std]
 extern crate alloc;
 
 use alloc::string::String;

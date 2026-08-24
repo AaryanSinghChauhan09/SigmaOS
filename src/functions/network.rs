@@ -1,7 +1,7 @@
 //! Network Diagnostic Functions (iproute2/ethtool Inspiration)
 //! Network configuration, diagnostics, and interface management
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

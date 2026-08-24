@@ -4,7 +4,7 @@
 //! including breakpoints, watchpoints, stack tracing, and memory inspection.
 //! Replicates Debian-style debug symbols packages (.dbgsym) and Build ID lookup systems.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::string::String;

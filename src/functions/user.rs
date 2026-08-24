@@ -1,7 +1,7 @@
 //! User Management Functions (useradd/passwd Inspiration)
 //! User manager, password manager, and authentication manager
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

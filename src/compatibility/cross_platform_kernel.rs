@@ -1,7 +1,7 @@
 // SigmaOS Sovereign Cross-Platform Kernel Internals Layer
 // Parity bridge representing low-level kernel mechanisms from Linux, Windows, and BSD
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

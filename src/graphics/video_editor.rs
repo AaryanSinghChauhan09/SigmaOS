@@ -2,7 +2,7 @@
 // Inspired by Adobe Premiere Pro, Final Cut Pro, DaVinci Resolve, and Kdenlive.
 // Provides GPU-accelerated timeline scrubbing, real-time effects preview, and multi-format exports.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

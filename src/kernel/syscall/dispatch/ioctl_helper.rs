@@ -1,7 +1,7 @@
 // Unix/BSD-grade ioctl (Input/Output Control) syscall helper and decoder
 // Decodes direction, size, group-type, and sequence parameters for hardware control calls.
 
-#![no_std]
+// #![no_std]
 
 /// Direction bitmasks for standard UNIX/BSD ioctl commands
 pub const IOC_VOID: u32  = 0x20000000; // No parameters, purely action command

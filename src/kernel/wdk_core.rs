@@ -2,7 +2,7 @@
 // Inspired by: x86-64/ARM kernel architectures, Windows Driver Kit, Linux, and BSD.
 // Zero external library dependency, no_std compatible.
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 use alloc::string::String;

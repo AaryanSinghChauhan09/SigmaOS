@@ -2,7 +2,7 @@
 // Integrates Mandatory Access Control with VFS layer
 // Solves BUG-014: MAC enforcement not wired into VFS call sites
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

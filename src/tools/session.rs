@@ -1,7 +1,7 @@
 //! Session Manager (systemd-logind Inspiration)
 //! Session tracking, seat management, and device assignment
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

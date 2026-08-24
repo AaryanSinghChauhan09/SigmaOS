@@ -1,7 +1,7 @@
 // Capability Token System for SigmaOS Security Framework
 // Location: src/kernel/security/capability.rs
 
-#![no_std]
+// #![no_std]
 
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;

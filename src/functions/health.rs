@@ -1,7 +1,7 @@
 //! System Health Check Functions (systemd-analyze Inspiration)
 //! Health checker, diagnostics tool, and recovery tool
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

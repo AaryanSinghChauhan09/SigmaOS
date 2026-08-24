@@ -2,7 +2,7 @@
 // Linux distro-inspired network configuration
 // Handles network interfaces, routing, DNS, and network settings
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

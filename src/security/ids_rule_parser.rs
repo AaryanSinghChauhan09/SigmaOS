@@ -2,7 +2,7 @@
 // Advanced rule-based intrusion detection system with Snort/Suricata-style syntax
 // Solves BUG-011: IDS Rule Parser not implemented
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

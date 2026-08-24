@@ -2,7 +2,7 @@
 // Fully absorbs and implements all features, systems, and philosophies of FreeDOS:
 // AUTOEXEC.BAT batch files, CONFIG.SYS drivers, INT 21h MS-DOS syscalls, TSR multiplexing, FAT32/LBA filesystems, and shell utilities.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

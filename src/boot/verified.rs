@@ -1,4 +1,4 @@
-#![no_std]
+// #![no_std]
 
 /// OOP-based Verified Boot for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 561

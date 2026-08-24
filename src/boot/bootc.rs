@@ -2,7 +2,7 @@
 // Inspired by RHEL Image Mode (bootc) and Fedora Atomic Desktops
 // OCI-compliant container images for OS deployment with atomic updates
 
-#![no_std]
+// #![no_std]
 extern crate alloc;
 
 use alloc::vec::Vec;

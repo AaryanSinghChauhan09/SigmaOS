@@ -6,7 +6,7 @@
 //! 3. Linux OverlayFS / Union Mount subsystem (`LinuxOverlayFsManager`)
 //! 4. Linux ProcFS & SysFS dynamic telemetry virtual file system (`LinuxProcSysfsEmulator`)
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::string::{String, ToString};

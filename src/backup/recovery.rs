@@ -1,7 +1,7 @@
 //! Comprehensive System Recovery & Backup inspired by Timeshift and Borg
 //! Incremental backups, deduplicated chunks, point-in-time recovery, and instant snapshot rollbacks.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::string::{String, ToString};

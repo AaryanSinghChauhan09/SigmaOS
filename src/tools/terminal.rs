@@ -1,7 +1,7 @@
 //! Terminal Emulator (gnome-terminal/konsole Inspiration)
 //! Terminal sessions, profiles, and PTY management
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

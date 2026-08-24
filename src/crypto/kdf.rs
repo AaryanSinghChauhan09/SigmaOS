@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// #![no_std]
+// #![no_main]
 
 /// OOP-based Key Derivation Function for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502

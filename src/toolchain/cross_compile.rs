@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// #![no_std]
+// #![no_main]
 
 /// OOP-based Cross-compile Toolchain for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 9

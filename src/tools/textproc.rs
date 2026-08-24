@@ -1,7 +1,7 @@
 //! Text Processing Tools (sed/awk/grep Inspiration)
 //! Stream editor, text processor, and pattern search
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

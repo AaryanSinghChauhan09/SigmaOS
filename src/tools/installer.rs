@@ -1,7 +1,7 @@
 //! System Installer (Ubiquity/Calamares Inspiration)
 //! Graphical installer with partitioning and user setup
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

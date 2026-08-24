@@ -1,7 +1,7 @@
 //! Display Manager (GDM/LightDM Inspiration)
 //! Login screen, session management, and display server spawning
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

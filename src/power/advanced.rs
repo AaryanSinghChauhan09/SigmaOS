@@ -2,7 +2,7 @@
 //! Dynamic CPU/GPU frequency scaling, battery health calibration,
 //! thermal throttling, and process energy impact scoring.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::string::{String, ToString};

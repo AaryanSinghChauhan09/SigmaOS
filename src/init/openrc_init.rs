@@ -1,7 +1,7 @@
 // OpenRC-Inspired Service Management System
 // Dependency-based init system with runlevels, service supervision, and parallel startup
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

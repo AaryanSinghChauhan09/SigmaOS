@@ -1,7 +1,7 @@
 // nftables-Inspired Modern Firewall Framework
 // Linux nftables provides a modern, flexible packet filtering framework with tables, chains, and rules
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

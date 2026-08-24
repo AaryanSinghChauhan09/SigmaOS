@@ -1,7 +1,7 @@
 //! Shell/Command Interpreter (bash/zsh Inspiration)
 //! Advanced shell with history, completion, aliases, and job control
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// #![no_std]
+// #![no_main]
 
 /// OOP-based Key Management for SigmaOS
 /// Based on Roadmap Item 16: Key management

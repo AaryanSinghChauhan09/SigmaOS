@@ -4,7 +4,7 @@
 // to surpass and make legacy open-source projects (Git, Systemd, WireGuard,
 // Prometheus/Grafana, Postman, Obsidian, GParted) completely obsolete.
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

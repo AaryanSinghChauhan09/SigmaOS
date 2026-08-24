@@ -1,7 +1,7 @@
 // S-SEC CAPABILITY-BASED SANDBOX
 // Android/AOSP-style permissions and capability-based security enforcement
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

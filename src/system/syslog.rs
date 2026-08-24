@@ -2,7 +2,7 @@
 // Linux/BSD distro-inspired logging system
 // Handles system logging, log rotation, and log management
 
-#![cfg_attr(not(test), no_std)]
+// #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

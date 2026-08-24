@@ -2,8 +2,8 @@
 // This module implements key concepts from Linux and BSD distributions
 // that provide competitive advantages for SigmaOS
 
-#![no_std]
-#![cfg_attr(target_os = "none", no_main)]
+// #![no_std]
+// #![cfg_attr(target_os = "none", no_main)]
 
 extern crate alloc;
 use alloc::vec::Vec;

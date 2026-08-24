@@ -3,7 +3,7 @@
 // Target: 10,000 pages/sec alloc/free, sub-100ns kmalloc
 // Formally verified with Kani
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

@@ -1,7 +1,7 @@
 // SigmaOS Strategic Vision Roadmap & OKR Engine
 // Pure Rust implementation of 3-Year Strategic Vision and Milestone Evaluators.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

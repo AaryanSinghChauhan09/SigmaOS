@@ -31,7 +31,7 @@
 // 10. Sovereign Recover Utility (sigma-recover): Sector node recovery from pristine backups
 // 11. Asynchronous Shard Ignition (ASI) with write-once system images (CoreOS Parity)
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

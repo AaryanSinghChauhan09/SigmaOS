@@ -1,5 +1,5 @@
-#![no_std]
-#![cfg_attr(not(test), no_main)]
+// #![no_std]
+// #![cfg_attr(not(test), no_main)]
 
 #[cfg(not(target_os = "none"))]
 extern crate std;

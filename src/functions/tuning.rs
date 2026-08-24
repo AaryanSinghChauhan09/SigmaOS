@@ -1,7 +1,7 @@
 //! Performance Tuning Functions (tuned Inspiration)
 //! Performance tuner, I/O tuner, and network tuner
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

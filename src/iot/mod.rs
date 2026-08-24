@@ -1,7 +1,7 @@
 //! IoT Platform (IoT Device Management Inspiration)
 //! Large-scale device management, protocol support, and digital twin integration
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

@@ -1,7 +1,7 @@
 // Windows Driver Model (WDM) / Kernel-Mode Driver Framework (KMDF) & UMDF
 // Zero-dependency, #![no_std] compliant, highly compatible driver architecture.
 
-#![no_std]
+// #![no_std]
 
 #[cfg(test)]
 extern crate std;

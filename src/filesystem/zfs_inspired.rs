@@ -1,7 +1,7 @@
 // ZFS-Inspired Advanced Filesystem Features
 // Combines ZFS innovations: snapshots, compression, deduplication, data integrity
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

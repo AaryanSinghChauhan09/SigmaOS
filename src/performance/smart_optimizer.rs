@@ -2,7 +2,7 @@
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically tunes CPU cores, compacts memory page fragmentation, and adjusts disk I/O priorities under live workloads.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

@@ -1,7 +1,7 @@
 //! Text Editor (gedit/nano Inspiration)
 //! Document management, syntax highlighting, and editor features
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

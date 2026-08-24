@@ -1,7 +1,7 @@
 // SigmaOS 4-Level Page Table Walking & Paging Subsystem
 // Zero-dependency, #![no_std] compliant x86_64 paging implementation.
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;

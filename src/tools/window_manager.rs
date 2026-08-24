@@ -1,7 +1,7 @@
 //! Window Manager (i3/sway Inspiration)
 //! Tiling window manager with workspaces and containers
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

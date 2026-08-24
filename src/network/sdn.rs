@@ -1,7 +1,7 @@
 //! Advanced Networking (SDN/NFV Inspiration)
 //! Software-defined networking, network virtualization, and network function virtualization
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

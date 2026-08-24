@@ -1,7 +1,7 @@
 //! GPU Driver Framework (Linux DRM & BSD drm-kmod Inspiration)
 //! Native bare-metal hardware drivers for AMD, Intel, NVIDIA, and VirtIO-GPU
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 

@@ -1,7 +1,7 @@
 // CPU Feature Detection - Gentoo-style compiler-assisted target optimizations
 // Dynamic CPU feature detection and JIT optimization selector
 
-#![cfg_attr(target_os = "none", no_std)]
+// #![cfg_attr(target_os = "none", no_std)]
 
 extern crate alloc;
 

@@ -1,7 +1,7 @@
 // SigmaOS Kernel Persona Containers & Syscall Graph
 // Encapsulates lightweight legacy kernel version mimicry and graph-based dynamic syscall mapping
 
-#![no_std]
+// #![no_std]
 
 extern crate alloc;
 
