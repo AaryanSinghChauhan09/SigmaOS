@@ -19,9 +19,7 @@
 // Legacy Keyboard Implementation (e.g., PS/2)
 // Demonstrates how user-defined drivers implement the unified OOP architecture.
 
-use crate::drivers::peripheral::{
-    DeviceGeneration, PeripheralDevice as PeripheralDeviceTrait, PowerState,
-};
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice as PeripheralDeviceTrait, PowerState};
 
 pub struct LegacyKeyboard {
     is_initialized: bool,

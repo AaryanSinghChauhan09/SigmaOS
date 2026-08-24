@@ -978,9 +978,7 @@ pub struct ZenithDisplayCompositor {
 
 impl ZenithDisplayCompositor {
     pub fn new() -> Self {
-        Self {
-            active_windows_count: 0,
-        }
+        Self { active_windows_count: 0 }
     }
 }
 

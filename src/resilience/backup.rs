@@ -117,11 +117,7 @@ impl SigmaTimeshiftManager {
         }
     }
 
-    pub fn create_snapshot(
-        &mut self,
-        label: String,
-        system_files: HashMap<String, String>,
-    ) -> Result<String, BackupError> {
+    pub fn create_snapshot(&mut self, label: String, system_files: HashMap<String, String>) -> Result<String, BackupError> {
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
@@ -168,9 +164,7 @@ mod tests {
         files.insert("/etc/hosts".to_string(), "hash123".to_string());
         files.insert("/bin/sigma-sh".to_string(), "hash456".to_string());
 
-        let id = timeshift
-            .create_snapshot("Initial Clean Install".to_string(), files)
-            .unwrap();
+        let id = timeshift.create_snapshot("Initial Clean Install".to_string(), files).unwrap();
         assert_eq!(timeshift.snapshots.len(), 1);
 
         let restored = timeshift.restore_snapshot(&id).unwrap();

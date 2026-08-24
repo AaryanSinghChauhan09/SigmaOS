@@ -1,4 +1,4 @@
-#![cfg_attr(not(test), no_std)]
+
 
 extern crate alloc;
 
@@ -33,9 +33,7 @@ pub struct SecurityLabel {
 
 impl SecurityLabel {
     pub fn new(label: &str) -> Self {
-        Self {
-            label: label.to_string(),
-        }
+        Self { label: label.to_string() }
     }
 }
 
@@ -62,19 +60,9 @@ impl SecurityPolicy {
         self.rules.push(rule);
     }
 
-    pub fn check_permission(
-        &self,
-        source_type: &str,
-        target_type: &str,
-        obj_type: ObjectType,
-        perm: SelinuxPermission,
-    ) -> bool {
+    pub fn check_permission(&self, source_type: &str, target_type: &str, obj_type: ObjectType, perm: SelinuxPermission) -> bool {
         for rule in &self.rules {
-            if rule.source_type == source_type
-                && rule.target_type == target_type
-                && rule.object_type == obj_type
-                && rule.permission == perm
-            {
+            if rule.source_type == source_type && rule.target_type == target_type && rule.object_type == obj_type && rule.permission == perm {
                 return rule.allow;
             }
         }
@@ -113,9 +101,7 @@ pub struct AppArmorManager {
 
 impl AppArmorManager {
     pub fn new() -> Self {
-        Self {
-            profiles: HashMap::new(),
-        }
+        Self { profiles: HashMap::new() }
     }
 
     pub fn load_profile(&mut self, profile: AppArmorProfile) {
@@ -171,10 +157,7 @@ impl SecurityContext {
     }
 
     pub fn to_string(&self) -> String {
-        format!(
-            "{}:{}:{}:{}",
-            self.user, self.role, self.type_name, self.sensitivity
-        )
+        format!("{}:{}:{}:{}", self.user, self.role, self.type_name, self.sensitivity)
     }
 }
 
@@ -231,18 +214,11 @@ pub struct PolicyRule {
 
 pub struct AppArmorManager;
 pub struct AppArmorProfile;
-pub enum ObjectType {
-    File,
-    Directory,
-}
+pub enum ObjectType { File, Directory }
 pub struct SecurityLabel;
 pub struct SecurityPolicy;
 pub struct SecurityRule;
-pub enum SelinuxPermission {
-    Read,
-    Write,
-    Execute,
-}
+pub enum SelinuxPermission { Read, Write, Execute }
 pub type Permission = SelinuxPermission;
 
 pub struct SelinuxEngine {
@@ -369,26 +345,14 @@ impl DynamicMacEnforcer {
         }
     }
 
-    pub fn set_process_level(
-        &mut self,
-        process_id: &str,
-        level: SensitivityLevel,
-        categories: HashSet<u32>,
-    ) {
+    pub fn set_process_level(&mut self, process_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
         self.process_levels.insert(process_id.to_string(), level);
-        self.process_categories
-            .insert(process_id.to_string(), categories);
+        self.process_categories.insert(process_id.to_string(), categories);
     }
 
-    pub fn set_object_level(
-        &mut self,
-        object_id: &str,
-        level: SensitivityLevel,
-        categories: HashSet<u32>,
-    ) {
+    pub fn set_object_level(&mut self, object_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
         self.object_levels.insert(object_id.to_string(), level);
-        self.object_categories
-            .insert(object_id.to_string(), categories);
+        self.object_categories.insert(object_id.to_string(), categories);
     }
 
     /// Read access check: No Read Up (Simple Security Property - Bell-LaPadula)
@@ -447,11 +411,7 @@ mod tests {
         cats_secret.insert(2);
 
         mac.set_process_level("proc_app", SensitivityLevel::Secret, cats_secret.clone());
-        mac.set_object_level(
-            "file_top_secret",
-            SensitivityLevel::TopSecret,
-            cats_secret.clone(),
-        );
+        mac.set_object_level("file_top_secret", SensitivityLevel::TopSecret, cats_secret.clone());
         mac.set_object_level("file_secret", SensitivityLevel::Secret, cats_secret.clone());
 
         // Cannot read TopSecret file from Secret process (No Read Up)
@@ -543,18 +503,8 @@ mod tests {
             allow: true,
         });
 
-        assert!(policy.check_permission(
-            "unconfined_t",
-            "etc_t",
-            ObjectType::File,
-            SelinuxPermission::Read
-        ));
-        assert!(!policy.check_permission(
-            "unconfined_t",
-            "shadow_t",
-            ObjectType::File,
-            SelinuxPermission::Read
-        ));
+        assert!(policy.check_permission("unconfined_t", "etc_t", ObjectType::File, SelinuxPermission::Read));
+        assert!(!policy.check_permission("unconfined_t", "shadow_t", ObjectType::File, SelinuxPermission::Read));
     }
 
     #[test]

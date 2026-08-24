@@ -3,10 +3,10 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::format;
+use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::vec::Vec;
+use alloc::format;
 
 // =========================================================================
 // 1. INTEL E1000 ETHERNET DRIVER SHIM
@@ -77,7 +77,7 @@ pub struct IntelHdaDriver {
     pub active_stream_id: Option<u32>,
     pub sample_rate: HdaSampleRate,
     pub stream_buffers: BTreeMap<u32, Vec<u8>>, // stream_id -> audio buffer
-    pub volume_level: u8,                       // 0 to 100
+    pub volume_level: u8, // 0 to 100
 }
 
 impl IntelHdaDriver {
@@ -98,11 +98,7 @@ impl IntelHdaDriver {
         }
     }
 
-    pub fn write_audio_samples(
-        &mut self,
-        stream_id: u32,
-        samples: &[u8],
-    ) -> Result<(), &'static str> {
+    pub fn write_audio_samples(&mut self, stream_id: u32, samples: &[u8]) -> Result<(), &'static str> {
         if let Some(buf) = self.stream_buffers.get_mut(&stream_id) {
             buf.extend_from_slice(samples);
             Ok(())
@@ -237,15 +233,11 @@ mod tests {
         assert_eq!(vblk.disk_size_sectors, 100);
 
         // Push Block request (Write)
-        assert!(vblk
-            .push_block_request(10, VirtioBlockOp::Write, b"SECTOR_DATA_10")
-            .is_ok());
+        assert!(vblk.push_block_request(10, VirtioBlockOp::Write, b"SECTOR_DATA_10").is_ok());
         assert_eq!(vblk.request_queue.len(), 1);
 
         // Push Block request out of bounds (fails)
-        assert!(vblk
-            .push_block_request(150, VirtioBlockOp::Read, b"")
-            .is_err());
+        assert!(vblk.push_block_request(150, VirtioBlockOp::Read, b"").is_err());
 
         // Execute next request
         let req = vblk.execute_next_request().unwrap();

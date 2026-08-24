@@ -1,11 +1,14 @@
 // SigmaOS Custom Arc (Atomic Reference Counting)
 // Reduces dependency on std::sync::Arc
+
+#![no_std]
+
 extern crate alloc;
 use alloc::boxed::Box;
-use core::convert::AsRef;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::convert::AsRef;
 
 /// ArcInner - Internal structure for Arc
 #[repr(C)]
@@ -59,7 +62,9 @@ impl<T: ?Sized> Arc<T> {
     /// Only safe if this is the only reference
     pub fn get_mut(this: &mut Self) -> Option<&mut T> {
         if this.inner().count.load(Ordering::SeqCst) == 1 {
-            unsafe { Some(&mut this.ptr.as_mut().data) }
+            unsafe {
+                Some(&mut this.ptr.as_mut().data)
+            }
         } else {
             None
         }
@@ -91,7 +96,9 @@ impl<T: ?Sized> Arc<T> {
 impl<T: ?Sized> Clone for Arc<T> {
     fn clone(&self) -> Self {
         self.increment();
-        Arc { ptr: self.ptr }
+        Arc {
+            ptr: self.ptr,
+        }
     }
 }
 

@@ -616,12 +616,7 @@ impl LstmAiSchedulerPredictor {
     }
 
     /// Anticipates workload bursts and signals pre-warming of CPU/Memory
-    pub fn predict_workload_burst(
-        &self,
-        cpu_pct: f32,
-        mem_pct: f32,
-        io_rate: u32,
-    ) -> (bool, bool, u64) {
+    pub fn predict_workload_burst(&self, cpu_pct: f32, mem_pct: f32, io_rate: u32) -> (bool, bool, u64) {
         let score = (cpu_pct * 0.4) + (mem_pct * 0.4) + (io_rate as f32 * 0.0001 * 0.2);
         let is_burst = score > 65.0;
         let prewarm_cpu_memory = score > 50.0;

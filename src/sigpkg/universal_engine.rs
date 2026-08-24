@@ -265,7 +265,10 @@ impl SovereignPackageManager {
     }
 
     pub fn register_udf_hook(&mut self, hook: UserDefinedPackageHook) {
-        self.hooks.entry(hook.hook_type).or_default().push(hook);
+        self.hooks
+            .entry(hook.hook_type)
+            .or_default()
+            .push(hook);
     }
 
     /// Dynamically routes package resolution to the most optimal microarchitecture binary based on CPU capability level (V4 down to V1)
@@ -392,9 +395,7 @@ impl PackageAdapterFactory {
             PackageFormat::Apt => std::boxed::Box::new(AptPackageAdapter),
             PackageFormat::Yum => std::boxed::Box::new(YumPackageAdapter),
             PackageFormat::Pacman => std::boxed::Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage => {
-                std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new()))
-            }
+            PackageFormat::Portage => std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new())),
             PackageFormat::Sovereign => std::boxed::Box::new(SovereignPackageAdapter),
             PackageFormat::Nix => std::boxed::Box::new(NixPackageAdapter),
             PackageFormat::Apk => std::boxed::Box::new(ApkPackageAdapter),
@@ -579,21 +580,9 @@ impl CachyCpuDetector {
     /// x86-64-v3: AVX, AVX2, BMI1, BMI2, F16C, FMA, LZCNT, MOVBE, OSXSAVE
     /// x86-64-v4: AVX512F, AVX512CD, AVX512ER, AVX512PF, AVX512VL, AVX512DQ, AVX512BW
     pub fn detect_level_from_features(features: &[&str]) -> CpuArchLevel {
-        let has_v2 = features.contains(&"sse3")
-            && features.contains(&"sse4.1")
-            && features.contains(&"sse4.2")
-            && features.contains(&"popcnt");
-        let has_v3 = has_v2
-            && features.contains(&"avx")
-            && features.contains(&"avx2")
-            && features.contains(&"fma")
-            && features.contains(&"bmi1")
-            && features.contains(&"bmi2");
-        let has_v4 = has_v3
-            && features.contains(&"avx512f")
-            && features.contains(&"avx512vl")
-            && features.contains(&"avx512dq")
-            && features.contains(&"avx512bw");
+        let has_v2 = features.contains(&"sse3") && features.contains(&"sse4.1") && features.contains(&"sse4.2") && features.contains(&"popcnt");
+        let has_v3 = has_v2 && features.contains(&"avx") && features.contains(&"avx2") && features.contains(&"fma") && features.contains(&"bmi1") && features.contains(&"bmi2");
+        let has_v4 = has_v3 && features.contains(&"avx512f") && features.contains(&"avx512vl") && features.contains(&"avx512dq") && features.contains(&"avx512bw");
 
         if has_v4 {
             CpuArchLevel::X86_64_v4
@@ -607,9 +596,7 @@ impl CachyCpuDetector {
     }
 
     pub fn detect_level() -> CpuArchLevel {
-        Self::detect_level_from_features(&[
-            "sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2",
-        ])
+        Self::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2"])
     }
 }
 
@@ -648,9 +635,7 @@ pub struct ParallelMirrorFetcher {
 
 impl ParallelMirrorFetcher {
     pub fn new() -> Self {
-        Self {
-            mirrors: Vec::new(),
-        }
+        Self { mirrors: Vec::new() }
     }
 
     pub fn add_mirror(&mut self, url: &str, latency_ms: u32) {
@@ -663,8 +648,7 @@ impl ParallelMirrorFetcher {
 
     /// Ranks mirrors by latency and selects the fastest active mirror for parallel chunk download
     pub fn select_fastest_mirror(&self) -> Option<String> {
-        let mut active_mirrors: Vec<&MirrorNode> =
-            self.mirrors.iter().filter(|m| m.is_active).collect();
+        let mut active_mirrors: Vec<&MirrorNode> = self.mirrors.iter().filter(|m| m.is_active).collect();
         active_mirrors.sort_by_key(|m| m.latency_ms);
         active_mirrors.first().map(|m| m.url.clone())
     }
@@ -682,16 +666,11 @@ pub struct DependencyGraphResolver {
 
 impl DependencyGraphResolver {
     pub fn new() -> Self {
-        Self {
-            graph: HashMap::new(),
-        }
+        Self { graph: HashMap::new() }
     }
 
     pub fn add_dependency(&mut self, pkg: &str, dep: &str) {
-        self.graph
-            .entry(pkg.to_string())
-            .or_default()
-            .push(dep.to_string());
+        self.graph.entry(pkg.to_string()).or_default().push(dep.to_string());
     }
 
     /// Performs a topological sort with cycle detection for multi-distro dependency resolution
@@ -824,15 +803,10 @@ mod tests {
 
     #[test]
     fn test_cachyos_cpu_detector() {
-        let level = CachyCpuDetector::detect_level_from_features(&[
-            "sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2",
-        ]);
+        let level = CachyCpuDetector::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2"]);
         assert_eq!(level, CpuArchLevel::X86_64_v3);
 
-        let v4_level = CachyCpuDetector::detect_level_from_features(&[
-            "sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2", "avx512f",
-            "avx512vl", "avx512dq", "avx512bw",
-        ]);
+        let v4_level = CachyCpuDetector::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2", "avx512f", "avx512vl", "avx512dq", "avx512bw"]);
         assert_eq!(v4_level, CpuArchLevel::X86_64_v4);
     }
 
@@ -895,10 +869,7 @@ mod tests {
         fetcher.add_mirror("https://mirror1.sigmaos.org", 12);
         fetcher.add_mirror("https://mirror3.sigmaos.org", 120);
 
-        assert_eq!(
-            fetcher.select_fastest_mirror().unwrap(),
-            "https://mirror1.sigmaos.org"
-        );
+        assert_eq!(fetcher.select_fastest_mirror().unwrap(), "https://mirror1.sigmaos.org");
     }
 
     #[test]
@@ -907,12 +878,7 @@ mod tests {
         resolver.add_dependency("sigma-desktop", "sigma-compositor");
         resolver.add_dependency("sigma-compositor", "glibc-sigma");
 
-        let order = resolver
-            .resolve_installation_order("sigma-desktop")
-            .unwrap();
-        assert_eq!(
-            order,
-            vec!["glibc-sigma", "sigma-compositor", "sigma-desktop"]
-        );
+        let order = resolver.resolve_installation_order("sigma-desktop").unwrap();
+        assert_eq!(order, vec!["glibc-sigma", "sigma-compositor", "sigma-desktop"]);
     }
 }

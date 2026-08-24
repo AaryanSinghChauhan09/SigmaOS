@@ -48,13 +48,7 @@ pub struct CinderBlockVolume {
 }
 
 impl CinderBlockVolume {
-    pub fn new(
-        volume_id: usize,
-        name: &str,
-        size_gb: usize,
-        block_size: usize,
-        bootable: bool,
-    ) -> Self {
+    pub fn new(volume_id: usize, name: &str, size_gb: usize, block_size: usize, bootable: bool) -> Self {
         let total_blocks = (size_gb * 1024 * 1024 * 1024) / block_size.max(512);
         let mut data = Vec::new();
         // Reserve minimal simulated backing buffer
@@ -110,27 +104,17 @@ impl CinderBlockVolume {
             return Err("Block index out of bounds");
         }
         let offset = (block_index * self.block_size) % self.data.len();
-        let bytes_to_copy = buffer
-            .len()
-            .min(self.block_size)
-            .min(self.data.len() - offset);
+        let bytes_to_copy = buffer.len().min(self.block_size).min(self.data.len() - offset);
         buffer[..bytes_to_copy].copy_from_slice(&self.data[offset..offset + bytes_to_copy]);
         Ok(bytes_to_copy)
     }
 
-    pub fn write_block(
-        &mut self,
-        block_index: usize,
-        buffer: &[u8],
-    ) -> Result<usize, &'static str> {
+    pub fn write_block(&mut self, block_index: usize, buffer: &[u8]) -> Result<usize, &'static str> {
         if block_index >= self.total_blocks {
             return Err("Block index out of bounds");
         }
         let offset = (block_index * self.block_size) % self.data.len();
-        let bytes_to_copy = buffer
-            .len()
-            .min(self.block_size)
-            .min(self.data.len() - offset);
+        let bytes_to_copy = buffer.len().min(self.block_size).min(self.data.len() - offset);
         self.data[offset..offset + bytes_to_copy].copy_from_slice(&buffer[..bytes_to_copy]);
         Ok(bytes_to_copy)
     }

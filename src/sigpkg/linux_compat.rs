@@ -1,3 +1,6 @@
+#![no_std]
+#![no_main]
+
 use core::mem;
 /// Universal Linux Package Translation and Compatibility Shim for SigmaOS
 /// Provides binary parsing and dynamic translation for Debian (.deb) and Red Hat (.rpm) packages.

@@ -29,13 +29,13 @@ mod jails;
 #[path = "../src/kernel/classic_os.rs"]
 mod classic_os;
 
-use btrfs::*;
-use classic_os::*;
-use jails::*;
 use pci_scanner::*;
-use securelevels::*;
 use transaction::*;
 use virt::*;
+use btrfs::*;
+use securelevels::*;
+use jails::*;
+use classic_os::*;
 
 #[test]
 fn test_inspection_pcie_ecam_and_bar_decoder() {
@@ -48,10 +48,7 @@ fn test_inspection_pcie_ecam_and_bar_decoder() {
     dev.decode_bar(0, 0xFE00_000C, Some(0x0000_0001), 65536);
     assert_eq!(dev.bars.len(), 1);
     assert_eq!(dev.bars[0].address, 0x0000_0001_FE00_0000);
-    assert_eq!(
-        dev.bars[0].bar_type,
-        BarType::Memory64 { prefetchable: true }
-    );
+    assert_eq!(dev.bars[0].bar_type, BarType::Memory64 { prefetchable: true });
 
     dev.add_capability(0x11, 0x60); // MSI-X
     assert_eq!(dev.capabilities.len(), 1);
@@ -77,9 +74,7 @@ fn test_inspection_package_snapshot_rollback() {
     current_pkgs.push(("curl".to_string(), "8.2.1".to_string()));
 
     // Perform atomic rollback
-    assert!(rollback_engine
-        .rollback_to_snapshot(&mut current_pkgs, snap_id)
-        .is_ok());
+    assert!(rollback_engine.rollback_to_snapshot(&mut current_pkgs, snap_id).is_ok());
     assert_eq!(current_pkgs.len(), 2);
     assert_eq!(current_pkgs[0].0, "glibc");
     assert_eq!(current_pkgs[1].1, "5.2");
@@ -179,16 +174,8 @@ fn test_inspection_classic_os_algorithms() {
 
     // 6. Multiprogrammed Batch Queue Processor
     let mut batch_queue = BatchSystemQueue::new(2);
-    batch_queue.submit_job(BatchJob {
-        job_id: 1,
-        priority: 1,
-        estimated_time_ms: 100,
-    });
-    batch_queue.submit_job(BatchJob {
-        job_id: 2,
-        priority: 2,
-        estimated_time_ms: 200,
-    });
+    batch_queue.submit_job(BatchJob { job_id: 1, priority: 1, estimated_time_ms: 100 });
+    batch_queue.submit_job(BatchJob { job_id: 2, priority: 2, estimated_time_ms: 200 });
     assert_eq!(batch_queue.running_count(), 2);
     assert!(batch_queue.complete_job(1));
 }

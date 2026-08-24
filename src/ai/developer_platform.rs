@@ -2,10 +2,13 @@
 //! Zero-dependency #![no_std] implementation of AI orchestration, ML experiment tracking,
 //! safety policy engine, signed model marketplace, multi-device model scheduling,
 //! privacy prompt redaction, default-deny network policy, and OpenShell sandboxing.
+
+#![no_std]
+
 extern crate alloc;
-use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 // =========================================================================
 // 1. MULTI-DEVICE MODEL SCHEDULING (LocalLlmOrchestrator)
@@ -102,10 +105,10 @@ impl PrivacyRouter {
 
         while i < bytes.len() {
             // Check for 16 contiguous digits first (Credit Card number)
-            if i + 16 <= bytes.len() && bytes[i..i + 16].iter().all(|b| b.is_ascii_digit()) {
+            if i + 16 <= bytes.len() && bytes[i..i+16].iter().all(|b| b.is_ascii_digit()) {
                 sanitized.extend_from_slice(b"[REDACTED_CREDIT_CARD]");
                 i += 16;
-            } else if i + 12 <= bytes.len() && bytes[i..i + 12].iter().all(|b| b.is_ascii_digit()) {
+            } else if i + 12 <= bytes.len() && bytes[i..i+12].iter().all(|b| b.is_ascii_digit()) {
                 // Check for 12 contiguous digits (Aadhaar number)
                 sanitized.extend_from_slice(b"[REDACTED_AADHAAR]");
                 i += 12;
@@ -150,15 +153,7 @@ pub struct OpenShellAgentSandbox;
 impl OpenShellAgentSandbox {
     /// Filters output commands against shell-escaping injection sequences (sudo, chmod, rm -rf).
     pub fn is_command_safe(command: &str) -> bool {
-        let blacklisted = [
-            "sudo",
-            "chmod",
-            "rm -rf",
-            "dd if=/dev/zero",
-            "mkfs",
-            "chown",
-            "> /dev/sd",
-        ];
+        let blacklisted = ["sudo", "chmod", "rm -rf", "dd if=/dev/zero", "mkfs", "chown", "> /dev/sd"];
         for bad in blacklisted {
             if command.contains(bad) {
                 return false;
@@ -304,10 +299,7 @@ impl SignedModelMarketplace {
 
     /// Computes a lightweight checksum over binary bytes and verifies against registered hash.
     pub fn verify_and_load(&mut self, id: &str, model_bytes: &[u8]) -> Result<(), &'static str> {
-        let model = self
-            .models
-            .iter_mut()
-            .find(|m| m.model_id == id)
+        let model = self.models.iter_mut().find(|m| m.model_id == id)
             .ok_or("Model not found in marketplace")?;
 
         let computed_hash = compute_blake3_simulated(model_bytes);

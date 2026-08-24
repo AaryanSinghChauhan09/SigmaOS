@@ -188,22 +188,16 @@ impl ProcFileSystem {
             cgroups: HashMap::new(),
             namespaces: HashMap::new(),
             active_namespace_id: 0,
-            system_uptime: 43200,          // 12 hours
+            system_uptime: 43200, // 12 hours
             total_memory: 16777216 * 1024, // 16GB
-            used_memory: 4194304 * 1024,   // 4GB
+            used_memory: 4194304 * 1024,  // 4GB
             cpu_model: "Sigma Core AI-Native 9".to_string(),
             cpu_cores: 16,
         };
 
         // Create default root cgroups
-        pfs.cgroups.insert(
-            "system.slice".to_string(),
-            CGroup::new("system.slice", 8 * 1024 * 1024 * 1024, 1024),
-        );
-        pfs.cgroups.insert(
-            "user.slice".to_string(),
-            CGroup::new("user.slice", 8 * 1024 * 1024 * 1024, 1024),
-        );
+        pfs.cgroups.insert("system.slice".to_string(), CGroup::new("system.slice", 8 * 1024 * 1024 * 1024, 1024));
+        pfs.cgroups.insert("user.slice".to_string(), CGroup::new("user.slice", 8 * 1024 * 1024 * 1024, 1024));
 
         // Create root PID namespace
         let mut root_ns = PidNamespace::new(0, None);
@@ -212,32 +206,8 @@ impl ProcFileSystem {
         pfs.namespaces.insert(0, root_ns);
 
         // Add standard startup processes
-        pfs.processes.insert(
-            1,
-            LinuxProcessEntry::new(
-                1,
-                0,
-                1,
-                1,
-                "systemd",
-                NiceValue::new(0),
-                "system.slice",
-                "/sbin/init",
-            ),
-        );
-        pfs.processes.insert(
-            2,
-            LinuxProcessEntry::new(
-                2,
-                0,
-                0,
-                0,
-                "kthreadd",
-                NiceValue::new(-20),
-                "system.slice",
-                "[kthreadd]",
-            ),
-        );
+        pfs.processes.insert(1, LinuxProcessEntry::new(1, 0, 1, 1, "systemd", NiceValue::new(0), "system.slice", "/sbin/init"));
+        pfs.processes.insert(2, LinuxProcessEntry::new(2, 0, 0, 0, "kthreadd", NiceValue::new(-20), "system.slice", "[kthreadd]"));
 
         pfs
     }
@@ -253,10 +223,9 @@ impl ProcFileSystem {
     ) -> usize {
         let next_pid = self.processes.keys().copied().max().unwrap_or(0) + 1;
         let pgid = ppid; // Default to parent's pgid
-        let sid = ppid; // Default to parent's session id
+        let sid = ppid;  // Default to parent's session id
 
-        let mut entry =
-            LinuxProcessEntry::new(next_pid, ppid, pgid, sid, name, nice, cgroup, cmdline);
+        let mut entry = LinuxProcessEntry::new(next_pid, ppid, pgid, sid, name, nice, cgroup, cmdline);
 
         // Add to cgroup list of PIDs
         if let Some(cg) = self.cgroups.get_mut(cgroup) {
@@ -274,11 +243,7 @@ impl ProcFileSystem {
 
     /// Fork an existing process
     pub fn fork_process(&mut self, parent_pid: usize) -> Result<usize, String> {
-        let parent = self
-            .processes
-            .get(&parent_pid)
-            .ok_or("Parent process not found")?
-            .clone();
+        let parent = self.processes.get(&parent_pid).ok_or("Parent process not found")?.clone();
         let next_pid = self.processes.keys().copied().max().unwrap_or(0) + 1;
 
         let mut child = parent.clone();
@@ -428,9 +393,7 @@ impl ProcFileSystem {
              SwapCached:                0 kB\n\
              Active:             3145728 kB\n\
              Inactive:           1048576 kB\n",
-            self.total_memory,
-            free_mem,
-            free_mem + 1048576
+            self.total_memory, free_mem, free_mem + 1048576
         )
     }
 
@@ -455,11 +418,7 @@ impl ProcFileSystem {
     }
 
     pub fn generate_uptime(&self) -> String {
-        format!(
-            "{}.25 {}.89\n",
-            self.system_uptime,
-            self.system_uptime * self.cpu_cores as u64
-        )
+        format!("{}.25 {}.89\n", self.system_uptime, self.system_uptime * self.cpu_cores as u64)
     }
 
     pub fn generate_cgroups(&self) -> String {
@@ -471,10 +430,7 @@ impl ProcFileSystem {
     }
 
     pub fn generate_status(&self, pid: usize) -> Result<String, String> {
-        let proc = self
-            .processes
-            .get(&pid)
-            .ok_or_else(|| format!("PID {} not found", pid))?;
+        let proc = self.processes.get(&pid).ok_or_else(|| format!("PID {} not found", pid))?;
         Ok(format!(
             "Name:           {}\n\
              State:          {}\n\
@@ -501,18 +457,12 @@ impl ProcFileSystem {
     }
 
     pub fn generate_cmdline(&self, pid: usize) -> Result<String, String> {
-        let proc = self
-            .processes
-            .get(&pid)
-            .ok_or_else(|| format!("PID {} not found", pid))?;
+        let proc = self.processes.get(&pid).ok_or_else(|| format!("PID {} not found", pid))?;
         Ok(format!("{}\0", proc.cmdline))
     }
 
     pub fn generate_stat(&self, pid: usize) -> Result<String, String> {
-        let proc = self
-            .processes
-            .get(&pid)
-            .ok_or_else(|| format!("PID {} not found", pid))?;
+        let proc = self.processes.get(&pid).ok_or_else(|| format!("PID {} not found", pid))?;
         // Return standard space-separated values mapped to proc stat structure
         Ok(format!(
             "{} ({}) {} {} {} {} 0 0 0 0 0 0 0 {} {} 0 0 {} 0 {} 0 {} 0\n",
@@ -547,7 +497,7 @@ mod tests {
 
         // Verify nice-to-priority mappings
         assert_eq!(high_nice.to_priority(), 1); // lowest priority
-        assert_eq!(low_nice.to_priority(), 5); // highest priority
+        assert_eq!(low_nice.to_priority(), 5);  // highest priority
         assert_eq!(normal_nice.to_priority(), 3); // normal priority
     }
 
@@ -583,13 +533,7 @@ mod tests {
         let mut pfs = ProcFileSystem::new();
 
         // Spawn a dummy process
-        let pid = pfs.spawn_process(
-            "dummy-daemon",
-            1,
-            NiceValue::new(-10),
-            "user.slice",
-            "/usr/bin/dummy-daemon --arg",
-        );
+        let pid = pfs.spawn_process("dummy-daemon", 1, NiceValue::new(-10), "user.slice", "/usr/bin/dummy-daemon --arg");
         assert!(pid > 2);
 
         // Read /proc/meminfo
@@ -628,13 +572,7 @@ mod tests {
 
         // Spawn a parent and child
         let parent_pid = pfs.spawn_process("parent", 1, NiceValue::new(0), "user.slice", "parent");
-        let child_pid = pfs.spawn_process(
-            "child",
-            parent_pid,
-            NiceValue::new(0),
-            "user.slice",
-            "child",
-        );
+        let child_pid = pfs.spawn_process("child", parent_pid, NiceValue::new(0), "user.slice", "child");
 
         // Parent exits -> child should be re-parented to init (PID 1)
         pfs.exit_process(parent_pid, 0).unwrap();
@@ -658,10 +596,7 @@ mod tests {
 
         // Send SigInt -> victim stops
         pfs.send_signal(pid as i32, LinuxSignal::SigInt).unwrap();
-        assert_eq!(
-            pfs.processes.get(&pid).unwrap().state,
-            LinuxProcessState::Stopped
-        );
+        assert_eq!(pfs.processes.get(&pid).unwrap().state, LinuxProcessState::Stopped);
 
         // Send SigKill -> victim is terminated and reaped
         pfs.send_signal(pid as i32, LinuxSignal::SigKill).unwrap();

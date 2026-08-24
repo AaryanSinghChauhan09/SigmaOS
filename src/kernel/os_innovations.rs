@@ -281,26 +281,9 @@ mod tests {
     #[test]
     fn test_haiku_app_server() {
         let mut server = HaikuApplicationServer::new();
-        server.create_window(
-            1,
-            b"Terminal",
-            Rect {
-                x: 0,
-                y: 0,
-                width: 800,
-                height: 600,
-            },
-        );
+        server.create_window(1, b"Terminal", Rect { x: 0, y: 0, width: 800, height: 600 });
         assert!(server.focus_window(1));
-        assert!(server.invalidate_region(
-            1,
-            Rect {
-                x: 10,
-                y: 10,
-                width: 100,
-                height: 100
-            }
-        ));
+        assert!(server.invalidate_region(1, Rect { x: 10, y: 10, width: 100, height: 100 }));
         assert_eq!(server.process_redraws(), 1);
     }
 
@@ -337,11 +320,7 @@ mod tests {
         let cmd = Plan9GpuCommand {
             tag: 1,
             container_id: 42,
-            op: Plan9GpuOp::AllocSurface {
-                width: 1920,
-                height: 1080,
-                bpp: 32,
-            },
+            op: Plan9GpuOp::AllocSurface { width: 1920, height: 1080, bpp: 32 },
         };
         assert!(gpu.handle_9p_gpu_command(cmd));
         let (surfaces, cmds) = gpu.stats();

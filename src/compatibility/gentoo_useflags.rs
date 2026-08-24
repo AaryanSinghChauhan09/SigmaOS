@@ -1,4 +1,7 @@
 //! Gentoo-Inspired USE Flags and Source Compilation System
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::collections::{BTreeMap, BTreeSet};

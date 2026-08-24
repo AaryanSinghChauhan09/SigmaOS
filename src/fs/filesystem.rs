@@ -1,3 +1,6 @@
+#![no_std]
+#![no_main]
+
 /// OOP-based Filesystem Abstraction for SigmaOS
 /// Implements filesystem using OOP principles with traits and structs
 /// No dependency on std::fs

@@ -1,8 +1,9 @@
-use core::mem;
 /// NetBSD & OpenBSD-inspired UVM (Universal Virtual Memory) Subsystem for SigmaOS
 /// Provides machine-independent Anonymous Maps (amap), decoupled Physical Maps (pmap),
 /// and zero-copy Page Loanout mechanisms to prevent memory copying overhead.
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -154,25 +155,13 @@ impl UvmPageLoan {
     }
 }
 
-struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-}
+struct Vec<T> { pub data: *mut T, pub len: usize, pub capacity: usize }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -180,19 +169,11 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -202,18 +183,14 @@ impl<T> Vec<T> {
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
+        if index >= self.len { panic!("index out of bounds"); }
         unsafe { &*self.data.add(index) }
     }
 }
 
 impl<T> core::ops::IndexMut<usize> for Vec<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
+        if index >= self.len { panic!("index out of bounds"); }
         unsafe { &mut *self.data.add(index) }
     }
 }
@@ -276,23 +253,9 @@ mod tests {
         assert_eq!(amap.amap_lookup(1).unwrap(), 0x4000000);
 
         // Verify COW reference decrements correctly
-        assert_eq!(
-            amap.slots[0]
-                .as_ref()
-                .unwrap()
-                .ref_count
-                .load(Ordering::SeqCst),
-            1
-        );
+        assert_eq!(amap.slots[0].as_ref().unwrap().ref_count.load(Ordering::SeqCst), 1);
         amap.amap_cow(0, 0x8000000);
-        assert_eq!(
-            amap.slots[0]
-                .as_ref()
-                .unwrap()
-                .ref_count
-                .load(Ordering::SeqCst),
-            0
-        );
+        assert_eq!(amap.slots[0].as_ref().unwrap().ref_count.load(Ordering::SeqCst), 0);
     }
 
     #[test]

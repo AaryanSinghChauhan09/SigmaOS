@@ -22,12 +22,8 @@ impl KernelPrism {
             active_facets: BTreeMap::new(),
         };
         // Refract memory ops into legacy 2.4 behaviour, network into modern 6.x
-        prism
-            .active_facets
-            .insert(PrismFacet::LegacyMemoryOps, "Linux 2.4 Facet".to_string());
-        prism
-            .active_facets
-            .insert(PrismFacet::ModernNetworkOps, "Linux 6.1 Facet".to_string());
+        prism.active_facets.insert(PrismFacet::LegacyMemoryOps, "Linux 2.4 Facet".to_string());
+        prism.active_facets.insert(PrismFacet::ModernNetworkOps, "Linux 6.1 Facet".to_string());
         prism
     }
 
@@ -60,28 +56,17 @@ impl SyscallLedgerbook {
             entries: BTreeMap::new(),
         };
         // Seed standard ledger entries
-        book.register_fallback(
-            12,
-            "sys_sysfs".to_string(),
-            "Translate sysfs to standard vfs probe".to_string(),
-        );
-        book.register_fallback(
-            110,
-            "sys_getfsstat".to_string(),
-            "Map stats directly to modern vfs queries".to_string(),
-        );
+        book.register_fallback(12, "sys_sysfs".to_string(), "Translate sysfs to standard vfs probe".to_string());
+        book.register_fallback(110, "sys_getfsstat".to_string(), "Map stats directly to modern vfs queries".to_string());
         book
     }
 
     pub fn register_fallback(&mut self, sys_num: u32, sig: String, fallback: String) {
-        self.entries.insert(
+        self.entries.insert(sys_num, LedgerEntry {
             sys_num,
-            LedgerEntry {
-                sys_num,
-                original_signature: sig,
-                semantic_fallback_action: fallback,
-            },
-        );
+            original_signature: sig,
+            semantic_fallback_action: fallback,
+        });
     }
 
     pub fn query_fallback(&self, sys_num: u32) -> Option<&LedgerEntry> {
@@ -96,27 +81,11 @@ mod tests {
     #[test]
     fn test_kernel_prism_refraction() {
         let mut prism = KernelPrism::new();
-        assert_eq!(
-            prism.refract_workload(PrismFacet::LegacyMemoryOps).unwrap(),
-            "Linux 2.4 Facet"
-        );
-        assert_eq!(
-            prism
-                .refract_workload(PrismFacet::ModernNetworkOps)
-                .unwrap(),
-            "Linux 6.1 Facet"
-        );
+        assert_eq!(prism.refract_workload(PrismFacet::LegacyMemoryOps).unwrap(), "Linux 2.4 Facet");
+        assert_eq!(prism.refract_workload(PrismFacet::ModernNetworkOps).unwrap(), "Linux 6.1 Facet");
 
-        prism.set_refraction(
-            PrismFacet::SovereignTaskOps,
-            "Sovereign APIC Scheduler Facet".to_string(),
-        );
-        assert_eq!(
-            prism
-                .refract_workload(PrismFacet::SovereignTaskOps)
-                .unwrap(),
-            "Sovereign APIC Scheduler Facet"
-        );
+        prism.set_refraction(PrismFacet::SovereignTaskOps, "Sovereign APIC Scheduler Facet".to_string());
+        assert_eq!(prism.refract_workload(PrismFacet::SovereignTaskOps).unwrap(), "Sovereign APIC Scheduler Facet");
     }
 
     #[test]
@@ -124,9 +93,6 @@ mod tests {
         let book = SyscallLedgerbook::new();
         let entry = book.query_fallback(12).unwrap();
         assert_eq!(entry.original_signature, "sys_sysfs");
-        assert_eq!(
-            entry.semantic_fallback_action,
-            "Translate sysfs to standard vfs probe"
-        );
+        assert_eq!(entry.semantic_fallback_action, "Translate sysfs to standard vfs probe");
     }
 }

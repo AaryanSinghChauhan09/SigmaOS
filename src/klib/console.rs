@@ -39,8 +39,9 @@ impl SigmaConsole {
 
     pub fn read_line(&self) -> Result<String, IoError> {
         let mut buffer = [0u8; 1024];
-        let bytes_read =
-            unsafe { Self::syscall_read(self.stdin_fd, buffer.as_mut_ptr(), buffer.len()) };
+        let bytes_read = unsafe {
+            Self::syscall_read(self.stdin_fd, buffer.as_mut_ptr(), buffer.len())
+        };
 
         if bytes_read < 0 {
             return Err(IoError::ReadFailed);

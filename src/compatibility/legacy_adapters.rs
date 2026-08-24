@@ -1,6 +1,9 @@
 // SigmaOS Legacy Compatibility Adapters
 // Provides implementations for legacy personality adaptations, syscall translations,
 // and bridge structures as expected by the integration tests.
+
+#![no_std]
+
 use core::cell::Cell;
 
 /// Represents kernel personas supported for legacy environments

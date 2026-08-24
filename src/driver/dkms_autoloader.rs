@@ -77,25 +77,15 @@ impl DkmsEngine {
 
     pub fn seed_default_dkms_modules(&mut self) {
         let mut nvidia = DkmsModule::new("nvidia-driver", "550.54.14", "/usr/src/nvidia-550.54.14");
-        nvidia.pci_matches.push(PciIdMatch {
-            vendor_id: 0x10DE,
-            device_id: 0x1C02,
-        }); // RTX 3060
+        nvidia.pci_matches.push(PciIdMatch { vendor_id: 0x10DE, device_id: 0x1C02 }); // RTX 3060
         self.register_dkms_module(nvidia);
 
-        let mut realtek_wifi =
-            DkmsModule::new("rtl8852ae-driver", "1.15.0", "/usr/src/rtl8852ae-1.15.0");
-        realtek_wifi.pci_matches.push(PciIdMatch {
-            vendor_id: 0x10EC,
-            device_id: 0x8852,
-        }); // RTL8852AE
+        let mut realtek_wifi = DkmsModule::new("rtl8852ae-driver", "1.15.0", "/usr/src/rtl8852ae-1.15.0");
+        realtek_wifi.pci_matches.push(PciIdMatch { vendor_id: 0x10EC, device_id: 0x8852 }); // RTL8852AE
         self.register_dkms_module(realtek_wifi);
 
         let mut usb_serial = DkmsModule::new("ch341-usb-serial", "2.0.0", "/usr/src/ch341-2.0.0");
-        usb_serial.usb_matches.push(UsbIdMatch {
-            vendor_id: 0x1A86,
-            product_id: 0x7523,
-        }); // CH340/CH341
+        usb_serial.usb_matches.push(UsbIdMatch { vendor_id: 0x1A86, product_id: 0x7523 }); // CH340/CH341
         self.register_dkms_module(usb_serial);
     }
 
@@ -110,11 +100,7 @@ impl DkmsEngine {
     }
 
     /// Build and install DKMS module for a target kernel
-    pub fn build_and_install(
-        &mut self,
-        name: &str,
-        kernel_version: &str,
-    ) -> Result<(), &'static str> {
+    pub fn build_and_install(&mut self, name: &str, kernel_version: &str) -> Result<(), &'static str> {
         let module = self.modules.get_mut(name).ok_or("DKMS module not found")?;
         module.status = DkmsModuleStatus::Building;
         module.target_kernel_version = kernel_version.to_string();
@@ -131,10 +117,7 @@ impl DkmsEngine {
 
     /// Linux udev-inspired hardware autoloader for PCI events
     pub fn autoprobe_pci(&mut self, vendor_id: u16, device_id: u16) -> Option<String> {
-        let pci = PciIdMatch {
-            vendor_id,
-            device_id,
-        };
+        let pci = PciIdMatch { vendor_id, device_id };
         if let Some(module_name) = self.pci_lookup_map.get(&pci).cloned() {
             if !self.loaded_modules.contains(&module_name) {
                 if let Some(module) = self.modules.get_mut(&module_name) {
@@ -149,10 +132,7 @@ impl DkmsEngine {
 
     /// Linux udev-inspired hardware autoloader for USB events
     pub fn autoprobe_usb(&mut self, vendor_id: u16, product_id: u16) -> Option<String> {
-        let usb = UsbIdMatch {
-            vendor_id,
-            product_id,
-        };
+        let usb = UsbIdMatch { vendor_id, product_id };
         if let Some(module_name) = self.usb_lookup_map.get(&usb).cloned() {
             if !self.loaded_modules.contains(&module_name) {
                 if let Some(module) = self.modules.get_mut(&module_name) {
@@ -181,9 +161,7 @@ mod tests {
         let mut dkms = DkmsEngine::new();
 
         // Build and install nvidia module for 6.12 kernel
-        assert!(dkms
-            .build_and_install("nvidia-driver", "6.12.0-sigma")
-            .is_ok());
+        assert!(dkms.build_and_install("nvidia-driver", "6.12.0-sigma").is_ok());
 
         // Autoprobe PCI RTX 3060 (0x10DE:0x1C02)
         let loaded_pci = dkms.autoprobe_pci(0x10DE, 0x1C02).unwrap();
@@ -193,8 +171,6 @@ mod tests {
         // Autoprobe USB CH340 Serial Converter (0x1A86:0x7523)
         let loaded_usb = dkms.autoprobe_usb(0x1A86, 0x7523).unwrap();
         assert_eq!(loaded_usb, "ch341-usb-serial");
-        assert!(dkms
-            .loaded_modules
-            .contains(&"ch341-usb-serial".to_string()));
+        assert!(dkms.loaded_modules.contains(&"ch341-usb-serial".to_string()));
     }
 }

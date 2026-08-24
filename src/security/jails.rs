@@ -4,8 +4,8 @@
 
 extern crate alloc;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 /// Administrative capabilities inside a jail
@@ -223,10 +223,7 @@ impl JailManager {
         ips: Vec<String>,
         caps: JailCapabilities,
     ) -> Result<u32, &'static str> {
-        let parent = self
-            .lookup_jail(parent_jid)
-            .ok_or("Parent jail not found")?
-            .clone();
+        let parent = self.lookup_jail(parent_jid).ok_or("Parent jail not found")?.clone();
         let full_path = format!("{}/{}", parent.path_root, relative_path);
 
         let jid = self.jid_allocator.fetch_add(1, Ordering::SeqCst);
@@ -303,16 +300,14 @@ mod tests {
             JailCapabilities::secure_default(),
         );
 
-        let child_jid = manager
-            .spawn_sub_jail(
-                parent_jid,
-                "child_subjail",
-                "child",
-                "child.local",
-                vec!["10.0.0.2".to_string()],
-                JailCapabilities::secure_default(),
-            )
-            .unwrap();
+        let child_jid = manager.spawn_sub_jail(
+            parent_jid,
+            "child_subjail",
+            "child",
+            "child.local",
+            vec!["10.0.0.2".to_string()],
+            JailCapabilities::secure_default(),
+        ).unwrap();
 
         let child = manager.lookup_jail(child_jid).unwrap();
         assert_eq!(child.parent_jid, Some(parent_jid));

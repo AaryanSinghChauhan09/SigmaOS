@@ -51,12 +51,7 @@ impl ProcessControlBlock {
         }
     }
 
-    pub fn transition_to_blocked(
-        &mut self,
-        state: BlockedProcessState,
-        reason: BlockReason,
-        timestamp: u64,
-    ) {
+    pub fn transition_to_blocked(&mut self, state: BlockedProcessState, reason: BlockReason, timestamp: u64) {
         self.state = state;
         self.block_reason = Some(reason);
         self.blocked_at_timestamp = timestamp;
@@ -87,19 +82,12 @@ impl BlockedProcessManager {
         self.blocked_queue.push(pcb);
     }
 
-    pub fn wake_process_by_io(
-        &mut self,
-        device_id: usize,
-        block_num: usize,
-    ) -> Vec<ProcessControlBlock> {
+    pub fn wake_process_by_io(&mut self, device_id: usize, block_num: usize) -> Vec<ProcessControlBlock> {
         let mut woken = Vec::new();
         let mut i = 0;
         while i < self.blocked_queue.len() {
             let is_match = match &self.blocked_queue[i].block_reason {
-                Some(BlockReason::BlockDeviceIo {
-                    device_id: d,
-                    block_num: b,
-                }) => *d == device_id && *b == block_num,
+                Some(BlockReason::BlockDeviceIo { device_id: d, block_num: b }) => *d == device_id && *b == block_num,
                 _ => false,
             };
 
@@ -129,10 +117,7 @@ mod tests {
         let mut pcb = ProcessControlBlock::new(42, 1, "disk-reader");
         pcb.transition_to_blocked(
             BlockedProcessState::WaitingIo,
-            BlockReason::BlockDeviceIo {
-                device_id: 1,
-                block_num: 128,
-            },
+            BlockReason::BlockDeviceIo { device_id: 1, block_num: 128 },
             5000,
         );
 

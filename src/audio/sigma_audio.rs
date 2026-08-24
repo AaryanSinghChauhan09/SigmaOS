@@ -1,5 +1,8 @@
 //! Audio/Media System (PipeWire/Jack2 Inspiration)
 //! Professional audio graph with low-latency processing and device management
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::vec::Vec;

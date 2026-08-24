@@ -36,11 +36,7 @@ impl NDArray {
             strides[i] = current_stride;
             current_stride *= shape[i];
         }
-        NDArray {
-            data,
-            shape,
-            strides,
-        }
+        NDArray { data, shape, strides }
     }
 
     /// Retrieve flat index using strides
@@ -136,11 +132,7 @@ pub struct ImageMat {
 
 impl ImageMat {
     pub fn new(width: usize, height: usize, pixels: Vec<u8>) -> Self {
-        ImageMat {
-            width,
-            height,
-            pixels,
-        }
+        ImageMat { width, height, pixels }
     }
 
     pub fn get_pixel(&self, x: usize, y: usize) -> u8 {
@@ -324,9 +316,9 @@ impl SovereignGrpcChannel {
     /// Mock protobuf Type-Length-Value serialization
     pub fn serialize_tlv(field_id: u8, data: &[u8]) -> Vec<u8> {
         let mut out = Vec::new();
-        out.push(field_id); // Type
-        out.push(data.len() as u8); // Length
-        out.extend_from_slice(data); // Value
+        out.push(field_id);                  // Type
+        out.push(data.len() as u8);          // Length
+        out.extend_from_slice(data);         // Value
         out
     }
 
@@ -340,7 +332,7 @@ impl SovereignGrpcChannel {
         if raw.len() < 2 + len {
             return None;
         }
-        Some((field_id, raw[2..2 + len].to_vec()))
+        Some((field_id, raw[2..2+len].to_vec()))
     }
 
     /// Simulates multiplexed HTTP/2 bidirectional frame writing
@@ -385,13 +377,7 @@ impl SovereignXnuKernel {
     }
 
     pub fn allocate_port(&mut self, id: u32) {
-        self.ports.insert(
-            id,
-            MachPort {
-                id,
-                receive_queue: Vec::new(),
-            },
-        );
+        self.ports.insert(id, MachPort { id, receive_queue: Vec::new() });
     }
 
     /// Mach IPC Ports Message Send
@@ -420,8 +406,7 @@ impl SovereignXnuKernel {
     /// Virtual Memory allocation & mapping simulator (submap layout models)
     pub fn vm_allocate(&mut self, virtual_addr: usize, physical_addr: usize, size: usize) {
         for offset in (0..size).step_by(4096) {
-            self.virtual_memory_map
-                .insert(virtual_addr + offset, physical_addr + offset);
+            self.virtual_memory_map.insert(virtual_addr + offset, physical_addr + offset);
         }
     }
 }
@@ -460,10 +445,7 @@ impl SovereignFreeTypeEngine {
     }
 
     pub fn get_kerning_adjustment(&self, char_a: u32, char_b: u32) -> i32 {
-        self.kerning_table
-            .get(&(char_a, char_b))
-            .cloned()
-            .unwrap_or(0)
+        self.kerning_table.get(&(char_a, char_b)).cloned().unwrap_or(0)
     }
 
     /// Grid-fitting/hinting simulation (forces glyph boundary alignment)
@@ -625,7 +607,11 @@ mod tests {
 
     #[test]
     fn test_opencv_filtering() {
-        let pixels = vec![10, 20, 30, 40, 150, 60, 70, 80, 90];
+        let pixels = vec![
+            10, 20, 30,
+            40, 150, 60,
+            70, 80, 90,
+        ];
         let mat = ImageMat::new(3, 3, pixels);
 
         // Test thresholding
@@ -727,27 +713,9 @@ mod tests {
     #[test]
     fn test_spatial_navigation() {
         let mut nav = SovereignSpatialNavigation::new();
-        let b1 = NavElement {
-            id: "Button1".to_string(),
-            x: 0,
-            y: 0,
-            width: 50,
-            height: 50,
-        };
-        let b2 = NavElement {
-            id: "Button2".to_string(),
-            x: 100,
-            y: 0,
-            width: 50,
-            height: 50,
-        };
-        let b3 = NavElement {
-            id: "Button3".to_string(),
-            x: 0,
-            y: 100,
-            width: 50,
-            height: 50,
-        };
+        let b1 = NavElement { id: "Button1".to_string(), x: 0, y: 0, width: 50, height: 50 };
+        let b2 = NavElement { id: "Button2".to_string(), x: 100, y: 0, width: 50, height: 50 };
+        let b3 = NavElement { id: "Button3".to_string(), x: 0, y: 100, width: 50, height: 50 };
 
         nav.register_element(b1);
         nav.register_element(b2);

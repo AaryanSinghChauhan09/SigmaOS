@@ -8,35 +8,20 @@ use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
-pub struct ContentAddressedStore {
-    pub path: std::path::PathBuf,
-}
+pub struct ContentAddressedStore { pub path: std::path::PathBuf }
 #[cfg(feature = "standalone_test")]
 impl ContentAddressedStore {
-    pub fn new(path: std::path::PathBuf) -> Self {
-        Self { path }
-    }
-    pub fn get(&self, _name: &str) -> Option<Package> {
-        None
-    }
+    pub fn new(path: std::path::PathBuf) -> Self { Self { path } }
+    pub fn get(&self, _name: &str) -> Option<Package> { None }
 }
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
-pub struct Package {
-    pub name: String,
-    pub version: (u64, u64, u64),
-}
+pub struct Package { pub name: String, pub version: (u64, u64, u64) }
 
 #[cfg(feature = "standalone_test")]
 impl Package {
-    pub fn new(
-        name: String,
-        version: (u64, u64, u64),
-        _s1: String,
-        _v: Vec<()>,
-        _s2: String,
-    ) -> Self {
+    pub fn new(name: String, version: (u64, u64, u64), _s1: String, _v: Vec<()>, _s2: String) -> Self {
         Self { name, version }
     }
 }
@@ -45,9 +30,7 @@ impl Package {
 pub struct SatSolver;
 #[cfg(feature = "standalone_test")]
 impl SatSolver {
-    pub fn new() -> Self {
-        Self
-    }
+    pub fn new() -> Self { Self }
     pub fn resolve(&self, _name: &str, _c: &Constraint) -> Result<Vec<Package>, ResolveError> {
         Err(ResolveError::PackageNotFound(_name.to_string()))
     }
@@ -55,15 +38,11 @@ impl SatSolver {
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
-pub enum Constraint {
-    Any,
-}
+pub enum Constraint { Any }
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
-pub enum ResolveError {
-    PackageNotFound(String),
-}
+pub enum ResolveError { PackageNotFound(String) }
 
 /// Transaction for package operations
 pub struct Transaction {
@@ -197,11 +176,7 @@ impl PackageSnapshotRollbackEngine {
         }
     }
 
-    pub fn create_pre_transaction_snapshot(
-        &mut self,
-        description: &str,
-        current_packages: &[(&str, &str)],
-    ) -> u64 {
+    pub fn create_pre_transaction_snapshot(&mut self, description: &str, current_packages: &[(&str, &str)]) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -225,17 +200,11 @@ impl PackageSnapshotRollbackEngine {
         self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id)
     }
 
-    pub fn compute_rollback_diff(
-        &self,
-        current_packages: &[(&str, &str)],
-        target_snapshot_id: u64,
-    ) -> Result<(Vec<(String, String)>, Vec<String>), TransactionError> {
-        let snapshot = self
-            .get_snapshot(target_snapshot_id)
-            .ok_or(TransactionError::RollbackFailed)?;
+    pub fn compute_rollback_diff(&self, current_packages: &[(&str, &str)], target_snapshot_id: u64) -> Result<(Vec<(String, String)>, Vec<String>), TransactionError> {
+        let snapshot = self.get_snapshot(target_snapshot_id).ok_or(TransactionError::RollbackFailed)?;
 
         let mut to_restore = Vec::new(); // Packages to install/revert
-        let mut to_remove = Vec::new(); // Packages installed after snapshot to remove
+        let mut to_remove = Vec::new();  // Packages installed after snapshot to remove
 
         // Find packages in snapshot that are missing or mismatched in current
         for (snap_name, snap_ver) in &snapshot.installed_packages {
@@ -253,11 +222,7 @@ impl PackageSnapshotRollbackEngine {
 
         // Find packages in current that were not in snapshot
         for (cur_name, _) in current_packages {
-            if !snapshot
-                .installed_packages
-                .iter()
-                .any(|(sn, _)| sn == cur_name)
-            {
+            if !snapshot.installed_packages.iter().any(|(sn, _)| sn == cur_name) {
                 to_remove.push(cur_name.to_string());
             }
         }
@@ -265,16 +230,9 @@ impl PackageSnapshotRollbackEngine {
         Ok((to_restore, to_remove))
     }
 
-    pub fn rollback_to_snapshot(
-        &mut self,
-        current_packages: &mut Vec<(String, String)>,
-        target_snapshot_id: u64,
-    ) -> Result<(), TransactionError> {
+    pub fn rollback_to_snapshot(&mut self, current_packages: &mut Vec<(String, String)>, target_snapshot_id: u64) -> Result<(), TransactionError> {
         let (to_restore, to_remove) = self.compute_rollback_diff(
-            &current_packages
-                .iter()
-                .map(|(n, v)| (n.as_str(), v.as_str()))
-                .collect::<Vec<_>>(),
+            &current_packages.iter().map(|(n, v)| (n.as_str(), v.as_str())).collect::<Vec<_>>(),
             target_snapshot_id,
         )?;
 
@@ -331,8 +289,8 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::klib::custom_string::SigmaString;
     use std::path::PathBuf;
+    use crate::klib::custom_string::SigmaString;
 
     #[test]
     fn test_transaction_creation() {
@@ -408,9 +366,7 @@ mod tests {
         current_pkgs.push(("nginx".to_string(), "1.24".to_string()));
 
         // Perform atomic rollback to snapshot #1
-        assert!(rollback_engine
-            .rollback_to_snapshot(&mut current_pkgs, snap_id)
-            .is_ok());
+        assert!(rollback_engine.rollback_to_snapshot(&mut current_pkgs, snap_id).is_ok());
 
         // Verify state is restored to pre-transaction snapshot exactly
         assert_eq!(current_pkgs.len(), 2);

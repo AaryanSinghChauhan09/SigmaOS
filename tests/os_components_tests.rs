@@ -1,6 +1,6 @@
 use segmentation_paging::{
-    AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
-    SegmentDescriptor, SegmentSelector,
+    AddressBindingMode, CpuRing as SegCpuPrivilegeMode,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, AslrEntropyConfig
 };
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
@@ -55,33 +55,22 @@ mod bitmap_pmm;
 #[path = "../src/memory/low_level.rs"]
 mod low_level_memory;
 
-#[path = "../src/access/control.rs"]
-mod access_control;
 #[path = "../src/filesystem/ext4_ntfs_security.rs"]
 mod ext4_ntfs_security;
+#[path = "../src/access/control.rs"]
+mod access_control;
 
-pub enum AclTag {
-    User(u32),
-    Group(u32),
-    Other,
-}
+pub enum AclTag { User(u32), Group(u32), Other }
 
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
 
-pub enum BreachSeverity {
-    Minor,
-    Major,
-    Critical,
-}
-pub enum StatutoryAuthority {
-    Gdpr,
-    Hipaa,
-    ISO27001,
-}
+pub enum BreachSeverity { Minor, Major, Critical }
+pub enum StatutoryAuthority { Gdpr, Hipaa, ISO27001 }
 
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
+
 
 #[path = "../src/system/user.rs"]
 mod system_user;
@@ -92,80 +81,37 @@ mod sigmatools;
 #[path = "../src/memory/segmentation_paging.rs"]
 mod segmentation_paging;
 
-pub enum CpuPrivilegeMode {
-    KernelRing0,
-    UserRing3,
-}
+pub enum CpuPrivilegeMode { KernelRing0, UserRing3 }
 pub struct GlobalDescriptorTable;
 impl GlobalDescriptorTable {
-    pub fn new() -> Self {
-        Self
+    pub fn new() -> Self { Self }
+    pub fn insert_descriptor(&mut self, _desc: segmentation_paging::SegmentDescriptor) -> SegmentSelector {
+        SegmentSelector { index: 1, rpl: segmentation_paging::CpuRing::Ring0Kernel, is_ldt: false }
     }
-    pub fn insert_descriptor(
-        &mut self,
-        _desc: segmentation_paging::SegmentDescriptor,
-    ) -> SegmentSelector {
-        SegmentSelector {
-            index: 1,
-            rpl: segmentation_paging::CpuRing::Ring0Kernel,
-            is_ldt: false,
-        }
-    }
-    pub fn translate_address(
-        &self,
-        seg_addr: SegmentedAddress,
-        _mode: CpuPrivilegeMode,
-    ) -> Result<u64, &'static str> {
+    pub fn translate_address(&self, seg_addr: SegmentedAddress, _mode: CpuPrivilegeMode) -> Result<u64, &'static str> {
         Ok(seg_addr.offset)
     }
 }
 pub struct MultiLevelPagingEngine;
 impl MultiLevelPagingEngine {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn map_page(
-        &mut self,
-        _v: u64,
-        _p: u64,
-        _r: bool,
-        _w: bool,
-        _x: bool,
-    ) -> Result<(), &'static str> {
-        Ok(())
-    }
-    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
-        Ok(PageTableEntry)
-    }
+    pub fn new() -> Self { Self }
+    pub fn map_page(&mut self, _v: u64, _p: u64, _r: bool, _w: bool, _x: bool) -> Result<(), &'static str> { Ok(()) }
+    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> { Ok(PageTableEntry) }
 }
 pub struct PageTableEntry;
-impl PageTableEntry {
-    pub fn get_physical_address(&self) -> u64 {
-        0x0000000100000000
-    }
-}
-pub enum ProtectionLevel {
-    Normal,
-    High,
-}
-pub enum ProtectionViolationType {
-    ReadViolation,
-    WriteViolation,
-}
-pub enum SegmentType {
-    Code,
-    Data,
-}
-pub struct SegmentedAddress {
-    pub selector: SegmentSelector,
-    pub offset: u64,
-}
+impl PageTableEntry { pub fn get_physical_address(&self) -> u64 { 0x0000000100000000 } }
+pub enum ProtectionLevel { Normal, High }
+pub enum ProtectionViolationType { ReadViolation, WriteViolation }
+pub enum SegmentType { Code, Data }
+pub struct SegmentedAddress { pub selector: SegmentSelector, pub offset: u64 }
+
 
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
 
 pub type ProcessActivityManager = ActivityManager;
 pub struct ResourceUsageMetrics;
+
 
 #[path = "../src/filesystem/sigma_fs.rs"]
 mod sigma_fs_extended;
@@ -177,55 +123,53 @@ mod epoll;
 mod elf_relocation;
 
 use community_toolkit::{
-    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
-    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
+    CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
+    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
 };
 use statutory_compliance::{
-    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
-    StatutoryGovernanceLayer, StatutoryGovernanceRule,
+    DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
+    StatutoryGovernanceRule, StatutoryFramework, ComplianceRuleStatus,
 };
 use system_user::UserManager as TestUserManager;
 
-use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
-use bitmap_pmm::{
-    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
-    SyscallTableRouter,
+use ext4_ntfs_security::{
+    NtfsAce as Nfs4Ace, AceType as Nfs4AceType,
 };
-use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
+use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
+use bitmap_pmm::{
+    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter,
+};
 use low_level_memory::{
-    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
-    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+    CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine,
+    SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr,
 };
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
 };
 
-use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-};
-use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
-use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
-use fedora_compat::DnfPackageResolver;
-use geom::{BioRequest, GeomProvider, GeomTopology};
 use pipes::Pipe;
-use sigmatools::*;
 use unveil::{UnveilManager, UnveilPermission};
-use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
+use geom::{GeomProvider, GeomTopology, BioRequest};
+use audio_editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
+use video_editor::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
+use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
+use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
+use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
+use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
+use fedora_compat::DnfPackageResolver;
+use sigmatools::*;
 
-use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
+use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
 use process_activity_manager::{
-    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+    ActivityState, ActivityManager, RegisterSnapshot as ProcRegisterSnapshot,
 };
 
 use access_control::{
-    AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
-    MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
+    PosixAcl, AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, MacSecurityLabel, SensitivityLevel, ZeroTrustAccessGate, FilterPolicy
 };
 #[test]
 fn test_segmentation_paging_and_aslr() {
@@ -235,19 +179,11 @@ fn test_segmentation_paging_and_aslr() {
     let selector = SegmentSelector::new(1, false, SegCpuPrivilegeMode::Ring0Kernel);
     assert_eq!(selector.index, 1);
 
-    let engine = segmentation_paging::SegmentationPagingEngine::new(
-        segmentation_paging::SpaceProtectionFlags::strict_hardening(),
-    );
-    let linear = engine
-        .translate_logical_to_linear(selector, 0x1000, SegCpuPrivilegeMode::Ring0Kernel)
-        .unwrap();
+    let engine = segmentation_paging::SegmentationPagingEngine::new(segmentation_paging::SpaceProtectionFlags::strict_hardening());
+    let linear = engine.translate_logical_to_linear(selector, 0x1000, SegCpuPrivilegeMode::Ring0Kernel).unwrap();
     assert_eq!(linear, 0x1000);
 
-    let aslr = RandomizedAddressSpace::compute_aslr_layout(
-        0x100000000,
-        AslrEntropyConfig::linux_default(),
-        0x12345678,
-    );
+    let aslr = RandomizedAddressSpace::compute_aslr_layout(0x100000000, AslrEntropyConfig::linux_default(), 0x12345678);
     assert!(aslr.text_base >= 0x100000000);
 }
 
@@ -255,22 +191,16 @@ fn test_segmentation_paging_and_aslr() {
 fn test_regex_unveil_and_glob_matching() {
     let mut unveil_mgr = UnveilManager::new();
     unveil_mgr.unveil("/var/log/*.log", "r").unwrap();
-    assert!(unveil_mgr
-        .validate_path("/var/log/syslog.log", UnveilPermission::Read)
-        .is_ok());
-    assert!(unveil_mgr
-        .validate_path("/var/log/syslog.txt", UnveilPermission::Read)
-        .is_err());
+    assert!(unveil_mgr.validate_path("/var/log/syslog.log", UnveilPermission::Read).is_ok());
+    assert!(unveil_mgr.validate_path("/var/log/syslog.txt", UnveilPermission::Read).is_err());
 }
 
 #[test]
 fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
     let mut pfs = PseudoFilesystemNamespace::new("root_master", PfsType::Master);
-    pfs.file_map
-        .insert("/etc/hostname".to_string(), "blake3-hash1".to_string());
+    pfs.file_map.insert("/etc/hostname".to_string(), "blake3-hash1".to_string());
 
-    let snap =
-        PseudoFilesystemNamespace::snapshot("root_snap_1", "root_master", pfs.file_map.clone());
+    let snap = PseudoFilesystemNamespace::snapshot("root_snap_1", "root_master", pfs.file_map.clone());
     assert!(snap.is_read_only);
     assert_eq!(snap.parent_snapshot_id.unwrap(), "root_master");
 
@@ -315,10 +245,7 @@ fn test_process_activity_manager_and_registers() {
     pam.capture_register_snapshot(500, ctx).unwrap();
 
     let loaded_proc = pam.get_process_activity(500).unwrap();
-    assert_eq!(
-        loaded_proc.register_snapshot.unwrap().rip,
-        0x00007FFF00002000
-    );
+    assert_eq!(loaded_proc.register_snapshot.unwrap().rip, 0x00007FFF00002000);
 }
 
 #[test]
@@ -342,22 +269,12 @@ fn test_unveil_sandboxing_and_landlock() {
     mgr.unveil("/usr/bin", "rx").unwrap();
     mgr.unveil_at("/etc", "nginx", "r").unwrap();
 
-    assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Read)
-        .is_ok());
-    assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Execute)
-        .is_ok());
-    assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Write)
-        .is_err());
+    assert!(mgr.validate_path("/usr/bin/cargo", UnveilPermission::Read).is_ok());
+    assert!(mgr.validate_path("/usr/bin/cargo", UnveilPermission::Execute).is_ok());
+    assert!(mgr.validate_path("/usr/bin/cargo", UnveilPermission::Write).is_err());
 
-    assert!(mgr
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Read)
-        .is_ok());
-    assert!(mgr
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Write)
-        .is_err());
+    assert!(mgr.validate_path("/etc/nginx/nginx.conf", UnveilPermission::Read).is_ok());
+    assert!(mgr.validate_path("/etc/nginx/nginx.conf", UnveilPermission::Write).is_err());
 }
 
 #[test]
@@ -366,12 +283,8 @@ fn test_geom_storage_topology_and_geli() {
     let disk = GeomProvider::new("ada0", 8192, 512);
     geom.register_provider(disk);
 
-    assert!(geom
-        .create_partition("ada0", "ada0p1", 0, 4096, "freebsd-ufs")
-        .is_ok());
-    assert!(geom
-        .create_eli("ada0p1", "ada0p1.eli", "sovereign_pass")
-        .is_ok());
+    assert!(geom.create_partition("ada0", "ada0p1", 0, 4096, "freebsd-ufs").is_ok());
+    assert!(geom.create_eli("ada0p1", "ada0p1.eli", "sovereign_pass").is_ok());
 
     let mut write_bio = BioRequest::new_write(0, b"SOVEREIGN_STORAGE_BLOCK".to_vec());
     geom.dispatch_bio("ada0p1.eli", &mut write_bio);
@@ -404,13 +317,7 @@ fn test_audio_dsp_mixing_and_effects() {
     let mut dsp_buf: [f32; 3] = [0.02, 0.80, -0.01];
     let noise_suppress = SpectralNoiseSuppressionEffect::new(0.05, 12.0);
     noise_suppress.apply(&mut dsp_buf);
-    assert!(
-        if dsp_buf[0] < 0.0 {
-            -dsp_buf[0]
-        } else {
-            dsp_buf[0]
-        } < 0.01
-    );
+    assert!(if dsp_buf[0] < 0.0 { -dsp_buf[0] } else { dsp_buf[0] } < 0.01);
     assert!(dsp_buf[1] > 0.70);
 }
 
@@ -459,23 +366,12 @@ fn test_chimera_linux_parity() {
 #[test]
 fn test_debian_compat_system() {
     let mut alts = DebianAlternativesSystem::new("editor".to_string());
-    alts.register_alternative(
-        "/usr/bin/editor".to_string(),
-        "/usr/bin/vim".to_string(),
-        50,
-    );
-    alts.register_alternative(
-        "/usr/bin/editor".to_string(),
-        "/usr/bin/nano".to_string(),
-        100,
-    );
+    alts.register_alternative("/usr/bin/editor".to_string(), "/usr/bin/vim".to_string(), 50);
+    alts.register_alternative("/usr/bin/editor".to_string(), "/usr/bin/nano".to_string(), 100);
 
     assert_eq!(alts.get_active_target().unwrap(), "/usr/bin/nano");
 
-    let mut repo = AptRepositorySync::new(
-        DebianChannel::Stable,
-        "http://deb.debian.org/debian".to_string(),
-    );
+    let mut repo = AptRepositorySync::new(DebianChannel::Stable, "http://deb.debian.org/debian".to_string());
     repo.verify_release_keyring(&[0x99, 0x01]);
     assert!(repo.fetch_package_index().is_ok());
 }
@@ -535,8 +431,7 @@ fn test_fedora_rpm_and_selinux() {
 
     let selinux = fedora_compat::SeLinuxEngine::new(true);
     let src = fedora_compat::SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
-    let tgt =
-        fedora_compat::SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
+    let tgt = fedora_compat::SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
     assert!(selinux.authorize_access(&src, &tgt, "file", "read").is_ok());
 }
 
@@ -566,9 +461,7 @@ fn test_elf_dynamic_relocation_resolution() {
     assert_eq!(resolved_rel, 0x400100);
 
     let glob_entry = ElfRelaEntry::new(0x28, R_X86_64_GLOB_DAT, 1, 0x10);
-    let resolved_glob = relocator
-        .resolve_relocation(&glob_entry, Some(b"sys_yield"))
-        .unwrap();
+    let resolved_glob = relocator.resolve_relocation(&glob_entry, Some(b"sys_yield")).unwrap();
     assert_eq!(resolved_glob, 0x401060);
 }
 
@@ -609,8 +502,8 @@ fn test_posix_and_nfsv4_acls() {
     let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
     let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
     gate.mac_filter.add_mac(allowed_mac);
-    gate.matrix
-        .grant_right(1, 10, access_control::acm_rights::READ);
+    gate.matrix.grant_right(1, 10, access_control::acm_rights::READ);
+
 }
 
 #[test]
@@ -618,9 +511,7 @@ fn test_alpc_local_procedure_calls() {
     let mut mgr = AlpcManager::new();
     mgr.register_facility_server(AlpcFacility::SecurityAuth, "auth_server");
 
-    let server = mgr
-        .get_facility_server_mut(AlpcFacility::SecurityAuth)
-        .unwrap();
+    let server = mgr.get_facility_server_mut(AlpcFacility::SecurityAuth).unwrap();
     server.register_procedure(301, |req| {
         let payload = req.get_payload();
         if payload == b"VERIFY_TOKEN_XYZ" {
@@ -641,10 +532,7 @@ fn test_alpc_local_procedure_calls() {
 
     let reply = mgr.request_reply(AlpcFacility::SecurityAuth, req).unwrap();
     assert_eq!(reply.get_payload(), b"TOKEN_VALIDATED_OK");
-    assert_eq!(
-        (reply.header.flags & alpc_flags::REPLY_MESSAGE),
-        alpc_flags::REPLY_MESSAGE
-    );
+    assert_eq!((reply.header.flags & alpc_flags::REPLY_MESSAGE), alpc_flags::REPLY_MESSAGE);
 }
 
 #[test]
@@ -660,12 +548,11 @@ fn test_task_states_and_workload_classifications() {
             .with_workload(TaskWorkloadType::IoBound),
     );
     let task_rt = Box::new(
-        Task::new(3, Priority::Realtime, 5, TaskCapability::full()).with_workload(
-            TaskWorkloadType::RealTimePeriodic {
+        Task::new(3, Priority::Realtime, 5, TaskCapability::full())
+            .with_workload(TaskWorkloadType::RealTimePeriodic {
                 period_ms: 10,
                 exec_time_ms: 2,
-            },
-        ),
+            }),
     );
 
     sched.add_task(task_cpu).unwrap();
@@ -701,15 +588,9 @@ fn test_file_attributes_and_cpu_ring_privileges() {
 fn test_two_tier_memory_and_fast_syscalls() {
     let mut allocator = TwoTierMemoryAllocator::new(0x1000_0000, 64);
 
-    let pcb_obj = allocator
-        .alloc_slab_object(SlabObjectType::ProcessControlBlock)
-        .unwrap();
-    let fd_obj = allocator
-        .alloc_slab_object(SlabObjectType::FileDescriptor)
-        .unwrap();
-    let inode_obj = allocator
-        .alloc_slab_object(SlabObjectType::InodeStruct)
-        .unwrap();
+    let pcb_obj = allocator.alloc_slab_object(SlabObjectType::ProcessControlBlock).unwrap();
+    let fd_obj = allocator.alloc_slab_object(SlabObjectType::FileDescriptor).unwrap();
+    let inode_obj = allocator.alloc_slab_object(SlabObjectType::InodeStruct).unwrap();
 
     assert!(pcb_obj >= 0x1000_0000);
     assert!(fd_obj >= 0x1000_0000);
@@ -764,24 +645,14 @@ fn test_shadow_passwords_usermod_and_sudo_policy() {
     manager.set_password("charlie", "P@ssword2026").unwrap();
     assert!(manager.verify_password("charlie", "P@ssword2026"));
 
-    manager
-        .usermod(
-            "charlie",
-            Some("/bin/bash"),
-            Some("/home/charlie"),
-            None,
-            None,
-        )
-        .unwrap();
+    manager.usermod("charlie", Some("/bin/bash"), Some("/home/charlie"), None, None).unwrap();
     assert_eq!(manager.get_user("charlie").unwrap().shell, "/bin/bash");
 
     manager.add_user_to_group("charlie", "wheel").unwrap();
     let groups = manager.get_user_groups("charlie");
     assert!(groups.contains(&"wheel".to_string()));
 
-    let sudo_res = manager
-        .sudo_engine
-        .evaluate_sudo_privilege("charlie", &groups, "/usr/bin/apt");
+    let sudo_res = manager.sudo_engine.evaluate_sudo_privilege("charlie", &groups, "/usr/bin/apt");
     assert!(sudo_res.is_ok());
 }
 
@@ -803,10 +674,7 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
 
     let mut rollback = DisputeAuditRollbackEngine::new();
     rollback.create_audit_checkpoint(100, "hash:state100");
-    assert_eq!(
-        rollback.rollback_dispute_checkpoint(100).unwrap(),
-        "hash:state100"
-    );
+    assert_eq!(rollback.rollback_dispute_checkpoint(100).unwrap(), "hash:state100");
 
     let handbook = CommunityHandbookCatalog::new();
     assert!(!handbook.articles.is_empty());
@@ -821,9 +689,7 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
 #[test]
 fn test_freebsd_jail_manager_inspection() {
     let mut mgr = bsd::FreeBsdJailManager::new();
-    let jid = mgr
-        .create_jail("web1.jail.local", "192.168.1.100", "/jails/web1")
-        .unwrap();
+    let jid = mgr.create_jail("web1.jail.local", "192.168.1.100", "/jails/web1").unwrap();
     assert_eq!(jid, 1);
     assert!(mgr.check_network_allowed(jid, "192.168.1.100"));
     assert!(mgr.stop_jail(jid).is_ok());
@@ -856,19 +722,12 @@ fn test_netbsd_rump_router_inspection() {
 #[test]
 fn test_sovereign_landlock_and_runit_inspection() {
     let mut sandbox = distro_inspirations::SovereignLandlockLsm::new();
-    assert!(sandbox
-        .add_rule("/usr/share", distro_inspirations::LandlockAccess::ReadOnly)
-        .is_ok());
+    assert!(sandbox.add_rule("/usr/share", distro_inspirations::LandlockAccess::ReadOnly).is_ok());
 
-    let mut runit = distro_inspirations::SovereignRunitSupervisor::new(
-        distro_inspirations::RunitRunlevel::Default,
-    );
+    let mut runit = distro_inspirations::SovereignRunitSupervisor::new(distro_inspirations::RunitRunlevel::Default);
     runit.register_service("nginx", distro_inspirations::RunitRunlevel::Default, &[], 3);
     assert_eq!(runit.tick_supervision(), 1);
-    assert_eq!(
-        runit.get_service_status("nginx").unwrap(),
-        distro_inspirations::RunitServiceStatus::Running
-    );
+    assert_eq!(runit.get_service_status("nginx").unwrap(), distro_inspirations::RunitServiceStatus::Running);
 }
 
 #[test]
@@ -878,14 +737,12 @@ fn test_sovereign_ostree_and_io_uring_inspection() {
     assert_eq!(idx, 0);
 
     let mut io_ring = distro_inspirations::SovereignIoUring::new(64);
-    assert!(io_ring
-        .submit_entry(distro_inspirations::SubmissionQueueEntry {
-            opcode: distro_inspirations::IoUringOpcode::Read,
-            fd: 1,
-            offset: 0,
-            user_data: 100,
-            data: vec![0u8; 512],
-        })
-        .is_ok());
+    assert!(io_ring.submit_entry(distro_inspirations::SubmissionQueueEntry {
+        opcode: distro_inspirations::IoUringOpcode::Read,
+        fd: 1,
+        offset: 0,
+        user_data: 100,
+        data: vec![0u8; 512],
+    }).is_ok());
     assert_eq!(io_ring.submit_and_wait(), 1);
 }

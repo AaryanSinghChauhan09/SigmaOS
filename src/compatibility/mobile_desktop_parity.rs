@@ -3,10 +3,10 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::format;
+use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::vec::Vec;
+use alloc::format;
 
 // =========================================================================
 // 1. ANDROID AOSP BINDER IPC EMULATOR
@@ -39,8 +39,7 @@ impl AospBinderIpc {
     }
 
     pub fn register_endpoint(&mut self, handle: u32, descriptor: &str) {
-        self.registered_endpoints
-            .insert(handle, descriptor.to_string());
+        self.registered_endpoints.insert(handle, descriptor.to_string());
     }
 
     pub fn send_transaction(
@@ -65,9 +64,7 @@ impl AospBinderIpc {
         Ok(())
     }
 
-    pub fn dispatch_next_transaction(
-        &mut self,
-    ) -> Option<(u32, BinderParcel, BinderTransactionType)> {
+    pub fn dispatch_next_transaction(&mut self) -> Option<(u32, BinderParcel, BinderTransactionType)> {
         if self.transaction_queue.is_empty() {
             None
         } else {
@@ -152,10 +149,7 @@ impl MacosLaunchdDaemon {
         if let Some(service) = self.services.get_mut(&label) {
             if service.state == LaunchdServiceState::Stopped {
                 service.state = LaunchdServiceState::Running;
-                return Ok(format!(
-                    "launchd: service '{}' socket-activated successfully",
-                    label
-                ));
+                return Ok(format!("launchd: service '{}' socket-activated successfully", label));
             }
         }
         Err("Service already running or failed")
@@ -204,16 +198,19 @@ impl SecureEnclaveKeyStore {
         }
     }
 
-    pub fn register_keychain_item(&mut self, account: &str, secret: &[u8], group: &str) {
-        self.keychain_records
-            .insert(account.to_string(), secret.to_vec());
+    pub fn register_keychain_item(
+        &mut self,
+        account: &str,
+        secret: &[u8],
+        group: &str,
+    ) {
+        self.keychain_records.insert(account.to_string(), secret.to_vec());
         if let Some(list) = self.access_groups.get_mut(&group.to_string()) {
             if !list.contains(&account.to_string()) {
                 list.push(account.to_string());
             }
         } else {
-            self.access_groups
-                .insert(group.to_string(), vec![account.to_string()]);
+            self.access_groups.insert(group.to_string(), vec![account.to_string()]);
         }
     }
 
@@ -243,9 +240,7 @@ impl SecureEnclaveKeyStore {
         // Enforce Biometric Session validation
         if let Some(ref active_token) = self.active_biometric_session_token {
             if active_token != biometric_token {
-                return Err(
-                    "SecureEnclave Access Denied: Biometric Session mismatch / invalid token",
-                );
+                return Err("SecureEnclave Access Denied: Biometric Session mismatch / invalid token");
             }
         } else {
             return Err("SecureEnclave Access Denied: Biometric verification required");
@@ -279,24 +274,12 @@ mod tests {
 
         // Send Transaction to registered handle
         assert!(binder
-            .send_transaction(
-                101,
-                1,
-                b"capture_frame",
-                "android.hardware.camera",
-                BinderTransactionType::TwoWay
-            )
+            .send_transaction(101, 1, b"capture_frame", "android.hardware.camera", BinderTransactionType::TwoWay)
             .is_ok());
 
         // Send Transaction to invalid handle
         assert!(binder
-            .send_transaction(
-                999,
-                1,
-                b"capture_frame",
-                "android.hardware.camera",
-                BinderTransactionType::TwoWay
-            )
+            .send_transaction(999, 1, b"capture_frame", "android.hardware.camera", BinderTransactionType::TwoWay)
             .is_err());
 
         // Dispatch next transaction
@@ -312,93 +295,44 @@ mod tests {
     #[test]
     fn test_macos_launchd_daemon_supervision() {
         let mut launchd = MacosLaunchdDaemon::new();
-        assert!(launchd
-            .register_service_from_plist("com.apple.WindowServer", Some(8080), true)
-            .is_ok());
-        assert!(launchd
-            .register_service_from_plist("com.apple.WindowServer", Some(8080), true)
-            .is_err());
+        assert!(launchd.register_service_from_plist("com.apple.WindowServer", Some(8080), true).is_ok());
+        assert!(launchd.register_service_from_plist("com.apple.WindowServer", Some(8080), true).is_err());
 
         // Socket activation trigger
         let act_msg = launchd.trigger_socket_activation(8080).unwrap();
         assert!(act_msg.contains("WindowServer"));
-        assert_eq!(
-            launchd
-                .services
-                .get("com.apple.WindowServer")
-                .unwrap()
-                .state,
-            LaunchdServiceState::Running
-        );
+        assert_eq!(launchd.services.get("com.apple.WindowServer").unwrap().state, LaunchdServiceState::Running);
 
         // Crash and KeepAlive restart loop
-        let crash_msg = launchd
-            .handle_service_crash("com.apple.WindowServer")
-            .unwrap();
+        let crash_msg = launchd.handle_service_crash("com.apple.WindowServer").unwrap();
         assert!(crash_msg.contains("auto-restarted"));
-        assert_eq!(
-            launchd
-                .services
-                .get("com.apple.WindowServer")
-                .unwrap()
-                .crash_restarts,
-            1
-        );
-        assert_eq!(
-            launchd
-                .services
-                .get("com.apple.WindowServer")
-                .unwrap()
-                .state,
-            LaunchdServiceState::Running
-        );
+        assert_eq!(launchd.services.get("com.apple.WindowServer").unwrap().crash_restarts, 1);
+        assert_eq!(launchd.services.get("com.apple.WindowServer").unwrap().state, LaunchdServiceState::Running);
     }
 
     #[test]
     fn test_secure_enclave_biometrics_and_access_groups() {
         let mut enclave = SecureEnclaveKeyStore::new();
-        enclave.register_keychain_item(
-            "user_token_abc",
-            b"top-secret-password-123",
-            "group.com.apple.mobilemail",
-        );
+        enclave.register_keychain_item("user_token_abc", b"top-secret-password-123", "group.com.apple.mobilemail");
 
         // Attempt access without biometrics (fails)
-        let fail_bio = enclave.access_keychain_secret(
-            "user_token_abc",
-            "group.com.apple.mobilemail",
-            "invalid_token",
-        );
+        let fail_bio = enclave.access_keychain_secret("user_token_abc", "group.com.apple.mobilemail", "invalid_token");
         assert!(fail_bio.is_err());
 
         // Raise biometric verification token
         enclave.raise_biometric_token("bio-session-789");
 
         // Attempt access with mismatched access group (fails)
-        let fail_group = enclave.access_keychain_secret(
-            "user_token_abc",
-            "group.com.apple.safari",
-            "bio-session-789",
-        );
+        let fail_group = enclave.access_keychain_secret("user_token_abc", "group.com.apple.safari", "bio-session-789");
         assert!(fail_group.is_err());
 
         // Correct credentials and biometrics (succeeds)
-        let secret = enclave
-            .access_keychain_secret(
-                "user_token_abc",
-                "group.com.apple.mobilemail",
-                "bio-session-789",
-            )
-            .unwrap();
+        let secret = enclave.access_keychain_secret("user_token_abc", "group.com.apple.mobilemail", "bio-session-789").unwrap();
         assert_eq!(secret, b"top-secret-password-123");
 
         // Invalidate biometric session
         enclave.invalidate_biometric_token();
-        let fail_expired = enclave.access_keychain_secret(
-            "user_token_abc",
-            "group.com.apple.mobilemail",
-            "bio-session-789",
-        );
+        let fail_expired = enclave.access_keychain_secret("user_token_abc", "group.com.apple.mobilemail", "bio-session-789");
         assert!(fail_expired.is_err());
     }
 }

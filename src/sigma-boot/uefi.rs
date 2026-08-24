@@ -2,6 +2,10 @@
 //! Native UEFI PE32+ bootloader implementation in Rust
 //! Supports Secure Boot with PQC/Dilithium-5 certificates
 //! Multi-arch: x86_64, ARM64, RISC-V
+
+#![no_std]
+#![no_main]
+
 use core::panic::PanicInfo;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

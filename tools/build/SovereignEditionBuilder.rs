@@ -8,7 +8,7 @@
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
-type SigmaU8 = u8;
+type SigmaU8  = u8;
 type SigmaU16 = u16;
 type SigmaU32 = u32;
 type SigmaU64 = u64;
@@ -110,13 +110,7 @@ pub struct Edition {
 }
 
 impl Edition {
-    pub fn new(
-        id: u32,
-        name_str: &[u8],
-        make_str: &[u8],
-        image_size_mb: u64,
-        target_cpu_bits: u32,
-    ) -> Self {
+    pub fn new(id: u32, name_str: &[u8], make_str: &[u8], image_size_mb: u64, target_cpu_bits: u32) -> Self {
         let mut name = [0u8; 48];
         let name_len = name_str.len().min(47);
         for i in 0..name_len {
@@ -169,13 +163,7 @@ impl EditionTarget {
     }
 
     /// Add a brand new Edition template to the build engine
-    pub fn addEdition(
-        &mut self,
-        name_str: &[u8],
-        make_str: &[u8],
-        image_size_mb: u64,
-        cpu_bits: u32,
-    ) -> Result<u32, &'static str> {
+    pub fn addEdition(&mut self, name_str: &[u8], make_str: &[u8], image_size_mb: u64, cpu_bits: u32) -> Result<u32, &'static str> {
         if !self.initialized {
             self.init();
         }
@@ -187,12 +175,7 @@ impl EditionTarget {
     }
 
     /// Add a package dependency to a specific Edition
-    pub fn addPackage(
-        &mut self,
-        edition_id: u32,
-        package_name: &[u8],
-        required: bool,
-    ) -> Result<(), &'static str> {
+    pub fn addPackage(&mut self, edition_id: u32, package_name: &[u8], required: bool) -> Result<(), &'static str> {
         let package = EditionPackage::new(package_name, required);
         self.packages.push((edition_id, package))?;
 
@@ -287,7 +270,8 @@ pub unsafe extern "C" fn setMinimalGUI() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn printStatus() {}
+pub unsafe extern "C" fn printStatus() {
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn edition_init() {
@@ -300,9 +284,11 @@ pub unsafe extern "C" fn edition_build() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn edition_status() {}
+pub unsafe extern "C" fn edition_status() {
+}
 
-fn main() {}
+fn main() {
+}
 
 // ─── Module: Static Unit Tests ──────────────────────────────────────────────
 
@@ -332,19 +318,13 @@ mod tests {
         builder.init();
 
         // Register Server edition
-        let ed_id = builder
-            .addEdition(b"SovereignServer", b"make_server", 512, 64)
-            .unwrap();
+        let ed_id = builder.addEdition(b"SovereignServer", b"make_server", 512, 64).unwrap();
         assert_eq!(ed_id, 1);
 
         // Add mandatory packages
         builder.addPackage(ed_id, b"kernel-core", true).unwrap();
-        builder
-            .addPackage(ed_id, b"network-wireguard", true)
-            .unwrap();
-        builder
-            .addPackage(ed_id, b"privacy-nemoclaw", false)
-            .unwrap();
+        builder.addPackage(ed_id, b"network-wireguard", true).unwrap();
+        builder.addPackage(ed_id, b"privacy-nemoclaw", false).unwrap();
 
         // Enforce settings
         builder.setTorDefault(ed_id, true);

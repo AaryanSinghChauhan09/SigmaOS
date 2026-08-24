@@ -43,7 +43,9 @@ impl SigmaEnv {
             return None;
         }
 
-        unsafe { Self::search_env_block(envp, key) }
+        unsafe {
+            Self::search_env_block(envp, key)
+        }
     }
 
     /// Set an environment variable
@@ -51,7 +53,9 @@ impl SigmaEnv {
         let key_cstr = Self::str_to_cstr(key)?;
         let value_cstr = Self::str_to_cstr(value)?;
 
-        let result = unsafe { syscall(SYSCALL_SETENV, key_cstr.as_ptr(), value_cstr.as_ptr()) };
+        let result = unsafe {
+            syscall(SYSCALL_SETENV, key_cstr.as_ptr(), value_cstr.as_ptr())
+        };
 
         if result == 0 {
             Ok(())
@@ -64,7 +68,9 @@ impl SigmaEnv {
     pub fn remove(key: &str) -> Result<(), EnvError> {
         let key_cstr = Self::str_to_cstr(key)?;
 
-        let result = unsafe { syscall(SYSCALL_UNSETENV, key_cstr.as_ptr()) };
+        let result = unsafe {
+            syscall(SYSCALL_UNSETENV, key_cstr.as_ptr())
+        };
 
         if result == 0 {
             Ok(())
@@ -127,7 +133,8 @@ impl SigmaEnv {
         loop {
             if *ptr.add(len) == 0 {
                 let bytes = core::slice::from_raw_parts(ptr as *const u8, len);
-                return core::str::from_utf8(bytes).map_err(EnvError::Utf8Error);
+                return core::str::from_utf8(bytes)
+                    .map_err(EnvError::Utf8Error);
             }
             len += 1;
         }

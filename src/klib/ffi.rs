@@ -124,10 +124,7 @@ mod tests {
         let s2 = b"Hello\0";
         let s3 = b"World\0";
         unsafe {
-            assert_eq!(
-                cstrcmp(s1.as_ptr() as *const i8, s2.as_ptr() as *const i8),
-                0
-            );
+            assert_eq!(cstrcmp(s1.as_ptr() as *const i8, s2.as_ptr() as *const i8), 0);
             assert!(cstrcmp(s1.as_ptr() as *const i8, s3.as_ptr() as *const i8) != 0);
         }
     }

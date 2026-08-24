@@ -243,12 +243,7 @@ impl SnortSignatureFirewall {
     }
 
     /// Evaluates raw packet headers and payload contents against registered Snort rules
-    pub fn evaluate_packet(
-        &self,
-        protocol: &str,
-        dest_port: u16,
-        payload: &[u8],
-    ) -> Option<DetectionResult> {
+    pub fn evaluate_packet(&self, protocol: &str, dest_port: u16, payload: &[u8]) -> Option<DetectionResult> {
         let payload_str = String::from_utf8_lossy(payload);
         for rule in &self.rules {
             if rule.protocol == protocol && rule.dest_port == dest_port {
@@ -307,11 +302,7 @@ impl CrowdStrikeFalconAi {
         unauthorized_hooks_probed: usize,
         allocation_burst_bytes: usize,
     ) -> Option<DetectionResult> {
-        let score = self.calculate_threat_score(
-            thread_migration_count,
-            unauthorized_hooks_probed,
-            allocation_burst_bytes,
-        );
+        let score = self.calculate_threat_score(thread_migration_count, unauthorized_hooks_probed, allocation_burst_bytes);
         if score >= self.threat_score_threshold {
             let action = if score >= 80.0 {
                 RuleAction::Quarantine // Highly malicious -> Quarantine process

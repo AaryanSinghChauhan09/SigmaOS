@@ -1,6 +1,7 @@
 #![allow(unused_variables)]
 // SigmaOS AUR Helper - Arch User Repository integration
 // Provides high-speed CLI helpers for AUR metadata parsing and package management
+
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -14,8 +15,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 /// AUR package metadata
 #[derive(Debug, Clone, PartialEq)]
@@ -183,12 +184,7 @@ impl AurParser {
         Ok(order)
     }
 
-    fn visit(
-        &self,
-        pkg_name: &str,
-        order: &mut Vec<String>,
-        visited: &mut BTreeMap<String, bool>,
-    ) -> Result<(), &'static str> {
+    fn visit(&self, pkg_name: &str, order: &mut Vec<String>, visited: &mut BTreeMap<String, bool>) -> Result<(), &'static str> {
         if visited.get(pkg_name).copied().unwrap_or(false) {
             return Ok(());
         }

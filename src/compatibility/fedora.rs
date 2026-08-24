@@ -10,7 +10,7 @@ use std::collections::HashMap;
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
 pub struct DnfPackageResolver {
     pub packages: HashMap<String, Vec<String>>, // pkg_name -> dependencies
-    pub installed: HashMap<String, String>,     // pkg_name -> version
+    pub installed: HashMap<String, String>,      // pkg_name -> version
     pub repodata_synced: bool,
     pub signatures_verified: bool,
 }
@@ -58,8 +58,7 @@ impl DnfPackageResolver {
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
 
         for pkg in &install_order {
-            self.installed
-                .insert(pkg.clone(), "1.0.0-fedora".to_string());
+            self.installed.insert(pkg.clone(), "1.0.0-fedora".to_string());
         }
 
         Ok(install_order)
@@ -164,11 +163,7 @@ impl KojiBuildServer {
     pub fn new() -> Self {
         KojiBuildServer {
             build_queue: Vec::new(),
-            targets: vec![
-                "x86_64".to_string(),
-                "aarch64".to_string(),
-                "riscv64".to_string(),
-            ],
+            targets: vec!["x86_64".to_string(), "aarch64".to_string(), "riscv64".to_string()],
             active_builders: 4,
         }
     }
@@ -194,7 +189,7 @@ impl KojiBuildServer {
 /// BodhiUpdateTriage mimics Fedora's update triage system (Bodhi).
 /// It handles community feedback, accumulates karma, and gates the transition to stable.
 pub struct BodhiUpdateTriage {
-    pub updates: HashMap<String, i32>,       // update_id -> karma
+    pub updates: HashMap<String, i32>, // update_id -> karma
     pub stable_gated: HashMap<String, bool>, // update_id -> is_gated
 }
 
@@ -298,10 +293,7 @@ impl SigmaNextChannel {
             self.package_version = "1.1.0-rawhide".to_string();
             Ok((87, "sigma.next rolling Rawhide update complete".to_string()))
         } else {
-            Ok((
-                0,
-                "No rolling updates available for stable channel".to_string(),
-            ))
+            Ok((0, "No rolling updates available for stable channel".to_string()))
         }
     }
 }
@@ -409,10 +401,7 @@ impl SeLinuxContext {
     }
 
     pub fn to_string_format(&self) -> String {
-        format!(
-            "{}:{}:{}:{}",
-            self.user, self.role, self.context_type, self.sensitivity
-        )
+        format!("{}:{}:{}:{}", self.user, self.role, self.context_type, self.sensitivity)
     }
 }
 
@@ -445,11 +434,7 @@ impl SeLinuxEngine {
             source_type: "httpd_t".to_string(),
             target_type: "httpd_sys_content_t".to_string(),
             class: "file".to_string(),
-            permissions: vec![
-                "read".to_string(),
-                "open".to_string(),
-                "getattr".to_string(),
-            ],
+            permissions: vec!["read".to_string(), "open".to_string(), "getattr".to_string()],
         });
 
         self.active_rules.push(SeLinuxPolicyRule {
@@ -494,12 +479,7 @@ impl SeLinuxEngine {
         // Mock transition rules
         if source.context_type == "user_t" && executable.context_type == "passwd_exec_t" {
             // Transitions to high privilege context
-            return Ok(SeLinuxContext::new(
-                &source.user,
-                "system_r",
-                "passwd_t",
-                &source.sensitivity,
-            ));
+            return Ok(SeLinuxContext::new(&source.user, "system_r", "passwd_t", &source.sensitivity));
         }
 
         Err("SELinux Domain Transition Violation: Transition Denied")
@@ -565,13 +545,10 @@ impl SystemdPresetConfigurator {
 
     /// Dynamically loads a custom preset rule (e.g. from user config overrides)
     pub fn add_custom_preset(&mut self, pattern: &str, action: SystemdPresetState) {
-        self.presets.insert(
-            0,
-            SystemdServicePreset {
-                service_pattern: pattern.to_string(),
-                action,
-            },
-        );
+        self.presets.insert(0, SystemdServicePreset {
+            service_pattern: pattern.to_string(),
+            action,
+        });
     }
 }
 
@@ -693,32 +670,18 @@ impl AnacondaInstaller {
 
     /// Executes automated package and partition installations according to loaded kickstart policies (Anaconda simulation)
     pub fn execute_automated_installation(&mut self) -> Result<String, &'static str> {
-        let ks = self
-            .kickstart
-            .as_ref()
-            .ok_or("No Kickstart configuration loaded")?;
+        let ks = self.kickstart.as_ref().ok_or("No Kickstart configuration loaded")?;
 
-        self.processed_steps
-            .push("Step 1: Set up locale and keyboard layouts".to_string());
-        self.processed_steps.push(format!(
-            "Step 2: Partitioning {} storage device segments",
-            ks.partitions.len()
-        ));
+        self.processed_steps.push("Step 1: Set up locale and keyboard layouts".to_string());
+        self.processed_steps.push(format!("Step 2: Partitioning {} storage device segments", ks.partitions.len()));
 
         for part in &ks.partitions {
-            self.processed_steps.push(format!(
-                "  -> Mounted {} on {} partition of {} MB",
-                part.fs_type, part.mount_point, part.size_mb
-            ));
+            self.processed_steps.push(format!("  -> Mounted {} on {} partition of {} MB", part.fs_type, part.mount_point, part.size_mb));
         }
 
-        self.processed_steps.push(format!(
-            "Step 3: Installing {} group packages",
-            ks.selected_groups.len()
-        ));
+        self.processed_steps.push(format!("Step 3: Installing {} group packages", ks.selected_groups.len()));
         for group in &ks.selected_groups {
-            self.processed_steps
-                .push(format!("  -> Installed pkg group: {}", group));
+            self.processed_steps.push(format!("  -> Installed pkg group: {}", group));
         }
 
         self.installation_successful = true;
@@ -737,6 +700,7 @@ pub enum SeLinuxMode {
     Disabled,
 }
 
+
 pub struct SeLinuxEnforcer {
     pub mode: SeLinuxMode,
     pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
@@ -745,10 +709,7 @@ pub struct SeLinuxEnforcer {
 impl SeLinuxEnforcer {
     pub fn new(mode: SeLinuxMode) -> Self {
         let mut transitions = HashMap::new();
-        transitions.insert(
-            "httpd_t".to_string(),
-            vec!["httpd_sys_content_t".to_string()],
-        );
+        transitions.insert("httpd_t".to_string(), vec!["httpd_sys_content_t".to_string()]);
         Self {
             mode,
             allowed_transitions: transitions,
@@ -756,11 +717,7 @@ impl SeLinuxEnforcer {
     }
 
     /// Validates transition or access check between subject context type and target file context type
-    pub fn check_access(
-        &self,
-        subject_type: &str,
-        target_type: &str,
-    ) -> Result<bool, &'static str> {
+    pub fn check_access(&self, subject_type: &str, target_type: &str) -> Result<bool, &'static str> {
         if self.mode == SeLinuxMode::Disabled {
             return Ok(true);
         }
@@ -890,10 +847,7 @@ impl SovereignOstreeDeployer {
     }
 
     pub fn get_active_state(&self) -> (String, Vec<String>) {
-        (
-            self.active_deployment_hash.clone(),
-            self.layered_packages.clone(),
-        )
+        (self.active_deployment_hash.clone(), self.layered_packages.clone())
     }
 }
 
@@ -928,19 +882,12 @@ impl SovereignSeLinuxContext {
             user: parts[0].to_string(),
             role: parts[1].to_string(),
             domain_type: parts[2].to_string(),
-            sensitivity: if parts.len() >= 4 {
-                parts[3].to_string()
-            } else {
-                "s0".to_string()
-            },
+            sensitivity: if parts.len() >= 4 { parts[3].to_string() } else { "s0".to_string() },
         })
     }
 
     pub fn to_string_representation(&self) -> String {
-        format!(
-            "{}:{}:{}:{}",
-            self.user, self.role, self.domain_type, self.sensitivity
-        )
+        format!("{}:{}:{}:{}", self.user, self.role, self.domain_type, self.sensitivity)
     }
 }
 
@@ -981,12 +928,7 @@ impl SovereignSeLinuxEngine {
             .push(permission.to_string());
     }
 
-    pub fn check_access(
-        &self,
-        src_domain: &str,
-        file_path: &str,
-        permission: &str,
-    ) -> Result<bool, &'static str> {
+    pub fn check_access(&self, src_domain: &str, file_path: &str, permission: &str) -> Result<bool, &'static str> {
         if self.mode == SeLinuxMode::Disabled {
             return Ok(true);
         }
@@ -998,8 +940,7 @@ impl SovereignSeLinuxEngine {
 
         let is_allowed = if let Some(classes) = self.domain_permissions.get(src_domain) {
             if let Some(perms) = classes.get("file") {
-                perms.contains(&permission.to_string())
-                    && file_ctx.domain_type == "httpd_sys_content_t"
+                perms.contains(&permission.to_string()) && file_ctx.domain_type == "httpd_sys_content_t"
             } else {
                 false
             }
@@ -1078,10 +1019,7 @@ impl SovereignFirewalldManager {
             interfaces.retain(|i| i != interface);
         }
 
-        self.active_zones
-            .get_mut(zone)
-            .unwrap()
-            .push(interface.to_string());
+        self.active_zones.get_mut(zone).unwrap().push(interface.to_string());
         Ok(())
     }
 
@@ -1109,6 +1047,7 @@ impl SovereignFirewalldManager {
         }
     }
 }
+
 
 pub struct SovereignCockpitConsole {
     pub is_listening: bool,
@@ -1188,9 +1127,7 @@ mod tests {
         assert!(mock.initialize_chroot().is_ok());
         assert_eq!(mock.mount_binds.len(), 3);
 
-        let deps_count = mock
-            .install_srpm_builddeps("BuildRequires: gcc make rpm-build")
-            .unwrap();
+        let deps_count = mock.install_srpm_builddeps("BuildRequires: gcc make rpm-build").unwrap();
         assert_eq!(deps_count, 3);
 
         let rpm_path = mock.run_rpmbuild("hello-world.src.rpm").unwrap();
@@ -1243,18 +1180,11 @@ mod tests {
         assert_eq!(engine.get_proposals().len(), 1);
         assert_eq!(engine.get_proposals().get("SCP-001").unwrap(), &proposal);
 
-        let new_status = engine
-            .update_proposal_status("SCP-001", "Completed")
-            .unwrap();
+        let new_status = engine.update_proposal_status("SCP-001", "Completed").unwrap();
         assert_eq!(new_status, "Completed");
-        assert_eq!(
-            engine.get_proposals().get("SCP-001").unwrap().status,
-            "Completed"
-        );
+        assert_eq!(engine.get_proposals().get("SCP-001").unwrap().status, "Completed");
 
-        assert!(engine
-            .update_proposal_status("SCP-002", "Completed")
-            .is_err());
+        assert!(engine.update_proposal_status("SCP-002", "Completed").is_err());
     }
 
     #[test]
@@ -1355,47 +1285,29 @@ mod tests {
         let html_obj = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
 
         // Allowed by targeted policy rule
-        assert!(engine
-            .authorize_access(&httpd_sub, &html_obj, "file", "read")
-            .is_ok());
+        assert!(engine.authorize_access(&httpd_sub, &html_obj, "file", "read").is_ok());
 
         // Blocked by missing rule
         let bad_obj = SeLinuxContext::new("system_u", "object_r", "secret_t", "s0");
-        assert!(engine
-            .authorize_access(&httpd_sub, &bad_obj, "file", "read")
-            .is_err());
+        assert!(engine.authorize_access(&httpd_sub, &bad_obj, "file", "read").is_err());
 
         // Domain transition
         let user_sub = SeLinuxContext::new("unconfined_u", "user_r", "user_t", "s0");
         let passwd_exe = SeLinuxContext::new("system_u", "object_r", "passwd_exec_t", "s0");
-        let transitioned = engine
-            .validate_domain_transition(&user_sub, &passwd_exe)
-            .unwrap();
+        let transitioned = engine.validate_domain_transition(&user_sub, &passwd_exe).unwrap();
         assert_eq!(transitioned.context_type, "passwd_t");
     }
 
     #[test]
     fn test_systemd_preset_configurator() {
         let mut configurator = SystemdPresetConfigurator::new();
-        assert_eq!(
-            configurator.evaluate_preset("sshd.service"),
-            SystemdPresetState::Enable
-        );
-        assert_eq!(
-            configurator.evaluate_preset("debug-shell.service"),
-            SystemdPresetState::Disable
-        );
-        assert_eq!(
-            configurator.evaluate_preset("nginx.service"),
-            SystemdPresetState::Ignore
-        );
+        assert_eq!(configurator.evaluate_preset("sshd.service"), SystemdPresetState::Enable);
+        assert_eq!(configurator.evaluate_preset("debug-shell.service"), SystemdPresetState::Disable);
+        assert_eq!(configurator.evaluate_preset("nginx.service"), SystemdPresetState::Ignore);
 
         // Custom override
         configurator.add_custom_preset("nginx.service", SystemdPresetState::Enable);
-        assert_eq!(
-            configurator.evaluate_preset("nginx.service"),
-            SystemdPresetState::Enable
-        );
+        assert_eq!(configurator.evaluate_preset("nginx.service"), SystemdPresetState::Enable);
     }
 
     #[test]

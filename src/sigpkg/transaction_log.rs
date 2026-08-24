@@ -1,7 +1,7 @@
 //! Transaction Log System (Debian APT dpkg inspiration)
 //! Provides atomic transactions and rollback capabilities
 
-use crate::klib::{String, Vec};
+use crate::klib::{Vec, String};
 use crate::sigpkg::Package;
 
 /// Transaction entry type
@@ -69,10 +69,7 @@ impl TransactionLog {
             let entry = TransactionEntry {
                 entry_type: TransactionType::Install,
                 package_name: package.name.clone(),
-                version: format!(
-                    "{}.{}.{}",
-                    package.version.major, package.version.minor, package.version.patch
-                ),
+                version: format!("{}.{}.{}", package.version.major, package.version.minor, package.version.patch),
                 timestamp: self.get_timestamp(),
                 state: TransactionState::Pending,
             };

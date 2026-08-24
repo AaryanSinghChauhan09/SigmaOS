@@ -1,6 +1,9 @@
 // Sovereign Non-Linear Video Editor & Frame Compositor Engine (SigmaCut)
 // Inspired by Adobe Premiere Pro, Final Cut Pro, DaVinci Resolve, and Kdenlive.
 // Provides GPU-accelerated timeline scrubbing, real-time effects preview, and multi-format exports.
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::string::String;
@@ -43,26 +46,11 @@ impl VideoClip {
 /// Dynamic stackable visual effects matching Final Cut / Premiere filters
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum VideoEffect {
-    ColorGrading {
-        contrast: f32,
-        brightness: f32,
-        saturation: f32,
-    },
-    CrossDissolve {
-        progress: f32,
-    },
-    ChromaKey {
-        target_rgb: [u8; 3],
-        tolerance: u8,
-    },
-    KenBurns {
-        scale_start: f32,
-        scale_end: f32,
-    },
-    TransitionFade {
-        duration_frames: usize,
-        is_fade_in: bool,
-    },
+    ColorGrading { contrast: f32, brightness: f32, saturation: f32 },
+    CrossDissolve { progress: f32 },
+    ChromaKey { target_rgb: [u8; 3], tolerance: u8 },
+    KenBurns { scale_start: f32, scale_end: f32 },
+    TransitionFade { duration_frames: usize, is_fade_in: bool },
 }
 
 /// A sequential video track holding layered clips
@@ -234,10 +222,7 @@ impl VideoTimeline {
                             // Pan/Zoom transition across the duration
                             let _scale = scale_start + (scale_end - scale_start) * 0.5;
                         }
-                        VideoEffect::TransitionFade {
-                            duration_frames,
-                            is_fade_in,
-                        } => {
+                        VideoEffect::TransitionFade { duration_frames, is_fade_in } => {
                             let current_clip = active_clip.unwrap();
                             let offset = frame_index - current_clip.timeline_start_frame;
                             let factor = if is_fade_in {

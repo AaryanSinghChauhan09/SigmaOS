@@ -1,5 +1,8 @@
 // SigmaOS Arch Linux Compatibility & Tooling Suite (Arch Parity)
 // Implements Arch Build System (ABS), Pacman database synchronizations, AUR package compilation helper, and Mirror ranker.
+
+#![no_std]
+
 #[cfg(test)]
 extern crate std;
 

@@ -1,5 +1,8 @@
 // SigmaOS Kernel Persona Containers & Syscall Graph
 // Encapsulates lightweight legacy kernel version mimicry and graph-based dynamic syscall mapping
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -71,39 +74,20 @@ impl SyscallGraph {
             translation_edges: BTreeMap::new(),
         };
         // Seed default legacy-to-modern syscall mappings
-        graph.add_syscall(
-            1,
-            SyscallCategory::Process,
-            "sys_exit_legacy".to_string(),
-            true,
-        );
-        graph.add_syscall(
-            60,
-            SyscallCategory::Process,
-            "sys_exit_modern".to_string(),
-            false,
-        );
+        graph.add_syscall(1, SyscallCategory::Process, "sys_exit_legacy".to_string(), true);
+        graph.add_syscall(60, SyscallCategory::Process, "sys_exit_modern".to_string(), false);
         graph.add_translation(1, 60); // Translate old exit (1) to modern exit (60)
 
         graph
     }
 
-    pub fn add_syscall(
-        &mut self,
-        num: u32,
-        category: SyscallCategory,
-        name: String,
-        deprecated: bool,
-    ) {
-        self.nodes.insert(
+    pub fn add_syscall(&mut self, num: u32, category: SyscallCategory, name: String, deprecated: bool) {
+        self.nodes.insert(num, SyscallNode {
             num,
-            SyscallNode {
-                num,
-                category,
-                name,
-                deprecated,
-            },
-        );
+            category,
+            name,
+            deprecated,
+        });
     }
 
     pub fn add_translation(&mut self, from: u32, to: u32) {

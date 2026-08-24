@@ -17,8 +17,8 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Observability Module
-pub mod profiler;
 pub mod stack;
+pub mod profiler;
 
 pub use stack::{
     Metric, MetricCapability, MetricID, MetricInfo, MetricType, ObservabilityError,

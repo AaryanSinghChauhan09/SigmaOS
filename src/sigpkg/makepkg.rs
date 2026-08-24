@@ -13,10 +13,10 @@
 #![allow(unused_imports)]
 
 extern crate alloc;
-use crate::sigpkg::{Package, Version};
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::string::{String, ToString};
+use crate::sigpkg::{Package, Version};
 
 /// PKGBUILD parser for Arch Linux package recipes
 pub struct PkgbuildParser {
@@ -47,11 +47,7 @@ impl PkgbuildParser {
                 let parts: Vec<&str> = line.splitn(2, '=').collect();
                 if parts.len() == 2 {
                     let key = parts[0].trim().to_string();
-                    let value = parts[1]
-                        .trim()
-                        .trim_matches('"')
-                        .trim_matches('\'')
-                        .to_string();
+                    let value = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
                     self.variables.insert(key, value);
                 }
             }
@@ -59,8 +55,7 @@ impl PkgbuildParser {
             // Parse function definitions
             if line.starts_with("function ") || line.ends_with("() {") {
                 let func_name = if line.starts_with("function ") {
-                    line.trim_start_matches("function ")
-                        .trim_end_matches("() {")
+                    line.trim_start_matches("function ").trim_end_matches("() {")
                 } else {
                     line.trim_end_matches("() {")
                 };
@@ -145,27 +140,19 @@ impl MakepkgSandbox {
 
     /// Execute the package build in a sandboxed environment
     pub fn build(&self) -> Result<Package, &'static str> {
-        let pkgname = self
-            .pkgbuild
-            .pkgname()
+        let pkgname = self.pkgbuild.pkgname()
             .ok_or("pkgname not found in PKGBUILD")?
             .clone();
 
-        let pkgver = self
-            .pkgbuild
-            .pkgver()
+        let pkgver = self.pkgbuild.pkgver()
             .ok_or("pkgver not found in PKGBUILD")?
             .clone();
 
-        let pkgrel = self
-            .pkgbuild
-            .pkgrel()
+        let pkgrel = self.pkgbuild.pkgrel()
             .ok_or("pkgrel not found in PKGBUILD")?
             .clone();
 
-        let pkgdesc = self
-            .pkgbuild
-            .pkgdesc()
+        let pkgdesc = self.pkgbuild.pkgdesc()
             .cloned()
             .unwrap_or_else(|| String::from("No description"));
 
@@ -176,7 +163,13 @@ impl MakepkgSandbox {
         };
         let version = Version::parse(&cleaned_ver).unwrap_or(Version::new(1, 0, 0));
 
-        let pkg = Package::new(pkgname, version, pkgdesc, Vec::new(), String::new());
+        let pkg = Package::new(
+            pkgname,
+            version,
+            pkgdesc,
+            Vec::new(),
+            String::new(),
+        );
         Ok(pkg)
     }
 

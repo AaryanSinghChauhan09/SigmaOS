@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT
 //! Strategic OKR Engine & Milestone Evaluation Subsystem for SigmaOS
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::string::{String, ToString};
@@ -93,22 +96,12 @@ impl StrategicOkrEvaluator {
         if self.milestones.is_empty() {
             return 100.0;
         }
-        let sum: f64 = self
-            .milestones
-            .iter()
-            .map(|m| m.completion_percentage)
-            .sum();
+        let sum: f64 = self.milestones.iter().map(|m| m.completion_percentage).sum();
         sum / self.milestones.len() as f64
     }
 
-    pub fn get_milestones_by_category(
-        &self,
-        category: MilestoneCategory,
-    ) -> Vec<&StrategicMilestone> {
-        self.milestones
-            .iter()
-            .filter(|m| m.category == category)
-            .collect()
+    pub fn get_milestones_by_category(&self, category: MilestoneCategory) -> Vec<&StrategicMilestone> {
+        self.milestones.iter().filter(|m| m.category == category).collect()
     }
 
     pub fn get_milestone(&self, id: u32) -> Option<&StrategicMilestone> {
@@ -189,10 +182,7 @@ mod tests {
         let mut evaluator = StrategicOkrEvaluator::new();
         assert!(evaluator.remove_milestone(1).is_ok());
         assert_eq!(evaluator.milestones.len(), 2);
-        assert_eq!(
-            evaluator.remove_milestone(99),
-            Err(OkrError::MilestoneNotFound)
-        );
+        assert_eq!(evaluator.remove_milestone(99), Err(OkrError::MilestoneNotFound));
     }
 
     #[test]
@@ -209,12 +199,7 @@ mod tests {
             milestones: Vec::new(),
         };
         evaluator.register_milestone(1, "M1".to_string(), MilestoneCategory::CoreKernel, 50.0);
-        evaluator.register_milestone(
-            2,
-            "M2".to_string(),
-            MilestoneCategory::AiOrchestration,
-            75.0,
-        );
+        evaluator.register_milestone(2, "M2".to_string(), MilestoneCategory::AiOrchestration, 75.0);
         assert_eq!(evaluator.compute_roadmap_completion(), 62.5);
     }
 

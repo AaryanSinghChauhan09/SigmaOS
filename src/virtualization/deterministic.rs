@@ -1,3 +1,6 @@
+#![no_std]
+#![no_main]
+
 use core::mem;
 /// Orange Slice-inspired Deterministic Micro-Virtualization Suite for SigmaOS
 /// Provides instruction-level deterministic emulation, virtual machine snapshotting,

@@ -33,11 +33,7 @@ pub struct XhciTrb {
 
 impl Default for XhciTrb {
     fn default() -> Self {
-        Self {
-            parameter: 0,
-            status: 0,
-            control: 0,
-        }
+        Self { parameter: 0, status: 0, control: 0 }
     }
 }
 

@@ -82,11 +82,7 @@ impl DebianDependencyResolver {
         self.registered_packages.push(manifest);
     }
 
-    pub fn resolve_dependencies_recursive(
-        &self,
-        target_package: &str,
-        resolved_list: &mut Vec<String>,
-    ) -> Result<(), &'static str> {
+    pub fn resolve_dependencies_recursive(&self, target_package: &str, resolved_list: &mut Vec<String>) -> Result<(), &'static str> {
         if resolved_list.contains(&target_package.to_string()) {
             return Ok(()); // Already resolved
         }
@@ -121,19 +117,17 @@ impl DebianPackageInstaller {
 
     /// Replaces dpkg maintainer scripts (preinst/postinst) with pure zero-hook
     /// declarative state updates, ensuring atomic transactional package installations.
-    pub fn install_deb_transactional(
-        &mut self,
-        manifest: &DebControlManifest,
-        payload: &[u8],
-    ) -> Result<(), &'static str> {
+    pub fn install_deb_transactional(&mut self, manifest: &DebControlManifest, payload: &[u8]) -> Result<(), &'static str> {
         if payload.is_empty() {
             return Err("Empty debian payload package payload");
         }
 
         // Atomically record package in declarative state
         self.installed_packages.push(manifest.package_name.clone());
-        self.declarative_state_json =
-            format!("{{\"installed_packages\": {:?}}}", self.installed_packages);
+        self.declarative_state_json = format!(
+            "{{\"installed_packages\": {:?}}}",
+            self.installed_packages
+        );
 
         Ok(())
     }
@@ -188,9 +182,7 @@ mod tests {
         });
 
         let mut resolved = Vec::new();
-        assert!(resolver
-            .resolve_dependencies_recursive("curl", &mut resolved)
-            .is_ok());
+        assert!(resolver.resolve_dependencies_recursive("curl", &mut resolved).is_ok());
         assert_eq!(resolved.len(), 3);
         assert_eq!(resolved[0], "libc6");
         assert_eq!(resolved[1], "libssl3");
@@ -208,9 +200,7 @@ mod tests {
             description: "Bourne Again SHell".to_string(),
         };
 
-        assert!(installer
-            .install_deb_transactional(&manifest, b"DEB_PAYLOAD_BYTES")
-            .is_ok());
+        assert!(installer.install_deb_transactional(&manifest, b"DEB_PAYLOAD_BYTES").is_ok());
         assert_eq!(installer.installed_packages.len(), 1);
         assert!(installer.declarative_state_json.contains("sigma-bash"));
         assert!(installer.install_deb_transactional(&manifest, b"").is_err());

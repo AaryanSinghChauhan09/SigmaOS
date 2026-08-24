@@ -1,5 +1,7 @@
 // Stack-Based Zero-Allocation Helper for SigmaOS Kernel Core
 // Location: src/kernel/core/stack_alloc.rs
+
+#![no_std]
 use core::mem::MaybeUninit;
 
 pub struct StackBuffer<T, const N: usize> {

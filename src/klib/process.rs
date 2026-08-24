@@ -45,14 +45,15 @@ impl ExitStatus {
 impl SigmaProcess {
     pub fn spawn(executable: &str, args: &[String]) -> Result<Self, ProcessError> {
         let executable_cstr = Self::to_cstring(executable)?;
-        let args_cstr: Vec<_> = args
-            .iter()
+        let args_cstr: Vec<_> = args.iter()
             .map(|s| Self::to_cstring(s))
             .collect::<Result<Vec<_>, _>>()?;
 
         let args_ptrs: Vec<*const u8> = args_cstr.iter().map(|s| s.as_ptr()).collect();
 
-        let pid = unsafe { Self::syscall_fork() };
+        let pid = unsafe {
+            Self::syscall_fork()
+        };
 
         if pid == 0 {
             // Child process
@@ -60,13 +61,11 @@ impl SigmaProcess {
                 Self::syscall_execve(
                     executable_cstr.as_ptr(),
                     args_ptrs.as_ptr(),
-                    0 as *const *const u8,
+                    0 as *const *const u8
                 );
             }
             // Should not reach here
-            unsafe {
-                core::hint::unreachable_unchecked();
-            }
+            unsafe { core::hint::unreachable_unchecked(); }
         } else if pid < 0 {
             return Err(ProcessError::ForkFailed);
         }
@@ -80,7 +79,9 @@ impl SigmaProcess {
 
     pub fn wait(&self) -> Result<ExitStatus, ProcessError> {
         let mut status: i32 = 0;
-        let result = unsafe { Self::syscall_waitpid(self.pid as i32, &mut status as *mut i32, 0) };
+        let result = unsafe {
+            Self::syscall_waitpid(self.pid as i32, &mut status as *mut i32, 0)
+        };
 
         if result < 0 {
             return Err(ProcessError::WaitFailed);
@@ -109,11 +110,7 @@ impl SigmaProcess {
         0
     }
 
-    unsafe fn syscall_execve(
-        path: *const u8,
-        argv: *const *const u8,
-        envp: *const *const u8,
-    ) -> i32 {
+    unsafe fn syscall_execve(path: *const u8, argv: *const *const u8, envp: *const *const u8) -> i32 {
         // Placeholder for actual syscall implementation
         0
     }

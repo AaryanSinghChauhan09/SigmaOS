@@ -111,11 +111,11 @@ pub struct BtrfsScrubResult {
 /// Linux distro-inspired default Btrfs mount options (Fedora & openSUSE defaults)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BtrfsMountOptions {
-    pub ssd: bool,            // Optimize block allocation layouts for SSDs
-    pub discard_async: bool,  // Background async TRIM / space reclamation
-    pub autodefrag: bool,     // Background automatic defragmentation of small files
-    pub compress_force: bool, // Bypass standard entropy estimator heuristics
-    pub noatime: bool,        // Reduce CoW write amplification from access time updates
+    pub ssd: bool,              // Optimize block allocation layouts for SSDs
+    pub discard_async: bool,    // Background async TRIM / space reclamation
+    pub autodefrag: bool,       // Background automatic defragmentation of small files
+    pub compress_force: bool,   // Bypass standard entropy estimator heuristics
+    pub noatime: bool,          // Reduce CoW write amplification from access time updates
 }
 
 impl Default for BtrfsMountOptions {
@@ -245,10 +245,7 @@ impl BtrfsFilesystem {
         limit_referenced: Option<u64>,
         limit_exclusive: Option<u64>,
     ) -> Result<(), &'static str> {
-        let qgroup = self
-            .qgroups
-            .get_mut(&subvol_id)
-            .ok_or("Qgroup not enabled")?;
+        let qgroup = self.qgroups.get_mut(&subvol_id).ok_or("Qgroup not enabled")?;
         qgroup.limit_referenced = limit_referenced;
         qgroup.limit_exclusive = limit_exclusive;
         Ok(())
@@ -261,9 +258,7 @@ impl BtrfsFilesystem {
 
     /// Transparent compression heuristics analyzing data entropy (Fedora style)
     pub fn heuristic_compress(&self, subvol_id: u64, data: &[u8]) -> (CompressionType, Vec<u8>) {
-        let compression = self
-            .subvolumes
-            .get(&subvol_id)
+        let compression = self.subvolumes.get(&subvol_id)
             .map(|s| s.compression)
             .unwrap_or(self.default_compression);
 
@@ -388,10 +383,7 @@ impl BtrfsFilesystem {
         offset: u64,
         data: &[u8],
     ) -> Result<u64, &'static str> {
-        let subvol = self
-            .subvolumes
-            .get(&subvol_id)
-            .ok_or("Subvolume not found")?;
+        let subvol = self.subvolumes.get(&subvol_id).ok_or("Subvolume not found")?;
         if subvol.readonly {
             return Err("Subvolume is read-only");
         }
@@ -589,24 +581,12 @@ impl BtrfsFilesystem {
         // Inherit properties if parent exists
         let (compression, level, readonly) = if let Some(p_id) = parent_id {
             if let Some(parent) = self.subvolumes.get(&p_id) {
-                (
-                    parent.compression,
-                    parent.compression_level,
-                    parent.readonly,
-                )
+                (parent.compression, parent.compression_level, parent.readonly)
             } else {
-                (
-                    self.default_compression,
-                    Some(self.default_compression_level),
-                    false,
-                )
+                (self.default_compression, Some(self.default_compression_level), false)
             }
         } else {
-            (
-                self.default_compression,
-                Some(self.default_compression_level),
-                false,
-            )
+            (self.default_compression, Some(self.default_compression_level), false)
         };
 
         let subvol = BtrfsSubvolume {
@@ -625,11 +605,7 @@ impl BtrfsFilesystem {
         if let Some(p_id) = parent_id {
             if let Some(parent_qgroup) = self.qgroups.get(&p_id).cloned() {
                 self.enable_qgroup(id)?;
-                self.set_qgroup_limit(
-                    id,
-                    parent_qgroup.limit_referenced,
-                    parent_qgroup.limit_exclusive,
-                )?;
+                self.set_qgroup_limit(id, parent_qgroup.limit_referenced, parent_qgroup.limit_exclusive)?;
             }
         }
 
@@ -755,8 +731,7 @@ impl BtrfsFilesystem {
         }
 
         // Get all extents for this subvolume
-        let mut subvol_extents: Vec<BtrfsExtent> = self
-            .extents
+        let mut subvol_extents: Vec<BtrfsExtent> = self.extents
             .values()
             .filter(|ext| ext.subvol_id == subvol_id)
             .cloned()
@@ -785,9 +760,7 @@ impl BtrfsFilesystem {
                         for i in 0..curr.replicas.len() {
                             let r1 = &curr.replicas[i];
                             let r2 = &ext.replicas[i];
-                            if r1.device_id != r2.device_id
-                                || r1.physical_offset + curr.length != r2.physical_offset
-                            {
+                            if r1.device_id != r2.device_id || r1.physical_offset + curr.length != r2.physical_offset {
                                 physical_contiguous = false;
                                 break;
                             }
@@ -848,10 +821,7 @@ impl BtrfsFilesystem {
 
     /// Send subvolume as a series of instructions representing its metadata and extents (Incremental Backup Send)
     pub fn send_subvolume(&self, subvol_id: u64) -> Result<Vec<BtrfsSendOperation>, &'static str> {
-        let subvol = self
-            .subvolumes
-            .get(&subvol_id)
-            .ok_or("Subvolume not found")?;
+        let subvol = self.subvolumes.get(&subvol_id).ok_or("Subvolume not found")?;
         let mut ops = Vec::new();
 
         ops.push(BtrfsSendOperation::CreateSubvolume {
@@ -866,9 +836,7 @@ impl BtrfsFilesystem {
         // Find all extents belonging to this subvolume and append write operations
         for extent in self.extents.values() {
             if extent.subvol_id == subvol_id {
-                let data = self
-                    .read_data(extent.offset)
-                    .unwrap_or_else(|_| alloc::vec![0u8; extent.length as usize]);
+                let data = self.read_data(extent.offset).unwrap_or_else(|_| alloc::vec![0u8; extent.length as usize]);
                 ops.push(BtrfsSendOperation::WriteExtent {
                     subvol_id,
                     offset: extent.offset,
@@ -884,22 +852,12 @@ impl BtrfsFilesystem {
     }
 
     /// Receive and replay a series of subvolume operations to recreate/sync a subvolume (Incremental Backup Receive)
-    pub fn receive_subvolume(
-        &mut self,
-        operations: &[BtrfsSendOperation],
-    ) -> Result<u64, &'static str> {
+    pub fn receive_subvolume(&mut self, operations: &[BtrfsSendOperation]) -> Result<u64, &'static str> {
         let mut created_subvol_id = None;
 
         for op in operations {
             match op {
-                BtrfsSendOperation::CreateSubvolume {
-                    id,
-                    parent_id,
-                    name,
-                    uuid,
-                    compression,
-                    readonly,
-                } => {
+                BtrfsSendOperation::CreateSubvolume { id, parent_id, name, uuid, compression, readonly } => {
                     let subvol_id = *id;
                     let subvol = BtrfsSubvolume {
                         id: subvol_id,
@@ -916,32 +874,16 @@ impl BtrfsFilesystem {
                     }
                     created_subvol_id = Some(subvol_id);
                 }
-                BtrfsSendOperation::WriteExtent {
-                    subvol_id,
-                    offset,
-                    length,
-                    compression,
-                    checksum,
-                    data: _,
-                } => {
+                BtrfsSendOperation::WriteExtent { subvol_id, offset, length, compression, checksum, data: _ } => {
                     let mut replicas = Vec::new();
                     match self.raid_profile {
                         RaidProfile::Single => {
-                            replicas.push(BtrfsExtentReplica {
-                                device_id: 1,
-                                physical_offset: *offset,
-                            });
+                            replicas.push(BtrfsExtentReplica { device_id: 1, physical_offset: *offset });
                         }
                         _ => {
-                            replicas.push(BtrfsExtentReplica {
-                                device_id: 1,
-                                physical_offset: *offset,
-                            });
+                            replicas.push(BtrfsExtentReplica { device_id: 1, physical_offset: *offset });
                             if self.devices.len() >= 2 {
-                                replicas.push(BtrfsExtentReplica {
-                                    device_id: 2,
-                                    physical_offset: *offset,
-                                });
+                                replicas.push(BtrfsExtentReplica { device_id: 2, physical_offset: *offset });
                             }
                         }
                     }
@@ -968,18 +910,12 @@ impl BtrfsFilesystem {
                         qgroup.exclusive_bytes += length;
                     }
                 }
-                BtrfsSendOperation::SetReadonly {
-                    subvol_id,
-                    readonly,
-                } => {
+                BtrfsSendOperation::SetReadonly { subvol_id, readonly } => {
                     if let Some(subvol) = self.subvolumes.get_mut(subvol_id) {
                         subvol.readonly = *readonly;
                     }
                 }
-                BtrfsSendOperation::SetCompression {
-                    subvol_id,
-                    compression,
-                } => {
+                BtrfsSendOperation::SetCompression { subvol_id, compression } => {
                     if let Some(subvol) = self.subvolumes.get_mut(subvol_id) {
                         subvol.compression = *compression;
                     }
@@ -1085,9 +1021,7 @@ mod tests {
     #[test]
     fn test_btrfs_quota_limits() {
         let mut fs = BtrfsFilesystem::new();
-        let subvol_id = fs
-            .create_subvolume("limited_subvol".to_string(), None)
-            .unwrap();
+        let subvol_id = fs.create_subvolume("limited_subvol".to_string(), None).unwrap();
 
         fs.enable_qgroup(subvol_id).unwrap();
         // Limit referenced size to 50 bytes
@@ -1099,18 +1033,13 @@ mod tests {
 
         // Writing another 30 bytes (total 60) should exceed the 50-byte limit and fail
         let data2 = [0u8; 30];
-        assert_eq!(
-            fs.write_data(subvol_id, 30, &data2),
-            Err("Quota limit (referenced) exceeded")
-        );
+        assert_eq!(fs.write_data(subvol_id, 30, &data2), Err("Quota limit (referenced) exceeded"));
     }
 
     #[test]
     fn test_btrfs_scrub_and_self_healing() {
         let mut fs = BtrfsFilesystem::new();
-        let subvol_id = fs
-            .create_subvolume("secure_subvol".to_string(), None)
-            .unwrap();
+        let subvol_id = fs.create_subvolume("secure_subvol".to_string(), None).unwrap();
 
         // Configure as RAID1 with multiple devices for redundancy
         fs.set_raid_profile(RaidProfile::Raid1);
@@ -1127,10 +1056,7 @@ mod tests {
         fs.corrupt_extent(extent_id).unwrap();
 
         // Reading should now fail because checksum verification fails
-        assert_eq!(
-            fs.read_data(extent_id),
-            Err("Input/output error (checksum verification failed)")
-        );
+        assert_eq!(fs.read_data(extent_id), Err("Input/output error (checksum verification failed)"));
 
         // Run Btrfs background scrubbing - should find the error and heal from RAID1 mirror copy
         let scrub_res = fs.scrub().unwrap();
@@ -1145,9 +1071,7 @@ mod tests {
     #[test]
     fn test_btrfs_compression_heuristics() {
         let mut fs = BtrfsFilesystem::new();
-        let subvol_id = fs
-            .create_subvolume("compressed_subvol".to_string(), None)
-            .unwrap();
+        let subvol_id = fs.create_subvolume("compressed_subvol".to_string(), None).unwrap();
 
         // 1. High-entropy data (unique unique random-like bytes) -> compression should be skipped
         let mut high_entropy = [0u8; 100];
@@ -1168,9 +1092,7 @@ mod tests {
     #[test]
     fn test_btrfs_send_receive_incremental() {
         let mut fs = BtrfsFilesystem::new();
-        let subvol_id = fs
-            .create_subvolume("origin_subvol".to_string(), None)
-            .unwrap();
+        let subvol_id = fs.create_subvolume("origin_subvol".to_string(), None).unwrap();
 
         // Write sample configuration and file layers
         let data1 = b"Debian/Fedora mirror repositories mapping database configuration file";
@@ -1188,10 +1110,7 @@ mod tests {
 
         assert_eq!(restored_id, subvol_id);
         assert_eq!(backup_fs.subvolume_count(), 1);
-        assert_eq!(
-            backup_fs.get_subvolume(restored_id).unwrap().name,
-            "origin_subvol"
-        );
+        assert_eq!(backup_fs.get_subvolume(restored_id).unwrap().name, "origin_subvol");
 
         // Verify content integrity of restored subvolume
         let restored_extent1 = backup_fs.get_extent(0).unwrap();
@@ -1203,9 +1122,7 @@ mod tests {
     #[test]
     fn test_btrfs_auto_defragmentation() {
         let mut fs = BtrfsFilesystem::new();
-        let subvol_id = fs
-            .create_subvolume("fragmented_db".to_string(), None)
-            .unwrap();
+        let subvol_id = fs.create_subvolume("fragmented_db".to_string(), None).unwrap();
 
         // Simulate heavily fragmented small random database writes (common issue in Btrfs CoW layout)
         fs.write_data(subvol_id, 0, b"part1").unwrap();
@@ -1233,9 +1150,7 @@ mod tests {
         let mut fs = BtrfsFilesystem::new();
         fs.mount_options.compress_force = true; // Fedora default override option
 
-        let subvol_id = fs
-            .create_subvolume("force_compress_subvol".to_string(), None)
-            .unwrap();
+        let subvol_id = fs.create_subvolume("force_compress_subvol".to_string(), None).unwrap();
 
         // Highly random random-like data (would normally fail the entropy heuristic and skip compression)
         let mut high_entropy = [0u8; 128];
@@ -1253,24 +1168,15 @@ mod tests {
     #[test]
     fn test_btrfs_property_inheritance() {
         let mut fs = BtrfsFilesystem::new();
-        let parent_id = fs
-            .create_subvolume("parent_home".to_string(), None)
-            .unwrap();
+        let parent_id = fs.create_subvolume("parent_home".to_string(), None).unwrap();
         fs.set_readonly(parent_id, true).unwrap();
-        fs.set_compression(parent_id, CompressionType::Zstd)
-            .unwrap();
+        fs.set_compression(parent_id, CompressionType::Zstd).unwrap();
 
         fs.enable_qgroup(parent_id).unwrap();
-        fs.set_qgroup_limit(parent_id, Some(1024), Some(2048))
-            .unwrap();
+        fs.set_qgroup_limit(parent_id, Some(1024), Some(2048)).unwrap();
 
         // Create child subvolume with property inheritance (openSUSE layout style)
-        let child_id = fs
-            .create_subvolume_with_inheritance(
-                "parent_home/user_nested".to_string(),
-                Some(parent_id),
-            )
-            .unwrap();
+        let child_id = fs.create_subvolume_with_inheritance("parent_home/user_nested".to_string(), Some(parent_id)).unwrap();
 
         let child = fs.get_subvolume(child_id).unwrap();
         assert!(child.readonly);

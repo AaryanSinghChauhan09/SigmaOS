@@ -28,9 +28,9 @@ pub const MAX_TOKENS: usize = 32;
 
 // Standard Linux-style POSIX Capability bit positions
 pub const CAP_NET_BIND_SERVICE: u32 = 10; // Allow binding to ports < 1024
-pub const CAP_SYS_ADMIN: u32 = 21; // Full administrator privileges
-pub const CAP_SYS_CHROOT: u32 = 18; // Allow chroot system call
-pub const CAP_SYS_PTRACE: u32 = 19; // Allow debugging/tracing other processes
+pub const CAP_SYS_ADMIN: u32 = 21;        // Full administrator privileges
+pub const CAP_SYS_CHROOT: u32 = 18;       // Allow chroot system call
+pub const CAP_SYS_PTRACE: u32 = 19;       // Allow debugging/tracing other processes
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
@@ -117,9 +117,9 @@ impl CapabilityToken {
                 "stdio" => new_promises |= 1 << 0,
                 "rpath" => new_promises |= 1 << 1,
                 "wpath" => new_promises |= 1 << 2,
-                "inet" => new_promises |= 1 << 3,
-                "proc" => new_promises |= 1 << 4,
-                "exec" => new_promises |= 1 << 5,
+                "inet"  => new_promises |= 1 << 3,
+                "proc"  => new_promises |= 1 << 4,
+                "exec"  => new_promises |= 1 << 5,
                 _ => {}
             }
         }
@@ -133,9 +133,9 @@ impl CapabilityToken {
             "stdio" => 1 << 0,
             "rpath" => 1 << 1,
             "wpath" => 1 << 2,
-            "inet" => 1 << 3,
-            "proc" => 1 << 4,
-            "exec" => 1 << 5,
+            "inet"  => 1 << 3,
+            "proc"  => 1 << 4,
+            "exec"  => 1 << 5,
             _ => return false,
         };
         (self.pledged_promises & bit) != 0
@@ -284,9 +284,7 @@ mod tests {
     fn test_token_revocation() {
         let mut enforcer = SecurityEnforcer::new();
 
-        let token = CapabilityToken::new(101)
-            .allow_network()
-            .grant_posix_capability(CAP_NET_BIND_SERVICE);
+        let token = CapabilityToken::new(101).allow_network().grant_posix_capability(CAP_NET_BIND_SERVICE);
         enforcer.assign_token(token).unwrap();
 
         assert!(enforcer.validate_network_access(101, 80));
@@ -327,15 +325,10 @@ mod tests {
 
         // Adding CAP_NET_BIND_SERVICE grants port 80 access
         enforcer.revoke_token(201).unwrap();
-        token = CapabilityToken::new(201)
-            .allow_network()
-            .grant_posix_capability(CAP_NET_BIND_SERVICE);
+        token = CapabilityToken::new(201).allow_network().grant_posix_capability(CAP_NET_BIND_SERVICE);
         enforcer.assign_token(token).unwrap();
         assert!(enforcer.validate_network_access(201, 80));
-        assert!(enforcer
-            .find_token(201)
-            .unwrap()
-            .has_posix_capability(CAP_NET_BIND_SERVICE));
+        assert!(enforcer.find_token(201).unwrap().has_posix_capability(CAP_NET_BIND_SERVICE));
     }
 
     #[test]
@@ -346,15 +339,12 @@ mod tests {
         let mut token = CapabilityToken::new(301).allow_fs_read().allow_fs_write();
         enforcer.assign_token(token).unwrap();
         assert!(enforcer.validate_filesystem_access(301, false)); // read ok
-        assert!(enforcer.validate_filesystem_access(301, true)); // write ok
+        assert!(enforcer.validate_filesystem_access(301, true));  // write ok
 
         // Call pledge: drops write-promises ("wpath" is dropped)
-        enforcer
-            .find_token_mut(301)
-            .unwrap()
-            .pledge(&["stdio", "rpath"]);
+        enforcer.find_token_mut(301).unwrap().pledge(&["stdio", "rpath"]);
 
         assert!(enforcer.validate_filesystem_access(301, false)); // read remains ok
-        assert!(!enforcer.validate_filesystem_access(301, true)); // write blocked! (pledged stdio,rpath)
+        assert!(!enforcer.validate_filesystem_access(301, true));  // write blocked! (pledged stdio,rpath)
     }
 }

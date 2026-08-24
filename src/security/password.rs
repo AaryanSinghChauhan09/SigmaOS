@@ -276,10 +276,7 @@ impl PasswordManager {
 
         let encrypted_entry = PasswordEntry {
             encrypted_password,
-            last_modified: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_secs())
-                .unwrap_or(0),
+            last_modified: std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0),
             ..entry
         };
 
@@ -458,11 +455,7 @@ impl PasswordManager {
 
         let mut password = String::new();
         // Simple, zero-dependency, safe LCG pseudo-random generator using nanosecond seed
-        let mut seed = (std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.as_millis())
-            .unwrap_or(0) as u64)
-            * 1_000_000;
+        let mut seed = (std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_millis()).unwrap_or(0) as u64) * 1_000_000;
 
         for _ in 0..length {
             seed = seed
@@ -480,18 +473,15 @@ impl Default for PasswordManager {
     fn default() -> Self {
         let mut key = vec![0u8; 32];
         // Generate a non-hardcoded key dynamically using system time entropy
-        let mut seed = (std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.as_nanos())
-            .unwrap_or(0)
-            ^ 0x5a5a5a5a5a5a5a5a) as u64;
+        let mut seed = (std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0) ^ 0x5a5a5a5a5a5a5a5a) as u64;
         for byte in key.iter_mut() {
-            seed = seed
-                .wrapping_mul(6364136223846793005)
-                .wrapping_add(1442695040888963407);
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
             *byte = (seed >> 32) as u8;
         }
-        Self::new("/home/user/.sigmaos/passwords".to_string(), key)
+        Self::new(
+            "/home/user/.sigmaos/passwords".to_string(),
+            key,
+        )
     }
 }
 
@@ -553,22 +543,14 @@ mod tests {
     #[test]
     fn test_password_encryption_decryption_optimization() {
         // Generate a non-hardcoded test key using system process state
-        let key: Vec<u8> = (0..32usize)
-            .map(|i| {
-                let bits = (i.wrapping_mul(0x9e3779b9) ^ (i << 6) ^ (i >> 2)) as u8;
-                bits
-            })
-            .collect();
+        let key: Vec<u8> = (0..32usize).map(|i| {
+            let bits = (i.wrapping_mul(0x9e3779b9) ^ (i << 6) ^ (i >> 2)) as u8;
+            bits
+        }).collect();
         let manager = PasswordManager::new("/test/path".to_string(), key);
 
         let dynamic_val = 0x5a5a5a5au32;
-        let password_bytes: Vec<u8> = dynamic_val
-            .to_be_bytes()
-            .iter()
-            .copied()
-            .cycle()
-            .take(20)
-            .collect();
+        let password_bytes: Vec<u8> = dynamic_val.to_be_bytes().iter().copied().cycle().take(20).collect();
         let password = &password_bytes[..];
         let encrypted = manager.encrypt_password(password).unwrap();
         let decrypted = manager.decrypt_password(&encrypted).unwrap();

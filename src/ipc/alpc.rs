@@ -9,10 +9,10 @@
 #![allow(unused_variables)]
 
 extern crate alloc;
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::string::{String, ToString};
+use alloc::collections::BTreeMap;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Facility categories for system procedure routing
@@ -86,11 +86,7 @@ pub struct AlpcSectionHandle {
 impl AlpcSectionHandle {
     pub fn new(section_id: u64, data: Vec<u8>) -> Self {
         let size = data.len();
-        Self {
-            section_id,
-            size,
-            data,
-        }
+        Self { section_id, size, data }
     }
 }
 
@@ -211,8 +207,7 @@ impl AlpcFacilityServer {
     where
         F: Fn(&AlpcMessage) -> Vec<u8> + Send + Sync + 'static,
     {
-        self.registered_procedures
-            .insert(procedure_id, Box::new(handler));
+        self.registered_procedures.insert(procedure_id, Box::new(handler));
     }
 
     pub fn dispatch_request(&self, request: &AlpcMessage) -> Option<AlpcMessage> {
@@ -249,12 +244,7 @@ impl AlpcManager {
         }
     }
 
-    pub fn create_port(
-        &mut self,
-        name: &str,
-        port_type: AlpcPortType,
-        facility: AlpcFacility,
-    ) -> u64 {
+    pub fn create_port(&mut self, name: &str, port_type: AlpcPortType, facility: AlpcFacility) -> u64 {
         let port_id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let port = AlpcPort::new(port_id, name, port_type, facility);
         self.ports.insert(port_id, port);
@@ -268,19 +258,12 @@ impl AlpcManager {
         port_id
     }
 
-    pub fn get_facility_server_mut(
-        &mut self,
-        facility: AlpcFacility,
-    ) -> Option<&mut AlpcFacilityServer> {
+    pub fn get_facility_server_mut(&mut self, facility: AlpcFacility) -> Option<&mut AlpcFacilityServer> {
         self.servers.get_mut(&facility.to_u32())
     }
 
     /// Synchronous Request-Reply Local Procedure Call execution
-    pub fn request_reply(
-        &mut self,
-        facility: AlpcFacility,
-        mut request: AlpcMessage,
-    ) -> Result<AlpcMessage, &'static str> {
+    pub fn request_reply(&mut self, facility: AlpcFacility, mut request: AlpcMessage) -> Result<AlpcMessage, &'static str> {
         let facility_key = facility.to_u32();
 
         // Handle large payloads (> 256 bytes) via zero-copy Section Memory Mapping
@@ -299,9 +282,7 @@ impl AlpcManager {
         }
 
         if let Some(server) = self.servers.get(&facility_key) {
-            server
-                .dispatch_request(&request)
-                .ok_or("Procedure handler not found")
+            server.dispatch_request(&request).ok_or("Procedure handler not found")
         } else {
             Err("Facility server not registered")
         }
@@ -323,9 +304,7 @@ mod tests {
         let mut mgr = AlpcManager::new();
         mgr.register_facility_server(AlpcFacility::FileSystemVfs, "vfs_server");
 
-        let server = mgr
-            .get_facility_server_mut(AlpcFacility::FileSystemVfs)
-            .unwrap();
+        let server = mgr.get_facility_server_mut(AlpcFacility::FileSystemVfs).unwrap();
         server.register_procedure(101, |req| {
             let payload = req.get_payload();
             assert_eq!(payload, b"PING_VFS");
@@ -343,10 +322,7 @@ mod tests {
 
         let reply = mgr.request_reply(AlpcFacility::FileSystemVfs, req).unwrap();
         assert_eq!(reply.get_payload(), b"PONG_VFS_OK");
-        assert_eq!(
-            (reply.header.flags & alpc_flags::REPLY_MESSAGE),
-            alpc_flags::REPLY_MESSAGE
-        );
+        assert_eq!((reply.header.flags & alpc_flags::REPLY_MESSAGE), alpc_flags::REPLY_MESSAGE);
     }
 
     #[test]
@@ -354,23 +330,24 @@ mod tests {
         let mut mgr = AlpcManager::new();
         mgr.register_facility_server(AlpcFacility::SystemKernel, "kernel_server");
 
-        let server = mgr
-            .get_facility_server_mut(AlpcFacility::SystemKernel)
-            .unwrap();
+        let server = mgr.get_facility_server_mut(AlpcFacility::SystemKernel).unwrap();
         server.register_procedure(202, |req| {
             assert!(req.section.is_some());
-            assert_eq!(
-                (req.header.flags & alpc_flags::LARGE_SECTION_PAYLOAD),
-                alpc_flags::LARGE_SECTION_PAYLOAD
-            );
+            assert_eq!((req.header.flags & alpc_flags::LARGE_SECTION_PAYLOAD), alpc_flags::LARGE_SECTION_PAYLOAD);
             let payload = req.get_payload();
             assert_eq!(payload.len(), 1024);
             b"LARGE_SECTION_PROCESSED".to_vec()
         });
 
         let large_payload = vec![0x42u8; 1024];
-        let req =
-            AlpcMessage::new_inline(2, AlpcFacility::SystemKernel, 202, 101, 0, large_payload);
+        let req = AlpcMessage::new_inline(
+            2,
+            AlpcFacility::SystemKernel,
+            202,
+            101,
+            0,
+            large_payload,
+        );
 
         let reply = mgr.request_reply(AlpcFacility::SystemKernel, req).unwrap();
         assert_eq!(reply.get_payload(), b"LARGE_SECTION_PROCESSED");

@@ -1,3 +1,4 @@
+#![no_std]
 extern crate alloc;
 use alloc::vec::Vec;
 use crate::filesystem::vfs::{Inode, FileType, FilePermissions};

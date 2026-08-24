@@ -218,15 +218,11 @@ mod tests {
         };
 
         // Signature check
-        assert!(verifier
-            .verify_debian_in_release(&release, b"dummy_signature", &keyring)
-            .is_ok());
+        assert!(verifier.verify_debian_in_release(&release, b"dummy_signature", &keyring).is_ok());
 
         // Fail signature check if keyring doesn't match trusted key
         let untrusted_keyring = AptKeyring::new();
-        assert!(verifier
-            .verify_debian_in_release(&release, b"dummy", &untrusted_keyring)
-            .is_err());
+        assert!(verifier.verify_debian_in_release(&release, b"dummy", &untrusted_keyring).is_err());
 
         // Package hash verification from Release manifest
         let valid_pkg = Package::new(
@@ -236,9 +232,7 @@ mod tests {
             Vec::new(),
             "nano_hash_value".to_string(),
         );
-        assert!(verifier
-            .verify_package_from_release(&valid_pkg, &release)
-            .is_ok());
+        assert!(verifier.verify_package_from_release(&valid_pkg, &release).is_ok());
 
         let invalid_pkg = Package::new(
             "nano".to_string(),
@@ -247,8 +241,6 @@ mod tests {
             Vec::new(),
             "different_hash".to_string(),
         );
-        assert!(verifier
-            .verify_package_from_release(&invalid_pkg, &release)
-            .is_err());
+        assert!(verifier.verify_package_from_release(&invalid_pkg, &release).is_err());
     }
 }

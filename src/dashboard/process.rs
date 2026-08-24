@@ -330,9 +330,7 @@ impl ProcessManager {
 
     /// Get process history
     pub fn get_process_history(&self, pid: u32) -> Option<&[ProcessInfo]> {
-        self.process_history
-            .get(&pid)
-            .map(|v: &Vec<ProcessInfo>| v.as_slice())
+        self.process_history.get(&pid).map(|v: &Vec<ProcessInfo>| v.as_slice())
     }
 
     /// Auto-refresh if needed

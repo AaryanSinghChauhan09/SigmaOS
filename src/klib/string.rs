@@ -1,10 +1,10 @@
 //! Custom string implementation for SigmaOS
 //! This module provides no_std alternatives to std::string and reduces dependency on predefined functions
 
-use super::vec::SigmaVec;
 use core::ops::{Deref, DerefMut};
 use core::slice;
 use core::str;
+use super::vec::SigmaVec;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -52,7 +52,9 @@ impl SigmaString {
 
     /// Convert to string slice
     pub fn as_str(&self) -> &str {
-        unsafe { str::from_utf8_unchecked(self.data.as_slice()) }
+        unsafe {
+            str::from_utf8_unchecked(self.data.as_slice())
+        }
     }
 
     /// Convert to byte slice
@@ -107,9 +109,7 @@ impl SigmaString {
         }
 
         let char_bytes = &self.data.as_slice()[new_len..self.len];
-        let result = str::from_utf8(char_bytes)
-            .ok()
-            .and_then(|s| s.chars().next());
+        let result = str::from_utf8(char_bytes).ok().and_then(|s| s.chars().next());
 
         self.len = new_len;
         self.data.truncate(new_len);
@@ -243,7 +243,10 @@ impl SigmaString {
     where
         P: Pattern,
     {
-        Split { string: self, pat }
+        Split {
+            string: self,
+            pat,
+        }
     }
 
     /// Check if the string contains a pattern
@@ -305,7 +308,9 @@ impl Deref for SigmaString {
 
 impl DerefMut for SigmaString {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { str::from_utf8_unchecked_mut(self.data.as_mut_slice()) }
+        unsafe {
+            str::from_utf8_unchecked_mut(self.data.as_mut_slice())
+        }
     }
 }
 

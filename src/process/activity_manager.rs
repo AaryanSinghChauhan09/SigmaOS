@@ -2,8 +2,8 @@
 // Inspired by Linux systemd cgroup activity tracking, Android ActivityManager,
 // Garuda Zen interactivity governor, FreeBSD process activity accounting, and macOS Activity Monitor.
 
-use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::collections::HashMap;
 
 /// Process activity state classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -154,15 +154,7 @@ impl ActivityManager {
     }
 
     /// Update resource utilization metrics for a process
-    pub fn update_activity_metrics(
-        &mut self,
-        pid: usize,
-        cpu_pct: f32,
-        memory_bytes: usize,
-        io_read: u64,
-        io_write: u64,
-        current_timestamp: u64,
-    ) -> Result<(), &'static str> {
+    pub fn update_activity_metrics(&mut self, pid: usize, cpu_pct: f32, memory_bytes: usize, io_read: u64, io_write: u64, current_timestamp: u64) -> Result<(), &'static str> {
         let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
         proc.cpu_usage_pct = cpu_pct;
         proc.memory_footprint_bytes = memory_bytes;
@@ -170,8 +162,7 @@ impl ActivityManager {
         proc.io_write_bytes += io_write;
         proc.last_active_timestamp = current_timestamp;
 
-        self.total_cpu_cycles_tracked
-            .fetch_add((cpu_pct * 100.0) as usize, Ordering::SeqCst);
+        self.total_cpu_cycles_tracked.fetch_add((cpu_pct * 100.0) as usize, Ordering::SeqCst);
 
         // Auto-classify activity state
         if proc.state != ActivityState::Terminated && proc.state != ActivityState::Suspended {
@@ -228,26 +219,14 @@ impl ActivityManager {
     }
 
     /// Capture thread register state snapshot
-    pub fn capture_register_snapshot(
-        &mut self,
-        pid: usize,
-        registers: RegisterSnapshot,
-    ) -> Result<(), &'static str> {
+    pub fn capture_register_snapshot(&mut self, pid: usize, registers: RegisterSnapshot) -> Result<(), &'static str> {
         let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
         proc.register_snapshot = Some(registers);
         Ok(())
     }
 
     /// Record executable address space binding
-    pub fn bind_address_space(
-        &mut self,
-        pid: usize,
-        binary_path: &str,
-        virt_base: u64,
-        size: u64,
-        aslr_offset: u64,
-        is_wx_compliant: bool,
-    ) -> Result<(), &'static str> {
+    pub fn bind_address_space(&mut self, pid: usize, binary_path: &str, virt_base: u64, size: u64, aslr_offset: u64, is_wx_compliant: bool) -> Result<(), &'static str> {
         let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
         proc.address_binding = Some(AddressSpaceBinding {
             binary_path: binary_path.to_string(),
@@ -273,11 +252,7 @@ impl ActivityManager {
     }
 
     /// Reclaim idle/background processes under OOM pressure (Linux oom_killer & Garuda nohang parity)
-    pub fn reclaim_background_activity(
-        &mut self,
-        current_timestamp: u64,
-        max_idle_sec: u64,
-    ) -> Vec<usize> {
+    pub fn reclaim_background_activity(&mut self, current_timestamp: u64, max_idle_sec: u64) -> Vec<usize> {
         let mut terminated_pids = Vec::new();
 
         for (pid, proc) in self.activities.iter_mut() {
@@ -348,8 +323,7 @@ mod tests {
         assert_eq!(browser.priority, -5); // Priority boosted from 0 to -5
 
         // Update compiler metrics -> background active process
-        am.update_activity_metrics(102, 85.0, 1024 * 1024 * 50, 2048, 1024, 1005)
-            .unwrap();
+        am.update_activity_metrics(102, 85.0, 1024 * 1024 * 50, 2048, 1024, 1005).unwrap();
         let compiler = am.get_process_activity(102).unwrap();
         assert_eq!(compiler.state, ActivityState::Active);
         assert_eq!(compiler.cpu_usage_pct, 85.0);
@@ -367,8 +341,7 @@ mod tests {
         assert_eq!(proc.priority, 5); // Demoted priority
 
         // Test idle activity reclamation
-        am.update_activity_metrics(201, 0.0, 1024 * 1024, 0, 0, 1000)
-            .unwrap();
+        am.update_activity_metrics(201, 0.0, 1024 * 1024, 0, 0, 1000).unwrap();
         let reclaimed = am.reclaim_background_activity(2000, 500); // 1000 sec idle
         assert_eq!(reclaimed, vec![201]);
 
@@ -391,15 +364,7 @@ mod tests {
         };
         am.capture_register_snapshot(301, regs).unwrap();
 
-        am.bind_address_space(
-            301,
-            "/bin/shell",
-            0x0000_7FFF_0000_0000,
-            0x10000,
-            0x20000,
-            true,
-        )
-        .unwrap();
+        am.bind_address_space(301, "/bin/shell", 0x0000_7FFF_0000_0000, 0x10000, 0x20000, true).unwrap();
         am.add_bound_library(301, "libsigma.so").unwrap();
 
         let proc = am.get_process_activity(301).unwrap();

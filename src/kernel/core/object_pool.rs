@@ -1,5 +1,7 @@
 // Object Pool Engine for Zero-Allocation Kernel Operations
 // Location: src/kernel/core/object_pool.rs
+
+#![no_std]
 use core::sync::atomic::{AtomicBool, Ordering};
 
 pub struct ObjectPoolEntry<T, const N: usize> {

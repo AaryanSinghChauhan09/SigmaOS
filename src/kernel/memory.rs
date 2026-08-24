@@ -7,10 +7,10 @@ use alloc::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
+#[cfg(not(test))]
+use crate::klib::HashMap;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -54,12 +54,7 @@ impl KernelPoolManager {
     }
 
     /// Allocate a block from the specific kernel pool with a pool tag (Inspired by Windows NT ExAllocatePoolWithTag)
-    pub fn allocate_pool(
-        &mut self,
-        pool_type: PoolType,
-        size: usize,
-        tag: &[u8; 4],
-    ) -> Result<PoolBlock, &'static str> {
+    pub fn allocate_pool(&mut self, pool_type: PoolType, size: usize, tag: &[u8; 4]) -> Result<PoolBlock, &'static str> {
         if size == 0 {
             return Err("Cannot allocate 0-byte pool block");
         }
@@ -537,7 +532,7 @@ pub const ISA_DMA_MAX_PHYSICAL_ADDR: u64 = 16 * 1024 * 1024; // Strict 16MB phys
 
 pub struct FloppyDiskDmaBuffer {
     pub physical_addr: u64,
-    pub channel: u8,          // ISA DMA Channel 2
+    pub channel: u8, // ISA DMA Channel 2
     pub buffer_length: usize, // Max 64KB
 }
 
@@ -651,18 +646,14 @@ mod tests {
         let mut pool_manager = KernelPoolManager::new();
 
         // Allocate Paged Pool Block with Tag 'File'
-        let paged_block = pool_manager
-            .allocate_pool(PoolType::Paged, 1024, b"File")
-            .unwrap();
+        let paged_block = pool_manager.allocate_pool(PoolType::Paged, 1024, b"File").unwrap();
         assert_eq!(paged_block.size, 1024);
         assert_eq!(paged_block.pool_type, PoolType::Paged);
         assert_eq!(&paged_block.tag, b"File");
         assert_eq!(pool_manager.total_paged_bytes, 1024);
 
         // Allocate NonPaged Pool Block with Tag 'Net '
-        let non_paged_block = pool_manager
-            .allocate_pool(PoolType::NonPaged, 2048, b"Net ")
-            .unwrap();
+        let non_paged_block = pool_manager.allocate_pool(PoolType::NonPaged, 2048, b"Net ").unwrap();
         assert_eq!(non_paged_block.size, 2048);
         assert_eq!(non_paged_block.pool_type, PoolType::NonPaged);
         assert_eq!(&non_paged_block.tag, b"Net ");

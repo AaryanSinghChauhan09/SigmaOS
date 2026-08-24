@@ -1,5 +1,8 @@
 //! Calamares-style Polished Guided GUI Installer Wizard
 //! Zero-dependency, `#![no_std]` compliant installation engine with Calamares & Anaconda parity
+
+#![no_std]
+
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

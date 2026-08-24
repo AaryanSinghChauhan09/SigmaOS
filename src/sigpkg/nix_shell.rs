@@ -11,10 +11,11 @@
 #[allow(unused_variables)]
 #[allow(unused_mut)]
 #[allow(unused_imports)]
+
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 /// Development environment configuration
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -113,9 +114,7 @@ impl NixShellManager {
 
     /// Get the active environment
     pub fn get_active(&self) -> Option<&DevEnvironment> {
-        self.active_environment
-            .as_ref()
-            .and_then(|name| self.environments.get(name))
+        self.active_environment.as_ref().and_then(|name| self.environments.get(name))
     }
 
     /// List all environments

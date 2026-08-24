@@ -22,11 +22,11 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
 use alloc::vec::Vec;
-use core::ptr::NonNull;
+use alloc::string::String;
+use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::ptr::NonNull;
 
 /// Component identifier (Genode-style capability-based)
 pub type ComponentId = usize;
@@ -227,29 +227,25 @@ impl Component {
     /// Check if component has specific capability rights
     pub fn has_capability_rights(&self, handle_id: u32, required_rights: CapabilityRights) -> bool {
         if let Some(&rights) = self.capabilities.get(&handle_id) {
-            (!required_rights.can_read || rights.can_read)
-                && (!required_rights.can_write || rights.can_write)
-                && (!required_rights.can_execute || rights.can_execute)
-                && (!required_rights.can_delegate || rights.can_delegate)
-                && (!required_rights.can_create_child || rights.can_create_child)
+            (!required_rights.can_read || rights.can_read) &&
+            (!required_rights.can_write || rights.can_write) &&
+            (!required_rights.can_execute || rights.can_execute) &&
+            (!required_rights.can_delegate || rights.can_delegate) &&
+            (!required_rights.can_create_child || rights.can_create_child)
         } else {
             false
         }
     }
 
     /// Allocate resource to component
-    pub fn allocate_resource(
-        &mut self,
-        resource: ResourceAllocation,
-    ) -> Result<(), ComponentError> {
+    pub fn allocate_resource(&mut self, resource: ResourceAllocation) -> Result<(), ComponentError> {
         self.resources.push(resource);
         Ok(())
     }
 
     /// Get total resource usage
     pub fn get_resource_usage(&self, resource_type: ResourceType) -> usize {
-        self.resources
-            .iter()
+        self.resources.iter()
             .filter(|r| r.resource_type == resource_type)
             .map(|r| r.amount)
             .sum()
@@ -295,11 +291,7 @@ impl ComponentTree {
     }
 
     /// Create a new component as child of parent
-    pub fn create_component(
-        &mut self,
-        parent_id: ComponentId,
-        name: &str,
-    ) -> Result<ComponentId, ComponentError> {
+    pub fn create_component(&mut self, parent_id: ComponentId, name: &str) -> Result<ComponentId, ComponentError> {
         // Check if parent exists
         if !self.components.contains_key(&parent_id) {
             return Err(ComponentError::ParentNotFound);
@@ -307,10 +299,7 @@ impl ComponentTree {
 
         // Check parent has create_child permission
         let parent = self.components.get(&parent_id).unwrap();
-        let parent_has_permission = parent
-            .capabilities
-            .values()
-            .any(|&rights| rights.can_create_child);
+        let parent_has_permission = parent.capabilities.values().any(|&rights| rights.can_create_child);
         if parent_id != self.root_id && !parent_has_permission {
             return Err(ComponentError::PermissionDenied);
         }
@@ -331,9 +320,7 @@ impl ComponentTree {
                         can_delegate: false, // Can't re-delegate inherited
                         can_create_child: false,
                     };
-                    new_component
-                        .delegate_capability(CapabilityHandle::new(cap_id, inherited_rights))
-                        .ok();
+                    new_component.delegate_capability(CapabilityHandle::new(cap_id, inherited_rights)).ok();
                 }
             }
         }
@@ -354,10 +341,7 @@ impl ComponentTree {
         }
 
         let (children_to_destroy, parent_id) = {
-            let component = self
-                .components
-                .get(&component_id)
-                .ok_or(ComponentError::NotFound)?;
+            let component = self.components.get(&component_id).ok_or(ComponentError::NotFound)?;
             (component.children.clone(), component.parent)
         };
 
@@ -380,71 +364,40 @@ impl ComponentTree {
 
     /// Get component by ID
     pub fn get_component(&self, component_id: ComponentId) -> Result<&Component, ComponentError> {
-        self.components
-            .get(&component_id)
-            .ok_or(ComponentError::NotFound)
+        self.components.get(&component_id).ok_or(ComponentError::NotFound)
     }
 
     /// Get mutable component by ID
-    pub fn get_component_mut(
-        &mut self,
-        component_id: ComponentId,
-    ) -> Result<&mut Component, ComponentError> {
-        self.components
-            .get_mut(&component_id)
-            .ok_or(ComponentError::NotFound)
+    pub fn get_component_mut(&mut self, component_id: ComponentId) -> Result<&mut Component, ComponentError> {
+        self.components.get_mut(&component_id).ok_or(ComponentError::NotFound)
     }
 
     /// Allocate capability to component
-    pub fn allocate_capability(
-        &mut self,
-        component_id: ComponentId,
-        rights: CapabilityRights,
-    ) -> Result<CapabilityHandle, ComponentError> {
-        let component = self
-            .components
-            .get_mut(&component_id)
-            .ok_or(ComponentError::NotFound)?;
+    pub fn allocate_capability(&mut self, component_id: ComponentId, rights: CapabilityRights) -> Result<CapabilityHandle, ComponentError> {
+        let component = self.components.get_mut(&component_id).ok_or(ComponentError::NotFound)?;
         Ok(component.allocate_capability(rights))
     }
 
     /// Delegate capability from parent to child
-    pub fn delegate_capability(
-        &mut self,
-        parent_id: ComponentId,
-        child_id: ComponentId,
-        handle: CapabilityHandle,
-    ) -> Result<(), ComponentError> {
-        let parent = self
-            .components
-            .get(&parent_id)
-            .ok_or(ComponentError::ParentNotFound)?;
+    pub fn delegate_capability(&mut self, parent_id: ComponentId, child_id: ComponentId, handle: CapabilityHandle) -> Result<(), ComponentError> {
+        let parent = self.components.get(&parent_id).ok_or(ComponentError::ParentNotFound)?;
 
         // Check parent has capability in capability_space and has delegation rights
         if !parent.has_capability_rights(handle.id, CapabilityRights::none().with_delegate()) {
             return Err(ComponentError::PermissionDenied);
         }
 
-        let child = self
-            .components
-            .get_mut(&child_id)
-            .ok_or(ComponentError::ChildNotFound)?;
+        let child = self.components.get_mut(&child_id).ok_or(ComponentError::ChildNotFound)?;
         child.delegate_capability(handle)
     }
 
     /// Find path from root to component
-    pub fn get_component_path(
-        &self,
-        component_id: ComponentId,
-    ) -> Result<Vec<String>, ComponentError> {
+    pub fn get_component_path(&self, component_id: ComponentId) -> Result<Vec<String>, ComponentError> {
         let mut path = Vec::new();
         let mut current_id = component_id;
 
         loop {
-            let component = self
-                .components
-                .get(&current_id)
-                .ok_or(ComponentError::NotFound)?;
+            let component = self.components.get(&current_id).ok_or(ComponentError::NotFound)?;
             path.insert(0, component.name.clone());
 
             match component.parent {
@@ -457,14 +410,8 @@ impl ComponentTree {
     }
 
     /// Get all descendants of a component
-    pub fn get_descendants(
-        &self,
-        component_id: ComponentId,
-    ) -> Result<Vec<ComponentId>, ComponentError> {
-        let component = self
-            .components
-            .get(&component_id)
-            .ok_or(ComponentError::NotFound)?;
+    pub fn get_descendants(&self, component_id: ComponentId) -> Result<Vec<ComponentId>, ComponentError> {
+        let component = self.components.get(&component_id).ok_or(ComponentError::NotFound)?;
         let mut descendants = Vec::new();
 
         for &child_id in &component.children {
@@ -478,12 +425,7 @@ impl ComponentTree {
     }
 
     /// Check resource availability in component tree
-    pub fn check_resource_availability(
-        &self,
-        component_id: ComponentId,
-        resource_type: ResourceType,
-        required: usize,
-    ) -> bool {
+    pub fn check_resource_availability(&self, component_id: ComponentId, resource_type: ResourceType, required: usize) -> bool {
         if let Ok(component) = self.get_component(component_id) {
             let available = component.get_resource_usage(resource_type);
             available >= required
@@ -493,15 +435,9 @@ impl ComponentTree {
     }
 
     /// Propagate resource limits from parent to children
-    pub fn propagate_resource_limits(
-        &mut self,
-        parent_id: ComponentId,
-    ) -> Result<(), ComponentError> {
+    pub fn propagate_resource_limits(&mut self, parent_id: ComponentId) -> Result<(), ComponentError> {
         let (parent_resources, parent_children) = {
-            let parent = self
-                .components
-                .get(&parent_id)
-                .ok_or(ComponentError::NotFound)?;
+            let parent = self.components.get(&parent_id).ok_or(ComponentError::NotFound)?;
             (parent.resources.clone(), parent.children.clone())
         };
         let children_count = parent_children.len().max(1);
@@ -547,8 +483,7 @@ mod tests {
     fn test_capability_delegation() {
         let mut tree = ComponentTree::new();
         let parent_id = tree.create_component(0, "parent").unwrap();
-        tree.allocate_capability(parent_id, CapabilityRights::full())
-            .unwrap();
+        tree.allocate_capability(parent_id, CapabilityRights::full()).unwrap();
         let child_id = tree.create_component(parent_id, "child").unwrap();
 
         let rights = CapabilityRights::full();
@@ -562,15 +497,11 @@ mod tests {
     fn test_resource_propagation() {
         let mut tree = ComponentTree::new();
         let parent_id = tree.create_component(0, "parent").unwrap();
-        tree.allocate_capability(parent_id, CapabilityRights::full())
-            .unwrap();
+        tree.allocate_capability(parent_id, CapabilityRights::full()).unwrap();
         let child_id = tree.create_component(parent_id, "child").unwrap();
 
         let resource = ResourceAllocation::new(ResourceType::Memory, 1024, 0, 1024);
-        tree.get_component_mut(parent_id)
-            .unwrap()
-            .allocate_resource(resource)
-            .unwrap();
+        tree.get_component_mut(parent_id).unwrap().allocate_resource(resource).unwrap();
 
         tree.propagate_resource_limits(parent_id).unwrap();
 

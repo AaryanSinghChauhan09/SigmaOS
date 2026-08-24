@@ -1,5 +1,8 @@
 //! Security Functions (firewalld/iptables Inspiration)
 //! Firewall management, SELinux management, and SSH key management
+
+#![no_std]
+
 extern crate alloc;
 
 use crate::klib::{Vec, String};

@@ -1,4 +1,5 @@
 #![allow(unused_variables)]
+#![no_std]
 #![cfg_attr(not(test), no_main)]
 
 /// Custom Syscall Dispatcher for SigmaOS

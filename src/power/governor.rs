@@ -135,9 +135,7 @@ pub struct EnergyAwareThreadBalancer {
 
 impl EnergyAwareThreadBalancer {
     pub const fn new(scale: f64) -> Self {
-        Self {
-            scale_factor: scale,
-        }
+        Self { scale_factor: scale }
     }
 
     /// Linux EAS (Energy Aware Scheduling) parity:

@@ -6,11 +6,11 @@ use std::collections::HashMap;
 /// Statutory regulatory frameworks
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum StatutoryFramework {
-    Gdpr,              // EU General Data Protection Regulation
-    IndianDpdpAct2023, // Indian Digital Personal Data Protection Act 2023
-    Iso27001,          // ISO/IEC 27001 Information Security
-    Hipaa,             // Health Insurance Portability and Accountability Act
-    PciDss,            // Payment Card Industry Data Security Standard
+    Gdpr,                // EU General Data Protection Regulation
+    IndianDpdpAct2023,   // Indian Digital Personal Data Protection Act 2023
+    Iso27001,            // ISO/IEC 27001 Information Security
+    Hipaa,               // Health Insurance Portability and Accountability Act
+    PciDss,              // Payment Card Industry Data Security Standard
 }
 
 impl StatutoryFramework {
@@ -78,12 +78,7 @@ impl PenaltyBreachNotifier {
         Self { alerts: Vec::new() }
     }
 
-    pub fn notify_breach(
-        &mut self,
-        rule: &StatutoryGovernanceRule,
-        breach_details: &str,
-        timestamp: u64,
-    ) {
+    pub fn notify_breach(&mut self, rule: &StatutoryGovernanceRule, breach_details: &str, timestamp: u64) {
         self.alerts.push(StatutoryBreachAlert {
             rule_id: rule.rule_id.clone(),
             framework: rule.framework,
@@ -113,19 +108,11 @@ impl DisputeAuditRollbackEngine {
     }
 
     pub fn create_audit_checkpoint(&mut self, checkpoint_id: usize, state_hash: &str) {
-        self.audit_checkpoint_history
-            .push((checkpoint_id, state_hash.to_string()));
+        self.audit_checkpoint_history.push((checkpoint_id, state_hash.to_string()));
     }
 
-    pub fn rollback_dispute_checkpoint(
-        &mut self,
-        target_checkpoint_id: usize,
-    ) -> Result<String, &'static str> {
-        if let Some(pos) = self
-            .audit_checkpoint_history
-            .iter()
-            .position(|(id, _)| *id == target_checkpoint_id)
-        {
+    pub fn rollback_dispute_checkpoint(&mut self, target_checkpoint_id: usize) -> Result<String, &'static str> {
+        if let Some(pos) = self.audit_checkpoint_history.iter().position(|(id, _)| *id == target_checkpoint_id) {
             let hash = self.audit_checkpoint_history[pos].1.clone();
             self.audit_checkpoint_history.truncate(pos + 1);
             Ok(hash)
@@ -198,11 +185,7 @@ impl StatutoryGovernanceLayer {
         let mut compliant_count = 0;
         for rule in self.rules.values_mut() {
             if rule.status == ComplianceRuleStatus::Breached {
-                self.notifier.notify_breach(
-                    rule,
-                    "Automated compliance audit detected rule breach",
-                    current_timestamp,
-                );
+                self.notifier.notify_breach(rule, "Automated compliance audit detected rule breach", current_timestamp);
             } else if rule.status == ComplianceRuleStatus::Compliant {
                 compliant_count += 1;
             }
@@ -238,23 +221,13 @@ mod tests {
         let score_after_breach = layer.evaluate_compliance_posture(1005);
         assert!(score_after_breach < 100);
         assert_eq!(layer.notifier.alerts.len(), 1);
-        assert_eq!(
-            layer.notifier.alerts[0].framework,
-            StatutoryFramework::IndianDpdpAct2023
-        );
+        assert_eq!(layer.notifier.alerts[0].framework, StatutoryFramework::IndianDpdpAct2023);
 
         // 3. Test Dispute Audit Rollback Engine
-        layer
-            .rollback_engine
-            .create_audit_checkpoint(1, "hash_state_001");
-        layer
-            .rollback_engine
-            .create_audit_checkpoint(2, "hash_state_002");
+        layer.rollback_engine.create_audit_checkpoint(1, "hash_state_001");
+        layer.rollback_engine.create_audit_checkpoint(2, "hash_state_002");
 
-        let hash = layer
-            .rollback_engine
-            .rollback_dispute_checkpoint(1)
-            .unwrap();
+        let hash = layer.rollback_engine.rollback_dispute_checkpoint(1).unwrap();
         assert_eq!(hash, "hash_state_001");
         assert_eq!(layer.rollback_engine.audit_checkpoint_history.len(), 1);
     }

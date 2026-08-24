@@ -104,17 +104,14 @@ impl SovereignFsJournal {
         let id = self.next_tx_id;
         self.next_tx_id += 1;
 
-        self.transactions.insert(
-            id,
-            JournalTransaction {
-                tx_id: id,
-                action: action.to_string(),
-                path: path.to_string(),
-                operation: action.to_string(),
-                data: data.to_vec(),
-                state: JournalState::Pending,
-            },
-        );
+        self.transactions.insert(id, JournalTransaction {
+            tx_id: id,
+            action: action.to_string(),
+            path: path.to_string(),
+            operation: action.to_string(),
+            data: data.to_vec(),
+            state: JournalState::Pending,
+        });
 
         id
     }
@@ -232,7 +229,7 @@ pub struct FileBlock {
 pub struct SigmaFS {
     pub file_blocks: HashMap<String, FileBlock>, // content-addressed block deduplication
     pub semantic_index: HashMap<String, String>, // search terms -> file names
-    pub audit_trail_hashes: Vec<String>,         // Tamper-evident SHA-256 blockchain hash ledger
+    pub audit_trail_hashes: Vec<String>, // Tamper-evident SHA-256 blockchain hash ledger
 }
 
 impl SigmaFS {
@@ -256,13 +253,10 @@ impl SigmaFS {
         let content_hash = format!("block-hash-{}", sum);
 
         if !self.file_blocks.contains_key(&content_hash) {
-            self.file_blocks.insert(
-                content_hash.clone(),
-                FileBlock {
-                    hash: content_hash.clone(),
-                    content: content.to_vec(),
-                },
-            );
+            self.file_blocks.insert(content_hash.clone(), FileBlock {
+                hash: content_hash.clone(),
+                content: content.to_vec(),
+            });
         }
 
         // Write blockchain audit trail block
@@ -277,8 +271,7 @@ impl SigmaFS {
 
         // Map semantic terms for search (simulated NLP indexer)
         if file_name.contains("report") {
-            self.semantic_index
-                .insert("finance".to_string(), file_name.to_string());
+            self.semantic_index.insert("finance".to_string(), file_name.to_string());
         }
 
         Ok(content_hash)
@@ -410,9 +403,7 @@ impl SigmaFhsRouter {
         rules.insert(".bin".to_string(), "/bin".to_string());
         rules.insert(".log".to_string(), "/var/log".to_string());
         rules.insert(".so".to_string(), "/lib".to_string());
-        SigmaFhsRouter {
-            routing_rules: rules,
-        }
+        SigmaFhsRouter { routing_rules: rules }
     }
 
     /// Dynamically routes paths, bypassing rigid static Linux FHS mappings
@@ -681,12 +672,8 @@ mod tests {
     #[test]
     fn test_sigma_fs_deduplication() {
         let mut fs = SigmaFS::new();
-        let hash1 = fs
-            .write_file_block("report-q1.txt", b"REVENUE_STABLE")
-            .unwrap();
-        let hash2 = fs
-            .write_file_block("report-q2.txt", b"REVENUE_STABLE")
-            .unwrap();
+        let hash1 = fs.write_file_block("report-q1.txt", b"REVENUE_STABLE").unwrap();
+        let hash2 = fs.write_file_block("report-q2.txt", b"REVENUE_STABLE").unwrap();
 
         // Identical contents must map to the same content hash (deduplicated)
         assert_eq!(hash1, hash2);
@@ -696,8 +683,7 @@ mod tests {
     #[test]
     fn test_sigma_fs_semantic_and_audit() {
         let mut fs = SigmaFS::new();
-        fs.write_file_block("financial_report.csv", b"SALES_GROWTH_15_PERCENT")
-            .unwrap();
+        fs.write_file_block("financial_report.csv", b"SALES_GROWTH_15_PERCENT").unwrap();
 
         let found = fs.semantic_search("finance").unwrap();
         assert_eq!(found, "financial_report.csv");
@@ -734,10 +720,7 @@ mod tests {
         ns.write_isolated_file("app.py", b"print('hello lts')".to_vec());
 
         assert_eq!(ns.bind_mounts.len(), 1);
-        assert_eq!(
-            ns.read_isolated_file("app.py").unwrap(),
-            &b"print('hello lts')".to_vec()
-        );
+        assert_eq!(ns.read_isolated_file("app.py").unwrap(), &b"print('hello lts')".to_vec());
     }
 
     #[test]
@@ -763,8 +746,7 @@ mod tests {
         let win_bin = hierarchy.translate_cross_platform_path("C:\\Windows\\System32\\cmd.exe");
         assert_eq!(win_bin, "/bin/cmd.exe");
 
-        let win_user =
-            hierarchy.translate_cross_platform_path("C:\\Users\\admin\\Documents\\file.txt");
+        let win_user = hierarchy.translate_cross_platform_path("C:\\Users\\admin\\Documents\\file.txt");
         assert_eq!(win_user, "/home/admin/Documents/file.txt");
 
         // BSD path translation

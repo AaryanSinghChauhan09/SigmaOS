@@ -2,6 +2,9 @@
 //! Implements desktop environment using OOP principles with traits and structs
 //! No dependency on external desktop frameworks
 //! Based on Roadmap Item 41: Zenith Desktop core
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::boxed::Box;

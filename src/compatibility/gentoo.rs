@@ -2,9 +2,10 @@
 /// Gentoo Linux & SysVinit runlevels Architecture Absorption for SigmaOS
 /// Implements Portage-grade ebuild compilation recipes, global & local compile-time USE Flags,
 /// and OpenRC runlevel dependency-resolved parallel process/daemon supervision.
+
 extern crate alloc;
-use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::string::String;
 
 // =========================================================================
 // 1. USE FLAGS (Gentoo-grade Compile-Time Feature Optimization)
@@ -36,11 +37,11 @@ impl UseFlagManager {
 // =========================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OpenRcRunlevel {
-    PowerOff = 0,   // Runlevel 0: Halt / PowerOff / poweroff.target
-    SingleUser = 1, // Runlevel 1: Single-user rescue mode / rescue.target (minimal services)
-    MultiUser = 3, // Runlevel 3: Multi-user command-line console mode / multi-user.target (networking active)
-    Graphical = 5, // Runlevel 5: Multi-user graphical display mode / graphical.target (X11 / Wayland / Zenith)
-    Reboot = 6,    // Runlevel 6: Reboot / reboot.target
+    PowerOff = 0,         // Runlevel 0: Halt / PowerOff / poweroff.target
+    SingleUser = 1,       // Runlevel 1: Single-user rescue mode / rescue.target (minimal services)
+    MultiUser = 3,        // Runlevel 3: Multi-user command-line console mode / multi-user.target (networking active)
+    Graphical = 5,        // Runlevel 5: Multi-user graphical display mode / graphical.target (X11 / Wayland / Zenith)
+    Reboot = 6,           // Runlevel 6: Reboot / reboot.target
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -98,15 +99,11 @@ impl OpenRcManager {
     }
 
     /// Transitions init state runlevels, resolving and starting services in parallel dependency orders
-    pub fn transition_to_runlevel(
-        &mut self,
-        target_runlevel: OpenRcRunlevel,
-    ) -> Result<(), &'static str> {
+    pub fn transition_to_runlevel(&mut self, target_runlevel: OpenRcRunlevel) -> Result<(), &'static str> {
         self.current_runlevel = target_runlevel;
 
         // If transitioning to PowerOff (0) or Reboot (6), we stop all services in reverse dependency order
-        if target_runlevel == OpenRcRunlevel::PowerOff || target_runlevel == OpenRcRunlevel::Reboot
-        {
+        if target_runlevel == OpenRcRunlevel::PowerOff || target_runlevel == OpenRcRunlevel::Reboot {
             for i in (0..self.services.len()).rev() {
                 self.services[i].status = ServiceStatus::Stopped;
             }
@@ -135,9 +132,8 @@ impl OpenRcManager {
 
             for i in 0..self.services.len() {
                 // If service is stopped and belongs to target set
-                if self.services[i].status == ServiceStatus::Stopped
-                    && target_services.contains(&self.services[i].name)
-                {
+                if self.services[i].status == ServiceStatus::Stopped && target_services.contains(&self.services[i].name) {
+
                     // Verify if all dependencies are already started
                     let mut deps_satisfied = true;
                     for dep in &self.services[i].dependencies {
@@ -201,8 +197,7 @@ impl EbuildPackage {
     }
 
     pub fn with_use_dep(mut self, flag: &str, dep_pkg: &str) -> Self {
-        self.use_conditional_deps
-            .push((flag.to_string(), dep_pkg.to_string()));
+        self.use_conditional_deps.push((flag.to_string(), dep_pkg.to_string()));
         self
     }
 
@@ -266,7 +261,8 @@ mod tests {
         let mut manager = OpenRcManager::new();
 
         // Register hardware clock, network, and GUI services
-        let udev = OpenRcService::new("udev").with_runlevel(OpenRcRunlevel::SingleUser);
+        let udev = OpenRcService::new("udev")
+            .with_runlevel(OpenRcRunlevel::SingleUser);
 
         let localmount = OpenRcService::new("localmount")
             .with_dependency("udev")
@@ -286,35 +282,24 @@ mod tests {
         manager.register_service(zenith);
 
         // 1. Transition to SingleUser (Runlevel 1) (starts only udev then localmount)
-        manager
-            .transition_to_runlevel(OpenRcRunlevel::SingleUser)
-            .unwrap();
+        manager.transition_to_runlevel(OpenRcRunlevel::SingleUser).unwrap();
         assert_eq!(manager.services[0].status, ServiceStatus::Started); // udev
         assert_eq!(manager.services[1].status, ServiceStatus::Started); // localmount
         assert_eq!(manager.services[2].status, ServiceStatus::Stopped); // dhcpcd (runlevel 3)
         assert_eq!(manager.services[3].status, ServiceStatus::Stopped); // zenith (runlevel 5)
 
         // 2. Transition to MultiUser (Runlevel 3) (starts dhcpcd network daemon)
-        manager
-            .transition_to_runlevel(OpenRcRunlevel::MultiUser)
-            .unwrap();
+        manager.transition_to_runlevel(OpenRcRunlevel::MultiUser).unwrap();
         assert_eq!(manager.services[2].status, ServiceStatus::Started); // dhcpcd
         assert_eq!(manager.services[3].status, ServiceStatus::Stopped); // zenith still stopped
 
         // 3. Transition to Graphical (Runlevel 5) (starts display compositor zenith)
-        manager
-            .transition_to_runlevel(OpenRcRunlevel::Graphical)
-            .unwrap();
+        manager.transition_to_runlevel(OpenRcRunlevel::Graphical).unwrap();
         assert_eq!(manager.services[3].status, ServiceStatus::Started); // zenith
 
         // 4. Transition to PowerOff (Runlevel 0) (Halt - stops all services cleanly in reverse order)
-        manager
-            .transition_to_runlevel(OpenRcRunlevel::PowerOff)
-            .unwrap();
-        assert!(manager
-            .services
-            .iter()
-            .all(|s| s.status == ServiceStatus::Stopped));
+        manager.transition_to_runlevel(OpenRcRunlevel::PowerOff).unwrap();
+        assert!(manager.services.iter().all(|s| s.status == ServiceStatus::Stopped));
     }
 
     #[test]
@@ -333,9 +318,7 @@ mod tests {
 
         // Compiling and installing nginx should succeed because dev-libs/openssl was already emerged
         assert!(portage.emerge(&nginx).is_ok());
-        assert!(portage
-            .installed_packages
-            .contains(&"www-servers/nginx".to_string()));
+        assert!(portage.installed_packages.contains(&"www-servers/nginx".to_string()));
     }
 
     #[test]

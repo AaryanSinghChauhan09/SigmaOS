@@ -45,11 +45,7 @@ impl std::fmt::Display for Version {
 #[cfg(feature = "standalone_test")]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self {
-            major,
-            minor,
-            patch,
-        }
+        Self { major, minor, patch }
     }
     pub fn parse(s: &str) -> Result<Self, &'static str> {
         let mut parts = s.split('.');
@@ -94,12 +90,8 @@ pub trait IPackage: Send + Sync {
     fn format(&self) -> PackageFormat;
     fn metadata(&self) -> &PackageMetadata;
     fn metadata_mut(&mut self) -> &mut PackageMetadata;
-    fn files(&self) -> &[String] {
-        &[]
-    }
-    fn conditional_dependencies(&self) -> &[ConditionalDependency] {
-        &[]
-    }
+    fn files(&self) -> &[String] { &[] }
+    fn conditional_dependencies(&self) -> &[ConditionalDependency] { &[] }
 }
 
 /// Package format enumeration
@@ -2022,9 +2014,7 @@ impl PackageParserFactory {
     }
 
     pub fn get_parser(&self, format: PackageFormat) -> Option<&dyn IPackageParser> {
-        self.parsers
-            .get(&format)
-            .map(|p: &Box<dyn IPackageParser>| p.as_ref())
+        self.parsers.get(&format).map(|p: &Box<dyn IPackageParser>| p.as_ref())
     }
 
     pub fn auto_detect_parser(&self, data: &[u8]) -> Option<&dyn IPackageParser> {
@@ -2126,10 +2116,7 @@ impl GpgPqcVerifierAdapter {
         }
 
         // Layer 2: Post-Quantum Check
-        let pqc_sig = meta
-            .pqc_signature
-            .as_ref()
-            .ok_or("Missing Post-Quantum signature")?;
+        let pqc_sig = meta.pqc_signature.as_ref().ok_or("Missing Post-Quantum signature")?;
         if !pqc_sig.contains("dilithium") {
             return Err("Invalid quantum-safe signature; signature tampered");
         }
@@ -2290,9 +2277,7 @@ impl UniversalPackageManager {
 
     /// Get installed package
     pub fn get_package(&self, name: &str) -> Option<&dyn IPackage> {
-        self.installed_packages
-            .get(name)
-            .map(|p: &Box<dyn IPackage>| p.as_ref())
+        self.installed_packages.get(name).map(|p: &Box<dyn IPackage>| p.as_ref())
     }
 
     /// List all installed packages

@@ -202,11 +202,7 @@ impl CinderBlockStorageEngine {
     ) -> Result<(), &'static str> {
         let vol = self.volumes.get_mut(&volume_id).ok_or("Volume not found")?;
 
-        if let Some(pos) = vol
-            .attached_instances
-            .iter()
-            .position(|&id| id == instance_id)
-        {
+        if let Some(pos) = vol.attached_instances.iter().position(|&id| id == instance_id) {
             vol.attached_instances.remove(pos);
             if vol.attached_instances.is_empty() {
                 vol.state = CinderVolumeState::Available;
@@ -217,11 +213,7 @@ impl CinderBlockStorageEngine {
         }
     }
 
-    pub fn create_snapshot(
-        &mut self,
-        volume_id: VolumeId,
-        snap_name: &str,
-    ) -> Result<SnapshotId, &'static str> {
+    pub fn create_snapshot(&mut self, volume_id: VolumeId, snap_name: &str) -> Result<SnapshotId, &'static str> {
         let vol = self.volumes.get(&volume_id).ok_or("Volume not found")?;
         let snap_id = self.next_snap_id.fetch_add(1, Ordering::SeqCst);
 
@@ -237,24 +229,11 @@ impl CinderBlockStorageEngine {
         Ok(snap_id)
     }
 
-    pub fn clone_volume(
-        &mut self,
-        source_volume_id: VolumeId,
-        clone_name: &str,
-    ) -> Result<VolumeId, &'static str> {
-        let src = self
-            .volumes
-            .get(&source_volume_id)
-            .ok_or("Source volume not found")?;
+    pub fn clone_volume(&mut self, source_volume_id: VolumeId, clone_name: &str) -> Result<VolumeId, &'static str> {
+        let src = self.volumes.get(&source_volume_id).ok_or("Source volume not found")?;
         let new_id = self.next_vol_id.fetch_add(1, Ordering::SeqCst);
 
-        let mut cloned_vol = CinderVolume::new(
-            new_id,
-            clone_name,
-            src.size_gb,
-            src.volume_type,
-            src.provisioning,
-        );
+        let mut cloned_vol = CinderVolume::new(new_id, clone_name, src.size_gb, src.volume_type, src.provisioning);
         cloned_vol.encrypted = src.encrypted;
         cloned_vol.encryption_key = src.encryption_key;
         cloned_vol.qos = src.qos.clone();
@@ -263,11 +242,7 @@ impl CinderBlockStorageEngine {
         Ok(new_id)
     }
 
-    pub fn backup_volume(
-        &mut self,
-        volume_id: VolumeId,
-        dest_url: &str,
-    ) -> Result<BackupId, &'static str> {
+    pub fn backup_volume(&mut self, volume_id: VolumeId, dest_url: &str) -> Result<BackupId, &'static str> {
         let vol = self.volumes.get_mut(&volume_id).ok_or("Volume not found")?;
         vol.state = CinderVolumeState::BackingUp;
 
@@ -320,26 +295,17 @@ mod tests {
         assert!(engine.attach_volume(vol_id, 1002).is_err());
 
         // Enable multi-attach
-        engine
-            .volumes
-            .get_mut(&vol_id)
-            .unwrap()
-            .multi_attach_enabled = true;
+        engine.volumes.get_mut(&vol_id).unwrap().multi_attach_enabled = true;
         assert!(engine.attach_volume(vol_id, 1002).is_ok());
 
         // Snapshot
-        let snap_id = engine
-            .create_snapshot(vol_id, "snap-before-upgrade")
-            .unwrap();
+        let snap_id = engine.create_snapshot(vol_id, "snap-before-upgrade").unwrap();
         assert_eq!(engine.snapshots.len(), 1);
         assert_eq!(engine.snapshots.get(&snap_id).unwrap().size_gb, 100);
 
         // Detach
         assert!(engine.detach_volume(vol_id, 1001).is_ok());
         assert!(engine.detach_volume(vol_id, 1002).is_ok());
-        assert_eq!(
-            engine.volumes.get(&vol_id).unwrap().state,
-            CinderVolumeState::Available
-        );
+        assert_eq!(engine.volumes.get(&vol_id).unwrap().state, CinderVolumeState::Available);
     }
 }

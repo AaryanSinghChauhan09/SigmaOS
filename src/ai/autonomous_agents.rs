@@ -1,6 +1,9 @@
 // Autonomous Agents: The Intelligence Layer
 // Implements the Sovereign Agent System as described in AGENTS.md
 // Replaces traditional background daemons and systemd services with Autonomous Agents
+
+#![no_std]
+
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;

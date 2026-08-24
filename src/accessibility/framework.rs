@@ -302,21 +302,14 @@ pub struct AccessibilityTestingHarness {
 
 impl AccessibilityTestingHarness {
     pub fn new() -> Self {
-        Self {
-            min_contrast_ratio: 4.5,
-        } // WCAG AA standard
+        Self { min_contrast_ratio: 4.5 } // WCAG AA standard
     }
 
     /// Audit an individual UI component for WCAG 2.1 AA compliance
     pub fn audit_component(&self, component: &AccessibilityComponent) -> Vec<&'static str> {
         let mut violations = Vec::new();
 
-        if component.label.is_none()
-            || component
-                .label
-                .as_ref()
-                .map_or(true, |l| l.trim().is_empty())
-        {
+        if component.label.is_none() || component.label.as_ref().map_or(true, |l| l.trim().is_empty()) {
             violations.push("Missing accessible label or ARIA name");
         }
 
@@ -332,10 +325,7 @@ impl AccessibilityTestingHarness {
     }
 
     /// Audit a full UI component tree
-    pub fn audit_ui_tree(
-        &self,
-        components: &[AccessibilityComponent],
-    ) -> BTreeMap<String, Vec<&'static str>> {
+    pub fn audit_ui_tree(&self, components: &[AccessibilityComponent]) -> BTreeMap<String, Vec<&'static str>> {
         let mut report = BTreeMap::new();
         for comp in components {
             let violations = self.audit_component(comp);

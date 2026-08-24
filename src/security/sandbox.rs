@@ -2,22 +2,22 @@
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Enhanced with Sandboxie-style file system overlays and Firejail-style execution profiles.
 
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{HashSet, HashMap, BTreeMap};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SandboxRule {
     NetworkWriteGate,
     FSWriteGate,
     ProcessForkGate,
-    IpcAccessGate,       // Block inter-process communication
-    MemoryDbgAttachGate, // Prevent debuggers attaching (ptrace)
-    RawSocketOpenGate,   // Block raw socket creations
+    IpcAccessGate,          // Block inter-process communication
+    MemoryDbgAttachGate,    // Prevent debuggers attaching (ptrace)
+    RawSocketOpenGate,      // Block raw socket creations
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SandboxProfile {
     None,
-    StrictBrowser,    // Demands network, blocks local filesystems except user downloads
+    StrictBrowser,   // Demands network, blocks local filesystems except user downloads
     RestrictedOffice, // Demands file writes, absolutely blocks network gates
     UntrustedInstaller,
 }
@@ -52,12 +52,7 @@ impl PrivacyFirstSandbox {
             virtualization_overlay: BTreeMap::new(),
             environment_variables: HashMap::new(),
             enforcement: EnforcementLevel::Enforce,
-            security_context: SovereignSecurityContext::new(
-                "system_u",
-                "system_r",
-                "sandbox_t",
-                "s0",
-            ),
+            security_context: SovereignSecurityContext::new("system_u", "system_r", "sandbox_t", "s0"),
             private_dir_shields: HashSet::new(),
             compliance: ComplianceProfile::StandardSandbox,
             security_audit_log: Vec::new(),
@@ -148,12 +143,8 @@ impl PrivacyFirstSandbox {
         if !self.validate_syscall_transition(SandboxRule::FSWriteGate) {
             return Err("System FSWriteGate is blocked; filesystem mutations must go through custom overlay maps");
         }
-        self.virtual_filesystem_overlay
-            .insert(file_path.to_string(), content.to_vec());
-        self.virtualization_overlay.insert(
-            file_path.to_string(),
-            String::from_utf8_lossy(content).to_string(),
-        );
+        self.virtual_filesystem_overlay.insert(file_path.to_string(), content.to_vec());
+        self.virtualization_overlay.insert(file_path.to_string(), String::from_utf8_lossy(content).to_string());
         Ok(())
     }
 
@@ -195,10 +186,7 @@ mod tests {
     fn test_privacy_first_sandbox() {
         let mut sandbox = PrivacyFirstSandbox::new(505, "crystals-dilithium-attestation-token-999");
         assert!(sandbox.is_active_sandboxed);
-        assert_eq!(
-            sandbox.active_pqc_key_attestation,
-            "crystals-dilithium-attestation-token-999"
-        );
+        assert_eq!(sandbox.active_pqc_key_attestation, "crystals-dilithium-attestation-token-999");
 
         // Allowed by default
         assert!(sandbox.validate_syscall_transition(SandboxRule::NetworkWriteGate));
@@ -268,35 +256,17 @@ mod tests {
     #[test]
     fn test_competitor_profiles_sandboxing() {
         // Test strict browser profile
-        let mut browser_sandbox = PrivacyFirstSandbox::with_profile(
-            601,
-            "dilithium-key-1",
-            SandboxProfile::StrictBrowser,
-        );
+        let mut browser_sandbox = PrivacyFirstSandbox::with_profile(601, "dilithium-key-1", SandboxProfile::StrictBrowser);
         assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::FSWriteGate));
         assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::ProcessForkGate));
         assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::MemoryDbgAttachGate));
-        assert_eq!(
-            browser_sandbox
-                .get_environment("BROWSER_SANDBOX_ENFORCED")
-                .unwrap(),
-            "1"
-        );
+        assert_eq!(browser_sandbox.get_environment("BROWSER_SANDBOX_ENFORCED").unwrap(), "1");
 
         // Test restricted office profile
-        let mut office_sandbox = PrivacyFirstSandbox::with_profile(
-            602,
-            "dilithium-key-2",
-            SandboxProfile::RestrictedOffice,
-        );
+        let mut office_sandbox = PrivacyFirstSandbox::with_profile(602, "dilithium-key-2", SandboxProfile::RestrictedOffice);
         assert!(!office_sandbox.validate_syscall_transition(SandboxRule::NetworkWriteGate));
         assert!(!office_sandbox.validate_syscall_transition(SandboxRule::IpcAccessGate));
-        assert_eq!(
-            office_sandbox
-                .get_environment("OFFICE_ISOLATION_ENFORCED")
-                .unwrap(),
-            "1"
-        );
+        assert_eq!(office_sandbox.get_environment("OFFICE_ISOLATION_ENFORCED").unwrap(), "1");
     }
 
     #[test]
@@ -305,13 +275,8 @@ mod tests {
         assert!(sandbox.virtual_read_opt("/etc/passwd").is_none());
 
         // Virtual write
-        sandbox
-            .virtual_write("/etc/passwd", b"root:x:0:0:root:/root:/bin/sh")
-            .unwrap();
-        assert_eq!(
-            sandbox.virtual_read_opt("/etc/passwd").unwrap(),
-            "root:x:0:0:root:/root:/bin/sh"
-        );
+        sandbox.virtual_write("/etc/passwd", b"root:x:0:0:root:/root:/bin/sh").unwrap();
+        assert_eq!(sandbox.virtual_read_opt("/etc/passwd").unwrap(), "root:x:0:0:root:/root:/bin/sh");
 
         // Purge
         sandbox.purge_sandbox();
@@ -321,6 +286,8 @@ mod tests {
 // SigmaOS Privacy-First Sandbox Subsystem
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Absorbs advanced security controls from SELinux, AppArmor, and Firejail to satisfy Common Criteria and FIPS compliance
+
+
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EnforcementLevel {
@@ -355,10 +322,7 @@ impl SovereignSecurityContext {
     }
 
     pub fn to_string_context(&self) -> String {
-        format!(
-            "{}:{}:{}:{}",
-            self.user, self.role, self.domain, self.sensitivity
-        )
+        format!("{}:{}:{}:{}", self.user, self.role, self.domain, self.sensitivity)
     }
 }
 

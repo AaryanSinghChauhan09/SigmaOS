@@ -391,8 +391,7 @@ impl LsmSentinel {
     }
 
     pub fn load_apparmor_profile(&mut self, profile_name: &str, enforcing: bool) {
-        self.apparmor_profiles
-            .insert(profile_name.to_string(), enforcing);
+        self.apparmor_profiles.insert(profile_name.to_string(), enforcing);
     }
 
     pub fn validate_access(&self, profile_name: &str) -> bool {
@@ -421,20 +420,14 @@ impl Default for LsmSentinel {
 
 pub struct PamGate {
     pub shadow_db: HashMap<String, String>, // username -> password hash
-    pub sudoers: Vec<String>,               // users allowed to escalate
+    pub sudoers: Vec<String>,              // users allowed to escalate
 }
 
 impl PamGate {
     pub fn new() -> Self {
         let mut shadow = HashMap::new();
-        shadow.insert(
-            "root".to_string(),
-            "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8".to_string(),
-        );
-        shadow.insert(
-            "arch_user".to_string(),
-            "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92".to_string(),
-        );
+        shadow.insert("root".to_string(), "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8".to_string());
+        shadow.insert("arch_user".to_string(), "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92".to_string());
 
         let mut sudoers = Vec::new();
         sudoers.push("arch_user".to_string());
@@ -509,10 +502,7 @@ pub struct SovereignEnvRegistry {
 impl SovereignEnvRegistry {
     pub fn new() -> Self {
         let mut vars = HashMap::new();
-        vars.insert(
-            "PATH".to_string(),
-            "/usr/local/bin:/usr/bin:/bin".to_string(),
-        );
+        vars.insert("PATH".to_string(), "/usr/local/bin:/usr/bin:/bin".to_string());
         vars.insert("HOME".to_string(), "/home/arch_user".to_string());
         vars.insert("USER".to_string(), "arch_user".to_string());
         vars.insert("SHELL".to_string(), "/bin/bash".to_string());
@@ -569,25 +559,18 @@ impl YayParuAdapter {
         if pkgname.is_empty() {
             return Err("Empty package name");
         }
-        self.cached_aur_git_repos
-            .insert(pkgname.to_string(), AurRepoStatus::Cloned);
+        self.cached_aur_git_repos.insert(pkgname.to_string(), AurRepoStatus::Cloned);
         Ok(())
     }
 
     pub fn resolve_dependencies(&mut self, pkgname: &str) -> Result<(), &'static str> {
-        let status = self
-            .cached_aur_git_repos
-            .get_mut(pkgname)
-            .ok_or("Repo not cloned yet")?;
+        let status = self.cached_aur_git_repos.get_mut(pkgname).ok_or("Repo not cloned yet")?;
         *status = AurRepoStatus::DependencyResolved;
         Ok(())
     }
 
     pub fn trigger_makepkg(&mut self, pkgname: &str) -> Result<(), &'static str> {
-        let status = self
-            .cached_aur_git_repos
-            .get_mut(pkgname)
-            .ok_or("Repo not cloned yet")?;
+        let status = self.cached_aur_git_repos.get_mut(pkgname).ok_or("Repo not cloned yet")?;
         if *status != AurRepoStatus::DependencyResolved {
             return Err("Dependencies not resolved");
         }
@@ -620,9 +603,7 @@ pub struct ReflectorMirrorlist {
 
 impl ReflectorMirrorlist {
     pub fn new() -> Self {
-        Self {
-            mirrors: Vec::new(),
-        }
+        Self { mirrors: Vec::new() }
     }
 
     pub fn add_mirror(&mut self, url: &str, country: &str, protocol: &str, latency_ms: u32) {
@@ -644,10 +625,10 @@ impl ReflectorMirrorlist {
         let n = filtered.len();
         for i in 0..n {
             for j in 0..n - 1 - i {
-                if filtered[j].latency_ms > filtered[j + 1].latency_ms {
+                if filtered[j].latency_ms > filtered[j+1].latency_ms {
                     let temp = filtered[j].clone();
-                    filtered[j] = filtered[j + 1].clone();
-                    filtered[j + 1] = temp;
+                    filtered[j] = filtered[j+1].clone();
+                    filtered[j+1] = temp;
                 }
             }
         }
@@ -752,10 +733,7 @@ impl ArtixInitBridge {
     }
 
     pub fn query_service_status(&self, service: &str) -> ServiceState {
-        self.active_services
-            .get(service)
-            .cloned()
-            .unwrap_or(ServiceState::Stopped)
+        self.active_services.get(service).cloned().unwrap_or(ServiceState::Stopped)
     }
 }
 
@@ -798,22 +776,16 @@ impl PacmanKeyring {
         if !self.is_initialized {
             return Err("Keyring not initialized");
         }
-        self.keys.insert(
-            "0x9E5A86A21B607B76".to_string(),
-            PacmanKey {
-                id: "0x9E5A86A21B607B76".to_string(),
-                owner: "Arch Linux Master Signing Key".to_string(),
-                trust: KeyTrustLevel::Ultimate,
-            },
-        );
-        self.keys.insert(
-            "0x8D969EEF6ECAD3C2".to_string(),
-            PacmanKey {
-                id: "0x8D969EEF6ECAD3C2".to_string(),
-                owner: "Arch Linux Package Maintainer".to_string(),
-                trust: KeyTrustLevel::Full,
-            },
-        );
+        self.keys.insert("0x9E5A86A21B607B76".to_string(), PacmanKey {
+            id: "0x9E5A86A21B607B76".to_string(),
+            owner: "Arch Linux Master Signing Key".to_string(),
+            trust: KeyTrustLevel::Ultimate,
+        });
+        self.keys.insert("0x8D969EEF6ECAD3C2".to_string(), PacmanKey {
+            id: "0x8D969EEF6ECAD3C2".to_string(),
+            owner: "Arch Linux Package Maintainer".to_string(),
+            trust: KeyTrustLevel::Full,
+        });
         Ok(())
     }
 
@@ -849,11 +821,7 @@ impl AurPatchEngine {
     }
 
     /// Applies line-by-line diff patch on an AUR PKGBUILD script
-    pub fn apply_patch(
-        &self,
-        original_script: &str,
-        patch: &AurPatch,
-    ) -> Result<String, &'static str> {
+    pub fn apply_patch(&self, original_script: &str, patch: &AurPatch) -> Result<String, &'static str> {
         if !original_script.contains(&patch.target_line) {
             return Err("Patch target line not found in recipe");
         }
@@ -912,9 +880,7 @@ impl MkinitcpioGenerator {
         let mut config = String::new();
         config.push_str("HOOKS=(");
         for (i, h) in self.hooks.iter().enumerate() {
-            if i > 0 {
-                config.push(' ');
-            }
+            if i > 0 { config.push(' '); }
             config.push_str(h);
         }
         config.push_str(")\nCOMPRESSION=\"");
@@ -1093,10 +1059,7 @@ impl ArchWikiSearchEngine {
     pub fn search_topics(&self, query: &str) -> Vec<&WikiPage> {
         let mut results = Vec::new();
         for page in &self.pages {
-            if page.title.contains(query)
-                || page.content.contains(query)
-                || page.category.contains(query)
-            {
+            if page.title.contains(query) || page.content.contains(query) || page.category.contains(query) {
                 results.push(page);
             }
         }
@@ -1104,34 +1067,27 @@ impl ArchWikiSearchEngine {
     }
 
     pub fn search_by_category(&self, category: &str) -> Vec<&WikiPage> {
-        self.pages
-            .iter()
-            .filter(|p| p.category == category)
-            .collect()
+        self.pages.iter().filter(|p| p.category == category).collect()
     }
 
     pub fn search_with_ranking(&self, query: &str) -> Vec<(&WikiPage, usize)> {
-        let mut scored: Vec<(&WikiPage, usize)> = self
-            .pages
-            .iter()
-            .filter_map(|page| {
-                let mut score = 0;
-                if page.title.contains(query) {
-                    score += 10;
-                }
-                if page.category.contains(query) {
-                    score += 5;
-                }
-                if page.content.contains(query) {
-                    score += 1;
-                }
-                if score > 0 {
-                    Some((page, score))
-                } else {
-                    None
-                }
-            })
-            .collect();
+        let mut scored: Vec<(&WikiPage, usize)> = self.pages.iter().filter_map(|page| {
+            let mut score = 0;
+            if page.title.contains(query) {
+                score += 10;
+            }
+            if page.category.contains(query) {
+                score += 5;
+            }
+            if page.content.contains(query) {
+                score += 1;
+            }
+            if score > 0 {
+                Some((page, score))
+            } else {
+                None
+            }
+        }).collect();
 
         scored.sort_by(|a, b| b.1.cmp(&a.1));
         scored
@@ -1172,17 +1128,11 @@ mod tests {
 
         // Lock database -> install should fail
         pacman.set_db_lock(true);
-        assert_eq!(
-            pacman.install_package("glibc"),
-            Err(PacmanError::DatabaseLocked)
-        );
+        assert_eq!(pacman.install_package("glibc"), Err(PacmanError::DatabaseLocked));
 
         pacman.set_db_lock(false);
         // Direct install fails due to missing dependencies (pacman requires glibc)
-        assert_eq!(
-            pacman.install_package("pacman"),
-            Err(PacmanError::DependencyMissing)
-        );
+        assert_eq!(pacman.install_package("pacman"), Err(PacmanError::DependencyMissing));
 
         // Satisfy dependency and install
         assert!(pacman.install_package("glibc").is_ok());
@@ -1259,21 +1209,12 @@ mod tests {
         assert!(adapter.clone_aur_repo("spotify").is_ok());
         assert_eq!(adapter.clone_aur_repo(""), Err("Empty package name"));
 
-        assert_eq!(
-            adapter.resolve_dependencies("nonexistent"),
-            Err("Repo not cloned yet")
-        );
+        assert_eq!(adapter.resolve_dependencies("nonexistent"), Err("Repo not cloned yet"));
         assert!(adapter.resolve_dependencies("spotify").is_ok());
 
-        assert_eq!(
-            adapter.trigger_makepkg("nonexistent"),
-            Err("Repo not cloned yet")
-        );
+        assert_eq!(adapter.trigger_makepkg("nonexistent"), Err("Repo not cloned yet"));
         assert!(adapter.trigger_makepkg("spotify").is_ok());
-        assert_eq!(
-            adapter.cached_aur_git_repos.get("spotify").unwrap(),
-            &AurRepoStatus::Compiled
-        );
+        assert_eq!(adapter.cached_aur_git_repos.get("spotify").unwrap(), &AurRepoStatus::Compiled);
     }
 
     #[test]
@@ -1350,12 +1291,7 @@ mod tests {
     #[test]
     fn test_arch_news_feed_parser() {
         let mut news = ArchNewsFeedParser::new();
-        news.add_item(
-            "Manual intervention required",
-            "2024-05-01",
-            "Update glibc manually",
-            true,
-        );
+        news.add_item("Manual intervention required", "2024-05-01", "Update glibc manually", true);
         news.add_item("Regular update", "2024-05-02", "Minor patches", false);
         let advisories = news.get_latest_advisories();
         assert_eq!(advisories.len(), 1);
@@ -1405,9 +1341,6 @@ mod tests {
             target_line: "pkgver=0.1.0".to_string(),
             replacement_line: "pkgver=0.2.0".to_string(),
         };
-        assert_eq!(
-            engine.apply_patch(original, &bad_patch),
-            Err("Patch target line not found in recipe")
-        );
+        assert_eq!(engine.apply_patch(original, &bad_patch), Err("Patch target line not found in recipe"));
     }
 }

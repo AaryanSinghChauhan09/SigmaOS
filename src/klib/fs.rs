@@ -75,7 +75,9 @@ impl SigmaFile {
         let path_cstr = Self::path_to_cstring(path)?;
         let flags = Self::mode_to_flags(mode);
 
-        let fd = unsafe { syscall_open(path_cstr.as_ptr(), flags, 0o644) };
+        let fd = unsafe {
+            syscall_open(path_cstr.as_ptr(), flags, 0o644)
+        };
 
         if fd < 0 {
             return Err(FsError::IoError);
@@ -89,7 +91,9 @@ impl SigmaFile {
 
     /// Read data from the file
     pub fn read(&mut self, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let result = unsafe { syscall_read(self.fd, buffer.as_mut_ptr(), buffer.len()) };
+        let result = unsafe {
+            syscall_read(self.fd, buffer.as_mut_ptr(), buffer.len())
+        };
 
         if result < 0 {
             Err(FsError::IoError)
@@ -100,7 +104,9 @@ impl SigmaFile {
 
     /// Write data to the file
     pub fn write(&mut self, data: &[u8]) -> Result<usize, FsError> {
-        let result = unsafe { syscall_write(self.fd, data.as_ptr(), data.len()) };
+        let result = unsafe {
+            syscall_write(self.fd, data.as_ptr(), data.len())
+        };
 
         if result < 0 {
             Err(FsError::IoError)
@@ -117,7 +123,9 @@ impl SigmaFile {
             SeekFrom::End(offset) => (2, offset),
         };
 
-        let result = unsafe { syscall_lseek(self.fd, offset, whence) };
+        let result = unsafe {
+            syscall_lseek(self.fd, offset, whence)
+        };
 
         if result < 0 {
             Err(FsError::IoError)
@@ -128,7 +136,9 @@ impl SigmaFile {
 
     /// Flush the file buffer
     pub fn flush(&mut self) -> Result<(), FsError> {
-        let result = unsafe { syscall_fsync(self.fd) };
+        let result = unsafe {
+            syscall_fsync(self.fd)
+        };
 
         if result < 0 {
             Err(FsError::IoError)
@@ -140,7 +150,9 @@ impl SigmaFile {
     /// Get file metadata
     pub fn metadata(&self) -> Result<Metadata, FsError> {
         let mut stat = Stat::default();
-        let result = unsafe { syscall_fstat(self.fd, &mut stat) };
+        let result = unsafe {
+            syscall_fstat(self.fd, &mut stat)
+        };
 
         if result < 0 {
             return Err(FsError::IoError);
@@ -158,7 +170,9 @@ impl SigmaFile {
 
     /// Close the file
     pub fn close(self) -> Result<(), FsError> {
-        let result = unsafe { syscall_close(self.fd) };
+        let result = unsafe {
+            syscall_close(self.fd)
+        };
 
         if result < 0 {
             Err(FsError::IoError)
@@ -199,7 +213,9 @@ impl SigmaFile {
 
 impl Drop for SigmaFile {
     fn drop(&mut self) {
-        let _ = unsafe { syscall_close(self.fd) };
+        let _ = unsafe {
+            syscall_close(self.fd)
+        };
     }
 }
 
@@ -249,7 +265,9 @@ impl SigmaDir {
     /// Open a directory
     pub fn open(path: &str) -> Result<Self, FsError> {
         let path_cstr = SigmaFile::path_to_cstring(path)?;
-        let fd = unsafe { syscall_opendir(path_cstr.as_ptr()) };
+        let fd = unsafe {
+            syscall_opendir(path_cstr.as_ptr())
+        };
 
         if fd < 0 {
             return Err(FsError::IoError);
@@ -267,13 +285,17 @@ impl SigmaDir {
         let mut entry = DirEntryRaw::default();
 
         loop {
-            let result = unsafe { syscall_readdir(self.fd, &mut entry) };
+            let result = unsafe {
+                syscall_readdir(self.fd, &mut entry)
+            };
 
             if result < 0 {
                 break;
             }
 
-            let name = unsafe { Self::cstr_to_string(entry.d_name.as_ptr()) };
+            let name = unsafe {
+                Self::cstr_to_string(entry.d_name.as_ptr())
+            };
 
             let is_file = entry.d_type == 8; // DT_REG
             let is_directory = entry.d_type == 4; // DT_DIR
@@ -290,7 +312,9 @@ impl SigmaDir {
 
     /// Close the directory
     pub fn close(self) -> Result<(), FsError> {
-        let result = unsafe { syscall_closedir(self.fd) };
+        let result = unsafe {
+            syscall_closedir(self.fd)
+        };
 
         if result < 0 {
             Err(FsError::IoError)
@@ -314,7 +338,9 @@ impl SigmaDir {
 
 impl Drop for SigmaDir {
     fn drop(&mut self) {
-        let _ = unsafe { syscall_closedir(self.fd) };
+        let _ = unsafe {
+            syscall_closedir(self.fd)
+        };
     }
 }
 
@@ -495,14 +521,8 @@ mod tests {
         assert_eq!(SigmaFile::mode_to_flags(OpenMode::ReadOnly), O_RDONLY);
         assert_eq!(SigmaFile::mode_to_flags(OpenMode::WriteOnly), O_WRONLY);
         assert_eq!(SigmaFile::mode_to_flags(OpenMode::ReadWrite), O_RDWR);
-        assert_eq!(
-            SigmaFile::mode_to_flags(OpenMode::Append),
-            O_WRONLY | O_APPEND
-        );
-        assert_eq!(
-            SigmaFile::mode_to_flags(OpenMode::Create),
-            O_CREAT | O_WRONLY | O_TRUNC
-        );
+        assert_eq!(SigmaFile::mode_to_flags(OpenMode::Append), O_WRONLY | O_APPEND);
+        assert_eq!(SigmaFile::mode_to_flags(OpenMode::Create), O_CREAT | O_WRONLY | O_TRUNC);
     }
 
     #[test]

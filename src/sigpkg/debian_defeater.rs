@@ -30,17 +30,8 @@ impl SovereignAlternativesSystem {
         }
     }
 
-    pub fn register_alternative(
-        &mut self,
-        generic_name: &str,
-        candidate_name: &str,
-        path: &str,
-        priority: u32,
-    ) {
-        let entry = self
-            .alternatives
-            .entry(generic_name.to_string())
-            .or_insert_with(Vec::new);
+    pub fn register_alternative(&mut self, generic_name: &str, candidate_name: &str, path: &str, priority: u32) {
+        let entry = self.alternatives.entry(generic_name.to_string()).or_insert_with(Vec::new);
         entry.push(AlternativeCandidate {
             name: candidate_name.to_string(),
             path: path.to_string(),
@@ -54,8 +45,7 @@ impl SovereignAlternativesSystem {
     pub fn auto_select(&mut self, generic_name: &str) {
         if let Some(candidates) = self.alternatives.get(generic_name) {
             if let Some(best) = candidates.iter().max_by_key(|c| c.priority) {
-                self.active_selections
-                    .insert(generic_name.to_string(), best.path.clone());
+                self.active_selections.insert(generic_name.to_string(), best.path.clone());
             }
         }
     }
@@ -107,11 +97,7 @@ impl SovereignMaintainerSandbox {
         }
     }
 
-    pub fn validate_script(
-        &self,
-        phase: MaintainerScriptPhase,
-        script_body: &str,
-    ) -> Result<(), &'static str> {
+    pub fn validate_script(&self, phase: MaintainerScriptPhase, script_body: &str) -> Result<(), &'static str> {
         // Disallow dangerous commands in package install scripts
         if script_body.contains("rm -rf /") || script_body.contains("dd if=") {
             return Err("Maintainer script contains dangerous unsafe file operations");
@@ -122,11 +108,7 @@ impl SovereignMaintainerSandbox {
             let line = line.trim();
             if line.starts_with("mkdir ") || line.starts_with("cp ") {
                 let target = line.split_whitespace().last().unwrap_or("");
-                if !self
-                    .allowed_directories
-                    .iter()
-                    .any(|allowed| target.starts_with(allowed))
-                {
+                if !self.allowed_directories.iter().any(|allowed| target.starts_with(allowed)) {
                     return Err("Maintainer script targets directory outside sandbox permissions");
                 }
             }
@@ -207,9 +189,7 @@ pub struct SovereignMirrorSelector {
 
 impl SovereignMirrorSelector {
     pub fn new() -> Self {
-        Self {
-            mirrors: Vec::new(),
-        }
+        Self { mirrors: Vec::new() }
     }
 
     pub fn add_mirror(&mut self, url: &str, latency_ms: u64, gpg_key_valid: bool) {
@@ -221,16 +201,12 @@ impl SovereignMirrorSelector {
     }
 
     pub fn select_optimal_mirror(&self) -> Result<String, &'static str> {
-        let valid_mirrors: Vec<&AptMirror> =
-            self.mirrors.iter().filter(|m| m.gpg_key_valid).collect();
+        let valid_mirrors: Vec<&AptMirror> = self.mirrors.iter().filter(|m| m.gpg_key_valid).collect();
         if valid_mirrors.is_empty() {
             return Err("No APT mirrors with valid GPG signatures available");
         }
 
-        let best = valid_mirrors
-            .into_iter()
-            .min_by_key(|m| m.latency_ms)
-            .unwrap();
+        let best = valid_mirrors.into_iter().min_by_key(|m| m.latency_ms).unwrap();
         Ok(best.url.clone())
     }
 }
@@ -261,19 +237,13 @@ mod tests {
         let sandbox = SovereignMaintainerSandbox::new();
 
         let safe_script = "mkdir /usr/bin/app_dir\ncp binary /usr/bin/app_dir/app";
-        assert!(sandbox
-            .validate_script(MaintainerScriptPhase::PostInst, safe_script)
-            .is_ok());
+        assert!(sandbox.validate_script(MaintainerScriptPhase::PostInst, safe_script).is_ok());
 
         let dangerous_script = "rm -rf /";
-        assert!(sandbox
-            .validate_script(MaintainerScriptPhase::PreRm, dangerous_script)
-            .is_err());
+        assert!(sandbox.validate_script(MaintainerScriptPhase::PreRm, dangerous_script).is_err());
 
         let unpermitted_path_script = "mkdir /root/secret_dir";
-        assert!(sandbox
-            .validate_script(MaintainerScriptPhase::PreInst, unpermitted_path_script)
-            .is_err());
+        assert!(sandbox.validate_script(MaintainerScriptPhase::PreInst, unpermitted_path_script).is_err());
     }
 
     #[test]
@@ -293,12 +263,9 @@ mod tests {
         let mut selector = SovereignMirrorSelector::new();
 
         selector.add_mirror("http://fast-untrusted.debian.org", 10, false); // Fast but untrusted
-        selector.add_mirror("http://mirror1.debian.org", 45, true); // Trusted, 45ms
-        selector.add_mirror("http://mirror2.debian.org", 20, true); // Trusted, 20ms
+        selector.add_mirror("http://mirror1.debian.org", 45, true);         // Trusted, 45ms
+        selector.add_mirror("http://mirror2.debian.org", 20, true);         // Trusted, 20ms
 
-        assert_eq!(
-            selector.select_optimal_mirror().unwrap(),
-            "http://mirror2.debian.org"
-        );
+        assert_eq!(selector.select_optimal_mirror().unwrap(), "http://mirror2.debian.org");
     }
 }

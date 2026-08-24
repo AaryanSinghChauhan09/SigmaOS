@@ -2,6 +2,9 @@
 #![allow(unused_variables)]
 // Advanced Routing - Linux-style routing table management
 // Supports multiple routing tables, route caching, and policy routing
+
+#![no_std]
+
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;

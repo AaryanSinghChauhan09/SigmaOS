@@ -563,9 +563,7 @@ pub struct ZorinAppearanceSwitcher {
 impl ZorinAppearanceSwitcher {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
-            panel_height_pixels: 40,
-        }
+        Self { panel_height_pixels: 40 }
     }
     pub fn switch_layout_preset(&mut self, preset: ZorinLayoutPreset) {
         if preset == ZorinLayoutPreset::MacOsLike {
@@ -587,9 +585,7 @@ pub struct ZorinConnectHub {
 impl ZorinConnectHub {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
-            devices: Vec::new(),
-        }
+        Self { devices: Vec::new() }
     }
     pub fn pair_new_device(&mut self, id: &str, name: &str) {
         self.devices.push((id.to_string(), name.to_string()));
@@ -611,9 +607,7 @@ pub struct ZorinWineLayer {
 
 impl ZorinWineLayer {
     pub fn new(prefix: &str) -> Self {
-        Self {
-            prefix: prefix.to_string(),
-        }
+        Self { prefix: prefix.to_string() }
     }
     pub fn check_wine_prefix_initialized(&self) -> bool {
         true
@@ -630,9 +624,7 @@ pub struct ZorinLiteOptimizer {
 impl ZorinLiteOptimizer {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
-            compositor_blur_radius: 8,
-        }
+        Self { compositor_blur_radius: 8 }
     }
     pub fn enable_zorin_lite_profile(&mut self, enable: bool) {
         if enable {
@@ -660,9 +652,7 @@ pub struct SigmaEcosystemInit {
 impl SigmaEcosystemInit {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
-            active_runlevel: FhsRunlevel::Console,
-        }
+        Self { active_runlevel: FhsRunlevel::Console }
     }
     pub fn sequence_runlevel_transition(&mut self, runlevel: FhsRunlevel) {
         self.active_runlevel = runlevel;
@@ -688,9 +678,7 @@ pub struct SigmaEcosystemProfiler {
 impl SigmaEcosystemProfiler {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
-            graphic_preset: GraphicPresetMode::IceWMPreset,
-        }
+        Self { graphic_preset: GraphicPresetMode::IceWMPreset }
     }
     pub fn apply_legacy_preset_rules(&mut self, ram_mb: u32) {
         if ram_mb <= 128 {
@@ -712,9 +700,7 @@ pub struct SigmaOnboardingWelcome {
 impl SigmaOnboardingWelcome {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
-            mirrors_ranked: Vec::new(),
-        }
+        Self { mirrors_ranked: Vec::new() }
     }
     pub fn rank_package_mirrors(&mut self, latencies: BTreeMap<String, u32>) {
         let mut sorted: Vec<(String, u32)> = latencies.into_iter().collect();
@@ -738,10 +724,7 @@ impl SigmaOnboardingLog {
     }
     pub fn sanitize_system_log(&self, raw: &str) -> String {
         if raw.contains("secret_key=") {
-            raw.replace(
-                "secret_key=999999",
-                "secret_key= [REDACTED_FOR_SECURITY_COMPLIANCE]",
-            )
+            raw.replace("secret_key=999999", "secret_key= [REDACTED_FOR_SECURITY_COMPLIANCE]")
         } else {
             raw.to_string()
         }

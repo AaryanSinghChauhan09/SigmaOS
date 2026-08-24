@@ -7,8 +7,8 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
-use core::marker::PhantomData;
 use core::ptr::NonNull;
+use core::marker::PhantomData;
 
 /// A doubly-linked list node.
 /// Inspired by Linux's `struct list_head` and BSD's `TAILQ_ENTRY`.
@@ -62,9 +62,7 @@ impl<T> LinkedList<T> {
         let node_ptr = unsafe { NonNull::new_unchecked(Box::into_raw(node)) };
 
         if let Some(mut old_head) = self.head {
-            unsafe {
-                old_head.as_mut().prev = Some(node_ptr);
-            }
+            unsafe { old_head.as_mut().prev = Some(node_ptr); }
         } else {
             // List was empty; tail = this new node
             self.tail = Some(node_ptr);
@@ -83,9 +81,7 @@ impl<T> LinkedList<T> {
         let node_ptr = unsafe { NonNull::new_unchecked(Box::into_raw(node)) };
 
         if let Some(mut old_tail) = self.tail {
-            unsafe {
-                old_tail.as_mut().next = Some(node_ptr);
-            }
+            unsafe { old_tail.as_mut().next = Some(node_ptr); }
         } else {
             // List was empty
             self.head = Some(node_ptr);
@@ -101,9 +97,7 @@ impl<T> LinkedList<T> {
             let head = unsafe { Box::from_raw(head_ptr.as_ptr()) };
             self.head = head.next;
             if let Some(mut new_head) = self.head {
-                unsafe {
-                    new_head.as_mut().prev = None;
-                }
+                unsafe { new_head.as_mut().prev = None; }
             } else {
                 self.tail = None;
             }
@@ -118,9 +112,7 @@ impl<T> LinkedList<T> {
             let tail = unsafe { Box::from_raw(tail_ptr.as_ptr()) };
             self.tail = tail.prev;
             if let Some(mut new_tail) = self.tail {
-                unsafe {
-                    new_tail.as_mut().next = None;
-                }
+                unsafe { new_tail.as_mut().next = None; }
             } else {
                 self.head = None;
             }
@@ -164,16 +156,12 @@ impl<T> LinkedList<T> {
             if pred(&node.value) {
                 // Unlink this node
                 if let Some(mut prev_ptr) = node.prev {
-                    unsafe {
-                        prev_ptr.as_mut().next = node.next;
-                    }
+                    unsafe { prev_ptr.as_mut().next = node.next; }
                 } else {
                     self.head = node.next;
                 }
                 if let Some(mut next_ptr) = node.next {
-                    unsafe {
-                        next_ptr.as_mut().prev = node.prev;
-                    }
+                    unsafe { next_ptr.as_mut().prev = node.prev; }
                 } else {
                     self.tail = node.prev;
                 }
@@ -240,18 +228,11 @@ impl<T> SList<T> {
         Self { head: None, len: 0 }
     }
 
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
 
     pub fn push(&mut self, value: T) {
-        let node = Box::new(SListNode {
-            value,
-            next: self.head,
-        });
+        let node = Box::new(SListNode { value, next: self.head });
         let ptr = unsafe { NonNull::new_unchecked(Box::into_raw(node)) };
         self.head = Some(ptr);
         self.len += 1;

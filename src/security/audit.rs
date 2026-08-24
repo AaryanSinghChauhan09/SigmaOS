@@ -1,8 +1,12 @@
-use crate::klib::Vec;
+#![no_std]
+#![no_main]
+
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type EventID = usize;
 
@@ -20,6 +24,13 @@ pub enum EventType {
     Authorization = 1,
     FileAccess = 2,
     SystemChange = 3,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    PlainText,
+    Json,
+    Binary,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -99,7 +110,9 @@ pub struct SimpleAuditLogger {
 
 impl SimpleAuditLogger {
     pub fn new() -> Self {
-        SimpleAuditLogger { events: Vec::new() }
+        SimpleAuditLogger {
+            events: Vec::new(),
+        }
     }
 }
 
@@ -179,23 +192,18 @@ impl SimpleAuditPolicy {
     }
 }
 
-impl Default for SimpleAuditPolicy {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
-        if self.require_authentication.load(Ordering::SeqCst) == 1 {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
+        let compliant = if self.require_authentication.load(Ordering::SeqCst) == 1 {
             event.event_type() == EventType::Authentication
         } else {
             true
-        }
+        };
+        Ok(compliant)
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event) {
+        if self.check_compliance(event)? {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)
@@ -210,12 +218,7 @@ mod tests {
     #[test]
     fn test_audit_event_logging() {
         let mut logger = SimpleAuditLogger::new();
-        let event = SimpleAuditEvent::new(
-            1,
-            EventType::Authentication,
-            1001,
-            b"User logged in successfully",
-        );
+        let event = SimpleAuditEvent::new(1, EventType::Authentication, 1001, b"User logged in successfully");
         logger.log_event(Box::new(event)).unwrap();
 
         let found = logger.get_event(1).unwrap();

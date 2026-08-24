@@ -1,5 +1,8 @@
 //! Terminal Emulator (gnome-terminal/konsole Inspiration)
 //! Terminal sessions, profiles, and PTY management
+
+#![no_std]
+
 extern crate alloc;
 
 use crate::klib::{Vec, String};

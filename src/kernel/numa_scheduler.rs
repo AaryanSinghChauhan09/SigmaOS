@@ -1,8 +1,8 @@
 // NUMA-Aware Scheduler with Lock-free Synchronization Primitives
 // Optimizes multi-core scalability, limits cache line bouncing, and prevents socket bus saturation.
 
-use std::ptr;
 use std::sync::atomic::{AtomicPtr, Ordering};
+use std::ptr;
 
 #[derive(Debug, Clone)]
 pub struct NumaTask {
@@ -67,34 +67,14 @@ impl LockFreeTaskQueue {
             if tail_ptr == self.tail.load(Ordering::Acquire) {
                 if next_ptr.is_null() {
                     // Try to link the new node to the end of the list
-                    if unsafe {
-                        (*tail_ptr)
-                            .next
-                            .compare_exchange(
-                                ptr::null_mut(),
-                                new_node,
-                                Ordering::Release,
-                                Ordering::Relaxed,
-                            )
-                            .is_ok()
-                    } {
+                    if unsafe { (*tail_ptr).next.compare_exchange(ptr::null_mut(), new_node, Ordering::Release, Ordering::Relaxed).is_ok() } {
                         // Successfully linked; try to advance the tail pointer
-                        let _ = self.tail.compare_exchange(
-                            tail_ptr,
-                            new_node,
-                            Ordering::Release,
-                            Ordering::Relaxed,
-                        );
+                        let _ = self.tail.compare_exchange(tail_ptr, new_node, Ordering::Release, Ordering::Relaxed);
                         break;
                     }
                 } else {
                     // Tail was lagging; try to advance it for a future thread
-                    let _ = self.tail.compare_exchange(
-                        tail_ptr,
-                        next_ptr,
-                        Ordering::Release,
-                        Ordering::Relaxed,
-                    );
+                    let _ = self.tail.compare_exchange(tail_ptr, next_ptr, Ordering::Release, Ordering::Relaxed);
                 }
             }
         }
@@ -113,21 +93,12 @@ impl LockFreeTaskQueue {
                         return None; // Queue is empty
                     }
                     // Tail is lagging behind; try to advance it
-                    let _ = self.tail.compare_exchange(
-                        tail_ptr,
-                        next_ptr,
-                        Ordering::Release,
-                        Ordering::Relaxed,
-                    );
+                    let _ = self.tail.compare_exchange(tail_ptr, next_ptr, Ordering::Release, Ordering::Relaxed);
                 } else {
                     // Read the task from the first non-dummy node
                     let task = unsafe { (*next_ptr).task.clone() };
                     // Attempt to shift head to next node
-                    if self
-                        .head
-                        .compare_exchange(head_ptr, next_ptr, Ordering::Release, Ordering::Relaxed)
-                        .is_ok()
-                    {
+                    if self.head.compare_exchange(head_ptr, next_ptr, Ordering::Release, Ordering::Relaxed).is_ok() {
                         // Deallocate the old dummy head node safely
                         unsafe {
                             let _ = Box::from_raw(head_ptr);
@@ -156,19 +127,14 @@ impl Drop for LockFreeTaskQueue {
 /// Represents a physical NUMA Node Socket
 pub struct NumaNode {
     pub node_id: usize,
-    pub cpu_cores_mask: u64, // Core affinity representation
+    pub cpu_cores_mask: u64,     // Core affinity representation
     pub memory_node_start: usize,
     pub memory_node_end: usize,
     pub task_queue: LockFreeTaskQueue,
 }
 
 impl NumaNode {
-    pub fn new(
-        node_id: usize,
-        cpu_cores_mask: u64,
-        memory_node_start: usize,
-        memory_node_end: usize,
-    ) -> Self {
+    pub fn new(node_id: usize, cpu_cores_mask: u64, memory_node_start: usize, memory_node_end: usize) -> Self {
         Self {
             node_id,
             cpu_cores_mask,

@@ -151,40 +151,22 @@ pub mod memory {
 pub mod math {
     /// Absolute value
     pub fn abs(x: i32) -> i32 {
-        if x < 0 {
-            -x
-        } else {
-            x
-        }
+        if x < 0 { -x } else { x }
     }
 
     /// Minimum
     pub fn min<T: PartialOrd>(a: T, b: T) -> T {
-        if a < b {
-            a
-        } else {
-            b
-        }
+        if a < b { a } else { b }
     }
 
     /// Maximum
     pub fn max<T: PartialOrd>(a: T, b: T) -> T {
-        if a > b {
-            a
-        } else {
-            b
-        }
+        if a > b { a } else { b }
     }
 
     /// Clamp value
     pub fn clamp<T: PartialOrd>(value: T, min: T, max: T) -> T {
-        if value < min {
-            min
-        } else if value > max {
-            max
-        } else {
-            value
-        }
+        if value < min { min } else if value > max { max } else { value }
     }
 
     /// Power of two check

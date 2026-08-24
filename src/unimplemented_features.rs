@@ -1,7 +1,7 @@
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
-#![cfg_attr(not(test), no_std)]
+
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -129,10 +129,7 @@ impl BareMetalPeripheralManager {
         }
     }
 
-    pub fn register_device(
-        &mut self,
-        mut dev: Box<dyn BareMetalUnifiedPeripheral>,
-    ) -> Result<usize, &'static str> {
+    pub fn register_device(&mut self, mut dev: Box<dyn BareMetalUnifiedPeripheral>) -> Result<usize, &'static str> {
         dev.initialize()?;
         self.registry.push(dev);
         Ok(self.registry.len() - 1)
@@ -203,19 +200,15 @@ impl UdfVm {
 
             match instr.opcode {
                 OP_READ => {
-                    if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr
-                    {
+                    if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr {
                         return Err("UDF VM Safety Guard: Read address out of peripheral boundary");
                     }
                     let val = hardware.read_register(instr.address_or_imm);
                     self.registers[instr.reg_dest as usize] = val;
                 }
                 OP_WRITE => {
-                    if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr
-                    {
-                        return Err(
-                            "UDF VM Safety Guard: Write address out of peripheral boundary",
-                        );
+                    if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr {
+                        return Err("UDF VM Safety Guard: Write address out of peripheral boundary");
                     }
                     let val = self.registers[instr.reg_src as usize];
                     hardware.write_register(instr.address_or_imm, val);
@@ -223,8 +216,7 @@ impl UdfVm {
                 OP_ADD => {
                     let r_dest = instr.reg_dest as usize;
                     let r_src = instr.reg_src as usize;
-                    self.registers[r_dest] =
-                        self.registers[r_dest].wrapping_add(self.registers[r_src]);
+                    self.registers[r_dest] = self.registers[r_dest].wrapping_add(self.registers[r_src]);
                 }
                 OP_HALT => {
                     self.is_halted = true;
@@ -321,9 +313,7 @@ impl SatSolverEngine {
                             let dep_id = dep.target_id as usize;
                             if dep_id < MAX_NODES {
                                 if let Some(assigned_ver) = self.selected_version[dep_id] {
-                                    if assigned_ver.major < dep.min_version.major
-                                        || assigned_ver.major > dep.max_version.major
-                                    {
+                                    if assigned_ver.major < dep.min_version.major || assigned_ver.major > dep.max_version.major {
                                         valid = false;
                                         break;
                                     }
@@ -390,10 +380,7 @@ impl Jbd2TransactionLedger {
     pub fn new(initial_merkle_root: u64) -> Self {
         Self {
             journal: [None; JOURNAL_CAPACITY],
-            merkle_nodes: [MerkleJournalNode {
-                transaction_id: 0,
-                merkle_root_hash: initial_merkle_root,
-            }; JOURNAL_CAPACITY],
+            merkle_nodes: [MerkleJournalNode { transaction_id: 0, merkle_root_hash: initial_merkle_root }; JOURNAL_CAPACITY],
             head_ptr: 0,
             current_merkle_root: initial_merkle_root,
             active_transaction_count: 0,
@@ -717,42 +704,17 @@ mod tests {
         let mut vm = UdfVm::new(0, 16);
 
         let program = [
-            UdfInstruction {
-                opcode: OP_WRITE,
-                reg_dest: 0,
-                reg_src: 0,
-                address_or_imm: 4,
-            }, // write R0 (0) to addr 4
-            UdfInstruction {
-                opcode: OP_READ,
-                reg_dest: 1,
-                reg_src: 0,
-                address_or_imm: 4,
-            }, // read addr 4 to R1
-            UdfInstruction {
-                opcode: OP_ADD,
-                reg_dest: 1,
-                reg_src: 1,
-                address_or_imm: 0,
-            }, // R1 = R1 + R1
-            UdfInstruction {
-                opcode: OP_HALT,
-                reg_dest: 1,
-                reg_src: 0,
-                address_or_imm: 0,
-            },
+            UdfInstruction { opcode: OP_WRITE, reg_dest: 0, reg_src: 0, address_or_imm: 4 }, // write R0 (0) to addr 4
+            UdfInstruction { opcode: OP_READ, reg_dest: 1, reg_src: 0, address_or_imm: 4 },  // read addr 4 to R1
+            UdfInstruction { opcode: OP_ADD, reg_dest: 1, reg_src: 1, address_or_imm: 0 },   // R1 = R1 + R1
+            UdfInstruction { opcode: OP_HALT, reg_dest: 1, reg_src: 0, address_or_imm: 0 },
         ];
 
         let res = vm.execute_program(&program, &mut dev).unwrap();
         assert_eq!(res, 0);
 
         let invalid_program = [
-            UdfInstruction {
-                opcode: OP_READ,
-                reg_dest: 0,
-                reg_src: 0,
-                address_or_imm: 100,
-            }, // out of bounds
+            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 }, // out of bounds
         ];
         assert!(vm.execute_program(&invalid_program, &mut dev).is_err());
     }
@@ -770,9 +732,7 @@ mod tests {
                     min_version: PkgVersion { major: 2, minor: 0 },
                     max_version: PkgVersion { major: 2, minor: 5 },
                 }),
-                None,
-                None,
-                None,
+                None, None, None,
             ],
         };
 

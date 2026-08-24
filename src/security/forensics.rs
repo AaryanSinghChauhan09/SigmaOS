@@ -47,7 +47,10 @@ impl KaliSnifferAudit {
     pub fn audit_network_frame(&mut self, frame: &[u8]) -> bool {
         let frame_str = String::from_utf8_lossy(frame);
         let p_word = ["pass", "word="].concat();
-        if frame_str.contains("USER") || frame_str.contains("PASS") || frame_str.contains(&p_word) {
+        if frame_str.contains("USER")
+            || frame_str.contains("PASS")
+            || frame_str.contains(&p_word)
+        {
             self.flagged_leak_count += 1;
             true // Plain-text credential leak detected!
         } else {

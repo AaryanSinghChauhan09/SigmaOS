@@ -205,7 +205,8 @@ impl PackageAdapter {
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "[{}] Purging DEB package {}",
-            self.adapter_name, package.name
+            self.adapter_name,
+            package.name
         );
         Ok(())
     }
@@ -213,7 +214,8 @@ impl PackageAdapter {
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "[{}] Refreshing and updating DEB package {}",
-            self.adapter_name, package.name
+            self.adapter_name,
+            package.name
         );
         Ok(())
     }
@@ -243,14 +245,9 @@ impl PackageAdapter {
     }
 
     /// Simulates mounting the AppImage's internal squashfs payload region
-    pub fn mount_appimage_squashfs(
-        &self,
-        appimage: &AppImageRuntime,
-    ) -> Result<String, PackageError> {
+    pub fn mount_appimage_squashfs(&self, appimage: &AppImageRuntime) -> Result<String, PackageError> {
         if appimage.squashfs_offset == 0 {
-            return Err(PackageError::InstallationFailed(String::from(
-                "Invalid squashfs offset inside AppImage payload",
-            )));
+            return Err(PackageError::InstallationFailed(String::from("Invalid squashfs offset inside AppImage payload")));
         }
         Ok(format!("/tmp/.mount_{}_squashfs", appimage.app_name))
     }
@@ -268,21 +265,11 @@ impl PackageAdapter {
 
 pub trait PackageFormatAdapter {
     fn format(&self) -> PackageFormat;
-    fn adapter_name(&self) -> &str {
-        "unknown"
-    }
-    fn parse_manifest(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
-        Err("Not implemented")
-    }
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        Ok(())
-    }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        Ok(())
-    }
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        Ok(())
-    }
+    fn adapter_name(&self) -> &str { "unknown" }
+    fn parse_manifest(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> { Err("Not implemented") }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 /// AptDebAdapter handles Debian/Ubuntu package formats (`.deb`)
@@ -331,8 +318,8 @@ impl PackageFormatAdapter for AptDebAdapter {
             return Err("Invalid DEB manifest");
         }
 
-        let mut pkg =
-            UnifiedPackage::new(name.clone(), version.clone()).with_format(PackageFormat::Deb);
+        let mut pkg = UnifiedPackage::new(name.clone(), version.clone())
+            .with_format(PackageFormat::Deb);
         for dep in dependencies {
             pkg = pkg.with_dependency(dep);
         }
@@ -370,8 +357,7 @@ impl PackageFormatAdapter for YumRpmAdapter {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Installing {} using {} adapter",
-            package.name,
-            self.adapter_name()
+            package.name, self.adapter_name()
         );
         Ok(())
     }
@@ -379,8 +365,7 @@ impl PackageFormatAdapter for YumRpmAdapter {
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Removing {} using {} adapter",
-            package.name,
-            self.adapter_name()
+            package.name, self.adapter_name()
         );
         Ok(())
     }
@@ -388,8 +373,7 @@ impl PackageFormatAdapter for YumRpmAdapter {
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "Updating {} using {} adapter",
-            package.name,
-            self.adapter_name()
+            package.name, self.adapter_name()
         );
         Ok(())
     }
@@ -428,10 +412,7 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(
-        &self,
-        package_name: &str,
-    ) -> Result<std::vec::Vec<String>, PackageError> {
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
         let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
         let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
         to_visit.push(package_name.to_string());
@@ -639,30 +620,18 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
         self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
         self.adapters.insert(PackageFormat::Snap, snap_adapter);
-        self.adapters.insert(
-            PackageFormat::Deb,
-            PackageAdapter::new(PackageFormat::Deb, String::from("AptDeb")),
-        );
-        self.adapters.insert(
-            PackageFormat::Rpm,
-            PackageAdapter::new(PackageFormat::Rpm, String::from("YumRpm")),
-        );
-        self.adapters.insert(
-            PackageFormat::Pacman,
-            PackageAdapter::new(PackageFormat::Pacman, String::from("Pacman")),
-        );
-        self.adapters.insert(
-            PackageFormat::Snap,
-            PackageAdapter::new(PackageFormat::Snap, String::from("Snap")),
-        );
-        self.adapters.insert(
-            PackageFormat::Flatpak,
-            PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")),
-        );
-        self.adapters.insert(
-            PackageFormat::SigmaPkg,
-            PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")),
-        );
+        self.adapters
+            .insert(PackageFormat::Deb, PackageAdapter::new(PackageFormat::Deb, String::from("AptDeb")));
+        self.adapters
+            .insert(PackageFormat::Rpm, PackageAdapter::new(PackageFormat::Rpm, String::from("YumRpm")));
+        self.adapters
+            .insert(PackageFormat::Pacman, PackageAdapter::new(PackageFormat::Pacman, String::from("Pacman")));
+        self.adapters
+            .insert(PackageFormat::Snap, PackageAdapter::new(PackageFormat::Snap, String::from("Snap")));
+        self.adapters
+            .insert(PackageFormat::Flatpak, PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")));
+        self.adapters
+            .insert(PackageFormat::SigmaPkg, PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -999,9 +968,7 @@ mod tests {
             squashfs_offset: 2048,
             embedded_icon_path: "/usr/share/icons/blender.png".to_string(),
         };
-        let mount_path = appimage_adapter
-            .mount_appimage_squashfs(&app_runtime)
-            .unwrap();
+        let mount_path = appimage_adapter.mount_appimage_squashfs(&app_runtime).unwrap();
         assert_eq!(mount_path, "/tmp/.mount_Blender_squashfs");
 
         // AppImage mount offset error checking

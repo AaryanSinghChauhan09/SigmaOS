@@ -100,9 +100,7 @@ impl PopOsBspTiler {
 
         // Master-Stack split tiling
         let master_w = (avail_w as f32 * 0.55) as u32;
-        let stack_w = avail_w
-            .saturating_sub(master_w)
-            .saturating_sub(self.inner_gap_px);
+        let stack_w = avail_w.saturating_sub(master_w).saturating_sub(self.inner_gap_px);
 
         // Master window
         self.windows[0].x = self.outer_gap_px;

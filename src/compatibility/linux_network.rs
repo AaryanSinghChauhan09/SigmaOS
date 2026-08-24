@@ -23,6 +23,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+
 /// Network interface types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterfaceType {
@@ -313,8 +314,7 @@ mod tests {
         assert_eq!(ip.netmask, "255.255.255.0");
         assert!(ip.gateway.is_none());
 
-        let ip_with_gateway =
-            IpAddress::with_gateway("192.168.1.100", "255.255.255.0", "192.168.1.1");
+        let ip_with_gateway = IpAddress::with_gateway("192.168.1.100", "255.255.255.0", "192.168.1.1");
         assert_eq!(ip_with_gateway.gateway, Some("192.168.1.1".to_string()));
     }
 

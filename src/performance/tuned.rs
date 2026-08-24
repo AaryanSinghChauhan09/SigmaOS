@@ -1,5 +1,8 @@
 //! System Performance Tuning inspired by tuned and systemd-analyze
 //! Adaptive ML tuning profiles, boot time performance analysis, and automated I/O/network optimization.
+
+#![no_std]
+
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

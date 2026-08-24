@@ -5,8 +5,6 @@ pub mod dkms_autoloader;
 pub mod framework;
 pub mod gpu_framework;
 pub mod grid;
-pub mod grid;
-pub mod grid;
 pub mod irp_system;
 pub mod mapper;
 pub mod network_framework;

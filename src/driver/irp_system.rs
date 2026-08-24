@@ -5,7 +5,7 @@
 // and iOS/macOS (Power state validation, Sandboxed Entitlements clearance).
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU8, Ordering};
+use std::sync::atomic::{Ordering, AtomicU8};
 
 pub const IRP_MJ_CREATE: u8 = 0x00;
 pub const IRP_MJ_CLOSE: u8 = 0x02;
@@ -54,8 +54,7 @@ pub struct IoStackLocation {
     pub minor_function: u8,
     pub flags: u8,
     pub device_object: *const DeviceObject,
-    pub completion_routine:
-        Option<fn(device: &DeviceObject, irp: &mut Irp, context: usize) -> IoStatus>,
+    pub completion_routine: Option<fn(device: &DeviceObject, irp: &mut Irp, context: usize) -> IoStatus>,
     pub completion_context: usize,
 }
 
@@ -82,7 +81,7 @@ pub struct Irp {
     pub buffer_length: usize,
     pub io_control_code: u32,
     pub stack_locations: [IoStackLocation; 10], // WDK layered device stack up to 10 frames
-    pub current_location: usize,                // 1-based index (0 is end of stack, 10 is top)
+    pub current_location: usize,                 // 1-based index (0 is end of stack, 10 is top)
     pub cancel_routine: Option<fn(irp: &mut Irp)>,
     pub cancelled: bool,
 }
@@ -506,7 +505,11 @@ impl Uio {
             let to_copy = std::cmp::min(seg_len, src.len() - src_offset);
             if to_copy > 0 {
                 unsafe {
-                    std::ptr::copy_nonoverlapping(src.as_ptr().add(src_offset), seg_ptr, to_copy);
+                    std::ptr::copy_nonoverlapping(
+                        src.as_ptr().add(src_offset),
+                        seg_ptr,
+                        to_copy,
+                    );
                 }
                 src_offset += to_copy;
                 bytes_copied += to_copy;
@@ -600,7 +603,11 @@ pub struct Entitlement {
     pub is_privileged: bool,
 }
 
-pub fn check_irp_entitlement(irp: &Irp, entitlements: &[Entitlement], required_key: &str) -> bool {
+pub fn check_irp_entitlement(
+    irp: &Irp,
+    entitlements: &[Entitlement],
+    required_key: &str,
+) -> bool {
     if irp.major_function == IRP_MJ_DEVICE_CONTROL {
         for ent in entitlements {
             if ent.key == required_key && ent.is_privileged {
@@ -635,10 +642,7 @@ impl RootkitHookDetector {
             if let Some(driver) = device.driver_object_ptr.as_ref() {
                 if let Some(&expected_ptr) = self.verified_drivers.get(&driver.driver_name) {
                     if device.driver_object_ptr != expected_ptr {
-                        println!(
-                            "ROOTKIT DETECTED: Driver object pointer mismatch for '{}'!",
-                            driver.driver_name
-                        );
+                        println!("ROOTKIT DETECTED: Driver object pointer mismatch for '{}'!", driver.driver_name);
                         return true; // Hooked
                     }
                 }
@@ -773,8 +777,9 @@ mod tests {
         let mut dispatch_table = HashMap::new();
         dispatch_table.insert(
             IRP_MJ_WRITE,
-            (|_dev: &DeviceObject, _irp: &mut Irp| IoStatus::Success)
-                as fn(&DeviceObject, &mut Irp) -> IoStatus,
+            (|_dev: &DeviceObject, _irp: &mut Irp| {
+                IoStatus::Success
+            }) as fn(&DeviceObject, &mut Irp) -> IoStatus,
         );
 
         let driver = DriverObject {
@@ -969,14 +974,8 @@ mod tests {
         let mut b2 = [0u8; 6];
 
         let segs = vec![
-            UioSegment {
-                buffer: b1.as_mut_ptr(),
-                len: 4,
-            },
-            UioSegment {
-                buffer: b2.as_mut_ptr(),
-                len: 6,
-            },
+            UioSegment { buffer: b1.as_mut_ptr(), len: 4 },
+            UioSegment { buffer: b2.as_mut_ptr(), len: 6 },
         ];
 
         let mut uio = Uio::new(segs);
@@ -1019,28 +1018,18 @@ mod tests {
         let irp_read = Irp::new(IRP_MJ_READ, METHOD_BUFFERED, 128);
         let irp_ioctl = Irp::new(IRP_MJ_DEVICE_CONTROL, METHOD_BUFFERED, 128);
 
-        let ents = vec![Entitlement {
-            key: "com.apple.developer.driverkit.transport".to_string(),
-            is_privileged: true,
-        }];
+        let ents = vec![
+            Entitlement {
+                key: "com.apple.developer.driverkit.transport".to_string(),
+                is_privileged: true,
+            }
+        ];
 
         // Non-ioctl IRPs bypass entitlement check
-        assert!(check_irp_entitlement(
-            &irp_read,
-            &ents,
-            "com.apple.developer.driverkit.transport"
-        ));
+        assert!(check_irp_entitlement(&irp_read, &ents, "com.apple.developer.driverkit.transport"));
 
         // IOCTL requires specific entitlement key
-        assert!(check_irp_entitlement(
-            &irp_ioctl,
-            &ents,
-            "com.apple.developer.driverkit.transport"
-        ));
-        assert!(!check_irp_entitlement(
-            &irp_ioctl,
-            &ents,
-            "com.apple.developer.driverkit.pci"
-        ));
+        assert!(check_irp_entitlement(&irp_ioctl, &ents, "com.apple.developer.driverkit.transport"));
+        assert!(!check_irp_entitlement(&irp_ioctl, &ents, "com.apple.developer.driverkit.pci"));
     }
 }

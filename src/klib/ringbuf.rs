@@ -11,8 +11,8 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Zero external dependencies - uses only `core`.
 pub struct RingBuf<T, const N: usize> {
     data: UnsafeCell<[Option<T>; N]>,
-    head: AtomicUsize, // Consumer reads from head
-    tail: AtomicUsize, // Producer writes to tail
+    head: AtomicUsize,  // Consumer reads from head
+    tail: AtomicUsize,  // Producer writes to tail
 }
 
 // SAFETY: Single-producer, single-consumer usage is safe across threads
@@ -127,7 +127,7 @@ impl<T, const N: usize> RingBuf<T, N> {
 /// Inspired by FreeBSD's `buf_ring` with critical section locking
 pub struct MpscRingBuf<T, const N: usize> {
     inner: RingBuf<T, N>,
-    lock: AtomicUsize, // Simple spinlock: 0 = free, 1 = locked
+    lock: AtomicUsize,  // Simple spinlock: 0 = free, 1 = locked
 }
 
 impl<T, const N: usize> MpscRingBuf<T, N> {
@@ -139,11 +139,9 @@ impl<T, const N: usize> MpscRingBuf<T, N> {
     }
 
     fn acquire_lock(&self) {
-        while self
-            .lock
-            .compare_exchange_weak(0, 1, Ordering::Acquire, Ordering::Relaxed)
-            .is_err()
-        {
+        while self.lock.compare_exchange_weak(
+            0, 1, Ordering::Acquire, Ordering::Relaxed
+        ).is_err() {
             // Spin with hint for CPU to reduce power consumption
             core::hint::spin_loop();
         }
@@ -199,15 +197,9 @@ mod tests {
         let buf: RingBuf<u32, 4> = RingBuf::new();
 
         // Fill and drain, then fill again (tests wrap-around)
-        for i in 0..4u32 {
-            buf.push(i).unwrap();
-        }
-        for _ in 0..4 {
-            buf.pop();
-        }
-        for i in 4..8u32 {
-            buf.push(i).unwrap();
-        }
+        for i in 0..4u32 { buf.push(i).unwrap(); }
+        for _ in 0..4 { buf.pop(); }
+        for i in 4..8u32 { buf.push(i).unwrap(); }
 
         assert_eq!(buf.pop(), Some(4));
         assert_eq!(buf.pop(), Some(5));

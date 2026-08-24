@@ -122,38 +122,22 @@ pub fn log10(n: u32) -> u32 {
     if n >= 100_000 {
         if n >= 10_000_000 {
             if n >= 100_000_000 {
-                if n >= 1_000_000_000 {
-                    9
-                } else {
-                    8
-                }
+                if n >= 1_000_000_000 { 9 } else { 8 }
             } else {
                 7
             }
         } else {
-            if n >= 1_000_000 {
-                6
-            } else {
-                5
-            }
+            if n >= 1_000_000 { 6 } else { 5 }
         }
     } else {
         if n >= 100 {
             if n >= 1_000 {
-                if n >= 10_000 {
-                    4
-                } else {
-                    3
-                }
+                if n >= 10_000 { 4 } else { 3 }
             } else {
                 2
             }
         } else {
-            if n >= 10 {
-                1
-            } else {
-                0
-            }
+            if n >= 10 { 1 } else { 0 }
         }
     }
 }
@@ -382,9 +366,7 @@ mod tests {
 
         // Baseline loop-based division implementation
         fn baseline_log10(mut n: u32) -> u32 {
-            if n == 0 {
-                return u32::MAX;
-            }
+            if n == 0 { return u32::MAX; }
             let mut log = 0;
             while n >= 10 {
                 n /= 10;

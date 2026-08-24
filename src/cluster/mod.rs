@@ -7,9 +7,9 @@
 #![allow(unused_imports)]
 
 extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::string::{String, ToString};
+use alloc::boxed::Box;
 use core::fmt;
 
 /// Error type for the Cluster module

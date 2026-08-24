@@ -44,15 +44,12 @@ impl ApkDatabaseIndex {
                 // End of package block -> insert
                 if !name.is_empty() {
                     self.total_footprint_bytes += size;
-                    self.installed.insert(
-                        name.clone(),
-                        ApkInstalledPackage {
-                            name: name.clone(),
-                            version: version.clone(),
-                            size_bytes: size,
-                            description: desc.clone(),
-                        },
-                    );
+                    self.installed.insert(name.clone(), ApkInstalledPackage {
+                        name: name.clone(),
+                        version: version.clone(),
+                        size_bytes: size,
+                        description: desc.clone(),
+                    });
                 }
                 // Reset for next block
                 name.clear();
@@ -73,15 +70,12 @@ impl ApkDatabaseIndex {
         // Handle final block if no trailing newline
         if !name.is_empty() {
             self.total_footprint_bytes += size;
-            self.installed.insert(
-                name.clone(),
-                ApkInstalledPackage {
-                    name,
-                    version,
-                    size_bytes: size,
-                    description: desc,
-                },
-            );
+            self.installed.insert(name.clone(), ApkInstalledPackage {
+                name,
+                version,
+                size_bytes: size,
+                description: desc,
+            });
         }
     }
 }
@@ -162,18 +156,9 @@ pub struct BusyBoxMulticall {
 impl BusyBoxMulticall {
     pub fn new() -> Self {
         let mut registry = HashMap::new();
-        registry.insert(
-            "ls".to_string(),
-            "BusyBox v1.36.0 ls: list files".to_string(),
-        );
-        registry.insert(
-            "cat".to_string(),
-            "BusyBox v1.36.0 cat: print file content".to_string(),
-        );
-        registry.insert(
-            "grep".to_string(),
-            "BusyBox v1.36.0 grep: search pattern".to_string(),
-        );
+        registry.insert("ls".to_string(), "BusyBox v1.36.0 ls: list files".to_string());
+        registry.insert("cat".to_string(), "BusyBox v1.36.0 cat: print file content".to_string());
+        registry.insert("grep".to_string(), "BusyBox v1.36.0 grep: search pattern".to_string());
         Self {
             applet_registry: registry,
         }

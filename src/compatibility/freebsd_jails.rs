@@ -149,11 +149,7 @@ impl SigmaJailManager {
     }
 
     /// Execute command in jail
-    pub fn exec_in_jail(
-        &self,
-        name: &str,
-        command: &str,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    pub fn exec_in_jail(&self, name: &str, command: &str) -> Result<String, Box<dyn std::error::Error>> {
         if let Some(jail) = self.jails.get(name) {
             if jail.state != JailState::Running {
                 return Err(format!("Jail '{}' is not running", name).into());
@@ -214,16 +210,13 @@ impl SigmaJailManager {
         Ok(())
     }
 
-    fn setup_jail_environment(
-        &self,
-        config: &JailConfig,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn setup_jail_environment(&self, config: &JailConfig) -> Result<(), Box<dyn std::error::Error>> {
         let root_path = &config.root_path;
 
         // Create basic directory structure
         let dirs = [
-            "bin", "boot", "dev", "etc", "lib", "proc", "root", "sbin", "sys", "tmp", "usr", "var",
-            "home",
+            "bin", "boot", "dev", "etc", "lib", "proc", "root",
+            "sbin", "sys", "tmp", "usr", "var", "home"
         ];
 
         for dir in dirs {
@@ -271,10 +264,7 @@ impl SigmaJailManager {
         Ok(())
     }
 
-    fn create_jail_config_files(
-        &self,
-        config: &JailConfig,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn create_jail_config_files(&self, config: &JailConfig) -> Result<(), Box<dyn std::error::Error>> {
         let etc_path = config.root_path.join("etc");
 
         // Create hostname file
@@ -299,16 +289,7 @@ impl SigmaJailManager {
         let if_name = format!("jail{}", jid);
 
         Command::new("ip")
-            .args([
-                "link",
-                "add",
-                &if_name,
-                "type",
-                "veth",
-                "peer",
-                "name",
-                &format!("{}-host", if_name),
-            ])
+            .args(["link", "add", &if_name, "type", "veth", "peer", "name", &format!("{}-host", if_name)])
             .output()?;
 
         // Assign IP to jail interface
@@ -329,42 +310,23 @@ impl SigmaJailManager {
 
         // Mount proc filesystem
         Command::new("mount")
-            .args([
-                "-t",
-                "proc",
-                "proc",
-                &root_path.join("proc").to_string_lossy(),
-            ])
+            .args(["-t", "proc", "proc", &root_path.join("proc").to_string_lossy()])
             .output()?;
 
         // Mount sysfs
         Command::new("mount")
-            .args([
-                "-t",
-                "sysfs",
-                "sysfs",
-                &root_path.join("sys").to_string_lossy(),
-            ])
+            .args(["-t", "sysfs", "sysfs", &root_path.join("sys").to_string_lossy()])
             .output()?;
 
         // Mount devtmpfs
         Command::new("mount")
-            .args([
-                "-t",
-                "devtmpfs",
-                "devtmpfs",
-                &root_path.join("dev").to_string_lossy(),
-            ])
+            .args(["-t", "devtmpfs", "devtmpfs", &root_path.join("dev").to_string_lossy()])
             .output()?;
 
         Ok(())
     }
 
-    fn apply_jail_restrictions(
-        &self,
-        jid: u32,
-        config: &JailConfig,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn apply_jail_restrictions(&self, jid: u32, config: &JailConfig) -> Result<(), Box<dyn std::error::Error>> {
         // Apply cgroup restrictions
         let cgroup_path = format!("/sys/fs/cgroup/sigma-jail-{}", jid);
         std::fs::create_dir_all(&cgroup_path)?;
@@ -378,23 +340,11 @@ impl SigmaJailManager {
         Ok(())
     }
 
-    fn execute_in_jail(
-        &self,
-        jid: u32,
-        command: &str,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    fn execute_in_jail(&self, jid: u32, command: &str) -> Result<String, Box<dyn std::error::Error>> {
         // Use chroot and namespaces to execute in jail context
         let output = Command::new("unshare")
             .args(["-p", "-f", "chroot"])
-            .arg(
-                &self
-                    .jails
-                    .values()
-                    .find(|j| j.jid == Some(jid))
-                    .unwrap()
-                    .config
-                    .root_path,
-            )
+            .arg(&self.jails.values().find(|j| j.jid == Some(jid)).unwrap().config.root_path)
             .arg("sh")
             .arg("-c")
             .arg(command)
@@ -403,11 +353,7 @@ impl SigmaJailManager {
         if output.status.success() {
             Ok(String::from_utf8_lossy(&output.stdout).to_string())
         } else {
-            Err(format!(
-                "Command failed: {}",
-                String::from_utf8_lossy(&output.stderr)
-            )
-            .into())
+            Err(format!("Command failed: {}", String::from_utf8_lossy(&output.stderr)).into())
         }
     }
 
@@ -466,6 +412,7 @@ pub struct JailInfo {
     pub root_path: PathBuf,
     pub process_count: usize,
 }
+
 
 #[cfg(test)]
 mod tests {

@@ -15,9 +15,9 @@ mod portage;
 #[path = "../src/system/generation_manager.rs"]
 mod generation_manager;
 
-use generation_manager::*;
-use portage::*;
 use universal_engine::*;
+use portage::*;
+use generation_manager::*;
 
 #[test]
 fn test_alpine_apk_package_adapter_inspection() {
@@ -30,9 +30,7 @@ fn test_alpine_apk_package_adapter_inspection() {
     assert_eq!(context.version, "3.18.0");
     assert_eq!(context.format, PackageFormat::Apk);
 
-    assert!(adapter
-        .extract_to_store(&context, "/store/test-apk-node")
-        .is_ok());
+    assert!(adapter.extract_to_store(&context, "/store/test-apk-node").is_ok());
 }
 
 #[test]
@@ -45,9 +43,7 @@ fn test_void_xbps_package_adapter_inspection() {
     assert_eq!(context.format, PackageFormat::Xbps);
     assert_eq!(context.name, "xbps-compat-pkg");
 
-    assert!(adapter
-        .extract_to_store(&context, "/store/test-xbps-node")
-        .is_ok());
+    assert!(adapter.extract_to_store(&context, "/store/test-xbps-node").is_ok());
 }
 
 #[test]
@@ -86,14 +82,13 @@ fn test_gentoo_portage_resolver_inspection() {
         .with_description("Wayland compositor protocol library".to_string());
     resolver.add_package(lib_spec);
 
-    let app_spec = EbuildSpec::new("weston".to_string(), Version::new(13, 0, 0)).with_dependencies(
-        DependencyCondition::Package {
+    let app_spec = EbuildSpec::new("weston".to_string(), Version::new(13, 0, 0))
+        .with_dependencies(DependencyCondition::Package {
             name: "libwayland".to_string(),
             version_constraint: VersionConstraint::Any,
             slot: None,
             use_flags: Vec::new(),
-        },
-    );
+        });
     resolver.add_package(app_spec);
 
     let deps = resolver.resolve_dependencies("weston").unwrap();

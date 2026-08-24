@@ -609,9 +609,7 @@ impl SigmaSoundscape {
     }
 
     pub fn trigger_sound_event(&self, event_name: &str) -> Option<&str> {
-        self.mapped_sounds
-            .get(event_name)
-            .map(|s: &String| s.as_str())
+        self.mapped_sounds.get(event_name).map(|s: &String| s.as_str())
     }
 }
 
@@ -637,35 +635,22 @@ impl SovereignCssColorEngine {
         let clean = hex_str.trim().trim_start_matches('#');
         match clean.len() {
             3 => {
-                let r = u8::from_str_radix(&clean[0..1].repeat(2), 16).map_err(|_| "Invalid hex")?
-                    as f32
-                    / 255.0;
-                let g = u8::from_str_radix(&clean[1..2].repeat(2), 16).map_err(|_| "Invalid hex")?
-                    as f32
-                    / 255.0;
-                let b = u8::from_str_radix(&clean[2..3].repeat(2), 16).map_err(|_| "Invalid hex")?
-                    as f32
-                    / 255.0;
+                let r = u8::from_str_radix(&clean[0..1].repeat(2), 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let g = u8::from_str_radix(&clean[1..2].repeat(2), 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let b = u8::from_str_radix(&clean[2..3].repeat(2), 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
                 Ok((r, g, b, 1.0))
             }
             6 => {
-                let r =
-                    u8::from_str_radix(&clean[0..2], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
-                let g =
-                    u8::from_str_radix(&clean[2..4], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
-                let b =
-                    u8::from_str_radix(&clean[4..6], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let r = u8::from_str_radix(&clean[0..2], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let g = u8::from_str_radix(&clean[2..4], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let b = u8::from_str_radix(&clean[4..6], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
                 Ok((r, g, b, 1.0))
             }
             8 => {
-                let r =
-                    u8::from_str_radix(&clean[0..2], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
-                let g =
-                    u8::from_str_radix(&clean[2..4], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
-                let b =
-                    u8::from_str_radix(&clean[4..6], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
-                let a =
-                    u8::from_str_radix(&clean[6..8], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let r = u8::from_str_radix(&clean[0..2], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let g = u8::from_str_radix(&clean[2..4], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let b = u8::from_str_radix(&clean[4..6], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
+                let a = u8::from_str_radix(&clean[6..8], 16).map_err(|_| "Invalid hex")? as f32 / 255.0;
                 Ok((r, g, b, a))
             }
             _ => Err("Unsupported hex color length"),

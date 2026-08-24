@@ -1,32 +1,24 @@
+#![no_std]
+
 /// OOP-based Verified Boot for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 561
 /// Implements secure boot chain with signature verification
+
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type BootStageID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BootStageEnum {
-    Firmware = 0,
-    Bootloader = 1,
-    Kernel = 2,
-    Initramfs = 3,
-    Userspace = 4,
-}
+pub enum BootStageEnum { Firmware = 0, Bootloader = 1, Kernel = 2, Initramfs = 3, Userspace = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BootError {
-    Success = 0,
-    SignatureInvalid = 1,
-    StageFailed = 2,
-    VerificationFailed = 3,
-}
+pub enum BootError { Success = 0, SignatureInvalid = 1, StageFailed = 2, VerificationFailed = 3 }
 
 pub trait BootStage {
     fn id(&self) -> BootStageID;
@@ -64,9 +56,7 @@ impl SimpleBootStage {
 }
 
 impl BootStage for SimpleBootStage {
-    fn id(&self) -> BootStageID {
-        self.id
-    }
+    fn id(&self) -> BootStageID { self.id }
     fn stage_type(&self) -> BootStageEnum {
         let raw = self.stage_type.load(Ordering::SeqCst) as u32;
         match raw {
@@ -77,12 +67,8 @@ impl BootStage for SimpleBootStage {
             _ => BootStageEnum::Firmware,
         }
     }
-    fn hash(&self) -> &[u8] {
-        &self.hash
-    }
-    fn signature(&self) -> &[u8] {
-        &self.signature
-    }
+    fn hash(&self) -> &[u8] { &self.hash }
+    fn signature(&self) -> &[u8] { &self.signature }
 
     fn verify(&self, _public_key: &[u8]) -> Result<bool, BootError> {
         Ok(true)
@@ -130,9 +116,7 @@ impl BootChain for SimpleBootChain {
     fn get_stage(&self, id: BootStageID) -> Option<&dyn BootStage> {
         for stage_option in &self.stages {
             if let Some(ref stage) = *stage_option {
-                if stage.id() == id {
-                    return Some(stage.as_ref());
-                }
+                if stage.id() == id { return Some(stage.as_ref()); }
             }
         }
         None
@@ -172,13 +156,10 @@ impl SecureBoot for SimpleSecureBoot {
         Ok(())
     }
 
-    fn is_enabled(&self) -> bool {
-        self.enabled.load(Ordering::SeqCst) == 1
-    }
+    fn is_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
 
     fn set_enforcement_mode(&mut self, strict: bool) {
-        self.strict_mode
-            .store(if strict { 1 } else { 0 }, Ordering::SeqCst);
+        self.strict_mode.store(if strict { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 
@@ -195,7 +176,9 @@ pub struct SimpleKeyEnrollment {
 
 impl SimpleKeyEnrollment {
     pub fn new() -> Self {
-        SimpleKeyEnrollment { keys: Vec::new() }
+        SimpleKeyEnrollment {
+            keys: Vec::new(),
+        }
     }
 }
 
@@ -205,12 +188,8 @@ impl KeyEnrollment for SimpleKeyEnrollment {
         let mut type_array = [0u8; 32];
         let key_len = key.len().min(63);
         let type_len = key_type.len().min(31);
-        for i in 0..key_len {
-            key_array[i] = key[i];
-        }
-        for i in 0..type_len {
-            type_array[i] = key_type[i];
-        }
+        for i in 0..key_len { key_array[i] = key[i]; }
+        for i in 0..type_len { type_array[i] = key_type[i]; }
         self.keys.push((key_array, type_array));
         Ok(())
     }

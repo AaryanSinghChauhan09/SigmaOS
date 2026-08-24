@@ -1,3 +1,6 @@
+#![no_std]
+#![no_main]
+
 /// OOP-based Battery Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 251
 /// Implements battery monitoring and power management

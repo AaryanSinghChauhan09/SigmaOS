@@ -2,7 +2,7 @@
 // Provides VGA and serial output for kernel logging and panic messages
 // Solves critical gap: no actual kernel output implementation
 
-#![cfg_attr(not(test), no_std)]
+
 
 extern crate alloc;
 
@@ -172,9 +172,11 @@ impl KernelConsole {
         }
     }
 
-    fn write_framebuffer(&self, message: &str) {}
+    fn write_framebuffer(&self, message: &str) {
+    }
 
-    fn write_efi(&self, message: &str) {}
+    fn write_efi(&self, message: &str) {
+    }
 
     pub fn clear(&mut self) {
         match self.backend {
@@ -236,7 +238,9 @@ pub fn initialize_kernel_console(backend: ConsoleBackend) -> Result<(), &'static
 }
 
 pub fn get_kernel_console() -> Option<&'static mut KernelConsole> {
-    unsafe { GLOBAL_CONSOLE.as_mut() }
+    unsafe {
+        GLOBAL_CONSOLE.as_mut()
+    }
 }
 
 pub fn kernel_panic(message: &str) -> ! {

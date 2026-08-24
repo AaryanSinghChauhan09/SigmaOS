@@ -69,14 +69,7 @@ impl CommunityHandbookCatalog {
         );
     }
 
-    pub fn add_article(
-        &mut self,
-        title: &str,
-        category: ArticleCategory,
-        tags: &[&str],
-        content: &str,
-        inspiration: &str,
-    ) -> usize {
+    pub fn add_article(&mut self, title: &str, category: ArticleCategory, tags: &[&str], content: &str, inspiration: &str) -> usize {
         let id = self.next_id;
         self.next_id += 1;
         let article = HandbookArticle {
@@ -95,11 +88,7 @@ impl CommunityHandbookCatalog {
         let q = query.to_lowercase();
         self.articles
             .values()
-            .filter(|a| {
-                a.title.to_lowercase().contains(&q)
-                    || a.content.to_lowercase().contains(&q)
-                    || a.tags.iter().any(|t| t.to_lowercase().contains(&q))
-            })
+            .filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q) || a.tags.iter().any(|t| t.to_lowercase().contains(&q)))
             .collect()
     }
 }
@@ -110,20 +99,15 @@ impl Default for CommunityHandbookCatalog {
     }
 }
 
+
 pub struct HybridFirewallTemplateStore {
     pub templates: HashMap<String, String>,
 }
 
 impl HybridFirewallTemplateStore {
     pub fn new() -> Self {
-        let mut store = Self {
-            templates: HashMap::new(),
-        };
-        store.templates.insert(
-            "default-mesh-shield".to_string(),
-            "table inet filter { chain input { type filter hook input priority 0; policy drop; } }"
-                .to_string(),
-        );
+        let mut store = Self { templates: HashMap::new() };
+        store.templates.insert("default-mesh-shield".to_string(), "table inet filter { chain input { type filter hook input priority 0; policy drop; } }".to_string());
         store
     }
 }
@@ -140,13 +124,8 @@ pub struct VirtualizationBlueprintStore {
 
 impl VirtualizationBlueprintStore {
     pub fn new() -> Self {
-        let mut store = Self {
-            blueprints: HashMap::new(),
-        };
-        store.blueprints.insert(
-            "micro-vm-node".to_string(),
-            "virtio-net,virtio-blk,memory=512M,vcpu=2".to_string(),
-        );
+        let mut store = Self { blueprints: HashMap::new() };
+        store.blueprints.insert("micro-vm-node".to_string(), "virtio-net,virtio-blk,memory=512M,vcpu=2".to_string());
         store
     }
 }
@@ -200,13 +179,8 @@ impl ReproduciblePackageRecipeManager {
             version: "1.0.0".to_string(),
             format: RecipeSourceFormat::SigmaRecipe,
             source_url: "https://packages.sigmaos.org/src/zenith-1.0.0.tar.gz".to_string(),
-            sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                .to_string(),
-            build_dependencies: vec![
-                "rust".to_string(),
-                "cargo".to_string(),
-                "wayland-protocols".to_string(),
-            ],
+            sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            build_dependencies: vec!["rust".to_string(), "cargo".to_string(), "wayland-protocols".to_string()],
             run_dependencies: vec!["pixman".to_string(), "libxkbcommon".to_string()],
             use_flags: vec!["vulkan".to_string(), "wayland".to_string()],
         });
@@ -253,11 +227,7 @@ impl SecurityProfileTemplateStore {
             templates: HashMap::new(),
         };
         store.register_template("browser_sandboxed", SecurityModelType::OpenBsdPledgeUnveil, "pledge: stdio rpath wpath cpath inet dns tty; unveil: /usr/share r, /home/user/Downloads rwc");
-        store.register_template(
-            "hardened-webserver",
-            SecurityModelType::LinuxAppArmor,
-            "profile hardened-webserver",
-        );
+        store.register_template("hardened-webserver", SecurityModelType::LinuxAppArmor, "profile hardened-webserver");
         store
     }
 
@@ -291,12 +261,7 @@ mod tests {
         assert_eq!(articles[0].distro_inspiration, "FreeBSD Handbook");
 
         let recipe_mgr = ReproduciblePackageRecipeManager::new();
-        assert!(recipe_mgr
-            .verify_checksum(
-                "zenith-desktop",
-                "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-            )
-            .unwrap());
+        assert!(recipe_mgr.verify_checksum("zenith-desktop", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").unwrap());
 
         let sec_store = SecurityProfileTemplateStore::new();
         assert!(sec_store.templates.contains_key("browser_sandboxed"));

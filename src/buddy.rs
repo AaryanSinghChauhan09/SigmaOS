@@ -13,6 +13,9 @@
 //! - Linux buddy allocator: Knuth Vol. 1, §2.5
 //! - FreeBSD `vm_phys_alloc_pages`
 //! - NetBSD `uvm_pglistalloc`
+
+#![no_std]
+
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Maximum order (2^MAX_ORDER pages per block = 4MB with 4KB pages)

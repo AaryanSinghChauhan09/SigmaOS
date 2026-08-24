@@ -1,5 +1,7 @@
 // SigmaOS Hardened Sysctl Implementation
 // Inspired by HardenedBSD security hardening approaches
+
+#![no_std]
 extern crate alloc;
 
 use alloc::format;

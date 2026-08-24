@@ -1,5 +1,7 @@
 // OOP-based Hardware Compatibility Matrix for SigmaOS
 // Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
+#![no_std]
+
 extern crate alloc;
 
 use alloc::boxed::Box;
@@ -122,11 +124,7 @@ pub enum HotplugEvent {
 }
 
 pub trait HotplugManager {
-    fn trigger_hotplug(
-        &mut self,
-        event: HotplugEvent,
-        device: Box<dyn HardwareDevice>,
-    ) -> Result<(), &'static str>;
+    fn trigger_hotplug(&mut self, event: HotplugEvent, device: Box<dyn HardwareDevice>) -> Result<(), &'static str>;
     fn list_hotplug_history(&self) -> &[(HotplugEvent, DeviceID)];
 }
 
@@ -255,11 +253,7 @@ impl SimpleCompatibilityMatrix {
 }
 
 impl HotplugManager for SimpleCompatibilityMatrix {
-    fn trigger_hotplug(
-        &mut self,
-        event: HotplugEvent,
-        device: Box<dyn HardwareDevice>,
-    ) -> Result<(), &'static str> {
+    fn trigger_hotplug(&mut self, event: HotplugEvent, device: Box<dyn HardwareDevice>) -> Result<(), &'static str> {
         let dev_id = device.id();
         self.hotplug_history.push((event, dev_id));
         match event {
@@ -329,12 +323,7 @@ impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CompatibilityResult {
-    Healthy = 0,
-    Warning = 1,
-    Error = 2,
-    Unknown = 3,
-}
+pub enum CompatibilityResult { Healthy = 0, Warning = 1, Error = 2, Unknown = 3 }
 
 pub struct CompatibilityReport {
     pub results: Vec<(DeviceID, CompatibilityResult)>,
@@ -473,17 +462,8 @@ mod tests {
     #[test]
     fn test_hotplug_manager() {
         let mut matrix = SimpleCompatibilityMatrix::new();
-        let cap = SimpleDevice::new(
-            99,
-            DeviceType::Storage,
-            0x1234,
-            0x5678,
-            "HotplugDisk",
-            SupportStatus::Supported,
-        );
-        assert!(matrix
-            .trigger_hotplug(HotplugEvent::Add, Box::new(cap))
-            .is_ok());
+        let cap = SimpleDevice::new(99, DeviceType::Storage, 0x1234, 0x5678, "HotplugDisk", SupportStatus::Supported);
+        assert!(matrix.trigger_hotplug(HotplugEvent::Add, Box::new(cap)).is_ok());
         assert_eq!(matrix.list_hotplug_history().len(), 1);
         assert_eq!(matrix.get_device(99).unwrap().name(), "HotplugDisk");
     }

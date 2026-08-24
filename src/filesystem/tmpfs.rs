@@ -1,5 +1,8 @@
 //! Tmpfs (In-Memory Virtual File System) Subsystem
 //! Inspired by Linux's on-demand VM allocations and FreeBSD's swap-backed tmpfs mechanics.
+
+#![no_std]
+
 pub const MAX_TMPFS_INODES: usize = 32;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

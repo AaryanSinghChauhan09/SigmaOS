@@ -1,10 +1,12 @@
+#![no_std]
+
 extern crate alloc;
-use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::any::Any;
 
 use crate::kernel::device::{Device, DeviceBinding, DeviceType, DriverError, DriverMetadata};
-use crate::kernel::object::{KObject, KRef, KernelObject, ObjectError};
+use crate::kernel::object::{KRef, KernelObject};
 use crate::security::capability::CapabilityToken;
 
 pub trait Driver: KernelObject + Send + Sync {
@@ -19,33 +21,23 @@ pub trait Driver: KernelObject + Send + Sync {
     fn as_driver_impl_mut(&mut self) -> Option<&mut dyn DeviceDriver>;
 
     // Linux & BSD inspired module features
-    fn is_pqc_signed(&self) -> bool {
-        true
-    }
-    fn get_module_param(&self, _param_name: &str) -> Option<String> {
-        None
-    }
-    fn set_module_param(&mut self, _param_name: &str, _value: &str) -> Result<(), DriverError> {
-        Ok(())
-    }
+    fn is_pqc_signed(&self) -> bool { true }
+    fn get_module_param(&self, _param_name: &str) -> Option<String> { None }
+    fn set_module_param(&mut self, _param_name: &str, _value: &str) -> Result<(), DriverError> { Ok(()) }
 }
 
-pub trait DeviceDriver: core::any::Any + Send + Sync {
+pub trait DeviceDriver: Any + Send + Sync {
     fn init(&mut self) -> Result<(), DriverError>;
     fn handle_io(&mut self, operation: u32) -> Result<u32, DriverError>;
     fn shutdown(&mut self) -> Result<(), DriverError>;
     fn metadata(&self) -> &DriverMetadata;
     fn has_capability(&self, capability: u64) -> bool;
-    fn as_any(&self) -> &dyn core::any::Any;
-    fn as_any_mut(&mut self) -> &mut dyn core::any::Any;
+    fn as_any(&self) -> &dyn Any;
+    fn as_any_mut(&mut self) -> &mut dyn Any;
 
     // Linux & BSD inspired module features
-    fn get_module_param(&self, _param_name: &str) -> Option<String> {
-        None
-    }
-    fn set_module_param(&mut self, _param_name: &str, _value: &str) -> Result<(), DriverError> {
-        Ok(())
-    }
+    fn get_module_param(&self, _param_name: &str) -> Option<String> { None }
+    fn set_module_param(&mut self, _param_name: &str, _value: &str) -> Result<(), DriverError> { Ok(()) }
 }
 
 #[derive(Debug, Clone)]
@@ -154,10 +146,7 @@ impl DriverRegistry {
                 if !reg.loaded && reg.driver.probe(device) {
                     if let Some(driver) = reg.driver.as_driver_impl_mut() {
                         driver.init()?;
-                        bindings.push((
-                            device.name().to_string(),
-                            reg.driver.driver_name().to_string(),
-                        ));
+                        bindings.push((device.name().to_string(), reg.driver.driver_name().to_string()));
                         reg.loaded = true;
                         break;
                     }
@@ -213,92 +202,30 @@ impl DriverRegistry {
     }
 }
 
-impl Default for DriverRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     struct MockDriver {
-        base: KObject,
         owner: Option<String>,
         debug_level: String,
     }
 
     impl KernelObject for MockDriver {
-        fn name(&self) -> &str {
-            self.base.name()
-        }
-        fn set_name(&mut self, name: &str) {
-            self.base.set_name(name);
-        }
-        fn parent(&self) -> Option<&dyn KernelObject> {
-            self.base.parent()
-        }
-        fn set_parent(&mut self, parent: Option<&dyn KernelObject>) {
-            self.base.set_parent(parent);
-        }
-        fn children(&self) -> Vec<&dyn KernelObject> {
-            self.base.children()
-        }
-        fn add_child(&mut self, child: &dyn KernelObject) {
-            self.base.add_child(child);
-        }
-        fn remove_child(&mut self, child_name: &str) -> Option<Box<dyn KernelObject>> {
-            self.base.remove_child(child_name)
-        }
-        fn kref(&self) -> &KRef {
-            self.base.kref()
-        }
-        fn as_any(&self) -> &dyn core::any::Any {
-            self
-        }
-        fn as_any_mut(&mut self) -> &mut dyn core::any::Any {
-            self
-        }
-        fn sysfs_attrs(&self) -> Vec<&str> {
-            self.base.sysfs_attrs()
-        }
-        fn sysfs_show(&self, attr: &str) -> Option<String> {
-            self.base.sysfs_show(attr)
-        }
-        fn sysfs_store(&mut self, attr: &str, value: &str) -> Result<(), ObjectError> {
-            self.base.sysfs_store(attr, value)
-        }
+        fn id(&self) -> u64 { 1 }
+        fn name(&self) -> &str { "mock_driver" }
     }
 
     impl Driver for MockDriver {
-        fn driver_name(&self) -> &str {
-            "mock_driver"
-        }
-        fn set_owner(&mut self, owner: &str) {
-            self.owner = Some(owner.to_string());
-        }
-        fn owner(&self) -> Option<&str> {
-            self.owner.as_deref()
-        }
-        fn probe(&self, _device: &dyn Device) -> bool {
-            true
-        }
-        fn attach(&mut self, _device: &mut dyn Device) -> Result<(), DriverError> {
-            Ok(())
-        }
-        fn detach(&mut self, _device: &mut dyn Device) -> Result<(), DriverError> {
-            Ok(())
-        }
-        fn supported_devices(&self) -> Vec<DeviceType> {
-            Vec::new()
-        }
-        fn as_driver_impl(&self) -> Option<&dyn DeviceDriver> {
-            None
-        }
-        fn as_driver_impl_mut(&mut self) -> Option<&mut dyn DeviceDriver> {
-            None
-        }
+        fn driver_name(&self) -> &str { "mock_driver" }
+        fn set_owner(&mut self, owner: &str) { self.owner = Some(owner.to_string()); }
+        fn owner(&self) -> Option<&str> { self.owner.as_deref() }
+        fn probe(&self, _device: &dyn Device) -> bool { true }
+        fn attach(&mut self, _device: &mut dyn Device) -> Result<(), DriverError> { Ok(()) }
+        fn detach(&mut self, _device: &mut dyn Device) -> Result<(), DriverError> { Ok(()) }
+        fn supported_devices(&self) -> Vec<DeviceType> { Vec::new() }
+        fn as_driver_impl(&self) -> Option<&dyn DeviceDriver> { None }
+        fn as_driver_impl_mut(&mut self) -> Option<&mut dyn DeviceDriver> { None }
 
         fn get_module_param(&self, param_name: &str) -> Option<String> {
             if param_name == "debug" {
@@ -321,7 +248,6 @@ mod tests {
     #[test]
     fn test_driver_module_params_and_pqc_signing() {
         let mut drv = MockDriver {
-            base: KObject::new("mock_driver"),
             owner: None,
             debug_level: "3".to_string(),
         };

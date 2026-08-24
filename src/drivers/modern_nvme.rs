@@ -20,11 +20,7 @@ pub struct NvmeSubmissionQueue {
 
 impl NvmeSubmissionQueue {
     pub fn new(size: usize) -> Self {
-        Self {
-            size,
-            head: 0,
-            tail: 0,
-        }
+        Self { size, head: 0, tail: 0 }
     }
 
     /// Submits a command and increments the doorbell tail pointer (doorbell write)
@@ -47,11 +43,7 @@ pub struct NvmeCompletionQueue {
 
 impl NvmeCompletionQueue {
     pub fn new(size: usize) -> Self {
-        Self {
-            size,
-            head: 0,
-            phase: true,
-        }
+        Self { size, head: 0, phase: true }
     }
 
     /// Reaps a completion entry, updating head and toggling phase bit on wrap
@@ -76,9 +68,9 @@ pub struct SmartTelemetry {
 impl SmartTelemetry {
     pub fn new() -> Self {
         Self {
-            temperature_c: 38,           // 38C optimal temperature
-            percentage_used: 1,          // 1% life used
-            data_units_read: 1048576,    // 1GB read
+            temperature_c: 38, // 38C optimal temperature
+            percentage_used: 1, // 1% life used
+            data_units_read: 1048576, // 1GB read
             data_units_written: 2097152, // 2GB written
         }
     }
@@ -88,6 +80,18 @@ impl Default for SmartTelemetry {
     fn default() -> Self {
         Self::new()
     }
+}
+
+
+/// AHCI Command Header
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct AhciCommandHeader {
+    pub opts: u16,
+    pub prdtl: u16,
+    pub prdbc: u32,
+    pub ctba: u64,
+    pub reserved: [u32; 4],
 }
 
 /// Simulated AHCI Port MMIO Register Map
@@ -100,13 +104,7 @@ impl AhciPort {
     pub const fn new() -> Self {
         Self {
             cmd_issue: 0,
-            cmd_headers: [AhciCommandHeader {
-                opts: 0,
-                prdtl: 0,
-                prdbc: 0,
-                ctba: 0,
-                reserved: [0; 4],
-            }; 32],
+            cmd_headers: [AhciCommandHeader { opts: 0, prdtl: 0, prdbc: 0, ctba: 0, reserved: [0; 4] }; 32],
         }
     }
 
@@ -188,18 +186,13 @@ impl AhciStorageDriver {
                 prdtl: 1,
                 prdbc: 0,
                 ctba: 0x100000,
+
             }; 32],
         }
     }
 
     /// Issue SATA ATA Read DMA command over AHCI Port
-    pub fn execute_sata_read_dma(
-        &mut self,
-        port: usize,
-        lba: u64,
-        sectors: u32,
-        buf: &mut [u8],
-    ) -> Result<usize, &'static str> {
+    pub fn execute_sata_read_dma(&mut self, port: usize, lba: u64, sectors: u32, buf: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized {
             return Err("AHCI driver not initialized");
         }
@@ -218,13 +211,7 @@ impl AhciStorageDriver {
     }
 
     /// Issue SATA ATA Write DMA command over AHCI Port
-    pub fn execute_sata_write_dma(
-        &mut self,
-        port: usize,
-        _lba: u64,
-        _sectors: u32,
-        data: &[u8],
-    ) -> Result<usize, &'static str> {
+    pub fn execute_sata_write_dma(&mut self, port: usize, _lba: u64, _sectors: u32, data: &[u8]) -> Result<usize, &'static str> {
         if !self.is_initialized {
             return Err("AHCI driver not initialized");
         }

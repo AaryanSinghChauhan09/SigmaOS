@@ -2,7 +2,7 @@
 // Independent, zero-dependency implementations of NixOS core tooling
 // Implements Nix package manager, declarative configuration, and functional package management
 
-use crate::klib::{BTreeMap, String, ToString, Vec};
+use crate::klib::{BTreeMap, Vec, String, ToString};
 
 // =========================================================================
 // 1. NIX PACKAGE MANAGER (Functional Package Management)
@@ -259,11 +259,7 @@ impl NixosConfig {
     fn config_option_to_string(&self, option: &ConfigOption) -> String {
         match option {
             ConfigOption::Boolean(b) => {
-                if *b {
-                    String::from("true")
-                } else {
-                    String::from("false")
-                }
+                if *b { String::from("true") } else { String::from("false") }
             }
             ConfigOption::String(s) => {
                 let mut result = String::from("\"");
@@ -271,7 +267,9 @@ impl NixosConfig {
                 result.push_str("\"");
                 result
             }
-            ConfigOption::Integer(i) => i.to_string(),
+            ConfigOption::Integer(i) => {
+                i.to_string()
+            }
             ConfigOption::List(items) => {
                 let mut items_str = Vec::new();
                 for s in items {
@@ -286,8 +284,7 @@ impl NixosConfig {
                 result
             }
             ConfigOption::Attrs(attrs) => {
-                let attrs_str: Vec<String> = attrs
-                    .iter()
+                let attrs_str: Vec<String> = attrs.iter()
                     .map(|(k, v)| format!("{} = {}", k, self.config_option_to_string(v)))
                     .collect();
                 format!("{{ {} }}", attrs_str.join("; "))
@@ -435,15 +432,7 @@ mod tests {
 
         // Remove one package from GC roots
         store.gc_roots.clear();
-        store.add_gc_root(
-            store
-                .packages
-                .get("hello")
-                .unwrap()
-                .outputs
-                .get("out")
-                .unwrap(),
-        );
+        store.add_gc_root(store.packages.get("hello").unwrap().outputs.get("out").unwrap());
 
         let deleted = store.garbage_collect(true).unwrap();
         assert!(deleted >= 1);
@@ -453,10 +442,7 @@ mod tests {
     fn test_nixos_config() {
         let mut config = NixosConfig::new();
 
-        config.set_option(
-            "networking.hostName",
-            ConfigOption::String(String::from("testhost")),
-        );
+        config.set_option("networking.hostName", ConfigOption::String(String::from("testhost")));
         assert_eq!(
             config.get_option("networking.hostName"),
             Some(&ConfigOption::String(String::from("testhost")))
@@ -471,10 +457,7 @@ mod tests {
 
         config.disable_service("nginx");
         if let Some(nginx_config) = config.services.get("nginx") {
-            assert_eq!(
-                nginx_config.get("enable"),
-                Some(&ConfigOption::Boolean(false))
-            );
+            assert_eq!(nginx_config.get("enable"), Some(&ConfigOption::Boolean(false)));
         }
     }
 

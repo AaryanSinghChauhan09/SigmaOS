@@ -63,11 +63,7 @@ impl AurSandboxOrchestrator {
     pub fn parse_pkgbuild_line(&self, line: &str) -> Option<PkgbuildMeta> {
         let line_trimmed = line.trim();
         if line_trimmed.starts_with("pkgname=") {
-            let name = line_trimmed
-                .strip_prefix("pkgname=")
-                .unwrap()
-                .trim_matches('"')
-                .trim_matches('\'');
+            let name = line_trimmed.strip_prefix("pkgname=").unwrap().trim_matches('"').trim_matches('\'');
             let hash = Self::calculate_name_hash(name);
             return Some(PkgbuildMeta {
                 name_hash: hash,
@@ -110,27 +106,18 @@ impl AurSandboxOrchestrator {
     }
 
     /// Executes the sandboxed compilation routines and registers the result package into sigpkg CAS
-    pub fn run_compilation(
-        &mut self,
-        meta: PkgbuildMeta,
-        sandbox: &PkgSandboxConfig,
-    ) -> Result<u32, &'static str> {
+    pub fn run_compilation(&mut self, meta: PkgbuildMeta, sandbox: &PkgSandboxConfig) -> Result<u32, &'static str> {
         if sandbox.allow_internet {
             return Err("AurOrchestrator: Insecure sandbox configuration - network connectivity prohibited during build phase");
         }
 
         // Simulate compiling source files inside isolated namespace boundaries
-        println!(
-            "AurCompiler: Compiling package (hash: 0x{:X}) inside isolated sandbox path: 0x{:X}",
-            meta.name_hash, sandbox.restricted_source_path_hash
-        );
+        println!("AurCompiler: Compiling package (hash: 0x{:X}) inside isolated sandbox path: 0x{:X}",
+                 meta.name_hash, sandbox.restricted_source_path_hash);
 
         // Compute simulated target output package hash
         let final_package_hash = meta.name_hash ^ 0xAAAAAAAA;
-        println!(
-            "AurCompiler: Attested package build successfully. Output CAS hash: 0x{:X}",
-            final_package_hash
-        );
+        println!("AurCompiler: Attested package build successfully. Output CAS hash: 0x{:X}", final_package_hash);
 
         Ok(final_package_hash)
     }

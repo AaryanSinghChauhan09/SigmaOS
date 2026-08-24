@@ -1,19 +1,15 @@
+#![no_std]
+
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
-use alloc::{
-    string::{String, ToString},
-    vec::Vec,
-};
+use alloc::{vec::Vec, string::{String, ToString}};
 
 #[cfg(feature = "standalone_test")]
 extern crate std;
 
 #[cfg(feature = "standalone_test")]
-use alloc::{
-    string::{String, ToString},
-    vec::Vec,
-};
+use alloc::{vec::Vec, string::{String, ToString}};
 
 /// io_uring operation codes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,14 +34,7 @@ pub struct SubmissionQueueEntry {
 }
 
 impl SubmissionQueueEntry {
-    pub fn new(
-        opcode: IoUringOpcode,
-        fd: i32,
-        offset: u64,
-        addr: u64,
-        len: u32,
-        user_data: u64,
-    ) -> Self {
+    pub fn new(opcode: IoUringOpcode, fd: i32, offset: u64, addr: u64, len: u32, user_data: u64) -> Self {
         Self {
             opcode,
             fd,
@@ -67,11 +56,7 @@ pub struct CompletionQueueEntry {
 
 impl CompletionQueueEntry {
     pub fn new(user_data: u64, res: i32, flags: u32) -> Self {
-        Self {
-            user_data,
-            res,
-            flags,
-        }
+        Self { user_data, res, flags }
     }
 }
 
@@ -113,8 +98,7 @@ impl IoUringEngine {
                 IoUringOpcode::Fsync => 0,
             };
 
-            self.cq_entries
-                .push(CompletionQueueEntry::new(sqe.user_data, res, 0));
+            self.cq_entries.push(CompletionQueueEntry::new(sqe.user_data, res, 0));
             processed += 1;
         }
 

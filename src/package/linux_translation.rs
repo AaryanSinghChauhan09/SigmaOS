@@ -2,7 +2,9 @@
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Integrates foreign Linux package frameworks (.deb, .rpm, pacman) directly with the SigmaOS Driver system.
 
-use crate::driver::framework::{DriverError, DriverID, DriverState, DriverType, SimpleDriver};
+use crate::driver::framework::{
+    DriverError, DriverID, DriverState, DriverType, SimpleDriver,
+};
 use crate::package::PackageFormat;
 use core::sync::atomic::{AtomicBool, Ordering};
 

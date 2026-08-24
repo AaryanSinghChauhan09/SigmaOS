@@ -12,7 +12,7 @@ pub enum TargetAbiConvention {
 /// System V AMD64 ABI Execution Frame Layout
 #[derive(Debug, Clone)]
 pub struct SystemVAbiFrame {
-    pub arg_registers: [u64; 6],   // RDI, RSI, RDX, RCX, R8, R9
+    pub arg_registers: [u64; 6], // RDI, RSI, RDX, RCX, R8, R9
     pub red_zone_bytes: [u8; 128], // Red Zone below stack pointer
     pub rsp_aligned_16: bool,
 }

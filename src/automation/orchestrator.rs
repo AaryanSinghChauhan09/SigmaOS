@@ -564,9 +564,7 @@ mod tests {
     #[test]
     fn test_dev_sandbox_manager() {
         let mut sandbox_mgr = DevSandboxManager::new();
-        let env_id = sandbox_mgr
-            .allocate_ephemeral_workspace("rust-developer-lab")
-            .unwrap();
+        let env_id = sandbox_mgr.allocate_ephemeral_workspace("rust-developer-lab").unwrap();
         assert_eq!(env_id, "sandbox-env-1");
         assert!(sandbox_mgr.is_workspace_active("sandbox-env-1"));
 
@@ -590,14 +588,10 @@ impl DevSandboxManager {
     }
 
     /// Allocates a lightweight, capability-isolated ephemeral workspace
-    pub fn allocate_ephemeral_workspace(
-        &mut self,
-        profile_name: &str,
-    ) -> Result<String, &'static str> {
+    pub fn allocate_ephemeral_workspace(&mut self, profile_name: &str) -> Result<String, &'static str> {
         self.total_allocated += 1;
         let env_id = format!("sandbox-env-{}", self.total_allocated);
-        self.active_workspaces
-            .insert(env_id.clone(), profile_name.to_string());
+        self.active_workspaces.insert(env_id.clone(), profile_name.to_string());
         Ok(env_id)
     }
 

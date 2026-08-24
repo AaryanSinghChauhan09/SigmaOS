@@ -1,6 +1,9 @@
 // Slab Allocator - Linux-style efficient small object allocation
 // Reduces fragmentation by caching freed objects of similar sizes
 // Enhanced with Linux-inspired size-bucketed kmalloc/kfree and sub-16MB legacy DMA pools for ancient devices.
+
+#![no_std]
+
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;

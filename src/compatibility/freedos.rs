@@ -1,12 +1,15 @@
 // SigmaOS FreeDOS Emulation & Integration Engine (SigmaDOS Layer)
 // Fully absorbs and implements all features, systems, and philosophies of FreeDOS:
 // AUTOEXEC.BAT batch files, CONFIG.SYS drivers, INT 21h MS-DOS syscalls, TSR multiplexing, FAT32/LBA filesystems, and shell utilities.
+
+#![no_std]
+
 extern crate alloc;
 
-use crate::klib::path::PathBuf as Path;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::string::String;
 use alloc::vec::Vec;
+use crate::klib::path::PathBuf as Path;
 
 /// Represents CONFIG.SYS driver or parameter settings
 #[derive(Debug, Clone)]
@@ -112,8 +115,7 @@ impl FreeDosEmulator {
                         let joined = parts[1..].join(" ");
                         let assign: Vec<&str> = joined.split('=').map(|s| s.trim()).collect();
                         if assign.len() == 2 {
-                            self.environment
-                                .insert(assign[0].to_uppercase(), assign[1].to_string());
+                            self.environment.insert(assign[0].to_uppercase(), assign[1].to_string());
                         }
                     }
                 }
@@ -176,8 +178,7 @@ impl FreeDosEmulator {
                 // Create File (DX = filename pointer, CX = attribute)
                 let path = format!("C:\\DOS_FILE_{}.TXT", dx);
                 self.files.insert(path.clone(), Vec::new());
-                self.output_stream
-                    .push(format!("Created DOS file: {}", path));
+                self.output_stream.push(format!("Created DOS file: {}", path));
                 Ok(1) // Return file handle
             }
             0x3F => {
@@ -192,8 +193,7 @@ impl FreeDosEmulator {
                 if let Some(buf) = self.files.get_mut(&path) {
                     buf.extend_from_slice(&vec![0xAA; cx as usize]);
                 }
-                self.output_stream
-                    .push(format!("Wrote {} bytes to DOS handle", cx));
+                self.output_stream.push(format!("Wrote {} bytes to DOS handle", cx));
                 Ok(cx)
             }
             _ => Err("Unsupported Interrupt 21h subfunction"),
@@ -211,19 +211,13 @@ impl FreeDosEmulator {
             is_active: true,
         };
         self.tsrs.push(tsr);
-        self.output_stream.push(format!(
-            "TSR Program '{}' successfully multiplexed at Segment {:#04X}",
-            name, segment
-        ));
+        self.output_stream.push(format!("TSR Program '{}' successfully multiplexed at Segment {:#04X}", name, segment));
     }
 
     pub fn trigger_tsr_interrupt(&mut self, vector: u8) -> bool {
         for tsr in &mut self.tsrs {
             if tsr.interrupt_vector == vector && tsr.is_active {
-                self.output_stream.push(format!(
-                    "[TSR Event] Active handler triggered inside '{}'",
-                    tsr.name
-                ));
+                self.output_stream.push(format!("[TSR Event] Active handler triggered inside '{}'", tsr.name));
                 return true;
             }
         }
@@ -258,10 +252,7 @@ impl FreeDosEmulator {
             },
         ];
         self.fat_entries.insert(mount_point.to_path_buf(), root_dir);
-        self.output_stream.push(format!(
-            "FAT32 LBA partition cleanly mounted at {:?}",
-            mount_point
-        ));
+        self.output_stream.push(format!("FAT32 LBA partition cleanly mounted at {:?}", mount_point));
     }
 
     pub fn list_fat_directory(&self, mount_point: &Path) -> Vec<String> {
@@ -269,10 +260,7 @@ impl FreeDosEmulator {
         if let Some(entries) = self.fat_entries.get(mount_point) {
             for entry in entries {
                 let suffix = if entry.is_directory { "<DIR>" } else { "" };
-                list.push(format!(
-                    "{:<8} {:<3} {:>8} {}",
-                    entry.filename, entry.extension, entry.file_size, suffix
-                ));
+                list.push(format!("{:<8} {:<3} {:>8} {}", entry.filename, entry.extension, entry.file_size, suffix));
             }
         }
         list
@@ -321,9 +309,7 @@ mod tests {
         ";
         dos.execute_autoexec_bat(content);
         assert_eq!(dos.environment.get("STATUS"), Some(&"RUNNING".to_string()));
-        assert!(dos
-            .output_stream
-            .contains(&"Loop iteration triggered".to_string()));
+        assert!(dos.output_stream.contains(&"Loop iteration triggered".to_string()));
         assert!(dos.output_stream.contains(&"Loop complete".to_string()));
     }
 
@@ -347,10 +333,7 @@ mod tests {
 
         let handled = dos.trigger_tsr_interrupt(0x33);
         assert!(handled);
-        assert!(dos
-            .output_stream
-            .iter()
-            .any(|s| s.contains("Active handler triggered inside 'MOUSE_DRIVER'")));
+        assert!(dos.output_stream.iter().any(|s| s.contains("Active handler triggered inside 'MOUSE_DRIVER'")));
     }
 
     #[test]

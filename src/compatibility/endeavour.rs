@@ -8,13 +8,13 @@
 
 extern crate alloc;
 
-use crate::security::capability::CapabilityToken;
-use crate::sigpkg::PackageRecipe;
 use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use alloc::collections::BTreeMap;
+use crate::security::capability::CapabilityToken;
+use crate::sigpkg::PackageRecipe;
 
 /// Represents a package mirror in the SigmaOS network.
 #[derive(Debug, Clone, PartialEq)]
@@ -226,9 +226,7 @@ impl MakepkgSandbox {
     ) -> Result<String, &'static str> {
         // Enforce capability check to prevent rootless compile privilege escalation
         if (token.bits() & self.required_compile_capabilities.bits()) == 0 {
-            return Err(
-                "Compilation Blocked: Insufficient capability token for makepkg compiler sandbox",
-            );
+            return Err("Compilation Blocked: Insufficient capability token for makepkg compiler sandbox");
         }
 
         if recipe.arch != self.target_arch && recipe.arch != "any" {
@@ -245,10 +243,7 @@ impl MakepkgSandbox {
         let sig = "DILITHIUM5_SIG:VALID_BUILD_PROVENANCE_ASSURED_SHA256";
         output_log.push_str(&format!("Signature successfully appended: {}\n", sig));
 
-        let pkg_path = format!(
-            "{}/{}-{}-{}.pkg.tar.zst",
-            self.build_root, recipe.name, recipe.version, recipe.pkgrel
-        );
+        let pkg_path = format!("{}/{}-{}-{}.pkg.tar.zst", self.build_root, recipe.name, recipe.version, recipe.pkgrel);
         Ok(pkg_path)
     }
 }
@@ -270,8 +265,7 @@ impl AlpmSyncDb {
     }
 
     pub fn sync_local_db(&mut self, pkg_name: &str, version: &str) {
-        self.registered_versions
-            .insert(pkg_name.to_string(), version.to_string());
+        self.registered_versions.insert(pkg_name.to_string(), version.to_string());
     }
 
     pub fn query_installed_version(&self, pkg_name: &str) -> Option<&String> {
@@ -356,10 +350,7 @@ impl YayAurHelper {
         let recipe = PackageRecipe::new(pkg_name.to_string(), version.clone())
             .with_arch(sandbox.target_arch.clone())
             .with_pkgrel(1)
-            .with_source(
-                "https://sigmahub.org/recipe".to_string(),
-                "hash_abc".to_string(),
-            )
+            .with_source("https://sigmahub.org/recipe".to_string(), "hash_abc".to_string())
             .with_build_command("make".to_string());
 
         let pkg_path = sandbox.compile_recipe(&recipe, token)?;
@@ -477,10 +468,7 @@ mod tests {
         let recipe = PackageRecipe::new("custom-shell-aur".to_string(), version)
             .with_arch("x86_64".to_string())
             .with_pkgrel(2)
-            .with_source(
-                "https://example.com/source".to_string(),
-                "hash_abc".to_string(),
-            )
+            .with_source("https://example.com/source".to_string(), "hash_abc".to_string())
             .with_build_command("make".to_string());
 
         // Unauthorized token should fail compilation
@@ -512,10 +500,7 @@ mod tests {
         assert_eq!(db.query_installed_version("nano"), None);
 
         db.sync_local_db("nano", "8.0-1");
-        assert_eq!(
-            db.query_installed_version("nano"),
-            Some(&"8.0-1".to_string())
-        );
+        assert_eq!(db.query_installed_version("nano"), Some(&"8.0-1".to_string()));
     }
 
     #[test]
@@ -525,12 +510,8 @@ mod tests {
         let token = CapabilityToken::from_bits(0x04);
         let mut sync_db = AlpmSyncDb::new();
 
-        let res =
-            helper.compile_and_register_aur("custom-theme-aur", &mut sandbox, &token, &mut sync_db);
+        let res = helper.compile_and_register_aur("custom-theme-aur", &mut sandbox, &token, &mut sync_db);
         assert!(res.is_ok());
-        assert_eq!(
-            sync_db.query_installed_version("custom-theme-aur"),
-            Some(&"1.0.0-1".to_string())
-        );
+        assert_eq!(sync_db.query_installed_version("custom-theme-aur"), Some(&"1.0.0-1".to_string()));
     }
 }

@@ -1,7 +1,7 @@
 //! Repository Management System (Debian APT + Arch Pacman Inspiration)
 //! Manages package repositories, mirrors, and metadata
 
-use crate::klib::{BTreeMap, String, Vec};
+use crate::klib::{BTreeMap, Vec, String};
 use crate::sigpkg::{Package, Version, VersionConstraint};
 
 /// Repository configuration (Debian sources.list inspiration)
@@ -59,10 +59,7 @@ impl RepositoryManager {
 
     /// Add mirror for a repository (Arch mirrorlist inspiration)
     pub fn add_mirror(&mut self, repo_name: &str, mirror_url: &str) {
-        let mirrors = self
-            .mirrors
-            .entry(repo_name.to_string())
-            .or_insert_with(Vec::new);
+        let mirrors = self.mirrors.entry(repo_name.to_string()).or_insert_with(Vec::new);
         mirrors.push(mirror_url.to_string());
     }
 
@@ -71,15 +68,11 @@ impl RepositoryManager {
         if let Some(mirrors) = self.mirrors.get(repo_name) {
             // Simple selection - in production would test latency
             if let Some(first) = mirrors.first() {
-                self.current_mirror
-                    .insert(repo_name.to_string(), first.clone());
+                self.current_mirror.insert(repo_name.to_string(), first.clone());
                 return Ok(first.clone());
             }
         }
-        Err(format!(
-            "No mirrors available for repository: {}",
-            repo_name
-        ))
+        Err(format!("No mirrors available for repository: {}", repo_name))
     }
 
     /// Get repository URL with mirror substitution

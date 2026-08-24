@@ -130,9 +130,7 @@ pub struct PosixAcl {
 
 impl PosixAcl {
     pub fn new() -> Self {
-        Self {
-            entries: Vec::new(),
-        }
+        Self { entries: Vec::new() }
     }
 
     pub fn from_mode(_uid: u32, _gid: u32, mode: u16) -> Self {
@@ -162,15 +160,7 @@ impl PosixAcl {
             .map(|e| e.perm_bits)
     }
 
-    pub fn evaluate_access(
-        &self,
-        uid: UserID,
-        gid: GroupID,
-        _groups: &[GroupID],
-        owner_uid: UserID,
-        group_gid: GroupID,
-        requested_bits: u16,
-    ) -> bool {
+    pub fn evaluate_access(&self, uid: UserID, gid: GroupID, _groups: &[GroupID], owner_uid: UserID, group_gid: GroupID, requested_bits: u16) -> bool {
         self.evaluate_acl(uid, gid, owner_uid, group_gid, requested_bits)
     }
 
@@ -185,14 +175,7 @@ impl PosixAcl {
     }
 
     /// Evaluates Extended POSIX ACL for a user and group
-    pub fn evaluate_acl(
-        &self,
-        uid: UserID,
-        gid: GroupID,
-        owner_uid: UserID,
-        group_gid: GroupID,
-        requested_bits: u16,
-    ) -> bool {
+    pub fn evaluate_acl(&self, uid: UserID, gid: GroupID, owner_uid: UserID, group_gid: GroupID, requested_bits: u16) -> bool {
         if uid == 0 {
             return true; // Root bypasses ACLs
         }
@@ -233,11 +216,7 @@ impl PosixAcl {
         }
 
         if gid == group_gid {
-            if let Some(group_obj) = self
-                .entries
-                .iter()
-                .find(|e| e.acl_type == AclType::GroupObj)
-            {
+            if let Some(group_obj) = self.entries.iter().find(|e| e.acl_type == AclType::GroupObj) {
                 let effective = group_obj.perm_bits & mask;
                 return (effective & requested_bits) == requested_bits;
             }
@@ -269,9 +248,7 @@ pub struct CapBoundingSet {
 
 impl CapBoundingSet {
     pub fn new(mask: u64) -> Self {
-        Self {
-            capability_mask: mask,
-        }
+        Self { capability_mask: mask }
     }
 
     pub fn drop_capability(&mut self, cap_bit: u64) {
@@ -309,12 +286,7 @@ impl DacPermission {
         }
     }
 
-    pub fn evaluate_access(
-        &self,
-        subject_uid: UserID,
-        subject_gid: GroupID,
-        requested_mode: u16,
-    ) -> bool {
+    pub fn evaluate_access(&self, subject_uid: UserID, subject_gid: GroupID, requested_mode: u16) -> bool {
         let allowed_bits = if subject_uid == 0 {
             0o777 // Root bypasses standard DAC
         } else if subject_uid == self.owner_uid {
@@ -350,20 +322,15 @@ pub struct MacSecurityLabel {
 
 impl MacSecurityLabel {
     pub fn new(level: SensitivityLevel, category_mask: u32) -> Self {
-        Self {
-            level,
-            category_mask,
-        }
+        Self { level, category_mask }
     }
 
     pub fn can_read(&self, object_label: &MacSecurityLabel) -> bool {
-        self.level >= object_label.level
-            && (self.category_mask & object_label.category_mask) == object_label.category_mask
+        self.level >= object_label.level && (self.category_mask & object_label.category_mask) == object_label.category_mask
     }
 
     pub fn can_write(&self, object_label: &MacSecurityLabel) -> bool {
-        self.level <= object_label.level
-            && (object_label.category_mask & self.category_mask) == self.category_mask
+        self.level <= object_label.level && (object_label.category_mask & self.category_mask) == self.category_mask
     }
 }
 
@@ -452,6 +419,7 @@ impl ZeroTrustAccessGate {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -503,16 +471,10 @@ mod tests {
         gate.matrix.grant_right(1, 10, acm_rights::READ);
 
         // Valid request -> OK
-        assert_eq!(
-            gate.evaluate_request(1, 10, acm_rights::READ, 2, &allowed_mac),
-            Ok(())
-        );
+        assert_eq!(gate.evaluate_request(1, 10, acm_rights::READ, 2, &allowed_mac), Ok(()));
 
         // Unknown MAC -> Blocked
         let blocked_mac = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
-        assert_eq!(
-            gate.evaluate_request(1, 10, acm_rights::READ, 2, &blocked_mac),
-            Err(AccessError::MacAddressBlocked)
-        );
+        assert_eq!(gate.evaluate_request(1, 10, acm_rights::READ, 2, &blocked_mac), Err(AccessError::MacAddressBlocked));
     }
 }

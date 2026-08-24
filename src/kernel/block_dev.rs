@@ -16,13 +16,13 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
 
 #[cfg(not(test))]
 use crate::klib::{BTreeMap, Vec, VecDeque};
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 use alloc::string::String;
 

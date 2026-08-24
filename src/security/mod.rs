@@ -1,12 +1,15 @@
 // SigmaOS Security Subsystem
 pub mod audit;
-pub mod bridge;
 pub mod capability;
+pub mod hardening;
+
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+};
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
-pub mod deobfuscation;
 pub mod forensics;
 pub mod hardening;
 pub mod integrity;
@@ -15,9 +18,12 @@ pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
+pub mod bridge;
+pub mod deobfuscation;
+pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod prism;
-pub mod qubes_isolation;
 pub mod sandbox;
+pub mod qubes_isolation;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
@@ -26,6 +32,8 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+
+pub use qubes_isolation::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -38,8 +46,6 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
-pub use forensics::*;
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };
@@ -52,7 +58,6 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::*;
 pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
@@ -70,3 +75,4 @@ pub use vpn::{
     WireGuardHandler,
 };
 pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+pub use forensics::*;

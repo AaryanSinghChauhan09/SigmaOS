@@ -6,9 +6,9 @@
 //! - Dynamic shared library symbol loader resolution simulation (`LinuxLdSoLoader`)
 
 extern crate alloc;
-use crate::klib::{HashMap, Vec};
 use alloc::string::String;
 use alloc::string::ToString;
+use crate::klib::{Vec, HashMap};
 
 // ==========================================
 // 1. Linux Standard Base (LSB) & /etc/os-release
@@ -42,10 +42,7 @@ impl LsbReleaseGovernor {
 
             if let Some(idx) = trimmed.find('=') {
                 let key = trimmed[..idx].trim();
-                let val = trimmed[idx + 1..]
-                    .trim()
-                    .trim_matches('"')
-                    .trim_matches('\'');
+                let val = trimmed[idx + 1..].trim().trim_matches('"').trim_matches('\'');
 
                 match key {
                     "ID" => distro_id = val.to_string(),
@@ -102,8 +99,7 @@ impl LinuxRunlevelGovernor {
                 self.active_services.clear();
             }
             LinuxRunlevel::Runlevel1SingleUser => {
-                self.active_services
-                    .retain(|s| s == "sulogin" || s == "syslog");
+                self.active_services.retain(|s| s == "sulogin" || s == "syslog");
             }
             LinuxRunlevel::Runlevel3MultiUserNet => {
                 if !self.active_services.contains(&"network".to_string()) {
@@ -111,10 +107,7 @@ impl LinuxRunlevelGovernor {
                 }
             }
             LinuxRunlevel::Runlevel5Graphical => {
-                if !self
-                    .active_services
-                    .contains(&"display-manager".to_string())
-                {
+                if !self.active_services.contains(&"display-manager".to_string()) {
                     self.active_services.push("display-manager".to_string());
                 }
             }
@@ -161,18 +154,9 @@ impl LinuxFstabEngine {
                 let spec = parts[0].to_string();
                 let file = parts[1].to_string();
                 let vfstype = parts[2].to_string();
-                let mntops = parts[3]
-                    .split(',')
-                    .map(|s: &str| s.trim().to_string())
-                    .collect();
-                let freq = parts
-                    .get(4)
-                    .and_then(|s: &&str| s.parse().ok())
-                    .unwrap_or(0);
-                let passno = parts
-                    .get(5)
-                    .and_then(|s: &&str| s.parse().ok())
-                    .unwrap_or(0);
+                let mntops = parts[3].split(',').map(|s: &str| s.trim().to_string()).collect();
+                let freq = parts.get(4).and_then(|s: &&str| s.parse().ok()).unwrap_or(0);
+                let passno = parts.get(5).and_then(|s: &&str| s.parse().ok()).unwrap_or(0);
 
                 entries.push(FstabEntry {
                     spec,
@@ -268,10 +252,7 @@ VERSION_CODENAME=noble
         assert_eq!(governor.current_runlevel, LinuxRunlevel::Runlevel5Graphical);
 
         governor.set_runlevel(LinuxRunlevel::Runlevel3MultiUserNet);
-        assert_eq!(
-            governor.current_runlevel,
-            LinuxRunlevel::Runlevel3MultiUserNet
-        );
+        assert_eq!(governor.current_runlevel, LinuxRunlevel::Runlevel3MultiUserNet);
         assert!(governor.active_services.contains(&"network".to_string()));
 
         governor.set_runlevel(LinuxRunlevel::Runlevel0Halt);
@@ -291,10 +272,7 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
         assert_eq!(entries[0].file, "/");
         assert_eq!(entries[0].vfstype, "ext4");
         assert_eq!(entries[2].file, "/home");
-        assert_eq!(
-            entries[2].mntops,
-            vec!["defaults".to_string(), "noatime".to_string()]
-        );
+        assert_eq!(entries[2].mntops, vec!["defaults".to_string(), "noatime".to_string()]);
     }
 
     #[test]

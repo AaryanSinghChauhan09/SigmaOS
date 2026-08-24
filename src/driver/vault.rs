@@ -1,8 +1,8 @@
 // SigmaOS Driver Archive Vault (DriverArchiveVault)
 // Encrypts driver binaries for cold storage to prevent unauthorized driver injection and tamper attacks
 
-use crate::klib;
 use crate::klib::collections::HashMap;
+use crate::klib;
 
 #[derive(Debug, Clone)]
 pub struct VaultEntry {
@@ -25,8 +25,7 @@ impl DriverArchiveVault {
     }
 
     pub fn store_driver(&mut self, name: &str, raw_binary: &[u8]) {
-        let encrypted: klib::vec::Vec<u8> =
-            raw_binary.iter().map(|b| b ^ self.secret_key).collect();
+        let encrypted: klib::vec::Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
         let sig = klib::string::SigmaString::from(format!("SIGMA_{}_OK", name));
 
         let entry = VaultEntry {
@@ -34,8 +33,7 @@ impl DriverArchiveVault {
             encrypted_payload: encrypted,
             hash_signature: sig,
         };
-        self.archive
-            .insert(klib::string::SigmaString::from(name), entry);
+        self.archive.insert(klib::string::SigmaString::from(name), entry);
     }
 
     pub fn retrieve_driver(&self, name: &str) -> Option<klib::vec::Vec<u8>> {

@@ -188,9 +188,7 @@ mod tests {
         let mut fjm = FreeBsdJailManager::new();
 
         // Create jails
-        let jid = fjm
-            .create_jail("webserver.local", "192.168.10.15", "/jails/web")
-            .unwrap();
+        let jid = fjm.create_jail("webserver.local", "192.168.10.15", "/jails/web").unwrap();
         assert_eq!(jid, 1);
         assert!(fjm.jails.get(&1).unwrap().is_running);
 
@@ -237,13 +235,7 @@ mod tests {
 
     #[test]
     fn test_netbsd_rump_router() {
-        assert_eq!(
-            NetBsdRumpKernelRouter::dispatch_hypercall(RumpHypercall::Syscall, 100),
-            101
-        );
-        assert_eq!(
-            NetBsdRumpKernelRouter::dispatch_hypercall(RumpHypercall::MemoryAlloc, 5000),
-            8192
-        );
+        assert_eq!(NetBsdRumpKernelRouter::dispatch_hypercall(RumpHypercall::Syscall, 100), 101);
+        assert_eq!(NetBsdRumpKernelRouter::dispatch_hypercall(RumpHypercall::MemoryAlloc, 5000), 8192);
     }
 }

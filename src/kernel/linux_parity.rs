@@ -1,6 +1,7 @@
 /// Sovereign Linux Kernel Parity Subsystem for SigmaOS
 /// Clean-room implementation of Linux io_uring, memfd_secret, BPF LSM, and Page Folios
 /// Designed for bare-metal zero-dependency performance and zero-trust security
+
 extern crate alloc;
 
 use alloc::vec::Vec;
@@ -127,8 +128,7 @@ impl KernelIoUringEngine {
             let cq_tail = self.cq_tail.load(Ordering::Acquire);
             let cq_idx = (cq_tail as usize) & (self.ring_size - 1);
             self.cq_entries[cq_idx] = cqe;
-            self.cq_tail
-                .store(cq_tail.wrapping_add(1), Ordering::Release);
+            self.cq_tail.store(cq_tail.wrapping_add(1), Ordering::Release);
 
             head = head.wrapping_add(1);
             processed += 1;
@@ -272,11 +272,7 @@ impl BpfLsmPolicyGovernor {
     }
 
     /// Evaluate an LSM security hook in constant-time O(1) matching
-    pub fn evaluate_hook(
-        &self,
-        hook_type: LsmHookType,
-        process_caps: u64,
-    ) -> Result<(), &'static str> {
+    pub fn evaluate_hook(&self, hook_type: LsmHookType, process_caps: u64) -> Result<(), &'static str> {
         self.total_evaluations.fetch_add(1, Ordering::Relaxed);
 
         for hook in &self.hooks {

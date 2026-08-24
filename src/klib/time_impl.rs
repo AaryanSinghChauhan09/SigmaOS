@@ -31,7 +31,11 @@ impl SigmaTimestamp {
     pub fn add(&self, duration: SigmaDuration) -> SigmaTimestamp {
         let new_seconds = self.seconds + duration.seconds;
         let new_nanos = self.nanoseconds + duration.nanoseconds;
-        let carry = if new_nanos >= 1_000_000_000 { 1 } else { 0 };
+        let carry = if new_nanos >= 1_000_000_000 {
+            1
+        } else {
+            0
+        };
         SigmaTimestamp {
             seconds: new_seconds + carry as u64,
             nanoseconds: new_nanos % 1_000_000_000,
@@ -91,7 +95,11 @@ impl SigmaDuration {
     pub fn add(&self, other: SigmaDuration) -> SigmaDuration {
         let new_seconds = self.seconds + other.seconds;
         let new_nanos = self.nanoseconds + other.nanoseconds;
-        let carry = if new_nanos >= 1_000_000_000 { 1 } else { 0 };
+        let carry = if new_nanos >= 1_000_000_000 {
+            1
+        } else {
+            0
+        };
         SigmaDuration {
             seconds: new_seconds + carry as u64,
             nanoseconds: new_nanos % 1_000_000_000,

@@ -3,8 +3,8 @@ pub mod desktop;
 pub mod shell;
 
 pub use desktop::{
-    InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession, SessionID,
-    SessionState, SigmaRendezvous, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    RemoteDesktop, RemoteError, RemoteSession, SessionID, InputAuthGate, PqcVideoCipher, SigmaRendezvous,
+    SessionState, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
 };
 pub use shell::{
     FileTransfer, RemoteShell, ShellError, ShellID, ShellManager, SimpleFileTransfer,

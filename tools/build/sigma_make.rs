@@ -8,7 +8,7 @@
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
-type SigmaU8 = u8;
+type SigmaU8  = u8;
 type SigmaU16 = u16;
 type SigmaU32 = u32;
 type SigmaU64 = u64;
@@ -130,11 +130,7 @@ impl SigmaMakeEngine {
     }
 
     /// Set a compilation dependency relation (parent target depends on child target)
-    pub fn add_dependency(
-        &mut self,
-        parent_idx: usize,
-        child_idx: usize,
-    ) -> Result<(), &'static str> {
+    pub fn add_dependency(&mut self, parent_idx: usize, child_idx: usize) -> Result<(), &'static str> {
         self.dependencies.push((parent_idx, child_idx))?;
 
         // Update parent target's dep count
@@ -176,14 +172,16 @@ pub unsafe fn str_copy_slice(src: &[u8], dest: &mut [u8]) {
 static mut GLOBAL_MAKE: SigmaMakeEngine = SigmaMakeEngine::new();
 
 #[no_mangle]
-pub unsafe extern "C" fn str_copy() {}
+pub unsafe extern "C" fn str_copy() {
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn sigma_make_register_c_target() {
     let _ = GLOBAL_MAKE.register_target(b"c_target", b"gcc c_target.c -o c_target");
 }
 
-fn main() {}
+fn main() {
+}
 
 // ─── Module: Static Unit Tests ──────────────────────────────────────────────
 
@@ -196,15 +194,9 @@ mod tests {
         let mut make = SigmaMakeEngine::new();
 
         // 1. Register build targets
-        let driver_o = make
-            .register_target(b"driver_block.o", b"rustc --emit=obj driver_block.rs")
-            .unwrap();
-        let kernel_o = make
-            .register_target(b"kernel.o", b"rustc --emit=obj kernel.rs")
-            .unwrap();
-        let kernel_elf = make
-            .register_target(b"kernel.elf", b"ld kernel.o driver_block.o -o kernel.elf")
-            .unwrap();
+        let driver_o = make.register_target(b"driver_block.o", b"rustc --emit=obj driver_block.rs").unwrap();
+        let kernel_o = make.register_target(b"kernel.o", b"rustc --emit=obj kernel.rs").unwrap();
+        let kernel_elf = make.register_target(b"kernel.elf", b"ld kernel.o driver_block.o -o kernel.elf").unwrap();
 
         // 2. Setup dependency relationships
         // kernel_elf depends on kernel_o and driver_o

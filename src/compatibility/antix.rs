@@ -141,10 +141,7 @@ impl AntiXSystemRemasterEngine {
         let mut clean_manifest = Vec::new();
         for &file in system_files {
             // Filter transient caches and temporary files
-            if !file.starts_with("/var/log/")
-                && !file.starts_with("/tmp/")
-                && !file.starts_with("/proc/")
-            {
+            if !file.starts_with("/var/log/") && !file.starts_with("/tmp/") && !file.starts_with("/proc/") {
                 clean_manifest.push(file.to_string());
             }
         }
@@ -178,28 +175,17 @@ impl Default for AntiXControlCentre {
     }
 }
 
+
 pub struct AntixInitManager;
-impl AntixInitManager {
-    pub const fn new() -> Self {
-        Self
-    }
-}
+impl AntixInitManager { pub const fn new() -> Self { Self } }
 
 pub struct AntixDesktopProfiler;
-impl AntixDesktopProfiler {
-    pub const fn new() -> Self {
-        Self
-    }
-}
+impl AntixDesktopProfiler { pub const fn new() -> Self { Self } }
 
 pub type AntixControlCenter = AntiXControlCentre;
 
 pub struct LegacyMemoryTrimmer;
-impl LegacyMemoryTrimmer {
-    pub const fn new() -> Self {
-        Self
-    }
-}
+impl LegacyMemoryTrimmer { pub const fn new() -> Self { Self } }
 
 pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();
 pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();
@@ -259,9 +245,7 @@ impl AntixLiveUsbPersistence {
             println!("antiX-LiveUSB: Flash wear warning! USB health at {}%. Delaying flush to preserve NAND flash.", health);
             0
         } else {
-            println!(
-                "antiX-LiveUSB: Persisting RAM session overlay buffers to USB flash storage..."
-            );
+            println!("antiX-LiveUSB: Persisting RAM session overlay buffers to USB flash storage...");
             1024 * 1024 // 1MB written
         }
     }
@@ -311,18 +295,10 @@ pub struct AntixCliToolsSuite;
 impl AntixCliToolsSuite {
     pub fn execute_cli_tool(tool: CliTool) -> &'static str {
         match tool {
-            CliTool::CliApti => {
-                "antiX-CliTools: Executed cli-apti terminal package manager interface."
-            }
-            CliTool::CliShellCheck => {
-                "antiX-CliTools: Executed cli-shell-check system health diagnostic tool."
-            }
-            CliTool::CliWifiManager => {
-                "antiX-CliTools: Executed CWR (cli-wifi-ref) lightweight terminal network selector."
-            }
-            CliTool::CliPartitionManager => {
-                "antiX-CliTools: Executed cli-installer terminal disk partition manager."
-            }
+            CliTool::CliApti => "antiX-CliTools: Executed cli-apti terminal package manager interface.",
+            CliTool::CliShellCheck => "antiX-CliTools: Executed cli-shell-check system health diagnostic tool.",
+            CliTool::CliWifiManager => "antiX-CliTools: Executed CWR (cli-wifi-ref) lightweight terminal network selector.",
+            CliTool::CliPartitionManager => "antiX-CliTools: Executed cli-installer terminal disk partition manager.",
         }
     }
 }
@@ -352,15 +328,9 @@ impl AntixKernelUpdater {
     pub fn switch_kernel_variant(&self, variant: KernelVariant) -> &'static str {
         self.active_kernel.store(variant as u8, Ordering::SeqCst);
         match variant {
-            KernelVariant::Kernel486NonPae => {
-                "antiX-KernelManager: Activated 32-bit non-PAE i486/Pentium legacy kernel variant."
-            }
-            KernelVariant::Kernel64Lts => {
-                "antiX-KernelManager: Activated 64-bit LTS modern kernel variant."
-            }
-            KernelVariant::Kernel64Rt => {
-                "antiX-KernelManager: Activated 64-bit Real-Time low-latency kernel variant."
-            }
+            KernelVariant::Kernel486NonPae => "antiX-KernelManager: Activated 32-bit non-PAE i486/Pentium legacy kernel variant.",
+            KernelVariant::Kernel64Lts => "antiX-KernelManager: Activated 64-bit LTS modern kernel variant.",
+            KernelVariant::Kernel64Rt => "antiX-KernelManager: Activated 64-bit Real-Time low-latency kernel variant.",
         }
     }
 }

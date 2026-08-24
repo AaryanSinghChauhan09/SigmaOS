@@ -1,8 +1,8 @@
 extern crate alloc;
 
-use crate::klib::collections::HashMap;
-use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::string::String;
+use crate::klib::collections::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {
@@ -16,13 +16,8 @@ impl ArchUserRepoManager {
         }
     }
 
-    pub fn install_from_aur(
-        &mut self,
-        pkg_name: &str,
-        build_script: &str,
-    ) -> Result<(), &'static str> {
-        self.packages
-            .insert(pkg_name.to_string(), build_script.to_string());
+    pub fn install_from_aur(&mut self, pkg_name: &str, build_script: &str) -> Result<(), &'static str> {
+        self.packages.insert(pkg_name.to_string(), build_script.to_string());
         Ok(())
     }
 }
@@ -62,13 +57,7 @@ impl BsdPfStateTable {
         }
     }
 
-    pub fn create_state(
-        &mut self,
-        tuple: PfFiveTuple,
-        nat_ip: Option<&str>,
-        nat_port: Option<u16>,
-        now_sec: u64,
-    ) {
+    pub fn create_state(&mut self, tuple: PfFiveTuple, nat_ip: Option<&str>, nat_port: Option<u16>, now_sec: u64) {
         let entry = PfStateEntry {
             tuple: tuple.clone(),
             translated_src_ip: nat_ip.map(|s| s.to_string()),
@@ -80,17 +69,9 @@ impl BsdPfStateTable {
         self.states.insert(tuple, entry);
     }
 
-    pub fn process_packet(
-        &mut self,
-        tuple: &PfFiveTuple,
-        now_sec: u64,
-    ) -> Result<Option<(String, u16)>, &'static str> {
+    pub fn process_packet(&mut self, tuple: &PfFiveTuple, now_sec: u64) -> Result<Option<(String, u16)>, &'static str> {
         if let Some(state) = self.states.get_mut(tuple) {
-            if now_sec
-                > state
-                    .last_seen_timestamp_sec
-                    .saturating_add(state.timeout_sec)
-            {
+            if now_sec > state.last_seen_timestamp_sec.saturating_add(state.timeout_sec) {
                 // State expired
                 self.states.remove(tuple);
                 return Err("PF: Matching state entry expired");
@@ -98,9 +79,7 @@ impl BsdPfStateTable {
             state.packets_passed += 1;
             state.last_seen_timestamp_sec = now_sec;
 
-            if let (Some(ref nat_ip), Some(nat_port)) =
-                (&state.translated_src_ip, state.translated_src_port)
-            {
+            if let (Some(ref nat_ip), Some(nat_port)) = (&state.translated_src_ip, state.translated_src_port) {
                 let nat_ip: &String = nat_ip;
                 Ok(Some((nat_ip.clone(), nat_port)))
             } else {
@@ -114,11 +93,7 @@ impl BsdPfStateTable {
     pub fn expire_states(&mut self, now_sec: u64) -> usize {
         let mut expired_keys: Vec<PfFiveTuple> = Vec::new();
         for (tuple, state) in &self.states {
-            if now_sec
-                > state
-                    .last_seen_timestamp_sec
-                    .saturating_add(state.timeout_sec)
-            {
+            if now_sec > state.last_seen_timestamp_sec.saturating_add(state.timeout_sec) {
                 expired_keys.push(tuple.clone());
             }
         }
@@ -160,14 +135,7 @@ impl LinuxFutexEngine {
     }
 
     /// Futex WAIT: Atomically verify *uaddr == val; if true, enqueue caller thread to wait
-    pub fn futex_wait(
-        &mut self,
-        uaddr: u64,
-        current_mem_val: u32,
-        expected_val: u32,
-        thread_id: u64,
-        timeout_ns: Option<u64>,
-    ) -> Result<(), &'static str> {
+    pub fn futex_wait(&mut self, uaddr: u64, current_mem_val: u32, expected_val: u32, thread_id: u64, timeout_ns: Option<u64>) -> Result<(), &'static str> {
         if current_mem_val != expected_val {
             return Err("Futex: EAGAIN - Memory value changed before lock acquired");
         }
@@ -177,10 +145,7 @@ impl LinuxFutexEngine {
             val: expected_val,
             timeout_ns,
         };
-        self.buckets
-            .entry(uaddr)
-            .or_insert_with(Vec::new)
-            .push(waiter);
+        self.buckets.entry(uaddr).or_insert_with(Vec::new).push(waiter);
         Ok(())
     }
 
@@ -226,39 +191,23 @@ impl FreeBsdVfsNullfs {
         }
     }
 
-    pub fn mount_nullfs(
-        &mut self,
-        lower_path: &str,
-        mount_point: &str,
-        read_only: bool,
-        perm_override: Option<u32>,
-    ) -> Result<(), &'static str> {
+    pub fn mount_nullfs(&mut self, lower_path: &str, mount_point: &str, read_only: bool, perm_override: Option<u32>) -> Result<(), &'static str> {
         if self.mounts.contains_key(mount_point) {
             return Err("Nullfs: Mount point busy");
         }
-        self.mounts.insert(
-            mount_point.to_string(),
-            NullfsLayerNode {
-                target_lower_path: lower_path.to_string(),
-                mount_point: mount_point.to_string(),
-                read_only,
-                override_permissions: perm_override,
-            },
-        );
+        self.mounts.insert(mount_point.to_string(), NullfsLayerNode {
+            target_lower_path: lower_path.to_string(),
+            mount_point: mount_point.to_string(),
+            read_only,
+            override_permissions: perm_override,
+        });
         Ok(())
     }
 
-    pub fn resolve_overlay_path(
-        &self,
-        overlay_path: &str,
-        is_write: bool,
-    ) -> Result<(String, Option<u32>), &'static str> {
+    pub fn resolve_overlay_path(&self, overlay_path: &str, is_write: bool) -> Result<(String, Option<u32>), &'static str> {
         for (mp, node) in &self.mounts {
             let mp: &String = mp;
-            if overlay_path == mp
-                || (overlay_path.starts_with(mp.as_str())
-                    && overlay_path.as_bytes().get(mp.len()) == Some(&b'/'))
-            {
+            if overlay_path == mp || (overlay_path.starts_with(mp.as_str()) && overlay_path.as_bytes().get(mp.len()) == Some(&b'/')) {
                 if is_write && node.read_only {
                     return Err("Nullfs: EROFS - Read-only file system layer");
                 }
@@ -372,9 +321,7 @@ impl<T: Copy, const N: usize> BoundedBufferProducerConsumer<T, N> {
         if self.count == 0 {
             return Err("Bounded Buffer Empty: Consumer blocked!");
         }
-        let item = self.buffer[self.head]
-            .take()
-            .ok_or("Buffer slot unpopulated")?;
+        let item = self.buffer[self.head].take().ok_or("Buffer slot unpopulated")?;
         self.head = (self.head + 1) % N;
         self.count -= 1;
         Ok(item)
@@ -525,12 +472,7 @@ impl MultikernelMessagePassing {
         }
     }
 
-    pub fn send_message(
-        &mut self,
-        receiver: &mut MultikernelMessagePassing,
-        payload: &str,
-        seq: u64,
-    ) -> Result<(), &'static str> {
+    pub fn send_message(&mut self, receiver: &mut MultikernelMessagePassing, payload: &str, seq: u64) -> Result<(), &'static str> {
         if receiver.mailbox.len() >= receiver.max_capacity {
             return Err("Multikernel: Target core mailbox capacity exceeded");
         }
@@ -574,37 +516,23 @@ impl NinePProtocolTranslator {
     }
 
     pub fn mount_resource(&mut self, path: &str, content: &str, perm: u32) {
-        self.resources.insert(
-            path.to_string(),
-            NinePResource {
-                path: path.to_string(),
-                content: content.to_string(),
-                permission_mask: perm,
-            },
-        );
+        self.resources.insert(path.to_string(), NinePResource {
+            path: path.to_string(),
+            content: content.to_string(),
+            permission_mask: perm,
+        });
     }
 
     pub fn read_resource(&self, path: &str, caller_perm: u32) -> Result<String, &'static str> {
-        let res = self
-            .resources
-            .get(path)
-            .ok_or("9P: Resource path not found")?;
+        let res = self.resources.get(path).ok_or("9P: Resource path not found")?;
         if (res.permission_mask & caller_perm) == 0 {
             return Err("9P: Permission denied reading resource");
         }
         Ok(res.content.clone())
     }
 
-    pub fn write_resource(
-        &mut self,
-        path: &str,
-        new_content: &str,
-        caller_perm: u32,
-    ) -> Result<(), &'static str> {
-        let res = self
-            .resources
-            .get_mut(path)
-            .ok_or("9P: Resource path not found")?;
+    pub fn write_resource(&mut self, path: &str, new_content: &str, caller_perm: u32) -> Result<(), &'static str> {
+        let res = self.resources.get_mut(path).ok_or("9P: Resource path not found")?;
         if (res.permission_mask & caller_perm) == 0 {
             return Err("9P: Permission denied writing resource");
         }
@@ -634,38 +562,25 @@ impl MicrokernelTranslatorRegistry {
     }
 
     pub fn bind_translator(&mut self, node: &str, port: u32) {
-        self.translators.insert(
-            node.to_string(),
-            HurdTranslator {
-                passive_node: node.to_string(),
-                server_port: port,
-                is_active: false,
-            },
-        );
+        self.translators.insert(node.to_string(), HurdTranslator {
+            passive_node: node.to_string(),
+            server_port: port,
+            is_active: false,
+        });
     }
 
     pub fn activate_translator(&mut self, node: &str) -> Result<u32, &'static str> {
-        let trans = self
-            .translators
-            .get_mut(node)
-            .ok_or("Mach/Hurd: No translator bound to this node")?;
+        let trans = self.translators.get_mut(node).ok_or("Mach/Hurd: No translator bound to this node")?;
         trans.is_active = true;
         Ok(trans.server_port)
     }
 
     pub fn dispatch_io_request(&self, node: &str, op: &str) -> Result<String, &'static str> {
-        let trans = self
-            .translators
-            .get(node)
-            .ok_or("Mach/Hurd: Target translator not found")?;
+        let trans = self.translators.get(node).ok_or("Mach/Hurd: Target translator not found")?;
         if !trans.is_active {
             return Err("Mach/Hurd: Translator is passive. Activate before dispatching I/O!");
         }
-        Ok(alloc::format!(
-            "Dispatched operational request '{}' to Mach Server on Port {}",
-            op,
-            trans.server_port
-        ))
+        Ok(alloc::format!("Dispatched operational request '{}' to Mach Server on Port {}", op, trans.server_port))
     }
 }
 
@@ -699,12 +614,8 @@ impl NanokernelHardwareBroker {
     }
 
     pub fn trigger_physical_irq(&mut self, irq: u32, priority: u32) {
-        self.pending_irqs.push(NanokernelIrq {
-            irq_line: irq,
-            priority,
-        });
-        self.pending_irqs
-            .sort_by(|a, b| b.priority.cmp(&a.priority));
+        self.pending_irqs.push(NanokernelIrq { irq_line: irq, priority });
+        self.pending_irqs.sort_by(|a, b| b.priority.cmp(&a.priority));
     }
 
     pub fn dispatch_next_irq(&mut self) -> Option<NanokernelIrq> {
@@ -737,41 +648,27 @@ impl SovereignZonesManager {
         }
     }
 
-    pub fn create_zone(
-        &mut self,
-        name: &str,
-        cpu_shares: u32,
-        mem_limit: u64,
-    ) -> Result<(), &'static str> {
+    pub fn create_zone(&mut self, name: &str, cpu_shares: u32, mem_limit: u64) -> Result<(), &'static str> {
         if self.zones.contains_key(name) {
             return Err("Solaris Zones: Zone with this name already exists");
         }
-        self.zones.insert(
-            name.to_string(),
-            SovereignZone {
-                name: name.to_string(),
-                cpu_shares,
-                memory_limit_bytes: mem_limit,
-                vnic_ips: Vec::new(),
-            },
-        );
+        self.zones.insert(name.to_string(), SovereignZone {
+            name: name.to_string(),
+            cpu_shares,
+            memory_limit_bytes: mem_limit,
+            vnic_ips: Vec::new(),
+        });
         Ok(())
     }
 
     pub fn configure_vnic(&mut self, zone_name: &str, ip_addr: &str) -> Result<(), &'static str> {
-        let zone = self
-            .zones
-            .get_mut(zone_name)
-            .ok_or("Solaris Zones: Target zone not found")?;
+        let zone = self.zones.get_mut(zone_name).ok_or("Solaris Zones: Target zone not found")?;
         zone.vnic_ips.push(ip_addr.to_string());
         Ok(())
     }
 
     pub fn calculate_cpu_percentage(&self, zone_name: &str) -> Result<f32, &'static str> {
-        let target_zone = self
-            .zones
-            .get(zone_name)
-            .ok_or("Solaris Zones: Target zone not found")?;
+        let target_zone = self.zones.get(zone_name).ok_or("Solaris Zones: Target zone not found")?;
         let total_shares: u32 = self.zones.values().map(|z| z.cpu_shares).sum();
         if total_shares == 0 {
             return Ok(0.0);
@@ -830,11 +727,8 @@ impl KmdfDriver {
     }
 
     pub fn enqueue_io_request(&mut self, id: u32, operation: &str) -> Result<(), &'static str> {
-        if self.pnp_state != KmdfPnpState::PnpActive || self.power_state != KmdfPowerState::PowerD0
-        {
-            return Err(
-                "KMDF: Driver is not active or powered on. Request queued into error state.",
-            );
+        if self.pnp_state != KmdfPnpState::PnpActive || self.power_state != KmdfPowerState::PowerD0 {
+            return Err("KMDF: Driver is not active or powered on. Request queued into error state.");
         }
         self.io_queue.push(KmdfIoRequest {
             id,
@@ -878,30 +772,18 @@ impl AndroidBinderIpc {
     }
 
     pub fn register_binder_node(&mut self, handle_id: u32, target_pid: u32, token: &str) {
-        self.registered_nodes.insert(
+        self.registered_nodes.insert(handle_id, BinderNode {
             handle_id,
-            BinderNode {
-                handle_id,
-                target_process_id: target_pid,
-                security_token: token.to_string(),
-            },
-        );
+            target_process_id: target_pid,
+            security_token: token.to_string(),
+        });
     }
 
     /// Safely translates binder object handles across caller process boundaries
-    pub fn translate_binder_handle(
-        &self,
-        handle_id: u32,
-        caller_token: &str,
-    ) -> Result<u32, &'static str> {
-        let node = self
-            .registered_nodes
-            .get(&handle_id)
-            .ok_or("Binder: Node handle not found")?;
+    pub fn translate_binder_handle(&self, handle_id: u32, caller_token: &str) -> Result<u32, &'static str> {
+        let node = self.registered_nodes.get(&handle_id).ok_or("Binder: Node handle not found")?;
         if node.security_token != caller_token {
-            return Err(
-                "Binder: Security token mismatch. Unauthorized handle translation blocked.",
-            );
+            return Err("Binder: Security token mismatch. Unauthorized handle translation blocked.");
         }
         Ok(node.target_process_id)
     }
@@ -945,8 +827,7 @@ impl GcdDispatchQueue {
             priority,
         });
         // Keep sorted so highest priority is executed first
-        self.pending_tasks
-            .sort_by(|a, b| b.priority.cmp(&a.priority));
+        self.pending_tasks.sort_by(|a, b| b.priority.cmp(&a.priority));
     }
 
     pub fn execute_next_batch(&mut self, count: usize) -> Vec<String> {
@@ -966,11 +847,7 @@ impl GcdDispatchQueue {
             for _ in 0..limit {
                 if !self.pending_tasks.is_empty() {
                     let task = self.pending_tasks.remove(0);
-                    executed.push(alloc::format!(
-                        "Concurrent executing priority {:?}: {}",
-                        task.priority,
-                        task.name
-                    ));
+                    executed.push(alloc::format!("Concurrent executing priority {:?}: {}", task.priority, task.name));
                 }
             }
         }
@@ -995,7 +872,9 @@ pub struct EbpfRuntime {
 
 impl EbpfRuntime {
     pub fn new() -> Self {
-        Self { registers: [0; 10] }
+        Self {
+            registers: [0; 10],
+        }
     }
 
     pub fn verify_program(&self, program: &[EbpfInstruction]) -> Result<(), &'static str> {
@@ -1019,23 +898,17 @@ impl EbpfRuntime {
         Ok(())
     }
 
-    pub fn execute(
-        &mut self,
-        program: &[EbpfInstruction],
-        initial_val: i64,
-    ) -> Result<i64, &'static str> {
+    pub fn execute(&mut self, program: &[EbpfInstruction], initial_val: i64) -> Result<i64, &'static str> {
         self.verify_program(program)?;
         self.registers[0] = initial_val;
 
         for inst in program {
             match inst.opcode {
                 0 => {
-                    self.registers[inst.dst as usize] =
-                        self.registers[inst.dst as usize].wrapping_add(inst.imm as i64);
+                    self.registers[inst.dst as usize] = self.registers[inst.dst as usize].wrapping_add(inst.imm as i64);
                 }
                 1 => {
-                    self.registers[inst.dst as usize] =
-                        self.registers[inst.dst as usize].wrapping_sub(inst.imm as i64);
+                    self.registers[inst.dst as usize] = self.registers[inst.dst as usize].wrapping_sub(inst.imm as i64);
                 }
                 2 => {
                     let div_val = inst.imm as i64;
@@ -1152,18 +1025,12 @@ impl SovereignSwapEngine {
         if sector >= self.total_sectors_available {
             return Err("Swap Engine: No available swap sector space remaining on disk!");
         }
-        self.swap_pages.push(SwapPage {
-            virtual_addr,
-            disk_sector: sector,
-        });
+        self.swap_pages.push(SwapPage { virtual_addr, disk_sector: sector });
         Ok(())
     }
 
     pub fn resolve_page_fault(&mut self, virtual_addr: u64) -> Result<u64, &'static str> {
-        let pos = self
-            .swap_pages
-            .iter()
-            .position(|p| p.virtual_addr == virtual_addr)
+        let pos = self.swap_pages.iter().position(|p| p.virtual_addr == virtual_addr)
             .ok_or("Swap Engine: Target page not located in swap space")?;
 
         let p = self.swap_pages.remove(pos);
@@ -1242,17 +1109,11 @@ impl SovereignEventReactor {
     }
 
     pub fn register_event_handle(&mut self, handle: u32, event: ReactorEvent) {
-        self.registrations.push(ReactorRegistration {
-            handle_id: handle,
-            target_event: event,
-        });
+        self.registrations.push(ReactorRegistration { handle_id: handle, target_event: event });
     }
 
     pub fn notify_handle_event(&mut self, handle: u32, event: ReactorEvent) {
-        let is_registered = self
-            .registrations
-            .iter()
-            .any(|r| r.handle_id == handle && r.target_event == event);
+        let is_registered = self.registrations.iter().any(|r| r.handle_id == handle && r.target_event == event);
         if is_registered && !self.triggered_handles.contains(&handle) {
             self.triggered_handles.push(handle);
         }
@@ -1301,10 +1162,7 @@ impl HybridKernelManager {
         self.executive.active_handles += 1;
         self.microkernel.active_threads += 1;
         self.microkernel.active_interrupts += 1;
-        Ok(alloc::format!(
-            "Dispatched Handle {} through NT-Executive to Microkernel",
-            handle_id
-        ))
+        Ok(alloc::format!("Dispatched Handle {} through NT-Executive to Microkernel", handle_id))
     }
 }
 
@@ -1329,19 +1187,11 @@ impl ExokernelHardwareMultiplexer {
         }
     }
 
-    pub fn bind_disk_blocks(
-        &mut self,
-        owner_id: u32,
-        start: usize,
-        end: usize,
-    ) -> Result<(), &'static str> {
+    pub fn bind_disk_blocks(&mut self, owner_id: u32, start: usize, end: usize) -> Result<(), &'static str> {
         for binding in &self.disk_bindings {
-            if (start >= binding.start_block && start <= binding.end_block)
-                || (end >= binding.start_block && end <= binding.end_block)
-            {
-                return Err(
-                    "Physical resource conflict: blocks already securely bound to another domain",
-                );
+            if (start >= binding.start_block && start <= binding.end_block) ||
+               (end >= binding.start_block && end <= binding.end_block) {
+                return Err("Physical resource conflict: blocks already securely bound to another domain");
             }
         }
         self.disk_bindings.push(ResourceBinding {
@@ -1374,27 +1224,18 @@ impl NetBsdRumpKernel {
     }
 
     pub fn register_component(&mut self, name: &str, run_in_userspace: bool) {
-        self.components.insert(
-            name.to_string(),
-            RumpComponent {
-                name: name.to_string(),
-                run_in_userspace,
-            },
-        );
+        self.components.insert(name.to_string(), RumpComponent {
+            name: name.to_string(),
+            run_in_userspace,
+        });
     }
 
     pub fn bootstrap_component(&self, name: &str) -> Result<String, &'static str> {
         let comp = self.components.get(name).ok_or("Component not found")?;
         if comp.run_in_userspace {
-            Ok(alloc::format!(
-                "Bootstrap Anykernel component: {} running as Userspace Micro-thread",
-                name
-            ))
+            Ok(alloc::format!("Bootstrap Anykernel component: {} running as Userspace Micro-thread", name))
         } else {
-            Ok(alloc::format!(
-                "Bootstrap Anykernel component: {} running in Ring 0 Monolithic Space",
-                name
-            ))
+            Ok(alloc::format!("Bootstrap Anykernel component: {} running in Ring 0 Monolithic Space", name))
         }
     }
 
@@ -1404,10 +1245,7 @@ impl NetBsdRumpKernel {
         hypercall_id: u32,
         payload: u64,
     ) -> Result<u64, &'static str> {
-        let comp = self
-            .components
-            .get(component_name)
-            .ok_or("Component not found")?;
+        let comp = self.components.get(component_name).ok_or("Component not found")?;
         if !comp.run_in_userspace {
             return Err("Hypercall allowed only for userspace rump microthreads");
         }
@@ -1416,18 +1254,12 @@ impl NetBsdRumpKernel {
 
     pub fn isolate_rump_vfs(&mut self, fs_name: &str) -> Result<String, &'static str> {
         self.register_component(fs_name, true);
-        Ok(alloc::format!(
-            "Isolated Rump VFS driver '{}' in userspace microthread",
-            fs_name
-        ))
+        Ok(alloc::format!("Isolated Rump VFS driver '{}' in userspace microthread", fs_name))
     }
 
     pub fn virtualize_rump_network(&mut self, net_dev: &str) -> Result<String, &'static str> {
         self.register_component(net_dev, true);
-        Ok(alloc::format!(
-            "Virtualised Rumpnet network stack driver '{}' in userspace microthread",
-            net_dev
-        ))
+        Ok(alloc::format!("Virtualised Rumpnet network stack driver '{}' in userspace microthread", net_dev))
     }
 }
 
@@ -1458,29 +1290,21 @@ impl DynamicLkmLoader {
         if !is_signed {
             return Err("Module signature verification failed: rejected unsigned code");
         }
-        self.loaded_modules.insert(
-            name.to_string(),
-            KernelModule {
-                name: name.to_string(),
-                is_signed,
-                is_loaded: true,
-            },
-        );
+        self.loaded_modules.insert(name.to_string(), KernelModule {
+            name: name.to_string(),
+            is_signed,
+            is_loaded: true,
+        });
         Ok(())
     }
 
-    pub fn register_syscall_hook(
-        &mut self,
-        syscall_id: u32,
-        hook_owner: &str,
-    ) -> Result<(), &'static str> {
+    pub fn register_syscall_hook(&mut self, syscall_id: u32, hook_owner: &str) -> Result<(), &'static str> {
         if let Some(owner) = self.sys_call_hooks.get(&syscall_id) {
             if owner != hook_owner {
                 return Err("Syscall hijack blocked: unauthorized hook attempt detected");
             }
         }
-        self.sys_call_hooks
-            .insert(syscall_id, hook_owner.to_string());
+        self.sys_call_hooks.insert(syscall_id, hook_owner.to_string());
         Ok(())
     }
 }
@@ -1506,27 +1330,16 @@ impl CapabilityDerivationTree {
         }
     }
 
-    pub fn derive_capability(
-        &mut self,
-        parent_id: u32,
-        child_id: u32,
-        child_rights: &str,
-    ) -> Result<(), &'static str> {
-        let parent = self
-            .capabilities
-            .get(&parent_id)
-            .ok_or("Parent capability not found")?;
+    pub fn derive_capability(&mut self, parent_id: u32, child_id: u32, child_rights: &str) -> Result<(), &'static str> {
+        let parent = self.capabilities.get(&parent_id).ok_or("Parent capability not found")?;
         if child_rights.len() > parent.rights.len() {
             return Err("Rights escalation forbidden in capability derivation");
         }
-        self.capabilities.insert(
-            child_id,
-            KernelCapability {
-                id: child_id,
-                parent_id: Some(parent_id),
-                rights: child_rights.to_string(),
-            },
-        );
+        self.capabilities.insert(child_id, KernelCapability {
+            id: child_id,
+            parent_id: Some(parent_id),
+            rights: child_rights.to_string(),
+        });
         Ok(())
     }
 
@@ -1562,12 +1375,8 @@ mod tests {
     #[test]
     fn test_arch_aur_manager() {
         let mut aur = ArchUserRepoManager::new();
-        aur.install_from_aur("test-pkg", "echo 'building test-pkg'")
-            .unwrap();
-        assert_eq!(
-            aur.packages.get("test-pkg").unwrap().as_str(),
-            "echo 'building test-pkg'"
-        );
+        aur.install_from_aur("test-pkg", "echo 'building test-pkg'").unwrap();
+        assert_eq!(aur.packages.get("test-pkg").unwrap().as_str(), "echo 'building test-pkg'");
     }
 
     #[test]
@@ -1612,15 +1421,11 @@ mod tests {
     #[test]
     fn test_nixos_declarative_manager() {
         let mut manager = NixOsDeclarativeManager::new();
-        manager
-            .apply_configuration(&["services.nginx.enable = true;"])
-            .unwrap();
+        manager.apply_configuration(&["services.nginx.enable = true;"]).unwrap();
         assert_eq!(manager.configuration.len(), 1);
 
         // Apply new configuration (saves previous)
-        manager
-            .apply_configuration(&["services.nginx.enable = false;"])
-            .unwrap();
+        manager.apply_configuration(&["services.nginx.enable = false;"]).unwrap();
         assert_eq!(manager.configuration.len(), 1);
         assert_eq!(manager.configuration[0], "services.nginx.enable = false;");
 
@@ -1668,20 +1473,15 @@ mod tests {
     #[test]
     fn test_capability_recursive_revocation() {
         let mut cdt = CapabilityDerivationTree::new();
-        cdt.capabilities.insert(
-            1,
-            KernelCapability {
-                id: 1,
-                parent_id: None,
-                rights: "rwx".to_string(),
-            },
-        );
+        cdt.capabilities.insert(1, KernelCapability {
+            id: 1,
+            parent_id: None,
+            rights: "rwx".to_string(),
+        });
 
         assert!(cdt.derive_capability(1, 2, "rw").is_ok());
         assert!(cdt.derive_capability(2, 3, "r").is_ok());
-        assert!(cdt
-            .derive_capability(1, 4, "rw-escalation-attempt")
-            .is_err());
+        assert!(cdt.derive_capability(1, 4, "rw-escalation-attempt").is_err());
 
         cdt.revoke_recursive(2);
         assert!(cdt.capabilities.get(&1).is_some());
@@ -1735,18 +1535,9 @@ mod tests {
         fs.commit_transaction(20, 1, "First updated contents");
         fs.commit_transaction(30, 1, "Latest contents");
 
-        assert_eq!(
-            fs.read_block_at_version(1, 15).unwrap().as_str(),
-            "Initial file contents"
-        );
-        assert_eq!(
-            fs.read_block_at_version(1, 25).unwrap().as_str(),
-            "First updated contents"
-        );
-        assert_eq!(
-            fs.read_block_at_version(1, 35).unwrap().as_str(),
-            "Latest contents"
-        );
+        assert_eq!(fs.read_block_at_version(1, 15).unwrap().as_str(), "Initial file contents");
+        assert_eq!(fs.read_block_at_version(1, 25).unwrap().as_str(), "First updated contents");
+        assert_eq!(fs.read_block_at_version(1, 35).unwrap().as_str(), "Latest contents");
     }
 
     #[test]
@@ -1786,18 +1577,12 @@ mod tests {
         binder.register_binder_node(1002, 5002, "CallerToken_AppB");
 
         // Authorized translation succeeds
-        let translated_pid = binder
-            .translate_binder_handle(1001, "CallerToken_AppA")
-            .unwrap();
+        let translated_pid = binder.translate_binder_handle(1001, "CallerToken_AppA").unwrap();
         assert_eq!(translated_pid, 5001);
 
         // Unauthorized translation fails
-        assert!(binder
-            .translate_binder_handle(1001, "RogueToken_AppX")
-            .is_err());
-        assert!(binder
-            .translate_binder_handle(9999, "CallerToken_AppA")
-            .is_err());
+        assert!(binder.translate_binder_handle(1001, "RogueToken_AppX").is_err());
+        assert!(binder.translate_binder_handle(9999, "CallerToken_AppA").is_err());
     }
 
     #[test]
@@ -1820,48 +1605,18 @@ mod tests {
         let mut runtime = EbpfRuntime::new();
 
         let safe_program = [
-            EbpfInstruction {
-                opcode: 0,
-                dst: 0,
-                src: 0,
-                imm: 100,
-            }, // add r0, 100
-            EbpfInstruction {
-                opcode: 1,
-                dst: 0,
-                src: 0,
-                imm: 40,
-            }, // sub r0, 40
-            EbpfInstruction {
-                opcode: 3,
-                dst: 0,
-                src: 0,
-                imm: 0,
-            }, // ret
+            EbpfInstruction { opcode: 0, dst: 0, src: 0, imm: 100 }, // add r0, 100
+            EbpfInstruction { opcode: 1, dst: 0, src: 0, imm: 40 },  // sub r0, 40
+            EbpfInstruction { opcode: 3, dst: 0, src: 0, imm: 0 },   // ret
         ];
 
         let unsafe_program_div_zero = [
-            EbpfInstruction {
-                opcode: 2,
-                dst: 0,
-                src: 0,
-                imm: 0,
-            }, // div r0, 0 (division by zero)
-            EbpfInstruction {
-                opcode: 3,
-                dst: 0,
-                src: 0,
-                imm: 0,
-            },
+            EbpfInstruction { opcode: 2, dst: 0, src: 0, imm: 0 },   // div r0, 0 (division by zero)
+            EbpfInstruction { opcode: 3, dst: 0, src: 0, imm: 0 },
         ];
 
         let unsafe_program_no_ret = [
-            EbpfInstruction {
-                opcode: 0,
-                dst: 0,
-                src: 0,
-                imm: 100,
-            }, // add r0, 100
+            EbpfInstruction { opcode: 0, dst: 0, src: 0, imm: 100 }, // add r0, 100
         ];
 
         assert!(runtime.verify_program(&safe_program).is_ok());
@@ -1917,9 +1672,7 @@ mod tests {
         let mut core0 = MultikernelMessagePassing::new(0, 5);
         let mut core1 = MultikernelMessagePassing::new(1, 5);
 
-        assert!(core0
-            .send_message(&mut core1, "Hello from Core 0", 101)
-            .is_ok());
+        assert!(core0.send_message(&mut core1, "Hello from Core 0", 101).is_ok());
         assert_eq!(core1.mailbox.len(), 1);
 
         let received = core1.receive_message().unwrap();
@@ -1941,14 +1694,10 @@ mod tests {
         assert_eq!(content, "State: Up");
 
         // Write permission denied check
-        assert!(translator
-            .write_resource("/net/ether0", "State: Down", 0o100)
-            .is_err());
+        assert!(translator.write_resource("/net/ether0", "State: Down", 0o100).is_err());
 
         // Successful write
-        assert!(translator
-            .write_resource("/net/ether0", "State: Down", 0o200)
-            .is_ok());
+        assert!(translator.write_resource("/net/ether0", "State: Down", 0o200).is_ok());
         let updated = translator.read_resource("/net/ether0", 0o400).unwrap();
         assert_eq!(updated, "State: Down");
     }
@@ -1959,18 +1708,14 @@ mod tests {
         registry.bind_translator("/servers/netfs", 4001);
 
         // Node is passive; dispatch fails
-        assert!(registry
-            .dispatch_io_request("/servers/netfs", "ReadBlocks")
-            .is_err());
+        assert!(registry.dispatch_io_request("/servers/netfs", "ReadBlocks").is_err());
 
         // Activate translator node
         let port = registry.activate_translator("/servers/netfs").unwrap();
         assert_eq!(port, 4001);
 
         // Dispatch succeeds
-        let dispatch_res = registry
-            .dispatch_io_request("/servers/netfs", "ReadBlocks")
-            .unwrap();
+        let dispatch_res = registry.dispatch_io_request("/servers/netfs", "ReadBlocks").unwrap();
         assert!(dispatch_res.contains("Mach Server on Port 4001"));
     }
 
@@ -2049,10 +1794,7 @@ mod tests {
 
         // VNIC setup
         manager.configure_vnic("db_zone", "10.0.0.5").unwrap();
-        assert_eq!(
-            manager.zones.get("db_zone").unwrap().vnic_ips[0],
-            "10.0.0.5"
-        );
+        assert_eq!(manager.zones.get("db_zone").unwrap().vnic_ips[0], "10.0.0.5");
     }
 
     #[test]
@@ -2128,20 +1870,14 @@ mod tests {
     #[test]
     fn test_freebsd_vfs_nullfs() {
         let mut nullfs = FreeBsdVfsNullfs::new();
-        nullfs
-            .mount_nullfs("/usr/src/sys", "/sys", true, Some(0o755))
-            .unwrap();
+        nullfs.mount_nullfs("/usr/src/sys", "/sys", true, Some(0o755)).unwrap();
 
-        let (resolved, perm) = nullfs
-            .resolve_overlay_path("/sys/kern/vfs_subr.c", false)
-            .unwrap();
+        let (resolved, perm) = nullfs.resolve_overlay_path("/sys/kern/vfs_subr.c", false).unwrap();
         assert_eq!(resolved, "/usr/src/sys/kern/vfs_subr.c");
         assert_eq!(perm, Some(0o755));
 
         // Write to read-only nullfs layer should fail
-        assert!(nullfs
-            .resolve_overlay_path("/sys/kern/vfs_subr.c", true)
-            .is_err());
+        assert!(nullfs.resolve_overlay_path("/sys/kern/vfs_subr.c", true).is_err());
     }
 }
 
@@ -2240,8 +1976,7 @@ impl GentooUseFlags {
     }
 
     pub fn add_dependency(&mut self, flag: &str, required_companion: &str) {
-        self.dependencies
-            .insert(flag.to_string(), required_companion.to_string());
+        self.dependencies.insert(flag.to_string(), required_companion.to_string());
     }
 
     pub fn has_feature(&self, flag: &str) -> bool {
@@ -2270,9 +2005,7 @@ pub struct VoidRunitInit {
 
 impl VoidRunitInit {
     pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
+        Self { services: Vec::new() }
     }
 
     pub fn start_service(&mut self, service: &str) {

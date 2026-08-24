@@ -46,12 +46,7 @@ impl NixLikeStore {
         build_script: &str,
     ) -> Result<PackageDerivation, Box<dyn std::error::Error>> {
         let mut h: u64 = 0xcbf29ce484222325;
-        for &b in name
-            .as_bytes()
-            .iter()
-            .chain(version.as_bytes())
-            .chain(build_script.as_bytes())
-        {
+        for &b in name.as_bytes().iter().chain(version.as_bytes()).chain(build_script.as_bytes()) {
             h = (h ^ (b as u64)).wrapping_mul(0x100000001b3);
         }
         for input in &inputs {
@@ -76,12 +71,8 @@ impl NixLikeStore {
     }
 
     /// Build a package from its derivation
-    pub fn build_package(
-        &self,
-        derivation: &PackageDerivation,
-    ) -> Result<PathBuf, Box<dyn std::error::Error>> {
-        let output_path = self.store_path.join(format!(
-            "{}-{}-{}",
+    pub fn build_package(&self, derivation: &PackageDerivation) -> Result<PathBuf, Box<dyn std::error::Error>> {
+        let output_path = self.store_path.join(format!("{}-{}-{}",
             derivation.hash[..8].to_string(),
             derivation.name,
             derivation.version
@@ -105,10 +96,7 @@ impl NixLikeStore {
     }
 
     /// Set up isolated build environment (like NixOS's build sandbox)
-    fn setup_build_sandbox(
-        &self,
-        derivation: &PackageDerivation,
-    ) -> Result<PathBuf, Box<dyn std::error::Error>> {
+    fn setup_build_sandbox(&self, derivation: &PackageDerivation) -> Result<PathBuf, Box<dyn std::error::Error>> {
         let sandbox_path = std::env::temp_dir().join(format!("sigma-build-{}", derivation.hash));
         std::fs::create_dir_all(&sandbox_path)?;
 
@@ -132,11 +120,7 @@ impl NixLikeStore {
     }
 
     /// Execute build script in sandboxed environment
-    fn execute_build(
-        &self,
-        build_env: &Path,
-        derivation: &PackageDerivation,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn execute_build(&self, build_env: &Path, derivation: &PackageDerivation) -> Result<(), Box<dyn std::error::Error>> {
         use std::process::Command;
 
         let mut build_command = Command::new("systemd-nspawn");
@@ -163,18 +147,14 @@ impl NixLikeStore {
         let output = build_command.output()?;
 
         if !output.status.success() {
-            return Err(
-                format!("Build failed: {}", String::from_utf8_lossy(&output.stderr)).into(),
-            );
+            return Err(format!("Build failed: {}", String::from_utf8_lossy(&output.stderr)).into());
         }
 
         Ok(())
     }
 
     /// Create deterministic build environment
-    fn create_build_environment(
-        &self,
-    ) -> Result<HashMap<String, String>, Box<dyn std::error::Error>> {
+    fn create_build_environment(&self) -> Result<HashMap<String, String>, Box<dyn std::error::Error>> {
         let mut env = HashMap::new();
 
         // Set deterministic environment variables
@@ -185,24 +165,14 @@ impl NixLikeStore {
         env.insert("SOURCE_DATE_EPOCH".to_string(), "1".to_string());
 
         // Reproducible build flags
-        env.insert(
-            "CFLAGS".to_string(),
-            "-fdebug-prefix-map=/build=/usr/src".to_string(),
-        );
-        env.insert(
-            "CXXFLAGS".to_string(),
-            "-fdebug-prefix-map=/build=/usr/src".to_string(),
-        );
+        env.insert("CFLAGS".to_string(), "-fdebug-prefix-map=/build=/usr/src".to_string());
+        env.insert("CXXFLAGS".to_string(), "-fdebug-prefix-map=/build=/usr/src".to_string());
 
         Ok(env)
     }
 
     /// Mount path as read-only in sandbox
-    fn mount_readonly(
-        &self,
-        source: &Path,
-        target: &Path,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn mount_readonly(&self, source: &Path, target: &Path) -> Result<(), Box<dyn std::error::Error>> {
         use std::process::Command;
 
         std::fs::create_dir_all(target)?;
@@ -223,11 +193,7 @@ impl NixLikeStore {
     }
 
     /// Verify build output matches expected hash
-    fn verify_build_output(
-        &self,
-        output_path: &Path,
-        derivation: &PackageDerivation,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn verify_build_output(&self, output_path: &Path, derivation: &PackageDerivation) -> Result<(), Box<dyn std::error::Error>> {
         let mut h: u64 = 0xcbf29ce484222325;
         if let Ok(entries) = std::fs::read_dir(output_path) {
             for entry in entries.flatten() {
@@ -248,11 +214,7 @@ impl NixLikeStore {
     }
 
     /// Install package to system (like NixOS profile management)
-    pub fn install_to_profile(
-        &self,
-        derivation: &PackageDerivation,
-        profile_name: &str,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn install_to_profile(&self, derivation: &PackageDerivation, profile_name: &str) -> Result<(), Box<dyn std::error::Error>> {
         let profile_path = self.store_path.join("profiles").join(profile_name);
         let package_path = self.build_package(derivation)?;
 
@@ -293,8 +255,7 @@ impl NixLikeStore {
         // Remove unreferenced packages
         for (hash, derivation) in self.derivations.clone() {
             if !referenced.contains(&hash) {
-                let package_path = self.store_path.join(format!(
-                    "{}-{}-{}",
+                let package_path = self.store_path.join(format!("{}-{}-{}",
                     hash[..8].to_string(),
                     derivation.name,
                     derivation.version
@@ -311,11 +272,7 @@ impl NixLikeStore {
         Ok(removed)
     }
 
-    fn find_references(
-        &self,
-        path: PathBuf,
-        referenced: &mut std::collections::HashSet<String>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn find_references(&self, path: PathBuf, referenced: &mut std::collections::HashSet<String>) -> Result<(), Box<dyn std::error::Error>> {
         if let Ok(entries) = std::fs::read_dir(path) {
             for entry in entries.flatten() {
                 if let Ok(target) = std::fs::read_link(entry.path()) {
@@ -399,8 +356,7 @@ impl CommunityPackageRegistry {
 
     /// Search community packages
     pub fn search_packages(&self, query: &str) -> Vec<&CommunityPackage> {
-        self.packages
-            .values()
+        self.packages.values()
             .filter(|pkg| pkg.name.contains(query) || pkg.maintainer.contains(query))
             .collect()
     }
@@ -414,8 +370,8 @@ impl CommunityPackageRegistry {
 
     fn contains_unsafe_commands(&self, script: &str) -> bool {
         let unsafe_commands = [
-            "rm -rf /", "dd if=", "mkfs", "fdisk", "parted", "wget", "curl", "nc", "netcat",
-            "socat",
+            "rm -rf /", "dd if=", "mkfs", "fdisk", "parted",
+            "wget", "curl", "nc", "netcat", "socat",
         ];
 
         unsafe_commands.iter().any(|cmd| script.contains(cmd))
@@ -432,16 +388,21 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let mut store = NixLikeStore::new(temp_dir.path());
 
-        let inputs = vec![PackageInput {
-            name: "gcc".to_string(),
-            hash: "abc123".to_string(),
-            url: None,
-            path: Some("/usr/bin/gcc".into()),
-        }];
+        let inputs = vec![
+            PackageInput {
+                name: "gcc".to_string(),
+                hash: "abc123".to_string(),
+                url: None,
+                path: Some("/usr/bin/gcc".into()),
+            }
+        ];
 
-        let derivation = store
-            .create_derivation("hello-world", "1.0.0", inputs, "gcc -o hello hello.c")
-            .unwrap();
+        let derivation = store.create_derivation(
+            "hello-world",
+            "1.0.0",
+            inputs,
+            "gcc -o hello hello.c"
+        ).unwrap();
 
         assert_eq!(derivation.name, "hello-world");
         assert_eq!(derivation.version, "1.0.0");

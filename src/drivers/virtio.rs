@@ -1,5 +1,8 @@
 // SigmaOS VirtIO Paravirtualization Drivers Subsystem
 // Natively implementing VirtIO Block, Net, and Entropy (RNG) interfaces in a #![no_std] environment
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::collections::VecDeque;

@@ -39,9 +39,7 @@ pub struct AttributesDefinitionTable {
 
 impl AttributesDefinitionTable {
     pub fn new() -> Self {
-        let mut table = AttributesDefinitionTable {
-            entries: Vec::new(),
-        };
+        let mut table = AttributesDefinitionTable { entries: Vec::new() };
         table.entries.push(AttributeDefinitionEntry {
             attribute_id: 1,
             name: String::from("SUDO_PRIVILEGE"),
@@ -147,10 +145,7 @@ mod tests {
         let fail_res = pipeline.authenticate_user("admin", 0x1234, 0x5678, Some(123456));
         assert_eq!(fail_res, AuthResultStatus::InvalidCredential);
 
-        let attr = pipeline
-            .attributes_table
-            .lookup_attribute("SUDO_PRIVILEGE")
-            .unwrap();
+        let attr = pipeline.attributes_table.lookup_attribute("SUDO_PRIVILEGE").unwrap();
         assert_eq!(attr.clearance_level, 10);
         assert!(!attr.automatic_allocation);
     }

@@ -19,9 +19,9 @@ pub enum BuildSystem {
 /// Gentoo-inspired compilation optimization profiles (stages)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StageProfile {
-    Stage1Minimal,   // Basic fallback bootstrap flags (-O1, -mno-sse)
-    Stage2Bootstrap, // Balanced standard optimization (-O2)
-    Stage3Optimized, // Maximum architecture-targeted performance (-O3 -march=native -flto)
+    Stage1Minimal,      // Basic fallback bootstrap flags (-O1, -mno-sse)
+    Stage2Bootstrap,    // Balanced standard optimization (-O2)
+    Stage3Optimized,    // Maximum architecture-targeted performance (-O3 -march=native -flto)
 }
 
 /// Gentoo-style Portage USE flags representing conditional package compilation features
@@ -326,9 +326,6 @@ mod tests {
         assert_eq!(recipe.get_stage_optimization_flags(), "-O2 -pipe"); // default Stage2
 
         recipe = recipe.with_compilation_profile(StageProfile::Stage3Optimized);
-        assert_eq!(
-            recipe.get_stage_optimization_flags(),
-            "-O3 -march=native -flto=fat -funroll-loops"
-        );
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O3 -march=native -flto=fat -funroll-loops");
     }
 }

@@ -86,17 +86,10 @@ pub struct SovereignSoftwareStore {
 
 impl SovereignSoftwareStore {
     pub fn new() -> Self {
-        Self {
-            catalog: Vec::new(),
-        }
+        Self { catalog: Vec::new() }
     }
 
-    pub fn add_to_catalog(
-        &mut self,
-        name: &str,
-        category: &str,
-        permissions: &[SoftwarePermission],
-    ) {
+    pub fn add_to_catalog(&mut self, name: &str, category: &str, permissions: &[SoftwarePermission]) {
         self.catalog.push(StoreApplication {
             name: name.to_string(),
             category: category.to_string(),
@@ -113,15 +106,8 @@ impl SovereignSoftwareStore {
             .collect()
     }
 
-    pub fn install_application(
-        &mut self,
-        name: &str,
-    ) -> Result<Vec<SoftwarePermission>, &'static str> {
-        let app = self
-            .catalog
-            .iter_mut()
-            .find(|a| a.name == name)
-            .ok_or("Application not found in store catalog")?;
+    pub fn install_application(&mut self, name: &str) -> Result<Vec<SoftwarePermission>, &'static str> {
+        let app = self.catalog.iter_mut().find(|a| a.name == name).ok_or("Application not found in store catalog")?;
         app.is_installed = true;
         Ok(app.required_permissions.clone())
     }
@@ -154,26 +140,18 @@ impl SovereignUpdateManager {
         }
     }
 
-    pub fn stage_system_update(
-        &mut self,
-        update: SovereignUpdatePackage,
-    ) -> Result<(), &'static str> {
+    pub fn stage_system_update(&mut self, update: SovereignUpdatePackage) -> Result<(), &'static str> {
         // Post-Quantum signature verification of update packages using Dilithium-5
         let is_valid = self.verify_update_signature(&update);
         if !is_valid {
-            return Err(
-                "Dilithium-5 Cryptographic update signature is invalid: Rejecting upgrade package!",
-            );
+            return Err("Dilithium-5 Cryptographic update signature is invalid: Rejecting upgrade package!");
         }
         self.update_staged = Some(update);
         Ok(())
     }
 
     pub fn apply_staged_update(&mut self) -> Result<String, &'static str> {
-        let update = self
-            .update_staged
-            .take()
-            .ok_or("No verified system update currently staged")?;
+        let update = self.update_staged.take().ok_or("No verified system update currently staged")?;
         self.current_version = update.version.clone();
         Ok(self.current_version.clone())
     }
@@ -266,11 +244,7 @@ mod tests {
     fn test_sovereign_software_store() {
         let mut store = SovereignSoftwareStore::new();
         store.add_to_catalog("GIMP", "Graphics", &[SoftwarePermission::Filesystem]);
-        store.add_to_catalog(
-            "Firefox",
-            "Network",
-            &[SoftwarePermission::Network, SoftwarePermission::Filesystem],
-        );
+        store.add_to_catalog("Firefox", "Network", &[SoftwarePermission::Network, SoftwarePermission::Filesystem]);
 
         let network_apps = store.search_by_category("Network");
         assert_eq!(network_apps.len(), 1);
@@ -324,10 +298,7 @@ mod tests {
 
         let matched = dm.match_and_load_drivers();
         assert_eq!(matched, 1);
-        assert_eq!(
-            dm.active_hardware[0].matched_driver_name,
-            Some("e1000e".to_string())
-        );
+        assert_eq!(dm.active_hardware[0].matched_driver_name, Some("e1000e".to_string()));
         assert_eq!(dm.active_hardware[1].matched_driver_name, None);
     }
 }

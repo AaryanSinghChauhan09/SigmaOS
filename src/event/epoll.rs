@@ -87,12 +87,7 @@ impl EpollInstance {
     }
 
     /// Add, modify, or remove target file descriptor interest
-    pub fn ctl(
-        &mut self,
-        op: EpollOp,
-        fd: i32,
-        event: Option<EpollEvent>,
-    ) -> Result<(), &'static str> {
+    pub fn ctl(&mut self, op: EpollOp, fd: i32, event: Option<EpollEvent>) -> Result<(), &'static str> {
         match op {
             EpollOp::CtlAdd => {
                 let ev = event.ok_or("EINVAL: Event required for EPOLL_CTL_ADD")?;

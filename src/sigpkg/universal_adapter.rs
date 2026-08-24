@@ -1,9 +1,23 @@
 extern crate alloc;
-use crate::security::Permission;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec::Vec;
+use crate::klib::collections::HashMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::security::Permission;
+
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+pub use crate::package::universal::{FlatpakManifest, PacmanPkgbuild, SnapcraftManifest};
+
+pub trait PackageFormatAdapter {
+    fn format_name(&self) -> &str;
+    fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
+    fn parse_package(&self, raw: &[u8]) -> Result<Package, String> { self.parse_manifest(raw) }
+    fn validate_permissions(&self, raw: &[u8]) -> Result<Vec<Permission>, String>;
+    fn validate(&self, _raw: &[u8]) -> Result<bool, String> { Ok(true) }
+    fn process_hook(&self, _hook: &str) -> Result<(), String> { Ok(()) }
+    fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> { Ok(Vec::new()) }
+}
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -24,29 +38,7 @@ pub struct AptDebManifest {
     pub priority: PackagePriority,
 }
 
-#[derive(Debug, Clone)]
-pub struct PacmanPkgbuild {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub depends: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String, // "strict", "classic", "devmode"
-    pub plugs: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FlatpakManifest {
-    pub id: String,
-    pub app_id: String,
-    pub command: String,
-    pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
-}
+pub type UniversalPackageManager = UniversalPackageAdapter;
 
 pub struct UniversalPackageAdapter;
 
@@ -289,13 +281,13 @@ impl UniversalPackageAdapter {
             });
         }
 
-        Ok(Package::new(
-            name,
-            parsed_ver,
-            desc,
+        Ok(Package {
+            name: name.to_string(),
+            version: parsed_ver,
+            description: desc.to_string(),
             dependencies,
-            &format!("SHA256:{}", name),
-        ))
+            checksum: format!("SHA256:{}", name),
+        })
     }
 }
 
@@ -305,105 +297,13 @@ impl Default for UniversalPackageAdapter {
     }
 }
 
-/// RedHat/Yum RPM SPEC manifest structure
-#[derive(Debug, Clone)]
-pub struct RpmSpecManifest {
-    pub name: String,
-    pub version: String,
-    pub release: String,
-    pub summary: String,
-    pub license: String,
-    pub requires: Vec<String>, // Dependencies list
-}
-
-/// AppImage single-file containerized loop-mounted layout
-#[derive(Debug, Clone)]
-pub struct AppImageContainer {
-    pub file_name: String,
-    pub payload_offset_bytes: u64,
-    pub entry_point_cmd: String,
-    pub mounted: bool,
-}
-
-impl AppImageContainer {
-    pub fn new(file_name: &str, entry_point_cmd: &str) -> Self {
-        AppImageContainer {
-            file_name: file_name.to_string(),
-            payload_offset_bytes: 0x20000, // standard SquashFS offset
-            entry_point_cmd: entry_point_cmd.to_string(),
-            mounted: false,
-        }
-    }
-
-    /// Mounts the SquashFS payload of the AppImage dynamically (simulated)
-    pub fn mount_and_run(&mut self, mount_point: &str) -> Result<String, &'static str> {
-        if mount_point.is_empty() {
-            return Err("AppImage: Invalid mount point.");
-        }
-        self.mounted = true;
-        let mut exec_path = mount_point.to_string();
-        exec_path.push_str("/");
-        exec_path.push_str(&self.entry_point_cmd);
-        Ok(exec_path)
-    }
-}
-
-impl UniversalPackageAdapter {
-    /// Parses RedHat/Yum .spec files for RPM metadata translation
-    pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut release = String::new();
-        let mut summary = String::new();
-        let mut license = String::new();
-        let mut requires = Vec::new();
-
-        for line in text.lines() {
-            let line = line.trim();
-            if line.is_empty() || line.starts_with('#') {
-                continue;
-            }
-            if let Some(pos) = line.find(':') {
-                let key = line[..pos].trim();
-                let val = line[pos + 1..].trim();
-                match key {
-                    "Name" => name = val.to_string(),
-                    "Version" => version = val.to_string(),
-                    "Release" => release = val.to_string(),
-                    "Summary" => summary = val.to_string(),
-                    "License" => license = val.to_string(),
-                    "Requires" => {
-                        for req in val.split(',') {
-                            requires.push(req.trim().to_string());
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
-
-        if name.is_empty() || version.is_empty() {
-            return Err("Invalid RPM spec file: missing Name or Version");
-        }
-
-        Ok(RpmSpecManifest {
-            name,
-            version,
-            release,
-            summary,
-            license,
-            requires,
-        })
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_apt_control_parsing_and_translation() {
-        let adapter = UniversalPackageAdapter::new();
+        let adapter = UniversalPackageManager::new();
         let manifest_text = r#"
             Package: curl
             Version: 8.2.1
@@ -504,10 +404,107 @@ mod tests {
         assert!(perms.contains(&Permission::NetworkTcp));
         assert!(perms.contains(&Permission::FileWrite));
     }
+}
+
+/// RedHat/Yum RPM SPEC manifest structure
+#[derive(Debug, Clone)]
+pub struct RpmSpecManifest {
+    pub name: String,
+    pub version: String,
+    pub release: String,
+    pub summary: String,
+    pub license: String,
+    pub requires: Vec<String>, // Dependencies list
+}
+
+/// AppImage single-file containerized loop-mounted layout
+#[derive(Debug, Clone)]
+pub struct AppImageContainer {
+    pub file_name: String,
+    pub payload_offset_bytes: u64,
+    pub entry_point_cmd: String,
+    pub mounted: bool,
+}
+
+impl AppImageContainer {
+    pub fn new(file_name: &str, entry_point_cmd: &str) -> Self {
+        AppImageContainer {
+            file_name: file_name.to_string(),
+            payload_offset_bytes: 0x20000, // standard SquashFS offset
+            entry_point_cmd: entry_point_cmd.to_string(),
+            mounted: false,
+        }
+    }
+
+    /// Mounts the SquashFS payload of the AppImage dynamically (simulated)
+    pub fn mount_and_run(&mut self, mount_point: &str) -> Result<String, &'static str> {
+        if mount_point.is_empty() {
+            return Err("AppImage: Invalid mount point.");
+        }
+        self.mounted = true;
+        let mut exec_path = mount_point.to_string();
+        exec_path.push_str("/");
+        exec_path.push_str(&self.entry_point_cmd);
+        Ok(exec_path)
+    }
+}
+
+impl UniversalPackageAdapter {
+    /// Parses RedHat/Yum .spec files for RPM metadata translation
+    pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut release = String::new();
+        let mut summary = String::new();
+        let mut license = String::new();
+        let mut requires = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+                match key {
+                    "Name" => name = val.to_string(),
+                    "Version" => version = val.to_string(),
+                    "Release" => release = val.to_string(),
+                    "Summary" => summary = val.to_string(),
+                    "License" => license = val.to_string(),
+                    "Requires" => {
+                        for req in val.split(',') {
+                            requires.push(req.trim().to_string());
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Invalid RPM spec file: missing Name or Version");
+        }
+
+        Ok(RpmSpecManifest {
+            name,
+            version,
+            release,
+            summary,
+            license,
+            requires,
+        })
+    }
+}
+
+#[cfg(test)]
+mod additional_adapter_tests {
+    use super::*;
 
     #[test]
     fn test_rpm_spec_parsing_and_native_translation() {
-        let adapter = UniversalPackageAdapter::new();
+        let adapter = UniversalPackageManager::new();
         let spec_text = r#"
             Name: custom_service
             Version: 2.1
@@ -524,14 +521,12 @@ mod tests {
         assert_eq!(parsed.requires.len(), 2);
         assert_eq!(parsed.requires[0], "bash");
 
-        let native = adapter
-            .translate_to_native_package(
-                &parsed.name,
-                &parsed.version,
-                &parsed.summary,
-                parsed.requires.as_slice(),
-            )
-            .unwrap();
+        let native = adapter.translate_to_native_package(
+            &parsed.name,
+            &parsed.version,
+            &parsed.summary,
+            parsed.requires.as_slice(),
+        ).unwrap();
 
         assert_eq!(native.name, "custom_service");
         assert_eq!(native.version, Version::new(2, 1, 0));

@@ -12,16 +12,16 @@ pub enum ToolchainProfile {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainOptProfile {
     None,
-    Size,        // Minimal memory footprints (Debian/Ubuntu-style -Os)
-    Performance, // standard distro optimizing (-O2 -mtune=generic)
-    ClearLinux, // Clear Linux performance optimization (-O3 -march=native -ftree-vectorize -ffast-math)
+    Size,           // Minimal memory footprints (Debian/Ubuntu-style -Os)
+    Performance,    // standard distro optimizing (-O2 -mtune=generic)
+    ClearLinux,     // Clear Linux performance optimization (-O3 -march=native -ftree-vectorize -ffast-math)
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainHardeningLevel {
     None,
-    Standard, // standard Ubuntu/Fedora hardening (-fstack-protector-strong, -D_FORTIFY_SOURCE=2)
-    NixOSHardened, // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3, -fPIE -pie, -Wl,-z,relro,-z,now)
+    Standard,       // standard Ubuntu/Fedora hardening (-fstack-protector-strong, -D_FORTIFY_SOURCE=2)
+    NixOSHardened,  // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3, -fPIE -pie, -Wl,-z,relro,-z,now)
 }
 
 pub struct ToolchainAdapter {

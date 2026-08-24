@@ -1,6 +1,8 @@
+#![no_std]
+
 extern crate alloc;
-use alloc::boxed::Box;
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
 /// Implements device detection, registration, and management
@@ -42,11 +44,11 @@ pub trait Device {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
-    D0, // Full power
-    D1, // Low power
-    D2, // Standby
-    D3, // Sleep
-    D4, // Off
+    D0,  // Full power
+    D1,  // Low power
+    D2,  // Standby
+    D3,  // Sleep
+    D4,  // Off
 }
 
 #[repr(C)]

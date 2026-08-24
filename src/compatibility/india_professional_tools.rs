@@ -204,8 +204,7 @@ impl PMWaniHotspotController {
     }
 
     pub fn register_pdo(&mut self, pdo_id: &str, location: &str) -> bool {
-        self.registered_pdos
-            .insert(pdo_id.to_string(), location.to_string());
+        self.registered_pdos.insert(pdo_id.to_string(), location.to_string());
         true
     }
 
@@ -240,8 +239,7 @@ impl DigiYatraPassScanner {
     }
 
     pub fn enroll_passenger(&mut self, passenger_id: &str, face_signature: &[u8]) -> bool {
-        self.passenger_faces
-            .insert(passenger_id.to_string(), face_signature.to_vec());
+        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec());
         true
     }
 

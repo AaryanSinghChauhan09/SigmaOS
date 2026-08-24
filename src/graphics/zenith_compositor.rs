@@ -1,6 +1,9 @@
 // Zenith Desktop Compositor
 // Wayland-inspired compositor with OOP design
 // Inspired by Mutter, KWin, Sway, and wlroots from popular Linux distributions.
+
+#![no_std]
+
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;

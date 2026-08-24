@@ -276,8 +276,7 @@ mod tests {
 
     #[test]
     fn test_load_document() {
-        let doc =
-            DocumentEngine::load_document("test.md".to_string(), "# Title\nContent".to_string());
+        let doc = DocumentEngine::load_document("test.md".to_string(), "# Title\nContent".to_string());
 
         assert_eq!(doc.metadata.format, DocumentFormat::Markdown);
         assert_eq!(doc.content, "# Title\nContent");

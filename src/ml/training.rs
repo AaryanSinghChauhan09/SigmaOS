@@ -2,6 +2,9 @@
 //! OOP-based ML Training for SigmaOS
 //! Based on Ideas-999-Structured: AI & Machine Learning Item 936
 //! Implements model training and optimization
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::vec::Vec;

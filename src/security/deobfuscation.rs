@@ -1,6 +1,7 @@
 /// SigmaOS Binary Analysis, Deobfuscation, and Semantic Inversion Engine
 /// Implements advanced abstract interpretation, transformation inversion,
 /// opaque predicate resolution, and a continuum of static/dynamic disassembler callbacks.
+
 use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,14 +36,7 @@ pub struct ArchInstruction {
 }
 
 impl ArchInstruction {
-    pub fn new(
-        address: u64,
-        arch: CpuArch,
-        inst_type: InstructionType,
-        op1: &[u8],
-        op2: &[u8],
-        immediate: i64,
-    ) -> Self {
+    pub fn new(address: u64, arch: CpuArch, inst_type: InstructionType, op1: &[u8], op2: &[u8], immediate: i64) -> Self {
         let mut op1_arr = [0u8; 16];
         let mut op2_arr = [0u8; 16];
         op1_arr[..op1.len().min(15)].copy_from_slice(&op1[..op1.len().min(15)]);
@@ -83,8 +77,8 @@ impl AbstractValue {
             (AbstractValue::Interval(min1, max1), AbstractValue::Interval(min2, max2)) => {
                 AbstractValue::Interval((*min1).min(*min2), (*max1).max(*max2))
             }
-            (AbstractValue::Constant(c), AbstractValue::Interval(min, max))
-            | (AbstractValue::Interval(min, max), AbstractValue::Constant(c)) => {
+            (AbstractValue::Constant(c), AbstractValue::Interval(min, max)) |
+            (AbstractValue::Interval(min, max), AbstractValue::Constant(c)) => {
                 AbstractValue::Interval((*min).min(*c), (*max).max(*c))
             }
             _ => AbstractValue::Unknown,
@@ -99,8 +93,8 @@ impl AbstractValue {
             (AbstractValue::Interval(min1, max1), AbstractValue::Interval(min2, max2)) => {
                 AbstractValue::Interval(min1.wrapping_add(*min2), max1.wrapping_add(*max2))
             }
-            (AbstractValue::Constant(c), AbstractValue::Interval(min, max))
-            | (AbstractValue::Interval(min, max), AbstractValue::Constant(c)) => {
+            (AbstractValue::Constant(c), AbstractValue::Interval(min, max)) |
+            (AbstractValue::Interval(min, max), AbstractValue::Constant(c)) => {
                 AbstractValue::Interval(min.wrapping_add(*c), max.wrapping_add(*c))
             }
             _ => AbstractValue::Unknown,
@@ -194,9 +188,7 @@ impl DeobfuscationEngine {
                 let inst2 = &instructions[i + 1];
 
                 // Substitution Pattern 1: [xor reg, reg] followed by [add reg, Val] -> [mov reg, Val]
-                if inst1.inst_type == InstructionType::Xor
-                    && inst2.inst_type == InstructionType::Add
-                {
+                if inst1.inst_type == InstructionType::Xor && inst2.inst_type == InstructionType::Add {
                     if inst1.op1 == inst1.op2 && inst1.op1 == inst2.op1 {
                         let simplified = ArchInstruction::new(
                             inst1.address,
@@ -213,9 +205,7 @@ impl DeobfuscationEngine {
                 }
 
                 // Substitution Pattern 2: [add reg, Val] followed by [sub reg, Val] -> Nop
-                if inst1.inst_type == InstructionType::Add
-                    && inst2.inst_type == InstructionType::Sub
-                {
+                if inst1.inst_type == InstructionType::Add && inst2.inst_type == InstructionType::Sub {
                     if inst1.op1 == inst2.op1 && inst1.immediate == inst2.immediate {
                         let nop = ArchInstruction::new(
                             inst1.address,
@@ -306,8 +296,7 @@ mod tests {
     #[test]
     fn test_transformation_inversion_engine() {
         // Obfuscated code sequence: xor eax, eax; add eax, 50
-        let inst1 =
-            ArchInstruction::new(1000, CpuArch::X64, InstructionType::Xor, b"eax", b"eax", 0);
+        let inst1 = ArchInstruction::new(1000, CpuArch::X64, InstructionType::Xor, b"eax", b"eax", 0);
         let inst2 = ArchInstruction::new(1004, CpuArch::X64, InstructionType::Add, b"eax", &[], 50);
 
         let obfuscated = [inst1, inst2];
@@ -320,8 +309,7 @@ mod tests {
 
     #[test]
     fn test_opaque_predicate_resolution() {
-        let op_inst =
-            ArchInstruction::new(2000, CpuArch::Arm, InstructionType::OpaqueJmp, &[], &[], 0);
+        let op_inst = ArchInstruction::new(2000, CpuArch::Arm, InstructionType::OpaqueJmp, &[], &[], 0);
         let result = DeobfuscationEngine::resolve_opaque_predicate(&op_inst);
         assert_eq!(result, AbstractValue::OpaqueTrue);
     }
@@ -329,10 +317,8 @@ mod tests {
     #[test]
     fn test_static_dynamic_continuum_callbacks() {
         let mut emu = MetasmEmulator::new();
-        let inst1 =
-            ArchInstruction::new(3000, CpuArch::X86, InstructionType::Mov, b"eax", &[], 100);
-        let inst2 =
-            ArchInstruction::new(3004, CpuArch::X86, InstructionType::Xor, b"eax", &[], 0xFF);
+        let inst1 = ArchInstruction::new(3000, CpuArch::X86, InstructionType::Mov, b"eax", &[], 100);
+        let inst2 = ArchInstruction::new(3004, CpuArch::X86, InstructionType::Xor, b"eax", &[], 0xFF);
         let inst3 = ArchInstruction::new(3008, CpuArch::X86, InstructionType::Jmp, &[], &[], 0); // Should be rewritten to Nop by callback
 
         emu.load_instructions(&[inst1, inst2, inst3]);

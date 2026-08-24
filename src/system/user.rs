@@ -44,9 +44,9 @@ pub struct Group {
 /// Sudoers rule specification (/etc/sudoers and BSD doas.conf parity)
 #[derive(Debug, Clone)]
 pub struct SudoersRule {
-    pub entity: String,  // "username" or "%groupname"
-    pub host: String,    // "ALL"
-    pub run_as: String,  // "ALL" or "root"
+    pub entity: String, // "username" or "%groupname"
+    pub host: String,   // "ALL"
+    pub run_as: String, // "ALL" or "root"
     pub command: String, // "ALL" or "/usr/bin/apt"
     pub nopasswd: bool,
 }
@@ -95,8 +95,8 @@ impl SudoPolicyEngine {
 
         for rule in &self.rules {
             let is_user_match = rule.entity == username;
-            let is_group_match =
-                rule.entity.starts_with('%') && user_groups.contains(&rule.entity[1..].to_string());
+            let is_group_match = rule.entity.starts_with('%')
+                && user_groups.contains(&rule.entity[1..].to_string());
 
             if is_user_match || is_group_match {
                 let cmd_matches = rule.command == "ALL" || rule.command == target_cmd;
@@ -106,10 +106,7 @@ impl SudoPolicyEngine {
             }
         }
 
-        Err(UserError::SudoPermissionDenied(
-            username.to_string(),
-            target_cmd.to_string(),
-        ))
+        Err(UserError::SudoPermissionDenied(username.to_string(), target_cmd.to_string()))
     }
 }
 
@@ -245,12 +242,7 @@ impl UserManager {
     }
 
     /// groupmod - modify group attributes (rename group or update GID)
-    pub fn groupmod(
-        &mut self,
-        old_name: &str,
-        new_name: Option<&str>,
-        new_gid: Option<u32>,
-    ) -> Result<(), UserError> {
+    pub fn groupmod(&mut self, old_name: &str, new_name: Option<&str>, new_gid: Option<u32>) -> Result<(), UserError> {
         if !self.groups.contains_key(old_name) {
             return Err(UserError::GroupNotFound(old_name.to_string()));
         }
@@ -415,7 +407,8 @@ impl UserManager {
             ));
         }
 
-        fs::write(&shadow_path, content).map_err(|e| UserError::WriteError(shadow_path, e))?;
+        fs::write(&shadow_path, content)
+            .map_err(|e| UserError::WriteError(shadow_path, e))?;
 
         Ok(())
     }
@@ -427,8 +420,8 @@ impl UserManager {
             return Ok(());
         }
 
-        let content =
-            fs::read_to_string(&shadow_path).map_err(|e| UserError::ReadError(shadow_path, e))?;
+        let content = fs::read_to_string(&shadow_path)
+            .map_err(|e| UserError::ReadError(shadow_path, e))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
@@ -481,7 +474,8 @@ impl UserManager {
             ));
         }
 
-        fs::write(&passwd_path, content).map_err(|e| UserError::WriteError(passwd_path, e))?;
+        fs::write(&passwd_path, content)
+            .map_err(|e| UserError::WriteError(passwd_path, e))?;
 
         Ok(())
     }
@@ -498,11 +492,15 @@ impl UserManager {
             let members_str = group.members.join(",");
             content.push_str(&format!(
                 "{}:{}:{}:{}\n",
-                group.groupname, "x", group.gid, members_str
+                group.groupname,
+                "x",
+                group.gid,
+                members_str
             ));
         }
 
-        fs::write(&group_path, content).map_err(|e| UserError::WriteError(group_path, e))?;
+        fs::write(&group_path, content)
+            .map_err(|e| UserError::WriteError(group_path, e))?;
 
         Ok(())
     }
@@ -515,8 +513,8 @@ impl UserManager {
             return Ok(());
         }
 
-        let content =
-            fs::read_to_string(&passwd_path).map_err(|e| UserError::ReadError(passwd_path, e))?;
+        let content = fs::read_to_string(&passwd_path)
+            .map_err(|e| UserError::ReadError(passwd_path, e))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
@@ -532,11 +530,7 @@ impl UserManager {
                     full_name: parts[4].to_string(),
                     home_dir: parts[5].to_string(),
                     shell: parts[6].to_string(),
-                    password_hash: if parts[1] == "x" {
-                        None
-                    } else {
-                        Some(parts[1].to_string())
-                    },
+                    password_hash: if parts[1] == "x" { None } else { Some(parts[1].to_string()) },
                     is_root: parts[0] == "root",
                     is_locked: false,
                 };
@@ -555,8 +549,8 @@ impl UserManager {
             return Ok(());
         }
 
-        let content =
-            fs::read_to_string(&group_path).map_err(|e| UserError::ReadError(group_path, e))?;
+        let content = fs::read_to_string(&group_path)
+            .map_err(|e| UserError::ReadError(group_path, e))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
@@ -629,15 +623,7 @@ mod tests {
         manager.initialize().unwrap();
 
         manager.create_user("alice", "Alice User").unwrap();
-        manager
-            .usermod(
-                "alice",
-                Some("/bin/zsh"),
-                Some("/var/home/alice"),
-                Some(2000),
-                Some(true),
-            )
-            .unwrap();
+        manager.usermod("alice", Some("/bin/zsh"), Some("/var/home/alice"), Some(2000), Some(true)).unwrap();
 
         let updated = manager.get_user("alice").unwrap();
         assert_eq!(updated.shell, "/bin/zsh");
@@ -645,9 +631,7 @@ mod tests {
         assert_eq!(updated.gid, 2000);
         assert!(updated.is_locked);
 
-        manager
-            .groupmod("alice", Some("alice_group"), Some(2000))
-            .unwrap();
+        manager.groupmod("alice", Some("alice_group"), Some(2000)).unwrap();
         assert!(manager.get_group("alice_group").is_some());
     }
 
@@ -664,10 +648,7 @@ mod tests {
         let groups = manager.get_user_groups("bob");
         assert!(groups.contains(&"wheel".to_string()));
 
-        let sudo_res =
-            manager
-                .sudo_engine
-                .evaluate_sudo_privilege("bob", &groups, "/usr/bin/systemctl");
+        let sudo_res = manager.sudo_engine.evaluate_sudo_privilege("bob", &groups, "/usr/bin/systemctl");
         assert!(sudo_res.is_ok());
     }
 }

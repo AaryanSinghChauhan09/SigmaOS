@@ -1,3 +1,4 @@
+#![no_std]
 #![cfg_attr(not(test), no_main)]
 
 /// Post-Quantum Cryptographic Secure Enclave and Token-Rotation IPC Bus

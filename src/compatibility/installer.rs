@@ -137,10 +137,7 @@ impl PreseedAutoDeployer {
     }
 
     /// Starts automated unattended deployment setup loops
-    pub fn execute_unattended_install(
-        &self,
-        wizard: &mut GuiInstallerWizard,
-    ) -> Result<(), &'static str> {
+    pub fn execute_unattended_install(&self, wizard: &mut GuiInstallerWizard) -> Result<(), &'static str> {
         // In production, would log to kernel buffer
 
         // 1. Resolve partitioning from preseed

@@ -4,6 +4,9 @@
 //! 1. **User-named aliases** (custom commands registered and manipulated by users)
 //! 2. **Fixed-named aliases** (standards-based package manager and utility mappings from Linux & BSD)
 //! 3. **Automatic aliases** (typo auto-correction and zsh-style suffix-based file extensions)
+
+#![no_std]
+
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -112,13 +115,7 @@ impl AliasManager {
     }
 
     /// Register a user, fixed, or automatic alias.
-    pub fn register_alias(
-        &mut self,
-        name: &str,
-        value: &str,
-        alias_type: AliasType,
-        description: &str,
-    ) {
+    pub fn register_alias(&mut self, name: &str, value: &str, alias_type: AliasType, description: &str) {
         let alias = SigmaAlias::new(name, value, alias_type, description);
         self.aliases.insert(name.to_string(), alias);
     }
@@ -140,14 +137,12 @@ impl AliasManager {
 
     /// Register a typo correction mapping.
     pub fn register_typo_correction(&mut self, typo: &str, correction: &str) {
-        self.typo_corrections
-            .insert(typo.to_string(), correction.to_string());
+        self.typo_corrections.insert(typo.to_string(), correction.to_string());
     }
 
     /// Register a suffix-based auto-alias.
     pub fn register_suffix_alias(&mut self, extension: &str, app: &str) {
-        self.suffix_aliases
-            .insert(extension.to_string(), app.to_string());
+        self.suffix_aliases.insert(extension.to_string(), app.to_string());
     }
 
     /// Recursively expands user-named and fixed-named aliases up to a specific recursion limit to prevent cycles.
@@ -270,16 +265,14 @@ impl AliasManager {
             // Gentoo Emerge Translation
             "emerge" => {
                 if args.contains(&"--unmerge") || args.contains(&"-C") {
-                    let pkg_args: Vec<&str> = args
-                        .iter()
+                    let pkg_args: Vec<&str> = args.iter()
                         .filter(|&&a| a != "--unmerge" && a != "-C")
                         .cloned()
                         .collect();
                     format!("sigpkg remove {}", pkg_args.join(" "))
                 } else {
                     // Filtering options to get package name
-                    let pkg_args: Vec<&str> = args
-                        .iter()
+                    let pkg_args: Vec<&str> = args.iter()
                         .filter(|&&a| !a.starts_with('-'))
                         .cloned()
                         .collect();
@@ -329,9 +322,7 @@ impl AliasManager {
         if let Some(dot_idx) = first_word.rfind('.') {
             let ext = &first_word[dot_idx + 1..];
             if let Some(app) = self.suffix_aliases.get(ext) {
-                return format!("{} {}{}", app, first_word, rest_of_cmd)
-                    .trim()
-                    .to_string();
+                return format!("{} {}{}", app, first_word, rest_of_cmd).trim().to_string();
             }
         }
 
@@ -368,24 +359,11 @@ mod tests {
         let mut manager = AliasManager::new();
 
         // Register custom user aliases
-        manager.register_alias(
-            "gs",
-            "git status",
-            AliasType::UserNamed,
-            "Shortcut for Git status",
-        );
-        manager.register_alias(
-            "dc",
-            "docker-compose",
-            AliasType::UserNamed,
-            "Shortcut for compose",
-        );
+        manager.register_alias("gs", "git status", AliasType::UserNamed, "Shortcut for Git status");
+        manager.register_alias("dc", "docker-compose", AliasType::UserNamed, "Shortcut for compose");
 
         assert_eq!(manager.get_alias("gs").unwrap().value, "git status");
-        assert_eq!(
-            manager.get_alias("dc").unwrap().alias_type,
-            AliasType::UserNamed
-        );
+        assert_eq!(manager.get_alias("dc").unwrap().alias_type, AliasType::UserNamed);
 
         // Verify manipulation: remove and assert
         assert!(manager.remove_alias("dc"));
@@ -426,72 +404,30 @@ mod tests {
         let manager = AliasManager::new();
 
         // Alpine APK Translation
-        assert_eq!(
-            manager.interpret_fixed_name_distro("apk add curl git"),
-            "sigpkg install curl git"
-        );
-        assert_eq!(
-            manager.interpret_fixed_name_distro("apk del vim"),
-            "sigpkg remove vim"
-        );
-        assert_eq!(
-            manager.interpret_fixed_name_distro("apk update"),
-            "sigpkg update"
-        );
+        assert_eq!(manager.interpret_fixed_name_distro("apk add curl git"), "sigpkg install curl git");
+        assert_eq!(manager.interpret_fixed_name_distro("apk del vim"), "sigpkg remove vim");
+        assert_eq!(manager.interpret_fixed_name_distro("apk update"), "sigpkg update");
 
         // Debian/Ubuntu APT Translation
-        assert_eq!(
-            manager.interpret_fixed_name_distro("apt install htop"),
-            "sigpkg install htop"
-        );
-        assert_eq!(
-            manager.interpret_fixed_name_distro("apt-get purge apache2"),
-            "sigpkg remove apache2"
-        );
+        assert_eq!(manager.interpret_fixed_name_distro("apt install htop"), "sigpkg install htop");
+        assert_eq!(manager.interpret_fixed_name_distro("apt-get purge apache2"), "sigpkg remove apache2");
 
         // Arch Linux Pacman Translation
-        assert_eq!(
-            manager.interpret_fixed_name_distro("pacman -S nmap"),
-            "sigpkg install nmap"
-        );
-        assert_eq!(
-            manager.interpret_fixed_name_distro("pacman -Syu"),
-            "sigpkg update"
-        );
-        assert_eq!(
-            manager.interpret_fixed_name_distro("pacman -R tree"),
-            "sigpkg remove tree"
-        );
+        assert_eq!(manager.interpret_fixed_name_distro("pacman -S nmap"), "sigpkg install nmap");
+        assert_eq!(manager.interpret_fixed_name_distro("pacman -Syu"), "sigpkg update");
+        assert_eq!(manager.interpret_fixed_name_distro("pacman -R tree"), "sigpkg remove tree");
 
         // RedHat/Fedora DNF/YUM Translation
-        assert_eq!(
-            manager.interpret_fixed_name_distro("dnf install python3"),
-            "sigpkg install python3"
-        );
-        assert_eq!(
-            manager.interpret_fixed_name_distro("yum update"),
-            "sigpkg update"
-        );
+        assert_eq!(manager.interpret_fixed_name_distro("dnf install python3"), "sigpkg install python3");
+        assert_eq!(manager.interpret_fixed_name_distro("yum update"), "sigpkg update");
 
         // Gentoo Emerge Translation
-        assert_eq!(
-            manager.interpret_fixed_name_distro("emerge --unmerge libpng"),
-            "sigpkg remove libpng"
-        );
-        assert_eq!(
-            manager.interpret_fixed_name_distro("emerge -av sys-kernel/gentoo-sources"),
-            "sigpkg install sys-kernel/gentoo-sources"
-        );
+        assert_eq!(manager.interpret_fixed_name_distro("emerge --unmerge libpng"), "sigpkg remove libpng");
+        assert_eq!(manager.interpret_fixed_name_distro("emerge -av sys-kernel/gentoo-sources"), "sigpkg install sys-kernel/gentoo-sources");
 
         // FreeBSD PKG Translation
-        assert_eq!(
-            manager.interpret_fixed_name_distro("pkg install bash"),
-            "sigpkg install bash"
-        );
-        assert_eq!(
-            manager.interpret_fixed_name_distro("pkg remove nano"),
-            "sigpkg remove nano"
-        );
+        assert_eq!(manager.interpret_fixed_name_distro("pkg install bash"), "sigpkg install bash");
+        assert_eq!(manager.interpret_fixed_name_distro("pkg remove nano"), "sigpkg remove nano");
     }
 
     #[test]
@@ -501,10 +437,7 @@ mod tests {
         // sl -> ls
         assert_eq!(manager.interpret_automatic_alias("sl -lh"), "ls -lh");
         // gti -> git
-        assert_eq!(
-            manager.interpret_automatic_alias("gti clone url"),
-            "git clone url"
-        );
+        assert_eq!(manager.interpret_automatic_alias("gti clone url"), "git clone url");
         // non-typo remains unchanged
         assert_eq!(manager.interpret_automatic_alias("pwd"), "pwd");
     }
@@ -514,20 +447,11 @@ mod tests {
         let manager = AliasManager::new();
 
         // txt -> editor
-        assert_eq!(
-            manager.interpret_automatic_alias("notes.txt"),
-            "editor notes.txt"
-        );
+        assert_eq!(manager.interpret_automatic_alias("notes.txt"), "editor notes.txt");
         // rs -> rustc
-        assert_eq!(
-            manager.interpret_automatic_alias("main.rs --bin"),
-            "rustc main.rs --bin"
-        );
+        assert_eq!(manager.interpret_automatic_alias("main.rs --bin"), "rustc main.rs --bin");
         // non-matching file extension remains untouched
-        assert_eq!(
-            manager.interpret_automatic_alias("archive.tar.gz"),
-            "archive.tar.gz"
-        );
+        assert_eq!(manager.interpret_automatic_alias("archive.tar.gz"), "archive.tar.gz");
     }
 
     #[test]

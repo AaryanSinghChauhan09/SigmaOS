@@ -1,3 +1,4 @@
+#![no_std]
 #![allow(unused, dead_code)]
 
 /// OOP-Based Cluster Orchestration for SigmaOS (Rancher, k3s, and Harvester Parity)

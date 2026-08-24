@@ -6,9 +6,9 @@
 //! - Concurrent Slate Lock NUMA synchronization primitives
 
 extern crate alloc;
-use crate::klib::{HashMap, Vec};
 use alloc::string::String;
 use alloc::string::ToString;
+use crate::klib::{Vec, HashMap};
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 // ==========================================
@@ -210,11 +210,7 @@ impl ConcurrentSlateLock {
     }
 
     pub fn lock(&self, cpu_id: u64) {
-        while self
-            .locked
-            .compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed)
-            .is_err()
-        {
+        while self.locked.compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed).is_err() {
             core::hint::spin_loop();
         }
         self.owner_cpu.store(cpu_id, Ordering::Release);
@@ -248,10 +244,8 @@ mod tests {
     fn test_hammer2_logging_and_snapshots() {
         let mut hammer2 = Hammer2Engine::new();
 
-        let tx1 =
-            hammer2.log_transaction(Hammer2TransactionType::InodeCreate, "/etc/dragonfly.conf");
-        let tx2 =
-            hammer2.log_transaction(Hammer2TransactionType::InodeModify, "/etc/dragonfly.conf");
+        let tx1 = hammer2.log_transaction(Hammer2TransactionType::InodeCreate, "/etc/dragonfly.conf");
+        let tx2 = hammer2.log_transaction(Hammer2TransactionType::InodeModify, "/etc/dragonfly.conf");
 
         assert_eq!(tx1, 1);
         assert_eq!(tx2, 2);

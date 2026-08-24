@@ -20,11 +20,11 @@
 // Stores packages by SHA3-256 hash for reproducibility
 
 extern crate alloc;
-use crate::sigpkg::Package;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;
 use std::path::PathBuf;
+use crate::sigpkg::Package;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
@@ -234,9 +234,7 @@ impl GentooPortageUseFlagMask {
 
     pub fn set_use_flag(&mut self, flag: &str, enable: bool) {
         if enable {
-            if !self.masked_flags.contains(&flag.to_string())
-                && !self.active_flags.contains(&flag.to_string())
-            {
+            if !self.masked_flags.contains(&flag.to_string()) && !self.active_flags.contains(&flag.to_string()) {
                 self.active_flags.push(flag.to_string());
             }
         } else {
@@ -252,8 +250,7 @@ impl GentooPortageUseFlagMask {
     }
 
     pub fn is_flag_active(&self, flag: &str) -> bool {
-        self.active_flags.contains(&flag.to_string())
-            && !self.masked_flags.contains(&flag.to_string())
+        self.active_flags.contains(&flag.to_string()) && !self.masked_flags.contains(&flag.to_string())
     }
 }
 
@@ -281,8 +278,7 @@ impl NixOsHermeticCasStore {
 
         let folder_name = format!("{}-{}-{}", hash_str, pkg_name, version);
         let store_path = self.store_dir.join(folder_name);
-        self.store_paths
-            .insert(pkg_name.to_string(), store_path.clone());
+        self.store_paths.insert(pkg_name.to_string(), store_path.clone());
         store_path
     }
 
@@ -297,8 +293,7 @@ mod distro_pkg_tests {
 
     #[test]
     fn test_bsd_pkg_repo_mirror() {
-        let mut mirror =
-            BsdPkgRepositoryMirror::new("https://pkg.freebsd.org/freebsd:14:x86:64/latest");
+        let mut mirror = BsdPkgRepositoryMirror::new("https://pkg.freebsd.org/freebsd:14:x86:64/latest");
         assert!(!mirror.is_trusted);
 
         let index_data = b"pkg_index_binary_blob_sample_data_12345";

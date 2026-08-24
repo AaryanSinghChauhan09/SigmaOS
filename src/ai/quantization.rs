@@ -1,10 +1,10 @@
 // Dynamic Matrix Quantization & Multi-Device Execution Fallback for SigmaOS
 // Inspired by vLLM, llama.cpp, and ROCm runtime fallback pipelines.
 
-use super::compute_scheduler::ComputeDeviceTarget;
-use super::tensor_memory::TensorDtype;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use super::tensor_memory::TensorDtype;
+use super::compute_scheduler::ComputeDeviceTarget;
 
 /// Quantized Tensor Container holding weights, scales, and zero-points.
 #[derive(Debug, Clone)]
@@ -159,8 +159,7 @@ impl AiExecutionDispatcher {
                         primary_device: requested,
                         active_device: ComputeDeviceTarget::IntegratedNpu,
                         is_fallback_active: true,
-                        fallback_reason: "Discrete GPU unavailable, falling back to Integrated NPU"
-                            .to_string(),
+                        fallback_reason: "Discrete GPU unavailable, falling back to Integrated NPU".to_string(),
                     }
                 } else {
                     self.fallback_count += 1;
@@ -168,9 +167,7 @@ impl AiExecutionDispatcher {
                         primary_device: requested,
                         active_device: ComputeDeviceTarget::CpuSimd,
                         is_fallback_active: true,
-                        fallback_reason:
-                            "Discrete GPU and NPU unavailable, falling back to CPU SIMD/AVX-512"
-                                .to_string(),
+                        fallback_reason: "Discrete GPU and NPU unavailable, falling back to CPU SIMD/AVX-512".to_string(),
                     }
                 }
             }
@@ -188,27 +185,23 @@ impl AiExecutionDispatcher {
                         primary_device: requested,
                         active_device: ComputeDeviceTarget::CpuSimd,
                         is_fallback_active: true,
-                        fallback_reason:
-                            "Integrated NPU unavailable, falling back to CPU SIMD/AVX-512"
-                                .to_string(),
+                        fallback_reason: "Integrated NPU unavailable, falling back to CPU SIMD/AVX-512".to_string(),
                     }
                 }
             }
-            ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect => DeviceFallbackRoute {
-                primary_device: requested,
-                active_device: ComputeDeviceTarget::CpuSimd,
-                is_fallback_active: false,
-                fallback_reason: String::new(),
-            },
+            ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect => {
+                DeviceFallbackRoute {
+                    primary_device: requested,
+                    active_device: ComputeDeviceTarget::CpuSimd,
+                    is_fallback_active: false,
+                    fallback_reason: String::new(),
+                }
+            }
         }
     }
 
     /// Simulates matrix GEMM operation execution on resolved target device.
-    pub fn execute_gemm(
-        &self,
-        matrix: &QuantizedMatrix,
-        route: &DeviceFallbackRoute,
-    ) -> (usize, u64) {
+    pub fn execute_gemm(&self, matrix: &QuantizedMatrix, route: &DeviceFallbackRoute) -> (usize, u64) {
         let ops = matrix.rows * matrix.cols * 2;
         let exec_time_us = match route.active_device {
             ComputeDeviceTarget::DiscreteGpu => ops as u64 / 10_000,
@@ -227,14 +220,7 @@ mod tests {
     #[test]
     fn test_quantization_and_fallback_dispatcher() {
         let weights = vec![1.2f32, -0.8, 0.5, 2.1, -1.5, 0.0, 0.9, -0.4];
-        let qmat = QuantizedMatrix::quantize_fp32_matrix(
-            "layer1.weight",
-            2,
-            4,
-            &weights,
-            TensorDtype::Int8,
-        )
-        .unwrap();
+        let qmat = QuantizedMatrix::quantize_fp32_matrix("layer1.weight", 2, 4, &weights, TensorDtype::Int8).unwrap();
         assert_eq!(qmat.quantized_data.len(), 8);
         assert!(qmat.compression_ratio >= 3.9);
 

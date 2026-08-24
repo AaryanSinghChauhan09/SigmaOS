@@ -104,17 +104,11 @@ fn test_pillar6_atomic_transaction_rollback() {
     let gen2 = engine.commit_transaction(vec!["curl".to_string(), "git".to_string()], 100);
     assert_eq!(gen2, 2);
 
-    let gen3 = engine.commit_transaction(
-        vec!["curl".to_string(), "git".to_string(), "vim".to_string()],
-        200,
-    );
+    let gen3 = engine.commit_transaction(vec!["curl".to_string(), "git".to_string(), "vim".to_string()], 200);
     assert_eq!(gen3, 3);
 
     let rolled_back = engine.rollback_generation(2).unwrap();
-    assert_eq!(
-        rolled_back.installed_packages,
-        vec!["curl".to_string(), "git".to_string()]
-    );
+    assert_eq!(rolled_back.installed_packages, vec!["curl".to_string(), "git".to_string()]);
     assert_eq!(engine.active_generation, 2);
 }
 
@@ -214,21 +208,14 @@ fn test_pillar14_unified_runtime_manager() {
     manager.set_runtime_version(LanguageRuntime::Python, "3.11.4");
     manager.set_runtime_version(LanguageRuntime::NodeJS, "20.5.0");
 
-    assert_eq!(
-        manager.get_runtime_version(LanguageRuntime::Python),
-        Some("3.11.4")
-    );
-    assert_eq!(
-        manager.get_runtime_version(LanguageRuntime::NodeJS),
-        Some("20.5.0")
-    );
+    assert_eq!(manager.get_runtime_version(LanguageRuntime::Python), Some("3.11.4"));
+    assert_eq!(manager.get_runtime_version(LanguageRuntime::NodeJS), Some("20.5.0"));
     assert_eq!(manager.get_runtime_version(LanguageRuntime::Java), None);
 }
 
 #[test]
 fn test_pillar15_flatpak_container_integration() {
-    let mut integration =
-        FlatpakContainerIntegration::new("org.gimp.GIMP", ApplicationType::FlatpakSandbox);
+    let mut integration = FlatpakContainerIntegration::new("org.gimp.GIMP", ApplicationType::FlatpakSandbox);
     integration.add_permission("--socket=x11");
     integration.add_permission("--filesystem=home");
 
@@ -257,13 +244,11 @@ fn test_pillar17_binary_compatibility_layer() {
 
 #[test]
 fn test_pillar18_developer_package_templates() {
-    let cmake_template =
-        DeveloperPackageTemplateManager::generate_spec_template("libxyz", TemplateKind::CCppCmake);
+    let cmake_template = DeveloperPackageTemplateManager::generate_spec_template("libxyz", TemplateKind::CCppCmake);
     assert!(cmake_template.contains("name = \"libxyz\""));
     assert!(cmake_template.contains("build_system = \"cmake\""));
 
-    let cargo_template =
-        DeveloperPackageTemplateManager::generate_spec_template("mycrate", TemplateKind::RustCargo);
+    let cargo_template = DeveloperPackageTemplateManager::generate_spec_template("mycrate", TemplateKind::RustCargo);
     assert!(cargo_template.contains("build_system = \"cargo\""));
 }
 

@@ -23,6 +23,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+
 /// Runlevel definitions (SysVinit-style)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Runlevel {
@@ -154,18 +155,14 @@ impl InitSystem {
         for dep in &service.dependencies {
             match dep.dep_type {
                 DependencyType::Requires => {
-                    if let Some(dep_service) =
-                        self.services.iter().find(|s| s.name == dep.service_name)
-                    {
+                    if let Some(dep_service) = self.services.iter().find(|s| s.name == dep.service_name) {
                         if dep_service.state != ServiceState::Running {
                             return Err(InitError::DependencyNotMet);
                         }
                     }
                 }
                 DependencyType::Conflicts => {
-                    if let Some(dep_service) =
-                        self.services.iter().find(|s| s.name == dep.service_name)
-                    {
+                    if let Some(dep_service) = self.services.iter().find(|s| s.name == dep.service_name) {
                         if dep_service.state == ServiceState::Running {
                             return Err(InitError::Conflict);
                         }
@@ -178,10 +175,7 @@ impl InitSystem {
     }
 
     pub fn get_service_state(&self, name: &str) -> Option<ServiceState> {
-        self.services
-            .iter()
-            .find(|s| s.name == name)
-            .map(|s| s.state.clone())
+        self.services.iter().find(|s| s.name == name).map(|s| s.state.clone())
     }
 }
 
@@ -276,7 +270,9 @@ pub enum LogLevel {
 impl SystemLogger {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SystemLogger { logs: Vec::new() }
+        SystemLogger {
+            logs: Vec::new(),
+        }
     }
 
     pub fn log(&mut self, service: &str, level: LogLevel, message: &str) {
@@ -316,10 +312,7 @@ mod tests {
         };
         init.add_service(service);
         init.start_service("test-service").unwrap();
-        assert_eq!(
-            init.get_service_state("test-service"),
-            Some(ServiceState::Running)
-        );
+        assert_eq!(init.get_service_state("test-service"), Some(ServiceState::Running));
     }
 
     #[test]

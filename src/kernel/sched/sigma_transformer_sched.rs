@@ -1,10 +1,12 @@
+#![no_std]
+
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
-use crate::filesystem::FsError;
-use crate::kernel::sched::scheduler::{RunQueue, SchedClass};
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
+use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
+use crate::filesystem::FsError;
 
 /// Transformer-based Scheduler
 ///

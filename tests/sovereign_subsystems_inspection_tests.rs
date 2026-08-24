@@ -14,17 +14,14 @@ mod sovereign_data_workspace;
 #[path = "../src/security/capability_enforcer.rs"]
 mod capability_enforcer;
 
-use capability_enforcer::*;
 use open_source_obsoletion::*;
 use sovereign_data_workspace::*;
+use capability_enforcer::*;
 
 #[test]
 fn test_open_source_obsoletion_subsystem_inspection() {
     let mut vcs = SovereignVcsEngine::new();
-    vcs.stage_file(
-        "kernel/src/lib.rs",
-        b"// SPDX-License-Identifier: MIT\npub fn init() {}",
-    );
+    vcs.stage_file("kernel/src/lib.rs", b"// SPDX-License-Identifier: MIT\npub fn init() {}");
     assert_eq!(vcs.staging_area.len(), 1);
 
     let mut init = SovereignInitSupervisor::new();
@@ -101,11 +98,7 @@ fn test_sovereign_data_workspace_inspection() {
     assert!(is_compliant.is_ok());
 
     let mut catalog = SovereignCatalog::new();
-    catalog.register_dataset(
-        "telemetry_v1".to_string(),
-        "Memory".to_string(),
-        "0xABC123".to_string(),
-    );
+    catalog.register_dataset("telemetry_v1".to_string(), "Memory".to_string(), "0xABC123".to_string());
     assert!(catalog.lookup_residency("telemetry_v1").is_some());
 }
 

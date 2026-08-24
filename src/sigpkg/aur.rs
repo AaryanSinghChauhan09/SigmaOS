@@ -66,12 +66,7 @@ impl MkinitcpioHookEngine {
         if self.active_hooks.is_empty() {
             return Err("mkinitcpio: No active boot hooks registered");
         }
-        Ok(format!(
-            "initramfs-linux-{}.img ({} compressed, {} hooks)",
-            kernel_version,
-            self.compression_format,
-            self.active_hooks.len()
-        ))
+        Ok(format!("initramfs-linux-{}.img ({} compressed, {} hooks)", kernel_version, self.compression_format, self.active_hooks.len()))
     }
 }
 
@@ -105,26 +100,10 @@ impl ArchChrootSandbox {
         Self {
             target_root: root.clone(),
             mount_binds: vec![
-                MountBindPoint {
-                    source_path: "/proc".to_string(),
-                    target_path: format!("{}/proc", root),
-                    is_read_only: false,
-                },
-                MountBindPoint {
-                    source_path: "/sys".to_string(),
-                    target_path: format!("{}/sys", root),
-                    is_read_only: false,
-                },
-                MountBindPoint {
-                    source_path: "/dev".to_string(),
-                    target_path: format!("{}/dev", root),
-                    is_read_only: false,
-                },
-                MountBindPoint {
-                    source_path: "/run".to_string(),
-                    target_path: format!("{}/run", root),
-                    is_read_only: false,
-                },
+                MountBindPoint { source_path: "/proc".to_string(), target_path: format!("{}/proc", root), is_read_only: false },
+                MountBindPoint { source_path: "/sys".to_string(), target_path: format!("{}/sys", root), is_read_only: false },
+                MountBindPoint { source_path: "/dev".to_string(), target_path: format!("{}/dev", root), is_read_only: false },
+                MountBindPoint { source_path: "/run".to_string(), target_path: format!("{}/run", root), is_read_only: false },
             ],
             is_pivot_mounted: false,
         }
@@ -139,10 +118,7 @@ impl ArchChrootSandbox {
         if !self.is_pivot_mounted {
             return Err("arch-chroot: Sandbox virtual filesystems not mounted");
         }
-        Ok(format!(
-            "chroot [{}] -> executed: {}",
-            self.target_root, command
-        ))
+        Ok(format!("chroot [{}] -> executed: {}", self.target_root, command))
     }
 }
 
@@ -186,11 +162,7 @@ impl PacmanTransactionHooks {
         self.hooks.push(hook);
     }
 
-    pub fn trigger_hooks_for_path(
-        &self,
-        hook_type: PacmanHookType,
-        changed_path: &str,
-    ) -> Vec<String> {
+    pub fn trigger_hooks_for_path(&self, hook_type: PacmanHookType, changed_path: &str) -> Vec<String> {
         let mut executed = Vec::new();
         for hook in &self.hooks {
             if hook.hook_type == hook_type && changed_path.contains(&hook.target_path_trigger) {
@@ -238,11 +210,7 @@ impl AurSandboxOrchestrator {
     pub fn parse_pkgbuild_line(&mut self, line: &str) -> Option<PkgbuildMeta> {
         let line = line.trim();
         if line.starts_with("pkgname=") {
-            let name = line
-                .strip_prefix("pkgname=")
-                .unwrap()
-                .trim_matches('"')
-                .trim_matches('\'');
+            let name = line.strip_prefix("pkgname=").unwrap().trim_matches('"').trim_matches('\'');
             let hash = Self::calculate_name_hash(name);
             return Some(PkgbuildMeta {
                 name_hash: hash,
@@ -287,11 +255,7 @@ impl AurSandboxOrchestrator {
     }
 
     /// Executes the sandboxed compilation routines and registers the result package into sigpkg CAS
-    pub fn run_compilation(
-        &mut self,
-        meta: PkgbuildMeta,
-        sandbox: &PkgSandboxConfig,
-    ) -> Result<u32, &'static str> {
+    pub fn run_compilation(&mut self, meta: PkgbuildMeta, sandbox: &PkgSandboxConfig) -> Result<u32, &'static str> {
         if sandbox.allow_internet {
             return Err("AurOrchestrator: Insecure sandbox configuration - network connectivity prohibited during build phase");
         }
@@ -324,13 +288,8 @@ mod tests {
     #[test]
     fn test_parse_pkgbuild_line() {
         let mut orchestrator = AurSandboxOrchestrator::new();
-        let meta = orchestrator
-            .parse_pkgbuild_line("pkgname=\"custom-app\"")
-            .unwrap();
-        assert_eq!(
-            meta.name_hash,
-            AurSandboxOrchestrator::calculate_name_hash("custom-app")
-        );
+        let meta = orchestrator.parse_pkgbuild_line("pkgname=\"custom-app\"").unwrap();
+        assert_eq!(meta.name_hash, AurSandboxOrchestrator::calculate_name_hash("custom-app"));
         assert_eq!(meta.version_major, 1);
         assert_eq!(meta.version_minor, 0);
         assert_eq!(meta.pkgrel, 1);
@@ -338,14 +297,8 @@ mod tests {
         orchestrator.parse_pkgbuild_line("depends=('libcurl' 'openssl')");
         assert_eq!(orchestrator.dep_count, 2);
         let deps = orchestrator.dependencies.borrow();
-        assert_eq!(
-            deps[0],
-            Some(AurSandboxOrchestrator::calculate_name_hash("libcurl"))
-        );
-        assert_eq!(
-            deps[1],
-            Some(AurSandboxOrchestrator::calculate_name_hash("openssl"))
-        );
+        assert_eq!(deps[0], Some(AurSandboxOrchestrator::calculate_name_hash("libcurl")));
+        assert_eq!(deps[1], Some(AurSandboxOrchestrator::calculate_name_hash("openssl")));
     }
 
     #[test]
@@ -393,10 +346,7 @@ mod tests {
         );
 
         assert_eq!(triggered.len(), 1);
-        assert_eq!(
-            triggered[0],
-            "glib-compile-schemas /usr/share/glib-2.0/schemas"
-        );
+        assert_eq!(triggered[0], "glib-compile-schemas /usr/share/glib-2.0/schemas");
     }
 
     #[test]

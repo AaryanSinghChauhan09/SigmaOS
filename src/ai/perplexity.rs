@@ -54,11 +54,7 @@ impl PerplexitySearchCli {
         self.api_key = Some(key.to_string());
     }
 
-    pub fn execute_search(
-        &mut self,
-        query: &str,
-        limit: usize,
-    ) -> Result<Vec<PerplexitySearchResult>, &'static str> {
+    pub fn execute_search(&mut self, query: &str, limit: usize) -> Result<Vec<PerplexitySearchResult>, &'static str> {
         if self.api_key.is_none() {
             return Err("Missing Perplexity API Key authentication");
         }
@@ -83,11 +79,7 @@ impl PerplexitySearchCli {
         Ok(results.into_iter().take(limit).collect())
     }
 
-    pub fn extract_snippets(
-        &mut self,
-        urls: &[&str],
-        max_tokens_per_page: usize,
-    ) -> Result<Vec<PerplexitySnippetResult>, &'static str> {
+    pub fn extract_snippets(&mut self, urls: &[&str], max_tokens_per_page: usize) -> Result<Vec<PerplexitySnippetResult>, &'static str> {
         if self.api_key.is_none() {
             return Err("Missing Perplexity API Key authentication");
         }
@@ -145,9 +137,7 @@ mod tests {
         assert_eq!(search.len(), 2);
         assert_eq!(search[0].domain, "rust-lang.org");
 
-        let snippets = cli
-            .extract_snippets(&["https://tokio.rs", "https://docs.rs"], 150)
-            .unwrap();
+        let snippets = cli.extract_snippets(&["https://tokio.rs", "https://docs.rs"], 150).unwrap();
         assert_eq!(snippets.len(), 2);
         assert!(snippets[0].error.is_none());
         assert_eq!(snippets[0].tokens_count, 100);

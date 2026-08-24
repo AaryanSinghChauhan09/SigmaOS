@@ -77,24 +77,12 @@ impl SsdBlockDevice {
 }
 
 impl BlockOrientedDevice for SsdBlockDevice {
-    fn device_id(&self) -> BlockDeviceID {
-        self.id
-    }
-    fn device_class(&self) -> DeviceClass {
-        DeviceClass::Ssd
-    }
-    fn block_size(&self) -> usize {
-        self.block_size
-    }
-    fn total_blocks(&self) -> u64 {
-        self.total_blocks
-    }
-    fn is_write_blocked(&self) -> bool {
-        self.write_blocked
-    }
-    fn set_write_blocked(&mut self, blocked: bool) {
-        self.write_blocked = blocked;
-    }
+    fn device_id(&self) -> BlockDeviceID { self.id }
+    fn device_class(&self) -> DeviceClass { DeviceClass::Ssd }
+    fn block_size(&self) -> usize { self.block_size }
+    fn total_blocks(&self) -> u64 { self.total_blocks }
+    fn is_write_blocked(&self) -> bool { self.write_blocked }
+    fn set_write_blocked(&mut self, blocked: bool) { self.write_blocked = blocked; }
 
     fn read_block(&self, block_num: BlockNumber, buffer: &mut [u8]) -> Result<(), BlockError> {
         if block_num >= self.total_blocks {
@@ -148,24 +136,12 @@ impl NvmeBlockDevice {
 }
 
 impl BlockOrientedDevice for NvmeBlockDevice {
-    fn device_id(&self) -> BlockDeviceID {
-        self.id
-    }
-    fn device_class(&self) -> DeviceClass {
-        DeviceClass::Nvme
-    }
-    fn block_size(&self) -> usize {
-        self.block_size
-    }
-    fn total_blocks(&self) -> u64 {
-        self.total_blocks
-    }
-    fn is_write_blocked(&self) -> bool {
-        self.write_blocked
-    }
-    fn set_write_blocked(&mut self, blocked: bool) {
-        self.write_blocked = blocked;
-    }
+    fn device_id(&self) -> BlockDeviceID { self.id }
+    fn device_class(&self) -> DeviceClass { DeviceClass::Nvme }
+    fn block_size(&self) -> usize { self.block_size }
+    fn total_blocks(&self) -> u64 { self.total_blocks }
+    fn is_write_blocked(&self) -> bool { self.write_blocked }
+    fn set_write_blocked(&mut self, blocked: bool) { self.write_blocked = blocked; }
 
     fn read_block(&self, block_num: BlockNumber, buffer: &mut [u8]) -> Result<(), BlockError> {
         if block_num >= self.total_blocks {
@@ -246,10 +222,7 @@ impl BlockOperationEngine {
                 for i in 0..req.count {
                     let start = i * blk_sz;
                     if start + blk_sz <= req.buffer.len() {
-                        dev.write_block(
-                            req.block_num + i as u64,
-                            &req.buffer[start..start + blk_sz],
-                        )?;
+                        dev.write_block(req.block_num + i as u64, &req.buffer[start..start + blk_sz])?;
                         written_bytes += blk_sz;
                     }
                 }
@@ -435,13 +408,7 @@ impl SystemBlockDiagramEngine {
         self.sub_blocks.insert(id, block);
     }
 
-    pub fn connect_bus(
-        &mut self,
-        bus_name: &str,
-        src_id: usize,
-        dst_id: usize,
-        bandwidth_mbps: u32,
-    ) {
+    pub fn connect_bus(&mut self, bus_name: &str, src_id: usize, dst_id: usize, bandwidth_mbps: u32) {
         self.signal_buses.push(SignalBus {
             bus_name: bus_name.to_string(),
             source_block_id: src_id,
@@ -490,25 +457,13 @@ impl SimpleBlockDevice {
 }
 
 impl BlockDevice for SimpleBlockDevice {
-    fn id(&self) -> BlockDeviceID {
-        self.id
-    }
-    fn device_type(&self) -> DeviceClass {
-        self.device_type
-    }
-    fn block_size(&self) -> usize {
-        self.block_size
-    }
-    fn total_blocks(&self) -> usize {
-        self.total_blocks
-    }
+    fn id(&self) -> BlockDeviceID { self.id }
+    fn device_type(&self) -> DeviceClass { self.device_type }
+    fn block_size(&self) -> usize { self.block_size }
+    fn total_blocks(&self) -> usize { self.total_blocks }
 
-    fn read_block(&self, _block_num: usize, _buffer: &mut [u8]) -> Result<(), BlockError> {
-        Ok(())
-    }
-    fn write_block(&mut self, _block_num: usize, _data: &[u8]) -> Result<(), BlockError> {
-        Ok(())
-    }
+    fn read_block(&self, _block_num: usize, _buffer: &mut [u8]) -> Result<(), BlockError> { Ok(()) }
+    fn write_block(&mut self, _block_num: usize, _data: &[u8]) -> Result<(), BlockError> { Ok(()) }
 }
 
 #[cfg(test)]
@@ -536,18 +491,8 @@ mod tests {
     #[test]
     fn test_system_block_diagram_topology() {
         let mut diagram = SystemBlockDiagramEngine::new("SigmaOS Memory & PCIe Topology");
-        diagram.add_sub_block(
-            1,
-            "PCIe Gen5 Controller",
-            &["Root Complex Bus"],
-            &["DMA Channels"],
-        );
-        diagram.add_sub_block(
-            2,
-            "NVMe Controller Engine",
-            &["DMA Channels"],
-            &["Flash Memory Arrays"],
-        );
+        diagram.add_sub_block(1, "PCIe Gen5 Controller", &["Root Complex Bus"], &["DMA Channels"]);
+        diagram.add_sub_block(2, "NVMe Controller Engine", &["DMA Channels"], &["Flash Memory Arrays"]);
         diagram.connect_bus("HighSpeedPCIeBus", 1, 2, 32000);
 
         assert_eq!(diagram.block_count(), 2);
@@ -556,10 +501,7 @@ mod tests {
 }
 
 pub trait BlockManager {
-    fn register_device(
-        &mut self,
-        device: Box<dyn BlockDevice>,
-    ) -> Result<BlockDeviceID, BlockError>;
+    fn register_device(&mut self, device: Box<dyn BlockDevice>) -> Result<BlockDeviceID, BlockError>;
     fn unregister_device(&mut self, id: BlockDeviceID) -> Result<(), BlockError>;
     fn get_device(&self, id: BlockDeviceID) -> Option<&dyn BlockDevice>;
     fn list_devices(&self) -> Vec<BlockDeviceID>;

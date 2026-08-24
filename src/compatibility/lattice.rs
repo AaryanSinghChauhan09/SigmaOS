@@ -23,12 +23,8 @@ impl KernelLattice {
         let mut lattice = KernelLattice {
             enabled_features: BTreeMap::new(),
         };
-        lattice
-            .enabled_features
-            .insert(LatticeFeature::LegacyMemoryModel, false);
-        lattice
-            .enabled_features
-            .insert(LatticeFeature::PredictiveScheduling, true);
+        lattice.enabled_features.insert(LatticeFeature::LegacyMemoryModel, false);
+        lattice.enabled_features.insert(LatticeFeature::PredictiveScheduling, true);
         lattice
     }
 
@@ -72,36 +68,17 @@ impl SyscallTracker {
             tracking_pool: BTreeMap::new(),
         };
         // Seed default trace history
-        tracker.register_syscall(
-            1,
-            "sys_exit".to_string(),
-            SyscallLifecycle::Deprecated,
-            "Linux 2.6".to_string(),
-        );
-        tracker.register_syscall(
-            60,
-            "sys_exit_group".to_string(),
-            SyscallLifecycle::Introduced,
-            "Linux 3.x".to_string(),
-        );
+        tracker.register_syscall(1, "sys_exit".to_string(), SyscallLifecycle::Deprecated, "Linux 2.6".to_string());
+        tracker.register_syscall(60, "sys_exit_group".to_string(), SyscallLifecycle::Introduced, "Linux 3.x".to_string());
         tracker
     }
 
-    pub fn register_syscall(
-        &mut self,
-        num: u32,
-        name: String,
-        lifecycle: SyscallLifecycle,
-        version: String,
-    ) {
-        self.tracking_pool.insert(
-            num,
-            SyscallHistory {
-                name,
-                lifecycle,
-                since_kernel_version: version,
-            },
-        );
+    pub fn register_syscall(&mut self, num: u32, name: String, lifecycle: SyscallLifecycle, version: String) {
+        self.tracking_pool.insert(num, SyscallHistory {
+            name,
+            lifecycle,
+            since_kernel_version: version,
+        });
     }
 
     pub fn query_lifecycle(&self, num: u32) -> Option<&SyscallHistory> {
