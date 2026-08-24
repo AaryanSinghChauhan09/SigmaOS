@@ -55,6 +55,8 @@ pub enum PowerState {
 pub struct SimpleDevice {
     pub id: DeviceID,
     pub name: [u8; 64],
+    /// Cached byte length of `name` to eliminate linear zero-byte scans on every slice access.
+    pub name_len: u8,
     pub device_class: AtomicUsize,
     pub power_state: PowerState,
     pub capability_token: u64,
@@ -70,6 +72,7 @@ impl SimpleDevice {
         SimpleDevice {
             id,
             name: name_array,
+            name_len: name_len as u8,
             device_class: AtomicUsize::new(device_class as usize),
             power_state: PowerState::D0,
             capability_token: 0,
@@ -82,8 +85,9 @@ impl Device for SimpleDevice {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt performance optimization: Return O(1) cached slice using stored name_len,
+        // eliminating the O(N) zero-byte linear scan up to 64 bytes on device lookups.
+        &self.name[..self.name_len as usize]
     }
     fn device_class(&self) -> DeviceClass {
         unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst)) }

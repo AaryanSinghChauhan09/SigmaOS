@@ -122,6 +122,9 @@ mod epoll;
 #[path = "../src/loader/elf/relocation.rs"]
 mod elf_relocation;
 
+#[path = "../src/device/manager.rs"]
+mod device_manager;
+
 use community_toolkit::{
     CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore,
     HybridFirewallTemplateStore, VirtualizationBlueprintStore,
@@ -745,4 +748,21 @@ fn test_sovereign_ostree_and_io_uring_inspection() {
         data: vec![0u8; 512],
     }).is_ok());
     assert_eq!(io_ring.submit_and_wait(), 1);
+}
+
+#[test]
+fn test_device_manager_and_simple_device() {
+    use device_manager::{SimpleDevice, DeviceClass, Device, SimpleDeviceManager, DeviceManager, PowerState};
+
+    let dev = SimpleDevice::new(42, b"sovereign_nvme_drive", DeviceClass::Block);
+    assert_eq!(dev.id(), 42);
+    assert_eq!(dev.name(), b"sovereign_nvme_drive");
+    assert_eq!(dev.device_class(), DeviceClass::Block);
+    assert_eq!(dev.get_power_state(), PowerState::D0);
+
+    let mut mgr = SimpleDeviceManager::new();
+    let id = mgr.register_device(alloc::boxed::Box::new(dev)).unwrap();
+    assert_eq!(id, 42);
+    let registered_dev = mgr.get_device(42).unwrap();
+    assert_eq!(registered_dev.name(), b"sovereign_nvme_drive");
 }
