@@ -63,3 +63,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-25 - Caching Stored Byte Lengths for SimpleDevice
 **Learning:** In device management and driver probing hot paths (`SimpleDevice`), calling `dev.name()` repeatedly executed an $O(N)$ linear byte scan (`.position(|&b| b == 0)`) over 64-byte name arrays on every device lookup, list, and status check. Storing `name_len: u8` during `SimpleDevice::new()` initialization turns slice retrieval into an instantaneous $O(1)$ constant-time lookup `&self.name[..self.name_len as usize]`, eliminating linear scanning overhead during high-frequency hardware device management routines.
 **Action:** Always store explicit byte lengths (`name_len: u8`) alongside fixed-size byte array fields in device management structures to guarantee $O(1)$ constant-time slice lookups.
+
+## 2026-08-26 - Single-Pass Map Iteration in Hardware Threshold Checkers
+**Learning:** In hardware watchdog/health monitoring systems (`WatchdogManager::check_thresholds`), calling repeated `get(&key)` queries on `BTreeMap` or `HashMap` for each distinct threshold enum variant introduces $O(K \log N)$ B-tree search traversals. Replacing key lookups with a single-pass iterator (`self.thresholds.iter()`) over configured thresholds reduces total lookup time to $O(N)$, eliminating redundant map search traversals during high-frequency telemetry cycles.
+**Action:** Iterate directly over collections (`map.iter()`) instead of making multiple `map.get(&key)` lookups when processing set threshold conditions.
