@@ -46,6 +46,7 @@ pub trait Metric {
 pub struct SimpleMetric {
     pub id: MetricID,
     pub name: [u8; 64],
+    pub name_len: u8, // Cached byte length for O(1) slicing
     pub metric_type: AtomicUsize,
     pub value: AtomicUsize,
 }
@@ -60,6 +61,7 @@ impl SimpleMetric {
         SimpleMetric {
             id,
             name: name_array,
+            name_len: name_len as u8,
             metric_type: AtomicUsize::new(metric_type as usize),
             value: AtomicUsize::new((value * 10000.0) as usize),
         }
@@ -69,8 +71,8 @@ impl SimpleMetric {
 impl Metric for SimpleMetric {
     fn id(&self) -> MetricID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Use stored explicit name length for O(1) constant-time slicing
+        &self.name[..self.name_len as usize]
     }
     fn metric_type(&self) -> MetricType { unsafe { core::mem::transmute(self.metric_type.load(Ordering::SeqCst)) } }
     fn value(&self) -> f64 { (self.value.load(Ordering::SeqCst) as f64) / 10000.0 }
