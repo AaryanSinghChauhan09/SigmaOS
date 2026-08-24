@@ -25,6 +25,9 @@ pub trait DigitalIdentity {
 pub struct SimpleDigitalIdentity {
     pub id: IdentityID,
     pub did: [u8; 128],
+    /// Bolt ⚡ Performance Caching: Explicit byte length of the DID string buffer
+    /// guarantees O(1) constant-time slice lookups without linear scanning.
+    pub did_len: u8,
     pub identity_type: AtomicUsize,
     pub public_key: [u8; 64],
 }
@@ -43,6 +46,7 @@ impl SimpleDigitalIdentity {
         SimpleDigitalIdentity {
             id,
             did: did_array,
+            did_len: did_len as u8,
             identity_type: AtomicUsize::new(identity_type as usize),
             public_key,
         }
@@ -52,8 +56,9 @@ impl SimpleDigitalIdentity {
 impl DigitalIdentity for SimpleDigitalIdentity {
     fn id(&self) -> IdentityID { self.id }
     fn did(&self) -> &[u8] {
-        let len = self.did.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.did[..len]
+        // Bolt ⚡ Optimization: O(1) constant-time slice access using pre-calculated did_len
+        // instead of an O(N) zero-byte linear position scan across 128 bytes.
+        &self.did[..self.did_len as usize]
     }
     fn identity_type(&self) -> IdentityType {
         match self.identity_type.load(Ordering::SeqCst) {
@@ -87,6 +92,55 @@ impl SimpleIdentityManager {
             identities: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_digital_identity_did_caching() {
+        let did_str = b"did:sigma:user:12345";
+        let identity = SimpleDigitalIdentity::new(1, did_str, IdentityType::User);
+
+        assert_eq!(identity.id(), 1);
+        assert_eq!(identity.did(), did_str);
+        assert_eq!(identity.did_len, did_str.len() as u8);
+        assert_eq!(identity.identity_type(), IdentityType::User);
+    }
+
+    #[test]
+    fn test_identity_manager_resolve_did() {
+        let mut manager = SimpleIdentityManager::new();
+        let did1 = b"did:sigma:service:auth";
+        let did2 = b"did:sigma:device:sensor";
+
+        let id1 = SimpleDigitalIdentity::new(101, did1, IdentityType::Service);
+        let id2 = SimpleDigitalIdentity::new(102, did2, IdentityType::Device);
+
+        manager.register_identity(Box::new(id1)).unwrap();
+        manager.register_identity(Box::new(id2)).unwrap();
+
+        assert_eq!(manager.resolve_did(did1), Some(101));
+        assert_eq!(manager.resolve_did(did2), Some(102));
+        assert_eq!(manager.resolve_did(b"did:sigma:unknown"), None);
+    }
+
+    #[test]
+    fn test_credential_and_decentralized_auth() {
+        let mut manager = SimpleIdentityManager::new();
+        let did = b"did:sigma:user:alice";
+        let identity = SimpleDigitalIdentity::new(1, did, IdentityType::User);
+        manager.register_identity(Box::new(identity)).unwrap();
+
+        let auth = SimpleDecentralizedAuth::new(manager);
+        assert_eq!(auth.authenticate(did, b"proof_token"), Ok(1));
+        assert!(auth.create_proof(1, b"challenge").is_ok());
+
+        let mut cred_mgr = SimpleCredentialManager::new();
+        assert_eq!(cred_mgr.issue_credential(1, 2, b"admin_claim"), Ok(()));
+        assert_eq!(cred_mgr.revoke_credential(0), Ok(()));
     }
 }
 
