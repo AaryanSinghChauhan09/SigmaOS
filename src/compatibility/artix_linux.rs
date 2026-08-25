@@ -98,13 +98,13 @@ impl ArtixPacman {
 
     /// Install package (pacman -S)
     pub fn install(&mut self, package: &str) -> Result<(), ArtixError> {
-        if self.installed.contains_key(package) {
+        if self.installed.contains_key_str(package) {
             return Err(ArtixError::PackageNotFound);
         }
 
         let pkg = self
             .available
-            .get(package)
+            .get_str(package)
             .ok_or(ArtixError::PackageNotFound)?
             .clone();
 
@@ -121,7 +121,7 @@ impl ArtixPacman {
 
         // Resolve dependencies
         for dep in &pkg.dependencies {
-            if !self.installed.contains_key(dep) {
+            if !self.installed.contains_key_str(dep) {
                 self.install(dep)?;
             }
         }
@@ -132,7 +132,7 @@ impl ArtixPacman {
 
     /// Remove package (pacman -R)
     pub fn remove(&mut self, package: &str, recursive: bool) -> Result<(), ArtixError> {
-        if !self.installed.contains_key(package) {
+        if !self.installed.contains_key_str(package) {
             return Err(ArtixError::PackageNotFound);
         }
 
@@ -155,7 +155,7 @@ impl ArtixPacman {
         let mut to_upgrade = Vec::new();
 
         for (name, installed_pkg) in &self.installed {
-            if let Some(available_pkg) = self.available.get(name) {
+            if let Some(available_pkg) = self.available.get_str(name) {
                 if available_pkg.version != installed_pkg.version || 
                    available_pkg.release != installed_pkg.release {
                     to_upgrade.push(name.clone());
@@ -244,7 +244,7 @@ impl OpenRCInit {
     }
 
     pub fn rc_service(&mut self, service: &str, action: &str) -> Result<(), &'static str> {
-        if let Some(svc) = self.services.get_mut(service) {
+        if let Some(svc) = self.services.get_mut_str(service) {
             match action {
                 "start" => {
                     svc.state = OpenRCServiceState::Started;
@@ -271,7 +271,7 @@ impl OpenRCInit {
     }
 
     pub fn rc_update(&mut self, service: &str, runlevel: &str, operation: &str) -> Result<(), &'static str> {
-        if let Some(svc) = self.services.get_mut(service) {
+        if let Some(svc) = self.services.get_mut_str(service) {
             match operation {
                 "add" => {
                     svc.enabled = true;
