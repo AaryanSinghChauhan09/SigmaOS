@@ -354,44 +354,25 @@ impl WatchdogManager {
 
     /// Check if thresholds are exceeded
     pub fn check_thresholds(&self) -> Vec<MonitorThreshold> {
+        // Bolt Optimization: Single-pass iteration over thresholds map instead of repeated key lookups.
+        // Direct iteration eliminates map lookup and tree traversal overhead during high-frequency health checks.
         let mut exceeded = Vec::new();
-
-        if let Some(&threshold) = self.thresholds.get(&MonitorThreshold::CpuTempCritical) {
-            if self.monitor.cpu_temperature >= threshold {
-                exceeded.push(MonitorThreshold::CpuTempCritical);
+        for (&metric, &threshold) in self.thresholds.iter() {
+            let val = match metric {
+                MonitorThreshold::CpuTempCritical | MonitorThreshold::CpuTempWarning => {
+                    self.monitor.cpu_temperature
+                }
+                MonitorThreshold::MemoryCritical | MonitorThreshold::MemoryWarning => {
+                    self.monitor.memory_usage
+                }
+                MonitorThreshold::DiskCritical | MonitorThreshold::DiskWarning => {
+                    self.monitor.disk_usage
+                }
+            };
+            if val >= threshold {
+                exceeded.push(metric);
             }
         }
-
-        if let Some(&threshold) = self.thresholds.get(&MonitorThreshold::CpuTempWarning) {
-            if self.monitor.cpu_temperature >= threshold {
-                exceeded.push(MonitorThreshold::CpuTempWarning);
-            }
-        }
-
-        if let Some(&threshold) = self.thresholds.get(&MonitorThreshold::MemoryCritical) {
-            if self.monitor.memory_usage >= threshold {
-                exceeded.push(MonitorThreshold::MemoryCritical);
-            }
-        }
-
-        if let Some(&threshold) = self.thresholds.get(&MonitorThreshold::MemoryWarning) {
-            if self.monitor.memory_usage >= threshold {
-                exceeded.push(MonitorThreshold::MemoryWarning);
-            }
-        }
-
-        if let Some(&threshold) = self.thresholds.get(&MonitorThreshold::DiskCritical) {
-            if self.monitor.disk_usage >= threshold {
-                exceeded.push(MonitorThreshold::DiskCritical);
-            }
-        }
-
-        if let Some(&threshold) = self.thresholds.get(&MonitorThreshold::DiskWarning) {
-            if self.monitor.disk_usage >= threshold {
-                exceeded.push(MonitorThreshold::DiskWarning);
-            }
-        }
-
         exceeded
     }
 
