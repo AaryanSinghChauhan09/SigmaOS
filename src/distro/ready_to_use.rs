@@ -1,10 +1,18 @@
 extern crate alloc;
 // SPDX-License-Identifier: MIT
-//! Ready-to-Use OS Usability Primitives
-//! Linux & BSD-inspired Service Supervision, Mount Management, User Session Environment, and Hotplug PnP Hardware Driver Binding.
+// Ready-to-Use OS Usability Primitives
+// Linux & BSD-inspired Service Supervision, Mount Management, User Session Environment, and Hotplug PnP Hardware Driver Binding.
 
+#[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
-use alloc::string::String;
+
+#[cfg(test)]
+use std::collections::HashMap;
+
+#[cfg(test)]
+use std::vec::Vec;
+
+use alloc::string::{String, ToString};
 
 /// Service execution state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -103,7 +111,8 @@ impl DistroServiceManager {
         let mut active: Vec<String> = Vec::new();
         for (name, unit) in self.services.iter() {
             if unit.state == ServiceState::Running {
-                active.push(name.clone());
+                let s_name: String = name.clone();
+                active.push(s_name);
             }
         }
         active
@@ -176,7 +185,8 @@ impl UniversalMountEngine {
         let mut options: Vec<String> = Vec::new();
         if parts.len() >= 4 {
             for opt in parts[3].split(',') {
-                options.push(opt.to_string());
+                let opt_str: String = opt.trim().to_string();
+                options.push(opt_str);
             }
         }
         self.mount_table.push(MountEntry {
@@ -223,7 +233,8 @@ impl UniversalMountEngine {
         let mut list: Vec<String> = Vec::new();
         for entry in self.mount_table.iter() {
             if entry.mounted {
-                list.push(entry.file.clone());
+                let f_path: String = entry.file.clone();
+                list.push(f_path);
             }
         }
         list
@@ -382,8 +393,10 @@ impl PlugAndPlayHardwareManager {
             HardwareEvent::DeviceAdded(dev_path, category) => {
                 let mut bound_driver: Option<String> = None;
                 for (driver_name, supported_cats) in self.registered_drivers.iter() {
-                    if supported_cats.contains(&category) {
-                        bound_driver = Some(driver_name.clone());
+                    let cats: &Vec<DeviceCategory> = supported_cats;
+                    if cats.contains(&category) {
+                        let d_name: String = driver_name.clone();
+                        bound_driver = Some(d_name);
                         break;
                     }
                 }
@@ -406,7 +419,8 @@ impl PlugAndPlayHardwareManager {
         let mut list: Vec<String> = Vec::new();
         for (path, node) in self.devices.iter() {
             if node.driver_bound.is_some() {
-                list.push(path.clone());
+                let d_path: String = path.clone();
+                list.push(d_path);
             }
         }
         list

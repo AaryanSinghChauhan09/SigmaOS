@@ -173,6 +173,9 @@ pub use distro::{
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
     NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
+    DistroServiceManager, ServiceUnit as DistroServiceUnit, MountEntry, MountType, UniversalMountEngine,
+    UserAccount, SessionEnvironment, InteractiveUserEnvironment, DeviceCategory,
+    HardwareEvent, DeviceNode, PlugAndPlayHardwareManager,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
