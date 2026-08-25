@@ -104,17 +104,14 @@ impl InitSystem {
     }
     
     pub fn start_service(&mut self, name: &str) -> Result<(), InitError> {
-        let index = self
-            .services
-            .iter()
-            .position(|s| s.name == name)
-            .ok_or(InitError::ServiceNotFound)?;
-
-        self.resolve_dependencies(&self.services[index])?;
-
-        self.services[index].state = ServiceState::Running;
-        self.services[index].enabled = true;
-        Ok(())
+        if let Some(service) = self.services.iter_mut().find(|s| s.name == name) {
+            self.resolve_dependencies(service)?;
+            service.state = ServiceState::Running;
+            service.enabled = true;
+            Ok(())
+        } else {
+            Err(InitError::ServiceNotFound)
+        }
     }
     
     pub fn stop_service(&mut self, name: &str) -> Result<(), InitError> {

@@ -459,19 +459,11 @@ pub struct SimpleContainerRuntime {
 
 /// Runtime capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,
     pub can_manage: bool,
-}
-
-pub type ContainerCapability = RuntimeCapability;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
 }
 
 impl RuntimeCapability {

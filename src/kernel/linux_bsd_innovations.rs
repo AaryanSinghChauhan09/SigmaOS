@@ -1368,6 +1368,90 @@ impl CapabilityDerivationTree {
     }
 }
 
+/// Linux cgroups v2 resource governor
+pub struct SovereignCgroupGovernor {
+    pub groups: HashMap<String, CgroupResourceLimits>,
+    pub pids: HashMap<String, Vec<u64>>,
+    pub cpu_usage: HashMap<String, u64>,
+    pub mem_usage: HashMap<String, u64>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct CgroupResourceLimits {
+    pub cpu_quota_us: u64,
+    pub cpu_period_us: u64,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u32,
+}
+
+impl SovereignCgroupGovernor {
+    pub fn new() -> Self {
+        Self {
+            groups: HashMap::new(),
+            pids: HashMap::new(),
+            cpu_usage: HashMap::new(),
+            mem_usage: HashMap::new(),
+        }
+    }
+
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        self.groups.insert(path.to_string(), CgroupResourceLimits {
+            cpu_quota_us: 100_000,
+            cpu_period_us: 100_000,
+            memory_max_bytes: 1024 * 1024 * 1024,
+            memory_high_bytes: 512 * 1024 * 1024,
+            memory_swap_max_bytes: 0,
+            io_weight: 100,
+        });
+        self.pids.insert(path.to_string(), Vec::new());
+        self.cpu_usage.insert(path.to_string(), 0);
+        self.mem_usage.insert(path.to_string(), 0);
+        Ok(())
+    }
+
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+        if let Some(l) = self.groups.get_mut(path) {
+            *l = limits;
+            Ok(())
+        } else {
+            Err("Cgroup not found")
+        }
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
+        if let Some(list) = self.pids.get_mut(path) {
+            list.push(pid);
+            Ok(())
+        } else {
+            Err("Cgroup not found")
+        }
+    }
+
+    pub fn check_cpu_budget(&mut self, path: &str, requested_us: u64) -> Result<bool, &'static str> {
+        let limits = *self.groups.get(path).ok_or("Cgroup not found")?;
+        let current = self.cpu_usage.get_mut(path).ok_or("Cgroup not found")?;
+        if *current + requested_us > limits.cpu_quota_us {
+            Ok(false)
+        } else {
+            *current += requested_us;
+            Ok(true)
+        }
+    }
+
+    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
+        let limits = *self.groups.get(path).ok_or("Cgroup not found")?;
+        let current = self.mem_usage.get_mut(path).ok_or("Cgroup not found")?;
+        if *current + bytes > limits.memory_max_bytes {
+            Err("Memory limit exceeded")
+        } else {
+            *current += bytes;
+            Ok(())
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -21,92 +21,89 @@ pub enum AnsiColor {
     Rgb(u8, u8, u8),
 }
 
-/// Linux/BSD POSIX Termios Line Discipline (Raw, Cbreak, Canonical modes)
+/// Linux/BSD POSIX Termios input mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TermiosInputMode {
-    Canonical,
-    Raw,
-    Cbreak,
+    Canonical, // Line buffered, line editing enabled (backspace, enter)
+    Raw,       // Character-by-character, no echo, no signal processing
+    Cbreak,    // Character-by-character with signal processing
 }
 
+/// Events emitted by POSIX Termios Line Discipline
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TermiosInputEvent {
+    LineSubmitted(String),
+    CharRead(char),
+    SignalInt,  // ^C
+    SignalStop, // ^Z
+    Eof,        // ^D
+}
+
+/// Linux & BSD POSIX Termios Line Discipline Processor
 #[derive(Debug, Clone)]
 pub struct TermiosLineDiscipline {
     pub mode: TermiosInputMode,
-    pub echo: bool,
-    pub echoe: bool,
-    pub echok: bool,
-    pub icanon: bool,
-    pub isig: bool,
-    pub buffer: Vec<u8>,
+    pub echo_enabled: bool,
+    pub line_buffer: String,
 }
 
 impl TermiosLineDiscipline {
-    pub fn new() -> Self {
+    pub fn new(mode: TermiosInputMode) -> Self {
         Self {
-            mode: TermiosInputMode::Canonical,
-            echo: true,
-            echoe: true,
-            echok: true,
-            icanon: true,
-            isig: true,
-            buffer: Vec::new(),
+            mode,
+            echo_enabled: true,
+            line_buffer: String::new(),
         }
     }
 
     pub fn set_mode(&mut self, mode: TermiosInputMode) {
         self.mode = mode;
-        match mode {
-            TermiosInputMode::Canonical => {
-                self.icanon = true;
-                self.echo = true;
-                self.isig = true;
-            }
-            TermiosInputMode::Raw => {
-                self.icanon = false;
-                self.echo = false;
-                self.isig = false;
-            }
-            TermiosInputMode::Cbreak => {
-                self.icanon = false;
-                self.echo = true;
-                self.isig = true;
-            }
-        }
     }
 
-    pub fn process_input_byte(&mut self, b: u8) -> Option<Vec<u8>> {
-        if self.mode == TermiosInputMode::Raw || self.mode == TermiosInputMode::Cbreak {
-            return Some(alloc::vec![b]);
-        }
-
-        match b {
-            b'\n' | b'\r' => {
-                let mut line = self.buffer.clone();
-                line.push(b'\n');
-                self.buffer.clear();
-                Some(line)
-            }
-            0x7f | 0x08 => {
-                if self.echoe && !self.buffer.is_empty() {
-                    self.buffer.pop();
+    pub fn process_input_char(&mut self, c: char) -> TermiosInputEvent {
+        match self.mode {
+            TermiosInputMode::Raw => TermiosInputEvent::CharRead(c),
+            TermiosInputMode::Cbreak => match c {
+                '\x03' => TermiosInputEvent::SignalInt,  // ^C
+                '\x1a' => TermiosInputEvent::SignalStop, // ^Z
+                '\x04' => TermiosInputEvent::Eof,        // ^D
+                _ => TermiosInputEvent::CharRead(c),
+            },
+            TermiosInputMode::Canonical => match c {
+                '\x03' => {
+                    self.line_buffer.clear();
+                    TermiosInputEvent::SignalInt
                 }
-                None
-            }
-            _ => {
-                self.buffer.push(b);
-                None
-            }
+                '\x1a' => TermiosInputEvent::SignalStop,
+                '\x04' => {
+                    if self.line_buffer.is_empty() {
+                        TermiosInputEvent::Eof
+                    } else {
+                        let line = self.line_buffer.clone();
+                        self.line_buffer.clear();
+                        TermiosInputEvent::LineSubmitted(line)
+                    }
+                }
+                '\n' | '\r' => {
+                    let line = self.line_buffer.clone();
+                    self.line_buffer.clear();
+                    TermiosInputEvent::LineSubmitted(line)
+                }
+                '\x08' | '\x7f' => {
+                    // Backspace / Erase
+                    self.line_buffer.pop();
+                    TermiosInputEvent::CharRead('\x08')
+                }
+                _ => {
+                    self.line_buffer.push(c);
+                    TermiosInputEvent::CharRead(c)
+                }
+            },
         }
     }
 }
 
-impl Default for TermiosLineDiscipline {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// BSD Console & Linux VT Theme Palettes
+/// BSD Console Preset Color Schemes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BsdConsoleTheme {
     Vt100Classic,
@@ -117,91 +114,61 @@ pub enum BsdConsoleTheme {
     GruvboxDark,
 }
 
-#[derive(Debug, Clone)]
+/// Color Palette definitions for BSD Console Themes
+#[derive(Debug, Clone, Copy)]
 pub struct BsdConsoleColorPalette {
-    pub theme: BsdConsoleTheme,
     pub foreground_rgb: (u8, u8, u8),
     pub background_rgb: (u8, u8, u8),
-    pub ansi_colors: [(u8, u8, u8); 16],
+    pub selection_rgb: (u8, u8, u8),
+    pub cursor_rgb: (u8, u8, u8),
 }
 
-impl BsdConsoleColorPalette {
-    pub fn from_theme(theme: BsdConsoleTheme) -> Self {
-        match theme {
-            BsdConsoleTheme::Vt100Classic => Self {
-                theme,
-                foreground_rgb: (0, 255, 0),
-                background_rgb: (0, 0, 0),
-                ansi_colors: [
-                    (0, 0, 0), (170, 0, 0), (0, 170, 0), (170, 85, 0),
-                    (0, 0, 170), (170, 0, 170), (0, 170, 170), (170, 170, 170),
-                    (85, 85, 85), (255, 85, 85), (85, 255, 85), (255, 255, 85),
-                    (85, 85, 255), (255, 85, 255), (85, 255, 255), (255, 255, 255),
-                ],
+impl BsdConsoleTheme {
+    pub fn palette(self) -> BsdConsoleColorPalette {
+        match self {
+            BsdConsoleTheme::Vt100Classic => BsdConsoleColorPalette {
+                foreground_rgb: (0, 255, 0),     // Green
+                background_rgb: (0, 0, 0),       // Black
+                selection_rgb: (0, 100, 0),
+                cursor_rgb: (0, 255, 0),
             },
-            BsdConsoleTheme::Dracula => Self {
-                theme,
+            BsdConsoleTheme::Dracula => BsdConsoleColorPalette {
                 foreground_rgb: (248, 248, 242),
                 background_rgb: (40, 42, 54),
-                ansi_colors: [
-                    (0, 0, 0), (255, 85, 85), (80, 250, 123), (241, 250, 140),
-                    (189, 147, 249), (255, 121, 198), (139, 233, 253), (191, 191, 191),
-                    (77, 77, 77), (255, 110, 110), (105, 255, 148), (244, 255, 165),
-                    (214, 172, 255), (255, 146, 223), (164, 255, 255), (255, 255, 255),
-                ],
+                selection_rgb: (68, 71, 90),
+                cursor_rgb: (248, 248, 242),
             },
-            BsdConsoleTheme::Nord => Self {
-                theme,
+            BsdConsoleTheme::Nord => BsdConsoleColorPalette {
                 foreground_rgb: (216, 222, 233),
                 background_rgb: (46, 52, 64),
-                ansi_colors: [
-                    (59, 66, 82), (191, 97, 106), (163, 190, 140), (235, 203, 139),
-                    (129, 161, 193), (180, 142, 173), (136, 192, 208), (229, 233, 240),
-                    (76, 86, 106), (191, 97, 106), (163, 190, 140), (235, 203, 139),
-                    (129, 161, 193), (180, 142, 173), (143, 188, 187), (236, 239, 244),
-                ],
+                selection_rgb: (67, 76, 94),
+                cursor_rgb: (216, 222, 233),
             },
-            BsdConsoleTheme::SolarizedDark => Self {
-                theme,
+            BsdConsoleTheme::SolarizedDark => BsdConsoleColorPalette {
                 foreground_rgb: (131, 148, 150),
                 background_rgb: (0, 43, 54),
-                ansi_colors: [
-                    (7, 54, 66), (220, 50, 47), (133, 153, 0), (181, 137, 0),
-                    (38, 139, 210), (211, 54, 130), (42, 161, 152), (238, 232, 213),
-                    (0, 43, 54), (203, 75, 22), (88, 110, 117), (101, 123, 131),
-                    (131, 148, 150), (108, 113, 196), (147, 161, 161), (253, 246, 227),
-                ],
+                selection_rgb: (7, 54, 66),
+                cursor_rgb: (147, 161, 161),
             },
-            BsdConsoleTheme::Monokai => Self {
-                theme,
+            BsdConsoleTheme::Monokai => BsdConsoleColorPalette {
                 foreground_rgb: (248, 248, 242),
                 background_rgb: (39, 40, 34),
-                ansi_colors: [
-                    (39, 40, 34), (249, 38, 114), (166, 226, 46), (244, 191, 117),
-                    (102, 217, 239), (174, 129, 255), (161, 239, 228), (248, 248, 242),
-                    (117, 113, 94), (249, 38, 114), (166, 226, 46), (244, 191, 117),
-                    (102, 217, 239), (174, 129, 255), (161, 239, 228), (249, 248, 245),
-                ],
+                selection_rgb: (73, 72, 62),
+                cursor_rgb: (248, 248, 240),
             },
-            BsdConsoleTheme::GruvboxDark => Self {
-                theme,
+            BsdConsoleTheme::GruvboxDark => BsdConsoleColorPalette {
                 foreground_rgb: (235, 219, 178),
                 background_rgb: (40, 40, 40),
-                ansi_colors: [
-                    (40, 40, 40), (204, 36, 29), (152, 151, 26), (215, 153, 33),
-                    (69, 133, 136), (177, 98, 134), (104, 157, 106), (168, 153, 132),
-                    (146, 131, 116), (251, 73, 52), (184, 187, 38), (250, 189, 47),
-                    (131, 165, 152), (211, 134, 155), (142, 192, 124), (235, 219, 178),
-                ],
+                selection_rgb: (80, 73, 69),
+                cursor_rgb: (235, 219, 178),
             },
         }
     }
 }
 
-/// Bracketed Paste Buffer for preventing pasting code execution vulnerabilities
-#[derive(Debug, Clone)]
+/// Safe Bracketed Paste Buffer (\x1b[200~ ... \x1b[201~)
+#[derive(Debug, Clone, Default)]
 pub struct BracketedPasteBuffer {
-    pub is_enabled: bool,
     pub is_pasting: bool,
     pub paste_content: String,
 }
@@ -209,7 +176,6 @@ pub struct BracketedPasteBuffer {
 impl BracketedPasteBuffer {
     pub fn new() -> Self {
         Self {
-            is_enabled: false,
             is_pasting: false,
             paste_content: String::new(),
         }
@@ -220,9 +186,9 @@ impl BracketedPasteBuffer {
         self.paste_content.clear();
     }
 
-    pub fn append(&mut self, text: &str) {
+    pub fn append_char(&mut self, c: char) {
         if self.is_pasting {
-            self.paste_content.push_str(text);
+            self.paste_content.push(c);
         }
     }
 
@@ -231,12 +197,6 @@ impl BracketedPasteBuffer {
         let content = self.paste_content.clone();
         self.paste_content.clear();
         content
-    }
-}
-
-impl Default for BracketedPasteBuffer {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -361,6 +321,9 @@ pub struct TerminalSession {
     pub graphics_frames: Vec<SixelGraphicFrame>,
     pub trigger_rules: Vec<TriggerRule>,
     pub visual_bell_active: bool,
+    pub line_discipline: TermiosLineDiscipline,
+    pub bracketed_paste: BracketedPasteBuffer,
+    pub theme: BsdConsoleTheme,
 }
 
 /// Sixel & Kitty Graphics Protocol Data Frame
@@ -484,33 +447,20 @@ impl TriggerRule {
 
 impl TerminalSession {
     pub fn new(width: usize, height: usize) -> Self {
-        let mut session = Self {
-            cursor_x: 0,
-            cursor_y: 0,
-            width,
-            height,
-            foreground: AnsiColor::Default,
-            background: AnsiColor::Default,
-            bold: false,
-            scrollback: Vec::new(),
-            current_line: String::new(),
-            aliases: BTreeMap::new(),
-            user_functions: BTreeMap::new(),
-            suggestion_engine: AutoSuggestionEngine::new(),
-        };
+        let mut suggestion_engine = AutoSuggestionEngine::new();
 
         // Standard Linux distro utilities to beat
-        session.suggestion_engine.register_builtin("ls");
-        session.suggestion_engine.register_builtin("cd");
-        session.suggestion_engine.register_builtin("pwd");
-        session.suggestion_engine.register_builtin("echo");
-        session.suggestion_engine.register_builtin("systemctl");
-        session.suggestion_engine.register_builtin("apt");
-        session.suggestion_engine.register_builtin("sigpkg");
+        suggestion_engine.register_builtin("ls");
+        suggestion_engine.register_builtin("cd");
+        suggestion_engine.register_builtin("pwd");
+        suggestion_engine.register_builtin("echo");
+        suggestion_engine.register_builtin("systemctl");
+        suggestion_engine.register_builtin("apt");
+        suggestion_engine.register_builtin("sigpkg");
 
         let multiplexer = TerminalMultiplexer::new(width, height);
 
-        session = Self {
+        Self {
             cursor_x: 0,
             cursor_y: 0,
             width,
@@ -522,14 +472,15 @@ impl TerminalSession {
             current_line: String::new(),
             aliases: BTreeMap::new(),
             user_functions: BTreeMap::new(),
-            suggestion_engine: session.suggestion_engine,
+            suggestion_engine,
             multiplexer,
             graphics_frames: Vec::new(),
             trigger_rules: Vec::new(),
             visual_bell_active: false,
-        };
-
-        session
+            line_discipline: TermiosLineDiscipline::new(TermiosInputMode::Canonical),
+            bracketed_paste: BracketedPasteBuffer::new(),
+            theme: BsdConsoleTheme::Vt100Classic,
+        }
     }
 
     /// OpenBSD wsdisplay-style Visual Bell trigger
@@ -800,6 +751,15 @@ impl TerminalSession {
                                 self.foreground = AnsiColor::Xterm256(color_val);
                             }
                             i += 2;
+                        } else if i + 4 < parts.len() && parts[i + 1] == "2" {
+                            if let (Ok(r), Ok(g), Ok(b)) = (
+                                parts[i + 2].parse::<u8>(),
+                                parts[i + 3].parse::<u8>(),
+                                parts[i + 4].parse::<u8>(),
+                            ) {
+                                self.foreground = AnsiColor::Rgb(r, g, b);
+                            }
+                            i += 4;
                         }
                     }
                     40 => self.background = AnsiColor::Black,
@@ -816,6 +776,15 @@ impl TerminalSession {
                                 self.background = AnsiColor::Xterm256(color_val);
                             }
                             i += 2;
+                        } else if i + 4 < parts.len() && parts[i + 1] == "2" {
+                            if let (Ok(r), Ok(g), Ok(b)) = (
+                                parts[i + 2].parse::<u8>(),
+                                parts[i + 3].parse::<u8>(),
+                                parts[i + 4].parse::<u8>(),
+                            ) {
+                                self.background = AnsiColor::Rgb(r, g, b);
+                            }
+                            i += 4;
                         }
                     }
                     _ => {}
@@ -879,6 +848,12 @@ mod tests {
         // \x1B[48;5;201m -> Xterm256 color 201 background
         session.parse_ansi("\x1B[48;5;201m");
         assert_eq!(session.background, AnsiColor::Xterm256(201));
+
+        // 24-bit TrueColor RGB
+        session.parse_ansi("\x1B[38;2;255;100;50m");
+        assert_eq!(session.foreground, AnsiColor::Rgb(255, 100, 50));
+        session.parse_ansi("\x1B[48;2;10;20;30m");
+        assert_eq!(session.background, AnsiColor::Rgb(10, 20, 30));
 
         // Test Cursor Movement sequences
         // \x1B[5A -> Move up 5 lines
@@ -1053,5 +1028,29 @@ mod tests {
         assert_eq!(matches.len(), 1);
         assert_eq!(matches[0].1, 6); // Starts at index 6
         assert_eq!(matches[0].0.highlight_color, AnsiColor::Cyan);
+    }
+
+    #[test]
+    fn test_termios_line_discipline_and_themes() {
+        let mut ld = TermiosLineDiscipline::new(TermiosInputMode::Canonical);
+        assert_eq!(ld.process_input_char('a'), TermiosInputEvent::CharRead('a'));
+        assert_eq!(ld.process_input_char('b'), TermiosInputEvent::CharRead('b'));
+        assert_eq!(ld.process_input_char('\x08'), TermiosInputEvent::CharRead('\x08')); // Backspace
+
+        let sub = ld.process_input_char('\n');
+        assert_eq!(sub, TermiosInputEvent::LineSubmitted("a".to_string()));
+
+        // Test themes
+        let theme = BsdConsoleTheme::Dracula;
+        let palette = theme.palette();
+        assert_eq!(palette.background_rgb, (40, 42, 54));
+
+        // Test Bracketed Paste
+        let mut paste = BracketedPasteBuffer::new();
+        paste.start_paste();
+        paste.append_char('c');
+        paste.append_char('m');
+        paste.append_char('d');
+        assert_eq!(paste.end_paste(), "cmd");
     }
 }

@@ -73,7 +73,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let (config, jid) = if let Some(jail) = self.jails.get_mut(name) {
+        if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -85,77 +85,67 @@ impl SigmaJailManager {
             self.next_jid += 1;
             jail.jid = Some(jid);
 
-            (jail.config.clone(), jid)
-        } else {
-            return Err(format!("Jail '{}' not found", name).into());
-        };
+            // Create network namespace if IP specified
+            if let Some(ip) = &jail.config.ip_address {
+                self.setup_jail_network(jid, ip)?;
+            }
 
-        // Create network namespace if IP specified
-        if let Some(ip) = &config.ip_address {
-            self.setup_jail_network(jid, ip)?;
-        }
+            // Mount jail filesystem
+            self.mount_jail_fs(&jail.config)?;
 
-        // Mount jail filesystem
-        self.mount_jail_fs(&config)?;
+            // Apply security restrictions
+            self.apply_jail_restrictions(jid, &jail.config)?;
 
-        // Apply security restrictions
-        self.apply_jail_restrictions(jid, &config)?;
+            // Execute startup script
+            if let Some(exec_start) = &jail.config.exec_start {
+                self.execute_in_jail(jid, exec_start)?;
+            }
 
-        // Execute startup script
-        if let Some(exec_start) = &config.exec_start {
-            self.execute_in_jail(jid, exec_start)?;
-        }
-
-        if let Some(jail) = self.jails.get_mut(name) {
             jail.state = JailState::Running;
             println!("Jail '{}' started with JID {}", name, jid);
-        }
 
-        Ok(())
+            Ok(())
+        } else {
+            Err(format!("Jail '{}' not found", name).into())
+        }
     }
 
     /// Stop a jail
     pub fn stop_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let (config, jid, processes) = if let Some(jail) = self.jails.get_mut(name) {
+        if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Running {
                 return Err(format!("Jail '{}' is not running", name).into());
             }
 
             jail.state = JailState::Stopping;
-            (jail.config.clone(), jail.jid, jail.processes.clone())
-        } else {
-            return Err(format!("Jail '{}' not found", name).into());
-        };
 
-        // Execute stop script
-        if let Some(exec_stop) = &config.exec_stop {
-            if let Some(jid_val) = jid {
-                let _ = self.execute_in_jail(jid_val, exec_stop);
+            // Execute stop script
+            if let Some(exec_stop) = &jail.config.exec_stop {
+                if let Some(jid) = jail.jid {
+                    let _ = self.execute_in_jail(jid, exec_stop);
+                }
             }
-        }
 
-        // Kill all processes in jail
-        if let Some(jail) = self.jails.get(name) {
+            // Kill all processes in jail
             self.kill_jail_processes(jail)?;
-        }
 
-        // Unmount jail filesystem
-        self.unmount_jail_fs(&config)?;
+            // Unmount jail filesystem
+            self.unmount_jail_fs(&jail.config)?;
 
-        // Cleanup network
-        if let Some(jid_val) = jid {
-            self.cleanup_jail_network(jid_val)?;
-        }
+            // Cleanup network
+            if let Some(jid) = jail.jid {
+                self.cleanup_jail_network(jid)?;
+            }
 
-        if let Some(jail) = self.jails.get_mut(name) {
             jail.state = JailState::Stopped;
             jail.jid = None;
             jail.processes.clear();
 
             println!("Jail '{}' stopped", name);
+            Ok(())
+        } else {
+            Err(format!("Jail '{}' not found", name).into())
         }
-
-        Ok(())
     }
 
     /// Execute command in jail

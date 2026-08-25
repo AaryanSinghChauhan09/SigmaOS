@@ -8,7 +8,7 @@
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
-type SigmaU8 = u8;
+type SigmaU8  = u8;
 type SigmaU16 = u16;
 type SigmaU32 = u32;
 type SigmaU64 = u64;
@@ -195,16 +195,12 @@ impl SigmaOSSetupWizard {
     /// Validates complete configuration and verifies build integrity prior to execution
     pub fn verify_configuration(&self) -> bool {
         // Enforce anti-bloat validation: Embedded system image cannot exceed 80MB
-        if self.config.profile == TargetHardwareProfile::RealTimeEmbedded
-            && self.config.system_image_size_mb > 80
-        {
+        if self.config.profile == TargetHardwareProfile::RealTimeEmbedded && self.config.system_image_size_mb > 80 {
             return false;
         }
 
         // Enforce ZeroTrust level validation: ZeroTrust must set VNET IP to local localhost bounds
-        if self.config.security_level == HardeningLevel::ZeroTrustBareMetal
-            && self.config.virtual_ip[0] != 127
-        {
+        if self.config.security_level == HardeningLevel::ZeroTrustBareMetal && self.config.virtual_ip[0] != 127 {
             return false;
         }
 
@@ -240,7 +236,8 @@ pub unsafe extern "C" fn setup_wizard_set_desktop() {
     GLOBAL_WIZARD.set_hardware_profile(TargetHardwareProfile::SovereignDesktop);
 }
 
-fn main() {}
+fn main() {
+}
 
 // ─── Module: Static Unit Tests ──────────────────────────────────────────────
 

@@ -206,11 +206,7 @@ pub use security::{
     ForensicStorageFilter, Permission, PledgeManager,
     PledgePromise, RoutingMode, SandboxPolicy,
 };
-pub use shell::{
-    AnsiColor, AutoSuggestionEngine, BracketedPasteBuffer, BsdConsoleColorPalette,
-    BsdConsoleTheme, ShellCommand, SimpleShellSession as ShellRepl, TermiosInputMode,
-    TermiosLineDiscipline, TerminalSession, UserDefinedFunction,
-};
+pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
     PackageRecipe, RecipeError, RecipeManager, SatSolver,
