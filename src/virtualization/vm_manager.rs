@@ -9,10 +9,13 @@ use crate::klib::collections::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 use alloc::format;
-use std::collections::HashMap;
 
 #[cfg(test)]
 use std::time::{SystemTime, UNIX_EPOCH};
+#[cfg(test)]
+use std::path::PathBuf;
+#[cfg(not(test))]
+use std::path::PathBuf;
 
 /// VM configuration
 #[derive(Debug, Clone)]
@@ -209,22 +212,16 @@ impl VhostUserDevice {
 pub enum KvmExitReason {
     Unknown,
     Io,
-use alloc::collections::HashMap;
-use alloc::format;
-use std::collections::HashMap;
     Mmio,
     Hypercall,
     Interrupt,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
-    Mmio,
     MmioRead { addr: u64, len: u8 },
     MmioWrite { addr: u64, len: u8, data: u64 },
-    Hypercall,
     Hlt,
     Shutdown,
     InternalError,
-    Interrupt,
 }
 
 /// KVM vCPU register state
@@ -1367,7 +1364,7 @@ impl VmManager {
                     .duration_since(std::time::UNIX_EPOCH)
                     .unwrap()
                     .as_secs(),
-                snapshot_path: PathBuf::from(format!("/var/lib/vm/snapshots/{}", snapshot_id)),
+                snapshot_path: format!("/var/lib/vm/snapshots/{}", snapshot_id),
             },
         );
 
@@ -1563,7 +1560,7 @@ mod tests {
         assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
         kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-            image_path: PathBuf::from("/var/lib/images/rootfs.qcow2"),
+            image_path: "/var/lib/images/rootfs.qcow2".to_string(),
             read_only: false,
             direct_io: true,
             queue_size: 256,
