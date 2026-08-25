@@ -4,6 +4,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
+use core::fmt;
 
 use crate::kernel::device::{Device, DeviceBinding, DeviceType, DriverError, DriverMetadata};
 use crate::kernel::object::{KRef, KernelObject};
@@ -40,12 +41,22 @@ pub trait DeviceDriver: Any + Send + Sync {
     fn set_module_param(&mut self, _param_name: &str, _value: &str) -> Result<(), DriverError> { Ok(()) }
 }
 
-#[derive(Debug, Clone)]
 pub struct DriverRegistration {
     pub driver: Box<dyn Driver>,
     pub priority: u32,
     pub builtin: bool,
     pub loaded: bool,
+}
+
+impl fmt::Debug for DriverRegistration {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("DriverRegistration")
+            .field("driver_name", &self.driver.driver_name())
+            .field("priority", &self.priority)
+            .field("builtin", &self.builtin)
+            .field("loaded", &self.loaded)
+            .finish()
+    }
 }
 
 pub struct DriverRegistry {
