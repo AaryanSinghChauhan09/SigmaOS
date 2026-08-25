@@ -2188,14 +2188,10 @@ impl DragonFlyHammer2FsSnapshotV2 {
             pfs_snapshots: Vec::new(),
             active_pfs_id: 1,
         };
-
-        assert!(sat.add_package_node(node_a));
-        assert!(sat.add_package_node(node_b));
-
-        assert!(sat.solve(0));
-        assert_eq!(sat.selected_version[0].unwrap().major, 1);
-        assert_eq!(sat.selected_version[1].unwrap().major, 2);
+        snap.pfs_snapshots.push((1, root_pfs_name.to_string(), 0));
+        snap
     }
+}
 
     #[test]
     fn test_section_6_4_jbd2_ledger() {
@@ -2491,5 +2487,3 @@ impl DragonFlyHammer2FsSnapshotV2 {
         assert_eq!(loop_engine.run_loop_step(), 1);
         assert!(loop_engine.is_running);
     }
-
-}
