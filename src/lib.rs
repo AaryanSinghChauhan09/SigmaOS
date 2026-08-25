@@ -120,18 +120,20 @@ pub use filesystem::{
 pub use governance::{
     MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
 };
+pub mod distro;
+
 pub use kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,
+    Apc, ApcMode, ApcQueue, ArchitectureEngine,
     BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
     AndroidBroadcastReceiverRegistry,
     AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
     CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
+    InstructionCyclePhase, InterruptClass, IpcError, IpcManager, Irql,
+    LcgRandom, LookasideList, LotteryTask, MemoryBlock,
+    MemoryDescriptorList, Message, Pcb, PolicyManager, PolicyError, FastPathIpc, InterruptMechanism,
+    ProtectionDomain, ResourceBroker, PrivilegeLevel, PoolType, Priority, Process,
     ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
+    RoundRobinSchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
     Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
 pub use kernel::io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};
@@ -209,7 +211,7 @@ pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
     PackageRecipe, RecipeError, RecipeManager, SatSolver,
-    Transaction, UniversalPackageAdapterManager,
+    Transaction, UniversalPackageAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
@@ -222,7 +224,7 @@ pub use unimplemented_tools::{
     DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
     AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
     MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
+    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
     CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
     SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
     PluginMarketplace, MusicLibraryManager,

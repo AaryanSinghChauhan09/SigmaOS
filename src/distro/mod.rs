@@ -92,13 +92,8 @@ pub use bsd_linux_innovations::{
     BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
     Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
     PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitService, RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
+    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
     SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
-};
-pub use linux_bsd_parity::{
-    FlakeInput, SystemClosure, NixOSFlakeEngine, HookWhen, HookAction, PacmanHook,
-    ArchPacmanHooksManager, ServiceState as RunitServiceStateEnum, VoidRunitSupervisor,
-    PortagePackage, GentooPortageUseFlagsEngine,
 };
 pub use linux_bsd_parity_extended::{
     SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,

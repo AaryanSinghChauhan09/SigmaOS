@@ -5,6 +5,7 @@ pub mod okr;
 pub mod rfc;
 pub mod strategic_vision;
 
+pub use okr::*;
 pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,

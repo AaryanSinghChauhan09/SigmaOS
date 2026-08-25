@@ -1,6 +1,7 @@
 // SigmaOS Standard CLI Utilities & Diagnostic Tools (Linux/BSD/Windows Parity)
 // Implements top/htop, ifconfig/ip, and ping equivalents inside the microkernel ecosystem.
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
