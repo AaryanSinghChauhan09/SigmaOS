@@ -1,8 +1,26 @@
 /// Security Hardening & Cryptographic Intrusion Detection Suite for SigmaOS
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
+
+#[cfg(test)]
+use std::vec::Vec;
+#[cfg(not(test))]
 use crate::klib::Vec;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp = 0,
+    FileRead = 1,
+}
+
+#[cfg(not(feature = "standalone_test"))]
+#[cfg(test)]
+use crate::security::capability::Permission;
+#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(test))]
 use crate::security::Permission;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
@@ -125,16 +143,16 @@ impl HardenedAuditTrail {
             return true;
         }
 
-        let mut expected_prev = 0x1337_C0DE_FA11_FACE;
+        let mut expected_prev: u64 = 0x1337_C0DE_FA11_FACE;
         for i in 0..self.logs.len() {
             let log = &self.logs[i];
             if log.previous_hash != expected_prev {
                 return false; // Chain broken! Tampering detected!
             }
 
-            let payload =
+            let payload: u64 =
                 log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1u64 } else { 0u64 });
-            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211u64);
+            let calculated_hash: u64 = (expected_prev ^ payload).wrapping_mul(1099511628211u64);
 
             if log.entry_hash != calculated_hash {
                 return false; // Entry hash mismatch! Tampering detected!

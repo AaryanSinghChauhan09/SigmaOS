@@ -1368,7 +1368,112 @@ impl CapabilityDerivationTree {
     }
 }
 
+
+// ================= Sovereign Cgroup Governor =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CgroupResourceLimits {
+    pub cpu_quota_us: u64,
+    pub cpu_period_us: u64,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u32,
+}
+
+impl Default for CgroupResourceLimits {
+    fn default() -> Self {
+        Self {
+            cpu_quota_us: 100_000,
+            cpu_period_us: 100_000,
+            memory_max_bytes: u64::MAX,
+            memory_high_bytes: u64::MAX,
+            memory_swap_max_bytes: 0,
+            io_weight: 100,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CgroupGroup {
+    pub path: String,
+    pub limits: CgroupResourceLimits,
+    pub pids: Vec<u64>,
+    pub current_cpu_usage_us: u64,
+    pub current_memory_bytes: u64,
+}
+
+pub struct SovereignCgroupGovernor {
+    pub groups: HashMap<String, CgroupGroup>,
+}
+
+impl SovereignCgroupGovernor {
+    pub fn new() -> Self {
+        Self {
+            groups: HashMap::new(),
+        }
+    }
+
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        if self.groups.contains_key(path) {
+            return Err("Cgroup: Group path already exists");
+        }
+        self.groups.insert(
+            path.to_string(),
+            CgroupGroup {
+                path: path.to_string(),
+                limits: CgroupResourceLimits::default(),
+                pids: Vec::new(),
+                current_cpu_usage_us: 0,
+                current_memory_bytes: 0,
+            },
+        );
+        Ok(())
+    }
+
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+        let g = self.groups.get_mut(path).ok_or("Cgroup: Group not found")?;
+        g.limits = limits;
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
+        let g = self.groups.get_mut(path).ok_or("Cgroup: Group not found")?;
+        if !g.pids.contains(&pid) {
+            g.pids.push(pid);
+        }
+        Ok(())
+    }
+
+    pub fn check_cpu_budget(&mut self, path: &str, requested_us: u64) -> Result<bool, &'static str> {
+        let g = self.groups.get_mut(path).ok_or("Cgroup: Group not found")?;
+        if g.current_cpu_usage_us + requested_us > g.limits.cpu_quota_us {
+            Ok(false)
+        } else {
+            g.current_cpu_usage_us += requested_us;
+            Ok(true)
+        }
+    }
+
+    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
+        let g = self.groups.get_mut(path).ok_or("Cgroup: Group not found")?;
+        if g.current_memory_bytes + bytes > g.limits.memory_max_bytes {
+            Err("Cgroup: Memory limit exceeded")
+        } else {
+            g.current_memory_bytes += bytes;
+            Ok(())
+        }
+    }
+}
+
+impl Default for SovereignCgroupGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
+
 mod tests {
     use super::*;
 
@@ -1777,25 +1882,6 @@ mod tests {
         assert_eq!(res[0], "BatteryReceiver");
     }
 
-    #[test]
-    fn test_sovereign_zones_manager() {
-        let mut manager = SovereignZonesManager::new();
-        manager.create_zone("db_zone", 50, 1024 * 1024).unwrap();
-        manager.create_zone("web_zone", 150, 2048 * 1024).unwrap();
-
-        assert!(manager.create_zone("db_zone", 10, 123).is_err());
-
-        // CPU Shares percentages
-        let db_percentage = manager.calculate_cpu_percentage("db_zone").unwrap();
-        assert!((db_percentage - 25.0).abs() < 1e-5); // 50 / 200 = 25%
-
-        let web_percentage = manager.calculate_cpu_percentage("web_zone").unwrap();
-        assert!((web_percentage - 75.0).abs() < 1e-5); // 150 / 200 = 75%
-
-        // VNIC setup
-        manager.configure_vnic("db_zone", "10.0.0.5").unwrap();
-        assert_eq!(manager.zones.get("db_zone").unwrap().vnic_ips[0], "10.0.0.5");
-    }
 
     #[test]
     fn test_sovereign_cgroup_governor() {
@@ -1814,10 +1900,31 @@ mod tests {
         gov.attach_pid("/sys/fs/cgroup/db", 1001).unwrap();
 
         assert!(gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap());
-        assert!(!gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap()); // Exceeds 50k quota
+        assert!(!gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap());
 
         assert!(gov.allocate_memory("/sys/fs/cgroup/db", 500_000).is_ok());
-        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 600_000).is_err()); // Exceeds 1MB limit
+        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 600_000).is_err());
+    }
+
+    #[test]
+    fn test_sovereign_zones_manager() {
+
+        let mut manager = SovereignZonesManager::new();
+        manager.create_zone("db_zone", 50, 1024 * 1024).unwrap();
+        manager.create_zone("web_zone", 150, 2048 * 1024).unwrap();
+
+        assert!(manager.create_zone("db_zone", 10, 123).is_err());
+
+        // CPU Shares percentages
+        let db_percentage = manager.calculate_cpu_percentage("db_zone").unwrap();
+        assert!((db_percentage - 25.0).abs() < 1e-5); // 50 / 200 = 25%
+
+        let web_percentage = manager.calculate_cpu_percentage("web_zone").unwrap();
+        assert!((web_percentage - 75.0).abs() < 1e-5); // 150 / 200 = 75%
+
+        // VNIC setup
+        manager.configure_vnic("db_zone", "10.0.0.5").unwrap();
+        assert_eq!(manager.zones.get("db_zone").unwrap().vnic_ips[0], "10.0.0.5");
     }
 
     #[test]
