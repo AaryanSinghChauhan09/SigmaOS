@@ -8,7 +8,6 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. Linux Evdev Subsystem (Multi-Touch, Force Feedback, Event Streaming)
