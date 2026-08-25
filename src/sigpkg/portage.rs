@@ -74,8 +74,8 @@ impl Slot {
         }
 
         match (&self.sub_slot, &other.sub_slot) {
-            (None, None) => true,
-            (Some(a), Some(b)) => a == b,
+            (core::option::Option::None, core::option::Option::None) => true,
+            (core::option::Option::Some(a), core::option::Option::Some(b)) => a == b,
             _ => false,
         }
     }

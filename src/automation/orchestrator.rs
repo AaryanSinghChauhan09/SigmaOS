@@ -1,3 +1,4 @@
+use crate::klib::HashMap;
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]

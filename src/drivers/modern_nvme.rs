@@ -83,6 +83,16 @@ impl Default for SmartTelemetry {
 }
 
 
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AhciCommandHeader {
+    pub opts: u16,
+    pub prdtl: u16,
+    pub prdbc: u32,
+    pub ctba: u64,
+    pub reserved: [u32; 4],
+}
+
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
     pub cmd_issue: u32,

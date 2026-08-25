@@ -87,6 +87,7 @@ pub mod sovereign_suite;
 pub mod superiority;
 pub mod wasm_sandbox;
 pub mod tiny_core;
+pub mod open_source_dominance;
 
 pub use gap_closure::{
     KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
@@ -179,4 +180,9 @@ pub use apache_ossie::{
 pub use sovereign_suite::{
     CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
+};
+
+pub use open_source_dominance::{
+    InspirationFeatureMatrix, InspirationFeatureNode, InspirationPackageIntegrator,
+    InspirationSecurityGuard, OpenSourceDominanceEngine, OpenSourceInspirationTier,
 };

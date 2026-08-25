@@ -100,8 +100,8 @@ impl Default for SigmaString {
     }
 }
 
-impl core::fmt::Display for SigmaString {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+impl fmt::Display for SigmaString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.data)
     }
 }

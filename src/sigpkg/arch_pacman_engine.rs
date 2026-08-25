@@ -87,12 +87,12 @@ impl PacmanDatabase {
     }
 
     /// Query package information (pacman -Si)
-    pub fn query_package(&self, package_name: &str) -> Option<&PacmanPackage> {
-        self.find_package(package_name)
+    pub fn query_package(&self, package_name: &str) -> Option<&ArchPacmanPackage> {
+        self.packages.iter().find(|p| p.name == package_name)
     }
 
     /// Search for packages (pacman -Ss)
-    pub fn search_packages(&self, query: &str) -> Vec<&PacmanPackage> {
+    pub fn search_packages(&self, query: &str) -> Vec<&ArchPacmanPackage> {
         self.packages
             .iter()
             .filter(|p| p.name.contains(query) || p.description.contains(query))

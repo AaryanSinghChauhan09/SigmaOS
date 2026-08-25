@@ -59,7 +59,7 @@ impl SigmaSoftwareStore {
                 }
             }
         }
-        count
+        Ok(())
     }
 
     /// Automatically scans and triggers update routines for registered packages

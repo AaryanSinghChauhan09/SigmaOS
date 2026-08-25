@@ -414,7 +414,7 @@ impl SigmaKube {
         }
     }
 
-    pub fn list_clusters(&self) -> Vec<String> {
+    pub fn list_registered_clusters(&self) -> Vec<String> {
         self.clusters.iter().map(|c| c.name.clone()).collect()
     }
 
