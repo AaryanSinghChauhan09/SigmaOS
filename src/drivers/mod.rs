@@ -1,6 +1,7 @@
 // SigmaOS Drivers Module
 pub mod boot_init;
 pub mod dde;
+pub mod distro_device_expansion;
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
 pub mod gpu;
@@ -34,3 +35,10 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+
+pub use distro_device_expansion::{
+    CanBusSocketDriver, IntelI2cSmbusControllerDriver, IntelIgbNicDriver, IntelIwfWifiDriver,
+    Mpt3SasControllerDriver, RadeonKmsGpuDriver, RaspberryPiGpioMailboxDriver,
+    RealtekAlcAudioDriver, RealtekRtl8169Driver, SynapticsTouchpadDriver,
+    VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
+};

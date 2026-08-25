@@ -15,6 +15,30 @@ mod tests {
     use std::collections::{BTreeMap, HashMap};
 
     #[test]
+    fn test_distro_expansion_drivers_registration() {
+        use sigmaos::drivers::*;
+
+        let mut manager = PeripheralManager::new();
+        assert_eq!(manager.device_count(), 0);
+
+        assert!(manager.register_device(Box::new(Mpt3SasControllerDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(VirtioScsiControllerDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(RealtekRtl8169Driver::new())).is_ok());
+        assert!(manager.register_device(Box::new(IntelIgbNicDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(IntelIwfWifiDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(WacomGraphicsTabletDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(SynapticsTouchpadDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(RealtekAlcAudioDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(RadeonKmsGpuDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(RaspberryPiGpioMailboxDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(IntelI2cSmbusControllerDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(CanBusSocketDriver::new())).is_ok());
+
+        assert_eq!(manager.device_count(), 12);
+        manager.broadcast_power_state(PowerState::Sleep);
+    }
+
+    #[test]
     fn test_system_integration() {
         // Linux-conforming Hard Link reference counting
         let mut vfs = VirtualFilesystem::new();
