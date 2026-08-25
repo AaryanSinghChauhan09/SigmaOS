@@ -23,6 +23,9 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
+use core::default::Default;
+use core::option::Option::{self, Some, None};
+use core::result::Result::{self, Ok, Err};
 
 pub const MAX_IPC_MESSAGE_SIZE: usize = 64;
 pub const IPC_QUEUE_CAPACITY: usize = 8;

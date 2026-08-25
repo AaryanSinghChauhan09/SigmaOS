@@ -463,14 +463,15 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        if pd_idx_in_vec >= self.pd_tables.len() {
-            while self.pd_tables.len() <= pd_idx_in_vec {
+        let pd_idx_val = pdpt_idx;
+        if pd_idx_val >= self.pd_tables.len() {
+            while self.pd_tables.len() <= pd_idx_val {
                 self.pd_tables.push(None);
             }
         }
 
-        let pt_idx_in_vec = pd_idx_in_vec * 512 + pd_idx;
-        let pd_table_mut: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
+        let pt_idx_in_vec = pd_idx_val * 512 + pd_idx;
+        let pd_table_mut: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_val];
         let pd_present = if let Some(ref mut pd) = pd_table_mut {
             pd.get_entry(pd_idx).is_present()
         } else {

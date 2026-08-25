@@ -26,6 +26,8 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
+use core::option::Option::{self, Some, None};
+use core::result::Result::{self, Ok, Err};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE: usize = 4096;

@@ -6,6 +6,15 @@ use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+pub type ContainerCapability = RuntimeCapability;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u64,
+}
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
