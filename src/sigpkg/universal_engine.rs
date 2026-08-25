@@ -4,6 +4,14 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap as HashMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::boxed::Box;
+use alloc::format;
+use core::option::Option::{self, Some, None};
+use core::result::Result::{self, Ok, Err};
+use core::default::Default;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
@@ -392,14 +400,14 @@ pub struct PackageAdapterFactory;
 impl PackageAdapterFactory {
     pub fn get_adapter(format: PackageFormat) -> std::boxed::Box<dyn IPackageAdapter> {
         match format {
-            PackageFormat::Apt => std::boxed::Box::new(AptPackageAdapter),
-            PackageFormat::Yum => std::boxed::Box::new(YumPackageAdapter),
-            PackageFormat::Pacman => std::boxed::Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage => std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new())),
-            PackageFormat::Sovereign => std::boxed::Box::new(SovereignPackageAdapter),
-            PackageFormat::Nix => std::boxed::Box::new(NixPackageAdapter),
-            PackageFormat::Apk => std::boxed::Box::new(ApkPackageAdapter),
-            PackageFormat::Xbps => std::boxed::Box::new(XbpsPackageAdapter::new(None)),
+            PackageFormat::Apt => Box::new(AptPackageAdapter),
+            PackageFormat::Yum => Box::new(YumPackageAdapter),
+            PackageFormat::Pacman => Box::new(PacmanPackageAdapter),
+            PackageFormat::Portage => Box::new(EbuildPackageAdapter::new(Vec::new())),
+            PackageFormat::Sovereign => Box::new(SovereignPackageAdapter),
+            PackageFormat::Nix => Box::new(NixPackageAdapter),
+            PackageFormat::Apk => Box::new(ApkPackageAdapter),
+            PackageFormat::Xbps => Box::new(XbpsPackageAdapter::new(None)),
         }
     }
 }

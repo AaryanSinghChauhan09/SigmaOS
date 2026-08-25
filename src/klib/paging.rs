@@ -25,6 +25,20 @@ impl PageSize {
     }
 }
 
+impl Clone for SimplePageTableEntry {
+    fn clone(&self) -> Self {
+        Self {
+            present: AtomicUsize::new(self.present.load(Ordering::SeqCst)),
+            writable: AtomicUsize::new(self.writable.load(Ordering::SeqCst)),
+            user_accessible: AtomicUsize::new(self.user_accessible.load(Ordering::SeqCst)),
+            physical_addr: AtomicUsize::new(self.physical_addr.load(Ordering::SeqCst)),
+            accessed: AtomicUsize::new(self.accessed.load(Ordering::SeqCst)),
+            dirty: AtomicUsize::new(self.dirty.load(Ordering::SeqCst)),
+            cow: AtomicUsize::new(self.cow.load(Ordering::SeqCst)),
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum PageTableLevel {
@@ -397,10 +411,9 @@ impl SimpleVMM {
                 let pd_phys = pdpt.get_entry_ref(pdpt_idx).get_physical_address();
                 let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
                 if let Some(ref mut pt) = self.pt_tables.get_mut(pt_idx_in_vec).and_then(|o| o.as_mut()) {
-                    let mut entry = pt.entries[pt_idx];
+                    let entry = &mut pt.entries[pt_idx];
                     entry.set_writable(false);
                     entry.cow.store(1, Ordering::SeqCst);
-                    pt.entries[pt_idx] = entry;
                     return Ok(());
                 }
             }
