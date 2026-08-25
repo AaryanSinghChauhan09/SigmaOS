@@ -28,6 +28,7 @@ pub mod tiny_core;
 pub mod arch;
 pub mod cachy;
 pub mod linux_bsd_parity_extended;
+pub mod wiki_ideas_implementation;
 
 pub use linux_bsd_parity::{
     NixOSFlakeEngine, FlakeInput, SystemClosure,
@@ -100,5 +101,11 @@ pub use linux_bsd_parity_extended::{
     ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
     NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
-    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
+    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot as ExtSnapperSnapshot, SnapperBtrfsEngine,
+};
+pub use wiki_ideas_implementation::{
+    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
+    SnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
+    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT,
 };
