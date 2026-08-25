@@ -884,14 +884,6 @@ pub struct CgroupResourceLimits {
     pub io_weight: u32,
 }
 
-pub struct CgroupGroup {
-    pub path: String,
-    pub limits: CgroupResourceLimits,
-    pub pids: Vec<u32>,
-    pub used_cpu_us: u64,
-    pub allocated_memory_bytes: u64,
-}
-
 pub struct SovereignCgroupGovernor {
     pub groups: HashMap<String, CgroupGroup>,
 }
@@ -1959,7 +1951,7 @@ impl Default for CgroupResourceLimits {
 }
 
 #[derive(Debug, Clone)]
-pub struct CgroupGroup {
+pub struct CgroupGroupV2 {
     pub path: String,
     pub limits: CgroupResourceLimits,
     pub pids: Vec<u64>,
@@ -1967,22 +1959,22 @@ pub struct CgroupGroup {
     pub current_memory_bytes: u64,
 }
 
-pub struct SovereignCgroupGovernor {
-    pub groups: HashMap<String, CgroupGroup>,
+pub struct SovereignCgroupGovernorV2 {
+    pub groups: HashMap<String, CgroupGroupV2>,
 }
 
-impl SovereignCgroupGovernor {
+impl SovereignCgroupGovernorV2 {
     pub fn new() -> Self {
         Self {
-            cgroups: HashMap::new(),
+            groups: HashMap::new(),
         }
     }
 
     pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
-        if self.cgroups.contains_key(path) {
+        if self.groups.contains_key_str(path) {
             return Err("cgroup path already exists");
         }
-        self.cgroups.insert(path.to_string(), SovereignCgroupEntry {
+        self.groups.insert(path.to_string(), CgroupGroupV2 {
             path: path.to_string(),
             limits: CgroupResourceLimits {
                 cpu_quota_us: 100_000,
@@ -1992,43 +1984,43 @@ impl SovereignCgroupGovernor {
                 memory_swap_max_bytes: 0,
                 io_weight: 100,
             },
-            attached_pids: Vec::new(),
-            current_memory_used: 0,
-            cpu_time_used_us: 0,
+            pids: Vec::new(),
+            current_cpu_usage_us: 0,
+            current_memory_bytes: 0,
         });
         Ok(())
     }
 
     pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
-        let entry = self.cgroups.get_mut(path).ok_or("cgroup path not found")?;
+        let entry = self.groups.get_mut_str(path).ok_or("cgroup path not found")?;
         entry.limits = limits;
         Ok(())
     }
 
     pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
-        let entry = self.cgroups.get_mut(path).ok_or("cgroup path not found")?;
-        if !entry.attached_pids.contains(&pid) {
-            entry.attached_pids.push(pid);
+        let entry = self.groups.get_mut_str(path).ok_or("cgroup path not found")?;
+        if !entry.pids.contains(&pid) {
+            entry.pids.push(pid);
         }
         Ok(())
     }
 
     pub fn check_cpu_budget(&mut self, path: &str, time_requested_us: u64) -> Result<bool, &'static str> {
-        let entry = self.cgroups.get_mut(path).ok_or("cgroup path not found")?;
-        if entry.cpu_time_used_us + time_requested_us > entry.limits.cpu_quota_us {
+        let entry = self.groups.get_mut_str(path).ok_or("cgroup path not found")?;
+        if entry.current_cpu_usage_us + time_requested_us > entry.limits.cpu_quota_us {
             Ok(false) // Quota exceeded
         } else {
-            entry.cpu_time_used_us += time_requested_us;
+            entry.current_cpu_usage_us += time_requested_us;
             Ok(true)
         }
     }
 
     pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
-        let entry = self.cgroups.get_mut(path).ok_or("cgroup path not found")?;
-        if entry.current_memory_used + bytes > entry.limits.memory_max_bytes {
+        let entry = self.groups.get_mut_str(path).ok_or("cgroup path not found")?;
+        if entry.current_memory_bytes + bytes > entry.limits.memory_max_bytes {
             Err("cgroup OOM: memory_max_bytes limit exceeded")
         } else {
-            entry.current_memory_used += bytes;
+            entry.current_memory_bytes += bytes;
             Ok(())
         }
     }
