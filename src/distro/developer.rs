@@ -57,7 +57,7 @@ impl DeveloperToolkit {
     }
 
     pub fn get_tool(&self, name: &str) -> Option<&DevTool> {
-        self.tools.get(name)
+        self.tools.get(&name.to_string())
     }
 
     pub fn is_fully_functional(&self) -> bool {

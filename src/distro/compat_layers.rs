@@ -94,7 +94,7 @@ impl WindowsRegistry {
 }
 
 /// Simulates Win32 GDI drawing objects (pen, brush, font)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum GdiObjectType {
     Pen,
     Brush,

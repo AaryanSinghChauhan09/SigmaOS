@@ -196,7 +196,7 @@ pub trait BlockDevice: Send + Sync {
 /// RAM-backed block device (for testing / ramdisk)
 pub struct RamDisk {
     name: String,
-    data: Vec<u8>,
+    data: crate::klib::Vec<u8>,
     sector_count: u64,
     reads: AtomicU64,
     writes: AtomicU64,
@@ -208,9 +208,13 @@ unsafe impl Sync for RamDisk {}
 impl RamDisk {
     pub fn new(name: &str, size_bytes: usize) -> Self {
         let sectors = (size_bytes / SECTOR_SIZE) as u64;
+        let mut data = crate::klib::Vec::with_capacity(size_bytes);
+        for _ in 0..size_bytes {
+            data.push(0);
+        }
         RamDisk {
             name: name.to_string(),
-            data: vec![0u8; size_bytes],
+            data,
             sector_count: sectors,
             reads: AtomicU64::new(0),
             writes: AtomicU64::new(0),
@@ -238,7 +242,9 @@ impl BlockDevice for RamDisk {
         if offset + len > self.data.len() {
             return Err("RamDisk: read out of bounds");
         }
-        buf.copy_from_slice(&self.data[offset..offset + len]);
+        for i in 0..len {
+            buf[i] = self.data[offset + i];
+        }
         self.reads.fetch_add(1, Ordering::Relaxed);
         Ok(len)
     }
@@ -248,7 +254,9 @@ impl BlockDevice for RamDisk {
         if offset + data.len() > self.data.len() {
             return Err("RamDisk: write out of bounds");
         }
-        self.data[offset..offset + data.len()].copy_from_slice(data);
+        for i in 0..data.len() {
+            self.data[offset + i] = data[i];
+        }
         self.writes.fetch_add(1, Ordering::Relaxed);
         Ok(data.len())
     }

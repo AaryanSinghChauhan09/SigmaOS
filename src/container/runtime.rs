@@ -179,14 +179,7 @@ impl NamespaceConfig {
 
 impl SeccompPolicy {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened {
-            return false;
-        }
-        if syscall_id < 32 {
-            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
-        } else {
-            false
-        }
+        self.blocked_syscalls.contains(&syscall_id)
     }
 }
 
@@ -453,11 +446,14 @@ pub struct SimpleContainerRuntime {
 
 /// Runtime capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,
     pub can_manage: bool,
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
 }
 
 impl RuntimeCapability {
@@ -466,6 +462,9 @@ impl RuntimeCapability {
             can_create: false,
             can_remove: false,
             can_manage: false,
+            can_start: false,
+            can_stop: false,
+            can_pause: false,
         }
     }
 
@@ -474,6 +473,9 @@ impl RuntimeCapability {
             can_create: true,
             can_remove: true,
             can_manage: true,
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
         }
     }
 }

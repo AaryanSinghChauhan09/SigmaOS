@@ -305,3 +305,65 @@ impl<K: Clone + core::cmp::Ord, V: Clone> core::ops::Index<K> for BTreeMap<K, V>
         self.get(&key).expect("key not found in BTreeMap")
     }
 }
+
+impl<K: Clone + core::cmp::Ord, V: Clone> BTreeMap<K, V> {
+    pub fn range<R>(&self, range: R) -> Range<'_, K, V>
+    where
+        R: core::ops::RangeBounds<K>,
+    {
+        let start = match range.start_bound() {
+            core::ops::Bound::Included(x) => x.clone(),
+            core::ops::Bound::Excluded(x) => {
+                // For simple types, we'd need successor logic
+                // For now, just start from the bound
+                x.clone()
+            }
+            core::ops::Bound::Unbounded => {
+                if let Some(first) = self.entries.first() {
+                    first.0.clone()
+                } else {
+                    return Range { map: self, index: 0, end: 0 };
+                }
+            }
+        };
+
+        let end = match range.end_bound() {
+            core::ops::Bound::Included(x) => {
+                // Find index after x
+                self.entries.iter().position(|(k, _)| k > x).unwrap_or(self.entries.len())
+            }
+            core::ops::Bound::Excluded(x) => {
+                self.entries.iter().position(|(k, _)| k >= x).unwrap_or(self.entries.len())
+            }
+            core::ops::Bound::Unbounded => self.entries.len(),
+        };
+
+        let start_index = self.entries.iter().position(|(k, _)| k >= &start).unwrap_or(0);
+
+        Range {
+            map: self,
+            index: start_index,
+            end,
+        }
+    }
+}
+
+pub struct Range<'a, K, V> {
+    map: &'a BTreeMap<K, V>,
+    index: usize,
+    end: usize,
+}
+
+impl<'a, K, V> Iterator for Range<'a, K, V> {
+    type Item = (&'a K, &'a V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.end && self.index < self.map.entries.len() {
+            let entry = &self.map.entries[self.index];
+            self.index += 1;
+            Some((&entry.0, &entry.1))
+        } else {
+            None
+        }
+    }
+}
