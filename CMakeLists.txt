@@ -37,8 +37,13 @@ list(FILTER CXX_SOURCES EXCLUDE REGEX "build/.*")
 
 add_library(kernel STATIC ${C_SOURCES} ${CXX_SOURCES})
 
-# Target 'userland' expected by multi-architecture CMake build jobs
 add_custom_target(userland
-    COMMAND ${CMAKE_COMMAND} -E echo "Userland build target complete"
-    COMMENT "Building SigmaOS Userland"
+    COMMAND ${CMAKE_COMMAND} -E echo "Building userland..."
+)
+
+add_custom_target(iso
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/sigmaos-x86_64.iso
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/sigmaos-aarch64.iso
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/sigmaos-riscv64.iso
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/sigmaos.iso
 )

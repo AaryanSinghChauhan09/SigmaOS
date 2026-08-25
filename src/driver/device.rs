@@ -707,6 +707,8 @@ impl Device for SimpleBlockDevice {
 mod legacy_tests {
     use super::*;
     use core::ops::Deref;
+    use crate::driver::device::DdeDeviceWrapper;
+    use crate::drivers::dde::UdfInterpreter;
 
     pub struct LegacyDevice {
         pub id: usize,

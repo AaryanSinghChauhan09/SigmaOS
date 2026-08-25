@@ -7,21 +7,19 @@ extern crate alloc;
 
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
-#[cfg(not(feature = "standalone_test"))]
 use crate::security::Permission;
-
-#[cfg(feature = "standalone_test")]
-extern crate alloc;
-#[cfg(feature = "standalone_test")]
-use alloc::vec::Vec;
-
-#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
     FileRead,
     FileWrite,
     NetworkTcp,
 }
+#[cfg(test)]
+use std::vec::Vec;
+#[cfg(not(test))]
+    NetworkTcp = 0,
+    FileRead = 1,
+use crate::security::capability::Permission;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
@@ -144,14 +142,14 @@ impl HardenedAuditTrail {
             return true;
         }
 
-        let mut expected_prev = 0x1337_C0DE_FA11_FACE;
+        let mut expected_prev: u64 = 0x1337_C0DE_FA11_FACE;
         for i in 0..self.logs.len() {
             let log = &self.logs[i];
             if log.previous_hash != expected_prev {
                 return false; // Chain broken! Tampering detected!
             }
 
-            let payload =
+            let payload: u64 =
                 log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1u64 } else { 0u64 });
             let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211_u64);
 
