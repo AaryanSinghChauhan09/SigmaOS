@@ -206,10 +206,13 @@ pub struct TextAttribute {
     pub bg_color: u8, // ANSI 8-color model (e.g. 40=Black, 41=Red)
     pub is_bold: bool,
     pub is_blinking: bool,
+    pub rgb_fg: Option<(u8, u8, u8)>,
+    pub rgb_bg: Option<(u8, u8, u8)>,
 }
 
 pub struct AnsiEscapeInterpreter {
     pub active_attr: TextAttribute,
+    pub window_title: [u8; 128],
 }
 
 impl AnsiEscapeInterpreter {
@@ -220,22 +223,40 @@ impl AnsiEscapeInterpreter {
                 bg_color: 40, // Black
                 is_bold: false,
                 is_blinking: false,
+                rgb_fg: None,
+                rgb_bg: None,
             },
+            window_title: [0u8; 128],
         }
     }
 
     pub fn parse_escape_sequence(&mut self, code: &[u8]) -> bool {
-        // Parses SGR codes (Select Graphic Rendition) e.g., "\x1b[31;1m" (Bold Red)
+        // Parses OSC codes e.g. "\x1b]0;Title\x07"
+        if code.len() >= 4 && code[0] == b'\x1b' && code[1] == b']' {
+            let last_byte = code[code.len() - 1];
+            if last_byte == b'\x07' || last_byte == b'\\' {
+                if (code.len() >= 5 && (code[2] == b'0' || code[2] == b'2') && code[3] == b';') {
+                    let title_slice = &code[4..code.len() - 1];
+                    let len = title_slice.len().min(127);
+                    self.window_title[..len].copy_from_slice(&title_slice[..len]);
+                    self.window_title[len] = 0;
+                    return true;
+                }
+            }
+        }
+
+        // Parses SGR codes (Select Graphic Rendition) e.g., "\x1b[31;1m" (Bold Red) or 24-bit RGB
         if code.len() >= 3 && code[0] == b'\x1b' && code[1] == b'[' {
             let last_byte = code[code.len() - 1];
             if last_byte == b'm' {
-                // Simplistic parser for common ANSI colors
                 if code.contains(&b'1') {
                     self.active_attr.is_bold = true;
                 }
                 if code.contains(&b'0') {
                     self.active_attr.is_bold = false;
                     self.active_attr.is_blinking = false;
+                    self.active_attr.rgb_fg = None;
+                    self.active_attr.rgb_bg = None;
                 }
                 if code.contains(&b'5') {
                     self.active_attr.is_blinking = true;
@@ -243,6 +264,51 @@ impl AnsiEscapeInterpreter {
                 // Foregrounds
                 if code.contains(&b'3') && code.contains(&b'1') { self.active_attr.fg_color = 31; } // Red
                 if code.contains(&b'3') && code.contains(&b'2') { self.active_attr.fg_color = 32; } // Green
+
+                // Dynamic 24-bit TrueColor sequence parsing e.g. \x1b[38;2;R;G;Bm or \x1b[48;2;R;G;Bm
+                let mut i = 0;
+                while i < code.len() {
+                    if i + 4 <= code.len() && &code[i..i+4] == b"38;2" {
+                        // Extract subsequent numbers after 38;2;
+                        let mut r: u8 = 0;
+                        let mut g: u8 = 0;
+                        let mut b: u8 = 0;
+                        let mut part_idx = 0;
+                        let mut curr = 0u16;
+                        for &byte in &code[i+4..code.len()-1] {
+                            if byte == b';' {
+                                if part_idx == 1 { r = curr.min(255) as u8; }
+                                else if part_idx == 2 { g = curr.min(255) as u8; }
+                                part_idx += 1;
+                                curr = 0;
+                            } else if byte.is_ascii_digit() {
+                                curr = curr * 10 + (byte - b'0') as u16;
+                            }
+                        }
+                        if part_idx == 3 || part_idx == 2 { b = curr.min(255) as u8; }
+                        self.active_attr.rgb_fg = Some((r, g, b));
+                    } else if i + 4 <= code.len() && &code[i..i+4] == b"48;2" {
+                        let mut r: u8 = 0;
+                        let mut g: u8 = 0;
+                        let mut b: u8 = 0;
+                        let mut part_idx = 0;
+                        let mut curr = 0u16;
+                        for &byte in &code[i+4..code.len()-1] {
+                            if byte == b';' {
+                                if part_idx == 1 { r = curr.min(255) as u8; }
+                                else if part_idx == 2 { g = curr.min(255) as u8; }
+                                part_idx += 1;
+                                curr = 0;
+                            } else if byte.is_ascii_digit() {
+                                curr = curr * 10 + (byte - b'0') as u16;
+                            }
+                        }
+                        if part_idx == 3 || part_idx == 2 { b = curr.min(255) as u8; }
+                        self.active_attr.rgb_bg = Some((r, g, b));
+                    }
+                    i += 1;
+                }
+
                 return true;
             }
         }
