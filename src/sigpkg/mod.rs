@@ -62,18 +62,12 @@ pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
 pub use transaction::Transaction;
-pub use universal_adapter::{
-    AptDebManifest, UniversalPackageAdapter,
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
-pub use store::{
-    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
-};
-pub use transaction::Transaction;
 pub use universal_adapter::{AptDebManifest, UniversalPackageManager as UniversalPackageAdapter};
 pub use verifier::CryptoVerifier;
 

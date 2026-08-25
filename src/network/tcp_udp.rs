@@ -3,8 +3,8 @@ use core::mem;
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
-//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
-//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+/// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+/// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
 extern crate alloc;
 use alloc::boxed::Box;

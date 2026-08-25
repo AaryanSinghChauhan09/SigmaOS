@@ -1387,8 +1387,48 @@ impl SerenityOsAsyncIpcLoop {
     }
 }
 
-#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopShellAction {
+    ToggleOverview,
+    SwitchWorkspace,
+    OpenTerminal,
+}
 
+pub struct GestureVoiceControlEngine {
+    pub registered_voice_commands: [Option<(&'static str, DesktopShellAction)>; 4],
+}
+
+impl GestureVoiceControlEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_voice_commands: [
+                Some(("open terminal", DesktopShellAction::OpenTerminal)),
+                None,
+                None,
+                None,
+            ],
+        }
+    }
+
+    pub fn parse_touchpad_gesture(&self, fingers_count: u8, swipe_up: bool) -> Option<DesktopShellAction> {
+        match (fingers_count, swipe_up) {
+            (3, true) => Some(DesktopShellAction::ToggleOverview),
+            (4, false) => Some(DesktopShellAction::SwitchWorkspace),
+            _ => None,
+        }
+    }
+
+    pub fn match_voice_phrase(&self, phrase: &str) -> Option<DesktopShellAction> {
+        for slot in self.registered_voice_commands.iter() {
+            if let Some((cmd_phrase, action)) = slot {
+                if *cmd_phrase == phrase {
+                    return Some(*action);
+                }
+            }
+        }
+        None
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -1479,26 +1519,8 @@ mod tests {
                 None,
             ],
         };
-
-    /// Translates touchpad multi-finger gestures to shell actions
-    pub fn parse_touchpad_gesture(&self, fingers_count: u8, swipe_up: bool) -> Option<DesktopShellAction> {
-        match (fingers_count, swipe_up) {
-            (3, true) => Some(DesktopShellAction::ToggleOverview),
-            (4, false) => Some(DesktopShellAction::SwitchWorkspace),
-            _ => None,
-        }
-    }
-
-    /// Matches voice audio transcript keywords to shell actions
-    pub fn match_voice_phrase(&self, phrase: &str) -> Option<DesktopShellAction> {
-        for slot in self.registered_voice_commands.iter() {
-            if let Some((cmd_phrase, action)) = slot {
-                if *cmd_phrase == phrase {
-                    return Some(*action);
-                }
-            }
-        }
-        None
+        assert!(sat.add_package_node(node_a));
+        assert!(sat.solve(0));
     }
 }
 
