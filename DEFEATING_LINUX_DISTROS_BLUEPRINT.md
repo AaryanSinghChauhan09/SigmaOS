@@ -61,5 +61,13 @@ Operating systems traditionally inherit decades of bloated POSIX assumptions, ca
 | **Qubes OS** | Xen Hardware Micro-Domain Isolation & Inter-VM Clipboard | `src/open_source_obsoletion.rs` (`SovereignQubesIsolationEngine`) |
 | **Linux eBPF / Landlock** | Sandboxed Access Mask & BPF Bytecode Verification | `src/open_source_obsoletion.rs` (`SovereignLinuxSecurityLsmEngine`) |
 | **Haiku OS** | BeAPI Desktop Kits & Zero-Copy Format Translators | `src/open_source_obsoletion.rs` (`SovereignHaikuInterfaceEngine`) |
+| **Firecracker / Qubes** | Lightweight MicroVM Isolation & Lifecycle | `src/open_source_obsoletion.rs` (`SovereignFirecrackerMicroVmManager`) |
+| **Fedora / TPM 2.0** | Remote Hardware Attestation & PCR Measurement | `src/open_source_obsoletion.rs` (`SovereignTpmAttestationWorkflow`) |
+| **NixOS / SPDX / CycloneDX** | Software Bill of Materials (SBOM) Pipeline | `src/open_source_obsoletion.rs` (`SovereignSbomGeneratorPipeline`) |
+| **Calamares / Arch** | Declarative System Installation Framework | `src/open_source_obsoletion.rs` (`SovereignCalamaresInstallerFramework`) |
+| **PipeWire / SPA** | Low-Latency Multimedia Graph Audio Engine | `src/open_source_obsoletion.rs` (`SovereignPipeWireAudioEngine`) |
+| **IPFS / Web3FS** | Decentralized Content-Addressed Block Storage | `src/open_source_obsoletion.rs` (`SovereignWeb3FsIpfsEngine`) |
+| **Wasmtime / Cranelift** | Sandboxed WASI Micro-Runtime Engine | `src/open_source_obsoletion.rs` (`SovereignWasmCraneliftEngine`) |
+| **NixOS Hydra / Debian** | Deterministic Reproducible Build Farm Auditor | `src/open_source_obsoletion.rs` (`SovereignReproducibleBuildFarm`) |
 
 By moving these heavy, procedural subsystems into lightweight, polymorphic, and memory-safe abstractions, **SigmaOS** delivers a far more scalable, unified, and performant operating system core.

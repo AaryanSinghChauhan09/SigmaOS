@@ -7,20 +7,34 @@ pub mod agent;
 pub mod agentic_os_runtime;
 pub mod apm;
 pub mod autogen;
+pub mod llm;
+pub mod orchestrator;
+pub mod sai;
+pub mod openclaw;
+pub mod system;
+pub mod voice;
+pub mod wiki;
+pub mod qwenpaw;
+pub mod agentic_os_runtime;
+pub mod developer_platform;
+pub mod open_computer;
+pub mod tensor_memory;
 pub mod compute_scheduler;
 pub mod lift_engine;
 pub mod next_gen;
 pub mod perplexity;
 pub mod quantization;
-pub mod qwenpaw;
-pub mod sai;
-pub mod system;
-pub mod tensor_memory;
-pub mod voice;
 pub mod wandr;
 pub mod wiki;
 
-pub use openclaw::{AlertPlatform, ClawBackgroundDaemon, ClawChatIntegrator, ClawVoiceTranscriber};
+pub use agentic_os_runtime::{
+    ContextVirtualMmu, EphemeralAgentSandbox, HybridContainerRuntime, LocalLlmSystemDaemon,
+    OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
+};
+
+pub use openclaw::{
+    ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
+};
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use agentic_os_runtime::{
