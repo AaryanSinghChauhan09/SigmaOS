@@ -376,3 +376,8 @@ pub mod loader;
 pub mod app;
 pub mod auth;
 pub use open_source_obsoletion::*;
+
+pub use unimplemented_features::{
+    KaliAnonsurfTrafficShunt, GhostBsdSysadmBridge, PopOsSystem76PowerManager, System76GpuMode,
+    ClearLinuxStatelessOverlayManager, KeylimeTpmAttestationEngine,
+};
