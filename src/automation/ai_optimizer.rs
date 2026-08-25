@@ -218,7 +218,11 @@ impl AiOptimizer {
                 .unwrap_or(core::cmp::Ordering::Equal)
         });
         recommendations.sort_by(|a, b| b.impact.partial_cmp(&a.impact).unwrap());
-        recommendations.sort_by(|a, b| b.impact.partial_cmp(&a.impact).unwrap_or(core::cmp::Ordering::Equal));
+        recommendations.sort_by(|a, b| {
+            b.impact
+                .partial_cmp(&a.impact)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
 
         recommendations
     }

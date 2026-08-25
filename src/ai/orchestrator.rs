@@ -107,7 +107,11 @@ impl ModelResource {
 
 pub trait AgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError>;
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
     fn list_agents(&self) -> Vec<AgentID>;
 }
@@ -139,14 +143,22 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         Ok(id)
     }
 
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError> {
         if let Some(target_id) = agent_id {
             if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
                 agent.execute(task)
             } else {
                 Err(AgentError::NotFound)
             }
-        } else if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+        } else if let Some(agent) = self
+            .agents
+            .iter_mut()
+            .find(|a| a.state() == AgentState::Idle)
+        {
             agent.execute(task)
         } else {
             Err(AgentError::NotFound)
@@ -154,7 +166,10 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
+        self.agents
+            .iter()
+            .find(|a| a.id() == id)
+            .map(|a| a.as_ref())
     }
 
     fn list_agents(&self) -> Vec<AgentID> {
@@ -213,8 +228,13 @@ mod tests {
         let agent = SimpleAIAgent::new(1, "TaskAgent");
         orchestrator.register_agent(Box::new(agent)).unwrap();
 
-        let response = orchestrator.dispatch_task(b"RELOAD_CORES", Some(1)).unwrap();
-        assert_eq!(std::str::from_utf8(&response).unwrap(), "TaskAgent: RELOAD_CORES");
+        let response = orchestrator
+            .dispatch_task(b"RELOAD_CORES", Some(1))
+            .unwrap();
+        assert_eq!(
+            std::str::from_utf8(&response).unwrap(),
+            "TaskAgent: RELOAD_CORES"
+        );
 
         let mut queue = SimpleTaskQueue::new();
         queue.enqueue(b"TASK_PRIO_HIGH", 10);

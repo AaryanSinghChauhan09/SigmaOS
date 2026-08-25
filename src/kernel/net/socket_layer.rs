@@ -2,7 +2,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
-
 extern crate alloc;
 use crate::klib::HashMap;
 use crate::klib::collections::HashMap;
@@ -260,7 +259,13 @@ impl SocketLayer {
         fd
     }
 
-    pub fn setsockopt(&mut self, fd: u32, level: i32, optname: i32, optval: &[u8]) -> Result<(), &'static str> {
+    pub fn setsockopt(
+        &mut self,
+        fd: u32,
+        level: i32,
+        optname: i32,
+        optval: &[u8],
+    ) -> Result<(), &'static str> {
         let sock = self.sockets.get_mut(&fd).ok_or("EBADF: invalid fd")?;
         if level != SOL_SOCKET {
             return Err("ENOPROTOOPT: level not supported");
@@ -296,8 +301,8 @@ impl SocketLayer {
         let new_sock = self.sockets.get(&fd).ok_or("EBADF: invalid fd")?;
         let allow_bind = if let Some(&existing_fd) = self.bound_ports.get(&addr.port) {
             if let Some(existing_sock) = self.sockets.get(&existing_fd) {
-                (existing_sock.flags.reuse_addr && new_sock.flags.reuse_addr) ||
-                (existing_sock.flags.reuse_port && new_sock.flags.reuse_port)
+                (existing_sock.flags.reuse_addr && new_sock.flags.reuse_addr)
+                    || (existing_sock.flags.reuse_port && new_sock.flags.reuse_port)
             } else {
                 false
             }

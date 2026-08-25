@@ -2,16 +2,16 @@
 // Verifies core system legacy compatibility, multi-persona VMs, and driver bridge layers
 #![allow(unused, clippy::all)]
 
-use sigmaos::filesystem::{VirtualFilesystem, FileType};
-use sigmaos::kernel::{Priority, Process, ProcessState};
+use sigmaos::filesystem::{FileType, VirtualFilesystem};
 use sigmaos::graphics::ColorRgba;
+use sigmaos::kernel::{Priority, Process, ProcessState};
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sigmaos::productivity::*;
     use sigmaos::compatibility::*;
     use sigmaos::logging::*;
+    use sigmaos::productivity::*;
     use std::collections::{BTreeMap, HashMap};
 
     #[test]
@@ -191,8 +191,11 @@ mod tests {
 
     #[test]
     fn test_reliability_and_testing_suite() {
+        use sigmaos::crash::{
+            Anonymizer, CoredumpCollector, CrashPipeline, CrashType, SimpleCoredumpCollector,
+            SimpleCrashPipeline,
+        };
         use sigmaos::tracing::{SigmaTrace, TraceEvent, TraceSpan};
-        use sigmaos::crash::{SimpleCrashPipeline, CrashPipeline, CrashType, SimpleCoredumpCollector, CoredumpCollector, Anonymizer};
 
         // 1. Tracepoint Spans & Observability tests
         let mut trace = SigmaTrace::new();

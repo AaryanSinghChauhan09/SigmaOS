@@ -438,6 +438,9 @@ impl WhisperGgufDecoder {
         if audio_data.is_empty() {
             return Err("Empty audio buffer");
         }
-        Ok(alloc::format!("System Voice Command: Transcribed {} bytes using Whisper GGUF 4-bit model", audio_data.len()))
+        Ok(alloc::format!(
+            "System Voice Command: Transcribed {} bytes using Whisper GGUF 4-bit model",
+            audio_data.len()
+        ))
     }
 }

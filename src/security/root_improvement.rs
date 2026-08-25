@@ -761,8 +761,8 @@ pub enum DoasAction {
 #[derive(Debug, Clone)]
 pub struct DoasRule {
     pub action: DoasAction,
-    pub identity: String,     // e.g. "wheel" or "alice"
-    pub target_user: String,  // e.g. "root"
+    pub identity: String,        // e.g. "wheel" or "alice"
+    pub target_user: String,     // e.g. "root"
     pub command: Option<String>, // Option for specific binary, e.g. "/sbin/reboot"
     pub nopass: bool,
     pub keepenv: bool,
@@ -951,7 +951,9 @@ mod tests {
     #[test]
     fn test_sudo_doas_privilege_elevation() {
         let mut elevator = SudoDoasElevator::new();
-        elevator.password_database.push(("admin".to_string(), "secure_hash_123".to_string()));
+        elevator
+            .password_database
+            .push(("admin".to_string(), "secure_hash_123".to_string()));
 
         // Failed attempt with incorrect password hash
         assert!(elevator
@@ -959,7 +961,9 @@ mod tests {
             .is_err());
 
         // Successful elevation
-        let uid = elevator.elevate_via_doas("admin", "secure_hash_123", 10000).unwrap();
+        let uid = elevator
+            .elevate_via_doas("admin", "secure_hash_123", 10000)
+            .unwrap();
         assert_eq!(uid, 0);
 
         // Verification must confirm active session under TTL
@@ -1031,9 +1035,8 @@ mod tests {
     fn test_linux_inspired_pam_stack() {
         let mut engine = PamEngine::new();
 
-        let unix_db: Vec<(String, String)> = vec![
-            ("alice".to_string(), "alice_pwd_hash".to_string()),
-        ];
+        let unix_db: Vec<(String, String)> =
+            vec![("alice".to_string(), "alice_pwd_hash".to_string())];
         let pam_unix = alloc::sync::Arc::new(PamUnixModule::new(unix_db));
         let pam_faillock = alloc::sync::Arc::new(PamFaillockModule);
         let pam_time = alloc::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM

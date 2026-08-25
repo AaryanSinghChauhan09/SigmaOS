@@ -12,11 +12,15 @@ pub struct PathBuf {
 
 impl PathBuf {
     pub fn new() -> Self {
-        PathBuf { inner: String::new() }
+        PathBuf {
+            inner: String::new(),
+        }
     }
 
     pub fn from(s: &str) -> Self {
-        PathBuf { inner: String::from(s) }
+        PathBuf {
+            inner: String::from(s),
+        }
     }
 
     pub fn push(&mut self, path: &str) {

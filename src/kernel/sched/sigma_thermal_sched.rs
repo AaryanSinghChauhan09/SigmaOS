@@ -1,13 +1,13 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
-use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
-use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
 use crate::filesystem::FsError;
+use crate::kernel::sched::scheduler::{RunQueue, SchedClass};
+use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 
 /// Thermal zone reading
 #[derive(Debug, Clone, Copy)]
@@ -66,7 +66,10 @@ impl ThermalScheduler {
 
     pub fn is_throttling(&self) -> bool {
         self.current_temp >= self.throttle_threshold
-            || self.zones.iter().any(|z| z.temperature_c >= z.critical_temp_c)
+            || self
+                .zones
+                .iter()
+                .any(|z| z.temperature_c >= z.critical_temp_c)
     }
 
     pub fn adjust_scheduling(&self, task: &Task) -> SchedulingDecision {
@@ -99,8 +102,13 @@ impl ThermalScheduler {
 #[derive(Debug, Clone, Copy)]
 pub enum SchedulingDecision {
     Normal,
-    Throttle { max_freq_mhz: u32, time_slice_reduction: f32 },
-    Migrate { target_cpu: u32 },
+    Throttle {
+        max_freq_mhz: u32,
+        time_slice_reduction: f32,
+    },
+    Migrate {
+        target_cpu: u32,
+    },
 }
 
 pub struct ThermalSchedClass {

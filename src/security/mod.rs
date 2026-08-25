@@ -3,10 +3,12 @@ pub mod audit;
 pub mod capability;
 pub mod hardening;
 
+pub mod bridge;
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
+pub mod deobfuscation;
 pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
@@ -14,13 +16,11 @@ pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
-pub mod bridge;
-pub mod deobfuscation;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod prism;
-pub mod sandbox;
 pub mod qubes_isolation;
 pub mod root_improvement;
+pub mod sandbox;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
@@ -44,6 +44,7 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
+pub use forensics::*;
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };
@@ -72,5 +73,6 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use vulnerability::{VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload, PenetrationAssistant};
-pub use forensics::*;
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+};

@@ -5,6 +5,7 @@ use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 use alloc::string::ToString;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct FirmwareMemoryMapEntry {
@@ -59,7 +60,8 @@ pub enum BootError {
 }
 
 pub trait BootLoader: Send + Sync {
-    fn enter_kernel(&self, kernel_entry: usize, params: *const BootParams) -> Result<(), BootError>;
+    fn enter_kernel(&self, kernel_entry: usize, params: *const BootParams)
+        -> Result<(), BootError>;
     fn load_kernel(&self, source: &str, dest: usize, size: usize) -> Result<usize, BootError>;
     fn load_initrd(&self, source: &str, dest: usize, size: usize) -> Result<usize, BootError>;
     fn parse_cmdline(&self, cmdline: &str) -> Result<BootParams, BootError>;
@@ -252,7 +254,9 @@ impl Initramfs {
     /// Triggers an emergency in-memory recovery shell when boot disk mapping fails
     pub fn trigger_rescue_fallback(&self) -> Result<String, BootError> {
         let mut fallback = String::new();
-        fallback.push_str("WARNING: Target root device not found! Dropping to fail-safe emergency ramfs shell.");
+        fallback.push_str(
+            "WARNING: Target root device not found! Dropping to fail-safe emergency ramfs shell.",
+        );
         Ok(fallback)
     }
 }
@@ -310,7 +314,11 @@ impl UefiBootLoader {
 }
 
 impl BootLoader for UefiBootLoader {
-    fn enter_kernel(&self, kernel_entry: usize, _params: *const BootParams) -> Result<(), BootError> {
+    fn enter_kernel(
+        &self,
+        kernel_entry: usize,
+        _params: *const BootParams,
+    ) -> Result<(), BootError> {
         if kernel_entry == 0 {
             return Err(BootError::InvalidConfiguration);
         }
@@ -958,11 +966,15 @@ mod tests {
         let initramfs = Initramfs::new();
 
         // 1. Success matching root device by UUID
-        let mount_str1 = initramfs.mount_root_by_uuid("root=UUID=8f9a2e3c-4b5d quiet").unwrap();
+        let mount_str1 = initramfs
+            .mount_root_by_uuid("root=UUID=8f9a2e3c-4b5d quiet")
+            .unwrap();
         assert!(mount_str1.contains("Mounted device with UUID=8f9a2e3c-4b5d"));
 
         // 2. Success matching root device by LABEL
-        let mount_str2 = initramfs.mount_root_by_uuid("root=LABEL=SIGMAOS_ROOT verbose").unwrap();
+        let mount_str2 = initramfs
+            .mount_root_by_uuid("root=LABEL=SIGMAOS_ROOT verbose")
+            .unwrap();
         assert!(mount_str2.contains("Mounted device with Label=SIGMAOS_ROOT"));
     }
 

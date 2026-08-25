@@ -75,47 +75,41 @@ impl SigmaFile {
     pub fn open(path: &str, mode: OpenMode) -> Result<Self, FsError> {
         let path_cstr = Self::path_to_cstring(path)?;
         let flags = Self::mode_to_flags(mode);
-        
-        let fd = unsafe {
-            syscall_open(path_cstr.as_ptr(), flags, 0o644)
-        };
-        
+
+        let fd = unsafe { syscall_open(path_cstr.as_ptr(), flags, 0o644) };
+
         if fd < 0 {
             return Err(FsError::IoError);
         }
-        
+
         Ok(Self {
             fd,
             path: crate::klib::string::SigmaString::from_str(path),
         })
     }
-    
+
     /// Read data from the file
     pub fn read(&mut self, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let result = unsafe {
-            syscall_read(self.fd, buffer.as_mut_ptr(), buffer.len())
-        };
-        
+        let result = unsafe { syscall_read(self.fd, buffer.as_mut_ptr(), buffer.len()) };
+
         if result < 0 {
             Err(FsError::IoError)
         } else {
             Ok(result as usize)
         }
     }
-    
+
     /// Write data to the file
     pub fn write(&mut self, data: &[u8]) -> Result<usize, FsError> {
-        let result = unsafe {
-            syscall_write(self.fd, data.as_ptr(), data.len())
-        };
-        
+        let result = unsafe { syscall_write(self.fd, data.as_ptr(), data.len()) };
+
         if result < 0 {
             Err(FsError::IoError)
         } else {
             Ok(result as usize)
         }
     }
-    
+
     /// Seek within the file
     pub fn seek(&mut self, pos: SeekFrom) -> Result<u64, FsError> {
         let (whence, offset) = match pos {
@@ -123,42 +117,36 @@ impl SigmaFile {
             SeekFrom::Current(offset) => (1, offset),
             SeekFrom::End(offset) => (2, offset),
         };
-        
-        let result = unsafe {
-            syscall_lseek(self.fd, offset, whence)
-        };
-        
+
+        let result = unsafe { syscall_lseek(self.fd, offset, whence) };
+
         if result < 0 {
             Err(FsError::IoError)
         } else {
             Ok(result as u64)
         }
     }
-    
+
     /// Flush the file buffer
     pub fn flush(&mut self) -> Result<(), FsError> {
-        let result = unsafe {
-            syscall_fsync(self.fd)
-        };
-        
+        let result = unsafe { syscall_fsync(self.fd) };
+
         if result < 0 {
             Err(FsError::IoError)
         } else {
             Ok(())
         }
     }
-    
+
     /// Get file metadata
     pub fn metadata(&self) -> Result<Metadata, FsError> {
         let mut stat = Stat::default();
-        let result = unsafe {
-            syscall_fstat(self.fd, &mut stat)
-        };
-        
+        let result = unsafe { syscall_fstat(self.fd, &mut stat) };
+
         if result < 0 {
             return Err(FsError::IoError);
         }
-        
+
         Ok(Metadata {
             size: stat.st_size,
             is_file: stat.is_file(),
@@ -168,20 +156,18 @@ impl SigmaFile {
             created: stat.created,
         })
     }
-    
+
     /// Close the file
     pub fn close(self) -> Result<(), FsError> {
-        let result = unsafe {
-            syscall_close(self.fd)
-        };
-        
+        let result = unsafe { syscall_close(self.fd) };
+
         if result < 0 {
             Err(FsError::IoError)
         } else {
             Ok(())
         }
     }
-    
+
     /// Convert open mode to flags
     fn mode_to_flags(mode: OpenMode) -> u32 {
         match mode {
@@ -194,29 +180,27 @@ impl SigmaFile {
             OpenMode::Truncate => O_WRONLY | O_TRUNC,
         }
     }
-    
+
     /// Convert path to C string
     fn path_to_cstring(path: &str) -> Result<[u8; 256], FsError> {
         let mut cstr = [0u8; 256];
         let bytes = path.as_bytes();
-        
+
         if bytes.len() >= 256 {
             return Err(FsError::InvalidPath);
         }
-        
+
         for (i, &byte) in bytes.iter().enumerate() {
             cstr[i] = byte;
         }
-        
+
         Ok(cstr)
     }
 }
 
 impl Drop for SigmaFile {
     fn drop(&mut self) {
-        let _ = unsafe {
-            syscall_close(self.fd)
-        };
+        let _ = unsafe { syscall_close(self.fd) };
     }
 }
 
@@ -243,7 +227,7 @@ impl Stat {
     fn is_file(&self) -> bool {
         (self.st_mode & 0o170000) == 0o100000
     }
-    
+
     fn is_directory(&self) -> bool {
         (self.st_mode & 0o170000) == 0o040000
     }
@@ -266,64 +250,56 @@ impl SigmaDir {
     /// Open a directory
     pub fn open(path: &str) -> Result<Self, FsError> {
         let path_cstr = SigmaFile::path_to_cstring(path)?;
-        let fd = unsafe {
-            syscall_opendir(path_cstr.as_ptr())
-        };
-        
+        let fd = unsafe { syscall_opendir(path_cstr.as_ptr()) };
+
         if fd < 0 {
             return Err(FsError::IoError);
         }
-        
+
         Ok(Self {
             fd,
             path: crate::klib::string::SigmaString::from_str(path),
         })
     }
-    
+
     /// Read directory entries
     pub fn read(&mut self) -> Result<Vec<DirEntry>, FsError> {
         let mut entries = Vec::new();
         let mut entry = DirEntryRaw::default();
-        
+
         loop {
-            let result = unsafe {
-                syscall_readdir(self.fd, &mut entry)
-            };
-            
+            let result = unsafe { syscall_readdir(self.fd, &mut entry) };
+
             if result < 0 {
                 break;
             }
-            
-            let name = unsafe {
-                Self::cstr_to_string(entry.d_name.as_ptr())
-            };
-            
+
+            let name = unsafe { Self::cstr_to_string(entry.d_name.as_ptr()) };
+
             let is_file = entry.d_type == 8; // DT_REG
             let is_directory = entry.d_type == 4; // DT_DIR
-            
+
             entries.push(DirEntry {
                 name,
                 is_file,
                 is_directory,
             });
         }
-        
+
         Ok(entries)
     }
-    
+
     /// Close the directory
     pub fn close(self) -> Result<(), FsError> {
-        let result = unsafe {
-            syscall_closedir(self.fd)
-        };
-        
+        let result = unsafe { syscall_closedir(self.fd) };
+
         if result < 0 {
             Err(FsError::IoError)
         } else {
             Ok(())
         }
     }
-    
+
     /// Convert C string to Rust string
     unsafe fn cstr_to_string(ptr: *const c_char) -> String {
         let mut len = 0;
@@ -339,9 +315,7 @@ impl SigmaDir {
 
 impl Drop for SigmaDir {
     fn drop(&mut self) {
-        let _ = unsafe {
-            syscall_closedir(self.fd)
-        };
+        let _ = unsafe { syscall_closedir(self.fd) };
     }
 }
 
@@ -510,12 +484,12 @@ unsafe fn syscall_closedir(fd: RawFd) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_path_to_cstring() {
         let result = SigmaFile::path_to_cstring("test.txt");
         assert!(result.is_ok());
-        
+
         let cstr = result.unwrap();
         assert_eq!(cstr[0], b't');
         assert_eq!(cstr[1], b'e');
@@ -527,23 +501,29 @@ mod tests {
         assert_eq!(cstr[7], b't');
         assert_eq!(cstr[8], 0);
     }
-    
+
     #[test]
     fn test_mode_to_flags() {
         assert_eq!(SigmaFile::mode_to_flags(OpenMode::ReadOnly), O_RDONLY);
         assert_eq!(SigmaFile::mode_to_flags(OpenMode::WriteOnly), O_WRONLY);
         assert_eq!(SigmaFile::mode_to_flags(OpenMode::ReadWrite), O_RDWR);
-        assert_eq!(SigmaFile::mode_to_flags(OpenMode::Append), O_WRONLY | O_APPEND);
-        assert_eq!(SigmaFile::mode_to_flags(OpenMode::Create), O_CREAT | O_WRONLY | O_TRUNC);
+        assert_eq!(
+            SigmaFile::mode_to_flags(OpenMode::Append),
+            O_WRONLY | O_APPEND
+        );
+        assert_eq!(
+            SigmaFile::mode_to_flags(OpenMode::Create),
+            O_CREAT | O_WRONLY | O_TRUNC
+        );
     }
-    
+
     #[test]
     fn test_stat_types() {
         let mut stat = Stat::default();
         stat.st_mode = 0o100644; // Regular file
         assert!(stat.is_file());
         assert!(!stat.is_directory());
-        
+
         stat.st_mode = 0o040755; // Directory
         assert!(!stat.is_file());
         assert!(stat.is_directory());

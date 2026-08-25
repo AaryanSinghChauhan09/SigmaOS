@@ -163,8 +163,9 @@ impl SigmaEnv {
         }
     }
 
-    /// Get command line arguments iterator
-    pub fn args() -> ArgsIterator {
+    /// Get command line arguments
+    pub fn args() -> impl Iterator<Item = &'static str> {
+        // Get command line arguments
         let argv = unsafe { Self::get_argv_pointer() };
         ArgsIterator::new(argv)
     }

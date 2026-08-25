@@ -49,11 +49,24 @@ impl BsdStatefulPacketFilter {
         }
     }
 
-    pub fn evaluate_packet(&mut self, src_ip: [u8; 4], dst_ip: [u8; 4], src_port: u16, dst_port: u16, payload_len: usize) -> PfRuleAction {
+    pub fn evaluate_packet(
+        &mut self,
+        src_ip: [u8; 4],
+        dst_ip: [u8; 4],
+        src_port: u16,
+        dst_port: u16,
+        payload_len: usize,
+    ) -> PfRuleAction {
         // Check existing state table for stateful match
         if let Some(entry) = self.state_table.iter_mut().find(|e| {
-            (e.src_ip == src_ip && e.dst_ip == dst_ip && e.src_port == src_port && e.dst_port == dst_port)
-                || (e.src_ip == dst_ip && e.dst_ip == src_ip && e.src_port == dst_port && e.dst_port == src_port)
+            (e.src_ip == src_ip
+                && e.dst_ip == dst_ip
+                && e.src_port == src_port
+                && e.dst_port == dst_port)
+                || (e.src_ip == dst_ip
+                    && e.dst_ip == src_ip
+                    && e.src_port == dst_port
+                    && e.dst_port == src_port)
         }) {
             entry.packets_matched += 1;
             entry.bytes_matched += payload_len as u64;
@@ -359,11 +372,17 @@ impl PfStateSynchronizationEngine {
         for &b in &entry.dst_ip {
             h = h.wrapping_mul(31).wrapping_add(u64::from(b));
         }
-        h = h.wrapping_add(u64::from(entry.src_port) << 16).wrapping_add(u64::from(entry.dst_port));
+        h = h
+            .wrapping_add(u64::from(entry.src_port) << 16)
+            .wrapping_add(u64::from(entry.dst_port));
         h
     }
 
-    pub fn create_sync_message(&mut self, msg_type: PfSyncMsgType, entry: PfStateEntry) -> PfSyncMessage {
+    pub fn create_sync_message(
+        &mut self,
+        msg_type: PfSyncMsgType,
+        entry: PfStateEntry,
+    ) -> PfSyncMessage {
         let hmac = self.compute_hmac(&entry);
         self.sync_messages_sent += 1;
         PfSyncMessage {
@@ -382,7 +401,10 @@ impl PfStateSynchronizationEngine {
         match msg.msg_type {
             PfSyncMsgType::InsertState | PfSyncMsgType::UpdateState => {
                 if let Some(existing) = self.synchronized_states.iter_mut().find(|e| {
-                    e.src_ip == msg.entry.src_ip && e.dst_ip == msg.entry.dst_ip && e.src_port == msg.entry.src_port && e.dst_port == msg.entry.dst_port
+                    e.src_ip == msg.entry.src_ip
+                        && e.dst_ip == msg.entry.dst_ip
+                        && e.src_port == msg.entry.src_port
+                        && e.dst_port == msg.entry.dst_port
                 }) {
                     existing.packets_matched = msg.entry.packets_matched;
                     existing.bytes_matched = msg.entry.bytes_matched;
@@ -392,7 +414,10 @@ impl PfStateSynchronizationEngine {
             }
             PfSyncMsgType::DeleteState => {
                 self.synchronized_states.retain(|e| {
-                    !(e.src_ip == msg.entry.src_ip && e.dst_ip == msg.entry.dst_ip && e.src_port == msg.entry.src_port && e.dst_port == msg.entry.dst_port)
+                    !(e.src_ip == msg.entry.src_ip
+                        && e.dst_ip == msg.entry.dst_ip
+                        && e.src_port == msg.entry.src_port
+                        && e.dst_port == msg.entry.dst_port)
                 });
             }
             PfSyncMsgType::SyncAll => {
@@ -491,7 +516,12 @@ impl BsdSecureNtpConstraintSync {
         }
     }
 
-    pub fn add_tls_constraint(&mut self, domain: &'static str, cert_timestamp: u64, is_valid: bool) {
+    pub fn add_tls_constraint(
+        &mut self,
+        domain: &'static str,
+        cert_timestamp: u64,
+        is_valid: bool,
+    ) {
         self.constraints.push(TlsConstraint {
             domain,
             cert_timestamp,
@@ -499,7 +529,10 @@ impl BsdSecureNtpConstraintSync {
         });
     }
 
-    pub fn validate_ntp_time_sample(&mut self, candidate_ntp_time: u64) -> Result<u64, &'static str> {
+    pub fn validate_ntp_time_sample(
+        &mut self,
+        candidate_ntp_time: u64,
+    ) -> Result<u64, &'static str> {
         if self.constraints.is_empty() {
             return Err("NTP_TLS_CONSTRAINT: No active TLS constraints configured");
         }
@@ -517,7 +550,9 @@ impl BsdSecureNtpConstraintSync {
         };
 
         if skew > self.max_allowed_skew_secs {
-            return Err("NTP_TLS_CONSTRAINT: NTP clock skew exceeds maximum allowed threshold boundary");
+            return Err(
+                "NTP_TLS_CONSTRAINT: NTP clock skew exceeds maximum allowed threshold boundary",
+            );
         }
 
         self.system_time = candidate_ntp_time;
@@ -555,7 +590,12 @@ impl VirtioFsZeroCopyBridge {
         }
     }
 
-    pub fn map_dax_region(&mut self, region_id: u32, host_phys_addr: u64, page_count: usize) -> u32 {
+    pub fn map_dax_region(
+        &mut self,
+        region_id: u32,
+        host_phys_addr: u64,
+        page_count: usize,
+    ) -> u32 {
         self.dax_regions.push(DaxMemoryRegion {
             region_id,
             host_phys_addr,
@@ -785,7 +825,10 @@ mod tests {
         assert!(ntp_sync.validate_ntp_time_sample(spoofed_time).is_err());
 
         let valid_ntp_time = 1700000100;
-        assert_eq!(ntp_sync.validate_ntp_time_sample(valid_ntp_time).unwrap(), 1700000100);
+        assert_eq!(
+            ntp_sync.validate_ntp_time_sample(valid_ntp_time).unwrap(),
+            1700000100
+        );
     }
 
     #[test]

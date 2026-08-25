@@ -6,12 +6,12 @@ use std::collections::HashMap;
 /// Linux-inspired Namespace Flags for process isolation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NamespaceFlags {
-    pub mount_ns: bool,   // CLONE_NEWNS
-    pub pid_ns: bool,     // CLONE_NEWPID
-    pub net_ns: bool,     // CLONE_NEWNET
-    pub user_ns: bool,    // CLONE_NEWUSER
-    pub uts_ns: bool,     // CLONE_NEWUTS
-    pub ipc_ns: bool,     // CLONE_NEWIPC
+    pub mount_ns: bool, // CLONE_NEWNS
+    pub pid_ns: bool,   // CLONE_NEWPID
+    pub net_ns: bool,   // CLONE_NEWNET
+    pub user_ns: bool,  // CLONE_NEWUSER
+    pub uts_ns: bool,   // CLONE_NEWUTS
+    pub ipc_ns: bool,   // CLONE_NEWIPC
 }
 
 impl NamespaceFlags {
@@ -86,7 +86,7 @@ impl SeccompPolicy {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CgroupV2Limits {
     pub memory_max_bytes: usize,
-    pub cpu_weight: u32,  // 1-1000 range
+    pub cpu_weight: u32, // 1-1000 range
     pub pids_max: u32,
     pub io_weight: u32,
 }
@@ -148,14 +148,19 @@ impl DistroSandboxEngine {
             is_active: true,
         };
 
-        self.active_sandboxes.insert(container_id.to_string(), instance);
+        self.active_sandboxes
+            .insert(container_id.to_string(), instance);
         Ok(())
     }
 
     /// Validate syscall invocation against Seccomp BPF policy
     pub fn validate_syscall(&self, container_id: &str, syscall_num: u32) -> SeccompAction {
         if let Some(sandbox) = self.active_sandboxes.get(container_id) {
-            if sandbox.seccomp_policy.blocked_syscalls.contains(&syscall_num) {
+            if sandbox
+                .seccomp_policy
+                .blocked_syscalls
+                .contains(&syscall_num)
+            {
                 return SeccompAction::KillProcess;
             }
             sandbox.seccomp_policy.default_action
@@ -165,21 +170,43 @@ impl DistroSandboxEngine {
     }
 
     /// Validate path access against Landlock LSM rules
-    pub fn validate_path_access(&self, container_id: &str, target_path: &str, is_write: bool) -> bool {
+    pub fn validate_path_access(
+        &self,
+        container_id: &str,
+        target_path: &str,
+        is_write: bool,
+    ) -> bool {
         if let Some(sandbox) = self.active_sandboxes.get(container_id) {
             // 1. Check forbidden paths
-            if sandbox.landlock_rules.forbidden_paths.iter().any(|p| target_path.starts_with(p)) {
+            if sandbox
+                .landlock_rules
+                .forbidden_paths
+                .iter()
+                .any(|p| target_path.starts_with(p))
+            {
                 return false;
             }
 
             // 2. Check write intent rules
             if is_write {
-                return sandbox.landlock_rules.read_write_paths.iter().any(|p| target_path.starts_with(p));
+                return sandbox
+                    .landlock_rules
+                    .read_write_paths
+                    .iter()
+                    .any(|p| target_path.starts_with(p));
             }
 
             // 3. Read access check
-            sandbox.landlock_rules.read_only_paths.iter().any(|p| target_path.starts_with(p))
-                || sandbox.landlock_rules.read_write_paths.iter().any(|p| target_path.starts_with(p))
+            sandbox
+                .landlock_rules
+                .read_only_paths
+                .iter()
+                .any(|p| target_path.starts_with(p))
+                || sandbox
+                    .landlock_rules
+                    .read_write_paths
+                    .iter()
+                    .any(|p| target_path.starts_with(p))
         } else {
             true
         }
@@ -203,16 +230,25 @@ mod tests {
         let ns = NamespaceFlags::full_isolation();
         let limits = CgroupV2Limits::default_container_limits();
 
-        engine.create_sandbox("app_sandbox_1", "/var/lib/sigma/rootfs_1", ns, limits).unwrap();
+        engine
+            .create_sandbox("app_sandbox_1", "/var/lib/sigma/rootfs_1", ns, limits)
+            .unwrap();
 
         // 1. Test Seccomp BPF syscall checks
-        assert_eq!(engine.validate_syscall("app_sandbox_1", 1), SeccompAction::Allow); // sys_write
-        assert_eq!(engine.validate_syscall("app_sandbox_1", 101), SeccompAction::KillProcess); // ptrace blocked!
+        assert_eq!(
+            engine.validate_syscall("app_sandbox_1", 1),
+            SeccompAction::Allow
+        ); // sys_write
+        assert_eq!(
+            engine.validate_syscall("app_sandbox_1", 101),
+            SeccompAction::KillProcess
+        ); // ptrace blocked!
 
         // 2. Test Landlock LSM path access rules
         assert!(engine.validate_path_access("app_sandbox_1", "/usr/share/doc", false)); // Read allowed
         assert!(!engine.validate_path_access("app_sandbox_1", "/usr/share/doc", true)); // Write forbidden on read-only path
         assert!(engine.validate_path_access("app_sandbox_1", "/tmp/scratch.tmp", true)); // Write allowed on /tmp
-        assert!(!engine.validate_path_access("app_sandbox_1", "/proc/kcore", false)); // Forbidden path!
+        assert!(!engine.validate_path_access("app_sandbox_1", "/proc/kcore", false));
+        // Forbidden path!
     }
 }

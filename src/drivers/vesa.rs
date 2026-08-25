@@ -170,7 +170,14 @@ impl VesaDriver {
     }
 
     /// Standard Bresenham's Line Drawing Algorithm (integer-only arithmetic)
-    pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: u32) -> Result<(), VesaError> {
+    pub fn draw_line(
+        &mut self,
+        x0: i32,
+        y0: i32,
+        x1: i32,
+        y1: i32,
+        color: u32,
+    ) -> Result<(), VesaError> {
         let dx = (x1 - x0).abs();
         let dy = -(y1 - y0).abs();
         let sx = if x0 < x1 { 1 } else { -1 };
@@ -181,7 +188,11 @@ impl VesaDriver {
         let mut cy = y0;
 
         loop {
-            if cx >= 0 && cx < self.mode_info.width as i32 && cy >= 0 && cy < self.mode_info.height as i32 {
+            if cx >= 0
+                && cx < self.mode_info.width as i32
+                && cy >= 0
+                && cy < self.mode_info.height as i32
+            {
                 self.write_pixel(cx as u32, cy as u32, color).ok();
             }
 
@@ -210,15 +221,8 @@ impl VesaDriver {
         let mut glyph = [0u8; 16];
         if ch == 'A' {
             glyph = [
-                0b00011000,
-                0b00111100,
-                0b01100110,
-                0b01100110,
-                0b11111111,
-                0b11000011,
-                0b11000011,
-                0b00000000,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+                0b00011000, 0b00111100, 0b01100110, 0b01100110, 0b11111111, 0b11000011, 0b11000011,
+                0b00000000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             ];
         } else {
             // Default generic dash glyph

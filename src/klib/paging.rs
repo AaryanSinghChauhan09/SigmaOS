@@ -232,6 +232,47 @@ impl SimpleVMM {
         (virt >> 12) & 0x1FF
     }
 
+    pub fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
+        let pml4_idx = self.get_pml4_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
+        let pd_idx = self.get_pd_index(virt);
+        let pt_idx = self.get_pt_index(virt);
+
+        if !self.pml4.get_entry_ref(pml4_idx).is_present() {
+            return Err(PageFaultError::NotPresent);
+        }
+
+        if let Some(ref mut pdpt) = self
+            .pdpt_tables
+            .get_mut(pml4_idx)
+            .and_then(|opt| opt.as_mut())
+        {
+            if !pdpt.get_entry_ref(pdpt_idx).is_present() {
+                return Err(PageFaultError::NotPresent);
+            }
+            if let Some(ref mut pd) = self
+                .pd_tables
+                .get_mut(pdpt_idx)
+                .and_then(|opt| opt.as_mut())
+            {
+                if !pd.get_entry_ref(pd_idx).is_present() {
+                    return Err(PageFaultError::NotPresent);
+                }
+                if let Some(ref mut pt) =
+                    self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut())
+                {
+                    let pt_entry = pt.get_entry(pt_idx);
+                    if pt_entry.is_present() {
+                        pt_entry.set_writable(false);
+                        pt_entry.set_cow(true);
+                        return Ok(());
+                    }
+                }
+            }
+        }
+        Err(PageFaultError::NotPresent)
+    }
+
     pub fn map_large_page(
         &mut self,
         virt: VirtualAddress,
@@ -346,10 +387,18 @@ impl SimpleVMM {
         if let Some(ref mut pdpt) = self.pdpt_tables.get_mut(pml4_idx).and_then(|o| o.as_mut()) {
             let pdpt_phys = self.pml4.get_entry_ref(pml4_idx).get_physical_address();
             let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
-            if let Some(ref mut pd) = self.pd_tables.get_mut(pd_idx_in_vec).and_then(|o| o.as_mut()) {
+            if let Some(ref mut pd) = self
+                .pd_tables
+                .get_mut(pd_idx_in_vec)
+                .and_then(|o| o.as_mut())
+            {
                 let pd_phys = pdpt.get_entry_ref(pdpt_idx).get_physical_address();
                 let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
-                if let Some(ref mut pt) = self.pt_tables.get_mut(pt_idx_in_vec).and_then(|o| o.as_mut()) {
+                if let Some(ref mut pt) = self
+                    .pt_tables
+                    .get_mut(pt_idx_in_vec)
+                    .and_then(|o| o.as_mut())
+                {
                     let mut entry = pt.entries[pt_idx];
                     entry.set_writable(false);
                     entry.cow.store(1, Ordering::SeqCst);
@@ -477,17 +526,27 @@ impl VirtualMemoryManager for SimpleVMM {
             return Err(PageFaultError::NotPresent);
         }
 
-        if let Some(ref mut pdpt) = self.pdpt_tables.get_mut(pml4_idx).and_then(|opt| opt.as_mut()) {
+        if let Some(ref mut pdpt) = self
+            .pdpt_tables
+            .get_mut(pml4_idx)
+            .and_then(|opt| opt.as_mut())
+        {
             if !pdpt.get_entry(pdpt_idx).is_present() {
                 return Err(PageFaultError::NotPresent);
             }
 
-            if let Some(ref mut pd) = self.pd_tables.get_mut(pdpt_idx).and_then(|opt| opt.as_mut()) {
+            if let Some(ref mut pd) = self
+                .pd_tables
+                .get_mut(pdpt_idx)
+                .and_then(|opt| opt.as_mut())
+            {
                 if !pd.get_entry(pd_idx).is_present() {
                     return Err(PageFaultError::NotPresent);
                 }
 
-                if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut()) {
+                if let Some(ref mut pt) =
+                    self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut())
+                {
                     let pt_entry = pt.get_entry(pt_idx);
                     pt_entry.set_present(false);
                     return Ok(());

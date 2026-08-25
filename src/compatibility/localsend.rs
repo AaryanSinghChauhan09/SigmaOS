@@ -160,8 +160,14 @@ impl LocalSendBridgeManager {
         token: &str,
         _chunk_payload: &[u8],
     ) -> Result<(), &'static str> {
-        let session = self.active_sessions.get(session_id).ok_or("Session not found")?;
-        let expected_token = session.accepted_files_tokens.get(file_id).ok_or("File not accepted in session")?;
+        let session = self
+            .active_sessions
+            .get(session_id)
+            .ok_or("Session not found")?;
+        let expected_token = session
+            .accepted_files_tokens
+            .get(file_id)
+            .ok_or("File not accepted in session")?;
         if expected_token != token {
             return Err("Invalid file validation token");
         }
@@ -224,16 +230,20 @@ mod tests {
 
         let cap = CapabilityToken::new();
         // Try with missing/invalid PIN
-        let bad_prep = manager.prepare_upload(peer.clone(), vec![file.clone()], Some("000000"), &cap);
+        let bad_prep =
+            manager.prepare_upload(peer.clone(), vec![file.clone()], Some("000000"), &cap);
         assert!(bad_prep.is_err());
 
         // Prepare with correct PIN
-        let session = manager.prepare_upload(peer, vec![file], Some("123456"), &cap).unwrap();
+        let session = manager
+            .prepare_upload(peer, vec![file], Some("123456"), &cap)
+            .unwrap();
         assert_eq!(session.session_id, "sess_fp_banana456");
 
         // Upload chunk with valid token
         let token = session.accepted_files_tokens.get("file_img1").unwrap();
-        let chunk_res = manager.handle_upload_chunk("sess_fp_banana456", "file_img1", token, &[0u8; 10]);
+        let chunk_res =
+            manager.handle_upload_chunk("sess_fp_banana456", "file_img1", token, &[0u8; 10]);
         assert!(chunk_res.is_ok());
 
         // Cancel session

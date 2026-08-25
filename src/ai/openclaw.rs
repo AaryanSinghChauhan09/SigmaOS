@@ -23,8 +23,8 @@
 // 2. ClawVoiceTranscriber (Acoustic frame feature-extraction & S-CLI mapper)
 // 3. ClawChatIntegrator (Chat webhook alert triggers and GitHub triage)
 
-use std::collections::{BTreeMap, VecDeque};
 use core::sync::atomic::{AtomicBool, Ordering};
+use std::collections::{BTreeMap, VecDeque};
 
 // ==========================================
 // 1. ClawBackgroundDaemon

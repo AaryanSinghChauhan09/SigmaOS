@@ -286,7 +286,11 @@ impl TailscaleWireguardMesh {
         }
     }
 
-    pub fn route_mesh_packet(&mut self, target_ip: [u8; 4], packet_len: usize) -> Result<(), &'static str> {
+    pub fn route_mesh_packet(
+        &mut self,
+        target_ip: [u8; 4],
+        packet_len: usize,
+    ) -> Result<(), &'static str> {
         if target_ip == self.local_ip {
             return Ok(());
         }
@@ -312,7 +316,10 @@ mod tests {
     fn test_tlp_power_governor() {
         let mut tlp = TlpPowerGovernor::new();
         assert_eq!(tlp.current_config.power_source, PowerSource::AC);
-        assert_eq!(tlp.current_config.cpu_policy, CpuGovernorPolicy::Performance);
+        assert_eq!(
+            tlp.current_config.cpu_policy,
+            CpuGovernorPolicy::Performance
+        );
 
         // Switch to battery
         tlp.switch_power_source(PowerSource::Battery);

@@ -2,10 +2,10 @@
 //! Reduces dependency on alloc::collections::BTreeMap
 
 extern crate alloc;
+use crate::klib::hash::SimpleHasher;
 use alloc::vec::Vec;
 use core::borrow::Borrow;
 use core::hash::{Hash, Hasher};
-use crate::klib::hash::SimpleHasher;
 
 pub type HashMap<K, V> = BTreeMap<K, V>;
 
@@ -311,7 +311,10 @@ where
                 if bucket[i].0 == key {
                     let val_ptr = &mut bucket[i].1 as *mut V;
                     // SAFETY: val_ptr is a valid pointer to the value in the bucket
-                    return Entry::Occupied(OccupiedEntry { value: unsafe { &mut *val_ptr }, _marker: core::marker::PhantomData });
+                    return Entry::Occupied(OccupiedEntry {
+                        value: unsafe { &mut *val_ptr },
+                        _marker: core::marker::PhantomData,
+                    });
                 }
             }
         }
@@ -327,7 +330,10 @@ where
     }
 
     pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
-        ValuesMut { iter: self.iter_mut(), _marker: core::marker::PhantomData }
+        ValuesMut {
+            iter: self.iter_mut(),
+            _marker: core::marker::PhantomData,
+        }
     }
 
     #[allow(unused_mut)]
@@ -517,7 +523,7 @@ mod tests {
         let mut map = BTreeMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
-        
+
         assert_eq!(map.get(&"key1"), Some(&"value1"));
         assert_eq!(map.get(&"key2"), Some(&"value2"));
         assert_eq!(map.get(&"key3"), None);
@@ -536,7 +542,7 @@ mod tests {
         let mut map = BTreeMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
-        
+
         let mut count = 0;
         for (_key, _value) in map.iter() {
             count += 1;

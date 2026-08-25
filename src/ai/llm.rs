@@ -203,7 +203,10 @@ impl LocalLlmEngine {
         if !self.loaded {
             return Err("Model not loaded".to_string());
         }
-        Ok(format!("{{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON for {}\"}}", schema_desc))
+        Ok(format!(
+            "{{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON for {}\"}}",
+            schema_desc
+        ))
     }
 
     pub fn new(config: LlmConfig) -> Self {
@@ -244,18 +247,17 @@ impl LocalLlmEngine {
 
         // Determine output based on format
         let text_output = match request.format {
-            InferenceFormat::Json => "{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON\"}".to_string(),
+            InferenceFormat::Json => {
+                "{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON\"}"
+                    .to_string()
+            }
             _ => "Generated response placeholder".to_string(),
         };
 
         // For now, return a placeholder response
         let _start_time = 0; // Would use actual timing
 
-        let mut response = InferenceResponse::new(
-            text_output,
-            10,
-            100,
-        );
+        let mut response = InferenceResponse::new(text_output, 10, 100);
 
         if !request.tools.is_empty() {
             let mut calls = Vec::new();
@@ -442,7 +444,11 @@ impl PagedAttentionCacheManager {
     }
 
     /// Allocate non-contiguous physical blocks for a logical token sequence
-    pub fn allocate_blocks_for_sequence(&mut self, seq_id: usize, token_count: usize) -> Result<Vec<usize>, String> {
+    pub fn allocate_blocks_for_sequence(
+        &mut self,
+        seq_id: usize,
+        token_count: usize,
+    ) -> Result<Vec<usize>, String> {
         let blocks_needed = (token_count + self.block_size_tokens - 1) / self.block_size_tokens;
         let mut allocated = Vec::new();
 
@@ -544,7 +550,8 @@ impl GrammarLogitsProcessor {
 
     pub fn register_state_transitions(&mut self, state: usize, mut permissible_tokens: Vec<u32>) {
         permissible_tokens.sort_unstable();
-        self.allowed_state_transitions.push((state, permissible_tokens));
+        self.allowed_state_transitions
+            .push((state, permissible_tokens));
     }
 
     /// Modifies logits array by setting non-permissible token scores to -infinity (-1e9)

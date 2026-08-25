@@ -46,7 +46,11 @@ impl SlackwarePkgTools {
 
     /// Simulates removepkg
     pub fn remove_pkg(&mut self, pkg_name: &str) -> Result<SlackPackage, &'static str> {
-        if let Some(pos) = self.installed_packages.iter().position(|p| p.name == pkg_name) {
+        if let Some(pos) = self
+            .installed_packages
+            .iter()
+            .position(|p| p.name == pkg_name)
+        {
             Ok(self.installed_packages.remove(pos))
         } else {
             Err("Package not found")
@@ -172,7 +176,11 @@ impl GuixFunctionalStore {
     /// Garbage collects unused store paths
     pub fn gc_live_paths(&mut self, live_roots: &[&str]) -> usize {
         let initial_count = self.store.len();
-        self.store.retain(|d| live_roots.iter().any(|&root| d.store_path.contains(root) || d.name == root));
+        self.store.retain(|d| {
+            live_roots
+                .iter()
+                .any(|&root| d.store_path.contains(root) || d.name == root)
+        });
         initial_count - self.store.len()
     }
 }
@@ -236,7 +244,8 @@ impl GNUGuixShepherdSupervisor {
         // Ensure required services/provisions are active
         for req in &requires {
             let req_active = self.services.iter().any(|s| {
-                (s.name == *req || s.provides.contains(req)) && s.state == ShepherdServiceState::Running
+                (s.name == *req || s.provides.contains(req))
+                    && s.state == ShepherdServiceState::Running
             });
             if !req_active {
                 return Err("Shepherd service dependency not satisfied");
@@ -326,7 +335,9 @@ impl OstreeDeploymentEngine {
     /// Layers an RPM package onto the active ostree deployment (rpm-ostree pkg-add)
     pub fn layer_package_overlay(&mut self, pkg_name: &str) -> Result<(), &'static str> {
         if let Some(idx) = self.active_index {
-            self.deployments[idx].layered_packages.push(String::from(pkg_name));
+            self.deployments[idx]
+                .layered_packages
+                .push(String::from(pkg_name));
             Ok(())
         } else {
             Err("No active deployment to layer package overlay onto")
@@ -465,7 +476,11 @@ impl NetBsdRumpKernel {
 
     /// Forwards a hypercall/syscall to the isolated RUMP driver server
     pub fn forward_rump_syscall(&mut self, server_id: u32) -> Result<u64, &'static str> {
-        if let Some(srv) = self.rump_servers.iter_mut().find(|s| s.server_id == server_id) {
+        if let Some(srv) = self
+            .rump_servers
+            .iter_mut()
+            .find(|s| s.server_id == server_id)
+        {
             srv.calls_processed += 1;
             Ok(srv.calls_processed)
         } else {
@@ -507,7 +522,13 @@ impl NetplanYamlRenderer {
         }
     }
 
-    pub fn add_interface(&mut self, name: &str, dhcp4: bool, addresses: &[&str], gateway: Option<&str>) {
+    pub fn add_interface(
+        &mut self,
+        name: &str,
+        dhcp4: bool,
+        addresses: &[&str],
+        gateway: Option<&str>,
+    ) {
         self.interfaces.push(NetplanInterface {
             name: String::from(name),
             dhcp4,
@@ -518,9 +539,15 @@ impl NetplanYamlRenderer {
 
     /// Renders declarative YAML structure into backend configurations
     pub fn generate_backend_config(&self) -> String {
-        let mut config = format!("network:\n  version: 2\n  renderer: {}\n  ethernets:\n", self.renderer_backend);
+        let mut config = format!(
+            "network:\n  version: 2\n  renderer: {}\n  ethernets:\n",
+            self.renderer_backend
+        );
         for iface in &self.interfaces {
-            config.push_str(&format!("    {}:\n      dhcp4: {}\n", iface.name, iface.dhcp4));
+            config.push_str(&format!(
+                "    {}:\n      dhcp4: {}\n",
+                iface.name, iface.dhcp4
+            ));
             if !iface.addresses.is_empty() {
                 config.push_str("      addresses:\n");
                 for addr in &iface.addresses {
@@ -595,11 +622,17 @@ pub struct Yast2ControlCenter {
 
 impl Yast2ControlCenter {
     pub fn new() -> Self {
-        Self { settings: Vec::new() }
+        Self {
+            settings: Vec::new(),
+        }
     }
 
     pub fn set_setting(&mut self, module: &str, key: &str, value: &str) {
-        if let Some(s) = self.settings.iter_mut().find(|s| s.module == module && s.key == key) {
+        if let Some(s) = self
+            .settings
+            .iter_mut()
+            .find(|s| s.module == module && s.key == key)
+        {
             s.value = String::from(value);
         } else {
             self.settings.push(YastSetting {
@@ -656,7 +689,12 @@ impl SnapperBtrfsEngine {
     }
 
     /// Creates a new Btrfs/S-FS snapshot before or after system transaction
-    pub fn create_snapshot(&mut self, snap_type: SnapperType, description: &str, root_data: &[u8]) -> u32 {
+    pub fn create_snapshot(
+        &mut self,
+        snap_type: SnapperType,
+        description: &str,
+        root_data: &[u8],
+    ) -> u32 {
         let mut hash_acc = 0u64;
         for &b in root_data {
             hash_acc = hash_acc.wrapping_mul(31).wrapping_add(b as u64);
@@ -759,7 +797,12 @@ mod tests {
     fn test_illumos_crossbow_and_netbsd_rump() {
         let mut crossbow = SolarisCrossbowVnicEngine::new();
         assert!(crossbow
-            .create_vnic("vnic0", "e1000g0", [0x02, 0x00, 0x00, 0x11, 0x22, 0x33], 1000)
+            .create_vnic(
+                "vnic0",
+                "e1000g0",
+                [0x02, 0x00, 0x00, 0x11, 0x22, 0x33],
+                1000
+            )
             .is_ok());
         assert!(crossbow.bind_cpu_core("vnic0", 2).is_ok());
         assert_eq!(crossbow.vnics[0].bound_cpu_core, Some(2));

@@ -33,22 +33,20 @@ pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
-pub use arch_pacman_engine::{ArchBuildSystem, AURHelper, PacmanDatabase, ArchPacmanPackage};
+pub use arch_compat::{
+    AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
+    PacmanDbAdapter, RollingSyncManager,
+};
+pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanDatabase};
 pub use debian_apt_engine::{AptRepository, DebPackage};
-pub use fedora_rpm_engine::{DnfRepository, RpmPackage};
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
 };
-pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
-pub use spec::{
-    ManagerCapability, PackageCapability,
-    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    SimplePackage, SimplePackageManager,
-    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+pub use fedora_rpm_engine::{DnfRepository, RpmPackage};
+pub use importer::{
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };
+pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
@@ -56,7 +54,17 @@ pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseF
 pub use transaction::Transaction;
 pub use universal_adapter::{
     AptDebManifest, UniversalPackageAdapter,
+pub use spec::{
+    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
+    PackageDependency, PackageError as SpecPackageError, PackageInfo,
+    PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
+    SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
+pub use store::{
+    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
+};
+pub use transaction::Transaction;
+pub use universal_adapter::{AptDebManifest, UniversalPackageManager as UniversalPackageAdapter};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
@@ -147,6 +155,24 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
+        }
+    }
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
         }
     }
 }

@@ -53,7 +53,9 @@ mod firmware;
 #[test]
 fn test_freebsd_jail_manager_inspection() {
     let mut mgr = FreeBsdJailManager::new();
-    let jail_id = mgr.create_jail("secure_web_jail", "192.168.1.100", "/vfs/jails/web").unwrap();
+    let jail_id = mgr
+        .create_jail("secure_web_jail", "192.168.1.100", "/vfs/jails/web")
+        .unwrap();
     assert_eq!(jail_id, 1);
 
     let jail_ref = mgr.jails.get(&jail_id).unwrap();
@@ -97,8 +99,12 @@ fn test_kvm_qemu_vcpu_inspection() {
 fn test_openbsd_unveil_inspection() {
     let mut unveil = UnveilManager::new();
     assert!(unveil.unveil("/var/log", "r").is_ok());
-    assert!(unveil.validate_path("/var/log/syslog", UnveilPermission::Read).is_ok());
-    assert!(unveil.validate_path("/var/log/syslog", UnveilPermission::Write).is_err());
+    assert!(unveil
+        .validate_path("/var/log/syslog", UnveilPermission::Read)
+        .is_ok());
+    assert!(unveil
+        .validate_path("/var/log/syslog", UnveilPermission::Write)
+        .is_err());
 }
 
 #[test]
@@ -110,7 +116,10 @@ fn test_zorin_gap_closure_inspection() {
 
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
+    use vm_manager::{
+        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
+        VirtioNetDeviceConfig, VmConfig, VmState,
+    };
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -139,21 +148,29 @@ fn test_vm_manager_kvm_qemu_inspection() {
     let vm_id = kvm.create_vm(&config).unwrap();
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
-    kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-        image_path: "/var/lib/images/rootfs.qcow2".to_string(),
-        read_only: false,
-        direct_io: true,
-        queue_size: 256,
-        block_size: 512,
-    }).unwrap();
+    kvm.attach_virtio_blk(
+        &vm_id,
+        VirtioBlockDeviceConfig {
+            image_path: "/var/lib/images/rootfs.qcow2".to_string(),
+            read_only: false,
+            direct_io: true,
+            queue_size: 256,
+            block_size: 512,
+        },
+    )
+    .unwrap();
 
-    kvm.attach_virtio_net(&vm_id, VirtioNetDeviceConfig {
-        mac_address: [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
-        tap_interface: "tap0".to_string(),
-        queues: 2,
-        offload_tso: true,
-        offload_csum: true,
-    }).unwrap();
+    kvm.attach_virtio_net(
+        &vm_id,
+        VirtioNetDeviceConfig {
+            mac_address: [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
+            tap_interface: "tap0".to_string(),
+            queues: 2,
+            offload_tso: true,
+            offload_csum: true,
+        },
+    )
+    .unwrap();
 
     kvm.start_vm(&vm_id).unwrap();
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Running);
@@ -167,7 +184,7 @@ fn test_vm_manager_kvm_qemu_inspection() {
 
 #[test]
 fn test_kernel_classic_algorithms_inspection() {
-    use eevdf::{EevdfScheduler, Task, ComputeUnit};
+    use eevdf::{ComputeUnit, EevdfScheduler, Task};
     use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbPageFlags};
 
     let mut sched = EevdfScheduler::new();
@@ -188,7 +205,10 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_zenith_desktop_applets_and_themes_inspection() {
-    use zenith_advanced::{DesktopAppletEngine, DesktopApplet, AppletCategory, ZenithThemePresetManager, ZenithThemePreset};
+    use zenith_advanced::{
+        AppletCategory, DesktopApplet, DesktopAppletEngine, ZenithThemePreset,
+        ZenithThemePresetManager,
+    };
 
     let mut applet_engine = DesktopAppletEngine::new();
     assert_eq!(applet_engine.get_active_applets().len(), 3);

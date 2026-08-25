@@ -23,7 +23,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 /// Linux Standard Base init script locations
 pub const LSB_INIT_SCRIPTS: &str = "/etc/init.d/";
 pub const LSB_RC_SCRIPTS: &str = "/etc/rc.d/";
@@ -250,9 +249,7 @@ impl SystemdTimerScheduler {
                 continue;
             }
             let trigger = match timer.timer_type {
-                TimerType::OnBoot => {
-                    timer.last_triggered_ms == 0 && self.current_time_ms >= 500
-                }
+                TimerType::OnBoot => timer.last_triggered_ms == 0 && self.current_time_ms >= 500,
                 TimerType::OnCalendarDaily => {
                     self.current_time_ms - timer.last_triggered_ms >= 86_400_000
                 }
@@ -351,7 +348,9 @@ pub struct PamServiceChain {
 
 impl PamServiceChain {
     pub fn new() -> Self {
-        Self { modules: Vec::new() }
+        Self {
+            modules: Vec::new(),
+        }
     }
 
     pub fn add_module(&mut self, name: &str, control_flag: &str, result: PamModuleResult) {
@@ -467,7 +466,7 @@ mod tests {
     fn test_seccomp_system_auditor() {
         let mut auditor = SeccompSystemAuditor::new();
         auditor.add_rule(57, SeccompAction::KillThread); // fork/clone system call constraint
-        auditor.add_rule(59, SeccompAction::Allow);      // execve
+        auditor.add_rule(59, SeccompAction::Allow); // execve
 
         assert_eq!(auditor.evaluate_syscall(59), SeccompAction::Allow);
         assert_eq!(auditor.evaluate_syscall(57), SeccompAction::KillThread);

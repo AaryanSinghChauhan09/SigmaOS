@@ -206,7 +206,12 @@ impl SovereignIsolationManager {
     }
 
     /// Registers a new isolated virtual domain
-    pub fn register_domain(&mut self, name_hash: u32, domain_type: DomainType, pci_slot: Option<u32>) -> Result<u32, &'static str> {
+    pub fn register_domain(
+        &mut self,
+        name_hash: u32,
+        domain_type: DomainType,
+        pci_slot: Option<u32>,
+    ) -> Result<u32, &'static str> {
         let dom_id = self.next_dom_id;
 
         let domain = VirtualDomain {
@@ -235,7 +240,10 @@ impl SovereignIsolationManager {
         let mut domains = self.domains.borrow_mut();
         for slot in domains.iter_mut() {
             if let Some(ref mut domain) = slot {
-                if domain.dom_id == dom_id && (domain.domain_type == DomainType::DispVM || domain.domain_type == DomainType::Disposable) {
+                if domain.dom_id == dom_id
+                    && (domain.domain_type == DomainType::DispVM
+                        || domain.domain_type == DomainType::Disposable)
+                {
                     domain.is_running = false;
                     *slot = None;
                     return Ok(());
@@ -310,7 +318,12 @@ pub struct IsolatedDomain {
 }
 
 impl IsolatedDomain {
-    pub fn new(id: DomainID, name_str: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Self {
+    pub fn new(
+        id: DomainID,
+        name_str: &[u8],
+        domain_type: DomainType,
+        caps: CapabilityToken,
+    ) -> Self {
         let mut name_arr = [0u8; 32];
         let len = name_str.len().min(31);
         name_arr[..len].copy_from_slice(&name_str[..len]);
@@ -331,7 +344,6 @@ impl IsolatedDomain {
         self
     }
 }
-
 
 /// Qrexec policy action
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -358,8 +370,17 @@ impl QrexecPolicyEngine {
         Self { rules: Vec::new() }
     }
 
-    pub fn add_rule(&mut self, source_type: DomainType, dest_type: DomainType, action: QrexecPolicyAction) {
-        self.rules.push(QrexecRule { source_type, dest_type, action });
+    pub fn add_rule(
+        &mut self,
+        source_type: DomainType,
+        dest_type: DomainType,
+        action: QrexecPolicyAction,
+    ) {
+        self.rules.push(QrexecRule {
+            source_type,
+            dest_type,
+            action,
+        });
     }
 
     pub fn check_rpc_policy(&self, src: DomainType, dest: DomainType) -> QrexecPolicyAction {
@@ -403,7 +424,9 @@ impl TemplateVmManager {
     pub fn discard_volatile_overlay(&mut self) {
         if self.app_vm_count > 0 {
             self.app_vm_count -= 1;
-            self.active_overlays_allocated_bytes = self.active_overlays_allocated_bytes.saturating_sub(128 * 1024 * 1024);
+            self.active_overlays_allocated_bytes = self
+                .active_overlays_allocated_bytes
+                .saturating_sub(128 * 1024 * 1024);
         }
     }
 }
@@ -474,8 +497,20 @@ mod tests {
     #[test]
     fn test_qubes_isolation_manager_flow() {
         let mut manager = SovereignIsolationManager::new();
-        let dom1 = manager.register_domain(SovereignIsolationManager::hash_name("work"), DomainType::AppVM, None).unwrap();
-        let dom2 = manager.register_domain(SovereignIsolationManager::hash_name("net"), DomainType::NetVM, Some(1)).unwrap();
+        let dom1 = manager
+            .register_domain(
+                SovereignIsolationManager::hash_name("work"),
+                DomainType::AppVM,
+                None,
+            )
+            .unwrap();
+        let dom2 = manager
+            .register_domain(
+                SovereignIsolationManager::hash_name("net"),
+                DomainType::NetVM,
+                Some(1),
+            )
+            .unwrap();
 
         let service = SovereignIsolationManager::hash_name("qubes.OpenInVM");
         let msg = QrexecMessage {

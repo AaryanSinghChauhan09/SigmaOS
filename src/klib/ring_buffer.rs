@@ -4,11 +4,10 @@ extern crate alloc;
 // Inspired by Linux kernel's kfifo and FreeBSD's ring buffer implementations
 // No external dependencies - fully sovereign implementation
 
-#[allow(dead_code)]
-
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::cell::UnsafeCell;
 use core::mem::MaybeUninit;
+#[allow(dead_code)]
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A fixed-capacity lock-free single-producer, single-consumer ring buffer.
 /// Inspired by Linux kfifo and FreeBSD SPSC ring buffers.
@@ -30,7 +29,10 @@ impl<T, const CAP: usize> RingBuffer<T, CAP> {
     /// Create a new empty ring buffer.
     /// CAP must be a power of two.
     pub const fn new() -> Self {
-        assert!(CAP.is_power_of_two(), "RingBuffer capacity must be a power of two");
+        assert!(
+            CAP.is_power_of_two(),
+            "RingBuffer capacity must be a power of two"
+        );
         // SAFETY: MaybeUninit does not require initialization
         let data = unsafe { MaybeUninit::uninit().assume_init() };
         Self {
@@ -145,7 +147,12 @@ impl<T> HeapRingBuffer<T> {
         if data.is_null() {
             panic!("HeapRingBuffer: allocation failed");
         }
-        Self { data, cap, write: 0, read: 0 }
+        Self {
+            data,
+            cap,
+            write: 0,
+            read: 0,
+        }
     }
 
     /// Returns the number of elements in the buffer.
@@ -153,22 +160,34 @@ impl<T> HeapRingBuffer<T> {
         self.write.wrapping_sub(self.read)
     }
 
-    pub fn is_empty(&self) -> bool { self.len() == 0 }
-    pub fn is_full(&self) -> bool { self.len() == self.cap }
-    pub fn capacity(&self) -> usize { self.cap }
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+    pub fn is_full(&self) -> bool {
+        self.len() == self.cap
+    }
+    pub fn capacity(&self) -> usize {
+        self.cap
+    }
 
     /// Push an item. Returns Err if full.
     pub fn push(&mut self, item: T) -> Result<(), T> {
-        if self.is_full() { return Err(item); }
+        if self.is_full() {
+            return Err(item);
+        }
         let idx = self.write & (self.cap - 1);
-        unsafe { (*self.data.add(idx)).write(item); }
+        unsafe {
+            (*self.data.add(idx)).write(item);
+        }
         self.write = self.write.wrapping_add(1);
         Ok(())
     }
 
     /// Pop an item. Returns None if empty.
     pub fn pop(&mut self) -> Option<T> {
-        if self.is_empty() { return None; }
+        if self.is_empty() {
+            return None;
+        }
         let idx = self.read & (self.cap - 1);
         let item = unsafe { (*self.data.add(idx)).assume_init_read() };
         self.read = self.read.wrapping_add(1);
@@ -180,7 +199,9 @@ impl<T> Drop for HeapRingBuffer<T> {
     fn drop(&mut self) {
         while self.pop().is_some() {}
         let layout = core::alloc::Layout::array::<core::mem::MaybeUninit<T>>(self.cap).unwrap();
-        unsafe { alloc::alloc::dealloc(self.data as *mut u8, layout); }
+        unsafe {
+            alloc::alloc::dealloc(self.data as *mut u8, layout);
+        }
     }
 }
 

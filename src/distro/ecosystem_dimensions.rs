@@ -160,7 +160,9 @@ pub struct MerkleTransactionalBackupEngine {
 
 impl MerkleTransactionalBackupEngine {
     pub fn new() -> Self {
-        Self { snapshots: Vec::new() }
+        Self {
+            snapshots: Vec::new(),
+        }
     }
 
     pub fn create_snapshot(&mut self, snapshot_id: u64, root_hash: &str, timestamp: u64) {
@@ -303,7 +305,9 @@ pub struct CryptographicBountyLedger {
 
 impl CryptographicBountyLedger {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     pub fn log_submission(&mut self, vuln_id: &str, reporter: &str, amount: u64) {
@@ -346,11 +350,14 @@ pub struct CasReleaseArchive {
 
 impl CasReleaseArchive {
     pub fn new() -> Self {
-        Self { storage_nodes: BTreeMap::new() }
+        Self {
+            storage_nodes: BTreeMap::new(),
+        }
     }
 
     pub fn store_milestone(&mut self, merkle_hash: &str, bytes: &[u8]) {
-        self.storage_nodes.insert(merkle_hash.to_string(), bytes.to_vec());
+        self.storage_nodes
+            .insert(merkle_hash.to_string(), bytes.to_vec());
     }
 }
 
@@ -411,7 +418,9 @@ pub struct PqcVulnerabilityAdvisoryStream {
 
 impl PqcVulnerabilityAdvisoryStream {
     pub fn new() -> Self {
-        Self { advisories: Vec::new() }
+        Self {
+            advisories: Vec::new(),
+        }
     }
 
     pub fn push_advisory(&mut self, cve: &str, score: f32, sig: &str) {
@@ -493,7 +502,8 @@ impl ZenithLocalizationEngine {
     }
 
     pub fn register_language(&mut self, lang_code: &str, translations: BTreeMap<String, String>) {
-        self.translation_tables.insert(lang_code.to_string(), translations);
+        self.translation_tables
+            .insert(lang_code.to_string(), translations);
     }
 }
 
@@ -538,7 +548,9 @@ pub struct VendorCertificationSuite {
 
 impl VendorCertificationSuite {
     pub fn new() -> Self {
-        Self { certified_vendors: Vec::new() }
+        Self {
+            certified_vendors: Vec::new(),
+        }
     }
 }
 
@@ -584,7 +596,9 @@ pub struct CryptographicMatrixVoting {
 
 impl CryptographicMatrixVoting {
     pub fn new() -> Self {
-        Self { proposals: BTreeMap::new() }
+        Self {
+            proposals: BTreeMap::new(),
+        }
     }
 
     pub fn submit_proposal(&mut self, proposal_id: u64, desc: &str) {
@@ -634,7 +648,9 @@ mod tests {
             memory_limit_mb: 8192,
         });
 
-        let manifest = builder.generate_manifest_json("Sovereign-Gamer-OS").unwrap();
+        let manifest = builder
+            .generate_manifest_json("Sovereign-Gamer-OS")
+            .unwrap();
         assert!(manifest.contains("Sovereign-Gamer-OS"));
         assert!(manifest.contains("8192"));
     }
@@ -654,7 +670,11 @@ mod tests {
     #[test]
     fn test_wifi_auto_negotiation_and_voting() {
         let mut wifi = ZenithWiFiBroker::new();
-        let aps = [("Home_5G", -55), ("Office_Guest", -70), ("Sovereign_Mesh", -40)];
+        let aps = [
+            ("Home_5G", -55),
+            ("Office_Guest", -70),
+            ("Sovereign_Mesh", -40),
+        ];
         assert!(wifi.auto_negotiate_best_ap(&aps));
         assert_eq!(wifi.connected_ssid.unwrap(), "Sovereign_Mesh");
 

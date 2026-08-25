@@ -1,7 +1,6 @@
 /// Sovereign Linux & BSD Distro Parity Subsystem for SigmaOS
 /// Clean-room implementation of NixOS Flakes, Arch Pacman Hooks, Void runit Supervision, and Gentoo Portage USE Flags
 /// Designed for bare-metal zero-dependency performance and zero-trust security
-
 extern crate alloc;
 
 use alloc::string::String;
@@ -262,7 +261,10 @@ impl VoidRunitSupervisor {
 
     /// Query the current status of a supervised service
     pub fn get_service_status(&self, name: &str) -> Option<ServiceState> {
-        self.services.iter().find(|s| s.name == name).map(|s| s.state)
+        self.services
+            .iter()
+            .find(|s| s.name == name)
+            .map(|s| s.state)
     }
 }
 
@@ -311,7 +313,10 @@ impl GentooPortageUseFlagsEngine {
     }
 
     /// Resolve USE flags for a package based on global policies and negative logic
-    pub fn resolve_package_flags(&mut self, package_name: &str) -> Result<Vec<String>, &'static str> {
+    pub fn resolve_package_flags(
+        &mut self,
+        package_name: &str,
+    ) -> Result<Vec<String>, &'static str> {
         let global_flags = self.global_use_flags.clone();
         if let Some(pkg) = self.packages.iter_mut().find(|p| p.name == package_name) {
             let mut resolved = Vec::new();
@@ -320,7 +325,8 @@ impl GentooPortageUseFlagsEngine {
                 let neg_flag = alloc::format!("-{}", flag);
 
                 let is_globally_disabled = global_flags.contains(&neg_flag);
-                let is_globally_enabled = global_flags.contains(&pos_flag) || global_flags.contains(flag);
+                let is_globally_enabled =
+                    global_flags.contains(&pos_flag) || global_flags.contains(flag);
 
                 if is_globally_enabled && !is_globally_disabled {
                     resolved.push(flag.clone());
@@ -376,7 +382,12 @@ mod tests {
     #[test]
     fn test_arch_pacman_hooks() {
         let mut manager = ArchPacmanHooksManager::new();
-        manager.register_hook("linux-initramfs", HookWhen::PostTransaction, "linux", "mkinitcpio");
+        manager.register_hook(
+            "linux-initramfs",
+            HookWhen::PostTransaction,
+            "linux",
+            "mkinitcpio",
+        );
 
         let triggered = manager.trigger_hooks(HookWhen::PostTransaction, "linux");
         assert_eq!(triggered, 1);
@@ -391,12 +402,18 @@ mod tests {
 
         // Cannot start iwd before dbus is up
         assert!(supervisor.start_service("iwd").is_err());
-        assert_eq!(supervisor.get_service_status("iwd"), Some(ServiceState::Down));
+        assert_eq!(
+            supervisor.get_service_status("iwd"),
+            Some(ServiceState::Down)
+        );
 
         // Start dbus first
         let dbus_pid = supervisor.start_service("dbus").unwrap();
         assert_eq!(dbus_pid, 1001);
-        assert_eq!(supervisor.get_service_status("dbus"), Some(ServiceState::Up));
+        assert_eq!(
+            supervisor.get_service_status("dbus"),
+            Some(ServiceState::Up)
+        );
 
         // Now iwd can start
         let iwd_pid = supervisor.start_service("iwd").unwrap();

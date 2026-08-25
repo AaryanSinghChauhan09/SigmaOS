@@ -6,9 +6,7 @@ extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
 use alloc::string::String;
-#[cfg(not(target_os = "none"))]
 use alloc::boxed::Box;
-#[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -44,7 +42,6 @@ pub enum ContainerState {
     Stopped = 3,
     Failed = 4,
 }
-
 
 /// Container trait (OOP interface)
 pub trait Container {
@@ -670,7 +667,6 @@ impl SimpleContainerRuntime {
     }
 }
 
-
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
@@ -686,9 +682,11 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 #[cfg(not(target_os = "none"))]
 pub mod oci {
     extern crate alloc;
-    use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
     use alloc::string::{String, ToString};
+    use crate::container::ContainerError;
+    use alloc::string::String;
+    use alloc::string::ToString;
     use alloc::vec::Vec;
 
     pub struct NamespaceSet {
@@ -714,7 +712,6 @@ pub mod oci {
             }
         }
     }
-
 
     pub struct OciSpec {
         pub version: String,
@@ -858,11 +855,7 @@ mod tests {
         assert!(!overlay.mounted);
 
         // Mount failure on empty lowerdirs
-        let mut invalid_overlay = OverlayFS::new(
-            vec![],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
+        let mut invalid_overlay = OverlayFS::new(vec![], "/upper".to_string(), "/work".to_string());
         assert!(invalid_overlay.mount().is_err());
     }
 

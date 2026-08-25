@@ -5,11 +5,11 @@ use std::collections::HashSet;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum NamespaceType {
-    Uts,     // Hostname / domain isolation
-    Net,     // Network stack isolation (VNET)
-    Pid,     // Process ID space isolation
-    Mount,   // Filesystem mount table isolation
-    User,    // User/Group ID virtualization
+    Uts,   // Hostname / domain isolation
+    Net,   // Network stack isolation (VNET)
+    Pid,   // Process ID space isolation
+    Mount, // Filesystem mount table isolation
+    User,  // User/Group ID virtualization
 }
 
 #[derive(Debug, Clone)]

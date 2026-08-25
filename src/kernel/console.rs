@@ -67,7 +67,7 @@ impl KernelConsole {
             ConsoleBackend::Framebuffer => self.initialize_framebuffer()?,
             ConsoleBackend::EFI => self.initialize_efi()?,
         }
-        
+
         self.backend = backend;
         self.initialized.store(true, Ordering::SeqCst);
         self.write_banner();
@@ -161,7 +161,7 @@ impl KernelConsole {
                     self.vga_buffer.add(offset).write_volatile(byte);
                     self.vga_buffer.add(offset + 1).write_volatile(0x0F);
                 }
-                
+
                 let new_x = (x + 1) % self.vga_width;
                 self.cursor_x.store(new_x, Ordering::SeqCst);
                 if new_x == 0 {
@@ -172,11 +172,9 @@ impl KernelConsole {
         }
     }
 
-    fn write_framebuffer(&self, message: &str) {
-    }
+    fn write_framebuffer(&self, message: &str) {}
 
-    fn write_efi(&self, message: &str) {
-    }
+    fn write_efi(&self, message: &str) {}
 
     pub fn clear(&mut self) {
         match self.backend {
@@ -238,9 +236,7 @@ pub fn initialize_kernel_console(backend: ConsoleBackend) -> Result<(), &'static
 }
 
 pub fn get_kernel_console() -> Option<&'static mut KernelConsole> {
-    unsafe {
-        GLOBAL_CONSOLE.as_mut()
-    }
+    unsafe { GLOBAL_CONSOLE.as_mut() }
 }
 
 pub fn kernel_panic(message: &str) -> ! {
@@ -249,7 +245,7 @@ pub fn kernel_panic(message: &str) -> ! {
         console.write(LogLevel::Critical, message);
         console.write(LogLevel::Critical, "\n!!! SYSTEM HALTED !!!\n");
     }
-    
+
     loop {
         core::hint::spin_loop();
     }

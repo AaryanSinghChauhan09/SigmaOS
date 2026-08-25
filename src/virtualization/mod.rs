@@ -1,11 +1,11 @@
 // SigmaOS Virtualization Module
+pub mod kvm_vcpu;
 pub mod oci_pod;
 pub mod orchestration;
-pub mod kvm_vcpu;
 
 pub use kvm_vcpu::{
-    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs,
-    VirtioDeviceBackend, VirtioDeviceType,
+    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs, VirtioDeviceBackend,
+    VirtioDeviceType,
 };
 
 pub use orchestration::{

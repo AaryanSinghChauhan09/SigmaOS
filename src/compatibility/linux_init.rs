@@ -23,7 +23,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 /// Runlevel definitions (SysVinit-style)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Runlevel {
@@ -98,11 +97,11 @@ impl InitSystem {
             system_state: SystemState::Starting,
         }
     }
-    
+
     pub fn add_service(&mut self, service: InitService) {
         self.services.push(service);
     }
-    
+
     pub fn start_service(&mut self, name: &str) -> Result<(), InitError> {
         if let Some(service) = self.services.iter_mut().find(|s| s.name == name) {
             self.resolve_dependencies(service)?;
@@ -113,7 +112,7 @@ impl InitSystem {
             Err(InitError::ServiceNotFound)
         }
     }
-    
+
     pub fn stop_service(&mut self, name: &str) -> Result<(), InitError> {
         if let Some(service) = self.services.iter_mut().find(|s| s.name == name) {
             service.state = ServiceState::Stopped;
@@ -122,10 +121,10 @@ impl InitSystem {
             Err(InitError::ServiceNotFound)
         }
     }
-    
+
     pub fn change_runlevel(&mut self, new_level: Runlevel) -> Result<(), InitError> {
         self.current_runlevel = new_level;
-        
+
         // Stop services not in new runlevel
         let to_stop: Vec<String> = self
             .services
@@ -147,22 +146,26 @@ impl InitSystem {
         for name in to_start {
             self.start_service(&name)?;
         }
-        
+
         Ok(())
     }
-    
+
     fn resolve_dependencies(&self, service: &InitService) -> Result<(), InitError> {
         for dep in &service.dependencies {
             match dep.dep_type {
                 DependencyType::Requires => {
-                    if let Some(dep_service) = self.services.iter().find(|s| s.name == dep.service_name) {
+                    if let Some(dep_service) =
+                        self.services.iter().find(|s| s.name == dep.service_name)
+                    {
                         if dep_service.state != ServiceState::Running {
                             return Err(InitError::DependencyNotMet);
                         }
                     }
                 }
                 DependencyType::Conflicts => {
-                    if let Some(dep_service) = self.services.iter().find(|s| s.name == dep.service_name) {
+                    if let Some(dep_service) =
+                        self.services.iter().find(|s| s.name == dep.service_name)
+                    {
                         if dep_service.state == ServiceState::Running {
                             return Err(InitError::Conflict);
                         }
@@ -173,9 +176,12 @@ impl InitSystem {
         }
         Ok(())
     }
-    
+
     pub fn get_service_state(&self, name: &str) -> Option<ServiceState> {
-        self.services.iter().find(|s| s.name == name).map(|s| s.state.clone())
+        self.services
+            .iter()
+            .find(|s| s.name == name)
+            .map(|s| s.state.clone())
     }
 }
 
@@ -222,11 +228,11 @@ impl ProcessSupervisor {
             supervised_processes: Vec::new(),
         }
     }
-    
+
     pub fn supervise(&mut self, process: SupervisedProcess) {
         self.supervised_processes.push(process);
     }
-    
+
     pub fn check_processes(&mut self) {
         for process in &mut self.supervised_processes {
             if process.state == ProcessState::Failed {
@@ -270,11 +276,9 @@ pub enum LogLevel {
 impl SystemLogger {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SystemLogger {
-            logs: Vec::new(),
-        }
+        SystemLogger { logs: Vec::new() }
     }
-    
+
     pub fn log(&mut self, service: &str, level: LogLevel, message: &str) {
         let entry = LogEntry {
             timestamp: self.get_timestamp(),
@@ -284,11 +288,11 @@ impl SystemLogger {
         };
         self.logs.push(entry);
     }
-    
+
     pub fn get_logs(&self, service: &str) -> Vec<&LogEntry> {
         self.logs.iter().filter(|l| l.service == service).collect()
     }
-    
+
     fn get_timestamp(&self) -> u64 {
         // In a real implementation, this would get the actual timestamp
         0
@@ -312,7 +316,10 @@ mod tests {
         };
         init.add_service(service);
         init.start_service("test-service").unwrap();
-        assert_eq!(init.get_service_state("test-service"), Some(ServiceState::Running));
+        assert_eq!(
+            init.get_service_state("test-service"),
+            Some(ServiceState::Running)
+        );
     }
 
     #[test]

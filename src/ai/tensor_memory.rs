@@ -133,7 +133,9 @@ impl AiTensorMemoryManager {
         let virt_ptr = 0x7F00_0000_0000 + (id * 0x100_000);
 
         let is_mapped = match pin_mode {
-            MemoryPinMode::PinnedHostDma | MemoryPinMode::CoherentShared | MemoryPinMode::DeviceLocalGpu => {
+            MemoryPinMode::PinnedHostDma
+            | MemoryPinMode::CoherentShared
+            | MemoryPinMode::DeviceLocalGpu => {
                 self.dma_mappings += 1;
                 true
             }

@@ -1,14 +1,13 @@
 use crate::klib::Vec;
 use core::ops::{Deref, DerefMut};
 
+use core::mem;
 /// OOP-based Boot Performance Optimization for SigmaOS
 /// Implements boot optimization using OOP principles with traits and structs
 /// No dependency on external optimization frameworks
 /// Based on Roadmap Item 20: Boot performance optimization
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Service ID
 pub type ServiceID = usize;
@@ -120,7 +119,13 @@ pub struct SimpleBootService {
 }
 
 impl SimpleBootService {
-    pub fn new(id: ServiceID, name: &[u8], priority: ServicePriority, startup_time: u32, capability: ServiceCapability) -> Self {
+    pub fn new(
+        id: ServiceID,
+        name: &[u8],
+        priority: ServicePriority,
+        startup_time: u32,
+        capability: ServiceCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 

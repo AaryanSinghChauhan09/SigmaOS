@@ -42,7 +42,6 @@ impl SimpleShellCommand {
     }
 }
 
-
 impl ShellCommand for SimpleShellCommand {
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
@@ -98,20 +97,34 @@ impl ShellCommand for SigmaGrepCommand {
         }
 
         let header_prefix = b"[sigmagrep (absorbing grep/ripgrep)] Searching for '";
-        for &b in header_prefix { output.push(b); }
-        for &b in query { output.push(b); }
-        for &b in b"' " { output.push(b); }
+        for &b in header_prefix {
+            output.push(b);
+        }
+        for &b in query {
+            output.push(b);
+        }
+        for &b in b"' " {
+            output.push(b);
+        }
 
         if case_insensitive {
-            for &b in b"(case-insensitive) " { output.push(b); }
+            for &b in b"(case-insensitive) " {
+                output.push(b);
+            }
         }
         if line_numbers {
-            for &b in b"(line-numbers) " { output.push(b); }
+            for &b in b"(line-numbers) " {
+                output.push(b);
+            }
         }
         if recursive {
-            for &b in b"(recursive) " { output.push(b); }
+            for &b in b"(recursive) " {
+                output.push(b);
+            }
         }
-        for &b in b"...\n" { output.push(b); }
+        for &b in b"...\n" {
+            output.push(b);
+        }
 
         let matches: &[(i32, &[u8])] = &[
             (12, b"src/main.rs: let query = \"pattern\";"),
@@ -193,17 +206,29 @@ impl ShellCommand for SigmaFindCommand {
             }
         }
 
-        for &b in b"[sigmafind (absorbing find/fd)] Finding matches for '" { output.push(b); }
-        for &b in pattern { output.push(b); }
-        for &b in b"' " { output.push(b); }
+        for &b in b"[sigmafind (absorbing find/fd)] Finding matches for '" {
+            output.push(b);
+        }
+        for &b in pattern {
+            output.push(b);
+        }
+        for &b in b"' " {
+            output.push(b);
+        }
 
         if regex_mode {
-            for &b in b"(regex-mode) " { output.push(b); }
+            for &b in b"(regex-mode) " {
+                output.push(b);
+            }
         }
         if let Some(_d) = max_depth {
-            for &b in b"(max-depth set) " { output.push(b); }
+            for &b in b"(max-depth set) " {
+                output.push(b);
+            }
         }
-        for &b in b"...\n" { output.push(b); }
+        for &b in b"...\n" {
+            output.push(b);
+        }
 
         let matches: &[&[u8]] = &[b"src/package/universal.rs", b"tests/integration_test.rs"];
         for text in matches {
@@ -248,17 +273,27 @@ impl ShellCommand for SigmaDiffCommand {
             }
         }
 
-        for &b in b"[sigmadiff (absorbing diff/git-diff)] Comparing files " { output.push(b); }
+        for &b in b"[sigmadiff (absorbing diff/git-diff)] Comparing files " {
+            output.push(b);
+        }
         if ignore_whitespace {
-            for &b in b"(ignoring whitespace) " { output.push(b); }
+            for &b in b"(ignoring whitespace) " {
+                output.push(b);
+            }
         }
         if side_by_side {
-            for &b in b"(side-by-side) " { output.push(b); }
+            for &b in b"(side-by-side) " {
+                output.push(b);
+            }
         }
         if unified {
-            for &b in b"(unified) " { output.push(b); }
+            for &b in b"(unified) " {
+                output.push(b);
+            }
         }
-        for &b in b"...\n" { output.push(b); }
+        for &b in b"...\n" {
+            output.push(b);
+        }
 
         if side_by_side {
             for &b in b"left_file.txt             | right_file.txt\n" {
@@ -613,7 +648,6 @@ impl CommandHistory for SimpleCommandHistory {
         commands
     }
 }
-
 
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]

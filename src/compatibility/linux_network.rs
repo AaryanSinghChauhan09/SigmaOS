@@ -23,7 +23,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 /// Network interface types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterfaceType {
@@ -59,7 +58,7 @@ impl IpAddress {
             gateway: None,
         }
     }
-    
+
     pub fn with_gateway(address: &str, netmask: &str, gateway: &str) -> Self {
         IpAddress {
             address: address.to_string(),
@@ -91,15 +90,15 @@ impl NetworkInterface {
             mtu: 1500,
         }
     }
-    
+
     pub fn set_up(&mut self) {
         self.state = InterfaceState::Up;
     }
-    
+
     pub fn set_down(&mut self) {
         self.state = InterfaceState::Down;
     }
-    
+
     pub fn configure_ip(&mut self, ip_config: IpAddress) {
         self.ip_config = Some(ip_config);
     }
@@ -121,11 +120,11 @@ impl NetworkNamespace {
             routing_table: Vec::new(),
         }
     }
-    
+
     pub fn add_interface(&mut self, interface: NetworkInterface) {
         self.interfaces.push(interface);
     }
-    
+
     pub fn add_route(&mut self, route: Route) {
         self.routing_table.push(route);
     }
@@ -189,22 +188,22 @@ impl FirewallRule {
             destination_port: None,
         }
     }
-    
+
     pub fn with_source(mut self, source: &str) -> Self {
         self.source = Some(source.to_string());
         self
     }
-    
+
     pub fn with_destination(mut self, destination: &str) -> Self {
         self.destination = Some(destination.to_string());
         self
     }
-    
+
     pub fn with_source_port(mut self, port: u16) -> Self {
         self.source_port = Some(port);
         self
     }
-    
+
     pub fn with_destination_port(mut self, port: u16) -> Self {
         self.destination_port = Some(port);
         self
@@ -225,15 +224,15 @@ impl FirewallManager {
             default_policy: FirewallAction::Accept,
         }
     }
-    
+
     pub fn add_rule(&mut self, rule: FirewallRule) {
         self.rules.push(rule);
     }
-    
+
     pub fn set_default_policy(&mut self, policy: FirewallAction) {
         self.default_policy = policy;
     }
-    
+
     pub fn evaluate_packet(&self, packet: &NetworkPacket) -> FirewallAction {
         for rule in &self.rules {
             if self.matches_rule(packet, rule) {
@@ -242,7 +241,7 @@ impl FirewallManager {
         }
         self.default_policy.clone()
     }
-    
+
     fn matches_rule(&self, packet: &NetworkPacket, rule: &FirewallRule) -> bool {
         // Simplified matching logic
         if rule.protocol != FirewallProtocol::All {
@@ -278,17 +277,17 @@ impl NetworkManager {
             firewall: FirewallManager::new(),
         }
     }
-    
+
     pub fn add_interface(&mut self, interface: NetworkInterface) {
         self.interfaces.push(interface);
     }
-    
+
     pub fn create_namespace(&mut self, name: String) -> NetworkNamespace {
         let namespace = NetworkNamespace::new(name);
         self.namespaces.push(namespace.clone());
         namespace
     }
-    
+
     pub fn get_interface_by_name(&self, name: &str) -> Option<&NetworkInterface> {
         self.interfaces.iter().find(|i| i.name == name)
     }
@@ -303,7 +302,7 @@ mod tests {
         let mut interface = NetworkInterface::new("eth0".to_string(), InterfaceType::Ethernet);
         interface.set_up();
         assert_eq!(interface.state, InterfaceState::Up);
-        
+
         let ip_config = IpAddress::new("192.168.1.100", "255.255.255.0");
         interface.configure_ip(ip_config);
         assert!(interface.ip_config.is_some());
@@ -315,8 +314,9 @@ mod tests {
         assert_eq!(ip.address, "192.168.1.100");
         assert_eq!(ip.netmask, "255.255.255.0");
         assert!(ip.gateway.is_none());
-        
-        let ip_with_gateway = IpAddress::with_gateway("192.168.1.100", "255.255.255.0", "192.168.1.1");
+
+        let ip_with_gateway =
+            IpAddress::with_gateway("192.168.1.100", "255.255.255.0", "192.168.1.1");
         assert_eq!(ip_with_gateway.gateway, Some("192.168.1.1".to_string()));
     }
 
@@ -333,7 +333,7 @@ mod tests {
         let rule = FirewallRule::new(FirewallAction::Accept, FirewallProtocol::Tcp)
             .with_destination_port(80)
             .with_source("192.168.1.0/24");
-        
+
         assert_eq!(rule.action, FirewallAction::Accept);
         assert_eq!(rule.destination_port, Some(80));
         assert_eq!(rule.source, Some("192.168.1.0/24".to_string()));
@@ -343,11 +343,11 @@ mod tests {
     fn test_firewall_manager() {
         let mut firewall = FirewallManager::new();
         firewall.set_default_policy(FirewallAction::Drop);
-        
+
         let rule = FirewallRule::new(FirewallAction::Accept, FirewallProtocol::Tcp)
             .with_destination_port(22);
         firewall.add_rule(rule);
-        
+
         assert_eq!(firewall.rules.len(), 1);
         assert_eq!(firewall.default_policy, FirewallAction::Drop);
     }

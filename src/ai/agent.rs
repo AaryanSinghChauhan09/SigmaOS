@@ -172,9 +172,7 @@ pub struct SimpleAIAgentManager {
 
 impl SimpleAIAgentManager {
     pub fn new() -> Self {
-        SimpleAIAgentManager {
-            agents: Vec::new(),
-        }
+        SimpleAIAgentManager { agents: Vec::new() }
     }
 }
 
@@ -221,7 +219,10 @@ mod tests {
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
         let mut agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
-        agent.register_mcp_tool("fetch_weather".to_string(), "MCP weather fetcher".to_string());
+        agent.register_mcp_tool(
+            "fetch_weather".to_string(),
+            "MCP weather fetcher".to_string(),
+        );
         assert_eq!(agent.mcp_tools.len(), 1);
 
         let opt_score = agent.optimize_prompt_weights();
@@ -244,9 +245,14 @@ mod tests {
     fn test_sigma_sovereign_copilot() {
         let mut copilot = SigmaSovereignCopilot::new();
         copilot.set_persona_memory("theme", "cyber");
-        assert_eq!(copilot.get_persona_memory("theme"), Some(&"cyber".to_string()));
+        assert_eq!(
+            copilot.get_persona_memory("theme"),
+            Some(&"cyber".to_string())
+        );
 
-        let cmd = copilot.dispatch_gui_cli_command("sigma-agent gui theme cyber").unwrap();
+        let cmd = copilot
+            .dispatch_gui_cli_command("sigma-agent gui theme cyber")
+            .unwrap();
         assert!(cmd.contains("Updated Zenith GUI theme"));
     }
 }
@@ -272,7 +278,8 @@ impl SigmaSovereignCopilot {
     }
 
     pub fn set_persona_memory(&mut self, key: &str, value: &str) {
-        self.l3_persona_memory.insert(key.to_string(), value.to_string());
+        self.l3_persona_memory
+            .insert(key.to_string(), value.to_string());
     }
 
     pub fn get_persona_memory(&self, key: &str) -> Option<&String> {
@@ -315,9 +322,15 @@ impl ModelMarketplace {
     }
 
     /// Registers a curated, PQC-signed AI model for local inference
-    pub fn register_signed_model(&mut self, name: &str, version: &str, pqc_signature: &str) -> usize {
+    pub fn register_signed_model(
+        &mut self,
+        name: &str,
+        version: &str,
+        pqc_signature: &str,
+    ) -> usize {
         let id = self.registered_models.len() + 1;
-        let is_verified = pqc_signature.contains("Dilithium5") || pqc_signature.contains("Kyber1024");
+        let is_verified =
+            pqc_signature.contains("Dilithium5") || pqc_signature.contains("Kyber1024");
         self.registered_models.push((
             id,
             name.to_string(),

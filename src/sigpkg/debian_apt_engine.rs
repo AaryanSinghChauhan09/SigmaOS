@@ -3,9 +3,9 @@
 // Implements APT package management, DEB package parsing, and dpkg compatibility
 
 extern crate alloc;
+use crate::klib::collections::HashMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::klib::collections::HashMap;
 
 /// DEB package metadata structure
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -91,7 +91,7 @@ impl DebControlParser {
                 if !self.current_field.is_empty() {
                     self.process_field(&mut package);
                 }
-                
+
                 let parts: Vec<&str> = line.splitn(2, ':').collect();
                 if parts.len() == 2 {
                     self.current_field = parts[0].trim().to_lowercase();
@@ -230,8 +230,10 @@ impl DpkgDatabase {
 
     /// Install a package
     pub fn install_package(&mut self, package: DebPackage) -> Result<(), String> {
-        self.installed_packages.insert(package.package.clone(), package);
-        self.status_database.insert(package.package.clone(), "install ok installed".to_string());
+        self.installed_packages
+            .insert(package.package.clone(), package);
+        self.status_database
+            .insert(package.package.clone(), "install ok installed".to_string());
         Ok(())
     }
 
@@ -276,7 +278,7 @@ Priority: optional"#;
 
         let mut parser = DebControlParser::new();
         let package = parser.parse_control(control_content).unwrap();
-        
+
         assert_eq!(package.package, "nginx");
         assert_eq!(package.version, "1.18.0-0ubuntu1");
         assert_eq!(package.architecture, "amd64");
@@ -288,7 +290,7 @@ Priority: optional"#;
     fn test_dependency_parsing() {
         let mut parser = DebControlParser::new();
         let deps = parser.parse_dependencies("libc6 (>= 2.28), libssl1.1 (>= 1.1.1), zlib1g");
-        
+
         assert_eq!(deps.len(), 3);
         assert_eq!(deps[0], "libc6");
         assert_eq!(deps[1], "libssl1.1");
@@ -299,7 +301,7 @@ Priority: optional"#;
     fn test_apt_repository_manager() {
         let mut manager = AptRepositoryManager::new();
         let sources = "deb https://archive.ubuntu.com/ubuntu/ focal main restricted";
-        
+
         manager.parse_sources_list(sources).unwrap();
         assert_eq!(manager.sources.len(), 1);
         assert_eq!(manager.sources[0].suite, "focal");
@@ -309,7 +311,7 @@ Priority: optional"#;
     #[test]
     fn test_dpkg_database() {
         let mut db = DpkgDatabase::new();
-        
+
         let package = DebPackage {
             package: "test-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -326,11 +328,14 @@ Priority: optional"#;
             section: "test".to_string(),
             priority: "optional".to_string(),
         };
-        
+
         db.install_package(package).unwrap();
-        assert_eq!(db.get_package_status("test-pkg"), Some("install ok installed"));
+        assert_eq!(
+            db.get_package_status("test-pkg"),
+            Some("install ok installed")
+        );
         assert_eq!(db.list_installed().len(), 1);
-        
+
         db.remove_package("test-pkg").unwrap();
         assert_eq!(db.get_package_status("test-pkg"), None);
     }

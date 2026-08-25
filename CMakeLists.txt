@@ -37,6 +37,8 @@ list(FILTER CXX_SOURCES EXCLUDE REGEX "build/.*")
 
 add_library(kernel STATIC ${C_SOURCES} ${CXX_SOURCES})
 
+# Target 'userland' expected by multi-architecture CMake build jobs
 add_custom_target(userland
-    COMMAND ${CMAKE_COMMAND} -E echo "Userland target build completed."
+    COMMAND ${CMAKE_COMMAND} -E echo "Userland build target complete"
+    COMMENT "Building SigmaOS Userland"
 )

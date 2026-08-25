@@ -55,4 +55,3 @@ mod tests {
         assert!(!bridge.is_graphic_output_ready());
     }
 }
-

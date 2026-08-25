@@ -1,7 +1,6 @@
 #![allow(unused_variables)]
 // SigmaOS AUR Helper - Arch User Repository integration
 // Provides high-speed CLI helpers for AUR metadata parsing and package management
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -15,8 +14,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// AUR package metadata
 #[derive(Debug, Clone, PartialEq)]
@@ -81,13 +80,13 @@ impl AurParser {
     /// Search for packages in AUR
     pub fn search(&self, query: &str) -> Vec<&AurPackage> {
         let mut results = Vec::new();
-        
+
         for pkg in self.cache.values() {
             if pkg.name.contains(query) || pkg.description.contains(query) {
                 results.push(pkg);
             }
         }
-        
+
         results
     }
 
@@ -184,7 +183,12 @@ impl AurParser {
         Ok(order)
     }
 
-    fn visit(&self, pkg_name: &str, order: &mut Vec<String>, visited: &mut BTreeMap<String, bool>) -> Result<(), &'static str> {
+    fn visit(
+        &self,
+        pkg_name: &str,
+        order: &mut Vec<String>,
+        visited: &mut BTreeMap<String, bool>,
+    ) -> Result<(), &'static str> {
         if visited.get(pkg_name).copied().unwrap_or(false) {
             return Ok(());
         }
@@ -278,7 +282,7 @@ mod tests {
     fn test_aur_parser() {
         let mut parser = AurParser::new();
         let metadata = r#"{"name":"test","version":"1.0.0"}"#;
-        
+
         assert!(parser.parse_metadata(metadata).is_ok());
         assert!(parser.get_package("test").is_some());
     }
@@ -326,7 +330,7 @@ pkgbase = neovim-git
     fn test_aur_helper() {
         let helper = AurHelper::new();
         let results = helper.search("test");
-        
+
         // Should return empty results since cache is empty
         assert!(results.is_empty());
     }
@@ -334,7 +338,7 @@ pkgbase = neovim-git
     #[test]
     fn test_build_order() {
         let mut parser = AurParser::new();
-        
+
         // Add a package with dependencies
         let pkg = AurPackage {
             name: String::from("dep"),
@@ -346,9 +350,9 @@ pkgbase = neovim-git
             keywords: Vec::new(),
             popularity: 0.0,
         };
-        
+
         parser.cache.insert(pkg.name.clone(), pkg);
-        
+
         let order = parser.calculate_build_order(&[String::from("dep")]);
         assert!(order.is_ok());
     }

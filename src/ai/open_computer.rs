@@ -99,15 +99,27 @@ impl AgentA11yInterface {
     }
 
     /// Invokes native action directly on a widget using its parsed text identifier
-    pub fn execute_action(&mut self, widget_id: &str, action: &str, param: &str) -> Result<String, &'static str> {
-        let widget = self.widgets.get_mut(widget_id).ok_or("Widget not found in A11y tree")?;
+    pub fn execute_action(
+        &mut self,
+        widget_id: &str,
+        action: &str,
+        param: &str,
+    ) -> Result<String, &'static str> {
+        let widget = self
+            .widgets
+            .get_mut(widget_id)
+            .ok_or("Widget not found in A11y tree")?;
         match action {
-            "click" => {
-                Ok(format!("Successfully clicked {} with label '{}'", widget.role, widget.label))
-            }
+            "click" => Ok(format!(
+                "Successfully clicked {} with label '{}'",
+                widget.role, widget.label
+            )),
             "input" => {
                 widget.value = param.to_string();
-                Ok(format!("Successfully input '{}' into {} '{}'", param, widget.role, widget.label))
+                Ok(format!(
+                    "Successfully input '{}' into {} '{}'",
+                    param, widget.role, widget.label
+                ))
             }
             _ => Err("Unsupported A11y action"),
         }
@@ -135,12 +147,16 @@ impl HumanInTheLoopController {
 
     /// Prompts the human with a collaborative question when stuck
     pub fn ask_user(&mut self, query_id: &str, question: &str) {
-        self.pending_queries.push((query_id.to_string(), question.to_string()));
+        self.pending_queries
+            .push((query_id.to_string(), question.to_string()));
     }
 
     /// Simulates user answering the agent's query in real-time
     pub fn resolve_query(&mut self, query_id: &str) -> Option<String> {
-        let pos = self.pending_queries.iter().position(|(id, _)| id == query_id);
+        let pos = self
+            .pending_queries
+            .iter()
+            .position(|(id, _)| id == query_id);
         if let Some(idx) = pos {
             let (_, query) = self.pending_queries.remove(idx);
             Some(format!("User response to: '{}' -> Done", query))
@@ -180,7 +196,8 @@ impl AgentMemoryInspector {
     }
 
     pub fn learn_fact(&mut self, key: &str, value: &str) {
-        self.long_term_facts.insert(key.to_string(), value.to_string());
+        self.long_term_facts
+            .insert(key.to_string(), value.to_string());
     }
 }
 
@@ -196,7 +213,8 @@ mod tests {
 
     #[test]
     fn test_open_computer_vm() {
-        let mut vm = OpenComputerVirtualMachine::new("agent-007", "base.qcow2", "overlay_007.qcow2");
+        let mut vm =
+            OpenComputerVirtualMachine::new("agent-007", "base.qcow2", "overlay_007.qcow2");
         assert_eq!(vm.state, MachineState::Stopped);
         assert_eq!(vm.ram_mb, 512);
 
@@ -234,7 +252,10 @@ mod tests {
         // Execute actions directly on text IDs
         let action_res1 = a11y.execute_action("w1", "click", "");
         assert!(action_res1.is_ok());
-        assert_eq!(action_res1.unwrap(), "Successfully clicked button with label 'Submit Order'");
+        assert_eq!(
+            action_res1.unwrap(),
+            "Successfully clicked button with label 'Submit Order'"
+        );
 
         let action_res2 = a11y.execute_action("w2", "input", "SigmaOS Pro");
         assert!(action_res2.is_ok());
@@ -259,6 +280,9 @@ mod tests {
         assert_eq!(inspector.short_term_context.len(), 1);
 
         inspector.learn_fact("target_country", "India");
-        assert_eq!(inspector.long_term_facts.get("target_country"), Some(&"India".to_string()));
+        assert_eq!(
+            inspector.long_term_facts.get("target_country"),
+            Some(&"India".to_string())
+        );
     }
 }

@@ -6,8 +6,6 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-#[cfg(test)]
-use std::collections::BTreeMap;
 #[cfg(not(test))]
 use crate::klib::BTreeMap;
 
@@ -113,7 +111,11 @@ impl PledgeManager {
     }
 
     /// Assign a sub-pledge promise to a worker thread (must be a subset of main process pledge)
-    pub fn sub_pledge_thread(&mut self, tid: u64, sub_promise: PledgePromise) -> Result<(), PledgeError> {
+    pub fn sub_pledge_thread(
+        &mut self,
+        tid: u64,
+        sub_promise: PledgePromise,
+    ) -> Result<(), PledgeError> {
         if let Some(ref main_pledge) = self.pledge {
             // Verify that thread sub-pledge does not exceed process pledge
             for perm in sub_promise.permissions() {
@@ -123,13 +125,8 @@ impl PledgeManager {
             }
         }
         sub_promise.activate()?;
-        self.thread_sub_pledges.insert(
-            tid,
-            ThreadSubPledgeContext {
-                tid,
-                sub_promise,
-            },
-        );
+        self.thread_sub_pledges
+            .insert(tid, ThreadSubPledgeContext { tid, sub_promise });
         Ok(())
     }
 

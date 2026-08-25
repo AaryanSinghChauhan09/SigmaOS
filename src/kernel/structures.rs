@@ -1,6 +1,6 @@
 use core::cell::{Cell, RefCell};
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 use core::ptr::NonNull;
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -242,7 +242,9 @@ pub struct IrqlState {
 
 impl IrqlState {
     pub fn new() -> Self {
-        Self { current_level: IrqlLevel::PassiveLevel }
+        Self {
+            current_level: IrqlLevel::PassiveLevel,
+        }
     }
 
     pub fn raise_irql(&mut self, new_level: IrqlLevel) -> Result<IrqlLevel, &'static str> {

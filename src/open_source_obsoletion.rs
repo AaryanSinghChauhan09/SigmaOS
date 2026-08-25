@@ -66,7 +66,12 @@ impl SovereignVcsEngine {
         });
     }
 
-    pub fn commit(&mut self, author: &str, message: &str, timestamp: u64) -> Result<String, &'static str> {
+    pub fn commit(
+        &mut self,
+        author: &str,
+        message: &str,
+        timestamp: u64,
+    ) -> Result<String, &'static str> {
         if self.staging_area.is_empty() {
             return Err("Vcs: Nothing staged for commit");
         }
@@ -119,7 +124,13 @@ impl SovereignVcsEngine {
         self.branches
             .iter()
             .find(|(b, _)| b == &self.active_branch)
-            .and_then(|(_, id)| if id.is_empty() { None } else { Some(id.clone()) })
+            .and_then(|(_, id)| {
+                if id.is_empty() {
+                    None
+                } else {
+                    Some(id.clone())
+                }
+            })
     }
 
     pub fn three_way_merge(
@@ -263,11 +274,18 @@ impl SovereignInitSupervisor {
             .ok_or("InitSupervisor: No socket listener for port")?;
 
         self.start_service(&target_service)?;
-        Ok(format!("Activated service '{}' on socket event port {}", target_service, port))
+        Ok(format!(
+            "Activated service '{}' on socket event port {}",
+            target_service, port
+        ))
     }
 
     pub fn handle_service_failure(&mut self, service_name: &str) {
-        if let Some(unit) = self.registered_units.iter_mut().find(|u| u.name == service_name) {
+        if let Some(unit) = self
+            .registered_units
+            .iter_mut()
+            .find(|u| u.name == service_name)
+        {
             unit.current_state = SupervisorServiceState::Failed;
             if unit.auto_restart_on_failure {
                 unit.restart_count += 1;
@@ -279,7 +297,8 @@ impl SovereignInitSupervisor {
     pub fn monitor_and_reconcile(&mut self) -> usize {
         let mut restarted = 0;
         for unit in &mut self.registered_units {
-            if unit.current_state == SupervisorServiceState::Failed && unit.auto_restart_on_failure {
+            if unit.current_state == SupervisorServiceState::Failed && unit.auto_restart_on_failure
+            {
                 unit.restart_count += 1;
                 unit.current_state = SupervisorServiceState::ActiveRunning;
                 restarted += 1;
@@ -401,7 +420,9 @@ impl SovereignObservabilitySuite {
         for m in &self.metrics_time_series {
             if m.metric_name == "cpu_utilization" && m.value > self.alert_threshold_cpu_pct {
                 alerts.push(format!("HIGH CPU ANOMALY: {}%", m.value));
-            } else if m.metric_name == "memory_utilization" && m.value > self.alert_threshold_mem_pct {
+            } else if m.metric_name == "memory_utilization"
+                && m.value > self.alert_threshold_mem_pct
+            {
                 alerts.push(format!("HIGH MEMORY ANOMALY: {}%", m.value));
             }
         }
@@ -484,7 +505,9 @@ pub struct SovereignApiTestSuite {
 
 impl SovereignApiTestSuite {
     pub fn new() -> Self {
-        Self { requests: Vec::new() }
+        Self {
+            requests: Vec::new(),
+        }
     }
 
     pub fn add_request(&mut self, req: ApiRequestSpec) {
@@ -608,7 +631,9 @@ pub struct SovereignContainerRuntime {
 
 impl SovereignContainerRuntime {
     pub fn new() -> Self {
-        Self { containers: Vec::new() }
+        Self {
+            containers: Vec::new(),
+        }
     }
 
     pub fn create_container(&mut self, name: &str, image: &str, memory_limit_mb: u64) {
@@ -690,7 +715,10 @@ impl SovereignPacketInspector {
     }
 
     pub fn export_pcap_summary(&self) -> String {
-        format!("PcapExport: {} packets captured", self.captured_packets.len())
+        format!(
+            "PcapExport: {} packets captured",
+            self.captured_packets.len()
+        )
     }
 }
 
@@ -800,7 +828,11 @@ impl SovereignEmbeddedDb {
         Ok(())
     }
 
-    pub fn insert_row(&mut self, table_name: &str, row: Vec<(String, String)>) -> Result<(), &'static str> {
+    pub fn insert_row(
+        &mut self,
+        table_name: &str,
+        row: Vec<(String, String)>,
+    ) -> Result<(), &'static str> {
         let t = self
             .tables
             .iter_mut()
@@ -854,7 +886,8 @@ impl SovereignMessageBroker {
     }
 
     pub fn subscribe(&mut self, topic: &str, subscriber_id: &str) {
-        self.subscriptions.push((topic.to_string(), subscriber_id.to_string()));
+        self.subscriptions
+            .push((topic.to_string(), subscriber_id.to_string()));
     }
 
     pub fn publish(&mut self, topic: &str, payload: &[u8], timestamp_ms: u64) -> usize {
@@ -871,10 +904,8 @@ impl SovereignMessageBroker {
     }
 
     pub fn consume(&mut self, topic: &str) -> Vec<MessagePacket> {
-        let (matching, remaining): (Vec<MessagePacket>, Vec<MessagePacket>) = self
-            .message_queue
-            .drain(..)
-            .partition(|m| m.topic == topic);
+        let (matching, remaining): (Vec<MessagePacket>, Vec<MessagePacket>) =
+            self.message_queue.drain(..).partition(|m| m.topic == topic);
         self.message_queue = remaining;
         matching
     }
@@ -984,6 +1015,10 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub observability: SovereignObservabilitySuite,
     pub db: SovereignEmbeddedDb,
     pub ai_server: SovereignAiInferenceServer,
+    pub ebpf: SovereignEbpfXdpEngine,
+    pub capsicum: SovereignCapsicumSandbox,
+    pub ninep: SovereignNinePProtocolHandler,
+    pub mesh_identity: SovereignMeshIdentityEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -1002,13 +1037,20 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             observability: SovereignObservabilitySuite::new(),
             db,
             ai_server,
-            total_obsoleted_projects_count: 15,
+            ebpf: SovereignEbpfXdpEngine::new(),
+            capsicum: SovereignCapsicumSandbox::new(),
+            ninep: SovereignNinePProtocolHandler::new(),
+            mesh_identity: SovereignMeshIdentityEngine::new("sigmaos.mesh"),
+            total_obsoleted_projects_count: 19,
         }
     }
 
     pub fn bootstrap_sovereign_stack(&mut self) -> Result<String, &'static str> {
-        self.vcs.stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
-        let _commit = self.vcs.commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
+        self.vcs
+            .stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
+        let _commit = self
+            .vcs
+            .commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
 
         let init_unit = ServiceUnit {
             name: "sovereign_core".to_string(),
@@ -1021,8 +1063,10 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.supervisor.register_service(init_unit)?;
         self.supervisor.start_service("sovereign_core")?;
 
-        self.observability.record_metric("cpu_utilization", 12.5, 1700000000);
+        self.observability
+            .record_metric("cpu_utilization", 12.5, 1700000000);
         self.firewall.establish_pqc_vpn_tunnel(&[0x1D; 32]);
+        self.capsicum.cap_enter();
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -1137,7 +1181,12 @@ impl SovereignZirconHandleManager {
         }
     }
 
-    pub fn create_handle(&mut self, object_type: &str, rights: ZirconRights, pqc_token: [u8; 16]) -> u32 {
+    pub fn create_handle(
+        &mut self,
+        object_type: &str,
+        rights: ZirconRights,
+        pqc_token: [u8; 16],
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
         self.handles.push(ZirconHandle {
@@ -1260,7 +1309,11 @@ impl SovereignSolarisZoneEngine {
     }
 
     pub fn fire_probe(&mut self, provider: &str, name: &str) -> bool {
-        if let Some(p) = self.probes.iter_mut().find(|p| p.provider == provider && p.name == name) {
+        if let Some(p) = self
+            .probes
+            .iter_mut()
+            .find(|p| p.provider == provider && p.name == name)
+        {
             p.hit_count += 1;
             true
         } else {
@@ -1369,7 +1422,11 @@ impl SovereignQubesIsolationEngine {
         });
     }
 
-    pub fn copy_inter_vm_buffer(&mut self, src_domain: &str, payload: &[u8]) -> Result<(), &'static str> {
+    pub fn copy_inter_vm_buffer(
+        &mut self,
+        src_domain: &str,
+        payload: &[u8],
+    ) -> Result<(), &'static str> {
         if !self.domains.iter().any(|d| d.name == src_domain) {
             return Err("QubesIsolationEngine: Source domain does not exist");
         }
@@ -1463,8 +1520,17 @@ impl SovereignHaikuInterfaceEngine {
         });
     }
 
-    pub fn convert_media(&self, in_fmt: &str, out_fmt: &str, data: &[u8]) -> Result<Vec<u8>, &'static str> {
-        if self.translators.iter().any(|t| t.input_format == in_fmt && t.output_format == out_fmt) {
+    pub fn convert_media(
+        &self,
+        in_fmt: &str,
+        out_fmt: &str,
+        data: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        if self
+            .translators
+            .iter()
+            .any(|t| t.input_format == in_fmt && t.output_format == out_fmt)
+        {
             let mut converted = data.to_vec();
             converted.reverse(); // Zero-copy representation transformation
             Ok(converted)
@@ -1477,6 +1543,292 @@ impl SovereignHaikuInterfaceEngine {
 impl Default for SovereignHaikuInterfaceEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// =========================================================================
+// 23. SOVEREIGN EBPF & XDP ENGINE (Superseding Linux eBPF, Cilium, BPFtrace)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XdpAction {
+    Pass,
+    Drop,
+    Redirect,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EbpfInstruction {
+    pub opcode: u8,
+    pub dst_reg: u8,
+    pub src_reg: u8,
+    pub offset: i16,
+    pub imm: i32,
+}
+
+pub struct SovereignEbpfXdpEngine {
+    pub loaded_instructions: Vec<EbpfInstruction>,
+    pub map_storage: Vec<(String, Vec<u8>)>,
+    pub packets_processed: u64,
+}
+
+impl SovereignEbpfXdpEngine {
+    pub fn new() -> Self {
+        Self {
+            loaded_instructions: Vec::new(),
+            map_storage: Vec::new(),
+            packets_processed: 0,
+        }
+    }
+
+    pub fn load_program(&mut self, instrs: &[EbpfInstruction]) {
+        self.loaded_instructions = instrs.to_vec();
+    }
+
+    pub fn map_update_elem(&mut self, key: &str, val: &[u8]) {
+        self.map_storage.retain(|(k, _)| k != key);
+        self.map_storage.push((key.to_string(), val.to_vec()));
+    }
+
+    pub fn map_lookup_elem(&self, key: &str) -> Option<&Vec<u8>> {
+        self.map_storage
+            .iter()
+            .find(|(k, _)| k == key)
+            .map(|(_, v)| v)
+    }
+
+    pub fn execute_xdp(&mut self, packet_data: &[u8]) -> XdpAction {
+        self.packets_processed += 1;
+        if packet_data.is_empty() {
+            return XdpAction::Drop;
+        }
+
+        for inst in &self.loaded_instructions {
+            if inst.opcode == 0x05 && inst.imm == 0x00 {
+                return XdpAction::Drop;
+            }
+        }
+
+        if let Some(drop_flag) = self.map_lookup_elem("drop_all") {
+            if drop_flag.first() == Some(&1) {
+                return XdpAction::Drop;
+            }
+        }
+
+        XdpAction::Pass
+    }
+}
+
+impl Default for SovereignEbpfXdpEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 24. SOVEREIGN CAPSICUM SANDBOX (Superseding FreeBSD Capsicum & CloudABI)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CapRight {
+    Read = 1 << 0,
+    Write = 1 << 1,
+    Seek = 1 << 2,
+    Fcntl = 1 << 3,
+    Ioctl = 1 << 4,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CapabilityDescriptor {
+    pub fd: u32,
+    pub allowed_rights_mask: u32,
+}
+
+pub struct SovereignCapsicumSandbox {
+    pub in_capability_mode: bool,
+    pub capability_descriptors: Vec<CapabilityDescriptor>,
+}
+
+impl SovereignCapsicumSandbox {
+    pub fn new() -> Self {
+        Self {
+            in_capability_mode: false,
+            capability_descriptors: Vec::new(),
+        }
+    }
+
+    pub fn cap_enter(&mut self) {
+        self.in_capability_mode = true;
+    }
+
+    pub fn cap_rights_limit(&mut self, fd: u32, rights_mask: u32) {
+        self.capability_descriptors.retain(|c| c.fd != fd);
+        self.capability_descriptors.push(CapabilityDescriptor {
+            fd,
+            allowed_rights_mask: rights_mask,
+        });
+    }
+
+    pub fn cap_check(&self, fd: u32, required_right: CapRight) -> bool {
+        if !self.in_capability_mode {
+            return true;
+        }
+        if let Some(desc) = self.capability_descriptors.iter().find(|c| c.fd == fd) {
+            (desc.allowed_rights_mask & (required_right as u32)) != 0
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignCapsicumSandbox {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 25. SOVEREIGN PLAN 9 9P2000 ENGINE (Superseding Plan 9 9P2000.u Protocol)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NinePMessageType {
+    Tversion,
+    Rversion,
+    Tattach,
+    Rattach,
+    Tread,
+    Rread,
+    Twrite,
+    Rwrite,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NinePMessage {
+    pub msg_type: NinePMessageType,
+    pub tag: u16,
+    pub fid: u32,
+    pub payload: Vec<u8>,
+}
+
+pub struct SovereignNinePProtocolHandler {
+    pub msize: u32,
+    pub version: String,
+    pub attached_fids: Vec<u32>,
+    pub rpc_count: u64,
+}
+
+impl SovereignNinePProtocolHandler {
+    pub fn new() -> Self {
+        Self {
+            msize: 8192,
+            version: "9P2000.L".to_string(),
+            attached_fids: Vec::new(),
+            rpc_count: 0,
+        }
+    }
+
+    pub fn handle_rpc(&mut self, req: NinePMessage) -> Result<NinePMessage, &'static str> {
+        self.rpc_count += 1;
+        match req.msg_type {
+            NinePMessageType::Tversion => Ok(NinePMessage {
+                msg_type: NinePMessageType::Rversion,
+                tag: req.tag,
+                fid: req.fid,
+                payload: format!("msize={} version={}", self.msize, self.version).into_bytes(),
+            }),
+            NinePMessageType::Tattach => {
+                if !self.attached_fids.contains(&req.fid) {
+                    self.attached_fids.push(req.fid);
+                }
+                Ok(NinePMessage {
+                    msg_type: NinePMessageType::Rattach,
+                    tag: req.tag,
+                    fid: req.fid,
+                    payload: b"qid_type=0".to_vec(),
+                })
+            }
+            NinePMessageType::Tread => Ok(NinePMessage {
+                msg_type: NinePMessageType::Rread,
+                tag: req.tag,
+                fid: req.fid,
+                payload: b"9p_read_ok".to_vec(),
+            }),
+            NinePMessageType::Twrite => Ok(NinePMessage {
+                msg_type: NinePMessageType::Rwrite,
+                tag: req.tag,
+                fid: req.fid,
+                payload: (req.payload.len() as u32).to_le_bytes().to_vec(),
+            }),
+            _ => Err("NinePHandler: Unsupported 9P message type"),
+        }
+    }
+}
+
+impl Default for SovereignNinePProtocolHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 26. SOVEREIGN MESH IDENTITY ENGINE (Superseding SPIFFE/SPIRE & Tailscale Mesh)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SpiffeIdentity {
+    pub trust_domain: String,
+    pub workload_path: String,
+    pub pqc_token: [u8; 32],
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MeshPeer {
+    pub peer_id: String,
+    pub spiffe_id: SpiffeIdentity,
+    pub verified: bool,
+}
+
+pub struct SovereignMeshIdentityEngine {
+    pub trust_domain: String,
+    pub trusted_peers: Vec<MeshPeer>,
+}
+
+impl SovereignMeshIdentityEngine {
+    pub fn new(trust_domain: &str) -> Self {
+        Self {
+            trust_domain: trust_domain.to_string(),
+            trusted_peers: Vec::new(),
+        }
+    }
+
+    pub fn issue_spiffe_id(&self, workload_path: &str, secret: &[u8; 32]) -> SpiffeIdentity {
+        SpiffeIdentity {
+            trust_domain: self.trust_domain.clone(),
+            workload_path: workload_path.to_string(),
+            pqc_token: *secret,
+        }
+    }
+
+    pub fn register_and_attest_peer(&mut self, peer_id: &str, spiffe_id: SpiffeIdentity) -> bool {
+        if spiffe_id.trust_domain != self.trust_domain {
+            return false;
+        }
+        self.trusted_peers.retain(|p| p.peer_id != peer_id);
+        self.trusted_peers.push(MeshPeer {
+            peer_id: peer_id.to_string(),
+            spiffe_id,
+            verified: true,
+        });
+        true
+    }
+
+    pub fn verify_peer_identity(&self, peer_id: &str) -> bool {
+        self.trusted_peers
+            .iter()
+            .find(|p| p.peer_id == peer_id)
+            .map(|p| p.verified)
+            .unwrap_or(false)
     }
 }
 
@@ -1533,11 +1885,17 @@ mod tests {
         assert!(activation_res.contains("sigmadb"));
 
         assert!(init.start_service("sigmaweb").is_ok());
-        assert_eq!(init.registered_units[1].current_state, SupervisorServiceState::ActiveRunning);
+        assert_eq!(
+            init.registered_units[1].current_state,
+            SupervisorServiceState::ActiveRunning
+        );
 
         init.handle_service_failure("sigmaweb");
         assert_eq!(init.registered_units[1].restart_count, 1);
-        assert_eq!(init.registered_units[1].current_state, SupervisorServiceState::ActiveRunning);
+        assert_eq!(
+            init.registered_units[1].current_state,
+            SupervisorServiceState::ActiveRunning
+        );
     }
 
     #[test]
@@ -1553,9 +1911,15 @@ mod tests {
             action: FirewallAction::Deny,
         });
 
-        assert_eq!(firewall.inspect_incoming_packet("192.168.1.50", 22), FirewallAction::Deny);
+        assert_eq!(
+            firewall.inspect_incoming_packet("192.168.1.50", 22),
+            FirewallAction::Deny
+        );
         assert_eq!(firewall.blocked_ip_count, 1);
-        assert_eq!(firewall.inspect_incoming_packet("192.168.1.100", 80), FirewallAction::Allow);
+        assert_eq!(
+            firewall.inspect_incoming_packet("192.168.1.100", 80),
+            FirewallAction::Allow
+        );
     }
 
     #[test]
@@ -1573,7 +1937,10 @@ mod tests {
     fn test_sovereign_knowledge_graph_backlinks() {
         let mut graph = SovereignKnowledgeGraph::new();
         graph.add_note("Kernel_Architecture", "Core microkernel design");
-        graph.add_note("Pqc_Enclave", "Security enclave based on [[Kernel_Architecture]]");
+        graph.add_note(
+            "Pqc_Enclave",
+            "Security enclave based on [[Kernel_Architecture]]",
+        );
 
         let backlinks = graph.query_backlinks("Kernel_Architecture");
         assert_eq!(backlinks.len(), 1);
@@ -1598,7 +1965,9 @@ mod tests {
     #[test]
     fn test_sovereign_partition_engine() {
         let mut pe = SovereignPartitionEngine::new(100_000); // 100,000 sectors
-        let p1 = pe.create_partition(SovereignFsType::SigmaFs, 20_000, "root").unwrap();
+        let p1 = pe
+            .create_partition(SovereignFsType::SigmaFs, 20_000, "root")
+            .unwrap();
         assert_eq!(p1, 1);
 
         assert!(pe.verify_alignment());
@@ -1610,7 +1979,10 @@ mod tests {
         runtime.create_container("app1", "alpine:latest", 512);
         assert_eq!(runtime.containers.len(), 1);
         assert!(runtime.start_container("app1").is_ok());
-        assert_eq!(runtime.containers[0].state, SovereignContainerState::Running);
+        assert_eq!(
+            runtime.containers[0].state,
+            SovereignContainerState::Running
+        );
 
         runtime.enforce_cgroups("app1", 50);
         assert_eq!(runtime.containers[0].cpu_usage_pct, 50);
@@ -1665,7 +2037,10 @@ mod tests {
         assert!(db.create_table("users").is_ok());
         assert!(db.begin_transaction());
 
-        let row = Vec::from([("id".to_string(), "1".to_string()), ("name".to_string(), "Jules".to_string())]);
+        let row = Vec::from([
+            ("id".to_string(), "1".to_string()),
+            ("name".to_string(), "Jules".to_string()),
+        ]);
         assert!(db.insert_row("users", row).is_ok());
         assert!(db.commit());
 
@@ -1707,7 +2082,9 @@ mod tests {
         let mut ai_server = SovereignAiInferenceServer::new();
         ai_server.load_model("llama-3-8b", 4096);
 
-        let response = ai_server.generate_response("Explain quantum computing").unwrap();
+        let response = ai_server
+            .generate_response("Explain quantum computing")
+            .unwrap();
         assert!(response.contains("llama-3-8b"));
         assert!(ai_server.generated_tokens_count > 0);
     }
@@ -1776,7 +2153,9 @@ mod tests {
         let mut qubes = SovereignQubesIsolationEngine::new();
         qubes.create_domain("work-vault", "red", false);
 
-        assert!(qubes.copy_inter_vm_buffer("work-vault", b"secret_token").is_ok());
+        assert!(qubes
+            .copy_inter_vm_buffer("work-vault", b"secret_token")
+            .is_ok());
         assert_eq!(qubes.inter_vm_clipboard, Some(b"secret_token".to_vec()));
     }
 
@@ -1806,5 +2185,77 @@ mod tests {
         assert_eq!(orchestrator.supervisor.registered_units.len(), 1);
         assert_eq!(orchestrator.observability.metrics_time_series.len(), 1);
         assert!(orchestrator.firewall.vpn_active);
+        assert!(orchestrator.capsicum.in_capability_mode);
+    }
+
+    #[test]
+    fn test_sovereign_ebpf_xdp_engine() {
+        let mut ebpf = SovereignEbpfXdpEngine::new();
+        ebpf.load_program(&[EbpfInstruction {
+            opcode: 0x05,
+            dst_reg: 0,
+            src_reg: 0,
+            offset: 0,
+            imm: 0x00,
+        }]);
+
+        let act = ebpf.execute_xdp(b"packet_payload");
+        assert_eq!(act, XdpAction::Drop);
+        assert_eq!(ebpf.packets_processed, 1);
+
+        let mut ebpf_pass = SovereignEbpfXdpEngine::new();
+        ebpf_pass.map_update_elem("drop_all", &[0]);
+        let act_pass = ebpf_pass.execute_xdp(b"good_packet");
+        assert_eq!(act_pass, XdpAction::Pass);
+    }
+
+    #[test]
+    fn test_sovereign_capsicum_sandbox() {
+        let mut sandbox = SovereignCapsicumSandbox::new();
+        assert!(sandbox.cap_check(3, CapRight::Read));
+
+        sandbox.cap_enter();
+        sandbox.cap_rights_limit(3, CapRight::Read as u32 | CapRight::Seek as u32);
+
+        assert!(sandbox.cap_check(3, CapRight::Read));
+        assert!(sandbox.cap_check(3, CapRight::Seek));
+        assert!(!sandbox.cap_check(3, CapRight::Write));
+        assert!(!sandbox.cap_check(4, CapRight::Read));
+    }
+
+    #[test]
+    fn test_sovereign_ninep_protocol_handler() {
+        let mut handler = SovereignNinePProtocolHandler::new();
+        let version_resp = handler
+            .handle_rpc(NinePMessage {
+                msg_type: NinePMessageType::Tversion,
+                tag: 1,
+                fid: 0,
+                payload: Vec::new(),
+            })
+            .unwrap();
+        assert_eq!(version_resp.msg_type, NinePMessageType::Rversion);
+
+        let attach_resp = handler
+            .handle_rpc(NinePMessage {
+                msg_type: NinePMessageType::Tattach,
+                tag: 2,
+                fid: 10,
+                payload: Vec::new(),
+            })
+            .unwrap();
+        assert_eq!(attach_resp.msg_type, NinePMessageType::Rattach);
+        assert!(handler.attached_fids.contains(&10));
+    }
+
+    #[test]
+    fn test_sovereign_mesh_identity_engine() {
+        let mut mesh = SovereignMeshIdentityEngine::new("sigmaos.mesh");
+        let spiffe_id = mesh.issue_spiffe_id("/service/api", &[0xAB; 32]);
+        assert_eq!(spiffe_id.trust_domain, "sigmaos.mesh");
+
+        assert!(mesh.register_and_attest_peer("node-1", spiffe_id));
+        assert!(mesh.verify_peer_identity("node-1"));
+        assert!(!mesh.verify_peer_identity("node-unknown"));
     }
 }

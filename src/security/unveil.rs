@@ -86,7 +86,12 @@ impl UnveilManager {
     }
 
     /// Landlock-style unveil_at: Register a constraint relative to a parent dir_fd / base_path
-    pub fn unveil_at(&mut self, base_path: &str, relative_path: &str, permissions: &str) -> Result<(), SigmaError> {
+    pub fn unveil_at(
+        &mut self,
+        base_path: &str,
+        relative_path: &str,
+        permissions: &str,
+    ) -> Result<(), SigmaError> {
         let full_path = if base_path.ends_with('/') {
             format!("{}{}", base_path, relative_path)
         } else {
@@ -179,13 +184,11 @@ impl UnveilManager {
             let is_match = if restriction.is_regex {
                 Self::match_glob_regex(r_path, path)
             } else {
-                path == r_path || (
-                    path.starts_with(r_path) && (
-                        r_path.ends_with('/') ||
-                        path[r_path.len()..].starts_with('/') ||
-                        path[r_path.len()..].starts_with('\\')
-                    )
-                )
+                path == r_path
+                    || (path.starts_with(r_path)
+                        && (r_path.ends_with('/')
+                            || path[r_path.len()..].starts_with('/')
+                            || path[r_path.len()..].starts_with('\\')))
             };
 
             if is_match {
@@ -206,7 +209,9 @@ impl UnveilManager {
                 Err(SigmaError::Security(SecurityError::AccessDenied))
             }
         } else {
-            Err(SigmaError::Security(SecurityError::PrivilegeEscalationDetected))
+            Err(SigmaError::Security(
+                SecurityError::PrivilegeEscalationDetected,
+            ))
         }
     }
 }

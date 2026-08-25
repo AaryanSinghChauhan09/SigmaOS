@@ -106,7 +106,7 @@ impl<'a> StringParser<'a> {
 pub fn split_string(s: &str, delimiter: char) -> Vec<String> {
     let mut result = Vec::new();
     let mut current = String::new();
-    
+
     for c in s.chars() {
         if c == delimiter {
             result.push(current);
@@ -115,11 +115,11 @@ pub fn split_string(s: &str, delimiter: char) -> Vec<String> {
             current.push(c);
         }
     }
-    
+
     if !current.is_empty() {
         result.push(current);
     }
-    
+
     result
 }
 

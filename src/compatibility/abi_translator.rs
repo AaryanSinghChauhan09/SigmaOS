@@ -243,22 +243,45 @@ mod tests {
     #[test]
     fn test_sovereign_alignment_checker() {
         // Stack alignment test (x86_64 16-byte alignment requirement)
-        assert!(SovereignAlignmentChecker::check_stack_alignment(0x7FFF_FFFF_F000, 16));
-        assert!(!SovereignAlignmentChecker::check_stack_alignment(0x7FFF_FFFF_F008, 16));
+        assert!(SovereignAlignmentChecker::check_stack_alignment(
+            0x7FFF_FFFF_F000,
+            16
+        ));
+        assert!(!SovereignAlignmentChecker::check_stack_alignment(
+            0x7FFF_FFFF_F008,
+            16
+        ));
 
         // Memory page alignment test (4KB, 2MB, 1GB)
-        assert!(SovereignAlignmentChecker::check_page_alignment(0x1000, 4096));
-        assert!(!SovereignAlignmentChecker::check_page_alignment(0x1080, 4096));
-        assert!(SovereignAlignmentChecker::check_page_alignment(0x200000, 2 * 1024 * 1024));
+        assert!(SovereignAlignmentChecker::check_page_alignment(
+            0x1000, 4096
+        ));
+        assert!(!SovereignAlignmentChecker::check_page_alignment(
+            0x1080, 4096
+        ));
+        assert!(SovereignAlignmentChecker::check_page_alignment(
+            0x200000,
+            2 * 1024 * 1024
+        ));
 
         // Ancient ISA DMA 16MB & 64KB boundary test
-        assert!(SovereignAlignmentChecker::check_isa_dma_alignment(0x10000, 4096)); // Valid 64KB page
-        assert!(!SovereignAlignmentChecker::check_isa_dma_alignment(0xFF0001, 65536)); // Crosses 16MB limit
-        assert!(!SovereignAlignmentChecker::check_isa_dma_alignment(0x0F00, 65536)); // Crosses 64KB boundary
+        assert!(SovereignAlignmentChecker::check_isa_dma_alignment(
+            0x10000, 4096
+        )); // Valid 64KB page
+        assert!(!SovereignAlignmentChecker::check_isa_dma_alignment(
+            0xFF0001, 65536
+        )); // Crosses 16MB limit
+        assert!(!SovereignAlignmentChecker::check_isa_dma_alignment(
+            0x0F00, 65536
+        )); // Crosses 64KB boundary
 
         // Disk 4KB AF sector alignment test (8 sectors)
-        assert!(SovereignAlignmentChecker::check_disk_sector_alignment(2048, 8)); // 2048 % 8 == 0
-        assert!(!SovereignAlignmentChecker::check_disk_sector_alignment(2049, 8));
+        assert!(SovereignAlignmentChecker::check_disk_sector_alignment(
+            2048, 8
+        )); // 2048 % 8 == 0
+        assert!(!SovereignAlignmentChecker::check_disk_sector_alignment(
+            2049, 8
+        ));
 
         // SIMD vector alignment test (AVX-512 64-byte alignment)
         assert!(SovereignAlignmentChecker::check_simd_alignment(0x1000, 64));
@@ -286,15 +309,17 @@ mod tests {
         assert_eq!(cdecl_layout.stack_cleaning_authority, "CALLER");
         assert_eq!(cdecl_layout.stack_alignment_bytes, 4);
 
-        let stdcall_layout = translator.compute_invocation_layout(&params, CallingConvention::Stdcall);
+        let stdcall_layout =
+            translator.compute_invocation_layout(&params, CallingConvention::Stdcall);
         assert_eq!(stdcall_layout.stack_params, vec![100, 200, 300, 400]);
         assert_eq!(stdcall_layout.stack_cleaning_authority, "CALLEE");
 
-        let fastcall_layout = translator.compute_invocation_layout(&params, CallingConvention::Fastcall32);
-        assert_eq!(fastcall_layout.register_params, vec![
-            ("ECX".to_string(), 100),
-            ("EDX".to_string(), 200),
-        ]);
+        let fastcall_layout =
+            translator.compute_invocation_layout(&params, CallingConvention::Fastcall32);
+        assert_eq!(
+            fastcall_layout.register_params,
+            vec![("ECX".to_string(), 100), ("EDX".to_string(), 200),]
+        );
         assert_eq!(fastcall_layout.stack_params, vec![300, 400]);
         assert_eq!(fastcall_layout.stack_cleaning_authority, "CALLEE");
     }
@@ -304,26 +329,34 @@ mod tests {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let params = vec![1, 2, 3, 4, 5, 6, 7];
 
-        let ms_layout = translator.compute_invocation_layout(&params, CallingConvention::MicrosoftX64);
-        assert_eq!(ms_layout.register_params, vec![
-            ("RCX".to_string(), 1),
-            ("RDX".to_string(), 2),
-            ("R8".to_string(), 3),
-            ("R9".to_string(), 4),
-        ]);
+        let ms_layout =
+            translator.compute_invocation_layout(&params, CallingConvention::MicrosoftX64);
+        assert_eq!(
+            ms_layout.register_params,
+            vec![
+                ("RCX".to_string(), 1),
+                ("RDX".to_string(), 2),
+                ("R8".to_string(), 3),
+                ("R9".to_string(), 4),
+            ]
+        );
         assert_eq!(ms_layout.stack_params, vec![5, 6, 7]);
         assert_eq!(ms_layout.shadow_space_bytes, 32);
         assert_eq!(ms_layout.stack_alignment_bytes, 16);
 
-        let sysv_layout = translator.compute_invocation_layout(&params, CallingConvention::SystemVAmd64);
-        assert_eq!(sysv_layout.register_params, vec![
-            ("RDI".to_string(), 1),
-            ("RSI".to_string(), 2),
-            ("RDX".to_string(), 3),
-            ("RCX".to_string(), 4),
-            ("R8".to_string(), 5),
-            ("R9".to_string(), 6),
-        ]);
+        let sysv_layout =
+            translator.compute_invocation_layout(&params, CallingConvention::SystemVAmd64);
+        assert_eq!(
+            sysv_layout.register_params,
+            vec![
+                ("RDI".to_string(), 1),
+                ("RSI".to_string(), 2),
+                ("RDX".to_string(), 3),
+                ("RCX".to_string(), 4),
+                ("R8".to_string(), 5),
+                ("R9".to_string(), 6),
+            ]
+        );
         assert_eq!(sysv_layout.stack_params, vec![7]);
         assert_eq!(sysv_layout.shadow_space_bytes, 0);
         assert_eq!(sysv_layout.stack_alignment_bytes, 16);
@@ -334,24 +367,32 @@ mod tests {
         let translator = ABITranslator::new(CpuArchitecture::Arm);
         let params = vec![11, 22, 33, 44, 55];
 
-        let aapcs32 = translator.compute_invocation_layout(&params, CallingConvention::AArch32AAPCS);
-        assert_eq!(aapcs32.register_params, vec![
-            ("R0".to_string(), 11),
-            ("R1".to_string(), 22),
-            ("R2".to_string(), 33),
-            ("R3".to_string(), 44),
-        ]);
+        let aapcs32 =
+            translator.compute_invocation_layout(&params, CallingConvention::AArch32AAPCS);
+        assert_eq!(
+            aapcs32.register_params,
+            vec![
+                ("R0".to_string(), 11),
+                ("R1".to_string(), 22),
+                ("R2".to_string(), 33),
+                ("R3".to_string(), 44),
+            ]
+        );
         assert_eq!(aapcs32.stack_params, vec![55]);
         assert_eq!(aapcs32.stack_alignment_bytes, 8);
 
-        let aapcs64 = translator.compute_invocation_layout(&params, CallingConvention::AArch64AAPCS);
-        assert_eq!(aapcs64.register_params, vec![
-            ("X0".to_string(), 11),
-            ("X1".to_string(), 22),
-            ("X2".to_string(), 33),
-            ("X3".to_string(), 44),
-            ("X4".to_string(), 55),
-        ]);
+        let aapcs64 =
+            translator.compute_invocation_layout(&params, CallingConvention::AArch64AAPCS);
+        assert_eq!(
+            aapcs64.register_params,
+            vec![
+                ("X0".to_string(), 11),
+                ("X1".to_string(), 22),
+                ("X2".to_string(), 33),
+                ("X3".to_string(), 44),
+                ("X4".to_string(), 55),
+            ]
+        );
         assert!(aapcs64.stack_params.is_empty());
         assert_eq!(aapcs64.stack_alignment_bytes, 16);
     }

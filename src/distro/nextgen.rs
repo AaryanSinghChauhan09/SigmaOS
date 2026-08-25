@@ -376,7 +376,11 @@ impl UniversalCapabilityMatrix {
         Ok(())
     }
 
-    pub fn unveil_path(&mut self, path: &str, rights: &[CapabilityRight]) -> Result<(), &'static str> {
+    pub fn unveil_path(
+        &mut self,
+        path: &str,
+        rights: &[CapabilityRight],
+    ) -> Result<(), &'static str> {
         if self.is_locked {
             return Err("Capability matrix is locked permanently");
         }
@@ -398,7 +402,10 @@ impl UniversalCapabilityMatrix {
 
         let mut best_rule: Option<&PathAccessRule> = None;
         for rule in &self.unveil_rules {
-            if path == rule.path || (path.starts_with(&rule.path) && (rule.path == "/" || path.as_bytes().get(rule.path.len()) == Some(&b'/'))) {
+            if path == rule.path
+                || (path.starts_with(&rule.path)
+                    && (rule.path == "/" || path.as_bytes().get(rule.path.len()) == Some(&b'/')))
+            {
                 match best_rule {
                     Some(best) if rule.path.len() > best.path.len() => best_rule = Some(rule),
                     None => best_rule = Some(rule),
@@ -465,11 +472,17 @@ impl SovereignAttestationEnclave {
     }
 
     pub fn verify_attestation(&self, enclave_id: u64, signature: u64) -> bool {
-        self.enclaves.iter().any(|e| e.enclave_id == enclave_id && e.pqc_dilithium5_hash == signature && e.is_trusted)
+        self.enclaves.iter().any(|e| {
+            e.enclave_id == enclave_id && e.pqc_dilithium5_hash == signature && e.is_trusted
+        })
     }
 
     pub fn revoke_enclave(&mut self, enclave_id: u64) {
-        if let Some(e) = self.enclaves.iter_mut().find(|e| e.enclave_id == enclave_id) {
+        if let Some(e) = self
+            .enclaves
+            .iter_mut()
+            .find(|e| e.enclave_id == enclave_id)
+        {
             e.is_trusted = false;
         }
     }
@@ -503,7 +516,8 @@ impl AutonomousKernelRelinker {
     }
 
     pub fn relink_kernel_layout(&mut self, entropy: u64) -> u64 {
-        let virt_base = 0xFFFFFFFF80000000u64 + ((entropy.wrapping_mul(6364136223846793005).wrapping_add(1) % 0x1000000) & !0xFFF);
+        let virt_base = 0xFFFFFFFF80000000u64
+            + ((entropy.wrapping_mul(6364136223846793005).wrapping_add(1) % 0x1000000) & !0xFFF);
         self.relinks.push(KernelRelinkRecord {
             layout_seed: entropy,
             virt_base,
@@ -722,7 +736,9 @@ mod tests {
     fn test_universal_capability_matrix() {
         let mut matrix = UniversalCapabilityMatrix::new();
         assert!(matrix.unveil_path("/etc", &[CapabilityRight::Read]).is_ok());
-        assert!(matrix.unveil_path("/var/log", &[CapabilityRight::Read, CapabilityRight::Write]).is_ok());
+        assert!(matrix
+            .unveil_path("/var/log", &[CapabilityRight::Read, CapabilityRight::Write])
+            .is_ok());
 
         assert!(matrix.check_access("/etc/hosts", CapabilityRight::Read));
         assert!(!matrix.check_access("/etc/hosts", CapabilityRight::Write));
@@ -730,7 +746,9 @@ mod tests {
 
         assert!(matrix.register_pledge(&["stdio", "rpath"]).is_ok());
         matrix.lock();
-        assert!(matrix.unveil_path("/tmp", &[CapabilityRight::Write]).is_err());
+        assert!(matrix
+            .unveil_path("/tmp", &[CapabilityRight::Write])
+            .is_err());
     }
 
     #[test]

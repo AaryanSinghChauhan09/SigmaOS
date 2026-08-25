@@ -25,7 +25,7 @@ pub use cross_device::{
     CrossDeviceOrchestrator, DeviceCapability, DeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use sigmakube::{
-    Cluster, ClusterState, Node, NodeState, Pod, PodPhase, Service, ServiceType,
-    Deployment, DeploymentStrategy, ContainerSpec, ResourceRequirements, ContainerPort,
-    ServicePort, PodTemplate, Metadata, PodSpec, SigmaKube, ClusterStats,
+    Cluster, ClusterState, ClusterStats, ContainerPort, ContainerSpec, Deployment,
+    DeploymentStrategy, Metadata, Node, NodeState, Pod, PodPhase, PodSpec, PodTemplate,
+    ResourceRequirements, Service, ServicePort, ServiceType, SigmaKube,
 };

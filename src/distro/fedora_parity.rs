@@ -129,7 +129,7 @@ impl SelinuxPolicy {
         if !self.enforcing_mode.get() {
             return true; // Permissive mode allows everything
         }
-        
+
         // Simplified policy check
         let op_str = String::from(operation);
         for rule in &self.policy_rules {

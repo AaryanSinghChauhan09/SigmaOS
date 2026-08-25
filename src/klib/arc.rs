@@ -5,10 +5,10 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::convert::AsRef;
 use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
-use core::convert::AsRef;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// ArcInner - Internal structure for Arc
 #[repr(C)]
@@ -33,7 +33,7 @@ impl<T> Arc<T> {
             count: AtomicUsize::new(1),
             data,
         }));
-        
+
         Arc {
             ptr: NonNull::new(inner).expect("ArcInner pointer should not be null"),
         }
@@ -62,9 +62,7 @@ impl<T: ?Sized> Arc<T> {
     /// Only safe if this is the only reference
     pub fn get_mut(this: &mut Self) -> Option<&mut T> {
         if this.inner().count.load(Ordering::SeqCst) == 1 {
-            unsafe {
-                Some(&mut this.ptr.as_mut().data)
-            }
+            unsafe { Some(&mut this.ptr.as_mut().data) }
         } else {
             None
         }
@@ -83,7 +81,7 @@ impl<T: ?Sized> Arc<T> {
     /// Decrement the reference count and drop if zero
     fn decrement(&self) {
         let old_count = self.inner().count.fetch_sub(1, Ordering::SeqCst);
-        
+
         if old_count == 1 {
             // This was the last reference, drop the data
             unsafe {
@@ -96,9 +94,7 @@ impl<T: ?Sized> Arc<T> {
 impl<T: ?Sized> Clone for Arc<T> {
     fn clone(&self) -> Self {
         self.increment();
-        Arc {
-            ptr: self.ptr,
-        }
+        Arc { ptr: self.ptr }
     }
 }
 
@@ -154,7 +150,7 @@ mod tests {
     fn test_arc_get_mut() {
         let mut arc = Arc::new(42);
         assert_eq!(Arc::get_mut(&mut arc), Some(&mut 42));
-        
+
         let arc2 = arc.clone();
         assert_eq!(Arc::get_mut(&mut arc), None);
     }

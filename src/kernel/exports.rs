@@ -78,10 +78,10 @@ impl SymbolRegistry {
 // =========================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SysInitPriority {
-    SubTunables = 10,  // Loader tunables configuration
-    SubCpu = 20,       // CPU identification & registers
-    SubMemory = 30,    // Virtual Memory & paging allocator
-    SubDrivers = 40,   // Low-level bus & storage controllers
+    SubTunables = 10,   // Loader tunables configuration
+    SubCpu = 20,        // CPU identification & registers
+    SubMemory = 30,     // Virtual Memory & paging allocator
+    SubDrivers = 40,    // Low-level bus & storage controllers
     SubFilesystem = 50, // Virtual Filesystem mounting
 }
 
@@ -97,9 +97,7 @@ pub struct SysInitOrchestrator {
 
 impl SysInitOrchestrator {
     pub const fn new() -> Self {
-        Self {
-            items: Vec::new(),
-        }
+        Self { items: Vec::new() }
     }
 
     /// Registers a BSD-style SYSINIT item to the sequencer queue.
@@ -170,9 +168,21 @@ mod tests {
     fn test_export_symbol_registration() {
         let mut registry = SymbolRegistry::new();
         // Export standard open routine
-        registry.export_symbol("sys_open", KernelSymbolType::Function, 0xC0001000, "VFS", false);
+        registry.export_symbol(
+            "sys_open",
+            KernelSymbolType::Function,
+            0xC0001000,
+            "VFS",
+            false,
+        );
         // Export highly private crypto verification routine (GPL only)
-        registry.export_symbol("sys_pqc_kyber", KernelSymbolType::Function, 0xC0005000, "Crypto", true);
+        registry.export_symbol(
+            "sys_pqc_kyber",
+            KernelSymbolType::Function,
+            0xC0005000,
+            "Crypto",
+            true,
+        );
 
         // Standard symbol should be resolvable by any caller
         assert_eq!(registry.lookup_symbol("sys_open", false), Some(0xC0001000));
@@ -180,7 +190,10 @@ mod tests {
 
         // GPL-only symbol should be None for non-GPL caller, and resolved for GPL caller
         assert_eq!(registry.lookup_symbol("sys_pqc_kyber", false), None);
-        assert_eq!(registry.lookup_symbol("sys_pqc_kyber", true), Some(0xC0005000));
+        assert_eq!(
+            registry.lookup_symbol("sys_pqc_kyber", true),
+            Some(0xC0005000)
+        );
     }
 
     #[test]

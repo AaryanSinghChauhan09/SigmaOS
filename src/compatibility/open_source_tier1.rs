@@ -95,7 +95,12 @@ impl LibsodiumIntegration {
     }
 
     /// Encrypts a plaintext message using libsodium-compatible secretbox symmetric encryption
-    pub fn crypto_secretbox_easy(&self, plaintext: &[u8], nonce: &[u8; 24], key: &[u8; 32]) -> Result<Vec<u8>, &'static str> {
+    pub fn crypto_secretbox_easy(
+        &self,
+        plaintext: &[u8],
+        nonce: &[u8; 24],
+        key: &[u8; 32],
+    ) -> Result<Vec<u8>, &'static str> {
         if plaintext.is_empty() {
             return Err("libsodium: Plaintext cannot be empty.");
         }
@@ -110,7 +115,12 @@ impl LibsodiumIntegration {
     }
 
     /// Decrypts a secretbox ciphertext using matching symmetric keys
-    pub fn crypto_secretbox_open_easy(&self, ciphertext: &[u8], nonce: &[u8; 24], key: &[u8; 32]) -> Result<Vec<u8>, &'static str> {
+    pub fn crypto_secretbox_open_easy(
+        &self,
+        ciphertext: &[u8],
+        nonce: &[u8; 24],
+        key: &[u8; 32],
+    ) -> Result<Vec<u8>, &'static str> {
         let mut plaintext = Vec::new();
         for (i, &byte) in ciphertext.iter().enumerate() {
             let key_byte = key[i % 32];
@@ -121,7 +131,11 @@ impl LibsodiumIntegration {
     }
 
     /// Generates a cryptographic digital signature using Dilithium-5 equivalent public key layers
-    pub fn crypto_sign(&self, message: &[u8], secret_key: &[u8; 64]) -> Result<[u8; 64], &'static str> {
+    pub fn crypto_sign(
+        &self,
+        message: &[u8],
+        secret_key: &[u8; 64],
+    ) -> Result<[u8; 64], &'static str> {
         if message.is_empty() {
             return Err("libsodium: Cannot sign empty message.");
         }
@@ -164,7 +178,8 @@ impl SqliteIntegration {
             return Err("SQLite: Missing table name.");
         }
         let table_name = parts[2].trim_matches('(').to_string();
-        self.tables.insert(table_name, vec!["id".to_string(), "name".to_string()]);
+        self.tables
+            .insert(table_name, vec!["id".to_string(), "name".to_string()]);
         Ok(())
     }
 
@@ -213,8 +228,12 @@ mod tests {
         let nonce = [0xCC; 24];
         let plaintext = b"SOVEREIGN_PLAINTEXT_DATA";
 
-        let ciphertext = sodium.crypto_secretbox_easy(plaintext, &nonce, &key).unwrap();
-        let recovered = sodium.crypto_secretbox_open_easy(&ciphertext, &nonce, &key).unwrap();
+        let ciphertext = sodium
+            .crypto_secretbox_easy(plaintext, &nonce, &key)
+            .unwrap();
+        let recovered = sodium
+            .crypto_secretbox_open_easy(&ciphertext, &nonce, &key)
+            .unwrap();
         assert_eq!(recovered, plaintext);
 
         let s_key = [0xDD; 64];
@@ -225,7 +244,9 @@ mod tests {
     #[test]
     fn test_sqlite_integration() {
         let mut db = SqliteIntegration::new("/home/user/app.db");
-        assert!(db.execute_create_table("CREATE TABLE users (id INT, name TEXT)").is_ok());
+        assert!(db
+            .execute_create_table("CREATE TABLE users (id INT, name TEXT)")
+            .is_ok());
         assert!(db.tables.contains_key("users"));
 
         let count = db.execute_query("SELECT * FROM users").unwrap();

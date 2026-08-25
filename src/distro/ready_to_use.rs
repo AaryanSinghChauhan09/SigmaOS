@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-//! Ready-to-Use OS Usability Primitives
-//! Linux & BSD-inspired Service Supervision, Mount Management, User Session Environment, and Hotplug PnP Hardware Driver Binding.
+// Ready-to-Use OS Usability Primitives
+// Linux & BSD-inspired Service Supervision, Mount Management, User Session Environment, and Hotplug PnP Hardware Driver Binding.
 
 extern crate alloc;
 
@@ -286,14 +286,21 @@ impl InteractiveUserEnvironment {
         self.accounts.insert(account.username.clone(), account);
     }
 
-    pub fn authenticate_and_login(&mut self, username: &str, password_attempt: &str) -> Result<String, &'static str> {
+    pub fn authenticate_and_login(
+        &mut self,
+        username: &str,
+        password_attempt: &str,
+    ) -> Result<String, &'static str> {
         if let Some(account) = self.accounts.get(username) {
             if account.password_hash == password_attempt {
                 let mut env_vars = HashMap::new();
                 env_vars.insert(String::from("USER"), account.username.clone());
                 env_vars.insert(String::from("HOME"), account.home_dir.clone());
                 env_vars.insert(String::from("SHELL"), account.shell.clone());
-                env_vars.insert(String::from("PATH"), String::from("/bin:/sbin:/usr/bin:/usr/sbin"));
+                env_vars.insert(
+                    String::from("PATH"),
+                    String::from("/bin:/sbin:/usr/bin:/usr/sbin"),
+                );
 
                 self.active_session = Some(SessionEnvironment {
                     username: account.username.clone(),
@@ -375,7 +382,8 @@ impl PlugAndPlayHardwareManager {
     }
 
     pub fn register_driver(&mut self, driver_name: &str, categories: Vec<DeviceCategory>) {
-        self.registered_drivers.insert(driver_name.to_string(), categories);
+        self.registered_drivers
+            .insert(driver_name.to_string(), categories);
     }
 
     pub fn handle_event(&mut self, event: HardwareEvent) -> Option<String> {
@@ -441,7 +449,8 @@ mod tests {
     #[test]
     fn test_mount_engine() {
         let mut me = UniversalMountEngine::new();
-        me.parse_fstab_line("/dev/nvme0n1p1 / ext4 defaults 0 1").unwrap();
+        me.parse_fstab_line("/dev/nvme0n1p1 / ext4 defaults 0 1")
+            .unwrap();
         assert_eq!(me.mount_table.len(), 1);
 
         me.mount_all_fstab();

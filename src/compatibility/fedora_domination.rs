@@ -73,7 +73,9 @@ pub struct SInitSupervisor {
 
 impl SInitSupervisor {
     pub fn new() -> Self {
-        Self { watchdogs: Vec::new() }
+        Self {
+            watchdogs: Vec::new(),
+        }
     }
 
     pub fn register_service(&mut self, id: u32, name: &str) {
@@ -112,10 +114,7 @@ impl SKickProvisioningManifest {
         Self {
             hostname: host.to_string(),
             root_password_pqc_hash: [0x55; 32],
-            target_partitions: vec![
-                ("/boot".to_string(), 512),
-                ("/".to_string(), 20480),
-            ],
+            target_partitions: vec![("/boot".to_string(), 512), ("/".to_string(), 20480)],
         }
     }
 
@@ -145,7 +144,9 @@ pub struct SSecCapabilityLsm {
 
 impl SSecCapabilityLsm {
     pub fn new() -> Self {
-        Self { active_tokens: Vec::new() }
+        Self {
+            active_tokens: Vec::new(),
+        }
     }
 
     pub fn grant_capability(&mut self, id: u32, path: &str, exec: bool) {
@@ -218,7 +219,9 @@ pub struct SMedMediaCompositor {
 
 impl SMedMediaCompositor {
     pub fn new() -> Self {
-        Self { active_streams: Vec::new() }
+        Self {
+            active_streams: Vec::new(),
+        }
     }
 
     pub fn push_zero_copy_audio_frame(&mut self, stream_id: u32, pcm_bytes: &[u8]) {

@@ -1,4 +1,7 @@
 // SigmaOS Distro/Ecosystem Maturity Module
+pub mod arch;
+pub mod bsd_linux_innovations;
+pub mod cachy;
 pub mod certification;
 pub mod community;
 pub mod compat_layers;
@@ -11,9 +14,9 @@ pub mod fedora_parity;
 pub mod gentoo;
 pub mod i18n;
 pub mod improvements;
-pub mod bsd_linux_innovations;
 pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
+pub mod linux_bsd_parity_extended;
 pub mod linux_ideas;
 pub mod manjaro;
 pub mod nextgen;
@@ -24,31 +27,28 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
-pub mod arch;
-pub mod cachy;
-pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_parity::{
-    NixOSFlakeEngine, FlakeInput, SystemClosure,
-    ArchPacmanHooksManager, PacmanHook, HookWhen, HookAction,
-    VoidRunitSupervisor, RunitService, ServiceState,
-    GentooPortageUseFlagsEngine, PortagePackage,
+    ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
+    NixOSFlakeEngine, PacmanHook, PortagePackage, RunitService, ServiceState, SystemClosure,
+    VoidRunitSupervisor,
 };
 
 pub use cachy::{
-    MicroArchLevel, CachyKernelVariant, CpuCapabilities, BoreSchedulerGovernor, CachyPackageRepo,
+    BoreSchedulerGovernor, CachyKernelVariant, CachyPackageRepo, CpuCapabilities, MicroArchLevel,
 };
 
 pub use arch::{
-    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
-    ArchRepoType,
+    ArchBuildSystem, ArchMirror, ArchRepoType, AurHelper, AurPackage, PacmanSyncManager,
+    PacmanSyncPackage,
 };
 
-pub use parity::{
-    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
-    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
-    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
-    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
+pub use bsd_linux_innovations::{
+    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
+    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
+    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
+    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner, SovereignDeltaPatch,
+    TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -71,10 +71,23 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
+pub use linux_bsd_parity_extended::{
+    CloudInitBootstrapEngine, CrossbowVnic, GNUGuixShepherdSupervisor, GuixDerivation,
+    GuixFunctionalStore, NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, OstreeDeployment,
+    OstreeDeploymentEngine, RumpKernelServer, ShepherdService, ShepherdServiceState,
+    SlackBuildCompiler, SlackPackage, SlackwarePkgTools, SnapperBtrfsEngine, SnapperSnapshot,
+    SnapperType, SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
+};
 pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
     NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
     TimeTravelEngine,
+};
+pub use parity::{
+    AppBundleRuntime, BundleError, ChannelManager, CpuArchitecture, HalError,
+    HardwareAbstractionLayer, InstallationTarget, InstallerError, InstallerStep, LiveInstaller,
+    SigmaAppBundle, SovereignBundleRuntime, SovereignChannelManager, SovereignHal,
+    SovereignInstaller, SystemStateStatus, UpdateChannel, UpdateError,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
@@ -101,3 +114,4 @@ pub use linux_bsd_parity_extended::{
     NetBsdRumpKernel, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
 };
+pub use tiny_core::{AppsAuditTool, TczExtensionManager, TinyCoreMode, TinyCoreRAMEngine};

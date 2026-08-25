@@ -104,7 +104,9 @@ pub trait HypervisorBackend {
     fn set_memory_balloon(&mut self, vm_id: &str, target_mb: u64) -> Result<(), VmError> {
         let _ = vm_id;
         let _ = target_mb;
-        Err(VmError::FeatureNotSupported("Memory Ballooning".to_string()))
+        Err(VmError::FeatureNotSupported(
+            "Memory Ballooning".to_string(),
+        ))
     }
     /// Pin CPU cores
     fn pin_cpu_cores(&mut self, vm_id: &str, cores: Vec<u32>) -> Result<(), VmError> {
@@ -116,7 +118,9 @@ pub trait HypervisorBackend {
     fn set_virtio_queues(&mut self, vm_id: &str, queues: u32) -> Result<(), VmError> {
         let _ = vm_id;
         let _ = queues;
-        Err(VmError::FeatureNotSupported("VirtIO Multi-queueing".to_string()))
+        Err(VmError::FeatureNotSupported(
+            "VirtIO Multi-queueing".to_string(),
+        ))
     }
     /// Configure Hugepages
     fn set_hugepages(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
@@ -125,7 +129,6 @@ pub trait HypervisorBackend {
         Err(VmError::FeatureNotSupported("Hugepages".to_string()))
     }
 }
-
 
 /// Live migration status protocol (QEMU / KVM parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -188,7 +191,9 @@ impl VhostUserDevice {
 
     pub fn connect(&mut self) -> Result<(), VmError> {
         if self.socket_path.is_empty() {
-            return Err(VmError::CreationFailed("Invalid vHost socket path".to_string()));
+            return Err(VmError::CreationFailed(
+                "Invalid vHost socket path".to_string(),
+            ));
         }
         self.is_connected = true;
         Ok(())
@@ -300,25 +305,45 @@ impl KvmHypervisor {
         }
     }
 
-    pub fn attach_virtio_blk(&mut self, vm_id: &str, blk: VirtioBlockDeviceConfig) -> Result<(), VmError> {
+    pub fn attach_virtio_blk(
+        &mut self,
+        vm_id: &str,
+        blk: VirtioBlockDeviceConfig,
+    ) -> Result<(), VmError> {
         if !self.vms.contains_key(vm_id) {
             return Err(VmError::VmNotFound(vm_id.to_string()));
         }
-        self.virtio_blk.entry(vm_id.to_string()).or_default().push(blk);
+        self.virtio_blk
+            .entry(vm_id.to_string())
+            .or_default()
+            .push(blk);
         Ok(())
     }
 
-    pub fn attach_virtio_net(&mut self, vm_id: &str, net: VirtioNetDeviceConfig) -> Result<(), VmError> {
+    pub fn attach_virtio_net(
+        &mut self,
+        vm_id: &str,
+        net: VirtioNetDeviceConfig,
+    ) -> Result<(), VmError> {
         if !self.vms.contains_key(vm_id) {
             return Err(VmError::VmNotFound(vm_id.to_string()));
         }
-        self.virtio_net.entry(vm_id.to_string()).or_default().push(net);
+        self.virtio_net
+            .entry(vm_id.to_string())
+            .or_default()
+            .push(net);
         Ok(())
     }
 
     pub fn run_vcpu(&mut self, vm_id: &str, vcpu_id: u32) -> Result<KvmExitReason, VmError> {
-        let vcpus = self.vcpus.get_mut(vm_id).ok_or_else(|| VmError::VmNotFound(vm_id.to_string()))?;
-        let vcpu = vcpus.iter_mut().find(|v| v.vcpu_id == vcpu_id).ok_or_else(|| VmError::StartFailed(format!("vCPU {} not found", vcpu_id)))?;
+        let vcpus = self
+            .vcpus
+            .get_mut(vm_id)
+            .ok_or_else(|| VmError::VmNotFound(vm_id.to_string()))?;
+        let vcpu = vcpus
+            .iter_mut()
+            .find(|v| v.vcpu_id == vcpu_id)
+            .ok_or_else(|| VmError::StartFailed(format!("vCPU {} not found", vcpu_id)))?;
 
         vcpu.rip += 2; // Simulate instruction execution step
         let exit = KvmExitReason::Hlt;
@@ -459,7 +484,10 @@ impl MemoryBalloonConfig {
         if self.current_balloon_mb < self.target_balloon_mb {
             self.current_balloon_mb = (self.current_balloon_mb + 256).min(self.target_balloon_mb);
         } else if self.current_balloon_mb > self.target_balloon_mb {
-            self.current_balloon_mb = self.current_balloon_mb.saturating_sub(256).max(self.target_balloon_mb);
+            self.current_balloon_mb = self
+                .current_balloon_mb
+                .saturating_sub(256)
+                .max(self.target_balloon_mb);
         }
         self.current_balloon_mb
     }
@@ -496,7 +524,8 @@ impl HypervisorBackend for QemuBackend {
         let vm_id = format!("vm_{}", self.vms.len());
         self.vms.insert(vm_id.clone(), config.clone());
         self.vm_states.insert(vm_id.clone(), VmState::Stopped);
-        self.balloons.insert(vm_id.clone(), MemoryBalloonConfig::new(config.memory_mb));
+        self.balloons
+            .insert(vm_id.clone(), MemoryBalloonConfig::new(config.memory_mb));
         Ok(vm_id)
     }
 
@@ -932,7 +961,10 @@ impl QemuMonitorEngine {
     pub fn execute_qmp_command(&mut self, cmd_json: &str) -> Result<String, VmError> {
         self.command_history.push(cmd_json.to_string());
         if cmd_json.contains("query-status") {
-            Ok("{\"return\": {\"running\": true, \"singlestep\": false, \"status\": \"running\"}}".to_string())
+            Ok(
+                "{\"return\": {\"running\": true, \"singlestep\": false, \"status\": \"running\"}}"
+                    .to_string(),
+            )
         } else if cmd_json.contains("system_powerdown") {
             Ok("{\"return\": {}}".to_string())
         } else if cmd_json.contains("balloon") {
@@ -1197,7 +1229,6 @@ mod tests {
         assert_eq!(config.kvm_dirty_ring_size, 1024);
     }
 
-
     #[test]
     fn test_kvm_hypervisor_backend() {
         let mut kvm = KvmHypervisor::new();
@@ -1227,21 +1258,29 @@ mod tests {
         let vm_id = kvm.create_vm(&config).unwrap();
         assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
-        kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-            image_path: "/var/lib/images/rootfs.qcow2".to_string(),
-            read_only: false,
-            direct_io: true,
-            queue_size: 256,
-            block_size: 512,
-        }).unwrap();
+        kvm.attach_virtio_blk(
+            &vm_id,
+            VirtioBlockDeviceConfig {
+                image_path: "/var/lib/images/rootfs.qcow2".to_string(),
+                read_only: false,
+                direct_io: true,
+                queue_size: 256,
+                block_size: 512,
+            },
+        )
+        .unwrap();
 
-        kvm.attach_virtio_net(&vm_id, VirtioNetDeviceConfig {
-            mac_address: [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
-            tap_interface: "tap0".to_string(),
-            queues: 2,
-            offload_tso: true,
-            offload_csum: true,
-        }).unwrap();
+        kvm.attach_virtio_net(
+            &vm_id,
+            VirtioNetDeviceConfig {
+                mac_address: [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
+                tap_interface: "tap0".to_string(),
+                queues: 2,
+                offload_tso: true,
+                offload_csum: true,
+            },
+        )
+        .unwrap();
 
         kvm.start_vm(&vm_id).unwrap();
         assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Running);
@@ -1393,7 +1432,9 @@ mod tests {
     #[test]
     fn test_qemu_monitor_protocol() {
         let mut qmp = QemuMonitorEngine::new();
-        let res = qmp.execute_qmp_command("{\"execute\": \"query-status\"}").unwrap();
+        let res = qmp
+            .execute_qmp_command("{\"execute\": \"query-status\"}")
+            .unwrap();
         assert!(res.contains("running"));
         assert_eq!(qmp.command_history.len(), 1);
     }
@@ -1424,11 +1465,17 @@ mod tests {
 
         // 1. Test VirtIO memory ballooning (RHEL inspired)
         manager.set_memory_balloon(&vm_id, 2048).unwrap();
-        assert_eq!(manager.get_vm_config(&vm_id).unwrap().memory_balloon_mb, 2048);
+        assert_eq!(
+            manager.get_vm_config(&vm_id).unwrap().memory_balloon_mb,
+            2048
+        );
 
         // 2. Test CPU core pinning (Proxmox inspired)
         manager.pin_cpu_cores(&vm_id, vec![2, 3]).unwrap();
-        assert_eq!(manager.get_vm_config(&vm_id).unwrap().cpu_pinning_cores, vec![2, 3]);
+        assert_eq!(
+            manager.get_vm_config(&vm_id).unwrap().cpu_pinning_cores,
+            vec![2, 3]
+        );
 
         // 3. Test VirtIO-net multi-queuing (Gentoo inspired)
         manager.set_virtio_queues(&vm_id, 8).unwrap();

@@ -1,9 +1,9 @@
 extern crate alloc;
+use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::klib::collections::HashMap;
 
 /// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
@@ -72,11 +72,19 @@ pub enum PackagePriority {
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
     fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
-    fn parse_package(&self, raw: &[u8]) -> Result<Package, String> { self.parse_manifest(raw) }
+    fn parse_package(&self, raw: &[u8]) -> Result<Package, String> {
+        self.parse_manifest(raw)
+    }
     fn validate_permissions(&self, raw: &[u8]) -> Result<Vec<Permission>, String>;
-    fn validate(&self, _raw: &[u8]) -> Result<bool, String> { Ok(true) }
-    fn process_hook(&self, _hook: &str) -> Result<(), String> { Ok(()) }
-    fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> { Ok(Vec::new()) }
+    fn validate(&self, _raw: &[u8]) -> Result<bool, String> {
+        Ok(true)
+    }
+    fn process_hook(&self, _hook: &str) -> Result<(), String> {
+        Ok(())
+    }
+    fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> {
+        Ok(Vec::new())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -588,12 +596,14 @@ mod tests {
         assert_eq!(parsed.requires.len(), 2);
         assert_eq!(parsed.requires[0], "bash");
 
-        let native = adapter.translate_to_native_package(
-            &parsed.name,
-            &parsed.version,
-            &parsed.summary,
-            parsed.requires.as_slice(),
-        ).unwrap();
+        let native = adapter
+            .translate_to_native_package(
+                &parsed.name,
+                &parsed.version,
+                &parsed.summary,
+                parsed.requires.as_slice(),
+            )
+            .unwrap();
 
         assert_eq!(native.name, "custom_service");
         assert_eq!(native.version, Version::new(2, 1, 0));

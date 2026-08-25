@@ -5,6 +5,7 @@
 use crate::driver::framework::{
     DriverError, DriverID, DriverState, DriverType,
 };
+use crate::driver::framework::{DriverError, DriverID, DriverState, DriverType, SimpleDriver};
 use crate::package::PackageFormat;
 use core::sync::atomic::{AtomicBool, Ordering};
 

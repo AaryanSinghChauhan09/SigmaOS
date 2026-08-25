@@ -78,7 +78,11 @@ impl PacmanDatabase {
 
     /// Remove a package (pacman -R)
     pub fn remove_package(&mut self, package_name: &str) -> Result<(), String> {
-        if let Some(pos) = self.local_packages.iter().position(|p| p.name == package_name) {
+        if let Some(pos) = self
+            .local_packages
+            .iter()
+            .position(|p| p.name == package_name)
+        {
             self.local_packages.remove(pos);
             Ok(())
         } else {
@@ -113,7 +117,10 @@ impl PacmanDatabase {
     }
 
     fn find_package(&self, package_name: &str) -> Option<ArchPacmanPackage> {
-        self.packages.iter().find(|p| p.name == package_name).cloned()
+        self.packages
+            .iter()
+            .find(|p| p.name == package_name)
+            .cloned()
     }
 
     fn install_dependencies(&mut self, depends: &[String]) -> Result<(), String> {
@@ -157,11 +164,17 @@ impl ArchBuildSystem {
         let mut srcinfo_lines = Vec::new();
 
         for line in lines {
-            if line.starts_with("pkgname=") || line.starts_with("pkgver=") ||
-               line.starts_with("pkgrel=") || line.starts_with("pkgdesc=") ||
-               line.starts_with("url=") || line.starts_with("arch=") ||
-               line.starts_with("license=") || line.starts_with("depends=") ||
-               line.starts_with("makedepends=") || line.starts_with("source=") {
+            if line.starts_with("pkgname=")
+                || line.starts_with("pkgver=")
+                || line.starts_with("pkgrel=")
+                || line.starts_with("pkgdesc=")
+                || line.starts_with("url=")
+                || line.starts_with("arch=")
+                || line.starts_with("license=")
+                || line.starts_with("depends=")
+                || line.starts_with("makedepends=")
+                || line.starts_with("source=")
+            {
                 srcinfo_lines.push(line);
             }
         }

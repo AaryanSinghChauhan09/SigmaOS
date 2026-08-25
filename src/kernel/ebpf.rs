@@ -102,16 +102,16 @@ impl EbpfEngine {
             let inst = &program[pc];
             match inst.opcode {
                 EBPF_OP_ADD => {
-                    self.registers[inst.dst as usize] =
-                        self.registers[inst.dst as usize].wrapping_add(self.registers[inst.src as usize]);
+                    self.registers[inst.dst as usize] = self.registers[inst.dst as usize]
+                        .wrapping_add(self.registers[inst.src as usize]);
                 }
                 EBPF_OP_ADDI => {
                     self.registers[inst.dst as usize] =
                         self.registers[inst.dst as usize].wrapping_add(inst.imm as i64);
                 }
                 EBPF_OP_SUB => {
-                    self.registers[inst.dst as usize] =
-                        self.registers[inst.dst as usize].wrapping_sub(self.registers[inst.src as usize]);
+                    self.registers[inst.dst as usize] = self.registers[inst.dst as usize]
+                        .wrapping_sub(self.registers[inst.src as usize]);
                 }
                 EBPF_OP_LD => {
                     let offset = inst.offset as usize;

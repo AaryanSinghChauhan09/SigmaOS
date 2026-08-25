@@ -8,7 +8,7 @@ pub use infrastructure::{
 };
 
 pub use toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
-    RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
-    SecurityProfileTemplateStore, SecurityTemplate,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe, RecipeSourceFormat,
+    ReproduciblePackageRecipeManager, SecurityModelType, SecurityProfileTemplateStore,
+    SecurityTemplate,
 };

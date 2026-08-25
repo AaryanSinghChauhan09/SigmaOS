@@ -281,7 +281,12 @@ impl GpuDriver {
         (self.capability_mask & capability) != 0
     }
 
-    pub fn set_drm_mode(&mut self, connector_id: u32, crtc_id: u32, mode: DrmModeInfo) -> Result<(), GpuError> {
+    pub fn set_drm_mode(
+        &mut self,
+        connector_id: u32,
+        crtc_id: u32,
+        mode: DrmModeInfo,
+    ) -> Result<(), GpuError> {
         self.width = mode.hdisplay;
         self.height = mode.vdisplay;
         self.crtc = Some(DrmCrtc {
@@ -364,11 +369,18 @@ mod tests {
         let mut gpu = GpuDriver::new(640, 480);
         let mut cmd_buf = GpuCommandBuffer::new();
         cmd_buf.begin_recording();
-        cmd_buf.record_command(GpuCommand::ClearScreen { r: 100, g: 100, b: 100 });
+        cmd_buf.record_command(GpuCommand::ClearScreen {
+            r: 100,
+            g: 100,
+            b: 100,
+        });
         cmd_buf.record_command(GpuCommand::SimulateHang);
         cmd_buf.end_recording();
 
-        assert_eq!(gpu.submit_command_buffer(cmd_buf), Err(GpuError::HardwareHang));
+        assert_eq!(
+            gpu.submit_command_buffer(cmd_buf),
+            Err(GpuError::HardwareHang)
+        );
         assert!(gpu.reset_state.is_hardware_ready);
         assert_eq!(gpu.reset_state.total_hangs_recovered, 1);
     }

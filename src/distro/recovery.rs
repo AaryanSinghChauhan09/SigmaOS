@@ -268,6 +268,9 @@ mod tests {
         let rolled_back_count = backup.rollback_to_snapshot(1, &mut current_state).unwrap();
         assert_eq!(rolled_back_count, 2);
         assert_eq!(current_state.len(), 2);
-        assert_eq!(current_state.get("/home/jules/code.rs").unwrap(), &"hash2".to_string());
+        assert_eq!(
+            current_state.get("/home/jules/code.rs").unwrap(),
+            &"hash2".to_string()
+        );
     }
 }

@@ -178,13 +178,22 @@ impl AperiodicScheduler {
 
             // Deduct server budget
             match task.server_kind {
-                AperiodicServerKind::DeferrableServer { ref mut current_budget_ms, .. } => {
+                AperiodicServerKind::DeferrableServer {
+                    ref mut current_budget_ms,
+                    ..
+                } => {
                     *current_budget_ms = current_budget_ms.saturating_sub(exec);
                 }
-                AperiodicServerKind::SporadicServer { ref mut active_capacity_ms, .. } => {
+                AperiodicServerKind::SporadicServer {
+                    ref mut active_capacity_ms,
+                    ..
+                } => {
                     *active_capacity_ms = active_capacity_ms.saturating_sub(exec);
                 }
-                AperiodicServerKind::ConstantBandwidthServer { ref mut current_budget_ms, .. } => {
+                AperiodicServerKind::ConstantBandwidthServer {
+                    ref mut current_budget_ms,
+                    ..
+                } => {
                     *current_budget_ms = current_budget_ms.saturating_sub(exec);
                 }
             }
@@ -217,16 +226,24 @@ impl AperiodicScheduler {
 
             // Verify budget availability for the task's server
             let has_budget = match task.server_kind {
-                AperiodicServerKind::DeferrableServer { current_budget_ms, .. } => current_budget_ms > 0,
-                AperiodicServerKind::SporadicServer { active_capacity_ms, .. } => active_capacity_ms > 0,
-                AperiodicServerKind::ConstantBandwidthServer { current_budget_ms, .. } => current_budget_ms > 0,
+                AperiodicServerKind::DeferrableServer {
+                    current_budget_ms, ..
+                } => current_budget_ms > 0,
+                AperiodicServerKind::SporadicServer {
+                    active_capacity_ms, ..
+                } => active_capacity_ms > 0,
+                AperiodicServerKind::ConstantBandwidthServer {
+                    current_budget_ms, ..
+                } => current_budget_ms > 0,
             };
 
             if !has_budget {
                 continue;
             }
 
-            if task.priority < best_priority || (task.priority == best_priority && task.absolute_deadline_ms < best_deadline) {
+            if task.priority < best_priority
+                || (task.priority == best_priority && task.absolute_deadline_ms < best_deadline)
+            {
                 best_idx = Some(idx);
                 best_priority = task.priority;
                 best_deadline = task.absolute_deadline_ms;

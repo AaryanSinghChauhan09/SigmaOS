@@ -538,9 +538,18 @@ pub struct ThreeTierReleaseModel {
 impl ThreeTierReleaseModel {
     pub fn new() -> Self {
         let mut channels = HashMap::new();
-        channels.insert("sigma.next".to_string(), "Rolling, experimental, daily updates".to_string());
-        channels.insert("sigma.beta".to_string(), "Pre-release, weekly, mostly stable".to_string());
-        channels.insert("sigma.stable".to_string(), "Production LTS, quarterly security-only".to_string());
+        channels.insert(
+            "sigma.next".to_string(),
+            "Rolling, experimental, daily updates".to_string(),
+        );
+        channels.insert(
+            "sigma.beta".to_string(),
+            "Pre-release, weekly, mostly stable".to_string(),
+        );
+        channels.insert(
+            "sigma.stable".to_string(),
+            "Production LTS, quarterly security-only".to_string(),
+        );
 
         Self {
             active_channel: "sigma.stable".to_string(),
@@ -568,7 +577,10 @@ impl ThreeTierReleaseModel {
     pub fn set_channel(&mut self, channel: &str) -> Result<String, &'static str> {
         if self.channels.contains_key(channel) {
             self.active_channel = channel.to_string();
-            Ok(format!("Σ [PKG] Channel set to {} (LTS). No experimental features.", channel))
+            Ok(format!(
+                "Σ [PKG] Channel set to {} (LTS). No experimental features.",
+                channel
+            ))
         } else {
             Err("Unknown release channel")
         }
@@ -605,7 +617,12 @@ impl DebianSocialContract {
         }
     }
 
-    pub fn evaluate_social_contract_compliance(&self, is_open_source: bool, is_bug_public: bool, is_user_needs_prioritized: bool) -> bool {
+    pub fn evaluate_social_contract_compliance(
+        &self,
+        is_open_source: bool,
+        is_bug_public: bool,
+        is_user_needs_prioritized: bool,
+    ) -> bool {
         if self.open_source_only && !is_open_source {
             return false;
         }
@@ -661,10 +678,10 @@ impl Default for FreezeBasedStabilization {
 /// Debian-style preseed configuration question representing a installer response
 #[derive(Debug, Clone)]
 pub struct PreseedQuestion {
-    pub owner: String,       // e.g. "d-i" or "debian-installer"
-    pub template: String,    // e.g. "mirror/http/hostname"
+    pub owner: String,         // e.g. "d-i" or "debian-installer"
+    pub template: String,      // e.g. "mirror/http/hostname"
     pub question_type: String, // e.g. "string"
-    pub value: String,       // e.g. "ftp.us.debian.org"
+    pub value: String,         // e.g. "ftp.us.debian.org"
 }
 
 /// Debian-style Automated Preseed installer configuration engine
@@ -733,22 +750,30 @@ mod tests {
         assert!(engine.parse_preseed_line("   ").is_ok());
 
         // Parse valid standard preseed directive
-        assert!(engine.parse_preseed_line("d-i mirror/http/hostname string ftp.us.debian.org").is_ok());
-        assert!(engine.parse_preseed_line("d-i passwd/root-login boolean false").is_ok());
+        assert!(engine
+            .parse_preseed_line("d-i mirror/http/hostname string ftp.us.debian.org")
+            .is_ok());
+        assert!(engine
+            .parse_preseed_line("d-i passwd/root-login boolean false")
+            .is_ok());
 
         // Invalid format
         assert!(engine.parse_preseed_line("d-i invalid_line").is_err());
 
         // Verify pre-configured answers
         assert_eq!(
-            engine.answer_question("d-i", "mirror/http/hostname").unwrap(),
+            engine
+                .answer_question("d-i", "mirror/http/hostname")
+                .unwrap(),
             "ftp.us.debian.org"
         );
         assert_eq!(
             engine.answer_question("d-i", "passwd/root-login").unwrap(),
             "false"
         );
-        assert!(engine.answer_question("d-i", "nonexistent/template").is_none());
+        assert!(engine
+            .answer_question("d-i", "nonexistent/template")
+            .is_none());
     }
 
     #[test]

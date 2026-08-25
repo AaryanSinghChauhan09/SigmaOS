@@ -185,7 +185,6 @@ impl MhwdDkmsRebuilder {
     }
 }
 
-
 /// Manjaro Settings Manager (MSM) Kernel Switcher
 #[derive(Debug, Clone)]
 pub struct ManjaroKernelSwitcher {
@@ -465,7 +464,6 @@ impl Default for MhwdPowerGovernor {
     }
 }
 
-
 /// Manjaro Settings Manager (MSM) general localization and sensor profile settings
 #[derive(Debug, Clone)]
 pub struct ManjaroSettingsManager {
@@ -580,7 +578,10 @@ mod tests {
             .langpack_installer
             .installed_packs
             .contains(&"firefox-i18n-de".to_string()));
-        assert!(msm.langpack_installer.installed_packs.contains(&"firefox-i18n-de".to_string()));
+        assert!(msm
+            .langpack_installer
+            .installed_packs
+            .contains(&"firefox-i18n-de".to_string()));
 
         msm.configure_thermal_profile(true);
         assert_eq!(msm.optimal_thermal_fan_speed_rpm, 4500);

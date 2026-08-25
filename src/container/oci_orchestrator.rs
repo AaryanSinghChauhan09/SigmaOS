@@ -59,7 +59,9 @@ impl TelemetryAiOrchestrator {
         };
 
         // Telemetry-driven AI orchestration auto-scaling rule
-        if self.telemetry.cpu_usage_pct > 85.0 || self.telemetry.memory_rss_mb > self.spec.memory_limit_mb {
+        if self.telemetry.cpu_usage_pct > 85.0
+            || self.telemetry.memory_rss_mb > self.spec.memory_limit_mb
+        {
             self.scale_instances += 1; // Auto-scale up
         } else if self.telemetry.cpu_usage_pct < 10.0 && self.scale_instances > 1 {
             self.scale_instances -= 1; // Auto-scale down

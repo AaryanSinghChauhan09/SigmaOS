@@ -5,10 +5,10 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 use core::default::Default;
-use core::result::Result::{self, Ok, Err};
+use core::result::Result::{self, Err, Ok};
 
 #[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
@@ -465,17 +465,29 @@ pub trait VirtualizationStrategy: Send + Sync {
 
 pub struct LegacyVirtualizationStrategy;
 impl VirtualizationStrategy for LegacyVirtualizationStrategy {
-    fn strategy_name(&self) -> &'static str { "Legacy" }
+    fn strategy_name(&self) -> &'static str {
+        "Legacy"
+    }
     fn create_vm(&self, name: &str) -> Result<VirtualMachine, VirtualizationError> {
-        Ok(VirtualMachine::new("legacy-id".to_string(), name.to_string(), VirtualizationTech::QEMU))
+        Ok(VirtualMachine::new(
+            "legacy-id".to_string(),
+            name.to_string(),
+            VirtualizationTech::QEMU,
+        ))
     }
 }
 
 pub struct ModernVirtualizationStrategy;
 impl VirtualizationStrategy for ModernVirtualizationStrategy {
-    fn strategy_name(&self) -> &'static str { "Modern" }
+    fn strategy_name(&self) -> &'static str {
+        "Modern"
+    }
     fn create_vm(&self, name: &str) -> Result<VirtualMachine, VirtualizationError> {
-        Ok(VirtualMachine::new("modern-id".to_string(), name.to_string(), VirtualizationTech::KVM))
+        Ok(VirtualMachine::new(
+            "modern-id".to_string(),
+            name.to_string(),
+            VirtualizationTech::KVM,
+        ))
     }
 }
 

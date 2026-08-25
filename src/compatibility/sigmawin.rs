@@ -82,7 +82,11 @@ impl NtHandleTable {
         }
     }
 
-    pub fn reference_object(&self, handle: u32, expected_type: NtObjectType) -> Result<&NtObject, Win32Error> {
+    pub fn reference_object(
+        &self,
+        handle: u32,
+        expected_type: NtObjectType,
+    ) -> Result<&NtObject, Win32Error> {
         if let Some(obj) = self.handles.get(&handle) {
             if obj.object_type == expected_type {
                 Ok(obj)
@@ -158,7 +162,8 @@ impl PeLoader {
         }
 
         // Extract number of sections (stored at pe_offset + 6)
-        let num_sections = (raw_bytes[pe_offset + 6] as u16) | ((raw_bytes[pe_offset + 7] as u16) << 8);
+        let num_sections =
+            (raw_bytes[pe_offset + 6] as u16) | ((raw_bytes[pe_offset + 7] as u16) << 8);
 
         // Optional header starts 24 bytes after the PE signature
         let optional_header_offset = pe_offset + 24;
@@ -416,7 +421,8 @@ mod tests {
     #[test]
     fn test_nt_handle_table_management() {
         let mut table = NtHandleTable::new();
-        let ev_handle = table.create_handle(NtObjectType::Event, "Global\\MySynergyEvent", 0x1F0003);
+        let ev_handle =
+            table.create_handle(NtObjectType::Event, "Global\\MySynergyEvent", 0x1F0003);
         assert_eq!(ev_handle, 4);
 
         let ref_obj = table.reference_object(4, NtObjectType::Event).unwrap();

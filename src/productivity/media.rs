@@ -3,10 +3,10 @@
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
 extern crate alloc;
-use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
 
 pub const MAX_AUDIO_CHANNELS: usize = 4;
 
@@ -306,7 +306,8 @@ mod tests {
         let mut aegisub = SigmaSupportSubtitleSync::new();
         assert_eq!(aegisub.font_name, "Arial");
 
-        let body = aegisub.parse_ass_styling_tags("{\\fnHelvetica\\fs28\\c&H00FFFF&}Welcome to SigmaOS");
+        let body =
+            aegisub.parse_ass_styling_tags("{\\fnHelvetica\\fs28\\c&H00FFFF&}Welcome to SigmaOS");
         assert_eq!(body, "Welcome to SigmaOS");
         assert_eq!(aegisub.font_name, "Helvetica");
         assert_eq!(aegisub.font_size, 28);

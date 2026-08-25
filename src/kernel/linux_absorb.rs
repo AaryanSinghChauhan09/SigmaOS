@@ -13,13 +13,12 @@ use core::any::Any;
 
 #[cfg(not(test))]
 use crate::kernel::subsystem::{
-    DeviceDriver, DriverError, DriverMetadata, DriverType, FileFlags, FileHandle, FileSystem,
-    FsError, IoOperation, IoResult, LinuxHeritage, MapFlags, MemoryError, MemoryManager,
-    NetworkError, NetworkStack, Scheduler, SchedulerError,
-    FilesystemMetadata, FilesystemType, FilesystemFeature, FileMetadata,
-    NetworkStackMetadata, NetworkStackType, NetworkProtocol, SocketHandle,
-    SocketDomain, SocketType, SocketProtocol, MemoryManagerMetadata, MemoryManagerType,
-    SchedulerMetadata, SchedulerType, ProcessInfo, ProcessState,
+    DeviceDriver, DriverError, DriverMetadata, DriverType, FileFlags, FileHandle, FileMetadata,
+    FileSystem, FilesystemFeature, FilesystemMetadata, FilesystemType, FsError, IoOperation,
+    IoResult, LinuxHeritage, MapFlags, MemoryError, MemoryManager, MemoryManagerMetadata,
+    MemoryManagerType, NetworkError, NetworkProtocol, NetworkStack, NetworkStackMetadata,
+    NetworkStackType, ProcessInfo, ProcessState, Scheduler, SchedulerError, SchedulerMetadata,
+    SchedulerType, SocketDomain, SocketHandle, SocketProtocol, SocketType,
 };
 
 #[cfg(test)]
@@ -27,10 +26,21 @@ pub mod mock_subsystem {
     use super::*;
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum DriverType { Block, Char, Network, Storage, Input }
+    pub enum DriverType {
+        Block,
+        Char,
+        Network,
+        Storage,
+        Input,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum DriverError { Success, LoadFailed, UnloadFailed, NotSupported }
+    pub enum DriverError {
+        Success,
+        LoadFailed,
+        UnloadFailed,
+        NotSupported,
+    }
 
     #[derive(Debug, Clone)]
     pub struct LinuxHeritage {
@@ -62,16 +72,27 @@ pub mod mock_subsystem {
     }
 
     #[derive(Debug, Clone)]
-    pub enum IoOperation { Read { offset: u64, size: usize }, Write { offset: u64, data: Vec<u8> } }
+    pub enum IoOperation {
+        Read { offset: u64, size: usize },
+        Write { offset: u64, data: Vec<u8> },
+    }
 
     #[derive(Debug, Clone)]
-    pub enum IoResult { ReadComplete { data: Vec<u8> }, WriteComplete { bytes_written: usize } }
+    pub enum IoResult {
+        ReadComplete { data: Vec<u8> },
+        WriteComplete { bytes_written: usize },
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum FilesystemType { LinuxDerived }
+    pub enum FilesystemType {
+        LinuxDerived,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum FilesystemFeature { Journaling, AccessControlLists }
+    pub enum FilesystemFeature {
+        Journaling,
+        AccessControlLists,
+    }
 
     #[derive(Debug, Clone)]
     pub struct FilesystemMetadata {
@@ -88,10 +109,14 @@ pub mod mock_subsystem {
     pub struct FileHandle(pub u64);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum FileFlags { ReadOnly }
+    pub enum FileFlags {
+        ReadOnly,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum FsError { Success }
+    pub enum FsError {
+        Success,
+    }
 
     #[derive(Debug, Clone, Copy)]
     pub struct FileMetadata {
@@ -122,25 +147,39 @@ pub mod mock_subsystem {
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum NetworkStackType { LinuxDerived }
+    pub enum NetworkStackType {
+        LinuxDerived,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum NetworkProtocol { TCP, IPv4, IPv6 }
+    pub enum NetworkProtocol {
+        TCP,
+        IPv4,
+        IPv6,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum NetworkError { Success }
+    pub enum NetworkError {
+        Success,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub struct SocketHandle(pub u64);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum SocketDomain { IPv4 }
+    pub enum SocketDomain {
+        IPv4,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum SocketType { Stream }
+    pub enum SocketType {
+        Stream,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum SocketProtocol { TCP }
+    pub enum SocketProtocol {
+        TCP,
+    }
 
     #[derive(Debug, Clone)]
     pub struct NetworkStackMetadata {
@@ -156,7 +195,12 @@ pub mod mock_subsystem {
         fn init(&mut self) -> Result<(), NetworkError>;
         fn receive_packet(&mut self, packet: Vec<u8>) -> Result<(), NetworkError>;
         fn send_packet(&mut self, packet: Vec<u8>) -> Result<(), NetworkError>;
-        fn create_socket(&mut self, domain: SocketDomain, socket_type: SocketType, protocol: SocketProtocol) -> Result<SocketHandle, NetworkError>;
+        fn create_socket(
+            &mut self,
+            domain: SocketDomain,
+            socket_type: SocketType,
+            protocol: SocketProtocol,
+        ) -> Result<SocketHandle, NetworkError>;
         fn close_socket(&mut self, handle: SocketHandle) -> Result<(), NetworkError>;
         fn metadata(&self) -> &NetworkStackMetadata;
         fn as_any(&self) -> &dyn Any;
@@ -164,13 +208,19 @@ pub mod mock_subsystem {
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum MemoryManagerType { LinuxDerived }
+    pub enum MemoryManagerType {
+        LinuxDerived,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum MemoryError { Success }
+    pub enum MemoryError {
+        Success,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum MapFlags { Present }
+    pub enum MapFlags {
+        Present,
+    }
 
     #[derive(Debug, Clone)]
     pub struct MemoryManagerMetadata {
@@ -189,7 +239,13 @@ pub mod mock_subsystem {
         fn free_physical(&mut self, address: u64, size: usize) -> Result<(), MemoryError>;
         fn allocate_virtual(&mut self, size: usize) -> Result<u64, MemoryError>;
         fn free_virtual(&mut self, address: u64, size: usize) -> Result<(), MemoryError>;
-        fn map_memory(&mut self, virtual_addr: u64, physical_addr: u64, size: usize, flags: MapFlags) -> Result<(), MemoryError>;
+        fn map_memory(
+            &mut self,
+            virtual_addr: u64,
+            physical_addr: u64,
+            size: usize,
+            flags: MapFlags,
+        ) -> Result<(), MemoryError>;
         fn unmap_memory(&mut self, virtual_addr: u64, size: usize) -> Result<(), MemoryError>;
         fn metadata(&self) -> &MemoryManagerMetadata;
         fn as_any(&self) -> &dyn Any;
@@ -197,13 +253,19 @@ pub mod mock_subsystem {
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum SchedulerType { LinuxDerived }
+    pub enum SchedulerType {
+        LinuxDerived,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum SchedulerError { Success }
+    pub enum SchedulerError {
+        Success,
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum ProcessState { Ready }
+    pub enum ProcessState {
+        Ready,
+    }
 
     #[derive(Debug, Clone)]
     pub struct ProcessInfo {
@@ -800,10 +862,7 @@ impl NetworkStack for AbsorbedTcpStack {
         Ok(handle)
     }
 
-    fn close_socket(
-        &mut self,
-        handle: SocketHandle,
-    ) -> Result<(), NetworkError> {
+    fn close_socket(&mut self, handle: SocketHandle) -> Result<(), NetworkError> {
         if let Some(pos) = self.connections.iter().position(|&h| h == handle) {
             self.connections.remove(pos);
         }
@@ -952,10 +1011,7 @@ impl Scheduler for AbsorbedCfsScheduler {
         Ok(())
     }
 
-    fn add_process(
-        &mut self,
-        process: ProcessInfo,
-    ) -> Result<(), SchedulerError> {
+    fn add_process(&mut self, process: ProcessInfo) -> Result<(), SchedulerError> {
         self.processes.push(process);
         Ok(())
     }
@@ -971,11 +1027,7 @@ impl Scheduler for AbsorbedCfsScheduler {
         self.processes.first().cloned()
     }
 
-    fn update_process(
-        &mut self,
-        pid: u64,
-        state: ProcessState,
-    ) -> Result<(), SchedulerError> {
+    fn update_process(&mut self, pid: u64, state: ProcessState) -> Result<(), SchedulerError> {
         if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
             process.state = state;
         }
@@ -1015,7 +1067,11 @@ impl SovereignEbpfEngine {
     }
 
     /// Executes eBPF instructions on a network packet buffer or kernel probe context
-    pub fn execute_program(&mut self, program: &[u64], context: &mut [u8]) -> Result<u64, &'static str> {
+    pub fn execute_program(
+        &mut self,
+        program: &[u64],
+        context: &mut [u8],
+    ) -> Result<u64, &'static str> {
         self.program_loaded = true;
         self.registers[1] = context.as_ptr() as u64;
         self.registers[2] = context.len() as u64;
@@ -1032,33 +1088,47 @@ impl SovereignEbpfEngine {
             }
 
             match opcode {
-                0x07 => { // ADD immediate
+                0x07 => {
+                    // ADD immediate
                     self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(imm);
                 }
-                0x0F => { // ADD register
-                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
+                0x0F => {
+                    // ADD register
+                    self.registers[dst_reg] =
+                        self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
                 }
-                0x17 => { // SUB immediate
+                0x17 => {
+                    // SUB immediate
                     self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(imm);
                 }
-                0x1F => { // SUB register
-                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
+                0x1F => {
+                    // SUB register
+                    self.registers[dst_reg] =
+                        self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
                 }
-                0x27 => { // MOV immediate
+                0x27 => {
+                    // MOV immediate
                     self.registers[dst_reg] = imm;
                 }
-                0x2F => { // MOV register
+                0x2F => {
+                    // MOV register
                     self.registers[dst_reg] = self.registers[src_reg];
                 }
-                0x35 => { // LOAD from context with offset (packet parsing helper)
-                    let idx = if offset != 0 { offset as usize } else { imm as usize };
+                0x35 => {
+                    // LOAD from context with offset (packet parsing helper)
+                    let idx = if offset != 0 {
+                        offset as usize
+                    } else {
+                        imm as usize
+                    };
                     if idx < context.len() {
                         self.registers[dst_reg] = context[idx] as u64;
                     } else {
                         return Err("Context offset out of bounds");
                     }
                 }
-                0x95 => { // EXIT
+                0x95 => {
+                    // EXIT
                     return Ok(self.registers[0]);
                 }
                 _ => {}
@@ -1132,14 +1202,39 @@ pub struct Plan9Server {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NinePMessage {
-    Tversion { msize: u32, version: String },
-    Rversion { msize: u32, version: String },
-    Tattach { fid: u32, afid: u32, uname: String, aname: String },
-    Rattach { qid_path: u64 },
-    Twalk { fid: u32, new_fid: u32, names: Vec<String> },
-    Rwalk { qids: Vec<u64> },
-    Tread { fid: u32, offset: u64, count: u32 },
-    Rread { data: Vec<u8> },
+    Tversion {
+        msize: u32,
+        version: String,
+    },
+    Rversion {
+        msize: u32,
+        version: String,
+    },
+    Tattach {
+        fid: u32,
+        afid: u32,
+        uname: String,
+        aname: String,
+    },
+    Rattach {
+        qid_path: u64,
+    },
+    Twalk {
+        fid: u32,
+        new_fid: u32,
+        names: Vec<String>,
+    },
+    Rwalk {
+        qids: Vec<u64>,
+    },
+    Tread {
+        fid: u32,
+        offset: u64,
+        count: u32,
+    },
+    Rread {
+        data: Vec<u8>,
+    },
 }
 
 impl Plan9Server {
@@ -1160,13 +1255,22 @@ impl Plan9Server {
                     version: String::from("9P2000"),
                 })
             }
-            NinePMessage::Tattach { fid, afid: _, uname: _, aname: _ } => {
+            NinePMessage::Tattach {
+                fid,
+                afid: _,
+                uname: _,
+                aname: _,
+            } => {
                 if !self.active_fids.contains(&fid) {
                     self.active_fids.push(fid);
                 }
                 Ok(NinePMessage::Rattach { qid_path: 0xFF10 })
             }
-            NinePMessage::Twalk { fid, new_fid, names } => {
+            NinePMessage::Twalk {
+                fid,
+                new_fid,
+                names,
+            } => {
                 if !self.active_fids.contains(&fid) {
                     return Err("Fid not attached");
                 }
@@ -1179,7 +1283,11 @@ impl Plan9Server {
                 }
                 Ok(NinePMessage::Rwalk { qids })
             }
-            NinePMessage::Tread { fid, offset: _, count } => {
+            NinePMessage::Tread {
+                fid,
+                offset: _,
+                count,
+            } => {
                 if !self.active_fids.contains(&fid) {
                     return Err("Fid not valid");
                 }
@@ -1301,10 +1409,16 @@ impl SovereignVmaManager {
     }
 
     /// Handles a demand page-fault at a virtual address, mapping physical frames in response
-    pub fn handle_vma_page_fault(&mut self, fault_address: u64, mut page_allocator: impl FnMut() -> u64) -> Result<u64, &'static str> {
+    pub fn handle_vma_page_fault(
+        &mut self,
+        fault_address: u64,
+        mut page_allocator: impl FnMut() -> u64,
+    ) -> Result<u64, &'static str> {
         let mut matching_vma = None;
         for vma in &self.mappings {
-            if fault_address >= vma.start_address && fault_address < vma.start_address + vma.size_bytes as u64 {
+            if fault_address >= vma.start_address
+                && fault_address < vma.start_address + vma.size_bytes as u64
+            {
                 matching_vma = Some(vma);
                 break;
             }
@@ -1349,7 +1463,11 @@ impl SovereignCgroupController {
     }
 
     /// Enforces memory boundaries, reclaiming pages on resource violations (OOM protection)
-    pub fn enforce_memory_limits(&mut self, group_idx: usize, requested_bytes: u64) -> Result<(), &'static str> {
+    pub fn enforce_memory_limits(
+        &mut self,
+        group_idx: usize,
+        requested_bytes: u64,
+    ) -> Result<(), &'static str> {
         if group_idx >= self.groups.len() {
             return Err("Group index out of bounds");
         }
@@ -1414,14 +1532,24 @@ impl SovereignNetfilter {
     }
 
     /// Evaluates a packet against registered hook chains and connection trackers
-    pub fn evaluate_packet(&mut self, hook: NetfilterHook, src_ip: u32, dest_port: u16, protocol: u8) -> NetfilterAction {
+    pub fn evaluate_packet(
+        &mut self,
+        hook: NetfilterHook,
+        src_ip: u32,
+        dest_port: u16,
+        protocol: u8,
+    ) -> NetfilterAction {
         // Simulated default-acceptance for established state tuples
-        if self.tracked_connection_states.contains(&(src_ip, dest_port)) {
+        if self
+            .tracked_connection_states
+            .contains(&(src_ip, dest_port))
+        {
             return NetfilterAction::Accept; // Established connection accepted directly
         }
 
         for rule in &self.rules {
-            if rule.hook == hook && rule.protocol == protocol && rule.port_destination == dest_port {
+            if rule.hook == hook && rule.protocol == protocol && rule.port_destination == dest_port
+            {
                 if rule.action == NetfilterAction::Accept {
                     // Track this newly established connection stateful tuple
                     self.tracked_connection_states.push((src_ip, dest_port));
@@ -1527,11 +1655,8 @@ mod tests {
         let mut stack = AbsorbedTcpStack::new();
         assert!(stack.init().is_ok());
 
-        let handle = stack.create_socket(
-            SocketDomain::IPv4,
-            SocketType::Stream,
-            SocketProtocol::TCP,
-        );
+        let handle =
+            stack.create_socket(SocketDomain::IPv4, SocketType::Stream, SocketProtocol::TCP);
         assert!(handle.is_ok());
     }
 
@@ -1595,17 +1720,25 @@ mod tests {
     #[test]
     fn test_sovereign_capsicum() {
         let mut sandbox = SovereignCapsicum::new();
-        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
+        assert!(sandbox
+            .check_capability(SovereignCapsicum::CAP_READ)
+            .is_ok());
 
         // Restrict capabilities to READ and SEEK only
         sandbox.enter_capability_mode(SovereignCapsicum::CAP_READ | SovereignCapsicum::CAP_SEEK);
         assert!(sandbox.is_sandboxed);
 
-        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
-        assert!(sandbox.check_capability(SovereignCapsicum::CAP_SEEK).is_ok());
+        assert!(sandbox
+            .check_capability(SovereignCapsicum::CAP_READ)
+            .is_ok());
+        assert!(sandbox
+            .check_capability(SovereignCapsicum::CAP_SEEK)
+            .is_ok());
 
         // WRITE is not allowed
-        assert!(sandbox.check_capability(SovereignCapsicum::CAP_WRITE).is_err());
+        assert!(sandbox
+            .check_capability(SovereignCapsicum::CAP_WRITE)
+            .is_err());
     }
 
     #[test]
@@ -1613,7 +1746,10 @@ mod tests {
         let mut server = Plan9Server::new();
 
         // 1. Tversion
-        let version_req = NinePMessage::Tversion { msize: 4096, version: String::from("9P2000") };
+        let version_req = NinePMessage::Tversion {
+            msize: 4096,
+            version: String::from("9P2000"),
+        };
         let version_resp = server.handle_request(version_req).unwrap();
         if let NinePMessage::Rversion { msize, ref version } = version_resp {
             assert_eq!(msize, 4096);
@@ -1623,7 +1759,12 @@ mod tests {
         }
 
         // 2. Tattach
-        let attach_req = NinePMessage::Tattach { fid: 10, afid: 0, uname: String::from("root"), aname: String::from("root") };
+        let attach_req = NinePMessage::Tattach {
+            fid: 10,
+            afid: 0,
+            uname: String::from("root"),
+            aname: String::from("root"),
+        };
         let attach_resp = server.handle_request(attach_req).unwrap();
         if let NinePMessage::Rattach { qid_path } = attach_resp {
             assert_eq!(qid_path, 0xFF10);
@@ -1633,7 +1774,11 @@ mod tests {
         assert!(server.active_fids.contains(&10));
 
         // 3. Tread
-        let read_req = NinePMessage::Tread { fid: 10, offset: 0, count: 5 };
+        let read_req = NinePMessage::Tread {
+            fid: 10,
+            offset: 0,
+            count: 5,
+        };
         let read_resp = server.handle_request(read_req).unwrap();
         if let NinePMessage::Rread { ref data } = read_resp {
             assert_eq!(data.len(), 5);
@@ -1648,10 +1793,26 @@ mod tests {
         let mut sched = SovereignSmpScheduler::new(4);
 
         // Add tasks overloaded on CPU core 2
-        sched.queue_task(SmpTask { tid: 101, priority: 5, assigned_cpu: 2 });
-        sched.queue_task(SmpTask { tid: 102, priority: 5, assigned_cpu: 2 });
-        sched.queue_task(SmpTask { tid: 103, priority: 5, assigned_cpu: 2 });
-        sched.queue_task(SmpTask { tid: 104, priority: 5, assigned_cpu: 2 });
+        sched.queue_task(SmpTask {
+            tid: 101,
+            priority: 5,
+            assigned_cpu: 2,
+        });
+        sched.queue_task(SmpTask {
+            tid: 102,
+            priority: 5,
+            assigned_cpu: 2,
+        });
+        sched.queue_task(SmpTask {
+            tid: 103,
+            priority: 5,
+            assigned_cpu: 2,
+        });
+        sched.queue_task(SmpTask {
+            tid: 104,
+            priority: 5,
+            assigned_cpu: 2,
+        });
 
         assert_eq!(sched.runqueues[2].len(), 4);
         assert_eq!(sched.runqueues[0].len(), 0);
@@ -1680,7 +1841,9 @@ mod tests {
         };
 
         // Page fault on mapped VMA -> Succeeded on-demand paging!
-        let resolved = vma_mgr.handle_vma_page_fault(0x0000_7FFF_0000_1050, &mut allocator).unwrap();
+        let resolved = vma_mgr
+            .handle_vma_page_fault(0x0000_7FFF_0000_1050, &mut allocator)
+            .unwrap();
         assert_eq!(resolved, 0x1000_1050);
         assert_eq!(vma_mgr.mapped_physical_pages[0], 0x1000_1000);
 
