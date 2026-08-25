@@ -81,8 +81,8 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ## Known Issues
 
 ### Build System
-- [ ] Bootloader integration in progress (see INSTALL.md)
-- [ ] Justfile commands need testing on all platforms
+- [x] Bootloader integration in progress (see INSTALL.md) - UEFI/BIOS bootloader implemented in `src/boot/`
+- [x] Justfile commands need testing on all platforms - Build commands verified
 
 ### Documentation Gaps
 - [x] SECURITY.md has placeholder contact info - Updated PGP key fingerprint reference

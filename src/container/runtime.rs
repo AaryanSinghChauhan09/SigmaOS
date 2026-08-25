@@ -5,7 +5,43 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+}
+
+impl ContainerCapability {
+    pub fn full() -> Self {
+        Self {
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if !self.hardened {
+            return false;
+        }
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            false
+        }
+    }
+}
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -83,7 +119,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: RuntimeCapability::new(),
+            capability: ContainerCapability::full(),
         }
     }
 }
@@ -168,33 +204,6 @@ impl NamespaceConfig {
     }
 }
 
-/// Container seccomp profiles
-
-impl SeccompProfile {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened {
-            return false;
-        }
-        if syscall_id < 32 {
-            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
-        } else {
-            false
-        }
-    }
-}
-
-impl SeccompProfile {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened {
-            return false;
-        }
-        if syscall_id < 32 {
-            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
-        } else {
-            false
-        }
-    }
-}
 
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
@@ -670,8 +679,7 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 pub mod oci {
     extern crate alloc;
-    use crate::container::ContainerError;
-    use crate::container::runtime::NamespaceConfig;
+    use super::{ContainerError, NamespaceConfig};
     use alloc::string::String;
     use alloc::string::ToString;
     use alloc::vec::Vec;
@@ -873,7 +881,7 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            RuntimeCapability::full(),
+            ContainerCapability::full(),
         );
         container.seccomp = SeccompProfile {
             hardened: true,

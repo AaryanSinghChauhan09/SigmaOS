@@ -168,9 +168,319 @@ pub enum Ipv6ExtensionHeader {
     NoNextHeader,
 }
 
+// =========================================================================
+// ICMPv6 Core Protocol Handling
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Icmpv6Type {
+    EchoRequest = 128,
+    EchoReply = 129,
+    RouterSolicitation = 133,
+    RouterAdvertisement = 134,
+    NeighborSolicitation = 135,
+    NeighborAdvertisement = 136,
+}
+
+#[derive(Debug, Clone)]
+pub struct Icmpv6Packet {
+    pub message_type: Icmpv6Type,
+    pub code: u8,
+    pub checksum: u16,
+    pub payload: Vec<u8>,
+}
+
+impl Icmpv6Packet {
+    pub fn new(message_type: Icmpv6Type, code: u8, payload: Vec<u8>) -> Self {
+        let mut packet = Self {
+            message_type,
+            code,
+            checksum: 0,
+            payload,
+        };
+        packet.checksum = packet.calculate_checksum();
+        packet
+    }
+
+    pub fn calculate_checksum(&self) -> u16 {
+        let mut sum: u32 = (self.message_type as u32) + (self.code as u32);
+        for chunk in self.payload.chunks(2) {
+            let word = if chunk.len() == 2 {
+                ((chunk[0] as u32) << 8) | (chunk[1] as u32)
+            } else {
+                (chunk[0] as u32) << 8
+            };
+            sum = sum.wrapping_add(word);
+        }
+        while (sum >> 16) != 0 {
+            sum = (sum & 0xFFFF) + (sum >> 16);
+        }
+        !(sum as u16)
+    }
+
+    /// Calculates ICMPv6 checksum using the IPv6 Pseudo-Header (RFC 4443)
+    pub fn calculate_pseudo_header_checksum(&self, source: &Ipv6Address, destination: &Ipv6Address) -> u16 {
+        let payload_bytes = self.serialize();
+        let payload_len = payload_bytes.len() as u32;
+
+        let mut sum: u32 = 0;
+        for chunk in source.bytes.chunks(2) {
+            sum = sum.wrapping_add(((chunk[0] as u32) << 8) | (chunk[1] as u32));
+        }
+        for chunk in destination.bytes.chunks(2) {
+            sum = sum.wrapping_add(((chunk[0] as u32) << 8) | (chunk[1] as u32));
+        }
+        sum = sum.wrapping_add(payload_len >> 16);
+        sum = sum.wrapping_add(payload_len & 0xFFFF);
+        sum = sum.wrapping_add(58); // Next Header = 58 (ICMPv6)
+
+        for chunk in payload_bytes.chunks(2) {
+            let word = if chunk.len() == 2 {
+                ((chunk[0] as u32) << 8) | (chunk[1] as u32)
+            } else {
+                (chunk[0] as u32) << 8
+            };
+            sum = sum.wrapping_add(word);
+        }
+
+        while (sum >> 16) != 0 {
+            sum = (sum & 0xFFFF) + (sum >> 16);
+        }
+        !(sum as u16)
+    }
+
+    pub fn serialize(&self) -> Vec<u8> {
+        let mut buf = Vec::new();
+        buf.push(self.message_type as u8);
+        buf.push(self.code);
+        buf.extend_from_slice(&self.checksum.to_be_bytes());
+        buf.extend_from_slice(&self.payload);
+        buf
+    }
+
+    pub fn parse(bytes: &[u8]) -> Result<Self, &'static str> {
+        if bytes.len() < 4 {
+            return Err("ICMPv6 packet too short");
+        }
+        let msg_type = match bytes[0] {
+            128 => Icmpv6Type::EchoRequest,
+            129 => Icmpv6Type::EchoReply,
+            133 => Icmpv6Type::RouterSolicitation,
+            134 => Icmpv6Type::RouterAdvertisement,
+            135 => Icmpv6Type::NeighborSolicitation,
+            136 => Icmpv6Type::NeighborAdvertisement,
+            _ => return Err("Unsupported ICMPv6 message type"),
+        };
+        let code = bytes[1];
+        let checksum = u16::from_be_bytes([bytes[2], bytes[3]]);
+        let payload = bytes[4..].to_vec();
+
+        Ok(Self {
+            message_type: msg_type,
+            code,
+            checksum,
+            payload,
+        })
+    }
+}
+
+// =========================================================================
+// Neighbor Discovery Option TLVs (RFC 4861)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub enum NdpOption {
+    SourceLinkLayerAddress([u8; 6]),
+    TargetLinkLayerAddress([u8; 6]),
+    PrefixInformation {
+        prefix_length: u8,
+        on_link: bool,
+        autonomous: bool,
+        valid_lifetime: u32,
+        preferred_lifetime: u32,
+        prefix: Ipv6Address,
+    },
+}
+
+impl NdpOption {
+    pub fn serialize(&self) -> Vec<u8> {
+        let mut buf = Vec::new();
+        match self {
+            NdpOption::SourceLinkLayerAddress(mac) => {
+                buf.push(1); // Type 1
+                buf.push(1); // Length in 8-octet units (1 = 8 bytes)
+                buf.extend_from_slice(mac);
+            }
+            NdpOption::TargetLinkLayerAddress(mac) => {
+                buf.push(2); // Type 2
+                buf.push(1); // Length
+                buf.extend_from_slice(mac);
+            }
+            NdpOption::PrefixInformation { prefix_length, on_link, autonomous, valid_lifetime, preferred_lifetime, prefix } => {
+                buf.push(3); // Type 3
+                buf.push(4); // Length (32 bytes)
+                buf.push(*prefix_length);
+                let flags = (if *on_link { 0x80 } else { 0 }) | (if *autonomous { 0x40 } else { 0 });
+                buf.push(flags);
+                buf.extend_from_slice(&valid_lifetime.to_be_bytes());
+                buf.extend_from_slice(&preferred_lifetime.to_be_bytes());
+                buf.extend_from_slice(&[0u8; 4]); // Reserved
+                buf.extend_from_slice(&prefix.bytes);
+            }
+        }
+        buf
+    }
+}
+
+// =========================================================================
+// DHCPv6 Option TLVs (RFC 8415)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct Dhcpv6Option {
+    pub option_code: u16,
+    pub option_data: Vec<u8>,
+}
+
+impl Dhcpv6Option {
+    pub fn new(option_code: u16, option_data: Vec<u8>) -> Self {
+        Self { option_code, option_data }
+    }
+
+    pub fn serialize(&self) -> Vec<u8> {
+        let mut buf = Vec::new();
+        buf.extend_from_slice(&self.option_code.to_be_bytes());
+        buf.extend_from_slice(&(self.option_data.len() as u16).to_be_bytes());
+        buf.extend_from_slice(&self.option_data);
+        buf
+    }
+}
+
+// =========================================================================
+// DHCPv6 Client State Machine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Dhcpv6State {
+    Init,
+    Solicit,
+    Request,
+    Bound,
+    Renew,
+}
+
+pub struct Dhcpv6Client {
+    pub state: Dhcpv6State,
+    pub transaction_id: u32,
+    pub client_duid: Vec<u8>,
+    pub assigned_address: Option<Ipv6Address>,
+    pub preferred_lifetime: u32,
+    pub valid_lifetime: u32,
+}
+
+impl Dhcpv6Client {
+    pub fn new(client_duid: Vec<u8>) -> Self {
+        Self {
+            state: Dhcpv6State::Init,
+            transaction_id: 0x123456,
+            client_duid,
+            assigned_address: None,
+            preferred_lifetime: 3600,
+            valid_lifetime: 7200,
+        }
+    }
+
+    pub fn send_solicit(&mut self) -> Result<Vec<u8>, &'static str> {
+        if self.state != Dhcpv6State::Init && self.state != Dhcpv6State::Solicit {
+            return Err("DHCPv6 client not in valid state for Solicit");
+        }
+        self.state = Dhcpv6State::Solicit;
+        let mut msg = Vec::new();
+        msg.push(1); // SOLICIT message type
+        msg.extend_from_slice(&self.transaction_id.to_be_bytes()[1..4]);
+        msg.extend_from_slice(&self.client_duid);
+        Ok(msg)
+    }
+
+    pub fn handle_advertise(&mut self, advertised_address: Ipv6Address) -> Result<Vec<u8>, &'static str> {
+        if self.state != Dhcpv6State::Solicit {
+            return Err("DHCPv6 client not expecting Advertise");
+        }
+        self.state = Dhcpv6State::Request;
+        let mut msg = Vec::new();
+        msg.push(3); // REQUEST message type
+        msg.extend_from_slice(&self.transaction_id.to_be_bytes()[1..4]);
+        msg.extend_from_slice(&advertised_address.bytes);
+        Ok(msg)
+    }
+
+    pub fn handle_reply(&mut self, assigned_address: Ipv6Address) -> Result<(), &'static str> {
+        if self.state != Dhcpv6State::Request && self.state != Dhcpv6State::Renew {
+            return Err("DHCPv6 client not expecting Reply");
+        }
+        self.assigned_address = Some(assigned_address);
+        self.state = Dhcpv6State::Bound;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// IPv6 Multicast Routing & Group Membership Engine
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct MulticastGroup {
+    pub group_address: Ipv6Address,
+    pub member_interfaces: Vec<String>,
+}
+
+pub struct Ipv6MulticastRouter {
+    pub groups: Vec<MulticastGroup>,
+}
+
+impl Ipv6MulticastRouter {
+    pub fn new() -> Self {
+        Self { groups: Vec::new() }
+    }
+
+    pub fn join_group(&mut self, group_address: Ipv6Address, interface: &str) -> Result<(), &'static str> {
+        if group_address.address_type() != Ipv6AddressType::Multicast {
+            return Err("Provided address is not an IPv6 multicast address");
+        }
+
+        for group in self.groups.iter_mut() {
+            if group.group_address.bytes == group_address.bytes {
+                if !group.member_interfaces.iter().any(|i| i == interface) {
+                    group.member_interfaces.push(interface.to_string());
+                }
+                return Ok(());
+            }
+        }
+
+        self.groups.push(MulticastGroup {
+            group_address,
+            member_interfaces: vec![interface.to_string()],
+        });
+
+        Ok(())
+    }
+
+    pub fn forward_multicast_packet(&self, group_address: &Ipv6Address, payload: &[u8]) -> Vec<String> {
+        for group in &self.groups {
+            if group.group_address.bytes == group_address.bytes {
+                return group.member_interfaces.clone();
+            }
+        }
+        Vec::new()
+    }
+}
+
 pub struct Ipv6Stack {
     interfaces: Vec<Ipv6Interface>,
     routing_table: Vec<Ipv6Route>,
+    pub icmpv6_enabled: bool,
+    pub dhcpv6_client: Option<Dhcpv6Client>,
+    pub multicast_router: Ipv6MulticastRouter,
 }
 
 #[derive(Debug, Clone)]
@@ -197,6 +507,9 @@ impl Ipv6Stack {
         Self {
             interfaces: Vec::new(),
             routing_table: Vec::new(),
+            icmpv6_enabled: true,
+            dhcpv6_client: None,
+            multicast_router: Ipv6MulticastRouter::new(),
         }
     }
 
@@ -365,5 +678,70 @@ mod tests {
         let addr2 = Ipv6Address::loopback();
         
         assert!(stack.matches_prefix(&addr1, &addr2, 128));
+    }
+
+    #[test]
+    fn test_icmpv6_packet_serialization_and_parsing() {
+        let pkt = Icmpv6Packet::new(Icmpv6Type::EchoRequest, 0, vec![1, 2, 3, 4, 5, 6]);
+        let serialized = pkt.serialize();
+        let parsed = Icmpv6Packet::parse(&serialized).unwrap();
+        assert_eq!(parsed.message_type, Icmpv6Type::EchoRequest);
+        assert_eq!(parsed.code, 0);
+        assert_eq!(parsed.payload, vec![1, 2, 3, 4, 5, 6]);
+    }
+
+    #[test]
+    fn test_dhcpv6_client_flow() {
+        let mut client = Dhcpv6Client::new(vec![0x00, 0x01, 0x02, 0x03]);
+        assert_eq!(client.state, Dhcpv6State::Init);
+
+        let solicit_bytes = client.send_solicit().unwrap();
+        assert_eq!(client.state, Dhcpv6State::Solicit);
+        assert_eq!(solicit_bytes[0], 1); // Solicit msg type
+
+        let adv_addr = Ipv6Address::new([0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+        let req_bytes = client.handle_advertise(adv_addr).unwrap();
+        assert_eq!(client.state, Dhcpv6State::Request);
+        assert_eq!(req_bytes[0], 3); // Request msg type
+
+        let assigned = Ipv6Address::new([0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100]);
+        client.handle_reply(assigned.clone()).unwrap();
+        assert_eq!(client.state, Dhcpv6State::Bound);
+        assert_eq!(client.assigned_address.unwrap().bytes, assigned.bytes);
+    }
+
+    #[test]
+    fn test_multicast_router() {
+        let mut router = Ipv6MulticastRouter::new();
+        let mc_addr = Ipv6Address::new([0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+
+        router.join_group(mc_addr.clone(), "eth0").unwrap();
+        router.join_group(mc_addr.clone(), "eth1").unwrap();
+
+        let interfaces = router.forward_multicast_packet(&mc_addr, &[0xAA, 0xBB]);
+        assert_eq!(interfaces.len(), 2);
+        assert_eq!(interfaces[0], "eth0");
+        assert_eq!(interfaces[1], "eth1");
+    }
+
+    #[test]
+    fn test_icmpv6_pseudo_header_checksum() {
+        let src = Ipv6Address::loopback();
+        let dst = Ipv6Address::loopback();
+        let pkt = Icmpv6Packet::new(Icmpv6Type::EchoRequest, 0, vec![1, 2, 3, 4]);
+        let csum = pkt.calculate_pseudo_header_checksum(&src, &dst);
+        assert_ne!(csum, 0);
+    }
+
+    #[test]
+    fn test_ndp_and_dhcpv6_option_tlvs() {
+        let mac_opt = NdpOption::SourceLinkLayerAddress([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        let mac_serialized = mac_opt.serialize();
+        assert_eq!(mac_serialized.len(), 8);
+        assert_eq!(mac_serialized[0], 1); // Type 1
+
+        let dhcp_opt = Dhcpv6Option::new(1, vec![0xDE, 0xAD, 0xBE, 0xEF]);
+        let dhcp_serialized = dhcp_opt.serialize();
+        assert_eq!(dhcp_serialized.len(), 8); // 2 bytes code + 2 bytes len + 4 bytes data
     }
 }
