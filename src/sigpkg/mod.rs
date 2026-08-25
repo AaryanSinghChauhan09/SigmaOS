@@ -32,8 +32,6 @@ pub mod universal_engine;
 pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
-pub mod universal_adapter;
-pub mod sovereign_sigpkg;
 
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,

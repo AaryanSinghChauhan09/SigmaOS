@@ -1920,7 +1920,7 @@ impl CapabilityDerivationTree {
 }
 
 /// Linux cgroups v2 resource governor
-pub struct SovereignCgroupGovernor {
+pub struct SovereignCgroupGovernorV3 {
     pub groups: HashMap<String, CgroupResourceLimits>,
     pub pids: HashMap<String, Vec<u64>>,
     pub cpu_usage: HashMap<String, u64>,
@@ -1928,7 +1928,7 @@ pub struct SovereignCgroupGovernor {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct CgroupResourceLimits {
+pub struct CgroupResourceLimitsV3 {
     pub cpu_quota_us: u64,
     pub cpu_period_us: u64,
     pub memory_max_bytes: u64,
@@ -1953,7 +1953,7 @@ impl Default for CgroupResourceLimits {
 #[derive(Debug, Clone)]
 pub struct CgroupGroupV2 {
     pub path: String,
-    pub limits: CgroupResourceLimits,
+    pub limits: CgroupResourceLimitsV3,
     pub pids: Vec<u64>,
     pub current_cpu_usage_us: u64,
     pub current_memory_bytes: u64,
@@ -1976,7 +1976,7 @@ impl SovereignCgroupGovernorV2 {
         }
         self.groups.insert(path.to_string(), CgroupGroupV2 {
             path: path.to_string(),
-            limits: CgroupResourceLimits {
+            limits: CgroupResourceLimitsV3 {
                 cpu_quota_us: 100_000,
                 cpu_period_us: 100_000,
                 memory_max_bytes: 1024 * 1024 * 1024,
@@ -1991,7 +1991,7 @@ impl SovereignCgroupGovernorV2 {
         Ok(())
     }
 
-    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimitsV3) -> Result<(), &'static str> {
         let entry = self.groups.get_mut_str(path).ok_or("cgroup path not found")?;
         entry.limits = limits;
         Ok(())
