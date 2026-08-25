@@ -1,15 +1,16 @@
 // SigmaOS Linux & BSD Inspired Advanced Drivers Subsystem
 // Zero-dependency, #![no_std] compliant, providing Linux evdev, FreeBSD DRM/KMS,
 // OpenBSD driver pledge/unveil sandboxing, NetBSD rump virtual drivers, Linux URB USB transfer queues,
-// Thunderbolt 4 PCIe tunneling, VirtIO 3D GPU acceleration, Ath10k Wi-Fi, I2C/SMBus sensors, and NetBSD GPIO/PWM.
+// Wi-Fi 6E/7 MLO, NVMe 2.0 ZNS/Fabrics, UAC3/Intel HDA Audio DSP, I2C/SPI/GPIO IIO sensors,
+// VirtIO-GPU VirGL 3D, Bluetooth 5.4 LE Audio, Zero-Copy Packet Engine, and Driver Isolation Rings.
 
 #![no_std]
 
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
+use alloc::vec;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. Linux Evdev Subsystem (Multi-Touch, Force Feedback, Event Streaming)
@@ -315,210 +316,562 @@ impl LinuxUrbQueue {
 }
 
 // =========================================================================
-// 6. Linux Thunderbolt 4 / USB4 Tunneling Controller
+// 6. Linux & BSD Wi-Fi 6E / Wi-Fi 7 (802.11be MLO) Driver
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum T4TunnelType {
-    Pcie,
-    DisplayPort,
-    Usb3,
+pub enum WifiProtocolMode {
+    Wifi5Ac,
+    Wifi6Ax,
+    Wifi6E6GHz,
+    Wifi7BeMlo,
 }
-
-pub struct Thunderbolt4Controller {
-    pub port_id: u8,
-    pub is_connected: bool,
-    pub bandwidth_gbps: u32, // e.g. 40 Gbps
-    pub active_tunnels: Vec<T4TunnelType>,
-}
-
-impl Thunderbolt4Controller {
-    pub fn new(port_id: u8) -> Self {
-        Self {
-            port_id,
-            is_connected: false,
-            bandwidth_gbps: 40,
-            active_tunnels: Vec::new(),
-        }
-    }
-
-    pub fn establish_tunnel(&mut self, tunnel: T4TunnelType) -> Result<(), &'static str> {
-        if !self.is_connected {
-            self.is_connected = true;
-        }
-        if self.active_tunnels.contains(&tunnel) {
-            return Err("Thunderbolt 4: Tunnel already active");
-        }
-        self.active_tunnels.push(tunnel);
-        Ok(())
-    }
-
-    pub fn teardown_tunnel(&mut self, tunnel: T4TunnelType) {
-        if let Some(pos) = self.active_tunnels.iter().position(|&t| t == tunnel) {
-            self.active_tunnels.remove(pos);
-        }
-        if self.active_tunnels.is_empty() {
-            self.is_connected = false;
-        }
-    }
-}
-
-// =========================================================================
-// 7. FreeBSD VirtIO GPU 3D Acceleration Driver (virgl3d)
-// =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VirtioGpu3dOpcode {
-    CreateContext = 0x0200,
-    DestroyContext = 0x0201,
-    Submit3dCommand = 0x0202,
+pub enum WifiBand {
+    Band2_4GHz,
+    Band5GHz,
+    Band6GHz,
 }
-
-pub struct VirtioGpu3dCommand {
-    pub opcode: VirtioGpu3dOpcode,
-    pub ctx_id: u32,
-    pub payload: Vec<u8>,
-}
-
-pub struct VirtioGpu3dAcceleration {
-    pub ctx_counter: AtomicUsize,
-    pub submitted_commands: Vec<VirtioGpu3dCommand>,
-}
-
-impl VirtioGpu3dAcceleration {
-    pub fn new() -> Self {
-        Self {
-            ctx_counter: AtomicUsize::new(1),
-            submitted_commands: Vec::new(),
-        }
-    }
-
-    pub fn create_context(&mut self) -> u32 {
-        let ctx_id = self.ctx_counter.fetch_add(1, Ordering::SeqCst) as u32;
-        self.submitted_commands.push(VirtioGpu3dCommand {
-            opcode: VirtioGpu3dOpcode::CreateContext,
-            ctx_id,
-            payload: Vec::new(),
-        });
-        ctx_id
-    }
-
-    pub fn submit_command(&mut self, ctx_id: u32, payload: Vec<u8>) -> Result<(), &'static str> {
-        self.submitted_commands.push(VirtioGpu3dCommand {
-            opcode: VirtioGpu3dOpcode::Submit3dCommand,
-            ctx_id,
-            payload,
-        });
-        Ok(())
-    }
-}
-
-// =========================================================================
-// 8. OpenBSD Ath10k 802.11ac Wi-Fi Network Driver
-// =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct WlanAccessPoint {
-    pub ssid: String,
-    pub bssid: [u8; 6],
+pub struct WifiMloLink {
+    pub link_id: u8,
+    pub band: WifiBand,
+    pub channel: u16,
     pub rssi_dbm: i8,
-    pub channel: u8,
 }
 
-pub struct Ath10kWlanDriver {
-    pub is_powered: bool,
-    pub connected_ap: Option<WlanAccessPoint>,
-    pub scanned_aps: Vec<WlanAccessPoint>,
+pub struct LinuxBsdWifi6e7Driver {
+    pub adapter_name: String,
+    pub protocol_mode: WifiProtocolMode,
+    pub active_mlo_links: Vec<WifiMloLink>,
+    pub connected_bssid: [u8; 6],
+    pub is_associated: bool,
 }
 
-impl Ath10kWlanDriver {
-    pub fn new() -> Self {
+impl LinuxBsdWifi6e7Driver {
+    pub fn new(name: &str) -> Self {
         Self {
-            is_powered: true,
-            connected_ap: None,
-            scanned_aps: Vec::new(),
+            adapter_name: name.to_string(),
+            protocol_mode: WifiProtocolMode::Wifi7BeMlo,
+            active_mlo_links: Vec::new(),
+            connected_bssid: [0u8; 6],
+            is_associated: false,
         }
     }
 
-    pub fn scan_networks(&mut self) -> Vec<WlanAccessPoint> {
-        let mock_ap = WlanAccessPoint {
-            ssid: String::from("Sovereign5G"),
-            bssid: [0x00, 0x11, 0x22, 0x33, 0x44, 0x55],
-            rssi_dbm: -55,
+    pub fn scan_mlo_links(&mut self) {
+        self.active_mlo_links.clear();
+        self.active_mlo_links.push(WifiMloLink {
+            link_id: 1,
+            band: WifiBand::Band5GHz,
             channel: 36,
-        };
-        self.scanned_aps.clear();
-        self.scanned_aps.push(mock_ap.clone());
-        self.scanned_aps.clone()
+            rssi_dbm: -55,
+        });
+        self.active_mlo_links.push(WifiMloLink {
+            link_id: 2,
+            band: WifiBand::Band6GHz,
+            channel: 69,
+            rssi_dbm: -48,
+        });
     }
 
-    pub fn connect(&mut self, ssid: &str) -> Result<(), &'static str> {
-        if let Some(ap) = self.scanned_aps.iter().find(|a| a.ssid == ssid) {
-            self.connected_ap = Some(ap.clone());
+    pub fn roam_bssid(&mut self, bssid: [u8; 6]) -> Result<(), &'static str> {
+        if bssid == [0u8; 6] {
+            return Err("WiFi: Invalid BSSID for roaming");
+        }
+        self.connected_bssid = bssid;
+        self.is_associated = true;
+        Ok(())
+    }
+
+    pub fn get_active_bandwidth_mbps(&self) -> u32 {
+        if !self.is_associated {
+            return 0;
+        }
+        match self.protocol_mode {
+            WifiProtocolMode::Wifi5Ac => 866,
+            WifiProtocolMode::Wifi6Ax => 2400,
+            WifiProtocolMode::Wifi6E6GHz => 4800,
+            WifiProtocolMode::Wifi7BeMlo => 9600,
+        }
+    }
+}
+
+// =========================================================================
+// 7. NVMe 2.0 Zoned Namespaces (ZNS) & NVMe-over-Fabrics Driver
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NvmeZoneState {
+    Empty,
+    ImplicitlyOpen,
+    ExplicitlyOpen,
+    Closed,
+    Full,
+    ReadOnly,
+    Offline,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct NvmeZoneDescriptor {
+    pub zone_id: u64,
+    pub start_lba: u64,
+    pub capacity_lbas: u64,
+    pub write_pointer_lba: u64,
+    pub state: NvmeZoneState,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NvmeFabricsTransport {
+    Pcie,
+    Rdma,
+    Tcp,
+}
+
+pub struct Nvme2ZnsFabricsDriver {
+    pub controller_name: String,
+    pub transport: NvmeFabricsTransport,
+    pub zones: Vec<NvmeZoneDescriptor>,
+    pub total_namespaces: u32,
+    pub target_nqn: String,
+}
+
+impl Nvme2ZnsFabricsDriver {
+    pub fn new(name: &str, transport: NvmeFabricsTransport, target_nqn: &str) -> Self {
+        let mut zones = Vec::new();
+        for i in 0..8 {
+            zones.push(NvmeZoneDescriptor {
+                zone_id: i,
+                start_lba: i * 65536,
+                capacity_lbas: 65536,
+                write_pointer_lba: i * 65536,
+                state: NvmeZoneState::Empty,
+            });
+        }
+        Self {
+            controller_name: name.to_string(),
+            transport,
+            zones,
+            total_namespaces: 1,
+            target_nqn: target_nqn.to_string(),
+        }
+    }
+
+    pub fn open_zone(&mut self, zone_id: u64) -> Result<(), &'static str> {
+        if let Some(zone) = self.zones.iter_mut().find(|z| z.zone_id == zone_id) {
+            if zone.state == NvmeZoneState::Full || zone.state == NvmeZoneState::Offline {
+                return Err("NVMe ZNS: Zone cannot be opened");
+            }
+            zone.state = NvmeZoneState::ExplicitlyOpen;
             Ok(())
         } else {
-            Err("Ath10k: Requested SSID not found during scan")
+            Err("NVMe ZNS: Zone not found")
+        }
+    }
+
+    pub fn append_zone_data(&mut self, zone_id: u64, lba_count: u64) -> Result<u64, &'static str> {
+        if let Some(zone) = self.zones.iter_mut().find(|z| z.zone_id == zone_id) {
+            if zone.state != NvmeZoneState::ExplicitlyOpen && zone.state != NvmeZoneState::ImplicitlyOpen && zone.state != NvmeZoneState::Empty {
+                return Err("NVMe ZNS: Zone is not open for writing");
+            }
+            let written_lba = zone.write_pointer_lba;
+            if zone.write_pointer_lba + lba_count > zone.start_lba + zone.capacity_lbas {
+                return Err("NVMe ZNS: Zone capacity exceeded");
+            }
+            zone.write_pointer_lba += lba_count;
+            zone.state = if zone.write_pointer_lba == zone.start_lba + zone.capacity_lbas {
+                NvmeZoneState::Full
+            } else {
+                NvmeZoneState::ExplicitlyOpen
+            };
+            Ok(written_lba)
+        } else {
+            Err("NVMe ZNS: Zone not found")
+        }
+    }
+
+    pub fn reset_zone(&mut self, zone_id: u64) -> Result<(), &'static str> {
+        if let Some(zone) = self.zones.iter_mut().find(|z| z.zone_id == zone_id) {
+            zone.write_pointer_lba = zone.start_lba;
+            zone.state = NvmeZoneState::Empty;
+            Ok(())
+        } else {
+            Err("NVMe ZNS: Zone not found")
         }
     }
 }
 
 // =========================================================================
-// 9. Linux I2C / SMBus Hardware Sensor Hub Driver
+// 8. USB Audio Class 3 (UAC3) & Intel HDA Audio DSP Controller
 // =========================================================================
 
-pub struct I2cSmbusSensorHubDriver {
-    pub bus_id: u8,
-    pub thermal_celsius: f32,
-    pub fan_rpm: u32,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AudioSampleFormat {
+    PcmS16Le,
+    PcmS24Le,
+    PcmS32Le,
+    Float32Le,
 }
 
-impl I2cSmbusSensorHubDriver {
-    pub fn new(bus_id: u8) -> Self {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AudioDspStream {
+    pub stream_id: u32,
+    pub sample_rate_hz: u32,
+    pub channels: u8,
+    pub format: AudioSampleFormat,
+    pub buffer_latency_us: u32,
+}
+
+pub struct Uac3IntelHdaAudioDspDriver {
+    pub device_name: String,
+    pub streams: Vec<AudioDspStream>,
+    pub eq_gain_db: [i8; 10], // 10-band equalizer gain (-12dB to +12dB)
+    pub is_dsp_active: bool,
+}
+
+impl Uac3IntelHdaAudioDspDriver {
+    pub fn new(device_name: &str) -> Self {
         Self {
-            bus_id,
-            thermal_celsius: 42.5,
-            fan_rpm: 2100,
+            device_name: device_name.to_string(),
+            streams: Vec::new(),
+            eq_gain_db: [0; 10],
+            is_dsp_active: true,
         }
     }
 
-    pub fn read_temperature(&mut self) -> f32 {
-        self.thermal_celsius += 0.1;
-        self.thermal_celsius
+    pub fn create_dsp_stream(&mut self, stream_id: u32, sample_rate_hz: u32, channels: u8, format: AudioSampleFormat) -> Result<(), &'static str> {
+        if sample_rate_hz == 0 || channels == 0 {
+            return Err("Audio DSP: Invalid sample rate or channel count");
+        }
+        self.streams.push(AudioDspStream {
+            stream_id,
+            sample_rate_hz,
+            channels,
+            format,
+            buffer_latency_us: 1000, // Low latency 1ms
+        });
+        Ok(())
     }
 
-    pub fn set_fan_speed_pwm(&mut self, pwm_percent: u8) {
-        let max_rpm = 5000.0;
-        self.fan_rpm = ((pwm_percent as f32 / 100.0) * max_rpm) as u32;
+    pub fn set_eq_band_gain(&mut self, band_idx: usize, gain_db: i8) -> Result<(), &'static str> {
+        if band_idx >= self.eq_gain_db.len() {
+            return Err("Audio DSP: Equalizer band index out of range");
+        }
+        self.eq_gain_db[band_idx] = gain_db.clamp(-12, 12);
+        Ok(())
+    }
+
+    pub fn process_audio_frame(&self, pcm_data: &mut [f32]) {
+        if !self.is_dsp_active {
+            return;
+        }
+        // Simple gain scaling simulation
+        let overall_scale = 1.0 + (self.eq_gain_db[0] as f32 / 12.0) * 0.5;
+        for sample in pcm_data.iter_mut() {
+            *sample *= overall_scale;
+        }
     }
 }
 
 // =========================================================================
-// 10. NetBSD GPIO / PWM LED & Buzzer Driver
+// 9. I2C / SPI / GPIO Bus & Industrial Sensor Controller
 // =========================================================================
 
-pub struct NetBsdGpioPwmDriver {
-    pub pin_number: u8,
-    pub is_output: bool,
-    pub pin_state: bool,
-    pub pwm_duty_cycle: u8, // 0 - 100%
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BusType {
+    I2c,
+    Spi,
+    Gpio,
 }
 
-impl NetBsdGpioPwmDriver {
-    pub fn new(pin_number: u8) -> Self {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpioDirection {
+    Input,
+    Output,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpioState {
+    Low = 0,
+    High = 1,
+}
+
+pub struct I2cSpiGpioBusController {
+    pub bus_name: String,
+    pub bus_type: BusType,
+    pub gpio_directions: [GpioDirection; 32],
+    pub gpio_states: [GpioState; 32],
+    pub clock_speed_hz: u32,
+}
+
+impl I2cSpiGpioBusController {
+    pub fn new(bus_name: &str, bus_type: BusType, clock_speed_hz: u32) -> Self {
         Self {
-            pin_number,
-            is_output: true,
-            pin_state: false,
-            pwm_duty_cycle: 0,
+            bus_name: bus_name.to_string(),
+            bus_type,
+            gpio_directions: [GpioDirection::Input; 32],
+            gpio_states: [GpioState::Low; 32],
+            clock_speed_hz,
         }
     }
 
-    pub fn set_pin_state(&mut self, high: bool) {
-        self.pin_state = high;
+    pub fn configure_gpio(&mut self, pin: usize, direction: GpioDirection) -> Result<(), &'static str> {
+        if pin >= 32 {
+            return Err("GPIO: Pin index out of bounds");
+        }
+        self.gpio_directions[pin] = direction;
+        Ok(())
     }
 
-    pub fn set_pwm_duty(&mut self, duty: u8) {
-        self.pwm_duty_cycle = duty.min(100);
+    pub fn write_gpio(&mut self, pin: usize, state: GpioState) -> Result<(), &'static str> {
+        if pin >= 32 {
+            return Err("GPIO: Pin index out of bounds");
+        }
+        if self.gpio_directions[pin] != GpioDirection::Output {
+            return Err("GPIO: Pin not configured for output");
+        }
+        self.gpio_states[pin] = state;
+        Ok(())
+    }
+
+    pub fn read_gpio(&self, pin: usize) -> Result<GpioState, &'static str> {
+        if pin >= 32 {
+            return Err("GPIO: Pin index out of bounds");
+        }
+        Ok(self.gpio_states[pin])
+    }
+
+    pub fn i2c_read_bytes(&self, device_addr: u8, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if self.bus_type != BusType::I2c {
+            return Err("I2C: Bus not configured for I2C mode");
+        }
+        if device_addr == 0 {
+            return Err("I2C: Invalid device address");
+        }
+        for (i, b) in buffer.iter_mut().enumerate() {
+            *b = (device_addr ^ (i as u8)) & 0xFF;
+        }
+        Ok(buffer.len())
+    }
+}
+
+// =========================================================================
+// 10. VirtIO-GPU VirGL 3D & DRM/KMS Zenith Compositor Driver
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Virgl3dCmd {
+    CreateResource = 1,
+    AttachBacking = 2,
+    Submit3dCmd = 3,
+    ResourceFlush = 4,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Virgl3dResource {
+    pub resource_id: u32,
+    pub format: u32, // VirGL format enum
+    pub width: u32,
+    pub height: u32,
+    pub is_attached: bool,
+}
+
+pub struct VirtioGpuVirgl3dDriver {
+    pub device_name: String,
+    pub resources: Vec<Virgl3dResource>,
+    pub command_queue_count: u32,
+    pub is_3d_accel_enabled: bool,
+}
+
+impl VirtioGpuVirgl3dDriver {
+    pub fn new(name: &str) -> Self {
+        Self {
+            device_name: name.to_string(),
+            resources: Vec::new(),
+            command_queue_count: 0,
+            is_3d_accel_enabled: true,
+        }
+    }
+
+    pub fn create_resource_3d(&mut self, resource_id: u32, format: u32, width: u32, height: u32) -> Result<(), &'static str> {
+        if width == 0 || height == 0 {
+            return Err("VirtIO-GPU 3D: Dimensions must be non-zero");
+        }
+        self.resources.push(Virgl3dResource {
+            resource_id,
+            format,
+            width,
+            height,
+            is_attached: false,
+        });
+        Ok(())
+    }
+
+    pub fn attach_backing_memory(&mut self, resource_id: u32) -> Result<(), &'static str> {
+        if let Some(res) = self.resources.iter_mut().find(|r| r.resource_id == resource_id) {
+            res.is_attached = true;
+            Ok(())
+        } else {
+            Err("VirtIO-GPU 3D: Resource not found")
+        }
+    }
+
+    pub fn submit_3d_command_stream(&mut self, cmd_bytes: &[u8]) -> Result<u32, &'static str> {
+        if !self.is_3d_accel_enabled {
+            return Err("VirtIO-GPU 3D: Hardware acceleration disabled");
+        }
+        if cmd_bytes.is_empty() {
+            return Err("VirtIO-GPU 3D: Command stream is empty");
+        }
+        self.command_queue_count += 1;
+        Ok(self.command_queue_count)
+    }
+}
+
+// =========================================================================
+// 11. Bluetooth 5.4 LE Audio & Isochronous Stream Controller
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LeAudioCodec {
+    Lc3,
+    Ldac,
+    AptxAdaptive,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IsochannelMode {
+    CisUnicast,
+    BisBroadcast,
+}
+
+pub struct Bluetooth54LeAudioDriver {
+    pub adapter_name: String,
+    pub codec: LeAudioCodec,
+    pub mode: IsochannelMode,
+    pub active_streams_count: u32,
+    pub is_connected: bool,
+}
+
+impl Bluetooth54LeAudioDriver {
+    pub fn new(name: &str) -> Self {
+        Self {
+            adapter_name: name.to_string(),
+            codec: LeAudioCodec::Lc3,
+            mode: IsochannelMode::CisUnicast,
+            active_streams_count: 0,
+            is_connected: false,
+        }
+    }
+
+    pub fn create_isochronous_stream(&mut self, mode: IsochannelMode, codec: LeAudioCodec) -> Result<u32, &'static str> {
+        self.mode = mode;
+        self.codec = codec;
+        self.active_streams_count += 1;
+        self.is_connected = true;
+        Ok(self.active_streams_count)
+    }
+
+    pub fn transmit_audio_frame(&self, frame: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_connected {
+            return Err("Bluetooth LE Audio: Stream not connected");
+        }
+        if frame.is_empty() {
+            return Err("Bluetooth LE Audio: Frame payload is empty");
+        }
+        Ok(frame.len())
+    }
+}
+
+// =========================================================================
+// 12. Zero-Copy Packet Driver Engine (Linux AF_XDP & FreeBSD Netmap)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PacketSlot {
+    pub chunk_id: u32,
+    pub buffer_addr: usize,
+    pub len: usize,
+}
+
+pub struct ZeroCopyPacketDriverEngine {
+    pub interface_name: String,
+    pub rx_ring: Vec<PacketSlot>,
+    pub tx_ring: Vec<PacketSlot>,
+    pub total_packets_processed: u64,
+}
+
+impl ZeroCopyPacketDriverEngine {
+    pub fn new(interface_name: &str) -> Self {
+        Self {
+            interface_name: interface_name.to_string(),
+            rx_ring: Vec::new(),
+            tx_ring: Vec::new(),
+            total_packets_processed: 0,
+        }
+    }
+
+    pub fn enqueue_rx_slot(&mut self, slot: PacketSlot) {
+        self.rx_ring.push(slot);
+    }
+
+    pub fn dequeue_rx_packet(&mut self) -> Option<PacketSlot> {
+        if self.rx_ring.is_empty() {
+            None
+        } else {
+            self.total_packets_processed += 1;
+            Some(self.rx_ring.remove(0))
+        }
+    }
+
+    pub fn transmit_tx_packet(&mut self, slot: PacketSlot) -> Result<(), &'static str> {
+        if slot.len == 0 {
+            return Err("Zero-Copy Packet: Invalid zero-length packet");
+        }
+        self.tx_ring.push(slot);
+        self.total_packets_processed += 1;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 13. OpenBSD-Style Driver Isolation Ring Guard
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IsolationRingLevel {
+    Ring0Kernel,
+    Ring1IsolatedDriver,
+    Ring3UserDriver,
+}
+
+pub struct DriverIsolationRingGuard {
+    pub driver_name: String,
+    pub isolation_level: IsolationRingLevel,
+    pub iommu_domain_id: u32,
+    pub total_faults_recovered: u32,
+}
+
+impl DriverIsolationRingGuard {
+    pub fn new(driver_name: &str, level: IsolationRingLevel, domain_id: u32) -> Self {
+        Self {
+            driver_name: driver_name.to_string(),
+            isolation_level: level,
+            iommu_domain_id: domain_id,
+            total_faults_recovered: 0,
+        }
+    }
+
+    pub fn report_fault_and_recover(&mut self) -> bool {
+        self.total_faults_recovered += 1;
+        // Self-healing restart simulation
+        true
+    }
+
+    pub fn is_isolated(&self) -> bool {
+        self.isolation_level != IsolationRingLevel::Ring0Kernel
     }
 }
 
@@ -588,7 +941,7 @@ mod tests {
             urb_id: 101,
             endpoint: 1,
             transfer_type: UrbTransferType::Bulk,
-            buffer: alloc::vec![0xAA, 0xBB],
+            buffer: vec![0xAA, 0xBB],
             status: -1,
         });
         assert_eq!(queue.pending_urbs.len(), 1);
@@ -600,50 +953,82 @@ mod tests {
     }
 
     #[test]
-    fn test_thunderbolt4_controller() {
-        let mut tb4 = Thunderbolt4Controller::new(1);
-        assert!(!tb4.is_connected);
-        assert!(tb4.establish_tunnel(T4TunnelType::Pcie).is_ok());
-        assert!(tb4.is_connected);
-        assert_eq!(tb4.active_tunnels.len(), 1);
-
-        tb4.teardown_tunnel(T4TunnelType::Pcie);
-        assert!(!tb4.is_connected);
+    fn test_wifi_6e_7_mlo_driver() {
+        let mut wifi = LinuxBsdWifi6e7Driver::new("wlan0");
+        wifi.scan_mlo_links();
+        assert_eq!(wifi.active_mlo_links.len(), 2);
+        assert!(wifi.roam_bssid([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]).is_ok());
+        assert_eq!(wifi.get_active_bandwidth_mbps(), 9600);
     }
 
     #[test]
-    fn test_virtio_gpu_3d() {
-        let mut virgl = VirtioGpu3dAcceleration::new();
-        let ctx_id = virgl.create_context();
-        assert_eq!(ctx_id, 1);
-        assert!(virgl.submit_command(ctx_id, alloc::vec![1, 2, 3]).is_ok());
-        assert_eq!(virgl.submitted_commands.len(), 2);
+    fn test_nvme_zns_fabrics_driver() {
+        let mut nvme = Nvme2ZnsFabricsDriver::new("nvme0n1", NvmeFabricsTransport::Tcp, "nqn.2026-08.org.sigmaos:nvme:fabrics0");
+        assert!(nvme.open_zone(0).is_ok());
+        let lba = nvme.append_zone_data(0, 16).unwrap();
+        assert_eq!(lba, 0);
+        assert!(nvme.reset_zone(0).is_ok());
     }
 
     #[test]
-    fn test_ath10k_wlan_driver() {
-        let mut wlan = Ath10kWlanDriver::new();
-        let aps = wlan.scan_networks();
-        assert_eq!(aps.len(), 1);
-        assert!(wlan.connect("Sovereign5G").is_ok());
-        assert!(wlan.connected_ap.is_some());
+    fn test_uac3_intel_hda_dsp_driver() {
+        let mut audio = Uac3IntelHdaAudioDspDriver::new("HDA Intel PCH");
+        assert!(audio.create_dsp_stream(1, 48000, 2, AudioSampleFormat::Float32Le).is_ok());
+        assert!(audio.set_eq_band_gain(0, 6).is_ok());
+
+        let mut buffer = [1.0f32, -0.5f32];
+        audio.process_audio_frame(&mut buffer);
+        assert!(buffer[0] > 1.0f32);
     }
 
     #[test]
-    fn test_i2c_smbus_sensor_hub() {
-        let mut sensor = I2cSmbusSensorHubDriver::new(0);
-        let temp = sensor.read_temperature();
-        assert!(temp > 42.0);
-        sensor.set_fan_speed_pwm(50);
-        assert_eq!(sensor.fan_rpm, 2500);
+    fn test_i2c_spi_gpio_bus_controller() {
+        let mut gpio_bus = I2cSpiGpioBusController::new("gpiobus0", BusType::Gpio, 1_000_000);
+        assert!(gpio_bus.configure_gpio(5, GpioDirection::Output).is_ok());
+        assert!(gpio_bus.write_gpio(5, GpioState::High).is_ok());
+        assert_eq!(gpio_bus.read_gpio(5).unwrap(), GpioState::High);
+
+        let i2c_bus = I2cSpiGpioBusController::new("iicbus0", BusType::I2c, 400_000);
+        let mut read_buf = [0u8; 4];
+        assert!(i2c_bus.i2c_read_bytes(0x68, &mut read_buf).is_ok());
     }
 
     #[test]
-    fn test_gpio_pwm_driver() {
-        let mut gpio = NetBsdGpioPwmDriver::new(12);
-        gpio.set_pin_state(true);
-        assert!(gpio.pin_state);
-        gpio.set_pwm_duty(75);
-        assert_eq!(gpio.pwm_duty_cycle, 75);
+    fn test_virtio_gpu_virgl3d_driver() {
+        let mut gpu = VirtioGpuVirgl3dDriver::new("virtio-gpu3d");
+        assert!(gpu.create_resource_3d(1, 1, 1920, 1080).is_ok());
+        assert!(gpu.attach_backing_memory(1).is_ok());
+        let seq = gpu.submit_3d_command_stream(&[0x01, 0x00, 0x00, 0x00]).unwrap();
+        assert_eq!(seq, 1);
+    }
+
+    #[test]
+    fn test_bluetooth_54_le_audio_driver() {
+        let mut bt = Bluetooth54LeAudioDriver::new("hci0");
+        let stream_id = bt.create_isochronous_stream(IsochannelMode::CisUnicast, LeAudioCodec::Lc3).unwrap();
+        assert_eq!(stream_id, 1);
+        let sent = bt.transmit_audio_frame(&[0x01, 0x02, 0x03, 0x04]).unwrap();
+        assert_eq!(sent, 4);
+    }
+
+    #[test]
+    fn test_zero_copy_packet_driver_engine() {
+        let mut zc = ZeroCopyPacketDriverEngine::new("eth0");
+        zc.enqueue_rx_slot(PacketSlot {
+            chunk_id: 1,
+            buffer_addr: 0x1000_0000,
+            len: 1500,
+        });
+        let rx = zc.dequeue_rx_packet().unwrap();
+        assert_eq!(rx.chunk_id, 1);
+        assert!(zc.transmit_tx_packet(rx).is_ok());
+    }
+
+    #[test]
+    fn test_driver_isolation_ring_guard() {
+        let mut guard = DriverIsolationRingGuard::new("gpu_driver", IsolationRingLevel::Ring1IsolatedDriver, 5);
+        assert!(guard.is_isolated());
+        assert!(guard.report_fault_and_recover());
+        assert_eq!(guard.total_faults_recovered, 1);
     }
 }

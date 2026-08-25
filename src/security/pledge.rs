@@ -13,6 +13,7 @@ use crate::klib::BTreeMap;
 
 #[cfg(test)]
 use capability::{CapabilityGate, CapabilityToken, Permission};
+use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
 #[cfg(not(test))]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};

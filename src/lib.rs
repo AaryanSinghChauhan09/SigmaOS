@@ -157,13 +157,18 @@ pub use driver::pci_bus::{
     SimulatedPciHardwareAccess,
 };
 pub use drivers::{
-    CanBusSocketDriver, GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent,
-    HidReportType, InputDriver, InputEvent, InputType, IntelI2cSmbusControllerDriver,
-    IntelIgbNicDriver, IntelIwfWifiDriver, Mpt3SasControllerDriver, NetworkCommand,
-    NetworkDriver, NetworkError, NetworkType, RadeonKmsGpuDriver,
-    RaspberryPiGpioMailboxDriver, RealtekAlcAudioDriver, RealtekRtl8169Driver, StorageCommand,
-    StorageDriver, StorageError, StorageType, SynapticsTouchpadDriver, UsbHidDriver, VesaDriver,
-    VesaError, VesaModeInfo, VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
+    AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
+    DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
+    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
+    I2cSpiGpioBusController, InputDriver, InputEvent, InputType, IsochannelMode,
+    IsolationRingLevel, LeAudioCodec, LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue,
+    MultiTouchSlot, NetBsdRumpDriverHost, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    Nvme2ZnsFabricsDriver, NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState,
+    OpenBsdDriverPledge, PacketSlot, StorageCommand, StorageDriver, StorageError, StorageType,
+    Uac3IntelHdaAudioDspDriver, UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    Virgl3dCmd, Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
+    ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -300,6 +305,10 @@ pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
+pub use shell::{
+    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
+    PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
+    SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,

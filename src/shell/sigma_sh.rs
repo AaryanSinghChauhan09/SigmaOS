@@ -4,6 +4,9 @@ use alloc::boxed::Box;
 extern crate alloc as std_alloc;
 use std_alloc::boxed::Box;
 
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec as StdVec;
 
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
@@ -997,5 +1000,681 @@ mod tests {
         let mut unset_box: Box<dyn ShellCommand> = Box::new(unset_cmd);
         unset_box.execute(&[b"FOO"]).unwrap();
         assert_eq!(shell.env.get(b"FOO"), None);
+    }
+}
+
+// =========================================================================
+// ADVANCED ZSH, BASH, TCSH & KSH SHELL INNOVATIONS
+// =========================================================================
+
+/// Bash & Zsh Inspired Parameter & Arithmetic Expansion Engine
+pub struct ParameterExpansionEngine;
+
+impl ParameterExpansionEngine {
+    /// Evaluates Bash/Zsh string parameter expressions:
+    /// - `${VAR:-default}`: Fallback to default if unset or empty
+    /// - `${VAR:=default}`: Fallback to default and update env
+    /// - `${#VAR}`: Variable string length
+    /// - `${VAR:offset:length}`: Substring slicing
+    /// - `${VAR/pattern/replacement}`: Replace first match
+    /// - `${VAR//pattern/replacement}`: Replace all matches
+    /// - `${VAR^}`: Uppercase first character
+    /// - `${VAR,,}`: Lowercase string
+    /// - `$(( expr ))`: Simple arithmetic evaluation (+, -, *, /, %, <, >)
+    pub fn expand_expression(token: &str, env: &mut dyn ShellEnvironment) -> String {
+        if !token.starts_with("${") || !token.ends_with('}') {
+            if token.starts_with("$(( ") && token.ends_with(" ))") {
+                let expr = &token[4..token.len() - 3].trim();
+                return Self::evaluate_arithmetic(expr).to_string();
+            }
+            if token.starts_with("$") && token.len() > 1 {
+                if let Some(val) = env.get(token[1..].as_bytes()) {
+                    return String::from_utf8_lossy(val).into_owned();
+                }
+            }
+            return token.to_string();
+        }
+
+        let inner = &token[2..token.len() - 1];
+
+        // 1. Length expansion: ${#VAR}
+        if inner.starts_with('#') {
+            let var_name = &inner[1..];
+            let val = env.get(var_name.as_bytes()).unwrap_or(b"");
+            return val.len().to_string();
+        }
+
+        // 2. Default value assignment: ${VAR:=default}
+        if let Some(pos) = inner.find(":=") {
+            let var_name = &inner[..pos];
+            let default_val = &inner[pos + 2..];
+            if let Some(val) = env.get(var_name.as_bytes()) {
+                if !val.is_empty() {
+                    return String::from_utf8_lossy(val).into_owned();
+                }
+            }
+            env.set(var_name.as_bytes(), default_val.as_bytes());
+            return default_val.to_string();
+        }
+
+        // 3. Default fallback: ${VAR:-default}
+        if let Some(pos) = inner.find(":-") {
+            let var_name = &inner[..pos];
+            let default_val = &inner[pos + 2..];
+            if let Some(val) = env.get(var_name.as_bytes()) {
+                if !val.is_empty() {
+                    return String::from_utf8_lossy(val).into_owned();
+                }
+            }
+            return default_val.to_string();
+        }
+
+        // 4. Substring slicing: ${VAR:offset:length}
+        if let Some(pos) = inner.find(':') {
+            let var_name = &inner[..pos];
+            let slice_spec = &inner[pos + 1..];
+            let val_bytes = env.get(var_name.as_bytes()).unwrap_or(b"");
+            let val_str = String::from_utf8_lossy(val_bytes);
+
+            let parts: StdVec<&str> = slice_spec.split(':').collect();
+            let offset: usize = parts.first().and_then(|s| s.parse().ok()).unwrap_or(0);
+            let length: usize = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(val_str.len());
+
+            if offset >= val_str.len() {
+                return String::new();
+            }
+            let end = (offset + length).min(val_str.len());
+            return val_str[offset..end].to_string();
+        }
+
+        // 5. Global replacement: ${VAR//pattern/replacement}
+        if let Some(pos) = inner.find("//") {
+            let var_name = &inner[..pos];
+            let rest = &inner[pos + 2..];
+            let val_bytes = env.get(var_name.as_bytes()).unwrap_or(b"");
+            let val_str = String::from_utf8_lossy(val_bytes);
+
+            let subparts: StdVec<&str> = rest.split('/').collect();
+            if subparts.len() >= 2 {
+                let pat = subparts[0];
+                let rep = subparts[1];
+                return val_str.replace(pat, rep);
+            }
+        }
+
+        // 6. Single replacement: ${VAR/pattern/replacement}
+        if let Some(pos) = inner.find('/') {
+            let var_name = &inner[..pos];
+            let rest = &inner[pos + 1..];
+            let val_bytes = env.get(var_name.as_bytes()).unwrap_or(b"");
+            let val_str = String::from_utf8_lossy(val_bytes);
+
+            let subparts: StdVec<&str> = rest.split('/').collect();
+            if subparts.len() >= 2 {
+                let pat = subparts[0];
+                let rep = subparts[1];
+                return val_str.replacen(pat, rep, 1);
+            }
+        }
+
+        // 7. Case transformations: ${VAR^} / ${VAR,,}
+        if inner.ends_with("^") {
+            let var_name = &inner[..inner.len() - 1];
+            let val_bytes = env.get(var_name.as_bytes()).unwrap_or(b"");
+            let val_str = String::from_utf8_lossy(val_bytes);
+            let mut chars = val_str.chars();
+            if let Some(first) = chars.next() {
+                return format!("{}{}", first.to_uppercase(), chars.as_str());
+            }
+            return String::new();
+        }
+
+        if inner.ends_with(",,") {
+            let var_name = &inner[..inner.len() - 2];
+            let val_bytes = env.get(var_name.as_bytes()).unwrap_or(b"");
+            return String::from_utf8_lossy(val_bytes).to_lowercase();
+        }
+
+        // Standard variable lookup fallback
+        if let Some(val) = env.get(inner.as_bytes()) {
+            String::from_utf8_lossy(val).into_owned()
+        } else {
+            String::new()
+        }
+    }
+
+    /// Basic integer arithmetic evaluator for `$(( expr ))`
+    pub fn evaluate_arithmetic(expr: &str) -> i64 {
+        let tokens: StdVec<&str> = expr.split_whitespace().collect();
+        if tokens.is_empty() {
+            return 0;
+        }
+        if tokens.len() == 1 {
+            return tokens[0].parse::<i64>().unwrap_or(0);
+        }
+        if tokens.len() == 3 {
+            let left = tokens[0].parse::<i64>().unwrap_or(0);
+            let op = tokens[1];
+            let right = tokens[2].parse::<i64>().unwrap_or(0);
+            match op {
+                "+" => left + right,
+                "-" => left - right,
+                "*" => left * right,
+                "/" => if right != 0 { left / right } else { 0 },
+                "%" => if right != 0 { left % right } else { 0 },
+                "==" => if left == right { 1 } else { 0 },
+                "!=" => if left != right { 1 } else { 0 },
+                ">" => if left > right { 1 } else { 0 },
+                "<" => if left < right { 1 } else { 0 },
+                _ => 0,
+            }
+        } else {
+            0
+        }
+    }
+}
+
+/// Zsh & Tcsh Inspired Dynamic Prompt Formatter
+pub struct ZshPromptFormatter;
+
+impl ZshPromptFormatter {
+    /// Formats prompt string with Zsh/Tcsh format specifiers:
+    /// - `%n`: username
+    /// - `%m`: hostname
+    /// - `%~`: current directory with ~ for $HOME
+    /// - `%?`: exit status of last command
+    /// - `%t`: timestamp
+    /// - `%F{color}`: ANSI foreground color (`%F{green}`, `%F{blue}`, `%f` for reset)
+    /// - `%B` / `%b`: bold toggle
+    pub fn format_prompt(
+        template: &str,
+        user: &str,
+        host: &str,
+        cwd: &str,
+        home: &str,
+        last_exit_code: i32,
+        time_str: &str,
+    ) -> String {
+        let mut result = template.to_string();
+
+        // 1. Directory formatting (%~)
+        let formatted_cwd = if !home.is_empty() && cwd.starts_with(home) {
+            format!("~{}", &cwd[home.len()..])
+        } else {
+            cwd.to_string()
+        };
+
+        result = result.replace("%n", user);
+        result = result.replace("%m", host);
+        result = result.replace("%~", &formatted_cwd);
+        result = result.replace("%?", &last_exit_code.to_string());
+        result = result.replace("%t", time_str);
+
+        // 2. Color codes
+        result = result.replace("%F{green}", "\x1B[32m");
+        result = result.replace("%F{blue}", "\x1B[34m");
+        result = result.replace("%F{red}", "\x1B[31m");
+        result = result.replace("%F{yellow}", "\x1B[33m");
+        result = result.replace("%F{cyan}", "\x1B[36m");
+        result = result.replace("%f", "\x1B[39m");
+
+        // 3. Bold toggle
+        result = result.replace("%B", "\x1B[1m");
+        result = result.replace("%b", "\x1B[22m");
+
+        result
+    }
+
+    /// Formats right-side prompt (`RPROMPT` / `RPS1` in Zsh)
+    pub fn format_rprompt(
+        git_branch: Option<&str>,
+        execution_time_ms: u64,
+    ) -> String {
+        let mut rprompt = String::new();
+        if let Some(branch) = git_branch {
+            rprompt.push_str(&format!("\x1B[33mgit:({})\x1B[39m ", branch));
+        }
+        if execution_time_ms > 0 {
+            rprompt.push_str(&format!("\x1B[90m{}ms\x1B[39m", execution_time_ms));
+        }
+        rprompt
+    }
+}
+
+/// Zsh & Fish Inspired Context-Aware Sub-Command Completer
+pub struct ContextualCompleter {
+    pub completions: StdVec<(&'static str, &'static str, &'static str)>, // (cmd, subcmd/flag, description)
+}
+
+impl ContextualCompleter {
+    pub fn new() -> Self {
+        let mut completer = Self {
+            completions: StdVec::new(),
+        };
+
+        // Populate Zsh-style sub-command completions
+        completer.register("git", "checkout", "Switch branches or restore working tree files");
+        completer.register("git", "commit", "Record changes to the repository");
+        completer.register("git", "push", "Update remote refs along with associated objects");
+        completer.register("git", "pull", "Fetch from and integrate with another repository");
+        completer.register("git", "status", "Show the working tree status");
+        completer.register("git", "diff", "Show changes between commits, commit and working tree");
+
+        completer.register("systemctl", "start", "Start (activate) one or more units");
+        completer.register("systemctl", "stop", "Stop (deactivate) one or more units");
+        completer.register("systemctl", "restart", "Start or restart one or more units");
+        completer.register("systemctl", "status", "Show terse runtime status information about units");
+
+        completer.register("sigpkg", "install", "Safely install sandboxed package shard");
+        completer.register("sigpkg", "remove", "Uninstall package shard and clean unused trees");
+        completer.register("sigpkg", "update", "Update local package index signatures");
+
+        completer.register("container", "run", "Spin up OCI-compliant isolated sandbox container");
+        completer.register("container", "stop", "Gracefully terminate active sandbox container");
+        completer.register("container", "ps", "List running container instances");
+
+        completer
+    }
+
+    pub fn register(&mut self, cmd: &'static str, subcmd: &'static str, desc: &'static str) {
+        self.completions.push((cmd, subcmd, desc));
+    }
+
+    /// Suggests completions given the command line input
+    pub fn complete(&self, input: &str) -> StdVec<(String, String)> {
+        let parts: StdVec<&str> = input.split_whitespace().collect();
+        if parts.is_empty() {
+            return StdVec::new();
+        }
+
+        let cmd = parts[0];
+        let sub_prefix = parts.get(1).copied().unwrap_or("");
+
+        let mut results = StdVec::new();
+        for &(c, sub, desc) in &self.completions {
+            if c == cmd && sub.starts_with(sub_prefix) {
+                results.push((sub.to_string(), desc.to_string()));
+            }
+        }
+        results
+    }
+}
+
+impl Default for ContextualCompleter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Ksh & FreeBSD Job Control & Pipeline Execution Framework
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum JobState {
+    Running,
+    Stopped,
+    Done,
+}
+
+#[derive(Debug, Clone)]
+pub struct ShellJob {
+    pub job_id: u32,
+    pub pid: u32,
+    pub command: String,
+    pub state: JobState,
+    pub is_background: bool,
+}
+
+pub struct JobControlManager {
+    pub jobs: StdVec<ShellJob>,
+    pub next_job_id: u32,
+}
+
+impl JobControlManager {
+    pub fn new() -> Self {
+        Self {
+            jobs: StdVec::new(),
+            next_job_id: 1,
+        }
+    }
+
+    pub fn add_job(&mut self, command: &str, pid: u32, is_bg: bool) -> u32 {
+        let job_id = self.next_job_id;
+        self.next_job_id += 1;
+
+        let job = ShellJob {
+            job_id,
+            pid,
+            command: command.to_string(),
+            state: JobState::Running,
+            is_background: is_bg,
+        };
+        self.jobs.push(job);
+        job_id
+    }
+
+    pub fn list_jobs(&self) -> StdVec<String> {
+        let mut list = StdVec::new();
+        for job in &self.jobs {
+            let state_str = match job.state {
+                JobState::Running => "Running",
+                JobState::Stopped => "Stopped",
+                JobState::Done => "Done",
+            };
+            list.push(format!("[{}] {} PID: {}  {}", job.job_id, state_str, job.pid, job.command));
+        }
+        list
+    }
+
+    pub fn bring_to_foreground(&mut self, job_id: u32) -> Result<String, ShellError> {
+        if let Some(pos) = self.jobs.iter().position(|j| j.job_id == job_id) {
+            self.jobs[pos].state = JobState::Running;
+            self.jobs[pos].is_background = false;
+            Ok(format!("Job [{}] {} brought to foreground", job_id, self.jobs[pos].command))
+        } else {
+            Err(ShellError::InvalidArgument)
+        }
+    }
+
+    pub fn resume_in_background(&mut self, job_id: u32) -> Result<String, ShellError> {
+        if let Some(pos) = self.jobs.iter().position(|j| j.job_id == job_id) {
+            self.jobs[pos].state = JobState::Running;
+            self.jobs[pos].is_background = true;
+            Ok(format!("Job [{}] {} resumed in background", job_id, self.jobs[pos].command))
+        } else {
+            Err(ShellError::InvalidArgument)
+        }
+    }
+}
+
+impl Default for JobControlManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Chained Pipeline Stage
+#[derive(Debug, Clone)]
+pub struct PipelineStage {
+    pub command: String,
+    pub redirect_stdout: Option<String>,
+    pub redirect_stdin: Option<String>,
+    pub append_stdout: bool,
+}
+
+/// Pipeline Execution Plan
+#[derive(Debug, Clone)]
+pub struct PipelinePlan {
+    pub stages: StdVec<PipelineStage>,
+    pub is_background: bool,
+    pub run_if_success: bool,
+    pub run_if_failure: bool,
+}
+
+pub struct PipelineExecutor;
+
+impl PipelineExecutor {
+    /// Parses line into pipeline stages, redirection, background tokens, and chaining
+    pub fn parse_pipeline(line: &str) -> PipelinePlan {
+        let trimmed = line.trim();
+        let is_bg = trimmed.ends_with('&');
+        let clean_line = if is_bg { &trimmed[..trimmed.len() - 1].trim() } else { trimmed };
+
+        let mut run_if_success = false;
+        let mut run_if_failure = false;
+
+        if clean_line.contains("&&") {
+            run_if_success = true;
+        } else if clean_line.contains("||") {
+            run_if_failure = true;
+        }
+
+        let raw_stages: StdVec<&str> = clean_line.split('|').collect();
+        let mut stages = StdVec::new();
+
+        for raw in raw_stages {
+            let stage_str = raw.trim();
+            let mut cmd = stage_str.to_string();
+            let mut redir_out = None;
+            let mut redir_in = None;
+            let mut append = false;
+
+            if let Some(pos) = stage_str.find(">>") {
+                cmd = stage_str[..pos].trim().to_string();
+                redir_out = Some(stage_str[pos + 2..].trim().to_string());
+                append = true;
+            } else if let Some(pos) = stage_str.find('>') {
+                cmd = stage_str[..pos].trim().to_string();
+                redir_out = Some(stage_str[pos + 1..].trim().to_string());
+            }
+
+            if let Some(pos) = stage_str.find('<') {
+                let left = &stage_str[..pos].trim();
+                let right = &stage_str[pos + 1..].trim();
+                cmd = left.to_string();
+                redir_in = Some(right.to_string());
+            }
+
+            stages.push(PipelineStage {
+                command: cmd,
+                redirect_stdout: redir_out,
+                redirect_stdin: redir_in,
+                append_stdout: append,
+            });
+        }
+
+        PipelinePlan {
+            stages,
+            is_background: is_bg,
+            run_if_success,
+            run_if_failure,
+        }
+    }
+}
+
+/// Bash & Zsh Inspired History Expansion Engine (!1, !!, !$)
+pub struct HistoryExpansionEngine;
+
+impl HistoryExpansionEngine {
+    /// Expands history event designations:
+    /// - `!!`: Repeat last command
+    /// - `!$`: Repeat last argument of last command
+    /// - `!^`: Repeat first argument of last command
+    /// - `!n`: Repeat command #n from history
+    /// - `!?str`: Repeat last command containing `str`
+    pub fn expand_history(input: &str, history: &[String]) -> String {
+        if history.is_empty() || !input.contains('!') {
+            return input.to_string();
+        }
+
+        let last_cmd = history.last().unwrap();
+        let last_tokens: StdVec<&str> = last_cmd.split_whitespace().collect();
+
+        let mut expanded = input.to_string();
+
+        // 1. Double exclamation: !!
+        if expanded.contains("!!") {
+            expanded = expanded.replace("!!", last_cmd);
+        }
+
+        // 2. Last argument: !$
+        if expanded.contains("!$") {
+            let last_arg = last_tokens.last().copied().unwrap_or("");
+            expanded = expanded.replace("!$", last_arg);
+        }
+
+        // 3. First argument: !^
+        if expanded.contains("!^") {
+            let first_arg = if last_tokens.len() > 1 { last_tokens[1] } else { "" };
+            expanded = expanded.replace("!^", first_arg);
+        }
+
+        // 4. History index: !n
+        if let Some(pos) = expanded.find('!') {
+            let rest = &expanded[pos + 1..];
+            if let Ok(idx) = rest.parse::<usize>() {
+                if idx > 0 && idx <= history.len() {
+                    expanded = history[idx - 1].clone();
+                }
+            } else if rest.starts_with('?') {
+                let query = &rest[1..];
+                for cmd in history.iter().rev() {
+                    if cmd.contains(query) {
+                        expanded = cmd.clone();
+                        break;
+                    }
+                }
+            }
+        }
+
+        expanded
+    }
+}
+
+#[cfg(test)]
+mod advanced_shell_tests {
+    use super::*;
+
+    struct MockEnv {
+        keys: StdVec<String>,
+        vals: StdVec<String>,
+    }
+
+    impl MockEnv {
+        fn new() -> Self {
+            Self { keys: StdVec::new(), vals: StdVec::new() }
+        }
+    }
+
+    impl ShellEnvironment for MockEnv {
+        fn set(&mut self, key: &[u8], value: &[u8]) {
+            let k = String::from_utf8_lossy(key).into_owned();
+            let v = String::from_utf8_lossy(value).into_owned();
+            if let Some(pos) = self.keys.iter().position(|x| x == &k) {
+                self.vals[pos] = v;
+            } else {
+                self.keys.push(k);
+                self.vals.push(v);
+            }
+        }
+
+        fn get(&self, key: &[u8]) -> Option<&[u8]> {
+            let k = String::from_utf8_lossy(key);
+            if let Some(pos) = self.keys.iter().position(|x| x == &k) {
+                Some(self.vals[pos].as_bytes())
+            } else {
+                None
+            }
+        }
+
+        fn unset(&mut self, key: &[u8]) {
+            let k = String::from_utf8_lossy(key);
+            if let Some(pos) = self.keys.iter().position(|x| x == &k) {
+                self.keys.remove(pos);
+                self.vals.remove(pos);
+            }
+        }
+    }
+
+    #[test]
+    fn test_parameter_and_arithmetic_expansion() {
+        let mut env = MockEnv::new();
+        env.set(b"USER", b"sovereign");
+        env.set(b"FRUIT", b"apple_pie");
+
+        // Fallback default ${UNSET:-guest}
+        assert_eq!(ParameterExpansionEngine::expand_expression("${UNSET:-guest}", &mut env), "guest");
+
+        // Assign default ${UNSET:=guest}
+        assert_eq!(ParameterExpansionEngine::expand_expression("${MODE:=sovereign}", &mut env), "sovereign");
+        assert_eq!(env.get(b"MODE"), Some(b"sovereign" as &[u8]));
+
+        // Length ${#USER}
+        assert_eq!(ParameterExpansionEngine::expand_expression("${#USER}", &mut env), "9");
+
+        // Substring slicing ${FRUIT:0:5}
+        assert_eq!(ParameterExpansionEngine::expand_expression("${FRUIT:0:5}", &mut env), "apple");
+
+        // Pattern replacement ${FRUIT/pie/tart}
+        assert_eq!(ParameterExpansionEngine::expand_expression("${FRUIT/pie/tart}", &mut env), "apple_tart");
+
+        // Case transformation ${USER^}
+        assert_eq!(ParameterExpansionEngine::expand_expression("${USER^}", &mut env), "Sovereign");
+
+        // Arithmetic evaluation $(( 10 + 20 * 2 ))
+        assert_eq!(ParameterExpansionEngine::evaluate_arithmetic("10 + 5"), 15);
+        assert_eq!(ParameterExpansionEngine::evaluate_arithmetic("12 * 4"), 48);
+        assert_eq!(ParameterExpansionEngine::evaluate_arithmetic("100 == 100"), 1);
+    }
+
+    #[test]
+    fn test_zsh_prompt_formatter() {
+        let template = "%F{green}%n@%m%f:%F{blue}%~%f %B%?%b %#";
+        let prompt = ZshPromptFormatter::format_prompt(
+            template,
+            "sovereign",
+            "sigma-box",
+            "/userland/home/sovereign/projects",
+            "/userland/home/sovereign",
+            0,
+            "12:00",
+        );
+
+        assert!(prompt.contains("\x1B[32msovereign@sigma-box"));
+        assert!(prompt.contains("~/projects"));
+        assert!(prompt.contains("\x1B[1m0\x1B[22m"));
+
+        let rprompt = ZshPromptFormatter::format_rprompt(Some("main"), 42);
+        assert!(rprompt.contains("git:(main)"));
+        assert!(rprompt.contains("42ms"));
+    }
+
+    #[test]
+    fn test_contextual_completer() {
+        let completer = ContextualCompleter::new();
+
+        let git_comps = completer.complete("git ch");
+        assert_eq!(git_comps.len(), 1);
+        assert_eq!(git_comps[0].0, "checkout");
+
+        let sys_comps = completer.complete("systemctl st");
+        assert_eq!(sys_comps.len(), 3); // start, stop, status
+        assert_eq!(sys_comps[0].0, "start");
+        assert_eq!(sys_comps[1].0, "stop");
+        assert_eq!(sys_comps[2].0, "status");
+    }
+
+    #[test]
+    fn test_job_control_manager() {
+        let mut mgr = JobControlManager::new();
+        let job1 = mgr.add_job("ping 8.8.8.8", 1001, true);
+        assert_eq!(job1, 1);
+
+        let list = mgr.list_jobs();
+        assert_eq!(list.len(), 1);
+        assert!(list[0].contains("Running"));
+
+        let fg_res = mgr.bring_to_foreground(1);
+        assert!(fg_res.is_ok());
+        assert!(!mgr.jobs[0].is_background);
+    }
+
+    #[test]
+    fn test_pipeline_executor_parser() {
+        let plan = PipelineExecutor::parse_pipeline("cat file.txt | sigmagrep pattern > output.log &");
+        assert!(plan.is_background);
+        assert_eq!(plan.stages.len(), 2);
+        assert_eq!(plan.stages[0].command, "cat file.txt");
+        assert_eq!(plan.stages[1].command, "sigmagrep pattern");
+        assert_eq!(plan.stages[1].redirect_stdout.as_deref(), Some("output.log"));
+    }
+
+    #[test]
+    fn test_history_expansion() {
+        let mut history = StdVec::new();
+        history.push("git commit -m 'Initial commit'".to_string());
+        history.push("sigpkg install rustc".to_string());
+
+        assert_eq!(HistoryExpansionEngine::expand_history("!!", &history), "sigpkg install rustc");
+        assert_eq!(HistoryExpansionEngine::expand_history("echo !$", &history), "echo rustc");
+        assert_eq!(HistoryExpansionEngine::expand_history("!?commit", &history), "git commit -m 'Initial commit'");
     }
 }
