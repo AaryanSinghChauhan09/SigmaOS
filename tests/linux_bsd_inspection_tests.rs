@@ -38,6 +38,12 @@ mod sysctl;
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
 
+#[path = "../src/compatibility/abi_extended.rs"]
+mod abi_extended;
+
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -234,4 +240,25 @@ fn test_pam_authentication_stack_inspection() {
     elevator.password_database.push(("admin".to_string(), "pass123".to_string()));
     assert_eq!(elevator.elevate_via_doas("admin", "pass123", 1000).unwrap(), 0);
     assert!(elevator.verify_active_sudo_session(0, 2000));
+}
+
+#[test]
+fn test_multi_arch_abi_and_syscall_bridge_inspection() {
+    use abi_extended::{Arm64AapcsFrame, Riscv64AbiFrame, SystemVAbiFrame};
+    use distro_bridge::{LinuxBsdAbiBridge, BinaryAbiFormat};
+
+    let sysv = SystemVAbiFrame::new(&[1, 2, 3, 4, 5, 6]);
+    assert_eq!(sysv.arg_registers[0], 1);
+
+    let arm64 = Arm64AapcsFrame::new(&[10, 20, 30, 40, 50, 60, 70, 80]);
+    assert_eq!(arm64.arg_registers[7], 80);
+
+    let riscv = Riscv64AbiFrame::new(&[100, 200, 300, 400, 500, 600, 700, 800]);
+    assert_eq!(riscv.arg_registers[0], 100);
+
+    let mut linux_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::LinuxElf64);
+    assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
+
+    let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
+    assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
 }

@@ -169,11 +169,20 @@ impl LinuxBsdAbiBridge {
     pub fn dispatch_syscall(&mut self, syscall_num: usize) -> Result<u64, &'static str> {
         self.sys_call_count += 1;
         match (self.active_abi, syscall_num) {
-            (BinaryAbiFormat::LinuxElf64, 0) => Ok(0),  // SYS_read
-            (BinaryAbiFormat::LinuxElf64, 1) => Ok(1),  // SYS_write
+            (BinaryAbiFormat::LinuxElf64, 0) => Ok(0),    // SYS_read
+            (BinaryAbiFormat::LinuxElf64, 1) => Ok(1),    // SYS_write
+            (BinaryAbiFormat::LinuxElf64, 9) => Ok(0x7FFF0000), // SYS_mmap
             (BinaryAbiFormat::LinuxElf64, 39) => Ok(1000), // SYS_getpid
-            (BinaryAbiFormat::FreeBsdElf64, 3) => Ok(0), // SYS_read (FreeBSD)
-            (BinaryAbiFormat::FreeBsdElf64, 4) => Ok(1), // SYS_write (FreeBSD)
+            (BinaryAbiFormat::LinuxElf64, 59) => Ok(0),   // SYS_execve
+            (BinaryAbiFormat::LinuxElf64, 60) => Ok(0),   // SYS_exit
+            (BinaryAbiFormat::FreeBsdElf64, 1) => Ok(0),  // SYS_exit (FreeBSD)
+            (BinaryAbiFormat::FreeBsdElf64, 3) => Ok(0),  // SYS_read (FreeBSD)
+            (BinaryAbiFormat::FreeBsdElf64, 4) => Ok(1),  // SYS_write (FreeBSD)
+            (BinaryAbiFormat::FreeBsdElf64, 20) => Ok(1000), // SYS_getpid (FreeBSD)
+            (BinaryAbiFormat::OpenBsdElf64, 1) => Ok(0),  // SYS_exit (OpenBSD)
+            (BinaryAbiFormat::OpenBsdElf64, 3) => Ok(0),  // SYS_read (OpenBSD)
+            (BinaryAbiFormat::OpenBsdElf64, 4) => Ok(1),  // SYS_write (OpenBSD)
+            (BinaryAbiFormat::OpenBsdElf64, 20) => Ok(1000), // SYS_getpid (OpenBSD)
             _ => Ok(0),
         }
     }

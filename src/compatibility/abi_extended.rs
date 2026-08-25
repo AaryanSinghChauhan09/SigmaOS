@@ -31,6 +31,46 @@ impl SystemVAbiFrame {
     }
 }
 
+/// ARM64 AAPCS ABI Execution Frame Layout
+#[derive(Debug, Clone)]
+pub struct Arm64AapcsFrame {
+    pub arg_registers: [u64; 8], // X0..X7
+    pub link_register_x30: u64,
+}
+
+impl Arm64AapcsFrame {
+    pub fn new(args: &[u64]) -> Self {
+        let mut reg_args = [0u64; 8];
+        for (i, &arg) in args.iter().take(8).enumerate() {
+            reg_args[i] = arg;
+        }
+        Arm64AapcsFrame {
+            arg_registers: reg_args,
+            link_register_x30: 0,
+        }
+    }
+}
+
+/// RISC-V 64-bit ABI Execution Frame Layout
+#[derive(Debug, Clone)]
+pub struct Riscv64AbiFrame {
+    pub arg_registers: [u64; 8], // A0..A7
+    pub return_address_ra: u64,
+}
+
+impl Riscv64AbiFrame {
+    pub fn new(args: &[u64]) -> Self {
+        let mut reg_args = [0u64; 8];
+        for (i, &arg) in args.iter().take(8).enumerate() {
+            reg_args[i] = arg;
+        }
+        Riscv64AbiFrame {
+            arg_registers: reg_args,
+            return_address_ra: 0,
+        }
+    }
+}
+
 /// Windows x64 ABI Execution Frame Layout
 #[derive(Debug, Clone)]
 pub struct WindowsX64AbiFrame {
@@ -102,6 +142,12 @@ mod tests {
         let win64 = WindowsX64AbiFrame::new(&[100, 200, 300, 400]);
         assert_eq!(win64.arg_registers[0], 100);
         assert_eq!(win64.shadow_space_bytes.len(), 32);
+
+        let arm64 = Arm64AapcsFrame::new(&[1, 2, 3, 4, 5, 6, 7, 8]);
+        assert_eq!(arm64.arg_registers[7], 8);
+
+        let riscv64 = Riscv64AbiFrame::new(&[11, 22, 33, 44, 55, 66, 77, 88]);
+        assert_eq!(riscv64.arg_registers[0], 11);
 
         let mut rel = DynamicAbiRelocationTable::new();
         rel.add_relocation("open", 0x4000, 7, 0x10);
