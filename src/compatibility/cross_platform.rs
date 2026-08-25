@@ -3,7 +3,6 @@
 
 extern crate alloc;
 use crate::klib::{BTreeMap, HashMap};
-use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
 
