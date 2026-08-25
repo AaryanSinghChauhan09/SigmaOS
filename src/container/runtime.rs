@@ -116,7 +116,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: RuntimeCapability::new(),
+            capability: ContainerCapability::full(),
         }
     }
 }
@@ -932,7 +932,7 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            RuntimeCapability::full(),
+            ContainerCapability::full(),
         );
         container.seccomp = SeccompPolicy {
             default_action: SeccompAction::Allow,

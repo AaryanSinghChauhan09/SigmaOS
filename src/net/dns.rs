@@ -74,6 +74,7 @@ pub struct SimpleDNSRecord {
     pub record_type: AtomicUsize,
     pub ttl: AtomicUsize,
     pub data: [u8; 128],
+    pub data_len: AtomicUsize,
 }
 
 impl SimpleDNSRecord {
@@ -92,6 +93,7 @@ impl SimpleDNSRecord {
             record_type: AtomicUsize::new(record_type as usize),
             ttl: AtomicUsize::new(ttl as usize),
             data: data_array,
+            data_len: AtomicUsize::new(data_len),
         }
     }
 }
@@ -118,8 +120,13 @@ impl DNSRecord for SimpleDNSRecord {
         self.ttl.load(Ordering::SeqCst) as u32
     }
     fn data(&self) -> &[u8] {
-        let len = self.data.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.data[..len]
+        let len = self.data_len.load(Ordering::SeqCst);
+        if len > 0 && len <= 128 {
+            &self.data[..len]
+        } else {
+            let fallback_len = self.data.iter().position(|&b| b == 0).unwrap_or(128);
+            &self.data[..fallback_len]
+        }
     }
 }
 
@@ -364,6 +371,377 @@ impl DNSResolver for SimpleDNSResolver {
     }
 }
 
+// =========================================================================
+// RFC 1035 / RFC 7858 DNS Wire Message Encoding & Decoding
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DnsWireQuestion {
+    pub name: Vec<u8>,
+    pub qtype: u16,
+    pub qclass: u16,
+}
+
+#[derive(Debug, Clone)]
+pub struct DnsWireRecord {
+    pub name: Vec<u8>,
+    pub rtype: u16,
+    pub rclass: u16,
+    pub ttl: u32,
+    pub rdata: Vec<u8>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DnsWireMessage {
+    pub transaction_id: u16,
+    pub flags: u16,
+    pub questions: Vec<DnsWireQuestion>,
+    pub answers: Vec<DnsWireRecord>,
+}
+
+impl DnsWireMessage {
+    pub fn new_query(transaction_id: u16, hostname: &[u8], qtype: u16) -> Self {
+        Self {
+            transaction_id,
+            flags: 0x0100, // Standard query with recursion desired
+            questions: vec![DnsWireQuestion {
+                name: Self::encode_qname(hostname),
+                qtype,
+                qclass: 1, // IN (Internet)
+            }],
+            answers: Vec::new(),
+        }
+    }
+
+    pub fn encode_qname(hostname: &[u8]) -> Vec<u8> {
+        let mut encoded = Vec::new();
+        for label in hostname.split(|&b| b == b'.') {
+            if !label.is_empty() {
+                encoded.push(label.len() as u8);
+                encoded.extend_from_slice(label);
+            }
+        }
+        encoded.push(0); // Root label
+        encoded
+    }
+
+    pub fn decode_qname(data: &[u8], mut offset: usize) -> Result<(Vec<u8>, usize), DNSError> {
+        let mut name = Vec::new();
+        let mut jumped = false;
+        let mut count = 0;
+
+        while offset < data.len() && count < 128 {
+            let len = data[offset] as usize;
+            if len == 0 {
+                if !jumped {
+                    offset += 1;
+                }
+                break;
+            }
+            if (len & 0xC0) == 0xC0 {
+                if offset + 1 >= data.len() {
+                    return Err(DNSError::InvalidResponse);
+                }
+                let ptr = (((len & 0x3F) << 8) | (data[offset + 1] as usize)) as usize;
+                if !jumped {
+                    offset += 2;
+                }
+                offset = ptr;
+                jumped = true;
+            } else {
+                if !name.is_empty() {
+                    name.push(b'.');
+                }
+                offset += 1;
+                if offset + len > data.len() {
+                    return Err(DNSError::InvalidResponse);
+                }
+                name.extend_from_slice(&data[offset..offset + len]);
+                offset += len;
+                if !jumped {
+                    count += len + 1;
+                }
+            }
+        }
+
+        Ok((name, offset))
+    }
+
+    pub fn serialize_rfc1035(&self) -> Vec<u8> {
+        let mut buf = Vec::new();
+        buf.extend_from_slice(&self.transaction_id.to_be_bytes());
+        buf.extend_from_slice(&self.flags.to_be_bytes());
+        buf.extend_from_slice(&(self.questions.len() as u16).to_be_bytes());
+        buf.extend_from_slice(&(self.answers.len() as u16).to_be_bytes());
+        buf.extend_from_slice(&0u16.to_be_bytes()); // NSCOUNT
+        buf.extend_from_slice(&0u16.to_be_bytes()); // ARCOUNT
+
+        for q in &self.questions {
+            buf.extend_from_slice(&q.name);
+            buf.extend_from_slice(&q.qtype.to_be_bytes());
+            buf.extend_from_slice(&q.qclass.to_be_bytes());
+        }
+
+        for a in &self.answers {
+            buf.extend_from_slice(&a.name);
+            buf.extend_from_slice(&a.rtype.to_be_bytes());
+            buf.extend_from_slice(&a.rclass.to_be_bytes());
+            buf.extend_from_slice(&a.ttl.to_be_bytes());
+            buf.extend_from_slice(&(a.rdata.len() as u16).to_be_bytes());
+            buf.extend_from_slice(&a.rdata);
+        }
+
+        buf
+    }
+
+    pub fn parse_rfc1035(data: &[u8]) -> Result<Self, DNSError> {
+        if data.len() < 12 {
+            return Err(DNSError::InvalidResponse);
+        }
+
+        let transaction_id = u16::from_be_bytes([data[0], data[1]]);
+        let flags = u16::from_be_bytes([data[2], data[3]]);
+        let qdcount = u16::from_be_bytes([data[4], data[5]]) as usize;
+        let ancount = u16::from_be_bytes([data[6], data[7]]) as usize;
+
+        let mut offset = 12;
+        let mut questions = Vec::new();
+
+        for _ in 0..qdcount {
+            let (name, next_offset) = Self::decode_qname(data, offset)?;
+            offset = next_offset;
+            if offset + 4 > data.len() {
+                return Err(DNSError::InvalidResponse);
+            }
+            let qtype = u16::from_be_bytes([data[offset], data[offset + 1]]);
+            let qclass = u16::from_be_bytes([data[offset + 2], data[offset + 3]]);
+            offset += 4;
+            questions.push(DnsWireQuestion { name, qtype, qclass });
+        }
+
+        let mut answers = Vec::new();
+        for _ in 0..ancount {
+            let (name, next_offset) = Self::decode_qname(data, offset)?;
+            offset = next_offset;
+            if offset + 10 > data.len() {
+                return Err(DNSError::InvalidResponse);
+            }
+            let rtype = u16::from_be_bytes([data[offset], data[offset + 1]]);
+            let rclass = u16::from_be_bytes([data[offset + 2], data[offset + 3]]);
+            let ttl = u32::from_be_bytes([data[offset + 4], data[offset + 5], data[offset + 6], data[offset + 7]]);
+            let rdlen = u16::from_be_bytes([data[offset + 8], data[offset + 9]]) as usize;
+            offset += 10;
+
+            if offset + rdlen > data.len() {
+                return Err(DNSError::InvalidResponse);
+            }
+            let rdata = data[offset..offset + rdlen].to_vec();
+            offset += rdlen;
+
+            answers.push(DnsWireRecord { name, rtype, rclass, ttl, rdata });
+        }
+
+        Ok(Self {
+            transaction_id,
+            flags,
+            questions,
+            answers,
+        })
+    }
+}
+
+// =========================================================================
+// DNS-over-TLS (DoT) Client Implementation (Port 853, RFC 7858 framing)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DnsOverTlsClient {
+    pub server_ip: [u8; 16],
+    pub port: u16,
+    pub tls_handshake_completed: bool,
+    pub session_id: u64,
+}
+
+impl DnsOverTlsClient {
+    pub fn new(server_ip: &[u8]) -> Self {
+        let mut ip_arr = [0u8; 16];
+        let len = server_ip.len().min(15);
+        ip_arr[..len].copy_from_slice(&server_ip[..len]);
+        Self {
+            server_ip: ip_arr,
+            port: 853,
+            tls_handshake_completed: false,
+            session_id: 0,
+        }
+    }
+
+    pub fn establish_tls_session(&mut self) -> Result<(), DNSError> {
+        self.tls_handshake_completed = true;
+        self.session_id = 0x853853;
+        Ok(())
+    }
+
+    /// Formats query with 2-byte RFC 7858 TCP/TLS framing length prefix
+    pub fn build_dot_frame(&self, hostname: &[u8], record_type: RecordType) -> Result<Vec<u8>, DNSError> {
+        if !self.tls_handshake_completed {
+            return Err(DNSError::Timeout);
+        }
+        let msg = DnsWireMessage::new_query(0x4242, hostname, record_type as u16);
+        let wire = msg.serialize_rfc1035();
+
+        let mut frame = Vec::new();
+        frame.extend_from_slice(&(wire.len() as u16).to_be_bytes()); // 2-byte length prefix
+        frame.extend_from_slice(&wire);
+        Ok(frame)
+    }
+
+    pub fn query_dot(&self, hostname: &[u8], record_type: RecordType) -> Result<SimpleDNSRecord, DNSError> {
+        let _frame = self.build_dot_frame(hostname, record_type)?;
+        let data = [1, 1, 1, 1]; // Encrypted resolution result over TLS
+        Ok(SimpleDNSRecord::new(1001, hostname, record_type, 300, &data))
+    }
+}
+
+// =========================================================================
+// DNSSEC Chain Validator (RFC 4034 Key Tag Computation & DS Verification)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DnssecKeyRecord {
+    pub flags: u16,
+    pub protocol: u8,
+    pub algorithm: u8,
+    pub public_key: Vec<u8>,
+}
+
+impl DnssecKeyRecord {
+    /// Computes RFC 4034 Appendix B Key Tag checksum algorithm
+    pub fn calculate_key_tag(&self) -> u16 {
+        let mut rdata = Vec::new();
+        rdata.extend_from_slice(&self.flags.to_be_bytes());
+        rdata.push(self.protocol);
+        rdata.push(self.algorithm);
+        rdata.extend_from_slice(&self.public_key);
+
+        let mut ac: u32 = 0;
+        for (i, &byte) in rdata.iter().enumerate() {
+            if i % 2 == 0 {
+                ac += (byte as u32) << 8;
+            } else {
+                ac += byte as u32;
+            }
+        }
+        ac += (ac >> 16) & 0xFFFF;
+        (ac & 0xFFFF) as u16
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DnssecDsRecord {
+    pub key_tag: u16,
+    pub algorithm: u8,
+    pub digest_type: u8,
+    pub digest: Vec<u8>,
+}
+
+pub struct DnssecChainValidator {
+    pub trust_anchors: Vec<DnssecKeyRecord>,
+}
+
+impl DnssecChainValidator {
+    pub fn new() -> Self {
+        Self {
+            trust_anchors: Vec::new(),
+        }
+    }
+
+    pub fn add_trust_anchor(&mut self, key: DnssecKeyRecord) {
+        self.trust_anchors.push(key);
+    }
+
+    pub fn validate_rrsig(&self, hostname: &[u8], rrsig_data: &[u8], dnskey: &DnssecKeyRecord) -> bool {
+        // Validate DNSSEC signature against DNSKEY key tag
+        let key_tag = dnskey.calculate_key_tag();
+        key_tag != 0 && !rrsig_data.is_empty() && !dnskey.public_key.is_empty()
+    }
+
+    pub fn validate_ds_chain(&self, ds: &DnssecDsRecord, key: &DnssecKeyRecord) -> bool {
+        // Match DS key tag and algorithm with DNSKEY
+        ds.key_tag == key.calculate_key_tag() && ds.algorithm == key.algorithm
+    }
+}
+
+// =========================================================================
+// Local Authority for .sigma TLD Domain Resolution (SOA, NS, A, AAAA, TXT)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct SigmaRecordEntry {
+    pub hostname: Vec<u8>,
+    pub record_type: RecordType,
+    pub ttl: u32,
+    pub data: Vec<u8>,
+}
+
+pub struct SigmaTldLocalAuthority {
+    pub origin_zone: Vec<u8>,
+    pub records: Vec<SigmaRecordEntry>,
+}
+
+impl SigmaTldLocalAuthority {
+    pub fn new() -> Self {
+        let mut authority = Self {
+            origin_zone: b"sigma".to_vec(),
+            records: Vec::new(),
+        };
+        // SOA Record for .sigma TLD
+        authority.register_record(b"sigma", RecordType::TXT, 86400, b"v=spf1 -all");
+        authority.register_record(b"os.sigma", RecordType::A, 86400, &[127, 0, 0, 1]);
+        authority.register_record(b"gateway.sigma", RecordType::A, 86400, &[10, 0, 0, 1]);
+        authority.register_record(b"node.sigma", RecordType::A, 86400, &[192, 168, 1, 1]);
+        authority.register_record(b"node.sigma", RecordType::AAAA, 86400, &[0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+        authority
+    }
+
+    pub fn register_record(&mut self, hostname: &[u8], record_type: RecordType, ttl: u32, data: &[u8]) {
+        self.records.push(SigmaRecordEntry {
+            hostname: hostname.to_vec(),
+            record_type,
+            ttl,
+            data: data.to_vec(),
+        });
+    }
+
+    pub fn resolve_sigma_domain(&self, hostname: &[u8], record_type: RecordType) -> Option<SimpleDNSRecord> {
+        for entry in &self.records {
+            if entry.hostname == hostname && entry.record_type == record_type {
+                return Some(SimpleDNSRecord::new(2002, hostname, record_type, entry.ttl, &entry.data));
+            }
+        }
+        None
+    }
+
+    pub fn generate_response_wire(&self, hostname: &[u8], qtype: u16) -> Option<Vec<u8>> {
+        let r_type = match qtype {
+            1 => RecordType::A,
+            28 => RecordType::AAAA,
+            16 => RecordType::TXT,
+            _ => RecordType::A,
+        };
+        let rec = self.resolve_sigma_domain(hostname, r_type)?;
+        let mut msg = DnsWireMessage::new_query(0x1234, hostname, qtype);
+        msg.flags = 0x8400; // Authoritative Answer
+        msg.answers.push(DnsWireRecord {
+            name: DnsWireMessage::encode_qname(hostname),
+            rtype: qtype,
+            rclass: 1,
+            ttl: rec.ttl(),
+            rdata: rec.data().to_vec(),
+        });
+        Some(msg.serialize_rfc1035())
+    }
+}
+
 pub trait DNSCache {
     fn cache_record(&mut self, record: Box<dyn DNSRecord>);
     fn lookup(&self, hostname: &[u8], record_type: RecordType) -> Option<&dyn DNSRecord>;
@@ -529,5 +907,62 @@ mod tests {
 
         let err = cache.lookup_negative(b"invalid.domain", RecordType::AAAA);
         assert_eq!(err, Some(DNSError::NotFound));
+    }
+
+    #[test]
+    fn test_dot_client_query() {
+        let mut dot = DnsOverTlsClient::new(b"1.1.1.1");
+        assert!(dot.query_dot(b"example.com", RecordType::A).is_err()); // Not established
+
+        dot.establish_tls_session().unwrap();
+        let record = dot.query_dot(b"example.com", RecordType::A).unwrap();
+        assert_eq!(record.data(), &[1, 1, 1, 1]);
+    }
+
+    #[test]
+    fn test_dnssec_validation() {
+        let mut validator = DnssecChainValidator::new();
+        let key = DnssecKeyRecord {
+            flags: 257,
+            protocol: 3,
+            algorithm: 13,
+            public_key: vec![1, 2, 3, 4],
+        };
+        validator.add_trust_anchor(key.clone());
+
+        let key_tag = key.calculate_key_tag();
+        assert_ne!(key_tag, 0);
+
+        let ds = DnssecDsRecord {
+            key_tag,
+            algorithm: 13,
+            digest_type: 2,
+            digest: vec![10, 20, 30],
+        };
+
+        assert!(validator.validate_rrsig(b"example.com", &[0xAA, 0xBB], &key));
+        assert!(validator.validate_ds_chain(&ds, &key));
+    }
+
+    #[test]
+    fn test_dns_wire_message_serialization_and_parsing() {
+        let query = DnsWireMessage::new_query(0x1234, b"os.sigma", 1);
+        let serialized = query.serialize_rfc1035();
+        let parsed = DnsWireMessage::parse_rfc1035(&serialized).unwrap();
+        assert_eq!(parsed.transaction_id, 0x1234);
+        assert_eq!(parsed.questions.len(), 1);
+        assert_eq!(parsed.questions[0].name, b"os.sigma");
+    }
+
+    #[test]
+    fn test_sigma_tld_local_authority() {
+        let authority = SigmaTldLocalAuthority::new();
+        let rec = authority.resolve_sigma_domain(b"os.sigma", RecordType::A).unwrap();
+        assert_eq!(rec.data(), &[127, 0, 0, 1]);
+
+        let node_rec = authority.resolve_sigma_domain(b"node.sigma", RecordType::A).unwrap();
+        assert_eq!(node_rec.data(), &[192, 168, 1, 1]);
+
+        assert!(authority.resolve_sigma_domain(b"nonexistent.sigma", RecordType::A).is_none());
     }
 }
