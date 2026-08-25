@@ -43,7 +43,7 @@ pub struct SocketActivationConfig {
 
 /// Cgroup Resource Control Limits for service sandboxing
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CgroupResourceLimits {
+pub struct InitCgroupResourceLimits {
     pub memory_limit_mb: u64,
     pub cpu_quota_percent: u32,
     pub max_pids: u32,
@@ -55,7 +55,7 @@ pub struct ServiceDependencyNode {
     pub service_name: String,
     pub dependencies: Vec<String>,
     pub socket_activation: Option<SocketActivationConfig>,
-    pub resource_limits: Option<CgroupResourceLimits>,
+    pub resource_limits: Option<InitCgroupResourceLimits>,
 }
 
 pub trait InitSystem {
@@ -160,7 +160,7 @@ mod tests {
             service_name: "network.service".to_string(),
             dependencies: Vec::new(),
             socket_activation: None,
-            resource_limits: Some(CgroupResourceLimits {
+            resource_limits: Some(InitCgroupResourceLimits {
                 memory_limit_mb: 512,
                 cpu_quota_percent: 50,
                 max_pids: 100,

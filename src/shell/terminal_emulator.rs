@@ -470,13 +470,13 @@ pub struct TerminalPane {
 
 /// Tmux / BSD-style Terminal Multiplexer
 #[derive(Debug, Clone)]
-pub struct TerminalMultiplexer {
+pub struct TerminalMultiplexerV1 {
     pub panes: Vec<TerminalPane>,
     pub active_pane_id: u32,
     pub next_pane_id: u32,
 }
 
-impl TerminalMultiplexer {
+impl TerminalMultiplexerV1 {
     pub fn new(root_width: usize, root_height: usize) -> Self {
         let root_pane = TerminalPane {
             pane_id: 1,
@@ -668,7 +668,7 @@ pub struct TerminalSession {
 
 /// Sixel & Kitty Graphics Protocol Data Frame
 #[derive(Debug, Clone)]
-pub struct SixelGraphicFrame {
+pub struct SixelGraphicFrameV2 {
     pub id: u32,
     pub width_px: u32,
     pub height_px: u32,
@@ -677,14 +677,14 @@ pub struct SixelGraphicFrame {
 
 /// Tmux / BSD Split Pane Direction
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PaneSplitDirection {
+pub enum PaneSplitDirectionV2 {
     Horizontal,
     Vertical,
 }
 
 /// Terminal Pane for Tmux / BSD-style terminal multiplexing
 #[derive(Debug, Clone)]
-pub struct TerminalPane {
+pub struct TerminalPaneV2 {
     pub pane_id: u32,
     pub width: usize,
     pub height: usize,
@@ -694,15 +694,15 @@ pub struct TerminalPane {
 
 /// Tmux / BSD-style Terminal Multiplexer Engine
 #[derive(Debug, Clone)]
-pub struct TerminalMultiplexer {
-    pub panes: Vec<TerminalPane>,
+pub struct TerminalMultiplexerV2 {
+    pub panes: Vec<TerminalPaneV2>,
     pub active_pane_id: u32,
     pub next_pane_id: u32,
 }
 
-impl TerminalMultiplexer {
+impl TerminalMultiplexerV2 {
     pub fn new(initial_width: usize, initial_height: usize) -> Self {
-        let first_pane = TerminalPane {
+        let first_pane = TerminalPaneV2 {
             pane_id: 1,
             width: initial_width,
             height: initial_height,
@@ -716,7 +716,7 @@ impl TerminalMultiplexer {
         }
     }
 
-    pub fn split_pane(&mut self, direction: PaneSplitDirection) -> u32 {
+    pub fn split_pane(&mut self, direction: PaneSplitDirectionV2) -> u32 {
         let new_id = self.next_pane_id;
         self.next_pane_id += 1;
 
@@ -729,10 +729,10 @@ impl TerminalMultiplexer {
             let cur_h = self.panes[pos].height;
 
             match direction {
-                PaneSplitDirection::Horizontal => {
+                PaneSplitDirectionV2::Horizontal => {
                     let half_h = cur_h / 2;
                     self.panes[pos].height = half_h;
-                    let new_pane = TerminalPane {
+                    let new_pane = TerminalPaneV2 {
                         pane_id: new_id,
                         width: cur_w,
                         height: cur_h.saturating_sub(half_h),
@@ -741,10 +741,10 @@ impl TerminalMultiplexer {
                     };
                     self.panes.push(new_pane);
                 }
-                PaneSplitDirection::Vertical => {
+                PaneSplitDirectionV2::Vertical => {
                     let half_w = cur_w / 2;
                     self.panes[pos].width = half_w;
-                    let new_pane = TerminalPane {
+                    let new_pane = TerminalPaneV2 {
                         pane_id: new_id,
                         width: cur_w.saturating_sub(half_w),
                         height: cur_h,
@@ -773,13 +773,13 @@ impl TerminalMultiplexer {
 
 /// Trigger Rule for Kitty/iTerm2-style automatic text highlighting & URL detection
 #[derive(Debug, Clone)]
-pub struct TriggerRule {
+pub struct TriggerRuleV2 {
     pub pattern: String,
     pub highlight_color: AnsiColor,
     pub action_command: Option<String>,
 }
 
-impl TriggerRule {
+impl TriggerRuleV2 {
     pub fn new(pattern: &str, color: AnsiColor, action: Option<&str>) -> Self {
         Self {
             pattern: pattern.to_string(),

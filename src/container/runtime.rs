@@ -12,13 +12,6 @@ use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SeccompProfile {
     pub hardened: bool,
     pub blocked_syscalls_mask: u32,

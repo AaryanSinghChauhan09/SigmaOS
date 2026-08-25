@@ -101,9 +101,9 @@ pub struct AhciCommandHeader {
 }
 
 
-/// AHCI Command Header Structure
+/// AHCI Command Header Structure (alternative)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AhciCommandHeader {
+pub struct AhciCommandHeaderV2 {
     pub opts: u8,
     pub prdtl: u16,
     pub prdbc: u16,
@@ -113,7 +113,7 @@ pub struct AhciCommandHeader {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AhciCommandHeader {
+pub struct AhciCommandHeaderV3 {
     pub opts: u16,
     pub prdtl: u16,
     pub prdbc: u32,
@@ -124,14 +124,14 @@ pub struct AhciCommandHeader {
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
     pub cmd_issue: u32,
-    pub cmd_headers: [AhciCommandHeader; 32], // 32 command slots
+    pub cmd_headers: [AhciCommandHeaderV3; 32], // 32 command slots
 }
 
 impl AhciPort {
     pub const fn new() -> Self {
         Self {
             cmd_issue: 0,
-            cmd_headers: [AhciCommandHeader {
+            cmd_headers: [AhciCommandHeaderV3 {
                 opts: 0,
                 prdtl: 0,
                 prdbc: 0,

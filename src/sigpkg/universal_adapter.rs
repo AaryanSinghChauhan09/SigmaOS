@@ -64,7 +64,7 @@ pub struct AptDebManifest {
 }
 
 #[derive(Debug, Clone)]
-pub struct PacmanPkgbuild {
+pub struct PacmanPkgbuildV2 {
     pub pkgname: String,
     pub pkgver: String,
     pub depends: Vec<String>,

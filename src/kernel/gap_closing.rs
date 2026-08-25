@@ -422,14 +422,14 @@ impl SectionObject {
 // ==========================================
 
 #[derive(Debug, Clone)]
-pub struct DeviceObject {
+pub struct RootkitDeviceObject {
     pub driver_name: String,
-    pub next_device: Option<Box<DeviceObject>>,
-    pub attached_device: Option<Box<DeviceObject>>,
+    pub next_device: Option<Box<RootkitDeviceObject>>,
+    pub attached_device: Option<Box<RootkitDeviceObject>>,
 }
 
 #[derive(Debug, Clone)]
-pub struct DriverObject {
+pub struct RootkitDriverObject {
     pub driver_name: String,
     pub major_function: [Option<usize>; 28],
 }
@@ -441,8 +441,8 @@ pub struct X86RootkitAuditor {
 }
 
 pub fn io_attach_device_to_device_stack(
-    source_device: &mut DeviceObject,
-    target_device: &mut DeviceObject,
+    source_device: &mut RootkitDeviceObject,
+    target_device: &mut RootkitDeviceObject,
 ) {
     source_device.next_device = Some(Box::new(target_device.clone()));
     target_device.attached_device = Some(Box::new(source_device.clone()));
@@ -458,7 +458,7 @@ impl X86RootkitAuditor {
 
     pub fn audit_device_stack(
         &self,
-        dev: &DeviceObject,
+        dev: &RootkitDeviceObject,
         allowed_drivers: &[&str],
     ) -> Result<(), &'static str> {
         let mut curr = Some(dev);
@@ -569,16 +569,16 @@ pub enum DeviceType {
 }
 
 #[derive(Debug, Clone)]
-pub struct DeviceObject {
+pub struct DeviceObjectX86 {
     pub device_type: DeviceType,
     pub driver_name: &'static str,
-    pub next_device: Option<alloc::boxed::Box<DeviceObject>>,
-    pub attached_device: Option<alloc::boxed::Box<DeviceObject>>,
+    pub next_device: Option<alloc::boxed::Box<DeviceObjectX86>>,
+    pub attached_device: Option<alloc::boxed::Box<DeviceObjectX86>>,
 }
 
-pub struct DriverObject {
+pub struct DriverObjectX86 {
     pub driver_name: &'static str,
-    pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
+    pub major_function: [Option<fn(&DeviceObjectX86, &mut Irp) -> u32>; 8],
 }
 
 #[derive(Debug, Clone)]
@@ -587,7 +587,7 @@ pub struct IrpStackLocation {
     pub ioctl_code: u32,
 }
 
-pub type CompletionRoutine = fn(&DeviceObject, &mut Irp) -> u32;
+pub type CompletionRoutine = fn(&DeviceObjectX86, &mut Irp) -> u32;
 
 pub struct Irp {
     pub major_function: IrpMajorFunction,
@@ -644,7 +644,7 @@ impl Irp {
     pub fn complete_request(&mut self, status: u32) {
         self.status = status;
         if let Some(routine) = self.completion_routine {
-            let dummy_dev = DeviceObject {
+            let dummy_dev = DeviceObjectX86 {
                 device_type: DeviceType::Functional,
                 driver_name: "dummy",
                 next_device: None,
@@ -1215,13 +1215,13 @@ mod tests {
     fn test_rootkit_dispatch_table_hook_auditer() {
         let mut major_function: [Option<usize>; 28] = [None; 28];
 
-        fn mock_dispatch(_dev: &DeviceObject, _irp: &mut Irp) -> u32 {
+        fn mock_dispatch(_dev: &RootkitDeviceObject, _irp: &mut Irp) -> u32 {
             0
         }
         let addr = mock_dispatch as usize;
         major_function[0] = Some(addr);
 
-        let driver = DriverObject {
+        let driver = RootkitDriverObject {
             driver_name: String::from("keyboard_driver"),
             major_function,
         };
