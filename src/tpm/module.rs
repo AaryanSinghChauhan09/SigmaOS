@@ -43,6 +43,7 @@ pub trait TPM {
 pub struct SimpleTPM {
     pub id: TPMID,
     pub manufacturer: [u8; 32],
+    pub manufacturer_len: u8,
     pub version: AtomicUsize,
     pub ready: AtomicUsize,
 }
@@ -57,6 +58,7 @@ impl SimpleTPM {
         SimpleTPM {
             id,
             manufacturer: manuf_array,
+            manufacturer_len: manuf_len as u8,
             version: AtomicUsize::new(version as usize),
             ready: AtomicUsize::new(1),
         }
@@ -66,11 +68,27 @@ impl SimpleTPM {
 impl TPM for SimpleTPM {
     fn id(&self) -> TPMID { self.id }
     fn manufacturer(&self) -> &[u8] {
-        let len = self.manufacturer.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.manufacturer[..len]
+        // Performance optimization: explicit manufacturer_len u8 field avoids $O(N)$ linear byte scans
+        &self.manufacturer[..self.manufacturer_len as usize]
     }
     fn version(&self) -> u32 { self.version.load(Ordering::SeqCst) as u32 }
     fn is_ready(&self) -> bool { self.ready.load(Ordering::SeqCst) == 1 }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_tpm_manufacturer_len_caching() {
+        let manufacturer_bytes = b"Infineon Technologies";
+        let tpm = SimpleTPM::new(1, manufacturer_bytes, 2);
+        assert_eq!(tpm.id(), 1);
+        assert_eq!(tpm.manufacturer(), manufacturer_bytes);
+        assert_eq!(tpm.manufacturer_len as usize, manufacturer_bytes.len());
+        assert_eq!(tpm.version(), 2);
+        assert!(tpm.is_ready());
+    }
 }
 
 pub trait TPMOperations {
