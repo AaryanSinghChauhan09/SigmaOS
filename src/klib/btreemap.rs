@@ -26,32 +26,6 @@ where
     }
 }
 
-impl<K, V> PartialEq for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: PartialEq + Clone,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.entries == other.entries
-    }
-}
-
-impl<K, V> Eq for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord + Eq,
-    V: PartialEq + Clone + Eq,
-{}
-
-impl<K, V> core::fmt::Debug for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord + core::fmt::Debug,
-    V: Clone + core::fmt::Debug,
-{
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_map().entries(self.iter()).finish()
-    }
-}
-
 impl<K, V> BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
