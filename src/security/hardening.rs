@@ -1,8 +1,24 @@
 /// Security Hardening & Cryptographic Intrusion Detection Suite for SigmaOS
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
+extern crate alloc;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::Vec;
+
+#[cfg(feature = "standalone_test")]
+use alloc::vec::Vec;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::Permission;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    FileRead = 0,
+    FileWrite = 1,
+    NetworkTcp = 2,
+}
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
@@ -104,7 +120,7 @@ impl HardenedAuditTrail {
 
         // Compute simple dynamic rolling hash chain: XOR elements with prime multi
         let entry_payload = pid ^ (perm as u64) ^ (if allowed { 1u64 } else { 0u64 });
-        let next_hash = (prev ^ entry_payload).wrapping_mul(1099511628211u64); // FNV-1a 64-bit prime
+        let next_hash = (prev ^ entry_payload).wrapping_mul(1099511628211_u64); // FNV-1a 64-bit prime
 
         let entry = AuditLogEntry {
             process_id: pid,
@@ -134,7 +150,7 @@ impl HardenedAuditTrail {
 
             let payload =
                 log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1u64 } else { 0u64 });
-            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211u64);
+            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211_u64);
 
             if log.entry_hash != calculated_hash {
                 return false; // Entry hash mismatch! Tampering detected!
