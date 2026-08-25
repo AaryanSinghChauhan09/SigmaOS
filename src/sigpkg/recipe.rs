@@ -52,6 +52,10 @@ pub struct PackageRecipe {
     pub active_use_flags: Vec<UseFlag>,
     pub compilation_profile: StageProfile,
     pub conditional_dependencies: Vec<(UseFlag, Dependency)>, // Dependency unlocked ONLY if USE flag is active
+
+    // Arch Linux compatibility fields
+    pub arch: String,
+    pub pkgrel: String,
 }
 
 impl PackageRecipe {
@@ -70,7 +74,19 @@ impl PackageRecipe {
             active_use_flags: Vec::new(),
             compilation_profile: StageProfile::Stage2Bootstrap,
             conditional_dependencies: Vec::new(),
+            arch: "x86_64".to_string(),
+            pkgrel: "1".to_string(),
         }
+    }
+
+    pub fn with_arch(mut self, arch: String) -> Self {
+        self.arch = arch;
+        self
+    }
+
+    pub fn with_pkgrel(mut self, pkgrel: String) -> Self {
+        self.pkgrel = pkgrel;
+        self
     }
 
     pub fn with_description(mut self, description: String) -> Self {

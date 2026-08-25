@@ -132,6 +132,17 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            unsafe {
+                self.len -= 1;
+                Some(core::ptr::read(self.data.add(self.len)))
+            }
+        }
+    }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
