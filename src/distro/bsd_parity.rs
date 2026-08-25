@@ -22,12 +22,12 @@ impl OpenBsdSecurity {
 
     /// Add pledge (restrict operations)
     pub fn add_pledge(&mut self, pledge: &str) {
-        self.pledges.push(String::from_str(pledge));
+        self.pledges.push(String::from(pledge));
     }
 
     /// Unveil path (restrict filesystem access)
     pub fn unveil(&mut self, path: &str, permissions: &str) {
-        let mut full_path = String::from_str(path);
+        let mut full_path = String::from(path);
         full_path.push(':');
         for c in permissions.chars() {
             full_path.push(c);
@@ -46,7 +46,7 @@ impl OpenBsdSecurity {
             return true;
         }
         
-        let op_str = String::from_str(operation);
+        let op_str = String::from(operation);
         for pledge in &self.pledges {
             if pledge.contains(&op_str) {
                 return true;
@@ -74,19 +74,19 @@ impl ZfsManager {
 
     /// Create ZFS pool
     pub fn create_pool(&mut self, pool_name: &str) -> bool {
-        self.pools.push(String::from_str(pool_name));
+        self.pools.push(String::from(pool_name));
         true
     }
 
     /// Create dataset
     pub fn create_dataset(&mut self, dataset_name: &str) -> bool {
-        self.datasets.push(String::from_str(dataset_name));
+        self.datasets.push(String::from(dataset_name));
         true
     }
 
     /// Create snapshot
     pub fn create_snapshot(&mut self, snapshot_name: &str) -> bool {
-        self.snapshots.push(String::from_str(snapshot_name));
+        self.snapshots.push(String::from(snapshot_name));
         true
     }
 
@@ -117,14 +117,14 @@ impl PortsManager {
 
     /// Install port from ports tree
     pub fn install_port(&mut self, port: &str) -> bool {
-        self.installed_ports.push(String::from_str(port));
+        self.installed_ports.push(String::from(port));
         true
     }
 
     /// Search for ports
     pub fn search_ports(&self, query: &str) -> Vec<String> {
         let mut results = Vec::new();
-        let search_str = String::from_str(query);
+        let search_str = String::from(query);
         for port in &self.installed_ports {
             if port.contains(&search_str) {
                 results.push(port.clone());
@@ -157,12 +157,12 @@ impl PfFirewall {
 
     /// Add firewall rule
     pub fn add_rule(&mut self, rule: &str) {
-        self.rules.push(String::from_str(rule));
+        self.rules.push(String::from(rule));
     }
 
     /// Add table
     pub fn add_table(&mut self, table: &str) {
-        self.tables.push(String::from_str(table));
+        self.tables.push(String::from(table));
     }
 
     /// Enable firewall
@@ -193,8 +193,8 @@ pub struct BsdJail {
 impl BsdJail {
     pub fn new(name: &str, ip: &str) -> Self {
         BsdJail {
-            jail_name: String::from_str(name),
-            ip_address: String::from_str(ip),
+            jail_name: String::from(name),
+            ip_address: String::from(ip),
             mounted: Cell::new(false),
             running: Cell::new(false),
         }

@@ -24,7 +24,7 @@ impl DebianPackageManager {
 
     /// Add repository to sources.list
     pub fn add_repository(&mut self, repo: &str) {
-        self.sources_list.push(String::from_str(repo));
+        self.sources_list.push(String::from(repo));
     }
 
     /// Update package cache (apt-get update equivalent)
@@ -34,13 +34,13 @@ impl DebianPackageManager {
 
     /// Install package (apt-get install equivalent)
     pub fn install_package(&mut self, package: &str) -> bool {
-        self.installed_packages.push(String::from_str(package));
+        self.installed_packages.push(String::from(package));
         true
     }
 
     /// Remove package (apt-get remove equivalent)
     pub fn remove_package(&mut self, package: &str) -> bool {
-        let package_str = String::from_str(package);
+        let package_str = String::from(package);
         for i in 0..self.installed_packages.len() {
             if self.installed_packages[i] == package_str {
                 self.installed_packages.remove(i);
@@ -54,7 +54,7 @@ impl DebianPackageManager {
     pub fn search_packages(&self, query: &str) -> Vec<String> {
         let mut results = Vec::new();
         // In real implementation, this would search package database
-        let search_str = String::from_str(query);
+        let search_str = String::from(query);
         for pkg in &self.installed_packages {
             if pkg.contains(&search_str) {
                 results.push(pkg.clone());
@@ -80,13 +80,13 @@ impl SnapPackageManager {
 
     /// Install snap package
     pub fn install_snap(&mut self, snap: &str) -> bool {
-        self.installed_snaps.push(String::from_str(snap));
+        self.installed_snaps.push(String::from(snap));
         true
     }
 
     /// Remove snap package
     pub fn remove_snap(&mut self, snap: &str) -> bool {
-        let snap_str = String::from_str(snap);
+        let snap_str = String::from(snap);
         for i in 0..self.installed_snaps.len() {
             if self.installed_snaps[i] == snap_str {
                 self.installed_snaps.remove(i);
@@ -138,15 +138,15 @@ impl DebianControl {
                     let value = parts[1].trim();
 
                     match field {
-                        "Package" => self.package = String::from_str(value),
-                        "Version" => self.version = String::from_str(value),
-                        "Architecture" => self.architecture = String::from_str(value),
-                        "Maintainer" => self.maintainer = String::from_str(value),
-                        "Description" => self.description = String::from_str(value),
+                        "Package" => self.package = String::from(value),
+                        "Version" => self.version = String::from(value),
+                        "Architecture" => self.architecture = String::from(value),
+                        "Maintainer" => self.maintainer = String::from(value),
+                        "Description" => self.description = String::from(value),
                         "Depends" => {
                             let deps: Vec<&str> = value.split(',').collect();
                             for dep in deps {
-                                self.depends.push(String::from_str(dep.trim()));
+                                self.depends.push(String::from(dep.trim()));
                             }
                         }
                         _ => {}
@@ -175,17 +175,17 @@ impl UbuntuDesktopIntegration {
 
     /// Add application to Unity launcher
     pub fn add_to_launcher(&mut self, app: &str) {
-        self.unity_launcher.push(String::from_str(app));
+        self.unity_launcher.push(String::from(app));
     }
 
     /// Install GNOME extension
     pub fn install_extension(&mut self, extension: &str) {
-        self.gnome_extensions.push(String::from_str(extension));
+        self.gnome_extensions.push(String::from(extension));
     }
 
     /// Create desktop file
     pub fn create_desktop_file(&mut self, filename: &str) {
-        self.desktop_files.push(String::from_str(filename));
+        self.desktop_files.push(String::from(filename));
     }
 }
 

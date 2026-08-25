@@ -5,6 +5,7 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::str::FromStr;
 #[derive(Debug, Clone)]
 pub struct JailConfig {
     pub name: String,

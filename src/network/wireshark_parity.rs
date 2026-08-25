@@ -16,7 +16,7 @@ pub struct PacketCapture {
 impl PacketCapture {
     pub fn new(interface: &str) -> Self {
         PacketCapture {
-            interface_name: String::from_str(interface),
+            interface_name: String::from(interface),
             capture_filter: String::new(),
             is_promiscuous: Cell::new(false),
             buffer_size: 65536,
@@ -36,7 +36,7 @@ impl PacketCapture {
 
     /// Set capture filter (BPF-like syntax)
     pub fn set_filter(&self, filter: &str) {
-        self.capture_filter = String::from_str(filter);
+        self.capture_filter = String::from(filter);
     }
 }
 
@@ -109,8 +109,8 @@ impl ProtocolDissector {
     /// Create network packet from raw data
     pub fn create_packet(&self, raw_data: &[u8]) -> WiresharkPacket {
         let timestamp = 0; // Would be actual timestamp in real implementation
-        let source_ip = String::from_str("0.0.0.0");
-        let dest_ip = String::from_str("0.0.0.0");
+        let source_ip = String::from("0.0.0.0");
+        let dest_ip = String::from("0.0.0.0");
         let source_port = 0;
         let dest_port = 0;
         let protocol = self.analyze_packet(raw_data).unwrap_or(ProtocolType::Unknown);

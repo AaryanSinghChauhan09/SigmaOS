@@ -24,7 +24,7 @@ impl DnfPackageManager {
 
     /// Add repository (dnf config-manager equivalent)
     pub fn add_repository(&mut self, repo: &str) {
-        self.repositories.push(String::from_str(repo));
+        self.repositories.push(String::from(repo));
     }
 
     /// Update package cache (dnf makecache equivalent)
@@ -34,13 +34,13 @@ impl DnfPackageManager {
 
     /// Install package (dnf install equivalent)
     pub fn install_package(&mut self, package: &str) -> bool {
-        self.installed_packages.push(String::from_str(package));
+        self.installed_packages.push(String::from(package));
         true
     }
 
     /// Remove package (dnf remove equivalent)
     pub fn remove_package(&mut self, package: &str) -> bool {
-        let package_str = String::from_str(package);
+        let package_str = String::from(package);
         for i in 0..self.installed_packages.len() {
             if self.installed_packages[i] == package_str {
                 self.installed_packages.remove(i);
@@ -53,7 +53,7 @@ impl DnfPackageManager {
     /// Search for packages (dnf search equivalent)
     pub fn search_packages(&self, query: &str) -> Vec<String> {
         let mut results = Vec::new();
-        let search_str = String::from_str(query);
+        let search_str = String::from(query);
         for pkg in &self.installed_packages {
             if pkg.contains(&search_str) {
                 results.push(pkg.clone());
@@ -121,7 +121,7 @@ impl SelinuxPolicy {
 
     /// Add policy rule
     pub fn add_rule(&mut self, rule: &str) {
-        self.policy_rules.push(String::from_str(rule));
+        self.policy_rules.push(String::from(rule));
     }
 
     /// Check if operation is allowed by policy
@@ -131,7 +131,7 @@ impl SelinuxPolicy {
         }
         
         // Simplified policy check
-        let op_str = String::from_str(operation);
+        let op_str = String::from(operation);
         for rule in &self.policy_rules {
             if rule.contains(&op_str) {
                 return true;
@@ -151,7 +151,7 @@ pub struct SystemdService {
 impl SystemdService {
     pub fn new(name: &str) -> Self {
         SystemdService {
-            service_name: String::from_str(name),
+            service_name: String::from(name),
             enabled: Cell::new(false),
             running: Cell::new(false),
         }
