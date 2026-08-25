@@ -9,7 +9,6 @@ use crate::klib::collections::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 use alloc::format;
-use std::collections::HashMap;
 
 #[cfg(test)]
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -209,12 +208,6 @@ impl VhostUserDevice {
 pub enum KvmExitReason {
     Unknown,
     Io,
-use alloc::collections::HashMap;
-use alloc::format;
-use std::collections::HashMap;
-    Mmio,
-    Hypercall,
-    Interrupt,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
     Mmio,

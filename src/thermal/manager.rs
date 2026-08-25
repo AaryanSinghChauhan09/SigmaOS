@@ -41,12 +41,14 @@ pub trait ThermalSensor {
     fn name(&self) -> &[u8];
     fn temperature(&self) -> i32;
     fn max_temperature(&self) -> i32;
+    fn set_temperature(&self, temp: i32);
 }
 
 #[repr(C)]
 pub struct SimpleThermalSensor {
     pub id: SensorID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub temperature: AtomicUsize,
     pub max_temperature: AtomicUsize,
 }
@@ -61,6 +63,7 @@ impl SimpleThermalSensor {
         SimpleThermalSensor {
             id,
             name: name_array,
+            name_len: name_len as u8,
             temperature: AtomicUsize::new(40),
             max_temperature: AtomicUsize::new(max_temperature as usize),
         }
@@ -70,11 +73,14 @@ impl SimpleThermalSensor {
 impl ThermalSensor for SimpleThermalSensor {
     fn id(&self) -> SensorID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // O(1) constant-time slice using cached byte length, replacing O(N) zero-byte linear scan
+        &self.name[..self.name_len as usize]
     }
     fn temperature(&self) -> i32 { self.temperature.load(Ordering::SeqCst) as i32 }
     fn max_temperature(&self) -> i32 { self.max_temperature.load(Ordering::SeqCst) as i32 }
+    fn set_temperature(&self, temp: i32) {
+        self.temperature.store(temp as usize, Ordering::SeqCst);
+    }
 }
 
 pub trait ThermalManager {
@@ -84,6 +90,7 @@ pub trait ThermalManager {
     fn get_thermal_state(&self) -> ThermalState;
     fn update_temperature(&mut self, id: SensorID, temperature: i32) -> Result<(), ThermalError>;
 }
+
 
 #[repr(C)]
 pub struct SimpleThermalManager {
@@ -154,9 +161,9 @@ impl ThermalManager for SimpleThermalManager {
 
     fn update_temperature(&mut self, id: SensorID, temperature: i32) -> Result<(), ThermalError> {
         for sensor_option in &mut self.sensors {
-            if let Some(ref mut sensor) = *sensor_option {
+            if let Some(ref sensor) = *sensor_option {
                 if sensor.id() == id {
-                    sensor.temperature.store(temperature as usize, Ordering::SeqCst);
+                    sensor.set_temperature(temperature);
                     return Ok(());
                 }
             }
@@ -266,5 +273,22 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_thermal_sensor() {
+        let sensor = SimpleThermalSensor::new(1, b"CPU Thermal Zone 0", 85);
+        assert_eq!(sensor.id(), 1);
+        assert_eq!(sensor.name(), b"CPU Thermal Zone 0");
+        assert_eq!(sensor.temperature(), 40);
+        assert_eq!(sensor.max_temperature(), 85);
+
+        sensor.set_temperature(65);
+        assert_eq!(sensor.temperature(), 65);
     }
 }
