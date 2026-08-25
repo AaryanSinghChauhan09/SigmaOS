@@ -297,3 +297,11 @@ mod tests {
         assert_eq!(items.len(), 3);
     }
 }
+
+impl<K: Clone + core::cmp::Ord, V: Clone> core::ops::Index<K> for BTreeMap<K, V> {
+    type Output = V;
+
+    fn index(&self, key: K) -> &Self::Output {
+        self.get(&key).expect("key not found in BTreeMap")
+    }
+}
