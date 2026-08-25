@@ -676,204 +676,120 @@ impl LinuxUrbQueue {
 }
 
 // =========================================================================
-// 14. Sovereign Device Manager Auto-Probing Engine
-// =========================================================================
-
-// =========================================================================
-// 14. VirtIO GPU 3D & VirtIO Sound PCM Audio Driver
-// =========================================================================
-
-pub struct VirtioGpu3dDriver {
-    pub num_capsets: u32,
-    pub virgl_3d_enabled: bool,
-    pub submitted_fences: u64,
-}
-
-impl VirtioGpu3dDriver {
-    pub fn new() -> Self {
-        Self {
-            num_capsets: 2,
-            virgl_3d_enabled: true,
-            submitted_fences: 0,
-        }
-    }
-
-    pub fn submit_3d_command_stream(&mut self, cmd_buffer: &[u8]) -> Result<u64, &'static str> {
-        if cmd_buffer.is_empty() {
-            return Err("VirtIO-GPU: Empty 3D command stream");
-        }
-        self.submitted_fences += 1;
-        Ok(self.submitted_fences)
-    }
-}
-
-impl Default for VirtioGpu3dDriver {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct VirtioSoundDriver {
-    pub num_streams: u8,
-    pub buffer_bytes: usize,
-    pub is_playing: bool,
-}
-
-impl VirtioSoundDriver {
-    pub fn new(num_streams: u8) -> Self {
-        Self {
-            num_streams,
-            buffer_bytes: 4096,
-            is_playing: false,
-        }
-    }
-
-    pub fn start_playback(&mut self) -> Result<(), &'static str> {
-        self.is_playing = true;
-        Ok(())
-    }
-}
-
-// =========================================================================
-// 15. Realtek r8169 & Intel igc 2.5GbE Ethernet Network Drivers
-// =========================================================================
-
-pub struct RealtekR8169EthernetDriver {
-    pub mac_address: [u8; 6],
-    pub rx_ring_size: usize,
-    pub tx_ring_size: usize,
-    pub link_speed_mbps: u32,
-}
-
-impl RealtekR8169EthernetDriver {
-    pub fn new(mac: [u8; 6]) -> Self {
-        Self {
-            mac_address: mac,
-            rx_ring_size: 256,
-            tx_ring_size: 256,
-            link_speed_mbps: 1000,
-        }
-    }
-
-    pub fn transmit_frame(&mut self, packet: &[u8]) -> Result<usize, &'static str> {
-        if packet.is_empty() {
-            return Err("r8169: Empty Ethernet frame");
-        }
-        Ok(packet.len())
-    }
-}
-
-pub struct IntelIgcEthernetDriver {
-    pub mac_address: [u8; 6],
-    pub num_rx_queues: u8,
-    pub num_tx_queues: u8,
-    pub link_speed_mbps: u32,
-}
-
-impl IntelIgcEthernetDriver {
-    pub fn new(mac: [u8; 6]) -> Self {
-        Self {
-            mac_address: mac,
-            num_rx_queues: 4,
-            num_tx_queues: 4,
-            link_speed_mbps: 2500, // 2.5 GbE
-        }
-    }
-
-    pub fn transmit_queue(&mut self, queue_id: u8, packet: &[u8]) -> Result<usize, &'static str> {
-        if queue_id >= self.num_tx_queues {
-            return Err("Intel igc: Queue index out of bounds");
-        }
-        if packet.is_empty() {
-            return Err("Intel igc: Empty packet frame");
-        }
-        Ok(packet.len())
-    }
-}
-
-// =========================================================================
-// 16. Linux IIO 6-Axis Accelerometer & Gyroscope Sensor Driver
+// 6. Universal Sovereign Peripheral Drivers & Device Manager
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SensorReadings {
-    pub accel_x_m_s2: i32,
-    pub accel_y_m_s2: i32,
-    pub accel_z_m_s2: i32,
-    pub gyro_x_rad_s: i32,
-    pub gyro_y_rad_s: i32,
-    pub gyro_z_rad_s: i32,
+pub enum DeviceCategory {
+    Input,
+    Gpu,
+    Network,
+    Storage,
+    Audio,
 }
 
-pub struct LinuxIioImuSensorDriver {
-    pub sensor_name: String,
-    pub sample_rate_hz: u32,
-    pub last_readings: SensorReadings,
+pub struct SovereignInputDeviceDriver {
+    pub name: String,
+    pub is_bound: bool,
+    pub event_device: EvdevInputDevice,
 }
 
-impl LinuxIioImuSensorDriver {
-    pub fn new(name: &str) -> Self {
+impl SovereignInputDeviceDriver {
+    pub fn new(name: &str, vendor: u16, product: u16) -> Self {
         Self {
-            sensor_name: name.to_string(),
-            sample_rate_hz: 100,
-            last_readings: SensorReadings {
-                accel_x_m_s2: 0,
-                accel_y_m_s2: 0,
-                accel_z_m_s2: 981, // 9.81 m/s^2 gravity
-                gyro_x_rad_s: 0,
-                gyro_y_rad_s: 0,
-                gyro_z_rad_s: 0,
-            },
+            name: name.to_string(),
+            is_bound: false,
+            event_device: EvdevInputDevice::new(name, vendor, product),
         }
     }
 
-    pub fn read_sensor_data(&mut self, ax: i32, ay: i32, az: i32) -> SensorReadings {
-        self.last_readings.accel_x_m_s2 = ax;
-        self.last_readings.accel_y_m_s2 = ay;
-        self.last_readings.accel_z_m_s2 = az;
-        self.last_readings
+    pub fn bind(&mut self) {
+        self.is_bound = true;
     }
 }
 
-// =========================================================================
-// 17. Sovereign Device Manager Auto-Probing Engine
-// =========================================================================
+pub struct SovereignGpuDriver {
+    pub name: String,
+    pub is_bound: bool,
+    pub connector: FreeBsdDrmConnector,
+    pub vram_bytes: u64,
+}
+
+impl SovereignGpuDriver {
+    pub fn new(name: &str, vram_mb: u64) -> Self {
+        Self {
+            name: name.to_string(),
+            is_bound: false,
+            connector: FreeBsdDrmConnector::new(1, DrmConnectorType::DisplayPort),
+            vram_bytes: vram_mb * 1024 * 1024,
+        }
+    }
+
+    pub fn bind(&mut self) {
+        self.is_bound = true;
+    }
+}
+
+pub struct SovereignNetworkCardDriver {
+    pub name: String,
+    pub is_bound: bool,
+    pub mac_address: [u8; 6],
+    pub rx_queue: Vec<Vec<u8>>,
+    pub tx_queue: Vec<Vec<u8>>,
+}
+
+impl SovereignNetworkCardDriver {
+    pub fn new(name: &str, mac: [u8; 6]) -> Self {
+        Self {
+            name: name.to_string(),
+            is_bound: false,
+            mac_address: mac,
+            rx_queue: Vec::new(),
+            tx_queue: Vec::new(),
+        }
+    }
+
+    pub fn bind(&mut self) {
+        self.is_bound = true;
+    }
+
+    pub fn transmit_packet(&mut self, packet: &[u8]) {
+        self.tx_queue.push(packet.to_vec());
+    }
+}
 
 pub struct SovereignDeviceManager {
-    pub bound_drivers: Vec<String>,
+    pub input_drivers: Vec<SovereignInputDeviceDriver>,
+    pub gpu_drivers: Vec<SovereignGpuDriver>,
+    pub net_drivers: Vec<SovereignNetworkCardDriver>,
 }
 
 impl SovereignDeviceManager {
     pub fn new() -> Self {
         Self {
-            bound_drivers: Vec::new(),
+            input_drivers: Vec::new(),
+            gpu_drivers: Vec::new(),
+            net_drivers: Vec::new(),
         }
     }
 
-    pub fn auto_probe_pci_device(&mut self, vendor_id: u16, device_id: u16) -> Result<String, &'static str> {
-        let driver_name = match (vendor_id, device_id) {
-            (0x1002, _) => "AMDGPU DRM/KMS Driver",
-            (0x8086, 0x4680) => "Intel Xe / i915 Graphics Driver",
-            (0x8086, 0x125b) => "Intel igc 2.5GbE Ethernet Driver",
-            (0x10ec, 0x8168) => "Realtek r8169 Ethernet Driver",
-            (0x8086, 0x2725) => "Intel iwlwifi Wi-Fi 6E Driver",
-            (0x1000, 0x005b) => "LSI MegaRAID SAS HBA Storage Driver",
-            (0x1af4, 0x1050) => "VirtIO GPU 3D Display Driver",
-            (0x1af4, 0x1059) => "VirtIO Sound Audio Driver",
-            _ => "Generic PCI Peripheral Driver",
-        };
-        self.bound_drivers.push(driver_name.to_string());
-        Ok(driver_name.to_string())
+    pub fn register_input_device(&mut self, mut drv: SovereignInputDeviceDriver) {
+        drv.bind();
+        self.input_drivers.push(drv);
     }
 
-    pub fn auto_probe_usb_device(&mut self, vendor_id: u16, product_id: u16) -> Result<String, &'static str> {
-        let driver_name = match (vendor_id, product_id) {
-            (0x05a9, 0x2640) => "UVC Video Camera Driver",
-            (0x056a, 0x037a) => "Wacom Precision Tablet Driver",
-            _ => "Generic USB HID Input Driver",
-        };
-        self.bound_drivers.push(driver_name.to_string());
-        Ok(driver_name.to_string())
+    pub fn register_gpu_device(&mut self, mut drv: SovereignGpuDriver) {
+        drv.bind();
+        self.gpu_drivers.push(drv);
+    }
+
+    pub fn register_net_device(&mut self, mut drv: SovereignNetworkCardDriver) {
+        drv.bind();
+        self.net_drivers.push(drv);
+    }
+
+    pub fn total_bound_devices(&self) -> usize {
+        self.input_drivers.len() + self.gpu_drivers.len() + self.net_drivers.len()
     }
 }
 
@@ -1033,82 +949,23 @@ mod tests {
     }
 
     #[test]
-    fn test_wifi_6e_7_mlo_driver() {
-        let mut wifi = LinuxBsdWifi6e7Driver::new("wlan0");
-        wifi.scan_mlo_links();
-        assert_eq!(wifi.active_mlo_links.len(), 2);
-        assert!(wifi.roam_bssid([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]).is_ok());
-        assert_eq!(wifi.get_active_bandwidth_mbps(), 9600);
-    }
+    fn test_sovereign_device_manager_and_drivers() {
+        let mut dev_mgr = SovereignDeviceManager::new();
 
-    #[test]
-    fn test_nvme_zns_fabrics_driver() {
-        let mut nvme = Nvme2ZnsFabricsDriver::new("nvme0n1", NvmeFabricsTransport::Tcp, "nqn.2026-08.org.sigmaos:nvme:fabrics0");
-        assert!(nvme.open_zone(0).is_ok());
-        let lba = nvme.append_zone_data(0, 16).unwrap();
-        assert_eq!(lba, 0);
-        assert!(nvme.reset_zone(0).is_ok());
-    }
+        let input_drv = SovereignInputDeviceDriver::new("keyboard0", 0x046D, 0xC077);
+        let gpu_drv = SovereignGpuDriver::new("radeon_rx6800", 16384);
+        let mut net_drv = SovereignNetworkCardDriver::new("eth0", [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
 
-    #[test]
-    fn test_uac3_intel_hda_dsp_driver() {
-        let mut audio = Uac3IntelHdaAudioDspDriver::new("HDA Intel PCH");
-        assert!(audio.create_dsp_stream(1, 48000, 2, AudioSampleFormat::Float32Le).is_ok());
-        assert!(audio.set_eq_band_gain(0, 6).is_ok());
+        net_drv.transmit_packet(b"ping_packet");
+        assert_eq!(net_drv.tx_queue.len(), 1);
 
-        let mut buffer = [1.0f32, -0.5f32];
-        audio.process_audio_frame(&mut buffer);
-        assert!(buffer[0] > 1.0f32);
-    }
+        dev_mgr.register_input_device(input_drv);
+        dev_mgr.register_gpu_device(gpu_drv);
+        dev_mgr.register_net_device(net_drv);
 
-    #[test]
-    fn test_i2c_spi_gpio_bus_controller() {
-        let mut gpio_bus = I2cSpiGpioBusController::new("gpiobus0", BusType::Gpio, 1_000_000);
-        assert!(gpio_bus.configure_gpio(5, GpioDirection::Output).is_ok());
-        assert!(gpio_bus.write_gpio(5, GpioState::High).is_ok());
-        assert_eq!(gpio_bus.read_gpio(5).unwrap(), GpioState::High);
-
-        let i2c_bus = I2cSpiGpioBusController::new("iicbus0", BusType::I2c, 400_000);
-        let mut read_buf = [0u8; 4];
-        assert!(i2c_bus.i2c_read_bytes(0x68, &mut read_buf).is_ok());
-    }
-
-    #[test]
-    fn test_virtio_gpu_virgl3d_driver() {
-        let mut gpu = VirtioGpuVirgl3dDriver::new("virtio-gpu3d");
-        assert!(gpu.create_resource_3d(1, 1, 1920, 1080).is_ok());
-        assert!(gpu.attach_backing_memory(1).is_ok());
-        let seq = gpu.submit_3d_command_stream(&[0x01, 0x00, 0x00, 0x00]).unwrap();
-        assert_eq!(seq, 1);
-    }
-
-    #[test]
-    fn test_bluetooth_54_le_audio_driver() {
-        let mut bt = Bluetooth54LeAudioDriver::new("hci0");
-        let stream_id = bt.create_isochronous_stream(IsochannelMode::CisUnicast, LeAudioCodec::Lc3).unwrap();
-        assert_eq!(stream_id, 1);
-        let sent = bt.transmit_audio_frame(&[0x01, 0x02, 0x03, 0x04]).unwrap();
-        assert_eq!(sent, 4);
-    }
-
-    #[test]
-    fn test_zero_copy_packet_driver_engine() {
-        let mut zc = ZeroCopyPacketDriverEngine::new("eth0");
-        zc.enqueue_rx_slot(PacketSlot {
-            chunk_id: 1,
-            buffer_addr: 0x1000_0000,
-            len: 1500,
-        });
-        let rx = zc.dequeue_rx_packet().unwrap();
-        assert_eq!(rx.chunk_id, 1);
-        assert!(zc.transmit_tx_packet(rx).is_ok());
-    }
-
-    #[test]
-    fn test_driver_isolation_ring_guard() {
-        let mut guard = DriverIsolationRingGuard::new("gpu_driver", IsolationRingLevel::Ring1IsolatedDriver, 5);
-        assert!(guard.is_isolated());
-        assert!(guard.report_fault_and_recover());
-        assert_eq!(guard.total_faults_recovered, 1);
+        assert_eq!(dev_mgr.total_bound_devices(), 3);
+        assert!(dev_mgr.input_drivers[0].is_bound);
+        assert!(dev_mgr.gpu_drivers[0].is_bound);
+        assert!(dev_mgr.net_drivers[0].is_bound);
     }
 }

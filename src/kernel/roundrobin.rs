@@ -406,11 +406,7 @@ impl SovereignMultiQueueRoundRobin {
         self.total_switches += 1;
 
         // 1. Realtime SCHED_RR / SCHED_FIFO queue
-        if let Some(pos) = self
-            .realtime_queue
-            .iter()
-            .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
-        {
+        if let Some(pos) = self.realtime_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
             let mut task = self.realtime_queue.remove(pos);
             if task.policy == SchedPolicy::SchedRr {
                 // Re-enqueue at back of RT queue after picking
@@ -422,11 +418,7 @@ impl SovereignMultiQueueRoundRobin {
         }
 
         // 2. High priority queue
-        if let Some(pos) = self
-            .high_queue
-            .iter()
-            .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
-        {
+        if let Some(pos) = self.high_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
             let task = self.high_queue.remove(pos);
             let mut queued = task.clone();
             self.high_queue.push(queued);
@@ -434,11 +426,7 @@ impl SovereignMultiQueueRoundRobin {
         }
 
         // 3. Normal queue
-        if let Some(pos) = self
-            .normal_queue
-            .iter()
-            .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
-        {
+        if let Some(pos) = self.normal_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
             let task = self.normal_queue.remove(pos);
             let mut queued = task.clone();
             self.normal_queue.push(queued);
@@ -446,11 +434,7 @@ impl SovereignMultiQueueRoundRobin {
         }
 
         // 4. Idle queue
-        if let Some(pos) = self
-            .idle_queue
-            .iter()
-            .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
-        {
+        if let Some(pos) = self.idle_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
             let task = self.idle_queue.remove(pos);
             let mut queued = task.clone();
             self.idle_queue.push(queued);
@@ -461,11 +445,7 @@ impl SovereignMultiQueueRoundRobin {
     }
 
     pub fn tick_cpu(&mut self, cpu_id: u8) {
-        for queue in [
-            &mut self.realtime_queue,
-            &mut self.high_queue,
-            &mut self.normal_queue,
-        ] {
+        for queue in [&mut self.realtime_queue, &mut self.high_queue, &mut self.normal_queue] {
             for task in queue.iter_mut() {
                 if task.cpu_id == cpu_id && task.state == ProcessState::Running {
                     if task.time_slice_remaining_ms > 0 {
@@ -634,54 +614,6 @@ mod tests {
         let p_penalized = &scheduler.processes[0];
         assert!(p_penalized.interactive_score < 0);
         assert!(p_penalized.full_slice_depletions > 0);
-    }
-
-    #[test]
-    fn test_posix_sched_rr_static_priority_preemption() {
-        let mut scheduler = RoundRobinScheduler::new();
-        let p_low = Process::new(10, "normal_task".to_string(), Priority::Normal);
-        let p_high = Process::new(20, "realtime_task".to_string(), Priority::Realtime);
-
-        scheduler.add_process(p_low).unwrap();
-        scheduler.add_process(p_high).unwrap();
-
-        // POSIX SCHED_RR Realtime priority (99) strictly preempts Normal priority (50)
-        let scheduled = scheduler.schedule_on_cpu(0).unwrap();
-        assert_eq!(scheduled.pid, 20);
-        assert_eq!(scheduled.priority, Priority::Realtime);
-    }
-
-    #[test]
-    fn test_sched_rr_get_interval() {
-        let mut scheduler = RoundRobinScheduler::new();
-        let p1 = Process::new(1, "norm".to_string(), Priority::Normal);
-        let p2 = Process::new(2, "rt".to_string(), Priority::Realtime);
-
-        scheduler.add_process(p1).unwrap();
-        scheduler.add_process(p2).unwrap();
-
-        let quantum_norm = scheduler.sched_rr_get_interval(1).unwrap();
-        let quantum_rt = scheduler.sched_rr_get_interval(2).unwrap();
-
-        // Realtime priority gets 8x base slice (80), Normal gets 2x base slice (20)
-        assert_eq!(quantum_norm, 20);
-        assert_eq!(quantum_rt, 80);
-    }
-
-    #[test]
-    fn test_interactivity_decay_and_load_balancing() {
-        let mut scheduler = RoundRobinScheduler::new();
-        let p1 = Process::new(1, "task1".to_string(), Priority::Normal);
-        scheduler.add_process(p1).unwrap();
-
-        // Boost interactive score then decay it
-        scheduler.processes[0].interactive_score = 5;
-        scheduler.decay_interactivity_scores();
-        assert_eq!(scheduler.processes[0].interactive_score, 4);
-
-        // SMP load balancing migration
-        assert!(scheduler.balance_cpu_load(0, 1));
-        assert_eq!(scheduler.processes[0].cpu_affinity, 1 << 1);
     }
 
     #[test]

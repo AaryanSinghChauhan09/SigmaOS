@@ -239,59 +239,20 @@ mod tests {
         base: KObject,
     }
 
-    impl MockDriver {
-        fn new() -> Self {
-            Self {
-                base: crate::kernel::object::KObject::new("mock_driver"),
-                owner: None,
-                debug_level: "3".to_string(),
-            }
-        }
-    }
-
     impl KernelObject for MockDriver {
-        fn name(&self) -> &str {
-            self.base.name()
-        }
-        fn set_name(&mut self, name: &str) {
-            self.base.set_name(name);
-        }
-        fn parent(&self) -> Option<&dyn KernelObject> {
-            self.base.parent()
-        }
-        fn set_parent(&mut self, parent: Option<&dyn KernelObject>) {
-            self.base.set_parent(parent);
-        }
-        fn children(&self) -> Vec<&dyn KernelObject> {
-            self.base.children()
-        }
-        fn add_child(&mut self, child: &dyn KernelObject) {
-            self.base.add_child(child);
-        }
-        fn remove_child(
-            &mut self,
-            child_name: &str,
-        ) -> Option<alloc::boxed::Box<dyn KernelObject>> {
-            self.base.remove_child(child_name)
-        }
-        fn kref(&self) -> &KRef {
-            self.base.kref()
-        }
-        fn as_any(&self) -> &dyn core::any::Any {
-            self
-        }
-        fn as_any_mut(&mut self) -> &mut dyn core::any::Any {
-            self
-        }
-        fn sysfs_attrs(&self) -> Vec<&str> {
-            self.base.sysfs_attrs()
-        }
-        fn sysfs_show(&self, attr: &str) -> Option<String> {
-            self.base.sysfs_show(attr)
-        }
-        fn sysfs_store(&mut self, attr: &str, value: &str) -> Result<(), ObjectError> {
-            self.base.sysfs_store(attr, value)
-        }
+        fn name(&self) -> &str { self.base.name() }
+        fn set_name(&mut self, name: &str) { self.base.set_name(name); }
+        fn parent(&self) -> Option<&dyn KernelObject> { self.base.parent() }
+        fn set_parent(&mut self, parent: Option<&dyn KernelObject>) { self.base.set_parent(parent); }
+        fn children(&self) -> Vec<&dyn KernelObject> { self.base.children() }
+        fn add_child(&mut self, child: &dyn KernelObject) { self.base.add_child(child); }
+        fn remove_child(&mut self, child_name: &str) -> Option<alloc::boxed::Box<dyn KernelObject>> { self.base.remove_child(child_name) }
+        fn kref(&self) -> &KRef { self.base.kref() }
+        fn as_any(&self) -> &dyn core::any::Any { self }
+        fn as_any_mut(&mut self) -> &mut dyn core::any::Any { self }
+        fn sysfs_attrs(&self) -> Vec<&str> { self.base.sysfs_attrs() }
+        fn sysfs_show(&self, attr: &str) -> Option<String> { self.base.sysfs_show(attr) }
+        fn sysfs_store(&mut self, attr: &str, value: &str) -> Result<(), ObjectError> { self.base.sysfs_store(attr, value) }
     }
 
     impl Driver for MockDriver {

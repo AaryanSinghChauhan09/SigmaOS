@@ -90,9 +90,11 @@ pub mod tiny_core;
 pub mod wasm_sandbox;
 
 pub use gap_closure::{
-    AiTaskOrchestrator, BuildLedgerSystem, DriverRepositoryManager, FirmwareBridgeManager,
-    HidGraphicsDriver, KernelModuleManager, NetworkStackGateway, PeripheralEmulationLibrary,
-    SecurityPolicyManager, SyscallCompatibilityRegistry, VirtualMemoryManager,
+    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
+    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
+    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
+    HidGraphicsDriver, AiTaskOrchestrator, SovereignDistroAbsorptionEngine,
+    OpenSourceCompetitorOrchestrator, TargetDistroFamily,
 };
 pub use superiority::{
     LockFreeQueue, NumaCfsScheduler, ShardIgnitor, SovereignCloudFS, SovereignForensics,

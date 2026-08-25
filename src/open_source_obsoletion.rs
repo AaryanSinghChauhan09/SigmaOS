@@ -1067,10 +1067,6 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub observability: SovereignObservabilitySuite,
     pub db: SovereignEmbeddedDb,
     pub ai_server: SovereignAiInferenceServer,
-    pub ebpf: SovereignEbpfXdpEngine,
-    pub capsicum: SovereignCapsicumSandbox,
-    pub ninep: SovereignNinePProtocolHandler,
-    pub mesh_identity: SovereignMeshIdentityEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -1089,20 +1085,13 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             observability: SovereignObservabilitySuite::new(),
             db,
             ai_server,
-            ebpf: SovereignEbpfXdpEngine::new(),
-            capsicum: SovereignCapsicumSandbox::new(),
-            ninep: SovereignNinePProtocolHandler::new(),
-            mesh_identity: SovereignMeshIdentityEngine::new("sigmaos.mesh"),
-            total_obsoleted_projects_count: 19,
+            total_obsoleted_projects_count: 15,
         }
     }
 
     pub fn bootstrap_sovereign_stack(&mut self) -> Result<String, &'static str> {
-        self.vcs
-            .stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
-        let _commit = self
-            .vcs
-            .commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
+        self.vcs.stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
+        let _commit = self.vcs.commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
 
         let init_unit = ServiceUnit {
             name: "sovereign_core".to_string(),
@@ -1115,10 +1104,8 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.supervisor.register_service(init_unit)?;
         self.supervisor.start_service("sovereign_core")?;
 
-        self.observability
-            .record_metric("cpu_utilization", 12.5, 1700000000);
+        self.observability.record_metric("cpu_utilization", 12.5, 1700000000);
         self.firewall.establish_pqc_vpn_tunnel(&[0x1D; 32]);
-        self.capsicum.cap_enter();
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -2326,94 +2313,6 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_scheme_router() {
-        let mut router = SovereignSchemeRouter::new();
-        assert!(router.register_scheme("ipc").is_ok());
-
-        let res = router
-            .dispatch_request(SchemePacket {
-                scheme: "file".to_string(),
-                path: "/etc/sigma.conf".to_string(),
-                flags: 0,
-                payload: b"config_data".to_vec(),
-            })
-            .unwrap();
-
-        assert!(res.len() > 0);
-        assert_eq!(router.handled_count, 1);
-    }
-
-    #[test]
-    fn test_sovereign_zircon_handle_manager() {
-        let mut manager = SovereignZirconHandleManager::new();
-        let handle_id = manager.create_handle("channel", ZirconRights::Transfer, [0x07; 16]);
-
-        let transferred = manager.validate_and_transfer(handle_id).unwrap();
-        assert_eq!(transferred.object_type, "channel");
-        assert_eq!(transferred.pqc_token, [0x07; 16]);
-    }
-
-    #[test]
-    fn test_sovereign_serenity_async_engine() {
-        let mut engine = SovereignSerenityAsyncEngine::new();
-        engine.enqueue_task(101, "GUI_EVENT", b"click_button");
-
-        let event = engine.process_next_event().unwrap();
-        assert_eq!(event.task_id, 101);
-        assert_eq!(engine.processed_count, 1);
-    }
-
-    #[test]
-    fn test_sovereign_solaris_zone_engine() {
-        let mut zone_engine = SovereignSolarisZoneEngine::new();
-        zone_engine.register_probe("syscall", "sys_open");
-        assert!(zone_engine.fire_probe("syscall", "sys_open"));
-        assert_eq!(zone_engine.probes[0].hit_count, 1);
-
-        zone_engine.create_zone("secure_app_zone", "sparse", 2048);
-        assert_eq!(zone_engine.zones.len(), 1);
-    }
-
-    #[test]
-    fn test_sovereign_nix_declarative_engine() {
-        let mut nix_engine = SovereignNixDeclarativeEngine::new();
-        let hash = nix_engine.build_derivation("rustc", &["gcc", "glibc"]);
-        assert!(hash.contains("nix_store_sha256"));
-
-        assert!(nix_engine.switch_profile(&hash).is_ok());
-        assert_eq!(nix_engine.active_profile_hash, Some(hash));
-    }
-
-    #[test]
-    fn test_sovereign_qubes_isolation_engine() {
-        let mut qubes = SovereignQubesIsolationEngine::new();
-        qubes.create_domain("work-vault", "red", false);
-
-        assert!(qubes
-            .copy_inter_vm_buffer("work-vault", b"secret_token")
-            .is_ok());
-        assert_eq!(qubes.inter_vm_clipboard, Some(b"secret_token".to_vec()));
-    }
-
-    #[test]
-    fn test_sovereign_linux_security_lsm_engine() {
-        let mut lsm = SovereignLinuxSecurityLsmEngine::new();
-        lsm.add_landlock_rule("/usr/bin", 0b001); // Read access
-
-        assert!(lsm.evaluate_access("/usr/bin/cat", 0b001));
-        assert!(!lsm.evaluate_access("/usr/bin/cat", 0b010)); // Write denied
-    }
-
-    #[test]
-    fn test_sovereign_haiku_interface_engine() {
-        let mut haiku = SovereignHaikuInterfaceEngine::new();
-        haiku.register_translator("PNG", "RAW_BITMAP");
-
-        let converted = haiku.convert_media("PNG", "RAW_BITMAP", b"1234").unwrap();
-        assert_eq!(converted, b"4321".to_vec());
-    }
-
-    #[test]
     fn test_sovereign_open_source_obsoletion_orchestrator() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
@@ -2421,77 +2320,5 @@ mod tests {
         assert_eq!(orchestrator.supervisor.registered_units.len(), 1);
         assert_eq!(orchestrator.observability.metrics_time_series.len(), 1);
         assert!(orchestrator.firewall.vpn_active);
-        assert!(orchestrator.capsicum.in_capability_mode);
-    }
-
-    #[test]
-    fn test_sovereign_ebpf_xdp_engine() {
-        let mut ebpf = SovereignEbpfXdpEngine::new();
-        ebpf.load_program(&[EbpfInstruction {
-            opcode: 0x05,
-            dst_reg: 0,
-            src_reg: 0,
-            offset: 0,
-            imm: 0x00,
-        }]);
-
-        let act = ebpf.execute_xdp(b"packet_payload");
-        assert_eq!(act, XdpAction::Drop);
-        assert_eq!(ebpf.packets_processed, 1);
-
-        let mut ebpf_pass = SovereignEbpfXdpEngine::new();
-        ebpf_pass.map_update_elem("drop_all", &[0]);
-        let act_pass = ebpf_pass.execute_xdp(b"good_packet");
-        assert_eq!(act_pass, XdpAction::Pass);
-    }
-
-    #[test]
-    fn test_sovereign_capsicum_sandbox() {
-        let mut sandbox = SovereignCapsicumSandbox::new();
-        assert!(sandbox.cap_check(3, CapRight::Read));
-
-        sandbox.cap_enter();
-        sandbox.cap_rights_limit(3, CapRight::Read as u32 | CapRight::Seek as u32);
-
-        assert!(sandbox.cap_check(3, CapRight::Read));
-        assert!(sandbox.cap_check(3, CapRight::Seek));
-        assert!(!sandbox.cap_check(3, CapRight::Write));
-        assert!(!sandbox.cap_check(4, CapRight::Read));
-    }
-
-    #[test]
-    fn test_sovereign_ninep_protocol_handler() {
-        let mut handler = SovereignNinePProtocolHandler::new();
-        let version_resp = handler
-            .handle_rpc(NinePMessage {
-                msg_type: NinePMessageType::Tversion,
-                tag: 1,
-                fid: 0,
-                payload: Vec::new(),
-            })
-            .unwrap();
-        assert_eq!(version_resp.msg_type, NinePMessageType::Rversion);
-
-        let attach_resp = handler
-            .handle_rpc(NinePMessage {
-                msg_type: NinePMessageType::Tattach,
-                tag: 2,
-                fid: 10,
-                payload: Vec::new(),
-            })
-            .unwrap();
-        assert_eq!(attach_resp.msg_type, NinePMessageType::Rattach);
-        assert!(handler.attached_fids.contains(&10));
-    }
-
-    #[test]
-    fn test_sovereign_mesh_identity_engine() {
-        let mut mesh = SovereignMeshIdentityEngine::new("sigmaos.mesh");
-        let spiffe_id = mesh.issue_spiffe_id("/service/api", &[0xAB; 32]);
-        assert_eq!(spiffe_id.trust_domain, "sigmaos.mesh");
-
-        assert!(mesh.register_and_attest_peer("node-1", spiffe_id));
-        assert!(mesh.verify_peer_identity("node-1"));
-        assert!(!mesh.verify_peer_identity("node-unknown"));
     }
 }

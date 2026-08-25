@@ -300,12 +300,6 @@ impl Scheduler {
     }
 }
 
-impl Default for Scheduler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
     tasks: [Option<Task>; 64],

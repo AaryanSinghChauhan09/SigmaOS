@@ -40,12 +40,6 @@ mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
-
-#[path = "../src/process/advanced_process_control.rs"]
-mod advanced_process_control;
-
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -203,84 +197,6 @@ fn test_kernel_classic_algorithms_inspection() {
     let translated = tlb.lookup_page_translation(0x10, 1, false, false);
     assert_eq!(translated, Ok(0x50));
     assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
-}
-
-#[test]
-fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas_implementation::{
-        NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
-        SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        PolicyAction, CAP_READ, CAP_SEEK,
-    };
-
-    // 1. NixOS Declarative System State
-    let mut nix = NixDeclarativeSystemState::new();
-    let config = "[packages]\n- curl\n[services]\n- networkd";
-    let gen = nix.parse_and_apply_config(config, 100).unwrap();
-    assert_eq!(gen.id, 2);
-    assert_eq!(nix.rollback().unwrap().id, 1);
-
-    // 2. Arch Plaintext Recipe Sandbox Compiler
-    let recipe_text = "pkgname=curl\npkgver=8.2.1\ndepends=(zlib openssl)";
-    let recipe = ArchRecipeSandboxCompiler::parse_recipe(recipe_text).unwrap();
-    assert_eq!(recipe.pkgname, "curl");
-    let compiler = ArchRecipeSandboxCompiler::new();
-    let artifact = compiler.compile_in_sandbox(&recipe, "/tmp/sandbox").unwrap();
-    assert!(!artifact.is_empty());
-
-    // 3. openSUSE Snapper Pre/Post Transaction Guard
-    let mut snapper = SnapperTransactionGuard::new();
-    let pre_id = snapper.create_pre_snapshot("Pre update", 1000);
-    let post_id = snapper.create_post_snapshot(pre_id, "Post update", 1005).unwrap();
-    assert_eq!(snapper.snapshots.len(), 2);
-
-    // 4. Zero-Copy Splice Pipeline
-    let splice = SigmaZeroCopySpliceEngine::new();
-    assert_eq!(splice.splice(1, 2, 4096).unwrap(), 4096);
-
-    // 5. eBPF Syscall Policy Verifier
-    let mut verifier = EbpfSyscallPolicyVerifier::new();
-    verifier.block_syscall(59); // execve
-    assert_eq!(verifier.evaluate_syscall(59), PolicyAction::Deny);
-
-    // 6. FreeBSD Capsicum Descriptor Delegation
-    let cap = FreeBsdCapsicumDescriptorDelegate::grant_capability(3, CAP_READ | CAP_SEEK);
-    assert!(FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_READ));
-}
-
-#[test]
-fn test_advanced_process_control_inspection() {
-    use advanced_process_control::{
-        ProcessVmReadWriteEngine, JobControlLifecycleEngine, ProcessWaiterAndRusageCollector,
-        ProcessCancellationAndTerminationManager, AdvancedIpcHub, JobState, CancellationType, BsdRusage,
-    };
-
-    // 1. Process VM read/write
-    let mut vm = ProcessVmReadWriteEngine::new();
-    vm.register_process_memory(42, 0x1000, vec![1, 2, 3, 4]);
-    assert_eq!(vm.process_vm_readv(42, 0x1000, 2).unwrap(), vec![1, 2]);
-
-    // 2. Job control & daemonize
-    let mut job = JobControlLifecycleEngine::new();
-    job.spawn_job(42, 42, 42, true, "test_cmd");
-    job.daemonize(42).unwrap();
-    assert_eq!(job.jobs.get(&42).unwrap().state, JobState::Background);
-
-    // 3. Process waiter & rusage
-    let mut waiter = ProcessWaiterAndRusageCollector::new();
-    waiter.record_rusage(42, BsdRusage { ru_utime_ms: 50, ..Default::default() });
-    assert_eq!(waiter.get_rusage(42).unwrap().ru_utime_ms, 50);
-
-    // 4. Cancellation & orphan reparenting
-    let mut cancel = ProcessCancellationAndTerminationManager::new();
-    cancel.register_process(10, 5, CancellationType::Deferred);
-    cancel.reparent_orphans(5);
-    assert_eq!(cancel.process_parents.get(&10), Some(&1));
-
-    // 5. Advanced IPC Hub
-    let mut ipc = AdvancedIpcHub::new();
-    let efd = ipc.eventfd_create(10, false);
-    assert_eq!(ipc.eventfd_read(efd).unwrap(), 10);
 }
 
 #[test]

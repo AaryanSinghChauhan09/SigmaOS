@@ -53,6 +53,7 @@ echo -e "${CYAN}:: Running Sovereign Subsystems Inspection Unit Tests...${RESET}
 rustc --edition 2021 --test tests/sovereign_subsystems_inspection_tests.rs -o build/sovereign_subsystems_test
 ./build/sovereign_subsystems_test
 
+
 echo -e "${CYAN}:: Running Core OS & Component Algorithms Inspection Unit Tests...${RESET}"
 rustc --edition 2021 --test tests/os_algorithms_inspection_tests.rs -o build/os_algorithms_test
 ./build/os_algorithms_test
