@@ -1,4 +1,3 @@
-use crate::klib::HashMap;
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -21,6 +20,7 @@ use crate::klib::HashMap;
 // OOP-based AI system optimization with predictive modeling
 
 use crate::klib::BTreeMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// System state

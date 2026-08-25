@@ -38,6 +38,7 @@ pub mod uuid {
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::fmt;
 
 #[derive(Debug, Clone)]
 pub struct SigmaString {
@@ -97,12 +98,6 @@ impl SigmaString {
 impl Default for SigmaString {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl fmt::Display for SigmaString {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.data)
     }
 }
 

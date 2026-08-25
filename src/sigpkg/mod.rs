@@ -53,9 +53,8 @@ pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
 pub use transaction::Transaction;
-pub use universal_adapter::{
-    AptDebManifest, PackageAdapterTrait,
-};
+pub use crate::package::universal::PackageAdapterTrait;
+pub use universal_adapter::AptDebManifest;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer

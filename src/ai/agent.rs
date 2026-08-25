@@ -7,6 +7,7 @@ use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::collections::BTreeMap;
 
 /// Intent type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

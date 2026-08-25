@@ -6,22 +6,6 @@ use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ContainerCapability {
-    NetAdmin,
-    SysAdmin,
-    SysPtrace,
-    AuditWrite,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SeccompProfile {
-    Default,
-    Unconfined,
-    Custom,
-}
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
