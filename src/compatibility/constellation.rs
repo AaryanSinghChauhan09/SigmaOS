@@ -56,7 +56,7 @@ impl KernelConstellation {
     }
 
     pub fn get_node_for_workload(&self, workload: &str) -> Option<&ConstellationNode> {
-        self.active_nodes.get(workload)
+        self.active_nodes.get_str(workload)
     }
 }
 
@@ -168,7 +168,7 @@ impl DriverMuseum {
     }
 
     pub fn load_exhibit_driver(&self, name: &str) -> Option<&ExhibitType> {
-        self.exhibits.get(name)
+        self.exhibits.get_str(name)
     }
 }
 

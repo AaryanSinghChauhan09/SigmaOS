@@ -355,7 +355,7 @@ impl YayAurHelper {
         let version = crate::sigpkg::Version::new(1, 0, 0);
         let recipe = PackageRecipe::new(pkg_name.to_string(), version.clone())
             .with_arch(sandbox.target_arch.clone())
-            .with_pkgrel(1)
+            .with_pkgrel("1".to_string())
             .with_source(
                 "https://sigmahub.org/recipe".to_string(),
                 "hash_abc".to_string(),

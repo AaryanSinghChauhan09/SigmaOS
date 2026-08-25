@@ -75,12 +75,12 @@ impl NixStore {
 
     /// Install package to profile (nix-env -i)
     pub fn install(&mut self, package: &str, profile: &str) -> Result<(), NixError> {
-        if !self.packages.contains_key(package) {
+        if !self.packages.contains_key_str(package) {
             return Err(NixError::EvaluationError);
         }
 
-        let pkg = self.packages.get(package).unwrap();
-        if let Some(out_path) = pkg.outputs.get("out") {
+        let pkg = self.packages.get_str(package).unwrap();
+        if let Some(out_path) = pkg.outputs.get_str("out") {
             self.add_to_profile(profile, out_path);
         }
 

@@ -191,9 +191,9 @@ impl SigmaJailManager {
 
     /// Get jail information
     pub fn jail_info(&self, name: &str) -> Option<JailInfo> {
-        if let Some(jail) = self.jails.get(name) {
+        if let Some(jail) = self.jails.get_str(name) {
             Some(JailInfo {
-                name: name.clone(),
+                name: name.to_string(),
                 state: jail.state.clone(),
                 jid: jail.jid,
                 hostname: jail.config.hostname.clone(),
