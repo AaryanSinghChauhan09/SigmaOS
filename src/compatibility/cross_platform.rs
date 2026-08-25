@@ -1,3 +1,4 @@
+use crate::klib::HashMap;
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 

@@ -103,8 +103,13 @@ impl InitSystem {
     }
 
     pub fn start_service(&mut self, name: &str) -> Result<(), InitError> {
-        if let Some(service) = self.services.iter_mut().find(|s| s.name == name) {
+        if let Some(service) = self.services.iter().find(|s| s.name == name) {
             self.resolve_dependencies(service)?;
+        } else {
+            return Err(InitError::ServiceNotFound);
+        }
+
+        if let Some(service) = self.services.iter_mut().find(|s| s.name == name) {
             service.state = ServiceState::Running;
             service.enabled = true;
             Ok(())

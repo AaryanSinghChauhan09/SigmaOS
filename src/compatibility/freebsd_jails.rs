@@ -113,40 +113,50 @@ impl SigmaJailManager {
 
     /// Stop a jail
     pub fn stop_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get_mut(name) {
+        let (exec_stop, jid, config, processes) = if let Some(jail) = self.jails.get(name) {
             if jail.state != JailState::Running {
                 return Err(format!("Jail '{}' is not running", name).into());
             }
+            (
+                jail.config.exec_stop.clone(),
+                jail.jid,
+                jail.config.clone(),
+                jail.processes.clone(),
+            )
+        } else {
+            return Err(format!("Jail '{}' not found", name).into());
+        };
 
+        if let Some(jail) = self.jails.get_mut(name) {
             jail.state = JailState::Stopping;
+        }
 
-            // Execute stop script
-            if let Some(exec_stop) = &jail.config.exec_stop {
-                if let Some(jid) = jail.jid {
-                    let _ = self.execute_in_jail(jid, exec_stop);
-                }
+        // Execute stop script
+        if let Some(exec_stop) = &exec_stop {
+            if let Some(jid) = jid {
+                let _ = self.execute_in_jail(jid, exec_stop);
             }
+        }
 
-            // Kill all processes in jail
-            self.kill_jail_processes(jail)?;
+        // Kill all processes in jail
+        self.kill_jail_processes_by_pids(&processes)?;
 
-            // Unmount jail filesystem
-            self.unmount_jail_fs(&jail.config)?;
+        // Unmount jail filesystem
+        self.unmount_jail_fs(&config)?;
 
-            // Cleanup network
-            if let Some(jid) = jail.jid {
-                self.cleanup_jail_network(jid)?;
-            }
+        // Cleanup network
+        if let Some(jid) = jid {
+            self.cleanup_jail_network(jid)?;
+        }
 
+        if let Some(jail) = self.jails.get_mut(name) {
             jail.state = JailState::Stopped;
             jail.jid = None;
             jail.processes.clear();
-
-            println!("Jail '{}' stopped", name);
-            Ok(())
-        } else {
-            Err(format!("Jail '{}' not found", name).into())
         }
+
+        println!("Jail '{}' stopped", name);
+        Ok(())
     }
 
     /// Execute command in jail
@@ -412,9 +422,9 @@ impl SigmaJailManager {
         }
     }
 
-    fn kill_jail_processes(&self, jail: &Jail) -> Result<(), Box<dyn std::error::Error>> {
+    fn kill_jail_processes_by_pids(&self, processes: &[u32]) -> Result<(), Box<dyn std::error::Error>> {
         // Kill all processes in jail's process group
-        for pid in &jail.processes {
+        for pid in processes {
             let _ = Command::new("kill")
                 .arg("-TERM")
                 .arg(pid.to_string())
@@ -432,6 +442,10 @@ impl SigmaJailManager {
         }
 
         Ok(())
+    }
+
+    fn kill_jail_processes(&self, jail: &Jail) -> Result<(), Box<dyn std::error::Error>> {
+        self.kill_jail_processes_by_pids(&jail.processes)
     }
 
     fn unmount_jail_fs(&self, config: &JailConfig) -> Result<(), Box<dyn std::error::Error>> {

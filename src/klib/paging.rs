@@ -9,6 +9,20 @@ pub type VirtualAddress = usize;
 
 #[repr(C)]
 
+impl Clone for SimplePageTableEntry {
+    fn clone(&self) -> Self {
+        Self {
+            present: AtomicUsize::new(self.present.load(Ordering::SeqCst)),
+            writable: AtomicUsize::new(self.writable.load(Ordering::SeqCst)),
+            user_accessible: AtomicUsize::new(self.user_accessible.load(Ordering::SeqCst)),
+            physical_addr: AtomicUsize::new(self.physical_addr.load(Ordering::SeqCst)),
+            accessed: AtomicUsize::new(self.accessed.load(Ordering::SeqCst)),
+            dirty: AtomicUsize::new(self.dirty.load(Ordering::SeqCst)),
+            cow: AtomicUsize::new(self.cow.load(Ordering::SeqCst)),
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum PageTableLevel {
@@ -402,7 +416,6 @@ impl SimpleVMM {
                     let mut entry = pt.entries[pt_idx];
                     entry.set_writable(false);
                     entry.cow.store(1, Ordering::SeqCst);
-                    pt.entries[pt_idx] = entry;
                     return Ok(());
                 }
             }

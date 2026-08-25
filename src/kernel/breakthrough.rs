@@ -395,6 +395,7 @@ extern "C" {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::boxed::Box;
     use crate::init::sigma_init::{InitSystem, Service, ServiceState, SigmaInit, SimpleService};
 
     #[test]

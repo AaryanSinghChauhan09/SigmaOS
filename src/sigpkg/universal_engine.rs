@@ -4,6 +4,14 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap as HashMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::boxed::Box;
+use alloc::format;
+use core::option::Option::{self, Some, None};
+use core::result::Result::{self, Ok, Err};
+use core::default::Default;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {

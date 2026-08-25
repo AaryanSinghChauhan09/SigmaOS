@@ -54,7 +54,8 @@ impl PacmanDatabase {
     /// Refresh package databases (pacman -Sy)
     pub fn refresh_databases(&mut self) -> Result<(), String> {
         // Simulate database refresh
-        for db in &self.sync_databases {
+        let dbs = self.sync_databases.clone();
+        for db in &dbs {
             self.sync_database(db)?;
         }
         Ok(())
@@ -106,10 +107,13 @@ impl PacmanDatabase {
     /// Update system (pacman -Syu)
     pub fn update_system(&mut self) -> Result<(), String> {
         self.refresh_databases()?;
-        for pkg in &mut self.local_packages {
-            if let Some(updated) = self.find_package(&pkg.name) {
-                if updated.version != pkg.version {
-                    *pkg = updated;
+        let pkg_names: Vec<String> = self.local_packages.iter().map(|p| p.name.clone()).collect();
+        for name in pkg_names {
+            if let Some(updated) = self.find_package(&name) {
+                if let Some(pkg) = self.local_packages.iter_mut().find(|p| p.name == name) {
+                    if updated.version != pkg.version {
+                        *pkg = updated;
+                    }
                 }
             }
         }

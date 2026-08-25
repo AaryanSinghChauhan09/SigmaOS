@@ -181,3 +181,8 @@ pub use sovereign_suite::{
     CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
+
+pub use open_source_dominance::{
+    InspirationFeatureMatrix, InspirationFeatureNode, InspirationPackageIntegrator,
+    InspirationSecurityGuard, OpenSourceDominanceEngine, OpenSourceInspirationTier,
+};

@@ -360,7 +360,7 @@ impl Default for ModelMarketplace {
 }
 
 #[cfg(test)]
-mod tests {
+mod tests_agent_memory {
     use super::*;
 
     #[test]
