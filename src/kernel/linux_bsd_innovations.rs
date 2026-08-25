@@ -681,6 +681,93 @@ impl SovereignZonesManager {
     }
 }
 
+// ================= Sovereign Linux Cgroup v2 Governor =================
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct CgroupResourceLimits {
+    pub cpu_quota_us: u64,
+    pub cpu_period_us: u64,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u32,
+}
+
+pub struct CgroupGroup {
+    pub path: String,
+    pub limits: CgroupResourceLimits,
+    pub pids: Vec<u32>,
+    pub used_cpu_us: u64,
+    pub allocated_memory_bytes: u64,
+}
+
+pub struct SovereignCgroupGovernor {
+    pub groups: HashMap<String, CgroupGroup>,
+}
+
+impl Default for SovereignCgroupGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCgroupGovernor {
+    pub fn new() -> Self {
+        Self {
+            groups: HashMap::new(),
+        }
+    }
+
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        if self.groups.contains_key(path) {
+            return Err("Group already exists");
+        }
+        self.groups.insert(
+            path.to_string(),
+            CgroupGroup {
+                path: path.to_string(),
+                limits: CgroupResourceLimits::default(),
+                pids: Vec::new(),
+                used_cpu_us: 0,
+                allocated_memory_bytes: 0,
+            },
+        );
+        Ok(())
+    }
+
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+        let group = self.groups.get_mut(path).ok_or("Group not found")?;
+        group.limits = limits;
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u32) -> Result<(), &'static str> {
+        let group = self.groups.get_mut(path).ok_or("Group not found")?;
+        group.pids.push(pid);
+        Ok(())
+    }
+
+    pub fn check_cpu_budget(&mut self, path: &str, usage_us: u64) -> Result<bool, &'static str> {
+        let group = self.groups.get_mut(path).ok_or("Group not found")?;
+        if group.used_cpu_us + usage_us <= group.limits.cpu_quota_us {
+            group.used_cpu_us += usage_us;
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
+    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
+        let group = self.groups.get_mut(path).ok_or("Group not found")?;
+        if group.allocated_memory_bytes + bytes <= group.limits.memory_max_bytes {
+            group.allocated_memory_bytes += bytes;
+            Ok(())
+        } else {
+            Err("Memory quota exceeded")
+        }
+    }
+}
+
 // ================= Windows KMDF Driver Framework Parity =================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
