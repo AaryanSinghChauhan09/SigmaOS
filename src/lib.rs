@@ -260,3 +260,8 @@ pub use tools::{
 
 pub mod open_source_obsoletion;
 pub use open_source_obsoletion::*;
+
+pub use unimplemented_features::{
+    KaliAnonsurfTrafficShunt, GhostBsdSysadmBridge, PopOsSystem76PowerManager, System76GpuMode,
+    ClearLinuxStatelessOverlayManager, KeylimeTpmAttestationEngine,
+};
