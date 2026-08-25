@@ -3,6 +3,7 @@
 pub mod driver;
 pub mod podcast;
 pub mod pipewire;
+pub mod editor;
 
 pub use editor::{
     AmplifyEffect, AudioEditor, AudioEffect, AudioTrack as EditorAudioTrack,
