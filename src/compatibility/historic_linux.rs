@@ -218,7 +218,7 @@ impl VintageDriverTranslator {
     pub fn emulate_io_port(&mut self, port: u16, val: u8) -> Result<(), HistoricError> {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
-            self.wrapper.simulated_pci_bar = val as u32;
+            self.wrapper.simulated_pci_bar[0] = val;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)

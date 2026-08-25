@@ -2,6 +2,9 @@
 //! This module provides no_std alternatives to std::fs
 
 use core::arch::asm;
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::ffi::c_char;
 use core::fmt;
 
@@ -353,132 +356,232 @@ const O_APPEND: u32 = 0o002000;
 // Syscall functions (platform-specific)
 #[inline(always)]
 unsafe fn syscall_open(path: *const u8, flags: u32, mode: u32) -> i32 {
-    let mut ret: i32;
-    asm!(
-        "syscall",
-        inlateout("rax") 2i32 => ret,
-        in("rdi") path,
-        in("rsi") flags as i32,
-        in("rdx") mode as i32,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: i32;
+        core::arch::asm!(
+            "syscall",
+            inout("eax") 2i32 => ret,
+            in("rdi") path,
+            in("rsi") flags,
+            in("rdx") mode,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = (path, flags, mode);
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_read(fd: RawFd, buf: *mut u8, count: usize) -> isize {
-    let mut ret: isize;
-    asm!(
-        "syscall",
-        inlateout("rax") 0isize => ret,
-        in("rdi") fd,
-        in("rsi") buf,
-        in("rdx") count,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: isize;
+        core::arch::asm!(
+            "syscall",
+            inout("rax") 0isize => ret,
+            in("rdi") fd,
+            in("rsi") buf,
+            in("rdx") count,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = (fd, buf, count);
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_write(fd: RawFd, buf: *const u8, count: usize) -> isize {
-    let mut ret: isize;
-    asm!(
-        "syscall",
-        inlateout("rax") 1isize => ret,
-        in("rdi") fd,
-        in("rsi") buf,
-        in("rdx") count,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: isize;
+        core::arch::asm!(
+            "syscall",
+            inout("rax") 1isize => ret,
+            in("rdi") fd,
+            in("rsi") buf,
+            in("rdx") count,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = (fd, buf, count);
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_lseek(fd: RawFd, offset: i64, whence: i32) -> i64 {
-    let mut ret: i64;
-    asm!(
-        "syscall",
-        inlateout("rax") 8isize => ret,
-        in("rdi") fd,
-        in("rsi") offset,
-        in("rdx") whence,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: i64;
+        core::arch::asm!(
+            "syscall",
+            inout("rax") 8isize => ret,
+            in("rdi") fd,
+            in("rsi") offset,
+            in("rdx") whence,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = (fd, offset, whence);
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_fsync(fd: RawFd) -> i32 {
-    let mut ret: i32;
-    asm!(
-        "syscall",
-        inlateout("rax") 74i32 => ret,
-        in("rdi") fd,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: i32;
+        core::arch::asm!(
+            "syscall",
+            inout("eax") 74i32 => ret,
+            in("rdi") fd,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = fd;
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_close(fd: RawFd) -> i32 {
-    let mut ret: i32;
-    asm!(
-        "syscall",
-        inlateout("rax") 3i32 => ret,
-        in("rdi") fd,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: i32;
+        core::arch::asm!(
+            "syscall",
+            inout("eax") 3i32 => ret,
+            in("rdi") fd,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = fd;
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_fstat(fd: RawFd, stat: *mut Stat) -> i32 {
-    let mut ret: i32;
-    asm!(
-        "syscall",
-        inlateout("rax") 5i32 => ret,
-        in("rdi") fd,
-        in("rsi") stat,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: i32;
+        core::arch::asm!(
+            "syscall",
+            inout("eax") 5i32 => ret,
+            in("rdi") fd,
+            in("rsi") stat,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = (fd, stat);
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_opendir(path: *const u8) -> i32 {
-    let mut ret: i32;
-    asm!(
-        "syscall",
-        inlateout("rax") 78i32 => ret,
-        in("rdi") path,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: i32;
+        core::arch::asm!(
+            "syscall",
+            inout("eax") 78i32 => ret,
+            in("rdi") path,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = path;
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_readdir(fd: RawFd, entry: *mut DirEntryRaw) -> i32 {
-    let mut ret: i32;
-    asm!(
-        "syscall",
-        inlateout("rax") 79i32 => ret,
-        in("rdi") fd,
-        in("rsi") entry,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: i32;
+        core::arch::asm!(
+            "syscall",
+            inout("eax") 79i32 => ret,
+            in("rdi") fd,
+            in("rsi") entry,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = (fd, entry);
+        -1
+    }
 }
 
 #[inline(always)]
 unsafe fn syscall_closedir(fd: RawFd) -> i32 {
-    let mut ret: i32;
-    asm!(
-        "syscall",
-        inlateout("rax") 80i32 => ret,
-        in("rdi") fd,
-        clobber_abi("system")
-    );
-    ret
+    #[cfg(target_arch = "x86_64")]
+    {
+        let ret: i32;
+        core::arch::asm!(
+            "syscall",
+            inout("eax") 80i32 => ret,
+            in("rdi") fd,
+            out("rcx") _,
+            out("r11") _,
+            options(nostack, preserves_flags)
+        );
+        ret
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = fd;
+        -1
+    }
 }
 
 #[cfg(test)]

@@ -478,33 +478,23 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        let pt_idx_in_vec = pd_idx_in_vec * 512 + pd_idx;
-        let pd_table_mut: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
-        let pd_present = if let Some(ref mut pd) = pd_table_mut {
-            pd.get_entry(pd_idx).is_present()
-        } else {
-            false
-        };
+        if self.pt_tables[pt_idx_in_vec].is_none() {
+            let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+            let mut pt_entry = SimplePageTableEntry::new();
+            pt_entry.set_present(true);
+            pt_entry.set_writable(true);
+            pt_entry.set_user_accessible(false);
+            pt_entry.set_physical_address(pt_phys);
 
-        if !pd_present {
-            if let Some(ref mut pd) = pd_table_mut {
-                let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
-                let mut pt_entry = SimplePageTableEntry::new();
-                pt_entry.set_present(true);
-                pt_entry.set_writable(true);
-                pt_entry.set_user_accessible(false);
-                pt_entry.set_physical_address(pt_phys);
+            let pt_table = SimplePageTable::new(pt_phys);
+            self.pt_tables[pt_idx_in_vec] = Some(pt_table);
 
-                let pt_table = SimplePageTable::new(pt_phys);
-                while self.pt_tables.len() <= pt_idx_in_vec {
-                    self.pt_tables.push(None);
-                }
-                self.pt_tables[pt_idx_in_vec] = Some(pt_table);
+            if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
                 pd.set_entry(pd_idx, pt_entry);
             }
         }
 
-        if let Some(ref mut pt) = self.pt_tables[pd_idx] {
+        if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
             pt_entry.set_writable(writable);

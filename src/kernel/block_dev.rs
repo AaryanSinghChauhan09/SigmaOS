@@ -27,6 +27,8 @@ use crate::klib::{BTreeMap, Vec};
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 use alloc::collections::{BTreeMap, VecDeque};
+extern crate alloc;
+use crate::klib::{BTreeMap, Vec, VecDeque};
 use alloc::string::String;
 use alloc::vec::Vec;
 

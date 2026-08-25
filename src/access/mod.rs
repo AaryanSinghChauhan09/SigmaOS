@@ -18,6 +18,7 @@ pub use control::{
     MacAddressFilter, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
 pub use control::*;
 pub use append_rights::*;
+pub use crate::filesystem::ext4_ntfs_security::*;
 
 extern crate alloc;
 use alloc::boxed::Box;

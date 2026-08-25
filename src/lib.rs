@@ -34,7 +34,13 @@ pub mod sigpkg;
 pub mod storage;
 pub mod thread;
 pub mod process;
-pub mod runtime;
+pub use process::{
+    ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
+    JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
+    ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
+    ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
+    SigQueuePayload, AdvancedIpcHub,
+};
 pub mod community;
 pub mod memory;
 pub mod tools;
@@ -184,10 +190,21 @@ pub use kernel::{
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
-pub use kernel::{
     BuddyAllocator, Channel, CompletionQueueEntry, IoUringEngine, IoUringOpcode, IpcError,
     IpcManager, MemoryBlock, Message, Priority, Process, ProcessState, RoundRobinConfig,
     RoundRobinScheduler, Scheduler, SubmissionQueueEntry, VirtualCpu, PAGE_SIZE,
+pub mod distro;
+
+    Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
+    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
+    InstructionCyclePhase, InterruptClass, IpcError, IpcManager, Irql,
+    LcgRandom, LookasideList, LotteryTask, MemoryBlock,
+    MemoryDescriptorList, Message, Pcb, PolicyManager, PolicyError, FastPathIpc, InterruptMechanism,
+    ProtectionDomain, ResourceBroker, PrivilegeLevel, PoolType, Priority, Process,
+    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
+    RoundRobinSchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
+    Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
@@ -239,6 +256,10 @@ pub use distro::{
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
     NetBsdRumpKernel, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
+    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
+    SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
+    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -307,7 +328,7 @@ pub use unimplemented_tools::{
     DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
     AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
     MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
+    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
     CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
     SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
     PluginMarketplace, MusicLibraryManager, FedoraToolboxContainerEngine, NixHomeManagerEnvironment,

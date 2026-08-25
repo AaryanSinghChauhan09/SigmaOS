@@ -47,7 +47,12 @@ pub mod uvm;
 pub mod vec;
 
 pub use btreemap::BTreeMap;
+extern crate alloc;
+
+pub use vec::Vec;
+pub use alloc::collections::BTreeMap;
 pub use hashmap::HashMap;
+pub use collections::VecDeque;
 pub use string::SigmaString;
 pub use alloc::string::{String, ToString};
 pub use vec::Vec;

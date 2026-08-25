@@ -9,13 +9,7 @@ pub enum InstructionCyclePhase {
     Commit,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86_64,
-    AArch64,
-    RiscV64,
-    Wasm32,
-}
+use super::structures::{CpuArchitectureClass, ThreadState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptClass {
@@ -254,14 +248,6 @@ impl MemoryDescriptorList {
 
 // 4. Processes & Threads
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ThreadState {
-    Running,
-    Ready,
-    Waiting,
-    Transition,
-    Terminated,
-}
 
 /// Thread Control Block (TCB)
 pub struct Tcb {

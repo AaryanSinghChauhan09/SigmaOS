@@ -275,7 +275,11 @@ impl SigmaString {
     where
         P: Pattern,
     {
-        Split { string: self, pat }
+        Split {
+            haystack: self.as_str(),
+            pat,
+            finished: false,
+        }
     }
 
     /// Check if the string contains a pattern
@@ -414,8 +418,9 @@ impl Pattern for &str {
 
 /// Split iterator for SigmaString
 pub struct Split<'a, P> {
-    string: &'a SigmaString,
+    haystack: &'a str,
     pat: P,
+    finished: bool,
 }
 
 impl<'a, P> Iterator for Split<'a, P>
@@ -430,13 +435,12 @@ where
 
         if let Some(idx) = self.pat.find_in(self.string) {
             let end = idx + self.pat.pattern_len();
-            let result = SigmaString::from_str(&haystack[start..idx]);
-            self.string = &SigmaString::from_str(&haystack[end..]);
+            let result = SigmaString::from_str(&self.haystack[..idx]);
+            self.haystack = &self.haystack[end..];
             Some(result)
         } else {
-            let result = SigmaString::from_str(haystack);
-            self.string = &SigmaString::new();
-            Some(result)
+            self.finished = true;
+            Some(SigmaString::from_str(self.haystack))
         }
     }
 }

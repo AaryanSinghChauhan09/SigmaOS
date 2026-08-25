@@ -1,6 +1,8 @@
 // SigmaOS AI Module
 // S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, and quantization
 
+extern crate alloc;
+
 pub mod agent;
 pub mod apm;
 pub mod autogen;
@@ -50,4 +52,9 @@ pub use system::{
 pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
+};
+pub use developer_platform::{
+    AiSafetyPolicyEngine, DefaultDenyNetworkPolicy, DeviceTarget, ExperimentRun,
+    LocalLlmOrchestrator, MarketplaceModel, MlExperimentTracker, OpenShellAgentSandbox,
+    PrivacyRouter, SignedModelMarketplace,
 };
