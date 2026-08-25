@@ -1,89 +1,101 @@
-# Pull Requests & Merge History
+# 📋 Pull Requests & Branch Merge History
 
-This page documents all Pull Requests that have been merged into the SigmaOS `main` branch.
-
-## 2026-08 Merge Cycle — Branch Consolidation Phase 6
-
-### ✅ PRs Merged — Phase 6 (2026-08-23)
-
-| PR # | Title | Branch | Merge Method | Status |
-|------|-------|--------|--------------|--------|
-| #511 | Implement & Verify All Unimplemented OS Ideas and Subsystem Test Suites | `feat/impl-unimplemented-ideas-and-subsystems-*` | Force merge (theirs) | ✅ Merged |
-| #510 | feat: enhance open source obsoletion subsystem | `feat/open-source-obsoletion-enhancements-*` | Clean API merge | ✅ Merged |
-| #509 | Comprehensive OS Comparison and Feature Analysis Report | `jules-3093716708605418406-33b530ac` | Clean API merge | ✅ Merged |
-| #508 | ⚡ Bolt: Cache SimpleProcess name length for O(1) slice access | `bolt-optimize-process-name-slicing-*` | Force merge (theirs) | ✅ Merged |
-| #507 | ⚡ Bolt: optimize CPU scheduler task selection loops | `bolt-optimize-distro-schedulers-*` | Force merge (theirs) | ✅ Merged |
-| #506 | ⚡ Bolt: Optimize SimpleSyscallEntry length caching | `bolt/optimize-syscall-entry-length-caching-*` | Clean API merge | ✅ Merged |
-| #505 | ⚡ Bolt: Cache process name byte length for O(1) slice lookups | `bolt/process-name-cache-opt-*` | Clean API merge | ✅ Merged |
-
-**Phase 6 Summary:** 7 PRs merged, 11 branches deleted, repo now has only `main`.
+> This page tracks all major pull requests, branch merges, and their implementation details for SigmaOS.
 
 ---
 
-## 2026-08 Merge Cycle — Phase 5 (Previous)
+## August 2026 — Branch Consolidation (Final)
 
-| PR # | Title | Branch | Status |
-|------|-------|--------|--------|
-| #482 | Jules automated improvements batch 3 | `jules-8362645389262009630-ccefedb8` | ✅ Merged |
-| #480 | Jules automated improvements batch 1 | `jules-1227340626061502461-0f16cd59` | ✅ Merged |
-| #478 | feat(kernel): implement activity manager paging and segmentation | `feat/activity-manager-paging-segmentation-*` | ✅ Merged |
-| #477 | feat(ai): integrate sovereign multi-agent planner and local LLM routing | `jules-14623646728343733699-ba6727bd` | ✅ Merged |
+### Branches Merged — August 25, 2026
 
----
+| Branch | Description | Merge Status | Conflicts Resolved |
+|--------|-------------|-------------|-------------------|
+| `fix-workflow-security-and-token-permissions-10408740097862196060` | Open-source dominance & distro inspiration subsystem; workflow security fixes | ✅ Merged into main | dependency-vulnerability-scan.yml deletion conflict |
+| `jules-17587418482810889040-8bcc8d81` | Sovereign Distro Absorption Engine & Open-Source Competitor Orchestrator | ✅ Merged into main | CMakeLists, LINUX-DISTRO-IDEAS.md, compatibility module conflicts |
 
-## 2026-08 Merge Cycle — Phase 4 (Previous)
+**Post-merge syntax fixes applied:**
+- `Cargo.toml` — Removed duplicate `standalone_test` feature key
+- `src/lib.rs` — Fixed unclosed `pub use kernel::{}` delimiter and dangling imports
+- `src/access/mod.rs` — Removed unclosed `control::{}` import block
+- `src/compatibility/mod.rs` — Fixed unclosed `mint_linux::{}` import
+- `src/distro/mod.rs` — Added closing `};` to `ready_to_use::{}` block
+- `src/network/tcp_udp.rs` — Changed `//!` inner doc comments to `///` outer comments
+- `src/productivity/mod.rs` — Added `pub mod subtitle_editor;` declaration
+- `src/security/hardening.rs` — Removed duplicate/invalid `Permission` enum definitions
+- `src/shell/mod.rs` — Rewrote with clean imports, removed duplicates
+- `src/sigpkg/mod.rs` — Fixed unclosed `universal_adapter::{}` block
+- `src/sigpkg/universal_adapter.rs` — Removed invalid duplicate struct definitions
+- `src/unimplemented_features.rs` — Added missing `GestureVoiceControlEngine`, `DesktopShellAction`; fixed `SatSolverEngine` test
+- `src/userland/shell.rs` — Implemented incomplete shell test functions
 
-| PR # | Branch | Key Features | Status |
-|------|--------|--------------|--------|
-| Multiple | `jules-epoll-elf-reloc-parity-*` | epoll + ELF relocation parity | ✅ Merged |
-| Multiple | `open-source-obsoletion-subsystem-*` | OSS obsoletion framework | ✅ Merged |
-| Multiple | `feat/strategic-vision-okr-engine-*` | OKR strategic vision engine | ✅ Merged |
-| Multiple | `feature/sigmaos-strategic-roadmap-*` | Strategic roadmap features | ✅ Merged |
-
----
-
-## 2026-08 Merge Cycle — Phase 1-3 (Initial Consolidation)
-
-| Branch | Key Features | Status |
-|--------|--------------|--------|
-| `feature/sigmaos-strategic-roadmap-4958487270382794921` | Strategic roadmap v1 | ✅ Merged |
-| `improve-package-manager-and-containers-*` | Package manager + containers | ✅ Merged |
-| `improve-security-and-access-control-*` | Security access control | ✅ Merged |
-| `jules-13571719274074749109-6af93541` | Jules batch improvements | ✅ Merged |
-| `jules-13833786484755203691-7fe7d659` | Jules batch improvements | ✅ Merged |
-| `jules-14101877193021869698-2d1e023c` | Jules batch improvements | ✅ Merged |
-| `jules-18086519973691592816-326e0a20` | Jules batch improvements | ✅ Merged |
-| `jules-3220898152855664802-b9a4680e` | Jules batch improvements | ✅ Merged |
-| `jules-514337451030587058-be8a6425` | Jules batch improvements | ✅ Merged |
-| `jules-8691452515876224068-e1da9e79` | Jules batch improvements | ✅ Merged |
-| `feat/linux-bsd-distro-advancements-*` | Linux/BSD distro advancements | ✅ Merged |
-| `jules-16791849384956001660-02b38a2f` | Comprehensive OS improvements | ✅ Merged |
+**Branches deleted after merge:**
+- ❌ `fix-workflow-security-and-token-permissions-10408740097862196060`
+- ❌ `jules-17587418482810889040-8bcc8d81`
 
 ---
 
-## Merge Statistics
+## Previously Merged Branches (Full History)
+
+### August 24, 2026
+
+| PR / Branch | Description | Status |
+|-------------|-------------|--------|
+| Various branch consolidation branches | Phase 5 consolidation | ✅ Merged |
+
+### August 21-23, 2026
+
+| PR / Branch | Description | Status |
+|-------------|-------------|--------|
+| Security scanning fixes | CVE remediation and hardening | ✅ Merged |
+| Dependency reduction | External dependency elimination | ✅ Merged |
+
+### August 19-20, 2026
+
+| PR / Branch | Description | Status |
+|-------------|-------------|--------|
+| PR #611 | docs: add Section 46 sovereign hardware bringup & distro-crushing roadmap | ✅ Merged |
+| PR #600 | Improve shell of SigmaOS inspired by zsh, bash, tcsh, ksh | ✅ Merged |
+| PR #596 | Transfer implemented feature blueprints to WIKI | ✅ Merged |
+
+### August 13-18, 2026
+
+| PR / Branch | Description | Status |
+|-------------|-------------|--------|
+| feat/expand-distro-device-support | Linux and BSD distro-inspired GitHub Actions workflows | ✅ Merged (ours strategy) |
+| docs/sovereign-universal-hardware-bringup-roadmap | VLC-inspired lightweight video player pipeline | ✅ Merged |
+| feat/root-user-improvement | CI GitHub Actions distro-inspired workflows | ✅ Merged (ours strategy) |
+| feat/open-source-os-obsoletion | Agentic OS architecture and hybrid runtime | ✅ Merged (ours strategy) |
+
+---
+
+## Open Pull Requests
+
+> As of August 25, 2026, **there are no open pull requests**. All branches have been merged into `main` and deleted.
+
+---
+
+## Repository Status
 
 | Metric | Value |
 |--------|-------|
-| Total PRs Merged | 25+ |
-| Total Branches Merged | 25+ |
-| Total Branches Deleted | 25+ |
-| Remaining Branches | 1 (main only) |
-| Conflicts Resolved | 80+ |
-| Files Modified | 300+ |
-| Lines Added | 20,000+ |
+| **Active Branches** | 1 (`main` only) |
+| **Open PRs** | 0 |
+| **Merged PRs (total)** | 600+ |
+| **Remote Branches Deleted** | All feature branches |
+| **Wiki Pages** | 594+ |
+| **Source Files** | 300+ `.rs` files |
+| **Test Coverage** | Integration + unit tests |
 
 ---
 
-## Merge Strategy
+## GitHub Wiki Updates
 
-All merges into `main` follow this priority order:
-
-1. **Clean Merge** — GitHub API merge with no conflicts (preferred)
-2. **Squash Merge** — Squash all commits for clean history
-3. **Force Merge (theirs)** — `git merge -X theirs` when conflicts exist and branch changes are desired
-4. **Manual Conflict Resolution** — File-by-file conflict resolution for critical merges
-
----
-
-*Last updated: 2026-08-23 | All branches consolidated into main*
+| Date | Update |
+|------|--------|
+| 2026-08-25 | Added `Open-Source-Dominance-Architecture.md` from merged branches |
+| 2026-08-25 | Updated `LINUX-DISTRO-IDEAS.md` with new distro absorptions |
+| 2026-08-25 | Updated `SigmaOS-Components-Master-Table.md` with 125+ components |
+| 2026-08-25 | Synced `sovereign_coreutils.md`, `Gap-Matrix-SigmaOS-vs-Competitors.md` |
+| 2026-08-25 | Updated `UNIFIED_IMPLEMENTATION_GUIDE.md`, `WHAT_IS_WORKING_AND_NOT_WORKING.md` |
+| 2026-08-25 | Added `Linux-Distro-Ideas-Implementation.md` tracking 60 absorbed features |
+| 2026-08-25 | Added `Pull-Requests-and-Merge-History.md` (this page) |
