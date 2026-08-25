@@ -41,7 +41,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct SigmaString {
     data: String,
 }
@@ -128,14 +128,8 @@ impl core::ops::Deref for SigmaString {
 }
 
 // ------------------------------------------------------------------
-// fmt::Display / fmt::Debug
+// fmt::Debug
 // ------------------------------------------------------------------
-
-impl fmt::Display for SigmaString {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.as_str())
-    }
-}
 
 impl fmt::Debug for SigmaString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -146,6 +140,14 @@ impl fmt::Debug for SigmaString {
 // ------------------------------------------------------------------
 // PartialEq, Eq
 // ------------------------------------------------------------------
+
+impl PartialEq for SigmaString {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+
+impl Eq for SigmaString {}
 
 impl PartialOrd for SigmaString {
     fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
@@ -158,14 +160,6 @@ impl Ord for SigmaString {
         self.as_str().cmp(other.as_str())
     }
 }
-
-impl PartialEq for SigmaString {
-    fn eq(&self, other: &Self) -> bool {
-        self.as_str() == other.as_str()
-    }
-}
-
-impl Eq for SigmaString {}
 
 impl core::hash::Hash for SigmaString {
     fn hash<H: core::hash::Hasher>(&self, state: &mut H) {

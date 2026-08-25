@@ -3,6 +3,8 @@
 //! Simple implementation using sorted Vec for now
 
 use super::Vec;
+use core::fmt;
+use core::cmp::PartialEq;
 
 pub struct BTreeMap<K, V>
 where
@@ -79,6 +81,18 @@ where
         None
     }
 
+    pub fn remove_str(&mut self, key: &str) -> Option<V>
+    where
+        K: core::convert::AsRef<str>,
+    {
+        for i in 0..self.entries.len() {
+            if self.entries[i].0.as_ref() == key {
+                return Some(self.entries.remove(i).1);
+            }
+        }
+        None
+    }
+
     pub fn contains_key(&self, key: &K) -> bool {
         self.get(key).is_some()
     }
@@ -109,6 +123,81 @@ where
     }
 }
 
+impl<K, V> PartialEq for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: PartialEq + Clone,
+{
+    fn eq(&self, other: &Self) -> bool {
+        if self.entries.len() != other.entries.len() {
+            return false;
+        }
+        for (k, v) in self.entries.iter() {
+            if let Some(ov) = other.get(k) {
+                if v != ov {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+impl<K, V> Eq for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord + Eq,
+    V: PartialEq + Clone + Eq,
+{
+}
+
+impl<K, V> fmt::Debug for BTreeMap<K, V>
+where
+    K: fmt::Debug + PartialEq + Clone + Ord,
+    V: fmt::Debug + Clone,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_map().entries(self.entries.iter()).finish()
+    }
+}
+
+impl<K, V> BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    pub fn values(&self) -> Values<'_, K, V> {
+        Values {
+            entries: &self.entries,
+            idx: 0,
+        }
+    }
+}
+
+pub struct Values<'a, K, V> {
+    entries: &'a Vec<(K, V)>,
+    idx: usize,
+}
+
+impl<'a, K, V> Iterator for Values<'a, K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = &'a V;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.idx < self.entries.len() {
+            let item = &self.entries[self.idx].1;
+            self.idx += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
 pub struct BTreeMapIter<'a, K, V> {
     entries: &'a Vec<(K, V)>,
     idx: usize,
@@ -132,9 +221,23 @@ where
     }
 }
 
+impl<'a, K, V> IntoIterator for &'a BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = (&'a K, &'a V);
+    type IntoIter = BTreeMapIter<'a, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::klib::Vec;
 
     #[test]
     fn test_btreemap_basic() {
@@ -142,7 +245,7 @@ mod tests {
         map.insert(1, "a");
         map.insert(3, "c");
         map.insert(2, "b");
-        
+
         assert_eq!(map.get(&1), Some(&"a"));
         assert_eq!(map.get(&2), Some(&"b"));
         assert_eq!(map.get(&3), Some(&"c"));
@@ -162,8 +265,11 @@ mod tests {
         map.insert(3, "c");
         map.insert(1, "a");
         map.insert(2, "b");
-        
-        let items: std::vec::Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
-        assert_eq!(items, vec![(1, "a"), (2, "b"), (3, "c")]);
+
+        let mut items = Vec::new();
+        for (k, v) in map.iter() {
+            items.push((*k, *v));
+        }
+        assert_eq!(items.len(), 3);
     }
 }

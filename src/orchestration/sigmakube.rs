@@ -345,10 +345,6 @@ impl SigmaKube {
         Ok(cluster_id)
     }
 
-    pub fn list_clusters(&self) -> &Vec<Cluster> {
-        &self.clusters
-    }
-
     pub fn get_cluster(&mut self, id: &str) -> Option<&mut Cluster> {
         self.clusters.iter_mut().find(|c| c.cluster_id == id || c.name == id)
     }

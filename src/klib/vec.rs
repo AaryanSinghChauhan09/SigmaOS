@@ -123,6 +123,15 @@ impl<T> Vec<T> {
         self.len = write_idx;
     }
 
+    pub fn clear(&mut self) {
+        unsafe {
+            for i in 0..self.len {
+                core::ptr::drop_in_place(self.data.add(i));
+            }
+            self.len = 0;
+        }
+    }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4

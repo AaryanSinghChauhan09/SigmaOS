@@ -375,7 +375,7 @@ unsafe fn syscall_open(path: *const u8, flags: u32, mode: u32) -> i32 {
         in("rdi") path,
         in("rsi") flags,
         in("rdx") mode,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -389,7 +389,7 @@ unsafe fn syscall_read(fd: RawFd, buf: *mut u8, count: usize) -> isize {
         in("rdi") fd,
         in("rsi") buf,
         in("rdx") count,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -403,7 +403,7 @@ unsafe fn syscall_write(fd: RawFd, buf: *const u8, count: usize) -> isize {
         in("rdi") fd,
         in("rsi") buf,
         in("rdx") count,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -417,7 +417,7 @@ unsafe fn syscall_lseek(fd: RawFd, offset: i64, whence: i32) -> i64 {
         in("rdi") fd,
         in("rsi") offset,
         in("rdx") whence,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -429,7 +429,7 @@ unsafe fn syscall_fsync(fd: RawFd) -> i32 {
         "syscall",
         inlateout("rax") 74i32 => ret,
         in("rdi") fd,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -441,7 +441,7 @@ unsafe fn syscall_close(fd: RawFd) -> i32 {
         "syscall",
         inlateout("rax") 3i32 => ret,
         in("rdi") fd,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -454,7 +454,7 @@ unsafe fn syscall_fstat(fd: RawFd, stat: *mut Stat) -> i32 {
         inlateout("rax") 5i32 => ret,
         in("rdi") fd,
         in("rsi") stat,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -466,7 +466,7 @@ unsafe fn syscall_opendir(path: *const u8) -> i32 {
         "syscall",
         inlateout("rax") 78i32 => ret,
         in("rdi") path,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -479,7 +479,7 @@ unsafe fn syscall_readdir(fd: RawFd, entry: *mut DirEntryRaw) -> i32 {
         inlateout("rax") 79i32 => ret,
         in("rdi") fd,
         in("rsi") entry,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }
@@ -491,7 +491,7 @@ unsafe fn syscall_closedir(fd: RawFd) -> i32 {
         "syscall",
         inlateout("rax") 80i32 => ret,
         in("rdi") fd,
-        clobber_abi("rcx", "r11", "memory")
+        clobber_abi("system")
     );
     ret
 }

@@ -145,7 +145,7 @@ impl ArtixPacman {
             }
         }
 
-        self.installed.remove(package);
+        self.installed.remove_str(package);
         Ok(())
     }
 
