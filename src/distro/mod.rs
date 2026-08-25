@@ -27,11 +27,10 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
-pub mod transformation_engine;
-pub mod preseed;
-pub mod endeavour_os;
-pub mod linux_bsd_inspirations;
-pub mod ecosystem_dimensions;
+pub mod arch;
+pub mod cachy;
+pub mod linux_bsd_parity_extended;
+pub mod missing_distro_innovations;
 
 pub use linux_bsd_parity::{
     ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
@@ -130,4 +129,9 @@ pub use ready_to_use::{
     DistroServiceManager, ServiceUnit, MountEntry, MountType, UniversalMountEngine,
     UserAccount, SessionEnvironment, InteractiveUserEnvironment, DeviceCategory,
     HardwareEvent, DeviceNode, PlugAndPlayHardwareManager,
+};
+
+pub use missing_distro_innovations::{
+    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
 };

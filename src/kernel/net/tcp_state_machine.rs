@@ -4,10 +4,8 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 ///         FIN_WAIT_1 → FIN_WAIT_2 → TIME_WAIT → CLOSED
 ///         ESTABLISHED → CLOSE_WAIT → LAST_ACK → CLOSED
 extern crate alloc;
-use crate::klib::{HashMap, collections::VecDeque};
 use alloc::collections::VecDeque;
 use crate::klib::collections::HashMap;
-use crate::klib::HashMap;
 use alloc::vec::Vec;
 
 // ── TCP States (RFC 793 §3.2) ─────────────────────────────────────────────
