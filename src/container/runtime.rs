@@ -1,9 +1,14 @@
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 
+#[cfg(not(target_os = "none"))]
 extern crate alloc;
+
+#[cfg(not(target_os = "none"))]
 use alloc::string::String;
+#[cfg(not(target_os = "none"))]
 use alloc::boxed::Box;
+#[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -670,11 +675,14 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 
 
+// OCI compatibility module temporarily disabled for no_std compatibility
+// This module requires alloc which is conditionally available
+#[cfg(not(target_os = "none"))]
 pub mod oci {
+    extern crate alloc;
     use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
-    use alloc::string::String;
-    use alloc::string::ToString;
+    use alloc::string::{String, ToString};
     use alloc::vec::Vec;
 
     pub struct NamespaceSet {

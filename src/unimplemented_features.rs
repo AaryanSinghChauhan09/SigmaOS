@@ -1176,7 +1176,6 @@ impl Default for NixOsDeclarativeConfigEngine {
     fn default() -> Self {
         Self::new()
     }
->>>>>>> jules-7830475306225292968-8692869d
 }
 
 
@@ -1597,7 +1596,6 @@ mod tests {
 
         nix.switch_generation(2).unwrap();
         assert_eq!(nix.active_generation, 2);
->>>>>>> jules-7830475306225292968-8692869d
     }
 
 

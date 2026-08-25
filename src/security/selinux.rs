@@ -215,7 +215,6 @@ pub struct PolicyRule {
     pub permission: String,
 }
 
-pub type Permission = SelinuxPermission;
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,
     pub policies: HashSet<AvcKey>,

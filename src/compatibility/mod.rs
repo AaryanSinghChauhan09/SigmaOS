@@ -140,8 +140,7 @@ pub use mint_linux::{
 };
 
 pub use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-    DinitServiceState,
+    ApkPackageMetadata, ApkPackageStore,
 };
 
 pub use relay_nexus::{

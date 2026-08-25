@@ -1,7 +1,5 @@
 extern crate alloc;
 use alloc::vec::Vec;
-    }
-}
 
 /// apk-tools (Alpine/Chimera) package registry compatibility layer
 #[derive(Debug, Clone)]

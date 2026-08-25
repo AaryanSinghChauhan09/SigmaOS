@@ -264,10 +264,7 @@ mod tests {
         let mut drv = MockDriver {
             owner: None,
             debug_level: "3".to_string(),
-<<<<<<< HEAD
             base: KObject::new("mock_driver"),
-=======
->>>>>>> origin/fix/kernel-algorithm-tests-16856064292844607661
         };
 
         assert!(drv.is_pqc_signed());

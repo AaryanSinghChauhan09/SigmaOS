@@ -463,6 +463,7 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
+        let pd_idx_in_vec = pdpt_idx;
         if pd_idx_in_vec >= self.pd_tables.len() {
             while self.pd_tables.len() <= pd_idx_in_vec {
                 self.pd_tables.push(None);
