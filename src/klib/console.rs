@@ -17,7 +17,7 @@ pub enum IoError {
 }
 
 impl SigmaConsole {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             stdout_fd: 1,
             stdin_fd: 0,

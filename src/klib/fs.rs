@@ -160,7 +160,7 @@ impl SigmaFile {
         }
         
         Ok(Metadata {
-            size: stat.size,
+            size: stat.st_size,
             is_file: stat.is_file(),
             is_directory: stat.is_directory(),
             modified: stat.modified,
@@ -183,7 +183,7 @@ impl SigmaFile {
     }
     
     /// Convert open mode to flags
-    fn mode_to_flags(mode: OpenMode) -> i32 {
+    fn mode_to_flags(mode: OpenMode) -> u32 {
         match mode {
             OpenMode::ReadOnly => O_RDONLY,
             OpenMode::WriteOnly => O_WRONLY,
@@ -347,13 +347,24 @@ impl Drop for SigmaDir {
 
 /// Raw directory entry
 #[repr(C)]
-#[derive(Default)]
 struct DirEntryRaw {
     d_ino: u64,
     d_off: i64,
     d_reclen: u16,
     d_type: u8,
     d_name: [c_char; 256],
+}
+
+impl Default for DirEntryRaw {
+    fn default() -> Self {
+        Self {
+            d_ino: 0,
+            d_off: 0,
+            d_reclen: 0,
+            d_type: 0,
+            d_name: [0; 256],
+        }
+    }
 }
 
 // Syscall flags
@@ -373,8 +384,8 @@ unsafe fn syscall_open(path: *const u8, flags: u32, mode: u32) -> i32 {
         "syscall",
         inlateout("rax") 2i32 => ret,
         in("rdi") path,
-        in("rsi") flags,
-        in("rdx") mode,
+        in("rsi") flags as i32,
+        in("rdx") mode as i32,
         clobber_abi("system")
     );
     ret

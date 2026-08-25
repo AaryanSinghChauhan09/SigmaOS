@@ -216,6 +216,15 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn extend_from_slice(&mut self, other: &[T])
+    where
+        T: Copy,
+    {
+        for &item in other {
+            self.push(item);
+        }
+    }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -283,6 +292,18 @@ impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
 impl<T: PartialEq<U>, U> PartialEq<std::vec::Vec<U>> for Vec<T> {
     fn eq(&self, other: &std::vec::Vec<U>) -> bool {
         self.as_slice() == other.as_slice()
+    }
+}
+
+impl<T: Ord> PartialOrd for Vec<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<T: Ord> Ord for Vec<T> {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.as_slice().cmp(other.as_slice())
     }
 }
 

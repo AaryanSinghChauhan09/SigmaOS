@@ -3,7 +3,7 @@
 //! Reduces dependency on std::collections::HashSet
 
 use super::BTreeMap;
-use super::hashmap::BTreeMapIter;
+use super::btreemap::BTreeMapIter;
 
 pub struct HashSet<T>
 where

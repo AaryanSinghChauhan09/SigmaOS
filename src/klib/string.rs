@@ -132,60 +132,72 @@ impl SigmaString {
     
     /// Remove a character at a specific position
     pub fn remove(&mut self, idx: usize) -> char {
-        let ch = self[idx];
-        
-        // Remove the character bytes
+        let slice = self.as_str();
+        let mut char_iter = slice.char_indices();
+        let (byte_start, ch) = char_iter.nth(idx).expect("index out of bounds");
         let char_len = ch.len_utf8();
-        let start = idx;
-        let end = idx + char_len;
-        
-        for i in end..self.len {
-            self.data.as_mut_slice()[start + (i - end)] = self.data.as_slice()[i];
+        let byte_end = byte_start + char_len;
+
+        // Remove the character bytes
+        for i in byte_end..self.len {
+            self.data.as_mut_slice()[byte_start + (i - byte_end)] = self.data.as_slice()[i];
         }
-        
+
         self.len -= char_len;
         self.data.truncate(self.len);
-        
+
         ch
     }
     
     /// Insert a character at a specific position
     pub fn insert(&mut self, idx: usize, ch: char) {
-        assert!(idx <= self.len);
-        
+        let byte_idx = if idx == self.len() {
+            self.len
+        } else {
+            let slice = self.as_str();
+            let mut char_iter = slice.char_indices();
+            char_iter.nth(idx).map_or(self.len, |(byte_start, _)| byte_start)
+        };
+
         let mut buf = [0u8; 4];
         let bytes = ch.encode_utf8(&mut buf);
         let char_len = bytes.len();
-        
+
         // Make space for the new character
-        for i in (idx..self.len).rev() {
+        for i in (byte_idx..self.len).rev() {
             self.data.as_mut_slice()[i + char_len] = self.data.as_slice()[i];
         }
-        
+
         // Insert the character bytes
         for (i, &byte) in bytes.as_bytes().iter().enumerate() {
-            self.data.as_mut_slice()[idx + i] = byte;
+            self.data.as_mut_slice()[byte_idx + i] = byte;
         }
-        
+
         self.len += char_len;
     }
     
     /// Insert a string slice at a specific position
     pub fn insert_str(&mut self, idx: usize, s: &str) {
-        assert!(idx <= self.len);
-        
+        let byte_idx = if idx == self.len() {
+            self.len
+        } else {
+            let slice = self.as_str();
+            let mut char_iter = slice.char_indices();
+            char_iter.nth(idx).map_or(self.len, |(byte_start, _)| byte_start)
+        };
+
         let s_len = s.len();
-        
+
         // Make space for the new string
-        for i in (idx..self.len).rev() {
+        for i in (byte_idx..self.len).rev() {
             self.data.as_mut_slice()[i + s_len] = self.data.as_slice()[i];
         }
-        
+
         // Insert the string bytes
         for (i, &byte) in s.as_bytes().iter().enumerate() {
-            self.data.as_mut_slice()[idx + i] = byte;
+            self.data.as_mut_slice()[byte_idx + i] = byte;
         }
-        
+
         self.len += s_len;
     }
     
@@ -201,11 +213,17 @@ impl SigmaString {
     
     /// Split the string at a position
     pub fn split_at(&self, mid: usize) -> (SigmaString, SigmaString) {
-        assert!(mid <= self.len);
-        
-        let left = SigmaString::from_bytes(&self.data.as_slice()[..mid]).unwrap();
-        let right = SigmaString::from_bytes(&self.data.as_slice()[mid..self.len]).unwrap();
-        
+        let byte_mid = if mid == self.len() {
+            self.len
+        } else {
+            let slice = self.as_str();
+            let mut char_iter = slice.char_indices();
+            char_iter.nth(mid).map_or(self.len, |(byte_start, _)| byte_start)
+        };
+
+        let left = SigmaString::from_bytes(&self.data.as_slice()[..byte_mid]).unwrap();
+        let right = SigmaString::from_bytes(&self.data.as_slice()[byte_mid..self.len]).unwrap();
+
         (left, right)
     }
     

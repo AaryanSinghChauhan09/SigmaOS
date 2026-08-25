@@ -15,6 +15,30 @@ pub struct BTreeMap<K, V> {
     len: usize,
 }
 
+impl<K: PartialEq + Clone, V: PartialEq + Clone> PartialEq for BTreeMap<K, V> {
+    fn eq(&self, other: &Self) -> bool {
+        if self.len != other.len {
+            return false;
+        }
+        for bucket in &self.buckets {
+            if let Some(entries) = bucket {
+                for (k, v) in entries {
+                    if let Some(other_v) = other.get(k) {
+                        if v != other_v {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+        true
+    }
+}
+
+impl<K: PartialEq + Clone + Eq, V: PartialEq + Eq> Eq for BTreeMap<K, V> {}
+
 pub enum Entry<'a, K, V> {
     Occupied(OccupiedEntry<'a, K, V>),
     Vacant(VacantEntry<'a, K, V>),

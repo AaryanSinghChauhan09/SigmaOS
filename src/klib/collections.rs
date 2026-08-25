@@ -94,6 +94,7 @@ impl<T: Ord> Default for HashSet<T> {
 }
 
 /// Simple VecDeque implementation for klib
+#[derive(Clone)]
 pub struct VecDeque<T> {
     inner: AllocVecDeque<T>,
 }
@@ -135,6 +136,13 @@ impl<T> VecDeque<T> {
 
     pub fn is_empty(&self) -> bool {
         self.inner.is_empty()
+    }
+
+    pub fn drain<R>(&mut self, range: R) -> AllocVecDequeDrain<'_, T>
+    where
+        R: core::ops::RangeBounds<usize>,
+    {
+        self.inner.drain(range)
     }
 }
 
