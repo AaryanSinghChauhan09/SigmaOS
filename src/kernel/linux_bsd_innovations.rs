@@ -884,17 +884,17 @@ pub struct CgroupResourceLimits {
     pub io_weight: u32,
 }
 
-pub struct SovereignCgroupGovernor {
+pub struct SovereignCgroupGovernorV1 {
     pub groups: HashMap<String, CgroupGroup>,
 }
 
-impl Default for SovereignCgroupGovernor {
+impl Default for SovereignCgroupGovernorV1 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl SovereignCgroupGovernor {
+impl SovereignCgroupGovernorV1 {
     pub fn new() -> Self {
         Self {
             groups: HashMap::new(),
