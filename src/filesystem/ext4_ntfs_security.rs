@@ -31,7 +31,7 @@ pub struct Ext4InodeMetadata {
     pub inode_id: u64,
     pub uid: u32,
     pub gid: u32,
-    pub i_mode: u16, // 16-bit file type + permissions
+    pub i_mode: u16,                       // 16-bit file type + permissions
     pub xattrs: BTreeMap<String, Vec<u8>>, // Extended attributes e.g. "system.posix_acl_access"
 }
 
@@ -54,7 +54,12 @@ impl Ext4InodeMetadata {
     /// 1. If Root (uid 0), grant access.
     /// 2. If POSIX ACL xattr ("system.posix_acl_access") exists, evaluate explicit ACEs.
     /// 3. Otherwise, fall back to standard 16-bit i_mode bits (Owner/Group/Others).
-    pub fn evaluate_ext4_access(&self, subject_uid: u32, subject_gid: u32, requested_mode: u16) -> bool {
+    pub fn evaluate_ext4_access(
+        &self,
+        subject_uid: u32,
+        subject_gid: u32,
+        requested_mode: u16,
+    ) -> bool {
         if subject_uid == 0 {
             return true; // Root bypass
         }
@@ -146,7 +151,9 @@ impl NtfsSecurityDescriptor {
             owner_sid: SecurityIdentifier::new(owner),
             group_sid: SecurityIdentifier::new(group),
             dacl: NtfsDacl { aces: Vec::new() },
-            sacl: NtfsSacl { audit_aces: Vec::new() },
+            sacl: NtfsSacl {
+                audit_aces: Vec::new(),
+            },
         }
     }
 
@@ -158,7 +165,11 @@ impl NtfsSecurityDescriptor {
     /// 1. Evaluate Explicit Deny ACEs sequentially. If a matching Deny ACE matches requested rights -> DENY immediately.
     /// 2. Evaluate Explicit Allow ACEs sequentially. Accumulate granted rights until requested_rights are satisfied -> ALLOW.
     /// 3. Default: Implicit Deny if no rule matched or rights remain unsatisfied.
-    pub fn evaluate_ntfs_access(&self, subject_sid: &SecurityIdentifier, requested_rights: u32) -> bool {
+    pub fn evaluate_ntfs_access(
+        &self,
+        subject_sid: &SecurityIdentifier,
+        requested_rights: u32,
+    ) -> bool {
         // Step 1: Check Explicit Deny ACEs
         for ace in &self.dacl.aces {
             if ace.ace_type == AceType::AccessDenied && ace.sid == *subject_sid {

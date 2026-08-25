@@ -85,34 +85,33 @@ pub mod sigmawin;
 pub mod solid_kernel;
 pub mod sovereign_suite;
 pub mod superiority;
-pub mod wasm_sandbox;
 pub mod tiny_core;
+pub mod wasm_sandbox;
 
 pub use gap_closure::{
-    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
-    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
-    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
-    HidGraphicsDriver, AiTaskOrchestrator,
+    AiTaskOrchestrator, BuildLedgerSystem, DriverRepositoryManager, FirmwareBridgeManager,
+    HidGraphicsDriver, KernelModuleManager, NetworkStackGateway, PeripheralEmulationLibrary,
+    SecurityPolicyManager, SyscallCompatibilityRegistry, VirtualMemoryManager,
 };
 pub use superiority::{
-    SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
-    SovereignTimeMachine, NumaCfsScheduler, LockFreeQueue, SovereignThemeEngine,
-    SovereignForensics, SovereignRecoverUtility, ShardIgnitor,
+    LockFreeQueue, NumaCfsScheduler, ShardIgnitor, SovereignCloudFS, SovereignForensics,
+    SovereignObjectBus, SovereignRecoverUtility, SovereignRegistry, SovereignSigLoader,
+    SovereignThemeEngine, SovereignTimeMachine,
 };
 
 pub use arch_linux::{
-    ProcFileType, ProcFile, DevFileType, DevFile, ArchPackage, PacmanError, PacmanEngine,
-    RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule, ArchFirewall,
-    LsmMode, LsmSentinel, PamGate, PaneLayout, TmuxMultiplexer, SovereignEnvRegistry,
-    AurRepoStatus, YayParuAdapter, ArchMirror, ReflectorMirrorlist, SubvolumeConfig,
-    ArchinstallConfig, ArchinstallParity, ArtixInitSystemType, ServiceState, ArtixInitBridge,
-    KeyTrustLevel, PacmanKey, PacmanKeyring, AurPatch, AurPatchEngine,
-    MkinitcpioGenerator, NewsItem, ArchNewsFeedParser, CachedPackage, PacmanDbCleaner,
-    WikiPage, ArchWikiSearchEngine,
+    ArchFirewall, ArchInitSystem, ArchMirror, ArchNewsFeedParser, ArchPackage,
+    ArchWikiSearchEngine, ArchinstallConfig, ArchinstallParity, ArtixInitBridge,
+    ArtixInitSystemType, AurPatch, AurPatchEngine, AurRepoStatus, CachedPackage, DevFile,
+    DevFileType, FirewallRule, KeyTrustLevel, LsmMode, LsmSentinel, MkinitcpioGenerator, NewsItem,
+    PacmanDbCleaner, PacmanEngine, PacmanError, PacmanKey, PacmanKeyring, PamGate, PaneLayout,
+    ProcFile, ProcFileType, ReflectorMirrorlist, RuleAction, RunlevelTarget, ServiceState,
+    SovereignEnvRegistry, SubvolumeConfig, SystemdBootMetrics, TmuxMultiplexer, WikiPage,
+    YayParuAdapter,
 };
 
 pub use open_source_tier1::{
-    WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
+    LibsodiumIntegration, SmolTcpIntegration, SqliteIntegration, WasmerIntegration,
 };
 
 pub use cross_platform::{
@@ -123,9 +122,9 @@ pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
 pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
 
 pub use cross_platform_kernel::{
-    PageAccessMode, MemoryArch, PageDirectory as CrossPlatformPageDirectory, DeferredProcedureCall,
-    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
-    UmsThreadState, UmsContext, SovereignKernelInternals,
+    DeferredProcedureCall, IdtEntry, Idtr, Irql, IrqlController, Kpcr, Kpcrb, MemoryArch,
+    PageAccessMode, PageDirectory as CrossPlatformPageDirectory, SovereignKernelInternals,
+    SystemServiceTable, UmsContext, UmsThreadState,
 };
 
 pub use historic_linux::{

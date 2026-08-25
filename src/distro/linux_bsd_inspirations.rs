@@ -6,10 +6,10 @@
 #![cfg_attr(target_os = "none", no_main)]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::string::{String, ToString};
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // ==========================================
 // 1. LINUX EBPF VM SIMULATOR (SovereignEbpfEngine)
@@ -18,15 +18,15 @@ use alloc::format;
 /// Instruction opcodes for our simulated Linux eBPF VM
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EbpfOpcode {
-    Add,  // RegDst = RegDst + RegSrc (or Imm)
-    Sub,  // RegDst = RegDst - RegSrc (or Imm)
-    Mul,  // RegDst = RegDst * RegSrc (or Imm)
-    Div,  // RegDst = RegDst / RegSrc (or Imm)
-    Load, // RegDst = Mem[RegSrc + Offset]
-    Store,// Mem[RegDst + Offset] = RegSrc (or Imm)
-    Jump, // PC = PC + Offset (unconditional)
-    Jeq,  // PC = PC + Offset if RegDst == RegSrc (or Imm)
-    Exit, // Halt VM
+    Add,   // RegDst = RegDst + RegSrc (or Imm)
+    Sub,   // RegDst = RegDst - RegSrc (or Imm)
+    Mul,   // RegDst = RegDst * RegSrc (or Imm)
+    Div,   // RegDst = RegDst / RegSrc (or Imm)
+    Load,  // RegDst = Mem[RegSrc + Offset]
+    Store, // Mem[RegDst + Offset] = RegSrc (or Imm)
+    Jump,  // PC = PC + Offset (unconditional)
+    Jeq,   // PC = PC + Offset if RegDst == RegSrc (or Imm)
+    Exit,  // Halt VM
 }
 
 /// eBPF instruction representation
@@ -92,7 +92,9 @@ impl SovereignEbpfEngine {
         }
 
         if !exit_found {
-            return Err("Static verification error: program does not terminate with Exit instruction");
+            return Err(
+                "Static verification error: program does not terminate with Exit instruction",
+            );
         }
 
         Ok(())
@@ -109,29 +111,47 @@ impl SovereignEbpfEngine {
 
         while pc < instructions.len() {
             if steps >= max_steps {
-                return Err("Execution exceeded maximum permitted steps (infinite loop protection)");
+                return Err(
+                    "Execution exceeded maximum permitted steps (infinite loop protection)",
+                );
             }
             steps += 1;
 
             let inst = instructions[pc];
             match inst.opcode {
                 EbpfOpcode::Add => {
-                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    let val = if inst.use_imm {
+                        inst.imm
+                    } else {
+                        self.registers[inst.src]
+                    };
                     self.registers[inst.dst] = self.registers[inst.dst].wrapping_add(val);
                     pc += 1;
                 }
                 EbpfOpcode::Sub => {
-                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    let val = if inst.use_imm {
+                        inst.imm
+                    } else {
+                        self.registers[inst.src]
+                    };
                     self.registers[inst.dst] = self.registers[inst.dst].wrapping_sub(val);
                     pc += 1;
                 }
                 EbpfOpcode::Mul => {
-                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    let val = if inst.use_imm {
+                        inst.imm
+                    } else {
+                        self.registers[inst.src]
+                    };
                     self.registers[inst.dst] = self.registers[inst.dst].wrapping_mul(val);
                     pc += 1;
                 }
                 EbpfOpcode::Div => {
-                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    let val = if inst.use_imm {
+                        inst.imm
+                    } else {
+                        self.registers[inst.src]
+                    };
                     if val == 0 {
                         return Err("Runtime division by zero");
                     }
@@ -146,12 +166,16 @@ impl SovereignEbpfEngine {
                     }
                     // Load 64-bit integer
                     let mut data = [0u8; 8];
-                    data.copy_from_slice(&self.memory[addr..addr+8]);
+                    data.copy_from_slice(&self.memory[addr..addr + 8]);
                     self.registers[inst.dst] = i64::from_le_bytes(data);
                     pc += 1;
                 }
                 EbpfOpcode::Store => {
-                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    let val = if inst.use_imm {
+                        inst.imm
+                    } else {
+                        self.registers[inst.src]
+                    };
                     let base = self.registers[inst.dst];
                     let addr = (base + inst.offset as i64) as usize;
                     if addr + 8 > self.memory.len() {
@@ -159,14 +183,18 @@ impl SovereignEbpfEngine {
                     }
                     // Store 64-bit integer
                     let data = val.to_le_bytes();
-                    self.memory[addr..addr+8].copy_from_slice(&data);
+                    self.memory[addr..addr + 8].copy_from_slice(&data);
                     pc += 1;
                 }
                 EbpfOpcode::Jump => {
                     pc = (pc as i32 + 1 + inst.offset as i32) as usize;
                 }
                 EbpfOpcode::Jeq => {
-                    let val = if inst.use_imm { inst.imm } else { self.registers[inst.src] };
+                    let val = if inst.use_imm {
+                        inst.imm
+                    } else {
+                        self.registers[inst.src]
+                    };
                     if self.registers[inst.dst] == val {
                         pc = (pc as i32 + 1 + inst.offset as i32) as usize;
                     } else {
@@ -224,7 +252,9 @@ impl ArchDependencyResolver {
                 continue;
             }
             // Find package or a package providing it
-            let pkg = self.packages.iter()
+            let pkg = self
+                .packages
+                .iter()
                 .find(|p| p.name == curr || p.provides.contains(&curr));
             if let Some(p) = pkg {
                 subgraph.push(p.name.clone());
@@ -460,10 +490,11 @@ impl OpenBSDUnveil {
         let mut best_perms: Option<&str> = None;
 
         for (unveiled_path, perms) in &self.mappings {
-            if cleaned_path == *unveiled_path ||
-               (cleaned_path.starts_with(unveiled_path) &&
-                (unveiled_path == "/" || cleaned_path.as_bytes().get(unveiled_path.len()) == Some(&b'/'))) {
-
+            if cleaned_path == *unveiled_path
+                || (cleaned_path.starts_with(unveiled_path)
+                    && (unveiled_path == "/"
+                        || cleaned_path.as_bytes().get(unveiled_path.len()) == Some(&b'/')))
+            {
                 if best_match.is_none() || unveiled_path.len() > best_match.unwrap().len() {
                     best_match = Some(unveiled_path);
                     best_perms = Some(perms);
@@ -621,8 +652,16 @@ impl NixStyleStore {
 
     /// Deduplicate identical store paths (simulates hardlinking in Nix store)
     pub fn deduplicate(&self, path_a: &str, path_b: &str) -> bool {
-        let content_a = self.registered_paths.iter().find(|(p, _)| p == path_a).map(|(_, c)| c);
-        let content_b = self.registered_paths.iter().find(|(p, _)| p == path_b).map(|(_, c)| c);
+        let content_a = self
+            .registered_paths
+            .iter()
+            .find(|(p, _)| p == path_a)
+            .map(|(_, c)| c);
+        let content_b = self
+            .registered_paths
+            .iter()
+            .find(|(p, _)| p == path_b)
+            .map(|(_, c)| c);
 
         match (content_a, content_b) {
             (Some(ca), Some(cb)) => ca == cb,
@@ -649,9 +688,7 @@ pub struct AptPinStore {
 
 impl AptPinStore {
     pub fn new() -> Self {
-        Self {
-            pins: Vec::new(),
-        }
+        Self { pins: Vec::new() }
     }
 
     pub fn add_pin(&mut self, pin: PinRule) {
@@ -659,7 +696,8 @@ impl AptPinStore {
     }
 
     pub fn get_package_priority(&self, package: &str) -> i32 {
-        self.pins.iter()
+        self.pins
+            .iter()
             .filter(|p| p.package == package)
             .map(|p| p.priority)
             .max()
@@ -706,10 +744,16 @@ impl NetBsdRumpRouter {
 
     /// Simulates routing a hardware/virtual hypercall.
     /// Translates contexts automatically (e.g. tracking overhead of userspace driver context switches).
-    pub fn dispatch_hypercall(&mut self, driver_name: &str, operation: &str) -> Result<String, &'static str> {
+    pub fn dispatch_hypercall(
+        &mut self,
+        driver_name: &str,
+        operation: &str,
+    ) -> Result<String, &'static str> {
         self.hypercall_count += 1;
 
-        let driver = self.drivers.iter()
+        let driver = self
+            .drivers
+            .iter()
             .find(|d| d.name == driver_name)
             .ok_or("Driver not found")?;
 
@@ -721,11 +765,15 @@ impl NetBsdRumpRouter {
         match driver.context {
             DriverContext::UserSpace => {
                 self.userspace_switches += 1;
-                Ok(format!("Dispatched {} to userspace driver {}", operation, driver_name))
+                Ok(format!(
+                    "Dispatched {} to userspace driver {}",
+                    operation, driver_name
+                ))
             }
-            DriverContext::KernelSpace => {
-                Ok(format!("Dispatched {} directly to kernelspace driver {}", operation, driver_name))
-            }
+            DriverContext::KernelSpace => Ok(format!(
+                "Dispatched {} directly to kernelspace driver {}",
+                operation, driver_name
+            )),
         }
     }
 
@@ -764,10 +812,15 @@ impl GentooUseFlagsManager {
 
     pub fn set_package_override(&mut self, package: &str, flags: &[&str]) {
         let over_flags: Vec<String> = flags.iter().map(|s| s.to_string()).collect();
-        if let Some(pos) = self.package_overrides.iter().position(|(p, _)| p == package) {
+        if let Some(pos) = self
+            .package_overrides
+            .iter()
+            .position(|(p, _)| p == package)
+        {
             self.package_overrides[pos].1 = over_flags;
         } else {
-            self.package_overrides.push((package.to_string(), over_flags));
+            self.package_overrides
+                .push((package.to_string(), over_flags));
         }
     }
 
@@ -799,11 +852,17 @@ impl GentooUseFlagsManager {
             if req.starts_with('!') {
                 let actual_flag = &req[1..];
                 if self.is_flag_enabled(package, actual_flag) {
-                    return Err(format!("Conflict: package {} requires flag {} to be disabled", package, actual_flag));
+                    return Err(format!(
+                        "Conflict: package {} requires flag {} to be disabled",
+                        package, actual_flag
+                    ));
                 }
             } else {
                 if !self.is_flag_enabled(package, req) {
-                    return Err(format!("Requirement unfulfilled: package {} requires flag {}", package, req));
+                    return Err(format!(
+                        "Requirement unfulfilled: package {} requires flag {}",
+                        package, req
+                    ));
                 }
             }
         }
@@ -995,7 +1054,10 @@ impl SovereignLandlockLsm {
         let mut best_match: Option<&LandlockRule> = None;
 
         for rule in &self.rules {
-            if path == rule.path || (path.starts_with(&rule.path) && (rule.path == "/" || path.as_bytes().get(rule.path.len()) == Some(&b'/'))) {
+            if path == rule.path
+                || (path.starts_with(&rule.path)
+                    && (rule.path == "/" || path.as_bytes().get(rule.path.len()) == Some(&b'/')))
+            {
                 match best_match {
                     Some(best) if rule.path.len() > best.path.len() => {
                         best_match = Some(rule);
@@ -1133,10 +1195,16 @@ impl DrmModeInfo {
         if self.htotal <= self.hdisplay || self.vtotal <= self.vdisplay {
             return false;
         }
-        if self.hsync_start < self.hdisplay || self.hsync_end < self.hsync_start || self.hsync_end > self.htotal {
+        if self.hsync_start < self.hdisplay
+            || self.hsync_end < self.hsync_start
+            || self.hsync_end > self.htotal
+        {
             return false;
         }
-        if self.vsync_start < self.vdisplay || self.vsync_end < self.vsync_start || self.vsync_end > self.vtotal {
+        if self.vsync_start < self.vdisplay
+            || self.vsync_end < self.vsync_start
+            || self.vsync_end > self.vtotal
+        {
             return false;
         }
         true
@@ -1160,7 +1228,9 @@ pub struct SovereignBpfCoReEngine {
 
 impl SovereignBpfCoReEngine {
     pub fn new() -> Self {
-        Self { relocations: Vec::new() }
+        Self {
+            relocations: Vec::new(),
+        }
     }
 
     pub fn register_relocation(&mut self, type_name: &str, field_name: &str, target_offset: i16) {
@@ -1171,8 +1241,17 @@ impl SovereignBpfCoReEngine {
         });
     }
 
-    pub fn relocate_instruction(&self, type_name: &str, field_name: &str, inst: &mut EbpfInstruction) -> Result<(), &'static str> {
-        if let Some(reloc) = self.relocations.iter().find(|r| r.type_name == type_name && r.field_name == field_name) {
+    pub fn relocate_instruction(
+        &self,
+        type_name: &str,
+        field_name: &str,
+        inst: &mut EbpfInstruction,
+    ) -> Result<(), &'static str> {
+        if let Some(reloc) = self
+            .relocations
+            .iter()
+            .find(|r| r.type_name == type_name && r.field_name == field_name)
+        {
             inst.offset = reloc.target_offset;
             Ok(())
         } else {
@@ -1218,7 +1297,15 @@ impl BsdCapsicumRights {
         self.in_capability_mode = true;
     }
 
-    pub fn limit_rights(&mut self, read: bool, write: bool, seek: bool, fstat: bool, mmap: bool, ioctl: bool) {
+    pub fn limit_rights(
+        &mut self,
+        read: bool,
+        write: bool,
+        seek: bool,
+        fstat: bool,
+        mmap: bool,
+        ioctl: bool,
+    ) {
         self.cap_read &= read;
         self.cap_write &= write;
         self.cap_seek &= seek;
@@ -1287,7 +1374,8 @@ impl Hammer2MultiVersionEngine {
     }
 
     pub fn read_at_generation(&self, inode_id: u64, target_gen: u64) -> Option<&Hammer2Inode> {
-        self.inodes.iter()
+        self.inodes
+            .iter()
             .filter(|i| i.inode_id == inode_id && i.generation <= target_gen)
             .max_by_key(|i| i.generation)
     }
@@ -1324,7 +1412,13 @@ impl SovereignOstreeEngine {
         }
     }
 
-    pub fn stage_commit(&mut self, checksum: &str, version: &str, kernel_ref: &str, rootfs_hash: u64) -> usize {
+    pub fn stage_commit(
+        &mut self,
+        checksum: &str,
+        version: &str,
+        kernel_ref: &str,
+        rootfs_hash: u64,
+    ) -> usize {
         let commit = OstreeCommit {
             checksum: checksum.to_string(),
             version: version.to_string(),
@@ -1348,7 +1442,8 @@ impl SovereignOstreeEngine {
     }
 
     pub fn get_active_deployment(&self) -> Option<&OstreeCommit> {
-        self.active_deployment_idx.and_then(|idx| self.staged_commits.get(idx))
+        self.active_deployment_idx
+            .and_then(|idx| self.staged_commits.get(idx))
     }
 }
 
@@ -1404,7 +1499,13 @@ impl SovereignRunitSupervisor {
         }
     }
 
-    pub fn register_service(&mut self, name: &str, runlevel: RunitRunlevel, dependencies: &[&str], max_restarts: u32) {
+    pub fn register_service(
+        &mut self,
+        name: &str,
+        runlevel: RunitRunlevel,
+        dependencies: &[&str],
+        max_restarts: u32,
+    ) {
         let deps = dependencies.iter().map(|s| s.to_string()).collect();
         self.services.push(RunitService {
             name: name.to_string(),
@@ -1431,14 +1532,18 @@ impl SovereignRunitSupervisor {
             if service.target_runlevel == self.active_runlevel {
                 // Check if all dependencies are running
                 let all_deps_running = service.dependencies.iter().all(|dep_name| {
-                    services_snapshot.iter().any(|s| &s.name == dep_name && s.status == RunitServiceStatus::Running)
+                    services_snapshot
+                        .iter()
+                        .any(|s| &s.name == dep_name && s.status == RunitServiceStatus::Running)
                 });
 
                 if all_deps_running && service.status == RunitServiceStatus::Stopped {
                     service.status = RunitServiceStatus::Running;
                     service.pid = Some(1000 + service.restart_count as u64);
                     updated += 1;
-                } else if service.status == RunitServiceStatus::Failed && service.restart_count < service.max_restarts {
+                } else if service.status == RunitServiceStatus::Failed
+                    && service.restart_count < service.max_restarts
+                {
                     service.restart_count += 1;
                     service.backoff_ms *= 2; // Exponential backoff
                     service.status = RunitServiceStatus::Respawning;
@@ -1460,7 +1565,10 @@ impl SovereignRunitSupervisor {
     }
 
     pub fn simulate_service_failure(&mut self, name: &str) -> Result<(), &'static str> {
-        let service = self.services.iter_mut().find(|s| s.name == name)
+        let service = self
+            .services
+            .iter_mut()
+            .find(|s| s.name == name)
             .ok_or("Service not found")?;
         service.status = RunitServiceStatus::Failed;
         service.pid = None;
@@ -1468,7 +1576,10 @@ impl SovereignRunitSupervisor {
     }
 
     pub fn get_service_status(&self, name: &str) -> Option<RunitServiceStatus> {
-        self.services.iter().find(|s| s.name == name).map(|s| s.status)
+        self.services
+            .iter()
+            .find(|s| s.name == name)
+            .map(|s| s.status)
     }
 }
 
@@ -1549,8 +1660,16 @@ impl SovereignZfsPoolEngine {
     }
 
     /// Write data using Copy-on-Write semantics (creates a new block version without mutating old ones)
-    pub fn write_block_cow(&mut self, dataset_name: &str, block_id: u64, data: &[u8]) -> Result<u64, &'static str> {
-        let dataset = self.datasets.iter_mut().find(|d| d.name == dataset_name)
+    pub fn write_block_cow(
+        &mut self,
+        dataset_name: &str,
+        block_id: u64,
+        data: &[u8],
+    ) -> Result<u64, &'static str> {
+        let dataset = self
+            .datasets
+            .iter_mut()
+            .find(|d| d.name == dataset_name)
             .ok_or("Dataset not found")?;
 
         let checksum = Self::calculate_checksum(data);
@@ -1574,8 +1693,15 @@ impl SovereignZfsPoolEngine {
     }
 
     /// Atomic dataset snapshot creation
-    pub fn take_snapshot(&mut self, dataset_name: &str, snapshot_name: &str) -> Result<(), &'static str> {
-        let dataset = self.datasets.iter().find(|d| d.name == dataset_name)
+    pub fn take_snapshot(
+        &mut self,
+        dataset_name: &str,
+        snapshot_name: &str,
+    ) -> Result<(), &'static str> {
+        let dataset = self
+            .datasets
+            .iter()
+            .find(|d| d.name == dataset_name)
             .ok_or("Dataset not found")?;
 
         self.snapshots.push(ZfsSnapshot {
@@ -1590,8 +1716,15 @@ impl SovereignZfsPoolEngine {
     }
 
     /// Zero-copy clone dataset creation from snapshot
-    pub fn create_clone_from_snapshot(&mut self, snapshot_name: &str, new_dataset_name: &str) -> Result<(), &'static str> {
-        let snapshot = self.snapshots.iter().find(|s| s.name == snapshot_name)
+    pub fn create_clone_from_snapshot(
+        &mut self,
+        snapshot_name: &str,
+        new_dataset_name: &str,
+    ) -> Result<(), &'static str> {
+        let snapshot = self
+            .snapshots
+            .iter()
+            .find(|s| s.name == snapshot_name)
             .ok_or("Snapshot not found")?;
 
         self.datasets.push(ZfsDataset {
@@ -1604,7 +1737,10 @@ impl SovereignZfsPoolEngine {
 
     /// Verify data integrity via block checksum validation
     pub fn verify_dataset_integrity(&self, dataset_name: &str) -> Result<bool, &'static str> {
-        let dataset = self.datasets.iter().find(|d| d.name == dataset_name)
+        let dataset = self
+            .datasets
+            .iter()
+            .find(|d| d.name == dataset_name)
             .ok_or("Dataset not found")?;
 
         for block in &dataset.blocks {
@@ -1627,8 +1763,8 @@ pub enum MemoryPagePerms {
     Read,
     Write,
     Execute,
-    ReadWrite,  // Writable
-    ReadExecute,// Executable
+    ReadWrite,   // Writable
+    ReadExecute, // Executable
 }
 
 #[derive(Debug, Clone)]
@@ -1648,7 +1784,8 @@ pub struct SovereignKaslrWxAllocator {
 impl SovereignKaslrWxAllocator {
     pub fn new(seed: u64) -> Self {
         // KARL (Kernel Address Randomized Link): Compute kernel base offset based on entropy seed
-        let base_offset = (seed.wrapping_mul(6364136223846793005).wrapping_add(1) % 0x1000000) & !0xFFF;
+        let base_offset =
+            (seed.wrapping_mul(6364136223846793005).wrapping_add(1) % 0x1000000) & !0xFFF;
         Self {
             kernel_base_offset: base_offset,
             pages: Vec::new(),
@@ -1658,11 +1795,20 @@ impl SovereignKaslrWxAllocator {
 
     /// Re-link/re-randomize kernel address layout (KARL behavior on boot)
     pub fn relink_kernel_base(&mut self, entropy: u64) {
-        self.kernel_base_offset = (entropy.wrapping_mul(2862933555777941757).wrapping_add(3037000493) % 0x2000000) & !0xFFF;
+        self.kernel_base_offset = (entropy
+            .wrapping_mul(2862933555777941757)
+            .wrapping_add(3037000493)
+            % 0x2000000)
+            & !0xFFF;
     }
 
     /// Allocate a virtual memory page conforming to strict W^X (Write XOR Execute) policy enforcement
-    pub fn allocate_page(&mut self, phys_addr: u64, size: usize, perms: MemoryPagePerms) -> Result<u64, &'static str> {
+    pub fn allocate_page(
+        &mut self,
+        phys_addr: u64,
+        size: usize,
+        perms: MemoryPagePerms,
+    ) -> Result<u64, &'static str> {
         let virt_addr = 0xFFFFFFFF80000000u64 + self.kernel_base_offset + phys_addr;
 
         let page = KernelMemoryPage {
@@ -1678,7 +1824,11 @@ impl SovereignKaslrWxAllocator {
 
     /// Change permissions on an allocated page with strict W^X (Write XOR Execute) check.
     /// Returns error and logs audit violation if page attempts to be BOTH Writable AND Executable!
-    pub fn set_page_permissions(&mut self, virt_addr: u64, requested_perms: MemoryPagePerms) -> Result<(), &'static str> {
+    pub fn set_page_permissions(
+        &mut self,
+        virt_addr: u64,
+        requested_perms: MemoryPagePerms,
+    ) -> Result<(), &'static str> {
         // W^X Enforcement check: Reject if permissions attempt combined Write + Execute
         if requested_perms == MemoryPagePerms::ReadWrite {
             // ReadWrite is fine as long as execution is disabled
@@ -1686,7 +1836,10 @@ impl SovereignKaslrWxAllocator {
             // ReadExecute is fine as long as write is disabled
         }
 
-        let page = self.pages.iter_mut().find(|p| p.virtual_addr == virt_addr)
+        let page = self
+            .pages
+            .iter_mut()
+            .find(|p| p.virtual_addr == virt_addr)
             .ok_or("Page not found")?;
 
         page.perms = requested_perms;
@@ -1699,7 +1852,10 @@ impl SovereignKaslrWxAllocator {
             match page.perms {
                 MemoryPagePerms::Execute | MemoryPagePerms::ReadExecute => true,
                 MemoryPagePerms::ReadWrite => {
-                    self.security_violations.push(format!("W^X Violation: Execution attempt on Writable page at {:#X}", virt_addr));
+                    self.security_violations.push(format!(
+                        "W^X Violation: Execution attempt on Writable page at {:#X}",
+                        virt_addr
+                    ));
                     false
                 }
                 _ => false,
@@ -1778,7 +1934,13 @@ impl SovereignDTraceEngine {
         }
     }
 
-    pub fn register_probe(&mut self, provider: DTraceProvider, module: &str, function: &str, name: &str) -> u32 {
+    pub fn register_probe(
+        &mut self,
+        provider: DTraceProvider,
+        module: &str,
+        function: &str,
+        name: &str,
+    ) -> u32 {
         let probe_id = self.next_probe_id;
         self.next_probe_id += 1;
         self.probes.push(DTraceProbe {
@@ -1827,7 +1989,11 @@ impl SovereignDTraceEngine {
     }
 
     pub fn aggregate_metric(&mut self, probe_id: u32, agg_type: DTraceAggregation, val: u64) {
-        if let Some(agg) = self.aggregations.iter_mut().find(|a| a.probe_id == probe_id && a.agg_type == agg_type) {
+        if let Some(agg) = self
+            .aggregations
+            .iter_mut()
+            .find(|a| a.probe_id == probe_id && a.agg_type == agg_type)
+        {
             agg.count += 1;
             agg.sum_or_val = agg.sum_or_val.wrapping_add(val);
             if val < agg.min_val {
@@ -1850,15 +2016,24 @@ impl SovereignDTraceEngine {
 
     pub fn get_aggregation_value(&self, probe_id: u32, agg_type: DTraceAggregation) -> Option<u64> {
         if agg_type == DTraceAggregation::Avg {
-            let sum_agg = self.aggregations.iter().find(|a| a.probe_id == probe_id && a.agg_type == DTraceAggregation::Sum);
-            let count_agg = self.aggregations.iter().find(|a| a.probe_id == probe_id && a.agg_type == DTraceAggregation::Count);
+            let sum_agg = self
+                .aggregations
+                .iter()
+                .find(|a| a.probe_id == probe_id && a.agg_type == DTraceAggregation::Sum);
+            let count_agg = self
+                .aggregations
+                .iter()
+                .find(|a| a.probe_id == probe_id && a.agg_type == DTraceAggregation::Count);
             if let (Some(sum), Some(cnt)) = (sum_agg, count_agg) {
                 if cnt.count > 0 {
                     return Some(sum.sum_or_val / cnt.count);
                 }
             }
         }
-        let agg = self.aggregations.iter().find(|a| a.probe_id == probe_id && a.agg_type == agg_type)?;
+        let agg = self
+            .aggregations
+            .iter()
+            .find(|a| a.probe_id == probe_id && a.agg_type == agg_type)?;
         match agg_type {
             DTraceAggregation::Count => Some(agg.count),
             DTraceAggregation::Sum => Some(agg.sum_or_val),
@@ -1987,7 +2162,11 @@ impl SovereignRaidSelfHealer {
                     data: data.to_vec(),
                     checksum,
                 };
-                if let Some(pos) = self.devices[data_target_idx].chunks.iter().position(|c| c.chunk_id == chunk_id) {
+                if let Some(pos) = self.devices[data_target_idx]
+                    .chunks
+                    .iter()
+                    .position(|c| c.chunk_id == chunk_id)
+                {
                     self.devices[data_target_idx].chunks[pos] = data_chunk;
                 } else {
                     self.devices[data_target_idx].chunks.push(data_chunk);
@@ -2000,7 +2179,11 @@ impl SovereignRaidSelfHealer {
                     data: data.to_vec(), // Simplified parity representation
                     checksum,
                 };
-                if let Some(pos) = self.devices[parity_target_idx].chunks.iter().position(|c| c.chunk_id == chunk_id) {
+                if let Some(pos) = self.devices[parity_target_idx]
+                    .chunks
+                    .iter()
+                    .position(|c| c.chunk_id == chunk_id)
+                {
                     self.devices[parity_target_idx].chunks[pos] = parity_chunk;
                 } else {
                     self.devices[parity_target_idx].chunks.push(parity_chunk);
@@ -2039,9 +2222,15 @@ impl SovereignRaidSelfHealer {
 
                 for cid in chunk_ids {
                     // Find a healthy copy among devices
-                    let healthy_copy = self.devices.iter().find_map(|dev| {
-                        dev.chunks.iter().find(|c| c.chunk_id == cid && Self::calculate_checksum(&c.data) == c.checksum)
-                    }).cloned();
+                    let healthy_copy = self
+                        .devices
+                        .iter()
+                        .find_map(|dev| {
+                            dev.chunks.iter().find(|c| {
+                                c.chunk_id == cid && Self::calculate_checksum(&c.data) == c.checksum
+                            })
+                        })
+                        .cloned();
 
                     if let Some(healthy) = healthy_copy {
                         // Heal corrupted copies on other devices
@@ -2070,9 +2259,15 @@ impl SovereignRaidSelfHealer {
                 }
 
                 for cid in chunk_ids {
-                    let healthy_copy = self.devices.iter().find_map(|dev| {
-                        dev.chunks.iter().find(|c| c.chunk_id == cid && Self::calculate_checksum(&c.data) == c.checksum)
-                    }).cloned();
+                    let healthy_copy = self
+                        .devices
+                        .iter()
+                        .find_map(|dev| {
+                            dev.chunks.iter().find(|c| {
+                                c.chunk_id == cid && Self::calculate_checksum(&c.data) == c.checksum
+                            })
+                        })
+                        .cloned();
 
                     if let Some(healthy) = healthy_copy {
                         for dev in self.devices.iter_mut() {
@@ -2170,7 +2365,12 @@ impl SovereignDeclarativeSystemEngine {
         hash
     }
 
-    pub fn build_generation(&mut self, hostname: &str, packages: &[&str], services: &[&str]) -> u32 {
+    pub fn build_generation(
+        &mut self,
+        hostname: &str,
+        packages: &[&str],
+        services: &[&str],
+    ) -> u32 {
         self.current_gen_id += 1;
         let gen_id = self.current_gen_id;
         let config_hash = Self::calculate_config_hash(hostname, packages, services);
@@ -2209,7 +2409,11 @@ impl SovereignDeclarativeSystemEngine {
     }
 
     pub fn rollback_to_generation(&mut self, gen_id: u32) -> RollbackStatus {
-        if let Some(pos) = self.generations.iter().position(|g| g.generation_id == gen_id) {
+        if let Some(pos) = self
+            .generations
+            .iter()
+            .position(|g| g.generation_id == gen_id)
+        {
             if self.generations[pos].active {
                 RollbackStatus::AlreadyActive
             } else {
@@ -2223,9 +2427,21 @@ impl SovereignDeclarativeSystemEngine {
         }
     }
 
-    pub fn compute_config_diff(&self, gen_a: u32, gen_b: u32) -> Option<(Vec<String>, Vec<String>)> {
-        let config_a = self.generations.iter().find(|g| g.generation_id == gen_a).map(|g| &g.config)?;
-        let config_b = self.generations.iter().find(|g| g.generation_id == gen_b).map(|g| &g.config)?;
+    pub fn compute_config_diff(
+        &self,
+        gen_a: u32,
+        gen_b: u32,
+    ) -> Option<(Vec<String>, Vec<String>)> {
+        let config_a = self
+            .generations
+            .iter()
+            .find(|g| g.generation_id == gen_a)
+            .map(|g| &g.config)?;
+        let config_b = self
+            .generations
+            .iter()
+            .find(|g| g.generation_id == gen_b)
+            .map(|g| &g.config)?;
 
         let mut added = Vec::new();
         let mut removed = Vec::new();
@@ -2299,8 +2515,14 @@ impl SovereignPrivSepSandbox {
         };
 
         // Default strict OpenBSD-style privilege separation policies
-        sandbox.restrict_role_policy(PrivSepProcessRole::RootParent, &["fork", "exec", "socket", "bind", "setuid"]);
-        sandbox.restrict_role_policy(PrivSepProcessRole::UnprivilegedChild, &["read", "write", "select", "poll"]);
+        sandbox.restrict_role_policy(
+            PrivSepProcessRole::RootParent,
+            &["fork", "exec", "socket", "bind", "setuid"],
+        );
+        sandbox.restrict_role_policy(
+            PrivSepProcessRole::UnprivilegedChild,
+            &["read", "write", "select", "poll"],
+        );
         sandbox.restrict_role_policy(PrivSepProcessRole::ChrootedWorker, &["read", "write"]);
 
         sandbox
@@ -2327,9 +2549,15 @@ impl SovereignPrivSepSandbox {
     }
 
     pub fn audit_syscall(&mut self, pid: u64, syscall: &str) -> bool {
-        let proc_opt = self.processes.iter().find(|p| p.pid == pid && p.alive).cloned();
+        let proc_opt = self
+            .processes
+            .iter()
+            .find(|p| p.pid == pid && p.alive)
+            .cloned();
         if let Some(proc_info) = proc_opt {
-            let is_allowed = self.policies.iter()
+            let is_allowed = self
+                .policies
+                .iter()
                 .find(|p| p.role == proc_info.role)
                 .map(|p| p.allowed_syscalls.contains(&syscall.to_string()))
                 .unwrap_or(false);
@@ -2424,7 +2652,10 @@ impl SerpentMossEngine {
     }
 
     pub fn stage_install(&mut self, tx_id: u64, pkg: MossPackageSpec) -> Result<(), &'static str> {
-        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+        let tx = self
+            .active_transactions
+            .iter_mut()
+            .find(|t| t.id == tx_id)
             .ok_or("Transaction not found")?;
         if tx.state != MossTransactionState::Pending {
             return Err("Transaction is not in Pending state");
@@ -2434,7 +2665,10 @@ impl SerpentMossEngine {
     }
 
     pub fn stage_remove(&mut self, tx_id: u64, pkg_name: &str) -> Result<(), &'static str> {
-        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+        let tx = self
+            .active_transactions
+            .iter_mut()
+            .find(|t| t.id == tx_id)
             .ok_or("Transaction not found")?;
         if tx.state != MossTransactionState::Pending {
             return Err("Transaction is not in Pending state");
@@ -2444,14 +2678,18 @@ impl SerpentMossEngine {
     }
 
     pub fn commit_transaction(&mut self, tx_id: u64) -> Result<(), &'static str> {
-        let tx_idx = self.active_transactions.iter().position(|t| t.id == tx_id)
+        let tx_idx = self
+            .active_transactions
+            .iter()
+            .position(|t| t.id == tx_id)
             .ok_or("Transaction not found")?;
 
         self.active_transactions[tx_idx].state = MossTransactionState::Active;
 
         // Execute removals
         let remove_queue = self.active_transactions[tx_idx].remove_queue.clone();
-        self.installed_packages.retain(|p| !remove_queue.contains(&p.name));
+        self.installed_packages
+            .retain(|p| !remove_queue.contains(&p.name));
 
         // Execute installations & trigger registration
         let install_queue = self.active_transactions[tx_idx].install_queue.clone();
@@ -2469,7 +2707,10 @@ impl SerpentMossEngine {
     }
 
     pub fn rollback_transaction(&mut self, tx_id: u64) -> Result<(), &'static str> {
-        let tx = self.active_transactions.iter_mut().find(|t| t.id == tx_id)
+        let tx = self
+            .active_transactions
+            .iter_mut()
+            .find(|t| t.id == tx_id)
             .ok_or("Transaction not found")?;
 
         if tx.state != MossTransactionState::Committed && tx.state != MossTransactionState::Active {
@@ -2477,8 +2718,10 @@ impl SerpentMossEngine {
         }
 
         // Revert installations
-        let installed_names: Vec<String> = tx.install_queue.iter().map(|p| p.name.clone()).collect();
-        self.installed_packages.retain(|p| !installed_names.contains(&p.name));
+        let installed_names: Vec<String> =
+            tx.install_queue.iter().map(|p| p.name.clone()).collect();
+        self.installed_packages
+            .retain(|p| !installed_names.contains(&p.name));
 
         tx.state = MossTransactionState::RolledBack;
         Ok(())
@@ -2506,7 +2749,7 @@ pub enum CoreTypePreference {
 pub struct BoreTaskProfile {
     pub task_id: u64,
     pub name: String,
-    pub priority: u8, // 0..255 (lower = higher urgency)
+    pub priority: u8,          // 0..255 (lower = higher urgency)
     pub interactive_score: u8, // 0..100 (higher = user-facing latency sensitive)
     pub burst_time_ns: u64,
     pub preferred_core: CoreTypePreference,
@@ -2543,7 +2786,10 @@ impl CachyBoreScheduler {
     }
 
     /// Picks the next optimal task considering core type affinity and latency score
-    pub fn schedule_next_task(&mut self, available_core_type: CoreTypePreference) -> Option<BoreTaskProfile> {
+    pub fn schedule_next_task(
+        &mut self,
+        available_core_type: CoreTypePreference,
+    ) -> Option<BoreTaskProfile> {
         if self.task_queue.is_empty() {
             return None;
         }
@@ -2554,7 +2800,9 @@ impl CachyBoreScheduler {
 
         for (idx, task) in self.task_queue.iter().enumerate() {
             let mut score = task.interactive_score as i32 * 2 - task.priority as i32;
-            if task.preferred_core == available_core_type || available_core_type == CoreTypePreference::AnyCore {
+            if task.preferred_core == available_core_type
+                || available_core_type == CoreTypePreference::AnyCore
+            {
                 score += 50;
             }
             if score > best_score {
@@ -2621,7 +2869,12 @@ impl FreeBsdRacctVnetGuard {
         }
     }
 
-    pub fn register_jail_guard(&mut self, jail_id: u64, limits: RacctResourceLimits, vnet: Option<VnetStack>) {
+    pub fn register_jail_guard(
+        &mut self,
+        jail_id: u64,
+        limits: RacctResourceLimits,
+        vnet: Option<VnetStack>,
+    ) {
         self.guards.push(JailGuardRecord {
             jail_id,
             limits,
@@ -2632,8 +2885,16 @@ impl FreeBsdRacctVnetGuard {
         });
     }
 
-    pub fn update_usage(&mut self, jail_id: u64, rss_bytes: u64, pids: u32) -> Result<bool, &'static str> {
-        let guard = self.guards.iter_mut().find(|g| g.jail_id == jail_id)
+    pub fn update_usage(
+        &mut self,
+        jail_id: u64,
+        rss_bytes: u64,
+        pids: u32,
+    ) -> Result<bool, &'static str> {
+        let guard = self
+            .guards
+            .iter_mut()
+            .find(|g| g.jail_id == jail_id)
             .ok_or("Jail guard record not found")?;
 
         guard.current_rss_bytes = rss_bytes;
@@ -2641,8 +2902,10 @@ impl FreeBsdRacctVnetGuard {
 
         if rss_bytes > guard.limits.max_rss_bytes || pids > guard.limits.max_pids {
             guard.throttled = true;
-            self.violations_log.push(format!("RACCT/RCTL Violation: Jail {} exceeded resource limits (RSS: {}/{}, PIDs: {}/{})",
-                jail_id, rss_bytes, guard.limits.max_rss_bytes, pids, guard.limits.max_pids));
+            self.violations_log.push(format!(
+                "RACCT/RCTL Violation: Jail {} exceeded resource limits (RSS: {}/{}, PIDs: {}/{})",
+                jail_id, rss_bytes, guard.limits.max_rss_bytes, pids, guard.limits.max_pids
+            ));
             Ok(false) // Resource limit violated
         } else {
             guard.throttled = false;
@@ -2702,7 +2965,12 @@ impl OpenBsdPledgeUnveilSentinel {
         }
     }
 
-    pub fn unveil_process(&mut self, pid: u64, path: &str, perms: &str) -> Result<(), &'static str> {
+    pub fn unveil_process(
+        &mut self,
+        pid: u64,
+        path: &str,
+        perms: &str,
+    ) -> Result<(), &'static str> {
         if let Some((_, unveil)) = self.unveiled_processes.iter_mut().find(|(p, _)| *p == pid) {
             unveil.unveil(path, perms)
         } else {
@@ -2713,7 +2981,13 @@ impl OpenBsdPledgeUnveilSentinel {
         }
     }
 
-    pub fn audit_syscall(&mut self, pid: u64, timestamp_ns: u64, operation: &str, target_path: Option<&str>) -> bool {
+    pub fn audit_syscall(
+        &mut self,
+        pid: u64,
+        timestamp_ns: u64,
+        operation: &str,
+        target_path: Option<&str>,
+    ) -> bool {
         // Check pledge
         if let Some((_, pledge)) = self.pledged_processes.iter().find(|(p, _)| *p == pid) {
             if !pledge.check_operation(operation) {
@@ -2818,16 +3092,14 @@ mod tests {
         assert_eq!(result.unwrap(), 30);
 
         // Verification fail: missing Exit instruction
-        let missing_exit = vec![
-            EbpfInstruction {
-                opcode: EbpfOpcode::Add,
-                dst: 1,
-                src: 0,
-                offset: 0,
-                imm: 10,
-                use_imm: true,
-            }
-        ];
+        let missing_exit = vec![EbpfInstruction {
+            opcode: EbpfOpcode::Add,
+            dst: 1,
+            src: 0,
+            offset: 0,
+            imm: 10,
+            use_imm: true,
+        }];
         assert!(engine.verify_program(&missing_exit).is_err());
 
         // Verification fail: jump out of bounds
@@ -2847,7 +3119,7 @@ mod tests {
                 offset: 0,
                 imm: 0,
                 use_imm: false,
-            }
+            },
         ];
         assert!(engine.verify_program(&bad_jump).is_err());
 
@@ -2868,7 +3140,7 @@ mod tests {
                 offset: 0,
                 imm: 0,
                 use_imm: false,
-            }
+            },
         ];
         assert!(engine.verify_program(&bad_div).is_err());
 
@@ -3066,7 +3338,8 @@ mod tests {
 
     #[test]
     fn test_freebsd_jail_hierarchy_and_limits() {
-        let mut parent_jail = FreeBSDJail::new(1, "/jails/parent".to_string(), "parent".to_string());
+        let mut parent_jail =
+            FreeBSDJail::new(1, "/jails/parent".to_string(), "parent".to_string());
         parent_jail.max_processes = 2;
 
         assert!(parent_jail.add_process_with_limit(101).is_ok());
@@ -3075,7 +3348,8 @@ mod tests {
         assert!(parent_jail.add_process_with_limit(103).is_err());
 
         // Hierarchical jails
-        let child_jail = FreeBSDJail::new(2, "/jails/parent/child".to_string(), "child".to_string());
+        let child_jail =
+            FreeBSDJail::new(2, "/jails/parent/child".to_string(), "child".to_string());
         assert!(parent_jail.add_child_jail(child_jail).is_ok());
 
         // Try adding a jail outside parent's root_path
@@ -3192,7 +3466,9 @@ mod tests {
         // Rules can only be added before self restriction
         assert!(lsm.add_rule("/usr/bin", LandlockAccess::Execute).is_ok());
         assert!(lsm.add_rule("/home/user", LandlockAccess::ReadOnly).is_ok());
-        assert!(lsm.add_rule("/home/user/downloads", LandlockAccess::ReadWrite).is_ok());
+        assert!(lsm
+            .add_rule("/home/user/downloads", LandlockAccess::ReadWrite)
+            .is_ok());
 
         // Prior to restriction, all access is allowed
         assert!(lsm.check_access("/etc/shadow", LandlockAccess::ReadWrite));
@@ -3275,9 +3551,13 @@ mod tests {
             use_imm: false,
         };
 
-        assert!(core_engine.relocate_instruction("task_struct", "pid", &mut inst).is_ok());
+        assert!(core_engine
+            .relocate_instruction("task_struct", "pid", &mut inst)
+            .is_ok());
         assert_eq!(inst.offset, 16);
-        assert!(core_engine.relocate_instruction("task_struct", "nonexistent", &mut inst).is_err());
+        assert!(core_engine
+            .relocate_instruction("task_struct", "nonexistent", &mut inst)
+            .is_err());
     }
 
     #[test]
@@ -3337,25 +3617,43 @@ mod tests {
         // First tick starts syslogd since it has no dependencies
         let updated = supervisor.tick_supervision();
         assert_eq!(updated, 1);
-        assert_eq!(supervisor.get_service_status("syslogd"), Some(RunitServiceStatus::Running));
-        assert_eq!(supervisor.get_service_status("networking"), Some(RunitServiceStatus::Stopped));
+        assert_eq!(
+            supervisor.get_service_status("syslogd"),
+            Some(RunitServiceStatus::Running)
+        );
+        assert_eq!(
+            supervisor.get_service_status("networking"),
+            Some(RunitServiceStatus::Stopped)
+        );
 
         // Second tick starts networking because syslogd is now running
         let updated2 = supervisor.tick_supervision();
         assert_eq!(updated2, 1);
-        assert_eq!(supervisor.get_service_status("networking"), Some(RunitServiceStatus::Running));
+        assert_eq!(
+            supervisor.get_service_status("networking"),
+            Some(RunitServiceStatus::Running)
+        );
 
         // Simulate failure of networking
         assert!(supervisor.simulate_service_failure("networking").is_ok());
-        assert_eq!(supervisor.get_service_status("networking"), Some(RunitServiceStatus::Failed));
+        assert_eq!(
+            supervisor.get_service_status("networking"),
+            Some(RunitServiceStatus::Failed)
+        );
 
         // Tick triggers respawning backoff
         supervisor.tick_supervision();
-        assert_eq!(supervisor.get_service_status("networking"), Some(RunitServiceStatus::Respawning));
+        assert_eq!(
+            supervisor.get_service_status("networking"),
+            Some(RunitServiceStatus::Respawning)
+        );
 
         // Tick recovers service to Running
         supervisor.tick_supervision();
-        assert_eq!(supervisor.get_service_status("networking"), Some(RunitServiceStatus::Running));
+        assert_eq!(
+            supervisor.get_service_status("networking"),
+            Some(RunitServiceStatus::Running)
+        );
     }
 
     #[test]
@@ -3379,10 +3677,16 @@ mod tests {
         assert_eq!(integrity, Ok(true));
 
         // Create zero-copy clone from snap1
-        assert!(zfs.create_clone_from_snapshot("rootfs@snap1", "rootfs_clone").is_ok());
+        assert!(zfs
+            .create_clone_from_snapshot("rootfs@snap1", "rootfs_clone")
+            .is_ok());
 
         // Check that clone holds v1 payload
-        let clone_ds = zfs.datasets.iter().find(|d| d.name == "rootfs_clone").unwrap();
+        let clone_ds = zfs
+            .datasets
+            .iter()
+            .find(|d| d.name == "rootfs_clone")
+            .unwrap();
         assert_eq!(clone_ds.blocks[0].payload, b"system_config_v1");
 
         // Check active dataset holds v2 payload
@@ -3396,11 +3700,15 @@ mod tests {
         assert_ne!(alloc.kernel_base_offset, 0); // Random offset generated
 
         // Allocate a ReadExecute code page
-        let virt_code = alloc.allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute).unwrap();
+        let virt_code = alloc
+            .allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)
+            .unwrap();
         assert!(alloc.validate_execution_attempt(virt_code));
 
         // Allocate a ReadWrite data page
-        let virt_data = alloc.allocate_page(0x2000, 4096, MemoryPagePerms::ReadWrite).unwrap();
+        let virt_data = alloc
+            .allocate_page(0x2000, 4096, MemoryPagePerms::ReadWrite)
+            .unwrap();
 
         // Attempting to execute a ReadWrite page triggers W^X security violation audit
         assert!(!alloc.validate_execution_attempt(virt_data));
@@ -3432,9 +3740,18 @@ mod tests {
         dtrace.aggregate_metric(p2, DTraceAggregation::Sum, 100);
         dtrace.aggregate_metric(p2, DTraceAggregation::Sum, 200);
 
-        assert_eq!(dtrace.get_aggregation_value(p2, DTraceAggregation::Count), Some(2));
-        assert_eq!(dtrace.get_aggregation_value(p2, DTraceAggregation::Sum), Some(300));
-        assert_eq!(dtrace.get_aggregation_value(p2, DTraceAggregation::Avg), Some(150));
+        assert_eq!(
+            dtrace.get_aggregation_value(p2, DTraceAggregation::Count),
+            Some(2)
+        );
+        assert_eq!(
+            dtrace.get_aggregation_value(p2, DTraceAggregation::Sum),
+            Some(300)
+        );
+        assert_eq!(
+            dtrace.get_aggregation_value(p2, DTraceAggregation::Avg),
+            Some(150)
+        );
     }
 
     #[test]
@@ -3463,7 +3780,11 @@ mod tests {
         let mut engine = SovereignDeclarativeSystemEngine::new();
 
         let gen1 = engine.build_generation("sigma-node-1", &["coreutils", "kernel"], &["syslogd"]);
-        let gen2 = engine.build_generation("sigma-node-1", &["coreutils", "kernel", "nginx"], &["syslogd", "nginx"]);
+        let gen2 = engine.build_generation(
+            "sigma-node-1",
+            &["coreutils", "kernel", "nginx"],
+            &["syslogd", "nginx"],
+        );
 
         assert_eq!(gen1, 1);
         assert_eq!(gen2, 2);
@@ -3559,7 +3880,9 @@ mod tests {
         assert!(slice1 < slice2); // Interactive gets shorter, faster slices
 
         // Next task scheduling
-        let next_task = sched.schedule_next_task(CoreTypePreference::PerformancePCore).unwrap();
+        let next_task = sched
+            .schedule_next_task(CoreTypePreference::PerformancePCore)
+            .unwrap();
         assert_eq!(next_task.task_id, 1);
     }
 
@@ -3604,11 +3927,17 @@ mod tests {
         // Invalid pledge operation fails and logs violation
         assert!(!sentinel.audit_syscall(501, 1001, "wpath", Some("/etc/hosts")));
         assert_eq!(sentinel.audit_log.len(), 1);
-        assert_eq!(sentinel.audit_log[0].violation_type, AuditViolationType::PledgeViolation);
+        assert_eq!(
+            sentinel.audit_log[0].violation_type,
+            AuditViolationType::PledgeViolation
+        );
 
         // Invalid unveil path fails and logs violation
         assert!(!sentinel.audit_syscall(501, 1002, "rpath", Some("/var/log/syslog")));
         assert_eq!(sentinel.audit_log.len(), 2);
-        assert_eq!(sentinel.audit_log[1].violation_type, AuditViolationType::UnveilViolation);
+        assert_eq!(
+            sentinel.audit_log[1].violation_type,
+            AuditViolationType::UnveilViolation
+        );
     }
 }

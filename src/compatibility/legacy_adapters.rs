@@ -20,7 +20,7 @@ impl KernelPersona {
             KernelPersona::Linux2_6 => "linux_2_6",
         }
     }
-    
+
     pub fn api_version(&self) -> u32 {
         match self {
             KernelPersona::Linux6X => 60000,
@@ -68,7 +68,7 @@ impl KernelPersonaVM {
         self.current_persona.set(persona);
         self.update_syscall_table(persona);
     }
-    
+
     fn update_syscall_table(&self, persona: KernelPersona) {
         // Update syscall table based on persona
         match persona {
@@ -76,27 +76,27 @@ impl KernelPersonaVM {
             KernelPersona::Linux2_6 => self.setup_linux26_syscalls(),
         }
     }
-    
+
     fn setup_linux6x_syscalls(&self) {
         // Setup Linux 6.x syscall table
     }
-    
+
     fn setup_linux26_syscalls(&self) {
         // Setup Linux 2.6 syscall table
     }
-    
+
     pub fn translate_syscall(&self, syscall: u32) -> u32 {
         match self.current_persona.get() {
             KernelPersona::Linux6X => self.translate_linux6x(syscall),
             KernelPersona::Linux2_6 => self.translate_linux26(syscall),
         }
     }
-    
+
     fn translate_linux6x(&self, syscall: u32) -> u32 {
         // Direct mapping for modern syscalls
         syscall
     }
-    
+
     fn translate_linux26(&self, syscall: u32) -> u32 {
         // Map legacy syscalls to modern equivalents
         match syscall {
@@ -113,14 +113,14 @@ impl SyscallTable {
             entries: [SyscallEntry::default(); 512],
         }
     }
-    
+
     pub fn register(&mut self, entry: SyscallEntry) {
         let num = entry.number as usize;
         if num < 512 {
             self.entries[num] = entry;
         }
     }
-    
+
     pub fn lookup(&self, number: u32) -> Option<&SyscallEntry> {
         if number < 512 {
             Some(&self.entries[number as usize])

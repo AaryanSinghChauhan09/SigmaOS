@@ -15,7 +15,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Absolute Superiority Subsystem (SigmaSuperiority)
 //
 // Formally implements and unifies all remaining planned/unimplemented USPs of SigmaOS:
@@ -30,7 +29,6 @@
 // 9. SovereignForensics & Audit System: Live, hardware-assisted page scrubbing and WORM logging
 // 10. Sovereign Recover Utility (sigma-recover): Sector node recovery from pristine backups
 // 11. Asynchronous Shard Ignition (ASI) with write-once system images (CoreOS Parity)
-
 #![no_std]
 
 extern crate alloc;
@@ -67,7 +65,9 @@ impl SovereignRegistry {
 
     /// Rebuilds entire system state declaratively from current registry configuration
     pub fn rebuild_state(&self) -> &'static str {
-        if self.config_values.contains_key("network_ip") && self.config_values.contains_key("gpu_enabled") {
+        if self.config_values.contains_key("network_ip")
+            && self.config_values.contains_key("gpu_enabled")
+        {
             "SovereignRegistry: Declarative State Rebuilt successfully"
         } else {
             "SovereignRegistry: Default state configured"
@@ -396,7 +396,8 @@ impl SovereignForensics {
 
     pub fn write_attested_audit(&mut self, entry: &str) {
         // Simulates writing cryptographically attested audits to secure write-once-read-many (WORM) hardware registers
-        self.hardware_worm_logs.push(format!("WORM_ATTEST: {}", entry));
+        self.hardware_worm_logs
+            .push(format!("WORM_ATTEST: {}", entry));
     }
 }
 
@@ -460,7 +461,10 @@ impl ShardIgnitor {
         if !self.write_once_activated {
             return Err("ASI rejected: write-once validation failed");
         }
-        Ok(format!("Shard '{}' ignited asynchronously inside CoreOS sandbox", shard_name))
+        Ok(format!(
+            "Shard '{}' ignited asynchronously inside CoreOS sandbox",
+            shard_name
+        ))
     }
 }
 
@@ -477,11 +481,17 @@ mod tests {
     #[test]
     fn test_sovereign_registry_rebuild() {
         let mut reg = SovereignRegistry::new();
-        assert_eq!(reg.rebuild_state(), "SovereignRegistry: Default state configured");
+        assert_eq!(
+            reg.rebuild_state(),
+            "SovereignRegistry: Default state configured"
+        );
 
         reg.set_config("network_ip".to_string(), "10.0.0.1".to_string());
         reg.set_config("gpu_enabled".to_string(), "true".to_string());
-        assert_eq!(reg.rebuild_state(), "SovereignRegistry: Declarative State Rebuilt successfully");
+        assert_eq!(
+            reg.rebuild_state(),
+            "SovereignRegistry: Declarative State Rebuilt successfully"
+        );
     }
 
     #[test]
@@ -566,7 +576,10 @@ mod tests {
         let mut recover = SovereignRecoverUtility::new();
         recover.register_pristine_node(1001, b"pristine_sector".to_vec());
 
-        assert_eq!(recover.recover_corrupted_sector(1001).unwrap(), b"pristine_sector");
+        assert_eq!(
+            recover.recover_corrupted_sector(1001).unwrap(),
+            b"pristine_sector"
+        );
 
         let ignitor = ShardIgnitor::new();
         assert!(ignitor.ignite_asynchronous_shard("gui_shard").is_ok());

@@ -50,19 +50,33 @@ impl CustomizabilityLayer {
     pub fn apply_layout_preset(&mut self, preset: DesktopPreset) -> &'static str {
         self.active_layout = preset;
         match preset {
-            DesktopPreset::PlasmaModular => "Theme Layout: High Customizability (Modular desktop plasmoids & panel dock)",
-            DesktopPreset::GnomeMinimal => "Theme Layout: Clean and Centered (Activity overview hot-corner & clean topbar)",
-            DesktopPreset::TilingWindowManager => "Theme Layout: Keyboard Driven (Dynamic layout splits, gap spaces, status blocks)",
-            DesktopPreset::TraditionalWin32 => "Theme Layout: Legacy Win32 Desktop Classic Layout Engaged",
+            DesktopPreset::PlasmaModular => {
+                "Theme Layout: High Customizability (Modular desktop plasmoids & panel dock)"
+            }
+            DesktopPreset::GnomeMinimal => {
+                "Theme Layout: Clean and Centered (Activity overview hot-corner & clean topbar)"
+            }
+            DesktopPreset::TilingWindowManager => {
+                "Theme Layout: Keyboard Driven (Dynamic layout splits, gap spaces, status blocks)"
+            }
+            DesktopPreset::TraditionalWin32 => {
+                "Theme Layout: Legacy Win32 Desktop Classic Layout Engaged"
+            }
         }
     }
 
     pub fn set_service_manager(&mut self, manager: InitServiceManager) -> &'static str {
         self.service_manager = manager;
         match manager {
-            InitServiceManager::SystemdCompatible => "Init System: Dynamic systemd-compatible target units supervisor",
-            InitServiceManager::S6Supervised => "Init System: Ultra-fast, process-supervised static s6-style runlevels",
-            InitServiceManager::RCDistributed => "Init System: Minimal BSD-style rc.d shell script runner",
+            InitServiceManager::SystemdCompatible => {
+                "Init System: Dynamic systemd-compatible target units supervisor"
+            }
+            InitServiceManager::S6Supervised => {
+                "Init System: Ultra-fast, process-supervised static s6-style runlevels"
+            }
+            InitServiceManager::RCDistributed => {
+                "Init System: Minimal BSD-style rc.d shell script runner"
+            }
         }
     }
 }
@@ -253,7 +267,11 @@ mod tests {
 
     #[test]
     fn test_customizability_layer() {
-        let mut layer = CustomizabilityLayer::new(DesktopPreset::PlasmaModular, InitServiceManager::SystemdCompatible, "breath-dark");
+        let mut layer = CustomizabilityLayer::new(
+            DesktopPreset::PlasmaModular,
+            InitServiceManager::SystemdCompatible,
+            "breath-dark",
+        );
         assert_eq!(layer.active_layout, DesktopPreset::PlasmaModular);
         assert_eq!(layer.service_manager, InitServiceManager::SystemdCompatible);
 
@@ -269,16 +287,21 @@ mod tests {
     #[test]
     fn test_rolling_vs_stable() {
         let engine_stable = ReleaseEngine::new(ReleaseStream::StableLts, 1);
-        assert!(engine_stable.negotiate_kernel_profile().contains("Highly verified"));
+        assert!(engine_stable
+            .negotiate_kernel_profile()
+            .contains("Highly verified"));
 
         let engine_rolling = ReleaseEngine::new(ReleaseStream::RollingBleedingEdge, 9);
-        assert!(engine_rolling.negotiate_kernel_profile().contains("Predictive AI"));
+        assert!(engine_rolling
+            .negotiate_kernel_profile()
+            .contains("Predictive AI"));
     }
 
     #[test]
     fn test_sandboxed_experimentation() {
         let mut lab = SandboxedExperimentLab::new();
-        let binary_hash = lab.spawn_reproducible_sandbox("pkg_name: ripgrep-pqc\nversion: 14.1.0\ndeps: libc6");
+        let binary_hash =
+            lab.spawn_reproducible_sandbox("pkg_name: ripgrep-pqc\nversion: 14.1.0\ndeps: libc6");
         assert_eq!(lab.build_store.len(), 1);
         assert!(binary_hash.starts_with("bin-sha256"));
     }

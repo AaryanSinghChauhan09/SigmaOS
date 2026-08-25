@@ -20,8 +20,8 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 
 /// Android Activity Declaration Record
 #[derive(Debug, Clone)]
@@ -93,7 +93,10 @@ impl ApkManifestParser {
     /// Checks if the manifest requests a specific Android permission
     pub fn has_permission(&self, permission: &str) -> bool {
         if let Some(manifest) = &self.manifest {
-            manifest.permissions_required.iter().any(|p| p == permission)
+            manifest
+                .permissions_required
+                .iter()
+                .any(|p| p == permission)
         } else {
             false
         }
@@ -153,7 +156,8 @@ impl ArtBytecodeSandbox {
 
     /// Registers a JNI native method entry point address
     pub fn register_jni_method(&mut self, method_signature: &str, address: u64) {
-        self.jni_methods.insert(method_signature.to_string(), address);
+        self.jni_methods
+            .insert(method_signature.to_string(), address);
     }
 
     /// Resolves a JNI native method entry point
@@ -359,8 +363,16 @@ impl AndroidActivityManager {
     }
 
     /// Transitions an activity state along its lifecycle
-    pub fn transition_state(&mut self, activity_id: u64, target_state: ActivityState) -> Result<(), &'static str> {
-        if let Some(record) = self.activity_stack.iter_mut().find(|a| a.activity_id == activity_id) {
+    pub fn transition_state(
+        &mut self,
+        activity_id: u64,
+        target_state: ActivityState,
+    ) -> Result<(), &'static str> {
+        if let Some(record) = self
+            .activity_stack
+            .iter_mut()
+            .find(|a| a.activity_id == activity_id)
+        {
             record.state = target_state;
             Ok(())
         } else {
@@ -369,9 +381,20 @@ impl AndroidActivityManager {
     }
 
     /// Persists key-value instance state during low memory or screen rotation
-    pub fn save_activity_state(&mut self, activity_id: u64, key: &str, value: &str) -> Result<(), &'static str> {
-        if let Some(record) = self.activity_stack.iter_mut().find(|a| a.activity_id == activity_id) {
-            record.saved_instance_state.insert(key.to_string(), value.to_string());
+    pub fn save_activity_state(
+        &mut self,
+        activity_id: u64,
+        key: &str,
+        value: &str,
+    ) -> Result<(), &'static str> {
+        if let Some(record) = self
+            .activity_stack
+            .iter_mut()
+            .find(|a| a.activity_id == activity_id)
+        {
+            record
+                .saved_instance_state
+                .insert(key.to_string(), value.to_string());
             Ok(())
         } else {
             Err("Activity ID not found")
@@ -461,7 +484,11 @@ impl AndroidApplicationController {
     }
 
     /// Updates the application state
-    pub fn update_app_state(&mut self, package_name: &str, state: ApplicationState) -> Result<(), &'static str> {
+    pub fn update_app_state(
+        &mut self,
+        package_name: &str,
+        state: ApplicationState,
+    ) -> Result<(), &'static str> {
         if let Some(app) = self.applications.get_mut(package_name) {
             app.state = state;
             Ok(())
@@ -471,7 +498,11 @@ impl AndroidApplicationController {
     }
 
     /// Attaches an activity instance ID to an application process
-    pub fn attach_activity(&mut self, package_name: &str, activity_id: u64) -> Result<(), &'static str> {
+    pub fn attach_activity(
+        &mut self,
+        package_name: &str,
+        activity_id: u64,
+    ) -> Result<(), &'static str> {
         if let Some(app) = self.applications.get_mut(package_name) {
             app.attached_activities.push(activity_id);
             Ok(())
@@ -481,7 +512,11 @@ impl AndroidApplicationController {
     }
 
     /// Attaches a service name to an application process
-    pub fn attach_service(&mut self, package_name: &str, service_name: &str) -> Result<(), &'static str> {
+    pub fn attach_service(
+        &mut self,
+        package_name: &str,
+        service_name: &str,
+    ) -> Result<(), &'static str> {
         if let Some(app) = self.applications.get_mut(package_name) {
             app.attached_services.push(service_name.to_string());
             Ok(())
@@ -539,7 +574,13 @@ impl AndroidLowMemoryKiller {
     }
 
     /// Registers a process profile into the LMK monitor
-    pub fn register_process(&mut self, pid: u32, package_name: &str, oom_adj: OomAdjScore, rss_mb: usize) {
+    pub fn register_process(
+        &mut self,
+        pid: u32,
+        package_name: &str,
+        oom_adj: OomAdjScore,
+        rss_mb: usize,
+    ) {
         let profile = ProcessMemoryProfile {
             pid,
             package_name: package_name.to_string(),
@@ -660,7 +701,8 @@ impl AndroidProcessKillingEngine {
             // Save state of attached activities
             if let Some(app) = app_ctrl.applications.get(&pkg) {
                 for &act_id in &app.attached_activities {
-                    let _ = act_mgr.save_activity_state(act_id, "killed_by", "ProcessKillingEngine");
+                    let _ =
+                        act_mgr.save_activity_state(act_id, "killed_by", "ProcessKillingEngine");
                     let _ = act_mgr.transition_state(act_id, ActivityState::Destroyed);
                 }
             }
@@ -857,7 +899,8 @@ impl AndroidSystemLibraryLoader {
     /// Loads a native shared library (.so) into memory space
     pub fn load_library(&mut self, lib_name: &str, symbols: &[&str]) -> Result<(), &'static str> {
         let mut native_symbols = Vec::new();
-        let mut base_addr = 0x7F00_0000_0000u64 + (self.loaded_libraries.len() as u64 * 0x1000_0000);
+        let mut base_addr =
+            0x7F00_0000_0000u64 + (self.loaded_libraries.len() as u64 * 0x1000_0000);
 
         for sym in symbols {
             native_symbols.push(NativeSymbol {
@@ -867,20 +910,24 @@ impl AndroidSystemLibraryLoader {
             base_addr += 0x100;
         }
 
-        self.loaded_libraries.insert(lib_name.to_string(), native_symbols);
+        self.loaded_libraries
+            .insert(lib_name.to_string(), native_symbols);
         Ok(())
     }
 
     /// Resolves an exported symbol from a loaded library
     pub fn resolve_symbol(&self, lib_name: &str, symbol_name: &str) -> Option<u64> {
-        self.loaded_libraries
-            .get(lib_name)
-            .and_then(|syms| syms.iter().find(|s| s.name == symbol_name).map(|s| s.address))
+        self.loaded_libraries.get(lib_name).and_then(|syms| {
+            syms.iter()
+                .find(|s| s.name == symbol_name)
+                .map(|s| s.address)
+        })
     }
 
     /// Registers a Bionic C syscall translation mapping
     pub fn register_bionic_syscall(&mut self, syscall_num: u32, name: &str) {
-        self.bionic_syscall_bindings.insert(syscall_num, name.to_string());
+        self.bionic_syscall_bindings
+            .insert(syscall_num, name.to_string());
     }
 
     /// Translates Bionic syscall to SigmaOS native syscall name
@@ -957,11 +1004,17 @@ impl StorageAccessFramework {
 
     /// Grants a URI permission grant to an application package
     pub fn grant_uri_permission(&mut self, package_name: &str, uri_str: &str) {
-        self.granted_uris.push((package_name.to_string(), uri_str.to_string()));
+        self.granted_uris
+            .push((package_name.to_string(), uri_str.to_string()));
     }
 
     /// Queries a Content Provider using SAF security scoping
-    pub fn query(&self, package_name: &str, uri_str: &str, key: &str) -> Result<Option<&String>, &'static str> {
+    pub fn query(
+        &self,
+        package_name: &str,
+        uri_str: &str,
+        key: &str,
+    ) -> Result<Option<&String>, &'static str> {
         let parsed = ContentUri::parse(uri_str).ok_or("Invalid content URI")?;
 
         let has_grant = self
@@ -981,7 +1034,13 @@ impl StorageAccessFramework {
     }
 
     /// Inserts data into a Content Provider
-    pub fn insert(&mut self, package_name: &str, uri_str: &str, key: &str, value: &str) -> Result<(), &'static str> {
+    pub fn insert(
+        &mut self,
+        package_name: &str,
+        uri_str: &str,
+        key: &str,
+        value: &str,
+    ) -> Result<(), &'static str> {
         let parsed = ContentUri::parse(uri_str).ok_or("Invalid content URI")?;
 
         let has_grant = self
@@ -994,7 +1053,9 @@ impl StorageAccessFramework {
         }
 
         if let Some(provider) = self.providers.get_mut(&parsed.authority) {
-            provider.data_store.insert(key.to_string(), value.to_string());
+            provider
+                .data_store
+                .insert(key.to_string(), value.to_string());
             Ok(())
         } else {
             Err("Content provider not found for authority")
@@ -1307,15 +1368,21 @@ mod tests {
             ActivityState::Created
         );
 
-        manager.transition_state(act_id, ActivityState::Resumed).unwrap();
+        manager
+            .transition_state(act_id, ActivityState::Resumed)
+            .unwrap();
         assert_eq!(
             manager.get_top_activity().unwrap().state,
             ActivityState::Resumed
         );
 
-        manager.save_activity_state(act_id, "scroll_position", "1250").unwrap();
+        manager
+            .save_activity_state(act_id, "scroll_position", "1250")
+            .unwrap();
         assert_eq!(
-            manager.restore_activity_state(act_id, "scroll_position").unwrap(),
+            manager
+                .restore_activity_state(act_id, "scroll_position")
+                .unwrap(),
             "1250"
         );
 
@@ -1330,9 +1397,11 @@ mod tests {
         let pid = ctrl.register_application("com.example.app", 10001);
         assert_eq!(pid, 1000);
 
-        ctrl.update_app_state("com.example.app", ApplicationState::RunningForeground).unwrap();
+        ctrl.update_app_state("com.example.app", ApplicationState::RunningForeground)
+            .unwrap();
         ctrl.attach_activity("com.example.app", 1).unwrap();
-        ctrl.attach_service("com.example.app", "SyncService").unwrap();
+        ctrl.attach_service("com.example.app", "SyncService")
+            .unwrap();
 
         let app = ctrl.get_application("com.example.app").unwrap();
         assert_eq!(app.state, ApplicationState::RunningForeground);
@@ -1366,7 +1435,13 @@ mod tests {
         app_ctrl.attach_activity("com.example.app", act_id).unwrap();
 
         kill_engine
-            .kill_process_gracefully(&mut app_ctrl, &mut act_mgr, pid, TerminationReason::OomKill, 12345678)
+            .kill_process_gracefully(
+                &mut app_ctrl,
+                &mut act_mgr,
+                pid,
+                TerminationReason::OomKill,
+                12345678,
+            )
             .unwrap();
 
         let app = app_ctrl.get_application("com.example.app").unwrap();
@@ -1383,10 +1458,16 @@ mod tests {
     fn test_service_manager_lifecycle() {
         let mut srv_mgr = AndroidServiceManager::new();
         srv_mgr
-            .start_service("com.example.app", "AudioPlaybackService", ServiceType::Background)
+            .start_service(
+                "com.example.app",
+                "AudioPlaybackService",
+                ServiceType::Background,
+            )
             .unwrap();
 
-        srv_mgr.set_foreground_notification("AudioPlaybackService", 99).unwrap();
+        srv_mgr
+            .set_foreground_notification("AudioPlaybackService", 99)
+            .unwrap();
         let srv = srv_mgr.services.get("AudioPlaybackService").unwrap();
         assert_eq!(srv.service_type, ServiceType::Foreground);
         assert_eq!(srv.foreground_notification_id, Some(99));
@@ -1404,13 +1485,18 @@ mod tests {
     #[test]
     fn test_system_library_loader_and_art() {
         let mut loader = AndroidSystemLibraryLoader::new();
-        loader.load_library("libbinder.so", &["binder_init", "binder_txn"]).unwrap();
+        loader
+            .load_library("libbinder.so", &["binder_init", "binder_txn"])
+            .unwrap();
 
         let addr = loader.resolve_symbol("libbinder.so", "binder_init");
         assert!(addr.is_some());
 
         loader.register_bionic_syscall(64, "sys_write");
-        assert_eq!(loader.translate_bionic_syscall(64), Some(&"sys_write".to_string()));
+        assert_eq!(
+            loader.translate_bionic_syscall(64),
+            Some(&"sys_write".to_string())
+        );
     }
 
     #[test]
@@ -1424,7 +1510,9 @@ mod tests {
             write_permission: "android.permission.WRITE".to_string(),
             data_store: BTreeMap::new(),
         };
-        provider.data_store.insert("user_setting".to_string(), "dark_mode".to_string());
+        provider
+            .data_store
+            .insert("user_setting".to_string(), "dark_mode".to_string());
 
         saf.register_provider(provider);
 

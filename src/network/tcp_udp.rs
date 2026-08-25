@@ -671,7 +671,6 @@ impl NetworkStack for SimpleNetworkStack {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

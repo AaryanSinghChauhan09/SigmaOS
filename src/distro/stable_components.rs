@@ -149,7 +149,12 @@ impl DebianDpkgDbSimulator {
         db
     }
 
-    pub fn register_package(&mut self, name: &'static str, version: &'static str, arch: &'static str) {
+    pub fn register_package(
+        &mut self,
+        name: &'static str,
+        version: &'static str,
+        arch: &'static str,
+    ) {
         if let Some(pkg) = self.packages.iter_mut().find(|p| p.name == name) {
             pkg.version = version;
             pkg.architecture = arch;
@@ -164,7 +169,11 @@ impl DebianDpkgDbSimulator {
         }
     }
 
-    pub fn transition_status(&mut self, name: &str, new_status: DpkgPackageStatus) -> Result<(), &'static str> {
+    pub fn transition_status(
+        &mut self,
+        name: &str,
+        new_status: DpkgPackageStatus,
+    ) -> Result<(), &'static str> {
         if let Some(pkg) = self.packages.iter_mut().find(|p| p.name == name) {
             pkg.status = new_status;
             if new_status == DpkgPackageStatus::Installed {
@@ -225,7 +234,11 @@ impl AlpineApkOverlayEngine {
             path_hash = path_hash.wrapping_mul(0x100000001b3);
         }
 
-        if let Some(file) = self.overlay_files.iter_mut().find(|f| f.path_hash == path_hash) {
+        if let Some(file) = self
+            .overlay_files
+            .iter_mut()
+            .find(|f| f.path_hash == path_hash)
+        {
             file.size_bytes = size_bytes;
         } else {
             self.overlay_files.push(ApkOverlayFile {
@@ -331,7 +344,9 @@ mod tests {
         assert_eq!(db.query_status("nginx"), DpkgPackageStatus::Unpacked);
 
         // Transition status to Installed
-        assert!(db.transition_status("nginx", DpkgPackageStatus::Installed).is_ok());
+        assert!(db
+            .transition_status("nginx", DpkgPackageStatus::Installed)
+            .is_ok());
         assert_eq!(db.query_status("nginx"), DpkgPackageStatus::Installed);
 
         // Execute pending triggers

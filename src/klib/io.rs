@@ -76,7 +76,7 @@ impl SigmaFormatter {
     pub fn format_int(&mut self, value: i32) -> SigmaString {
         let mut result = Vec::new();
         let mut num = value;
-        
+
         if num == 0 {
             result.push(b'0');
         } else {
@@ -84,17 +84,17 @@ impl SigmaFormatter {
             if negative {
                 num = -num;
             }
-            
+
             while num > 0 {
                 let digit = (num % 10) as u8;
                 result.push(digit + b'0');
                 num /= 10;
             }
-            
+
             if negative {
                 result.push(b'-');
             }
-            
+
             // Reverse the result
             let len = result.len();
             for i in 0..len / 2 {
@@ -103,7 +103,7 @@ impl SigmaFormatter {
                 result[len - 1 - i] = temp;
             }
         }
-        
+
         let mut string_result = SigmaString::new();
         for &byte in &result {
             string_result.push(byte as char);
@@ -173,7 +173,7 @@ impl KlibRead for SigmaBuffer {
             Ok(bytes_read)
         }
     }
-    
+
     fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), SigmaIoError> {
         let mut total_read = 0;
         while total_read < buf.len() {
@@ -185,23 +185,23 @@ impl KlibRead for SigmaBuffer {
         }
         Ok(())
     }
-    
+
     fn read_to_string(&mut self, s: &mut SigmaString) -> Result<usize, SigmaIoError> {
         let mut buffer = [0u8; 4096];
         let mut total_read = 0;
-        
+
         loop {
             let bytes_read = self.read(&mut buffer);
             if bytes_read == 0 {
                 break;
             }
-            
+
             for byte in &buffer[..bytes_read] {
                 s.push(*byte as char);
             }
             total_read += bytes_read;
         }
-        
+
         Ok(total_read)
     }
 }
@@ -211,7 +211,7 @@ impl KlibWrite for SigmaBuffer {
         let bytes_written = self.write(buf);
         Ok(bytes_written)
     }
-    
+
     fn write_all(&mut self, buf: &[u8]) -> Result<(), SigmaIoError> {
         let mut total_written = 0;
         while total_written < buf.len() {
@@ -223,7 +223,7 @@ impl KlibWrite for SigmaBuffer {
         }
         Ok(())
     }
-    
+
     fn flush(&mut self) -> Result<(), SigmaIoError> {
         // Buffer-based, no flush needed
         Ok(())

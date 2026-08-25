@@ -3,8 +3,8 @@
 // fine-grained USE flag feature toggles, target-specific CPU hardware optimization,
 // and topological sort build order dependency resolution.
 
-use crate::klib::BTreeMap;
 use crate::klib::hashset::HashSet;
+use crate::klib::BTreeMap;
 use crate::sigpkg::Version;
 
 /// Portage USE Flag feature representation

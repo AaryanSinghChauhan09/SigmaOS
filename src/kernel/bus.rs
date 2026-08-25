@@ -5,7 +5,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-use crate::kernel::object::{KRef, KernelObject, KObject};
+use crate::kernel::object::{KObject, KRef, KernelObject};
 use crate::security::capability::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

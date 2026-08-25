@@ -8,9 +8,9 @@ extern crate std;
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::format;
 use alloc::vec::Vec;
 
 #[cfg(not(test))]
@@ -100,7 +100,11 @@ impl BoreSchedulerGovernor {
     }
 
     /// Calculates dynamic task burst score and adjusts time-slice allocation
-    pub fn calculate_task_timeslice_ns(&self, task_burst_count: u32, base_timeslice_ns: u64) -> u64 {
+    pub fn calculate_task_timeslice_ns(
+        &self,
+        task_burst_count: u32,
+        base_timeslice_ns: u64,
+    ) -> u64 {
         if task_burst_count < 10 {
             // High burst interactive task (mouse/UI/game input) -> grant low latency slice
             self.interactive_latency_ns
@@ -128,9 +132,18 @@ impl CachyPackageRepo {
     pub fn new(detected_caps: CpuCapabilities) -> Self {
         let level = detected_caps.detect_microarch_level();
         let mut repos = HashMap::new();
-        repos.insert(MicroArchLevel::V1, "https://mirror.cachyos.org/repo/x86_64".to_string());
-        repos.insert(MicroArchLevel::V3, "https://mirror.cachyos.org/repo/x86_64_v3".to_string());
-        repos.insert(MicroArchLevel::V4, "https://mirror.cachyos.org/repo/x86_64_v4".to_string());
+        repos.insert(
+            MicroArchLevel::V1,
+            "https://mirror.cachyos.org/repo/x86_64".to_string(),
+        );
+        repos.insert(
+            MicroArchLevel::V3,
+            "https://mirror.cachyos.org/repo/x86_64_v3".to_string(),
+        );
+        repos.insert(
+            MicroArchLevel::V4,
+            "https://mirror.cachyos.org/repo/x86_64_v4".to_string(),
+        );
 
         Self {
             active_level: level,
@@ -183,7 +196,10 @@ mod tests {
         let mut repo = CachyPackageRepo::new(caps);
 
         assert_eq!(repo.active_level, MicroArchLevel::V3);
-        assert_eq!(repo.get_active_repo_url(), "https://mirror.cachyos.org/repo/x86_64_v3");
+        assert_eq!(
+            repo.get_active_repo_url(),
+            "https://mirror.cachyos.org/repo/x86_64_v3"
+        );
 
         repo.switch_kernel_variant(CachyKernelVariant::CachyLto);
         assert_eq!(repo.active_kernel, CachyKernelVariant::CachyLto);

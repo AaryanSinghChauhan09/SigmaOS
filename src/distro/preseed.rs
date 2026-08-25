@@ -4,8 +4,8 @@
 extern crate alloc;
 
 use alloc::string::String;
-use alloc::vec::Vec;
 use alloc::string::ToString;
+use alloc::vec::Vec;
 use core::cell::RefCell;
 
 #[derive(Debug, Clone)]
@@ -81,7 +81,10 @@ impl SovereignPreseedParser {
 
     /// Triggers automated system configuration and package sync based on preseed values
     pub fn execute_automated_installation(&self) -> bool {
-        if self.is_applied.swap(true, core::sync::atomic::Ordering::Relaxed) {
+        if self
+            .is_applied
+            .swap(true, core::sync::atomic::Ordering::Relaxed)
+        {
             return false; // Already executed
         }
 

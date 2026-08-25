@@ -2,9 +2,8 @@
 
 extern crate alloc;
 
-
-use alloc::vec::Vec;
 use alloc::collections::VecDeque;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageState {
@@ -22,11 +21,11 @@ pub struct TrackedPage {
 pub struct LinuxKswapd {
     pub active_list: VecDeque<usize>,   // LRU active queue
     pub inactive_list: VecDeque<usize>, // LRU inactive queue
-    pub swapped_pages: Vec<usize>,       // List of virtual page addresses swapped out
-    pub min_watermark: usize,            // Critically low (trigger OOM soon)
-    pub low_watermark: usize,            // Wake up kswapd to reclaim
-    pub high_watermark: usize,           // Target to reach before kswapd sleeps
-    pub swappiness: u8,                  // Likelihood of reclaiming anonymous pages (0-100)
+    pub swapped_pages: Vec<usize>,      // List of virtual page addresses swapped out
+    pub min_watermark: usize,           // Critically low (trigger OOM soon)
+    pub low_watermark: usize,           // Wake up kswapd to reclaim
+    pub high_watermark: usize,          // Target to reach before kswapd sleeps
+    pub swappiness: u8,                 // Likelihood of reclaiming anonymous pages (0-100)
 }
 
 impl LinuxKswapd {

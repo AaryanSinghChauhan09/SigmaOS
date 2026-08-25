@@ -1,10 +1,9 @@
 /// OOP-based Scheduler for SigmaOS
 /// Implements process/thread scheduling using Linux & BSD inspired task states and workload classifications.
-
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
-use core::sync::atomic::{AtomicUsize, AtomicU64, Ordering};
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -383,7 +382,9 @@ impl Scheduler for RoundRobinScheduler {
                 match task.state() {
                     TaskState::Ready => stats.ready_tasks += 1,
                     TaskState::Running => stats.running_tasks += 1,
-                    TaskState::WaitingBlocked | TaskState::Blocked | TaskState::Sleeping => stats.blocked_tasks += 1,
+                    TaskState::WaitingBlocked | TaskState::Blocked | TaskState::Sleeping => {
+                        stats.blocked_tasks += 1
+                    }
                     TaskState::SuspendedStopped => stats.suspended_tasks += 1,
                     TaskState::TerminatedZombie | TaskState::Terminated => stats.zombie_tasks += 1,
                 }
@@ -405,13 +406,7 @@ pub struct PriorityScheduler {
 impl PriorityScheduler {
     pub fn new() -> Self {
         PriorityScheduler {
-            priority_queues: [
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-            ],
+            priority_queues: [Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new()],
             current_task: AtomicUsize::new(0),
             context_switches: AtomicU64::new(0),
         }
@@ -529,9 +524,13 @@ impl Scheduler for PriorityScheduler {
                     match task.state() {
                         TaskState::Ready => stats.ready_tasks += 1,
                         TaskState::Running => stats.running_tasks += 1,
-                        TaskState::WaitingBlocked | TaskState::Blocked | TaskState::Sleeping => stats.blocked_tasks += 1,
+                        TaskState::WaitingBlocked | TaskState::Blocked | TaskState::Sleeping => {
+                            stats.blocked_tasks += 1
+                        }
                         TaskState::SuspendedStopped => stats.suspended_tasks += 1,
-                        TaskState::TerminatedZombie | TaskState::Terminated => stats.zombie_tasks += 1,
+                        TaskState::TerminatedZombie | TaskState::Terminated => {
+                            stats.zombie_tasks += 1
+                        }
                     }
                 }
             }
@@ -548,11 +547,12 @@ mod tests {
 
     #[test]
     fn test_task_states_and_workload_classification() {
-        let mut task = Task::new(1, Priority::High, 10, TaskCapability::full())
-            .with_workload(TaskWorkloadType::RealTimePeriodic {
+        let mut task = Task::new(1, Priority::High, 10, TaskCapability::full()).with_workload(
+            TaskWorkloadType::RealTimePeriodic {
                 period_ms: 10,
                 exec_time_ms: 2,
-            });
+            },
+        );
 
         assert_eq!(task.state(), TaskState::Ready);
         assert_eq!(

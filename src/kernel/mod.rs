@@ -36,8 +36,8 @@ pub mod os_innovations;
 pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
-pub mod scheduler;
 pub mod sched;
+pub mod scheduler;
 pub mod subsystem;
 
 pub use breakthroughs::{
@@ -60,10 +60,12 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
+pub use roundrobin::{
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
+};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub mod virtual_cpu;
 pub mod vmm_paging;
+pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-pub use io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};

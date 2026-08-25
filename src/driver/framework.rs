@@ -40,10 +40,18 @@ pub trait Driver {
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
     fn set_state(&self, _state: DriverState) {}
-    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
-    fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
-    fn shutdown(&mut self) -> Result<(), DriverError> { Ok(()) }
-    fn dependencies(&self) -> &'static [DriverType] { &[] }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        &[]
+    }
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
 }
@@ -148,10 +156,10 @@ pub enum IrpMajorFunction {
 /// Buffer transfer methods for user-kernel communication
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IoctlTransferMethod {
-    MethodBuffered, // Copies input/output via system-allocated kernel buffer
-    MethodInDirect, // Maps input buffer directly via MDL (read access)
+    MethodBuffered,  // Copies input/output via system-allocated kernel buffer
+    MethodInDirect,  // Maps input buffer directly via MDL (read access)
     MethodOutDirect, // Maps output buffer directly via MDL (write access)
-    MethodNeither,  // Uses raw user-mode virtual addresses directly (unsafe/requires validation)
+    MethodNeither,   // Uses raw user-mode virtual addresses directly (unsafe/requires validation)
 }
 
 /// Simulated IOCTL Control Code structure
@@ -165,7 +173,12 @@ pub struct IoctlCode {
 
 impl IoctlCode {
     /// CTL_CODE macro equivalent: packs control parameters into a single 32-bit integer
-    pub const fn build(device_type: u32, function: u32, method: IoctlTransferMethod, access: u32) -> Self {
+    pub const fn build(
+        device_type: u32,
+        function: u32,
+        method: IoctlTransferMethod,
+        access: u32,
+    ) -> Self {
         Self {
             device_type,
             function,
@@ -242,7 +255,7 @@ pub struct DeviceObject {
     pub driver_object: *mut DriverObject,
     pub next_device: *mut DeviceObject, // Attached filters/minifilters (Device Stack)
     pub current_power_state: DevicePowerState,
-    pub is_kernel_mode: bool, // True for KMDF, False for UMDF
+    pub is_kernel_mode: bool,  // True for KMDF, False for UMDF
     pub device_extension: u64, // Device-specific state representation
 }
 
@@ -327,7 +340,8 @@ pub fn usb_forensic_filter_dispatch(device: &mut DeviceObject, irp: &mut Irp) ->
                         // Buffered I/O: read input from system kernel buffer, safely write output
                         if !irp.input_buffer.is_empty() {
                             let cmd = irp.input_buffer[0];
-                            if cmd == 0x99 { // Mock unlock command
+                            if cmd == 0x99 {
+                                // Mock unlock command
                                 irp.output_buffer.push(0x01); // Success code
                             }
                         }
@@ -391,8 +405,15 @@ impl InterruptDescriptorTable {
     }
 
     /// Simulates triggering a hardware interrupt. Validates IDT presence and rings privilege
-    pub fn trigger_interrupt(&self, vector: u8, current_ring_privilege: u8, isr: PisrHandler, context: u64) -> Result<bool, &'static str> {
-        let entry = self.entries[vector as usize].ok_or("Interrupt vector not registered in IDT")?;
+    pub fn trigger_interrupt(
+        &self,
+        vector: u8,
+        current_ring_privilege: u8,
+        isr: PisrHandler,
+        context: u64,
+    ) -> Result<bool, &'static str> {
+        let entry =
+            self.entries[vector as usize].ok_or("Interrupt vector not registered in IDT")?;
         if !entry.is_present {
             return Err("Interrupt gate is disabled");
         }
@@ -483,35 +504,52 @@ impl DriverFramework for SimpleDriverFramework {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::driver::irp_system::*;
+    use super::{
+        DeviceObject as FrameworkDeviceObject, DriverError, DriverFramework,
+        DriverObject as FrameworkDriverObject, DriverState, DriverType,
+        IoManager as FrameworkIoManager, Irp as FrameworkIrp, IrpMajorFunction, SimpleDriver,
+        SimpleDriverFramework,
+    };
 
     #[test]
     fn test_driver_framework_lifecycle() {
         let mut framework = SimpleDriverFramework::new();
-        let driver = Box::new(SimpleStorageDriver::new(101, DriverType::Block));
+        let driver = Box::new(SimpleDriver::new(101, DriverType::Block));
 
         let reg_id = framework.register_driver(driver).unwrap();
         assert_eq!(reg_id, 101);
 
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
+        assert_eq!(
+            framework.get_driver(101).unwrap().state(),
+            DriverState::Unloaded
+        );
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
+        assert_eq!(
+            framework.get_driver(101).unwrap().state(),
+            DriverState::Active
+        );
 
         framework.unload_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
+        assert_eq!(
+            framework.get_driver(101).unwrap().state(),
+            DriverState::Unloaded
+        );
     }
 
     #[test]
     fn test_wdm_irp_device_stack_flow() {
         unsafe {
-            let mut drv_obj = DriverObject::new("TestDriver");
-            let mut dev_obj = DeviceObject::new(&mut drv_obj as *mut DriverObject, true);
-            dev_obj.current_power_state = DevicePowerState::D0;
+            let mut drv_obj = FrameworkDriverObject::new("TestDriver");
+            let mut dev_obj =
+                FrameworkDeviceObject::new(&mut drv_obj as *mut FrameworkDriverObject, true);
+            dev_obj.current_power_state = super::DevicePowerState::D0;
 
             // Register Create & Close Dispatch Routines
-            fn test_create_dispatch(device: &mut DeviceObject, irp: &mut Irp) -> DriverError {
+            fn test_create_dispatch(
+                device: &mut FrameworkDeviceObject,
+                irp: &mut FrameworkIrp,
+            ) -> DriverError {
                 device.device_extension = 0xAA55;
                 irp.input_buffer.push(0xCC);
                 DriverError::Success
@@ -519,12 +557,13 @@ mod tests {
 
             drv_obj.register_dispatch(IrpMajorFunction::Create, test_create_dispatch);
 
-            let mut io_mgr = IoManager::new();
-            io_mgr.register_device(&mut dev_obj as *mut DeviceObject);
+            let mut io_mgr = FrameworkIoManager::new();
+            io_mgr.register_device(&mut dev_obj as *mut FrameworkDeviceObject);
 
-            let mut create_irp = Irp::new(IrpMajorFunction::Create);
+            let mut create_irp = FrameworkIrp::new(IrpMajorFunction::Create);
 
-            let res = io_mgr.dispatch_irp(&mut dev_obj as *mut DeviceObject, &mut create_irp);
+            let res =
+                io_mgr.dispatch_irp(&mut dev_obj as *mut FrameworkDeviceObject, &mut create_irp);
             assert_eq!(res, DriverError::Success);
             assert_eq!(dev_obj.device_extension, 0xAA55);
             assert_eq!(create_irp.input_buffer[0], 0xCC);
@@ -534,27 +573,33 @@ mod tests {
     #[test]
     fn test_keyboard_and_usb_storage_filters() {
         unsafe {
-            let mut keyboard_drv = DriverObject::new("KbdFilter");
-            keyboard_drv.register_dispatch(IrpMajorFunction::Read, keyboard_filter_dispatch);
+            let mut keyboard_drv = FrameworkDriverObject::new("KbdFilter");
+            keyboard_drv.register_dispatch(IrpMajorFunction::Read, super::keyboard_filter_dispatch);
 
-            let mut keyboard_dev = DeviceObject::new(&mut keyboard_drv as *mut DriverObject, true);
+            let mut keyboard_dev =
+                FrameworkDeviceObject::new(&mut keyboard_drv as *mut FrameworkDriverObject, true);
 
-            let mut usb_drv = DriverObject::new("UsbStorageFilter");
-            usb_drv.register_dispatch(IrpMajorFunction::Write, usb_forensic_filter_dispatch);
+            let mut usb_drv = FrameworkDriverObject::new("UsbStorageFilter");
+            usb_drv.register_dispatch(IrpMajorFunction::Write, super::usb_forensic_filter_dispatch);
 
-            let mut usb_dev = DeviceObject::new(&mut usb_drv as *mut DriverObject, true);
+            let mut usb_dev =
+                FrameworkDeviceObject::new(&mut usb_drv as *mut FrameworkDriverObject, true);
 
-            let mut io_mgr = IoManager::new();
+            let mut io_mgr = FrameworkIoManager::new();
 
             // Test Keyboard Filter keystroke interception
-            let mut kbd_irp = Irp::new(IrpMajorFunction::Read);
-            let res_kbd = io_mgr.dispatch_irp(&mut keyboard_dev as *mut DeviceObject, &mut kbd_irp);
+            let mut kbd_irp = FrameworkIrp::new(IrpMajorFunction::Read);
+            let res_kbd = io_mgr.dispatch_irp(
+                &mut keyboard_dev as *mut FrameworkDeviceObject,
+                &mut kbd_irp,
+            );
             assert_eq!(res_kbd, DriverError::Success);
             assert_eq!(kbd_irp.input_buffer[0], 0x41); // Key logged correctly!
 
             // Test USB Forensic Filter write protection
-            let mut usb_irp = Irp::new(IrpMajorFunction::Write);
-            let res_usb = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut usb_irp);
+            let mut usb_irp = FrameworkIrp::new(IrpMajorFunction::Write);
+            let res_usb =
+                io_mgr.dispatch_irp(&mut usb_dev as *mut FrameworkDeviceObject, &mut usb_irp);
             assert_eq!(res_usb, DriverError::UnloadFailed); // Write blocked successfully!
         }
     }
@@ -562,45 +607,79 @@ mod tests {
     #[test]
     fn test_ioctl_buffered_direct_neither_io() {
         unsafe {
-            let mut usb_drv = DriverObject::new("UsbIOCTL");
-            usb_drv.register_dispatch(IrpMajorFunction::DeviceControl, usb_forensic_filter_dispatch);
+            let mut usb_drv = FrameworkDriverObject::new("UsbIOCTL");
+            usb_drv.register_dispatch(
+                IrpMajorFunction::DeviceControl,
+                super::usb_forensic_filter_dispatch,
+            );
 
-            let mut usb_dev = DeviceObject::new(&mut usb_drv as *mut DriverObject, true);
-            let mut io_mgr = IoManager::new();
+            let mut usb_dev =
+                FrameworkDeviceObject::new(&mut usb_drv as *mut FrameworkDriverObject, true);
+            let mut io_mgr = FrameworkIoManager::new();
 
             // 1. Test METHOD_BUFFERED (valid unlock command)
-            let mut irp_buffered = Irp::new(IrpMajorFunction::DeviceControl);
-            irp_buffered.ioctl_code = Some(IoctlCode::build(0x00000022, 0x801, IoctlTransferMethod::MethodBuffered, 0x01));
+            let mut irp_buffered = FrameworkIrp::new(IrpMajorFunction::DeviceControl);
+            irp_buffered.ioctl_code = Some(super::IoctlCode::build(
+                0x00000022,
+                0x801,
+                super::IoctlTransferMethod::MethodBuffered,
+                0x01,
+            ));
             irp_buffered.input_buffer.push(0x99); // Unlock code
 
-            let res_buffered = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_buffered);
+            let res_buffered = io_mgr.dispatch_irp(
+                &mut usb_dev as *mut FrameworkDeviceObject,
+                &mut irp_buffered,
+            );
             assert_eq!(res_buffered, DriverError::Success);
             assert_eq!(irp_buffered.output_buffer[0], 0x01);
 
             // 2. Test METHOD_IN_DIRECT with locked MDL pages
-            let mut irp_direct = Irp::new(IrpMajorFunction::DeviceControl);
-            irp_direct.ioctl_code = Some(IoctlCode::build(0x00000022, 0x802, IoctlTransferMethod::MethodInDirect, 0x01));
+            let mut irp_direct = FrameworkIrp::new(IrpMajorFunction::DeviceControl);
+            irp_direct.ioctl_code = Some(super::IoctlCode::build(
+                0x00000022,
+                0x802,
+                super::IoctlTransferMethod::MethodInDirect,
+                0x01,
+            ));
             irp_direct.physical_pages_mdl.push(0x1000_1000); // Mock MDL page
 
-            let res_direct = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_direct);
+            let res_direct =
+                io_mgr.dispatch_irp(&mut usb_dev as *mut FrameworkDeviceObject, &mut irp_direct);
             assert_eq!(res_direct, DriverError::Success);
             assert_eq!(irp_direct.output_buffer[0], 0xAB);
 
             // 3. Test METHOD_NEITHER (safe user address)
-            let mut irp_neither_safe = Irp::new(IrpMajorFunction::DeviceControl);
-            irp_neither_safe.ioctl_code = Some(IoctlCode::build(0x00000022, 0x803, IoctlTransferMethod::MethodNeither, 0x01));
+            let mut irp_neither_safe = FrameworkIrp::new(IrpMajorFunction::DeviceControl);
+            irp_neither_safe.ioctl_code = Some(super::IoctlCode::build(
+                0x00000022,
+                0x803,
+                super::IoctlTransferMethod::MethodNeither,
+                0x01,
+            ));
             irp_neither_safe.user_mode_virtual_address = Some(0x0000_7FFF_FFFF_F000); // User space
 
-            let res_neither_safe = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_neither_safe);
+            let res_neither_safe = io_mgr.dispatch_irp(
+                &mut usb_dev as *mut FrameworkDeviceObject,
+                &mut irp_neither_safe,
+            );
             assert_eq!(res_neither_safe, DriverError::Success);
             assert_eq!(irp_neither_safe.output_buffer[0], 0xFE);
 
             // 4. Test METHOD_NEITHER (malicious address in kernel space)
-            let mut irp_neither_malicious = Irp::new(IrpMajorFunction::DeviceControl);
-            irp_neither_malicious.ioctl_code = Some(IoctlCode::build(0x00000022, 0x803, IoctlTransferMethod::MethodNeither, 0x01));
+            let mut irp_neither_malicious = FrameworkIrp::new(IrpMajorFunction::DeviceControl);
+            irp_neither_malicious.ioctl_code = Some(super::IoctlCode::build(
+                0x00000022,
+                0x803,
+                super::IoctlTransferMethod::MethodNeither,
+                0x01,
+            ));
             irp_neither_malicious.user_mode_virtual_address = Some(0xFFFF_8000_0000_0000); // Kernel space
 
-            let res_neither_malicious = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_neither_malicious);
+            let res_neither_malicious = io_mgr.dispatch_irp(
+                &mut usb_dev as *mut FrameworkDeviceObject,
+                &mut irp_neither_malicious,
+            );
             assert_eq!(res_neither_malicious, DriverError::AccessDenied);
         }
     }
@@ -631,6 +710,9 @@ mod tests {
         // 2. Trigger from User space (Ring 3) to Ring 0 Gate -> Fails with privilege error!
         let res_user = idt.trigger_interrupt(0x21, 3, mock_keyboard_isr, 0x99AA);
         assert!(res_user.is_err());
-        assert_eq!(res_user.unwrap_err(), "General Protection Fault: Privilege violation accessing IDT gate");
+        assert_eq!(
+            res_user.unwrap_err(),
+            "General Protection Fault: Privilege violation accessing IDT gate"
+        );
     }
 }

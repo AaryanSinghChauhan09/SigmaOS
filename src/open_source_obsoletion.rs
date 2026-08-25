@@ -67,7 +67,12 @@ impl SovereignVcsEngine {
         });
     }
 
-    pub fn commit(&mut self, author: &str, message: &str, timestamp: u64) -> Result<String, &'static str> {
+    pub fn commit(
+        &mut self,
+        author: &str,
+        message: &str,
+        timestamp: u64,
+    ) -> Result<String, &'static str> {
         if self.staging_area.is_empty() {
             return Err("Vcs: Nothing staged for commit");
         }
@@ -120,7 +125,13 @@ impl SovereignVcsEngine {
         self.branches
             .iter()
             .find(|(b, _)| b == &self.active_branch)
-            .and_then(|(_, id)| if id.is_empty() { None } else { Some(id.clone()) })
+            .and_then(|(_, id)| {
+                if id.is_empty() {
+                    None
+                } else {
+                    Some(id.clone())
+                }
+            })
     }
 
     pub fn three_way_merge(
@@ -264,11 +275,18 @@ impl SovereignInitSupervisor {
             .ok_or("InitSupervisor: No socket listener for port")?;
 
         self.start_service(&target_service)?;
-        Ok(format!("Activated service '{}' on socket event port {}", target_service, port))
+        Ok(format!(
+            "Activated service '{}' on socket event port {}",
+            target_service, port
+        ))
     }
 
     pub fn handle_service_failure(&mut self, service_name: &str) {
-        if let Some(unit) = self.registered_units.iter_mut().find(|u| u.name == service_name) {
+        if let Some(unit) = self
+            .registered_units
+            .iter_mut()
+            .find(|u| u.name == service_name)
+        {
             unit.current_state = SupervisorServiceState::Failed;
             if unit.auto_restart_on_failure {
                 unit.restart_count += 1;
@@ -280,7 +298,8 @@ impl SovereignInitSupervisor {
     pub fn monitor_and_reconcile(&mut self) -> usize {
         let mut restarted = 0;
         for unit in &mut self.registered_units {
-            if unit.current_state == SupervisorServiceState::Failed && unit.auto_restart_on_failure {
+            if unit.current_state == SupervisorServiceState::Failed && unit.auto_restart_on_failure
+            {
                 unit.restart_count += 1;
                 unit.current_state = SupervisorServiceState::ActiveRunning;
                 restarted += 1;
@@ -402,7 +421,9 @@ impl SovereignObservabilitySuite {
         for m in &self.metrics_time_series {
             if m.metric_name == "cpu_utilization" && m.value > self.alert_threshold_cpu_pct {
                 alerts.push(format!("HIGH CPU ANOMALY: {}%", m.value));
-            } else if m.metric_name == "memory_utilization" && m.value > self.alert_threshold_mem_pct {
+            } else if m.metric_name == "memory_utilization"
+                && m.value > self.alert_threshold_mem_pct
+            {
                 alerts.push(format!("HIGH MEMORY ANOMALY: {}%", m.value));
             }
         }
@@ -485,7 +506,9 @@ pub struct SovereignApiTestSuite {
 
 impl SovereignApiTestSuite {
     pub fn new() -> Self {
-        Self { requests: Vec::new() }
+        Self {
+            requests: Vec::new(),
+        }
     }
 
     pub fn add_request(&mut self, req: ApiRequestSpec) {
@@ -609,7 +632,9 @@ pub struct SovereignContainerRuntime {
 
 impl SovereignContainerRuntime {
     pub fn new() -> Self {
-        Self { containers: Vec::new() }
+        Self {
+            containers: Vec::new(),
+        }
     }
 
     pub fn create_container(&mut self, name: &str, image: &str, memory_limit_mb: u64) {
@@ -691,7 +716,10 @@ impl SovereignPacketInspector {
     }
 
     pub fn export_pcap_summary(&self) -> String {
-        format!("PcapExport: {} packets captured", self.captured_packets.len())
+        format!(
+            "PcapExport: {} packets captured",
+            self.captured_packets.len()
+        )
     }
 }
 
@@ -801,7 +829,11 @@ impl SovereignEmbeddedDb {
         Ok(())
     }
 
-    pub fn insert_row(&mut self, table_name: &str, row: Vec<(String, String)>) -> Result<(), &'static str> {
+    pub fn insert_row(
+        &mut self,
+        table_name: &str,
+        row: Vec<(String, String)>,
+    ) -> Result<(), &'static str> {
         let t = self
             .tables
             .iter_mut()
@@ -855,7 +887,8 @@ impl SovereignMessageBroker {
     }
 
     pub fn subscribe(&mut self, topic: &str, subscriber_id: &str) {
-        self.subscriptions.push((topic.to_string(), subscriber_id.to_string()));
+        self.subscriptions
+            .push((topic.to_string(), subscriber_id.to_string()));
     }
 
     pub fn publish(&mut self, topic: &str, payload: &[u8], timestamp_ms: u64) -> usize {
@@ -872,10 +905,8 @@ impl SovereignMessageBroker {
     }
 
     pub fn consume(&mut self, topic: &str) -> Vec<MessagePacket> {
-        let (matching, remaining): (Vec<MessagePacket>, Vec<MessagePacket>) = self
-            .message_queue
-            .drain(..)
-            .partition(|m| m.topic == topic);
+        let (matching, remaining): (Vec<MessagePacket>, Vec<MessagePacket>) =
+            self.message_queue.drain(..).partition(|m| m.topic == topic);
         self.message_queue = remaining;
         matching
     }
@@ -1016,8 +1047,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
     }
 
     pub fn bootstrap_sovereign_stack(&mut self) -> Result<String, &'static str> {
-        self.vcs.stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
-        let _commit = self.vcs.commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
+        self.vcs
+            .stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
+        let _commit = self
+            .vcs
+            .commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
 
         let init_unit = ServiceUnit {
             name: "sovereign_core".to_string(),
@@ -1030,7 +1064,8 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.supervisor.register_service(init_unit)?;
         self.supervisor.start_service("sovereign_core")?;
 
-        self.observability.record_metric("cpu_utilization", 12.5, 1700000000);
+        self.observability
+            .record_metric("cpu_utilization", 12.5, 1700000000);
         self.firewall.establish_pqc_vpn_tunnel(&[0x1D; 32]);
         self.capsicum.cap_enter();
 
@@ -1147,7 +1182,12 @@ impl SovereignZirconHandleManager {
         }
     }
 
-    pub fn create_handle(&mut self, object_type: &str, rights: ZirconRights, pqc_token: [u8; 16]) -> u32 {
+    pub fn create_handle(
+        &mut self,
+        object_type: &str,
+        rights: ZirconRights,
+        pqc_token: [u8; 16],
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
         self.handles.push(ZirconHandle {
@@ -1270,7 +1310,11 @@ impl SovereignSolarisZoneEngine {
     }
 
     pub fn fire_probe(&mut self, provider: &str, name: &str) -> bool {
-        if let Some(p) = self.probes.iter_mut().find(|p| p.provider == provider && p.name == name) {
+        if let Some(p) = self
+            .probes
+            .iter_mut()
+            .find(|p| p.provider == provider && p.name == name)
+        {
             p.hit_count += 1;
             true
         } else {
@@ -1379,7 +1423,11 @@ impl SovereignQubesIsolationEngine {
         });
     }
 
-    pub fn copy_inter_vm_buffer(&mut self, src_domain: &str, payload: &[u8]) -> Result<(), &'static str> {
+    pub fn copy_inter_vm_buffer(
+        &mut self,
+        src_domain: &str,
+        payload: &[u8],
+    ) -> Result<(), &'static str> {
         if !self.domains.iter().any(|d| d.name == src_domain) {
             return Err("QubesIsolationEngine: Source domain does not exist");
         }
@@ -1473,8 +1521,17 @@ impl SovereignHaikuInterfaceEngine {
         });
     }
 
-    pub fn convert_media(&self, in_fmt: &str, out_fmt: &str, data: &[u8]) -> Result<Vec<u8>, &'static str> {
-        if self.translators.iter().any(|t| t.input_format == in_fmt && t.output_format == out_fmt) {
+    pub fn convert_media(
+        &self,
+        in_fmt: &str,
+        out_fmt: &str,
+        data: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        if self
+            .translators
+            .iter()
+            .any(|t| t.input_format == in_fmt && t.output_format == out_fmt)
+        {
             let mut converted = data.to_vec();
             converted.reverse(); // Zero-copy representation transformation
             Ok(converted)
@@ -1535,7 +1592,10 @@ impl SovereignEbpfXdpEngine {
     }
 
     pub fn map_lookup_elem(&self, key: &str) -> Option<&Vec<u8>> {
-        self.map_storage.iter().find(|(k, _)| k == key).map(|(_, v)| v)
+        self.map_storage
+            .iter()
+            .find(|(k, _)| k == key)
+            .map(|(_, v)| v)
     }
 
     pub fn execute_xdp(&mut self, packet_data: &[u8]) -> XdpAction {
@@ -1826,11 +1886,17 @@ mod tests {
         assert!(activation_res.contains("sigmadb"));
 
         assert!(init.start_service("sigmaweb").is_ok());
-        assert_eq!(init.registered_units[1].current_state, SupervisorServiceState::ActiveRunning);
+        assert_eq!(
+            init.registered_units[1].current_state,
+            SupervisorServiceState::ActiveRunning
+        );
 
         init.handle_service_failure("sigmaweb");
         assert_eq!(init.registered_units[1].restart_count, 1);
-        assert_eq!(init.registered_units[1].current_state, SupervisorServiceState::ActiveRunning);
+        assert_eq!(
+            init.registered_units[1].current_state,
+            SupervisorServiceState::ActiveRunning
+        );
     }
 
     #[test]
@@ -1846,9 +1912,15 @@ mod tests {
             action: FirewallAction::Deny,
         });
 
-        assert_eq!(firewall.inspect_incoming_packet("192.168.1.50", 22), FirewallAction::Deny);
+        assert_eq!(
+            firewall.inspect_incoming_packet("192.168.1.50", 22),
+            FirewallAction::Deny
+        );
         assert_eq!(firewall.blocked_ip_count, 1);
-        assert_eq!(firewall.inspect_incoming_packet("192.168.1.100", 80), FirewallAction::Allow);
+        assert_eq!(
+            firewall.inspect_incoming_packet("192.168.1.100", 80),
+            FirewallAction::Allow
+        );
     }
 
     #[test]
@@ -1866,7 +1938,10 @@ mod tests {
     fn test_sovereign_knowledge_graph_backlinks() {
         let mut graph = SovereignKnowledgeGraph::new();
         graph.add_note("Kernel_Architecture", "Core microkernel design");
-        graph.add_note("Pqc_Enclave", "Security enclave based on [[Kernel_Architecture]]");
+        graph.add_note(
+            "Pqc_Enclave",
+            "Security enclave based on [[Kernel_Architecture]]",
+        );
 
         let backlinks = graph.query_backlinks("Kernel_Architecture");
         assert_eq!(backlinks.len(), 1);
@@ -1891,7 +1966,9 @@ mod tests {
     #[test]
     fn test_sovereign_partition_engine() {
         let mut pe = SovereignPartitionEngine::new(100_000); // 100,000 sectors
-        let p1 = pe.create_partition(SovereignFsType::SigmaFs, 20_000, "root").unwrap();
+        let p1 = pe
+            .create_partition(SovereignFsType::SigmaFs, 20_000, "root")
+            .unwrap();
         assert_eq!(p1, 1);
 
         assert!(pe.verify_alignment());
@@ -1903,7 +1980,10 @@ mod tests {
         runtime.create_container("app1", "alpine:latest", 512);
         assert_eq!(runtime.containers.len(), 1);
         assert!(runtime.start_container("app1").is_ok());
-        assert_eq!(runtime.containers[0].state, SovereignContainerState::Running);
+        assert_eq!(
+            runtime.containers[0].state,
+            SovereignContainerState::Running
+        );
 
         runtime.enforce_cgroups("app1", 50);
         assert_eq!(runtime.containers[0].cpu_usage_pct, 50);
@@ -1958,7 +2038,10 @@ mod tests {
         assert!(db.create_table("users").is_ok());
         assert!(db.begin_transaction());
 
-        let row = Vec::from([("id".to_string(), "1".to_string()), ("name".to_string(), "Jules".to_string())]);
+        let row = Vec::from([
+            ("id".to_string(), "1".to_string()),
+            ("name".to_string(), "Jules".to_string()),
+        ]);
         assert!(db.insert_row("users", row).is_ok());
         assert!(db.commit());
 
@@ -2000,7 +2083,9 @@ mod tests {
         let mut ai_server = SovereignAiInferenceServer::new();
         ai_server.load_model("llama-3-8b", 4096);
 
-        let response = ai_server.generate_response("Explain quantum computing").unwrap();
+        let response = ai_server
+            .generate_response("Explain quantum computing")
+            .unwrap();
         assert!(response.contains("llama-3-8b"));
         assert!(ai_server.generated_tokens_count > 0);
     }
@@ -2069,7 +2154,9 @@ mod tests {
         let mut qubes = SovereignQubesIsolationEngine::new();
         qubes.create_domain("work-vault", "red", false);
 
-        assert!(qubes.copy_inter_vm_buffer("work-vault", b"secret_token").is_ok());
+        assert!(qubes
+            .copy_inter_vm_buffer("work-vault", b"secret_token")
+            .is_ok());
         assert_eq!(qubes.inter_vm_clipboard, Some(b"secret_token".to_vec()));
     }
 

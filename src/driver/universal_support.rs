@@ -3,28 +3,30 @@
 
 extern crate alloc;
 
+use crate::driver::device::{
+    CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice, PortAddress,
+};
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use crate::driver::device::{Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice, CharacterDevice, PortAddress};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
-    LegacyISA = 0,    // 1980s (Serial, Parallel, Floppy, NE2000, SoundBlaster16, PC Speaker)
-    ClassicPCI = 1,   // 1990s (PCI Ethernet, SoundBlaster16 PCI)
-    ModernPCIe = 2,   // 2000s+ (NVMe, Gigabit Ethernet, GPU)
+    LegacyISA = 0,  // 1980s (Serial, Parallel, Floppy, NE2000, SoundBlaster16, PC Speaker)
+    ClassicPCI = 1, // 1990s (PCI Ethernet, SoundBlaster16 PCI)
+    ModernPCIe = 2, // 2000s+ (NVMe, Gigabit Ethernet, GPU)
 }
 
 /// Supported legacy device types that other operating systems have dropped
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LegacyHardwareType {
-    Ne2000Ethernet,   // Standard 10Mbps ISA Ethernet Card (created 1987, dropped by modern OSes)
-    ParallelLptPort,  // IEEE 1284 Parallel Printer Port (dropped by modern OSes)
+    Ne2000Ethernet, // Standard 10Mbps ISA Ethernet Card (created 1987, dropped by modern OSes)
+    ParallelLptPort, // IEEE 1284 Parallel Printer Port (dropped by modern OSes)
     FloppyController, // Standard NEC 765 Floppy Disk Controller (dropped by modern OSes)
-    SerialMouse,      // Antique Microsoft 2-button Serial Mouse (ISA 0x3F8)
-    SoundBlaster16,   // ISA Sound Blaster 16 base port 0x220 (dropped by modern OSes)
-    PcSpeaker,        // IBM PC Speaker PIT Channel 2 base port 0x61 (dropped by modern OSes)
+    SerialMouse,    // Antique Microsoft 2-button Serial Mouse (ISA 0x3F8)
+    SoundBlaster16, // ISA Sound Blaster 16 base port 0x220 (dropped by modern OSes)
+    PcSpeaker,      // IBM PC Speaker PIT Channel 2 base port 0x61 (dropped by modern OSes)
 }
 
 /// A hardware-level representation of an antique device mapping port registers
@@ -147,8 +149,8 @@ impl Device for SovereignLegacyPeripheralAdapter {
                 self.registers.write_port(0x02, 0x0C); // Reset parallel port control
             }
             LegacyHardwareType::SoundBlaster16 => {
-                self.registers.write_port(0x06, 1);    // Set DSP reset active
-                self.registers.write_port(0x06, 0);    // Clear DSP reset
+                self.registers.write_port(0x06, 1); // Set DSP reset active
+                self.registers.write_port(0x06, 0); // Clear DSP reset
                 self.registers.write_port(0x0E, 0xAA); // DSP acknowledged ready byte
             }
             LegacyHardwareType::PcSpeaker => {
@@ -171,8 +173,8 @@ impl Device for SovereignLegacyPeripheralAdapter {
                 // Byte 3: Delta Y motion
                 if buffer.len() >= 3 {
                     buffer[0] = 0x40 | 1; // Left button pressed
-                    buffer[1] = 2;        // Moved 2 units right
-                    buffer[2] = 0;        // No Y motion
+                    buffer[1] = 2; // Moved 2 units right
+                    buffer[2] = 0; // No Y motion
                     Ok(3)
                 } else {
                     Ok(0)
@@ -248,8 +250,9 @@ impl Device for SovereignLegacyPeripheralAdapter {
                     self.pitch_frequency = freq;
                     let reload = 1193182 / freq;
                     self.registers.write_port(0x03, (reload & 0xFF) as u8); // Send PIT LSB
-                    self.registers.write_port(0x03, ((reload >> 8) & 0xFF) as u8); // Send PIT MSB
-                    // Enable speaker beeper gate
+                    self.registers
+                        .write_port(0x03, ((reload >> 8) & 0xFF) as u8); // Send PIT MSB
+                                                                         // Enable speaker beeper gate
                     self.registers.write_port(0x00, 0x03);
                     return Ok(freq as usize);
                 }
@@ -352,8 +355,10 @@ impl HardwareAutoNegotiationBroker {
             0x3F8 => Some(SovereignLegacyPeripheralAdapter::new_serial_mouse(0x3F8)),
             0x378 => Some(SovereignLegacyPeripheralAdapter::new_lpt(0x378)),
             0x300 => Some(SovereignLegacyPeripheralAdapter::new_ne2000(0x300, 9)),
-            0x220 => Some(SovereignLegacyPeripheralAdapter::new_sound_blaster(0x220, 5)),
-            0x61  => Some(SovereignLegacyPeripheralAdapter::new_pc_speaker()),
+            0x220 => Some(SovereignLegacyPeripheralAdapter::new_sound_blaster(
+                0x220, 5,
+            )),
+            0x61 => Some(SovereignLegacyPeripheralAdapter::new_pc_speaker()),
             _ => None,
         }
     }

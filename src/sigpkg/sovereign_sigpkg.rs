@@ -33,7 +33,12 @@ pub struct SigpkgHeader {
 }
 
 impl SigpkgHeader {
-    pub fn new(payload_size: u64, uncompressed_size: u64, sha256_checksum: [u8; 32], sig: [u8; 64]) -> Self {
+    pub fn new(
+        payload_size: u64,
+        uncompressed_size: u64,
+        sha256_checksum: [u8; 32],
+        sig: [u8; 64],
+    ) -> Self {
         Self {
             magic: *b"SPKG",
             format_version: 1,
@@ -122,7 +127,11 @@ impl ReproducibleBuildContext {
         }
     }
 
-    pub fn compute_derivation_hash(&self, source_hash: &[u8; 32], env_vars: &BTreeMap<String, String>) -> [u8; 32] {
+    pub fn compute_derivation_hash(
+        &self,
+        source_hash: &[u8; 32],
+        env_vars: &BTreeMap<String, String>,
+    ) -> [u8; 32] {
         let mut digest = [0u8; 32];
         for (i, &b) in source_hash.iter().enumerate() {
             digest[i] = b ^ ((self.source_date_epoch as u8).wrapping_add(i as u8));
@@ -164,7 +173,11 @@ impl SourceFirstBuilder {
         self.binary_cache.insert(derivation_hash, artifact);
     }
 
-    pub fn fetch_or_build<F>(&mut self, derivation_hash: &[u8; 32], source_builder: F) -> Result<Vec<u8>, &'static str>
+    pub fn fetch_or_build<F>(
+        &mut self,
+        derivation_hash: &[u8; 32],
+        source_builder: F,
+    ) -> Result<Vec<u8>, &'static str>
     where
         F: FnOnce() -> Result<Vec<u8>, &'static str>,
     {
@@ -218,7 +231,10 @@ impl DeterministicDependencyResolver {
             .push(req);
     }
 
-    pub fn resolve_dependencies(&self, root_targets: &[&str]) -> Result<Vec<String>, DependencyDiagnostic> {
+    pub fn resolve_dependencies(
+        &self,
+        root_targets: &[&str],
+    ) -> Result<Vec<String>, DependencyDiagnostic> {
         let mut resolved = Vec::new();
         let mut conflicts = BTreeMap::new();
 
@@ -230,7 +246,10 @@ impl DeterministicDependencyResolver {
                             return Err(DependencyDiagnostic {
                                 package_a: target.to_string(),
                                 package_b: conflict.clone(),
-                                conflict_reason: format!("Direct incompatibility between {} and {}", target, conflict),
+                                conflict_reason: format!(
+                                    "Direct incompatibility between {} and {}",
+                                    target, conflict
+                                ),
                             });
                         }
                         conflicts.insert(conflict.clone(), target.to_string());
@@ -285,7 +304,10 @@ impl AtomicTransactionEngine {
         next_id
     }
 
-    pub fn rollback_generation(&mut self, target_gen: u32) -> Result<&PackageGeneration, &'static str> {
+    pub fn rollback_generation(
+        &mut self,
+        target_gen: u32,
+    ) -> Result<&PackageGeneration, &'static str> {
         for gen in &self.history {
             if gen.generation_id == target_gen {
                 self.active_generation = target_gen;
@@ -457,7 +479,8 @@ impl LocalPackageProxyCache {
         }
         self.total_misses += 1;
         let downloaded = download_fn()?;
-        self.cached_downloads.insert(url.to_string(), downloaded.clone());
+        self.cached_downloads
+            .insert(url.to_string(), downloaded.clone());
         Ok(downloaded)
     }
 }
@@ -517,7 +540,9 @@ pub struct BuildFarmManager {
 
 impl BuildFarmManager {
     pub fn new() -> Self {
-        Self { workers: Vec::new() }
+        Self {
+            workers: Vec::new(),
+        }
     }
 
     pub fn register_worker(&mut self, id: u32, arch: TargetArchitecture) {
@@ -609,7 +634,11 @@ impl FlatpakContainerIntegration {
 pub struct PackageQualityChecker;
 
 impl PackageQualityChecker {
-    pub fn check_quality(name: &str, license: &str, binaries_present: bool) -> Result<(), &'static str> {
+    pub fn check_quality(
+        name: &str,
+        license: &str,
+        binaries_present: bool,
+    ) -> Result<(), &'static str> {
         if name.is_empty() {
             return Err("Quality Gate: Package name cannot be empty");
         }
@@ -712,7 +741,10 @@ impl PackageAnalyticsDashboard {
     }
 
     pub fn record_download(&mut self, pkg_name: &str, size_bytes: u64) {
-        *self.download_counts.entry(pkg_name.to_string()).or_insert(0) += 1;
+        *self
+            .download_counts
+            .entry(pkg_name.to_string())
+            .or_insert(0) += 1;
         self.bandwidth_bytes_served += size_bytes;
     }
 
@@ -741,7 +773,10 @@ impl LegacyPackageMigrator {
                 version = line.split(':').nth(1).unwrap_or("").trim();
             }
         }
-        Ok(format!("[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"debian\"\n", name, version))
+        Ok(format!(
+            "[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"debian\"\n",
+            name, version
+        ))
     }
 
     pub fn convert_arch_pkgbuild(pkgbuild_text: &str) -> Result<String, &'static str> {
@@ -752,12 +787,25 @@ impl LegacyPackageMigrator {
         let mut version = "";
         for line in pkgbuild_text.lines() {
             if line.starts_with("pkgname=") {
-                name = line.split('=').nth(1).unwrap_or("").trim_matches('"').trim();
+                name = line
+                    .split('=')
+                    .nth(1)
+                    .unwrap_or("")
+                    .trim_matches('"')
+                    .trim();
             } else if line.starts_with("pkgver=") {
-                version = line.split('=').nth(1).unwrap_or("").trim_matches('"').trim();
+                version = line
+                    .split('=')
+                    .nth(1)
+                    .unwrap_or("")
+                    .trim_matches('"')
+                    .trim();
             }
         }
-        Ok(format!("[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"arch\"\n", name, version))
+        Ok(format!(
+            "[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"arch\"\n",
+            name, version
+        ))
     }
 
     pub fn convert_fedora_spec(spec_text: &str) -> Result<String, &'static str> {
@@ -773,6 +821,9 @@ impl LegacyPackageMigrator {
                 version = line.split(':').nth(1).unwrap_or("").trim();
             }
         }
-        Ok(format!("[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"fedora\"\n", name, version))
+        Ok(format!(
+            "[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"fedora\"\n",
+            name, version
+        ))
     }
 }

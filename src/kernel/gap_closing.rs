@@ -251,8 +251,8 @@ impl Default for MetadataJournal {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SystemControlRegisters {
     // x86/x64 CR0 flags
-    pub cr0_wp: bool,  // Write Protect (prevents kernel from writing to read-only user pages)
-    pub cr0_pe: bool,  // Protection Enable
+    pub cr0_wp: bool, // Write Protect (prevents kernel from writing to read-only user pages)
+    pub cr0_pe: bool, // Protection Enable
 
     // x86/x64 CR3 value (Page Directory Base Register)
     pub cr3_pdbr: u64,
@@ -438,7 +438,10 @@ pub struct X86RootkitAuditor {
     pub expected_ssdt_checksum: u64,
 }
 
-pub fn io_attach_device_to_device_stack(source_device: &mut DeviceObject, target_device: &mut DeviceObject) {
+pub fn io_attach_device_to_device_stack(
+    source_device: &mut DeviceObject,
+    target_device: &mut DeviceObject,
+) {
     source_device.next_device = Some(Box::new(target_device.clone()));
     target_device.attached_device = Some(Box::new(source_device.clone()));
 }
@@ -451,7 +454,11 @@ impl X86RootkitAuditor {
         }
     }
 
-    pub fn audit_device_stack(&self, dev: &DeviceObject, allowed_drivers: &[&str]) -> Result<(), &'static str> {
+    pub fn audit_device_stack(
+        &self,
+        dev: &DeviceObject,
+        allowed_drivers: &[&str],
+    ) -> Result<(), &'static str> {
         let mut curr = Some(dev);
         while let Some(d) = curr {
             let mut is_allowed = false;
@@ -469,12 +476,19 @@ impl X86RootkitAuditor {
         Ok(())
     }
 
-    pub fn audit_driver_dispatch_table(&self, driver: &DriverObject, lower_bound: usize, upper_bound: usize) -> Result<(), &'static str> {
+    pub fn audit_driver_dispatch_table(
+        &self,
+        driver: &DriverObject,
+        lower_bound: usize,
+        upper_bound: usize,
+    ) -> Result<(), &'static str> {
         for handler in &driver.major_function {
             if let Some(f) = handler {
                 let addr = *f as usize;
                 if addr < lower_bound || addr > upper_bound {
-                    return Err("Rootkit hook detected in DriverObject major function dispatch table!");
+                    return Err(
+                        "Rootkit hook detected in DriverObject major function dispatch table!",
+                    );
                 }
             }
         }
@@ -512,7 +526,9 @@ impl X86RootkitAuditor {
         // Detect kernel inline code hooking
         let cur_text_sum = Self::checksum_buffer(active_kernel_text);
         if cur_text_sum != self.expected_kernel_text_checksum {
-            return Err("Rootkit hooks detected in kernel .text section (Inline code modification)!");
+            return Err(
+                "Rootkit hooks detected in kernel .text section (Inline code modification)!",
+            );
         }
 
         // Detect SSDT/Descriptor Table hijacking
@@ -528,7 +544,6 @@ impl X86RootkitAuditor {
 
         Ok(())
     }
-
 }
 
 // ==========================================
@@ -543,7 +558,6 @@ pub enum IrpMajorFunction {
     Write = 3,
     DeviceControl = 4, // equivalent to IOCTL
 }
-
 
 pub struct Irp {
     pub major_function: IrpMajorFunction,
@@ -565,7 +579,12 @@ impl Irp {
             stack_locations: Vec::new(),
         }
     }
-    pub fn new_with_stack(major_function: IrpMajorFunction, _minor_function: u8, buffer: Vec<u8>, stack_locations: u8) -> Self {
+    pub fn new_with_stack(
+        major_function: IrpMajorFunction,
+        _minor_function: u8,
+        buffer: Vec<u8>,
+        stack_locations: u8,
+    ) -> Self {
         Self {
             major_function,
             ioctl_code: 0,
@@ -581,8 +600,6 @@ impl Irp {
     pub fn complete_request(&mut self, _status: u32) {}
 }
 
-
-
 pub struct IrpHandler {
     // Dispatch callbacks for Major Functions
     pub dispatch_read: fn(&mut Irp) -> u32,
@@ -591,11 +608,7 @@ pub struct IrpHandler {
 }
 
 impl IrpHandler {
-    pub fn new(
-        dr: fn(&mut Irp) -> u32,
-        dw: fn(&mut Irp) -> u32,
-        di: fn(&mut Irp) -> u32,
-    ) -> Self {
+    pub fn new(dr: fn(&mut Irp) -> u32, dw: fn(&mut Irp) -> u32, di: fn(&mut Irp) -> u32) -> Self {
         Self {
             dispatch_read: dr,
             dispatch_write: dw,
@@ -703,10 +716,12 @@ impl EbpfJitVerifier {
                     regs[insn.dst_reg as usize] = insn.imm as u64;
                 }
                 EbpfOpcode::Add => {
-                    regs[insn.dst_reg as usize] = regs[insn.dst_reg as usize].wrapping_add(insn.imm as u64);
+                    regs[insn.dst_reg as usize] =
+                        regs[insn.dst_reg as usize].wrapping_add(insn.imm as u64);
                 }
                 EbpfOpcode::Sub => {
-                    regs[insn.dst_reg as usize] = regs[insn.dst_reg as usize].wrapping_sub(insn.imm as u64);
+                    regs[insn.dst_reg as usize] =
+                        regs[insn.dst_reg as usize].wrapping_sub(insn.imm as u64);
                 }
                 EbpfOpcode::Exit => {
                     return Ok(regs[0]); // R0 contains return value
@@ -766,7 +781,10 @@ impl OpenBsdPledgeUnveil {
 
         if let Some(target_path) = path {
             if !self.unveiled_paths.is_empty() {
-                let allowed = self.unveiled_paths.iter().any(|(p, _)| target_path.starts_with(p));
+                let allowed = self
+                    .unveiled_paths
+                    .iter()
+                    .any(|(p, _)| target_path.starts_with(p));
                 if !allowed {
                     return false;
                 }
@@ -839,8 +857,8 @@ impl CapsicumEngine {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CallingConvention {
-    Cdecl,     // x86 standard (Stack passed right-to-left, caller cleans)
-    Fastcall,  // x64/ARM modern standard (Registers first, callee cleans or caller cleans)
+    Cdecl,    // x86 standard (Stack passed right-to-left, caller cleans)
+    Fastcall, // x64/ARM modern standard (Registers first, callee cleans or caller cleans)
 }
 
 pub struct CallingConventionEngine {
@@ -1017,7 +1035,9 @@ mod tests {
     #[test]
     fn test_x86_rootkit_auditor() {
         let mut ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler1(_args: &[u64]) -> u64 { 1 }
+        fn mock_handler1(_args: &[u64]) -> u64 {
+            1
+        }
         ssdt.register_service(1, mock_handler1, 0);
 
         let kernel_text = b"\x90\x90\xCC\xC3"; // mock instructions
@@ -1035,7 +1055,9 @@ mod tests {
 
         // Test 2: SSDT Hooking (handler hijack)
         let mut infected_ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler2(__args: &[u64]) -> u64 { 2 } // Different handler for hijack simulation
+        fn mock_handler2(__args: &[u64]) -> u64 {
+            2
+        } // Different handler for hijack simulation
         infected_ssdt.register_service(1, mock_handler2, 0); // hijacked handler
         let err2 = auditor.audit_system(kernel_text, &infected_ssdt, 0x7FFF0000, 0x7FFF0000);
         assert!(err2.is_err());
@@ -1056,10 +1078,7 @@ mod tests {
         }
         let handler = IrpHandler::new(|_| 0, |_| 0, mock_ioctl_dispatch);
 
-        let mut irp = Irp::new(
-            IrpMajorFunction::DeviceControl,
-            vec![0x11, 0x22],
-        );
+        let mut irp = Irp::new(IrpMajorFunction::DeviceControl, vec![0x11, 0x22]);
         irp.ioctl_code = 0x222000;
 
         let res = handler.process_irp(irp);
@@ -1094,9 +1113,24 @@ mod tests {
     #[test]
     fn test_ebpf_verifier_and_execution() {
         let prog = vec![
-            EbpfInstruction { opcode: EbpfOpcode::Mov, dst_reg: 0, src_reg: 0, imm: 10 },
-            EbpfInstruction { opcode: EbpfOpcode::Add, dst_reg: 0, src_reg: 0, imm: 32 },
-            EbpfInstruction { opcode: EbpfOpcode::Exit, dst_reg: 0, src_reg: 0, imm: 0 },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Mov,
+                dst_reg: 0,
+                src_reg: 0,
+                imm: 10,
+            },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Add,
+                dst_reg: 0,
+                src_reg: 0,
+                imm: 32,
+            },
+            EbpfInstruction {
+                opcode: EbpfOpcode::Exit,
+                dst_reg: 0,
+                src_reg: 0,
+                imm: 0,
+            },
         ];
 
         let result = EbpfJitVerifier::execute_program(&prog);
@@ -1126,7 +1160,9 @@ mod tests {
     fn test_rootkit_dispatch_table_hook_auditer() {
         let mut major_function: [Option<usize>; 28] = [None; 28];
 
-        fn mock_dispatch(_dev: &DeviceObject, _irp: &mut Irp) -> u32 { 0 }
+        fn mock_dispatch(_dev: &DeviceObject, _irp: &mut Irp) -> u32 {
+            0
+        }
         let addr = mock_dispatch as usize;
         major_function[0] = Some(addr);
 
@@ -1144,6 +1180,9 @@ mod tests {
         // Bounds audit fails if bounds are restricted to exclude the dispatch address (detecting hook redirect)
         let res2 = auditor.audit_driver_dispatch_table(&driver, addr + 10, addr + 100);
         assert!(res2.is_err());
-        assert_eq!(res2.unwrap_err(), "Rootkit hook detected in DriverObject major function dispatch table!");
+        assert_eq!(
+            res2.unwrap_err(),
+            "Rootkit hook detected in DriverObject major function dispatch table!"
+        );
     }
 }

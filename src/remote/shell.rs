@@ -4,10 +4,9 @@
 /// OOP-based Remote Shell for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 966
 /// Implements remote shell access
-
 extern crate alloc;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ShellID = usize;
 

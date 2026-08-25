@@ -20,7 +20,6 @@
 // Each section implements concepts adapted from a specific distribution's innovations.
 
 #[allow(dead_code)]
-
 // ============================================================================
 // ARCH LINUX — Rolling Release Model, Minimal Base
 // ============================================================================
@@ -64,9 +63,15 @@ impl MinimalBaseInstaller {
     }
 
     pub fn install_base(&mut self) {
-        let base = ["sigmaos-base", "sigmaos-linux-kernel", "sigmaos-util-linux", "sigmaos-glibc"];
+        let base = [
+            "sigmaos-base",
+            "sigmaos-linux-kernel",
+            "sigmaos-util-linux",
+            "sigmaos-glibc",
+        ];
         for pkg in &base {
-            self.installed_packages.push(alloc::string::String::from(*pkg));
+            self.installed_packages
+                .push(alloc::string::String::from(*pkg));
         }
         self.total_size_kb = 512 * 1024; // ~512 MB
     }
@@ -421,7 +426,9 @@ pub enum PenTestCategory {
 impl PenTestToolRegistry {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut registry = PenTestToolRegistry { tools: alloc::vec::Vec::new() };
+        let mut registry = PenTestToolRegistry {
+            tools: alloc::vec::Vec::new(),
+        };
         registry.register_default_tools();
         registry
     }
@@ -544,8 +551,8 @@ pub struct BoreSchedulerConfig {
 impl BoreSchedulerConfig {
     pub fn default_desktop() -> Self {
         BoreSchedulerConfig {
-            burst_time_ns: 8_000_000,  // 8ms burst
-            base_slice_ns: 4_000_000,  // 4ms base slice
+            burst_time_ns: 8_000_000, // 8ms burst
+            base_slice_ns: 4_000_000, // 4ms base slice
             cache_aware: true,
             hpc_mode: false,
         }
@@ -577,7 +584,10 @@ pub struct BoreScheduler {
 
 impl BoreScheduler {
     pub fn new(config: BoreSchedulerConfig) -> Self {
-        BoreScheduler { config, run_queue: alloc::vec::Vec::new() }
+        BoreScheduler {
+            config,
+            run_queue: alloc::vec::Vec::new(),
+        }
     }
 
     pub fn enqueue(&mut self, task: Task) {
@@ -586,7 +596,9 @@ impl BoreScheduler {
 
     /// Pick the task with minimum virtual runtime (CFS-like) adjusted by burst score.
     pub fn pick_next(&mut self) -> Option<&Task> {
-        self.run_queue.iter().min_by_key(|t| t.vruntime.wrapping_add(t.burst_score))
+        self.run_queue
+            .iter()
+            .min_by_key(|t| t.vruntime.wrapping_add(t.burst_score))
     }
 
     pub fn update_burst_score(&mut self, pid: u32, delta_ns: u64) {
@@ -779,7 +791,10 @@ mod tests {
         assert_eq!(manager.get_outdated_packages().len(), 1);
 
         // Upgrade system fails without mirror sync
-        assert_eq!(manager.upgrade_system(), Err(ReleaseError::MirrorSyncFailed));
+        assert_eq!(
+            manager.upgrade_system(),
+            Err(ReleaseError::MirrorSyncFailed)
+        );
 
         assert!(manager.sync_mirrors().is_ok());
         assert_eq!(manager.upgrade_system().unwrap(), 1);
@@ -804,7 +819,10 @@ mod tests {
 
         assert_eq!(manager.snapshots.len(), 2);
         assert!(manager.rollback_to(id2).is_ok());
-        assert_eq!(manager.rollback_to(999), Err(ReleaseError::SnapshotNotFound));
+        assert_eq!(
+            manager.rollback_to(999),
+            Err(ReleaseError::SnapshotNotFound)
+        );
     }
 
     #[test]

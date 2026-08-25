@@ -155,8 +155,8 @@ impl LiveInstaller for SovereignInstaller {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UpdateChannel {
-    LTS,         // Long-Term Stable (Quarterly vetted releases)
-    Rolling,     // Rolling Release (Weekly stable synchronization)
+    LTS,          // Long-Term Stable (Quarterly vetted releases)
+    Rolling,      // Rolling Release (Weekly stable synchronization)
     Experimental, // Bleeding Edge (Daily automated integrations)
 }
 
@@ -240,7 +240,9 @@ pub struct SovereignBundleRuntime {
 
 impl SovereignBundleRuntime {
     pub fn new() -> Self {
-        Self { active_bundle: None }
+        Self {
+            active_bundle: None,
+        }
     }
 }
 
@@ -291,7 +293,12 @@ pub trait HardwareAbstractionLayer {
     fn get_arch(&self) -> CpuArchitecture;
     fn enable_interrupts(&self);
     fn disable_interrupts(&self);
-    fn map_virtual_page(&mut self, virtual_addr: u64, physical_addr: u64, flags: u32) -> Result<(), HalError>;
+    fn map_virtual_page(
+        &mut self,
+        virtual_addr: u64,
+        physical_addr: u64,
+        flags: u32,
+    ) -> Result<(), HalError>;
 }
 
 pub struct SovereignHal {
@@ -324,15 +331,24 @@ impl HardwareAbstractionLayer for SovereignHal {
 
     fn enable_interrupts(&self) {
         #[cfg(all(target_arch = "x86_64", not(test)))]
-        unsafe { core::arch::asm!("sti", options(nomem, nostack)); }
+        unsafe {
+            core::arch::asm!("sti", options(nomem, nostack));
+        }
     }
 
     fn disable_interrupts(&self) {
         #[cfg(all(target_arch = "x86_64", not(test)))]
-        unsafe { core::arch::asm!("cli", options(nomem, nostack)); }
+        unsafe {
+            core::arch::asm!("cli", options(nomem, nostack));
+        }
     }
 
-    fn map_virtual_page(&mut self, _virtual_addr: u64, _physical_addr: u64, _flags: u32) -> Result<(), HalError> {
+    fn map_virtual_page(
+        &mut self,
+        _virtual_addr: u64,
+        _physical_addr: u64,
+        _flags: u32,
+    ) -> Result<(), HalError> {
         Ok(())
     }
 }
@@ -371,11 +387,14 @@ pub struct UnveilRestrictions {
 
 impl UnveilRestrictions {
     pub fn new() -> Self {
-        Self { allowed_paths: Vec::new() }
+        Self {
+            allowed_paths: Vec::new(),
+        }
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) {
-        self.allowed_paths.push((path.to_string(), permissions.to_string()));
+        self.allowed_paths
+            .push((path.to_string(), permissions.to_string()));
     }
 
     pub fn check_access(&self, path: &str, perm: char) -> bool {
@@ -414,7 +433,7 @@ impl OpenSourceParityEngine {
     pub fn new() -> Self {
         Self {
             capsicum_rights: CapsicumRights::new(
-                CapsicumRights::CAP_READ | CapsicumRights::CAP_WRITE | CapsicumRights::CAP_SEEK
+                CapsicumRights::CAP_READ | CapsicumRights::CAP_WRITE | CapsicumRights::CAP_SEEK,
             ),
             unveil_restrictions: UnveilRestrictions::new(),
         }
@@ -446,7 +465,10 @@ mod tests {
     #[test]
     fn test_sovereign_installer() {
         let mut installer = SovereignInstaller::new();
-        assert_eq!(installer.get_current_step(), InstallerStep::DetectingHardware);
+        assert_eq!(
+            installer.get_current_step(),
+            InstallerStep::DetectingHardware
+        );
 
         // Detect OS & set dual-boot mode
         let os_list = installer.detect_existing_operating_systems();
@@ -552,6 +574,8 @@ mod tests {
         let unsafe_pkgbuild = "pkgname=evil-app\nbuild() { sudo rm -rf /; }";
 
         assert!(AurPkgBuildVerifier::verify_pkgbuild_content(safe_pkgbuild));
-        assert!(!AurPkgBuildVerifier::verify_pkgbuild_content(unsafe_pkgbuild));
+        assert!(!AurPkgBuildVerifier::verify_pkgbuild_content(
+            unsafe_pkgbuild
+        ));
     }
 }

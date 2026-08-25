@@ -161,7 +161,9 @@ pub struct SovereignTeeEngine {
 
 impl SovereignTeeEngine {
     pub fn new() -> Self {
-        Self { bytes_duplicated: 0 }
+        Self {
+            bytes_duplicated: 0,
+        }
     }
 
     pub fn tee(
@@ -191,7 +193,9 @@ pub struct SovereignVmSpliceEngine {
 
 impl SovereignVmSpliceEngine {
     pub fn new() -> Self {
-        Self { total_spliced_bytes: 0 }
+        Self {
+            total_spliced_bytes: 0,
+        }
     }
 
     pub fn vmsplice(
@@ -518,7 +522,9 @@ mod tests {
         source_pipe.write_structure(vec![2, 2, 2]).unwrap();
 
         let mut splice_engine = SovereignSpliceEngine::new();
-        let spliced = splice_engine.splice(&mut source_pipe, &mut dest_pipe, 2).unwrap();
+        let spliced = splice_engine
+            .splice(&mut source_pipe, &mut dest_pipe, 2)
+            .unwrap();
 
         assert_eq!(spliced, 2);
         assert_eq!(splice_engine.bytes_spliced, 6);
@@ -529,14 +535,12 @@ mod tests {
     #[test]
     fn test_sovereign_sendfile_engine() {
         let mut dest_pipe = SovereignPipe::new(3, 100, 200, 10);
-        let file_cache = vec![
-            vec![10, 20],
-            vec![30, 40],
-            vec![50, 60],
-        ];
+        let file_cache = vec![vec![10, 20], vec![30, 40], vec![50, 60]];
 
         let mut sendfile_engine = SovereignSendfileEngine::new();
-        let sent = sendfile_engine.send_file_to_pipe(&file_cache, &mut dest_pipe, 1, 2).unwrap();
+        let sent = sendfile_engine
+            .send_file_to_pipe(&file_cache, &mut dest_pipe, 1, 2)
+            .unwrap();
 
         assert_eq!(sent, 4);
         assert_eq!(sendfile_engine.files_sent, 1);
@@ -590,7 +594,9 @@ mod tests {
         let mut vmsplice_engine = SovereignVmSpliceEngine::new();
         let buf1 = [1u8, 2u8, 3u8];
         let buf2 = [4u8, 5u8];
-        let spliced_bytes = vmsplice_engine.vmsplice(&[&buf1[..], &buf2[..]], &mut pipe2).unwrap();
+        let spliced_bytes = vmsplice_engine
+            .vmsplice(&[&buf1[..], &buf2[..]], &mut pipe2)
+            .unwrap();
         assert_eq!(spliced_bytes, 5);
         assert_eq!(pipe2.ring_buffer.len(), 4);
     }

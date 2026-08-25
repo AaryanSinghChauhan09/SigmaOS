@@ -1,6 +1,6 @@
+use crate::klib::hash::SimpleHasher;
 use core::hash::{Hash, Hasher};
 use core::mem::MaybeUninit;
-use crate::klib::hash::SimpleHasher;
 
 /// A lightweight, allocation-free, fixed-size association grid map.
 /// Replaces std::collections::HashMap inside the kernel.
@@ -12,9 +12,8 @@ pub struct StaticHashMap<K, V, const N: usize> {
 impl<K, V, const N: usize> StaticHashMap<K, V, N> {
     /// Creates a new, empty StaticHashMap.
     pub fn new() -> Self {
-        let mut entries: [MaybeUninit<Option<(K, V)>>; N] = unsafe {
-            MaybeUninit::uninit().assume_init()
-        };
+        let mut entries: [MaybeUninit<Option<(K, V)>>; N] =
+            unsafe { MaybeUninit::uninit().assume_init() };
         for entry in &mut entries {
             unsafe {
                 core::ptr::write(entry.as_mut_ptr(), None);
@@ -76,7 +75,9 @@ where
                 if self.len >= N {
                     return Err("StaticHashMap capacity exceeded");
                 }
-                unsafe { *entry_ptr = Some((key, value)); }
+                unsafe {
+                    *entry_ptr = Some((key, value));
+                }
                 self.len += 1;
                 return Ok(None);
             }
@@ -161,10 +162,10 @@ where
                     if pair.0.borrow() == key {
                         let removed = unsafe { self.get_entry_mut(idx) }.take().unwrap();
                         self.len -= 1;
-                        
+
                         // We must rehash any subsequent keys to prevent breaking the probe chain.
                         self.rehash_after(idx);
-                        
+
                         return Some(removed.1);
                     }
                 }

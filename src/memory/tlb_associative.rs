@@ -34,11 +34,11 @@ impl TlbPageFlags {
 /// TLB Entry Record
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TlbEntry {
-    pub vpn: u64,          // Virtual Page Number
-    pub pfn: u64,          // Physical Frame Number
-    pub asid: u16,         // Address Space ID / PCID tag
+    pub vpn: u64,  // Virtual Page Number
+    pub pfn: u64,  // Physical Frame Number
+    pub asid: u16, // Address Space ID / PCID tag
     pub flags: TlbPageFlags,
-    pub lru_tick: u64,     // LRU replacement timestamp
+    pub lru_tick: u64, // LRU replacement timestamp
     pub is_valid: bool,
 }
 
@@ -74,7 +74,13 @@ impl AssociativeTlbCache {
     }
 
     /// Perform associative TLB lookup to translate Virtual Page Number (VPN) to Physical Frame Number (PFN)
-    pub fn lookup_page_translation(&mut self, vpn: u64, asid: u16, is_write: bool, is_execute: bool) -> Result<u64, &'static str> {
+    pub fn lookup_page_translation(
+        &mut self,
+        vpn: u64,
+        asid: u16,
+        is_write: bool,
+        is_execute: bool,
+    ) -> Result<u64, &'static str> {
         self.current_tick += 1;
 
         let index_range = match self.mode {
@@ -246,6 +252,9 @@ mod tests {
         tlb.flush_tlb_by_asid(1);
 
         assert!(tlb.lookup_page_translation(0x10, 1, false, false).is_err());
-        assert_eq!(tlb.lookup_page_translation(0x20, 2, false, false).unwrap(), 0x200);
+        assert_eq!(
+            tlb.lookup_page_translation(0x20, 2, false, false).unwrap(),
+            0x200
+        );
     }
 }

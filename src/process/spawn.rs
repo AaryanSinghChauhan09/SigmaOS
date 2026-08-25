@@ -34,7 +34,7 @@ pub enum ProcessError {
 }
 
 // Linux namespace isolation flags representation
-pub const CLONE_NEWNS: u32 = 0x00020000;  // Mount namespace
+pub const CLONE_NEWNS: u32 = 0x00020000; // Mount namespace
 pub const CLONE_NEWNET: u32 = 0x40000000; // Network namespace
 pub const CLONE_NEWPID: u32 = 0x20000000; // PID namespace
 

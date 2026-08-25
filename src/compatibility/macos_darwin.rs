@@ -10,8 +10,8 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 
 /// Mach-O Magic Numbers
 pub const MH_MAGIC_64: u32 = 0xfeedfacf;
@@ -105,11 +105,36 @@ impl MachOLoader {
                 if offset + 20 > data.len() {
                     break;
                 }
-                let cputype = u32::from_be_bytes([data[offset], data[offset+1], data[offset+2], data[offset+3]]);
-                let cpusubtype = u32::from_be_bytes([data[offset+4], data[offset+5], data[offset+6], data[offset+7]]);
-                let arch_offset = u32::from_be_bytes([data[offset+8], data[offset+9], data[offset+10], data[offset+11]]);
-                let size = u32::from_be_bytes([data[offset+12], data[offset+13], data[offset+14], data[offset+15]]);
-                let align = u32::from_be_bytes([data[offset+16], data[offset+17], data[offset+18], data[offset+19]]);
+                let cputype = u32::from_be_bytes([
+                    data[offset],
+                    data[offset + 1],
+                    data[offset + 2],
+                    data[offset + 3],
+                ]);
+                let cpusubtype = u32::from_be_bytes([
+                    data[offset + 4],
+                    data[offset + 5],
+                    data[offset + 6],
+                    data[offset + 7],
+                ]);
+                let arch_offset = u32::from_be_bytes([
+                    data[offset + 8],
+                    data[offset + 9],
+                    data[offset + 10],
+                    data[offset + 11],
+                ]);
+                let size = u32::from_be_bytes([
+                    data[offset + 12],
+                    data[offset + 13],
+                    data[offset + 14],
+                    data[offset + 15],
+                ]);
+                let align = u32::from_be_bytes([
+                    data[offset + 16],
+                    data[offset + 17],
+                    data[offset + 18],
+                    data[offset + 19],
+                ]);
 
                 self.fat_architectures.push(FatArch {
                     cputype,
@@ -238,7 +263,10 @@ impl LaunchdServiceManager {
     pub fn trigger_socket_activation(&mut self, port: u16) -> usize {
         let mut activated = 0;
         for job in self.jobs.values_mut() {
-            if job.socket_activation && job.port_number == port && job.state == LaunchdState::Stopped {
+            if job.socket_activation
+                && job.port_number == port
+                && job.state == LaunchdState::Stopped
+            {
                 job.state = LaunchdState::Running;
                 activated += 1;
             }
@@ -523,7 +551,11 @@ mod tests {
         let snap_id = apfs.create_snapshot("Pre-Update Snapshot", 1700000000, 0xABCDEF);
         assert_eq!(snap_id, 1);
 
-        apfs.clone_file("/System/Library/CoreServices/Finder.app", "/Users/Shared/FinderClone.app", 512);
+        apfs.clone_file(
+            "/System/Library/CoreServices/Finder.app",
+            "/Users/Shared/FinderClone.app",
+            512,
+        );
         assert_eq!(apfs.clones.len(), 1);
         assert_eq!(apfs.clones[0].shared_block_count, 512);
     }

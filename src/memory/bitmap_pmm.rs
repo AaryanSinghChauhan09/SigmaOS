@@ -5,8 +5,8 @@
 #![allow(unused_variables)]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE_4096: usize = 4096;
@@ -14,8 +14,8 @@ pub const HIGHER_HALF_OFFSET: u64 = 0xFFFFFFFF80000000;
 pub const SELF_REF_INDEX: usize = 510;
 
 pub const PAGE_PRESENT: u64 = 1 << 0;
-pub const PAGE_WRITE: u64   = 1 << 1;
-pub const PAGE_USER: u64    = 1 << 2;
+pub const PAGE_WRITE: u64 = 1 << 1;
+pub const PAGE_USER: u64 = 1 << 2;
 
 // =========================================================================
 // Step 1: Physical Memory Manager (PMM) - Bitmap Allocator

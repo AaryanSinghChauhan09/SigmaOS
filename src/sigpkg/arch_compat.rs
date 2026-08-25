@@ -15,7 +15,11 @@ pub struct Version {
 
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
 
     pub fn parse(v_str: &str) -> Result<Self, &'static str> {
@@ -115,7 +119,8 @@ impl AurRecipeCompiler {
             return Err("PKGBUILD missing mandatory pkgname field");
         }
 
-        let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
+        let parsed_ver =
+            Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
             pkgname.to_string(),
@@ -157,15 +162,19 @@ impl RollingSyncManager {
     }
 
     pub fn register_installed(&mut self, name: &str, version: Version) {
-        self.installed_packages.insert(crate::klib::string::SigmaString::from(name), version);
+        self.installed_packages
+            .insert(crate::klib::string::SigmaString::from(name), version);
     }
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
-        self.remote_repository.insert(crate::klib::string::SigmaString::from(name), version);
+        self.remote_repository
+            .insert(crate::klib::string::SigmaString::from(name), version);
     }
 
     /// Checks for available package updates in the rolling release stream
-    pub fn list_pending_rolling_updates(&self) -> Vec<(crate::klib::string::SigmaString, Version, Version)> {
+    pub fn list_pending_rolling_updates(
+        &self,
+    ) -> Vec<(crate::klib::string::SigmaString, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
@@ -180,7 +189,9 @@ impl RollingSyncManager {
 
     /// Validates if all compile-time build dependencies for a Debian sbuild source package are satisfied
     pub fn is_debian_sbuild_builddeps_satisfied(&self, pkg: &DebianSbuildPackage) -> bool {
-        pkg.build_depends.iter().all(|dep| self.installed_packages.contains_key(dep))
+        pkg.build_depends
+            .iter()
+            .all(|dep| self.installed_packages.contains_key(dep))
     }
 }
 
@@ -229,7 +240,8 @@ impl PacmanDbAdapter {
         }
 
         let base_version = version.split('-').next().unwrap_or("1.0.0");
-        let parsed_ver = Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
+        let parsed_ver =
+            Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
             name.to_string(),
@@ -264,7 +276,9 @@ pub struct AlpmHookManager {
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self { hooks: alloc::vec::Vec::new() }
+        Self {
+            hooks: alloc::vec::Vec::new(),
+        }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -433,16 +447,34 @@ impl SAbsSimdCompiler {
 
     pub fn generate_compiler_flags(&self) -> String {
         match self.target_isa {
-            SimdTarget::Avx512 => format!("-C target-cpu=skylake-avx512 -C opt-level={}", self.optimization_level),
-            SimdTarget::Avx2 => format!("-C target-cpu=haswell -C opt-level={}", self.optimization_level),
-            SimdTarget::Sse42 => format!("-C target-feature=+sse4.2 -C opt-level={}", self.optimization_level),
-            SimdTarget::Neon => format!("-C target-cpu=cortex-a72 -C opt-level={}", self.optimization_level),
+            SimdTarget::Avx512 => format!(
+                "-C target-cpu=skylake-avx512 -C opt-level={}",
+                self.optimization_level
+            ),
+            SimdTarget::Avx2 => format!(
+                "-C target-cpu=haswell -C opt-level={}",
+                self.optimization_level
+            ),
+            SimdTarget::Sse42 => format!(
+                "-C target-feature=+sse4.2 -C opt-level={}",
+                self.optimization_level
+            ),
+            SimdTarget::Neon => format!(
+                "-C target-cpu=cortex-a72 -C opt-level={}",
+                self.optimization_level
+            ),
         }
     }
 
     pub fn compile_vectorized_binary(&self, source_code: &str) -> Vec<u8> {
         let flags = self.generate_compiler_flags();
-        let mut binary_header = format!("S-ABS_SIMD_BINARY | ISA: {:?} | Flags: {} | SourceLength: {}\n", self.target_isa, flags, source_code.len()).into_bytes();
+        let mut binary_header = format!(
+            "S-ABS_SIMD_BINARY | ISA: {:?} | Flags: {} | SourceLength: {}\n",
+            self.target_isa,
+            flags,
+            source_code.len()
+        )
+        .into_bytes();
         binary_header.extend_from_slice(b"\x7FELF_SIMD_VECTORIZED_PAYLOAD");
         binary_header
     }
@@ -474,15 +506,22 @@ impl MakepkgBuilder {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
         }
         let computed = crate::klib::SigmaString::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256 || self.expected_sha256 == crate::klib::SigmaString::from("SKIP")
+        computed == self.expected_sha256
+            || self.expected_sha256 == crate::klib::SigmaString::from("SKIP")
     }
 
-    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(crate::klib::SigmaString, crate::klib::Vec<u8>), &'static str> {
+    pub fn build_package_archive(
+        &self,
+        source_data: &[u8],
+    ) -> Result<(crate::klib::SigmaString, crate::klib::Vec<u8>), &'static str> {
         if !self.verify_source_integrity(source_data) {
             return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
 
-        let archive_name = crate::klib::SigmaString::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
+        let archive_name = crate::klib::SigmaString::from(format!(
+            "{}-{}-{}.pkg.tar.zst",
+            self.pkgname, self.pkgver, self.arch
+        ));
         let mut archive_content = crate::klib::SigmaString::from(format!(
             "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
             self.pkgname, self.pkgver, self.arch
@@ -515,7 +554,11 @@ mod tests {
         let source_pkg_missing = DebianSbuildPackage {
             name: "coreutils".to_string(),
             version: Version::new(9, 1, 0),
-            build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
+            build_depends: vec![
+                "gcc".to_string(),
+                "make".to_string(),
+                "libc-dev".to_string(),
+            ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }
@@ -588,7 +631,9 @@ mod tests {
             Exec = /usr/bin/mkinitcpio -p linux
         "#;
 
-        assert!(manager.parse_hook_file("90-mkinitcpio.hook", hook_str).is_ok());
+        assert!(manager
+            .parse_hook_file("90-mkinitcpio.hook", hook_str)
+            .is_ok());
         let triggered = manager.trigger_hooks(HookWhen::PostTransaction, "usr/bin/bash");
         assert_eq!(triggered.len(), 1);
         assert_eq!(triggered[0], "/usr/bin/mkinitcpio -p linux");
@@ -619,7 +664,10 @@ mod tests {
 
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
-        let mut verifier = SAurP2pVerifier::new("swarm_arch_community_001", "merkle_root_99887766554433221100");
+        let mut verifier = SAurP2pVerifier::new(
+            "swarm_arch_community_001",
+            "merkle_root_99887766554433221100",
+        );
         assert!(verifier.verify_chunk_hash(0, b"chunk0_data_block"));
         assert!(verifier.verify_chunk_hash(1, b"chunk1_data_block"));
         assert_eq!(verifier.verified_chunks, 2);

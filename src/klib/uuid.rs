@@ -23,24 +23,24 @@ impl Uuid {
         // Simple pseudo-random UUID v4
         // In a real implementation, this would use a proper CSPRNG
         let mut bytes = [0u8; 16];
-        
+
         // Use time-based seed for pseudo-randomness
         let seed = Self::get_seed();
         let mut state = seed;
-        
+
         for i in 0..16 {
             state = Self::xorshift(state);
             bytes[i] = (state & 0xFF) as u8;
         }
-        
+
         // Set version bits (UUID v4)
         bytes[6] = (bytes[6] & 0x0F) | 0x40;
         // Set variant bits
         bytes[8] = (bytes[8] & 0x3F) | 0x80;
-        
+
         Self { bytes }
     }
-    
+
     /// Simple XORShift PRNG for seeding
     fn xorshift(mut state: u64) -> u64 {
         state ^= state >> 12;
@@ -48,14 +48,14 @@ impl Uuid {
         state ^= state >> 27;
         state
     }
-    
+
     /// Get a simple seed based on time (would be replaced with proper RNG)
     fn get_seed() -> u64 {
         // This is a placeholder - in a real kernel, this would use
         // hardware RNG or proper entropy sources
         0x123456789ABCDEF0
     }
-    
+
     /// Get UUID as hyphenated string
     pub fn to_hyphenated(&self) -> String {
         format!(
@@ -67,7 +67,7 @@ impl Uuid {
             self.bytes[10], self.bytes[11], self.bytes[12], self.bytes[13], self.bytes[14], self.bytes[15]
         )
     }
-    
+
     /// Get UUID as bytes
     pub fn as_bytes(&self) -> &[u8; 16] {
         &self.bytes

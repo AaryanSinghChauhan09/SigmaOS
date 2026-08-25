@@ -70,10 +70,10 @@ impl NeuroSymbolicEngine {
 // =========================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProgrammableRootPersona {
-    SecurityRoot,     // Mask 0x01 (Key credential modification)
-    MaintenanceRoot,  // Mask 0x02 (Disk defragmentation, log rotation)
-    DeveloperRoot,    // Mask 0x04 (Hot-reloading kernel modules, debugging)
-    AuditRoot,        // Mask 0x08 (Accessing cryptographic ledger)
+    SecurityRoot,    // Mask 0x01 (Key credential modification)
+    MaintenanceRoot, // Mask 0x02 (Disk defragmentation, log rotation)
+    DeveloperRoot,   // Mask 0x04 (Hot-reloading kernel modules, debugging)
+    AuditRoot,       // Mask 0x08 (Accessing cryptographic ledger)
 }
 
 pub struct PersonaManager {
@@ -174,7 +174,11 @@ impl AdaptiveInitSystem {
     }
 
     /// Dynamically shifts system runlevels based on detected workloads and hardware profiles
-    pub fn shift_target_dynamically(&mut self, workload_factor: u64, has_gpu: bool) -> AdaptiveInitTarget {
+    pub fn shift_target_dynamically(
+        &mut self,
+        workload_factor: u64,
+        has_gpu: bool,
+    ) -> AdaptiveInitTarget {
         if workload_factor > 90 {
             self.current_target = AdaptiveInitTarget::HighPerformanceHpc;
         } else if has_gpu {
@@ -255,7 +259,10 @@ impl SelfOptimizingShellBuiltin {
     /// Self-optimizes frequent paths directory changes
     pub fn optimize_cd_command(&self, frequent_path: &str) -> String {
         self.frequency_map_cd.fetch_add(1, Ordering::SeqCst);
-        format!("Self-Optimization Engaged: Fast-path shortcut mapped for {}", frequent_path)
+        format!(
+            "Self-Optimization Engaged: Fast-path shortcut mapped for {}",
+            frequent_path
+        )
     }
 }
 
@@ -287,8 +294,12 @@ impl CrossModeMultiplexer {
     pub fn get_active_buffer_mode(&self) -> &'static str {
         match self.active_mode {
             MultiplexerDisplayMode::CliTextMode => "Render Buffer: Raw CLI TTY Stream",
-            MultiplexerDisplayMode::GuiFramebufferMode => "Render Buffer: GUI Framebuffer Screen-Mirroring",
-            MultiplexerDisplayMode::HybridOverlaidMode => "Render Buffer: Overlaid GUI Framebuffer + CLI Terminal Sub-pane",
+            MultiplexerDisplayMode::GuiFramebufferMode => {
+                "Render Buffer: GUI Framebuffer Screen-Mirroring"
+            }
+            MultiplexerDisplayMode::HybridOverlaidMode => {
+                "Render Buffer: Overlaid GUI Framebuffer + CLI Terminal Sub-pane"
+            }
         }
     }
 }
@@ -335,7 +346,8 @@ mod tests {
     #[test]
     fn test_neuro_symbolic_reasoning() {
         let engine = NeuroSymbolicEngine::new(0, 0.95);
-        let (stable, decision) = engine.reason_about_diagnostics("PAGE_FAULT_ENGAGED at HIGH_IRQL_DETECTED");
+        let (stable, decision) =
+            engine.reason_about_diagnostics("PAGE_FAULT_ENGAGED at HIGH_IRQL_DETECTED");
         assert!(!stable);
         assert!(decision.contains("Violates IRQL rules"));
 
@@ -418,10 +430,16 @@ mod tests {
     #[test]
     fn test_cross_mode_multiplexer() {
         let mut mux = CrossModeMultiplexer::new();
-        assert_eq!(mux.get_active_buffer_mode(), "Render Buffer: Raw CLI TTY Stream");
+        assert_eq!(
+            mux.get_active_buffer_mode(),
+            "Render Buffer: Raw CLI TTY Stream"
+        );
 
         mux.set_display_mode(MultiplexerDisplayMode::HybridOverlaidMode);
-        assert_eq!(mux.get_active_buffer_mode(), "Render Buffer: Overlaid GUI Framebuffer + CLI Terminal Sub-pane");
+        assert_eq!(
+            mux.get_active_buffer_mode(),
+            "Render Buffer: Overlaid GUI Framebuffer + CLI Terminal Sub-pane"
+        );
     }
 
     #[test]

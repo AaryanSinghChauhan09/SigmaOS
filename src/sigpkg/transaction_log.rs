@@ -1,10 +1,9 @@
 extern crate alloc;
 /// Transaction Log System (Debian APT dpkg inspiration)
 /// Provides atomic transactions and rollback capabilities
-
 use crate::klib::Vec;
-use alloc::string::String;
 use crate::sigpkg::Package;
+use alloc::string::String;
 
 /// Transaction entry type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -71,7 +70,10 @@ impl TransactionLog {
             let entry = TransactionEntry {
                 entry_type: TransactionType::Install,
                 package_name: package.name.clone(),
-                version: format!("{}.{}.{}", package.version.major, package.version.minor, package.version.patch),
+                version: format!(
+                    "{}.{}.{}",
+                    package.version.major, package.version.minor, package.version.patch
+                ),
                 timestamp: self.get_timestamp(),
                 state: TransactionState::Pending,
             };
@@ -147,10 +149,10 @@ mod tests {
     #[test]
     fn test_transaction_lifecycle() {
         let mut log = TransactionLog::new();
-        
+
         // Begin transaction
         log.begin_transaction();
-        
+
         // Add install
         let package = Package::new(
             "test-package".to_string(),
@@ -160,10 +162,10 @@ mod tests {
             "checksum".to_string(),
         );
         log.add_install(&package);
-        
+
         // Commit
         assert!(log.commit().is_ok());
-        
+
         // Check history
         let history = log.get_history();
         assert_eq!(history.len(), 2); // transaction + install
@@ -172,12 +174,12 @@ mod tests {
     #[test]
     fn test_transaction_rollback() {
         let mut log = TransactionLog::new();
-        
+
         log.begin_transaction();
         log.add_remove("test-package", "1.0.0");
-        
+
         assert!(log.rollback().is_ok());
-        
+
         let history = log.get_history();
         assert_eq!(history[1].state, TransactionState::RolledBack);
     }

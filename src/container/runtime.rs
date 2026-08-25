@@ -2,8 +2,8 @@
 #![cfg_attr(target_os = "none", no_main)]
 
 extern crate alloc;
-use alloc::string::String;
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Container Runtime for SigmaOS
@@ -24,7 +24,6 @@ pub enum ContainerState {
     Stopped = 3,
     Failed = 4,
 }
-
 
 /// Container trait (OOP interface)
 pub trait Container {
@@ -289,7 +288,10 @@ impl SimpleContainer {
             cpu_limit: 0,
             capability,
             environment: [0; 512],
-            seccomp: SeccompProfile { hardened: false, blocked_syscalls_mask: 0 },
+            seccomp: SeccompProfile {
+                hardened: false,
+                blocked_syscalls_mask: 0,
+            },
         }
     }
 
@@ -657,7 +659,6 @@ impl SimpleContainerRuntime {
     }
 }
 
-
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
@@ -666,12 +667,10 @@ unsafe fn alloc(size: usize) -> *mut u8 {
     std::alloc::alloc(layout)
 }
 
-
-
 pub mod oci {
     extern crate alloc;
-    use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
+    use crate::container::ContainerError;
     use alloc::string::String;
     use alloc::string::ToString;
     use alloc::vec::Vec;
@@ -699,7 +698,6 @@ pub mod oci {
             }
         }
     }
-
 
     pub struct OciSpec {
         pub version: String,
@@ -843,11 +841,7 @@ mod tests {
         assert!(!overlay.mounted);
 
         // Mount failure on empty lowerdirs
-        let mut invalid_overlay = OverlayFS::new(
-            vec![],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
+        let mut invalid_overlay = OverlayFS::new(vec![], "/upper".to_string(), "/work".to_string());
         assert!(invalid_overlay.mount().is_err());
     }
 
@@ -869,12 +863,8 @@ mod tests {
 
     #[test]
     fn test_hardened_seccomp_syscall_filtering() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"hardened_ct",
-            b"alpine",
-            RuntimeCapability::full(),
-        );
+        let mut container =
+            SimpleContainer::new(1, b"hardened_ct", b"alpine", RuntimeCapability::full());
         container.seccomp = SeccompProfile {
             hardened: true,
             blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)

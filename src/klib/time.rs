@@ -122,13 +122,17 @@ impl SystemTime {
     }
 
     pub fn duration_since(&self, earlier: SystemTime) -> Duration {
-        let diff = self.secs_since_epoch.saturating_sub(earlier.secs_since_epoch);
+        let diff = self
+            .secs_since_epoch
+            .saturating_sub(earlier.secs_since_epoch);
         Duration::from_secs(diff)
     }
 }
 
 /// UNIX epoch constant
-pub const UNIX_EPOCH: SystemTime = SystemTime { secs_since_epoch: 0 };
+pub const UNIX_EPOCH: SystemTime = SystemTime {
+    secs_since_epoch: 0,
+};
 
 /// Simple time structure
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -277,7 +281,10 @@ impl Instant {
     }
 
     pub fn duration_since(&self, earlier: Instant) -> Duration {
-        Duration::from_nanos(self.nanos_since_epoch.saturating_sub(earlier.nanos_since_epoch))
+        Duration::from_nanos(
+            self.nanos_since_epoch
+                .saturating_sub(earlier.nanos_since_epoch),
+        )
     }
 
     pub fn elapsed(&self) -> Duration {

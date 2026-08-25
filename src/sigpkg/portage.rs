@@ -184,8 +184,8 @@ pub struct EbuildSpec {
     pub dependencies: DependencyCondition,
     pub rdependencies: DependencyCondition, // Runtime dependencies
     pub pdependencies: DependencyCondition, // Post-install dependencies
-    pub keywords: Vec<String>, // Architecture keywords
-    pub iuse: Vec<String>, // Available USE flags
+    pub keywords: Vec<String>,              // Architecture keywords
+    pub iuse: Vec<String>,                  // Available USE flags
     pub required_use: Option<DependencyCondition>, // Required USE flag combinations
 }
 
@@ -232,7 +232,7 @@ impl EbuildSpec {
 pub struct PortageResolver {
     packages: BTreeMap<String, Vec<EbuildSpec>>, // name -> versions
     installed: BTreeMap<String, (Version, Slot)>, // name -> (version, slot)
-    use_flags: BTreeMap<String, bool>, // Global USE flags
+    use_flags: BTreeMap<String, bool>,           // Global USE flags
     arch: String,
 }
 
@@ -284,13 +284,17 @@ impl PortageResolver {
         visited: &mut BTreeSet<String>,
     ) -> Result<(), DependencyError> {
         if visited.contains(package_name) {
-            return Err(DependencyError::CircularDependency(package_name.to_string()));
+            return Err(DependencyError::CircularDependency(
+                package_name.to_string(),
+            ));
         }
 
         visited.insert(package_name.to_string());
 
         // Find best matching version
-        let versions = self.packages.get(package_name)
+        let versions = self
+            .packages
+            .get(package_name)
             .ok_or_else(|| DependencyError::PackageNotFound(package_name.to_string()))?;
 
         let best_version = self.select_best_version(versions)?;
@@ -339,7 +343,11 @@ impl PortageResolver {
                 }
                 Err(DependencyError::UnsatisfiedCondition)
             }
-            DependencyCondition::UseConditional { flag, enabled, condition } => {
+            DependencyCondition::UseConditional {
+                flag,
+                enabled,
+                condition,
+            } => {
                 let flag_enabled = self.get_use_flag(flag).unwrap_or(false);
                 if flag_enabled == *enabled {
                     self.resolve_condition(condition, resolved, visited)
@@ -347,11 +355,19 @@ impl PortageResolver {
                     Ok(())
                 }
             }
-            DependencyCondition::Package { name, version_constraint, slot, .. } => {
-                let versions = self.packages.get(name)
+            DependencyCondition::Package {
+                name,
+                version_constraint,
+                slot,
+                ..
+            } => {
+                let versions = self
+                    .packages
+                    .get(name)
                     .ok_or_else(|| DependencyError::PackageNotFound(name.clone()))?;
 
-                let matching: Vec<_> = versions.iter()
+                let matching: Vec<_> = versions
+                    .iter()
                     .filter(|v| v.version.satisfies(version_constraint))
                     .filter(|v| slot.as_ref().map_or(true, |s| v.slot.matches(s)))
                     .collect();
@@ -366,28 +382,49 @@ impl PortageResolver {
         }
     }
 
-    fn select_best_version<'a>(&self, versions: &'a [EbuildSpec]) -> Result<&'a EbuildSpec, DependencyError> {
-        let stable: Vec<&'a EbuildSpec> = versions.iter()
+    fn select_best_version<'a>(
+        &self,
+        versions: &'a [EbuildSpec],
+    ) -> Result<&'a EbuildSpec, DependencyError> {
+        let stable: Vec<&'a EbuildSpec> = versions
+            .iter()
             .filter(|v| v.is_stable_for_arch(&self.arch))
             .collect();
 
         if !stable.is_empty() {
-            stable.into_iter().max_by_key(|v| &v.version).ok_or(DependencyError::NoSuitableVersion)
+            stable
+                .into_iter()
+                .max_by_key(|v| &v.version)
+                .ok_or(DependencyError::NoSuitableVersion)
         } else {
-            versions.iter().max_by_key(|v| &v.version).ok_or(DependencyError::NoSuitableVersion)
+            versions
+                .iter()
+                .max_by_key(|v| &v.version)
+                .ok_or(DependencyError::NoSuitableVersion)
         }
     }
 
-    fn select_best_version_from_refs<'a>(&self, versions: &[&'a EbuildSpec]) -> Result<&'a EbuildSpec, DependencyError> {
-        let stable: Vec<&'a EbuildSpec> = versions.iter()
+    fn select_best_version_from_refs<'a>(
+        &self,
+        versions: &[&'a EbuildSpec],
+    ) -> Result<&'a EbuildSpec, DependencyError> {
+        let stable: Vec<&'a EbuildSpec> = versions
+            .iter()
             .copied()
             .filter(|v| v.is_stable_for_arch(&self.arch))
             .collect();
 
         if !stable.is_empty() {
-            stable.into_iter().max_by_key(|v| &v.version).ok_or(DependencyError::NoSuitableVersion)
+            stable
+                .into_iter()
+                .max_by_key(|v| &v.version)
+                .ok_or(DependencyError::NoSuitableVersion)
         } else {
-            versions.iter().copied().max_by_key(|v| &v.version).ok_or(DependencyError::NoSuitableVersion)
+            versions
+                .iter()
+                .copied()
+                .max_by_key(|v| &v.version)
+                .ok_or(DependencyError::NoSuitableVersion)
         }
     }
 
@@ -400,7 +437,8 @@ impl PortageResolver {
             if let Some(versions) = self.packages.get(package_name) {
                 if let Ok(best) = self.select_best_version(versions) {
                     let slot_key = format!("{}:{}", best.name, best.slot.name);
-                    slot_usage.entry(slot_key.clone())
+                    slot_usage
+                        .entry(slot_key.clone())
                         .or_insert_with(Vec::new)
                         .push((best.name.clone(), best.version));
                 }
@@ -411,7 +449,10 @@ impl PortageResolver {
             if packages.len() > 1 {
                 conflicts.push(SlotConflict {
                     slot,
-                    packages: packages.iter().map(|(n, v)| format!("{}-{}", n, v)).collect(),
+                    packages: packages
+                        .iter()
+                        .map(|(n, v)| format!("{}-{}", n, v))
+                        .collect(),
                 });
             }
         }
@@ -421,7 +462,9 @@ impl PortageResolver {
 
     /// Optimize USE flags for minimal dependencies
     pub fn optimize_use_flags(&self, package_name: &str) -> Result<Vec<String>, DependencyError> {
-        let versions = self.packages.get(package_name)
+        let versions = self
+            .packages
+            .get(package_name)
             .ok_or_else(|| DependencyError::PackageNotFound(package_name.to_string()))?;
 
         let best = self.select_best_version(versions)?;
@@ -436,7 +479,11 @@ impl PortageResolver {
 
     fn extract_required_flags(&self, condition: &DependencyCondition, flags: &mut Vec<String>) {
         match condition {
-            DependencyCondition::UseConditional { flag, enabled: true, .. } => {
+            DependencyCondition::UseConditional {
+                flag,
+                enabled: true,
+                ..
+            } => {
                 if !flags.contains(flag) {
                     flags.push(flag.clone());
                 }
@@ -460,7 +507,10 @@ impl PortageResolver {
     }
 
     /// Calculate installation order (topological sort)
-    pub fn calculate_install_order(&self, packages: &[String]) -> Result<Vec<String>, DependencyError> {
+    pub fn calculate_install_order(
+        &self,
+        packages: &[String],
+    ) -> Result<Vec<String>, DependencyError> {
         let mut order = Vec::new();
         let mut visited = BTreeSet::new();
         let mut temp_visited = BTreeSet::new();
@@ -521,12 +571,17 @@ impl PortageResolver {
             DependencyCondition::AtLeastOne(conditions) => {
                 // Try to resolve at least one
                 for cond in conditions {
-                    if self.visit_condition(cond, order, visited, temp_visited).is_ok() {
+                    if self
+                        .visit_condition(cond, order, visited, temp_visited)
+                        .is_ok()
+                    {
                         return Ok(());
                     }
                 }
             }
-            DependencyCondition::UseConditional { condition: cond, .. } => {
+            DependencyCondition::UseConditional {
+                condition: cond, ..
+            } => {
                 self.visit_condition(cond, order, visited, temp_visited)?;
             }
             _ => {}
@@ -630,10 +685,10 @@ mod tests {
     #[test]
     fn test_dependency_resolution() {
         let mut resolver = PortageResolver::new("amd64".to_string());
-        
+
         let lib_spec = EbuildSpec::new("libfoo".to_string(), Version::new(1, 0, 0));
         resolver.add_package(lib_spec);
-        
+
         let app_spec = EbuildSpec::new("myapp".to_string(), Version::new(1, 0, 0))
             .with_dependencies(DependencyCondition::Package {
                 name: "libfoo".to_string(),
@@ -642,7 +697,7 @@ mod tests {
                 use_flags: Vec::new(),
             });
         resolver.add_package(app_spec);
-        
+
         let deps = resolver.resolve_dependencies("myapp").unwrap();
         assert!(deps.contains(&"libfoo".to_string()));
     }
@@ -651,7 +706,7 @@ mod tests {
     fn test_use_flag_handling() {
         let mut resolver = PortageResolver::new("amd64".to_string());
         resolver.set_use_flag("gtk".to_string(), true);
-        
+
         assert_eq!(resolver.get_use_flag("gtk"), Some(true));
     }
 }

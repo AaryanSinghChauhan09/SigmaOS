@@ -1,7 +1,7 @@
 // SigmaOS Customization Module
+pub mod profile;
 pub mod routines;
 pub mod theme;
-pub mod profile;
 
 pub use routines::{
     Action, AutoThemeScheduler, Condition, CustomizationEngine, CustomizationError, Routine,
@@ -9,6 +9,6 @@ pub use routines::{
 };
 
 pub use profile::{
-    ProfileSwitcher, PerformanceProfile, ZenithProfile, GamifiedProductivity as CustomGamifiedProductivity,
-    GameDifficultyBalancer,
+    GameDifficultyBalancer, GamifiedProductivity as CustomGamifiedProductivity, PerformanceProfile,
+    ProfileSwitcher, ZenithProfile,
 };

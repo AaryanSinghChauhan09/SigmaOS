@@ -390,7 +390,9 @@ impl SovereignResearchLattice {
 
         let mut output = Vec::new();
         let header = b"SYNTHESIZED ANSWER (Evidence-Backed):\n";
-        for &byte in header { output.push(byte); }
+        for &byte in header {
+            output.push(byte);
+        }
 
         for idx in 0..doc_ids.len() {
             if let Some(&id) = doc_ids.get(idx) {
@@ -406,19 +408,29 @@ impl SovereignResearchLattice {
 
                 if let Some(doc) = found_doc {
                     let cite_prefix = b" - Claim supported by citation: [";
-                    for &byte in cite_prefix { output.push(byte); }
+                    for &byte in cite_prefix {
+                        output.push(byte);
+                    }
 
                     let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
-                    for &byte in &doc.title[..title_len] { output.push(byte); }
+                    for &byte in &doc.title[..title_len] {
+                        output.push(byte);
+                    }
 
                     let url_prefix = b"] (Source: ";
-                    for &byte in url_prefix { output.push(byte); }
+                    for &byte in url_prefix {
+                        output.push(byte);
+                    }
 
                     let url_len = doc.source_url.iter().position(|&b| b == 0).unwrap_or(128);
-                    for &byte in &doc.source_url[..url_len] { output.push(byte); }
+                    for &byte in &doc.source_url[..url_len] {
+                        output.push(byte);
+                    }
 
                     let end_bracket = b")\n";
-                    for &byte in end_bracket { output.push(byte); }
+                    for &byte in end_bracket {
+                        output.push(byte);
+                    }
                 }
             }
         }
@@ -494,7 +506,9 @@ pub struct SovereignTemporalComputing {
 
 impl SovereignTemporalComputing {
     pub fn new() -> Self {
-        Self { history_traces: Vec::new() }
+        Self {
+            history_traces: Vec::new(),
+        }
     }
 
     pub fn record_resource_trace(&mut self, trace: ResourceTrace) {
@@ -525,9 +539,9 @@ impl SovereignTemporalComputing {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BiosensorType {
-    EmgElectromyography, // Muscle potentials
+    EmgElectromyography,       // Muscle potentials
     EegElectroencephalography, // Brainwaves
-    HrvHeartRateVariability, // Heart metric
+    HrvHeartRateVariability,   // Heart metric
 }
 
 pub struct SovereignBioDigitalFusion {
@@ -577,7 +591,12 @@ impl SovereignEmotionAwareEngine {
     }
 
     /// Evaluates user emotional states based on biometric indicators like Heart Rate Variability (HRV) and stress levels
-    pub fn classify_emotional_state(&mut self, hrv_bpm: f64, blink_delay_ms: u32, stress_vocal_coefficient: f32) -> UserEmotionalState {
+    pub fn classify_emotional_state(
+        &mut self,
+        hrv_bpm: f64,
+        blink_delay_ms: u32,
+        stress_vocal_coefficient: f32,
+    ) -> UserEmotionalState {
         let state = if hrv_bpm > 100.0 && stress_vocal_coefficient > 0.7 {
             UserEmotionalState::Stressed
         } else if blink_delay_ms > 400 {
@@ -685,7 +704,7 @@ mod tests {
             1,
             b"WANDR Wide and Deep Research",
             b"Perplexity WANDR is a deep research framework for high-volume entity disambiguation.",
-            b"https://github.com/perplexityai/wandr"
+            b"https://github.com/perplexityai/wandr",
         );
         lattice.ingest_source(doc1);
         assert_eq!(lattice.corpus.len(), 1);
@@ -724,8 +743,14 @@ mod tests {
     #[test]
     fn test_temporal_computing_prediction() {
         let mut temporal = SovereignTemporalComputing::new();
-        temporal.record_resource_trace(ResourceTrace { cpu_overhead: 20, timestamp_epoch: 1000 });
-        temporal.record_resource_trace(ResourceTrace { cpu_overhead: 40, timestamp_epoch: 1001 });
+        temporal.record_resource_trace(ResourceTrace {
+            cpu_overhead: 20,
+            timestamp_epoch: 1000,
+        });
+        temporal.record_resource_trace(ResourceTrace {
+            cpu_overhead: 40,
+            timestamp_epoch: 1001,
+        });
 
         // Future prediction trend
         let predicted = temporal.predict_future_resource_states(5);

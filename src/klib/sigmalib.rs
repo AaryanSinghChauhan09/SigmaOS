@@ -58,14 +58,14 @@ pub mod string {
         if needle.is_empty() {
             return Some(0);
         }
-        
+
         let haystack_len = strlen(haystack);
         let needle_len = strlen(needle);
-        
+
         if needle_len > haystack_len {
             return None;
         }
-        
+
         for i in 0..=(haystack_len - needle_len) {
             let mut j = 0;
             while j < needle_len && haystack[i + j] == needle[j] {
@@ -75,7 +75,7 @@ pub mod string {
                 return Some(i);
             }
         }
-        
+
         None
     }
 }
@@ -151,22 +151,40 @@ pub mod memory {
 pub mod math {
     /// Absolute value
     pub fn abs(x: i32) -> i32 {
-        if x < 0 { -x } else { x }
+        if x < 0 {
+            -x
+        } else {
+            x
+        }
     }
 
     /// Minimum
     pub fn min<T: PartialOrd>(a: T, b: T) -> T {
-        if a < b { a } else { b }
+        if a < b {
+            a
+        } else {
+            b
+        }
     }
 
     /// Maximum
     pub fn max<T: PartialOrd>(a: T, b: T) -> T {
-        if a > b { a } else { b }
+        if a > b {
+            a
+        } else {
+            b
+        }
     }
 
     /// Clamp value
     pub fn clamp<T: PartialOrd>(value: T, min: T, max: T) -> T {
-        if value < min { min } else if value > max { max } else { value }
+        if value < min {
+            min
+        } else if value > max {
+            max
+        } else {
+            value
+        }
     }
 
     /// Power of two check
@@ -194,16 +212,16 @@ pub mod math {
         if x <= 0.0 {
             return 0.0;
         }
-        
+
         let mut x = x;
         let mut result = x;
         let mut x0 = x;
-        
+
         while result > x0 {
             x0 = result;
             result = (x / result + result) / 2.0;
         }
-        
+
         result
     }
 }
@@ -284,10 +302,10 @@ mod tests {
     fn test_string_operations() {
         let s1 = b"hello";
         let s2 = b"world";
-        
+
         assert_eq!(string::strlen(s1), 5);
         assert_eq!(string::strcmp(s1, s1), 0);
-        
+
         let mut dest = [0u8; 10];
         string::strcpy(&mut dest, s1);
         assert_eq!(string::strcmp(&dest, s1), 0);
@@ -297,11 +315,11 @@ mod tests {
     fn test_memory_operations() {
         let mut src = [1u8, 2, 3, 4, 5];
         let mut dest = [0u8; 5];
-        
+
         unsafe {
             memory::memcpy(dest.as_mut_ptr(), src.as_ptr(), 5);
         }
-        
+
         assert_eq!(dest, src);
     }
 

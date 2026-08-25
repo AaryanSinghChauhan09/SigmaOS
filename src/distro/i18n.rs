@@ -213,7 +213,9 @@ impl LocaleManager {
 
     pub fn set_locale(&mut self, locale: &str) -> Result<(), &'static str> {
         let locale_str = locale.to_string();
-        if self.language_packs.contains_key(&locale_str) || self.regional_settings.contains_key(&locale_str) {
+        if self.language_packs.contains_key(&locale_str)
+            || self.regional_settings.contains_key(&locale_str)
+        {
             self.current_locale = locale.to_string();
             Ok(())
         } else {

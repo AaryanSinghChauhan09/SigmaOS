@@ -100,9 +100,7 @@ pub struct SimpleAuditLogger {
 
 impl SimpleAuditLogger {
     pub fn new() -> Self {
-        SimpleAuditLogger {
-            events: Vec::new(),
-        }
+        SimpleAuditLogger { events: Vec::new() }
     }
 }
 
@@ -207,7 +205,12 @@ mod tests {
     #[test]
     fn test_audit_event_logging() {
         let mut logger = SimpleAuditLogger::new();
-        let event = SimpleAuditEvent::new(1, EventType::Authentication, 1001, b"User logged in successfully");
+        let event = SimpleAuditEvent::new(
+            1,
+            EventType::Authentication,
+            1001,
+            b"User logged in successfully",
+        );
         logger.log_event(Box::new(event)).unwrap();
 
         let found = logger.get_event(1).unwrap();

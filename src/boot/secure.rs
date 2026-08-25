@@ -5,13 +5,12 @@
 /// Implements secure boot using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 10: Secure boot & firmware validation
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Component ID
 pub type ComponentID = usize;
@@ -111,9 +110,15 @@ impl UnifiedKernelImage {
     /// Compute raw payload hash
     pub fn compute_hash(&self) -> u64 {
         let mut hash = 0u64;
-        for &b in self.kernel_payload.iter() { hash = hash.wrapping_add(b as u64); }
-        for &b in self.initramfs_payload.iter() { hash = hash.wrapping_add(b as u64); }
-        for &b in self.cmdline.iter() { hash = hash.wrapping_add(b as u64); }
+        for &b in self.kernel_payload.iter() {
+            hash = hash.wrapping_add(b as u64);
+        }
+        for &b in self.initramfs_payload.iter() {
+            hash = hash.wrapping_add(b as u64);
+        }
+        for &b in self.cmdline.iter() {
+            hash = hash.wrapping_add(b as u64);
+        }
         hash
     }
 }
@@ -137,19 +142,29 @@ impl Tpm2Simulator {
     }
 
     /// Extend PCR register with a new measurement hash (standard TPM 2.0 sha256-like extend)
-    pub fn extend_pcr(&mut self, pcr_index: usize, measurement_hash: u64) -> Result<(), &'static str> {
+    pub fn extend_pcr(
+        &mut self,
+        pcr_index: usize,
+        measurement_hash: u64,
+    ) -> Result<(), &'static str> {
         if pcr_index >= 24 {
             return Err("TPM 2.0: Invalid PCR register index");
         }
         let current_val = self.pcr_registers[pcr_index];
         // PCR extension equation: New_PCR_Value = Hash(Current_PCR_Value || New_Measurement)
-        let extended_val = current_val.wrapping_add(measurement_hash).wrapping_mul(1099511628211);
+        let extended_val = current_val
+            .wrapping_add(measurement_hash)
+            .wrapping_mul(1099511628211);
         self.pcr_registers[pcr_index] = extended_val;
         Ok(())
     }
 
     /// Sealed secret key release based on PCR policy checks
-    pub fn unseal_key_policy(&self, pcr_index: usize, expected_hash: u64) -> Result<[u8; 32], &'static str> {
+    pub fn unseal_key_policy(
+        &self,
+        pcr_index: usize,
+        expected_hash: u64,
+    ) -> Result<[u8; 32], &'static str> {
         if pcr_index >= 24 {
             return Err("TPM 2.0: Invalid PCR index");
         }
@@ -244,7 +259,12 @@ pub struct SimpleComponent {
 }
 
 impl SimpleComponent {
-    pub fn new(id: ComponentID, name: &[u8], component_type: ComponentType, capability: ComponentCapability) -> Self {
+    pub fn new(
+        id: ComponentID,
+        name: &[u8],
+        component_type: ComponentType,
+        capability: ComponentCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -334,7 +354,10 @@ impl Component for SimpleComponent {
 /// Secure boot validator trait (OOP interface)
 pub trait SecureBootValidator {
     /// Register component
-    fn register_component(&mut self, component: Box<dyn Component>) -> Result<ComponentID, SecureBootError>;
+    fn register_component(
+        &mut self,
+        component: Box<dyn Component>,
+    ) -> Result<ComponentID, SecureBootError>;
     /// Unregister component
     fn unregister_component(&mut self, id: ComponentID) -> Result<(), SecureBootError>;
     /// Validate component
@@ -414,7 +437,10 @@ impl SimpleSecureBootValidator {
 }
 
 impl SecureBootValidator for SimpleSecureBootValidator {
-    fn register_component(&mut self, component: Box<dyn Component>) -> Result<ComponentID, SecureBootError> {
+    fn register_component(
+        &mut self,
+        component: Box<dyn Component>,
+    ) -> Result<ComponentID, SecureBootError> {
         if !self.capability.can_register {
             return Err(SecureBootError::PermissionDenied);
         }

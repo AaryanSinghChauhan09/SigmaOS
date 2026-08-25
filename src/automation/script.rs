@@ -8,7 +8,6 @@ use std_alloc::boxed::Box;
 /// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
 /// Implements interactive scripting, dynamic script-like functions, positional arguments,
 /// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -121,7 +120,11 @@ impl SimpleScriptEngine {
     }
 
     /// Executes a loaded script after performing positional parameter expansion (e.g., replacing $1, $2 with arguments)
-    pub fn execute_script_with_args(&self, id: ScriptID, args: &[&[u8]]) -> Result<Vec<u8>, ScriptError> {
+    pub fn execute_script_with_args(
+        &self,
+        id: ScriptID,
+        args: &[&[u8]],
+    ) -> Result<Vec<u8>, ScriptError> {
         let script = self.get_script(id).ok_or(ScriptError::NotFound)?;
         let source = script.source();
 
@@ -129,7 +132,11 @@ impl SimpleScriptEngine {
         let mut i = 0;
         while i < source.len() {
             // Check for positional arguments: e.g. $1, $2
-            if source[i] == b'$' && i + 1 < source.len() && source[i + 1] >= b'1' && source[i + 1] <= b'9' {
+            if source[i] == b'$'
+                && i + 1 < source.len()
+                && source[i + 1] >= b'1'
+                && source[i + 1] <= b'9'
+            {
                 let arg_index = (source[i + 1] - b'1') as usize;
                 if arg_index < args.len() {
                     for &byte in args[arg_index] {
@@ -280,8 +287,12 @@ impl SimpleScriptEnvironment {
         let mut key_entry = [0u8; 64];
         let mut value_entry = [0u8; 64];
 
-        for i in 0..key_len { key_entry[i] = key[i]; }
-        for i in 0..value_len { value_entry[i] = value[i]; }
+        for i in 0..key_len {
+            key_entry[i] = key[i];
+        }
+        for i in 0..value_len {
+            value_entry[i] = value[i];
+        }
 
         for i in 0..self.keys.len() {
             if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {

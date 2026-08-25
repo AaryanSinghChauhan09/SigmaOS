@@ -3,9 +3,9 @@
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
 extern crate alloc;
+use crate::klib::collections::HashMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::klib::collections::HashMap;
 
 /// RPM package metadata structure
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -47,13 +47,14 @@ impl RpmSpecParser {
 
         for line in spec_content.lines() {
             let line = line.trim();
-            
+
             if line.starts_with('%') {
                 // Save previous section
                 if !current_section.is_empty() {
-                    self.sections.insert(current_section.clone(), current_lines.clone());
+                    self.sections
+                        .insert(current_section.clone(), current_lines.clone());
                 }
-                
+
                 // Start new section
                 let section_name = line.split_whitespace().next().unwrap_or("").to_string();
                 current_section = section_name;
@@ -148,15 +149,15 @@ impl DnfRepositoryManager {
 
         for line in repo_content.lines() {
             let line = line.trim();
-            
+
             if line.starts_with('[') && line.ends_with(']') {
                 // Save previous repo
                 if let Some(repo) = current_repo {
                     self.repositories.push(repo);
                 }
-                
+
                 // Start new repo
-                let repo_id = line[1..line.len()-1].to_string();
+                let repo_id = line[1..line.len() - 1].to_string();
                 current_repo = Some(DnfRepository {
                     id: repo_id.clone(),
                     name: repo_id,
@@ -211,23 +212,27 @@ impl RpmDatabase {
 
     /// Install an RPM package
     pub fn install_package(&mut self, package: RpmPackage) -> Result<(), String> {
-        let package_key = format!("{}-{}-{}.{}", package.name, package.version, package.release, package.architecture);
+        let package_key = format!(
+            "{}-{}-{}.{}",
+            package.name, package.version, package.release, package.architecture
+        );
         self.installed_packages.insert(package_key, package);
         Ok(())
     }
 
     /// Remove an RPM package
     pub fn remove_package(&mut self, name: &str) -> Result<(), String> {
-        let keys_to_remove: Vec<String> = self.installed_packages
+        let keys_to_remove: Vec<String> = self
+            .installed_packages
             .keys()
             .filter(|k| k.starts_with(name))
             .cloned()
             .collect();
-        
+
         for key in keys_to_remove {
             self.installed_packages.remove(&key);
         }
-        
+
         Ok(())
     }
 
@@ -262,9 +267,11 @@ impl RpmDependencyResolver {
 
     /// Resolve dependencies for a package
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, String> {
-        let package = self.database.get_package(package_name)
+        let package = self
+            .database
+            .get_package(package_name)
             .ok_or_else(|| format!("Package {} not found", package_name))?;
-        
+
         let mut resolved = Vec::new();
         for req in &package.requires {
             resolved.push(req.clone());
@@ -273,22 +280,24 @@ impl RpmDependencyResolver {
                 resolved.extend(sub_deps);
             }
         }
-        
+
         Ok(resolved)
     }
 
     /// Check for conflicts
     pub fn check_conflicts(&self, package_name: &str) -> Result<Vec<String>, String> {
-        let package = self.database.get_package(package_name)
+        let package = self
+            .database
+            .get_package(package_name)
             .ok_or_else(|| format!("Package {} not found", package_name))?;
-        
+
         let mut conflicts = Vec::new();
         for conflict in &package.conflicts {
             if self.database.get_package(conflict).is_some() {
                 conflicts.push(conflict.clone());
             }
         }
-        
+
         Ok(conflicts)
     }
 }
@@ -310,7 +319,7 @@ It provides essential functionality for the system.
 
         let mut parser = RpmSpecParser::new();
         let package = parser.parse_spec(spec_content).unwrap();
-        
+
         assert!(package.description.contains("test package"));
         assert_eq!(parser.get_section("%description").unwrap().len(), 3);
     }
@@ -326,7 +335,7 @@ gpgcheck=1
 
         let mut manager = DnfRepositoryManager::new();
         manager.parse_repo_file(repo_content).unwrap();
-        
+
         assert_eq!(manager.repositories.len(), 1);
         assert_eq!(manager.repositories[0].id, "fedora");
         assert_eq!(manager.repositories[0].enabled, true);
@@ -336,7 +345,7 @@ gpgcheck=1
     #[test]
     fn test_rpm_database() {
         let mut db = RpmDatabase::new();
-        
+
         let package = RpmPackage {
             name: "test-rpm".to_string(),
             version: "1.0.0".to_string(),
@@ -355,11 +364,11 @@ gpgcheck=1
             conflicts: Vec::new(),
             obsoletes: Vec::new(),
         };
-        
+
         db.install_package(package).unwrap();
         assert_eq!(db.list_all().len(), 1);
         assert!(db.get_package("test-rpm").is_some());
-        
+
         db.remove_package("test-rpm").unwrap();
         assert_eq!(db.list_all().len(), 0);
     }
@@ -367,7 +376,7 @@ gpgcheck=1
     #[test]
     fn test_dependency_resolver() {
         let mut db = RpmDatabase::new();
-        
+
         let base_pkg = RpmPackage {
             name: "base-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -386,7 +395,7 @@ gpgcheck=1
             conflicts: Vec::new(),
             obsoletes: Vec::new(),
         };
-        
+
         let dep_pkg = RpmPackage {
             name: "dep-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -405,13 +414,13 @@ gpgcheck=1
             conflicts: Vec::new(),
             obsoletes: Vec::new(),
         };
-        
+
         db.install_package(base_pkg).unwrap();
         db.install_package(dep_pkg).unwrap();
-        
+
         let resolver = RpmDependencyResolver::new(db);
         let deps = resolver.resolve_dependencies("base-pkg").unwrap();
-        
+
         assert!(deps.contains(&"dep-pkg".to_string()));
     }
 }

@@ -2,7 +2,6 @@ extern crate alloc;
 // SPDX-License-Identifier: MIT
 /// Arch Linux & AUR Compatibility Subsystem
 /// Pacman/AUR package dependency resolution, PKGBUILD tar.zst payload extraction, and Archiso OverlayFS liveboot builder.
-
 use crate::klib::{HashMap, Vec};
 use alloc::string::String;
 
@@ -92,8 +91,10 @@ impl PkgbuildPayloadExtractor {
             && header_magic[2] == 0x2F
             && header_magic[3] == 0xFD
         {
-            self.extracted_files.push(String::from("/usr/bin/arch_binary"));
-            self.extracted_files.push(String::from("/usr/lib/libarch.so"));
+            self.extracted_files
+                .push(String::from("/usr/bin/arch_binary"));
+            self.extracted_files
+                .push(String::from("/usr/lib/libarch.so"));
             Ok(2)
         } else {
             Err("Invalid .pkg.tar.zst Zstandard magic header")

@@ -12,14 +12,12 @@ mod distro_inspirations;
 
 #[cfg(test)]
 mod algorithm_inspection_tests {
-    use super::vm_manager::{
-        KvmExitReason, KvmVirtualCpu, QemuMonitorEngine,
-    };
     use super::bsd::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall};
     use super::distro_inspirations::{
         BoreTaskProfile, CachyBoreScheduler, CoreTypePreference, MemoryPagePerms,
         SovereignKaslrWxAllocator,
     };
+    use super::vm_manager::{KvmExitReason, KvmVirtualCpu, QemuMonitorEngine};
 
     #[test]
     fn test_kvm_vcpu_algorithm_execution() {
@@ -47,7 +45,9 @@ mod algorithm_inspection_tests {
     #[test]
     fn test_freebsd_jail_manager_algorithm() {
         let mut mgr = FreeBsdJailManager::new();
-        let jail_id = mgr.create_jail("web_jail", "192.168.1.10", "/vfs/jails/web").unwrap();
+        let jail_id = mgr
+            .create_jail("web_jail", "192.168.1.10", "/vfs/jails/web")
+            .unwrap();
         assert_eq!(jail_id, 1);
 
         assert!(mgr.jails.contains_key(&jail_id));
@@ -80,7 +80,9 @@ mod algorithm_inspection_tests {
     #[test]
     fn test_sovereign_kaslr_wx_allocator() {
         let mut alloc = SovereignKaslrWxAllocator::new(0x2000000);
-        let phys_virt = alloc.allocate_page(0x1000000, 4096, MemoryPagePerms::ReadExecute).unwrap();
+        let phys_virt = alloc
+            .allocate_page(0x1000000, 4096, MemoryPagePerms::ReadExecute)
+            .unwrap();
         assert!(phys_virt > 0);
     }
 }

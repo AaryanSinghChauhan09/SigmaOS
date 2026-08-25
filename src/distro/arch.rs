@@ -8,9 +8,9 @@ extern crate std;
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::format;
 use alloc::vec::Vec;
 
 #[cfg(not(test))]

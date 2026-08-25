@@ -3,11 +3,11 @@
 // driver entry contexts, dynamic unloading, and Non-Paged Pool memory tracking.
 
 extern crate alloc;
+use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectError {
@@ -407,7 +407,10 @@ impl DriverEntryContext {
         }
     }
 
-    pub fn load_driver(&mut self, unload: fn(usize) -> Result<(), ObjectError>) -> Result<(), ObjectError> {
+    pub fn load_driver(
+        &mut self,
+        unload: fn(usize) -> Result<(), ObjectError>,
+    ) -> Result<(), ObjectError> {
         self.unload_routine = Some(unload);
         self.is_loaded = true;
         Ok(())
@@ -452,7 +455,8 @@ impl ObpObjectManager {
     }
 
     pub fn register_symbolic_link(&mut self, alias: &str, real_path: &str) {
-        self.symbolic_links.insert(alias.to_string(), real_path.to_string());
+        self.symbolic_links
+            .insert(alias.to_string(), real_path.to_string());
     }
 
     pub fn resolve_path(&self, path: &str) -> String {
@@ -669,7 +673,6 @@ impl Default for NtObjectManager {
     }
 }
 
-
 #[cfg(test)]
 mod tests_extended {
     use super::*;
@@ -684,7 +687,9 @@ mod tests_extended {
             object_type: NtObjectType::Device,
             target_path: None,
         };
-        manager.insert_object("\\Device\\Keyboard", keyboard_dev).unwrap();
+        manager
+            .insert_object("\\Device\\Keyboard", keyboard_dev)
+            .unwrap();
 
         // 2. Create a symbolic link in \DosDevices\KeyboardAlias pointing to \Device\Keyboard
         let keyboard_link = NtObject {
@@ -692,10 +697,14 @@ mod tests_extended {
             object_type: NtObjectType::SymbolicLink,
             target_path: Some(String::from("\\Device\\Keyboard")),
         };
-        manager.insert_object("\\DosDevices\\KeyboardAlias", keyboard_link).unwrap();
+        manager
+            .insert_object("\\DosDevices\\KeyboardAlias", keyboard_link)
+            .unwrap();
 
         // 3. Look up \DosDevices\KeyboardAlias and verify it resolves to the real Keyboard Device object
-        let resolved = manager.lookup_object("\\DosDevices\\KeyboardAlias").unwrap();
+        let resolved = manager
+            .lookup_object("\\DosDevices\\KeyboardAlias")
+            .unwrap();
         assert_eq!(resolved.name, "Keyboard");
         assert_eq!(resolved.object_type, NtObjectType::Device);
     }

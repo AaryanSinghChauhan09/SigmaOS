@@ -44,7 +44,7 @@ pub mod uuid;
 pub mod uvm;
 pub mod vec;
 
-pub use vec::Vec;
 pub use btreemap::BTreeMap;
 pub use hashmap::HashMap;
 pub use string::SigmaString;
+pub use vec::Vec;

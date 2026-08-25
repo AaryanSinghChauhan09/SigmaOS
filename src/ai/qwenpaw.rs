@@ -153,8 +153,15 @@ impl PawAgentCommunicationProtocol {
         self.active_agents.push(name.to_string());
     }
 
-    pub fn send_message(&mut self, sender: &str, recipient: &str, payload: &str) -> Result<(), &'static str> {
-        if !self.active_agents.contains(&sender.to_string()) || !self.active_agents.contains(&recipient.to_string()) {
+    pub fn send_message(
+        &mut self,
+        sender: &str,
+        recipient: &str,
+        payload: &str,
+    ) -> Result<(), &'static str> {
+        if !self.active_agents.contains(&sender.to_string())
+            || !self.active_agents.contains(&recipient.to_string())
+        {
             return Err("Sender or recipient agent not registered");
         }
         self.message_queue.push_back(PawAgentMessage {
@@ -209,7 +216,8 @@ impl SemanticSkillFunction {
 
 pub struct NativeSkillFunction {
     pub name: String,
-    pub handler: Arc<dyn Fn(&HashMap<String, String>) -> Result<String, &'static str> + Send + Sync>,
+    pub handler:
+        Arc<dyn Fn(&HashMap<String, String>) -> Result<String, &'static str> + Send + Sync>,
 }
 
 pub struct SovereignSkillKernel {
@@ -336,8 +344,12 @@ mod tests {
         acp.register_agent("AgentA");
         acp.register_agent("AgentB");
 
-        assert!(acp.send_message("AgentA", "AgentB", "Initiate scan").is_ok());
-        assert!(acp.send_message("AgentA", "AgentC", "Initiate scan").is_err());
+        assert!(acp
+            .send_message("AgentA", "AgentB", "Initiate scan")
+            .is_ok());
+        assert!(acp
+            .send_message("AgentA", "AgentC", "Initiate scan")
+            .is_err());
 
         let msg = acp.dispatch_next().unwrap();
         assert_eq!(msg.sender, "AgentA");

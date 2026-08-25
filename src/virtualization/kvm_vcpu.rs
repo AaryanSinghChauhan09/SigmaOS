@@ -2,9 +2,9 @@
 // Provides low-level vCPU execution loops, register synchronization, memory mapping, and virtio backends.
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// x86_64 General Purpose & Control Register State
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -47,9 +47,9 @@ impl Default for KvmVcpuSregs {
         Self {
             cr0: 0x80050033, // PE, PG, WP enabled
             cr2: 0,
-            cr3: 0x1000,     // Root PML4 page table base
-            cr4: 0x20,       // PAE enabled
-            efer: 0x500,     // LME, LMA (64-bit long mode)
+            cr3: 0x1000, // Root PML4 page table base
+            cr4: 0x20,   // PAE enabled
+            efer: 0x500, // LME, LMA (64-bit long mode)
             cs_base: 0,
             ds_base: 0,
             ss_base: 0,
@@ -60,8 +60,16 @@ impl Default for KvmVcpuSregs {
 /// KVM vCPU VM exit reason
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum KvmExitCode {
-    ExitIo { port: u16, is_write: bool, data: u32 },
-    ExitMmio { phys_addr: u64, is_write: bool, data: Vec<u8> },
+    ExitIo {
+        port: u16,
+        is_write: bool,
+        data: u32,
+    },
+    ExitMmio {
+        phys_addr: u64,
+        is_write: bool,
+        data: Vec<u8>,
+    },
     ExitHlt,
     ExitShutdown,
     ExitUnknown(u32),
@@ -191,7 +199,11 @@ mod tests {
         let exit = vcpu.run_vcpu_step();
         assert_eq!(exit, KvmExitCode::ExitHlt);
 
-        let count = vcpu.virtio_devices.get_mut(&0).unwrap().process_virtqueue_ring();
+        let count = vcpu
+            .virtio_devices
+            .get_mut(&0)
+            .unwrap()
+            .process_virtqueue_ring();
         assert_eq!(count, 16);
     }
 }

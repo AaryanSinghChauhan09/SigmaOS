@@ -135,9 +135,19 @@ pub struct PcieAerLog {
 /// MSI/MSI-X Interrupt Mode Capability Allocation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PciInterruptMode {
-    LegacyPin { irq_line: u8, pin: u8 },
-    Msi { vector_base: u16, count: u8 },
-    MsiX { vector_base: u16, table_size: u16, table_bar: u8 },
+    LegacyPin {
+        irq_line: u8,
+        pin: u8,
+    },
+    Msi {
+        vector_base: u16,
+        count: u8,
+    },
+    MsiX {
+        vector_base: u16,
+        table_size: u16,
+        table_bar: u8,
+    },
 }
 
 // ============================================================================
@@ -180,7 +190,10 @@ impl PciDeviceNode {
             header_type: PciHeaderType::StandardDevice,
             is_multi_function: false,
             bars: Vec::new(),
-            interrupt_mode: PciInterruptMode::LegacyPin { irq_line: 0, pin: 0 },
+            interrupt_mode: PciInterruptMode::LegacyPin {
+                irq_line: 0,
+                pin: 0,
+            },
             aspm_state: PcieAspmState::Disabled,
             bound_driver: None,
             command_register: 0x0006, // Bus Master + Memory Space enabled default
@@ -314,9 +327,9 @@ impl PciBusManager {
             driver_rules: Vec::new(),
             aer_logs: Vec::new(),
             ecam_base_address: None,
-            next_mem32_alloc: 0xE000_0000,     // 3.5GB base MMIO space for 32-bit BARs
+            next_mem32_alloc: 0xE000_0000, // 3.5GB base MMIO space for 32-bit BARs
             next_mem64_alloc: 0x10_0000_0000, // 64GB base MMIO space for 64-bit BARs
-            next_io_alloc: 0x2000,             // I/O port alloc base
+            next_io_alloc: 0x2000,         // I/O port alloc base
             msi_vector_allocator: AtomicU32::new(32), // Legacy IRQs 0-31 reserved
         }
     }
@@ -505,7 +518,9 @@ impl PciBusManager {
             return Err("Vector count must be greater than zero");
         }
 
-        let base_vector = self.msi_vector_allocator.fetch_add(count as u32, Ordering::SeqCst) as u16;
+        let base_vector = self
+            .msi_vector_allocator
+            .fetch_add(count as u32, Ordering::SeqCst) as u16;
 
         if let Some(dev) = self.devices.iter_mut().find(|d| d.address == address) {
             let mode = PciInterruptMode::Msi {

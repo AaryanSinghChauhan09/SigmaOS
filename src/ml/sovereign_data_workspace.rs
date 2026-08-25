@@ -8,10 +8,10 @@
 //! 5. SovereignCatalog: Data Manager System (unified memory-mapped Merkle tables across local SigmaFS and remote SigmaCloud)
 
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. DATA SCIENTIST WORKSPACE (SovereignML)
@@ -85,7 +85,9 @@ impl DilithiumNeuralNode {
 
     pub fn execute_forward(&self, input: &SovereignTensor) -> Result<f32, &'static str> {
         if !self.is_verified {
-            return Err("DilithiumNeuralNode: Execution blocked - unverified Dilithium-5 signature");
+            return Err(
+                "DilithiumNeuralNode: Execution blocked - unverified Dilithium-5 signature",
+            );
         }
         self.weights.dot(input)
     }
@@ -192,11 +194,16 @@ impl SovereignQuery {
     }
 
     pub fn add_column(&mut self, name: String, values: Vec<f64>) {
-        self.columns.insert(name.clone(), ColumnSeries { name, values });
+        self.columns
+            .insert(name.clone(), ColumnSeries { name, values });
     }
 
     /// Executes SIMD-accelerated array filtering over columnar data
-    pub fn filter_greater_than(&self, col_name: &str, threshold: f64) -> Result<Vec<f64>, &'static str> {
+    pub fn filter_greater_than(
+        &self,
+        col_name: &str,
+        threshold: f64,
+    ) -> Result<Vec<f64>, &'static str> {
         let col = self.columns.get(col_name).ok_or("Column not found")?;
         let mut filtered = Vec::new();
 
@@ -260,9 +267,22 @@ pub struct SovereignGuard {
 impl SovereignGuard {
     pub fn new() -> Self {
         let mut sigs = Vec::new();
-        sigs.push(([0x47, 0x44, 0x50, 0x52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ComplianceFramework::Gdpr));   // "GDPR"
-        sigs.push(([0x48, 0x49, 0x50, 0x41, 0x41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ComplianceFramework::Hipaa)); // "HIPAA"
-        sigs.push(([0x50, 0x43, 0x49, 0x44, 0x53, 0x53, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ComplianceFramework::PciDss)); // "PCIDSS"
+        sigs.push((
+            [0x47, 0x44, 0x50, 0x52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            ComplianceFramework::Gdpr,
+        )); // "GDPR"
+        sigs.push((
+            [
+                0x48, 0x49, 0x50, 0x41, 0x41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ],
+            ComplianceFramework::Hipaa,
+        )); // "HIPAA"
+        sigs.push((
+            [
+                0x50, 0x43, 0x49, 0x44, 0x53, 0x53, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ],
+            ComplianceFramework::PciDss,
+        )); // "PCIDSS"
 
         Self {
             compliance_signatures: sigs,
@@ -276,14 +296,19 @@ impl SovereignGuard {
             let sig_len = sig.iter().position(|&b| b == 0).unwrap_or(16);
             let target_slice = &sig[..sig_len];
 
-            if payload.windows(sig_len).any(|window| window == target_slice) {
+            if payload
+                .windows(sig_len)
+                .any(|window| window == target_slice)
+            {
                 self.compliance_ledger.push(AuditLedgerEntry {
                     timestamp,
                     framework: *framework,
                     event: format!("DLP violation blocked for framework {:?}", framework),
                     blocked: true,
                 });
-                return Err("SovereignGuard: Transaction blocked by Real-Time Data Loss Prevention (DLP)");
+                return Err(
+                    "SovereignGuard: Transaction blocked by Real-Time Data Loss Prevention (DLP)",
+                );
             }
         }
 
@@ -331,11 +356,14 @@ impl SovereignCatalog {
     }
 
     pub fn register_dataset(&mut self, name: String, residency: String, root_hash: String) {
-        self.dataset_registry.insert(name.clone(), SchemaMetadata {
-            dataset_name: name,
-            residency_zone: residency,
-            merkle_root_hash: root_hash,
-        });
+        self.dataset_registry.insert(
+            name.clone(),
+            SchemaMetadata {
+                dataset_name: name,
+                residency_zone: residency,
+                merkle_root_hash: root_hash,
+            },
+        );
     }
 
     pub fn lookup_residency(&self, dataset_name: &str) -> Option<&SchemaMetadata> {
@@ -405,7 +433,9 @@ mod tests {
         let mut guard = SovereignGuard::new();
 
         // Approved payload
-        assert!(guard.inspect_payload(b"STANDARD_DATA_PAYLOAD", 1000).is_ok());
+        assert!(guard
+            .inspect_payload(b"STANDARD_DATA_PAYLOAD", 1000)
+            .is_ok());
 
         // Violating payload containing "HIPAA" signature
         let violation_payload = b"PATIENT_HEALTH_RECORD_HIPAA_SENSITIVE";

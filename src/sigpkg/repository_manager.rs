@@ -1,10 +1,9 @@
 extern crate alloc;
 /// Repository Management System (Debian APT + Arch Pacman Inspiration)
 /// Manages package repositories, mirrors, and metadata
-
 use crate::klib::{BTreeMap, Vec};
-use alloc::string::String;
 use crate::sigpkg::{Package, Version, VersionConstraint};
+use alloc::string::String;
 
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]
@@ -61,7 +60,10 @@ impl RepositoryManager {
 
     /// Add mirror for a repository (Arch mirrorlist inspiration)
     pub fn add_mirror(&mut self, repo_name: &str, mirror_url: &str) {
-        let mirrors = self.mirrors.entry(repo_name.to_string()).or_insert_with(Vec::new);
+        let mirrors = self
+            .mirrors
+            .entry(repo_name.to_string())
+            .or_insert_with(Vec::new);
         mirrors.push(mirror_url.to_string());
     }
 
@@ -70,11 +72,15 @@ impl RepositoryManager {
         if let Some(mirrors) = self.mirrors.get(repo_name) {
             // Simple selection - in production would test latency
             if let Some(first) = mirrors.first() {
-                self.current_mirror.insert(repo_name.to_string(), first.clone());
+                self.current_mirror
+                    .insert(repo_name.to_string(), first.clone());
                 return Ok(first.clone());
             }
         }
-        Err(format!("No mirrors available for repository: {}", repo_name))
+        Err(format!(
+            "No mirrors available for repository: {}",
+            repo_name
+        ))
     }
 
     /// Get repository URL with mirror substitution
@@ -124,7 +130,7 @@ mod tests {
         let mut manager = RepositoryManager::new();
         let repo = Repository::new("core", "https://repo.sigmaos.org");
         manager.add_repository(repo);
-        
+
         assert_eq!(manager.list_repositories().len(), 1);
     }
 
@@ -133,7 +139,7 @@ mod tests {
         let mut manager = RepositoryManager::new();
         manager.add_mirror("core", "https://mirror1.sigmaos.org");
         manager.add_mirror("core", "https://mirror2.sigmaos.org");
-        
+
         let result = manager.select_best_mirror("core");
         assert!(result.is_ok());
     }

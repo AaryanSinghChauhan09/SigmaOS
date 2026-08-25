@@ -18,7 +18,9 @@ impl<const WORDS: usize> AtomicBitmap<WORDS> {
         // We use const-context unsafe for static allocation
         #[allow(clippy::declare_interior_mutable_const)]
         const ZERO: AtomicU64 = AtomicU64::new(0);
-        Self { bits: [ZERO; WORDS] }
+        Self {
+            bits: [ZERO; WORDS],
+        }
     }
 
     /// Total capacity in bits
@@ -28,7 +30,9 @@ impl<const WORDS: usize> AtomicBitmap<WORDS> {
 
     /// Set bit at position (mark as used). Returns false if already set.
     pub fn set(&self, pos: usize) -> bool {
-        if pos >= self.capacity() { return false; }
+        if pos >= self.capacity() {
+            return false;
+        }
         let word = pos / 64;
         let bit = pos % 64;
         let old = self.bits[word].fetch_or(1 << bit, Ordering::AcqRel);
@@ -37,7 +41,9 @@ impl<const WORDS: usize> AtomicBitmap<WORDS> {
 
     /// Clear bit at position (mark as free). Returns false if already clear.
     pub fn clear(&self, pos: usize) -> bool {
-        if pos >= self.capacity() { return false; }
+        if pos >= self.capacity() {
+            return false;
+        }
         let word = pos / 64;
         let bit = pos % 64;
         let old = self.bits[word].fetch_and(!(1u64 << bit), Ordering::AcqRel);
@@ -46,7 +52,9 @@ impl<const WORDS: usize> AtomicBitmap<WORDS> {
 
     /// Test if bit is set.
     pub fn test(&self, pos: usize) -> bool {
-        if pos >= self.capacity() { return false; }
+        if pos >= self.capacity() {
+            return false;
+        }
         let word = pos / 64;
         let bit = pos % 64;
         self.bits[word].load(Ordering::Acquire) & (1 << bit) != 0
@@ -120,7 +128,10 @@ impl<const WORDS: usize> AtomicBitmap<WORDS> {
     }
 
     /// Iterate over all set bit positions (non-atomic snapshot)
-    pub fn iter_set<F>(&self, mut f: F) where F: FnMut(usize) {
+    pub fn iter_set<F>(&self, mut f: F)
+    where
+        F: FnMut(usize),
+    {
         for (word_idx, word) in self.bits.iter().enumerate() {
             let mut w = word.load(Ordering::Relaxed);
             while w != 0 {
@@ -151,9 +162,9 @@ mod tests {
         static BITMAP: AtomicBitmap<2> = AtomicBitmap::new();
 
         assert!(!BITMAP.test(0));
-        assert!(BITMAP.set(0));   // Set bit 0
-        assert!(BITMAP.test(0));  // Should be set
-        assert!(!BITMAP.set(0));  // Already set - returns false
+        assert!(BITMAP.set(0)); // Set bit 0
+        assert!(BITMAP.test(0)); // Should be set
+        assert!(!BITMAP.set(0)); // Already set - returns false
         assert!(BITMAP.clear(0)); // Clear bit 0
         assert!(!BITMAP.test(0)); // Should be clear
     }
@@ -189,13 +200,11 @@ mod tests {
         BITMAP.set(42);
 
         let mut found = [false; 3];
-        BITMAP.iter_set(|pos| {
-            match pos {
-                1 => found[0] = true,
-                7 => found[1] = true,
-                42 => found[2] = true,
-                _ => {}
-            }
+        BITMAP.iter_set(|pos| match pos {
+            1 => found[0] = true,
+            7 => found[1] = true,
+            42 => found[2] = true,
+            _ => {}
         });
         assert!(found.iter().all(|&b| b));
     }

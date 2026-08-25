@@ -46,7 +46,9 @@ pub struct SigmaString {
 
 impl SigmaString {
     pub fn new() -> Self {
-        Self { data: String::new() }
+        Self {
+            data: String::new(),
+        }
     }
 
     pub fn empty() -> Self {
@@ -54,7 +56,9 @@ impl SigmaString {
     }
 
     pub fn from_str(s: &str) -> Self {
-        Self { data: String::from(s) }
+        Self {
+            data: String::from(s),
+        }
     }
 
     pub fn as_str(&self) -> &str {

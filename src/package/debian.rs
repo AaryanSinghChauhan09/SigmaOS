@@ -58,7 +58,11 @@ impl DebControl {
         }
 
         // Validate package name (alphanumeric, '+', '-', '.' only, no relative traversal or path separators)
-        if package.starts_with('.') || package.contains('/') || package.contains('\\') || package.contains("..") {
+        if package.starts_with('.')
+            || package.contains('/')
+            || package.contains('\\')
+            || package.contains("..")
+        {
             return Err("Invalid or unsafe package name in Debian control file");
         }
         for b in package.bytes() {
@@ -127,7 +131,9 @@ impl DebPackage {
                     return Err("Unsupported Debian package ar binary version");
                 }
             } else if name.starts_with("control") {
-                control_text = Some(core::str::from_utf8(member_data).map_err(|_| "Control file must be UTF-8")?);
+                control_text = Some(
+                    core::str::from_utf8(member_data).map_err(|_| "Control file must be UTF-8")?,
+                );
             } else if name.starts_with("data") {
                 data_size = size;
             }
@@ -316,7 +322,10 @@ mod tests {
         assert_eq!(control.depends[0], "libc6");
         assert_eq!(control.depends[1], "libssl3");
         assert_eq!(control.depends[2], "zlib1g");
-        assert_eq!(control.maintainer, "Debian Nginx Maintainers <pkg-nginx-maintainers@alioth-lists.debian.net>");
+        assert_eq!(
+            control.maintainer,
+            "Debian Nginx Maintainers <pkg-nginx-maintainers@alioth-lists.debian.net>"
+        );
         assert_eq!(control.description, "high-performance web server");
     }
 
@@ -353,7 +362,10 @@ mod tests {
         let deb = DebPackage::parse_binary(&binary_data).unwrap();
         assert_eq!(deb.control.package, "curl");
         assert_eq!(deb.control.version, "7.88.1-8");
-        assert_eq!(deb.control.description, "command line tool for transferring data");
+        assert_eq!(
+            deb.control.description,
+            "command line tool for transferring data"
+        );
     }
 
     #[test]

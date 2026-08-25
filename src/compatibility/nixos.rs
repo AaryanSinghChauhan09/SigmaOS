@@ -54,7 +54,7 @@ impl NixStore {
         package_path.push_str(&store_hash);
         package_path.push('-');
         package_path.push_str(derivation);
-        
+
         let pkg = NixPackage {
             name: derivation.to_string(),
             version: String::from("1.0.0"),
@@ -69,7 +69,7 @@ impl NixStore {
 
         self.packages.insert(derivation.to_string(), pkg);
         self.add_gc_root(&package_path);
-        
+
         Ok(package_path)
     }
 
@@ -227,7 +227,7 @@ impl NixosConfig {
     /// Generate Nix expression from configuration
     pub fn to_nix_expression(&self) -> String {
         let mut expr = String::from("{ config, pkgs, ... }:\n{\n");
-        
+
         // Add options
         for (key, value) in &self.options {
             expr.push_str("  ");
@@ -261,7 +261,11 @@ impl NixosConfig {
     fn config_option_to_string(&self, option: &ConfigOption) -> String {
         match option {
             ConfigOption::Boolean(b) => {
-                if *b { String::from("true") } else { String::from("false") }
+                if *b {
+                    String::from("true")
+                } else {
+                    String::from("false")
+                }
             }
             ConfigOption::String(s) => {
                 let mut result = String::from("\"");
@@ -269,9 +273,7 @@ impl NixosConfig {
                 result.push_str("\"");
                 result
             }
-            ConfigOption::Integer(i) => {
-                i.to_string()
-            }
+            ConfigOption::Integer(i) => i.to_string(),
             ConfigOption::List(items) => {
                 let mut items_str = Vec::new();
                 for s in items {
@@ -286,7 +288,8 @@ impl NixosConfig {
                 result
             }
             ConfigOption::Attrs(attrs) => {
-                let attrs_str: Vec<String> = attrs.iter()
+                let attrs_str: Vec<String> = attrs
+                    .iter()
                     .map(|(k, v)| format!("{} = {}", k, self.config_option_to_string(v)))
                     .collect();
                 format!("{{ {} }}", attrs_str.join("; "))
@@ -320,7 +323,7 @@ pub struct NixChannels {
 impl NixChannels {
     pub fn new() -> Self {
         let mut channels = BTreeMap::new();
-        
+
         channels.insert(
             String::from("nixos-unstable"),
             NixChannel {
@@ -431,11 +434,19 @@ mod tests {
         let mut store = NixStore::new();
         store.build("hello").unwrap();
         store.build("world").unwrap();
-        
+
         // Remove one package from GC roots
         store.gc_roots.clear();
-        store.add_gc_root(store.packages.get("hello").unwrap().outputs.get("out").unwrap());
-        
+        store.add_gc_root(
+            store
+                .packages
+                .get("hello")
+                .unwrap()
+                .outputs
+                .get("out")
+                .unwrap(),
+        );
+
         let deleted = store.garbage_collect(true).unwrap();
         assert!(deleted >= 1);
     }
@@ -443,8 +454,11 @@ mod tests {
     #[test]
     fn test_nixos_config() {
         let mut config = NixosConfig::new();
-        
-        config.set_option("networking.hostName", ConfigOption::String(String::from("testhost")));
+
+        config.set_option(
+            "networking.hostName",
+            ConfigOption::String(String::from("testhost")),
+        );
         assert_eq!(
             config.get_option("networking.hostName"),
             Some(&ConfigOption::String(String::from("testhost")))
@@ -456,10 +470,13 @@ mod tests {
         let mut config = NixosConfig::new();
         config.enable_service("nginx");
         assert!(config.services.contains_key("nginx"));
-        
+
         config.disable_service("nginx");
         if let Some(nginx_config) = config.services.get("nginx") {
-            assert_eq!(nginx_config.get("enable"), Some(&ConfigOption::Boolean(false)));
+            assert_eq!(
+                nginx_config.get("enable"),
+                Some(&ConfigOption::Boolean(false))
+            );
         }
     }
 
@@ -468,7 +485,7 @@ mod tests {
         let mut channels = NixChannels::new();
         assert!(channels.channels.contains_key("nixos-24.05"));
         assert_eq!(channels.current_channel, "nixos-24.05");
-        
+
         assert!(channels.set_channel("nixos-unstable").is_ok());
         assert_eq!(channels.current_channel, "nixos-unstable");
     }

@@ -74,7 +74,11 @@ impl PrivacyBadgerTrackerShield {
     }
 
     /// Evaluates 3rd-party domain tracking heuristics (Privacy Badger 3-strike rule)
-    pub fn evaluate_domain_tracker(&mut self, domain: &str, tracking_sites_count: usize) -> TrackerAction {
+    pub fn evaluate_domain_tracker(
+        &mut self,
+        domain: &str,
+        tracking_sites_count: usize,
+    ) -> TrackerAction {
         if tracking_sites_count >= 3 {
             self.blocked_domains_count += 1;
             TrackerAction::BlockDomain
@@ -87,7 +91,9 @@ impl PrivacyBadgerTrackerShield {
 
     /// Evaluates WebRTC local IP leak protection
     pub fn sanitize_webrtc_candidate(&self, candidate_ip: &str) -> Option<String> {
-        if self.block_webrtc_ip_leak && (candidate_ip.starts_with("192.168.") || candidate_ip.starts_with("10.")) {
+        if self.block_webrtc_ip_leak
+            && (candidate_ip.starts_with("192.168.") || candidate_ip.starts_with("10."))
+        {
             None // Redact local LAN IP leak
         } else {
             Some(candidate_ip.to_string())
@@ -121,12 +127,42 @@ impl PrivacyDashboard {
         let mut rules = Vec::new();
 
         // O&O ShutUp10 Parity Default Rules
-        rules.push(TelemetryRule::new("OOS_01", "Diagnostic & Usage Data", TelemetryCategory::DiagnosticData, true));
-        rules.push(TelemetryRule::new("OOS_02", "Location Tracking & Geolocation", TelemetryCategory::LocationServices, true));
-        rules.push(TelemetryRule::new("OOS_03", "Automatic Error Reporting", TelemetryCategory::ErrorReporting, true));
-        rules.push(TelemetryRule::new("OOS_04", "App Usage & Advertising ID", TelemetryCategory::AppUsageTracking, true));
-        rules.push(TelemetryRule::new("OOS_05", "Search Queries Telemetry", TelemetryCategory::SearchTelemetry, true));
-        rules.push(TelemetryRule::new("OOS_06", "Cortana Voice Input Recording", TelemetryCategory::CortanaVoiceTelemetry, false));
+        rules.push(TelemetryRule::new(
+            "OOS_01",
+            "Diagnostic & Usage Data",
+            TelemetryCategory::DiagnosticData,
+            true,
+        ));
+        rules.push(TelemetryRule::new(
+            "OOS_02",
+            "Location Tracking & Geolocation",
+            TelemetryCategory::LocationServices,
+            true,
+        ));
+        rules.push(TelemetryRule::new(
+            "OOS_03",
+            "Automatic Error Reporting",
+            TelemetryCategory::ErrorReporting,
+            true,
+        ));
+        rules.push(TelemetryRule::new(
+            "OOS_04",
+            "App Usage & Advertising ID",
+            TelemetryCategory::AppUsageTracking,
+            true,
+        ));
+        rules.push(TelemetryRule::new(
+            "OOS_05",
+            "Search Queries Telemetry",
+            TelemetryCategory::SearchTelemetry,
+            true,
+        ));
+        rules.push(TelemetryRule::new(
+            "OOS_06",
+            "Cortana Voice Input Recording",
+            TelemetryCategory::CortanaVoiceTelemetry,
+            false,
+        ));
 
         Self {
             rules,
@@ -204,12 +240,24 @@ mod tests {
     fn test_privacy_badger_tracker_shield() {
         let mut shield = PrivacyBadgerTrackerShield::new();
 
-        assert_eq!(shield.evaluate_domain_tracker("analytics.com", 1), TrackerAction::Allow);
-        assert_eq!(shield.evaluate_domain_tracker("adnetwork.com", 2), TrackerAction::BlockCookies);
-        assert_eq!(shield.evaluate_domain_tracker("fingerprint.com", 3), TrackerAction::BlockDomain);
+        assert_eq!(
+            shield.evaluate_domain_tracker("analytics.com", 1),
+            TrackerAction::Allow
+        );
+        assert_eq!(
+            shield.evaluate_domain_tracker("adnetwork.com", 2),
+            TrackerAction::BlockCookies
+        );
+        assert_eq!(
+            shield.evaluate_domain_tracker("fingerprint.com", 3),
+            TrackerAction::BlockDomain
+        );
         assert_eq!(shield.blocked_domains_count, 1);
 
         assert!(shield.sanitize_webrtc_candidate("192.168.1.10").is_none());
-        assert_eq!(shield.sanitize_webrtc_candidate("93.184.216.34").unwrap(), "93.184.216.34");
+        assert_eq!(
+            shield.sanitize_webrtc_candidate("93.184.216.34").unwrap(),
+            "93.184.216.34"
+        );
     }
 }

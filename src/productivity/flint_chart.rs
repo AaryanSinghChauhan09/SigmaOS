@@ -21,7 +21,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FlintMark {
     Bar,

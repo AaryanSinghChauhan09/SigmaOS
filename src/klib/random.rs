@@ -17,7 +17,7 @@ impl XorShiftRng {
             state: Cell::new(seed),
         }
     }
-    
+
     /// Generate a random u64
     pub fn gen_u64(&self) -> u64 {
         let mut state = self.state.get();
@@ -27,22 +27,22 @@ impl XorShiftRng {
         self.state.set(state);
         state
     }
-    
+
     /// Generate a random u32
     pub fn gen_u32(&self) -> u32 {
         (self.gen_u64() & 0xFFFFFFFF) as u32
     }
-    
+
     /// Generate a random u16
     pub fn gen_u16(&self) -> u16 {
         (self.gen_u64() & 0xFFFF) as u16
     }
-    
+
     /// Generate a random u8
     pub fn gen_u8(&self) -> u8 {
         (self.gen_u64() & 0xFF) as u8
     }
-    
+
     /// Generate a random number in range [min, max)
     pub fn gen_range(&self, min: u64, max: u64) -> u64 {
         let range = max - min;
@@ -51,7 +51,7 @@ impl XorShiftRng {
         }
         min + (self.gen_u64() % range)
     }
-    
+
     /// Generate a random boolean
     pub fn gen_bool(&self) -> bool {
         self.gen_u64() & 1 == 1

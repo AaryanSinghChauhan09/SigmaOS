@@ -44,9 +44,9 @@ pub struct RegisterSet {
     pub rbx: u64,
     pub rcx: u64,
     pub rdx: u64,
-    pub rsi: u64, // Source Index (string instructions)
-    pub rdi: u64, // Destination Index (string instructions)
-    pub rbp: u64, // Base Pointer
+    pub rsi: u64,    // Source Index (string instructions)
+    pub rdi: u64,    // Destination Index (string instructions)
+    pub rbp: u64,    // Base Pointer
     pub rflags: u64, // Status flags register (ZF, SF, CF, OF)
 
     // --- x86 Segments ---
@@ -150,9 +150,11 @@ impl SovereignVirtualCPU {
         }
         let scaled_index = index.wrapping_mul(scale);
         let final_addr = if displacement >= 0 {
-            base.wrapping_add(scaled_index).wrapping_add(displacement as u64)
+            base.wrapping_add(scaled_index)
+                .wrapping_add(displacement as u64)
         } else {
-            base.wrapping_add(scaled_index).wrapping_sub((-displacement) as u64)
+            base.wrapping_add(scaled_index)
+                .wrapping_sub((-displacement) as u64)
         };
         if final_addr >= self.memory.len() as u64 {
             return Err(CpuError::MemoryAccessViolation);
@@ -293,7 +295,12 @@ impl SovereignVirtualCPU {
     // --- Complex CISC Instructions ---
 
     /// Bitwise Shifts & Rotates: SHL, SHR, SAR, ROL, ROR
-    pub fn exec_shift_rotate(&mut self, opcode: &str, val: u64, amount: u32) -> Result<u64, CpuError> {
+    pub fn exec_shift_rotate(
+        &mut self,
+        opcode: &str,
+        val: u64,
+        amount: u32,
+    ) -> Result<u64, CpuError> {
         let amount = amount % 64;
         let result = match opcode {
             "SHL" => val.wrapping_shl(amount),
@@ -599,7 +606,9 @@ mod tests {
         let shl = cpu.exec_shift_rotate("SHL", 0xF, 4).unwrap();
         assert_eq!(shl, 0xF0);
 
-        let ror = cpu.exec_shift_rotate("ROR", 0xFF00000000000000u64, 8).unwrap();
+        let ror = cpu
+            .exec_shift_rotate("ROR", 0xFF00000000000000u64, 8)
+            .unwrap();
         assert_eq!(ror, 0x00FF000000000000u64);
     }
 

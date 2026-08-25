@@ -2,9 +2,9 @@
 
 extern crate alloc;
 
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnsiColor {
@@ -197,7 +197,11 @@ impl TerminalMultiplexer {
         let new_id = self.next_pane_id;
         self.next_pane_id += 1;
 
-        if let Some(pos) = self.panes.iter().position(|p| p.pane_id == self.active_pane_id) {
+        if let Some(pos) = self
+            .panes
+            .iter()
+            .position(|p| p.pane_id == self.active_pane_id)
+        {
             let cur_w = self.panes[pos].width;
             let cur_h = self.panes[pos].height;
 
@@ -338,7 +342,8 @@ impl TerminalSession {
 
     /// Parses Sixel (\x1BPq) or Kitty (\x1B_G) graphics escape sequences
     pub fn parse_graphics_escape(&mut self, seq: &str) -> bool {
-        if seq.starts_with("\x1BPq") { // Sixel header
+        if seq.starts_with("\x1BPq") {
+            // Sixel header
             let frame = SixelGraphicFrame {
                 id: (self.graphics_frames.len() + 1) as u32,
                 width_px: 640,
@@ -347,7 +352,8 @@ impl TerminalSession {
             };
             self.graphics_frames.push(frame);
             true
-        } else if seq.starts_with("\x1B_G") { // Kitty graphics protocol
+        } else if seq.starts_with("\x1B_G") {
+            // Kitty graphics protocol
             let frame = SixelGraphicFrame {
                 id: (self.graphics_frames.len() + 1) as u32,
                 width_px: 800,
@@ -396,7 +402,9 @@ impl TerminalSession {
     /// Invokes a user-defined function with arguments.
     /// Returns the fully interpolated list of command lines to run.
     pub fn invoke_user_function(&self, name: &str, args: &[&str]) -> Option<Vec<String>> {
-        self.user_functions.get(name).map(|func| func.interpolate(args))
+        self.user_functions
+            .get(name)
+            .map(|func| func.interpolate(args))
     }
 
     // =========================================================================
@@ -414,7 +422,10 @@ impl TerminalSession {
             plan.push("rm -f /tmp/*.tmp".to_string());
             plan.push("clear".to_string());
         } else {
-            plan.push(alloc::format!("echo 'AI Plan: {} - Completed successfully.'", goal));
+            plan.push(alloc::format!(
+                "echo 'AI Plan: {} - Completed successfully.'",
+                goal
+            ));
         }
         plan
     }
@@ -446,7 +457,8 @@ impl TerminalSession {
              - Detected missing linkage: libssl.so.3 (OpenSSL compatibility)\n\
              - Invoking sigpkg to resolve libssl...\n\
              - Linked libssl.so.3 successfully. Package '{}' is now healthy.",
-            package_name, package_name
+            package_name,
+            package_name
         );
         Ok(report)
     }
@@ -687,7 +699,7 @@ mod tests {
             "echo 'Arg 1 is: $1'",
             "sigpkg install $2",
             "echo 'All args: $@'",
-            "echo 'Total count: $#'"
+            "echo 'Total count: $#'",
         ];
         let func = UserDefinedFunction::new("deploy", &lines);
 

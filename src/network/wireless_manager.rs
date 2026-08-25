@@ -65,7 +65,11 @@ impl WirelessManager {
     }
 
     pub fn pair_bluetooth_device(&mut self, mac: [u8; 6]) -> Result<(), &'static str> {
-        if let Some(dev) = self.bluetooth_devices.iter_mut().find(|d| d.mac_address == mac) {
+        if let Some(dev) = self
+            .bluetooth_devices
+            .iter_mut()
+            .find(|d| d.mac_address == mac)
+        {
             dev.is_paired = true;
             dev.is_connected = true;
             Ok(())
@@ -108,7 +112,9 @@ mod tests {
             is_connected: false,
         });
 
-        assert!(mgr.pair_bluetooth_device([0x00, 0x1A, 0x7D, 0xDA, 0x71, 0x13]).is_ok());
+        assert!(mgr
+            .pair_bluetooth_device([0x00, 0x1A, 0x7D, 0xDA, 0x71, 0x13])
+            .is_ok());
         assert!(mgr.bluetooth_devices[0].is_paired);
     }
 }

@@ -18,14 +18,14 @@
 
 extern crate alloc;
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use crate::klib::collections::VecDeque;
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
 
 #[cfg(not(test))]
 use crate::klib::{BTreeMap, Vec};
-use crate::klib::collections::VecDeque;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 use alloc::string::String;
 

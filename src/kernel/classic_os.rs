@@ -238,7 +238,9 @@ impl TicketSpinlock {
     }
 
     pub fn lock(&self) -> usize {
-        let ticket = self.next_ticket.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+        let ticket = self
+            .next_ticket
+            .fetch_add(1, core::sync::atomic::Ordering::Relaxed);
         let mut backoff = 1usize;
         while self.now_serving.load(core::sync::atomic::Ordering::Acquire) != ticket {
             for _ in 0..backoff {
@@ -250,7 +252,10 @@ impl TicketSpinlock {
     }
 
     pub fn unlock(&self, ticket: usize) {
-        self.now_serving.store(ticket.wrapping_add(1), core::sync::atomic::Ordering::Release);
+        self.now_serving.store(
+            ticket.wrapping_add(1),
+            core::sync::atomic::Ordering::Release,
+        );
     }
 }
 
@@ -304,7 +309,8 @@ impl BatchSystemQueue {
     }
 
     pub fn dispatch_jobs(&mut self) {
-        while self.running_jobs.len() < self.multiprogramming_limit && !self.queued_jobs.is_empty() {
+        while self.running_jobs.len() < self.multiprogramming_limit && !self.queued_jobs.is_empty()
+        {
             let next_job = self.queued_jobs.remove(0);
             self.running_jobs.push(next_job);
         }
@@ -394,9 +400,21 @@ mod tests {
     #[test]
     fn test_batch_system_queue() {
         let mut batch = BatchSystemQueue::new(2);
-        batch.submit_job(BatchJob { job_id: 1, priority: 1, estimated_time_ms: 100 });
-        batch.submit_job(BatchJob { job_id: 2, priority: 2, estimated_time_ms: 200 });
-        batch.submit_job(BatchJob { job_id: 3, priority: 3, estimated_time_ms: 300 });
+        batch.submit_job(BatchJob {
+            job_id: 1,
+            priority: 1,
+            estimated_time_ms: 100,
+        });
+        batch.submit_job(BatchJob {
+            job_id: 2,
+            priority: 2,
+            estimated_time_ms: 200,
+        });
+        batch.submit_job(BatchJob {
+            job_id: 3,
+            priority: 3,
+            estimated_time_ms: 300,
+        });
 
         assert_eq!(batch.running_count(), 2);
         assert!(batch.complete_job(1));

@@ -1,29 +1,28 @@
 /// Custom CPU Register Set and Thread Context Subsystems for SigmaOS
 /// Implements standard x86_64 Register Set context, FPU/SSE/AVX XSAVE Area state transitions,
 /// Control and Debug Registers (DR0-DR7) breakpoints, and context-switching governors.
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 // Standard Status and Control Flags Constants (x86/x64 rflags & ARM CPSR)
 // Inspired directly by Linux pt_regs, FreeBSD trapframe, and Windows NT _KTRAP_FRAME
-pub const X86_RFLAGS_CF: u64 = 1 << 0;   // Carry Flag
-pub const X86_RFLAGS_PF: u64 = 1 << 2;   // Parity Flag
-pub const X86_RFLAGS_AF: u64 = 1 << 4;   // Auxiliary Carry Flag
-pub const X86_RFLAGS_ZF: u64 = 1 << 6;   // Zero Flag
-pub const X86_RFLAGS_SF: u64 = 1 << 7;   // Sign Flag
-pub const X86_RFLAGS_TF: u64 = 1 << 8;   // Trap Flag (Hardware Single-Step)
-pub const X86_RFLAGS_IF: u64 = 1 << 9;   // Interrupt Enable Flag
-pub const X86_RFLAGS_DF: u64 = 1 << 10;  // Direction Flag
-pub const X86_RFLAGS_OF: u64 = 1 << 11;  // Overflow Flag
+pub const X86_RFLAGS_CF: u64 = 1 << 0; // Carry Flag
+pub const X86_RFLAGS_PF: u64 = 1 << 2; // Parity Flag
+pub const X86_RFLAGS_AF: u64 = 1 << 4; // Auxiliary Carry Flag
+pub const X86_RFLAGS_ZF: u64 = 1 << 6; // Zero Flag
+pub const X86_RFLAGS_SF: u64 = 1 << 7; // Sign Flag
+pub const X86_RFLAGS_TF: u64 = 1 << 8; // Trap Flag (Hardware Single-Step)
+pub const X86_RFLAGS_IF: u64 = 1 << 9; // Interrupt Enable Flag
+pub const X86_RFLAGS_DF: u64 = 1 << 10; // Direction Flag
+pub const X86_RFLAGS_OF: u64 = 1 << 11; // Overflow Flag
 
-pub const ARM_CPSR_N: u64 = 1 << 31;     // Negative Flag
-pub const ARM_CPSR_Z: u64 = 1 << 30;     // Zero Flag
-pub const ARM_CPSR_C: u64 = 1 << 29;     // Carry Flag
-pub const ARM_CPSR_V: u64 = 1 << 28;     // Overflow Flag
-pub const ARM_CPSR_I: u64 = 1 << 7;      // IRQ Disable Flag
-pub const ARM_CPSR_F: u64 = 1 << 6;      // FIQ Disable Flag
+pub const ARM_CPSR_N: u64 = 1 << 31; // Negative Flag
+pub const ARM_CPSR_Z: u64 = 1 << 30; // Zero Flag
+pub const ARM_CPSR_C: u64 = 1 << 29; // Carry Flag
+pub const ARM_CPSR_V: u64 = 1 << 28; // Overflow Flag
+pub const ARM_CPSR_I: u64 = 1 << 7; // IRQ Disable Flag
+pub const ARM_CPSR_F: u64 = 1 << 6; // FIQ Disable Flag
 
 // ==========================================
 // 1. General Purpose & Segment Register Set
@@ -58,16 +57,36 @@ pub struct X86RegisterSet {
 impl X86RegisterSet {
     pub fn new() -> Self {
         X86RegisterSet {
-            rax: 0, rbx: 0, rcx: 0, rdx: 0, rsi: 0, rdi: 0, rbp: 0, rsp: 0,
-            rip: 0, rflags: 0x202, // Interrupt Enable Flag (IF) bit default set
-            cs: 0x08, ds: 0x10, es: 0x10, fs: 0x10, gs: 0x10, ss: 0x10, // Default GDT ring 0 selectors
+            rax: 0,
+            rbx: 0,
+            rcx: 0,
+            rdx: 0,
+            rsi: 0,
+            rdi: 0,
+            rbp: 0,
+            rsp: 0,
+            rip: 0,
+            rflags: 0x202, // Interrupt Enable Flag (IF) bit default set
+            cs: 0x08,
+            ds: 0x10,
+            es: 0x10,
+            fs: 0x10,
+            gs: 0x10,
+            ss: 0x10, // Default GDT ring 0 selectors
         }
     }
 
     pub fn reset(&mut self) {
-        self.rax = 0; self.rbx = 0; self.rcx = 0; self.rdx = 0;
-        self.rsi = 0; self.rdi = 0; self.rbp = 0; self.rsp = 0;
-        self.rip = 0; self.rflags = 0x202;
+        self.rax = 0;
+        self.rbx = 0;
+        self.rcx = 0;
+        self.rdx = 0;
+        self.rsi = 0;
+        self.rdi = 0;
+        self.rbp = 0;
+        self.rsp = 0;
+        self.rip = 0;
+        self.rflags = 0x202;
     }
 
     pub fn set_flag(&mut self, flag: u64, enabled: bool) {

@@ -11,9 +11,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;
+use alloc::vec::Vec;
 
 pub const PAGE_SIZE_BYTES: usize = 4096;
 pub const PAGE_TABLE_ENTRIES: usize = 512;
@@ -39,13 +39,13 @@ pub struct PageTableEntry {
     pub present: bool,
     pub writable: bool,
     pub user_accessible: bool,
-    pub is_huge: bool,               // Page is 2MB or 1GB huge page
-    pub execute_disable: bool,       // NX/XD bit
-    pub cache_disable: bool,         // PCD bit
-    pub write_through: bool,         // PWT bit
-    pub dirty: bool,                 // D bit (written)
-    pub accessed: bool,              // A bit (accessed)
-    pub is_ksm_shared: bool,         // Linux KSM shared read-only page indicator
+    pub is_huge: bool,         // Page is 2MB or 1GB huge page
+    pub execute_disable: bool, // NX/XD bit
+    pub cache_disable: bool,   // PCD bit
+    pub write_through: bool,   // PWT bit
+    pub dirty: bool,           // D bit (written)
+    pub accessed: bool,        // A bit (accessed)
+    pub is_ksm_shared: bool,   // Linux KSM shared read-only page indicator
     pub physical_address: PhysicalAddress,
 }
 
@@ -253,7 +253,7 @@ pub struct SimpleVMM {
     pub vmas: Vec<VirtualMemoryArea>, // Virtual memory regions for demand paging
     pub active_pages_for_clock: Vec<VirtualAddress>, // Swapping tracker for Clock replacement
     pub clock_hand: usize,
-    pub zram_pool: Vec<ZramPage>,       // Swapped compressed pages
+    pub zram_pool: Vec<ZramPage>,            // Swapped compressed pages
     pub ksm_registry: Vec<KsmRegistryEntry>, // Tracked KSM hashes and reference vectors
 }
 
@@ -404,18 +404,28 @@ impl SimpleVMM {
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
         let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
 
-        let has_pml4 = self.pml4_table.get(pml4_idx).and_then(|opt| opt.as_ref()).is_some();
+        let has_pml4 = self
+            .pml4_table
+            .get(pml4_idx)
+            .and_then(|opt| opt.as_ref())
+            .is_some();
         if !has_pml4 {
             return self.attempt_demand_paging(virt, write_intent, execute_intent);
         }
 
-        let pml4 = self.pml4_table.get_mut(pml4_idx).and_then(|opt| opt.as_mut()).unwrap();
+        let pml4 = self
+            .pml4_table
+            .get_mut(pml4_idx)
+            .and_then(|opt| opt.as_mut())
+            .unwrap();
 
         // 1GB Huge Page Check at PML4 level (points to PDPT huge entry)
         if let Some(huge_pte) = pml4.get_huge_entry(pdpt_idx) {
             self.validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x3FFF_FFFF; // 1GB offset
-            return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset));
+            return Ok(PhysicalAddress(
+                (huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset,
+            ));
         }
 
         let has_pdpt = pml4.get_directory(pdpt_idx).is_some();
@@ -429,7 +439,9 @@ impl SimpleVMM {
         if let Some(huge_pte) = pdpt.get_huge_entry(pd_idx) {
             self.validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x1F_FFFF; // 2MB offset
-            return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x1F_FFFF) + offset));
+            return Ok(PhysicalAddress(
+                (huge_pte.physical_address.0 & !0x1F_FFFF) + offset,
+            ));
         }
 
         let has_pd = pdpt.get_table(pd_idx).is_some();
@@ -484,7 +496,8 @@ impl SimpleVMM {
                 // Decompress page and map it back on demand (zram decompression swap-in)
                 let decompressed_phys = PhysicalAddress(virt.0); // mapped back
                 self.zram_pool.remove(i);
-                self.map_page_with_flags(virt, decompressed_phys, true, false).unwrap();
+                self.map_page_with_flags(virt, decompressed_phys, true, false)
+                    .unwrap();
                 return Ok(decompressed_phys);
             }
         }
@@ -655,16 +668,28 @@ impl SimpleVMM {
     }
 
     /// Marks a page table entry's accessed bit to simulate memory activities
-    pub fn mark_accessed(&mut self, virt: VirtualAddress, accessed: bool) -> Result<(), MemoryError> {
+    pub fn mark_accessed(
+        &mut self,
+        virt: VirtualAddress,
+        accessed: bool,
+    ) -> Result<(), MemoryError> {
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
         let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
 
-        let pml4 = self.pml4_table[pml4_idx].as_mut().ok_or(MemoryError::PageNotPresent)?;
-        let pdpt = pml4.get_directory_mut(pdpt_idx).ok_or(MemoryError::PageNotPresent)?;
-        let pd = pdpt.get_table_mut(pd_idx).ok_or(MemoryError::PageNotPresent)?;
-        let pte = pd.get_entry_mut(pt_idx).ok_or(MemoryError::PageNotPresent)?;
+        let pml4 = self.pml4_table[pml4_idx]
+            .as_mut()
+            .ok_or(MemoryError::PageNotPresent)?;
+        let pdpt = pml4
+            .get_directory_mut(pdpt_idx)
+            .ok_or(MemoryError::PageNotPresent)?;
+        let pd = pdpt
+            .get_table_mut(pd_idx)
+            .ok_or(MemoryError::PageNotPresent)?;
+        let pte = pd
+            .get_entry_mut(pt_idx)
+            .ok_or(MemoryError::PageNotPresent)?;
 
         pte.accessed = accessed;
         Ok(())
@@ -682,7 +707,9 @@ impl SimpleVMM {
         let pdpt = pml4
             .get_directory_mut(pdpt_idx)
             .ok_or(MemoryError::PageNotPresent)?;
-        let pd = pdpt.get_table_mut(pd_idx).ok_or(MemoryError::PageNotPresent)?;
+        let pd = pdpt
+            .get_table_mut(pd_idx)
+            .ok_or(MemoryError::PageNotPresent)?;
 
         pd.entries[pt_idx] = None;
 
@@ -763,7 +790,9 @@ mod tests {
         let phys = PhysicalAddress(0x800000);
 
         vmm.map_huge_2mb(virt, phys, true).unwrap();
-        let resolved = vmm.get_physical_address(VirtualAddress(0x200000 + 0x1000)).unwrap();
+        let resolved = vmm
+            .get_physical_address(VirtualAddress(0x200000 + 0x1000))
+            .unwrap();
 
         // Must translate using base + 4KB offset
         assert_eq!(resolved.0, 0x800000 + 0x1000);
@@ -776,7 +805,9 @@ mod tests {
         let phys = PhysicalAddress(0xC0000000);
 
         vmm.map_huge_1gb(virt, phys, true).unwrap();
-        let resolved = vmm.get_physical_address(VirtualAddress(0x40000000 + 0x200000)).unwrap();
+        let resolved = vmm
+            .get_physical_address(VirtualAddress(0x40000000 + 0x200000))
+            .unwrap();
 
         // Must translate using base + 2MB offset
         assert_eq!(resolved.0, 0xC0000000 + 0x200000);
@@ -795,11 +826,15 @@ mod tests {
         vmm.register_vma(vma);
 
         // Address doesn't exist in page tables but fits in VMA -> Simulated demand allocation
-        let resolved = vmm.get_physical_address_with_access(VirtualAddress(0x5020000), true, false).unwrap();
+        let resolved = vmm
+            .get_physical_address_with_access(VirtualAddress(0x5020000), true, false)
+            .unwrap();
         assert_eq!(resolved.0, 0x5020000);
 
         // Accessing outside registered VMA fails
-        assert!(vmm.get_physical_address_with_access(VirtualAddress(0x7000000), false, false).is_err());
+        assert!(vmm
+            .get_physical_address_with_access(VirtualAddress(0x7000000), false, false)
+            .is_err());
     }
 
     #[test]
@@ -827,24 +862,50 @@ mod tests {
 
         assert!(pt.set_entry(512, entry).is_err());
     }
-#[test]
+    #[test]
     fn test_vmm_address_alignment_verification() {
         let mut vmm = SimpleVMM::new();
 
         // 4KB alignment checks
-        assert!(vmm.map_page(VirtualAddress(0x1005), PhysicalAddress(0x2000)).is_err());
-        assert!(vmm.map_page(VirtualAddress(0x1000), PhysicalAddress(0x2003)).is_err());
-        assert!(vmm.map_page(VirtualAddress(0x1000), PhysicalAddress(0x2000)).is_ok());
+        assert!(vmm
+            .map_page(VirtualAddress(0x1005), PhysicalAddress(0x2000))
+            .is_err());
+        assert!(vmm
+            .map_page(VirtualAddress(0x1000), PhysicalAddress(0x2003))
+            .is_err());
+        assert!(vmm
+            .map_page(VirtualAddress(0x1000), PhysicalAddress(0x2000))
+            .is_ok());
 
         // 2MB alignment checks
-        assert!(vmm.map_huge_2mb(VirtualAddress(0x200100), PhysicalAddress(0x800000), true).is_err());
-        assert!(vmm.map_huge_2mb(VirtualAddress(0x200000), PhysicalAddress(0x800100), true).is_err());
-        assert!(vmm.map_huge_2mb(VirtualAddress(0x200000), PhysicalAddress(0x800000), true).is_ok());
+        assert!(vmm
+            .map_huge_2mb(VirtualAddress(0x200100), PhysicalAddress(0x800000), true)
+            .is_err());
+        assert!(vmm
+            .map_huge_2mb(VirtualAddress(0x200000), PhysicalAddress(0x800100), true)
+            .is_err());
+        assert!(vmm
+            .map_huge_2mb(VirtualAddress(0x200000), PhysicalAddress(0x800000), true)
+            .is_ok());
 
         // 1GB alignment checks
-        assert!(vmm.map_huge_1gb(VirtualAddress(0x40001000), PhysicalAddress(0xC0000000), true).is_err());
-        assert!(vmm.map_huge_1gb(VirtualAddress(0x40000000), PhysicalAddress(0xC001000), true).is_err());
-        assert!(vmm.map_huge_1gb(VirtualAddress(0x40000000), PhysicalAddress(0xC0000000), true).is_ok());
+        assert!(vmm
+            .map_huge_1gb(
+                VirtualAddress(0x40001000),
+                PhysicalAddress(0xC0000000),
+                true
+            )
+            .is_err());
+        assert!(vmm
+            .map_huge_1gb(VirtualAddress(0x40000000), PhysicalAddress(0xC001000), true)
+            .is_err());
+        assert!(vmm
+            .map_huge_1gb(
+                VirtualAddress(0x40000000),
+                PhysicalAddress(0xC0000000),
+                true
+            )
+            .is_ok());
     }
 
     // ==========================================
@@ -857,20 +918,30 @@ mod tests {
         let virt_a = VirtualAddress(0x1000);
         let virt_b = VirtualAddress(0x2000);
 
-        vmm.map_page_with_flags(virt_a, PhysicalAddress(0x10000), true, false).unwrap();
-        vmm.map_page_with_flags(virt_b, PhysicalAddress(0x20000), true, false).unwrap();
+        vmm.map_page_with_flags(virt_a, PhysicalAddress(0x10000), true, false)
+            .unwrap();
+        vmm.map_page_with_flags(virt_b, PhysicalAddress(0x20000), true, false)
+            .unwrap();
 
         // Trigger KSM sweep representing content deduplication
-        let merged_phys = vmm.trigger_ksm_deduplication_sweep(virt_a, virt_b, 0xDEADBEEF).unwrap();
+        let merged_phys = vmm
+            .trigger_ksm_deduplication_sweep(virt_a, virt_b, 0xDEADBEEF)
+            .unwrap();
         assert_eq!(merged_phys.0, 0x10000);
 
         // Verify that both are mapped to identical shared physical page frames and read-only
-        let res_a = vmm.get_physical_address_with_access(virt_a, false, false).unwrap();
-        let res_b = vmm.get_physical_address_with_access(virt_b, false, false).unwrap();
+        let res_a = vmm
+            .get_physical_address_with_access(virt_a, false, false)
+            .unwrap();
+        let res_b = vmm
+            .get_physical_address_with_access(virt_b, false, false)
+            .unwrap();
         assert_eq!(res_a.0, res_b.0);
 
         // Write intent on B triggers Copy-On-Write (CoW) page fault splitter
-        let cow_phys_b = vmm.get_physical_address_with_access(virt_b, true, false).unwrap();
+        let cow_phys_b = vmm
+            .get_physical_address_with_access(virt_b, true, false)
+            .unwrap();
         assert_eq!(cow_phys_b.0, virt_b.0); // mapped to newly allocated unique page frame
 
         // Confirm KSM references record has split

@@ -24,7 +24,9 @@ impl PageTableFlags {
     pub const NO_EXECUTE: u64 = 1 << 63; // NX bit
 
     pub fn new() -> Self {
-        Self { bits: Self::PRESENT }
+        Self {
+            bits: Self::PRESENT,
+        }
     }
 
     pub fn is_present(&self) -> bool {
@@ -59,7 +61,10 @@ pub struct PageTableEntry {
 
 impl PageTableEntry {
     pub fn new(physical_frame: u64, flags: PageTableFlags) -> Self {
-        Self { physical_frame, flags }
+        Self {
+            physical_frame,
+            flags,
+        }
     }
 }
 
@@ -69,7 +74,7 @@ pub struct PageTableManager {
     pub pml4_phys_addr: u64,
     pub level5_enabled: bool, // 5-Level Paging (PML5) for 57-bit virtual address space
     pub entries: HashMap<u64, PageTableEntry>, // Virt Page -> PTE mapping
-    pub pcid_asid: u16,                        // Process Context ID / ASID for TLB isolation
+    pub pcid_asid: u16,       // Process Context ID / ASID for TLB isolation
 }
 
 impl PageTableManager {
@@ -116,13 +121,25 @@ pub struct VmProtection {
 
 impl VmProtection {
     pub fn rx() -> Self {
-        Self { read: true, write: false, execute: true }
+        Self {
+            read: true,
+            write: false,
+            execute: true,
+        }
     }
     pub fn rw() -> Self {
-        Self { read: true, write: true, execute: false }
+        Self {
+            read: true,
+            write: true,
+            execute: false,
+        }
     }
     pub fn rwx() -> Self {
-        Self { read: true, write: true, execute: true }
+        Self {
+            read: true,
+            write: true,
+            execute: true,
+        }
     }
 }
 
@@ -189,7 +206,13 @@ impl VirtualMemoryManager {
     }
 
     /// Create an mmap virtual memory allocation
-    pub fn mmap(&mut self, addr: u64, len: u64, protection: VmProtection, name: &str) -> Result<u64, &'static str> {
+    pub fn mmap(
+        &mut self,
+        addr: u64,
+        len: u64,
+        protection: VmProtection,
+        name: &str,
+    ) -> Result<u64, &'static str> {
         let page_aligned_len = (len + 4095) & !0xFFF;
         let start_addr = if addr != 0 { addr } else { 0x7FFFF0000000 };
 
@@ -217,7 +240,12 @@ impl VirtualMemoryManager {
     }
 
     /// Change protection flags for address range (mprotect)
-    pub fn mprotect(&mut self, addr: u64, len: u64, new_protection: VmProtection) -> Result<(), &'static str> {
+    pub fn mprotect(
+        &mut self,
+        addr: u64,
+        len: u64,
+        new_protection: VmProtection,
+    ) -> Result<(), &'static str> {
         let end_addr = addr + len;
         for vma in &mut self.vmas {
             if vma.start_addr >= addr && vma.end_addr <= end_addr {
@@ -229,7 +257,11 @@ impl VirtualMemoryManager {
     }
 
     /// Handle Page Fault exception (Demand Paging & Copy-On-Write)
-    pub fn handle_page_fault(&mut self, fault_addr: u64, cause: PageFaultCause) -> Result<(), &'static str> {
+    pub fn handle_page_fault(
+        &mut self,
+        fault_addr: u64,
+        cause: PageFaultCause,
+    ) -> Result<(), &'static str> {
         self.page_faults_count += 1;
         let page_base = fault_addr & !0xFFF;
 
@@ -258,7 +290,8 @@ impl VirtualMemoryManager {
                 if vma.protection.write {
                     flags.bits |= PageTableFlags::WRITABLE;
                 }
-                self.page_table.map_page(page_base, 0x20000000 + page_base, flags);
+                self.page_table
+                    .map_page(page_base, 0x20000000 + page_base, flags);
                 self.flush_tlb_page(page_base);
                 return Ok(());
             }
@@ -297,7 +330,9 @@ mod tests {
     #[test]
     fn test_vmm_mmap_and_translation() {
         let mut vmm = VirtualMemoryManager::new(0x1000, 1);
-        let virt_addr = vmm.mmap(0x0000_7FFF_0000_0000, 8192, VmProtection::rw(), "heap").unwrap();
+        let virt_addr = vmm
+            .mmap(0x0000_7FFF_0000_0000, 8192, VmProtection::rw(), "heap")
+            .unwrap();
 
         assert_eq!(virt_addr, 0x0000_7FFF_0000_0000);
         let (phys, flags) = vmm.page_table.translate(virt_addr).unwrap();
@@ -309,7 +344,8 @@ mod tests {
     #[test]
     fn test_copy_on_write_page_fault() {
         let mut vmm = VirtualMemoryManager::new(0x1000, 1);
-        vmm.mmap(0x10000, 4096, VmProtection::rw(), "cow_test").unwrap();
+        vmm.mmap(0x10000, 4096, VmProtection::rw(), "cow_test")
+            .unwrap();
 
         // Simulate fork() setting COW on page
         let entry = vmm.page_table.entries.get_mut(&0x10000).unwrap();

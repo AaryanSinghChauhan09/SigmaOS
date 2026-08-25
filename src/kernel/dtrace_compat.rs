@@ -40,16 +40,16 @@ pub enum ProbeType {
 #[derive(Debug)]
 pub struct Probe {
     /// Provider name (e.g. `"syscall"`, `"vfs"`, `"net"`).
-    pub provider:  &'static str,
+    pub provider: &'static str,
     /// Module / subsystem (e.g. `"kernel"`, `"scheduler"`).
-    pub module:    &'static str,
+    pub module: &'static str,
     /// Function name (e.g. `"read"`, `"open"`, `"fork"`).
-    pub function:  &'static str,
+    pub function: &'static str,
     /// Probe variant within the function (e.g. `"entry"`, `"return"`).
-    pub name:      &'static str,
-    pub kind:      ProbeType,
+    pub name: &'static str,
+    pub kind: ProbeType,
     /// Whether this probe is currently collecting records.
-    pub enabled:   bool,
+    pub enabled: bool,
     /// Total times this probe has fired since registration.
     pub fire_count: u64,
 }
@@ -57,12 +57,20 @@ pub struct Probe {
 impl Probe {
     pub const fn new(
         provider: &'static str,
-        module:   &'static str,
+        module: &'static str,
         function: &'static str,
-        name:     &'static str,
-        kind:     ProbeType,
+        name: &'static str,
+        kind: ProbeType,
     ) -> Self {
-        Self { provider, module, function, name, kind, enabled: false, fire_count: 0 }
+        Self {
+            provider,
+            module,
+            function,
+            name,
+            kind,
+            enabled: false,
+            fire_count: 0,
+        }
     }
 }
 
@@ -74,15 +82,15 @@ impl Probe {
 #[derive(Debug, Clone)]
 pub struct TraceRecord {
     /// Kernel timestamp (nanoseconds since boot or epoch).
-    pub timestamp:  u64,
+    pub timestamp: u64,
     /// CPU ID on which the probe fired.
-    pub cpu_id:     u32,
+    pub cpu_id: u32,
     /// PID of the process in whose context the probe fired.
-    pub pid:        u32,
+    pub pid: u32,
     /// Index of the probe in the TraceEngine's probe list.
-    pub probe_idx:  usize,
+    pub probe_idx: usize,
     /// Up to 4 arguments passed by the probe site.
-    pub args:       [u64; 4],
+    pub args: [u64; 4],
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -95,14 +103,14 @@ pub struct TraceRecord {
 /// When the buffer is full, new records are dropped (like DTrace's `drop`
 /// action).  The caller should drain records frequently.
 pub struct TraceEngine {
-    probes:      Vec<Probe>,
-    records:     Vec<TraceRecord>,
+    probes: Vec<Probe>,
+    records: Vec<TraceRecord>,
     /// Maximum records before dropping.
     max_records: usize,
     /// Global enable/disable switch.
-    enabled:     bool,
+    enabled: bool,
     /// Number of records dropped due to buffer full.
-    drop_count:  u64,
+    drop_count: u64,
     /// Total records ever produced (including dropped).
     total_fired: u64,
 }
@@ -166,10 +174,16 @@ impl TraceEngine {
     // ── Global switch ─────────────────────────────────────────────────────────
 
     /// Enable the global tracing engine.
-    pub fn start(&mut self) { self.enabled = true; }
+    pub fn start(&mut self) {
+        self.enabled = true;
+    }
     /// Pause the global tracing engine (probes remain registered).
-    pub fn stop(&mut self)  { self.enabled = false; }
-    pub fn is_running(&self) -> bool { self.enabled }
+    pub fn stop(&mut self) {
+        self.enabled = false;
+    }
+    pub fn is_running(&self) -> bool {
+        self.enabled
+    }
 
     // ── Probe firing (called from kernel hot paths) ───────────────────────────
 
@@ -179,14 +193,7 @@ impl TraceEngine {
     /// - Early return if global switch is off.
     /// - Early return if probe is disabled.
     /// - Drop record if buffer is full (no blocking).
-    pub fn fire(
-        &mut self,
-        idx:       usize,
-        timestamp: u64,
-        cpu_id:    u32,
-        pid:       u32,
-        args:      [u64; 4],
-    ) {
+    pub fn fire(&mut self, idx: usize, timestamp: u64, cpu_id: u32, pid: u32, args: [u64; 4]) {
         if !self.enabled {
             return;
         }
@@ -205,7 +212,13 @@ impl TraceEngine {
             self.drop_count = self.drop_count.wrapping_add(1);
             return;
         }
-        self.records.push(TraceRecord { timestamp, cpu_id, pid, probe_idx: idx, args });
+        self.records.push(TraceRecord {
+            timestamp,
+            cpu_id,
+            pid,
+            probe_idx: idx,
+            args,
+        });
     }
 
     // ── Record collection ─────────────────────────────────────────────────────
@@ -227,10 +240,18 @@ impl TraceEngine {
 
     // ── Statistics ────────────────────────────────────────────────────────────
 
-    pub fn probe_count(&self)    -> usize { self.probes.len() }
-    pub fn record_count(&self)   -> usize { self.records.len() }
-    pub fn drop_count(&self)     -> u64   { self.drop_count }
-    pub fn total_fired(&self)    -> u64   { self.total_fired }
+    pub fn probe_count(&self) -> usize {
+        self.probes.len()
+    }
+    pub fn record_count(&self) -> usize {
+        self.records.len()
+    }
+    pub fn drop_count(&self) -> u64 {
+        self.drop_count
+    }
+    pub fn total_fired(&self) -> u64 {
+        self.total_fired
+    }
 
     /// Per-probe fire count.
     pub fn probe_fires(&self, idx: usize) -> u64 {
@@ -262,10 +283,22 @@ macro_rules! sigma_trace {
         $eng.fire($idx, $ts, $cpu, $pid, [$a0 as u64, $a1 as u64, 0, 0])
     };
     ($eng:expr, $idx:expr, $ts:expr, $cpu:expr, $pid:expr, $a0:expr, $a1:expr, $a2:expr) => {
-        $eng.fire($idx, $ts, $cpu, $pid, [$a0 as u64, $a1 as u64, $a2 as u64, 0])
+        $eng.fire(
+            $idx,
+            $ts,
+            $cpu,
+            $pid,
+            [$a0 as u64, $a1 as u64, $a2 as u64, 0],
+        )
     };
     ($eng:expr, $idx:expr, $ts:expr, $cpu:expr, $pid:expr, $a0:expr, $a1:expr, $a2:expr, $a3:expr) => {
-        $eng.fire($idx, $ts, $cpu, $pid, [$a0 as u64, $a1 as u64, $a2 as u64, $a3 as u64])
+        $eng.fire(
+            $idx,
+            $ts,
+            $cpu,
+            $pid,
+            [$a0 as u64, $a1 as u64, $a2 as u64, $a3 as u64],
+        )
     };
 }
 
@@ -275,13 +308,19 @@ macro_rules! sigma_trace {
 
 /// Pre-defined probe descriptors for common SigmaOS subsystems.
 /// Register these with `engine.register(PROBE_SYSCALL_READ_ENTRY)` etc.
-pub const PROBE_SYSCALL_READ_ENTRY:  Probe = Probe::new("syscall", "kernel", "read",  "entry",  ProbeType::Entry);
-pub const PROBE_SYSCALL_WRITE_ENTRY: Probe = Probe::new("syscall", "kernel", "write", "entry",  ProbeType::Entry);
-pub const PROBE_SYSCALL_OPEN_ENTRY:  Probe = Probe::new("syscall", "kernel", "open",  "entry",  ProbeType::Entry);
-pub const PROBE_SCHED_SWITCH:        Probe = Probe::new("sched",   "kernel", "switch","fire",   ProbeType::Custom);
-pub const PROBE_NET_CONNECT:         Probe = Probe::new("net",     "tcp",    "connect","entry", ProbeType::Entry);
-pub const PROBE_VFS_WRITE:           Probe = Probe::new("vfs",     "sigma_fs","write","entry",  ProbeType::Entry);
-pub const PROBE_SECURITY_PLEDGE:     Probe = Probe::new("security","pledge", "check", "entry",  ProbeType::Entry);
+pub const PROBE_SYSCALL_READ_ENTRY: Probe =
+    Probe::new("syscall", "kernel", "read", "entry", ProbeType::Entry);
+pub const PROBE_SYSCALL_WRITE_ENTRY: Probe =
+    Probe::new("syscall", "kernel", "write", "entry", ProbeType::Entry);
+pub const PROBE_SYSCALL_OPEN_ENTRY: Probe =
+    Probe::new("syscall", "kernel", "open", "entry", ProbeType::Entry);
+pub const PROBE_SCHED_SWITCH: Probe =
+    Probe::new("sched", "kernel", "switch", "fire", ProbeType::Custom);
+pub const PROBE_NET_CONNECT: Probe = Probe::new("net", "tcp", "connect", "entry", ProbeType::Entry);
+pub const PROBE_VFS_WRITE: Probe =
+    Probe::new("vfs", "sigma_fs", "write", "entry", ProbeType::Entry);
+pub const PROBE_SECURITY_PLEDGE: Probe =
+    Probe::new("security", "pledge", "check", "entry", ProbeType::Entry);
 
 // ─────────────────────────────────────────────────────────────────────────────
 #[cfg(test)]

@@ -2087,7 +2087,11 @@ impl PacketSniffer {
     }
 
     pub fn decrypt_frame(&self, id: u64) -> Result<String, &'static str> {
-        let frame = self.captured_frames.iter().find(|f| f.id == id).ok_or("Frame not found")?;
+        let frame = self
+            .captured_frames
+            .iter()
+            .find(|f| f.id == id)
+            .ok_or("Frame not found")?;
         let key = self.decryption_key.ok_or("Decryption key not configured")?;
         let decrypted: Vec<u8> = frame.encrypted_payload.iter().map(|&b| b ^ key).collect();
         String::from_utf8(decrypted).map_err(|_| "Decrypted payload contains invalid UTF-8")
@@ -2115,7 +2119,12 @@ impl VpnTunnelManager {
         }
     }
 
-    pub fn establish_tunnel(&mut self, peer_endpoint: &str, private_key: &str, public_key: &str) -> Result<(), &'static str> {
+    pub fn establish_tunnel(
+        &mut self,
+        peer_endpoint: &str,
+        private_key: &str,
+        public_key: &str,
+    ) -> Result<(), &'static str> {
         if private_key.is_empty() || public_key.is_empty() {
             return Err("Incomplete cryptographic keypair configured");
         }
@@ -2178,7 +2187,11 @@ impl ZeroKnowledgeVault {
     }
 
     pub fn retrieve_secret(&self, title: &str) -> Result<String, &'static str> {
-        let item = self.vault_items.iter().find(|i| i.title == title).ok_or("Vault item not found")?;
+        let item = self
+            .vault_items
+            .iter()
+            .find(|i| i.title == title)
+            .ok_or("Vault item not found")?;
         let key = self.master_key_hash[0];
         let decrypted: Vec<u8> = item.encrypted_secret.iter().map(|&b| b ^ key).collect();
         String::from_utf8(decrypted).map_err(|_| "Invalid decrypted payload UTF-8 encoding")
@@ -2251,7 +2264,12 @@ impl PartitionManager {
         }
     }
 
-    pub fn create_partition(&mut self, size: u32, format: PartitionFormat, label: &str) -> Result<(), &'static str> {
+    pub fn create_partition(
+        &mut self,
+        size: u32,
+        format: PartitionFormat,
+        label: &str,
+    ) -> Result<(), &'static str> {
         let current_allocated: u32 = self.partitions.iter().map(|p| p.size_gb).sum();
         if current_allocated + size > self.total_disk_gb {
             return Err("Insufficient disk volume remaining");
@@ -2266,8 +2284,16 @@ impl PartitionManager {
         Ok(())
     }
 
-    pub fn format_partition(&mut self, index: u32, format: PartitionFormat) -> Result<(), &'static str> {
-        let part = self.partitions.iter_mut().find(|p| p.index == index).ok_or("Partition index out of bounds")?;
+    pub fn format_partition(
+        &mut self,
+        index: u32,
+        format: PartitionFormat,
+    ) -> Result<(), &'static str> {
+        let part = self
+            .partitions
+            .iter_mut()
+            .find(|p| p.index == index)
+            .ok_or("Partition index out of bounds")?;
         part.format = format;
         Ok(())
     }
@@ -2333,7 +2359,11 @@ impl VmGuestSupervisor {
     }
 
     pub fn boot_guest_vm(&mut self, id: u32) -> Result<(), &'static str> {
-        let guest = self.guests.iter_mut().find(|g| g.id == id).ok_or("VM target not found")?;
+        let guest = self
+            .guests
+            .iter_mut()
+            .find(|g| g.id == id)
+            .ok_or("VM target not found")?;
         guest.status = "Running";
         Ok(())
     }
@@ -2364,7 +2394,13 @@ impl EmailClient {
         self.pgp_private_key = Some(key);
     }
 
-    pub fn receive_encrypted_email(&mut self, sender: &str, receiver: &str, encrypted_payload: &[u8], signed: bool) {
+    pub fn receive_encrypted_email(
+        &mut self,
+        sender: &str,
+        receiver: &str,
+        encrypted_payload: &[u8],
+        signed: bool,
+    ) {
         self.inbox.push(PgpEmail {
             sender: sender.to_string(),
             receiver: receiver.to_string(),
@@ -2375,9 +2411,12 @@ impl EmailClient {
 
     pub fn read_email_content(&self, idx: usize) -> Result<String, &'static str> {
         let email = self.inbox.get(idx).ok_or("Email index out of bounds")?;
-        let key = self.pgp_private_key.ok_or("PGP decryption key is missing")?;
+        let key = self
+            .pgp_private_key
+            .ok_or("PGP decryption key is missing")?;
         let decrypted: Vec<u8> = email.mime_payload.iter().map(|&b| b ^ key).collect();
-        String::from_utf8(decrypted).map_err(|_| "Email decryption payload contains invalid encoding")
+        String::from_utf8(decrypted)
+            .map_err(|_| "Email decryption payload contains invalid encoding")
     }
 }
 
@@ -2442,7 +2481,11 @@ impl BtopSystemMonitor {
 
     pub fn get_top_cpu_processes(&self, count: usize) -> Vec<ProcessInfo> {
         let mut sorted = self.processes.clone();
-        sorted.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap_or(core::cmp::Ordering::Equal));
+        sorted.sort_by(|a, b| {
+            b.cpu_usage
+                .partial_cmp(&a.cpu_usage)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
         sorted.into_iter().take(count).collect()
     }
 }
@@ -2609,7 +2652,13 @@ impl EbpfSystemTracer {
         Ok(())
     }
 
-    pub fn record_event(&mut self, pid: u32, probe_type: &str, symbol_name: &str, timestamp_ns: u64) {
+    pub fn record_event(
+        &mut self,
+        pid: u32,
+        probe_type: &str,
+        symbol_name: &str,
+        timestamp_ns: u64,
+    ) {
         self.events.push(TraceEvent {
             pid,
             probe_type: probe_type.to_string(),
@@ -2753,7 +2802,9 @@ pub struct SystemdCgTop {
 
 impl SystemdCgTop {
     pub fn new() -> Self {
-        Self { cgroups: Vec::new() }
+        Self {
+            cgroups: Vec::new(),
+        }
     }
 
     pub fn update_cgroup(&mut self, path: &str, cpu_pct: f32, mem_bytes: u64, tasks: usize) {
@@ -3003,7 +3054,9 @@ pub struct OmarchyAppletEngine {
 
 impl OmarchyAppletEngine {
     pub fn new() -> Self {
-        Self { applets: Vec::new() }
+        Self {
+            applets: Vec::new(),
+        }
     }
 
     pub fn register_applet(&mut self, title: &str, command: &str, category: &str) {
@@ -3018,7 +3071,9 @@ impl OmarchyAppletEngine {
         let q = query.to_lowercase();
         self.applets
             .iter()
-            .filter(|a| a.title.to_lowercase().contains(&q) || a.category.to_lowercase().contains(&q))
+            .filter(|a| {
+                a.title.to_lowercase().contains(&q) || a.category.to_lowercase().contains(&q)
+            })
             .cloned()
             .collect()
     }
@@ -3092,7 +3147,8 @@ impl BsdPledgeUnveilSecuritySandboxing {
         if self.is_locked {
             return Err("Unveil rules already locked");
         }
-        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+        self.unveiled_paths
+            .push((path.to_string(), permissions.to_string()));
         Ok(())
     }
 
@@ -3203,7 +3259,11 @@ impl AlpineMuslApkManager {
         self.trusted_keys.iter().any(|k| k == key_fingerprint)
     }
 
-    pub fn install_apk(&mut self, pkg_name: &str, key_fingerprint: &str) -> Result<(), &'static str> {
+    pub fn install_apk(
+        &mut self,
+        pkg_name: &str,
+        key_fingerprint: &str,
+    ) -> Result<(), &'static str> {
         if !self.verify_signature(key_fingerprint) {
             return Err("APK signature verification failed: Key untrusted");
         }
@@ -3989,8 +4049,12 @@ mod tests {
     #[test]
     fn test_vpn_tunnel_manager() {
         let mut vpn = VpnTunnelManager::new();
-        assert!(vpn.establish_tunnel("10.0.0.1:51820", "", "pubkey").is_err());
-        assert!(vpn.establish_tunnel("10.0.0.1:51820", "privkey", "pubkey").is_ok());
+        assert!(vpn
+            .establish_tunnel("10.0.0.1:51820", "", "pubkey")
+            .is_err());
+        assert!(vpn
+            .establish_tunnel("10.0.0.1:51820", "privkey", "pubkey")
+            .is_ok());
         assert!(vpn.interface_up);
 
         vpn.add_route("192.168.1.0/24", "wg0");
@@ -4013,9 +4077,21 @@ mod tests {
     #[test]
     fn test_markdown_notebook_backlinks() {
         let mut notebook = MarkdownNotebook::new();
-        notebook.create_note("Maturity_Parity_Roadmap.md", "Core architecture roadmap", &[]);
-        notebook.create_note("SigmaFS_Innovations.md", "This depends on [[Maturity_Parity_Roadmap.md]] design pattern", &[]);
-        notebook.create_note("SigmaMedia_Frameworks.md", "Another note linking [[Maturity_Parity_Roadmap.md]] for rendering", &[]);
+        notebook.create_note(
+            "Maturity_Parity_Roadmap.md",
+            "Core architecture roadmap",
+            &[],
+        );
+        notebook.create_note(
+            "SigmaFS_Innovations.md",
+            "This depends on [[Maturity_Parity_Roadmap.md]] design pattern",
+            &[],
+        );
+        notebook.create_note(
+            "SigmaMedia_Frameworks.md",
+            "Another note linking [[Maturity_Parity_Roadmap.md]] for rendering",
+            &[],
+        );
 
         let backlinks = notebook.parse_wiki_backlinks("Maturity_Parity_Roadmap.md");
         assert_eq!(backlinks.len(), 2);
@@ -4026,9 +4102,15 @@ mod tests {
     #[test]
     fn test_gparted_partition_manager() {
         let mut pm = PartitionManager::new(512); // 512 GB disk
-        assert!(pm.create_partition(200, PartitionFormat::SigmaFs, "root").is_ok());
-        assert!(pm.create_partition(400, PartitionFormat::Fat32, "extra").is_err()); // Exceeds disk size
-        assert!(pm.create_partition(312, PartitionFormat::Fat32, "extra").is_ok());
+        assert!(pm
+            .create_partition(200, PartitionFormat::SigmaFs, "root")
+            .is_ok());
+        assert!(pm
+            .create_partition(400, PartitionFormat::Fat32, "extra")
+            .is_err()); // Exceeds disk size
+        assert!(pm
+            .create_partition(312, PartitionFormat::Fat32, "extra")
+            .is_ok());
 
         assert_eq!(pm.partitions[0].label, "root");
         assert!(pm.format_partition(1, PartitionFormat::Ext4).is_ok());
@@ -4059,7 +4141,10 @@ mod tests {
     #[test]
     fn test_thunderbird_pgp_email_client() {
         let mut client = EmailClient::new();
-        let payload = b"Hello, this is a secret email payload!".iter().map(|&b| b ^ 0x7F).collect::<Vec<u8>>();
+        let payload = b"Hello, this is a secret email payload!"
+            .iter()
+            .map(|&b| b ^ 0x7F)
+            .collect::<Vec<u8>>();
         client.receive_encrypted_email("security@sigma.os", "jules@sigma.os", &payload, true);
 
         assert!(client.read_email_content(0).is_err()); // Missing PGP key
@@ -4107,7 +4192,8 @@ mod tests {
     #[test]
     fn test_bat_syntax_viewer() {
         let viewer = BatSyntaxViewer::new(true, true, "monokai");
-        let rendered = viewer.render_highlighted_file("main.rs", "fn main() {\n    println!(\"Hello\");\n}");
+        let rendered =
+            viewer.render_highlighted_file("main.rs", "fn main() {\n    println!(\"Hello\");\n}");
         assert!(viewer.show_line_numbers);
         assert!(rendered.contains("File: main.rs"));
         assert!(rendered.contains("1 │ + fn main()"));
@@ -4290,7 +4376,12 @@ mod tests {
         apk.add_repository("https://dl-cdn.alpinelinux.org/alpine/v3.19/main");
         apk.add_trusted_key("alpine-devel@lists.alpinelinux.org-52431f0e.rsa.pub");
 
-        assert!(apk.install_apk("musl", "alpine-devel@lists.alpinelinux.org-52431f0e.rsa.pub").is_ok());
+        assert!(apk
+            .install_apk(
+                "musl",
+                "alpine-devel@lists.alpinelinux.org-52431f0e.rsa.pub"
+            )
+            .is_ok());
         assert!(apk.is_installed("musl"));
         assert!(apk.install_apk("bash", "untrusted-key").is_err());
     }

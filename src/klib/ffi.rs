@@ -6,12 +6,12 @@ pub unsafe fn cstr_to_rust_string(ptr: *const i8) -> Result<String, &'static str
     if ptr.is_null() {
         return Err("Null pointer");
     }
-    
+
     let mut len = 0;
     while *ptr.add(len) != 0 {
         len += 1;
     }
-    
+
     let slice = core::slice::from_raw_parts(ptr as *const u8, len);
     String::from_utf8(slice.to_vec()).map_err(|_| "Invalid UTF-8")
 }
@@ -28,7 +28,7 @@ pub unsafe fn cstrlen(ptr: *const i8) -> usize {
     if ptr.is_null() {
         return 0;
     }
-    
+
     let mut len = 0;
     while *ptr.add(len) != 0 {
         len += 1;
@@ -41,12 +41,12 @@ pub unsafe fn cstrcmp(s1: *const i8, s2: *const i8) -> i32 {
     if s1.is_null() || s2.is_null() {
         return if s1 == s2 { 0 } else { -1 };
     }
-    
+
     let mut i = 0;
     loop {
         let c1 = *s1.add(i);
         let c2 = *s2.add(i);
-        
+
         if c1 == 0 && c2 == 0 {
             return 0;
         }
@@ -68,7 +68,7 @@ pub unsafe fn cstrcpy(dest: *mut i8, src: *const i8) -> *mut i8 {
     if dest.is_null() || src.is_null() {
         return dest;
     }
-    
+
     let mut i = 0;
     loop {
         let c = *src.add(i);
@@ -86,13 +86,13 @@ pub unsafe fn cstrcat(dest: *mut i8, src: *const i8) -> *mut i8 {
     if dest.is_null() || src.is_null() {
         return dest;
     }
-    
+
     // Find end of dest
     let mut dest_len = 0;
     while *dest.add(dest_len) != 0 {
         dest_len += 1;
     }
-    
+
     // Append src
     let mut i = 0;
     loop {
@@ -124,7 +124,10 @@ mod tests {
         let s2 = b"Hello\0";
         let s3 = b"World\0";
         unsafe {
-            assert_eq!(cstrcmp(s1.as_ptr() as *const i8, s2.as_ptr() as *const i8), 0);
+            assert_eq!(
+                cstrcmp(s1.as_ptr() as *const i8, s2.as_ptr() as *const i8),
+                0
+            );
             assert!(cstrcmp(s1.as_ptr() as *const i8, s3.as_ptr() as *const i8) != 0);
         }
     }

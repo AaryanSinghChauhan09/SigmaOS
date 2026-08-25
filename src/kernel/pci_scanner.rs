@@ -174,7 +174,9 @@ pub struct PcieEcamManager {
 
 impl PcieEcamManager {
     pub fn new(ecam_base: u64) -> Self {
-        Self { base_mmio_address: ecam_base }
+        Self {
+            base_mmio_address: ecam_base,
+        }
     }
 
     pub fn calculate_function_offset(&self, bus: u8, slot: u8, func: u8) -> u64 {
@@ -269,6 +271,8 @@ mod tests {
                 .scan_and_register(0, i as u8, 0x1000 + i as u16, 0x2000, 0x02)
                 .is_ok());
         }
-        assert!(scanner.scan_and_register(1, 0, 0x9999, 0x8888, 0x02).is_err());
+        assert!(scanner
+            .scan_and_register(1, 0, 0x9999, 0x8888, 0x02)
+            .is_err());
     }
 }

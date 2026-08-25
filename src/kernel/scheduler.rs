@@ -367,7 +367,11 @@ mod tests {
     #[test]
     fn test_add_process() {
         let mut scheduler = CfsScheduler::new();
-        let task = Task { id: TaskId(1), vruntime: 10, priority: 1 };
+        let task = Task {
+            id: TaskId(1),
+            vruntime: 10,
+            priority: 1,
+        };
         scheduler.add_task(task);
         assert_eq!(scheduler.task_count, 1);
     }
@@ -375,7 +379,11 @@ mod tests {
     #[test]
     fn test_schedule() {
         let mut scheduler = CfsScheduler::new();
-        let task = Task { id: TaskId(1), vruntime: 10, priority: 1 };
+        let task = Task {
+            id: TaskId(1),
+            vruntime: 10,
+            priority: 1,
+        };
         scheduler.add_task(task);
 
         let scheduled = scheduler.pick_next_task();

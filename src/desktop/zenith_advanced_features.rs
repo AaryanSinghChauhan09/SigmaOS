@@ -7,19 +7,19 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Advanced window layout modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowLayoutMode {
-    Tiling,        // Automatic tiling (i3/sway-style)
-    Stacking,      // Traditional stacking
-    Tabbed,        // Tabbed windows
-    Floating,      // Floating windows
-    Grid,          // Grid layout
-    Spiral,        // Spiral layout
+    Tiling,   // Automatic tiling (i3/sway-style)
+    Stacking, // Traditional stacking
+    Tabbed,   // Tabbed windows
+    Floating, // Floating windows
+    Grid,     // Grid layout
+    Spiral,   // Spiral layout
 }
 
 /// Multi-monitor configuration
@@ -309,7 +309,8 @@ impl AdvancedWindowManager {
             self.ai_suggestions.push(AISuggestion {
                 suggestion_type: SuggestionType::SuggestLayout,
                 title: "Optimize Window Layout".to_string(),
-                description: "Consider switching to grid layout for better window organization".to_string(),
+                description: "Consider switching to grid layout for better window organization"
+                    .to_string(),
                 confidence: 0.85,
             });
         }
@@ -318,7 +319,9 @@ impl AdvancedWindowManager {
             self.ai_suggestions.push(AISuggestion {
                 suggestion_type: SuggestionType::SuggestWorkspace,
                 title: "Organize Workspaces".to_string(),
-                description: "Distribute windows across multiple workspaces for better productivity".to_string(),
+                description:
+                    "Distribute windows across multiple workspaces for better productivity"
+                        .to_string(),
                 confidence: 0.75,
             });
         }
@@ -354,7 +357,6 @@ impl Default for AdvancedWindowManager {
     }
 }
 
-
 /// Desktop Panel Applet Categories (Cinnamon / Pantheon / KDE inspired)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppletCategory {
@@ -386,27 +388,36 @@ pub struct DesktopAppletEngine {
 impl DesktopAppletEngine {
     pub fn new() -> Self {
         let mut applets = BTreeMap::new();
-        applets.insert("systray".to_string(), DesktopApplet {
-            id: "systray".to_string(),
-            name: "System Tray".to_string(),
-            category: AppletCategory::SystemTray,
-            enabled: true,
-            position_index: 0,
-        });
-        applets.insert("workspace_switcher".to_string(), DesktopApplet {
-            id: "workspace_switcher".to_string(),
-            name: "Workspace Switcher".to_string(),
-            category: AppletCategory::WorkspaceSwitcher,
-            enabled: true,
-            position_index: 1,
-        });
-        applets.insert("weather".to_string(), DesktopApplet {
-            id: "weather".to_string(),
-            name: "Weather Indicator".to_string(),
-            category: AppletCategory::Weather,
-            enabled: true,
-            position_index: 2,
-        });
+        applets.insert(
+            "systray".to_string(),
+            DesktopApplet {
+                id: "systray".to_string(),
+                name: "System Tray".to_string(),
+                category: AppletCategory::SystemTray,
+                enabled: true,
+                position_index: 0,
+            },
+        );
+        applets.insert(
+            "workspace_switcher".to_string(),
+            DesktopApplet {
+                id: "workspace_switcher".to_string(),
+                name: "Workspace Switcher".to_string(),
+                category: AppletCategory::WorkspaceSwitcher,
+                enabled: true,
+                position_index: 1,
+            },
+        );
+        applets.insert(
+            "weather".to_string(),
+            DesktopApplet {
+                id: "weather".to_string(),
+                name: "Weather Indicator".to_string(),
+                category: AppletCategory::Weather,
+                enabled: true,
+                position_index: 2,
+            },
+        );
         Self { applets }
     }
 
@@ -500,45 +511,60 @@ impl ProfileManager {
     pub fn new() -> Self {
         let mut profiles = BTreeMap::new();
 
-        profiles.insert(UsageProfile::Development, ProfileSettings {
-            cpu_governor: "performance".to_string(),
-            gpu_performance: "high".to_string(),
-            refresh_rate: 144,
-            power_mode: "balanced".to_string(),
-            thermal_limit: 85,
-        });
+        profiles.insert(
+            UsageProfile::Development,
+            ProfileSettings {
+                cpu_governor: "performance".to_string(),
+                gpu_performance: "high".to_string(),
+                refresh_rate: 144,
+                power_mode: "balanced".to_string(),
+                thermal_limit: 85,
+            },
+        );
 
-        profiles.insert(UsageProfile::Gaming, ProfileSettings {
-            cpu_governor: "performance".to_string(),
-            gpu_performance: "maximum".to_string(),
-            refresh_rate: 240,
-            power_mode: "performance".to_string(),
-            thermal_limit: 90,
-        });
+        profiles.insert(
+            UsageProfile::Gaming,
+            ProfileSettings {
+                cpu_governor: "performance".to_string(),
+                gpu_performance: "maximum".to_string(),
+                refresh_rate: 240,
+                power_mode: "performance".to_string(),
+                thermal_limit: 90,
+            },
+        );
 
-        profiles.insert(UsageProfile::MediaConsumption, ProfileSettings {
-            cpu_governor: "powersave".to_string(),
-            gpu_performance: "balanced".to_string(),
-            refresh_rate: 60,
-            power_mode: "powersave".to_string(),
-            thermal_limit: 70,
-        });
+        profiles.insert(
+            UsageProfile::MediaConsumption,
+            ProfileSettings {
+                cpu_governor: "powersave".to_string(),
+                gpu_performance: "balanced".to_string(),
+                refresh_rate: 60,
+                power_mode: "powersave".to_string(),
+                thermal_limit: 70,
+            },
+        );
 
-        profiles.insert(UsageProfile::Productivity, ProfileSettings {
-            cpu_governor: "balanced".to_string(),
-            gpu_performance: "balanced".to_string(),
-            refresh_rate: 120,
-            power_mode: "balanced".to_string(),
-            thermal_limit: 80,
-        });
+        profiles.insert(
+            UsageProfile::Productivity,
+            ProfileSettings {
+                cpu_governor: "balanced".to_string(),
+                gpu_performance: "balanced".to_string(),
+                refresh_rate: 120,
+                power_mode: "balanced".to_string(),
+                thermal_limit: 80,
+            },
+        );
 
-        profiles.insert(UsageProfile::Accessibility, ProfileSettings {
-            cpu_governor: "balanced".to_string(),
-            gpu_performance: "balanced".to_string(),
-            refresh_rate: 60,
-            power_mode: "balanced".to_string(),
-            thermal_limit: 75,
-        });
+        profiles.insert(
+            UsageProfile::Accessibility,
+            ProfileSettings {
+                cpu_governor: "balanced".to_string(),
+                gpu_performance: "balanced".to_string(),
+                refresh_rate: 60,
+                power_mode: "balanced".to_string(),
+                thermal_limit: 75,
+            },
+        );
 
         Self {
             current_profile: UsageProfile::Productivity,
@@ -580,7 +606,7 @@ mod tests {
     #[test]
     fn test_monitor_configuration() {
         let mut manager = AdvancedWindowManager::new();
-        
+
         let monitor = MonitorConfig {
             id: 1,
             width: 1920,
@@ -590,7 +616,7 @@ mod tests {
             position: (0, 0),
             scale_factor: 1.0,
         };
-        
+
         manager.add_monitor(monitor);
         assert_eq!(manager.monitors.len(), 1);
         assert!(manager.get_primary_monitor().is_some());
@@ -599,14 +625,14 @@ mod tests {
     #[test]
     fn test_workspace_switching() {
         let mut manager = AdvancedWindowManager::new();
-        
+
         let workspace = WorkspaceConfig {
             id: 0,
             name: String::from("Main"),
             layout_mode: WindowLayoutMode::Tiling,
             monitors: Vec::new(),
         };
-        
+
         manager.add_workspace(workspace);
         assert!(manager.switch_workspace(0).is_ok());
         assert_eq!(manager.current_workspace, 0);
@@ -615,7 +641,7 @@ mod tests {
     #[test]
     fn test_tiling_layout_calculation() {
         let mut manager = AdvancedWindowManager::new();
-        
+
         let monitor = MonitorConfig {
             id: 1,
             width: 1920,
@@ -625,10 +651,10 @@ mod tests {
             position: (0, 0),
             scale_factor: 1.0,
         };
-        
+
         manager.add_monitor(monitor);
         let layout = manager.calculate_optimal_layout(2);
-        
+
         assert_eq!(layout.len(), 2);
         assert_eq!(layout[0].0, 0);
         assert_eq!(layout[1].0, 960);
@@ -637,16 +663,16 @@ mod tests {
     #[test]
     fn test_gesture_bindings() {
         let mut manager = AdvancedWindowManager::new();
-        
+
         let binding = GestureBinding {
             gesture: GestureType::SwipeUp,
             action: GestureAction::ShowDesktop,
             threshold: 0.5,
         };
-        
+
         manager.add_gesture_binding(binding);
         assert!(manager.gesture_control_enabled);
-        
+
         let action = manager.process_gesture(GestureType::SwipeUp, 0.6);
         assert_eq!(action, Some(GestureAction::ShowDesktop));
     }
@@ -655,11 +681,10 @@ mod tests {
     fn test_ai_suggestions() {
         let mut manager = AdvancedWindowManager::new();
         manager.generate_ai_suggestions(5, "terminal");
-        
+
         assert!(!manager.ai_suggestions.is_empty());
         assert!(manager.ai_suggestions_enabled);
     }
-
 
     #[test]
     fn test_desktop_applet_and_theme_engine() {
@@ -684,10 +709,10 @@ mod tests {
     #[test]
     fn test_profile_manager() {
         let mut profile_manager = ProfileManager::new();
-        
+
         assert!(profile_manager.switch_profile(UsageProfile::Gaming).is_ok());
         assert_eq!(profile_manager.current_profile, UsageProfile::Gaming);
-        
+
         let settings = profile_manager.get_current_settings();
         assert!(settings.is_some());
         assert_eq!(settings.unwrap().refresh_rate, 240);
