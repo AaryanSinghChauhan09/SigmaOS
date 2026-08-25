@@ -1612,17 +1612,80 @@ impl NetBsdRumpKernel {
 
 // ================= Monolithic Kernel Inspirations =================
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModuleState {
+    Unloaded,
+    Loading,
+    Live,
+    Unloading,
+    Failed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModuleEvent {
+    Load,
+    Unload,
+    Shutdown,
+    Quiesce,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KernelSymbol {
+    pub name: String,
+    pub address: u64,
+    pub exporting_module: String,
+    pub is_gpl_only: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModuleParam {
+    pub name: String,
+    pub param_type: String,
+    pub value: String,
+    pub perm_mask: u32, // e.g. 0o644 for sysctl read/write
+}
+
 #[derive(Clone)]
 pub struct KernelModule {
     pub name: String,
+    pub version: String,
+    pub author: String,
+    pub license: String,
     pub is_signed: bool,
     pub is_loaded: bool,
+    pub dependencies: Vec<String>,
+    pub exported_symbols: Vec<KernelSymbol>,
+    pub parameters: HashMap<String, ModuleParam>,
+    pub ref_count: usize,
+    pub state: ModuleState,
+    pub event_log: Vec<ModuleEvent>,
 }
 
-/// Linux-style dynamically loadable kernel modules (LKM) with symbol/syscall monitoring
+impl KernelModule {
+    pub fn new(name: &str, is_signed: bool) -> Self {
+        Self {
+            name: name.to_string(),
+            version: "1.0.0".to_string(),
+            author: "SigmaOS Developer".to_string(),
+            license: "GPL".to_string(),
+            is_signed,
+            is_loaded: false,
+            dependencies: Vec::new(),
+            exported_symbols: Vec::new(),
+            parameters: HashMap::new(),
+            ref_count: 0,
+            state: ModuleState::Unloaded,
+            event_log: Vec::new(),
+        }
+    }
+}
+
+/// Linux & BSD-style dynamically loadable kernel modules (LKM / KLD) with symbol/syscall monitoring,
+/// dependency resolution, module lifecycle event handling, and parameter management.
 pub struct DynamicLkmLoader {
     pub loaded_modules: HashMap<String, KernelModule>,
     pub sys_call_hooks: HashMap<u32, String>,
+    pub global_symbol_table: HashMap<String, KernelSymbol>,
 }
 
 impl DynamicLkmLoader {
@@ -1630,6 +1693,7 @@ impl DynamicLkmLoader {
         Self {
             loaded_modules: HashMap::new(),
             sys_call_hooks: HashMap::new(),
+            global_symbol_table: HashMap::new(),
         }
     }
 
@@ -1637,22 +1701,151 @@ impl DynamicLkmLoader {
         if !is_signed {
             return Err("Module signature verification failed: rejected unsigned code");
         }
-        self.loaded_modules.insert(
-            name.to_string(),
-            KernelModule {
-                name: name.to_string(),
-                is_signed,
-                is_loaded: true,
-            },
-        );
+        let mut mod_obj = KernelModule::new(name, is_signed);
+        mod_obj.is_loaded = true;
+        mod_obj.state = ModuleState::Live;
+        mod_obj.event_log.push(ModuleEvent::Load);
+        self.loaded_modules.insert(name.to_string(), mod_obj);
         Ok(())
     }
 
-    pub fn register_syscall_hook(
-        &mut self,
-        syscall_id: u32,
-        hook_owner: &str,
-    ) -> Result<(), &'static str> {
+    pub fn load_module_with_dependencies(&mut self, mut module: KernelModule, signature: &[u8]) -> Result<(), &'static str> {
+        if !module.is_signed || signature.is_empty() {
+            return Err("Module signature verification failed: rejected unsigned or invalid signature");
+        }
+
+        // Verify dependencies are loaded and active
+        for dep in &module.dependencies {
+            let dep_mod = self.loaded_modules.get(dep).ok_or("Unresolved module dependency: required dependency not loaded")?;
+            if dep_mod.state != ModuleState::Live {
+                return Err("Module dependency state invalid: dependency is not active");
+            }
+        }
+
+        // Increment reference count on dependencies
+        for dep in &module.dependencies {
+            if let Some(dep_mod) = self.loaded_modules.get_mut(dep) {
+                dep_mod.ref_count += 1;
+            }
+        }
+
+        module.state = ModuleState::Live;
+        module.is_loaded = true;
+        module.event_log.push(ModuleEvent::Load);
+
+        // Register exported symbols in global kernel symbol table (kallsyms / EXPORT_SYMBOL)
+        for sym in &module.exported_symbols {
+            self.global_symbol_table.insert(sym.name.clone(), sym.clone());
+        }
+
+        self.loaded_modules.insert(module.name.clone(), module);
+        Ok(())
+    }
+
+    pub fn unload_module(&mut self, name: &str) -> Result<(), &'static str> {
+        let mod_obj = self.loaded_modules.get(name).ok_or("Module not found")?;
+
+        if mod_obj.ref_count > 0 {
+            return Err("Cannot unload module: active reference count > 0");
+        }
+
+        // Check if any other loaded module depends on this module
+        for (other_name, other_mod) in &self.loaded_modules {
+            if other_name != name && other_mod.is_loaded && other_mod.dependencies.contains(&name.to_string()) {
+                return Err("Cannot unload module: required by another active module");
+            }
+        }
+
+        // Decrement reference counts on dependencies
+        let deps = mod_obj.dependencies.clone();
+        for dep in &deps {
+            if let Some(dep_mod) = self.loaded_modules.get_mut(dep) {
+                dep_mod.ref_count = dep_mod.ref_count.saturating_sub(1);
+            }
+        }
+
+        if let Some(mut mod_obj) = self.loaded_modules.remove(name) {
+            mod_obj.state = ModuleState::Unloaded;
+            mod_obj.is_loaded = false;
+            mod_obj.event_log.push(ModuleEvent::Unload);
+
+            // Remove exported symbols from global symbol table
+            for sym in &mod_obj.exported_symbols {
+                self.global_symbol_table.remove(&sym.name);
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn dispatch_module_event(&mut self, module_name: &str, event: ModuleEvent) -> Result<(), &'static str> {
+        let mod_obj = self.loaded_modules.get_mut(module_name).ok_or("Module not found")?;
+        mod_obj.event_log.push(event);
+        match event {
+            ModuleEvent::Quiesce => {
+                if mod_obj.state == ModuleState::Live {
+                    mod_obj.state = ModuleState::Unloading;
+                }
+            }
+            ModuleEvent::Shutdown => {
+                mod_obj.state = ModuleState::Unloaded;
+                mod_obj.is_loaded = false;
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
+    pub fn get_symbol(&self, name: &str, caller_is_gpl: bool) -> Result<u64, &'static str> {
+        let sym = self.global_symbol_table.get(name).ok_or("Symbol not found in kernel symbol table")?;
+        if sym.is_gpl_only && !caller_is_gpl {
+            return Err("Symbol access denied: EXPORT_SYMBOL_GPL symbol requested by non-GPL module");
+        }
+        Ok(sym.address)
+    }
+
+    pub fn get_param(&self, module_name: &str, param_name: &str) -> Result<String, &'static str> {
+        let mod_obj = self.loaded_modules.get(module_name).ok_or("Module not found")?;
+        let param = mod_obj.parameters.get(param_name).ok_or("Module parameter not found")?;
+        Ok(param.value.clone())
+    }
+
+    pub fn set_param(&mut self, module_name: &str, param_name: &str, new_val: &str) -> Result<(), &'static str> {
+        let mod_obj = self.loaded_modules.get_mut(module_name).ok_or("Module not found")?;
+        let param = mod_obj.parameters.get_mut(param_name).ok_or("Module parameter not found")?;
+        if (param.perm_mask & 0o200) == 0 {
+            return Err("Permission denied: module parameter is read-only");
+        }
+        param.value = new_val.to_string();
+        Ok(())
+    }
+
+    pub fn get_ref_count(&self, name: &str) -> Result<usize, &'static str> {
+        let mod_obj = self.loaded_modules.get(name).ok_or("Module not found")?;
+        Ok(mod_obj.ref_count)
+    }
+
+    pub fn get_module_state(&self, name: &str) -> Result<ModuleState, &'static str> {
+        let mod_obj = self.loaded_modules.get(name).ok_or("Module not found")?;
+        Ok(mod_obj.state)
+    }
+
+    pub fn inc_ref_count(&mut self, name: &str) -> Result<usize, &'static str> {
+        let mod_obj = self.loaded_modules.get_mut(name).ok_or("Module not found")?;
+        mod_obj.ref_count += 1;
+        Ok(mod_obj.ref_count)
+    }
+
+    pub fn dec_ref_count(&mut self, name: &str) -> Result<usize, &'static str> {
+        let mod_obj = self.loaded_modules.get_mut(name).ok_or("Module not found")?;
+        if mod_obj.ref_count == 0 {
+            return Err("Reference count underflow");
+        }
+        mod_obj.ref_count -= 1;
+        Ok(mod_obj.ref_count)
+    }
+
+    pub fn register_syscall_hook(&mut self, syscall_id: u32, hook_owner: &str) -> Result<(), &'static str> {
         if let Some(owner) = self.sys_call_hooks.get(&syscall_id) {
             if owner != hook_owner {
                 return Err("Syscall hijack blocked: unauthorized hook attempt detected");
@@ -2352,6 +2545,113 @@ mod tests {
 
         assert!(loader.register_syscall_hook(101, "signed-core").is_ok());
         assert!(loader.register_syscall_hook(101, "rogue-hook").is_err());
+    }
+
+    #[test]
+    fn test_lkm_loader_lifecycle_and_events() {
+        let mut loader = DynamicLkmLoader::new();
+
+        let mut core_mod = KernelModule::new("e1000e", true);
+        core_mod.version = "2.1.0".to_string();
+
+        assert!(loader.load_module_with_dependencies(core_mod, b"pqc_dilithium_sig").is_ok());
+        assert_eq!(loader.get_module_state("e1000e").unwrap(), ModuleState::Live);
+
+        assert!(loader.dispatch_module_event("e1000e", ModuleEvent::Quiesce).is_ok());
+        assert_eq!(loader.get_module_state("e1000e").unwrap(), ModuleState::Unloading);
+
+        // Reset to live then unload
+        if let Some(m) = loader.loaded_modules.get_mut("e1000e") {
+            m.state = ModuleState::Live;
+        }
+
+        assert!(loader.unload_module("e1000e").is_ok());
+        assert!(loader.get_module_state("e1000e").is_err());
+    }
+
+    #[test]
+    fn test_lkm_loader_refcounts_and_dependents() {
+        let mut loader = DynamicLkmLoader::new();
+
+        let core_mod = KernelModule::new("net_core", true);
+        assert!(loader.load_module_with_dependencies(core_mod, b"sig_net_core").is_ok());
+
+        let mut drv_mod = KernelModule::new("e1000e", true);
+        drv_mod.dependencies.push("net_core".to_string());
+        assert!(loader.load_module_with_dependencies(drv_mod, b"sig_e1000e").is_ok());
+
+        // net_core ref_count should be 1
+        assert_eq!(loader.get_ref_count("net_core").unwrap(), 1);
+
+        // Unloading net_core directly should fail because e1000e depends on it and ref_count > 0
+        assert!(loader.unload_module("net_core").is_err());
+
+        // Unloading dependent e1000e succeeds and decrements net_core ref_count
+        assert!(loader.unload_module("e1000e").is_ok());
+        assert_eq!(loader.get_ref_count("net_core").unwrap(), 0);
+
+        // Now unloading net_core succeeds
+        assert!(loader.unload_module("net_core").is_ok());
+    }
+
+    #[test]
+    fn test_lkm_loader_symbol_resolution_and_gpl() {
+        let mut loader = DynamicLkmLoader::new();
+
+        let mut core_mod = KernelModule::new("core_crypto", true);
+        core_mod.exported_symbols.push(KernelSymbol {
+            name: "crypto_sha256_hash".to_string(),
+            address: 0xffffffff81001000,
+            exporting_module: "core_crypto".to_string(),
+            is_gpl_only: false,
+        });
+        core_mod.exported_symbols.push(KernelSymbol {
+            name: "crypto_internal_pqc_key".to_string(),
+            address: 0xffffffff81002000,
+            exporting_module: "core_crypto".to_string(),
+            is_gpl_only: true,
+        });
+
+        assert!(loader.load_module_with_dependencies(core_mod, b"sig_crypto").is_ok());
+
+        // Non-GPL caller can access standard EXPORT_SYMBOL
+        assert_eq!(loader.get_symbol("crypto_sha256_hash", false).unwrap(), 0xffffffff81001000);
+
+        // Non-GPL caller blocked from EXPORT_SYMBOL_GPL
+        assert!(loader.get_symbol("crypto_internal_pqc_key", false).is_err());
+
+        // GPL caller can access EXPORT_SYMBOL_GPL
+        assert_eq!(loader.get_symbol("crypto_internal_pqc_key", true).unwrap(), 0xffffffff81002000);
+    }
+
+    #[test]
+    fn test_lkm_loader_module_parameters() {
+        let mut loader = DynamicLkmLoader::new();
+
+        let mut wifi_mod = KernelModule::new("iwlwifi", true);
+        wifi_mod.parameters.insert("power_save".to_string(), ModuleParam {
+            name: "power_save".to_string(),
+            param_type: "bool".to_string(),
+            value: "1".to_string(),
+            perm_mask: 0o644,
+        });
+        wifi_mod.parameters.insert("hw_id".to_string(), ModuleParam {
+            name: "hw_id".to_string(),
+            param_type: "uint".to_string(),
+            value: "0x8086".to_string(),
+            perm_mask: 0o444, // Read-only
+        });
+
+        assert!(loader.load_module_with_dependencies(wifi_mod, b"sig_iwlwifi").is_ok());
+
+        assert_eq!(loader.get_param("iwlwifi", "power_save").unwrap().as_str(), "1");
+
+        // Write to writable param succeeds
+        assert!(loader.set_param("iwlwifi", "power_save", "0").is_ok());
+        assert_eq!(loader.get_param("iwlwifi", "power_save").unwrap().as_str(), "0");
+
+        // Write to read-only param fails
+        assert!(loader.set_param("iwlwifi", "hw_id", "0x1234").is_err());
     }
 
     #[test]

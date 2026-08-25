@@ -20,6 +20,9 @@ use std::vec::Vec;
     NetworkTcp = 0,
     FileRead = 1,
 use crate::security::capability::Permission;
+#[cfg(not(feature = "standalone_test"))]
+    SystemAdmin,
+    KernelModuleLoad,
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
