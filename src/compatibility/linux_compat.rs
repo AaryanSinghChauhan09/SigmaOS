@@ -3,9 +3,10 @@ extern crate alloc;
 /// SigmaOS Linux & BSD Distribution Compatibility & Userland Parity Subsystem (linux_compat)
 /// Linuxulator syscall translation, FreeBSD kqueue EVFILT multiplexing, OpenBSD pledge/unveil filtering, ProcFS, and ELF auxv loader.
 
-use crate::klib::BTreeMap as HashMap;
-use crate::klib::Vec;
+use alloc::collections::BTreeMap as HashMap;
+use alloc::format;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TargetDistro {
@@ -155,7 +156,7 @@ impl OpenBsdPledgeUnveilFilter {
             return true; // No unveil restrictions applied
         }
         if let Some(perms) = self.unveiled_paths.get(path) {
-            perms.contains(required_perm)
+            perms.as_str().contains(required_perm)
         } else {
             false
         }
