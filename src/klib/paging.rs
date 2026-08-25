@@ -7,7 +7,22 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
-#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageSize {
+    Standard4KB,
+    Huge2MB,
+    Giant1GB,
+}
+
+impl PageSize {
+    pub fn byte_size(&self) -> usize {
+        match self {
+            PageSize::Standard4KB => 4096,
+            PageSize::Huge2MB => 2 * 1024 * 1024,
+            PageSize::Giant1GB => 1024 * 1024 * 1024,
+        }
+    }
+}
 
 impl Clone for SimplePageTableEntry {
     fn clone(&self) -> Self {
@@ -459,11 +474,11 @@ impl VirtualMemoryManager for SimpleVMM {
             self.pml4.set_entry(pml4_idx, pdpt_entry);
         }
 
-        while self.pd_tables.len() <= pdpt_idx {
+        let pd_idx_in_vec = pml4_idx * 512 + pdpt_idx;
+        while self.pd_tables.len() <= pd_idx_in_vec {
             self.pd_tables.push(None);
         }
 
-        let pd_idx_in_vec = pml4_idx * 512 + pdpt_idx;
         if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
             if !pdpt.get_entry(pdpt_idx).is_present() {
                 let pd_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
@@ -474,21 +489,14 @@ impl VirtualMemoryManager for SimpleVMM {
                 pd_entry.set_physical_address(pd_phys);
 
                 let pd_table = SimplePageTable::new(pd_phys);
-                if pd_idx_in_vec >= self.pd_tables.len() {
-                    while self.pd_tables.len() <= pd_idx_in_vec {
-                        self.pd_tables.push(None);
-                    }
-                }
                 self.pd_tables[pd_idx_in_vec] = Some(pd_table);
                 pdpt.set_entry(pdpt_idx, pd_entry);
             }
         }
 
-        let pd_idx_in_vec = pdpt_idx;
-        if pd_idx_in_vec >= self.pd_tables.len() {
-            while self.pd_tables.len() <= pd_idx_in_vec {
-                self.pd_tables.push(None);
-            }
+        let pt_idx_in_vec = pd_idx_in_vec * 512 + pd_idx;
+        while self.pt_tables.len() <= pt_idx_in_vec {
+            self.pt_tables.push(None);
         }
 
         if self.pt_tables[pt_idx_in_vec].is_none() {
