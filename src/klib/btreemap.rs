@@ -97,6 +97,30 @@ where
         self.get(key).is_some()
     }
 
+    pub fn contains_key_str(&self, key: &str) -> bool
+    where
+        K: core::convert::AsRef<str>,
+    {
+        for (k, _) in self.entries.iter() {
+            if k.as_ref() == key {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn get_mut_str(&mut self, key: &str) -> Option<&mut V>
+    where
+        K: core::convert::AsRef<str>,
+    {
+        for (k, v) in self.entries.iter_mut() {
+            if k.as_ref() == key {
+                return Some(v);
+            }
+        }
+        None
+    }
+
     pub fn len(&self) -> usize {
         self.entries.len()
     }
