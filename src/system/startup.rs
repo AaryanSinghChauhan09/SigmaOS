@@ -19,6 +19,8 @@
 // SigmaOS Startup Optimizer
 // OOP-based startup process optimization with dependency analysis
 
+extern crate alloc;
+
 #[cfg(not(test))]
 use crate::klib::BTreeMap;
 

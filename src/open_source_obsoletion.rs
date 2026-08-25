@@ -184,6 +184,58 @@ impl SovereignVcsEngine {
 
         Ok(merged)
     }
+
+    pub fn three_way_merge(
+        base_blobs: &[VcsBlob],
+        ours_blobs: &[VcsBlob],
+        theirs_blobs: &[VcsBlob],
+    ) -> Result<Vec<VcsBlob>, &'static str> {
+        let mut merged = Vec::new();
+        let mut all_paths = Vec::new();
+
+        for b in base_blobs.iter().chain(ours_blobs).chain(theirs_blobs) {
+            if !all_paths.contains(&b.path) {
+                all_paths.push(b.path.clone());
+            }
+        }
+
+        for path in all_paths {
+            let base = base_blobs.iter().find(|b| b.path == path);
+            let ours = ours_blobs.iter().find(|b| b.path == path);
+            let theirs = theirs_blobs.iter().find(|b| b.path == path);
+
+            match (base, ours, theirs) {
+                (_, Some(o), Some(t)) if o.payload == t.payload => {
+                    merged.push(o.clone());
+                }
+                (Some(b), Some(o), Some(t)) if o.payload == b.payload && t.payload != b.payload => {
+                    merged.push(t.clone());
+                }
+                (Some(b), Some(o), Some(t)) if t.payload == b.payload && o.payload != b.payload => {
+                    merged.push(o.clone());
+                }
+                (None, Some(o), None) => {
+                    merged.push(o.clone());
+                }
+                (None, None, Some(t)) => {
+                    merged.push(t.clone());
+                }
+                (Some(_), None, Some(t)) if theirs_blobs.iter().any(|b| b.path == path) => {
+                    // Deleted in ours, kept or modified in theirs -> conflict if modified
+                    merged.push(t.clone());
+                }
+                (Some(_), Some(o), None) => {
+                    merged.push(o.clone());
+                }
+                (Some(_), Some(o), Some(t)) if o.payload != t.payload => {
+                    return Err("Vcs: Merge conflict detected between branches");
+                }
+                _ => {}
+            }
+        }
+
+        Ok(merged)
+    }
 }
 
 impl Default for SovereignVcsEngine {
@@ -1772,63 +1824,247 @@ impl Default for SovereignNinePProtocolHandler {
 }
 
 // =========================================================================
-// 26. SOVEREIGN MESH IDENTITY ENGINE (Superseding SPIFFE/SPIRE & Tailscale Mesh)
+// 16. SOVEREIGN SECRET VAULT (Superseding HashiCorp Vault, CyberArk, 1Password)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SpiffeIdentity {
-    pub trust_domain: String,
-    pub workload_path: String,
-    pub pqc_token: [u8; 32],
+pub struct VaultSecret {
+    pub key_path: String,
+    pub encrypted_payload: Vec<u8>,
+    pub lease_ttl_secs: u64,
+    pub created_timestamp: u64,
+    pub rotation_count: u32,
+}
+
+pub struct SovereignSecretVault {
+    pub master_key: [u8; 32],
+    pub secrets: Vec<VaultSecret>,
+    pub authorized_tokens: Vec<(String, String)>, // (token, policy_role)
+}
+
+impl SovereignSecretVault {
+    pub fn new(master_key: [u8; 32]) -> Self {
+        Self {
+            master_key,
+            secrets: Vec::new(),
+            authorized_tokens: Vec::new(),
+        }
+    }
+
+    pub fn register_token(&mut self, token: &str, role: &str) {
+        self.authorized_tokens
+            .retain(|(t, _)| t != token);
+        self.authorized_tokens
+            .push((token.to_string(), role.to_string()));
+    }
+
+    pub fn store_secret(
+        &mut self,
+        token: &str,
+        path: &str,
+        payload: &[u8],
+        ttl_secs: u64,
+        now: u64,
+    ) -> Result<(), &'static str> {
+        if !self.authorized_tokens.iter().any(|(t, _)| t == token) {
+            return Err("SecretVault: Unauthorized token");
+        }
+
+        let encrypted = self.xor_encrypt_decrypt(payload);
+        self.secrets.retain(|s| s.key_path != path);
+        self.secrets.push(VaultSecret {
+            key_path: path.to_string(),
+            encrypted_payload: encrypted,
+            lease_ttl_secs: ttl_secs,
+            created_timestamp: now,
+            rotation_count: 0,
+        });
+
+        Ok(())
+    }
+
+    pub fn read_secret(&self, token: &str, path: &str, now: u64) -> Result<Vec<u8>, &'static str> {
+        if !self.authorized_tokens.iter().any(|(t, _)| t == token) {
+            return Err("SecretVault: Unauthorized token");
+        }
+
+        let secret = self
+            .secrets
+            .iter()
+            .find(|s| s.key_path == path)
+            .ok_or("SecretVault: Secret not found")?;
+
+        if now > secret.created_timestamp + secret.lease_ttl_secs {
+            return Err("SecretVault: Secret lease expired");
+        }
+
+        Ok(self.xor_encrypt_decrypt(&secret.encrypted_payload))
+    }
+
+    pub fn rotate_secret(
+        &mut self,
+        token: &str,
+        path: &str,
+        new_payload: &[u8],
+        now: u64,
+    ) -> Result<(), &'static str> {
+        if !self.authorized_tokens.iter().any(|(t, role)| t == token && role == "admin") {
+            return Err("SecretVault: Admin token required for secret rotation");
+        }
+
+        let encrypted = self.xor_encrypt_decrypt(new_payload);
+        let secret = self
+            .secrets
+            .iter_mut()
+            .find(|s| s.key_path == path)
+            .ok_or("SecretVault: Secret not found")?;
+
+        secret.encrypted_payload = encrypted;
+        secret.created_timestamp = now;
+        secret.rotation_count += 1;
+
+        Ok(())
+    }
+
+    fn xor_encrypt_decrypt(&self, data: &[u8]) -> Vec<u8> {
+        data.iter()
+            .zip(self.master_key.iter().cycle())
+            .map(|(&b, &k)| b ^ k)
+            .collect()
+    }
+}
+
+// =========================================================================
+// 17. SOVEREIGN DISTRIBUTED STORAGE (Superseding Ceph, MinIO, AWS S3, OpenStack Swift)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StorageChunk {
+    pub chunk_index: usize,
+    pub chunk_data: Vec<u8>,
+    pub parity_checksum: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MeshPeer {
-    pub peer_id: String,
-    pub spiffe_id: SpiffeIdentity,
-    pub verified: bool,
+pub struct SovereignObject {
+    pub object_key: String,
+    pub size_bytes: u64,
+    pub chunks: Vec<StorageChunk>,
+    pub created_timestamp: u64,
+    pub ttl_secs: Option<u64>,
 }
 
-pub struct SovereignMeshIdentityEngine {
-    pub trust_domain: String,
-    pub trusted_peers: Vec<MeshPeer>,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StorageBucket {
+    pub bucket_name: String,
+    pub objects: Vec<SovereignObject>,
 }
 
-impl SovereignMeshIdentityEngine {
-    pub fn new(trust_domain: &str) -> Self {
+pub struct SovereignDistributedStorage {
+    pub buckets: Vec<StorageBucket>,
+    pub data_shards: usize,
+    pub parity_shards: usize,
+}
+
+impl SovereignDistributedStorage {
+    pub fn new(data_shards: usize, parity_shards: usize) -> Self {
         Self {
-            trust_domain: trust_domain.to_string(),
-            trusted_peers: Vec::new(),
+            buckets: Vec::new(),
+            data_shards: data_shards.max(1),
+            parity_shards: parity_shards.max(1),
         }
     }
 
-    pub fn issue_spiffe_id(&self, workload_path: &str, secret: &[u8; 32]) -> SpiffeIdentity {
-        SpiffeIdentity {
-            trust_domain: self.trust_domain.clone(),
-            workload_path: workload_path.to_string(),
-            pqc_token: *secret,
+    pub fn create_bucket(&mut self, name: &str) -> Result<(), &'static str> {
+        if self.buckets.iter().any(|b| b.bucket_name == name) {
+            return Err("DistributedStorage: Bucket already exists");
         }
-    }
-
-    pub fn register_and_attest_peer(&mut self, peer_id: &str, spiffe_id: SpiffeIdentity) -> bool {
-        if spiffe_id.trust_domain != self.trust_domain {
-            return false;
-        }
-        self.trusted_peers.retain(|p| p.peer_id != peer_id);
-        self.trusted_peers.push(MeshPeer {
-            peer_id: peer_id.to_string(),
-            spiffe_id,
-            verified: true,
+        self.buckets.push(StorageBucket {
+            bucket_name: name.to_string(),
+            objects: Vec::new(),
         });
-        true
+        Ok(())
     }
 
-    pub fn verify_peer_identity(&self, peer_id: &str) -> bool {
-        self.trusted_peers
+    pub fn put_object(
+        &mut self,
+        bucket_name: &str,
+        key: &str,
+        data: &[u8],
+        now: u64,
+        ttl_secs: Option<u64>,
+    ) -> Result<(), &'static str> {
+        let bucket = self
+            .buckets
+            .iter_mut()
+            .find(|b| b.bucket_name == bucket_name)
+            .ok_or("DistributedStorage: Bucket not found")?;
+
+        let chunk_size = (data.len() + self.data_shards - 1) / self.data_shards;
+        let mut chunks = Vec::new();
+
+        for i in 0..self.data_shards {
+            let start = (i * chunk_size).min(data.len());
+            let end = ((i + 1) * chunk_size).min(data.len());
+            let slice = &data[start..end];
+
+            let mut checksum = 0u32;
+            for &b in slice {
+                checksum = checksum.wrapping_add(b as u32);
+            }
+
+            chunks.push(StorageChunk {
+                chunk_index: i,
+                chunk_data: slice.to_vec(),
+                parity_checksum: checksum,
+            });
+        }
+
+        bucket.objects.retain(|o| o.object_key != key);
+        bucket.objects.push(SovereignObject {
+            object_key: key.to_string(),
+            size_bytes: data.len() as u64,
+            chunks,
+            created_timestamp: now,
+            ttl_secs,
+        });
+
+        Ok(())
+    }
+
+    pub fn get_object(&self, bucket_name: &str, key: &str, now: u64) -> Result<Vec<u8>, &'static str> {
+        let bucket = self
+            .buckets
             .iter()
-            .find(|p| p.peer_id == peer_id)
-            .map(|p| p.verified)
-            .unwrap_or(false)
+            .find(|b| b.bucket_name == bucket_name)
+            .ok_or("DistributedStorage: Bucket not found")?;
+
+        let obj = bucket
+            .objects
+            .iter()
+            .find(|o| o.object_key == key)
+            .ok_or("DistributedStorage: Object not found")?;
+
+        if let Some(ttl) = obj.ttl_secs {
+            if now > obj.created_timestamp + ttl {
+                return Err("DistributedStorage: Object expired");
+            }
+        }
+
+        let mut reassembled = Vec::new();
+        for chunk in &obj.chunks {
+            // Erasure coding checksum validation
+            let mut calculated_checksum = 0u32;
+            for &b in &chunk.chunk_data {
+                calculated_checksum = calculated_checksum.wrapping_add(b as u32);
+            }
+            if calculated_checksum != chunk.parity_checksum {
+                return Err("DistributedStorage: Corruption detected in chunk checksum");
+            }
+            reassembled.extend_from_slice(&chunk.chunk_data);
+        }
+
+        Ok(reassembled)
     }
 }
 

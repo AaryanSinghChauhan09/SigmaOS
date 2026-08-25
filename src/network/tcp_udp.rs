@@ -3,6 +3,12 @@ use core::mem;
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
+//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type SocketID = usize;
@@ -148,12 +154,16 @@ pub trait TCPConnection {
 
 impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
-        self.remote_port
-            .store(remote_port as usize, Ordering::SeqCst);
-        self.state
-            .store(TCPState::SynSent as usize, Ordering::SeqCst);
-        self.state
-            .store(TCPState::Established as usize, Ordering::SeqCst);
+        let current = self.get_state();
+        if current != TCPState::Closed && current != TCPState::Listen {
+            return Err(NetworkError::ConnectionFailed);
+        }
+
+        self.remote_port.store(remote_port as u32, Ordering::SeqCst);
+
+        // Transition: Closed -> SynSent -> Established
+        self.state.store(TCPState::SynSent as u32, Ordering::SeqCst);
+        self.state.store(TCPState::Established as u32, Ordering::SeqCst);
         Ok(())
     }
     fn listen(&mut self) -> Result<(), NetworkError> {
@@ -630,16 +640,20 @@ impl Default for SimpleNetworkStack {
     }
 }
 
-impl SimpleNetworkStack {
-    pub fn new() -> Self {
-        SimpleNetworkStack {
-            sockets: Vec::new(),
-            next_id: AtomicUsize::new(1),
-            firewall: SimpleFirewall::new(),
-            congestion: RenoCongestionControl::new(),
-            netfilter: NetfilterFirewall::new(),
-            routing_table: RoutingTable::new(),
-            interfaces: Vec::new(),
+impl NetworkStack for SimpleNetworkStack {
+    fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
+        let id = self.next_id.fetch_add(1, Ordering::SeqCst) as usize;
+        let socket = SimpleSocket::new(id, protocol, port);
+        self.sockets.push(Box::new(socket));
+        Ok(id)
+    }
+
+    fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
+        if let Some(pos) = self.sockets.iter().position(|s: &Box<dyn Socket>| s.id() == id) {
+            self.sockets.remove(pos);
+            Ok(())
+        } else {
+            Err(NetworkError::InvalidSocket)
         }
     }
 }

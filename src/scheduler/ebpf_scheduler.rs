@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 /// Scheduling policy types
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SchedulingPolicy {
     Mlfq,           // Multi-level feedback queue
     Cfs,            // Completely fair scheduler
@@ -21,12 +21,23 @@ pub enum SchedulingPolicy {
 }
 
 /// eBPF program configuration
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct BpfProgram {
     pub name: String,
     pub bytecode: Vec<u8>,
     pub map_descriptors: Vec<BpfMapDescriptor>,
     pub loaded: AtomicBool,
+}
+
+impl Clone for BpfProgram {
+    fn clone(&self) -> Self {
+        Self {
+            name: self.name.clone(),
+            bytecode: self.bytecode.clone(),
+            map_descriptors: self.map_descriptors.clone(),
+            loaded: AtomicBool::new(self.loaded.load(Ordering::Relaxed)),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -69,10 +80,8 @@ impl SchedExtScheduler {
     }
     
     pub fn load_policy(&mut self, policy: SchedulingPolicy) -> Result<(), SchedError> {
-        self.scheduling_policy = policy;
-        
         // Load appropriate eBPF program based on policy
-        match policy {
+        match &policy {
             SchedulingPolicy::Mlfq => {
                 self.load_mlfq_program()?;
             }
@@ -82,11 +91,13 @@ impl SchedExtScheduler {
             SchedulingPolicy::Edf => {
                 self.load_edf_program()?;
             }
-            SchedulingPolicy::Custom(name) => {
-                self.load_custom_program(&name)?;
+            SchedulingPolicy::Custom(ref name) => {
+                self.load_custom_program(name)?;
             }
             _ => {}
         }
+
+        self.scheduling_policy = policy;
         
         Ok(())
     }
@@ -195,7 +206,7 @@ impl SchedExtScheduler {
     }
     
     pub fn get_scheduling_policy(&self) -> SchedulingPolicy {
-        self.scheduling_policy
+        self.scheduling_policy.clone()
     }
 }
 

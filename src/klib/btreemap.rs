@@ -26,6 +26,32 @@ where
     }
 }
 
+impl<K, V> PartialEq for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: PartialEq + Clone,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.entries == other.entries
+    }
+}
+
+impl<K, V> Eq for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord + Eq,
+    V: PartialEq + Clone + Eq,
+{}
+
+impl<K, V> core::fmt::Debug for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord + core::fmt::Debug,
+    V: Clone + core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_map().entries(self.iter()).finish()
+    }
+}
+
 impl<K, V> BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -146,6 +172,52 @@ where
             entries: &self.entries,
             idx: 0,
         }
+    }
+
+    pub fn iter_mut(&mut self) -> BTreeMapIterMut<'_, K, V> {
+        BTreeMapIterMut {
+            entries: &mut self.entries,
+            idx: 0,
+        }
+    }
+}
+
+pub struct BTreeMapIterMut<'a, K, V> {
+    entries: &'a mut Vec<(K, V)>,
+    idx: usize,
+}
+
+impl<'a, K, V> Iterator for BTreeMapIterMut<'a, K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = (&'a K, &'a mut V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.idx < self.entries.len() {
+            let ptr = self.entries.as_mut_ptr();
+            unsafe {
+                let item = &mut *ptr.add(self.idx);
+                self.idx += 1;
+                Some((&item.0, &mut item.1))
+            }
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, K, V> IntoIterator for &'a mut BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = (&'a K, &'a mut V);
+    type IntoIter = BTreeMapIterMut<'a, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
 

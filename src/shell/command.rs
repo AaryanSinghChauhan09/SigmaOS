@@ -461,9 +461,11 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn unregister(&mut self, name: &[u8]) -> Result<(), CommandError> {
+        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
+        let name_slice = &name[..name_len];
         for i in 0..self.commands.len() {
             if let Some(Some(ref cmd)) = self.commands.get(i) {
-                if cmd.name() == name {
+                if cmd.name() == name_slice {
                     if let Some(slot) = self.commands.get_mut(i) {
                         *slot = None;
                     }
@@ -475,9 +477,11 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
+        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
+        let name_slice = &name[..name_len];
         for i in 0..self.commands.len() {
             if let Some(Some(ref command)) = self.commands.get(i) {
-                if command.name() == name {
+                if command.name() == name_slice {
                     return Some(command.as_ref());
                 }
             }
@@ -536,7 +540,11 @@ impl ShellSession for SimpleShellSession {
 
         if let Some(command) = self.registry.get(trimmed_name) {
             let mut cmd = SimpleShellCommand::new(command.name(), command.help());
-            let slice = unsafe { core::slice::from_raw_parts(args.data, args.len) };
+            let slice = if args.data.is_null() || args.len == 0 {
+                &[]
+            } else {
+                unsafe { core::slice::from_raw_parts(args.data, args.len) }
+            };
             cmd.execute(slice)
         } else {
             Err(CommandError::NotFound)

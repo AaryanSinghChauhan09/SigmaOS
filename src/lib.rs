@@ -33,6 +33,10 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
+pub mod process;
+pub mod runtime;
+pub mod community;
+pub mod memory;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
@@ -69,9 +73,7 @@ pub mod toolchain {
     pub mod capsule;
     pub mod codex;
 }
-pub mod scheduler {
-    pub mod numa_scheduler;
-}
+pub mod scheduler;
 pub mod crypto {
     pub mod vectorized_pqc;
 }
@@ -247,6 +249,12 @@ pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
+pub use remote::{
+    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
+    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    SimpleShellManager,
+};
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
     PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
@@ -338,4 +346,12 @@ pub use tools::{
 };
 
 pub mod open_source_obsoletion;
+pub mod ipc;
+pub mod audio;
+pub mod access;
+pub mod system;
+pub mod event;
+pub mod loader;
+pub mod app;
+pub mod auth;
 pub use open_source_obsoletion::*;

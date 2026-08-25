@@ -43,24 +43,40 @@ pub enum ContainerState {
     Failed = 4,
 }
 
-/// Container trait (OOP interface)
-pub trait Container {
-    /// Get container ID
-    fn id(&self) -> ContainerID;
-    /// Get container name
-    fn name(&self) -> &[u8];
-    /// Start container
-    fn start(&mut self) -> Result<(), ContainerError>;
-    /// Stop container
-    fn stop(&mut self) -> Result<(), ContainerError>;
-    /// Pause container
-    fn pause(&mut self) -> Result<(), ContainerError>;
-    /// Resume container
-    fn resume(&mut self) -> Result<(), ContainerError>;
-    /// Get container state
-    fn state(&self) -> ContainerState;
-    /// Get container info
-    fn info(&self) -> ContainerInfo;
+/// Container capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
+}
+
+impl ContainerCapability {
+    pub const fn new() -> Self {
+        ContainerCapability {
+            can_start: false,
+            can_stop: false,
+            can_pause: false,
+            can_modify: false,
+        }
+    }
+
+    pub const fn full() -> Self {
+        ContainerCapability {
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
+            can_modify: true,
+        }
+    }
+}
+
+impl Default for ContainerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Container error types
@@ -103,6 +119,26 @@ impl ContainerInfo {
             capability: RuntimeCapability::new(),
         }
     }
+}
+
+/// Container trait (OOP interface)
+pub trait Container {
+    /// Get container ID
+    fn id(&self) -> ContainerID;
+    /// Get container name
+    fn name(&self) -> &[u8];
+    /// Start container
+    fn start(&mut self) -> Result<(), ContainerError>;
+    /// Stop container
+    fn stop(&mut self) -> Result<(), ContainerError>;
+    /// Pause container
+    fn pause(&mut self) -> Result<(), ContainerError>;
+    /// Resume container
+    fn resume(&mut self) -> Result<(), ContainerError>;
+    /// Get container state
+    fn state(&self) -> ContainerState;
+    /// Get container info
+    fn info(&self) -> ContainerInfo;
 }
 
 /// Container network configuration type
@@ -840,6 +876,19 @@ mod tests {
     use super::*;
     use alloc::string::ToString;
     use alloc::vec;
+
+    #[test]
+    fn test_container_creation() {
+        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
+        let id = runtime
+            .create_container(
+                b"sovereign_container",
+                b"ubuntu-pqc",
+                ContainerCapability::full(),
+            )
+            .unwrap();
+        assert_eq!(id, 1);
+    }
 
     #[test]
     fn test_overlayfs_stacking() {

@@ -99,9 +99,10 @@ impl ProcessSupervisor {
     /// Start a process
     pub fn start_process(&mut self, name: &str) -> Result<(), SupervisorError> {
         if let Some(config) = self.processes.get(name) {
+            let pid_offset = self.process_status.len() as u32;
             if let Some(status) = self.process_status.get_mut(name) {
                 status.state = ProcessState::Running;
-                status.pid = Some(1000 + self.process_status.len() as u32); // Simulated PID
+                status.pid = Some(1000 + pid_offset); // Simulated PID
                 status.uptime = 0;
                 status.restart_count = 0;
             }

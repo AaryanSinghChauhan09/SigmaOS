@@ -3,13 +3,13 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
-
 use core::mem;
+use core::ptr::{self, NonNull};
+use core::sync::atomic::{AtomicUsize, Ordering};
+
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Unified representation of communication channels (OOP Abstraction)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -311,6 +311,8 @@ impl UnifiedPeripheral for DdeDeviceWrapper {
     }
 }
 
+/// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
+#[derive(Debug, Clone)]
 pub struct DeviceExtension {
     pub irq: u8,
     pub base_port: u16,
@@ -1587,4 +1589,141 @@ extern "C" {
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     malloc(size)
+}
+
+// ==========================================
+// Standalone unit tests
+// ==========================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_legacy_device_oop() {
+        let mut legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
+        assert_eq!(legacy.query_channel(), PortAddress::PortIO(0x3F8));
+        assert_eq!(legacy.read_byte(0).unwrap(), 0);
+        assert!(legacy.write_byte(0, 0xAA).is_ok());
+    }
+
+    #[test]
+    fn test_modern_device_oop() {
+        let modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
+        assert_eq!(
+            modern.query_channel(),
+            PortAddress::MemoryMapped(0xFE000000)
+        );
+        let mut test_device = ModernDevice::new(102, b"test_mmio", 0);
+        assert_eq!(test_device.read_byte(4).unwrap(), 0);
+        assert!(test_device.write_byte(4, 0xFF).is_ok());
+    }
+
+    #[test]
+    fn test_udf_interpreter_bytecode() {
+        let mut legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
+        let bytecode = [0x01, 0x00, 0x04, 0x03, 0x00, 0x02, 0x02, 0x08, 0x00, 0x04];
+        let interpreter = UdfInterpreter::new(&bytecode);
+        let mut regs = [5, 0, 0, 0];
+        let res = interpreter.execute(&mut legacy, &mut regs);
+        assert!(res.is_ok());
+        assert_eq!(regs[0], 0);
+    }
+
+    #[test]
+    fn test_dde_device_translation_wrapper() {
+        let mut dde_wrapper = DdeDeviceWrapper::new(201, b"linux_e1000", 0xFC000000, b"Linux");
+
+        assert_eq!(
+            dde_wrapper.query_channel(),
+            PortAddress::MemoryMapped(0xFC000000)
+        );
+        assert_eq!(dde_wrapper.info().vendor_id, 0x8086);
+        assert_eq!(dde_wrapper.info().device_id, 0x100e);
+
+        assert!(dde_wrapper.write_byte(0x10, 0x55).is_ok());
+        assert_eq!(dde_wrapper.read_byte(0x10).unwrap(), 0x55);
+
+        let test_buffer = [0xAA; 16];
+        assert!(dde_wrapper.write(&test_buffer).is_ok());
+
+        let mut read_buffer = [0u8; 16];
+        assert!(dde_wrapper.read(&mut read_buffer).is_ok());
+        assert_eq!(read_buffer, test_buffer);
+
+        assert_eq!(dde_wrapper.ioctl(0xFF, 0).unwrap(), 1);
+    }
+
+    #[test]
+    fn test_wdm_driver_lifecycle() {
+        let mut io_mgr = IoManager::new();
+
+        let driver_idx = io_mgr.normal_driver_installation_process(b"MySerialDriver", b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver").unwrap();
+        assert_eq!(io_mgr.active_drivers.len(), 1);
+
+        let driver = &mut io_mgr.active_drivers[driver_idx];
+        assert_eq!(&driver.driver_name[..14], b"MySerialDriver");
+        assert_eq!(&driver.registry_path[..66], b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver");
+
+        driver.unload_routine = Some(|_drv| {});
+
+        assert!(io_mgr.io_create_device(driver_idx, b"COM1", DeviceType::Character).is_ok());
+
+        let driver_updated = &io_mgr.active_drivers[driver_idx];
+        assert_eq!(driver_updated.device_objects.len(), 1);
+        assert_eq!(&driver_updated.device_objects[0].name[..4], b"COM1");
+        assert_eq!(driver_updated.device_objects[0].device_type, DeviceType::Character);
+
+        let ext = &mut io_mgr.active_drivers[driver_idx].device_objects[0].device_extension;
+        ext.irq = 4;
+        ext.base_port = 0x3F8;
+        ext.device_context[0] = 0xFF;
+
+        assert!(io_mgr.io_unload_driver(driver_idx).is_ok());
+
+        assert_eq!(io_mgr.active_drivers[driver_idx].device_objects.len(), 0);
+    }
+
+    #[test]
+    fn test_device_descriptors() {
+        let capability = DeviceCapability::full();
+        let desc = DeviceDescriptor::new(10, b"SerialTTY", DeviceType::Character, capability);
+        assert_eq!(desc.get_state(), DeviceState::Uninitialized);
+        desc.set_state(DeviceState::Ready);
+        assert_eq!(desc.get_state(), DeviceState::Ready);
+    }
+
+    #[test]
+    fn test_simple_block_device() {
+        let mut dev = SimpleBlockDevice::new(1, b"disk0", 4, 512);
+        assert_eq!(dev.info().vendor_id, 0x8086);
+        assert!(dev.init().is_ok());
+
+        let mut write_buf = [0u8; 512];
+        write_buf[0] = 0xAA;
+        assert!(dev.write_block(2, &write_buf).is_ok());
+
+        let mut read_buf = [0u8; 512];
+        assert!(dev.read_block(2, &mut read_buf).is_ok());
+        assert_eq!(read_buf[0], 0xAA);
+    }
+
+    #[test]
+    fn test_device_manager_autoprobe_and_params() {
+        let mut mgr = DeviceManager::new();
+
+        mgr.set_module_param(b"debug_level", 4);
+        assert_eq!(mgr.get_module_param(b"debug_level"), Some(4));
+        assert_eq!(mgr.get_module_param(b"non_existent"), None);
+
+        let entry = DriverProbeEntry {
+            vendor_id: 0x10EC,
+            device_id: 0x8168,
+            device_type: DeviceType::Network,
+        };
+        mgr.register_probe_match(entry);
+
+        assert!(mgr.auto_probe_and_bind(0x10EC, 0x8168, DeviceType::Network));
+        assert!(!mgr.auto_probe_and_bind(0xFFFF, 0xFFFF, DeviceType::Network));
+    }
 }

@@ -1,6 +1,8 @@
 // SigmaOS Cron Daemon - Linux-inspired task scheduler
 // Zero-dependency implementation of cron-like functionality
 
+extern crate alloc;
+
 use crate::klib::{BTreeMap, Vec};
 use alloc::string::String;
 
@@ -40,7 +42,7 @@ pub enum CronField {
 impl CronSchedule {
     /// Parse cron schedule string (e.g., "0 0 * * *")
     pub fn from_string(schedule: &str) -> Result<Self, CronError> {
-        let parts: core::vec::Vec<&str> = schedule.split_whitespace().collect();
+        let parts: alloc::vec::Vec<&str> = schedule.split_whitespace().collect();
         if parts.len() != 5 {
             return Err(CronError::InvalidFormat);
         }
@@ -72,7 +74,7 @@ impl CronField {
         }
 
         if field.contains('/') {
-            let parts: core::vec::Vec<&str> = field.split('/').collect();
+            let parts: alloc::vec::Vec<&str> = field.split('/').collect();
             if parts.len() != 2 {
                 return Err(CronError::InvalidField);
             }
@@ -82,7 +84,7 @@ impl CronField {
         }
 
         if field.contains('-') {
-            let parts: core::vec::Vec<&str> = field.split('-').collect();
+            let parts: alloc::vec::Vec<&str> = field.split('-').collect();
             if parts.len() != 2 {
                 return Err(CronError::InvalidField);
             }
@@ -92,14 +94,15 @@ impl CronField {
         }
 
         if field.contains(',') {
-            let parts: core::vec::Vec<&str> = field.split(',').collect();
+            let parts: alloc::vec::Vec<&str> = field.split(',').collect();
             if parts.len() > 8 {
                 return Err(CronError::InvalidField);
             }
             let mut values = [0u32; 8];
             let mut count = 0;
             for (i, part) in parts.iter().enumerate() {
-                values[i] = part.parse::<u32>().map_err(|_| CronError::InvalidField)?;
+                let p: &str = *part;
+                values[i] = p.parse::<u32>().map_err(|_| CronError::InvalidField)?;
                 count += 1;
             }
             return Ok(CronField::List(values, count));
@@ -189,8 +192,8 @@ impl CronDaemon {
     }
 
     /// Check and run jobs that are due
-    pub fn check_and_run(&mut self, current_time: u64) -> core::vec::Vec<String> {
-        let mut run_jobs = core::vec::Vec::new();
+    pub fn check_and_run(&mut self, current_time: u64) -> Vec<String> {
+        let mut run_jobs: Vec<String> = Vec::new();
 
         for (id, job) in self.jobs.iter_mut() {
             if !job.enabled {
@@ -204,7 +207,9 @@ impl CronDaemon {
                 // Calculate next run time (simplified - normally would parse cron schedule)
                 job.next_run = current_time + 60; // Default to 1 minute for now
                 
-                run_jobs.push(id.clone());
+                let id_str: &str = AsRef::<str>::as_ref(id);
+                let job_id: String = id_str.into();
+                run_jobs.push(job_id);
             }
         }
 

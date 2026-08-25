@@ -3,6 +3,8 @@ extern crate alloc;
 // Sovereign Sigpkg - Complete 20-Pillar Package, Build & Reproducibility System for SigmaOS
 // Inspired by Nix/Guix, Arch Linux, Debian, Fedora, FreeBSD Ports, and Alpine Linux
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -136,9 +138,17 @@ impl ReproducibleBuildContext {
         for (i, &b) in source_hash.iter().enumerate() {
             digest[i] = b ^ ((self.source_date_epoch as u8).wrapping_add(i as u8));
         }
+        let mut idx: usize = 0;
         for (k, v) in env_vars.iter() {
-            for (i, &b) in k.as_bytes().iter().chain(v.as_bytes().iter()).enumerate() {
-                digest[i % 32] ^= b;
+            let k_bytes: &[u8] = AsRef::<[u8]>::as_ref(k);
+            for &b in k_bytes {
+                digest[idx % 32] ^= b;
+                idx += 1;
+            }
+            let v_bytes: &[u8] = AsRef::<[u8]>::as_ref(v);
+            for &b in v_bytes {
+                digest[idx % 32] ^= b;
+                idx += 1;
             }
         }
         digest
@@ -183,7 +193,7 @@ impl SourceFirstBuilder {
     {
         if self.preference != BuildPreference::SourceOnly {
             if let Some(artifact) = self.binary_cache.get(derivation_hash) {
-                return Ok(artifact.clone());
+                return Ok(Vec::clone(artifact));
             }
             if self.preference == BuildPreference::BinaryOnly {
                 return Err("Binary cache miss and SourceOnly building is disabled");
@@ -475,7 +485,7 @@ impl LocalPackageProxyCache {
     {
         if let Some(bytes) = self.cached_downloads.get(url) {
             self.total_hits += 1;
-            return Ok(bytes.clone());
+            return Ok(Vec::clone(bytes));
         }
         self.total_misses += 1;
         let downloaded = download_fn()?;
@@ -592,7 +602,7 @@ impl UnifiedRuntimeManager {
     }
 
     pub fn get_runtime_version(&self, runtime: LanguageRuntime) -> Option<&str> {
-        self.active_runtimes.get(&runtime).map(|s| s.as_str())
+        self.active_runtimes.get(&runtime).map(|s: &String| s.as_str())
     }
 }
 

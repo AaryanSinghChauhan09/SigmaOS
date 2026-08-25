@@ -148,7 +148,7 @@ impl SystemConfigManager {
     }
 
     /// Create default configuration
-    fn create_default_config(&self, filename: &str) -> Result<(), ConfigError> {
+    fn create_default_config(&mut self, filename: &str) -> Result<(), ConfigError> {
         let default_entries = self.get_default_config(filename);
         self.configs.insert(filename.to_string(), default_entries);
         self.save_config(filename)

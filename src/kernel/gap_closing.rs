@@ -559,45 +559,102 @@ pub enum IrpMajorFunction {
     DeviceControl = 4, // equivalent to IOCTL
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceType {
+    Physical,
+    Functional,
+    Filter,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeviceObject {
+    pub device_type: DeviceType,
+    pub driver_name: &'static str,
+    pub next_device: Option<alloc::boxed::Box<DeviceObject>>,
+    pub attached_device: Option<alloc::boxed::Box<DeviceObject>>,
+}
+
+pub struct DriverObject {
+    pub driver_name: &'static str,
+    pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
+}
+
+pub fn io_attach_device_to_device_stack(source: &mut DeviceObject, target: &mut DeviceObject) {
+    source.next_device = Some(alloc::boxed::Box::new(target.clone()));
+}
+
+#[derive(Debug, Clone)]
+pub struct IrpStackLocation {
+    pub major_function: IrpMajorFunction,
+    pub ioctl_code: u32,
+}
+
+pub type CompletionRoutine = fn(&DeviceObject, &mut Irp) -> u32;
+
 pub struct Irp {
     pub major_function: IrpMajorFunction,
     pub ioctl_code: u32,
     pub system_buffer: Vec<u8>,
     pub status: u32, // Status codes (NTSTATUS/errno-like)
     pub current_stack_index: usize,
-    pub stack_locations: Vec<u8>,
+    pub stack_locations: Vec<IrpStackLocation>,
+    pub completion_routine: Option<CompletionRoutine>,
 }
 
 impl Irp {
-    pub fn new(major_function: IrpMajorFunction, buffer: Vec<u8>) -> Self {
+    pub fn new(major_function: IrpMajorFunction, ioctl_code: u32, system_buffer: Vec<u8>) -> Self {
         Self {
             major_function,
-            ioctl_code: 0,
-            system_buffer: buffer,
+            ioctl_code,
+            system_buffer,
             status: 0,
             current_stack_index: 0,
             stack_locations: Vec::new(),
+            completion_routine: None,
         }
     }
+
     pub fn new_with_stack(
         major_function: IrpMajorFunction,
-        _minor_function: u8,
-        buffer: Vec<u8>,
-        stack_locations: u8,
+        ioctl_code: u32,
+        system_buffer: Vec<u8>,
+        stack_count: usize,
     ) -> Self {
+        let mut stack_locations = Vec::new();
+        for _ in 0..stack_count {
+            stack_locations.push(IrpStackLocation {
+                major_function,
+                ioctl_code,
+            });
+        }
         Self {
             major_function,
-            ioctl_code: 0,
-            system_buffer: buffer,
+            ioctl_code,
+            system_buffer,
             status: 0,
-            current_stack_index: stack_locations as usize - 1,
-            stack_locations: vec![0; stack_locations as usize],
+            current_stack_index: if stack_count > 0 { stack_count - 1 } else { 0 },
+            stack_locations,
+            completion_routine: None,
         }
     }
-    pub fn set_completion_routine<F>(&mut self, _f: F) -> Result<(), &'static str> {
+
+    pub fn set_completion_routine(&mut self, routine: CompletionRoutine) -> Result<(), &'static str> {
+        self.completion_routine = Some(routine);
         Ok(())
     }
-    pub fn complete_request(&mut self, _status: u32) {}
+
+    pub fn complete_request(&mut self, status: u32) {
+        self.status = status;
+        if let Some(routine) = self.completion_routine {
+            let dummy_dev = DeviceObject {
+                device_type: DeviceType::Functional,
+                driver_name: "dummy",
+                next_device: None,
+                attached_device: None,
+            };
+            routine(&dummy_dev, self);
+        }
+    }
 }
 
 pub struct IrpHandler {

@@ -1,5 +1,9 @@
 extern crate alloc;
 use alloc::boxed::Box;
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+use std_alloc::boxed::Box;
+
 
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
@@ -653,16 +657,25 @@ mod tests {
         shell.execute_line(b"spy $SECRET_KEY").unwrap();
 
         // Inspect captured variable inside spy command
-        unsafe {
-            assert_eq!(&CAPTURED_BUF[..CAPTURED_LEN], b"sovereign_pass_123");
+        if let Some(ref cmd_box) = shell.commands[0] {
+            // Unsafe cast to access captured properties (extract data pointer from trait object)
+            let spy_ptr = (&**cmd_box) as *const dyn ShellCommand as *const () as *const SpyCommand;
+            unsafe {
+                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
+                assert_eq!(captured, b"sovereign_pass_123");
+            }
         }
 
         // 3. Setup and verify alias resolution
         shell.set_alias(b"reveal", b"spy");
         shell.execute_line(b"reveal $USER").unwrap();
 
-        unsafe {
-            assert_eq!(&CAPTURED_BUF[..CAPTURED_LEN], b"sovereign");
+        if let Some(ref cmd_box) = shell.commands[0] {
+            let spy_ptr = (&**cmd_box) as *const dyn ShellCommand as *const () as *const SpyCommand;
+            unsafe {
+                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
+                assert_eq!(captured, b"sovereign");
+            }
         }
 
         // 4. Remove alias

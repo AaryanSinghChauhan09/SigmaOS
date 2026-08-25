@@ -1,6 +1,9 @@
 // SigmaOS Shell Module
 pub mod alias_system;
 pub mod command;
+pub mod intelligent_terminal;
+pub mod kimi_code_agent;
+pub mod multicall;
 pub mod repl;
 pub mod terminal_emulator;
 

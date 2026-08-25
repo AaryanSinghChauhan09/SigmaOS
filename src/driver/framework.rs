@@ -56,6 +56,63 @@ pub trait Driver {
     fn unload(&mut self) -> Result<(), DriverError>;
 }
 
+pub trait StorageDriver: Driver {
+    fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
+    fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
+}
+
+pub trait NetworkDriver: Driver {
+    fn send_packet(&mut self, packet: &[u8]) -> Result<(), DriverError>;
+    fn receive_packet(&mut self, buf: &mut [u8]) -> Result<usize, DriverError>;
+}
+
+pub trait GraphicsDriver: Driver {
+    fn set_resolution(&mut self, width: u32, height: u32) -> Result<(), DriverError>;
+    fn flip_buffers(&mut self) -> Result<(), DriverError>;
+}
+
+pub trait InputDriver: Driver {
+    fn poll_events(&mut self) -> Result<usize, DriverError>;
+}
+
+// Concrete Driver Classes (OOP Implementation)
+
+pub struct SimpleDriver {
+    pub id: DriverID,
+    pub driver_type: DriverType,
+    pub state: AtomicUsize,
+}
+
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver {
+            id,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
+    }
+}
+
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.state.store(DriverState::Loaded as usize, Ordering::SeqCst);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        Ok(())
+    }
+}
+
 pub struct SimpleStorageDriver {
     id: DriverID,
     driver_type: DriverType,

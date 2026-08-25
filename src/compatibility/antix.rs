@@ -159,7 +159,7 @@ pub struct AntiXControlCentre {
 }
 
 impl AntiXControlCentre {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         AntiXControlCentre {
             low_mem_mode: false,
             power_save_active: false,

@@ -5,6 +5,11 @@ pub mod distro_schedulers;
 pub mod ebpf_scheduler;
 pub mod numa_scheduler;
 pub mod affinity;
+pub mod scheduler;
+pub mod process;
+pub mod eevdf;
+pub mod sovereign;
+pub mod energy_aware;
 
 pub use distro_schedulers::*;
 pub use ebpf_scheduler::{

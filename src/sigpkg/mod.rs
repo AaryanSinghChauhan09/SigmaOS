@@ -32,6 +32,16 @@ pub mod universal_engine;
 pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
+pub mod universal_adapter;
+pub mod sovereign_sigpkg;
+
+pub use zero_alloc_resolver::{
+    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
+};
+pub use universal_adapter::{
+    PackageFormatAdapter, UniversalPackageManager, AdapterError, DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
+};
+pub use sovereign_sigpkg::*;
 
 pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,

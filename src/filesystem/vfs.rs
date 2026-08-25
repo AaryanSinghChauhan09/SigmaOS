@@ -104,6 +104,7 @@ pub struct FilePermissions {
 
 impl FilePermissions {
     pub fn new(read: bool, write: bool, execute: bool) -> Self {
+        let mask = ((read as u8) << 2) | ((write as u8) << 1) | (execute as u8);
         Self {
             read,
             write,
@@ -122,6 +123,50 @@ impl FilePermissions {
             sticky: false,
             bsd_flags: BsdFileFlags::new(),
         }
+    }
+
+    pub fn from_mode_bits(mode: u32) -> Self {
+        let suid = (mode & 0o4000) != 0;
+        let sgid = (mode & 0o2000) != 0;
+        let sticky = (mode & 0o1000) != 0;
+        let owner_mask = ((mode >> 6) & 0o7) as u8;
+        let group_mask = ((mode >> 3) & 0o7) as u8;
+        let other_mask = (mode & 0o7) as u8;
+
+        Self {
+            read: (owner_mask & 0o4) != 0,
+            write: (owner_mask & 0o2) != 0,
+            execute: (owner_mask & 0o1) != 0,
+            suid,
+            sgid,
+            sticky,
+            owner_mask,
+            group_mask,
+            other_mask,
+        }
+    }
+
+    pub fn to_mode_bits(&self) -> u32 {
+        let mut mode = 0u32;
+        if self.suid { mode |= 0o4000; }
+        if self.sgid { mode |= 0o2000; }
+        if self.sticky { mode |= 0o1000; }
+        mode |= ((self.owner_mask as u32) & 0o7) << 6;
+        mode |= ((self.group_mask as u32) & 0o7) << 3;
+        mode |= (self.other_mask as u32) & 0o7;
+        mode
+    }
+
+    pub fn allows_owner(&self, req_mask: u8) -> bool {
+        (self.owner_mask & req_mask) == req_mask
+    }
+
+    pub fn allows_group(&self, req_mask: u8) -> bool {
+        (self.group_mask & req_mask) == req_mask
+    }
+
+    pub fn allows_other(&self, req_mask: u8) -> bool {
+        (self.other_mask & req_mask) == req_mask
     }
 
     pub fn all() -> Self {
@@ -618,7 +663,27 @@ mod tests {
     }
 
     #[test]
-    fn test_gated_read_write() {
+    fn test_file_permissions_octal_mode_bits() {
+        let perms = FilePermissions::from_mode_bits(0o4755);
+        assert!(perms.suid);
+        assert!(!perms.sgid);
+        assert!(!perms.sticky);
+        assert!(perms.allows_owner(0o4)); // read
+        assert!(perms.allows_owner(0o2)); // write
+        assert!(perms.allows_owner(0o1)); // execute
+        assert!(perms.allows_group(0o5)); // r-x
+        assert!(perms.allows_other(0o5)); // r-x
+        assert_eq!(perms.to_mode_bits(), 0o4755);
+
+        let sticky_perms = FilePermissions::from_mode_bits(0o1777);
+        assert!(!sticky_perms.suid);
+        assert!(!sticky_perms.sgid);
+        assert!(sticky_perms.sticky);
+        assert_eq!(sticky_perms.to_mode_bits(), 0o1777);
+    }
+
+    #[test]
+    fn test_zero_sized_read_write_optimization() {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         let fd = vfs.open_file(inode_id, 0).unwrap();

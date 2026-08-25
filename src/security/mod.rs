@@ -29,6 +29,11 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod qubes_isolation;
+
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+};
 
 pub use qubes_isolation::*;
 pub use root_improvement::*;
@@ -76,3 +81,4 @@ pub use vpn::{
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };
+pub use vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner};

@@ -38,7 +38,10 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod subsystem;
+pub mod traits;
+pub mod gap_closing;
+pub mod generation_manager;
+pub mod atomic_extended;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,

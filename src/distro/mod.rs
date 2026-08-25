@@ -27,6 +27,11 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
+pub mod transformation_engine;
+pub mod preseed;
+pub mod endeavour_os;
+pub mod linux_bsd_inspirations;
+pub mod ecosystem_dimensions;
 
 pub use linux_bsd_parity::{
     ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
