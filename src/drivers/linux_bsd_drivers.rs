@@ -1,6 +1,7 @@
 // SigmaOS Linux & BSD Inspired Advanced Drivers Subsystem
 // Zero-dependency, #![no_std] compliant, providing Linux evdev, FreeBSD DRM/KMS,
-// OpenBSD driver pledge/unveil sandboxing, NetBSD rump virtual drivers, and Linux URB USB transfer queues.
+// OpenBSD driver pledge/unveil sandboxing, NetBSD rump virtual drivers, Linux URB USB transfer queues,
+// Thunderbolt 4 PCIe tunneling, VirtIO 3D GPU acceleration, Ath10k Wi-Fi, I2C/SMBus sensors, and NetBSD GPIO/PWM.
 
 #![no_std]
 
@@ -314,126 +315,210 @@ impl LinuxUrbQueue {
 }
 
 // =========================================================================
-// 6. Universal Sovereign Peripheral Drivers & Device Manager
+// 6. Linux Thunderbolt 4 / USB4 Tunneling Controller
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceCategory {
-    Input,
-    Gpu,
-    Network,
-    Storage,
-    Audio,
+pub enum T4TunnelType {
+    Pcie,
+    DisplayPort,
+    Usb3,
 }
 
-pub struct SovereignInputDeviceDriver {
-    pub name: String,
-    pub is_bound: bool,
-    pub event_device: EvdevInputDevice,
+pub struct Thunderbolt4Controller {
+    pub port_id: u8,
+    pub is_connected: bool,
+    pub bandwidth_gbps: u32, // e.g. 40 Gbps
+    pub active_tunnels: Vec<T4TunnelType>,
 }
 
-impl SovereignInputDeviceDriver {
-    pub fn new(name: &str, vendor: u16, product: u16) -> Self {
+impl Thunderbolt4Controller {
+    pub fn new(port_id: u8) -> Self {
         Self {
-            name: name.to_string(),
-            is_bound: false,
-            event_device: EvdevInputDevice::new(name, vendor, product),
+            port_id,
+            is_connected: false,
+            bandwidth_gbps: 40,
+            active_tunnels: Vec::new(),
         }
     }
 
-    pub fn bind(&mut self) {
-        self.is_bound = true;
+    pub fn establish_tunnel(&mut self, tunnel: T4TunnelType) -> Result<(), &'static str> {
+        if !self.is_connected {
+            self.is_connected = true;
+        }
+        if self.active_tunnels.contains(&tunnel) {
+            return Err("Thunderbolt 4: Tunnel already active");
+        }
+        self.active_tunnels.push(tunnel);
+        Ok(())
     }
-}
 
-pub struct SovereignGpuDriver {
-    pub name: String,
-    pub is_bound: bool,
-    pub connector: FreeBsdDrmConnector,
-    pub vram_bytes: u64,
-}
-
-impl SovereignGpuDriver {
-    pub fn new(name: &str, vram_mb: u64) -> Self {
-        Self {
-            name: name.to_string(),
-            is_bound: false,
-            connector: FreeBsdDrmConnector::new(1, DrmConnectorType::DisplayPort),
-            vram_bytes: vram_mb * 1024 * 1024,
+    pub fn teardown_tunnel(&mut self, tunnel: T4TunnelType) {
+        if let Some(pos) = self.active_tunnels.iter().position(|&t| t == tunnel) {
+            self.active_tunnels.remove(pos);
+        }
+        if self.active_tunnels.is_empty() {
+            self.is_connected = false;
         }
     }
-
-    pub fn bind(&mut self) {
-        self.is_bound = true;
-    }
 }
 
-pub struct SovereignNetworkCardDriver {
-    pub name: String,
-    pub is_bound: bool,
-    pub mac_address: [u8; 6],
-    pub rx_queue: Vec<Vec<u8>>,
-    pub tx_queue: Vec<Vec<u8>>,
+// =========================================================================
+// 7. FreeBSD VirtIO GPU 3D Acceleration Driver (virgl3d)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VirtioGpu3dOpcode {
+    CreateContext = 0x0200,
+    DestroyContext = 0x0201,
+    Submit3dCommand = 0x0202,
 }
 
-impl SovereignNetworkCardDriver {
-    pub fn new(name: &str, mac: [u8; 6]) -> Self {
-        Self {
-            name: name.to_string(),
-            is_bound: false,
-            mac_address: mac,
-            rx_queue: Vec::new(),
-            tx_queue: Vec::new(),
-        }
-    }
-
-    pub fn bind(&mut self) {
-        self.is_bound = true;
-    }
-
-    pub fn transmit_packet(&mut self, packet: &[u8]) {
-        self.tx_queue.push(packet.to_vec());
-    }
+pub struct VirtioGpu3dCommand {
+    pub opcode: VirtioGpu3dOpcode,
+    pub ctx_id: u32,
+    pub payload: Vec<u8>,
 }
 
-pub struct SovereignDeviceManager {
-    pub input_drivers: Vec<SovereignInputDeviceDriver>,
-    pub gpu_drivers: Vec<SovereignGpuDriver>,
-    pub net_drivers: Vec<SovereignNetworkCardDriver>,
+pub struct VirtioGpu3dAcceleration {
+    pub ctx_counter: AtomicUsize,
+    pub submitted_commands: Vec<VirtioGpu3dCommand>,
 }
 
-impl SovereignDeviceManager {
+impl VirtioGpu3dAcceleration {
     pub fn new() -> Self {
         Self {
-            input_drivers: Vec::new(),
-            gpu_drivers: Vec::new(),
-            net_drivers: Vec::new(),
+            ctx_counter: AtomicUsize::new(1),
+            submitted_commands: Vec::new(),
         }
     }
 
-    pub fn register_input_device(&mut self, mut drv: SovereignInputDeviceDriver) {
-        drv.bind();
-        self.input_drivers.push(drv);
+    pub fn create_context(&mut self) -> u32 {
+        let ctx_id = self.ctx_counter.fetch_add(1, Ordering::SeqCst) as u32;
+        self.submitted_commands.push(VirtioGpu3dCommand {
+            opcode: VirtioGpu3dOpcode::CreateContext,
+            ctx_id,
+            payload: Vec::new(),
+        });
+        ctx_id
     }
 
-    pub fn register_gpu_device(&mut self, mut drv: SovereignGpuDriver) {
-        drv.bind();
-        self.gpu_drivers.push(drv);
-    }
-
-    pub fn register_net_device(&mut self, mut drv: SovereignNetworkCardDriver) {
-        drv.bind();
-        self.net_drivers.push(drv);
-    }
-
-    pub fn total_bound_devices(&self) -> usize {
-        self.input_drivers.len() + self.gpu_drivers.len() + self.net_drivers.len()
+    pub fn submit_command(&mut self, ctx_id: u32, payload: Vec<u8>) -> Result<(), &'static str> {
+        self.submitted_commands.push(VirtioGpu3dCommand {
+            opcode: VirtioGpu3dOpcode::Submit3dCommand,
+            ctx_id,
+            payload,
+        });
+        Ok(())
     }
 }
 
-impl Default for SovereignDeviceManager {
-    fn default() -> Self {
-        Self::new()
+// =========================================================================
+// 8. OpenBSD Ath10k 802.11ac Wi-Fi Network Driver
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WlanAccessPoint {
+    pub ssid: String,
+    pub bssid: [u8; 6],
+    pub rssi_dbm: i8,
+    pub channel: u8,
+}
+
+pub struct Ath10kWlanDriver {
+    pub is_powered: bool,
+    pub connected_ap: Option<WlanAccessPoint>,
+    pub scanned_aps: Vec<WlanAccessPoint>,
+}
+
+impl Ath10kWlanDriver {
+    pub fn new() -> Self {
+        Self {
+            is_powered: true,
+            connected_ap: None,
+            scanned_aps: Vec::new(),
+        }
+    }
+
+    pub fn scan_networks(&mut self) -> Vec<WlanAccessPoint> {
+        let mock_ap = WlanAccessPoint {
+            ssid: String::from("Sovereign5G"),
+            bssid: [0x00, 0x11, 0x22, 0x33, 0x44, 0x55],
+            rssi_dbm: -55,
+            channel: 36,
+        };
+        self.scanned_aps.clear();
+        self.scanned_aps.push(mock_ap.clone());
+        self.scanned_aps.clone()
+    }
+
+    pub fn connect(&mut self, ssid: &str) -> Result<(), &'static str> {
+        if let Some(ap) = self.scanned_aps.iter().find(|a| a.ssid == ssid) {
+            self.connected_ap = Some(ap.clone());
+            Ok(())
+        } else {
+            Err("Ath10k: Requested SSID not found during scan")
+        }
+    }
+}
+
+// =========================================================================
+// 9. Linux I2C / SMBus Hardware Sensor Hub Driver
+// =========================================================================
+
+pub struct I2cSmbusSensorHubDriver {
+    pub bus_id: u8,
+    pub thermal_celsius: f32,
+    pub fan_rpm: u32,
+}
+
+impl I2cSmbusSensorHubDriver {
+    pub fn new(bus_id: u8) -> Self {
+        Self {
+            bus_id,
+            thermal_celsius: 42.5,
+            fan_rpm: 2100,
+        }
+    }
+
+    pub fn read_temperature(&mut self) -> f32 {
+        self.thermal_celsius += 0.1;
+        self.thermal_celsius
+    }
+
+    pub fn set_fan_speed_pwm(&mut self, pwm_percent: u8) {
+        let max_rpm = 5000.0;
+        self.fan_rpm = ((pwm_percent as f32 / 100.0) * max_rpm) as u32;
+    }
+}
+
+// =========================================================================
+// 10. NetBSD GPIO / PWM LED & Buzzer Driver
+// =========================================================================
+
+pub struct NetBsdGpioPwmDriver {
+    pub pin_number: u8,
+    pub is_output: bool,
+    pub pin_state: bool,
+    pub pwm_duty_cycle: u8, // 0 - 100%
+}
+
+impl NetBsdGpioPwmDriver {
+    pub fn new(pin_number: u8) -> Self {
+        Self {
+            pin_number,
+            is_output: true,
+            pin_state: false,
+            pwm_duty_cycle: 0,
+        }
+    }
+
+    pub fn set_pin_state(&mut self, high: bool) {
+        self.pin_state = high;
+    }
+
+    pub fn set_pwm_duty(&mut self, duty: u8) {
+        self.pwm_duty_cycle = duty.min(100);
     }
 }
 
@@ -515,23 +600,50 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_device_manager_and_drivers() {
-        let mut dev_mgr = SovereignDeviceManager::new();
+    fn test_thunderbolt4_controller() {
+        let mut tb4 = Thunderbolt4Controller::new(1);
+        assert!(!tb4.is_connected);
+        assert!(tb4.establish_tunnel(T4TunnelType::Pcie).is_ok());
+        assert!(tb4.is_connected);
+        assert_eq!(tb4.active_tunnels.len(), 1);
 
-        let input_drv = SovereignInputDeviceDriver::new("keyboard0", 0x046D, 0xC077);
-        let gpu_drv = SovereignGpuDriver::new("radeon_rx6800", 16384);
-        let mut net_drv = SovereignNetworkCardDriver::new("eth0", [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
+        tb4.teardown_tunnel(T4TunnelType::Pcie);
+        assert!(!tb4.is_connected);
+    }
 
-        net_drv.transmit_packet(b"ping_packet");
-        assert_eq!(net_drv.tx_queue.len(), 1);
+    #[test]
+    fn test_virtio_gpu_3d() {
+        let mut virgl = VirtioGpu3dAcceleration::new();
+        let ctx_id = virgl.create_context();
+        assert_eq!(ctx_id, 1);
+        assert!(virgl.submit_command(ctx_id, alloc::vec![1, 2, 3]).is_ok());
+        assert_eq!(virgl.submitted_commands.len(), 2);
+    }
 
-        dev_mgr.register_input_device(input_drv);
-        dev_mgr.register_gpu_device(gpu_drv);
-        dev_mgr.register_net_device(net_drv);
+    #[test]
+    fn test_ath10k_wlan_driver() {
+        let mut wlan = Ath10kWlanDriver::new();
+        let aps = wlan.scan_networks();
+        assert_eq!(aps.len(), 1);
+        assert!(wlan.connect("Sovereign5G").is_ok());
+        assert!(wlan.connected_ap.is_some());
+    }
 
-        assert_eq!(dev_mgr.total_bound_devices(), 3);
-        assert!(dev_mgr.input_drivers[0].is_bound);
-        assert!(dev_mgr.gpu_drivers[0].is_bound);
-        assert!(dev_mgr.net_drivers[0].is_bound);
+    #[test]
+    fn test_i2c_smbus_sensor_hub() {
+        let mut sensor = I2cSmbusSensorHubDriver::new(0);
+        let temp = sensor.read_temperature();
+        assert!(temp > 42.0);
+        sensor.set_fan_speed_pwm(50);
+        assert_eq!(sensor.fan_rpm, 2500);
+    }
+
+    #[test]
+    fn test_gpio_pwm_driver() {
+        let mut gpio = NetBsdGpioPwmDriver::new(12);
+        gpio.set_pin_state(true);
+        assert!(gpio.pin_state);
+        gpio.set_pwm_duty(75);
+        assert_eq!(gpio.pwm_duty_cycle, 75);
     }
 }

@@ -1,4 +1,6 @@
 // SigmaOS Kernel Library
+extern crate alloc;
+
 pub mod adt;
 pub mod arc;
 pub mod async_runtime;
@@ -48,3 +50,4 @@ pub use vec::Vec;
 pub use btreemap::BTreeMap;
 pub use hashmap::HashMap;
 pub use string::SigmaString;
+pub use alloc::string::{String, ToString};

@@ -176,10 +176,23 @@ impl NamespaceConfig {
 }
 
 /// Container seccomp profiles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
 
-impl SeccompPolicy {
+
+impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        self.blocked_syscalls.contains(&syscall_id)
+        if !self.hardened {
+            return false;
+        }
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            false
+        }
     }
 }
 
@@ -210,16 +223,11 @@ impl OverlayFS {
             return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
         }
         self.mounted = true;
-        println!(
-            "OverlayFS mounted successfully: lowerdirs={:?}, upperdir={}, workdir={}",
-            self.lower_dirs, self.upper_dir, self.work_dir
-        );
         Ok(())
     }
 
     pub fn umount(&mut self) {
         self.mounted = false;
-        println!("OverlayFS unmounted successfully.");
     }
 }
 
@@ -240,10 +248,6 @@ pub struct SimpleContainer {
 impl SimpleContainer {
     pub fn execute_syscall(&self, syscall_id: u32) -> Result<(), ContainerError> {
         if self.seccomp.is_syscall_blocked(syscall_id) {
-            println!(
-                "Container Seccomp Violation: Syscall {} is strictly prohibited by security profile",
-                syscall_id
-            );
             return Err(ContainerError::PermissionDenied);
         }
         Ok(())

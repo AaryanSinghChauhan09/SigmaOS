@@ -1,5 +1,3 @@
-#![no_std]
-
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
@@ -65,10 +63,11 @@ pub struct SimpleDevice {
 impl SimpleDevice {
     pub fn new(id: DeviceID, name: &[u8], device_class: DeviceClass) -> Self {
         let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
+        let len = name.len().min(63);
         unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
+        let name_len = len as u8;
         SimpleDevice {
             id,
             name: name_array,

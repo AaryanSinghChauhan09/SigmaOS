@@ -118,6 +118,9 @@ impl SigmaMediaEngine {
 }
 
 pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
+// SigmaOS Polish-Parity Out-of-the-Box Codecs & Multimedia Engine (SigmaMedia)
+// Designed for chiptune synthesizers, audio playing, and decoders with zero dependencies
+
 
 pub struct AudioTrack {
     pub name: String,

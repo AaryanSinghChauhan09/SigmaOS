@@ -27,7 +27,9 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use crate::klib::{BTreeMap, Vec};
 use crate::klib::collections::VecDeque;
 
+use alloc::collections::{BTreeMap, VecDeque};
 use alloc::string::String;
+use alloc::vec::Vec;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks

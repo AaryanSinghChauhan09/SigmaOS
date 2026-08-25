@@ -220,9 +220,20 @@ mod tests {
     use crate::kernel::object::{KObject, ObjectError};
 
     struct MockDriver {
+        base: crate::kernel::object::KObject,
         owner: Option<String>,
         debug_level: String,
         base: KObject,
+    }
+
+    impl MockDriver {
+        fn new() -> Self {
+            Self {
+                base: crate::kernel::object::KObject::new("mock_driver"),
+                owner: None,
+                debug_level: "3".to_string(),
+            }
+        }
     }
 
     impl KernelObject for MockDriver {
