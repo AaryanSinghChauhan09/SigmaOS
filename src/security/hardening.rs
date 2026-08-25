@@ -1,8 +1,25 @@
 /// Security Hardening & Cryptographic Intrusion Detection Suite for SigmaOS
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::Vec;
+#[cfg(feature = "standalone_test")]
+extern crate alloc;
+#[cfg(feature = "standalone_test")]
+use alloc::vec::Vec;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::Permission;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    SystemAdmin,
+    KernelModuleLoad,
+    NetworkTcp,
+    FileRead,
+}
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
