@@ -78,6 +78,9 @@ pub struct RegisterSet {
     pub es: u64,
     pub fs: u64,
     pub gs: u64,
+    pub cr0: u64,
+    pub cr3: u64,
+    pub cr4: u64,
 }
 
 pub trait InterruptHandler {

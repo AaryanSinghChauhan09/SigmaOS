@@ -3,8 +3,9 @@
 
 extern crate alloc;
 use alloc::string::String;
+use core::ops::Deref;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct PathBuf {
     inner: String,
 }
@@ -28,10 +29,40 @@ impl PathBuf {
     pub fn to_str(&self) -> Option<&str> {
         Some(&self.inner)
     }
+
+    pub fn to_path_buf(&self) -> PathBuf {
+        self.clone()
+    }
 }
 
 impl Default for PathBuf {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl Deref for PathBuf {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl From<&str> for PathBuf {
+    fn from(s: &str) -> Self {
+        PathBuf { inner: String::from(s) }
+    }
+}
+
+impl From<String> for PathBuf {
+    fn from(s: String) -> Self {
+        PathBuf { inner: s }
+    }
+}
+
+impl AsRef<str> for PathBuf {
+    fn as_ref(&self) -> &str {
+        &self.inner
     }
 }

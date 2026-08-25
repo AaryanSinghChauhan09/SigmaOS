@@ -105,6 +105,7 @@ impl NetworkInterface {
 }
 
 /// Network namespace (Linux container networking)
+#[derive(Clone)]
 pub struct NetworkNamespace {
     pub name: String,
     pub interfaces: Vec<NetworkInterface>,

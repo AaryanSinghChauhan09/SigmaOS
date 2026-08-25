@@ -251,13 +251,13 @@ impl FreeDosEmulator {
                 start_cluster: 55,
             },
         ];
-        self.fat_entries.insert(mount_point.to_path_buf(), root_dir);
+        self.fat_entries.insert(mount_point.to_str().unwrap().to_string(), root_dir);
         self.output_stream.push(format!("FAT32 LBA partition cleanly mounted at {:?}", mount_point));
     }
 
     pub fn list_fat_directory(&self, mount_point: &Path) -> Vec<String> {
         let mut list = Vec::new();
-        if let Some(entries) = self.fat_entries.get(mount_point) {
+        if let Some(entries) = self.fat_entries.get(&mount_point.to_str().unwrap().to_string()) {
             for entry in entries {
                 let suffix = if entry.is_directory { "<DIR>" } else { "" };
                 list.push(format!("{:<8} {:<3} {:>8} {}", entry.filename, entry.extension, entry.file_size, suffix));

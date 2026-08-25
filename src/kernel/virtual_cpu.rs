@@ -58,6 +58,7 @@ pub struct RegisterSet {
     // --- x86 Control Registers ---
     pub cr0: u64, // Control Register 0: Bit 0 is PE (Protection Enable)
     pub cr3: u64, // Control Register 3: Page Table Base Address
+    pub cr4: u64, // Control Register 4: Enable paging extensions, etc.
 
     // --- ARM general-purpose registers ---
     pub r0: u32,
@@ -111,6 +112,7 @@ impl SovereignVirtualCPU {
                 ss: 0,
                 cr0: 0,
                 cr3: 0,
+                cr4: 0,
                 r0: 0,
                 r1: 0,
                 r2: 0,
