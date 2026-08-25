@@ -343,6 +343,94 @@ impl OpenBsdPledge {
     }
 }
 
+// ================= Linux cgroups v2 Governor =================
+
+#[derive(Debug, Clone, Copy)]
+pub struct CgroupResourceLimits {
+    pub cpu_quota_us: u64,
+    pub cpu_period_us: u64,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u32,
+}
+
+pub struct CgroupGroup {
+    pub path: String,
+    pub limits: Option<CgroupResourceLimits>,
+    pub pids: Vec<u32>,
+    pub cpu_used_us: u64,
+    pub memory_allocated_bytes: u64,
+}
+
+pub struct SovereignCgroupGovernor {
+    pub groups: HashMap<String, CgroupGroup>,
+}
+
+impl SovereignCgroupGovernor {
+    pub fn new() -> Self {
+        Self {
+            groups: HashMap::new(),
+        }
+    }
+
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        if self.groups.contains_key(path) {
+            return Err("Cgroup path already exists");
+        }
+        self.groups.insert(
+            path.to_string(),
+            CgroupGroup {
+                path: path.to_string(),
+                limits: None,
+                pids: Vec::new(),
+                cpu_used_us: 0,
+                memory_allocated_bytes: 0,
+            },
+        );
+        Ok(())
+    }
+
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+        let grp = self.groups.get_mut(path).ok_or("Cgroup path not found")?;
+        grp.limits = Some(limits);
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u32) -> Result<(), &'static str> {
+        let grp = self.groups.get_mut(path).ok_or("Cgroup path not found")?;
+        grp.pids.push(pid);
+        Ok(())
+    }
+
+    pub fn check_cpu_budget(&mut self, path: &str, usage_us: u64) -> Result<bool, &'static str> {
+        let grp = self.groups.get_mut(path).ok_or("Cgroup path not found")?;
+        if let Some(limits) = grp.limits {
+            if grp.cpu_used_us + usage_us > limits.cpu_quota_us {
+                return Ok(false);
+            }
+            grp.cpu_used_us += usage_us;
+            Ok(true)
+        } else {
+            Ok(true)
+        }
+    }
+
+    pub fn allocate_memory(&mut self, path: &str, size_bytes: u64) -> Result<(), &'static str> {
+        let grp = self.groups.get_mut(path).ok_or("Cgroup path not found")?;
+        if let Some(limits) = grp.limits {
+            if grp.memory_allocated_bytes + size_bytes > limits.memory_max_bytes {
+                return Err("Cgroup memory limit exceeded");
+            }
+            grp.memory_allocated_bytes += size_bytes;
+            Ok(())
+        } else {
+            grp.memory_allocated_bytes += size_bytes;
+            Ok(())
+        }
+    }
+}
+
 // ================= Bounded Buffer Producer/Consumer Monitor =================
 
 pub struct BoundedBufferProducerConsumer<T, const N: usize> {
