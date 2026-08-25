@@ -59,7 +59,7 @@ impl SigmaSoftwareStore {
                 }
             }
         }
-        count
+        Err("PackageNotFound")
     }
 
     /// Automatically scans and triggers update routines for registered packages

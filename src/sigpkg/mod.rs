@@ -54,8 +54,9 @@ pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
 pub use transaction::Transaction;
 pub use universal_adapter::{
-    AptDebManifest, UniversalPackageManager as UniversalPackageAdapter,
+    AptDebManifest, UniversalPackageAdapter,
 };
+pub use universal_oop_system::UniversalPackageManager;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
@@ -146,18 +147,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }

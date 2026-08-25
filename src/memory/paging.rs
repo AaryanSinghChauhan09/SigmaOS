@@ -274,12 +274,18 @@ impl SimpleVMM {
         self.vmas.push(vma);
     }
 
-    /// Maps a standard 4KB page
-    pub fn map_page(
+    /// Maps a standard 4KB page with explicit protection flags
+    pub fn map_page_with_flags(
         &mut self,
         virt: VirtualAddress,
         phys: PhysicalAddress,
+        writable: bool,
+        execute_disable: bool,
     ) -> Result<(), MemoryError> {
+        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -316,6 +322,15 @@ impl SimpleVMM {
         }
 
         Ok(())
+    }
+
+    /// Maps a standard 4KB page
+    pub fn map_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+    ) -> Result<(), MemoryError> {
+        self.map_page_with_flags(virt, phys, true, false)
     }
 
     /// Maps a 2MB Huge Page (at the Page Directory level)
