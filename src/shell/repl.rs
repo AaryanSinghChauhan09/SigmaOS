@@ -33,6 +33,10 @@ use crate::customization::{CustomizationEngine, Theme};
 use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
 use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
 use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
+use crate::shell::zsh_bash_parity::{
+    BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
+    ZshSyntaxHighlighter,
+};
 use crate::virtualization::{
     Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
     VmState,
@@ -222,10 +226,24 @@ pub struct ShellRepl {
     pub virt_orchestrator: VirtualizationOrchestrator,
     pub compatibility: CompatibilityManager,
     pub self_healing: SelfHealingModule,
+
+    // Advanced Zsh, Bash, Fish & BSD Parity components
+    pub prompt_builder: PowerlinePromptBuilder,
+    pub fuzzy_completer: FuzzyCompletionEngine,
+    pub highlighter: ZshSyntaxHighlighter,
+    pub dir_stack: BsdDirectoryStack,
+    pub job_control: ShellJobControl,
 }
 
 impl ShellRepl {
     pub fn new() -> Self {
+        let current_dir = "/home/ubuntu".to_string();
+        let mut prompt_builder = PowerlinePromptBuilder::new();
+        prompt_builder.user = "ubuntu".to_string();
+        prompt_builder.current_dir = current_dir.clone();
+        prompt_builder.home_dir = "/home/ubuntu".to_string();
+
+        let dir_stack = BsdDirectoryStack::new(&current_dir);
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
@@ -251,6 +269,11 @@ impl ShellRepl {
             virt_orchestrator: VirtualizationOrchestrator::new(),
             compatibility: CompatibilityManager::new(),
             self_healing: SelfHealingModule::new(),
+            prompt_builder,
+            fuzzy_completer: FuzzyCompletionEngine::new(),
+            highlighter: ZshSyntaxHighlighter::new(),
+            dir_stack,
+            job_control: ShellJobControl::new(),
         }
     }
 
@@ -284,20 +307,28 @@ impl ShellRepl {
     }
 
     pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
-        let mut suggestions = Vec::new();
-        let commands = [
-            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
-            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
-        ];
-        for cmd in &commands {
-            if cmd.starts_with(prefix) {
-                suggestions.push(cmd.to_string());
+        let candidates = self.fuzzy_completer.get_completions(prefix);
+        if !candidates.is_empty() {
+            candidates.into_iter().map(|c| c.text).collect()
+        } else {
+            let mut suggestions = Vec::new();
+            let commands = [
+                "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
+                "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+            ];
+            for cmd in &commands {
+                if cmd.starts_with(prefix) {
+                    suggestions.push(cmd.to_string());
+                }
             }
+            suggestions
         }
-        suggestions
     }
 
     pub fn history_suggest_fish(&self, partial: &str) -> Option<String> {
+        if let Some(ghost) = self.fuzzy_completer.get_ghost_suggestion(partial) {
+            return Some(format!("{}{}", partial, ghost));
+        }
         if partial.is_empty() {
             return None;
         }
