@@ -1427,7 +1427,7 @@ impl<'a, T> Iterator for VecIteratorMut<'a, T> {
 }
 
 pub struct Enumerate<'a, T> {
-    iter: VecIterator<'a, T>,
+    iter: VecIter<'a, T>,
     index: usize,
 }
 

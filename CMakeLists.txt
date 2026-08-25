@@ -37,3 +37,4 @@ list(FILTER CXX_SOURCES EXCLUDE REGEX "build/.*")
 
 add_library(kernel STATIC ${C_SOURCES} ${CXX_SOURCES})
 add_custom_target(userland)
+add_custom_target(iso)

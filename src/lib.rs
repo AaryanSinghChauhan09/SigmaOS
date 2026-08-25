@@ -207,9 +207,9 @@ pub use security::{
     PledgePromise, RoutingMode, SandboxPolicy,
 };
 pub use shell::{
-    ShellCommand, SimpleShellSession as ShellRepl, TerminalSession, TermiosMode,
-    SignalTrigger, TermiosLineDiscipline, BsdConsoleTheme, BsdConsoleColorPalette,
-    BracketedPasteBuffer, TerminalMultiplexer,
+    AnsiColor, AutoSuggestionEngine, BracketedPasteBuffer, BsdConsoleColorPalette,
+    BsdConsoleTheme, ShellCommand, SimpleShellSession as ShellRepl, TermiosInputMode,
+    TermiosLineDiscipline, TerminalSession, UserDefinedFunction,
 };
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,

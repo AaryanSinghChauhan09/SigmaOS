@@ -244,7 +244,7 @@ impl SigmaString {
         P: Pattern,
     {
         Split {
-            remainder: Some(self.as_str()),
+            string: self,
             pat,
         }
     }
@@ -369,7 +369,7 @@ impl Pattern for &str {
 
 /// Split iterator for SigmaString
 pub struct Split<'a, P> {
-    remainder: Option<&'a str>,
+    string: &'a SigmaString,
     pat: P,
 }
 
@@ -377,19 +377,21 @@ impl<'a, P> Iterator for Split<'a, P>
 where
     P: Pattern,
 {
-    type Item = &'a str;
+    type Item = SigmaString;
     
     fn next(&mut self) -> Option<Self::Item> {
-        let remainder = self.remainder?;
-        let dummy = SigmaString::from_str(remainder);
-        if let Some(idx) = self.pat.find_in(&dummy) {
+        let haystack = self.string.as_str();
+        let start = 0;
+
+        if let Some(idx) = self.pat.find_in(self.string) {
             let end = idx + self.pat.pattern_len();
-            let result = &remainder[..idx];
-            self.remainder = Some(&remainder[end..]);
+            let result = SigmaString::from_str(&haystack[start..idx]);
+            self.string = &SigmaString::from_str(&haystack[end..]);
             Some(result)
         } else {
-            self.remainder = None;
-            Some(remainder)
+            let result = SigmaString::from_str(haystack);
+            self.string = &SigmaString::new();
+            Some(result)
         }
     }
 }
@@ -437,10 +439,10 @@ mod tests {
     #[test]
     fn test_string_split() {
         let s = SigmaString::from_str("hello world");
-        let parts: Vec<&str> = s.split(' ').collect();
+        let parts: Vec<SigmaString> = s.split(' ').collect();
         assert_eq!(parts.len(), 2);
-        assert_eq!(parts[0], "hello");
-        assert_eq!(parts[1], "world");
+        assert_eq!(parts[0].as_str(), "hello");
+        assert_eq!(parts[1].as_str(), "world");
     }
     
     #[test]

@@ -5,8 +5,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 ///         ESTABLISHED → CLOSE_WAIT → LAST_ACK → CLOSED
 
 extern crate alloc;
-use crate::klib::HashMap;
-use alloc::collections::VecDeque;
+use alloc::collections::{HashMap, VecDeque};
 use alloc::vec::Vec;
 
 // ── TCP States (RFC 793 §3.2) ─────────────────────────────────────────────
