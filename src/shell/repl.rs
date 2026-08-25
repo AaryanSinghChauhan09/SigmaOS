@@ -26,6 +26,10 @@ use crate::accessibility::{
     AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
     AccessibilitySetting,
 };
+use crate::shell::{
+    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
+    PipelineExecutor, ZshPromptFormatter,
+};
 use crate::compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
 };
@@ -196,6 +200,12 @@ pub enum ShellCommand {
     AuditLog,
     AuditCheck,
 
+    // Ksh/BSD Job Control commands
+    Jobs,
+    JobFg {
+        job_id: u32,
+    },
+
     Unknown(String),
 }
 
@@ -222,6 +232,8 @@ pub struct ShellRepl {
     pub virt_orchestrator: VirtualizationOrchestrator,
     pub compatibility: CompatibilityManager,
     pub self_healing: SelfHealingModule,
+    pub job_manager: JobControlManager,
+    pub completer: ContextualCompleter,
 }
 
 impl ShellRepl {
@@ -251,6 +263,8 @@ impl ShellRepl {
             virt_orchestrator: VirtualizationOrchestrator::new(),
             compatibility: CompatibilityManager::new(),
             self_healing: SelfHealingModule::new(),
+            job_manager: JobControlManager::new(),
+            completer: ContextualCompleter::new(),
         }
     }
 
@@ -719,6 +733,15 @@ impl ShellRepl {
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
+            }
+            "jobs" => ShellCommand::Jobs,
+            "fg" => {
+                let job_id = if parts.len() >= 2 {
+                    parts[1].trim_start_matches('%').parse::<u32>().unwrap_or(1)
+                } else {
+                    1
+                };
+                ShellCommand::JobFg { job_id }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }
@@ -1260,6 +1283,21 @@ impl ShellRepl {
                     Scan Result: 100% Secure. System is in absolute sovereign state.".to_string())
             }
 
+            ShellCommand::Jobs => {
+                let jobs_list = self.job_manager.list_jobs();
+                if jobs_list.is_empty() {
+                    Ok("No active background or stopped jobs.".to_string())
+                } else {
+                    Ok(jobs_list.join("\n"))
+                }
+            }
+            ShellCommand::JobFg { job_id } => {
+                match self.job_manager.bring_to_foreground(job_id) {
+                    Ok(msg) => Ok(msg),
+                    Err(_) => Err(format!("fg: Job %{} not found.", job_id)),
+                }
+            }
+
             ShellCommand::Echo { message } => Ok(message.clone()),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -1730,5 +1768,25 @@ mod tests {
         let check_res = repl.execute_command(check_cmd).unwrap();
         assert!(check_res.contains("System Safety Sanity Scan"));
         assert!(check_res.contains("W^X strictly enforced"));
+    }
+
+    #[test]
+    fn test_job_control_in_repl() {
+        let mut repl = ShellRepl::new();
+
+        let jobs_cmd = repl.parse_command("jobs");
+        assert!(matches!(jobs_cmd, ShellCommand::Jobs));
+        let jobs_res = repl.execute_command(jobs_cmd).unwrap();
+        assert!(jobs_res.contains("No active background"));
+
+        // Register job
+        repl.job_manager.add_job("sleep 100", 1234, true);
+        let jobs_res2 = repl.execute_command(ShellCommand::Jobs).unwrap();
+        assert!(jobs_res2.contains("sleep 100"));
+
+        let fg_cmd = repl.parse_command("fg %1");
+        assert!(matches!(fg_cmd, ShellCommand::JobFg { .. }));
+        let fg_res = repl.execute_command(fg_cmd).unwrap();
+        assert!(fg_res.contains("brought to foreground"));
     }
 }

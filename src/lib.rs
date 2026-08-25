@@ -206,7 +206,11 @@ pub use security::{
     ForensicStorageFilter, Permission, PledgeManager,
     PledgePromise, RoutingMode, SandboxPolicy,
 };
-pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
+pub use shell::{
+    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
+    PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
+    SimpleShellSession as ShellRepl, ZshPromptFormatter,
+};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
     PackageRecipe, RecipeError, RecipeManager, SatSolver,
