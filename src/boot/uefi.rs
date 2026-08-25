@@ -3,7 +3,6 @@ use core::mem;
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 /// Inspired by systemd-boot, GRUB2, and Plymouth from popular Linux distributions.
-use core::sync::atomic::{AtomicUsize, Ordering};
 extern crate alloc;
 
 use alloc::vec::Vec;
@@ -208,15 +207,15 @@ impl SecureBoot for SimpleSecureBoot {
 // ==============================================================================
 // Vec Implementation
 // ==============================================================================
-pub struct Vec<T> {
+pub struct UefiVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
+impl<T> UefiVec<T> {
     pub fn new() -> Self {
-        Vec {
+        UefiVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,

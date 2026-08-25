@@ -38,7 +38,8 @@ pub use process::{
     JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
     ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
     ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
-    SigQueuePayload, AdvancedIpcHub,
+    SigQueuePayload, AdvancedIpcHub, Process, ProcessID, ProcessState, ProcessError, SimpleProcess,
+    ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter,
 };
 pub mod tools;
 pub mod unimplemented_features;

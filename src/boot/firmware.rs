@@ -1,10 +1,7 @@
 
 extern crate alloc;
 use alloc::format;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
