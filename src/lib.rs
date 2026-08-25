@@ -187,7 +187,6 @@ pub use kernel::{
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
-pub mod distro;
 
 pub use kernel::{
     Apc, ApcMode, ApcQueue, ArchitectureEngine,
@@ -371,7 +370,6 @@ pub use tools::{
 pub mod open_source_obsoletion;
 pub mod ipc;
 pub mod audio;
-pub mod access;
 pub mod system;
 pub mod event;
 pub mod loader;

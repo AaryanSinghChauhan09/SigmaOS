@@ -2149,11 +2149,11 @@ impl SovereignRunitSupervisor {
 // 39. ADDITIONAL LINUX & BSD DISTRO PARITY INSPIRATIONS
 // =========================================================================
 
-pub struct AlpineApkPackageIndex {
+pub struct AlpineApkPackageIndexV2 {
     pub package_entries: Vec<(String, String, u64)>, // (name, sha256_checksum, size_bytes)
 }
 
-impl AlpineApkPackageIndex {
+impl AlpineApkPackageIndexV2 {
     pub fn new() -> Self {
         Self {
             package_entries: Vec::new(),
@@ -2177,12 +2177,12 @@ impl AlpineApkPackageIndex {
     }
 }
 
-pub struct DragonFlyHammer2FsSnapshot {
+pub struct DragonFlyHammer2FsSnapshotV2 {
     pub pfs_snapshots: Vec<(u32, String, u64)>, // (snapshot_id, pfs_name, timestamp)
     pub active_pfs_id: u32,
 }
 
-impl DragonFlyHammer2FsSnapshot {
+impl DragonFlyHammer2FsSnapshotV2 {
     pub fn new(root_pfs_name: &str) -> Self {
         let mut snap = Self {
             pfs_snapshots: Vec::new(),
