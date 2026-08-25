@@ -29,19 +29,19 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 | **snap-like containment** | Application sandboxing | ✅ Implemented | `src/package/universal.rs` |
 | **apt-like dependency resolution** | Smart dep solving | ✅ Implemented | `src/sigpkg/solver.rs` |
 | **Ubuntu HWE** | Hardware Enablement Stack | 🚧 In Progress | `src/driver/hwe.rs` |
-| **Ubuntu Pro features** | Extended security maintenance | ✅ Implemented | `src/unimplemented_tools.rs` |
-| **Netplan networking** | YAML-based network config | ✅ Implemented | `src/distro/linux_bsd_parity_extended.rs` |
-| **cloud-init** | Cloud instance initialization | ✅ Implemented | `src/distro/linux_bsd_parity_extended.rs` |
+| **Ubuntu Pro features** | Extended security maintenance | 📌 Planned | - |
+| **Netplan networking** | YAML-based network config | 📌 Planned | - |
+| **cloud-init** | Cloud instance initialization | 📌 Planned | - |
 
 ## 🐾 Fedora/RHEL Ideas
 
 | Idea | Description | Status | Implementation |
 |------|-------------|--------|----------------|
-| **rpm-ostree** | Image-based OS updates | ✅ Implemented | `src/distro/linux_bsd_parity_extended.rs` |
-| **Silverblue immutability** | Immutable OS design | ✅ Implemented | `src/distro/linux_bsd_parity_extended.rs` |
+| **rpm-ostree** | Image-based OS updates | 📌 Planned | - |
+| **Silverblue immutability** | Immutable OS design | 📌 Planned | - |
 | **SELinux policies** | Mandatory access control | ✅ Implemented | `src/security/mod.rs` |
 | **systemd-boot** | UEFI boot manager | ✅ Implemented | `src/boot/mod.rs` |
-| **Fedora Toolbox** | Container-based dev envs | ✅ Implemented | `src/unimplemented_tools.rs` |
+| **Fedora Toolbox** | Container-based dev envs | 📌 Planned | - |
 | **DNF4/5 features** | Fast package management | 🚧 In Progress | `src/sigpkg/mod.rs` |
 
 ## 🐍 Gentoo Ideas
@@ -62,7 +62,7 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 | **Atomic rollbacks** | Instant system rollback | ✅ Implemented | `src/sigpkg/transaction.rs` |
 | **Nix store concept** | Immutable package store | 📌 Planned | - |
 | **Reproducible builds** | Bit-for-bit reproducibility | 📌 Planned | - |
-| **Home Manager** | User environment management | ✅ Implemented | `src/unimplemented_tools.rs` |
+| **Home Manager** | User environment management | 📌 Planned | - |
 
 ## 🟢 Alpine Linux Ideas
 
@@ -78,10 +78,10 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 
 | Idea | Description | Status | Implementation |
 |------|-------------|--------|----------------|
-| **Penetration testing tools** | Security auditing suite | ✅ Implemented | `src/security/parrot_kali.rs` |
+| **Penetration testing tools** | Security auditing suite | 📌 Planned | - |
 | **Live USB persistence** | Persistent live mode | 🚧 In Progress | `scripts/build-iso.sh` |
-| **Forensics mode** | Write-protected boot | ✅ Implemented | `src/distro/transformation_engine.rs` |
-| **Aircrack-ng stack** | Wireless security tools | ✅ Implemented | `src/unimplemented_tools.rs` |
+| **Forensics mode** | Write-protected boot | 📌 Planned | - |
+| **Aircrack-ng stack** | Wireless security tools | 📌 Planned | - |
 
 ## 🧊 Elementary OS / Pantheon Ideas
 
@@ -101,7 +101,7 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 | **glibc/musl choice** | Multiple libc options | 📌 Planned | - |
 | **Musl bootstrap** | Complete musl userland | ✅ Implemented | Core |
 
-## 🦊 AntiX / MX Linux Ideas  
+## 🦊 AntiX / MX Linux Ideas
 
 | Idea | Description | Status | Implementation |
 |------|-------------|--------|----------------|
@@ -126,13 +126,13 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 | **Capsicum capabilities** | FreeBSD | ✅ Implemented | `src/security/capability.rs` |
 | **pledge/unveil** | OpenBSD | ✅ Implemented | `src/security/pledge.rs` |
 | **ZFS integration** | FreeBSD/OpenZFS | 🚧 In Progress | `src/filesystem/` |
-| **Jails** | FreeBSD | ✅ Implemented | `src/security/jails.rs` |
+| **Jails** | FreeBSD | 📌 Planned | - |
 | **pf firewall** | OpenBSD | ✅ Implemented | `src/network/` |
 | **W^X enforcement** | OpenBSD | ✅ Implemented | `src/security/` |
 | **Secure Levels** | FreeBSD | ✅ Implemented | `src/security/` |
 | **bhyve hypervisor** | FreeBSD | ✅ Inspired VMM | `src/virt/mod.rs` |
 | **Ports system** | FreeBSD/NetBSD | 🚧 In Progress | `src/sigpkg/ports.rs` |
-| **DTrace** | Solaris/FreeBSD | ✅ Implemented | `src/kernel/dtrace_compat.rs` |
+| **DTrace** | Solaris/FreeBSD | 📌 Planned | - |
 
 ---
 
@@ -144,16 +144,16 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 - **Btrfs CoW snapshots** (openSUSE): Automatic pre-update snapshots - ✅ Implemented
 - **Transparent huge pages** (RHEL): Automatic memory optimization - ✅ Implemented
 
-### Security  
+### Security
 - **Unprivileged user namespaces OFF by default** (Debian): Reduce attack surface - ✅ Implemented
 - **ASLR+PIE everywhere** (Hardened Gentoo): Memory randomization - ✅ Implemented
 - **Stack canaries** (OpenBSD): Buffer overflow protection - ✅ Implemented
 - **FORTIFY_SOURCE=3** (Ubuntu): Stricter source fortification - ✅ Implemented
 
 ### Developer Experience
-- **devenv.sh** (NixOS community): Reproducible dev environments - ✅ Implemented (`src/unimplemented_tools.rs`)
-- **mise (asdf replacement)**: Universal version manager - ✅ Implemented (`src/unimplemented_tools.rs`)
-- **Flatpak SDK** (Fedora/GNOME): Portable development kit - ✅ Implemented (`src/unimplemented_tools.rs`)
+- **devenv.sh** (NixOS community): Reproducible dev environments - 📌 Planned
+- **mise (asdf replacement)**: Universal version manager - 📌 Planned
+- **Flatpak SDK** (Fedora/GNOME): Portable development kit - 📌 Planned
 
 ---
 

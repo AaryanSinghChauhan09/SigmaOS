@@ -100,13 +100,13 @@ int sigma_present_start_present(const present_deck_t *deck);
 ## Roadmap
 
 - [x] Architecture design and component specification
-- [ ] SigmaWriter rich text engine implementation
-- [ ] SigmaSheet calculation engine implementation
-- [ ] SigmaPresent slide editor implementation
-- [ ] File format import/export (DOCX, XLSX, PPTX)
-- [ ] Collaboration backend
-- [ ] AI-powered features (writing assistant, formula suggestions)
-- [ ] SigmaScript macro language
+- [x] SigmaWriter rich text engine implementation
+- [x] SigmaSheet calculation engine implementation
+- [x] SigmaPresent slide editor implementation
+- [x] Collaboration backend
+- [x] AI-powered features & CRM sales pipeline integration
+- [x] SigmaScript macro language
+- [ ] Full OOXML DOCX/PPTX binary import parsers
 - [ ] Mobile versions (SigmaOS Mobile)
 - [ ] Web versions (SigmaOS Cloud)
 

@@ -15,8 +15,8 @@ SigmaOS networking shard.
 
 ## Roadmap
 
-- [ ] DoT client implementation
+- [x] DoT client implementation
 
-- [ ] DNSSEC chain validator
+- [x] DNSSEC chain validator
 
-- [ ] Local authority for `.sigma` TLD
+- [x] Local authority for `.sigma` TLD

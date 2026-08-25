@@ -1,0 +1,158 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'rust', 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended,security-and-quality
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+      with:
+        category: "/language:${{matrix.language}}"
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+
+    - name: Dependency Review
+      uses: actions/dependency-review-action@5f1ce9c37e174475a914a598765ac9e4f4f0490a
+      with:
+        fail-on-severity: moderate
+        allow-licenses: GPL-3.0-or-later, MIT, Apache-2.0, BSD-3-Clause, BSD-2-Clause
+
+  rust-audit:
+    name: Rust Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@16437dce0d1cbde1a44b8bcb1502e33d034c264c
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+
+    - name: Install cargo-audit
+      run: cargo install cargo-audit
+
+    - name: Run cargo audit
+      run: cargo audit
+      continue-on-error: true
+
+  rust-clippy:
+    name: Rust Clippy Linting
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@16437dce0d1cbde1a44b8bcb1502e33d034c264c
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+        components: clippy
+
+    - name: Run clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@f1b33cf6ff13815a543b5f762d4be4b4c4839e68
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@b6f47e18f9c8a16e4c45bbc8625d2f7b7fea8506
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  bandit-scan:
+    name: Python Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+
+    - name: Set up Python
+      uses: actions/setup-python@3974166073a6f6614d9053289224962e58c4eaa4
+      with:
+        python-version: '3.x'
+
+    - name: Install Bandit
+      run: pip install bandit
+
+    - name: Run Bandit
+      run: bandit -r . -f json -o bandit-report.json
+      continue-on-error: true
+
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@0ad4b8fadaa221615c556ef6a276828e6dbdd4cf
+      with:
+        fetch-depth: 0
+
+    - name: Run TruffleHog
+      uses: trufflesecurity/trufflehog@e397de5f2a4d2c1f194d562f34c4f58692df48a9
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
