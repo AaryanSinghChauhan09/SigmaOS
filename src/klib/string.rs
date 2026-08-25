@@ -20,6 +20,12 @@ impl fmt::Debug for SigmaString {
     }
 }
 
+impl fmt::Display for SigmaString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
 impl SigmaString {
     /// Create a new empty SigmaString
     pub fn new() -> Self {
@@ -262,6 +268,11 @@ impl SigmaString {
         P: Pattern,
     {
         pat.find_in(self).is_some()
+    }
+
+    /// Convert to bytes
+    pub fn into_bytes(self) -> SigmaVec<u8> {
+        self.data
     }
     
     /// Find the first occurrence of a pattern
