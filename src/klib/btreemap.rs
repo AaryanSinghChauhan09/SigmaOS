@@ -348,13 +348,13 @@ impl<K: Clone + core::cmp::Ord, V: Clone> BTreeMap<K, V> {
     }
 }
 
-pub struct Range<'a, K, V> {
+pub struct Range<'a, K: Clone + Ord, V: Clone> {
     map: &'a BTreeMap<K, V>,
     index: usize,
     end: usize,
 }
 
-impl<'a, K, V> Iterator for Range<'a, K, V> {
+impl<'a, K: Clone + Ord, V: Clone> Iterator for Range<'a, K, V> {
     type Item = (&'a K, &'a V);
 
     fn next(&mut self) -> Option<Self::Item> {
