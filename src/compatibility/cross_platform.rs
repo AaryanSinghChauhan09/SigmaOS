@@ -1,15 +1,11 @@
-use crate::klib::HashMap;
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
 extern crate alloc;
 use crate::klib::{BTreeMap, HashMap};
-use crate::klib::HashMap;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::klib::HashMap;
-use crate::klib::collections::HashMap;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {

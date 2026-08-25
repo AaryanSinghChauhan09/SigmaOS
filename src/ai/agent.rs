@@ -9,7 +9,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use crate::klib::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::BTreeMap;
 
 /// Intent type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

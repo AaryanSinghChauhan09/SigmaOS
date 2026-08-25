@@ -228,11 +228,6 @@ pub use productivity::{
     PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
     TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
-pub use remote::{
-    FileTransfer, RemoteDesktop, RemoteError, RemoteSession, RemoteShell, SessionID, SessionState,
-    ShellError, ShellID, ShellManager, SimpleFileTransfer, SimpleRemoteDesktop,
-    SimpleRemoteSession, SimpleScreenSharing, SimpleShellManager,
-};
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
