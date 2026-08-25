@@ -28,6 +28,10 @@ pub mod wandr;
 pub use agentic_os_runtime::{
     ContextVirtualMmu, EphemeralAgentSandbox, HybridContainerRuntime, LocalLlmSystemDaemon,
     OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
+    AgentAuditRecord, ContainerConfig, ContainerFirstRuntimeHost, ContainerState, ContextTokenType,
+    DeterministicAgentSandbox, EbpfTraceEvent, EbpfTraceEventType, EbpfTracingMonitor, LocalLlmModel,
+    PosixNativeBridgeLayer, TamperProofAgentAuditLogger,
+    TpmTokenKeyVault, VectorContextBlock, VectorContextMmu,
 };
 
 pub use openclaw::{
@@ -35,12 +39,6 @@ pub use openclaw::{
 };
 
 pub use agent::{AIAgent, SimpleAIAgent};
-pub use agentic_os_runtime::{
-    AgentAuditRecord, ContainerConfig, ContainerFirstRuntimeHost, ContainerState, ContextTokenType,
-    DeterministicAgentSandbox, EbpfTraceEvent, EbpfTraceEventType, EbpfTracingMonitor, LocalLlmModel,
-    LocalLlmSystemDaemon, OmniAutomatorStudioApi, PosixNativeBridgeLayer, TamperProofAgentAuditLogger,
-    TpmTokenKeyVault, VectorContextBlock, VectorContextMmu,
-};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,

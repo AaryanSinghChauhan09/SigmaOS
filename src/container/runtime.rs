@@ -713,8 +713,6 @@ pub mod oci {
     use crate::container::runtime::NamespaceConfig;
     use alloc::string::{String, ToString};
     use crate::container::ContainerError;
-    use alloc::string::String;
-    use alloc::string::ToString;
     use alloc::vec::Vec;
 
     pub struct NamespaceSet {
