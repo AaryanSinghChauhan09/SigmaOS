@@ -307,7 +307,32 @@ Remove misplaced inner `#![no_std]` or `#![no_main]` lines from submodule files 
 
 ---
 
-### Issue 8: CI Conda Environment File Missing
+### Issue 9: Cgroup Resource Field Mismatches & HashMap Method Mismatches (`E0560` / `E0609` / `E0599`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0560]: struct `CgroupGroup` has no field named `used_cpu_us`
+   --> src/kernel/linux_bsd_innovations.rs:914:17
+    |
+914 |                 used_cpu_us: 0,
+    |                 ^^^^^^^^^^^ unknown field
+    |
+help: a field with a similar name exists: `cpu_used_us`
+
+error[E0599]: no method named `get_mut_str` found for struct `HashMap`
+```
+
+#### **Why It Occurred:**
+When field names on kernel structs (such as `CgroupGroup`) are updated (e.g. from `used_cpu_us` to `cpu_used_us` and `allocated_memory_bytes` to `memory_allocated_bytes`), or custom HashMap wrapper helper methods are unified to standard `get_mut` / `contains_key`, call sites and initializers using the older field names generate `E0560`, `E0609`, or `E0599` errors.
+
+#### **How to Fix It (Blueprint):**
+1. Update field references: `used_cpu_us` -> `cpu_used_us`, `allocated_memory_bytes` -> `memory_allocated_bytes`.
+2. Wrap `CgroupResourceLimits` in `Some(...)` when assigning to `Option<CgroupResourceLimits>`.
+3. Replace non-standard `get_mut_str` / `contains_key_str` calls with standard `.get_mut(path)` / `.contains_key(path)`.
+
+---
+
+### Issue 10: CI Conda Environment File Missing
 
 #### **Symptom / CI Log Output:**
 ```text
