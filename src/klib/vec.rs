@@ -199,6 +199,58 @@ impl<T> core::iter::FromIterator<T> for Vec<T> {
     }
 }
 
+impl<T> IntoIterator for Vec<T> {
+    type Item = T;
+    type IntoIter = VecIntoIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        VecIntoIter {
+            vec: self,
+            index: 0,
+        }
+    }
+}
+
+pub struct VecIntoIter<T> {
+    vec: Vec<T>,
+    index: usize,
+}
+
+impl<T> Iterator for VecIntoIter<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len {
+            unsafe {
+                let item = core::ptr::read(self.vec.data.add(self.index));
+                self.index += 1;
+                Some(item)
+            }
+        } else {
+            None
+        }
+    }
+}
+
+impl<T> Drop for VecIntoIter<T> {
+    fn drop(&mut self) {
+        unsafe {
+            for i in self.index..self.vec.len {
+                core::ptr::drop_in_place(self.vec.data.add(i));
+            }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -209,14 +261,6 @@ impl<T> core::ops::Deref for Vec<T> {
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_mut_slice()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
     }
 }
 

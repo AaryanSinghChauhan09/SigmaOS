@@ -217,7 +217,12 @@ impl OpenRCInit {
                 name: String::from("sshd"),
                 state: OpenRCServiceState::Started,
                 enabled: true,
-                dependencies: vec![String::from("net"), String::from("syslog")],
+                dependencies: {
+                    let mut deps = Vec::new();
+                    deps.push(String::from("net"));
+                    deps.push(String::from("syslog"));
+                    deps
+                },
             },
         );
 
