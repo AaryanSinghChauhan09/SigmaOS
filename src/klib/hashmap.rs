@@ -173,6 +173,52 @@ where
         None
     }
 
+    // Convenience method for String keys with &str lookups
+    pub fn get_str(&self, key: &str) -> Option<&V>
+    where
+        K: AsRef<str>,
+    {
+        if self.capacity == 0 || self.buckets.is_empty() {
+            return None;
+        }
+        let hash = self.hash_key(&key);
+        if let Some(ref bucket) = self.buckets[hash] {
+            for item in bucket.iter() {
+                if item.0.as_ref() == key {
+                    return Some(&item.1);
+                }
+            }
+        }
+        None
+    }
+
+    // Convenience method for String keys with &str contains_key
+    pub fn contains_key_str(&self, key: &str) -> bool
+    where
+        K: AsRef<str>,
+    {
+        self.get_str(key).is_some()
+    }
+
+    // Convenience method for String keys with &str get_mut
+    pub fn get_mut_str(&mut self, key: &str) -> Option<&mut V>
+    where
+        K: AsRef<str>,
+    {
+        if self.capacity == 0 || self.buckets.is_empty() {
+            return None;
+        }
+        let hash = self.hash_key(&key);
+        if let Some(ref mut bucket) = self.buckets[hash] {
+            for item in bucket.iter_mut() {
+                if item.0.as_ref() == key {
+                    return Some(&mut item.1);
+                }
+            }
+        }
+        None
+    }
+
     pub fn get_mut<Q>(&mut self, key: &Q) -> Option<&mut V>
     where
         K: Borrow<Q>,

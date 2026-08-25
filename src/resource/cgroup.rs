@@ -5,7 +5,7 @@ extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use crate::klib::BTreeMap;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,8 +120,8 @@ impl CgroupManager {
         }
 
         // Migrate PIDs to parent or root
-        let parent = self.cgroups.get(name).unwrap().parent_name.clone().unwrap_or(String::from("/"));
-        let pids_to_migrate = self.cgroups.get(name).unwrap().pids.clone();
+        let parent = self.cgroups.get_str(name).unwrap().parent_name.clone().unwrap_or(String::from("/"));
+        let pids_to_migrate = self.cgroups.get_str(name).unwrap().pids.clone();
 
         for pid in pids_to_migrate {
             let _ = self.attach_pid(&parent, pid);
@@ -140,7 +140,7 @@ impl CgroupManager {
 
         // Check task limit/process count limit in target cgroup
         {
-            let target_group = self.cgroups.get(name).unwrap();
+            let target_group = self.cgroups.get_str(name).unwrap();
             if target_group.usage.pids_count >= target_group.limits.pids_max {
                 return Err(CgroupError::LimitExceeded);
             }
@@ -251,7 +251,7 @@ impl CgroupManager {
         // Dry run: check if any ancestor group exceeds its limits
         let mut curr = Some(name.clone());
         while let Some(cname) = curr {
-            if let Some(group) = self.cgroups.get(&cname) {
+            if let Some(group) = self.cgroups.get_str(&cname) {
                 if group.usage.memory_usage_bytes.saturating_add(bytes) > group.limits.memory_max {
                     return Err(CgroupError::LimitExceeded);
                 }
@@ -264,7 +264,7 @@ impl CgroupManager {
         // Apply allocations hierarchically
         let mut curr = Some(name);
         while let Some(cname) = curr {
-            let parent = if let Some(group) = self.cgroups.get_mut(&cname) {
+            let parent = if let Some(group) = self.cgroups.get_mut_str(&cname) {
                 group.usage.memory_usage_bytes = group.usage.memory_usage_bytes.saturating_add(bytes);
                 group.parent_name.clone()
             } else {
@@ -332,7 +332,7 @@ mod tests {
         // Attempting to create under non-existent parent
         assert_eq!(manager.create_cgroup("/app/web", Some("/app")), Err(CgroupError::ParentNotFound));
 
-        let db_group = manager.cgroups.get("/sys/db").unwrap();
+        let db_group = manager.cgroups.get_str("/sys/db").unwrap();
         assert_eq!(db_group.parent_name.as_deref(), Some("/sys"));
     }
 
@@ -351,11 +351,11 @@ mod tests {
         assert_eq!(manager.get_cgroup_of_pid(1001).unwrap().name, "/user/bob");
 
         // Old group should no longer contain PID
-        let alice_group = manager.cgroups.get("/user/alice").unwrap();
+        let alice_group = manager.cgroups.get_str("/user/alice").unwrap();
         assert!(!alice_group.pids.contains(&1001));
         assert_eq!(alice_group.usage.pids_count, 0);
 
-        let bob_group = manager.cgroups.get("/user/bob").unwrap();
+        let bob_group = manager.cgroups.get_str("/user/bob").unwrap();
         assert!(bob_group.pids.contains(&1001));
         assert_eq!(bob_group.usage.pids_count, 1);
     }
@@ -370,19 +370,19 @@ mod tests {
 
         // First allocation fits
         assert_eq!(manager.track_memory_alloc(101, 600), Ok(()));
-        assert_eq!(manager.cgroups.get("/app").unwrap().usage.memory_usage_bytes, 600);
+        assert_eq!(manager.cgroups.get_str("/app").unwrap().usage.memory_usage_bytes, 600);
 
         // Second allocation exceeds limit
         assert_eq!(manager.track_memory_alloc(101, 500), Err(CgroupError::LimitExceeded));
-        assert_eq!(manager.cgroups.get("/app").unwrap().usage.memory_usage_bytes, 600); // usage unchanged
+        assert_eq!(manager.cgroups.get_str("/app").unwrap().usage.memory_usage_bytes, 600); // usage unchanged
 
         // Release some memory
         assert_eq!(manager.track_memory_free(101, 200), Ok(()));
-        assert_eq!(manager.cgroups.get("/app").unwrap().usage.memory_usage_bytes, 400);
+        assert_eq!(manager.cgroups.get_str("/app").unwrap().usage.memory_usage_bytes, 400);
 
         // Now the second allocation fits
         assert_eq!(manager.track_memory_alloc(101, 500), Ok(()));
-        assert_eq!(manager.cgroups.get("/app").unwrap().usage.memory_usage_bytes, 900);
+        assert_eq!(manager.cgroups.get_str("/app").unwrap().usage.memory_usage_bytes, 900);
     }
 
     #[test]

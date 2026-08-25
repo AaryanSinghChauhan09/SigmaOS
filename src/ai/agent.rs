@@ -275,7 +275,7 @@ impl SigmaSovereignCopilot {
     }
 
     pub fn get_persona_memory(&self, key: &str) -> Option<&String> {
-        self.l3_persona_memory.get(key)
+        self.l3_persona_memory.get_str(key)
     }
 
     pub fn dispatch_gui_cli_command(&mut self, cli_cmd: &str) -> Result<String, &'static str> {
