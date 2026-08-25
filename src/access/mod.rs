@@ -11,8 +11,12 @@ pub mod control;
 
 pub use control::{
     AccessControlMatrix, AclType, AclTag, AclEntry, PosixAcl,
-    CapBoundingSet, DacPermission, SensitivityLevel, MacSecurityLabel,
+    CapBoundingSet, DacPermission, dac_flags, SensitivityLevel, MacSecurityLabel,
     FilterPolicy, MacAddressFilter, ZeroTrustAccessGate,
+    FileAttributeAccessControl, file_flags, CapsicumRights, capsicum_rights,
+    Nfs4AceType, Nfs4Ace, Nfs4Acl, nfs4_ace_masks, nfs4_ace_flags,
+    AppArmorMode, AppArmorPathRule, AppArmorProfile,
+    BsdSecureLevel, SecureLevelManager,
 };
 pub use crate::filesystem::ext4_ntfs_security::{
     NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
