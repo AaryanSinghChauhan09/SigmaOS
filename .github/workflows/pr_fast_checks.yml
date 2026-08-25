@@ -6,6 +6,9 @@ on:
   push:
     branches: [ main, master ]
 
+
+permissions:
+  contents: read
 jobs:
   fast-checks:
     name: Fast PR Validation & Standalone Tests

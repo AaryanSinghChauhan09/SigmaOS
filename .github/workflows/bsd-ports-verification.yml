@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+
+permissions:
+  contents: read
 jobs:
   verify-ports-recipes:
     name: Package SAT Solver & Dependency Verification

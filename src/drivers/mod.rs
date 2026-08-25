@@ -43,6 +43,7 @@ pub use modern_wifi::ModernWifiDriver;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
+pub use linux_bsd_drivers::*;
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
