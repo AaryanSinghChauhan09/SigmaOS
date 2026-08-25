@@ -1,6 +1,7 @@
 #![no_std]
 
 use core::mem;
+use core::hash::{Hash, Hasher};
 
 pub type SigmaVec<T> = Vec<T>;
 
@@ -29,6 +30,34 @@ impl<T> Vec<T> {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
+        }
+    }
+
+    pub fn with_capacity(capacity: usize) -> Self {
+        if capacity == 0 {
+            return Self::new();
+        }
+        let size = mem::size_of::<T>() * capacity;
+        let new_data = alloc(size) as *mut T;
+        Vec {
+            data: new_data,
+            len: 0,
+            capacity,
+        }
+    }
+
+    pub fn reserve(&mut self, additional: usize) {
+        if self.len + additional > self.capacity {
+            unsafe { self.grow_to(self.len + additional); }
+        }
+    }
+
+    pub fn truncate(&mut self, new_len: usize) {
+        unsafe {
+            while self.len > new_len {
+                self.len -= 1;
+                core::ptr::drop_in_place(self.data.add(self.len));
+            }
         }
     }
 
@@ -143,12 +172,56 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn insert(&mut self, index: usize, item: T) {
+        if index > self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if index < self.len {
+                for i in (index..self.len).rev() {
+                    core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+                }
+            }
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
+    pub fn drain<R>(&mut self, range: R) -> Drain<'_, T>
+    where
+        R: core::ops::RangeBounds<usize>,
+    {
+        let start = match range.start_bound() {
+            core::ops::Bound::Included(&x) => x,
+            core::ops::Bound::Excluded(&x) => x + 1,
+            core::ops::Bound::Unbounded => 0,
+        };
+        let end = match range.end_bound() {
+            core::ops::Bound::Included(&x) => x + 1,
+            core::ops::Bound::Excluded(&x) => x,
+            core::ops::Bound::Unbounded => self.len,
+        };
+
+        Drain {
+            vec: self,
+            start,
+            end,
+        }
+    }
+
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
         } else {
             self.capacity * 2
         };
+        self.grow_to(new_capacity);
+    }
+
+    unsafe fn grow_to(&mut self, new_capacity: usize) {
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             if self.capacity > 0 && !self.data.is_null() {
@@ -186,6 +259,15 @@ impl<T: PartialEq> PartialEq for Vec<T> {
 }
 
 impl<T: Eq> Eq for Vec<T> {}
+
+impl<T: Hash> Hash for Vec<T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.len.hash(state);
+        for item in self.iter() {
+            item.hash(state);
+        }
+    }
+}
 
 impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
     fn eq(&self, other: &[U]) -> bool {
@@ -349,6 +431,46 @@ impl<T> Drop for Vec<T> {
                 }
                 free(self.data as *mut u8);
             }
+        }
+    }
+}
+
+pub struct Drain<'a, T> {
+    vec: &'a mut Vec<T>,
+    start: usize,
+    end: usize,
+}
+
+impl<'a, T> Iterator for Drain<'a, T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.start < self.end {
+            unsafe {
+                self.start += 1;
+                Some(core::ptr::read(self.vec.data.add(self.start - 1)))
+            }
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, T> Drop for Drain<'a, T> {
+    fn drop(&mut self) {
+        unsafe {
+            for i in self.start..self.end {
+                core::ptr::drop_in_place(self.vec.data.add(i));
+            }
+            let remaining = self.vec.len - self.end;
+            for i in 0..remaining {
+                core::ptr::copy_nonoverlapping(
+                    self.vec.data.add(self.end + i),
+                    self.vec.data.add(self.start + i),
+                    1,
+                );
+            }
+            self.vec.len -= self.end - self.start;
         }
     }
 }
