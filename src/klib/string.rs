@@ -347,19 +347,8 @@ impl core::ops::Index<usize> for SigmaString {
         if index >= bytes.len() {
             panic!("index out of bounds");
         }
-        // Find the character boundary
-        let mut char_start = index;
-        while char_start > 0 && bytes[char_start].is_utf8_continuation() {
-            char_start -= 1;
-        }
-        let mut char_end = index + 1;
-        while char_end < bytes.len() && bytes[char_end].is_utf8_continuation() {
-            char_end += 1;
-        }
-        if char_end >= bytes.len() {
-            char_end = bytes.len();
-        }
-        core::str::from_utf8(&bytes[char_start..char_end]).unwrap()
+        // Return single character at position
+        &self.as_str()[index..index + 1]
     }
 }
 
