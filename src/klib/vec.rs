@@ -81,6 +81,10 @@ impl<T> Vec<T> {
         self.len == 0
     }
 
+    pub fn capacity(&self) -> usize {
+        self.capacity
+    }
+
     pub fn as_slice(&self) -> &[T] {
         if self.len == 0 {
             &[]

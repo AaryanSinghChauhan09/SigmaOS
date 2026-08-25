@@ -4,6 +4,7 @@
 use core::ops::{Deref, DerefMut};
 use core::slice;
 use core::str;
+use core::fmt;
 use super::vec::SigmaVec;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
@@ -11,6 +12,12 @@ use super::vec::SigmaVec;
 pub struct SigmaString {
     data: SigmaVec<u8>,
     len: usize,
+}
+
+impl fmt::Debug for SigmaString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "SigmaString({:?})", self.as_str())
+    }
 }
 
 impl SigmaString {
@@ -329,6 +336,30 @@ impl From<String> for SigmaString {
 impl From<SigmaString> for String {
     fn from(s: SigmaString) -> Self {
         s.as_str().to_string()
+    }
+}
+
+impl core::ops::Index<usize> for SigmaString {
+    type Output = str;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        let bytes = self.as_bytes();
+        if index >= bytes.len() {
+            panic!("index out of bounds");
+        }
+        // Find the character boundary
+        let mut char_start = index;
+        while char_start > 0 && bytes[char_start].is_utf8_continuation() {
+            char_start -= 1;
+        }
+        let mut char_end = index + 1;
+        while char_end < bytes.len() && bytes[char_end].is_utf8_continuation() {
+            char_end += 1;
+        }
+        if char_end >= bytes.len() {
+            char_end = bytes.len();
+        }
+        core::str::from_utf8(&bytes[char_start..char_end]).unwrap()
     }
 }
 
