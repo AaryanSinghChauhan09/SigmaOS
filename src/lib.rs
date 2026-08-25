@@ -28,6 +28,13 @@ pub mod sigpkg;
 pub mod storage;
 pub mod thread;
 pub mod process;
+pub use process::{
+    ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
+    JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
+    ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
+    ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
+    SigQueuePayload, AdvancedIpcHub,
+};
 pub mod community;
 pub mod memory;
 pub mod access;

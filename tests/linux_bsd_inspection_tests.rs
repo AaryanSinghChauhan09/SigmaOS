@@ -35,6 +35,9 @@ mod zenith_advanced;
 #[path = "../src/distro/wiki_ideas_implementation.rs"]
 mod wiki_ideas_implementation;
 
+#[path = "../src/process/advanced_process_control.rs"]
+mod advanced_process_control;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -217,6 +220,41 @@ fn test_wiki_distro_innovations_inspection() {
     // 6. FreeBSD Capsicum Descriptor Delegation
     let cap = FreeBsdCapsicumDescriptorDelegate::grant_capability(3, CAP_READ | CAP_SEEK);
     assert!(FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_READ));
+}
+
+#[test]
+fn test_advanced_process_control_inspection() {
+    use advanced_process_control::{
+        ProcessVmReadWriteEngine, JobControlLifecycleEngine, ProcessWaiterAndRusageCollector,
+        ProcessCancellationAndTerminationManager, AdvancedIpcHub, JobState, CancellationType, BsdRusage,
+    };
+
+    // 1. Process VM read/write
+    let mut vm = ProcessVmReadWriteEngine::new();
+    vm.register_process_memory(42, 0x1000, vec![1, 2, 3, 4]);
+    assert_eq!(vm.process_vm_readv(42, 0x1000, 2).unwrap(), vec![1, 2]);
+
+    // 2. Job control & daemonize
+    let mut job = JobControlLifecycleEngine::new();
+    job.spawn_job(42, 42, 42, true, "test_cmd");
+    job.daemonize(42).unwrap();
+    assert_eq!(job.jobs.get(&42).unwrap().state, JobState::Background);
+
+    // 3. Process waiter & rusage
+    let mut waiter = ProcessWaiterAndRusageCollector::new();
+    waiter.record_rusage(42, BsdRusage { ru_utime_ms: 50, ..Default::default() });
+    assert_eq!(waiter.get_rusage(42).unwrap().ru_utime_ms, 50);
+
+    // 4. Cancellation & orphan reparenting
+    let mut cancel = ProcessCancellationAndTerminationManager::new();
+    cancel.register_process(10, 5, CancellationType::Deferred);
+    cancel.reparent_orphans(5);
+    assert_eq!(cancel.process_parents.get(&10), Some(&1));
+
+    // 5. Advanced IPC Hub
+    let mut ipc = AdvancedIpcHub::new();
+    let efd = ipc.eventfd_create(10, false);
+    assert_eq!(ipc.eventfd_read(efd).unwrap(), 10);
 }
 
 #[test]
