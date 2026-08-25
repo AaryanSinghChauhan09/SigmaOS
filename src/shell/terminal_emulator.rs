@@ -264,7 +264,7 @@ impl TriggerRule {
 
 impl TerminalSession {
     pub fn new(width: usize, height: usize) -> Self {
-        let mut session = Self {
+        let session = Self {
             cursor_x: 0,
             cursor_y: 0,
             width,
@@ -277,6 +277,10 @@ impl TerminalSession {
             aliases: BTreeMap::new(),
             user_functions: BTreeMap::new(),
             suggestion_engine: AutoSuggestionEngine::new(),
+            multiplexer: TerminalMultiplexer::new(width, height),
+            graphics_frames: Vec::new(),
+            trigger_rules: Vec::new(),
+            visual_bell_active: false,
         };
 
         // Standard Linux distro utilities to beat
@@ -287,27 +291,6 @@ impl TerminalSession {
         session.suggestion_engine.register_builtin("systemctl");
         session.suggestion_engine.register_builtin("apt");
         session.suggestion_engine.register_builtin("sigpkg");
-
-        let multiplexer = TerminalMultiplexer::new(width, height);
-
-        session = Self {
-            cursor_x: 0,
-            cursor_y: 0,
-            width,
-            height,
-            foreground: AnsiColor::Default,
-            background: AnsiColor::Default,
-            bold: false,
-            scrollback: Vec::new(),
-            current_line: String::new(),
-            aliases: BTreeMap::new(),
-            user_functions: BTreeMap::new(),
-            suggestion_engine: session.suggestion_engine,
-            multiplexer,
-            graphics_frames: Vec::new(),
-            trigger_rules: Vec::new(),
-            visual_bell_active: false,
-        };
 
         session
     }

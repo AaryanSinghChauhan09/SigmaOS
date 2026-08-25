@@ -138,7 +138,7 @@ impl<T> VecDeque<T> {
         self.inner.is_empty()
     }
 
-    pub fn drain<R>(&mut self, range: R) -> AllocVecDequeDrain<'_, T>
+    pub fn drain<R>(&mut self, range: R) -> alloc::collections::vec_deque::Drain<'_, T>
     where
         R: core::ops::RangeBounds<usize>,
     {

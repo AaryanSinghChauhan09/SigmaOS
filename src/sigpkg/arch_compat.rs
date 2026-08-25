@@ -104,7 +104,7 @@ impl AurRecipeCompiler {
                     .trim_matches('"');
                 for d in dep_str.split_whitespace() {
                     depends.push(Dependency {
-                        name: d.replace('\'', "").replace('"', ""),
+                        name: d.replace('\'', "").replace('"', "").into(),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -120,7 +120,7 @@ impl AurRecipeCompiler {
         Ok(Package::new(
             pkgname.to_string(),
             parsed_ver,
-            format!("Compiled AUR Package: {}", pkgname),
+            format!("Compiled AUR Package: {}", pkgname).into(),
             depends,
             "sha256_compiled_mock_hash_value".to_string(),
         ))

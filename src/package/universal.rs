@@ -424,7 +424,7 @@ impl DependencyResolver {
                 continue;
             }
 
-            visited.push(current.clone());
+            visited.insert(current.clone());
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
@@ -686,7 +686,7 @@ impl UniversalPackageManager {
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
                         let adapter: &PackageAdapter = adapter;
-                        adapter.install(package)?;
+                        adapter.install(&package)?;
                         break;
                     }
                 }
@@ -706,7 +706,7 @@ impl UniversalPackageManager {
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     let adapter: &PackageAdapter = adapter;
-                    adapter.remove(package)?;
+                    adapter.remove(&package)?;
                     break;
                 }
             }
@@ -721,7 +721,7 @@ impl UniversalPackageManager {
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     let adapter: &PackageAdapter = adapter;
-                    adapter.update(package)?;
+                    adapter.update(&package)?;
                     break;
                 }
             }

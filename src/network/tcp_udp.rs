@@ -663,8 +663,10 @@ impl NetworkStack for SimpleNetworkStack {
     }
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket in &self.sockets {
-            if socket.id() == id {
-                return Some(socket.as_ref());
+            if let Some(s) = socket {
+                if s.id() == id {
+                    return Some(s.as_ref());
+                }
             }
         }
         None
