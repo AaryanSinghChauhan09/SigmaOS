@@ -522,6 +522,7 @@ pub enum AbsorptionError {
 pub struct AbsorbedUsbHidDriver {
     metadata: DriverMetadata,
     connected: bool,
+    _connected: bool,
 }
 
 impl AbsorbedUsbHidDriver {
@@ -558,12 +559,14 @@ impl AbsorbedUsbHidDriver {
                 },
             },
             connected: false,
+            _connected: false,
         }
     }
 }
 
 impl DeviceDriver for AbsorbedUsbHidDriver {
     fn init(&mut self) -> Result<(), DriverError> {
+        self.connected = true;
         self._connected = true;
         Ok(())
     }
@@ -584,6 +587,7 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
     }
 
     fn shutdown(&mut self) -> Result<(), DriverError> {
+        self.connected = false;
         self._connected = false;
         Ok(())
     }
@@ -607,6 +611,8 @@ pub struct AbsorbedExt4Driver {
     fs_metadata: FilesystemMetadata,
     mounted: bool,
     mount_point: String,
+    _mounted: bool,
+    _mount_point: String,
 }
 
 impl AbsorbedExt4Driver {
@@ -656,6 +662,8 @@ impl AbsorbedExt4Driver {
                     v
                 },
             },
+            mounted: false,
+            mount_point: String::new(),
             _mounted: false,
             _mount_point: String::new(),
         }
@@ -674,8 +682,8 @@ impl FileSystem for AbsorbedExt4Driver {
     }
 
     fn unmount(&mut self) -> Result<(), FsError> {
-        self._mounted = false;
-        self._mount_point.clear();
+        self.mounted = false;
+        self.mount_point.clear();
         Ok(())
     }
 
