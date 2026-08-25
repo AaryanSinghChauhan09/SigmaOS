@@ -32,6 +32,12 @@ mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 
+#[path = "../src/kernel/sysctl.rs"]
+mod sysctl;
+
+#[path = "../src/security/root_improvement.rs"]
+mod root_improvement;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -195,4 +201,37 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     theme_mgr.apply_preset(ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.current_preset, ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
+}
+
+#[test]
+fn test_sysctl_parameter_registry_inspection() {
+    use sysctl::{SysctlRegistry, SysctlValue};
+
+    let mut registry = SysctlRegistry::new();
+    assert_eq!(registry.get("kern.ostype"), Some(&SysctlValue::String("SigmaOS".to_string())));
+    assert!(registry.set("vm.swappiness", SysctlValue::Int(15)).is_ok());
+    assert_eq!(registry.get("vm.swappiness"), Some(&SysctlValue::Int(15)));
+    assert!(registry.set("vm.swappiness", SysctlValue::Int(-1)).is_err());
+}
+
+#[test]
+fn test_pam_authentication_stack_inspection() {
+    use root_improvement::{PamEngine, PamGroup, PamRule, PamControlFlag, PamUnixModule, PamResult, SudoDoasElevator};
+
+    let mut engine = PamEngine::new();
+    let db = vec![("admin".to_string(), "hash_secret".to_string())];
+    let unix_mod = std::sync::Arc::new(PamUnixModule::new(db));
+
+    engine.add_rule(PamGroup::Auth, PamRule {
+        control_flag: PamControlFlag::Required,
+        module: unix_mod,
+    });
+
+    assert_eq!(engine.execute_group(PamGroup::Auth, "admin", "hash_secret"), PamResult::Success);
+    assert_eq!(engine.execute_group(PamGroup::Auth, "admin", "wrong_hash"), PamResult::AuthError);
+
+    let mut elevator = SudoDoasElevator::new();
+    elevator.password_database.push(("admin".to_string(), "pass123".to_string()));
+    assert_eq!(elevator.elevate_via_doas("admin", "pass123", 1000).unwrap(), 0);
+    assert!(elevator.verify_active_sudo_session(0, 2000));
 }

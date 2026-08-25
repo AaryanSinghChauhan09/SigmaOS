@@ -27,6 +27,7 @@
 // - Never use hard-coded password hashes or weak hashing algorithms
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec;
@@ -64,8 +65,8 @@ impl SudoDoasElevator {
 
     pub fn elevate_via_doas(
         &mut self,
-        _username: &str,
-        _password_hash: &str,
+        username: &str,
+        password_hash: &str,
         current_time_ms: u64,
     ) -> Result<u32, &'static str> {
         let mut user_found = false;
@@ -333,7 +334,7 @@ impl PamMfaAuthenticator {
 // ==========================================
 
 /// Standard PAM service types (management groups)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PamGroup {
     Auth,
     Account,
@@ -452,8 +453,8 @@ impl PamModule for PamUnixModule {
 
     fn authenticate(
         &self,
-        _username: &str,
-        _password_hash: &str,
+        username: &str,
+        password_hash: &str,
         _context: &mut PamContext,
     ) -> PamResult {
         for (user, hash) in &self.password_database {
@@ -584,25 +585,20 @@ pub struct PamRule {
 
 /// Central Pluggable Authentication Modules manager
 pub struct PamEngine {
-    pub chains: crate::klib::BTreeMap<PamGroup, Vec<PamRule>>,
+    pub chains: BTreeMap<PamGroup, Vec<PamRule>>,
     pub context: PamContext,
 }
 
 impl PamEngine {
     pub fn new() -> Self {
         Self {
-            chains: crate::klib::BTreeMap::new(),
+            chains: BTreeMap::new(),
             context: PamContext::new(),
         }
     }
 
     pub fn add_rule(&mut self, group: PamGroup, rule: PamRule) {
-        if !self.chains.contains_key(&group) {
-            self.chains.insert(group, Vec::new());
-        }
-        if let Some(chain) = self.chains.get_mut(&group) {
-            chain.push(rule);
-        }
+        self.chains.entry(group).or_insert_with(Vec::new).push(rule);
     }
 
     /// Evaluates the complete PAM configuration stack for a specific management group.
@@ -610,8 +606,8 @@ impl PamEngine {
     pub fn execute_group(
         &mut self,
         group: PamGroup,
-        _username: &str,
-        _password_hash: &str,
+        username: &str,
+        password_hash: &str,
     ) -> PamResult {
         let rules = match self.chains.get(&group) {
             Some(r) => r,
@@ -690,15 +686,15 @@ mod tests {
     #[test]
     fn test_sudo_doas_privilege_elevation() {
         let mut elevator = SudoDoasElevator::new();
+        elevator.password_database.push(("admin".to_string(), "hash123".to_string()));
+
         // Failed attempt with incorrect password hash
         assert!(elevator
             .elevate_via_doas("admin", "invalid_hash", 10000)
             .is_err());
 
-        // Test that elevation fails with empty database
-        assert!(elevator
-            .elevate_via_doas("admin", "any_hash", 10000)
-            .is_err());
+        // Successful elevation creates active token
+        assert_eq!(elevator.elevate_via_doas("admin", "hash123", 10000).unwrap(), 0);
 
         // Verification must confirm active session under TTL
         assert!(elevator.verify_active_sudo_session(0, 15000)); // 5 secs later
@@ -769,8 +765,7 @@ mod tests {
     fn test_linux_inspired_pam_stack() {
         let mut engine = PamEngine::new();
 
-        // Empty database for security - passwords set at runtime
-        let unix_db: Vec<(String, String)> = vec![];
+        let unix_db = vec![("alice".to_string(), "correct_hash".to_string())];
         let pam_unix = std::sync::Arc::new(PamUnixModule::new(unix_db));
         let pam_faillock = std::sync::Arc::new(PamFaillockModule);
         let pam_time = std::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM
@@ -799,16 +794,22 @@ mod tests {
             },
         );
 
-        // Test authentication with empty database should fail
-        assert_eq!(
-            engine.execute_group(PamGroup::Auth, "alice", "any_password"),
-            PamResult::AuthErr
-        );
-
-        // Test wrong credentials
+        // Test authentication with valid user and wrong credentials
         assert_eq!(
             engine.execute_group(PamGroup::Auth, "alice", "wrong_hash"),
             PamResult::AuthError
+        );
+
+        // Test authentication with unknown user
+        assert_eq!(
+            engine.execute_group(PamGroup::Auth, "bob", "any_hash"),
+            PamResult::UserUnknown
+        );
+
+        // Test authentication with correct credentials
+        assert_eq!(
+            engine.execute_group(PamGroup::Auth, "alice", "correct_hash"),
+            PamResult::Success
         );
 
         // Scenario 2: Test account lockout with pam_faillock
