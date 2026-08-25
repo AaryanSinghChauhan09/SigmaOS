@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+
+permissions:
+  contents: read
 jobs:
   mac-security-policy-check:
     name: Fedora SELinux MLS/MCS Policy Evaluation Test
