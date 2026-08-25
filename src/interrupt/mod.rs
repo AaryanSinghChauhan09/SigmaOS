@@ -12,8 +12,5 @@ pub use controller::{
     SimpleIRQHandler, SimpleInterruptController,
 };
 pub use handler::{
-    ControllerCapability as HandlerControllerCapability, HandlerCapability, HandlerType,
-    InterruptDescriptor, InterruptError, InterruptHandler, InterruptHandlerInfo, InterruptManager,
-    InterruptNumber, InterruptResult, InterruptStats, Priority as HandlerPriority,
-    SimpleInterruptHandler, PIC,
+    InterruptHandler, InterruptNumber, InterruptResult, SimpleInterruptHandler, RegisterSet,
 };

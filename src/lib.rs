@@ -47,6 +47,8 @@ pub use unimplemented_features::{
 pub mod virtualization;
 pub mod cluster;
 
+pub mod interrupt;
+
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
