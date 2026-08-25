@@ -909,10 +909,10 @@ impl SovereignCgroupGovernorV1 {
             path.to_string(),
             CgroupGroup {
                 path: path.to_string(),
-                limits: CgroupResourceLimits::default(),
+                limits: Some(CgroupResourceLimits::default()),
                 pids: Vec::new(),
-                used_cpu_us: 0,
-                allocated_memory_bytes: 0,
+                cpu_used_us: 0,
+                memory_allocated_bytes: 0,
             },
         );
         Ok(())
@@ -920,7 +920,7 @@ impl SovereignCgroupGovernorV1 {
 
     pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        group.limits = limits;
+        group.limits = Some(limits);
         Ok(())
     }
 
@@ -932,21 +932,31 @@ impl SovereignCgroupGovernorV1 {
 
     pub fn check_cpu_budget(&mut self, path: &str, usage_us: u64) -> Result<bool, &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        if group.used_cpu_us + usage_us <= group.limits.cpu_quota_us {
-            group.used_cpu_us += usage_us;
-            Ok(true)
+        if let Some(limits) = &group.limits {
+            if group.cpu_used_us + usage_us <= limits.cpu_quota_us {
+                group.cpu_used_us += usage_us;
+                Ok(true)
+            } else {
+                Ok(false)
+            }
         } else {
-            Ok(false)
+            group.cpu_used_us += usage_us;
+            Ok(true)
         }
     }
 
     pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        if group.allocated_memory_bytes + bytes <= group.limits.memory_max_bytes {
-            group.allocated_memory_bytes += bytes;
-            Ok(())
+        if let Some(limits) = &group.limits {
+            if group.memory_allocated_bytes + bytes <= limits.memory_max_bytes {
+                group.memory_allocated_bytes += bytes;
+                Ok(())
+            } else {
+                Err("Memory quota exceeded")
+            }
         } else {
-            Err("Memory quota exceeded")
+            group.memory_allocated_bytes += bytes;
+            Ok(())
         }
     }
 }
@@ -3026,10 +3036,9 @@ mod tests {
 
     #[test]
     fn test_sovereign_cgroup_governor() {
-        use crate::kernel::linux_absorb::SovereignCgroupController;
-        let mut controller = SovereignCgroupController::new();
-        controller.create_cgroup("db").unwrap();
-        assert_eq!(controller.groups.len(), 1);
+        let mut governor = SovereignCgroupGovernorV1::new();
+        governor.create_group("db").unwrap();
+        assert_eq!(governor.groups.len(), 1);
     }
 
     #[test]
