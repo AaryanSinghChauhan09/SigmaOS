@@ -314,7 +314,7 @@ impl FileManager {
 
     /// Remove bookmark
     pub fn remove_bookmark(&mut self, name: &str) {
-        self.bookmarks.remove_str(name);
+        self.bookmarks.remove(&name.to_string());
     }
 
     /// Get bookmarks
@@ -324,7 +324,7 @@ impl FileManager {
 
     /// Navigate to bookmark
     pub fn navigate_to_bookmark(&mut self, name: &str) -> Result<(), FileManagerError> {
-        if let Some(path) = self.bookmarks.get_str(name).cloned() {
+        if let Some(path) = self.bookmarks.get(&name.to_string()).cloned() {
             self.navigate(&path)
         } else {
             Err(FileManagerError::BookmarkNotFound(name.to_string()))

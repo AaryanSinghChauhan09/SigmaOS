@@ -553,7 +553,7 @@ impl ThreeTierReleaseModel {
         let mut sorted_keys: Vec<&String> = self.channels.keys().collect();
         sorted_keys.sort(); // Consistent ordering
         for key in sorted_keys {
-            let desc = &self.channels[key.clone()];
+            let desc = self.channels.get(key).unwrap_or(&"".to_string());
             let k: &String = key;
             let name_alias = match k.as_str() {
                 "sigma.next" => "Σ-next",
@@ -566,7 +566,7 @@ impl ThreeTierReleaseModel {
     }
 
     pub fn set_channel(&mut self, channel: &str) -> Result<String, &'static str> {
-        if self.channels.contains_key_str(channel) {
+        if self.channels.contains_key(channel) {
             self.active_channel = channel.to_string();
             Ok(format!("Σ [PKG] Channel set to {} (LTS). No experimental features.", channel))
         } else {
