@@ -3044,6 +3044,13 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_sovereign_cgroup_governor() {
+        use crate::kernel::linux_absorb::SovereignCgroupController;
+        let mut controller = SovereignCgroupController::new();
+        controller.create_cgroup("db").unwrap();
+        assert_eq!(controller.groups.len(), 1);
+    }
 
     #[test]
     fn test_bsd_pf_state_table() {
