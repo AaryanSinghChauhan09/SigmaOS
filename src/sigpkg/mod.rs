@@ -55,7 +55,7 @@ pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
 pub use transaction::Transaction;
 pub use universal_adapter::{
-    AptDebManifest, UniversalPackageManager as UniversalPackageAdapter,
+    AptDebManifest, UniversalPackageAdapter,
 };
 pub use verifier::CryptoVerifier;
 

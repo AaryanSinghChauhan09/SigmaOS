@@ -307,7 +307,7 @@ impl SimpleVMM {
         let pd = pdpt.get_table_mut(pd_idx).unwrap();
 
         // Set the page table entry
-        let pte = PageTableEntry::with_attributes(phys, writable, false, execute_disable);
+        let pte = PageTableEntry::with_attributes(phys, true, false, false);
         pd.set_entry(pt_idx, pte)?;
 
         // Register in active list for Clock paging tracker

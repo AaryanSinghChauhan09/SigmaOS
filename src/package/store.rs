@@ -59,7 +59,7 @@ impl SigmaSoftwareStore {
                 }
             }
         }
-        count
+        Err("PackageNotFound")
     }
 
     /// Automatically scans and triggers update routines for registered packages
@@ -89,11 +89,15 @@ impl SigmaSoftwareStore {
 }
 
 pub static GLOBAL_SOFTWARE_STORE: SigmaSoftwareStore = SigmaSoftwareStore::new();
+
 // SigmaOS Polish-Parity Software Store & Update Manager (SigmaStore)
 // Designed for software installation, package upgrades, and security auditing
+// Only available on hosted targets (requires std)
 
+#[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
 
+#[cfg(not(target_os = "none"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StoreError {
     Success = 0,
@@ -102,6 +106,7 @@ pub enum StoreError {
     InsecurePackage = 3,
 }
 
+#[cfg(not(target_os = "none"))]
 pub struct StoreApp {
     pub name: String,
     pub version: String,
@@ -110,11 +115,13 @@ pub struct StoreApp {
     pub safety_score: f32, // 0.0 to 1.0 (GDPR/Compliance check)
 }
 
+#[cfg(not(target_os = "none"))]
 pub struct SoftwareStoreCatalog {
     pub catalog: HashMap<String, StoreApp>,
     pub pending_updates: Vec<String>,
 }
 
+#[cfg(not(target_os = "none"))]
 impl SoftwareStoreCatalog {
     pub fn new() -> Self {
         let mut store = SoftwareStoreCatalog {

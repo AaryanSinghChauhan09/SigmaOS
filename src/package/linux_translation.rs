@@ -47,7 +47,7 @@ impl PackageTranslationUdf for GenericLinuxTranslationUdf {
 pub trait LinuxDriverPackageTranslator {
     fn source_format(&self) -> PackageFormat;
     fn package_name(&self) -> &'static str;
-    fn translate_to_driver(&self) -> SimpleDriver;
+    fn translate_to_driver(&self) -> DriverID;
 }
 
 /// Concrete .deb (Debian/Ubuntu/Parrot/Mint) package translator
@@ -66,17 +66,13 @@ impl LinuxDriverPackageTranslator for DebPackageDriverTranslator {
         self.name
     }
 
-    fn translate_to_driver(&self) -> SimpleDriver {
+    fn translate_to_driver(&self) -> DriverID {
         println!(
             "PackageTranslator: Converting Debian Package '{}' ({} bytes) to SigmaOS system driver.",
             self.name, self.payload_size
         );
-        let driver_type = if self.is_kernel_module {
-            DriverType::Block
-        } else {
-            DriverType::Char
-        };
-        SimpleDriver::new(9901, driver_type)
+        // Return a simple driver ID for the translated package
+        9901
     }
 }
 
@@ -95,7 +91,7 @@ impl LinuxDriverPackageTranslator for RpmPackageDriverTranslator {
         self.name
     }
 
-    fn translate_to_driver(&self) -> SimpleDriver {
+    fn translate_to_driver(&self) -> DriverID {
         println!(
             "PackageTranslator: Processing RPM Package '{}'. Verifying header layout signatures...",
             self.name
@@ -105,7 +101,7 @@ impl LinuxDriverPackageTranslator for RpmPackageDriverTranslator {
                 "PackageTranslator: RPM signature is valid. Provisioning micro-driver bridge."
             );
         }
-        SimpleDriver::new(9902, DriverType::Char)
+        9902
     }
 }
 
@@ -124,7 +120,7 @@ impl LinuxDriverPackageTranslator for PacmanPackageDriverTranslator {
         self.name
     }
 
-    fn translate_to_driver(&self) -> SimpleDriver {
+    fn translate_to_driver(&self) -> DriverID {
         println!(
             "PackageTranslator: Mapping Arch Linux Package '{}' to native driver layer.",
             self.name
@@ -132,7 +128,7 @@ impl LinuxDriverPackageTranslator for PacmanPackageDriverTranslator {
         if self.has_aur_recipes {
             println!("  -> Found embedded AUR building recipes. Executing clean compile sandbox.");
         }
-        SimpleDriver::new(9903, DriverType::Network)
+        9903
     }
 }
 
