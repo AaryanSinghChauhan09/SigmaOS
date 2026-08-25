@@ -30,10 +30,6 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
-
 pub use qubes_isolation::*;
 pub use root_improvement::*;
 
@@ -79,5 +75,5 @@ pub use vpn::{
 };
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    SimpleVulnerability, SimpleVulnerabilityScanner,
 };
-pub use vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner};

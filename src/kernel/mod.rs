@@ -43,6 +43,7 @@ pub mod traits;
 pub use architecture::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
+pub mod structures;
 pub use policy_mechanism::*;
 pub use structures::*;
 pub use breakthroughs::{
@@ -88,7 +89,7 @@ pub use linux_bsd_innovations::{
     HybridKernelManager, NtExecutiveService, MicrokernelCore, ExokernelHardwareMultiplexer, ResourceBinding,
     NetBsdRumpKernel, RumpComponent, DynamicLkmLoader, KernelModule, CapabilityDerivationTree, KernelCapability,
     FreeBsdJail, NixOsDeclarativeManager, GentooUseFlags, VoidRunitInit,
-    SovereignCgroupGovernor, SovereignCgroupEntry, CgroupResourceLimits,
+    SovereignCgroupGovernor, CgroupResourceLimits,
     KernelFastPacketEngine, FastPacketFrame, XdpAction,
     KernelAccessController, LandlockPathRule, LandlockAccessRight, PLEDGE_STDIO, PLEDGE_RPATH, PLEDGE_WPATH, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_INET, PLEDGE_UNIX, PLEDGE_EXEC,
     InteractiveHybridScheduler, HybridTask,

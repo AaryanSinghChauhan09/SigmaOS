@@ -37,7 +37,10 @@ pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError, DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
+    PackageFormatAdapter, UniversalPackageManager,
+};
+pub use universal_oop_system::{
+    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
 };
 pub use sovereign_sigpkg::*;
 
@@ -157,24 +160,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }

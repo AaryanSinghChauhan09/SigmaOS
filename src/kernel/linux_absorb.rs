@@ -11,17 +11,6 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-#[cfg(not(test))]
-use crate::kernel::subsystem::{
-    DeviceDriver, DriverError, DriverMetadata, DriverType, FileFlags, FileHandle, FileMetadata,
-    FileSystem, FilesystemFeature, FilesystemMetadata, FilesystemType, FsError, IoOperation,
-    IoResult, LinuxHeritage, MapFlags, MemoryError, MemoryManager, MemoryManagerMetadata,
-    MemoryManagerType, NetworkError, NetworkProtocol, NetworkStack, NetworkStackMetadata,
-    NetworkStackType, ProcessInfo, ProcessState, Scheduler, SchedulerError, SchedulerMetadata,
-    SchedulerType, SocketDomain, SocketHandle, SocketProtocol, SocketType,
-};
-
-#[cfg(test)]
 pub mod mock_subsystem {
     use super::*;
 
@@ -299,7 +288,6 @@ pub mod mock_subsystem {
     }
 }
 
-#[cfg(test)]
 use mock_subsystem::*;
 
 // ============================================================================

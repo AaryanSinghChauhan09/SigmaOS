@@ -281,12 +281,12 @@ pub struct SimpleContainer {
     pub cpu_limit: u32,
     pub capability: RuntimeCapability,
     pub environment: [u8; 512],
-    pub seccomp: SeccompPolicy,
+    pub seccomp: SeccompProfile,
 }
 
 impl SimpleContainer {
     pub fn execute_syscall(&self, syscall_id: u32) -> Result<(), ContainerError> {
-        if self.seccomp.is_syscall_blocked(syscall_id) {
+        if self.seccomp.hardened && (self.seccomp.blocked_syscalls_mask & (1 << (syscall_id % 32))) != 0 {
             return Err(ContainerError::PermissionDenied);
         }
         Ok(())
@@ -319,7 +319,7 @@ impl SimpleContainer {
             cpu_limit: 0,
             capability,
             environment: [0; 512],
-            seccomp: SeccompPolicy { default_action: SeccompAction::Allow, blocked_syscalls: Vec::new() },
+            seccomp: SeccompProfile { hardened: false, blocked_syscalls_mask: 0 },
         }
     }
 
@@ -922,9 +922,9 @@ mod tests {
             b"alpine",
             ContainerCapability::full(),
         );
-        container.seccomp = SeccompPolicy {
-            default_action: SeccompAction::Allow,
-            blocked_syscalls: vec![0], // Block sys_mount (syscall 0)
+        container.seccomp = SeccompProfile {
+            hardened: true,
+            blocked_syscalls_mask: 1, // Block syscall 0
         };
 
         // Allowed syscall (e.g. syscall 1)

@@ -22,6 +22,24 @@ impl Clone for SimplePageTableEntry {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageSize {
+    Standard4KB = 0,
+    Huge2MB = 1,
+    Giant1GB = 2,
+}
+
+impl PageSize {
+    pub fn byte_size(&self) -> usize {
+        match self {
+            PageSize::Standard4KB => 4096,
+            PageSize::Huge2MB => 2 * 1024 * 1024,
+            PageSize::Giant1GB => 1024 * 1024 * 1024,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum PageTableLevel {
     PML4 = 0,
@@ -244,47 +262,6 @@ impl SimpleVMM {
         (virt >> 12) & 0x1FF
     }
 
-    pub fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
-        let pml4_idx = self.get_pml4_index(virt);
-        let pdpt_idx = self.get_pdpt_index(virt);
-        let pd_idx = self.get_pd_index(virt);
-        let pt_idx = self.get_pt_index(virt);
-
-        if !self.pml4.get_entry_ref(pml4_idx).is_present() {
-            return Err(PageFaultError::NotPresent);
-        }
-
-        if let Some(ref mut pdpt) = self
-            .pdpt_tables
-            .get_mut(pml4_idx)
-            .and_then(|opt| opt.as_mut())
-        {
-            if !pdpt.get_entry_ref(pdpt_idx).is_present() {
-                return Err(PageFaultError::NotPresent);
-            }
-            if let Some(ref mut pd) = self
-                .pd_tables
-                .get_mut(pdpt_idx)
-                .and_then(|opt| opt.as_mut())
-            {
-                if !pd.get_entry_ref(pd_idx).is_present() {
-                    return Err(PageFaultError::NotPresent);
-                }
-                if let Some(ref mut pt) =
-                    self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut())
-                {
-                    let pt_entry = pt.get_entry(pt_idx);
-                    if pt_entry.is_present() {
-                        pt_entry.set_writable(false);
-                        pt_entry.set_cow(true);
-                        return Ok(());
-                    }
-                }
-            }
-        }
-        Err(PageFaultError::NotPresent)
-    }
-
     pub fn map_large_page(
         &mut self,
         virt: VirtualAddress,
@@ -411,7 +388,7 @@ impl SimpleVMM {
                     .get_mut(pt_idx_in_vec)
                     .and_then(|o| o.as_mut())
                 {
-                    let mut entry = pt.entries[pt_idx];
+                    let entry = &mut pt.entries[pt_idx];
                     entry.set_writable(false);
                     entry.cow.store(1, Ordering::SeqCst);
                     return Ok(());

@@ -80,6 +80,24 @@ impl MultiTrackSession {
     }
 }
 
+pub struct AmplifyEffect {
+    pub gain: f32,
+}
+
+impl AmplifyEffect {
+    pub fn new(gain: f32) -> Self {
+        AmplifyEffect { gain }
+    }
+}
+
+impl AudioEffect for AmplifyEffect {
+    fn apply(&self, samples: &mut [f32]) {
+        for sample in samples.iter_mut() {
+            *sample = (*sample * self.gain).clamp(-1.0, 1.0);
+        }
+    }
+}
+
 pub struct SpectralNoiseSuppressionEffect {
     pub noise_floor: f32,
 }
