@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+#![cfg_attr(target_os = "none", no_std)]
+#![cfg_attr(target_os = "none", no_main)]
 
 /// OOP-based Desktop Terminal for SigmaOS
 /// Implements terminal emulator, ANSI escape interpretation, and shell integration.
@@ -28,7 +28,9 @@ pub trait Terminal {
 pub struct SimpleTerminal {
     pub id: TerminalID,
     pub title: [u8; 128],
+    pub title_len: usize,
     pub working_directory: [u8; 256],
+    pub working_directory_len: usize,
 }
 
 impl SimpleTerminal {
@@ -44,20 +46,24 @@ impl SimpleTerminal {
         SimpleTerminal {
             id,
             title: title_array,
+            title_len,
             working_directory: dir_array,
+            working_directory_len: dir_len,
         }
     }
 }
 
 impl Terminal for SimpleTerminal {
     fn id(&self) -> TerminalID { self.id }
+
+    // Optimization: Return slice using cached title_len to avoid $O(N)$ linear byte scans over 128 bytes.
     fn title(&self) -> &[u8] {
-        let len = self.title.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.title[..len]
+        &self.title[..self.title_len]
     }
+
+    // Optimization: Return slice using cached working_directory_len to avoid $O(N)$ linear byte scans over 256 bytes.
     fn working_directory(&self) -> &[u8] {
-        let len = self.working_directory.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.working_directory[..len]
+        &self.working_directory[..self.working_directory_len]
     }
     
     fn set_working_directory(&mut self, path: &[u8]) {
@@ -65,6 +71,7 @@ impl Terminal for SimpleTerminal {
         unsafe {
             core::ptr::copy_nonoverlapping(path.as_ptr(), self.working_directory.as_mut_ptr(), path_len);
         }
+        self.working_directory_len = path_len;
     }
 }
 
@@ -547,5 +554,28 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_terminal_cached_lengths() {
+        let title = b"terminal_session_1";
+        let mut term = SimpleTerminal::new(10, title);
+
+        assert_eq!(term.id(), 10);
+        assert_eq!(term.title(), title);
+        assert_eq!(term.title_len, title.len());
+
+        assert_eq!(term.working_directory(), b"/home/user");
+        assert_eq!(term.working_directory_len, b"/home/user".len());
+
+        let new_path = b"/var/log/sigma";
+        term.set_working_directory(new_path);
+        assert_eq!(term.working_directory(), new_path);
+        assert_eq!(term.working_directory_len, new_path.len());
     }
 }
