@@ -3306,6 +3306,324 @@ impl VoidXbpsPackageEngine {
     }
 }
 
+// -------------------------------------------------------------------------
+// Fedora Toolbox & Distrobox Container Engine
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct FedoraToolboxContainerEngine {
+    pub container_name: String,
+    pub base_image: String,
+    pub host_home_mounted: bool,
+    pub is_running: bool,
+}
+
+impl FedoraToolboxContainerEngine {
+    pub fn new(container_name: &str, base_image: &str) -> Self {
+        Self {
+            container_name: container_name.to_string(),
+            base_image: base_image.to_string(),
+            host_home_mounted: true,
+            is_running: false,
+        }
+    }
+
+    pub fn create_toolbox(&mut self) -> Result<(), &'static str> {
+        if self.base_image.is_empty() {
+            return Err("Invalid base image for toolbox container");
+        }
+        Ok(())
+    }
+
+    pub fn enter_toolbox(&mut self) -> Result<&'static str, &'static str> {
+        self.is_running = true;
+        Ok("Entered Fedora/Distrobox container shell")
+    }
+
+    pub fn stop_toolbox(&mut self) {
+        self.is_running = false;
+    }
+}
+
+// -------------------------------------------------------------------------
+// NixOS Home Manager User Environment
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct HomeManagerPackage {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct NixHomeManagerEnvironment {
+    pub username: String,
+    pub user_packages: Vec<HomeManagerPackage>,
+    pub dotfiles_managed: Vec<String>,
+    pub active_generation: u32,
+}
+
+impl NixHomeManagerEnvironment {
+    pub fn new(username: &str) -> Self {
+        Self {
+            username: username.to_string(),
+            user_packages: Vec::new(),
+            dotfiles_managed: Vec::new(),
+            active_generation: 1,
+        }
+    }
+
+    pub fn add_user_package(&mut self, name: &str, version: &str) {
+        self.user_packages.push(HomeManagerPackage {
+            name: name.to_string(),
+            version: version.to_string(),
+        });
+    }
+
+    pub fn manage_dotfile(&mut self, relative_path: &str) {
+        self.dotfiles_managed.push(relative_path.to_string());
+    }
+
+    pub fn switch_generation(&mut self) -> u32 {
+        self.active_generation += 1;
+        self.active_generation
+    }
+}
+
+// -------------------------------------------------------------------------
+// mise / asdf Universal Version Manager
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct LanguageRuntimeVersion {
+    pub tool_name: String,
+    pub active_version: String,
+}
+
+pub struct MiseUniversalVersionManager {
+    pub installed_tools: Vec<LanguageRuntimeVersion>,
+}
+
+impl MiseUniversalVersionManager {
+    pub fn new() -> Self {
+        Self {
+            installed_tools: Vec::new(),
+        }
+    }
+
+    pub fn install_tool(&mut self, tool: &str, version: &str) {
+        if let Some(existing) = self.installed_tools.iter_mut().find(|t| t.tool_name == tool) {
+            existing.active_version = version.to_string();
+        } else {
+            self.installed_tools.push(LanguageRuntimeVersion {
+                tool_name: tool.to_string(),
+                active_version: version.to_string(),
+            });
+        }
+    }
+
+    pub fn use_global(&self, tool: &str) -> Option<String> {
+        self.installed_tools
+            .iter()
+            .find(|t| t.tool_name == tool)
+            .map(|t| t.active_version.clone())
+    }
+}
+
+impl Default for MiseUniversalVersionManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// -------------------------------------------------------------------------
+// devenv.sh Reproducible Developer Environment
+// -------------------------------------------------------------------------
+
+pub struct DevenvReproducibleEnvironment {
+    pub project_name: String,
+    pub environment_variables: Vec<(String, String)>,
+    pub pre_commit_hooks_enabled: bool,
+    pub is_active: bool,
+}
+
+impl DevenvReproducibleEnvironment {
+    pub fn new(project_name: &str) -> Self {
+        Self {
+            project_name: project_name.to_string(),
+            environment_variables: Vec::new(),
+            pre_commit_hooks_enabled: true,
+            is_active: false,
+        }
+    }
+
+    pub fn set_env_var(&mut self, key: &str, value: &str) {
+        self.environment_variables.push((key.to_string(), value.to_string()));
+    }
+
+    pub fn enter_shell(&mut self) -> Result<usize, &'static str> {
+        self.is_active = true;
+        Ok(self.environment_variables.len())
+    }
+}
+
+// -------------------------------------------------------------------------
+// Aircrack-ng & Kali Wireless Penetration Testing Suite
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct AccessPointPacket {
+    pub bssid: String,
+    pub ssid: String,
+    pub channel: u8,
+    pub signal_dbm: i8,
+    pub encryption: &'static str,
+}
+
+pub struct AircrackWirelessAuditor {
+    pub monitor_interface: String,
+    pub captured_access_points: Vec<AccessPointPacket>,
+    pub handshake_captured: bool,
+}
+
+impl AircrackWirelessAuditor {
+    pub fn new(interface: &str) -> Self {
+        Self {
+            monitor_interface: interface.to_string(),
+            captured_access_points: Vec::new(),
+            handshake_captured: false,
+        }
+    }
+
+    pub fn scan_airspace(&mut self, bssid: &str, ssid: &str, channel: u8, signal: i8, enc: &'static str) {
+        self.captured_access_points.push(AccessPointPacket {
+            bssid: bssid.to_string(),
+            ssid: ssid.to_string(),
+            channel,
+            signal_dbm: signal,
+            encryption: enc,
+        });
+    }
+
+    pub fn capture_eapol_handshake(&mut self, target_bssid: &str) -> bool {
+        if self.captured_access_points.iter().any(|ap| ap.bssid == target_bssid) {
+            self.handshake_captured = true;
+            return true;
+        }
+        false
+    }
+}
+
+// -------------------------------------------------------------------------
+// Ubuntu Pro Kernel Livepatch Engine
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct LivepatchPatchModule {
+    pub patch_id: String,
+    pub cwe_reference: String,
+    pub applied: bool,
+}
+
+pub struct UbuntuProLivepatchEngine {
+    pub subscription_active: bool,
+    pub installed_patches: Vec<LivepatchPatchModule>,
+}
+
+impl UbuntuProLivepatchEngine {
+    pub fn new(subscription_active: bool) -> Self {
+        Self {
+            subscription_active,
+            installed_patches: Vec::new(),
+        }
+    }
+
+    pub fn apply_hotpatch(&mut self, patch_id: &str, cwe: &str) -> Result<(), &'static str> {
+        if !self.subscription_active {
+            return Err("Ubuntu Pro livepatch subscription required");
+        }
+        self.installed_patches.push(LivepatchPatchModule {
+            patch_id: patch_id.to_string(),
+            cwe_reference: cwe.to_string(),
+            applied: true,
+        });
+        Ok(())
+    }
+
+    pub fn get_applied_patches_count(&self) -> usize {
+        self.installed_patches.iter().filter(|p| p.applied).count()
+    }
+}
+
+// -------------------------------------------------------------------------
+// Flatpak SDK Container Builder
+// -------------------------------------------------------------------------
+
+pub struct FlatpakSdkContainerBuilder {
+    pub app_id: String,
+    pub runtime_sdk: String,
+    pub build_steps: Vec<String>,
+}
+
+impl FlatpakSdkContainerBuilder {
+    pub fn new(app_id: &str, sdk: &str) -> Self {
+        Self {
+            app_id: app_id.to_string(),
+            runtime_sdk: sdk.to_string(),
+            build_steps: Vec::new(),
+        }
+    }
+
+    pub fn add_build_step(&mut self, command: &str) {
+        self.build_steps.push(command.to_string());
+    }
+
+    pub fn build_bundle(&self) -> Result<String, &'static str> {
+        if self.build_steps.is_empty() {
+            return Err("No build steps supplied for Flatpak SDK bundle");
+        }
+        Ok(format!("org.sigma.flatpak.{}.flatpak", self.app_id))
+    }
+}
+
+// -------------------------------------------------------------------------
+// Clear Linux Stateless OS Configuration Engine
+// -------------------------------------------------------------------------
+
+pub struct ClearLinuxStatelessEngine {
+    pub sysconfdir_overrides: Vec<(String, String)>,
+    pub usr_defaults: Vec<(String, String)>,
+}
+
+impl ClearLinuxStatelessEngine {
+    pub fn new() -> Self {
+        Self {
+            sysconfdir_overrides: Vec::new(),
+            usr_defaults: Vec::new(),
+        }
+    }
+
+    pub fn register_usr_default(&mut self, path: &str, content: &str) {
+        self.usr_defaults.push((path.to_string(), content.to_string()));
+    }
+
+    pub fn override_etc(&mut self, path: &str, content: &str) {
+        self.sysconfdir_overrides.push((path.to_string(), content.to_string()));
+    }
+
+    pub fn reset_etc_to_stateless_defaults(&mut self) -> usize {
+        let count = self.sysconfdir_overrides.len();
+        self.sysconfdir_overrides.clear();
+        count
+    }
+}
+
+impl Default for ClearLinuxStatelessEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // UNIT TESTS
 // =========================================================================
@@ -4314,5 +4632,83 @@ mod tests {
         assert_eq!(xbps.sync_repository(), 42);
         assert!(xbps.install_package("void-repo-multilib").is_ok());
         assert!(xbps.is_installed("void-repo-multilib"));
+    }
+
+    #[test]
+    fn test_fedora_toolbox_container_engine() {
+        let mut toolbox = FedoraToolboxContainerEngine::new("dev-box", "fedora:39");
+        assert!(toolbox.create_toolbox().is_ok());
+        assert!(!toolbox.is_running);
+        assert!(toolbox.enter_toolbox().is_ok());
+        assert!(toolbox.is_running);
+        toolbox.stop_toolbox();
+        assert!(!toolbox.is_running);
+    }
+
+    #[test]
+    fn test_nix_home_manager_environment() {
+        let mut hm = NixHomeManagerEnvironment::new("jules");
+        hm.add_user_package("ripgrep", "14.1.0");
+        hm.manage_dotfile(".config/zsh/.zshrc");
+        assert_eq!(hm.user_packages.len(), 1);
+        assert_eq!(hm.dotfiles_managed.len(), 1);
+        assert_eq!(hm.switch_generation(), 2);
+    }
+
+    #[test]
+    fn test_mise_universal_version_manager() {
+        let mut mise = MiseUniversalVersionManager::new();
+        mise.install_tool("node", "20.11.0");
+        mise.install_tool("rust", "1.76.0");
+        assert_eq!(mise.use_global("node"), Some("20.11.0".to_string()));
+        mise.install_tool("node", "22.0.0");
+        assert_eq!(mise.use_global("node"), Some("22.0.0".to_string()));
+    }
+
+    #[test]
+    fn test_devenv_reproducible_environment() {
+        let mut devenv = DevenvReproducibleEnvironment::new("sigma-core");
+        devenv.set_env_var("RUST_LOG", "debug");
+        let count = devenv.enter_shell().unwrap();
+        assert_eq!(count, 1);
+        assert!(devenv.is_active);
+    }
+
+    #[test]
+    fn test_aircrack_wireless_auditor() {
+        let mut auditor = AircrackWirelessAuditor::new("wlan0mon");
+        auditor.scan_airspace("00:11:22:33:44:55", "SigmaNet", 6, -45, "WPA2");
+        assert!(!auditor.handshake_captured);
+        assert!(auditor.capture_eapol_handshake("00:11:22:33:44:55"));
+        assert!(auditor.handshake_captured);
+    }
+
+    #[test]
+    fn test_ubuntu_pro_livepatch_engine() {
+        let mut engine_no_sub = UbuntuProLivepatchEngine::new(false);
+        assert!(engine_no_sub.apply_hotpatch("LP-2026-001", "CWE-119").is_err());
+
+        let mut engine_sub = UbuntuProLivepatchEngine::new(true);
+        assert!(engine_sub.apply_hotpatch("LP-2026-001", "CWE-119").is_ok());
+        assert_eq!(engine_sub.get_applied_patches_count(), 1);
+    }
+
+    #[test]
+    fn test_flatpak_sdk_container_builder() {
+        let mut builder = FlatpakSdkContainerBuilder::new("gimp", "org.gnome.Sdk//45");
+        assert!(builder.build_bundle().is_err());
+        builder.add_build_step("meson setup build");
+        let bundle = builder.build_bundle().unwrap();
+        assert_eq!(bundle, "org.sigma.flatpak.gimp.flatpak");
+    }
+
+    #[test]
+    fn test_clear_linux_stateless_engine() {
+        let mut engine = ClearLinuxStatelessEngine::new();
+        engine.register_usr_default("/usr/share/defaults/etc/fstab", "LABEL=root / ext4 defaults 0 1");
+        engine.override_etc("/etc/fstab", "/dev/sda1 / ext4 defaults 0 1");
+        assert_eq!(engine.sysconfdir_overrides.len(), 1);
+        assert_eq!(engine.reset_etc_to_stateless_defaults(), 1);
+        assert_eq!(engine.sysconfdir_overrides.len(), 0);
     }
 }
