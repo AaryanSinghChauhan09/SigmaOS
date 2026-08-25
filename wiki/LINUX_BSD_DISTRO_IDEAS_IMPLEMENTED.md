@@ -40,13 +40,14 @@ SigmaOS absorbs the best architectural decisions from leading Linux distribution
 | VFS Layer | Linux `fs/` | `src/kernel/vfs/` | ✅ Done |
 | SigmaFS | Linux ext4 concepts | `src/filesystem/` | ✅ Done |
 
-### Security
+### Security & Device Drivers
 | Feature | Linux Source | SigmaOS Implementation | Status |
 |---------|-------------|----------------------|--------|
 | Crypto primitives | Linux `crypto/` | `src/kernel/crypto/` | ✅ Done |
 | IPC | Linux `ipc/` | `src/kernel/ipc.rs` | ✅ Done |
 | Watchdog | Linux `drivers/watchdog/` | `src/kernel/watchdog.rs` | ✅ Done |
 | Secure free | Linux `lib/string.c` (memzero) | `src/kernel/secure_free.rs` | ✅ Done |
+| 25 Distro Hardware Drivers | Linux & BSD `drivers/` | `src/drivers/linux_bsd_distro_devices.rs` | ✅ Done |
 
 ## 🐡 BSD Inspirations
 
