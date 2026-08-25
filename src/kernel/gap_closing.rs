@@ -581,10 +581,6 @@ pub struct DriverObject {
     pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
 }
 
-pub fn io_attach_device_to_device_stack(source: &mut DeviceObject, target: &mut DeviceObject) {
-    source.next_device = Some(alloc::boxed::Box::new(target.clone()));
-}
-
 #[derive(Debug, Clone)]
 pub struct IrpStackLocation {
     pub major_function: IrpMajorFunction,

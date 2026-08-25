@@ -18,19 +18,9 @@
 
 extern crate alloc;
 
-use crate::klib::collections::VecDeque;
-/// SigmaOS Block Device Layer
-/// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
-/// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
-
-use crate::klib::{BTreeMap, Vec};
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
-
-use alloc::collections::{BTreeMap, VecDeque};
-extern crate alloc;
 use crate::klib::{BTreeMap, Vec, VecDeque};
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use alloc::string::String;
-use alloc::vec::Vec;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks

@@ -61,8 +61,6 @@ pub trait StorageDriver: Driver {
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
 }
 
-pub type SimpleStorageDriver = SimpleDriver;
-
 #[repr(C)]
 #[derive(Debug)]
 pub struct SimpleStorageDriver {
@@ -130,22 +128,6 @@ impl Driver for SimpleDriver {
     fn unload(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
-    }
-}
-
-pub struct SimpleStorageDriver {
-    id: DriverID,
-    driver_type: DriverType,
-    state: DriverState,
-}
-
-impl SimpleStorageDriver {
-    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        Self {
-            id,
-            driver_type,
-            state: DriverState::Unloaded,
-        }
     }
 }
 

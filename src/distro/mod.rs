@@ -27,9 +27,6 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
-pub mod arch;
-pub mod cachy;
-pub mod linux_bsd_parity_extended;
 pub mod missing_distro_innovations;
 
 pub use linux_bsd_parity::{

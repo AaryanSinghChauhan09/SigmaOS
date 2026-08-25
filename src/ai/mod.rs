@@ -15,7 +15,6 @@ pub mod system;
 pub mod voice;
 pub mod wiki;
 pub mod qwenpaw;
-pub mod agentic_os_runtime;
 pub mod developer_platform;
 pub mod open_computer;
 pub mod tensor_memory;
@@ -25,7 +24,6 @@ pub mod next_gen;
 pub mod perplexity;
 pub mod quantization;
 pub mod wandr;
-pub mod wiki;
 
 pub use agentic_os_runtime::{
     ContextVirtualMmu, EphemeralAgentSandbox, HybridContainerRuntime, LocalLlmSystemDaemon,
