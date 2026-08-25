@@ -2,6 +2,7 @@
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
 extern crate alloc;
+use crate::klib::HashMap;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 

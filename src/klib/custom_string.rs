@@ -129,14 +129,8 @@ impl core::ops::Deref for SigmaString {
 // fmt::Display / fmt::Debug
 // ------------------------------------------------------------------
 
-impl fmt::Display for SigmaString {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.as_str())
-    }
-}
-
-impl fmt::Debug for SigmaString {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl core::fmt::Debug for SigmaString {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "SigmaString({:?})", self.as_str())
     }
 }
