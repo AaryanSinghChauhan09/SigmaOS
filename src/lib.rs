@@ -256,7 +256,9 @@ pub use unimplemented_tools::{
     AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
     CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
     SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
-    PluginMarketplace, MusicLibraryManager,
+    PluginMarketplace, MusicLibraryManager, FedoraToolboxContainerEngine, NixHomeManagerEnvironment,
+    MiseUniversalVersionManager, DevenvReproducibleEnvironment, AircrackWirelessAuditor,
+    UbuntuProLivepatchEngine, FlatpakSdkContainerBuilder, ClearLinuxStatelessEngine,
 };
 
 pub mod init {

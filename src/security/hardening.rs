@@ -3,6 +3,10 @@
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::Vec;
+extern crate alloc;
+
+#[cfg(feature = "standalone_test")]
+use alloc::vec::Vec;
 #[cfg(not(feature = "standalone_test"))]
 use crate::security::Permission;
 

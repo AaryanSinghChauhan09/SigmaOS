@@ -2378,6 +2378,16 @@ mod tests {
         assert_eq!(manager.zones.get("db_zone").unwrap().vnic_ips[0], "10.0.0.5");
     }
 
+    #[test]
+    fn test_sovereign_cgroup_governor() {
+        use crate::resource::cgroup::CgroupManager;
+        let mut manager = CgroupManager::new();
+        assert!(manager.create_cgroup("/sys/fs/cgroup/db", None).is_ok());
+        assert!(manager.set_memory_max("/sys/fs/cgroup/db", 1024 * 1024).is_ok());
+        assert!(manager.attach_pid("/sys/fs/cgroup/db", 1001).is_ok());
+        assert!(manager.track_memory_alloc(1001, 500_000).is_ok());
+        assert!(manager.track_memory_alloc(1001, 600_000).is_err());
+    }
 
     #[test]
     fn test_bsd_pf_state_table() {

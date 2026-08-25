@@ -305,6 +305,8 @@ impl SimpleVMM {
 
         let pd = pdpt.get_table_mut(pd_idx).unwrap();
 
+        let writable = true;
+        let execute_disable = false;
         // Set the page table entry
         let pte = PageTableEntry::with_attributes(phys, true, false, false);
         pd.set_entry(pt_idx, pte)?;

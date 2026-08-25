@@ -3,6 +3,8 @@
 
 extern crate alloc;
 use crate::klib::{BTreeMap, HashMap};
+use crate::klib::HashMap;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 
 /// OOP-based Superset Application Capability matching

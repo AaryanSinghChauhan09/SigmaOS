@@ -401,6 +401,7 @@ impl VirtualMemoryManager for SimpleVMM {
             self.pd_tables.push(None);
         }
 
+        let pd_idx_in_vec = pml4_idx * 512 + pdpt_idx;
         if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
             if !pdpt.get_entry(pdpt_idx).is_present() {
                 let pd_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
@@ -411,7 +412,12 @@ impl VirtualMemoryManager for SimpleVMM {
                 pd_entry.set_physical_address(pd_phys);
 
                 let pd_table = SimplePageTable::new(pd_phys);
-                self.pd_tables[pdpt_idx] = Some(pd_table);
+                if pd_idx_in_vec >= self.pd_tables.len() {
+                    while self.pd_tables.len() <= pd_idx_in_vec {
+                        self.pd_tables.push(None);
+                    }
+                }
+                self.pd_tables[pd_idx_in_vec] = Some(pd_table);
                 pdpt.set_entry(pdpt_idx, pd_entry);
             }
         }
