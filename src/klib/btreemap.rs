@@ -109,6 +109,18 @@ where
         false
     }
 
+    pub fn get_str(&self, key: &str) -> Option<&V>
+    where
+        K: core::convert::AsRef<str>,
+    {
+        for (k, v) in self.entries.iter() {
+            if k.as_ref() == key {
+                return Some(v);
+            }
+        }
+        None
+    }
+
     pub fn get_mut_str(&mut self, key: &str) -> Option<&mut V>
     where
         K: core::convert::AsRef<str>,
