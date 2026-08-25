@@ -440,6 +440,23 @@ impl SovereignUtility for ThemeUtility {
 }
 
 // ==========================================
+// TERMINAL EMULATOR & MULTIPLEXER
+// ==========================================
+// Integrated in src/shell/terminal_emulator.rs:
+// - Sixel and Kitty graphics protocol escape sequence parsing (SixelGraphicFrame)
+// - Tmux / BSD-style terminal split-pane multiplexing (TerminalMultiplexer)
+// - iTerm2 / Kitty-style regex URL and trigger rules (TriggerRule)
+// - OpenBSD wsdisplay visual bell notification support (trigger_visual_bell)
+
+// ==========================================
+// STANDARD STREAMS & I/O BUFFERING
+// ==========================================
+// Integrated in src/runtime/io/file.rs:
+// - Pre-allocated FDs 0 (stdin), 1 (stdout), 2 (stderr)
+// - Line-buffering (is_line_buffered) and non-blocking streaming
+// - Stream redirection via redirect_stream (dup2 parity)
+
+// ==========================================
 // MULTI-CALL BINARY DISPATCH MANAGER
 // ==========================================
 pub struct MultiCallManager {

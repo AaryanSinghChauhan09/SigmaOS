@@ -21,4 +21,5 @@ SigmaOS features native clean-room driver architectures for **Direct Rendering M
 |-----------|------------------|--------------|
 | **Sigma KMS** | Linux DRM/KMS | Zero-flicker boot transition, hardware cursor planes, gamma LUTs |
 | **Sigma USB HCD** | USB 3.2 Gen 2 (XHCI) | 64-byte TRB ring buffers, asynchronous endpoint scheduling, power suspend/resume |
+| **USB HID Keyboard** | USB HID 1.11 | NKRO rollover tracking, typematic auto-repeat, multi-layout translation (US, UK, DE, FR) |
 | **Driver Manager** | Sigma Unified Model | Hotplug detection, automatic driver binding via PCI class/vendor table |

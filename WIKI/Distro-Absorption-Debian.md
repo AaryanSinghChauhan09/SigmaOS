@@ -46,7 +46,14 @@ Our `DebianSocialContract` class validates system and package compliance against
 3. **Radical Transparency**: Keeping all bugs open and public.
 4. **Prioritizing Users**: Designing capabilities and system updates strictly for user empowerment.
 
-### 2.3 Freeze-Based Stabilization Lifecycle
+### 2.3 Universal Init System Control & Socket Activation
+
+Integrated into [`src/init/init_abstraction.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/init/init_abstraction.rs):
+- **Socket Activation (`SocketActivationConfig`)**: systemd and launchd inspired socket-on-demand service spawning.
+- **Cgroup Resource Limits (`CgroupResourceLimits`)**: Memory, CPU quota, and PID cap enforcement per service unit.
+- **Parallel Boot Dependency Ordering (`ServiceDependencyNode`)**: Topological dependency sorting for fast parallel boot sequences.
+
+### 2.4 Freeze-Based Stabilization Lifecycle
 
 Before every major stable release, a strict freeze-based stabilization window is enforced via `FreezeBasedStabilization`:
 

@@ -35,3 +35,12 @@ SigmaOS incorporates scheduling heuristics inspired by **CachyOS's BORE (Burst-O
        [Interactive Priority Boost]    [Batch Cache-Locality Slot]
        (Sub-millisecond scheduling)    (Larger time quanta, lower prio)
 ```
+
+---
+
+## Garuda Linux Inspired Performance Optimizations
+
+Integrated into [`src/performance/cachy_opt.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/performance/cachy_opt.rs):
+- **`GarudaGameModeProfile`**: Ultra-performance CPU governor, high GPU performance level, and high I/O scheduling priority.
+- **`GarudaZramTuner`**: ZRAM memory compression ratio tuning with zstd algorithm (defaulting to 150% RAM allocation).
+- **`GarudaIrqBalanceOptimizer`**: IRQ balance core isolation for dedicated gaming threads.

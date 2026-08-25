@@ -464,6 +464,92 @@ impl Default for CachySysctlTuner {
 }
 
 // ==========================================
+// 5B. GARUDA LINUX INSPIRED PERFORMANCE TWEAKS
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GarudaGameModeState {
+    Disabled,
+    StandardGaming,
+    UltraPerformance,
+}
+
+pub struct GarudaGameModeProfile {
+    pub state: GarudaGameModeState,
+    pub cpu_governor: &'static str,
+    pub gpu_perf_level: &'static str,
+    pub io_priority: i32,
+}
+
+impl GarudaGameModeProfile {
+    pub fn new() -> Self {
+        Self {
+            state: GarudaGameModeState::Disabled,
+            cpu_governor: "powersave",
+            gpu_perf_level: "auto",
+            io_priority: 0,
+        }
+    }
+
+    pub fn activate_ultra_performance(&mut self) {
+        self.state = GarudaGameModeState::UltraPerformance;
+        self.cpu_governor = "performance";
+        self.gpu_perf_level = "high";
+        self.io_priority = -10; // High I/O scheduling priority
+    }
+}
+
+impl Default for GarudaGameModeProfile {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct GarudaZramTuner {
+    pub comp_algorithm: &'static str, // zstd, lz4
+    pub ram_percentage: u32,         // e.g., 150% ZRAM allocation
+    pub max_compression_ratio: f32,
+}
+
+impl GarudaZramTuner {
+    pub fn new() -> Self {
+        Self {
+            comp_algorithm: "zstd",
+            ram_percentage: 150, // Garuda default: 150% of RAM size as ZRAM
+            max_compression_ratio: 3.5,
+        }
+    }
+}
+
+impl Default for GarudaZramTuner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct GarudaIrqBalanceOptimizer {
+    pub isolated_cores: Vec<u32>,
+}
+
+impl GarudaIrqBalanceOptimizer {
+    pub fn new() -> Self {
+        Self { isolated_cores: Vec::new() }
+    }
+
+    pub fn isolate_core_for_gaming(&mut self, core_id: u32) {
+        if !self.isolated_cores.contains(&core_id) {
+            self.isolated_cores.push(core_id);
+        }
+    }
+}
+
+impl Default for GarudaIrqBalanceOptimizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
 // 6. CACHYOS KERNEL MANAGER (SYSCTL & SCHEDULER SWAP)
 // ==========================================
 
@@ -687,6 +773,25 @@ mod tests {
         let copied = dispatcher.vectorized_memcpy(&mut dest, &src);
         assert_eq!(copied, 128);
         assert_eq!(dest, src);
+    }
+
+    #[test]
+    fn test_garuda_performance_tweaks() {
+        let mut gamemode = GarudaGameModeProfile::new();
+        assert_eq!(gamemode.state, GarudaGameModeState::Disabled);
+
+        gamemode.activate_ultra_performance();
+        assert_eq!(gamemode.state, GarudaGameModeState::UltraPerformance);
+        assert_eq!(gamemode.cpu_governor, "performance");
+        assert_eq!(gamemode.gpu_perf_level, "high");
+
+        let zram = GarudaZramTuner::new();
+        assert_eq!(zram.ram_percentage, 150);
+        assert_eq!(zram.comp_algorithm, "zstd");
+
+        let mut irq_opt = GarudaIrqBalanceOptimizer::new();
+        irq_opt.isolate_core_for_gaming(3);
+        assert_eq!(irq_opt.isolated_cores, vec![3]);
     }
 
     #[test]

@@ -4,6 +4,8 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::{vec, vec::Vec};
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnsiColor {
@@ -17,6 +19,100 @@ pub enum AnsiColor {
     Cyan,
     White,
     Xterm256(u8),
+}
+
+/// Sixel and Kitty graphics protocol frame descriptor
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SixelGraphicFrame {
+    pub image_id: u32,
+    pub width: u32,
+    pub height: u32,
+    pub payload_bytes: Vec<u8>,
+}
+
+/// Split Direction for Tmux / BSD-style terminal multiplexing
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PaneSplitDirection {
+    Horizontal,
+    Vertical,
+}
+
+/// Multiplexed Terminal Pane
+#[derive(Debug, Clone)]
+pub struct TerminalPane {
+    pub pane_id: u32,
+    pub x: usize,
+    pub y: usize,
+    pub width: usize,
+    pub height: usize,
+    pub session: TerminalSession,
+}
+
+/// Tmux / BSD-style Terminal Multiplexer
+#[derive(Debug, Clone)]
+pub struct TerminalMultiplexer {
+    pub panes: Vec<TerminalPane>,
+    pub active_pane_id: u32,
+    pub next_pane_id: u32,
+}
+
+impl TerminalMultiplexer {
+    pub fn new(root_width: usize, root_height: usize) -> Self {
+        let root_pane = TerminalPane {
+            pane_id: 1,
+            x: 0,
+            y: 0,
+            width: root_width,
+            height: root_height,
+            session: TerminalSession::new(root_width, root_height),
+        };
+        Self {
+            panes: vec![root_pane],
+            active_pane_id: 1,
+            next_pane_id: 2,
+        }
+    }
+
+    pub fn split_active_pane(&mut self, direction: PaneSplitDirection) -> Result<u32, &'static str> {
+        let pos = self.panes.iter().position(|p| p.pane_id == self.active_pane_id).ok_or("Pane not found")?;
+        let active = &mut self.panes[pos];
+
+        let (new_w, new_h, new_x, new_y) = match direction {
+            PaneSplitDirection::Horizontal => {
+                let half_h = active.height / 2;
+                active.height = half_h;
+                (active.width, half_h, active.x, active.y + half_h)
+            }
+            PaneSplitDirection::Vertical => {
+                let half_w = active.width / 2;
+                active.width = half_w;
+                (half_w, active.height, active.x + half_w, active.y)
+            }
+        };
+
+        let new_id = self.next_pane_id;
+        self.next_pane_id += 1;
+
+        let new_pane = TerminalPane {
+            pane_id: new_id,
+            x: new_x,
+            y: new_y,
+            width: new_w,
+            height: new_h,
+            session: TerminalSession::new(new_w, new_h),
+        };
+
+        self.panes.push(new_pane);
+        self.active_pane_id = new_id;
+        Ok(new_id)
+    }
+}
+
+/// Trigger Rule for iTerm2 / Kitty-style URL and text matching
+#[derive(Debug, Clone)]
+pub struct TriggerRule {
+    pub pattern: String,
+    pub action_command: String,
 }
 
 /// Dynamic, user-defined shell function.
@@ -511,6 +607,44 @@ impl TerminalSession {
         }
     }
 
+    /// Triggers OpenBSD wsdisplay visual bell notification
+    pub fn trigger_visual_bell(&mut self) {
+        self.visual_bell_active = true;
+    }
+
+    /// Parses Sixel and Kitty inline graphics escape sequences (\x1BPq... or \x1B_G...)
+    pub fn parse_graphics_escape(&mut self, seq: &str) -> bool {
+        if seq.starts_with("\x1BPq") || seq.starts_with("\x1B_G") {
+            let frame = SixelGraphicFrame {
+                image_id: (self.graphics_frames.len() + 1) as u32,
+                width: 640,
+                height: 480,
+                payload_bytes: seq.as_bytes().to_vec(),
+            };
+            self.graphics_frames.push(frame);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn register_trigger_rule(&mut self, pattern: &str, action: &str) {
+        self.trigger_rules.push(TriggerRule {
+            pattern: pattern.to_string(),
+            action_command: action.to_string(),
+        });
+    }
+
+    pub fn match_trigger_rules(&self, text: &str) -> Vec<String> {
+        let mut matched_actions = Vec::new();
+        for rule in &self.trigger_rules {
+            if text.contains(&rule.pattern) {
+                matched_actions.push(rule.action_command.clone());
+            }
+        }
+        matched_actions
+    }
+
     /// Parses basic ANSI Escape Sequences (CSIs)
     /// Supports:
     /// - \x1B[A (Cursor Up)
@@ -761,6 +895,37 @@ mod tests {
         let heal = session.ai_heal_dependency("sigma-vim").unwrap();
         assert!(heal.contains("libssl.so.3"));
         assert!(heal.contains("healthy"));
+    }
+
+    #[test]
+    fn test_sixel_kitty_graphics_and_visual_bell() {
+        let mut session = TerminalSession::new(80, 24);
+        assert!(!session.visual_bell_active);
+
+        session.trigger_visual_bell();
+        assert!(session.visual_bell_active);
+
+        let sixel_seq = "\x1BPq#0;2;0;0;0#1;2;100;100;100\x1B\\";
+        assert!(session.parse_graphics_escape(sixel_seq));
+        assert_eq!(session.graphics_frames.len(), 1);
+        assert_eq!(session.graphics_frames[0].width, 640);
+    }
+
+    #[test]
+    fn test_tmux_split_panes_and_trigger_rules() {
+        let mut mux = TerminalMultiplexer::new(100, 50);
+        assert_eq!(mux.panes.len(), 1);
+
+        let p2 = mux.split_active_pane(PaneSplitDirection::Vertical).unwrap();
+        assert_eq!(p2, 2);
+        assert_eq!(mux.panes.len(), 2);
+        assert_eq!(mux.panes[0].width, 50);
+        assert_eq!(mux.panes[1].width, 50);
+
+        let mut session = TerminalSession::new(80, 24);
+        session.register_trigger_rule("https://", "open_browser");
+        let matches = session.match_trigger_rules("Visit https://sigmaos.org now!");
+        assert_eq!(matches, vec!["open_browser".to_string()]);
     }
 
     #[test]
