@@ -4,7 +4,10 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::HashMap;
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 use alloc::format;
 use std::collections::HashMap;
 
