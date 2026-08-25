@@ -18,8 +18,6 @@ SigmaPkg is SigmaOS's native package manager, a clean-room, zero-dependency impl
 | **Multiple repos** | Rolling, stable, and security channels |
 | **Rollback** | Snapshot-based system rollback |
 | **AUR-compatible** | Build-from-source packages like Arch AUR |
-| **Parallel Mirror Fetcher** | Dynamic latency-based mirror ranking & parallel downloading |
-| **Dependency Graph Resolver** | Topological sort with cycle detection for multi-distro packages |
 
 ---
 
@@ -184,6 +182,6 @@ Packages stored by content hash — identical files shared automatically.
 ---
 
 *See also:*
-- [DEPENDENCY_REDUCTION_GUIDE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DEPENDENCY_REDUCTION_GUIDE.md)
-- [KLIB_REFERENCE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/KLIB_REFERENCE.md)
-- [ARCH_LINUX_PARITY_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ARCH_LINUX_PARITY_ROADMAP.md)
+- [DEPENDENCY_REDUCTION_GUIDE.md](file:///home/aaryansinghchauhan/SigmaOS/DEPENDENCY_REDUCTION_GUIDE.md)
+- [KLIB_REFERENCE.md](file:///home/aaryansinghchauhan/SigmaOS/KLIB_REFERENCE.md)
+- [ARCH_LINUX_PARITY_ROADMAP.md](file:///home/aaryansinghchauhan/SigmaOS/ARCH_LINUX_PARITY_ROADMAP.md)
