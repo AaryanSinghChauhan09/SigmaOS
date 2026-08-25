@@ -354,6 +354,12 @@ pub use ai::next_gen::{
     AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType, EnergyGovernorMode, ModelType,
     MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
 };
+pub use ai::agentic_os_runtime::{
+    AgentAuditRecord, ContainerConfig, ContainerFirstRuntimeHost, ContainerState, ContextTokenType,
+    DeterministicAgentSandbox, EbpfTraceEvent, EbpfTraceEventType, EbpfTracingMonitor, LocalLlmModel,
+    LocalLlmSystemDaemon, OmniAutomatorStudioApi, PosixNativeBridgeLayer, TamperProofAgentAuditLogger,
+    TpmTokenKeyVault, VectorContextBlock, VectorContextMmu,
+};
 pub use ai::wandr::{
     ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
 };

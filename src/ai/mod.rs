@@ -1,9 +1,10 @@
 // SigmaOS AI Module
-// S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, and quantization
+// S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, quantization, and Agentic OS runtime
 
 extern crate alloc;
 
 pub mod agent;
+pub mod agentic_os_runtime;
 pub mod apm;
 pub mod autogen;
 pub mod compute_scheduler;
@@ -27,6 +28,12 @@ pub mod wiki;
 pub use openclaw::{AlertPlatform, ClawBackgroundDaemon, ClawChatIntegrator, ClawVoiceTranscriber};
 
 pub use agent::{AIAgent, SimpleAIAgent};
+pub use agentic_os_runtime::{
+    AgentAuditRecord, ContainerConfig, ContainerFirstRuntimeHost, ContainerState, ContextTokenType,
+    DeterministicAgentSandbox, EbpfTraceEvent, EbpfTraceEventType, EbpfTracingMonitor, LocalLlmModel,
+    LocalLlmSystemDaemon, OmniAutomatorStudioApi, PosixNativeBridgeLayer, TamperProofAgentAuditLogger,
+    TpmTokenKeyVault, VectorContextBlock, VectorContextMmu,
+};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,
