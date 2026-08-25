@@ -874,7 +874,7 @@ impl SovereignZonesManager {
 
 // ================= Sovereign Linux Cgroup v2 Governor =================
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 pub struct CgroupResourceLimitsV1 {
     pub cpu_quota_us: u64,
     pub cpu_period_us: u64,

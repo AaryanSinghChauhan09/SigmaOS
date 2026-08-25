@@ -81,16 +81,17 @@ impl SimpleStorageDriver {
 
 impl Driver for SimpleStorageDriver {
     fn id(&self) -> DriverID { self.id }
+    fn name(&self) -> &str { "SimpleStorageDriver" }
     fn driver_type(&self) -> DriverType { self.driver_type }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.state.load(core::sync::atomic::Ordering::SeqCst)) }
     }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
+        self.state.store(DriverState::Active as usize, core::sync::atomic::Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.state.store(DriverState::Unloaded as usize, core::sync::atomic::Ordering::SeqCst);
         Ok(())
     }
 }
@@ -115,41 +116,21 @@ impl Driver for SimpleDriver {
     fn id(&self) -> DriverID {
         self.id
     }
-    fn driver_type(&self) -> DriverType {
-        self.driver_type
-    }
-    fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-    }
-    fn load(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Loaded as usize, Ordering::SeqCst);
-        Ok(())
-    }
-    fn unload(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
-        Ok(())
-    }
-}
-
-impl Driver for SimpleStorageDriver {
-    fn id(&self) -> DriverID {
-        self.id
-    }
     fn name(&self) -> &str {
-        "SimpleStorageDriver"
+        "SimpleDriver"
     }
     fn driver_type(&self) -> DriverType {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-        self.state
+        unsafe { core::mem::transmute(self.state.load(core::sync::atomic::Ordering::SeqCst)) }
     }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state = DriverState::Active;
+        self.state.store(DriverState::Active as usize, core::sync::atomic::Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state = DriverState::Unloaded;
+        self.state.store(DriverState::Unloaded as usize, core::sync::atomic::Ordering::SeqCst);
         Ok(())
     }
 }
