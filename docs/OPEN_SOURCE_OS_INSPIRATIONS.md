@@ -53,5 +53,19 @@ To maintain strict clean-room implementation standards and prevent copyright or 
 - [x] Implementation of `KernelIoUringEngine` submission/completion queue manager.
 - [x] Implementation of `BsdPfStateTable` stateful packet filtering.
 - [x] Implementation of `SystemStabilityMonitor` double fault guard and recovery pipeline.
-- [ ] Integration of Redox-inspired URL scheme drivers into microkernel VFS routing.
-- [ ] Integration of Fuchsia Zircon-parity object handle table into capability-based syscall handler.
+- [x] Integration of Redox-inspired URL scheme drivers into microkernel VFS routing (`SovereignSchemeRouter`).
+- [x] Integration of Fuchsia Zircon-parity object handle table into capability-based syscall handler (`SovereignZirconHandleManager`).
+- [x] Integration of SerenityOS LibCore event loop & IPC pipeline (`SovereignSerenityAsyncEngine`).
+- [x] Integration of illumos/Solaris DTrace dynamic probes & tenant zone isolation (`SovereignSolarisZoneEngine`).
+- [x] Integration of NixOS/Guix functional declarative package management & Merkle store paths (`SovereignNixDeclarativeEngine`).
+- [x] Integration of Qubes OS Xen micro-domain isolation & clipboard proxying (`SovereignQubesIsolationEngine`).
+- [x] Integration of Linux eBPF verifier & Landlock LSM security hooks (`SovereignLinuxSecurityLsmEngine`).
+- [x] Integration of Haiku OS BeAPI Desktop Kits & zero-copy media format translators (`SovereignHaikuInterfaceEngine`).
+- [x] Integration of Firecracker lightweight microVM isolation & lifecycle manager (`SovereignFirecrackerMicroVmManager`).
+- [x] Integration of Fedora / TPM 2.0 remote hardware attestation & PCR measurement workflow (`SovereignTpmAttestationWorkflow`).
+- [x] Integration of NixOS / SPDX / CycloneDX Software Bill of Materials (SBOM) generator pipeline (`SovereignSbomGeneratorPipeline`).
+- [x] Integration of Calamares / Arch declarative system installer framework (`SovereignCalamaresInstallerFramework`).
+- [x] Integration of PipeWire SPA graph low-latency audio engine (`SovereignPipeWireAudioEngine`).
+- [x] Integration of IPFS / Web3FS decentralized content-addressed block storage engine (`SovereignWeb3FsIpfsEngine`).
+- [x] Integration of Wasmtime / Cranelift sandboxed WASI micro-runtime engine (`SovereignWasmCraneliftEngine`).
+- [x] Integration of NixOS Hydra / Debian deterministic reproducible build farm auditor (`SovereignReproducibleBuildFarm`).

@@ -12,21 +12,21 @@ pub mod system;
 pub mod voice;
 pub mod wiki;
 pub mod qwenpaw;
+pub mod agentic_os_runtime;
 pub mod developer_platform;
 pub mod open_computer;
 pub mod tensor_memory;
 pub mod compute_scheduler;
-pub mod developer_platform;
 pub mod lift_engine;
-pub mod llm;
 pub mod next_gen;
-pub mod open_computer;
-pub mod openclaw;
-pub mod orchestrator;
 pub mod perplexity;
 pub mod quantization;
-pub mod next_gen;
 pub mod wandr;
+
+pub use agentic_os_runtime::{
+    ContextVirtualMmu, EphemeralAgentSandbox, HybridContainerRuntime, LocalLlmSystemDaemon,
+    OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
+};
 
 pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
