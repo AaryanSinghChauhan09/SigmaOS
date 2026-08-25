@@ -50,6 +50,12 @@ mod unimplemented_features;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
+use bsd::*;
+use kvm_vcpu::*;
+use unveil::*;
+use gap_closure::*;
+use unimplemented_features::*;
+
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {

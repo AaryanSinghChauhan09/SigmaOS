@@ -5,11 +5,88 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-#[cfg(feature = "standalone_test")]
-extern crate alloc;
-#[cfg(feature = "standalone_test")]
-use alloc::vec::Vec;
+pub trait AudioEffect {
+    fn apply(&self, samples: &mut [f32]);
+}
+
+pub struct AudioTrack {
+    pub id: u64,
+    pub name: String,
+    pub samples: Vec<f32>,
+    pub volume: f32,
+    pub is_muted: bool,
+    pub is_solo: bool,
+}
+
+impl AudioTrack {
+    pub fn new(id: u64, name: &str) -> Self {
+        AudioTrack {
+            id,
+            name: String::from(name),
+            samples: Vec::new(),
+            volume: 1.0,
+            is_muted: false,
+            is_solo: false,
         }
+    }
+
+    pub fn with_samples(mut self, samples: &[f32]) -> Self {
+        self.samples = samples.to_vec();
+        self
+    }
+
+    pub fn with_volume(mut self, volume: f32) -> Self {
+        self.volume = volume;
+        self
+    }
+}
+
+pub struct MultiTrackSession {
+    pub sample_rate: u32,
+    pub tracks: Vec<AudioTrack>,
+}
+
+impl MultiTrackSession {
+    pub fn new(sample_rate: u32) -> Self {
+        MultiTrackSession {
+            sample_rate,
+            tracks: Vec::new(),
+        }
+    }
+
+    pub fn add_track(&mut self, track: AudioTrack) {
+        self.tracks.push(track);
+    }
+
+    pub fn mix_session(&self) -> Vec<f32> {
+        let has_solo = self.tracks.iter().any(|t| t.is_solo);
+        let max_len = self.tracks.iter().map(|t| t.samples.len()).max().unwrap_or(0);
+        let mut mixed = alloc::vec![0.0f32; max_len];
+
+        for track in &self.tracks {
+            if track.is_muted {
+                continue;
+            }
+            if has_solo && !track.is_solo {
+                continue;
+            }
+
+            for (i, &sample) in track.samples.iter().enumerate() {
+                mixed[i] += sample * track.volume;
+            }
+        }
+
+        mixed
+    }
+}
+
+pub struct SpectralNoiseSuppressionEffect {
+    pub noise_floor: f32,
+}
+
+impl SpectralNoiseSuppressionEffect {
+    pub fn new(noise_floor: f32) -> Self {
+        SpectralNoiseSuppressionEffect { noise_floor }
     }
 }
 
