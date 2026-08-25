@@ -70,6 +70,7 @@ impl IpAddress {
 }
 
 /// Network interface
+#[derive(Clone)]
 pub struct NetworkInterface {
     pub name: String,
     pub interface_type: InterfaceType,

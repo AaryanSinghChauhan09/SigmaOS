@@ -4,8 +4,7 @@
 extern crate alloc;
 
 use crate::driver::device::DeviceError;
-use crate::kernel::virtual_cpu::{CpuMode, CpuRing, RegisterSet};
-use alloc::boxed::Box;
+use crate::interrupt::handler::RegisterSet;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
@@ -98,13 +97,29 @@ impl LinuxProcessInstance {
                 rbx: 0,
                 rcx: 0,
                 rdx: 0,
-                rdi: 0,
                 rsi: 0,
+                rdi: 0,
+                rbp: 0,
+                rsp: 0x7FFFFFFF0000,
+                r8: 0,
+                r9: 0,
+                r10: 0,
+                r11: 0,
+                r12: 0,
+                r13: 0,
+                r14: 0,
+                r15: 0,
+                rip: 0,
+                rflags: 0,
+                cs: 0,
+                ss: 0,
+                ds: 0,
+                es: 0,
+                fs: 0,
+                gs: 0,
                 cr0: 0,
                 cr3: 0,
                 cr4: 0,
-                rip: 0,
-                rsp: 0x7FFFFFFF0000,
             },
             brk_start: 0,
             brk_current: 0,
