@@ -22,94 +22,146 @@ pub enum AnsiColor {
     Rgb(u8, u8, u8),
 }
 
-/// Popular Linux & BSD color scheme presets
+/// Linux/BSD POSIX Termios input mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ColorSchemePreset {
-    Nord,
-    Dracula,
-    SolarizedDark,
-    Gruvbox,
-    Catppuccin,
-    TokyoNight,
+pub enum TermiosInputMode {
+    Canonical, // Line buffered, line editing enabled (backspace, enter)
+    Raw,       // Character-by-character, no echo, no signal processing
+    Cbreak,    // Character-by-character with signal processing
 }
 
-/// Terminal theme palette with 16-color ANSI mapping
+/// Events emitted by POSIX Termios Line Discipline
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TermiosInputEvent {
+    LineSubmitted(String),
+    CharRead(char),
+    SignalInt,  // ^C
+    SignalStop, // ^Z
+    Eof,        // ^D
+}
+
+/// Linux & BSD POSIX Termios Line Discipline Processor
 #[derive(Debug, Clone)]
-pub struct TerminalTheme {
-    pub name: String,
-    pub foreground: (u8, u8, u8),
-    pub background: (u8, u8, u8),
-    pub ansi_palette: [(u8, u8, u8); 16],
+pub struct TermiosLineDiscipline {
+    pub mode: TermiosInputMode,
+    pub echo_enabled: bool,
+    pub line_buffer: String,
 }
 
-impl TerminalTheme {
-    pub fn preset(scheme: ColorSchemePreset) -> Self {
-        match scheme {
-            ColorSchemePreset::Nord => Self {
-                name: String::from("Nord"),
-                foreground: (216, 222, 233),
-                background: (46, 52, 64),
-                ansi_palette: [
-                    (46, 52, 64),    (191, 97, 106),  (163, 190, 140), (235, 203, 139),
-                    (129, 161, 193), (180, 142, 173), (136, 192, 208), (229, 233, 240),
-                    (76, 86, 106),   (191, 97, 106),  (163, 190, 140), (235, 203, 139),
-                    (129, 161, 193), (180, 142, 173), (143, 188, 187), (236, 239, 244),
-                ],
+impl TermiosLineDiscipline {
+    pub fn new(mode: TermiosInputMode) -> Self {
+        Self {
+            mode,
+            echo_enabled: true,
+            line_buffer: String::new(),
+        }
+    }
+
+    pub fn set_mode(&mut self, mode: TermiosInputMode) {
+        self.mode = mode;
+    }
+
+    pub fn process_input_char(&mut self, c: char) -> TermiosInputEvent {
+        match self.mode {
+            TermiosInputMode::Raw => TermiosInputEvent::CharRead(c),
+            TermiosInputMode::Cbreak => match c {
+                '\x03' => TermiosInputEvent::SignalInt,  // ^C
+                '\x1a' => TermiosInputEvent::SignalStop, // ^Z
+                '\x04' => TermiosInputEvent::Eof,        // ^D
+                _ => TermiosInputEvent::CharRead(c),
             },
-            ColorSchemePreset::Dracula => Self {
-                name: String::from("Dracula"),
-                foreground: (248, 248, 242),
-                background: (40, 42, 54),
-                ansi_palette: [
-                    (33, 34, 44),    (255, 85, 85),   (80, 250, 123),  (241, 250, 140),
-                    (189, 147, 249), (255, 121, 198), (139, 233, 253), (248, 248, 242),
-                    (98, 114, 164),  (255, 110, 110), (105, 255, 148), (244, 255, 165),
-                    (214, 172, 255), (255, 146, 223), (164, 255, 255), (255, 255, 255),
-                ],
+            TermiosInputMode::Canonical => match c {
+                '\x03' => {
+                    self.line_buffer.clear();
+                    TermiosInputEvent::SignalInt
+                }
+                '\x1a' => TermiosInputEvent::SignalStop,
+                '\x04' => {
+                    if self.line_buffer.is_empty() {
+                        TermiosInputEvent::Eof
+                    } else {
+                        let line = self.line_buffer.clone();
+                        self.line_buffer.clear();
+                        TermiosInputEvent::LineSubmitted(line)
+                    }
+                }
+                '\n' | '\r' => {
+                    let line = self.line_buffer.clone();
+                    self.line_buffer.clear();
+                    TermiosInputEvent::LineSubmitted(line)
+                }
+                '\x08' | '\x7f' => {
+                    // Backspace / Erase
+                    self.line_buffer.pop();
+                    TermiosInputEvent::CharRead('\x08')
+                }
+                _ => {
+                    self.line_buffer.push(c);
+                    TermiosInputEvent::CharRead(c)
+                }
             },
-            ColorSchemePreset::SolarizedDark => Self {
-                name: String::from("Solarized Dark"),
-                foreground: (131, 148, 150),
-                background: (0, 43, 54),
-                ansi_palette: [
-                    (7, 54, 66),     (220, 50, 47),   (133, 153, 0),   (181, 137, 0),
-                    (38, 139, 210),  (211, 54, 130),  (42, 161, 152),  (238, 232, 213),
-                    (0, 43, 54),     (203, 75, 22),   (88, 110, 117),  (101, 123, 131),
-                    (131, 148, 150), (108, 113, 196), (147, 161, 161), (253, 246, 227),
-                ],
+        }
+    }
+}
+
+/// BSD Console Preset Color Schemes
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BsdConsoleTheme {
+    Vt100Classic,
+    Dracula,
+    Nord,
+    SolarizedDark,
+    Monokai,
+    GruvboxDark,
+}
+
+/// Color Palette definitions for BSD Console Themes
+#[derive(Debug, Clone, Copy)]
+pub struct BsdConsoleColorPalette {
+    pub foreground_rgb: (u8, u8, u8),
+    pub background_rgb: (u8, u8, u8),
+    pub selection_rgb: (u8, u8, u8),
+    pub cursor_rgb: (u8, u8, u8),
+}
+
+impl BsdConsoleTheme {
+    pub fn palette(self) -> BsdConsoleColorPalette {
+        match self {
+            BsdConsoleTheme::Vt100Classic => BsdConsoleColorPalette {
+                foreground_rgb: (0, 255, 0),     // Green
+                background_rgb: (0, 0, 0),       // Black
+                selection_rgb: (0, 100, 0),
+                cursor_rgb: (0, 255, 0),
             },
-            ColorSchemePreset::Gruvbox => Self {
-                name: String::from("Gruvbox"),
-                foreground: (235, 219, 178),
-                background: (40, 40, 40),
-                ansi_palette: [
-                    (40, 40, 40),    (204, 36, 29),   (152, 151, 26),  (215, 153, 33),
-                    (69, 133, 136),  (177, 98, 134),  (104, 157, 106), (168, 153, 132),
-                    (146, 131, 116), (251, 73, 52),   (184, 187, 38),  (250, 189, 47),
-                    (131, 165, 152), (211, 134, 155), (142, 192, 124), (235, 219, 178),
-                ],
+            BsdConsoleTheme::Dracula => BsdConsoleColorPalette {
+                foreground_rgb: (248, 248, 242),
+                background_rgb: (40, 42, 54),
+                selection_rgb: (68, 71, 90),
+                cursor_rgb: (248, 248, 242),
             },
-            ColorSchemePreset::Catppuccin => Self {
-                name: String::from("Catppuccin Mocha"),
-                foreground: (205, 214, 244),
-                background: (30, 30, 46),
-                ansi_palette: [
-                    (69, 71, 90),    (243, 139, 168), (166, 227, 161), (249, 226, 175),
-                    (137, 180, 250), (245, 194, 231), (148, 226, 213), (186, 194, 222),
-                    (88, 91, 112),   (243, 139, 168), (166, 227, 161), (249, 226, 175),
-                    (137, 180, 250), (245, 194, 231), (148, 226, 213), (166, 173, 200),
-                ],
+            BsdConsoleTheme::Nord => BsdConsoleColorPalette {
+                foreground_rgb: (216, 222, 233),
+                background_rgb: (46, 52, 64),
+                selection_rgb: (67, 76, 94),
+                cursor_rgb: (216, 222, 233),
             },
-            ColorSchemePreset::TokyoNight => Self {
-                name: String::from("Tokyo Night"),
-                foreground: (192, 202, 245),
-                background: (26, 27, 38),
-                ansi_palette: [
-                    (21, 22, 30),    (247, 118, 142), (158, 206, 106), (224, 175, 104),
-                    (122, 162, 247), (187, 154, 247), (7, 208, 220),   (169, 177, 214),
-                    (65, 72, 104),   (247, 118, 142), (158, 206, 106), (224, 175, 104),
-                    (122, 162, 247), (187, 154, 247), (7, 208, 220),   (192, 202, 245),
-                ],
+            BsdConsoleTheme::SolarizedDark => BsdConsoleColorPalette {
+                foreground_rgb: (131, 148, 150),
+                background_rgb: (0, 43, 54),
+                selection_rgb: (7, 54, 66),
+                cursor_rgb: (147, 161, 161),
+            },
+            BsdConsoleTheme::Monokai => BsdConsoleColorPalette {
+                foreground_rgb: (248, 248, 242),
+                background_rgb: (39, 40, 34),
+                selection_rgb: (73, 72, 62),
+                cursor_rgb: (248, 248, 240),
+            },
+            BsdConsoleTheme::GruvboxDark => BsdConsoleColorPalette {
+                foreground_rgb: (235, 219, 178),
+                background_rgb: (40, 40, 40),
+                selection_rgb: (80, 73, 69),
+                cursor_rgb: (235, 219, 178),
             },
         }
     }
@@ -1212,6 +1264,15 @@ impl TerminalSession {
                                 self.foreground = AnsiColor::Xterm256(color_val);
                             }
                             i += 2;
+                        } else if i + 4 < parts.len() && parts[i + 1] == "2" {
+                            if let (Ok(r), Ok(g), Ok(b)) = (
+                                parts[i + 2].parse::<u8>(),
+                                parts[i + 3].parse::<u8>(),
+                                parts[i + 4].parse::<u8>(),
+                            ) {
+                                self.foreground = AnsiColor::Rgb(r, g, b);
+                            }
+                            i += 4;
                         }
                     }
                     40 => self.background = AnsiColor::Black,
@@ -1237,6 +1298,15 @@ impl TerminalSession {
                                 self.background = AnsiColor::Xterm256(color_val);
                             }
                             i += 2;
+                        } else if i + 4 < parts.len() && parts[i + 1] == "2" {
+                            if let (Ok(r), Ok(g), Ok(b)) = (
+                                parts[i + 2].parse::<u8>(),
+                                parts[i + 3].parse::<u8>(),
+                                parts[i + 4].parse::<u8>(),
+                            ) {
+                                self.background = AnsiColor::Rgb(r, g, b);
+                            }
+                            i += 4;
                         }
                     }
                     _ => {}
@@ -1300,6 +1370,12 @@ mod tests {
         // \x1B[48;5;201m -> Xterm256 color 201 background
         session.parse_ansi("\x1B[48;5;201m");
         assert_eq!(session.background, AnsiColor::Xterm256(201));
+
+        // 24-bit TrueColor RGB
+        session.parse_ansi("\x1B[38;2;255;100;50m");
+        assert_eq!(session.foreground, AnsiColor::Rgb(255, 100, 50));
+        session.parse_ansi("\x1B[48;2;10;20;30m");
+        assert_eq!(session.background, AnsiColor::Rgb(10, 20, 30));
 
         // Test Cursor Movement sequences
         // \x1B[5A -> Move up 5 lines

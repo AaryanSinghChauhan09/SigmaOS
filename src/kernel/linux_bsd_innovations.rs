@@ -1734,7 +1734,13 @@ impl CapabilityDerivationTree {
     }
 }
 
-// ================= Linux Control Groups (cgroups v2) Governor =================
+/// Linux cgroups v2 resource governor
+pub struct SovereignCgroupGovernor {
+    pub groups: HashMap<String, CgroupResourceLimits>,
+    pub pids: HashMap<String, Vec<u64>>,
+    pub cpu_usage: HashMap<String, u64>,
+    pub mem_usage: HashMap<String, u64>,
+}
 
 #[derive(Debug, Clone, Copy)]
 pub struct CgroupResourceLimits {

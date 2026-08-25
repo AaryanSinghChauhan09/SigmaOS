@@ -18,7 +18,11 @@ pub use terminal_emulator::{
 pub mod alias_system;
 pub mod zsh_bash_parity;
 pub use command::{CommandError, CommandParser, CommandRegistry, ShellCommand, ShellSession, SimpleCommandRegistry, SimpleShellSession};
-pub use terminal_emulator::{TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor};
+pub use terminal_emulator::{
+    TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor,
+    BsdConsoleColorPalette, BsdConsoleTheme, BracketedPasteBuffer,
+    TermiosInputEvent, TermiosInputMode, TermiosLineDiscipline,
+};
 pub use alias_system::{AliasManager, SigmaAlias, AliasType};
 pub use zsh_bash_parity::{
     PowerlinePromptBuilder, PromptTheme, FuzzyCompletionEngine, CompletionCandidate, CandidateCategory,
