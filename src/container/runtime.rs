@@ -216,13 +216,13 @@ impl NamespaceConfig {
 
 /// Container seccomp profiles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
+pub struct SeccompProfileV2 {
     pub hardened: bool,
     pub blocked_syscalls_mask: u32,
 }
 
 
-impl SeccompProfile {
+impl SeccompProfileV2 {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {
             return false;
@@ -486,9 +486,6 @@ pub struct SimpleContainerRuntime {
     stats: RuntimeStats,
     capability: RuntimeCapability,
 }
-
-/// Runtime capability
-pub type ContainerCapability = RuntimeCapability;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

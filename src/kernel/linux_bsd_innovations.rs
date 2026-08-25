@@ -875,7 +875,7 @@ impl SovereignZonesManager {
 // ================= Sovereign Linux Cgroup v2 Governor =================
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct CgroupResourceLimits {
+pub struct CgroupResourceLimitsV1 {
     pub cpu_quota_us: u64,
     pub cpu_period_us: u64,
     pub memory_max_bytes: u64,
@@ -1937,7 +1937,7 @@ pub struct CgroupResourceLimitsV3 {
     pub io_weight: u32,
 }
 
-impl Default for CgroupResourceLimits {
+impl Default for CgroupResourceLimitsV1 {
     fn default() -> Self {
         Self {
             cpu_quota_us: 100_000,
