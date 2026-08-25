@@ -104,10 +104,13 @@ pub use driver::pci_bus::{
     PcieAspmState, SimulatedPciHardwareAccess,
 };
 pub use drivers::{
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    CanBusSocketDriver, GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent,
+    HidReportType, InputDriver, InputEvent, InputType, IntelI2cSmbusControllerDriver,
+    IntelIgbNicDriver, IntelIwfWifiDriver, Mpt3SasControllerDriver, NetworkCommand,
+    NetworkDriver, NetworkError, NetworkType, RadeonKmsGpuDriver,
+    RaspberryPiGpioMailboxDriver, RealtekAlcAudioDriver, RealtekRtl8169Driver, StorageCommand,
+    StorageDriver, StorageError, StorageType, SynapticsTouchpadDriver, UsbHidDriver, VesaDriver,
+    VesaError, VesaModeInfo, VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -173,6 +176,8 @@ pub use distro::{
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
     NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
+    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
