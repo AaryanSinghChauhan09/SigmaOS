@@ -38,6 +38,7 @@ impl Default for ResourceLimits {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Cgroup {
     pub name: String,
     pub limits: ResourceLimits,

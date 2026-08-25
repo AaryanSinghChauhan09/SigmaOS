@@ -4,6 +4,8 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -204,7 +206,7 @@ impl AIAgentManager for SimpleAIAgentManager {
 }
 
 #[cfg(test)]
-mod tests {
+mod marketplace_tests {
     use super::*;
 
     #[test]

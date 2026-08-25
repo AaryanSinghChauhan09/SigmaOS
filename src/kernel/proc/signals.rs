@@ -21,10 +21,9 @@
 extern crate alloc;
 use crate::klib::BTreeMap;
 use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
-extern crate alloc;
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u32)]
 pub enum Signal {
     SIGHUP = 1,

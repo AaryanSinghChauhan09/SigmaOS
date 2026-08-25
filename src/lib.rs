@@ -104,10 +104,16 @@ pub use driver::pci_bus::{
     PcieAspmState, SimulatedPciHardwareAccess,
 };
 pub use drivers::{
+    AcpiEcBatterySensor, AmdRadeonGpuDriver, AppleTouchBarDriver, AtherosWifiDriver,
+    BroadcomWifiDriver, DisplayLinkUsbGpu, DualSenseGameController, GoogleCoralTpuDriver,
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    InputEvent, InputType, LsiMegaRaidSasDriver, MidiSequencerDriver, NetworkCommand,
+    NetworkDriver, NetworkError, NetworkType, NvdimmPmemDriver, RealtekRtl8139Driver,
+    RpiGpioSpiController, SdhciMmccardDriver, SocketCanBusController, SpiFlashMtdDriver,
+    StorageCommand, StorageDriver, StorageError, StorageType, SynapticsTouchpadDriver,
+    Tpm2SecurityChipDriver, UsbAudioClass2Driver, UsbHidDriver, UvcWebcamCapture, VesaDriver,
+    VesaError, VesaModeInfo, VirtioGpu3dDriver, VirtioScsiController, VirtioSoundDriver,
+    WacomDigitizerDriver, WireGuardVpnAdapter,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,

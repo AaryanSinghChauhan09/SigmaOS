@@ -369,8 +369,9 @@ impl Pattern for &str {
 
 /// Split iterator for SigmaString
 pub struct Split<'a, P> {
-    string: &'a SigmaString,
+    remainder: &'a str,
     pat: P,
+    finished: bool,
 }
 
 impl<'a, P> Iterator for Split<'a, P>
@@ -378,19 +379,21 @@ where
     P: Pattern,
 {
     type Item = SigmaString;
-    
+
     fn next(&mut self) -> Option<Self::Item> {
-        let haystack = self.string.as_str();
-        let start = 0;
-        
-        if let Some(idx) = self.pat.find_in(self.string) {
+        if self.finished {
+            return None;
+        }
+
+        let temp_string = SigmaString::from_str(self.remainder);
+        if let Some(idx) = self.pat.find_in(&temp_string) {
             let end = idx + self.pat.pattern_len();
-            let result = SigmaString::from_str(&haystack[start..idx]);
-            self.string = &SigmaString::from_str(&haystack[end..]);
+            let result = SigmaString::from_str(&self.remainder[..idx]);
+            self.remainder = &self.remainder[end..];
             Some(result)
         } else {
-            let result = SigmaString::from_str(haystack);
-            self.string = &SigmaString::new();
+            let result = SigmaString::from_str(self.remainder);
+            self.finished = true;
             Some(result)
         }
     }

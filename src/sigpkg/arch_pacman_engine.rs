@@ -53,8 +53,8 @@ impl PacmanDatabase {
 
     /// Refresh package databases (pacman -Sy)
     pub fn refresh_databases(&mut self) -> Result<(), String> {
-        // Simulate database refresh
-        for db in &self.sync_databases {
+        let dbs = self.sync_databases.clone();
+        for db in &dbs {
             self.sync_database(db)?;
         }
         Ok(())
@@ -87,12 +87,12 @@ impl PacmanDatabase {
     }
 
     /// Query package information (pacman -Si)
-    pub fn query_package(&self, package_name: &str) -> Option<&PacmanPackage> {
+    pub fn query_package(&self, package_name: &str) -> Option<ArchPacmanPackage> {
         self.find_package(package_name)
     }
 
     /// Search for packages (pacman -Ss)
-    pub fn search_packages(&self, query: &str) -> Vec<&PacmanPackage> {
+    pub fn search_packages(&self, query: &str) -> Vec<&ArchPacmanPackage> {
         self.packages
             .iter()
             .filter(|p| p.name.contains(query) || p.description.contains(query))
@@ -102,10 +102,11 @@ impl PacmanDatabase {
     /// Update system (pacman -Syu)
     pub fn update_system(&mut self) -> Result<(), String> {
         self.refresh_databases()?;
-        for pkg in &mut self.local_packages {
-            if let Some(updated) = self.find_package(&pkg.name) {
-                if updated.version != pkg.version {
-                    *pkg = updated;
+        for i in 0..self.local_packages.len() {
+            let pkg_name = self.local_packages[i].name.clone();
+            if let Some(updated) = self.find_package(&pkg_name) {
+                if updated.version != self.local_packages[i].version {
+                    self.local_packages[i] = updated;
                 }
             }
         }

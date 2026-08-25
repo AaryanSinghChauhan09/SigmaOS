@@ -15,6 +15,19 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
+pub struct DeviceId {
+    pub vendor: u16,
+    pub device: u16,
+}
+
+pub type SdfResult<T> = Result<T, &'static str>;
+
+pub trait SdfDriver {
+    fn probe(dev: &DeviceId) -> bool;
+    fn init(&mut self) -> SdfResult<()>;
+    fn shutdown(&mut self);
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverType {
@@ -484,12 +497,11 @@ impl DriverFramework for SimpleDriverFramework {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::driver::irp_system::*;
 
     #[test]
     fn test_driver_framework_lifecycle() {
         let mut framework = SimpleDriverFramework::new();
-        let driver = Box::new(SimpleStorageDriver::new(101, DriverType::Block));
+        let driver = Box::new(SimpleDriver::new(101, DriverType::Block));
 
         let reg_id = framework.register_driver(driver).unwrap();
         assert_eq!(reg_id, 101);

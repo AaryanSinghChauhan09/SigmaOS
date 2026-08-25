@@ -35,6 +35,7 @@ pub mod object;
 pub mod os_innovations;
 pub mod paging;
 pub mod policy_mechanism;
+pub mod proc;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod sched;

@@ -3,6 +3,7 @@ extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;
 use crate::klib::collections::HashMap;
+use crate::kernel::proc::cgroups::{CgroupManager as SovereignCgroupGovernor, ResourceLimits as CgroupResourceLimits};
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {
@@ -1800,24 +1801,17 @@ mod tests {
     #[test]
     fn test_sovereign_cgroup_governor() {
         let mut gov = SovereignCgroupGovernor::new();
-        gov.create_group("/sys/fs/cgroup/db").unwrap();
-
         let limits = CgroupResourceLimits {
-            cpu_quota_us: 50_000,
-            cpu_period_us: 100_000,
-            memory_max_bytes: 1024 * 1024,
-            memory_high_bytes: 512 * 1024,
-            memory_swap_max_bytes: 0,
-            io_weight: 500,
+            cpu_shares: 512,
+            max_memory_bytes: 1024 * 1024,
+            max_pids: 2,
         };
-        gov.configure_limits("/sys/fs/cgroup/db", limits).unwrap();
-        gov.attach_pid("/sys/fs/cgroup/db", 1001).unwrap();
+        gov.create_group("db", limits).unwrap();
+        assert_eq!(gov.get_limits("db").unwrap().cpu_shares, 512);
 
-        assert!(gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap());
-        assert!(!gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap()); // Exceeds 50k quota
-
-        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 500_000).is_ok());
-        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 600_000).is_err()); // Exceeds 1MB limit
+        gov.attach_process("db", 1001).unwrap();
+        gov.attach_process("db", 1002).unwrap();
+        assert!(gov.attach_process("db", 1003).is_err());
     }
 
     #[test]

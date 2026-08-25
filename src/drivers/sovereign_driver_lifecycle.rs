@@ -5,7 +5,7 @@
 
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
+use crate::klib::collections::BTreeMap;
 use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -4,6 +4,7 @@
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
+use std::collections::HashMap;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {
