@@ -138,6 +138,51 @@ impl ShellCommand for UnaliasCommand {
     fn help(&self) -> &[u8] { b"unalias [shortcut] - Remove a shell alias" }
 }
 
+/// Linux/BSD export / setenv builtin command
+pub struct ExportCommand {
+    pub shell_ptr: *mut SimpleShell,
+}
+
+impl ShellCommand for ExportCommand {
+    fn name(&self) -> &[u8] { b"export" }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        if args.is_empty() { return Ok(()); }
+        for arg in args {
+            if let Some(pos) = arg.iter().position(|&b| b == b'=') {
+                let key = &arg[..pos];
+                let val = &arg[pos + 1..];
+                unsafe {
+                    if !self.shell_ptr.is_null() {
+                        (*self.shell_ptr).env.set(key, val);
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] { b"export KEY=VALUE - Set environment variable" }
+}
+
+/// Linux/BSD unset / unsetenv builtin command
+pub struct UnsetCommand {
+    pub shell_ptr: *mut SimpleShell,
+}
+
+impl ShellCommand for UnsetCommand {
+    fn name(&self) -> &[u8] { b"unset" }
+    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
+        for arg in args {
+            unsafe {
+                if !self.shell_ptr.is_null() {
+                    (*self.shell_ptr).env.unset(arg);
+                }
+            }
+        }
+        Ok(())
+    }
+    fn help(&self) -> &[u8] { b"unset KEY - Unset environment variable" }
+}
+
 pub trait Shell {
     fn register_command(&mut self, command: Box<dyn ShellCommand>) -> Result<CommandID, ShellError>;
     fn execute_line(&mut self, line: &[u8]) -> Result<(), ShellError>;
@@ -153,6 +198,8 @@ pub struct SimpleShell {
     pub prompt_len: AtomicUsize,
     pub env: SimpleShellEnvironment,
     pub aliases: SimpleShellEnvironment, // Recycles environment implementation for alias maps
+    pub last_exit_code: AtomicUsize,
+    pub auto_cd: bool,
 }
 
 impl SimpleShell {
@@ -164,14 +211,29 @@ impl SimpleShell {
             prompt_len: AtomicUsize::new(0),
             env: SimpleShellEnvironment::new(),
             aliases: SimpleShellEnvironment::new(),
+            last_exit_code: AtomicUsize::new(0),
+            auto_cd: true,
         };
         let default_prompt = b"sigma-sh> ";
         shell.set_prompt(default_prompt);
 
         // Populate standard Linux-inspired default environment variables
         shell.env.set(b"USER", b"sovereign");
+        shell.env.set(b"HOSTNAME", b"sigmaos");
         shell.env.set(b"HOME", b"/userland/home/sovereign");
+        shell.env.set(b"PWD", b"/userland/home/sovereign");
         shell.env.set(b"PATH", b"/shards:/system:/userland");
+
+        // Register built-in commands (echo, exit, help, clear, alias, unalias, export, unset)
+        let shell_ptr = &mut shell as *mut SimpleShell;
+        let _ = shell.register_command(Box::new(EchoCommand::new(0)));
+        let _ = shell.register_command(Box::new(ExitCommand::new(0)));
+        let _ = shell.register_command(Box::new(HelpCommand::new(0)));
+        let _ = shell.register_command(Box::new(ClearCommand::new(0)));
+        let _ = shell.register_command(Box::new(AliasCommand { shell_ptr }));
+        let _ = shell.register_command(Box::new(UnaliasCommand { shell_ptr }));
+        let _ = shell.register_command(Box::new(ExportCommand { shell_ptr }));
+        let _ = shell.register_command(Box::new(UnsetCommand { shell_ptr }));
 
         shell
     }
@@ -186,6 +248,87 @@ impl SimpleShell {
 
     pub fn get_alias(&self, name: &[u8]) -> Option<&[u8]> {
         self.aliases.get(name)
+    }
+
+    /// Zsh/Bash/Fish-inspired prompt string token expansion (%n, %m, %~, %?, %F{color}, %f)
+    pub fn expand_prompt_string(&self, template: &[u8]) -> alloc::vec::Vec<u8> {
+        let mut result = alloc::vec::Vec::new();
+        let mut i = 0;
+        while i < template.len() {
+            if template[i] == b'%' && i + 1 < template.len() {
+                match template[i + 1] {
+                    b'n' => {
+                        let user = self.env.get(b"USER").unwrap_or(b"sovereign");
+                        result.extend_from_slice(user);
+                        i += 2;
+                    }
+                    b'm' => {
+                        let host = self.env.get(b"HOSTNAME").unwrap_or(b"sigmaos");
+                        result.extend_from_slice(host);
+                        i += 2;
+                    }
+                    b'~' | b'w' => {
+                        let pwd = self.env.get(b"PWD").unwrap_or(b"~");
+                        result.extend_from_slice(pwd);
+                        i += 2;
+                    }
+                    b'?' => {
+                        let code = self.last_exit_code.load(Ordering::SeqCst);
+                        let mut buf = [0u8; 16];
+                        let mut n = code;
+                        let mut idx = 15;
+                        if n == 0 {
+                            buf[idx] = b'0';
+                            idx -= 1;
+                        } else {
+                            while n > 0 {
+                                buf[idx] = b'0' + (n % 10) as u8;
+                                n /= 10;
+                                idx -= 1;
+                            }
+                        }
+                        result.extend_from_slice(&buf[idx + 1..16]);
+                        i += 2;
+                    }
+                    b'f' => {
+                        result.extend_from_slice(b"\x1b[0m");
+                        i += 2;
+                    }
+                    b'F' if i + 2 < template.len() && template[i + 2] == b'{' => {
+                        let mut end_idx = i + 3;
+                        while end_idx < template.len() && template[end_idx] != b'}' {
+                            end_idx += 1;
+                        }
+                        if end_idx < template.len() {
+                            let color_name = &template[i + 3..end_idx];
+                            match color_name {
+                                b"red" => result.extend_from_slice(b"\x1b[31m"),
+                                b"green" => result.extend_from_slice(b"\x1b[32m"),
+                                b"yellow" => result.extend_from_slice(b"\x1b[33m"),
+                                b"blue" => result.extend_from_slice(b"\x1b[34m"),
+                                b"magenta" => result.extend_from_slice(b"\x1b[35m"),
+                                b"cyan" => result.extend_from_slice(b"\x1b[36m"),
+                                b"white" => result.extend_from_slice(b"\x1b[37m"),
+                                b"reset" => result.extend_from_slice(b"\x1b[0m"),
+                                _ => {}
+                            }
+                            i = end_idx + 1;
+                        } else {
+                            result.push(template[i]);
+                            i += 1;
+                        }
+                    }
+                    _ => {
+                        result.push(template[i]);
+                        i += 1;
+                    }
+                }
+            } else {
+                result.push(template[i]);
+                i += 1;
+            }
+        }
+        result
     }
 }
 
@@ -260,17 +403,42 @@ impl Shell for SimpleShell {
         for cmd_option in &mut self.commands {
             if let Some(ref mut cmd) = *cmd_option {
                 if cmd.name() == resolved_cmd_name {
-                    return cmd.execute(&cmd_args);
+                    let res = cmd.execute(&cmd_args);
+                    let code = if res.is_ok() { 0 } else { 1 };
+                    self.last_exit_code.store(code, Ordering::SeqCst);
+                    return res;
                 }
             }
         }
+
+        // 3. Zsh-style auto-cd directory resolution
+        if self.auto_cd && (resolved_cmd_name.starts_with(b"/") || resolved_cmd_name.starts_with(b"./") || resolved_cmd_name.starts_with(b"../") || resolved_cmd_name.starts_with(b"~") || resolved_cmd_name.ends_with(b"/")) {
+            self.env.set(b"PWD", resolved_cmd_name);
+            self.last_exit_code.store(0, Ordering::SeqCst);
+            return Ok(());
+        }
         
+        self.last_exit_code.store(1, Ordering::SeqCst);
         Err(ShellError::CommandNotFound)
     }
     
     fn get_prompt(&self) -> &[u8] {
         let len = self.prompt_len.load(Ordering::SeqCst);
-        &self.prompt[..len]
+        let template = &self.prompt[..len];
+        let expanded = self.expand_prompt_string(template);
+        if !expanded.is_empty() {
+            // Static storage for formatted prompt reference
+            static mut PROMPT_BUF: [u8; 128] = [0u8; 128];
+            static mut PROMPT_BUF_LEN: usize = 0;
+            let copy_len = expanded.len().min(127);
+            unsafe {
+                PROMPT_BUF[..copy_len].copy_from_slice(&expanded[..copy_len]);
+                PROMPT_BUF_LEN = copy_len;
+                &PROMPT_BUF[..PROMPT_BUF_LEN]
+            }
+        } else {
+            template
+        }
     }
     
     fn set_prompt(&mut self, prompt: &[u8]) {
@@ -292,6 +460,7 @@ pub trait ShellHistory {
 pub struct SimpleShellHistory {
     pub history: Vec<[u8; 256]>,
     pub lengths: Vec<usize>,
+    pub timestamps: Vec<u64>,
     pub next_index: AtomicUsize,
 }
 
@@ -300,13 +469,13 @@ impl SimpleShellHistory {
         SimpleShellHistory {
             history: Vec::new(),
             lengths: Vec::new(),
+            timestamps: Vec::new(),
             next_index: AtomicUsize::new(0),
         }
     }
-}
 
-impl ShellHistory for SimpleShellHistory {
-    fn add(&mut self, command: &[u8]) {
+    /// Add command to history with explicit timestamp (Zsh history format inspired)
+    pub fn add_with_timestamp(&mut self, command: &[u8], timestamp: u64) {
         let len = command.len().min(255);
         let mut entry = [0u8; 256];
         for i in 0..len {
@@ -314,7 +483,46 @@ impl ShellHistory for SimpleShellHistory {
         }
         self.history.push(entry);
         self.lengths.push(len);
+        self.timestamps.push(timestamp);
         self.next_index.fetch_add(1, Ordering::SeqCst);
+    }
+
+    /// Search history for entries starting with prefix (Zsh history-beginning-search-backward inspired)
+    pub fn history_search_prefix(&self, prefix: &[u8]) -> Vec<&[u8]> {
+        let mut matches = Vec::new();
+        if prefix.is_empty() {
+            return matches;
+        }
+        for i in (0..self.history.len()).rev() {
+            let len = self.lengths[i];
+            let entry = &self.history[i][..len];
+            if entry.starts_with(prefix) {
+                matches.push(entry);
+            }
+        }
+        matches
+    }
+
+    /// Search history for entries containing substring (Fish/Bash Ctrl+R substring search inspired)
+    pub fn history_search_substring(&self, pattern: &[u8]) -> Vec<&[u8]> {
+        let mut matches = Vec::new();
+        if pattern.is_empty() {
+            return matches;
+        }
+        for i in (0..self.history.len()).rev() {
+            let len = self.lengths[i];
+            let entry = &self.history[i][..len];
+            if entry.windows(pattern.len()).any(|w| w == pattern) {
+                matches.push(entry);
+            }
+        }
+        matches
+    }
+}
+
+impl ShellHistory for SimpleShellHistory {
+    fn add(&mut self, command: &[u8]) {
+        self.add_with_timestamp(command, 0);
     }
     
     fn get(&self, index: usize) -> Option<&[u8]> {
@@ -402,9 +610,13 @@ impl ShellPledgeUnveilGuard {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TokenClass {
     Command,
+    Keyword,
     OptionFlag,
     Argument,
     Variable,
+    StringLiteral,
+    Comment,
+    Operator,
     Unknown,
 }
 
@@ -412,6 +624,27 @@ pub struct ShellSyntaxHighlighter;
 
 impl ShellSyntaxHighlighter {
     pub fn classify_token(token: &[u8], is_first: bool) -> TokenClass {
+        if token.is_empty() {
+            return TokenClass::Unknown;
+        }
+        if token.starts_with(b"#") {
+            return TokenClass::Comment;
+        }
+        if token == b"&&" || token == b"||" || token == b";" || token == b"|" || token == b">" || token == b"<" || token == b">>" {
+            return TokenClass::Operator;
+        }
+        if token.starts_with(b"\"") || token.starts_with(b"'") {
+            return TokenClass::StringLiteral;
+        }
+        let keywords: &[&[u8]] = &[
+            b"if", b"then", b"else", b"elif", b"fi", b"for", b"in", b"do", b"done",
+            b"while", b"until", b"case", b"esac", b"function", b"select",
+        ];
+        for kw in keywords {
+            if token == *kw {
+                return TokenClass::Keyword;
+            }
+        }
         if is_first {
             TokenClass::Command
         } else if token.starts_with(b"-") {
@@ -701,8 +934,55 @@ mod tests {
     #[test]
     fn test_zsh_syntax_highlighter_tokens() {
         assert_eq!(ShellSyntaxHighlighter::classify_token(b"grep", true), TokenClass::Command);
+        assert_eq!(ShellSyntaxHighlighter::classify_token(b"if", false), TokenClass::Keyword);
         assert_eq!(ShellSyntaxHighlighter::classify_token(b"-rn", false), TokenClass::OptionFlag);
         assert_eq!(ShellSyntaxHighlighter::classify_token(b"$HOME", false), TokenClass::Variable);
+        assert_eq!(ShellSyntaxHighlighter::classify_token(b"\"hello\"", false), TokenClass::StringLiteral);
+        assert_eq!(ShellSyntaxHighlighter::classify_token(b"# comment", false), TokenClass::Comment);
+        assert_eq!(ShellSyntaxHighlighter::classify_token(b"&&", false), TokenClass::Operator);
         assert_eq!(ShellSyntaxHighlighter::classify_token(b"src/", false), TokenClass::Argument);
+    }
+
+    #[test]
+    fn test_prompt_string_token_expansion_and_auto_cd() {
+        let mut shell = SimpleShell::new();
+        shell.env.set(b"USER", b"sovereign");
+        shell.env.set(b"HOSTNAME", b"sigmaos-box");
+        shell.env.set(b"PWD", b"/home/sovereign/code");
+
+        let template = b"%F{cyan}[%n@%m %~]%f %?";
+        let expanded = shell.expand_prompt_string(template);
+        assert_eq!(expanded, b"\x1b[36m[sovereign@sigmaos-box /home/sovereign/code]\x1b[0m 0");
+
+        // Auto-cd test
+        assert!(shell.execute_line(b"/var/log").is_ok());
+        assert_eq!(shell.env.get(b"PWD"), Some(b"/var/log" as &[u8]));
+    }
+
+    #[test]
+    fn test_history_search_and_export_builtins() {
+        let mut history = SimpleShellHistory::new();
+        history.add_with_timestamp(b"git status", 100);
+        history.add_with_timestamp(b"git log -n 5", 101);
+        history.add_with_timestamp(b"cargo build", 102);
+
+        let prefix_matches = history.history_search_prefix(b"git");
+        assert_eq!(prefix_matches.len(), 2);
+        assert_eq!(prefix_matches[0], b"git log -n 5");
+
+        let sub_matches = history.history_search_substring(b"build");
+        assert_eq!(sub_matches.len(), 1);
+        assert_eq!(sub_matches[0], b"cargo build");
+
+        let mut shell = SimpleShell::new();
+        let export_cmd = ExportCommand { shell_ptr: &raw mut shell };
+        let mut export_box: Box<dyn ShellCommand> = Box::new(export_cmd);
+        export_box.execute(&[b"FOO=bar"]).unwrap();
+        assert_eq!(shell.env.get(b"FOO"), Some(b"bar" as &[u8]));
+
+        let unset_cmd = UnsetCommand { shell_ptr: &raw mut shell };
+        let mut unset_box: Box<dyn ShellCommand> = Box::new(unset_cmd);
+        unset_box.execute(&[b"FOO"]).unwrap();
+        assert_eq!(shell.env.get(b"FOO"), None);
     }
 }

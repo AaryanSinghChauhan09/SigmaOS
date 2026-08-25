@@ -36,11 +36,56 @@ impl Environment {
         Self { vars }
     }
 
+    /// Bash/Zsh-inspired arithmetic expansion `$(( 1 + 2 ))` evaluation
+    pub fn eval_arithmetic_expr(expr: &str) -> i64 {
+        let trimmed = expr.trim();
+        let tokens: Vec<&str> = trimmed.split_whitespace().collect();
+        if tokens.len() == 3 {
+            let left = tokens[0].parse::<i64>().unwrap_or(0);
+            let right = tokens[2].parse::<i64>().unwrap_or(0);
+            match tokens[1] {
+                "+" => left + right,
+                "-" => left - right,
+                "*" => left * right,
+                "/" if right != 0 => left / right,
+                "%" if right != 0 => left % right,
+                _ => 0,
+            }
+        } else if let Ok(val) = trimmed.parse::<i64>() {
+            val
+        } else {
+            0
+        }
+    }
+
+    /// Performs environment variable and $(( arithmetic )) expansion
     pub fn expand(&self, input: &str) -> String {
         let mut expanded = String::new();
         let mut chars = input.chars().peekable();
         while let Some(c) = chars.next() {
             if c == '$' {
+                if chars.peek() == Some(&'(') {
+                    chars.next(); // consume '('
+                    if chars.peek() == Some(&'(') {
+                        chars.next(); // consume '('
+                        let mut arith_body = String::new();
+                        let mut closed = false;
+                        while let Some(ac) = chars.next() {
+                            if ac == ')' && chars.peek() == Some(&')') {
+                                chars.next(); // consume second ')'
+                                closed = true;
+                                break;
+                            }
+                            arith_body.push(ac);
+                        }
+                        if closed {
+                            let val = Self::eval_arithmetic_expr(&arith_body);
+                            expanded.push_str(&val.to_string());
+                            continue;
+                        }
+                    }
+                }
+
                 let mut var_name = String::new();
                 while let Some(&next_c) = chars.peek() {
                     if next_c.is_alphanumeric() || next_c == '_' {
@@ -57,6 +102,25 @@ impl Environment {
             }
         }
         expanded
+    }
+
+    /// Bash/Zsh-inspired brace expansion: `file_{a,b}.txt` -> `["file_a.txt", "file_b.txt"]`
+    pub fn expand_braces(input: &str) -> Vec<String> {
+        if let (Some(start), Some(end)) = (input.find('{'), input.find('}')) {
+            if start < end {
+                let prefix = &input[..start];
+                let suffix = &input[end + 1..];
+                let body = &input[start + 1..end];
+                let options: Vec<&str> = body.split(',').collect();
+                let mut results = Vec::new();
+                for opt in options {
+                    let combined = alloc::format!("{}{}{}", prefix, opt.trim(), suffix);
+                    results.extend(Self::expand_braces(&combined));
+                }
+                return results;
+            }
+        }
+        alloc::vec![input.to_string()]
     }
 }
 
@@ -164,7 +228,8 @@ impl<'a> Parser<'a> {
             }
 
             if let Some(word) = self.parse_word() {
-                args.push(word);
+                let expanded_words = Environment::expand_braces(&word);
+                args.extend(expanded_words);
             } else {
                 break;
             }
@@ -289,5 +354,24 @@ impl Shell {
                 self.execute_ast(child)
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_brace_expansion_and_arithmetic() {
+        let env = Environment::new();
+        assert_eq!(Environment::eval_arithmetic_expr("10 + 20"), 30);
+        assert_eq!(Environment::eval_arithmetic_expr("50 - 15"), 35);
+        assert_eq!(Environment::eval_arithmetic_expr("6 * 7"), 42);
+
+        let expanded = env.expand("Result is $(( 5 + 5 ))");
+        assert_eq!(expanded, "Result is 10");
+
+        let files = Environment::expand_braces("img_{1,2}.png");
+        assert_eq!(files, alloc::vec!["img_1.png", "img_2.png"]);
     }
 }

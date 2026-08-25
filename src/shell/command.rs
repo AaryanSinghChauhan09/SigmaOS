@@ -284,6 +284,153 @@ impl ShellCommand for SigmaDiffCommand {
     }
 }
 
+pub struct WhichCommand;
+
+impl ShellCommand for WhichCommand {
+    fn name(&self) -> &[u8] {
+        b"which"
+    }
+
+    fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        let mut output = ShellVec::new();
+        for arg in args {
+            let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
+            if len == 0 { continue; }
+            let s = &arg[..len];
+            for &b in b"/system/bin/" { output.push(b); }
+            for &b in s { output.push(b); }
+            output.push(b'\n');
+        }
+        Ok(output)
+    }
+
+    fn help(&self) -> &[u8] {
+        b"which <command> - Locate a command in PATH"
+    }
+}
+
+pub struct TypeCommand;
+
+impl ShellCommand for TypeCommand {
+    fn name(&self) -> &[u8] {
+        b"type"
+    }
+
+    fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        let mut output = ShellVec::new();
+        for arg in args {
+            let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
+            if len == 0 { continue; }
+            let s = &arg[..len];
+            for &b in s { output.push(b); }
+            for &b in b" is a shell builtin\n" { output.push(b); }
+        }
+        Ok(output)
+    }
+
+    fn help(&self) -> &[u8] {
+        b"type <name> - Describe a command type"
+    }
+}
+
+pub struct DirectoryStack {
+    pub stack: ShellVec<[u8; 64]>,
+}
+
+impl DirectoryStack {
+    pub fn new() -> Self {
+        DirectoryStack { stack: ShellVec::new() }
+    }
+}
+
+pub struct PushdCommand {
+    pub dir_stack: *mut DirectoryStack,
+}
+
+impl ShellCommand for PushdCommand {
+    fn name(&self) -> &[u8] {
+        b"pushd"
+    }
+
+    fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        let mut output = ShellVec::new();
+        if !args.is_empty() {
+            let len = args[0].iter().position(|&b| b == 0).unwrap_or(64);
+            if len > 0 {
+                unsafe {
+                    if !self.dir_stack.is_null() {
+                        (*self.dir_stack).stack.push(args[0]);
+                    }
+                }
+            }
+        }
+        for &b in b"pushd: directory pushed\n" { output.push(b); }
+        Ok(output)
+    }
+
+    fn help(&self) -> &[u8] {
+        b"pushd <dir> - Push directory onto directory stack"
+    }
+}
+
+pub struct PopdCommand {
+    pub dir_stack: *mut DirectoryStack,
+}
+
+impl ShellCommand for PopdCommand {
+    fn name(&self) -> &[u8] {
+        b"popd"
+    }
+
+    fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        let mut output = ShellVec::new();
+        unsafe {
+            if !self.dir_stack.is_null() && !(*self.dir_stack).stack.is_empty() {
+                let last_idx = (*self.dir_stack).stack.len() - 1;
+                (*self.dir_stack).stack.remove(last_idx);
+                for &b in b"popd: popped directory\n" { output.push(b); }
+            } else {
+                for &b in b"popd: directory stack empty\n" { output.push(b); }
+            }
+        }
+        Ok(output)
+    }
+
+    fn help(&self) -> &[u8] {
+        b"popd - Pop directory from directory stack"
+    }
+}
+
+pub struct DirsCommand {
+    pub dir_stack: *mut DirectoryStack,
+}
+
+impl ShellCommand for DirsCommand {
+    fn name(&self) -> &[u8] {
+        b"dirs"
+    }
+
+    fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        let mut output = ShellVec::new();
+        for &b in b"Directory stack: " { output.push(b); }
+        unsafe {
+            if !self.dir_stack.is_null() {
+                for (i, dir) in (*self.dir_stack).stack.iter().enumerate() {
+                    if i > 0 { output.push(b' '); }
+                    let len = dir.iter().position(|&b| b == 0).unwrap_or(64);
+                    for &b in &dir[..len] { output.push(b); }
+                }
+            }
+        }
+        output.push(b'\n');
+        Ok(output)
+    }
+
+    fn help(&self) -> &[u8] {
+        b"dirs - Display directory stack"
+    }
+}
+
 pub trait CommandParser {
     fn parse(&self, input: &[u8]) -> Result<([u8; 32], ShellVec<[u8; 64]>), CommandError>;
     fn validate(&self, command: &[u8], args: &[[u8; 64]]) -> Result<(), CommandError>;
@@ -410,6 +557,24 @@ impl SimpleCommandRegistry {
 
         let sigmadiff = SigmaDiffCommand;
         self.commands.push(Some(Box::new(sigmadiff)));
+
+        let which = WhichCommand;
+        self.commands.push(Some(Box::new(which)));
+
+        let type_cmd = TypeCommand;
+        self.commands.push(Some(Box::new(type_cmd)));
+
+        static mut GLOBAL_DIR_STACK: DirectoryStack = DirectoryStack { stack: Vec::new() };
+        unsafe {
+            let pushd = PushdCommand { dir_stack: &raw mut GLOBAL_DIR_STACK };
+            self.commands.push(Some(Box::new(pushd)));
+
+            let popd = PopdCommand { dir_stack: &raw mut GLOBAL_DIR_STACK };
+            self.commands.push(Some(Box::new(popd)));
+
+            let dirs = DirsCommand { dir_stack: &raw mut GLOBAL_DIR_STACK };
+            self.commands.push(Some(Box::new(dirs)));
+        }
     }
 }
 
@@ -772,5 +937,30 @@ mod tests {
         let args = [arg1, arg2];
         let output = cmd.execute(&args).unwrap();
         assert!(!output.is_empty());
+    }
+
+    #[test]
+    fn test_which_type_and_directory_stack() {
+        let mut session = SimpleShellSession::new();
+        assert!(session.registry.get(b"which").is_some());
+        assert!(session.registry.get(b"type").is_some());
+        assert!(session.registry.get(b"pushd").is_some());
+        assert!(session.registry.get(b"popd").is_some());
+        assert!(session.registry.get(b"dirs").is_some());
+
+        let which_out = session.execute_line(b"which ls").unwrap();
+        assert!(which_out.starts_with(b"/system/bin/ls"));
+
+        let type_out = session.execute_line(b"type ls").unwrap();
+        assert!(type_out.contains(&b'b'));
+
+        let pushd_out = session.execute_line(b"pushd /tmp").unwrap();
+        assert!(pushd_out.starts_with(b"pushd"));
+
+        let dirs_out = session.execute_line(b"dirs").unwrap();
+        assert!(dirs_out.starts_with(b"Directory stack:"));
+
+        let popd_out = session.execute_line(b"popd").unwrap();
+        assert!(popd_out.starts_with(b"popd"));
     }
 }
