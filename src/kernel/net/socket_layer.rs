@@ -5,6 +5,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 extern crate alloc;
 use crate::klib::HashMap;
+use crate::klib::collections::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

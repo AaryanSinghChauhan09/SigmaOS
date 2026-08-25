@@ -23,7 +23,6 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
 
-#[cfg(not(test))]
 use crate::klib::{BTreeMap, Vec};
 use crate::klib::collections::VecDeque;
 

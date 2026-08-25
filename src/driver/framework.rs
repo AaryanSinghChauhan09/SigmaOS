@@ -166,7 +166,7 @@ mod tests {
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Unloaded);

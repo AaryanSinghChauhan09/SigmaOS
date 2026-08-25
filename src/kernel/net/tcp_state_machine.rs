@@ -6,6 +6,8 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 extern crate alloc;
 use crate::klib::{HashMap, collections::VecDeque};
+use alloc::collections::VecDeque;
+use crate::klib::collections::HashMap;
 use alloc::vec::Vec;
 
 // ── TCP States (RFC 793 §3.2) ─────────────────────────────────────────────
