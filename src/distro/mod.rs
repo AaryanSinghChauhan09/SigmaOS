@@ -80,3 +80,9 @@ pub use specialized::{
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
 };
+
+pub mod wiki_ideas_implementation;
+pub use wiki_ideas_implementation::{
+    CpuPStateGovernor, JournalLogEntry, NumaNodeTopology, SovereignHybridSchedulerInnovations,
+    SovereignSystemdParityEngine, SystemdUnit, SystemdUnitState, SystemdUnitType,
+};
