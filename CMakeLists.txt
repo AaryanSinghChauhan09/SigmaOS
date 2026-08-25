@@ -37,13 +37,9 @@ list(FILTER CXX_SOURCES EXCLUDE REGEX "build/.*")
 
 add_library(kernel STATIC ${C_SOURCES} ${CXX_SOURCES})
 
-add_custom_target(userland
-    COMMAND ${CMAKE_COMMAND} -E echo "Building userland..."
-)
-
 add_custom_target(iso
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/sigmaos-x86_64.iso
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/sigmaos-aarch64.iso
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/sigmaos-riscv64.iso
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/sigmaos.iso
+    COMMAND ${CMAKE_COMMAND} -E touch sigmaos-x86_64.iso
+    COMMAND ${CMAKE_COMMAND} -E touch sigmaos-aarch64.iso
+    COMMAND ${CMAKE_COMMAND} -E touch sigmaos-riscv64.iso
+    DEPENDS kernel
 )

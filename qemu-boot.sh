@@ -12,7 +12,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -iso)
-      ISO_PATH="$2"
+      ISO="$2"
       shift 2
       ;;
     *)

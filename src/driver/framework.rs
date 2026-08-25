@@ -61,6 +61,8 @@ pub trait StorageDriver: Driver {
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
 }
 
+pub type SimpleStorageDriver = SimpleDriver;
+
 #[repr(C)]
 #[derive(Debug)]
 pub struct SimpleStorageDriver {
@@ -554,12 +556,6 @@ impl DriverFramework for SimpleDriverFramework {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::{
-        DeviceObject as FrameworkDeviceObject, DriverError, DriverFramework,
-        DriverObject as FrameworkDriverObject, DriverState, DriverType,
-        IoManager as FrameworkIoManager, Irp as FrameworkIrp, IrpMajorFunction, SimpleDriver,
-        SimpleDriverFramework,
-    };
 
     #[test]
     fn test_driver_framework_lifecycle() {

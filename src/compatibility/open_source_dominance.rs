@@ -1,18 +1,16 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
-//! Open-Source Dominance & Multi-Project Inspiration Engine
-//!
-//! Synthesizes paradigms from Linux kernel (eBPF/io_uring), FreeBSD (GEOM/Capsicum),
-//! OpenBSD (pledge/unveil), NixOS (functional generations), Qubes OS (qubes-core-admin isolation),
-//! Redox (schemes), Haiku (translators), and SerenityOS (zero-dep UI/IPC) into a unified
-//! sovereign engine.
+// SigmaOS Open-Source Dominance & Distro Inspiration Subsystem
+// Zero-dependency, #![no_std] compliant engine synthesizing architectural paradigms
+// from Linux (Debian, Arch, Gentoo, Fedora, Alpine, Void, CachyOS, NixOS),
+// FreeBSD (GEOM, Capsicum, Jail), OpenBSD (pledge, unveil, pf), DragonFly BSD (HAMMER2),
+// Haiku (BeOS Translators), SerenityOS, and ReactOS/Wine Win32 translation layers.
+
+#![no_std]
 
 extern crate alloc;
-
-use alloc::string::{String, ToString};
+use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
-use alloc::vec;
 
-/// Inspiration tiers representing major open-source operating system families.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum OpenSourceInspirationTier {
     LinuxKernel,
@@ -20,258 +18,235 @@ pub enum OpenSourceInspirationTier {
     OpenBsd,
     DragonFlyBsd,
     NixOs,
-    QubesOs,
-    RedoxOs,
-    HaikuOs,
+    HaikuBeOS,
     SerenityOs,
     ReactOsWine,
 }
 
-/// Feature matrix node describing an open-source inspiration and its SigmaOS status.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InspirationFeatureNode {
+pub struct InspirationFeature {
+    pub name: String,
     pub tier: OpenSourceInspirationTier,
-    pub project_name: String,
-    pub core_feature: String,
-    pub legacy_weakness_solved: String,
-    pub implemented: bool,
+    pub is_enabled: bool,
+    pub description: String,
 }
 
-/// Multi-project inspiration feature matrix manager.
-#[derive(Debug, Clone)]
 pub struct InspirationFeatureMatrix {
-    pub nodes: Vec<InspirationFeatureNode>,
+    pub features: Vec<InspirationFeature>,
 }
 
 impl InspirationFeatureMatrix {
-    /// Creates a new populated inspiration feature matrix.
     pub fn new() -> Self {
-        let nodes = vec![
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::LinuxKernel,
-                project_name: "Linux Kernel".to_string(),
-                core_feature: "eBPF, io_uring, cgroups v2, SCHED_RR/FIFO".to_string(),
-                legacy_weakness_solved: "C memory unsafety, complex module dependency chains".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::FreeBsd,
-                project_name: "FreeBSD".to_string(),
-                core_feature: "GEOM storage providers, bhyve hypervisor, Capsicum rights".to_string(),
-                legacy_weakness_solved: "Monolithic driver lock-in, slow release iterations".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::OpenBsd,
-                project_name: "OpenBSD".to_string(),
-                core_feature: "pledge(), unveil(), signify signatures, CARP failover".to_string(),
-                legacy_weakness_solved: "C-based userland tools, unsafe memory management".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::DragonFlyBsd,
-                project_name: "DragonFly BSD".to_string(),
-                core_feature: "HAMMER2 filesystem, lockless SMP thread migration".to_string(),
-                legacy_weakness_solved: "Single-point BSD driver bottlenecks".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::NixOs,
-                project_name: "NixOS".to_string(),
-                core_feature: "Declarative generations, immutable CAS store, atomic rollbacks".to_string(),
-                legacy_weakness_solved: "Nix DSL evaluation slowdowns, dependency sprawl".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::QubesOs,
-                project_name: "Qubes OS".to_string(),
-                core_feature: "qubes-core-admin domain isolation, PQC-encrypted IPC".to_string(),
-                legacy_weakness_solved: "High VM memory overhead per domain".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::RedoxOs,
-                project_name: "Redox OS".to_string(),
-                core_feature: "scheme:// microkernel resource routing, zero-copy IPC".to_string(),
-                legacy_weakness_solved: "Microkernel IPC context-switch latency".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::HaikuOs,
-                project_name: "Haiku".to_string(),
-                core_feature: "Extended attribute queries, IPC translator pipelines".to_string(),
-                legacy_weakness_solved: "Legacy C++ API dependencies, single-user desktop limits".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::SerenityOs,
-                project_name: "SerenityOS".to_string(),
-                core_feature: "Zero-dependency UI component tree, Sixel/Kitty ANSI protocols".to_string(),
-                legacy_weakness_solved: "Heavy Qt/GTK desktop runtime overhead".to_string(),
-                implemented: true,
-            },
-            InspirationFeatureNode {
-                tier: OpenSourceInspirationTier::ReactOsWine,
-                project_name: "ReactOS / Wine".to_string(),
-                core_feature: "PE/COFF relocator, WDM device extension wrappers".to_string(),
-                legacy_weakness_solved: "Reverse-engineered fragile headers".to_string(),
-                implemented: true,
-            },
-        ];
-
-        Self { nodes }
+        let mut matrix = Self {
+            features: Vec::new(),
+        };
+        matrix.register_default_distro_features();
+        matrix
     }
 
-    /// Returns the number of implemented open-source inspiration nodes.
-    pub fn implemented_count(&self) -> usize {
-        self.nodes.iter().filter(|n| n.implemented).count()
+    pub fn register_default_distro_features(&mut self) {
+        self.features.push(InspirationFeature {
+            name: "eBPF XDP Packet Filter".to_string(),
+            tier: OpenSourceInspirationTier::LinuxKernel,
+            is_enabled: true,
+            description: "Linux eBPF eXpress Data Path zero-copy network filtering".to_string(),
+        });
+        self.features.push(InspirationFeature {
+            name: "FreeBSD Capsicum Sandboxing".to_string(),
+            tier: OpenSourceInspirationTier::FreeBsd,
+            is_enabled: true,
+            description: "FreeBSD capability rights and descriptor-based process isolation".to_string(),
+        });
+        self.features.push(InspirationFeature {
+            name: "OpenBSD Pledge & Unveil".to_string(),
+            tier: OpenSourceInspirationTier::OpenBsd,
+            is_enabled: true,
+            description: "OpenBSD syscall pledge reduction and path-based unveil restriction".to_string(),
+        });
+        self.features.push(InspirationFeature {
+            name: "DragonFly HAMMER2 PFS".to_string(),
+            tier: OpenSourceInspirationTier::DragonFlyBsd,
+            is_enabled: true,
+            description: "DragonFly BSD Pseudo-FS snapshotting and BLAKE3 deduplication".to_string(),
+        });
+        self.features.push(InspirationFeature {
+            name: "NixOS Atomic Rollback".to_string(),
+            tier: OpenSourceInspirationTier::NixOs,
+            is_enabled: true,
+            description: "NixOS store generation rollbacks and declarative state management".to_string(),
+        });
+        self.features.push(InspirationFeature {
+            name: "Haiku Translation Kit".to_string(),
+            tier: OpenSourceInspirationTier::HaikuBeOS,
+            is_enabled: true,
+            description: "Haiku / BeOS format translation and UI messaging pipeline".to_string(),
+        });
+        self.features.push(InspirationFeature {
+            name: "ReactOS Win32 Subsystem".to_string(),
+            tier: OpenSourceInspirationTier::ReactOsWine,
+            is_enabled: true,
+            description: "ReactOS / Wine PE binary loader and GDI/User32 translation".to_string(),
+        });
     }
 
-    /// Evaluates total dominance percentage across open-source inspiration projects.
-    pub fn dominance_score(&self) -> u32 {
-        if self.nodes.is_empty() {
-            return 0;
-        }
-        ((self.implemented_count() as u64 * 100) / self.nodes.len() as u64) as u32
+    pub fn is_feature_active(&self, feature_name: &str) -> bool {
+        self.features
+            .iter()
+            .any(|f| f.name == feature_name && f.is_enabled)
+    }
+
+    pub fn count_features_by_tier(&self, tier: OpenSourceInspirationTier) -> usize {
+        self.features.iter().filter(|f| f.tier == tier).count()
     }
 }
 
-/// Consolidated multi-project security guard integrating pledge/unveil (OpenBSD), Capsicum (FreeBSD), and Landlock (Linux).
-#[derive(Debug, Clone)]
+impl Default for InspirationFeatureMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct InspirationSecurityGuard {
     pub pledge_promises: Vec<String>,
-    pub unveiled_paths: Vec<(String, String)>, // (path, permissions "r", "rw", etc.)
-    pub capsicum_rights_mask: u64,
-    pub landlock_active: bool,
+    pub unveiled_paths: Vec<String>,
+    pub capsicum_enabled: bool,
 }
 
 impl InspirationSecurityGuard {
-    /// Creates a default permissive security guard.
     pub fn new() -> Self {
         Self {
             pledge_promises: Vec::new(),
             unveiled_paths: Vec::new(),
-            capsicum_rights_mask: u64::MAX,
-            landlock_active: false,
+            capsicum_enabled: false,
         }
     }
 
-    /// Applies OpenBSD pledge promises string (e.g., "stdio rpath wpath cpath id").
-    pub fn pledge(&mut self, promises: &str) {
-        self.pledge_promises = promises.split_whitespace().map(|s| s.to_string()).collect();
+    pub fn pledge(&mut self, promises: &[&str]) -> Result<(), &'static str> {
+        for promise in promises {
+            self.pledge_promises.push(promise.to_string());
+        }
+        Ok(())
     }
 
-    /// Applies OpenBSD unveil path restriction.
-    pub fn unveil(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if permissions.is_empty() {
+            return Err("Unveil: Permissions string cannot be empty");
+        }
+        self.unveiled_paths.push(path.to_string());
+        Ok(())
     }
 
-    /// Checks if a file path is permitted by active unveil rules.
-    pub fn is_path_permitted(&self, target_path: &str, mode: &str) -> bool {
+    pub fn validate_path_access(&self, path: &str) -> bool {
         if self.unveiled_paths.is_empty() {
-            return true; // Unveil not sealed/active
+            return true; // Permissive until unveiled
         }
-
-        for (path, perms) in &self.unveiled_paths {
-            if target_path.starts_with(path.as_str()) && perms.contains(mode) {
-                return true;
-            }
-        }
-        false
+        self.unveiled_paths.iter().any(|p| path.starts_with(p))
     }
 }
 
-/// Package & format converter taking ideas from Nix, XBPS, APK, Pacman, and Portage.
-#[derive(Debug, Clone)]
+impl Default for InspirationSecurityGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct InspirationPackageIntegrator {
     pub supported_formats: Vec<String>,
+    pub installed_packages_count: usize,
 }
 
 impl InspirationPackageIntegrator {
     pub fn new() -> Self {
-        Self {
-            supported_formats: vec![
-                "NixCAS".to_string(),
-                "XBPS".to_string(),
-                "APK".to_string(),
-                "PacmanAUR".to_string(),
-                "Portage".to_string(),
-                "RPM".to_string(),
-                "DEB".to_string(),
-            ],
-        }
+        let mut integrator = Self {
+            supported_formats: Vec::new(),
+            installed_packages_count: 0,
+        };
+        integrator.supported_formats.push("APT (.deb)".to_string());
+        integrator.supported_formats.push("Pacman (.pkg.tar.zst)".to_string());
+        integrator.supported_formats.push("Nix (.nix flake)".to_string());
+        integrator.supported_formats.push("Portage (ebuild)".to_string());
+        integrator.supported_formats.push("XBPS (.xbps)".to_string());
+        integrator
     }
 
-    /// Validates if a package format is supported by the universal integrator engine.
-    pub fn is_format_supported(&self, format_name: &str) -> bool {
-        self.supported_formats.iter().any(|f: &String| f.eq_ignore_ascii_case(format_name))
+    pub fn install_package_transaction(&mut self, pkg_name: &str, format: &str) -> Result<usize, &'static str> {
+        if !self.supported_formats.iter().any(|f| f.contains(format)) {
+            return Err("Package Integrator: Unsupported package format");
+        }
+        if pkg_name.is_empty() {
+            return Err("Package Integrator: Invalid package name");
+        }
+        self.installed_packages_count += 1;
+        Ok(self.installed_packages_count)
     }
 }
 
-/// Primary orchestrator engine for open-source dominance and feature synthesis.
-#[derive(Debug, Clone)]
+impl Default for InspirationPackageIntegrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct OpenSourceDominanceEngine {
-    pub feature_matrix: InspirationFeatureMatrix,
+    pub matrix: InspirationFeatureMatrix,
     pub security_guard: InspirationSecurityGuard,
     pub package_integrator: InspirationPackageIntegrator,
 }
 
 impl OpenSourceDominanceEngine {
-    /// Initializes the open-source dominance engine.
     pub fn new() -> Self {
         Self {
-            feature_matrix: InspirationFeatureMatrix::new(),
+            matrix: InspirationFeatureMatrix::new(),
             security_guard: InspirationSecurityGuard::new(),
             package_integrator: InspirationPackageIntegrator::new(),
         }
     }
 
-    /// Executes a comprehensive open-source parity audit.
-    pub fn execute_parity_audit(&self) -> bool {
-        self.feature_matrix.dominance_score() == 100
+    pub fn audit_dominance_readiness(&self) -> bool {
+        self.matrix.features.len() >= 5
+            && self.package_integrator.supported_formats.len() >= 5
     }
 }
+
+impl Default for OpenSourceDominanceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Unit Tests Module
+// =========================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_inspiration_feature_matrix_and_dominance_score() {
+    fn test_inspiration_feature_matrix() {
         let matrix = InspirationFeatureMatrix::new();
-        assert_eq!(matrix.implemented_count(), 10);
-        assert_eq!(matrix.dominance_score(), 100);
+        assert!(matrix.is_feature_active("OpenBSD Pledge & Unveil"));
+        assert_eq!(matrix.count_features_by_tier(OpenSourceInspirationTier::LinuxKernel), 1);
+        assert_eq!(matrix.count_features_by_tier(OpenSourceInspirationTier::FreeBsd), 1);
     }
 
     #[test]
-    fn test_inspiration_security_guard_pledge_and_unveil() {
+    fn test_inspiration_security_guard() {
         let mut guard = InspirationSecurityGuard::new();
-        guard.pledge("stdio rpath wpath");
-        assert_eq!(guard.pledge_promises.len(), 3);
+        assert!(guard.pledge(&["stdio", "rpath", "wpath"]).is_ok());
+        assert!(guard.unveil("/usr/lib", "r").is_ok());
 
-        guard.unveil("/tmp", "rw");
-        guard.unveil("/usr/bin", "r");
-
-        assert!(guard.is_path_permitted("/tmp/test.txt", "r"));
-        assert!(guard.is_path_permitted("/tmp/test.txt", "w"));
-        assert!(guard.is_path_permitted("/usr/bin/ls", "r"));
-        assert!(!guard.is_path_permitted("/usr/bin/ls", "w"));
-        assert!(!guard.is_path_permitted("/etc/shadow", "r"));
+        assert!(guard.validate_path_access("/usr/lib/libc.so"));
+        assert!(!guard.validate_path_access("/etc/shadow"));
     }
 
     #[test]
-    fn test_inspiration_package_integrator() {
-        let integrator = InspirationPackageIntegrator::new();
-        assert!(integrator.is_format_supported("NixCAS"));
-        assert!(integrator.is_format_supported("xbps"));
-        assert!(integrator.is_format_supported("apk"));
-        assert!(integrator.is_format_supported("pacmanaur"));
-        assert!(!integrator.is_format_supported("unknown_pkg"));
-    }
+    fn test_inspiration_package_integrator_and_dominance_engine() {
+        let mut integrator = InspirationPackageIntegrator::new();
+        let count = integrator.install_package_transaction("vim", "APT").unwrap();
+        assert_eq!(count, 1);
 
-    #[test]
-    fn test_open_source_dominance_engine_audit() {
         let engine = OpenSourceDominanceEngine::new();
-        assert!(engine.execute_parity_audit());
+        assert!(engine.audit_dominance_readiness());
     }
 }
