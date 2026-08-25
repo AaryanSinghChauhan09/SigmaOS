@@ -287,6 +287,121 @@ impl SovereignSectorServices {
     }
 }
 
+// =========================================================================
+// 10. Linux (insmod/rmmod) & BSD (kldload/kldunload) Inspired Kernel Module Loader
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModuleState {
+    Unloaded,
+    Loading,
+    Live,
+    Unloading,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignKernelModule {
+    pub name: String,
+    pub version: String,
+    pub author: String,
+    pub license: String,
+    pub dependencies: Vec<String>,
+    pub exported_symbols: Vec<String>,
+    pub state: ModuleState,
+    pub ref_count: usize,
+    pub is_pqc_signed: bool,
+}
+
+pub struct SovereignDynamicKernelModuleManager {
+    pub loaded_modules: std::collections::HashMap<String, SovereignKernelModule>,
+    pub global_symbol_table: std::collections::HashMap<String, String>, // symbol -> module_name
+}
+
+impl SovereignDynamicKernelModuleManager {
+    pub fn new() -> Self {
+        Self {
+            loaded_modules: std::collections::HashMap::new(),
+            global_symbol_table: std::collections::HashMap::new(),
+        }
+    }
+
+    pub fn insmod_kldload(&mut self, mut module: SovereignKernelModule) -> Result<(), &'static str> {
+        if self.loaded_modules.contains_key(&module.name) {
+            return Err("KernelModule: Module already loaded");
+        }
+
+        if !module.is_pqc_signed {
+            return Err("KernelModule: Signature verification failed (unsigned module blocked in Lockdown mode)");
+        }
+
+        // Verify dependencies
+        for dep in &module.dependencies {
+            let dep_module = self
+                .loaded_modules
+                .get_mut(dep)
+                .ok_or("KernelModule: Unresolved dependency")?;
+            dep_module.ref_count += 1;
+        }
+
+        module.state = ModuleState::Live;
+
+        // Register exported symbols
+        for sym in &module.exported_symbols {
+            self.global_symbol_table.insert(sym.clone(), module.name.clone());
+        }
+
+        self.loaded_modules.insert(module.name.clone(), module);
+        Ok(())
+    }
+
+    pub fn rmmod_kldunload(&mut self, name: &str) -> Result<(), &'static str> {
+        let module = self
+            .loaded_modules
+            .get(name)
+            .ok_or("KernelModule: Module not found")?;
+
+        if module.ref_count > 0 {
+            return Err("KernelModule: Cannot unload module in use by dependent modules");
+        }
+
+        let deps = module.dependencies.clone();
+        let syms = module.exported_symbols.clone();
+
+        self.loaded_modules.remove(name);
+
+        // Remove symbols
+        for sym in syms {
+            self.global_symbol_table.remove(&sym);
+        }
+
+        // Decrement dependency ref counts
+        for dep in deps {
+            if let Some(dep_mod) = self.loaded_modules.get_mut(&dep) {
+                if dep_mod.ref_count > 0 {
+                    dep_mod.ref_count -= 1;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn modinfo_kldstat(&self, name: &str) -> Option<String> {
+        self.loaded_modules.get(name).map(|m| {
+            format!(
+                "name: {}\nversion: {}\nauthor: {}\nlicense: {}\nstate: {:?}\nref_count: {}",
+                m.name, m.version, m.author, m.license, m.state, m.ref_count
+            )
+        })
+    }
+}
+
+impl Default for SovereignDynamicKernelModuleManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -381,5 +496,53 @@ mod tests {
         // 4. Agricultural irrigation
         let strategy = services.evaluate_soil_irrigation_strategy(15.0);
         assert_eq!(strategy, "Action Required: Initiate localized water drip loop");
+    }
+
+    #[test]
+    fn test_sovereign_dynamic_kernel_module_manager() {
+        let mut kmod = SovereignDynamicKernelModuleManager::new();
+
+        let base_module = SovereignKernelModule {
+            name: "snd_core".to_string(),
+            version: "1.0.0".to_string(),
+            author: "SigmaOS".to_string(),
+            license: "GPL-2.0".to_string(),
+            dependencies: Vec::new(),
+            exported_symbols: vec!["snd_pcm_write".to_string()],
+            state: ModuleState::Unloaded,
+            ref_count: 0,
+            is_pqc_signed: true,
+        };
+
+        let driver_module = SovereignKernelModule {
+            name: "snd_hda_intel".to_string(),
+            version: "1.0.0".to_string(),
+            author: "SigmaOS".to_string(),
+            license: "GPL-2.0".to_string(),
+            dependencies: vec!["snd_core".to_string()],
+            exported_symbols: vec!["azx_probe".to_string()],
+            state: ModuleState::Unloaded,
+            ref_count: 0,
+            is_pqc_signed: true,
+        };
+
+        // Load base module
+        assert!(kmod.insmod_kldload(base_module).is_ok());
+        assert_eq!(kmod.global_symbol_table.get("snd_pcm_write"), Some(&"snd_core".to_string()));
+
+        // Load dependent driver module
+        assert!(kmod.insmod_kldload(driver_module).is_ok());
+        assert_eq!(kmod.loaded_modules.get("snd_core").unwrap().ref_count, 1);
+
+        // Cannot unload base module while dependent module is active!
+        assert!(kmod.rmmod_kldunload("snd_core").is_err());
+
+        // Unload dependent driver module first
+        assert!(kmod.rmmod_kldunload("snd_hda_intel").is_ok());
+        assert_eq!(kmod.loaded_modules.get("snd_core").unwrap().ref_count, 0);
+
+        // Now unloading base module succeeds!
+        assert!(kmod.rmmod_kldunload("snd_core").is_ok());
+        assert!(!kmod.global_symbol_table.contains_key("snd_pcm_write"));
     }
 }

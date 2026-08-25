@@ -97,7 +97,8 @@ pub use gap_closure::{
     KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
     FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
     PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
-    HidGraphicsDriver, AiTaskOrchestrator,
+    HidGraphicsDriver, AiTaskOrchestrator, SovereignDistroAbsorptionEngine,
+    OpenSourceCompetitorOrchestrator, TargetDistroFamily,
 };
 pub use superiority::{
     SovereignRegistry, SovereignObjectBus, SovereignCloudFS, SovereignSigLoader,
