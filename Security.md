@@ -1,3 +1,3 @@
 # Security
-
-Security features and hardening guide for SigmaOS.
+Capability tokens restrict syscalls.
+Pledge/unveil isolate processes.

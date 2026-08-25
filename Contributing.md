@@ -1,3 +1,2 @@
 # Contributing
-
-How to contribute to SigmaOS.
+See `CONTRIBUTING.md` in the main repo.
