@@ -1,0 +1,39 @@
+name: PR Fast Checks
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  fast-checks:
+    name: Fast PR Validation & Standalone Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check Formatting (rustfmt)
+        run: cargo fmt -- --check
+
+      - name: Run Clippy Lints (deny warnings)
+        run: cargo clippy -- -D warnings
+
+      - name: Run no_std Enforcement Check
+        run: |
+          chmod +x ./scripts/no_std_check.sh
+          ./scripts/no_std_check.sh
+
+      - name: Run Standalone File Tests for Modified Files
+        run: |
+          chmod +x ./scripts/changed_files_rustc_tests.sh
+          ./scripts/changed_files_rustc_tests.sh

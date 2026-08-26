@@ -100,6 +100,10 @@ impl Default for CommunityHandbookCatalog {
 }
 
 
+pub struct HybridFirewallTemplateStore {
+    pub templates: HashMap<String, String>,
+}
+
 impl HybridFirewallTemplateStore {
     pub fn new() -> Self {
         let mut store = Self { templates: HashMap::new() };
