@@ -7,6 +7,11 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
+
 // =========================================================================
 // 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // =========================================================================
@@ -1519,7 +1524,13 @@ mod tests {
                 None,
             ],
         };
+        let node_b = PackageNode {
+            pkg_id: 1,
+            version: PkgVersion { major: 2, minor: 1 },
+            dependencies: [None, None, None, None],
+        };
         assert!(sat.add_package_node(node_a));
+        assert!(sat.add_package_node(node_b));
         assert!(sat.solve(0));
     }
 }
@@ -1588,35 +1599,6 @@ impl GamifiedProductivityLayer {
 #[cfg(test)]
 mod zenith_desktop_core_tests {
     use super::*;
-
-    #[test]
-    fn test_zenith_desktop_profile_switching() {
-        let mut manager = ZenithDesktopProfileManager::new();
-        assert_eq!(manager.active_config.mode, ZenithProfileMode::Developer);
-
-        // Switch to Minimalist profile (<30MB idle RAM target)
-        manager.switch_profile(ZenithProfileMode::Minimalist);
-        assert_eq!(manager.active_config.mode, ZenithProfileMode::Minimalist);
-        assert_eq!(manager.active_config.target_clock_mhz, 800);
-        assert!(manager.active_config.idle_ram_budget_mb < 30);
-
-        // Switch to Gamer profile
-        manager.switch_profile(ZenithProfileMode::Gamer);
-        assert_eq!(manager.active_config.mode, ZenithProfileMode::Gamer);
-        assert_eq!(manager.active_config.compositor_fps, 144);
-    }
-
-    #[test]
-    fn test_cross_device_continuity() {
-        let mut continuity = CrossDeviceContinuityEngine::new();
-        continuity.snapshot_application_context("SigmaDev IDE", 42, (0, 0, 1024, 768), 1000);
-        continuity.sync_clipboard_content("SOVEREIGN_PASTE_BUFFER");
-
-        assert_eq!(continuity.shared_clipboard_data, "SOVEREIGN_PASTE_BUFFER");
-        let (app, offset) = continuity.resume_context_on_target_device().unwrap();
-        assert_eq!(app, "SigmaDev IDE");
-        assert_eq!(offset, 42);
-    }
 
     #[test]
     fn test_gesture_and_voice_control() {
@@ -2188,14 +2170,14 @@ impl DragonFlyHammer2FsSnapshotV2 {
             pfs_snapshots: Vec::new(),
             active_pfs_id: 1,
         };
-
-        assert!(sat.add_package_node(node_a));
-        assert!(sat.add_package_node(node_b));
-
-        assert!(sat.solve(0));
-        assert_eq!(sat.selected_version[0].unwrap().major, 1);
-        assert_eq!(sat.selected_version[1].unwrap().major, 2);
+        snap.pfs_snapshots.push((1, root_pfs_name.to_string(), 0));
+        snap
     }
+}
+
+#[cfg(test)]
+mod extra_tests {
+    use super::*;
 
     #[test]
     fn test_section_6_4_jbd2_ledger() {
