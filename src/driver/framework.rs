@@ -85,7 +85,11 @@ impl Driver for SimpleStorageDriver {
     fn name(&self) -> &str { "SimpleStorageDriver" }
     fn driver_type(&self) -> DriverType { self.driver_type }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        match self.state.load(Ordering::SeqCst) {
+            1 => DriverState::Active,
+            2 => DriverState::Failed,
+            _ => DriverState::Unloaded,
+        }
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Active as usize, Ordering::SeqCst);
@@ -124,7 +128,11 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        match self.state.load(Ordering::SeqCst) {
+            1 => DriverState::Active,
+            2 => DriverState::Failed,
+            _ => DriverState::Unloaded,
+        }
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Active as usize, Ordering::SeqCst);

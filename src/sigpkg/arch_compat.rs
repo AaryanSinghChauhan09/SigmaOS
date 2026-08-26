@@ -120,14 +120,14 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
-        let depends_klib = klib::vec::Vec::from_iter(depends);
+        let depends_klib = crate::klib::vec::Vec::from_iter(depends);
 
         Ok(Package::new(
-            klib::string::SigmaString::from(pkgname),
+            crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
-            klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
+            crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
             depends_klib,
-            klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
+            crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
 }
@@ -244,11 +244,11 @@ impl PacmanDbAdapter {
             Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
-            klib::string::SigmaString::from(name),
+            crate::klib::string::SigmaString::from(name),
             parsed_ver,
-            klib::string::SigmaString::from(desc),
-            klib::vec::Vec::new(),
-            klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
+            crate::klib::string::SigmaString::from(desc),
+            crate::klib::vec::Vec::new(),
+            crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
 }
@@ -308,16 +308,16 @@ impl AlpmHookManager {
         }
 
         self.add_hook(AlpmHook {
-            name: klib::string::SigmaString::from(name),
+            name: crate::klib::string::SigmaString::from(name),
             when,
-            target_pattern: klib::string::SigmaString::from(target_pattern),
-            exec_cmd: klib::string::SigmaString::from(exec_cmd),
+            target_pattern: crate::klib::string::SigmaString::from(target_pattern),
+            exec_cmd: crate::klib::string::SigmaString::from(exec_cmd),
         });
 
         Ok(())
     }
 
-    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<klib::string::SigmaString> {
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<crate::klib::string::SigmaString> {
         let mut triggered_cmds = alloc::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -382,7 +382,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        klib::vec::Vec::from_iter(image_header)
+        crate::klib::vec::Vec::from_iter(image_header)
     }
 }
 
@@ -536,7 +536,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, klib::vec::Vec::from_iter(archive_content)))
+        Ok((archive_name, crate::klib::vec::Vec::from_iter(archive_content)))
     }
 }
 
@@ -551,21 +551,21 @@ mod tests {
         sync.register_installed("make", Version::new(4, 3, 0));
 
         let source_pkg = DebianSbuildPackage {
-            name: klib::string::SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: klib::vec::Vec::from_iter(alloc::vec![klib::string::SigmaString::from("gcc"), klib::string::SigmaString::from("make")]),
+            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")]),
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
         let source_pkg_missing = DebianSbuildPackage {
-            name: klib::string::SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: vec![
-                "gcc".to_string(),
-                "make".to_string(),
-                "libc-dev".to_string(),
-            ],
+            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+                crate::klib::string::SigmaString::from("libc-dev"),
+            ]),
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }
@@ -580,10 +580,10 @@ mod tests {
         "#;
 
         let package = compiler.compile_pkgbuild(pkgbuild).unwrap();
-        assert_eq!(package.name, "neo-vim");
+        assert_eq!(package.name, crate::klib::string::SigmaString::from("neo-vim"));
         assert_eq!(package.version, Version::new(0, 9, 1));
         assert_eq!(package.dependencies.len(), 3);
-        assert_eq!(package.dependencies[0].name, "libc");
+        assert_eq!(package.dependencies[0].name, crate::klib::string::SigmaString::from("libc"));
     }
 
     #[test]
@@ -597,7 +597,7 @@ mod tests {
 
         let pending = sync.list_pending_rolling_updates();
         assert_eq!(pending.len(), 1);
-        assert_eq!(pending[0].0, "bash");
+        assert_eq!(pending[0].0, crate::klib::string::SigmaString::from("bash"));
         assert_eq!(pending[0].1, Version::new(5, 1, 0));
         assert_eq!(pending[0].2, Version::new(5, 2, 0));
     }
@@ -617,11 +617,11 @@ mod tests {
         "#;
 
         let imported = adapter.import_legacy_pacman_package(desc).unwrap();
-        assert_eq!(imported.name, "pacman-contrib");
+        assert_eq!(imported.name, crate::klib::string::SigmaString::from("pacman-contrib"));
         assert_eq!(imported.version, Version::new(1, 8, 0));
         assert_eq!(
             imported.description,
-            "Contrib utilities for pacman package manager"
+            crate::klib::string::SigmaString::from("Contrib utilities for pacman package manager")
         );
     }
 
@@ -665,7 +665,7 @@ mod tests {
         let source_bytes = b"cargo build --release";
 
         let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
-        assert_eq!(pkg_file, "ripgrep-13.0.0-x86_64.pkg.tar.zst");
+        assert_eq!(pkg_file, crate::klib::string::SigmaString::from("ripgrep-13.0.0-x86_64.pkg.tar.zst"));
         assert!(pkg_data.len() > source_bytes.len());
     }
 

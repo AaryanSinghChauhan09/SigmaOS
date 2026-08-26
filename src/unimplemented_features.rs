@@ -2431,3 +2431,68 @@ mod extra_unimplemented_tests {
     }
 
 }
+
+/// Gentoo Portage package masking and keyword evaluation engine
+pub struct GentooPortageMaskEngine {
+    pub arch: String,
+    pub ebuilds: HashMap<String, PortageEbuildSpec>,
+    pub hard_masks: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PortageEbuildSpec {
+    pub package_name: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(arch: &str) -> Self {
+        Self {
+            arch: arch.to_string(),
+            ebuilds: HashMap::new(),
+            hard_masks: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, package: &str, version: &str, keywords: &[&str], is_masked: bool) {
+        let key = format!("{}:{}", package, version);
+        self.ebuilds.insert(key, PortageEbuildSpec {
+            package_name: package.to_string(),
+            version: version.to_string(),
+            keywords: keywords.iter().map(|k| k.to_string()).collect(),
+            is_masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, package: &str) {
+        self.hard_masks.push(package.to_string());
+    }
+
+    pub fn evaluate_installability(&self, package: &str, version: &str, accept_testing: bool) -> Result<bool, &'static str> {
+        if self.hard_masks.contains(&package.to_string()) {
+            return Err("Package is hard-masked in package.mask");
+        }
+
+        let key = format!("{}:{}", package, version);
+        let ebuild = self.ebuilds.get(&key).ok_or("Ebuild not found")?;
+
+        if ebuild.is_masked {
+            return Err("Ebuild is explicitly masked");
+        }
+
+        let testing_keyword = format!("~{}", self.arch);
+        let stable_keyword = self.arch.clone();
+
+        if ebuild.keywords.contains(&stable_keyword) {
+            return Ok(true);
+        }
+
+        if accept_testing && ebuild.keywords.contains(&testing_keyword) {
+            return Ok(true);
+        }
+
+        Err("No matching keyword accepted for current profile")
+    }
+}
