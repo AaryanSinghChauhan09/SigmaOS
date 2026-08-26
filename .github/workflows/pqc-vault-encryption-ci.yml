@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+
+permissions:
+  contents: read
 jobs:
   pqc-vault-check:
     name: PQC Dilithium-5 Vault Encryption & Network Security Test

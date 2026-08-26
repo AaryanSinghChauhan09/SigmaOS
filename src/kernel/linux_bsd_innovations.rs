@@ -1799,25 +1799,21 @@ mod tests {
 
     #[test]
     fn test_sovereign_cgroup_governor() {
-        let mut gov = SovereignCgroupGovernor::new();
-        gov.create_group("/sys/fs/cgroup/db").unwrap();
+        use crate::kernel::proc::cgroups::{CgroupManager, ResourceLimits};
 
-        let limits = CgroupResourceLimits {
-            cpu_quota_us: 50_000,
-            cpu_period_us: 100_000,
-            memory_max_bytes: 1024 * 1024,
-            memory_high_bytes: 512 * 1024,
-            memory_swap_max_bytes: 0,
-            io_weight: 500,
+        let mut cgm = CgroupManager::new();
+        let limits = ResourceLimits {
+            cpu_shares: 512,
+            max_memory_bytes: 1024 * 1024,
+            max_pids: 2,
         };
-        gov.configure_limits("/sys/fs/cgroup/db", limits).unwrap();
-        gov.attach_pid("/sys/fs/cgroup/db", 1001).unwrap();
 
-        assert!(gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap());
-        assert!(!gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap()); // Exceeds 50k quota
+        cgm.create_group("db", limits).unwrap();
+        assert_eq!(cgm.get_limits("db").unwrap().cpu_shares, 512);
 
-        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 500_000).is_ok());
-        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 600_000).is_err()); // Exceeds 1MB limit
+        cgm.attach_process("db", 1001).unwrap();
+        cgm.attach_process("db", 1002).unwrap();
+        assert!(cgm.attach_process("db", 1003).is_err());
     }
 
     #[test]

@@ -68,6 +68,7 @@ pub mod mobile_desktop_parity;
 pub mod nixos;
 pub mod nixos_reproducible;
 pub mod oldlinux;
+pub mod open_source_dominance;
 pub mod open_source_tier1;
 pub mod opensuse_slackware;
 pub mod overtake;
@@ -111,6 +112,7 @@ pub use arch_linux::{
     WikiPage, ArchWikiSearchEngine,
 };
 
+pub use open_source_dominance::*;
 pub use open_source_tier1::{
     WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
 };
@@ -168,7 +170,17 @@ pub use absorb_tools::{
 };
 
 pub use antix::*;
+pub use bsd::{
+    BsdJail, BsdKqueueFilter as BsdCompatKqueueFilter, FreeBsdGeomManager, FreeBsdJailManager,
+    GeomClassType, GeomProvider, NetBsdRumpKernelRouter, OpenBsdSandboxGuard,
+    OpenBsdSysctlKernelMib, RumpHypercall,
+};
 pub use legacy_adapters::*;
+pub use linux_compat::{
+    AuxVector, BsdKevent, BsdKqueueFilter, BsdKqueueMultiplexer, DistroTargetProfile,
+    LinuxCompatSpec, LinuxElfLoaderShim, LinuxProcFsAdapter, LinuxSyscallNum,
+    LinuxSyscallTranslator, OpenBsdPledgeUnveilFilter, TargetDistro,
+};
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 
 pub use apache_ossie::{
