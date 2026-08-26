@@ -490,6 +490,21 @@ h2 {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
+.text-danger {
+    color: var(--danger);
+}
+
+.error-text {
+    font-size: 0.75rem;
+    color: var(--danger);
+    margin-top: 2px;
+}
+
+.form-group input.input-error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+}
+
 /* Installation Progress */
 .progress-container {
     background: rgba(255, 255, 255, 0.02);
