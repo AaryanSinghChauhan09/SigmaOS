@@ -137,12 +137,19 @@ impl FilePermissions {
             read: (owner_mask & 0o4) != 0,
             write: (owner_mask & 0o2) != 0,
             execute: (owner_mask & 0o1) != 0,
+            user_read: (owner_mask & 0o4) != 0,
+            user_write: (owner_mask & 0o2) != 0,
+            user_execute: (owner_mask & 0o1) != 0,
+            group_read: (group_mask & 0o4) != 0,
+            group_write: (group_mask & 0o2) != 0,
+            group_execute: (group_mask & 0o1) != 0,
+            other_read: (other_mask & 0o4) != 0,
+            other_write: (other_mask & 0o2) != 0,
+            other_execute: (other_mask & 0o1) != 0,
             suid,
             sgid,
             sticky,
-            owner_mask,
-            group_mask,
-            other_mask,
+            bsd_flags: BsdFileFlags::new(),
         }
     }
 
@@ -151,22 +158,28 @@ impl FilePermissions {
         if self.suid { mode |= 0o4000; }
         if self.sgid { mode |= 0o2000; }
         if self.sticky { mode |= 0o1000; }
-        mode |= ((self.owner_mask as u32) & 0o7) << 6;
-        mode |= ((self.group_mask as u32) & 0o7) << 3;
-        mode |= (self.other_mask as u32) & 0o7;
+        let owner_mask = ((self.user_read as u8) << 2) | ((self.user_write as u8) << 1) | (self.user_execute as u8);
+        let group_mask = ((self.group_read as u8) << 2) | ((self.group_write as u8) << 1) | (self.group_execute as u8);
+        let other_mask = ((self.other_read as u8) << 2) | ((self.other_write as u8) << 1) | (self.other_execute as u8);
+        mode |= (owner_mask as u32) << 6;
+        mode |= (group_mask as u32) << 3;
+        mode |= other_mask as u32;
         mode
     }
 
     pub fn allows_owner(&self, req_mask: u8) -> bool {
-        (self.owner_mask & req_mask) == req_mask
+        let owner_mask = ((self.user_read as u8) << 2) | ((self.user_write as u8) << 1) | (self.user_execute as u8);
+        (owner_mask & req_mask) == req_mask
     }
 
     pub fn allows_group(&self, req_mask: u8) -> bool {
-        (self.group_mask & req_mask) == req_mask
+        let group_mask = ((self.group_read as u8) << 2) | ((self.group_write as u8) << 1) | (self.group_execute as u8);
+        (group_mask & req_mask) == req_mask
     }
 
     pub fn allows_other(&self, req_mask: u8) -> bool {
-        (self.other_mask & req_mask) == req_mask
+        let other_mask = ((self.other_read as u8) << 2) | ((self.other_write as u8) << 1) | (self.other_execute as u8);
+        (other_mask & req_mask) == req_mask
     }
 
     pub fn all() -> Self {
