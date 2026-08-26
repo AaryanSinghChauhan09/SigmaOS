@@ -108,6 +108,15 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+
     pub fn remove(&mut self, index: usize) -> T {
         if index >= self.len {
             panic!("index out of bounds");

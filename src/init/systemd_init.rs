@@ -300,7 +300,7 @@ impl SystemdEngine {
 
         for &id in unit_ids.iter() {
             if !visited.contains(&id) {
-                self.topo_visit(id, unit_ids, &mut sorted, &mut visiting, &mut visited)?;
+                self.topo_visit(id, unit_ids.as_slice(), &mut sorted, &mut visiting, &mut visited)?;
             }
         }
         Ok(SystemdVec::from(sorted.as_slice()))
@@ -323,11 +323,27 @@ impl SystemdEngine {
 
         visiting.push(id);
 
+        let mut prereqs = Vec::new();
+
         if let Some(unit) = self.find_unit(id) {
-            for &before_id in unit.before.iter() {
-                if all_ids.contains(&before_id) && !visited.contains(&before_id) {
-                    self.topo_visit(before_id, all_ids, sorted, visiting, visited)?;
+            for &after_id in unit.after.iter() {
+                if all_ids.contains(&after_id) && !prereqs.contains(&after_id) {
+                    prereqs.push(after_id);
                 }
+            }
+        }
+
+        for &other_id in all_ids.iter() {
+            if let Some(other_unit) = self.find_unit(other_id) {
+                if other_unit.before.contains(&id) && !prereqs.contains(&other_id) {
+                    prereqs.push(other_id);
+                }
+            }
+        }
+
+        for p_id in prereqs {
+            if !visited.contains(&p_id) {
+                self.topo_visit(p_id, all_ids, sorted, visiting, visited)?;
             }
         }
 
@@ -644,7 +660,7 @@ impl SystemdEngine {
                 }
             }
         }
-        blame_list
+        SystemdVec::from(blame_list)
     }
 
     pub fn query_target_by_name(&self, name: &[u8]) -> Option<UnitID> {
@@ -664,6 +680,43 @@ pub struct SystemdVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> SystemdVec<T> {
+    pub fn as_slice(&self) -> &[T] {
+        if self.data.is_null() || self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::Deref for SystemdVec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        self.as_slice()
+    }
+}
+
+impl<'a, T: Clone> From<&'a [T]> for SystemdVec<T> {
+    fn from(slice: &'a [T]) -> Self {
+        let mut vec = Self::new();
+        for item in slice {
+            vec.push(item.clone());
+        }
+        vec
+    }
+}
+
+impl<T> From<Vec<T>> for SystemdVec<T> {
+    fn from(v: Vec<T>) -> Self {
+        let mut vec = Self::new();
+        for item in v {
+            vec.push(item);
+        }
+        vec
+    }
 }
 
 impl<T: PartialEq> SystemdVec<T> {
