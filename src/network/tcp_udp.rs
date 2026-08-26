@@ -640,6 +640,23 @@ impl Default for SimpleNetworkStack {
     }
 }
 
+impl NetworkStack for SimpleNetworkStack {
+    fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
+        let id = self.next_id.fetch_add(1, Ordering::SeqCst) as usize;
+        let socket = SimpleSocket::new(id, protocol, port);
+        self.sockets.push(Box::new(socket));
+        Ok(id)
+    }
+
+    fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
+        if let Some(pos) = self.sockets.iter().position(|s: &Box<dyn Socket>| s.id() == id) {
+            self.sockets.remove(pos);
+            Ok(())
+        } else {
+            Err(NetworkError::InvalidSocket)
+        }
+    }
+}
 
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {

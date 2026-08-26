@@ -372,7 +372,6 @@ mod tests {
         );
     }
 
-
     #[test]
     fn test_freebsd_geom_manager() {
         let mut geom = FreeBsdGeomManager::new();

@@ -182,16 +182,16 @@ impl SimpleAuditPolicy {
 }
 
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
         if self.require_authentication.load(Ordering::SeqCst) == 1 {
-            Ok(event.event_type() == EventType::Authentication)
+            event.event_type() == EventType::Authentication
         } else {
-            Ok(true)
+            true
         }
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event)? {
+        if self.check_compliance(event) {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)
