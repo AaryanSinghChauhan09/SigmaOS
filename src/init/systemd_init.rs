@@ -303,7 +303,7 @@ impl SystemdEngine {
                 self.topo_visit(id, unit_ids, &mut sorted, &mut visiting, &mut visited)?;
             }
         }
-        Ok(sorted)
+        Ok(SystemdVec::from(sorted.as_slice()))
     }
 
     fn topo_visit(
@@ -340,7 +340,7 @@ impl SystemdEngine {
     pub fn systemctl_start(&mut self, id: UnitID) -> Result<(), &'static str> {
         let (is_enabled, conflicts, requires, wants) = if let Some(u) = self.find_unit(id) {
             (
-                u.enabled,
+                u.is_enabled,
                 u.conflicts.clone(),
                 u.requires.clone(),
                 u.wants.clone(),
