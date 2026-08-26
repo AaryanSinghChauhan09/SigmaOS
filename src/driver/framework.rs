@@ -86,8 +86,8 @@ impl Driver for SimpleStorageDriver {
     fn driver_type(&self) -> DriverType { self.driver_type }
     fn state(&self) -> DriverState {
         match self.state.load(Ordering::SeqCst) {
-            1 => DriverState::Active,
-            2 => DriverState::Failed,
+            val if val == DriverState::Active as usize => DriverState::Active,
+            val if val == DriverState::Failed as usize => DriverState::Failed,
             _ => DriverState::Unloaded,
         }
     }
@@ -129,8 +129,8 @@ impl Driver for SimpleDriver {
     }
     fn state(&self) -> DriverState {
         match self.state.load(Ordering::SeqCst) {
-            1 => DriverState::Active,
-            2 => DriverState::Failed,
+            val if val == DriverState::Active as usize => DriverState::Active,
+            val if val == DriverState::Failed as usize => DriverState::Failed,
             _ => DriverState::Unloaded,
         }
     }

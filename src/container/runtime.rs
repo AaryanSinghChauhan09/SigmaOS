@@ -286,7 +286,6 @@ impl OverlayFS {
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
-    pub name_len: u8, // Cached byte length for O(1) slice access without O(N) zero-byte scanning
     pub image: [u8; 128],
     pub state: AtomicUsize, // ContainerState as usize
     pub pid: AtomicUsize,
@@ -325,7 +324,6 @@ impl SimpleContainer {
         SimpleContainer {
             id,
             name: name_array,
-            name_len: name_len as u8,
             image: image_array,
             state: AtomicUsize::new(ContainerState::Created as usize),
             pid: AtomicUsize::new(0),
@@ -364,9 +362,8 @@ impl Container for SimpleContainer {
     }
 
     fn name(&self) -> &[u8] {
-        // Optimization: Use stored explicit byte length for instant O(1) slice retrieval,
-        // eliminating O(N) linear zero-byte scans during frequent container inspections.
-        &self.name[..self.name_len as usize]
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.name[..len]
     }
 
     fn start(&mut self) -> Result<(), ContainerError> {

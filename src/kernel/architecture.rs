@@ -9,7 +9,7 @@ pub enum InstructionCyclePhase {
     Commit,
 }
 
-use crate::kernel::structures::{CpuArchitectureClass, ThreadState};
+use super::structures::{CpuArchitectureClass, ThreadState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptClass {
@@ -421,11 +421,12 @@ impl ArchitectureEngine {
 
         // 1. Save register context of current running thread
         pcb.thread_list[from_idx].state = ThreadState::Ready;
-        pcb.thread_list[from_idx].registers.rax = 0xAA; // Simulated saved context values
+        let mut saved_regs = pcb.thread_list[from_idx].registers;
+        saved_regs.rax = 0xAA; // Simulated saved context values
 
         // 2. Restore register context of target thread
         pcb.thread_list[to_idx].state = ThreadState::Running;
-        let _target_regs = pcb.thread_list[to_idx].registers;
+        let target_regs = pcb.thread_list[to_idx].registers;
 
         // 3. Switch page directory mapping (CR3 / PML4 register base)
         let cr3 = pcb.page_directory_base;

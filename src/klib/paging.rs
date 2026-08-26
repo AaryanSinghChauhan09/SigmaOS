@@ -429,9 +429,8 @@ impl SimpleVMM {
                     .get_mut(pt_idx_in_vec)
                     .and_then(|o| o.as_mut())
                 {
-                    let entry = &mut pt.entries[pt_idx];
-                    entry.set_writable(false);
-                    entry.cow.store(1, Ordering::SeqCst);
+                    pt.entries[pt_idx].set_writable(false);
+                    pt.entries[pt_idx].cow.store(1, Ordering::SeqCst);
                     return Ok(());
                 }
             }

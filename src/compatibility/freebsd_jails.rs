@@ -74,7 +74,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let (jid, config) = if let Some(jail) = self.jails.get_mut(name) {
+        if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -85,33 +85,30 @@ impl SigmaJailManager {
             let jid = self.next_jid;
             self.next_jid += 1;
             jail.jid = Some(jid);
-            (jid, jail.config.clone())
-        } else {
-            return Err(format!("Jail '{}' not found", name).into());
-        };
 
-        // Create network namespace if IP specified
-        if let Some(ip) = &config.ip_address {
-            self.setup_jail_network(jid, ip)?;
-        }
+            // Create network namespace if IP specified
+            if let Some(ip) = &jail.config.ip_address {
+                self.setup_jail_network(jid, ip)?;
+            }
 
-        // Mount jail filesystem
-        self.mount_jail_fs(&config)?;
+            // Mount jail filesystem
+            self.mount_jail_fs(&jail.config)?;
 
-        // Apply security restrictions
-        self.apply_jail_restrictions(jid, &config)?;
+            // Apply security restrictions
+            self.apply_jail_restrictions(jid, &jail.config)?;
 
-        // Execute startup script
-        if let Some(exec_start) = &config.exec_start {
-            self.execute_in_jail(jid, exec_start)?;
-        }
+            // Execute startup script
+            if let Some(exec_start) = &jail.config.exec_start {
+                self.execute_in_jail(jid, exec_start)?;
+            }
 
-        if let Some(jail) = self.jails.get_mut(name) {
             jail.state = JailState::Running;
-        }
+            println!("Jail '{}' started with JID {}", name, jid);
 
-        println!("Jail '{}' started with JID {}", name, jid);
-        Ok(())
+            Ok(())
+        } else {
+            Err(format!("Jail '{}' not found", name).into())
+        }
     }
 
     /// Stop a jail
@@ -194,7 +191,7 @@ impl SigmaJailManager {
 
     /// Get jail information
     pub fn jail_info(&self, name: &str) -> Option<JailInfo> {
-        if let Some(jail) = self.jails.get(name) {
+        if let Some(jail) = self.jails.get_str(name) {
             Some(JailInfo {
                 name: name.to_string(),
                 state: jail.state.clone(),
@@ -377,7 +374,7 @@ impl SigmaJailManager {
     fn apply_jail_restrictions(
         &self,
         jid: u32,
-        _config: &JailConfig,
+        config: &JailConfig,
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Apply cgroup restrictions
         let cgroup_path = format!("/sys/fs/cgroup/sigma-jail-{}", jid);

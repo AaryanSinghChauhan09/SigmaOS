@@ -448,14 +448,12 @@ fn test_pam_authentication_policy_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    #[path = "../src/distro/linux_bsd_parity.rs"]
-    mod linux_bsd_parity;
-    use linux_bsd_parity::GentooPortageUseFlagsEngine;
+    use unimplemented_features::GentooUseFlagEngine;
 
-    let mut portage = GentooPortageUseFlagsEngine::new();
-    portage.set_global_use_flags(&["experimental"]);
-    portage.register_package("sys-kernel/gentoo-sources", &["experimental", "vanilla"]);
-    let flags = portage.resolve_package_flags("sys-kernel/gentoo-sources").unwrap();
-    assert!(flags.contains(&"experimental".to_string()));
-    assert!(!flags.contains(&"vanilla".to_string()));
+    let mut portage = GentooUseFlagEngine::new();
+    portage.set_use_flag("+qt5");
+    portage.set_use_flag("-wayland");
+
+    assert!(portage.is_flag_enabled("qt5"));
+    assert!(!portage.is_flag_enabled("wayland"));
 }
