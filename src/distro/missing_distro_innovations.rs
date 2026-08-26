@@ -6,9 +6,21 @@
 /// - Solus eopkg delta package manager & Solus Budgie Raven panel
 /// - Mageia urpmi RPM dependency solver & netinstall engine
 
+extern crate alloc;
+
+#[cfg(not(test))]
 use crate::klib::collections::HashMap;
+#[cfg(not(test))]
 use crate::klib::Vec;
+#[cfg(not(test))]
 use crate::klib::String;
+
+#[cfg(test)]
+use std::collections::HashMap;
+#[cfg(test)]
+use std::vec::Vec;
+#[cfg(test)]
+use std::string::String;
 
 /// Clear Linux Stateless Configuration Overlay
 #[derive(Debug, Clone)]
@@ -162,8 +174,16 @@ pub struct MageiaUrpmiEngine {
 impl MageiaUrpmiEngine {
     pub fn new() -> Self {
         let mut db = HashMap::new();
-        db.insert(String::from("mageia-kde-desktop"), vec![String::from("plasma-workspace"), String::from("sddm"), String::from("kwin")]);
-        db.insert(String::from("plasma-workspace"), vec![String::from("qtbase"), String::from("kf5-kio")]);
+        let mut deps1 = Vec::new();
+        deps1.push(String::from("plasma-workspace"));
+        deps1.push(String::from("sddm"));
+        deps1.push(String::from("kwin"));
+        db.insert(String::from("mageia-kde-desktop"), deps1);
+
+        let mut deps2 = Vec::new();
+        deps2.push(String::from("qtbase"));
+        deps2.push(String::from("kf5-kio"));
+        db.insert(String::from("plasma-workspace"), deps2);
         Self { package_database: db }
     }
 
@@ -175,6 +195,143 @@ impl MageiaUrpmiEngine {
             }
         }
         resolved
+    }
+}
+
+/// Alpine Linux /etc/apk/world State & Verification Engine
+#[derive(Debug, Clone)]
+pub struct AlpineApkWorldEngine {
+    pub world_packages: Vec<String>,
+    pub installed_index_hash: u64,
+}
+
+impl AlpineApkWorldEngine {
+    pub fn new() -> Self {
+        let mut world = Vec::new();
+        world.push(String::from("alpine-base"));
+        world.push(String::from("musl"));
+        world.push(String::from("busybox"));
+        Self {
+            world_packages: world,
+            installed_index_hash: 0xA1917E_u64,
+        }
+    }
+
+    pub fn add_to_world(&mut self, package: String) -> bool {
+        if !self.world_packages.contains(&package) {
+            self.world_packages.push(package);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn remove_from_world(&mut self, package: &str) -> bool {
+        let initial_len = self.world_packages.len();
+        self.world_packages.retain(|p| p != package);
+        self.world_packages.len() < initial_len
+    }
+
+    pub fn verify_index_integrity(&self, expected_hash: u64) -> bool {
+        self.installed_index_hash == expected_hash
+    }
+}
+
+/// Void Linux XBPS Package Transaction & Integrity Engine
+#[derive(Debug, Clone)]
+pub struct VoidXbpsEngine {
+    pub installed_packages: HashMap<String, String>, // pkg -> version
+    pub rsa_pubkey_fingerprint: u64,
+}
+
+impl VoidXbpsEngine {
+    pub fn new(rsa_pubkey_fingerprint: u64) -> Self {
+        let mut installed = HashMap::new();
+        installed.insert(String::from("xbps"), String::from("0.59.1"));
+        installed.insert(String::from("runit"), String::from("2.1.2"));
+        Self {
+            installed_packages: installed,
+            rsa_pubkey_fingerprint,
+        }
+    }
+
+    pub fn install_package(&mut self, pkg: String, version: String, signature: u64) -> Result<(), &'static str> {
+        if (signature ^ self.rsa_pubkey_fingerprint) == 0 {
+            self.installed_packages.insert(pkg, version);
+            Ok(())
+        } else {
+            Err("XBPS RSA signature invalid")
+        }
+    }
+
+    pub fn is_installed(&self, pkg: &str) -> bool {
+        self.installed_packages.contains_key(pkg)
+    }
+}
+
+/// FreeBSD VNET Per-Jail Network Stack Engine
+#[derive(Debug, Clone)]
+pub struct FreeBsdVnetStackEngine {
+    pub jail_id: u32,
+    pub vnet_interfaces: Vec<String>,
+    pub loopback_enabled: bool,
+}
+
+impl FreeBsdVnetStackEngine {
+    pub fn new(jail_id: u32) -> Self {
+        let mut vnet = Vec::new();
+        vnet.push(String::from("lo0"));
+        Self {
+            jail_id,
+            vnet_interfaces: vnet,
+            loopback_enabled: true,
+        }
+    }
+
+    pub fn attach_epair_interface(&mut self, iface: String) {
+        if !self.vnet_interfaces.contains(&iface) {
+            self.vnet_interfaces.push(iface);
+        }
+    }
+
+    pub fn count_interfaces(&self) -> usize {
+        self.vnet_interfaces.len()
+    }
+}
+
+/// OpenBSD Unveil Path Access Auditor
+#[derive(Debug, Clone)]
+pub struct OpenBsdUnveilAuditor {
+    pub permissions: HashMap<String, String>, // path -> flags (e.g. "r", "rw", "rx", "c")
+    pub locked: bool,
+}
+
+impl OpenBsdUnveilAuditor {
+    pub fn new() -> Self {
+        Self {
+            permissions: HashMap::new(),
+            locked: false,
+        }
+    }
+
+    pub fn unveil(&mut self, path: String, permissions: String) -> Result<(), &'static str> {
+        if self.locked {
+            return Err("Unveil configuration is locked");
+        }
+        self.permissions.insert(path, permissions);
+        Ok(())
+    }
+
+    pub fn lock(&mut self) {
+        self.locked = true;
+    }
+
+    pub fn check_permission(&self, path: &str, required_flag: char) -> bool {
+        if let Some(flags) = self.permissions.get(path) {
+            flags.contains(required_flag)
+        } else {
+            false
+        }
     }
 }
 
@@ -211,10 +368,64 @@ mod tests {
     #[test]
     fn test_chimera_dinit_supervisor() {
         let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service(String::from("networking"), vec![]);
+        dinit.register_service(String::from("networking"), Vec::new());
         assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Stopped);
 
         assert!(dinit.start_service("networking").is_ok());
         assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Running);
+    }
+
+    #[test]
+    fn test_solus_eopkg_manager() {
+        let mut eopkg = SolusEopkgManager::new();
+        assert!(eopkg.installed_eopkgs.contains_key("budgie-desktop"));
+        eopkg.apply_delta_binary_patch(String::from("budgie-desktop"), String::from("10.9.0"));
+        assert_eq!(eopkg.installed_eopkgs.get("budgie-desktop").unwrap(), "10.9.0");
+    }
+
+    #[test]
+    fn test_mageia_urpmi_engine() {
+        let urpmi = MageiaUrpmiEngine::new();
+        let deps = urpmi.resolve_dependencies("mageia-kde-desktop");
+        assert_eq!(deps.len(), 3);
+        assert!(deps.contains(&String::from("plasma-workspace")));
+    }
+
+    #[test]
+    fn test_alpine_apk_world_engine() {
+        let mut apk = AlpineApkWorldEngine::new();
+        assert!(apk.add_to_world(String::from("curl")));
+        assert!(!apk.add_to_world(String::from("curl")));
+        assert!(apk.verify_index_integrity(0xA1917E_u64));
+        assert!(apk.remove_from_world("curl"));
+        assert!(!apk.world_packages.contains(&String::from("curl")));
+    }
+
+    #[test]
+    fn test_void_xbps_engine() {
+        let mut xbps = VoidXbpsEngine::new(0xDEADBEEF);
+        assert!(xbps.is_installed("xbps"));
+        assert!(xbps.install_package(String::from("gcc"), String::from("13.2.0"), 0xDEADBEEF).is_ok());
+        assert!(xbps.is_installed("gcc"));
+        assert!(xbps.install_package(String::from("clang"), String::from("17.0.0"), 0xBAD51651).is_err());
+    }
+
+    #[test]
+    fn test_freebsd_vnet_stack_engine() {
+        let mut vnet = FreeBsdVnetStackEngine::new(10);
+        assert_eq!(vnet.count_interfaces(), 1);
+        vnet.attach_epair_interface(String::from("epair0b"));
+        assert_eq!(vnet.count_interfaces(), 2);
+    }
+
+    #[test]
+    fn test_openbsd_unveil_auditor() {
+        let mut unveil = OpenBsdUnveilAuditor::new();
+        assert!(unveil.unveil(String::from("/etc"), String::from("r")).is_ok());
+        assert!(unveil.check_permission("/etc", 'r'));
+        assert!(!unveil.check_permission("/etc", 'w'));
+
+        unveil.lock();
+        assert!(unveil.unveil(String::from("/usr"), String::from("rx")).is_err());
     }
 }

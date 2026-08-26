@@ -118,4 +118,5 @@ pub use ready_to_use::{
 pub use missing_distro_innovations::{
     ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
     ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
+    AlpineApkWorldEngine, VoidXbpsEngine, FreeBsdVnetStackEngine, OpenBsdUnveilAuditor,
 };
