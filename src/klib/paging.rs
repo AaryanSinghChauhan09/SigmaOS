@@ -429,7 +429,7 @@ impl SimpleVMM {
                     .get_mut(pt_idx_in_vec)
                     .and_then(|o| o.as_mut())
                 {
-                    let mut entry = pt.entries[pt_idx];
+                    let entry = &mut pt.entries[pt_idx];
                     entry.set_writable(false);
                     entry.cow.store(1, Ordering::SeqCst);
                     return Ok(());
