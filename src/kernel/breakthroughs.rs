@@ -3,7 +3,24 @@
 // Universal ABI Translator, SigmaFS++, Self-Healing Kernel, AI-Native Runtime,
 // Energy-Aware Scheduler, User-Defined Kernel Functions, and Privacy-First Sandboxes.
 
+#[cfg(not(test))]
 use crate::security::CapabilityToken;
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub permissions: u64,
+}
+
+#[cfg(test)]
+impl CapabilityToken {
+    pub fn from_bits(permissions: u64) -> Self {
+        Self { permissions }
+    }
+    pub fn bits(&self) -> u64 {
+        self.permissions
+    }
+}
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// 1. Universal ABI Translator
@@ -457,4 +474,102 @@ unsafe fn free(ptr: *mut u8) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_universal_abi_translator() {
+        let translator = UniversalAbiTranslator::new("SigmaOS");
+        assert_eq!(translator.host_platform(), "SigmaOS");
+        assert_eq!(translator.translate_abi_syscall("Windows", 0x2A), Some("sys_win32_create_window"));
+        assert_eq!(translator.translate_abi_syscall("Linux", 9), Some("sys_mmap"));
+        assert_eq!(translator.translate_abi_syscall("MacOS", 0x2000004), Some("sys_write"));
+        assert_eq!(translator.translate_abi_syscall("Unknown", 1), None);
+    }
+
+    #[test]
+    fn test_sigma_fs_plus_plus() {
+        let fs = SigmaFsPlusPlus::new();
+        let mut audit_hash = [0u8; 32];
+        let bytes = fs.write_and_audit("/data/block", b"hello_world", &mut audit_hash);
+        assert_eq!(bytes, 11);
+        assert_eq!(fs.total_blocks(), 1);
+        assert_ne!(audit_hash, [0u8; 32]);
+    }
+
+    #[test]
+    fn test_self_healing_kernel() {
+        let healing = SelfHealingKernel::new(0xDEADBEEF);
+        assert!(healing.verify_and_heal(0xDEADBEEF).unwrap().contains("integral"));
+        assert!(healing.verify_and_heal(0xBAD00000).unwrap().contains("Rollback applied"));
+    }
+
+    #[test]
+    fn test_ai_native_runtime() {
+        let ai = AiNativeRuntime::new();
+        ai.register_model_context();
+        assert_eq!(ai.active_models_count(), 1);
+
+        let cycles = ai.execute_inference_cycles(1, 10);
+        assert_eq!(cycles, 2560);
+    }
+
+    #[test]
+    fn test_energy_aware_scheduler() {
+        let eas = EnergyAwareScheduler::new(85);
+        assert_eq!(eas.calculate_energy_multiplier(90, 10), 1); // Throttling
+        assert_eq!(eas.calculate_energy_multiplier(50, 10), 4); // High performance
+        assert_eq!(eas.calculate_energy_multiplier(50, 2), 2);  // Eco mode
+    }
+
+    #[test]
+    fn test_user_defined_kernel_functions() {
+        let udkf = UserDefinedKernelFunctions::new();
+        let mut state = 5u32;
+        let script = [3u8];
+        assert!(udkf.execute_custom_script(&script, &mut state).is_ok());
+        assert_eq!(state, 15);
+        assert_eq!(udkf.script_count(), 1);
+        assert!(udkf.execute_custom_script(&[], &mut state).is_err());
+    }
+
+    #[test]
+    fn test_privacy_first_sandbox() {
+        let sandbox = PrivacyFirstSandbox::default();
+        let token = CapabilityToken::from_bits(0b1010);
+        assert!(sandbox.validate_and_execute_secure_call(&token, 0b1010));
+        assert!(!sandbox.validate_and_execute_secure_call(&token, 0b1111));
+    }
+
+    #[test]
+    fn test_dynamic_kernel_personality() {
+        let switcher = DynamicKernelPersonalitySwitcher::default();
+        assert_eq!(switcher.get_mode(), KernelPersonalityMode::Microkernel);
+        switcher.set_mode(KernelPersonalityMode::Monolithic);
+        assert_eq!(switcher.get_mode(), KernelPersonalityMode::Monolithic);
+        switcher.set_mode(KernelPersonalityMode::Exokernel);
+        assert_eq!(switcher.get_mode(), KernelPersonalityMode::Exokernel);
+    }
+
+    #[test]
+    fn test_interrupt_rate_predictor() {
+        let predictor = InterruptRatePredictor::default();
+        predictor.record_interrupt_event(500);
+        assert!(!predictor.predict_storm_and_prebuffer());
+
+        predictor.record_interrupt_event(1500);
+        assert!(predictor.predict_storm_and_prebuffer());
+    }
+
+    #[test]
+    fn test_deterministic_replay_engine() {
+        let mut engine = DeterministicReplayEngine::new();
+        engine.record_syscall(1, 1000);
+        engine.record_syscall(2, 2000);
+        assert_eq!(engine.get_trace_count(), 2);
+        assert!(engine.replay_with_identical_timing());
+    }
 }
