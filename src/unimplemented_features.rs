@@ -1676,6 +1676,84 @@ mod linux_lts_upstream_tests {
 }
 
 // =========================================================================
+// GENTOO PORTAGE EBUILD MASK & ARCHITECTURE EVALUATOR
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct GentooEbuildEntry {
+    pub package_atom: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_hard_masked: bool,
+}
+
+pub struct GentooPortageMaskEngine {
+    pub target_arch: String,
+    pub ebuilds: Vec<GentooEbuildEntry>,
+    pub package_mask: Vec<String>,
+    pub package_unmask: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(target_arch: &str) -> Self {
+        Self {
+            target_arch: target_arch.to_string(),
+            ebuilds: Vec::new(),
+            package_mask: Vec::new(),
+            package_unmask: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, atom: &str, version: &str, keywords: &[&str], hard_masked: bool) {
+        self.ebuilds.push(GentooEbuildEntry {
+            package_atom: atom.to_string(),
+            version: version.to_string(),
+            keywords: keywords.iter().map(|k| k.to_string()).collect(),
+            is_hard_masked: hard_masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, atom: &str) {
+        if !self.package_mask.contains(&atom.to_string()) {
+            self.package_mask.push(atom.to_string());
+        }
+    }
+
+    pub fn add_unmask(&mut self, atom: &str) {
+        if !self.package_unmask.contains(&atom.to_string()) {
+            self.package_unmask.push(atom.to_string());
+        }
+    }
+
+    pub fn evaluate_installability(&self, atom: &str, version: &str, accept_testing_keywords: bool) -> Result<bool, &'static str> {
+        let ebuild = self.ebuilds.iter().find(|e| e.package_atom == atom && e.version == version)
+            .ok_or("Ebuild atom not found in Portage tree")?;
+
+        if ebuild.is_hard_masked || (self.package_mask.contains(&atom.to_string()) && !self.package_unmask.contains(&atom.to_string())) {
+            return Err("Package atom is hard masked in package.mask");
+        }
+
+        let testing_keyword = format!("~{}", self.target_arch);
+        let stable_keyword = self.target_arch.clone();
+
+        let is_stable = ebuild.keywords.contains(&stable_keyword);
+        let is_testing = ebuild.keywords.contains(&testing_keyword);
+
+        if is_stable {
+            Ok(true)
+        } else if is_testing {
+            if accept_testing_keywords {
+                Ok(true)
+            } else {
+                Err("Package version requires testing keyword (~arch) in package.accept_keywords")
+            }
+        } else {
+            Err("Package version lacks keyword for target architecture")
+        }
+    }
+}
+
+// =========================================================================
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
