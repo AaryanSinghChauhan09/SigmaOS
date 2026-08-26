@@ -20,7 +20,6 @@ mod unveil;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
 
-<<<<<<< HEAD
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 
@@ -29,14 +28,21 @@ mod eevdf;
 
 #[path = "../src/memory/tlb_associative.rs"]
 mod tlb_associative;
-=======
 
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
+
+#[path = "../src/kernel/sysctl.rs"]
+mod sysctl;
+
+#[path = "../src/security/root_improvement.rs"]
+mod root_improvement;
+
+#[path = "../src/compatibility/abi_extended.rs"]
+mod abi_extended;
+
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
@@ -104,7 +110,6 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
-    use std::path::PathBuf;
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -134,7 +139,7 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
     kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-        image_path: PathBuf::from("/var/lib/images/rootfs.qcow2"),
+        image_path: "/var/lib/images/rootfs.qcow2".to_string(),
         read_only: false,
         direct_io: true,
         queue_size: 256,
@@ -159,10 +164,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
     assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
 #[test]
 fn test_kernel_classic_algorithms_inspection() {
     use eevdf::{EevdfScheduler, Task, ComputeUnit};
@@ -183,12 +184,6 @@ fn test_kernel_classic_algorithms_inspection() {
     assert_eq!(translated, Ok(0x50));
     assert_eq!(tlb.get_hit_ratio_pct(), 100.0);
 }
-<<<<<<< HEAD
-=======
-
-
->>>>>>> origin/sovereign-os-v10-encyclopedia-12719014658612660683
-
 
 #[test]
 fn test_zenith_desktop_applets_and_themes_inspection() {
@@ -212,4 +207,58 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     theme_mgr.apply_preset(ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.current_preset, ZenithThemePreset::PantheonGranite);
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
+}
+
+#[test]
+fn test_sysctl_parameter_registry_inspection() {
+    use sysctl::{SysctlRegistry, SysctlValue};
+
+    let mut registry = SysctlRegistry::new();
+    assert_eq!(registry.get("kern.ostype"), Some(&SysctlValue::String("SigmaOS".to_string())));
+    assert!(registry.set("vm.swappiness", SysctlValue::Int(15)).is_ok());
+    assert_eq!(registry.get("vm.swappiness"), Some(&SysctlValue::Int(15)));
+    assert!(registry.set("vm.swappiness", SysctlValue::Int(-1)).is_err());
+}
+
+#[test]
+fn test_pam_authentication_stack_inspection() {
+    use root_improvement::{PamEngine, PamGroup, PamRule, PamControlFlag, PamUnixModule, PamResult, SudoDoasElevator};
+
+    let mut engine = PamEngine::new();
+    let db = vec![("admin".to_string(), "hash_secret".to_string())];
+    let unix_mod = std::sync::Arc::new(PamUnixModule::new(db));
+
+    engine.add_rule(PamGroup::Auth, PamRule {
+        control_flag: PamControlFlag::Required,
+        module: unix_mod,
+    });
+
+    assert_eq!(engine.execute_group(PamGroup::Auth, "admin", "hash_secret"), PamResult::Success);
+    assert_eq!(engine.execute_group(PamGroup::Auth, "admin", "wrong_hash"), PamResult::AuthError);
+
+    let mut elevator = SudoDoasElevator::new();
+    elevator.password_database.push(("admin".to_string(), "pass123".to_string()));
+    assert_eq!(elevator.elevate_via_doas("admin", "pass123", 1000).unwrap(), 0);
+    assert!(elevator.verify_active_sudo_session(0, 2000));
+}
+
+#[test]
+fn test_multi_arch_abi_and_syscall_bridge_inspection() {
+    use abi_extended::{Arm64AapcsFrame, Riscv64AbiFrame, SystemVAbiFrame};
+    use distro_bridge::{LinuxBsdAbiBridge, BinaryAbiFormat};
+
+    let sysv = SystemVAbiFrame::new(&[1, 2, 3, 4, 5, 6]);
+    assert_eq!(sysv.arg_registers[0], 1);
+
+    let arm64 = Arm64AapcsFrame::new(&[10, 20, 30, 40, 50, 60, 70, 80]);
+    assert_eq!(arm64.arg_registers[7], 80);
+
+    let riscv = Riscv64AbiFrame::new(&[100, 200, 300, 400, 500, 600, 700, 800]);
+    assert_eq!(riscv.arg_registers[0], 100);
+
+    let mut linux_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::LinuxElf64);
+    assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
+
+    let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
+    assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
 }

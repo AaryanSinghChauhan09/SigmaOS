@@ -8,10 +8,16 @@
 - [Getting Started](Getting-Started)
 - [Building SigmaOS](Building-SigmaOS)
 - [Quick Start Guide](Quick-Start-Guide)
-- [Architecture Overview](Architecture-Overview)
+- [Installation Guide](Installation-Guide)
+- [FAQ](FAQ)
+
+### 🔩 Components
+- [**Components Master Table**](Components-Master-Table) 🆕
+- [Components & Inspirations](Components-and-Inspirations)
 
 ### 🧠 Architecture
 - [Architecture](Architecture)
+- [Architecture Overview](Architecture-Overview)
 - [Kernel Internals](Kernel-Internals)
 - [Boot Process](Boot-Process-Architecture)
 - [Filesystem Spec](Filesystem-Spec-and-Virtual-FS)
@@ -44,6 +50,7 @@
 - [Qubes Isolation](QUBES_ISOLATION_ROADMAP)
 
 ### 🐧 Linux/BSD Inspirations
+- [**Linux Distro Ideas**](Linux-Distro-Ideas-Implementation) 🆕
 - [Linux BSD Inspirations](LINUX_BSD_INSPIRATIONS)
 - [Arch Linux Parity](Arch_Linux_Parity_Roadmap)
 - [Linux Distro Guide](LINUX_DISTRO_GUIDE)
