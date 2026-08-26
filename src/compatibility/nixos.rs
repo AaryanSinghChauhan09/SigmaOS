@@ -75,18 +75,16 @@ impl NixStore {
 
     /// Install package to profile (nix-env -i)
     pub fn install(&mut self, package: &str, profile: &str) -> Result<(), NixError> {
-        let out_path = if let Some(pkg) = self.packages.get_str(package) {
-            pkg.outputs.get_str("out").cloned()
-        } else {
+        if !self.packages.contains_key_str(package) {
             return Err(NixError::EvaluationError);
-        };
-
-        if let Some(out_path) = out_path {
-            self.add_to_profile(profile, &out_path);
-            Ok(())
-        } else {
-            Err(NixError::EvaluationError)
         }
+
+        let pkg = self.packages.get_str(package).unwrap();
+        if let Some(out_path) = pkg.outputs.get_str("out") {
+            self.add_to_profile(profile, out_path);
+        }
+
+        Ok(())
     }
 
     /// Garbage collection (nix-collect-garbage)

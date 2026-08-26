@@ -4,7 +4,7 @@
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
 extern crate alloc;
-use crate::klib::{self, HashMap};
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

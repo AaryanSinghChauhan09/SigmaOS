@@ -175,7 +175,7 @@ pub use absorb_tools::{
 
 pub use antix::*;
 pub use bsd::{
-    BsdJail, FreeBsdGeomManager, FreeBsdJailManager,
+    BsdJail, BsdKqueueFilter as BsdCompatKqueueFilter, FreeBsdGeomManager, FreeBsdJailManager,
     GeomClassType, GeomProvider, NetBsdRumpKernelRouter, OpenBsdSandboxGuard,
     OpenBsdSysctlKernelMib, RumpHypercall,
 };
