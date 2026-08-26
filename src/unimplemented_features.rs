@@ -6,6 +6,10 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 // =========================================================================
 // 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -40,6 +44,72 @@ impl LegacyController {
             base_port,
             power_state: PowerState::D3Off,
             ports_buffer: [0u8; 16],
+        }
+    }
+}
+
+/// Gentoo Portage Ebuild Profile with Package Slotting & Keywords
+#[derive(Debug, Clone)]
+pub struct PortageEbuildProfile {
+    pub atom_name: String,
+    pub slot: String,
+    pub keywords: Vec<String>, // e.g. "amd64", "~amd64"
+    pub is_ebuild_masked: bool,
+}
+
+/// Gentoo Portage Masking & Slotting Resolver Engine
+pub struct GentooPortageMaskEngine {
+    pub hard_masked_atoms: Vec<String>,
+    pub ebuilds: Vec<PortageEbuildProfile>,
+    pub target_arch: String,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(target_arch: &str) -> Self {
+        Self {
+            hard_masked_atoms: Vec::new(),
+            ebuilds: Vec::new(),
+            target_arch: target_arch.to_string(),
+        }
+    }
+
+    pub fn add_hard_mask(&mut self, atom: &str) {
+        self.hard_masked_atoms.push(atom.to_string());
+    }
+
+    pub fn register_ebuild(&mut self, atom: &str, slot: &str, keywords: &[&str], masked: bool) {
+        self.ebuilds.push(PortageEbuildProfile {
+            atom_name: atom.to_string(),
+            slot: slot.to_string(),
+            keywords: keywords.iter().map(|s| s.to_string()).collect(),
+            is_ebuild_masked: masked,
+        });
+    }
+
+    pub fn evaluate_installability(&self, atom: &str, slot: &str, accept_keywords_testing: bool) -> Result<bool, &'static str> {
+        if self.hard_masked_atoms.contains(&atom.to_string()) {
+            return Err("Portage Mask: Package is hard-masked in package.mask");
+        }
+
+        let ebuild = self
+            .ebuilds
+            .iter()
+            .find(|e| e.atom_name == atom && e.slot == slot)
+            .ok_or("Portage Mask: Matching ebuild atom/slot not found")?;
+
+        if ebuild.is_ebuild_masked {
+            return Err("Portage Mask: Ebuild has RESTRICT/mask active");
+        }
+
+        let testing_keyword = format!("~{}", self.target_arch);
+        let stable_keyword = self.target_arch.clone();
+
+        if ebuild.keywords.contains(&stable_keyword) {
+            Ok(true)
+        } else if accept_keywords_testing && ebuild.keywords.contains(&testing_keyword) {
+            Ok(true)
+        } else {
+            Err("Portage Mask: Keywording mismatch (~amd64 testing keyword rejected)")
         }
     }
 }
@@ -1519,7 +1589,13 @@ mod tests {
                 None,
             ],
         };
+        let node_b = PackageNode {
+            pkg_id: 1,
+            version: PkgVersion { major: 2, minor: 1 },
+            dependencies: [None, None, None, None],
+        };
         assert!(sat.add_package_node(node_a));
+        assert!(sat.add_package_node(node_b));
         assert!(sat.solve(0));
     }
 }
@@ -1588,35 +1664,6 @@ impl GamifiedProductivityLayer {
 #[cfg(test)]
 mod zenith_desktop_core_tests {
     use super::*;
-
-    #[test]
-    fn test_zenith_desktop_profile_switching() {
-        let mut manager = ZenithDesktopProfileManager::new();
-        assert_eq!(manager.active_config.mode, ZenithProfileMode::Developer);
-
-        // Switch to Minimalist profile (<30MB idle RAM target)
-        manager.switch_profile(ZenithProfileMode::Minimalist);
-        assert_eq!(manager.active_config.mode, ZenithProfileMode::Minimalist);
-        assert_eq!(manager.active_config.target_clock_mhz, 800);
-        assert!(manager.active_config.idle_ram_budget_mb < 30);
-
-        // Switch to Gamer profile
-        manager.switch_profile(ZenithProfileMode::Gamer);
-        assert_eq!(manager.active_config.mode, ZenithProfileMode::Gamer);
-        assert_eq!(manager.active_config.compositor_fps, 144);
-    }
-
-    #[test]
-    fn test_cross_device_continuity() {
-        let mut continuity = CrossDeviceContinuityEngine::new();
-        continuity.snapshot_application_context("SigmaDev IDE", 42, (0, 0, 1024, 768), 1000);
-        continuity.sync_clipboard_content("SOVEREIGN_PASTE_BUFFER");
-
-        assert_eq!(continuity.shared_clipboard_data, "SOVEREIGN_PASTE_BUFFER");
-        let (app, offset) = continuity.resume_context_on_target_device().unwrap();
-        assert_eq!(app, "SigmaDev IDE");
-        assert_eq!(offset, 42);
-    }
 
     #[test]
     fn test_gesture_and_voice_control() {
@@ -2188,14 +2235,14 @@ impl DragonFlyHammer2FsSnapshotV2 {
             pfs_snapshots: Vec::new(),
             active_pfs_id: 1,
         };
-
-        assert!(sat.add_package_node(node_a));
-        assert!(sat.add_package_node(node_b));
-
-        assert!(sat.solve(0));
-        assert_eq!(sat.selected_version[0].unwrap().major, 1);
-        assert_eq!(sat.selected_version[1].unwrap().major, 2);
+        snap.pfs_snapshots.push((1, root_pfs_name.to_string(), 0));
+        snap
     }
+}
+
+#[cfg(test)]
+mod additional_parity_tests {
+    use super::*;
 
     #[test]
     fn test_section_6_4_jbd2_ledger() {

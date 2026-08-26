@@ -1,7 +1,22 @@
 // SigmaOS DNS, mDNS, QUIC, TCP/IP, UDP, DHCP, HTTP, HTTPS, FTP, SSH, SMTP, TLS, WebSocket, BGP Network Implementations
 // Full-protocol stack support for bare-metal kernel and userspace layers
 
-use crate::security::CapabilityToken;
+#[derive(Debug, Clone, Default)]
+pub struct CapabilityToken {
+    pub rights_mask: u64,
+}
+
+impl CapabilityToken {
+    pub fn new() -> Self {
+        Self { rights_mask: 0 }
+    }
+    pub fn new_with_perms(rights: u64) -> Self {
+        Self { rights_mask: rights }
+    }
+    pub fn is_empty(&self) -> bool {
+        self.rights_mask == 0
+    }
+}
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // --- IP versions ---
@@ -208,6 +223,85 @@ impl Default for SshdConfig {
     }
 }
 
+/// BGP Route Prefix Representation with AS Path and Next Hop
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BgpRoutePrefix {
+    pub prefix_ip: [u8; 4],
+    pub prefix_len: u8,
+    pub next_hop: [u8; 4],
+    pub as_path: Vec<u32>,
+    pub local_pref: u32,
+    pub is_reflected: bool,
+}
+
+/// Enterprise BGP Routing Table Manager (Fedora / RHEL / VyOS parity)
+pub struct BgpRoutingTableManager {
+    pub local_as: u32,
+    pub router_id: [u8; 4],
+    pub is_route_reflector: bool,
+    pub routes: Vec<BgpRoutePrefix>,
+}
+
+impl BgpRoutingTableManager {
+    pub fn new(local_as: u32, router_id: [u8; 4], is_route_reflector: bool) -> Self {
+        Self {
+            local_as,
+            router_id,
+            is_route_reflector,
+            routes: Vec::new(),
+        }
+    }
+
+    pub fn advertise_prefix(
+        &mut self,
+        prefix_ip: [u8; 4],
+        prefix_len: u8,
+        next_hop: [u8; 4],
+        local_pref: u32,
+    ) {
+        let route = BgpRoutePrefix {
+            prefix_ip,
+            prefix_len,
+            next_hop,
+            as_path: vec![self.local_as],
+            local_pref,
+            is_reflected: false,
+        };
+        self.routes.push(route);
+    }
+
+    pub fn process_incoming_route(&mut self, mut route: BgpRoutePrefix, from_i_bgp_peer: bool) -> bool {
+        // AS Path loop detection
+        if route.as_path.contains(&self.local_as) {
+            return false; // Reject loop
+        }
+
+        // Route Reflector logic
+        if from_i_bgp_peer && self.is_route_reflector {
+            route.is_reflected = true;
+        }
+
+        route.as_path.insert(0, self.local_as);
+        self.routes.push(route);
+        true
+    }
+
+    pub fn best_path_selection(&self, prefix_ip: [u8; 4], prefix_len: u8) -> Option<&BgpRoutePrefix> {
+        self.routes
+            .iter()
+            .filter(|r| r.prefix_ip == prefix_ip && r.prefix_len == prefix_len)
+            .max_by(|a, b| {
+                // 1. Highest Local Preference
+                if a.local_pref != b.local_pref {
+                    a.local_pref.cmp(&b.local_pref)
+                } else {
+                    // 2. Shortest AS Path
+                    b.as_path.len().cmp(&a.as_path.len())
+                }
+            })
+    }
+}
+
 impl SshdConfig {
     /// Parse an OpenSSH-style config string (e.g. sshd_config)
     pub fn parse(config_str: &str) -> Self {
@@ -267,7 +361,7 @@ pub struct SshDaemon {
     pub config: SshdConfig,
     pub active_sessions: usize,
     pub max_sessions: usize,
-    pub failed_attempts: crate::klib::HashMap<String, u32>, // IP -> Count
+    pub failed_attempts: std::collections::HashMap<String, u32>, // IP -> Count
     pub blocklisted_ips: Vec<String>,
 }
 
@@ -277,7 +371,7 @@ impl SshDaemon {
             config,
             active_sessions: 0,
             max_sessions,
-            failed_attempts: crate::klib::HashMap::new(),
+            failed_attempts: std::collections::HashMap::new(),
             blocklisted_ips: Vec::new(),
         }
     }
@@ -859,8 +953,9 @@ impl SnclLedgerProtocol {
         self.entries_logged += 1;
         // Mutate simulated merkle root with shard signature representation
         self.current_merkle_root[0] = self.current_merkle_root[0].wrapping_add(1);
-        self.current_merkle_root[1..shard_name.len().min(30)].copy_from_slice(
-            &shard_name.as_bytes()[..shard_name.len().min(30)]
+        let slice_len = shard_name.len().min(30);
+        self.current_merkle_root[1..1 + slice_len].copy_from_slice(
+            &shard_name.as_bytes()[..slice_len]
         );
         Ok(self.current_merkle_root)
     }
@@ -911,7 +1006,7 @@ mod tests {
         assert!(!ledger.verify_ledger_integrity());
 
         let root = ledger.append_audit_entry("S-SEC", "POL_ENFORCE").unwrap();
-        assert_eq!(root[1..5], *b"S-SEC");
+        assert_eq!(root[1..6], *b"S-SEC");
         assert!(ledger.verify_ledger_integrity());
         assert_eq!(ledger.entries_logged, 1);
     }

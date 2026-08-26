@@ -434,7 +434,7 @@ impl SigmaJailManager {
         // Wait and force kill if necessary
         std::thread::sleep(std::time::Duration::from_secs(5));
 
-        for pid in &jail.processes {
+        for pid in processes {
             let _ = Command::new("kill")
                 .arg("-KILL")
                 .arg(pid.to_string())

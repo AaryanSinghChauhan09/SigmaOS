@@ -38,13 +38,14 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
+pub mod structures;
 pub mod traits;
 
 pub use architecture::*;
+pub use structures::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
 pub use policy_mechanism::*;
-pub use structures::*;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
@@ -74,7 +75,6 @@ pub mod vmm_paging;
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-pub use io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};
 pub use linux_bsd_innovations::{
     ArchUserRepoManager, BsdPfStateTable, PfFiveTuple, PfStateEntry,
     LinuxFutexEngine, FutexOp, FutexWaiter, FreeBsdVfsNullfs, NullfsLayerNode,
@@ -89,7 +89,7 @@ pub use linux_bsd_innovations::{
     HybridKernelManager, NtExecutiveService, MicrokernelCore, ExokernelHardwareMultiplexer, ResourceBinding,
     NetBsdRumpKernel, RumpComponent, DynamicLkmLoader, KernelModule, CapabilityDerivationTree, KernelCapability,
     FreeBsdJail, NixOsDeclarativeManager, GentooUseFlags, VoidRunitInit,
-    SovereignCgroupGovernor, SovereignCgroupEntry, CgroupResourceLimits,
+    SovereignCgroupGovernor, CgroupResourceLimits,
     KernelFastPacketEngine, FastPacketFrame, XdpAction,
     KernelAccessController, LandlockPathRule, LandlockAccessRight, PLEDGE_STDIO, PLEDGE_RPATH, PLEDGE_WPATH, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_INET, PLEDGE_UNIX, PLEDGE_EXEC,
     InteractiveHybridScheduler, HybridTask,

@@ -5,7 +5,6 @@ extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type EventID = usize;
 
@@ -183,19 +182,18 @@ impl SimpleAuditPolicy {
 }
 
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
         if self.require_authentication.load(Ordering::SeqCst) == 1 {
-            event.event_type() == EventType::Authentication
+            Ok(event.event_type() == EventType::Authentication)
         } else {
-            true
+            Ok(true)
         }
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event) {
-            Ok(())
-        } else {
-            Err(AuditError::InvalidEvent)
+        match self.check_compliance(event) {
+            Ok(true) => Ok(()),
+            _ => Err(AuditError::InvalidEvent),
         }
     }
 }

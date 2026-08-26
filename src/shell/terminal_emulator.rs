@@ -3,9 +3,8 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use alloc::{vec, vec::Vec};
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnsiColor {
@@ -468,8 +467,51 @@ pub struct TerminalPane {
     pub session: TerminalSession,
 }
 
-/// Tmux / BSD-style Terminal Multiplexer
 #[derive(Debug, Clone)]
+pub struct TerminalTheme {
+    pub name: String,
+    pub foreground: (u8, u8, u8),
+    pub background: (u8, u8, u8),
+    pub ansi_palette: [(u8, u8, u8); 16],
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ColorSchemePreset {
+    Default,
+    Nord,
+    Dracula,
+    SolarizedDark,
+    Monokai,
+}
+
+impl TerminalTheme {
+    pub fn preset(preset: ColorSchemePreset) -> Self {
+        match preset {
+            ColorSchemePreset::Nord => Self {
+                name: String::from("Nord"),
+                foreground: (216, 222, 233),
+                background: (46, 52, 64),
+                ansi_palette: [(0, 0, 0); 16],
+            },
+            ColorSchemePreset::Dracula => Self {
+                name: String::from("Dracula"),
+                foreground: (248, 248, 242),
+                background: (40, 42, 54),
+                ansi_palette: [(0, 0, 0); 16],
+            },
+            _ => Self {
+                name: String::from("Default"),
+                foreground: (255, 255, 255),
+                background: (0, 0, 0),
+                ansi_palette: [(0, 0, 0); 16],
+            },
+        }
+    }
+}
+
+/// Tmux / BSD-style Terminal Multiplexer
+pub type TerminalMultiplexer = TerminalMultiplexerV1;
+
 pub struct TerminalMultiplexerV1 {
     pub panes: Vec<TerminalPane>,
     pub active_pane_id: u32,
@@ -791,25 +833,7 @@ impl TriggerRuleV2 {
 
 impl TerminalSession {
     pub fn new(width: usize, height: usize) -> Self {
-        let session = Self {
-            cursor_x: 0,
-            cursor_y: 0,
-            width,
-            height,
-            foreground: AnsiColor::Default,
-            background: AnsiColor::Default,
-            bold: false,
-            scrollback: Vec::new(),
-            current_line: String::new(),
-            aliases: BTreeMap::new(),
-            user_functions: BTreeMap::new(),
-            suggestion_engine: AutoSuggestionEngine::new(),
-            multiplexer: TerminalMultiplexer::new(width, height),
-            graphics_frames: Vec::new(),
-            trigger_rules: Vec::new(),
-            visual_bell_active: false,
-        };
-
+        let mut suggestion_engine = AutoSuggestionEngine::new();
         // Standard Linux distro utilities to beat
         suggestion_engine.register_builtin("ls");
         suggestion_engine.register_builtin("cd");
@@ -847,8 +871,6 @@ impl TerminalSession {
             keybinding_engine: TerminalKeybindingEngine::new(),
             visual_bell_config: VisualBellConfig::default_config(),
         };
-
-        session
     }
 
     /// OpenBSD wsdisplay-style Visual Bell trigger

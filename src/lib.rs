@@ -207,45 +207,6 @@ pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
 };
-pub use distro::{
-    AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
-    HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
-    ReleaseStage, SoftwareCertificationProgram,
-    BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
-    ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
-    NixOSFlakeEngine, FlakeInput, SystemClosure,
-    ArchPacmanHooksManager, PacmanHook, HookWhen, HookAction,
-    VoidRunitSupervisor, RunitService, ServiceState,
-    GentooPortageUseFlagsEngine, PortagePackage,
-    MicroArchLevel, CachyKernelVariant, CpuCapabilities, BoreSchedulerGovernor, CachyPackageRepo,
-    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
-    ArchRepoType,
-    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
-    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
-    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
-    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
-    DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
-    RegistryValue, Win32Gdi, WindowsRegistry,
-    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
-    TargetArch,
-    AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
-    ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings,
-    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
-    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
-    TimeTravelEngine,
-    BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
-    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
-    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
-    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
-    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
-    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
-    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
-};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -254,12 +215,6 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-};
-pub use remote::{
-    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
-    SimpleShellManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
@@ -281,7 +236,6 @@ pub use security::{
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
     SandboxPolicy,
 };
-pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
@@ -325,10 +279,7 @@ pub use ai::next_gen::{
     MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
 };
 pub use ai::agentic_os_runtime::{
-    AgentAuditRecord, ContainerConfig, ContainerFirstRuntimeHost, ContainerState, ContextTokenType,
-    DeterministicAgentSandbox, EbpfTraceEvent, EbpfTraceEventType, EbpfTracingMonitor, LocalLlmModel,
-    LocalLlmSystemDaemon, OmniAutomatorStudioApi, PosixNativeBridgeLayer, TamperProofAgentAuditLogger,
-    TpmTokenKeyVault, VectorContextBlock, VectorContextMmu,
+    LocalLlmSystemDaemon, OmniAutomatorStudioApi,
 };
 pub use ai::wandr::{
     ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
@@ -362,6 +313,5 @@ pub mod auth;
 pub use open_source_obsoletion::*;
 
 pub use unimplemented_features::{
-    KaliAnonsurfTrafficShunt, GhostBsdSysadmBridge, PopOsSystem76PowerManager, System76GpuMode,
-    ClearLinuxStatelessOverlayManager, KeylimeTpmAttestationEngine,
+    GentooPortageMaskEngine, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
 };

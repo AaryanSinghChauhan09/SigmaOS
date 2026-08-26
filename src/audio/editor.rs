@@ -9,6 +9,24 @@ pub trait AudioEffect {
     fn apply(&self, samples: &mut [f32]);
 }
 
+pub struct AmplifyEffect {
+    pub gain: f32,
+}
+
+impl AmplifyEffect {
+    pub fn new(gain: f32) -> Self {
+        AmplifyEffect { gain }
+    }
+}
+
+impl AudioEffect for AmplifyEffect {
+    fn apply(&self, samples: &mut [f32]) {
+        for sample in samples.iter_mut() {
+            *sample *= self.gain;
+        }
+    }
+}
+
 pub struct AudioTrack {
     pub id: u64,
     pub name: String,

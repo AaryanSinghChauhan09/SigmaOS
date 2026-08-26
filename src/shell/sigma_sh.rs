@@ -1,8 +1,5 @@
 extern crate alloc;
 use alloc::boxed::Box;
-#[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
-use std_alloc::boxed::Box;
 
 use alloc::format;
 use alloc::string::{String, ToString};

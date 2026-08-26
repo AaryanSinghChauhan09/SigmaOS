@@ -1,11 +1,7 @@
 /// Security Hardening & Cryptographic Intrusion Detection Suite for SigmaOS
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::Vec;
 extern crate alloc;
-
-#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
@@ -161,6 +157,105 @@ impl HardenedAuditTrail {
 impl Default for HardenedAuditTrail {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PamModuleType {
+    Auth,
+    Account,
+    Session,
+    Password,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PamControlFlag {
+    Required,
+    Requisite,
+    Sufficient,
+    Optional,
+}
+
+#[derive(Debug, Clone)]
+pub struct PamModuleRule {
+    pub module_type: PamModuleType,
+    pub control_flag: PamControlFlag,
+    pub module_name: alloc::string::String,
+    pub pass_by_default: bool,
+}
+
+pub struct PamAuthenticationPolicyEngine {
+    pub rules: Vec<PamModuleRule>,
+    pub sudo_wheel_group_required: bool,
+}
+
+impl PamAuthenticationPolicyEngine {
+    pub fn new(sudo_wheel_group_required: bool) -> Self {
+        Self {
+            rules: Vec::new(),
+            sudo_wheel_group_required,
+        }
+    }
+
+    pub fn add_rule(
+        &mut self,
+        module_type: PamModuleType,
+        control_flag: PamControlFlag,
+        module_name: &str,
+        pass_by_default: bool,
+    ) {
+        self.rules.push(PamModuleRule {
+            module_type,
+            control_flag,
+            module_name: alloc::string::String::from(module_name),
+            pass_by_default,
+        });
+    }
+
+    pub fn authenticate_pam_stack(
+        &self,
+        module_type: PamModuleType,
+        is_wheel_member: bool,
+    ) -> Result<bool, &'static str> {
+        if self.sudo_wheel_group_required && !is_wheel_member {
+            return Err("PAM / Sudo: User not in wheel group; privilege escalation denied");
+        }
+
+        let type_rules: Vec<&PamModuleRule> = self
+            .rules
+            .iter()
+            .filter(|r| r.module_type == module_type)
+            .collect();
+
+        if type_rules.is_empty() {
+            return Ok(true);
+        }
+
+        let mut overall_success = true;
+
+        for rule in type_rules {
+            let res = rule.pass_by_default;
+            match rule.control_flag {
+                PamControlFlag::Required => {
+                    if !res {
+                        overall_success = false;
+                    }
+                }
+                PamControlFlag::Requisite => {
+                    if !res {
+                        return Ok(false);
+                    }
+                }
+                PamControlFlag::Sufficient => {
+                    if res && overall_success {
+                        return Ok(true);
+                    }
+                }
+                PamControlFlag::Optional => {}
+            }
+        }
+
+        Ok(overall_success)
     }
 }
 
