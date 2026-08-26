@@ -5,8 +5,6 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-
-#[cfg(not(test))]
 use crate::klib::BTreeMap;
 
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};

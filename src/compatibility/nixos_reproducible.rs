@@ -425,11 +425,34 @@ impl CommunityPackageRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
+    use std::path::PathBuf;
+
+    // Simple temporary directory implementation for testing
+    struct TestTempDir {
+        path: PathBuf,
+    }
+
+    impl TestTempDir {
+        fn new() -> std::io::Result<Self> {
+            let path = std::env::temp_dir().join(format!("sigma_test_{}", std::process::id()));
+            std::fs::create_dir_all(&path)?;
+            Ok(TestTempDir { path })
+        }
+
+        fn path(&self) -> &PathBuf {
+            &self.path
+        }
+    }
+
+    impl Drop for TestTempDir {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.path);
+        }
+    }
 
     #[test]
     fn test_package_derivation_creation() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TestTempDir::new().unwrap();
         let mut store = NixLikeStore::new(temp_dir.path());
 
         let inputs = vec![PackageInput {

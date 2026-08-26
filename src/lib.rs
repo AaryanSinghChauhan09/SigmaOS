@@ -271,20 +271,18 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub mod init {
-    pub mod systemd_init;
-}
-pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
+pub mod init;
+pub use init::*;
 
 pub use ai::next_gen::{
     AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType, EnergyGovernorMode, ModelType,
     MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
 };
 pub use ai::agentic_os_runtime::{
-    AgentAuditRecord, ContainerConfig, ContainerFirstRuntimeHost, ContainerState, ContextTokenType,
-    DeterministicAgentSandbox, EbpfTraceEvent, EbpfTraceEventType, EbpfTracingMonitor, LocalLlmModel,
-    LocalLlmSystemDaemon, OmniAutomatorStudioApi, PosixNativeBridgeLayer, TamperProofAgentAuditLogger,
-    TpmTokenKeyVault, VectorContextBlock, VectorContextMmu,
+    ContextVirtualMmu, EphemeralAgentSandbox, HybridContainerRuntime, LocalLlmSystemDaemon,
+    OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
+    ContainerEngineType, BootContainer, EbpfNetworkFilter, ContextMemorySegment,
+    GpuBackend, LocalLlmDaemon, AgentAuditEvent,
 };
 pub use ai::wandr::{
     ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
@@ -316,8 +314,3 @@ pub mod loader;
 pub mod app;
 pub mod auth;
 pub use open_source_obsoletion::*;
-
-pub use unimplemented_features::{
-    KaliAnonsurfTrafficShunt, GhostBsdSysadmBridge, PopOsSystem76PowerManager, System76GpuMode,
-    ClearLinuxStatelessOverlayManager, KeylimeTpmAttestationEngine,
-};

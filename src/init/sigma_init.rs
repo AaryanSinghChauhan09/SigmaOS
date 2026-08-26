@@ -1,12 +1,14 @@
 #![no_std]
-#![no_main]
 
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
 /// Implements minimal init system with service management, dependency resolution, parallel startup
 
+extern crate alloc;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 pub type ServiceID = usize;
 
@@ -60,7 +62,16 @@ impl Service for SimpleService {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ServiceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ServiceState { 
+        match self.state.load(Ordering::SeqCst) {
+            0 => ServiceState::Stopped,
+            1 => ServiceState::Starting,
+            2 => ServiceState::Running,
+            3 => ServiceState::Stopping,
+            4 => ServiceState::Failed,
+            _ => ServiceState::Stopped,
+        }
+    }
     fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
 
     fn start(&mut self) -> Result<(), InitError> {
@@ -88,6 +99,10 @@ pub trait InitSystem {
     fn register_service(&mut self, service: Box<dyn Service>) -> Result<ServiceID, InitError>;
     fn start_service(&mut self, id: ServiceID) -> Result<(), InitError>;
     fn stop_service(&mut self, id: ServiceID) -> Result<(), InitError>;
+    fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        self.stop_service(id)?;
+        self.start_service(id)
+    }
     fn get_service(&self, id: ServiceID) -> Option<&dyn Service>;
     fn get_all_services(&self) -> Vec<ServiceID>;
 }
@@ -125,13 +140,29 @@ impl InitSystem for SigmaInit {
     }
 
     fn start_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        // First, find the service and collect its dependencies
+        let deps = {
+            let mut deps_vec = Vec::new();
+            for svc_option in &self.services {
+                if let Some(ref svc) = *svc_option {
+                    if svc.id() == id {
+                        deps_vec = svc.dependencies();
+                        break;
+                    }
+                }
+            }
+            deps_vec
+        };
+        
+        // Start dependencies first
+        for dep_id in deps {
+            self.start_service(dep_id)?;
+        }
+        
+        // Now start the service itself
         for svc_option in &mut self.services {
             if let Some(ref mut svc) = *svc_option {
                 if svc.id() == id {
-                    let deps = svc.dependencies();
-                    for dep_id in deps {
-                        self.start_service(dep_id)?;
-                    }
                     return svc.start();
                 }
             }
@@ -420,56 +451,6 @@ impl Default for RancherContainerInit {
         Self::new()
     }
 }
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
-        }
-        new_vec
-    }
-    fn contains(&self, item: &T) -> bool where T: PartialEq {
-        for i in 0..self.len {
-            unsafe {
-                if &*self.data.add(i) == item { return true; }
-            }
-        }
-        false
-    }
-    fn pop(&mut self) -> Option<T> {
-        if self.len == 0 { return None; }
-        self.len -= 1;
-        unsafe { Some(core::ptr::read(self.data.add(self.len))) }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 #[cfg(test)]
 mod tests {

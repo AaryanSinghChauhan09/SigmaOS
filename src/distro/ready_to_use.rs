@@ -6,12 +6,6 @@ extern crate alloc;
 
 use crate::klib::{HashMap, Vec};
 
-#[cfg(test)]
-use std::collections::HashMap;
-
-#[cfg(test)]
-use std::vec::Vec;
-
 use alloc::string::{String, ToString};
 
 /// Service execution state

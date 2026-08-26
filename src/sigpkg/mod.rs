@@ -37,7 +37,9 @@ pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError, DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
+    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
+    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    RpmSpecManifest, AppImageContainer,
 };
 pub use sovereign_sigpkg::*;
 
@@ -66,7 +68,6 @@ pub use spec::{
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
-pub use universal_adapter::{AptDebManifest, UniversalPackageManager as UniversalPackageAdapter};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer

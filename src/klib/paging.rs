@@ -48,6 +48,24 @@ pub enum PrivilegeLevel {
     User = 3,
 }
 
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageSize {
+    Standard4KB,
+    Huge2MB,
+    Giant1GB,
+}
+
+impl PageSize {
+    pub fn byte_size(&self) -> usize {
+        match self {
+            PageSize::Standard4KB => 4096,
+            PageSize::Huge2MB => 2 * 1024 * 1024,
+            PageSize::Giant1GB => 1024 * 1024 * 1024,
+        }
+    }
+}
+
 pub trait PageTableEntry {
     fn is_present(&self) -> bool;
     fn is_writable(&self) -> bool;
@@ -474,12 +492,12 @@ impl VirtualMemoryManager for SimpleVMM {
                 pd_entry.set_physical_address(pd_phys);
 
                 let pd_table = SimplePageTable::new(pd_phys);
-                if pd_idx_in_vec >= self.pd_tables.len() {
-                    while self.pd_tables.len() <= pd_idx_in_vec {
+                if pdpt_idx >= self.pd_tables.len() {
+                    while self.pd_tables.len() <= pdpt_idx {
                         self.pd_tables.push(None);
                     }
                 }
-                self.pd_tables[pd_idx_in_vec] = Some(pd_table);
+                self.pd_tables[pdpt_idx] = Some(pd_table);
                 pdpt.set_entry(pdpt_idx, pd_entry);
             }
         }
@@ -491,7 +509,7 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        if self.pt_tables[pt_idx_in_vec].is_none() {
+        if self.pt_tables[pd_idx].is_none() {
             let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
@@ -500,14 +518,14 @@ impl VirtualMemoryManager for SimpleVMM {
             pt_entry.set_physical_address(pt_phys);
 
             let pt_table = SimplePageTable::new(pt_phys);
-            self.pt_tables[pt_idx_in_vec] = Some(pt_table);
+            self.pt_tables[pd_idx] = Some(pt_table);
 
-            if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+            if let Some(ref mut pd) = self.pd_tables[pd_idx] {
                 pd.set_entry(pd_idx, pt_entry);
             }
         }
 
-        if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
+        if let Some(ref mut pt) = self.pt_tables[pd_idx] {
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
             pt_entry.set_writable(writable);

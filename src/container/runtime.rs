@@ -11,10 +11,22 @@ use alloc::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
+    pub default_action: SeccompAction,
+    pub blocked_syscalls: Vec<u32>,
+}
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        self.blocked_syscalls.contains(&syscall_id)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeccompAction {
+    Allow,
+    Deny,
 }
 
 /// OOP-based Container Runtime for SigmaOS
@@ -281,7 +293,7 @@ pub struct SimpleContainer {
     pub cpu_limit: u32,
     pub capability: RuntimeCapability,
     pub environment: [u8; 512],
-    pub seccomp: SeccompPolicy,
+    pub seccomp: SeccompProfile,
 }
 
 impl SimpleContainer {
@@ -319,7 +331,7 @@ impl SimpleContainer {
             cpu_limit: 0,
             capability,
             environment: [0; 512],
-            seccomp: SeccompPolicy { default_action: SeccompAction::Allow, blocked_syscalls: Vec::new() },
+            seccomp: SeccompProfile { default_action: SeccompAction::Allow, blocked_syscalls: Vec::new() },
         }
     }
 
@@ -922,7 +934,7 @@ mod tests {
             b"alpine",
             ContainerCapability::full(),
         );
-        container.seccomp = SeccompPolicy {
+        container.seccomp = SeccompProfile {
             default_action: SeccompAction::Allow,
             blocked_syscalls: vec![0], // Block sys_mount (syscall 0)
         };

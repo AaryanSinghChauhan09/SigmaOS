@@ -1431,7 +1431,7 @@ impl GestureVoiceControlEngine {
 }
 
 #[cfg(test)]
-mod tests {
+mod peripheral_tests {
     use super::*;
 
     #[test]
@@ -2188,14 +2188,13 @@ impl DragonFlyHammer2FsSnapshotV2 {
             pfs_snapshots: Vec::new(),
             active_pfs_id: 1,
         };
-
-        assert!(sat.add_package_node(node_a));
-        assert!(sat.add_package_node(node_b));
-
-        assert!(sat.solve(0));
-        assert_eq!(sat.selected_version[0].unwrap().major, 1);
-        assert_eq!(sat.selected_version[1].unwrap().major, 2);
+        snap
     }
+}
+
+#[cfg(test)]
+mod distro_parity_tests {
+    use super::*;
 
     #[test]
     fn test_section_6_4_jbd2_ledger() {

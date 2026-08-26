@@ -39,6 +39,8 @@ pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
 pub mod structures;
+pub mod subsystem;
+pub mod subsystems;
 pub mod traits;
 
 pub use architecture::*;

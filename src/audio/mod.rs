@@ -6,7 +6,7 @@ pub mod pipewire;
 pub mod editor;
 
 pub use editor::{
-    AmplifyEffect, AudioEditor, AudioEffect, AudioTrack as EditorAudioTrack,
+    AudioEditor, AudioEffect, AudioTrack as EditorAudioTrack,
     EchoEffect, LowPassFilter, MultiTrackSession, NoiseGateEffect,
     SpectralNoiseSuppressionEffect,
 };

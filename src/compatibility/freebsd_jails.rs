@@ -434,7 +434,7 @@ impl SigmaJailManager {
         // Wait and force kill if necessary
         std::thread::sleep(std::time::Duration::from_secs(5));
 
-        for pid in &jail.processes {
+        for pid in processes {
             let _ = Command::new("kill")
                 .arg("-KILL")
                 .arg(pid.to_string())
@@ -485,12 +485,35 @@ pub struct JailInfo {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
+    use std::path::PathBuf;
+
+    // Simple temporary directory implementation for testing
+    struct TestTempDir {
+        path: PathBuf,
+    }
+
+    impl TestTempDir {
+        fn new() -> std::io::Result<Self> {
+            let path = std::env::temp_dir().join(format!("sigma_test_{}", std::process::id()));
+            std::fs::create_dir_all(&path)?;
+            Ok(TestTempDir { path })
+        }
+
+        fn path(&self) -> &PathBuf {
+            &self.path
+        }
+    }
+
+    impl Drop for TestTempDir {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.path);
+        }
+    }
 
     #[test]
     fn test_jail_creation() {
         let mut manager = SigmaJailManager::new();
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TestTempDir::new().unwrap();
 
         let config = JailConfig {
             name: "test-jail".to_string(),
@@ -511,7 +534,7 @@ mod tests {
     #[test]
     fn test_jail_info() {
         let mut manager = SigmaJailManager::new();
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TestTempDir::new().unwrap();
 
         let config = JailConfig {
             name: "info-test".to_string(),

@@ -20,6 +20,25 @@ pub enum AnsiColor {
     Rgb(u8, u8, u8),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ColorSchemePreset {
+    Nord,
+    Dracula,
+    Solarized,
+    Gruvbox,
+}
+
+#[derive(Debug, Clone)]
+pub struct TerminalTheme {
+    pub preset: ColorSchemePreset,
+}
+
+impl TerminalTheme {
+    pub fn preset(preset: ColorSchemePreset) -> Self {
+        TerminalTheme { preset }
+    }
+}
+
 /// Linux/BSD POSIX Termios input mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TermiosInputMode {
@@ -650,7 +669,7 @@ pub struct TerminalSession {
     pub aliases: BTreeMap<String, String>,
     pub user_functions: BTreeMap<String, UserDefinedFunction>,
     pub suggestion_engine: AutoSuggestionEngine,
-    pub multiplexer: TerminalMultiplexer,
+    pub multiplexer: TerminalMultiplexerV1,
     pub graphics_frames: Vec<SixelGraphicFrame>,
     pub trigger_rules: Vec<TriggerRule>,
     pub visual_bell_active: bool,
@@ -802,7 +821,7 @@ impl TerminalSession {
             aliases: BTreeMap::new(),
             user_functions: BTreeMap::new(),
             suggestion_engine: AutoSuggestionEngine::new(),
-            multiplexer: TerminalMultiplexer::new(width, height),
+            multiplexer: TerminalMultiplexerV1::new(width, height),
             graphics_frames: Vec::new(),
             trigger_rules: Vec::new(),
             visual_bell_active: false,
@@ -817,7 +836,7 @@ impl TerminalSession {
         suggestion_engine.register_builtin("apt");
         suggestion_engine.register_builtin("sigpkg");
 
-        let multiplexer = TerminalMultiplexer::new(width, height);
+        let multiplexer = TerminalMultiplexerV1::new(width, height);
 
         Self {
             cursor_x: 0,
@@ -1487,54 +1506,6 @@ mod tests {
     #[test]
     fn test_sixel_kitty_graphics_and_visual_bell() {
         let mut session = TerminalSession::new(80, 24);
-        assert!(!session.visual_bell_active);
-
-        session.trigger_visual_bell();
-        assert!(session.visual_bell_active);
-
-        let sixel_seq = "\x1BPq#0;2;0;0;0#1;2;100;100;100\x1B\\";
-        assert!(session.parse_graphics_escape(sixel_seq));
-        assert_eq!(session.graphics_frames.len(), 1);
-        assert_eq!(session.graphics_frames[0].width, 640);
-    }
-
-    #[test]
-    fn test_tmux_split_panes_and_trigger_rules() {
-        let mut mux = TerminalMultiplexer::new(100, 50);
-        assert_eq!(mux.panes.len(), 1);
-
-        let p2 = mux.split_active_pane(PaneSplitDirection::Vertical).unwrap();
-        assert_eq!(p2, 2);
-        assert_eq!(mux.panes.len(), 2);
-        assert_eq!(mux.panes[0].width, 50);
-        assert_eq!(mux.panes[1].width, 50);
-
-        let mut session = TerminalSession::new(80, 24);
-        session.register_trigger_rule("https://", "open_browser");
-        let matches = session.match_trigger_rules("Visit https://sigmaos.org now!");
-        assert_eq!(matches, vec!["open_browser".to_string()]);
-    }
-
-    #[test]
-    fn test_cross_platform_translation() {
-        let session = TerminalSession::new(80, 24);
-
-        // Test PowerShell translation
-        let translated_ps = session.translate_shell_script("Get-Process | dir", "PowerShell");
-        assert_eq!(translated_ps, "ps | ls");
-
-        // Test Bash translation
-        let translated_bash = session.translate_shell_script("ls -la && rm -rf file.txt", "Bash");
-        assert_eq!(translated_bash, "ls && rm file.txt");
-
-        // Test BSD translation
-        let translated_bsd = session.translate_shell_script("pkg install curl", "FreeBSD");
-        assert_eq!(translated_bsd, "sigpkg install curl");
-    }
-
-    #[test]
-    fn test_sixel_kitty_graphics_and_visual_bell() {
-        let mut session = TerminalSession::new(80, 24);
 
         // Test Sixel graphics escape sequence parsing
         assert!(session.parse_graphics_escape("\x1BPq#0;2;0;0;0#1;2;100;100;100"));
@@ -1579,6 +1550,23 @@ mod tests {
         assert_eq!(matches.len(), 1);
         assert_eq!(matches[0].1, 6); // Starts at index 6
         assert_eq!(matches[0].0.highlight_color, AnsiColor::Cyan);
+    }
+
+    #[test]
+    fn test_cross_platform_translation() {
+        let session = TerminalSession::new(80, 24);
+
+        // Test PowerShell translation
+        let translated_ps = session.translate_shell_script("Get-Process | dir", "PowerShell");
+        assert_eq!(translated_ps, "ps | ls");
+
+        // Test Bash translation
+        let translated_bash = session.translate_shell_script("ls -la && rm -rf file.txt", "Bash");
+        assert_eq!(translated_bash, "ls && rm file.txt");
+
+        // Test BSD translation
+        let translated_bsd = session.translate_shell_script("pkg install curl", "FreeBSD");
+        assert_eq!(translated_bsd, "sigpkg install curl");
     }
 
     #[test]
