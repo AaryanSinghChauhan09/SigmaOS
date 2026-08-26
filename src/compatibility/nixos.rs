@@ -79,12 +79,9 @@ impl NixStore {
             return Err(NixError::EvaluationError);
         }
 
-        let out_path_opt = {
-            let pkg = self.packages.get_str(package).unwrap();
-            pkg.outputs.get_str("out").cloned()
-        };
-        if let Some(out_path) = out_path_opt {
-            self.add_to_profile(profile, &out_path);
+        let pkg = self.packages.get_str(package).unwrap();
+        if let Some(out_path) = pkg.outputs.get_str("out") {
+            self.add_to_profile(profile, out_path);
         }
 
         Ok(())

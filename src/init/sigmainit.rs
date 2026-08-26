@@ -201,10 +201,9 @@ impl Supervisor {
     
     pub fn start_service(&mut self, name: &str) -> Result<(), ServiceError> {
         // Start dependencies first
-        let deps_opt = self.dependency_graph.get_dependencies(name).cloned();
-        if let Some(deps) = deps_opt {
+        if let Some(deps) = self.dependency_graph.get_dependencies(name) {
             for dep in deps {
-                self.start_service(&dep)?;
+                self.start_service(dep)?;
             }
         }
         
@@ -221,10 +220,9 @@ impl Supervisor {
     
     pub fn stop_service(&mut self, name: &str) -> Result<(), ServiceError> {
         // Stop dependents first
-        let dependents_opt = self.dependency_graph.get_dependents(name).cloned();
-        if let Some(dependents) = dependents_opt {
+        if let Some(dependents) = self.dependency_graph.get_dependents(name) {
             for dep in dependents {
-                self.stop_service(&dep)?;
+                self.stop_service(dep)?;
             }
         }
         
