@@ -4,6 +4,7 @@
 
 extern crate alloc;
 
+#[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
 
 #[cfg(test)]

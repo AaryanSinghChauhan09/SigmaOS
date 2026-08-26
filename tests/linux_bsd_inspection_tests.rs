@@ -40,6 +40,15 @@ mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -115,7 +124,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -286,6 +294,7 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
 
 #[test]
 fn test_alpine_apk_package_index_inspection() {
+    use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry};
     let mut apk_index = AlpineApkPackageIndex::new();
     let key = [0x99; 32];
     assert!(apk_index.verify_index_signature(&key));
@@ -305,6 +314,7 @@ fn test_alpine_apk_package_index_inspection() {
 
 #[test]
 fn test_dragonfly_hammer2_snapshot_inspection() {
+    use unimplemented_features::DragonFlyHammer2FsSnapshot;
     let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
     hammer2.register_cluster_node(1, "192.168.1.50");
 
@@ -318,6 +328,7 @@ fn test_dragonfly_hammer2_snapshot_inspection() {
 
 #[test]
 fn test_nixos_declarative_config_engine_inspection() {
+    use unimplemented_features::NixOsDeclarativeConfigEngine;
     let mut nix_engine = NixOsDeclarativeConfigEngine::new();
     let gen1 = nix_engine.build_generation(0xDEADBEEF, 1680000000, 150, "quiet splash");
     assert_eq!(gen1, 1);

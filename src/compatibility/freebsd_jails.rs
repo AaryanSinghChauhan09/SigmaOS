@@ -74,7 +74,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get_mut(name) {
+        let (jid, config, exec_start) = if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -86,29 +86,33 @@ impl SigmaJailManager {
             self.next_jid += 1;
             jail.jid = Some(jid);
 
-            // Create network namespace if IP specified
-            if let Some(ip) = &jail.config.ip_address {
-                self.setup_jail_network(jid, ip)?;
-            }
-
-            // Mount jail filesystem
-            self.mount_jail_fs(&jail.config)?;
-
-            // Apply security restrictions
-            self.apply_jail_restrictions(jid, &jail.config)?;
-
-            // Execute startup script
-            if let Some(exec_start) = &jail.config.exec_start {
-                self.execute_in_jail(jid, exec_start)?;
-            }
-
-            jail.state = JailState::Running;
-            println!("Jail '{}' started with JID {}", name, jid);
-
-            Ok(())
+            (jid, jail.config.clone(), jail.config.exec_start.clone())
         } else {
-            Err(format!("Jail '{}' not found", name).into())
+            return Err(format!("Jail '{}' not found", name).into());
+        };
+
+        // Create network namespace if IP specified
+        if let Some(ip) = &config.ip_address {
+            self.setup_jail_network(jid, ip)?;
         }
+
+        // Mount jail filesystem
+        self.mount_jail_fs(&config)?;
+
+        // Apply security restrictions
+        self.apply_jail_restrictions(jid, &config)?;
+
+        // Execute startup script
+        if let Some(exec_start) = &exec_start {
+            self.execute_in_jail(jid, exec_start)?;
+        }
+
+        if let Some(jail) = self.jails.get_mut(name) {
+            jail.state = JailState::Running;
+        }
+
+        println!("Jail '{}' started with JID {}", name, jid);
+        Ok(())
     }
 
     /// Stop a jail
@@ -191,7 +195,7 @@ impl SigmaJailManager {
 
     /// Get jail information
     pub fn jail_info(&self, name: &str) -> Option<JailInfo> {
-        if let Some(jail) = self.jails.get_str(name) {
+        if let Some(jail) = self.jails.get(name) {
             Some(JailInfo {
                 name: name.to_string(),
                 state: jail.state.clone(),
@@ -434,7 +438,7 @@ impl SigmaJailManager {
         // Wait and force kill if necessary
         std::thread::sleep(std::time::Duration::from_secs(5));
 
-        for pid in &jail.processes {
+        for pid in processes {
             let _ = Command::new("kill")
                 .arg("-KILL")
                 .arg(pid.to_string())
@@ -485,18 +489,17 @@ pub struct JailInfo {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
 
     #[test]
     fn test_jail_creation() {
         let mut manager = SigmaJailManager::new();
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = std::env::temp_dir().join("sigma_jail_test_1");
 
         let config = JailConfig {
             name: "test-jail".to_string(),
             hostname: "testjail".to_string(),
             ip_address: Some("192.168.1.100".to_string()),
-            root_path: temp_dir.path().to_path_buf(),
+            root_path: temp_dir,
             allow_raw_sockets: false,
             allow_chflags: false,
             allow_mount: false,
@@ -511,13 +514,13 @@ mod tests {
     #[test]
     fn test_jail_info() {
         let mut manager = SigmaJailManager::new();
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = std::env::temp_dir().join("sigma_jail_test_2");
 
         let config = JailConfig {
             name: "info-test".to_string(),
             hostname: "infotest".to_string(),
             ip_address: None,
-            root_path: temp_dir.path().to_path_buf(),
+            root_path: temp_dir,
             allow_raw_sockets: false,
             allow_chflags: false,
             allow_mount: false,

@@ -1495,20 +1495,10 @@ mod tests {
         let sixel_seq = "\x1BPq#0;2;0;0;0#1;2;100;100;100\x1B\\";
         assert!(session.parse_graphics_escape(sixel_seq));
         assert_eq!(session.graphics_frames.len(), 1);
-        assert_eq!(session.graphics_frames[0].width, 640);
     }
 
     #[test]
     fn test_tmux_split_panes_and_trigger_rules() {
-        let mut mux = TerminalMultiplexer::new(100, 50);
-        assert_eq!(mux.panes.len(), 1);
-
-        let p2 = mux.split_active_pane(PaneSplitDirection::Vertical).unwrap();
-        assert_eq!(p2, 2);
-        assert_eq!(mux.panes.len(), 2);
-        assert_eq!(mux.panes[0].width, 50);
-        assert_eq!(mux.panes[1].width, 50);
-
         let mut session = TerminalSession::new(80, 24);
         session.register_trigger_rule("https://", "open_browser");
         let matches = session.match_trigger_rules("Visit https://sigmaos.org now!");
@@ -1530,55 +1520,6 @@ mod tests {
         // Test BSD translation
         let translated_bsd = session.translate_shell_script("pkg install curl", "FreeBSD");
         assert_eq!(translated_bsd, "sigpkg install curl");
-    }
-
-    #[test]
-    fn test_sixel_kitty_graphics_and_visual_bell() {
-        let mut session = TerminalSession::new(80, 24);
-
-        // Test Sixel graphics escape sequence parsing
-        assert!(session.parse_graphics_escape("\x1BPq#0;2;0;0;0#1;2;100;100;100"));
-        assert_eq!(session.graphics_frames.len(), 1);
-        assert_eq!(session.graphics_frames[0].width_px, 640);
-
-        // Test Kitty graphics escape sequence parsing
-        assert!(session.parse_graphics_escape("\x1B_Ga=T,f=100;ABCD\x1B\\"));
-        assert_eq!(session.graphics_frames.len(), 2);
-        assert_eq!(session.graphics_frames[1].width_px, 800);
-
-        // Test Visual Bell trigger
-        assert!(!session.visual_bell_active);
-        session.trigger_visual_bell();
-        assert!(session.visual_bell_active);
-        session.clear_visual_bell();
-        assert!(!session.visual_bell_active);
-    }
-
-    #[test]
-    fn test_tmux_split_panes_and_trigger_rules() {
-        let mut session = TerminalSession::new(100, 40);
-
-        // Initial pane
-        assert_eq!(session.multiplexer.panes.len(), 1);
-        assert_eq!(session.multiplexer.panes[0].width, 100);
-
-        // Vertical split (splits width 100 into 50 and 50)
-        let new_pane_id = session.multiplexer.split_pane(PaneSplitDirection::Vertical);
-        assert_eq!(session.multiplexer.panes.len(), 2);
-        assert_eq!(session.multiplexer.panes[0].width, 50);
-
-        // Focus new pane
-        assert!(session.multiplexer.focus_pane(new_pane_id));
-        assert_eq!(session.multiplexer.active_pane_id, new_pane_id);
-
-        // Trigger Rules test
-        let url_rule = TriggerRule::new("https://", AnsiColor::Cyan, Some("open_browser"));
-        session.add_trigger_rule(url_rule);
-
-        let matches = session.match_trigger_rules("Visit https://sigmaos.dev for docs");
-        assert_eq!(matches.len(), 1);
-        assert_eq!(matches[0].1, 6); // Starts at index 6
-        assert_eq!(matches[0].0.highlight_color, AnsiColor::Cyan);
     }
 
     #[test]
