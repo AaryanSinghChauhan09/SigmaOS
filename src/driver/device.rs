@@ -11,6 +11,12 @@ use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PortAddress {
+    PortIO(u16),
+    MemoryMapped(u32),
+}
+
 #[derive(Debug, Clone)]
 pub struct DdeDeviceWrapper {
     pub id: u32,
@@ -982,6 +988,14 @@ impl<T> Vec<T> {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        if self.data.is_null() || self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
 
