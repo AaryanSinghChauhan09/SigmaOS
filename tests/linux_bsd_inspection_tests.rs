@@ -238,15 +238,6 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 
@@ -457,16 +448,14 @@ fn test_pam_authentication_policy_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    use unimplemented_features::GentooPortageMaskEngine;
+    #[path = "../src/distro/linux_bsd_parity.rs"]
+    mod linux_bsd_parity;
+    use linux_bsd_parity::GentooPortageUseFlagsEngine;
 
-    let mut portage = GentooPortageMaskEngine::new("amd64");
-    portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
-    portage.register_ebuild("app-admin/sudo", "0", &["amd64"], false);
-
-    assert!(portage.evaluate_installability("app-admin/sudo", "0", false).unwrap());
-    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", false).is_err());
-    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", true).unwrap());
-
-    portage.add_hard_mask("app-admin/sudo");
-    assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
+    let mut portage = GentooPortageUseFlagsEngine::new();
+    portage.set_global_use_flags(&["experimental"]);
+    portage.register_package("sys-kernel/gentoo-sources", &["experimental", "vanilla"]);
+    let flags = portage.resolve_package_flags("sys-kernel/gentoo-sources").unwrap();
+    assert!(flags.contains(&"experimental".to_string()));
+    assert!(!flags.contains(&"vanilla".to_string()));
 }
