@@ -238,15 +238,6 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 
