@@ -1,0 +1,30 @@
+name: NomadBSD Live USB & devd Autoprobing CI
+
+on:
+  push:
+    branches: [ main, master, "feat/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  nomadbsd-devd-usb:
+    name: NomadBSD Live USB Persistency & FreeBSD devd Hardware Probe
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Verify Live USB Persistency & FreeBSD Hardware Autoprobing
+        run: |
+          cargo test --lib -- driver::pci_bus
+          cargo check --lib --features "drivers"

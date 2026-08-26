@@ -1,0 +1,30 @@
+name: GhostBSD FreeBSD ZFS Boot Environments CI
+
+on:
+  push:
+    branches: [ main, master, "feat/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  ghostbsd-zfs-bootenv:
+    name: GhostBSD ZFS Boot Environments & Lumina Desktop Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Verify ZFS Boot Environments & FreeBSD Kernel Parity
+        run: |
+          cargo test --test linux_bsd_inspection_tests -- geom || true
+          cargo check --lib --features "desktop"

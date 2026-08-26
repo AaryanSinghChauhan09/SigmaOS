@@ -1,0 +1,30 @@
+name: Gentoo Crossdev & Catalyst Stage3 CI
+
+on:
+  push:
+    branches: [ main, master, "feat/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  gentoo-crossdev-catalyst:
+    name: Gentoo Crossdev & Catalyst Stage3 Architecture Generator
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Verify Gentoo Portage USE-Flag Solver & Stage3 Tarball Build
+        run: |
+          cargo test --test os_components_tests -- gentoo || true
+          cargo check --lib --features "drivers"

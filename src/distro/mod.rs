@@ -28,6 +28,7 @@ pub mod tiny_core;
 pub mod arch;
 pub mod cachy;
 pub mod linux_bsd_parity_extended;
+pub mod missing_distro_innovations;
 
 pub use linux_bsd_parity::{
     NixOSFlakeEngine, FlakeInput, SystemClosure,
@@ -101,4 +102,9 @@ pub use linux_bsd_parity_extended::{
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
     NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
+};
+
+pub use missing_distro_innovations::{
+    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
 };
