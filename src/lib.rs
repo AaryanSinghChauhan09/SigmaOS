@@ -148,6 +148,9 @@ pub use distro::{
     TimeTravelCheckpoint, TimeTravelEngine, TinyCoreMode, TinyCoreRAMEngine, TlsConstraint,
     UpdateChannel, UpdateError, VirtioFsZeroCopyBridge, VoidRunitManager, VoidRunitSupervisor,
     WikiPage, Win32Gdi, WindowsRegistry, Yast2ControlCenter, YastSetting,
+    SovereignSystemdParityEngine, SystemdUnitType, SystemdUnitState, SystemdJournalEntry,
+    SovereignSystemdUnit, SovereignHybridSchedulerInnovations, DvfsPowerGovernor,
+    NumaNodeAffinity, RtlaneRealtimeTask,
 };
 pub use driver::pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,

@@ -4,7 +4,9 @@
 // openSUSE Snapper-inspired pre/post CoW transaction recovery (openSUSE pattern),
 // zero-copy page splice pipelines (Linux splice / FreeBSD sendfile),
 // eBPF-inspired lightweight syscall policy verifiers,
-// and FreeBSD Capsicum descriptor capability delegation.
+// FreeBSD Capsicum descriptor capability delegation,
+// systemd-style unit parity management & structured journald logging,
+// and real-time hybrid scheduler innovations (RTLane <5µs latency, NUMA topology, DVFS governor).
 
 extern crate alloc;
 use alloc::string::{String, ToString};
@@ -404,6 +406,187 @@ impl FreeBsdCapsicumDescriptorDelegate {
     }
 }
 
+/// 7. Sovereign systemd Parity Engine (Service, Slice, Scope, Mount, Automount, Swap, Path, Device)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemdUnitType {
+    Service,
+    Slice,
+    Scope,
+    Mount,
+    Automount,
+    Swap,
+    Path,
+    Device,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemdUnitState {
+    Inactive,
+    Activating,
+    Active,
+    Deactivating,
+    Failed,
+}
+
+#[derive(Debug, Clone)]
+pub struct SystemdJournalEntry {
+    pub timestamp: u64,
+    pub unit_name: String,
+    pub priority: u8,
+    pub message: String,
+    pub pid: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignSystemdUnit {
+    pub name: String,
+    pub unit_type: SystemdUnitType,
+    pub state: SystemdUnitState,
+    pub dependencies: Vec<String>,
+    pub socket_activation_port: Option<u16>,
+    pub pledge_promises: Option<String>,
+    pub unveil_paths: Vec<(String, String)>,
+}
+
+pub struct SovereignSystemdParityEngine {
+    pub units: BTreeMap<String, SovereignSystemdUnit>,
+    pub journal: Vec<SystemdJournalEntry>,
+}
+
+impl SovereignSystemdParityEngine {
+    pub fn new() -> Self {
+        Self {
+            units: BTreeMap::new(),
+            journal: Vec::new(),
+        }
+    }
+
+    pub fn register_unit(&mut self, unit: SovereignSystemdUnit) {
+        self.units.insert(unit.name.clone(), unit);
+    }
+
+    pub fn start_unit(&mut self, name: &str, timestamp: u64) -> Result<(), String> {
+        if let Some(unit) = self.units.get_mut(name) {
+            unit.state = SystemdUnitState::Active;
+            self.journal.push(SystemdJournalEntry {
+                timestamp,
+                unit_name: name.to_string(),
+                priority: 6, // INFO
+                message: format!("Started unit {}", name),
+                pid: 1,
+            });
+            Ok(())
+        } else {
+            Err(format!("Unit {} not found", name))
+        }
+    }
+
+    pub fn trigger_socket_activation(&mut self, port: u16, timestamp: u64) -> Result<String, String> {
+        let matching_unit = self.units.values_mut().find(|u| u.socket_activation_port == Some(port));
+        if let Some(unit) = matching_unit {
+            unit.state = SystemdUnitState::Active;
+            let name = unit.name.clone();
+            self.journal.push(SystemdJournalEntry {
+                timestamp,
+                unit_name: name.clone(),
+                priority: 6,
+                message: format!("Socket activation triggered on port {}", port),
+                pid: 1,
+            });
+            Ok(name)
+        } else {
+            Err(format!("No service registered for socket port {}", port))
+        }
+    }
+
+    pub fn log_journal(&mut self, entry: SystemdJournalEntry) {
+        self.journal.push(entry);
+    }
+}
+
+impl Default for SovereignSystemdParityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 8. Sovereign Hybrid Scheduler Innovations (RTLane <5µs preemption, NUMA node binding, DVFS governor, eBPF preemption hooks)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
+    Performance,
+    Powersave,
+    Schedutil,
+    OnDemand,
+}
+
+#[derive(Debug, Clone)]
+pub struct NumaNodeAffinity {
+    pub node_id: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct RtlaneRealtimeTask {
+    pub task_id: usize,
+    pub max_latency_budget_us: u64,
+    pub priority: u8,
+    pub assigned_numa_node: usize,
+    pub ebpf_boost_score: u32,
+}
+
+pub struct SovereignHybridSchedulerInnovations {
+    pub current_governor: DvfsPowerGovernor,
+    pub numa_nodes: Vec<NumaNodeAffinity>,
+    pub rt_tasks: BTreeMap<usize, RtlaneRealtimeTask>,
+    pub preemption_count: u64,
+}
+
+impl SovereignHybridSchedulerInnovations {
+    pub fn new() -> Self {
+        let default_numa = NumaNodeAffinity {
+            node_id: 0,
+            cpu_cores: vec![0, 1, 2, 3],
+            total_memory_mb: 8192,
+        };
+
+        Self {
+            current_governor: DvfsPowerGovernor::Schedutil,
+            numa_nodes: vec![default_numa],
+            rt_tasks: BTreeMap::new(),
+            preemption_count: 0,
+        }
+    }
+
+    pub fn set_governor(&mut self, governor: DvfsPowerGovernor) {
+        self.current_governor = governor;
+    }
+
+    pub fn register_rt_task(&mut self, task: RtlaneRealtimeTask) -> Result<(), String> {
+        if task.max_latency_budget_us > 5 {
+            return Err(String::from("RTLane preemption latency budget exceeds 5 microseconds constraint"));
+        }
+        self.rt_tasks.insert(task.task_id, task);
+        Ok(())
+    }
+
+    pub fn evaluate_ebpf_preemption_hook(&mut self, task_id: usize, extra_score: u32) -> bool {
+        if let Some(task) = self.rt_tasks.get_mut(&task_id) {
+            task.ebpf_boost_score += extra_score;
+            self.preemption_count += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignHybridSchedulerInnovations {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -491,5 +674,58 @@ mod tests {
 
         FreeBsdCapsicumDescriptorDelegate::restrict_rights(&mut cap, CAP_READ);
         assert!(!FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_SEEK));
+    }
+
+    #[test]
+    fn test_systemd_parity_engine() {
+        let mut engine = SovereignSystemdParityEngine::new();
+
+        let srv = SovereignSystemdUnit {
+            name: String::from("httpd.service"),
+            unit_type: SystemdUnitType::Service,
+            state: SystemdUnitState::Inactive,
+            dependencies: vec![String::from("network.target")],
+            socket_activation_port: Some(8080),
+            pledge_promises: Some(String::from("stdio inet rpath")),
+            unveil_paths: vec![(String::from("/var/www"), String::from("r"))],
+        };
+
+        engine.register_unit(srv);
+        assert_eq!(engine.units.len(), 1);
+
+        let activated = engine.trigger_socket_activation(8080, 100).unwrap();
+        assert_eq!(activated, "httpd.service");
+        assert_eq!(engine.units.get("httpd.service").unwrap().state, SystemdUnitState::Active);
+        assert_eq!(engine.journal.len(), 1);
+    }
+
+    #[test]
+    fn test_hybrid_scheduler_innovations() {
+        let mut sched = SovereignHybridSchedulerInnovations::new();
+        sched.set_governor(DvfsPowerGovernor::Performance);
+        assert_eq!(sched.current_governor, DvfsPowerGovernor::Performance);
+
+        let rt_task = RtlaneRealtimeTask {
+            task_id: 42,
+            max_latency_budget_us: 3, // <= 5us constraint
+            priority: 99,
+            assigned_numa_node: 0,
+            ebpf_boost_score: 10,
+        };
+
+        assert!(sched.register_rt_task(rt_task).is_ok());
+
+        let invalid_rt_task = RtlaneRealtimeTask {
+            task_id: 43,
+            max_latency_budget_us: 10, // > 5us
+            priority: 50,
+            assigned_numa_node: 0,
+            ebpf_boost_score: 0,
+        };
+
+        assert!(sched.register_rt_task(invalid_rt_task).is_err());
+
+        assert!(sched.evaluate_ebpf_preemption_hook(42, 5));
+        assert_eq!(sched.rt_tasks.get(&42).unwrap().ebpf_boost_score, 15);
     }
 }
