@@ -16,22 +16,25 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// SigmaOS Linux-Inspired Superuser / Root Improvements Suite
-// Implements advanced privilege management: timed sudo/doas tokens, Polkit fine-grained control,
-// Cap capability splitting, user namespaces / root-less translation, and PAM MFA verification.
-//
-// SECURITY WARNING: This module contains placeholder password hashes for testing purposes only.
-// In production, use:
-// - `crate::security::crypto_utils::hash_password_placeholder` or proper Argon2/bcrypt
-// - `crate::security::crypto_utils::SecureRandom` for salt generation
-// - Never use hard-coded password hashes or weak hashing algorithms
+// SigmaOS Linux & BSD Inspired Superuser / Root Improvements Suite
+// Implements advanced privilege management:
+// 1. Timed sudo/doas tokens
+// 2. Polkit fine-grained action authorization
+// 3. Linux LinuxCap capability splitting
+// 4. Rootless user namespace UID/GID translation
+// 5. Stackable PAM subsystem (pam_unix, pam_faillock, pam_time, pam_limits, pam_mfa)
+// 6. BSD Securelevel Kernel Security Enforcement (OpenBSD/FreeBSD parity)
+// 7. OpenBSD doas.conf Granular Rule Engine
+// 8. Linux Subordinate UID/GID Mapper (subuid/subgid container parity)
+// 9. Rootless Privileged Port Binding Manager (sysctl ip_unprivileged_port_start parity)
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicI32, AtomicU64, Ordering};
 
 // ==========================================
 // 1. sudo/doas Style Privilege Elevator
@@ -54,18 +57,14 @@ impl SudoDoasElevator {
     pub fn new() -> Self {
         Self {
             active_tokens: Vec::new(),
-            password_database: vec![
-                // WARNING: Empty password database for security.
-                // Passwords must be set at runtime using proper hashing (Argon2)
-                // via the security configuration system.
-            ],
+            password_database: Vec::new(),
         }
     }
 
     pub fn elevate_via_doas(
         &mut self,
-        _username: &str,
-        _password_hash: &str,
+        username: &str,
+        password_hash: &str,
         current_time_ms: u64,
     ) -> Result<u32, &'static str> {
         let mut user_found = false;
@@ -333,7 +332,7 @@ impl PamMfaAuthenticator {
 // ==========================================
 
 /// Standard PAM service types (management groups)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PamGroup {
     Auth,
     Account,
@@ -452,8 +451,8 @@ impl PamModule for PamUnixModule {
 
     fn authenticate(
         &self,
-        _username: &str,
-        _password_hash: &str,
+        username: &str,
+        password_hash: &str,
         _context: &mut PamContext,
     ) -> PamResult {
         for (user, hash) in &self.password_database {
@@ -579,19 +578,19 @@ impl PamModule for PamMfaPluggableModule {
 /// A single rule in a PAM configuration chain
 pub struct PamRule {
     pub control_flag: PamControlFlag,
-    pub module: std::sync::Arc<dyn PamModule>,
+    pub module: alloc::sync::Arc<dyn PamModule>,
 }
 
 /// Central Pluggable Authentication Modules manager
 pub struct PamEngine {
-    pub chains: crate::klib::BTreeMap<PamGroup, Vec<PamRule>>,
+    pub chains: BTreeMap<PamGroup, Vec<PamRule>>,
     pub context: PamContext,
 }
 
 impl PamEngine {
     pub fn new() -> Self {
         Self {
-            chains: crate::klib::BTreeMap::new(),
+            chains: BTreeMap::new(),
             context: PamContext::new(),
         }
     }
@@ -610,8 +609,8 @@ impl PamEngine {
     pub fn execute_group(
         &mut self,
         group: PamGroup,
-        _username: &str,
-        _password_hash: &str,
+        username: &str,
+        password_hash: &str,
     ) -> PamResult {
         let rules = match self.chains.get(&group) {
             Some(r) => r,
@@ -680,7 +679,269 @@ impl Default for PamEngine {
 }
 
 // ==========================================
-// Unit Tests for Root Privilege improvements
+// 7. BSD Securelevel Kernel Controller (OpenBSD / FreeBSD Parity)
+// ==========================================
+
+/// BSD Securelevels (-1, 0, 1, 2, 3) enforcing strict hardware/kernel restrictions even on root
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum BsdSecurelevel {
+    PermanentlyUnsecure = -1,
+    Insecure = 0,
+    Secure = 1,
+    HighlySecure = 2,
+    NetworkSecure = 3,
+}
+
+pub struct BsdSecurelevelController {
+    level: AtomicI32,
+}
+
+impl BsdSecurelevelController {
+    pub fn new(initial_level: BsdSecurelevel) -> Self {
+        Self {
+            level: AtomicI32::new(initial_level as i32),
+        }
+    }
+
+    pub fn current_level(&self) -> BsdSecurelevel {
+        match self.level.load(Ordering::SeqCst) {
+            -1 => BsdSecurelevel::PermanentlyUnsecure,
+            0 => BsdSecurelevel::Insecure,
+            1 => BsdSecurelevel::Secure,
+            2 => BsdSecurelevel::HighlySecure,
+            _ => BsdSecurelevel::NetworkSecure,
+        }
+    }
+
+    /// Raises the securelevel. Note: Once raised above 0, securelevel can NEVER be lowered without rebooting.
+    pub fn raise_level(&self, target_level: BsdSecurelevel) -> Result<(), &'static str> {
+        let cur = self.level.load(Ordering::SeqCst);
+        let target = target_level as i32;
+
+        if target < cur && cur > 0 {
+            return Err("securelevel: cannot lower securelevel once raised above 0");
+        }
+
+        self.level.store(target, Ordering::SeqCst);
+        Ok(())
+    }
+
+    /// Checks if raw disk write operations are permitted
+    pub fn check_raw_disk_write_allowed(&self) -> bool {
+        self.current_level() < BsdSecurelevel::Secure
+    }
+
+    /// Checks if kernel module loading/unloading is permitted
+    pub fn check_module_loading_allowed(&self) -> bool {
+        self.current_level() < BsdSecurelevel::Secure
+    }
+
+    /// Checks if firewall rule modifications are allowed
+    pub fn check_firewall_modification_allowed(&self) -> bool {
+        self.current_level() < BsdSecurelevel::NetworkSecure
+    }
+}
+
+impl Default for BsdSecurelevelController {
+    fn default() -> Self {
+        Self::new(BsdSecurelevel::Insecure)
+    }
+}
+
+// ==========================================
+// 8. OpenBSD doas.conf Parity Rule Engine
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DoasAction {
+    Permit,
+    Deny,
+}
+
+#[derive(Debug, Clone)]
+pub struct DoasRule {
+    pub action: DoasAction,
+    pub identity: String,     // e.g. "wheel" or "alice"
+    pub target_user: String,  // e.g. "root"
+    pub command: Option<String>, // Option for specific binary, e.g. "/sbin/reboot"
+    pub nopass: bool,
+    pub keepenv: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct DoasEvaluationResult {
+    pub permitted: bool,
+    pub nopass_required: bool,
+    pub keepenv: bool,
+}
+
+pub struct DoasRuleEngine {
+    pub rules: Vec<DoasRule>,
+}
+
+impl DoasRuleEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: DoasRule) {
+        self.rules.push(rule);
+    }
+
+    /// Evaluates doas command invocation following OpenBSD `last-matching-rule` semantics
+    pub fn evaluate(
+        &self,
+        username: &str,
+        user_groups: &[&str],
+        target_user: &str,
+        command: &str,
+    ) -> DoasEvaluationResult {
+        let mut last_matching: Option<&DoasRule> = None;
+
+        for rule in &self.rules {
+            // Check identity match (username or group)
+            let id_matches = rule.identity == username
+                || rule.identity == ":wheel" && user_groups.contains(&"wheel")
+                || rule.identity.starts_with(':') && user_groups.contains(&&rule.identity[1..]);
+
+            if !id_matches {
+                continue;
+            }
+
+            // Check target user match
+            if rule.target_user != target_user && rule.target_user != "*" {
+                continue;
+            }
+
+            // Check command match
+            if let Some(ref cmd) = rule.command {
+                if cmd != command {
+                    continue;
+                }
+            }
+
+            // Rule matches! OpenBSD doas takes the LAST matching rule.
+            last_matching = Some(rule);
+        }
+
+        match last_matching {
+            Some(rule) => DoasEvaluationResult {
+                permitted: rule.action == DoasAction::Permit,
+                nopass_required: rule.nopass,
+                keepenv: rule.keepenv,
+            },
+            None => DoasEvaluationResult {
+                permitted: false,
+                nopass_required: false,
+                keepenv: false,
+            },
+        }
+    }
+}
+
+impl Default for DoasRuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 9. Subordinate UID/GID Mapping Engine (SubUid / SubGid Parity)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct SubUidRange {
+    pub username: String,
+    pub start_id: u32,
+    pub count: u32,
+}
+
+pub struct SubUidGidMapper {
+    pub subuid_database: Vec<SubUidRange>,
+    pub subgid_database: Vec<SubUidRange>,
+}
+
+impl SubUidGidMapper {
+    pub fn new() -> Self {
+        Self {
+            subuid_database: Vec::new(),
+            subgid_database: Vec::new(),
+        }
+    }
+
+    pub fn add_subuid_range(&mut self, username: &str, start_id: u32, count: u32) {
+        self.subuid_database.push(SubUidRange {
+            username: username.to_string(),
+            start_id,
+            count,
+        });
+    }
+
+    pub fn get_subuid_range(&self, username: &str) -> Option<&SubUidRange> {
+        self.subuid_database.iter().find(|r| r.username == username)
+    }
+
+    /// Map container internal UID to host subuid range
+    pub fn map_container_uid(&self, username: &str, container_uid: u32) -> Option<u32> {
+        let range = self.get_subuid_range(username)?;
+        if container_uid < range.count {
+            Some(range.start_id + container_uid)
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for SubUidGidMapper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 10. Rootless Privileged Port Binding Manager
+// ==========================================
+
+pub struct RootlessPortBindingManager {
+    pub unprivileged_port_start: u16,
+    pub explicitly_allowed_users: Vec<u32>,
+}
+
+impl RootlessPortBindingManager {
+    pub fn new(port_start: u16) -> Self {
+        Self {
+            unprivileged_port_start: port_start,
+            explicitly_allowed_users: Vec::new(),
+        }
+    }
+
+    pub fn allow_user_port_access(&mut self, uid: u32) {
+        if !self.explicitly_allowed_users.contains(&uid) {
+            self.explicitly_allowed_users.push(uid);
+        }
+    }
+
+    pub fn can_bind_port(&self, uid: u32, port: u16) -> bool {
+        if uid == 0 {
+            return true; // Root can bind any port
+        }
+
+        if port >= self.unprivileged_port_start {
+            return true; // Above threshold, non-privileged port
+        }
+
+        self.explicitly_allowed_users.contains(&uid)
+    }
+}
+
+impl Default for RootlessPortBindingManager {
+    fn default() -> Self {
+        Self::new(1024) // Linux default sysctl net.ipv4.ip_unprivileged_port_start = 1024
+    }
+}
+
+// ==========================================
+// Comprehensive Unit Tests
 // ==========================================
 
 #[cfg(test)]
@@ -690,15 +951,16 @@ mod tests {
     #[test]
     fn test_sudo_doas_privilege_elevation() {
         let mut elevator = SudoDoasElevator::new();
+        elevator.password_database.push(("admin".to_string(), "secure_hash_123".to_string()));
+
         // Failed attempt with incorrect password hash
         assert!(elevator
             .elevate_via_doas("admin", "invalid_hash", 10000)
             .is_err());
 
-        // Test that elevation fails with empty database
-        assert!(elevator
-            .elevate_via_doas("admin", "any_hash", 10000)
-            .is_err());
+        // Successful elevation
+        let uid = elevator.elevate_via_doas("admin", "secure_hash_123", 10000).unwrap();
+        assert_eq!(uid, 0);
 
         // Verification must confirm active session under TTL
         assert!(elevator.verify_active_sudo_session(0, 15000)); // 5 secs later
@@ -769,12 +1031,13 @@ mod tests {
     fn test_linux_inspired_pam_stack() {
         let mut engine = PamEngine::new();
 
-        // Empty database for security - passwords set at runtime
-        let unix_db: Vec<(String, String)> = vec![];
-        let pam_unix = std::sync::Arc::new(PamUnixModule::new(unix_db));
-        let pam_faillock = std::sync::Arc::new(PamFaillockModule);
-        let pam_time = std::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM
-        let pam_mfa = std::sync::Arc::new(PamMfaPluggableModule);
+        let unix_db: Vec<(String, String)> = vec![
+            ("alice".to_string(), "alice_pwd_hash".to_string()),
+        ];
+        let pam_unix = alloc::sync::Arc::new(PamUnixModule::new(unix_db));
+        let pam_faillock = alloc::sync::Arc::new(PamFaillockModule);
+        let pam_time = alloc::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM
+        let pam_mfa = alloc::sync::Arc::new(PamMfaPluggableModule);
 
         // Scenario 1: Configure stack: Required pam_faillock + Required pam_unix + Optional pam_mfa
         engine.add_rule(
@@ -799,10 +1062,10 @@ mod tests {
             },
         );
 
-        // Test authentication with empty database should fail
+        // Test valid authentication
         assert_eq!(
-            engine.execute_group(PamGroup::Auth, "alice", "any_password"),
-            PamResult::AuthErr
+            engine.execute_group(PamGroup::Auth, "alice", "alice_pwd_hash"),
+            PamResult::Success
         );
 
         // Test wrong credentials
@@ -814,7 +1077,7 @@ mod tests {
         // Scenario 2: Test account lockout with pam_faillock
         engine.context.failed_attempts = 4; // Locked out!
         assert_eq!(
-            engine.execute_group(PamGroup::Auth, "alice", "any_password"),
+            engine.execute_group(PamGroup::Auth, "alice", "alice_pwd_hash"),
             PamResult::MaxTries
         );
 
@@ -841,5 +1104,92 @@ mod tests {
             engine_acct.execute_group(PamGroup::Account, "alice", ""),
             PamResult::Success
         );
+    }
+
+    #[test]
+    fn test_bsd_securelevels() {
+        let controller = BsdSecurelevelController::new(BsdSecurelevel::Insecure);
+        assert_eq!(controller.current_level(), BsdSecurelevel::Insecure);
+        assert!(controller.check_raw_disk_write_allowed());
+        assert!(controller.check_module_loading_allowed());
+
+        // Raise level to Secure (1)
+        assert!(controller.raise_level(BsdSecurelevel::Secure).is_ok());
+        assert_eq!(controller.current_level(), BsdSecurelevel::Secure);
+        assert!(!controller.check_raw_disk_write_allowed());
+        assert!(!controller.check_module_loading_allowed());
+
+        // Attempting to lower securelevel back to Insecure fails!
+        assert!(controller.raise_level(BsdSecurelevel::Insecure).is_err());
+        assert_eq!(controller.current_level(), BsdSecurelevel::Secure);
+    }
+
+    #[test]
+    fn test_doas_rule_engine() {
+        let mut engine = DoasRuleEngine::new();
+
+        // In OpenBSD doas.conf, rules are evaluated in order and the last matching rule wins.
+        // General rule for :wheel group:
+        engine.add_rule(DoasRule {
+            action: DoasAction::Permit,
+            identity: ":wheel".to_string(),
+            target_user: "root".to_string(),
+            command: None,
+            nopass: false,
+            keepenv: true,
+        });
+
+        // Specific override rule for alice for /sbin/reboot with nopass:
+        engine.add_rule(DoasRule {
+            action: DoasAction::Permit,
+            identity: "alice".to_string(),
+            target_user: "root".to_string(),
+            command: Some("/sbin/reboot".to_string()),
+            nopass: true,
+            keepenv: false,
+        });
+
+        // Evaluate reboot for alice
+        let res1 = engine.evaluate("alice", &["wheel"], "root", "/sbin/reboot");
+        assert!(res1.permitted);
+        assert!(res1.nopass_required);
+
+        // Evaluate general command for bob in wheel group
+        let res2 = engine.evaluate("bob", &["wheel"], "root", "/usr/bin/htop");
+        assert!(res2.permitted);
+        assert!(!res2.nopass_required);
+        assert!(res2.keepenv);
+
+        // Evaluate unauthorized user charlie
+        let res3 = engine.evaluate("charlie", &["users"], "root", "/sbin/reboot");
+        assert!(!res3.permitted);
+    }
+
+    #[test]
+    fn test_subuid_gid_mapping() {
+        let mut mapper = SubUidGidMapper::new();
+        mapper.add_subuid_range("alice", 100000, 65536);
+
+        assert_eq!(mapper.map_container_uid("alice", 0), Some(100000));
+        assert_eq!(mapper.map_container_uid("alice", 1000), Some(101000));
+        assert_eq!(mapper.map_container_uid("alice", 70000), None); // Exceeds count
+    }
+
+    #[test]
+    fn test_rootless_port_binding() {
+        let mut manager = RootlessPortBindingManager::new(1024);
+
+        // Root user can bind any port
+        assert!(manager.can_bind_port(0, 80));
+
+        // Regular user cannot bind privileged port (< 1024)
+        assert!(!manager.can_bind_port(1000, 80));
+
+        // Regular user can bind unprivileged port (>= 1024)
+        assert!(manager.can_bind_port(1000, 8080));
+
+        // Allow user 1000 explicitly
+        manager.allow_user_port_access(1000);
+        assert!(manager.can_bind_port(1000, 80));
     }
 }

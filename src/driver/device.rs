@@ -658,8 +658,6 @@ impl Device for SimpleBlockDevice {
 #[cfg(test)]
 mod legacy_tests {
     use super::*;
-    use crate::compatibility::historic_linux::DdeDeviceWrapper;
-    use crate::drivers::dde::UdfInterpreter;
 
     pub struct LegacyDevice {
         pub id: usize,
@@ -1427,7 +1425,7 @@ impl<'a, T> Iterator for VecIteratorMut<'a, T> {
 }
 
 pub struct Enumerate<'a, T> {
-    iter: VecIter<'a, T>,
+    iter: VecIterator<'a, T>,
     index: usize,
 }
 
