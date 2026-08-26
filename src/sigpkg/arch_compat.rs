@@ -317,7 +317,7 @@ impl AlpmHookManager {
         Ok(())
     }
 
-    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<klib::string::SigmaString> {
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<crate::klib::string::SigmaString> {
         let mut triggered_cmds = alloc::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -551,20 +551,20 @@ mod tests {
         sync.register_installed("make", Version::new(4, 3, 0));
 
         let source_pkg = DebianSbuildPackage {
-            name: klib::string::SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: klib::vec::Vec::from_iter(alloc::vec![klib::string::SigmaString::from("gcc"), klib::string::SigmaString::from("make")]),
+            build_depends: alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
         let source_pkg_missing = DebianSbuildPackage {
-            name: klib::string::SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: vec![
-                "gcc".to_string(),
-                "make".to_string(),
-                "libc-dev".to_string(),
+            build_depends: alloc::vec![
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+                crate::klib::string::SigmaString::from("libc-dev"),
             ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));

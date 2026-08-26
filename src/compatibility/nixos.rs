@@ -75,20 +75,21 @@ impl NixStore {
 
     /// Install package to profile (nix-env -i)
     pub fn install(&mut self, package: &str, profile: &str) -> Result<(), NixError> {
-        if !self.packages.contains_key_str(package) {
-            return Err(NixError::EvaluationError);
-        }
+        let out_path = {
+            let pkg = self.packages.get_str(package).ok_or(NixError::EvaluationError)?;
+            pkg.outputs.get_str("out").cloned()
+        };
 
-        let pkg = self.packages.get_str(package).unwrap();
-        if let Some(out_path) = pkg.outputs.get_str("out") {
-            self.add_to_profile(profile, out_path);
+        if let Some(out_path) = out_path {
+            self.add_to_profile(profile, &out_path);
+            Ok(())
+        } else {
+            Err(NixError::EvaluationError)
         }
-
-        Ok(())
     }
 
     /// Garbage collection (nix-collect-garbage)
-    pub fn garbage_collect(&mut self, delete_old: bool) -> Result<usize, NixError> {
+    pub fn garbage_collect(&mut self, _delete_old: bool) -> Result<usize, NixError> {
         let mut deleted_count = 0;
         let mut to_delete = Vec::new();
 
@@ -124,9 +125,9 @@ impl NixStore {
             .collect()
     }
 
-    fn generate_store_hash(derivation: &str) -> String {
+    fn generate_store_hash(_derivation: &str) -> String {
         // Simple hash simulation for store path
-        let mut hash = String::from("abcdefghijklmnopqrstuvwxyz");
+        let hash = String::from("abcdefghijklmnopqrstuvwxyz");
         let chars: Vec<char> = hash.chars().collect();
         let mut result = String::new();
         for i in 0..32 {
@@ -384,7 +385,7 @@ impl NixChannels {
     pub fn update_channels(&mut self) -> Result<usize, &'static str> {
         // Simulate updating all channels
         let mut updated_count = 0;
-        for channel in self.channels.values() {
+        for _channel in self.channels.values() {
             // In real implementation, this would fetch channel updates
             updated_count += 1;
         }
