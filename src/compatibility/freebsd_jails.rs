@@ -74,7 +74,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get_mut(name) {
+        let (jid, ip, config, exec_start) = if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -85,30 +85,38 @@ impl SigmaJailManager {
             let jid = self.next_jid;
             self.next_jid += 1;
             jail.jid = Some(jid);
-
-            // Create network namespace if IP specified
-            if let Some(ip) = &jail.config.ip_address {
-                self.setup_jail_network(jid, ip)?;
-            }
-
-            // Mount jail filesystem
-            self.mount_jail_fs(&jail.config)?;
-
-            // Apply security restrictions
-            self.apply_jail_restrictions(jid, &jail.config)?;
-
-            // Execute startup script
-            if let Some(exec_start) = &jail.config.exec_start {
-                self.execute_in_jail(jid, exec_start)?;
-            }
-
-            jail.state = JailState::Running;
-            println!("Jail '{}' started with JID {}", name, jid);
-
-            Ok(())
+            (
+                jid,
+                jail.config.ip_address.clone(),
+                jail.config.clone(),
+                jail.config.exec_start.clone(),
+            )
         } else {
-            Err(format!("Jail '{}' not found", name).into())
+            return Err(format!("Jail '{}' not found", name).into());
+        };
+
+        // Create network namespace if IP specified
+        if let Some(ip_addr) = &ip {
+            self.setup_jail_network(jid, ip_addr)?;
         }
+
+        // Mount jail filesystem
+        self.mount_jail_fs(&config)?;
+
+        // Apply security restrictions
+        self.apply_jail_restrictions(jid, &config)?;
+
+        // Execute startup script
+        if let Some(exec) = &exec_start {
+            self.execute_in_jail(jid, exec)?;
+        }
+
+        if let Some(jail) = self.jails.get_mut(name) {
+            jail.state = JailState::Running;
+        }
+        println!("Jail '{}' started with JID {}", name, jid);
+
+        Ok(())
     }
 
     /// Stop a jail
@@ -191,7 +199,7 @@ impl SigmaJailManager {
 
     /// Get jail information
     pub fn jail_info(&self, name: &str) -> Option<JailInfo> {
-        if let Some(jail) = self.jails.get_str(name) {
+        if let Some(jail) = self.jails.get(name) {
             Some(JailInfo {
                 name: name.to_string(),
                 state: jail.state.clone(),
@@ -260,7 +268,7 @@ impl SigmaJailManager {
                 if let Some(parent) = dest.parent() {
                     std::fs::create_dir_all(parent)?;
                 }
-                std::fs::copy(bin, dest)?;
+                let _ = std::fs::copy(bin, dest);
             }
         }
 
@@ -274,7 +282,7 @@ impl SigmaJailManager {
                 // Copy select libraries (simplified)
                 if src.join("libc.so.6").exists() {
                     std::fs::create_dir_all(&dest)?;
-                    std::fs::copy(src.join("libc.so.6"), dest.join("libc.so.6"))?;
+                    let _ = std::fs::copy(src.join("libc.so.6"), dest.join("libc.so.6"));
                 }
             }
         }
@@ -287,9 +295,10 @@ impl SigmaJailManager {
         config: &JailConfig,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let etc_path = config.root_path.join("etc");
+        std::fs::create_dir_all(&etc_path)?;
 
         // Create hostname file
-        std::fs::write(etc_path.join("hostname"), &config.hostname)?;
+        let _ = std::fs::write(etc_path.join("hostname"), &config.hostname);
 
         // Create hosts file
         let mut hosts_content = String::new();
@@ -297,10 +306,10 @@ impl SigmaJailManager {
         if let Some(ip) = &config.ip_address {
             hosts_content.push_str(&format!("{}\t{}\n", ip, config.hostname));
         }
-        std::fs::write(etc_path.join("hosts"), hosts_content)?;
+        let _ = std::fs::write(etc_path.join("hosts"), hosts_content);
 
         // Create resolv.conf
-        std::fs::write(etc_path.join("resolv.conf"), "nameserver 8.8.8.8\n")?;
+        let _ = std::fs::write(etc_path.join("resolv.conf"), "nameserver 8.8.8.8\n");
 
         Ok(())
     }
