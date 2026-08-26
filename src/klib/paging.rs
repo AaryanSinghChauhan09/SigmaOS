@@ -7,8 +7,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
-#[repr(C)]
-
 impl Clone for SimplePageTableEntry {
     fn clone(&self) -> Self {
         Self {

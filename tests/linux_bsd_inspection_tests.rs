@@ -115,7 +115,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -226,6 +225,21 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+
 #[test]
 fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
     use linux_bsd_innovations::{
@@ -286,6 +300,8 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
 
 #[test]
 fn test_alpine_apk_package_index_inspection() {
+    use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry};
+
     let mut apk_index = AlpineApkPackageIndex::new();
     let key = [0x99; 32];
     assert!(apk_index.verify_index_signature(&key));
@@ -305,6 +321,8 @@ fn test_alpine_apk_package_index_inspection() {
 
 #[test]
 fn test_dragonfly_hammer2_snapshot_inspection() {
+    use unimplemented_features::DragonFlyHammer2FsSnapshot;
+
     let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
     hammer2.register_cluster_node(1, "192.168.1.50");
 
@@ -318,6 +336,8 @@ fn test_dragonfly_hammer2_snapshot_inspection() {
 
 #[test]
 fn test_nixos_declarative_config_engine_inspection() {
+    use unimplemented_features::NixOsDeclarativeConfigEngine;
+
     let mut nix_engine = NixOsDeclarativeConfigEngine::new();
     let gen1 = nix_engine.build_generation(0xDEADBEEF, 1680000000, 150, "quiet splash");
     assert_eq!(gen1, 1);
@@ -383,4 +403,57 @@ fn test_linux_bsd_firmware_innovations_inspection() {
     assert!(iommu.parse_acpi_dmar(&dmar_header));
     assert_eq!(iommu.architecture, IommuArchitecture::IntelVtD);
     assert!(iommu.is_preboot_dma_protected);
+}
+
+#[test]
+fn test_bgp_routing_table_manager_inspection() {
+    use protocols::{BgpRoutingTableManager, BgpRoutePrefix};
+
+    let mut bgp_mgr = BgpRoutingTableManager::new(65001, [10, 0, 0, 1], true);
+    bgp_mgr.advertise_prefix([192, 168, 1, 0], 24, [10, 0, 0, 1], 100);
+    assert_eq!(bgp_mgr.routes.len(), 1);
+
+    let incoming = BgpRoutePrefix {
+        prefix_ip: [192, 168, 1, 0],
+        prefix_len: 24,
+        next_hop: [10, 0, 0, 2],
+        as_path: vec![65002],
+        local_pref: 200,
+        is_reflected: false,
+    };
+
+    assert!(bgp_mgr.process_incoming_route(incoming, true));
+    assert_eq!(bgp_mgr.routes.len(), 2);
+    assert!(bgp_mgr.routes[1].is_reflected);
+
+    let best = bgp_mgr.best_path_selection([192, 168, 1, 0], 24).unwrap();
+    assert_eq!(best.local_pref, 200);
+}
+
+#[test]
+fn test_pam_authentication_policy_engine_inspection() {
+    use hardening::{PamAuthenticationPolicyEngine, PamControlFlag, PamModuleType};
+
+    let mut pam = PamAuthenticationPolicyEngine::new(true);
+    pam.add_rule(PamModuleType::Auth, PamControlFlag::Required, "pam_unix", true);
+    pam.add_rule(PamModuleType::Auth, PamControlFlag::Required, "pam_tpm2", true);
+
+    assert!(pam.authenticate_pam_stack(PamModuleType::Auth, true).unwrap());
+    assert!(pam.authenticate_pam_stack(PamModuleType::Auth, false).is_err());
+}
+
+#[test]
+fn test_gentoo_portage_mask_engine_inspection() {
+    use unimplemented_features::GentooPortageMaskEngine;
+
+    let mut portage = GentooPortageMaskEngine::new("amd64");
+    portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
+    portage.register_ebuild("app-admin/sudo", "0", &["amd64"], false);
+
+    assert!(portage.evaluate_installability("app-admin/sudo", "0", false).unwrap());
+    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", false).is_err());
+    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", true).unwrap());
+
+    portage.add_hard_mask("app-admin/sudo");
+    assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
 }
