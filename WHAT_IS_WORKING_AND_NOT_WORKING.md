@@ -358,6 +358,193 @@ dependencies:
 
 ---
 
+### Issue 11: Borrow Checker Conflicts in Method Calls (`E0502`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0502]: cannot borrow `*self` as immutable because it is also borrowed as mutable
+  --> src/compatibility/freebsd_jails.rs:91:17
+   |
+77 |         if let Some(jail) = self.jails.get_mut(name) {
+   |                             ---------- mutable borrow occurs here
+91 |                 self.setup_jail_network(jid, ip)?;
+   |                 ^^^^ immutable borrow occurs here
+```
+
+#### **Why It Occurs:**
+Holding a mutable reference (`self.jails.get_mut(name)`) alive across calls to other methods on `self` (`self.setup_jail_network(...)`) violates Rust's aliasing XOR mutability principle.
+
+#### **How to Fix It (Blueprint):**
+Separate parameter extraction from mutation: extract configuration copies or IDs first, drop the borrow on `self.jails`, perform operations on `self`, and then update `self.jails` afterwards:
+
+```rust
+// BEFORE (Conflicting simultaneous borrow):
+if let Some(jail) = self.jails.get_mut(name) {
+    self.setup_jail_network(jail.id, jail.ip)?;
+    jail.state = JailState::Running;
+}
+
+// AFTER (Separated Phase Borrowing):
+let (jid, ip, config) = if let Some(jail) = self.jails.get(name) {
+    (jail.id, jail.ip, jail.config.clone())
+} else {
+    return Err("Jail not found");
+};
+
+self.setup_jail_network(jid, ip)?;
+
+if let Some(jail) = self.jails.get_mut(name) {
+    jail.state = JailState::Running;
+}
+```
+
+---
+
+### Issue 12: Moved Value Borrow in Data Structure Insertion (`E0382`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0382]: borrow of moved value: `package`
+  --> src/sigpkg/debian_apt_engine.rs:236:21
+   |
+234|         self.installed_packages.insert(package.package.clone(), package);
+   |                                                                 ------- value moved here
+236|         self.status_database.insert(package.package.clone(), ...);
+   |                                     ^^^^^^^^^^^^^^^ value borrowed here after move
+```
+
+#### **Why It Occurs:**
+Passing ownership of `package` into `insert()` moves the struct instance. Subsequent accesses to `package.package.clone()` attempt to read a value that has already been moved out of scope.
+
+#### **How to Fix It (Blueprint):**
+Extract necessary string fields or clone the struct before moving it into the first map:
+
+```rust
+// BEFORE (Move before borrow):
+self.installed_packages.insert(package.package.clone(), package);
+self.status_database.insert(package.package.clone(), "install ok installed".to_string());
+
+// AFTER (Clone or save name before moving):
+let pkg_name = package.package.clone();
+self.installed_packages.insert(pkg_name.clone(), package);
+self.status_database.insert(pkg_name, "install ok installed".to_string());
+```
+
+---
+
+### Issue 13: Move Out of Index on Custom Collections (`E0507`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0507]: cannot move out of index of `klib::vec::Vec<SimplePageTableEntry>`
+  --> src/klib/paging.rs:431:37
+   |
+431|                     let mut entry = pt.entries[pt_idx];
+   |                                     ^^^^^^^^^^^^^^^^^^ move occurs because type does not implement `Copy`
+```
+
+#### **Why It Occurs:**
+Indexing into custom collections returning element values attempts to move the item out of memory. If the element type does not implement `Copy`, Rust forbids moving out of an indexed container.
+
+#### **How to Fix It (Blueprint):**
+Use `.clone()` or borrow by reference (`&` / `&mut`):
+
+```rust
+// BEFORE (Invalid move):
+let mut entry = pt.entries[pt_idx];
+
+// AFTER (Safe clone or reference):
+let mut entry = pt.entries[pt_idx].clone();
+```
+
+---
+
+### Issue 14: Temporary Value Freeing in `unwrap_or` References (`E0716`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0716]: temporary value dropped while borrowed
+  --> src/distro/specialized.rs:565:58
+   |
+565|             let desc = self.channels.get(key).unwrap_or(&"".to_string());
+   |                                                          ^^^^^^^^^^^^^^ temporary value freed here
+```
+
+#### **Why It Occurs:**
+Calling `&"".to_string()` creates a short-lived temporary `String` inside the method argument expression. Returning a reference `&String` to a temporary value that drops at the end of the statement creates a dangling pointer.
+
+#### **How to Fix It (Blueprint):**
+Use `Option::map` with `as_str()` or a static default slice:
+
+```rust
+// BEFORE (Temporary String drop):
+let desc = self.channels.get(key).unwrap_or(&"".to_string());
+
+// AFTER (Safe string slice reference or map):
+let default_desc = String::new();
+let desc = self.channels.get(key).unwrap_or(&default_desc);
+
+// OR:
+let desc = self.channels.get(key).map(|s| s.as_str()).unwrap_or("");
+```
+
+---
+
+### Issue 15: Architecture-Specific Register Inline Assembly (`invalid register rax`)
+
+#### **Symptom / Compiler Output:**
+```text
+error: invalid register `rax`: unknown register
+  --> src/klib/time.rs:118:17
+   |
+118|                 out("rax") rdtsc,
+   |                 ^^^^^^^^^^^^^^^^
+```
+
+#### **Why It Occurs:**
+Inline assembly blocks using x86_64-specific registers (`rax`, `rdx`) compile successfully on `x86_64` targets but fail when built for `aarch64` or `riscv64` targets.
+
+#### **How to Fix It (Blueprint):**
+Gate assembly blocks behind conditional compilation `#[cfg(target_arch = "x86_64")]` with target-agnostic fallback implementations for other architectures:
+
+```rust
+// BEFORE (Ungated x86_64 assembly):
+pub fn read_tsc() -> u64 {
+    let rdtsc: u64;
+    unsafe {
+        core::arch::asm!("rdtsc", out("rax") rdtsc, out("rdx") _);
+    }
+    rdtsc
+}
+
+// AFTER (Conditionally gated target architecture assembly):
+pub fn read_tsc() -> u64 {
+    #[cfg(target_arch = "x86_64")]
+    {
+        let low: u32;
+        let high: u32;
+        unsafe {
+            core::arch::asm!("rdtsc", out("eax") low, out("edx") high);
+        }
+        ((high as u64) << 32) | (low as u64)
+    }
+    #[cfg(target_arch = "aarch64")]
+    {
+        let val: u64;
+        unsafe {
+            core::arch::asm!("mrs {}, cntvct_el0", out(reg) val);
+        }
+        val
+    }
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "aarch64")))]
+    {
+        0 // Fallback timestamp counter for other architectures
+    }
+}
+```
+
+---
+
 ## SECTION 3: ALGORITHM DIAGNOSTICS & FIX BLUEPRINTS FOR AI AGENTS
 
 This section provides complete, self-contained safe Rust algorithm implementations for key OS subsystems. AI agents can reference or drop in these blueprints to fix broken or missing algorithms.
