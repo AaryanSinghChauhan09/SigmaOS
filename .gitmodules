@@ -41,3 +41,7 @@
 [submodule "wiki_remote_clone"]
 	path = wiki_remote_clone
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git
+
+[submodule "wiki_clone"]
+	path = wiki_clone
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git

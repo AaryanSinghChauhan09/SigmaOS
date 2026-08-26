@@ -73,10 +73,12 @@ pub enum BreachSeverity {
     Minor,
     Major,
     Critical,
+}
 pub enum StatutoryAuthority {
     Gdpr,
     Hipaa,
     ISO27001,
+}
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
 #[path = "../src/system/user.rs"]
@@ -88,6 +90,7 @@ mod segmentation_paging;
 pub enum CpuPrivilegeMode {
     KernelRing0,
     UserRing3,
+}
 pub struct GlobalDescriptorTable;
 impl GlobalDescriptorTable {
     pub fn new() -> Self {
@@ -102,12 +105,15 @@ impl GlobalDescriptorTable {
             rpl: segmentation_paging::CpuRing::Ring0Kernel,
             is_ldt: false,
         }
+    }
     pub fn translate_address(
         &self,
         seg_addr: SegmentedAddress,
         _mode: CpuPrivilegeMode,
     ) -> Result<u64, &'static str> {
         Ok(seg_addr.offset)
+    }
+}
 pub struct MultiLevelPagingEngine;
 impl MultiLevelPagingEngine {
     pub fn map_page(
@@ -118,24 +124,33 @@ impl MultiLevelPagingEngine {
         _x: bool,
     ) -> Result<(), &'static str> {
         Ok(())
+    }
     pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
         Ok(PageTableEntry)
+    }
+}
 pub struct PageTableEntry;
 impl PageTableEntry {
     pub fn get_physical_address(&self) -> u64 {
         0x0000000100000000
+    }
+}
 pub enum ProtectionLevel {
     Normal,
     High,
+}
 pub enum ProtectionViolationType {
     ReadViolation,
     WriteViolation,
+}
 pub enum SegmentType {
     Code,
     Data,
+}
 pub struct SegmentedAddress {
     pub selector: SegmentSelector,
     pub offset: u64,
+}
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
 pub type ProcessActivityManager = ActivityManager;
@@ -155,22 +170,26 @@ use community_toolkit::{
 use statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
     StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
 use system_user::UserManager as TestUserManager;
 use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
 use bitmap_pmm::{
     BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
     SyscallTableRouter,
+};
 use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
 use low_level_memory::{
     posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
     RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+};
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
+};
 use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
 use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
 use chimera_linux::{
     ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+};
 use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
 use fedora_compat::DnfPackageResolver;
 use geom::{BioRequest, GeomProvider, GeomTopology};
@@ -183,6 +202,7 @@ use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 use process_activity_manager::{
     ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+};
 use sigmaos::memory::segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
 use sigmaos::process::activity_manager::{ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot as ProcRegisterSnapshot};
 use sigmaos::filesystem::sigma_fs::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};

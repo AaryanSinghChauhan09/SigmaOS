@@ -874,6 +874,16 @@ impl SovereignZonesManager {
 
 // ================= Sovereign Linux Cgroup v2 Governor =================
 
+#[derive(Debug, Clone, Copy)]
+pub struct CgroupResourceLimitsV1 {
+    pub cpu_quota_us: u64,
+    pub cpu_period_us: u64,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u32,
+}
+
 pub struct SovereignCgroupGovernorV1 {
     pub groups: HashMap<String, CgroupGroup>,
 }
@@ -922,7 +932,7 @@ impl SovereignCgroupGovernorV1 {
 
     pub fn check_cpu_budget(&mut self, path: &str, usage_us: u64) -> Result<bool, &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        if let Some(limits) = &group.limits {
+        if let Some(limits) = group.limits {
             if group.cpu_used_us + usage_us <= limits.cpu_quota_us {
                 group.cpu_used_us += usage_us;
                 Ok(true)
@@ -936,7 +946,7 @@ impl SovereignCgroupGovernorV1 {
 
     pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        if let Some(limits) = &group.limits {
+        if let Some(limits) = group.limits {
             if group.memory_allocated_bytes + bytes <= limits.memory_max_bytes {
                 group.memory_allocated_bytes += bytes;
                 Ok(())
