@@ -6,9 +6,11 @@
 /// - Solus eopkg delta package manager & Solus Budgie Raven panel
 /// - Mageia urpmi RPM dependency solver & netinstall engine
 
-use crate::klib::collections::HashMap;
-use crate::klib::Vec;
-use crate::klib::String;
+extern crate alloc;
+use alloc::collections::BTreeMap as HashMap;
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::string::String;
 
 /// Clear Linux Stateless Configuration Overlay
 #[derive(Debug, Clone)]
@@ -46,6 +48,12 @@ impl ClearLinuxStatelessEngine {
     }
 }
 
+impl Default for ClearLinuxStatelessEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Tails Amnesic Incognito Memory & Network Scrubbing Engine
 #[derive(Debug, Clone)]
 pub struct TailsAmnesicEngine {
@@ -80,6 +88,12 @@ impl TailsAmnesicEngine {
                 *b = 0x00;
             }
         }
+    }
+}
+
+impl Default for TailsAmnesicEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -134,6 +148,12 @@ impl ChimeraDinitSupervisor {
     }
 }
 
+impl Default for ChimeraDinitSupervisor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Solus eopkg Delta Package Engine & Budgie Raven Panel
 #[derive(Debug, Clone)]
 pub struct SolusEopkgManager {
@@ -150,6 +170,12 @@ impl SolusEopkgManager {
 
     pub fn apply_delta_binary_patch(&mut self, pkg_name: String, new_version: String) {
         self.installed_eopkgs.insert(pkg_name, new_version);
+    }
+}
+
+impl Default for SolusEopkgManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -175,6 +201,12 @@ impl MageiaUrpmiEngine {
             }
         }
         resolved
+    }
+}
+
+impl Default for MageiaUrpmiEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
