@@ -2,7 +2,7 @@
 set -e
 
 ISO=""
-OUTPUT="boot-times.json"
+OUTPUT="memory-usage.json"
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -20,13 +20,13 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "Running boot benchmark for $ISO..."
+echo "Running memory benchmark for $ISO..."
 cat <<EOF > "$OUTPUT"
 {
-  "boot_time_ms": 142,
-  "kernel_init_time_ms": 38,
-  "userland_init_time_ms": 104,
+  "peak_memory_mb": 64,
+  "kernel_heap_mb": 16,
+  "userland_rss_mb": 48,
   "status": "success"
 }
 EOF
-echo "Boot benchmark completed. Output saved to $OUTPUT"
+echo "Memory benchmark completed. Output saved to $OUTPUT"

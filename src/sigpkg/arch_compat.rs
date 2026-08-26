@@ -120,13 +120,12 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
-        let depends_klib = crate::klib::vec::Vec::from_iter(depends);
 
         Ok(Package::new(
             crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
             crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
-            depends_klib,
+            depends,
             crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
@@ -247,7 +246,7 @@ impl PacmanDbAdapter {
             crate::klib::string::SigmaString::from(name),
             parsed_ver,
             crate::klib::string::SigmaString::from(desc),
-            crate::klib::vec::Vec::new(),
+            alloc::vec::Vec::new(),
             crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
