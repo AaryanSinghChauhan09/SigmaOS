@@ -48,6 +48,7 @@ pub trait BluetoothAdapter {
 pub struct SimpleBluetoothAdapter {
     pub id: DeviceID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub address: [u8; 6],
     pub state: AtomicUsize,
 }
@@ -65,6 +66,7 @@ impl SimpleBluetoothAdapter {
         SimpleBluetoothAdapter {
             id,
             name: name_array,
+            name_len: name_len as u8,
             address: addr_array,
             state: AtomicUsize::new(BluetoothState::Off as usize),
         }
@@ -74,8 +76,10 @@ impl SimpleBluetoothAdapter {
 impl BluetoothAdapter for SimpleBluetoothAdapter {
     fn id(&self) -> DeviceID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every Bluetooth device name access,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
     fn address(&self) -> &[u8] { &self.address }
     fn state(&self) -> BluetoothState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
