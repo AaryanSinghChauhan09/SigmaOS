@@ -42,7 +42,6 @@ pub use process::{
     SigQueuePayload, AdvancedIpcHub, Process, ProcessID, ProcessState, ProcessError, SimpleProcess,
     ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter,
 };
-    SigQueuePayload, AdvancedIpcHub,
 pub mod community;
 pub mod memory;
 pub mod access;
@@ -195,9 +194,6 @@ pub use kernel::{
     InteractiveHybridScheduler, HybridTask,
     CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
-};
-pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
-
     Apc, ApcMode, ApcQueue, ArchitectureEngine,
     AuditBlock, CircularDoublyLinkedList, CpuArchitectureClass,
     CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase, InterruptClass, Irql,
@@ -205,18 +201,11 @@ pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
     MemoryDescriptorList, Pcb, PolicyManager, PolicyError, FastPathIpc, InterruptMechanism,
     ProtectionDomain, ResourceBroker, PrivilegeLevel, PoolType, ProcessorInitState,
     SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
-    Tcb, ThreadState, WorkItem,
-pub mod distro;
-    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IpcError, IpcManager, Irql,
-    LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyManager, PolicyError, FastPathIpc, InterruptMechanism,
-    ProtectionDomain, ResourceBroker, PrivilegeLevel, PoolType, Priority, Process,
-    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    RoundRobinSchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
-    Tcb, ThreadState, WorkItem, PAGE_SIZE,
+    Tcb, ThreadState, WorkItem, Process, ProcessState,
 };
+pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
+
+pub mod distro;
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,

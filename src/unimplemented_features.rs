@@ -1728,6 +1728,7 @@ mod zenith_desktop_core_tests {
         assert_eq!(engine.match_voice_phrase("open terminal"), Some(DesktopShellAction::OpenTerminal));
         assert_eq!(engine.match_voice_phrase("unknown phrase"), None);
     }
+    #[test]
     fn test_gamified_productivity_layer() {
         let mut gamification = GamifiedProductivityLayer::new();
         assert_eq!(gamification.level, 1);
@@ -1737,6 +1738,7 @@ mod zenith_desktop_core_tests {
         assert_eq!(gamification.total_xp, 1200);
         assert_eq!(gamification.level, 2);
         assert!(gamification.badges[0].unlocked); // "Package Artisan" unlocked
+    }
 }
 // =========================================================================
 // 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
@@ -2432,9 +2434,6 @@ impl DragonFlyHammer2FsSnapshotV2 {
 
 #[cfg(test)]
 mod extra_unimplemented_tests {
-mod additional_parity_tests {
-mod tests_v2 {
-mod extra_tests {
     use super::*;
 
     #[test]
