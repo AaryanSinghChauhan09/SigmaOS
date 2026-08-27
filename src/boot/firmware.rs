@@ -4,6 +4,7 @@ use core::convert::TryInto;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::vec;
 
 #[derive(Debug, Clone)]
 pub struct FirmwareMemoryMapEntry {

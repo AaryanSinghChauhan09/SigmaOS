@@ -1,15 +1,14 @@
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-
 
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 // =========================================================================
 // 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -67,32 +66,33 @@ impl GentooPortageMaskEngine {
         Self {
             target_arch: target_arch.to_string(),
             ebuilds: Vec::new(),
-            hard_masked_pkgs: Vec::new(),
+            hard_masked_atoms: Vec::new(),
         }
     }
 
     pub fn register_ebuild(&mut self, category_pkg: &str, version: &str, keywords: &[&str], is_masked: bool) {
-        self.ebuilds.push(EbuildEntry {
-            category_pkg: category_pkg.to_string(),
-            version: version.to_string(),
+        self.ebuilds.push(PortageEbuildProfile {
+            atom_name: format!("{}:{}", category_pkg, version),
+            slot: "0".to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_masked,
+            is_ebuild_masked: is_masked,
         });
     }
 
     pub fn add_hard_mask(&mut self, category_pkg: &str) {
-        self.hard_masked_pkgs.push(category_pkg.to_string());
+        self.hard_masked_atoms.push(category_pkg.to_string());
     }
 
     pub fn evaluate_installability(&self, category_pkg: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
-        if self.hard_masked_pkgs.iter().any(|pkg| pkg == category_pkg) {
+        if self.hard_masked_atoms.iter().any(|pkg| pkg == category_pkg) {
             return Err("Package is hard-masked in package.mask");
         }
 
-        let ebuild = self.ebuilds.iter().find(|e| e.category_pkg == category_pkg && e.version == version)
+        let target_atom = format!("{}:{}", category_pkg, version);
+        let ebuild = self.ebuilds.iter().find(|e| e.atom_name == target_atom || e.atom_name.starts_with(category_pkg))
             .ok_or("Ebuild not found")?;
 
-        if ebuild.is_masked && !accept_keywords {
+        if ebuild.is_ebuild_masked && !accept_keywords {
             return Err("Ebuild is masked by package.mask or keywords");
         }
 
@@ -1799,69 +1799,6 @@ mod linux_lts_upstream_tests {
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
-pub struct GentooEbuildPackage {
-    pub name: String,
-    pub version: String,
-    pub keywords: Vec<String>,
-    pub is_masked: bool,
-}
-
-pub struct GentooPortageMaskEngine {
-    pub target_arch: String,
-    pub ebuilds: Vec<GentooEbuildPackage>,
-    pub hard_masks: Vec<String>,
-}
-
-impl GentooPortageMaskEngine {
-    pub fn new(target_arch: &str) -> Self {
-        Self {
-            target_arch: target_arch.to_string(),
-            ebuilds: Vec::new(),
-            hard_masks: Vec::new(),
-        }
-    }
-
-    pub fn register_ebuild(&mut self, pkg_name: &str, version: &str, keywords: &[&str], masked: bool) {
-        self.ebuilds.push(GentooEbuildPackage {
-            name: pkg_name.to_string(),
-            version: version.to_string(),
-            keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_masked: masked,
-        });
-    }
-
-    pub fn add_hard_mask(&mut self, pkg_name: &str) {
-        self.hard_masks.push(pkg_name.to_string());
-    }
-
-    pub fn evaluate_installability(&self, pkg_name: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
-        if self.hard_masks.iter().any(|m| m == pkg_name) {
-            return Err("Package is hard-masked in package.mask");
-        }
-
-        let ebuild = self.ebuilds.iter().find(|e| e.name == pkg_name && (version == "0" || e.version == version))
-            .ok_or("Ebuild package not found in Portage tree")?;
-
-        if ebuild.is_masked {
-            return Err("Ebuild package is masked");
-        }
-
-        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
-        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
-
-        if is_stable {
-            Ok(true)
-        } else if is_testing {
-            if accept_keywords {
-                Ok(true)
-            } else {
-                Err("Package requires ~arch keyword acceptance in package.accept_keywords")
-            }
-        } else {
-            Err("Package not available for target architecture")
-        }
-    }
-}
 
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
@@ -1900,6 +1837,7 @@ impl GentooUseFlagEngine {
         }
     }
 }
+
 
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;

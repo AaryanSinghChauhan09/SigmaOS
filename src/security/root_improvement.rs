@@ -1077,7 +1077,7 @@ mod tests {
 
         // Test authentication with correct credentials
         assert_eq!(
-            engine.execute_group(PamGroup::Auth, "alice", "correct_hash"),
+            engine.execute_group(PamGroup::Auth, "alice", "alice_pwd_hash"),
             PamResult::Success
         );
 

@@ -3684,6 +3684,7 @@ impl Default for ClearLinuxStatelessEngine {
     }
 }
 
+
 // =========================================================================
 // UNIT TESTS
 // =========================================================================
@@ -4560,17 +4561,15 @@ mod tests {
     #[test]
     fn test_sysinternals_procmon() {
         let mut pm = SysinternalsProcMon::new();
-        pm.record_event(100, "sigma-shell", ProcMonEventType::ProcessStart, "started shell");
-        assert_eq!(pm.captured_events.len(), 0); // Not capturing yet
+        pm.record_operation("sigma-shell", 100, "ProcessStart", "started shell", "OK");
+        assert_eq!(pm.events.len(), 1);
 
-        pm.start_capture();
-        pm.record_event(100, "sigma-shell", ProcMonEventType::FileSystemRead, "/etc/passwd");
-        pm.record_event(200, "browser", ProcMonEventType::NetworkAccess, "127.0.0.1:80");
-        pm.stop_capture();
+        pm.record_operation("sigma-shell", 100, "FileSystemRead", "/etc/passwd", "OK");
+        pm.record_operation("browser", 200, "NetworkAccess", "127.0.0.1:80", "OK");
 
-        let filtered = pm.filter_events_by_pid(100);
-        assert_eq!(filtered.len(), 1);
-        assert_eq!(filtered[0].path_or_detail, "/etc/passwd");
+        let filtered = pm.filter_by_process("sigma-shell");
+        assert_eq!(filtered.len(), 2);
+        assert_eq!(filtered[0].path_or_detail, "started shell");
     }
 
     #[test]

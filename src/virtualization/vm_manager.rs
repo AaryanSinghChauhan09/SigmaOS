@@ -5,9 +5,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use std::collections::HashMap;
-
-#[cfg(test)]
-use std::time::{SystemTime, UNIX_EPOCH};
+use alloc::format;
 
 /// VM configuration
 #[derive(Debug, Clone)]
@@ -209,14 +207,11 @@ pub enum KvmExitReason {
     Interrupt,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
-    Mmio,
     MmioRead { addr: u64, len: u8 },
     MmioWrite { addr: u64, len: u8, data: u64 },
-    Hypercall,
     Hlt,
     Shutdown,
     InternalError,
-    Interrupt,
 }
 
 /// KVM vCPU register state

@@ -2,10 +2,6 @@
 // This module implements key concepts from Linux and BSD distributions
 // that provide competitive advantages for SigmaOS
 
-#![no_std]
-#![cfg_attr(target_os = "none", no_main)]
-
-extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

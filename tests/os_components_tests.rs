@@ -5,8 +5,8 @@ extern crate alloc;
 
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
-use sigmatools::*;
-
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 #[path = "../src/storage/geom.rs"]
 mod geom;
 #[path = "../src/audio/editor.rs"]
@@ -15,12 +15,8 @@ mod audio_editor;
 mod video_editor;
 #[path = "../src/compatibility/chimera_linux.rs"]
 mod chimera_linux;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
@@ -45,94 +41,16 @@ mod access_control;
 mod ext4_ntfs_security;
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
-pub enum BreachSeverity {
-    Minor,
-    Major,
-    Critical,
-}
-pub enum StatutoryAuthority {
-    Gdpr,
-    Hipaa,
-    ISO27001,
-}
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
 #[path = "../src/system/user.rs"]
 mod system_user;
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 #[path = "../src/memory/segmentation_paging.rs"]
 mod segmentation_paging;
-pub enum CpuPrivilegeMode {
-    KernelRing0,
-    UserRing3,
-}
-pub struct GlobalDescriptorTable;
-impl GlobalDescriptorTable {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn insert_descriptor(
-        &mut self,
-        _desc: segmentation_paging::SegmentDescriptor,
-    ) -> SegmentSelector {
-        SegmentSelector {
-            index: 1,
-            rpl: segmentation_paging::CpuRing::Ring0Kernel,
-            is_ldt: false,
-        }
-    }
-    pub fn translate_address(
-        &self,
-        seg_addr: SegmentedAddress,
-        _mode: CpuPrivilegeMode,
-    ) -> Result<u64, &'static str> {
-        Ok(seg_addr.offset)
-    }
-}
-pub struct MultiLevelPagingEngine;
-impl MultiLevelPagingEngine {
-    pub fn map_page(
-        _v: u64,
-        _p: u64,
-        _r: bool,
-        _w: bool,
-        _x: bool,
-    ) -> Result<(), &'static str> {
-        Ok(())
-    }
-    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
-        Ok(PageTableEntry)
-    }
-}
-pub struct PageTableEntry;
-impl PageTableEntry {
-    pub fn get_physical_address(&self) -> u64 {
-        0x0000000100000000
-    }
-}
-pub enum ProtectionLevel {
-    Normal,
-    High,
-}
-pub enum ProtectionViolationType {
-    ReadViolation,
-    WriteViolation,
-}
-pub enum SegmentType {
-    Code,
-    Data,
-}
-pub struct SegmentedAddress {
-    pub selector: SegmentSelector,
-    pub offset: u64,
-}
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
-pub type ProcessActivityManager = process_activity_manager::ActivityManager;
-pub struct ResourceUsageMetrics;
 #[path = "../src/filesystem/sigma_fs.rs"]
 mod sigma_fs_extended;
 #[path = "../src/event/epoll.rs"]
@@ -141,58 +59,31 @@ mod epoll;
 mod elf_relocation;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 
-use community_toolkit::{
-    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
-    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
-};
-use statutory_compliance::{
-    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
-    StatutoryGovernanceLayer, StatutoryGovernanceRule,
-};
-use system_user::UserManager as TestUserManager;
-use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
-use bitmap_pmm::{
-    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
-    SyscallTableRouter,
-};
-use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
-use low_level_memory::{
-    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
-    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
-};
-use task_scheduler::{
-    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
-};
+use pipes::Pipe;
+use unveil::{UnveilManager, UnveilPermission};
+use geom::{BioRequest, GeomProvider, GeomTopology};
 use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-};
+use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
+use chimera_linux::{ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager};
 use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
 use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
 use fedora_compat::DnfPackageResolver;
-use geom::{BioRequest, GeomProvider, GeomTopology};
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
-use pipes::Pipe;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
+use task_scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType};
+use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
+use bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
+use low_level_memory::{posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator};
+use access_control::{AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate};
+use statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
+use community_toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
+use system_user::UserManager as TestUserManager;
 use sigmatools::*;
-use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
-use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
+use process_activity_manager::{ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot};
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use process_activity_manager::{
-    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
-};
-
-use access_control::{
-    AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
-    MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
-};
+use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 
 #[test]
 fn test_segmentation_paging_and_aslr() {
