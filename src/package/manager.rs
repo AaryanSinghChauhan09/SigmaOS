@@ -87,6 +87,94 @@ pub trait PackageManager {
     fn get_package(&self, id: PackageID) -> Option<&dyn Package>;
 }
 
+/// GUI App Store Manager (GNOME Software / KDE Discover Parity)
+#[derive(Debug, Clone)]
+pub struct AppReview {
+    pub author: alloc::string::String,
+    pub rating_stars: u8,
+    pub comment: alloc::string::String,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppListing {
+    pub app_id: alloc::string::String,
+    pub display_name: alloc::string::String,
+    pub category: alloc::string::String,
+    pub description: alloc::string::String,
+    pub average_rating: f32,
+    pub reviews: alloc::vec::Vec<AppReview>,
+    pub is_installed: bool,
+}
+
+pub struct GuiAppStoreManager {
+    pub store_listings: alloc::vec::Vec<AppListing>,
+}
+
+impl GuiAppStoreManager {
+    pub fn new() -> Self {
+        GuiAppStoreManager {
+            store_listings: alloc::vec::Vec::new(),
+        }
+    }
+
+    pub fn publish_app(&mut self, app_id: &str, display_name: &str, category: &str, description: &str) {
+        let listing = AppListing {
+            app_id: alloc::string::String::from(app_id),
+            display_name: alloc::string::String::from(display_name),
+            category: alloc::string::String::from(category),
+            description: alloc::string::String::from(description),
+            average_rating: 5.0,
+            reviews: alloc::vec::Vec::new(),
+            is_installed: false,
+        };
+        self.store_listings.push(listing);
+    }
+
+    pub fn add_review(&mut self, app_id: &str, author: &str, rating_stars: u8, comment: &str) -> Result<(), &'static str> {
+        let stars = rating_stars.clamp(1, 5);
+        for app in &mut self.store_listings {
+            if app.app_id == app_id {
+                app.reviews.push(AppReview {
+                    author: alloc::string::String::from(author),
+                    rating_stars: stars,
+                    comment: alloc::string::String::from(comment),
+                });
+                let total_stars: u32 = app.reviews.iter().map(|r| r.rating_stars as u32).sum();
+                app.average_rating = total_stars as f32 / app.reviews.len() as f32;
+                return Ok(());
+            }
+        }
+        Err("App ID not found in store registry")
+    }
+
+    pub fn search_apps(&self, keyword: &str) -> alloc::vec::Vec<&AppListing> {
+        self.store_listings
+            .iter()
+            .filter(|app| {
+                app.display_name.contains(keyword)
+                    || app.description.contains(keyword)
+                    || app.category.contains(keyword)
+            })
+            .collect()
+    }
+
+    pub fn install_gui_app(&mut self, app_id: &str) -> Result<(), &'static str> {
+        for app in &mut self.store_listings {
+            if app.app_id == app_id {
+                app.is_installed = true;
+                return Ok(());
+            }
+        }
+        Err("App ID not found in store")
+    }
+}
+
+impl Default for GuiAppStoreManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum PackageError { Success = 0, PackageNotFound = 1, InstallFailed = 2, UpdateFailed = 3 }
@@ -263,5 +351,24 @@ mod tests {
         assert_eq!(pkg.version(), b"8.1.0");
         assert_eq!(pkg.name_len, 4);
         assert_eq!(pkg.version_len, 5);
+    }
+
+    #[test]
+    fn test_gui_app_store_manager() {
+        let mut store = GuiAppStoreManager::new();
+        store.publish_app("org.gimp.GIMP", "GIMP Image Editor", "Graphics", "Professional photo manipulation software");
+        assert_eq!(store.store_listings.len(), 1);
+
+        assert!(store.add_review("org.gimp.GIMP", "Alice", 5, "Amazing open source photo editor!").is_ok());
+        assert!(store.add_review("org.gimp.GIMP", "Bob", 3, "Good but complex UI").is_ok());
+
+        let app = &store.store_listings[0];
+        assert_eq!(app.average_rating, 4.0);
+
+        let results = store.search_apps("Image");
+        assert_eq!(results.len(), 1);
+
+        assert!(store.install_gui_app("org.gimp.GIMP").is_ok());
+        assert!(store.store_listings[0].is_installed);
     }
 }

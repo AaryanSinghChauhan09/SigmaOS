@@ -175,13 +175,14 @@ pub use absorb_tools::{
 
 pub use antix::*;
 pub use bsd::{
-    BsdJail, BsdKqueueFilter as BsdCompatKqueueFilter, FreeBsdGeomManager, FreeBsdJailManager,
+    BsdJail, FreeBsdGeomManager, FreeBsdJailManager,
     GeomClassType, GeomProvider, NetBsdRumpKernelRouter, OpenBsdSandboxGuard,
     OpenBsdSysctlKernelMib, RumpHypercall,
 };
 pub use legacy_adapters::*;
 pub use linux_compat::{
-    AuxVector, BsdKevent, BsdKqueueFilter, BsdKqueueMultiplexer, DistroTargetProfile,
+    AuxVector, BsdKevent, BsdKqueueFilter, BsdKqueueFilter as BsdCompatKqueueFilter,
+    BsdKqueueMultiplexer, DistroTargetProfile,
     LinuxCompatSpec, LinuxElfLoaderShim, LinuxProcFsAdapter, LinuxSyscallNum,
     LinuxSyscallTranslator, OpenBsdPledgeUnveilFilter, TargetDistro,
 };

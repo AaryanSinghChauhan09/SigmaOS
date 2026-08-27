@@ -1,0 +1,20 @@
+name: FreeBSD bhyve NVMe Passthrough CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-bhyve-nvme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Verify FreeBSD bhyve NVMe PCI Passthrough
+        run: |
+          cargo test --test sovereign_subsystems_inspection_tests
