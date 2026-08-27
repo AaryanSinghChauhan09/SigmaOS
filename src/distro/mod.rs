@@ -27,9 +27,9 @@ pub mod stable_components;
 pub mod tiny_core;
 pub mod arch;
 pub mod cachy;
+pub mod linux_bsd_parity_extended;
 pub mod wiki_ideas_implementation;
 pub mod missing_distro_innovations;
-pub mod bsd_linux_innovations;
 
 pub use arch_parity::{
     PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
@@ -91,9 +91,16 @@ pub use bsd_linux_innovations::{
     RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
     SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
 };
+pub use linux_bsd_parity_extended::{
+    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
+    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
+    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
+    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
+    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot as ExtSnapperSnapshot, SnapperBtrfsEngine,
+};
 pub use wiki_ideas_implementation::{
     Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
-    SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    SnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
     PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
     CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
     SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,

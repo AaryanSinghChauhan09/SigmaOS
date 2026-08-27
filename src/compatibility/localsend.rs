@@ -22,6 +22,8 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 extern crate alloc;
+
+extern crate alloc;
 use crate::security::capability::CapabilityToken;
 use alloc::collections::{BTreeMap, BTreeSet};
 

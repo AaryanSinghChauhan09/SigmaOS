@@ -2,7 +2,7 @@
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
 use crate::klib::HashMap;
-use crate::klib::collections::HashSet;
+use crate::klib::HashSet;
 use std::io::{self, BufRead, Write};
 
 /// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs

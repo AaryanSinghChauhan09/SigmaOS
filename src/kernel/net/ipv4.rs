@@ -24,7 +24,6 @@ extern crate alloc;
 use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ── Types ────────────────────────────────────────────────────────────────
 
