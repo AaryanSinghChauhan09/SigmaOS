@@ -1,7 +1,7 @@
 extern crate alloc;
 
-// Sovereign Sigpkg - Complete 20-Pillar Package, Build & Reproducibility System for SigmaOS
-use crate::klib::BTreeMap;
+extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

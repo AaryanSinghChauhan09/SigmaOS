@@ -22,6 +22,10 @@ use alloc::string::{String, ToString};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::Vec;
 /// SigmaOS Netfilter — stateless and stateful packet filtering
+/// Absorbs Linux netfilter hooks: PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING
+/// Supports: ACCEPT, DROP, REJECT, LOG actions; conntrack state matching
+extern crate alloc;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NfHookpoint {

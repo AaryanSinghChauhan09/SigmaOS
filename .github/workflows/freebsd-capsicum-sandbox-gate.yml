@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-permissions:
-  contents: read
-
 jobs:
   capsicum-gate:
     name: FreeBSD Capsicum Descriptor Capability Delegation Gate

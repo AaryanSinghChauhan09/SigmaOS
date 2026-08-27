@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-permissions:
-  contents: read
-
 jobs:
   snapper-cow-recovery:
     name: Snapper Pre/Post CoW Transaction Recovery Verification

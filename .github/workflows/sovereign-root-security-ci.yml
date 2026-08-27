@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-permissions:
-  contents: read
-
 jobs:
   root-security-audit:
     name: BSD Securelevels & OpenBSD Doas Security Verification

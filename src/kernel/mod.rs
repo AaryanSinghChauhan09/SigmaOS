@@ -37,6 +37,7 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod sched;
 pub mod structures;
 pub mod subsystem;
 pub mod virtual_cpu;

@@ -14,7 +14,6 @@ pub mod mind_map;
 pub mod mint_competitor;
 pub mod sovereign_apps;
 pub mod subtitle_editor;
-pub mod tmux;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,

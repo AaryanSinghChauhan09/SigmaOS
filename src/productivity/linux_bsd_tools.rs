@@ -1,7 +1,9 @@
 extern crate alloc;
 // SigmaOS Standard CLI Utilities & Diagnostic Tools (Linux/BSD/Windows Parity)
-use alloc::string::String;
-use alloc::vec::Vec;
+// Implements top/htop, ifconfig/ip, and ping equivalents inside the microkernel ecosystem.
+
+extern crate alloc;
+use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::BTreeMap;
 

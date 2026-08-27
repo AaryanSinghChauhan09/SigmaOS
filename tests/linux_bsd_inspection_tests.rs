@@ -43,11 +43,14 @@ mod zenith_advanced;
 #[path = "../src/distro/wiki_ideas_implementation.rs"]
 mod wiki_ideas_implementation;
 
-#[path = "../src/filesystem/bsd_linux_innovations.rs"]
-mod fs_bsd_linux_innovations;
+#[path = "../src/process/advanced_process_control.rs"]
+mod advanced_process_control;
 
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+mod missing_distro_innovations;
+
+#[path = "../src/process/sovereign_process_engine.rs"]
+mod sovereign_process_engine;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
@@ -275,7 +278,18 @@ fn test_wiki_distro_innovations_inspection() {
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
 
-    // 9. Missing Distro Innovations (Clear Linux, Tails, Chimera, FreeBsd VNET, OpenBSD Unveil Auditor)
+    // 9. Sovereign Process Engine (Process Spawning, I/O, Background Execution & IPC)
+    use sovereign_process_engine::{SovereignProcessManager, SovereignProcessState};
+    let mut sov_mgr = SovereignProcessManager::new();
+    let s_pid = sov_mgr.sovereign_spawn("test_worker", 10);
+    sov_mgr.sovereign_run_background(s_pid).unwrap();
+    assert_eq!(sov_mgr.processes.get(&s_pid).unwrap().state, SovereignProcessState::BackgroundRunning);
+
+    let ch_id = sov_mgr.create_ipc_channel(s_pid, 2);
+    sov_mgr.sovereign_ipc_send(ch_id, b"data_pkt").unwrap();
+    assert_eq!(sov_mgr.sovereign_ipc_receive(ch_id).unwrap(), b"data_pkt");
+
+    // 10. Missing Distro Innovations (Clear Linux, Tails, Chimera, FreeBsd VNET, OpenBSD Unveil Auditor)
     use missing_distro_innovations::{
         ClearLinuxStatelessEngine, TailsAmnesicEngine, ChimeraDinitSupervisor, DinitServiceState,
         FreeBsdVnetStackEngine, OpenBsdUnveilAuditor,

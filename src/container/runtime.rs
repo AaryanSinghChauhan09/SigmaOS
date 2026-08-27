@@ -498,6 +498,7 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
+pub type ContainerCapability = RuntimeCapability;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
