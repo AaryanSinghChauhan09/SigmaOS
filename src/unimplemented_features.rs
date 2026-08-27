@@ -1679,6 +1679,55 @@ mod linux_lts_upstream_tests {
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
+pub struct GentooPortageMaskEngine {
+    pub architecture: String,
+    pub ebuilds: HashMap<String, (String, Vec<String>, bool)>, // pkg -> (ver, keywords, masked)
+    pub hard_masks: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(architecture: &str) -> Self {
+        Self {
+            architecture: architecture.to_string(),
+            ebuilds: HashMap::new(),
+            hard_masks: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, package: &str, version: &str, keywords: &[&str], masked: bool) {
+        let kw_vec = keywords.iter().map(|s| s.to_string()).collect();
+        self.ebuilds.insert(package.to_string(), (version.to_string(), kw_vec, masked));
+    }
+
+    pub fn add_hard_mask(&mut self, package: &str) {
+        self.hard_masks.push(package.to_string());
+    }
+
+    pub fn evaluate_installability(&self, package: &str, _version: &str, accept_testing: bool) -> Result<bool, &'static str> {
+        if self.hard_masks.contains(&package.to_string()) {
+            return Err("Package is hard-masked in package.mask");
+        }
+
+        if let Some((_, keywords, masked)) = self.ebuilds.get(package) {
+            if *masked {
+                return Err("Package version is masked");
+            }
+
+            let is_stable = keywords.contains(&self.architecture);
+            let testing_kw = format!("~{}", self.architecture);
+            let is_testing = keywords.contains(&testing_kw);
+
+            if is_stable || (accept_testing && is_testing) {
+                Ok(true)
+            } else {
+                Err("Package lacks matching KEYWORDS for architecture")
+            }
+        } else {
+            Err("Package ebuild not found")
+        }
+    }
+}
+
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
     pub disabled_flags: Vec<String>,
