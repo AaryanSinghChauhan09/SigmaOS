@@ -126,7 +126,7 @@ pub use distro::{
     DevTool, DeveloperToolkit, DirectoryService, DirectoryUser, DllLoader, DllModule,
     DpkgMultiArch, DragonFlyHammerFs, EcuController, EduChallenge, EduPlayground, FlakeInput,
     ForumChannel, ForumPost, FreezeBasedStabilization, GNUGuixShepherdSupervisor, GdiObjectType,
-    GentooPortageUseFlagsEngine, GuixDerivation, GuixFunctionalStore, HalError,
+    GentooPortageMaskEngine, GentooPortageUseFlagsEngine, GuixDerivation, GuixFunctionalStore, HalError,
     Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, HardwareAbstractionLayer,
     HardwareCertificate, HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite,
     HelpSystem, HookAction, HookWhen, HowToGuide, HpcClusterJob, HpcJobState, ImeCandidate,

@@ -8,26 +8,30 @@ use segmentation_paging::{
 extern crate alloc;
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
-use sigmaos::ipc::pipes::Pipe;
-use sigmaos::security::sigma_unveil::{UnveilManager, UnveilPermission};
-use sigmaos::filesystem::geom::{GeomProvider, GeomTopology, BioRequest};
-use sigmaos::audio::editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
-use sigmaos::graphics::video::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
-use sigmaos::compatibility::chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
-use sigmaos::compatibility::debian::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
-use sigmaos::compatibility::cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
-use sigmaos::distro::endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use sigmaos::compatibility::fedora::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
-use sigmaos::scheduler::scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType};
+use pipes::Pipe;
 
-use sigmaos::ipc::alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
-use sigmaos::memory::bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
-use sigmaos::memory::low_level::{CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr};
-use sigmaos::access::control::{AclEntry, AclType, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask};
-use sigmaos::dashboard::statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
-use sigmaos::community::toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
-use sigmaos::system::user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
-use sigmaos::tools::sigmatools::*;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+use unveil::{UnveilManager, UnveilPermission};
+
+use geom::{GeomProvider, GeomTopology, BioRequest};
+use audio_editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
+use video_editor::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
+use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
+use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
+use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
+use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
+use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use task_scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType};
+
+use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
+use bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
+use low_level_memory::{CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr};
+use access_control::{AclEntry, AclType, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask};
+use statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
+use community_toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
+use system_user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
+use sigmatools::*;
 
 #[path = "../src/storage/geom.rs"]
 mod geom;
@@ -195,7 +199,6 @@ use fedora_compat::DnfPackageResolver;
 use geom::{BioRequest, GeomProvider, GeomTopology};
 use pipes::Pipe;
 use sigmatools::*;
-use unveil::{UnveilManager, UnveilPermission};
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
@@ -203,11 +206,6 @@ use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesyste
 use process_activity_manager::{
     ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
 };
-use sigmaos::memory::segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
-use sigmaos::process::activity_manager::{ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot as ProcRegisterSnapshot};
-use sigmaos::filesystem::sigma_fs::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use sigmaos::event::epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
-use sigmaos::loader::elf::relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
@@ -274,8 +272,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 #[test]
 fn test_process_activity_manager_and_registers() {
     let mut pam = ActivityManager::new();
-    pam.register_process(500, "chrome", "/usr/bin/chrome").unwrap();
-    pam.register_thread(500, 501, "render_main").unwrap();
+    pam.register_process(500, 0, "chrome", 0);
 
     pam.set_foreground_process(500).unwrap();
     let active_proc = pam.get_process_activity(500).unwrap();
