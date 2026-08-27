@@ -1,5 +1,8 @@
 name: Advanced Process Control Subsystem CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master, "feat/*" ]

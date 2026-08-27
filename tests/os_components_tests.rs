@@ -177,6 +177,8 @@ use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParu
 use fedora_compat::DnfPackageResolver;
 use geom::{BioRequest, GeomProvider, GeomTopology};
 use pipes::Pipe;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 use sigmatools::*;
 use unveil::{UnveilManager, UnveilPermission};
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
@@ -252,7 +254,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 #[test]
 fn test_process_activity_manager_and_registers() {
     let mut pam = ActivityManager::new();
-    pam.register_process(500, 0, "chrome", 0);
+    pam.register_process(500, 1, "chrome", 0);
     pam.register_thread(500, 501, "render_main").unwrap();
 
     pam.set_foreground_process(500).unwrap();
@@ -423,7 +425,7 @@ fn test_chimera_linux_parity() {
 
 #[test]
 fn test_debian_compat_system() {
-    let mut alts = DebianAlternativesSystem::new("editor".to_string());
+    let mut alts = debian_compat::DebianAlternativesSystem::new("editor".to_string());
     alts.register_alternative(
         "/usr/bin/editor".to_string(),
         "/usr/bin/vim".to_string(),
@@ -437,8 +439,8 @@ fn test_debian_compat_system() {
 
     assert_eq!(alts.get_active_target().unwrap(), "/usr/bin/nano");
 
-    let mut repo = AptRepositorySync::new(
-        DebianChannel::Stable,
+    let mut repo = debian_compat::AptRepositorySync::new(
+        debian_compat::DebianChannel::Stable,
         "http://deb.debian.org/debian".to_string(),
     );
     repo.verify_release_keyring(&[0x99, 0x01]);
