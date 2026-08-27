@@ -108,6 +108,8 @@ pub use wiki_ideas_implementation::{
     SnapperSnapshot as WikiSnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
     PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
     CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT,
+    CpuPStateGovernor, JournalLogEntry, NumaNodeTopology, SovereignHybridSchedulerInnovations,
+    SovereignSystemdParityEngine, SystemdUnit, SystemdUnitState, SystemdUnitType,
 };
 pub use ready_to_use::{
     DistroServiceManager, ServiceUnit, MountEntry, MountType, UniversalMountEngine,
