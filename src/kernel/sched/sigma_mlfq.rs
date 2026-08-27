@@ -4,7 +4,7 @@ use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-use crate::filesystem::FsError;
+use crate::klib::fs::FsError;
 
 /// Multi-Level Feedback Queue (MLFQ) Scheduler
 ///

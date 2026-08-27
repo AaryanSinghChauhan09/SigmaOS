@@ -40,7 +40,6 @@ pub mod uuid {
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use core::fmt;
 
 #[derive(Clone)]
 pub struct SigmaString {

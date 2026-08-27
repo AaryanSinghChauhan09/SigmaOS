@@ -22,7 +22,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
-use crate::filesystem::FsError;
+use crate::klib::fs::FsError;
 use crate::security::CapabilityToken;
 
 pub const PID_MAX_LIMIT: u32 = 32768;

@@ -4,7 +4,7 @@ extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
-use crate::filesystem::FsError;
+use crate::klib::fs::FsError;
 use crate::kernel::sched::scheduler::{RunQueue, SchedClass};
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 

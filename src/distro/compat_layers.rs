@@ -17,7 +17,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 extern crate alloc;
-use alloc::collections::BTreeMap as HashMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::BTreeMap;
