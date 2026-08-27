@@ -6,6 +6,7 @@ use segmentation_paging::{
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
 extern crate alloc;
+
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
 #[path = "../src/security/unveil.rs"]
@@ -33,7 +34,6 @@ use unveil::{UnveilManager, UnveilPermission};
 
 #[path = "../src/storage/geom.rs"]
 mod geom;
-
 #[path = "../src/audio/editor.rs"]
 mod audio_editor;
 #[path = "../src/graphics/video_editor.rs"]
@@ -67,11 +67,6 @@ mod low_level_memory;
 mod access_control;
 #[path = "../src/filesystem/ext4_ntfs_security.rs"]
 mod ext4_ntfs_security;
-pub enum AclTag {
-    User(u32),
-    Group(u32),
-    Other,
-}
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
 pub enum BreachSeverity {
@@ -110,15 +105,12 @@ impl GlobalDescriptorTable {
             rpl: segmentation_paging::CpuRing::Ring0Kernel,
             is_ldt: false,
         }
-    }
     pub fn translate_address(
         &self,
         seg_addr: SegmentedAddress,
         _mode: CpuPrivilegeMode,
     ) -> Result<u64, &'static str> {
         Ok(seg_addr.offset)
-    }
-}
 pub struct MultiLevelPagingEngine;
 impl MultiLevelPagingEngine {
     pub fn map_page(
@@ -129,33 +121,24 @@ impl MultiLevelPagingEngine {
         _x: bool,
     ) -> Result<(), &'static str> {
         Ok(())
-    }
     pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
         Ok(PageTableEntry)
-    }
-}
 pub struct PageTableEntry;
 impl PageTableEntry {
     pub fn get_physical_address(&self) -> u64 {
         0x0000000100000000
-    }
-}
 pub enum ProtectionLevel {
     Normal,
     High,
-}
 pub enum ProtectionViolationType {
     ReadViolation,
     WriteViolation,
-}
 pub enum SegmentType {
     Code,
     Data,
-}
 pub struct SegmentedAddress {
     pub selector: SegmentSelector,
     pub offset: u64,
-}
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
 pub type ProcessActivityManager = process_activity_manager::ActivityManager;
@@ -168,6 +151,9 @@ mod epoll;
 mod elf_relocation;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+
 use community_toolkit::{
     CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
     SecurityProfileTemplateStore, VirtualizationBlueprintStore,
@@ -217,11 +203,16 @@ use sigmaos::event::epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET
 use sigmaos::loader::elf::relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 use sigmaos::security::sigma_unveil as unveil;
 use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+use segmentation_paging::{
+    AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
+    SegmentDescriptor, SegmentSelector,
+};
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
     MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
 };
+
 #[test]
 fn test_segmentation_paging_and_aslr() {
     let code_desc = SegmentDescriptor::code_segment_ring0();

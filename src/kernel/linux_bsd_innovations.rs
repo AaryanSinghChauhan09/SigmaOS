@@ -345,7 +345,7 @@ impl OpenBsdPledge {
 
 // ================= Linux cgroups v2 Governor =================
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct CgroupResourceLimits {
     pub cpu_quota_us: u64,
     pub cpu_period_us: u64,

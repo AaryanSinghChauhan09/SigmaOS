@@ -1625,6 +1625,12 @@ mod peripheral_tests {
     fn test_section_6_3_sat_solver() {
         let mut sat = SatSolverEngine::new();
 
+        let node_b = PackageNode {
+            pkg_id: 1,
+            version: PkgVersion { major: 2, minor: 1 },
+            dependencies: [None, None, None, None],
+        };
+
         let node_a = PackageNode {
             pkg_id: 0,
             version: PkgVersion { major: 1, minor: 0 },
@@ -1635,6 +1641,7 @@ mod peripheral_tests {
             version: PkgVersion { major: 2, minor: 1 },
             dependencies: [None, None, None, None],
         };
+        assert!(sat.add_package_node(node_b));
         assert!(sat.add_package_node(node_a));
         assert!(sat.add_package_node(node_b));
         assert!(sat.solve(0));
@@ -2342,6 +2349,7 @@ impl DragonFlyHammer2FsSnapshotV2 {
 #[cfg(test)]
 mod extra_unimplemented_tests {
 mod additional_parity_tests {
+mod tests_v2 {
     use super::*;
 
     #[test]
