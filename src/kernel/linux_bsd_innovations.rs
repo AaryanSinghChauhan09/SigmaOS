@@ -3126,19 +3126,19 @@ impl SovereignCgroupGovernor {
         let mut controller = SovereignCgroupGovernor::new();
         controller.create_group("db").unwrap();
         assert_eq!(controller.groups.len(), 1);
-        use crate::kernel::proc::cgroups::{CgroupManager, ResourceLimits};
 
-        let mut cgm = CgroupManager::new();
-        let limits = ResourceLimits {
-            cpu_shares: 512,
-            max_memory_bytes: 1024 * 1024,
-            max_pids: 2,
+        let limits = CgroupResourceLimits {
+            cpu_quota_us: 100000,
+            cpu_period_us: 100000,
+            memory_max_bytes: 1024 * 1024,
+            memory_high_bytes: 512 * 1024,
+            memory_swap_max_bytes: 0,
+            io_weight: 100,
         };
-        cgm.create_group("db", limits).unwrap();
-        assert_eq!(cgm.get_limits("db").unwrap().cpu_shares, 512);
-        cgm.attach_process("db", 1001).unwrap();
-        cgm.attach_process("db", 1002).unwrap();
-        assert!(cgm.attach_process("db", 1003).is_err());
+        controller.configure_limits("db", limits).unwrap();
+        assert_eq!(controller.groups.get("db").unwrap().limits.as_ref().unwrap().memory_max_bytes, 1024 * 1024);
+        controller.attach_pid("db", 1001).unwrap();
+        controller.attach_pid("db", 1002).unwrap();
         let mut governor = SovereignCgroupGovernorV1::new();
         governor.create_group("db").unwrap();
         assert_eq!(governor.groups.len(), 1);

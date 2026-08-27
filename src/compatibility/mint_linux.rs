@@ -283,7 +283,11 @@ impl MintSoftwareManager {
 
     pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
         let mut filtered = Vec::new();
+        let cat_len = category.len();
         for app in self.apps_catalog.iter() {
+            if app.category.len() < cat_len {
+                continue;
+            }
             let mut matches = true;
             for i in 0..cat_len {
                 if app.category[i] != category[i] {
@@ -725,7 +729,7 @@ mod tests {
 
     #[test]
     fn test_mint_cinnamon_styling_options() {
-        let style = MintCinnamonStyling::default();
+        let mut style = MintCinnamonStyling::default();
         assert_eq!(style.panel_height, 40);
         assert!(style.window_effects_enabled);
 

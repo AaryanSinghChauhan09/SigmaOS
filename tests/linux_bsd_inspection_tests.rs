@@ -49,6 +49,21 @@ mod advanced_process_control;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
 
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -56,7 +71,6 @@ use unimplemented_features::{
     AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
 };
 use unveil::{UnveilManager, UnveilPermission};
-use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -128,7 +142,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -363,10 +376,6 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-#[path = "../src/security/hardening.rs"]
-mod hardening;
 
 #[path = "../src/distro/linux_bsd_parity.rs"]
 mod linux_bsd_parity;
@@ -423,6 +432,7 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
     let pfn = mem_alloc.allocate_2mb_superpage().unwrap();
     assert_eq!(pfn, 0);
 }
+#[test]
 fn test_alpine_apk_package_index_inspection() {
     use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry};
     let mut apk_index = AlpineApkPackageIndex::new();
@@ -434,9 +444,13 @@ fn test_alpine_apk_package_index_inspection() {
         arch: "x86_64".to_string(),
         sha256_hash: [0xAB; 32],
         dependencies: vec!["musl".to_string()],
+    });
     let pkg = apk_index.find_package("openssl").unwrap();
     assert_eq!(pkg.version, "3.1.0");
     assert_eq!(apk_index.resolve_dependencies("openssl"), vec!["musl"]);
+}
+
+#[test]
 fn test_dragonfly_hammer2_snapshot_inspection() {
     use unimplemented_features::DragonFlyHammer2FsSnapshot;
     let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
@@ -445,6 +459,9 @@ fn test_dragonfly_hammer2_snapshot_inspection() {
     assert!(hammer2.replicate_snapshot_to_node(snap_id, 1).is_ok());
     let rolled_back_merkle = hammer2.rollback_pfs("ROOT_PFS", snap_id).unwrap();
     assert_eq!(rolled_back_merkle, 0x1234567887654321);
+}
+
+#[test]
 fn test_nixos_declarative_config_engine_inspection() {
     use unimplemented_features::NixOsDeclarativeConfigEngine;
     let mut nix_engine = NixOsDeclarativeConfigEngine::new();
@@ -456,11 +473,15 @@ fn test_nixos_declarative_config_engine_inspection() {
     let rolled_back = nix_engine.rollback_generation().unwrap();
     assert_eq!(rolled_back.gen_number, 1);
     assert_eq!(nix_engine.active_generation, 1);
+}
+
+#[test]
 fn test_linux_bsd_firmware_innovations_inspection() {
     use firmware::{
         EfiVariableStore, CpuMicrocodePatchEngine, MicrocodeVendor,
         FirmwareCapsuleUpdateManager, CapsuleUpdateStatus, SmbiosFirmwareParser,
         IommuFirmwareEngine, IommuArchitecture, EFI_GLOBAL_VARIABLE_GUID,
+    };
     // 1. UEFI NVRAM Variable Management (Linux efivarfs & FreeBSD efivar(8))
     let mut efivars = EfiVariableStore::new();
     assert!(efivars.get_variable("BootOrder", EFI_GLOBAL_VARIABLE_GUID).is_some());
@@ -499,6 +520,9 @@ fn test_linux_bsd_firmware_innovations_inspection() {
     assert!(iommu.parse_acpi_dmar(&dmar_header));
     assert_eq!(iommu.architecture, IommuArchitecture::IntelVtD);
     assert!(iommu.is_preboot_dma_protected);
+}
+
+#[test]
 fn test_bgp_routing_table_manager_inspection() {
     use protocols::{BgpRoutingTableManager, BgpRoutePrefix};
     let mut bgp_mgr = BgpRoutingTableManager::new(65001, [10, 0, 0, 1], true);
@@ -511,11 +535,15 @@ fn test_bgp_routing_table_manager_inspection() {
         as_path: vec![65002],
         local_pref: 200,
         is_reflected: false,
+    };
     assert!(bgp_mgr.process_incoming_route(incoming, true));
     assert_eq!(bgp_mgr.routes.len(), 2);
     assert!(bgp_mgr.routes[1].is_reflected);
     let best = bgp_mgr.best_path_selection([192, 168, 1, 0], 24).unwrap();
     assert_eq!(best.local_pref, 200);
+}
+
+#[test]
 fn test_pam_authentication_policy_engine_inspection() {
     use hardening::{PamAuthenticationPolicyEngine, PamControlFlag, PamModuleType};
     let mut pam = PamAuthenticationPolicyEngine::new(true);
@@ -523,6 +551,9 @@ fn test_pam_authentication_policy_engine_inspection() {
     pam.add_rule(PamModuleType::Auth, PamControlFlag::Required, "pam_tpm2", true);
     assert!(pam.authenticate_pam_stack(PamModuleType::Auth, true).unwrap());
     assert!(pam.authenticate_pam_stack(PamModuleType::Auth, false).is_err());
+}
+
+#[test]
 fn test_gentoo_use_flag_engine_inspection() {
     use unimplemented_features::GentooUseFlagEngine;
     let mut gentoo = GentooUseFlagEngine::new();
@@ -534,6 +565,9 @@ fn test_gentoo_use_flag_engine_inspection() {
     assert!(!gentoo.is_flag_enabled("wayland"));
     gentoo.set_use_flag("wayland");
     assert!(gentoo.resolve_conflicts(("wayland", "x264")).is_err());
+}
+
+#[test]
 fn test_gentoo_portage_mask_engine_inspection() {
     use gap_closure::{TargetDistroFamily, SovereignDistroAbsorptionEngine};
 
