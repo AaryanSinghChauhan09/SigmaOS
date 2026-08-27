@@ -124,7 +124,6 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
-
         Ok(Package::new(
             crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
@@ -553,7 +552,10 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")]),
+            build_depends: alloc::vec![
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+            ],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
@@ -566,11 +568,11 @@ mod tests {
         let source_pkg_missing = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![
+            build_depends: alloc::vec![
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),
-            ]),
+            ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }
