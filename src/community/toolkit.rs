@@ -114,6 +114,10 @@ pub struct HybridFirewallTemplateStore {
     pub templates: HashMap<String, String>,
 }
 
+pub struct HybridFirewallTemplateStore {
+    pub templates: HashMap<String, String>,
+}
+
 impl HybridFirewallTemplateStore {
     pub fn new() -> Self {
         let mut store = Self {
