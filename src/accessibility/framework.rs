@@ -232,11 +232,11 @@ impl AccessibilityFramework {
     pub fn get_active_profile(&self) -> Option<&AccessibilityProfile> {
         self.active_profile
             .as_ref()
-            .and_then(|name| self.profiles.get_str(name))
+            .and_then(|name| self.profiles.get(name))
     }
 
     pub fn get_profile(&self, name: &str) -> Option<&AccessibilityProfile> {
-        self.profiles.get_str(name)
+        self.profiles.get(&name.to_string())
     }
 
     pub fn list_profiles(&self) -> Vec<&AccessibilityProfile> {

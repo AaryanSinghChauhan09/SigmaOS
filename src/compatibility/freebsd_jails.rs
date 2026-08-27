@@ -74,41 +74,53 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get_mut(name) {
+        if let Some(jail) = self.jails.get(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
-
-            jail.state = JailState::Starting;
-
-            // Assign JID
-            let jid = self.next_jid;
-            self.next_jid += 1;
-            jail.jid = Some(jid);
-
-            // Create network namespace if IP specified
-            if let Some(ip) = &jail.config.ip_address {
-                self.setup_jail_network(jid, ip)?;
-            }
-
-            // Mount jail filesystem
-            self.mount_jail_fs(&jail.config)?;
-
-            // Apply security restrictions
-            self.apply_jail_restrictions(jid, &jail.config)?;
-
-            // Execute startup script
-            if let Some(exec_start) = &jail.config.exec_start {
-                self.execute_in_jail(jid, exec_start)?;
-            }
-
-            jail.state = JailState::Running;
-            println!("Jail '{}' started with JID {}", name, jid);
-
-            Ok(())
         } else {
-            Err(format!("Jail '{}' not found", name).into())
+            return Err(format!("Jail '{}' not found", name).into());
         }
+
+        let jail = self.jails.get_mut(name).unwrap();
+        jail.state = JailState::Starting;
+
+        // Assign JID
+        let jid = self.next_jid;
+        self.next_jid += 1;
+        jail.jid = Some(jid);
+
+        // Clone config before using it
+        let ip_address = jail.config.ip_address.clone();
+        let config_clone = jail.config.clone();
+        let exec_start = jail.config.exec_start.clone();
+
+        // Release mutable borrow
+        drop(jail);
+
+        // Create network namespace if IP specified
+        if let Some(ip) = &ip_address {
+            self.setup_jail_network(jid, ip)?;
+        }
+
+        // Mount jail filesystem
+        self.mount_jail_fs(&config_clone)?;
+
+        // Apply security restrictions
+        self.apply_jail_restrictions(jid, &config_clone)?;
+
+        // Execute startup script
+        if let Some(start_cmd) = &exec_start {
+            self.execute_in_jail(jid, start_cmd)?;
+        }
+
+        // Set final state
+        if let Some(jail) = self.jails.get_mut(name) {
+            jail.state = JailState::Running;
+        }
+        println!("Jail '{}' started with JID {}", name, jid);
+
+        Ok(())
     }
 
     /// Stop a jail
@@ -191,7 +203,7 @@ impl SigmaJailManager {
 
     /// Get jail information
     pub fn jail_info(&self, name: &str) -> Option<JailInfo> {
-        if let Some(jail) = self.jails.get_str(name) {
+        if let Some(jail) = self.jails.get(name) {
             Some(JailInfo {
                 name: name.to_string(),
                 state: jail.state.clone(),

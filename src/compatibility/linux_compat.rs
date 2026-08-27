@@ -154,7 +154,7 @@ impl OpenBsdPledgeUnveilFilter {
         if self.unveiled_paths.is_empty() {
             return true; // No unveil restrictions applied
         }
-        if let Some(perms) = self.unveiled_paths.get_str(path) {
+        if let Some(perms) = self.unveiled_paths.get(&path.to_string()) {
             perms.contains(required_perm)
         } else {
             false

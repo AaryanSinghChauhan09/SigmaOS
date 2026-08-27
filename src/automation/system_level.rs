@@ -305,7 +305,7 @@ impl SystemAutomationManager {
     pub fn get_current_profile(&self) -> Option<&PerformanceProfile> {
         self.current_profile
             .as_ref()
-            .and_then(|name| self.performance_profiles.get_str(name))
+            .and_then(|name| self.performance_profiles.get(name))
     }
 
     pub fn handle_event(
@@ -392,12 +392,12 @@ impl SystemAutomationManager {
         context: &BTreeMap<String, f64>,
     ) -> SystemPrediction {
         let predicted_value = match model_type {
-            PredictiveModel::UsagePattern => context.get_str("cpu_usage").unwrap_or(&50.0) * 1.1,
+            PredictiveModel::UsagePattern => context.get("cpu_usage").unwrap_or(&50.0) * 1.1,
             PredictiveModel::PerformanceTrend => {
-                context.get_str("memory_usage").unwrap_or(&50.0) * 1.05
+                context.get("memory_usage").unwrap_or(&50.0) * 1.05
             }
-            PredictiveModel::FailurePrediction => context.get_str("temperature").unwrap_or(&50.0) * 1.2,
-            PredictiveModel::ResourceForecast => context.get_str("disk_usage").unwrap_or(&50.0) * 1.01,
+            PredictiveModel::FailurePrediction => context.get("temperature").unwrap_or(&50.0) * 1.2,
+            PredictiveModel::ResourceForecast => context.get("disk_usage").unwrap_or(&50.0) * 1.01,
         };
 
         let pseudo_random = || -> f64 {
@@ -459,7 +459,7 @@ impl SystemAutomationManager {
         for rule in &mut self.rules {
             if rule.adaptive {
                 // Simulate adaptive learning
-                if let Some(cpu_usage) = context.get_str("cpu_usage") {
+                if let Some(cpu_usage) = context.get("cpu_usage") {
                     if *cpu_usage > 90.0 && rule.trigger_event == SystemEventType::CpuHighUsage {
                         rule.priority = rule.priority.saturating_add(1);
                     }

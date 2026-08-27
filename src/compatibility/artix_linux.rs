@@ -98,13 +98,13 @@ impl ArtixPacman {
 
     /// Install package (pacman -S)
     pub fn install(&mut self, package: &str) -> Result<(), ArtixError> {
-        if self.installed.contains_key_str(package) {
+        if self.installed.contains_key(&package.to_string()) {
             return Err(ArtixError::PackageNotFound);
         }
 
         let pkg = self
             .available
-            .get_str(package)
+            .get(&package.to_string())
             .ok_or(ArtixError::PackageNotFound)?
             .clone();
 
@@ -121,7 +121,7 @@ impl ArtixPacman {
 
         // Resolve dependencies
         for dep in &pkg.dependencies {
-            if !self.installed.contains_key_str(dep) {
+            if !self.installed.contains_key(&dep.to_string()) {
                 self.install(dep)?;
             }
         }
@@ -155,7 +155,7 @@ impl ArtixPacman {
         let mut to_upgrade = Vec::new();
 
         for (name, installed_pkg) in &self.installed {
-            if let Some(available_pkg) = self.available.get_str(name) {
+            if let Some(available_pkg) = self.available.get(name) {
                 if available_pkg.version != installed_pkg.version || 
                    available_pkg.release != installed_pkg.release {
                     to_upgrade.push(name.clone());

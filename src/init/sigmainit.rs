@@ -206,7 +206,7 @@ impl Supervisor {
                 self.start_service(dep)?;
             }
         }
-        
+
         if let Some(service) = self.services.get_mut(name) {
             service.state = ServiceState::Starting;
             // In a real implementation, this would fork and execute
@@ -217,7 +217,7 @@ impl Supervisor {
             Err(ServiceError::NotFound)
         }
     }
-    
+
     pub fn stop_service(&mut self, name: &str) -> Result<(), ServiceError> {
         // Stop dependents first
         if let Some(dependents) = self.dependency_graph.get_dependents(name) {
