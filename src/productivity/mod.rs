@@ -13,7 +13,6 @@ pub mod media;
 pub mod mind_map;
 pub mod mint_competitor;
 pub mod sovereign_apps;
-pub mod tmux;
 pub mod subtitle_editor;
 
 pub use gamification::{

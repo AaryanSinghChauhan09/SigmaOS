@@ -352,79 +352,16 @@ pub struct MkinitcpioBuilder {
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
-        let mut hooks = KVec::new();
-        hooks.push(SigmaString::from("base"));
-        hooks.push(SigmaString::from("udev"));
-        hooks.push(SigmaString::from("autodetect"));
-        hooks.push(SigmaString::from("modconf"));
-        hooks.push(SigmaString::from("block"));
-        hooks.push(SigmaString::from("filesystems"));
+        let mut hooks = crate::klib::vec::Vec::new();
+        hooks.push(crate::klib::string::SigmaString::from("base"));
+        hooks.push(crate::klib::string::SigmaString::from("udev"));
+        hooks.push(crate::klib::string::SigmaString::from("autodetect"));
+        hooks.push(crate::klib::string::SigmaString::from("modconf"));
+        hooks.push(crate::klib::string::SigmaString::from("block"));
+        hooks.push(crate::klib::string::SigmaString::from("filesystems"));
         Self {
-            hooks: Vec::new(),
-            compression: "zstd".to_string(),
-        }
-    }
-
-    pub fn add_hook(&mut self, hook: &str) {
-        self.hooks.push(hook.to_string());
-    }
-
-    pub fn build_initramfs_image(&self, kernel_ver: &str) -> Vec<u8> {
-        let header = format!("INITRAMFS:{}:hooks={:?}", kernel_ver, self.hooks);
-        header.into_bytes()
-    }
-}
-
-impl Default for MkinitcpioBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// --- makepkg Arch Package Builder ---
-
-#[derive(Debug, Clone)]
-pub struct MakepkgBuilder {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub arch: String,
-    pub sha256sum: String,
-}
-
-impl MakepkgBuilder {
-    pub fn new(pkgname: &str, pkgver: &str, arch: &str, sha256sum: &str) -> Self {
-        Self {
-            pkgname: pkgname.to_string(),
-            pkgver: pkgver.to_string(),
-            arch: arch.to_string(),
-            sha256sum: sha256sum.to_string(),
-        }
-    }
-
-    pub fn build_package_archive(&self, source_bytes: &[u8]) -> Result<(String, Vec<u8>), &'static str> {
-        if source_bytes.is_empty() {
-            return Err("Empty source bytes");
-        }
-        let filename = format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch);
-        let mut archive_payload = Vec::new();
-        archive_payload.extend_from_slice(b"ARCH_PKG_ZSTD_V1:");
-        archive_payload.extend_from_slice(source_bytes);
-        Ok((filename, archive_payload))
-    }
-}
-
-impl DebianSbuildPackage {
-    pub fn new(name: &str, build_depends: Vec<String>) -> Self {
-        Self {
-            hooks: alloc::vec![
-                SigmaString::from("base"),
-                SigmaString::from("udev"),
-                SigmaString::from("autodetect"),
-                SigmaString::from("modconf"),
-                SigmaString::from("block"),
-                SigmaString::from("filesystems"),
-            ],
-            compression: SigmaString::from("zstd"),
+            hooks,
+            compression: crate::klib::string::SigmaString::from("zstd"),
         }
     }
 

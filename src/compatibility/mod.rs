@@ -87,7 +87,6 @@ pub mod solid_kernel;
 pub mod sovereign_suite;
 pub mod superiority;
 pub mod tiny_core;
-pub mod wasm_sandbox;
 pub mod zorin;
 
 pub use zorin::*;

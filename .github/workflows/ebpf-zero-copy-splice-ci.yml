@@ -1,16 +1,10 @@
 name: eBPF & Zero-Copy Splice Subsystem CI
 
-permissions:
-  contents: read
-
 on:
   push:
     branches: [ main, master, "feat/*" ]
   pull_request:
     branches: [ main, master ]
-
-permissions:
-  contents: read
 
 jobs:
   ebpf-splice-ci:

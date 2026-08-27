@@ -1,16 +1,10 @@
 name: FreeBSD Capsicum Sandbox Gate
 
-permissions:
-  contents: read
-
 on:
   push:
     branches: [ main, master, "feat/*" ]
   pull_request:
     branches: [ main, master ]
-
-permissions:
-  contents: read
 
 jobs:
   capsicum-gate:

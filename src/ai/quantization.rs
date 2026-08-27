@@ -2,8 +2,6 @@
 // Inspired by vLLM, llama.cpp, and ROCm runtime fallback pipelines.
 
 extern crate alloc;
-use super::compute_scheduler::ComputeDeviceTarget;
-use super::tensor_memory::TensorDtype;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

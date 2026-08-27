@@ -34,6 +34,7 @@ pub mod arch;
 pub mod cachy;
 pub mod linux_bsd_parity_extended;
 pub mod wiki_ideas_implementation;
+pub mod missing_distro_innovations;
 
 pub use linux_bsd_parity::{
     ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
@@ -138,18 +139,16 @@ pub use linux_bsd_parity_extended::{
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
     NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot as ExtSnapperSnapshot, SnapperBtrfsEngine,
+};
+pub use wiki_ideas_implementation::{
+    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
     SnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
     CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
     SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,
 };
-
-pub use linux_bsd_inspirations::{
-    SovereignEbpfEngine, ArchDependencyResolver, FreeBSDJail, OpenBSDUnveil, OpenBSDPledge,
-    NixStyleStore, AptPinStore, NetBsdRumpRouter, GentooUseFlagsManager, OpenRCService,
-    SovereignIoUring, SovereignLandlockLsm, SovereignRingBuffer, DrmModeInfo, SovereignBpfCoReEngine,
-    BsdCapsicumRights, Hammer2MultiVersionEngine, SovereignOstreeEngine, SovereignRunitSupervisor,
-    SovereignZfsPoolEngine, SovereignKaslrWxAllocator, SovereignDTraceEngine, SovereignRaidSelfHealer,
-    SovereignDeclarativeSystemEngine, SovereignPrivSepSandbox, SerpentMossEngine, CachyBoreScheduler,
-    FreeBsdRacctVnetGuard, OpenBsdPledgeUnveilSentinel, SovereignBcachefsTieringEngine,
-    SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
+pub use missing_distro_innovations::{
+    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, AlpineApkWorldEngine,
+    VoidXbpsEngine, VnetStack, FreeBsdVnetStackEngine, UnveilAuditViolation, OpenBsdUnveilAuditor,
 };

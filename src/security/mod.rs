@@ -20,7 +20,6 @@ pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
-pub mod sandbox;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;

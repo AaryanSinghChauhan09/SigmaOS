@@ -9,7 +9,7 @@ pub enum InstructionCyclePhase {
     Commit,
 }
 
-use crate::kernel::structures::{CpuArchitectureClass, ThreadState};
+use super::structures::{CpuArchitectureClass, ThreadState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptClass {
