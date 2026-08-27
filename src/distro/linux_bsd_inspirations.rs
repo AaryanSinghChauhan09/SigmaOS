@@ -351,6 +351,8 @@ pub struct FreeBSDJail {
     pub max_processes: usize,
     pub child_jails: Vec<FreeBSDJail>,
     pub isolated_mounts: Vec<String>,
+    pub max_memory_bytes: u64,
+    pub cpu_shares: u32,
 }
 
 impl FreeBSDJail {
@@ -364,7 +366,17 @@ impl FreeBSDJail {
             max_processes: 10,
             child_jails: Vec::new(),
             isolated_mounts: Vec::new(),
+            max_memory_bytes: 0, // 0 means unlimited
+            cpu_shares: 1024,    // default CPU weight shares
         }
+    }
+
+    pub fn set_memory_limit(&mut self, bytes: u64) {
+        self.max_memory_bytes = bytes;
+    }
+
+    pub fn set_cpu_shares(&mut self, shares: u32) {
+        self.cpu_shares = shares;
     }
 
     pub fn enable_network_stack(&mut self) {
@@ -3769,6 +3781,15 @@ mod tests {
         parent_jail.mount_checkpoint("/etc");
         assert!(parent_jail.verify_mount_isolated("/etc"));
         assert!(!parent_jail.verify_mount_isolated("/var"));
+
+        // Verify next-generation resource constraints limits
+        assert_eq!(parent_jail.max_memory_bytes, 0);
+        assert_eq!(parent_jail.cpu_shares, 1024);
+
+        parent_jail.set_memory_limit(1024 * 1024 * 512); // 512 MB limit
+        parent_jail.set_cpu_shares(2048);
+        assert_eq!(parent_jail.max_memory_bytes, 512 * 1024 * 1024);
+        assert_eq!(parent_jail.cpu_shares, 2048);
     }
 
     #[test]

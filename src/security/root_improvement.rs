@@ -310,7 +310,185 @@ impl Default for RootlessNamespaceManager {
 }
 
 // ==========================================
-// 5. PAM MFA Pluggable Authenticator
+// 5. OpenBSD doas.conf Rule Engine
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DoasAction {
+    Permit,
+    Deny,
+}
+
+#[derive(Debug, Clone)]
+pub struct DoasRule {
+    pub action: DoasAction,
+    pub identity: String, // username or group (e.g. ":wheel" or "alice")
+    pub target_user: String, // target user (e.g. "root")
+    pub keepenv: bool,
+    pub nopass: bool,
+    pub command: Option<String>,
+}
+
+pub struct DoasRuleEngine {
+    pub rules: Vec<DoasRule>,
+}
+
+impl DoasRuleEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: DoasRule) {
+        self.rules.push(rule);
+    }
+
+    /// Evaluates rules using OpenBSD's last-matching-rule semantics.
+    pub fn evaluate(&self, user: &str, is_wheel: bool, target: &str, cmd: &str) -> Option<&DoasRule> {
+        let mut last_match = None;
+        for rule in &self.rules {
+            let id_match = if rule.identity.starts_with(':') {
+                rule.identity == ":wheel" && is_wheel
+            } else {
+                rule.identity == user || rule.identity == "*"
+            };
+
+            let target_match = rule.target_user == "*" || rule.target_user == target;
+            let cmd_match = match &rule.command {
+                Some(c) => c == cmd,
+                None => true,
+            };
+
+            if id_match && target_match && cmd_match {
+                last_match = Some(rule);
+            }
+        }
+        last_match
+    }
+}
+
+impl Default for DoasRuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 6. FreeBSD Kernel Securelevel Guard
+// ==========================================
+
+/// FreeBSD kernel securelevel states (-1 to 3)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SecureLevel {
+    PermanentlyUnsecure = -1,
+    Insecure = 0,
+    Secure = 1,
+    HighlySecure = 2,
+    NetworkSecure = 3,
+}
+
+pub struct BsdSecurelevelGuard {
+    current_level: SecureLevel,
+}
+
+impl BsdSecurelevelGuard {
+    pub fn new(level: SecureLevel) -> Self {
+        Self { current_level: level }
+    }
+
+    pub fn current_level(&self) -> SecureLevel {
+        self.current_level
+    }
+
+    /// Securelevel can only be raised when level >= 0, never lowered!
+    pub fn raise_level(&mut self, new_level: SecureLevel) -> Result<(), &'static str> {
+        if self.current_level == SecureLevel::PermanentlyUnsecure {
+            return Err("securelevel is permanently unsecure and cannot be raised");
+        }
+        if new_level > self.current_level {
+            self.current_level = new_level;
+            Ok(())
+        } else {
+            Err("securelevel can only be raised, not lowered");
+        }
+    }
+
+    pub fn allow_module_loading(&self) -> bool {
+        self.current_level < SecureLevel::Secure
+    }
+
+    pub fn allow_raw_disk_write(&self) -> bool {
+        self.current_level < SecureLevel::Secure
+    }
+
+    pub fn allow_time_adjustment(&self) -> bool {
+        self.current_level < SecureLevel::HighlySecure
+    }
+
+    pub fn allow_firewall_modification(&self) -> bool {
+        self.current_level < SecureLevel::NetworkSecure
+    }
+}
+
+// ==========================================
+// 7. Linux SubUid / SubGid Multi-Range Mapper
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct SubUidGidRange {
+    pub username: String,
+    pub start_id: u32,
+    pub count: u32,
+}
+
+pub struct SubUidGidMapper {
+    pub subuid_ranges: Vec<SubUidGidRange>,
+    pub subgid_ranges: Vec<SubUidGidRange>,
+}
+
+impl SubUidGidMapper {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            subuid_ranges: Vec::new(),
+            subgid_ranges: Vec::new(),
+        }
+    }
+
+    pub fn add_subuid_range(&mut self, username: &str, start_id: u32, count: u32) {
+        self.subuid_ranges.push(SubUidGidRange {
+            username: username.to_string(),
+            start_id,
+            count,
+        });
+    }
+
+    pub fn add_subgid_range(&mut self, username: &str, start_id: u32, count: u32) {
+        self.subgid_ranges.push(SubUidGidRange {
+            username: username.to_string(),
+            start_id,
+            count,
+        });
+    }
+
+    pub fn is_subuid_valid(&self, username: &str, mapped_uid: u32) -> bool {
+        for range in &self.subuid_ranges {
+            if range.username == username && mapped_uid >= range.start_id && mapped_uid < range.start_id + range.count {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for SubUidGidMapper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 8. PAM MFA Pluggable Authenticator
 // ==========================================
 
 pub struct PamMfaAuthenticator {
@@ -1013,6 +1191,65 @@ mod tests {
 
         // Fallbacks remain identical
         assert_eq!(manager.translate_inside_to_outside_uid(500), 500);
+    }
+
+    #[test]
+    fn test_doas_last_match_rules() {
+        let mut engine = DoasRuleEngine::new();
+        engine.add_rule(DoasRule {
+            action: DoasAction::Deny,
+            identity: "alice".to_string(),
+            target_user: "root".to_string(),
+            keepenv: false,
+            nopass: false,
+            command: None,
+        });
+        engine.add_rule(DoasRule {
+            action: DoasAction::Permit,
+            identity: "alice".to_string(),
+            target_user: "root".to_string(),
+            keepenv: true,
+            nopass: true,
+            command: Some("reboot".to_string()),
+        });
+
+        let res1 = engine.evaluate("alice", false, "root", "shutdown").unwrap();
+        assert_eq!(res1.action, DoasAction::Deny);
+
+        let res2 = engine.evaluate("alice", false, "root", "reboot").unwrap();
+        assert_eq!(res2.action, DoasAction::Permit);
+        assert!(res2.keepenv);
+        assert!(res2.nopass);
+    }
+
+    #[test]
+    fn test_bsd_securelevel_enforcement() {
+        let mut guard = BsdSecurelevelGuard::new(SecureLevel::Insecure);
+        assert!(guard.allow_module_loading());
+        assert!(guard.allow_raw_disk_write());
+
+        assert!(guard.raise_level(SecureLevel::Secure).is_ok());
+        assert!(!guard.allow_module_loading());
+        assert!(!guard.allow_raw_disk_write());
+        assert!(guard.allow_time_adjustment());
+
+        assert!(guard.raise_level(SecureLevel::HighlySecure).is_ok());
+        assert!(!guard.allow_time_adjustment());
+
+        assert!(guard.raise_level(SecureLevel::Insecure).is_err());
+    }
+
+    #[test]
+    fn test_subuid_gid_mapping() {
+        let mut mapper = SubUidGidMapper::new();
+        mapper.add_subuid_range("bob", 100000, 65536);
+        mapper.add_subgid_range("bob", 100000, 65536);
+
+        assert!(mapper.is_subuid_valid("bob", 100000));
+        assert!(mapper.is_subuid_valid("bob", 165535));
+        assert!(!mapper.is_subuid_valid("bob", 165536));
+        assert!(!mapper.is_subuid_valid("bob", 99999));
+        assert!(!mapper.is_subuid_valid("alice", 100000));
     }
 
     #[test]

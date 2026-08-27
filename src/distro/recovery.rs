@@ -1,4 +1,8 @@
-use crate::klib::HashMap;
+#[cfg(not(target_os = "none"))]
+use std::collections::HashMap;
+
+#[cfg(target_os = "none")]
+use crate::klib::BTreeMap as HashMap;
 
 /// Disaster rescue environment setup (inspired by SystemRescue and Rescuezilla).
 #[derive(Debug, Clone)]
