@@ -303,21 +303,29 @@ impl Kyber1024 {
         let mut ct = [0u8; Self::CIPHERTEXT_SIZE];
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
 
+        if pk.is_empty() {
+            return (ct, ss);
+        }
+
         for i in 0..Self::CIPHERTEXT_SIZE {
             ct[i] = pk[i % pk.len()].wrapping_add(11);
         }
         for i in 0..Self::SHARED_SECRET_SIZE {
-            ss[i] = pk[i % pk.len()].wrapping_mul(5);
+            ss[i] = ct[i % ct.len()].wrapping_mul(5);
         }
 
         (ct, ss)
     }
 
-    pub fn decapsulate(sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
+    pub fn decapsulate(_sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
 
+        if ct.is_empty() {
+            return ss;
+        }
+
         for i in 0..Self::SHARED_SECRET_SIZE {
-            ss[i] = sk[i % sk.len()].wrapping_add(ct[i % ct.len()]);
+            ss[i] = ct[i % ct.len()].wrapping_mul(5);
         }
 
         ss

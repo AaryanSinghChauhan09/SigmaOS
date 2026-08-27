@@ -1425,6 +1425,14 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn as_slice(&self) -> &[T] {
+        if self.data.is_null() || self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.len
     }
