@@ -1679,6 +1679,72 @@ mod linux_lts_upstream_tests {
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
+#[derive(Debug, Clone)]
+pub struct EbuildEntry {
+    pub name: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
+
+pub struct GentooPortageMaskEngine {
+    pub arch: String,
+    pub ebuilds: Vec<EbuildEntry>,
+    pub hard_masks: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(arch: &str) -> Self {
+        Self {
+            arch: arch.to_string(),
+            ebuilds: Vec::new(),
+            hard_masks: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, name: &str, version: &str, keywords: &[&str], is_masked: bool) {
+        self.ebuilds.push(EbuildEntry {
+            name: name.to_string(),
+            version: version.to_string(),
+            keywords: keywords.iter().map(|s| s.to_string()).collect(),
+            is_masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, name: &str) {
+        if !self.hard_masks.contains(&name.to_string()) {
+            self.hard_masks.push(name.to_string());
+        }
+    }
+
+    pub fn evaluate_installability(&self, name: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
+        if self.hard_masks.contains(&name.to_string()) {
+            return Err("Package is hard-masked in package.mask");
+        }
+        if let Some(ebuild) = self.ebuilds.iter().find(|e| e.name == name && e.version == version) {
+            if ebuild.is_masked {
+                return Err("Ebuild is masked");
+            }
+            let testing_keyword = format!("~{}", self.arch);
+            let is_testing = ebuild.keywords.contains(&testing_keyword);
+            let is_stable = ebuild.keywords.contains(&self.arch);
+            if is_stable {
+                Ok(true)
+            } else if is_testing {
+                if accept_keywords {
+                    Ok(true)
+                } else {
+                    Err("Package requires ~arch keyword acceptance in package.accept_keywords")
+                }
+            } else {
+                Err("No matching keyword for architecture")
+            }
+        } else {
+            Err("Ebuild not found in Portage tree")
+        }
+    }
+}
+
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
     pub disabled_flags: Vec<String>,
