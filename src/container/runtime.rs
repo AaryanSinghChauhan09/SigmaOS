@@ -121,7 +121,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: ContainerCapability::full(),
+            capability: RuntimeCapability::full(),
         }
     }
 }
@@ -286,7 +286,9 @@ impl OverlayFS {
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub image: [u8; 128],
+    pub image_len: u8,
     pub state: AtomicUsize, // ContainerState as usize
     pub pid: AtomicUsize,
     pub memory_limit: u64,
@@ -324,7 +326,9 @@ impl SimpleContainer {
         SimpleContainer {
             id,
             name: name_array,
+            name_len: name_len as u8,
             image: image_array,
+            image_len: image_len as u8,
             state: AtomicUsize::new(ContainerState::Created as usize),
             pid: AtomicUsize::new(0),
             memory_limit: 0,
@@ -361,9 +365,9 @@ impl Container for SimpleContainer {
         self.id
     }
 
+    // Bolt optimization: Cache slice length during creation to turn O(N) linear zero-byte scanning into instant O(1) slicing
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        &self.name[..self.name_len as usize]
     }
 
     fn start(&mut self) -> Result<(), ContainerError> {
@@ -722,9 +726,9 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 #[cfg(not(target_os = "none"))]
 pub mod oci {
     extern crate alloc;
-    use crate::container::runtime::NamespaceConfig;
+    use super::NamespaceConfig;
     use alloc::string::{String, ToString};
-    use crate::container::ContainerError;
+    use super::ContainerError;
     use alloc::vec::Vec;
 
     pub struct NamespaceSet {
@@ -886,10 +890,12 @@ mod tests {
             .create_container(
                 b"sovereign_container",
                 b"ubuntu-pqc",
-                ContainerCapability::full(),
+                RuntimeCapability::full(),
             )
             .unwrap();
         assert_eq!(id, 1);
+        let ct = runtime.get_container(id).unwrap();
+        assert_eq!(ct.name(), b"sovereign_container");
     }
 
     #[test]
@@ -932,7 +938,7 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            ContainerCapability::full(),
+            RuntimeCapability::full(),
         );
         container.seccomp = SeccompProfile {
             default_action: SeccompAction::Allow,
