@@ -203,8 +203,8 @@ impl Supervisor {
         // Start dependencies first
         let deps = self.dependency_graph.get_dependencies(name).cloned();
         if let Some(deps) = deps {
-            for dep in deps {
-                self.start_service(&dep)?;
+            for dep in &deps {
+                self.start_service(dep)?;
             }
         }
 
@@ -223,8 +223,8 @@ impl Supervisor {
         // Stop dependents first
         let dependents = self.dependency_graph.get_dependents(name).cloned();
         if let Some(dependents) = dependents {
-            for dep in dependents {
-                self.stop_service(&dep)?;
+            for dep in &dependents {
+                self.stop_service(dep)?;
             }
         }
         

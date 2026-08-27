@@ -103,7 +103,6 @@ impl Driver for SimpleStorageDriver {
     fn driver_type(&self) -> DriverType { self.driver_type }
     fn state(&self) -> DriverState {
         match self.state.load(Ordering::SeqCst) {
-            0 => DriverState::Unloaded,
             1 => DriverState::Active,
             2 => DriverState::Failed,
             _ => DriverState::Unloaded,
@@ -147,7 +146,6 @@ impl Driver for SimpleStorageDriver {
     }
     fn state(&self) -> DriverState {
         match self.state.load(Ordering::SeqCst) {
-            0 => DriverState::Unloaded,
             1 => DriverState::Active,
             2 => DriverState::Failed,
             _ => DriverState::Unloaded,

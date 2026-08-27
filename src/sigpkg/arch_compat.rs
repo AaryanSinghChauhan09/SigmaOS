@@ -127,13 +127,11 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
-        let depends_klib = crate::klib::vec::Vec::from_iter(depends);
-
         Ok(Package::new(
             crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
             crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
-            depends_klib,
+            depends,
             crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
@@ -324,7 +322,7 @@ impl AlpmHookManager {
         Ok(())
     }
 
-    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<SigmaString> {
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<crate::klib::string::SigmaString> {
         let mut triggered_cmds = alloc::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -445,7 +443,7 @@ impl DebianSbuildPackage {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        Vec::from_iter(image_header)
+        crate::klib::vec::Vec::from_iter(image_header)
     }
 }
 
@@ -599,7 +597,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, Vec::from_iter(archive_content)))
+        Ok((archive_name, crate::klib::vec::Vec::from_iter(archive_content)))
     }
 }
 
@@ -636,11 +634,11 @@ mod tests {
         let source_pkg_missing = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![
+            build_depends: alloc::vec![
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),
-            ]),
+            ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }

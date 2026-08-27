@@ -74,47 +74,38 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get(name) {
+        let (jid, config) = if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
+
+            jail.state = JailState::Starting;
+
+            // Assign JID
+            let jid = self.next_jid;
+            self.next_jid += 1;
+            jail.jid = Some(jid);
+            (jid, jail.config.clone())
         } else {
             return Err(format!("Jail '{}' not found", name).into());
-        }
-
-        let jail = self.jails.get_mut(name).unwrap();
-        jail.state = JailState::Starting;
-
-        // Assign JID
-        let jid = self.next_jid;
-        self.next_jid += 1;
-        jail.jid = Some(jid);
-
-        // Clone config before using it
-        let ip_address = jail.config.ip_address.clone();
-        let config_clone = jail.config.clone();
-        let exec_start = jail.config.exec_start.clone();
-
-        // Release mutable borrow
-        drop(jail);
+        };
 
         // Create network namespace if IP specified
-        if let Some(ip) = &ip_address {
+        if let Some(ip) = &config.ip_address {
             self.setup_jail_network(jid, ip)?;
         }
 
         // Mount jail filesystem
-        self.mount_jail_fs(&config_clone)?;
+        self.mount_jail_fs(&config)?;
 
         // Apply security restrictions
-        self.apply_jail_restrictions(jid, &config_clone)?;
+        self.apply_jail_restrictions(jid, &config)?;
 
         // Execute startup script
-        if let Some(start_cmd) = &exec_start {
-            self.execute_in_jail(jid, start_cmd)?;
+        if let Some(exec_start) = &config.exec_start {
+            self.execute_in_jail(jid, &exec_start)?;
         }
 
-        // Set final state
         if let Some(jail) = self.jails.get_mut(name) {
             jail.state = JailState::Running;
         }
