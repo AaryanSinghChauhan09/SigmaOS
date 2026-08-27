@@ -30,6 +30,9 @@ pub mod tiny_core;
 pub mod missing_distro_innovations;
 pub mod ready_to_use;
 pub mod wiki_ideas_implementation;
+pub mod arch;
+pub mod cachy;
+pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_parity::{
     ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
@@ -115,6 +118,11 @@ pub use ready_to_use::{
     DistroServiceManager, ServiceUnit, MountEntry, MountType, UniversalMountEngine,
     UserAccount, SessionEnvironment, InteractiveUserEnvironment, DeviceCategory,
     HardwareEvent, DeviceNode, PlugAndPlayHardwareManager,
+};
+
+pub use missing_distro_innovations::{
+    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
 };
 
 pub use missing_distro_innovations::{

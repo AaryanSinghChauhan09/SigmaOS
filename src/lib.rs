@@ -53,6 +53,7 @@ pub use unimplemented_features::{
     SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
     ZorinWinAppDbRegistry,
 };
+pub mod expanded_wiki_innovations;
 pub mod virtualization;
 
 pub mod interrupt;
@@ -207,6 +208,50 @@ pub use network::{
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
+};
+pub use distro::{
+    AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
+    HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
+    ReleaseStage, SoftwareCertificationProgram,
+    BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
+    ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
+    NixOSFlakeEngine, FlakeInput, SystemClosure,
+    ArchPacmanHooksManager, PacmanHook, HookWhen, HookAction,
+    VoidRunitSupervisor, RunitService, ServiceState,
+    GentooPortageUseFlagsEngine, PortagePackage,
+    MicroArchLevel, CachyKernelVariant, CpuCapabilities, BoreSchedulerGovernor, CachyPackageRepo,
+    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
+    ArchRepoType,
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
+    DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
+    RegistryValue, Win32Gdi, WindowsRegistry,
+    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
+    TargetArch,
+    AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
+    ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings,
+    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
+    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
+    TimeTravelEngine,
+    BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
+    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
+    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
+    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
+    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
+    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
+    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
+    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
+    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
+    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
+    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
+    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
+    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
+    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
