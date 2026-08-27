@@ -5,7 +5,6 @@ extern crate alloc;
 use crate::klib::{BTreeMap, HashMap};
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::klib::HashMap;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {
@@ -983,6 +982,12 @@ impl ZenithDisplayCompositor {
         Self {
             active_windows_count: 0,
         }
+    }
+}
+
+impl Default for ZenithDisplayCompositor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

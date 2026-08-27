@@ -1,6 +1,5 @@
 extern crate alloc;
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -96,6 +95,12 @@ impl CentralRepositoryManager {
 
     pub fn add_trusted_gpg_key(&mut self, key_fingerprint: [u8; 32]) {
         self.gpg_keyring.push(key_fingerprint);
+    }
+}
+
+impl Default for CentralRepositoryManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -271,6 +276,12 @@ impl DeterministicDependencyResolver {
     }
 }
 
+impl Default for DeterministicDependencyResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 6. ATOMIC UPDATES & TRANSACTIONAL ROLLBACK
 // =========================================================================
@@ -321,6 +332,12 @@ impl AtomicTransactionEngine {
             }
         }
         Err("Target generation ID not found in transaction history")
+    }
+}
+
+impl Default for AtomicTransactionEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -491,6 +508,12 @@ impl LocalPackageProxyCache {
     }
 }
 
+impl Default for LocalPackageProxyCache {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 12. PACKAGE VULNERABILITY SCANNER (CVE DIAGNOSTICS)
 // =========================================================================
@@ -526,6 +549,12 @@ impl VulnerabilityScanner {
             .iter()
             .filter(|cve| cve.affected_package == package_name)
             .collect()
+    }
+}
+
+impl Default for VulnerabilityScanner {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -570,6 +599,12 @@ impl BuildFarmManager {
     }
 }
 
+impl Default for BuildFarmManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 14. LANGUAGE RUNTIME MANAGEMENT (PYTHON, NODE, JAVA, RUST)
 // =========================================================================
@@ -599,6 +634,12 @@ impl UnifiedRuntimeManager {
 
     pub fn get_runtime_version(&self, runtime: LanguageRuntime) -> Option<&str> {
         self.active_runtimes.get(&runtime).map(|s: &String| s.as_str())
+    }
+}
+
+impl Default for UnifiedRuntimeManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -756,6 +797,12 @@ impl PackageAnalyticsDashboard {
 
     pub fn get_total_downloads(&self, pkg_name: &str) -> u64 {
         self.download_counts.get(pkg_name).copied().unwrap_or(0)
+    }
+}
+
+impl Default for PackageAnalyticsDashboard {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

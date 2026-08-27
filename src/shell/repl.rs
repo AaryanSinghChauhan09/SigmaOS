@@ -2,7 +2,7 @@
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
 use crate::klib::HashMap;
-use crate::klib::HashSet;
+use crate::klib::hashset::HashSet;
 use std::io::{self, BufRead, Write};
 
 /// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs
@@ -244,6 +244,7 @@ pub struct ShellRepl {
     pub highlighter: ZshSyntaxHighlighter,
     pub dir_stack: BsdDirectoryStack,
     pub job_control: ShellJobControl,
+    pub job_manager: JobControlManager,
 }
 
 impl ShellRepl {
@@ -285,6 +286,7 @@ impl ShellRepl {
             highlighter: ZshSyntaxHighlighter::new(),
             dir_stack,
             job_control: ShellJobControl::new(),
+            job_manager: JobControlManager::new(),
         }
     }
 
@@ -401,126 +403,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "echo" => ShellCommand::Echo {
-                message: parts[1..].join(" "),
-            },
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password: parts.get(2).map(|s| s.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Systemctl {
-                        action: parts[1].to_string(),
-                        service: parts.get(2).unwrap_or(&"").to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Apt {
-                        subcommand: parts[1].to_string(),
-                        package: parts.get(2).map(|s| s.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "touch" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Touch {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "mkdir" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Mkdir {
-                        dirname: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "echo" => ShellCommand::Echo {
-                message: parts[1..].join(" "),
-            },
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password: parts.get(2).map(|s| s.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Systemctl {
-                        action: parts[1].to_string(),
-                        service: parts.get(2).unwrap_or(&"").to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Apt {
-                        subcommand: parts[1].to_string(),
-                        package: parts.get(2).map(|s| s.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "theme" => {
                 if parts.len() >= 2 {
                     if parts[1] == "list" {
@@ -610,6 +492,24 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {
                         filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "touch" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Touch {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "mkdir" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Mkdir {
+                        dirname: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())

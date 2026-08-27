@@ -1,5 +1,6 @@
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_parity;
+pub mod bsd_linux_innovations;
 pub mod certification;
 pub mod community;
 pub mod compat_layers;
@@ -27,7 +28,6 @@ pub mod stable_components;
 pub mod tiny_core;
 pub mod arch;
 pub mod cachy;
-pub mod linux_bsd_parity_extended;
 pub mod wiki_ideas_implementation;
 pub mod missing_distro_innovations;
 
@@ -91,16 +91,9 @@ pub use bsd_linux_innovations::{
     RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
     SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
 };
-pub use linux_bsd_parity_extended::{
-    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
-    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
-    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
-    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
-    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot as ExtSnapperSnapshot, SnapperBtrfsEngine,
-};
 pub use wiki_ideas_implementation::{
     Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
-    SnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    SnapperSnapshot as WikiSnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
     PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
     CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
     SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,

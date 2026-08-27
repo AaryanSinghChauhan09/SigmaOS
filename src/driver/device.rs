@@ -1437,9 +1437,6 @@ impl<T> Vec<T> {
         self.len
     }
 
-        }
-    }
-
     pub fn clear(&mut self) {
         self.len = 0;
     }
