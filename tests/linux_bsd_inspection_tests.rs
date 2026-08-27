@@ -245,12 +245,14 @@ mod linux_bsd_innovations;
 mod unimplemented_features;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
-
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 
 #[path = "../src/security/hardening.rs"]
 mod hardening;
+
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
 
 #[test]
 fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
@@ -482,4 +484,106 @@ fn test_gentoo_portage_mask_engine_inspection() {
     assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", true).unwrap());
     portage.add_hard_mask("app-admin/sudo");
     assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
+}
+
+#[test]
+fn test_xbps_package_manager_inspection() {
+    use linux_bsd_parity::{XbpsPackage, XbpsPackageManager};
+
+    let mut xbps = XbpsPackageManager::new();
+    xbps.register_repository_package(XbpsPackage {
+        name: "glibc".to_string(),
+        version: "2.38".to_string(),
+        revision: 1,
+        run_depends: vec![],
+        sha256_hash: [0x11; 32],
+        is_signed: true,
+    });
+    xbps.register_repository_package(XbpsPackage {
+        name: "bash".to_string(),
+        version: "5.2.21".to_string(),
+        revision: 1,
+        run_depends: vec!["glibc".to_string()],
+        sha256_hash: [0x22; 32],
+        is_signed: true,
+    });
+
+    assert!(xbps.verify_signature("bash"));
+    let deps = xbps.resolve_dependencies("bash").unwrap();
+    assert_eq!(deps, vec!["glibc".to_string(), "bash".to_string()]);
+
+    let count = xbps.install_package_atomic("bash").unwrap();
+    assert_eq!(count, 2);
+    assert_eq!(xbps.installed_packages.len(), 2);
+}
+
+#[test]
+fn test_linux_devlink_driver_inspection() {
+    use linux_bsd_parity::{DevlinkPortFlavor, LinuxDevlinkDriver};
+
+    let mut devlink = LinuxDevlinkDriver::new();
+    devlink.register_port("pci", "0000:01:00.0", 1, DevlinkPortFlavor::Physical);
+
+    assert!(devlink.split_port(1, 4).is_ok());
+    assert_eq!(devlink.ports[0].split_count, 4);
+
+    let flashed = devlink.flash_device_firmware("pci", "0000:01:00.0", b"FIRMWARE_IMAGE_BLOB").unwrap();
+    assert_eq!(flashed, 19);
+}
+
+#[test]
+fn test_systemd_unit_dependency_engine_inspection() {
+    use linux_bsd_parity::{SystemdUnit, SystemdUnitDependencyEngine};
+
+    let mut engine = SystemdUnitDependencyEngine::new();
+    engine.add_unit(SystemdUnit {
+        name: "network.target".to_string(),
+        requires: vec![],
+        after: vec![],
+    });
+    engine.add_unit(SystemdUnit {
+        name: "sshd.service".to_string(),
+        requires: vec!["network.target".to_string()],
+        after: vec!["network.target".to_string()],
+    });
+
+    assert!(!engine.detect_circular_dependencies());
+    let seq = engine.compute_startup_sequence().unwrap();
+    assert_eq!(seq, vec!["network.target".to_string(), "sshd.service".to_string()]);
+}
+
+#[test]
+fn test_alpine_apk_v3_and_triggers_inspection() {
+    use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, ApkTriggerScript};
+
+    let mut apk = AlpineApkPackageIndex::new();
+    apk.add_package(ApkPackageEntry {
+        name: "musl".to_string(),
+        version: "1.2.4".to_string(),
+        arch: "x86_64".to_string(),
+        sha256_hash: [0x77; 32],
+        dependencies: vec![],
+    });
+
+    apk.add_trigger(ApkTriggerScript {
+        trigger_path: "/lib/modules".to_string(),
+        command: "depmod -a".to_string(),
+    });
+
+    assert_eq!(apk.run_package_triggers(), 1);
+    assert!(apk.verify_apk_v3_checksum("musl", &[0x77; 32]));
+    assert!(apk.resolve_musl_abi_compat("1.2.4"));
+}
+
+#[test]
+fn test_dragonfly_hammer2_pfs_cluster_delta_inspection() {
+    use unimplemented_features::DragonFlyHammer2FsSnapshot;
+
+    let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
+    hammer2.register_cluster_node(5, "192.168.1.105");
+    let snap_id = hammer2.create_pfs_snapshot("VAR_PFS", 0x12345678, 1700000000);
+
+    let delta_hash = hammer2.sync_cluster_delta(snap_id, 5).unwrap();
+    assert_ne!(delta_hash, 0);
+    assert!(hammer2.verify_cluster_merkle_roots("VAR_PFS"));
 }

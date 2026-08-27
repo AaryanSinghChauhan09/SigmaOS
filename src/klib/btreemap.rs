@@ -55,27 +55,39 @@ where
         self.entries.insert(insert_idx, (key, value));
     }
 
-    pub fn get(&self, key: &K) -> Option<&V> {
+    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
+    where
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq,
+    {
         for (k, v) in self.entries.iter() {
-            if k == key {
+            if k.borrow() == key {
                 return Some(v);
             }
         }
         None
     }
 
-    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
+    pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
+    where
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq,
+    {
         for (k, v) in self.entries.iter_mut() {
-            if k == key {
+            if (k as &K).borrow() == key {
                 return Some(v);
             }
         }
         None
     }
 
-    pub fn remove(&mut self, key: &K) -> Option<V> {
+    pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
+    where
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq,
+    {
         for i in 0..self.entries.len() {
-            if self.entries[i].0 == *key {
+            if self.entries[i].0.borrow() == key {
                 return Some(self.entries.remove(i).1);
             }
         }
@@ -94,7 +106,11 @@ where
         None
     }
 
-    pub fn contains_key(&self, key: &K) -> bool {
+    pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
+    where
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq,
+    {
         self.get(key).is_some()
     }
 
@@ -149,10 +165,43 @@ where
         }
     }
 
+    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
+        ValuesMut {
+            entries: &mut self.entries,
+            idx: 0,
+        }
+    }
+
     pub fn iter_mut(&mut self) -> BTreeMapIterMut<'_, K, V> {
         BTreeMapIterMut {
             entries: &mut self.entries,
             idx: 0,
+        }
+    }
+}
+
+pub struct ValuesMut<'a, K, V> {
+    entries: &'a mut Vec<(K, V)>,
+    idx: usize,
+}
+
+impl<'a, K, V> Iterator for ValuesMut<'a, K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = &'a mut V;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.idx < self.entries.len() {
+            let ptr = self.entries.as_mut_ptr();
+            unsafe {
+                let item = &mut *ptr.add(self.idx);
+                self.idx += 1;
+                Some(&mut item.1)
+            }
+        } else {
+            None
         }
     }
 }

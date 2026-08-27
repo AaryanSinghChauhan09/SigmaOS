@@ -30,9 +30,14 @@ pub enum DriverState {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum DriverError {
+    Success,
     LoadFailed,
     UnloadFailed,
     NotFound,
+    InvalidDevice,
+    IrpNotHandled,
+    InvalidParameter,
+    AccessDenied,
 }
 
 pub trait Driver {

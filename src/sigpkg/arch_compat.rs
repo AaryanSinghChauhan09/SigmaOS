@@ -246,11 +246,11 @@ impl PacmanDbAdapter {
             Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
-            SigmaString::from(name),
+            crate::klib::string::SigmaString::from(name),
             parsed_ver,
-            SigmaString::from(desc),
-            Vec::new(),
-            SigmaString::from("sha256_imported_legacy_hash_value"),
+            crate::klib::string::SigmaString::from(desc),
+            alloc::vec::Vec::new(),
+            crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
 }
@@ -310,10 +310,10 @@ impl AlpmHookManager {
         }
 
         self.add_hook(AlpmHook {
-            name: SigmaString::from(name),
+            name: crate::klib::string::SigmaString::from(name),
             when,
-            target_pattern: SigmaString::from(target_pattern),
-            exec_cmd: SigmaString::from(exec_cmd),
+            target_pattern: crate::klib::string::SigmaString::from(target_pattern),
+            exec_cmd: crate::klib::string::SigmaString::from(exec_cmd),
         });
 
         Ok(())
@@ -602,9 +602,12 @@ mod tests {
         sync.register_installed("make", Version::new(4, 3, 0));
 
         let source_pkg = DebianSbuildPackage {
-            name: SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: Vec::from_iter(alloc::vec![SigmaString::from("gcc"), SigmaString::from("make")]),
+            build_depends: alloc::vec![
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+            ],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
@@ -612,10 +615,10 @@ mod tests {
         let source_pkg_missing = DebianSbuildPackage {
             name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: vec![
-                "gcc".to_string(),
-                "make".to_string(),
-                "libc-dev".to_string(),
+            build_depends: alloc::vec![
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+                crate::klib::string::SigmaString::from("libc-dev"),
             ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));

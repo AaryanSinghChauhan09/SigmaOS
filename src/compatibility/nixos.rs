@@ -79,9 +79,14 @@ impl NixStore {
             return Err(NixError::EvaluationError);
         }
 
-        let pkg = self.packages.get(package).unwrap();
-        if let Some(out_path) = pkg.outputs.get("out") {
-            self.add_to_profile(profile, out_path);
+        let out_path = self
+            .packages
+            .get_str(package)
+            .and_then(|pkg| pkg.outputs.get_str("out"))
+            .map(|path| path.to_string());
+
+        if let Some(path) = out_path {
+            self.add_to_profile(profile, &path);
         }
 
         Ok(())

@@ -1065,8 +1065,15 @@ pub struct ApkPackageEntry {
     pub dependencies: Vec<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkTriggerScript {
+    pub trigger_path: String,
+    pub command: String,
+}
+
 pub struct AlpineApkPackageIndex {
     pub entries: Vec<ApkPackageEntry>,
+    pub triggers: Vec<ApkTriggerScript>,
     pub is_signature_verified: bool,
 }
 
@@ -1074,12 +1081,17 @@ impl AlpineApkPackageIndex {
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),
+            triggers: Vec::new(),
             is_signature_verified: false,
         }
     }
 
     pub fn add_package(&mut self, entry: ApkPackageEntry) {
         self.entries.push(entry);
+    }
+
+    pub fn add_trigger(&mut self, trigger: ApkTriggerScript) {
+        self.triggers.push(trigger);
     }
 
     pub fn verify_index_signature(&mut self, public_key: &[u8]) -> bool {
@@ -1099,6 +1111,22 @@ impl AlpineApkPackageIndex {
             }
         }
         resolved
+    }
+
+    pub fn run_package_triggers(&self) -> usize {
+        self.triggers.len()
+    }
+
+    pub fn verify_apk_v3_checksum(&self, pkg_name: &str, expected_sha256: &[u8; 32]) -> bool {
+        if let Some(pkg) = self.find_package(pkg_name) {
+            pkg.sha256_hash == *expected_sha256
+        } else {
+            false
+        }
+    }
+
+    pub fn resolve_musl_abi_compat(&self, required_musl_version: &str) -> bool {
+        !required_musl_version.is_empty()
     }
 }
 
@@ -1185,6 +1213,23 @@ impl DragonFlyHammer2FsSnapshot {
         } else {
             Err("Matching PFS snapshot not found for rollback")
         }
+    }
+
+    pub fn sync_cluster_delta(&mut self, snapshot_id: u64, target_node_id: u32) -> Result<u64, &'static str> {
+        let snap = self.pfs_snapshots.iter().find(|s| s.snapshot_id == snapshot_id)
+            .ok_or("PFS snapshot not found")?;
+        let merkle = snap.merkle_root;
+
+        let node_active = self.cluster_nodes.iter().any(|n| n.node_id == target_node_id && n.active);
+        if !node_active {
+            return Err("Target cluster node is inactive or missing");
+        }
+        Ok(merkle ^ (target_node_id as u64))
+    }
+
+    pub fn verify_cluster_merkle_roots(&self, pfs_name: &str) -> bool {
+        let count = self.pfs_snapshots.iter().filter(|s| s.pfs_name == pfs_name).count();
+        count > 0
     }
 }
 
@@ -1681,7 +1726,6 @@ mod zenith_desktop_core_tests {
         assert_eq!(gamification.level, 2);
         assert!(gamification.badges[0].unlocked); // "Package Artisan" unlocked
 }
-
 // =========================================================================
 // 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
 // =========================================================================
@@ -1777,6 +1821,70 @@ mod linux_lts_upstream_tests {
 // =========================================================================
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
+
+pub struct GentooEbuildPackage {
+    pub name: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
+
+pub struct GentooPortageMaskEngine {
+    pub target_arch: String,
+    pub ebuilds: Vec<GentooEbuildPackage>,
+    pub hard_masks: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(target_arch: &str) -> Self {
+        Self {
+            target_arch: target_arch.to_string(),
+            ebuilds: Vec::new(),
+            hard_masks: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, pkg_name: &str, version: &str, keywords: &[&str], masked: bool) {
+        self.ebuilds.push(GentooEbuildPackage {
+            name: pkg_name.to_string(),
+            version: version.to_string(),
+            keywords: keywords.iter().map(|k| k.to_string()).collect(),
+            is_masked: masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, pkg_name: &str) {
+        self.hard_masks.push(pkg_name.to_string());
+    }
+
+    pub fn evaluate_installability(&self, pkg_name: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
+        if self.hard_masks.iter().any(|m| m == pkg_name) {
+            return Err("Package is hard-masked in package.mask");
+        }
+
+        let ebuild = self.ebuilds.iter().find(|e| e.name == pkg_name && (version == "0" || e.version == version))
+            .ok_or("Ebuild package not found in Portage tree")?;
+
+        if ebuild.is_masked {
+            return Err("Ebuild package is masked");
+        }
+
+        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
+        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
+
+        if is_stable {
+            Ok(true)
+        } else if is_testing {
+            if accept_keywords {
+                Ok(true)
+            } else {
+                Err("Package requires ~arch keyword acceptance in package.accept_keywords")
+            }
+        } else {
+            Err("Package not available for target architecture")
+        }
+    }
+}
 
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,

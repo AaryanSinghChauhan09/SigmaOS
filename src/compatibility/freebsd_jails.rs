@@ -386,7 +386,7 @@ impl SigmaJailManager {
     fn apply_jail_restrictions(
         &self,
         jid: u32,
-        config: &JailConfig,
+        _config: &JailConfig,
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Apply cgroup restrictions
         let cgroup_path = format!("/sys/fs/cgroup/sigma-jail-{}", jid);
@@ -406,18 +406,15 @@ impl SigmaJailManager {
         jid: u32,
         command: &str,
     ) -> Result<String, Box<dyn std::error::Error>> {
+        let root_path = match self.jails.values().find(|j| j.jid == Some(jid)) {
+            Some(j) => j.config.root_path.clone(),
+            None => return Err("Jail not found".into()),
+        };
+
         // Use chroot and namespaces to execute in jail context
         let output = Command::new("unshare")
             .args(["-p", "-f", "chroot"])
-            .arg(
-                &self
-                    .jails
-                    .values()
-                    .find(|j| j.jid == Some(jid))
-                    .unwrap()
-                    .config
-                    .root_path,
-            )
+            .arg(&root_path)
             .arg("sh")
             .arg("-c")
             .arg(command)

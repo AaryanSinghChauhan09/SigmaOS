@@ -39,8 +39,11 @@ mod audio_editor;
 mod video_editor;
 #[path = "../src/compatibility/chimera_linux.rs"]
 mod chimera_linux;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
+use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]

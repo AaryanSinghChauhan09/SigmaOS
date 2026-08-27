@@ -108,6 +108,15 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+
     pub fn remove(&mut self, index: usize) -> T {
         if index >= self.len {
             panic!("index out of bounds");
@@ -153,6 +162,22 @@ impl<T> Vec<T> {
                 core::ptr::drop_in_place(self.data.add(i));
             }
             self.len = 0;
+        }
+    }
+
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
         }
     }
 
