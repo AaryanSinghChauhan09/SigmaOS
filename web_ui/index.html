@@ -20,7 +20,7 @@
 
         <!-- Stepper Indicator -->
         <div class="stepper" role="navigation" aria-label="Installation Steps">
-            <div class="step active" id="step-ind-1">
+            <div class="step active" id="step-ind-1" aria-current="step">
                 <span class="step-num">1</span>
                 <span class="step-label">Welcome</span>
             </div>
@@ -70,10 +70,13 @@
 
                 <div class="license-agreement">
                     <label class="checkbox-container">
-                        <input type="checkbox" id="accept-license" aria-required="true">
+                        <input type="checkbox" id="accept-license" aria-required="true" aria-describedby="license-error">
                         <span class="checkmark"></span>
                         I accept the Sovereign Digital Autonomy Agreement and Licensing Terms.
                     </label>
+                    <div id="license-error" role="alert" style="display: none; color: var(--danger); font-size: 0.78rem; margin-top: 8px; font-weight: 500;">
+                        ⚠️ Please accept the licensing terms and sovereign autonomy agreement to proceed.
+                    </div>
                 </div>
             </section>
 
@@ -206,7 +209,7 @@
                 <p class="panel-desc">Please wait while the automated installer formats partitions and extracts the base system image.</p>
 
                 <div class="progress-container">
-                    <div class="progress-bar-outer">
+                    <div class="progress-bar-outer" id="progress-bar-outer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-valuetext="0%" aria-describedby="progress-status">
                         <div class="progress-bar-inner" id="installation-progress" style="width: 0%;"></div>
                     </div>
                     <div class="progress-text">
@@ -298,10 +301,13 @@
                 const indicator = document.getElementById(`step-ind-${i}`);
                 if (i < currentStep) {
                     indicator.className = 'step completed';
+                    indicator.removeAttribute('aria-current');
                 } else if (i === currentStep) {
                     indicator.className = 'step active';
+                    indicator.setAttribute('aria-current', 'step');
                 } else {
                     indicator.className = 'step';
+                    indicator.removeAttribute('aria-current');
                 }
             }
         }
@@ -324,11 +330,16 @@
 
         function nextStep() {
             if (currentStep === 1) {
-                const accepted = document.getElementById('accept-license').checked;
-                if (!accepted) {
-                    alert('Please accept the licensing terms and sovereign autonomy agreement to proceed.');
+                const licenseCb = document.getElementById('accept-license');
+                const licenseErr = document.getElementById('license-error');
+                if (!licenseCb.checked) {
+                    licenseErr.style.display = 'block';
+                    licenseCb.setAttribute('aria-invalid', 'true');
+                    licenseCb.focus();
                     return;
                 }
+                licenseErr.style.display = 'none';
+                licenseCb.removeAttribute('aria-invalid');
             }
 
             if (currentStep < totalSteps) {
@@ -383,6 +394,7 @@
                 { prg: 100, msg: "✅ Installation completed successfully! Dual-boot boot records linked.", class: "text-green" }
             ];
 
+            const progressBarOuter = document.getElementById('progress-bar-outer');
             let logIndex = 0;
             const interval = setInterval(() => {
                 if (logIndex < logs.length) {
@@ -392,6 +404,10 @@
                         progressBar.style.width = `${progress}%`;
                         progressPct.textContent = `${progress}%`;
                         progressStatus.textContent = currentLog.msg;
+                        if (progressBarOuter) {
+                            progressBarOuter.setAttribute('aria-valuenow', progress);
+                            progressBarOuter.setAttribute('aria-valuetext', `${progress}%`);
+                        }
                         appendLog(currentLog.msg, currentLog.class);
                         logIndex++;
                     }
