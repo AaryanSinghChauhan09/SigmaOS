@@ -9,6 +9,7 @@ pub mod advanced_process_control;
 pub use spawn::{Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter};
 pub use sovereign_process_engine::{
     IpcChannelBuffer, IpcMessage, ProcessHandle, SovereignProcessManager, SovereignProcessState,
+    SovereignPidAllocator, PidNamespaceScope, ProcessTreeNode,
 };
 pub use activity_manager::{
     ActivityManager, ActivityManager as ProcessActivityManager, ActivityState, AddressSpaceBinding,

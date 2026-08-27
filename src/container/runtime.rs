@@ -108,7 +108,7 @@ pub struct ContainerInfo {
     pub pid: Option<usize>,
     pub memory_limit: u64,
     pub cpu_limit: u32,
-    pub capability: RuntimeCapability,
+    pub capability: ContainerCapability,
 }
 
 impl ContainerInfo {
@@ -291,7 +291,7 @@ pub struct SimpleContainer {
     pub pid: AtomicUsize,
     pub memory_limit: u64,
     pub cpu_limit: u32,
-    pub capability: RuntimeCapability,
+    pub capability: ContainerCapability,
     pub environment: [u8; 512],
     pub seccomp: SeccompProfile,
 }
@@ -308,7 +308,7 @@ impl SimpleContainer {
         id: ContainerID,
         name: &[u8],
         image: &[u8],
-        capability: RuntimeCapability,
+        capability: ContainerCapability,
     ) -> Self {
         let mut name_array = [0u8; 64];
         let mut image_array = [0u8; 128];
@@ -450,7 +450,7 @@ pub trait ContainerRuntime {
         &mut self,
         name: &[u8],
         image: &[u8],
-        capability: RuntimeCapability,
+        capability: ContainerCapability,
     ) -> Result<ContainerID, ContainerError>;
     /// Remove container
     fn remove_container(&mut self, id: ContainerID) -> Result<(), ContainerError>;
@@ -550,7 +550,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
         &mut self,
         name: &[u8],
         image: &[u8],
-        capability: RuntimeCapability,
+        capability: ContainerCapability,
     ) -> Result<ContainerID, ContainerError> {
         if !self.capability.can_create {
             return Err(ContainerError::PermissionDenied);

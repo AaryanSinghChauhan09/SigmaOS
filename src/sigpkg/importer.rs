@@ -200,7 +200,7 @@ impl PackageImporter for PacmanPackageImporter {
                 "pacman-sha256-placeholder".to_string(),
             )
             .with_build_command("cargo build --release".to_string())
-            .with_pkgrel(pkgrel);
+            .with_pkgrel(pkgrel.to_string());
 
         Ok(recipe)
     }
