@@ -38,7 +38,16 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod sched;
+pub mod structures;
+pub mod subsystem;
+pub mod virtual_cpu;
+pub mod vmm_paging;
 
+pub use architecture::*;
+pub use bus::*;
+pub use linux_bsd_innovations::*;
+pub use policy_mechanism::*;
+pub use structures::*;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,

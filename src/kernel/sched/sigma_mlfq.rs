@@ -2,11 +2,8 @@ extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
-#[cfg(feature = "kernel")]
 use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
-#[cfg(feature = "kernel")]
 use crate::kernel::sched::scheduler::{SchedClass, RunQueue};
-#[cfg(feature = "kernel")]
 use crate::filesystem::FsError;
 
 /// Multi-Level Feedback Queue (MLFQ) Scheduler
@@ -94,12 +91,10 @@ impl MlfqScheduler {
     }
 }
 
-#[cfg(feature = "kernel")]
 pub struct MlfqSchedClass {
     pub mlfq: MlfqScheduler,
 }
 
-#[cfg(feature = "kernel")]
 impl MlfqSchedClass {
     pub fn new(nr_queues: usize) -> Self {
         MlfqSchedClass {
@@ -108,7 +103,6 @@ impl MlfqSchedClass {
     }
 }
 
-#[cfg(feature = "kernel")]
 impl SchedClass for MlfqSchedClass {
     fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.nr_running.fetch_add(1, Ordering::SeqCst);

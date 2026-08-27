@@ -1,0 +1,23 @@
+name: Arch Recipe Sandbox Packaging Pipeline
+
+on:
+  push:
+    branches: [ main, master, "feat/*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  arch-recipe-build:
+    name: Arch Plaintext Recipe Sandbox Compiler Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Compile and Test Recipe Sandbox
+        run: |
+          rustc --edition=2021 --test src/distro/wiki_ideas_implementation.rs -o test_wiki_ideas && ./test_wiki_ideas
+          rm test_wiki_ideas
