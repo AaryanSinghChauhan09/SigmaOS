@@ -503,6 +503,9 @@ pub struct SimpleContainerRuntime {
     capability: RuntimeCapability,
 }
 
+/// Runtime capability
+pub type ContainerCapability = RuntimeCapability;
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
@@ -729,6 +732,10 @@ pub mod oci {
     use super::NamespaceConfig;
     use alloc::string::{String, ToString};
     use super::ContainerError;
+    use crate::container::ContainerError;
+    use crate::container::runtime::NamespaceConfig;
+    use alloc::string::String;
+    use alloc::string::ToString;
     use alloc::vec::Vec;
 
     pub struct NamespaceSet {

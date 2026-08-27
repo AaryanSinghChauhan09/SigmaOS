@@ -33,6 +33,7 @@ pub mod wiki_ideas_implementation;
 pub mod arch;
 pub mod cachy;
 pub mod linux_bsd_parity_extended;
+pub mod wiki_ideas_implementation;
 
 pub use linux_bsd_parity::{
     ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
@@ -122,9 +123,19 @@ pub use ready_to_use::{
 pub use missing_distro_innovations::{
     ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
     ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
-};
-
-pub use missing_distro_innovations::{
-    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
+pub use bsd_linux_innovations::{
+    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
+    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
+    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
+    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
+    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
+pub use linux_bsd_parity_extended::{
+    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
+    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
+    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
+    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
+    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot as ExtSnapperSnapshot, SnapperBtrfsEngine,
+    SnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
+    SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,
 };

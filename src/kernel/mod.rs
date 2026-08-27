@@ -48,6 +48,8 @@ pub use structures::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
 pub use policy_mechanism::*;
+pub mod virtual_cpu;
+pub mod vmm_paging;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,

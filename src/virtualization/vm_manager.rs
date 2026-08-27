@@ -9,9 +9,7 @@ use crate::klib::collections::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 use alloc::format;
-#[cfg(not(test))]
 use crate::klib::path::PathBuf;
-#[cfg(test)]
 use std::path::PathBuf;
 
 #[cfg(test)]

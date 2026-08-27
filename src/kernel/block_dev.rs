@@ -26,6 +26,8 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 use crate::klib::{BTreeMap, Vec};
 use crate::klib::collections::VecDeque;
+extern crate alloc;
+use crate::klib::{BTreeMap, Vec, VecDeque};
 use alloc::string::String;
 
 pub const SECTOR_SIZE: usize = 512;

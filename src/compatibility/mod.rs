@@ -88,6 +88,9 @@ pub mod sovereign_suite;
 pub mod superiority;
 pub mod tiny_core;
 pub mod wasm_sandbox;
+pub mod zorin;
+
+pub use zorin::*;
 
 pub use gap_closure::{
     KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,

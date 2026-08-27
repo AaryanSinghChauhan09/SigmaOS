@@ -3,6 +3,7 @@ extern crate alloc;
 // Sovereign Sigpkg - Complete 20-Pillar Package, Build & Reproducibility System for SigmaOS
 // Inspired by Nix/Guix, Arch Linux, Debian, Fedora, FreeBSD Ports, and Alpine Linux
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};

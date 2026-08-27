@@ -506,7 +506,7 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        if let Some(ref mut pt) = self.pt_tables[pd_idx] {
+        if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
             pt_entry.set_writable(writable);

@@ -655,32 +655,68 @@ mod tests {
     }
 
     #[test]
+    fn test_zero_copy_splice() {
+        let splice_engine = SigmaZeroCopySpliceEngine::new();
+        let transferred = splice_engine.splice(3, 4, 1024).unwrap();
+        assert_eq!(transferred, 1024);
+        assert!(splice_engine.splice(3, 3, 1024).is_err());
+    }
+
+    #[test]
+    fn test_ebpf_policy_verifier() {
+        let mut verifier = EbpfSyscallPolicyVerifier::new();
+        verifier.block_syscall(101); // ptrace
+        verifier.allow_syscall(1);   // write
+
+        assert_eq!(verifier.evaluate_syscall(101), PolicyAction::Deny);
+        assert_eq!(verifier.evaluate_syscall(1), PolicyAction::Allow);
+        assert_eq!(verifier.evaluate_syscall(999), PolicyAction::Allow);
+    }
+
+    #[test]
+    fn test_capsicum_descriptor_delegate() {
+        let mut cap = FreeBsdCapsicumDescriptorDelegate::grant_capability(5, CAP_READ | CAP_SEEK);
+        assert!(FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_READ));
+        assert!(!FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_WRITE));
+
+        FreeBsdCapsicumDescriptorDelegate::restrict_rights(&mut cap, CAP_READ);
+        assert!(!FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_SEEK));
+    }
+
+    #[test]
     fn test_systemd_parity_engine() {
-        let mut engine = SovereignSystemdParityEngine::new();
-        engine.register_unit("docker.service", SystemdUnitType::Service, &[]);
-        engine.register_unit("user.slice", SystemdUnitType::Slice, &[]);
-        engine.register_unit("mnt-data.mount", SystemdUnitType::Mount, &[]);
+        let mut systemd = SovereignSystemdParityEngine::new();
+        let unit = SystemdUnit {
+            name: String::from("sshd.service"),
+            unit_type: SystemdUnitType::Service,
+            active_state: SystemdUnitActiveState::Inactive,
+            description: String::from("OpenSSH Daemon"),
+            exec_start: vec![String::from("/usr/bin/sshd")],
+            dependencies: Vec::new(),
+            memory_limit_bytes: Some(512 * 1024 * 1024),
+            cpu_quota_pct: Some(50),
+        };
 
-        assert!(engine.start_unit("docker.service").is_ok());
-        assert_eq!(engine.units["docker.service"].state, SystemdUnitState::Active);
-
-        assert!(engine.set_resource_limits("user.slice", 2048, 200).is_ok());
-        assert_eq!(engine.units["user.slice"].memory_limit_mb, Some(2048));
-
-        let logs = engine.query_journal("docker.service");
-        assert_eq!(logs.len(), 1);
-        assert!(logs[0].message.contains("Started unit"));
+        systemd.register_unit(unit);
+        let state = systemd.start_unit("sshd.service").unwrap();
+        assert_eq!(state, SystemdUnitActiveState::Active);
+        assert!(systemd.journal_logs.len() >= 2);
     }
 
     #[test]
     fn test_hybrid_scheduler_innovations() {
         let mut sched = SovereignHybridSchedulerInnovations::new();
-        assert!(sched.verify_rt_lane_preemption_latency());
+        let task = RealtimeTask {
+            pid: 10,
+            class: SchedulerClass::RTLane,
+            deadline_us: 100,
+            wcet_us: 10,
+            numa_node: 0,
+        };
 
-        assert_eq!(sched.select_optimal_numa_node(2), Some(0));
-        assert_eq!(sched.select_optimal_numa_node(6), Some(1));
-
-        sched.set_governor(CpuPStateGovernor::Performance);
-        assert_eq!(sched.governor, CpuPStateGovernor::Performance);
+        sched.add_task(task);
+        let selected = sched.select_next_rt_task().unwrap();
+        assert_eq!(selected.pid, 10);
+        assert_eq!(sched.auto_adjust_dvfs(), 4200);
     }
 }

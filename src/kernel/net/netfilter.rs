@@ -24,6 +24,8 @@ use crate::klib::Vec;
 /// Absorbs Linux netfilter hooks: PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING
 /// Supports: ACCEPT, DROP, REJECT, LOG actions; conntrack state matching
 use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NfHookpoint {

@@ -3,6 +3,8 @@
 
 extern crate alloc;
 
+extern crate alloc;
+
 pub mod agent;
 pub mod agentic_os_runtime;
 pub mod apm;
@@ -63,4 +65,9 @@ pub use system::{
 pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
+};
+pub use developer_platform::{
+    AiSafetyPolicyEngine, DefaultDenyNetworkPolicy, DeviceTarget, ExperimentRun,
+    LocalLlmOrchestrator, MarketplaceModel, MlExperimentTracker, OpenShellAgentSandbox,
+    PrivacyRouter, SignedModelMarketplace,
 };

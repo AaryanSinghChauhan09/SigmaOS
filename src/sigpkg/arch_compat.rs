@@ -349,6 +349,13 @@ pub struct MkinitcpioBuilder {
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
+        let mut hooks = crate::klib::vec::Vec::new();
+        hooks.push(crate::klib::string::SigmaString::from("base"));
+        hooks.push(crate::klib::string::SigmaString::from("udev"));
+        hooks.push(crate::klib::string::SigmaString::from("autodetect"));
+        hooks.push(crate::klib::string::SigmaString::from("modconf"));
+        hooks.push(crate::klib::string::SigmaString::from("block"));
+        hooks.push(crate::klib::string::SigmaString::from("filesystems"));
         Self {
             hooks: Vec::new(),
             compression: "zstd".to_string(),

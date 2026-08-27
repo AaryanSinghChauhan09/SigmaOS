@@ -49,6 +49,9 @@ pub mod vec;
 pub use btreemap::BTreeMap;
 pub use vec::Vec;
 pub use rng::{SigmaRng, Rng};
+extern crate alloc;
+
+pub use alloc::collections::BTreeMap;
 pub use hashmap::HashMap;
 pub use collections::VecDeque;
 pub use string::SigmaString;

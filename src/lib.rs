@@ -33,6 +33,7 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
+pub mod process;
 pub use process::{
     ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
     JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
@@ -41,6 +42,10 @@ pub use process::{
     SigQueuePayload, AdvancedIpcHub, Process, ProcessID, ProcessState, ProcessError, SimpleProcess,
     ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter,
 };
+    SigQueuePayload, AdvancedIpcHub,
+pub mod community;
+pub mod memory;
+pub mod access;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
@@ -190,7 +195,6 @@ pub use kernel::{
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 
-pub use kernel::{
     Apc, ApcMode, ApcQueue, ArchitectureEngine,
     AuditBlock, CircularDoublyLinkedList, CpuArchitectureClass,
     CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase, InterruptClass, Irql,
@@ -199,6 +203,16 @@ pub use kernel::{
     ProtectionDomain, ResourceBroker, PrivilegeLevel, PoolType, ProcessorInitState,
     SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
     Tcb, ThreadState, WorkItem,
+pub mod distro;
+    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
+    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
+    InstructionCyclePhase, InterruptClass, IpcError, IpcManager, Irql,
+    LcgRandom, LookasideList, LotteryTask, MemoryBlock,
+    MemoryDescriptorList, Message, Pcb, PolicyManager, PolicyError, FastPathIpc, InterruptMechanism,
+    ProtectionDomain, ResourceBroker, PrivilegeLevel, PoolType, Priority, Process,
+    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
+    RoundRobinSchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
+    Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
@@ -250,8 +264,11 @@ pub use distro::{
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
     NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
-    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
+    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
+    SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
+    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
+    SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -308,10 +325,25 @@ pub use unimplemented_tools::{
     FedoraToolboxContainerEngine, NixHomeManagerEnvironment,
     MiseUniversalVersionManager, DevenvReproducibleEnvironment, AircrackWirelessAuditor,
     UbuntuProLivepatchEngine, FlatpakSdkContainerBuilder, ClearLinuxStatelessEngine,
+    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
+    PackageRecipe, RecipeError, RecipeManager, SatSolver,
+    Transaction, UniversalPackageAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use unimplemented_tools::{
+    AudioEditor, PodcastRecorder, SubtitleEditor, MemoryLeakDetector, GamifiedTodo, MindMapCreator,
+    GameHubLauncher, EmulatorManager, GameRecorder, GamePerformanceBooster, CloudGaming, VrArRuntime,
+    ControllerMapper, GameModManager, AiDifficultyDirector, GanttChartPlanner, PdfEditor,
+    DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
+    AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
+    MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
+    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
+    CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
+    SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
+    PluginMarketplace, MusicLibraryManager,
 };
 
 pub mod init;
