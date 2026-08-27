@@ -56,6 +56,13 @@ pub use fedora_rpm_engine::{DnfRepository, RpmPackage};
 pub use importer::{
     DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };
+pub use multi_distro::{
+    AptPinPriority, BsdPkgDb, BsdPkgDirective, BsdPkgManifest, DnfDeltaEngine,
+    EbuildManifestEntry, EbuildManifestEntryType, GentooEbuildManifestEngine,
+    NixFlakeInput, NixFlakeLockVerifier, NixFlakeLockfile, PacmanAlpmHookRegistry,
+    ParallelMirrorDownloader, PortageSlotResolver, SovereignMultiDistroPackageManager,
+    StagedTransaction, TransactionRollbackHandler, XbpsCasExtractor,
+};
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;

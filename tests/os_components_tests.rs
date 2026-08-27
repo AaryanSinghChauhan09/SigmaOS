@@ -85,6 +85,8 @@ mod community_toolkit;
 mod system_user;
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 #[path = "../src/memory/segmentation_paging.rs"]
 mod segmentation_paging;
 pub enum CpuPrivilegeMode {
