@@ -6,9 +6,9 @@ This document is the master, definitive diagnostic guide for SigmaOS. It provide
 
 ## SECTION 1: WHAT IS WORKING
 
-SigmaOS features a zero-dependency, modular microkernel and OS suite written in safe Rust. Running `./run_sigma_tests.sh` executes the master atomic test suite and subsystem inspection harness with a **100% pass rate (40/40 atomic tests pass)**.
+SigmaOS features a zero-dependency, modular microkernel and OS suite written in safe Rust. Running `./run_sigma_tests.sh` executes the master atomic test suite and subsystem inspection harness with a **100% pass rate on the atomic test suite (40/40 atomic tests pass)**.
 
-### 1. Core Microkernel & Scheduling Algorithms (`src/kernel/`)
+### 1. Core Microkernel & Scheduling Algorithms (`src/kernel/`, `src/scheduler/`)
 - **EEVDF Scheduler (`src/kernel/scheduler.rs` & `src/scheduler/eevdf.rs`):** Linux 6.6+ Earliest Eligible Virtual Deadline First algorithm implementing lag tracking (`lag = vruntime_avg - task_vruntime`), weighted deadline calculation (`vruntime + time_slice * 1024 / weight`), eligibility checks (`task_vruntime <= vruntime_avg`), 64-byte cache-line aligned task picking, and NUMA-aware work-stealing queues.
 - **BORE Interactive Scheduler (`src/kernel/bore.rs`):** CachyOS Burst-Oriented Response Enhancer algorithm tracking burst vs. sleep history windows, calculating dynamic interactivity scores (0 = CPU-bound, 100 = interactive UI task), and evaluating SMP migration candidates.
 - **Classic OS Algorithms (`src/kernel/classic_os.rs`):**
@@ -25,8 +25,8 @@ SigmaOS features a zero-dependency, modular microkernel and OS suite written in 
 - **HAL Multi-Arch Abstraction (`src/kernel/architecture.rs`):** Unified architecture interface supporting x86_64 (APIC/IOAPIC, CR0/CR4/EFER registers), AArch64 (GICv2/v3, TTBR page tables), and RISC-V 64 (PLIC/CLINT, satp S-mode paging).
 - **PCI/PCIe Bus Scanner (`src/kernel/pci_scanner.rs`):** PCIe ECAM memory-mapped configuration space addressing, 32-bit/64-bit MMIO & I/O BAR decoding, prefetchable memory flags, and Capabilities pointer parsing (MSI, MSI-X, PCIe, Power Management).
 
-### 3. Linux & BSD Parity Layers (`src/compatibility/`, `src/distro/`, `src/package/`)
-- **Distro Parity Subsystems (`src/distro/parity.rs`, `src/distro/linux_bsd_parity.rs`):**
+### 3. Linux & BSD Parity Layers (`src/compatibility/`, `src/distro/`, `src/sigpkg/`)
+- **Distro Parity Subsystems (`src/distro/linux_bsd_parity.rs`):**
   - FreeBSD Capsicum fine-grained file rights (`CapsicumRights`) & FreeBSD Jails VNET network namespace isolation.
   - OpenBSD Pledge/Unveil path restriction virtualizers (`UnveilRestrictions`).
   - Arch Linux AUR PKGBUILD verification (`AurPkgBuildVerifier`).
@@ -165,11 +165,11 @@ error[E0063]: missing fields `changelogs`, `licenses`, `maintainers` in initiali
 ```
 
 #### **Why It Occurs:**
-1. **E0034**: Duplicate `pub fn new(...)` method implementations exist within the same `impl` block or across multiple `impl` blocks for a single struct (e.g. `Package`).
+1. **E0034**: Duplicate `pub fn new(...)` method implementations exist within the same `impl` block or across multiple `impl` blocks for a single struct (e.g. `Package`, `DoasRuleEngine`, `SubUidGidMapper`).
 2. **E0063**: When new fields are added to a struct definition, any manual struct initializers (`Package { name, version, ... }`) that omit the new fields will fail to compile.
 
 #### **How to Fix It (Blueprint):**
-1. Maintain exactly **one** `pub fn new(...)` constructor method per struct.
+1. Maintain exactly **one** `pub fn new(...)` constructor method per struct by consolidating or removing duplicates.
 2. Ensure `new(...)` initializes all fields, providing sensible defaults (`Vec::new()`, `String::new()`, `None`) for optional fields:
 
 ```rust
@@ -232,86 +232,60 @@ match command {
 
 ---
 
-### Issue 5: Undeclared / Renamed Type References (`E0433`)
+### Issue 5: Undeclared Types & Structural Field Mismatches (`E0433` / `E0560` / `E0609`)
 
 #### **Symptom / Compiler Output:**
 ```text
-error[E0433]: failed to resolve: use of undeclared type `SimpleStorageDriver`
-  --> src/driver/framework.rs:492:31
-   |
-492 | let driver = Box::new(SimpleStorageDriver::new(...));
-   |                       ^^^^^^^^^^^^^^^^^^^ use of undeclared type
+error[E0433]: failed to resolve: use of undeclared type `DvfsPowerGovernor`
+error[E0560]: struct `root_improvement::SubUidGidMapper` has no field named `subuid_database`
+error[E0609]: no field `subuid_database` on type `&mut root_improvement::SubUidGidMapper`
 ```
 
 #### **Why It Occurs:**
-Subsystem refactoring renamed legacy types (e.g. `SimpleStorageDriver` was consolidated into `SimpleDriver`; `SimpleVulnerabilityScanner` was renamed to `SecurityScanner`).
+1. Subsystem refactoring renamed legacy types (e.g. `SimpleStorageDriver` was consolidated into `SimpleDriver`; `SimpleVulnerabilityScanner` into `SecurityScanner`).
+2. Fields were renamed in struct definitions (e.g. `SubUidGidMapper` field renamed from `subuid_database` to `subuid_ranges`).
 
 #### **How to Fix It (Blueprint):**
-Update type references to their updated canonical names:
+Update struct references and field accesses to match updated type declarations:
 
-| Legacy / Deprecated Type Name | Canonical Updated Type Name | Module File Location |
+| Deprecated / Misnamed Item | Canonical Updated Declaration | File Location |
 | :--- | :--- | :--- |
 | `SimpleStorageDriver` | `SimpleDriver` | `src/driver/framework.rs` |
-| `SimpleVulnerabilityScanner` | `SecurityScanner` | `src/security/vulnerability.rs` |
-| `SimpleVulnerability` | `VulnerabilityReport` | `src/security/vulnerability.rs` |
-| `UniversalPackageManager` | `UniversalPackageAdapter` | `src/sigpkg/universal_adapter.rs` |
+| `subuid_database` | `subuid_ranges` | `src/security/root_improvement.rs` |
+| `subgid_database` | `subgid_ranges` | `src/security/root_improvement.rs` |
+| `DvfsPowerGovernor` | `PowerGovernor` | `src/power/dvfs.rs` |
 
 ---
 
-### Issue 6: Stray Git Merge Conflict Markers
+### Issue 6: Missing Methods & Return Type Mismatches (`E0599` / `E0308`)
 
 #### **Symptom / Compiler Output:**
 ```text
-error: expected item, found `|`
-  --> tests/linux_bsd_inspection_tests.rs:242:1
-   |
-242 | ||||||| 78b38b7
-   | ^
+error[E0599]: no method named `query_journal` found for struct `SovereignSystemdParityEngine`
+error[E0308]: mismatched types: expected `Result<SystemdUnitActiveState, String>`, found `Result<(), _>`
 ```
 
 #### **Why It Occurs:**
-Automated multi-branch merging or concurrent rebases left unmerged conflict markers (`<<<<<<<`, `|||||||`, `=======`, `>>>>>>>`) inside source code files.
+1. A method referenced in integration tests was omitted during struct implementation or placed under a different name.
+2. Method return signatures evolved (e.g. `start_unit` returning `Result<SystemdUnitActiveState, String>` instead of `Result<(), String>`).
 
 #### **How to Fix It (Blueprint):**
-Strip conflict markers programmatically or via editor replacement:
-
-```python
-import re
-
-def clean_conflict_markers(filepath):
-    with open(filepath, 'r') as f:
-        content = f.read()
-    cleaned = re.sub(r'<<<<<<<.*?\n|||||||.*?\n=======.*?\n>>>>>>>.*?\n', '', content, flags=re.DOTALL)
-    cleaned = '\n'.join([
-        line for line in cleaned.splitlines()
-        if not (line.startswith('|||||||') or line.startswith('<<<<<<<') or line.startswith('>>>>>>>') or line.startswith('======='))
-    ])
-    with open(filepath, 'w') as f:
-        f.write(cleaned)
+1. Implement missing methods directly on the targeted struct:
+```rust
+impl SovereignSystemdParityEngine {
+    pub fn query_journal(&self, unit_name: &str) -> Vec<String> {
+        self.journal_logs
+            .get(unit_name)
+            .cloned()
+            .unwrap_or_default()
+    }
+}
 ```
+2. Update assertion expectations in test files to match the declared return type.
 
 ---
 
-### Issue 7: Inner Crate Attribute Misplacement
-
-#### **Symptom / Compiler Output:**
-```text
-warning: crate-level attribute should be in the root module
-  --> src/container/oci_runtime.rs:2:1
-   |
- 2 | #![no_main]
-   | ^^^^^^^^^^^
-```
-
-#### **Why It Occurs:**
-Inner crate attributes beginning with `#![...]` apply to the whole crate root (`src/lib.rs` or `src/main.rs`). Placing `#![no_std]` or `#![no_main]` inside submodules triggers warnings or compilation failures.
-
-#### **How to Fix It (Blueprint):**
-Remove misplaced `#![no_std]` or `#![no_main]` inner attributes from submodule files under `src/`. Standard outer attributes (`#[...]`) on structs/functions remain valid.
-
----
-
-### Issue 8: Borrow Checker Move Errors in HashMaps (`E0382`)
+### Issue 7: Borrow Checker Move Errors in HashMaps (`E0382`)
 
 #### **Symptom / Compiler Output:**
 ```text
@@ -329,7 +303,7 @@ error[E0382]: borrow of moved value: `package`
 The variable `package` is moved into `self.installed_packages.insert(...)` on line 234, rendering `package` invalid for subsequent operations on line 236.
 
 #### **How to Fix It (Blueprint):**
-Clone the key field before moving the struct, or borrow fields prior to the move operation:
+Clone key fields before moving the struct:
 
 ```rust
 // BEFORE (Value Moved):
@@ -344,7 +318,7 @@ self.status_database.insert(pkg_name, "install ok installed".to_string());
 
 ---
 
-### Issue 9: Immutable Self Borrow Conflict with Self Call (`E0502`)
+### Issue 8: Immutable Self Borrow Conflict with Self Call (`E0502`)
 
 #### **Symptom / Compiler Output:**
 ```text
@@ -609,7 +583,8 @@ When an AI agent is tasked with fixing an algorithm or compilation error in Sigm
 |                 AI AGENT ALGORITHM FIX CHECKLIST                      |
 +-----------------------------------------------------------------------+
 |  [ ] STEP 1: RUN SUITE DIAGNOSTICS                                     |
-|      Execute `./run_sigma_tests.sh` to get baseline test output.     |
+|      Execute `./run_sigma_tests.sh` and `cargo check --lib` to get    |
+|      baseline test outputs and error logs.                            |
 |                                                                       |
 |  [ ] STEP 2: CLASSIFY ERROR                                           |
 |      Match compiler output to Section 2:                              |
@@ -618,6 +593,8 @@ When an AI agent is tasked with fixing an algorithm or compilation error in Sigm
 |      - E0063  => Update struct initializer / use Package::new().      |
 |      - E0004  => Add missing match pattern or _ wildcard arm.         |
 |      - E0433  => Replace legacy type name with canonical type.        |
+|      - E0560/E0609 => Match struct field names to current struct impl. |
+|      - E0599/E0308 => Add missing struct methods or align return types.|
 |      - E0382  => Clone map key before moving value into hashmap.      |
 |      - E0502  => Collect query results into owned Vec before loop.    |
 |                                                                       |
@@ -626,7 +603,7 @@ When an AI agent is tasked with fixing an algorithm or compilation error in Sigm
 |      Do not edit build artifacts under target/ or dist/.              |
 |                                                                       |
 |  [ ] STEP 4: VERIFY RE-COMPILATION & UNIT TESTS                       |
-|      Run `./run_sigma_tests.sh` and confirm all tests pass cleanly.  |
+|      Run `./run_sigma_tests.sh` and confirm atomic tests pass 100%.  |
 +-----------------------------------------------------------------------+
 ```
 
