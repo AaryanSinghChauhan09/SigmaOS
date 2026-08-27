@@ -480,13 +480,10 @@ impl X86RootkitAuditor {
 
     pub fn audit_driver_dispatch_table(
         &self,
-        _driver: &crate::driver::framework::DriverObject,
+        driver: &crate::driver::framework::DriverObject,
         lower_bound: usize,
         upper_bound: usize,
     ) -> Result<(), &'static str> {
-        // Temporarily disabled due to DriverObject access issues
-        // TODO: Fix driver object structure access
-        /*
         for handler in &driver.major_function {
             if let Some(f) = handler {
                 let addr = *f as usize;
@@ -497,7 +494,6 @@ impl X86RootkitAuditor {
                 }
             }
         }
-        */
         Ok(())
     }
 

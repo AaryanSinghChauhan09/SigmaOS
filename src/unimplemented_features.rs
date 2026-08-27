@@ -57,20 +57,18 @@ impl LegacyController {
     }
 }
 
-/// Gentoo Portage Ebuild Profile with Package Slotting & Keywords
 #[derive(Debug, Clone)]
-pub struct PortageEbuildProfile {
-    pub atom_name: String,
-    pub slot: String,
-    pub keywords: Vec<String>, // e.g. "amd64", "~amd64"
-    pub is_ebuild_masked: bool,
+pub struct EbuildEntry {
+    pub category_pkg: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
 }
 
-/// Gentoo Portage Masking & Slotting Resolver Engine
 pub struct GentooPortageMaskEngine {
-    pub hard_masked_atoms: Vec<String>,
-    pub ebuilds: Vec<PortageEbuildProfile>,
     pub target_arch: String,
+    pub ebuilds: Vec<EbuildEntry>,
+    pub hard_masked_pkgs: Vec<String>,
 }
 
 impl GentooPortageMaskEngine {

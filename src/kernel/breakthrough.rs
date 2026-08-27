@@ -440,38 +440,6 @@ mod tests {
         assert_eq!(sys.modules.as_slice()[0].optimized_latency_ticks, 150);
     }
 
-    #[test]
-    fn test_parallel_service_startup() {
-        // Temporarily disabled due to import issues with init system
-        // TODO: Fix init system module structure
-        /*
-        let mut init = SigmaInit::new();
-
-        let mut s1 = SimpleService::new(1, b"udev");
-        let mut s2 = SimpleService::new(2, b"syslog");
-        let mut s3 = SimpleService::new(3, b"networking");
-        s3.deps.push(1); // networking depends on udev
-        s3.deps.push(2); // networking depends on syslog
-
-        init.register_service(Box::new(s1)).unwrap();
-        init.register_service(Box::new(s2)).unwrap();
-        init.register_service(Box::new(s3)).unwrap();
-
-        // 1. Parallel Startup schedule
-        let schedule = init.parallel_DAG_startup().unwrap();
-        assert_eq!(schedule.len, 2);
-        // Wave 0: udev and syslog (independent services scheduled in parallel)
-        assert_eq!(schedule.as_slice()[0].len, 2);
-        assert!(schedule.as_slice()[0].contains(&1));
-        assert!(schedule.as_slice()[0].contains(&2));
-        // Wave 1: networking (runs after its dependencies complete)
-        assert_eq!(schedule.as_slice()[1].len, 1);
-        assert!(schedule.as_slice()[1].contains(&3));
-
-        // 2. AI Bottleneck prediction
-        let bottleneck = init.predict_boot_bottleneck().unwrap();
-        */
-    }
 
     #[test]
     fn test_adaptive_sudo() {

@@ -765,15 +765,4 @@ mod tests {
     fn mock_write(_buf: &[u8]) -> i32 { 0 }
     fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 { 0 }
 
-    #[test]
-    fn test_linux_driver_shim() {
-        // Temporarily disabled - LinuxFileOperations struct not defined
-        // TODO: Implement LinuxFileOperations or remove this test
-    }
-
-    #[test]
-    fn test_procedural_driver_dispatch_table() {
-        // Temporarily disabled - ProceduralDriverDispatchTable not defined
-        // TODO: Implement ProceduralDriverDispatchTable or remove this test
-    }
 }

@@ -9,6 +9,8 @@ extern crate alloc;
 
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 
 #[path = "../src/storage/geom.rs"]
 mod geom;
@@ -258,6 +260,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 fn test_process_activity_manager_and_registers() {
     let mut pam = ActivityManager::new();
     pam.register_process(500, 0, "chrome", 0);
+    pam.register_thread(500, 501, "render_main").unwrap();
 
     pam.set_foreground_process(500).unwrap();
     let active_proc = pam.get_process_activity(500).unwrap();
