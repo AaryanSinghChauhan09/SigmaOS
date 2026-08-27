@@ -4,8 +4,12 @@ pub mod linux_sysfs;
 pub mod activity_manager;
 pub mod blocked_state;
 pub mod advanced_process_control;
+pub mod sovereign_process_engine;
 
 pub use spawn::{Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter};
+pub use sovereign_process_engine::{
+    SovereignProcessState, SovereignProcess, ZeroCopyIpcChannel, SovereignProcessManager,
+};
 pub use advanced_process_control::{
     ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
     JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
