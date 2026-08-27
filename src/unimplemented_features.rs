@@ -1932,6 +1932,85 @@ impl GentooUseFlagEngine {
     }
 }
 
+pub struct PortageEbuild {
+    pub package: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
+
+pub struct GentooPortageMaskEngine {
+    pub arch: String,
+    pub ebuilds: Vec<PortageEbuild>,
+    pub hard_masked_packages: Vec<String>,
+    pub unmasked_packages: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(arch: &str) -> Self {
+        Self {
+            arch: arch.to_string(),
+            ebuilds: Vec::new(),
+            hard_masked_packages: Vec::new(),
+            unmasked_packages: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, package: &str, version: &str, keywords: &[&str], is_masked: bool) {
+        self.ebuilds.push(PortageEbuild {
+            package: package.to_string(),
+            version: version.to_string(),
+            keywords: keywords.iter().map(|s| s.to_string()).collect(),
+            is_masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, package: &str) {
+        self.hard_masked_packages.push(package.to_string());
+    }
+
+    pub fn unmask_package(&mut self, package: &str) {
+        self.unmasked_packages.push(package.to_string());
+    }
+
+    pub fn evaluate_installability(
+        &self,
+        package: &str,
+        _version: &str,
+        accept_testing: bool,
+    ) -> Result<bool, &'static str> {
+        if self.hard_masked_packages.iter().any(|p| p == package) {
+            return Err("Package is hard-masked in package.mask");
+        }
+
+        let ebuild = self
+            .ebuilds
+            .iter()
+            .find(|e| e.package == package)
+            .ok_or("Package not found in Portage tree")?;
+
+        if ebuild.is_masked && !self.unmasked_packages.iter().any(|p| p == package) {
+            return Err("Package is masked");
+        }
+
+        let testing_keyword = format!("~{}", self.arch);
+        let has_stable = ebuild.keywords.iter().any(|k| k == &self.arch);
+        let has_testing = ebuild.keywords.iter().any(|k| k == &testing_keyword);
+
+        if has_stable {
+            Ok(true)
+        } else if has_testing {
+            if accept_testing {
+                Ok(true)
+            } else {
+                Err("Package requires ACCEPT_KEYWORDS=~arch")
+            }
+        } else {
+            Err("Package is not supported on this architecture")
+        }
+    }
+}
+
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_SEEK: u64 = 1 << 2;

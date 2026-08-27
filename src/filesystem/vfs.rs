@@ -99,6 +99,10 @@ pub struct FilePermissions {
     pub sgid: bool,      // SGID bit (set-group-ID)
     pub sticky: bool,    // Sticky bit
 
+    pub owner_mask: u8,
+    pub group_mask: u8,
+    pub other_mask: u8,
+
     pub bsd_flags: BsdFileFlags,
 }
 
@@ -121,6 +125,9 @@ impl FilePermissions {
             suid: false,
             sgid: false,
             sticky: false,
+            owner_mask: mask,
+            group_mask: (read as u8) << 2 | (execute as u8),
+            other_mask: (read as u8) << 2 | (execute as u8),
             bsd_flags: BsdFileFlags::new(),
         }
     }
@@ -149,6 +156,9 @@ impl FilePermissions {
             suid,
             sgid,
             sticky,
+            owner_mask,
+            group_mask,
+            other_mask,
             bsd_flags: BsdFileFlags::new(),
         }
     }
