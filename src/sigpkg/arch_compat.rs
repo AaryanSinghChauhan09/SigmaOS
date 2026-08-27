@@ -120,14 +120,12 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
-        let depends_klib = klib::vec::Vec::from_iter(depends);
-
         Ok(Package::new(
-            klib::string::SigmaString::from(pkgname),
+            crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
-            klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
-            depends_klib,
-            klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
+            crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
+            depends,
+            crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
 }
@@ -244,11 +242,11 @@ impl PacmanDbAdapter {
             Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
-            klib::string::SigmaString::from(name),
+            crate::klib::string::SigmaString::from(name),
             parsed_ver,
-            klib::string::SigmaString::from(desc),
-            klib::vec::Vec::new(),
-            klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
+            crate::klib::string::SigmaString::from(desc),
+            alloc::vec::Vec::new(),
+            crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
 }
@@ -308,16 +306,16 @@ impl AlpmHookManager {
         }
 
         self.add_hook(AlpmHook {
-            name: klib::string::SigmaString::from(name),
+            name: crate::klib::string::SigmaString::from(name),
             when,
-            target_pattern: klib::string::SigmaString::from(target_pattern),
-            exec_cmd: klib::string::SigmaString::from(exec_cmd),
+            target_pattern: crate::klib::string::SigmaString::from(target_pattern),
+            exec_cmd: crate::klib::string::SigmaString::from(exec_cmd),
         });
 
         Ok(())
     }
 
-    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<klib::string::SigmaString> {
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<crate::klib::string::SigmaString> {
         let mut triggered_cmds = alloc::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -382,7 +380,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        klib::vec::Vec::from_iter(image_header)
+        crate::klib::vec::Vec::from_iter(image_header)
     }
 }
 
@@ -536,7 +534,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, klib::vec::Vec::from_iter(archive_content)))
+        Ok((archive_name, crate::klib::vec::Vec::from_iter(archive_content)))
     }
 }
 
@@ -551,20 +549,23 @@ mod tests {
         sync.register_installed("make", Version::new(4, 3, 0));
 
         let source_pkg = DebianSbuildPackage {
-            name: klib::string::SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: klib::vec::Vec::from_iter(alloc::vec![klib::string::SigmaString::from("gcc"), klib::string::SigmaString::from("make")]),
+            build_depends: alloc::vec![
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+            ],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
         let source_pkg_missing = DebianSbuildPackage {
-            name: klib::string::SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: vec![
-                "gcc".to_string(),
-                "make".to_string(),
-                "libc-dev".to_string(),
+            build_depends: alloc::vec![
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+                crate::klib::string::SigmaString::from("libc-dev"),
             ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
