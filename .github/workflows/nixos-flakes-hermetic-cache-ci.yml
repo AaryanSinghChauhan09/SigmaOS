@@ -1,0 +1,20 @@
+name: NixOS Flakes Hermetic Binary Cache CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-nixos-flakes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Verify NixOS Flakes Hermetic Binary Cache & Lockfile Evaluation
+        run: |
+          cargo test --test distro_inspection_and_security_tests

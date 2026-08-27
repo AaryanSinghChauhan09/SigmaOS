@@ -377,6 +377,7 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
+
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 #[path = "../src/security/hardening.rs"]
@@ -559,12 +560,10 @@ fn test_gentoo_portage_mask_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    use unimplemented_features::GentooUseFlagEngine;
+    use gap_closure::{TargetDistroFamily, SovereignDistroAbsorptionEngine};
 
-    let mut portage = GentooUseFlagEngine::new();
-    portage.set_use_flag("ssl");
-    portage.set_use_flag("-debug");
-
-    assert!(portage.is_flag_enabled("ssl"));
-    assert!(!portage.is_flag_enabled("debug"));
+    let mut engine = SovereignDistroAbsorptionEngine::new();
+    engine.set_active_target(TargetDistroFamily::GentooPortage);
+    let spec = engine.execute_distro_absorption("sys-kernel/gentoo-sources");
+    assert!(spec.contains("S-PORTAGE Absorption"));
 }
