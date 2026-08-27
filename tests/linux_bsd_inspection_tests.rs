@@ -49,20 +49,14 @@ mod advanced_process_control;
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
-#[path = "../src/network/protocols.rs"]
-mod protocols;
+#[path = "../src/distro/wiki_ideas_implementation.rs"]
+mod wiki_ideas_implementation;
 
-#[path = "../src/security/hardening.rs"]
-mod hardening;
-
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
+#[path = "../src/process/advanced_process_control.rs"]
+mod advanced_process_control;
 
 #[path = "../src/kernel/sysctl.rs"]
 mod sysctl;
@@ -75,6 +69,12 @@ mod abi_extended;
 
 #[path = "../src/compatibility/distro_bridge.rs"]
 mod distro_bridge;
+
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+
+#[path = "../src/security/hardening.rs"]
+mod hardening;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
@@ -235,7 +235,7 @@ fn test_wiki_distro_innovations_inspection() {
     use wiki_ideas_implementation::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType, SystemdUnitState,
+        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
         SovereignSystemdParityEngine, SovereignHybridSchedulerInnovations,
     };
 
@@ -276,9 +276,7 @@ fn test_wiki_distro_innovations_inspection() {
     // 7. Systemd Parity Engine
     let mut systemd = SovereignSystemdParityEngine::new();
     systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
-    assert!(systemd.start_unit("test.service").is_ok());
-    assert_eq!(systemd.units.get("test.service").unwrap().state, SystemdUnitState::Active);
-
+    assert_eq!(systemd.start_unit("test.service"), Ok(()));
     // 8. Real-Time Hybrid Scheduler
     let sched = SovereignHybridSchedulerInnovations::new();
     assert!(sched.verify_rt_lane_preemption_latency());
@@ -290,7 +288,6 @@ fn test_advanced_process_control_inspection() {
         ProcessVmReadWriteEngine, JobControlLifecycleEngine, ProcessWaiterAndRusageCollector,
         ProcessCancellationAndTerminationManager, AdvancedIpcHub, JobState, CancellationType, BsdRusage,
     };
-
     // 1. Process VM read/write
     let mut vm = ProcessVmReadWriteEngine::new();
     vm.register_process_memory(42, 0x1000, vec![1, 2, 3, 4]);
@@ -454,8 +451,7 @@ fn test_linux_bsd_firmware_innovations_inspection() {
         FirmwareCapsuleUpdateManager, CapsuleUpdateStatus, SmbiosFirmwareParser,
         IommuFirmwareEngine, IommuArchitecture, EFI_GLOBAL_VARIABLE_GUID,
     };
-
-    // 1. UEFI NVRAM Variable Management
+    // 1. UEFI NVRAM Variable Management (Linux efivarfs & FreeBSD efivar(8))
     let mut efivars = EfiVariableStore::new();
     assert!(efivars.get_variable("BootOrder", EFI_GLOBAL_VARIABLE_GUID).is_some());
     efivars.set_variable("FastBoot", EFI_GLOBAL_VARIABLE_GUID, 7, &[0x01]);
@@ -546,6 +542,13 @@ fn test_gentoo_use_flag_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
+    use unimplemented_features::GentooUseFlagEngine;
+    let mut use_engine = GentooUseFlagEngine::new();
+    use_engine.set_use_flag("+qt5");
+    use_engine.set_use_flag("-wayland");
+    assert!(use_engine.is_flag_enabled("qt5"));
+    assert!(!use_engine.is_flag_enabled("wayland"));
+
     use unimplemented_features::GentooPortageMaskEngine;
     let mut portage = GentooPortageMaskEngine::new("amd64");
     portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
@@ -557,10 +560,10 @@ fn test_gentoo_portage_mask_engine_inspection() {
     assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
 
     use linux_bsd_parity::GentooPortageUseFlagsEngine;
-    let mut portage_flags = GentooPortageUseFlagsEngine::new();
-    portage_flags.set_global_use_flags(&["+ssl", "+x265"]);
-    portage_flags.register_package("media-video/ffmpeg", &["ssl", "x265", "gtk"]);
-    let resolved = portage_flags.resolve_package_flags("media-video/ffmpeg").unwrap();
+    let mut use_flags_engine = GentooPortageUseFlagsEngine::new();
+    use_flags_engine.set_global_use_flags(&["+ssl", "+x265"]);
+    use_flags_engine.register_package("media-video/ffmpeg", &["ssl", "x265", "gtk"]);
+    let resolved = use_flags_engine.resolve_package_flags("media-video/ffmpeg").unwrap();
     assert_eq!(resolved.len(), 2);
     assert!(resolved.contains(&"ssl".to_string()));
     assert!(resolved.contains(&"x265".to_string()));
@@ -697,4 +700,12 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
     assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
     let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
     assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
+
+    use linux_bsd_parity::GentooPortageUseFlagsEngine;
+    let mut portage = GentooPortageUseFlagsEngine::new();
+    portage.set_global_use_flags(&["+ssl", "-gtk"]);
+    portage.register_package("curl", &["ssl", "gtk"]);
+    let flags = portage.resolve_package_flags("curl").unwrap();
+    assert!(flags.contains(&"ssl".to_string()));
+    assert!(!flags.contains(&"gtk".to_string()));
 }

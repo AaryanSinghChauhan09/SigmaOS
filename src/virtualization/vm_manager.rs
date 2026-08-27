@@ -6,6 +6,10 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use std::collections::HashMap;
 use alloc::format;
+use std::path::PathBuf;
+
+#[cfg(test)]
+use std::time::{SystemTime, UNIX_EPOCH};
 
 /// VM configuration
 #[derive(Debug, Clone)]
@@ -202,9 +206,6 @@ impl VhostUserDevice {
 pub enum KvmExitReason {
     Unknown,
     Io,
-    Mmio,
-    Hypercall,
-    Interrupt,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
     MmioRead { addr: u64, len: u8 },
