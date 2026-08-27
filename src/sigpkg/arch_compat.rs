@@ -127,11 +127,13 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
+        let depends_klib = crate::klib::vec::Vec::from_iter(depends);
+
         Ok(Package::new(
             crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
             crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
-            depends,
+            depends_klib,
             crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
@@ -252,7 +254,7 @@ impl PacmanDbAdapter {
             crate::klib::string::SigmaString::from(name),
             parsed_ver,
             crate::klib::string::SigmaString::from(desc),
-            alloc::vec::Vec::new(),
+            crate::klib::vec::Vec::new(),
             crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
@@ -555,10 +557,7 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: alloc::vec![
-                crate::klib::string::SigmaString::from("gcc"),
-                crate::klib::string::SigmaString::from("make"),
-            ],
+            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")]),
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
@@ -571,11 +570,11 @@ mod tests {
         let source_pkg_missing = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: alloc::vec![
+            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),
-            ],
+            ]),
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }

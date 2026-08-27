@@ -158,10 +158,10 @@ impl SnapshotStorage for FileSnapshotStorage {
     fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<RestoreResult, SnapshotError> {
         let start = std::time::Instant::now();
 
-        let snapshot_key = snapshot_id.to_string();
+        let key = snapshot_id.to_string();
         let metadata = self
             .snapshots
-            .get(&snapshot_key)
+            .get(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -193,9 +193,9 @@ impl SnapshotStorage for FileSnapshotStorage {
     }
 
     fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), SnapshotError> {
-        let snapshot_key = snapshot_id.to_string();
+        let key = snapshot_id.to_string();
         self.snapshots
-            .remove(&snapshot_id.to_string())
+            .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -292,10 +292,10 @@ impl SnapshotStorage for MerkleSnapshotStorage {
     fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<RestoreResult, SnapshotError> {
         let start = std::time::Instant::now();
 
-        let snapshot_key = snapshot_id.to_string();
+        let key = snapshot_id.to_string();
         let metadata = self
             .snapshots
-            .get(&snapshot_id.to_string())
+            .get(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -339,9 +339,9 @@ impl SnapshotStorage for MerkleSnapshotStorage {
     }
 
     fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), SnapshotError> {
-        let snapshot_key = snapshot_id.to_string();
+        let key = snapshot_id.to_string();
         self.snapshots
-            .remove(&snapshot_key)
+            .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);

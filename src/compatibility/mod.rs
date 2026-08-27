@@ -183,7 +183,8 @@ pub use bsd::{
 };
 pub use legacy_adapters::*;
 pub use linux_compat::{
-    AuxVector, BsdKevent, BsdKqueueFilter, BsdKqueueMultiplexer, DistroTargetProfile,
+    AuxVector, BsdKevent, BsdKqueueFilter, BsdKqueueFilter as BsdCompatKqueueFilter,
+    BsdKqueueMultiplexer, DistroTargetProfile,
     LinuxCompatSpec, LinuxElfLoaderShim, LinuxProcFsAdapter, LinuxSyscallNum,
     LinuxSyscallTranslator, OpenBsdPledgeUnveilFilter, TargetDistro,
 };
