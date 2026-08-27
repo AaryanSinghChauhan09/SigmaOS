@@ -48,6 +48,71 @@ impl LegacyController {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct EbuildEntry {
+    pub category_pkg: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
+
+pub struct GentooPortageMaskEngine {
+    pub target_arch: String,
+    pub ebuilds: Vec<EbuildEntry>,
+    pub hard_masked_pkgs: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(target_arch: &str) -> Self {
+        Self {
+            target_arch: target_arch.to_string(),
+            ebuilds: Vec::new(),
+            hard_masked_pkgs: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, category_pkg: &str, version: &str, keywords: &[&str], is_masked: bool) {
+        self.ebuilds.push(EbuildEntry {
+            category_pkg: category_pkg.to_string(),
+            version: version.to_string(),
+            keywords: keywords.iter().map(|k| k.to_string()).collect(),
+            is_masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, category_pkg: &str) {
+        self.hard_masked_pkgs.push(category_pkg.to_string());
+    }
+
+    pub fn evaluate_installability(&self, category_pkg: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
+        if self.hard_masked_pkgs.iter().any(|pkg| pkg == category_pkg) {
+            return Err("Package is hard-masked in package.mask");
+        }
+
+        let ebuild = self.ebuilds.iter().find(|e| e.category_pkg == category_pkg && e.version == version)
+            .ok_or("Ebuild not found")?;
+
+        if ebuild.is_masked && !accept_keywords {
+            return Err("Ebuild is masked by package.mask or keywords");
+        }
+
+        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
+        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
+
+        if is_stable {
+            Ok(true)
+        } else if is_testing {
+            if accept_keywords {
+                Ok(true)
+            } else {
+                Err("Package requires ~arch keyword acceptance in package.accept_keywords")
+            }
+        } else {
+            Err("Package is not keyworded for target architecture")
+        }
+    }
+}
+
 impl BareMetalUnifiedPeripheral for LegacyController {
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.power_state = PowerState::D0Active;
