@@ -28,6 +28,9 @@ mod unveil;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
 
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+
 #[path = "../src/unimplemented_features.rs"]
 mod unimplemented_features;
 
@@ -635,4 +638,10 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
     assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
     let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
     assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
+
+    portage.set_global_use_flags(&["+ssl", "-gtk"]);
+    portage.register_package("curl", &["ssl", "gtk"]);
+    let flags = portage.resolve_package_flags("curl").unwrap();
+    assert!(flags.contains(&"ssl".to_string()));
+    assert!(!flags.contains(&"gtk".to_string()));
 }

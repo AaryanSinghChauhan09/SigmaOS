@@ -431,8 +431,17 @@ pub enum SystemdUnitState {
     Failed,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SystemdUnit {
+#[derive(Debug, Clone)]
+pub struct SystemdJournalEntry {
+    pub timestamp: u64,
+    pub unit_name: String,
+    pub priority: u8,
+    pub message: String,
+    pub pid: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignSystemdUnit {
     pub name: String,
     pub unit_type: SystemdUnitType,
     pub state: SystemdUnitState,
@@ -519,29 +528,36 @@ impl Default for SovereignSystemdParityEngine {
     }
 }
 
-// ============================================================================
-// 8. HYBRID SCHEDULER INNOVATIONS (RTLane, NUMA, DVFS, AI Hooks)
-// ============================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NumaNodeTopology {
-    pub node_id: u32,
-    pub cpu_cores: Vec<u32>,
-    pub local_memory_mb: u64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum CpuPStateGovernor {
+/// 8. Sovereign Hybrid Scheduler Innovations (RTLane <5µs preemption, NUMA node binding, DVFS governor, eBPF preemption hooks)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
     Performance,
     Powersave,
     Schedutil,
+    OnDemand,
+}
+
+#[derive(Debug, Clone)]
+pub struct NumaNodeAffinity {
+    pub node_id: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct RtlaneRealtimeTask {
+    pub task_id: usize,
+    pub max_latency_budget_us: u64,
+    pub priority: u8,
+    pub assigned_numa_node: usize,
+    pub ebpf_boost_score: u32,
 }
 
 pub struct SovereignHybridSchedulerInnovations {
-    pub numa_nodes: Vec<NumaNodeTopology>,
-    pub governor: CpuPStateGovernor,
-    pub rt_lane_latency_us: u32,
-    pub ai_prediction_boost: bool,
+    pub current_governor: DvfsPowerGovernor,
+    pub numa_nodes: Vec<NumaNodeAffinity>,
+    pub rt_tasks: BTreeMap<usize, RtlaneRealtimeTask>,
+    pub preemption_count: u64,
 }
 
 impl SovereignHybridSchedulerInnovations {
@@ -685,38 +701,54 @@ mod tests {
 
     #[test]
     fn test_systemd_parity_engine() {
-        let mut systemd = SovereignSystemdParityEngine::new();
-        let unit = SystemdUnit {
-            name: String::from("sshd.service"),
+        let mut engine = SovereignSystemdParityEngine::new();
+
+        let srv = SovereignSystemdUnit {
+            name: String::from("httpd.service"),
             unit_type: SystemdUnitType::Service,
-            active_state: SystemdUnitActiveState::Inactive,
-            description: String::from("OpenSSH Daemon"),
-            exec_start: vec![String::from("/usr/bin/sshd")],
-            dependencies: Vec::new(),
-            memory_limit_bytes: Some(512 * 1024 * 1024),
-            cpu_quota_pct: Some(50),
+            state: SystemdUnitState::Inactive,
+            dependencies: vec![String::from("network.target")],
+            socket_activation_port: Some(8080),
+            pledge_promises: Some(String::from("stdio inet rpath")),
+            unveil_paths: vec![(String::from("/var/www"), String::from("r"))],
         };
 
-        systemd.register_unit(unit);
-        let state = systemd.start_unit("sshd.service").unwrap();
-        assert_eq!(state, SystemdUnitActiveState::Active);
-        assert!(systemd.journal_logs.len() >= 2);
+        engine.register_unit(srv);
+        assert_eq!(engine.units.len(), 1);
+
+        let activated = engine.trigger_socket_activation(8080, 100).unwrap();
+        assert_eq!(activated, "httpd.service");
+        assert_eq!(engine.units.get("httpd.service").unwrap().state, SystemdUnitState::Active);
+        assert_eq!(engine.journal.len(), 1);
     }
 
     #[test]
     fn test_hybrid_scheduler_innovations() {
         let mut sched = SovereignHybridSchedulerInnovations::new();
-        let task = RealtimeTask {
-            pid: 10,
-            class: SchedulerClass::RTLane,
-            deadline_us: 100,
-            wcet_us: 10,
-            numa_node: 0,
+        sched.set_governor(DvfsPowerGovernor::Performance);
+        assert_eq!(sched.current_governor, DvfsPowerGovernor::Performance);
+
+        let rt_task = RtlaneRealtimeTask {
+            task_id: 42,
+            max_latency_budget_us: 3, // <= 5us constraint
+            priority: 99,
+            assigned_numa_node: 0,
+            ebpf_boost_score: 10,
         };
 
-        sched.add_task(task);
-        let selected = sched.select_next_rt_task().unwrap();
-        assert_eq!(selected.pid, 10);
-        assert_eq!(sched.auto_adjust_dvfs(), 4200);
+        assert!(sched.register_rt_task(rt_task).is_ok());
+
+        let invalid_rt_task = RtlaneRealtimeTask {
+            task_id: 43,
+            max_latency_budget_us: 10, // > 5us
+            priority: 50,
+            assigned_numa_node: 0,
+            ebpf_boost_score: 0,
+        };
+
+        assert!(sched.register_rt_task(invalid_rt_task).is_err());
+
+        assert!(sched.evaluate_ebpf_preemption_hook(42, 5));
+        assert_eq!(sched.rt_tasks.get(&42).unwrap().ebpf_boost_score, 15);
     }
 }

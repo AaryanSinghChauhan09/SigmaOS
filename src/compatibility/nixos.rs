@@ -3,8 +3,11 @@ extern crate alloc;
 // Independent, zero-dependency implementations of NixOS core tooling
 // Implements Nix package manager, declarative configuration, and functional package management
 
-use crate::klib::{BTreeMap, Vec};
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
+use alloc::vec;
 use alloc::string::{String, ToString};
+use alloc::format;
 
 // =========================================================================
 // 1. NIX PACKAGE MANAGER (Functional Package Management)
@@ -93,7 +96,7 @@ impl NixStore {
     }
 
     /// Garbage collection (nix-collect-garbage)
-    pub fn garbage_collect(&mut self, delete_old: bool) -> Result<usize, NixError> {
+    pub fn garbage_collect(&mut self, _delete_old: bool) -> Result<usize, NixError> {
         let mut deleted_count = 0;
         let mut to_delete = Vec::new();
 
@@ -129,9 +132,9 @@ impl NixStore {
             .collect()
     }
 
-    fn generate_store_hash(derivation: &str) -> String {
+    fn generate_store_hash(_derivation: &str) -> String {
         // Simple hash simulation for store path
-        let mut hash = String::from("abcdefghijklmnopqrstuvwxyz");
+        let hash = String::from("abcdefghijklmnopqrstuvwxyz");
         let chars: Vec<char> = hash.chars().collect();
         let mut result = String::new();
         for i in 0..32 {
@@ -389,7 +392,7 @@ impl NixChannels {
     pub fn update_channels(&mut self) -> Result<usize, &'static str> {
         // Simulate updating all channels
         let mut updated_count = 0;
-        for channel in self.channels.values() {
+        for _channel in self.channels.values() {
             // In real implementation, this would fetch channel updates
             updated_count += 1;
         }
@@ -442,15 +445,15 @@ mod tests {
 
         // Remove one package from GC roots
         store.gc_roots.clear();
-        store.add_gc_root(
-            store
-                .packages
-                .get("hello")
-                .unwrap()
-                .outputs
-                .get("out")
-                .unwrap(),
-        );
+        let root_path = store
+            .packages
+            .get("hello")
+            .unwrap()
+            .outputs
+            .get("out")
+            .unwrap()
+            .clone();
+        store.add_gc_root(&root_path);
 
         let deleted = store.garbage_collect(true).unwrap();
         assert!(deleted >= 1);

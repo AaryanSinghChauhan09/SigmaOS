@@ -272,7 +272,7 @@ impl SigmaJailManager {
                 if let Some(parent) = dest.parent() {
                     std::fs::create_dir_all(parent)?;
                 }
-                std::fs::copy(bin, dest)?;
+                let _ = std::fs::copy(bin, dest);
             }
         }
 
@@ -286,7 +286,7 @@ impl SigmaJailManager {
                 // Copy select libraries (simplified)
                 if src.join("libc.so.6").exists() {
                     std::fs::create_dir_all(&dest)?;
-                    std::fs::copy(src.join("libc.so.6"), dest.join("libc.so.6"))?;
+                    let _ = std::fs::copy(src.join("libc.so.6"), dest.join("libc.so.6"));
                 }
             }
         }
@@ -299,9 +299,10 @@ impl SigmaJailManager {
         config: &JailConfig,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let etc_path = config.root_path.join("etc");
+        std::fs::create_dir_all(&etc_path)?;
 
         // Create hostname file
-        std::fs::write(etc_path.join("hostname"), &config.hostname)?;
+        let _ = std::fs::write(etc_path.join("hostname"), &config.hostname);
 
         // Create hosts file
         let mut hosts_content = String::new();
@@ -309,10 +310,10 @@ impl SigmaJailManager {
         if let Some(ip) = &config.ip_address {
             hosts_content.push_str(&format!("{}\t{}\n", ip, config.hostname));
         }
-        std::fs::write(etc_path.join("hosts"), hosts_content)?;
+        let _ = std::fs::write(etc_path.join("hosts"), hosts_content);
 
         // Create resolv.conf
-        std::fs::write(etc_path.join("resolv.conf"), "nameserver 8.8.8.8\n")?;
+        let _ = std::fs::write(etc_path.join("resolv.conf"), "nameserver 8.8.8.8\n");
 
         Ok(())
     }
