@@ -3,6 +3,9 @@ extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::vec;
+use alloc::string::ToString;
 
 #[derive(Debug, Clone)]
 pub struct FirmwareMemoryMapEntry {

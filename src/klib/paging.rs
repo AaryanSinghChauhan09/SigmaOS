@@ -7,6 +7,23 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageSize {
+    Standard4KB,
+    Huge2MB,
+    Giant1GB,
+}
+
+impl PageSize {
+    pub fn byte_size(&self) -> usize {
+        match self {
+            PageSize::Standard4KB => 4096,
+            PageSize::Huge2MB => 2 * 1024 * 1024,
+            PageSize::Giant1GB => 1024 * 1024 * 1024,
+        }
+    }
+}
+
 impl Clone for SimplePageTableEntry {
     fn clone(&self) -> Self {
         Self {
@@ -466,7 +483,14 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        if self.pt_tables[pd_idx].is_none() {
+        let pt_idx_in_vec = pd_idx;
+        if pt_idx_in_vec >= self.pt_tables.len() {
+            while self.pt_tables.len() <= pt_idx_in_vec {
+                self.pt_tables.push(None);
+            }
+        }
+
+        if self.pt_tables[pt_idx_in_vec].is_none() {
             let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);

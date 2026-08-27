@@ -10,6 +10,25 @@ extern crate alloc;
 mod pipes;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
+use sigmaos::ipc::pipes::Pipe;
+use sigmaos::security::sigma_unveil::{UnveilManager, UnveilPermission};
+use sigmaos::filesystem::geom::{GeomProvider, GeomTopology, BioRequest};
+use sigmaos::audio::editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
+use sigmaos::graphics::video_editor::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
+use sigmaos::compatibility::chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
+use sigmaos::compatibility::debian::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
+use sigmaos::compatibility::cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
+use sigmaos::distro::endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
+use sigmaos::compatibility::fedora::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use sigmaos::scheduler::PriorityScheduler;
+use sigmaos::ipc::alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
+use sigmaos::memory::bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
+use sigmaos::memory::low_level::{CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr};
+use sigmaos::access::control::{AclEntry, AclType, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask};
+use sigmaos::dashboard::statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
+use sigmaos::community::toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
+use sigmaos::system::user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
+use sigmaos::tools::sigmatools::*;
 
 #[path = "../src/storage/geom.rs"]
 mod geom;
@@ -188,6 +207,12 @@ use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesyste
 use process_activity_manager::{
     ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
 };
+use sigmaos::memory::segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
+use sigmaos::process::activity_manager::{ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot as ProcRegisterSnapshot};
+use sigmaos::filesystem::sigma_fs::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
+use sigmaos::event::epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
+use sigmaos::loader::elf::relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use sigmaos::security::sigma_unveil as unveil;
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,

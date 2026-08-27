@@ -262,12 +262,6 @@ pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use remote::{
-    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
-    SimpleShellManager,
-};
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
     PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
@@ -282,6 +276,10 @@ pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
     SandboxPolicy,
+};
+pub use userland::shell::{
+    Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
+    StreamTarget,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
@@ -359,3 +357,7 @@ pub mod loader;
 pub mod app;
 pub mod auth;
 pub use open_source_obsoletion::*;
+
+pub use unimplemented_features::{
+    GentooPortageMaskEngine, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
+};

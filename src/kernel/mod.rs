@@ -44,10 +44,10 @@ pub mod subsystems;
 pub mod traits;
 
 pub use architecture::*;
+pub use structures::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
 pub use policy_mechanism::*;
-pub use structures::*;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,

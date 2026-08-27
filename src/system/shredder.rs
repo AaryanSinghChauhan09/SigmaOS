@@ -19,7 +19,7 @@
 // SigmaOS File Shredder
 // OOP-based secure file deletion with multiple overwrite passes
 
-use crate::klib::{SigmaRng, rng::Rng};
+use crate::klib::rng::{Rng, SigmaRng};
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Seek, SeekFrom, Write};
 use std::path::Path;

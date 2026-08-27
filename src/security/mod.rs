@@ -36,6 +36,7 @@ pub use qubes_isolation::{
     QrexecMessage, PolicyRule, SovereignIsolationManager, QrexecPolicyAction,
     QrexecRule, QrexecPolicyEngine, TemplateVmManager, SQrexecChannel,
 };
+pub use qubes_isolation::*;
 pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
@@ -82,3 +83,4 @@ pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
     SimpleVulnerability, SimpleVulnerabilityScanner,
 };
+pub use vulnerability::*;

@@ -10,6 +10,10 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 // =========================================================================
 // 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -48,18 +52,20 @@ impl LegacyController {
     }
 }
 
+/// Gentoo Portage Ebuild Profile with Package Slotting & Keywords
 #[derive(Debug, Clone)]
-pub struct EbuildEntry {
-    pub category_pkg: String,
-    pub version: String,
-    pub keywords: Vec<String>,
-    pub is_masked: bool,
+pub struct PortageEbuildProfile {
+    pub atom_name: String,
+    pub slot: String,
+    pub keywords: Vec<String>, // e.g. "amd64", "~amd64"
+    pub is_ebuild_masked: bool,
 }
 
+/// Gentoo Portage Masking & Slotting Resolver Engine
 pub struct GentooPortageMaskEngine {
+    pub hard_masked_atoms: Vec<String>,
+    pub ebuilds: Vec<PortageEbuildProfile>,
     pub target_arch: String,
-    pub ebuilds: Vec<EbuildEntry>,
-    pub hard_masked_pkgs: Vec<String>,
 }
 
 impl GentooPortageMaskEngine {
@@ -1579,7 +1585,13 @@ mod peripheral_tests {
             version: PkgVersion { major: 1, minor: 0 },
             dependencies: [None, None, None, None],
         };
+        let node_b = PackageNode {
+            pkg_id: 1,
+            version: PkgVersion { major: 2, minor: 1 },
+            dependencies: [None, None, None, None],
+        };
         assert!(sat.add_package_node(node_a));
+        assert!(sat.add_package_node(node_b));
         assert!(sat.solve(0));
     }
 }
@@ -1645,6 +1657,30 @@ impl GamifiedProductivityLayer {
     }
 }
 
+#[cfg(test)]
+mod zenith_desktop_core_tests {
+    use super::*;
+
+    #[test]
+    fn test_gesture_and_voice_control() {
+        let engine = GestureVoiceControlEngine::new();
+        // Touchpad gesture matching
+        assert_eq!(engine.parse_touchpad_gesture(3, true), Some(DesktopShellAction::ToggleOverview));
+        assert_eq!(engine.parse_touchpad_gesture(2, false), None);
+        // Voice phrase matching
+        assert_eq!(engine.match_voice_phrase("open terminal"), Some(DesktopShellAction::OpenTerminal));
+        assert_eq!(engine.match_voice_phrase("unknown phrase"), None);
+    }
+    fn test_gamified_productivity_layer() {
+        let mut gamification = GamifiedProductivityLayer::new();
+        assert_eq!(gamification.level, 1);
+        assert!(!gamification.badges[0].unlocked);
+        // Award XP for compiling package
+        gamification.award_experience("compile_package", 1200, 10000);
+        assert_eq!(gamification.total_xp, 1200);
+        assert_eq!(gamification.level, 2);
+        assert!(gamification.badges[0].unlocked); // "Package Artisan" unlocked
+}
 
 // =========================================================================
 // 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
@@ -2196,6 +2232,7 @@ impl DragonFlyHammer2FsSnapshotV2 {
 
 #[cfg(test)]
 mod extra_unimplemented_tests {
+mod additional_parity_tests {
     use super::*;
 
     #[test]

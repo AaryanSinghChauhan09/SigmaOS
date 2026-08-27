@@ -239,6 +239,12 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
 }
 
 
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
 
 #[path = "../src/network/protocols.rs"]
 mod protocols;
@@ -467,4 +473,13 @@ fn test_gentoo_portage_mask_engine_inspection() {
     portage.set_use_flag("-wayland");
     assert!(portage.is_flag_enabled("qt5"));
     assert!(!portage.is_flag_enabled("wayland"));
+    use unimplemented_features::GentooPortageMaskEngine;
+    let mut portage = GentooPortageMaskEngine::new("amd64");
+    portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
+    portage.register_ebuild("app-admin/sudo", "0", &["amd64"], false);
+    assert!(portage.evaluate_installability("app-admin/sudo", "0", false).unwrap());
+    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", false).is_err());
+    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", true).unwrap());
+    portage.add_hard_mask("app-admin/sudo");
+    assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
 }
