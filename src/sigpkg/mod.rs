@@ -169,7 +169,6 @@ impl Package {
     }
 }
 
-
 /// Package dependency
 #[derive(Debug, Clone)]
 pub struct Dependency {

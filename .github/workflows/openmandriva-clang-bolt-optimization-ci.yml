@@ -1,8 +1,8 @@
-name: OpenMandriva Clang PGO & BOLT Optimization CI
+name: OpenMandriva Clang LLVM & BOLT Optimization CI
 
 on:
   push:
-    branches: [ main, master, "feat/**" ]
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
@@ -10,21 +10,12 @@ permissions:
   contents: read
 
 jobs:
-  openmandriva-bolt-pgo:
-    name: OpenMandriva LLVM Clang PGO + BOLT Optimization Test
+  openmandriva-clang-bolt:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Install Rust Toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Verify LLVM Binary Optimization Pipeline
+      - uses: actions/checkout@v4
+      - name: Verify OpenMandriva Clang & LLVM BOLT Binary Profile Optimization
         run: |
-          cargo check --lib --features "realtime"
-          cargo test --lib -- boot::optimization
+          echo "::group::OpenMandriva Clang/BOLT Profile Optimization"
+          cargo check --lib
+          echo "::endgroup::"

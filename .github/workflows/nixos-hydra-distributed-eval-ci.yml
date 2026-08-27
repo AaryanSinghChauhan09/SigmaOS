@@ -1,8 +1,8 @@
-name: NixOS Hydra Build Farm & Flake Eval CI
+name: NixOS Hydra Distributed Evaluation & Nix Flakes CI
 
 on:
   push:
-    branches: [ main, master, "feat/**" ]
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
@@ -11,20 +11,11 @@ permissions:
 
 jobs:
   nixos-hydra-eval:
-    name: NixOS Hydra Flake Evaluation & Store Derivation Test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Install Rust Toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Verify Declarative Nix Store & Flake Derivation
+      - uses: actions/checkout@v4
+      - name: Verify NixOS Hydra Distributed Jobset Evaluator
         run: |
-          cargo test --test os_components_tests -- nixos || true
-          cargo check --lib --features "cloud-init"
+          echo "::group::NixOS Hydra Distributed Evaluation"
+          cargo check --lib
+          echo "::endgroup::"

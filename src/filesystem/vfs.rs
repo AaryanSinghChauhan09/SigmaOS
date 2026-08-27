@@ -156,6 +156,9 @@ impl FilePermissions {
             suid,
             sgid,
             sticky,
+            owner_mask,
+            group_mask,
+            other_mask,
             bsd_flags: BsdFileFlags::new(),
         }
     }
@@ -207,6 +210,17 @@ impl FilePermissions {
         let user_r = (mode & mode_bits::S_IRUSR) != 0;
         let user_w = (mode & mode_bits::S_IWUSR) != 0;
         let user_x = (mode & mode_bits::S_IXUSR) != 0;
+        let owner_m = ((user_r as u8) << 2) | ((user_w as u8) << 1) | (user_x as u8);
+
+        let group_r = (mode & mode_bits::S_IRGRP) != 0;
+        let group_w = (mode & mode_bits::S_IWGRP) != 0;
+        let group_x = (mode & mode_bits::S_IXGRP) != 0;
+        let group_m = ((group_r as u8) << 2) | ((group_w as u8) << 1) | (group_x as u8);
+
+        let other_r = (mode & mode_bits::S_IROTH) != 0;
+        let other_w = (mode & mode_bits::S_IWOTH) != 0;
+        let other_x = (mode & mode_bits::S_IXOTH) != 0;
+        let other_m = ((other_r as u8) << 2) | ((other_w as u8) << 1) | (other_x as u8);
 
         Self {
             read: user_r,
@@ -217,17 +231,21 @@ impl FilePermissions {
             user_write: user_w,
             user_execute: user_x,
 
-            group_read: (mode & mode_bits::S_IRGRP) != 0,
-            group_write: (mode & mode_bits::S_IWGRP) != 0,
-            group_execute: (mode & mode_bits::S_IXGRP) != 0,
+            group_read: group_r,
+            group_write: group_w,
+            group_execute: group_x,
 
-            other_read: (mode & mode_bits::S_IROTH) != 0,
-            other_write: (mode & mode_bits::S_IWOTH) != 0,
-            other_execute: (mode & mode_bits::S_IXOTH) != 0,
+            other_read: other_r,
+            other_write: other_w,
+            other_execute: other_x,
 
             suid: (mode & mode_bits::S_ISUID) != 0,
             sgid: (mode & mode_bits::S_ISGID) != 0,
             sticky: (mode & mode_bits::S_ISVTX) != 0,
+
+            owner_mask: owner_m,
+            group_mask: group_m,
+            other_mask: other_m,
 
             bsd_flags: BsdFileFlags::new(),
         }

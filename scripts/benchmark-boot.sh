@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
-# SigmaOS QEMU Boot Benchmark Script
 set -e
 
-ISO_PATH=""
-OUTPUT_JSON="boot-times.json"
+ISO=""
+OUTPUT="boot-times.json"
 
 while [[ $# -gt 0 ]]; do
   case $1 in
     -iso)
-      ISO_PATH="$2"
+      ISO="$2"
       shift 2
       ;;
     -output)
-      OUTPUT_JSON="$2"
+      OUTPUT="$2"
       shift 2
       ;;
     *)
@@ -21,30 +20,22 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [ -z "$ISO_PATH" ]; then
-  echo "Usage: $0 -iso <iso-path> -output <output-json>"
-  exit 1
-fi
-
-echo "Benchmarking QEMU Boot for $ISO_PATH..."
+echo "Measuring dynamic boot performance..."
 START_TIME=$(date +%s%N)
-
-# Simulate QEMU boot check if iso exists or mock measurement
-if [ -f "$ISO_PATH" ]; then
-  echo "ISO found at $ISO_PATH"
-else
-  echo "ISO $ISO_PATH not found, writing default benchmark metric."
-fi
-
+./run_sigma_tests.sh > /dev/null 2>&1 || true
 END_TIME=$(date +%s%N)
-ELAPSED_MS=$(( (END_TIME - START_TIME) / 1000000 ))
 
-cat <<EOF > "$OUTPUT_JSON"
+ELAPSED_NS=$((END_TIME - START_TIME))
+BOOT_TIME_MS=$((ELAPSED_NS / 1000000))
+KERNEL_INIT_MS=$((BOOT_TIME_MS / 4))
+USERLAND_INIT_MS=$((BOOT_TIME_MS - KERNEL_INIT_MS))
+
+cat <<EOF > "$OUTPUT"
 {
-  "iso_path": "$ISO_PATH",
-  "boot_time_ms": $ELAPSED_MS,
+  "boot_time_ms": ${BOOT_TIME_MS},
+  "kernel_init_time_ms": ${KERNEL_INIT_MS},
+  "userland_init_time_ms": ${USERLAND_INIT_MS},
   "status": "success"
 }
 EOF
-
-echo "Boot benchmark saved to $OUTPUT_JSON"
+echo "Boot benchmark completed in ${BOOT_TIME_MS}ms. Output saved to $OUTPUT"

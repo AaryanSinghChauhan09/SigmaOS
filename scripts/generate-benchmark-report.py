@@ -1,35 +1,38 @@
 #!/usr/bin/env python3
-import sys
-import json
 import argparse
+import json
+import os
 
-def main():
-    parser = argparse.ArgumentParser(description="Generate benchmark report")
-    parser.add_argument("--boot", help="Boot benchmark JSON file")
-    parser.add_argument("--memory", help="Memory benchmark JSON file")
-    parser.add_argument("--output", help="Output report file")
-    args = parser.parse_args()
+parser = argparse.ArgumentParser(description="Generate benchmark report")
+parser.add_argument("--boot", required=True)
+parser.add_argument("--memory", required=True)
+parser.add_argument("--output", required=True)
+args = parser.parse_args()
 
-    report = {"status": "success", "benchmarks": {}}
-    if args.boot:
-        try:
-            with open(args.boot, "r") as f:
-                report["benchmarks"]["boot"] = json.load(f)
-        except Exception as e:
-            report["benchmarks"]["boot_error"] = str(e)
+boot_data = {}
+if os.path.exists(args.boot):
+    with open(args.boot, "r") as f:
+        boot_data = json.load(f)
 
-    if args.memory:
-        try:
-            with open(args.memory, "r") as f:
-                report["benchmarks"]["memory"] = json.load(f)
-        except Exception as e:
-            report["benchmarks"]["memory_error"] = str(e)
+mem_data = {}
+if os.path.exists(args.memory):
+    with open(args.memory, "r") as f:
+        mem_data = json.load(f)
 
-    output_path = args.output if args.output else "benchmark-report.json"
-    with open(output_path, "w") as f:
-        json.dump(report, f, indent=2)
+report = f"""# Performance Benchmark Report
 
-    print(f"Generated benchmark report at {output_path}")
+## Boot Performance
+- **Boot Time:** {boot_data.get('boot_time_ms', 'N/A')} ms
+- **Kernel Init:** {boot_data.get('kernel_init_time_ms', 'N/A')} ms
+- **Userland Init:** {boot_data.get('userland_init_time_ms', 'N/A')} ms
 
-if __name__ == "__main__":
-    main()
+## Memory Usage
+- **Peak Memory:** {mem_data.get('peak_memory_mb', 'N/A')} MB
+- **Kernel Heap:** {mem_data.get('kernel_heap_mb', 'N/A')} MB
+- **Userland RSS:** {mem_data.get('userland_rss_mb', 'N/A')} MB
+"""
+
+with open(args.output, "w") as f:
+    f.write(report)
+
+print(f"Report generated at {args.output}")

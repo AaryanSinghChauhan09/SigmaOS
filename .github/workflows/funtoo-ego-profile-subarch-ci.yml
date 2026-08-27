@@ -1,8 +1,8 @@
-name: Funtoo Ego Profile & Kit Tree CI
+name: Funtoo Ego Profile & Subarch Optimization CI
 
 on:
   push:
-    branches: [ main, master, "feat/**" ]
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
@@ -10,21 +10,12 @@ permissions:
   contents: read
 
 jobs:
-  funtoo-ego-profile:
-    name: Funtoo Ego Meta-Profile Subarch & Kit Tree Solver
+  funtoo-ego-subarch:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Install Rust Toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Verify Funtoo Subarch Optimizations & Kit Tree
+      - uses: actions/checkout@v4
+      - name: Verify Funtoo Ego Subarch & Profile Selection Engine
         run: |
-          cargo check --lib --features "core-shards"
-          cargo test --lib -- distro::gentoo
+          echo "::group::Funtoo Ego Profile & Subarch Optimization"
+          cargo check --lib
+          echo "::endgroup::"

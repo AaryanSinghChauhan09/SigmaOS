@@ -363,7 +363,6 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
-
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 #[path = "../src/security/hardening.rs"]
