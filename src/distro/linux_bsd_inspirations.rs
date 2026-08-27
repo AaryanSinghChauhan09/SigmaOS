@@ -3035,6 +3035,419 @@ impl Default for OpenBsdPledgeUnveilSentinel {
     }
 }
 
+// ==========================================
+// 28. BCACHEFS MULTI-TIER STORAGE ENGINE (SovereignBcachefsTieringEngine)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StorageTier {
+    FastSsd,
+    SlowHdd,
+    Archive,
+}
+
+#[derive(Debug, Clone)]
+pub struct BcachefsExtent {
+    pub extent_id: u64,
+    pub path: String,
+    pub tier: StorageTier,
+    pub data: Vec<u8>,
+    pub checksum: u64,
+    pub access_count: u64,
+}
+
+pub struct SovereignBcachefsTieringEngine {
+    pub extents: Vec<BcachefsExtent>,
+    pub ssd_capacity_bytes: u64,
+    pub hdd_capacity_bytes: u64,
+    pub used_ssd_bytes: u64,
+    pub used_hdd_bytes: u64,
+    pub next_extent_id: u64,
+}
+
+impl SovereignBcachefsTieringEngine {
+    pub fn new(ssd_capacity_bytes: u64, hdd_capacity_bytes: u64) -> Self {
+        Self {
+            extents: Vec::new(),
+            ssd_capacity_bytes,
+            hdd_capacity_bytes,
+            used_ssd_bytes: 0,
+            used_hdd_bytes: 0,
+            next_extent_id: 1,
+        }
+    }
+
+    pub fn calculate_checksum(data: &[u8]) -> u64 {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in data {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        hash
+    }
+
+    pub fn write_extent(&mut self, path: &str, data: &[u8]) -> Result<u64, &'static str> {
+        let len = data.len() as u64;
+        let checksum = Self::calculate_checksum(data);
+        let extent_id = self.next_extent_id;
+        self.next_extent_id += 1;
+
+        // Try SSD fast tier first if space permits, else fallback to SlowHdd
+        let target_tier = if self.used_ssd_bytes + len <= self.ssd_capacity_bytes {
+            self.used_ssd_bytes += len;
+            StorageTier::FastSsd
+        } else if self.used_hdd_bytes + len <= self.hdd_capacity_bytes {
+            self.used_hdd_bytes += len;
+            StorageTier::SlowHdd
+        } else {
+            return Err("Storage capacity exceeded across all tiers");
+        };
+
+        self.extents.push(BcachefsExtent {
+            extent_id,
+            path: path.to_string(),
+            tier: target_tier,
+            data: data.to_vec(),
+            checksum,
+            access_count: 1,
+        });
+
+        Ok(extent_id)
+    }
+
+    pub fn read_extent(&mut self, path: &str) -> Result<Vec<u8>, &'static str> {
+        let extent = self
+            .extents
+            .iter_mut()
+            .find(|e| e.path == path)
+            .ok_or("Extent not found")?;
+
+        extent.access_count += 1;
+        let actual_checksum = Self::calculate_checksum(&extent.data);
+        if actual_checksum != extent.checksum {
+            return Err("Data checksum mismatch detected");
+        }
+
+        Ok(extent.data.clone())
+    }
+
+    /// Tier migration pass: promote hot extents (> 5 reads) from SlowHdd to FastSsd, demote cold extents (<= 1 read) from FastSsd to SlowHdd
+    pub fn promote_demote_pass(&mut self) -> (usize, usize) {
+        let mut promoted = 0;
+        let mut demoted = 0;
+
+        for extent in self.extents.iter_mut() {
+            let len = extent.data.len() as u64;
+            match extent.tier {
+                StorageTier::SlowHdd if extent.access_count >= 5 => {
+                    if self.used_ssd_bytes + len <= self.ssd_capacity_bytes {
+                        self.used_hdd_bytes = self.used_hdd_bytes.saturating_sub(len);
+                        self.used_ssd_bytes += len;
+                        extent.tier = StorageTier::FastSsd;
+                        promoted += 1;
+                    }
+                }
+                StorageTier::FastSsd if extent.access_count <= 1 => {
+                    if self.used_hdd_bytes + len <= self.hdd_capacity_bytes {
+                        self.used_ssd_bytes = self.used_ssd_bytes.saturating_sub(len);
+                        self.used_hdd_bytes += len;
+                        extent.tier = StorageTier::SlowHdd;
+                        demoted += 1;
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        (promoted, demoted)
+    }
+
+    pub fn verify_extent_integrity(&self, path: &str) -> bool {
+        if let Some(extent) = self.extents.iter().find(|e| e.path == path) {
+            Self::calculate_checksum(&extent.data) == extent.checksum
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignBcachefsTieringEngine {
+    fn default() -> Self {
+        Self::new(1024 * 1024 * 1024, 10 * 1024 * 1024 * 1024)
+    }
+}
+
+// ==========================================
+// 29. ILLUMOS ZONES & ZFS BOOT ENVIRONMENT ENGINE (SovereignIllumosZonesEngine)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZoneBrand {
+    Native,
+    LinuxBrand,
+    BsdBrand,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZoneState {
+    Configured,
+    Installed,
+    Running,
+    Halted,
+}
+
+#[derive(Debug, Clone)]
+pub struct IllumosZone {
+    pub zone_id: u32,
+    pub name: String,
+    pub brand: ZoneBrand,
+    pub state: ZoneState,
+    pub cpu_cap_pct: u32,
+    pub mem_cap_bytes: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct IllumosBootEnv {
+    pub name: String,
+    pub active: bool,
+    pub dataset_name: String,
+    pub snapshot_name: String,
+}
+
+pub struct SovereignIllumosZonesEngine {
+    pub zones: Vec<IllumosZone>,
+    pub boot_environments: Vec<IllumosBootEnv>,
+    pub next_zone_id: u32,
+}
+
+impl SovereignIllumosZonesEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            zones: Vec::new(),
+            boot_environments: Vec::new(),
+            next_zone_id: 1,
+        };
+
+        // Create default active boot environment
+        engine.boot_environments.push(IllumosBootEnv {
+            name: "sigmaos-default".to_string(),
+            active: true,
+            dataset_name: "rpool/ROOT/sigmaos-default".to_string(),
+            snapshot_name: "rpool/ROOT/sigmaos-default@initial".to_string(),
+        });
+
+        engine
+    }
+
+    pub fn create_zone(
+        &mut self,
+        name: &str,
+        brand: ZoneBrand,
+        cpu_cap_pct: u32,
+        mem_cap_bytes: u64,
+    ) -> Result<u32, &'static str> {
+        if self.zones.iter().any(|z| z.name == name) {
+            return Err("Zone with target name already exists");
+        }
+
+        let zone_id = self.next_zone_id;
+        self.next_zone_id += 1;
+
+        self.zones.push(IllumosZone {
+            zone_id,
+            name: name.to_string(),
+            brand,
+            state: ZoneState::Installed,
+            cpu_cap_pct,
+            mem_cap_bytes,
+        });
+
+        Ok(zone_id)
+    }
+
+    pub fn boot_zone(&mut self, zone_id: u32) -> Result<(), &'static str> {
+        let zone = self
+            .zones
+            .iter_mut()
+            .find(|z| z.zone_id == zone_id)
+            .ok_or("Zone not found")?;
+
+        if zone.state == ZoneState::Running {
+            return Err("Zone is already running");
+        }
+
+        zone.state = ZoneState::Running;
+        Ok(())
+    }
+
+    pub fn halt_zone(&mut self, zone_id: u32) -> Result<(), &'static str> {
+        let zone = self
+            .zones
+            .iter_mut()
+            .find(|z| z.zone_id == zone_id)
+            .ok_or("Zone not found")?;
+
+        if zone.state != ZoneState::Running {
+            return Err("Zone is not running");
+        }
+
+        zone.state = ZoneState::Halted;
+        Ok(())
+    }
+
+    pub fn dispatch_brand_syscall(
+        &self,
+        zone_id: u32,
+        syscall_name: &str,
+    ) -> Result<String, &'static str> {
+        let zone = self
+            .zones
+            .iter()
+            .find(|z| z.zone_id == zone_id)
+            .ok_or("Zone not found")?;
+
+        if zone.state != ZoneState::Running {
+            return Err("Cannot dispatch syscall to non-running zone");
+        }
+
+        match zone.brand {
+            ZoneBrand::Native => Ok(format!("Native Solaris/Illumos syscall {}", syscall_name)),
+            ZoneBrand::LinuxBrand => Ok(format!("LxBrand Linux ABI translation for {}", syscall_name)),
+            ZoneBrand::BsdBrand => Ok(format!("BsdBrand BSD ABI translation for {}", syscall_name)),
+        }
+    }
+
+    pub fn create_boot_environment(&mut self, name: &str) -> Result<(), &'static str> {
+        if self.boot_environments.iter().any(|be| be.name == name) {
+            return Err("Boot environment name already exists");
+        }
+
+        self.boot_environments.push(IllumosBootEnv {
+            name: name.to_string(),
+            active: false,
+            dataset_name: format!("rpool/ROOT/{}", name),
+            snapshot_name: format!("rpool/ROOT/{}@snap", name),
+        });
+
+        Ok(())
+    }
+
+    pub fn activate_boot_environment(&mut self, name: &str) -> Result<(), &'static str> {
+        let exists = self.boot_environments.iter().any(|be| be.name == name);
+        if !exists {
+            return Err("Target boot environment not found");
+        }
+
+        for be in self.boot_environments.iter_mut() {
+            be.active = be.name == name;
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for SovereignIllumosZonesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 30. DRAGONFLY BSD VARSYMS & NUMA LOCKLESS NETPOLL ENGINE (SovereignDragonflyNpotEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct VarsymEntry {
+    pub key: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct CpuNetPollRing {
+    pub cpu_id: usize,
+    pub packets: Vec<Vec<u8>>,
+    pub max_capacity: usize,
+}
+
+pub struct SovereignDragonflyNpotEngine {
+    pub varsyms: Vec<VarsymEntry>,
+    pub cpu_rings: Vec<CpuNetPollRing>,
+}
+
+impl SovereignDragonflyNpotEngine {
+    pub fn new(num_cpus: usize) -> Self {
+        let mut rings = Vec::with_capacity(num_cpus);
+        for i in 0..num_cpus {
+            rings.push(CpuNetPollRing {
+                cpu_id: i,
+                packets: Vec::new(),
+                max_capacity: 1024,
+            });
+        }
+
+        let mut engine = Self {
+            varsyms: Vec::new(),
+            cpu_rings: rings,
+        };
+
+        // Default DragonFly varsyms
+        engine.set_varsym("MACHINE", "x86_64");
+        engine.set_varsym("SYS", "SigmaOS");
+
+        engine
+    }
+
+    pub fn set_varsym(&mut self, key: &str, value: &str) {
+        if let Some(pos) = self.varsyms.iter().position(|v| v.key == key) {
+            self.varsyms[pos].value = value.to_string();
+        } else {
+            self.varsyms.push(VarsymEntry {
+                key: key.to_string(),
+                value: value.to_string(),
+            });
+        }
+    }
+
+    /// Resolves variant symlinks e.g. "/usr/lib/$MACHINE/libfoo.so" -> "/usr/lib/x86_64/libfoo.so"
+    pub fn resolve_varsym(&self, path_pattern: &str) -> String {
+        let mut result = path_pattern.to_string();
+        for entry in &self.varsyms {
+            let var_key = format!("${}", entry.key);
+            result = result.replace(&var_key, &entry.value);
+        }
+        result
+    }
+
+    pub fn enqueue_packet(&mut self, cpu_id: usize, packet: Vec<u8>) -> Result<(), &'static str> {
+        let ring = self
+            .cpu_rings
+            .iter_mut()
+            .find(|r| r.cpu_id == cpu_id)
+            .ok_or("Target CPU ring not found")?;
+
+        if ring.packets.len() >= ring.max_capacity {
+            return Err("Per-CPU packet ring overflow");
+        }
+
+        ring.packets.push(packet);
+        Ok(())
+    }
+
+    pub fn poll_cpu_net_ring(&mut self, cpu_id: usize) -> Vec<Vec<u8>> {
+        if let Some(ring) = self.cpu_rings.iter_mut().find(|r| r.cpu_id == cpu_id) {
+            ring.packets.drain(..).collect()
+        } else {
+            Vec::new()
+        }
+    }
+}
+
+impl Default for SovereignDragonflyNpotEngine {
+    fn default() -> Self {
+        Self::new(4)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3939,5 +4352,93 @@ mod tests {
             sentinel.audit_log[1].violation_type,
             AuditViolationType::UnveilViolation
         );
+    }
+
+    #[test]
+    fn test_bcachefs_multi_tier_storage() {
+        let mut bcachefs = SovereignBcachefsTieringEngine::new(100, 2000);
+
+        // 1. Write extent fits into fast SSD tier
+        let data1 = vec![0x55; 50];
+        let id1 = bcachefs.write_extent("/var/db/fast.db", &data1).unwrap();
+        assert_eq!(id1, 1);
+        assert_eq!(bcachefs.extents[0].tier, StorageTier::FastSsd);
+
+        // 2. Verify integrity
+        assert!(bcachefs.verify_extent_integrity("/var/db/fast.db"));
+
+        // 3. Write data larger than remaining SSD capacity (50 + 80 = 130 > 100) -> falls back to SlowHdd
+        let large_data = vec![0xAA; 80];
+        let id2 = bcachefs.write_extent("/var/log/large.log", &large_data).unwrap();
+        assert_eq!(id2, 2);
+        assert_eq!(bcachefs.extents[1].tier, StorageTier::SlowHdd);
+
+        // 4. Access large.log multiple times to make it "hot"
+        for _ in 0..5 {
+            let _ = bcachefs.read_extent("/var/log/large.log");
+        }
+
+        // 5. Run promotion/demotion pass
+        let (promoted, demoted) = bcachefs.promote_demote_pass();
+        assert_eq!(promoted, 1);
+        assert_eq!(demoted, 1); // fast.db demoted to SlowHdd due to low access_count (<=1), large.log promoted to FastSsd
+        assert_eq!(bcachefs.extents[1].tier, StorageTier::FastSsd);
+    }
+
+    #[test]
+    fn test_illumos_zones_and_boot_environments() {
+        let mut zones_engine = SovereignIllumosZonesEngine::new();
+
+        // 1. Boot environments
+        assert_eq!(zones_engine.boot_environments.len(), 1);
+        assert!(zones_engine.boot_environments[0].active);
+
+        assert!(zones_engine.create_boot_environment("sigmaos-be-2026").is_ok());
+        assert!(zones_engine.activate_boot_environment("sigmaos-be-2026").is_ok());
+        assert!(zones_engine.boot_environments[1].active);
+        assert!(!zones_engine.boot_environments[0].active);
+
+        // 2. Zone creation & lifecycle
+        let zone_id = zones_engine
+            .create_zone("lx-container-1", ZoneBrand::LinuxBrand, 50, 1024 * 1024 * 1024)
+            .unwrap();
+
+        // Cannot dispatch syscall to non-running zone
+        assert!(zones_engine.dispatch_brand_syscall(zone_id, "sys_clone").is_err());
+
+        // Boot zone
+        assert!(zones_engine.boot_zone(zone_id).is_ok());
+        let dispatch_res = zones_engine.dispatch_brand_syscall(zone_id, "sys_clone").unwrap();
+        assert!(dispatch_res.contains("LxBrand Linux ABI translation"));
+
+        // Halt zone
+        assert!(zones_engine.halt_zone(zone_id).is_ok());
+        assert!(zones_engine.dispatch_brand_syscall(zone_id, "sys_clone").is_err());
+    }
+
+    #[test]
+    fn test_dragonfly_varsyms_and_netpoll() {
+        let mut dragonfly = SovereignDragonflyNpotEngine::new(2);
+
+        // 1. Variant symlinks resolution
+        let resolved_path = dragonfly.resolve_varsym("/usr/lib/$MACHINE/$SYS/libkernel.so");
+        assert_eq!(resolved_path, "/usr/lib/x86_64/SigmaOS/libkernel.so");
+
+        // Custom varsym override
+        dragonfly.set_varsym("MACHINE", "aarch64");
+        let resolved_arm = dragonfly.resolve_varsym("/usr/lib/$MACHINE/$SYS/libkernel.so");
+        assert_eq!(resolved_arm, "/usr/lib/aarch64/SigmaOS/libkernel.so");
+
+        // 2. NUMA lockless per-CPU netpoll ring
+        let packet1 = vec![0x08, 0x00, 0x27, 0x00, 0x01, 0x02];
+        assert!(dragonfly.enqueue_packet(0, packet1.clone()).is_ok());
+
+        let polled = dragonfly.poll_cpu_net_ring(0);
+        assert_eq!(polled.len(), 1);
+        assert_eq!(polled[0], packet1);
+
+        // Ring is empty after poll
+        let polled_empty = dragonfly.poll_cpu_net_ring(0);
+        assert!(polled_empty.is_empty());
     }
 }
