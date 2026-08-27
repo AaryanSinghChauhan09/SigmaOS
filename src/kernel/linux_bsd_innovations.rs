@@ -343,6 +343,284 @@ impl OpenBsdPledge {
     }
 }
 
+// ================= FreeBSD GEOM Modular Storage Framework =================
+
+#[derive(Debug, Clone)]
+pub struct GeomProvider {
+    pub name: String,
+    pub mediasize_bytes: u64,
+    pub sectorsize: u32,
+    pub class_name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomClass {
+    pub class_name: String,
+    pub providers: Vec<GeomProvider>,
+}
+
+/// FreeBSD GEOM disk transformation and provider topology engine
+pub struct FreeBsdGeomTopology {
+    pub classes: HashMap<String, GeomClass>,
+}
+
+impl FreeBsdGeomTopology {
+    pub fn new() -> Self {
+        Self {
+            classes: HashMap::new(),
+        }
+    }
+
+    pub fn register_class(&mut self, class_name: &str) {
+        if !self.classes.contains_key(class_name) {
+            self.classes.insert(
+                class_name.to_string(),
+                GeomClass {
+                    class_name: class_name.to_string(),
+                    providers: Vec::new(),
+                },
+            );
+        }
+    }
+
+    pub fn add_provider(
+        &mut self,
+        class_name: &str,
+        provider_name: &str,
+        size_bytes: u64,
+        sector_size: u32,
+    ) -> Result<(), &'static str> {
+        let class = self
+            .classes
+            .get_mut(class_name)
+            .ok_or("GEOM: Class not registered")?;
+        class.providers.push(GeomProvider {
+            name: provider_name.to_string(),
+            mediasize_bytes: size_bytes,
+            sectorsize: sector_size,
+            class_name: class_name.to_string(),
+        });
+        Ok(())
+    }
+
+    pub fn find_provider(&self, provider_name: &str) -> Option<GeomProvider> {
+        for class in self.classes.values() {
+            for provider in &class.providers {
+                if provider.name == provider_name {
+                    return Some(provider.clone());
+                }
+            }
+        }
+        None
+    }
+}
+
+impl Default for FreeBsdGeomTopology {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ================= Linux Devlink Device Health Monitor =================
+
+#[derive(Debug, Clone)]
+pub struct DevlinkHealthReporter {
+    pub reporter_name: String,
+    pub error_count: u64,
+    pub recover_count: u64,
+    pub state: String, // "healthy", "error", "recovered"
+}
+
+/// Linux Devlink device health monitoring and recovery subsystem
+pub struct LinuxDevlinkHealthMonitor {
+    pub reporters: HashMap<String, DevlinkHealthReporter>,
+}
+
+impl LinuxDevlinkHealthMonitor {
+    pub fn new() -> Self {
+        Self {
+            reporters: HashMap::new(),
+        }
+    }
+
+    pub fn register_reporter(&mut self, name: &str) {
+        self.reporters.insert(
+            name.to_string(),
+            DevlinkHealthReporter {
+                reporter_name: name.to_string(),
+                error_count: 0,
+                recover_count: 0,
+                state: "healthy".to_string(),
+            },
+        );
+    }
+
+    pub fn report_error(&mut self, name: &str) -> Result<(), &'static str> {
+        let reporter = self
+            .reporters
+            .get_mut(name)
+            .ok_or("Devlink: Health reporter not found")?;
+        reporter.error_count += 1;
+        reporter.state = "error".to_string();
+        Ok(())
+    }
+
+    pub fn recover(&mut self, name: &str) -> Result<(), &'static str> {
+        let reporter = self
+            .reporters
+            .get_mut(name)
+            .ok_or("Devlink: Health reporter not found")?;
+        if reporter.state != "error" {
+            return Err("Devlink: Reporter is not in error state");
+        }
+        reporter.recover_count += 1;
+        reporter.state = "recovered".to_string();
+        Ok(())
+    }
+
+    pub fn get_state(&self, name: &str) -> Option<String> {
+        self.reporters.get(name).map(|r| r.state.clone())
+    }
+}
+
+impl Default for LinuxDevlinkHealthMonitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ================= OpenBSD Unveil Path Restriction Engine =================
+
+#[derive(Debug, Clone)]
+pub struct UnveilPathRule {
+    pub path_prefix: String,
+    pub permissions: String, // e.g., "rwxc"
+}
+
+/// OpenBSD unveil(2) filesystem view restriction engine
+pub struct OpenBsdUnveilEngine {
+    pub rules: Vec<UnveilPathRule>,
+    pub is_locked: bool,
+}
+
+impl OpenBsdUnveilEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            is_locked: false,
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if self.is_locked {
+            return Err("Unveil: Engine is locked; no further unveil calls allowed");
+        }
+        for ch in permissions.chars() {
+            if !['r', 'w', 'x', 'c'].contains(&ch) {
+                return Err("Unveil: Invalid permission character (allowed: r, w, x, c)");
+            }
+        }
+        self.rules.push(UnveilPathRule {
+            path_prefix: path.to_string(),
+            permissions: permissions.to_string(),
+        });
+        Ok(())
+    }
+
+    pub fn lock(&mut self) {
+        self.is_locked = true;
+    }
+
+    pub fn check_path(&self, path: &str, requested_perm: char) -> Result<(), &'static str> {
+        if self.rules.is_empty() {
+            // If no unveil rules created, full view available
+            return Ok(());
+        }
+
+        for rule in &self.rules {
+            if path.starts_with(&rule.path_prefix) {
+                if rule.permissions.contains(requested_perm) {
+                    return Ok(());
+                } else {
+                    return Err("Unveil: Permission denied for path");
+                }
+            }
+        }
+        Err("Unveil: Path not exposed in unveiled view")
+    }
+}
+
+impl Default for OpenBsdUnveilEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ================= FreeBSD VNET Virtualized Network Stack =================
+
+#[derive(Debug, Clone)]
+pub struct VnetNetworkStack {
+    pub vnet_id: u32,
+    pub interfaces: Vec<String>,
+    pub ip_addresses: Vec<String>,
+}
+
+/// FreeBSD VNET virtualized network stack container isolation
+pub struct FreeBsdVnetManager {
+    pub vnet_stacks: HashMap<u32, VnetNetworkStack>,
+}
+
+impl FreeBsdVnetManager {
+    pub fn new() -> Self {
+        Self {
+            vnet_stacks: HashMap::new(),
+        }
+    }
+
+    pub fn create_vnet(&mut self, vnet_id: u32) -> Result<(), &'static str> {
+        if self.vnet_stacks.contains_key(&vnet_id) {
+            return Err("VNET: Stack ID already exists");
+        }
+        self.vnet_stacks.insert(
+            vnet_id,
+            VnetNetworkStack {
+                vnet_id,
+                interfaces: Vec::new(),
+                ip_addresses: Vec::new(),
+            },
+        );
+        Ok(())
+    }
+
+    pub fn assign_interface(&mut self, vnet_id: u32, iface: &str) -> Result<(), &'static str> {
+        let stack = self
+            .vnet_stacks
+            .get_mut(&vnet_id)
+            .ok_or("VNET: Stack ID not found")?;
+        stack.interfaces.push(iface.to_string());
+        Ok(())
+    }
+
+    pub fn assign_ip(&mut self, vnet_id: u32, ip: &str) -> Result<(), &'static str> {
+        let stack = self
+            .vnet_stacks
+            .get_mut(&vnet_id)
+            .ok_or("VNET: Stack ID not found")?;
+        stack.ip_addresses.push(ip.to_string());
+        Ok(())
+    }
+
+    pub fn get_vnet(&self, vnet_id: u32) -> Option<VnetNetworkStack> {
+        self.vnet_stacks.get(&vnet_id).cloned()
+    }
+}
+
+impl Default for FreeBsdVnetManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ================= Linux cgroups v2 Governor =================
 
 #[derive(Debug, Clone, Copy)]
