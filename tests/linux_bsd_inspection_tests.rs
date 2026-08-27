@@ -46,6 +46,9 @@ mod zenith_advanced;
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 
+#[path = "../src/filesystem/bsd_linux_innovations.rs"]
+mod fs_bsd_linux_innovations;
+
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
@@ -608,4 +611,16 @@ fn test_kernel_parity_innovations_geom_devlink_unveil_vnet_inspection() {
     let vnet_stack = vnet_mgr.get_vnet(10).unwrap();
     assert_eq!(vnet_stack.interfaces, vec!["epair0b".to_string()]);
     assert_eq!(vnet_stack.ip_addresses, vec!["10.0.0.10/24".to_string()]);
+}
+
+#[test]
+fn test_sovereign_fhs_hierarchy_engine_inspection() {
+    use fs_bsd_linux_innovations::SovereignFhsHierarchyEngine;
+
+    let fhs = SovereignFhsHierarchyEngine::new();
+    assert_eq!(fhs.resolve_fhs_path("/bin/bash"), "/usr/bin/bash");
+    assert_eq!(fhs.resolve_fhs_path("/sbin/ip"), "/usr/sbin/ip");
+    assert_eq!(fhs.resolve_fhs_path("/lib/modules"), "/usr/lib/modules");
+    assert_eq!(fhs.resolve_fhs_path("/var/run/dbus/system_bus_socket"), "/run/dbus/system_bus_socket");
+    assert_eq!(fhs.resolve_fhs_path("/usr/local/bin/python"), "/usr/local/bin/python");
 }

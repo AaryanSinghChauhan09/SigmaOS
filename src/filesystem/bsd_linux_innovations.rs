@@ -319,3 +319,85 @@ mod tests {
         assert_eq!(cpu, "0-7\n");
     }
 }
+
+// ================= Linux FHS 3.0 & FreeBSD hier(7) Filesystem Hierarchy Engine =================
+
+/// Sovereign Linux FHS 3.0 & FreeBSD hier(7) unified filesystem hierarchy manager
+pub struct SovereignFhsHierarchyEngine {
+    pub merged_usr: bool,
+    pub var_run_redirect: bool,
+    pub bsd_hier_mode: bool,
+}
+
+impl SovereignFhsHierarchyEngine {
+    pub fn new() -> Self {
+        Self {
+            merged_usr: true,
+            var_run_redirect: true,
+            bsd_hier_mode: true,
+        }
+    }
+
+    /// Resolves raw paths into canonical Linux FHS 3.0 and FreeBSD hier(7) paths
+    pub fn resolve_fhs_path(&self, raw_path: &str) -> String {
+        let mut path = raw_path.to_string();
+
+        // 1. Linux merged-usr resolution (/bin -> /usr/bin, /sbin -> /usr/sbin, /lib -> /usr/lib)
+        if self.merged_usr {
+            if path == "/bin" || path.starts_with("/bin/") {
+                path = format!("/usr{}", path);
+            } else if path == "/sbin" || path.starts_with("/sbin/") {
+                path = format!("/usr{}", path);
+            } else if path == "/lib" || path.starts_with("/lib/") {
+                path = format!("/usr{}", path);
+            } else if path == "/lib64" || path.starts_with("/lib64/") {
+                path = format!("/usr{}", path);
+            }
+        }
+
+        // 2. /var/run -> /run and /var/lock -> /run/lock symlink redirection
+        if self.var_run_redirect {
+            if path == "/var/run" || path.starts_with("/var/run/") {
+                path = format!("/run{}", &path[8..]);
+            } else if path == "/var/lock" || path.starts_with("/var/lock/") {
+                path = format!("/run/lock{}", &path[9..]);
+            }
+        }
+
+        // 3. FreeBSD hier(7) /usr/local ports directory hierarchy resolution
+        if self.bsd_hier_mode && (path == "/usr/local" || path.starts_with("/usr/local/")) {
+            // Keep /usr/local hierarchy intact as top-class BSD ports prefix
+            return path;
+        }
+
+        path
+    }
+}
+
+impl Default for SovereignFhsHierarchyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod fhs_tests {
+    use super::*;
+
+    #[test]
+    fn test_fhs_hierarchy_resolution() {
+        let engine = SovereignFhsHierarchyEngine::new();
+
+        // Merged-usr test
+        assert_eq!(engine.resolve_fhs_path("/bin/sh"), "/usr/bin/sh");
+        assert_eq!(engine.resolve_fhs_path("/sbin/init"), "/usr/sbin/init");
+        assert_eq!(engine.resolve_fhs_path("/lib/libc.so.6"), "/usr/lib/libc.so.6");
+
+        // /var/run redirection
+        assert_eq!(engine.resolve_fhs_path("/var/run/sshd.pid"), "/run/sshd.pid");
+        assert_eq!(engine.resolve_fhs_path("/var/lock/subsys"), "/run/lock/subsys");
+
+        // FreeBSD hier(7) /usr/local
+        assert_eq!(engine.resolve_fhs_path("/usr/local/etc/nginx.conf"), "/usr/local/etc/nginx.conf");
+    }
+}
