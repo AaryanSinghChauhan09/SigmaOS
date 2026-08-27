@@ -449,6 +449,9 @@ pub struct SovereignSystemdUnit {
     pub memory_limit_mb: Option<u64>,
     pub cpu_weight: u32,
     pub is_sandboxed: bool,
+    pub socket_activation_port: Option<u16>,
+    pub pledge_promises: Option<String>,
+    pub unveil_paths: Vec<(String, String)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -460,65 +463,51 @@ pub struct JournalLogEntry {
 }
 
 pub struct SovereignSystemdParityEngine {
-    pub units: BTreeMap<String, SystemdUnit>,
-    pub journal_logs: Vec<JournalLogEntry>,
+    pub units: BTreeMap<String, SovereignSystemdUnit>,
+    pub journal: Vec<JournalLogEntry>,
 }
 
 impl SovereignSystemdParityEngine {
     pub fn new() -> Self {
         Self {
             units: BTreeMap::new(),
-            journal_logs: Vec::new(),
+            journal: Vec::new(),
         }
     }
 
-    /// Registers a new systemd-style unit (Service, Slice, Scope, Mount, Automount, Swap, Path, Device).
-    pub fn register_unit(&mut self, name: &str, unit_type: SystemdUnitType, deps: &[&str]) {
-        let deps_vec = deps.iter().map(|d| d.to_string()).collect();
-        self.units.insert(
-            name.to_string(),
-            SystemdUnit {
-                name: name.to_string(),
-                unit_type,
-                state: SystemdUnitState::Inactive,
-                dependencies: deps_vec,
-                memory_limit_mb: None,
-                cpu_weight: 100,
-                is_sandboxed: true,
-            },
-        );
+    pub fn register_unit(&mut self, unit: SovereignSystemdUnit) {
+        self.units.insert(unit.name.clone(), unit);
     }
 
-    /// Starts a unit and logs the event to the sovereign journal.
+    pub fn trigger_socket_activation(&mut self, port: u16, timestamp: u64) -> Result<String, &'static str> {
+        for (name, unit) in self.units.iter_mut() {
+            if unit.socket_activation_port == Some(port) {
+                unit.state = SystemdUnitState::Active;
+                self.journal.push(JournalLogEntry {
+                    timestamp_ns: timestamp,
+                    unit_name: name.clone(),
+                    priority: 6,
+                    message: format!("Socket activation triggered on port {}", port),
+                });
+                return Ok(name.clone());
+            }
+        }
+        Err("No unit listening on socket port")
+    }
+
     pub fn start_unit(&mut self, name: &str) -> Result<(), &'static str> {
         if let Some(unit) = self.units.get_mut(name) {
             unit.state = SystemdUnitState::Active;
-            self.journal_logs.push(JournalLogEntry {
+            self.journal.push(JournalLogEntry {
                 timestamp_ns: 1_000_000,
                 unit_name: name.to_string(),
-                priority: 6, // INFO
+                priority: 6,
                 message: format!("Started unit {}", name),
             });
             Ok(())
         } else {
             Err("SystemdParity: Unit not found")
         }
-    }
-
-    /// Configures resource limits on Slice and Scope units.
-    pub fn set_resource_limits(&mut self, name: &str, mem_mb: u64, cpu_weight: u32) -> Result<(), &'static str> {
-        if let Some(unit) = self.units.get_mut(name) {
-            unit.memory_limit_mb = Some(mem_mb);
-            unit.cpu_weight = cpu_weight;
-            Ok(())
-        } else {
-            Err("SystemdParity: Unit not found")
-        }
-    }
-
-    /// Queries journal logs filtered by unit name.
-    pub fn query_journal(&self, unit_name: &str) -> Vec<&JournalLogEntry> {
-        self.journal_logs.iter().filter(|entry| entry.unit_name == unit_name).collect()
     }
 }
 
@@ -528,7 +517,7 @@ impl Default for SovereignSystemdParityEngine {
     }
 }
 
-/// 8. Sovereign Hybrid Scheduler Innovations (RTLane <5µs preemption, NUMA node binding, DVFS governor, eBPF preemption hooks)
+/// 8. Sovereign Hybrid Scheduler Innovations
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DvfsPowerGovernor {
     Performance,
@@ -538,10 +527,10 @@ pub enum DvfsPowerGovernor {
 }
 
 #[derive(Debug, Clone)]
-pub struct NumaNodeAffinity {
+pub struct NumaNodeTopology {
     pub node_id: usize,
-    pub cpu_cores: Vec<usize>,
-    pub total_memory_mb: usize,
+    pub cpu_cores: Vec<u32>,
+    pub local_memory_mb: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -555,9 +544,11 @@ pub struct RtlaneRealtimeTask {
 
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
-    pub numa_nodes: Vec<NumaNodeAffinity>,
+    pub numa_nodes: Vec<NumaNodeTopology>,
     pub rt_tasks: BTreeMap<usize, RtlaneRealtimeTask>,
     pub preemption_count: u64,
+    pub rt_lane_latency_us: u64,
+    pub ai_prediction_boost: bool,
 }
 
 impl SovereignHybridSchedulerInnovations {
@@ -575,26 +566,40 @@ impl SovereignHybridSchedulerInnovations {
         });
 
         Self {
+            current_governor: DvfsPowerGovernor::Schedutil,
             numa_nodes: nodes,
-            governor: CpuPStateGovernor::Schedutil,
-            rt_lane_latency_us: 3, // Guarantees < 5µs real-time preemption
+            rt_tasks: BTreeMap::new(),
+            preemption_count: 0,
+            rt_lane_latency_us: 3,
             ai_prediction_boost: true,
         }
     }
 
-    /// Evaluates real-time preemption gate timing.
+    pub fn register_rt_task(&mut self, task: RtlaneRealtimeTask) -> Result<(), &'static str> {
+        if task.max_latency_budget_us > 5 {
+            return Err("Latency budget exceeds 5us threshold");
+        }
+        self.rt_tasks.insert(task.task_id, task);
+        Ok(())
+    }
+
+    pub fn evaluate_ebpf_preemption_hook(&mut self, task_id: usize, boost: u32) -> bool {
+        if let Some(task) = self.rt_tasks.get_mut(&task_id) {
+            task.ebpf_boost_score += boost;
+        }
+        true
+    }
+
     pub fn verify_rt_lane_preemption_latency(&self) -> bool {
         self.rt_lane_latency_us < 5
     }
 
-    /// Selects optimal NUMA node for memory and thread affinity binding.
     pub fn select_optimal_numa_node(&self, cpu_core: u32) -> Option<u32> {
-        self.numa_nodes.iter().find(|n| n.cpu_cores.contains(&cpu_core)).map(|n| n.node_id)
+        self.numa_nodes.iter().find(|n| n.cpu_cores.contains(&cpu_core)).map(|n| n.node_id as u32)
     }
 
-    /// Adjusts CPU DVFS P-state governor mode dynamically.
-    pub fn set_governor(&mut self, gov: CpuPStateGovernor) {
-        self.governor = gov;
+    pub fn set_governor(&mut self, gov: DvfsPowerGovernor) {
+        self.current_governor = gov;
     }
 }
 
@@ -708,6 +713,9 @@ mod tests {
             unit_type: SystemdUnitType::Service,
             state: SystemdUnitState::Inactive,
             dependencies: vec![String::from("network.target")],
+            memory_limit_mb: None,
+            cpu_weight: 100,
+            is_sandboxed: true,
             socket_activation_port: Some(8080),
             pledge_promises: Some(String::from("stdio inet rpath")),
             unveil_paths: vec![(String::from("/var/www"), String::from("r"))],

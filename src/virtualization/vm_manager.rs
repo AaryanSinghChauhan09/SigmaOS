@@ -9,7 +9,6 @@ use crate::klib::collections::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 use alloc::format;
-use crate::klib::path::PathBuf;
 use std::path::PathBuf;
 
 #[cfg(test)]
@@ -210,9 +209,6 @@ impl VhostUserDevice {
 pub enum KvmExitReason {
     Unknown,
     Io,
-    Mmio,
-    Hypercall,
-    Interrupt,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
     Mmio,

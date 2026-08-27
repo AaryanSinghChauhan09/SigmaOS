@@ -1,20 +1,10 @@
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-
 
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
-
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
@@ -67,43 +57,43 @@ pub struct PortageEbuildProfile {
 }
 
 /// Gentoo Portage Masking & Slotting Resolver Engine
-pub struct GentooPortageMaskEngine {
+pub struct GentooPortageMaskResolver {
     pub hard_masked_atoms: Vec<String>,
     pub ebuilds: Vec<PortageEbuildProfile>,
     pub target_arch: String,
 }
 
-impl GentooPortageMaskEngine {
+impl GentooPortageMaskResolver {
     pub fn new(target_arch: &str) -> Self {
         Self {
             target_arch: target_arch.to_string(),
             ebuilds: Vec::new(),
-            hard_masked_pkgs: Vec::new(),
+            hard_masked_atoms: Vec::new(),
         }
     }
 
-    pub fn register_ebuild(&mut self, category_pkg: &str, version: &str, keywords: &[&str], is_masked: bool) {
-        self.ebuilds.push(EbuildEntry {
-            category_pkg: category_pkg.to_string(),
-            version: version.to_string(),
+    pub fn register_ebuild(&mut self, atom_name: &str, slot: &str, keywords: &[&str], is_masked: bool) {
+        self.ebuilds.push(PortageEbuildProfile {
+            atom_name: atom_name.to_string(),
+            slot: slot.to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_masked,
+            is_ebuild_masked: is_masked,
         });
     }
 
-    pub fn add_hard_mask(&mut self, category_pkg: &str) {
-        self.hard_masked_pkgs.push(category_pkg.to_string());
+    pub fn add_hard_mask(&mut self, atom_name: &str) {
+        self.hard_masked_atoms.push(atom_name.to_string());
     }
 
-    pub fn evaluate_installability(&self, category_pkg: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
-        if self.hard_masked_pkgs.iter().any(|pkg| pkg == category_pkg) {
+    pub fn evaluate_installability(&self, atom_name: &str, _slot: &str, accept_keywords: bool) -> Result<bool, &'static str> {
+        if self.hard_masked_atoms.iter().any(|pkg| pkg == atom_name) {
             return Err("Package is hard-masked in package.mask");
         }
 
-        let ebuild = self.ebuilds.iter().find(|e| e.category_pkg == category_pkg && e.version == version)
+        let ebuild = self.ebuilds.iter().find(|e| e.atom_name == atom_name)
             .ok_or("Ebuild not found")?;
 
-        if ebuild.is_masked && !accept_keywords {
+        if ebuild.is_ebuild_masked && !accept_keywords {
             return Err("Ebuild is masked by package.mask or keywords");
         }
 
@@ -1843,13 +1833,13 @@ pub struct GentooEbuildPackage {
     pub is_masked: bool,
 }
 
-pub struct GentooPortageMaskEngine {
+pub struct GentooPortageMaskEngineLegacy {
     pub target_arch: String,
     pub ebuilds: Vec<GentooEbuildPackage>,
     pub hard_masks: Vec<String>,
 }
 
-impl GentooPortageMaskEngine {
+impl GentooPortageMaskEngineLegacy {
     pub fn new(target_arch: &str) -> Self {
         Self {
             target_arch: target_arch.to_string(),
@@ -1859,7 +1849,7 @@ impl GentooPortageMaskEngine {
     }
 
     pub fn register_ebuild(&mut self, name: &str, version: &str, keywords: &[&str], is_masked: bool) {
-        self.ebuilds.push(EbuildEntry {
+        self.ebuilds.push(GentooEbuildPackage {
             name: name.to_string(),
             version: version.to_string(),
             keywords: keywords.iter().map(|s| s.to_string()).collect(),
@@ -1881,9 +1871,9 @@ impl GentooPortageMaskEngine {
             if ebuild.is_masked {
                 return Err("Ebuild is masked");
             }
-            let testing_keyword = format!("~{}", self.arch);
+            let testing_keyword = format!("~{}", self.target_arch);
             let is_testing = ebuild.keywords.contains(&testing_keyword);
-            let is_stable = ebuild.keywords.contains(&self.arch);
+            let is_stable = ebuild.keywords.contains(&self.target_arch);
             if is_stable {
                 Ok(true)
             } else if is_testing {
@@ -2734,7 +2724,7 @@ mod extra_unimplemented_tests {
 }
 
 /// Gentoo Portage package masking and keyword evaluation engine
-pub struct GentooPortageMaskEngine {
+pub struct GentooPortageMaskEngineV2 {
     pub arch: String,
     pub ebuilds: HashMap<String, PortageEbuildSpec>,
     pub hard_masks: Vec<String>,
@@ -2748,7 +2738,7 @@ pub struct PortageEbuildSpec {
     pub is_masked: bool,
 }
 
-impl GentooPortageMaskEngine {
+impl GentooPortageMaskEngineV2 {
     pub fn new(arch: &str) -> Self {
         Self {
             arch: arch.to_string(),

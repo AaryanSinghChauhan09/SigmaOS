@@ -4,11 +4,13 @@
 
 extern crate alloc;
 
-extern crate alloc;
-
-use crate::klib::{HashMap, Vec};
-
+use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+
+#[cfg(test)]
+use std::collections::HashMap;
+#[cfg(not(test))]
+use alloc::collections::BTreeMap as HashMap;
 
 /// Service execution state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
