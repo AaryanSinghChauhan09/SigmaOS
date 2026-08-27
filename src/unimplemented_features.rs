@@ -1844,44 +1844,45 @@ impl GentooPortageMaskEngine {
         }
     }
 
-    pub fn register_ebuild(&mut self, pkg_name: &str, version: &str, keywords: &[&str], masked: bool) {
-        self.ebuilds.push(GentooEbuildPackage {
-            name: pkg_name.to_string(),
+    pub fn register_ebuild(&mut self, name: &str, version: &str, keywords: &[&str], is_masked: bool) {
+        self.ebuilds.push(EbuildEntry {
+            name: name.to_string(),
             version: version.to_string(),
-            keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_masked: masked,
+            keywords: keywords.iter().map(|s| s.to_string()).collect(),
+            is_masked,
         });
     }
 
-    pub fn add_hard_mask(&mut self, pkg_name: &str) {
-        self.hard_masks.push(pkg_name.to_string());
+    pub fn add_hard_mask(&mut self, name: &str) {
+        if !self.hard_masks.contains(&name.to_string()) {
+            self.hard_masks.push(name.to_string());
+        }
     }
 
-    pub fn evaluate_installability(&self, pkg_name: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
-        if self.hard_masks.iter().any(|m| m == pkg_name) {
+    pub fn evaluate_installability(&self, name: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
+        if self.hard_masks.contains(&name.to_string()) {
             return Err("Package is hard-masked in package.mask");
         }
-
-        let ebuild = self.ebuilds.iter().find(|e| e.name == pkg_name && (version == "0" || e.version == version))
-            .ok_or("Ebuild package not found in Portage tree")?;
-
-        if ebuild.is_masked {
-            return Err("Ebuild package is masked");
-        }
-
-        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
-        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
-
-        if is_stable {
-            Ok(true)
-        } else if is_testing {
-            if accept_keywords {
+        if let Some(ebuild) = self.ebuilds.iter().find(|e| e.name == name && e.version == version) {
+            if ebuild.is_masked {
+                return Err("Ebuild is masked");
+            }
+            let testing_keyword = format!("~{}", self.arch);
+            let is_testing = ebuild.keywords.contains(&testing_keyword);
+            let is_stable = ebuild.keywords.contains(&self.arch);
+            if is_stable {
                 Ok(true)
+            } else if is_testing {
+                if accept_keywords {
+                    Ok(true)
+                } else {
+                    Err("Package requires ~arch keyword acceptance in package.accept_keywords")
+                }
             } else {
-                Err("Package requires ~arch keyword acceptance in package.accept_keywords")
+                Err("No matching keyword for architecture")
             }
         } else {
-            Err("Package not available for target architecture")
+            Err("Ebuild not found in Portage tree")
         }
     }
 }
