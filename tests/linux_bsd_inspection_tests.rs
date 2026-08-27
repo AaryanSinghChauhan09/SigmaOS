@@ -53,6 +53,9 @@ mod wiki_ideas_implementation;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use unimplemented_features::{
@@ -571,6 +574,14 @@ fn test_gentoo_portage_mask_engine_inspection() {
     assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", true).unwrap());
     portage.add_hard_mask("app-admin/sudo");
     assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
+    use linux_bsd_parity::GentooPortageUseFlagsEngine;
+    let mut portage = GentooPortageUseFlagsEngine::new();
+    portage.set_global_use_flags(&["+ssl", "+x265"]);
+    portage.register_package("media-video/ffmpeg", &["ssl", "x265", "gtk"]);
+    let resolved = portage.resolve_package_flags("media-video/ffmpeg").unwrap();
+    assert_eq!(resolved.len(), 2);
+    assert!(resolved.contains(&"ssl".to_string()));
+    assert!(resolved.contains(&"x265".to_string()));
 }
 
 #[test]
