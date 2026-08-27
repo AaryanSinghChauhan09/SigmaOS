@@ -3,7 +3,7 @@
 pub mod compatibility;
 
 pub use compatibility::{
-    CompatibilityMatrix, Device, DeviceID, DeviceType, DiagnosticResult, DriverManager,
-    HardwareDiagnostics, SimpleCompatibilityMatrix, SimpleDevice, SimpleDriverManager,
-    SimpleHardwareDiagnostics, SupportStatus,
+    AcpiLoadBalancer, AcpiPowerState, CompatibilityCheck, CompatibilityError, CompatibilityReport,
+    CompatibilityResult, DeviceID, DeviceType, HardwareDevice, HotplugEvent, HotplugManager,
+    SimpleAcpiManager, SimpleCompatibilityMatrix, SimpleDevice, SimpleDiagnostics, SupportStatus,
 };
