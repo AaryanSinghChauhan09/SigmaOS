@@ -456,11 +456,15 @@ fn test_gentoo_use_flag_engine_inspection() {
     gentoo.set_use_flag("+ssl");
     gentoo.set_use_flag("x264");
     gentoo.set_use_flag("-wayland");
-
     assert!(gentoo.is_flag_enabled("ssl"));
     assert!(gentoo.is_flag_enabled("x264"));
     assert!(!gentoo.is_flag_enabled("wayland"));
-
     gentoo.set_use_flag("wayland");
     assert!(gentoo.resolve_conflicts(("wayland", "x264")).is_err());
+fn test_gentoo_portage_mask_engine_inspection() {
+    let mut portage = GentooUseFlagEngine::new();
+    portage.set_use_flag("+qt5");
+    portage.set_use_flag("-wayland");
+    assert!(portage.is_flag_enabled("qt5"));
+    assert!(!portage.is_flag_enabled("wayland"));
 }
