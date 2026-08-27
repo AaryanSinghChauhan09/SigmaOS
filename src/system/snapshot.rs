@@ -193,6 +193,7 @@ impl SnapshotStorage for FileSnapshotStorage {
     }
 
     fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), SnapshotError> {
+        let snapshot_key = snapshot_id.to_string();
         self.snapshots
             .remove(&snapshot_id.to_string())
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
@@ -291,6 +292,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
     fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<RestoreResult, SnapshotError> {
         let start = std::time::Instant::now();
 
+        let snapshot_key = snapshot_id.to_string();
         let metadata = self
             .snapshots
             .get(&snapshot_id.to_string())

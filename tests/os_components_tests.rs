@@ -32,7 +32,6 @@ use sigmaos::system::user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserErro
 use sigmaos::tools::sigmatools::*;
 use unveil::{UnveilManager, UnveilPermission};
 
-
 #[path = "../src/storage/geom.rs"]
 mod geom;
 #[path = "../src/audio/editor.rs"]
@@ -188,6 +187,8 @@ use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
 use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
 use fedora_compat::DnfPackageResolver;
 use geom::{BioRequest, GeomProvider, GeomTopology};
+#[path = "../src/ipc/pipes.rs"]
+mod pipes;
 use pipes::Pipe;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
@@ -210,6 +211,8 @@ use segmentation_paging::{
     AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
     SegmentDescriptor, SegmentSelector,
 };
+use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
+use segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
