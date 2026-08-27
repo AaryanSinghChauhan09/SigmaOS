@@ -23,16 +23,31 @@ pub enum DriverType {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum DriverState {
-    Unloaded,
-    Active,
-    Failed,
+    Unloaded = 0,
+    Active = 1,
+    Failed = 2,
+}
+
+impl DriverState {
+    pub fn from_usize(val: usize) -> Self {
+        match val {
+            1 => DriverState::Active,
+            2 => DriverState::Failed,
+            _ => DriverState::Unloaded,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum DriverError {
+    Success,
     LoadFailed,
     UnloadFailed,
     NotFound,
+    InvalidDevice,
+    IrpNotHandled,
+    InvalidParameter,
+    AccessDenied,
 }
 
 pub trait Driver {
@@ -85,7 +100,7 @@ impl Driver for SimpleStorageDriver {
     fn name(&self) -> &str { "SimpleStorageDriver" }
     fn driver_type(&self) -> DriverType { self.driver_type }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        DriverState::from_usize(self.state.load(Ordering::SeqCst))
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Active as usize, Ordering::SeqCst);
@@ -124,7 +139,7 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        DriverState::from_usize(self.state.load(Ordering::SeqCst))
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Active as usize, Ordering::SeqCst);
@@ -535,7 +550,7 @@ mod tests {
         );
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(

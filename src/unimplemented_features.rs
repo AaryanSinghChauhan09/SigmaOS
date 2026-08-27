@@ -1679,65 +1679,6 @@ mod linux_lts_upstream_tests {
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct EbuildEntry {
-    pub atom: String,
-    pub version: String,
-    pub keywords: Vec<String>,
-    pub is_masked: bool,
-}
-
-pub struct GentooPortageMaskEngine {
-    pub arch: String,
-    pub ebuilds: Vec<EbuildEntry>,
-    pub hard_masks: Vec<String>,
-}
-
-impl GentooPortageMaskEngine {
-    pub fn new(arch: &str) -> Self {
-        Self {
-            arch: arch.to_string(),
-            ebuilds: Vec::new(),
-            hard_masks: Vec::new(),
-        }
-    }
-
-    pub fn register_ebuild(&mut self, atom: &str, version: &str, keywords: &[&str], is_masked: bool) {
-        self.ebuilds.push(EbuildEntry {
-            atom: atom.to_string(),
-            version: version.to_string(),
-            keywords: keywords.iter().map(|s| s.to_string()).collect(),
-            is_masked,
-        });
-    }
-
-    pub fn add_hard_mask(&mut self, atom: &str) {
-        self.hard_masks.push(atom.to_string());
-    }
-
-    pub fn evaluate_installability(&self, atom: &str, _version: &str, accept_testing: bool) -> Result<bool, &'static str> {
-        if self.hard_masks.iter().any(|m| m == atom) {
-            return Err("Package is hard masked in package.mask");
-        }
-        if let Some(entry) = self.ebuilds.iter().find(|e| e.atom == atom) {
-            if entry.is_masked {
-                return Err("Package is masked");
-            }
-            let is_stable = entry.keywords.contains(&self.arch);
-            let testing_kw = format!("~{}", self.arch);
-            let is_testing = entry.keywords.contains(&testing_kw);
-
-            if is_stable || (accept_testing && is_testing) {
-                Ok(true)
-            } else {
-                Err("Package keyword not accepted")
-            }
-        } else {
-            Err("Ebuild not found")
-        }
-    }
-}
-
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
     pub disabled_flags: Vec<String>,
