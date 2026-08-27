@@ -440,9 +440,11 @@ pub struct SystemdUnit {
     pub cpu_quota_pct: Option<u32>,
 }
 
+pub type SovereignSystemdUnit = SystemdUnit;
+
 pub struct SovereignSystemdParityEngine {
     pub units: BTreeMap<String, SovereignSystemdUnit>,
-    pub journal_logs: Vec<JournalLogEntry>,
+    pub journal_logs: Vec<String>,
 }
 
 impl SovereignSystemdParityEngine {
@@ -458,14 +460,15 @@ impl SovereignSystemdParityEngine {
         let deps_vec = deps.iter().map(|d| d.to_string()).collect();
         self.units.insert(
             name.to_string(),
-            SovereignSystemdUnit {
+            SystemdUnit {
                 name: name.to_string(),
                 unit_type,
-                state: SystemdUnitState::Inactive,
+                active_state: SystemdUnitActiveState::Inactive,
+                description: name.to_string(),
+                exec_start: Vec::new(),
                 dependencies: deps_vec,
-                memory_limit_mb: None,
-                cpu_weight: 100,
-                is_sandboxed: true,
+                memory_limit_bytes: None,
+                cpu_quota_pct: None,
             },
         );
     }
@@ -475,6 +478,10 @@ impl SovereignSystemdParityEngine {
         unit.active_state = SystemdUnitActiveState::Active;
         self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
         Ok(SystemdUnitActiveState::Active)
+    }
+
+    pub fn query_journal(&self, name: &str) -> Vec<&String> {
+        self.journal_logs.iter().filter(|log| log.contains(name)).collect()
     }
 
     pub fn stop_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
@@ -491,6 +498,15 @@ impl Default for SovereignSystemdParityEngine {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
+    Performance,
+    Powersave,
+    Schedutil,
+    Ondemand,
+    Conservative,
+}
+
 /// 8. Real-Time Hybrid Scheduler Innovations (<5µs RTLane Latency & NUMA/DVFS)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedulerClass {
@@ -498,6 +514,13 @@ pub enum SchedulerClass {
     Interactive,
     Normal,
     Idle,
+}
+
+#[derive(Debug, Clone)]
+pub struct NumaNodeAffinity {
+    pub node_id: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: u64,
 }
 
 #[derive(Debug, Clone)]
@@ -512,7 +535,7 @@ pub struct RealtimeTask {
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
     pub numa_nodes: Vec<NumaNodeAffinity>,
-    pub rt_tasks: BTreeMap<usize, RtlaneRealtimeTask>,
+    pub rt_tasks: BTreeMap<usize, RealtimeTask>,
     pub preemption_count: u64,
     pub rt_lane_latency_us: u64,
 }
@@ -536,6 +559,7 @@ impl SovereignHybridSchedulerInnovations {
             numa_nodes: nodes,
             rt_tasks: BTreeMap::new(),
             preemption_count: 0,
+            rt_lane_latency_us: 4,
         }
     }
 
@@ -657,7 +681,7 @@ mod tests {
         engine.register_unit("httpd.service", SystemdUnitType::Service, &["network.target"]);
         assert_eq!(engine.units.len(), 1);
 
-        assert_eq!(engine.start_unit("httpd.service"), Ok(()));
+        assert!(engine.start_unit("httpd.service").is_ok());
         assert_eq!(engine.query_journal("httpd.service").len(), 1);
     }
 
