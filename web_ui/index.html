@@ -185,9 +185,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="hostname-input">Hostname <span class="text-danger" aria-hidden="true">*</span></label>
-                        <input type="text" id="hostname-input" value="sigmaos-node" placeholder="Enter system name" required aria-required="true" aria-describedby="hostname-error">
-                        <span id="hostname-error" class="error-text" aria-live="polite"></span>
+                        <label for="hostname-input">Hostname</label>
+                        <input type="text" id="hostname-input" value="sigmaos-node" placeholder="Enter system name">
                     </div>
 
                     <div class="form-group">
@@ -329,28 +328,6 @@
                 if (!accepted) {
                     alert('Please accept the licensing terms and sovereign autonomy agreement to proceed.');
                     return;
-                }
-            }
-
-            if (currentStep === 4) {
-                const hostnameInput = document.getElementById('hostname-input');
-                const hostnameError = document.getElementById('hostname-error');
-                const val = hostnameInput.value.trim();
-                const hostnameRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,62}$/;
-
-                if (!val) {
-                    hostnameError.innerText = 'Hostname is required.';
-                    hostnameInput.classList.add('input-error');
-                    hostnameInput.focus();
-                    return;
-                } else if (!hostnameRegex.test(val)) {
-                    hostnameError.innerText = 'Hostname must start with alphanumeric char and contain only letters, numbers, or hyphens.';
-                    hostnameInput.classList.add('input-error');
-                    hostnameInput.focus();
-                    return;
-                } else {
-                    hostnameError.innerText = '';
-                    hostnameInput.classList.remove('input-error');
                 }
             }
 
