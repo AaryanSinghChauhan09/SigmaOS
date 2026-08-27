@@ -1679,6 +1679,64 @@ mod linux_lts_upstream_tests {
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
+#[derive(Debug, Clone)]
+pub struct EbuildEntry {
+    pub name: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_hard_masked: bool,
+}
+
+pub struct GentooPortageMaskEngine {
+    pub arch: String,
+    pub ebuilds: Vec<EbuildEntry>,
+    pub hard_masked_packages: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(arch: &str) -> Self {
+        Self {
+            arch: arch.to_string(),
+            ebuilds: Vec::new(),
+            hard_masked_packages: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, name: &str, version: &str, keywords: &[&str], hard_masked: bool) {
+        self.ebuilds.push(EbuildEntry {
+            name: name.to_string(),
+            version: version.to_string(),
+            keywords: keywords.iter().map(|s| s.to_string()).collect(),
+            is_hard_masked: hard_masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, pkg_name: &str) {
+        self.hard_masked_packages.push(pkg_name.to_string());
+    }
+
+    pub fn evaluate_installability(&self, name: &str, _version: &str, accept_testing_keywords: bool) -> Result<bool, &'static str> {
+        if self.hard_masked_packages.contains(&name.to_string()) {
+            return Err("Package is hard masked");
+        }
+        if let Some(ebuild) = self.ebuilds.iter().find(|e| e.name == name) {
+            if ebuild.is_hard_masked {
+                return Err("Package is hard masked in ebuild");
+            }
+            if ebuild.keywords.contains(&self.arch) {
+                return Ok(true);
+            }
+            let testing_keyword = alloc::format!("~{}", self.arch);
+            if accept_testing_keywords && ebuild.keywords.contains(&testing_keyword) {
+                return Ok(true);
+            }
+            Err("Package keyword not accepted")
+        } else {
+            Err("Ebuild not found")
+        }
+    }
+}
+
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
     pub disabled_flags: Vec<String>,
