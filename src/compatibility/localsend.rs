@@ -21,6 +21,7 @@
 // Implements the LocalSend REST/UDP v2.1 protocol format
 // to enable offline peer-to-peer secure file transfer within local networks.
 
+extern crate alloc;
 use crate::security::capability::CapabilityToken;
 use alloc::collections::{BTreeMap, BTreeSet};
 

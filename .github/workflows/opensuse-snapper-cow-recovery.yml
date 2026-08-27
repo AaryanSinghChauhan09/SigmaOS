@@ -1,0 +1,22 @@
+name: openSUSE Snapper CoW Recovery CI
+
+on:
+  push:
+    branches: [ main, master, "feat/*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  snapper-cow-recovery:
+    name: Snapper Pre/Post CoW Transaction Recovery Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Snapper Transaction Guard
+        run: |
+          cargo test --test linux_bsd_inspection_tests test_wiki_distro_innovations_inspection

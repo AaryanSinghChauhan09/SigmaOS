@@ -21,6 +21,7 @@ use std::string::{String, ToString};
 /// SigmaOS Netfilter — stateless and stateful packet filtering
 /// Absorbs Linux netfilter hooks: PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING
 /// Supports: ACCEPT, DROP, REJECT, LOG actions; conntrack state matching
+extern crate alloc;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

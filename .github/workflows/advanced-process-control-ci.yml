@@ -1,0 +1,23 @@
+name: Advanced Process Control Subsystem CI
+
+on:
+  push:
+    branches: [ main, master, "feat/*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  process-control-verification:
+    name: Process VM, Job Control, Rusage & IPC Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Compile and Run Process Control Unit Tests
+        run: |
+          rustc --edition=2021 --test src/process/advanced_process_control.rs -o test_proc_ctrl && ./test_proc_ctrl
+          rm test_proc_ctrl

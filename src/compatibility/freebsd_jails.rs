@@ -402,7 +402,7 @@ impl SigmaJailManager {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct JailInfo {
     pub name: String,
     pub state: JailState,
