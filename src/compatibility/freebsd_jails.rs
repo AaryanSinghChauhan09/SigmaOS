@@ -2,7 +2,7 @@
 //!
 //! Lightweight OS-level virtualization with process isolation
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::str::FromStr;

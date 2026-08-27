@@ -1,7 +1,8 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
+use crate::klib::HashSet;
 use std::io::{self, BufRead, Write};
 
 /// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs
@@ -216,17 +217,17 @@ pub enum ShellCommand {
 /// Shell REPL
 pub struct ShellRepl {
     pub running: bool,
-    pub variables: std::collections::HashMap<String, String>,
-    pub aliases: std::collections::HashMap<String, String>,
+    pub variables: crate::klib::HashMap<String, String>,
+    pub aliases: crate::klib::HashMap<String, String>,
     pub prompt: String,
     pub agent_engine: AgentAutomationEngine,
     pub current_user: String,
     pub current_dir: String,
-    pub services: std::collections::HashMap<String, String>,
-    pub installed_packages: std::collections::HashSet<String>,
+    pub services: crate::klib::HashMap<String, String>,
+    pub installed_packages: HashSet<String>,
     pub current_theme: String,
     pub current_profile: String,
-    pub a11y_features: std::collections::HashMap<String, bool>,
+    pub a11y_features: crate::klib::HashMap<String, bool>,
     pub command_history: Vec<String>,
 
     // Keep internal instances of engines for persistent state during shell interaction
@@ -254,24 +255,24 @@ impl ShellRepl {
         prompt_builder.home_dir = "/home/ubuntu".to_string();
 
         let dir_stack = BsdDirectoryStack::new(&current_dir);
-        let mut services = std::collections::HashMap::new();
+        let mut services = crate::klib::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
-            variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
+            variables: crate::klib::HashMap::new(),
+            aliases: crate::klib::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
-            installed_packages: std::collections::HashSet::new(),
+            installed_packages: HashSet::new(),
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
+            a11y_features: crate::klib::HashMap::new(),
             command_history: Vec::new(),
             customization: CustomizationEngine::new(),
             accessibility: AccessibilityFramework::new(),

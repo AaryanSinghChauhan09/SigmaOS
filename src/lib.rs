@@ -33,7 +33,6 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
-pub mod process;
 pub use process::{
     ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
     JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
@@ -41,9 +40,6 @@ pub use process::{
     ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
     SigQueuePayload, AdvancedIpcHub,
 };
-pub mod community;
-pub mod memory;
-pub mod access;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
@@ -54,7 +50,7 @@ pub use unimplemented_features::{
     GenerationManager, GentooPortageMaskEngine, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
     SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
-    ZorinWinAppDbRegistry,
+    ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
 };
 pub mod expanded_wiki_innovations;
 pub mod virtualization;
@@ -152,9 +148,7 @@ pub use distro::{
     TimeTravelCheckpoint, TimeTravelEngine, TinyCoreMode, TinyCoreRAMEngine, TlsConstraint,
     UpdateChannel, UpdateError, VirtioFsZeroCopyBridge, VoidRunitManager, VoidRunitSupervisor,
     WikiPage, Win32Gdi, WindowsRegistry, Yast2ControlCenter, YastSetting,
-    SovereignSystemdParityEngine, SystemdUnitType, SystemdUnitState, SystemdJournalEntry,
-    SovereignSystemdUnit, SovereignHybridSchedulerInnovations, DvfsPowerGovernor,
-    NumaNodeAffinity, RtlaneRealtimeTask,
+    SovereignSystemdParityEngine, SystemdUnitType,
 };
 pub use driver::pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
@@ -177,8 +171,6 @@ pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
     DemocraticProposal, DemocraticVoting,
 };
-pub mod distro;
-
 pub use kernel::{
     Apc, ApcMode, ApcQueue, ArchitectureEngine,
     BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
@@ -193,9 +185,7 @@ pub use kernel::{
     RoundRobinSchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
     Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
-pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 
-pub mod distro;
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
@@ -204,56 +194,6 @@ pub use network::{
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
-};
-pub use distro::{
-    AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
-    HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
-    ReleaseStage, SoftwareCertificationProgram,
-    BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
-    ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
-    NixOSFlakeEngine, FlakeInput, SystemClosure,
-    ArchPacmanHooksManager, PacmanHook, HookWhen, HookAction,
-    VoidRunitSupervisor, RunitService, ServiceState,
-    GentooPortageUseFlagsEngine, PortagePackage,
-    MicroArchLevel, CachyKernelVariant, CpuCapabilities, BoreSchedulerGovernor, CachyPackageRepo,
-    ArchBuildSystem, PacmanSyncManager, PacmanSyncPackage, ArchMirror, AurPackage, AurHelper,
-    ArchRepoType,
-    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
-    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
-    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
-    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
-    DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
-    RegistryValue, Win32Gdi, WindowsRegistry,
-    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
-    TargetArch,
-    AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
-    ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings,
-    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
-    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
-    TimeTravelEngine,
-    BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
-    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
-    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
-    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
-    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
-    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
-    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
-    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
-    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
-    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
-    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
-    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
-    SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
-    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
-    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
-    SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,
-    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, AlpineApkWorldEngine,
-    VoidXbpsEngine, VnetStack, FreeBsdVnetStackEngine, UnveilAuditViolation, OpenBsdUnveilAuditor,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -288,10 +228,6 @@ pub use shell::{
     PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
-pub use userland::shell::{
-    Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
-    StreamTarget,
-};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
     RecipeManager, SatSolver, Transaction,
@@ -310,27 +246,11 @@ pub use unimplemented_tools::{
     FedoraToolboxContainerEngine, NixHomeManagerEnvironment,
     MiseUniversalVersionManager, DevenvReproducibleEnvironment, AircrackWirelessAuditor,
     UbuntuProLivepatchEngine, FlatpakSdkContainerBuilder, ClearLinuxStatelessEngine,
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
-    PackageRecipe, RecipeError, RecipeManager, SatSolver,
-    Transaction, UniversalPackageAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-pub use unimplemented_tools::{
-    AudioEditor, PodcastRecorder, SubtitleEditor, MemoryLeakDetector, GamifiedTodo, MindMapCreator,
-    GameHubLauncher, EmulatorManager, GameRecorder, GamePerformanceBooster, CloudGaming, VrArRuntime,
-    ControllerMapper, GameModManager, AiDifficultyDirector, GanttChartPlanner, PdfEditor,
-    DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
-    AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
-    MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
-    CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
-    SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
-    PluginMarketplace, MusicLibraryManager,
-};
-
 pub mod init;
 pub use init::*;
 
@@ -375,6 +295,3 @@ pub mod app;
 pub mod auth;
 pub use open_source_obsoletion::*;
 
-pub use unimplemented_features::{
-    GentooPortageMaskEngine, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
-};

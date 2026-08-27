@@ -930,31 +930,6 @@ impl PrecisionTouchpadDriver {
 // 13. USB Audio Class 2.0 (UAC2) & Sound Open Firmware Driver
 // =========================================================================
 
-pub struct Uac2AudioDriver {
-    pub sample_rate_hz: u32,
-    pub bit_depth: u8,
-    pub active_stream: bool,
-}
-
-impl Uac2AudioDriver {
-    pub fn new() -> Self {
-        Self {
-            sample_rate_hz: 96000, // 96kHz Hi-Res Audio
-            bit_depth: 24,
-            active_stream: false,
-        }
-    }
-
-    pub fn start_async_stream(&mut self) -> Result<(), &'static str> {
-        self.active_stream = true;
-        Ok(())
-    }
-}
-
-// =========================================================================
-// 14. SDHCI eMMC 5.1 Host Controller Driver
-// =========================================================================
-
 pub struct SdhciEmmcDriver {
     pub slot_id: u8,
     pub hs400_tuning_done: bool,

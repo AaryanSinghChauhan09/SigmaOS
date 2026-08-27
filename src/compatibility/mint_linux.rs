@@ -285,7 +285,7 @@ impl MintSoftwareManager {
         let mut filtered = Vec::new();
         for app in self.apps_catalog.iter() {
             let mut matches = true;
-            for i in 0..cat_len {
+            for i in 0..category.len() {
                 if app.category[i] != category[i] {
                     matches = false;
                     break;

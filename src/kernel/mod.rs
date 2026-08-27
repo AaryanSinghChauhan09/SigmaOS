@@ -36,7 +36,7 @@ pub mod os_innovations;
 pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
-pub mod sched;
+pub mod scheduler;
 pub mod structures;
 pub mod subsystem;
 pub mod virtual_cpu;
@@ -71,8 +71,6 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub mod virtual_cpu;
-pub mod vmm_paging;
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};

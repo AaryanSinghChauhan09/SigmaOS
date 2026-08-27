@@ -218,11 +218,11 @@ impl AccessibilityFramework {
     }
 
     pub fn activate_profile(&mut self, name: &str) -> Result<(), AccessibilityError> {
-        if !self.profiles.contains_key_str(name) {
+        if !self.profiles.contains_key(name) {
             return Err(AccessibilityError::ProfileNotFound);
         }
         self.active_profile = Some(name.to_string());
-        if let Some(profile) = self.profiles.get_mut_str(name) {
+        if let Some(profile) = self.profiles.get_mut(name) {
             let profile: &mut AccessibilityProfile = profile;
             profile.enable_all();
         }

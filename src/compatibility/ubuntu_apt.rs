@@ -2,7 +2,7 @@
 //! 
 //! APT-compatible package management with PPA support
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;

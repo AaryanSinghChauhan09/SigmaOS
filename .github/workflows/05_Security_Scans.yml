@@ -22,7 +22,6 @@ jobs:
 
       - name: Static Code Analysis (cppcheck)
         run: |
-          echo "Running Static Analysis..."
           cppcheck --enable=all --inconclusive --force -I modules/core/include modules/core/ 2> cppcheck-report.txt
           cat cppcheck-report.txt
 
@@ -37,12 +36,11 @@ jobs:
 
       - name: Memory Leak & Race Condition Scans
         run: |
-          echo "Simulating Valgrind and ThreadSanitizer..."
-          # In a real environment, we would build with -fsanitize=thread and run tests
-          echo "[✓] Zero race conditions detected in IPC layer."
+          sudo apt-get install -y valgrind
+          cargo test --lib --no-fail-fast
 
       - name: Sandbox Isolation Verification
         run: |
-          echo "Running Isolation testing on atomic modules..."
-          # Mock isolation test execution
-          echo "[✓] Secure Shards properly sandboxed. Syscall filters validated."
+          cargo test --lib security::capsicum -- --nocapture
+          cargo test --lib security::capability_enforcer -- --nocapture
+          cargo test --lib security::kernel_hardening -- --nocapture

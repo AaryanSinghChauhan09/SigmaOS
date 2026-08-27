@@ -77,7 +77,6 @@ jobs:
 
     - name: Run cargo audit
       run: cargo audit
-      continue-on-error: true
 
   rust-clippy:
     name: Rust Clippy Linting
@@ -144,7 +143,6 @@ jobs:
 
     - name: Run Bandit
       run: bandit -r . -f json -o bandit-report.json
-      continue-on-error: true
 
   secret-scan:
     name: Secret Scanning

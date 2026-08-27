@@ -27,9 +27,7 @@ jobs:
         run: cargo install cargo-audit --locked
 
       - name: Run cargo audit
-        # continue-on-error so the rest of the checks still run
         run: cargo audit
-        continue-on-error: true
 
   # ── Unsafe without SAFETY ────────────────────────────────────────────────────
   unsafe-check:

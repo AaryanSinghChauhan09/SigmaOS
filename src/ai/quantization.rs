@@ -5,6 +5,28 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TensorDtype {
+    FP32,
+    FP16,
+    BF16,
+    INT8,
+    INT4,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ComputeDeviceTarget {
+    CPU,
+    CPU_SIMD,
+    GPU,
+    DiscreteGpu,
+    IntegratedGpu,
+    NPU,
+    IntegratedNpu,
+    TPU,
+    AutoSelect,
+}
+
 /// Quantized Tensor Container holding weights, scales, and zero-points.
 #[derive(Debug, Clone)]
 pub struct QuantizedMatrix {

@@ -13,7 +13,7 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::sync::{Arc, Mutex};
 
 /// SQLite database connection

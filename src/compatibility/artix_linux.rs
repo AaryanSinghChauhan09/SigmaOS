@@ -132,7 +132,7 @@ impl ArtixPacman {
 
     /// Remove package (pacman -R)
     pub fn remove(&mut self, package: &str, recursive: bool) -> Result<(), ArtixError> {
-        if !self.installed.contains_key_str(package) {
+        if !self.installed.contains_key(package) {
             return Err(ArtixError::PackageNotFound);
         }
 
@@ -145,7 +145,7 @@ impl ArtixPacman {
             }
         }
 
-        self.installed.remove_str(package);
+        self.installed.remove(package);
         Ok(())
     }
 
@@ -244,7 +244,7 @@ impl OpenRCInit {
     }
 
     pub fn rc_service(&mut self, service: &str, action: &str) -> Result<(), &'static str> {
-        if let Some(svc) = self.services.get_mut_str(service) {
+        if let Some(svc) = self.services.get_mut(service) {
             match action {
                 "start" => {
                     svc.state = OpenRCServiceState::Started;
@@ -271,7 +271,7 @@ impl OpenRCInit {
     }
 
     pub fn rc_update(&mut self, service: &str, runlevel: &str, operation: &str) -> Result<(), &'static str> {
-        if let Some(svc) = self.services.get_mut_str(service) {
+        if let Some(svc) = self.services.get_mut(service) {
             match operation {
                 "add" => {
                     svc.enabled = true;

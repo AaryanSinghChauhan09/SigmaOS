@@ -9,7 +9,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::sync::atomic::AtomicUsize;
 
 pub type DriverID = usize;
 
@@ -77,7 +76,6 @@ pub trait StorageDriver: Driver {
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
 }
 
-pub type SimpleStorageDriver = SimpleDriver;
 
 #[repr(C)]
 #[derive(Debug)]
@@ -134,32 +132,6 @@ impl SimpleDriver {
     }
 }
 
-impl Driver for SimpleStorageDriver {
-    fn id(&self) -> DriverID {
-        self.id
-    }
-    fn name(&self) -> &str {
-        "SimpleDriver"
-    }
-    fn driver_type(&self) -> DriverType {
-        self.driver_type
-    }
-    fn state(&self) -> DriverState {
-        match self.state.load(Ordering::SeqCst) {
-            1 => DriverState::Active,
-            2 => DriverState::Failed,
-            _ => DriverState::Unloaded,
-        }
-    }
-    fn load(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
-        Ok(())
-    }
-    fn unload(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
-        Ok(())
-    }
-}
 
 // =========================================================================
 // WDM & WDF (KMDF / UMDF) Specification Subsystems

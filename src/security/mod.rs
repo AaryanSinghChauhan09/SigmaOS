@@ -80,6 +80,6 @@ pub use vpn::{
 };
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
-    SimpleVulnerability, SimpleVulnerabilityScanner,
+    SimpleVulnerabilityScanner,
 };
 pub use vulnerability::*;

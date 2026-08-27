@@ -4,14 +4,11 @@
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
 extern crate alloc;
-use crate::klib::{HashMap, SigmaString, Vec};
-use crate::klib::collections::HashMap;
+use crate::klib::{HashMap, SigmaString, Vec as KVec};
 use crate::klib;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec as AllocVec;
-
-use crate::klib::{HashMap, SigmaString, Vec as KVec};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

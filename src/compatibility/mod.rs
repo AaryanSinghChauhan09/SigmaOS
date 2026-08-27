@@ -168,7 +168,6 @@ pub use solid_kernel::{
     SigmaFSPlusPlus, SolidKernelCore,
 };
 
-pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
 
 pub use absorb_tools::{
     CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,

@@ -23,7 +23,7 @@
 // 2. PawToolGuard & PawFileGuard (Security layers)
 // 3. PawAgentCommunicationProtocol (Multi-agent orchestration/ACP)
 
-use std::collections::VecDeque;
+use crate::klib::collections::VecDeque;
 
 pub struct PawThreeLayerMemory {
     pub live_context: Vec<String>,
@@ -187,7 +187,7 @@ impl Default for PawAgentCommunicationProtocol {
 // Semantic Kernel AI Skills & Composable Planner Subsystem (Inspired by dotnet/skills)
 // ============================================================================
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::sync::Arc;
 
 pub struct SemanticSkillFunction {

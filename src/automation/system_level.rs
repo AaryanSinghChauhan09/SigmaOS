@@ -295,7 +295,7 @@ impl SystemAutomationManager {
     }
 
     pub fn set_performance_profile(&mut self, name: &str) -> Result<(), AutomationError> {
-        if !self.performance_profiles.contains_key_str(name) {
+        if !self.performance_profiles.contains_key(name) {
             return Err(AutomationError::ProfileNotFound);
         }
         self.current_profile = Some(name.to_string());

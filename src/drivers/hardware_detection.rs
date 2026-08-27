@@ -2,7 +2,7 @@
 // Inspired by Linux udev, DevFS, and BSD device management
 // Supports automatic device detection, hot-plug events, and device abstraction
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 

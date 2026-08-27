@@ -10,15 +10,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
-
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
 
 // =========================================================================
 // 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -1808,70 +1799,6 @@ mod linux_lts_upstream_tests {
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
-pub struct GentooEbuildPackage {
-    pub name: String,
-    pub version: String,
-    pub keywords: Vec<String>,
-    pub is_masked: bool,
-}
-
-pub struct GentooPortageMaskEngine {
-    pub target_arch: String,
-    pub ebuilds: Vec<GentooEbuildPackage>,
-    pub hard_masks: Vec<String>,
-}
-
-impl GentooPortageMaskEngine {
-    pub fn new(target_arch: &str) -> Self {
-        Self {
-            target_arch: target_arch.to_string(),
-            ebuilds: Vec::new(),
-            hard_masks: Vec::new(),
-        }
-    }
-
-    pub fn register_ebuild(&mut self, pkg_name: &str, version: &str, keywords: &[&str], masked: bool) {
-        self.ebuilds.push(GentooEbuildPackage {
-            name: pkg_name.to_string(),
-            version: version.to_string(),
-            keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_masked: masked,
-        });
-    }
-
-    pub fn add_hard_mask(&mut self, pkg_name: &str) {
-        self.hard_masks.push(pkg_name.to_string());
-    }
-
-    pub fn evaluate_installability(&self, pkg_name: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
-        if self.hard_masks.iter().any(|m| m == pkg_name) {
-            return Err("Package is hard-masked in package.mask");
-        }
-
-        let ebuild = self.ebuilds.iter().find(|e| e.name == pkg_name && (version == "0" || e.version == version))
-            .ok_or("Ebuild package not found in Portage tree")?;
-
-        if ebuild.is_masked {
-            return Err("Ebuild package is masked");
-        }
-
-        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
-        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
-
-        if is_stable {
-            Ok(true)
-        } else if is_testing {
-            if accept_keywords {
-                Ok(true)
-            } else {
-                Err("Package requires ~arch keyword acceptance in package.accept_keywords")
-            }
-        } else {
-            Err("Package not available for target architecture")
-        }
-    }
-}
-
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
     pub disabled_flags: Vec<String>,
@@ -1906,85 +1833,6 @@ impl GentooUseFlagEngine {
             Err("Gentoo USE flag conflict: mutually exclusive flags enabled")
         } else {
             Ok(())
-        }
-    }
-}
-
-pub struct PortageEbuild {
-    pub package: String,
-    pub version: String,
-    pub keywords: Vec<String>,
-    pub is_masked: bool,
-}
-
-pub struct GentooPortageMaskEngine {
-    pub arch: String,
-    pub ebuilds: Vec<PortageEbuild>,
-    pub hard_masked_packages: Vec<String>,
-    pub unmasked_packages: Vec<String>,
-}
-
-impl GentooPortageMaskEngine {
-    pub fn new(arch: &str) -> Self {
-        Self {
-            arch: arch.to_string(),
-            ebuilds: Vec::new(),
-            hard_masked_packages: Vec::new(),
-            unmasked_packages: Vec::new(),
-        }
-    }
-
-    pub fn register_ebuild(&mut self, package: &str, version: &str, keywords: &[&str], is_masked: bool) {
-        self.ebuilds.push(PortageEbuild {
-            package: package.to_string(),
-            version: version.to_string(),
-            keywords: keywords.iter().map(|s| s.to_string()).collect(),
-            is_masked,
-        });
-    }
-
-    pub fn add_hard_mask(&mut self, package: &str) {
-        self.hard_masked_packages.push(package.to_string());
-    }
-
-    pub fn unmask_package(&mut self, package: &str) {
-        self.unmasked_packages.push(package.to_string());
-    }
-
-    pub fn evaluate_installability(
-        &self,
-        package: &str,
-        _version: &str,
-        accept_testing: bool,
-    ) -> Result<bool, &'static str> {
-        if self.hard_masked_packages.iter().any(|p| p == package) {
-            return Err("Package is hard-masked in package.mask");
-        }
-
-        let ebuild = self
-            .ebuilds
-            .iter()
-            .find(|e| e.package == package)
-            .ok_or("Package not found in Portage tree")?;
-
-        if ebuild.is_masked && !self.unmasked_packages.iter().any(|p| p == package) {
-            return Err("Package is masked");
-        }
-
-        let testing_keyword = format!("~{}", self.arch);
-        let has_stable = ebuild.keywords.iter().any(|k| k == &self.arch);
-        let has_testing = ebuild.keywords.iter().any(|k| k == &testing_keyword);
-
-        if has_stable {
-            Ok(true)
-        } else if has_testing {
-            if accept_testing {
-                Ok(true)
-            } else {
-                Err("Package requires ACCEPT_KEYWORDS=~arch")
-            }
-        } else {
-            Err("Package is not supported on this architecture")
         }
     }
 }
@@ -2704,67 +2552,3 @@ mod extra_unimplemented_tests {
 
 }
 
-/// Gentoo Portage package masking and keyword evaluation engine
-pub struct GentooPortageMaskEngine {
-    pub arch: String,
-    pub ebuilds: HashMap<String, PortageEbuildSpec>,
-    pub hard_masks: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct PortageEbuildSpec {
-    pub package_name: String,
-    pub version: String,
-    pub keywords: Vec<String>,
-    pub is_masked: bool,
-}
-
-impl GentooPortageMaskEngine {
-    pub fn new(arch: &str) -> Self {
-        Self {
-            arch: arch.to_string(),
-            ebuilds: HashMap::new(),
-            hard_masks: Vec::new(),
-        }
-    }
-
-    pub fn register_ebuild(&mut self, package: &str, version: &str, keywords: &[&str], is_masked: bool) {
-        let key = format!("{}:{}", package, version);
-        self.ebuilds.insert(key, PortageEbuildSpec {
-            package_name: package.to_string(),
-            version: version.to_string(),
-            keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_masked,
-        });
-    }
-
-    pub fn add_hard_mask(&mut self, package: &str) {
-        self.hard_masks.push(package.to_string());
-    }
-
-    pub fn evaluate_installability(&self, package: &str, version: &str, accept_testing: bool) -> Result<bool, &'static str> {
-        if self.hard_masks.contains(&package.to_string()) {
-            return Err("Package is hard-masked in package.mask");
-        }
-
-        let key = format!("{}:{}", package, version);
-        let ebuild = self.ebuilds.get(&key).ok_or("Ebuild not found")?;
-
-        if ebuild.is_masked {
-            return Err("Ebuild is explicitly masked");
-        }
-
-        let testing_keyword = format!("~{}", self.arch);
-        let stable_keyword = self.arch.clone();
-
-        if ebuild.keywords.contains(&stable_keyword) {
-            return Ok(true);
-        }
-
-        if accept_testing && ebuild.keywords.contains(&testing_keyword) {
-            return Ok(true);
-        }
-
-        Err("No matching keyword accepted for current profile")
-    }
-}

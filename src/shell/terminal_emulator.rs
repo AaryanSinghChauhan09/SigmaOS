@@ -539,50 +539,6 @@ pub struct TerminalPane {
 }
 
 #[derive(Debug, Clone)]
-pub struct TerminalTheme {
-    pub name: String,
-    pub foreground: (u8, u8, u8),
-    pub background: (u8, u8, u8),
-    pub ansi_palette: [(u8, u8, u8); 16],
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ColorSchemePreset {
-    Default,
-    Nord,
-    Dracula,
-    SolarizedDark,
-    Monokai,
-}
-
-impl TerminalTheme {
-    pub fn preset(preset: ColorSchemePreset) -> Self {
-        match preset {
-            ColorSchemePreset::Nord => Self {
-                name: String::from("Nord"),
-                foreground: (216, 222, 233),
-                background: (46, 52, 64),
-                ansi_palette: [(0, 0, 0); 16],
-            },
-            ColorSchemePreset::Dracula => Self {
-                name: String::from("Dracula"),
-                foreground: (248, 248, 242),
-                background: (40, 42, 54),
-                ansi_palette: [(0, 0, 0); 16],
-            },
-            _ => Self {
-                name: String::from("Default"),
-                foreground: (255, 255, 255),
-                background: (0, 0, 0),
-                ansi_palette: [(0, 0, 0); 16],
-            },
-        }
-    }
-}
-
-/// Tmux / BSD-style Terminal Multiplexer
-pub type TerminalMultiplexer = TerminalMultiplexerV1;
-
 pub struct TerminalMultiplexerV1 {
     pub panes: Vec<TerminalPane>,
     pub active_pane_id: u32,

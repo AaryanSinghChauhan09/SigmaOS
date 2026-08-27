@@ -6,7 +6,6 @@ pub mod driver;
 pub mod editor;
 pub mod ffmpeg_core;
 pub mod pipewire;
-pub mod editor;
 pub mod podcast;
 pub mod sigma_audio;
 

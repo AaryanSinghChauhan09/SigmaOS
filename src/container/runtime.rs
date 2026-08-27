@@ -214,6 +214,19 @@ pub struct SeccompProfile {
     pub blocked_syscalls_mask: u32,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfileV2 {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeccompAction {
+    Allow,
+    Deny,
+    Log,
+    Trace,
+}
 
 impl SeccompProfileV2 {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
@@ -485,7 +498,6 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
-pub type ContainerCapability = RuntimeCapability;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

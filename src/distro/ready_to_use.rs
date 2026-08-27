@@ -4,8 +4,6 @@
 
 extern crate alloc;
 
-extern crate alloc;
-
 use crate::klib::{HashMap, Vec};
 
 use alloc::string::{String, ToString};
