@@ -359,6 +359,223 @@ impl Default for SyntaxHighlightingEngine {
     }
 }
 
+/// BSD vt(4) & wscons-style terminal cursor shape
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CursorStyle {
+    Block,
+    BlinkingBlock,
+    Underline,
+    BlinkingUnderline,
+    IBeam,
+    BlinkingIBeam,
+}
+
+/// BSD vt(4) / wscons-style cursor and font manager
+#[derive(Debug, Clone)]
+pub struct BsdConsoleCursorManager {
+    pub style: CursorStyle,
+    pub font_size_pt: u32,
+    pub is_visible: bool,
+}
+
+impl BsdConsoleCursorManager {
+    pub fn new() -> Self {
+        Self {
+            style: CursorStyle::BlinkingBlock,
+            font_size_pt: 12,
+            is_visible: true,
+        }
+    }
+
+    pub fn set_cursor_style(&mut self, style: CursorStyle) {
+        self.style = style;
+    }
+
+    pub fn zoom_font(&mut self, delta_pt: i32) {
+        let new_size = (self.font_size_pt as i32 + delta_pt).clamp(6, 72);
+        self.font_size_pt = new_size as u32;
+    }
+}
+
+impl Default for BsdConsoleCursorManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Segment for Powerline / Starship / Powerlevel10k statusline
+#[derive(Debug, Clone)]
+pub struct PowerlineSegment {
+    pub text: String,
+    pub fg: AnsiColor,
+    pub bg: AnsiColor,
+}
+
+/// Powerline-style statusline generator
+#[derive(Debug, Clone)]
+pub struct PowerlineStatusline {
+    pub segments: Vec<PowerlineSegment>,
+}
+
+impl PowerlineStatusline {
+    pub fn new() -> Self {
+        Self { segments: Vec::new() }
+    }
+
+    pub fn add_segment(&mut self, text: &str, fg: AnsiColor, bg: AnsiColor) {
+        self.segments.push(PowerlineSegment {
+            text: text.to_string(),
+            fg,
+            bg,
+        });
+    }
+
+    pub fn render_statusline(&self) -> String {
+        let mut line = String::new();
+        for seg in &self.segments {
+            line.push_str(&format!("[ {} ]", seg.text));
+        }
+        line
+    }
+}
+
+impl Default for PowerlineStatusline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Timestamped terminal session recording frame (script(1) / Asciinema-style)
+#[derive(Debug, Clone)]
+pub struct SessionFrame {
+    pub timestamp_ms: u64,
+    pub output_data: String,
+}
+
+/// Terminal session recorder (Linux script(1) / auditd / Asciinema)
+#[derive(Debug, Clone)]
+pub struct TerminalSessionRecorder {
+    pub recording_active: bool,
+    pub frames: Vec<SessionFrame>,
+}
+
+impl TerminalSessionRecorder {
+    pub fn new() -> Self {
+        Self {
+            recording_active: false,
+            frames: Vec::new(),
+        }
+    }
+
+    pub fn start_recording(&mut self) {
+        self.recording_active = true;
+        self.frames.clear();
+    }
+
+    pub fn stop_recording(&mut self) {
+        self.recording_active = false;
+    }
+
+    pub fn record_output(&mut self, timestamp_ms: u64, text: &str) {
+        if self.recording_active {
+            self.frames.push(SessionFrame {
+                timestamp_ms,
+                output_data: text.to_string(),
+            });
+        }
+    }
+
+    pub fn playback_summary(&self) -> String {
+        format!("Recorded {} frames across {} ms", self.frames.len(), self.frames.last().map(|f| f.timestamp_ms).unwrap_or(0))
+    }
+}
+
+impl Default for TerminalSessionRecorder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Kitty / WezTerm / Zsh-style tabbed terminal workspace
+#[derive(Debug, Clone)]
+pub struct TerminalTab {
+    pub tab_id: u32,
+    pub title: String,
+    pub is_active: bool,
+}
+
+/// Tabbed terminal workspace manager
+#[derive(Debug, Clone)]
+pub struct TerminalTabManager {
+    pub tabs: Vec<TerminalTab>,
+    pub next_tab_id: u32,
+}
+
+impl TerminalTabManager {
+    pub fn new() -> Self {
+        let initial_tab = TerminalTab {
+            tab_id: 1,
+            title: String::from("Tab 1"),
+            is_active: true,
+        };
+        Self {
+            tabs: vec![initial_tab],
+            next_tab_id: 2,
+        }
+    }
+
+    pub fn create_tab(&mut self, title: &str) -> u32 {
+        for tab in &mut self.tabs {
+            tab.is_active = false;
+        }
+
+        let new_id = self.next_tab_id;
+        self.next_tab_id += 1;
+
+        let new_tab = TerminalTab {
+            tab_id: new_id,
+            title: title.to_string(),
+            is_active: true,
+        };
+        self.tabs.push(new_tab);
+        new_id
+    }
+
+    pub fn switch_tab(&mut self, tab_id: u32) -> bool {
+        if self.tabs.iter().any(|t| t.tab_id == tab_id) {
+            for tab in &mut self.tabs {
+                tab.is_active = tab.tab_id == tab_id;
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn close_tab(&mut self, tab_id: u32) -> bool {
+        if self.tabs.len() <= 1 {
+            return false; // Retain at least 1 tab
+        }
+        if let Some(pos) = self.tabs.iter().position(|t| t.tab_id == tab_id) {
+            self.tabs.remove(pos);
+            if !self.tabs.iter().any(|t| t.is_active) {
+                if let Some(first) = self.tabs.first_mut() {
+                    first.is_active = true;
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for TerminalTabManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Starship/Powerlevel10k-inspired segmented prompt generator
 #[derive(Debug, Clone)]
 pub struct SovereignPromptEngine {
@@ -1580,5 +1797,47 @@ mod tests {
         assert_eq!(search_results.len(), 2);
         assert_eq!(search_results[0].line_index, 0);
         assert_eq!(search_results[1].line_index, 2);
+    }
+
+    #[test]
+    fn test_bsd_cursor_powerline_recorder_and_tabs() {
+        // 1. BSD Console Cursor & Font Scaling
+        let mut cursor_mgr = BsdConsoleCursorManager::new();
+        assert_eq!(cursor_mgr.style, CursorStyle::BlinkingBlock);
+        cursor_mgr.set_cursor_style(CursorStyle::Underline);
+        assert_eq!(cursor_mgr.style, CursorStyle::Underline);
+        cursor_mgr.zoom_font(2);
+        assert_eq!(cursor_mgr.font_size_pt, 14);
+
+        // 2. Powerline Statusline Generator
+        let mut statusline = PowerlineStatusline::new();
+        statusline.add_segment("main", AnsiColor::Green, AnsiColor::Black);
+        statusline.add_segment("0.12s", AnsiColor::Yellow, AnsiColor::Black);
+        let rendered = statusline.render_statusline();
+        assert!(rendered.contains("main"));
+        assert!(rendered.contains("0.12s"));
+
+        // 3. Terminal Session Recorder
+        let mut recorder = TerminalSessionRecorder::new();
+        recorder.start_recording();
+        recorder.record_output(100, "user@sigma:~$ ls");
+        recorder.record_output(250, "Cargo.toml src/");
+        assert_eq!(recorder.frames.len(), 2);
+        let summary = recorder.playback_summary();
+        assert!(summary.contains("2 frames"));
+
+        // 4. Tabbed Terminal Workspaces
+        let mut tab_mgr = TerminalTabManager::new();
+        assert_eq!(tab_mgr.tabs.len(), 1);
+        let tab2_id = tab_mgr.create_tab("Dev Environment");
+        assert_eq!(tab_mgr.tabs.len(), 2);
+        assert_eq!(tab_mgr.tabs[1].tab_id, tab2_id);
+        assert!(tab_mgr.tabs[1].is_active);
+
+        assert!(tab_mgr.switch_tab(1));
+        assert!(tab_mgr.tabs[0].is_active);
+
+        assert!(tab_mgr.close_tab(tab2_id));
+        assert_eq!(tab_mgr.tabs.len(), 1);
     }
 }
