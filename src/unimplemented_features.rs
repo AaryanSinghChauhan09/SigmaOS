@@ -1679,6 +1679,58 @@ mod linux_lts_upstream_tests {
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
+pub struct GentooPortageMaskEngine {
+    pub target_arch: String,
+    pub ebuilds: Vec<(String, String, Vec<String>, bool)>, // (atom, version, keywords, is_masked)
+    pub hard_masks: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(arch: &str) -> Self {
+        Self {
+            target_arch: arch.to_string(),
+            ebuilds: Vec::new(),
+            hard_masks: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, atom: &str, version: &str, keywords: &[&str], masked: bool) {
+        let kw = keywords.iter().map(|s| s.to_string()).collect();
+        self.ebuilds.push((atom.to_string(), version.to_string(), kw, masked));
+    }
+
+    pub fn add_hard_mask(&mut self, atom: &str) {
+        self.hard_masks.push(atom.to_string());
+    }
+
+    pub fn evaluate_installability(&self, atom: &str, _version: &str, accept_keywords_testing: bool) -> Result<bool, &'static str> {
+        if self.hard_masks.iter().any(|m| m == atom) {
+            return Err("Package is hard-masked in Gentoo package.mask");
+        }
+
+        for (ebuild_atom, _ver, keywords, masked) in &self.ebuilds {
+            if ebuild_atom == atom {
+                if *masked {
+                    return Err("Ebuild is marked masked");
+                }
+                let testing_kw = alloc::format!("~{}", self.target_arch);
+                let stable_kw = self.target_arch.clone();
+
+                let is_stable = keywords.contains(&stable_kw);
+                let is_testing = keywords.contains(&testing_kw);
+
+                if is_stable || (is_testing && accept_keywords_testing) {
+                    return Ok(true);
+                } else {
+                    return Err("Package keyword missing or testing keyword required");
+                }
+            }
+        }
+
+        Err("Ebuild atom not found")
+    }
+}
+
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
     pub disabled_flags: Vec<String>,

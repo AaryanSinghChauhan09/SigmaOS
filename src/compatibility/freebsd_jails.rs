@@ -74,7 +74,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get_mut(name) {
+        let (jid, config) = if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -85,30 +85,33 @@ impl SigmaJailManager {
             let jid = self.next_jid;
             self.next_jid += 1;
             jail.jid = Some(jid);
-
-            // Create network namespace if IP specified
-            if let Some(ip) = &jail.config.ip_address {
-                self.setup_jail_network(jid, ip)?;
-            }
-
-            // Mount jail filesystem
-            self.mount_jail_fs(&jail.config)?;
-
-            // Apply security restrictions
-            self.apply_jail_restrictions(jid, &jail.config)?;
-
-            // Execute startup script
-            if let Some(exec_start) = &jail.config.exec_start {
-                self.execute_in_jail(jid, exec_start)?;
-            }
-
-            jail.state = JailState::Running;
-            println!("Jail '{}' started with JID {}", name, jid);
-
-            Ok(())
+            (jid, jail.config.clone())
         } else {
-            Err(format!("Jail '{}' not found", name).into())
+            return Err(format!("Jail '{}' not found", name).into());
+        };
+
+        // Create network namespace if IP specified
+        if let Some(ip) = &config.ip_address {
+            self.setup_jail_network(jid, ip)?;
         }
+
+        // Mount jail filesystem
+        self.mount_jail_fs(&config)?;
+
+        // Apply security restrictions
+        self.apply_jail_restrictions(jid, &config)?;
+
+        // Execute startup script
+        if let Some(exec_start) = &config.exec_start {
+            self.execute_in_jail(jid, exec_start)?;
+        }
+
+        if let Some(jail) = self.jails.get_mut(name) {
+            jail.state = JailState::Running;
+        }
+        println!("Jail '{}' started with JID {}", name, jid);
+
+        Ok(())
     }
 
     /// Stop a jail
