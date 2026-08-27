@@ -1,8 +1,8 @@
 // SigmaOS Meta-Kernel Orchestration, OOP Plugins, Micro-Drivers, and Legacy Pods
 // Allows parallel execution of legacy kernel personas (2.x -> 6.x) alongside modern ABIs.
 
+#[cfg(not(test))]
 use crate::security::CapabilityToken;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// 1. Meta-Kernel Orchestration
 /// Supervisory kernel managing multiple kernel personas simultaneously.

@@ -9,11 +9,6 @@ use crate::klib::collections::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 use alloc::format;
-use crate::klib::path::PathBuf;
-use std::path::PathBuf;
-
-#[cfg(test)]
-use std::time::{SystemTime, UNIX_EPOCH};
 
 /// VM configuration
 #[derive(Debug, Clone)]
@@ -215,14 +210,11 @@ pub enum KvmExitReason {
     Interrupt,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
-    Mmio,
     MmioRead { addr: u64, len: u8 },
     MmioWrite { addr: u64, len: u8, data: u64 },
-    Hypercall,
     Hlt,
     Shutdown,
     InternalError,
-    Interrupt,
 }
 
 /// KVM vCPU register state
