@@ -2,7 +2,6 @@
 /// Implements Armbian Imager 2.0 block burning, Fedora Atomic OS-tree deployment manager,
 /// RHEL/CentOS DNF history rollbacks, and Ubuntu Livepatching dynamic function hooks.
 extern crate alloc;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 // ==========================================

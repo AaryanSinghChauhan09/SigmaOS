@@ -20,7 +20,6 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::vec;
 use alloc::vec::Vec;
 
 /// Android Activity Declaration Record

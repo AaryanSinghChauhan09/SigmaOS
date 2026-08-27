@@ -1,6 +1,5 @@
 // SigmaOS Distro Compatibility Layer
 extern crate alloc;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Representation of an Enlightenment Foundation Libraries (EFL) Canvas Element
