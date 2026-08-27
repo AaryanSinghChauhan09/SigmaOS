@@ -153,6 +153,13 @@ impl ActivityManager {
         self.activities.insert(pid, record);
     }
 
+    /// Register a thread for a process
+    pub fn register_thread(&mut self, pid: usize, _tid: usize, _name: &str) -> Result<(), &'static str> {
+        let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
+        proc.thread_count += 1;
+        Ok(())
+    }
+
     /// Update resource utilization metrics for a process
     pub fn update_activity_metrics(
         &mut self,

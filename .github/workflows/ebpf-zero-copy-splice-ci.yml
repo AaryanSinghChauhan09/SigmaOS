@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   ebpf-splice-ci:
     name: eBPF Policy Verifier & Splice Pipeline Audit
