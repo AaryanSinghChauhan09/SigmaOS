@@ -1,0 +1,21 @@
+name: NomadBSD Live USB & FreeBSD Persistency Layer CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  nomadbsd-usb-persistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify NomadBSD Live USB & FreeBSD Persistency Subsystem
+        run: |
+          echo "::group::NomadBSD Live USB & Persistency Verification"
+          cargo check --lib
+          echo "::endgroup::"

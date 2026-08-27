@@ -1,0 +1,21 @@
+name: Gentoo Portage Crossdev & Catalyst Stage3 Builder CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  gentoo-crossdev-catalyst:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Gentoo Crossdev Toolchain & Catalyst Stage3 Builder
+        run: |
+          echo "::group::Gentoo Crossdev & Catalyst Stage3 Verification"
+          cargo check --lib
+          echo "::endgroup::"

@@ -562,7 +562,8 @@ impl ThreeTierReleaseModel {
         let mut sorted_keys: Vec<&String> = self.channels.keys().collect();
         sorted_keys.sort(); // Consistent ordering
         for key in sorted_keys {
-            let desc = self.channels.get(key).unwrap_or(&"".to_string());
+            let empty_str = String::new();
+            let desc = self.channels.get(key).unwrap_or(&empty_str);
             let k: &String = key;
             let name_alias = match k.as_str() {
                 "sigma.next" => "Σ-next",

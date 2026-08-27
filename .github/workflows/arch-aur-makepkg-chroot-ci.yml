@@ -1,8 +1,8 @@
-name: Arch Linux AUR & makepkg Chroot CI
+name: Arch Linux AUR makepkg & Clean-Chroot Build CI
 
 on:
   push:
-    branches: [ main, master, "jules-*" ]
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
@@ -10,16 +10,13 @@ permissions:
   contents: read
 
 jobs:
-  arch-aur-verification:
-    name: Arch Linux AUR PKGBUILD & Sandboxed makepkg Chroot Test
+  arch-makepkg-chroot:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Run Arch AUR Test Suite
+      - uses: actions/checkout@v4
+      - name: Verify Arch AUR PKGBUILD & Clean-Chroot Build Architecture
         run: |
+          echo "::group::Arch Linux makepkg & Clean-Chroot Verification"
+          chmod +x ./run_sigma_tests.sh
           ./run_sigma_tests.sh
+          echo "::endgroup::"

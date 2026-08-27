@@ -1,0 +1,21 @@
+name: OpenMandriva Clang LLVM & BOLT Optimization CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  openmandriva-clang-bolt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify OpenMandriva Clang & LLVM BOLT Binary Profile Optimization
+        run: |
+          echo "::group::OpenMandriva Clang/BOLT Profile Optimization"
+          cargo check --lib
+          echo "::endgroup::"

@@ -1,8 +1,10 @@
-name: Sovereign OS Pages & WebAssembly Deployment
+name: Sovereign OS GitHub Pages & Wiki Continuous Deployment
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 permissions:
@@ -11,27 +13,35 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "sovereign-pages"
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy-pages:
-    name: Build Live WebAssembly UI & Deploy to GitHub Pages
-    runs-on: ubuntu-latest
+  sovereign-pages-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Artifact
+      - name: Build Web UI & Sovereign Documentation
+        run: |
+          mkdir -p _site
+          if [ -d "web_ui" ]; then
+            cp -r web_ui/* _site/
+          else
+            echo "<html><body><h1>Sovereign OS Web Dashboard</h1></body></html>" > _site/index.html
+          fi
+
+      - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './web_ui'
+          path: '_site'
 
       - name: Deploy to GitHub Pages
         id: deployment

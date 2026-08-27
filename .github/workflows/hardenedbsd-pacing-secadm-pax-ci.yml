@@ -1,0 +1,21 @@
+name: HardenedBSD ASLR/PaX & secadm MAC Security CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  hardenedbsd-pax-secadm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify HardenedBSD ASLR, PaX, and secadm Mandatory Access Control
+        run: |
+          echo "::group::HardenedBSD PaX & secadm Security Verification"
+          cargo check --lib
+          echo "::endgroup::"

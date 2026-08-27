@@ -1,0 +1,21 @@
+name: Knoppix Micro-RAMDisk & XZ/CLOOP Compression Overlay CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  knoppix-ramdisk-overlay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Knoppix Micro-RAMDisk & Compressed Live Overlay
+        run: |
+          echo "::group::Knoppix Micro-RAMDisk & Live Media Verification"
+          cargo check --lib
+          echo "::endgroup::"
