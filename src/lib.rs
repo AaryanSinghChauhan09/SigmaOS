@@ -42,10 +42,9 @@ pub mod distro;
 //     pub mod paint;
 //     pub mod video;
 // }
-// pub mod hardware {
-//     pub mod compatibility;
-//     pub mod win32;
-// }
+pub mod hardware {
+    pub mod compatibility;
+}
 // pub mod power {
 //     pub mod governor;
 // }

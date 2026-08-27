@@ -210,6 +210,56 @@ impl SimpleCompatibilityMatrix {
             SupportStatus::Supported,
         );
         self.devices.push(Box::new(storage1));
+
+        let wifi3 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::WiFi,
+            0x8086,
+            0x2725,
+            "Intel Wi-Fi 6E AX210",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(wifi3));
+
+        let usb1 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Chipset,
+            0x8086,
+            0xA36D,
+            "Intel xHCI USB 3.2 Controller",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(usb1));
+
+        let nvme1 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Storage,
+            0x144D,
+            0xA809,
+            "Samsung NVMe SSD Controller 980 Pro",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(nvme1));
+
+        let virtio_net = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::WiFi,
+            0x1AF4,
+            0x1000,
+            "VirtIO Network Adapter",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(virtio_net));
+
+        let virtio_blk = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Storage,
+            0x1AF4,
+            0x1001,
+            "VirtIO Block Storage Device",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(virtio_blk));
     }
 }
 
@@ -393,9 +443,8 @@ mod tests {
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        // Includes 6 standard devices + 2 new ones (Realtek ALC887, Intel SATA Controller)
-        assert_eq!(matrix.list_supported().len(), 7);
-        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 2);
+        assert_eq!(matrix.list_supported().len(), 12);
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
     }
 
     #[test]
@@ -404,7 +453,35 @@ mod tests {
         matrix.seed_with_defaults();
         let diag = SimpleDiagnostics::new(matrix);
         let report = diag.run_full_scan();
-        assert_eq!(report.results.len(), 8);
+        assert_eq!(report.results.len(), 13);
+    }
+
+    #[test]
+    fn test_expanded_device_matrix() {
+        let mut matrix = SimpleCompatibilityMatrix::new();
+        matrix.seed_with_defaults();
+        assert_eq!(matrix.devices.len(), 13);
+        assert_eq!(matrix.list_supported().len(), 12);
+
+        let diag = SimpleDiagnostics::new(matrix);
+        let report = diag.run_full_scan();
+        assert_eq!(report.results.len(), 13);
+    }
+
+    #[test]
+    fn test_device_type_filtering() {
+        let mut matrix = SimpleCompatibilityMatrix::new();
+        matrix.seed_with_defaults();
+
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
+        assert_eq!(matrix.list_by_type(DeviceType::Storage).len(), 3);
+        assert_eq!(matrix.list_by_type(DeviceType::Chipset).len(), 2);
+        assert_eq!(matrix.list_by_type(DeviceType::GPU).len(), 2);
+        assert_eq!(matrix.list_by_type(DeviceType::Printer).len(), 1);
+        assert_eq!(matrix.list_by_type(DeviceType::Audio).len(), 1);
+
+        let nvme_id = matrix.find_by_vendor_device(0x144D, 0xA809).unwrap();
+        assert_eq!(matrix.get_device(nvme_id).unwrap().name(), "Samsung NVMe SSD Controller 980 Pro");
     }
 
     #[test]
