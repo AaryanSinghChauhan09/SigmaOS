@@ -48,7 +48,7 @@ pub mod userland;
 
 pub use unimplemented_features::{
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
-    GenerationManager, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
+    GenerationManager, GentooPortageMaskEngine, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
     SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
     ZorinWinAppDbRegistry,
@@ -126,7 +126,7 @@ pub use distro::{
     DevTool, DeveloperToolkit, DirectoryService, DirectoryUser, DllLoader, DllModule,
     DpkgMultiArch, DragonFlyHammerFs, EcuController, EduChallenge, EduPlayground, FlakeInput,
     ForumChannel, ForumPost, FreezeBasedStabilization, GNUGuixShepherdSupervisor, GdiObjectType,
-    GentooPortageMaskEngine, GentooPortageUseFlagsEngine, GuixDerivation, GuixFunctionalStore, HalError,
+    GentooPortageUseFlagsEngine, GuixDerivation, GuixFunctionalStore, HalError,
     Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, HardwareAbstractionLayer,
     HardwareCertificate, HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite,
     HelpSystem, HookAction, HookWhen, HowToGuide, HpcClusterJob, HpcJobState, ImeCandidate,
