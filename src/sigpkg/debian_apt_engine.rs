@@ -230,10 +230,10 @@ impl DpkgDatabase {
 
     /// Install a package
     pub fn install_package(&mut self, package: DebPackage) -> Result<(), String> {
-        self.installed_packages
-            .insert(package.package.clone(), package);
+        let pkg_name = package.package.clone();
+        self.installed_packages.insert(pkg_name.clone(), package);
         self.status_database
-            .insert(package.package.clone(), "install ok installed".to_string());
+            .insert(pkg_name, "install ok installed".to_string());
         Ok(())
     }
 
