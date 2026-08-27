@@ -1,7 +1,6 @@
 // SigmaOS AI-Driven Optimization System
 // Copilot-style assistants for system tuning and automation
 
-use std::collections::HashMap;
 
 /// Optimization category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

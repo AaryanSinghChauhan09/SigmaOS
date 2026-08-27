@@ -1,5 +1,5 @@
 use segmentation_paging::{
-    AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
+    AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
     SegmentDescriptor, SegmentSelector,
 };
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
@@ -29,6 +29,7 @@ use sigmaos::dashboard::statutory_compliance::{ComplianceRuleStatus, DisputeAudi
 use sigmaos::community::toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
 use sigmaos::system::user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
 use sigmaos::tools::sigmatools::*;
+use unveil::{UnveilManager, UnveilPermission};
 
 #[path = "../src/storage/geom.rs"]
 mod geom;
@@ -157,7 +158,7 @@ pub struct SegmentedAddress {
 }
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
-pub type ProcessActivityManager = ActivityManager;
+pub type ProcessActivityManager = process_activity_manager::ActivityManager;
 pub struct ResourceUsageMetrics;
 #[path = "../src/filesystem/sigma_fs.rs"]
 mod sigma_fs_extended;
@@ -202,7 +203,6 @@ use pipes::Pipe;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
 use sigmatools::*;
-use unveil::{UnveilManager, UnveilPermission};
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
@@ -216,6 +216,7 @@ use sigmaos::filesystem::sigma_fs::{Blake3BlockDeduplicationEngine, PfsType, Pse
 use sigmaos::event::epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
 use sigmaos::loader::elf::relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 use sigmaos::security::sigma_unveil as unveil;
+use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
