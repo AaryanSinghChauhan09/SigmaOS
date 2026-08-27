@@ -107,12 +107,15 @@ impl GlobalDescriptorTable {
             rpl: segmentation_paging::CpuRing::Ring0Kernel,
             is_ldt: false,
         }
+    }
     pub fn translate_address(
         &self,
         seg_addr: SegmentedAddress,
         _mode: CpuPrivilegeMode,
     ) -> Result<u64, &'static str> {
         Ok(seg_addr.offset)
+    }
+}
 pub struct MultiLevelPagingEngine;
 impl MultiLevelPagingEngine {
     pub fn map_page(
@@ -123,24 +126,33 @@ impl MultiLevelPagingEngine {
         _x: bool,
     ) -> Result<(), &'static str> {
         Ok(())
+    }
     pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
         Ok(PageTableEntry)
+    }
+}
 pub struct PageTableEntry;
 impl PageTableEntry {
     pub fn get_physical_address(&self) -> u64 {
         0x0000000100000000
+    }
+}
 pub enum ProtectionLevel {
     Normal,
     High,
+}
 pub enum ProtectionViolationType {
     ReadViolation,
     WriteViolation,
+}
 pub enum SegmentType {
     Code,
     Data,
+}
 pub struct SegmentedAddress {
     pub selector: SegmentSelector,
     pub offset: u64,
+}
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
 pub type ProcessActivityManager = process_activity_manager::ActivityManager;

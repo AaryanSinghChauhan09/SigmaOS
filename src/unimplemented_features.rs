@@ -15,6 +15,11 @@ use crate::klib::collections::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
+
 // =========================================================================
 // 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // =========================================================================
@@ -2429,6 +2434,7 @@ impl DragonFlyHammer2FsSnapshotV2 {
 mod extra_unimplemented_tests {
 mod additional_parity_tests {
 mod tests_v2 {
+mod extra_tests {
     use super::*;
 
     #[test]

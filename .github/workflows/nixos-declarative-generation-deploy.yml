@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   nixos-declarative-verification:
     name: NixOS System Generation & Rollback Test

@@ -3139,6 +3139,9 @@ impl SovereignCgroupGovernor {
         cgm.attach_process("db", 1001).unwrap();
         cgm.attach_process("db", 1002).unwrap();
         assert!(cgm.attach_process("db", 1003).is_err());
+        let mut governor = SovereignCgroupGovernorV1::new();
+        governor.create_group("db").unwrap();
+        assert_eq!(governor.groups.len(), 1);
     }
 
     #[test]
