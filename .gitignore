@@ -5,6 +5,8 @@
 *.tmp
 SigmaOS.wiki/
 
+node_modules/
+
 # Build artifacts and compiled binaries
 build/
 *.iso
