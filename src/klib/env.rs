@@ -88,6 +88,14 @@ impl SigmaEnv {
             "XDG_CACHE_HOME" => "/userland/home/sovereign/.cache",
             "XDG_RUNTIME_DIR" => "/run/user/1000",
 
+            // Linux & BSD Device / Driver Environment Defaults
+            "DEVPATH" => "/sys/devices/pci0000:00/0000:00:1f.2",
+            "DRIVER" => "pci_core",
+            "SUBSYSTEM" => "pci",
+            "MODALIAS" => "pci:v00008086d0000100Esv00000000sd00000000bc02sc00pn00",
+            "DRM_CARD" => "/dev/dri/card0",
+            "AUDIO_DEVICE" => "/dev/snd/pcmC0D0p",
+
             _ => "",
         }
     }
@@ -133,6 +141,36 @@ impl SigmaEnv {
     /// Linux XDG Base Directory: Runtime Directory
     pub fn xdg_runtime_dir() -> &'static str {
         Self::get_or_default("XDG_RUNTIME_DIR")
+    }
+
+    /// Linux/BSD Device Path Environment Variable
+    pub fn devpath() -> &'static str {
+        Self::get_or_default("DEVPATH")
+    }
+
+    /// Linux/BSD Driver Environment Variable
+    pub fn driver() -> &'static str {
+        Self::get_or_default("DRIVER")
+    }
+
+    /// Linux/BSD Subsystem Environment Variable
+    pub fn subsystem() -> &'static str {
+        Self::get_or_default("SUBSYSTEM")
+    }
+
+    /// Linux Modalias Hardware Identification Variable
+    pub fn modalias() -> &'static str {
+        Self::get_or_default("MODALIAS")
+    }
+
+    /// DRM Display Card Device Node Variable
+    pub fn drm_card() -> &'static str {
+        Self::get_or_default("DRM_CARD")
+    }
+
+    /// PCM Audio Device Node Variable
+    pub fn audio_device() -> &'static str {
+        Self::get_or_default("AUDIO_DEVICE")
     }
 
     /// Set an environment variable
@@ -421,6 +459,13 @@ unsafe fn syscall(num: usize, arg1: *const u8, arg2: *const u8) -> isize {
     0
 }
 
+#[cfg(not(target_arch = "x86_64"))]
+#[inline(always)]
+unsafe fn syscall(num: usize, arg1: *const u8, arg2: *const u8) -> isize {
+    let _ = (num, arg1, arg2);
+    0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -485,6 +530,14 @@ mod tests {
             "/userland/home/sovereign/.cache"
         );
         assert_eq!(SigmaEnv::default_for_key("XDG_RUNTIME_DIR"), "/run/user/1000");
+
+        // Device and driver environment variable getters test
+        assert_eq!(SigmaEnv::devpath(), "/sys/devices/pci0000:00/0000:00:1f.2");
+        assert_eq!(SigmaEnv::driver(), "pci_core");
+        assert_eq!(SigmaEnv::subsystem(), "pci");
+        assert_eq!(SigmaEnv::modalias(), "pci:v00008086d0000100Esv00000000sd00000000bc02sc00pn00");
+        assert_eq!(SigmaEnv::drm_card(), "/dev/dri/card0");
+        assert_eq!(SigmaEnv::audio_device(), "/dev/snd/pcmC0D0p");
     }
 
     #[test]

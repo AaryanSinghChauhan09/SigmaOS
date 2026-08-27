@@ -596,12 +596,7 @@ impl PamEngine {
     }
 
     pub fn add_rule(&mut self, group: PamGroup, rule: PamRule) {
-        if !self.chains.contains_key(&group) {
-            self.chains.insert(group, Vec::new());
-        }
-        if let Some(chain) = self.chains.get_mut(&group) {
-            chain.push(rule);
-        }
+        self.chains.entry(group).or_insert_with(Vec::new).push(rule);
     }
 
     /// Evaluates the complete PAM configuration stack for a specific management group.
@@ -1075,6 +1070,18 @@ mod tests {
         assert_eq!(
             engine.execute_group(PamGroup::Auth, "alice", "wrong_hash"),
             PamResult::AuthError
+        );
+
+        // Test authentication with unknown user
+        assert_eq!(
+            engine.execute_group(PamGroup::Auth, "bob", "any_hash"),
+            PamResult::UserUnknown
+        );
+
+        // Test authentication with correct credentials
+        assert_eq!(
+            engine.execute_group(PamGroup::Auth, "alice", "correct_hash"),
+            PamResult::Success
         );
 
         // Scenario 2: Test account lockout with pam_faillock

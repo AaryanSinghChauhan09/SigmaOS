@@ -8,9 +8,9 @@ SigmaOS features a zero-dependency, direct-to-metal graphics and compute subsyst
 
 ## Key Modules
 
-- [`src/drivers/gpu.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/drivers/gpu.rs): Direct GPU abstraction, command ring buffer, and framebuffer management.
-- [`src/distro/linux_bsd_inspirations.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/distro/linux_bsd_inspirations.rs) — [`DrmModeInfo`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/distro/linux_bsd_inspirations.rs#L1100-L1158): Atomic DRM/KMS modesetting and video timing boundaries.
-- [`src/graphics/compositor.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/graphics/compositor.rs): High-efficiency hardware-accelerated window compositor.
+- [`src/drivers/gpu.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/drivers/gpu.rs): Direct GPU abstraction, command ring buffer, and framebuffer management.
+- [`src/distro/linux_bsd_inspirations.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/distro/linux_bsd_inspirations.rs) — [`DrmModeInfo`](file:///home/aaryansinghchauhan/SigmaOS/src/distro/linux_bsd_inspirations.rs#L1100-L1158): Atomic DRM/KMS modesetting and video timing boundaries.
+- [`src/graphics/compositor.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/graphics/compositor.rs): High-efficiency hardware-accelerated window compositor.
 
 ---
 

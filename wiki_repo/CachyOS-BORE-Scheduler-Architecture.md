@@ -8,8 +8,8 @@ SigmaOS incorporates scheduling heuristics inspired by **CachyOS's BORE (Burst-O
 
 ## Key Modules
 
-- [`src/kernel/sched/sigma_mlfq.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/kernel/sched/sigma_mlfq.rs): Dynamic burst tracking and burst-penalty scaling.
-- [`src/docs/CachyOS-BORE-Scheduler-Spec.md`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/docs/CachyOS-BORE-Scheduler-Spec.md): Formal mathematical specification of the BORE heuristic algorithm.
+- [`src/kernel/sched/sigma_mlfq.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/kernel/sched/sigma_mlfq.rs): Dynamic burst tracking and burst-penalty scaling.
+- [`src/docs/CachyOS-BORE-Scheduler-Spec.md`](file:///home/aaryansinghchauhan/SigmaOS/src/docs/CachyOS-BORE-Scheduler-Spec.md): Formal mathematical specification of the BORE heuristic algorithm.
 
 ---
 

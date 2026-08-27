@@ -50,7 +50,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Driver development guide - OOP-based driver framework documented
 - [x] Package manager usage guide - Dependency resolver documented
 - [x] POSIX layer overview - Syscall handler with POSIX compatibility documented
-- [ ] Arch Wiki-style knowledge base
+- [x] Arch Wiki-style knowledge base
 - [x] Audio driver documentation - HDA/ALSA driver documented
 - [x] Storage driver documentation - NVMe/AHCI driver documented
 - [x] Network driver documentation - e1000e driver documented

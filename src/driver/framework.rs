@@ -7,9 +7,9 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
-use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::AtomicUsize;
 
 pub type DriverID = usize;
 
@@ -127,15 +127,15 @@ pub struct SimpleDriver {
 
 impl SimpleDriver {
     pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        SimpleDriver {
+        Self {
             id,
             driver_type,
-            state: AtomicUsize::new(DriverState::Unloaded as usize),
+            state: DriverState::Unloaded,
         }
     }
 }
 
-impl Driver for SimpleDriver {
+impl Driver for SimpleStorageDriver {
     fn id(&self) -> DriverID {
         self.id
     }
