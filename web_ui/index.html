@@ -280,7 +280,7 @@
             element.classList.add('active');
             element.setAttribute('aria-checked', 'true');
             selectedDiskId = diskId;
-            document.querySelectorAll('.selected-disk-name').forEach(el => el.innerText = diskId);
+            document.querySelectorAll('.selected-disk-name').forEach(el => el.textContent = diskId);
         }
 
         function selectInstallMode(element, mode) {
@@ -313,7 +313,7 @@
                 document.getElementById(`panel-${currentStep}`).classList.add('active');
                 updateStepIndicators();
 
-                document.getElementById('btn-next').innerText = 'Next';
+                document.getElementById('btn-next').textContent = 'Next';
                 document.getElementById('btn-next').disabled = false;
 
                 if (currentStep === 1) {
@@ -344,7 +344,7 @@
                     document.getElementById('btn-back').disabled = true;
                     startInstallationSimulation();
                 } else if (currentStep === totalSteps) {
-                    document.getElementById('btn-next').innerText = 'Reboot';
+                    document.getElementById('btn-next').textContent = 'Reboot';
                     document.getElementById('btn-next').onclick = () => alert('Rebooting node... Entering Zenith.');
                     document.getElementById('btn-back').disabled = true;
                 }
@@ -355,7 +355,7 @@
             const consoleEl = document.getElementById('log-console');
             const line = document.createElement('div');
             line.className = `log-line ${className}`;
-            line.innerText = text;
+            line.textContent = text;
             consoleEl.appendChild(line);
             consoleEl.scrollTop = consoleEl.scrollHeight;
         }
@@ -366,9 +366,9 @@
             const progressPct = document.getElementById('progress-percentage');
             const progressStatus = document.getElementById('progress-status');
 
-            document.getElementById('summary-device').innerText = `/dev/${selectedDiskId}`;
+            document.getElementById('summary-device').textContent = `/dev/${selectedDiskId}`;
             const modeText = selectedInstallMode === 'dual' ? 'Dual-Boot (Install Alongside)' : (selectedInstallMode === 'clean' ? 'Erase Entire Disk' : 'Custom Partitioning');
-            document.getElementById('summary-mode').innerText = modeText;
+            document.getElementById('summary-mode').textContent = modeText;
 
             const logs = [
                 { prg: 5, msg: "Quering hardware buses... Detected CPU topology matching x86_64 standard.", class: "text-blue" },
@@ -390,8 +390,8 @@
                     if (progress < currentLog.prg) {
                         progress = currentLog.prg;
                         progressBar.style.width = `${progress}%`;
-                        progressPct.innerText = `${progress}%`;
-                        progressStatus.innerText = currentLog.msg;
+                        progressPct.textContent = `${progress}%`;
+                        progressStatus.textContent = currentLog.msg;
                         appendLog(currentLog.msg, currentLog.class);
                         logIndex++;
                     }
