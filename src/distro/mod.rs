@@ -1,4 +1,5 @@
 // SigmaOS Distro/Ecosystem Maturity Module
+pub mod arch_parity;
 pub mod certification;
 pub mod community;
 pub mod compat_layers;
@@ -12,6 +13,9 @@ pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
 
+pub use arch_parity::{
+    PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
+};
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
