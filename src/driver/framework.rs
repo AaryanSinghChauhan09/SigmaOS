@@ -77,6 +77,8 @@ pub trait StorageDriver: Driver {
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
 }
 
+pub type SimpleStorageDriver = SimpleDriver;
+
 #[repr(C)]
 #[derive(Debug)]
 pub struct SimpleStorageDriver {

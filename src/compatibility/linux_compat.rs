@@ -4,7 +4,11 @@ extern crate alloc;
 /// Linuxulator syscall translation, FreeBSD kqueue EVFILT multiplexing, OpenBSD pledge/unveil filtering, ProcFS, and ELF auxv loader.
 use crate::klib::BTreeMap as HashMap;
 use crate::klib::Vec;
+
+use alloc::collections::BTreeMap as HashMap;
+use alloc::format;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TargetDistro {
