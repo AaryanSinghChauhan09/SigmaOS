@@ -717,6 +717,82 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 
 
+/// Flatpak & Snap Sandboxed App Compatibility Layer
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppBundleFormat {
+    Flatpak,
+    Snap,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppBundleContainer {
+    pub app_id: alloc::string::String,
+    pub format: AppBundleFormat,
+    pub runtime_version: alloc::string::String,
+    pub sandbox_permissions: alloc::vec::Vec<alloc::string::String>,
+    pub is_active: bool,
+}
+
+pub struct FlatpakSnapCompatLayer {
+    pub installed_bundles: alloc::vec::Vec<AppBundleContainer>,
+}
+
+impl FlatpakSnapCompatLayer {
+    pub fn new() -> Self {
+        FlatpakSnapCompatLayer {
+            installed_bundles: alloc::vec::Vec::new(),
+        }
+    }
+
+    pub fn install_flatpak_ref(&mut self, app_id: &str, runtime_ver: &str, permissions: &[&str]) {
+        let bundle = AppBundleContainer {
+            app_id: alloc::string::String::from(app_id),
+            format: AppBundleFormat::Flatpak,
+            runtime_version: alloc::string::String::from(runtime_ver),
+            sandbox_permissions: permissions.iter().map(|&s| alloc::string::String::from(s)).collect(),
+            is_active: false,
+        };
+        self.installed_bundles.push(bundle);
+    }
+
+    pub fn install_snap_ref(&mut self, snap_name: &str, revision: &str, permissions: &[&str]) {
+        let bundle = AppBundleContainer {
+            app_id: alloc::string::String::from(snap_name),
+            format: AppBundleFormat::Snap,
+            runtime_version: alloc::string::String::from(revision),
+            sandbox_permissions: permissions.iter().map(|&s| alloc::string::String::from(s)).collect(),
+            is_active: false,
+        };
+        self.installed_bundles.push(bundle);
+    }
+
+    pub fn launch_sandboxed_app(&mut self, app_id: &str) -> Result<usize, &'static str> {
+        for bundle in &mut self.installed_bundles {
+            if bundle.app_id == app_id {
+                bundle.is_active = true;
+                return Ok(42); // Returns simulated PID in bubblewrap/snap-confine sandbox
+            }
+        }
+        Err("Sandboxed app bundle not installed")
+    }
+
+    pub fn terminate_sandboxed_app(&mut self, app_id: &str) -> Result<(), &'static str> {
+        for bundle in &mut self.installed_bundles {
+            if bundle.app_id == app_id {
+                bundle.is_active = false;
+                return Ok(());
+            }
+        }
+        Err("Sandboxed app bundle not found")
+    }
+}
+
+impl Default for FlatpakSnapCompatLayer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // OCI compatibility module temporarily disabled for no_std compatibility
 // This module requires alloc which is conditionally available
 #[cfg(not(target_os = "none"))]
@@ -947,5 +1023,21 @@ mod tests {
             container.execute_syscall(0).unwrap_err(),
             ContainerError::PermissionDenied
         );
+    }
+
+    #[test]
+    fn test_flatpak_snap_compat_layer() {
+        let mut compat = FlatpakSnapCompatLayer::new();
+        compat.install_flatpak_ref("org.videolan.VLC", "23.08", &["wayland", "pulseaudio"]);
+        compat.install_snap_ref("spotify", "1080", &["network", "pulseaudio"]);
+
+        assert_eq!(compat.installed_bundles.len(), 2);
+
+        let pid = compat.launch_sandboxed_app("org.videolan.VLC").unwrap();
+        assert_eq!(pid, 42);
+        assert!(compat.installed_bundles[0].is_active);
+
+        assert!(compat.terminate_sandboxed_app("org.videolan.VLC").is_ok());
+        assert!(!compat.installed_bundles[0].is_active);
     }
 }

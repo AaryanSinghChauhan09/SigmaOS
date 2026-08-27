@@ -163,13 +163,15 @@ impl CronDaemon {
 
     /// Remove a cron job
     pub fn remove_job(&mut self, id: &str) -> Result<(), CronError> {
-        self.jobs.remove(id).ok_or(CronError::JobNotFound)?;
+        let key = id.to_string();
+        self.jobs.remove(&key).ok_or(CronError::JobNotFound)?;
         Ok(())
     }
 
     /// Get a cron job
     pub fn get_job(&self, id: &str) -> Option<&CronJob> {
-        self.jobs.get(id)
+        let key = id.to_string();
+        self.jobs.get(&key)
     }
 
     /// List all cron jobs
@@ -218,14 +220,16 @@ impl CronDaemon {
 
     /// Enable a job
     pub fn enable_job(&mut self, id: &str) -> Result<(), CronError> {
-        let job = self.jobs.get_mut(id).ok_or(CronError::JobNotFound)?;
+        let key = id.to_string();
+        let job = self.jobs.get_mut(&key).ok_or(CronError::JobNotFound)?;
         job.enabled = true;
         Ok(())
     }
 
     /// Disable a job
     pub fn disable_job(&mut self, id: &str) -> Result<(), CronError> {
-        let job = self.jobs.get_mut(id).ok_or(CronError::JobNotFound)?;
+        let key = id.to_string();
+        let job = self.jobs.get_mut(&key).ok_or(CronError::JobNotFound)?;
         job.enabled = false;
         Ok(())
     }
