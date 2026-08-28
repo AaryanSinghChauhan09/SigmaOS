@@ -125,6 +125,7 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, LinkType,
     InodeRecord, SovereignLinkEngine, AT_FDCWD, MAX_SYMLINK_DEPTH,
+    SovereignFileDescriptor, SovereignFdTable, fd_flags, cap_rights, fcntl_cmd,
 };
 pub use governance::{
     MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
