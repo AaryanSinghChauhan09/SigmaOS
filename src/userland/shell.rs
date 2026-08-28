@@ -76,27 +76,25 @@ pub enum ShellCommand {
     Redirect(Box<ShellCommand>, RedirectSpec),
 }
 
-/// Legacy alias for backward compatibility
-pub type Redirect = RedirectSpec;
-
-/// Target stream binding for file descriptor redirection
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RedirectKind {
-    Output,        // >
-    Append,        // >>
-    Input,         // <
-    HereDoc,       // <<
-    HereString,    // <<<
-    DupOutput,     // >& or 2>&1
-    DupInput,      // <&
+/// Mock file descriptor redirection buffer store for userland shell
+pub struct RedirectionEngine {
+    pub streams: BTreeMap<u32, Vec<u8>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Redirect {
-    pub src_fd: u32,
-    pub target_fd: Option<u32>,
-    pub path: String,
-    pub kind: RedirectKind,
+impl RedirectionEngine {
+    pub fn new() -> Self {
+        Self {
+            streams: BTreeMap::new(),
+        }
+    }
+
+    pub fn write_fd(&mut self, fd: u32, data: &[u8]) {
+        self.streams.entry(fd).or_insert_with(Vec::new).extend_from_slice(data);
+    }
+
+    pub fn read_fd(&self, fd: u32) -> Option<&[u8]> {
+        self.streams.get(&fd).map(|v| v.as_slice())
+    }
 }
 
 pub struct Environment {
@@ -751,7 +749,64 @@ impl Shell {
                                         .insert(arg[..idx].to_string(), arg[idx + 1..].to_string());
                                 }
                             }
+                        } else {
+                            for (k, v) in &self.env.vars {
+                                let out = format!("declare -x {}=\"{}\"\n", k, v);
+                                self.redirection_engine.write_fd(1, out.as_bytes());
+                            }
                         }
+                        Ok(0)
+                    }
+                    "unset" => {
+                        for arg in &args[1..] {
+                            self.env.vars.remove(arg);
+                        }
+                        Ok(0)
+                    }
+                    "alias" => {
+                        if args.len() == 1 {
+                            let aliases = self.env.vars.iter().filter(|(k, _)| k.starts_with("ALIAS_"));
+                            for (k, v) in aliases {
+                                let alias_name = &k[6..];
+                                let out = format!("alias {}='{}'\n", alias_name, v);
+                                self.redirection_engine.write_fd(1, out.as_bytes());
+                            }
+                        } else {
+                            for arg in &args[1..] {
+                                if let Some(idx) = arg.find('=') {
+                                    let name = &arg[..idx];
+                                    let val = &arg[idx + 1..];
+                                    self.env.vars.insert(format!("ALIAS_{}", name), val.to_string());
+                                }
+                            }
+                        }
+                        Ok(0)
+                    }
+                    "unalias" => {
+                        for arg in &args[1..] {
+                            self.env.vars.remove(&format!("ALIAS_{}", arg));
+                        }
+                        Ok(0)
+                    }
+                    "type" => {
+                        let builtins = ["cd", "echo", "pwd", "export", "unset", "alias", "unalias", "type", "history", "exit"];
+                        for arg in &args[1..] {
+                            if builtins.contains(&arg.as_str()) {
+                                let out = format!("{} is a shell builtin\n", arg);
+                                self.redirection_engine.write_fd(1, out.as_bytes());
+                            } else if let Some(alias_val) = self.env.vars.get(&format!("ALIAS_{}", arg)) {
+                                let out = format!("{} is aliased to `{}`\n", arg, alias_val);
+                                self.redirection_engine.write_fd(1, out.as_bytes());
+                            } else {
+                                let out = format!("{} is /bin/{}\n", arg, arg);
+                                self.redirection_engine.write_fd(1, out.as_bytes());
+                            }
+                        }
+                        Ok(0)
+                    }
+                    "history" => {
+                        let out = "1  ls\n2  cd /home\n3  history\n";
+                        self.redirection_engine.write_fd(1, out.as_bytes());
                         Ok(0)
                     }
                     "echo" => {
@@ -815,27 +870,29 @@ impl Shell {
             ShellCommand::Redirect(child, redir) => {
                 // Execute child with redirection context logged in environment / streams
                 let status = self.execute_ast(child)?;
-                match redir.kind {
-                    RedirectKind::Output => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("FILE:{}", redir.path));
+                match redir {
+                    RedirectSpec::Output { fd, ref path, append, .. } => {
+                        let prefix = if *append { "APPEND:" } else { "FILE:" };
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), format!("{}{}", prefix, path));
                     }
-                    RedirectKind::Append => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("APPEND:{}", redir.path));
+                    RedirectSpec::Input { fd, ref path } => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), format!("INPUT:{}", path));
                     }
-                    RedirectKind::Input => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("INPUT:{}", redir.path));
+                    RedirectSpec::HereDoc { fd, ref content, .. } => {
+                        self.env.vars.insert(format!("FD_{}_HEREDOC", fd), content.clone());
                     }
-                    RedirectKind::HereDoc => {
-                        self.env.vars.insert(format!("FD_{}_HEREDOC", redir.src_fd), redir.path.clone());
+                    RedirectSpec::HereString { fd, ref content } => {
+                        self.env.vars.insert(format!("FD_{}_HERESTRING", fd), content.clone());
                     }
-                    RedirectKind::HereString => {
-                        self.env.vars.insert(format!("FD_{}_HERESTRING", redir.src_fd), redir.path.clone());
+                    RedirectSpec::DupOutput { src_fd, target_fd } | RedirectSpec::DupInput { src_fd, target_fd } => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", src_fd), format!("FD:{}", target_fd));
                     }
-                    RedirectKind::DupOutput | RedirectKind::DupInput => {
-                        if let Some(target) = redir.target_fd {
-                            self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("FD:{}", target));
-                        }
+                    RedirectSpec::CombinedOutput { ref path, append } => {
+                        let prefix = if *append { "APPEND:" } else { "FILE:" };
+                        self.env.vars.insert("FD_1_REDIRECT".to_string(), format!("{}{}", prefix, path));
+                        self.env.vars.insert("FD_2_REDIRECT".to_string(), format!("{}{}", prefix, path));
                     }
+                    _ => {}
                 }
                 Ok(status)
             }
@@ -913,5 +970,28 @@ mod tests {
 
         assert!(shell.execute_line("cat << EOF").is_ok());
         assert_eq!(shell.env.vars.get("FD_0_HEREDOC").unwrap(), "EOF");
+    }
+
+    #[test]
+    fn test_shell_builtins_alias_export_unset_type() {
+        let mut shell = Shell::new();
+
+        // Test export & unset
+        assert!(shell.execute_line("export FOO=BAR").is_ok());
+        assert_eq!(shell.env.vars.get("FOO").map(|s| s.as_str()), Some("BAR"));
+
+        assert!(shell.execute_line("unset FOO").is_ok());
+        assert_eq!(shell.env.vars.get("FOO"), None);
+
+        // Test alias & unalias
+        assert!(shell.execute_line("alias ll=ls -la").is_ok());
+        assert_eq!(shell.env.vars.get("ALIAS_ll").map(|s| s.as_str()), Some("ls -la"));
+
+        assert!(shell.execute_line("type ll").is_ok());
+        let stream_out = String::from_utf8(shell.redirection_engine.read_fd(1).unwrap().to_vec()).unwrap();
+        assert!(stream_out.contains("ll is aliased to `ls -la`"));
+
+        assert!(shell.execute_line("unalias ll").is_ok());
+        assert_eq!(shell.env.vars.get("ALIAS_ll"), None);
     }
 }

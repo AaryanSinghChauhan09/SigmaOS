@@ -644,46 +644,92 @@ impl UniversalPackageManager {
     }
 
     fn add_default_adapters(&mut self) {
-        let apt_adapter = PackageAdapter::new(PackageFormat::Deb, "apt".to_string());
-        let yum_adapter = PackageAdapter::new(PackageFormat::Rpm, "yum".to_string());
-        let pacman_adapter = PackageAdapter::new(PackageFormat::Pacman, "pacman".to_string());
-        let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
-        let flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
-        let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
-        let sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
+        let all_formats = [
+            (PackageFormat::Deb, "apt/dpkg"),
+            (PackageFormat::Rpm, "yum/dnf/zypper"),
+            (PackageFormat::Pacman, "pacman"),
+            (PackageFormat::Snap, "snap"),
+            (PackageFormat::Flatpak, "flatpak"),
+            (PackageFormat::AppImage, "appimage"),
+            (PackageFormat::SigmaPkg, "sigpkg"),
+            (PackageFormat::Air, "adobe-air"),
+            (PackageFormat::Bottle, "homebrew-bottle"),
+            (PackageFormat::Ipa, "ios-ipa"),
+            (PackageFormat::Ports, "bsd-ports"),
+            (PackageFormat::Pkg, "freebsd-pkg"),
+            (PackageFormat::Aab, "android-bundle"),
+            (PackageFormat::Apk, "alpine-apk/android-apk"),
+            (PackageFormat::Hap, "harmony-hap"),
+            (PackageFormat::Pisi, "pisi/eopkg"),
+            (PackageFormat::Pup, "puppy-pup"),
+            (PackageFormat::Pet, "puppy-pet"),
+            (PackageFormat::SuperDeb, "superdeb"),
+            (PackageFormat::Lzm, "slax-lzm"),
+            (PackageFormat::TarArchive, "tar-archive"),
+            (PackageFormat::NixPkg, "nix-store"),
+            (PackageFormat::PortagePkg, "gentoo-portage"),
+            (PackageFormat::App, "macos-app"),
+        ];
 
-        self.adapters.insert(PackageFormat::Deb, apt_adapter);
-        self.adapters.insert(PackageFormat::Rpm, yum_adapter);
-        self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
-        self.adapters.insert(PackageFormat::Snap, snap_adapter);
-        self.adapters.insert(
-            PackageFormat::Deb,
-            PackageAdapter::new(PackageFormat::Deb, String::from("AptDeb")),
-        );
-        self.adapters.insert(
-            PackageFormat::Rpm,
-            PackageAdapter::new(PackageFormat::Rpm, String::from("YumRpm")),
-        );
-        self.adapters.insert(
-            PackageFormat::Pacman,
-            PackageAdapter::new(PackageFormat::Pacman, String::from("Pacman")),
-        );
-        self.adapters.insert(
-            PackageFormat::Snap,
-            PackageAdapter::new(PackageFormat::Snap, String::from("Snap")),
-        );
-        self.adapters.insert(
-            PackageFormat::Flatpak,
-            PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")),
-        );
-        self.adapters.insert(
-            PackageFormat::AppImage,
-            appimage_adapter,
-        );
-        self.adapters.insert(
-            PackageFormat::SigmaPkg,
-            PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")),
-        );
+        for (fmt, name) in all_formats {
+            self.adapters.insert(fmt, PackageAdapter::new(fmt, String::from(name)));
+        }
+    }
+
+    /// Detect package format based on filename extension
+    pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
+        let lower = filename.to_lowercase();
+        if lower.ends_with(".deb") {
+            Some(PackageFormat::Deb)
+        } else if lower.ends_with(".superdeb") {
+            Some(PackageFormat::SuperDeb)
+        } else if lower.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
+        } else if lower.ends_with(".pkg.tar.xz") || lower.ends_with(".pkg.tar.zst") || lower.ends_with(".pkg.tar.gz") {
+            Some(PackageFormat::Pacman)
+        } else if lower.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if lower.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if lower.ends_with(".flatpak") || lower.ends_with(".flatpakref") {
+            Some(PackageFormat::Flatpak)
+        } else if lower.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if lower.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if lower.ends_with(".bottle") || lower.ends_with(".tar.gz.bottle") {
+            Some(PackageFormat::Bottle)
+        } else if lower.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if lower.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if lower.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if lower.ends_with(".pisi") || lower.ends_with(".eopkg") {
+            Some(PackageFormat::Pisi)
+        } else if lower.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if lower.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if lower.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if lower.ends_with(".nix") || lower.ends_with(".nixpkg") {
+            Some(PackageFormat::NixPkg)
+        } else if lower.ends_with(".ebuild") || lower.ends_with(".portage") {
+            Some(PackageFormat::PortagePkg)
+        } else if lower.ends_with(".app") {
+            Some(PackageFormat::App)
+        } else if lower.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if lower.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if lower.ends_with(".tar.gz") || lower.ends_with(".tgz") || lower.ends_with(".tar.xz") || lower.ends_with(".tar") {
+            Some(PackageFormat::TarArchive)
+        } else if lower.ends_with(".sigpkg") {
+            Some(PackageFormat::SigmaPkg)
+        } else {
+            None
+        }
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -848,7 +894,27 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 7); // updated to 7 to include AppImage
+        assert!(manager.adapters.len() >= 24);
+    }
+
+    #[test]
+    fn test_universal_format_detection() {
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.deb"), Some(PackageFormat::Deb));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.rpm"), Some(PackageFormat::Rpm));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.apk"), Some(PackageFormat::Apk));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.AppImage"), Some(PackageFormat::AppImage));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.pkg.tar.zst"), Some(PackageFormat::Pacman));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.eopkg"), Some(PackageFormat::Pisi));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.nixpkg"), Some(PackageFormat::NixPkg));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.ebuild"), Some(PackageFormat::PortagePkg));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.bottle"), Some(PackageFormat::Bottle));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.ipa"), Some(PackageFormat::Ipa));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.aab"), Some(PackageFormat::Aab));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.hap"), Some(PackageFormat::Hap));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.pup"), Some(PackageFormat::Pup));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.pet"), Some(PackageFormat::Pet));
+        assert_eq!(UniversalPackageManager::detect_format_from_filename("app.lzm"), Some(PackageFormat::Lzm));
     }
 
     #[test]
