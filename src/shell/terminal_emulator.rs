@@ -763,6 +763,8 @@ pub struct TerminalMultiplexerV1 {
     pub panes: Vec<TerminalPane>,
     pub active_pane_id: u32,
     pub next_pane_id: u32,
+    pub sync_panes: bool,
+    pub status_line_format: String,
 }
 
 impl TerminalMultiplexerV1 {
@@ -778,6 +780,8 @@ impl TerminalMultiplexerV1 {
             panes: vec![root_pane],
             active_pane_id: 1,
             next_pane_id: 2,
+            sync_panes: false,
+            status_line_format: String::from("[SigmaTmux] Pane:#{active_pane} | #{status}"),
         }
     }
 
@@ -812,6 +816,18 @@ impl TerminalMultiplexerV1 {
         self.panes.push(new_pane);
         self.active_pane_id = new_id;
         Ok(new_id)
+    }
+
+    pub fn toggle_sync_panes(&mut self) -> bool {
+        self.sync_panes = !self.sync_panes;
+        self.sync_panes
+    }
+
+    pub fn render_status_line(&self) -> String {
+        let mut status = self.status_line_format.clone();
+        status = status.replace("#{active_pane}", &format!("{}", self.active_pane_id));
+        status = status.replace("#{status}", if self.sync_panes { "SYNC-ON" } else { "NORMAL" });
+        status
     }
 }
 
@@ -1089,8 +1105,6 @@ impl TerminalSession {
         suggestion_engine.register_builtin("systemctl");
         suggestion_engine.register_builtin("apt");
         suggestion_engine.register_builtin("sigpkg");
-
-        let multiplexer = TerminalMultiplexer::new(width, height);
 
         Self {
             cursor_x: 0,
@@ -1746,6 +1760,12 @@ mod tests {
         // Focus new pane
         session.multiplexer.active_pane_id = new_pane_id;
         assert_eq!(session.multiplexer.active_pane_id, new_pane_id);
+
+        // Sync panes and status line test
+        assert!(!session.multiplexer.sync_panes);
+        assert!(session.multiplexer.toggle_sync_panes());
+        let status = session.multiplexer.render_status_line();
+        assert!(status.contains("SYNC-ON"));
 
         // Trigger Rules test
         let url_rule = TriggerRule {

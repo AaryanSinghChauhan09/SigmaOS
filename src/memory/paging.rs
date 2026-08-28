@@ -165,6 +165,10 @@ impl PageDirectory {
     pub fn get_table_mut(&mut self, idx: usize) -> Option<&mut PageTable> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
+    }
 }
 
 impl Default for PageDirectory {
@@ -215,6 +219,10 @@ impl PageDirectoryPointerTable {
 
     pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
+    }
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
     }
 }
 
@@ -511,7 +519,7 @@ impl SimpleVMM {
                 // Decompress page and map it back on demand (zram decompression swap-in)
                 let decompressed_phys = PhysicalAddress(virt.0); // mapped back
                 self.zram_pool.remove(i);
-                self.map_page_with_flags(virt, decompressed_phys, true, false)
+                self.map_page(virt, decompressed_phys)
                     .unwrap();
                 return Ok(decompressed_phys);
             }
@@ -932,9 +940,9 @@ mod tests {
         let virt_a = VirtualAddress(0x1000);
         let virt_b = VirtualAddress(0x2000);
 
-        vmm.map_page_with_flags(virt_a, PhysicalAddress(0x10000), true, false)
+        vmm.map_page(virt_a, PhysicalAddress(0x10000))
             .unwrap();
-        vmm.map_page_with_flags(virt_b, PhysicalAddress(0x20000), true, false)
+        vmm.map_page(virt_b, PhysicalAddress(0x20000))
             .unwrap();
 
         // Trigger KSM sweep representing content deduplication

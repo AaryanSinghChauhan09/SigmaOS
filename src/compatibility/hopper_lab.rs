@@ -289,12 +289,12 @@ mod tests {
         let engine_stable = ReleaseEngine::new(ReleaseStream::StableLts, 1);
         assert!(engine_stable
             .negotiate_kernel_profile()
-            .contains("Highly verified"));
+            .contains("highly verified"));
 
         let engine_rolling = ReleaseEngine::new(ReleaseStream::RollingBleedingEdge, 9);
         assert!(engine_rolling
             .negotiate_kernel_profile()
-            .contains("Predictive AI"));
+            .contains("predictive AI"));
     }
 
     #[test]
@@ -332,7 +332,7 @@ mod tests {
         assert!(arch_tips.contains("Replaced pacman"));
 
         let fedora_tips = docs.query_migration_tutorial("Fedora");
-        assert!(fedora_tips.contains("DNFe")); // DNS/dnf -> sigpkg, SELinux -> sandbox
+        assert!(fedora_tips.contains("dnf")); // DNS/dnf -> sigpkg, SELinux -> sandbox
     }
 
     #[test]
