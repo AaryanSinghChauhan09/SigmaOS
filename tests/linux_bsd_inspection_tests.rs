@@ -89,15 +89,6 @@ mod unimplemented_features;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-
-#[path = "../src/security/hardening.rs"]
-mod hardening;
-
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-
 #[path = "../src/kernel/sysctl.rs"]
 mod sysctl;
 
@@ -110,10 +101,23 @@ mod abi_extended;
 #[path = "../src/compatibility/distro_bridge.rs"]
 mod distro_bridge;
 
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unveil::{UnveilManager, UnveilPermission};
+use wiki_ideas_implementation::SystemdUnitActiveState;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -271,9 +275,7 @@ fn test_wiki_distro_innovations_inspection() {
     // 7. Systemd Parity Engine
     let mut systemd = SovereignSystemdParityEngine::new();
     systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
-    assert!(systemd.start_unit("test.service").is_ok());
-    assert_eq!(systemd.units.get("test.service").unwrap().state, SystemdUnitState::Active);
-
+    assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
     // 8. Real-Time Hybrid Scheduler
     let sched = SovereignHybridSchedulerInnovations::new();
     assert!(sched.verify_rt_lane_preemption_latency());

@@ -18,7 +18,13 @@ pub struct SniffedPacket {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AnonymityMode { Tor, I2p, Clearnet, Direct }
+pub enum AnonymityMode {
+    Tor,
+    I2p,
+    I2P,
+    Clearnet,
+    Direct,
+}
 
 pub struct AnonsurfEngine {
     pub mode: AnonymityMode,
@@ -47,7 +53,9 @@ impl Default for AnonsurfEngine {
 pub struct ForensicsAuditTool;
 
 impl ForensicsAuditTool {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 
 impl Default for ForensicsAuditTool {
@@ -61,28 +69,6 @@ pub struct RecoveredFile {
     pub name: String,
     pub path: String,
     pub size: usize,
-}
-
-pub struct PentestAssistant;
-impl PentestAssistant {
-    pub fn new() -> Self { Self }
-}
-
-impl Default for PentestAssistant {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SecureWipeTool;
-impl SecureWipeTool {
-    pub fn new() -> Self { Self }
-}
-
-impl Default for SecureWipeTool {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 pub struct ParrotSniffer {
@@ -126,6 +112,34 @@ impl Default for ParrotSniffer {
 }
 
 pub type KaliSniffer = ParrotSniffer;
+
+pub struct PentestAssistant;
+
+impl PentestAssistant {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for PentestAssistant {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SecureWipeTool;
+
+impl SecureWipeTool {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for SecureWipeTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntrusionSeverity { Low, Medium, High, Critical }

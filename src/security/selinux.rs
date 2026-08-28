@@ -1,9 +1,8 @@
-
 extern crate alloc;
 
 // Fedora-inspired SELinux (Security-Enhanced Linux) Mandatory Access Control Subsystem.
 // Implements labeling security contexts (user:role:type:sensitivity), enforcement modes,
-// an Access Vector Cache (AVC) for performance, policy rules, and detailed audit logging.
+// an Access Vector Cache (AVC) for performance, policy rules, SELinux booleans, AppArmor profiles and detailed audit logging.
 
 use std::collections::{HashMap, HashSet};
 
@@ -84,19 +83,30 @@ impl SecurityPolicy {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppArmorMode {
+    Enforcing,
+    Complain,
+    Disabled,
+}
+
 #[derive(Debug, Clone)]
 pub struct AppArmorProfile {
     pub name: String,
+    pub mode: AppArmorMode,
     pub attachments: Vec<String>, // path attachments
     pub allow_rules: HashSet<String>,
+    pub transitions: HashMap<String, String>, // path -> target profile name
 }
 
 impl AppArmorProfile {
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
+            mode: AppArmorMode::Enforcing,
             attachments: Vec::new(),
             allow_rules: HashSet::new(),
+            transitions: HashMap::new(),
         }
     }
 
@@ -104,8 +114,16 @@ impl AppArmorProfile {
         self.allow_rules.insert(rule.to_string());
     }
 
+    pub fn add_transition(&mut self, path: &str, target_profile: &str) {
+        self.transitions.insert(path.to_string(), target_profile.to_string());
+    }
+
     pub fn is_allowed(&self, path: &str) -> bool {
         self.allow_rules.contains(path)
+    }
+
+    pub fn get_transition(&self, path: &str) -> Option<&String> {
+        self.transitions.get(path)
     }
 }
 
@@ -126,9 +144,21 @@ impl AppArmorManager {
 
     pub fn check_access(&self, profile_name: &str, path: &str) -> bool {
         if let Some(profile) = self.profiles.get(profile_name) {
-            profile.is_allowed(path)
+            match profile.mode {
+                AppArmorMode::Disabled => true,
+                AppArmorMode::Complain => true, // Allows access in complain mode
+                AppArmorMode::Enforcing => profile.is_allowed(path),
+            }
         } else {
             false
+        }
+    }
+
+    pub fn transition_profile(&self, current_profile: &str, exec_path: &str) -> Option<String> {
+        if let Some(profile) = self.profiles.get(current_profile) {
+            profile.get_transition(exec_path).cloned()
+        } else {
+            None
         }
     }
 }
@@ -231,11 +261,10 @@ pub struct PolicyRule {
     pub permission: String,
 }
 
-pub type Permission = SelinuxPermission;
-
 pub struct SelinuxEngine {
     pub mode: SeLinuxMode,
     pub policies: HashSet<AvcKey>,
+    pub booleans: HashMap<String, bool>,
     pub avc: AccessVectorCache,
     pub audit_logs: Vec<String>,
 }
@@ -245,6 +274,7 @@ impl SelinuxEngine {
         let mut engine = Self {
             mode: SeLinuxMode::Enforcing,
             policies: HashSet::new(),
+            booleans: HashMap::new(),
             avc: AccessVectorCache::new(),
             audit_logs: Vec::new(),
         };
@@ -260,6 +290,10 @@ impl SelinuxEngine {
         self.allow("unconfined_t", "admin_home_t", "file", "read");
         self.allow("unconfined_t", "admin_home_t", "file", "write");
         self.allow("unconfined_t", "unconfined_t", "process", "transition");
+
+        // Default SELinux booleans
+        self.set_boolean("httpd_can_network_connect", false);
+        self.set_boolean("httpd_enable_homedirs", false);
     }
 
     pub fn allow(&mut self, source: &str, target: &str, class: &str, permission: &str) {
@@ -271,6 +305,15 @@ impl SelinuxEngine {
         };
         self.policies.insert(key);
         self.avc.clear(); // Flush cache on policy update
+    }
+
+    pub fn set_boolean(&mut self, name: &str, value: bool) {
+        self.booleans.insert(name.to_string(), value);
+        self.avc.clear();
+    }
+
+    pub fn get_boolean(&self, name: &str) -> Option<bool> {
+        self.booleans.get(name).copied()
     }
 
     pub fn set_mode(&mut self, mode: SeLinuxMode) {
@@ -300,11 +343,19 @@ impl SelinuxEngine {
             permission: permission.to_string(),
         };
 
-        // Query AVC cache
+        // Check AVC cache
         let allowed = if let Some(decision) = self.avc.query(&avc_key) {
             decision
         } else {
-            let decision = self.policies.contains(&avc_key);
+            let mut decision = self.policies.contains(&avc_key);
+
+            // Conditional boolean evaluation
+            if !decision && src_context.type_name == "httpd_t" && class == "tcp_socket" && permission == "name_connect" {
+                if self.get_boolean("httpd_can_network_connect").unwrap_or(false) {
+                    decision = true;
+                }
+            }
+
             self.avc.insert(avc_key, decision);
             decision
         };
@@ -427,6 +478,45 @@ impl DynamicMacEnforcer {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    #[test]
+    fn test_selinux_booleans() {
+        let mut engine = SelinuxEngine::new();
+        let src = "system_u:system_r:httpd_t:s0";
+        let tgt = "system_u:object_r:http_cache_port_t:s0";
+
+        // Default httpd_can_network_connect is false
+        assert_eq!(engine.get_boolean("httpd_can_network_connect"), Some(false));
+        assert!(!engine.has_permission(src, tgt, "tcp_socket", "name_connect").unwrap());
+
+        // Toggle boolean to true
+        engine.set_boolean("httpd_can_network_connect", true);
+        assert_eq!(engine.get_boolean("httpd_can_network_connect"), Some(true));
+        assert!(engine.has_permission(src, tgt, "tcp_socket", "name_connect").unwrap());
+    }
+
+    #[test]
+    fn test_apparmor_mode_transitions() {
+        let mut manager = AppArmorManager::new();
+
+        let mut apache_profile = AppArmorProfile::new("usr.sbin.apache2");
+        apache_profile.add_allow_rule("/var/www/html/*");
+        apache_profile.add_transition("/usr/bin/php-cgi", "usr.bin.php-cgi");
+
+        let mut php_profile = AppArmorProfile::new("usr.bin.php-cgi");
+        php_profile.add_allow_rule("/tmp/*");
+
+        manager.load_profile(apache_profile);
+        manager.load_profile(php_profile);
+
+        assert!(manager.check_access("usr.sbin.apache2", "/var/www/html/*"));
+        assert!(!manager.check_access("usr.sbin.apache2", "/etc/shadow"));
+
+        let next_profile = manager.transition_profile("usr.sbin.apache2", "/usr/bin/php-cgi");
+        assert_eq!(next_profile, Some("usr.bin.php-cgi".to_string()));
+    }
+
     #[test]
     fn test_dynamic_mac_enforcer() {
         let mut mac = DynamicMacEnforcer::new();
@@ -451,7 +541,6 @@ mod tests {
         // Can write TopSecret file from Secret process (Write Up)
         assert!(mac.can_write("proc_app", "file_top_secret"));
     }
-    use super::*;
 
     #[test]
     fn test_context_parsing() {

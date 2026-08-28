@@ -79,7 +79,7 @@ impl GentooPortageMaskResolver {
             atom_name: format!("{}:{}", category_pkg, version),
             slot: "0".to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_ebuild_masked: is_masked,
+            is_masked,
         });
     }
 

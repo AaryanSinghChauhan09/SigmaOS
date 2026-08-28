@@ -26,8 +26,6 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
 
-extern crate alloc;
-use crate::klib::{BTreeMap, Vec, VecDeque};
 use alloc::string::String;
 
 pub const SECTOR_SIZE: usize = 512;

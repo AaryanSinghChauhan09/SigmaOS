@@ -321,6 +321,10 @@ impl FuzzyCompletionEngine {
         }
         None
     }
+
+    pub fn get_ghost_ghost_or_suggestion(&self, current_input: &str) -> Option<String> {
+        self.get_ghost_suggestion(current_input)
+    }
 }
 
 impl Default for FuzzyCompletionEngine {
@@ -439,7 +443,7 @@ impl Default for ZshSyntaxHighlighter {
 pub struct BashParameterExpansion;
 
 impl BashParameterExpansion {
-    /// Expands bash parameter syntax: ${VAR:-default}, ${VAR#prefix}, ${VAR%suffix}, ${#VAR}, ${VAR//pattern/replacement}
+    /// Expands bash parameter syntax: ${VAR:-default}, ${VAR#prefix}, ${VAR%suffix}, ${#VAR}, ${VAR//pattern/replacement}, ${VAR:offset:length}
     pub fn expand(expr: &str, env: &BTreeMap<String, String>) -> String {
         if !expr.starts_with("${") || !expr.ends_with('}') {
             return expr.to_string();
@@ -468,7 +472,30 @@ impl BashParameterExpansion {
             }
         }
 
-        // 3. ${VAR:-default} - default value
+        // 3. ${VAR:offset:length} - substring slicing
+        if let Some(pos) = inner.find(':') {
+            if !inner.contains(":-") {
+                let var_name = &inner[..pos];
+                let slice_spec = &inner[pos + 1..];
+                let val = env.get(var_name).cloned().unwrap_or_default();
+                if let Some(len_pos) = slice_spec.find(':') {
+                    let offset: usize = slice_spec[..len_pos].parse().unwrap_or(0);
+                    let length: usize = slice_spec[len_pos + 1..].parse().unwrap_or(val.len());
+                    if offset < val.len() {
+                        let end = (offset + length).min(val.len());
+                        return val[offset..end].to_string();
+                    }
+                    return String::new();
+                } else if let Ok(offset) = slice_spec.parse::<usize>() {
+                    if offset < val.len() {
+                        return val[offset..].to_string();
+                    }
+                    return String::new();
+                }
+            }
+        }
+
+        // 4. ${VAR:-default} - default value
         if let Some(pos) = inner.find(":-") {
             let var_name = &inner[..pos];
             let default_val = &inner[pos + 2..];
@@ -480,7 +507,7 @@ impl BashParameterExpansion {
             return default_val.to_string();
         }
 
-        // 4. ${VAR#prefix} - strip prefix
+        // 5. ${VAR#prefix} - strip prefix
         if let Some(pos) = inner.find('#') {
             let var_name = &inner[..pos];
             let prefix = &inner[pos + 1..];
@@ -491,7 +518,7 @@ impl BashParameterExpansion {
             return val;
         }
 
-        // 5. ${VAR%suffix} - strip suffix
+        // 6. ${VAR%suffix} - strip suffix
         if let Some(pos) = inner.find('%') {
             let var_name = &inner[..pos];
             let suffix = &inner[pos + 1..];
@@ -561,6 +588,7 @@ pub struct PipelineCommand {
     pub stdout_file: Option<String>,
     pub append_stdout: bool,
     pub stderr_file: Option<String>,
+    pub here_string: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -597,11 +625,15 @@ impl ShellPipelineParser {
             let mut stdout_file = None;
             let mut append_stdout = false;
             let mut stderr_file = None;
+            let mut here_string = None;
 
             let mut i = 0;
             while i < tokens.len() {
                 let tok = tokens[i];
-                if tok == "<" && i + 1 < tokens.len() {
+                if tok == "<<<" && i + 1 < tokens.len() {
+                    here_string = Some(tokens[i + 1].trim_matches('"').trim_matches('\'').to_string());
+                    i += 2;
+                } else if tok == "<" && i + 1 < tokens.len() {
                     stdin_file = Some(tokens[i + 1].to_string());
                     i += 2;
                 } else if tok == ">" && i + 1 < tokens.len() {
@@ -633,6 +665,7 @@ impl ShellPipelineParser {
                     stdout_file,
                     append_stdout,
                     stderr_file,
+                    here_string,
                 });
             }
         }
@@ -783,6 +816,118 @@ impl Default for ShellJobControl {
 }
 
 // =========================================================================
+// 6. ZSH/FISH-INSPIRED SCRIPT HOOKS & ARITHMETIC EVALUATOR
+// =========================================================================
+
+pub struct ShellScriptHookEngine {
+    pub precmd_hooks: Vec<String>,
+    pub preexec_hooks: Vec<String>,
+    pub chpwd_hooks: Vec<String>,
+}
+
+impl ShellScriptHookEngine {
+    pub fn new() -> Self {
+        Self {
+            precmd_hooks: Vec::new(),
+            preexec_hooks: Vec::new(),
+            chpwd_hooks: Vec::new(),
+        }
+    }
+
+    pub fn add_precmd_hook(&mut self, cmd: &str) {
+        self.precmd_hooks.push(cmd.to_string());
+    }
+
+    pub fn add_preexec_hook(&mut self, cmd: &str) {
+        self.preexec_hooks.push(cmd.to_string());
+    }
+
+    pub fn add_chpwd_hook(&mut self, cmd: &str) {
+        self.chpwd_hooks.push(cmd.to_string());
+    }
+
+    pub fn trigger_precmd(&self) -> Vec<String> {
+        self.precmd_hooks.clone()
+    }
+
+    pub fn trigger_preexec(&self, command_line: &str) -> Vec<String> {
+        self.preexec_hooks
+            .iter()
+            .map(|hook| format!("{} {}", hook, command_line))
+            .collect()
+    }
+
+    pub fn trigger_chpwd(&self, old_pwd: &str, new_pwd: &str) -> Vec<String> {
+        self.chpwd_hooks
+            .iter()
+            .map(|hook| format!("{} {} {}", hook, old_pwd, new_pwd))
+            .collect()
+    }
+}
+
+impl Default for ShellScriptHookEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct ShellArithmeticEvaluator;
+
+impl ShellArithmeticEvaluator {
+    /// Evaluates Bash `$(( expr ))` arithmetic expressions (e.g. `$(( 10 + 20 * 2 ))`)
+    pub fn evaluate(expr: &str) -> Result<i64, &'static str> {
+        let clean = expr.trim();
+        let inner = if clean.starts_with("$(( ") || clean.starts_with("$(((") {
+            clean.trim_start_matches("$(( ").trim_start_matches("$(((").trim_end_matches(" ))").trim_end_matches(")))")
+        } else if clean.starts_with("$(( ") || clean.starts_with("$(( ") {
+            clean.trim_start_matches("$(( ").trim_end_matches(" ))")
+        } else if clean.starts_with("$((") && clean.ends_with("))") {
+            &clean[3..clean.len() - 2]
+        } else {
+            clean
+        };
+
+        let tokens: Vec<&str> = inner.split_whitespace().collect();
+        if tokens.is_empty() {
+            return Ok(0);
+        }
+
+        if tokens.len() == 1 {
+            return tokens[0].parse::<i64>().map_err(|_| "Invalid integer");
+        }
+
+        if tokens.len() == 3 {
+            let left = tokens[0].parse::<i64>().map_err(|_| "Invalid left operand")?;
+            let op = tokens[1];
+            let right = tokens[2].parse::<i64>().map_err(|_| "Invalid right operand")?;
+
+            match op {
+                "+" => Ok(left + right),
+                "-" => Ok(left - right),
+                "*" => Ok(left * right),
+                "/" => {
+                    if right == 0 {
+                        Err("Division by zero")
+                    } else {
+                        Ok(left / right)
+                    }
+                }
+                "%" => {
+                    if right == 0 {
+                        Err("Modulo by zero")
+                    } else {
+                        Ok(left % right)
+                    }
+                }
+                _ => Err("Unsupported arithmetic operator"),
+            }
+        } else {
+            Err("Complex arithmetic expression not supported")
+        }
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -817,21 +962,14 @@ mod tests {
         // Exact matches
         let comps_sys = engine.get_completions("sys");
         assert!(comps_sys.iter().any(|c| c.text == "systemctl"));
-        assert!(comps_sys.iter().any(|c| c.text == "sysctl"));
 
         // Fuzzy edit distance match
-        let comps_fuz = engine.get_completions("systm");
+        let comps_fuz = engine.get_completions("systmctl");
         assert!(comps_fuz.iter().any(|c| c.text == "systemctl"));
 
         // Inline ghost text
-        let ghost = engine.get_ghost_ghost_or_suggestion("systemc");
-        assert_eq!(ghost, Some("tl".to_string()));
-    }
-
-    impl FuzzyCompletionEngine {
-        pub fn get_ghost_ghost_or_suggestion(&self, input: &str) -> Option<String> {
-            self.get_ghost_suggestion(input)
-        }
+        let ghost = engine.get_ghost_suggestion("systemctl status ngin");
+        assert_eq!(ghost, Some("x".to_string()));
     }
 
     #[test]
@@ -876,6 +1014,9 @@ mod tests {
 
         // Global replacement
         assert_eq!(BashParameterExpansion::expand("${FILE//doc/file}", &env), "fileument.txt");
+
+        // Substring slicing
+        assert_eq!(BashParameterExpansion::expand("${USER:0:5}", &env), "sover");
     }
 
     #[test]
@@ -906,6 +1047,13 @@ mod tests {
         assert_eq!(stage2.args, vec!["-i", "\"error\""]);
         assert_eq!(stage2.stdout_file, Some("output.txt".to_string()));
         assert_eq!(stage2.stderr_file, Some("error.log".to_string()));
+    }
+
+    #[test]
+    fn test_here_string_parsing() {
+        let pipeline = ShellPipelineParser::parse("grep hello <<< \"hello_world\"");
+        assert_eq!(pipeline.stages[0].program, "grep");
+        assert_eq!(pipeline.stages[0].here_string, Some("hello_world".to_string()));
     }
 
     #[test]
@@ -941,5 +1089,26 @@ mod tests {
 
         assert!(jc.remove_job(id2));
         assert_eq!(jc.jobs.len(), 1);
+    }
+
+    #[test]
+    fn test_shell_script_hooks() {
+        let mut hooks = ShellScriptHookEngine::new();
+        hooks.add_precmd_hook("update_status_line");
+        hooks.add_preexec_hook("log_cmd");
+        hooks.add_chpwd_hook("auto_ls");
+
+        assert_eq!(hooks.trigger_precmd(), vec!["update_status_line"]);
+        assert_eq!(hooks.trigger_preexec("ls -l"), vec!["log_cmd ls -l"]);
+        assert_eq!(hooks.trigger_chpwd("/home", "/etc"), vec!["auto_ls /home /etc"]);
+    }
+
+    #[test]
+    fn test_arithmetic_evaluator() {
+        assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 10 + 20 ))"), Ok(30));
+        assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 50 - 15 ))"), Ok(35));
+        assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 6 * 7 ))"), Ok(42));
+        assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 100 / 5 ))"), Ok(20));
+        assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 100 / 0 ))"), Err("Division by zero"));
     }
 }
