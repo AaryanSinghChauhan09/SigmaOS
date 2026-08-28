@@ -1,7 +1,6 @@
-# 🔩 SigmaOS Components — Master Table
+# 🔩 SigmaOS Components — Master Reference Table
 
-> **Last Updated:** August 2026  
-> This page is the **authoritative reference** for all SigmaOS components. It shows every component's implementation status, source file, and the Linux/BSD/OS project it was inspired by.
+This wiki page provides a comprehensive table of all SigmaOS components, their implementation status, source file locations, inspiration sources, and links to relevant documentation.
 
 ---
 
@@ -29,15 +28,6 @@
 | **SigmaSyscall** | System call dispatch table and validation | ✅ | `src/kernel/syscall.rs` | Linux syscall ABI |
 | **SigmaPCIScanner** | PCIe ECAM config access, BAR decoding, MSI/MSI-X | 🔄 | `src/kernel/pci_scanner.rs` | Linux PCI subsystem |
 | **SigmaPageFault** | Page fault handler and demand paging | ✅ | `src/kernel/paging.rs` | Linux page fault |
-| **SigmaEBPF** | eBPF bytecode interpreter and JIT compiler | ✅ | `src/kernel/ebpf.rs` | Linux eBPF |
-| **SigmaIoUring** | Async I/O submission queue (io_uring-compatible) | ✅ | `src/kernel/io_uring.rs` | Linux io_uring |
-| **SigmaKqueue** | kqueue-style event notification interface | ✅ | `src/kernel/kqueue.rs` | FreeBSD kqueue |
-| **SovereignScheduler** | AI-enhanced sovereign scheduler with workload classification | ✅ | `src/kernel/core/sovereign_scheduler.rs` | CachyOS, Gentoo |
-| **SigmaNumaScheduler** | NUMA-aware task placement and memory affinity | ✅ | `src/kernel/numa_scheduler.rs` | Linux NUMA |
-| **SigmaLinuxAbsorb** | Linux kernel innovations absorption layer | ✅ | `src/kernel/linux_absorb.rs` | Linux kernel |
-| **SigmaLinuxBsdInnovations** | Unified Linux/BSD innovations implementation | ✅ | `src/kernel/linux_bsd_innovations.rs` | Linux + BSD combined |
-| **SigmaOsInnovations** | Novel OS-level innovations beyond existing distros | ✅ | `src/kernel/os_innovations.rs` | Multiple distros |
-| **SigmaGapClosing** | Closes identified gaps vs. competitor distros | ✅ | `src/kernel/gap_closing.rs` | Arch, NixOS, Gentoo |
 
 ---
 
@@ -46,22 +36,15 @@
 | Component | Description | Status | Source File | Inspired By |
 |-----------|-------------|--------|-------------|-------------|
 | **SigmaMAC** | Mandatory Access Control (Bell-LaPadula + SELinux) | ✅ | `src/security/mac.rs` | SELinux, AppArmor |
-| **SigmaDAC** | Discretionary Access Control with POSIX ACLs | ✅ | `src/access/control.rs` | POSIX ACL |
+| **SigmaDAC** | Discretionary Access Control with POSIX ACLs | ✅ | `src/access/control.rs` | POSIX ACL, Linux DAC |
 | **SigmaRBAC** | Role-Based Access Control with policy engine | ✅ | `src/security/rbac.rs` | RBAC standard |
 | **OpenBsdPledgeUnveilSentinel** | OpenBSD-style pledge/unveil syscall restriction | ✅ | `src/security/pledge.rs` | OpenBSD pledge |
 | **SigmaCapability** | Linux-compatible capability bounding sets | ✅ | `src/security/capability.rs` | Linux capabilities |
-| **PostQuantumTls** | Kyber-1024 + Dilithium-5 TLS 1.3 stack | ✅ | `src/crypto/pqc_dilithium.rs` | liboqs |
+| **PostQuantumTls** | Kyber-1024 + Dilithium-5 TLS 1.3 stack | ✅ | `src/crypto/pqc_dilithium.rs` | liboqs, wolfSSL |
 | **SigmaCrypto** | Symmetric and asymmetric crypto primitives | ✅ | `src/crypto/` | LibreSSL, Ring |
 | **SELinuxEngine** | Full SELinux AVC caching and policy engine | ✅ | `src/security/selinux.rs` | SELinux reference |
 | **SigmaSecureBoot** | UEFI Secure Boot + measured boot chain | 🔄 | `src/boot/secure_boot.rs` | shim, UEFI spec |
 | **SigmaAudit** | Kernel-level audit subsystem with log streaming | ✅ | `src/audit/` | Linux audit |
-| **SigmaVulnerability** | CVE tracking and vulnerability assessment engine | ✅ | `src/security/vulnerability.rs` | CVSS, NVD |
-| **SigmaIntegrity** | IMA/EVM file integrity measurement | ✅ | `src/security/integrity.rs` | Linux IMA |
-| **SigmaJails** | FreeBSD jail-style process isolation | ✅ | `src/security/jails.rs` | FreeBSD jails |
-| **SigmaSandbox** | Multi-layered application sandboxing | ✅ | `src/security/sandbox.rs` | Flatpak, Firejail |
-| **SigmaIntrusion** | Intrusion detection and prevention system | ✅ | `src/security/intrusion.rs` | SNORT, Suricata |
-| **SigmaDeobfuscation** | Malware/exploit deobfuscation engine | 🔄 | `src/security/deobfuscation.rs` | radare2, Ghidra |
-| **QubesIsolation** | Qubes OS-style VM compartmentalization | ✅ | `src/security/qubes_isolation.rs` | Qubes OS |
 
 ---
 
@@ -74,15 +57,6 @@
 | **PackageSnapshotRollback** | Btrfs/ZFS-style package snapshot + differential rollback | ✅ | `src/sigpkg/transaction.rs` | snapper, ostree |
 | **UniversalOopSystem** | Multi-distro format verification and rollback hooks | ✅ | `src/sigpkg/universal_oop_system.rs` | Nix, Portage |
 | **SigmaAUR** | AUR-compatible community package helper | 🔄 | `src/sigpkg/aur.rs` | paru, yay |
-| **ArchPacmanEngine** | Pacman-compatible full package engine | ✅ | `src/sigpkg/arch_pacman_engine.rs` | Arch Linux pacman |
-| **DebianAptEngine** | APT-compatible .deb package engine | ✅ | `src/sigpkg/debian_apt_engine.rs` | Debian APT |
-| **FedoraRpmEngine** | RPM-compatible package engine | ✅ | `src/sigpkg/fedora_rpm_engine.rs` | Fedora DNF/RPM |
-| **PortageEngine** | Gentoo Portage USE flags and slot resolution | ✅ | `src/sigpkg/portage.rs` | Gentoo Portage |
-| **NixShellEngine** | Nix reproducible hermetic build environments | ✅ | `src/sigpkg/nix_shell.rs` | NixOS Nix |
-| **SovereignSigpkg** | SigmaOS-native package format and pipeline | ✅ | `src/sigpkg/sovereign_sigpkg.rs` | SigmaOS native |
-| **RollingRelease** | Rolling release management with stability gates | ✅ | `src/sigpkg/rolling_release.rs` | Arch, Void Linux |
-| **DebianCrusher** | Debian-format crushing competitive features | ✅ | `src/sigpkg/debian_crusher.rs` | Debian |
-| **DebianDefeater** | Debian feature parity and superiority layer | ✅ | `src/sigpkg/debian_defeater.rs` | Debian |
 
 ---
 
@@ -106,11 +80,8 @@
 | **SigmaFire** | Zone-based firewall with stateful packet inspection | ✅ | `src/net/firewall.rs` | firewalld, pf |
 | **SigmaVPN** | WireGuard-inspired VPN tunnel | 🔄 | `src/net/vpn.rs` | WireGuard |
 | **SigmaZeroTrust** | Zero-trust network access control model | ✅ | `src/net/zero_trust.rs` | BeyondCorp, Tailscale |
-| **SigmaDNS** | Encrypted DNS resolver (DoH/DoT) | 🔄 | `src/net/dns.rs` | systemd-resolved |
+| **SigmaDNS** | Encrypted DNS resolver (DoH/DoT) | 🔄 | `src/net/dns.rs` | systemd-resolved, Unbound |
 | **FreeBsdRacctVnetGuard** | RACCT resource accounting + VNET isolation | ✅ | `src/compat/freebsd.rs` | FreeBSD VNET |
-| **WireguardManager** | WireGuard-compatible VPN management layer | ✅ | `src/network/wireless_manager.rs` | WireGuard |
-| **WiresharkParity** | Protocol inspection and analysis engine | ✅ | `src/network/wireshark_parity.rs` | Wireshark |
-| **TcpUdpStack** | High-fidelity TCP/UDP networking stack | ✅ | `src/network/tcp_udp.rs` | Linux TCP/IP |
 
 ---
 
@@ -122,34 +93,8 @@
 | **SigmaWM** | Tiling + stacking + floating window manager | ✅ | `src/desktop/wm.rs` | i3, AwesomeWM, KWin |
 | **SigmaBar** | Status bar with system monitoring widgets | ✅ | `src/desktop/bar.rs` | polybar, waybar |
 | **SigmaLauncher** | Application launcher with fuzzy search | ✅ | `src/desktop/launcher.rs` | rofi, wofi |
-| **SigmaTheme** | Declarative theming engine with CSS-like syntax | ✅ | `src/desktop/theme.rs` | GTK themes |
+| **SigmaTheme** | Declarative theming engine with CSS-like syntax | ✅ | `src/desktop/theme.rs` | GTK themes, Qt themes |
 | **SigmaA11y** | Accessibility layer (screen reader, magnifier) | 🔄 | `src/accessibility/` | AT-SPI, Orca |
-
----
-
-## Compatibility & Distro Absorption
-
-| Component | Description | Status | Source File | Inspired By |
-|-----------|-------------|--------|-------------|-------------|
-| **OpenSourceDominanceEngine** | Absorbs best features from 20+ open-source projects | ✅ | `src/compatibility/open_source_dominance.rs` | Linux, BSD, NixOS |
-| **InspirationFeatureMatrix** | Feature matrix tracking vs. all major distros | ✅ | `src/compatibility/open_source_dominance.rs` | Multiple distros |
-| **GarudaZenKernelPort** | Garuda/ZEN kernel optimizations port | ✅ | `src/compatibility/garuda_zen.rs` | Garuda Linux |
-| **BsdCompatLayer** | Full BSD system call and ABI compatibility | ✅ | `src/compatibility/bsd.rs` | FreeBSD, OpenBSD |
-| **GapClosureEngine** | Closes feature gaps vs. competitor distros | ✅ | `src/compatibility/gap_closure.rs` | Multiple distros |
-| **ArchLinuxCompat** | Arch Linux AUR and pacman compatibility | ✅ | `src/compatibility/arch_linux.rs` | Arch Linux |
-| **DebianCompat** | Debian APT and .deb package compatibility | ✅ | `src/compatibility/debian.rs` | Debian |
-| **FedoraCompat** | Fedora DNF and RPM compatibility | ✅ | `src/compatibility/fedora.rs` | Fedora |
-| **NixOsCompat** | NixOS declarative system and flake support | ✅ | `src/compatibility/nixos.rs` | NixOS |
-| **AlpineLinuxCompat** | Alpine Linux APK and musl compatibility | ✅ | `src/compatibility/alpine_linux.rs` | Alpine Linux |
-| **VoidLinuxCompat** | Void Linux XBPS and runit compatibility | ✅ | `src/compatibility/void_linux.rs` | Void Linux |
-| **CachyOsCompat** | CachyOS BORE scheduler and gaming optimizations | ✅ | `src/compatibility/cachy_os.rs` | CachyOS |
-| **GentooPortageCompat** | Gentoo Portage USE flags and emerge parity | ✅ | `src/compatibility/arch.rs` | Gentoo |
-| **PopOsCompat** | Pop!_OS system76 power management and GPU | ✅ | `src/compatibility/pop_os.rs` | Pop!_OS |
-| **AntiXCompat** | AntiX low-RAM SysVinit governor | ✅ | `src/compatibility/antix.rs` | antiX Linux |
-| **ZorinOsCompat** | Zorin OS Windows app compatibility layer | ✅ | `src/compatibility/zorin.rs` | Zorin OS |
-| **ReactOsCompat** | ReactOS Win32/NT kernel compatibility | ✅ | `src/compatibility/reactos.rs` | ReactOS |
-| **SovereignAbsorbTools** | Content-addressed storage for absorbed tools | ✅ | `src/compatibility/absorb_tools.rs` | Multiple |
-| **ChimeraLinuxCompat** | Chimera Linux APK and LLVM-based toolchain | ✅ | `src/compatibility/chimera_linux.rs` | Chimera Linux |
 
 ---
 
@@ -157,41 +102,13 @@
 
 | Component | Description | Status | Source File | Inspired By |
 |-----------|-------------|--------|-------------|-------------|
-| **LinuxBsdDriversEngine** | Unified Linux/BSD driver compatibility layer | ✅ | `src/drivers/linux_bsd_drivers.rs` | Linux drivers |
-| **SigmaDriverFramework** | Core driver framework with hot-plug support | ✅ | `src/driver/framework.rs` | Linux driver model |
-| **NvmeFabricsDriver** | NVMe-oF and NVMe queue pair driver | ✅ | `src/drivers/modern_nvme.rs` | Linux NVMe |
-| **VirtioGpuVirgl3d** | Virtio-GPU + virgl 3D acceleration driver | ✅ | `src/drivers/linux_bsd_drivers.rs` | VirtIO GPU |
-| **LinuxUrb** | USB Request Block driver stack | ✅ | `src/drivers/linux_bsd_drivers.rs` | Linux USB stack |
-| **Bluetooth54LeAudio** | Bluetooth 5.4 LE Audio codec driver | ✅ | `src/drivers/linux_bsd_drivers.rs` | Linux BT stack |
-| **LinuxBsdWifi6e7** | WiFi 6E/7 MLO multi-link operation driver | ✅ | `src/drivers/linux_bsd_drivers.rs` | Linux WiFi |
-| **SovereignRootkit** | Anti-rootkit detection and kernel protection | ✅ | `src/driver/rootkit.rs` | Security focused |
-
----
-
-## AI & ML Subsystem
-
-| Component | Description | Status | Source File | Inspired By |
-|-----------|-------------|--------|-------------|-------------|
-| **SigmaAINext** | Next-gen AI model orchestration runtime | ✅ | `src/ai/next_gen.rs` | LLM frameworks |
-| **AgenticOsRuntime** | Agentic OS containerized AI task execution | ✅ | `src/ai/agentic_os_runtime.rs` | AutoGPT, LangChain |
-| **SigmaWandr** | AI research and documentation generation agent | ✅ | `src/ai/wandr.rs` | Wandr agent framework |
-| **SovereignDataWorkspace** | ML data pipeline and workspace management | ✅ | `src/ml/sovereign_data_workspace.rs` | Jupyter, DVC |
-| **AiScheduler** | AI-powered CPU scheduler workload predictor | ✅ | `src/scheduler/sovereign.rs` | Linux AI scheduler |
-
----
-
-## Productivity Suite
-
-| Component | Description | Status | Source File | Inspired By |
-|-----------|-------------|--------|-------------|-------------|
-| **SigmaOffice** | Office suite (word processor, spreadsheet, presentation) | 🔄 | `src/productivity/document_engine.rs` | LibreOffice |
-| **SovereignApps** | Native sovereign productivity applications | ✅ | `src/productivity/sovereign_apps.rs` | GNOME, KDE apps |
-| **MintCompetitor** | Mint-inspired user-friendly desktop experience | ✅ | `src/productivity/mint_competitor.rs` | Linux Mint |
-| **AdvancedAppAbsorber** | Application feature absorption engine | ✅ | `src/productivity/advanced_app_absorber.rs` | Multiple distros |
-| **LinuxBsdProductivityTools** | Linux/BSD-inspired productivity utilities | ✅ | `src/productivity/linux_bsd_tools.rs` | Ubuntu, Fedora |
-| **FlintChart** | Advanced charting and visualization engine | ✅ | `src/productivity/flint_chart.rs` | Observable, D3 |
-| **MindMap** | Mind mapping and brainstorming tool | ✅ | `src/productivity/mind_map.rs` | FreeMind |
-| **SigmaMediaPlayer** | VLC-inspired lightweight video player | ✅ | `src/media/sovereign_video_player.rs` | VLC, mpv |
+| **SigmaGPU** | AMD/Intel GPU driver with Vulkan support | 🔄 | `src/drivers/gpu/` | Mesa, AMDGPU |
+| **SigmaAudio** | ALSA/PipeWire-compatible audio subsystem | ✅ | `src/audio/` | ALSA, PipeWire |
+| **SigmaUSB** | USB host controller and device enumeration | ✅ | `src/drivers/usb/` | Linux USB core |
+| **SigmaNIC** | Ethernet + WiFi driver framework | ✅ | `src/drivers/net/` | Linux netdev |
+| **SigmaBT** | Bluetooth HCI stack | 🔄 | `src/bluetooth/` | BlueZ |
+| **SigmaInput** | Keyboard/mouse/touchpad/touchscreen drivers | ✅ | `src/drivers/input/` | Linux input layer |
+| **UnifiedDriverFramework** | Universal driver loading with hardware ID matching | ✅ | `src/driver/device.rs` | Windows WDM |
 
 ---
 
@@ -199,75 +116,83 @@
 
 | Component | Description | Status | Source File | Inspired By |
 |-----------|-------------|--------|-------------|-------------|
-| **SigmaKVM** | KVM-compatible kernel virtual machine | 🔄 | `src/virtualization/kvm_vcpu.rs` | Linux KVM |
-| **SigmaContainer** | OCI-compatible container runtime | ✅ | `src/container/` | Podman, Docker |
-| **SigmaKube** | Kubernetes-compatible orchestration | 🔄 | `src/orchestration/sigmakube.rs` | Kubernetes |
-| **CrossDeviceOrchestration** | Cross-device workload orchestration | ✅ | `src/orchestration/cross_device.rs` | Nomad, k3s |
-| **SigmaVMManager** | Virtual machine lifecycle management | ✅ | `src/virtualization/vm_manager.rs` | libvirt |
+| **QubesIsolationManager** | VM compartmentalization + domain isolation | ✅ | `src/vm/qubes.rs` | Qubes OS |
+| **SigmaContainer** | Rootless OCI container runtime | ✅ | `src/container/` | podman, runc |
+| **SigmaVM** | KVM/QEMU-enhanced virtual machine manager | 🔄 | `src/vm/` | QEMU, bhyve |
+| **SigmaWASM** | WebAssembly runtime for sandboxed execution | 🔄 | `src/wasm/` | Wasmtime, WasmEdge |
+| **SigmaNamespace** | Linux namespace emulation (PID/NET/MNT/UTS) | ✅ | `src/container/namespace.rs` | Linux namespaces |
 
 ---
 
-## Shell & Terminal
+## Init & Service Management
 
 | Component | Description | Status | Source File | Inspired By |
 |-----------|-------------|--------|-------------|-------------|
-| **SigmaSh** | Sovereign shell with zsh/bash/tcsh/ksh parity | ✅ | `src/shell/sigma_sh.rs` | zsh, bash, fish |
-| **ZshBashParity** | Zsh and bash feature parity implementation | ✅ | `src/shell/zsh_bash_parity.rs` | zsh, bash |
-| **TerminalEmulator** | ANSI/VT100 terminal emulator with unicode | ✅ | `src/shell/terminal_emulator.rs` | alacritty, kitty |
-| **SigmaAliasSystem** | Advanced shell alias and function management | ✅ | `src/shell/alias_system.rs` | zsh aliases |
-| **SigmaRepl** | Interactive read-eval-print loop | ✅ | `src/shell/repl.rs` | IPython, Nushell |
+| **SovereignInitSupervisor** | Parallel init daemon with dependency graph | ✅ | `src/init/` | systemd, s6, runit |
+| **SigmaService** | Service unit management with socket activation | ✅ | `src/init/service.rs` | systemd units |
+| **SigmaSession** | Login session and seat management | ✅ | `src/auth/session.rs` | elogind, logind |
+| **SigmaTimer** | Timer-based service activation | ✅ | `src/init/timer.rs` | systemd.timer |
+| **SigmaMount** | Automount and mount unit management | 🔄 | `src/fs/mount.rs` | systemd.mount |
 
 ---
 
-## System Services
+## AI & Automation
 
 | Component | Description | Status | Source File | Inspired By |
 |-----------|-------------|--------|-------------|-------------|
-| **SigmaInit** | Systemd-compatible init system | ✅ | `src/init/systemd_init.rs` | systemd, runit |
-| **SigmaCron** | Cron-compatible task scheduler | ✅ | `src/system/cron.rs` | crond, fcron |
-| **SigmaResilienceBackup** | System backup and recovery engine | ✅ | `src/resilience/backup.rs` | Restic, Borg |
-| **SigmaSelfHealing** | Self-healing OS component restoration | ✅ | `src/resilience/self_healing.rs` | CoreOS, Fedora |
-| **GenerationManager** | Declarative system generation management | ✅ | `src/system/generation_manager.rs` | NixOS generations |
-| **SigmaStateManager** | System state capture and rollback | ✅ | `src/system/state.rs` | NixOS, Guix |
+| **SigmaAI** | AI orchestrator for system optimization | 🔄 | `src/ai/` | systemd-analyze, k8s |
+| **SigmaCopilot** | AI-assisted CLI and system configuration | 🔄 | `src/ai/copilot.rs` | GitHub Copilot, Cortex |
+| **SigmaPredict** | Predictive prefetch and memory optimization | 🔄 | `src/ai/predict.rs` | fwupd, inotify |
 
 ---
 
-## Open-Source Inspirations Implemented (August 2026 Merge)
+## Developer Tools
 
-| Inspiration Source | Feature Absorbed | Status | Implementation |
-|-------------------|-----------------|--------|----------------|
-| **Linux Kernel** | eBPF, io_uring, cgroups v2, EEVDF | ✅ | `src/kernel/ebpf.rs`, `src/kernel/io_uring.rs` |
-| **FreeBSD** | GEOM, bhyve, Capsicum, GELI | ✅ | `src/compatibility/bsd.rs` |
-| **OpenBSD** | pledge(), unveil(), signify | ✅ | `src/security/pledge.rs` |
-| **DragonFly BSD** | HAMMER2 FS, Lockless SMP | ✅ | `src/kernel/linux_bsd_innovations.rs` |
-| **NixOS** | Declarative generations, CAS store | ✅ | `src/system/generation_manager.rs` |
-| **Qubes OS** | VM compartmentalization, PQC IPC | ✅ | `src/security/qubes_isolation.rs` |
-| **Alpine Linux** | APK index, musl-based coreutils | ✅ | `src/compatibility/alpine_linux.rs` |
-| **Void Linux** | XBPS content-addressed format, runit | ✅ | `src/compatibility/void_linux.rs` |
-| **CachyOS / Garuda** | BORE scheduler, ZRAM, GameMode IRQ | ✅ | `src/compatibility/garuda_zen.rs` |
-| **Arch / Gentoo** | AUR P2P builds, Portage USE slots | ✅ | `src/sigpkg/portage.rs`, `src/sigpkg/aur.rs` |
-| **SerenityOS** | LibGUI, IPC protocol generator | ✅ | `src/compatibility/open_source_dominance.rs` |
-| **ReactOS** | Win32 PE/COFF loader, NT namespace | ✅ | `src/compatibility/reactos.rs` |
-| **Haiku / BeOS** | Attribute FS queries, Translators | ✅ | `src/compatibility/open_source_dominance.rs` |
-| **Redox OS** | URL scheme architecture, microkernel IPC | ✅ | `src/compatibility/open_source_dominance.rs` |
+| Component | Description | Status | Source File | Inspired By |
+|-----------|-------------|--------|-------------|-------------|
+| **SovereignVcsEngine** | Zero-dependency version control system | ✅ | `src/vcs/` | git, fossil |
+| **SigmaDebugger** | Kernel and userspace debugger | 🔄 | `src/debugger/` | gdb, lldb |
+| **SigmaBenchmark** | System benchmarking suite | ✅ | `src/benchmarks/` | sysbench, phoronix |
+| **SigmaBuild** | Build system with LTO and multi-arch support | ✅ | `src/build/` | cmake, meson |
+| **BtopSystemMonitor** | btop-inspired terminal resource monitor | ✅ | `src/unimplemented_tools.rs` | btop, htop |
+| **FastFetchInfo** | fastfetch-inspired system info display | ✅ | `src/unimplemented_tools.rs` | fastfetch, neofetch |
+| **BatSyntaxViewer** | bat-inspired syntax-highlighted file viewer | ✅ | `src/unimplemented_tools.rs` | bat, cat |
+| **FastFileSearchEngine** | fd-inspired fast file search engine | ✅ | `src/unimplemented_tools.rs` | fd, find |
+| **EbpfSystemTracer** | eBPF-based system performance tracer | ✅ | `src/unimplemented_tools.rs` | bpftrace, perf |
 
 ---
 
-## Statistics
+## Cloud & Enterprise
 
-| Category | Total | ✅ Implemented | 🔄 In Progress | 📋 Planned |
-|----------|-------|---------------|----------------|-----------|
-| Kernel | 18 | 16 | 2 | 0 |
-| Security | 17 | 15 | 2 | 0 |
-| Package Mgmt | 14 | 13 | 1 | 0 |
+| Component | Description | Status | Source File | Inspired By |
+|-----------|-------------|--------|-------------|-------------|
+| **SigmaCloud** | Cloud instance management and sync | 🔄 | `src/cloud/` | cloud-init, AWS SSM |
+| **SigmaCluster** | Kubernetes-compatible cluster orchestration | 🔄 | `src/cluster/` | k8s, Nomad |
+| **SigmaLDAP** | Directory service client (LDAP/Kerberos) | 🔄 | `src/auth/ldap.rs` | SSSD, FreeIPA |
+| **SigmaMonitor** | Prometheus-compatible metrics exporter | 🔄 | `src/dashboard/` | Prometheus, Grafana |
+
+---
+
+## Summary Statistics
+
+| Subsystem | Total | ✅ Done | 🔄 WIP | 📋 Planned |
+|-----------|-------|---------|--------|-----------|
+| Kernel | 9 | 7 | 2 | 0 |
+| Security | 10 | 8 | 2 | 0 |
+| Package Mgmt | 5 | 4 | 1 | 0 |
 | Filesystem | 5 | 4 | 1 | 0 |
-| Networking | 9 | 7 | 2 | 0 |
-| Desktop/UI | 6 | 5 | 1 | 0 |
-| Compatibility | 19 | 19 | 0 | 0 |
-| Drivers | 8 | 8 | 0 | 0 |
-| AI/ML | 5 | 5 | 0 | 0 |
-| Productivity | 8 | 7 | 1 | 0 |
-| Virtualization | 5 | 4 | 2 | 0 |
-| Shell/Terminal | 5 | 5 | 0 | 0 |
-| System Services | 6 | 6 | 0 | 0 |
-| **TOTAL** | **125** | **114 (91%)** | **12 (10%)** | **0 (0%)** |
+| Networking | 6 | 3 | 3 | 0 |
+| Desktop & UI | 6 | 5 | 1 | 0 |
+| Drivers | 7 | 5 | 2 | 0 |
+| Virtualization | 5 | 3 | 2 | 0 |
+| Init & Services | 5 | 4 | 1 | 0 |
+| AI & Automation | 3 | 0 | 3 | 0 |
+| Dev Tools | 9 | 7 | 2 | 0 |
+| Cloud & Enterprise | 4 | 0 | 4 | 0 |
+| **TOTAL** | **74** | **50 (68%)** | **24 (32%)** | **0** |
+
+---
+
+> 💡 **Want to contribute?** Check the [Contributing Guide](Contributing) and pick a 🔄 in-progress component!
+
+*Last updated: 2026-08-23 | SigmaOS Development Team*

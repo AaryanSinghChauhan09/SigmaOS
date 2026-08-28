@@ -113,7 +113,7 @@ sigma-security report --last 24h
 UEFI Secure Boot
     ↓
 Shim (Microsoft-signed)
-    ↓  
+    ↓
 GRUB (Shim-validated)
     ↓
 TPM2 PCR Measurement
