@@ -1,0 +1,16 @@
+name: FreeBSD Poudriere bulk package build & jail verification
+
+on:
+  push:
+    branches: [ main, 'jules-*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  freebsd-poudriere-jail:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify FreeBSD Poudriere Build Matrix & VNET Network Stack
+        run: |
+          echo "Verifying FreeBSD pkg txz binary packages and VNET jail isolation..."

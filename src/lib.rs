@@ -6,38 +6,20 @@
 
 pub mod accessibility;
 pub mod ai;
+pub mod arch;
 pub mod audio;
 pub mod automation;
+pub mod boot;
 pub mod compatibility;
 pub mod container;
-pub mod init;
 pub mod customization;
-pub mod desktop;
 pub mod dashboard;
 pub mod desktop;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod graphics;
-pub mod hardware;
-pub mod init;
-pub mod interrupt;
-pub mod kernel;
-pub mod klib;
-pub mod ml;
-pub mod network;
-pub mod orchestration;
-pub mod distro;
-pub mod package;
-pub mod performance;
-pub mod productivity;
-pub mod resilience;
-pub mod security;
-pub mod shell;
-pub mod sigpkg;
-pub mod ui;
-pub mod virtualization;
 pub mod graphics {
     pub mod compositor;
     pub mod paint;
@@ -47,19 +29,32 @@ pub mod hardware {
     pub mod compatibility;
     pub mod win32;
 }
-pub mod power {
-    pub mod governor;
-}
+pub mod init;
+pub mod interrupt;
+pub mod kernel;
+pub mod klib;
+pub mod ml;
+pub mod network;
 pub mod observability {
     pub mod profiler;
 }
-pub mod ai;
-pub mod arch;
-pub mod boot;
-pub mod toolchain;
+pub mod orchestration;
+pub mod package;
+pub mod performance;
+pub mod power {
+    pub mod governor;
+}
+pub mod productivity;
+pub mod resilience;
 pub mod scheduler {
     pub mod numa_scheduler;
 }
+pub mod security;
+pub mod shell;
+pub mod sigpkg;
+pub mod toolchain;
+pub mod ui;
+pub mod virtualization;
 pub mod crypto {
     pub mod vectorized_pqc;
 }

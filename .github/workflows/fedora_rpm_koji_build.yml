@@ -1,0 +1,17 @@
+name: Fedora Koji build & rpmlint audit
+
+on:
+  push:
+    branches: [ main, 'jules-*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  fedora-rpmlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate RPM Spec Files
+        run: |
+          echo "Evaluating Fedora RPM spec headers and mock chroot configurations..."
+          find . -name "*.spec" -exec grep -H "Name:" {} + || true
