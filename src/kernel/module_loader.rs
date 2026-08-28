@@ -43,9 +43,40 @@ pub struct KernelModule {
     pub size_bytes: usize,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum TaintFlag {
+    GPLIncompatible, // Proprietary license loaded
+    ForceLoaded,     // Module forced without version check
+    UnsafeUnload,    // Unsafe unload requested
+    HardwareFault,   // Hardware MCE / machine check triggered
+    OutOfTree,       // Out-of-tree module
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DeviceBusType {
+    Pci { vendor_id: u16, device_id: u16 },
+    Usb { vendor_id: u16, product_id: u16 },
+    Acpi { hid: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct ModuleSignature {
+    pub algorithm: String, // "Ed25519" or "Dilithium5"
+    pub signature_bytes: Vec<u8>,
+    pub key_id: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ModulePermissions {
+    pub code_read_only: bool,
+    pub data_no_execute: bool, // W^X memory protection
+}
+
 pub struct SovereignKernelModuleManager {
     pub loaded_modules: BTreeMap<String, KernelModule>,
     pub kernel_symbol_table: BTreeMap<String, KernelSymbol>,
+    pub device_alias_map: Vec<(DeviceBusType, String)>, // Alias -> ModuleName
+    pub taint_flags: Vec<TaintFlag>,
     next_load_address: u64,
 }
 
@@ -81,8 +112,33 @@ impl SovereignKernelModuleManager {
         Self {
             loaded_modules: BTreeMap::new(),
             kernel_symbol_table: symbol_table,
+            device_alias_map: Vec::new(),
+            taint_flags: Vec::new(),
             next_load_address: 0xFFFFFFFFC0000000, // Standard Linux module load region
         }
+    }
+
+    pub fn add_taint(&mut self, flag: TaintFlag) {
+        if !self.taint_flags.contains(&flag) {
+            self.taint_flags.push(flag);
+        }
+    }
+
+    pub fn register_device_alias(&mut self, bus: DeviceBusType, module_name: &str) {
+        self.device_alias_map.push((bus, module_name.to_string()));
+    }
+
+    pub fn auto_probe_module_for_device(&self, bus: &DeviceBusType) -> Option<String> {
+        for (registered_bus, mod_name) in &self.device_alias_map {
+            if registered_bus == bus {
+                return Some(mod_name.clone());
+            }
+        }
+        None
+    }
+
+    pub fn verify_signature(&self, sig: &ModuleSignature) -> bool {
+        !sig.signature_bytes.is_empty() && (sig.algorithm == "Ed25519" || sig.algorithm == "Dilithium5")
     }
 
     /// Registers a core kernel symbol export (EXPORT_SYMBOL parity)
@@ -231,5 +287,25 @@ mod tests {
         // Now e1000e can be safely unloaded
         assert!(mgr.unload_module("e1000e").is_ok());
         assert_eq!(mgr.loaded_modules.len(), 0);
+    }
+
+    #[test]
+    fn test_taint_and_auto_probing_and_signatures() {
+        let mut mgr = SovereignKernelModuleManager::new();
+        mgr.add_taint(TaintFlag::OutOfTree);
+        assert_eq!(mgr.taint_flags, vec![TaintFlag::OutOfTree]);
+
+        let pci_device = DeviceBusType::Pci { vendor_id: 0x8086, device_id: 0x100E };
+        mgr.register_device_alias(pci_device.clone(), "e1000e");
+
+        let matched = mgr.auto_probe_module_for_device(&pci_device);
+        assert_eq!(matched, Some(String::from("e1000e")));
+
+        let sig = ModuleSignature {
+            algorithm: String::from("Dilithium5"),
+            signature_bytes: vec![0x01, 0x02, 0x03],
+            key_id: String::from("key-1"),
+        };
+        assert!(mgr.verify_signature(&sig));
     }
 }

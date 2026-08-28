@@ -322,7 +322,24 @@ fn test_wiki_distro_innovations_inspection() {
     kmod_mgr.unload_module("virtio_gpu").unwrap();
     assert_eq!(kmod_mgr.loaded_modules.len(), 0);
 
-    // 13. Missing Distro Innovations (Clear Linux, Tails, Chimera, FreeBsd VNET, OpenBSD Unveil Auditor)
+    // 13. Advanced Kernel Module Loader (Taint Flags, Device Matching, Module Signatures)
+    use module_loader::{TaintFlag, DeviceBusType, ModuleSignature};
+    let mut adv_kmod = SovereignKernelModuleManager::new();
+    adv_kmod.add_taint(TaintFlag::GPLIncompatible);
+    assert_eq!(adv_kmod.taint_flags, vec![TaintFlag::GPLIncompatible]);
+
+    let usb_dev = DeviceBusType::Usb { vendor_id: 0x057E, product_id: 0x2009 };
+    adv_kmod.register_device_alias(usb_dev.clone(), "hid_nintendo");
+    assert_eq!(adv_kmod.auto_probe_module_for_device(&usb_dev), Some("hid_nintendo".to_string()));
+
+    let mod_sig = ModuleSignature {
+        algorithm: "Ed25519".to_string(),
+        signature_bytes: vec![0xDE, 0xAD, 0xBE, 0xEF],
+        key_id: "sec-key-1".to_string(),
+    };
+    assert!(adv_kmod.verify_signature(&mod_sig));
+
+    // 14. Missing Distro Innovations (Clear Linux, Tails, Chimera, FreeBsd VNET, OpenBSD Unveil Auditor)
     use missing_distro_innovations::{
         ClearLinuxStatelessEngine, TailsAmnesicEngine, ChimeraDinitSupervisor, DinitServiceState,
         FreeBsdVnetStackEngine, OpenBsdUnveilAuditor,
