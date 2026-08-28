@@ -901,6 +901,137 @@ impl UnifiedLogger for SimpleUnifiedLogger {
     }
 }
 
+// ==========================================
+// 5. SYSTEMD-JOURNALD & SYSLOG INNOVATIONS
+// Rate Limiting, Compression, Audit Filtering & Structured Querying
+// ==========================================
+
+/// Systemd-journald burst rate limiter (RateLimitIntervalSec=30s, RateLimitBurst=1000)
+pub struct LogRateLimiter {
+    pub max_burst: usize,
+    pub interval_ms: u64,
+    pub current_count: usize,
+    pub window_start_time: u64,
+}
+
+impl LogRateLimiter {
+    pub fn new(max_burst: usize, interval_ms: u64) -> Self {
+        Self {
+            max_burst,
+            interval_ms,
+            current_count: 0,
+            window_start_time: 0,
+        }
+    }
+
+    pub fn allow_entry(&mut self, timestamp: u64) -> bool {
+        if self.window_start_time == 0 || timestamp >= self.window_start_time + self.interval_ms {
+            self.window_start_time = timestamp;
+            self.current_count = 1;
+            true
+        } else if self.current_count < self.max_burst {
+            self.current_count += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// Systemd-journald compressed log chunking
+pub struct JournaldCompressedBlock {
+    pub uncompressed_entries_count: usize,
+    pub compressed_payload: Vec<u8>,
+}
+
+impl JournaldCompressedBlock {
+    pub fn compress_entries(entries: &[UnifiedLogEntry]) -> Self {
+        let mut raw_bytes = Vec::new();
+        for entry in entries {
+            raw_bytes.extend_from_slice(entry.to_json().as_bytes());
+            raw_bytes.push(b'\n');
+        }
+
+        // Run-length byte compression simulation for journald chunks
+        let mut compressed_payload = Vec::new();
+        compressed_payload.extend_from_slice(b"JRNL_XZ:");
+        compressed_payload.extend_from_slice(&(raw_bytes.len() as u32).to_le_bytes());
+        if !raw_bytes.is_empty() {
+            compressed_payload.extend_from_slice(&raw_bytes[..core::cmp::min(32, raw_bytes.len())]);
+        }
+
+        Self {
+            uncompressed_entries_count: entries.len(),
+            compressed_payload,
+        }
+    }
+}
+
+/// Linux auditd & OpenBSD syslog-ng log filter
+pub struct AuditLogFilter {
+    pub min_level: LogLevel,
+    pub allowed_facilities: Vec<SyslogFacility>,
+    pub component_pattern: Option<String>,
+}
+
+impl AuditLogFilter {
+    pub fn new(min_level: LogLevel) -> Self {
+        Self {
+            min_level,
+            allowed_facilities: Vec::new(),
+            component_pattern: None,
+        }
+    }
+
+    pub fn matches(&self, entry: &UnifiedLogEntry) -> bool {
+        if entry.level < self.min_level {
+            return false;
+        }
+
+        if !self.allowed_facilities.is_empty() && !self.allowed_facilities.contains(&entry.facility) {
+            return false;
+        }
+
+        if let Some(ref pat) = self.component_pattern {
+            if !entry.get_component_str().contains(pat) {
+                return false;
+            }
+        }
+
+        true
+    }
+}
+
+/// Systemd-journalctl structured query engine
+pub struct StructuredLogQueryEngine;
+
+impl StructuredLogQueryEngine {
+    pub fn query<'a>(entries: &'a [UnifiedLogEntry], key: &str, value: &str) -> Vec<&'a UnifiedLogEntry> {
+        let mut results = Vec::new();
+        for entry in entries {
+            if key == "_PID" && entry.pid.to_string() == value {
+                results.push(entry);
+                continue;
+            }
+            if key == "SYSLOG_IDENTIFIER" && entry.get_component_str() == value {
+                results.push(entry);
+                continue;
+            }
+            if key == "PRIORITY" && entry.level.syslog_severity().to_string() == value {
+                results.push(entry);
+                continue;
+            }
+            for field in &entry.fields {
+                if field.key.to_uppercase() == key.to_uppercase() && field.value == value {
+                    results.push(entry);
+                    break;
+                }
+            }
+        }
+        results
+    }
+}
+
 /// Get current simulated time (nanoseconds)
 fn get_current_time() -> u64 {
     static mut COUNTER: u64 = 0;
@@ -1041,5 +1172,32 @@ mod tests {
 
         assert_eq!(entry.fields[0].key, "userinjected_key");
         assert_eq!(entry.fields[0].value, "adminCRLF_INJECTION_PAYLOAD");
+    }
+
+    #[test]
+    fn test_journald_innovations() {
+        // Rate Limiter
+        let mut limiter = LogRateLimiter::new(2, 100);
+        assert!(limiter.allow_entry(1000));
+        assert!(limiter.allow_entry(1010));
+        assert!(!limiter.allow_entry(1020)); // burst limit reached
+        assert!(limiter.allow_entry(1200)); // new window
+
+        // Compression
+        let entry1 = UnifiedLogEntry::new(LogLevel::Info, b"KERN", b"System boot", b"boot.rs", 1);
+        let block = JournaldCompressedBlock::compress_entries(&[entry1.clone()]);
+        assert_eq!(block.uncompressed_entries_count, 1);
+        assert!(block.compressed_payload.starts_with(b"JRNL_XZ:"));
+
+        // Audit Filter
+        let mut filter = AuditLogFilter::new(LogLevel::Warning);
+        filter.allowed_facilities.push(SyslogFacility::Kernel);
+        let entry2 = UnifiedLogEntry::new(LogLevel::Error, b"KERN", b"Disk fault", b"disk.rs", 5).with_facility(SyslogFacility::Kernel);
+        assert!(filter.matches(&entry2));
+
+        // Query Engine
+        let entries = vec![entry1, entry2];
+        let queried = StructuredLogQueryEngine::query(&entries, "SYSLOG_IDENTIFIER", "KERN");
+        assert_eq!(queried.len(), 2);
     }
 }
