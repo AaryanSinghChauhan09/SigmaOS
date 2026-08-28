@@ -53,6 +53,9 @@ mod package_repository;
 #[path = "../src/kernel/module_loader.rs"]
 mod module_loader;
 
+#[path = "../src/logging/unified.rs"]
+mod unified;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -322,7 +325,24 @@ fn test_wiki_distro_innovations_inspection() {
     kmod_mgr.unload_module("virtio_gpu").unwrap();
     assert_eq!(kmod_mgr.loaded_modules.len(), 0);
 
-    // 13. Advanced Kernel Module Loader (Taint Flags, Device Matching, Module Signatures)
+    // 13. System Log Innovations (Journald Compression, Rate Limiting, Audit Filtering, Structured Queries)
+    use unified::{LogRateLimiter, JournaldCompressedBlock, AuditLogFilter, StructuredLogQueryEngine, UnifiedLogEntry, LogLevel, SyslogFacility};
+    let mut limiter = LogRateLimiter::new(1, 100);
+    assert!(limiter.allow_entry(100));
+    assert!(!limiter.allow_entry(105)); // Suppressed by rate limiter
+
+    let log_entry = UnifiedLogEntry::new(LogLevel::Error, b"NET", b"Link down", b"net.rs", 12).with_facility(SyslogFacility::Kernel).with_pid(100);
+    let comp_block = JournaldCompressedBlock::compress_entries(&[log_entry.clone()]);
+    assert_eq!(comp_block.uncompressed_entries_count, 1);
+
+    let mut audit_filter = AuditLogFilter::new(LogLevel::Error);
+    assert!(audit_filter.matches(&log_entry));
+
+    let log_slice = [log_entry];
+    let queried_logs = StructuredLogQueryEngine::query(&log_slice, "_PID", "100");
+    assert_eq!(queried_logs.len(), 1);
+
+    // 14. Advanced Kernel Module Loader (Taint Flags, Device Matching, Module Signatures)
     use module_loader::{TaintFlag, DeviceBusType, ModuleSignature};
     let mut adv_kmod = SovereignKernelModuleManager::new();
     adv_kmod.add_taint(TaintFlag::GPLIncompatible);
