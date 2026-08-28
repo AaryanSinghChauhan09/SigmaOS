@@ -586,7 +586,11 @@ impl SovereignHybridSchedulerInnovations {
     }
 
     pub fn add_task(&mut self, task: RealtimeTask) {
-        self.tasks.push(task);
+        self.rt_tasks.insert(task.pid, task);
+    }
+
+    pub fn verify_rt_lane_preemption_latency(&self) -> bool {
+        self.rt_lane_latency_us < 5
     }
 
     /// Selects optimal NUMA node for memory and thread affinity binding.

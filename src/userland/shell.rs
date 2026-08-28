@@ -73,11 +73,8 @@ pub enum ShellCommand {
     Or(Box<ShellCommand>, Box<ShellCommand>),
     Sequence(Box<ShellCommand>, Box<ShellCommand>),
     Background(Box<ShellCommand>),
-    Redirect(Box<ShellCommand>, RedirectSpec),
+    Redirect(Box<ShellCommand>, Redirect),
 }
-
-/// Legacy alias for backward compatibility
-pub type Redirect = RedirectSpec;
 
 /// Target stream binding for file descriptor redirection
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -97,6 +94,93 @@ pub struct Redirect {
     pub target_fd: Option<u32>,
     pub path: String,
     pub kind: RedirectKind,
+}
+
+impl From<RedirectSpec> for Redirect {
+    fn from(spec: RedirectSpec) -> Self {
+        match spec {
+            RedirectSpec::Output { fd, path, append, .. } => Redirect {
+                src_fd: fd,
+                target_fd: None,
+                path,
+                kind: if append { RedirectKind::Append } else { RedirectKind::Output },
+            },
+            RedirectSpec::Input { fd, path } => Redirect {
+                src_fd: fd,
+                target_fd: None,
+                path,
+                kind: RedirectKind::Input,
+            },
+            RedirectSpec::DupOutput { src_fd, target_fd } => Redirect {
+                src_fd,
+                target_fd: Some(target_fd),
+                path: target_fd.to_string(),
+                kind: RedirectKind::DupOutput,
+            },
+            RedirectSpec::DupInput { src_fd, target_fd } => Redirect {
+                src_fd,
+                target_fd: Some(target_fd),
+                path: target_fd.to_string(),
+                kind: RedirectKind::DupInput,
+            },
+            RedirectSpec::CloseFd { fd } => Redirect {
+                src_fd: fd,
+                target_fd: None,
+                path: String::new(),
+                kind: RedirectKind::Output,
+            },
+            RedirectSpec::HereDoc { fd, delimiter, .. } => Redirect {
+                src_fd: fd,
+                target_fd: None,
+                path: delimiter,
+                kind: RedirectKind::HereDoc,
+            },
+            RedirectSpec::HereString { fd, content } => Redirect {
+                src_fd: fd,
+                target_fd: None,
+                path: content,
+                kind: RedirectKind::HereString,
+            },
+            RedirectSpec::CombinedOutput { path, .. } => Redirect {
+                src_fd: 1,
+                target_fd: None,
+                path,
+                kind: RedirectKind::Output,
+            },
+            RedirectSpec::ProcessSubInput { fd, .. } | RedirectSpec::ProcessSubOutput { fd, .. } => Redirect {
+                src_fd: fd,
+                target_fd: None,
+                path: String::new(),
+                kind: RedirectKind::Output,
+            },
+        }
+    }
+}
+
+pub struct RedirectionEngine {
+    pub streams: BTreeMap<u32, Vec<u8>>,
+}
+
+impl RedirectionEngine {
+    pub fn new() -> Self {
+        Self {
+            streams: BTreeMap::new(),
+        }
+    }
+
+    pub fn write_fd(&mut self, fd: u32, data: &[u8]) {
+        self.streams.entry(fd).or_default().extend_from_slice(data);
+    }
+
+    pub fn read_fd(&self, fd: u32) -> Option<&[u8]> {
+        self.streams.get(&fd).map(|v| v.as_slice())
+    }
+}
+
+impl Default for RedirectionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct Environment {
@@ -417,7 +501,7 @@ impl<'a> Parser<'a> {
             let peek_c = self.peek();
             if peek_c == Some('>') || peek_c == Some('<') || self.starts_with("&>") || self.starts_with(">&") {
                 if let Some(spec) = self.parse_redirect_operator(explicit_fd) {
-                    redirects.push(spec);
+                    redirects.push(Redirect::from(spec));
                     continue;
                 } else {
                     self.pos = current_pos;
@@ -761,7 +845,7 @@ impl Shell {
                         Ok(0)
                     }
                     "cat" => {
-                        let stdin_bytes = self.redirection_engine.read_fd(0).map(|b| b.to_vec());
+                        let stdin_bytes = self.redirection_engine.read_fd(0).map(|b: &[u8]| b.to_vec());
                         if let Some(bytes) = stdin_bytes {
                             self.redirection_engine.write_fd(1, &bytes);
                         } else {

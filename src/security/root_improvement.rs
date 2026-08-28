@@ -343,6 +343,24 @@ impl DoasRuleEngine {
         self.rules.push(rule);
     }
 
+    pub fn evaluate_groups(&self, user: &str, groups: &[&str], target: &str, cmd: &str) -> DoasEvaluationResult {
+        let is_wheel = groups.contains(&"wheel");
+        let rule_opt = self.evaluate(user, is_wheel, target, cmd);
+        if let Some(rule) = rule_opt {
+            DoasEvaluationResult {
+                permitted: rule.action == DoasAction::Permit,
+                nopass_required: rule.nopass,
+                keepenv: rule.keepenv,
+            }
+        } else {
+            DoasEvaluationResult {
+                permitted: false,
+                nopass_required: false,
+                keepenv: false,
+            }
+        }
+    }
+
     /// Evaluates rules using OpenBSD's last-matching-rule semantics.
     pub fn evaluate(&self, user: &str, is_wheel: bool, target: &str, cmd: &str) -> Option<&DoasRule> {
         let mut last_match = None;
@@ -409,7 +427,7 @@ impl BsdSecurelevelGuard {
             self.current_level = new_level;
             Ok(())
         } else {
-            Err("securelevel can only be raised, not lowered");
+            Err("securelevel can only be raised, not lowered")
         }
     }
 
