@@ -1,6 +1,19 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+#[path = "../src/process/sovereign_process_engine.rs"]
+pub mod sovereign_process_engine;
+#[path = "../src/shell/sovereign_shell_parity.rs"]
+pub mod sovereign_shell_parity;
+#[path = "../src/package/repository.rs"]
+pub mod package_repository;
+#[path = "../src/kernel/module_loader.rs"]
+pub mod module_loader;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+pub mod missing_distro_innovations;
+
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 #[path = "../src/unimplemented_features.rs"]
@@ -216,7 +229,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
     // 8. Real-Time Hybrid Scheduler
     use wiki_ideas_implementation::{
-        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
+        RealtimeTask, SchedulerClass,
     };
     let mut sched = SovereignHybridSchedulerInnovations::new();
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
@@ -259,7 +272,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(mir_eng.get_fastest_mirror(), Some("https://fast.repo.org".to_string()));
 
     let mut journal = PackageTransactionJournal::new();
-    let tx1 = journal.log_transaction("install", "bash", "5.2", 100);
+    let _tx1 = journal.log_transaction("install", "bash", "5.2", 100);
     let tx2 = journal.log_transaction("install", "zsh", "5.9", 105);
     assert_eq!(journal.rollback_transaction(tx2).len(), 1);
 
@@ -293,7 +306,7 @@ fn test_wiki_distro_innovations_inspection() {
     let comp_block = JournaldCompressedBlock::compress_entries(&[log_entry.clone()]);
     assert_eq!(comp_block.uncompressed_entries_count, 1);
 
-    let mut audit_filter = AuditLogFilter::new(LogLevel::Error);
+    let audit_filter = AuditLogFilter::new(LogLevel::Error);
     assert!(audit_filter.matches(&log_entry));
 
     let log_slice = [log_entry];

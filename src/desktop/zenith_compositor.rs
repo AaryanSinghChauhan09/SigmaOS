@@ -23,7 +23,7 @@ use sigma_types::{CapabilityToken, Result};
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// Window state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

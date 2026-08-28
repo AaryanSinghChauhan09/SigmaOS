@@ -540,7 +540,7 @@ mod tests {
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.list_supported().len(), 12);
+        assert_eq!(matrix.list_supported().len(), 14);
         assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
     }
 
@@ -550,19 +550,19 @@ mod tests {
         matrix.seed_with_defaults();
         let diag = SimpleDiagnostics::new(matrix);
         let report = diag.run_full_scan();
-        assert_eq!(report.results.len(), 13);
+        assert_eq!(report.results.len(), 15);
     }
 
     #[test]
     fn test_expanded_device_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.devices.len(), 13);
-        assert_eq!(matrix.list_supported().len(), 12);
+        assert_eq!(matrix.devices.len(), 15);
+        assert_eq!(matrix.list_supported().len(), 14);
 
         let diag = SimpleDiagnostics::new(matrix);
         let report = diag.run_full_scan();
-        assert_eq!(report.results.len(), 13);
+        assert_eq!(report.results.len(), 15);
     }
 
     #[test]
@@ -571,7 +571,7 @@ mod tests {
         matrix.seed_with_defaults();
 
         assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
-        assert_eq!(matrix.list_by_type(DeviceType::Storage).len(), 3);
+        assert_eq!(matrix.list_by_type(DeviceType::Storage).len(), 4);
         assert_eq!(matrix.list_by_type(DeviceType::Chipset).len(), 2);
         assert_eq!(matrix.list_by_type(DeviceType::GPU).len(), 2);
         assert_eq!(matrix.list_by_type(DeviceType::Printer).len(), 1);

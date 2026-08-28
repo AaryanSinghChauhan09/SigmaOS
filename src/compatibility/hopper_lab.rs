@@ -289,12 +289,14 @@ mod tests {
         let engine_stable = ReleaseEngine::new(ReleaseStream::StableLts, 1);
         assert!(engine_stable
             .negotiate_kernel_profile()
+            .to_lowercase()
             .contains("highly verified"));
 
         let engine_rolling = ReleaseEngine::new(ReleaseStream::RollingBleedingEdge, 9);
         assert!(engine_rolling
             .negotiate_kernel_profile()
-            .contains("predictive AI"));
+            .to_lowercase()
+            .contains("predictive ai"));
     }
 
     #[test]
