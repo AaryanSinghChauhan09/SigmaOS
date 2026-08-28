@@ -21,6 +21,9 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 
+#[cfg(test)]
+use std::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 extern crate alloc;
