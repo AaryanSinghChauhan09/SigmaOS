@@ -5,9 +5,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use std::collections::HashMap;
-
-#[cfg(test)]
-use std::time::{SystemTime, UNIX_EPOCH};
+use alloc::format;
 
 /// VM configuration
 #[derive(Debug, Clone)]
@@ -210,7 +208,6 @@ pub enum KvmExitReason {
     MmioWrite { addr: u64, len: u8, data: u64 },
     Hlt,
     Shutdown,
-    Interrupt,
     InternalError,
 }
 
