@@ -7,49 +7,30 @@ mod linux_bsd_innovations;
 mod unimplemented_features;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
-
 #[path = "../src/distro/linux_bsd_parity.rs"]
 mod linux_bsd_parity;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
 #[path = "../src/kernel/sysctl.rs"]
 mod sysctl;
-
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
-
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
-
 #[path = "../src/compatibility/distro_bridge.rs"]
 mod distro_bridge;
-
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 #[path = "../src/security/hardening.rs"]
 mod hardening;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
 #[path = "../src/compatibility/garuda_zen.rs"]
 mod garuda_zen;
-#[path = "../src/compatibility/distro_bridge.rs"]
-mod distro_bridge;
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 #[path = "../src/compatibility/zorin.rs"]
 mod zorin;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
-#[path = "../src/kernel/sysctl.rs"]
-mod sysctl;
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
-#[path = "../src/compatibility/abi_extended.rs"]
-mod abi_extended;
 #[path = "../src/compatibility/freebsd_jails.rs"]
 mod freebsd_jails;
 #[path = "../src/compatibility/bsd.rs"]
@@ -58,66 +39,14 @@ mod bsd_compat;
 mod wiki_ideas;
 #[path = "../src/kernel/bore.rs"]
 mod bore;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-
 #[path = "../src/filesystem/bsd_linux_innovations.rs"]
 mod fs_bsd_linux_innovations;
-
 #[path = "../src/memory/tlb_associative.rs"]
 mod tlb_associative;
-
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
-
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
-
-#[path = "../src/process/advanced_process_control.rs"]
-mod advanced_process_control;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/kernel/sysctl.rs"]
-mod sysctl;
-
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
-
-#[path = "../src/compatibility/abi_extended.rs"]
-mod abi_extended;
-
-#[path = "../src/compatibility/distro_bridge.rs"]
-mod distro_bridge;
-
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-
-#[path = "../src/security/hardening.rs"]
-mod hardening;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-
-use bsd::*;
-use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
-use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
-use unveil::{UnveilManager, UnveilPermission};
-use wiki_ideas_implementation::SystemdUnitActiveState;
+use wiki_ideas::SystemdUnitActiveState;
+use bsd_compat::*;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -231,7 +160,7 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas_implementation::{
+    use wiki_ideas::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
         PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType, SystemdUnitState,
@@ -543,7 +472,7 @@ fn test_gentoo_use_flag_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    use unimplemented_features::GentooPortageMaskEngine;
+    use unimplemented_features::GentooPortageMaskResolver as GentooPortageMaskEngine;
     let mut portage = GentooPortageMaskEngine::new("amd64");
     portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
     portage.register_ebuild("app-admin/sudo", "0", &["amd64"], false);
