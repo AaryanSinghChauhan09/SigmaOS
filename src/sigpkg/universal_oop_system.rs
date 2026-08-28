@@ -139,6 +139,38 @@ pub enum PackageFormat {
     Guix,
     // SigmaOS Native
     Sigma,
+    // Adobe AIR
+    Air,
+    // Homebrew Bottle
+    Bottle,
+    // iOS App (.ipa)
+    Ipa,
+    // FreeBSD / OpenBSD Ports
+    Ports,
+    // macOS / FreeBSD / Solaris PKG
+    Pkg,
+    // Android App Bundle (.aab)
+    Aab,
+    // Compressed Tar archives (.tar.gz, .tgz)
+    TarGz,
+    // Compressed Tar XZ archives (.tar.xz, .xz, .pkg.tar.xz)
+    TarXz,
+    // Plain Tar archive (.tar)
+    Tar,
+    // macOS / Nextstep App bundle (.app)
+    AppBundle,
+    // HarmonyOS Ability Package (.hap)
+    Hap,
+    // Pardus / Solus PiSi (.PiSi)
+    Pisi,
+    // Deepin Superdeb (.superdeb)
+    Superdeb,
+    // Slax Linux Module (.lzm)
+    Lzm,
+    // Puppy Linux Package (.pup)
+    Pup,
+    // Puppy Extra Tarball / Pet (.pet)
+    Pet,
 }
 
 /// Package metadata structure
@@ -364,6 +396,128 @@ impl IPackageParser for DebAdapter {
         Ok(output.into_bytes())
     }
 }
+
+/// Generic helper macro for generating lightweight package adapters
+macro_rules! impl_generic_package_adapter {
+    ($struct_name:ident, $format_variant:ident, $can_parse_key:expr, $name_prefix:expr, $version_prefix:expr) => {
+        pub struct $struct_name {
+            base: BaseAdapter,
+        }
+
+        impl $struct_name {
+            #[allow(clippy::new_without_default)]
+            pub fn new() -> Self {
+                Self {
+                    base: BaseAdapter::new(PackageFormat::$format_variant),
+                }
+            }
+
+            pub fn add_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
+                self.base.add_hook(hook);
+            }
+        }
+
+        impl IPackageParser for $struct_name {
+            fn format(&self) -> PackageFormat {
+                PackageFormat::$format_variant
+            }
+
+            fn can_parse(&self, data: &[u8]) -> bool {
+                let content = String::from_utf8_lossy(data);
+                content.contains($can_parse_key)
+            }
+
+            fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+                let content = String::from_utf8_lossy(data);
+                let mut name = String::new();
+                let mut version_str = String::new();
+                let mut description = String::new();
+                let mut dependencies = Vec::new();
+
+                for line in content.lines() {
+                    let trimmed = line.trim();
+                    if trimmed.starts_with($name_prefix) {
+                        name = trimmed[$name_prefix.len()..].trim_matches(|c| c == '"' || c == '\'' || c == ' ').to_string();
+                    } else if trimmed.starts_with($version_prefix) {
+                        version_str = trimmed[$version_prefix.len()..].trim_matches(|c| c == '"' || c == '\'' || c == ' ').to_string();
+                    } else if trimmed.starts_with("description=") || trimmed.starts_with("Description:") || trimmed.starts_with("summary=") {
+                        let pos = trimmed.find('=').or_else(|| trimmed.find(':')).unwrap_or(0);
+                        description = trimmed[pos + 1..].trim().to_string();
+                    } else if trimmed.starts_with("depends=") || trimmed.starts_with("Depends:") {
+                        let pos = trimmed.find('=').or_else(|| trimmed.find(':')).unwrap_or(0);
+                        for dep in trimmed[pos + 1..].split_whitespace() {
+                            dependencies.push(Dependency {
+                                name: dep.to_string(),
+                                version_constraint: VersionConstraint::Any,
+                            });
+                        }
+                    }
+                }
+
+                if name.is_empty() {
+                    name = stringify!($struct_name).to_lowercase();
+                }
+
+                let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(1, 0, 0));
+
+                let mut package: Box<dyn IPackage> = Box::new(StandardPackage {
+                    metadata: PackageMetadata {
+                        name,
+                        version,
+                        description,
+                        license: String::new(),
+                        maintainer: String::new(),
+                        homepage: String::new(),
+                        architecture: "x86_64".to_string(),
+                        checksum: String::new(),
+                        size: 0,
+                        install_date: None,
+                        pqc_signature: None,
+                        gpg_key_id: None,
+                        supported_architectures: Vec::new(),
+                    },
+                    dependencies,
+                    format: PackageFormat::$format_variant,
+                });
+
+                self.base
+                    .execute_hooks(package.as_mut())
+                    .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
+
+                Ok(package)
+            }
+
+            fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+                let mut output = String::new();
+                let meta = package.metadata();
+
+                output.push_str(&format!("{}{}\n", $name_prefix, meta.name));
+                output.push_str(&format!(
+                    "{}{}.{}.{}\n",
+                    $version_prefix, meta.version.major, meta.version.minor, meta.version.patch
+                ));
+                Ok(output.into_bytes())
+            }
+        }
+    };
+}
+
+impl_generic_package_adapter!(AirAdapter, Air, "air-application:", "air-application: ", "air-version: ");
+impl_generic_package_adapter!(BottleAdapter, Bottle, "bottle:", "bottle: ", "bottle-version: ");
+impl_generic_package_adapter!(IpaAdapter, Ipa, "CFBundleName", "CFBundleName: ", "CFBundleShortVersionString: ");
+impl_generic_package_adapter!(PortsAdapter, Ports, "PORTNAME=", "PORTNAME=", "PORTVERSION=");
+impl_generic_package_adapter!(PkgAdapter, Pkg, "pkg_name:", "pkg_name: ", "pkg_version: ");
+impl_generic_package_adapter!(AabAdapter, Aab, "aab-package:", "aab-package: ", "aab-version: ");
+impl_generic_package_adapter!(TarGzAdapter, TarGz, "tar-gz-package:", "tar-gz-package: ", "tar-gz-version: ");
+impl_generic_package_adapter!(TarXzAdapter, TarXz, "tar-xz-package:", "tar-xz-package: ", "tar-xz-version: ");
+impl_generic_package_adapter!(TarAdapter, Tar, "tar-package:", "tar-package: ", "tar-version: ");
+impl_generic_package_adapter!(AppBundleAdapter, AppBundle, "CFBundleExecutable", "CFBundleExecutable: ", "CFBundleVersion: ");
+impl_generic_package_adapter!(HapAdapter, Hap, "hap-app-name:", "hap-app-name: ", "hap-version: ");
+impl_generic_package_adapter!(PisiAdapter, Pisi, "pisi-name:", "pisi-name: ", "pisi-version: ");
+impl_generic_package_adapter!(SuperdebAdapter, Superdeb, "Superdeb-Package:", "Superdeb-Package: ", "Superdeb-Version: ");
+impl_generic_package_adapter!(LzmAdapter, Lzm, "lzm-module:", "lzm-module: ", "lzm-version: ");
+impl_generic_package_adapter!(PupAdapter, Pup, "pup-name:", "pup-name: ", "pup-version: ");
+impl_generic_package_adapter!(PetAdapter, Pet, "pet-package:", "pet-package: ", "pet-version: ");
 
 /// Fedora/RHEL .rpm adapter
 pub struct RpmAdapter {
@@ -2017,6 +2171,22 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(ZypperAdapter::new()));
         factory.register_parser(Box::new(GuixAdapter::new()));
         factory.register_parser(Box::new(SigmaAdapter::new()));
+        factory.register_parser(Box::new(AirAdapter::new()));
+        factory.register_parser(Box::new(BottleAdapter::new()));
+        factory.register_parser(Box::new(IpaAdapter::new()));
+        factory.register_parser(Box::new(PortsAdapter::new()));
+        factory.register_parser(Box::new(PkgAdapter::new()));
+        factory.register_parser(Box::new(AabAdapter::new()));
+        factory.register_parser(Box::new(TarGzAdapter::new()));
+        factory.register_parser(Box::new(TarXzAdapter::new()));
+        factory.register_parser(Box::new(TarAdapter::new()));
+        factory.register_parser(Box::new(AppBundleAdapter::new()));
+        factory.register_parser(Box::new(HapAdapter::new()));
+        factory.register_parser(Box::new(PisiAdapter::new()));
+        factory.register_parser(Box::new(SuperdebAdapter::new()));
+        factory.register_parser(Box::new(LzmAdapter::new()));
+        factory.register_parser(Box::new(PupAdapter::new()));
+        factory.register_parser(Box::new(PetAdapter::new()));
 
         factory
     }
@@ -2600,6 +2770,40 @@ Depends: kernel-base";
         assert_eq!(package.name(), "test-sigma");
         assert_eq!(package.format(), PackageFormat::Sigma);
         assert_eq!(package.dependencies().len(), 1);
+    }
+
+    #[test]
+    fn test_expanded_package_format_adapters() {
+        let air = AirAdapter::new();
+        let air_data = b"air-application: test-app\nair-version: 2.0.0";
+        assert!(air.can_parse(air_data));
+        let pkg = air.parse(air_data).unwrap();
+        assert_eq!(pkg.format(), PackageFormat::Air);
+        assert_eq!(pkg.name(), "test-app");
+
+        let bottle = BottleAdapter::new();
+        let bottle_data = b"bottle: test-bottle\nbottle-version: 1.0.0";
+        assert!(bottle.can_parse(bottle_data));
+        let pkg = bottle.parse(bottle_data).unwrap();
+        assert_eq!(pkg.format(), PackageFormat::Bottle);
+
+        let ipa = IpaAdapter::new();
+        let ipa_data = b"CFBundleName: test-ipa\nCFBundleShortVersionString: 3.1.0";
+        assert!(ipa.can_parse(ipa_data));
+        let pkg = ipa.parse(ipa_data).unwrap();
+        assert_eq!(pkg.format(), PackageFormat::Ipa);
+
+        let ports = PortsAdapter::new();
+        let ports_data = b"PORTNAME=test-port\nPORTVERSION=4.0.0";
+        assert!(ports.can_parse(ports_data));
+        let pkg = ports.parse(ports_data).unwrap();
+        assert_eq!(pkg.format(), PackageFormat::Ports);
+
+        let pisi = PisiAdapter::new();
+        let pisi_data = b"pisi-name: test-pisi\npisi-version: 1.2.0";
+        assert!(pisi.can_parse(pisi_data));
+        let pkg = pisi.parse(pisi_data).unwrap();
+        assert_eq!(pkg.format(), PackageFormat::Pisi);
     }
 
     #[test]

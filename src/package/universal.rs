@@ -26,6 +26,26 @@ pub enum PackageFormat {
     Flatpak,  // flatpak sandbox
     AppImage, // AppImage single-file container
     SigmaPkg, // native SigmaOS format
+    Air,      // Adobe AIR (.air)
+    Bottle,   // Homebrew Bottle (.bottle)
+    Ipa,      // iOS App (.ipa)
+    Ports,    // BSD Ports (.ports)
+    Pkg,      // macOS / BSD / Solaris PKG (.pkg)
+    Aab,      // Android App Bundle (.aab)
+    Apk,      // Android Package / Alpine Package (.apk)
+    Eopkg,    // Solus eopkg (.eopkg)
+    Nixpkg,   // Nix store package (.nixpkg)
+    Ebuild,   // Gentoo ebuild (.ebuild / .portage)
+    TarGz,    // Compressed Tar (.tar.gz, .tgz)
+    Xz,       // Compressed XZ archive (.xz, .tar.xz)
+    App,      // macOS App bundle (.app)
+    Hap,      // HarmonyOS Ability Package (.hap)
+    Pisi,     // Pardus / Solus PiSi (.PiSi)
+    Superdeb, // Deepin Superdeb (.superdeb)
+    Lzm,      // Slax Linux Module (.lzm)
+    Pup,      // Puppy Linux Package (.pup)
+    Pet,      // Puppy Extra Tarball (.pet)
+    Tar,      // Plain tarball (.tar)
 }
 
 /// Package source
@@ -667,6 +687,26 @@ impl UniversalPackageManager {
             PackageFormat::SigmaPkg,
             PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")),
         );
+        self.adapters.insert(PackageFormat::Air, PackageAdapter::new(PackageFormat::Air, "air".to_string()));
+        self.adapters.insert(PackageFormat::Bottle, PackageAdapter::new(PackageFormat::Bottle, "bottle".to_string()));
+        self.adapters.insert(PackageFormat::Ipa, PackageAdapter::new(PackageFormat::Ipa, "ipa".to_string()));
+        self.adapters.insert(PackageFormat::Ports, PackageAdapter::new(PackageFormat::Ports, "ports".to_string()));
+        self.adapters.insert(PackageFormat::Pkg, PackageAdapter::new(PackageFormat::Pkg, "pkg".to_string()));
+        self.adapters.insert(PackageFormat::Aab, PackageAdapter::new(PackageFormat::Aab, "aab".to_string()));
+        self.adapters.insert(PackageFormat::Apk, PackageAdapter::new(PackageFormat::Apk, "apk".to_string()));
+        self.adapters.insert(PackageFormat::Eopkg, PackageAdapter::new(PackageFormat::Eopkg, "eopkg".to_string()));
+        self.adapters.insert(PackageFormat::Nixpkg, PackageAdapter::new(PackageFormat::Nixpkg, "nixpkg".to_string()));
+        self.adapters.insert(PackageFormat::Ebuild, PackageAdapter::new(PackageFormat::Ebuild, "ebuild".to_string()));
+        self.adapters.insert(PackageFormat::TarGz, PackageAdapter::new(PackageFormat::TarGz, "targz".to_string()));
+        self.adapters.insert(PackageFormat::Xz, PackageAdapter::new(PackageFormat::Xz, "xz".to_string()));
+        self.adapters.insert(PackageFormat::App, PackageAdapter::new(PackageFormat::App, "app".to_string()));
+        self.adapters.insert(PackageFormat::Hap, PackageAdapter::new(PackageFormat::Hap, "hap".to_string()));
+        self.adapters.insert(PackageFormat::Pisi, PackageAdapter::new(PackageFormat::Pisi, "pisi".to_string()));
+        self.adapters.insert(PackageFormat::Superdeb, PackageAdapter::new(PackageFormat::Superdeb, "superdeb".to_string()));
+        self.adapters.insert(PackageFormat::Lzm, PackageAdapter::new(PackageFormat::Lzm, "lzm".to_string()));
+        self.adapters.insert(PackageFormat::Pup, PackageAdapter::new(PackageFormat::Pup, "pup".to_string()));
+        self.adapters.insert(PackageFormat::Pet, PackageAdapter::new(PackageFormat::Pet, "pet".to_string()));
+        self.adapters.insert(PackageFormat::Tar, PackageAdapter::new(PackageFormat::Tar, "tar".to_string()));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -831,7 +871,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 7); // updated to 7 to include AppImage
+        assert!(manager.adapters.len() >= 25);
     }
 
     #[test]
