@@ -139,6 +139,23 @@ pub enum PackageFormat {
     Guix,
     // SigmaOS Native
     Sigma,
+    // Mobile & Cross-Platform / App formats
+    Air,
+    Bottle,
+    Ipa,
+    Ports,
+    Pkg,
+    Aab,
+    Hap,
+    Pisi,
+    Pup,
+    Pet,
+    SuperDeb,
+    Lzm,
+    TarArchive,
+    NixPkg,
+    PortagePkg,
+    App,
 }
 
 /// Package metadata structure
@@ -1952,6 +1969,136 @@ impl IPackageParser for SigmaAdapter {
     }
 }
 
+macro_rules! impl_simple_adapter {
+    ($adapter:ident, $format:ident, $tag:expr, $key_prefix:expr) => {
+        pub struct $adapter {
+            base: BaseAdapter,
+        }
+
+        impl $adapter {
+            #[allow(clippy::new_without_default)]
+            pub fn new() -> Self {
+                Self {
+                    base: BaseAdapter::new(PackageFormat::$format),
+                }
+            }
+
+            pub fn add_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
+                self.base.add_hook(hook);
+            }
+        }
+
+        impl IPackageParser for $adapter {
+            fn format(&self) -> PackageFormat {
+                PackageFormat::$format
+            }
+
+            fn can_parse(&self, data: &[u8]) -> bool {
+                let content = String::from_utf8_lossy(data);
+                content.contains($tag)
+            }
+
+            fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+                let content = String::from_utf8_lossy(data);
+                let mut name = String::new();
+                let mut version_str = String::new();
+                let mut description = String::new();
+                let mut dependencies = Vec::new();
+
+                for line in content.lines() {
+                    let trimmed = line.trim();
+                    if trimmed.starts_with(concat!($key_prefix, ": ")) {
+                        name = trimmed[($key_prefix.len() + 2)..].to_string();
+                    } else if trimmed.starts_with("Version: ") {
+                        version_str = trimmed[9..].to_string();
+                    } else if trimmed.starts_with("Description: ") {
+                        description = trimmed[13..].to_string();
+                    } else if trimmed.starts_with("Depends: ") {
+                        for dep in trimmed[9..].split_whitespace() {
+                            dependencies.push(Dependency {
+                                name: dep.to_string(),
+                                version_constraint: VersionConstraint::Any,
+                            });
+                        }
+                    }
+                }
+
+                if name.is_empty() {
+                    name = stringify!($adapter).to_lowercase();
+                }
+                if version_str.is_empty() {
+                    version_str = "1.0.0".to_string();
+                }
+
+                let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(1, 0, 0));
+
+                let mut package: Box<dyn IPackage> = Box::new(StandardPackage {
+                    metadata: PackageMetadata {
+                        name,
+                        version,
+                        description,
+                        license: String::new(),
+                        maintainer: String::new(),
+                        homepage: String::new(),
+                        architecture: "universal".to_string(),
+                        checksum: String::new(),
+                        size: data.len() as u64,
+                        install_date: None,
+                        pqc_signature: None,
+                        gpg_key_id: None,
+                        supported_architectures: Vec::new(),
+                    },
+                    dependencies,
+                    format: PackageFormat::$format,
+                });
+
+                self.base
+                    .execute_hooks(package.as_mut())
+                    .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
+
+                Ok(package)
+            }
+
+            fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+                let mut output = String::new();
+                let meta = package.metadata();
+                output.push_str(&format!("{}: {}\n", $key_prefix, meta.name));
+                output.push_str(&format!(
+                    "Version: {}.{}.{}\n",
+                    meta.version.major, meta.version.minor, meta.version.patch
+                ));
+                output.push_str(&format!("Description: {}\n", meta.description));
+                if !package.dependencies().is_empty() {
+                    let dep_names: Vec<&str> = package
+                        .dependencies()
+                        .iter()
+                        .map(|d| d.name.as_str())
+                        .collect();
+                    output.push_str(&format!("Depends: {}\n", dep_names.join(" ")));
+                }
+                Ok(output.into_bytes())
+            }
+        }
+    };
+}
+
+impl_simple_adapter!(AirAdapter, Air, "AirPackage:", "AirPackage");
+impl_simple_adapter!(BottleAdapter, Bottle, "BottlePackage:", "BottlePackage");
+impl_simple_adapter!(IpaAdapter, Ipa, "IpaPackage:", "IpaPackage");
+impl_simple_adapter!(PortsAdapter, Ports, "PortsPackage:", "PortsPackage");
+impl_simple_adapter!(PkgAdapter, Pkg, "PkgPackage:", "PkgPackage");
+impl_simple_adapter!(AabAdapter, Aab, "AabPackage:", "AabPackage");
+impl_simple_adapter!(HapAdapter, Hap, "HapPackage:", "HapPackage");
+impl_simple_adapter!(PisiAdapter, Pisi, "PisiPackage:", "PisiPackage");
+impl_simple_adapter!(PupAdapter, Pup, "PupPackage:", "PupPackage");
+impl_simple_adapter!(PetAdapter, Pet, "PetPackage:", "PetPackage");
+impl_simple_adapter!(SuperDebAdapter, SuperDeb, "SuperDebPackage:", "SuperDebPackage");
+impl_simple_adapter!(LzmAdapter, Lzm, "LzmPackage:", "LzmPackage");
+impl_simple_adapter!(TarArchiveAdapter, TarArchive, "TarArchivePackage:", "TarArchivePackage");
+impl_simple_adapter!(NixPkgAdapter, NixPkg, "NixPkgPackage:", "NixPkgPackage");
+impl_simple_adapter!(PortagePkgAdapter, PortagePkg, "PortagePkgPackage:", "PortagePkgPackage");
+impl_simple_adapter!(AppAdapter, App, "AppBundlePackage:", "AppBundlePackage");
+
 /// Standard package implementation
 pub struct StandardPackage {
     pub metadata: PackageMetadata,
@@ -2017,8 +2164,60 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(ZypperAdapter::new()));
         factory.register_parser(Box::new(GuixAdapter::new()));
         factory.register_parser(Box::new(SigmaAdapter::new()));
+        factory.register_parser(Box::new(AirAdapter::new()));
+        factory.register_parser(Box::new(BottleAdapter::new()));
+        factory.register_parser(Box::new(IpaAdapter::new()));
+        factory.register_parser(Box::new(PortsAdapter::new()));
+        factory.register_parser(Box::new(PkgAdapter::new()));
+        factory.register_parser(Box::new(AabAdapter::new()));
+        factory.register_parser(Box::new(HapAdapter::new()));
+        factory.register_parser(Box::new(PisiAdapter::new()));
+        factory.register_parser(Box::new(PupAdapter::new()));
+        factory.register_parser(Box::new(PetAdapter::new()));
+        factory.register_parser(Box::new(SuperDebAdapter::new()));
+        factory.register_parser(Box::new(LzmAdapter::new()));
+        factory.register_parser(Box::new(TarArchiveAdapter::new()));
+        factory.register_parser(Box::new(NixPkgAdapter::new()));
+        factory.register_parser(Box::new(PortagePkgAdapter::new()));
+        factory.register_parser(Box::new(AppAdapter::new()));
 
         factory
+    }
+
+    pub fn from_extension(ext: &str) -> Option<PackageFormat> {
+        match ext.trim_start_matches('.').to_lowercase().as_str() {
+            "deb" => Some(PackageFormat::Deb),
+            "rpm" => Some(PackageFormat::Rpm),
+            "pkg.tar.zst" | "pkg.tar.xz" | "db" => Some(PackageFormat::Pacman),
+            "ebuild" => Some(PackageFormat::Ebuild),
+            "apk" => Some(PackageFormat::Apk),
+            "nix" => Some(PackageFormat::Nix),
+            "flatpak" => Some(PackageFormat::Flatpak),
+            "snap" => Some(PackageFormat::Snap),
+            "appimage" => Some(PackageFormat::AppImage),
+            "xbps" => Some(PackageFormat::Xbps),
+            "txz" | "tgz" | "tar.gz" | "tar" | "xz" => Some(PackageFormat::TarArchive),
+            "eopkg" => Some(PackageFormat::Eopkg),
+            "zypper" => Some(PackageFormat::Zypper),
+            "scm" | "scm.in" => Some(PackageFormat::Guix),
+            "sigpkg" => Some(PackageFormat::Sigma),
+            "air" => Some(PackageFormat::Air),
+            "bottle" => Some(PackageFormat::Bottle),
+            "ipa" => Some(PackageFormat::Ipa),
+            "ports" => Some(PackageFormat::Ports),
+            "pkg" => Some(PackageFormat::Pkg),
+            "aab" => Some(PackageFormat::Aab),
+            "hap" => Some(PackageFormat::Hap),
+            "pisi" => Some(PackageFormat::Pisi),
+            "pup" => Some(PackageFormat::Pup),
+            "pet" => Some(PackageFormat::Pet),
+            "superdeb" => Some(PackageFormat::SuperDeb),
+            "lzm" => Some(PackageFormat::Lzm),
+            "nixpkg" => Some(PackageFormat::NixPkg),
+            "portage" => Some(PackageFormat::PortagePkg),
+            "app" => Some(PackageFormat::App),
+            _ => None,
+        }
     }
 
     pub fn register_parser(&mut self, parser: Box<dyn IPackageParser>) {
@@ -2720,5 +2919,43 @@ Description: Hook test";
             verifier.verify_authenticity(&bad_pkg2),
             Err("Invalid quantum-safe signature; signature tampered")
         );
+    }
+
+    #[test]
+    fn test_new_package_format_adapters() {
+        let test_cases: &[(PackageFormat, &[u8], &str, &str)] = &[
+            (PackageFormat::Air, b"AirPackage: test-air\nVersion: 1.0.0", "test-air", "air"),
+            (PackageFormat::Bottle, b"BottlePackage: test-bottle\nVersion: 2.1.0", "test-bottle", "bottle"),
+            (PackageFormat::Ipa, b"IpaPackage: test-ipa\nVersion: 14.0.0", "test-ipa", "ipa"),
+            (PackageFormat::Ports, b"PortsPackage: test-ports\nVersion: 1.0.0", "test-ports", "ports"),
+            (PackageFormat::Pkg, b"PkgPackage: test-pkg\nVersion: 1.0.0", "test-pkg", "pkg"),
+            (PackageFormat::Aab, b"AabPackage: test-aab\nVersion: 3.0.0", "test-aab", "aab"),
+            (PackageFormat::Hap, b"HapPackage: test-hap\nVersion: 1.0.0", "test-hap", "hap"),
+            (PackageFormat::Pisi, b"PisiPackage: test-pisi\nVersion: 2.0.0", "test-pisi", "pisi"),
+            (PackageFormat::Pup, b"PupPackage: test-pup\nVersion: 1.0.0", "test-pup", "pup"),
+            (PackageFormat::Pet, b"PetPackage: test-pet\nVersion: 1.0.0", "test-pet", "pet"),
+            (PackageFormat::SuperDeb, b"SuperDebPackage: test-superdeb\nVersion: 1.0.0", "test-superdeb", "superdeb"),
+            (PackageFormat::Lzm, b"LzmPackage: test-lzm\nVersion: 1.0.0", "test-lzm", "lzm"),
+            (PackageFormat::TarArchive, b"TarArchivePackage: test-tar\nVersion: 1.0.0", "test-tar", "tar.gz"),
+            (PackageFormat::NixPkg, b"NixPkgPackage: test-nixpkg\nVersion: 1.0.0", "test-nixpkg", "nixpkg"),
+            (PackageFormat::PortagePkg, b"PortagePkgPackage: test-portage\nVersion: 1.0.0", "test-portage", "portage"),
+            (PackageFormat::App, b"AppBundlePackage: test-app\nVersion: 1.0.0", "test-app", "app"),
+        ];
+
+        let factory = PackageParserFactory::new();
+
+        for &(fmt, raw_bytes, expected_name, ext) in test_cases {
+            assert_eq!(PackageParserFactory::from_extension(ext), Some(fmt));
+
+            let parser = factory.get_parser(fmt).expect("Parser should be registered");
+            assert!(parser.can_parse(raw_bytes), "Failed can_parse for format {:?}", fmt);
+
+            let pkg = parser.parse(raw_bytes).expect("Failed parse");
+            assert_eq!(pkg.name(), expected_name);
+            assert_eq!(pkg.format(), fmt);
+
+            let serialized = parser.serialize(pkg.as_ref()).expect("Failed serialize");
+            assert!(!serialized.is_empty());
+        }
     }
 }

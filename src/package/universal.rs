@@ -26,6 +26,23 @@ pub enum PackageFormat {
     Flatpak,  // flatpak sandbox
     AppImage, // AppImage single-file container
     SigmaPkg, // native SigmaOS format
+    Air,
+    Bottle,
+    Ipa,
+    Ports,
+    Pkg,
+    Aab,
+    Apk,
+    Hap,
+    Pisi,
+    Pup,
+    Pet,
+    SuperDeb,
+    Lzm,
+    TarArchive,
+    NixPkg,
+    PortagePkg,
+    App,
 }
 
 /// Package source

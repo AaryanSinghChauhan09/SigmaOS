@@ -23,6 +23,22 @@ pub enum PackageFormat {
     Nix,
     Apk,
     Xbps,
+    Air,
+    Bottle,
+    Ipa,
+    Ports,
+    Pkg,
+    Aab,
+    Hap,
+    Pisi,
+    Pup,
+    Pet,
+    SuperDeb,
+    Lzm,
+    TarArchive,
+    NixPkg,
+    PortagePkg,
+    App,
 }
 
 #[derive(Debug, Clone)]
@@ -407,6 +423,7 @@ impl PackageAdapterFactory {
             PackageFormat::Nix => std::boxed::Box::new(NixPackageAdapter),
             PackageFormat::Apk => std::boxed::Box::new(ApkPackageAdapter),
             PackageFormat::Xbps => std::boxed::Box::new(XbpsPackageAdapter::new(None)),
+            _ => std::boxed::Box::new(SovereignPackageAdapter),
         }
     }
 }
@@ -637,6 +654,27 @@ pub enum UniversalPackageType {
     Flatpak,
     Snap,
     Sovereign,
+    Air,
+    Bottle,
+    Ipa,
+    Ports,
+    Pkg,
+    Aab,
+    Apk,
+    Hap,
+    Pisi,
+    Pup,
+    Pet,
+    SuperDeb,
+    Lzm,
+    TarArchive,
+    NixPkg,
+    PortagePkg,
+    App,
+    Deb,
+    Rpm,
+    Pacman,
+    Ebuild,
 }
 
 // ==========================================
