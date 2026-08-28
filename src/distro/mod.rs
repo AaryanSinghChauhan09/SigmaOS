@@ -30,6 +30,7 @@ pub mod cachy;
 pub mod linux_bsd_parity_extended;
 pub mod wiki_ideas_implementation;
 pub mod missing_distro_innovations;
+pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
     PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
@@ -109,4 +110,9 @@ pub use missing_distro_innovations::{
     ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
     ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, AlpineApkWorldEngine,
     VoidXbpsEngine, VnetStack, FreeBsdVnetStackEngine, UnveilAuditViolation, OpenBsdUnveilAuditor,
+};
+pub use sovereign_distro_dominance::{
+    StorePackageSlice, NixGuixZeroCopyStore, TaskSchedState, SchedTask,
+    CachyBoreDynamicAiScheduler, CapsicumRight, OpenBsdHardenedCapsicumPledge,
+    CoWSubvolume, ZfsBtrfsHybridSelfHealingCoW, SovereignDistroDominanceSuite,
 };
