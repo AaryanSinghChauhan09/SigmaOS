@@ -95,23 +95,13 @@ where
         self.entries.insert(insert_idx, (key, value));
     }
 
-    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
-        for i in 0..self.entries.len() {
-            if self.entries[i].0 == key {
-                return Entry::Occupied(OccupiedEntry { map: self, index: i });
-            }
-        }
-        Entry::Vacant(VacantEntry { map: self, key })
-    }
-
     pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
     where
-        K: Borrow<Q>,
+        K: core::borrow::Borrow<Q>,
         Q: PartialEq,
     {
         for (k, v) in self.entries.iter() {
-            let b: &Q = k.borrow();
-            if b == key {
+            if k.borrow() == key {
                 return Some(v);
             }
         }
@@ -120,12 +110,11 @@ where
 
     pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
     where
-        K: Borrow<Q>,
+        K: core::borrow::Borrow<Q>,
         Q: PartialEq,
     {
         for (k, v) in self.entries.iter_mut() {
-            let b: &Q = (*k).borrow();
-            if b == key {
+            if (k as &K).borrow() == key {
                 return Some(v);
             }
         }
@@ -134,12 +123,11 @@ where
 
     pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
     where
-        K: Borrow<Q>,
+        K: core::borrow::Borrow<Q>,
         Q: PartialEq,
     {
         for i in 0..self.entries.len() {
-            let b: &Q = self.entries[i].0.borrow();
-            if b == key {
+            if self.entries[i].0.borrow() == key {
                 return Some(self.entries.remove(i).1);
             }
         }
@@ -160,7 +148,7 @@ where
 
     pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
     where
-        K: Borrow<Q>,
+        K: core::borrow::Borrow<Q>,
         Q: PartialEq,
     {
         self.get(key).is_some()

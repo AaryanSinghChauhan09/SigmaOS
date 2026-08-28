@@ -5,8 +5,7 @@ extern crate alloc;
 
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
+
 #[path = "../src/storage/geom.rs"]
 mod geom;
 #[path = "../src/audio/editor.rs"]
@@ -15,8 +14,11 @@ mod audio_editor;
 mod video_editor;
 #[path = "../src/compatibility/chimera_linux.rs"]
 mod chimera_linux;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
+use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
@@ -82,8 +84,9 @@ use sigmatools::*;
 use segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
 use process_activity_manager::{ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot};
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
-use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use process_activity_manager::{
+    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+};
 
 #[test]
 fn test_segmentation_paging_and_aslr() {
@@ -146,8 +149,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 #[test]
 fn test_process_activity_manager_and_registers() {
     let mut pam = ActivityManager::new();
-    pam.register_process(500, 1, "chrome", 0);
-    // pam.register_thread
+    pam.register_process(500, 0, "chrome", 0);
 
     pam.set_foreground_process(500).unwrap();
     let active_proc = pam.get_process_activity(500).unwrap();

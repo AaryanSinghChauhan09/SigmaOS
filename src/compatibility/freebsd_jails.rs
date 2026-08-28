@@ -74,7 +74,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let (config, jid) = if let Some(jail) = self.jails.get_mut(name) {
+        let (jid, config) = if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -85,7 +85,7 @@ impl SigmaJailManager {
             let jid = self.next_jid;
             self.next_jid += 1;
             jail.jid = Some(jid);
-            (jail.config.clone(), jid)
+            (jid, jail.config.clone())
         } else {
             return Err(format!("Jail '{}' not found", name).into());
         };
@@ -103,7 +103,7 @@ impl SigmaJailManager {
 
         // Execute startup script
         if let Some(exec_start) = &config.exec_start {
-            self.execute_in_jail(jid, exec_start)?;
+            self.execute_in_jail(jid, &exec_start)?;
         }
 
         if let Some(jail) = self.jails.get_mut(name) {

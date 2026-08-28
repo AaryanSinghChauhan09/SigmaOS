@@ -100,7 +100,9 @@ impl TransactionLog {
         if let Some(idx) = self.current_transaction {
             // Mark all pending entries as completed
             for i in idx..self.entries.len() {
-                self.entries[i].state = TransactionState::Completed;
+                if let Some(entry) = self.entries.get_mut(i) {
+                    entry.state = TransactionState::Completed;
+                }
             }
             self.current_transaction = None;
             Ok(())
@@ -114,7 +116,9 @@ impl TransactionLog {
         if let Some(idx) = self.current_transaction {
             // Mark all entries as rolled back
             for i in idx..self.entries.len() {
-                self.entries[i].state = TransactionState::RolledBack;
+                if let Some(entry) = self.entries.get_mut(i) {
+                    entry.state = TransactionState::RolledBack;
+                }
             }
             self.current_transaction = None;
             Ok(())

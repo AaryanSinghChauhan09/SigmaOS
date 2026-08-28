@@ -177,16 +177,17 @@ pub struct MageiaUrpmiEngine;
 impl MageiaUrpmiEngine {
     pub fn new() -> Self {
         let mut db = HashMap::new();
-        let mut kde_deps = Vec::new();
-        kde_deps.push(String::from("plasma-workspace"));
-        kde_deps.push(String::from("sddm"));
-        kde_deps.push(String::from("kwin"));
-        db.insert(String::from("mageia-kde-desktop"), kde_deps);
+        let mut deps1 = Vec::new();
+        deps1.push(String::from("plasma-workspace"));
+        deps1.push(String::from("sddm"));
+        deps1.push(String::from("kwin"));
+        db.insert(String::from("mageia-kde-desktop"), deps1);
 
-        let mut plasma_deps = Vec::new();
-        plasma_deps.push(String::from("qtbase"));
-        plasma_deps.push(String::from("kf5-kio"));
-        db.insert(String::from("plasma-workspace"), plasma_deps);
+        let mut deps2 = Vec::new();
+        deps2.push(String::from("qtbase"));
+        deps2.push(String::from("kf5-kio"));
+        db.insert(String::from("plasma-workspace"), deps2);
+
         Self { package_database: db }
     }
 
