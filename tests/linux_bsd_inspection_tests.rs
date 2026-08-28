@@ -750,3 +750,28 @@ fn test_arch_wiki_knowledge_base_engine_inspection() {
     assert_eq!(zfs_matches.len(), 1);
     assert_eq!(zfs_matches[0].title, "ZFS");
 }
+
+#[test]
+fn test_sovereign_swap_engine_zram_and_priority_inspection() {
+    use linux_bsd_innovations::SovereignSwapEngine;
+
+    let mut swap = SovereignSwapEngine::new(100);
+    swap.add_swap_device("/dev/zram0", 100, 50);
+    swap.add_swap_device("/dev/nvme0n1p2", 10, 50);
+
+    // Highest priority device selected
+    assert_eq!(swap.swap_devices[0].device_name, "/dev/zram0");
+    assert_eq!(swap.swap_devices[0].priority, 100);
+
+    // ZRAM in-memory compression/decompression
+    let raw_page = vec![0x12, 0x34, 0x56, 0x78];
+    let compressed_size = swap.zram_compress_and_page(0x7fff0000, &raw_page).unwrap();
+    assert_eq!(compressed_size, 4);
+
+    let decompressed = swap.zram_decompress_and_restore(0x7fff0000).unwrap();
+    assert_eq!(decompressed, raw_page);
+
+    // Swappiness eviction check
+    swap.swappiness = 80;
+    assert!(swap.should_evict_page(15)); // 15% free RAM < (100 - 80 = 20%) -> evict!
+}

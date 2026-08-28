@@ -86,7 +86,7 @@ pub use linux_bsd_innovations::{
     MicrokernelTranslatorRegistry, HurdTranslator, NanokernelHardwareBroker, NanokernelIrq,
     SovereignZonesManager, SovereignZone, KmdfDriver, KmdfPnpState, KmdfPowerState, KmdfIoRequest,
     AndroidBinderIpc, BinderNode, GcdDispatchQueue, GcdPriority, GcdTask, EbpfRuntime, EbpfInstruction,
-    HammerHistoryFilesystem, HammerBlockTransaction, CarpSecurityRouter, SovereignSwapEngine, SwapPage,
+    HammerHistoryFilesystem, HammerBlockTransaction, CarpSecurityRouter, SovereignSwapEngine, SwapPage, ZramCompressedPage, SwapDeviceConfig,
     SovereignNamespaceContainer, NamespaceType, SovereignEventReactor, ReactorRegistration, ReactorEvent,
     HybridKernelManager, NtExecutiveService, MicrokernelCore, ExokernelHardwareMultiplexer, ResourceBinding,
     NetBsdRumpKernel, RumpComponent, DynamicLkmLoader, KernelModule, CapabilityDerivationTree, KernelCapability,

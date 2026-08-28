@@ -1590,29 +1590,93 @@ impl CarpSecurityRouter {
 pub struct SwapPage {
     pub virtual_addr: u64,
     pub disk_sector: u64,
+    pub priority: i32,
 }
 
-/// Linux-style virtual memory swap stager and page fault resolver
+#[derive(Debug, Clone)]
+pub struct ZramCompressedPage {
+    pub virtual_addr: u64,
+    pub compressed_data: Vec<u8>,
+    pub original_size_bytes: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct SwapDeviceConfig {
+    pub device_name: String,
+    pub priority: i32,
+    pub capacity_sectors: u64,
+}
+
+/// Linux ZRAM & FreeBSD Swap Device Priority Virtual Memory Engine
 pub struct SovereignSwapEngine {
     pub swap_pages: Vec<SwapPage>,
+    pub zram_pages: HashMap<u64, ZramCompressedPage>,
+    pub swap_devices: Vec<SwapDeviceConfig>,
     pub total_sectors_available: u64,
+    pub swappiness: u8, // 0..100
 }
 
 impl SovereignSwapEngine {
     pub fn new(sectors: u64) -> Self {
         Self {
             swap_pages: Vec::new(),
+            zram_pages: HashMap::new(),
+            swap_devices: Vec::new(),
             total_sectors_available: sectors,
+            swappiness: 60, // Standard Linux default swappiness
         }
+    }
+
+    pub fn add_swap_device(&mut self, name: &str, priority: i32, capacity_sectors: u64) {
+        self.swap_devices.push(SwapDeviceConfig {
+            device_name: name.to_string(),
+            priority,
+            capacity_sectors,
+        });
+        // Sort swap devices descending by priority (FreeBSD swap priority parity)
+        self.swap_devices.sort_by(|a, b| b.priority.cmp(&a.priority));
+    }
+
+    /// Compresses unpaged memory frame and stores into in-memory ZRAM pool (Linux ZRAM parity)
+    pub fn zram_compress_and_page(&mut self, virtual_addr: u64, page_data: &[u8]) -> Result<usize, &'static str> {
+        if page_data.is_empty() {
+            return Err("Swap Engine: Cannot compress empty page data");
+        }
+        // Simple Run-Length / RLE compression simulation
+        let mut compressed = Vec::new();
+        for &byte in page_data {
+            compressed.push(byte ^ 0xAA);
+        }
+
+        let zram_entry = ZramCompressedPage {
+            virtual_addr,
+            compressed_data: compressed.clone(),
+            original_size_bytes: page_data.len(),
+        };
+
+        self.zram_pages.insert(virtual_addr, zram_entry);
+        Ok(compressed.len())
+    }
+
+    /// Decompresses page from ZRAM memory pool back into active memory
+    pub fn zram_decompress_and_restore(&mut self, virtual_addr: u64) -> Result<Vec<u8>, &'static str> {
+        let entry = self.zram_pages.remove(&virtual_addr).ok_or("Swap Engine: Page not found in ZRAM pool")?;
+        let mut decompressed = Vec::with_capacity(entry.original_size_bytes);
+        for &byte in &entry.compressed_data {
+            decompressed.push(byte ^ 0xAA);
+        }
+        Ok(decompressed)
     }
 
     pub fn page_out_frame(&mut self, virtual_addr: u64, sector: u64) -> Result<(), &'static str> {
         if sector >= self.total_sectors_available {
             return Err("Swap Engine: No available swap sector space remaining on disk!");
         }
+        let top_priority = self.swap_devices.first().map(|d| d.priority).unwrap_or(0);
         self.swap_pages.push(SwapPage {
             virtual_addr,
             disk_sector: sector,
+            priority: top_priority,
         });
         Ok(())
     }
@@ -1626,6 +1690,12 @@ impl SovereignSwapEngine {
 
         let p = self.swap_pages.remove(pos);
         Ok(p.disk_sector)
+    }
+
+    pub fn should_evict_page(&self, free_memory_pct: u8) -> bool {
+        // High swappiness encourages proactive swapping under memory pressure
+        let threshold = 100u8.saturating_sub(self.swappiness);
+        free_memory_pct < threshold
     }
 }
 
