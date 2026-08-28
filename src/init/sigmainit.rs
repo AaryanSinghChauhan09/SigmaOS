@@ -28,14 +28,48 @@ pub enum ServiceState {
     Failed,
 }
 
-/// System target
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// System target (Systemd targets & SysVInit / OpenRC runlevel parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SystemTarget {
-    Rescue,        // Single-user mode
-    MultiUser,     // Console login
-    Graphical,     // Desktop environment
-    Cloud,         // Cloud/headless mode
-    Realtime,      // Real-time mode
+    Emergency,      // Emergency mode: Minimal read-only rootfs recovery shell
+    Rescue,         // Runlevel 1 / Single-user mode: Single-user maintenance
+    MultiUserNoNet, // Runlevel 2: Multi-user text console without networking
+    MultiUser,      // Runlevel 3: Standard multi-user text console with networking
+    Graphical,      // Runlevel 5: Multi-user graphical desktop environment
+    Cloud,          // Headless cloud-init server profile
+    Realtime,       // Hard real-time audio/HPC workload profile
+    Reboot,         // Runlevel 6: System reboot
+    Poweroff,       // Runlevel 0: System shutdown / poweroff
+}
+
+impl SystemTarget {
+    pub fn to_runlevel_number(&self) -> u8 {
+        match self {
+            SystemTarget::Poweroff => 0,
+            SystemTarget::Emergency => 1,
+            SystemTarget::Rescue => 1,
+            SystemTarget::MultiUserNoNet => 2,
+            SystemTarget::MultiUser => 3,
+            SystemTarget::Cloud => 3,
+            SystemTarget::Realtime => 4,
+            SystemTarget::Graphical => 5,
+            SystemTarget::Reboot => 6,
+        }
+    }
+
+    pub fn to_target_name(&self) -> &'static str {
+        match self {
+            SystemTarget::Emergency => "emergency.target",
+            SystemTarget::Rescue => "rescue.target",
+            SystemTarget::MultiUserNoNet => "multi-user-nonet.target",
+            SystemTarget::MultiUser => "multi-user.target",
+            SystemTarget::Graphical => "graphical.target",
+            SystemTarget::Cloud => "cloud.target",
+            SystemTarget::Realtime => "realtime.target",
+            SystemTarget::Reboot => "reboot.target",
+            SystemTarget::Poweroff => "poweroff.target",
+        }
+    }
 }
 
 /// Service definition
@@ -248,32 +282,61 @@ impl Supervisor {
         self.services.get(name).map(|s| s.state)
     }
     
+    pub fn start_service_if_exists(&mut self, name: &str) -> Result<(), ServiceError> {
+        if self.services.contains_key(name) {
+            self.start_service(name)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub fn stop_all_services(&mut self) -> Result<(), ServiceError> {
+        let order_opt = self.dependency_graph.topological_sort().ok();
+        if let Some(order) = order_opt {
+            for service_name in order.into_iter().rev() {
+                let _ = self.stop_service(&service_name);
+            }
+        }
+        Ok(())
+    }
+
     pub fn start_target(&mut self, target: SystemTarget) -> Result<(), ServiceError> {
         match target {
+            SystemTarget::Emergency => {
+                self.start_service_if_exists("emergency-shell")?;
+            }
             SystemTarget::Rescue => {
-                self.start_service("syslog")?;
-                self.start_service(" rescue-shell")?;
+                self.start_service_if_exists("syslog")?;
+                self.start_service_if_exists("rescue-shell")?;
+            }
+            SystemTarget::MultiUserNoNet => {
+                self.start_service_if_exists("syslog")?;
+                self.start_service_if_exists("dbus")?;
+                self.start_service_if_exists("local-console")?;
             }
             SystemTarget::MultiUser => {
-                self.start_service("syslog")?;
-                self.start_service("network")?;
-                self.start_service("sshd")?;
-                self.start_service("cron")?;
+                self.start_service_if_exists("syslog")?;
+                self.start_service_if_exists("network")?;
+                self.start_service_if_exists("sshd")?;
+                self.start_service_if_exists("cron")?;
             }
             SystemTarget::Graphical => {
                 self.start_target(SystemTarget::MultiUser)?;
-                self.start_service("display-manager")?;
-                self.start_service("desktop-environment")?;
+                self.start_service_if_exists("display-manager")?;
+                self.start_service_if_exists("desktop-environment")?;
             }
             SystemTarget::Cloud => {
-                self.start_service("syslog")?;
-                self.start_service("network")?;
-                self.start_service("cloud-init")?;
-                self.start_service("sshd")?;
+                self.start_service_if_exists("syslog")?;
+                self.start_service_if_exists("network")?;
+                self.start_service_if_exists("cloud-init")?;
+                self.start_service_if_exists("sshd")?;
             }
             SystemTarget::Realtime => {
-                self.start_service("syslog")?;
-                self.start_service("realtime-scheduler")?;
+                self.start_service_if_exists("syslog")?;
+                self.start_service_if_exists("realtime-scheduler")?;
+            }
+            SystemTarget::Reboot | SystemTarget::Poweroff => {
+                self.stop_all_services()?;
             }
         }
         Ok(())
@@ -288,13 +351,16 @@ pub enum ServiceError {
     DependencyFailed,
     StartFailed,
     StopFailed,
+    AuthenticationRequired,
+    TargetTransitionFailed,
 }
 
 /// Main SigmaInit manager
 pub struct SigmaInit {
-    supervisor: Supervisor,
-    current_target: SystemTarget,
-    boot_complete: AtomicBool,
+    pub supervisor: Supervisor,
+    pub current_target: SystemTarget,
+    pub boot_complete: AtomicBool,
+    pub rescue_authenticated: bool,
 }
 
 impl SigmaInit {
@@ -303,6 +369,16 @@ impl SigmaInit {
             supervisor: Supervisor::new(),
             current_target: SystemTarget::MultiUser,
             boot_complete: AtomicBool::new(false),
+            rescue_authenticated: false,
+        }
+    }
+
+    pub fn authenticate_rescue(&mut self, provided_secret: &str, expected_secret: &str) -> bool {
+        if provided_secret == expected_secret {
+            self.rescue_authenticated = true;
+            true
+        } else {
+            false
         }
     }
     
@@ -347,9 +423,34 @@ impl SigmaInit {
     }
     
     pub fn switch_target(&mut self, target: SystemTarget) -> Result<(), ServiceError> {
-        self.supervisor.start_target(target)?;
+        if target == SystemTarget::Rescue || target == SystemTarget::Emergency {
+            if !self.rescue_authenticated {
+                return Err(ServiceError::AuthenticationRequired);
+            }
+        }
+
+        let previous_target = self.current_target;
+        if let Err(e) = self.supervisor.start_target(target) {
+            // Target transition failed! Rollback to previous target
+            let _ = self.supervisor.start_target(previous_target);
+            self.current_target = previous_target;
+            return Err(ServiceError::TargetTransitionFailed);
+        }
+
         self.current_target = target;
         Ok(())
+    }
+
+    /// Isolates a system target (`systemctl isolate` parity), stopping non-target units first
+    pub fn isolate_target(&mut self, target: SystemTarget) -> Result<(), ServiceError> {
+        if target == SystemTarget::Rescue || target == SystemTarget::Emergency {
+            if !self.rescue_authenticated {
+                return Err(ServiceError::AuthenticationRequired);
+            }
+        }
+
+        self.supervisor.stop_all_services()?;
+        self.switch_target(target)
     }
 }
 
@@ -362,6 +463,7 @@ impl Default for SigmaInit {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_service_creation() {
@@ -436,5 +538,48 @@ mod tests {
         
         assert!(init.boot(SystemTarget::MultiUser).is_ok());
         assert!(init.is_boot_complete());
+    }
+
+    #[test]
+    fn test_system_target_runlevels_and_names() {
+        assert_eq!(SystemTarget::Poweroff.to_runlevel_number(), 0);
+        assert_eq!(SystemTarget::Rescue.to_runlevel_number(), 1);
+        assert_eq!(SystemTarget::MultiUserNoNet.to_runlevel_number(), 2);
+        assert_eq!(SystemTarget::MultiUser.to_runlevel_number(), 3);
+        assert_eq!(SystemTarget::Graphical.to_runlevel_number(), 5);
+        assert_eq!(SystemTarget::Reboot.to_runlevel_number(), 6);
+
+        assert_eq!(SystemTarget::Graphical.to_target_name(), "graphical.target");
+        assert_eq!(SystemTarget::Rescue.to_target_name(), "rescue.target");
+    }
+
+    #[test]
+    fn test_rescue_mode_authentication_gate() {
+        let mut init = SigmaInit::new();
+        assert_eq!(init.switch_target(SystemTarget::Rescue), Err(ServiceError::AuthenticationRequired));
+
+        assert!(init.authenticate_rescue("secret_pass", "secret_pass"));
+        assert!(init.switch_target(SystemTarget::Rescue).is_ok());
+        assert_eq!(init.current_target, SystemTarget::Rescue);
+    }
+
+    #[test]
+    fn test_target_isolation_and_switching() {
+        let mut init = SigmaInit::new();
+
+        let syslog = Service::new("syslog").with_command(vec![String::from("/bin/syslog")]);
+        let network = Service::new("network").with_command(vec![String::from("/bin/network")]);
+        let dm = Service::new("display-manager").with_command(vec![String::from("/bin/dm")]);
+
+        init.load_services(vec![syslog, network, dm]);
+
+        // Boot into MultiUser
+        assert!(init.switch_target(SystemTarget::MultiUser).is_ok());
+        assert_eq!(init.supervisor.get_service_state("syslog"), Some(ServiceState::Running));
+
+        // Isolate Graphical target
+        assert!(init.isolate_target(SystemTarget::Graphical).is_ok());
+        assert_eq!(init.current_target, SystemTarget::Graphical);
+        assert_eq!(init.supervisor.get_service_state("display-manager"), Some(ServiceState::Running));
     }
 }
