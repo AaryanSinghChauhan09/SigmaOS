@@ -356,8 +356,8 @@ mod tests {
     #[test]
     fn test_fat32_lba_mounting() {
         let mut dos = FreeDosEmulator::new();
-        dos.mount_fat32_volume(Path::new("C:\\"));
-        let files = dos.list_fat_directory(Path::new("C:\\"));
+        dos.mount_fat32_volume(&crate::klib::path::PathBuf::from("C:\\"));
+        let files = dos.list_fat_directory(&crate::klib::path::PathBuf::from("C:\\"));
         assert_eq!(files.len(), 3);
         assert!(files[0].contains("COMMAND"));
         assert!(files[0].contains("COM"));

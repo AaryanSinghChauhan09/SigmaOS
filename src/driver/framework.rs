@@ -21,18 +21,24 @@ pub enum DriverType {
     Gpu,
 }
 
+#[repr(usize)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum DriverState {
-    Unloaded,
-    Active,
-    Failed,
+    Unloaded = 0,
+    Active = 1,
+    Failed = 2,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum DriverError {
+    Success,
     LoadFailed,
     UnloadFailed,
     NotFound,
+    InvalidDevice,
+    IrpNotHandled,
+    InvalidParameter,
+    AccessDenied,
 }
 
 pub trait Driver {
@@ -535,7 +541,7 @@ mod tests {
         );
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Loaded);
+        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
 
         framework.unload_driver(101).unwrap();
         assert_eq!(

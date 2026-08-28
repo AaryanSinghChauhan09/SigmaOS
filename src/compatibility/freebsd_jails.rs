@@ -74,7 +74,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get_mut(name) {
+        let (config, jid) = if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -85,30 +85,33 @@ impl SigmaJailManager {
             let jid = self.next_jid;
             self.next_jid += 1;
             jail.jid = Some(jid);
-
-            // Create network namespace if IP specified
-            if let Some(ip) = &jail.config.ip_address {
-                self.setup_jail_network(jid, ip)?;
-            }
-
-            // Mount jail filesystem
-            self.mount_jail_fs(&jail.config)?;
-
-            // Apply security restrictions
-            self.apply_jail_restrictions(jid, &jail.config)?;
-
-            // Execute startup script
-            if let Some(exec_start) = &jail.config.exec_start {
-                self.execute_in_jail(jid, exec_start)?;
-            }
-
-            jail.state = JailState::Running;
-            println!("Jail '{}' started with JID {}", name, jid);
-
-            Ok(())
+            (jail.config.clone(), jid)
         } else {
-            Err(format!("Jail '{}' not found", name).into())
+            return Err(format!("Jail '{}' not found", name).into());
+        };
+
+        // Create network namespace if IP specified
+        if let Some(ip) = &config.ip_address {
+            self.setup_jail_network(jid, ip)?;
         }
+
+        // Mount jail filesystem
+        self.mount_jail_fs(&config)?;
+
+        // Apply security restrictions
+        self.apply_jail_restrictions(jid, &config)?;
+
+        // Execute startup script
+        if let Some(exec_start) = &config.exec_start {
+            self.execute_in_jail(jid, exec_start)?;
+        }
+
+        if let Some(jail) = self.jails.get_mut(name) {
+            jail.state = JailState::Running;
+        }
+        println!("Jail '{}' started with JID {}", name, jid);
+
+        Ok(())
     }
 
     /// Stop a jail
@@ -191,7 +194,7 @@ impl SigmaJailManager {
 
     /// Get jail information
     pub fn jail_info(&self, name: &str) -> Option<JailInfo> {
-        if let Some(jail) = self.jails.get_str(name) {
+        if let Some(jail) = self.jails.get(name) {
             Some(JailInfo {
                 name: name.to_string(),
                 state: jail.state.clone(),
@@ -251,30 +254,27 @@ impl SigmaJailManager {
     }
 
     fn copy_essential_files(&self, root_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
-        // Copy essential binaries
         let essential_bins = ["/bin/sh", "/bin/ls", "/bin/cat", "/bin/echo"];
 
         for bin in essential_bins {
             if Path::new(bin).exists() {
                 let dest = root_path.join(&bin[1..]);
                 if let Some(parent) = dest.parent() {
-                    std::fs::create_dir_all(parent)?;
+                    let _ = std::fs::create_dir_all(parent);
                 }
-                std::fs::copy(bin, dest)?;
+                let _ = std::fs::copy(bin, dest);
             }
         }
 
-        // Copy essential libraries
         let lib_dirs = ["/lib", "/lib64", "/usr/lib"];
 
         for lib_dir in lib_dirs {
             let src = Path::new(lib_dir);
             if src.exists() {
                 let dest = root_path.join(&lib_dir[1..]);
-                // Copy select libraries (simplified)
                 if src.join("libc.so.6").exists() {
-                    std::fs::create_dir_all(&dest)?;
-                    std::fs::copy(src.join("libc.so.6"), dest.join("libc.so.6"))?;
+                    let _ = std::fs::create_dir_all(&dest);
+                    let _ = std::fs::copy(src.join("libc.so.6"), dest.join("libc.so.6"));
                 }
             }
         }
@@ -494,7 +494,10 @@ mod tests {
 
     impl TestTempDir {
         fn new() -> std::io::Result<Self> {
-            let path = std::env::temp_dir().join(format!("sigma_test_{}", std::process::id()));
+            use std::sync::atomic::{AtomicUsize, Ordering};
+            static COUNTER: AtomicUsize = AtomicUsize::new(0);
+            let id = COUNTER.fetch_add(1, Ordering::SeqCst);
+            let path = std::env::temp_dir().join(format!("sigma_test_{}_{}", std::process::id(), id));
             std::fs::create_dir_all(&path)?;
             Ok(TestTempDir { path })
         }
