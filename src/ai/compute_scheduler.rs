@@ -2,6 +2,7 @@ extern crate alloc;
 // Heterogeneous AI Compute Task Scheduler for SigmaOS
 // Inspired by Linux cgroups v2 resource limits and FreeBSD SCHED_ULE multi-queue scheduling.
 
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

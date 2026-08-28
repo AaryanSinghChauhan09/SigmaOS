@@ -263,6 +263,40 @@ impl Default for RecipeManager {
     }
 }
 
+/// Kernel header sysroot manager for cross-distro package compilation compatibility
+#[derive(Debug, Clone)]
+pub struct KernelHeaderSysroot {
+    pub include_path: String,
+    pub active_headers: Vec<String>,
+}
+
+impl KernelHeaderSysroot {
+    pub fn default_sysroot() -> Self {
+        Self {
+            include_path: "include/".to_string(),
+            active_headers: vec![
+                "sigma_kernel.h".to_string(),
+                "sigma_abi.h".to_string(),
+                "sigma_kmod.h".to_string(),
+                "sigma_vfs.h".to_string(),
+                "sigma_net.h".to_string(),
+                "sigma_sched.h".to_string(),
+            ],
+        }
+    }
+
+    pub fn validate_sysroot_headers(&self) -> bool {
+        self.active_headers.iter().all(|hdr| {
+            let path = format!("{}{}", self.include_path, hdr);
+            std::path::Path::new(&path).exists()
+        })
+    }
+
+    pub fn get_cflags(&self) -> String {
+        format!("-I{} -D__SIGMAOS_KERNEL__", self.include_path)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -357,5 +391,12 @@ mod tests {
             recipe.get_stage_optimization_flags(),
             "-O3 -march=native -flto=fat -funroll-loops"
         );
+    }
+
+    #[test]
+    fn test_kernel_header_sysroot_package_compat() {
+        let sysroot = KernelHeaderSysroot::default_sysroot();
+        assert!(sysroot.validate_sysroot_headers());
+        assert_eq!(sysroot.get_cflags(), "-Iinclude/ -D__SIGMAOS_KERNEL__");
     }
 }

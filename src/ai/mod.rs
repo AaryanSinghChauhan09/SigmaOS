@@ -5,6 +5,8 @@
 
 
 
+extern crate alloc;
+
 pub mod agent;
 pub mod agentic_os_runtime;
 pub mod apm;

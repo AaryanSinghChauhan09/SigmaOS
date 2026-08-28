@@ -2,6 +2,7 @@ extern crate alloc;
 // Dynamic Matrix Quantization & Multi-Device Execution Fallback for SigmaOS
 // Inspired by vLLM, llama.cpp, and ROCm runtime fallback pipelines.
 
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
