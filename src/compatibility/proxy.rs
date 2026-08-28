@@ -842,7 +842,7 @@ mod tests {
         manager.register_syscall(entry);
 
         let translation = manager.translate(1).unwrap();
-        assert!(translation.contains("translated to replacement number 60"));
+        assert!(translation.contains("Translated to replacement number 60"));
     }
 
     #[test]

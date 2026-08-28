@@ -30,10 +30,13 @@ pub struct StandardStreamHandle {
     pub internal_buffer: Vec<u8>,
     pub redirected_fd: Option<i32>,
     pub is_closed: bool,
+    pub is_tty: bool,                // Linux isatty(3) / BSD tty capability
+    pub broken_stream_sigpipe: bool, // Linux EPIPE / SIGPIPE signal trigger
 }
 
 impl StandardStreamHandle {
     pub fn new(fd: i32, name: &str, buffer_mode: StreamBufferMode) -> Self {
+        let is_tty = fd >= 0 && fd <= 2; // Default 0, 1, 2 attached to interactive TTY
         Self {
             fd,
             name: name.to_string(),
@@ -41,11 +44,23 @@ impl StandardStreamHandle {
             internal_buffer: Vec::new(),
             redirected_fd: None,
             is_closed: false,
+            is_tty,
+            broken_stream_sigpipe: false,
+        }
+    }
+
+    /// Auto-detects optimal stream buffering mode (isatty ? LineBuffered : BlockBuffered)
+    pub fn auto_detect_buffering(&mut self) {
+        if self.is_tty {
+            self.buffer_mode = StreamBufferMode::LineBuffered;
+        } else {
+            self.buffer_mode = StreamBufferMode::BlockBuffered(4096);
         }
     }
 
     pub fn write_bytes(&mut self, data: &[u8]) -> Vec<u8> {
         if self.is_closed {
+            self.broken_stream_sigpipe = true; // Trigger SIGPIPE signal state on write to closed stream
             return Vec::new();
         }
         let mut flushed = Vec::new();
@@ -177,6 +192,33 @@ impl StandardStreamController {
         handle.buffer_mode = mode;
         Ok(())
     }
+
+    /// Linux stdbuf / setvbuf override parity
+    pub fn apply_stdbuf_override(&mut self, stdout_mode: StreamBufferMode, stderr_mode: StreamBufferMode) {
+        if let Some(stdout) = self.handles.get_mut(&STDOUT_FILENO) {
+            stdout.buffer_mode = stdout_mode;
+        }
+        if let Some(stderr) = self.handles.get_mut(&STDERR_FILENO) {
+            stderr.buffer_mode = stderr_mode;
+        }
+    }
+
+    /// Synchronizes and flushes all open standard stream buffers (fflush(NULL) parity)
+    pub fn flush_all(&mut self) -> BTreeMap<i32, Vec<u8>> {
+        let mut flushed_streams = BTreeMap::new();
+        for (fd, handle) in self.handles.iter_mut() {
+            let data = handle.flush();
+            if !data.is_empty() {
+                flushed_streams.insert(*fd, data);
+            }
+        }
+        flushed_streams
+    }
+
+    /// Linux isatty(3) / BSD tty query
+    pub fn isatty(&self, fd: i32) -> bool {
+        self.handles.get(&fd).map(|h| h.is_tty && !h.is_closed).unwrap_or(false)
+    }
 }
 
 impl Default for StandardStreamController {
@@ -240,5 +282,37 @@ mod tests {
 
         let spliced = router.splice_streams(&mut src, &mut dest, 100);
         assert_eq!(spliced, 20);
+    }
+
+    #[test]
+    fn test_stdbuf_isatty_flush_all_and_sigpipe() {
+        let mut controller = StandardStreamController::new();
+
+        // TTY query check
+        assert!(controller.isatty(STDOUT_FILENO));
+        assert!(controller.isatty(STDERR_FILENO));
+
+        // Auto-detect buffering
+        let mut pipe_handle = StandardStreamHandle::new(5, "pipe_out", StreamBufferMode::Unbuffered);
+        pipe_handle.is_tty = false;
+        pipe_handle.auto_detect_buffering();
+        assert_eq!(pipe_handle.buffer_mode, StreamBufferMode::BlockBuffered(4096));
+
+        // Linux stdbuf override
+        controller.apply_stdbuf_override(StreamBufferMode::Unbuffered, StreamBufferMode::LineBuffered);
+        assert_eq!(controller.handles.get(&STDOUT_FILENO).unwrap().buffer_mode, StreamBufferMode::Unbuffered);
+
+        // SIGPIPE signal trigger on closed stream write
+        pipe_handle.is_closed = true;
+        pipe_handle.write_bytes(b"doomed write");
+        assert!(pipe_handle.broken_stream_sigpipe);
+
+        // Multi-stream flush_all
+        let mut ctrl2 = StandardStreamController::new();
+        ctrl2.set_buffering(STDOUT_FILENO, StreamBufferMode::BlockBuffered(1024)).unwrap();
+        ctrl2.write_to_fd(STDOUT_FILENO, b"buffered_stdout").unwrap();
+        let flushed = ctrl2.flush_all();
+        assert!(flushed.contains_key(&STDOUT_FILENO));
+        assert_eq!(flushed.get(&STDOUT_FILENO).unwrap(), b"buffered_stdout");
     }
 }

@@ -1036,20 +1036,13 @@ mod tests {
     fn test_sovereign_device_manager_and_drivers() {
         let mut dev_mgr = SovereignDeviceManager::new();
 
-        let input_drv = SovereignInputDeviceDriver::new("keyboard0", 0x046D, 0xC077);
-        let gpu_drv = SovereignGpuDriver::new("radeon_rx6800", 16384);
-        let mut net_drv = SovereignNetworkCardDriver::new("eth0", [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
+        let bound_gpu = dev_mgr.auto_probe_pci_device(0x1002, 0x731F).unwrap();
+        let bound_net = dev_mgr.auto_probe_pci_device(0x8086, 0x125b).unwrap();
+        let bound_usb = dev_mgr.auto_probe_usb_device(0x056a, 0x037a).unwrap();
 
-        net_drv.transmit_packet(b"ping_packet");
-        assert_eq!(net_drv.tx_queue.len(), 1);
-
-        dev_mgr.register_input_device(input_drv);
-        dev_mgr.register_gpu_device(gpu_drv);
-        dev_mgr.register_net_device(net_drv);
-
-        assert_eq!(dev_mgr.total_bound_devices(), 3);
-        assert!(dev_mgr.input_drivers[0].is_bound);
-        assert!(dev_mgr.gpu_drivers[0].is_bound);
-        assert!(dev_mgr.net_drivers[0].is_bound);
+        assert_eq!(dev_mgr.bound_drivers.len(), 3);
+        assert_eq!(bound_gpu, "AMDGPU DRM/KMS Driver");
+        assert_eq!(bound_net, "Intel igc 2.5GbE Ethernet Driver");
+        assert_eq!(bound_usb, "Wacom Precision Tablet Driver");
     }
 }

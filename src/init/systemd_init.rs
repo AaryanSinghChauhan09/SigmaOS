@@ -294,9 +294,9 @@ impl SystemdEngine {
         &self,
         unit_ids: &SystemdVec<UnitID>,
     ) -> Result<SystemdVec<UnitID>, &'static str> {
-        let mut sorted = Vec::new();
-        let mut visiting = Vec::new();
-        let mut visited = Vec::new();
+        let mut sorted = SystemdVec::new();
+        let mut visiting = SystemdVec::new();
+        let mut visited = SystemdVec::new();
 
         for &id in unit_ids.iter() {
             if !visited.contains(&id) {
@@ -310,9 +310,9 @@ impl SystemdEngine {
         &self,
         id: UnitID,
         all_ids: &[UnitID],
-        sorted: &mut Vec<UnitID>,
-        visiting: &mut Vec<UnitID>,
-        visited: &mut Vec<UnitID>,
+        sorted: &mut SystemdVec<UnitID>,
+        visiting: &mut SystemdVec<UnitID>,
+        visited: &mut SystemdVec<UnitID>,
     ) -> Result<(), &'static str> {
         if visiting.contains(&id) {
             return Err("Dependency cycle detected");
@@ -323,11 +323,23 @@ impl SystemdEngine {
 
         visiting.push(id);
 
-        if let Some(unit) = self.find_unit(id) {
-            for &before_id in unit.before.iter() {
-                if all_ids.contains(&before_id) && !visited.contains(&before_id) {
-                    self.topo_visit(before_id, all_ids, sorted, visiting, visited)?;
+        for &other_id in all_ids.iter() {
+            if other_id == id {
+                continue;
+            }
+            let mut is_prereq = false;
+            if let Some(unit) = self.find_unit(id) {
+                if unit.after.contains(&other_id) {
+                    is_prereq = true;
                 }
+            }
+            if let Some(other_unit) = self.find_unit(other_id) {
+                if other_unit.before.contains(&id) {
+                    is_prereq = true;
+                }
+            }
+            if is_prereq && !visited.contains(&other_id) {
+                self.topo_visit(other_id, all_ids, sorted, visiting, visited)?;
             }
         }
 
@@ -340,7 +352,7 @@ impl SystemdEngine {
     pub fn systemctl_start(&mut self, id: UnitID) -> Result<(), &'static str> {
         let (is_enabled, conflicts, requires, wants) = if let Some(u) = self.find_unit(id) {
             (
-                u.enabled,
+                u.is_enabled,
                 u.conflicts.clone(),
                 u.requires.clone(),
                 u.wants.clone(),
@@ -629,7 +641,7 @@ impl SystemdEngine {
     }
 
     pub fn systemd_analyze_blame(&self) -> SystemdVec<(UnitID, u64)> {
-        let mut blame_list = Vec::new();
+        let mut blame_list = SystemdVec::new();
         for unit in self.units.iter() {
             if unit.state == UnitState::Active {
                 blame_list.push((unit.id, unit.duration_ms));
@@ -664,6 +676,17 @@ pub struct SystemdVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> core::ops::Deref for SystemdVec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
 }
 
 impl<T: PartialEq> SystemdVec<T> {

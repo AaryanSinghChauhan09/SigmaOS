@@ -121,7 +121,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: ContainerCapability::full(),
+            capability: RuntimeCapability::full(),
         }
     }
 }
@@ -886,7 +886,7 @@ mod tests {
             .create_container(
                 b"sovereign_container",
                 b"ubuntu-pqc",
-                ContainerCapability::full(),
+                RuntimeCapability::full(),
             )
             .unwrap();
         assert_eq!(id, 1);
@@ -932,7 +932,7 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            ContainerCapability::full(),
+            RuntimeCapability::full(),
         );
         container.seccomp = SeccompProfile {
             default_action: SeccompAction::Allow,

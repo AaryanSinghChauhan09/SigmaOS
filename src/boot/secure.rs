@@ -181,9 +181,9 @@ mod additional_secure_boot_tests {
     #[test]
     fn test_unified_kernel_image_signing_and_hashing() {
         let mut uki = UnifiedKernelImage::new(
-            crate::klib::Vec::new(),
-            crate::klib::Vec::new(),
-            crate::klib::Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
         );
 
         uki.kernel_payload.push(0xDE);

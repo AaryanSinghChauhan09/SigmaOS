@@ -182,7 +182,11 @@ impl UniversalPackageAdapter {
         Ok(PacmanPkgbuild {
             pkgname,
             pkgver,
+            pkgdesc: String::new(),
+            arch: Vec::new(),
             depends,
+            makedepends: Vec::new(),
+            source_urls: Vec::new(),
         })
     }
 
@@ -317,8 +321,16 @@ impl UniversalPackageAdapter {
             version_str
         };
 
+        let mut semver_str = cleaned_ver.to_string();
+        let dot_count = semver_str.chars().filter(|&c| c == '.').count();
+        if dot_count == 0 {
+            semver_str.push_str(".0.0");
+        } else if dot_count == 1 {
+            semver_str.push_str(".0");
+        }
+
         let parsed_ver =
-            Version::parse(cleaned_ver).map_err(|_| "Failed to parse semver representation")?;
+            Version::parse(&semver_str).map_err(|_| "Failed to parse semver representation")?;
 
         let mut dependencies = Vec::new();
         for dep in raw_deps {
@@ -328,13 +340,13 @@ impl UniversalPackageAdapter {
             });
         }
 
-        Ok(Package {
-            name: name.to_string(),
-            version: parsed_ver,
-            description: desc.to_string(),
+        Ok(Package::new(
+            name.to_string(),
+            parsed_ver,
+            desc.to_string(),
             dependencies,
-            checksum: format!("SHA256:{}", name),
-        })
+            format!("SHA256:{}", name),
+        ))
     }
 }
 

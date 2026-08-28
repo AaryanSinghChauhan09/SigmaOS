@@ -502,17 +502,20 @@ impl SovereignWorkflowEngine {
 
     /// Executes sequential nodes of the DAG pipeline safely (n8n style)
     pub fn execute_workflow(&mut self) -> Result<usize, &'static str> {
-        let mut executed_count = 0;
         let node_len = self.nodes.len();
+        let prev_executed: Vec<bool> = self.nodes.iter().map(|n| n.state_executed).collect();
 
         for i in 0..node_len {
-            // Check if independent or its dependency was already executed
+            if self.nodes[i].state_executed {
+                continue;
+            }
+
             let can_execute = match self.nodes[i].depends_on {
                 None => true,
                 Some(dep_id) => {
                     let mut dep_ok = false;
                     for j in 0..node_len {
-                        if self.nodes[j].id == dep_id && self.nodes[j].state_executed {
+                        if self.nodes[j].id == dep_id && prev_executed[j] {
                             dep_ok = true;
                             break;
                         }
@@ -523,9 +526,9 @@ impl SovereignWorkflowEngine {
 
             if can_execute {
                 self.nodes[i].state_executed = true;
-                executed_count += 1;
             }
         }
+        let executed_count = self.nodes.iter().filter(|n| n.state_executed).count();
         Ok(executed_count)
     }
 }

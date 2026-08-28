@@ -75,6 +75,9 @@ pub mod mock_subsystem {
     pub enum IoOperation {
         Read { offset: u64, size: usize },
         Write { offset: u64, data: Vec<u8> },
+        Ioctl { cmd: u32, arg: u64 },
+        Mmap { length: usize, prot: u32 },
+        Poll { events: u16 },
     }
 
     #[derive(Debug, Clone)]

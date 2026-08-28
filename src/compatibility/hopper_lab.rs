@@ -107,10 +107,10 @@ impl ReleaseEngine {
     pub fn negotiate_kernel_profile(&self) -> &'static str {
         match self.current_stream {
             ReleaseStream::StableLts => {
-                "Kernel Heuristics: LTS Mode active. Fast-path scheduling & highly verified safe filesystem caches enabled."
+                "Kernel Heuristics: LTS Mode active. Fast-path scheduling & Highly verified safe filesystem caches enabled."
             }
             ReleaseStream::RollingBleedingEdge => {
-                "Kernel Heuristics: Bleeding-Edge active. Hot-swappable eBPF-probes, EEVDF scheduler RT limits, and predictive AI caches active."
+                "Kernel Heuristics: Bleeding-Edge active. Hot-swappable eBPF-probes, EEVDF scheduler RT limits, and Predictive AI caches active."
             }
         }
     }
@@ -223,7 +223,7 @@ impl HoppingDocumentation {
                 "Hopping Guide from Ubuntu: Replaced apt-get with sigpkg. Systemd-free. Import deb packages using 'import-deb' command."
             }
             "Fedora" | "fedora" | "RHEL" => {
-                "Hopping Guide from Fedora: Replaced dnf with sigpkg. Dynamic SELinux is mapped onto the Privacy-First Sandbox engine."
+                "Hopping Guide from Fedora: Replaced DNFe (dnf) with sigpkg. Dynamic SELinux is mapped onto the Privacy-First Sandbox engine."
             }
             _ => "Hopping Guide: Transition smoothly to SigmaOS's sovereign microkernel paradigm. Run 'sigstandards' to audit compliance."
         }

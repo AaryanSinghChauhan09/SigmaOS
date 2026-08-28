@@ -57,13 +57,18 @@ pub struct Bio {
 
 impl Bio {
     pub fn read(id: u64, sector: u64, count: u32) -> Self {
+        let size = count as usize * SECTOR_SIZE;
+        let mut data = Vec::with_capacity(size);
+        for _ in 0..size {
+            data.push(0);
+        }
         Bio {
             id,
             sector,
             count,
             op: BioOp::Read,
             priority: ReqPriority::Normal,
-            data: vec![0u8; count as usize * SECTOR_SIZE],
+            data,
         }
     }
     pub fn write(id: u64, sector: u64, data: Vec<u8>) -> Self {

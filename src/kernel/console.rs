@@ -46,13 +46,18 @@ pub struct KernelConsole {
 
 impl KernelConsole {
     pub fn new() -> Self {
+        #[cfg(not(target_os = "none"))]
+        let vga_ptr = alloc::vec![0u8; 80 * 25 * 2].leak().as_mut_ptr();
+        #[cfg(target_os = "none")]
+        let vga_ptr = 0xB8000 as *mut u8;
+
         Self {
             backend: ConsoleBackend::Serial,
             log_level: LogLevel::Info,
             initialized: AtomicBool::new(false),
             write_count: AtomicUsize::new(0),
             serial_base: 0x3F8,
-            vga_buffer: 0xB8000 as *mut u8,
+            vga_buffer: vga_ptr,
             vga_width: 80,
             vga_height: 25,
             cursor_x: AtomicUsize::new(0),
@@ -291,12 +296,14 @@ mod tests {
     fn test_log_levels() {
         let mut console = KernelConsole::new();
         console.initialize(ConsoleBackend::Serial).unwrap();
+        let initial_count = console.get_write_count();
         console.set_log_level(LogLevel::Warning);
         console.write(LogLevel::Debug, "Debug message");
         let count1 = console.get_write_count();
+        assert_eq!(count1, initial_count);
         console.write(LogLevel::Warning, "Warning message");
         let count2 = console.get_write_count();
-        assert_eq!(count1, count2);
+        assert_eq!(count2, count1 + "Warning message".len());
     }
 
     #[test]

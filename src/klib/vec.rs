@@ -108,36 +108,12 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn with_capacity(capacity: usize) -> Self {
-        let mut vec = Vec::new();
-        if capacity > 0 {
-            let new_data = unsafe { alloc(capacity * mem::size_of::<T>()) } as *mut T;
-            if !new_data.is_null() {
-                vec.data = new_data;
-                vec.capacity = capacity;
-            }
-        }
-        vec
-    }
-
-    pub fn clear(&mut self) {
-        unsafe {
-            for i in 0..self.len {
-                core::ptr::drop_in_place(self.data.add(i));
-            }
-        }
-        self.len = 0;
-    }
-
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
         }
     }
 
@@ -380,6 +356,7 @@ impl<T> Drop for VecIntoIter<T> {
             for i in self.index..self.vec.len {
                 core::ptr::drop_in_place(self.vec.data.add(i));
             }
+            self.vec.len = 0;
         }
     }
 }
