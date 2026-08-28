@@ -5,8 +5,7 @@ extern crate alloc;
 
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
+
 #[path = "../src/storage/geom.rs"]
 mod geom;
 #[path = "../src/audio/editor.rs"]
@@ -15,8 +14,11 @@ mod audio_editor;
 mod video_editor;
 #[path = "../src/compatibility/chimera_linux.rs"]
 mod chimera_linux;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
+use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
@@ -223,12 +225,6 @@ use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 use process_activity_manager::{
     ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
-};
-
-use unveil::{UnveilManager, UnveilPermission};
-use segmentation_paging::{
-    AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
-    SegmentDescriptor, SegmentSelector,
 };
 
 use access_control::{

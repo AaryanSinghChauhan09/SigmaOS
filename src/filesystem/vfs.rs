@@ -136,6 +136,26 @@ impl FilePermissions {
         Self::from_mode((mode & 0o7777) as u16)
     }
 
+        Self {
+            read: (owner_mask & 0o4) != 0,
+            write: (owner_mask & 0o2) != 0,
+            execute: (owner_mask & 0o1) != 0,
+            user_read: (owner_mask & 0o4) != 0,
+            user_write: (owner_mask & 0o2) != 0,
+            user_execute: (owner_mask & 0o1) != 0,
+            group_read: (group_mask & 0o4) != 0,
+            group_write: (group_mask & 0o2) != 0,
+            group_execute: (group_mask & 0o1) != 0,
+            other_read: (other_mask & 0o4) != 0,
+            other_write: (other_mask & 0o2) != 0,
+            other_execute: (other_mask & 0o1) != 0,
+            suid,
+            sgid,
+            sticky,
+            bsd_flags: BsdFileFlags::new(),
+        }
+    }
+
     pub fn owner_mask(&self) -> u8 {
         ((self.user_read as u8) << 2) | ((self.user_write as u8) << 1) | (self.user_execute as u8)
     }

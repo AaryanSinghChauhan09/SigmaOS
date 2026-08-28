@@ -84,8 +84,8 @@ impl NixStore {
 
         let out_path = self
             .packages
-            .get(package)
-            .and_then(|pkg| pkg.outputs.get("out"))
+            .get_str(package)
+            .and_then(|pkg| pkg.outputs.get_str("out"))
             .map(|path| path.to_string());
 
         if let Some(path) = out_path {

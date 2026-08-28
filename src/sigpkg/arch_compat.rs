@@ -377,7 +377,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        image_header.into_iter().collect::<Vec<u8>>()
+        crate::klib::vec::Vec::from_iter(image_header)
     }
 }
 
@@ -531,7 +531,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, archive_content.into_iter().collect::<Vec<u8>>()))
+        Ok((archive_name, crate::klib::vec::Vec::from_iter(archive_content)))
     }
 }
 
@@ -552,7 +552,10 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")]).to_vec(),
+            build_depends: alloc::vec![
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+            ],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
@@ -569,7 +572,7 @@ mod tests {
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),
-            ].to_vec(),
+            ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }

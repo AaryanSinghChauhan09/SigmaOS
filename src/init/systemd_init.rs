@@ -487,6 +487,20 @@ impl SystemdEngine {
             }
         }
 
+        for &other_id in all_ids.iter() {
+            if let Some(other_unit) = self.find_unit(other_id) {
+                if other_unit.before.contains(&id) && !prereqs.contains(&other_id) {
+                    prereqs.push(other_id);
+                }
+            }
+        }
+
+        for p_id in prereqs {
+            if !visited.contains(&p_id) {
+                self.topo_visit(p_id, all_ids, sorted, visiting, visited)?;
+            }
+        }
+
         visiting.retain(|&x| x != id);
         visited.push(id);
         sorted.push(id);

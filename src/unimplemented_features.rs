@@ -1233,6 +1233,78 @@ impl DragonFlyHammer2FsSnapshot {
     }
 }
 
+// ================= Arch Wiki Style Offline Knowledge Base Engine =================
+
+#[derive(Debug, Clone)]
+pub struct ArchWikiArticle {
+    pub title: String,
+    pub category: String,
+    pub tags: Vec<String>,
+    pub content: String,
+}
+
+/// Offline Arch Wiki-style documentation and Linux/BSD distro troubleshooting knowledge base
+pub struct ArchWikiKnowledgeBaseEngine {
+    pub articles: HashMap<String, ArchWikiArticle>,
+}
+
+impl ArchWikiKnowledgeBaseEngine {
+    pub fn new() -> Self {
+        let mut articles = HashMap::new();
+        articles.insert(
+            "Systemd".to_string(),
+            ArchWikiArticle {
+                title: "Systemd Service & Target Management".to_string(),
+                category: "System Administration".to_string(),
+                tags: vec!["init".to_string(), "systemd".to_string(), "services".to_string()],
+                content: "Systemd unit files describe services, sockets, timers, and targets...".to_string(),
+            },
+        );
+        articles.insert(
+            "Btrfs".to_string(),
+            ArchWikiArticle {
+                title: "Btrfs Subvolumes & CoW Snapshots".to_string(),
+                category: "Filesystems".to_string(),
+                tags: vec!["btrfs".to_string(), "snapshots".to_string(), "cow".to_string()],
+                content: "Btrfs provides copy-on-write snapshots, subvolumes, and compression...".to_string(),
+            },
+        );
+        Self { articles }
+    }
+
+    pub fn add_article(&mut self, title: &str, category: &str, tags: &[&str], content: &str) {
+        self.articles.insert(
+            title.to_string(),
+            ArchWikiArticle {
+                title: title.to_string(),
+                category: category.to_string(),
+                tags: tags.iter().map(|t| t.to_string()).collect(),
+                content: content.to_string(),
+            },
+        );
+    }
+
+    pub fn search_by_tag(&self, tag: &str) -> Vec<ArchWikiArticle> {
+        let mut matches = Vec::new();
+        for article in self.articles.values() {
+            if article.tags.iter().any(|t| t == tag) {
+                matches.push(article.clone());
+            }
+        }
+        matches
+    }
+
+    pub fn get_article(&self, title: &str) -> Option<ArchWikiArticle> {
+        self.articles.get(title).cloned()
+    }
+}
+
+impl Default for ArchWikiKnowledgeBaseEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for DragonFlyHammer2FsSnapshot {
     fn default() -> Self {
         Self::new()
@@ -1803,6 +1875,63 @@ pub struct GentooEbuildPackage {
     pub version: String,
     pub keywords: Vec<String>,
     pub is_masked: bool,
+}
+
+pub struct GentooPortageMaskEngine {
+    pub target_arch: String,
+    pub ebuilds: Vec<GentooEbuildPackage>,
+    pub hard_masks: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(target_arch: &str) -> Self {
+        Self {
+            target_arch: target_arch.to_string(),
+            ebuilds: Vec::new(),
+            hard_masks: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, pkg_name: &str, version: &str, keywords: &[&str], masked: bool) {
+        self.ebuilds.push(GentooEbuildPackage {
+            name: pkg_name.to_string(),
+            version: version.to_string(),
+            keywords: keywords.iter().map(|k| k.to_string()).collect(),
+            is_masked: masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, pkg_name: &str) {
+        self.hard_masks.push(pkg_name.to_string());
+    }
+
+    pub fn evaluate_installability(&self, pkg_name: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
+        if self.hard_masks.iter().any(|m| m == pkg_name) {
+            return Err("Package is hard-masked in package.mask");
+        }
+
+        let ebuild = self.ebuilds.iter().find(|e| e.name == pkg_name && (version == "0" || e.version == version))
+            .ok_or("Ebuild package not found in Portage tree")?;
+
+        if ebuild.is_masked {
+            return Err("Ebuild package is masked");
+        }
+
+        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
+        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
+
+        if is_stable {
+            Ok(true)
+        } else if is_testing {
+            if accept_keywords {
+                Ok(true)
+            } else {
+                Err("Package requires ~arch keyword acceptance in package.accept_keywords")
+            }
+        } else {
+            Err("Package not available for target architecture")
+        }
+    }
 }
 
 pub struct GentooUseFlagEngine {

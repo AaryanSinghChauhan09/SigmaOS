@@ -7,14 +7,8 @@ pub mod linux_sysfs;
 pub mod sovereign_process_engine;
 
 pub use sovereign_process_engine::{
-    SovereignProcessState, SovereignProcess, ZeroCopyIpcChannel, SovereignProcessManager,
-};
-pub use advanced_process_control::{
-    ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
-    JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
-    ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
-    ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
-    SigQueuePayload, AdvancedIpcHub,
+    IpcChannelBuffer, IpcMessage, ProcessHandle, SovereignProcessManager, SovereignProcessState,
+    SovereignPidAllocator, PidNamespaceScope, ProcessTreeNode,
 };
 pub use activity_manager::{
     ActivityManager, ActivityManager as ProcessActivityManager, ActivityState, AddressSpaceBinding,
