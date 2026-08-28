@@ -5,9 +5,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-#[cfg(test)]
 use std::collections::HashMap;
 
 // =========================================================================
@@ -61,12 +58,6 @@ pub struct GentooPortageMaskResolver {
     pub unmasked_packages: Vec<String>,
     pub ebuilds: Vec<PortageEbuildProfile>,
     pub target_arch: String,
-    pub arch: String,
-    pub ebuilds: Vec<EbuildEntry>,
-    pub hard_masked_pkgs: Vec<String>,
-    pub hard_masks: Vec<String>,
-    pub hard_masked_packages: Vec<String>,
-    pub unmasked_packages: Vec<String>,
 }
 
 impl GentooPortageMaskResolver {

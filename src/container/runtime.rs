@@ -102,7 +102,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: RuntimeCapability::full(),
+            capability: ContainerCapability::full(),
         }
     }
 }
@@ -207,11 +207,30 @@ impl NamespaceConfig {
     }
 }
 
+impl Default for NamespaceConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Container seccomp profiles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SeccompProfile {
     pub hardened: bool,
     pub blocked_syscalls_mask: u32,
+}
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if !self.hardened {
+            return false;
+        }
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            false
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -329,7 +348,7 @@ impl SimpleContainer {
             cpu_limit: 0,
             capability,
             environment: [0; 512],
-            seccomp: SeccompProfile { default_action: SeccompAction::Allow, blocked_syscalls: Vec::new() },
+            seccomp: SeccompProfile { hardened: false, blocked_syscalls_mask: 0 },
         }
     }
 
@@ -489,6 +508,12 @@ impl RuntimeStats {
     }
 }
 
+impl Default for RuntimeStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple container runtime (OOP: Concrete runtime class)
 pub struct SimpleContainerRuntime {
     containers: Vec<Option<Box<dyn Container>>>,
@@ -496,9 +521,6 @@ pub struct SimpleContainerRuntime {
     stats: RuntimeStats,
     capability: RuntimeCapability,
 }
-
-/// Runtime capability
-pub type ContainerCapability = RuntimeCapability;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -532,6 +554,12 @@ impl RuntimeCapability {
             can_stop: true,
             can_pause: true,
         }
+    }
+}
+
+impl Default for RuntimeCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -829,6 +857,12 @@ pub mod oci {
         }
     }
 
+    impl Default for NamespaceSet {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     pub struct OciSpec {
         pub version: String,
         pub platform: String,
@@ -949,6 +983,12 @@ pub mod oci {
             ContainerManager
         }
     }
+
+    impl Default for ContainerManager {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
 }
 
 #[cfg(test)]
@@ -1012,11 +1052,11 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            RuntimeCapability::full(),
+            ContainerCapability::full(),
         );
         container.seccomp = SeccompProfile {
-            default_action: SeccompAction::Allow,
-            blocked_syscalls: vec![0], // Block sys_mount (syscall 0)
+            hardened: true,
+            blocked_syscalls_mask: 1, // Block sys_mount (syscall 0)
         };
 
         // Allowed syscall (e.g. syscall 1)

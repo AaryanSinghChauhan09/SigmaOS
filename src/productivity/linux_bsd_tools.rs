@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS Standard CLI Utilities & Diagnostic Tools (Linux/BSD/Windows Parity)
 // Implements top/htop, ifconfig/ip, and ping equivalents inside the microkernel ecosystem.
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. TOP / HTOP (System Resource & Process Task Monitor)
@@ -53,6 +52,12 @@ impl TopCommand {
     }
 }
 
+impl Default for TopCommand {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 2. IFCONFIG / IP (Network Interface & Link Configuration)
 // =========================================================================
@@ -95,6 +100,12 @@ impl IfconfigCommand {
 
     pub fn get_interface(&self, name: &str) -> Option<&NetworkInterface> {
         self.interfaces.get(name)
+    }
+}
+
+impl Default for IfconfigCommand {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -144,6 +155,12 @@ impl PingCommand {
 
         self.ping_history.push(result.clone());
         result
+    }
+}
+
+impl Default for PingCommand {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

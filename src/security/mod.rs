@@ -29,7 +29,6 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 pub mod parrot_linux;
-pub mod root_improvement;
 
 pub use root_improvement::{
     BsdSecurelevelGuard, CapSplitter, DoasRuleEngine, PamEngine, PolkitEnforcer,
@@ -48,7 +47,6 @@ pub use qubes_isolation::{
     QrexecRule, QrexecPolicyEngine, TemplateVmManager, SQrexecChannel,
 };
 pub use qubes_isolation::*;
-pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission};
@@ -94,4 +92,3 @@ pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
     SimpleVulnerabilityScanner,
 };
-pub use vulnerability::*;

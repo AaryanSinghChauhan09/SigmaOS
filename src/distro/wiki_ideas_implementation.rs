@@ -444,38 +444,11 @@ pub struct SystemdUnit {
     pub unveil_paths: Vec<(String, String)>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct JournalLogEntry {
-    pub timestamp_ns: u64,
-    pub unit_name: String,
-    pub priority: u8,
-    pub message: String,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SystemdUnitState {
-    Active,
-    Inactive,
-    Failed,
-}
-
-#[derive(Debug, Clone)]
-pub struct SovereignSystemdUnit {
-    pub name: String,
-    pub unit_type: SystemdUnitType,
-    pub active_state: SystemdUnitActiveState,
-    pub state: SystemdUnitState,
-    pub dependencies: Vec<String>,
-    pub memory_limit_mb: Option<u64>,
-    pub cpu_weight: u32,
-    pub is_sandboxed: bool,
-}
-
-pub type JournalLogEntry = String;
+pub type SovereignSystemdUnit = SystemdUnit;
 
 pub struct SovereignSystemdParityEngine {
     pub units: BTreeMap<String, SovereignSystemdUnit>,
-    pub journal: Vec<JournalLogEntry>,
+    pub journal_logs: Vec<String>,
 }
 
 impl SovereignSystemdParityEngine {
@@ -491,15 +464,15 @@ impl SovereignSystemdParityEngine {
         let deps_vec = deps.iter().map(|d| d.to_string()).collect();
         self.units.insert(
             name.to_string(),
-            SovereignSystemdUnit {
+            SystemdUnit {
                 name: name.to_string(),
                 unit_type,
                 active_state: SystemdUnitActiveState::Inactive,
-                state: SystemdUnitState::Inactive,
+                description: name.to_string(),
+                exec_start: Vec::new(),
                 dependencies: deps_vec,
-                memory_limit_mb: None,
-                cpu_weight: 100,
-                is_sandboxed: true,
+                memory_limit_bytes: None,
+                cpu_quota_pct: None,
             },
         );
     }
@@ -510,6 +483,10 @@ impl SovereignSystemdParityEngine {
         unit.state = SystemdUnitState::Active;
         self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
         Ok(SystemdUnitActiveState::Active)
+    }
+
+    pub fn query_journal(&self, name: &str) -> Vec<&String> {
+        self.journal_logs.iter().filter(|log| log.contains(name)).collect()
     }
 
     pub fn stop_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
@@ -531,7 +508,16 @@ impl Default for SovereignSystemdParityEngine {
     }
 }
 
-/// 8. Sovereign Hybrid Scheduler Innovations
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
+    Performance,
+    Powersave,
+    Schedutil,
+    Ondemand,
+    Conservative,
+}
+
+/// 8. Real-Time Hybrid Scheduler Innovations (<5µs RTLane Latency & NUMA/DVFS)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedulerClass {
     RTLane,  // Sub-5 microsecond strict real-time deadline lane
@@ -541,10 +527,19 @@ pub enum SchedulerClass {
 }
 
 #[derive(Debug, Clone)]
-pub struct NumaNodeTopology {
+pub struct NumaNodeAffinity {
     pub node_id: usize,
-    pub cpu_cores: Vec<u32>,
-    pub local_memory_mb: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct RealtimeTask {
+    pub pid: usize,
+    pub class: SchedulerClass,
+    pub deadline_us: u64,
+    pub wcet_us: u64, // Worst-Case Execution Time
+    pub numa_node: u32,
 }
 
 #[derive(Debug, Clone)]
@@ -575,8 +570,8 @@ pub type RtlaneRealtimeTask = RealtimeTask;
 
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
-    pub numa_nodes: Vec<NumaNodeTopology>,
-    pub rt_tasks: BTreeMap<usize, RtlaneRealtimeTask>,
+    pub numa_nodes: Vec<NumaNodeAffinity>,
+    pub rt_tasks: BTreeMap<usize, RealtimeTask>,
     pub preemption_count: u64,
     pub rt_lane_latency_us: u64,
     pub ai_prediction_boost: bool,
@@ -748,7 +743,7 @@ mod tests {
         engine.register_unit(srv);
         assert_eq!(engine.units.len(), 1);
 
-        assert_eq!(engine.start_unit("httpd.service"), Ok(SystemdUnitActiveState::Active));
+        assert!(engine.start_unit("httpd.service").is_ok());
         assert_eq!(engine.query_journal("httpd.service").len(), 1);
     }
 

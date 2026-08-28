@@ -1,5 +1,6 @@
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_parity;
+pub mod bsd_linux_innovations;
 pub mod certification;
 pub mod community;
 pub mod compat_layers;
@@ -25,6 +26,9 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
+pub mod arch;
+pub mod cachy;
+pub mod wiki_ideas_implementation;
 pub mod missing_distro_innovations;
 pub mod sovereign_distro_dominance;
 
@@ -80,6 +84,13 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+};
+pub use bsd_linux_innovations::{
+    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
+    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
+    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
+    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
+    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
 };
 pub use wiki_ideas_implementation::{
     Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,

@@ -2,7 +2,7 @@
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
 use crate::klib::HashMap;
-use crate::klib::HashSet;
+use crate::klib::hashset::HashSet;
 use std::io::{self, BufRead, Write};
 
 /// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs
@@ -244,6 +244,7 @@ pub struct ShellRepl {
     pub highlighter: ZshSyntaxHighlighter,
     pub dir_stack: BsdDirectoryStack,
     pub job_control: ShellJobControl,
+    pub job_manager: JobControlManager,
 }
 
 impl ShellRepl {
@@ -285,6 +286,7 @@ impl ShellRepl {
             highlighter: ZshSyntaxHighlighter::new(),
             dir_stack,
             job_control: ShellJobControl::new(),
+            job_manager: JobControlManager::new(),
         }
     }
 
@@ -401,24 +403,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "touch" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Touch {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "mkdir" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Mkdir {
-                        dirname: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "theme" => {
                 if parts.len() >= 2 {
                     if parts[1] == "list" {
@@ -508,6 +492,24 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {
                         filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "touch" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Touch {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "mkdir" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Mkdir {
+                        dirname: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())

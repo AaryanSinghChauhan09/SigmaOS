@@ -409,7 +409,7 @@ impl BsdSecurelevelGuard {
             self.current_level = new_level;
             Ok(())
         } else {
-            Err("securelevel can only be raised, not lowered");
+            Err("securelevel can only be raised, not lowered")
         }
     }
 
@@ -478,6 +478,17 @@ impl SubUidGidMapper {
             }
         }
         false
+    }
+
+    pub fn map_container_uid(&self, username: &str, container_uid: u32) -> Option<u32> {
+        for range in &self.subuid_ranges {
+            if range.username == username {
+                if container_uid < range.count {
+                    return Some(range.start_id + container_uid);
+                }
+            }
+        }
+        None
     }
 }
 
@@ -852,7 +863,78 @@ impl Default for PamEngine {
 }
 
 // ==========================================
-// 11. Rootless Privileged Port Binding Manager
+// 7. BSD Securelevel Kernel Controller (OpenBSD / FreeBSD Parity)
+// ==========================================
+
+/// BSD Securelevels (-1, 0, 1, 2, 3) enforcing strict hardware/kernel restrictions even on root
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum BsdSecurelevel {
+    PermanentlyUnsecure = -1,
+    Insecure = 0,
+    Secure = 1,
+    HighlySecure = 2,
+    NetworkSecure = 3,
+}
+
+pub struct BsdSecurelevelController {
+    level: AtomicI32,
+}
+
+impl BsdSecurelevelController {
+    pub fn new(initial_level: BsdSecurelevel) -> Self {
+        Self {
+            level: AtomicI32::new(initial_level as i32),
+        }
+    }
+
+    pub fn current_level(&self) -> BsdSecurelevel {
+        match self.level.load(Ordering::SeqCst) {
+            -1 => BsdSecurelevel::PermanentlyUnsecure,
+            0 => BsdSecurelevel::Insecure,
+            1 => BsdSecurelevel::Secure,
+            2 => BsdSecurelevel::HighlySecure,
+            _ => BsdSecurelevel::NetworkSecure,
+        }
+    }
+
+    /// Raises the securelevel. Note: Once raised above 0, securelevel can NEVER be lowered without rebooting.
+    pub fn raise_level(&self, target_level: BsdSecurelevel) -> Result<(), &'static str> {
+        let cur = self.level.load(Ordering::SeqCst);
+        let target = target_level as i32;
+
+        if target < cur && cur > 0 {
+            return Err("securelevel: cannot lower securelevel once raised above 0");
+        }
+
+        self.level.store(target, Ordering::SeqCst);
+        Ok(())
+    }
+
+    /// Checks if raw disk write operations are permitted
+    pub fn check_raw_disk_write_allowed(&self) -> bool {
+        self.current_level() < BsdSecurelevel::Secure
+    }
+
+    /// Checks if kernel module loading/unloading is permitted
+    pub fn check_module_loading_allowed(&self) -> bool {
+        self.current_level() < BsdSecurelevel::Secure
+    }
+
+    /// Checks if firewall rule modifications are allowed
+    pub fn check_firewall_modification_allowed(&self) -> bool {
+        self.current_level() < BsdSecurelevel::NetworkSecure
+    }
+}
+
+impl Default for BsdSecurelevelController {
+    fn default() -> Self {
+        Self::new(BsdSecurelevel::Insecure)
+    }
+}
+
+
+// ==========================================
+// 10. Rootless Privileged Port Binding Manager
 // ==========================================
 
 pub struct RootlessPortBindingManager {
@@ -1174,23 +1256,23 @@ mod tests {
         });
 
         // Evaluate reboot for alice
-        let res1 = engine.evaluate_groups("alice", &["wheel"], "root", "/sbin/reboot");
-        assert!(res1.permitted);
-        assert!(res1.nopass_required);
+        let res1 = engine.evaluate("alice", true, "root", "/sbin/reboot").unwrap();
+        assert_eq!(res1.action, DoasAction::Permit);
+        assert!(res1.nopass);
 
         // Evaluate general command for bob in wheel group
-        let res2 = engine.evaluate_groups("bob", &["wheel"], "root", "/usr/bin/htop");
-        assert!(res2.permitted);
-        assert!(!res2.nopass_required);
+        let res2 = engine.evaluate("bob", true, "root", "/usr/bin/htop").unwrap();
+        assert_eq!(res2.action, DoasAction::Permit);
+        assert!(!res2.nopass);
         assert!(res2.keepenv);
 
         // Evaluate unauthorized user charlie
-        let res3 = engine.evaluate_groups("charlie", &["users"], "root", "/sbin/reboot");
-        assert!(!res3.permitted);
+        let res3 = engine.evaluate("charlie", false, "root", "/sbin/reboot");
+        assert!(res3.is_none());
     }
 
     #[test]
-    fn test_subuid_container_mapping() {
+    fn test_subuid_gid_mapping_container() {
         let mut mapper = SubUidGidMapper::new();
         mapper.add_subuid_range("alice", 100000, 65536);
 
