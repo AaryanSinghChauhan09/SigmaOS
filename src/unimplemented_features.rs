@@ -1364,7 +1364,8 @@ impl Default for NixOsDeclarativeConfigEngine {
 
 
 // 4. ANTIX LINUX LIGHTWEIGHT SYSVINIT & LOW-RAM GOVERNOR
-// ===========================================================pub struct AntiXLowRamSysVInitGovernor {
+// ===========================================================
+pub struct AntiXLowRamSysVInitGovernor {
     pub max_ram_mb: u32,
     pub disable_compositing: bool,
     pub init_style_sequential: bool,
@@ -1982,8 +1983,10 @@ impl AurDependencySolver {
     }
 }
 
-// ==================================================================// 40. TAILS-INSPIRED AMNESIC SECURITY & VOLATILE RAM SCRUBBING
-// ===========================================================pub struct SovereignAmnesicEngine {
+// ==================================================================
+// 40. TAILS-INSPIRED AMNESIC SECURITY & VOLATILE RAM SCRUBBING
+// ===========================================================
+pub struct SovereignAmnesicEngine {
     pub is_amnesic_mode: bool,
     pub mac_spoofed: bool,
     pub spoofed_mac: [u8; 6],
@@ -2061,8 +2064,10 @@ impl SovereignStatelessArchitectureEngine {
     }
 }
 
-// ==================================================================// 43. NIXOS-INSPIRED CAS GARBAGE COLLECTION & GENERATION PRUNING
-// ===========================================================pub struct NixGcNode {
+// ==================================================================
+// 43. NIXOS-INSPIRED CAS GARBAGE COLLECTION & GENERATION PRUNING
+// ===========================================================
+pub struct NixGcNode {
     pub path: String,
     pub is_gc_root: bool,
 }
@@ -2223,8 +2228,10 @@ impl SovereignRunitSupervisor {
     }
 }
 
-// ==================================================================// 39. ADDITIONAL LINUX & BSD DISTRO PARITY INSPIRATIONS
-// ===========================================================pub struct AlpineApkPackageIndexV2 {
+// ==================================================================
+// 39. ADDITIONAL LINUX & BSD DISTRO PARITY INSPIRATIONS
+// ===========================================================
+pub struct AlpineApkPackageIndexV2 {
     pub package_entries: Vec<(String, String, u64)>, // (name, sha256_checksum, size_bytes)
 }
 
