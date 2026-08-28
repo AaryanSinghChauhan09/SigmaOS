@@ -1,3 +1,4 @@
+extern crate alloc;
 /// SigmaOS devtmpfs (/dev) pseudo-filesystem
 /// Automatically registers and creates device files when drivers boot.
 /// Improved with Linux-inspired udev rules, permissions, and symlink mappings.

@@ -175,13 +175,11 @@ impl Default for SolusEopkgManager {
 /// 5. Mageia Linux urpmi Dependency Solver
 pub struct MageiaUrpmiEngine {
     pub urpmi_db: crate::klib::BTreeMap<String, Vec<String>>,
-    pub package_database: std::collections::HashMap<String, String>,
     pub package_database: BTreeMap<String, Vec<String>>,
 }
 
 impl MageiaUrpmiEngine {
     pub fn new() -> Self {
-        let mut db = crate::klib::BTreeMap::new();
         let mut db = BTreeMap::new();
         let mut kde_deps = Vec::new();
         kde_deps.push(String::from("plasma-workspace"));
@@ -193,7 +191,7 @@ impl MageiaUrpmiEngine {
         plasma_deps.push(String::from("qtbase"));
         plasma_deps.push(String::from("kf5-kio"));
         db.insert(String::from("plasma-workspace"), plasma_deps);
-        Self { urpmi_db: db, package_database: std::collections::HashMap::new() }
+        Self { urpmi_db: db, package_database: BTreeMap::new() }
     }
 
     pub fn resolve_urpmi(&self, target_pkg: &str) -> Vec<String> {

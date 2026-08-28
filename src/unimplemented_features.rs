@@ -12,7 +12,8 @@ use crate::klib::collections::HashMap;
 use crate::klib::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
-// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
     D0Active,
     D1LowPower,
@@ -82,8 +83,6 @@ impl GentooPortageMaskResolver {
             category_pkg: category_pkg.to_string(),
             version: version.to_string(),
             slot: "0".to_string(),
-            category_pkg: category_pkg.to_string(),
-            version: version.to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
             is_masked,
             is_ebuild_masked: is_masked,
@@ -323,8 +322,10 @@ impl UdfVm {
     }
 }
 
-// ==================================================================// 6.3 DECLARATIVE PACKAGE RESOLUTION SAT SOLVER SPECIFICATIONS
-// ===========================================================pub const MAX_NODES: usize = 8;
+// ==================================================================
+// 6.3 DECLARATIVE PACKAGE RESOLUTION SAT SOLVER SPECIFICATIONS
+// ===========================================================
+pub const MAX_NODES: usize = 8;
 pub const MAX_DEPS: usize = 4;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -444,8 +445,10 @@ impl Default for SatSolverEngine {
     }
 }
 
-// ==================================================================// 6.4 JBD2-STYLE CRASH-RESILIENT TRANSACTIONAL LEDGER SPECIFICATIONS
-// ===========================================================pub const JOURNAL_CAPACITY: usize = 8;
+// ==================================================================
+// 6.4 JBD2-STYLE CRASH-RESILIENT TRANSACTIONAL LEDGER SPECIFICATIONS
+// ===========================================================
+pub const JOURNAL_CAPACITY: usize = 8;
 
 #[derive(Debug, Clone, Copy)]
 pub struct TransactionBlock {
@@ -639,7 +642,8 @@ impl Default for PciBusScanner {
 }
 
 // ==================================================================// 2. S-FS SNAPSHOTS & GENERATIONS (NIXOS-STYLE BLUEPRINT)
-// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Generation {
     pub id: u32,
     pub root_inode: u64,
@@ -695,8 +699,10 @@ impl Default for GenerationManager {
     }
 }
 
-// ==================================================================// 3. S-IPC TRANSACTION BUS (MICROKERNEL INTER-PROCESS COMMUNICATION)
-// ===========================================================pub const MAX_IPC_MESSAGE_SIZE: usize = 64;
+// ==================================================================
+// 3. S-IPC TRANSACTION BUS (MICROKERNEL INTER-PROCESS COMMUNICATION)
+// ===========================================================
+pub const MAX_IPC_MESSAGE_SIZE: usize = 64;
 pub const IPC_QUEUE_CAPACITY: usize = 8;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1037,7 +1043,8 @@ impl Default for SovereignIpcBus {
 }
 
 // ==================================================================// LINUX & BSD DISTRO PARITY ABSTRACTIONS
-// ===========================================================#[derive(Debug, Clone, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ApkPackageEntry {
     pub name: String,
     pub version: String,
@@ -1214,7 +1221,8 @@ impl DragonFlyHammer2FsSnapshot {
     }
 }
 
-// ================= Arch Wiki Style Offline Knowledge Base Engine ===#[derive(Debug, Clone)]
+// ================= Arch Wiki Style Offline Knowledge Base Engine ===
+#[derive(Debug, Clone)]
 pub struct ArchWikiArticle {
     pub title: String,
     pub category: String,
@@ -1411,7 +1419,8 @@ impl AntiXLowRamSysVInitGovernor {
 }
 
 // ==================================================================// 5. ZORIN OS WINDOWS COMPATIBILITY & APP DB REGISTRY
-// ===========================================================#[derive(Debug, Clone, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ZorinAppMapping {
     pub exe_name: &'static str,
     pub compatibility_layer: &'static str,
@@ -1452,7 +1461,8 @@ impl ZorinWinAppDbRegistry {
 }
 
 // ==================================================================// 6. HAIKU OS DYNAMIC MEDIA TRANSLATOR ENGINE
-// ===========================================================#[derive(Debug, Clone, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HaikuMediaTranslator {
     pub name: &'static str,
     pub input_mime: &'static str,
@@ -1504,7 +1514,8 @@ impl HaikuTranslatorEngine {
 }
 
 // ==================================================================// 7. SERENITYOS ASYNC IPC EVENT LOOP (LIBCORE INSPIRED)
-// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SerenityIpcEvent {
     pub client_id: u32,
     pub event_type: u16,
@@ -1744,7 +1755,8 @@ impl GamifiedProductivityLayer {
 }
 
 // ==================================================================// 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
-// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxLtsVersion {
     Lts5_15, // Long-Term Support 5.15
     Lts6_1,  // Long-Term Support 6.1
@@ -2021,7 +2033,8 @@ impl SovereignAmnesicEngine {
 }
 
 // ==================================================================// 42. CLEAR LINUX-INSPIRED STATELESS ARCHITECTURE & ISA AUTO-DETECTION
-// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum X86IsaLevel {
     V1Baseline, // Baseline x86-64
     V2Nehalem,  // SSE4.2, Popcnt
@@ -2102,7 +2115,8 @@ impl SovereignNixGcEngine {
 }
 
 // ==================================================================// 44. POP!_OS COSMIC-INSPIRED DYNAMIC BSP TILING & GPU ROUTING
-// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuRenderPreference {
     Integrated,
     DiscreteNvidia,
@@ -2145,8 +2159,10 @@ impl SovereignCosmicTilingEngine {
     }
 }
 
-// ==================================================================// 41. VOID LINUX-INSPIRED RUNIT 3-STAGE SERVICE SUPERVISOR
-// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ==================================================================
+// 41. VOID LINUX-INSPIRED RUNIT 3-STAGE SERVICE SUPERVISOR
+// ===========================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitStage {
     OneOneTimeInit, // Stage 1: Initial boot mounts and initialization
     TwoRunsvDir,     // Stage 2: Main supervision loop (runsvdir)
