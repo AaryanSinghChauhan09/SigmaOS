@@ -51,7 +51,8 @@ pub use process::{
     ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
     ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
     SigQueuePayload, AdvancedIpcHub, SovereignProcessState, SovereignProcess, ZeroCopyIpcChannel,
-    SovereignProcessManager,
+    SovereignProcessManager, JobLimitViolation, JobObjectLimits, JobObjectAccounting,
+    SovereignJobObject, JobObjectManager,
 };
 pub mod productivity;
 pub mod remote;
