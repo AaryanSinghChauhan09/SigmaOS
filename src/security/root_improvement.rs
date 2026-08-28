@@ -365,28 +365,6 @@ impl DoasRuleEngine {
         }
         last_match
     }
-
-    pub fn evaluate_groups(
-        &self,
-        username: &str,
-        user_groups: &[&str],
-        target_user: &str,
-        command: &str,
-    ) -> DoasEvaluationResult {
-        let is_wheel = user_groups.contains(&"wheel");
-        match self.evaluate(username, is_wheel, target_user, command) {
-            Some(rule) => DoasEvaluationResult {
-                permitted: rule.action == DoasAction::Permit,
-                nopass_required: rule.nopass,
-                keepenv: rule.keepenv,
-            },
-            None => DoasEvaluationResult {
-                permitted: false,
-                nopass_required: false,
-                keepenv: false,
-            },
-        }
-    }
 }
 
 impl Default for DoasRuleEngine {
@@ -431,7 +409,7 @@ impl BsdSecurelevelGuard {
             self.current_level = new_level;
             Ok(())
         } else {
-            Err("securelevel can only be raised, not lowered")
+            Err("securelevel can only be raised, not lowered");
         }
     }
 
@@ -500,19 +478,6 @@ impl SubUidGidMapper {
             }
         }
         false
-    }
-
-    pub fn get_subuid_range(&self, username: &str) -> Option<&SubUidGidRange> {
-        self.subuid_ranges.iter().find(|r| r.username == username)
-    }
-
-    pub fn map_container_uid(&self, username: &str, container_uid: u32) -> Option<u32> {
-        let range = self.get_subuid_range(username)?;
-        if container_uid < range.count {
-            Some(range.start_id + container_uid)
-        } else {
-            None
-        }
     }
 }
 
