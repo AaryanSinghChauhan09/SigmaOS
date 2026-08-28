@@ -385,14 +385,26 @@ impl FilesystemMetadata {
 // 5. Sovereign Advanced Mount Manager (Linux-inspired)
 // ==========================================
 
-/// Standard Linux-inspired mount flags
+/// Standard Linux & BSD-inspired mount flags
 pub const MS_RDONLY: u32 = 1;       // Mount read-only
 pub const MS_NOSUID: u32 = 2;       // Ignore suid and sgid bits
 pub const MS_NODEV: u32 = 4;        // Disallow access to device special files
 pub const MS_NOEXEC: u32 = 8;       // Disallow program execution
+pub const MS_SYNCHRONOUS: u32 = 16; // Writes are synced immediately
 pub const MS_REMOUNT: u32 = 32;     // Alter flags of a mounted FS
+pub const MS_NOATIME: u32 = 1024;   // Do not update access times
+pub const MS_NODIRATIME: u32 = 2048; // Do not update directory access times
 pub const MS_BIND: u32 = 4096;      // Create a bind mount
 pub const MS_MOVE: u32 = 8192;      // Move a subtree
+pub const MS_REC: u32 = 16384;      // Recursive mount
+pub const MS_LAZYATIME: u32 = 32768; // Lazy atime updates
+pub const MS_STRICTATIME: u32 = 16777216; // Always update atime
+
+/// Unmount flags (umount2 parity)
+pub const MNT_FORCE: u32 = 1;       // Force unmount
+pub const MNT_DETACH: u32 = 2;      // Lazy unmount (detach from hierarchy)
+pub const MNT_EXPIRE: u32 = 4;      // Mark for expiration
+pub const MNT_UNION: u32 = 8;       // BSD Union mount
 
 /// Standard Linux-inspired mount propagation modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -418,6 +430,7 @@ pub struct SovereignMountManager {
     pub active_mount_table: BTreeMap<String, ActiveMountEntry>, // maps mount point to entry
     pub fstab_config: BTreeMap<String, String>,                 // raw lines of /etc/fstab configuration
     pub automount_triggers: BTreeMap<String, String>,           // maps device UUID to auto-mount target
+    pub securelevel: i32,                                       // OpenBSD securelevel (>=2 locks mount table modification)
 }
 
 impl SovereignMountManager {
@@ -426,11 +439,16 @@ impl SovereignMountManager {
             active_mount_table: BTreeMap::new(),
             fstab_config: BTreeMap::new(),
             automount_triggers: BTreeMap::new(),
+            securelevel: 0,
         }
     }
 
     /// Parses a standard Linux /etc/fstab entry line (e.g. "UUID=1234-ABCD /mnt/data ext4 rw,nosuid,nodev 0 2")
     pub fn parse_and_register_fstab_entry(&mut self, line: &str) -> Result<(), &'static str> {
+        if self.securelevel >= 2 {
+            return Err("OpenBSD Securelevel >= 2 prohibits modifying mount table");
+        }
+
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() < 4 {
             return Err("Invalid fstab entry: expected at least 4 standard fields");
@@ -448,6 +466,9 @@ impl SovereignMountManager {
                 "nosuid" => flags |= MS_NOSUID,
                 "nodev" => flags |= MS_NODEV,
                 "noexec" => flags |= MS_NOEXEC,
+                "sync" => flags |= MS_SYNCHRONOUS,
+                "noatime" => flags |= MS_NOATIME,
+                "nodiratime" => flags |= MS_NODIRATIME,
                 _ => {}
             }
         }
@@ -468,6 +489,9 @@ impl SovereignMountManager {
 
     /// Implements Bind Mount operations (MS_BIND) and Namespace Propagation settings
     pub fn execute_bind_mount(&mut self, source_dir: &str, target_dir: &str, propagation: MountPropagation) -> Result<(), &'static str> {
+        if self.securelevel >= 2 {
+            return Err("OpenBSD Securelevel >= 2 prohibits modifying mount table");
+        }
         if source_dir.is_empty() || target_dir.is_empty() {
             return Err("Source and target paths cannot be empty");
         }
@@ -483,6 +507,60 @@ impl SovereignMountManager {
 
         self.active_mount_table.insert(target_dir.to_string(), entry);
         Ok(())
+    }
+
+    /// Remounts an active filesystem modifying its flags (MS_REMOUNT parity)
+    pub fn remount(&mut self, mount_point: &str, new_flags: u32) -> Result<(), &'static str> {
+        if self.securelevel >= 2 {
+            return Err("OpenBSD Securelevel >= 2 prohibits modifying mount table");
+        }
+        if let Some(entry) = self.active_mount_table.get_mut(mount_point) {
+            entry.flags = new_flags | MS_REMOUNT;
+            Ok(())
+        } else {
+            Err("Mount point not found")
+        }
+    }
+
+    /// Advanced unmount with support for force (MNT_FORCE) and lazy detach (MNT_DETACH) (umount2 parity)
+    pub fn unmount_with_flags(&mut self, mount_point: &str, flags: u32) -> Result<(), &'static str> {
+        if self.securelevel >= 2 {
+            return Err("OpenBSD Securelevel >= 2 prohibits modifying mount table");
+        }
+        if !self.active_mount_table.contains_key(mount_point) {
+            return Err("Mount point not found");
+        }
+
+        if (flags & MNT_DETACH) != 0 {
+            // Lazy unmount: detach immediately from visibility table
+            self.active_mount_table.remove(mount_point);
+        } else if (flags & MNT_FORCE) != 0 {
+            // Force unmount: remove regardless of active handles
+            self.active_mount_table.remove(mount_point);
+        } else {
+            // Standard unmount
+            self.active_mount_table.remove(mount_point);
+        }
+        Ok(())
+    }
+
+    /// Generates Linux /proc/mounts and /etc/mtab formatted text representation
+    pub fn generate_proc_mounts(&self) -> String {
+        let mut result = String::new();
+        for (mp, entry) in &self.active_mount_table {
+            let mut opts = Vec::new();
+            if (entry.flags & MS_RDONLY) != 0 { opts.push("ro"); } else { opts.push("rw"); }
+            if (entry.flags & MS_NOSUID) != 0 { opts.push("nosuid"); }
+            if (entry.flags & MS_NODEV) != 0 { opts.push("nodev"); }
+            if (entry.flags & MS_NOEXEC) != 0 { opts.push("noexec"); }
+            if (entry.flags & MS_SYNCHRONOUS) != 0 { opts.push("sync"); }
+            if (entry.flags & MS_NOATIME) != 0 { opts.push("noatime"); }
+            if (entry.flags & MS_BIND) != 0 { opts.push("bind"); }
+
+            let opts_str = if opts.is_empty() { "defaults".to_string() } else { opts.join(",") };
+            result.push_str(&format!("{} {} {} {} 0 {}\n", entry.spec_device_uuid, mp, entry.fstype, opts_str, entry.pass_no));
+        }
+        result
     }
 
     /// Automount (autofs) lookup on-demand triggers
@@ -568,5 +646,30 @@ mod mount_tests {
 
         // Active mount entry should now exist
         assert!(manager.active_mount_table.contains_key("/media/usb"));
+    }
+
+    #[test]
+    fn test_remount_unmount_and_proc_mounts() {
+        let mut manager = SovereignMountManager::new();
+        manager.parse_and_register_fstab_entry("UUID=1111-2222 /mnt/data ext4 ro,sync 0 1").unwrap();
+
+        // Check proc mounts formatting
+        let proc_mounts = manager.generate_proc_mounts();
+        assert!(proc_mounts.contains("UUID=1111-2222 /mnt/data ext4 ro,sync 0 1"));
+
+        // Remount read-write with MS_REMOUNT
+        assert!(manager.remount("/mnt/data", MS_NOSUID).is_ok());
+        let entry = manager.active_mount_table.get("/mnt/data").unwrap();
+        assert_ne!(entry.flags & MS_REMOUNT, 0);
+
+        // Test OpenBSD securelevel lockdown
+        manager.securelevel = 2;
+        assert!(manager.remount("/mnt/data", MS_RDONLY).is_err());
+        assert!(manager.unmount_with_flags("/mnt/data", MNT_FORCE).is_err());
+
+        // Lower securelevel and test unmount_with_flags (MNT_DETACH)
+        manager.securelevel = 0;
+        assert!(manager.unmount_with_flags("/mnt/data", MNT_DETACH).is_ok());
+        assert!(!manager.active_mount_table.contains_key("/mnt/data"));
     }
 }
