@@ -1,10 +1,7 @@
 // SigmaOS Composable Filesystem (SigmaFS++)
 // Deploys plugin-based storage, deduplication, semantic indexers, and blockchain audit logs
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 /// Standardized next-generation hierarchy (SigmaFS)

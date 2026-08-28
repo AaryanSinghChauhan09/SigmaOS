@@ -155,7 +155,7 @@ impl UvmPageLoan {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     pub data: *mut T,
     pub len: usize,
     pub capacity: usize,

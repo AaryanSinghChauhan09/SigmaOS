@@ -1,19 +1,6 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
-#[path = "../src/klib/mod.rs"]
-pub mod klib;
-#[path = "../src/process/sovereign_process_engine.rs"]
-pub mod sovereign_process_engine;
-#[path = "../src/shell/sovereign_shell_parity.rs"]
-pub mod sovereign_shell_parity;
-#[path = "../src/package/repository.rs"]
-pub mod package_repository;
-#[path = "../src/kernel/module_loader.rs"]
-pub mod module_loader;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-pub mod missing_distro_innovations;
-
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 #[path = "../src/unimplemented_features.rs"]
@@ -64,11 +51,58 @@ mod gap_closure;
 mod kvm_vcpu;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
+
+#[path = "../src/distro/wiki_ideas_implementation.rs"]
+mod wiki_ideas_implementation;
+
+#[path = "../src/process/advanced_process_control.rs"]
+mod advanced_process_control;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/kernel/sysctl.rs"]
+mod sysctl;
+
+#[path = "../src/security/root_improvement.rs"]
+mod root_improvement;
+
+#[path = "../src/compatibility/abi_extended.rs"]
+mod abi_extended;
+
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
+
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+
 #[path = "../src/logging/unified.rs"]
 mod unified;
 
-use bsd_compat::*;
+use bsd::*;
 use wiki_ideas_implementation::SystemdUnitActiveState;
+use bsd_compat::*;
+use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
+use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
+use unveil::{UnveilManager, UnveilPermission};
+use wiki_ideas_implementation::SystemdUnitActiveState;
+use bsd_compat::*;
+use wiki_ideas::SystemdUnitActiveState;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -182,7 +216,7 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas_implementation::{
+    use wiki_ideas::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
         PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
@@ -229,7 +263,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
     // 8. Real-Time Hybrid Scheduler
     use wiki_ideas_implementation::{
-        RealtimeTask, SchedulerClass,
+        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
     };
     let mut sched = SovereignHybridSchedulerInnovations::new();
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
@@ -272,7 +306,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(mir_eng.get_fastest_mirror(), Some("https://fast.repo.org".to_string()));
 
     let mut journal = PackageTransactionJournal::new();
-    let _tx1 = journal.log_transaction("install", "bash", "5.2", 100);
+    let tx1 = journal.log_transaction("install", "bash", "5.2", 100);
     let tx2 = journal.log_transaction("install", "zsh", "5.9", 105);
     assert_eq!(journal.rollback_transaction(tx2).len(), 1);
 
@@ -291,7 +325,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert!(ls_out[0].contains("virtio_gpu 16384 0"));
 
     kmod_mgr.set_module_parameter("virtio_gpu", "modeset", "1").unwrap();
-    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s: &String| s.as_str()), Some("1"));
+    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s| s.as_str()), Some("1"));
 
     kmod_mgr.unload_module("virtio_gpu").unwrap();
     assert_eq!(kmod_mgr.loaded_modules.len(), 0);
@@ -306,7 +340,7 @@ fn test_wiki_distro_innovations_inspection() {
     let comp_block = JournaldCompressedBlock::compress_entries(&[log_entry.clone()]);
     assert_eq!(comp_block.uncompressed_entries_count, 1);
 
-    let audit_filter = AuditLogFilter::new(LogLevel::Error);
+    let mut audit_filter = AuditLogFilter::new(LogLevel::Error);
     assert!(audit_filter.matches(&log_entry));
 
     let log_slice = [log_entry];

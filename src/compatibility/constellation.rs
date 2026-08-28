@@ -26,6 +26,7 @@ use crate::klib::BTreeMap;
 // ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[allow(non_camel_case_types)]
 pub enum ConstellationNode {
     Star2_6, // Kernel 2.6 APIs
     Star3_x, // Kernel 3.x APIs

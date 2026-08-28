@@ -160,7 +160,7 @@ pub struct RuleBasedOptimizer {
 }
 
 /// Optimization rule
-struct OptimizationRule {
+pub struct OptimizationRule {
     condition: Box<dyn Fn(&SystemState) -> bool>,
     recommendation: OptimizationRecommendation,
 }

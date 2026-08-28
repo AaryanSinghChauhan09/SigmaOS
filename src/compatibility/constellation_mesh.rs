@@ -1,3 +1,4 @@
+#[allow(unused_imports, dead_code, unused_variables, unused_mut)]
 extern crate alloc;
 // SigmaOS Constellation-and-Mesh Architecture
 // Houses the core OOP designs for Kernel Constellations, Syscall Almanacs, Driver Archives,

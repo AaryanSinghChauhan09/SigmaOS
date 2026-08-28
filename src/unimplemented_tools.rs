@@ -4607,7 +4607,6 @@ mod tests {
     #[test]
     fn test_sysinternals_procmon() {
         let mut pm = SysinternalsProcMon::new();
-        pm.start_capture();
         pm.record_operation("sigma-shell", 100, "ProcessStart", "started shell", "OK");
         assert_eq!(pm.events.len(), 1);
 

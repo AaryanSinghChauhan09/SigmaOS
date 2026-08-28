@@ -1,3 +1,4 @@
+#[allow(unused_imports, dead_code, unused_variables, unused_mut)]
 extern crate alloc;
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
