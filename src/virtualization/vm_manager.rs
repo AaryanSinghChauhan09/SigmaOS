@@ -6,6 +6,10 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use std::collections::HashMap;
 use alloc::format;
+use std::path::PathBuf;
+
+#[cfg(test)]
+use std::time::{SystemTime, UNIX_EPOCH};
 
 /// VM configuration
 #[derive(Debug, Clone)]

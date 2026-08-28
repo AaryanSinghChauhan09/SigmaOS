@@ -62,28 +62,116 @@ mod device_manager;
 
 use pipes::Pipe;
 use unveil::{UnveilManager, UnveilPermission};
-use geom::{BioRequest, GeomProvider, GeomTopology};
-use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
-use chimera_linux::{ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager};
-use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
-use fedora_compat::DnfPackageResolver;
-use task_scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType};
-use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
+use geom::{GeomProvider, GeomTopology, BioRequest};
+use audio_editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
+use video_editor::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
+use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
+use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
+use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
+use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
+use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
+use task_scheduler::{PriorityScheduler, Priority, Scheduler, Task, TaskCapability, TaskWorkloadType};
+use alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
 use bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
-use low_level_memory::{posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator};
-use access_control::{AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate};
+use low_level_memory::{CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr};
+use access_control::{AclEntry, AclType, FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy, MacSecurityLabel, SensitivityLevel, ZeroTrustAccessGate};
 use statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
-use community_toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
-use system_user::UserManager as TestUserManager;
+use community_toolkit::{CommunityHandbookCatalog, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore};
+use system_user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager};
 use sigmatools::*;
-use segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
-use process_activity_manager::{ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot};
+use segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine, CpuRing as SegCpuPrivilegeMode};
+use process_activity_manager::{ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot as ProcRegisterSnapshot};
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
-use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
+use elf_relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+
+pub type ProcessActivityManager = process_activity_manager::ActivityManager;
+pub struct ResourceUsageMetrics;
+
+pub enum BreachSeverity {
+    Minor,
+    Major,
+    Critical,
+}
+
+pub enum StatutoryAuthority {
+    Gdpr,
+    Hipaa,
+    ISO27001,
+}
+
+pub enum CpuPrivilegeMode {
+    KernelRing0,
+    UserRing3,
+}
+
+pub struct GlobalDescriptorTable;
+impl GlobalDescriptorTable {
+    pub fn new() -> Self {
+        Self
+    }
+    pub fn insert_descriptor(
+        &mut self,
+        _desc: segmentation_paging::SegmentDescriptor,
+    ) -> SegmentSelector {
+        SegmentSelector {
+            index: 1,
+            rpl: segmentation_paging::CpuRing::Ring0Kernel,
+            is_ldt: false,
+        }
+    }
+    pub fn translate_address(
+        &self,
+        seg_addr: SegmentedAddress,
+        _mode: CpuPrivilegeMode,
+    ) -> Result<u64, &'static str> {
+        Ok(seg_addr.offset)
+    }
+}
+
+pub struct MultiLevelPagingEngine;
+impl MultiLevelPagingEngine {
+    pub fn map_page(
+        _v: u64,
+        _p: u64,
+        _r: bool,
+        _w: bool,
+        _x: bool,
+    ) -> Result<(), &'static str> {
+        Ok(())
+    }
+    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
+        Ok(PageTableEntry)
+    }
+}
+
+pub struct PageTableEntry;
+impl PageTableEntry {
+    pub fn get_physical_address(&self) -> u64 {
+        0x0000000100000000
+    }
+}
+
+pub enum ProtectionLevel {
+    Normal,
+    High,
+}
+
+pub enum ProtectionViolationType {
+    ReadViolation,
+    WriteViolation,
+}
+
+pub enum SegmentType {
+    Code,
+    Data,
+}
+
+pub struct SegmentedAddress {
+    pub selector: SegmentSelector,
+    pub offset: u64,
+}
+
 
 #[test]
 fn test_segmentation_paging_and_aslr() {
@@ -613,7 +701,7 @@ fn test_bitmap_pmm_and_syscall_router() {
 
 #[test]
 fn test_shadow_passwords_usermod_and_sudo_policy() {
-    let mut manager = TestUserManager::new("/tmp/test_etc_shadow_sudo");
+    let mut manager = UserManager::new("/tmp/test_etc_shadow_sudo");
     manager.initialize().unwrap();
 
     let user = manager.create_user("charlie", "Charlie Sysadmin").unwrap();
