@@ -234,7 +234,6 @@ mod tests {
     struct MockDriver {
         owner: Option<String>,
         debug_level: String,
-        base: KObject,
     }
 
     impl KernelObject for MockDriver {
@@ -295,7 +294,7 @@ mod tests {
                 self.debug_level = value.to_string();
                 Ok(())
             } else {
-                Err(DriverError::NotFound)
+                Err(DriverError::CapabilityDenied)
             }
         }
     }

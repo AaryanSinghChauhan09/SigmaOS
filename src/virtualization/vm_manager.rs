@@ -210,6 +210,7 @@ pub enum KvmExitReason {
     Hlt,
     Shutdown,
     InternalError,
+    Interrupt,
 }
 
 /// KVM vCPU register state
