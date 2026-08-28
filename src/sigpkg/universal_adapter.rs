@@ -22,6 +22,7 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 /// Description of Snapcraft Manifest (snap parity)
+#[derive(Debug, Clone)]
 pub struct SnapcraftManifest {
     pub name: String,
     pub version: String,
@@ -31,7 +32,9 @@ pub struct SnapcraftManifest {
     pub grade: String,
     pub apps: Vec<String>,
     pub plugs: Vec<String>,
-/// Description of Flatpak Manifest (flatpak parity)
+}
+
+#[derive(Debug, Clone)]
 pub struct FlatpakManifest {
     pub id: String,
     pub runtime: String,
@@ -39,13 +42,21 @@ pub struct FlatpakManifest {
     pub sdk: String,
     pub command: String,
     pub finish_args: Vec<String>,
+}
+
 #[derive(Debug, Clone)]
 pub enum AdapterError {
     ParseError(String),
     ValidationError(String),
     UnsupportedFormat(String),
-/// Permission structure for package format validation
+}
+
+#[derive(Debug, Clone)]
 pub struct Permission {
+    pub name: String,
+    pub granted: bool,
+}
+
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
     fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
@@ -54,6 +65,7 @@ pub trait PackageFormatAdapter {
     fn validate(&self, _raw: &[u8]) -> Result<bool, String> { Ok(true) }
     fn process_hook(&self, _hook: &str) -> Result<(), String> { Ok(()) }
     fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> { Ok(Vec::new()) }
+}
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};

@@ -16,7 +16,7 @@ pub use crate::filesystem::ext4_ntfs_security::{
 pub use control::{
     AccessControlMatrix, AclEntry, AclTag, AclType, CapBoundingSet, DacPermission, FilterPolicy,
     MacAddressFilter, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
-pub use control::*;
+};
 pub use append_rights::*;
 pub use crate::filesystem::ext4_ntfs_security::*;
 

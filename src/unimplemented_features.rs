@@ -1480,25 +1480,6 @@ mod tests {
             ],
         };
 
-    /// Translates touchpad multi-finger gestures to shell actions
-    pub fn parse_touchpad_gesture(&self, fingers_count: u8, swipe_up: bool) -> Option<DesktopShellAction> {
-        match (fingers_count, swipe_up) {
-            (3, true) => Some(DesktopShellAction::ToggleOverview),
-            (4, false) => Some(DesktopShellAction::SwitchWorkspace),
-            _ => None,
-        }
-    }
-
-    /// Matches voice audio transcript keywords to shell actions
-    pub fn match_voice_phrase(&self, phrase: &str) -> Option<DesktopShellAction> {
-        for slot in self.registered_voice_commands.iter() {
-            if let Some((cmd_phrase, action)) = slot {
-                if *cmd_phrase == phrase {
-                    return Some(*action);
-                }
-            }
-        }
-        None
     }
 }
 

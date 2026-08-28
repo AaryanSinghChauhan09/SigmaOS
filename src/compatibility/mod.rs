@@ -136,8 +136,8 @@ pub use historic_linux::{
 pub use mint_linux::{
     MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
     MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+};
 pub use legacy_adapters::{
-    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
     LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
 };
 

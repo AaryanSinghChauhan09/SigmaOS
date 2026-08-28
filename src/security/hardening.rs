@@ -9,22 +9,14 @@ extern crate alloc;
 use alloc::vec::Vec;
 use crate::security::Permission;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
+pub enum HardeningPermission {
     FileRead,
     FileWrite,
     NetworkTcp,
-}
-#[cfg(test)]
-use std::vec::Vec;
-#[cfg(not(test))]
-    NetworkTcp = 0,
-    FileRead = 1,
-use crate::security::capability::Permission;
-#[cfg(not(feature = "standalone_test"))]
     SystemAdmin,
     KernelModuleLoad,
+}
 use core::sync::atomic::{AtomicUsize, Ordering};
-
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data
 /// Uses volatile writes to guarantee that the compiler does not optimize away the memory wipe (preventing CVE leaks)

@@ -195,24 +195,8 @@ pub use kernel::{
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
-    BuddyAllocator, Channel, CompletionQueueEntry, IoUringEngine, IoUringOpcode, IpcError,
-    IpcManager, MemoryBlock, Message, Priority, Process, ProcessState, RoundRobinConfig,
-    RoundRobinScheduler, Scheduler, SubmissionQueueEntry, VirtualCpu, PAGE_SIZE,
 pub mod distro;
-
-    Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IpcError, IpcManager, Irql,
-    LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyManager, PolicyError, FastPathIpc, InterruptMechanism,
-    ProtectionDomain, ResourceBroker, PrivilegeLevel, PoolType, Priority, Process,
-    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    RoundRobinSchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
-    Tcb, ThreadState, WorkItem, PAGE_SIZE,
-};
 pub use network::{
-    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
     ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
 };
@@ -305,8 +289,8 @@ pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
+};
 pub use shell::{
-    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
@@ -329,20 +313,6 @@ pub use unimplemented_tools::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-pub use unimplemented_tools::{
-    AudioEditor, PodcastRecorder, SubtitleEditor, MemoryLeakDetector, GamifiedTodo, MindMapCreator,
-    GameHubLauncher, EmulatorManager, GameRecorder, GamePerformanceBooster, CloudGaming, VrArRuntime,
-    ControllerMapper, GameModManager, AiDifficultyDirector, GanttChartPlanner, PdfEditor,
-    DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
-    AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
-    MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
-    CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
-    SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
-    PluginMarketplace, MusicLibraryManager, FedoraToolboxContainerEngine, NixHomeManagerEnvironment,
-    MiseUniversalVersionManager, DevenvReproducibleEnvironment, AircrackWirelessAuditor,
-    UbuntuProLivepatchEngine, FlatpakSdkContainerBuilder, ClearLinuxStatelessEngine,
 };
 
 pub mod init {
