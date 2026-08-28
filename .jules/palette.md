@@ -31,3 +31,7 @@ This journal logs CRITICAL usability enhancements, accessibility standard compli
 ## 2026-08-27 - Inline Accessible Validation and Dynamic Stepper ARIA States
 **Learning:** Native browser `alert()` dialogs disrupt multi-step setup wizards, losing focus and creating bad UX for screen readers and keyboard users. Replacing `alert()` with inline `role="alert"` messages, `aria-invalid="true"` attributes, and automatic focus management ensures smooth, accessible form progression.
 **Action:** Replace modal alerts in wizard flows with inline aria-describedby validation alerts and focus target elements directly.
+
+## 2026-08-28 - Heading Focus Shifts in Multi-Step Wizard Panels
+**Learning:** When navigating panels in multi-step wizard applications, focus remains trapped on footer navigation controls ("Next"/"Back") unless explicitly shifted to the active panel title (`<h2 tabindex="-1">`). Automatically focusing panel headings on step transition announces the new step context immediately to screen reader users and establishes keyboard orientation.
+**Action:** Assign `tabindex="-1"` to section panel headings and call `.focus()` on the active step title during wizard step transitions.

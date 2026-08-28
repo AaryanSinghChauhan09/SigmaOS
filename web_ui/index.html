@@ -50,7 +50,7 @@
         <div class="wizard-body">
             <!-- Step 1: Welcome -->
             <section class="panel active" id="panel-1" aria-labelledby="step-1-title">
-                <h2 id="step-1-title">Welcome to the Future of Computing</h2>
+                <h2 id="step-1-title" tabindex="-1">Welcome to the Future of Computing</h2>
                 <p class="panel-desc">You are about to install SigmaOS — a sovereign, AI-native operating system built for post-quantum security and bare-metal performance.</p>
 
                 <div class="feature-grid">
@@ -82,7 +82,7 @@
 
             <!-- Step 2: Disk Selection -->
             <section class="panel" id="panel-2" aria-labelledby="step-2-title">
-                <h2 id="step-2-title">Select Target Storage Device</h2>
+                <h2 id="step-2-title" tabindex="-1">Select Target Storage Device</h2>
                 <p class="panel-desc">Choose the physical disk drive to use for SigmaOS installation.</p>
 
                 <div class="disk-list" role="radiogroup" aria-label="Select Target Disk">
@@ -112,7 +112,7 @@
 
             <!-- Step 3: Calamares-Style Partitioning & Dual-Boot Mode -->
             <section class="panel" id="panel-3" aria-labelledby="step-3-title">
-                <h2 id="step-3-title">Installation Type & Partition Layout</h2>
+                <h2 id="step-3-title" tabindex="-1">Installation Type & Partition Layout</h2>
                 <p class="panel-desc">Select how you want to partition the storage drive. Dual-boot mode allows running SigmaOS alongside your current OS.</p>
 
                 <div class="mode-list" role="radiogroup" aria-label="Partitioning Mode">
@@ -164,7 +164,7 @@
 
             <!-- Step 4: Settings -->
             <section class="panel" id="panel-4" aria-labelledby="step-4-title">
-                <h2 id="step-4-title">System Settings & Release Channels</h2>
+                <h2 id="step-4-title" tabindex="-1">System Settings & Release Channels</h2>
                 <p class="panel-desc">Configure your locale, host parameters, and select your rolling system release stream.</p>
 
                 <div class="form-grid">
@@ -189,7 +189,10 @@
 
                     <div class="form-group">
                         <label for="hostname-input">Hostname</label>
-                        <input type="text" id="hostname-input" value="sigmaos-node" placeholder="Enter system name">
+                        <input type="text" id="hostname-input" value="sigmaos-node" placeholder="Enter system name" aria-describedby="hostname-error">
+                        <div id="hostname-error" role="alert" style="display: none; color: var(--danger); font-size: 0.78rem; margin-top: 4px; font-weight: 500;">
+                            ⚠️ Please enter a valid system hostname.
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -205,7 +208,7 @@
 
             <!-- Step 5: Interactive Progress -->
             <section class="panel" id="panel-5" aria-labelledby="step-5-title">
-                <h2 id="step-5-title">Extracting Base Image & Packaging Shards</h2>
+                <h2 id="step-5-title" tabindex="-1">Extracting Base Image & Packaging Shards</h2>
                 <p class="panel-desc">Please wait while the automated installer formats partitions and extracts the base system image.</p>
 
                 <div class="progress-container">
@@ -235,7 +238,7 @@
             <section class="panel" id="panel-6" aria-labelledby="step-6-title">
                 <div class="success-screen">
                     <div class="success-icon">✓</div>
-                    <h2 id="step-6-title">Lattice Integration Complete!</h2>
+                    <h2 id="step-6-title" tabindex="-1">Lattice Integration Complete!</h2>
                     <p class="panel-desc">SigmaOS has been successfully written to disk, and dual-boot bootloader chainloading entries are configured in sigma-boot.</p>
 
                     <div class="summary-box">
@@ -310,6 +313,24 @@
                     indicator.removeAttribute('aria-current');
                 }
             }
+            const titleEl = document.getElementById(`step-${currentStep}-title`);
+            if (titleEl) {
+                titleEl.focus();
+            }
+        }
+
+        function updateNextButtonState() {
+            const btnNext = document.getElementById('btn-next');
+            if (currentStep === 4) {
+                btnNext.textContent = 'Install';
+                btnNext.setAttribute('aria-label', 'Start System Installation');
+            } else if (currentStep === totalSteps) {
+                btnNext.textContent = 'Reboot';
+                btnNext.setAttribute('aria-label', 'Reboot Node into Zenith Desktop');
+            } else {
+                btnNext.textContent = 'Next';
+                btnNext.setAttribute('aria-label', 'Continue to Next Step');
+            }
         }
 
         function prevStep() {
@@ -318,8 +339,8 @@
                 currentStep--;
                 document.getElementById(`panel-${currentStep}`).classList.add('active');
                 updateStepIndicators();
+                updateNextButtonState();
 
-                document.getElementById('btn-next').textContent = 'Next';
                 document.getElementById('btn-next').disabled = false;
 
                 if (currentStep === 1) {
@@ -342,11 +363,27 @@
                 licenseCb.removeAttribute('aria-invalid');
             }
 
+            if (currentStep === 4) {
+                const hostnameInput = document.getElementById('hostname-input');
+                const hostnameErr = document.getElementById('hostname-error');
+                if (!hostnameInput || !hostnameInput.value.trim()) {
+                    if (hostnameErr) hostnameErr.style.display = 'block';
+                    if (hostnameInput) {
+                        hostnameInput.setAttribute('aria-invalid', 'true');
+                        hostnameInput.focus();
+                    }
+                    return;
+                }
+                if (hostnameErr) hostnameErr.style.display = 'none';
+                if (hostnameInput) hostnameInput.removeAttribute('aria-invalid');
+            }
+
             if (currentStep < totalSteps) {
                 document.getElementById(`panel-${currentStep}`).classList.remove('active');
                 currentStep++;
                 document.getElementById(`panel-${currentStep}`).classList.add('active');
                 updateStepIndicators();
+                updateNextButtonState();
 
                 document.getElementById('btn-back').disabled = false;
 
@@ -355,7 +392,6 @@
                     document.getElementById('btn-back').disabled = true;
                     startInstallationSimulation();
                 } else if (currentStep === totalSteps) {
-                    document.getElementById('btn-next').textContent = 'Reboot';
                     document.getElementById('btn-next').onclick = () => alert('Rebooting node... Entering Zenith.');
                     document.getElementById('btn-back').disabled = true;
                 }
