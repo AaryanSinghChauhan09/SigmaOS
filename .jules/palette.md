@@ -27,3 +27,7 @@ This journal logs CRITICAL usability enhancements, accessibility standard compli
 ## 2026-08-23 - Keyboard Navigation and Focus Rings for Role Radio Selection Cards
 **Learning:** Custom selection cards (such as target disk or partitioning mode selectors) with `role="radio"` and `tabindex="0"` are unreachable by keyboard users unless explicit `Enter`/`Space` keydown event handlers (`handleCardKeydown`) and high-contrast `:focus-visible` outline rings are defined.
 **Action:** Pair custom interactive card components with keydown handlers for `Enter` and `Space` activation and explicit `:focus-visible` styles.
+
+## 2026-08-27 - Inline Accessible Validation and Dynamic Stepper ARIA States
+**Learning:** Native browser `alert()` dialogs disrupt multi-step setup wizards, losing focus and creating bad UX for screen readers and keyboard users. Replacing `alert()` with inline `role="alert"` messages, `aria-invalid="true"` attributes, and automatic focus management ensures smooth, accessible form progression.
+**Action:** Replace modal alerts in wizard flows with inline aria-describedby validation alerts and focus target elements directly.
