@@ -22,6 +22,9 @@
 
 
 extern crate alloc;
+#[cfg(test)]
+use std::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use alloc::string::{String, ToString};

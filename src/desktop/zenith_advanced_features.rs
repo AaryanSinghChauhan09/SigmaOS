@@ -8,7 +8,9 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
 
 /// Advanced window layout modes
@@ -289,7 +291,7 @@ impl AdvancedWindowManager {
     }
 
     /// Move window to specific monitor
-    pub fn move_window_to_monitor(&self, window_id: u64, monitor_id: u32) -> Result<(), String> {
+    pub fn move_window_to_monitor(&self, _window_id: u64, monitor_id: u32) -> Result<(), String> {
         if !self.multi_monitor_enabled {
             return Err("Multi-monitor not enabled".to_string());
         }
@@ -592,6 +594,224 @@ impl Default for ProfileManager {
     }
 }
 
+// =======================================================================// KWin & Hyprland Inspired Window Rules Engine
+// =======================================================================#[derive(Debug, Clone)]
+pub struct WindowRuleMatch {
+    pub app_id: Option<String>,
+    pub title_pattern: Option<String>,
+    pub window_class: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub enum WindowRuleAction {
+    SetWorkspace(u32),
+    SetFloating(bool),
+    SetOpacity(f32),
+    SetPinToAllWorkspaces(bool),
+    SetInitialGeometry { x: i32, y: i32, w: u32, h: u32 },
+}
+
+#[derive(Debug, Clone)]
+pub struct WindowRule {
+    pub id: u32,
+    pub name: String,
+    pub matcher: WindowRuleMatch,
+    pub actions: Vec<WindowRuleAction>,
+}
+
+pub struct ZenithWindowRuleEngine {
+    pub rules: Vec<WindowRule>,
+}
+
+impl ZenithWindowRuleEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: WindowRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn match_window(&self, app_id: &str, title: &str, window_class: &str) -> Vec<WindowRuleAction> {
+        let mut matched_actions = Vec::new();
+        for rule in &self.rules {
+            let mut app_match = true;
+            let mut title_match = true;
+            let mut class_match = true;
+
+            if let Some(ref req_app) = rule.matcher.app_id {
+                app_match = req_app == app_id;
+            }
+            if let Some(ref req_title) = rule.matcher.title_pattern {
+                title_match = title.contains(req_title.as_str());
+            }
+            if let Some(ref req_class) = rule.matcher.window_class {
+                class_match = req_class == window_class;
+            }
+
+            if app_match && title_match && class_match {
+                matched_actions.extend(rule.actions.iter().cloned());
+            }
+        }
+        matched_actions
+    }
+}
+
+impl Default for ZenithWindowRuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =======================================================================// Sway & Hyprland Inspired Scratchpad Manager (Dropdown terminals & floating tools)
+// =======================================================================#[derive(Debug, Clone)]
+pub struct ScratchpadWindow {
+    pub window_id: u64,
+    pub app_id: String,
+    pub visible: bool,
+    pub preferred_width: u32,
+    pub preferred_height: u32,
+}
+
+pub struct ZenithScratchpadManager {
+    pub windows: BTreeMap<String, ScratchpadWindow>,
+}
+
+impl ZenithScratchpadManager {
+    pub fn new() -> Self {
+        Self { windows: BTreeMap::new() }
+    }
+
+    pub fn register_scratchpad(&mut self, app_id: String, window_id: u64, width: u32, height: u32) {
+        self.windows.insert(app_id.clone(), ScratchpadWindow {
+            window_id,
+            app_id,
+            visible: false,
+            preferred_width: width,
+            preferred_height: height,
+        });
+    }
+
+    pub fn toggle_scratchpad(&mut self, app_id: &str) -> Option<bool> {
+        if let Some(win) = self.windows.get_mut(app_id) {
+            win.visible = !win.visible;
+            Some(win.visible)
+        } else {
+            None
+        }
+    }
+
+    pub fn get_scratchpad(&self, app_id: &str) -> Option<&ScratchpadWindow> {
+        self.windows.get(app_id)
+    }
+}
+
+impl Default for ZenithScratchpadManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =======================================================================// KDE Plasma Inspired Desktop Activity Manager (Contextual workspace environments)
+// =======================================================================#[derive(Debug, Clone)]
+pub struct DesktopActivity {
+    pub id: String,
+    pub name: String,
+    pub icon: String,
+    pub wallpaper_path: String,
+    pub default_workspaces: Vec<u32>,
+    pub active: bool,
+}
+
+pub struct ZenithActivityManager {
+    pub activities: BTreeMap<String, DesktopActivity>,
+    pub current_activity_id: String,
+}
+
+impl ZenithActivityManager {
+    pub fn new() -> Self {
+        let mut activities = BTreeMap::new();
+        activities.insert("default".to_string(), DesktopActivity {
+            id: "default".to_string(),
+            name: "General Workspace".to_string(),
+            icon: "desktop".to_string(),
+            wallpaper_path: "/usr/share/backgrounds/sigma_default.png".to_string(),
+            default_workspaces: vec![0, 1, 2],
+            active: true,
+        });
+
+        Self {
+            activities,
+            current_activity_id: "default".to_string(),
+        }
+    }
+
+    pub fn add_activity(&mut self, activity: DesktopActivity) {
+        self.activities.insert(activity.id.clone(), activity);
+    }
+
+    pub fn switch_activity(&mut self, activity_id: &str) -> Result<(), String> {
+        if self.activities.contains_key(activity_id) {
+            if let Some(current) = self.activities.get_mut(&self.current_activity_id) {
+                current.active = false;
+            }
+            if let Some(target) = self.activities.get_mut(activity_id) {
+                target.active = true;
+            }
+            self.current_activity_id = activity_id.to_string();
+            Ok(())
+        } else {
+            Err(format!("Activity '{}' does not exist", activity_id))
+        }
+    }
+
+    pub fn get_current_activity(&self) -> Option<&DesktopActivity> {
+        self.activities.get(&self.current_activity_id)
+    }
+}
+
+impl Default for ZenithActivityManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =======================================================================// OpenBSD cwm & FreeBSD Lumina Inspired Desktop Security Guard
+// =======================================================================pub struct ZenithDesktopSecurityGuard {
+    pub lock_screen_on_idle: bool,
+    pub idle_timeout_seconds: u32,
+    pub disable_screen_capture: bool,
+    pub restrict_untrusted_clipboard: bool,
+}
+
+impl ZenithDesktopSecurityGuard {
+    pub fn new() -> Self {
+        Self {
+            lock_screen_on_idle: true,
+            idle_timeout_seconds: 300,
+            disable_screen_capture: false,
+            restrict_untrusted_clipboard: true,
+        }
+    }
+
+    pub fn should_lock_session(&self, idle_time_sec: u32) -> bool {
+        self.lock_screen_on_idle && idle_time_sec >= self.idle_timeout_seconds
+    }
+
+    pub fn authorize_screen_capture(&self, requesting_app_id: &str) -> bool {
+        if self.disable_screen_capture {
+            return false;
+        }
+        !requesting_app_id.starts_with("untrusted_")
+    }
+}
+
+impl Default for ZenithDesktopSecurityGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -716,5 +936,60 @@ mod tests {
         let settings = profile_manager.get_current_settings();
         assert!(settings.is_some());
         assert_eq!(settings.unwrap().refresh_rate, 240);
+    }
+
+    #[test]
+    fn test_window_rule_engine() {
+        let mut engine = ZenithWindowRuleEngine::new();
+        engine.add_rule(WindowRule {
+            id: 1,
+            name: "Steam Floating Rule".to_string(),
+            matcher: WindowRuleMatch {
+                app_id: Some("steam".to_string()),
+                title_pattern: None,
+                window_class: None,
+            },
+            actions: vec![
+                WindowRuleAction::SetFloating(true),
+                WindowRuleAction::SetWorkspace(2),
+            ],
+        });
+
+        let actions = engine.match_window("steam", "Steam Friends List", "steam_class");
+        assert_eq!(actions.len(), 2);
+    }
+
+    #[test]
+    fn test_scratchpad_manager() {
+        let mut scratchpad = ZenithScratchpadManager::new();
+        scratchpad.register_scratchpad("terminal".to_string(), 42, 800, 600);
+
+        assert_eq!(scratchpad.toggle_scratchpad("terminal"), Some(true));
+        assert!(scratchpad.get_scratchpad("terminal").unwrap().visible);
+
+        assert_eq!(scratchpad.toggle_scratchpad("terminal"), Some(false));
+        assert!(!scratchpad.get_scratchpad("terminal").unwrap().visible);
+    }
+
+    #[test]
+    fn test_activity_manager_and_security_guard() {
+        let mut activity_mgr = ZenithActivityManager::new();
+        activity_mgr.add_activity(DesktopActivity {
+            id: "coding".to_string(),
+            name: "Development Activity".to_string(),
+            icon: "code".to_string(),
+            wallpaper_path: "/usr/share/backgrounds/code.png".to_string(),
+            default_workspaces: vec![1, 2],
+            active: false,
+        });
+
+        assert!(activity_mgr.switch_activity("coding").is_ok());
+        assert_eq!(activity_mgr.get_current_activity().unwrap().name, "Development Activity");
+
+        let sec_guard = ZenithDesktopSecurityGuard::new();
+        assert!(!sec_guard.should_lock_session(100));
+        assert!(sec_guard.should_lock_session(350));
+        assert!(sec_guard.authorize_screen_capture("obs_studio"));
+        assert!(!sec_guard.authorize_screen_capture("untrusted_app"));
     }
 }
