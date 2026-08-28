@@ -98,6 +98,144 @@ impl InitSystemBridge {
     }
 }
 
+/// Socket kinds for Systemd socket activation (Linux systemd parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketKind {
+    Stream,
+    Datagram,
+    SequentialPacket,
+    UnixStream,
+    UnixDatagram,
+    Fifo,
+}
+
+/// Socket activation configuration for Systemd socket units
+#[derive(Debug, Clone)]
+pub struct SystemdSocketConfig {
+    pub socket_id: UnitID,
+    pub service_id: UnitID,
+    pub listen_address: [u8; 64],
+    pub listen_port: u16,
+    pub socket_kind: SocketKind,
+    pub accept_connection: bool,
+    pub max_connections: usize,
+    pub current_connections: usize,
+    pub pass_fds: bool,
+}
+
+impl SystemdSocketConfig {
+    pub fn new(
+        socket_id: UnitID,
+        service_id: UnitID,
+        listen_address: &[u8],
+        listen_port: u16,
+        socket_kind: SocketKind,
+    ) -> Self {
+        let mut addr = [0u8; 64];
+        let len = listen_address.len().min(63);
+        addr[..len].copy_from_slice(&listen_address[..len]);
+        Self {
+            socket_id,
+            service_id,
+            listen_address: addr,
+            listen_port,
+            socket_kind,
+            accept_connection: false,
+            max_connections: 128,
+            current_connections: 0,
+            pass_fds: true,
+        }
+    }
+}
+
+/// Event triggering socket activation when incoming traffic is received
+#[derive(Debug, Clone)]
+pub struct SocketActivationEvent {
+    pub socket_id: UnitID,
+    pub remote_address: [u8; 64],
+    pub remote_port: u16,
+    pub file_descriptor: i32,
+}
+
+impl SocketActivationEvent {
+    pub fn new(socket_id: UnitID, remote_address: &[u8], remote_port: u16, file_descriptor: i32) -> Self {
+        let mut addr = [0u8; 64];
+        let len = remote_address.len().min(63);
+        addr[..len].copy_from_slice(&remote_address[..len]);
+        Self {
+            socket_id,
+            remote_address: addr,
+            remote_port,
+            file_descriptor,
+        }
+    }
+}
+
+/// Socket activation manager handling listening sockets and service activation triggers
+pub struct SystemdSocketActivationManager {
+    pub sockets: Vec<SystemdSocketConfig>,
+    pub active_fds: Vec<(UnitID, i32)>,
+}
+
+impl Default for SystemdSocketActivationManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SystemdSocketActivationManager {
+    pub fn new() -> Self {
+        Self {
+            sockets: Vec::new(),
+            active_fds: Vec::new(),
+        }
+    }
+
+    pub fn register_socket(&mut self, config: SystemdSocketConfig) {
+        self.sockets.push(config);
+    }
+
+    pub fn bind_socket_fd(&mut self, socket_id: UnitID, fd: i32) -> Result<(), &'static str> {
+        if self.sockets.iter().any(|s| s.socket_id == socket_id) {
+            self.active_fds.push((socket_id, fd));
+            Ok(())
+        } else {
+            Err("Socket unit not found in activation manager")
+        }
+    }
+
+    pub fn process_incoming_event(
+        &mut self,
+        engine: &mut SystemdEngine,
+        event: &SocketActivationEvent,
+    ) -> Result<UnitID, &'static str> {
+        let mut target_service = None;
+        for s in self.sockets.iter_mut() {
+            if s.socket_id == event.socket_id {
+                s.current_connections = s.current_connections.saturating_add(1);
+                target_service = Some(s.service_id);
+                break;
+            }
+        }
+
+        if let Some(service_id) = target_service {
+            engine.trigger_socket_activation(event.socket_id)?;
+            Ok(service_id)
+        } else {
+            Err("No service associated with incoming socket event")
+        }
+    }
+
+    pub fn get_socket_fd(&self, socket_id: UnitID) -> Option<i32> {
+        for &(id, fd) in self.active_fds.iter() {
+            if id == socket_id {
+                return Some(fd);
+            }
+        }
+        None
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UnitState {
     Active,
@@ -1128,5 +1266,35 @@ mod tests {
 
         let runit_script = bridge.convert_runit_service_script("apache2");
         assert!(&runit_script[..].starts_with(b"#!/bin/sh\nexec apache2 --foreground\n"));
+    }
+
+    #[test]
+    fn test_socket_activation_manager() {
+        let mut engine = SystemdEngine::new();
+        let mut socket_mgr = SystemdSocketActivationManager::new();
+
+        let mut socket_unit = SystemdUnit::new(10, b"httpd.socket", UnitType::Socket);
+        socket_unit.triggered_unit = Some(20);
+        let srv_unit = SystemdUnit::new(20, b"httpd.service", UnitType::Service);
+
+        engine.register_unit(socket_unit);
+        engine.register_unit(srv_unit);
+
+        let socket_cfg = SystemdSocketConfig::new(
+            10,
+            20,
+            b"0.0.0.0",
+            80,
+            SocketKind::Stream,
+        );
+        socket_mgr.register_socket(socket_cfg);
+
+        socket_mgr.bind_socket_fd(10, 5).unwrap();
+        assert_eq!(socket_mgr.get_socket_fd(10), Some(5));
+
+        let event = SocketActivationEvent::new(10, b"192.168.1.50", 54321, 5);
+        let triggered_srv = socket_mgr.process_incoming_event(&mut engine, &event).unwrap();
+        assert_eq!(triggered_srv, 20);
+        assert_eq!(engine.systemctl_status(20), Some(UnitState::Active));
     }
 }

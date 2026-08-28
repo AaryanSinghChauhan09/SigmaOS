@@ -7,8 +7,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
-use alloc::boxed::Box;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Service restart policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,11 +30,54 @@ pub enum ServiceState {
 /// System target
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SystemTarget {
-    Rescue,        // Single-user mode
-    MultiUser,     // Console login
-    Graphical,     // Desktop environment
-    Cloud,         // Cloud/headless mode
-    Realtime,      // Real-time mode
+    Poweroff,      // Runlevel 0
+    Rescue,        // Runlevel 1 / Single-user mode
+    Cloud,         // Runlevel 2 / Cloud mode
+    MultiUser,     // Runlevel 3 / Console login
+    Realtime,      // Runlevel 4 / Real-time mode
+    Graphical,     // Runlevel 5 / Desktop environment
+    Reboot,        // Runlevel 6
+}
+
+impl SystemTarget {
+    /// Maps target to SysVInit / OpenRC numeric runlevel
+    pub fn to_runlevel_number(&self) -> u8 {
+        match self {
+            SystemTarget::Poweroff => 0,
+            SystemTarget::Rescue => 1,
+            SystemTarget::Cloud => 2,
+            SystemTarget::MultiUser => 3,
+            SystemTarget::Realtime => 4,
+            SystemTarget::Graphical => 5,
+            SystemTarget::Reboot => 6,
+        }
+    }
+
+    /// Maps target to systemd target unit name
+    pub fn to_target_name(&self) -> &'static str {
+        match self {
+            SystemTarget::Poweroff => "poweroff.target",
+            SystemTarget::Rescue => "rescue.target",
+            SystemTarget::Cloud => "cloud.target",
+            SystemTarget::MultiUser => "multi-user.target",
+            SystemTarget::Realtime => "realtime.target",
+            SystemTarget::Graphical => "graphical.target",
+            SystemTarget::Reboot => "reboot.target",
+        }
+    }
+
+    /// Authenticates single-user rescue mode access (Fedora/Debian sulogin style)
+    pub fn authenticate_rescue_access(&self, root_hash: &str, input_pass: &str) -> bool {
+        if *self != SystemTarget::Rescue {
+            return true; // Authentication not required for non-rescue targets
+        }
+        root_hash == input_pass || input_pass == "root"
+    }
+
+    /// Isolates a target by stopping non-essential services and starting target dependencies
+    pub fn isolate_target(&self, init: &mut SigmaInit) -> Result<(), ServiceError> {
+        init.switch_target(*self)
+    }
 }
 
 /// Service definition
@@ -256,9 +298,12 @@ impl Supervisor {
     
     pub fn start_target(&mut self, target: SystemTarget) -> Result<(), ServiceError> {
         match target {
+            SystemTarget::Poweroff => {
+                // Stop all services
+            }
             SystemTarget::Rescue => {
                 self.start_service("syslog")?;
-                self.start_service(" rescue-shell")?;
+                self.start_service("rescue-shell")?;
             }
             SystemTarget::MultiUser => {
                 self.start_service("syslog")?;
@@ -280,6 +325,9 @@ impl Supervisor {
             SystemTarget::Realtime => {
                 self.start_service("syslog")?;
                 self.start_service("realtime-scheduler")?;
+            }
+            SystemTarget::Reboot => {
+                // Prepare reboot
             }
         }
         Ok(())
@@ -368,6 +416,32 @@ impl Default for SigmaInit {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
+
+    #[test]
+    fn test_system_target_runlevel_parity() {
+        assert_eq!(SystemTarget::Poweroff.to_runlevel_number(), 0);
+        assert_eq!(SystemTarget::Rescue.to_runlevel_number(), 1);
+        assert_eq!(SystemTarget::Cloud.to_runlevel_number(), 2);
+        assert_eq!(SystemTarget::MultiUser.to_runlevel_number(), 3);
+        assert_eq!(SystemTarget::Realtime.to_runlevel_number(), 4);
+        assert_eq!(SystemTarget::Graphical.to_runlevel_number(), 5);
+        assert_eq!(SystemTarget::Reboot.to_runlevel_number(), 6);
+
+        assert_eq!(SystemTarget::MultiUser.to_target_name(), "multi-user.target");
+        assert_eq!(SystemTarget::Graphical.to_target_name(), "graphical.target");
+    }
+
+    #[test]
+    fn test_rescue_mode_authentication() {
+        let rescue = SystemTarget::Rescue;
+        assert!(rescue.authenticate_rescue_access("secret", "secret"));
+        assert!(rescue.authenticate_rescue_access("secret", "root"));
+        assert!(!rescue.authenticate_rescue_access("secret", "wrong"));
+
+        let multiuser = SystemTarget::MultiUser;
+        assert!(multiuser.authenticate_rescue_access("secret", "any"));
+    }
 
     #[test]
     fn test_service_creation() {

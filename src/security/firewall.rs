@@ -3,6 +3,7 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -14,8 +15,10 @@ pub enum Action { Accept, Drop, Reject, Log, NatSnat(u32), NatDnat(u32) }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConnectionState { New, Established, Related, Invalid }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Ipv4Address(pub u32);
 
+#[derive(Debug, Clone)]
 pub struct MatchCriteria {
     pub source_ip: Option<Ipv4Address>,
     pub dest_ip: Option<Ipv4Address>,
@@ -41,6 +44,7 @@ pub struct Rule {
     pub action: Action,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PacketInfo {
     pub source_ip: Ipv4Address,
     pub dest_ip: Ipv4Address,
@@ -80,10 +84,46 @@ impl RateLimiter {
     }
 }
 
+/// Ubuntu/UFW inspired Application Profile
+#[derive(Debug, Clone)]
+pub struct UfwAppProfile {
+    pub title: String,
+    pub description: String,
+    pub ports: Vec<(u16, Protocol)>,
+}
+
+impl UfwAppProfile {
+    pub fn new(title: &str, description: &str) -> Self {
+        Self {
+            title: String::from(title),
+            description: String::from(description),
+            ports: Vec::new(),
+        }
+    }
+
+    pub fn add_port(&mut self, port: u16, protocol: Protocol) {
+        self.ports.push((port, protocol));
+    }
+}
+
+/// Linux iptables / nftables inspired NAT type
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NatType {
+    Snat { new_src_ip: u32 },
+    Dnat { new_dst_ip: u32, new_dst_port: u16 },
+    Masquerade { outgoing_ip: u32 },
+}
+
+pub struct NatRule {
+    pub match_criteria: MatchCriteria,
+    pub nat_type: NatType,
+}
+
 pub struct Firewall {
     pub input_rules: Vec<Rule>,
     pub output_rules: Vec<Rule>,
     pub forward_rules: Vec<Rule>,
+    pub nat_rules: Vec<NatRule>,
     pub default_action: Action,
     pub conntrack: BTreeMap<ConnectionTuple, ConnectionEntry>,
     pub rate_limiter: RateLimiter,
@@ -95,6 +135,7 @@ impl Firewall {
             input_rules: Vec::new(),
             output_rules: Vec::new(),
             forward_rules: Vec::new(),
+            nat_rules: Vec::new(),
             default_action: Action::Drop,
             conntrack: BTreeMap::new(),
             rate_limiter: RateLimiter { tokens: 100, capacity: 100, fill_rate: 10, last_update: 0 },
@@ -117,6 +158,63 @@ impl Firewall {
         }
     }
 
+    pub fn enable_app_profile(&mut self, profile: &UfwAppProfile, action: Action) {
+        for &(port, protocol) in &profile.ports {
+            let rule = Rule {
+                criteria: MatchCriteria {
+                    source_ip: None,
+                    dest_ip: None,
+                    source_port: None,
+                    dest_port: Some(port),
+                    protocol,
+                    state: None,
+                },
+                action,
+            };
+            self.input_rules.push(rule);
+        }
+    }
+
+    pub fn add_nat_rule(&mut self, rule: NatRule) {
+        self.nat_rules.push(rule);
+    }
+
+    pub fn translate_nat(&self, packet: &PacketInfo, state: ConnectionState) -> Option<(PacketInfo, NatType)> {
+        for nat_rule in &self.nat_rules {
+            if nat_rule.match_criteria.matches(packet, state) {
+                let mut translated = packet.clone();
+                match &nat_rule.nat_type {
+                    NatType::Snat { new_src_ip } => {
+                        translated.source_ip = Ipv4Address(*new_src_ip);
+                    }
+                    NatType::Dnat { new_dst_ip, new_dst_port } => {
+                        translated.dest_ip = Ipv4Address(*new_dst_ip);
+                        translated.dest_port = *new_dst_port;
+                    }
+                    NatType::Masquerade { outgoing_ip } => {
+                        translated.source_ip = Ipv4Address(*outgoing_ip);
+                    }
+                }
+                return Some((translated, nat_rule.nat_type.clone()));
+            }
+        }
+        None
+    }
+
+    pub fn cleanup_stale_connections(&mut self, now: u64, timeout_secs: u64) -> usize {
+        let mut stale_tuples = Vec::new();
+        for (tuple, entry) in self.conntrack.iter() {
+            if now.saturating_sub(entry.last_seen) > timeout_secs {
+                stale_tuples.push(tuple.clone());
+            }
+        }
+        let count = stale_tuples.len();
+        for tuple in stale_tuples {
+            self.conntrack.remove(&tuple);
+        }
+        count
+    }
+
     pub fn evaluate_forward(&mut self, packet: &PacketInfo, now: u64) -> Action {
         let state = self.track_connection(packet, now);
         for rule in &self.forward_rules {
@@ -131,5 +229,55 @@ impl Firewall {
             }
         }
         self.default_action
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ufw_application_profile() {
+        let mut fw = Firewall::new();
+        let mut web_server = UfwAppProfile::new("Nginx Full", "Web Server (HTTP + HTTPS)");
+        web_server.add_port(80, Protocol::Tcp);
+        web_server.add_port(443, Protocol::Tcp);
+
+        fw.enable_app_profile(&web_server, Action::Accept);
+        assert_eq!(fw.input_rules.len(), 2);
+    }
+
+    #[test]
+    fn test_nat_port_forwarding() {
+        let mut fw = Firewall::new();
+        fw.add_nat_rule(NatRule {
+            match_criteria: MatchCriteria {
+                source_ip: None,
+                dest_ip: Some(Ipv4Address(0x0A000001)), // 10.0.0.1
+                source_port: None,
+                dest_port: Some(8080),
+                protocol: Protocol::Tcp,
+                state: None,
+            },
+            nat_type: NatType::Dnat {
+                new_dst_ip: 0xC0A80164, // 192.168.1.100
+                new_dst_port: 80,
+            },
+        });
+
+        let pkt = PacketInfo {
+            source_ip: Ipv4Address(0x01020304),
+            dest_ip: Ipv4Address(0x0A000001),
+            source_port: 12345,
+            dest_port: 8080,
+            protocol: Protocol::Tcp,
+        };
+
+        let translated = fw.translate_nat(&pkt, ConnectionState::New);
+        assert!(translated.is_some());
+        let (new_pkt, nat_type) = translated.unwrap();
+        assert_eq!(new_pkt.dest_ip, Ipv4Address(0xC0A80164));
+        assert_eq!(new_pkt.dest_port, 80);
+        assert_eq!(nat_type, NatType::Dnat { new_dst_ip: 0xC0A80164, new_dst_port: 80 });
     }
 }

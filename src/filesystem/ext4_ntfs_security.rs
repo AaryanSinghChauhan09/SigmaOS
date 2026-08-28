@@ -26,12 +26,59 @@ pub mod ext4_mode_bits {
     pub const S_IXOTH: u16 = 0o0001; // Others Execute
 }
 
+/// Ext4 Extent mapping block range to physical disk blocks
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Ext4Extent {
+    pub block_offset: u32,
+    pub length: u16,
+    pub start_hi: u16,
+    pub start_lo: u32,
+}
+
+impl Ext4Extent {
+    pub fn new(block_offset: u32, length: u16, physical_block: u64) -> Self {
+        Self {
+            block_offset,
+            length,
+            start_hi: (physical_block >> 32) as u16,
+            start_lo: (physical_block & 0xFFFFFFFF) as u32,
+        }
+    }
+
+    pub fn physical_block(&self) -> u64 {
+        ((self.start_hi as u64) << 32) | (self.start_lo as u64)
+    }
+}
+
+/// Ext4 Fast Commit Log Record (Linux 5.10+ fast commit parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Ext4FastCommit {
+    pub commit_id: u64,
+    pub inode_id: u64,
+    pub updated_extents: Vec<Ext4Extent>,
+}
+
+impl Ext4FastCommit {
+    pub fn new(commit_id: u64, inode_id: u64) -> Self {
+        Self {
+            commit_id,
+            inode_id,
+            updated_extents: Vec::new(),
+        }
+    }
+
+    pub fn add_extent(&mut self, extent: Ext4Extent) {
+        self.updated_extents.push(extent);
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Ext4InodeMetadata {
     pub inode_id: u64,
     pub uid: u32,
     pub gid: u32,
     pub i_mode: u16,                       // 16-bit file type + permissions
+    pub extents: Vec<Ext4Extent>,          // Ext4 extent tree mapping
     pub xattrs: BTreeMap<String, Vec<u8>>, // Extended attributes e.g. "system.posix_acl_access"
 }
 
@@ -42,12 +89,28 @@ impl Ext4InodeMetadata {
             uid,
             gid,
             i_mode,
+            extents: Vec::new(),
             xattrs: BTreeMap::new(),
         }
     }
 
     pub fn set_xattr(&mut self, name: &str, value: &[u8]) {
         self.xattrs.insert(name.to_string(), value.to_vec());
+    }
+
+    pub fn add_extent(&mut self, extent: Ext4Extent) {
+        self.extents.push(extent);
+    }
+
+    /// Recovers extent mappings from a Fast Commit log entry
+    pub fn apply_fast_commit(&mut self, fc: &Ext4FastCommit) -> bool {
+        if fc.inode_id != self.inode_id {
+            return false;
+        }
+        for extent in &fc.updated_extents {
+            self.extents.push(extent.clone());
+        }
+        true
     }
 
     /// Ext4 Access Check Flow:
@@ -209,6 +272,19 @@ mod tests {
         // Set POSIX ACL Extended Attribute
         ext4.set_xattr("system.posix_acl_access", &[0x02, 0x00]);
         assert!(ext4.evaluate_ext4_access(1000, 1000, 0o7));
+    }
+
+    #[test]
+    fn test_ext4_fast_commit_and_extents() {
+        let mut ext4 = Ext4InodeMetadata::new(202, 1000, 1000, 0o644);
+        let ext = Ext4Extent::new(0, 8, 0x1000);
+        ext4.add_extent(ext);
+        assert_eq!(ext4.extents[0].physical_block(), 0x1000);
+
+        let mut fc = Ext4FastCommit::new(1, 202);
+        fc.add_extent(Ext4Extent::new(8, 4, 0x1008));
+        assert!(ext4.apply_fast_commit(&fc));
+        assert_eq!(ext4.extents.len(), 2);
     }
 
     #[test]

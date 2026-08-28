@@ -365,6 +365,28 @@ impl DoasRuleEngine {
         }
         last_match
     }
+
+    pub fn evaluate_groups(
+        &self,
+        username: &str,
+        user_groups: &[&str],
+        target_user: &str,
+        command: &str,
+    ) -> DoasEvaluationResult {
+        let is_wheel = user_groups.contains(&"wheel");
+        match self.evaluate(username, is_wheel, target_user, command) {
+            Some(rule) => DoasEvaluationResult {
+                permitted: rule.action == DoasAction::Permit,
+                nopass_required: rule.nopass,
+                keepenv: rule.keepenv,
+            },
+            None => DoasEvaluationResult {
+                permitted: false,
+                nopass_required: false,
+                keepenv: false,
+            },
+        }
+    }
 }
 
 impl Default for DoasRuleEngine {
@@ -409,7 +431,7 @@ impl BsdSecurelevelGuard {
             self.current_level = new_level;
             Ok(())
         } else {
-            Err("securelevel can only be raised, not lowered");
+            Err("securelevel can only be raised, not lowered")
         }
     }
 
@@ -478,6 +500,19 @@ impl SubUidGidMapper {
             }
         }
         false
+    }
+
+    pub fn get_subuid_range(&self, username: &str) -> Option<&SubUidGidRange> {
+        self.subuid_ranges.iter().find(|r| r.username == username)
+    }
+
+    pub fn map_container_uid(&self, username: &str, container_uid: u32) -> Option<u32> {
+        let range = self.get_subuid_range(username)?;
+        if container_uid < range.count {
+            Some(range.start_id + container_uid)
+        } else {
+            None
+        }
     }
 }
 
@@ -925,97 +960,11 @@ impl Default for BsdSecurelevelController {
 // 8. OpenBSD doas.conf Parity Rule Engine
 // ==========================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DoasAction {
-    Permit,
-    Deny,
-}
-
-#[derive(Debug, Clone)]
-pub struct DoasRule {
-    pub action: DoasAction,
-    pub identity: String,     // e.g. "wheel" or "alice"
-    pub target_user: String,  // e.g. "root"
-    pub command: Option<String>, // Option for specific binary, e.g. "/sbin/reboot"
-    pub nopass: bool,
-    pub keepenv: bool,
-}
-
 #[derive(Debug, Clone)]
 pub struct DoasEvaluationResult {
     pub permitted: bool,
     pub nopass_required: bool,
     pub keepenv: bool,
-}
-
-pub struct DoasRuleEngine {
-    pub rules: Vec<DoasRule>,
-}
-
-impl DoasRuleEngine {
-    pub fn new() -> Self {
-        Self { rules: Vec::new() }
-    }
-
-    pub fn add_rule(&mut self, rule: DoasRule) {
-        self.rules.push(rule);
-    }
-
-    /// Evaluates doas command invocation following OpenBSD `last-matching-rule` semantics
-    pub fn evaluate(
-        &self,
-        username: &str,
-        user_groups: &[&str],
-        target_user: &str,
-        command: &str,
-    ) -> DoasEvaluationResult {
-        let mut last_matching: Option<&DoasRule> = None;
-
-        for rule in &self.rules {
-            // Check identity match (username or group)
-            let id_matches = rule.identity == username
-                || rule.identity == ":wheel" && user_groups.contains(&"wheel")
-                || rule.identity.starts_with(':') && user_groups.contains(&&rule.identity[1..]);
-
-            if !id_matches {
-                continue;
-            }
-
-            // Check target user match
-            if rule.target_user != target_user && rule.target_user != "*" {
-                continue;
-            }
-
-            // Check command match
-            if let Some(ref cmd) = rule.command {
-                if cmd != command {
-                    continue;
-                }
-            }
-
-            // Rule matches! OpenBSD doas takes the LAST matching rule.
-            last_matching = Some(rule);
-        }
-
-        match last_matching {
-            Some(rule) => DoasEvaluationResult {
-                permitted: rule.action == DoasAction::Permit,
-                nopass_required: rule.nopass,
-                keepenv: rule.keepenv,
-            },
-            None => DoasEvaluationResult {
-                permitted: false,
-                nopass_required: false,
-                keepenv: false,
-            },
-        }
-    }
-}
-
-impl Default for DoasRuleEngine {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 // ==========================================
@@ -1027,48 +976,6 @@ pub struct SubUidRange {
     pub username: String,
     pub start_id: u32,
     pub count: u32,
-}
-
-pub struct SubUidGidMapper {
-    pub subuid_database: Vec<SubUidRange>,
-    pub subgid_database: Vec<SubUidRange>,
-}
-
-impl SubUidGidMapper {
-    pub fn new() -> Self {
-        Self {
-            subuid_database: Vec::new(),
-            subgid_database: Vec::new(),
-        }
-    }
-
-    pub fn add_subuid_range(&mut self, username: &str, start_id: u32, count: u32) {
-        self.subuid_database.push(SubUidRange {
-            username: username.to_string(),
-            start_id,
-            count,
-        });
-    }
-
-    pub fn get_subuid_range(&self, username: &str) -> Option<&SubUidRange> {
-        self.subuid_database.iter().find(|r| r.username == username)
-    }
-
-    /// Map container internal UID to host subuid range
-    pub fn map_container_uid(&self, username: &str, container_uid: u32) -> Option<u32> {
-        let range = self.get_subuid_range(username)?;
-        if container_uid < range.count {
-            Some(range.start_id + container_uid)
-        } else {
-            None
-        }
-    }
-}
-
-impl Default for SubUidGidMapper {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 // ==========================================
@@ -1394,29 +1301,19 @@ mod tests {
         });
 
         // Evaluate reboot for alice
-        let res1 = engine.evaluate("alice", &["wheel"], "root", "/sbin/reboot");
+        let res1 = engine.evaluate_groups("alice", &["wheel"], "root", "/sbin/reboot");
         assert!(res1.permitted);
         assert!(res1.nopass_required);
 
         // Evaluate general command for bob in wheel group
-        let res2 = engine.evaluate("bob", &["wheel"], "root", "/usr/bin/htop");
+        let res2 = engine.evaluate_groups("bob", &["wheel"], "root", "/usr/bin/htop");
         assert!(res2.permitted);
         assert!(!res2.nopass_required);
         assert!(res2.keepenv);
 
         // Evaluate unauthorized user charlie
-        let res3 = engine.evaluate("charlie", &["users"], "root", "/sbin/reboot");
+        let res3 = engine.evaluate_groups("charlie", &["users"], "root", "/sbin/reboot");
         assert!(!res3.permitted);
-    }
-
-    #[test]
-    fn test_subuid_gid_mapping() {
-        let mut mapper = SubUidGidMapper::new();
-        mapper.add_subuid_range("alice", 100000, 65536);
-
-        assert_eq!(mapper.map_container_uid("alice", 0), Some(100000));
-        assert_eq!(mapper.map_container_uid("alice", 1000), Some(101000));
-        assert_eq!(mapper.map_container_uid("alice", 70000), None); // Exceeds count
     }
 
     #[test]
