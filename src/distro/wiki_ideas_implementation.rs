@@ -609,6 +609,10 @@ impl SovereignHybridSchedulerInnovations {
         self.rt_tasks.insert(task.pid, task);
     }
 
+    pub fn verify_rt_lane_preemption_latency(&self) -> bool {
+        self.rt_lane_latency_us < 5
+    }
+
     /// Selects optimal NUMA node for memory and thread affinity binding.
     pub fn select_optimal_numa_node(&self, cpu_core: usize) -> Option<usize> {
         self.numa_nodes.iter().find(|n| n.cpu_cores.contains(&cpu_core)).map(|n| n.node_id)

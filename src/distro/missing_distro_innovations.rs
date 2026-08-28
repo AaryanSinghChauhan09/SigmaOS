@@ -176,11 +176,13 @@ impl Default for SolusEopkgManager {
 pub struct MageiaUrpmiEngine {
     pub urpmi_db: crate::klib::BTreeMap<String, Vec<String>>,
     pub package_database: std::collections::HashMap<String, String>,
+    pub package_database: BTreeMap<String, Vec<String>>,
 }
 
 impl MageiaUrpmiEngine {
     pub fn new() -> Self {
         let mut db = crate::klib::BTreeMap::new();
+        let mut db = BTreeMap::new();
         let mut kde_deps = Vec::new();
         kde_deps.push(String::from("plasma-workspace"));
         kde_deps.push(String::from("sddm"));
@@ -358,7 +360,7 @@ mod tests {
     #[test]
     fn test_chimera_dinit_supervisor() {
         let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service(String::from("networking"), Vec::new());
+        dinit.register_service("networking", "/sbin/ip link set up", Vec::new());
         assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Stopped);
     }
 

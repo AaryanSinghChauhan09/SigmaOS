@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Arch Linux Parity Implementation
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
@@ -144,6 +143,12 @@ impl PkgBuild {
         } else {
             None
         }
+    }
+}
+
+impl Default for PkgBuild {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -363,7 +368,12 @@ impl AlpmDatabase {
         let mut visiting = Vec::new();
         let mut visited = Vec::new();
 
-        self.dfs_resolve(&root_pkgname.to_string(), &mut visiting, &mut visited, &mut resolved)?;
+        self.dfs_resolve(
+            &root_pkgname.to_string(),
+            &mut visiting,
+            &mut visited,
+            &mut resolved,
+        )?;
 
         Ok(resolved)
     }
@@ -400,6 +410,12 @@ impl AlpmDatabase {
         resolved.push(pkgname.clone());
 
         Ok(())
+    }
+}
+
+impl Default for AlpmDatabase {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

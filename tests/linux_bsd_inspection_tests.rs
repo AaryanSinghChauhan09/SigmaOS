@@ -36,7 +36,7 @@ mod freebsd_jails;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd_compat;
 #[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas;
+mod wiki_ideas_implementation;
 #[path = "../src/kernel/bore.rs"]
 mod bore;
 #[path = "../src/filesystem/bsd_linux_innovations.rs"]
@@ -45,6 +45,12 @@ mod fs_bsd_linux_innovations;
 mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
+#[path = "../src/compatibility/gap_closure.rs"]
+mod gap_closure;
+#[path = "../src/virtualization/kvm_vcpu.rs"]
+mod kvm_vcpu;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 
 #[path = "../src/distro/wiki_ideas_implementation.rs"]
 mod wiki_ideas_implementation;
@@ -90,6 +96,7 @@ mod unified;
 
 use bsd::*;
 use wiki_ideas_implementation::SystemdUnitActiveState;
+use bsd_compat::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unveil::{UnveilManager, UnveilPermission};

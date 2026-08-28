@@ -12,8 +12,7 @@ use crate::klib::collections::HashMap;
 use crate::klib::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
-// ==================================================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
     D0Active,
     D1LowPower,
@@ -83,6 +82,8 @@ impl GentooPortageMaskResolver {
             category_pkg: category_pkg.to_string(),
             version: version.to_string(),
             slot: "0".to_string(),
+            category_pkg: category_pkg.to_string(),
+            version: version.to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
             is_masked,
             is_ebuild_masked: is_masked,
@@ -99,7 +100,7 @@ impl GentooPortageMaskResolver {
         }
 
         let target_atom = format!("{}:{}", category_pkg, version);
-        let ebuild = self.ebuilds.iter().find(|e| e.atom_name == target_atom || e.atom_name.starts_with(category_pkg))
+        let ebuild = self.ebuilds.iter().find(|e| format!("{}:{}", e.category_pkg, e.version) == target_atom || e.category_pkg == category_pkg)
             .ok_or("Ebuild not found")?;
 
         if ebuild.is_masked && !accept_keywords {
@@ -235,8 +236,7 @@ impl Default for BareMetalPeripheralManager {
 }
 
 // ==================================================================// 6.2 ZERO-ALLOCATION UDF BYTECODE INTERPRETER SPECIFICATION
-// ==================================================================
-pub const OP_READ: u8 = 0x10;
+// ===========================================================pub const OP_READ: u8 = 0x10;
 pub const OP_WRITE: u8 = 0x20;
 pub const OP_ADD: u8 = 0x30;
 pub const OP_HALT: u8 = 0xF0;
@@ -324,8 +324,7 @@ impl UdfVm {
 }
 
 // ==================================================================// 6.3 DECLARATIVE PACKAGE RESOLUTION SAT SOLVER SPECIFICATIONS
-// ==================================================================
-pub const MAX_NODES: usize = 8;
+// ===========================================================pub const MAX_NODES: usize = 8;
 pub const MAX_DEPS: usize = 4;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -446,8 +445,7 @@ impl Default for SatSolverEngine {
 }
 
 // ==================================================================// 6.4 JBD2-STYLE CRASH-RESILIENT TRANSACTIONAL LEDGER SPECIFICATIONS
-// ==================================================================
-pub const JOURNAL_CAPACITY: usize = 8;
+// ===========================================================pub const JOURNAL_CAPACITY: usize = 8;
 
 #[derive(Debug, Clone, Copy)]
 pub struct TransactionBlock {
@@ -563,8 +561,7 @@ impl Jbd2TransactionLedger {
 }
 
 // ==================================================================// 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
-// ==================================================================
-pub const PCI_MAX_BUS: usize = 256;
+// ===========================================================pub const PCI_MAX_BUS: usize = 256;
 pub const PCI_MAX_DEVICE: u8 = 32;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -642,8 +639,7 @@ impl Default for PciBusScanner {
 }
 
 // ==================================================================// 2. S-FS SNAPSHOTS & GENERATIONS (NIXOS-STYLE BLUEPRINT)
-// ==================================================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Generation {
     pub id: u32,
     pub root_inode: u64,
@@ -700,8 +696,7 @@ impl Default for GenerationManager {
 }
 
 // ==================================================================// 3. S-IPC TRANSACTION BUS (MICROKERNEL INTER-PROCESS COMMUNICATION)
-// ==================================================================
-pub const MAX_IPC_MESSAGE_SIZE: usize = 64;
+// ===========================================================pub const MAX_IPC_MESSAGE_SIZE: usize = 64;
 pub const IPC_QUEUE_CAPACITY: usize = 8;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -780,8 +775,7 @@ impl SovereignIpcBus {
 }
 
 // =====================================================================// SECTION 7: LINUX & BSD DISTRO PARITY & UNIMPLEMENTED IDEAS ENGINE
-// =====================================================================
-/// Fedora Silverblue / rpm-ostree Immutable OS Deployment State
+// ==============================================================/// Fedora Silverblue / rpm-ostree Immutable OS Deployment State
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum OstreeDeploymentState {
     Staged,
@@ -1043,8 +1037,7 @@ impl Default for SovereignIpcBus {
 }
 
 // ==================================================================// LINUX & BSD DISTRO PARITY ABSTRACTIONS
-// ==================================================================
-#[derive(Debug, Clone, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ApkPackageEntry {
     pub name: String,
     pub version: String,
@@ -1221,8 +1214,7 @@ impl DragonFlyHammer2FsSnapshot {
     }
 }
 
-// ================= Arch Wiki Style Offline Knowledge Base Engine ==========
-#[derive(Debug, Clone)]
+// ================= Arch Wiki Style Offline Knowledge Base Engine ===#[derive(Debug, Clone)]
 pub struct ArchWikiArticle {
     pub title: String,
     pub category: String,
@@ -1372,8 +1364,7 @@ impl Default for NixOsDeclarativeConfigEngine {
 
 
 // 4. ANTIX LINUX LIGHTWEIGHT SYSVINIT & LOW-RAM GOVERNOR
-// ==================================================================
-pub struct AntiXLowRamSysVInitGovernor {
+// ===========================================================pub struct AntiXLowRamSysVInitGovernor {
     pub max_ram_mb: u32,
     pub disable_compositing: bool,
     pub init_style_sequential: bool,
@@ -1419,8 +1410,7 @@ impl AntiXLowRamSysVInitGovernor {
 }
 
 // ==================================================================// 5. ZORIN OS WINDOWS COMPATIBILITY & APP DB REGISTRY
-// ==================================================================
-#[derive(Debug, Clone, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ZorinAppMapping {
     pub exe_name: &'static str,
     pub compatibility_layer: &'static str,
@@ -1461,8 +1451,7 @@ impl ZorinWinAppDbRegistry {
 }
 
 // ==================================================================// 6. HAIKU OS DYNAMIC MEDIA TRANSLATOR ENGINE
-// ==================================================================
-#[derive(Debug, Clone, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HaikuMediaTranslator {
     pub name: &'static str,
     pub input_mime: &'static str,
@@ -1514,8 +1503,7 @@ impl HaikuTranslatorEngine {
 }
 
 // ==================================================================// 7. SERENITYOS ASYNC IPC EVENT LOOP (LIBCORE INSPIRED)
-// ==================================================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SerenityIpcEvent {
     pub client_id: u32,
     pub event_type: u16,
@@ -1755,8 +1743,7 @@ impl GamifiedProductivityLayer {
 }
 
 // ==================================================================// 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
-// ==================================================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxLtsVersion {
     Lts5_15, // Long-Term Support 5.15
     Lts6_1,  // Long-Term Support 6.1
@@ -1845,8 +1832,7 @@ mod linux_lts_upstream_tests {
 }
 
 // ==================================================================// 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
-// ==================================================================
-
+// ===========================================================
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
     pub disabled_flags: Vec<String>,
@@ -1997,8 +1983,7 @@ impl AurDependencySolver {
 }
 
 // ==================================================================// 40. TAILS-INSPIRED AMNESIC SECURITY & VOLATILE RAM SCRUBBING
-// ==================================================================
-pub struct SovereignAmnesicEngine {
+// ===========================================================pub struct SovereignAmnesicEngine {
     pub is_amnesic_mode: bool,
     pub mac_spoofed: bool,
     pub spoofed_mac: [u8; 6],
@@ -2033,8 +2018,7 @@ impl SovereignAmnesicEngine {
 }
 
 // ==================================================================// 42. CLEAR LINUX-INSPIRED STATELESS ARCHITECTURE & ISA AUTO-DETECTION
-// ==================================================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum X86IsaLevel {
     V1Baseline, // Baseline x86-64
     V2Nehalem,  // SSE4.2, Popcnt
@@ -2078,8 +2062,7 @@ impl SovereignStatelessArchitectureEngine {
 }
 
 // ==================================================================// 43. NIXOS-INSPIRED CAS GARBAGE COLLECTION & GENERATION PRUNING
-// ==================================================================
-pub struct NixGcNode {
+// ===========================================================pub struct NixGcNode {
     pub path: String,
     pub is_gc_root: bool,
 }
@@ -2114,8 +2097,7 @@ impl SovereignNixGcEngine {
 }
 
 // ==================================================================// 44. POP!_OS COSMIC-INSPIRED DYNAMIC BSP TILING & GPU ROUTING
-// ==================================================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuRenderPreference {
     Integrated,
     DiscreteNvidia,
@@ -2159,8 +2141,7 @@ impl SovereignCosmicTilingEngine {
 }
 
 // ==================================================================// 41. VOID LINUX-INSPIRED RUNIT 3-STAGE SERVICE SUPERVISOR
-// ==================================================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ===========================================================#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitStage {
     OneOneTimeInit, // Stage 1: Initial boot mounts and initialization
     TwoRunsvDir,     // Stage 2: Main supervision loop (runsvdir)
@@ -2243,8 +2224,7 @@ impl SovereignRunitSupervisor {
 }
 
 // ==================================================================// 39. ADDITIONAL LINUX & BSD DISTRO PARITY INSPIRATIONS
-// ==================================================================
-pub struct AlpineApkPackageIndexV2 {
+// ===========================================================pub struct AlpineApkPackageIndexV2 {
     pub package_entries: Vec<(String, String, u64)>, // (name, sha256_checksum, size_bytes)
 }
 
