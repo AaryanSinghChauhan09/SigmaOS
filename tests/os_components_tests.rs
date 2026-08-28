@@ -17,12 +17,8 @@ mod audio_editor;
 mod video_editor;
 #[path = "../src/compatibility/chimera_linux.rs"]
 mod chimera_linux;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
@@ -63,8 +59,6 @@ mod community_toolkit;
 mod system_user;
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 #[path = "../src/memory/segmentation_paging.rs"]
 mod segmentation_paging;
 pub enum CpuPrivilegeMode {
@@ -143,8 +137,6 @@ mod epoll;
 mod elf_relocation;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 
 use community_toolkit::{
     CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
@@ -177,11 +169,7 @@ use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
 use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
 use fedora_compat::DnfPackageResolver;
 use geom::{BioRequest, GeomProvider, GeomTopology};
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
 use pipes::Pipe;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 use sigmatools::*;
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
@@ -192,7 +180,6 @@ use process_activity_manager::{
 };
 
 use unveil::{UnveilManager, UnveilPermission};
-use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
 use segmentation_paging::{
     AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
     SegmentDescriptor, SegmentSelector,

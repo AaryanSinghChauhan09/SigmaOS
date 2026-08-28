@@ -103,6 +103,147 @@ pub enum Permission {
     Ipc = 5,
 }
 
+/// Linux POSIX capability definitions (`capabilities(7)`)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u64)]
+pub enum LinuxCapability {
+    Chown = 0,
+    DacOverride = 1,
+    DacReadSearch = 2,
+    FOwner = 3,
+    FSetId = 4,
+    Kill = 5,
+    SetGid = 6,
+    SetUid = 7,
+    SetPcap = 8,
+    LinuxImmutable = 9,
+    NetBindService = 10,
+    NetBroadcast = 11,
+    NetAdmin = 12,
+    NetRaw = 13,
+    IpcLock = 14,
+    IpcOwner = 15,
+    SysModule = 16,
+    SysRawIo = 17,
+    SysChroot = 18,
+    SysPtrace = 19,
+    SysPacct = 20,
+    SysAdmin = 21,
+    SysBoot = 22,
+    SysNice = 23,
+    SysResource = 24,
+    SysTime = 25,
+    SysTtyConfig = 26,
+    Mknod = 27,
+    Lease = 28,
+    AuditWrite = 29,
+    AuditControl = 30,
+    SetFCap = 31,
+    MacOverride = 32,
+    MacAdmin = 33,
+    Syslog = 34,
+    WakeAlarm = 35,
+    BlockSuspend = 36,
+    AuditRead = 37,
+    PerfMon = 38,
+    Bpf = 39,
+    CheckpointRestore = 40,
+}
+
+/// Linux process capability set managing effective, permitted, inheritable, bounding, and ambient sets
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LinuxCapabilitySet {
+    pub effective: u64,
+    pub permitted: u64,
+    pub inheritable: u64,
+    pub bounding: u64,
+    pub ambient: u64,
+}
+
+impl LinuxCapabilitySet {
+    /// Create full capabilities set (e.g. root UID 0 initial state)
+    pub fn full() -> Self {
+        Self {
+            effective: u64::MAX,
+            permitted: u64::MAX,
+            inheritable: 0,
+            bounding: u64::MAX,
+            ambient: 0,
+        }
+    }
+
+    /// Create empty unprivileged capability set
+    pub fn empty() -> Self {
+        Self {
+            effective: 0,
+            permitted: 0,
+            inheritable: 0,
+            bounding: u64::MAX, // Bounding set defaults to all allowed unless dropped
+            ambient: 0,
+        }
+    }
+
+    /// Check if effective set has specific Linux capability
+    pub fn has_cap(&self, cap: LinuxCapability) -> bool {
+        let bit = 1u64 << (cap as u64);
+        (self.effective & bit) != 0
+    }
+
+    /// Raise effective capability (must be in permitted set)
+    pub fn raise_effective(&mut self, cap: LinuxCapability) -> Result<(), &'static str> {
+        let bit = 1u64 << (cap as u64);
+        if (self.permitted & bit) == 0 {
+            return Err("Capability not in permitted set");
+        }
+        self.effective |= bit;
+        Ok(())
+    }
+
+    /// Lower/drop effective capability
+    pub fn drop_effective(&mut self, cap: LinuxCapability) {
+        let bit = 1u64 << (cap as u64);
+        self.effective &= !bit;
+    }
+
+    /// Drop capability from bounding set (irreversible per `prctl(PR_CAP_BOUNDING_DROP)`)
+    pub fn drop_bounding(&mut self, cap: LinuxCapability) {
+        let bit = 1u64 << (cap as u64);
+        self.bounding &= !bit;
+        // Also trim permitted, effective, ambient if exceeding bounding set
+        self.permitted &= self.bounding;
+        self.effective &= self.bounding;
+        self.ambient &= self.bounding;
+    }
+
+    /// Raise capability in ambient set (must be in both permitted and inheritable sets, and bounding set)
+    pub fn raise_ambient(&mut self, cap: LinuxCapability) -> Result<(), &'static str> {
+        let bit = 1u64 << (cap as u64);
+        if (self.permitted & bit) == 0 || (self.inheritable & bit) == 0 || (self.bounding & bit) == 0 {
+            return Err("Ambient capability must be in permitted, inheritable, and bounding sets");
+        }
+        self.ambient |= bit;
+        Ok(())
+    }
+
+    /// Clear ambient capability set
+    pub fn clear_ambient(&mut self) {
+        self.ambient = 0;
+    }
+
+    /// Perform execve capability transition (Linux capability transformation rules)
+    pub fn execve_transform(&mut self, is_suid_execution: bool) {
+        if is_suid_execution {
+            self.ambient = 0;
+            self.permitted = self.bounding;
+            self.effective = self.permitted;
+        } else {
+            self.permitted = (self.inheritable & self.inheritable) | self.ambient;
+            self.permitted &= self.bounding;
+            self.effective = self.permitted;
+        }
+    }
+}
+
 /// Capability gate for syscall validation
 pub struct CapabilityGate {
     /// Current capability token
@@ -189,5 +330,30 @@ mod tests {
         // Extracts port stored in bits 16-31
         let port = (token.bits() >> 16) & 0xFFFF;
         assert_eq!(port, 443);
+    }
+
+    #[test]
+    fn test_linux_capabilities_parity() {
+        let mut caps = LinuxCapabilitySet::full();
+        assert!(caps.has_cap(LinuxCapability::SysAdmin));
+        assert!(caps.has_cap(LinuxCapability::NetAdmin));
+
+        // Drop CAP_SYS_ADMIN from bounding set
+        caps.drop_bounding(LinuxCapability::SysAdmin);
+        assert!(!caps.has_cap(LinuxCapability::SysAdmin));
+
+        // Trying to raise CAP_SYS_ADMIN effective when not permitted fails
+        assert!(caps.raise_effective(LinuxCapability::SysAdmin).is_err());
+
+        // Ambient capability requirements test
+        let mut user_caps = LinuxCapabilitySet::empty();
+        assert!(user_caps.raise_ambient(LinuxCapability::NetBindService).is_err());
+
+        user_caps.permitted |= 1 << (LinuxCapability::NetBindService as u64);
+        user_caps.inheritable |= 1 << (LinuxCapability::NetBindService as u64);
+        assert!(user_caps.raise_ambient(LinuxCapability::NetBindService).is_ok());
+
+        user_caps.clear_ambient();
+        assert_eq!(user_caps.ambient, 0);
     }
 }
