@@ -17,9 +17,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // XFS - Linux-style high-performance journaling filesystem
-// Supports allocation groups, extent-based allocation, and journaling
-
-// (no_std only applicable at crate root - removed)
+// Supports allocation groups, extent-based allocation, realtime subsystem, and journaling
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
@@ -40,6 +38,7 @@ pub enum AllocationStrategy {
     BestFit,
     Near,
     Exact,
+    Realtime,
 }
 
 #[derive(Debug, Clone)]
@@ -49,6 +48,53 @@ pub struct XfsAllocationGroup {
     pub block_count: u64,
     pub free_blocks: u64,
     pub used_blocks: u64,
+}
+
+/// XFS Realtime Subsystem for zero-latency direct I/O allocations
+#[derive(Debug, Clone)]
+pub struct XfsRealtimeSubsystem {
+    pub extent_size_blocks: u32,
+    pub total_extents: u64,
+    pub free_extents: u64,
+    pub bitmap: Vec<bool>,
+}
+
+impl XfsRealtimeSubsystem {
+    pub fn new(extent_size_blocks: u32, total_extents: u64) -> Self {
+        Self {
+            extent_size_blocks,
+            total_extents,
+            free_extents: total_extents,
+            bitmap: alloc::vec![true; total_extents as usize],
+        }
+    }
+
+    pub fn allocate_extent(&mut self) -> Result<u64, &'static str> {
+        if self.free_extents == 0 {
+            return Err("Realtime space exhausted");
+        }
+        for (idx, &is_free) in self.bitmap.iter().enumerate() {
+            if is_free {
+                self.bitmap[idx] = false;
+                self.free_extents -= 1;
+                return Ok(idx as u64);
+            }
+        }
+        Err("No free extent found in bitmap")
+    }
+
+    pub fn free_extent(&mut self, extent_idx: u64) -> Result<(), &'static str> {
+        let idx = extent_idx as usize;
+        if idx >= self.bitmap.len() {
+            return Err("Invalid realtime extent index");
+        }
+        if self.bitmap[idx] {
+            return Err("Realtime extent is already free");
+        }
+        self.bitmap[idx] = true;
+        self.free_extents += 1;
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -61,6 +107,7 @@ pub struct XfsInode {
     pub ctime: u64,
     pub mode: u32,
     pub nlink: u32,
+    pub is_realtime: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -83,6 +130,7 @@ pub struct XfsFilesystem {
     allocation_groups: BTreeMap<u32, XfsAllocationGroup>,
     inodes: BTreeMap<u64, XfsInode>,
     extents: BTreeMap<u64, Vec<XfsExtent>>,
+    realtime: Option<XfsRealtimeSubsystem>,
     journal: Option<XfsJournal>,
     state: XfsState,
     block_size: u32,
@@ -110,12 +158,17 @@ impl XfsFilesystem {
             allocation_groups,
             inodes: BTreeMap::new(),
             extents: BTreeMap::new(),
+            realtime: None,
             journal: None,
             state: XfsState::Clean,
             block_size,
             total_blocks,
             next_inode_id: 1,
         }
+    }
+
+    pub fn enable_realtime(&mut self, extent_size_blocks: u32, total_extents: u64) {
+        self.realtime = Some(XfsRealtimeSubsystem::new(extent_size_blocks, total_extents));
     }
 
     /// Create a new inode
@@ -132,6 +185,7 @@ impl XfsFilesystem {
             ctime: 0,
             mode,
             nlink: 1,
+            is_realtime: false,
         };
 
         self.inodes.insert(id, inode);
@@ -145,10 +199,29 @@ impl XfsFilesystem {
         &mut self,
         inode_id: u64,
         block_count: u64,
-        _strategy: AllocationStrategy,
+        strategy: AllocationStrategy,
     ) -> Result<Vec<XfsExtent>, &'static str> {
         if !self.inodes.contains_key(&inode_id) {
             return Err("Inode not found");
+        }
+
+        if strategy == AllocationStrategy::Realtime {
+            let rt = self.realtime.as_mut().ok_or("Realtime subsystem not enabled")?;
+            let ext_idx = rt.allocate_extent()?;
+            let start_block = ext_idx * rt.extent_size_blocks as u64;
+            let extent = XfsExtent {
+                start_block,
+                block_count: rt.extent_size_blocks as u64,
+                offset: 0,
+            };
+            if let Some(inode) = self.inodes.get_mut(&inode_id) {
+                inode.blocks += rt.extent_size_blocks as u64;
+                inode.is_realtime = true;
+            }
+            let vec = alloc::vec![extent];
+            self.extents.insert(inode_id, vec.clone());
+            self.state = XfsState::Dirty;
+            return Ok(vec);
         }
 
         let mut allocated_extents = Vec::new();
@@ -220,7 +293,14 @@ impl XfsFilesystem {
         // Free blocks
         if let Some(extents) = self.extents.remove(&id) {
             for extent in extents {
-                self.free_blocks(extent.start_block, extent.block_count)?;
+                if inode.is_realtime {
+                    if let Some(ref mut rt) = self.realtime {
+                        let ext_idx = extent.start_block / rt.extent_size_blocks as u64;
+                        let _ = rt.free_extent(ext_idx);
+                    }
+                } else {
+                    self.free_blocks(extent.start_block, extent.block_count)?;
+                }
             }
         }
 
@@ -341,6 +421,21 @@ mod tests {
 
         assert_eq!(extents.len(), 1);
         assert_eq!(extents[0].block_count, 8);
+    }
+
+    #[test]
+    fn test_xfs_realtime_allocations() {
+        let mut fs = XfsFilesystem::new(1024 * 1024, 4096, 4);
+        fs.enable_realtime(64, 16);
+
+        let id = fs.create_inode(262144, 0o644).unwrap();
+        let extents = fs.allocate_blocks(id, 64, AllocationStrategy::Realtime).unwrap();
+        assert_eq!(extents.len(), 1);
+        assert_eq!(extents[0].block_count, 64);
+        assert!(fs.get_inode(id).unwrap().is_realtime);
+
+        fs.delete_inode(id).unwrap();
+        assert_eq!(fs.inode_count(), 0);
     }
 
     #[test]
