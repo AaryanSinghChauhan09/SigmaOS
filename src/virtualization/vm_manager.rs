@@ -212,6 +212,7 @@ pub enum KvmExitReason {
     MmioWrite { addr: u64, len: u8, data: u64 },
     Hlt,
     Shutdown,
+    Interrupt,
     InternalError,
 }
 

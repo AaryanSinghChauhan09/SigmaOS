@@ -75,7 +75,7 @@ impl GentooPortageMaskEngine {
             category_pkg: category_pkg.to_string(),
             version: version.to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_ebuild_masked: is_masked,
+            is_masked,
         });
     }
 

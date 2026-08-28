@@ -900,6 +900,7 @@ mod tests {
         }
 
         // 3. Setup and verify alias resolution
+        shell.env.set(b"USER", b"sovereign");
         shell.set_alias(b"reveal", b"spy");
         shell.execute_line(b"reveal $USER").unwrap();
 
