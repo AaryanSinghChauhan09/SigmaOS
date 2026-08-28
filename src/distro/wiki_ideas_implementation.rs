@@ -428,6 +428,9 @@ pub enum SystemdUnitActiveState {
     Deactivating,
 }
 
+pub type SystemdUnitState = SystemdUnitActiveState;
+pub type JournalLogEntry = String;
+
 #[derive(Debug, Clone)]
 pub struct SystemdUnit {
     pub name: String,
@@ -438,6 +441,17 @@ pub struct SystemdUnit {
     pub dependencies: Vec<String>,
     pub memory_limit_bytes: Option<u64>,
     pub cpu_quota_pct: Option<u32>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignSystemdUnit {
+    pub name: String,
+    pub unit_type: SystemdUnitType,
+    pub active_state: SystemdUnitActiveState,
+    pub dependencies: Vec<String>,
+    pub memory_limit_mb: Option<u64>,
+    pub cpu_weight: u32,
+    pub is_sandboxed: bool,
 }
 
 pub struct SovereignSystemdParityEngine {
@@ -461,7 +475,7 @@ impl SovereignSystemdParityEngine {
             SovereignSystemdUnit {
                 name: name.to_string(),
                 unit_type,
-                state: SystemdUnitState::Inactive,
+                active_state: SystemdUnitActiveState::Inactive,
                 dependencies: deps_vec,
                 memory_limit_mb: None,
                 cpu_weight: 100,
@@ -482,6 +496,14 @@ impl SovereignSystemdParityEngine {
         unit.active_state = SystemdUnitActiveState::Inactive;
         self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
         Ok(SystemdUnitActiveState::Inactive)
+    }
+
+    pub fn query_journal(&self, unit_name: &str) -> Vec<JournalLogEntry> {
+        self.journal_logs
+            .iter()
+            .filter(|log| log.contains(unit_name))
+            .cloned()
+            .collect()
     }
 }
 
@@ -508,6 +530,24 @@ pub struct RealtimeTask {
     pub wcet_us: u64, // Worst-Case Execution Time
     pub numa_node: u32,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
+    Performance,
+    Powersave,
+    Schedutil,
+    Ondemand,
+    Conservative,
+}
+
+#[derive(Debug, Clone)]
+pub struct NumaNodeAffinity {
+    pub node_id: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: usize,
+}
+
+pub type RtlaneRealtimeTask = RealtimeTask;
 
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
@@ -536,7 +576,12 @@ impl SovereignHybridSchedulerInnovations {
             numa_nodes: nodes,
             rt_tasks: BTreeMap::new(),
             preemption_count: 0,
+            rt_lane_latency_us: 4,
         }
+    }
+
+    pub fn set_governor(&mut self, gov: DvfsPowerGovernor) {
+        self.current_governor = gov;
     }
 
     /// Evaluates real-time preemption gate timing.
@@ -657,7 +702,7 @@ mod tests {
         engine.register_unit("httpd.service", SystemdUnitType::Service, &["network.target"]);
         assert_eq!(engine.units.len(), 1);
 
-        assert_eq!(engine.start_unit("httpd.service"), Ok(()));
+        assert_eq!(engine.start_unit("httpd.service"), Ok(SystemdUnitActiveState::Active));
         assert_eq!(engine.query_journal("httpd.service").len(), 1);
     }
 

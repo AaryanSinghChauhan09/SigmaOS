@@ -554,7 +554,7 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")]),
+            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")]).to_vec(),
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
@@ -571,7 +571,7 @@ mod tests {
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),
-            ]),
+            ]).to_vec(),
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }

@@ -162,7 +162,7 @@ mod tests {
             "test-package".to_string(),
             Version::new(1, 0, 0),
             "Test package".to_string(),
-            Vec::new(),
+            Vec::new().to_vec(),
             "checksum".to_string(),
         );
         log.add_install(&package);
