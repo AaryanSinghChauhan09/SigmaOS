@@ -73,16 +73,23 @@ impl PipeFlags {
 }
 
 /// Represents a high-performance structured sovereign pipe (defeating legacy Linux pipes)
+pub const POSIX_PIPE_BUF_SIZE: usize = 4096; // POSIX guaranteed atomic pipe write size
+
 pub struct SovereignPipe {
     pub id: u64,
     pub reader_pid: u64,
     pub writer_pid: u64,
     pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
+    pub byte_stream: Vec<u8>,       // POSIX/BSD byte stream buffer
     pub max_capacity: usize,
     pub bytes_transferred: u64,
     pub flags: PipeFlags,
     pub read_low_watermark: usize,  // BSD SO_RCVLOWAT equivalent
     pub write_low_watermark: usize, // BSD SO_SNDLOWAT equivalent
+    pub reader_count: usize,        // OpenBSD/FreeBSD reference counting for readers
+    pub writer_count: usize,        // OpenBSD/FreeBSD reference counting for writers
+    pub broken_pipe: bool,          // EPIPE flag when no readers remain
+    pub fifo_path: Option<String>,   // POSIX / BSD mkfifo(2) named pipe path
 }
 
 impl SovereignPipe {
@@ -92,11 +99,42 @@ impl SovereignPipe {
             reader_pid,
             writer_pid,
             ring_buffer: Vec::new(),
+            byte_stream: Vec::new(),
             max_capacity: capacity,
             bytes_transferred: 0,
             flags: PipeFlags::default(),
             read_low_watermark: 1,
             write_low_watermark: 1,
+            reader_count: 1,
+            writer_count: 1,
+            broken_pipe: false,
+            fifo_path: None,
+        }
+    }
+
+    /// Creates a POSIX/BSD named pipe (mkfifo(2) parity)
+    pub fn new_fifo(id: u64, fifo_path: &str, capacity: usize) -> Self {
+        let mut pipe = Self::new(id, 0, 0, capacity);
+        pipe.fifo_path = Some(fifo_path.to_string());
+        pipe.reader_count = 0;
+        pipe.writer_count = 0;
+        pipe
+    }
+
+    /// Closes a reader handle and detects broken pipe / EOF condition
+    pub fn close_reader(&mut self) {
+        if self.reader_count > 0 {
+            self.reader_count -= 1;
+        }
+        if self.reader_count == 0 {
+            self.broken_pipe = true;
+        }
+    }
+
+    /// Closes a writer handle
+    pub fn close_writer(&mut self) {
+        if self.writer_count > 0 {
+            self.writer_count -= 1;
         }
     }
 
@@ -114,14 +152,41 @@ impl SovereignPipe {
         self.max_capacity
     }
 
-    /// Structured write operation with dynamic backpressure (returns Err if capacity reached)
+    /// Structured write operation with dynamic backpressure and EPIPE broken pipe detection
     pub fn write_structure(&mut self, payload: Vec<u8>) -> Result<(), IpcError> {
+        if self.broken_pipe || self.reader_count == 0 {
+            return Err(IpcError::BrokenPipe);
+        }
         if self.ring_buffer.len() >= self.max_capacity {
             return Err(IpcError::ChannelFull);
         }
         self.bytes_transferred += payload.len() as u64;
         self.ring_buffer.push(payload);
         Ok(())
+    }
+
+    /// Writes raw byte stream into pipe with POSIX PIPE_BUF atomic guarantees
+    pub fn write_bytes(&mut self, data: &[u8]) -> Result<usize, IpcError> {
+        if self.broken_pipe || self.reader_count == 0 {
+            return Err(IpcError::BrokenPipe);
+        }
+        if data.len() <= POSIX_PIPE_BUF_SIZE && (self.byte_stream.len() + data.len()) > (self.max_capacity * 4096) {
+            return Err(IpcError::ChannelFull); // POSIX PIPE_BUF guarantees atomic write if space available
+        }
+        self.byte_stream.extend_from_slice(data);
+        self.bytes_transferred += data.len() as u64;
+        Ok(data.len())
+    }
+
+    /// Reads raw byte stream from pipe (returns number of bytes read into buffer)
+    pub fn read_bytes(&mut self, buf: &mut [u8]) -> usize {
+        let to_read = std::cmp::min(buf.len(), self.byte_stream.len());
+        if to_read == 0 {
+            return 0;
+        }
+        buf[..to_read].copy_from_slice(&self.byte_stream[..to_read]);
+        self.byte_stream.drain(0..to_read);
+        to_read
     }
 
     /// Structured read operation (returns None if pipe is empty)
@@ -446,6 +511,7 @@ pub enum IpcError {
     ChannelFull,
     PermissionDenied,
     InvalidMessage,
+    BrokenPipe, // Linux EPIPE / SIGPIPE parity
 }
 
 #[cfg(test)]
@@ -620,5 +686,30 @@ mod tests {
         assert_eq!(pipe.set_pipe_capacity(16).unwrap(), 16);
         assert!(pipe.is_writable());
         assert!(pipe.write_structure(vec![5]).is_ok());
+    }
+
+    #[test]
+    fn test_sovereign_pipe_epipe_and_fifo() {
+        // Test broken pipe (EPIPE) on reader close
+        let mut pipe = SovereignPipe::new(20, 101, 102, 10);
+        assert!(pipe.write_structure(vec![1, 2, 3]).is_ok());
+
+        pipe.close_reader();
+        assert!(pipe.broken_pipe);
+        assert_eq!(pipe.write_structure(vec![4, 5, 6]), Err(IpcError::BrokenPipe));
+
+        // Test POSIX/BSD byte stream read/write
+        let mut byte_pipe = SovereignPipe::new(21, 101, 102, 10);
+        let bytes_written = byte_pipe.write_bytes(b"Hello SigmaOS Pipe").unwrap();
+        assert_eq!(bytes_written, 18);
+
+        let mut read_buf = [0u8; 32];
+        let bytes_read = byte_pipe.read_bytes(&mut read_buf);
+        assert_eq!(bytes_read, 18);
+        assert_eq!(&read_buf[..18], b"Hello SigmaOS Pipe");
+
+        // Test POSIX named FIFO creation
+        let fifo = SovereignPipe::new_fifo(30, "/tmp/sigma_fifo", 16);
+        assert_eq!(fifo.fifo_path, Some("/tmp/sigma_fifo".to_string()));
     }
 }

@@ -100,9 +100,7 @@ impl TransactionLog {
         if let Some(idx) = self.current_transaction {
             // Mark all pending entries as completed
             for i in idx..self.entries.len() {
-                if let Some(entry) = self.entries.get_mut(i) {
-                    entry.state = TransactionState::Completed;
-                }
+                self.entries[i].state = TransactionState::Completed;
             }
             self.current_transaction = None;
             Ok(())
@@ -116,9 +114,7 @@ impl TransactionLog {
         if let Some(idx) = self.current_transaction {
             // Mark all entries as rolled back
             for i in idx..self.entries.len() {
-                if let Some(entry) = self.entries.get_mut(i) {
-                    entry.state = TransactionState::RolledBack;
-                }
+                self.entries[i].state = TransactionState::RolledBack;
             }
             self.current_transaction = None;
             Ok(())
@@ -162,7 +158,7 @@ mod tests {
             "test-package".to_string(),
             Version::new(1, 0, 0),
             "Test package".to_string(),
-            Vec::new().to_vec(),
+            alloc::vec::Vec::new(),
             "checksum".to_string(),
         );
         log.add_install(&package);

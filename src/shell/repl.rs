@@ -403,6 +403,24 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "touch" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Touch {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "mkdir" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Mkdir {
+                        dirname: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "theme" => {
                 if parts.len() >= 2 {
                     if parts[1] == "list" {
