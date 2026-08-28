@@ -31,9 +31,40 @@ pub struct ParsedPipelineCommand {
     pub run_in_background: bool,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BashFunction {
+    pub name: String,
+    pub body_lines: Vec<String>,
+    pub is_exported: bool,
+}
+
+impl BashFunction {
+    /// Interpolates positional parameters ($0, $1, $2, $@, $#) inside function body lines
+    pub fn interpolate(&self, args: &[&str]) -> Vec<String> {
+        let mut expanded = Vec::new();
+        let arg_count = args.len().to_string();
+        let all_args = args.join(" ");
+
+        for line in &self.body_lines {
+            let mut l = line.clone();
+            l = l.replace("$0", &self.name);
+            l = l.replace("$#", &arg_count);
+            l = l.replace("$@", &all_args);
+
+            for (idx, arg) in args.iter().enumerate() {
+                let param_var = format!("${}", idx + 1);
+                l = l.replace(&param_var, arg);
+            }
+            expanded.push(l);
+        }
+        expanded
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct SovereignBashZshParityShell {
     pub variables: BTreeMap<String, String>,
+    pub functions: BTreeMap<String, BashFunction>,
     pub history: Vec<String>,
     pub builtins: Vec<String>,
     pub prompt_format: String,
@@ -61,6 +92,7 @@ impl SovereignBashZshParityShell {
 
         Self {
             variables: vars,
+            functions: BTreeMap::new(),
             history: Vec::new(),
             builtins,
             prompt_format: String::from("\\u@\\h:\\w\\$ "),
@@ -220,6 +252,81 @@ impl SovereignBashZshParityShell {
         prompt
     }
 
+    /// Defines a GNU Bash / POSIX function
+    pub fn define_function(&mut self, name: &str, body_lines: &[&str]) {
+        let func = BashFunction {
+            name: name.to_string(),
+            body_lines: body_lines.iter().map(|s| s.to_string()).collect(),
+            is_exported: false,
+        };
+        self.functions.insert(name.to_string(), func);
+    }
+
+    /// Exports a Bash function (`export -f func_name`)
+    pub fn export_function(&mut self, name: &str) -> bool {
+        if let Some(func) = self.functions.get_mut(name) {
+            func.is_exported = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Unsets a Bash function (`unset -f func_name`)
+    pub fn unset_function(&mut self, name: &str) -> bool {
+        self.functions.remove(name).is_some()
+    }
+
+    /// Returns formatting of functions (`declare -f`)
+    pub fn list_functions(&self) -> Vec<String> {
+        let mut list = Vec::new();
+        for (name, func) in &self.functions {
+            let header = if func.is_exported {
+                format!("export -f {}; {}\n{{", name, name)
+            } else {
+                format!("{} () \n{{", name)
+            };
+            let mut body = vec![header];
+            for line in &func.body_lines {
+                body.push(format!("    {}", line));
+            }
+            body.push("}".to_string());
+            list.push(body.join("\n"));
+        }
+        list
+    }
+
+    /// Invokes a defined Bash function with positional arguments
+    pub fn invoke_function(&self, name: &str, args: &[&str]) -> Option<Vec<String>> {
+        self.functions.get(name).map(|func| {
+            let interpolated = func.interpolate(args);
+            interpolated.iter().map(|l| self.expand_variables(l)).collect()
+        })
+    }
+
+    /// Parses function definitions from shell script input (e.g. `foo() { echo $1; }` or `function foo { echo $1; }`)
+    pub fn parse_and_define_function_script(&mut self, script: &str) -> Option<String> {
+        let trimmed = script.trim();
+        let (name, body) = if trimmed.starts_with("function ") {
+            let rest = &trimmed[9..].trim_start();
+            let brace_pos = rest.find('{')?;
+            let func_name = rest[..brace_pos].trim();
+            let body_part = rest[brace_pos + 1..].trim_end_matches('}').trim();
+            (func_name, body_part)
+        } else if let Some(paren_pos) = trimmed.find("()") {
+            let func_name = trimmed[..paren_pos].trim();
+            let brace_pos = trimmed.find('{')?;
+            let body_part = trimmed[brace_pos + 1..].trim_end_matches('}').trim();
+            (func_name, body_part)
+        } else {
+            return None;
+        };
+
+        let body_lines: Vec<&str> = body.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()).collect();
+        self.define_function(name, &body_lines);
+        Some(name.to_string())
+    }
+
     /// Tab completion engine for command builtins and paths
     pub fn tab_complete(&self, partial: &str) -> Vec<String> {
         let mut matches = Vec::new();
@@ -283,5 +390,49 @@ mod tests {
         let shell = SovereignBashZshParityShell::new();
         let completions = shell.tab_complete("hi");
         assert_eq!(completions, vec!["history"]);
+    }
+
+    #[test]
+    fn test_bash_function_definition_and_execution() {
+        let mut shell = SovereignBashZshParityShell::new();
+        shell.define_function("greet", &["echo Hello $1", "echo World $2"]);
+
+        let res = shell.invoke_function("greet", &["Alice", "Bob"]).unwrap();
+        assert_eq!(res.len(), 2);
+        assert_eq!(res[0], "echo Hello Alice");
+        assert_eq!(res[1], "echo World Bob");
+    }
+
+    #[test]
+    fn test_bash_function_positional_params() {
+        let mut shell = SovereignBashZshParityShell::new();
+        shell.define_function("info", &["echo $0 called with $# args: $@"]);
+
+        let res = shell.invoke_function("info", &["one", "two", "three"]).unwrap();
+        assert_eq!(res[0], "echo info called with 3 args: one two three");
+    }
+
+    #[test]
+    fn test_bash_function_export_and_list() {
+        let mut shell = SovereignBashZshParityShell::new();
+        shell.define_function("myfunc", &["echo 1"]);
+        shell.export_function("myfunc");
+
+        let listed = shell.list_functions();
+        assert_eq!(listed.len(), 1);
+        assert!(listed[0].contains("export -f myfunc; myfunc"));
+
+        assert!(shell.unset_function("myfunc"));
+        assert_eq!(shell.list_functions().len(), 0);
+    }
+
+    #[test]
+    fn test_bash_function_script_parsing() {
+        let mut shell = SovereignBashZshParityShell::new();
+        let parsed = shell.parse_and_define_function_script("function my_fn { echo $1; echo $2; }");
+        assert_eq!(parsed, Some("my_fn".to_string()));
+
+        let res = shell.invoke_function("my_fn", &["foo", "bar"]).unwrap();
+        assert_eq!(res, vec!["echo foo", "echo bar"]);
     }
 }
